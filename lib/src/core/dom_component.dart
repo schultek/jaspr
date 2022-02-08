@@ -1,12 +1,24 @@
 part of core;
 
+typedef EventCallback = void Function();
+
 class DomComponent implements Component {
-  DomComponent({required this.tag, this.id, this.onClick, this.child});
+  DomComponent(
+      {required this.tag,
+      this.id,
+      this.classes,
+      this.styles,
+      this.attributes,
+      this.events,
+      this.child});
 
   final String tag;
   final String? id;
+  final Iterable<String>? classes;
+  final Map<String, String>? styles;
+  final Map<String, String>? attributes;
+  final Map<String, EventCallback>? events;
   final Component? child;
-  final void Function()? onClick;
 
   @override
   Element createElement() {
@@ -48,12 +60,15 @@ class DomElement extends Element {
     b.open(
       _component.tag,
       id: _component.id,
-      events: {
-        if (_component.onClick != null)
-          'click': (e) {
-            _component.onClick!();
-          },
-      },
+      classes: _component.classes,
+      styles: _component.styles,
+      attributes: _component.attributes,
+      events: _component.events != null
+          ? {
+              for (var entry in _component.events!.entries)
+                entry.key: (e) => entry.value(),
+            }
+          : null,
       onCreate: (event) {
         view = event.view;
       },

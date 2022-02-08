@@ -3,9 +3,7 @@ import 'dart:html';
 import 'package:dart_web/src/web_app.dart';
 import 'package:domino/browser.dart' hide DomComponent;
 
-import '../../dart_web.dart';
-
-export '../../dart_web.dart';
+import 'core/core.dart';
 
 class BrowserWebApp extends WebApp {
   BrowserWebApp(this.view);

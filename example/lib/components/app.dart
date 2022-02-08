@@ -17,6 +17,7 @@ class AppState extends State<App, int> {
 
   @override
   FutureOr<int?> preloadData() {
+    // fetch some data, only executed on the server
     return DataService.instance!.getData();
   }
 

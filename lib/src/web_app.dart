@@ -1,1 +1,1 @@
-abstract class WebApp {}
+class WebApp {}

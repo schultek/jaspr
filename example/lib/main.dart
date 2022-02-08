@@ -1,12 +1,12 @@
 import 'package:dart_web/dart_web.dart';
-import 'package:domino_test/service.dart';
 
+import './service.dart';
 import 'components/app.dart';
 
 class ServerDataService implements DataService {
   @override
   Future<int> getData() async {
-    return 102;
+    return 500;
   }
 }
 
