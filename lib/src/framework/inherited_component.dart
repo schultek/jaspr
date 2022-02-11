@@ -1,4 +1,4 @@
-part of core;
+part of framework;
 
 abstract class InheritedComponent extends Component {
   const InheritedComponent({required this.child});
@@ -9,10 +9,10 @@ abstract class InheritedComponent extends Component {
   InheritedElement createElement() => InheritedElement(this);
 
   @protected
-  bool updateShouldNotify(covariant InheritedComponent oldWidget);
+  bool updateShouldNotify(covariant InheritedComponent oldComponent);
 }
 
-class InheritedElement extends ComponentElement {
+class InheritedElement extends SingleChildElement {
   InheritedElement(InheritedComponent component) : super(component);
 
   @override
@@ -22,11 +22,10 @@ class InheritedElement extends ComponentElement {
 
   @override
   void _updateInheritance() {
-    final Map<Type, InheritedElement>? incomingElements =
-        _parent?._inheritedElements;
+    assert(_lifecycleState == _ElementLifecycle.active);
+    final Map<Type, InheritedElement>? incomingElements = _parent?._inheritedElements;
     if (incomingElements != null) {
-      _inheritedElements =
-          HashMap<Type, InheritedElement>.from(incomingElements);
+      _inheritedElements = HashMap<Type, InheritedElement>.from(incomingElements);
     } else {
       _inheritedElements = HashMap<Type, InheritedElement>();
     }
@@ -53,6 +52,8 @@ class InheritedElement extends ComponentElement {
     var oldComponent = component;
     super.update(newComponent);
     updated(oldComponent);
+    _dirty = true;
+    root.performRebuildOn(this);
   }
 
   @protected
@@ -65,10 +66,5 @@ class InheritedElement extends ComponentElement {
   }
 
   @override
-  void markNeedsBuild() {
-    _parent?.markNeedsBuild();
-  }
-
-  @override
-  Iterable<Component> build(BuildContext context) => [component.child];
+  Component? build() => component.child;
 }

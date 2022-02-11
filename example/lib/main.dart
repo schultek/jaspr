@@ -11,9 +11,11 @@ class ServerDataService implements DataService {
 }
 
 void main() {
-  // create a service instance
-  DataService.instance = ServerDataService();
+  runApp(() {
+    // create a service instance
+    DataService.instance = ServerDataService();
 
-  // provide an entry component and an id to attach it to
-  runApp(App(), id: 'app');
+    // provide an entry component and an id to attach it to
+    return App();
+  }, id: 'app');
 }

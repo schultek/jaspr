@@ -1,28 +1,50 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:html';
 
-import 'package:dart_web/src/web_app.dart';
 import 'package:domino/browser.dart' hide DomComponent;
 
-import 'core/core.dart';
+import 'framework/framework.dart';
 
-class BrowserWebApp extends WebApp {
-  BrowserWebApp(this.view);
-
-  final DomView view;
+void runApp(Component Function() setup, {required String id}) {
+  BrowserAppBinding.ensureInitialized().attachRootComponent(setup(), to: id);
 }
 
-Future<BrowserWebApp> runApp(Component app, {required String id}) async {
-  var root = StateStore(child: DomComponent(tag: 'div', id: id, child: app));
+class BrowserAppBinding extends AppBinding {
+  static AppBinding ensureInitialized() {
+    if (AppBinding.instance == null) {
+      BrowserAppBinding();
+    }
+    return AppBinding.instance!;
+  }
 
-  root.parse(document.body!.attributes['data-app'] ?? '{}');
-  document.body!.attributes.remove('data-app');
+  @override
+  Map<String, dynamic> loadStateData() {
+    var body = document.body!;
+    return jsonDecode(body.attributes.remove('data-app') ?? '{}');
+  }
 
-  var rootElement = root.createElement();
+  @override
+  void attachRootElement(BuildScheduler element, {required String to}) async {
+    await firstBuild;
+    element.view = registerView(
+      root: document.getElementById(to)!,
+      builderFn: element.render,
+    );
+  }
 
-  await rootElement.mount(null);
-  await rootElement.rebuild();
+  @override
+  Uri get currentUri => Uri.parse(window.location.toString());
 
-  var view = registerView(root: document.body!, builderFn: rootElement.render);
-
-  return BrowserWebApp(view);
+  @override
+  FutureOr<void> performRebuild(Element? child) {
+    if (child is StatefulElement && child.state is DeferRenderMixin && isFirstBuild) {
+      return Future.sync(() async {
+        await (child.state as DeferRenderMixin).defer;
+        return super.performRebuild(child);
+      });
+    } else {
+      return super.performRebuild(child);
+    }
+  }
 }

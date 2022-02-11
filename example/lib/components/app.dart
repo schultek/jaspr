@@ -1,43 +1,28 @@
-import 'dart:async';
-
 import 'package:dart_web/dart_web.dart';
 
-import '../service.dart';
+import 'about.dart' deferred as about;
 import 'button.dart';
+import 'home.dart' deferred as home;
 
-class App extends StatefulComponent {
-  App() : super(key: 'app');
-
-  @override
-  State<StatefulComponent, dynamic> createState() => AppState();
-}
-
-class AppState extends State<App, int> {
-  int counter = 0;
-
-  @override
-  FutureOr<int?> preloadData() {
-    // fetch some data, only executed on the server
-    return DataService.instance!.getData();
-  }
-
-  @override
-  void initState(int? data) {
-    super.initState(data);
-
-    counter = data ?? 0;
-  }
-
+class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield Button(
-      label: 'Click Me',
-      onPressed: () => setState(() => counter++),
-    );
-
-    yield DomComponent(
-      tag: 'span',
-      child: Text('Counter: $counter'),
+    yield Router(
+      routes: [
+        Route.lazy('/about', about.loadLibrary, (context) => about.About()),
+        Route.lazy('/', home.loadLibrary, (context) => home.Home()),
+      ],
+      onUnknownRoute: (String path, BuildContext context) {
+        return DomComponent(
+          tag: 'span',
+          child: Button(
+            label: 'UNKNOWN PAGE',
+            onPressed: () {
+              Router.of(context).back();
+            },
+          ),
+        );
+      },
     );
   }
 }

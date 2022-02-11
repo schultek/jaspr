@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 
 void main(List<String> args) async {
-  var runner = CommandRunner<int>("dart_web",
-      "An experimental web framework for dart apps, supporting SPA and SSR.")
+  var runner = CommandRunner<int>("dart_web", "An experimental web framework for dart apps, supporting SPA and SSR.")
     ..addCommand(ServeCommand())
     ..addCommand(BuildCommand());
 
@@ -29,8 +28,7 @@ class ServeCommand extends Command<int> {
   }
 
   @override
-  String get description =>
-      'Runs a development server that serves the web app with SSR and '
+  String get description => 'Runs a development server that serves the web app with SSR and '
       'reloads based on file system updates.';
 
   @override
@@ -48,7 +46,7 @@ class ServeCommand extends Command<int> {
 
     var process = await Process.start(
       'dart',
-      ['run', '--enable-vm-service', argResults!['input']],
+      ['run', '--enable-vm-service', '--enable-asserts', argResults!['input']],
       environment: {
         'DART_WEB_MODE': 'DEBUG',
         'DART_WEB_PROXY_PORT': '5467',
@@ -84,8 +82,7 @@ class BuildCommand extends Command<int> {
   }
 
   @override
-  String get description =>
-      'Performs a single build on the specified target and then exits.';
+  String get description => 'Performs a single build on the specified target and then exits.';
 
   @override
   String get name => 'build';
@@ -108,13 +105,7 @@ class BuildCommand extends Command<int> {
 
     var process = await Process.start(
       'dart',
-      [
-        'compile',
-        argResults!['target'],
-        argResults!['input'],
-        '-o',
-        './build/app'
-      ],
+      ['compile', argResults!['target'], argResults!['input'], '-o', './build/app'],
     );
 
     process.stderr.listen((event) => stderr.add(event));
