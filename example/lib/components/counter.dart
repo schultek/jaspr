@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:dart_web/dart_web.dart';
 
-import '../service.dart';
+import '../services/service.dart';
 import 'button.dart';
 
 class Counter extends StatefulComponent {
@@ -12,7 +12,7 @@ class Counter extends StatefulComponent {
   State<StatefulComponent> createState() => CounterState();
 }
 
-class CounterState extends State<Counter> with PreloadStateMixin<Counter, int>, PersistStateMixin<Counter, int> {
+class CounterState extends State<Counter> with PreloadStateMixin<Counter, int> {
   int counter = 0;
 
   @override
@@ -24,7 +24,6 @@ class CounterState extends State<Counter> with PreloadStateMixin<Counter, int>, 
   @override
   void initState() {
     super.initState();
-
     counter = preloadedState ?? 0;
   }
 
@@ -38,7 +37,7 @@ class CounterState extends State<Counter> with PreloadStateMixin<Counter, int>, 
     yield Button(
       label: 'Click Me',
       onPressed: () {
-        setState(() => ++counter);
+        setState(() => counter++);
       },
     );
 

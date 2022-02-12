@@ -1,7 +1,7 @@
 import 'package:dart_web/dart_web.dart';
 
-import './service.dart';
-import 'components/app.dart';
+import 'app.dart';
+import 'services/service.dart';
 
 class ServerDataService implements DataService {
   @override

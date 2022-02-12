@@ -63,6 +63,7 @@ class GlobalKey<T extends State<StatefulComponent>> extends Key {
   }
 }
 
+/// Key used with [PreloadStateMixin] to sync state between server and client
 class StateKey<T extends State> extends GlobalKey<T> {
   const StateKey({required this.id}) : super();
 

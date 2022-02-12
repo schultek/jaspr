@@ -3,6 +3,8 @@ import 'dart:html' hide Element;
 
 import '../../../dart_web.dart';
 
+/// Browser implementation of HistoryManager
+/// Accesses the window.history api
 class HistoryManagerImpl extends HistoryManager {
   HistoryManagerImpl() : super.base();
 
@@ -14,8 +16,13 @@ class HistoryManagerImpl extends HistoryManager {
   }
 
   @override
-  void push(String path) {
-    window.history.pushState(null, path, path);
+  void push(String path, {String? title}) {
+    window.history.pushState(null, title ?? path, path);
+  }
+
+  @override
+  void replace(String path, {String? title}) {
+    window.history.replaceState(null, title ?? path, path);
   }
 
   @override
@@ -24,10 +31,10 @@ class HistoryManagerImpl extends HistoryManager {
   }
 
   @override
-  Future<void>? preload(Route nextRoute) {
+  Future<void>? loadState(String path) {
     AppBinding.instance!.isLoadingState = true;
     return window
-        .fetch(nextRoute.path, {
+        .fetch(path, {
           'headers': {'dart-web-mode': 'data-only'}
         })
         .then((result) => result.text())

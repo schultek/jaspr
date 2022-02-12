@@ -1,12 +1,11 @@
 name: dart_web
-version: 0.0.1
+version: 0.1.0
 
 environment:
   sdk: '>=2.16.0 <3.0.0'
 
 dependencies:
-  domino: #^0.8.0
-    path: ../domino/domino
+  domino: ^0.8.0
   shelf: ^1.2.0
   meta: ^1.7.0
   shelf_proxy: ^1.0.1

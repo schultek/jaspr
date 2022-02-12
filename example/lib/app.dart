@@ -1,16 +1,16 @@
 import 'package:dart_web/dart_web.dart';
 
-import 'about.dart' deferred as about;
-import 'button.dart';
-import 'home.dart' deferred as home;
+import 'components/button.dart';
+import 'pages/about.dart' deferred as about;
+import 'pages/home.dart' deferred as home;
 
 class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield Router(
       routes: [
-        Route.lazy('/about', about.loadLibrary, (context) => about.About()),
-        Route.lazy('/', home.loadLibrary, (context) => home.Home()),
+        Route.lazy('/about', (context) => about.About(), about.loadLibrary),
+        Route.lazy('/', (context) => home.Home(), home.loadLibrary),
       ],
       onUnknownRoute: (String path, BuildContext context) {
         return DomComponent(

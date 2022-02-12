@@ -3,79 +3,55 @@ part of router;
 typedef FutureBuilder = Future Function();
 typedef ComponentBuilder = Component Function(BuildContext);
 
-class _LazyRoute implements Route {
-  @override
-  final String path;
+/// Interface for any Route
+/// Do not subclass this, always subclass either LazyRoute or ResolvedRoute
+abstract class Route {
+  factory Route.lazy(String path, ComponentBuilder builder, FutureBuilder loader) = LazyRoute;
+
+  const factory Route(String path, ComponentBuilder builder) = ResolvedRoute;
+
+  bool matches(String path);
+}
+
+/// Interface for a resolved route that does not require any loading
+abstract class ResolvedRoute implements Route {
+  const factory ResolvedRoute(String path, ComponentBuilder builder) = _ResolvedRoute;
+
+  Component build(BuildContext context);
+}
+
+/// Lazy loaded route. Should be used with deferred imports
+class LazyRoute implements Route {
+  final String _path;
   final FutureBuilder _loader;
   final ComponentBuilder _builder;
 
-  _LazyRoute(this.path, this._loader, this._builder);
+  LazyRoute(this._path, this._builder, this._loader);
 
-  Future<void>? _loaded;
+  Future<ResolvedRoute>? _resolved;
 
-  @override
-  Future<void> load([Future<void>? Function()? andLoad]) {
-    if (_loaded == null) {
-      var andLoader = andLoad?.call();
-      _loaded = Future.wait<dynamic>([_loader(), if (andLoader != null) andLoader]).whenComplete(() {
-        isLoaded = true;
-      });
+  Future<ResolvedRoute> load({bool eager = true, Future<void>? Function(String)? preload}) {
+    if (_resolved == null) {
+      var preloaded = preload?.call(_path);
+      _resolved = Future.wait([_loader(), if (!eager && preloaded != null) preloaded])
+          .then((_) => ResolvedRoute(_path, _builder));
     }
-    return _loaded!;
+    return _resolved!;
   }
 
   @override
-  bool get needsLoading => _loaded == null;
-
-  @override
-  bool isLoaded = false;
-
-  @override
-  bool matches(String path) {
-    return this.path == path;
-  }
-
-  @override
-  Component build(BuildContext context) => _builder(context);
+  bool matches(String path) => _path == path;
 }
 
-class _LoadedRoute implements Route {
-  @override
-  final String path;
+class _ResolvedRoute implements ResolvedRoute {
+  final String _path;
   final ComponentBuilder _builder;
 
-  _LoadedRoute(this.path, this._builder);
+  const _ResolvedRoute(this._path, this._builder);
 
   @override
   Component build(BuildContext context) => _builder(context);
 
   @override
-  bool get isLoaded => true;
-
-  @override
-  Future<void> load([Future<void>? Function()? andLoad]) => Future.value();
-
-  @override
-  bool matches(String path) => this.path == path;
-
-  @override
-  bool get needsLoading => false;
-}
-
-abstract class Route {
-  factory Route.lazy(String path, FutureBuilder loader, ComponentBuilder builder) = _LazyRoute;
-
-  factory Route(String path, ComponentBuilder builder) = _LoadedRoute;
-
-  Future<void> load([Future<void>? Function()? andLoad]);
-
-  String get path;
-
-  bool get needsLoading;
-
-  bool get isLoaded;
-
-  bool matches(String path);
-
-  Component build(BuildContext context);
+  bool matches(String path) => _path == path;
 }

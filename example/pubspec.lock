@@ -182,13 +182,13 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.0"
   domino:
     dependency: transitive
     description:
-      path: "../../domino/domino"
-      relative: true
-    source: path
+      name: domino
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "0.8.0"
   file:
     dependency: transitive

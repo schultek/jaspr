@@ -9,6 +9,7 @@ abstract class StatefulComponent extends Component {
   State createState();
 }
 
+/// This defers the first rendering on the client for an async operation
 mixin DeferRenderMixin<T extends StatefulComponent> on State<T> {
   Future<void> get defer => _deferFuture ?? Future.value();
   Future? _deferFuture;
@@ -28,6 +29,7 @@ mixin DeferRenderMixin<T extends StatefulComponent> on State<T> {
   Future<void> beforeFirstRender();
 }
 
+/// This preloads state on the server and automatically syncs with the client
 mixin PreloadStateMixin<T extends StatefulComponent, U> on State<T> {
   U? _preloadedState;
   U? get preloadedState => _preloadedState;
@@ -80,17 +82,6 @@ mixin PreloadStateMixin<T extends StatefulComponent, U> on State<T> {
 
   @protected
   void didLoadState() {}
-}
-
-mixin PersistStateMixin<T extends StatefulComponent, U> on State<T> {
-  @override
-  void setState(covariant U Function() fn) {
-    var result = fn();
-    if (component.key is StateKey) {
-      (component.key as StateKey)._saveState(result);
-    }
-    _element!.markNeedsBuild();
-  }
 }
 
 abstract class State<T extends StatefulComponent> {

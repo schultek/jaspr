@@ -5,14 +5,15 @@ class About extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
-      tag: 'p',
+      tag: 'span',
       child: Text('ABOUT'),
     );
 
     yield Button(
-        label: 'Home',
-        onPressed: () {
-          Router.of(context).push('/');
-        });
+      label: 'Home',
+      onPressed: () {
+        Router.of(context).push('/');
+      },
+    );
   }
 }

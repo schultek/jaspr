@@ -6,10 +6,12 @@ import 'package:domino/browser.dart' hide DomComponent;
 
 import 'framework/framework.dart';
 
+/// Main entry point for the browser app
 void runApp(Component Function() setup, {required String id}) {
   BrowserAppBinding.ensureInitialized().attachRootComponent(setup(), to: id);
 }
 
+/// Global app binding for the browser
 class BrowserAppBinding extends AppBinding {
   static AppBinding ensureInitialized() {
     if (AppBinding.instance == null) {

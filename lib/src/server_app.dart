@@ -15,16 +15,16 @@ import 'framework/framework.dart';
 
 typedef SetupFunction = Component Function();
 
+/// Main entry point on the server
 Future<ServerApp> runApp(SetupFunction setup, {required String id}) {
-  var mode = Platform.environment['DART_WEB_MODE'];
-
-  if (mode == 'DEBUG') {
+  if (Platform.environment['DART_WEB_MODE'] == 'DEBUG') {
     return _runDebugApp(setup, id: id);
   } else {
     return _runReleaseApp(setup, id: id);
   }
 }
 
+/// Runs a debug version of the app with proxying webdev and hotreload
 Future<ServerApp> _runDebugApp(SetupFunction setup, {required String id}) async {
   var handler = proxyHandler('http://localhost:${Platform.environment['DART_WEB_PROXY_PORT']}/');
   var serverApp = await _reload(() => _createServer(setup, catchAll(handler), id: id));
@@ -33,6 +33,7 @@ Future<ServerApp> _runDebugApp(SetupFunction setup, {required String id}) async 
   return serverApp;
 }
 
+/// Runs a release version of the app with static files
 Future<ServerApp> _runReleaseApp(SetupFunction setup, {required String id}) async {
   var handler = createStaticHandler('web', defaultDocument: 'index.html');
   var server = await _createServer(setup, catchAll(handler), id: id);
@@ -41,6 +42,7 @@ Future<ServerApp> _runReleaseApp(SetupFunction setup, {required String id}) asyn
   return ServerApp(server);
 }
 
+/// Redirects all unhandled urls to the base url
 Future<Response> Function(Request) catchAll(FutureOr<Response> Function(Request) handler) {
   return (Request req) async {
     var res = await handler(req);
@@ -51,6 +53,8 @@ Future<Response> Function(Request) catchAll(FutureOr<Response> Function(Request)
   };
 }
 
+/// An object to be returned from runApp on the server and provide access to the internal http server
+/// TODO: extend this to enable custom handlers (e.g. for additional api endpoints)
 class ServerApp {
   ServerApp(this._server);
 
@@ -58,6 +62,8 @@ class ServerApp {
   HttpServer get server => _server;
 }
 
+/// Wraps the http server creation and enables hotreload
+/// Modified from package:shelf_hotreload
 Future<ServerApp> _reload(FutureOr<HttpServer> Function() init) async {
   var app = ServerApp(await init());
 
@@ -85,6 +91,7 @@ Future<ServerApp> _reload(FutureOr<HttpServer> Function() init) async {
   return app;
 }
 
+/// Creates and runs the http server
 Future<HttpServer> _createServer(SetupFunction setup, Handler fileHandler, {required String id}) async {
   var handler = const Pipeline().addHandler((Request request) async {
     var fileResponse = await fileHandler(request);
@@ -101,25 +108,12 @@ Future<HttpServer> _createServer(SetupFunction setup, Handler fileHandler, {requ
   return server;
 }
 
-class HtmlRenderMessage extends RenderMessage {
-  String html;
-
-  HtmlRenderMessage(SetupFunction setup, Uri requestUri, String id, SendPort sendPort, this.html)
-      : super(setup, requestUri, id, sendPort);
-}
-
-class RenderMessage {
-  String id;
-  SetupFunction setup;
-  Uri requestUri;
-  SendPort sendPort;
-
-  RenderMessage(this.setup, this.requestUri, this.id, this.sendPort);
-}
-
+/// This spawns an isolate for each render, in order to avoid conflicts with static instances and multiple parallel requests
 Future<Response> renderApp(Request request, SetupFunction setup, String id, Response fileResponse) async {
   var port = ReceivePort();
 
+  /// We support two modes here, rendered-html and data-only
+  /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
   if (request.headers['dart-web-mode'] == 'data-only') {
     var message = RenderMessage(setup, request.requestedUri, id, port.sendPort);
 
@@ -138,18 +132,37 @@ Future<Response> renderApp(Request request, SetupFunction setup, String id, Resp
   }
 }
 
+class RenderMessage {
+  String id;
+  SetupFunction setup;
+  Uri requestUri;
+  SendPort sendPort;
+
+  RenderMessage(this.setup, this.requestUri, this.id, this.sendPort);
+}
+
+class HtmlRenderMessage extends RenderMessage {
+  String html;
+
+  HtmlRenderMessage(SetupFunction setup, Uri requestUri, String id, SendPort sendPort, this.html)
+      : super(setup, requestUri, id, sendPort);
+}
+
+/// Runs the app and returns the rendered html
 void renderHtml(HtmlRenderMessage message) async {
   var app = message.setup();
   var binding = ServerAppBinding(message.requestUri)..attachRootComponent(app, to: message.id);
   message.sendPort.send(await binding.render(message.html));
 }
 
+/// Runs the app and returns the preloaded state data as json
 void renderData(RenderMessage message) async {
   var app = message.setup();
   var binding = ServerAppBinding(message.requestUri)..attachRootComponent(app, to: message.id);
   message.sendPort.send(await binding.data());
 }
 
+/// Global app binding for the server
 class ServerAppBinding extends AppBinding {
   ServerAppBinding(this.currentUri);
 

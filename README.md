@@ -1,13 +1,24 @@
 # dart_web
 
-Experimental web framework for Dart. Supports SPA and SSR. 
-Relies on [package:domino](https://pub.dev/packages/domino) and its incremental dom rendering approach for dynamic updates.
+Experimental web framework for Dart. Supports SPAs and SSR. 
 
-**Features:**
+**Main Features:**
 
-- Server Side Rendering
-- Component model similar to Flutter
-- Automatic hydration of component data in client
+- Familiar component model similar to Flutter widgets
+- Easy Server Side Rendering
+- Automatic hydration of component data on the client
+- Fast incremental DOM updates using [package:domino](https://pub.dev/packages/domino)
+
+> I'm looking for contributors. Don't hesitate to contact me if you want to help in any way.
+
+## Outline
+
+- [Get Started](#get-started)
+- [Components](#components)
+- [Preloading Data](#preloading-data)
+- [Routing](#routing)
+  - [Lazy Routes](#lazy-routes)
+- [Building](#building)
 
 ## Get Started
 
@@ -53,12 +64,14 @@ import 'package:dart_web/dart_web.dart';
 import 'package:my_web_app/components/app.dart';
 
 void main() {
-  runApp(App(), id: 'output');
+  runApp(() => App(), id: 'output');
 }
 ```
 
 This will import the `App` component and pass it to `runApp`, together with the id of the root element of our app. 
 *Notice that this is the id of the generated `<div id="output"></div>` in the `index.html` file. You can change the id as you like but it must match in both files.*
+
+> If you want to build an SPA, that's all you need. Run `webdev serve` and see your running webapp. Read on for server side rendering
 
 2. For the server app create a new `main.dart` file inside the `lib/` folder and insert the following:
 
@@ -67,12 +80,12 @@ import 'package:dart_web/dart_web.dart';
 import 'components/app.dart';
 
 void main() {
-  runApp(App(), id: 'output');
+  runApp(() => App(), id: 'output');
 }
 ```
 
 You will notice it is pretty much the same for both entrypoints, and this is by design. 
-However you still want to keep them separate for later, when you need to add platform specific code.
+However you still want to keep them separate for later, when you need to add server or client specific code.
 
 Finally, run the development server using the following command:
 
@@ -83,36 +96,113 @@ dart run dart_web serve
 This will spin up a server at `localhost:8080`. You can now start developing your web app. 
 Also observe that the browser automatically refreshes the page when you change something in your code, like the `Hello World` text.
 
+**I also highly recommend having a look at the example [here](https://github.com/schultek/dart_web/tree/main/example)**
 
 ## Components
 
 `dart_web` uses a similar structure to Flutter in building applications. 
-You can define custom stateless or stateful components (not widgets) by overriding its `build()` method.
+You can define custom stateless or stateful components (not widgets) by overriding the `build()` method, or use inherited components for managing state inside the component tree.
 
 Since html rendering works different to flutters painting approach, here are the core aspects and differences of the component model:
 
 1. The `build()` method returns an `Iterable<Component>` instead of a single component. This is because a html node can always have multiple child nodes.
    The recommended way of using this is with a **synchronous generator**. Simply use the `sync*` keyword in the method definition and `yield` one or multiple components.
    
-2. There are only two existing components that you can use: `DomComponent` and `Text`.
+2. There are two main predefined components that you can use: `DomComponent` and `Text`.
   - `DomComponent` renders a html element with the given tag. You can also set an id, attributes and events. It also takes a child component.
-  - `Text` renders some raw html text. It receives only a string and nothing else. *Style it through the parent element(s), as you normally would in html and css*.
+  - `Text` renders some raw html text. It receives only a string and nothing else. *You can style it through the parent element(s), as you normally would in html and css*.
 
-3. The `State` of a `StatefulComponent` supports preloading some data on the server. To use this feature, override the `FutureOr<T?> preloadData()` method. See [Preloading Data](#preloading-data).
+3. A `StatefulComponent` supports preloading some data on the server. See [Preloading Data](#preloading-data) on how to use this feature.
    
 ## Preloading Data
 
-When using server side rendering, you have the ability to preload data for your components before rendering the html. 
-Also when initializing the app on the client, we need access to this data to keep the rendering consistent.
+When using server side rendering, you have the ability to preload data for your stateful components before rendering the html. 
+Also when initializing the app on the client, you can access to this data to keep the rendering consistent.
 
 With `dart_web` this is build into the package and easy to do.
 
-First, when defining your `State` class for a `StatefulComponent`, it takes an additional type argument referring to the data type that you want to load: `class MyState extends State<MyStatefulWidget, T>`. 
-Note that this type must be json serializable. 
+Start by using the `PreloadStateMixin` on your component state and set the type argument `T` to the data type that you want to load. 
+Note that this type must be json serializable.
 
-To load your data, override the `FutureOr<T?> preloadData()` method. This will only be executed on the server and can return a future.
+```dart
+class MyState extends State<MyStatefulComponent> with PreloadStateMixin<MyStatefulComponent, T> {
+  
+}
+```
 
-Now when overriding `initState(T? data)` you receive an additional parameter containing the loaded data, both on the server and on the client.
+In your component class, provide a `StateKey` to the super constructor. It takes an id that has to be globally unique.
+
+```dart
+class MyStatefulComponent extends StatefulComponent {
+   MyStatefulComponent() : super(key: StateKey(id: 'some_unique_id'));
+
+   ...
+}
+```
+
+To load your state, override the `Future<T> preloadState()` method. This will only be executed on the server and must return a future.
+Now inside your component both on the server and client, you can use the `preloadedState` getter to access the preloaded state, e.g. in the `initState()` method.
+
+```dart
+@override
+void initState() {
+  super.initState();
+  var myState = preloadedState; // do something with the preloaded state
+}
+```
+
+## Routing
+
+Use can use the `Router` component for some basic routing. It takes a list of `Route`s or 
+optionally a `onGenerateRoute` callback.
+
+A simple use looks like this:
+
+```dart
+import 'pages/home.dart';
+import 'pages/about.dart' ;
+
+class App extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield Router(
+      routes: [
+        Route('/', (context) => Home()),
+        Route('/about', (context) => About()),
+      ],
+    );
+  }
+}
+```
+
+To push a new route call `Router.of(context).push('/path');` inside your child components. Similarly you can call `.replace()` or `.back()`.
+
+### Lazy Routes
+
+For larger web apps, we don't want to load everything together, but rather split our pages into smaller chunks.
+`dart_web` can do this automatically using `LazyRoutes` and deferred imports.
+
+To use lazy routes, change the above code to the following:
+
+```dart
+import 'pages/home.dart' deferred as home;
+import 'pages/about.dart' deferred as about;
+
+class App extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield Router(
+      routes: [
+        Route.lazy('/', (context) => home.Home(), home.loadLibrary),
+        Route.lazy('/about', (context) => About(), about.loadLibrary),
+      ],
+    );
+  }
+}
+```
+
+This will lazy load the appropriate javascript files for each route when navigating to it. 
+You can also mix normal and lazy routes.
 
 ## Building
 
