@@ -6,6 +6,7 @@ import 'dart:isolate';
 import 'package:domino/markup.dart' hide DomComponent;
 import 'package:hotreloader/hotreloader.dart';
 import 'package:html/parser.dart';
+import 'package:path/path.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_proxy/shelf_proxy.dart';
@@ -35,7 +36,7 @@ Future<ServerApp> _runDebugApp(SetupFunction setup, {required String id}) async 
 
 /// Runs a release version of the app with static files
 Future<ServerApp> _runReleaseApp(SetupFunction setup, {required String id}) async {
-  var handler = createStaticHandler('web', defaultDocument: 'index.html');
+  var handler = createStaticHandler(join(dirname(Platform.script.path), 'web'), defaultDocument: 'index.html');
   var server = await _createServer(setup, catchAll(handler), id: id);
   print('[INFO] Running app in release mode');
   print('[INFO] Serving at http://${server.address.host}:${server.port}');
@@ -103,7 +104,8 @@ Future<HttpServer> _createServer(SetupFunction setup, Handler fileHandler, {requ
     return renderApp(request, setup, id, fileResponse);
   });
 
-  var server = await shelf_io.serve(handler, 'localhost', 8080);
+  var port = int.parse(Platform.environment['PORT'] ?? '8080');
+  var server = await shelf_io.serve(handler, InternetAddress.anyIPv4, port);
 
   return server;
 }
@@ -205,5 +207,10 @@ class ServerAppBinding extends AppBinding {
     } else {
       return super.performRebuild(child);
     }
+  }
+
+  @override
+  Future<String> fetchState(String url) {
+    throw 'Cannot fetch state on the server';
   }
 }

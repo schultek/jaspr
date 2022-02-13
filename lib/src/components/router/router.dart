@@ -10,12 +10,10 @@ part 'route.dart';
 /// Interface for history management
 /// Will be implemented separately on browser and server
 abstract class HistoryManager {
-  factory HistoryManager() = HistoryManagerImpl;
-
-  HistoryManager.base();
+  static HistoryManager instance = HistoryManagerImpl();
 
   /// Initialize the history manager and setup any listeners to history changes
-  void init(void Function(String) onChange) {}
+  void init(void Function(String) onChange);
 
   /// Push a new state to the history
   void push(String path, {String? title});
@@ -25,10 +23,6 @@ abstract class HistoryManager {
 
   /// Go back in the history
   void back();
-
-  /// Used to load the state of a new lazy route
-  /// TODO move this out of history manager api
-  Future<void>? loadState(String path) => null;
 }
 
 /// Simple router component
@@ -53,8 +47,6 @@ class Router extends StatefulComponent {
 enum _HistoryAction { none, push, replace }
 
 class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedRoute>, DeferRenderMixin<Router> {
-  final HistoryManager _history = HistoryManager();
-
   ResolvedRoute? _currentRoute;
   ResolvedRoute get currentRoute => _currentRoute!;
 
@@ -75,7 +67,7 @@ class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedR
   @override
   void initState() {
     super.initState();
-    _history.init((path) {
+    HistoryManager.instance.init((path) {
       _update(path, action: _HistoryAction.none);
     });
     _currentRoute ??= preloadedState;
@@ -91,7 +83,7 @@ class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedR
   }
 
   void back() {
-    _history.back();
+    HistoryManager.instance.back();
   }
 
   Future<void> _update(
@@ -102,15 +94,15 @@ class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedR
   }) async {
     var nextRoute = _matchRoute(path);
     if (nextRoute is LazyRoute) {
-      nextRoute = await nextRoute.load(eager: eager, preload: _history.loadState);
+      nextRoute = await nextRoute.load(eager: eager, preload: true);
     }
     assert(nextRoute is ResolvedRoute);
     setState(() {
       _currentRoute = nextRoute as ResolvedRoute;
       if (action == _HistoryAction.push) {
-        _history.push(path, title: title);
+        HistoryManager.instance.push(path, title: title);
       } else if (action == _HistoryAction.replace) {
-        _history.replace(path, title: title);
+        HistoryManager.instance.replace(path, title: title);
       }
     });
   }

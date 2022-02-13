@@ -37,8 +37,8 @@ class ServeCommand extends Command<int> {
   @override
   Future<int> run() async {
     var webProcess = await Process.start(
-      'webdev',
-      ['serve', '--auto=refresh', 'web:5467'],
+      'dart',
+      ['run', 'webdev', 'serve', '--auto=refresh', 'web:5467'],
     );
 
     webProcess.stderr.listen((event) => stderr.add(event));
@@ -96,8 +96,8 @@ class BuildCommand extends Command<int> {
     }
 
     var webProcess = await Process.start(
-      'webdev',
-      ['build', '--output=web:build/web'],
+      'dart',
+      ['run', 'webdev', 'build', '--output=web:build/web'],
     );
 
     webProcess.stderr.listen((event) => stderr.add(event));

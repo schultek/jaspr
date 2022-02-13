@@ -44,12 +44,16 @@ abstract class AppBinding {
     return _stateData[key.id];
   }
 
-  bool isLoadingState = false;
+  bool _isLoadingState = false;
 
-  /// Notifies elements about new global state synced from the server
+  /// Loads state from the server and and notifies elements.
   /// This is called when a [LazyRoute] is eagerly loaded.
-  void notifyState(Map<String, dynamic> data) {
-    isLoadingState = false;
+  Future<void> loadState(String path) async {
+    _isLoadingState = true;
+    var result = await fetchState(path);
+    var data = jsonDecode(result) as Map<String, dynamic>;
+    _isLoadingState = false;
+
     for (var id in data.keys) {
       _stateData[id] = data[id];
     }
@@ -63,6 +67,8 @@ abstract class AppBinding {
       }
     }
   }
+
+  Future<String> fetchState(String url);
 
   bool get isFirstBuild => _buildQueue.isNotEmpty;
 

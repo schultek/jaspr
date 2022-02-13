@@ -49,4 +49,11 @@ class BrowserAppBinding extends AppBinding {
       return super.performRebuild(child);
     }
   }
+
+  @override
+  Future<String> fetchState(String url) {
+    return window.fetch(url, {
+      'headers': {'dart-web-mode': 'data-only'}
+    }).then((result) => result.text());
+  }
 }

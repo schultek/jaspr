@@ -78,7 +78,7 @@ class StateKey<T extends State> extends GlobalKey<T> {
   }
 
   bool _isLoadingState() {
-    return AppBinding.instance!.isLoadingState;
+    return AppBinding.instance!._isLoadingState;
   }
 
   @override

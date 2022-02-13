@@ -30,11 +30,14 @@ class LazyRoute implements Route {
 
   Future<ResolvedRoute>? _resolved;
 
-  Future<ResolvedRoute> load({bool eager = true, Future<void>? Function(String)? preload}) {
+  Future<ResolvedRoute> load({bool eager = true, bool preload = false}) {
     if (_resolved == null) {
-      var preloaded = preload?.call(_path);
-      _resolved = Future.wait([_loader(), if (!eager && preloaded != null) preloaded])
-          .then((_) => ResolvedRoute(_path, _builder));
+      List<Future> loading = [_loader()];
+      if (preload) {
+        var preloaded = AppBinding.instance!.loadState(_path);
+        if (!eager) loading.add(preloaded);
+      }
+      _resolved = Future.wait(loading).then((_) => ResolvedRoute(_path, _builder));
     }
     return _resolved!;
   }

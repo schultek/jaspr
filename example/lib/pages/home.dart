@@ -8,7 +8,7 @@ class Home extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'span',
-      child: Text('ABOUT'),
+      child: Text('HOME'),
     );
 
     yield Counter();

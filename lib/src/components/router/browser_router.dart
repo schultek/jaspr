@@ -1,13 +1,10 @@
-import 'dart:convert';
 import 'dart:html' hide Element;
 
 import '../../../dart_web.dart';
 
 /// Browser implementation of HistoryManager
 /// Accesses the window.history api
-class HistoryManagerImpl extends HistoryManager {
-  HistoryManagerImpl() : super.base();
-
+class HistoryManagerImpl implements HistoryManager {
   @override
   void init(void Function(String) onChange) {
     window.onPopState.listen((event) {
@@ -28,19 +25,5 @@ class HistoryManagerImpl extends HistoryManager {
   @override
   void back() {
     window.history.back();
-  }
-
-  @override
-  Future<void>? loadState(String path) {
-    AppBinding.instance!.isLoadingState = true;
-    return window
-        .fetch(path, {
-          'headers': {'dart-web-mode': 'data-only'}
-        })
-        .then((result) => result.text())
-        .then((data) {
-          var map = jsonDecode(data) as Map<String, dynamic>;
-          AppBinding.instance!.notifyState(map);
-        });
   }
 }

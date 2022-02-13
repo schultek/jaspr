@@ -2,9 +2,7 @@ import 'router.dart';
 
 /// Server implementation of HistoryManager
 /// This will just throw on each method, since routing is not supported on the server
-class HistoryManagerImpl extends HistoryManager {
-  HistoryManagerImpl() : super.base();
-
+class HistoryManagerImpl implements HistoryManager {
   @override
   void push(String path, {String? title}) {
     throw 'Routing unavailable on the server';
@@ -18,5 +16,10 @@ class HistoryManagerImpl extends HistoryManager {
   @override
   void back() {
     throw 'Routing unavailable on the server';
+  }
+
+  @override
+  void init(void Function(String p1) onChange) {
+    // No-op
   }
 }
