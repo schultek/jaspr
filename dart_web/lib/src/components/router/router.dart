@@ -27,11 +27,11 @@ abstract class HistoryManager {
 
 /// Simple router component
 class Router extends StatefulComponent {
-  final List<Route> routes;
+  final List<Route>? routes;
   final Route? Function(String, BuildContext)? onGenerateRoute;
   final Component Function(String, BuildContext)? onUnknownRoute;
 
-  Router({required this.routes, this.onGenerateRoute, this.onUnknownRoute});
+  Router({this.routes, this.onGenerateRoute, this.onUnknownRoute});
 
   @override
   State<StatefulComponent> createState() => RouterState();
@@ -108,9 +108,9 @@ class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedR
   }
 
   Route _matchRoute(String path) {
-    for (var route in component.routes) {
-      if (route.matches(path)) {
-        return route;
+    if (component.routes != null) {
+      for (var route in component.routes!) {
+        if (route.matches(path)) return route;
       }
     }
     var _route = component.onGenerateRoute?.call(path, context);

@@ -1,0 +1,14 @@
+name: dart_web_demo
+
+environment:
+  sdk: '>=2.16.0 <3.0.0'
+
+dependencies:
+  dart_web:
+    path: ../dart_web
+
+dev_dependencies:
+  build_runner: ^2.1.7
+  build_web_compilers: ^3.2.2
+  lints: ^1.0.1
+  webdev: ^2.7.7

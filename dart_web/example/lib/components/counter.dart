@@ -6,7 +6,7 @@ import '../services/service.dart';
 import 'button.dart';
 
 class Counter extends StatefulComponent {
-  Counter() : super(key: StateKey(id: 'counter'));
+  Counter({Key? key}) : super(key: key ?? StateKey(id: 'counter'));
 
   @override
   State<StatefulComponent> createState() => CounterState();
@@ -28,11 +28,6 @@ class CounterState extends State<Counter> with PreloadStateMixin<Counter, int> {
   }
 
   @override
-  void didLoadState() {
-    counter = preloadedState ?? 0;
-  }
-
-  @override
   Iterable<Component> build(BuildContext context) sync* {
     yield Button(
       label: 'Click Me',
@@ -41,13 +36,9 @@ class CounterState extends State<Counter> with PreloadStateMixin<Counter, int> {
       },
     );
 
-    if (isLoadingState) {
-      yield DomComponent(tag: 'span', child: Text('LOADING'));
-    } else {
-      yield DomComponent(
-        tag: 'span',
-        child: Text('Counter: $counter'),
-      );
-    }
+    yield DomComponent(
+      tag: 'span',
+      child: Text('Counter: $counter'),
+    );
   }
 }

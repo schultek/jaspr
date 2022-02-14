@@ -108,28 +108,34 @@ abstract class AppBinding {
       _globalKeyRegistry.remove(key);
     }
   }
+
+  final _InactiveElements _inactiveElements = _InactiveElements();
 }
 
 /// In difference to Flutter, we have multiple build schedulers instead of one global build owner
 /// Particularly each dom element is a build scheduler and manages its subtree of components
 mixin BuildScheduler on Element {
-  DomView? view;
+  DomView? _view;
+
+  DomView get view => _view!;
+  set view(DomView v) {
+    _view = v;
+  }
 
   Future? _rebuilding;
-
-  // TODO: find out how activation / deactivation of a build scheduler affects its child elements, this probably has some bugs still
-  final _InactiveElements _inactiveElements = _InactiveElements();
 
   void scheduleBuildFor(Element element) {
     scheduleRebuild();
   }
 
   Future<void> scheduleRebuild() {
+    assert(_dirty || _view != null);
     return _rebuilding ??= Future.microtask(() async {
       try {
         rebuild();
-        view?.update();
-        _inactiveElements._unmountAll();
+        _view!.update();
+        _dirty = false;
+        root._inactiveElements._unmountAll();
       } finally {
         _rebuilding = null;
       }

@@ -1,0 +1,10 @@
+name: styles_experiment
+version: 0.1.0
+
+environment:
+  sdk: '>=2.16.0 <3.0.0'
+
+dependencies:
+  scopify: ^0.2.2
+  html: ^0.13.0
+  csslib: ^0.14.0

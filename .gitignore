@@ -6,8 +6,3 @@
 
 # Conventional directory for build outputs
 build/
-
-# Directory created by dartdoc
-doc/api/
-
-webdev/

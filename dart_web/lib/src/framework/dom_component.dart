@@ -12,8 +12,10 @@ class DomComponent extends Component {
     this.styles,
     this.attributes,
     this.events,
-    this.child,
-  }) : super(key: key);
+    Component? child,
+    List<Component>? children,
+  })  : children = [if (child != null) child, ...children ?? []],
+        super(key: key);
 
   final String tag;
   final String? id;
@@ -21,20 +23,20 @@ class DomComponent extends Component {
   final Map<String, String>? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
-  final Component? child;
+  final List<Component>? children;
 
   @override
   Element createElement() => DomElement(this);
 }
 
-class DomElement extends SingleChildElement with BuildScheduler {
+class DomElement extends MultiChildElement with BuildScheduler {
   DomElement(DomComponent component) : super(component);
 
   @override
   DomComponent get component => super.component as DomComponent;
 
   @override
-  Component? build() => component.child;
+  Iterable<Component> build() => component.children ?? [];
 
   @override
   void update(DomComponent newComponent) {
@@ -47,16 +49,18 @@ class DomElement extends SingleChildElement with BuildScheduler {
   void render(DomBuilder b) {
     b.open(
       component.tag,
+      key: component.key?.hashCode.toString(),
       id: component.id,
       classes: component.classes,
       styles: component.styles,
       attributes: component.attributes,
-      events: component.events != null
-          ? {
-              for (var entry in component.events!.entries) entry.key: (e) => entry.value(),
-            }
-          : null,
+      events: component.events?.map((k, v) => MapEntry(k, (e) => v())),
       onCreate: (event) {
+        print("ON CREATE ${component.tag} $event");
+        view = event.view;
+      },
+      onUpdate: (event) {
+        print("ON UPDATE ${component.tag} $event");
         view = event.view;
       },
     );

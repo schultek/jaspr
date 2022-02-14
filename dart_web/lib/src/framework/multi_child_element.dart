@@ -5,6 +5,8 @@ abstract class MultiChildElement extends Element {
 
   List<Element>? _children;
 
+  final Set<Element> _forgottenChildren = HashSet<Element>();
+
   @override
   void mount(Element? parent) {
     super.mount(parent);
@@ -21,7 +23,8 @@ abstract class MultiChildElement extends Element {
   void rebuild() {
     if (dirty) {
       List<Component> built = build().toList();
-      _children = updateChildren(_children ?? [], built);
+      _children = updateChildren(_children ?? [], built, forgottenChildren: _forgottenChildren);
+      _forgottenChildren.clear();
       _dirty = false;
     } else {
       assert(_children != null);
@@ -43,8 +46,9 @@ abstract class MultiChildElement extends Element {
     int newChildrenBottom = newComponents.length - 1;
     int oldChildrenBottom = oldChildren.length - 1;
 
-    final List<Element?> newChildren =
-        oldChildren.length == newComponents.length ? oldChildren : List<Element?>.filled(newComponents.length, null);
+    final List<Element?> newChildren = oldChildren.length == newComponents.length
+        ? oldChildren
+        : List<Element?>.filled(newComponents.length, null, growable: true);
 
     // Update the top of the list.
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
@@ -146,7 +150,9 @@ abstract class MultiChildElement extends Element {
   @override
   void visitChildren(ElementVisitor visitor) {
     for (var child in _children ?? []) {
-      visitor(child);
+      if (!_forgottenChildren.contains(child)) {
+        visitor(child);
+      }
     }
   }
 
@@ -154,7 +160,8 @@ abstract class MultiChildElement extends Element {
   void forgetChild(Element child) {
     assert(_children != null);
     assert(_children!.contains(child));
-    _children!.remove(child);
+    assert(!_forgottenChildren.contains(child));
+    _forgottenChildren.add(child);
     super.forgetChild(child);
   }
 }

@@ -187,7 +187,7 @@ abstract class Element implements BuildContext {
       parent.deactivateChild(element);
     }
     assert(element._parent == null);
-    _scheduler!._inactiveElements.remove(element);
+    root._inactiveElements.remove(element);
     return element;
   }
 
@@ -215,7 +215,7 @@ abstract class Element implements BuildContext {
     assert(child._parent == this);
     child._parent = null;
     child.detachScheduler();
-    _scheduler!._inactiveElements.add(child);
+    root._inactiveElements.add(child);
   }
 
   @protected
@@ -226,8 +226,8 @@ abstract class Element implements BuildContext {
     assert(_lifecycleState == _ElementLifecycle.inactive);
     _parent = parent;
     _updateDepth(_parent!.depth);
-    _activateRecursively(this);
     attachScheduler();
+    _activateRecursively(this);
     assert(_lifecycleState == _ElementLifecycle.active);
   }
 
