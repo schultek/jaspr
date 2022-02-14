@@ -33,7 +33,7 @@ Next you need to activate `webdev` which handles the general serving and buildin
 
 ```shell
 dart pub global activate webdev
-dart pub add jaspr --git-url=https://github.com/schultek/jaspr
+dart pub add jaspr --git-url=https://github.com/schultek/jaspr --git-path=jaspr
 ```
 
 Now it is time to create your main component, which will be the starting point of your app. Place the following code in `lib/components/app.dart`:

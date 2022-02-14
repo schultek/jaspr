@@ -5,7 +5,9 @@ environment:
 
 dependencies:
   jaspr:
-    path: ../jaspr
+    git:
+      url: https://github.com/schultek/dart_web
+      path: jaspr
 
 dev_dependencies:
   build_runner: ^2.1.7

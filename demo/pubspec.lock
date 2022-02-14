@@ -319,9 +319,11 @@ packages:
   jaspr:
     dependency: "direct main"
     description:
-      path: "../jaspr"
-      relative: true
-    source: path
+      path: jaspr
+      ref: HEAD
+      resolved-ref: "417181ef6e11ec66df8ae501d8d3b11b12895893"
+      url: "https://github.com/schultek/dart_web"
+    source: git
     version: "0.1.0"
   js:
     dependency: transitive

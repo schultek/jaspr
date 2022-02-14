@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
@@ -36,13 +37,16 @@ class ServeCommand extends Command<int> {
 
   @override
   Future<int> run() async {
-    var webProcess = await Process.start(
-      'dart',
-      ['run', 'webdev', 'serve', '--auto=refresh', 'web:5467'],
-    );
+    var webProcess = await runWebdev(['serve', '--auto=refresh', 'web:5467']);
 
     webProcess.stderr.listen((event) => stderr.add(event));
     webProcess.stdout.listen((event) => stdout.add(event));
+
+    webProcess.exitCode.then((code) {
+      if (code != 0) {
+        exit(code);
+      }
+    });
 
     var process = await Process.start(
       'dart',
@@ -95,10 +99,7 @@ class BuildCommand extends Command<int> {
       dir.create();
     }
 
-    var webProcess = await Process.start(
-      'dart',
-      ['run', 'webdev', 'build', '--output=web:build/web'],
-    );
+    var webProcess = await runWebdev(['build', '--output=web:build/web']);
 
     webProcess.stderr.listen((event) => stderr.add(event));
     webProcess.stdout.listen((event) => stdout.add(event));
@@ -115,4 +116,15 @@ class BuildCommand extends Command<int> {
     var result = await process.exitCode;
     return webResult != 0 ? webResult : result;
   }
+}
+
+Future<Process> runWebdev(List<String> args) async {
+  var globalPackageList = await Process.run('dart', ['pub', 'global', 'list'], stdoutEncoding: Utf8Codec());
+  var hasGlobalWebdev = (globalPackageList.stdout as String).contains('webdev');
+
+  if (hasGlobalWebdev) {
+    return Process.start('webdev', args);
+  }
+
+  return Process.start('dart', ['run', 'webdev', ...args]);
 }
