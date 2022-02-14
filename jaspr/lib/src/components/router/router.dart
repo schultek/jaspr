@@ -74,6 +74,13 @@ class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedR
     assert(_currentRoute != null);
   }
 
+  Future<void> preload(String path) async {
+    var nextRoute = _matchRoute(path);
+    if (nextRoute is LazyRoute) {
+      await nextRoute.load(preload: true);
+    }
+  }
+
   Future<void> push(String path, {String? title, bool eager = true}) {
     return _update(path, title: title, eager: eager);
   }

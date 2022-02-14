@@ -34,7 +34,7 @@ mixin PreloadStateMixin<T extends StatefulComponent, U> on State<T> {
   U? _preloadedState;
   U? get preloadedState => _preloadedState;
 
-  Future<void> get preload => _preloadFuture ?? Future.value();
+  Future<void> get preloadFuture => _preloadFuture ?? Future.value();
   Future? _preloadFuture;
 
   bool _isLoadingState = false;

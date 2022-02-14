@@ -38,6 +38,7 @@ class HomeState extends State<Home> with PreloadStateMixin<Home, Map<String, dyn
           tag: 'div',
           events: {
             'click': () => Router.of(context).push('/book/${entry.key}'),
+            'mouseenter': () => Router.of(context).preload('/book/${entry.key}'),
           },
           child: BookInfo(book: entry.value),
         ),

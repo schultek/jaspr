@@ -201,7 +201,7 @@ class ServerAppBinding extends AppBinding {
   FutureOr<void> performRebuild(Element? child) {
     if (child is StatefulElement && child.state is PreloadStateMixin) {
       return Future.sync(() async {
-        await (child.state as PreloadStateMixin).preload;
+        await (child.state as PreloadStateMixin).preloadFuture;
         return super.performRebuild(child);
       });
     } else {
