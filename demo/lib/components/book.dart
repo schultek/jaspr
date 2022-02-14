@@ -1,4 +1,4 @@
-import 'package:dart_web/dart_web.dart';
+import 'package:jaspr/jaspr.dart';
 
 class Book {
   final String title;

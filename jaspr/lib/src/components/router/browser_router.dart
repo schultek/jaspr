@@ -1,6 +1,6 @@
 import 'dart:html' hide Element;
 
-import '../../../dart_web.dart';
+import 'router.dart';
 
 /// Browser implementation of HistoryManager
 /// Accesses the window.history api

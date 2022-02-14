@@ -1,10 +1,10 @@
-name: dart_web_example
+name: jaspr_example
 
 environment:
   sdk: '>=2.16.0 <3.0.0'
 
 dependencies:
-  dart_web:
+  jaspr:
     path: ../
 
 dev_dependencies:

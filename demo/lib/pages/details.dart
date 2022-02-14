@@ -1,4 +1,4 @@
-import 'package:dart_web/dart_web.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../components/book.dart';
 import '../services/service.dart';

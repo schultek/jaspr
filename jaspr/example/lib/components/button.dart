@@ -1,4 +1,4 @@
-import 'package:dart_web/dart_web.dart';
+import 'package:jaspr/jaspr.dart';
 
 class Button extends StatelessComponent {
   Button({required this.label, required this.onPressed});

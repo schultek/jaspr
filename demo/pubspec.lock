@@ -190,13 +190,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.1"
-  dart_web:
-    dependency: "direct main"
-    description:
-      path: "../dart_web"
-      relative: true
-    source: path
-    version: "0.1.0"
   dds:
     dependency: transitive
     description:
@@ -323,6 +316,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
+  jaspr:
+    dependency: "direct main"
+    description:
+      path: "../jaspr"
+      relative: true
+    source: path
+    version: "0.1.0"
   js:
     dependency: transitive
     description:

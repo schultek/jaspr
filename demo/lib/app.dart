@@ -1,4 +1,4 @@
-import 'package:dart_web/dart_web.dart';
+import 'package:jaspr/jaspr.dart';
 
 import 'pages/details.dart';
 import 'pages/home.dart';

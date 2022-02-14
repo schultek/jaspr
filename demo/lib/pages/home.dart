@@ -1,6 +1,6 @@
-import 'package:dart_web/dart_web.dart';
-import 'package:dart_web_demo/components/book.dart';
-import 'package:dart_web_demo/services/service.dart';
+import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_demo/components/book.dart';
+import 'package:jaspr_demo/services/service.dart';
 
 class Home extends StatefulComponent {
   Home() : super(key: StateKey(id: 'books'));

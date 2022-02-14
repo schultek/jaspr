@@ -4,7 +4,7 @@ WORKDIR /app
 COPY . .
 
 RUN dart pub get
-RUN dart run dart_web build
+RUN dart run jaspr build
 
 FROM alpine:3.14
 

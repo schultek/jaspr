@@ -1,4 +1,4 @@
-# dart_web
+# jaspr
 
 Experimental web framework for Dart. Supports SPAs and SSR. 
 
@@ -29,17 +29,17 @@ dart create -t web-simple my_web_app
 cd my_web_app
 ```
 
-Next you need to activate `webdev` which handles the general serving and building of the web app, and also add `dart_web` as a dependency:
+Next you need to activate `webdev` which handles the general serving and building of the web app, and also add `jaspr` as a dependency:
 
 ```shell
 dart pub global activate webdev
-dart pub add dart_web --git-url=https://github.com/schultek/dart_web
+dart pub add jaspr --git-url=https://github.com/schultek/jaspr
 ```
 
 Now it is time to create your main component, which will be the starting point of your app. Place the following code in `lib/components/app.dart`:
 
 ```dart
-import 'package:dart_web/dart_web.dart';
+import 'package:jaspr/jaspr.dart';
 
 class App extends StatelessComponent {
   @override
@@ -54,13 +54,13 @@ class App extends StatelessComponent {
 
 This will later render a single paragraph element with the content `Hello World`.
 
-Now you need to use this component by passing it to the `runApp` method that is available through `dart_web`.
+Now you need to use this component by passing it to the `runApp` method that is available through `jaspr`.
 Since we are effectively building two apps - one in the browser and one on the server - we need separate entry points for this.
 
 1. For the browser app there is already a `main.dart` inside the `web/` folder. Change its content to the following:
 
 ```dart
-import 'package:dart_web/dart_web.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:my_web_app/components/app.dart';
 
 void main() {
@@ -76,7 +76,7 @@ This will import the `App` component and pass it to `runApp`, together with the 
 2. For the server app create a new `main.dart` file inside the `lib/` folder and insert the following:
 
 ```dart
-import 'package:dart_web/dart_web.dart';
+import 'package:jaspr/jaspr.dart';
 import 'components/app.dart';
 
 void main() {
@@ -90,17 +90,17 @@ However you still want to keep them separate for later, when you need to add ser
 Finally, run the development server using the following command:
 
 ```shell
-dart run dart_web serve
+dart run jaspr serve
 ```
 
 This will spin up a server at `localhost:8080`. You can now start developing your web app. 
 Also observe that the browser automatically refreshes the page when you change something in your code, like the `Hello World` text.
 
-**I also highly recommend having a look at the example [here](https://github.com/schultek/dart_web/tree/main/example)**
+**I also highly recommend having a look at the example [here](https://github.com/schultek/jaspr/tree/main/example)**
 
 ## Components
 
-`dart_web` uses a similar structure to Flutter in building applications. 
+`jaspr` uses a similar structure to Flutter in building applications. 
 You can define custom stateless or stateful components (not widgets) by overriding the `build()` method, or use inherited components for managing state inside the component tree.
 
 Since html rendering works different to flutters painting approach, here are the core aspects and differences of the component model:
@@ -119,7 +119,7 @@ Since html rendering works different to flutters painting approach, here are the
 When using server side rendering, you have the ability to preload data for your stateful components before rendering the html. 
 Also when initializing the app on the client, you can access to this data to keep the rendering consistent.
 
-With `dart_web` this is build into the package and easy to do.
+With `jaspr` this is build into the package and easy to do.
 
 Start by using the `PreloadStateMixin` on your component state and set the type argument `T` to the data type that you want to load. 
 Note that this type must be json serializable.
@@ -180,7 +180,7 @@ To push a new route call `Router.of(context).push('/path');` inside your child c
 ### Lazy Routes
 
 For larger web apps, we don't want to load everything together, but rather split our pages into smaller chunks.
-`dart_web` can do this automatically using `LazyRoutes` and deferred imports.
+`jaspr` can do this automatically using `LazyRoutes` and deferred imports.
 
 To use lazy routes, change the above code to the following:
 
@@ -209,7 +209,7 @@ You can also mix normal and lazy routes.
 You can build your application using the following command:
 
 ```shell
-dart run dart_web build
+dart run jaspr build
 ```
 
 This will build the app inside the `build` directory. 

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 
 void main(List<String> args) async {
-  var runner = CommandRunner<int>("dart_web", "An experimental web framework for dart apps, supporting SPA and SSR.")
+  var runner = CommandRunner<int>("jaspr", "An experimental web framework for dart apps, supporting SPA and SSR.")
     ..addCommand(ServeCommand())
     ..addCommand(BuildCommand());
 
