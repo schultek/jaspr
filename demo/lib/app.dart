@@ -1,19 +1,21 @@
 import 'package:jaspr/jaspr.dart';
 
-import 'pages/details.dart';
-import 'pages/home.dart';
+import 'pages/details.dart' deferred as details;
+import 'pages/home.dart' deferred as home;
 
 class App extends StatelessComponent {
+  var routes = <String, Route>{};
+
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield Router(
       onGenerateRoute: (path, context) {
         if (path == '/') {
-          return Route.lazy(path, (context) => Home(), () => Future.value());
+          return routes[path] ??= Route.lazy(path, (context) => home.Home(), home.loadLibrary);
         } else {
           var segments = path.split('/');
           if (segments.length == 3 && segments[1] == 'book') {
-            return Route.lazy(path, (context) => Details(segments.last), () => Future.value());
+            return routes[path] ??= Route.lazy(path, (context) => details.Details(segments.last), details.loadLibrary);
           }
         }
       },

@@ -321,7 +321,7 @@ packages:
     description:
       path: jaspr
       ref: HEAD
-      resolved-ref: "417181ef6e11ec66df8ae501d8d3b11b12895893"
+      resolved-ref: "3ecce3257fb5ba2732625ee8160d80c6524be1b4"
       url: "https://github.com/schultek/dart_web"
     source: git
     version: "0.1.0"
