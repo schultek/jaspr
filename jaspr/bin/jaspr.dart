@@ -60,7 +60,7 @@ class ServeCommand extends Command<int> {
     process.stderr.listen((event) => stderr.add(event));
     process.stdout.listen((event) => stdout.add(event));
 
-    return await process.exitCode;
+    return process.exitCode;
   }
 }
 
