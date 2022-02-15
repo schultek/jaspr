@@ -1,0 +1,17 @@
+name: scoped_styles_experiment
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: '>=2.16.0 <3.0.0'
+
+dependencies:
+  http: ^0.13.4
+  jaspr:
+    path: ../../jaspr
+  domino: ^0.8.1
+
+dev_dependencies:
+  build_runner: ^2.1.7
+  build_web_compilers: ^3.2.2
+  lints: ^1.0.1

@@ -39,9 +39,12 @@ class DetailsState extends State<Details> with PreloadStateMixin<Details, Map<St
       'book-details'
     ], children: [
       DomComponent(
-        tag: 'img',
-        classes: ['book-cover'],
-        attributes: {'src': book['image'] ?? '', 'preload': ''},
+        tag: 'p',
+        child: Text('Genre: ${book['genre']}'),
+      ),
+      DomComponent(
+        tag: 'p',
+        child: Text('Publisher: ${book['publisher']}'),
       ),
       DomComponent(
         tag: 'p',

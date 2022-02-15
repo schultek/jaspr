@@ -88,7 +88,7 @@ class _ScopedVisitor extends Visitor {
   }
 }
 
-class ScopedDomBuilder implements DomBuilder {
+class ScopedDomBuilder extends DomBuilder {
   ScopedDomBuilder(this.builder, this.state);
 
   final DomBuilder builder;
@@ -131,10 +131,4 @@ class ScopedDomBuilder implements DomBuilder {
 
   @override
   void text(String value) => builder.text(value);
-
-  @override
-  void visit(DomNode node) => builder.visit(node);
-
-  @override
-  void visitAll(Iterable<DomNode> nodes) => builder.visitAll(nodes);
 }

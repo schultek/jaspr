@@ -56,18 +56,4 @@ class BrowserAppBinding extends AppBinding {
       'headers': {'dart-web-mode': 'data-only'}
     }).then((result) => result.text());
   }
-
-  @override
-  void preloadResources(List resources) {
-    for (var resource in resources) {
-      var element = LinkElement()
-        ..rel = 'preload'
-        ..href = resource
-        ..as = 'image' // TODO: support more types
-        ..onLoad.first.then((event) {
-          (event.target as LinkElement).remove();
-        });
-      document.body!.children.add(element);
-    }
-  }
 }

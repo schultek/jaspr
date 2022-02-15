@@ -194,21 +194,8 @@ class ServerAppBinding extends AppBinding {
 
   Future<String> data() async {
     await firstBuild;
-
-    var preload = [];
-    visitor(Element element) {
-      if (element is DomElement) {
-        if (element.component.tag == 'img' &&
-            element.component.attributes?['preload'] != null &&
-            element.component.attributes?['src'] != null) {
-          preload.add(element.component.attributes!['src']);
-        }
-      }
-      element.visitChildren(visitor);
-    }
-
-    _element!.visitChildren(visitor);
-    return jsonEncode({'data': getStateData(), 'preload': preload});
+    renderMarkup(builderFn: _element!.render);
+    return jsonEncode(getStateData());
   }
 
   @override
@@ -227,7 +214,4 @@ class ServerAppBinding extends AppBinding {
   Future<String> fetchState(String url) {
     throw 'Cannot fetch state on the server';
   }
-
-  @override
-  void preloadResources(List resources) {}
 }

@@ -29,8 +29,6 @@ html, body {
 
 .book-details {
   padding: 15px;
-  display: flex;
-  flex-direction: row;
 }
 
 .book-cover {
@@ -38,5 +36,4 @@ html, body {
 }
 
 .book-description {
-  padding-left: 15px;
 }
