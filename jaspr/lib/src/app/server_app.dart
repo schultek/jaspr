@@ -12,7 +12,7 @@ import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
-import 'framework/framework.dart';
+import '../framework/framework.dart';
 
 typedef SetupFunction = Component Function();
 

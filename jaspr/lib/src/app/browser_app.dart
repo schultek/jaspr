@@ -4,7 +4,7 @@ import 'dart:html';
 
 import 'package:domino/browser.dart' hide DomComponent;
 
-import 'framework/framework.dart';
+import '../framework/framework.dart';
 
 /// Main entry point for the browser app
 void runApp(Component Function() setup, {required String id}) {

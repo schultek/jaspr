@@ -2,8 +2,8 @@ library router;
 
 import 'dart:async';
 
-import './browser_router.dart' if (dart.library.io) 'server_router.dart';
-import '../../framework/framework.dart';
+import '../framework/framework.dart';
+import 'history_stub.dart' if (dart.library.html) 'history_browser.dart';
 
 part 'route.dart';
 
