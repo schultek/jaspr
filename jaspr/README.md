@@ -36,7 +36,7 @@ dart pub global activate webdev
 dart pub add jaspr --git-url=https://github.com/schultek/jaspr --git-path=jaspr
 ```
 
-Now it is time to create your main component, which will be the starting point of your app. Place the following code in `lib/components/app.dart`:
+Now it is time to create your main component, which will be the starting point of your app. Place the following code in `lib/app.dart`:
 
 ```dart
 import 'package:jaspr/jaspr.dart';
@@ -55,13 +55,12 @@ class App extends StatelessComponent {
 This will later render a single paragraph element with the content `Hello World`.
 
 Now you need to use this component by passing it to the `runApp` method that is available through `jaspr`.
-Since we are effectively building two apps - one in the browser and one on the server - we need separate entry points for this.
 
-1. For the browser app there is already a `main.dart` inside the `web/` folder. Change its content to the following:
+`Change the content of `web/main.dart to the following:
 
 ```dart
 import 'package:jaspr/jaspr.dart';
-import 'package:my_web_app/components/app.dart';
+import 'package:my_web_app/app.dart';
 
 void main() {
   runApp(() => App(), id: 'output');
@@ -70,22 +69,6 @@ void main() {
 
 This will import the `App` component and pass it to `runApp`, together with the id of the root element of our app. 
 *Notice that this is the id of the generated `<div id="output"></div>` in the `index.html` file. You can change the id as you like but it must match in both files.*
-
-> If you want to build an SPA, that's all you need. Run `webdev serve` and see your running webapp. Read on for server side rendering
-
-2. For the server app create a new `main.dart` file inside the `lib/` folder and insert the following:
-
-```dart
-import 'package:jaspr/jaspr.dart';
-import 'components/app.dart';
-
-void main() {
-  runApp(() => App(), id: 'output');
-}
-```
-
-You will notice it is pretty much the same for both entrypoints, and this is by design. 
-However you still want to keep them separate for later, when you need to add server or client specific code.
 
 Finally, run the development server using the following command:
 

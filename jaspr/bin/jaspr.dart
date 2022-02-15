@@ -24,7 +24,6 @@ class ServeCommand extends Command<int> {
       'input',
       abbr: 'i',
       help: 'Specify the input file for the web app',
-      defaultsTo: 'lib/main.dart',
     );
   }
 
@@ -37,10 +36,7 @@ class ServeCommand extends Command<int> {
 
   @override
   Future<int> run() async {
-    var webProcess = await runWebdev(['serve', '--auto=refresh', 'web:5467']);
-
-    webProcess.stderr.listen((event) => stderr.add(event));
-    webProcess.stdout.listen((event) => stdout.add(event));
+    var webProcess = await _runWebdev(['serve', '--auto=refresh', 'web:5467']);
 
     webProcess.exitCode.then((code) {
       if (code != 0) {
@@ -48,9 +44,16 @@ class ServeCommand extends Command<int> {
       }
     });
 
+    String? entryPoint = await _getEntryPoint(argResults!['input']);
+
+    if (entryPoint == null) {
+      print("Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.");
+      return 1;
+    }
+
     var process = await Process.start(
       'dart',
-      ['run', '--enable-vm-service', '--enable-asserts', argResults!['input']],
+      ['run', '--enable-vm-service', '--enable-asserts', entryPoint],
       environment: {
         'DART_WEB_MODE': 'DEBUG',
         'DART_WEB_PROXY_PORT': '5467',
@@ -99,14 +102,18 @@ class BuildCommand extends Command<int> {
       dir.create();
     }
 
-    var webProcess = await runWebdev(['build', '--output=web:build/web']);
+    var webProcess = await _runWebdev(['build', '--output=web:build/web']);
 
-    webProcess.stderr.listen((event) => stderr.add(event));
-    webProcess.stdout.listen((event) => stdout.add(event));
+    String? entryPoint = await _getEntryPoint(argResults!['input']);
+
+    if (entryPoint == null) {
+      print("Cannot find entry point. Create a main.dart in lib/ or web/, or specify a file using --input.");
+      return 1;
+    }
 
     var process = await Process.start(
       'dart',
-      ['compile', argResults!['target'], argResults!['input'], '-o', './build/app'],
+      ['compile', argResults!['target'], entryPoint, '-o', './build/app'],
     );
 
     process.stderr.listen((event) => stderr.add(event));
@@ -118,13 +125,35 @@ class BuildCommand extends Command<int> {
   }
 }
 
-Future<Process> runWebdev(List<String> args) async {
+Future<Process> _runWebdev(List<String> args) async {
   var globalPackageList = await Process.run('dart', ['pub', 'global', 'list'], stdoutEncoding: Utf8Codec());
   var hasGlobalWebdev = (globalPackageList.stdout as String).contains('webdev');
 
+  Process process;
+
   if (hasGlobalWebdev) {
-    return Process.start('webdev', args);
+    process = await Process.start('webdev', args);
+  } else {
+    process = await Process.start('dart', ['run', 'webdev', ...args]);
   }
 
-  return Process.start('dart', ['run', 'webdev', ...args]);
+  process.stderr.listen((event) => stderr.add(event));
+  process.stdout.listen((event) => stdout.add(event));
+
+  return process;
+}
+
+Future<String?> _getEntryPoint(String? input) async {
+  var entryPoints = [input, 'lib/main.dart', 'web/main.dart'];
+  String? entryPoint;
+
+  for (var path in entryPoints) {
+    if (path == null) continue;
+    if (await File(path).exists()) {
+      entryPoint = path;
+      break;
+    }
+  }
+
+  return entryPoint;
 }
