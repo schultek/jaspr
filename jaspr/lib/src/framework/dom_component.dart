@@ -56,11 +56,9 @@ class DomElement extends MultiChildElement with BuildScheduler {
       attributes: component.attributes,
       events: component.events?.map((k, v) => MapEntry(k, (e) => v())),
       onCreate: (event) {
-        print("ON CREATE ${component.tag} $event");
         view = event.view;
       },
       onUpdate: (event) {
-        print("ON UPDATE ${component.tag} $event");
         view = event.view;
       },
     );
@@ -97,4 +95,7 @@ class TextElement extends Element {
 
   @override
   void rebuild() {}
+
+  @override
+  void visitChildren(ElementVisitor visitor) {}
 }

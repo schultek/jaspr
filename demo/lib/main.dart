@@ -1,21 +1,32 @@
+import 'dart:convert';
+
+import 'package:http/http.dart';
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_demo/components/book.dart';
 
 import 'app.dart';
 import 'services/service.dart';
 
 class ServerBooksService implements BooksService {
-  final books = <String, Book>{
-    '0': Book('Left Hand of Darkness', 'Ursula K. Le Guin'),
-    '1': Book('Too Like the Lightning', 'Ada Palmer'),
-    '2': Book('Kindred', 'Octavia E. Butler'),
-  };
+  List? books;
 
   @override
-  Future<Book> getBookById(String id) async => books[id] ?? Book('', '');
+  Future<Map<String, dynamic>> getBookById(String id) async {
+    var data = (await _getBooks())[int.parse(id) - 1];
+    data['image'] = 'https://picsum.photos/id/${data['id'] * 11}/120/160';
+    return data;
+  }
 
   @override
-  Future<Map<String, Book>> getBooks() async => books;
+  Future<List<dynamic>> getBooks() async {
+    var data = await _getBooks();
+    return data.map((d) => {'id': d['id'], 'title': d['title'], 'author': d['author']}).toList();
+  }
+
+  Future<List> _getBooks() async {
+    if (books != null) return books!;
+    var res = await get(Uri.parse('https://fakerapi.it/api/v1/books?_quantity=20&_seed=1'));
+    return books = jsonDecode(res.body)['data'];
+  }
 }
 
 void main() {

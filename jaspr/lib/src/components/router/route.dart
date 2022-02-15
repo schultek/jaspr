@@ -44,6 +44,13 @@ class LazyRoute implements Route {
 
   @override
   bool matches(String path) => _path == path;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is LazyRoute && runtimeType == other.runtimeType && _path == other._path;
+
+  @override
+  int get hashCode => _path.hashCode;
 }
 
 class _ResolvedRoute implements ResolvedRoute {

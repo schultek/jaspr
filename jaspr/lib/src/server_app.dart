@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:domino/markup.dart' hide DomComponent;
+import 'package:domino/markup.dart' hide DomComponent, DomElement;
 import 'package:hotreloader/hotreloader.dart';
 import 'package:html/parser.dart';
 import 'package:path/path.dart';
@@ -194,7 +194,21 @@ class ServerAppBinding extends AppBinding {
 
   Future<String> data() async {
     await firstBuild;
-    return jsonEncode(getStateData());
+
+    var preload = [];
+    visitor(Element element) {
+      if (element is DomElement) {
+        if (element.component.tag == 'img' &&
+            element.component.attributes?['preload'] != null &&
+            element.component.attributes?['src'] != null) {
+          preload.add(element.component.attributes!['src']);
+        }
+      }
+      element.visitChildren(visitor);
+    }
+
+    _element!.visitChildren(visitor);
+    return jsonEncode({'data': getStateData(), 'preload': preload});
   }
 
   @override
@@ -213,4 +227,7 @@ class ServerAppBinding extends AppBinding {
   Future<String> fetchState(String url) {
     throw 'Cannot fetch state on the server';
   }
+
+  @override
+  void preloadResources(List resources) {}
 }

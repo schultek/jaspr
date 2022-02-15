@@ -26,3 +26,17 @@ html, body {
 .book-author {
   color: grey;
 }
+
+.book-details {
+  padding: 15px;
+  display: flex;
+  flex-direction: row;
+}
+
+.book-cover {
+  width: 100px;
+}
+
+.book-description {
+  padding-left: 15px;
+}

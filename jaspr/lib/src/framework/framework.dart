@@ -28,7 +28,7 @@ abstract class Component {
   Element createElement();
 
   static bool canUpdate(Component oldComponent, Component newComponent) {
-    return oldComponent.runtimeType == newComponent.runtimeType;
+    return oldComponent.runtimeType == newComponent.runtimeType && oldComponent.key == newComponent.key;
   }
 }
 
@@ -72,7 +72,7 @@ abstract class Element implements BuildContext {
 
   _ElementLifecycle _lifecycleState = _ElementLifecycle.initial;
 
-  void visitChildren(ElementVisitor visitor) {}
+  void visitChildren(ElementVisitor visitor);
 
   @protected
   Element? updateChild(Element? child, Component? newComponent) {

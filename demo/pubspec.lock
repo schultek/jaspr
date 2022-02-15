@@ -282,7 +282,7 @@ packages:
     source: hosted
     version: "0.15.0"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       url: "https://pub.dartlang.org"
@@ -319,11 +319,9 @@ packages:
   jaspr:
     dependency: "direct main"
     description:
-      path: jaspr
-      ref: HEAD
-      resolved-ref: "3ecce3257fb5ba2732625ee8160d80c6524be1b4"
-      url: "https://github.com/schultek/dart_web"
-    source: git
+      path: "../jaspr"
+      relative: true
+    source: path
     version: "0.1.0"
   js:
     dependency: transitive

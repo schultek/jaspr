@@ -44,6 +44,8 @@ abstract class AppBinding {
     return _stateData[key.id];
   }
 
+  void preloadResources(List resources);
+
   bool _isLoadingState = false;
 
   /// Loads state from the server and and notifies elements.
@@ -51,7 +53,10 @@ abstract class AppBinding {
   Future<void> loadState(String path) async {
     _isLoadingState = true;
     var result = await fetchState(path);
-    var data = jsonDecode(result) as Map<String, dynamic>;
+    var state = jsonDecode(result) as Map<String, dynamic>;
+    var data = state['data'];
+    var preload = state['preload'];
+    preloadResources(preload);
     _isLoadingState = false;
 
     for (var id in data.keys) {

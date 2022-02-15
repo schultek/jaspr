@@ -9,12 +9,12 @@ class Home extends StatefulComponent {
   State<StatefulComponent> createState() => HomeState();
 }
 
-class HomeState extends State<Home> with PreloadStateMixin<Home, Map<String, dynamic>> {
-  late Map<String, Book> books;
+class HomeState extends State<Home> with PreloadStateMixin<Home, List> {
+  late List books;
 
   @override
-  Future<Map<String, dynamic>> preloadState() {
-    return BooksService.instance!.getBooks().then((books) => books.map((k, v) => MapEntry(k, v.toMap())));
+  Future<List> preloadState() {
+    return BooksService.instance!.getBooks();
   }
 
   @override
@@ -25,7 +25,7 @@ class HomeState extends State<Home> with PreloadStateMixin<Home, Map<String, dyn
   @override
   void initState() {
     super.initState();
-    books = preloadedState != null ? preloadedState!.map((k, v) => MapEntry(k, Book.fromMap(v))) : {};
+    books = preloadedState ?? [];
   }
 
   @override
@@ -33,14 +33,14 @@ class HomeState extends State<Home> with PreloadStateMixin<Home, Map<String, dyn
     yield DomComponent(tag: 'div', classes: [
       'books-list'
     ], children: [
-      for (var entry in books.entries)
+      for (var book in books)
         DomComponent(
           tag: 'div',
           events: {
-            'click': () => Router.of(context).push('/book/${entry.key}'),
-            'mouseenter': () => Router.of(context).preload('/book/${entry.key}'),
+            'click': () => Router.of(context).push('/book/${book['id']}'),
+            'mouseenter': () => Router.of(context).preload('/book/${book['id']}'),
           },
-          child: BookInfo(book: entry.value),
+          child: BookInfo(book: book),
         ),
     ]);
   }

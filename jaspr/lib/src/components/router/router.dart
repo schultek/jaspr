@@ -50,17 +50,19 @@ class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedR
   ResolvedRoute? _currentRoute;
   ResolvedRoute get currentRoute => _currentRoute!;
 
+  final Map<LazyRoute, ResolvedRoute> _resolvedRoutes = {};
+
   @override
   Future<void> beforeFirstRender() async {
     var route = _matchRoute((context as Element).root.currentUri.path);
-    if (route is LazyRoute) route = await route.load();
+    if (route is LazyRoute) route = _resolvedRoutes[route] = await route.load();
     _currentRoute = route as ResolvedRoute;
   }
 
   @override
   Future<ResolvedRoute> preloadState() async {
     var route = _matchRoute((context as Element).root.currentUri.path);
-    if (route is LazyRoute) route = await route.load();
+    if (route is LazyRoute) route = _resolvedRoutes[route] = await route.load();
     return route as ResolvedRoute;
   }
 
@@ -77,7 +79,7 @@ class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedR
   Future<void> preload(String path) async {
     var nextRoute = _matchRoute(path);
     if (nextRoute is LazyRoute) {
-      await nextRoute.load(preload: true);
+      _resolvedRoutes[nextRoute] = await nextRoute.load(preload: true);
     }
   }
 
@@ -101,7 +103,7 @@ class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedR
   }) async {
     var nextRoute = _matchRoute(path);
     if (nextRoute is LazyRoute) {
-      nextRoute = await nextRoute.load(eager: eager, preload: true);
+      nextRoute = _resolvedRoutes[nextRoute] = await nextRoute.load(eager: eager, preload: true);
     }
     assert(nextRoute is ResolvedRoute);
     setState(() {
@@ -115,13 +117,18 @@ class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedR
   }
 
   Route _matchRoute(String path) {
+    Route? route;
     if (component.routes != null) {
-      for (var route in component.routes!) {
-        if (route.matches(path)) return route;
+      for (var r in component.routes!) {
+        if (r.matches(path)) {
+          route = r;
+          break;
+        }
       }
     }
-    var _route = component.onGenerateRoute?.call(path, context);
-    return _route ?? _generateUnknownRoute(path);
+    route ??= component.onGenerateRoute?.call(path, context);
+    route ??= _generateUnknownRoute(path);
+    return _resolvedRoutes[route] ?? route;
   }
 
   Route _generateUnknownRoute(String path) {

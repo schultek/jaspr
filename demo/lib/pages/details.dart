@@ -13,11 +13,11 @@ class Details extends StatefulComponent {
 }
 
 class DetailsState extends State<Details> with PreloadStateMixin<Details, Map<String, dynamic>> {
-  late Book book;
+  late Map<String, dynamic> book;
 
   @override
   Future<Map<String, dynamic>> preloadState() {
-    return BooksService.instance!.getBookById(component.id).then((book) => book.toMap());
+    return BooksService.instance!.getBookById(component.id);
   }
 
   @override
@@ -28,11 +28,26 @@ class DetailsState extends State<Details> with PreloadStateMixin<Details, Map<St
   @override
   void initState() {
     super.initState();
-    book = preloadedState != null ? Book.fromMap(preloadedState!) : Book('', '');
+    book = preloadedState ?? {};
   }
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield BookInfo(book: book);
+
+    yield DomComponent(tag: 'div', classes: [
+      'book-details'
+    ], children: [
+      DomComponent(
+        tag: 'img',
+        classes: ['book-cover'],
+        attributes: {'src': book['image'] ?? '', 'preload': ''},
+      ),
+      DomComponent(
+        tag: 'p',
+        classes: ['book-description'],
+        child: Text(book['description'] ?? ''),
+      ),
+    ]);
   }
 }
