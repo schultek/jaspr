@@ -47,7 +47,7 @@ abstract class AppBinding {
   bool _isLoadingState = false;
 
   /// Loads state from the server and and notifies elements.
-  /// This is called when a [LazyRoute] is eagerly loaded.
+  /// This is called when a [LazyRoute] is loaded.
   Future<void> loadState(String path) async {
     _isLoadingState = true;
     var result = await fetchState(path);

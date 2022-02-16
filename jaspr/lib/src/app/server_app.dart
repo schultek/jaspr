@@ -17,30 +17,71 @@ import '../framework/framework.dart';
 typedef SetupFunction = Component Function();
 
 /// Main entry point on the server
-Future<ServerApp> runApp(SetupFunction setup, {required String id}) {
-  if (Platform.environment['DART_WEB_MODE'] == 'DEBUG') {
-    return _runDebugApp(setup, id: id);
-  } else {
-    return _runReleaseApp(setup, id: id);
+ServerApp runApp(SetupFunction setup, {required String id}) {
+  return ServerApp._(setup, id).._run();
+}
+
+/// An object to be returned from runApp on the server and provide access to the internal http server
+/// TODO: extend this to enable custom handlers (e.g. for additional api endpoints)
+class ServerApp {
+  ServerApp._(this._setup, this.id);
+
+  final String id;
+  final SetupFunction _setup;
+
+  HttpServer? _server;
+  HttpServer? get server => _server;
+
+  bool _running = false;
+
+  final List<Middleware> _middleware = [];
+
+  void addMiddleware(Middleware middleware) {
+    if (_running) throw 'Cannot attach middleware. Server is already running.';
+    _middleware.add(middleware);
+  }
+
+  Function(HttpServer server)? _listener;
+
+  void setListener(Function(HttpServer server) listener) {
+    if (_running) throw 'Cannot attach listener. Server is already running.';
+    _listener = listener;
+  }
+
+  Future<HttpServer> Function(Handler)? _builder;
+
+  void setBuilder(Future<HttpServer> Function(Handler) builder) {
+    if (_running) throw 'Cannot attach builder. Server is already running.';
+    _builder = builder;
+  }
+
+  void _run() {
+    Future.microtask(() async {
+      _running = true;
+      if (Platform.environment['DART_WEB_MODE'] == 'DEBUG') {
+        await _runDebugApp(this);
+      } else {
+        await _runReleaseApp(this);
+      }
+    });
   }
 }
 
 /// Runs a debug version of the app with proxying webdev and hotreload
-Future<ServerApp> _runDebugApp(SetupFunction setup, {required String id}) async {
+Future<void> _runDebugApp(ServerApp app) async {
   var handler = proxyHandler('http://localhost:${Platform.environment['DART_WEB_PROXY_PORT']}/');
-  var serverApp = await _reload(() => _createServer(setup, catchAll(handler), id: id));
+  await _reload(app, () => _createServer(app, catchAll(handler)));
   print('[INFO] Running app in debug mode');
-  print('[INFO] Serving at http://${serverApp.server.address.host}:${serverApp.server.port}');
-  return serverApp;
+  print('[INFO] Serving at http://${app.server!.address.host}:${app.server!.port}');
 }
 
 /// Runs a release version of the app with static files
-Future<ServerApp> _runReleaseApp(SetupFunction setup, {required String id}) async {
+Future<void> _runReleaseApp(ServerApp app) async {
   var handler = createStaticHandler(join(dirname(Platform.script.path), 'web'), defaultDocument: 'index.html');
-  var server = await _createServer(setup, catchAll(handler), id: id);
+  app._server = await _createServer(app, catchAll(handler));
+  app._listener?.call(app._server!);
   print('[INFO] Running app in release mode');
-  print('[INFO] Serving at http://${server.address.host}:${server.port}');
-  return ServerApp(server);
+  print('[INFO] Serving at http://${app.server!.address.host}:${app.server!.port}');
 }
 
 /// Redirects all unhandled urls to the base url
@@ -54,25 +95,18 @@ Future<Response> Function(Request) catchAll(FutureOr<Response> Function(Request)
   };
 }
 
-/// An object to be returned from runApp on the server and provide access to the internal http server
-/// TODO: extend this to enable custom handlers (e.g. for additional api endpoints)
-class ServerApp {
-  ServerApp(this._server);
-
-  HttpServer _server;
-  HttpServer get server => _server;
-}
-
 /// Wraps the http server creation and enables hotreload
 /// Modified from package:shelf_hotreload
-Future<ServerApp> _reload(FutureOr<HttpServer> Function() init) async {
-  var app = ServerApp(await init());
+Future<void> _reload(ServerApp app, FutureOr<HttpServer> Function() init) async {
+  app._server = await init();
+  app._listener?.call(app._server!);
 
   // ignore: prefer_function_declarations_over_variables
   var obtainNewServer = (FutureOr<HttpServer> Function() initializer) async {
-    await app.server.close(force: true);
+    await app.server?.close(force: true);
     print('[INFO] Application reloaded.');
     app._server = await initializer();
+    app._listener?.call(app._server!);
   };
 
   try {
@@ -88,36 +122,40 @@ Future<ServerApp> _reload(FutureOr<HttpServer> Function() init) async {
       rethrow;
     }
   }
-
-  return app;
 }
 
 /// Creates and runs the http server
-Future<HttpServer> _createServer(SetupFunction setup, Handler fileHandler, {required String id}) async {
-  var handler = const Pipeline().addHandler((Request request) async {
+Future<HttpServer> _createServer(ServerApp app, Handler fileHandler) async {
+  var pipeline = const Pipeline();
+  for (var middleware in app._middleware) {
+    pipeline = pipeline.addMiddleware(middleware);
+  }
+  var handler = pipeline.addHandler((Request request) async {
     var fileResponse = await fileHandler(request);
 
     if (fileResponse.headers['content-type'] != 'text/html') {
       return fileResponse;
     }
 
-    return renderApp(request, setup, id, fileResponse);
+    return renderApp(app, request, fileResponse);
   });
 
-  var port = int.parse(Platform.environment['PORT'] ?? '8080');
-  var server = await shelf_io.serve(handler, InternetAddress.anyIPv4, port);
-
-  return server;
+  if (app._builder != null) {
+    return app._builder!.call(handler);
+  } else {
+    var port = int.parse(Platform.environment['PORT'] ?? '8080');
+    return shelf_io.serve(handler, InternetAddress.anyIPv4, port);
+  }
 }
 
 /// This spawns an isolate for each render, in order to avoid conflicts with static instances and multiple parallel requests
-Future<Response> renderApp(Request request, SetupFunction setup, String id, Response fileResponse) async {
+Future<Response> renderApp(ServerApp app, Request request, Response fileResponse) async {
   var port = ReceivePort();
 
   /// We support two modes here, rendered-html and data-only
   /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
   if (request.headers['dart-web-mode'] == 'data-only') {
-    var message = RenderMessage(setup, request.requestedUri, id, port.sendPort);
+    var message = RenderMessage(app._setup, request.requestedUri, app.id, port.sendPort);
 
     await Isolate.spawn(renderData, message);
     var result = await port.first;
@@ -125,7 +163,7 @@ Future<Response> renderApp(Request request, SetupFunction setup, String id, Resp
     return Response.ok(result, headers: {'Content-Type': 'application/json'});
   } else {
     var indexHtml = await fileResponse.readAsString();
-    var message = HtmlRenderMessage(setup, request.requestedUri, id, port.sendPort, indexHtml);
+    var message = HtmlRenderMessage(app._setup, request.requestedUri, app.id, port.sendPort, indexHtml);
 
     await Isolate.spawn(renderHtml, message);
     var result = await port.first;
