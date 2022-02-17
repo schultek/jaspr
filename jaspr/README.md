@@ -22,57 +22,17 @@ Experimental web framework for Dart. Supports SPAs and SSR.
 
 ## Get Started
 
-To get started create a new dart web app using the `web-simple` template with the `dart create` tool:
+To get started simply activate the `jasper` command line tool and run `jaspr create`:
 
 ```shell
-dart create -t web-simple my_web_app
+dart pub global activate jaspr
+jaspr create my_web_app
+```
+
+Next, run the development server using the following command:
+
+```shell
 cd my_web_app
-```
-
-Next you need to activate `webdev` which handles the general serving and building of the web app, and also add `jaspr` as a dependency:
-
-```shell
-dart pub global activate webdev
-dart pub add jaspr --git-url=https://github.com/schultek/jaspr --git-path=jaspr
-```
-
-Now it is time to create your main component, which will be the starting point of your app. Place the following code in `lib/app.dart`:
-
-```dart
-import 'package:jaspr/jaspr.dart';
-
-class App extends StatelessComponent {
-  @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'p',
-      child: Text('Hello World'),
-    );
-  }
-}
-```
-
-This will later render a single paragraph element with the content `Hello World`.
-
-Now you need to use this component by passing it to the `runApp` method that is available through `jaspr`.
-
-`Change the content of `web/main.dart to the following:
-
-```dart
-import 'package:jaspr/jaspr.dart';
-import 'package:my_web_app/app.dart';
-
-void main() {
-  runApp(() => App(), id: 'output');
-}
-```
-
-This will import the `App` component and pass it to `runApp`, together with the id of the root element of our app. 
-*Notice that this is the id of the generated `<div id="output"></div>` in the `index.html` file. You can change the id as you like but it must match in both files.*
-
-Finally, run the development server using the following command:
-
-```shell
 dart run jaspr serve
 ```
 
@@ -174,7 +134,7 @@ class MyStateModelCodec extends Codec<MyStateModel, Map<String, dynamic>> {
   ...
   
 }
-```
+```zz
 
 ## Routing
 
