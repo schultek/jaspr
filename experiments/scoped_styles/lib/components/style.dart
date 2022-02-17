@@ -25,7 +25,7 @@ class StyleState extends State<Style> {
   @override
   void initState() {
     super.initState();
-    this.id = Uuid().v4();
+    id = Uuid().v4();
     style = _generateScopedStyle();
   }
 
@@ -72,6 +72,7 @@ class _ScopedVisitor extends Visitor {
 
   _ScopedVisitor(this.attr);
 
+  @override
   void visitSelector(Selector node) {
     var sequences = node.simpleSelectorSequences;
     var i = 0;

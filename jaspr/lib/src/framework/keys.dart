@@ -63,29 +63,41 @@ class GlobalKey<T extends State<StatefulComponent>> extends Key {
   }
 }
 
-/// Key used with [PreloadStateMixin] to sync state between server and client
-class StateKey<T extends State> extends GlobalKey<T> {
-  const StateKey({required this.id}) : super();
+@optionalTypeArgs
+class GlobalObjectKey<T extends State<StatefulComponent>> extends GlobalKey<T> {
+  /// Creates a global key that uses [identical] on [value] for its [operator==].
+  const GlobalObjectKey(this.value) : super();
 
-  final String id;
-
-  void _saveState(dynamic state) {
-    AppBinding.instance!._saveState(this, state);
-  }
-
-  dynamic _getState() {
-    return AppBinding.instance!._getState(this);
-  }
-
-  bool _isLoadingState() {
-    return AppBinding.instance!._isLoadingState;
-  }
+  /// The object whose identity is used by this key's [operator==].
+  final Object value;
 
   @override
   bool operator ==(Object other) {
-    return other.runtimeType == runtimeType && other is StateKey<T> && other.id == id;
+    return other.runtimeType == runtimeType && other is GlobalObjectKey<T> && identical(other.value, value);
   }
 
   @override
-  int get hashCode => Object.hashAll([runtimeType, id]);
+  int get hashCode => identityHashCode(value);
+}
+
+extension _SyncKey on GlobalKey {
+  bool get _canSync {
+    var state = currentState;
+    return state != null && state is SyncStateMixin;
+  }
+
+  SyncStateMixin get _currentState => currentState as SyncStateMixin;
+
+  String get _id => _currentState.syncId;
+
+  void _notifyState(String? state) {
+    if (!_canSync) return;
+    var s = _currentState;
+    s.updateState(state != null ? s.syncCodec.decode(state) : null);
+  }
+
+  String _saveState() {
+    var s = _currentState;
+    return s.syncCodec.encode(s.saveState());
+  }
 }

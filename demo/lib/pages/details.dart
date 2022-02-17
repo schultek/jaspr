@@ -4,7 +4,7 @@ import '../components/book.dart';
 import '../services/service.dart';
 
 class Details extends StatefulComponent {
-  Details(this.id) : super(key: StateKey(id: 'book-$id'));
+  Details(this.id) : super(key: GlobalObjectKey('book-$id'));
 
   final String id;
 
@@ -12,23 +12,28 @@ class Details extends StatefulComponent {
   State<StatefulComponent> createState() => DetailsState();
 }
 
-class DetailsState extends State<Details> with PreloadStateMixin<Details, Map<String, dynamic>> {
+class DetailsState extends State<Details>
+    with PreloadStateMixin<Details>, SyncStateMixin<Details, Map<String, dynamic>> {
   late Map<String, dynamic> book;
 
   @override
-  Future<Map<String, dynamic>> preloadState() {
-    return BooksService.instance!.getBookById(component.id);
+  Future<void> preloadState() async {
+    book = await BooksService.instance!.getBookById(component.id);
   }
 
   @override
-  void didLoadState() {
-    initState();
+  Map<String, dynamic> saveState() {
+    return book;
   }
 
   @override
-  void initState() {
-    super.initState();
-    book = preloadedState ?? {};
+  String get syncId => 'book-${component.id}';
+
+  @override
+  void updateState(Map<String, dynamic>? value) {
+    setState(() {
+      book = value ?? {};
+    });
   }
 
   @override

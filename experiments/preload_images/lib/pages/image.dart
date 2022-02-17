@@ -3,7 +3,7 @@ import 'package:jaspr/jaspr.dart';
 import '../services/service.dart';
 
 class Image extends StatefulComponent {
-  Image(this.id) : super(key: StateKey(id: 'image-$id'));
+  Image(this.id) : super(key: GlobalObjectKey('image-$id'));
 
   final String id;
 
@@ -11,23 +11,27 @@ class Image extends StatefulComponent {
   State<StatefulComponent> createState() => ImageState();
 }
 
-class ImageState extends State<Image> with PreloadStateMixin<Image, Map<String, dynamic>> {
+class ImageState extends State<Image> with PreloadStateMixin<Image>, SyncStateMixin<Image, Map<String, dynamic>> {
   late Map<String, dynamic> image;
 
   @override
-  Future<Map<String, dynamic>> preloadState() {
-    return ImageService.instance!.getImageById(component.id);
+  Future<void> preloadState() async {
+    image = await ImageService.instance!.getImageById(component.id);
   }
 
   @override
-  void didLoadState() {
-    initState();
+  Map<String, dynamic> saveState() {
+    return image;
   }
 
   @override
-  void initState() {
-    super.initState();
-    image = preloadedState ?? {};
+  String get syncId => 'image-${component.id}';
+
+  @override
+  void updateState(Map<String, dynamic>? value) {
+    setState(() {
+      image = value ?? {};
+    });
   }
 
   @override

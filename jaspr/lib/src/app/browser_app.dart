@@ -20,10 +20,8 @@ class BrowserAppBinding extends AppBinding {
     return AppBinding.instance!;
   }
 
-  @override
-  Map<String, dynamic> loadStateData() {
-    var body = document.body!;
-    return jsonDecode(body.attributes.remove('data-app') ?? '{}');
+  BrowserAppBinding() {
+    _loadRawState();
   }
 
   @override
@@ -50,10 +48,33 @@ class BrowserAppBinding extends AppBinding {
     }
   }
 
+  final Map<String, String> _rawState = {};
+
+  void _loadRawState() {
+    var attrs = document.body!.attributes;
+    var stateKeys = attrs.keys.where((k) => k.startsWith('data-state-')).toList();
+    for (var key in stateKeys) {
+      _rawState[key.replaceFirst('data-state-', '')] = attrs.remove(key)!;
+    }
+  }
+
   @override
-  Future<String> fetchState(String url) {
-    return window.fetch(url, {
-      'headers': {'dart-web-mode': 'data-only'}
-    }).then((result) => result.text());
+  void updateRawState(String id, String state) {
+    _rawState[id] = state;
+  }
+
+  @override
+  String? getRawState(String id) {
+    return _rawState[id];
+  }
+
+  @override
+  Future<Map<String, String>> fetchState(String url) {
+    return window
+        .fetch(url, {
+          'headers': {'dart-web-mode': 'data-only'}
+        })
+        .then((result) => result.text())
+        .then((data) => (jsonDecode(data) as Map<String, dynamic>).cast());
   }
 }

@@ -5,6 +5,6 @@ import 'components/counter.dart';
 class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield Counter();
+    yield Counter(key: GlobalKey());
   }
 }

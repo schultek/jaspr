@@ -46,7 +46,7 @@ class Router extends StatefulComponent {
 
 enum _HistoryAction { none, push, replace }
 
-class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedRoute>, DeferRenderMixin<Router> {
+class RouterState extends State<Router> with PreloadStateMixin<Router>, DeferRenderMixin<Router> {
   ResolvedRoute? _currentRoute;
   ResolvedRoute get currentRoute => _currentRoute!;
 
@@ -60,10 +60,10 @@ class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedR
   }
 
   @override
-  Future<ResolvedRoute> preloadState() async {
+  Future<void> preloadState() async {
     var route = _matchRoute((context as Element).root.currentUri.path);
     if (route is LazyRoute) route = _resolvedRoutes[route] = await route.load();
-    return route as ResolvedRoute;
+    _currentRoute = route as ResolvedRoute;
   }
 
   @override
@@ -72,7 +72,6 @@ class RouterState extends State<Router> with PreloadStateMixin<Router, ResolvedR
     HistoryManager.instance.init((path) {
       _update(path, action: _HistoryAction.none);
     });
-    _currentRoute ??= preloadedState;
     assert(_currentRoute != null);
   }
 

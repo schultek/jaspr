@@ -9,7 +9,6 @@ abstract class AppBinding {
 
   AppBinding() {
     _instance = this;
-    _stateData = loadStateData();
   }
 
   void attachRootComponent(Component app, {required String to}) {
@@ -28,47 +27,48 @@ abstract class AppBinding {
   @protected
   void attachRootElement(BuildScheduler element, {required String to}) {}
 
-  /// Global state data returned from the server. See [PreloadStateMixin]
-  late final Map<String, dynamic> _stateData;
+  @protected
+  Map<String, String> getStateData() {
+    var state = <String, String>{};
+    for (var key in _globalKeyRegistry.keys) {
+      if (key._canSync) {
+        var s = key._saveState();
+        state[key._id] = s;
+      }
+    }
+    return state;
+  }
 
   @protected
-  Map<String, dynamic> loadStateData() => {};
+  String? getRawState(String id);
 
-  Map<String, dynamic> getStateData() => _stateData;
-
-  void _saveState(StateKey key, dynamic state) {
-    _stateData[key.id] = state;
-  }
-
-  dynamic _getState(StateKey key) {
-    return _stateData[key.id];
-  }
+  @protected
+  void updateRawState(String id, String state);
 
   bool _isLoadingState = false;
+  bool get isLoadingState => _isLoadingState;
 
   /// Loads state from the server and and notifies elements.
   /// This is called when a [LazyRoute] is loaded.
   Future<void> loadState(String path) async {
     _isLoadingState = true;
-    var result = await fetchState(path);
-    var data = jsonDecode(result) as Map<String, dynamic>;
+    var data = await fetchState(path);
     _isLoadingState = false;
+    print("LOADED DATA $data");
 
     for (var id in data.keys) {
-      _stateData[id] = data[id];
+      updateRawState(id, data[id]!);
     }
 
     for (var key in _globalKeyRegistry.keys) {
-      if (key is StateKey) {
-        var state = key.currentState;
-        if (state is PreloadStateMixin) {
-          state._notifyLoadedState(_stateData[key.id]);
-        }
+      if (key._canSync && data.containsKey(key._id)) {
+        key._notifyState(data[key._id]);
       }
     }
   }
 
-  Future<String> fetchState(String url);
+  @protected
+  Future<Map<String, String>> fetchState(String url);
 
   bool get isFirstBuild => _buildQueue.isNotEmpty;
 
@@ -106,6 +106,12 @@ abstract class AppBinding {
   void _unregisterGlobalKey(GlobalKey key, Element element) {
     if (_globalKeyRegistry[key] == element) {
       _globalKeyRegistry.remove(key);
+    }
+  }
+
+  void _initState(GlobalKey key) {
+    if (key._canSync) {
+      key._notifyState(getRawState(key._id));
     }
   }
 

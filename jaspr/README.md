@@ -95,42 +95,84 @@ Since html rendering works different to flutters painting approach, here are the
   - `DomComponent` renders a html element with the given tag. You can also set an id, attributes and events. It also takes a child component.
   - `Text` renders some raw html text. It receives only a string and nothing else. *You can style it through the parent element(s), as you normally would in html and css*.
 
-3. A `StatefulComponent` supports preloading some data on the server. See [Preloading Data](#preloading-data) on how to use this feature.
+3. A `StatefulComponent` supports preloading some data on the server and automatic syncing data with the client. See [Preloading Data](#preloading-data) and [Syncing Data](#sync-data) on how to use this feature.
    
 ## Preloading Data
 
-When using server side rendering, you have the ability to preload data for your stateful components before rendering the html. 
-Also when initializing the app on the client, you can access to this data to keep the rendering consistent.
-
+When using server side rendering, you have the ability to preload data for your stateful components before rendering the html.
 With `jaspr` this is build into the package and easy to do.
 
-Start by using the `PreloadStateMixin` on your component state and set the type argument `T` to the data type that you want to load. 
-Note that this type must be json serializable.
+Start by using the `PreloadStateMixin` on your component state and implement the `Future<T> preloadState()` method.
 
 ```dart
-class MyState extends State<MyStatefulComponent> with PreloadStateMixin<MyStatefulComponent, T> {
+class MyState extends State<MyStatefulComponent> with PreloadStateMixin<MyStatefulComponent> {
   
+  @override
+  Future<void> preloadState() async {
+    ...
+  }
 }
 ```
 
-In your component class, provide a `StateKey` to the super constructor. It takes an id that has to be globally unique.
+## Syncing Data
+
+Alongside with preloading some data on the server, you often want to sync the data with the client.
+You can simply add the `SyncStateMixin` which will automatically sync state from the server with the client.
+
+The `SyncStateMixin` accepts a second type argument for the data type that you want to sync. You the have to
+implement the the `saveState` and `updateState()` methods.
 
 ```dart
-class MyStatefulComponent extends StatefulComponent {
-   MyStatefulComponent() : super(key: StateKey(id: 'some_unique_id'));
+class MyState extends State<MyStatefulComponent> with SyncStateMixin<MyStatefulComponent, MyStateModel> {
 
-   ...
+  MyStateModel? model;
+  
+  // a globally unique id that is used to identify the state
+  @override
+  String get syncId => 'my_id';
+
+  // this will save the state to be sent to the client
+  // and is only executed on the server
+  @override
+  MyStateModel? saveState() {
+    return model;
+  }
+
+  // this will receive the state on the client
+  // and it is safe to call setState
+  void updateState(MyStateModel? value) {
+    setState(() {
+      model = value;
+    });
+  }
 }
 ```
 
-To load your state, override the `Future<T> preloadState()` method. This will only be executed on the server and must return a future.
-Now inside your component both on the server and client, you can use the `preloadedState` getter to access the preloaded state, e.g. in the `initState()` method.
+In order to send the data, it needs to be serialized on the server and deserialized on the client.
+The serialization format is defined by the `syncCodec` getter defined in `SyncStateMixin`.
+
+By default, this is set to `StateJsonCodec()` which will encode your state to JSON. Be aware that this 
+only works for JSON-encodable types, like primitives, `List`s and `Map`s.
+
+When you want to use another type like a custom model class, you have to override the `syncCodec` getter, which
+has to return a `Codec` that encodes to `String`. This can be any codec, however a typical use would be to 
+encode your model to `Map<String, dynamic>` and the fuse this with the json codec to get a json string.
 
 ```dart
-@override
-void initState() {
-  super.initState();
-  var myState = preloadedState; // do something with the preloaded state
+
+class MyState extends State<MyStatefulComponent> with SyncStateMixin<MyStatefulComponent, MyStateModel> {
+
+  @override
+  Codec<MyStateModel, String> get syncCodec => MyStateModelCodec().fuse(StateJsonCodec());
+
+  ...
+}
+
+// codec that encodes a value of MyStateModel to Map<String, dynamic>
+class MyStateModelCodec extends Codec<MyStateModel, Map<String, dynamic>> {
+  
+  ...
+  
 }
 ```
 

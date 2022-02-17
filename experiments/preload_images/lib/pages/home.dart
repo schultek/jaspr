@@ -3,29 +3,33 @@ import 'package:jaspr/jaspr.dart';
 import '../services/service.dart';
 
 class Home extends StatefulComponent {
-  Home() : super(key: StateKey(id: 'books'));
+  Home({Key? key}) : super(key: key);
 
   @override
   State<StatefulComponent> createState() => HomeState();
 }
 
-class HomeState extends State<Home> with PreloadStateMixin<Home, List> {
+class HomeState extends State<Home> with PreloadStateMixin<Home>, SyncStateMixin<Home, List> {
   late List images;
 
   @override
-  Future<List> preloadState() {
-    return ImageService.instance!.getImages();
+  Future<void> preloadState() async {
+    images = await ImageService.instance!.getImages();
   }
 
   @override
-  void didLoadState() {
-    initState();
+  List saveState() {
+    return images;
   }
 
   @override
-  void initState() {
-    super.initState();
-    images = preloadedState ?? [];
+  String get syncId => 'images';
+
+  @override
+  void updateState(List? value) {
+    setState(() {
+      images = value ?? [];
+    });
   }
 
   @override

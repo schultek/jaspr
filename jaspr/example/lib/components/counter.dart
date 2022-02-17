@@ -6,25 +6,33 @@ import '../services/service.dart';
 import 'button.dart';
 
 class Counter extends StatefulComponent {
-  Counter({Key? key}) : super(key: key ?? StateKey(id: 'counter'));
+  Counter({Key? key}) : super(key: key);
 
   @override
   State<StatefulComponent> createState() => CounterState();
 }
 
-class CounterState extends State<Counter> with PreloadStateMixin<Counter, int> {
+class CounterState extends State<Counter> with PreloadStateMixin<Counter>, SyncStateMixin<Counter, int> {
   int counter = 0;
 
   @override
-  Future<int> preloadState() async {
-    // fetch some data, only executed on the server
-    return DataService.instance!.getData();
+  String get syncId => 'counter';
+
+  @override
+  int saveState() {
+    return counter;
   }
 
   @override
-  void initState() {
-    super.initState();
-    counter = preloadedState ?? 0;
+  void updateState(int? value) {
+    counter = value ?? counter;
+    setState(() {});
+  }
+
+  @override
+  Future<void> preloadState() async {
+    // fetch some data, only executed on the server
+    counter = await DataService.instance!.getData();
   }
 
   @override

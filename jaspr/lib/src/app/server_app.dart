@@ -160,7 +160,7 @@ Future<Response> renderApp(ServerApp app, Request request, Response fileResponse
     await Isolate.spawn(renderData, message);
     var result = await port.first;
 
-    return Response.ok(result, headers: {'Content-Type': 'application/json'});
+    return Response.ok(result, headers: {'Content-Type': 'application/x-www-form-urlencoded'});
   } else {
     var indexHtml = await fileResponse.readAsString();
     var message = HtmlRenderMessage(app._setup, request.requestedUri, app.id, port.sendPort, indexHtml);
@@ -225,14 +225,15 @@ class ServerAppBinding extends AppBinding {
     var appElement = document.getElementById(_targetId!)!;
     appElement.innerHtml = renderMarkup(builderFn: _element!.render);
 
-    document.body!.attributes['data-app'] = jsonEncode(getStateData());
+    for (var entry in getStateData().entries) {
+      document.body!.attributes['data-state-${entry.key}'] = entry.value;
+    }
 
     return document.outerHtml;
   }
 
   Future<String> data() async {
     await firstBuild;
-    renderMarkup(builderFn: _element!.render);
     return jsonEncode(getStateData());
   }
 
@@ -249,7 +250,13 @@ class ServerAppBinding extends AppBinding {
   }
 
   @override
-  Future<String> fetchState(String url) {
+  String? getRawState(String id) => null;
+
+  @override
+  Future<Map<String, String>> fetchState(String url) {
     throw 'Cannot fetch state on the server';
   }
+
+  @override
+  void updateRawState(String id, String state) {}
 }

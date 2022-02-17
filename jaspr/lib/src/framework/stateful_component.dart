@@ -9,7 +9,7 @@ abstract class StatefulComponent extends Component {
   State createState();
 }
 
-/// This defers the first rendering on the client for an async operation
+/// This defers the first rendering on the client for an async task
 mixin DeferRenderMixin<T extends StatefulComponent> on State<T> {
   Future<void> get defer => _deferFuture ?? Future.value();
   Future? _deferFuture;
@@ -18,70 +18,61 @@ mixin DeferRenderMixin<T extends StatefulComponent> on State<T> {
     if (kIsWeb && AppBinding.instance!.isFirstBuild) {
       _deferFuture = Future.sync(() async {
         await beforeFirstRender();
-        initState();
-        didChangeDependencies();
+        _element!._initState();
       });
       return true;
     }
     return false;
   }
 
+  /// Called on the client before initState() to perform some asynchronous task
   Future<void> beforeFirstRender();
 }
 
-/// This preloads state on the server and automatically syncs with the client
-mixin PreloadStateMixin<T extends StatefulComponent, U> on State<T> {
-  U? _preloadedState;
-  U? get preloadedState => _preloadedState;
-
+/// Mixin on [State] that preloads state on the server
+mixin PreloadStateMixin<T extends StatefulComponent> on State<T> {
   Future<void> get preloadFuture => _preloadFuture ?? Future.value();
   Future? _preloadFuture;
-
-  bool _isLoadingState = false;
-  bool get isLoadingState => _isLoadingState;
 
   bool _preload() {
     if (!kIsWeb) {
       _preloadFuture = Future.sync(() async {
-        _preloadedState = await preloadState();
-        if (_preloadedState != null && component.key is StateKey) {
-          (component.key as StateKey)._saveState(_preloadedState);
-        }
-        initState();
-        didChangeDependencies();
+        await preloadState();
+        _element!._initState();
       });
       return true;
-    }
-    if (component.key is StateKey) {
-      _preloadedState = (component.key as StateKey)._getState();
-      _isLoadingState = (component.key as StateKey)._isLoadingState();
     }
     return false;
   }
 
-  void _notifyLoadedState(dynamic data) {
-    assert(data is U?);
-    assert(_element != null);
-
-    if (data == _preloadedState) {
-      if (_isLoadingState) {
-        _isLoadingState = false;
-        _element!.markNeedsBuild();
-      }
-      return;
-    }
-
-    _preloadedState = data;
-    _isLoadingState = false;
-    _element!.markNeedsBuild();
-    didLoadState();
-  }
-
+  /// Called on the server before initState() to preload asynchronous data
   @protected
-  Future<U> preloadState();
+  Future<void> preloadState();
+}
 
-  @protected
-  void didLoadState() {}
+/// Mixin on [State] that syncs state data from the server with the client
+mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> {
+  /// Codec used to serialize the state data on the server and deserialize on the client
+  Codec<U, String> get syncCodec => StateJsonCodec();
+
+  /// Globally unique id used to identify the state data between server and client
+  String get syncId;
+
+  /// Called on the server after the initial build, to retrieve the state data of this component.
+  U saveState();
+
+  /// Called on the client when a new state value is available, either when the state is first initialized, or when the
+  /// state becomes available through lazy loading a route.
+  ///
+  /// On initialization, this will be called after initState() and before didChangeDependencies()
+  void updateState(U? value);
+}
+
+class StateJsonCodec<T> extends Codec<T, String> {
+  @override
+  Converter<String, T> get decoder => JsonDecoder().cast();
+  @override
+  Converter<T, String> get encoder => JsonEncoder().cast();
 }
 
 abstract class State<T extends StatefulComponent> {
@@ -142,6 +133,14 @@ class StatefulElement extends MultiChildElement {
   State? _state;
   State get state => _state!;
 
+  void _initState() {
+    state.initState();
+    if (kIsWeb && state is SyncStateMixin && component.key is GlobalKey) {
+      AppBinding.instance!._initState(component.key as GlobalKey);
+    }
+    state.didChangeDependencies();
+  }
+
   @override
   void _firstBuild() {
     var didInit = false;
@@ -153,10 +152,8 @@ class StatefulElement extends MultiChildElement {
     }
 
     if (!didInit) {
-      state.initState();
-      state.didChangeDependencies();
+      _initState();
     }
-
     super._firstBuild();
   }
 
