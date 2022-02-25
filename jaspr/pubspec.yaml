@@ -13,10 +13,12 @@ dependencies:
   shelf_static: ^1.1.0
   args: ^2.3.0
   html: ^0.15.0
-  path: ^1.8.1
+  path: ^1.8.0
 
 dev_dependencies:
   build_runner: ^2.1.7
   build_web_compilers: ^3.2.2
   lints: ^1.0.1
   webdev: ^2.7.7
+  jaspr_test:
+    path: ../jaspr_test

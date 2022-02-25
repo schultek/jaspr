@@ -15,7 +15,7 @@ mixin DeferRenderMixin<T extends StatefulComponent> on State<T> {
   Future? _deferFuture;
 
   bool _defer() {
-    if (kIsWeb && AppBinding.instance!.isFirstBuild) {
+    if (ComponentsBinding.instance!.isClient && ComponentsBinding.instance!.isFirstBuild) {
       _deferFuture = Future.sync(() async {
         await beforeFirstRender();
         _element!._initState();
@@ -35,7 +35,7 @@ mixin PreloadStateMixin<T extends StatefulComponent> on State<T> {
   Future? _preloadFuture;
 
   bool _preload() {
-    if (!kIsWeb) {
+    if (!ComponentsBinding.instance!.isClient) {
       _preloadFuture = Future.sync(() async {
         await preloadState();
         _element!._initState();
@@ -135,8 +135,8 @@ class StatefulElement extends MultiChildElement {
 
   void _initState() {
     state.initState();
-    if (kIsWeb && state is SyncStateMixin && component.key is GlobalKey) {
-      AppBinding.instance!._initState(component.key as GlobalKey);
+    if (ComponentsBinding.instance!.isClient && state is SyncStateMixin && component.key is GlobalKey) {
+      ComponentsBinding.instance!._initState(component.key as GlobalKey);
     }
     state.didChangeDependencies();
   }

@@ -19,6 +19,7 @@ Experimental web framework for Dart. Supports SPAs and SSR.
 - [Routing](#routing)
   - [Lazy Routes](#lazy-routes)
 - [Building](#building)
+- [Testing](#testing)
 
 ## Get Started
 
@@ -134,7 +135,7 @@ class MyStateModelCodec extends Codec<MyStateModel, Map<String, dynamic>> {
   ...
   
 }
-```zz
+```
 
 ## Routing
 
@@ -205,4 +206,37 @@ To run your built application do:
 ```shell
 cd build
 ./app
+```
+
+## Testing
+
+`jaspr` comes with it's own testing package `jaspr_test`.
+
+A simple component test looks like this:
+
+```dart
+import 'package:jaspr_test/jaspr_test.dart';
+
+import 'app.dart';
+
+void main() {
+  group('simple component test', () {
+    late ComponentTester tester;
+
+    setUp(() {
+      TestComponentsBinding.setUp();
+      tester = TestComponentsBinding.instance.tester;
+    });
+
+    test('should render component', () async {
+      await tester.pumpComponent(App());
+
+      expect(find.text('Count: 0'), findsOneComponent);
+
+      await tester.click(find.tag('button'));
+
+      expect(find.text('Count: 1'), findsOneComponent);
+    });
+  });
+}
 ```

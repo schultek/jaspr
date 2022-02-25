@@ -8,8 +8,8 @@ import 'package:domino/domino.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:meta/meta.dart';
 
-part 'app_binding.dart';
 part 'build_context.dart';
+part 'components_binding.dart';
 part 'dom_component.dart';
 part 'inactive_elements.dart';
 part 'inherited_component.dart';
@@ -18,8 +18,6 @@ part 'multi_child_element.dart';
 part 'single_child_element.dart';
 part 'stateful_component.dart';
 part 'stateless_component.dart';
-
-const bool kIsWeb = identical(0, 0.0);
 
 abstract class Component {
   const Component({this.key});
@@ -66,8 +64,8 @@ abstract class Element implements BuildContext {
   Component? _component;
   Component get component => _component!;
 
-  AppBinding? _root;
-  AppBinding get root => _root!;
+  ComponentsBinding? _root;
+  ComponentsBinding get root => _root!;
 
   BuildScheduler? _scheduler;
 
@@ -337,6 +335,14 @@ abstract class Element implements BuildContext {
     }
     final StatefulElement? statefulAncestor = ancestor as StatefulElement?;
     return statefulAncestor?.state as T?;
+  }
+
+  @override
+  void visitAncestorElements(bool Function(Element element) visitor) {
+    Element? ancestor = _parent;
+    while (ancestor != null && visitor(ancestor)) {
+      ancestor = ancestor._parent;
+    }
   }
 
   void didChangeDependencies() {

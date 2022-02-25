@@ -46,7 +46,7 @@ class UniqueKey extends LocalKey {
 class GlobalKey<T extends State<StatefulComponent>> extends Key {
   const GlobalKey() : super.empty();
 
-  Element? get _currentElement => AppBinding.instance!._globalKeyRegistry[this];
+  Element? get _currentElement => ComponentsBinding.instance!._globalKeyRegistry[this];
 
   BuildContext? get currentContext => _currentElement;
 

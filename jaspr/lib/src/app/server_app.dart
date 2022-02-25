@@ -22,7 +22,6 @@ ServerApp runApp(SetupFunction setup, {required String id}) {
 }
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
-/// TODO: extend this to enable custom handlers (e.g. for additional api endpoints)
 class ServerApp {
   ServerApp._(this._setup, this.id);
 
@@ -36,6 +35,7 @@ class ServerApp {
 
   final List<Middleware> _middleware = [];
 
+  /// Adds a custom shelf middleware to the server
   void addMiddleware(Middleware middleware) {
     if (_running) throw 'Cannot attach middleware. Server is already running.';
     _middleware.add(middleware);
@@ -43,6 +43,8 @@ class ServerApp {
 
   Function(HttpServer server)? _listener;
 
+  /// Registers a listener to be called after the server has started.
+  /// Might be called multiple times when using hot reload.
   void setListener(Function(HttpServer server) listener) {
     if (_running) throw 'Cannot attach listener. Server is already running.';
     _listener = listener;
@@ -50,6 +52,8 @@ class ServerApp {
 
   Future<HttpServer> Function(Handler)? _builder;
 
+  /// Registers a custom function to spin up a http server,
+  /// which will be used instead of the default server.
   void setBuilder(Future<HttpServer> Function(Handler) builder) {
     if (_running) throw 'Cannot attach builder. Server is already running.';
     _builder = builder;
@@ -191,30 +195,31 @@ class HtmlRenderMessage extends RenderMessage {
 /// Runs the app and returns the rendered html
 void renderHtml(HtmlRenderMessage message) async {
   var app = message.setup();
-  var binding = ServerAppBinding(message.requestUri)..attachRootComponent(app, to: message.id);
+  var binding = ServerComponentsBinding(message.requestUri)..attachRootComponent(app, to: message.id);
   message.sendPort.send(await binding.render(message.html));
 }
 
 /// Runs the app and returns the preloaded state data as json
 void renderData(RenderMessage message) async {
   var app = message.setup();
-  var binding = ServerAppBinding(message.requestUri)..attachRootComponent(app, to: message.id);
+  var binding = ServerComponentsBinding(message.requestUri)..attachRootComponent(app, to: message.id);
   message.sendPort.send(await binding.data());
 }
 
-/// Global app binding for the server
-class ServerAppBinding extends AppBinding {
-  ServerAppBinding(this.currentUri);
+/// Global component binding for the server
+class ServerComponentsBinding extends ComponentsBinding {
+  ServerComponentsBinding(this.currentUri);
 
   @override
   final Uri currentUri;
 
-  BuildScheduler? _element;
   String? _targetId;
 
   @override
-  void attachRootElement(BuildScheduler element, {required String to}) {
-    _element = element;
+  bool get isClient => false;
+
+  @override
+  void didAttachRootElement(BuildScheduler element, {required String to}) {
     _targetId = to;
   }
 
@@ -223,7 +228,7 @@ class ServerAppBinding extends AppBinding {
 
     var document = parse(rawHtml);
     var appElement = document.getElementById(_targetId!)!;
-    appElement.innerHtml = renderMarkup(builderFn: _element!.render);
+    appElement.innerHtml = renderMarkup(builderFn: rootElement!.render);
 
     for (var entry in getStateData().entries) {
       document.body!.attributes['data-state-${entry.key}'] = entry.value;

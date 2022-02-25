@@ -8,24 +8,27 @@ import '../framework/framework.dart';
 
 /// Main entry point for the browser app
 void runApp(Component Function() setup, {required String id}) {
-  BrowserAppBinding.ensureInitialized().attachRootComponent(setup(), to: id);
+  BrowserComponentsBinding.ensureInitialized().attachRootComponent(setup(), to: id);
 }
 
-/// Global app binding for the browser
-class BrowserAppBinding extends AppBinding {
-  static AppBinding ensureInitialized() {
-    if (AppBinding.instance == null) {
-      BrowserAppBinding();
+/// Global component binding for the browser
+class BrowserComponentsBinding extends ComponentsBinding {
+  static ComponentsBinding ensureInitialized() {
+    if (ComponentsBinding.instance == null) {
+      BrowserComponentsBinding();
     }
-    return AppBinding.instance!;
+    return ComponentsBinding.instance!;
   }
 
-  BrowserAppBinding() {
+  BrowserComponentsBinding() {
     _loadRawState();
   }
 
   @override
-  void attachRootElement(BuildScheduler element, {required String to}) async {
+  bool get isClient => true;
+
+  @override
+  void didAttachRootElement(BuildScheduler element, {required String to}) async {
     await firstBuild;
     element.view = registerView(
       root: document.getElementById(to)!,

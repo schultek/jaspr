@@ -35,6 +35,9 @@ class DomElement extends MultiChildElement with BuildScheduler {
   @override
   DomComponent get component => super.component as DomComponent;
 
+  dynamic _source;
+  dynamic get source => _source;
+
   @override
   Iterable<Component> build() => component.children ?? [];
 
@@ -57,9 +60,11 @@ class DomElement extends MultiChildElement with BuildScheduler {
       events: component.events?.map((k, v) => MapEntry(k, (e) => v())),
       onCreate: (event) {
         view = event.view;
+        _source = event.source;
       },
       onUpdate: (event) {
         view = event.view;
+        _source = event.source;
       },
     );
 

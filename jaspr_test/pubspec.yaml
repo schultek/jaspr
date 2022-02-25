@@ -1,0 +1,16 @@
+name: jaspr_test
+version: 0.1.0
+
+environment:
+  sdk: '>=2.16.0 <3.0.0'
+
+dependencies:
+  test: ^1.19.5
+  meta: ^1.7.0
+  jaspr:
+    path: ../jaspr
+  domino: ^0.8.1
+  html: ^0.15.0
+
+dev_dependencies:
+  lints: ^1.0.1

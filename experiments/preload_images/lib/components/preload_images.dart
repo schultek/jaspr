@@ -42,7 +42,7 @@ class PreloadImagesState extends State<PreloadImages> with SyncStateMixin<Preloa
   Iterable<Component> build(BuildContext context) sync* {
     yield component.child;
 
-    if (kIsWeb) {
+    if (ComponentsBinding.instance!.isClient) {
       for (var image in preloadImages) {
         yield DomComponent(
           tag: 'link',

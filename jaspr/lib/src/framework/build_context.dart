@@ -1,6 +1,7 @@
 part of framework;
 
-/// As known from Flutter
+/// The BuildContext supplied to a Components build() method,
+/// as known from Flutter
 abstract class BuildContext {
   InheritedComponent dependOnInheritedElement(InheritedElement ancestor, {Object? aspect});
 
@@ -11,4 +12,6 @@ abstract class BuildContext {
   T? getInheritedComponentOfExactType<T extends InheritedComponent>();
 
   T? findAncestorStateOfType<T extends State>();
+
+  void visitAncestorElements(bool Function(Element element) visitor);
 }

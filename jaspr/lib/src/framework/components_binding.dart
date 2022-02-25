@@ -1,31 +1,42 @@
 part of framework;
 
 /// Main app binding, controls the root component and global state
-abstract class AppBinding {
+abstract class ComponentsBinding {
   Uri get currentUri;
 
-  static AppBinding? _instance;
-  static AppBinding? get instance => _instance;
+  static ComponentsBinding? _instance;
+  static ComponentsBinding? get instance => _instance;
 
-  AppBinding() {
+  ComponentsBinding() {
     _instance = this;
   }
+
+  /// Whether the current app is run on the client (in the browser)
+  bool get isClient;
 
   void attachRootComponent(Component app, {required String to}) {
     var element = _Root(child: app).createElement();
     element._root = this;
 
     var syncBuildLock = Future.value();
-    _buildQueue.add(syncBuildLock);
+    _initialBuildQueue.add(syncBuildLock);
 
     element.mount(null);
-    attachRootElement(element, to: to);
+    _rootElement = element;
 
-    _buildQueue.remove(syncBuildLock);
+    didAttachRootElement(element, to: to);
+
+    _initialBuildQueue.remove(syncBuildLock);
   }
 
   @protected
-  void attachRootElement(BuildScheduler element, {required String to}) {}
+  void didAttachRootElement(BuildScheduler element, {required String to});
+
+  /// The [Element] that is at the root of the hierarchy.
+  ///
+  /// This is initialized the first time [runApp] is called.
+  Element? get rootElement => _rootElement;
+  Element? _rootElement;
 
   @protected
   Map<String, String> getStateData() {
@@ -70,10 +81,19 @@ abstract class AppBinding {
   @protected
   Future<Map<String, String>> fetchState(String url);
 
-  bool get isFirstBuild => _buildQueue.isNotEmpty;
+  bool get isFirstBuild => _initialBuildQueue.isNotEmpty;
+
+  final List<Future> _initialBuildQueue = [];
+  Future<void> get firstBuild async {
+    while (_initialBuildQueue.isNotEmpty) {
+      await _initialBuildQueue.first;
+    }
+  }
+
+  bool get isRebuilding => _buildQueue.isNotEmpty;
 
   final List<Future> _buildQueue = [];
-  Future<void> get firstBuild async {
+  Future<void> get currentBuild async {
     while (_buildQueue.isNotEmpty) {
       await _buildQueue.first;
     }
@@ -82,9 +102,9 @@ abstract class AppBinding {
   void performRebuildOn(Element? child) {
     var built = performRebuild(child);
     if (built is Future) {
-      assert(isFirstBuild);
-      _buildQueue.add(built);
-      built.whenComplete(() => _buildQueue.remove(built));
+      assert(isFirstBuild, 'Only the first build is allowed to be asynchronous.');
+      _initialBuildQueue.add(built);
+      built.whenComplete(() => _initialBuildQueue.remove(built));
     }
   }
 
@@ -136,16 +156,21 @@ mixin BuildScheduler on Element {
 
   Future<void> scheduleRebuild() {
     assert(_dirty || _view != null);
-    return _rebuilding ??= Future.microtask(() async {
-      try {
-        rebuild();
-        _view!.update();
-        _dirty = false;
-        root._inactiveElements._unmountAll();
-      } finally {
-        _rebuilding = null;
-      }
-    });
+    if (_rebuilding == null) {
+      _rebuilding = Future.microtask(() async {
+        try {
+          rebuild();
+          _view!.update();
+          _dirty = false;
+          root._inactiveElements._unmountAll();
+        } finally {
+          root._buildQueue.remove(_rebuilding);
+          _rebuilding = null;
+        }
+      });
+      root._buildQueue.add(_rebuilding!);
+    }
+    return _rebuilding!;
   }
 }
 
