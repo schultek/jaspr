@@ -2,7 +2,10 @@ part of framework;
 
 typedef EventCallback = void Function();
 
-/// Represents a dom element
+/// Represents a html element in the DOM
+///
+/// Must have a [tag] and any number of attributes.
+/// Can have a single [child] component or any amount of [children].
 class DomComponent extends Component {
   DomComponent({
     Key? key,
@@ -74,8 +77,9 @@ class DomElement extends MultiChildElement with BuildScheduler {
   }
 }
 
-/// Represents a plain text node
-/// This has no other properties. I.e. styling is done through the parent element(s) and their styles.
+/// Represents a plain text node with no additional properties.
+///
+/// Styling is done through the parent element(s) and their styles.
 class Text extends Component {
   Text(this.text, {Key? key}) : super(key: key);
 

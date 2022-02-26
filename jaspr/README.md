@@ -16,6 +16,7 @@ Experimental web framework for Dart. Supports SPAs and SSR.
 - [Get Started](#get-started)
 - [Components](#components)
 - [Preloading Data](#preloading-data)
+- [Syncing Data](#syncing-data)
 - [Routing](#routing)
   - [Lazy Routes](#lazy-routes)
 - [Building](#building)
@@ -56,7 +57,7 @@ Since html rendering works different to flutters painting approach, here are the
   - `DomComponent` renders a html element with the given tag. You can also set an id, attributes and events. It also takes a child component.
   - `Text` renders some raw html text. It receives only a string and nothing else. *You can style it through the parent element(s), as you normally would in html and css*.
 
-3. A `StatefulComponent` supports preloading some data on the server and automatic syncing data with the client. See [Preloading Data](#preloading-data) and [Syncing Data](#sync-data) on how to use this feature.
+3. A `StatefulComponent` supports preloading some data on the server and automatic syncing data with the client. See [Preloading Data](#preloading-data) and [Syncing Data](#syncing-data) on how to use this feature.
    
 ## Preloading Data
 

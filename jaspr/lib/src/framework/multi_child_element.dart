@@ -1,10 +1,23 @@
 part of framework;
 
+/// An [Element] that has multiple children.
+///
+/// Used by [DomComponent], [StatelessComponent] and [StatefulComponent].
 abstract class MultiChildElement extends Element {
+  /// Creates an element that uses the given component as its configuration.
   MultiChildElement(Component component) : super(component);
 
-  List<Element>? _children;
+  /// The current list of children of this element.
+  ///
+  /// This list is filtered to hide elements that have been forgotten (using
+  /// [forgetChild]).
+  @protected
+  @visibleForTesting
+  Iterable<Element> get children => _children!.where((Element child) => !_forgottenChildren.contains(child));
 
+  List<Element>? _children;
+  // We keep a set of forgotten children to avoid O(n^2) work walking _children
+  // repeatedly to remove children.
   final Set<Element> _forgottenChildren = HashSet<Element>();
 
   @override
@@ -34,12 +47,59 @@ abstract class MultiChildElement extends Element {
     }
   }
 
+  /// Updates the children of this element to use new components.
+  ///
+  /// Attempts to update the given old children list using the given new
+  /// components, removing obsolete elements and introducing new ones as necessary,
+  /// and then returns the new child list.
+  ///
+  /// During this function the `oldChildren` list must not be modified. If the
+  /// caller wishes to remove elements from `oldChildren` re-entrantly while
+  /// this function is on the stack, the caller can supply a `forgottenChildren`
+  /// argument, which can be modified while this function is on the stack.
+  /// Whenever this function reads from `oldChildren`, this function first
+  /// checks whether the child is in `forgottenChildren`. If it is, the function
+  /// acts as if the child was not in `oldChildren`.
+  ///
+  /// This function is a convenience wrapper around [updateChild], which updates
+  /// each individual child.
   @protected
   List<Element> updateChildren(List<Element> oldChildren, List<Component> newComponents,
       {Set<Element>? forgottenChildren}) {
     Element? replaceWithNullIfForgotten(Element child) {
       return forgottenChildren != null && forgottenChildren.contains(child) ? null : child;
     }
+
+    // This attempts to diff the new child list (newComponents) with
+    // the old child list (oldChildren), and produce a new list of elements to
+    // be the new list of child elements of this element. The called of this
+    // method is expected to update this render object accordingly.
+
+    // The cases it tries to optimize for are:
+    //  - the old list is empty
+    //  - the lists are identical
+    //  - there is an insertion or removal of one or more components in
+    //    only one place in the list
+    // If a component with a key is in both lists, it will be synced.
+    // Components without keys might be synced but there is no guarantee.
+
+    // The general approach is to sync the entire new list backwards, as follows:
+    // 1. Walk the lists from the top, syncing nodes, until you no longer have
+    //    matching nodes.
+    // 2. Walk the lists from the bottom, without syncing nodes, until you no
+    //    longer have matching nodes. We'll sync these nodes at the end. We
+    //    don't sync them now because we want to sync all the nodes in order
+    //    from beginning to end.
+    // At this point we narrowed the old and new lists to the point
+    // where the nodes no longer match.
+    // 3. Walk the narrowed part of the old list to get the list of
+    //    keys and sync null with non-keyed items.
+    // 4. Walk the narrowed part of the new list forwards:
+    //     * Sync non-keyed items with null
+    //     * Sync keyed items with the source if it exists, else with null.
+    // 5. Walk the bottom of the list again, syncing the nodes.
+    // 6. Sync null with any items in the list of keys that are still
+    //    mounted.
 
     int newChildrenTop = 0;
     int oldChildrenTop = 0;
@@ -144,6 +204,9 @@ abstract class MultiChildElement extends Element {
     }
   }
 
+  /// Subclasses should override this function to actually call the appropriate
+  /// `build` function (e.g., [StatelessComponent.build] or [State.build]) for
+  /// their component.
   @protected
   Iterable<Component> build();
 

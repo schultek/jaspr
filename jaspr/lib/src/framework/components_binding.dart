@@ -2,6 +2,9 @@ part of framework;
 
 /// Main app binding, controls the root component and global state
 abstract class ComponentsBinding {
+  /// The currently active uri.
+  /// On the server, this is the requested uri. On the client, this is the
+  /// currently visited uri in the browser.
   Uri get currentUri;
 
   static ComponentsBinding? _instance;
@@ -14,6 +17,7 @@ abstract class ComponentsBinding {
   /// Whether the current app is run on the client (in the browser)
   bool get isClient;
 
+  /// Sets [app] as the new root of the component tree and performs an initial build
   void attachRootComponent(Component app, {required String to}) {
     var element = _Root(child: app).createElement();
     element._root = this;
@@ -38,6 +42,7 @@ abstract class ComponentsBinding {
   Element? get rootElement => _rootElement;
   Element? _rootElement;
 
+  /// Returns the accumulated data from all active [State]s that use the [SyncStateMixin]
   @protected
   Map<String, String> getStateData() {
     var state = <String, String>{};
@@ -50,9 +55,13 @@ abstract class ComponentsBinding {
     return state;
   }
 
+  /// Must return the serialized state data associated with [id]. On the client this is the
+  /// data that is synced from the server.
   @protected
   String? getRawState(String id);
 
+  /// Must update the serialized state data associated with [id]. This is called on the client
+  /// when new data is loaded for a [LazyRoute].
   @protected
   void updateRawState(String id, String state);
 
@@ -65,7 +74,6 @@ abstract class ComponentsBinding {
     _isLoadingState = true;
     var data = await fetchState(path);
     _isLoadingState = false;
-    print("LOADED DATA $data");
 
     for (var id in data.keys) {
       updateRawState(id, data[id]!);
@@ -78,27 +86,37 @@ abstract class ComponentsBinding {
     }
   }
 
+  /// On the client, this should perform a http request to [url] to fetch state data from the server.
   @protected
   Future<Map<String, String>> fetchState(String url);
 
+  final List<Future> _initialBuildQueue = [];
+
+  /// Whether the initial build is currently performed.
   bool get isFirstBuild => _initialBuildQueue.isNotEmpty;
 
-  final List<Future> _initialBuildQueue = [];
+  /// Future that resolves when the initial build is completed.
   Future<void> get firstBuild async {
     while (_initialBuildQueue.isNotEmpty) {
       await _initialBuildQueue.first;
     }
   }
 
+  final List<Future> _buildQueue = [];
+
+  /// Whether a rebuild is currently performed.
   bool get isRebuilding => _buildQueue.isNotEmpty;
 
-  final List<Future> _buildQueue = [];
+  /// Future that resolves when the current build is completed.
   Future<void> get currentBuild async {
     while (_buildQueue.isNotEmpty) {
       await _buildQueue.first;
     }
   }
 
+  /// Rebuilds [child] and correctly accounts for any asynchronous operations that can occurr during the initial
+  /// build of an app.
+  /// Async builds are only allowed for [StatefulComponent]s that use the [PreloadDataMixin] or [DeferRenderMixin].
   void performRebuildOn(Element? child) {
     var built = performRebuild(child);
     if (built is Future) {
@@ -129,12 +147,6 @@ abstract class ComponentsBinding {
     }
   }
 
-  void _initState(GlobalKey key) {
-    if (key._canSync) {
-      key._notifyState(getRawState(key._id));
-    }
-  }
-
   final _InactiveElements _inactiveElements = _InactiveElements();
 }
 
@@ -150,14 +162,13 @@ mixin BuildScheduler on Element {
 
   Future? _rebuilding;
 
-  void scheduleBuildFor(Element element) {
-    scheduleRebuild();
-  }
-
+  /// Schedules a rebuild of the subtree relative to this element.
+  ///
+  /// Multiple calls to [scheduleRebuild] are ignored when a rebuild is already scheduled.
   Future<void> scheduleRebuild() {
     assert(_dirty || _view != null);
     if (_rebuilding == null) {
-      _rebuilding = Future.microtask(() async {
+      _rebuilding = Future.microtask(() {
         try {
           rebuild();
           _view!.update();

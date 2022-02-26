@@ -1,7 +1,15 @@
 part of framework;
 
+/// An [Element] that has a single children.
+///
+/// Used by [InheritedComponent].
 abstract class SingleChildElement extends Element {
   SingleChildElement(Component component) : super(component);
+
+  /// The current child of this element.
+  @protected
+  @visibleForTesting
+  Element get children => _child!;
 
   Element? _child;
 
@@ -34,6 +42,8 @@ abstract class SingleChildElement extends Element {
     _child?.render(b);
   }
 
+  /// Subclasses should override this function to return the current configuration of
+  /// their child.
   @protected
   Component? build();
 
