@@ -48,7 +48,7 @@ class DomElement extends MultiChildElement with BuildScheduler {
   void update(DomComponent newComponent) {
     super.update(newComponent);
     _dirty = true;
-    root.performRebuildOn(this);
+    rebuild();
   }
 
   @override
@@ -103,7 +103,7 @@ class TextElement extends Element {
   }
 
   @override
-  void rebuild() {}
+  void performRebuild() {}
 
   @override
   void visitChildren(ElementVisitor visitor) {}

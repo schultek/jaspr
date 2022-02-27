@@ -4,8 +4,8 @@ import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../../jaspr_test.dart';
 import '../dom_tester.dart';
-import '../finders.dart';
 
 class ComponentTester {
   ComponentTester._(this.binding);
@@ -29,9 +29,11 @@ class ComponentTester {
     return binding.firstBuild;
   }
 
-  Future<void> click(Finder finder) {
+  Future<void> click(Finder finder, {bool pump = true}) async {
     dispatchEvent(finder, 'click', null);
-    return binding.currentBuild;
+    if (pump) {
+      await pumpEventQueue();
+    }
   }
 
   void dispatchEvent(Finder finder, String event, dynamic data) {

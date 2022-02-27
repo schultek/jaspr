@@ -12,7 +12,10 @@ abstract class ComponentsBinding {
 
   ComponentsBinding() {
     _instance = this;
+    _owner = BuildOwner();
   }
+
+  late BuildOwner _owner;
 
   /// Whether the current app is run on the client (in the browser)
   bool get isClient;
@@ -102,37 +105,30 @@ abstract class ComponentsBinding {
     }
   }
 
-  final List<Future> _buildQueue = [];
-
-  /// Whether a rebuild is currently performed.
-  bool get isRebuilding => _buildQueue.isNotEmpty;
-
-  /// Future that resolves when the current build is completed.
-  Future<void> get currentBuild async {
-    while (_buildQueue.isNotEmpty) {
-      await _buildQueue.first;
-    }
-  }
-
   /// Rebuilds [child] and correctly accounts for any asynchronous operations that can occurr during the initial
   /// build of an app.
   /// Async builds are only allowed for [StatefulComponent]s that use the [PreloadDataMixin] or [DeferRenderMixin].
-  void performRebuildOn(Element? child) {
+  void performRebuildOn(Element? child, [void Function()? whenComplete]) {
     var built = performRebuild(child);
     if (built is Future) {
       assert(isFirstBuild, 'Only the first build is allowed to be asynchronous.');
       _initialBuildQueue.add(built);
-      built.whenComplete(() => _initialBuildQueue.remove(built));
+      built.whenComplete(() {
+        _initialBuildQueue.remove(built);
+        whenComplete?.call();
+      });
+    } else {
+      whenComplete?.call();
     }
   }
 
   /// The first build on server and browser is allowed to have asynchronous operations (i.e. preloading data)
   /// However we want the component and element apis to stay synchronous, so subclasses
-  /// can override this method to simulate an async rebuild for a child
+  /// can override this method to simulate an async build for a child
   @protected
   @mustCallSuper
   FutureOr<void> performRebuild(Element? child) {
-    child?.rebuild();
+    child?.performRebuild();
   }
 
   final Map<GlobalKey, Element> _globalKeyRegistry = {};
@@ -146,8 +142,6 @@ abstract class ComponentsBinding {
       _globalKeyRegistry.remove(key);
     }
   }
-
-  final _InactiveElements _inactiveElements = _InactiveElements();
 }
 
 /// In difference to Flutter, we have multiple build schedulers instead of one global build owner
@@ -158,34 +152,6 @@ mixin BuildScheduler on Element {
   DomView get view => _view!;
   set view(DomView v) {
     _view = v;
-  }
-
-  Future? _rebuilding;
-
-  /// Schedules a rebuild of the subtree relative to this element.
-  ///
-  /// Multiple calls to [scheduleRebuild] are ignored when a rebuild is already scheduled.
-  Future<void> scheduleRebuild() {
-    assert(_dirty || _view != null, 'View was not initialized on BuildScheduler');
-    if (_rebuilding == null) {
-      if (_parent?._scheduler?._rebuilding != null) {
-        return _parent!._scheduler!._rebuilding!;
-      }
-
-      _rebuilding = Future.microtask(() {
-        try {
-          rebuild();
-          _view!.update();
-          _dirty = false;
-          root._inactiveElements._unmountAll();
-        } finally {
-          root._buildQueue.remove(_rebuilding);
-          _rebuilding = null;
-        }
-      });
-      root._buildQueue.add(_rebuilding!);
-    }
-    return _rebuilding!;
   }
 }
 
@@ -206,4 +172,117 @@ class _RootElement extends SingleChildElement with BuildScheduler {
 
   @override
   Component build() => component.child;
+}
+
+class BuildOwner {
+  final List<Element> _dirtyElements = <Element>[];
+
+  Future? _scheduledBuild;
+
+  BuildScheduler? _schedulerContext;
+
+  final _InactiveElements _inactiveElements = _InactiveElements();
+
+  /// Whether [_dirtyElements] need to be sorted again as a result of more
+  /// elements becoming dirty during the build.
+  ///
+  /// This is necessary to preserve the sort order defined by [Element._sort].
+  ///
+  /// This field is set to null when [performBuild] is not actively rebuilding
+  /// the widget tree.
+  bool? _dirtyElementsNeedsResorting;
+
+  /// Whether this widget tree is in the build phase.
+  ///
+  /// Only valid when asserts are enabled.
+  bool get debugBuilding => _debugBuilding;
+  bool _debugBuilding = false;
+
+  void scheduleBuildFor(Element element) {
+    assert(!ComponentsBinding.instance!.isFirstBuild);
+    assert(element.dirty, 'scheduleBuildFor() called for a widget that is not marked as dirty.');
+
+    if (element._inDirtyList) {
+      _dirtyElementsNeedsResorting = true;
+      return;
+    }
+    _scheduledBuild ??= Future.microtask(performBuild);
+    if (_schedulerContext == null || element._scheduler!.depth < _schedulerContext!.depth) {
+      _schedulerContext = element._scheduler;
+    }
+
+    _dirtyElements.add(element);
+    element._inDirtyList = true;
+  }
+
+  void performBuild() {
+    assert(!ComponentsBinding.instance!.isFirstBuild);
+
+    assert(_schedulerContext != null);
+    assert(!_debugBuilding);
+
+    assert(() {
+      _debugBuilding = true;
+      return true;
+    }());
+
+    try {
+      _dirtyElements.sort(Element._sort);
+      _dirtyElementsNeedsResorting = false;
+
+      int dirtyCount = _dirtyElements.length;
+      int index = 0;
+
+      while (index < dirtyCount) {
+        final Element element = _dirtyElements[index];
+        assert(element._inDirtyList);
+
+        try {
+          element.rebuild();
+          assert(!element._dirty, 'Build was not finished synchronously on $element');
+        } catch (e) {
+          // TODO: properly report error
+          print("Error on rebuilding component: $e");
+        }
+
+        index += 1;
+        if (dirtyCount < _dirtyElements.length || _dirtyElementsNeedsResorting!) {
+          _dirtyElements.sort(Element._sort);
+          _dirtyElementsNeedsResorting = false;
+          dirtyCount = _dirtyElements.length;
+          while (index > 0 && _dirtyElements[index - 1].dirty) {
+            index -= 1;
+          }
+        }
+      }
+
+      assert(() {
+        if (_dirtyElements
+            .any((Element element) => element._lifecycleState == _ElementLifecycle.active && element.dirty)) {
+          throw 'buildScope missed some dirty elements.';
+        }
+        return true;
+      }());
+    } finally {
+      for (final Element element in _dirtyElements) {
+        assert(element._inDirtyList);
+        element._inDirtyList = false;
+      }
+      _dirtyElements.clear();
+      _dirtyElementsNeedsResorting = null;
+
+      _schedulerContext!.view.update();
+      _schedulerContext = null;
+
+      _inactiveElements._unmountAll();
+
+      _scheduledBuild = null;
+
+      assert(_debugBuilding);
+      assert(() {
+        _debugBuilding = false;
+        return true;
+      }());
+    }
+  }
 }

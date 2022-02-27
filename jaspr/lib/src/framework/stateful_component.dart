@@ -633,14 +633,20 @@ class StatefulElement extends MultiChildElement {
   }
 
   void _initState() {
-    Object? result = state.initState() as dynamic;
-    assert(
-      result is! Future,
-      '${state.runtimeType}.initState() returned a Future.\n\n'
-      'Rather than awaiting on asynchronous work directly inside of initState, '
-      'call a separate method to do this work without awaiting it.\n\n'
-      'If you need to do some async work before the first render, use PreloadStateMixin or DeferRenderMixin on State.',
-    );
+    assert(state._debugLifecycleState == _StateLifecycle.created);
+    try {
+      _debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
+      Object? result = state.initState() as dynamic;
+      assert(
+        result is! Future,
+        '${state.runtimeType}.initState() returned a Future.\n\n'
+        'Rather than awaiting on asynchronous work directly inside of initState, '
+        'call a separate method to do this work without awaiting it.\n\n'
+        'If you need to do some async work before the first render, use PreloadStateMixin or DeferRenderMixin on State.',
+      );
+    } finally {
+      _debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
+    }
     assert(() {
       state._debugLifecycleState = _StateLifecycle.initialized;
       return true;
@@ -653,24 +659,33 @@ class StatefulElement extends MultiChildElement {
   }
 
   @override
-  void rebuild() {
+  void performRebuild() {
     if (_didChangeDependencies) {
       state.didChangeDependencies();
       _didChangeDependencies = false;
     }
-    super.rebuild();
+    super.performRebuild();
   }
 
   @override
   void update(StatefulComponent newComponent) {
     super.update(newComponent);
+    assert(component == newComponent);
     final StatefulComponent oldComponent = state.component;
 
+    // We mark ourselves as dirty before calling didUpdateWidget to
+    // let authors call setState from within didUpdateWidget without triggering
+    // asserts.
     _dirty = true;
     state._component = newComponent;
-
-    state.didUpdateComponent(oldComponent);
-    root.performRebuildOn(this);
+    try {
+      _debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
+      // TODO: check for returned future
+      state.didUpdateComponent(oldComponent);
+    } finally {
+      _debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
+    }
+    rebuild();
   }
 
   @override

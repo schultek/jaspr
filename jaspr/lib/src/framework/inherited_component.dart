@@ -165,7 +165,7 @@ class InheritedElement extends SingleChildElement {
     super.update(newComponent);
     updated(oldComponent);
     _dirty = true;
-    root.performRebuildOn(this);
+    rebuild();
   }
 
   /// Called during build when the [component] has changed.

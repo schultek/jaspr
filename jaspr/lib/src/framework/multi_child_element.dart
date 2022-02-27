@@ -29,22 +29,30 @@ abstract class MultiChildElement extends Element {
   }
 
   void _firstBuild() {
-    root.performRebuildOn(this);
+    rebuild();
   }
 
   @override
-  void rebuild() {
-    if (dirty) {
-      List<Component> built = build().toList();
-      _children = updateChildren(_children ?? [], built, forgottenChildren: _forgottenChildren);
-      _forgottenChildren.clear();
+  void performRebuild() {
+    assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(true));
+    List<Component>? built;
+    try {
+      built = build().toList();
+    } catch (e) {
+      // TODO: implement actual error component
+      built = [
+        DomComponent(
+          tag: 'div',
+          child: Text("Error on building component: $e"),
+        ),
+      ];
+    } finally {
       _dirty = false;
-    } else {
-      assert(_children != null);
-      for (var child in _children!) {
-        root.performRebuildOn(child);
-      }
+      assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(false));
     }
+
+    _children = updateChildren(_children ?? [], built, forgottenChildren: _forgottenChildren);
+    _forgottenChildren.clear();
   }
 
   /// Updates the children of this element to use new components.

@@ -271,7 +271,6 @@ abstract class Element implements BuildContext {
     if (child != null) {
       if (child._component == newComponent) {
         newChild = child;
-        root.performRebuildOn(newChild);
       } else if (Component.canUpdate(child.component, newComponent)) {
         child.update(newComponent);
         assert(child.component == newComponent);
@@ -401,7 +400,7 @@ abstract class Element implements BuildContext {
       parent.deactivateChild(element);
     }
     assert(element._parent == null);
-    root._inactiveElements.remove(element);
+    root._owner._inactiveElements.remove(element);
     return element;
   }
 
@@ -457,7 +456,7 @@ abstract class Element implements BuildContext {
     assert(child._parent == this);
     child._parent = null;
     child.detachScheduler();
-    root._inactiveElements.add(child);
+    root._owner._inactiveElements.add(child);
   }
 
   /// Remove the given child from the element's child list, in preparation for
@@ -514,7 +513,9 @@ abstract class Element implements BuildContext {
     _dependencies?.clear();
     _hadUnsatisfiedDependencies = false;
     _updateInheritance();
-    if (_dirty) _scheduler!.scheduleRebuild();
+    if (_dirty) {
+      root._owner.scheduleBuildFor(this);
+    }
     if (hadDependencies) didChangeDependencies();
   }
 
@@ -647,6 +648,21 @@ abstract class Element implements BuildContext {
   bool _dirty = true;
   bool get dirty => _dirty;
 
+  // Whether this is in owner._dirtyElements. This is used to know whether we
+  // should be adding the element back into the list when it's reactivated.
+  bool _inDirtyList = false;
+
+  // We let widget authors call setState from initState, didUpdateWidget, and
+  // build even when state is locked because its convenient and a no-op anyway.
+  // This flag ensures that this convenience is only allowed on the element
+  // currently undergoing initState, didUpdateWidget, or build.
+  bool _debugAllowIgnoredCallsToMarkNeedsBuild = false;
+  bool _debugSetAllowIgnoredCallsToMarkNeedsBuild(bool value) {
+    assert(_debugAllowIgnoredCallsToMarkNeedsBuild == !value);
+    _debugAllowIgnoredCallsToMarkNeedsBuild = value;
+    return true;
+  }
+
   /// Marks the element as dirty and schedules a rebuild.
   @mustCallSuper
   void markNeedsBuild() {
@@ -654,17 +670,56 @@ abstract class Element implements BuildContext {
     if (_lifecycleState != _ElementLifecycle.active) return;
     assert(_scheduler != null);
     assert(_lifecycleState == _ElementLifecycle.active);
+    assert(() {
+      if (root._owner._debugBuilding) {
+        if (_debugIsInScope(root._owner._schedulerContext!)) {
+          return true;
+        }
+        if (!_debugAllowIgnoredCallsToMarkNeedsBuild) {
+          throw 'setState() or markNeedsBuild() called during build.';
+        }
+        // can only get here if we're not in scope, but ignored calls are allowed, and our call would somehow be ignored (since we're already dirty)
+        assert(dirty);
+      }
+      return true;
+    }());
+
     if (_dirty) return;
     _dirty = true;
-    _scheduler!.scheduleRebuild();
+    _root!._owner.scheduleBuildFor(this);
+  }
+
+  bool _debugIsInScope(BuildScheduler target) {
+    BuildScheduler? current = _scheduler;
+    while (current != null) {
+      if (target == current) {
+        return true;
+      }
+      current = current._parent?._scheduler;
+    }
+    return false;
   }
 
   /// Cause the component to update itself.
   ///
-  /// Called by the [BuildScheduler] when rebuilding, by [mount] when the element is first
+  /// Called by the [BuildOwner] when rebuilding, by [mount] when the element is first
   /// built, and by [update] when the component has changed.
-  @mustCallSuper
-  void rebuild();
+  void rebuild() {
+    assert(_lifecycleState != _ElementLifecycle.initial);
+    if (_lifecycleState != _ElementLifecycle.active || !_dirty) {
+      return;
+    }
+    assert(_lifecycleState == _ElementLifecycle.active);
+    root.performRebuildOn(this, () {
+      assert(!_dirty);
+    });
+  }
+
+  /// Cause the component to update itself.
+  ///
+  /// Called by [rebuild] after the appropriate checks have been made.
+  @protected
+  void performRebuild();
 
   /// Renders the element to the DOM.
   ///

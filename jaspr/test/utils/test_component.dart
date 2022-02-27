@@ -17,7 +17,7 @@ class TestComponentController<T> {
 
   Future<void> rebuild() {
     _element?.markNeedsBuild();
-    return ComponentsBinding.instance!.currentBuild;
+    return pumpEventQueue();
   }
 
   Future<void> rebuildWith(T value) {

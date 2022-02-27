@@ -22,19 +22,27 @@ abstract class SingleChildElement extends Element {
   }
 
   void _firstBuild() {
-    root.performRebuildOn(this);
+    rebuild();
   }
 
   @override
-  void rebuild() {
-    if (dirty) {
-      var built = build();
-      _child = updateChild(_child, built);
+  void performRebuild() {
+    assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(true));
+    Component? built;
+    try {
+      built = build();
+    } catch (e) {
+      // TODO: implement actual error component
+      built = DomComponent(
+        tag: 'div',
+        child: Text("Error on building component: $e"),
+      );
+    } finally {
       _dirty = false;
-    } else {
-      assert(_child != null);
-      root.performRebuildOn(_child!);
+      assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(false));
     }
+
+    _child = updateChild(_child, built);
   }
 
   @override

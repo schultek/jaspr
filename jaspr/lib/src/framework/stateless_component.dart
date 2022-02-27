@@ -135,6 +135,6 @@ class StatelessElement extends MultiChildElement {
   void update(StatelessComponent newComponent) {
     super.update(newComponent);
     _dirty = true;
-    root.performRebuildOn(this);
+    rebuild();
   }
 }

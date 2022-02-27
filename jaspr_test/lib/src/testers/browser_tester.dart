@@ -3,7 +3,8 @@ import 'dart:html' as html;
 
 import 'package:domino/browser.dart' as domino;
 import 'package:jaspr/browser.dart';
-import 'package:jaspr_test/jaspr_test.dart';
+
+import '../../jaspr_test.dart';
 
 class BrowserTester {
   BrowserTester._(this.binding, this._id);
