@@ -22,6 +22,8 @@ extension _SyncKey on GlobalKey {
 }
 
 /// Mixin on [State] that syncs state data from the server with the client
+///
+/// Requires a [GlobalKey] on the component.
 mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> {
   /// Codec used to serialize the state data on the server and deserialize on the client
   Codec<U, String> get syncCodec => StateJsonCodec();
@@ -52,6 +54,14 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> {
   @override
   void initState() {
     super.initState();
+    assert((() {
+      if (component.key is! GlobalKey) {
+        print('[WARNING] Using SyncStateMixin without a GlobalKey is not supported and '
+            'will result in unsynched state. Please make sure that the component has a '
+            'GlobalKey.');
+      }
+      return true;
+    })());
     if (_element!.root.isClient) {
       var key = component.key;
       if (key is GlobalKey && key._canSync) {

@@ -1,0 +1,10 @@
+paths:
+  - test/framework
+  - test/server
+
+presets:
+  browser:
+    paths:
+      - test/browser
+    platforms:
+      - chrome

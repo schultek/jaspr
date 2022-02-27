@@ -18,15 +18,24 @@ typedef SetupFunction = Component Function();
 
 /// Main entry point on the server
 ServerApp runApp(SetupFunction setup, {required String id}) {
-  return ServerApp._(setup, id).._run();
+  return ServerApp.start(setup, id);
 }
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
 class ServerApp {
-  ServerApp._(this._setup, this.id);
+  ServerApp._(this._setup, this.id, [this._fileHandler, this._debugMode]);
+
+  factory ServerApp.start(SetupFunction setup, String id, [Handler? fileHandler, bool? debugMode]) {
+    return ServerApp._(setup, id, fileHandler, debugMode).._run();
+  }
 
   final String id;
   final SetupFunction _setup;
+
+  final bool? _debugMode;
+  final Handler? _fileHandler;
+
+  HotReloader? _reloader;
 
   HttpServer? _server;
   HttpServer? get server => _server;
@@ -62,30 +71,30 @@ class ServerApp {
   void _run() {
     Future.microtask(() async {
       _running = true;
-      if (Platform.environment['DART_WEB_MODE'] == 'DEBUG') {
-        await _runDebugApp(this);
+
+      var isDebug = _debugMode ?? Platform.environment['JASPR_MODE'] == 'DEBUG';
+
+      var fileHandler = _fileHandler ??
+          (isDebug
+              ? proxyHandler('http://localhost:${Platform.environment['JASPR_PROXY_PORT']}/')
+              : createStaticHandler(join(dirname(Platform.script.path), 'web'), defaultDocument: 'index.html'));
+
+      if (isDebug) {
+        await _reload(this, () => _createServer(this, catchAll(fileHandler)));
       } else {
-        await _runReleaseApp(this);
+        _server = await _createServer(this, catchAll(fileHandler));
+        _listener?.call(_server!);
       }
+
+      print('[INFO] Running app in ${isDebug ? 'debug' : 'release'} mode');
+      print('[INFO] Serving at http://${server!.address.host}:${server!.port}');
     });
   }
-}
 
-/// Runs a debug version of the app with proxying webdev and hotreload
-Future<void> _runDebugApp(ServerApp app) async {
-  var handler = proxyHandler('http://localhost:${Platform.environment['DART_WEB_PROXY_PORT']}/');
-  await _reload(app, () => _createServer(app, catchAll(handler)));
-  print('[INFO] Running app in debug mode');
-  print('[INFO] Serving at http://${app.server!.address.host}:${app.server!.port}');
-}
-
-/// Runs a release version of the app with static files
-Future<void> _runReleaseApp(ServerApp app) async {
-  var handler = createStaticHandler(join(dirname(Platform.script.path), 'web'), defaultDocument: 'index.html');
-  app._server = await _createServer(app, catchAll(handler));
-  app._listener?.call(app._server!);
-  print('[INFO] Running app in release mode');
-  print('[INFO] Serving at http://${app.server!.address.host}:${app.server!.port}');
+  Future<void> close() async {
+    await _server?.close();
+    await _reloader?.stop();
+  }
 }
 
 /// Redirects all unhandled urls to the base url
@@ -114,7 +123,7 @@ Future<void> _reload(ServerApp app, FutureOr<HttpServer> Function() init) async 
   };
 
   try {
-    await HotReloader.create(
+    app._reloader = await HotReloader.create(
       debounceInterval: Duration.zero,
       onAfterReload: (ctx) => obtainNewServer(init),
     );

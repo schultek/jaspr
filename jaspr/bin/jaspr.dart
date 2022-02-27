@@ -132,8 +132,8 @@ class ServeCommand extends Command<int> {
       'dart',
       ['run', '--enable-vm-service', '--enable-asserts', entryPoint],
       environment: {
-        'DART_WEB_MODE': 'DEBUG',
-        'DART_WEB_PROXY_PORT': '5467',
+        'JASPR_MODE': 'DEBUG',
+        'JASPR_PROXY_PORT': '5467',
       },
     );
 

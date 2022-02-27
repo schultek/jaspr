@@ -39,8 +39,8 @@ abstract class ComponentsBinding {
   /// The [Element] that is at the root of the hierarchy.
   ///
   /// This is initialized the first time [runApp] is called.
-  Element? get rootElement => _rootElement;
-  Element? _rootElement;
+  SingleChildElement? get rootElement => _rootElement;
+  SingleChildElement? _rootElement;
 
   /// Returns the accumulated data from all active [State]s that use the [SyncStateMixin]
   @protected

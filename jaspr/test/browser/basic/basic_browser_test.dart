@@ -1,13 +1,13 @@
-import 'package:jaspr_test/jaspr_test.dart';
+import 'package:jaspr_test/browser_test.dart';
 
 import 'basic_app.dart';
 
 void main() {
-  group('basic component test', () {
-    late ComponentTester tester;
+  group('basic browser test', () {
+    late BrowserTester tester;
 
     setUp(() {
-      tester = ComponentTester.setUp();
+      tester = BrowserTester.setUp();
     });
 
     test('should render component', () async {

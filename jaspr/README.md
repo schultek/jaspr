@@ -8,6 +8,7 @@ Experimental web framework for Dart. Supports SPAs and SSR.
 - Easy Server Side Rendering
 - Automatic hydration of component data on the client
 - Fast incremental DOM updates using [package:domino](https://pub.dev/packages/domino)
+- Well tested (currently > 78% coverage)
 
 > I'm looking for contributors. Don't hesitate to contact me if you want to help in any way.
 
@@ -41,7 +42,7 @@ dart run jaspr serve
 This will spin up a server at `localhost:8080`. You can now start developing your web app. 
 Also observe that the browser automatically refreshes the page when you change something in your code, like the `Hello World` text.
 
-**I also highly recommend having a look at the example [here](https://github.com/schultek/jaspr/tree/main/example)**
+**I also highly recommend having a look at the example [here](https://github.com/schultek/jaspr/tree/main/jaspr/example)**
 
 ## Components
 
@@ -241,3 +242,5 @@ void main() {
   });
 }
 ```
+
+For more examples on how to use the testing package, check out the [tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/jaspr/test).

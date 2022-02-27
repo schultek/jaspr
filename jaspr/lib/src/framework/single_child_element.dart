@@ -9,7 +9,7 @@ abstract class SingleChildElement extends Element {
   /// The current child of this element.
   @protected
   @visibleForTesting
-  Element get children => _child!;
+  Element get child => _child!;
 
   Element? _child;
 

@@ -64,4 +64,9 @@ class _ResolvedRoute implements ResolvedRoute {
 
   @override
   bool matches(String path) => _path == path;
+
+  @override
+  String toString() {
+    return '_ResolvedRoute{_path: $_path}';
+  }
 }
