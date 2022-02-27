@@ -167,13 +167,13 @@ Future<Response> renderApp(ServerApp app, Request request, Response fileResponse
 
   /// We support two modes here, rendered-html and data-only
   /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
-  if (request.headers['dart-web-mode'] == 'data-only') {
+  if (request.headers['jaspr-mode'] == 'data-only') {
     var message = RenderMessage(app._setup, request.requestedUri, app.id, port.sendPort);
 
     await Isolate.spawn(renderData, message);
     var result = await port.first;
 
-    return Response.ok(result, headers: {'Content-Type': 'application/x-www-form-urlencoded'});
+    return Response.ok(result, headers: {'Content-Type': 'application/json'});
   } else {
     var indexHtml = await fileResponse.readAsString();
     var message = HtmlRenderMessage(app._setup, request.requestedUri, app.id, port.sendPort, indexHtml);

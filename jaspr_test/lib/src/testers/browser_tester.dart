@@ -1,24 +1,37 @@
 import 'dart:async';
 import 'dart:html' as html;
-import 'dart:html';
 
+import 'package:domino/browser.dart' as domino;
 import 'package:jaspr/browser.dart';
-import 'package:jaspr_test/src/finders.dart';
+import 'package:jaspr_test/jaspr_test.dart';
 
 class BrowserTester {
   BrowserTester._(this.binding, this._id);
 
-  final BrowserComponentsBinding binding;
+  final TestBrowserComponentsBinding binding;
   final String _id;
 
-  static BrowserTester setUp({String id = 'app', Map<String, String>? initialStateData}) {
+  static BrowserTester setUp({
+    String id = 'app',
+    String location = '/',
+    Map<String, String>? initialStateData,
+    Map<String, String> Function(String url)? onFetchState,
+  }) {
     if (initialStateData != null) {
       for (var key in initialStateData.keys) {
-        document.body!.attributes['data-state-$key'] = initialStateData[key]!;
+        html.document.body!.attributes['data-state-$key'] = initialStateData[key]!;
       }
     }
 
-    var binding = BrowserComponentsBinding.ensureInitialized() as BrowserComponentsBinding;
+    if (!html.document.body!.children.any((e) => e.id == id)) {
+      html.document.body!.append(html.document.createElement('div')..id = id);
+    }
+
+    if (html.window.location.pathname != location) {
+      html.window.history.replaceState(null, 'Test', location);
+    }
+
+    var binding = TestBrowserComponentsBinding(onFetchState);
     return BrowserTester._(binding, id);
   }
 
@@ -29,9 +42,30 @@ class BrowserTester {
     return binding.firstBuild;
   }
 
-  Future<void> click(Finder finder) {
+  Future<void> navigate(Function(RouterState) navigate, {bool pump = true}) async {
+    RouterState? router;
+    findRouter(Element element) {
+      if (element is StatefulElement && element.state is RouterState) {
+        router = element.state as RouterState;
+      } else {
+        element.visitChildren(findRouter);
+      }
+    }
+
+    binding.rootElement!.visitChildren(findRouter);
+    if (router != null) {
+      navigate(router!);
+      if (pump) {
+        await pumpEventQueue();
+      }
+    }
+  }
+
+  Future<void> click(Finder finder, {bool pump = true}) async {
     dispatchEvent(finder, 'click', null);
-    return binding.currentBuild;
+    if (pump) {
+      await pumpEventQueue();
+    }
   }
 
   void dispatchEvent(Finder finder, String event, dynamic data) {
@@ -74,5 +108,37 @@ class BrowserTester {
     }
 
     return _foundElement!;
+  }
+}
+
+class TestBrowserComponentsBinding extends BrowserComponentsBinding {
+  TestBrowserComponentsBinding(this._onFetchState);
+
+  Completer? _rootViewCompleter;
+
+  @override
+  Future<void> get firstBuild => _rootViewCompleter!.future;
+
+  @override
+  void attachRootComponent(Component app, {required String to}) {
+    _rootViewCompleter = Completer();
+    super.attachRootComponent(app, to: to);
+  }
+
+  @override
+  Future<void> didAttachRootElement(BuildScheduler element, {required String to}) async {
+    await super.firstBuild;
+    element.view = domino.registerView(
+      root: html.document.getElementById(to)!,
+      builderFn: element.render,
+    );
+    _rootViewCompleter!.complete();
+  }
+
+  final Map<String, String> Function(String url)? _onFetchState;
+
+  @override
+  Future<Map<String, String>> fetchState(String url) async {
+    return _onFetchState?.call(url) ?? {};
   }
 }

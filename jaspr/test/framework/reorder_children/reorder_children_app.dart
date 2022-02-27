@@ -6,8 +6,8 @@ class App extends TestComponent<int> {
   App() : super(initialValue: 1);
 
   final child1Key = UniqueKey();
-  final child2Key = UniqueKey();
-  final child3Key = UniqueKey();
+  final child2Key = ValueKey(2);
+  final child3Key = GlobalObjectKey(3);
 
   @override
   Iterable<Component> build(BuildContext context, int phase) sync* {
@@ -30,11 +30,6 @@ class App extends TestComponent<int> {
       yield ChildComponent(
         key: child2Key,
         num: 2,
-      );
-
-      yield ChildComponent(
-        key: child1Key,
-        num: 1,
       );
     } else if (phase == 3) {
       yield ChildComponent(

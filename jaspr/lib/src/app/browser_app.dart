@@ -28,7 +28,7 @@ class BrowserComponentsBinding extends ComponentsBinding {
   bool get isClient => true;
 
   @override
-  void didAttachRootElement(BuildScheduler element, {required String to}) async {
+  Future<void> didAttachRootElement(BuildScheduler element, {required String to}) async {
     await firstBuild;
     element.view = registerView(
       root: document.getElementById(to)!,
@@ -75,7 +75,7 @@ class BrowserComponentsBinding extends ComponentsBinding {
   Future<Map<String, String>> fetchState(String url) {
     return window
         .fetch(url, {
-          'headers': {'dart-web-mode': 'data-only'}
+          'headers': {'jaspr-mode': 'data-only'}
         })
         .then((result) => result.text())
         .then((data) => (jsonDecode(data) as Map<String, dynamic>).cast());

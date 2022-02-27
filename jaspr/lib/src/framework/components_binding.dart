@@ -166,8 +166,12 @@ mixin BuildScheduler on Element {
   ///
   /// Multiple calls to [scheduleRebuild] are ignored when a rebuild is already scheduled.
   Future<void> scheduleRebuild() {
-    assert(_dirty || _view != null);
+    assert(_dirty || _view != null, 'View was not initialized on BuildScheduler');
     if (_rebuilding == null) {
+      if (_parent?._scheduler?._rebuilding != null) {
+        return _parent!._scheduler!._rebuilding!;
+      }
+
       _rebuilding = Future.microtask(() {
         try {
           rebuild();

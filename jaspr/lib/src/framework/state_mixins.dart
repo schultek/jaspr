@@ -49,6 +49,9 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> {
   ///   // do some post-initialization
   /// }
   /// ```
+  ///
+  /// The framework won't call setState() for you, so you have to call it yourself if you want to rebuild the component.
+  /// That allows for custom update logic and reduces unnecessary builds.
   void updateState(U? value);
 
   @override

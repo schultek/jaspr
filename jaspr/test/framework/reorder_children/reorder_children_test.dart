@@ -15,20 +15,22 @@ void main() {
       var controller = await tester.pumpTestComponent(App());
       var app = controller.element;
 
+      expect((app.component as App).child2Key.toString(), equals('[<2>]'));
+
       // phase 1 (1, 2, 3): children should be mounted
       expect(find.textContaining('Child'), findsNComponents(3));
 
       var elements1 = app.children.whereType<ChildElement>().toList();
       expect(elements1.map((e) => e.component.num), equals([1, 2, 3]));
 
-      // phase 2 (2, 1): children should be reordered
+      // phase 2 (2): children should be reordered
       await controller.rebuildWith(2);
 
-      expect(find.textContaining('Child'), findsNComponents(2));
+      expect(find.textContaining('Child'), findsNComponents(1));
 
       // all elements should be reused
       var elements2 = app.children.whereType<ChildElement>().toList();
-      expect(elements2, equals([elements1[1], elements1[0]]));
+      expect(elements2, equals([elements1[1]]));
 
       // phase 3 (3, 2): children should be reordered
       await controller.rebuildWith(3);

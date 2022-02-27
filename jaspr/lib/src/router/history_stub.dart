@@ -5,17 +5,17 @@ import 'router.dart';
 class HistoryManagerImpl implements HistoryManager {
   @override
   void push(String path, {String? title}) {
-    throw 'Routing unavailable on the server';
+    throw UnimplementedError('Routing unavailable on the server');
   }
 
   @override
   void replace(String path, {String? title}) {
-    throw 'Routing unavailable on the server';
+    throw UnimplementedError('Routing unavailable on the server');
   }
 
   @override
   void back() {
-    throw 'Routing unavailable on the server';
+    throw UnimplementedError('Routing unavailable on the server');
   }
 
   @override

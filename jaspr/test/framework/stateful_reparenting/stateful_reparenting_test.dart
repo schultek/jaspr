@@ -30,7 +30,8 @@ void main() {
       expect(find.descendant(of: find.tag('div'), matching: find.byType(MyStatefulComponent)), findsOneComponent);
 
       // lifecycle: state should be reparented, updated and built again
-      expect(state.lifecycle, equals(['deactivate', 'activate', 'didUpdateComponent', 'build']));
+      expect(
+          state.lifecycle, equals(['deactivate', 'activate', 'didUpdateComponent', 'didChangeDependencies', 'build']));
       state.lifecycle.clear();
 
       // phase 3: component should be unmounted

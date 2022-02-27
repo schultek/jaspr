@@ -8,3 +8,10 @@ presets:
       - test/browser
     platforms:
       - chrome
+    verbose_trace: false
+    js_trace: true
+
+override_platforms:
+  chrome:
+    settings:
+      headless: true

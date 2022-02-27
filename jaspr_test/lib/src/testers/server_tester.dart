@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:jaspr/server.dart';
+import 'package:test/fake.dart';
 
 class DocumentResponse {
   DocumentResponse({required this.statusCode, required this.body, this.document});
@@ -19,12 +21,23 @@ class DocumentResponse {
   Document? document;
 }
 
+class DataResponse {
+  DataResponse({required this.statusCode, required this.data});
+
+  /// The status code of the HTTP response
+  int statusCode;
+
+  /// The data returned by the HTTP request
+  Map<String, String>? data;
+}
+
 class ServerTester {
   ServerTester._();
 
-  static Future<ServerTester> setUp(SetupFunction setup, {String id = 'app', String? html, bool virtual = true}) async {
+  static Future<ServerTester> setUp(SetupFunction setup,
+      {String id = 'app', String? html, bool virtual = true, bool debug = false, List<Middleware>? middleware}) async {
     var tester = ServerTester._();
-    await tester._start(setup, id, html, virtual);
+    await tester._start(setup, id, html, virtual, debug, middleware);
     return tester;
   }
 
@@ -36,7 +49,8 @@ class ServerTester {
   Handler? _handler;
   http.Client? _client;
 
-  Future<void> _start(SetupFunction setup, String id, String? html, bool virtual) async {
+  Future<void> _start(
+      SetupFunction setup, String id, String? html, bool virtual, bool debug, List<Middleware>? middleware) async {
     var _html = html ?? '<html><head></head><body><div id="$id"></div></body></html>';
 
     fileHandler(Request request) {
@@ -48,15 +62,19 @@ class ServerTester {
     }
 
     var appCompleter = Completer();
-    app = ServerApp.start(setup, id, fileHandler, false)
+    app = ServerApp.start(setup, id, fileHandler, debug)
       ..setListener((server) {
         if (!appCompleter.isCompleted) appCompleter.complete();
       });
 
+    for (var m in middleware ?? []) {
+      app.addMiddleware(m);
+    }
+
     if (virtual) {
       app.setBuilder((handler) async {
         _handler = handler;
-        return VirtualHttpServer();
+        return FakeHttpServer();
       });
     } else {
       _client = http.Client();
@@ -89,38 +107,45 @@ class ServerTester {
       document: doc?.body != null ? doc : null,
     );
   }
+
+  Future<DataResponse> fetchData(String location) async {
+    var uri = Uri.parse('http://${app.server!.address.host}:${app.server!.port}$location');
+
+    int statusCode;
+    String body;
+
+    var headers = {'jaspr-mode': 'data-only'};
+
+    if (_handler != null) {
+      var response = await _handler!(Request('GET', uri, headers: headers));
+      statusCode = response.statusCode;
+      body = await response.readAsString();
+    } else {
+      var response = await _client!.get(uri, headers: headers);
+      statusCode = response.statusCode;
+      body = response.body;
+    }
+
+    Map<String, String>? data;
+    if (statusCode == 200) {
+      try {
+        data = (jsonDecode(body) as Map<String, dynamic>).cast();
+      } catch (_) {}
+    }
+
+    return DataResponse(
+      statusCode: statusCode,
+      data: data,
+    );
+  }
 }
 
-class VirtualHttpServer extends Stream<HttpRequest> implements HttpServer {
+class FakeHttpServer extends Fake implements HttpServer {
   @override
   InternetAddress get address => InternetAddress('virtual.server', type: InternetAddressType.unix);
 
   @override
   int get port => 0;
-
-  @override
-  bool autoCompress = false;
-
-  @override
-  Duration? idleTimeout;
-
-  @override
-  String? serverHeader;
-
-  @override
-  set sessionTimeout(int timeout) {}
-
-  @override
-  HttpHeaders get defaultResponseHeaders => throw UnimplementedError();
-
-  @override
-  HttpConnectionsInfo connectionsInfo() => HttpConnectionsInfo();
-
-  @override
-  StreamSubscription<HttpRequest> listen(void Function(HttpRequest event)? onData,
-      {Function? onError, void Function()? onDone, bool? cancelOnError}) {
-    throw UnimplementedError();
-  }
 
   @override
   Future close({bool force = false}) async {}

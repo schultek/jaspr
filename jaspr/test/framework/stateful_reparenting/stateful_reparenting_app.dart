@@ -10,6 +10,19 @@ class App extends TestComponent<int> {
 
   @override
   Iterable<Component> build(BuildContext context, int phase) sync* {
+    yield InheritedData(
+      child: Home(phase),
+    );
+  }
+}
+
+class Home extends StatelessComponent {
+  Home(this.phase);
+
+  final int phase;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
     if (phase == 1) {
       yield MyStatefulComponent(key: myKey);
     } else if (phase == 2) {
@@ -21,10 +34,25 @@ class App extends TestComponent<int> {
   }
 }
 
+class InheritedData extends InheritedComponent {
+  InheritedData({required Component child}) : super(child: child);
+
+  @override
+  bool updateShouldNotify(covariant InheritedData oldComponent) {
+    return true;
+  }
+}
+
 class MyStatefulComponent extends StatefulComponent {
   MyStatefulComponent({Key? key}) : super(key: key);
   @override
   State<StatefulComponent> createState() => MyState();
 }
 
-class MyState extends State<MyStatefulComponent> with TrackStateLifecycle<MyStatefulComponent> {}
+class MyState extends State<MyStatefulComponent> with TrackStateLifecycle<MyStatefulComponent> {
+  @override
+  Iterable<Component> build(BuildContext context) {
+    context.dependOnInheritedComponentOfExactType<InheritedData>();
+    return super.build(context);
+  }
+}

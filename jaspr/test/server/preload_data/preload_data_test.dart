@@ -1,4 +1,5 @@
 import 'package:jaspr_test/server_test.dart';
+import 'package:shelf/shelf.dart';
 
 import 'preload_data_app.dart';
 
@@ -6,8 +7,17 @@ void main() {
   group('preload data test', () {
     late ServerTester tester;
 
+    testMiddleware(Handler innerHandler) {
+      return (Request request) {
+        if (request.url.path.startsWith('api')) {
+          return Response.ok('{"data": "123"}');
+        }
+        return innerHandler(request);
+      };
+    }
+
     setUp(() async {
-      tester = await ServerTester.setUp(App.new);
+      tester = await ServerTester.setUp(App.new, middleware: [testMiddleware]);
     });
 
     tearDown(() async {
@@ -26,6 +36,20 @@ void main() {
       expect(body!.innerHtml, equals(appHtml));
 
       expect(body.attributes, equals({'data-state-counter': '202'}));
+    });
+
+    test('should fetch data', () async {
+      var response = await tester.fetchData('/');
+
+      expect(response.statusCode, equals(200));
+      expect(response.data, equals({'counter': '202'}));
+    });
+
+    test('should fetch api', () async {
+      var response = await tester.request('/api');
+
+      expect(response.statusCode, equals(200));
+      expect(response.body, equals('{"data": "123"}'));
     });
   });
 }
