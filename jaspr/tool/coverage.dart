@@ -7,7 +7,7 @@ void main() async {
   ]);
 
   await run(
-      'dart pub global run coverage:format_coverage --packages=.packages --report-on=lib --lcov -o ./coverage/lcov.info -i ./coverage');
+      'dart pub global run coverage:format_coverage --check-ignore --packages=.packages --report-on=lib --lcov -o ./coverage/lcov.info -i ./coverage');
 
   await run('genhtml -o ./coverage/report ./coverage/lcov.info');
 

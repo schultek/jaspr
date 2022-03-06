@@ -35,9 +35,9 @@ class ServerTester {
   ServerTester._();
 
   static Future<ServerTester> setUp(SetupFunction setup,
-      {String id = 'app', String? html, bool virtual = true, bool debug = false, List<Middleware>? middleware}) async {
+      {String id = 'app', String? html, bool virtual = true, List<Middleware>? middleware}) async {
     var tester = ServerTester._();
-    await tester._start(setup, id, html, virtual, debug, middleware);
+    await tester._start(setup, id, html, virtual, middleware);
     return tester;
   }
 
@@ -49,8 +49,7 @@ class ServerTester {
   Handler? _handler;
   http.Client? _client;
 
-  Future<void> _start(
-      SetupFunction setup, String id, String? html, bool virtual, bool debug, List<Middleware>? middleware) async {
+  Future<void> _start(SetupFunction setup, String id, String? html, bool virtual, List<Middleware>? middleware) async {
     var _html = html ?? '<html><head></head><body><div id="$id"></div></body></html>';
 
     fileHandler(Request request) {
@@ -62,7 +61,7 @@ class ServerTester {
     }
 
     var appCompleter = Completer();
-    app = ServerApp.start(setup, id, fileHandler, debug)
+    app = ServerApp.start(setup, id, fileHandler)
       ..setListener((server) {
         if (!appCompleter.isCompleted) appCompleter.complete();
       });

@@ -96,8 +96,14 @@ class ServeCommand extends Command<int> {
     argParser.addOption(
       'input',
       abbr: 'i',
-      help: 'Specify the input file for the web app',
+      help: 'Specify the input file for the web app.',
     );
+    argParser.addFlag(
+      'debug',
+      abbr: 'd',
+      help: 'Serves the app in debug mode.',
+    );
+    argParser.addFlag('verbose', abbr: 'v', help: 'Enable verbose logging.');
   }
 
   @override
@@ -111,15 +117,32 @@ class ServeCommand extends Command<int> {
   Future<int> run() async {
     var webProcess = await _runWebdev(['serve', '--auto=refresh', 'web:5467']);
 
+    print("Starting jaspr development server...");
+
     var startupCompleter = Completer();
-    _pipeProcess(webProcess, listen: (str) {
+
+    checkWebdevStarted(String str) {
       if (str.contains('Serving `web`') && !startupCompleter.isCompleted) {
         startupCompleter.complete();
       }
-    });
+    }
+
+    if (argResults!['verbose']) {
+      _pipeProcess(webProcess, listen: checkWebdevStarted);
+    } else {
+      _pipeError(webProcess);
+      webProcess.stdout.map(utf8.decode).listen(checkWebdevStarted);
+    }
+
     maybeExit(webProcess.exitCode);
 
     await startupCompleter.future;
+
+    var args = ['run', '--enable-vm-service', '--enable-asserts', '-Djaspr.debug=true'];
+
+    if (argResults!['debug']) {
+      args.add('--pause-isolates-on-start');
+    }
 
     String? entryPoint = await _getEntryPoint(argResults!['input']);
 
@@ -128,14 +151,9 @@ class ServeCommand extends Command<int> {
       return 1;
     }
 
-    var process = await Process.start(
-      'dart',
-      ['run', '--enable-vm-service', '--enable-asserts', entryPoint],
-      environment: {
-        'JASPR_MODE': 'DEBUG',
-        'JASPR_PROXY_PORT': '5467',
-      },
-    );
+    args.add(entryPoint);
+
+    var process = await Process.start('dart', args, environment: {'JASPR_PROXY_PORT': '5467'});
 
     _pipeProcess(process);
 

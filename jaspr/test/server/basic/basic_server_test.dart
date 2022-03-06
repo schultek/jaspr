@@ -3,7 +3,7 @@ import 'package:jaspr_test/server_test.dart';
 import 'basic_app.dart';
 
 void main() {
-  makeTest(bool virtual, [bool debug = false]) => () {
+  makeTest(bool virtual) => () {
         late ServerTester tester;
 
         setUp(() async {
@@ -13,7 +13,6 @@ void main() {
               return App();
             },
             virtual: virtual,
-            debug: debug,
           );
         });
 
@@ -36,6 +35,4 @@ void main() {
   group('basic virtual server test', makeTest(true));
 
   group('basic real server test', makeTest(false));
-
-  group('basic debug server test', makeTest(true, true));
 }

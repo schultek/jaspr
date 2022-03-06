@@ -6,6 +6,7 @@ import 'dart:isolate';
 import 'package:domino/markup.dart' hide DomComponent, DomElement;
 import 'package:hotreloader/hotreloader.dart';
 import 'package:html/parser.dart';
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
@@ -16,6 +17,8 @@ import '../framework/framework.dart';
 
 typedef SetupFunction = Component Function();
 
+const jasprDebugMode = bool.fromEnvironment('jaspr.debug');
+
 /// Main entry point on the server
 ServerApp runApp(SetupFunction setup, {required String id}) {
   return ServerApp.start(setup, id);
@@ -23,16 +26,15 @@ ServerApp runApp(SetupFunction setup, {required String id}) {
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
 class ServerApp {
-  ServerApp._(this._setup, this.id, [this._fileHandler, this._debugMode]);
+  ServerApp._(this._setup, this.id, [this._fileHandler]);
 
-  factory ServerApp.start(SetupFunction setup, String id, [Handler? fileHandler, bool? debugMode]) {
-    return ServerApp._(setup, id, fileHandler, debugMode).._run();
+  factory ServerApp.start(SetupFunction setup, String id, [Handler? fileHandler]) {
+    return ServerApp._(setup, id, fileHandler).._run();
   }
 
   final String id;
   final SetupFunction _setup;
 
-  final bool? _debugMode;
   final Handler? _fileHandler;
 
   HotReloader? _reloader;
@@ -72,21 +74,34 @@ class ServerApp {
     Future.microtask(() async {
       _running = true;
 
-      var isDebug = _debugMode ?? Platform.environment['JASPR_MODE'] == 'DEBUG';
+      var portToProxy = Platform.environment['JASPR_PROXY_PORT'];
 
       var fileHandler = _fileHandler ??
-          (isDebug
-              ? proxyHandler('http://localhost:${Platform.environment['JASPR_PROXY_PORT']}/')
+          (jasprDebugMode
+              ? webdevProxyHandler('http://localhost:$portToProxy/', this)
               : createStaticHandler(join(dirname(Platform.script.path), 'web'), defaultDocument: 'index.html'));
 
-      if (isDebug) {
-        await _reload(this, () => _createServer(this, catchAll(fileHandler)));
+      var cascade = Cascade();
+
+      if (jasprDebugMode) {
+        final serverHostname = 'localhost';
+        final serverUri = Uri.parse('http://$serverHostname:$portToProxy');
+        final serverSseUri = serverUri.replace(path: r'/$dwdsSseHandler');
+        final sseUri = Uri.parse(r'/$dwdsSseHandler');
+
+        cascade = cascade.add(sseProxyHandler(sseUri, serverSseUri));
+      }
+
+      cascade = cascade.add(fileHandler).add(proxyRootIndexHandler(fileHandler));
+
+      if (jasprDebugMode) {
+        await _reload(this, () => _createServer(this, cascade.handler));
       } else {
-        _server = await _createServer(this, catchAll(fileHandler));
+        _server = await _createServer(this, cascade.handler);
         _listener?.call(_server!);
       }
 
-      print('[INFO] Running app in ${isDebug ? 'debug' : 'release'} mode');
+      print('[INFO] Running app in ${jasprDebugMode ? 'debug' : 'release'} mode');
       print('[INFO] Serving at http://${server!.address.host}:${server!.port}');
     });
   }
@@ -97,14 +112,92 @@ class ServerApp {
   }
 }
 
-/// Redirects all unhandled urls to the base url
-Future<Response> Function(Request) catchAll(FutureOr<Response> Function(Request) handler) {
+Handler proxyRootIndexHandler(Handler proxyHandler) {
+  return (Request req) {
+    final indexRequest = Request('GET', req.requestedUri.replace(path: '/'),
+        context: req.context, encoding: req.encoding, headers: req.headers, protocolVersion: req.protocolVersion);
+    return proxyHandler(indexRequest);
+  };
+}
+
+// coverage:ignore-start
+
+Handler webdevProxyHandler(String url, ServerApp app) {
+  var handler = proxyHandler(url);
   return (Request req) async {
     var res = await handler(req);
-    if (res.statusCode == 404 && req.method == 'GET') {
-      res = await handler(Request(req.method, req.requestedUri.replace(path: '/')));
+    if (res.statusCode == 200 && app.server != null && res.headers['content-type'] == 'application/javascript') {
+      var body = await res.readAsString();
+      res = res.change(body: body.replaceAll('localhost:5467', '${app.server!.address.host}:${app.server!.port}'));
     }
     return res;
+  };
+}
+
+String _sseHeaders(String? origin) => 'HTTP/1.1 200 OK\r\n'
+    'Content-Type: text/event-stream\r\n'
+    'Cache-Control: no-cache\r\n'
+    'Connection: keep-alive\r\n'
+    'Access-Control-Allow-Credentials: true\r\n'
+    'Access-Control-Allow-Origin: $origin\r\n'
+    '\r\n';
+
+Handler sseProxyHandler(Uri proxyUri, Uri serverUri) {
+  Handler? _incomingMessageProxyHandler;
+  var _httpClient = http.Client();
+
+  Future<Response> _createSseConnection(Request req, String path) async {
+    final serverReq = http.StreamedRequest(req.method, serverUri.replace(query: req.requestedUri.query))
+      ..followRedirects = false
+      ..headers.addAll(req.headers)
+      ..headers['Host'] = serverUri.authority
+      ..sink.close();
+
+    final serverResponse = await _httpClient.send(serverReq);
+
+    req.hijack((channel) {
+      final sink = utf8.encoder.startChunkedConversion(channel.sink)..add(_sseHeaders(req.headers['origin']));
+
+      StreamSubscription? serverSseSub;
+      StreamSubscription? reqChannelSub;
+
+      serverSseSub = utf8.decoder.bind(serverResponse.stream).listen(sink.add, onDone: () {
+        reqChannelSub?.cancel();
+        sink.close();
+      });
+
+      reqChannelSub = channel.stream.listen((_) {
+        // SSE is unidirectional.
+      }, onDone: () {
+        serverSseSub?.cancel();
+        sink.close();
+      });
+    });
+  }
+
+  Future<Response> _handleIncomingMessage(Request req) async {
+    _incomingMessageProxyHandler ??= proxyHandler(
+      serverUri,
+      client: _httpClient,
+    );
+    return _incomingMessageProxyHandler!(req);
+  }
+
+  return (Request req) async {
+    final path = req.requestedUri.path;
+    if (path != proxyUri.path) {
+      return Response.notFound('');
+    }
+
+    if (req.headers['accept'] == 'text/event-stream' && req.method == 'GET') {
+      return _createSseConnection(req, path);
+    }
+
+    if (req.headers['accept'] != 'text/event-stream' && req.method == 'POST') {
+      return _handleIncomingMessage(req);
+    }
+
+    return Response.notFound('');
   };
 }
 
@@ -136,6 +229,8 @@ Future<void> _reload(ServerApp app, FutureOr<HttpServer> Function() init) async 
     }
   }
 }
+
+// coverage:ignore-end
 
 /// Creates and runs the http server
 Future<HttpServer> _createServer(ServerApp app, Handler fileHandler) async {
