@@ -6,6 +6,20 @@ abstract class BuildContext {
   /// The current configuration of the [Element] that is this [BuildContext].
   Component get component;
 
+  /// Whether the [component] is currently updating the component or render tree.
+  ///
+  /// For [StatefulComponent]s and [StatelessComponent]s this flag is true while
+  /// their respective build methods are executing.
+  /// Other [Component] types may set this to true for conceptually similar phases
+  /// of their lifecycle.
+  ///
+  /// When this is true, it is safe for [component] to establish a dependency to an
+  /// [InheritedComponent] by calling [dependOnInheritedElement] or
+  /// [dependOnInheritedComponentOfExactType].
+  ///
+  /// Accessing this flag in release mode is not valid.
+  bool get debugDoingBuild;
+
   /// Registers this build context with [ancestor] such that when
   /// [ancestor]'s component changes this build context is rebuilt.
   ///

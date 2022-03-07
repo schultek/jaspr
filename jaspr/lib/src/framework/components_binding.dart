@@ -47,12 +47,13 @@ abstract class ComponentsBinding {
 
   /// Returns the accumulated data from all active [State]s that use the [SyncStateMixin]
   @protected
-  Map<String, String> getStateData() {
-    var state = <String, String>{};
-    for (var key in _globalKeyRegistry.keys) {
-      if (key._canSync) {
-        var s = key._saveState();
-        state[key._id] = s;
+  Map<String, dynamic> getStateData() {
+    var state = <String, dynamic>{};
+    for (var key in _globalSyncRegistry.keys) {
+      var syncState = _globalSyncRegistry[key]!;
+      assert(syncState._syncId == key);
+      if (syncState.mounted) {
+        state[key] = syncState._saveState();
       }
     }
     return state;
@@ -61,12 +62,12 @@ abstract class ComponentsBinding {
   /// Must return the serialized state data associated with [id]. On the client this is the
   /// data that is synced from the server.
   @protected
-  String? getRawState(String id);
+  dynamic getRawState(String id);
 
   /// Must update the serialized state data associated with [id]. This is called on the client
   /// when new data is loaded for a [LazyRoute].
   @protected
-  void updateRawState(String id, String state);
+  void updateRawState(String id, dynamic state);
 
   bool _isLoadingState = false;
   bool get isLoadingState => _isLoadingState;
@@ -82,16 +83,20 @@ abstract class ComponentsBinding {
       updateRawState(id, data[id]!);
     }
 
-    for (var key in _globalKeyRegistry.keys) {
-      if (key._canSync && data.containsKey(key._id)) {
-        key._notifyState(data[key._id]);
+    for (var key in _globalSyncRegistry.keys) {
+      if (data.containsKey(key)) {
+        var state = _globalSyncRegistry[key]!;
+        assert(state._syncId == key);
+        if (state.mounted) {
+          state._updateState(data[key]);
+        }
       }
     }
   }
 
   /// On the client, this should perform a http request to [url] to fetch state data from the server.
   @protected
-  Future<Map<String, String>> fetchState(String url);
+  Future<Map<String, dynamic>> fetchState(String url);
 
   final List<Future> _initialBuildQueue = [];
 
@@ -105,19 +110,22 @@ abstract class ComponentsBinding {
     }
   }
 
-  /// Rebuilds [child] and correctly accounts for any asynchronous operations that can occurr during the initial
-  /// build of an app.
-  /// Async builds are only allowed for [StatefulComponent]s that use the [PreloadDataMixin] or [DeferRenderMixin].
+  /// Rebuilds [child] and correctly accounts for any asynchronous operations that can
+  /// occur during the initial build of the app.
+  /// We want the component and element apis to stay synchronous, so this delays
+  /// the execution of [child.performRebuild()] instead of calling it directly.
   void performRebuildOn(Element? child, [void Function()? whenComplete]) {
-    var built = performRebuild(child);
-    if (built is Future) {
+    var asyncFirstBuild = child?._asyncFirstBuild;
+    if (asyncFirstBuild is Future) {
       assert(isFirstBuild, 'Only the first build is allowed to be asynchronous.');
-      _initialBuildQueue.add(built);
-      built.whenComplete(() {
-        _initialBuildQueue.remove(built);
+      _initialBuildQueue.add(asyncFirstBuild);
+      asyncFirstBuild.whenComplete(() {
+        child?.performRebuild();
+        _initialBuildQueue.remove(asyncFirstBuild);
         whenComplete?.call();
       });
     } else {
+      child?.performRebuild();
       whenComplete?.call();
     }
   }
@@ -140,6 +148,18 @@ abstract class ComponentsBinding {
   void _unregisterGlobalKey(GlobalKey key, Element element) {
     if (_globalKeyRegistry[key] == element) {
       _globalKeyRegistry.remove(key);
+    }
+  }
+
+  final Map<String, SyncStateMixin> _globalSyncRegistry = {};
+
+  void _registerSyncState(SyncStateMixin syncState) {
+    _globalSyncRegistry[syncState._syncId!] = syncState;
+  }
+
+  void _unregisterSyncState(SyncStateMixin syncState) {
+    if (_globalSyncRegistry[syncState._syncId] == syncState) {
+      _globalSyncRegistry.remove(syncState._syncId);
     }
   }
 }

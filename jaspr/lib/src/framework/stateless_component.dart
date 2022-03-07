@@ -120,6 +120,11 @@ abstract class StatelessComponent extends Component {
   Iterable<Component> build(BuildContext context);
 }
 
+/// Mixin on [StatelessComponent] that performs some async task on the first build
+mixin OnFirstBuild on StatelessComponent {
+  FutureOr<void> onFirstBuild(BuildContext context);
+}
+
 /// An [Element] that uses a [StatelessComponent] as its configuration.
 class StatelessElement extends MultiChildElement {
   /// Creates an element that uses the given component as its configuration.
@@ -130,6 +135,19 @@ class StatelessElement extends MultiChildElement {
 
   @override
   Iterable<Component> build() => component.build(this);
+
+  @override
+  void _firstBuild() {
+    if (root.isFirstBuild && component is OnFirstBuild) {
+      var result = (component as OnFirstBuild).onFirstBuild(this);
+      if (result is Future) {
+        _asyncFirstBuild = result.then((_) {
+          _asyncFirstBuild = null;
+        });
+      }
+    }
+    super._firstBuild();
+  }
 
   @override
   void update(StatelessComponent newComponent) {

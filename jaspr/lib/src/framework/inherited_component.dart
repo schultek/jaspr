@@ -36,7 +36,7 @@ part of framework;
 abstract class InheritedComponent extends Component {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
-  const InheritedComponent({required this.child});
+  const InheritedComponent({required this.child, Key? key}) : super(key: key);
 
   /// The component below this component in the tree.
   final Component child;
@@ -212,6 +212,19 @@ class InheritedElement extends SingleChildElement {
   @protected
   void notifyDependent(covariant InheritedComponent oldComponent, Element dependent) {
     dependent.didChangeDependencies();
+  }
+
+  @protected
+  @mustCallSuper
+  void updateDependent(Element dependent) {
+    assert(_dependents.containsKey(dependent));
+  }
+
+  @protected
+  @mustCallSuper
+  void deactivateDependent(Element dependent) {
+    assert(_dependents.containsKey(dependent));
+    _dependents.remove(dependent);
   }
 
   @override

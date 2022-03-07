@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:binary_codec/binary_codec.dart';
 import 'package:domino/domino.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:meta/meta.dart';
@@ -538,8 +539,8 @@ abstract class Element implements BuildContext {
     assert(_component != null);
     assert(_depth != null);
     if (_dependencies != null && _dependencies!.isNotEmpty) {
-      for (final InheritedElement dependency in _dependencies!) {
-        dependency._dependents.remove(this);
+      for (var dependency in _dependencies!) {
+        dependency.deactivateDependent(this);
       }
     }
     _inheritedElements = null;
@@ -712,6 +713,11 @@ abstract class Element implements BuildContext {
     assert(_lifecycleState == _ElementLifecycle.active);
     root.performRebuildOn(this, () {
       assert(!_dirty);
+      if (_dependencies != null && _dependencies!.isNotEmpty) {
+        for (var dependency in _dependencies!) {
+          dependency.updateDependent(this);
+        }
+      }
     });
   }
 
@@ -726,4 +732,7 @@ abstract class Element implements BuildContext {
   /// This is typically called after a completed build by the [BuildScheduler].
   @mustCallSuper
   void render(DomBuilder b);
+
+  /// Can be set by the element to signal that the first build should be performed asynchronous.
+  Future? _asyncFirstBuild;
 }

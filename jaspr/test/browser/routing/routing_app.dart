@@ -38,7 +38,7 @@ class Contact extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(tag: 'span', child: Text('Contact'));
-    yield SyncContact(key: GlobalKey());
+    yield SyncContact();
   }
 }
 

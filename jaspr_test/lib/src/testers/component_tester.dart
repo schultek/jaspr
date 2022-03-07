@@ -134,5 +134,5 @@ class TestComponentsBinding extends ComponentsBinding {
   }
 
   @override
-  void updateRawState(String id, String state) {}
+  void updateRawState(String id, dynamic state) {}
 }

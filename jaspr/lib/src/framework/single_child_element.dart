@@ -13,6 +13,10 @@ abstract class SingleChildElement extends Element {
 
   Element? _child;
 
+  bool _debugDoingBuild = false;
+  @override
+  bool get debugDoingBuild => _debugDoingBuild;
+
   @override
   void mount(Element? parent) {
     super.mount(parent);
@@ -30,8 +34,17 @@ abstract class SingleChildElement extends Element {
     assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(true));
     Component? built;
     try {
+      assert(() {
+        _debugDoingBuild = true;
+        return true;
+      }());
       built = build();
+      assert(() {
+        _debugDoingBuild = false;
+        return true;
+      }());
     } catch (e) {
+      _debugDoingBuild = false;
       // TODO: implement actual error component
       built = DomComponent(
         tag: 'div',

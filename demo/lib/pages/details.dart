@@ -4,7 +4,7 @@ import '../components/book.dart';
 import '../services/service.dart';
 
 class Details extends StatefulComponent {
-  Details(this.id) : super(key: GlobalObjectKey('book-$id'));
+  Details(this.id) : super();
 
   final String id;
 

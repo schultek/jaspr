@@ -3,7 +3,7 @@ import 'package:jaspr_demo/components/book.dart';
 import 'package:jaspr_demo/services/service.dart';
 
 class Home extends StatefulComponent {
-  Home() : super(key: GlobalObjectKey('books'));
+  Home() : super();
 
   @override
   State<StatefulComponent> createState() => HomeState();

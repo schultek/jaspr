@@ -98,13 +98,16 @@ class TextElement extends Element {
   Text get _component => super._component as Text;
 
   @override
-  void render(DomBuilder b) {
-    b.text(_component.text);
-  }
+  bool get debugDoingBuild => false;
 
   @override
   void performRebuild() {}
 
   @override
   void visitChildren(ElementVisitor visitor) {}
+
+  @override
+  void render(DomBuilder b) {
+    b.text(_component.text);
+  }
 }

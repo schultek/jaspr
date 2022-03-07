@@ -334,10 +334,7 @@ class ServerComponentsBinding extends ComponentsBinding {
     var appElement = document.getElementById(_targetId!)!;
     appElement.innerHtml = renderMarkup(builderFn: rootElement!.render);
 
-    for (var entry in getStateData().entries) {
-      document.body!.attributes['data-state-${entry.key}'] = entry.value;
-    }
-
+    document.body!.attributes['state-data'] = stateCodec.encode(getStateData());
     return document.outerHtml;
   }
 
@@ -347,19 +344,7 @@ class ServerComponentsBinding extends ComponentsBinding {
   }
 
   @override
-  FutureOr<void> performRebuild(Element? child) {
-    if (child is StatefulElement && child.state is PreloadStateMixin) {
-      return Future.sync(() async {
-        await (child.state as PreloadStateMixin).preloadFuture;
-        return super.performRebuild(child);
-      });
-    } else {
-      return super.performRebuild(child);
-    }
-  }
-
-  @override
-  String? getRawState(String id) => null;
+  dynamic getRawState(String id) => null;
 
   @override
   Future<Map<String, String>> fetchState(String url) {
@@ -367,5 +352,5 @@ class ServerComponentsBinding extends ComponentsBinding {
   }
 
   @override
-  void updateRawState(String id, String state) {}
+  void updateRawState(String id, dynamic state) {}
 }

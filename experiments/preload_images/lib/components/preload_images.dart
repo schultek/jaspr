@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
 class PreloadImages extends StatefulComponent {
-  PreloadImages({required this.child}) : super(key: GlobalObjectKey('preload-images'));
+  PreloadImages({required this.child}) : super();
 
   final Component child;
 

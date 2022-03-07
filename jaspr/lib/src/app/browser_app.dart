@@ -39,45 +39,32 @@ class BrowserComponentsBinding extends ComponentsBinding {
   @override
   Uri get currentUri => Uri.parse(window.location.toString());
 
-  @override
-  FutureOr<void> performRebuild(Element? child) {
-    if (child is StatefulElement && child.state is DeferRenderMixin && isFirstBuild) {
-      return Future.sync(() async {
-        await (child.state as DeferRenderMixin).defer;
-        return super.performRebuild(child);
-      });
-    } else {
-      return super.performRebuild(child);
-    }
-  }
-
-  final Map<String, String> _rawState = {};
+  final Map<String, dynamic> _rawState = {};
 
   void _loadRawState() {
-    var attrs = document.body!.attributes;
-    var stateKeys = attrs.keys.where((k) => k.startsWith('data-state-')).toList();
-    for (var key in stateKeys) {
-      _rawState[key.replaceFirst('data-state-', '')] = attrs.remove(key)!;
+    var stateData = document.body!.attributes.remove('state-data');
+    if (stateData != null) {
+      _rawState.addAll(stateCodec.decode(stateData).cast<String, dynamic>());
     }
   }
 
   @override
-  void updateRawState(String id, String state) {
+  void updateRawState(String id, dynamic state) {
     _rawState[id] = state;
   }
 
   @override
-  String? getRawState(String id) {
+  dynamic getRawState(String id) {
     return _rawState[id];
   }
 
   @override
-  Future<Map<String, String>> fetchState(String url) {
+  Future<Map<String, dynamic>> fetchState(String url) {
     return window
         .fetch(url, {
           'headers': {'jaspr-mode': 'data-only'}
         })
         .then((result) => result.text())
-        .then((data) => (jsonDecode(data) as Map<String, dynamic>).cast());
+        .then((data) => jsonDecode(data));
   }
 }

@@ -9,7 +9,7 @@ class App extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield PreloadImages(child: Router(onGenerateRoute: (path, context) {
       if (path == '/') {
-        return Route.lazy(path, (context) => home.Home(key: GlobalKey()), home.loadLibrary);
+        return Route.lazy(path, (context) => home.Home(), home.loadLibrary);
       } else {
         var segments = path.split('/');
         if (segments.length == 3 && segments[1] == 'image') {

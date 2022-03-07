@@ -20,6 +20,10 @@ abstract class MultiChildElement extends Element {
   // repeatedly to remove children.
   final Set<Element> _forgottenChildren = HashSet<Element>();
 
+  bool _debugDoingBuild = false;
+  @override
+  bool get debugDoingBuild => _debugDoingBuild;
+
   @override
   void mount(Element? parent) {
     super.mount(parent);
@@ -28,6 +32,7 @@ abstract class MultiChildElement extends Element {
     _firstBuild();
   }
 
+  @mustCallSuper
   void _firstBuild() {
     rebuild();
   }
@@ -37,8 +42,17 @@ abstract class MultiChildElement extends Element {
     assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(true));
     List<Component>? built;
     try {
+      assert(() {
+        _debugDoingBuild = true;
+        return true;
+      }());
       built = build().toList();
+      assert(() {
+        _debugDoingBuild = false;
+        return true;
+      }());
     } catch (e) {
+      _debugDoingBuild = false;
       // TODO: implement actual error component
       built = [
         DomComponent(

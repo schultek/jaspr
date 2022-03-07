@@ -5,7 +5,7 @@ class App extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(tag: 'div', children: [
       Text('App'),
-      Counter(key: GlobalKey()),
+      Counter(),
     ]);
   }
 }

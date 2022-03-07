@@ -3,7 +3,7 @@ import 'package:jaspr/jaspr.dart';
 import '../services/service.dart';
 
 class Image extends StatefulComponent {
-  Image(this.id) : super(key: GlobalObjectKey('image-$id'));
+  Image(this.id) : super();
 
   final String id;
 
