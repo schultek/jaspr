@@ -17,8 +17,17 @@ Experimental web framework for Dart. Supports SPAs and SSR.
 - **/experiments**: Experimental apps or features, that are not part of the core framework (yet?)
   - **/minimal_app**: A minimal example with a single entry point for both client and server
   - **/preload_images**: A component that automatically preloads images for a next route
-  - **/riverpod**: Riverpod implementation for jaspr
+  - **/riverpod**: Riverpod example for jaspr
   - **/scoped_styles**: A component that introduces scoped styles
   - **/server_handling**: An app that uses custom middleware on the server to host an api
-- **/jaspr**: The main framework package
-- **/jaspr_test**: A test package for jaspr
+- **/packages**:
+  - **/jaspr**: The main framework package
+  - **/jaspr_riverpod**: Riverpod implementation for jaspr
+  - **/jaspr_test**: A test package for jaspr
+  
+## Todo
+
+- Add documentation for foundation & components
+- Bump coverage over 80%
+- Add documentation website
+- Add more complex demo app

@@ -43,6 +43,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
+  binary_codec:
+    dependency: transitive
+    description:
+      name: binary_codec
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.3"
   browser_launcher:
     dependency: transitive
     description:
@@ -319,7 +326,7 @@ packages:
   jaspr:
     dependency: "direct main"
     description:
-      path: "../jaspr"
+      path: "../packages/jaspr"
       relative: true
     source: path
     version: "0.1.0"

@@ -9,7 +9,7 @@ dependencies:
   html: ^0.15.0
   csslib: ^0.17.1
   jaspr:
-    path: ../../jaspr
+    path: ../../packages/jaspr
   uuid: ^3.0.5
   domino: ^0.8.1
 

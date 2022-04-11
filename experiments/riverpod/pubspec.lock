@@ -263,14 +263,14 @@ packages:
   jaspr:
     dependency: "direct main"
     description:
-      path: "../../jaspr"
+      path: "../../packages/jaspr"
       relative: true
     source: path
     version: "0.1.0"
   jaspr_riverpod:
     dependency: "direct main"
     description:
-      path: jaspr_riverpod
+      path: "../../packages/jaspr_riverpod"
       relative: true
     source: path
     version: "0.1.0"

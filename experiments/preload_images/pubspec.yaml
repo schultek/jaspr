@@ -8,7 +8,7 @@ environment:
 dependencies:
   http: ^0.13.4
   jaspr:
-    path: ../../jaspr
+    path: ../../packages/jaspr
   domino: ^0.8.1
 
 dev_dependencies:

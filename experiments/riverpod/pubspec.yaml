@@ -8,9 +8,9 @@ environment:
 
 dependencies:
   jaspr:
-    path: ../../jaspr
+    path: ../../packages/jaspr
   jaspr_riverpod:
-    path: jaspr_riverpod
+    path: ../../packages/jaspr_riverpod
 
 dev_dependencies:
   build_runner: ^2.1.4

@@ -9,13 +9,14 @@ class App extends StatelessComponent {
     yield Router(
       onGenerateRoute: (path, context) {
         if (path == '/') {
-          return Route.lazy(path, (context) => home.Home(), home.loadLibrary);
+          return Route.lazy(path, (context) => [home.Home()], home.loadLibrary);
         } else {
           var segments = path.split('/');
           if (segments.length == 3 && segments[1] == 'book') {
-            return Route.lazy(path, (context) => details.Details(segments.last), details.loadLibrary);
+            return Route.lazy(path, (context) => [details.Details(segments.last)], details.loadLibrary);
           }
         }
+        return null;
       },
     );
   }
