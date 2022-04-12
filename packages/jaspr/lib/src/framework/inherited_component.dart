@@ -219,7 +219,7 @@ class InheritedElement extends SingleChildElement {
   /// do or don't depend to them.
   @protected
   @mustCallSuper
-  void updateDependent(Element dependent) {
+  void didRebuildDependent(Element dependent) {
     assert(_dependents.containsKey(dependent));
   }
 

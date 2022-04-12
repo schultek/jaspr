@@ -7,7 +7,7 @@ typedef EventCallback = void Function();
 /// Must have a [tag] and any number of attributes.
 /// Can have a single [child] component or any amount of [children].
 class DomComponent extends Component {
-  DomComponent({
+  const DomComponent({
     Key? key,
     required this.tag,
     this.id,
@@ -17,7 +17,8 @@ class DomComponent extends Component {
     this.events,
     Component? child,
     List<Component>? children,
-  })  : children = [if (child != null) child, ...children ?? []],
+  })  : _child = child,
+        _children = children,
         super(key: key);
 
   final String tag;
@@ -26,7 +27,10 @@ class DomComponent extends Component {
   final Map<String, String>? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
-  final List<Component>? children;
+  final Component? _child;
+  final List<Component>? _children;
+
+  List<Component> get children => [if (_child != null) _child!, ..._children ?? []];
 
   @override
   Element createElement() => DomElement(this);
@@ -42,7 +46,7 @@ class DomElement extends MultiChildElement with BuildScheduler {
   dynamic get source => _source;
 
   @override
-  Iterable<Component> build() => component.children ?? [];
+  Iterable<Component> build() => component.children;
 
   @override
   void update(DomComponent newComponent) {
@@ -81,14 +85,12 @@ class DomElement extends MultiChildElement with BuildScheduler {
 ///
 /// Styling is done through the parent element(s) and their styles.
 class Text extends Component {
-  Text(this.text, {Key? key}) : super(key: key);
+  const Text(this.text, {Key? key}) : super(key: key);
 
   final String text;
 
   @override
-  Element createElement() {
-    return TextElement(this);
-  }
+  Element createElement() => TextElement(this);
 }
 
 class TextElement extends Element {

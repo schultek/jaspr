@@ -725,7 +725,7 @@ abstract class Element implements BuildContext {
       assert(!_dirty);
       if (_dependencies != null && _dependencies!.isNotEmpty) {
         for (var dependency in _dependencies!) {
-          dependency.updateDependent(this);
+          dependency.didRebuildDependent(this);
         }
       }
     });

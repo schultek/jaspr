@@ -272,7 +272,7 @@ class BuildOwner {
       assert(() {
         if (_dirtyElements
             .any((Element element) => element._lifecycleState == _ElementLifecycle.active && element.dirty)) {
-          throw 'buildScope missed some dirty elements.';
+          throw 'performBuild missed some dirty elements.';
         }
         return true;
       }());

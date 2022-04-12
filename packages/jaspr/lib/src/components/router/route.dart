@@ -1,11 +1,9 @@
 part of router;
 
-typedef FutureBuilder = Future Function();
-
 /// Interface for any Route
 /// Do not subclass this, always subclass either LazyRoute or ResolvedRoute
 abstract class Route {
-  factory Route.lazy(String path, ComponentBuilder builder, FutureBuilder loader) = LazyRoute;
+  factory Route.lazy(String path, ComponentBuilder builder, AsyncCallback loader) = LazyRoute;
 
   const factory Route(String path, ComponentBuilder builder) = ResolvedRoute;
 
@@ -22,7 +20,7 @@ abstract class ResolvedRoute implements Route {
 /// Lazy loaded route. Should be used with deferred imports
 class LazyRoute implements Route {
   final String _path;
-  final FutureBuilder _loader;
+  final AsyncCallback _loader;
   final ComponentBuilder _builder;
 
   LazyRoute(this._path, this._builder, this._loader);

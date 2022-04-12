@@ -2,6 +2,7 @@ library router;
 
 import 'dart:async';
 
+import '../../../foundation.dart';
 import '../../framework/framework.dart';
 import 'history_stub.dart' if (dart.library.html) 'history_browser.dart';
 

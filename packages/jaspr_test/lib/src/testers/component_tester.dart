@@ -36,6 +36,10 @@ class ComponentTester {
     }
   }
 
+  Future<void> pump() async {
+    await pumpEventQueue();
+  }
+
   void dispatchEvent(Finder finder, String event, dynamic data) {
     var element = _findDomElement(finder);
 

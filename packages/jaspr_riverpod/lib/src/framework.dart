@@ -7,10 +7,10 @@ import 'package:jaspr/components.dart';
 import 'package:meta/meta.dart';
 import 'package:riverpod/riverpod.dart';
 
-part 'dependency_watcher.dart';
+part 'jaspr/sync_provider.dart';
+part 'jaspr/sync_ref.dart';
 part 'provider_context.dart';
-part 'sync_provider.dart';
-part 'sync_ref.dart';
+part 'provider_dependencies.dart';
 
 /// {@template riverpod.providerscope}
 /// A component that stores the state of providers.
@@ -305,11 +305,6 @@ class UncontrolledProviderScope extends InheritedComponent {
   }
 }
 
-class ListenerDependencies {
-  Set<ProviderListenable> watchers = {};
-  Set<ProviderListenable> listeners = {};
-}
-
 @sealed
 class _UncontrolledProviderScopeElement extends InheritedElement {
   _UncontrolledProviderScopeElement(UncontrolledProviderScope component) : super(component);
@@ -320,8 +315,6 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
   @override
   UncontrolledProviderScope get component => super.component as UncontrolledProviderScope;
 
-  final watchers = <Element, DependencyWatcher>{};
-
   T _read<T>(ProviderBase<T> provider) {
     return component.container.read(provider);
   }
@@ -331,7 +324,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
   }
 
   T _watch<T>(Object dependent, ProviderListenable<T> target) {
-    return watchers[dependent]!.watch(target);
+    return getDependencies(dependent)!.watch(target);
   }
 
   void _listen<T>(
@@ -341,7 +334,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     void Function(Object error, StackTrace stackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    watchers[dependent]!.listen(target, listener, onError: onError, fireImmediately: fireImmediately);
+    getDependencies(dependent)!.listen(target, listener, onError: onError, fireImmediately: fireImmediately);
   }
 
   ProviderSubscription<T> _subscribe<T>(
@@ -375,7 +368,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
 
   @override
   void updateDependencies(Element dependent, Object? aspect) {
-    watchers[dependent] ??= DependencyWatcher(dependent, this);
+    setDependencies(dependent, getDependencies(dependent) ?? ProviderDependencies(dependent, this));
   }
 
   @override
@@ -402,12 +395,12 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
 
     // ignore: unnecessary_non_null_assertion, blocked by https://github.com/rrousselGit/river_pod/issues/1156
     // if (SchedulerBinding.instance!.schedulerPhase == SchedulerPhase.transientCallbacks) {
-    markNeedsBuild();
+    // markNeedsBuild();
     // } else {
     //   // Using microtask as Flutter otherwise Flutter tests complains about pending timers
-    //   Future.microtask(() {
-    //     if (_mounted) markNeedsBuild();
-    //   });
+    Future.microtask(() {
+      if (_mounted) markNeedsBuild();
+    });
     // }
   }
 
@@ -418,24 +411,24 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
   }
 
   @override
-  ListenerDependencies? getDependencies(Element dependent) {
-    return super.getDependencies(dependent) as ListenerDependencies?;
+  ProviderDependencies? getDependencies(Object dependent) {
+    return super.getDependencies(dependent as Element) as ProviderDependencies?;
   }
 
   @override
-  void setDependencies(Element dependent, covariant ListenerDependencies value) {
+  void setDependencies(Element dependent, covariant ProviderDependencies value) {
     super.setDependencies(dependent, value);
   }
 
   @override
-  void updateDependent(Element dependent) {
-    watchers[dependent]?.checkDependencies();
-    super.updateDependent(dependent);
+  void didRebuildDependent(Element dependent) {
+    getDependencies(dependent)?.didRebuild();
+    super.didRebuildDependent(dependent);
   }
 
   @override
   void deactivateDependent(Element dependent) {
-    watchers[dependent]?.dispose();
+    getDependencies(dependent)?.deactivate();
     super.deactivateDependent(dependent);
   }
 
@@ -448,12 +441,6 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     }());
 
     component.container.vsyncOverride = null;
-
-    for (var watcher in watchers.values) {
-      watcher.clear();
-    }
-    watchers.clear();
-
     super.unmount();
   }
 
