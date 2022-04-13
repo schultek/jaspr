@@ -7,11 +7,9 @@ environment:
 
 dependencies:
   riverpod: ^2.0.0-dev.4
-  jaspr:
-    path: ../jaspr
+  jaspr: ^0.1.0
 
 dev_dependencies:
   lints: ^1.0.0
   test: ^1.16.0
-  jaspr_test:
-    path: ../jaspr_test
+  jaspr_test: ^0.1.0

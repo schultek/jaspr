@@ -1,0 +1,6 @@
+name: jaspr
+
+packages:
+  - packages/jaspr
+  - packages/jaspr_riverpod
+  - packages/jaspr_test

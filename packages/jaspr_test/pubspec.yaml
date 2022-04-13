@@ -7,8 +7,7 @@ environment:
 dependencies:
   test: ^1.19.5
   meta: ^1.7.0
-  jaspr:
-    path: ../jaspr
+  jaspr: ^0.1.0
   domino: ^0.8.1
   html: ^0.15.0
 
