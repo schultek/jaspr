@@ -7,8 +7,7 @@ packages:
 
 scripts:
   analyze: melos exec -- "dart analyze ."
-  jaspr:
-    name: jaspr
-    run: melos exec -- "dart run jaspr"
-    select-package:
-      riverpod: true
+  tools:
+    name: tools
+    run: melos exec -- "dart run $MELOS_ROOT_PATH/scripts/jaspr_tools/bin/jaspr_tools.dart"
+    select-package: {}
