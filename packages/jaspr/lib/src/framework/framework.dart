@@ -11,7 +11,6 @@ import 'dart:convert';
 import 'package:binary_codec/binary_codec.dart';
 import 'package:domino/domino.dart';
 import 'package:jaspr/jaspr.dart';
-import 'package:meta/meta.dart';
 
 part 'build_context.dart';
 part 'components_binding.dart';
@@ -661,6 +660,7 @@ abstract class Element implements BuildContext {
 
   // Whether this is in owner._dirtyElements. This is used to know whether we
   // should be adding the element back into the list when it's reactivated.
+  // ignore: prefer_final_fields
   bool _inDirtyList = false;
 
   // We let component authors call setState from initState, didUpdateComponent, and

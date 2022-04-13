@@ -301,7 +301,7 @@ class ChangeNotifier implements Listenable {
     for (int i = 0; i < end; i++) {
       try {
         _listeners[i]?.call();
-      } catch (exception, stack) {
+      } catch (exception) {
         rethrow; // TODO error handling
       }
     }

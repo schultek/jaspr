@@ -7,10 +7,8 @@ environment:
   sdk: '>=2.16.0 <3.0.0'
 
 dependencies:
-  jaspr:
-    path: ../../packages/jaspr
-  jaspr_riverpod:
-    path: ../../packages/jaspr_riverpod
+  jaspr: ^0.1.0
+  jaspr_riverpod: ^0.1.0
 
 dev_dependencies:
   build_runner: ^2.1.4

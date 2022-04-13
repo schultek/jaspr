@@ -1,6 +1,5 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
-import 'package:meta/meta.dart';
 
 extension PumpTestComponent on ComponentTester {
   Future<TestComponentController> pumpTestComponent<T>(TestComponent<T> component) async {

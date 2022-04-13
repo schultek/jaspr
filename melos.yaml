@@ -1,6 +1,14 @@
-name: jaspr
+name: jaspr_project
 
 packages:
-  - packages/jaspr
-  - packages/jaspr_riverpod
-  - packages/jaspr_test
+  - packages/**
+  - experiments/**
+  - demo/**
+
+scripts:
+  analyze: melos exec -- "dart analyze ."
+  jaspr:
+    name: jaspr
+    run: melos exec -- "dart run jaspr"
+    select-package:
+      riverpod: true

@@ -1,5 +1,4 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:meta/meta.dart';
 
 mixin TrackStateLifecycle<T extends StatefulComponent> on State<T> {
   List<String> lifecycle = [];
