@@ -1,0 +1,1 @@
+void open(String url) {}
