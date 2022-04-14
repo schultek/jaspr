@@ -127,14 +127,21 @@ class ServeCommand extends Command<int> {
       }
     }
 
-    if (argResults!['verbose']) {
+    var verbose = argResults!['verbose'] as bool;
+
+    if (verbose) {
       _pipeProcess(webProcess, listen: checkWebdevStarted);
     } else {
       _pipeError(webProcess);
       webProcess.stdout.map(utf8.decode).listen(checkWebdevStarted);
     }
 
-    maybeExit(webProcess.exitCode);
+    maybeExit(
+      webProcess.exitCode,
+      onExit: !verbose
+          ? () => stdout.write('webdev serve exited unexpectedly. Run again with -v to see verbose output')
+          : null,
+    );
 
     await startupCompleter.future;
 
@@ -271,9 +278,12 @@ Future<String?> _getEntryPoint(String? input) async {
   return entryPoint;
 }
 
-Future<void> maybeExit(Future<int> exitResult) async {
+Future<void> maybeExit(Future<int> exitResult, {void Function()? onExit}) async {
   var exitCode = await exitResult;
-  if (exitCode != 0) exit(exitCode);
+  if (exitCode != 0) {
+    onExit?.call();
+    exit(exitCode);
+  }
 }
 
 String mainFileContent(package) => ""

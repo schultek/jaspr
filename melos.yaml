@@ -9,5 +9,5 @@ scripts:
   analyze: melos exec -- "dart analyze ."
   tools:
     name: tools
-    run: melos exec -- "dart run $MELOS_ROOT_PATH/scripts/jaspr_tools/bin/jaspr_tools.dart"
+    run: melos exec -- "dart run $MELOS_ROOT_PATH/tools/bin/tools.dart"
     select-package: {}

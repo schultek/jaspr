@@ -5,7 +5,7 @@ import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 
 void main(List<String> args) async {
-  var runner = CommandRunner<int>("jaspr_tools", "Development tools for jaspr")
+  var runner = CommandRunner<int>("tools", "Development tools for jaspr")
     ..addCommand(SetupCommand())
     ..addCommand(CleanCommand());
 
@@ -73,7 +73,7 @@ class SetupCommand extends Command<int> {
       pubspecPre = pubspecContent.substring(0, splitIndex);
       pubspecPost = pubspecContent.substring(splitIndex);
     } else {
-      pubspecPre = pubspecContent.trimRight() + '\n\ndependency_overrides:';
+      pubspecPre = pubspecContent + '\ndependency_overrides:';
       pubspecPost = '';
     }
 
@@ -114,8 +114,6 @@ class CleanCommand extends Command<int> {
 
     var pubspecContent = await pubspecYaml.readAsString();
     var pubspecDoc = loadYamlDocument(pubspecContent).contents;
-    var pubspecDeps = (pubspecDoc as Map)['dependencies'] as Map;
-    var pubspecDevDeps = (pubspecDoc as Map)['dev_dependencies'] as Map;
     var pubspecDepsOvr = (pubspecDoc as Map)['dependency_overrides'] as YamlMap?;
 
     if (pubspecDepsOvr == null) {

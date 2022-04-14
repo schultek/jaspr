@@ -12,6 +12,8 @@ import 'package:binary_codec/binary_codec.dart';
 import 'package:domino/domino.dart';
 import 'package:jaspr/jaspr.dart';
 
+export 'package:domino/domino.dart' show DomBuilder;
+
 part 'build_context.dart';
 part 'components_binding.dart';
 part 'dom_component.dart';

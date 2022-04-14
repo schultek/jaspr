@@ -16,7 +16,7 @@ class DomComponent extends Component {
     this.attributes,
     this.events,
     Component? child,
-    List<Component>? children,
+    Iterable<Component>? children,
   })  : _child = child,
         _children = children,
         super(key: key);
@@ -28,7 +28,7 @@ class DomComponent extends Component {
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
   final Component? _child;
-  final List<Component>? _children;
+  final Iterable<Component>? _children;
 
   List<Component> get children => [if (_child != null) _child!, ..._children ?? []];
 
@@ -77,7 +77,7 @@ class DomElement extends MultiChildElement with BuildScheduler {
 
     super.render(b);
 
-    b.close(tag: component.tag);
+    _source = b.close(tag: component.tag);
   }
 }
 
