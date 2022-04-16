@@ -9,10 +9,11 @@ dependencies:
   analyzer: ^3.0.0
   build: ^2.0.0
   collection: ^1.15.0
-  jaspr: ^0.1.0
+  dart_style: ^2.2.3
   path: ^1.8.0
   source_gen: ^1.2.0
 
 dev_dependencies:
   build_runner: ^2.1.7
   lints: ^1.0.1
+  test: ^1.21.0

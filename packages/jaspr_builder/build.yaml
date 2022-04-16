@@ -5,3 +5,9 @@ builders:
     build_extensions: { ".web.dart": [ ".stub.dart", ".dart" ] }
     auto_apply: dependents
     build_to: source
+targets:
+  $default:
+    builders:
+      jaspr_builder:
+        generate_for:
+          - test/native_interfaces.web.dart

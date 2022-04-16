@@ -1,6 +1,10 @@
 import 'dart:async';
 
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
+import 'package:dart_style/dart_style.dart';
+import 'package:jaspr_builder/src/generators/element_generator.dart';
 import 'package:path/path.dart' as path;
 
 /// The main builder used for code generation
@@ -10,7 +14,7 @@ class JasprWebBuilder implements Builder {
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     var inputId = buildStep.inputId;
-    var name = path.basenameWithoutExtension(inputId.path);
+    var name = path.basename(inputId.path).split('.').first;
 
     try {
       var stubSource = generateStub(buildStep);
@@ -43,7 +47,64 @@ class JasprWebBuilder implements Builder {
       "// Generated with jaspr_web_builder\n";
 
   Future<String> generateStub(BuildStep buildStep) async {
-    return '$generationHeader\n';
+    var output = StringBuffer();
+    var resolveTransitives = <Element, bool>{};
+    var toGenerate = <Element>[];
+    var didGenerate = <Element>{};
+
+    bool canResolve(DartType t) => t.transitiveElements //
+        .every((e) => didGenerate.contains(e) || toGenerate.contains(e));
+
+    var lib = await buildStep.inputLibrary;
+
+    for (var e in lib.topLevelElements) {
+      toGenerate.add(e);
+      resolveTransitives[e] = true;
+    }
+
+    for (var export in lib.exports) {
+      List<String>? showNames;
+
+      if (export.combinators.length == 1 && export.combinators.first is ShowElementCombinator) {
+        var c = export.combinators.first as ShowElementCombinator;
+        showNames = c.shownNames;
+      }
+
+      if (showNames == null) {
+        throw UnsupportedError('Exports must have an explicit show combinator.');
+      }
+
+      for (var name in showNames) {
+        var element = export.exportedLibrary!.exportNamespace.get(name)!;
+        toGenerate.add(element);
+      }
+    }
+
+    while (toGenerate.isNotEmpty) {
+      var e = toGenerate.removeLast();
+      didGenerate.add(e);
+
+      var generator = ElementGenerator.from(e, canResolve);
+
+      if (resolveTransitives[e] ?? false) {
+        var transitives = generator.getTransitiveElements();
+        for (var e in transitives) {
+          if (!didGenerate.contains(e) && !toGenerate.contains(e)) {
+            toGenerate.add(e);
+            resolveTransitives[e] = true;
+          }
+        }
+      }
+
+      var source = generator.generate();
+      if (source.isNotEmpty) {
+        output.writeln(source + '\n');
+      }
+    }
+
+    return DartFormatter(pageWidth: 120).format('$generationHeader'
+        '// ignore_for_file: annotate_overrides, non_constant_identifier_names\n\n'
+        '$output');
   }
 
   Future<String> generateBase(String fileName) async {
