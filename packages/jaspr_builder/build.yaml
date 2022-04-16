@@ -1,0 +1,7 @@
+builders:
+  jaspr_builder:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildWebFake" ]
+    build_extensions: { ".web.dart": [ ".stub.dart", ".dart" ] }
+    auto_apply: dependents
+    build_to: source
