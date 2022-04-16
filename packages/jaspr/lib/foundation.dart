@@ -5,3 +5,4 @@ export 'src/foundation/basic_types.dart';
 export 'src/foundation/change_notifier.dart';
 export 'src/foundation/constants.dart';
 export 'src/foundation/object.dart';
+export 'src/foundation/wrapped_builder.dart';

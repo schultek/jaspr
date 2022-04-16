@@ -1,8 +1,9 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_pad/components/elements/splitter.dart';
 
 import '../elements/button.dart';
-import '../elements/splitter.dart';
 import '../elements/tab_bar.dart';
+import 'editing/editor.dart';
 import 'output_split_view.dart';
 
 class MainSection extends StatelessComponent {
@@ -14,11 +15,15 @@ class MainSection extends StatelessComponent {
       tag: 'section',
       classes: ['main-section'],
       children: [
-        Splitter(
-          children: [
-            EditorPanel(),
-            OutputPanel(),
-          ],
+        DomComponent(
+          tag: 'div',
+          classes: ['panels'],
+          child: Splitter(
+            children: [
+              EditorPanel(),
+              OutputPanel(),
+            ],
+          ),
         ),
       ],
     );
@@ -60,10 +65,7 @@ class EditorPanel extends StatelessComponent {
     );
 
     yield OutputSplitView(
-      child: DomComponent(
-        tag: 'div',
-        id: 'editor-host',
-      ),
+      child: Editor(),
     );
   }
 }

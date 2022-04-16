@@ -51,6 +51,7 @@ class ButtonElement extends StatelessElement {
   @override
   void render(DomBuilder b) {
     super.render(b);
+    _ripple?.destroy();
     _ripple = attachRipple((children.first as DomElement).source);
   }
 }

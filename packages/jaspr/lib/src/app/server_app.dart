@@ -245,6 +245,12 @@ Future<HttpServer> _createServer(ServerApp app, Handler fileHandler) async {
       return fileResponse;
     }
 
+    if (request.url.path.endsWith('.dart') ||
+        request.url.path.endsWith('.js.map') ||
+        request.url.path.endsWith('.js')) {
+      return Response.internalServerError(body: 'Cannot handle request');
+    }
+
     return renderApp(app, request, fileResponse);
   });
 

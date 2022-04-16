@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
+import 'components/playground/footer.dart';
 import 'components/playground/header.dart';
 import 'components/playground/main.dart';
 
@@ -10,6 +11,6 @@ class Playground extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield PlaygroundHeader();
     yield MainSection();
-    //yield PlaygroundFooter();
+    yield PlaygroundFooter();
   }
 }

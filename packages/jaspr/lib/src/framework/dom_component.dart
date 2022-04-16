@@ -59,6 +59,7 @@ class DomElement extends MultiChildElement with BuildScheduler {
   void render(DomBuilder b) {
     b.open(
       component.tag,
+      // TODO currently this does not really work on first render, find better solution
       key: component.key?.hashCode.toString(),
       id: component.id,
       classes: component.classes,

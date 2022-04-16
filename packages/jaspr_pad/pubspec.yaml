@@ -6,6 +6,7 @@ environment:
   sdk: '>=2.15.0 <3.0.0'
 
 dependencies:
+  codemirror: ^0.7.3+5.65.2
   jaspr: ^0.1.0
 
 dev_dependencies:

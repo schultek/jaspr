@@ -73,9 +73,13 @@ class TabBarElement extends StatefulElement {
   TabBarElement(TabBar component) : super(component);
 
   @override
+  TabBarState get state => super.state as TabBarState;
+
+  @override
   void render(DomBuilder b) {
     super.render(b);
-    (state as TabBarState)._tabBar = attachTabBar((children.first as DomElement).source);
+    state._tabBar?.destroy();
+    state._tabBar = attachTabBar((children.first as DomElement).source);
   }
 }
 

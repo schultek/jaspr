@@ -12,7 +12,7 @@ import 'package:binary_codec/binary_codec.dart';
 import 'package:domino/domino.dart';
 import 'package:jaspr/jaspr.dart';
 
-export 'package:domino/domino.dart' show DomBuilder;
+export 'package:domino/domino.dart' show DomBuilder, DomEvent, DomEventFn, DomLifecycleEvent, DomLifecycleEventFn;
 
 part 'build_context.dart';
 part 'components_binding.dart';
@@ -700,6 +700,12 @@ abstract class Element implements BuildContext {
     if (_dirty) return;
     _dirty = true;
     _root!._owner.scheduleBuildFor(this);
+  }
+
+  /// Invalidates the element and schedules a re-render
+  @protected
+  Future<void> invalidate() {
+    return _scheduler!.view.invalidate() ?? Future.value();
   }
 
   bool _debugIsInScope(BuildScheduler target) {
