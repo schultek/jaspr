@@ -47,7 +47,21 @@ class FunctionGenerator extends ElementGenerator<ExecutableElement> {
       paramsString += '[${optParams.join(', ')}]';
     }
 
-    return '$static$returnType ${element.isOperator ? 'operator ' : ''}${element.name}($paramsString) => $body';
+    if (e is ConstructorElement) {
+      var conststr = e.isConst ? 'const ' : '';
+      var name = '${e.enclosingElement.name}${e.name.isNotEmpty ? '.${e.name}' : ''}';
+      if (e.isFactory) {
+        return '${conststr}factory $name($paramsString) => $body';
+      } else {
+        return '$conststr$name($paramsString);';
+      }
+    }
+
+    var typeParams =
+        element.typeParameters.map((e) => '${e.name}${e.bound != null ? ' extends ${typeName(e.bound!)}' : ''}');
+    var typeParamsStr = typeParams.isNotEmpty ? '<${typeParams.join(', ')}>' : '';
+
+    return '$static$returnType ${element.isOperator ? 'operator ' : ''}${element.name}$typeParamsStr($paramsString) => $body';
   }
 
   @override

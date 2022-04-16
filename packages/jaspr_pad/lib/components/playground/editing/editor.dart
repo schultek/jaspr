@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
-import '../../../pkg/codemirror/codemirror.dart';
+import '../../../adapters/codemirror.dart';
 import 'codemirror_options.dart';
 
 class Editor extends StatelessComponent {
@@ -26,9 +26,10 @@ class EditorElement extends StatelessElement {
   @override
   void render(DomBuilder b) {
     super.render(b);
-
-    var element = (children.first as DomElement).source;
-    _editor?.dispose();
-    _editor = CodeMirror.fromElement(element, options: codeMirrorOptions);
+    if (kIsWeb) {
+      var element = (children.first as DomElement).source;
+      _editor?.dispose();
+      _editor = CodeMirror.fromElement(element, options: codeMirrorOptions);
+    }
   }
 }

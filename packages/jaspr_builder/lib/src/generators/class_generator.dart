@@ -10,12 +10,13 @@ class ClassGenerator extends ElementGenerator<ClassElement> {
     var members = {
       ...element.methods,
       ...element.accessors,
+      ...element.constructors,
     };
     var superMembers = element.allSupertypes
         .where((t) => !t.isDartCoreObject)
         .expand((t) => [...t.element.methods, ...t.element.accessors].where((m) => !m.isStatic));
     for (var m in superMembers) {
-      if (members.every((e) => e.name != m.name)) {
+      if (members.every((e) => e is ConstructorElement || e.name != m.name)) {
         members.add(m);
       }
     }
@@ -30,7 +31,10 @@ class ClassGenerator extends ElementGenerator<ClassElement> {
           '}';
     }
 
-    return 'class ${element.name} {\n'
+    var extendsStr =
+        element.supertype != null && canResolve(element.supertype!) ? ' extends ${typeName(element.supertype!)}' : '';
+
+    return 'class ${element.name}$extendsStr {\n'
         "${members.map((m) => m.generate()).join('\n')}"
         "}";
   }

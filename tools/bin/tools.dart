@@ -56,6 +56,7 @@ class SetupCommand extends Command<int> {
       checkPackage('jaspr'),
       checkPackage('jaspr_test'),
       checkPackage('jaspr_riverpod'),
+      checkPackage('jaspr_builder'),
     ].whereType<String>();
 
     if (dependencies.isEmpty) {

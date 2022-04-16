@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
-import '../../pkg/mdc/mdc.dart';
+import '../../adapters/mdc.dart';
 
 class TabBar extends StatefulComponent {
   const TabBar({required this.id, Key? key}) : super(key: key);
@@ -78,8 +78,10 @@ class TabBarElement extends StatefulElement {
   @override
   void render(DomBuilder b) {
     super.render(b);
-    state._tabBar?.destroy();
-    state._tabBar = attachTabBar((children.first as DomElement).source);
+    if (kIsWeb) {
+      state._tabBar?.destroy();
+      state._tabBar = MDCTabBar((children.first as DomElement).source);
+    }
   }
 }
 

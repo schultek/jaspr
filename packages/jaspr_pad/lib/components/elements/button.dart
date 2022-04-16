@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
-import '../../pkg/mdc/mdc.dart';
+import '../../adapters/mdc.dart';
 
 class Button extends StatelessComponent {
   const Button(
@@ -51,7 +51,9 @@ class ButtonElement extends StatelessElement {
   @override
   void render(DomBuilder b) {
     super.render(b);
-    _ripple?.destroy();
-    _ripple = attachRipple((children.first as DomElement).source);
+    if (kIsWeb) {
+      _ripple?.destroy();
+      _ripple = MDCRipple((children.first as DomElement).source);
+    }
   }
 }

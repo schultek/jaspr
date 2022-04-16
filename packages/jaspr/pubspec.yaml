@@ -22,7 +22,3 @@ dev_dependencies:
   lints: ^1.0.1
   webdev: ^2.7.7
   jaspr_test: ^0.1.0
-
-dependency_overrides:
-  jaspr_test: 
-    path: ../jaspr_test

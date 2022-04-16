@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:jaspr/jaspr.dart';
 
-import '../../pkg/split/split.dart';
+import '../../adapters/html.dart' as html;
 
 class Splitter extends StatelessComponent {
   const Splitter({required this.children, this.horizontal = true, this.initialSizes, Key? key}) : super(key: key);
@@ -16,6 +18,71 @@ class Splitter extends StatelessComponent {
 
   @override
   Element createElement() => SplitterElement(this);
+}
+
+class SplitPair {
+  SplitterElement parent;
+  DomElement a, b;
+  bool dragging;
+  int index;
+
+  double? _size;
+  double? _start;
+  double? _end;
+  double? _dragOffset;
+
+  SplitPair(this.parent, this.index, this.a, this.b, {this.dragging = false});
+
+  void drag(html.Event e) {
+    if (!dragging) return;
+    if (e is! html.MouseEvent) return;
+
+    var h = parent.component.horizontal;
+
+    var offset = (h ? e.client.x : e.client.y) - _start! + (3 - _dragOffset!);
+
+    parent.adjustSizes(offset / _size!, index);
+  }
+
+  StreamSubscription? _mouseUpSub, _mouseMoveSub;
+
+  void startDragging(html.MouseEvent e) {
+    // Right-clicking can't start dragging.
+    if (e.button != 0) {
+      return;
+    }
+
+    e.preventDefault();
+
+    dragging = true;
+    _mouseUpSub = html.window.onMouseUp.listen(stopDragging);
+    _mouseMoveSub = html.window.onMouseMove.listen(drag);
+
+    var h = parent.component.horizontal;
+    html.document.body!.style.cursor = h ? 'col-resize' : 'row-resize';
+
+    var a = (this.a.source as html.Element).getBoundingClientRect();
+    var b = (this.b.source as html.Element).getBoundingClientRect();
+
+    _size = (h ? (a.width + b.width) : (a.height + b.height)) + 6;
+    _start = (h ? a.left : a.top) + 0.0;
+    _end = (h ? a.right : a.bottom) + 0.0;
+
+    _dragOffset = (h ? e.client.x : e.client.y) - _end!;
+
+    parent.invalidateSelf();
+  }
+
+  void stopDragging(html.Event e) {
+    dragging = false;
+
+    _mouseUpSub?.cancel();
+    _mouseMoveSub?.cancel();
+
+    html.document.body!.style.cursor = '';
+
+    parent.invalidateSelf();
+  }
 }
 
 class SplitterElement extends StatelessElement {

@@ -48,7 +48,6 @@ class JasprWebBuilder implements Builder {
 
   Future<String> generateStub(BuildStep buildStep) async {
     var output = StringBuffer();
-    var resolveTransitives = <Element, bool>{};
     var toGenerate = <Element>[];
     var didGenerate = <Element>{};
 
@@ -57,10 +56,7 @@ class JasprWebBuilder implements Builder {
 
     var lib = await buildStep.inputLibrary;
 
-    for (var e in lib.topLevelElements) {
-      toGenerate.add(e);
-      resolveTransitives[e] = true;
-    }
+    toGenerate.addAll(lib.topLevelElements);
 
     for (var export in lib.exports) {
       List<String>? showNames;
@@ -86,12 +82,11 @@ class JasprWebBuilder implements Builder {
 
       var generator = ElementGenerator.from(e, canResolve);
 
-      if (resolveTransitives[e] ?? false) {
+      if (e.library == lib) {
         var transitives = generator.getTransitiveElements();
         for (var e in transitives) {
-          if (!didGenerate.contains(e) && !toGenerate.contains(e)) {
+          if (e.library == lib && !didGenerate.contains(e) && !toGenerate.contains(e)) {
             toGenerate.add(e);
-            resolveTransitives[e] = true;
           }
         }
       }
