@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import 'class_generator.dart';
@@ -13,7 +14,7 @@ abstract class ElementGenerator<T extends Element> {
 
   String generate();
 
-  Iterable<Element> getTransitiveElements();
+  Iterable<Element> getTransitiveElements({bool recursive = false});
 
   String typeName(DartType t) {
     if (canResolve(t)) {
@@ -34,9 +35,15 @@ abstract class ElementGenerator<T extends Element> {
       }
 
       return '$rt Function($p)';
-    } else {
-      return 'dynamic';
+    } else if (t is InterfaceType) {
+      if (t.typeArguments.isNotEmpty && canResolve(t.element.thisType)) {
+        var tt = t.element.name;
+        var tp = t.typeArguments.map((t) => typeName(t));
+        return '$tt<${tp.join(', ')}>${t.nullabilitySuffix != NullabilitySuffix.none ? '?' : ''}';
+      }
     }
+
+    return 'dynamic';
   }
 
   static ElementGenerator from(Element e, ResolverFn canResolve) {
@@ -60,37 +67,5 @@ class UnsupportedElementGenerator extends ElementGenerator {
   }
 
   @override
-  Iterable<Element> getTransitiveElements() => [];
-}
-
-extension TransitiveTypeElements on DartType {
-  Iterable<Element> get transitiveElements {
-    var t = this;
-    if (t is ParameterizedType) {
-      return [
-        if (!_standardType()) element!,
-        ...t.typeArguments.expand((t) => t.transitiveElements),
-      ];
-    } else if (t is VoidType || t is DynamicType) {
-      return [];
-    } else if (t is TypeParameterType) {
-      return t.bound.transitiveElements;
-    } else if (t is FunctionType) {
-      return [
-        ...t.returnType.transitiveElements,
-        ...t.parameters.expand((p) => p.type.transitiveElements),
-        ...t.typeFormals.expand((t) => t.bound?.transitiveElements ?? []),
-      ];
-    } else {
-      print("UNSUPPORTED ${t.runtimeType}");
-      return [if (t.element != null) t.element!];
-    }
-  }
-
-  bool _standardType() {
-    if (element?.library?.isInSdk ?? true) {
-      return ['dart.core', 'dart.async'].contains(element?.library?.name);
-    }
-    return false;
-  }
+  Iterable<Element> getTransitiveElements({bool recursive = false}) => [];
 }

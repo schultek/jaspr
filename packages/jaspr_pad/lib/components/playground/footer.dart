@@ -7,7 +7,7 @@ class PlaygroundFooter extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'footer',
-      children: buildChildren(context),
+      children: buildChildren(context).toList(),
     );
   }
 

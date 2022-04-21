@@ -16,7 +16,7 @@ class DomComponent extends Component {
     this.attributes,
     this.events,
     Component? child,
-    Iterable<Component>? children,
+    List<Component>? children,
   })  : _child = child,
         _children = children,
         super(key: key);
@@ -28,7 +28,7 @@ class DomComponent extends Component {
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
   final Component? _child;
-  final Iterable<Component>? _children;
+  final List<Component>? _children;
 
   List<Component> get children => [if (_child != null) _child!, ..._children ?? []];
 
@@ -86,9 +86,10 @@ class DomElement extends MultiChildElement with BuildScheduler {
 ///
 /// Styling is done through the parent element(s) and their styles.
 class Text extends Component {
-  const Text(this.text, {Key? key}) : super(key: key);
+  const Text(this.text, {this.rawHtml = false, Key? key}) : super(key: key);
 
   final String text;
+  final bool rawHtml;
 
   @override
   Element createElement() => TextElement(this);
@@ -111,6 +112,10 @@ class TextElement extends Element {
 
   @override
   void render(DomBuilder b) {
-    b.text(_component.text);
+    if (_component.rawHtml) {
+      b.innerHtml(_component.text);
+    } else {
+      b.text(_component.text);
+    }
   }
 }

@@ -1,6 +1,5 @@
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart';
-import 'package:domino/domino.dart' hide DomComponent;
 import 'package:jaspr/jaspr.dart';
 import 'package:uuid/uuid.dart';
 

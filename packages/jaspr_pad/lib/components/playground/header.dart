@@ -1,5 +1,8 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_pad/providers/logic_provider.dart';
+import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
+import '../../providers/gist_provider.dart';
 import '../../utils/utils.dart';
 import '../elements/button.dart';
 
@@ -11,7 +14,7 @@ class PlaygroundHeader extends StatelessComponent {
     yield DomComponent(
       tag: 'header',
       classes: ['mdc-elevation--z4'],
-      children: buildChildren(context),
+      children: buildChildren(context).toList(),
     );
   }
 
@@ -42,19 +45,25 @@ class PlaygroundHeader extends StatelessComponent {
           id: 'jnew-button',
           label: 'New Pad',
           icon: 'code',
-          onPressed: () {},
+          onPressed: () {
+            context.read(logicProvider).newPad();
+          },
         ),
         Button(
           id: 'reset-button',
           label: 'Reset',
           icon: 'refresh',
-          onPressed: () {},
+          onPressed: () {
+            context.read(logicProvider).refresh();
+          },
         ),
         Button(
           id: 'jformat-button',
           label: 'Format',
           icon: 'format_align_left',
-          onPressed: () {},
+          onPressed: () {
+            context.read(logicProvider).formatDartFiles();
+          },
         ),
         Button(
           id: 'jinstall-button',
@@ -66,5 +75,12 @@ class PlaygroundHeader extends StatelessComponent {
         ),
       ],
     );
+
+    yield Builder(builder: (context) sync* {
+      var name = context.watch(gistNameProvider);
+      if (name != null) {
+        yield DomComponent(tag: 'div', classes: ['header-gist-name'], child: Text(name));
+      }
+    });
   }
 }

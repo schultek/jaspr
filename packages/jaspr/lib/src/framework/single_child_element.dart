@@ -43,13 +43,14 @@ abstract class SingleChildElement extends Element {
         _debugDoingBuild = false;
         return true;
       }());
-    } catch (e) {
+    } catch (e, st) {
       _debugDoingBuild = false;
       // TODO: implement actual error component
       built = DomComponent(
         tag: 'div',
         child: Text("Error on building component: $e"),
       );
+      print('Error: $e $st');
     } finally {
       _dirty = false;
       assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(false));

@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 
+import '../utils.dart';
 import 'element_generator.dart';
 
 class FunctionGenerator extends ElementGenerator<ExecutableElement> {
@@ -48,24 +49,23 @@ class FunctionGenerator extends ElementGenerator<ExecutableElement> {
     }
 
     if (e is ConstructorElement) {
-      var conststr = e.isConst ? 'const ' : '';
+      var conststr = e.isFactory && e.isConst ? 'const ' : '';
       var name = '${e.enclosingElement.name}${e.name.isNotEmpty ? '.${e.name}' : ''}';
-      if (e.isFactory) {
-        return '${conststr}factory $name($paramsString) => $body';
-      } else {
-        return '$conststr$name($paramsString);';
-      }
+      return '${conststr}factory $name($paramsString) => $body';
     }
 
     var typeParams =
         element.typeParameters.map((e) => '${e.name}${e.bound != null ? ' extends ${typeName(e.bound!)}' : ''}');
     var typeParamsStr = typeParams.isNotEmpty ? '<${typeParams.join(', ')}>' : '';
 
-    return '$static$returnType ${element.isOperator ? 'operator ' : ''}${element.name}$typeParamsStr($paramsString) => $body';
+    return '$static$returnType ${element.isOperator ? 'operator ' : ''}${element.name}$typeParamsStr($paramsString)'
+        '${element.isAbstract ? ';' : ' => $body'}';
   }
 
   @override
-  Iterable<Element> getTransitiveElements() {
-    return [...element.type.transitiveElements];
+  Iterable<Element> getTransitiveElements({bool recursive = false}) {
+    return [
+      if (recursive) ...element.type.transitiveElements,
+    ];
   }
 }

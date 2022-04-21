@@ -10,6 +10,7 @@ class Button extends StatelessComponent {
       required this.onPressed,
       this.raised = false,
       this.dense = false,
+      this.disabled = false,
       Key? key})
       : super(key: key);
 
@@ -18,6 +19,7 @@ class Button extends StatelessComponent {
   final String icon;
   final bool raised;
   final bool dense;
+  final bool disabled;
   final VoidCallback onPressed;
 
   @override
@@ -26,7 +28,7 @@ class Button extends StatelessComponent {
       tag: 'button',
       classes: ['mdc-button', if (raised) 'mdc-button--raised', if (dense) 'mdc-button--dense'],
       id: id,
-      attributes: {'type': 'button'},
+      attributes: {'type': 'button', if (disabled) 'disabled': ''},
       events: {'click': onPressed},
       children: [
         DomComponent(

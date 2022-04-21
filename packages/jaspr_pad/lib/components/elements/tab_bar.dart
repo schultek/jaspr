@@ -1,27 +1,29 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../../adapters/mdc.dart';
 
-class TabBar extends StatefulComponent {
-  const TabBar({required this.id, Key? key}) : super(key: key);
+final tabSelectedProvider = Provider<bool>((ref) => false);
+final tabCallbackProvider = Provider<VoidCallback>((ref) => () {});
+
+class TabBar extends StatelessComponent {
+  const TabBar({required this.id, required this.selected, required this.onSelected, required this.tabs, Key? key})
+      : super(key: key);
+
   final String id;
+  final int selected;
+  final ValueChanged<int> onSelected;
+  final List<Tab> tabs;
 
-  @override
-  State<StatefulComponent> createState() => TabBarState();
-
-  @override
-  Element createElement() => TabBarElement(this);
-}
-
-class TabBarState extends State<TabBar> {
-  int selectedTab = 0;
-  MDCTabBar? _tabBar;
+  void _select(int tab) {
+    onSelected(tab);
+  }
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'div',
-      id: component.id,
+      id: id,
       classes: ['mdc-tab-bar'],
       attributes: {'role': 'tablist'},
       child: DomComponent(
@@ -34,67 +36,52 @@ class TabBarState extends State<TabBar> {
             tag: 'div',
             classes: ['mdc-tab-scroller__scroll-content'],
             children: [
-              Tab(
-                id: 'dart-tab',
-                label: 'Dart',
-                selected: selectedTab == 0,
-                onSelect: () {
-                  _tabBar?.activateTab(0);
-                  setState(() => selectedTab = 0);
-                },
-              ),
-              Tab(
-                id: 'html-tab',
-                label: 'HTML',
-                selected: selectedTab == 1,
-                onSelect: () {
-                  _tabBar?.activateTab(1);
-                  setState(() => selectedTab = 1);
-                },
-              ),
-              Tab(
-                id: 'css-tab',
-                label: 'CSS',
-                selected: selectedTab == 2,
-                onSelect: () {
-                  _tabBar?.activateTab(2);
-                  setState(() => selectedTab = 2);
-                },
-              ),
+              for (var i = 0; i < tabs.length; i++)
+                ProviderScope(overrides: [
+                  tabSelectedProvider.overrideWithValue(i == selected),
+                  tabCallbackProvider.overrideWithValue(() => _select(i)),
+                ], child: tabs[i]),
             ],
           ),
         ),
       ),
     );
   }
+
+  @override
+  Element createElement() => TabBarElement(this);
 }
 
-class TabBarElement extends StatefulElement {
+class TabBarElement extends StatelessElement {
   TabBarElement(TabBar component) : super(component);
 
   @override
-  TabBarState get state => super.state as TabBarState;
+  TabBar get component => super.component as TabBar;
+
+  MDCTabBar? _tabBar;
 
   @override
   void render(DomBuilder b) {
     super.render(b);
+
     if (kIsWeb) {
-      state._tabBar?.destroy();
-      state._tabBar = MDCTabBar((children.first as DomElement).source);
+      _tabBar?.destroy();
+      var tabBarRoot = (children.first as DomElement).source;
+      _tabBar = MDCTabBar(tabBarRoot)..activateTab(component.selected);
     }
   }
 }
 
 class Tab extends StatelessComponent {
-  const Tab({required this.id, required this.label, this.selected = false, required this.onSelect, Key? key})
-      : super(key: key);
-  final String id;
-  final bool selected;
+  const Tab({required this.label, Key? key}) : super(key: key);
+
   final String label;
-  final VoidCallback onSelect;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
+    var selected = context.watch(tabSelectedProvider);
+    var onSelect = context.watch(tabCallbackProvider);
+
     yield DomComponent(
       tag: 'button',
       classes: ['mdc-tab', if (selected) 'mdc-tab--active'],

@@ -60,7 +60,8 @@ extension ProviderContext on BuildContext {
   void _ensureDebugDoingBuild(String method) {
     assert(() {
       if (!debugDoingBuild) {
-        throw StateError('context.$method can only be used within the build method of a widget');
+        throw StateError(
+            'context.$method can only be used within the build method of a widget. When calling: ${StackTrace.current}');
       }
       return true;
     }());

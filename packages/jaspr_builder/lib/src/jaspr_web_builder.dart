@@ -4,8 +4,10 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
-import 'package:jaspr_builder/src/generators/element_generator.dart';
 import 'package:path/path.dart' as path;
+
+import './generators/element_generator.dart';
+import './utils.dart';
 
 /// The main builder used for code generation
 class JasprWebBuilder implements Builder {
@@ -46,13 +48,31 @@ class JasprWebBuilder implements Builder {
   String get generationHeader => "// GENERATED FILE, DO NOT MODIFY\n"
       "// Generated with jaspr_web_builder\n";
 
+  final webSdks = ['dart:html', 'dart:js', 'dart:svg', 'dart:indexed_db'];
+
   Future<String> generateStub(BuildStep buildStep) async {
+    //return DartFormatter(pageWidth: 120).format(generationHeader);
+
+    var imports = <String>{};
     var output = StringBuffer();
     var toGenerate = <Element>[];
     var didGenerate = <Element>{};
 
+    bool checkInSdk(Element e) {
+      if (e.library == null || !e.library!.isInSdk || e.library!.isPrivate) {
+        return false;
+      }
+      var source = e.librarySource?.uri.toString() ?? '';
+      var isWebSdk = webSdks.contains(source);
+      if (isWebSdk) {
+        return false;
+      }
+      imports.add(source);
+      return true;
+    }
+
     bool canResolve(DartType t) => t.transitiveElements //
-        .every((e) => didGenerate.contains(e) || toGenerate.contains(e));
+        .every((e) => checkInSdk(e) || didGenerate.contains(e) || toGenerate.contains(e));
 
     var lib = await buildStep.inputLibrary;
 
@@ -82,12 +102,10 @@ class JasprWebBuilder implements Builder {
 
       var generator = ElementGenerator.from(e, canResolve);
 
-      if (e.library == lib) {
-        var transitives = generator.getTransitiveElements();
-        for (var e in transitives) {
-          if (e.library == lib && !didGenerate.contains(e) && !toGenerate.contains(e)) {
-            toGenerate.add(e);
-          }
+      var transitives = generator.getTransitiveElements(recursive: e.library == lib);
+      for (var e in transitives) {
+        if (!checkInSdk(e) && !didGenerate.contains(e) && !toGenerate.contains(e)) {
+          toGenerate.add(e);
         }
       }
 
@@ -98,7 +116,8 @@ class JasprWebBuilder implements Builder {
     }
 
     return DartFormatter(pageWidth: 120).format('$generationHeader'
-        '// ignore_for_file: annotate_overrides, non_constant_identifier_names\n\n'
+        '// ignore_for_file: annotate_overrides, non_constant_identifier_names, unused_element\n\n'
+        '${imports.map((i) => "import '$i';").join('\n')}'
         '$output');
   }
 

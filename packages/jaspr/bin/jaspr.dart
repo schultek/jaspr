@@ -115,14 +115,14 @@ class ServeCommand extends Command<int> {
 
   @override
   Future<int> run() async {
-    var webProcess = await _runWebdev(['serve', '--auto=refresh', 'web:5467']);
+    var webProcess = await _runWebdev(['serve', '--auto=refresh', 'web:5467', '--', '--delete-conflicting-outputs']);
 
     print("Starting jaspr development server...");
 
     var startupCompleter = Completer();
 
     checkWebdevStarted(String str) {
-      if (str.contains('Serving `web`') && !startupCompleter.isCompleted) {
+      if (str.contains('Running build completed') && !startupCompleter.isCompleted) {
         startupCompleter.complete();
       }
     }
@@ -163,8 +163,6 @@ class ServeCommand extends Command<int> {
     var process = await Process.start('dart', args, environment: {'JASPR_PROXY_PORT': '5467'});
 
     _pipeProcess(process);
-
-    await Future.wait([webProcess.exitCode, process.exitCode]);
     return process.exitCode;
   }
 }
@@ -256,6 +254,7 @@ void _pipeProcess(Process process,
     if (pipe && until != null) {
       pipe = !until(decoded());
     }
+
     if (!pipe) return;
     if (hide?.call(decoded()) ?? false) return;
     listen?.call(decoded());

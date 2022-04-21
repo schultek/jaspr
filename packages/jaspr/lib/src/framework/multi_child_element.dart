@@ -51,7 +51,7 @@ abstract class MultiChildElement extends Element {
         _debugDoingBuild = false;
         return true;
       }());
-    } catch (e) {
+    } catch (e, st) {
       _debugDoingBuild = false;
       // TODO: implement actual error component
       built = [
@@ -60,6 +60,7 @@ abstract class MultiChildElement extends Element {
           child: Text("Error on building component: $e"),
         ),
       ];
+      print('Error: $e $st');
     } finally {
       _dirty = false;
       assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(false));
