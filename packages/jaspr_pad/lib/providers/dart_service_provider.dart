@@ -15,21 +15,16 @@ class DartService {
   final Ref ref;
   final client = http.Client();
 
-  Future<FormatResponse> format(String source) => _request('format', {'source': source});
+  Future<FormatResponse> format(String source) => _request('format', FormatRequest(source, 0));
 
-  Future<AnalyzeResponse> analyze(String source) => _request(
-      'analyze',
-      {
-        'sources': {'main.dart': source}
-      },
-      url: '${window.location.origin}/api');
+  Future<AnalyzeResponse> analyze(String source) => _request('analyze', AnalyzeRequest({'main.dart': source}));
 
-  Future<CompileResponse> compile(Map<String, String> sources) =>
-      _request('compile', CompileRequest(sources), url: '${window.location.origin}/api');
+  Future<CompileResponse> compile(Map<String, String> sources) => _request('compile', CompileRequest(sources));
 
-  Future<T> _request<T>(String action, Object body, {String? url}) async {
-    var response =
-        await client.post(Uri.parse('${url ?? ref.read(serviceUrlProvider)}/$action'), body: Mapper.toJson(body));
+  Future<DocumentResponse> document(String source, int offset) => _request('document', DocumentRequest(source, offset));
+
+  Future<T> _request<T>(String action, Object body) async {
+    var response = await client.post(Uri.parse('${window.location.origin}/api/$action'), body: Mapper.toJson(body));
     return Mapper.fromJson<T>(response.body);
   }
 }

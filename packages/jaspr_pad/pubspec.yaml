@@ -11,6 +11,7 @@ dependencies:
   dart_mappable: ^1.1.0
   jaspr: ^0.1.0
   jaspr_riverpod: ^0.1.0
+  markdown: ^5.0.0
   shelf_router: ^1.1.2
 
 dev_dependencies:
@@ -23,6 +24,7 @@ dev_dependencies:
   jaspr_test: ^0.1.0
   dart_mappable_builder: ^1.1.0
   yaml_writer: ^1.0.1
+  webdev: ^2.7.7
 
 dependency_overrides:
   jaspr: 

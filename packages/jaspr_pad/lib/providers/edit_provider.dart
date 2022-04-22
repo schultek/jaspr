@@ -1,32 +1,37 @@
 import 'dart:async';
 
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_pad/main.mapper.g.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
-import '../adapters/codemirror.dart';
+import '../main.mapper.g.dart';
+import '../models/api_models.dart';
 import 'gist_provider.dart';
 
-final mutableGistProvider = Provider((ref) {
+final mutableGistProvider = StateProvider((ref) {
   var asyncGist = ref.watch(gistProvider);
 
-  var docs = asyncGist.value?.files //
-          .map((k, f) => MapEntry(k, Doc(f.content, _toMode(f.type)))) ??
-      {};
-
-  if (asyncGist.value != null) {
-    for (var key in docs.keys) {
-      var doc = docs[key]!;
-
-      doc.onChange.debounce(Duration(seconds: 1)).listen((data) {
-        ref.read(storageProvider)['gist'] = asyncGist.value!.copyWith.files
-            .apply((f) => f.map((k, v) => MapEntry(k, v.copyWith(content: docs[k]!.getValue()!))))
-            .toJson();
-      });
-    }
+  if (kIsWeb) {
+    var debouncedStore = debounce((GistData gist) {
+      ref.read(storageProvider)['gist'] = gist.toJson();
+    }, Duration(seconds: 1));
+    ref.listenSelf((_, next) => debouncedStore(next.state));
   }
 
-  return MutableGist(asyncGist.value, docs);
+  return asyncGist.value?.copyWith.files.putAll({}) ?? GistData('', '', {});
 });
+
+final fileSelectionProvider = StateProvider.family<IssueLocation?, String>((ref, String key) => null);
+
+void Function(T) debounce<T>(void Function(T) fn, Duration duration) {
+  Timer? timer;
+  return (v) {
+    timer?.cancel();
+    timer = Timer(duration, () {
+      fn(v);
+    });
+  };
+}
 
 extension DebounceStream<T> on Stream<T> {
   Stream<T> debounce(Duration duration) {
@@ -40,7 +45,7 @@ extension DebounceStream<T> on Stream<T> {
   }
 }
 
-String _toMode(String type) {
+String toMode(String type) {
   switch (type) {
     case 'text/html':
       return 'text/html';
@@ -53,9 +58,4 @@ String _toMode(String type) {
   }
 }
 
-class MutableGist {
-  final GistData? gist;
-  final Map<String, Doc> docs;
-
-  MutableGist(this.gist, this.docs);
-}
+final activeDocumentationProvider = StateProvider<HoverInfo?>((ref) => null);

@@ -25,8 +25,17 @@ class AnalyzeRequest {
 @MappableClass()
 class FormatResponse {
   final String newString;
+  final int newOffset;
 
-  FormatResponse(this.newString);
+  FormatResponse(this.newString, this.newOffset);
+}
+
+@MappableClass()
+class FormatRequest {
+  final String source;
+  final int offset;
+
+  FormatRequest(this.source, this.offset);
 }
 
 @MappableClass()
@@ -71,4 +80,44 @@ class IssueLocation {
   final int startColumn, endColumn;
 
   IssueLocation({required this.startLine, required this.endLine, required this.startColumn, required this.endColumn});
+}
+
+@MappableClass()
+class DocumentResponse {
+  final HoverInfo info;
+  final String? error;
+
+  DocumentResponse(this.info, this.error);
+}
+
+@MappableClass()
+class HoverInfo {
+  final String? description;
+  final String? kind;
+  final String? dartdoc;
+  final String? enclosingClassName;
+  final String? libraryName;
+  final String? parameter;
+  final bool? deprecated;
+  final String? staticType;
+  final String? propagatedType;
+
+  HoverInfo(
+      {this.description,
+      this.kind,
+      this.dartdoc,
+      this.enclosingClassName,
+      this.libraryName,
+      this.parameter,
+      this.deprecated,
+      this.staticType,
+      this.propagatedType});
+}
+
+@MappableClass()
+class DocumentRequest {
+  final String source;
+  final int offset;
+
+  DocumentRequest(this.source, this.offset);
 }

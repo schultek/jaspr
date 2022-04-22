@@ -1,8 +1,11 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_pad/main.mapper.g.dart';
+import 'package:jaspr_pad/providers/issues_provider.dart';
 import 'package:jaspr_pad/providers/logic_provider.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../../../providers/docs_provider.dart';
+import '../../../providers/edit_provider.dart';
 import '../../elements/button.dart';
 import '../../elements/tab_bar.dart';
 import '../editing/editor.dart';
@@ -32,9 +35,9 @@ class EditorPanelState extends State<EditorPanel> {
         tag: 'nav',
         child: TabBar(
           id: 'web-tab-bar',
-          selected: context.watch(activeFileIndexProvider),
+          selected: context.watch(activeDocIndexProvider),
           onSelected: (index) {
-            context.read(activeFileIndexProvider.notifier).state = index;
+            context.read(activeDocIndexProvider.notifier).state = index;
           },
           tabs: [
             for (var fileName in context.watch(fileNamesProvider)) Tab(label: fileName),
@@ -64,10 +67,39 @@ class EditorPanelState extends State<EditorPanel> {
     );
 
     yield OutputSplitView(
-      child: Editor(
-        key: _editorKey,
-        activeDoc: kIsWeb ? context.watch(activeDocProvider) : null,
-      ),
+      child: Builder.single(builder: (context) {
+        var mutableGist = context.watch(mutableGistProvider);
+
+        return Editor(
+          key: _editorKey,
+          activeDoc: context.watch(activeDocKeyProvider),
+          documents: [
+            for (var key in mutableGist.files.keys)
+              EditorDocument(
+                key: key,
+                source: mutableGist.files[key]!.content,
+                mode: toMode(mutableGist.files[key]!.type),
+                issues: toMode(mutableGist.files[key]!.type) == 'dart'
+                    ? context.watch(docIssuesProvider(key)).value ?? []
+                    : [],
+                selection: context.watch(fileSelectionProvider(key)),
+              ),
+          ],
+          onDocumentChanged: (String key, String content) {
+            context
+                .read(mutableGistProvider.notifier)
+                .update((state) => state.copyWith.files.get(key)!.call(content: content));
+          },
+          onSelectionChanged: (key, index, isWhitespace, shouldNotify) {
+            if (shouldNotify) {
+              context.read(fileSelectionProvider(key).notifier).state = null;
+            }
+            if (!isWhitespace) {
+              context.read(logicProvider).document(context.read(fileContentProvider(key)).value ?? '', index);
+            }
+          },
+        );
+      }),
     );
   }
 }

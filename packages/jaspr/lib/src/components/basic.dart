@@ -94,6 +94,16 @@ class Builder extends StatelessComponent {
     required this.builder,
   }) : super(key: key);
 
+  /// Creates a component that delegates its build to a callback
+  /// that returns a single child component.
+  ///
+  /// The [builder] argument must not be null.
+  Builder.single({
+    Key? key,
+    required SingleComponentBuilder builder,
+  })  : builder = _WrappedComponentBuilder(builder),
+        super(key: key);
+
   /// Called to obtain the child component.
   ///
   /// This function is called whenever this component is included in its parent's
@@ -105,6 +115,16 @@ class Builder extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) => builder(context);
+}
+
+class _WrappedComponentBuilder {
+  final SingleComponentBuilder _builder;
+
+  const _WrappedComponentBuilder(this._builder);
+
+  Iterable<Component> call(BuildContext context) sync* {
+    yield _builder(context);
+  }
 }
 
 /// Signature for the builder callback used by [StatefulBuilder].

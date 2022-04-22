@@ -10,36 +10,47 @@ import 'scheduler.dart';
 
 // Use very long timeouts to ensure that the server has enough time to restart.
 const Duration _analysisServerTimeout = Duration(seconds: 35);
+const Duration _analysisWarmupTimeout = Duration(seconds: 60);
+
+const String _warmupSrc = 'main() { int b = 2;  b++;   b. }';
+final mainPath = path.join(jasprBasicTemplatePath, 'main.dart');
 
 class Analyzer {
   final TaskScheduler serverScheduler = TaskScheduler();
 
+  final String sdkPath;
+
   /// Instance to handle communication with the server.
   late AnalysisServer analysisServer;
 
-  late Future<void> initialize;
-
-  Analyzer() {
+  Analyzer(this.sdkPath) {
     init();
   }
 
   Future<void> init() async {
-    analysisServer = await AnalysisServer.create();
+    serverScheduler.schedule(ClosureTask(() async {
+      analysisServer = await AnalysisServer.create(sdkPath: sdkPath, clientId: 'JasprPad');
 
-    analysisServer.server.onError.listen((ServerError error) {
-      print('server error${error.isFatal ? ' (fatal)' : ''}: ${error.message}');
-    });
-    await analysisServer.server.onConnected.first;
-    await analysisServer.server.setSubscriptions(<String>['STATUS']);
+      analysisServer.server.onError.listen((ServerError error) {
+        print('server error${error.isFatal ? ' (fatal)' : ''}: ${error.message}');
+      });
+      await analysisServer.server.onConnected.first;
+      await analysisServer.server.setSubscriptions(<String>['STATUS']);
 
-    await analysisServer.analysis.setAnalysisRoots([projectTemplatePath], []);
+      await analysisServer.analysis.setAnalysisRoots([jasprBasicTemplatePath], []);
+
+      // Warmup.
+      await _sendAddOverlays({mainPath: _warmupSrc});
+      await _sendRemoveOverlays();
+    }, timeoutDuration: _analysisWarmupTimeout));
   }
 
   Future<AnalyzeResponse> analyze(AnalyzeRequest request) {
     return serverScheduler.schedule(ClosureTask<AnalyzeResponse>(() async {
-      var sources = request.sources.map((k, v) => MapEntry(path.join(projectTemplatePath, k), v));
+      var sources = request.sources.map((k, v) => MapEntry(path.join(jasprBasicTemplatePath, k), v));
+
       await _loadSources(sources);
-      final errors = (await analysisServer.analysis.getErrors(path.join(projectTemplatePath, 'main.dart'))).errors;
+      final errors = (await analysisServer.analysis.getErrors(mainPath)).errors;
       await _unloadSources();
 
       var lines = request.sources.map((k, v) => MapEntry(k, Lines(v)));
@@ -67,6 +78,58 @@ class Analyzer {
           correction: error.correction,
         );
       }).toList());
+    }, timeoutDuration: _analysisServerTimeout));
+  }
+
+  Future<FormatResponse> format(FormatRequest request) async {
+    return serverScheduler.schedule(ClosureTask<FormatResponse>(() async {
+      await _loadSources({mainPath: request.source});
+      final FormatResult result;
+      try {
+        result = await analysisServer.edit.format(mainPath, request.offset, 0);
+      } finally {
+        await _unloadSources();
+      }
+
+      final edits = result.edits;
+      edits.sort((SourceEdit e1, SourceEdit e2) => -1 * e1.offset.compareTo(e2.offset));
+
+      var src = request.source;
+      for (final edit in edits) {
+        src = src.replaceRange(edit.offset, edit.offset + edit.length, edit.replacement);
+      }
+
+      return FormatResponse(src, result.selectionOffset);
+    }, timeoutDuration: _analysisServerTimeout));
+  }
+
+  Future<DocumentResponse> document(DocumentRequest request) async {
+    return serverScheduler.schedule(ClosureTask<DocumentResponse>(() async {
+      await _loadSources({mainPath: request.source});
+
+      final result = await analysisServer.analysis.getHover(mainPath, request.offset);
+      await _unloadSources();
+
+      if (result.hovers.isEmpty) {
+        return DocumentResponse(HoverInfo(), null);
+      }
+
+      final info = result.hovers.first;
+
+      return DocumentResponse(
+        HoverInfo(
+          description: info.elementDescription,
+          kind: info.elementKind,
+          dartdoc: info.dartdoc,
+          enclosingClassName: info.containingClassDescription,
+          libraryName: info.containingLibraryName,
+          parameter: info.parameter,
+          deprecated: info.isDeprecated,
+          staticType: info.staticType,
+          propagatedType: info.propagatedType,
+        ),
+        null,
+      );
     }, timeoutDuration: _analysisServerTimeout));
   }
 

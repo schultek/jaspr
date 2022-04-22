@@ -1,15 +1,27 @@
 # Use latest stable channel SDK.
-FROM dart:stable AS build
+FROM dart:stable as build
 
 # Resolve app dependencies.
 WORKDIR /app
-COPY pubspec.* ./
+COPY . .
+WORKDIR /app/packages/jaspr_pad
+RUN dart pub get
+RUN dart run jaspr build
+
+FROM dart:stable
+
+COPY --from=build /runtime/ /
+COPY --from=build /app/packages/jaspr_pad/build/ /app/packages/jaspr_pad/
+COPY --from=build /app/packages/jaspr_pad/templates /app/packages/jaspr_pad/templates
+COPY --from=build /app/packages/jaspr /app/packages/jaspr
+COPY --from=build /app/packages/jaspr_riverpod /app/packages/jaspr_riverpod
+
+WORKDIR /app/packages/jaspr_pad/templates/jaspr_basic
 RUN dart pub get
 
-# Copy app source code (except anything in .dockerignore) and AOT compile app.
-COPY . .
-RUN dart run jaspr build
+WORKDIR /app/packages/jaspr_pad
 
 # Start server.
 EXPOSE 8080
-CMD ["/build/app"]
+
+CMD ["./app", "/usr/lib/dart"]

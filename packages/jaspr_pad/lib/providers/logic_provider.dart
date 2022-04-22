@@ -1,5 +1,6 @@
 import 'package:jaspr_pad/adapters/html.dart';
 import 'package:jaspr_pad/components/playground/output/execution_service.dart';
+import 'package:jaspr_pad/main.mapper.g.dart';
 import 'package:jaspr_pad/providers/dart_service_provider.dart';
 import 'package:jaspr_pad/providers/edit_provider.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
@@ -29,12 +30,11 @@ class Logic {
     var gist = ref.read(mutableGistProvider);
 
     await Future.wait([
-      for (var key in gist.docs.keys)
-        if (gist.gist?.files[key]!.type == 'application/vnd.dart')
-          ref
-              .read(dartServiceProvider)
-              .format(gist.docs[key]!.getValue()!)
-              .then((res) => gist.docs[key]!.setValue(res.newString)),
+      for (var key in gist.files.keys)
+        if (gist.files[key]!.type == 'application/vnd.dart')
+          ref.read(dartServiceProvider).format(gist.files[key]!.content).then((res) => ref
+              .read(mutableGistProvider.notifier)
+              .update((state) => state.copyWith.files.get(key)!.call(content: res.newString))),
     ]);
   }
 
@@ -44,16 +44,16 @@ class Logic {
 
     try {
       var response = await ref.read(dartServiceProvider).compile({
-        for (var key in gist.docs.keys)
-          if (gist.gist?.files[key]!.type == 'application/vnd.dart') key: gist.docs[key]!.getValue()!,
+        for (var key in gist.files.keys)
+          if (gist.files[key]!.type == 'application/vnd.dart') key: gist.files[key]!.content,
       });
 
       if (response.result != null) {
         var executionService = ref.read(executionProvider);
         if (executionService == null) return;
 
-        var htmlSource = gist.docs['index.html']!.getValue()!;
-        var cssSource = gist.docs['styles.css']!.getValue()!;
+        var htmlSource = gist.files['index.html']!.content;
+        var cssSource = gist.files['styles.css']!.content;
 
         await executionService.execute(
           htmlSource,
@@ -67,5 +67,10 @@ class Logic {
     } finally {
       ref.read(isCompilingProvider.notifier).state = false;
     }
+  }
+
+  Future<void> document(String source, int index) async {
+    var response = await ref.read(dartServiceProvider).document(source, index);
+    ref.read(activeDocumentationProvider.notifier).state = response.info;
   }
 }

@@ -7,11 +7,15 @@ import '../main.mapper.g.dart';
 import 'analyzer.dart';
 import 'compiler.dart';
 
-Handler get apiRouter {
+Handler apiRouter(String sdkPath) {
   var router = Router();
 
+  var analyzer = Analyzer(sdkPath);
+
   router.post('/compile', mappedHandler(Compiler().compile));
-  router.post('/analyze', mappedHandler(Analyzer().analyze));
+  router.post('/analyze', mappedHandler(analyzer.analyze));
+  router.post('/format', mappedHandler(analyzer.format));
+  router.post('/document', mappedHandler(analyzer.document));
 
   return router;
 }

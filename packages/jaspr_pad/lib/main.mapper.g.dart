@@ -13,9 +13,13 @@ var _mappers = <BaseMapper>{
   CompileResponseMapper._(),
   AnalyzeRequestMapper._(),
   FormatResponseMapper._(),
+  FormatRequestMapper._(),
   AnalyzeResponseMapper._(),
   IssueMapper._(),
   IssueLocationMapper._(),
+  DocumentResponseMapper._(),
+  HoverInfoMapper._(),
+  DocumentRequestMapper._(),
   GistDataMapper._(),
   GistFileMapper._(),
   // enum mappers
@@ -139,15 +143,15 @@ class FormatResponseMapper extends BaseMapper<FormatResponse> {
 
   @override Function get decoder => decode;
   FormatResponse decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
-  FormatResponse fromMap(Map<String, dynamic> map) => FormatResponse(Mapper.i.$get(map, 'newString'));
+  FormatResponse fromMap(Map<String, dynamic> map) => FormatResponse(Mapper.i.$get(map, 'newString'), Mapper.i.$get(map, 'newOffset'));
 
   @override Function get encoder => (FormatResponse v) => encode(v);
   dynamic encode(FormatResponse v) => toMap(v);
-  Map<String, dynamic> toMap(FormatResponse f) => {'newString': Mapper.i.$enc(f.newString, 'newString')};
+  Map<String, dynamic> toMap(FormatResponse f) => {'newString': Mapper.i.$enc(f.newString, 'newString'), 'newOffset': Mapper.i.$enc(f.newOffset, 'newOffset')};
 
-  @override String stringify(FormatResponse self) => 'FormatResponse(newString: ${Mapper.asString(self.newString)})';
-  @override int hash(FormatResponse self) => Mapper.hash(self.newString);
-  @override bool equals(FormatResponse self, FormatResponse other) => Mapper.isEqual(self.newString, other.newString);
+  @override String stringify(FormatResponse self) => 'FormatResponse(newString: ${Mapper.asString(self.newString)}, newOffset: ${Mapper.asString(self.newOffset)})';
+  @override int hash(FormatResponse self) => Mapper.hash(self.newString) ^ Mapper.hash(self.newOffset);
+  @override bool equals(FormatResponse self, FormatResponse other) => Mapper.isEqual(self.newString, other.newString) && Mapper.isEqual(self.newOffset, other.newOffset);
 
   @override Function get typeFactory => (f) => f<FormatResponse>();
 }
@@ -160,14 +164,50 @@ extension FormatResponseMapperExtension  on FormatResponse {
 
 abstract class FormatResponseCopyWith<$R> {
   factory FormatResponseCopyWith(FormatResponse value, Then<FormatResponse, $R> then) = _FormatResponseCopyWithImpl<$R>;
-  $R call({String? newString});
+  $R call({String? newString, int? newOffset});
   $R apply(FormatResponse Function(FormatResponse) transform);
 }
 
 class _FormatResponseCopyWithImpl<$R> extends BaseCopyWith<FormatResponse, $R> implements FormatResponseCopyWith<$R> {
   _FormatResponseCopyWithImpl(FormatResponse value, Then<FormatResponse, $R> then) : super(value, then);
 
-  @override $R call({String? newString}) => $then(FormatResponse(newString ?? $value.newString));
+  @override $R call({String? newString, int? newOffset}) => $then(FormatResponse(newString ?? $value.newString, newOffset ?? $value.newOffset));
+}
+
+class FormatRequestMapper extends BaseMapper<FormatRequest> {
+  FormatRequestMapper._();
+
+  @override Function get decoder => decode;
+  FormatRequest decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
+  FormatRequest fromMap(Map<String, dynamic> map) => FormatRequest(Mapper.i.$get(map, 'source'), Mapper.i.$get(map, 'offset'));
+
+  @override Function get encoder => (FormatRequest v) => encode(v);
+  dynamic encode(FormatRequest v) => toMap(v);
+  Map<String, dynamic> toMap(FormatRequest f) => {'source': Mapper.i.$enc(f.source, 'source'), 'offset': Mapper.i.$enc(f.offset, 'offset')};
+
+  @override String stringify(FormatRequest self) => 'FormatRequest(source: ${Mapper.asString(self.source)}, offset: ${Mapper.asString(self.offset)})';
+  @override int hash(FormatRequest self) => Mapper.hash(self.source) ^ Mapper.hash(self.offset);
+  @override bool equals(FormatRequest self, FormatRequest other) => Mapper.isEqual(self.source, other.source) && Mapper.isEqual(self.offset, other.offset);
+
+  @override Function get typeFactory => (f) => f<FormatRequest>();
+}
+
+extension FormatRequestMapperExtension  on FormatRequest {
+  String toJson() => Mapper.toJson(this);
+  Map<String, dynamic> toMap() => Mapper.toMap(this);
+  FormatRequestCopyWith<FormatRequest> get copyWith => FormatRequestCopyWith(this, $identity);
+}
+
+abstract class FormatRequestCopyWith<$R> {
+  factory FormatRequestCopyWith(FormatRequest value, Then<FormatRequest, $R> then) = _FormatRequestCopyWithImpl<$R>;
+  $R call({String? source, int? offset});
+  $R apply(FormatRequest Function(FormatRequest) transform);
+}
+
+class _FormatRequestCopyWithImpl<$R> extends BaseCopyWith<FormatRequest, $R> implements FormatRequestCopyWith<$R> {
+  _FormatRequestCopyWithImpl(FormatRequest value, Then<FormatRequest, $R> then) : super(value, then);
+
+  @override $R call({String? source, int? offset}) => $then(FormatRequest(source ?? $value.source, offset ?? $value.offset));
 }
 
 class AnalyzeResponseMapper extends BaseMapper<AnalyzeResponse> {
@@ -280,6 +320,116 @@ class _IssueLocationCopyWithImpl<$R> extends BaseCopyWith<IssueLocation, $R> imp
   _IssueLocationCopyWithImpl(IssueLocation value, Then<IssueLocation, $R> then) : super(value, then);
 
   @override $R call({int? startLine, int? endLine, int? startColumn, int? endColumn}) => $then(IssueLocation(startLine: startLine ?? $value.startLine, endLine: endLine ?? $value.endLine, startColumn: startColumn ?? $value.startColumn, endColumn: endColumn ?? $value.endColumn));
+}
+
+class DocumentResponseMapper extends BaseMapper<DocumentResponse> {
+  DocumentResponseMapper._();
+
+  @override Function get decoder => decode;
+  DocumentResponse decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
+  DocumentResponse fromMap(Map<String, dynamic> map) => DocumentResponse(Mapper.i.$get(map, 'info'), Mapper.i.$getOpt(map, 'error'));
+
+  @override Function get encoder => (DocumentResponse v) => encode(v);
+  dynamic encode(DocumentResponse v) => toMap(v);
+  Map<String, dynamic> toMap(DocumentResponse d) => {'info': Mapper.i.$enc(d.info, 'info'), 'error': Mapper.i.$enc(d.error, 'error')};
+
+  @override String stringify(DocumentResponse self) => 'DocumentResponse(info: ${Mapper.asString(self.info)}, error: ${Mapper.asString(self.error)})';
+  @override int hash(DocumentResponse self) => Mapper.hash(self.info) ^ Mapper.hash(self.error);
+  @override bool equals(DocumentResponse self, DocumentResponse other) => Mapper.isEqual(self.info, other.info) && Mapper.isEqual(self.error, other.error);
+
+  @override Function get typeFactory => (f) => f<DocumentResponse>();
+}
+
+extension DocumentResponseMapperExtension  on DocumentResponse {
+  String toJson() => Mapper.toJson(this);
+  Map<String, dynamic> toMap() => Mapper.toMap(this);
+  DocumentResponseCopyWith<DocumentResponse> get copyWith => DocumentResponseCopyWith(this, $identity);
+}
+
+abstract class DocumentResponseCopyWith<$R> {
+  factory DocumentResponseCopyWith(DocumentResponse value, Then<DocumentResponse, $R> then) = _DocumentResponseCopyWithImpl<$R>;
+  HoverInfoCopyWith<$R> get info;
+  $R call({HoverInfo? info, String? error});
+  $R apply(DocumentResponse Function(DocumentResponse) transform);
+}
+
+class _DocumentResponseCopyWithImpl<$R> extends BaseCopyWith<DocumentResponse, $R> implements DocumentResponseCopyWith<$R> {
+  _DocumentResponseCopyWithImpl(DocumentResponse value, Then<DocumentResponse, $R> then) : super(value, then);
+
+  @override HoverInfoCopyWith<$R> get info => HoverInfoCopyWith($value.info, (v) => call(info: v));
+  @override $R call({HoverInfo? info, Object? error = $none}) => $then(DocumentResponse(info ?? $value.info, or(error, $value.error)));
+}
+
+class HoverInfoMapper extends BaseMapper<HoverInfo> {
+  HoverInfoMapper._();
+
+  @override Function get decoder => decode;
+  HoverInfo decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
+  HoverInfo fromMap(Map<String, dynamic> map) => HoverInfo(description: Mapper.i.$getOpt(map, 'description'), kind: Mapper.i.$getOpt(map, 'kind'), dartdoc: Mapper.i.$getOpt(map, 'dartdoc'), enclosingClassName: Mapper.i.$getOpt(map, 'enclosingClassName'), libraryName: Mapper.i.$getOpt(map, 'libraryName'), parameter: Mapper.i.$getOpt(map, 'parameter'), deprecated: Mapper.i.$getOpt(map, 'deprecated'), staticType: Mapper.i.$getOpt(map, 'staticType'), propagatedType: Mapper.i.$getOpt(map, 'propagatedType'));
+
+  @override Function get encoder => (HoverInfo v) => encode(v);
+  dynamic encode(HoverInfo v) => toMap(v);
+  Map<String, dynamic> toMap(HoverInfo h) => {'description': Mapper.i.$enc(h.description, 'description'), 'kind': Mapper.i.$enc(h.kind, 'kind'), 'dartdoc': Mapper.i.$enc(h.dartdoc, 'dartdoc'), 'enclosingClassName': Mapper.i.$enc(h.enclosingClassName, 'enclosingClassName'), 'libraryName': Mapper.i.$enc(h.libraryName, 'libraryName'), 'parameter': Mapper.i.$enc(h.parameter, 'parameter'), 'deprecated': Mapper.i.$enc(h.deprecated, 'deprecated'), 'staticType': Mapper.i.$enc(h.staticType, 'staticType'), 'propagatedType': Mapper.i.$enc(h.propagatedType, 'propagatedType')};
+
+  @override String stringify(HoverInfo self) => 'HoverInfo(description: ${Mapper.asString(self.description)}, kind: ${Mapper.asString(self.kind)}, dartdoc: ${Mapper.asString(self.dartdoc)}, enclosingClassName: ${Mapper.asString(self.enclosingClassName)}, libraryName: ${Mapper.asString(self.libraryName)}, parameter: ${Mapper.asString(self.parameter)}, deprecated: ${Mapper.asString(self.deprecated)}, staticType: ${Mapper.asString(self.staticType)}, propagatedType: ${Mapper.asString(self.propagatedType)})';
+  @override int hash(HoverInfo self) => Mapper.hash(self.description) ^ Mapper.hash(self.kind) ^ Mapper.hash(self.dartdoc) ^ Mapper.hash(self.enclosingClassName) ^ Mapper.hash(self.libraryName) ^ Mapper.hash(self.parameter) ^ Mapper.hash(self.deprecated) ^ Mapper.hash(self.staticType) ^ Mapper.hash(self.propagatedType);
+  @override bool equals(HoverInfo self, HoverInfo other) => Mapper.isEqual(self.description, other.description) && Mapper.isEqual(self.kind, other.kind) && Mapper.isEqual(self.dartdoc, other.dartdoc) && Mapper.isEqual(self.enclosingClassName, other.enclosingClassName) && Mapper.isEqual(self.libraryName, other.libraryName) && Mapper.isEqual(self.parameter, other.parameter) && Mapper.isEqual(self.deprecated, other.deprecated) && Mapper.isEqual(self.staticType, other.staticType) && Mapper.isEqual(self.propagatedType, other.propagatedType);
+
+  @override Function get typeFactory => (f) => f<HoverInfo>();
+}
+
+extension HoverInfoMapperExtension  on HoverInfo {
+  String toJson() => Mapper.toJson(this);
+  Map<String, dynamic> toMap() => Mapper.toMap(this);
+  HoverInfoCopyWith<HoverInfo> get copyWith => HoverInfoCopyWith(this, $identity);
+}
+
+abstract class HoverInfoCopyWith<$R> {
+  factory HoverInfoCopyWith(HoverInfo value, Then<HoverInfo, $R> then) = _HoverInfoCopyWithImpl<$R>;
+  $R call({String? description, String? kind, String? dartdoc, String? enclosingClassName, String? libraryName, String? parameter, bool? deprecated, String? staticType, String? propagatedType});
+  $R apply(HoverInfo Function(HoverInfo) transform);
+}
+
+class _HoverInfoCopyWithImpl<$R> extends BaseCopyWith<HoverInfo, $R> implements HoverInfoCopyWith<$R> {
+  _HoverInfoCopyWithImpl(HoverInfo value, Then<HoverInfo, $R> then) : super(value, then);
+
+  @override $R call({Object? description = $none, Object? kind = $none, Object? dartdoc = $none, Object? enclosingClassName = $none, Object? libraryName = $none, Object? parameter = $none, Object? deprecated = $none, Object? staticType = $none, Object? propagatedType = $none}) => $then(HoverInfo(description: or(description, $value.description), kind: or(kind, $value.kind), dartdoc: or(dartdoc, $value.dartdoc), enclosingClassName: or(enclosingClassName, $value.enclosingClassName), libraryName: or(libraryName, $value.libraryName), parameter: or(parameter, $value.parameter), deprecated: or(deprecated, $value.deprecated), staticType: or(staticType, $value.staticType), propagatedType: or(propagatedType, $value.propagatedType)));
+}
+
+class DocumentRequestMapper extends BaseMapper<DocumentRequest> {
+  DocumentRequestMapper._();
+
+  @override Function get decoder => decode;
+  DocumentRequest decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
+  DocumentRequest fromMap(Map<String, dynamic> map) => DocumentRequest(Mapper.i.$get(map, 'source'), Mapper.i.$get(map, 'offset'));
+
+  @override Function get encoder => (DocumentRequest v) => encode(v);
+  dynamic encode(DocumentRequest v) => toMap(v);
+  Map<String, dynamic> toMap(DocumentRequest d) => {'source': Mapper.i.$enc(d.source, 'source'), 'offset': Mapper.i.$enc(d.offset, 'offset')};
+
+  @override String stringify(DocumentRequest self) => 'DocumentRequest(source: ${Mapper.asString(self.source)}, offset: ${Mapper.asString(self.offset)})';
+  @override int hash(DocumentRequest self) => Mapper.hash(self.source) ^ Mapper.hash(self.offset);
+  @override bool equals(DocumentRequest self, DocumentRequest other) => Mapper.isEqual(self.source, other.source) && Mapper.isEqual(self.offset, other.offset);
+
+  @override Function get typeFactory => (f) => f<DocumentRequest>();
+}
+
+extension DocumentRequestMapperExtension  on DocumentRequest {
+  String toJson() => Mapper.toJson(this);
+  Map<String, dynamic> toMap() => Mapper.toMap(this);
+  DocumentRequestCopyWith<DocumentRequest> get copyWith => DocumentRequestCopyWith(this, $identity);
+}
+
+abstract class DocumentRequestCopyWith<$R> {
+  factory DocumentRequestCopyWith(DocumentRequest value, Then<DocumentRequest, $R> then) = _DocumentRequestCopyWithImpl<$R>;
+  $R call({String? source, int? offset});
+  $R apply(DocumentRequest Function(DocumentRequest) transform);
+}
+
+class _DocumentRequestCopyWithImpl<$R> extends BaseCopyWith<DocumentRequest, $R> implements DocumentRequestCopyWith<$R> {
+  _DocumentRequestCopyWithImpl(DocumentRequest value, Then<DocumentRequest, $R> then) : super(value, then);
+
+  @override $R call({String? source, int? offset}) => $then(DocumentRequest(source ?? $value.source, offset ?? $value.offset));
 }
 
 class GistDataMapper extends BaseMapper<GistData> {

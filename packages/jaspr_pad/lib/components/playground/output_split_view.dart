@@ -3,10 +3,11 @@ import 'package:jaspr_pad/providers/docs_provider.dart';
 import 'package:jaspr_pad/providers/issues_provider.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
-import '../../adapters/codemirror.dart';
 import '../../models/api_models.dart';
+import '../../providers/edit_provider.dart';
 import '../elements/splitter.dart';
 import 'output/execution_service.dart';
+import 'panels/document_panel.dart';
 
 enum OutputTabsState { closed, issues, docs, console }
 
@@ -170,15 +171,17 @@ class EditorTabWindow extends StatelessComponent {
       yield DomComponent(
         tag: 'div',
         styles: {'display': 'flex', 'flex-direction': 'column'},
+        classes: ['console', 'custom-scrollbar'],
         children: [
           for (var msg in messages)
             DomComponent(
               tag: 'span',
-              styles: {'white-space': 'pre-wrap'},
               child: Text(msg, rawHtml: true),
             ),
         ],
       );
+    } else if (state == OutputTabsState.docs) {
+      yield DocumentPanel();
     }
   }
 }
@@ -195,11 +198,8 @@ class IssueItem extends StatelessComponent {
       classes: ['issue-item', issue.kind.name],
       events: {
         'click': () {
-          context.read(docProvider(issue.sourceName)).setSelection(
-                Position(issue.location.startLine, issue.location.startColumn),
-                head: Position(issue.location.endLine, issue.location.endColumn),
-              );
-          context.read(activeFileIndexProvider.notifier).state =
+          context.read(fileSelectionProvider(issue.sourceName).notifier).state = issue.location;
+          context.read(activeDocIndexProvider.notifier).state =
               context.read(fileNamesProvider).indexOf(issue.sourceName);
         }
       },

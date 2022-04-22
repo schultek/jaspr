@@ -1,1 +1,1 @@
-export 'package:codemirror/codemirror.dart' show CodeMirror, Doc, Position;
+export 'package:codemirror/codemirror.dart' show CodeMirror, Doc, Position, Span;

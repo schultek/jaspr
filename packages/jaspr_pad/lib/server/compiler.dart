@@ -11,7 +11,7 @@ class Compiler {
     final temp = await Directory.systemTemp.createTemp('dartpad');
 
     try {
-      var fromPath = path.join(projectTemplatePath, 'jaspr_basic');
+      var fromPath = jasprBasicTemplatePath;
       await copyPath(fromPath, temp.path);
       await fixPathPackages(fromPath, temp.path);
 

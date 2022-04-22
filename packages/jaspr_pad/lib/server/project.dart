@@ -2,4 +2,6 @@ import 'dart:io';
 
 import 'package:path/path.dart' as path;
 
-String projectTemplatePath = path.join(Directory.current.path, 'templates');
+String templatesPath = path.join(Directory.current.path, 'templates');
+
+String jasprBasicTemplatePath = path.join(templatesPath, 'jaspr_basic');

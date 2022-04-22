@@ -2,6 +2,17 @@
 // Generated with jaspr_web_builder
 // ignore_for_file: annotate_overrides, non_constant_identifier_names, unused_element
 
+class Span extends Object {
+  dynamic toProxy() => throw UnimplementedError('toProxy');
+  bool operator ==(Object other) => throw UnimplementedError('==');
+  String toString() => throw UnimplementedError('toString');
+  Position get head => throw UnimplementedError('head');
+  Position get anchor => throw UnimplementedError('anchor');
+  int get hashCode => throw UnimplementedError('hashCode');
+  factory Span(Position head, Position anchor) => throw UnimplementedError('');
+  factory Span.fromProxy(dynamic obj) => throw UnimplementedError('fromProxy');
+}
+
 class Position extends Object implements Comparable<Position> {
   dynamic toProxy() => throw UnimplementedError('toProxy');
   bool operator ==(Object other) => throw UnimplementedError('==');
@@ -41,7 +52,7 @@ class Doc {
       throw UnimplementedError('setSelection');
   void replaceSelection(String replacement, [String? select]) => throw UnimplementedError('replaceSelection');
   Iterable<String> getSelections([String? lineSep]) => throw UnimplementedError('getSelections');
-  void setSelections(Iterable<dynamic> ranges, {int? primary, Map<dynamic, dynamic>? options}) =>
+  void setSelections(Iterable<Span> ranges, {int? primary, Map<dynamic, dynamic>? options}) =>
       throw UnimplementedError('setSelections');
   void replaceSelections(Iterable<String> replacement, {String? select}) =>
       throw UnimplementedError('replaceSelections');
@@ -50,11 +61,11 @@ class Doc {
       throw UnimplementedError('extendSelection');
   void extendSelections(List<Position> heads, [Map<dynamic, dynamic>? options]) =>
       throw UnimplementedError('extendSelections');
-  void extendSelectionsBy(Position Function(dynamic, int) f, [Map<dynamic, dynamic>? options]) =>
+  void extendSelectionsBy(Position Function(Span, int) f, [Map<dynamic, dynamic>? options]) =>
       throw UnimplementedError('extendSelectionsBy');
   void setExtending(bool value) => throw UnimplementedError('setExtending');
   bool? getExtending() => throw UnimplementedError('getExtending');
-  Iterable<dynamic>? listSelections() => throw UnimplementedError('listSelections');
+  Iterable<Span>? listSelections() => throw UnimplementedError('listSelections');
   void replaceRange(String replacement, Position from, [Position? to, String? origin]) =>
       throw UnimplementedError('replaceRange');
   void markClean() => throw UnimplementedError('markClean');

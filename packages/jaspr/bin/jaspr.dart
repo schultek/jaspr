@@ -160,6 +160,8 @@ class ServeCommand extends Command<int> {
 
     args.add(entryPoint);
 
+    args.addAll(argResults!.rest);
+
     var process = await Process.start('dart', args, environment: {'JASPR_PROXY_PORT': '5467'});
 
     _pipeProcess(process);

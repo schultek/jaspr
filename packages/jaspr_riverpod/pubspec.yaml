@@ -13,3 +13,7 @@ dev_dependencies:
   lints: ^1.0.0
   test: ^1.16.0
   jaspr_test: ^0.1.0
+
+dependency_overrides:
+  jaspr:
+    path: ../jaspr
