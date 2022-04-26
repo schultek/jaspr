@@ -6,16 +6,20 @@ import 'package:shelf_router/shelf_router.dart';
 import '../main.mapper.g.dart';
 import 'analyzer.dart';
 import 'compiler.dart';
+import 'download.dart';
+import 'samples.dart';
 
-Handler apiRouter(String sdkPath) {
+Handler get apiRouter {
   var router = Router();
 
-  var analyzer = Analyzer(sdkPath);
+  var analyzer = Analyzer();
 
   router.post('/compile', mappedHandler(Compiler().compile));
   router.post('/analyze', mappedHandler(analyzer.analyze));
   router.post('/format', mappedHandler(analyzer.format));
   router.post('/document', mappedHandler(analyzer.document));
+  router.get('/sample/<id>', getSample);
+  router.get('/download', downloadProject);
 
   return router;
 }

@@ -47,7 +47,7 @@ class EditorElement extends StatelessElement {
   CodeMirror? _editor;
   String? _activeDoc;
   Map<String, Doc> docs = {};
-  bool _lockSelection = false;
+  bool _lockIsUpdating = false;
 
   @override
   void mount(Element? parent) {
@@ -61,56 +61,59 @@ class EditorElement extends StatelessElement {
   @override
   void update(covariant Editor newComponent) {
     if (kIsWeb && _editor != null) {
-      var oldDocs = {...docs};
-      docs = {};
+      _lockIsUpdating = true;
+      try {
+        var oldDocs = {...docs};
+        docs = {};
 
-      for (var document in newComponent.documents) {
-        if (oldDocs.containsKey(document.key)) {
-          var doc = oldDocs.remove(document.key)!;
-          if (doc.getValue() != document.source) {
-            doc.setValue(document.source);
+        for (var document in newComponent.documents) {
+          if (oldDocs.containsKey(document.key)) {
+            var doc = oldDocs.remove(document.key)!;
+            if (doc.getValue() != document.source) {
+              doc.setValue(document.source);
+            }
+            docs[document.key] = doc;
+          } else {
+            docs[document.key] = createDoc(document.key, document.source, document.mode);
           }
-          docs[document.key] = doc;
-        } else {
-          docs[document.key] = createDoc(document.key, document.source, document.mode);
-        }
-        var doc = docs[document.key]!;
+          var doc = docs[document.key]!;
 
-        // TODO check diff
-        for (final marker in doc.getAllMarks()) {
-          marker.clear();
-        }
-        for (final issue in document.issues) {
-          // Create in-line squiggles.
-          doc.markText(Position(issue.location.startLine, issue.location.startColumn),
-              Position(issue.location.endLine, issue.location.endColumn),
-              className: 'squiggle-${issue.kind.name}', title: issue.message);
+          // TODO check diff
+          for (final marker in doc.getAllMarks()) {
+            marker.clear();
+          }
+          for (final issue in document.issues) {
+            // Create in-line squiggles.
+            doc.markText(Position(issue.location.startLine, issue.location.startColumn),
+                Position(issue.location.endLine, issue.location.endColumn),
+                className: 'squiggle-${issue.kind.name}', title: issue.message);
+          }
+
+          if (document.selection != null) {
+            var sel = document.selection!;
+            doc.setSelection(
+              Position(sel.startLine, sel.startColumn),
+              head: Position(sel.endLine, sel.endColumn),
+            );
+            _editor!.focus();
+          }
         }
 
-        if (document.selection != null) {
-          var sel = document.selection!;
-          _lockSelection = true;
-          doc.setSelection(
-            Position(sel.startLine, sel.startColumn),
-            head: Position(sel.endLine, sel.endColumn),
-          );
-          _editor!.focus();
-          _lockSelection = false;
+        for (var doc in oldDocs.values) {
+          if (_editor!.doc == doc) {
+            _editor!.swapDoc(docs.values.firstOrNull ?? Doc(''));
+            _activeDoc = docs.keys.firstOrNull;
+          }
+          doc.dispose();
         }
-      }
 
-      for (var doc in oldDocs.values) {
-        if (_editor!.doc == doc) {
-          _editor!.swapDoc(docs.values.firstOrNull ?? Doc(''));
-          _activeDoc = docs.keys.firstOrNull;
+        if (newComponent.activeDoc != null && newComponent.activeDoc != _activeDoc) {
+          assert(docs.containsKey(newComponent.activeDoc));
+          _editor!.swapDoc(docs[newComponent.activeDoc!]!);
+          _activeDoc = newComponent.activeDoc!;
         }
-        doc.dispose();
-      }
-
-      if (newComponent.activeDoc != null && newComponent.activeDoc != _activeDoc) {
-        assert(docs.containsKey(newComponent.activeDoc));
-        _editor!.swapDoc(docs[newComponent.activeDoc!]!);
-        _activeDoc = newComponent.activeDoc!;
+      } finally {
+        _lockIsUpdating = false;
       }
     }
     super.update(newComponent);
@@ -119,14 +122,16 @@ class EditorElement extends StatelessElement {
   Doc createDoc(String key, String source, String mode) {
     var doc = Doc(source, mode);
     doc.onChange.listen((event) {
-      component.onDocumentChanged?.call(key, doc.getValue() ?? '');
+      if (!_lockIsUpdating) {
+        component.onDocumentChanged?.call(key, doc.getValue() ?? '');
+      }
     });
     doc.onEvent('cursorActivity').listen((event) {
       var index = doc.indexFromPos(doc.getCursor()) ?? 0;
       final str = doc.getValue() ?? '';
       var char = index < 0 || index >= str.length ? '' : str[index];
       var isWhitespace = char != char.trim();
-      component.onSelectionChanged?.call(key, index, isWhitespace, !_lockSelection);
+      component.onSelectionChanged?.call(key, index, isWhitespace, !_lockIsUpdating);
     });
     return doc;
   }

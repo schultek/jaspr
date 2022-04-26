@@ -3,10 +3,12 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../../../adapters/html.dart';
+import '../panels/output_split_view.dart';
 
 final iframeProvider = StateProvider<IFrameElement?>((ref) => null);
 final executionProvider = Provider<ExecutionService?>((ref) {
@@ -230,12 +232,19 @@ require(["dartpad_main", "dart_sdk"], function(dartpad_main, dart_sdk) {
           // Ignore any exceptions before the iframe has completed initialization.
           if (_readyCompleter.isCompleted) {
             // TODO error
-            ref.read(consoleMessagesProvider.notifier).update((l) => [...l, data['message'] as String]);
+            ref
+                .read(consoleMessagesProvider.notifier)
+                .update((l) => [...l.skip(max(0, l.length - 1000)), data['message'] as String]);
           }
         } else if (type == 'ready' && !_readyCompleter.isCompleted) {
           _readyCompleter.complete();
         } else if (data['message'] != null) {
-          ref.read(consoleMessagesProvider.notifier).update((l) => [...l, data['message'] as String]);
+          ref
+              .read(consoleMessagesProvider.notifier)
+              .update((l) => [...l.skip(max(0, l.length - 1000)), data['message'] as String]);
+          if (ref.read(tabsStateProvider) == OutputTabsState.closed) {
+            ref.read(tabsStateProvider.notifier).state = OutputTabsState.console;
+          }
         }
       }
     }, false);

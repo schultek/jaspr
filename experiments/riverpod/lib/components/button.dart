@@ -10,7 +10,7 @@ class Button extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'button',
-      events: {'click': onPressed},
+      events: {'click': (e) => onPressed()},
       child: Text(label),
     );
   }

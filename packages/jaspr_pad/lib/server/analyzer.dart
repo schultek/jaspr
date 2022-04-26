@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:analysis_server_lib/analysis_server_lib.dart';
 import 'package:path/path.dart' as path;
@@ -18,17 +19,16 @@ final mainPath = path.join(jasprBasicTemplatePath, 'main.dart');
 class Analyzer {
   final TaskScheduler serverScheduler = TaskScheduler();
 
-  final String sdkPath;
-
   /// Instance to handle communication with the server.
   late AnalysisServer analysisServer;
 
-  Analyzer(this.sdkPath) {
+  Analyzer() {
     init();
   }
 
   Future<void> init() async {
     serverScheduler.schedule(ClosureTask(() async {
+      var sdkPath = Platform.environment['DART_SDK_PATH'];
       analysisServer = await AnalysisServer.create(sdkPath: sdkPath, clientId: 'JasprPad');
 
       analysisServer.server.onError.listen((ServerError error) {
@@ -105,9 +105,11 @@ class Analyzer {
 
   Future<DocumentResponse> document(DocumentRequest request) async {
     return serverScheduler.schedule(ClosureTask<DocumentResponse>(() async {
-      await _loadSources({mainPath: request.source});
+      var sources = request.sources.map((k, v) => MapEntry(path.join(jasprBasicTemplatePath, k), v));
+      await _loadSources(sources);
 
-      final result = await analysisServer.analysis.getHover(mainPath, request.offset);
+      final result =
+          await analysisServer.analysis.getHover(path.join(jasprBasicTemplatePath, request.name), request.offset);
       await _unloadSources();
 
       if (result.hovers.isEmpty) {

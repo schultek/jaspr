@@ -48,7 +48,7 @@ class PreloadImagesState extends State<PreloadImages> with SyncStateMixin<Preloa
           tag: 'link',
           attributes: {'rel': 'preload', 'as': 'image', 'href': image},
           events: {
-            'onload': () {
+            'onload': (e) {
               preloadImages.remove(image);
               setState(() {});
             }

@@ -119,11 +119,12 @@ class ServeCommand extends Command<int> {
 
     print("Starting jaspr development server...");
 
-    var startupCompleter = Completer();
+    var buildCompleted = StreamController<int>.broadcast();
+    var build = 0;
 
     checkWebdevStarted(String str) {
-      if (str.contains('Running build completed') && !startupCompleter.isCompleted) {
-        startupCompleter.complete();
+      if (str.contains('Running build completed')) {
+        buildCompleted.add(build++);
       }
     }
 
@@ -143,7 +144,7 @@ class ServeCommand extends Command<int> {
           : null,
     );
 
-    await startupCompleter.future;
+    await buildCompleted.stream.first;
 
     var args = ['run', '--enable-vm-service', '--enable-asserts', '-Djaspr.debug=true'];
 
@@ -163,6 +164,10 @@ class ServeCommand extends Command<int> {
     args.addAll(argResults!.rest);
 
     var process = await Process.start('dart', args, environment: {'JASPR_PROXY_PORT': '5467'});
+
+    buildCompleted.stream.listen((_) {
+      process.stdin.write('r');
+    });
 
     _pipeProcess(process);
     return process.exitCode;

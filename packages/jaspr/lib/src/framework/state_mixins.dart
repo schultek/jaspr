@@ -127,7 +127,7 @@ class StateEncoder extends Converter<dynamic, String> {
   @override
   String convert(dynamic input) {
     var binary = binaryCodec.encode(input);
-    return base64Encode(binary);
+    return base64UrlEncode(binary);
   }
 }
 

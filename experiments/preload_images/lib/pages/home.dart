@@ -42,8 +42,8 @@ class HomeState extends State<Home> with PreloadStateMixin<Home>, SyncStateMixin
           DomComponent(
             tag: 'div',
             events: {
-              'click': () => Router.of(context).push('/image/${image['id']}'),
-              'mouseenter': () => Router.of(context).preload('/image/${image['id']}'),
+              'click': (e) => Router.of(context).push('/image/${image['id']}'),
+              'mouseenter': (e) => Router.of(context).preload('/image/${image['id']}'),
             },
             child: Text('Image: ${image['id']} by ${image['author']}'),
           ),

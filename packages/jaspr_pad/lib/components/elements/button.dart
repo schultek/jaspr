@@ -2,6 +2,8 @@ import 'package:jaspr/jaspr.dart';
 
 import '../../adapters/mdc.dart';
 
+enum IconAffinity { left, right }
+
 class Button extends StatelessComponent {
   const Button(
       {required this.id,
@@ -11,6 +13,8 @@ class Button extends StatelessComponent {
       this.raised = false,
       this.dense = false,
       this.disabled = false,
+      this.hideIcon = false,
+      this.iconAffinity = IconAffinity.left,
       Key? key})
       : super(key: key);
 
@@ -20,6 +24,8 @@ class Button extends StatelessComponent {
   final bool raised;
   final bool dense;
   final bool disabled;
+  final bool hideIcon;
+  final IconAffinity iconAffinity;
   final VoidCallback onPressed;
 
   @override
@@ -29,14 +35,21 @@ class Button extends StatelessComponent {
       classes: ['mdc-button', if (raised) 'mdc-button--raised', if (dense) 'mdc-button--dense'],
       id: id,
       attributes: {'type': 'button', if (disabled) 'disabled': ''},
-      events: {'click': onPressed},
+      events: {'click': (e) => onPressed()},
       children: [
+        if (iconAffinity == IconAffinity.right)
+          DomComponent(
+            tag: 'span',
+            classes: ['mdc-button__label'],
+            child: Text(label),
+          ),
         DomComponent(
           tag: 'i',
           classes: ['material-icons mdc-button__icon'],
+          attributes: {if (hideIcon) 'aria-hidden': 'true'},
           child: Text(icon),
         ),
-        Text(label),
+        if (iconAffinity == IconAffinity.left) Text(label),
       ],
     );
   }

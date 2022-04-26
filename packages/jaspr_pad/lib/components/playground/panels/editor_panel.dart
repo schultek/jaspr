@@ -1,18 +1,16 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_pad/main.mapper.g.dart';
-import 'package:jaspr_pad/providers/issues_provider.dart';
-import 'package:jaspr_pad/providers/logic_provider.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
-import '../../../providers/docs_provider.dart';
 import '../../../providers/edit_provider.dart';
+import '../../../providers/issues_provider.dart';
+import '../../../providers/logic_provider.dart';
 import '../../elements/button.dart';
 import '../../elements/tab_bar.dart';
 import '../editing/editor.dart';
-import '../output_split_view.dart';
+import 'output_split_view.dart';
 
 class EditorPanel extends StatefulComponent {
-  const EditorPanel({Key? key}) : super(key: key);
+  EditorPanel({Key? key}) : super(key: key ?? ValueKey('editor-panel'));
 
   @override
   State<StatefulComponent> createState() => EditorPanelState();
@@ -67,39 +65,52 @@ class EditorPanelState extends State<EditorPanel> {
     );
 
     yield OutputSplitView(
-      child: Builder.single(builder: (context) {
-        var mutableGist = context.watch(mutableGistProvider);
+      key: ValueKey('output-split'),
+      child: Builder.single(
+          key: ValueKey('output-builder'),
+          builder: (context) {
+            var proj = context.watch(editProjectProvider);
 
-        return Editor(
-          key: _editorKey,
-          activeDoc: context.watch(activeDocKeyProvider),
-          documents: [
-            for (var key in mutableGist.files.keys)
-              EditorDocument(
+            if (proj == null) {
+              return Editor(
+                key: _editorKey,
+                activeDoc: null,
+                documents: [],
+              );
+            }
+
+            EditorDocument doc(String key, String mode) {
+              return EditorDocument(
                 key: key,
-                source: mutableGist.files[key]!.content,
-                mode: toMode(mutableGist.files[key]!.type),
-                issues: toMode(mutableGist.files[key]!.type) == 'dart'
-                    ? context.watch(docIssuesProvider(key)).value ?? []
-                    : [],
+                source: proj.fileContentFor(key) ?? '',
+                mode: mode,
+                issues: mode == 'dart' ? context.watch(docIssuesProvider(key)) : [],
                 selection: context.watch(fileSelectionProvider(key)),
-              ),
-          ],
-          onDocumentChanged: (String key, String content) {
-            context
-                .read(mutableGistProvider.notifier)
-                .update((state) => state.copyWith.files.get(key)!.call(content: content));
-          },
-          onSelectionChanged: (key, index, isWhitespace, shouldNotify) {
-            if (shouldNotify) {
-              context.read(fileSelectionProvider(key).notifier).state = null;
+              );
             }
-            if (!isWhitespace) {
-              context.read(logicProvider).document(context.read(fileContentProvider(key)).value ?? '', index);
-            }
-          },
-        );
-      }),
+
+            return Editor(
+              key: _editorKey,
+              activeDoc: context.watch(activeDocKeyProvider),
+              documents: [
+                doc('main.dart', 'dart'),
+                for (var key in proj.dartFiles.keys) doc(key, 'dart'),
+                doc('index.html', 'text/html'),
+                doc('styles.css', 'css'),
+              ],
+              onDocumentChanged: (String key, String content) {
+                context.read(editProjectProvider.notifier).update((state) => state?.updateContent(key, content));
+              },
+              onSelectionChanged: (key, index, isWhitespace, shouldNotify) {
+                if (shouldNotify) {
+                  context.read(fileSelectionProvider(key).notifier).state = null;
+                }
+                if (!isWhitespace && proj.isDart(key)) {
+                  context.read(logicProvider).document(key, index);
+                }
+              },
+            );
+          }),
     );
   }
 }

@@ -116,7 +116,7 @@ class JasprWebBuilder implements Builder {
     }
 
     return DartFormatter(pageWidth: 120).format('$generationHeader'
-        '// ignore_for_file: annotate_overrides, non_constant_identifier_names, unused_element\n\n'
+        '// ignore_for_file: annotate_overrides, non_constant_identifier_names, unused_element, avoid_renaming_method_parameters\n\n'
         '${imports.map((i) => "import '$i';").join('\n')}'
         '$output');
   }

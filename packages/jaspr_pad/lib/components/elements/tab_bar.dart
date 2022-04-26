@@ -37,10 +37,13 @@ class TabBar extends StatelessComponent {
             classes: ['mdc-tab-scroller__scroll-content'],
             children: [
               for (var i = 0; i < tabs.length; i++)
-                ProviderScope(overrides: [
-                  tabSelectedProvider.overrideWithValue(i == selected),
-                  tabCallbackProvider.overrideWithValue(() => _select(i)),
-                ], child: tabs[i]),
+                ProviderScope(
+                    key: ValueKey('tab-provider'),
+                    overrides: [
+                      tabSelectedProvider.overrideWithValue(i == selected),
+                      tabCallbackProvider.overrideWithValue(() => _select(i)),
+                    ],
+                    child: tabs[i]),
             ],
           ),
         ),
@@ -73,7 +76,7 @@ class TabBarElement extends StatelessElement {
 }
 
 class Tab extends StatelessComponent {
-  const Tab({required this.label, Key? key}) : super(key: key);
+  Tab({required this.label, Key? key}) : super(key: key ?? ValueKey('tab-$label'));
 
   final String label;
 
@@ -85,7 +88,7 @@ class Tab extends StatelessComponent {
     yield DomComponent(
       tag: 'button',
       classes: ['mdc-tab', if (selected) 'mdc-tab--active'],
-      events: {'click': onSelect},
+      events: {'click': (e) => onSelect()},
       attributes: {
         'role': 'tab',
         'tabindex': '0',

@@ -1,61 +1,53 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_pad/main.mapper.g.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../main.mapper.g.dart';
 import '../models/api_models.dart';
-import 'gist_provider.dart';
+import '../models/project.dart';
+import 'project_provider.dart';
+import 'utils.dart';
 
-final mutableGistProvider = StateProvider((ref) {
-  var asyncGist = ref.watch(gistProvider);
+final editProjectProvider = StateProvider((ref) {
+  var loadedProject = ref.watch(loadedProjectProvider).value;
 
   if (kIsWeb) {
-    var debouncedStore = debounce((GistData gist) {
-      ref.read(storageProvider)['gist'] = gist.toJson();
-    }, Duration(seconds: 1));
-    ref.listenSelf((_, next) => debouncedStore(next.state));
+    ref.listenSelf((_, controller) {
+      controller.addListener(debounce((ProjectData? project) {
+        if (project != null) {
+          ref.read(storageProvider)['project'] = project.toJson();
+        }
+      }, Duration(seconds: 1)));
+    });
   }
 
-  return asyncGist.value?.copyWith.files.putAll({}) ?? GistData('', '', {});
-});
+  return loadedProject;
+}, name: 'editProject');
 
 final fileSelectionProvider = StateProvider.family<IssueLocation?, String>((ref, String key) => null);
 
-void Function(T) debounce<T>(void Function(T) fn, Duration duration) {
-  Timer? timer;
-  return (v) {
-    timer?.cancel();
-    timer = Timer(duration, () {
-      fn(v);
-    });
-  };
-}
+final activeDocIndexProvider = StateProvider((ref) => 0, name: 'activeDocIndex');
 
-extension DebounceStream<T> on Stream<T> {
-  Stream<T> debounce(Duration duration) {
-    Timer? timer;
-    return transform(StreamTransformer.fromHandlers(handleData: (data, sink) {
-      timer?.cancel();
-      timer = Timer(duration, () {
-        sink.add(data);
-      });
-    }));
-  }
-}
+final activeDocKeyProvider = Provider((ref) {
+  var index = ref.watch(activeDocIndexProvider);
+  return ref.watch(fileNamesProvider).skip(index).firstOrNull;
+}, name: 'activeDocKey');
 
-String toMode(String type) {
-  switch (type) {
-    case 'text/html':
-      return 'text/html';
-    case 'application/vnd.dart':
-      return 'dart';
-    case 'text/css':
-      return 'css';
-    default:
-      return 'text';
-  }
-}
+final fileNamesProvider = Provider((ref) {
+  if (!kIsWeb) return <String>[];
+  return ref.watch(editProjectProvider)?.fileNames ?? [];
+}, name: 'fileNames');
 
-final activeDocumentationProvider = StateProvider<HoverInfo?>((ref) => null);
+final fileContentProvider = StreamProvider.family((ref, String key) {
+  var c = StreamController<String>();
+  var sub = ref.listen<String>(editProjectProvider.select((proj) => proj?.fileContentFor(key) ?? ''), (_, next) {
+    c.add(next);
+  }, fireImmediately: true);
+  ref.onDispose(() {
+    sub.close();
+    c.close();
+  });
+  return c.stream;
+}, name: 'fileContent');

@@ -1,31 +1,27 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_pad/providers/docs_provider.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../models/api_models.dart';
+import '../models/project.dart';
 import 'dart_service_provider.dart';
 import 'edit_provider.dart';
+import 'utils.dart';
 
-final docIssuesProvider = StreamProvider.family((ref, String key) {
-  return ref.watch(fileContentProvider(key).stream).debounce(Duration(milliseconds: 500)).asyncMap((source) async {
-    var result = await ref.read(dartServiceProvider).analyze(source);
-    return result.issues..sort();
-  });
-});
-
-final issuesProvider = Provider((ref) {
+final issuesProvider = Provider<List<Issue>>((ref) {
   if (!kIsWeb) return [];
 
-  var gist = ref.watch(mutableGistProvider);
+  var fetchIssues = debounce((ProjectData proj) async {
+    var response = await ref.read(dartServiceProvider).analyze(proj.allDartFiles);
+    ref.state = response.issues;
+  }, Duration(milliseconds: 500));
 
-  var issues = <Issue>[];
+  ref.listen<ProjectData?>(editProjectProvider, (_, proj) {
+    if (proj != null) fetchIssues(proj);
+  }, fireImmediately: true);
 
-  for (var key in gist.files.keys) {
-    if (gist.files[key]!.type == 'application/vnd.dart') {
-      var docIssues = ref.watch(docIssuesProvider(key));
-      issues.addAll(docIssues.value ?? []);
-    }
-  }
+  return [];
+}, name: 'issues');
 
-  return issues;
+final docIssuesProvider = Provider.family((ref, String key) {
+  return ref.watch(issuesProvider.select((issues) => issues.where((i) => i.sourceName == key).toList()));
 });

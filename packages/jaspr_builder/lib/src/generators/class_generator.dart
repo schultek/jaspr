@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:jaspr_builder/src/generators/function_generator.dart';
 
 import 'element_generator.dart';
+import 'function_generator.dart';
 
 class ClassGenerator extends ElementGenerator<ClassElement> {
   ClassGenerator(ClassElement element, ResolverFn canResolve) : super(element, canResolve);

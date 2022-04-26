@@ -5,7 +5,8 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:markdown/markdown.dart' as markdown;
 
 import '../../../models/api_models.dart';
-import '../../../providers/edit_provider.dart';
+import '../../../providers/docu_provider.dart';
+import '../../elements/markdown.dart';
 
 class DocumentPanel extends StatelessComponent {
   const DocumentPanel({Key? key}) : super(key: key);
@@ -30,18 +31,18 @@ class _DocumentHintMarkdown extends StatefulComponent {
 }
 
 class __DocumentHintMarkdownState extends State<_DocumentHintMarkdown> {
-  late _DocResult result;
+  late String markdown;
 
   @override
   void initState() {
     super.initState();
-    result = _getHtmlTextFor(component.info);
+    markdown = _getMarkdownFor(component.info);
   }
 
   @override
   void didUpdateComponent(covariant _DocumentHintMarkdown oldComponent) {
     super.didUpdateComponent(oldComponent);
-    result = _getHtmlTextFor(component.info);
+    markdown = _getMarkdownFor(component.info);
   }
 
   @override
@@ -49,13 +50,13 @@ class __DocumentHintMarkdownState extends State<_DocumentHintMarkdown> {
     yield DomComponent(
       tag: 'p',
       classes: ['documentation', 'custom-scrollbar'],
-      child: Text(result.html, rawHtml: true),
+      child: Markdown(markdown: markdown, inlineSyntaxes: [InlineBracketsColon(), InlineBrackets()]),
     );
   }
 
-  _DocResult _getHtmlTextFor(HoverInfo info) {
+  String _getMarkdownFor(HoverInfo info) {
     if (info.description == null && info.dartdoc == null) {
-      return _DocResult('');
+      return '';
     }
 
     final libraryName = info.libraryName;
@@ -72,12 +73,10 @@ ${isVariable ? "$kind\n\n" : ''}
 ${(isVariable && propagatedType != null) ? "**Propagated type:** $propagatedType\n\n" : ''}
 $apiLink\n\n''';
 
-    var _htmlDocs = markdown.markdownToHtml(_mdDocs, inlineSyntaxes: [InlineBracketsColon(), InlineBrackets()]);
-
     // Append a 'launch' icon to the 'Open library docs' link.
-    _htmlDocs = _htmlDocs.replaceAll('library docs</a>', "library docs <span class='launch-icon'></span></a>");
+    //_htmlDocs = _htmlDocs.replaceAll('library docs</a>', "library docs <span class='launch-icon'></span></a>");
 
-    return _DocResult(_htmlDocs, kind.replaceAll(' ', '_'));
+    return _mdDocs;
   }
 
   String _dartApiLink(String? libraryName) {
@@ -100,13 +99,6 @@ $apiLink\n\n''';
 
     return libraryName;
   }
-}
-
-class _DocResult {
-  final String html;
-  final String? entityKind;
-
-  _DocResult(this.html, [this.entityKind]);
 }
 
 class InlineBracketsColon extends markdown.InlineSyntax {

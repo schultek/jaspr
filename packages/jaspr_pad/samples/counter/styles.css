@@ -1,0 +1,23 @@
+html, body, #app {
+  height: 100%;
+  color: white;
+  font-family: sans-serif;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+button {
+  margin: 10px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+}
+
+button:active {
+  background: #ddd;
+}

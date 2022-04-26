@@ -1,0 +1,11 @@
+html, body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+div {
+  color: white;
+  font-family: sans-serif;
+}

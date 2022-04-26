@@ -1,5 +1,0 @@
-include: package:lints/recommended.yaml
-
-linter:
-  rules:
-    body_might_complete_normally_nullable: false

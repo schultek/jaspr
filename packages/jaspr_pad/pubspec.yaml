@@ -3,10 +3,11 @@ description: Dartpad inspired online-editor for jaspr built with jaspr
 version: 0.1.0
 
 environment:
-  sdk: '>=2.15.0 <3.0.0'
+  sdk: '>=2.16.0 <3.0.0'
 
 dependencies:
   analysis_server_lib: ^0.2.2
+  archive: ^3.3.0
   codemirror: ^0.7.3+5.65.2
   dart_mappable: ^1.1.0
   jaspr: ^0.1.0

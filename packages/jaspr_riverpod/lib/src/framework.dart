@@ -310,6 +310,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
   _UncontrolledProviderScopeElement(UncontrolledProviderScope component) : super(component);
 
   void Function()? _task;
+  // ignore: unused_field
   bool _mounted = true;
 
   @override
@@ -393,21 +394,17 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     assert(_task == null, 'Only one task can be scheduled at a time');
     _task = task;
 
-    // ignore: unnecessary_non_null_assertion, blocked by https://github.com/rrousselGit/river_pod/issues/1156
-    // if (SchedulerBinding.instance!.schedulerPhase == SchedulerPhase.transientCallbacks) {
-    // markNeedsBuild();
-    // } else {
-    //   // Using microtask as Flutter otherwise Flutter tests complains about pending timers
+    // TODO: From my testing, we don't schedule a build here as opposed to flutter_riverpod.
+    //  Find out why this was done originally and if this has any other implications.
     Future.microtask(() {
-      if (_mounted) markNeedsBuild();
+      _task?.call();
+      _task = null;
     });
-    // }
   }
 
   void _debugCanModifyProviders() {
-    if (!ComponentsBinding.instance!.isFirstBuild) {
-      markNeedsBuild();
-    }
+    // TODO: Scheduling a build here lead to some weird bugs. For now we just ignore this as
+    //  it is a debug check only anyways
   }
 
   @override

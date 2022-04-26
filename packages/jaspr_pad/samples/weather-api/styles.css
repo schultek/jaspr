@@ -1,0 +1,55 @@
+html, body, #app {
+  height: 100%;
+  color: white;
+  font-family: sans-serif;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+button {
+  margin: 10px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+}
+
+button:active {
+  background: #ddd;
+}
+
+input {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+}
+
+.weather {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.weather img {
+  width: 80px;
+}
+
+.weather .info {
+  margin: 0 10px;
+}
+
+.weather .info h1 {
+  font-size: 50px;
+  margin: 0;
+  line-height: 1;
+  font-weight: lighter;
+}
+
+.weather .info span {
+  font-size: 12px;
+  opacity: 0.6;
+}

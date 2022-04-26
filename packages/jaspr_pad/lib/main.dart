@@ -1,19 +1,21 @@
 import 'package:jaspr/server.dart' hide Router;
-import 'package:jaspr_pad/app.dart';
 import 'package:shelf_router/shelf_router.dart';
 
+import 'app.dart';
+import 'providers/samples_provider.dart';
+import 'server/samples.dart';
 import 'server/server_api.dart';
 
-void main(List<String> args) {
-  if (args.isEmpty) {
-    throw 'Missing sdk path argument.';
-  }
-
-  runApp(() => App(), id: 'playground')
+void main() {
+  runApp(() {
+    return App(providerOverrides: [
+      samplesProvider.overrideWithProvider(loadSamplesProvider),
+    ]);
+  }, id: 'playground')
     ..addMiddleware(logRequests())
     ..addMiddleware((handler) {
       var router = Router(notFoundHandler: handler);
-      router.mount('/api', apiRouter(args[0]));
+      router.mount('/api', apiRouter);
       return router;
     });
 }

@@ -10,11 +10,13 @@ import 'dart:convert';
 
 import 'package:binary_codec/binary_codec.dart';
 import 'package:domino/domino.dart';
-import 'package:jaspr/jaspr.dart';
+
+import '../../jaspr.dart';
 
 export 'package:domino/domino.dart' show DomBuilder, DomEvent, DomEventFn, DomLifecycleEvent, DomLifecycleEventFn;
 
 part 'build_context.dart';
+part 'build_owner.dart';
 part 'components_binding.dart';
 part 'dom_component.dart';
 part 'inactive_elements.dart';

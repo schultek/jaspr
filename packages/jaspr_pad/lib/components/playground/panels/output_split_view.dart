@@ -1,13 +1,13 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_pad/providers/docs_provider.dart';
-import 'package:jaspr_pad/providers/issues_provider.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
-import '../../models/api_models.dart';
-import '../../providers/edit_provider.dart';
-import '../elements/splitter.dart';
-import 'output/execution_service.dart';
-import 'panels/document_panel.dart';
+import '../../../models/api_models.dart';
+import '../../../providers/issues_provider.dart';
+import '../../elements/splitter.dart';
+import '../output/execution_service.dart';
+import 'console_panel.dart';
+import 'document_panel.dart';
+import 'issues_panel.dart';
 
 enum OutputTabsState { closed, issues, docs, console }
 
@@ -20,19 +20,26 @@ class OutputSplitView extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    context.watch(issuesProvider); // load issues
+    context.listen<List<Issue>>(issuesProvider, (_, issues) {
+      if (issues.where((i) => i.kind == IssueKind.error).isNotEmpty &&
+          context.read(tabsStateProvider) == OutputTabsState.closed) {
+        context.read(tabsStateProvider.notifier).state = OutputTabsState.issues;
+      }
+    });
+
     var isClosed = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.closed));
 
     if (isClosed) {
       yield child;
-      yield EditorTabs();
+      yield EditorTabs(key: ValueKey('editor-tabs'));
     } else {
       yield Splitter(
+        key: ValueKey('editor-splitter'),
         horizontal: false,
         initialSizes: [70, 30],
         children: [
           child,
-          EditorTabs(),
+          EditorTabs(key: ValueKey('editor-tabs')),
         ],
       );
     }
@@ -82,13 +89,18 @@ class EditorTabs extends StatelessComponent {
               children: [
                 Builder(builder: (context) sync* {
                   var isConsole = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.console));
-                  yield DomComponent(
-                    tag: 'button',
-                    id: 'left-console-clear-button',
-                    classes: ['console-clear-icon', 'mdc-icon-button'],
-                    styles: {if (!isConsole) 'visibility': 'hidden'},
-                    attributes: {'title': 'Clear console'},
-                  );
+                  yield DomComponent(tag: 'button', id: 'left-console-clear-button', classes: [
+                    'console-clear-icon',
+                    'mdc-icon-button'
+                  ], styles: {
+                    if (!isConsole) 'visibility': 'hidden'
+                  }, attributes: {
+                    'title': 'Clear console'
+                  }, events: {
+                    'click': (e) {
+                      context.read(consoleMessagesProvider.notifier).state = [];
+                    }
+                  });
                 }),
                 DomComponent(
                   tag: 'button',
@@ -96,7 +108,7 @@ class EditorTabs extends StatelessComponent {
                   classes: ["mdc-icon-button", "material-icons"],
                   attributes: {if (isClosed) 'hidden': ''},
                   events: {
-                    'click': () {
+                    'click': (e) {
                       context.read(tabsStateProvider.notifier).state = OutputTabsState.closed;
                     }
                   },
@@ -134,7 +146,7 @@ class EditorTab extends StatelessComponent {
       id: id,
       classes: ['editor-tab', 'mdc-button', if (selected) 'active'],
       events: {
-        'click': () {
+        'click': (e) {
           var notifier = context.read(tabsStateProvider.notifier);
           if (selected) {
             notifier.state = OutputTabsState.closed;
@@ -156,61 +168,11 @@ class EditorTabWindow extends StatelessComponent {
     var state = context.watch(tabsStateProvider);
 
     if (state == OutputTabsState.issues) {
-      var issues = context.watch(issuesProvider);
-
-      yield DomComponent(
-        tag: 'div',
-        styles: {'display': 'flex', 'flex-direction': 'column'},
-        children: [
-          for (var issue in issues) IssueItem(issue),
-        ],
-      );
+      yield IssuesPanel();
     } else if (state == OutputTabsState.console) {
-      var messages = context.watch(consoleMessagesProvider);
-
-      yield DomComponent(
-        tag: 'div',
-        styles: {'display': 'flex', 'flex-direction': 'column'},
-        classes: ['console', 'custom-scrollbar'],
-        children: [
-          for (var msg in messages)
-            DomComponent(
-              tag: 'span',
-              child: Text(msg, rawHtml: true),
-            ),
-        ],
-      );
+      yield ConsolePanel();
     } else if (state == OutputTabsState.docs) {
       yield DocumentPanel();
     }
-  }
-}
-
-class IssueItem extends StatelessComponent {
-  const IssueItem(this.issue, {Key? key}) : super(key: key);
-
-  final Issue issue;
-
-  @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'span',
-      classes: ['issue-item', issue.kind.name],
-      events: {
-        'click': () {
-          context.read(fileSelectionProvider(issue.sourceName).notifier).state = issue.location;
-          context.read(activeDocIndexProvider.notifier).state =
-              context.read(fileNamesProvider).indexOf(issue.sourceName);
-        }
-      },
-      children: [
-        DomComponent(
-          tag: 'i',
-          classes: ['material-icons'],
-          child: Text(issue.kind.name),
-        ),
-        Text(issue.message),
-      ],
-    );
   }
 }

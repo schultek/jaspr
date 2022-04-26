@@ -55,7 +55,7 @@ class Button extends StatelessComponent {
     yield DomComponent(
       tag: 'button',
       child: Text(label),
-      events: {'click': onPressed},
+      events: {'click': (e) => onPressed()},
     );
   }
 }

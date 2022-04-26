@@ -116,8 +116,9 @@ class HoverInfo {
 
 @MappableClass()
 class DocumentRequest {
-  final String source;
+  final Map<String, String> sources;
+  final String name;
   final int offset;
 
-  DocumentRequest(this.source, this.offset);
+  DocumentRequest(this.sources, this.name, this.offset);
 }

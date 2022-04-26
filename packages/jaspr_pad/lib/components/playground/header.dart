@@ -1,10 +1,13 @@
+import 'dart:async';
+
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_pad/providers/logic_provider.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
-import '../../providers/gist_provider.dart';
-import '../../utils/utils.dart';
+import '../../providers/logic_provider.dart';
+import '../../providers/project_provider.dart';
+import '../../providers/samples_provider.dart';
 import '../elements/button.dart';
+import '../elements/menu.dart';
 
 class PlaygroundHeader extends StatelessComponent {
   const PlaygroundHeader({Key? key}) : super(key: key);
@@ -66,21 +69,67 @@ class PlaygroundHeader extends StatelessComponent {
           },
         ),
         Button(
-          id: 'jinstall-button',
-          label: 'Install SDK',
+          id: 'download-button',
+          label: 'Download Project',
           icon: 'get_app',
           onPressed: () {
-            open('https://dart.dev/get-dart');
+            context.read(logicProvider).downloadProject();
           },
         ),
       ],
     );
 
     yield Builder(builder: (context) sync* {
-      var name = context.watch(gistNameProvider);
-      if (name != null) {
-        yield DomComponent(tag: 'div', classes: ['header-gist-name'], child: Text(name));
-      }
+      var name = context.watch(projectNameProvider);
+      yield DomComponent(tag: 'div', classes: ['header-gist-name'], child: Text(name ?? ''));
     });
+
+    yield SamplesMenuButton();
+
+    yield DomComponent(
+      tag: 'div',
+      styles: {
+        'display': 'flex',
+        'justify-content': 'center',
+        'align-items': 'center',
+        'padding': '0 10px',
+      },
+      children: [
+        DomComponent(
+          tag: 'a',
+          attributes: {'href': 'https://github.com/schultek/jaspr', 'target': '_blank'},
+          children: [
+            DomComponent(
+              tag: 'img',
+              styles: {'width': '40px', '-webkit-backface-visibility': 'hidden'},
+              attributes: {'src': 'https://findicons.com/files/icons/2779/simple_icons/128/github.png'},
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class SamplesMenuButton extends StatelessComponent with OnFirstBuild {
+  const SamplesMenuButton({Key? key}) : super(key: key);
+
+  @override
+  FutureOr<void> onFirstBuild(BuildContext context) {
+    return context.preload(samplesProvider);
+  }
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    var samples = context.watch(samplesProvider);
+
+    yield Menu(
+      items: [
+        for (var sample in samples) MenuItem(label: sample.description),
+      ],
+      onItemSelected: (index) {
+        context.read(logicProvider).selectSample(samples[index]);
+      },
+    );
   }
 }

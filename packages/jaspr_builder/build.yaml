@@ -5,6 +5,8 @@ builders:
     build_extensions: { ".web.dart": [ ".stub.dart", ".dart" ] }
     auto_apply: dependents
     build_to: source
+    runs_before:
+      - build_web_compilers
 targets:
   $default:
     builders:

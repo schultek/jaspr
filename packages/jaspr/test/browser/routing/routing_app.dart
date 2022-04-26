@@ -28,7 +28,7 @@ class About extends StatelessComponent {
       tag: 'button',
       child: Text('Contact'),
       events: {
-        'click': () => Router.of(context).replace('/contact', eager: false),
+        'click': (e) => Router.of(context).replace('/contact', eager: false),
       },
     );
   }

@@ -1,8 +1,8 @@
 import 'package:jaspr/jaspr.dart';
 
-import 'components/playground/footer.dart';
-import 'components/playground/header.dart';
-import 'components/playground/main.dart';
+import 'footer.dart';
+import 'header.dart';
+import 'main.dart';
 
 class Playground extends StatelessComponent {
   const Playground({Key? key}) : super(key: key);

@@ -36,7 +36,7 @@ class PlaygroundFooter extends StatelessComponent {
         DomComponent(
           tag: 'a',
           attributes: {
-            'href': 'https://github.com/dart-lang/dart-pad/issues',
+            'href': 'https://github.com/schultek/jaspr/issues',
             'target': 'repo',
           },
           child: Text('Send feedback'),

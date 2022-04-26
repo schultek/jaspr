@@ -1,12 +1,18 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_pad/playground.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
+import 'components/playground/playground.dart';
+
 class App extends StatelessComponent {
-  const App({Key? key}) : super(key: key);
+  const App({required this.providerOverrides, Key? key}) : super(key: key);
+
+  final List<Override> providerOverrides;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield ProviderScope(child: Playground());
+    yield ProviderScope(
+      overrides: providerOverrides,
+      child: Playground(),
+    );
   }
 }

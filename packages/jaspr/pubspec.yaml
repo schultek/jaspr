@@ -9,7 +9,7 @@ dependencies:
   shelf: ^1.2.0
   meta: ^1.7.0
   shelf_proxy: ^1.0.1
-  hotreloader: ^3.0.2
+  hotreloader: ^3.0.4
   shelf_static: ^1.1.0
   args: ^2.3.0
   html: ^0.15.0
@@ -22,3 +22,7 @@ dev_dependencies:
   lints: ^1.0.1
   webdev: ^2.7.7
   jaspr_test: ^0.1.0
+
+dependency_overrides:
+  jaspr_test:
+    path: ../jaspr_test

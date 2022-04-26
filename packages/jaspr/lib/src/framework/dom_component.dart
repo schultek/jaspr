@@ -1,6 +1,6 @@
 part of framework;
 
-typedef EventCallback = void Function();
+typedef EventCallback = void Function(dynamic event);
 
 /// Represents a html element in the DOM
 ///
@@ -65,7 +65,7 @@ class DomElement extends MultiChildElement with BuildScheduler {
       classes: component.classes,
       styles: component.styles,
       attributes: component.attributes,
-      events: component.events?.map((k, v) => MapEntry(k, (e) => v())),
+      events: component.events?.map((k, v) => MapEntry(k, (e) => v(e.event))),
       onCreate: (event) {
         view = event.view;
         _source = event.source;

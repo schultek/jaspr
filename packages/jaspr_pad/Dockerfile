@@ -13,6 +13,7 @@ FROM dart:stable
 COPY --from=build /runtime/ /
 COPY --from=build /app/packages/jaspr_pad/build/ /app/packages/jaspr_pad/
 COPY --from=build /app/packages/jaspr_pad/templates /app/packages/jaspr_pad/templates
+COPY --from=build /app/packages/jaspr_pad/samples /app/packages/jaspr_pad/samples
 COPY --from=build /app/packages/jaspr /app/packages/jaspr
 COPY --from=build /app/packages/jaspr_riverpod /app/packages/jaspr_riverpod
 
@@ -24,4 +25,6 @@ WORKDIR /app/packages/jaspr_pad
 # Start server.
 EXPOSE 8080
 
-CMD ["./app", "/usr/lib/dart"]
+ENV DART_SDK_PATH=/usr/lib/dart
+
+CMD ["./app"]

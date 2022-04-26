@@ -1,11 +1,14 @@
-import 'package:jaspr_pad/adapters/html.dart';
-import 'package:jaspr_pad/components/playground/output/execution_service.dart';
-import 'package:jaspr_pad/main.mapper.g.dart';
-import 'package:jaspr_pad/providers/dart_service_provider.dart';
-import 'package:jaspr_pad/providers/edit_provider.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
-import 'gist_provider.dart';
+import '../adapters/html.dart';
+import '../components/playground/output/execution_service.dart';
+import '../main.mapper.g.dart';
+import '../models/sample.dart';
+import 'dart_service_provider.dart';
+import 'docu_provider.dart';
+import 'edit_provider.dart';
+import 'project_provider.dart';
 
 final isCompilingProvider = StateProvider((ref) => false);
 
@@ -16,48 +19,50 @@ class Logic {
   final Ref ref;
 
   void newPad() async {
-    ref.read(storageProvider).remove('gist');
+    ref.read(storageProvider).remove('project');
     window.history.pushState(null, 'JasprPad', window.location.origin);
-    ref.refresh(gistProvider);
+    ref.refresh(loadedProjectProvider);
   }
 
   void refresh() {
-    ref.read(storageProvider).remove('gist');
-    ref.refresh(gistProvider);
+    ref.read(storageProvider).remove('project');
+    ref.refresh(loadedProjectProvider);
+  }
+
+  void selectSample(Sample data) async {
+    ref.read(storageProvider).remove('project');
+    window.history.pushState(null, 'JasprPad', window.location.origin + '?sample=${data.id}');
+    ref.refresh(loadedProjectProvider);
   }
 
   Future<void> formatDartFiles() async {
-    var gist = ref.read(mutableGistProvider);
+    var proj = ref.read(editProjectProvider);
+
+    if (proj == null) return;
 
     await Future.wait([
-      for (var key in gist.files.keys)
-        if (gist.files[key]!.type == 'application/vnd.dart')
-          ref.read(dartServiceProvider).format(gist.files[key]!.content).then((res) => ref
-              .read(mutableGistProvider.notifier)
-              .update((state) => state.copyWith.files.get(key)!.call(content: res.newString))),
+      for (var e in proj.allDartFiles.entries)
+        ref.read(dartServiceProvider).format(e.value).then((res) =>
+            ref.read(editProjectProvider.notifier).update((state) => state?.updateContent(e.key, res.newString))),
     ]);
   }
 
   Future<void> compileFiles() async {
     ref.read(isCompilingProvider.notifier).state = true;
-    var gist = ref.read(mutableGistProvider);
+    var proj = ref.read(editProjectProvider);
+
+    if (proj == null) return;
 
     try {
-      var response = await ref.read(dartServiceProvider).compile({
-        for (var key in gist.files.keys)
-          if (gist.files[key]!.type == 'application/vnd.dart') key: gist.files[key]!.content,
-      });
+      var response = await ref.read(dartServiceProvider).compile(proj.allDartFiles);
 
       if (response.result != null) {
         var executionService = ref.read(executionProvider);
         if (executionService == null) return;
 
-        var htmlSource = gist.files['index.html']!.content;
-        var cssSource = gist.files['styles.css']!.content;
-
         await executionService.execute(
-          htmlSource,
-          cssSource,
+          proj.htmlFile,
+          proj.cssFile,
           response.result!,
           destroyFrame: false,
         );
@@ -69,8 +74,28 @@ class Logic {
     }
   }
 
-  Future<void> document(String source, int index) async {
-    var response = await ref.read(dartServiceProvider).document(source, index);
+  Future<void> document(String name, int index) async {
+    var proj = ref.read(editProjectProvider);
+    if (proj == null) return;
+    var response = await ref.read(dartServiceProvider).document(proj.allDartFiles, name, index);
     ref.read(activeDocumentationProvider.notifier).state = response.info;
+  }
+
+  void downloadProject() {
+    var currentProject = ref.read(editProjectProvider);
+    if (currentProject == null) return;
+
+    var doc = window.document as HtmlDocument;
+    var element = doc.createElement('a');
+    element.setAttribute(
+        'href', '${window.location.origin}/api/download?project=${stateCodec.encode(Mapper.toValue(currentProject))}');
+    element.setAttribute('download', 'jaspr_${currentProject.id}.zip');
+
+    element.style.display = 'none';
+    doc.body?.append(element);
+
+    element.click();
+
+    element.remove();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_demo/components/book.dart';
-import 'package:jaspr_demo/services/service.dart';
+
+import '../components/book.dart';
+import '../services/service.dart';
 
 class Home extends StatefulComponent {
   Home() : super();
@@ -42,8 +43,8 @@ class HomeState extends State<Home> with PreloadStateMixin<Home>, SyncStateMixin
         DomComponent(
           tag: 'div',
           events: {
-            'click': () => Router.of(context).push('/book/${book['id']}'),
-            'mouseenter': () => Router.of(context).preload('/book/${book['id']}'),
+            'click': (e) => Router.of(context).push('/book/${book['id']}'),
+            'mouseenter': (e) => Router.of(context).preload('/book/${book['id']}'),
           },
           child: BookInfo(book: book),
         ),

@@ -1,14 +1,24 @@
+import 'dart:core';
+
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:dart_mappable/internals.dart';
 
 import 'models/api_models.dart';
-import 'providers/gist_provider.dart';
+import 'models/gist.dart';
+import 'models/project.dart';
+import 'models/sample.dart';
 
 
 // === ALL STATICALLY REGISTERED MAPPERS ===
 
 var _mappers = <BaseMapper>{
   // class mappers
+  SampleMapper._(),
+  ComparableMapper._(),
+  SampleResponseMapper._(),
+  ProjectDataMapper._(),
+  GistDataMapper._(),
+  GistFileMapper._(),
   CompileRequestMapper._(),
   CompileResponseMapper._(),
   AnalyzeRequestMapper._(),
@@ -20,8 +30,6 @@ var _mappers = <BaseMapper>{
   DocumentResponseMapper._(),
   HoverInfoMapper._(),
   DocumentRequestMapper._(),
-  GistDataMapper._(),
-  GistFileMapper._(),
   // enum mappers
   IssueKindMapper._(),
   // custom mappers
@@ -29,6 +37,216 @@ var _mappers = <BaseMapper>{
 
 
 // === GENERATED CLASS MAPPERS AND EXTENSIONS ===
+
+class SampleMapper extends BaseMapper<Sample> {
+  SampleMapper._();
+
+  @override Function get decoder => decode;
+  Sample decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
+  Sample fromMap(Map<String, dynamic> map) => Sample(Mapper.i.$get(map, 'id'), Mapper.i.$get(map, 'description'), Mapper.i.$getOpt(map, 'index'));
+
+  @override Function get encoder => (Sample v) => encode(v);
+  dynamic encode(Sample v) => toMap(v);
+  Map<String, dynamic> toMap(Sample s) => {'id': Mapper.i.$enc(s.id, 'id'), 'description': Mapper.i.$enc(s.description, 'description'), 'index': Mapper.i.$enc(s.index, 'index')};
+
+  @override String stringify(Sample self) => 'Sample(id: ${Mapper.asString(self.id)}, description: ${Mapper.asString(self.description)}, index: ${Mapper.asString(self.index)})';
+  @override int hash(Sample self) => Mapper.hash(self.id) ^ Mapper.hash(self.description) ^ Mapper.hash(self.index);
+  @override bool equals(Sample self, Sample other) => Mapper.isEqual(self.id, other.id) && Mapper.isEqual(self.description, other.description) && Mapper.isEqual(self.index, other.index);
+
+  @override Function get typeFactory => (f) => f<Sample>();
+}
+
+extension SampleMapperExtension  on Sample {
+  String toJson() => Mapper.toJson(this);
+  Map<String, dynamic> toMap() => Mapper.toMap(this);
+  SampleCopyWith<Sample> get copyWith => SampleCopyWith(this, $identity);
+}
+
+abstract class SampleCopyWith<$R> {
+  factory SampleCopyWith(Sample value, Then<Sample, $R> then) = _SampleCopyWithImpl<$R>;
+  $R call({String? id, String? description, int? index});
+  $R apply(Sample Function(Sample) transform);
+}
+
+class _SampleCopyWithImpl<$R> extends BaseCopyWith<Sample, $R> implements SampleCopyWith<$R> {
+  _SampleCopyWithImpl(Sample value, Then<Sample, $R> then) : super(value, then);
+
+  @override $R call({String? id, String? description, Object? index = $none}) => $then(Sample(id ?? $value.id, description ?? $value.description, or(index, $value.index)));
+}
+
+class ComparableMapper extends BaseMapper<Comparable> {
+  ComparableMapper._();
+
+  @override Function get decoder => decode;
+  Comparable<T> decode<T>(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap<T>(map));
+  Comparable<T> fromMap<T>(Map<String, dynamic> map) => throw MapperException.missingConstructor('Comparable');
+
+  @override Function get encoder => (Comparable v) => encode(v);
+  dynamic encode(Comparable v) {
+    if (v is Sample) { return SampleMapper._().encode(v); }
+    else { return toMap(v); }
+  }
+  Map<String, dynamic> toMap(Comparable c) => {};
+
+  @override String stringify(Comparable self) => 'Comparable()';
+  @override int hash(Comparable self) => 0;
+  @override bool equals(Comparable self, Comparable other) => true;
+
+  @override Function get typeFactory => <T>(f) => f<Comparable<T>>();
+}
+
+extension ComparableMapperExtension <T> on Comparable<T> {
+  String toJson() => Mapper.toJson(this);
+  Map<String, dynamic> toMap() => Mapper.toMap(this);
+}
+
+class SampleResponseMapper extends BaseMapper<SampleResponse> {
+  SampleResponseMapper._();
+
+  @override Function get decoder => decode;
+  SampleResponse decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
+  SampleResponse fromMap(Map<String, dynamic> map) => SampleResponse(Mapper.i.$getOpt(map, 'project'), Mapper.i.$getOpt(map, 'error'));
+
+  @override Function get encoder => (SampleResponse v) => encode(v);
+  dynamic encode(SampleResponse v) => toMap(v);
+  Map<String, dynamic> toMap(SampleResponse s) => {'project': Mapper.i.$enc(s.project, 'project'), 'error': Mapper.i.$enc(s.error, 'error')};
+
+  @override String stringify(SampleResponse self) => 'SampleResponse(project: ${Mapper.asString(self.project)}, error: ${Mapper.asString(self.error)})';
+  @override int hash(SampleResponse self) => Mapper.hash(self.project) ^ Mapper.hash(self.error);
+  @override bool equals(SampleResponse self, SampleResponse other) => Mapper.isEqual(self.project, other.project) && Mapper.isEqual(self.error, other.error);
+
+  @override Function get typeFactory => (f) => f<SampleResponse>();
+}
+
+extension SampleResponseMapperExtension  on SampleResponse {
+  String toJson() => Mapper.toJson(this);
+  Map<String, dynamic> toMap() => Mapper.toMap(this);
+  SampleResponseCopyWith<SampleResponse> get copyWith => SampleResponseCopyWith(this, $identity);
+}
+
+abstract class SampleResponseCopyWith<$R> {
+  factory SampleResponseCopyWith(SampleResponse value, Then<SampleResponse, $R> then) = _SampleResponseCopyWithImpl<$R>;
+  ProjectDataCopyWith<$R>? get project;
+  $R call({ProjectData? project, String? error});
+  $R apply(SampleResponse Function(SampleResponse) transform);
+}
+
+class _SampleResponseCopyWithImpl<$R> extends BaseCopyWith<SampleResponse, $R> implements SampleResponseCopyWith<$R> {
+  _SampleResponseCopyWithImpl(SampleResponse value, Then<SampleResponse, $R> then) : super(value, then);
+
+  @override ProjectDataCopyWith<$R>? get project => $value.project != null ? ProjectDataCopyWith($value.project!, (v) => call(project: v)) : null;
+  @override $R call({Object? project = $none, Object? error = $none}) => $then(SampleResponse(or(project, $value.project), or(error, $value.error)));
+}
+
+class ProjectDataMapper extends BaseMapper<ProjectData> {
+  ProjectDataMapper._();
+
+  @override Function get decoder => decode;
+  ProjectData decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
+  ProjectData fromMap(Map<String, dynamic> map) => ProjectData(id: Mapper.i.$getOpt(map, 'id'), description: Mapper.i.$getOpt(map, 'description'), htmlFile: Mapper.i.$get(map, 'htmlFile'), cssFile: Mapper.i.$get(map, 'cssFile'), mainDartFile: Mapper.i.$get(map, 'mainDartFile'), dartFiles: Mapper.i.$getOpt(map, 'dartFiles') ?? const {});
+
+  @override Function get encoder => (ProjectData v) => encode(v);
+  dynamic encode(ProjectData v) => toMap(v);
+  Map<String, dynamic> toMap(ProjectData p) => {'id': Mapper.i.$enc(p.id, 'id'), 'description': Mapper.i.$enc(p.description, 'description'), 'htmlFile': Mapper.i.$enc(p.htmlFile, 'htmlFile'), 'cssFile': Mapper.i.$enc(p.cssFile, 'cssFile'), 'mainDartFile': Mapper.i.$enc(p.mainDartFile, 'mainDartFile'), 'dartFiles': Mapper.i.$enc(p.dartFiles, 'dartFiles')};
+
+  @override String stringify(ProjectData self) => 'ProjectData(id: ${Mapper.asString(self.id)}, description: ${Mapper.asString(self.description)}, htmlFile: ${Mapper.asString(self.htmlFile)}, cssFile: ${Mapper.asString(self.cssFile)}, mainDartFile: ${Mapper.asString(self.mainDartFile)}, dartFiles: ${Mapper.asString(self.dartFiles)})';
+  @override int hash(ProjectData self) => Mapper.hash(self.id) ^ Mapper.hash(self.description) ^ Mapper.hash(self.htmlFile) ^ Mapper.hash(self.cssFile) ^ Mapper.hash(self.mainDartFile) ^ Mapper.hash(self.dartFiles);
+  @override bool equals(ProjectData self, ProjectData other) => Mapper.isEqual(self.id, other.id) && Mapper.isEqual(self.description, other.description) && Mapper.isEqual(self.htmlFile, other.htmlFile) && Mapper.isEqual(self.cssFile, other.cssFile) && Mapper.isEqual(self.mainDartFile, other.mainDartFile) && Mapper.isEqual(self.dartFiles, other.dartFiles);
+
+  @override Function get typeFactory => (f) => f<ProjectData>();
+}
+
+extension ProjectDataMapperExtension  on ProjectData {
+  String toJson() => Mapper.toJson(this);
+  Map<String, dynamic> toMap() => Mapper.toMap(this);
+  ProjectDataCopyWith<ProjectData> get copyWith => ProjectDataCopyWith(this, $identity);
+}
+
+abstract class ProjectDataCopyWith<$R> {
+  factory ProjectDataCopyWith(ProjectData value, Then<ProjectData, $R> then) = _ProjectDataCopyWithImpl<$R>;
+  $R call({String? id, String? description, String? htmlFile, String? cssFile, String? mainDartFile, Map<String, String>? dartFiles});
+  $R apply(ProjectData Function(ProjectData) transform);
+}
+
+class _ProjectDataCopyWithImpl<$R> extends BaseCopyWith<ProjectData, $R> implements ProjectDataCopyWith<$R> {
+  _ProjectDataCopyWithImpl(ProjectData value, Then<ProjectData, $R> then) : super(value, then);
+
+  @override $R call({Object? id = $none, Object? description = $none, String? htmlFile, String? cssFile, String? mainDartFile, Map<String, String>? dartFiles}) => $then(ProjectData(id: or(id, $value.id), description: or(description, $value.description), htmlFile: htmlFile ?? $value.htmlFile, cssFile: cssFile ?? $value.cssFile, mainDartFile: mainDartFile ?? $value.mainDartFile, dartFiles: dartFiles ?? $value.dartFiles));
+}
+
+class GistDataMapper extends BaseMapper<GistData> {
+  GistDataMapper._();
+
+  @override Function get decoder => decode;
+  GistData decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
+  GistData fromMap(Map<String, dynamic> map) => GistData(Mapper.i.$getOpt(map, 'id'), Mapper.i.$getOpt(map, 'description'), Mapper.i.$get(map, 'files'));
+
+  @override Function get encoder => (GistData v) => encode(v);
+  dynamic encode(GistData v) => toMap(v);
+  Map<String, dynamic> toMap(GistData g) => {'id': Mapper.i.$enc(g.id, 'id'), 'description': Mapper.i.$enc(g.description, 'description'), 'files': Mapper.i.$enc(g.files, 'files')};
+
+  @override String stringify(GistData self) => 'GistData(id: ${Mapper.asString(self.id)}, description: ${Mapper.asString(self.description)}, files: ${Mapper.asString(self.files)})';
+  @override int hash(GistData self) => Mapper.hash(self.id) ^ Mapper.hash(self.description) ^ Mapper.hash(self.files);
+  @override bool equals(GistData self, GistData other) => Mapper.isEqual(self.id, other.id) && Mapper.isEqual(self.description, other.description) && Mapper.isEqual(self.files, other.files);
+
+  @override Function get typeFactory => (f) => f<GistData>();
+}
+
+extension GistDataMapperExtension  on GistData {
+  String toJson() => Mapper.toJson(this);
+  Map<String, dynamic> toMap() => Mapper.toMap(this);
+  GistDataCopyWith<GistData> get copyWith => GistDataCopyWith(this, $identity);
+}
+
+abstract class GistDataCopyWith<$R> {
+  factory GistDataCopyWith(GistData value, Then<GistData, $R> then) = _GistDataCopyWithImpl<$R>;
+  MapCopyWith<$R, String, GistFile, GistFileCopyWith<$R>> get files;
+  $R call({String? id, String? description, Map<String, GistFile>? files});
+  $R apply(GistData Function(GistData) transform);
+}
+
+class _GistDataCopyWithImpl<$R> extends BaseCopyWith<GistData, $R> implements GistDataCopyWith<$R> {
+  _GistDataCopyWithImpl(GistData value, Then<GistData, $R> then) : super(value, then);
+
+  @override MapCopyWith<$R, String, GistFile, GistFileCopyWith<$R>> get files => MapCopyWith($value.files, (v, t) => GistFileCopyWith(v, t), (v) => call(files: v));
+  @override $R call({Object? id = $none, Object? description = $none, Map<String, GistFile>? files}) => $then(GistData(or(id, $value.id), or(description, $value.description), files ?? $value.files));
+}
+
+class GistFileMapper extends BaseMapper<GistFile> {
+  GistFileMapper._();
+
+  @override Function get decoder => decode;
+  GistFile decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
+  GistFile fromMap(Map<String, dynamic> map) => GistFile(Mapper.i.$get(map, 'filename'), Mapper.i.$get(map, 'content'), Mapper.i.$get(map, 'type'));
+
+  @override Function get encoder => (GistFile v) => encode(v);
+  dynamic encode(GistFile v) => toMap(v);
+  Map<String, dynamic> toMap(GistFile g) => {'filename': Mapper.i.$enc(g.name, 'name'), 'content': Mapper.i.$enc(g.content, 'content'), 'type': Mapper.i.$enc(g.type, 'type')};
+
+  @override String stringify(GistFile self) => 'GistFile(name: ${Mapper.asString(self.name)}, content: ${Mapper.asString(self.content)}, type: ${Mapper.asString(self.type)})';
+  @override int hash(GistFile self) => Mapper.hash(self.name) ^ Mapper.hash(self.content) ^ Mapper.hash(self.type);
+  @override bool equals(GistFile self, GistFile other) => Mapper.isEqual(self.name, other.name) && Mapper.isEqual(self.content, other.content) && Mapper.isEqual(self.type, other.type);
+
+  @override Function get typeFactory => (f) => f<GistFile>();
+}
+
+extension GistFileMapperExtension  on GistFile {
+  String toJson() => Mapper.toJson(this);
+  Map<String, dynamic> toMap() => Mapper.toMap(this);
+  GistFileCopyWith<GistFile> get copyWith => GistFileCopyWith(this, $identity);
+}
+
+abstract class GistFileCopyWith<$R> {
+  factory GistFileCopyWith(GistFile value, Then<GistFile, $R> then) = _GistFileCopyWithImpl<$R>;
+  $R call({String? name, String? content, String? type});
+  $R apply(GistFile Function(GistFile) transform);
+}
+
+class _GistFileCopyWithImpl<$R> extends BaseCopyWith<GistFile, $R> implements GistFileCopyWith<$R> {
+  _GistFileCopyWithImpl(GistFile value, Then<GistFile, $R> then) : super(value, then);
+
+  @override $R call({String? name, String? content, String? type}) => $then(GistFile(name ?? $value.name, content ?? $value.content, type ?? $value.type));
+}
 
 class CompileRequestMapper extends BaseMapper<CompileRequest> {
   CompileRequestMapper._();
@@ -401,15 +619,15 @@ class DocumentRequestMapper extends BaseMapper<DocumentRequest> {
 
   @override Function get decoder => decode;
   DocumentRequest decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
-  DocumentRequest fromMap(Map<String, dynamic> map) => DocumentRequest(Mapper.i.$get(map, 'source'), Mapper.i.$get(map, 'offset'));
+  DocumentRequest fromMap(Map<String, dynamic> map) => DocumentRequest(Mapper.i.$get(map, 'sources'), Mapper.i.$get(map, 'name'), Mapper.i.$get(map, 'offset'));
 
   @override Function get encoder => (DocumentRequest v) => encode(v);
   dynamic encode(DocumentRequest v) => toMap(v);
-  Map<String, dynamic> toMap(DocumentRequest d) => {'source': Mapper.i.$enc(d.source, 'source'), 'offset': Mapper.i.$enc(d.offset, 'offset')};
+  Map<String, dynamic> toMap(DocumentRequest d) => {'sources': Mapper.i.$enc(d.sources, 'sources'), 'name': Mapper.i.$enc(d.name, 'name'), 'offset': Mapper.i.$enc(d.offset, 'offset')};
 
-  @override String stringify(DocumentRequest self) => 'DocumentRequest(source: ${Mapper.asString(self.source)}, offset: ${Mapper.asString(self.offset)})';
-  @override int hash(DocumentRequest self) => Mapper.hash(self.source) ^ Mapper.hash(self.offset);
-  @override bool equals(DocumentRequest self, DocumentRequest other) => Mapper.isEqual(self.source, other.source) && Mapper.isEqual(self.offset, other.offset);
+  @override String stringify(DocumentRequest self) => 'DocumentRequest(sources: ${Mapper.asString(self.sources)}, name: ${Mapper.asString(self.name)}, offset: ${Mapper.asString(self.offset)})';
+  @override int hash(DocumentRequest self) => Mapper.hash(self.sources) ^ Mapper.hash(self.name) ^ Mapper.hash(self.offset);
+  @override bool equals(DocumentRequest self, DocumentRequest other) => Mapper.isEqual(self.sources, other.sources) && Mapper.isEqual(self.name, other.name) && Mapper.isEqual(self.offset, other.offset);
 
   @override Function get typeFactory => (f) => f<DocumentRequest>();
 }
@@ -422,88 +640,14 @@ extension DocumentRequestMapperExtension  on DocumentRequest {
 
 abstract class DocumentRequestCopyWith<$R> {
   factory DocumentRequestCopyWith(DocumentRequest value, Then<DocumentRequest, $R> then) = _DocumentRequestCopyWithImpl<$R>;
-  $R call({String? source, int? offset});
+  $R call({Map<String, String>? sources, String? name, int? offset});
   $R apply(DocumentRequest Function(DocumentRequest) transform);
 }
 
 class _DocumentRequestCopyWithImpl<$R> extends BaseCopyWith<DocumentRequest, $R> implements DocumentRequestCopyWith<$R> {
   _DocumentRequestCopyWithImpl(DocumentRequest value, Then<DocumentRequest, $R> then) : super(value, then);
 
-  @override $R call({String? source, int? offset}) => $then(DocumentRequest(source ?? $value.source, offset ?? $value.offset));
-}
-
-class GistDataMapper extends BaseMapper<GistData> {
-  GistDataMapper._();
-
-  @override Function get decoder => decode;
-  GistData decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
-  GistData fromMap(Map<String, dynamic> map) => GistData(Mapper.i.$getOpt(map, 'id'), Mapper.i.$getOpt(map, 'description'), Mapper.i.$get(map, 'files'));
-
-  @override Function get encoder => (GistData v) => encode(v);
-  dynamic encode(GistData v) => toMap(v);
-  Map<String, dynamic> toMap(GistData g) => {'id': Mapper.i.$enc(g.id, 'id'), 'description': Mapper.i.$enc(g.description, 'description'), 'files': Mapper.i.$enc(g.files, 'files')};
-
-  @override String stringify(GistData self) => 'GistData(id: ${Mapper.asString(self.id)}, description: ${Mapper.asString(self.description)}, files: ${Mapper.asString(self.files)})';
-  @override int hash(GistData self) => Mapper.hash(self.id) ^ Mapper.hash(self.description) ^ Mapper.hash(self.files);
-  @override bool equals(GistData self, GistData other) => Mapper.isEqual(self.id, other.id) && Mapper.isEqual(self.description, other.description) && Mapper.isEqual(self.files, other.files);
-
-  @override Function get typeFactory => (f) => f<GistData>();
-}
-
-extension GistDataMapperExtension  on GistData {
-  String toJson() => Mapper.toJson(this);
-  Map<String, dynamic> toMap() => Mapper.toMap(this);
-  GistDataCopyWith<GistData> get copyWith => GistDataCopyWith(this, $identity);
-}
-
-abstract class GistDataCopyWith<$R> {
-  factory GistDataCopyWith(GistData value, Then<GistData, $R> then) = _GistDataCopyWithImpl<$R>;
-  MapCopyWith<$R, String, GistFile, GistFileCopyWith<$R>> get files;
-  $R call({String? id, String? description, Map<String, GistFile>? files});
-  $R apply(GistData Function(GistData) transform);
-}
-
-class _GistDataCopyWithImpl<$R> extends BaseCopyWith<GistData, $R> implements GistDataCopyWith<$R> {
-  _GistDataCopyWithImpl(GistData value, Then<GistData, $R> then) : super(value, then);
-
-  @override MapCopyWith<$R, String, GistFile, GistFileCopyWith<$R>> get files => MapCopyWith($value.files, (v, t) => GistFileCopyWith(v, t), (v) => call(files: v));
-  @override $R call({Object? id = $none, Object? description = $none, Map<String, GistFile>? files}) => $then(GistData(or(id, $value.id), or(description, $value.description), files ?? $value.files));
-}
-
-class GistFileMapper extends BaseMapper<GistFile> {
-  GistFileMapper._();
-
-  @override Function get decoder => decode;
-  GistFile decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
-  GistFile fromMap(Map<String, dynamic> map) => GistFile(Mapper.i.$get(map, 'filename'), Mapper.i.$get(map, 'content'), Mapper.i.$get(map, 'type'));
-
-  @override Function get encoder => (GistFile v) => encode(v);
-  dynamic encode(GistFile v) => toMap(v);
-  Map<String, dynamic> toMap(GistFile g) => {'filename': Mapper.i.$enc(g.name, 'name'), 'content': Mapper.i.$enc(g.content, 'content'), 'type': Mapper.i.$enc(g.type, 'type')};
-
-  @override String stringify(GistFile self) => 'GistFile(name: ${Mapper.asString(self.name)}, content: ${Mapper.asString(self.content)}, type: ${Mapper.asString(self.type)})';
-  @override int hash(GistFile self) => Mapper.hash(self.name) ^ Mapper.hash(self.content) ^ Mapper.hash(self.type);
-  @override bool equals(GistFile self, GistFile other) => Mapper.isEqual(self.name, other.name) && Mapper.isEqual(self.content, other.content) && Mapper.isEqual(self.type, other.type);
-
-  @override Function get typeFactory => (f) => f<GistFile>();
-}
-
-extension GistFileMapperExtension  on GistFile {
-  String toJson() => Mapper.toJson(this);
-  Map<String, dynamic> toMap() => Mapper.toMap(this);
-  GistFileCopyWith<GistFile> get copyWith => GistFileCopyWith(this, $identity);
-}
-
-abstract class GistFileCopyWith<$R> {
-  factory GistFileCopyWith(GistFile value, Then<GistFile, $R> then) = _GistFileCopyWithImpl<$R>;
-  $R call({String? name, String? content, String? type});
-  $R apply(GistFile Function(GistFile) transform);
-}
-
-class _GistFileCopyWithImpl<$R> extends BaseCopyWith<GistFile, $R> implements GistFileCopyWith<$R> {
-  _GistFileCopyWithImpl(GistFile value, Then<GistFile, $R> then) : super(value, then);
-
-  @override $R call({String? name, String? content, String? type}) => $then(GistFile(name ?? $value.name, content ?? $value.content, type ?? $value.type));
+  @override $R call({Map<String, String>? sources, String? name, int? offset}) => $then(DocumentRequest(sources ?? $value.sources, name ?? $value.name, offset ?? $value.offset));
 }
 
 
