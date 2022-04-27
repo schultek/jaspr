@@ -10,7 +10,32 @@ import '../models/sample.dart';
 import '../providers/utils.dart';
 import 'project.dart';
 
-final sampleHeader = RegExp(r'//\s?\[sample(?:=(\d+))?\](?:\s*)(.*)');
+final sampleHeader = RegExp(r'//\s?\[sample(?:=(\d+))?\](\[hidden\])?(?:\s*)(.*)');
+
+class SampleConfig {
+  String description;
+  int? index;
+  bool hidden;
+  String source;
+
+  SampleConfig(this.description, this.index, this.hidden, this.source);
+
+  static SampleConfig? from(String source) {
+    var splitIndex = source.indexOf('\n');
+    var line0 = source.substring(0, splitIndex == -1 ? null : splitIndex);
+
+    if (sampleHeader.hasMatch(line0)) {
+      var match = sampleHeader.firstMatch(line0)!;
+      return SampleConfig(
+        match.group(3)!.trim(),
+        int.tryParse(match.group(1) ?? ''),
+        match.group(2) != null,
+        source.substring(splitIndex + 1),
+      );
+    }
+    return null;
+  }
+}
 
 Future<Response> getSample(Request request, String id) async {
   var description = id;
@@ -27,17 +52,19 @@ Future<Response> getSample(Request request, String id) async {
     var files = await dir.list().toList();
 
     await Future.wait(files.map((file) async {
+      if ((await file.stat()).type == FileSystemEntityType.directory) {
+        return;
+      }
+
       var name = path.basename(file.path);
       Future<String> read() => File(file.path).readAsString();
 
       if (name == 'main.dart') {
         dart = await read();
-        var splitIndex = dart!.indexOf('\n');
-        var firstLine = dart!.substring(0, splitIndex);
-        if (sampleHeader.hasMatch(firstLine)) {
-          var match = sampleHeader.firstMatch(firstLine)!;
-          description = match.group(2)!.trim();
-          dart = dart!.substring(splitIndex + 1);
+        var config = SampleConfig.from(dart!);
+        if (config != null) {
+          description = config.description;
+          dart = config.source;
         }
       } else if (name == 'index.html') {
         html = await read();
@@ -45,6 +72,8 @@ Future<Response> getSample(Request request, String id) async {
         css = await read();
       } else if (name.endsWith('.dart')) {
         dartFiles[name] = await read();
+      } else if (name == 'workshop.yaml') {
+
       } else {
         print('[WARNING] Unsupported file $name in sample $id');
       }
@@ -80,23 +109,27 @@ final loadSamplesProvider = Provider<List<Sample>>((ref) {
   ref.onPreload(() async {
     var dirs = await Directory(samplesPath).list().toList();
 
-    var loadedSamples = await Future.wait(dirs.map((dir) async {
+    var loadedSamples = (await Future.wait(dirs.map((dir) async {
       var id = path.basename(dir.path);
       var description = id;
       int? index;
       var mainFile = File(path.join(dir.path, 'main.dart'));
 
       if (await mainFile.exists()) {
-        var lines = await mainFile.readAsLines();
-        if (sampleHeader.hasMatch(lines[0])) {
-          var match = sampleHeader.firstMatch(lines[0])!;
-          index = int.tryParse(match.group(1) ?? '');
-          description = match.group(2)!.trim();
+        var config = SampleConfig.from(await mainFile.readAsString());
+        if (config != null) {
+          if (config.hidden) {
+            return null;
+          }
+          description = config.description;
+          index = config.index;
         }
       }
 
       return Sample(id, description, index);
-    }));
+    })))
+        .whereType<Sample>()
+        .toList();
 
     loadedSamples.sort();
     samples.addAll(loadedSamples);

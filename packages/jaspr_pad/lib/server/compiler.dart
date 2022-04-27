@@ -1,13 +1,27 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:path/path.dart' as path;
 
 import '../models/api_models.dart';
+import 'cache.dart';
 import 'project.dart';
 
 class Compiler {
+  StorageCache cache;
+
+  Compiler() : cache = StorageCache();
+
   Future<CompileResponse> compile(CompileRequest request) async {
+    var sourceHash = MapEquality().hash(request.sources);
+    var hashedResult = await cache.getCachedResult(sourceHash);
+
+    if (hashedResult != null) {
+      print("[INFO] Cache hit for $sourceHash");
+      return CompileResponse(hashedResult, null);
+    }
+
     final temp = await Directory.systemTemp.createTemp('jasprpad');
 
     try {
@@ -40,8 +54,9 @@ class Compiler {
       if (result.exitCode != 0) {
         return CompileResponse(null, result.stdout as String);
       } else {
-        final mainJs = File(path.join(temp.path, 'main.js'));
-        return CompileResponse(await mainJs.readAsString(), null);
+        final mainJs = await File(path.join(temp.path, 'main.js')).readAsString();
+        await cache.cacheResult(sourceHash, mainJs);
+        return CompileResponse(mainJs, null);
       }
     } catch (e, st) {
       print('Compiler failed: $e\n$st');

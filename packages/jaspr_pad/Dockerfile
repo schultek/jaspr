@@ -12,6 +12,7 @@ FROM dart:stable
 
 COPY --from=build /runtime/ /
 COPY --from=build /app/packages/jaspr_pad/build/ /app/packages/jaspr_pad/
+COPY --from=build /app/packages/jaspr_pad/serviceAccountKey.json /app/packages/jaspr_pad/
 COPY --from=build /app/packages/jaspr_pad/templates /app/packages/jaspr_pad/templates
 COPY --from=build /app/packages/jaspr_pad/samples /app/packages/jaspr_pad/samples
 COPY --from=build /app/packages/jaspr /app/packages/jaspr

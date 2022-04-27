@@ -12,9 +12,10 @@ import 'samples.dart';
 Handler get apiRouter {
   var router = Router();
 
+  var compiler = Compiler();
   var analyzer = Analyzer();
 
-  router.post('/compile', mappedHandler(Compiler().compile));
+  router.post('/compile', mappedHandler(compiler.compile));
   router.post('/analyze', mappedHandler(analyzer.analyze));
   router.post('/format', mappedHandler(analyzer.format));
   router.post('/document', mappedHandler(analyzer.document));
