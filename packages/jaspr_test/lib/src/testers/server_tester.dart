@@ -31,17 +31,24 @@ class DataResponse {
   Map<String, dynamic>? data;
 }
 
+ServerApp _runTestApp(Component app, String id, Handler fileHandler) {
+  return ServerApp.run(() {
+    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: id);
+  }, fileHandler);
+}
+
 class ServerTester {
   ServerTester._();
 
-  static Future<ServerTester> setUp(Component app,
-      {String attachTo = 'body',
-      SetupFunction? beforeRender,
-      String? html,
-      bool virtual = true,
-      List<Middleware>? middleware}) async {
+  static Future<ServerTester> setUp(
+    Component app, {
+    String attachTo = 'body',
+    String? html,
+    bool virtual = true,
+    List<Middleware>? middleware,
+  }) async {
     var tester = ServerTester._();
-    await tester._start(app, attachTo, beforeRender, html, virtual, middleware);
+    await tester._start(app, attachTo, html, virtual, middleware);
     return tester;
   }
 
@@ -53,9 +60,8 @@ class ServerTester {
   Handler? _handler;
   http.Client? _client;
 
-  Future<void> _start(Component comp, String id, SetupFunction? beforeRender, String? html, bool virtual,
-      List<Middleware>? middleware) async {
-    var _html = html ?? '<html><head></head><body><div id="$id"></div></body></html>';
+  Future<void> _start(Component comp, String attachTo, String? html, bool virtual, List<Middleware>? middleware) async {
+    var _html = html ?? '<html><head></head><body></body></html>';
 
     fileHandler(Request request) {
       if (request.requestedUri.path == '/') {
@@ -66,9 +72,7 @@ class ServerTester {
     }
 
     var appCompleter = Completer();
-    app = ServerApp.run(() {
-      ServerComponentsBinding.ensureInitialized().attachRootComponent(comp, attachTo: id);
-    }, fileHandler)
+    app = _runTestApp(comp, attachTo, fileHandler)
       ..setListener((server) {
         if (!appCompleter.isCompleted) appCompleter.complete();
       });

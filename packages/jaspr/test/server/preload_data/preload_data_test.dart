@@ -33,7 +33,7 @@ void main() {
       var body = response.document?.body;
       expect(body, isNotNull);
 
-      var appHtml = '<div id="app"><div>App<button>Click Me</button>Count: 202</div></div>';
+      var appHtml = '<div>App<button>Click Me</button>Count: 202</div>';
       expect(body!.innerHtml, equals(appHtml));
 
       expect(

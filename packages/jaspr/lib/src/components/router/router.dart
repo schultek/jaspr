@@ -55,14 +55,14 @@ class RouterState extends State<Router> with PreloadStateMixin<Router>, DeferRen
 
   @override
   Future<void> beforeFirstRender() async {
-    var route = _matchRoute((context as Element).root.currentUri.path);
+    var route = _matchRoute(ComponentsBinding.instance!.currentUri.path);
     if (route is LazyRoute) route = _resolvedRoutes[route] = await route.load();
     _currentRoute = route as ResolvedRoute;
   }
 
   @override
   Future<void> preloadState() async {
-    var route = _matchRoute((context as Element).root.currentUri.path);
+    var route = _matchRoute(ComponentsBinding.instance!.currentUri.path);
     if (route is LazyRoute) route = _resolvedRoutes[route] = await route.load();
     _currentRoute = route as ResolvedRoute;
   }

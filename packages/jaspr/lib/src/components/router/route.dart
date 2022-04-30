@@ -31,7 +31,7 @@ class LazyRoute implements Route {
     if (_resolved == null) {
       List<Future> loading = [_loader()];
       if (preload) {
-        var preloaded = ComponentsBinding.instance!.loadState(_path);
+        var preloaded = SyncBinding.instance!.loadState(_path);
         if (!eager) loading.add(preloaded);
       }
       _resolved = Future.wait(loading).then((_) {

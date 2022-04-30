@@ -1,3 +1,4 @@
+import 'package:jaspr/components.dart';
 import 'package:jaspr_test/server_test.dart';
 
 import 'basic_app.dart';
@@ -8,10 +9,10 @@ void main() {
 
         setUp(() async {
           tester = await ServerTester.setUp(
-            App(),
-            beforeRender: () {
+            Builder.single(builder: (context) {
               Counter.initialValue = 101;
-            },
+              return App();
+            }),
             virtual: virtual,
           );
         });
@@ -26,7 +27,7 @@ void main() {
           expect(response.statusCode, equals(200));
           expect(response.document?.body, isNotNull);
 
-          var appHtml = '<div id="app"><div>App<button>Click Me</button>Count: 101</div></div>';
+          var appHtml = '<div>App<button>Click Me</button>Count: 101</div>';
 
           expect(response.document!.body!.innerHtml, equals(appHtml));
         });

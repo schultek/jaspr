@@ -3,23 +3,16 @@ part of framework;
 /// Mixin on [State] that syncs state data from the server with the client
 ///
 /// Requires a [GlobalKey] on the component.
-mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> {
+mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> implements SyncState<U> {
   /// Codec used to serialize the state data on the server and deserialize on the client
   /// Should convert the state to any dynamic type: Null, bool, double, int, Uint8List, String, Map, List
+  @override
   Codec<U, dynamic> get syncCodec => CastCodec();
 
   /// Globally unique id used to identify the state data between server and client
   /// Returns null if state should not be synced
-  String? get syncId;
-
-  late String? _syncId;
-
-  /// Called on the server after the initial build, to retrieve the state data of this component.
-  U saveState();
-
-  dynamic _saveState() {
-    return syncCodec.encode(saveState());
-  }
+  @override
+  String get syncId;
 
   /// Called on the client when a new state value is available, either when the state is first initialized, or when the
   /// state becomes available through lazy loading a route.
@@ -39,95 +32,23 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> {
   ///
   /// The framework won't call setState() for you, so you have to call it yourself if you want to rebuild the component.
   /// That allows for custom update logic and reduces unnecessary builds.
+  @override
   void updateState(U? value);
 
-  void _updateState(dynamic state) {
-    updateState(state != null ? syncCodec.decode(state) : null);
-  }
+  /// Can be overridden to signal that the state should not be synced
+  @override
+  bool wantsSync() => true;
 
   @override
   void initState() {
     super.initState();
-    _syncId = syncId; // Call getter once and save result
-    if (_syncId != null) {
-      _element!.root._registerSyncState(this);
-      if (_element!.root.isClient) {
-        _updateState(_element!.root.getRawState(_syncId!));
-      }
-    }
+    SyncBinding.instance!.registerSyncState(this, initialUpdate: ComponentsBinding.instance!.isClient);
   }
 
   @override
   void dispose() {
-    if (_syncId != null) {
-      _element!.root._unregisterSyncState(this);
-    }
+    SyncBinding.instance!.unregisterSyncState(this);
     super.dispose();
-  }
-}
-
-class SimpleCodec<T, R> extends Codec<T, R> {
-  SimpleCodec(T Function(R) decode, R Function(T) encode)
-      : decoder = SimpleConverter(decode),
-        encoder = SimpleConverter(encode);
-
-  @override
-  final Converter<R, T> decoder;
-  @override
-  final Converter<T, R> encoder;
-}
-
-class SimpleConverter<T, R> extends Converter<T, R> {
-  SimpleConverter(this._convert);
-
-  final R Function(T) _convert;
-
-  @override
-  R convert(T input) => _convert(input);
-}
-
-Type typeOf<T>() => T;
-
-class CastCodec<T> extends Codec<T, dynamic> {
-  @override
-  Converter<dynamic, T> get decoder => SimpleConverter((v) {
-        if (T == typeOf<Map<String, dynamic>>() && v is Map) {
-          v = v.cast<String, dynamic>();
-        }
-        return v;
-      });
-
-  @override
-  Converter<T, dynamic> get encoder => SimpleConverter((v) => v);
-}
-
-const stateCodec = StateCodec();
-
-class StateCodec extends Codec<dynamic, String> {
-  const StateCodec();
-
-  @override
-  final Converter<String, dynamic> decoder = const StateDecoder();
-  @override
-  final Converter<dynamic, String> encoder = const StateEncoder();
-}
-
-class StateDecoder extends Converter<String, dynamic> {
-  const StateDecoder();
-
-  @override
-  dynamic convert(String input) {
-    var binary = base64Decode(input);
-    return binaryCodec.decode(binary);
-  }
-}
-
-class StateEncoder extends Converter<dynamic, String> {
-  const StateEncoder();
-  @override
-  String convert(dynamic input) {
-    var binary = binaryCodec.encode(input);
-    return base64UrlEncode(binary);
   }
 }
 

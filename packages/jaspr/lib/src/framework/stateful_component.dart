@@ -618,17 +618,17 @@ class StatefulElement extends MultiChildElement {
     assert(state._debugLifecycleState == _StateLifecycle.created);
 
     // We check if state uses on of the mixins that support async initialization,
-    // which will be handled by [ComponentsBinding.preformRebuildOn].
+    // which will be handled by [BuildOwnner.preformRebuildOn].
     // In this case we don't call [_initState()] directly here, but rather let it
     // be called by the mixins implementation.
 
     Future? _asyncFirstBuild;
 
-    if (root.isFirstBuild) {
-      if (state is DeferRenderMixin && root.isClient) {
+    if (owner.isFirstBuild) {
+      if (state is DeferRenderMixin && ComponentsBinding.instance!.isClient) {
         _asyncFirstBuild = (state as DeferRenderMixin).beforeFirstRender();
       }
-      if (state is PreloadStateMixin && !root.isClient) {
+      if (state is PreloadStateMixin && !ComponentsBinding.instance!.isClient) {
         _asyncFirstBuild = (state as PreloadStateMixin).preloadState();
       }
     }

@@ -9,7 +9,8 @@ presets:
     platforms:
       - chrome
     verbose_trace: false
-    js_trace: true
+    js_trace: false
+
 
 override_platforms:
   chrome:

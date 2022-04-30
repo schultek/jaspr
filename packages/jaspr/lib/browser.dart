@@ -1,2 +1,2 @@
-export 'jaspr.dart' hide runApp;
-export 'src/app/browser_app.dart';
+export 'jaspr.dart' hide runApp, AppBinding;
+export 'src/bindings/browser_bindings.dart';

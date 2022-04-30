@@ -8,10 +8,10 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:binary_codec/binary_codec.dart';
 import 'package:domino/domino.dart';
 
 import '../../jaspr.dart';
+import '../scheduler/binding.dart';
 
 export 'package:domino/domino.dart' show DomBuilder, DomEvent, DomEventFn, DomLifecycleEvent, DomLifecycleEventFn;
 
@@ -218,8 +218,8 @@ abstract class Element implements BuildContext {
   Component? _component;
 
   /// The root component binding that manages the component tree.
-  ComponentsBinding? _root;
-  ComponentsBinding get root => _root!;
+  BuildOwner? _owner;
+  BuildOwner get owner => _owner!;
 
   /// The nearest ancestor build scheduler that can rebuild its children.
   BuildScheduler? _scheduler;
@@ -338,13 +338,13 @@ abstract class Element implements BuildContext {
     _depth = parent != null ? parent.depth + 1 : 1;
 
     if (parent != null) {
-      _root = parent._root;
+      _owner = parent.owner;
     }
-    assert(_root != null);
+    assert(_owner != null);
 
     final Key? key = component.key;
     if (key is GlobalKey) {
-      root._registerGlobalKey(key, this);
+      owner._registerGlobalKey(key, this);
     }
     _updateInheritance();
   }
@@ -416,7 +416,7 @@ abstract class Element implements BuildContext {
       parent.deactivateChild(element);
     }
     assert(element._parent == null);
-    root._owner._inactiveElements.remove(element);
+    owner._inactiveElements.remove(element);
     return element;
   }
 
@@ -472,7 +472,7 @@ abstract class Element implements BuildContext {
     assert(child._parent == this);
     child._parent = null;
     child.detachScheduler();
-    root._owner._inactiveElements.add(child);
+    owner._inactiveElements.add(child);
   }
 
   /// Remove the given child from the element's child list, in preparation for
@@ -520,7 +520,7 @@ abstract class Element implements BuildContext {
   void activate() {
     assert(_lifecycleState == _ElementLifecycle.inactive);
     assert(_component != null);
-    assert(_root != null);
+    assert(_owner != null);
     assert(_scheduler != null);
     assert(_depth != null);
     final bool hadDependencies = (_dependencies != null && _dependencies!.isNotEmpty) || _hadUnsatisfiedDependencies;
@@ -530,7 +530,7 @@ abstract class Element implements BuildContext {
     _hadUnsatisfiedDependencies = false;
     _updateInheritance();
     if (_dirty) {
-      root._owner.scheduleBuildFor(this);
+      owner.scheduleBuildFor(this);
     }
     if (hadDependencies) didChangeDependencies();
   }
@@ -581,11 +581,11 @@ abstract class Element implements BuildContext {
     assert(_lifecycleState == _ElementLifecycle.inactive);
     assert(_component != null);
     assert(_depth != null);
-    assert(_root != null);
+    assert(_owner != null);
 
     final Key? key = component.key;
     if (key is GlobalKey) {
-      root._unregisterGlobalKey(key, this);
+      owner._unregisterGlobalKey(key, this);
     }
 
     _component = null;
@@ -657,7 +657,19 @@ abstract class Element implements BuildContext {
   /// this function to notify this element of the change.
   void didChangeDependencies() {
     assert(_lifecycleState == _ElementLifecycle.active);
+    assert(_debugCheckOwnerBuildTargetExists('didChangeDependencies'));
     markNeedsBuild();
+  }
+
+  bool _debugCheckOwnerBuildTargetExists(String methodName) {
+    assert(() {
+      if (owner._debugCurrentBuildTarget == null) {
+        throw '$methodName for ${component.runtimeType} was called at an '
+            'inappropriate time.';
+      }
+      return true;
+    }());
+    return true;
   }
 
   /// Returns true if the element has been marked as needing rebuilding.
@@ -688,8 +700,9 @@ abstract class Element implements BuildContext {
     assert(_scheduler != null);
     assert(_lifecycleState == _ElementLifecycle.active);
     assert(() {
-      if (root._owner._debugBuilding) {
-        if (_debugIsInScope(root._owner._schedulerContext!)) {
+      if (owner._debugBuilding) {
+        assert(owner._debugCurrentBuildTarget != null);
+        if (_debugIsInScope(owner._debugCurrentBuildTarget!)) {
           return true;
         }
         if (!_debugAllowIgnoredCallsToMarkNeedsBuild) {
@@ -697,13 +710,16 @@ abstract class Element implements BuildContext {
         }
         // can only get here if we're not in scope, but ignored calls are allowed, and our call would somehow be ignored (since we're already dirty)
         assert(dirty);
+      } else if (owner._debugStateLocked) {
+        assert(!_debugAllowIgnoredCallsToMarkNeedsBuild);
+        throw 'setState() or markNeedsBuild() called when widget tree was locked.';
       }
       return true;
     }());
 
     if (_dirty) return;
     _dirty = true;
-    _root!._owner.scheduleBuildFor(this);
+    owner.scheduleBuildFor(this);
   }
 
   /// Invalidates the element and schedules a re-render
@@ -712,13 +728,13 @@ abstract class Element implements BuildContext {
     return _scheduler!.view.invalidate() ?? Future.value();
   }
 
-  bool _debugIsInScope(BuildScheduler target) {
-    BuildScheduler? current = _scheduler;
+  bool _debugIsInScope(Element target) {
+    Element? current = this;
     while (current != null) {
       if (target == current) {
         return true;
       }
-      current = current._parent?._scheduler;
+      current = current._parent;
     }
     return false;
   }
@@ -733,7 +749,19 @@ abstract class Element implements BuildContext {
       return;
     }
     assert(_lifecycleState == _ElementLifecycle.active);
-    root.performRebuildOn(this, () {
+    assert(owner._debugStateLocked);
+    Element? debugPreviousBuildTarget;
+    assert(() {
+      debugPreviousBuildTarget = owner._debugCurrentBuildTarget;
+      owner._debugCurrentBuildTarget = this;
+      return true;
+    }());
+    owner.performRebuildOn(this, () {
+      assert(() {
+        assert(owner._debugCurrentBuildTarget == this);
+        owner._debugCurrentBuildTarget = debugPreviousBuildTarget;
+        return true;
+      }());
       assert(!_dirty);
       if (_dependencies != null && _dependencies!.isNotEmpty) {
         for (var dependency in _dependencies!) {

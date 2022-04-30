@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:jaspr/components.dart';
+import 'package:jaspr/foundation.dart';
 import 'package:meta/meta.dart';
 import 'package:riverpod/riverpod.dart';
 
@@ -186,7 +187,11 @@ class ProviderScopeState extends State<ProviderScope> with SyncStateMixin<Provid
   var _dirty = false;
 
   @override
-  String? syncId;
+  String syncId = 'provider_scope';
+
+  late bool _isRoot;
+  @override
+  bool wantsSync() => _isRoot;
 
   @override
   Map<String, dynamic> saveState() {
@@ -206,10 +211,7 @@ class ProviderScopeState extends State<ProviderScope> with SyncStateMixin<Provid
       return true;
     }(), '');
 
-    if (parent == null) {
-      syncId = 'provider_scope';
-    }
-
+    _isRoot = parent == null;
     container = ProviderContainer(
       parent: parent,
       overrides: component.overrides,

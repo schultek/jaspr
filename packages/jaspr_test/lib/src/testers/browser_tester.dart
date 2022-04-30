@@ -7,13 +7,13 @@ import 'package:jaspr/browser.dart';
 import '../../jaspr_test.dart';
 
 class BrowserTester {
-  BrowserTester._(this.binding, this._id);
+  BrowserTester._(this.binding, this._attachTo);
 
   final TestBrowserComponentsBinding binding;
-  final String _id;
+  final String _attachTo;
 
   static BrowserTester setUp({
-    String id = 'app',
+    String attachTo = 'body',
     String location = '/',
     Map<String, dynamic>? initialStateData,
     Map<String, dynamic> Function(String url)? onFetchState,
@@ -22,23 +22,18 @@ class BrowserTester {
       html.document.body!.attributes['state-data'] = stateCodec.encode(initialStateData);
     }
 
-    if (!html.document.body!.children.any((e) => e.id == id)) {
-      html.document.body!.append(html.document.createElement('div')..id = id);
-    }
-
     if (html.window.location.pathname != location) {
       html.window.history.replaceState(null, 'Test', location);
     }
 
     var binding = TestBrowserComponentsBinding(onFetchState);
-    return BrowserTester._(binding, id);
+    return BrowserTester._(binding, attachTo);
   }
 
   static void tearDown() {}
 
   Future<void> pumpComponent(Component component) {
-    binding.attachRootComponent(component, attachTo: _id);
-    return binding.firstBuild;
+    return binding.attachRootComponent(component, attachTo: _attachTo);
   }
 
   Future<void> navigate(Function(RouterState) navigate, {bool pump = true}) async {
@@ -110,28 +105,15 @@ class BrowserTester {
   }
 }
 
-class TestBrowserComponentsBinding extends BrowserComponentsBinding {
+class TestBrowserComponentsBinding extends AppBinding {
   TestBrowserComponentsBinding(this._onFetchState);
 
-  Completer? _rootViewCompleter;
-
   @override
-  Future<void> get firstBuild => _rootViewCompleter!.future;
-
-  @override
-  void attachRootComponent(Component app, {required String attachTo}) {
-    _rootViewCompleter = Completer();
-    super.attachRootComponent(app, attachTo: attachTo);
-  }
-
-  @override
-  Future<void> didAttachRootElement(BuildScheduler element, {required String to}) async {
-    await super.firstBuild;
+  void didAttachRootElement(BuildScheduler element, {required String to}) {
     element.view = domino.registerView(
-      root: html.document.getElementById(to)!,
+      root: html.document.querySelector(to)!,
       builderFn: element.render,
     );
-    _rootViewCompleter!.complete();
   }
 
   final Map<String, dynamic> Function(String url)? _onFetchState;

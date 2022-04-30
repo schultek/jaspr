@@ -190,6 +190,7 @@ class InheritedElement extends SingleChildElement {
   /// associated with this element but before rebuilding this element.
   @protected
   void notifyClients(covariant InheritedComponent oldComponent) {
+    assert(_debugCheckOwnerBuildTargetExists('notifyClients'));
     for (final Element dependent in _dependents.keys) {
       notifyDependent(oldComponent, dependent);
     }

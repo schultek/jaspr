@@ -4,23 +4,28 @@ import 'dart:html';
 
 import 'package:domino/browser.dart' hide DomComponent;
 
+import '../foundation/binding.dart';
+import '../foundation/sync.dart';
 import '../framework/framework.dart';
+import '../scheduler/binding.dart';
 
 /// Main entry point for the browser app
 void runApp(Component app, {String attachTo = 'body'}) {
-  BrowserComponentsBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
+  AppBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
 }
 
 /// Global component binding for the browser
-class BrowserComponentsBinding extends ComponentsBinding {
-  static ComponentsBinding ensureInitialized() {
+class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, SchedulerBinding {
+  static AppBinding ensureInitialized() {
     if (ComponentsBinding.instance == null) {
-      BrowserComponentsBinding();
+      AppBinding();
     }
-    return ComponentsBinding.instance!;
+    return ComponentsBinding.instance! as AppBinding;
   }
 
-  BrowserComponentsBinding() {
+  @override
+  void initInstances() {
+    super.initInstances();
     _loadRawState();
   }
 
@@ -28,8 +33,7 @@ class BrowserComponentsBinding extends ComponentsBinding {
   bool get isClient => true;
 
   @override
-  Future<void> didAttachRootElement(BuildScheduler element, {required String to}) async {
-    await firstBuild;
+  void didAttachRootElement(BuildScheduler element, {required String to}) {
     element.view = registerView(
       root: document.querySelector(to)!,
       builderFn: element.render,
@@ -66,5 +70,14 @@ class BrowserComponentsBinding extends ComponentsBinding {
         })
         .then((result) => result.text())
         .then((data) => jsonDecode(data));
+  }
+
+  @override
+  void scheduleBuild() {
+    // This seems to give the best results over futures and microtasks
+    // Needs to be inspected in more detail
+    window.requestAnimationFrame((highResTime) {
+      buildOwner.performBuild();
+    });
   }
 }

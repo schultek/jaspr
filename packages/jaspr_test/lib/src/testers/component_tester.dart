@@ -12,9 +12,9 @@ class ComponentTester {
 
   final TestComponentsBinding binding;
 
-  static ComponentTester setUp({String? html, String id = 'app', Uri? currentUri, bool isClient = false}) {
+  static ComponentTester setUp({String? html, String attachTo = 'body', Uri? currentUri, bool isClient = false}) {
     tearDown();
-    var binding = TestComponentsBinding(html, id, currentUri, isClient);
+    var binding = TestComponentsBinding(html, attachTo, currentUri, isClient);
     return ComponentTester._(binding);
   }
 
@@ -25,8 +25,7 @@ class ComponentTester {
   }
 
   Future<void> pumpComponent(Component component) {
-    binding.attachRootComponent(component, attachTo: binding._id);
-    return binding.firstBuild;
+    return binding.attachRootComponent(component, attachTo: binding._attachTo);
   }
 
   Future<void> click(Finder finder, {bool pump = true}) async {
@@ -85,13 +84,13 @@ class ComponentTester {
   }
 }
 
-class TestComponentsBinding extends ComponentsBinding {
+class TestComponentsBinding extends BindingBase with ComponentsBinding, SyncBinding, SchedulerBinding {
   static TestComponentsBinding get instance => ComponentsBinding.instance as TestComponentsBinding;
 
-  TestComponentsBinding(this._html, this._id, this._currentUri, this._isClient);
+  TestComponentsBinding(this._html, this._attachTo, this._currentUri, this._isClient);
 
   final String? _html;
-  final String _id;
+  final String _attachTo;
 
   final Uri? _currentUri;
   @override
@@ -101,30 +100,15 @@ class TestComponentsBinding extends ComponentsBinding {
   @override
   bool get isClient => _isClient;
 
-  Completer? _rootViewCompleter;
-
-  @override
-  Future<void> get firstBuild => _rootViewCompleter!.future;
-
-  @override
-  void attachRootComponent(Component app, {required String attachTo}) {
-    _rootViewCompleter = Completer();
-    super.attachRootComponent(app, attachTo: attachTo);
-  }
-
   @override
   void didAttachRootElement(BuildScheduler element, {required String to}) async {
-    await super.firstBuild;
-
-    var document = parse(_html ?? '<html><head></head><body><div id="$to"></div></body></html>');
+    var document = parse(_html ?? '<html><head></head><body></body></html>');
 
     element.view = registerView(
       document: document,
-      root: document.getElementById(to)!,
+      root: document.querySelector(to)!,
       builderFn: element.render,
     );
-
-    _rootViewCompleter!.complete();
   }
 
   @override
@@ -139,4 +123,9 @@ class TestComponentsBinding extends ComponentsBinding {
 
   @override
   void updateRawState(String id, dynamic state) {}
+
+  @override
+  void scheduleBuild() {
+    Future(buildOwner.performBuild);
+  }
 }

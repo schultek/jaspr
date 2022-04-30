@@ -13,7 +13,10 @@ import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
+import '../foundation/binding.dart';
+import '../foundation/sync.dart';
 import '../framework/framework.dart';
+import '../scheduler/binding.dart';
 
 const jasprDebugMode = bool.fromEnvironment('jaspr.debug');
 
@@ -25,7 +28,7 @@ void runApp(Component app, {String attachTo = 'body'}) {
 /// Same as [runApp] but returns an instance of [ServerApp] to control aspects of the http server
 ServerApp runServer(Component app, {String attachTo = 'body'}) {
   return ServerApp.run(() {
-    ServerComponentsBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
+    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
   });
 }
 
@@ -309,29 +312,27 @@ class HtmlRenderMessage extends RenderMessage {
 
 /// Runs the app and returns the rendered html
 void renderHtml(HtmlRenderMessage message) async {
-  ServerComponentsBinding._requestUri = message.requestUri;
+  AppBinding._requestUri = message.requestUri;
   message.setup();
-  var html = await (ComponentsBinding.instance as ServerComponentsBinding).render(message.html);
+  var html = await AppBinding.ensureInitialized().render(message.html);
   message.sendPort.send(html);
 }
 
 /// Runs the app and returns the preloaded state data as json
 void renderData(RenderMessage message) async {
-  ServerComponentsBinding._requestUri = message.requestUri;
+  AppBinding._requestUri = message.requestUri;
   message.setup();
-  var data = await (ComponentsBinding.instance as ServerComponentsBinding).data();
+  var data = await AppBinding.ensureInitialized().data();
   message.sendPort.send(data);
 }
 
 /// Global component binding for the server
-class ServerComponentsBinding extends ComponentsBinding {
-  ServerComponentsBinding();
-
-  static ComponentsBinding ensureInitialized() {
+class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, SchedulerBinding {
+  static AppBinding ensureInitialized() {
     if (ComponentsBinding.instance == null) {
-      ServerComponentsBinding();
+      AppBinding();
     }
-    return ComponentsBinding.instance!;
+    return ComponentsBinding.instance! as AppBinding;
   }
 
   static late Uri _requestUri;
@@ -343,13 +344,16 @@ class ServerComponentsBinding extends ComponentsBinding {
   @override
   bool get isClient => false;
 
+  final rootCompleter = Completer.sync();
+
   @override
   void didAttachRootElement(BuildScheduler element, {required String to}) {
     _targetId = to;
+    rootCompleter.complete();
   }
 
   Future<String> render(String rawHtml) async {
-    await firstBuild;
+    await rootCompleter.future;
 
     var document = parse(rawHtml);
     var appElement = document.querySelector(_targetId!)!;
@@ -360,7 +364,7 @@ class ServerComponentsBinding extends ComponentsBinding {
   }
 
   Future<String> data() async {
-    await firstBuild;
+    await rootCompleter.future;
     return jsonEncode(getStateData());
   }
 
@@ -374,4 +378,9 @@ class ServerComponentsBinding extends ComponentsBinding {
 
   @override
   void updateRawState(String id, dynamic state) {}
+
+  @override
+  void scheduleBuild() {
+    throw UnsupportedError('Scheduling a build is not supported on the server, and should never happen.');
+  }
 }

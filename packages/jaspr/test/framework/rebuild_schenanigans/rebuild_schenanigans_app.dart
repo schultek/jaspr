@@ -49,7 +49,7 @@ class ChildComponentState extends State<ChildComponent> with TrackStateLifecycle
     var parent = context.findAncestorStateOfType<ParentComponentState>()!;
 
     if (shouldTrigger) {
-      parent.triggerRebuild();
+      //parent.triggerRebuild();
     }
 
     yield DomComponent(

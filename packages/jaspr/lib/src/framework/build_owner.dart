@@ -3,9 +3,13 @@ part of framework;
 class BuildOwner {
   final List<Element> _dirtyElements = <Element>[];
 
-  Future? _scheduledBuild;
+  bool _scheduledBuild = false;
 
   BuildScheduler? _schedulerContext;
+
+  // ignore: prefer_final_fields
+  bool _isFirstBuild = false;
+  bool get isFirstBuild => _isFirstBuild;
 
   final _InactiveElements _inactiveElements = _InactiveElements();
 
@@ -18,21 +22,18 @@ class BuildOwner {
   /// the widget tree.
   bool? _dirtyElementsNeedsResorting;
 
-  /// Whether this widget tree is in the build phase.
-  ///
-  /// Only valid when asserts are enabled.
-  bool get debugBuilding => _debugBuilding;
-  bool _debugBuilding = false;
-
   void scheduleBuildFor(Element element) {
-    assert(!ComponentsBinding.instance!.isFirstBuild);
+    assert(!isFirstBuild);
     assert(element.dirty, 'scheduleBuildFor() called for a widget that is not marked as dirty.');
 
     if (element._inDirtyList) {
       _dirtyElementsNeedsResorting = true;
       return;
     }
-    _scheduledBuild ??= Future(performBuild);
+    if (!_scheduledBuild) {
+      SchedulerBinding.instance!.scheduleBuild();
+      _scheduledBuild = true;
+    }
     if (_schedulerContext == null || element._scheduler!.depth < _schedulerContext!.depth) {
       _schedulerContext = element._scheduler;
     }
@@ -41,33 +42,91 @@ class BuildOwner {
     element._inDirtyList = true;
   }
 
+  /// Whether this widget tree is in the build phase.
+  ///
+  /// Only valid when asserts are enabled.
+  bool get debugBuilding => _debugBuilding;
+  bool _debugBuilding = false;
+  Element? _debugCurrentBuildTarget;
+
+  int _debugStateLockLevel = 0;
+  bool get _debugStateLocked => _debugStateLockLevel > 0;
+
+  /// Establishes a scope in which calls to [State.setState] are forbidden, and
+  /// calls the given `callback`.
+  ///
+  /// This mechanism is used to ensure that, for instance, [State.dispose] does
+  /// not call [State.setState].
+  Future<void> lockState(VoidCallback callback) async {
+    assert(_debugStateLockLevel >= 0);
+    assert(() {
+      _debugStateLockLevel += 1;
+      return true;
+    }());
+    try {
+      var res = callback() as dynamic;
+      if (res is Future) {
+        await res;
+      }
+    } finally {
+      assert(() {
+        _debugStateLockLevel -= 1;
+        return true;
+      }());
+    }
+    assert(_debugStateLockLevel >= 0);
+  }
+
   /// Rebuilds [child] and correctly accounts for any asynchronous operations that can
   /// occur during the initial build of the app.
   /// We want the component and element apis to stay synchronous, so this delays
   /// the execution of [child.performRebuild()] instead of calling it directly.
-  void performRebuildOn(Element? child, [void Function()? whenComplete]) {
-    var asyncFirstBuild = child?._asyncFirstBuild;
+  void performRebuildOn(Element child, void Function() whenComplete) {
+    var asyncFirstBuild = child._asyncFirstBuild;
     if (asyncFirstBuild is Future) {
-      assert(ComponentsBinding.instance!.isFirstBuild, 'Only the first build is allowed to be asynchronous.');
-      ComponentsBinding.instance!._initialBuildQueue.add(asyncFirstBuild);
+      assert(isFirstBuild, 'Only the first build is allowed to be asynchronous.');
+      var buildCompleter = Completer.sync()..future.whenComplete(whenComplete);
+      child._asyncFirstBuild = buildCompleter.future;
       asyncFirstBuild.whenComplete(() {
-        child?.performRebuild();
-        ComponentsBinding.instance!._initialBuildQueue.remove(asyncFirstBuild);
-        whenComplete?.call();
+        child.performRebuild();
+        _waitChildren(child, buildCompleter);
       });
     } else {
-      child?.performRebuild();
-      whenComplete?.call();
+      child.performRebuild();
+      var buildCompleter = Completer.sync()..future.whenComplete(whenComplete);
+
+      _waitChildren(child, buildCompleter);
+      if (!buildCompleter.isCompleted) {
+        child._asyncFirstBuild = buildCompleter.future;
+      }
+    }
+  }
+
+  void _waitChildren(Element child, Completer buildCompleter) {
+    var remaining = 0;
+    child.visitChildren((element) {
+      if (element._asyncFirstBuild is Future) {
+        remaining++;
+        element._asyncFirstBuild!.whenComplete(() {
+          remaining--;
+          if (remaining == 0) buildCompleter.complete();
+        });
+      }
+    });
+    if (remaining == 0) {
+      buildCompleter.complete();
     }
   }
 
   void performBuild() {
-    assert(!ComponentsBinding.instance!.isFirstBuild);
+    assert(!isFirstBuild);
 
+    assert(_debugStateLockLevel >= 0);
     assert(_schedulerContext != null);
     assert(!_debugBuilding);
 
     assert(() {
+      _debugStateLockLevel += 1;
       _debugBuilding = true;
       return true;
     }());
@@ -122,15 +181,29 @@ class BuildOwner {
       _schedulerContext!.view.update();
       _schedulerContext = null;
 
-      _inactiveElements._unmountAll();
+      lockState(_inactiveElements._unmountAll);
 
-      _scheduledBuild = null;
+      _scheduledBuild = false;
 
       assert(_debugBuilding);
       assert(() {
         _debugBuilding = false;
+        _debugStateLockLevel -= 1;
         return true;
       }());
+    }
+    assert(_debugStateLockLevel >= 0);
+  }
+
+  final Map<GlobalKey, Element> _globalKeyRegistry = {};
+
+  void _registerGlobalKey(GlobalKey key, Element element) {
+    _globalKeyRegistry[key] = element;
+  }
+
+  void _unregisterGlobalKey(GlobalKey key, Element element) {
+    if (_globalKeyRegistry[key] == element) {
+      _globalKeyRegistry.remove(key);
     }
   }
 }
