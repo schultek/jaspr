@@ -75,6 +75,53 @@ class TabBarElement extends StatelessElement {
   }
 }
 
+class ButtonTab extends Tab {
+  ButtonTab({required this.icon, String? label, required this.onPressed}) : super(label: label ?? '');
+
+  final String icon;
+  final VoidCallback onPressed;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield DomComponent(
+      tag: 'button',
+      classes: ['mdc-tab'],
+      events: {'click': (e) => onPressed()},
+      attributes: {
+        'role': 'tab',
+        'tabindex': '0',
+      },
+      styles: {'padding': '0 16px'},
+      children: [
+        DomComponent(
+          tag: 'span',
+          classes: ['mdc-tab__content'],
+          children: [
+            DomComponent(
+              tag: 'span',
+              classes: ['mdc-tab__text-label'],
+              styles: {'display': 'inline-flex', 'align-items': 'center'},
+              children: [
+                DomComponent(
+                  tag: 'i',
+                  classes: ['material-icons', 'mdc-tab__icon'],
+                  styles: {'font-size': '20px', if (label.isNotEmpty) 'margin-right': '4px'},
+                  child: Text(icon),
+                ),
+                Text(label),
+              ],
+            ),
+          ],
+        ),
+        DomComponent(
+          tag: 'span',
+          classes: ['mdc-tab__ripple'],
+        ),
+      ],
+    );
+  }
+}
+
 class Tab extends StatelessComponent {
   Tab({required this.label, Key? key}) : super(key: key ?? ValueKey('tab-$label'));
 

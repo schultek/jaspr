@@ -8,28 +8,32 @@ class ProjectData {
   final String? id;
   final String? description;
 
-  final String htmlFile;
-  final String cssFile;
+  final String? htmlFile;
+  final String? cssFile;
   final String mainDartFile;
   final Map<String, String> dartFiles;
 
   ProjectData({
     this.id,
     this.description,
-    required this.htmlFile,
-    required this.cssFile,
+    this.htmlFile,
+    this.cssFile,
     required this.mainDartFile,
     this.dartFiles = const {},
   });
 
   factory ProjectData.fromGist(GistData gist) {
     var htmlFile = gist.files['index.html'];
-    if (htmlFile == null) throw 'Missing index.html file';
-    if (htmlFile.type != 'text/html') throw 'index.html has wrong type "${htmlFile.type}"';
+    if (htmlFile != null && htmlFile.type != 'text/html') {
+      print('[WARNING] index.html has wrong type "${htmlFile.type}"');
+      htmlFile = null;
+    }
 
     var cssFile = gist.files['styles.css'];
-    if (cssFile == null) throw 'Missing styles.css file';
-    if (cssFile.type != 'text/css') throw 'styles.css has wrong type "${cssFile.type}"';
+    if (cssFile != null && cssFile.type != 'text/css') {
+      print('[WARNING] styles.css has wrong type "${cssFile.type}"');
+      cssFile = null;
+    }
 
     var dartFile = gist.files['main.dart'];
     if (dartFile == null) throw 'Missing main.dart file';
@@ -42,14 +46,15 @@ class ProjectData {
     return ProjectData(
       id: gist.id,
       description: gist.description,
-      htmlFile: htmlFile.content,
-      cssFile: cssFile.content,
+      htmlFile: htmlFile?.content,
+      cssFile: cssFile?.content,
       mainDartFile: dartFile.content,
       dartFiles: dartFiles,
     );
   }
 
-  List<String> get fileNames => ['main.dart', ...dartFiles.keys, 'index.html', 'styles.css'];
+  List<String> get fileNames =>
+      ['main.dart', ...dartFiles.keys, if (htmlFile != null) 'index.html', if (cssFile != null) 'styles.css'];
 
   Map<String, String> get allDartFiles => {'main.dart': mainDartFile, ...dartFiles};
 
@@ -63,17 +68,19 @@ class ProjectData {
     );
   }
 
-  ProjectData updateContent(String key, String content) {
+  ProjectData updateContent(String key, String? content) {
     return switchFile(
       key,
       onMain: () => copyWith(mainDartFile: content),
       onHtml: () => copyWith(htmlFile: content),
       onCss: () => copyWith(cssFile: content),
-      onDart: () => copyWith(dartFiles: {...dartFiles, key: content}),
+      onDart: () => copyWith(
+          dartFiles: content != null ? {...dartFiles, key: content} : {...dartFiles}
+            ..remove(key)),
     );
   }
 
-  T switchFile<T>(
+  static T switchFile<T>(
     String key, {
     required T Function() onMain,
     required T Function() onHtml,
@@ -94,5 +101,9 @@ class ProjectData {
 
   bool isDart(String key) {
     return key == 'main.dart' || dartFiles.keys.contains(key);
+  }
+
+  static bool canDelete(String key) {
+    return switchFile(key, onMain: () => false, onHtml: () => true, onCss: () => true, onDart: () => true);
   }
 }

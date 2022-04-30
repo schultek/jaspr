@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
+import '../elements/dialog.dart';
 import 'footer.dart';
 import 'header.dart';
 import 'main.dart';
@@ -12,5 +13,6 @@ class Playground extends StatelessComponent {
     yield PlaygroundHeader();
     yield MainSection();
     yield PlaygroundFooter();
+    yield DialogSlot(slotId: 'dialog');
   }
 }

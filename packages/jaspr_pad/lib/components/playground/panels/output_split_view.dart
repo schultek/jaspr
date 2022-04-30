@@ -113,7 +113,7 @@ class EditorTabs extends StatelessComponent {
                     }
                   },
                   child: Text('close'),
-                )
+                ),
               ],
             ),
           ],

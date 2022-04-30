@@ -21,7 +21,7 @@ abstract class ComponentsBinding {
   bool get isClient;
 
   /// Sets [app] as the new root of the component tree and performs an initial build
-  void attachRootComponent(Component app, {required String to}) {
+  void attachRootComponent(Component app, {required String attachTo}) {
     var element = _Root(child: app).createElement();
     element._root = this;
 
@@ -31,7 +31,7 @@ abstract class ComponentsBinding {
     element.mount(null);
     _rootElement = element;
 
-    didAttachRootElement(element, to: to);
+    didAttachRootElement(element, to: attachTo);
 
     _initialBuildQueue.remove(syncBuildLock);
   }

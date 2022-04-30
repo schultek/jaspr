@@ -8,6 +8,8 @@ import '../../providers/project_provider.dart';
 import '../../providers/samples_provider.dart';
 import '../elements/button.dart';
 import '../elements/menu.dart';
+import 'dialogs/new_pad_dialog.dart';
+import 'dialogs/reset_dialog.dart';
 
 class PlaygroundHeader extends StatelessComponent {
   const PlaygroundHeader({Key? key}) : super(key: key);
@@ -48,16 +50,22 @@ class PlaygroundHeader extends StatelessComponent {
           id: 'jnew-button',
           label: 'New Pad',
           icon: 'code',
-          onPressed: () {
-            context.read(logicProvider).newPad();
+          onPressed: () async {
+            var result = await NewPadDialog.show(context);
+            if (result == true) {
+              context.read(logicProvider).newPad();
+            }
           },
         ),
         Button(
           id: 'reset-button',
           label: 'Reset',
           icon: 'refresh',
-          onPressed: () {
-            context.read(logicProvider).refresh();
+          onPressed: () async {
+            var result = await ResetDialog.show(context);
+            if (result == true) {
+              context.read(logicProvider).refresh();
+            }
           },
         ),
         Button(

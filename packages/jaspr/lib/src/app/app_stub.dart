@@ -1,4 +1,6 @@
 import '../framework/framework.dart';
 
 /// Main entry point for the app
-void runApp(Component Function() setup, {required String id}) {}
+///
+/// TODO: Add hint about usage of global variables and isolate state
+void runApp(Component app, {String attachTo = 'body'}) {}

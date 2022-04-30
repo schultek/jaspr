@@ -4,7 +4,7 @@ import 'package:jaspr/jaspr.dart';
 import 'api.dart';
 
 void main() {
-  runApp(() => App(), id: 'app');
+  runApp(App());
 }
 
 class App extends StatefulComponent {

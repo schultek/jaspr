@@ -18,7 +18,7 @@ void main() {
     }
 
     setUp(() async {
-      tester = await ServerTester.setUp(App.new, middleware: [testMiddleware]);
+      tester = await ServerTester.setUp(App(), middleware: [testMiddleware]);
     });
 
     tearDown(() async {

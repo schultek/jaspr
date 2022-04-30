@@ -37,7 +37,7 @@ class BrowserTester {
   static void tearDown() {}
 
   Future<void> pumpComponent(Component component) {
-    binding.attachRootComponent(component, to: _id);
+    binding.attachRootComponent(component, attachTo: _id);
     return binding.firstBuild;
   }
 
@@ -119,9 +119,9 @@ class TestBrowserComponentsBinding extends BrowserComponentsBinding {
   Future<void> get firstBuild => _rootViewCompleter!.future;
 
   @override
-  void attachRootComponent(Component app, {required String to}) {
+  void attachRootComponent(Component app, {required String attachTo}) {
     _rootViewCompleter = Completer();
-    super.attachRootComponent(app, to: to);
+    super.attachRootComponent(app, attachTo: attachTo);
   }
 
   @override

@@ -79,26 +79,20 @@ ProjectData createDefaultProject() {
   return ProjectData(
     id: 'basic',
     description: 'jaspr_basic',
-    htmlFile: '<div id="app"></div>',
     cssFile: 'html, body {\n'
         '  display: flex;\n'
         '  justify-content: center;\n'
         '  align-items: center;\n'
         '  height: 100%;\n'
-        '}\n\n'
-        'div {\n'
         '  color: white;\n'
         '  font-family: sans-serif;\n'
         '}',
     mainDartFile: "import 'package:jaspr/jaspr.dart';\n\n"
         "void main() {\n"
-        "  runApp(\n"
-        "    () => DomComponent(\n"
-        "      tag: 'h1',\n"
-        "      child: Text('Hello World!'),\n"
-        "    ),\n "
-        "    id: 'app',\n"
-        "  );\n"
+        "  runApp(DomComponent(\n"
+        "    tag: 'h1',\n"
+        "    child: Text('Hello World!'),\n"
+        "  ));\n"
         "}",
   );
 }

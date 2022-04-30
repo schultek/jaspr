@@ -15,24 +15,30 @@ import 'package:shelf_static/shelf_static.dart';
 
 import '../framework/framework.dart';
 
-typedef SetupFunction = Component Function();
-
 const jasprDebugMode = bool.fromEnvironment('jaspr.debug');
 
 /// Main entry point on the server
-ServerApp runApp(SetupFunction setup, {required String id}) {
-  return ServerApp.start(setup, id);
+void runApp(Component app, {String attachTo = 'body'}) {
+  runServer(app, attachTo: attachTo);
 }
+
+/// Same as [runApp] but returns an instance of [ServerApp] to control aspects of the http server
+ServerApp runServer(Component app, {String attachTo = 'body'}) {
+  return ServerApp.run(() {
+    ServerComponentsBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
+  });
+}
+
+typedef SetupFunction = void Function();
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
 class ServerApp {
-  ServerApp._(this._setup, this.id, [this._fileHandler]);
+  ServerApp._(this._setup, [this._fileHandler]);
 
-  factory ServerApp.start(SetupFunction setup, String id, [Handler? fileHandler]) {
-    return ServerApp._(setup, id, fileHandler).._run();
+  factory ServerApp.run(SetupFunction setup, [Handler? fileHandler]) {
+    return ServerApp._(setup, fileHandler).._run();
   }
 
-  final String id;
   final SetupFunction _setup;
 
   final Handler? _fileHandler;
@@ -258,7 +264,7 @@ Future<HttpServer> _createServer(ServerApp app, Handler fileHandler) async {
     return app._builder!.call(handler);
   } else {
     var port = int.parse(Platform.environment['PORT'] ?? '8080');
-    return shelf_io.serve(handler, InternetAddress.anyIPv4, port);
+    return shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true);
   }
 }
 
@@ -269,7 +275,7 @@ Future<Response> renderApp(ServerApp app, Request request, Response fileResponse
   /// We support two modes here, rendered-html and data-only
   /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
   if (request.headers['jaspr-mode'] == 'data-only') {
-    var message = RenderMessage(app._setup, request.requestedUri, app.id, port.sendPort);
+    var message = RenderMessage(app._setup, request.requestedUri, port.sendPort);
 
     await Isolate.spawn(renderData, message);
     var result = await port.first;
@@ -277,7 +283,7 @@ Future<Response> renderApp(ServerApp app, Request request, Response fileResponse
     return Response.ok(result, headers: {'Content-Type': 'application/json'});
   } else {
     var indexHtml = await fileResponse.readAsString();
-    var message = HtmlRenderMessage(app._setup, request.requestedUri, app.id, port.sendPort, indexHtml);
+    var message = HtmlRenderMessage(app._setup, request.requestedUri, port.sendPort, indexHtml);
 
     await Isolate.spawn(renderHtml, message);
     var result = await port.first;
@@ -287,41 +293,50 @@ Future<Response> renderApp(ServerApp app, Request request, Response fileResponse
 }
 
 class RenderMessage {
-  String id;
   SetupFunction setup;
   Uri requestUri;
   SendPort sendPort;
 
-  RenderMessage(this.setup, this.requestUri, this.id, this.sendPort);
+  RenderMessage(this.setup, this.requestUri, this.sendPort);
 }
 
 class HtmlRenderMessage extends RenderMessage {
   String html;
 
-  HtmlRenderMessage(SetupFunction setup, Uri requestUri, String id, SendPort sendPort, this.html)
-      : super(setup, requestUri, id, sendPort);
+  HtmlRenderMessage(SetupFunction setup, Uri requestUri, SendPort sendPort, this.html)
+      : super(setup, requestUri, sendPort);
 }
 
 /// Runs the app and returns the rendered html
 void renderHtml(HtmlRenderMessage message) async {
-  var app = message.setup();
-  var binding = ServerComponentsBinding(message.requestUri)..attachRootComponent(app, to: message.id);
-  message.sendPort.send(await binding.render(message.html));
+  ServerComponentsBinding._requestUri = message.requestUri;
+  message.setup();
+  var html = await (ComponentsBinding.instance as ServerComponentsBinding).render(message.html);
+  message.sendPort.send(html);
 }
 
 /// Runs the app and returns the preloaded state data as json
 void renderData(RenderMessage message) async {
-  var app = message.setup();
-  var binding = ServerComponentsBinding(message.requestUri)..attachRootComponent(app, to: message.id);
-  message.sendPort.send(await binding.data());
+  ServerComponentsBinding._requestUri = message.requestUri;
+  message.setup();
+  var data = await (ComponentsBinding.instance as ServerComponentsBinding).data();
+  message.sendPort.send(data);
 }
 
 /// Global component binding for the server
 class ServerComponentsBinding extends ComponentsBinding {
-  ServerComponentsBinding(this.currentUri);
+  ServerComponentsBinding();
 
+  static ComponentsBinding ensureInitialized() {
+    if (ComponentsBinding.instance == null) {
+      ServerComponentsBinding();
+    }
+    return ComponentsBinding.instance!;
+  }
+
+  static late Uri _requestUri;
   @override
-  final Uri currentUri;
+  Uri get currentUri => _requestUri;
 
   String? _targetId;
 
@@ -337,7 +352,7 @@ class ServerComponentsBinding extends ComponentsBinding {
     await firstBuild;
 
     var document = parse(rawHtml);
-    var appElement = document.getElementById(_targetId!)!;
+    var appElement = document.querySelector(_targetId!)!;
     appElement.innerHtml = renderMarkup(builderFn: rootElement!.render);
 
     document.body!.attributes['state-data'] = stateCodec.encode(getStateData());

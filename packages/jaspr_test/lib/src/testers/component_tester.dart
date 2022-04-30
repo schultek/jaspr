@@ -25,7 +25,7 @@ class ComponentTester {
   }
 
   Future<void> pumpComponent(Component component) {
-    binding.attachRootComponent(component, to: binding._id);
+    binding.attachRootComponent(component, attachTo: binding._id);
     return binding.firstBuild;
   }
 
@@ -107,9 +107,9 @@ class TestComponentsBinding extends ComponentsBinding {
   Future<void> get firstBuild => _rootViewCompleter!.future;
 
   @override
-  void attachRootComponent(Component app, {required String to}) {
+  void attachRootComponent(Component app, {required String attachTo}) {
     _rootViewCompleter = Completer();
-    super.attachRootComponent(app, to: to);
+    super.attachRootComponent(app, attachTo: attachTo);
   }
 
   @override

@@ -7,7 +7,7 @@ void main() {
     late ServerTester tester;
 
     setUp(() async {
-      tester = await ServerTester.setUp(App.new);
+      tester = await ServerTester.setUp(App());
     });
 
     tearDown(() async {

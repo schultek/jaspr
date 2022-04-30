@@ -3,13 +3,21 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as path;
 
 void main(List<String> args) async {
   var runner = CommandRunner<int>("jaspr", "An experimental web framework for dart apps, supporting SPA and SSR.")
     ..addCommand(CreateCommand())
     ..addCommand(ServeCommand())
     ..addCommand(BuildCommand());
+
+  var n = 0;
+  ProcessSignal.sigint.watch().listen((signal) {
+    print(" caught ${++n} of 3");
+    if (n == 3) {
+      exit(0);
+    }
+  });
 
   try {
     var result = await runner.run(args);
@@ -41,14 +49,14 @@ class CreateCommand extends Command<int> {
       return usageException('Specify a target directory.');
     }
 
-    var path = argResults!.rest.first;
+    var targetPath = argResults!.rest.first;
 
-    var directory = Directory(path);
-    var dir = basename(path);
+    var directory = Directory(targetPath);
+    var dir = path.basename(targetPath);
     var name = dir.replaceAll('-', '_');
 
     if (await directory.exists()) {
-      return usageException('Directory $path already exists.');
+      return usageException('Directory $targetPath already exists.');
     }
 
     var process = await Process.start('dart', ['create', '-t', 'web-simple', '--no-pub', directory.absolute.path]);
@@ -57,10 +65,10 @@ class CreateCommand extends Command<int> {
 
     await maybeExit(process.exitCode);
 
-    var webMain = File(join(directory.absolute.path, 'web/main.dart'));
-    var pubspecFile = File(join(directory.absolute.path, 'pubspec.yaml'));
-    var libMain = File(join(directory.absolute.path, 'lib/main.dart'));
-    var appDart = File(join(directory.absolute.path, 'lib/app.dart'));
+    var webMain = File(path.join(directory.absolute.path, 'web/main.dart'));
+    var pubspecFile = File(path.join(directory.absolute.path, 'pubspec.yaml'));
+    var libMain = File(path.join(directory.absolute.path, 'lib/main.dart'));
+    var appDart = File(path.join(directory.absolute.path, 'lib/app.dart'));
 
     await Future.wait([
       webMain.writeAsString(mainFileContent('package:$name')),

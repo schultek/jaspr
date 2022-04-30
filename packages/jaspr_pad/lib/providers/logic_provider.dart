@@ -98,4 +98,12 @@ class Logic {
 
     element.remove();
   }
+
+  void addNewFile(String result) {
+    ref.read(editProjectProvider.notifier).update((proj) => proj?.updateContent(result, ''));
+  }
+
+  void deleteFile(String key) {
+    ref.read(editProjectProvider.notifier).update((proj) => proj?.updateContent(key, null));
+  }
 }

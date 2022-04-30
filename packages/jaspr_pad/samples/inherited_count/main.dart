@@ -2,7 +2,7 @@
 import 'package:jaspr/jaspr.dart';
 
 void main() {
-  runApp(() => App(), id: 'app');
+  runApp(App());
 }
 
 class InheritedCount extends InheritedComponent {

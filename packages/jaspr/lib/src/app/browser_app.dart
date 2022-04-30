@@ -7,8 +7,8 @@ import 'package:domino/browser.dart' hide DomComponent;
 import '../framework/framework.dart';
 
 /// Main entry point for the browser app
-void runApp(Component Function() setup, {required String id}) {
-  BrowserComponentsBinding.ensureInitialized().attachRootComponent(setup(), to: id);
+void runApp(Component app, {String attachTo = 'body'}) {
+  BrowserComponentsBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
 }
 
 /// Global component binding for the browser
@@ -31,7 +31,7 @@ class BrowserComponentsBinding extends ComponentsBinding {
   Future<void> didAttachRootElement(BuildScheduler element, {required String to}) async {
     await firstBuild;
     element.view = registerView(
-      root: document.getElementById(to)!,
+      root: document.querySelector(to)!,
       builderFn: element.render,
     );
   }

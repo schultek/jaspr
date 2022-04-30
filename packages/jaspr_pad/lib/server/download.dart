@@ -36,14 +36,14 @@ class ZipProjectEncoder {
       'project_name': project.id ?? 'jaspr_app',
       'project_description': project.description ?? 'Simple jaspr project',
       'project_title': project.description ?? 'Jaspr',
-      'project_html': project.htmlFile.indent('    '),
+      'project_html': project.htmlFile?.indent('    ') ?? '',
     };
 
     await addFromFile('pubspec.yaml', replacements);
     await addFromFile('web/main.dart', replacements);
     await addFromFile('web/index.html', replacements);
 
-    addFromSource('web/styles.css', project.cssFile);
+    addFromSource('web/styles.css', project.cssFile ?? '');
     addFromSource('lib/main.dart', project.mainDartFile);
 
     for (var file in project.dartFiles.keys) {

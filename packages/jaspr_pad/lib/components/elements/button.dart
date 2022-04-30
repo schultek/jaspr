@@ -6,25 +6,27 @@ enum IconAffinity { left, right }
 
 class Button extends StatelessComponent {
   const Button(
-      {required this.id,
+      {this.id,
       required this.label,
-      required this.icon,
+      this.icon,
       required this.onPressed,
       this.raised = false,
       this.dense = false,
       this.disabled = false,
       this.hideIcon = false,
+      this.dialog = false,
       this.iconAffinity = IconAffinity.left,
       Key? key})
       : super(key: key);
 
-  final String id;
+  final String? id;
   final String label;
-  final String icon;
+  final String? icon;
   final bool raised;
   final bool dense;
   final bool disabled;
   final bool hideIcon;
+  final bool dialog;
   final IconAffinity iconAffinity;
   final VoidCallback onPressed;
 
@@ -32,7 +34,12 @@ class Button extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'button',
-      classes: ['mdc-button', if (raised) 'mdc-button--raised', if (dense) 'mdc-button--dense'],
+      classes: [
+        'mdc-button',
+        if (raised) 'mdc-button--raised',
+        if (dense) 'mdc-button--dense',
+        if (dialog) 'mdc-dialog__button'
+      ],
       id: id,
       attributes: {'type': 'button', if (disabled) 'disabled': ''},
       events: {'click': (e) => onPressed()},
@@ -43,12 +50,13 @@ class Button extends StatelessComponent {
             classes: ['mdc-button__label'],
             child: Text(label),
           ),
-        DomComponent(
-          tag: 'i',
-          classes: ['material-icons mdc-button__icon'],
-          attributes: {if (hideIcon) 'aria-hidden': 'true'},
-          child: Text(icon),
-        ),
+        if (icon != null)
+          DomComponent(
+            tag: 'i',
+            classes: ['material-icons mdc-button__icon'],
+            attributes: {if (hideIcon) 'aria-hidden': 'true'},
+            child: Text(icon!),
+          ),
         if (iconAffinity == IconAffinity.left) Text(label),
       ],
     );

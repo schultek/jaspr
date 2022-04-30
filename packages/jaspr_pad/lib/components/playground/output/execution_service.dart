@@ -45,8 +45,8 @@ class ExecutionService {
   }
 
   Future<void> execute(
-    String html,
-    String css,
+    String? html,
+    String? css,
     String javaScript, {
     String? modulesBaseUrl,
     bool addRequireJs = false,
@@ -54,8 +54,8 @@ class ExecutionService {
     bool destroyFrame = false,
   }) async {
     return _send('execute', {
-      'html': html,
-      'css': css,
+      'html': html ?? '',
+      'css': css ?? '',
       'js': _decorateJavaScript(javaScript, modulesBaseUrl: modulesBaseUrl, requireFirebase: addFirebaseJs),
       'addRequireJs': addRequireJs,
       'addFirebaseJs': addFirebaseJs,

@@ -41,6 +41,26 @@ class BuildOwner {
     element._inDirtyList = true;
   }
 
+  /// Rebuilds [child] and correctly accounts for any asynchronous operations that can
+  /// occur during the initial build of the app.
+  /// We want the component and element apis to stay synchronous, so this delays
+  /// the execution of [child.performRebuild()] instead of calling it directly.
+  void performRebuildOn(Element? child, [void Function()? whenComplete]) {
+    var asyncFirstBuild = child?._asyncFirstBuild;
+    if (asyncFirstBuild is Future) {
+      assert(ComponentsBinding.instance!.isFirstBuild, 'Only the first build is allowed to be asynchronous.');
+      ComponentsBinding.instance!._initialBuildQueue.add(asyncFirstBuild);
+      asyncFirstBuild.whenComplete(() {
+        child?.performRebuild();
+        ComponentsBinding.instance!._initialBuildQueue.remove(asyncFirstBuild);
+        whenComplete?.call();
+      });
+    } else {
+      child?.performRebuild();
+      whenComplete?.call();
+    }
+  }
+
   void performBuild() {
     assert(!ComponentsBinding.instance!.isFirstBuild);
 

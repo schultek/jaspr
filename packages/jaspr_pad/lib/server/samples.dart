@@ -73,7 +73,6 @@ Future<Response> getSample(Request request, String id) async {
       } else if (name.endsWith('.dart')) {
         dartFiles[name] = await read();
       } else if (name == 'workshop.yaml') {
-
       } else {
         print('[WARNING] Unsupported file $name in sample $id');
       }
@@ -81,17 +80,13 @@ Future<Response> getSample(Request request, String id) async {
 
     if (dart == null) {
       result = SampleResponse(null, 'Missing main.dart in sample $id');
-    } else if (html == null) {
-      result = SampleResponse(null, 'Missing index.html in sample $id');
-    } else if (css == null) {
-      result = SampleResponse(null, 'Missing styles.css in sample $id');
     } else {
       result = SampleResponse(
         ProjectData(
           id: id,
           description: description,
-          htmlFile: html!,
-          cssFile: css!,
+          htmlFile: html,
+          cssFile: css,
           mainDartFile: dart!,
           dartFiles: dartFiles,
         ),

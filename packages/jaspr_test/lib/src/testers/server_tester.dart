@@ -34,10 +34,14 @@ class DataResponse {
 class ServerTester {
   ServerTester._();
 
-  static Future<ServerTester> setUp(SetupFunction setup,
-      {String id = 'app', String? html, bool virtual = true, List<Middleware>? middleware}) async {
+  static Future<ServerTester> setUp(Component app,
+      {String attachTo = 'body',
+      SetupFunction? beforeRender,
+      String? html,
+      bool virtual = true,
+      List<Middleware>? middleware}) async {
     var tester = ServerTester._();
-    await tester._start(setup, id, html, virtual, middleware);
+    await tester._start(app, attachTo, beforeRender, html, virtual, middleware);
     return tester;
   }
 
@@ -49,7 +53,8 @@ class ServerTester {
   Handler? _handler;
   http.Client? _client;
 
-  Future<void> _start(SetupFunction setup, String id, String? html, bool virtual, List<Middleware>? middleware) async {
+  Future<void> _start(Component comp, String id, SetupFunction? beforeRender, String? html, bool virtual,
+      List<Middleware>? middleware) async {
     var _html = html ?? '<html><head></head><body><div id="$id"></div></body></html>';
 
     fileHandler(Request request) {
@@ -61,7 +66,9 @@ class ServerTester {
     }
 
     var appCompleter = Completer();
-    app = ServerApp.start(setup, id, fileHandler)
+    app = ServerApp.run(() {
+      ServerComponentsBinding.ensureInitialized().attachRootComponent(comp, attachTo: id);
+    }, fileHandler)
       ..setListener((server) {
         if (!appCompleter.isCompleted) appCompleter.complete();
       });

@@ -2,6 +2,79 @@
 // Generated with jaspr_web_builder
 // ignore_for_file: annotate_overrides, non_constant_identifier_names, unused_element, avoid_renaming_method_parameters
 
+class MDCTextField {
+  void destroy() => throw UnimplementedError('destroy');
+  void listen(String type, dynamic Function(Event) handler, {bool captureThis = false}) =>
+      throw UnimplementedError('listen');
+  void unlisten(String type, dynamic Function(Event) handler, {bool captureThis = false}) =>
+      throw UnimplementedError('unlisten');
+  void emit(String type, dynamic data, [bool shouldBubble = false]) => throw UnimplementedError('emit');
+  dynamic get js => throw UnimplementedError('js');
+  dynamic get root => throw UnimplementedError('root');
+  dynamic get foundation => throw UnimplementedError('foundation');
+  MDCRipple get ripple => throw UnimplementedError('ripple');
+  static MDCTextField attachTo(dynamic root) => throw UnimplementedError('attachTo');
+  void layout() => throw UnimplementedError('layout');
+  String? get value => throw UnimplementedError('value');
+  set value(String? _) => throw UnimplementedError('value=');
+  bool? get disabled => throw UnimplementedError('disabled');
+  set disabled(bool? _) => throw UnimplementedError('disabled=');
+  set useNativeValidation(bool _) => throw UnimplementedError('useNativeValidation=');
+  set helperTextContent(String _) => throw UnimplementedError('helperTextContent=');
+  set leadingIconAriaLabel(String _) => throw UnimplementedError('leadingIconAriaLabel=');
+  set trailingIconAriaLabel(String _) => throw UnimplementedError('trailingIconAriaLabel=');
+  set leadingIconContent(String _) => throw UnimplementedError('leadingIconContent=');
+  set trailingIconContent(String _) => throw UnimplementedError('trailingIconContent=');
+  set ripple(MDCRipple _) => throw UnimplementedError('ripple=');
+  bool? get valid => throw UnimplementedError('valid');
+  set valid(bool? _) => throw UnimplementedError('valid=');
+  bool? get required => throw UnimplementedError('required');
+  set required(bool? _) => throw UnimplementedError('required=');
+  int? get minLength => throw UnimplementedError('minLength');
+  set minLength(int? _) => throw UnimplementedError('minLength=');
+  int? get maxLength => throw UnimplementedError('maxLength');
+  set maxLength(int? _) => throw UnimplementedError('maxLength=');
+  String? get min => throw UnimplementedError('min');
+  set min(String? _) => throw UnimplementedError('min=');
+  String? get max => throw UnimplementedError('max');
+  set max(String? _) => throw UnimplementedError('max=');
+  String? get step => throw UnimplementedError('step');
+  set step(String? _) => throw UnimplementedError('step=');
+  String? get pattern => throw UnimplementedError('pattern');
+  set pattern(String? _) => throw UnimplementedError('pattern=');
+  factory MDCTextField._attach(dynamic root) => throw UnimplementedError('_attach');
+  factory MDCTextField(dynamic root, [dynamic foundation, dynamic args]) => throw UnimplementedError('');
+}
+
+class MDCDialog {
+  void destroy() => throw UnimplementedError('destroy');
+  void listen(String type, dynamic Function(Event) handler, {bool captureThis = false}) =>
+      throw UnimplementedError('listen');
+  void unlisten(String type, dynamic Function(Event) handler, {bool captureThis = false}) =>
+      throw UnimplementedError('unlisten');
+  void emit(String type, dynamic data, [bool shouldBubble = false]) => throw UnimplementedError('emit');
+  dynamic get js => throw UnimplementedError('js');
+  dynamic get root => throw UnimplementedError('root');
+  dynamic get foundation => throw UnimplementedError('foundation');
+  static MDCDialog attachTo(dynamic root) => throw UnimplementedError('attachTo');
+  void layout() => throw UnimplementedError('layout');
+  void open() => throw UnimplementedError('open');
+  void close([String? action]) => throw UnimplementedError('close');
+  static String get openingEvent => throw UnimplementedError('openingEvent');
+  static String get openedEvent => throw UnimplementedError('openedEvent');
+  static String get closingEvent => throw UnimplementedError('closingEvent');
+  static String get closedEvent => throw UnimplementedError('closedEvent');
+  bool get isOpen => throw UnimplementedError('isOpen');
+  String? get escapeKeyAction => throw UnimplementedError('escapeKeyAction');
+  set escapeKeyAction(String? _) => throw UnimplementedError('escapeKeyAction=');
+  String? get scrimClickAction => throw UnimplementedError('scrimClickAction');
+  set scrimClickAction(String? _) => throw UnimplementedError('scrimClickAction=');
+  bool? get autoStackButtons => throw UnimplementedError('autoStackButtons');
+  set autoStackButtons(bool? _) => throw UnimplementedError('autoStackButtons=');
+  factory MDCDialog._attach(dynamic root) => throw UnimplementedError('_attach');
+  factory MDCDialog(dynamic root, [dynamic foundation, dynamic args]) => throw UnimplementedError('');
+}
+
 class AnchorCorner extends Object {
   static int get topLeft => throw UnimplementedError('topLeft');
   static int get topRight => throw UnimplementedError('topRight');

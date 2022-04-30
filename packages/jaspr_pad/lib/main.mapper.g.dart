@@ -143,7 +143,7 @@ class ProjectDataMapper extends BaseMapper<ProjectData> {
 
   @override Function get decoder => decode;
   ProjectData decode(dynamic v) => checked(v, (Map<String, dynamic> map) => fromMap(map));
-  ProjectData fromMap(Map<String, dynamic> map) => ProjectData(id: Mapper.i.$getOpt(map, 'id'), description: Mapper.i.$getOpt(map, 'description'), htmlFile: Mapper.i.$get(map, 'htmlFile'), cssFile: Mapper.i.$get(map, 'cssFile'), mainDartFile: Mapper.i.$get(map, 'mainDartFile'), dartFiles: Mapper.i.$getOpt(map, 'dartFiles') ?? const {});
+  ProjectData fromMap(Map<String, dynamic> map) => ProjectData(id: Mapper.i.$getOpt(map, 'id'), description: Mapper.i.$getOpt(map, 'description'), htmlFile: Mapper.i.$getOpt(map, 'htmlFile'), cssFile: Mapper.i.$getOpt(map, 'cssFile'), mainDartFile: Mapper.i.$get(map, 'mainDartFile'), dartFiles: Mapper.i.$getOpt(map, 'dartFiles') ?? const {});
 
   @override Function get encoder => (ProjectData v) => encode(v);
   dynamic encode(ProjectData v) => toMap(v);
@@ -171,7 +171,7 @@ abstract class ProjectDataCopyWith<$R> {
 class _ProjectDataCopyWithImpl<$R> extends BaseCopyWith<ProjectData, $R> implements ProjectDataCopyWith<$R> {
   _ProjectDataCopyWithImpl(ProjectData value, Then<ProjectData, $R> then) : super(value, then);
 
-  @override $R call({Object? id = $none, Object? description = $none, String? htmlFile, String? cssFile, String? mainDartFile, Map<String, String>? dartFiles}) => $then(ProjectData(id: or(id, $value.id), description: or(description, $value.description), htmlFile: htmlFile ?? $value.htmlFile, cssFile: cssFile ?? $value.cssFile, mainDartFile: mainDartFile ?? $value.mainDartFile, dartFiles: dartFiles ?? $value.dartFiles));
+  @override $R call({Object? id = $none, Object? description = $none, Object? htmlFile = $none, Object? cssFile = $none, String? mainDartFile, Map<String, String>? dartFiles}) => $then(ProjectData(id: or(id, $value.id), description: or(description, $value.description), htmlFile: or(htmlFile, $value.htmlFile), cssFile: or(cssFile, $value.cssFile), mainDartFile: mainDartFile ?? $value.mainDartFile, dartFiles: dartFiles ?? $value.dartFiles));
 }
 
 class GistDataMapper extends BaseMapper<GistData> {

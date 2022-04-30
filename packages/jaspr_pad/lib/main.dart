@@ -7,11 +7,11 @@ import 'server/samples.dart';
 import 'server/server_api.dart';
 
 void main() {
-  runApp(() {
+  runServer(Builder.single(builder: (context) {
     return App(providerOverrides: [
       samplesProvider.overrideWithProvider(loadSamplesProvider),
     ]);
-  }, id: 'playground')
+  }))
     ..addMiddleware(logRequests())
     ..addMiddleware((handler) {
       var router = Router(notFoundHandler: handler);

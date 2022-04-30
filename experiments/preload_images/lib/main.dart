@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/server.dart';
 
 import 'app.dart';
 import 'services/service.dart';
@@ -31,11 +31,9 @@ class ServerImageService implements ImageService {
 }
 
 void main() {
-  runApp(() {
+  runServer(Builder.single(builder: (context) {
     // create a service instance
     ImageService.instance = ServerImageService();
-
-    // provide an entry component and an id to attach it to
     return App();
-  }, id: 'app');
+  }));
 }

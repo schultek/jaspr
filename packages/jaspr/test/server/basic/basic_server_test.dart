@@ -8,9 +8,9 @@ void main() {
 
         setUp(() async {
           tester = await ServerTester.setUp(
-            () {
+            App(),
+            beforeRender: () {
               Counter.initialValue = 101;
-              return App();
             },
             virtual: virtual,
           );
