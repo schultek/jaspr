@@ -100,14 +100,20 @@ class TestComponentsBinding extends BindingBase with ComponentsBinding, SyncBind
   @override
   bool get isClient => _isClient;
 
+  late final dom.Document _document;
+
   @override
   void didAttachRootElement(BuildScheduler element, {required String to}) async {
-    var document = parse(_html ?? '<html><head></head><body></body></html>');
+    _document = parse(_html ?? '<html><head></head><body></body></html>');
+    element.view = registerView(_document.querySelector(to)!, element.render);
+  }
 
-    element.view = registerView(
-      document: document,
-      root: document.querySelector(to)!,
-      builderFn: element.render,
+  @override
+  DomView registerView(dom.Element root, DomBuilderFn builderFn) {
+    return registerTestView(
+      document: _document,
+      root: root,
+      builderFn: builderFn,
     );
   }
 

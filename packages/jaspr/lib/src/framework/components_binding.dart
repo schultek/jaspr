@@ -52,12 +52,17 @@ mixin ComponentsBinding on BindingBase {
   /// This is initialized the first time [runApp] is called.
   SingleChildElement? get rootElement => _rootElement;
   SingleChildElement? _rootElement;
+
+  DomView registerView(covariant dynamic root, DomBuilderFn builderFn);
 }
 
 /// In difference to Flutter, we have multiple build schedulers instead of one global build owner
 /// Particularly each dom element is a build scheduler and manages its subtree of components
 mixin BuildScheduler on Element {
   DomView? _view;
+
+  // ignore: prefer_final_fields
+  bool _willUpdate = false;
 
   DomView get view => _view!;
   set view(DomView v) {

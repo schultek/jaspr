@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 
-import 'package:domino/browser.dart' hide DomComponent;
+import 'package:domino/browser.dart' as domino;
 
 import '../foundation/binding.dart';
 import '../foundation/sync.dart';
@@ -34,10 +34,12 @@ class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, Schedu
 
   @override
   void didAttachRootElement(BuildScheduler element, {required String to}) {
-    element.view = registerView(
-      root: document.querySelector(to)!,
-      builderFn: element.render,
-    );
+    element.view = registerView(document.querySelector(to)!, element.render);
+  }
+
+  @override
+  DomView registerView(dynamic root, DomBuilderFn builderFn) {
+    return domino.registerView(root: root, builderFn: builderFn);
   }
 
   @override

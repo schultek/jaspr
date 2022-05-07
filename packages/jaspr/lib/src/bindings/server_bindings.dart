@@ -380,7 +380,23 @@ class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, Schedu
   void updateRawState(String id, dynamic state) {}
 
   @override
+  DomView registerView(dynamic root, DomBuilderFn builderFn) {
+    return NullDomView();
+  }
+
+  @override
   void scheduleBuild() {
     throw UnsupportedError('Scheduling a build is not supported on the server, and should never happen.');
   }
+}
+
+class NullDomView implements DomView {
+  @override
+  Future<void>? dispose() => null;
+
+  @override
+  Future<void>? invalidate() => null;
+
+  @override
+  void update() {}
 }

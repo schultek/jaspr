@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:html' as html;
 
-import 'package:domino/browser.dart' as domino;
+import 'package:domino/browser.dart' show registerView;
 import 'package:jaspr/browser.dart';
 
 import '../../jaspr_test.dart';
@@ -110,10 +110,7 @@ class TestBrowserComponentsBinding extends AppBinding {
 
   @override
   void didAttachRootElement(BuildScheduler element, {required String to}) {
-    element.view = domino.registerView(
-      root: html.document.querySelector(to)!,
-      builderFn: element.render,
-    );
+    element.view = registerView(root: html.document.querySelector(to)!, builderFn: element.render);
   }
 
   final Map<String, dynamic> Function(String url)? _onFetchState;

@@ -51,8 +51,6 @@ class Tab extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    var tabs = context.findAncestorStateOfType<_TabsState>()!;
-
     yield DomComponent(
       tag: 'li',
       classes: [if (selected) 'is-active'],

@@ -4,7 +4,7 @@ import 'package:domino/domino.dart';
 import 'package:html/dom.dart';
 
 /// Register DOM view in browser.
-DomView registerView({
+DomView registerTestView({
   required Document document,
   required Element root,
   required DomBuilderFn builderFn,
@@ -217,7 +217,7 @@ class _DomBuilder extends DomBuilder {
   }
 
   @override
-  void close({String? tag}) {
+  Element close({String? tag}) {
     final last = _positions.removeLast();
     if (tag != null && last.tag != tag) {
       throw AssertionError('Tag missmatch: "$tag" != "$last".');
@@ -226,6 +226,8 @@ class _DomBuilder extends DomBuilder {
     while (last.container.nodes.length > last.cursor) {
       _onRemove(last.container.nodes.removeLast());
     }
+
+    return last.container;
   }
 
   void _onRemove(Node removed) {

@@ -10,10 +10,11 @@ import 'dart:convert';
 
 import 'package:domino/domino.dart';
 
-import '../../jaspr.dart';
+import '../../foundation.dart';
 import '../scheduler/binding.dart';
 
-export 'package:domino/domino.dart' show DomBuilder, DomEvent, DomEventFn, DomLifecycleEvent, DomLifecycleEventFn;
+export 'package:domino/domino.dart'
+    show DomBuilder, DomEvent, DomEventFn, DomLifecycleEvent, DomLifecycleEventFn, DomView, DomBuilderFn;
 
 part 'build_context.dart';
 part 'build_owner.dart';

@@ -66,19 +66,12 @@ class DomElement extends MultiChildElement with BuildScheduler {
       styles: component.styles,
       attributes: component.attributes,
       events: component.events?.map((k, v) => MapEntry(k, (e) => v(e.event))),
-      onCreate: (event) {
-        view = event.view;
-        _source = event.source;
-      },
-      onUpdate: (event) {
-        view = event.view;
-        _source = event.source;
-      },
     );
 
     super.render(b);
 
     _source = b.close(tag: component.tag);
+    _view = ComponentsBinding.instance!.registerView(_source, super.render);
   }
 }
 

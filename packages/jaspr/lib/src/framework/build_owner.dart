@@ -5,8 +5,6 @@ class BuildOwner {
 
   bool _scheduledBuild = false;
 
-  BuildScheduler? _schedulerContext;
-
   // ignore: prefer_final_fields
   bool _isFirstBuild = false;
   bool get isFirstBuild => _isFirstBuild;
@@ -35,13 +33,9 @@ class BuildOwner {
       _scheduledBuild = true;
     }
 
-    if (_schedulerContext == null || element._scheduler!.depth < _schedulerContext!.depth) {
-      // TODO check for sibling schedulers, currently ok because always root is rerendered
-      _schedulerContext = element._scheduler;
-    }
-
     _dirtyElements.add(element);
     element._inDirtyList = true;
+    element._scheduler!._willUpdate = true;
   }
 
   /// Whether this widget tree is in the build phase.
@@ -124,7 +118,6 @@ class BuildOwner {
     assert(!isFirstBuild);
 
     assert(_debugStateLockLevel >= 0);
-    assert(_schedulerContext != null);
     assert(!_debugBuilding);
 
     assert(() {
@@ -176,12 +169,15 @@ class BuildOwner {
       for (final Element element in _dirtyElements) {
         assert(element._inDirtyList);
         element._inDirtyList = false;
+
+        if (element._scheduler?._willUpdate ?? false) {
+          element._scheduler!.view.update();
+          element._scheduler!._willUpdate = false;
+        }
       }
+
       _dirtyElements.clear();
       _dirtyElementsNeedsResorting = null;
-
-      _schedulerContext!.view.update();
-      _schedulerContext = null;
 
       lockState(_inactiveElements._unmountAll);
 
