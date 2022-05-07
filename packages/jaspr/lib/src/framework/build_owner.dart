@@ -34,7 +34,9 @@ class BuildOwner {
       SchedulerBinding.instance!.scheduleBuild();
       _scheduledBuild = true;
     }
+
     if (_schedulerContext == null || element._scheduler!.depth < _schedulerContext!.depth) {
+      // TODO check for sibling schedulers, currently ok because always root is rerendered
       _schedulerContext = element._scheduler;
     }
 

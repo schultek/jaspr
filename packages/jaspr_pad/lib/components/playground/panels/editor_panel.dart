@@ -24,7 +24,11 @@ class EditorPanelState extends State<EditorPanel> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'div', id: 'editor-panel', children: buildChildren(context).toList());
+    yield DomComponent(
+      tag: 'div',
+      id: 'editor-panel',
+      children: buildChildren(context).toList(),
+    );
   }
 
   Iterable<Component> buildChildren(BuildContext context) sync* {
@@ -32,50 +36,48 @@ class EditorPanelState extends State<EditorPanel> {
       tag: 'div',
       id: 'editor-panel-header',
       classes: ['header'],
-      child: DomComponent(
-        tag: 'nav',
-        styles: {'display': 'flex'},
-        children: [
-          ButtonTab(
-            icon: 'note_add',
-            onPressed: () async {
-              var result = await NewFileDialog.show(context);
-              if (result != null) {
-                context.read(logicProvider).addNewFile(result);
-              }
-            },
-          ),
-          TabBar(
+      children: [
+        DomComponent(
+          tag: 'nav',
+          child: TabBar(
             id: 'web-tab-bar',
             selected: context.watch(activeDocIndexProvider),
             onSelected: (index) {
               context.read(activeDocIndexProvider.notifier).state = index;
             },
+            leading: ButtonTab(
+              icon: 'note_add',
+              onPressed: () async {
+                var result = await NewFileDialog.show(context);
+                if (result != null) {
+                  context.read(logicProvider).addNewFile(result);
+                }
+              },
+            ),
             tabs: [
               for (var fileName in context.watch(fileNamesProvider)) Tab(label: fileName),
             ],
           ),
-        ],
-      ),
-    );
-
-    yield DomComponent(
-      tag: 'div',
-      classes: ['button-group'],
-      children: [
-        Builder(builder: (context) sync* {
-          yield Button(
-            id: 'run-button',
-            dense: true,
-            raised: true,
-            label: 'Run',
-            icon: 'play_arrow',
-            disabled: context.watch(isCompilingProvider),
-            onPressed: () {
-              context.read(logicProvider).compileFiles();
-            },
-          );
-        }),
+        ),
+        DomComponent(
+          tag: 'div',
+          classes: ['button-group'],
+          children: [
+            Builder(builder: (context) sync* {
+              yield Button(
+                id: 'run-button',
+                dense: true,
+                raised: true,
+                label: 'Run',
+                icon: 'play_arrow',
+                disabled: context.watch(isCompilingProvider),
+                onPressed: () {
+                  context.read(logicProvider).compileFiles();
+                },
+              );
+            }),
+          ],
+        ),
       ],
     );
 

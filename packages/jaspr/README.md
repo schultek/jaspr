@@ -1,25 +1,28 @@
 # jaspr
 
-Experimental web framework for Dart. Supports SPAs and SSR. 
+Experimental web framework for Dart. Supports SPAs and SSR.
 
 **Main Features:**
 
 - Familiar component model similar to Flutter widgets
 - Easy Server Side Rendering
 - Automatic hydration of component data on the client
-- Fast incremental DOM updates using [package:domino](https://pub.dev/packages/domino)
-- Well tested (>80% test coverage)
+- Fast incremental DOM updates
+- Well tested (>70% test coverage)
 
 > I'm looking for contributors. Don't hesitate to contact me if you want to help in any way.
 
 ## Outline
 
 - [Get Started](#get-started)
-- [Components](#components)
-- [Preloading Data](#preloading-data)
-- [Syncing Data](#syncing-data)
-- [Routing](#routing)
-  - [Lazy Routes](#lazy-routes)
+- [CLI Tool](#cli-tool)
+- [Framework](#framework)
+  - [Components](#components)
+  - [Differences to Flutter](#differences-to-flutter)
+  - [Preloading Data](#preloading-data)
+  - [Syncing Data](#syncing-data)
+  - [Routing](#routing)
+    - [Lazy Routes](#lazy-routes)
 - [Building](#building)
 - [Testing](#testing)
 
@@ -44,23 +47,88 @@ Also observe that the browser automatically refreshes the page when you change s
 
 **I also highly recommend having a look at the example [here](https://github.com/schultek/jaspr/tree/main/jaspr/example)**
 
-## Components
+## CLI Tool
 
-`jaspr` uses a similar structure to Flutter in building applications. 
-You can define custom stateless or stateful components (not widgets) by overriding the `build()` method, or use inherited components for managing state inside the component tree.
+Jaspr comes with a cli tool to create, serve and build your web app.
 
-Since html rendering works different to flutters painting approach, here are the core aspects and differences of the component model:
+- `jaspr create my_web_app` will create a new jaspr project inside the `my_web_app` directory
+- `jaspr serve` will serve the web-app in the current directory, including hot-reloading
+- `jaspr build` will build the web-app containing the static web assets (compiled js, html, ...) and the server executable
 
-1. The `build()` method returns an `Iterable<Component>` instead of a single component. This is because a html node can always have multiple child nodes.
-   The recommended way of using this is with a **synchronous generator**. Simply use the `sync*` keyword in the method definition and `yield` one or multiple components.
+## Framework
+
+Jaspr was developed with the premise to look and feel just like Flutter. Therefore when you know Flutter
+you probably already know jaspr.
+
+### Components
+
+The core building block of UIs build with jaspr are **Components**. These are just what you know 
+as **Widgets** from Flutter. jaspr comes with all three base types of Components, namely:
+
+- **StatelessComponent**: A basic component that has a single build method.
+- **StatefulComponent**: A component that holds state and can trigger rebuilds using `setState()`.
+- **InheritedComponent**: A component that can notify its dependents when its state changes.
+
+In addition to these base components, there are two more components that don't exist in Flutter:
+
+- **DomComponent**: A component that renders any HTML element given a tag, attributes and events.
+  ```dart
+  var component = DomComponent(
+    tag: 'div',
+    id: 'my-id',
+    classes: ['class-a', 'class-b'],
+    attributes: {'my-attribute': 'my-value'},
+    events: {'click': (e) => print('clicked')},
+    children: [
+      ...
+    ],
+  );
+  ```
+  
+- **Text**: A simple component that renders a text node.
+  `var text = Text('Hello World!');`
+
+
+### Differences to Flutter
+
+As you might know Flutter renders Widgets by manually painting pixels to a canvas. However web-pages
+with HTML work fundamentally different to Flutters painting approach. `jaspr` embraces these differences
+in the following ways:
+
+1. The `build()` method of a `StatelessComponent` or `StatefulComponent` returns an `Iterable<Component>` 
+   instead of a single component. This is because a HTML element can always have multiple child elements.
+   The recommended way of using this is with a **synchronous generator**. Simply use the `sync*` keyword 
+   in the method definition and `yield` one or multiple components:
    
-2. There are two main predefined components that you can use: `DomComponent` and `Text`.
-  - `DomComponent` renders a html element with the given tag. You can also set an id, attributes and events. It also takes a child component.
-  - `Text` renders some raw html text. It receives only a string and nothing else. *You can style it through the parent element(s), as you normally would in html and css*.
-
-3. A `StatefulComponent` supports preloading some data on the server and automatic syncing data with the client. See [Preloading Data](#preloading-data) and [Syncing Data](#syncing-data) on how to use this feature.
+   ```dart
+   class MyComponent extends StatelessComponent {
    
-## Preloading Data
+     @override
+     Iterable<Component> build(BuildContext context) sync* {
+       yield ChildA();
+       yield ChildB();
+     } 
+   }
+   ```
+   
+   *Trade-Off: Returning a single component and having an extra multi-child component would be superficial 
+   to how html works and thereby not a good practice.*
+   
+2. Jaspr does not care about the styling of components. There are (currently) no prestyled components
+   like in Flutters material or cupertino libraries.
+   
+   *Trade-Off: Providing styled components would be a lot of extra work and is currently not feasible.
+    Also there exist a lot of different, well established CSS frameworks for web that you can already
+    integrate and use with jaspr.*
+   
+3. `Text` receives only a `String` and nothing else. As usual for web, styling is done through a combination
+   of CSS attributes, either in a **Stylesheet** or though the **`style` attributes** of the parent elements. 
+   
+   *Trade-Off: Giving `Text` a style option would be superficial and not native to web, and thereby not
+    a good practice.*
+   
+
+### Preloading Data
 
 When using server side rendering, you have the ability to preload data for your stateful components before rendering the html.
 With `jaspr` this is build into the package and easy to do.
@@ -77,7 +145,7 @@ class MyState extends State<MyStatefulComponent> with PreloadStateMixin<MyStatef
 }
 ```
 
-## Syncing Data
+### Syncing Data
 
 Alongside with preloading some data on the server, you often want to sync the data with the client.
 You can simply add the `SyncStateMixin` which will automatically sync state from the server with the client.
@@ -139,7 +207,7 @@ class MyStateModelCodec extends Codec<MyStateModel, Map<String, dynamic>> {
 }
 ```
 
-## Routing
+### Routing
 
 Use can use the `Router` component for some basic routing. It takes a list of `Route`s or 
 optionally a `onGenerateRoute` callback.
@@ -165,7 +233,7 @@ class App extends StatelessComponent {
 
 To push a new route call `Router.of(context).push('/path');` inside your child components. Similarly you can call `.replace()` or `.back()`.
 
-### Lazy Routes
+#### Lazy Routes
 
 For larger web apps, we don't want to load everything together, but rather split our pages into smaller chunks.
 `jaspr` can do this automatically using `LazyRoutes` and deferred imports.

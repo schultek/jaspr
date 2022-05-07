@@ -27,3 +27,27 @@
   font-size: 18px;
   vertical-align: top;
 }
+
+#editor-panel {
+  min-width: 1px;
+}
+
+#editor-panel-header {
+  width: 100%;
+}
+
+#editor-panel-header nav {
+  display: flex;
+  min-width: 1px;
+}
+
+#editor-panel-header .button-group {
+  position: initial;
+  margin-top: 0;
+  margin-right: 12px;
+  margin-left: 12px;
+}
+
+.mdc-tab-scroller__scroll-area {
+  overflow-x: scroll !important;
+}

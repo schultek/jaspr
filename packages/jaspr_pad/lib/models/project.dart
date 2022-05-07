@@ -74,9 +74,7 @@ class ProjectData {
       onMain: () => copyWith(mainDartFile: content),
       onHtml: () => copyWith(htmlFile: content),
       onCss: () => copyWith(cssFile: content),
-      onDart: () => copyWith(
-          dartFiles: content != null ? {...dartFiles, key: content} : {...dartFiles}
-            ..remove(key)),
+      onDart: () => copyWith(dartFiles: content != null ? {...dartFiles, key: content} : ({...dartFiles}..remove(key))),
     );
   }
 

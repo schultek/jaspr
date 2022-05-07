@@ -7,13 +7,15 @@ final tabSelectedProvider = Provider<bool>((ref) => false);
 final tabCallbackProvider = Provider<VoidCallback>((ref) => () {});
 
 class TabBar extends StatelessComponent {
-  const TabBar({required this.id, required this.selected, required this.onSelected, required this.tabs, Key? key})
+  const TabBar(
+      {required this.id, required this.selected, required this.onSelected, required this.tabs, this.leading, Key? key})
       : super(key: key);
 
   final String id;
   final int selected;
   final ValueChanged<int> onSelected;
   final List<Tab> tabs;
+  final Component? leading;
 
   void _select(int tab) {
     onSelected(tab);
@@ -25,6 +27,7 @@ class TabBar extends StatelessComponent {
       tag: 'div',
       id: id,
       classes: ['mdc-tab-bar'],
+      styles: {'min-width': '1px'},
       attributes: {'role': 'tablist'},
       child: DomComponent(
         tag: 'div',
@@ -36,14 +39,16 @@ class TabBar extends StatelessComponent {
             tag: 'div',
             classes: ['mdc-tab-scroller__scroll-content'],
             children: [
+              if (leading != null) leading!,
               for (var i = 0; i < tabs.length; i++)
                 ProviderScope(
-                    key: ValueKey('tab-provider'),
-                    overrides: [
-                      tabSelectedProvider.overrideWithValue(i == selected),
-                      tabCallbackProvider.overrideWithValue(() => _select(i)),
-                    ],
-                    child: tabs[i]),
+                  key: ValueKey('tab-provider'),
+                  overrides: [
+                    tabSelectedProvider.overrideWithValue(i == selected),
+                    tabCallbackProvider.overrideWithValue(() => _select(i)),
+                  ],
+                  child: tabs[i],
+                ),
             ],
           ),
         ),
@@ -67,10 +72,9 @@ class TabBarElement extends StatelessElement {
   void render(DomBuilder b) {
     super.render(b);
 
-    if (kIsWeb) {
-      _tabBar?.destroy();
+    if (kIsWeb && _tabBar == null) {
       var tabBarRoot = (children.first as DomElement).source;
-      _tabBar = MDCTabBar(tabBarRoot)..activateTab(component.selected);
+      _tabBar = MDCTabBar(tabBarRoot)..activateTab(component.selected + (component.leading != null ? 1 : 0));
     }
   }
 }
@@ -110,6 +114,16 @@ class ButtonTab extends Tab {
                 ),
                 Text(label),
               ],
+            ),
+          ],
+        ),
+        DomComponent(
+          tag: 'span',
+          classes: ['mdc-tab-indicator'],
+          children: [
+            DomComponent(
+              tag: 'span',
+              classes: ['mdc-tab-indicator__content', 'mdc-tab-indicator__content--underline'],
             ),
           ],
         ),

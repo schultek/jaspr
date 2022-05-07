@@ -1,39 +1,34 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# jaspr_builder
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+Polyfill builder for integrating js libraries with jaspr.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
+## How to Use
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+First, add `jaspr_builder` as a dev dependency to your project:
 
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
-
-```dart
-const like = 'sample';
+```shell
+dart pub add jaspr_builder --dev
 ```
 
-## Additional information
+Next, create a new file named `<libname>.web.dart` and export any
+element from the targeted js library:
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+> For example purpose, dart:html is used.
+
+```dart
+export 'dart:html' show window, Window, Storage;
+```
+
+The export directive **must** contain an explicit **show** constraint.
+
+Finally run code generation:
+```shell
+dart run build_runner build
+```
+
+This will generate two files:
+
+- `<libname>.stub.dart` contains interface-stubs for all the exported elements
+- `<libname>.dart` combines the stub and web file with conditional imports
+
+In you project, you should the only import the `<libname>.dart` file.
