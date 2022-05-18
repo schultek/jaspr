@@ -32,8 +32,8 @@ class PlaygroundHeader extends StatelessComponent {
           tag: 'img',
           classes: ['logo'],
           attributes: {
-            'src': "https://dartpad.dev/dart-192.png",
-            'alt': "DartPad Logo",
+            'src': "jaspr-192.png",
+            'alt': "JasprPad Logo",
           },
         ),
         DomComponent(
