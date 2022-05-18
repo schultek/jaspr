@@ -1,6 +1,8 @@
 name: Jaspr Tutorial
 steps:
+  - name: Introduction
+    id: intro
   - name: Hello World
-    id: step_01
-  - name: Test step
-    id: step_02
+    id: hello
+  - name: Coming Soon
+    id: more

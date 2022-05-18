@@ -66,6 +66,7 @@ final loadedProjectProvider = Provider<AsyncValue<ProjectData>>((ref) {
   if (!kIsWeb) {
     return AsyncValue.loading(); // Don't load on server
   }
+
   var storedProject = ref.read(storedProjectProvider);
   if (storedProject != null) {
     return AsyncValue.data(storedProject);

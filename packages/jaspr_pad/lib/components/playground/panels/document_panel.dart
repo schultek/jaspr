@@ -1,8 +1,5 @@
-import 'dart:convert' as convert;
-
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
-import 'package:markdown/markdown.dart' as markdown;
 
 import '../../../models/api_models.dart';
 import '../../../providers/docu_provider.dart';
@@ -50,7 +47,7 @@ class __DocumentHintMarkdownState extends State<_DocumentHintMarkdown> {
     yield DomComponent(
       tag: 'p',
       classes: ['documentation', 'custom-scrollbar'],
-      child: Markdown(markdown: markdown, inlineSyntaxes: [InlineBracketsColon(), InlineBrackets()]),
+      child: Markdown(markdown: markdown),
     );
   }
 
@@ -98,38 +95,5 @@ $apiLink\n\n''';
     }
 
     return libraryName;
-  }
-}
-
-class InlineBracketsColon extends markdown.InlineSyntax {
-  InlineBracketsColon() : super(r'\[:\s?((?:.|\n)*?)\s?:\]');
-
-  String htmlEscape(String text) => convert.htmlEscape.convert(text);
-
-  @override
-  bool onMatch(markdown.InlineParser parser, Match match) {
-    final element = markdown.Element.text('code', htmlEscape(match[1]!));
-    parser.addNode(element);
-    return true;
-  }
-}
-
-// TODO: [someCodeReference] should be converted to for example
-// https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:core.someReference
-// for now it gets converted <code>someCodeReference</code>
-class InlineBrackets extends markdown.InlineSyntax {
-  // This matches URL text in the documentation, with a negative filter
-  // to detect if it is followed by a URL to prevent e.g.
-  // [text] (http://www.example.com) getting turned into
-  // <code>text</code> (http://www.example.com)
-  InlineBrackets() : super(r'\[\s?((?:.|\n)*?)\s?\](?!\s?\()');
-
-  String htmlEscape(String text) => convert.htmlEscape.convert(text);
-
-  @override
-  bool onMatch(markdown.InlineParser parser, Match match) {
-    final element = markdown.Element.text('code', '<em>${htmlEscape(match[1]!)}</em>');
-    parser.addNode(element);
-    return true;
   }
 }

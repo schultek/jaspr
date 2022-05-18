@@ -38,7 +38,7 @@ class Logic {
 
   void selectTutorial() async {
     ref.read(storageProvider).remove('project');
-    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=step_01');
+    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=intro');
     ref.refresh(loadedProjectProvider);
   }
 
@@ -62,6 +62,7 @@ class Logic {
     var updated = await changeStep(tut, tut.configs[tut.currentStep - 1].id);
     ref.read(editProjectProvider.notifier).state = updated;
     window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=${updated.step.id}');
+    compileFiles();
   }
 
   void nextTutorialStep() async {
@@ -69,6 +70,7 @@ class Logic {
     var updated = await changeStep(tut, tut.configs[tut.currentStep + 1].id);
     ref.read(editProjectProvider.notifier).state = updated;
     window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=${updated.step.id}');
+    compileFiles();
   }
 
   void selectTutorialStep(String id) async {
@@ -76,10 +78,12 @@ class Logic {
     var updated = await changeStep(tut, id);
     ref.read(editProjectProvider.notifier).state = updated;
     window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=${updated.step.id}');
+    compileFiles();
   }
 
   void toggleSolution() {
     ref.read(editProjectProvider.notifier).update((s) => (s as TutorialData).toggleSolution());
+    compileFiles();
   }
 
   Future<void> formatDartFiles() async {

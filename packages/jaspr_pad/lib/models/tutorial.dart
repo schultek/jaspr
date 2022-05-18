@@ -55,7 +55,6 @@ class TutorialData implements ProjectData {
   ProjectData copy() => copyWith();
 
   static TutorialData fromConfig(TutorialConfig config) {
-    print(Mapper.asString(config));
     return TutorialData(
       config.id,
       config.name,

@@ -1,13 +1,49 @@
+import 'dart:convert' as convert;
+
 import 'package:jaspr/jaspr.dart' hide Element, Text;
 import 'package:markdown/markdown.dart';
 
+import '../../adapters/hljs.dart' as hljs;
+
+class InlineBracketsColon extends InlineSyntax {
+  InlineBracketsColon() : super(r'\[:\s?((?:.|\n)*?)\s?:\]');
+
+  String htmlEscape(String text) => convert.htmlEscape.convert(text);
+
+  @override
+  bool onMatch(InlineParser parser, Match match) {
+    final element = Element.text('code', htmlEscape(match[1]!));
+    parser.addNode(element);
+    return true;
+  }
+}
+
+// TODO: [someCodeReference] should be converted to for example
+// https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:core.someReference
+// for now it gets converted <code>someCodeReference</code>
+class InlineBrackets extends InlineSyntax {
+  // This matches URL text in the documentation, with a negative filter
+  // to detect if it is followed by a URL to prevent e.g.
+  // [text] (http://www.example.com) getting turned into
+  // <code>text</code> (http://www.example.com)
+  InlineBrackets() : super(r'\[\s?((?:.|\n)*?)\s?\](?!\s?\()');
+
+  String htmlEscape(String text) => convert.htmlEscape.convert(text);
+
+  @override
+  bool onMatch(InlineParser parser, Match match) {
+    final element = Element.text('code', '<em>${htmlEscape(match[1]!)}</em>');
+    parser.addNode(element);
+    return true;
+  }
+}
+
 class Markdown extends StatefulComponent {
-  const Markdown({required this.markdown, this.blockSyntaxes, this.inlineSyntaxes, Key? key}) : super(key: key);
+  const Markdown({required this.markdown, this.blockSyntaxes, Key? key}) : super(key: key);
 
   final String markdown;
 
   final Iterable<BlockSyntax>? blockSyntaxes;
-  final Iterable<InlineSyntax>? inlineSyntaxes;
 
   @override
   State<Markdown> createState() => _MarkdownState();
@@ -34,7 +70,7 @@ class _MarkdownState extends State<Markdown> {
   void parseMarkdown() {
     document = Document(
       blockSyntaxes: component.blockSyntaxes,
-      inlineSyntaxes: component.inlineSyntaxes,
+      inlineSyntaxes: [InlineBracketsColon(), InlineBrackets()],
     );
     nodes = document.parseLines(component.markdown.replaceAll('\r\n', '\n').split('\n'));
   }
@@ -53,6 +89,7 @@ class MarkdownRenderer extends CustomRenderComponent {
   @override
   void render(DomBuilder b) {
     MarkdownDomVisitor(b).render(nodes);
+    hljs.highlightAll();
   }
 }
 
@@ -69,9 +106,9 @@ class MarkdownDomVisitor implements NodeVisitor {
 
   @override
   void visitText(Text text) {
-   builder.open('span');
-      builder.innerHtml(text.text);
-      builder.close();
+    builder.open('span');
+    builder.innerHtml(text.text);
+    builder.close();
   }
 
   @override

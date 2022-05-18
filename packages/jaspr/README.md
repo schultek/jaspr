@@ -91,18 +91,22 @@ In addition to these base components, there are two more components that don't e
 
 ### Differences to Flutter
 
-As you might know Flutter renders Widgets by manually painting pixels to a canvas. However web-pages
-with HTML work fundamentally different to Flutters painting approach. `jaspr` embraces these differences
-in the following ways:
+As you might know Flutter renders Widgets by manually painting pixels to a canvas. However rendering web-pages
+with HTML & CSS works fundamentally different to Flutters painting approach. Also Flutter has a vast variety
+of widgets with different purposes and styling, whereas in html you can uniquely style each html element however
+you like.
+
+Instead of trying to mirror every little thing from Flutter, `jaspr` tries to give a general Fluttery feeling
+by matching features where it makes sense without compromising on the unique properties of the web platform.
+Rather it embraces these differences to give the best of both worlds.
 
 1. The `build()` method of a `StatelessComponent` or `StatefulComponent` returns an `Iterable<Component>` 
    instead of a single component. This is because a HTML element can always have multiple child elements.
-   The recommended way of using this is with a **synchronous generator**. Simply use the `sync*` keyword 
-   in the method definition and `yield` one or multiple components:
+   The recommended way of using this is with a [**synchronous generator**](https://dart.dev/guides/language/language-tour#generators). 
+   Simply use the `sync*` keyword in the method definition and `yield` one or multiple components:
    
    ```dart
    class MyComponent extends StatelessComponent {
-   
      @override
      Iterable<Component> build(BuildContext context) sync* {
        yield ChildA();
@@ -119,10 +123,10 @@ in the following ways:
    
    *Trade-Off: Providing styled components would be a lot of extra work and is currently not feasible.
     Also there exist a lot of different, well established CSS frameworks for web that you can already
-    integrate and use with jaspr.*
+    integrate and use with jaspr (e.g. [Bulma](https://jasprpad.schultek.de/?sample=bulma).*
    
 3. `Text` receives only a `String` and nothing else. As usual for web, styling is done through a combination
-   of CSS attributes, either in a **Stylesheet** or though the **`style` attributes** of the parent elements. 
+   of CSS attributes, either in a **Stylesheet** or though the **`style` attribute** of the parent elements. 
    
    *Trade-Off: Giving `Text` a style option would be superficial and not native to web, and thereby not
     a good practice.*

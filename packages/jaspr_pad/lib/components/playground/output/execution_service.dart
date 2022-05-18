@@ -210,12 +210,11 @@ require(["dartpad_main", "dart_sdk"], function(dartpad_main, dart_sdk) {
   Stream<TestResult> get testResults => _testResultsController.stream;
 
   Future<void> _send(String command, Map<String, Object> params) {
-    print("SEND $command");
     final message = {
       'command': command,
       ...params,
     };
-    _frame.contentWindow!.postMessage(message, '*');
+    _frame.contentWindow?.postMessage(message, '*');
     lastCommand = message;
     return Future.value();
   }
@@ -227,7 +226,6 @@ require(["dartpad_main", "dart_sdk"], function(dartpad_main, dart_sdk) {
   void _initListener() {
     window.addEventListener('message', (event) {
       if (event is MessageEvent) {
-        print("GOT MSG $event ${event.data}");
         final data = event.data;
         if (data['sender'] != 'frame') {
           return;
