@@ -92,6 +92,17 @@ class PlaygroundHeader extends StatelessComponent {
       yield DomComponent(tag: 'div', classes: ['header-gist-name'], child: Text(name ?? ''));
     });
 
+    yield Button(
+      dense: true,
+      raised: true,
+      label: 'Tutorial',
+      onPressed: () {
+        context.read(logicProvider).selectTutorial();
+      },
+    );
+
+    yield DomComponent(tag: 'div', styles: {'width': '10px'});
+
     yield SamplesMenuButton();
 
     yield DomComponent(

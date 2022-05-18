@@ -39,7 +39,6 @@ also strong in terms of type-safety and null-safety compared to JS.
 - [x] Write test package and framework tests
 - [x] Add riverpod integration package
 - [x] Add jasprpad as online playground with samples
-- [ ] Adapt rendering process to make it more js-y
 - [ ] Add tutorials to jasprpad
 - [ ] Add documentation in readme files
 - [ ] Add website

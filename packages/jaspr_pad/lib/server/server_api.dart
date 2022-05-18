@@ -8,6 +8,7 @@ import 'analyzer.dart';
 import 'compiler.dart';
 import 'download.dart';
 import 'samples.dart';
+import 'tutorial.dart';
 
 Handler get apiRouter {
   var router = Router();
@@ -20,6 +21,7 @@ Handler get apiRouter {
   router.post('/format', mappedHandler(analyzer.format));
   router.post('/document', mappedHandler(analyzer.document));
   router.get('/sample/<id>', getSample);
+  router.get('/tutorial/<stepId>', getTutorial);
   router.get('/download', downloadProject);
 
   return router;

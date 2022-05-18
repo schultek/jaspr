@@ -106,6 +106,17 @@ class ServeCommand extends Command<int> {
       abbr: 'i',
       help: 'Specify the input file for the web app.',
     );
+    argParser.addOption(
+      'mode',
+      abbr: 'm',
+      help: 'Sets the reload/refresh mode.',
+      allowed: ['reload', 'refresh'],
+      allowedHelp: {
+        'reload': 'Reloads js modules without server reload (loses current state)',
+        'refresh': 'Performs a full page refresh and server reload',
+      },
+      defaultsTo: 'reload',
+    );
     argParser.addFlag(
       'debug',
       abbr: 'd',
@@ -123,7 +134,13 @@ class ServeCommand extends Command<int> {
 
   @override
   Future<int> run() async {
-    var webProcess = await _runWebdev(['serve', '--auto=refresh', 'web:5467', '--', '--delete-conflicting-outputs']);
+    var webProcess = await _runWebdev([
+      'serve',
+      '--auto=${argResults!['mode'] == 'reload' ? 'restart' : 'refresh'}',
+      'web:5467',
+      '--',
+      '--delete-conflicting-outputs'
+    ]);
 
     print("Starting jaspr development server...");
 
@@ -154,7 +171,13 @@ class ServeCommand extends Command<int> {
 
     await buildCompleted.stream.first;
 
-    var args = ['run', '--enable-vm-service', '--enable-asserts', '-Djaspr.debug=true'];
+    var args = [
+      'run',
+      '--enable-vm-service',
+      '--enable-asserts',
+      '-Djaspr.debug=true',
+      '-Djaspr.hotreload=true',
+    ];
 
     if (argResults!['debug']) {
       args.add('--pause-isolates-on-start');

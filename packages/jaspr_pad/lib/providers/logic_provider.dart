@@ -5,6 +5,7 @@ import '../adapters/html.dart';
 import '../components/playground/output/execution_service.dart';
 import '../main.mapper.g.dart';
 import '../models/sample.dart';
+import '../models/tutorial.dart';
 import 'dart_service_provider.dart';
 import 'docu_provider.dart';
 import 'edit_provider.dart';
@@ -33,6 +34,52 @@ class Logic {
     ref.read(storageProvider).remove('project');
     window.history.pushState(null, 'JasprPad', window.location.origin + '?sample=${data.id}');
     ref.refresh(loadedProjectProvider);
+  }
+
+  void selectTutorial() async {
+    ref.read(storageProvider).remove('project');
+    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=step_01');
+    ref.refresh(loadedProjectProvider);
+  }
+
+  Future<TutorialData> changeStep(TutorialData tutorial, String newId) async {
+    var newStep = tutorial.configs.indexWhere((c) => c.id == newId);
+    if (tutorial.steps[newId] != null) {
+      return tutorial.copyWith(currentStep: newStep);
+    } else {
+      var project = await ref.read(dartServiceProvider).getTutorial(newId);
+      if (project.tutorial != null) {
+        return tutorial
+            .copyWith(currentStep: newStep, steps: {...tutorial.steps, newId: project.tutorial!.initialStep});
+      } else {
+        throw project.error!;
+      }
+    }
+  }
+
+  void prevTutorialStep() async {
+    var tut = ref.read(editProjectProvider) as TutorialData;
+    var updated = await changeStep(tut, tut.configs[tut.currentStep - 1].id);
+    ref.read(editProjectProvider.notifier).state = updated;
+    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=${updated.step.id}');
+  }
+
+  void nextTutorialStep() async {
+    var tut = ref.read(editProjectProvider) as TutorialData;
+    var updated = await changeStep(tut, tut.configs[tut.currentStep + 1].id);
+    ref.read(editProjectProvider.notifier).state = updated;
+    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=${updated.step.id}');
+  }
+
+  void selectTutorialStep(String id) async {
+    var tut = ref.read(editProjectProvider) as TutorialData;
+    var updated = await changeStep(tut, id);
+    ref.read(editProjectProvider.notifier).state = updated;
+    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=${updated.step.id}');
+  }
+
+  void toggleSolution() {
+    ref.read(editProjectProvider.notifier).update((s) => (s as TutorialData).toggleSolution());
   }
 
   Future<void> formatDartFiles() async {

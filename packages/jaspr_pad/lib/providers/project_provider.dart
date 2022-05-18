@@ -7,9 +7,10 @@ import '../components/elements/snackbar.dart';
 import '../main.mapper.g.dart';
 import '../models/gist.dart';
 import '../models/project.dart';
+import '../models/tutorial.dart';
 import 'dart_service_provider.dart';
 
-final fetchedProjectProvider = FutureProvider.family((ref, String id) async {
+final fetchedGistProvider = FutureProvider.family((ref, String id) async {
   try {
     var response = await http.get(Uri.parse('https://api.github.com/gists/$id'));
     if (response.statusCode == 404) throw 'Gist does not exist';
@@ -37,6 +38,20 @@ final fetchedSampleProvider = FutureProvider.family((ref, String id) async {
   }
 });
 
+final fetchedTutorialProvider = FutureProvider.family((ref, String id) async {
+  try {
+    var project = await ref.read(dartServiceProvider).getTutorial(id);
+    if (project.tutorial != null) {
+      return TutorialData.fromConfig(project.tutorial!);
+    } else {
+      throw project.error!;
+    }
+  } catch (e) {
+    ref.read(snackBarProvider.notifier).state = 'Error loading tutorial $id: $e.';
+    return null;
+  }
+});
+
 final storageProvider = Provider((ref) => window.localStorage);
 
 final storedProjectProvider = Provider.autoDispose((ref) {
@@ -58,22 +73,27 @@ final loadedProjectProvider = Provider<AsyncValue<ProjectData>>((ref) {
     var uri = ComponentsBinding.instance!.currentUri;
     var gistId = uri.queryParameters['gist'];
     var sampleId = uri.queryParameters['sample'];
+    var tutorialId = uri.queryParameters['tutorial'];
 
     AsyncValue<ProjectData?> project;
 
     if (gistId != null) {
-      project = ref.watch(fetchedProjectProvider(gistId));
+      project = ref.watch(fetchedGistProvider(gistId));
     } else if (sampleId != null) {
       project = ref.watch(fetchedSampleProvider(sampleId));
+    } else if (tutorialId != null) {
+      project = ref.watch(fetchedTutorialProvider(tutorialId));
     } else {
       project = AsyncValue.data(createDefaultProject());
     }
 
-    return project.whenData((project) => project?.copyWith() ?? createDefaultProject());
+    return project.whenData((project) => project?.copy() ?? createDefaultProject());
   }
 });
 
 final projectNameProvider = Provider<String?>((ref) => ref.watch(loadedProjectProvider).value?.description);
+
+final isTutorialProvider = Provider((ref) => ref.watch(loadedProjectProvider.select((l) => l.value is TutorialData)));
 
 ProjectData createDefaultProject() {
   return ProjectData(

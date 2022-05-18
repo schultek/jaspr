@@ -19,6 +19,7 @@ import '../framework/framework.dart';
 import '../scheduler/binding.dart';
 
 const jasprDebugMode = bool.fromEnvironment('jaspr.debug');
+const jasprHotreload = bool.fromEnvironment('jaspr.hotreload');
 
 /// Main entry point on the server
 void runApp(Component app, {String attachTo = 'body'}) {
@@ -103,7 +104,7 @@ class ServerApp {
 
       cascade = cascade.add(fileHandler).add(proxyRootIndexHandler(fileHandler));
 
-      if (jasprDebugMode) {
+      if (jasprHotreload) {
         await _reload(this, () => _createServer(this, cascade.handler));
       } else {
         _server = await _createServer(this, cascade.handler);
@@ -380,7 +381,7 @@ class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, Schedu
   void updateRawState(String id, dynamic state) {}
 
   @override
-  DomView registerView(dynamic root, DomBuilderFn builderFn) {
+  DomView registerView(dynamic root, DomBuilderFn builderFn, bool initialRender) {
     return NullDomView();
   }
 

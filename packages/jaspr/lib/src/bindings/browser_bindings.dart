@@ -34,12 +34,12 @@ class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, Schedu
 
   @override
   void didAttachRootElement(BuildScheduler element, {required String to}) {
-    element.view = registerView(document.querySelector(to)!, element.render);
+    element.view = registerView(document.querySelector(to)!, element.render, true);
   }
 
   @override
-  DomView registerView(dynamic root, DomBuilderFn builderFn) {
-    return domino.registerView(root: root, builderFn: builderFn);
+  DomView registerView(dynamic root, DomBuilderFn builderFn, bool initialRender) {
+    return domino.registerView(root: root, builderFn: builderFn, skipInitialUpdate: !initialRender);
   }
 
   @override

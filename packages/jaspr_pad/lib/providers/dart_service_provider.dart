@@ -5,6 +5,7 @@ import '../adapters/html.dart';
 import '../main.mapper.g.dart';
 import '../models/api_models.dart';
 import '../models/sample.dart';
+import '../models/tutorial.dart';
 
 final dartServiceProvider = Provider((ref) => DartService(ref));
 
@@ -24,6 +25,7 @@ class DartService {
       _request('document', DocumentRequest(sources, name, offset));
 
   Future<SampleResponse> getSample(String id) => _get('sample/$id');
+  Future<TutorialResponse> getTutorial(String id) => _get('tutorial/$id');
 
   Future<T> _get<T>(String path) async {
     var response = await client.get(Uri.parse('${window.location.origin}/api/$path'));

@@ -1,5 +1,7 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
+import '../../../providers/project_provider.dart';
 import '../output/execution_iframe.dart';
 
 class OutputPanel extends StatelessComponent {
@@ -7,8 +9,13 @@ class OutputPanel extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'div', id: 'output-panel', children: [
-      ExecutionIFrame(),
-    ]);
+    var isTutorial = context.watch(isTutorialProvider);
+
+    yield DomComponent(
+      tag: 'div',
+      id: 'output-panel',
+      styles: {if (isTutorial) 'width': 'auto'},
+      child: ExecutionIFrame(),
+    );
   }
 }

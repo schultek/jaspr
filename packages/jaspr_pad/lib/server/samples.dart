@@ -5,7 +5,6 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:path/path.dart' as path;
 
 import '../main.mapper.g.dart';
-import '../models/project.dart';
 import '../models/sample.dart';
 import '../providers/utils.dart';
 import 'project.dart';
@@ -38,61 +37,14 @@ class SampleConfig {
 }
 
 Future<Response> getSample(Request request, String id) async {
-  var description = id;
-  String? html, css, dart;
-  Map<String, String> dartFiles = {};
-
-  var dir = Directory(path.join(samplesPath, id));
-
   SampleResponse result;
 
-  if (!(await dir.exists())) {
+  try {
+    result = SampleResponse(await loadProjectFromDirectory(id, path.join(samplesPath, id)), null);
+  } on DirectoryNotFoundException {
     result = SampleResponse(null, 'Sample with id $id does not exist');
-  } else {
-    var files = await dir.list().toList();
-
-    await Future.wait(files.map((file) async {
-      if ((await file.stat()).type == FileSystemEntityType.directory) {
-        return;
-      }
-
-      var name = path.basename(file.path);
-      Future<String> read() => File(file.path).readAsString();
-
-      if (name == 'main.dart') {
-        dart = await read();
-        var config = SampleConfig.from(dart!);
-        if (config != null) {
-          description = config.description;
-          dart = config.source;
-        }
-      } else if (name == 'index.html') {
-        html = await read();
-      } else if (name == 'styles.css') {
-        css = await read();
-      } else if (name.endsWith('.dart')) {
-        dartFiles[name] = await read();
-      } else if (name == 'workshop.yaml') {
-      } else {
-        print('[WARNING] Unsupported file $name in sample $id');
-      }
-    }));
-
-    if (dart == null) {
-      result = SampleResponse(null, 'Missing main.dart in sample $id');
-    } else {
-      result = SampleResponse(
-        ProjectData(
-          id: id,
-          description: description,
-          htmlFile: html,
-          cssFile: css,
-          mainDartFile: dart!,
-          dartFiles: dartFiles,
-        ),
-        null,
-      );
-    }
+  } on MainDartFileMissingException {
+    result = SampleResponse(null, 'Missing main.dart in sample $id');
   }
 
   return Response.ok(Mapper.toJson(result), headers: {'Content-Type': 'application/json'});
@@ -119,6 +71,8 @@ final loadSamplesProvider = Provider<List<Sample>>((ref) {
           description = config.description;
           index = config.index;
         }
+      } else {
+        return null;
       }
 
       return Sample(id, description, index);

@@ -26,16 +26,22 @@ class ExecutionIFrame extends StatelessComponent {
 class ExecutionIFrameElement extends StatelessElement {
   ExecutionIFrameElement(ExecutionIFrame component) : super(component);
 
+  dynamic element;
+
   @override
   void render(DomBuilder b) {
-    super.render(b);
+    if (element == null) {
+      super.render(b);
 
-    if (kIsWeb) {
-      var element = (children.first as DomElement).source;
-      var iframe = read(iframeProvider);
-      if (iframe == null || iframe != element) {
-        read(iframeProvider.notifier).state = element;
+      if (kIsWeb) {
+        element = (children.first as DomElement).source;
+        var iframe = read(iframeProvider);
+        if (iframe == null || iframe != element) {
+          read(iframeProvider.notifier).state = element;
+        }
       }
+    } else {
+      b.skipRemainingNodes();
     }
   }
 }

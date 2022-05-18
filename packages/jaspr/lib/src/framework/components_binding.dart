@@ -53,7 +53,7 @@ mixin ComponentsBinding on BindingBase {
   SingleChildElement? get rootElement => _rootElement;
   SingleChildElement? _rootElement;
 
-  DomView registerView(covariant dynamic root, DomBuilderFn builderFn);
+  DomView registerView(covariant dynamic root, DomBuilderFn builderFn, bool initialRender);
 }
 
 /// In difference to Flutter, we have multiple build schedulers instead of one global build owner
@@ -67,6 +67,12 @@ mixin BuildScheduler on Element {
   DomView get view => _view!;
   set view(DomView v) {
     _view = v;
+  }
+
+  @override
+  void render(DomBuilder b) {
+    _willUpdate = false;
+    super.render(b);
   }
 }
 

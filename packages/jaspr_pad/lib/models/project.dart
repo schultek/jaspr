@@ -3,7 +3,7 @@ import 'package:dart_mappable/dart_mappable.dart';
 import '../main.mapper.g.dart';
 import 'gist.dart';
 
-@MappableClass()
+@MappableClass(discriminatorKey: 'type')
 class ProjectData {
   final String? id;
   final String? description;
@@ -57,6 +57,8 @@ class ProjectData {
       ['main.dart', ...dartFiles.keys, if (htmlFile != null) 'index.html', if (cssFile != null) 'styles.css'];
 
   Map<String, String> get allDartFiles => {'main.dart': mainDartFile, ...dartFiles};
+
+  ProjectData copy() => copyWith();
 
   String? fileContentFor(String key) {
     return switchFile(

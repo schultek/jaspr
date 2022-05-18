@@ -35,6 +35,8 @@ class ExecutionService {
   IFrameElement get frame => _frame;
   final Completer<void> _readyCompleter = Completer();
 
+  Map<String, Object>? lastCommand;
+
   ExecutionService(this._frame, this.ref) {
     final src = _frame.src;
     if (src == null) {
@@ -208,17 +210,24 @@ require(["dartpad_main", "dart_sdk"], function(dartpad_main, dart_sdk) {
   Stream<TestResult> get testResults => _testResultsController.stream;
 
   Future<void> _send(String command, Map<String, Object> params) {
+    print("SEND $command");
     final message = {
       'command': command,
       ...params,
     };
     _frame.contentWindow!.postMessage(message, '*');
+    lastCommand = message;
     return Future.value();
+  }
+
+  void replayLastCommand() {
+    _frame.contentWindow!.postMessage(lastCommand, '*');
   }
 
   void _initListener() {
     window.addEventListener('message', (event) {
       if (event is MessageEvent) {
+        print("GOT MSG $event ${event.data}");
         final data = event.data;
         if (data['sender'] != 'frame') {
           return;
@@ -236,8 +245,13 @@ require(["dartpad_main", "dart_sdk"], function(dartpad_main, dart_sdk) {
                 .read(consoleMessagesProvider.notifier)
                 .update((l) => [...l.skip(max(0, l.length - 1000)), data['message'] as String]);
           }
-        } else if (type == 'ready' && !_readyCompleter.isCompleted) {
-          _readyCompleter.complete();
+        } else if (type == 'ready') {
+          if (!_readyCompleter.isCompleted) {
+            _readyCompleter.complete();
+          }
+          if (lastCommand != null) {
+            replayLastCommand();
+          }
         } else if (data['message'] != null) {
           ref
               .read(consoleMessagesProvider.notifier)

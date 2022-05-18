@@ -71,7 +71,7 @@ class DomElement extends MultiChildElement with BuildScheduler {
     super.render(b);
 
     _source = b.close(tag: component.tag);
-    _view = ComponentsBinding.instance!.registerView(_source, super.render);
+    _view = ComponentsBinding.instance!.registerView(_source, super.render, false);
   }
 }
 
@@ -98,7 +98,9 @@ class TextElement extends Element {
   bool get debugDoingBuild => false;
 
   @override
-  void performRebuild() {}
+  void performRebuild() {
+    _dirty = false;
+  }
 
   @override
   void visitChildren(ElementVisitor visitor) {}
