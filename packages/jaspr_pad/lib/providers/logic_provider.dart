@@ -11,7 +11,8 @@ import 'docu_provider.dart';
 import 'edit_provider.dart';
 import 'project_provider.dart';
 
-final isCompilingProvider = StateProvider((ref) => false);
+final isCompilingProvider = Provider((ref) => ref.watch(compilingIdProvider) != null);
+final compilingIdProvider = StateProvider<String?>((ref) => null);
 
 final logicProvider = Provider((ref) => Logic(ref));
 
@@ -31,13 +32,11 @@ class Logic {
   }
 
   void selectSample(Sample data) async {
-    ref.read(storageProvider).remove('project');
     window.history.pushState(null, 'JasprPad', window.location.origin + '?sample=${data.id}');
     ref.refresh(loadedProjectProvider);
   }
 
   void selectTutorial() async {
-    ref.read(storageProvider).remove('project');
     window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=intro');
     ref.refresh(loadedProjectProvider);
   }
@@ -99,15 +98,19 @@ class Logic {
   }
 
   Future<void> compileFiles() async {
-    ref.read(isCompilingProvider.notifier).state = true;
     var proj = ref.read(editProjectProvider);
-
     if (proj == null) return;
+
+    ref.read(compilingIdProvider.notifier).state = proj.id;
 
     try {
       var response = await ref.read(dartServiceProvider).compile(proj.allDartFiles);
 
       if (response.result != null) {
+        if (ref.read(compilingIdProvider) != proj.id) {
+          return;
+        }
+
         var executionService = ref.read(executionProvider);
         if (executionService == null) return;
 
@@ -121,7 +124,9 @@ class Logic {
         ref.read(consoleMessagesProvider.notifier).update((l) => [...l, response.error!]);
       }
     } finally {
-      ref.read(isCompilingProvider.notifier).state = false;
+      if (ref.read(compilingIdProvider) == proj.id) {
+        ref.read(compilingIdProvider.notifier).state = null;
+      }
     }
   }
 

@@ -8,6 +8,7 @@ import 'dart:math';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../../../adapters/html.dart';
+import '../../../providers/project_provider.dart';
 import '../panels/output_split_view.dart';
 
 final iframeProvider = StateProvider<IFrameElement?>((ref) => null);
@@ -216,11 +217,16 @@ require(["dartpad_main", "dart_sdk"], function(dartpad_main, dart_sdk) {
     };
     _frame.contentWindow?.postMessage(message, '*');
     lastCommand = message;
+
+    if (ref.read(isTutorialProvider) && ref.read(tabsStateProvider) == OutputTabsState.closed) {
+      ref.read(tabsStateProvider.notifier).state = OutputTabsState.ui;
+    }
+
     return Future.value();
   }
 
   void replayLastCommand() {
-    _frame.contentWindow!.postMessage(lastCommand, '*');
+    _frame.contentWindow?.postMessage(lastCommand, '*');
   }
 
   void _initListener() {

@@ -54,9 +54,9 @@ Rather it embraces these differences to give the best of both worlds.
 - [x] Write test package and framework tests
 - [x] Add riverpod integration package
 - [x] Add jasprpad as online playground with samples
-- [ ] Add tutorials to jasprpad
+- [x] Add tutorial to jasprpad
 - [ ] Add documentation in readme files
-- [ ] Add website
 - [ ] Add ssg support
+- [ ] Add website
 - [ ] Expand framework with missing concepts (Animations, ...)
 - [ ] Bump test coverage over 80%

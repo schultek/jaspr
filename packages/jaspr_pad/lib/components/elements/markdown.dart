@@ -89,7 +89,9 @@ class MarkdownRenderer extends CustomRenderComponent {
   @override
   void render(DomBuilder b) {
     MarkdownDomVisitor(b).render(nodes);
-    hljs.highlightAll();
+    if (kIsWeb) {
+      hljs.highlightAll();
+    }
   }
 }
 

@@ -13,13 +13,13 @@ class Playground extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    context.listen(loadedProjectProvider, (_, proj) {
-      if (proj != null) {
-        Future.microtask(() {
-          context.read(logicProvider).compileFiles();
-        });
-      }
-    });
+    if (kIsWeb) {
+      context.listen(loadedProjectProvider, (_, proj) {
+        if (proj != null) {
+          Future(() => context.read(logicProvider).compileFiles());
+        }
+      }, fireImmediately: true);
+    }
 
     yield PlaygroundHeader();
     yield MainSection();

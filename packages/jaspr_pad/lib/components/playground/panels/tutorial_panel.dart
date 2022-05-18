@@ -5,6 +5,7 @@ import '../../../models/tutorial.dart';
 import '../../../providers/edit_provider.dart';
 import '../../../providers/logic_provider.dart';
 import '../../elements/button.dart';
+import '../../elements/hidden.dart';
 import '../../elements/markdown.dart';
 import 'output_split_view.dart';
 

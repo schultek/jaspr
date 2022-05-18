@@ -68,10 +68,17 @@ final loadedProjectProvider = Provider<AsyncValue<ProjectData>>((ref) {
   }
 
   var storedProject = ref.read(storedProjectProvider);
-  if (storedProject != null) {
+  var uri = ComponentsBinding.instance!.currentUri;
+  var queryId = uri.queryParameters['gist'] != null
+      ? 'gist-${uri.queryParameters['gist']}'
+      : uri.queryParameters['sample'] != null
+          ? 'sample-${uri.queryParameters['sample']}'
+          : uri.queryParameters['tutorial'] != null
+              ? 'tutorial-${uri.queryParameters['tutorial']}'
+              : null;
+  if (storedProject != null && storedProject.id == queryId) {
     return AsyncValue.data(storedProject);
   } else {
-    var uri = ComponentsBinding.instance!.currentUri;
     var gistId = uri.queryParameters['gist'];
     var sampleId = uri.queryParameters['sample'];
     var tutorialId = uri.queryParameters['tutorial'];

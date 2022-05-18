@@ -4,6 +4,7 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import '../../../models/api_models.dart';
 import '../../../providers/issues_provider.dart';
 import '../../../providers/project_provider.dart';
+import '../../elements/hidden.dart';
 import '../../elements/splitter.dart';
 import '../output/execution_service.dart';
 import 'console_panel.dart';
@@ -174,11 +175,14 @@ class EditorTabWindow extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     var state = context.watch(tabsStateProvider);
+    var isTutorial = context.watch(isTutorialProvider);
 
-    yield Hidden(
-      hidden: state != OutputTabsState.ui,
-      child: OutputPanel(),
-    );
+    if (isTutorial) {
+      yield Hidden(
+        hidden: state != OutputTabsState.ui,
+        child: OutputPanel(),
+      );
+    }
 
     if (state == OutputTabsState.issues) {
       yield IssuesPanel();
@@ -187,71 +191,5 @@ class EditorTabWindow extends StatelessComponent {
     } else if (state == OutputTabsState.docs) {
       yield DocumentPanel();
     }
-  }
-}
-
-class Hidden extends StatelessComponent {
-  const Hidden({required this.hidden, required this.child, this.visibilityMode = false, Key? key}) : super(key: key);
-
-  final bool hidden;
-  final Component child;
-  final bool visibilityMode;
-
-  @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield child;
-  }
-
-  @override
-  Element createElement() => HiddenElement(this);
-}
-
-class HiddenElement extends StatelessElement {
-  HiddenElement(Hidden component) : super(component);
-
-  @override
-  Hidden get component => super.component as Hidden;
-
-  @override
-  void render(DomBuilder b) {
-    super.render(HiddenBuilder(component.hidden, component.visibilityMode, b));
-  }
-}
-
-class HiddenBuilder extends WrappedDomBuilder {
-  HiddenBuilder(this.hidden, this.visibilityMode, DomBuilder builder) : super(builder);
-
-  final bool hidden;
-  final bool visibilityMode;
-
-  bool isFirst = true;
-
-  @override
-  void open(
-    String tag, {
-    String? key,
-    String? id,
-    Iterable<String>? classes,
-    Map<String, String>? styles,
-    Map<String, String>? attributes,
-    Map<String, DomEventFn>? events,
-    DomLifecycleEventFn? onCreate,
-    DomLifecycleEventFn? onUpdate,
-    DomLifecycleEventFn? onRemove,
-  }) {
-    var hide = isFirst && hidden;
-    isFirst = false;
-    super.open(
-      tag,
-      key: key,
-      id: id,
-      classes: classes,
-      styles: {...styles ?? {}, if (hide && visibilityMode) 'visibility': 'hidden'},
-      attributes: {...attributes ?? {}, if (hide && !visibilityMode) 'hidden': ''},
-      events: events,
-      onCreate: onCreate,
-      onUpdate: onUpdate,
-      onRemove: onRemove,
-    );
   }
 }

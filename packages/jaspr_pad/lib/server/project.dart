@@ -54,7 +54,7 @@ Future<ProjectData> loadProjectFromDirectory(String id, String dirPath) async {
       throw MainDartFileMissingException();
     } else {
       return ProjectData(
-        id: id,
+        id: 'sample-$id',
         description: description,
         htmlFile: html,
         cssFile: css,

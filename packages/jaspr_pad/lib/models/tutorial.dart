@@ -56,7 +56,7 @@ class TutorialData implements ProjectData {
 
   static TutorialData fromConfig(TutorialConfig config) {
     return TutorialData(
-      config.id,
+      'tutorial-${config.id}',
       config.name,
       config.steps.indexWhere((c) => c.id == config.initialStep.id),
       config.steps,

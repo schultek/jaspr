@@ -44,7 +44,7 @@ class ProjectData {
         .map((e) => MapEntry(e.key, e.value.content)));
 
     return ProjectData(
-      id: gist.id,
+      id: 'gist-${gist.id}',
       description: gist.description,
       htmlFile: htmlFile?.content,
       cssFile: cssFile?.content,
