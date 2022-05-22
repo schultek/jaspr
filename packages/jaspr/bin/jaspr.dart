@@ -9,7 +9,8 @@ void main(List<String> args) async {
   var runner = CommandRunner<int>("jaspr", "An experimental web framework for dart apps, supporting SPA and SSR.")
     ..addCommand(CreateCommand())
     ..addCommand(ServeCommand())
-    ..addCommand(BuildCommand());
+    ..addCommand(BuildCommand())
+    ..addCommand(GenerateCommand());
 
   var n = 0;
   ProcessSignal.sigint.watch().listen((signal) {
@@ -227,10 +228,49 @@ class BuildCommand extends Command<int> {
   }
 
   @override
-  String get description => 'Performs a single build on the specified target and then exits.';
+  String get description => 'Builds a dart application that serves the web-app via server-side-rendering.';
 
   @override
   String get name => 'build';
+
+  @override
+  Future<int> run() async {
+    var dir = Directory.fromUri(Uri.parse(Directory.current.path + "/build"));
+
+    if (!await dir.exists()) {
+      await dir.create();
+    }
+
+    var webProcess = await _runWebdev(['build', '--output=web:build/web']);
+    _pipeProcess(webProcess);
+
+    String? entryPoint = await _getEntryPoint(argResults!['input']);
+
+    if (entryPoint == null) {
+      print("Cannot find entry point. Create a main.dart in lib/ or web/, or specify a file using --input.");
+      return 1;
+    }
+
+    var process = await Process.start(
+      'dart',
+      ['compile', argResults!['target'], entryPoint, '-o', './build/app'],
+    );
+
+    _pipeProcess(process);
+
+    await Future.wait([maybeExit(webProcess.exitCode), maybeExit(process.exitCode)]);
+    return 0;
+  }
+}
+
+class GenerateCommand extends Command<int> {
+  GenerateCommand() {}
+
+  @override
+  String get description => 'Generates assets for a static site from the specified routes.';
+
+  @override
+  String get name => 'generate';
 
   @override
   Future<int> run() async {

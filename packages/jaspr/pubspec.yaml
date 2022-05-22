@@ -6,7 +6,7 @@ environment:
   sdk: '>=2.16.0 <3.0.0'
 
 dependencies:
-  domino: ^0.8.1
+  domino: ^0.8.2
   shelf: ^1.2.0
   meta: ^1.7.0
   shelf_proxy: ^1.0.1
