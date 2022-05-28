@@ -14,8 +14,10 @@ Experimental web framework for Dart. Supports SPAs and SSR.
 
 > I'm looking for contributors. Don't hesitate to contact me if you want to help in any way.
 
-- [Demo & Playground](https://jasprpad.schultek.de)
 - [Wiki & Documentation](https://github.com/schultek/jaspr/wiki)
+- [Demo & Playground](https://jasprpad.schultek.de)
+
+![JasprPad Screenshot](https://user-images.githubusercontent.com/13920539/170837732-9e09d5f3-e79e-4ddd-b118-72e49456a7cd.png)
 
 ## Outline
 

@@ -14,8 +14,10 @@ Experimental web framework for Dart. Supports SPAs and SSR.
 
 > I'm looking for contributors. Don't hesitate to contact me if you want to help in any way.
 
-- [Demo & Playground](https://jasprpad.schultek.de)
 - [Wiki & Documentation](https://github.com/schultek/jaspr/wiki)
+- [Demo & Playground](https://jasprpad.schultek.de)
+
+![JasprPad Screenshot](https://user-images.githubusercontent.com/13920539/170837732-9e09d5f3-e79e-4ddd-b118-72e49456a7cd.png)
 
 ## About
 
@@ -55,14 +57,14 @@ Rather it embraces these differences to give the best of both worlds.
   
 ## Roadmap
 
-- [x] Implement core framework
-- [x] Write test package and framework tests
-- [x] Add riverpod integration package
-- [x] Add jasprpad as online playground with samples
-- [x] Add tutorial to jasprpad
-- [ ] Add documentation in readme files
-- [ ] Improve router package
-- [ ] Add ssg support
-- [ ] Add website
-- [ ] Expand framework with missing concepts (Animations, ...)
-- [ ] Bump test coverage over 80%
+- ✅ Implement core framework
+- ✅ Write test package and framework tests
+- ✅ Add riverpod integration package
+- ✅ Add jasprpad as online playground with samples
+- 🚧 Add tutorial to jasprpad
+- 🚧 Add wiki and documentation
+- 🚧 Bump test coverage over 80%
+- 🔜 Improve router package
+- 🔜 Add ssg support
+- 🔜 Add website
+- 🔜 Expand framework with missing concepts (Animations, ...)
