@@ -4,13 +4,13 @@
 
 Experimental web framework for Dart. Supports SPAs and SSR.
 
-**Main Features:**
+**Core Features:**
 
 - Familiar component model similar to Flutter widgets
 - Easy Server Side Rendering
 - Automatic hydration of component data on the client
 - Fast incremental DOM updates
-- Well tested (>70% test coverage)
+- Well tested (~70% test coverage)
 
 > I'm looking for contributors. Don't hesitate to contact me if you want to help in any way.
 

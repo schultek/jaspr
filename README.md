@@ -4,12 +4,13 @@
 
 Experimental web framework for Dart. Supports SPAs and SSR. 
 
-**Main Features:**
+**Core Features:**
 
 - Familiar component model similar to Flutter widgets
 - Easy Server Side Rendering
 - Automatic hydration of component data on the client
 - Fast incremental DOM updates
+- Well tested (~70% test coverage)
 
 > I'm looking for contributors. Don't hesitate to contact me if you want to help in any way.
 
@@ -48,7 +49,8 @@ Rather it embraces these differences to give the best of both worlds.
   - **/jaspr_builder**: Polyfill builder for integrating js libraries with jaspr.
   - **/jaspr_pad**: DartPad inspired online playground for jaspr apps.
   - **/jaspr_riverpod**: Riverpod implementation for jaspr.
-  - **/jaspr_test**: A test package for jaspr.
+  - **/jaspr_router**: A router implementation for jaspr.
+  - **/jaspr_test**: A testing package for jaspr.
   
 ## Roadmap
 
@@ -58,6 +60,7 @@ Rather it embraces these differences to give the best of both worlds.
 - [x] Add jasprpad as online playground with samples
 - [x] Add tutorial to jasprpad
 - [ ] Add documentation in readme files
+- [ ] Improve router package
 - [ ] Add ssg support
 - [ ] Add website
 - [ ] Expand framework with missing concepts (Animations, ...)
