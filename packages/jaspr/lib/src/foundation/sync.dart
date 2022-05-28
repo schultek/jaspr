@@ -23,7 +23,7 @@ mixin SyncBinding on BindingBase {
       var syncState = _globalSyncRegistry[key]!;
       assert(syncState.syncId == key);
       if (syncState.wantsSync()) {
-        state[key] = syncState.syncCodec.encode(syncState.saveState());
+        state[key] = syncState._get();
       }
     }
     return state;
@@ -58,7 +58,7 @@ mixin SyncBinding on BindingBase {
         var state = _globalSyncRegistry[key]!;
         assert(state.syncId == key);
         if (state.wantsSync()) {
-          state.updateState(data[key] != null ? state.syncCodec.decode(data[key]) : null);
+          state._update(data[key]);
         }
       }
     }
@@ -74,7 +74,7 @@ mixin SyncBinding on BindingBase {
     _globalSyncRegistry[syncState.syncId] = syncState;
     if (initialUpdate && syncState.wantsSync()) {
       var data = getRawState(syncState.syncId);
-      syncState.updateState(data != null ? syncState.syncCodec.decode(data) : null);
+      syncState._update(data);
     }
   }
 
@@ -89,14 +89,14 @@ mixin SyncBinding on BindingBase {
 abstract class SyncState<U> {
   /// Codec used to serialize the state data on the server and deserialize on the client
   /// Should convert the state to any dynamic type: Null, bool, double, int, Uint8List, String, Map, List
-  Codec<U, dynamic> get syncCodec;
+  Codec<U, dynamic>? get syncCodec;
 
   /// Globally unique id used to identify the state data between server and client
   String get syncId;
 
   /// Called on the server after the initial build, to retrieve the state data of this component.
   @visibleForOverriding
-  U saveState();
+  U getState();
 
   /// Called on the client when a new state value is available, either when the state is first initialized, or when the
   /// state becomes available through lazy loading a route.
@@ -106,6 +106,21 @@ abstract class SyncState<U> {
   /// Can be overridden to signal that the state should not be synced
   @protected
   bool wantsSync();
+}
+
+extension _SyncEncoding<U> on SyncState<U> {
+  _update(dynamic data) {
+    if (data == null || syncCodec == null) {
+      updateState(data);
+    } else {
+      updateState(syncCodec!.decode(data));
+    }
+  }
+
+  U _get() {
+    var state = getState();
+    return syncCodec != null ? syncCodec!.encode(state) : null;
+  }
 }
 
 class SimpleCodec<T, R> extends Codec<T, R> {

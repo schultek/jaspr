@@ -193,7 +193,7 @@ class ProviderScopeState extends State<ProviderScope> with SyncStateMixin<Provid
   bool wantsSync() => _isRoot;
 
   @override
-  Map<String, dynamic> saveState() {
+  Map<String, dynamic> getState() {
     return container.read(_syncProvider.notifier)._saveState();
   }
 

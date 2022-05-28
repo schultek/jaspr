@@ -18,7 +18,7 @@ A simple stateless component would extend the [StatelessComponent] class and mus
 A simple [build()] method can look like this:
 
 ```dart
-Iterable<Component> build(BuildContext) sync* {
+Iterable<Component> build(BuildContext context) sync* {
   yield DomComponent(...);
 }
 ```

@@ -7,7 +7,7 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> implements Sync
   /// Codec used to serialize the state data on the server and deserialize on the client
   /// Should convert the state to any dynamic type: Null, bool, double, int, Uint8List, String, Map, List
   @override
-  Codec<U, dynamic> get syncCodec => CastCodec();
+  Codec<U, dynamic>? get syncCodec => null;
 
   /// Globally unique id used to identify the state data between server and client
   /// Returns null if state should not be synced

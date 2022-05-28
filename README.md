@@ -14,7 +14,8 @@ Experimental web framework for Dart. Supports SPAs and SSR.
 
 > I'm looking for contributors. Don't hesitate to contact me if you want to help in any way.
 
-[Demo & Playground](https://jasprpad.schultek.de)
+- [Demo & Playground](https://jasprpad.schultek.de)
+- [Wiki & Documentation](https://github.com/schultek/jaspr/wiki)
 
 ## About
 
@@ -34,7 +35,7 @@ Instead of trying to mirror every little thing from Flutter, `jaspr` tries to gi
 by matching features where it makes sense without compromising on the unique properties of the web platform.
 Rather it embraces these differences to give the best of both worlds.
 
-[More](https://github.com/schultek/jaspr/tree/main/packages/jaspr#differences-to-flutter)
+[More](https://github.com/schultek/jaspr/wiki#-jaspr-vs-flutter-web)
 
 ## Directories
 

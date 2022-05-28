@@ -13,7 +13,7 @@ class PreloadImagesState extends State<PreloadImages> with SyncStateMixin<Preloa
   Set<String> preloadImages = {};
 
   @override
-  List saveState() {
+  List getState() {
     visitImages(Element e) {
       if (e is DomElement &&
           e.component.tag == 'img' &&

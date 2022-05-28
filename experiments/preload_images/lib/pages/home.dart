@@ -19,7 +19,7 @@ class HomeState extends State<Home> with PreloadStateMixin, SyncStateMixin<Home,
   }
 
   @override
-  List saveState() {
+  List getState() {
     return images;
   }
 

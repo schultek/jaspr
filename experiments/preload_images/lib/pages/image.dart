@@ -20,7 +20,7 @@ class ImageState extends State<Image> with PreloadStateMixin, SyncStateMixin<Ima
   }
 
   @override
-  Map<String, dynamic> saveState() {
+  Map<String, dynamic> getState() {
     return image;
   }
 

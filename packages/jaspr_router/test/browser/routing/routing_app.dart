@@ -59,7 +59,7 @@ class ContactState extends State<SyncContact> with SyncStateMixin<SyncContact, S
   }
 
   @override
-  String saveState() => throw UnimplementedError();
+  String getState() => throw UnimplementedError();
 
   @override
   String get syncId => 'contact';
