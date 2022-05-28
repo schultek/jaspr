@@ -1,0 +1,6 @@
+include: package:lints/recommended.yaml
+
+linter:
+  rules:
+    prefer_relative_imports: true
+    directives_ordering: true

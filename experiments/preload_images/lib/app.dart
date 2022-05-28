@@ -1,4 +1,5 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_router/jaspr_router.dart';
 
 import 'components/preload_images.dart';
 import 'pages/home.dart' deferred as home;

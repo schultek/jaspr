@@ -2,8 +2,8 @@ library router;
 
 import 'dart:async';
 
-import '../../../foundation.dart';
-import '../../framework/framework.dart';
+import 'package:jaspr/jaspr.dart';
+
 import 'history_stub.dart' if (dart.library.html) 'history_browser.dart';
 
 part 'route.dart';
@@ -47,7 +47,7 @@ class Router extends StatefulComponent {
 
 enum _HistoryAction { none, push, replace }
 
-class RouterState extends State<Router> with PreloadStateMixin<Router>, DeferRenderMixin<Router> {
+class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin {
   ResolvedRoute? _currentRoute;
   ResolvedRoute get currentRoute => _currentRoute!;
 

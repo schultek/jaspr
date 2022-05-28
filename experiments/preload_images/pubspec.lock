@@ -245,7 +245,7 @@ packages:
       name: hotreloader
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.2"
+    version: "3.0.4"
   html:
     dependency: transitive
     description:
@@ -285,6 +285,13 @@ packages:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr"
+      relative: true
+    source: path
+    version: "0.1.0"
+  jaspr_router:
+    dependency: "direct main"
+    description:
+      path: "../../packages/jaspr_router"
       relative: true
     source: path
     version: "0.1.0"

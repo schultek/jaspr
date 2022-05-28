@@ -36,25 +36,6 @@ class BrowserTester {
     return binding.attachRootComponent(component, attachTo: _attachTo);
   }
 
-  Future<void> navigate(Function(RouterState) navigate, {bool pump = true}) async {
-    RouterState? router;
-    findRouter(Element element) {
-      if (element is StatefulElement && element.state is RouterState) {
-        router = element.state as RouterState;
-      } else {
-        element.visitChildren(findRouter);
-      }
-    }
-
-    binding.rootElement!.visitChildren(findRouter);
-    if (router != null) {
-      navigate(router!);
-      if (pump) {
-        await pumpEventQueue();
-      }
-    }
-  }
-
   Future<void> click(Finder finder, {bool pump = true}) async {
     dispatchEvent(finder, 'click', null);
     if (pump) {
