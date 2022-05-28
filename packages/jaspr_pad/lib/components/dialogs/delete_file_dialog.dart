@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
-import '../../elements/button.dart';
-import '../../elements/dialog.dart';
+import '../elements/button.dart';
+import '../elements/dialog.dart';
 
 class DeleteFileDialog extends StatelessComponent {
   const DeleteFileDialog({required this.file, Key? key}) : super(key: key);

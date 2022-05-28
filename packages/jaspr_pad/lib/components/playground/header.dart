@@ -6,10 +6,10 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import '../../providers/logic_provider.dart';
 import '../../providers/project_provider.dart';
 import '../../providers/samples_provider.dart';
+import '../dialogs/new_pad_dialog.dart';
+import '../dialogs/reset_dialog.dart';
 import '../elements/button.dart';
 import '../elements/menu.dart';
-import 'dialogs/new_pad_dialog.dart';
-import 'dialogs/reset_dialog.dart';
 
 class PlaygroundHeader extends StatelessComponent {
   const PlaygroundHeader({Key? key}) : super(key: key);

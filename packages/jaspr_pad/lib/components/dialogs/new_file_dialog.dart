@@ -1,10 +1,10 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
-import '../../../providers/edit_provider.dart';
-import '../../elements/button.dart';
-import '../../elements/dialog.dart';
-import '../../elements/textfield.dart';
+import '../../providers/edit_provider.dart';
+import '../elements/button.dart';
+import '../elements/dialog.dart';
+import '../elements/textfield.dart';
 
 class NewFileDialog extends StatefulComponent {
   const NewFileDialog({Key? key}) : super(key: key);

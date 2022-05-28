@@ -1,20 +1,20 @@
 import 'package:jaspr/jaspr.dart';
 
-import '../../elements/button.dart';
-import '../../elements/dialog.dart';
+import '../elements/button.dart';
+import '../elements/dialog.dart';
 
-class NewPadDialog extends StatelessComponent {
-  const NewPadDialog({Key? key}) : super(key: key);
+class ResetDialog extends StatelessComponent {
+  const ResetDialog({Key? key}) : super(key: key);
 
   static Future<bool?> show(BuildContext context) {
-    return showDialog(context, slotId: 'dialog', builder: (_) => NewPadDialog());
+    return showDialog(context, slotId: 'dialog', builder: (_) => ResetDialog());
   }
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield Dialog(
-      title: 'Create New Pad',
-      content: Text('This will discard the current pad.'),
+      title: 'Reset Pad',
+      content: Text('Discard changes to the current pad?'),
       actions: [
         Button(
           label: 'Cancel',
@@ -24,7 +24,7 @@ class NewPadDialog extends StatelessComponent {
           },
         ),
         Button(
-          label: 'Create',
+          label: 'Reset',
           dialog: true,
           onPressed: () {
             closeDialog(context, slotId: 'dialog', result: true);

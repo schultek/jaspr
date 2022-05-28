@@ -6,7 +6,7 @@ import '../../providers/project_provider.dart';
 import '../elements/dialog.dart';
 import 'footer.dart';
 import 'header.dart';
-import 'main.dart';
+import 'main_section.dart';
 
 class Playground extends StatelessComponent {
   const Playground({Key? key}) : super(key: key);

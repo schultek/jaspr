@@ -100,7 +100,7 @@ class TestComponentsBinding extends BindingBase with ComponentsBinding, SyncBind
   @override
   bool get isClient => _isClient;
 
-  late final dom.Document _document;
+  late dom.Document _document;
 
   @override
   void didAttachRootElement(BuildScheduler element, {required String to}) async {

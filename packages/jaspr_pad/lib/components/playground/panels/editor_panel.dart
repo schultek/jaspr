@@ -5,10 +5,10 @@ import '../../../models/project.dart';
 import '../../../providers/edit_provider.dart';
 import '../../../providers/issues_provider.dart';
 import '../../../providers/logic_provider.dart';
+import '../../dialogs/delete_file_dialog.dart';
+import '../../dialogs/new_file_dialog.dart';
 import '../../elements/button.dart';
 import '../../elements/tab_bar.dart';
-import '../dialogs/delete_file_dialog.dart';
-import '../dialogs/new_file_dialog.dart';
 import '../editing/editor.dart';
 import 'output_split_view.dart';
 

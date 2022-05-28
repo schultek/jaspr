@@ -7,7 +7,6 @@ import '../../../providers/logic_provider.dart';
 import '../../elements/button.dart';
 import '../../elements/hidden.dart';
 import '../../elements/markdown.dart';
-import 'output_split_view.dart';
 
 class TutorialPanel extends StatelessComponent {
   const TutorialPanel({Key? key}) : super(key: key);
