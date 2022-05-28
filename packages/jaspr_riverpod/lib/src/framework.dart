@@ -3,8 +3,7 @@ library framework;
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:jaspr/components.dart';
-import 'package:jaspr/foundation.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:meta/meta.dart';
 import 'package:riverpod/riverpod.dart';
 

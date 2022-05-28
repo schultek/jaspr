@@ -83,6 +83,7 @@ node_modules/
 # Files and directories created by pub
 .dart_tool/
 .packages
+pubspec_overrides.yaml
 
 # Conventional directory for build outputs
 build/

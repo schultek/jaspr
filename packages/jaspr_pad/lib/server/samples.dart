@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:jaspr/server.dart';
+import 'package:jaspr/jaspr_server.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:path/path.dart' as path;
 

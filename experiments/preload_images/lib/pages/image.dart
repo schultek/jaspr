@@ -11,7 +11,7 @@ class Image extends StatefulComponent {
   State<StatefulComponent> createState() => ImageState();
 }
 
-class ImageState extends State<Image> with PreloadStateMixin<Image>, SyncStateMixin<Image, Map<String, dynamic>> {
+class ImageState extends State<Image> with PreloadStateMixin, SyncStateMixin<Image, Map<String, dynamic>> {
   late Map<String, dynamic> image;
 
   @override

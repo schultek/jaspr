@@ -1,13 +1,12 @@
 name: jaspr_project
 
 packages:
-  - packages/**
+  - packages/*/*
   - experiments/**
-  - demo/**
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
 
 scripts:
   analyze: melos exec -- "dart analyze ."
-  tools:
-    name: tools
-    run: melos exec -- "dart run $MELOS_ROOT_PATH/tools/bin/tools.dart"
-    select-package: {}

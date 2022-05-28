@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:html' as html;
 
 import 'package:domino/browser.dart' show registerView;
-import 'package:jaspr/browser.dart';
+import 'package:jaspr/jaspr_browser.dart';
 
 import '../../jaspr_test.dart';
 

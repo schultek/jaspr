@@ -8,7 +8,7 @@
 // You can then use it in your terminal by executing:
 // generate_providers <riverpod/flutter_riverpod/hooks_riverpod> <path to builder file to update>
 
-import 'package:jaspr/foundation.dart';
+import 'package:jaspr/jaspr.dart';
 
 import 'internals.dart';
 

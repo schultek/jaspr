@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:jaspr/server.dart' hide Router;
+import 'package:jaspr/jaspr_server.dart' hide Router;
 import 'package:shelf_router/shelf_router.dart';
 
 import '../main.mapper.g.dart';

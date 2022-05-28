@@ -1,7 +1,7 @@
 import '../foundation/binding.dart';
+import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
 import '../framework/framework.dart';
-import '../scheduler/binding.dart';
 
 /// Main entry point for the app
 ///

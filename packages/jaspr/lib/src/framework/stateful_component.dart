@@ -618,7 +618,7 @@ class StatefulElement extends MultiChildElement {
     assert(state._debugLifecycleState == _StateLifecycle.created);
 
     // We check if state uses on of the mixins that support async initialization,
-    // which will be handled by [BuildOwnner.preformRebuildOn].
+    // which will be handled by [BuildOwner.preformRebuildOn].
     // In this case we don't call [_initState()] directly here, but rather let it
     // be called by the mixins implementation.
 

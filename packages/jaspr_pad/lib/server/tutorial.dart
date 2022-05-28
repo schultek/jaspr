@@ -1,15 +1,12 @@
 import 'dart:io';
 
-import 'package:jaspr/server.dart';
-import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr/jaspr_server.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart' as yaml;
 
 import '../main.mapper.g.dart';
 import '../models/project.dart';
-import '../models/sample.dart';
 import '../models/tutorial.dart';
-import '../providers/utils.dart';
 import 'project.dart';
 
 Future<TutorialStep> getTutorialStep(String stepId) async {

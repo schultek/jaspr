@@ -9,9 +9,12 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:domino/domino.dart';
+import 'package:meta/meta.dart';
 
-import '../../foundation.dart';
-import '../scheduler/binding.dart';
+import '../foundation/basic_types.dart';
+import '../foundation/binding.dart';
+import '../foundation/scheduler.dart';
+import '../foundation/sync.dart';
 
 export 'package:domino/domino.dart'
     show DomBuilder, DomEvent, DomEventFn, DomLifecycleEvent, DomLifecycleEventFn, DomView, DomBuilderFn;

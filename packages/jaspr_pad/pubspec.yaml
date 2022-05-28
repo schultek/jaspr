@@ -1,6 +1,9 @@
 name: jaspr_pad
-description: Dartpad inspired online-editor for jaspr built with jaspr
+description: Dartpad inspired online-editor for jaspr built with jaspr.
 version: 0.1.0
+publish_to: none
+homepage: https://github.com/schultek/jaspr
+issue_tracker: https://github.com/schultek/jaspr/issues
 
 environment:
   sdk: '>=2.16.0 <3.0.0'
@@ -29,13 +32,3 @@ dev_dependencies:
   dart_mappable_builder: ^1.1.0
   yaml_writer: ^1.0.1
   webdev: ^2.7.7
-
-dependency_overrides:
-  jaspr: 
-    path: ../jaspr
-  jaspr_test: 
-    path: ../jaspr_test
-  jaspr_builder: 
-    path: ../jaspr_builder
-  jaspr_riverpod:
-    path: ../jaspr_riverpod

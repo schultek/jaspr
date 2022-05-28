@@ -1,4 +1,4 @@
-import 'package:jaspr/foundation.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:meta/meta.dart';
 // ignore: implementation_imports
 import 'package:riverpod/src/internals.dart';

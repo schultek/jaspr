@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
-import 'package:jaspr/server.dart';
+import 'package:jaspr/jaspr_server.dart';
 import 'package:test/fake.dart';
 
 class DocumentResponse {

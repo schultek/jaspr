@@ -17,7 +17,7 @@ class Counter extends StatefulComponent {
   State<StatefulComponent> createState() => CounterState();
 }
 
-class CounterState extends State<Counter> with PreloadStateMixin<Counter>, SyncStateMixin<Counter, int> {
+class CounterState extends State<Counter> with PreloadStateMixin, SyncStateMixin<Counter, int> {
   int counter = 0;
 
   @override

@@ -14,9 +14,9 @@ import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
 import '../foundation/binding.dart';
+import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
 import '../framework/framework.dart';
-import '../scheduler/binding.dart';
 
 const jasprDebugMode = bool.fromEnvironment('jaspr.debug');
 const jasprHotreload = bool.fromEnvironment('jaspr.hotreload');

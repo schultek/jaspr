@@ -1,7 +1,7 @@
 import 'dart:async';
 
 // server specific import
-import 'package:jaspr/server.dart';
+import 'package:jaspr/jaspr_server.dart';
 
 import 'app.dart';
 
