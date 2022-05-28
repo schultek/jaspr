@@ -10,3 +10,10 @@ command:
 
 scripts:
   analyze: melos exec -- "dart analyze ."
+  coverage:
+    run: |
+      melos exec --ignore=*experiment* -- "dart test --coverage=coverage" | melos exec --ignore=*experiment* --scope=jaspr --scope=jaspr_router -- "dart test --preset=browser --coverage=coverage"
+      melos exec --ignore=*experiment* -- "dart pub global run coverage:format_coverage --check-ignore --packages=.packages --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/$(echo "\$MELOS_PACKAGE_NAME")_lcov.info" -i ./coverage"
+      find $MELOS_ROOT_PATH/coverage -type f -empty -print -delete
+      genhtml -o $MELOS_ROOT_PATH/coverage/report $MELOS_ROOT_PATH/coverage/*_lcov.info
+      open $MELOS_ROOT_PATH/coverage/report/index.html

@@ -1,0 +1,17 @@
+paths:
+  - test/server
+
+presets:
+  browser:
+    paths:
+      - test/browser
+    platforms:
+      - chrome
+    verbose_trace: false
+    js_trace: false
+
+
+override_platforms:
+  chrome:
+    settings:
+      headless: true
