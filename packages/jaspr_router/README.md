@@ -1,39 +1,58 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# jaspr_router
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+A simple `Router` component for [`jaspr`](https://github.com/schultek/jaspr)
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
-
-```dart
-const like = 'sample';
+```shell
+dart pub add jaspr_router
 ```
 
-## Additional information
+Use can use the `Router` component for some basic routing. It takes a list of `Route`s or
+optionally a `onGenerateRoute` callback.
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+A simple use looks like this:
+
+```dart
+import 'pages/home.dart';
+import 'pages/about.dart' ;
+
+class App extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield Router(
+      routes: [
+        Route('/', (context) => Home()),
+        Route('/about', (context) => About()),
+      ],
+    );
+  }
+}
+```
+
+To push a new route call `Router.of(context).push('/path');` inside your child components. Similarly you can call `.replace()` or `.back()`.
+
+# 🐨 Lazy Routes & Code Splitting
+
+For larger web apps, we don't want to load everything together, but rather split our pages into smaller chunks.
+`jaspr` can do this automatically using `LazyRoutes` and deferred imports.
+
+To use lazy routes, change the above code to the following:
+
+```dart
+import 'pages/home.dart' deferred as home;
+import 'pages/about.dart' deferred as about;
+
+class App extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield Router(
+      routes: [
+        Route.lazy('/', (context) => home.Home(), home.loadLibrary),
+        Route.lazy('/about', (context) => About(), about.loadLibrary),
+      ],
+    );
+  }
+}
+```
+
+This will lazy load the appropriate javascript files for each route when navigating to it.
+You can also mix normal and lazy routes.
