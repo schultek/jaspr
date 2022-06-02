@@ -119,7 +119,7 @@ extension _SyncEncoding<U> on SyncState<U> {
 
   U _get() {
     var state = getState();
-    return syncCodec != null ? syncCodec!.encode(state) : null;
+    return syncCodec != null ? syncCodec!.encode(state) : state;
   }
 }
 

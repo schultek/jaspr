@@ -198,8 +198,8 @@ class ProviderScopeState extends State<ProviderScope> with SyncStateMixin<Provid
   }
 
   @override
-  void updateState(Map<String, dynamic>? value) {
-    container.read(_syncProvider.notifier)._updateState(value);
+  void updateState(Map? value) {
+    container.read(_syncProvider.notifier)._updateState(value?.cast());
   }
 
   @override
