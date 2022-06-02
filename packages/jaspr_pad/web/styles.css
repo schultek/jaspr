@@ -51,3 +51,16 @@
 .mdc-tab-scroller__scroll-area {
   overflow-x: scroll !important;
 }
+
+#markdown-content {
+  box-sizing: border-box;
+  padding-left: 8px;
+}
+
+#markdown-content details {
+  margin-left: 12px;
+}
+
+#markdown-content ol {
+  padding-left: 1em;
+}

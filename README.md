@@ -61,10 +61,11 @@ Rather it embraces these differences to give the best of both worlds.
 - ✅ Write test package and framework tests
 - ✅ Add riverpod integration package
 - ✅ Add jasprpad as online playground with samples
-- 🚧 Add tutorial to jasprpad
-- 🚧 Add wiki and documentation
+- ✅ Add tutorial to jasprpad
+- ✅ Add wiki and documentation
 - 🚧 Bump test coverage over 80%
 - 🔜 Improve router package
 - 🔜 Add ssg support
-- 🔜 Add website
-- 🔜 Expand framework with missing concepts (Animations, ...)
+- 🔜 Improve tutorial on jasprpad
+- 🔜 Improve wiki and add website
+- 🔜 Extend framework with missing concepts (Animations, ...)

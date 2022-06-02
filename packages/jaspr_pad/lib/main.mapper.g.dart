@@ -17,7 +17,6 @@ var _mappers = <BaseMapper>{
   SampleMapper._(),
   ComparableMapper._(),
   SampleResponseMapper._(),
-  ProjectDataMapper._(),
   CompileRequestMapper._(),
   CompileResponseMapper._(),
   AnalyzeRequestMapper._(),
@@ -29,6 +28,7 @@ var _mappers = <BaseMapper>{
   DocumentResponseMapper._(),
   HoverInfoMapper._(),
   DocumentRequestMapper._(),
+  ProjectDataMapper._(),
   TutorialDataMapper._(),
   TutorialStepMapper._(),
   TutorialResponseMapper._(),
@@ -142,52 +142,6 @@ class _SampleResponseCopyWithImpl<$R> extends BaseCopyWith<SampleResponse, $R> i
 
   @override ProjectDataCopyWith<$R>? get project => $value.project != null ? ProjectDataCopyWith($value.project!, (v) => call(project: v)) : null;
   @override $R call({Object? project = $none, Object? error = $none}) => $then(SampleResponse(or(project, $value.project), or(error, $value.error)));
-}
-
-class ProjectDataMapper extends BaseMapper<ProjectData> {
-  ProjectDataMapper._();
-
-  @override Function get decoder => decode;
-  ProjectData decode(dynamic v) => checked(v, (Map<String, dynamic> map) {
-    switch(map['type']) {
-      case 'TutorialData': return TutorialDataMapper._().decode(map);
-      case 'TutorialStep': return TutorialStepMapper._().decode(map);
-      default: return fromMap(map);
-    }
-  });
-  ProjectData fromMap(Map<String, dynamic> map) => ProjectData(id: Mapper.i.$getOpt(map, 'id'), description: Mapper.i.$getOpt(map, 'description'), htmlFile: Mapper.i.$getOpt(map, 'htmlFile'), cssFile: Mapper.i.$getOpt(map, 'cssFile'), mainDartFile: Mapper.i.$get(map, 'mainDartFile'), dartFiles: Mapper.i.$getOpt(map, 'dartFiles') ?? const {});
-
-  @override Function get encoder => (ProjectData v) => encode(v);
-  dynamic encode(ProjectData v) {
-    if (v is TutorialData) { return TutorialDataMapper._().encode(v); }
-    else if (v is TutorialStep) { return TutorialStepMapper._().encode(v); }
-    else { return toMap(v); }
-  }
-  Map<String, dynamic> toMap(ProjectData p) => {'id': Mapper.i.$enc(p.id, 'id'), 'description': Mapper.i.$enc(p.description, 'description'), 'htmlFile': Mapper.i.$enc(p.htmlFile, 'htmlFile'), 'cssFile': Mapper.i.$enc(p.cssFile, 'cssFile'), 'mainDartFile': Mapper.i.$enc(p.mainDartFile, 'mainDartFile'), 'dartFiles': Mapper.i.$enc(p.dartFiles, 'dartFiles')};
-
-  @override String stringify(ProjectData self) => 'ProjectData(id: ${Mapper.asString(self.id)}, description: ${Mapper.asString(self.description)}, htmlFile: ${Mapper.asString(self.htmlFile)}, cssFile: ${Mapper.asString(self.cssFile)}, mainDartFile: ${Mapper.asString(self.mainDartFile)}, dartFiles: ${Mapper.asString(self.dartFiles)})';
-  @override int hash(ProjectData self) => Mapper.hash(self.id) ^ Mapper.hash(self.description) ^ Mapper.hash(self.htmlFile) ^ Mapper.hash(self.cssFile) ^ Mapper.hash(self.mainDartFile) ^ Mapper.hash(self.dartFiles);
-  @override bool equals(ProjectData self, ProjectData other) => Mapper.isEqual(self.id, other.id) && Mapper.isEqual(self.description, other.description) && Mapper.isEqual(self.htmlFile, other.htmlFile) && Mapper.isEqual(self.cssFile, other.cssFile) && Mapper.isEqual(self.mainDartFile, other.mainDartFile) && Mapper.isEqual(self.dartFiles, other.dartFiles);
-
-  @override Function get typeFactory => (f) => f<ProjectData>();
-}
-
-extension ProjectDataMapperExtension  on ProjectData {
-  String toJson() => Mapper.toJson(this);
-  Map<String, dynamic> toMap() => Mapper.toMap(this);
-  ProjectDataCopyWith<ProjectData> get copyWith => ProjectDataCopyWith(this, $identity);
-}
-
-abstract class ProjectDataCopyWith<$R> {
-  factory ProjectDataCopyWith(ProjectData value, Then<ProjectData, $R> then) = _ProjectDataCopyWithImpl<$R>;
-  $R call({String? id, String? description, String? htmlFile, String? cssFile, String? mainDartFile, Map<String, String>? dartFiles});
-  $R apply(ProjectData Function(ProjectData) transform);
-}
-
-class _ProjectDataCopyWithImpl<$R> extends BaseCopyWith<ProjectData, $R> implements ProjectDataCopyWith<$R> {
-  _ProjectDataCopyWithImpl(ProjectData value, Then<ProjectData, $R> then) : super(value, then);
-
-  @override $R call({Object? id = $none, Object? description = $none, Object? htmlFile = $none, Object? cssFile = $none, String? mainDartFile, Map<String, String>? dartFiles}) => $then(ProjectData(id: or(id, $value.id), description: or(description, $value.description), htmlFile: or(htmlFile, $value.htmlFile), cssFile: or(cssFile, $value.cssFile), mainDartFile: mainDartFile ?? $value.mainDartFile, dartFiles: dartFiles ?? $value.dartFiles));
 }
 
 class CompileRequestMapper extends BaseMapper<CompileRequest> {
@@ -590,6 +544,52 @@ class _DocumentRequestCopyWithImpl<$R> extends BaseCopyWith<DocumentRequest, $R>
   _DocumentRequestCopyWithImpl(DocumentRequest value, Then<DocumentRequest, $R> then) : super(value, then);
 
   @override $R call({Map<String, String>? sources, String? name, int? offset}) => $then(DocumentRequest(sources ?? $value.sources, name ?? $value.name, offset ?? $value.offset));
+}
+
+class ProjectDataMapper extends BaseMapper<ProjectData> {
+  ProjectDataMapper._();
+
+  @override Function get decoder => decode;
+  ProjectData decode(dynamic v) => checked(v, (Map<String, dynamic> map) {
+    switch(map['type']) {
+      case 'TutorialData': return TutorialDataMapper._().decode(map);
+      case 'TutorialStep': return TutorialStepMapper._().decode(map);
+      default: return fromMap(map);
+    }
+  });
+  ProjectData fromMap(Map<String, dynamic> map) => ProjectData(id: Mapper.i.$getOpt(map, 'id'), description: Mapper.i.$getOpt(map, 'description'), htmlFile: Mapper.i.$getOpt(map, 'htmlFile'), cssFile: Mapper.i.$getOpt(map, 'cssFile'), mainDartFile: Mapper.i.$get(map, 'mainDartFile'), dartFiles: Mapper.i.$getOpt(map, 'dartFiles') ?? const {});
+
+  @override Function get encoder => (ProjectData v) => encode(v);
+  dynamic encode(ProjectData v) {
+    if (v is TutorialData) { return TutorialDataMapper._().encode(v); }
+    else if (v is TutorialStep) { return TutorialStepMapper._().encode(v); }
+    else { return toMap(v); }
+  }
+  Map<String, dynamic> toMap(ProjectData p) => {'id': Mapper.i.$enc(p.id, 'id'), 'description': Mapper.i.$enc(p.description, 'description'), 'htmlFile': Mapper.i.$enc(p.htmlFile, 'htmlFile'), 'cssFile': Mapper.i.$enc(p.cssFile, 'cssFile'), 'mainDartFile': Mapper.i.$enc(p.mainDartFile, 'mainDartFile'), 'dartFiles': Mapper.i.$enc(p.dartFiles, 'dartFiles')};
+
+  @override String stringify(ProjectData self) => 'ProjectData(id: ${Mapper.asString(self.id)}, description: ${Mapper.asString(self.description)}, htmlFile: ${Mapper.asString(self.htmlFile)}, cssFile: ${Mapper.asString(self.cssFile)}, mainDartFile: ${Mapper.asString(self.mainDartFile)}, dartFiles: ${Mapper.asString(self.dartFiles)})';
+  @override int hash(ProjectData self) => Mapper.hash(self.id) ^ Mapper.hash(self.description) ^ Mapper.hash(self.htmlFile) ^ Mapper.hash(self.cssFile) ^ Mapper.hash(self.mainDartFile) ^ Mapper.hash(self.dartFiles);
+  @override bool equals(ProjectData self, ProjectData other) => Mapper.isEqual(self.id, other.id) && Mapper.isEqual(self.description, other.description) && Mapper.isEqual(self.htmlFile, other.htmlFile) && Mapper.isEqual(self.cssFile, other.cssFile) && Mapper.isEqual(self.mainDartFile, other.mainDartFile) && Mapper.isEqual(self.dartFiles, other.dartFiles);
+
+  @override Function get typeFactory => (f) => f<ProjectData>();
+}
+
+extension ProjectDataMapperExtension  on ProjectData {
+  String toJson() => Mapper.toJson(this);
+  Map<String, dynamic> toMap() => Mapper.toMap(this);
+  ProjectDataCopyWith<ProjectData> get copyWith => ProjectDataCopyWith(this, $identity);
+}
+
+abstract class ProjectDataCopyWith<$R> {
+  factory ProjectDataCopyWith(ProjectData value, Then<ProjectData, $R> then) = _ProjectDataCopyWithImpl<$R>;
+  $R call({String? id, String? description, String? htmlFile, String? cssFile, String? mainDartFile, Map<String, String>? dartFiles});
+  $R apply(ProjectData Function(ProjectData) transform);
+}
+
+class _ProjectDataCopyWithImpl<$R> extends BaseCopyWith<ProjectData, $R> implements ProjectDataCopyWith<$R> {
+  _ProjectDataCopyWithImpl(ProjectData value, Then<ProjectData, $R> then) : super(value, then);
+
+  @override $R call({Object? id = $none, Object? description = $none, Object? htmlFile = $none, Object? cssFile = $none, String? mainDartFile, Map<String, String>? dartFiles}) => $then(ProjectData(id: or(id, $value.id), description: or(description, $value.description), htmlFile: or(htmlFile, $value.htmlFile), cssFile: or(cssFile, $value.cssFile), mainDartFile: mainDartFile ?? $value.mainDartFile, dartFiles: dartFiles ?? $value.dartFiles));
 }
 
 class TutorialDataMapper extends BaseMapper<TutorialData> {

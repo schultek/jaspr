@@ -3,7 +3,7 @@ description: Riverpod for jaspr
 version: 0.1.0
 
 environment:
-  sdk: '>=2.15.0 <3.0.0'
+  sdk: '>=2.16.0 <3.0.0'
 
 dependencies:
   riverpod: ^2.0.0-dev.4

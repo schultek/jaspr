@@ -9,3 +9,7 @@ html, body {
   height: 100%;
   font-family: sans-serif;
 }
+
+body {
+  padding: 16px;
+}

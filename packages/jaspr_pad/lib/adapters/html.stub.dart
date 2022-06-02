@@ -436,6 +436,7 @@ class Element {
       throw UnimplementedError('createFragment');
   void setInnerHtml(String? html, {dynamic validator, dynamic treeSanitizer}) =>
       throw UnimplementedError('setInnerHtml');
+  Future<void> requestFullscreen([Map<dynamic, dynamic>? options]) => throw UnimplementedError('requestFullscreen');
   void blur() => throw UnimplementedError('blur');
   void click() => throw UnimplementedError('click');
   void focus() => throw UnimplementedError('focus');
@@ -451,9 +452,9 @@ class Element {
   void requestPointerLock() => throw UnimplementedError('requestPointerLock');
   void scroll([dynamic options_OR_x, num? y]) => throw UnimplementedError('scroll');
   void scrollBy([dynamic options_OR_x, num? y]) => throw UnimplementedError('scrollBy');
+  void scrollIntoViewIfNeeded([bool? centerIfNeeded]) => throw UnimplementedError('scrollIntoViewIfNeeded');
   void scrollTo([dynamic options_OR_x, num? y]) => throw UnimplementedError('scrollTo');
   void setPointerCapture(int pointerId) => throw UnimplementedError('setPointerCapture');
-  void requestFullscreen() => throw UnimplementedError('requestFullscreen');
   static dynamic get mouseWheelEvent => throw UnimplementedError('mouseWheelEvent');
   static dynamic get transitionEndEvent => throw UnimplementedError('transitionEndEvent');
   static dynamic get abortEvent => throw UnimplementedError('abortEvent');

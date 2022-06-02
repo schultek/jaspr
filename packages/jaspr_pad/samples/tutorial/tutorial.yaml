@@ -4,5 +4,11 @@ steps:
     id: intro
   - name: Hello World
     id: hello
+  - name: StatelessComponent
+    id: stateless
+  - name: StatefulComponent
+    id: stateful
+  - name: Events and Rebuilds
+    id: events
   - name: Coming Soon
     id: more

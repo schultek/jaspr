@@ -71,6 +71,7 @@ class _MarkdownState extends State<Markdown> {
     document = Document(
       blockSyntaxes: component.blockSyntaxes,
       inlineSyntaxes: [InlineBracketsColon(), InlineBrackets()],
+      extensionSet: ExtensionSet.gitHubFlavored,
     );
     nodes = document.parseLines(component.markdown.replaceAll('\r\n', '\n').split('\n'));
   }

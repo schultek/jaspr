@@ -3,7 +3,7 @@ description: Polyfill builder for integrating js libraries with jaspr
 version: 0.1.0
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=2.16.0 <3.0.0'
 
 dependencies:
   analyzer: ^3.0.0

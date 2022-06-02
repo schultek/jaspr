@@ -146,9 +146,7 @@ class SplitterElement extends StatelessElement {
     if (sizes.length != elements.length) {
       sizes = List.filled(elements.length, 100 / elements.length);
     }
-    if (splitPairs.length != elements.length - 1) {
-      splitPairs = List.generate(elements.length - 1, (i) => SplitPair(this, i, elements[i], elements[i + 1]));
-    }
+    splitPairs = List.generate(elements.length - 1, (i) => SplitPair(this, i, elements[i], elements[i + 1]));
   }
 
   @override

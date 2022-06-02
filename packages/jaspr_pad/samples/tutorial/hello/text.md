@@ -11,26 +11,35 @@ Just like in Flutter, you use [runApp] to set the root component of your app.
 
 ---
 
-Similar to Flutter, you can extract parts of your component tree into your own custom components.
-A simple stateless component would extend the [StatelessComponent] class and must override the 
-[build()] method.
+## 🔎 DomComponent
 
-A simple [build()] method can look like this:
+The `DomComponent` will render a single html element to the webpage. It takes a tag, and optionally 
+some attributes and events.
 
-```dart
-Iterable<Component> build(BuildContext context) sync* {
-  yield DomComponent(...);
-}
-```
+It also takes a single `child` or a list of `children`, since html elements can have multiple child nodes.
 
-Notice that different to Flutter it must return an [Iterable<Component>] instead of a single component.
-This is a [**Design Principle**](https://github.com/schultek/jaspr/tree/main/packages/jaspr#differences-to-flutter) 
-of Jaspr to better match the unique properties of the web platform compared to Flutter.
+## 🔎 Text
 
-> The recommended way to write build methods with Jaspr is using the [**Sync Generator**](https://dart.dev/guides/language/language-tour#generators) pattern.
-> Simply use the `sync*` keyword in the method definition and `yield` one or multiple components (instead of returning).
+The `Text` component renders a plain text node.
 
-# Task
+A text node in html is just some standalone string, that is placed inside another html element. 
+Therefore the `Text` component also only receives a single string to render to the page.
 
-Refactor the Hello World app to use a custom [StatelessComponent] called [App] and provide this
-component to the [runApp] method.
+> As usual for web, styling is done through a combination of CSS attributes, either in a 
+> **Stylesheet** or inline though the **`style` attribute** of the parent elements.
+
+---
+
+# 🚀 Task
+
+1. Wrap the `h1` element in another `div` element.
+   <details>
+     <summary>Tip</summary>
+     Wrap with a new `DomComponent`.
+   </details>
+   
+2. Inside the new `div` element, add a new paragraph under the heading, containing some text.
+   <details>
+     <summary>Tip</summary>
+     Change the `child` property of the div component to `children` and use a list.
+   </details>
