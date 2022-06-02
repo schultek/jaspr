@@ -24,11 +24,11 @@ dependencies:
 dev_dependencies:
   build_runner: ^2.1.7
   build_web_compilers: ^3.2.2
+  dart_mappable_builder: ^1.1.0
+  jaspr_builder: ^0.1.0
+  jaspr_test: ^0.1.0
   lints: ^1.0.0
   mdc_web: ^0.6.0
   test: ^1.16.0
-  jaspr_builder: ^0.1.0
-  jaspr_test: ^0.1.0
-  dart_mappable_builder: ^1.1.0
-  yaml_writer: ^1.0.1
   webdev: ^2.7.7
+  yaml_writer: ^1.0.1
