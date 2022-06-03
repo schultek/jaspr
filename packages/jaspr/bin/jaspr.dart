@@ -328,7 +328,7 @@ String mainFileContent(package) => ""
     "import '$package/app.dart';\n"
     "\n"
     "void main() {\n"
-    "  runApp(() => App(), id: 'output');\n"
+    "  runApp(App());\n"
     "}";
 String appFileContent() => ""
     "import 'package:jaspr/jaspr.dart';\n"
