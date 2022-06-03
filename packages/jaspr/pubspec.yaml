@@ -1,11 +1,14 @@
 name: jaspr
 description: Experimental web framework that feels like Flutter but supports server-side rendering.
-version: 0.1.1
+version: 0.1.2
 homepage: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
 
 environment:
   sdk: '>=2.16.0 <3.0.0'
+
+executables:
+  jaspr:
 
 dependencies:
   args: ^2.3.0
