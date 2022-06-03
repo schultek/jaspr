@@ -64,8 +64,10 @@ Rather it embraces these differences to give the best of both worlds.
 - ✅ Add tutorial to jasprpad
 - ✅ Add wiki and documentation
 - 🚧 Bump test coverage over 80%
+- 🔜 Add benchmarks
 - 🔜 Improve router package
 - 🔜 Add ssg support
+- 🔜 Add css preprocessing and scoped styles
 - 🔜 Improve tutorial on jasprpad
 - 🔜 Improve wiki and add website
 - 🔜 Extend framework with missing concepts (Animations, ...)
