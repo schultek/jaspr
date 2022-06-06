@@ -117,6 +117,12 @@ class ServeCommand extends Command<int> {
       },
       defaultsTo: 'reload',
     );
+    argParser.addOption(
+      'port',
+      abbr: 'p',
+      help: 'Specify a port to run the dev server on.',
+      defaultsTo: '8080',
+    );
     argParser.addFlag(
       'debug',
       abbr: 'd',
@@ -194,7 +200,11 @@ class ServeCommand extends Command<int> {
 
     args.addAll(argResults!.rest);
 
-    var process = await Process.start('dart', args, environment: {'JASPR_PROXY_PORT': '5467'});
+    var process = await Process.start(
+      'dart',
+      args,
+      environment: {'PORT': argResults!['port'], 'JASPR_PROXY_PORT': '5467'},
+    );
 
     _pipeProcess(process);
     return process.exitCode;
@@ -352,4 +362,4 @@ String pubspecYaml(String name) => ""
     "  build_runner: ^2.1.4\n"
     "  build_web_compilers: ^3.2.1\n"
     "  lints: ^1.0.0\n"
-    "  webdev: ^2.7.7";
+    "  webdev: 2.7.7";
