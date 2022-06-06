@@ -362,4 +362,4 @@ String pubspecYaml(String name) => ""
     "  build_runner: ^2.1.4\n"
     "  build_web_compilers: ^3.2.1\n"
     "  lints: ^1.0.0\n"
-    "  webdev: ^2.7.7";
+    "  webdev: 2.7.7";
