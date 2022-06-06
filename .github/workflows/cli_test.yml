@@ -1,0 +1,40 @@
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+    paths:
+      - '.github/workflows/cli_test.yml'
+      - 'packages/jaspr/**'
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - '.github/workflows/cli_test.yml'
+      - 'packages/jaspr/**'
+
+name: CLI Test
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    name: CLI Test
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - uses: dart-lang/setup-dart@v1.3
+
+      - name: Activate Jaspr
+        run: |
+          cd packages
+          dart pub global activate jaspr --source=path
+
+      - name: Create & Build Project
+        run: |
+          jaspr create my_app
+          cd my_app
+          jaspr build
