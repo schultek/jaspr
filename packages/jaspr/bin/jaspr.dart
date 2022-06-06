@@ -230,7 +230,7 @@ class BuildCommand extends Command<int> {
 
   @override
   Future<int> run() async {
-    var dir = Directory(path.join(Directory.current.path, 'build'));
+    var dir = Directory('build');
     if (!await dir.exists()) {
       await dir.create();
     }
