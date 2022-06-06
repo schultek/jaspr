@@ -1,4 +1,4 @@
-![Banner](/assets/jaspr_banner.png)
+![Banner](https://github.com/schultek/jaspr/raw/main/assets/jaspr_banner.png)
 
 # jaspr
 
