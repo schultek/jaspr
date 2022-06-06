@@ -196,10 +196,6 @@ class ServeCommand extends Command<int> {
 
     var process = await Process.start('dart', args, environment: {'JASPR_PROXY_PORT': '5467'});
 
-    buildCompleted.stream.listen((_) {
-      process.stdin.write('r');
-    });
-
     _pipeProcess(process);
     return process.exitCode;
   }
@@ -234,8 +230,7 @@ class BuildCommand extends Command<int> {
 
   @override
   Future<int> run() async {
-    var dir = Directory.fromUri(Uri.parse(Directory.current.path + "/build"));
-
+    var dir = Directory(path.join(Directory.current.path, 'build'));
     if (!await dir.exists()) {
       await dir.create();
     }
