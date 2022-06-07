@@ -1,0 +1,12 @@
+name: jaspr_bootstrap
+description: Bootstrap components for jaspr.
+version: 0.1.0
+
+environment:
+  sdk: '>=2.16.0 <3.0.0'
+
+dependencies:
+  jaspr: ^0.1.4
+
+dev_dependencies:
+  lints: ^1.0.0

@@ -1,0 +1,72 @@
+Core:
+- [ ] Container
+- [ ] Grid
+- [ ] Column
+- [ ] Row
+- [ ] Padding
+- [ ] Margin
+- [ ] Flex
+
+
+Elements:
+- [ ] Header
+- [ ] Paragraph
+- [ ] Button
+- [ ] Divider
+- [ ] List
+- [ ] Table
+- [ ] Image
+- [ ] Icon
+
+
+Forms:
+- [ ] Input
+- [ ] Label
+- [ ] File input
+- [ ] Select
+- [ ] Check/Radio
+- [ ] Range
+- [ ] Form layout
+- [ ] Input group
+- [ ] Floating labels
+- [ ] Validation
+
+
+Components:
+- [ ] Accortion
+- [ ] Alert
+- [ ] Badge
+- [ ] Breadcrumb
+- [ ] Button group
+- [ ] Card
+- [ ] Carousel
+- [ ] Collapse
+- [ ] Dropdown
+- [ ] List group
+- [ ] Modal
+- [ ] NavBar
+- [ ] Navs
+- [ ] Tabs
+- [ ] OffCanvas
+- [ ] Pagination
+- [ ] Popover
+- [ ] Progress
+- [ ] Spinner
+- [ ] Toast
+- [ ] Tooltip
+ 
+
+Others:
+- [ ] Close button
+- [ ] Placeholder
+- [ ] ScrollSpy
+- [ ] Figure
+- [ ] Address
+- [ ] Quote
+- [ ] InlineCode
+- [ ] CodeBlock
+- [ ] Variable
+- [ ] Kbd
+- [ ] Sample
+
+
