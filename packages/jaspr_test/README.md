@@ -14,8 +14,7 @@ void main() {
     late ComponentTester tester;
 
     setUp(() {
-      TestComponentsBinding.setUp();
-      tester = TestComponentsBinding.instance.tester;
+      tester = ComponentTester.setUp();
     });
 
     test('should render component', () async {
