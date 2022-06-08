@@ -274,7 +274,7 @@ Future<Process> _runWebdev(List<String> args) async {
   Process process;
 
   if (hasGlobalWebdev) {
-    process = await Process.start('webdev', args);
+    process = await Process.start('dart', ['pub', 'global', 'run', 'webdev', ...args]);
   } else {
     process = await Process.start('dart', ['run', 'webdev', ...args]);
   }
