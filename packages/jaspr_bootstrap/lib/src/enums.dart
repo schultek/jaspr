@@ -70,6 +70,7 @@ enum FontStyle {
   normal,
   italic,
 }
+
 enum TextDecoration {
   none('none'),
   underline('underline'),
