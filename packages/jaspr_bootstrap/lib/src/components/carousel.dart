@@ -1,110 +1,173 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_bootstrap/src/elements/image.dart';
+import 'package:jaspr_bootstrap/jaspr_bootstrap.dart';
+import 'package:jaspr_bootstrap/src/utils.dart';
+
+class Caption {
+  final Header title;
+  final Paragraph description;
+
+  Caption({required this.title, required this.description});
+}
+
+enum CarouselTransition { fade, slide }
 
 class Carousel extends StatelessComponent {
+  final String? id;
+  final List<CarouselItem> items;
+  final bool dark;
+  final bool enableControl;
+  final bool enableIndicator;
+  final int activeIndex;
+  final CarouselTransition transition;
+
+  Carousel({
+    this.id,
+    required this.items,
+    this.dark = false,
+    this.enableControl = false,
+    this.enableIndicator = false,
+    this.activeIndex = 0,
+    this.transition = CarouselTransition.slide,
+  });
+
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'div', id: 'carouselExampleControls', classes: [
-      'carousel',
-      'carousel-dark',
-      'slide'
-    ], attributes: {
-      'data-bs-ride': 'carousel',
-    }, children: [
-      DomComponent(tag: 'div', styles: {
-        '--bs-carousel-indicator-width': '90px'
-      }, classes: [
-        'carousel-indicators'
-      ], children: [
-        DomComponent(
-          tag: 'button',
-          attributes: {
-            'type': 'button',
-            'data-bs-target': '#carouselExampleCaptions',
-            'data-bs-slide-to': '0',
-            'aria-current': 'true',
-            'aria-label': 'Slide 1',
-          },
-          classes: ['active'],
-        ),
-        DomComponent(
-          tag: 'button',
-          attributes: {
-            'type': 'button',
-            'data-bs-target': '#carouselExampleCaptions',
-            'data-bs-slide-to': '1',
-            'aria-label': 'Slide 2',
-          },
-        ),
-        DomComponent(
-          tag: 'button',
-          attributes: {
-            'type': 'button',
-            'data-bs-target': '#carouselExampleCaptions',
-            'data-bs-slide-to': '2',
-            'aria-label': 'Slide 3',
-          },
-        ),
-      ]),
-      DomComponent(
-        tag: 'div',
-        classes: ['carousel-inner'],
-        children: [
+    final componentId = id ?? Utils.getRandomString(12);
+    yield DomComponent(
+      tag: 'div',
+      id: componentId,
+      classes: [
+        'carousel',
+        'slide',
+        if (dark) 'carousel-dark',
+        if (transition == CarouselTransition.fade) 'carousel-fade',
+      ],
+      attributes: {
+        'data-bs-ride': 'carousel',
+      },
+      children: [
+        if (enableIndicator)
           DomComponent(
             tag: 'div',
-            classes: ['carousel-item', 'active'],
-            child: Image(
-              classes: ['d-block', 'w-100'],
-              source:
-                  "https://image.shutterstock.com/image-vector/colorful-illustration-test-word-260nw-1438324490.jpg",
-            ),
+            classes: ['carousel-indicators'],
+            children: [
+              for (var i = 0; i < items.length; i++)
+                DomComponent(
+                  tag: 'button',
+                  attributes: {
+                    'type': 'button',
+                    'data-bs-target': '#$componentId',
+                    'data-bs-slide-to': '$i',
+                    if (items[i].isActive) 'aria-current': 'true',
+                    'aria-label': items[i].label,
+                  },
+                  classes: items[i].isActive ? ['active'] : null,
+                ),
+            ],
           ),
+        DomComponent(
+          tag: 'div',
+          classes: ['carousel-inner'],
+          children: items,
+        ),
+        if (enableControl)
+          DomComponent(
+            tag: 'button',
+            classes: ['carousel-control-prev'],
+            attributes: {
+              'type': 'button',
+              'data-bs-target': '#$componentId',
+              'data-bs-slide': 'prev',
+            },
+            children: [
+              DomComponent(tag: 'span', classes: ['carousel-control-prev-icon'], attributes: {'aria-hidden': 'true'}),
+              DomComponent(tag: 'span', classes: ['visually-hidden'], child: Text("Previous")),
+            ],
+          ),
+        if (enableControl)
+          DomComponent(
+            tag: 'button',
+            classes: ['carousel-control-next'],
+            attributes: {
+              'type': 'button',
+              'data-bs-target': '#$componentId',
+              'data-bs-slide': 'next',
+            },
+            children: [
+              DomComponent(tag: 'span', classes: ['carousel-control-next-icon'], attributes: {'aria-hidden': 'true'}),
+              DomComponent(tag: 'span', classes: ['visually-hidden'], child: Text("Next")),
+            ],
+          ),
+      ],
+    );
+  }
+}
+
+abstract class CarouselItem extends StatelessComponent {
+  final String label;
+  final bool isActive;
+  final int? interval;
+
+  CarouselItem({
+    this.isActive = false,
+    this.label = '',
+    this.interval,
+  });
+
+  Iterable<Component> _getCarouselItemComponent({required List<Component> children}) sync* {
+    yield DomComponent(
+      tag: 'div',
+      classes: ['carousel-item', if (isActive) 'active'],
+      attributes: {if (interval != null) 'data-bs-interval': '$interval'},
+      children: children,
+    );
+  }
+}
+
+class CarouselSlide extends CarouselItem {
+  final DomComponent content;
+
+  CarouselSlide({
+    required this.content,
+    super.label,
+    super.isActive,
+    super.interval,
+  });
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield* _getCarouselItemComponent(children: [content]);
+  }
+}
+
+class CarouselImage extends CarouselItem {
+  final Image image;
+  final Caption? caption;
+
+  CarouselImage({
+    required this.image,
+    this.caption,
+    super.label,
+    super.isActive,
+    super.interval,
+  });
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield* _getCarouselItemComponent(
+      children: [
+        Image(
+          classes: ['d-block', 'w-100'],
+          source: image.source,
+          alternate: image.alternate,
+        ),
+        if (caption != null)
           DomComponent(
             tag: 'div',
-            classes: ['carousel-item'],
-            child: Image(
-              classes: ['d-block', 'w-100'],
-              source:
-                  "https://image.shutterstock.com/image-vector/colorful-illustration-test-word-260nw-1438324490.jpg",
-            ),
+            classes: ['carousel-caption', 'd-none', 'd-md-block'],
+            children: [caption!.title, caption!.description],
           ),
-          DomComponent(
-            tag: 'div',
-            classes: ['carousel-item'],
-            child: Image(
-              classes: ['d-block', 'w-100'],
-              source:
-                  "https://image.shutterstock.com/image-vector/colorful-illustration-test-word-260nw-1438324490.jpg",
-            ),
-          ),
-        ],
-      ),
-      DomComponent(
-        tag: 'button',
-        classes: ['carousel-control-prev'],
-        attributes: {
-          'type': 'button',
-          'data-bs-target': '#carouselExampleControls',
-          'data-bs-slide': 'prev',
-        },
-        children: [
-          DomComponent(tag: 'span', classes: ['carousel-control-prev-icon'], attributes: {'aria-hidden': 'true'}),
-          DomComponent(tag: 'span', classes: ['visually-hidden'], child: Text("Previous")),
-        ],
-      ),
-      DomComponent(
-        tag: 'button',
-        classes: ['carousel-control-next'],
-        attributes: {
-          'type': 'button',
-          'data-bs-target': '#carouselExampleControls',
-          'data-bs-slide': 'next',
-        },
-        children: [
-          DomComponent(tag: 'span', classes: ['carousel-control-next-icon'], attributes: {'aria-hidden': 'true'}),
-          DomComponent(tag: 'span', classes: ['visually-hidden'], child: Text("Next")),
-        ],
-      ),
-    ]);
+      ],
+    );
   }
 }
