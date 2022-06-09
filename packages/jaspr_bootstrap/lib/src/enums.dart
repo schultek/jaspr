@@ -1,11 +1,11 @@
 enum Breakpoint {
-  small(''),
-  extraSmall('-sm'),
+  extraSmall(''),
+  small('-sm'),
   medium('-md'),
   large('-lg'),
   extraExtraLarge('-xl'),
   extraLarge('-xxl'),
-  infinity('-fluid');
+  fluid('-fluid');
 
   final String value;
   const Breakpoint(this.value);
@@ -44,6 +44,68 @@ enum BackgroundColor {
 
   final String value;
   const BackgroundColor(this.value);
+}
+
+enum BorderColor {
+  primary('border-primary'),
+  secondary('border-secondary'),
+  success('border-success'),
+  danger('border-danger'),
+  warning('border-warning'),
+  info('border-info'),
+  light('border-light'),
+  dark('border-dark'),
+  white('border-white');
+
+  final String value;
+  const BorderColor(this.value);
+}
+
+enum BorderRound {
+  all('rounded'),
+  left('rounded-start'),
+  top('rounded-top'),
+  right('rounded-end'),
+  bottom('rounded-bottom'),
+  circle('rounded-circle'),
+  pill('rounded-pill');
+
+  final String value;
+  const BorderRound(this.value);
+}
+
+enum BorderRadius {
+  r0('rounded-0'),
+  r1('rounded-1'),
+  r2('rounded-2'),
+  r3('rounded-3'),
+  r4('rounded-4'),
+  r5('rounded-5');
+
+  final String value;
+  const BorderRadius(this.value);
+}
+
+enum BorderWidth {
+  w1('border-1'),
+  w2('border-2'),
+  w3('border-3'),
+  w4('border-4'),
+  w5('border-5');
+
+  final String value;
+  const BorderWidth(this.value);
+}
+
+enum BorderOpacity {
+  o100(''),
+  o75('border-opacity-75'),
+  o50('border-opacity-50'),
+  o25('border-opacity-25'),
+  o10('border-opacity-10');
+
+  final String value;
+  const BorderOpacity(this.value);
 }
 
 enum TextAlign {
