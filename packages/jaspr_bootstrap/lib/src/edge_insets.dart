@@ -36,7 +36,7 @@ class EdgeInsets {
 
   static const EdgeInsets zero = EdgeInsets.only();
 
-  getClasses(String type) {
+  Iterable<String> getClasses(String type) {
     if (horizontal == null && vertical == null) {
       return [
         if (left != null) '${type}s-${left!.value}',
