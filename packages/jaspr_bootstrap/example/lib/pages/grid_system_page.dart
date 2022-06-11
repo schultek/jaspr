@@ -2,6 +2,16 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_bootstrap/jaspr_bootstrap.dart';
 
 class GridSystemPage extends StatelessComponent {
+  static String style = '''
+        .content {
+          padding: 10px;
+          font-size: 32px;
+          font-weight: bold;
+          text-align: center;
+          background: #dbdfe5;
+        }
+      ''';
+
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield HorizontalLine();
@@ -396,13 +406,7 @@ class GridSystemPage extends StatelessComponent {
             ],
             child: Paragraph(
               "Box $i",
-              styles: {
-                "padding": "50px",
-                "font-size": "32px",
-                "font-weight": "bold",
-                "text-align": "center",
-                "background": "#dbdfe5",
-              },
+              classes: ['content'],
             ),
           )
       ]),

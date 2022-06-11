@@ -1,11 +1,12 @@
 library jaspr_bootstrap;
 
+export 'src/core/page_style.dart';
 export 'src/components/carousel.dart';
-export 'src/core/center.dart';
-export 'src/core/container.dart';
-export 'src/core/column.dart';
-export 'src/core/row.dart';
-export 'src/core/size.dart';
+export 'src/layout/center.dart';
+export 'src/layout/container.dart';
+export 'src/layout/column.dart';
+export 'src/layout/row.dart';
+export 'src/layout/size.dart';
 export 'src/elements/button.dart';
 export 'src/elements/header.dart';
 export 'src/elements/horizontal_line.dart';
