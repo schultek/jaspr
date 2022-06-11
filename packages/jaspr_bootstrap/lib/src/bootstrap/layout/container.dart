@@ -1,47 +1,38 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_ui/bootstrap.dart';
+import 'package:jaspr_ui/src/bootstrap/components/base.dart';
 
-class Container extends StatelessComponent {
+class Container extends BaseComponent {
   final Breakpoint breakpoint;
-  final BackgroundColor? backgroundColor;
-  final TextColor? textColor;
-  final EdgeInsets? padding;
-  final EdgeInsets? margin;
-  final Border? border;
-  final Map<String, String>? styles;
-
-  final Component? _child;
-  final List<Component>? _children;
 
   Container({
-    Key? key,
-    Component? child,
-    List<Component>? children,
     this.breakpoint = Breakpoint.extraSmall,
-    this.backgroundColor,
-    this.textColor,
-    this.padding,
-    this.margin,
-    this.border,
-    this.styles,
-  })  : _child = child,
-        _children = children,
-        super(key: key);
-
-  List<Component> get children => [if (_child != null) _child!, ..._children ?? []];
+    super.id,
+    super.key,
+    super.child,
+    super.children,
+    super.styles,
+    super.classes,
+    super.attributes,
+    super.events,
+    super.backgroundColor,
+    super.textColor,
+    super.padding,
+    super.margin,
+    super.border,
+  });
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'div',
+      id: id,
       styles: styles,
+      attributes: attributes,
+      events: events,
       classes: [
         'container${breakpoint.value}',
-        if (backgroundColor != null) backgroundColor!.value,
-        if (textColor != null) textColor!.value,
-        if (padding != null) ...padding!.getClasses('p'),
-        if (margin != null) ...margin!.getClasses('m'),
-        if (border != null) ...border!.getClasses(),
+        ...getClasses(classes),
       ],
       children: children,
     );

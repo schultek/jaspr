@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_ui/core.dart';
+import 'package:jaspr_ui/src/bootstrap/components/base.dart';
 import 'package:jaspr_ui/src/utils.dart';
 
 class Caption {
@@ -11,8 +12,7 @@ class Caption {
 
 enum CarouselTransition { fade, slide }
 
-class Carousel extends StatelessComponent {
-  final String? id;
+class Carousel extends BaseComponent {
   final List<CarouselItem> items;
   final bool dark;
   final bool enableControl;
@@ -21,13 +21,25 @@ class Carousel extends StatelessComponent {
   final CarouselTransition transition;
 
   Carousel({
-    this.id,
     required this.items,
     this.dark = false,
     this.enableControl = false,
     this.enableIndicator = false,
     this.activeIndex = 0,
     this.transition = CarouselTransition.slide,
+    super.id,
+    super.key,
+    super.child,
+    super.children,
+    super.styles,
+    super.classes,
+    super.attributes,
+    super.events,
+    super.backgroundColor,
+    super.textColor,
+    super.padding,
+    super.margin,
+    super.border,
   });
 
   @override
@@ -36,14 +48,18 @@ class Carousel extends StatelessComponent {
     yield DomComponent(
       tag: 'div',
       id: componentId,
+      styles: styles,
+      events: events,
       classes: [
         'carousel',
         'slide',
         if (dark) 'carousel-dark',
         if (transition == CarouselTransition.fade) 'carousel-fade',
+        ...getClasses(classes),
       ],
       attributes: {
         'data-bs-ride': 'carousel',
+        if (attributes != null) ...attributes!,
       },
       children: [
         if (enableIndicator)
