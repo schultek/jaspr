@@ -1,9 +1,7 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_bootstrap/src/border.dart';
-import 'package:jaspr_bootstrap/src/edge_insets.dart';
-import 'package:jaspr_bootstrap/src/enums.dart';
+import 'package:jaspr_ui/bootstrap.dart';
 
-class Column extends StatelessComponent {
+class Row extends StatelessComponent {
   final BackgroundColor? backgroundColor;
   final TextColor? textColor;
   final EdgeInsets? padding;
@@ -12,15 +10,11 @@ class Column extends StatelessComponent {
 
   final Component? _child;
   final List<Component>? _children;
-  final Flex? _flex;
-  final List<Flex>? _flexibility;
 
-  const Column({
+  Row({
     Key? key,
     Component? child,
     List<Component>? children,
-    Flex? flex,
-    List<Flex>? flexibility,
     this.backgroundColor,
     this.textColor,
     this.padding,
@@ -28,23 +22,16 @@ class Column extends StatelessComponent {
     this.border,
   })  : _child = child,
         _children = children,
-        _flex = flex,
-        _flexibility = flexibility,
         super(key: key);
 
   List<Component> get children => [if (_child != null) _child!, ..._children ?? []];
-
-  List<Flex> get flexibility {
-    final List<Flex> result = [if (_flex != null) _flex!, ..._flexibility ?? []];
-    return result.isEmpty ? [Flex()] : result;
-  }
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'div',
       classes: [
-        ...flexibility.map((e) => e.getClass('col')),
+        'row',
         if (backgroundColor != null) backgroundColor!.value,
         if (textColor != null) textColor!.value,
         if (padding != null) ...padding!.getClasses('p'),
@@ -54,16 +41,4 @@ class Column extends StatelessComponent {
       children: children,
     );
   }
-}
-
-class Flex {
-  final Breakpoint breakpoint;
-  final ColumnSpace space;
-
-  const Flex({
-    this.breakpoint = Breakpoint.extraSmall,
-    this.space = ColumnSpace.auto,
-  });
-
-  String getClass(String type) => space == ColumnSpace.auto ? type : '$type${breakpoint.value}-${space.value}';
 }

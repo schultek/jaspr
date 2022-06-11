@@ -6,7 +6,7 @@ environment:
   sdk: '>=2.17.0 <3.0.0'
 
 dependencies:
-  jaspr_bootstrap:
+  jaspr_ui:
     path: ../
 
 dev_dependencies:

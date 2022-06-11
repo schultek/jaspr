@@ -316,7 +316,7 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.4"
-  jaspr_bootstrap:
+  jaspr_ui:
     dependency: "direct main"
     description:
       path: ".."

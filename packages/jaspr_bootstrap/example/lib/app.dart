@@ -1,6 +1,7 @@
 import 'package:example/pages/grid_system_page.dart';
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_bootstrap/jaspr_bootstrap.dart';
+import 'package:jaspr_ui/bootstrap.dart';
+import 'package:jaspr_ui/core.dart';
 
 class App extends StatelessComponent {
   @override
