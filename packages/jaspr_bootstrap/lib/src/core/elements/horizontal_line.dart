@@ -3,13 +3,13 @@ import 'package:jaspr_ui/src/core/elements/base.dart';
 
 class HorizontalLine extends BaseElement {
   HorizontalLine({
-    Key? key,
+    super.key,
     super.id,
     super.styles,
     super.classes,
     super.attributes,
     super.events,
-  }) : super(key: key);
+  });
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

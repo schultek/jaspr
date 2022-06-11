@@ -28,7 +28,6 @@ class FirstPage extends StatelessComponent {
             child: Image(
               source: "https://metacode.biz/@test/avatar.jpg",
               alternate: "Test image",
-              width: 25,
             ),
           ),
           //Carousel(),

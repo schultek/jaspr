@@ -6,13 +6,13 @@ class ButtonElement extends BaseElement {
 
   const ButtonElement({
     required this.text,
-    Key? key,
+    super.key,
     super.id,
     super.styles,
     super.classes,
     super.attributes,
     super.events,
-  }) : super(key: key);
+  });
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

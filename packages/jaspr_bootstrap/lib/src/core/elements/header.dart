@@ -9,14 +9,14 @@ class Header extends BaseElement {
 
   Header(
     this.text, {
-    Key? key,
+    this.size = HeaderSize.h3,
+    super.key,
     super.id,
     super.styles,
     super.classes,
     super.attributes,
     super.events,
-    this.size = HeaderSize.h3,
-  }) : super(key: key);
+  });
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
