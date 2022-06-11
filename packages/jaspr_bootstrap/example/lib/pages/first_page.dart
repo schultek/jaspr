@@ -2,7 +2,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_ui/bootstrap.dart';
 import 'package:jaspr_ui/core.dart';
 
-class App extends StatelessComponent {
+class FirstPage extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
@@ -13,11 +13,14 @@ class App extends StatelessComponent {
         classes: ['row'],
         children: [
           Paragraph("Hello world!!"),
-          Center(child: Button("test123")),
+          Center(child: Button.basic(text: "test123")),
           Size(height: "25px"),
           DomComponent(
             tag: 'div',
-            child: Button("test123"),
+            children: [
+              Button(text: "test123"),
+              Button(text: "test123", type: ButtonType.danger),
+            ],
           ),
           Size(height: "25px"),
           Center(

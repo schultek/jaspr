@@ -1,6 +1,7 @@
 library bootstrap;
 
 export 'src/bootstrap/components/carousel.dart';
+export 'src/bootstrap/elements/button.dart';
 export 'src/bootstrap/layout/center.dart';
 export 'src/bootstrap/layout/container.dart';
 export 'src/bootstrap/layout/column.dart';

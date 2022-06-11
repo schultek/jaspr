@@ -1,28 +1,16 @@
 import 'package:jaspr/jaspr.dart';
 
-enum ButtonType {
-  primary,
-  secondary,
-  success,
-  danger,
-  warning,
-  info,
-  light,
-  dark,
-  link
-}
-
-class Button extends StatelessComponent {
-  final ButtonType type;
+class ButtonElement extends StatelessComponent {
   final String text;
+  final List<String>? classes;
 
-  Button(this.text, {this.type = ButtonType.primary});
+  const ButtonElement({required this.text, this.classes});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'button',
-      classes: ['btn', 'btn-${type.name}'],
+      classes: classes,
       child: Text(text),
     );
   }
