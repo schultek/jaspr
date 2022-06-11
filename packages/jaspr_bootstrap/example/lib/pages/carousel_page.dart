@@ -1,3 +1,4 @@
+
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_ui/bootstrap.dart';
 import 'package:jaspr_ui/core.dart';
@@ -12,11 +13,9 @@ const image3 =
 class CarouselPage extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
+    yield DivElement(
       classes: ['container', 'pt-5'],
-      child: DomComponent(
-        tag: 'div',
+      child: DivElement(
         children: [
           Header("Carousel test page:", size: HeaderSize.h1),
           Section(
@@ -139,8 +138,7 @@ class Section extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield Header(title, size: HeaderSize.h3);
-    yield DomComponent(
-      tag: 'div',
+    yield DivElement(
       classes: ['mt-4', 'mb-4', 'pb-4', 'w-50'],
       child: child,
     );

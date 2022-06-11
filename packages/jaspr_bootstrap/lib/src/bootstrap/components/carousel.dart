@@ -1,6 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_ui/core.dart';
 import 'package:jaspr_ui/src/bootstrap/components/base.dart';
+import 'package:jaspr_ui/src/core/elements/div.dart';
 import 'package:jaspr_ui/src/utils.dart';
 
 class Caption {
@@ -45,8 +46,7 @@ class Carousel extends BaseComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     final componentId = id ?? Utils.getRandomString(12);
-    yield DomComponent(
-      tag: 'div',
+    yield DivElement(
       id: componentId,
       styles: styles,
       events: events,
@@ -63,8 +63,7 @@ class Carousel extends BaseComponent {
       },
       children: [
         if (enableIndicator)
-          DomComponent(
-            tag: 'div',
+          DivElement(
             classes: ['carousel-indicators'],
             children: [
               for (var i = 0; i < items.length; i++)
@@ -81,8 +80,7 @@ class Carousel extends BaseComponent {
                 ),
             ],
           ),
-        DomComponent(
-          tag: 'div',
+        DivElement(
           classes: ['carousel-inner'],
           children: items,
         ),
@@ -131,8 +129,7 @@ abstract class CarouselItem extends StatelessComponent {
   });
 
   Iterable<Component> _getCarouselItemComponent({required List<Component> children}) sync* {
-    yield DomComponent(
-      tag: 'div',
+    yield DivElement(
       classes: ['carousel-item', if (isActive) 'active'],
       attributes: {if (interval != null) 'data-bs-interval': '$interval'},
       children: children,
@@ -178,8 +175,7 @@ class CarouselImage extends CarouselItem {
           alternate: image.alternate,
         ),
         if (caption != null)
-          DomComponent(
-            tag: 'div',
+          DivElement(
             classes: ['carousel-caption', 'd-none', 'd-md-block'],
             children: [caption!.title, caption!.description],
           ),

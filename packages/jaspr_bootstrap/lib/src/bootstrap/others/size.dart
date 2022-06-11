@@ -1,4 +1,5 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_ui/src/core/elements/div.dart';
 
 class Size extends StatelessComponent {
   final String width;
@@ -9,8 +10,7 @@ class Size extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
+    yield DivElement(
       styles: {'width': width, 'height': height},
       child: child,
     );

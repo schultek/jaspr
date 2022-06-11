@@ -1,4 +1,5 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_ui/src/core/elements/div.dart';
 
 class Center extends StatelessComponent {
   final Component child;
@@ -7,8 +8,7 @@ class Center extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
+    yield DivElement(
       classes: ['text-center'],
       child: child,
     );

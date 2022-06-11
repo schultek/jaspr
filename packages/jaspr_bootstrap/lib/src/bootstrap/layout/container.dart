@@ -1,6 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_ui/bootstrap.dart';
 import 'package:jaspr_ui/src/bootstrap/components/base.dart';
+import 'package:jaspr_ui/src/core/elements/div.dart';
 
 class Container extends BaseComponent {
   final Breakpoint breakpoint;
@@ -24,8 +25,7 @@ class Container extends BaseComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
+    yield DivElement(
       id: id,
       styles: styles,
       attributes: attributes,

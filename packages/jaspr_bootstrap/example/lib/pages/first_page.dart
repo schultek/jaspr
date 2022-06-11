@@ -5,18 +5,15 @@ import 'package:jaspr_ui/core.dart';
 class FirstPage extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
+    yield DivElement(
       classes: ['container'],
-      child: DomComponent(
-        tag: 'div',
+      child: DivElement(
         classes: ['row'],
         children: [
           Paragraph("Hello world!!"),
           Center(child: Button.basic(text: "test123")),
           Size(height: "25px"),
-          DomComponent(
-            tag: 'div',
+          DivElement(
             children: [
               ButtonElement(text: "test123"),
               Button(text: "test123"),
