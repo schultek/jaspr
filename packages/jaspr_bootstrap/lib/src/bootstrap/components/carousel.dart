@@ -1,7 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_ui/core.dart';
 import 'package:jaspr_ui/src/bootstrap/components/base.dart';
-import 'package:jaspr_ui/src/core/elements/div.dart';
 import 'package:jaspr_ui/src/utils.dart';
 
 class Caption {
@@ -100,8 +99,8 @@ class _CarouselButton extends StatelessComponent {
         'data-bs-slide': type.name,
       },
       children: [
-        DomComponent(tag: 'span', classes: ['carousel-control-${type.name}-icon'], attributes: {'aria-hidden': 'true'}),
-        DomComponent(tag: 'span', classes: ['visually-hidden'], child: Text(type.name)),
+        SpanElement(classes: ['carousel-control-${type.name}-icon'], attributes: {'aria-hidden': 'true'}),
+        SpanElement(classes: ['visually-hidden'], child: Text(type.name)),
       ],
     );
   }
@@ -119,8 +118,7 @@ class _CarouselIndicator extends StatelessComponent {
       classes: ['carousel-indicators'],
       children: [
         for (var i = 0; i < items.length; i++)
-          DomComponent(
-            tag: 'button',
+          ButtonElement(
             attributes: {
               'type': 'button',
               'data-bs-target': '#$componentId',

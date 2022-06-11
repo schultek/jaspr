@@ -7,3 +7,4 @@ export 'src/core/elements/header.dart';
 export 'src/core/elements/horizontal_line.dart';
 export 'src/core/elements/image.dart';
 export 'src/core/elements/paragraph.dart';
+export 'src/core/elements/span.dart';
