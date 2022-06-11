@@ -62,55 +62,73 @@ class Carousel extends BaseComponent {
         if (attributes != null) ...attributes!,
       },
       children: [
-        if (enableIndicator)
-          DivElement(
-            classes: ['carousel-indicators'],
-            children: [
-              for (var i = 0; i < items.length; i++)
-                DomComponent(
-                  tag: 'button',
-                  attributes: {
-                    'type': 'button',
-                    'data-bs-target': '#$componentId',
-                    'data-bs-slide-to': '$i',
-                    if (items[i].isActive) 'aria-current': 'true',
-                    'aria-label': items[i].label,
-                  },
-                  classes: items[i].isActive ? ['active'] : null,
-                ),
-            ],
-          ),
+        if (enableIndicator) _CarouselIndicator(componentId: componentId, items: items),
         DivElement(
           classes: ['carousel-inner'],
           children: items,
         ),
         if (enableControl)
-          DomComponent(
-            tag: 'button',
-            classes: ['carousel-control-prev'],
-            attributes: {
-              'type': 'button',
-              'data-bs-target': '#$componentId',
-              'data-bs-slide': 'prev',
-            },
-            children: [
-              DomComponent(tag: 'span', classes: ['carousel-control-prev-icon'], attributes: {'aria-hidden': 'true'}),
-              DomComponent(tag: 'span', classes: ['visually-hidden'], child: Text("Previous")),
-            ],
+          _CarouselButton(
+            componentId: componentId,
+            type: _CarouselButtonType.prev,
           ),
         if (enableControl)
+          _CarouselButton(
+            componentId: componentId,
+            type: _CarouselButtonType.next,
+          ),
+      ],
+    );
+  }
+}
+
+enum _CarouselButtonType { next, prev }
+
+class _CarouselButton extends StatelessComponent {
+  final String componentId;
+  final _CarouselButtonType type;
+
+  _CarouselButton({required this.componentId, required this.type});
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield ButtonElement(
+      classes: ['carousel-control-${type.name}'],
+      attributes: {
+        'type': 'button',
+        'data-bs-target': '#$componentId',
+        'data-bs-slide': type.name,
+      },
+      children: [
+        DomComponent(tag: 'span', classes: ['carousel-control-${type.name}-icon'], attributes: {'aria-hidden': 'true'}),
+        DomComponent(tag: 'span', classes: ['visually-hidden'], child: Text(type.name)),
+      ],
+    );
+  }
+}
+
+class _CarouselIndicator extends StatelessComponent {
+  final String componentId;
+  final List<CarouselItem> items;
+
+  const _CarouselIndicator({required this.componentId, required this.items});
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield DivElement(
+      classes: ['carousel-indicators'],
+      children: [
+        for (var i = 0; i < items.length; i++)
           DomComponent(
             tag: 'button',
-            classes: ['carousel-control-next'],
             attributes: {
               'type': 'button',
               'data-bs-target': '#$componentId',
-              'data-bs-slide': 'next',
+              'data-bs-slide-to': '$i',
+              if (items[i].isActive) 'aria-current': 'true',
+              'aria-label': items[i].label,
             },
-            children: [
-              DomComponent(tag: 'span', classes: ['carousel-control-next-icon'], attributes: {'aria-hidden': 'true'}),
-              DomComponent(tag: 'span', classes: ['visually-hidden'], child: Text("Next")),
-            ],
+            classes: items[i].isActive ? ['active'] : null,
           ),
       ],
     );

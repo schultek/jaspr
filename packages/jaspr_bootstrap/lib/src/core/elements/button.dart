@@ -2,16 +2,18 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_ui/src/core/elements/base.dart';
 
 class ButtonElement extends BaseElement {
-  final String text;
+  final String? text;
 
   const ButtonElement({
-    required this.text,
+    this.text,
     super.key,
     super.id,
     super.styles,
     super.classes,
     super.attributes,
     super.events,
+    super.child,
+    super.children,
   });
 
   @override
@@ -23,7 +25,7 @@ class ButtonElement extends BaseElement {
       classes: classes,
       attributes: attributes,
       events: events,
-      child: Text(text),
+      children: [if (text != null) Text(text!) else ...children],
     );
   }
 }
