@@ -1,18 +1,28 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_ui/src/core/elements/base.dart';
 
-class Paragraph extends StatelessComponent {
+class Paragraph extends BaseElement {
   final String text;
-  final Map<String, String>? styles;
-  final List<String>? classes;
 
-  Paragraph(this.text, {this.styles, this.classes});
+  Paragraph(
+    this.text, {
+    Key? key,
+    super.id,
+    super.styles,
+    super.classes,
+    super.attributes,
+    super.events,
+  }) : super(key: key);
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'p',
+      id: id,
       styles: styles,
       classes: classes,
+      attributes: attributes,
+      events: events,
       child: Text(text),
     );
   }

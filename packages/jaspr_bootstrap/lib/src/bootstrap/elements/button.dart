@@ -16,7 +16,16 @@ enum ButtonType {
 class Button extends ButtonElement {
   final ButtonType? type;
 
-  const Button({required super.text, this.type = ButtonType.primary});
+  const Button({
+    super.id,
+    super.key,
+    super.styles,
+    super.classes,
+    super.attributes,
+    super.events,
+    required super.text,
+    this.type = ButtonType.primary,
+  });
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

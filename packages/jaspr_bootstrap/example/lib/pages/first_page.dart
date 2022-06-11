@@ -18,6 +18,7 @@ class FirstPage extends StatelessComponent {
           DomComponent(
             tag: 'div',
             children: [
+              ButtonElement(text: "test123"),
               Button(text: "test123"),
               Button(text: "test123", type: ButtonType.danger),
             ],
