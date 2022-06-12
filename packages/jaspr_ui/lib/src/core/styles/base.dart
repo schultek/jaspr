@@ -1,3 +1,5 @@
+import 'package:jaspr/jaspr.dart';
+
 abstract class BaseStyle {
   const BaseStyle();
 
@@ -22,17 +24,24 @@ class Style implements BaseStyle {
 }
 
 class MultipleStyle implements BaseStyle {
-  final List<Style>? _styles;
+  final Iterable<Style>? _styles;
+  String? _value;
 
-  const MultipleStyle({
-    List<Style>? styles,
-  })  : _styles = styles;
+  MultipleStyle({Iterable<Style>? styles}) : _styles = styles;
 
-  List<Style> getStyles() => _styles ?? [];
+  Iterable<Style> getStyles() => _styles ?? [];
 
   @override
-  String getStyle() => getStyles().map((e) => e.getStyle()).join(' ');
+  String getStyle() => _value ?? getStyles().map((e) => e.getStyle()).join(' ');
 
   @override
   Map<String, String> asMap() => {for (var style in getStyles()) ...style.asMap()};
+
+  factory MultipleStyle.fromMap(Map<String, String> map) {
+    return MultipleStyle(styles: map.entries.map((e) => Style(e.key, e.value)));
+  }
+
+  factory MultipleStyle.fromString(String value) {
+    return MultipleStyle().._value = value;
+  }
 }
