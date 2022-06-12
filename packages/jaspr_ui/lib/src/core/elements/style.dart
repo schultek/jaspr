@@ -1,4 +1,5 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_ui/src/core/styles/base.dart';
 
 class StyleElement extends StatelessComponent {
   final Component? child;
@@ -6,15 +7,30 @@ class StyleElement extends StatelessComponent {
 
   const StyleElement({this.child, required this.styles});
 
-  getStyles() {
-    return styles.map((e) => e.getStyles()).join('\n');
-  }
+  String getStyles() => styles.map((e) => e.getStyles()).join('\n');
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(tag: 'style', child: Text(getStyles()));
     if (child != null) yield child!;
   }
+}
+
+class InlineStyle {
+  final Style? _style;
+  final List<Style>? _styles;
+
+  InlineStyle({
+    Style? style,
+    List<DomStyle>? styles,
+  })  : _style = style,
+        _styles = styles;
+
+  List<Style> get styles => [if (_style != null) _style! else ..._styles ?? []];
+
+  String getStyles() => styles.map((e) => e.getStyle()).join(' ');
+
+  Map<String, String> asMap() => {for (var style in styles) ...style.asMap()};
 }
 
 class StyleGroup {
@@ -31,9 +47,7 @@ class StyleGroup {
 
   Selectors get selectors => _selector != null ? Selectors.one(_selector!) : _selectors ?? Selectors('');
 
-  getStyles() {
-    return '${selectors.selectors} {\n${styles.map((e) => e.getStyle()).join('\n')}\n}';
-  }
+  String getStyles() => '${selectors.selectors} {\n${styles.map((e) => e.getStyle()).join('\n')}\n}';
 }
 
 class Selector {
@@ -70,17 +84,6 @@ class Selectors {
   factory Selectors.group(List<Selector> selectors) => Selectors(selectors.map((e) => e.name).join(', '));
 }
 
-class Style {
-  final String type;
-  final String value;
-
-  Style({required this.type, required this.value});
-
-  getStyle() {
-    return '$type: $value;';
-  }
-}
-
 class Color {
   final String _value;
 
@@ -96,7 +99,7 @@ class Color {
     return Color('#${value.toRadixString(16)}');
   }
 
-  factory Color.fromEnum(Colors value) {
+  factory Color.fromName(Colors value) {
     return Color(value.name);
   }
 }
