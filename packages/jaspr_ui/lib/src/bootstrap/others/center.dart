@@ -4,7 +4,7 @@ import 'package:jaspr_ui/src/core/elements/div.dart';
 class Center extends StatelessComponent {
   final Component child;
 
-  Center({required this.child});
+  const Center({required this.child});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

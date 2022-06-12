@@ -1,7 +1,7 @@
 import 'package:jaspr_ui/src/core/elements/base.dart';
 
 class DivElement extends BaseElement {
-  DivElement({
+  const DivElement({
     super.key,
     super.id,
     super.style,

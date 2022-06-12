@@ -20,7 +20,7 @@ class Carousel extends BaseComponent {
   final int activeIndex;
   final CarouselTransition transition;
 
-  Carousel({
+  const Carousel({
     required this.items,
     this.dark = false,
     this.enableControl = false,

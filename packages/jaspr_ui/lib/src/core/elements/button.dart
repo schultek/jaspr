@@ -5,7 +5,7 @@ import 'base.dart';
 class ButtonElement extends BaseElement {
   final String? text;
 
-  ButtonElement({
+  const ButtonElement({
     this.text,
     children,
     super.key,

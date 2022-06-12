@@ -21,7 +21,7 @@ class StyleGroup {
   final Selector? _selector;
   final List<BaseStyle> styles;
 
-  StyleGroup({
+  const StyleGroup({
     Selector? selector,
     Selectors? selectors,
     required this.styles,
@@ -36,7 +36,7 @@ class StyleGroup {
 class Selector {
   final String name;
 
-  Selector(this.name);
+  const Selector(this.name);
 
   factory Selector.id(String selector) => Selector('#$selector');
 
@@ -50,7 +50,7 @@ class Selector {
 class Selectors {
   final String selectors;
 
-  Selectors(this.selectors);
+  const Selectors(this.selectors);
 
   factory Selectors.all() => Selectors('*');
 

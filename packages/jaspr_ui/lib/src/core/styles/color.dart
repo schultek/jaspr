@@ -9,7 +9,7 @@ class ColorStyle extends Style {
 class Color {
   final String _value;
 
-  Color(this._value);
+  const Color(this._value);
 
   get value => _value;
 

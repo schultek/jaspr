@@ -6,7 +6,7 @@ import 'package:jaspr_ui/src/core/elements/div.dart';
 class Container extends BaseComponent {
   final Breakpoint breakpoint;
 
-  Container({
+  const Container({
     this.breakpoint = Breakpoint.extraSmall,
     super.id,
     super.key,

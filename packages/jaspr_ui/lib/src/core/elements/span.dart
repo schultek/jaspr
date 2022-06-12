@@ -1,7 +1,7 @@
 import 'package:jaspr_ui/src/core/elements/base.dart';
 
 class SpanElement extends BaseElement {
-  SpanElement({
+  const SpanElement({
     super.key,
     super.id,
     super.style,

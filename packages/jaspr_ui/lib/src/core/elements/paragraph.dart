@@ -4,7 +4,7 @@ import 'package:jaspr_ui/src/core/elements/base.dart';
 class Paragraph extends BaseElement {
   final String text;
 
-  Paragraph(
+  const Paragraph(
     this.text, {
     super.key,
     super.id,

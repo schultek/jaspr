@@ -15,7 +15,7 @@ enum ButtonType {
 class Button extends ButtonElement {
   final ButtonType? type;
 
-  Button({
+  const Button({
     super.id,
     super.key,
     super.style,

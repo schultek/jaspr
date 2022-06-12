@@ -1,7 +1,7 @@
 import 'package:jaspr_ui/src/bootstrap/components/base.dart';
 
 class Row extends BaseComponent {
-  Row({
+  const Row({
     super.id,
     super.key,
     super.child,

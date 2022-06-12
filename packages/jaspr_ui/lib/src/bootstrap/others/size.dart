@@ -7,7 +7,7 @@ class Size extends StatelessComponent {
   final String height;
   final Component? child;
 
-  Size({this.width = "100%", this.height = "100%", this.child});
+  const Size({this.width = "100%", this.height = "100%", this.child});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
