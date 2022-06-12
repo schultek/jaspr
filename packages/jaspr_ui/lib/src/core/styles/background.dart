@@ -1,21 +1,12 @@
 import 'package:jaspr_ui/core.dart';
 
-class BackgroundStyle implements Style {
+class BackgroundStyle extends MultipleStyle {
   final Color? color;
 
-  const BackgroundStyle({this.color});
-
-  InlineStyle get inlineStyle {
-    return InlineStyle(styles: [
-      if (color != null) DomStyle('background-color', color!.value),
-    ]);
-  }
+  const BackgroundStyle({this.color}) : super();
 
   @override
-  String getStyle() => inlineStyle.getStyles();
-
-  @override
-  Map<String, String> asMap() {
-    return {'background-color': color!.value};
-  }
+  List<Style> getStyles() => [
+    if (color != null) Style('background-color', color!.value),
+  ];
 }

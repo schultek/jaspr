@@ -16,27 +16,10 @@ class StyleElement extends StatelessComponent {
   }
 }
 
-class InlineStyle {
-  final Style? _style;
-  final List<Style>? _styles;
-
-  InlineStyle({
-    Style? style,
-    List<DomStyle>? styles,
-  })  : _style = style,
-        _styles = styles;
-
-  List<Style> get styles => [if (_style != null) _style! else ..._styles ?? []];
-
-  String getStyles() => styles.map((e) => e.getStyle()).join(' ');
-
-  Map<String, String> asMap() => {for (var style in styles) ...style.asMap()};
-}
-
 class StyleGroup {
   final Selectors? _selectors;
   final Selector? _selector;
-  final List<Style> styles;
+  final List<BaseStyle> styles;
 
   StyleGroup({
     Selector? selector,
@@ -82,43 +65,4 @@ class Selectors {
   factory Selectors.generalSibling(List<Selector> selectors) => Selectors(selectors.map((e) => e.name).join(' ~ '));
 
   factory Selectors.group(List<Selector> selectors) => Selectors(selectors.map((e) => e.name).join(', '));
-}
-
-class Color {
-  final String _value;
-
-  Color(this._value);
-
-  get value => _value;
-
-  factory Color.fromRGB(int red, int blue, int green) {
-    return Color('rgb($red, $blue, $green)');
-  }
-
-  factory Color.fromHEX(int value) {
-    return Color('#${value.toRadixString(16)}');
-  }
-
-  factory Color.fromName(Colors value) {
-    return Color(value.name);
-  }
-}
-
-enum Colors {
-  aqua,
-  black,
-  blue,
-  fuchsia,
-  gray,
-  green,
-  lime,
-  maroon,
-  navy,
-  olive,
-  purple,
-  red,
-  silver,
-  teal,
-  white,
-  yellow,
 }

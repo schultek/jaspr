@@ -6,6 +6,6 @@ class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield StyleElement(styles: GridSystemPage.pageStyle);
-    yield FirstPage();
+    yield GridSystemPage();
   }
 }

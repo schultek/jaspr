@@ -7,10 +7,10 @@ class GridSystemPage extends StatelessComponent {
     StyleGroup(
       selector: Selector.classHtml('content'),
       styles: [
-        DomStyle('padding', '50px'),
-        DomStyle('font-size', '32px'),
-        DomStyle('font-weight', 'bold'),
-        DomStyle('text-align', 'center'),
+        Style('padding', '50px'),
+        Style('font-size', '32px'),
+        Style('font-weight', 'bold'),
+        Style('text-align', 'center'),
         BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
       ],
     )
@@ -32,7 +32,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column left"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: InlineStyle(style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5))).asMap()
+              styles: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)).asMap()
             ),
           ),
           Column(
