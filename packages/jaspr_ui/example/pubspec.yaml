@@ -10,7 +10,7 @@ dependencies:
     path: ../
 
 dev_dependencies:
-  build_runner: ^2.1.4
-  build_web_compilers: ^3.2.1
+  build_runner: ^2.1.11
+  build_web_compilers: ^3.2.3
   lints: ^2.0.0
-  webdev: 2.7.7
+  webdev: ^2.7.9
