@@ -8,7 +8,7 @@ class Paragraph extends BaseElement {
     this.text, {
     super.key,
     super.id,
-    super.styles,
+    super.style,
     super.classes,
     super.attributes,
     super.events,

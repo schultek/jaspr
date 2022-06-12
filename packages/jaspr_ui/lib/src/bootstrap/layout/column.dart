@@ -12,7 +12,7 @@ class Column extends BaseComponent {
     super.key,
     super.child,
     super.children,
-    super.styles,
+    super.style,
     super.classes,
     super.attributes,
     super.events,

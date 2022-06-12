@@ -4,7 +4,7 @@ class HorizontalLine extends BaseElement {
   HorizontalLine({
     super.key,
     super.id,
-    super.styles,
+    super.style,
     super.classes,
     super.attributes,
     super.events,

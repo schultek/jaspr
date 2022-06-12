@@ -1,9 +1,10 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_ui/src/core/styles.dart';
 
 abstract class BaseElement extends StatelessComponent {
   final String? id;
   final String tag;
-  final Map<String, String>? styles;
+  final BaseStyle? style;
   final List<String>? classes;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
@@ -17,7 +18,7 @@ abstract class BaseElement extends StatelessComponent {
     List<Component>? children,
     this.id,
     required this.tag,
-    this.styles,
+    this.style,
     this.classes,
     this.attributes,
     this.events,
@@ -29,7 +30,7 @@ abstract class BaseElement extends StatelessComponent {
 
   List<String> getClasses() => classes ?? [];
 
-  Map<String, String> getStyles() => styles ?? {};
+  BaseStyle? getStyles() => style;
 
   Map<String, String> getAttributes() => attributes ?? {};
 
@@ -40,7 +41,7 @@ abstract class BaseElement extends StatelessComponent {
     yield DomComponent(
       id: id,
       tag: tag,
-      styles: getStyles(),
+      styles: getStyles()?.asMap(),
       classes: getClasses(),
       attributes: getAttributes(),
       events: getEvents(),

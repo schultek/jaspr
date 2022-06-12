@@ -18,7 +18,7 @@ class Button extends ButtonElement {
   Button({
     super.id,
     super.key,
-    super.styles,
+    super.style,
     classes,
     super.attributes,
     super.events,

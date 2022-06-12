@@ -4,7 +4,7 @@ class DivElement extends BaseElement {
   DivElement({
     super.key,
     super.id,
-    super.styles,
+    super.style,
     super.classes,
     super.attributes,
     super.events,

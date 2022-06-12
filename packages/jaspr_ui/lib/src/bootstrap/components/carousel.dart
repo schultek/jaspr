@@ -31,7 +31,7 @@ class Carousel extends BaseComponent {
     super.key,
     super.child,
     super.children,
-    super.styles,
+    super.style,
     super.classes,
     super.attributes,
     super.events,
@@ -47,7 +47,7 @@ class Carousel extends BaseComponent {
     final componentId = id ?? Utils.getRandomString(12);
     yield DivElement(
       id: componentId,
-      styles: styles,
+      style: style,
       events: events,
       classes: [
         'carousel',

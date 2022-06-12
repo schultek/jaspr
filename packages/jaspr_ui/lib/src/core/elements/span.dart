@@ -4,7 +4,7 @@ class SpanElement extends BaseElement {
   SpanElement({
     super.key,
     super.id,
-    super.styles,
+    super.style,
     super.classes,
     super.attributes,
     super.events,

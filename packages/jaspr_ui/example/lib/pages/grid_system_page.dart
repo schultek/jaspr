@@ -32,7 +32,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column left"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)).asMap()
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           ),
           Column(
@@ -44,7 +44,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column right"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#abb1b8'},
+              style: BackgroundStyle(color: Color.fromHEX(0xabb1b8)),
             ),
           )
         ]),
@@ -62,7 +62,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column left"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           ),
           Column(
@@ -74,7 +74,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column right"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#abb1b8'},
+              style: BackgroundStyle(color: Color.fromHEX(0xabb1b8)),
             ),
           )
         ]),
@@ -92,7 +92,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column left"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           ),
           Column(
@@ -104,7 +104,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column right"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#abb1b8'},
+              style: BackgroundStyle(color: Color.fromHEX(0xabb1b8)),
             ),
           )
         ]),
@@ -124,7 +124,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column left"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           ),
           Column(
@@ -136,7 +136,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column middle"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#abb1b8'},
+              style: BackgroundStyle(color: Color.fromHEX(0xabb1b8)),
             ),
           ),
           Column(
@@ -148,7 +148,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column right"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           )
         ]),
@@ -166,7 +166,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column left"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           ),
           Column(
@@ -178,7 +178,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column middle"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#abb1b8'},
+              style: BackgroundStyle(color: Color.fromHEX(0xabb1b8)),
             ),
           ),
           Column(
@@ -190,7 +190,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column right"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           )
         ]),
@@ -208,7 +208,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column left"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           ),
           Column(
@@ -220,7 +220,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column middle"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#abb1b8'},
+              style: BackgroundStyle(color: Color.fromHEX(0xabb1b8)),
             ),
           ),
           Column(
@@ -232,7 +232,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column right"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           )
         ]),
@@ -248,7 +248,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column left"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           ),
           Column(
@@ -256,7 +256,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column right"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#abb1b8'},
+              style: BackgroundStyle(color: Color.fromHEX(0xabb1b8)),
             ),
           ),
         ]),
@@ -270,7 +270,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column left"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           ),
           Column(
@@ -278,7 +278,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column middle"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#abb1b8'},
+              style: BackgroundStyle(color: Color.fromHEX(0xabb1b8)),
             ),
           ),
           Column(
@@ -286,7 +286,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column right"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           )
         ]),
@@ -300,7 +300,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column left"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           ),
           Column(
@@ -312,7 +312,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column middle"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#abb1b8'},
+              style: BackgroundStyle(color: Color.fromHEX(0xabb1b8)),
             ),
           ),
           Column(
@@ -320,7 +320,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column right"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           )
         ]),
@@ -346,7 +346,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column left"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           ),
           Column(
@@ -361,11 +361,10 @@ class GridSystemPage extends StatelessComponent {
               ),
             ],
             child: Container(
-              child: Text("Column middle"),
-              padding: EdgeInsets.all(Space.s3),
-              margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#abb1b8'},
-            ),
+                child: Text("Column middle"),
+                padding: EdgeInsets.all(Space.s3),
+                margin: EdgeInsets.symmetric(vertical: Space.s2),
+                style: BackgroundStyle(color: Color.fromHEX(0xabb1b8))),
           ),
           Column(
             flexibility: [
@@ -382,7 +381,7 @@ class GridSystemPage extends StatelessComponent {
               child: Text("Column right"),
               padding: EdgeInsets.all(Space.s3),
               margin: EdgeInsets.symmetric(vertical: Space.s2),
-              styles: {'background': '#dbdfe5'},
+              style: BackgroundStyle(color: Color.fromHEX(0xdbdfe5)),
             ),
           )
         ]),

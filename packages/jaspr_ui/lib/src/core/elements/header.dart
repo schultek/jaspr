@@ -12,7 +12,7 @@ class Header extends BaseElement {
     this.size = HeaderSize.h3,
     super.key,
     super.id,
-    super.styles,
+    super.style,
     super.classes,
     super.attributes,
     super.events,

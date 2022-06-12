@@ -10,7 +10,7 @@ class ButtonElement extends BaseElement {
     children,
     super.key,
     super.id,
-    super.styles,
+    super.style,
     super.classes,
     super.attributes,
     super.events,

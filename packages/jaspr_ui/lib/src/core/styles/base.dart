@@ -25,7 +25,6 @@ class MultipleStyle implements BaseStyle {
   final List<Style>? _styles;
 
   const MultipleStyle({
-    Style? style,
     List<Style>? styles,
   })  : _styles = styles;
 

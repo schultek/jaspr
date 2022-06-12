@@ -1,4 +1,5 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_ui/core.dart';
 import 'package:jaspr_ui/src/core/elements/div.dart';
 
 class Size extends StatelessComponent {
@@ -11,7 +12,10 @@ class Size extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DivElement(
-      styles: {'width': width, 'height': height},
+      style: MultipleStyle(styles: [
+        Style('width', width),
+        Style('height', height),
+      ]),
       child: child,
     );
   }

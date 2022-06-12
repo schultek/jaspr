@@ -9,7 +9,7 @@ class Image extends BaseElement {
     this.alternate = '',
     super.key,
     super.id,
-    super.styles,
+    super.style,
     super.classes,
     super.attributes,
     super.events,
