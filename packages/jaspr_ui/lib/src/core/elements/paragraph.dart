@@ -12,18 +12,10 @@ class Paragraph extends BaseElement {
     super.classes,
     super.attributes,
     super.events,
-  });
+  }) : super(tag: 'p');
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'p',
-      id: id,
-      styles: styles,
-      classes: classes,
-      attributes: attributes,
-      events: events,
-      child: Text(text),
-    );
+  List<Component> getChildren() {
+    return [Text(text)];
   }
 }

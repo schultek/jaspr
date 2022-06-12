@@ -1,4 +1,3 @@
-import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_ui/src/core/elements/base.dart';
 
 class HorizontalLine extends BaseElement {
@@ -9,17 +8,5 @@ class HorizontalLine extends BaseElement {
     super.classes,
     super.attributes,
     super.events,
-  });
-
-  @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'hr',
-      id: id,
-      styles: styles,
-      classes: classes,
-      attributes: attributes,
-      events: events,
-    );
-  }
+  }) : super(tag: 'hr');
 }

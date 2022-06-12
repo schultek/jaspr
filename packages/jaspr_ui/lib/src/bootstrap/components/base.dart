@@ -24,8 +24,9 @@ abstract class BaseComponent extends BaseElement {
     this.padding,
     this.margin,
     this.border,
-  });
+  }) : super(tag: 'div');
 
+  @override
   List<String> getClasses([List<String>? classes]) {
     return [
       if (backgroundColor != null) backgroundColor!.value,

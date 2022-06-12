@@ -1,4 +1,3 @@
-import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_ui/src/core/elements/base.dart';
 
 class Image extends BaseElement {
@@ -14,21 +13,15 @@ class Image extends BaseElement {
     super.classes,
     super.attributes,
     super.events,
-  });
+  }) : super(tag: 'img');
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'img',
-      id: id,
-      styles: styles,
-      classes: classes,
-      events: events,
-      attributes: {
-        'src': source,
-        'alt': alternate,
-        if (attributes != null) ...attributes!,
-      },
-    );
+  Map<String, String> getAttributes() {
+    return {
+      'src': source,
+      'alt': alternate,
+      ...super.getAttributes(),
+    };
   }
+
 }

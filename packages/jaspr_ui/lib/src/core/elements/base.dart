@@ -2,6 +2,7 @@ import 'package:jaspr/jaspr.dart';
 
 abstract class BaseElement extends StatelessComponent {
   final String? id;
+  final String tag;
   final Map<String, String>? styles;
   final List<String>? classes;
   final Map<String, String>? attributes;
@@ -15,6 +16,7 @@ abstract class BaseElement extends StatelessComponent {
     Component? child,
     List<Component>? children,
     this.id,
+    required this.tag,
     this.styles,
     this.classes,
     this.attributes,
@@ -23,18 +25,26 @@ abstract class BaseElement extends StatelessComponent {
         _children = children,
         super(key: key);
 
-  List<Component> get children => [if (_child != null) _child!, ..._children ?? []];
+  List<Component> getChildren() => _children ?? [];
+
+  List<String> getClasses() => classes ?? [];
+
+  Map<String, String> getStyles() => styles ?? {};
+
+  Map<String, String> getAttributes() => attributes ?? {};
+
+  Map<String, EventCallback> getEvents() => events ?? {};
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
-      tag: 'div',
       id: id,
-      styles: styles,
-      classes: classes,
-      attributes: attributes,
-      events: events,
-      children: children,
+      tag: tag,
+      styles: getStyles(),
+      classes: getClasses(),
+      attributes: getAttributes(),
+      events: getEvents(),
+      children: [if (_child != null) _child!, ...getChildren()],
     );
   }
 }

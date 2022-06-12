@@ -1,31 +1,21 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_ui/src/core/elements/base.dart';
+
+import 'base.dart';
 
 class ButtonElement extends BaseElement {
   final String? text;
 
-  const ButtonElement({
+  ButtonElement({
     this.text,
+    children,
     super.key,
     super.id,
     super.styles,
     super.classes,
     super.attributes,
     super.events,
-    super.child,
-    super.children,
-  });
+  }) : super(tag: 'button');
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'button',
-      id: id,
-      styles: styles,
-      classes: classes,
-      attributes: attributes,
-      events: events,
-      children: [if (text != null) Text(text!) else ...children],
-    );
-  }
+  getChildren() => [if (text != null) Text(text!) else ...super.getChildren()];
 }

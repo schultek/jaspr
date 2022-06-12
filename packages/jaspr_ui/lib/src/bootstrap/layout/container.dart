@@ -24,17 +24,10 @@ class Container extends BaseComponent {
   });
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DivElement(
-      id: id,
-      styles: styles,
-      attributes: attributes,
-      events: events,
-      classes: [
-        'container${breakpoint.value}',
-        ...getClasses(classes),
-      ],
-      children: children,
-    );
+  List<String> getClasses([List<String>? classes]) {
+    return [
+      'container${breakpoint.value}',
+      ...super.getClasses(classes),
+    ];
   }
 }

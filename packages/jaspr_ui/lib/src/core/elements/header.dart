@@ -16,18 +16,8 @@ class Header extends BaseElement {
     super.classes,
     super.attributes,
     super.events,
-  });
+  }) : super(tag: size.name);
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      id: id,
-      styles: styles,
-      classes: classes,
-      attributes: attributes,
-      events: events,
-      tag: size.name,
-      child: Text(text),
-    );
-  }
+  List<Component> getChildren() => [Text(text)];
 }
