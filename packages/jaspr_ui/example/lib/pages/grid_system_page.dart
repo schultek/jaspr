@@ -3,15 +3,18 @@ import 'package:jaspr_ui/bootstrap.dart';
 import 'package:jaspr_ui/core.dart';
 
 class GridSystemPage extends StatelessComponent {
-  static String style = '''
-        .content {
-          padding: 10px;
-          font-size: 32px;
-          font-weight: bold;
-          text-align: center;
-          background: #dbdfe5;
-        }
-      ''';
+  static List<StyleGroup> pageStyle = [
+    StyleGroup(
+      selector: Selector.classHtml('content'),
+      styles: [
+        Style(type: 'padding', value: '50px'),
+        Style(type: 'font-size', value: '32px'),
+        Style(type: 'font-weight', value: 'bold'),
+        Style(type: 'text-align', value: 'center'),
+        Style(type: StyleType.backgroundColor.value, value: Color.fromHEX(0xdbdfe5).value),
+      ],
+    )
+  ];
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
