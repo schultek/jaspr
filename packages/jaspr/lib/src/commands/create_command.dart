@@ -51,7 +51,7 @@ class CreateCommand extends BaseCommand {
       libMain
           .create(recursive: true)
           .then((_) => libMain.writeAsString(mainFileContent('.')))
-          .then((_) => print('  lib/app.dart')),
+          .then((_) => print('  lib/main.dart')),
       appDart
           .create(recursive: true)
           .then((_) => appDart.writeAsString(appFileContent()))
