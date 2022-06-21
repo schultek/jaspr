@@ -1,1 +1,1 @@
-# Bootstrap components for Jaspr
+# UI components for Jaspr
