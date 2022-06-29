@@ -87,3 +87,5 @@ pubspec_overrides.yaml
 
 # Conventional directory for build outputs
 build/
+
+NOTES.md
