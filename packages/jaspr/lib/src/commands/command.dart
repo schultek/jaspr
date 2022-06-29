@@ -21,9 +21,11 @@ abstract class BaseCommand extends Command<void> {
   }
 
   Never shutdown([int exitCode = 1]) {
-    for (var process in activeProcesses) {
-      process.kill();
-    }
+    // for (var process in activeProcesses) {
+    // this would leave open files and ports broken
+    // we should wait for https://github.com/dart-lang/sdk/issues/49234 to implement a better way
+    // process.kill();
+    // }
     exit(exitCode);
   }
 
