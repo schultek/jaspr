@@ -11,7 +11,7 @@ dependencies:
       url: https://github.com/mjablecnik/jaspr.git
       path: packages/jaspr
       ref: bootstrap-components
-  jaspr_ui:
+  jaspr_bootstrap:
     path: ../
 
 dev_dependencies:

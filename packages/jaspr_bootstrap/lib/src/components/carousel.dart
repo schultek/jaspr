@@ -1,7 +1,8 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/ui.dart';
-import 'package:jaspr_ui/src/bootstrap/components/base.dart';
-import 'package:jaspr_ui/src/utils.dart';
+import 'package:jaspr_bootstrap/src/core/utils.dart';
+
+import 'base.dart';
 
 class Caption {
   final Header title;

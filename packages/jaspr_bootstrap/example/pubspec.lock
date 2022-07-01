@@ -297,7 +297,7 @@ packages:
       url: "https://github.com/mjablecnik/jaspr.git"
     source: git
     version: "0.1.4"
-  jaspr_ui:
+  jaspr_bootstrap:
     dependency: "direct main"
     description:
       path: ".."

@@ -1,4 +1,4 @@
-import 'package:jaspr_ui/src/bootstrap/components/base.dart';
+import 'package:jaspr_bootstrap/src/components/base.dart';
 
 class Row extends BaseComponent {
   const Row({

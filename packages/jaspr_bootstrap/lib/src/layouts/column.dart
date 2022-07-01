@@ -1,5 +1,5 @@
-import 'package:jaspr_ui/bootstrap.dart';
-import 'package:jaspr_ui/src/bootstrap/components/base.dart';
+import 'package:jaspr_bootstrap/core.dart';
+import 'package:jaspr_bootstrap/src/components/base.dart';
 
 class Column extends BaseComponent {
   final Flex? _flex;

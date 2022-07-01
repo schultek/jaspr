@@ -1,6 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/ui.dart';
-import 'package:jaspr_ui/bootstrap.dart';
+import 'package:jaspr_bootstrap/core.dart';
+import 'package:jaspr_bootstrap/layouts.dart';
 
 class GridSystemPage extends StatelessComponent {
   static List<StyleGroup> pageStyle = [
@@ -19,7 +20,7 @@ class GridSystemPage extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield HorizontalLine();
-    // Two column layout
+    // Two column layouts
     yield Container(
       children: [
         Row(children: [
@@ -111,7 +112,7 @@ class GridSystemPage extends StatelessComponent {
       ],
     );
     yield HorizontalLine();
-    // Three column layout
+    // Three column layouts
     yield Container(
       children: [
         Row(children: [
@@ -239,7 +240,7 @@ class GridSystemPage extends StatelessComponent {
       ],
     );
     yield HorizontalLine();
-    // Auto-layout columns
+    // Auto-layouts columns
     yield Container(
       children: [
         Row(children: [

@@ -1,6 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/ui.dart';
-import 'package:jaspr_ui/bootstrap.dart';
+import 'package:jaspr_bootstrap/core.dart';
+import 'package:jaspr_bootstrap/layouts.dart';
 
 class ContainerPage extends StatelessComponent {
   @override

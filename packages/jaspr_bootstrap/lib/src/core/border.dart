@@ -1,4 +1,4 @@
-import 'package:jaspr_ui/bootstrap.dart';
+import 'package:jaspr_bootstrap/core.dart';
 
 class BorderEdge {
   final bool left;

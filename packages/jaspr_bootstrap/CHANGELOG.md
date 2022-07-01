@@ -7,17 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added 
 - EdgeInsets, Border and many basic enums
-- HorizontalLine, Button, Header, Image and Paragraph elements
 - Container, Row and Column components
-- BaseElement and BaseComponent abstract classes
-- Div and Span elements
-- BaseStyle, Style, MultipleStyle, StyleGroup and StyleElement
+- BaseComponent abstract class
 - Container, Carousel and Grid system examples
 
 ### Changed 
-- Refactor jaspr_ui project structure
+- Refactor project structure
 - Refactor Carousel component
-- Refactor elements and component
 
 ### Deprecated
 
@@ -30,5 +26,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.1] - 2017-06-20
 ### Added
-- Initialized jaspr_ui project
+- Initialized jaspr_bootstrap project
 - Test first Carousel component

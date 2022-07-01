@@ -1,5 +1,5 @@
 import 'package:jaspr/ui.dart';
-import 'package:jaspr_ui/bootstrap.dart';
+import 'package:jaspr_bootstrap/core.dart';
 
 abstract class BaseComponent extends BaseElement {
   final BackgroundColor? backgroundColor;
