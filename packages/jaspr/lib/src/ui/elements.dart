@@ -8,6 +8,7 @@ export 'elements/header.dart';
 export 'elements/horizontal_line.dart';
 export 'elements/image.dart';
 export 'elements/line_break.dart';
+export 'elements/link.dart';
 export 'elements/paragraph.dart';
 export 'elements/size.dart';
 export 'elements/span.dart';

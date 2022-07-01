@@ -1,7 +1,7 @@
 Basic HTML Tags
 - [x] Header
 - [x] Paragraph
-- [ ] Link
+- [x] Link
 - [ ] Text formating
 - [x] Image
 - [ ] Table

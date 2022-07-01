@@ -26,6 +26,11 @@ class FirstPage extends StatelessComponent {
               alternate: "Test image",
             ),
           ),
+          Link(
+            href: "https://www.google.com/",
+            target: LinkTarget.blank,
+            child: Text("Google link"),
+          ),
         ],
       ),
     );
