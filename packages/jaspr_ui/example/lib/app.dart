@@ -1,6 +1,6 @@
 import 'package:example/pages.dart';
+import 'package:jaspr/ui.dart';
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_ui/core.dart';
 
 class App extends StatelessComponent {
   @override

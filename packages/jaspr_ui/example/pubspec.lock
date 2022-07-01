@@ -7,14 +7,14 @@ packages:
       name: _fe_analyzer_shared
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "40.0.0"
+    version: "41.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.1.0"
+    version: "4.2.0"
   archive:
     dependency: transitive
     description:
@@ -56,7 +56,7 @@ packages:
       name: browser_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   build:
     dependency: transitive
     description:
@@ -126,7 +126,7 @@ packages:
       name: built_value
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.3.2"
+    version: "8.3.3"
   checked_yaml:
     dependency: transitive
     description:
@@ -238,7 +238,7 @@ packages:
       name: glob
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.0"
   graphs:
     dependency: transitive
     description:
@@ -273,7 +273,7 @@ packages:
       name: http_multi_server
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.2.0"
+    version: "3.2.1"
   http_parser:
     dependency: transitive
     description:
@@ -289,11 +289,13 @@ packages:
     source: hosted
     version: "1.0.3"
   jaspr:
-    dependency: transitive
+    dependency: "direct main"
     description:
-      name: jaspr
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "packages/jaspr"
+      ref: bootstrap-components
+      resolved-ref: "5bdba5399c8f1c1617af42dcd7b50d0790cd7599"
+      url: "https://github.com/mjablecnik/jaspr.git"
+    source: git
     version: "0.1.4"
   jaspr_ui:
     dependency: "direct main"
@@ -322,7 +324,7 @@ packages:
       name: json_rpc_2
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.1"
+    version: "3.0.2"
   lints:
     dependency: "direct dev"
     description:
@@ -343,7 +345,7 @@ packages:
       name: matcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.11"
+    version: "0.12.12"
   meta:
     dependency: transitive
     description:
@@ -364,7 +366,7 @@ packages:
       name: package_config
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.0"
   path:
     dependency: transitive
     description:
@@ -385,14 +387,14 @@ packages:
       name: pool
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.5.0"
+    version: "1.5.1"
   protobuf:
     dependency: transitive
     description:
       name: protobuf
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.1"
+    version: "2.1.0"
   pub_semver:
     dependency: transitive
     description:
@@ -420,35 +422,35 @@ packages:
       name: shelf
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.3.0"
+    version: "1.3.1"
   shelf_packages_handler:
     dependency: transitive
     description:
       name: shelf_packages_handler
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.0"
+    version: "3.0.1"
   shelf_proxy:
     dependency: transitive
     description:
       name: shelf_proxy
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   shelf_static:
     dependency: transitive
     description:
       name: shelf_static
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   shelf_web_socket:
     dependency: transitive
     description:
       name: shelf_web_socket
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   source_maps:
     dependency: transitive
     description:
@@ -504,7 +506,7 @@ packages:
       name: term_glyph
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.0"
+    version: "1.2.1"
   timing:
     dependency: transitive
     description:
@@ -525,7 +527,7 @@ packages:
       name: usage
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.2"
+    version: "4.1.0"
   uuid:
     dependency: transitive
     description:
@@ -560,7 +562,7 @@ packages:
       name: webdev
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.7.9"
+    version: "2.7.10"
   webkit_inspection_protocol:
     dependency: transitive
     description:

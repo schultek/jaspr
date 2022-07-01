@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/ui.dart';
 import 'package:jaspr_ui/bootstrap.dart';
-import 'package:jaspr_ui/core.dart';
 
 class GridSystemPage extends StatelessComponent {
   static List<StyleGroup> pageStyle = [
