@@ -17,6 +17,18 @@ class Color {
     return Color('rgb($red, $blue, $green)');
   }
 
+  factory Color.fromRGBA(int red, int blue, int green, double alpha) {
+    return Color('rgba($red, $blue, $green, $alpha)');
+  }
+
+  factory Color.fromHSL(int red, int blue, int green) {
+    return Color('hsl($red, $blue, $green)');
+  }
+
+  factory Color.fromHSLA(int red, int blue, int green, double alpha) {
+    return Color('hsla($red, $blue, $green, $alpha)');
+  }
+
   factory Color.fromHEX(int value) {
     return Color('#${value.toRadixString(16)}');
   }
