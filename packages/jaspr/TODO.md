@@ -19,7 +19,7 @@ HTML5 Tags
 
 Basic CSS Styles
 - [x] Color
-- [?] Background
+- [x] Background
 - [ ] Fonts
 - [ ] Text
 - [ ] Link

@@ -1,5 +1,3 @@
-import 'package:jaspr/jaspr.dart';
-
 abstract class BaseStyle {
   const BaseStyle();
 
