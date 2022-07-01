@@ -1,4 +1,4 @@
-import 'package:jaspr_ui/core.dart';
+import 'package:jaspr/ui.dart';
 
 class ColorStyle extends Style {
   final Color color;

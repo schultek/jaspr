@@ -1,5 +1,5 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_ui/src/core/styles/base.dart';
+import 'package:jaspr/ui.dart';
 
 class StyleElement extends StatelessComponent {
   final Component? child;

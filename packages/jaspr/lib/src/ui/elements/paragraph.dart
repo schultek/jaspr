@@ -1,5 +1,5 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_ui/src/core/elements/base.dart';
+import 'package:jaspr/src/ui/elements/base.dart';
 
 class Paragraph extends BaseElement {
   final String text;
