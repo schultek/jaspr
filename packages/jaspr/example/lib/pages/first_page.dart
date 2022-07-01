@@ -15,8 +15,8 @@ class FirstPage extends StatelessComponent {
           DivElement(
             children: [
               ButtonElement(text: "test123"),
-              ButtonElement(text: "test123", style: Style('background-color', 'orange')),
-              ButtonElement(text: "test123", style: Style('color', 'red')),
+              ButtonElement(text: "test123", style: BackgroundStyle(color: Color.fromName(Colors.lightBlue))),
+              ButtonElement(text: "test123", style: ColorStyle(Color.fromName(Colors.hotPink))),
             ],
           ),
           Size(height: Pixels(50)),
