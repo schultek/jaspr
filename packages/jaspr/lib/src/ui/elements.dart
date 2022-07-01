@@ -1,3 +1,6 @@
+library elements;
+
+export 'elements/base.dart';
 export 'elements/button.dart';
 export 'elements/div.dart';
 export 'elements/header.dart';

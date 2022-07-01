@@ -1,3 +1,5 @@
+library enums;
+
 enum StyleType {
   color ('color'),
   backgroundColor('background-color'),
