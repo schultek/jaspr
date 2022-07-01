@@ -6,7 +6,11 @@ environment:
   sdk: '>=2.17.0 <3.0.0'
 
 dependencies:
-  jaspr: ^0.1.4
+  jaspr:
+    git:
+      url: https://github.com/mjablecnik/jaspr.git
+      path: packages/jaspr
+      ref: bootstrap-components
 
 dev_dependencies:
   lints: ^2.0.0

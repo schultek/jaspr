@@ -1,5 +1,5 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_ui/src/core/elements/div.dart';
+import 'package:jaspr/ui.dart';
 
 class Center extends StatelessComponent {
   final Component child;

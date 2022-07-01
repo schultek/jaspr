@@ -1,7 +1,5 @@
-import 'package:jaspr_ui/src/bootstrap/border.dart';
-import 'package:jaspr_ui/src/bootstrap/edge_insets.dart';
-import 'package:jaspr_ui/src/bootstrap/enums.dart';
-import 'package:jaspr_ui/src/core/elements/base.dart';
+import 'package:jaspr/ui.dart';
+import 'package:jaspr_ui/bootstrap.dart';
 
 abstract class BaseComponent extends BaseElement {
   final BackgroundColor? backgroundColor;

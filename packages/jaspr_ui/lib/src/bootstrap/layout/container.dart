@@ -1,7 +1,5 @@
-import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_ui/bootstrap.dart';
 import 'package:jaspr_ui/src/bootstrap/components/base.dart';
-import 'package:jaspr_ui/src/core/elements/div.dart';
 
 class Container extends BaseComponent {
   final Breakpoint breakpoint;
