@@ -1,8 +1,7 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/ui.dart';
 
-import 'base.dart';
-
-class ButtonElement extends BaseElement {
+class ButtonElement extends Box {
   final String? text;
 
   const ButtonElement({

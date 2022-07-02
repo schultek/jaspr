@@ -11,7 +11,7 @@ class FirstPage extends StatelessComponent {
         children: [
           Paragraph(child: Text("Hello world!!")),
           Center(child: ButtonElement(text: "test123")),
-          Size(height: Pixels(50)),
+          Box(height: Pixels(50)),
           DivElement(
             children: [
               ButtonElement(text: "test123"),
@@ -19,7 +19,7 @@ class FirstPage extends StatelessComponent {
               ButtonElement(text: "test123", style: ColorStyle(Color.fromName(Colors.hotPink))),
             ],
           ),
-          Size(height: Pixels(50)),
+          Box(height: Pixels(50)),
           Center(
             child: Image(
               source: "https://metacode.biz/@test/avatar.jpg",
@@ -32,17 +32,24 @@ class FirstPage extends StatelessComponent {
             child: Text("Google link"),
           ),
           Center(
-            child: Size(
+            child: Box(
               width: Pixels(200),
               child: ListView(
-                //insideMarkers: true,
+                  //insideMarkers: true,
                   style: MultipleStyle(styles: [
                     BackgroundStyle(color: Color.fromName(Colors.greenYellow)),
                     TextStyle(align: TextAlign.left)
                   ]),
                   ordered: true,
                   children: [
-                    ListItem(child: Size(height: Pixels(50), width: Pixels(50), child: Text("test1"))),
+                    ListItem(
+                      child: Box(
+                        height: Pixels(20),
+                        width: Pixels(50),
+                        padding: EdgeInsets.symmetric(vertical: Pixels(30)),
+                        child: Text("test1"),
+                      ),
+                    ),
                     ListItem(child: Text("test2")),
                     ListItem(child: Text("test3")),
                     ListItem(child: Text("test4")),

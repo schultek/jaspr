@@ -1,6 +1,6 @@
-import 'package:jaspr/src/ui/elements/base.dart';
+import 'package:jaspr/ui.dart';
 
-class Image extends BaseElement {
+class Image extends Box {
   final String source;
   final String alternate;
 

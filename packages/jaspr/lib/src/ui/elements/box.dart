@@ -1,4 +1,5 @@
 import 'package:jaspr/src/ui/elements/base.dart';
+import 'package:jaspr/src/ui/models.dart';
 import 'package:jaspr/src/ui/styles.dart';
 
 class BoxConstraints {
@@ -12,11 +13,13 @@ class BoxConstraints {
   static const BoxConstraints zero = BoxConstraints();
 }
 
-class ConstrainedBox extends BaseElement {
+class ConstrainedBox extends Box {
   final BoxConstraints constraints;
 
   const ConstrainedBox({
     required this.constraints,
+    super.padding,
+    super.margin,
     super.key,
     super.id,
     super.style,
@@ -25,7 +28,7 @@ class ConstrainedBox extends BaseElement {
     super.events,
     super.child,
     super.children,
-  }) : super(tag: 'div');
+  });
 
   @override
   BaseStyle? getStyles() => MultipleStyle(styles: [
@@ -36,11 +39,17 @@ class ConstrainedBox extends BaseElement {
   ]);
 }
 
-class Size extends BaseElement {
-    final Unit? width;
-    final Unit? height;
+class Box extends BaseElement {
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final Border? border;
+  final Unit? width;
+  final Unit? height;
 
-    const Size({
+  const Box({
+    this.padding,
+    this.margin,
+    this.border,
     this.width,
     this.height,
     super.key,
@@ -51,10 +60,14 @@ class Size extends BaseElement {
     super.events,
     super.child,
     super.children,
-  }) : super(tag: 'div');
+    super.tag = 'div',
+  });
 
   @override
   BaseStyle? getStyles() => MultipleStyle(styles: [
+    if (padding != null) Style('padding', padding!.getStyle()),
+    if (margin != null) Style('margin', margin!.getStyle()),
+    if (border != null) ...border!.getStyles(),
     if (width != null) Style('width', width.toString()),
     if (height != null) Style('height', height.toString()),
   ]);

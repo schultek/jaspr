@@ -121,3 +121,5 @@ enum LinkSelector {
   final String value;
   const LinkSelector(this.value);
 }
+
+enum BorderStyle { none, solid, hidden, dashed, dotted, double, inset, outset, groove, ridge }

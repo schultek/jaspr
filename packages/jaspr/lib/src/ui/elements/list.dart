@@ -1,10 +1,11 @@
 import 'package:jaspr/ui.dart';
 
-class ListView extends BaseElement {
+class ListView extends Box {
   final bool ordered;
   final bool? defaultType;
   final bool? insideMarkers;
   final String? markerImageUrl;
+
   const ListView({
     this.ordered = false,
     this.defaultType,
@@ -29,7 +30,7 @@ class ListView extends BaseElement {
   );
 }
 
-class ListItem extends BaseElement {
+class ListItem extends Box {
   const ListItem({
     super.key,
     super.id,

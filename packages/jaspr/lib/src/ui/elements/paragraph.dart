@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/src/ui/elements/base.dart';
+import 'package:jaspr/ui.dart';
 
-class PreformattedText extends BaseElement {
+class PreformattedText extends Box {
   final String text;
 
   const PreformattedText(
@@ -20,7 +20,7 @@ class PreformattedText extends BaseElement {
   }
 }
 
-class Paragraph extends BaseElement {
+class Paragraph extends Box {
   const Paragraph({
   super.key,
   super.id,
@@ -33,7 +33,7 @@ class Paragraph extends BaseElement {
   }) : super(tag: 'p');
 }
 
-class TextSpan extends BaseElement {
+class TextSpan extends Box {
   const TextSpan({
   super.key,
   super.id,
