@@ -41,7 +41,7 @@ abstract class BaseElement extends StatelessComponent {
     yield DomComponent(
       id: id,
       tag: tag,
-      styles: getStyles()?.asMap(),
+      styles: {...getStyles()?.asMap() ?? {}, ...style?.asMap() ?? {} },
       classes: getClasses(),
       attributes: getAttributes(),
       events: getEvents(),
