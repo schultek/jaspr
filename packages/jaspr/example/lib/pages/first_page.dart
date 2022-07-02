@@ -31,6 +31,24 @@ class FirstPage extends StatelessComponent {
             target: LinkTarget.blank,
             child: Text("Google link"),
           ),
+          Center(
+            child: Size(
+              width: Pixels(200),
+              child: ListView(
+                //insideMarkers: true,
+                  style: MultipleStyle(styles: [
+                    BackgroundStyle(color: Color.fromName(Colors.greenYellow)),
+                    TextStyle(align: TextAlign.left)
+                  ]),
+                  ordered: true,
+                  children: [
+                    ListItem(child: Size(height: Pixels(50), width: Pixels(50), child: Text("test1"))),
+                    ListItem(child: Text("test2")),
+                    ListItem(child: Text("test3")),
+                    ListItem(child: Text("test4")),
+                  ]),
+            ),
+          )
         ],
       ),
     );

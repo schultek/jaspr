@@ -22,12 +22,12 @@ class Style implements BaseStyle {
 }
 
 class MultipleStyle implements BaseStyle {
-  final Iterable<Style>? _styles;
+  final Iterable<BaseStyle>? _styles;
   String? _value;
 
-  MultipleStyle({Iterable<Style>? styles}) : _styles = styles;
+  MultipleStyle({Iterable<BaseStyle>? styles}) : _styles = styles;
 
-  Iterable<Style> getStyles() => _styles ?? [];
+  Iterable<BaseStyle> getStyles() => _styles ?? [];
 
   @override
   String getStyle() => _value ?? getStyles().map((e) => e.getStyle()).join(' ');

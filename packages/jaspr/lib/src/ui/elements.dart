@@ -10,6 +10,7 @@ export 'elements/horizontal_line.dart';
 export 'elements/image.dart';
 export 'elements/line_break.dart';
 export 'elements/link.dart';
+export 'elements/list.dart';
 export 'elements/paragraph.dart';
 export 'elements/span.dart';
 export 'elements/style.dart';

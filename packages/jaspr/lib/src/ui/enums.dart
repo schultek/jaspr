@@ -73,11 +73,11 @@ enum FontFamily {
   const FontFamily(this.value);
 }
 
-enum Alignment { left, center, right, justify }
+enum TextAlign { left, center, right, justify }
 
 enum FontStyle { normal, italic, oblique }
 
-enum TextTransformation { uppercase, capitalize, lowercase }
+enum TextTransform { uppercase, capitalize, lowercase }
 
 enum FontWeight {
   normal("normal"),

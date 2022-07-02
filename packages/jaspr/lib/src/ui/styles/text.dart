@@ -2,13 +2,13 @@ import 'package:jaspr/ui.dart';
 
 class TextStyle extends MultipleStyle {
   final Color? color;
-  final Alignment? align;
+  final TextAlign? align;
   final FontFamily? fontFamily;
   final FontStyle? fontStyle;
   final Unit? fontSize;
   final FontWeight? fontWeight;
   final TextDecoration? decoration;
-  final TextTransformation? transformation;
+  final TextTransform? transformation;
   final Unit? indentation;
   final Unit? letterSpacing;
   final Unit? wordSpacing;
