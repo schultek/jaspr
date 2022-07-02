@@ -85,3 +85,21 @@ class Border {
     if (radius != null) Style('border-radius', radius.toString()),
   ];
 }
+
+class Outline {
+  final BorderStyle? style;
+  final Unit? width;
+  final Color? color;
+
+  const Outline({
+    this.style,
+    this.width,
+    this.color,
+  });
+
+  List<Style> getStyles() => [
+    if (style != null) Style('outline-style', style!.name),
+    if (width != null) Style('outline-width', width.toString()),
+    if (color != null) Style('outline-color', color!.value),
+  ];
+}
