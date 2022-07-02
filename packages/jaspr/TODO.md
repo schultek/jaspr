@@ -2,12 +2,12 @@ Basic HTML Tags
 - [x] Header
 - [x] Paragraph
 - [x] Link
-- [ ] Text formating
+- [x] Text formating
 - [x] Image
 - [ ] Table
-- [ ] Lists
+- [x] Lists
 - [ ] Forms
-- [ ] Iframe
+- [?] Iframe
 - [x] Style
 
 HTML5 Tags
@@ -20,32 +20,31 @@ HTML5 Tags
 Basic CSS Styles
 - [x] Color
 - [x] Background
-- [ ] Fonts
-- [ ] Text
-- [ ] Link
-- [ ] Lists
+- [x] Fonts
+- [x] Text
+- [x] Link
+- [x] Lists
 - [ ] Table
-- [ ] Box Model
+- [x] Box Model
 
 Advanced CSS Styles:
-- [ ] Outline
-- [ ] Cursor
-- [ ] Overflow
-- [ ] Units
-- [ ] Display
-- [ ] Visibility
-- [ ] Position
-- [ ] Layers
-- [ ] Float
-- [ ] Alignment
-- [ ] Sprite
-- [ ] Opacity
-- [ ] Attribute selector
+- [x] Outline
+- [x] Cursor
+- [x] Overflow
+- [x] Units
+- [x] Display
+- [x] Visibility
+- [x] Position
+- [?] Float
+- [x] Alignment
+- [?] Sprite
+- [x] Opacity
+- [?] Attribute selector
 
 CSS3 Styles
-- [ ] Border
-- [ ] Color
-- [ ] Background
+- [x] Border
+- [x] Color
+- [x] Background
 - [ ] Gradient
 - [ ] Text Overflow
 - [ ] Drop shadow
