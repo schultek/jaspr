@@ -42,6 +42,8 @@ class Selector {
 
   factory Selector.element(String selector) => Selector(selector);
 
+  factory Selector.link(LinkSelector selector) => Selector(selector.value);
+
   factory Selector.classHtml(String selector, {String? element}) => Selector('${element ?? ''}.$selector');
 
   factory Selector.own(String selector) => Selector('#$selector');

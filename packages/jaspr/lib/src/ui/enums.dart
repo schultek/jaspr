@@ -110,3 +110,14 @@ enum TextDecoration {
   final String value;
   const TextDecoration(this.value);
 }
+
+enum LinkSelector {
+  unvisited("a:link"),
+  visited("a:visited"),
+  hover("a:hover"),
+  active("a:active"),
+  ;
+
+  final String value;
+  const LinkSelector(this.value);
+}
