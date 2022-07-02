@@ -103,3 +103,30 @@ class Outline {
     if (color != null) Style('outline-color', color!.value),
   ];
 }
+
+class Position {
+  final String type;
+  final EdgeInsets position;
+
+  Position(this.type, this.position);
+
+  factory Position.absolute(EdgeInsets position) {
+    return Position('absolute', position);
+  }
+
+  factory Position.relative(EdgeInsets position) {
+    return Position('relative', position);
+  }
+
+  factory Position.fixed(EdgeInsets position) {
+    return Position('fixed', position);
+  }
+
+  List<Style> getStyles() => [
+    Style('position', type),
+    if (position.left != null) Style('left', position.left.toString()),
+    if (position.top != null) Style('top', position.top.toString()),
+    if (position.right != null) Style('right', position.right.toString()),
+    if (position.bottom != null) Style('bottom', position.bottom.toString()),
+  ];
+}

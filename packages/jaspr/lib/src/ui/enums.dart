@@ -18,14 +18,16 @@ enum Repeat {
   const Repeat(this.value);
 }
 
-enum Position {
+/*
+enum PositionEnum {
   topLeft("left top"), top("top"), topRight("right top"),
   left("left"), center("center"), right("right"),
   bottomLeft("left bottom"), bottom("bottom"), bottomRight("right bottom");
 
   final String value;
-  const Position(this.value);
+  const PositionEnum(this.value);
 }
+ */
 
 enum Clip {
   border("border-box"),
@@ -123,3 +125,18 @@ enum LinkSelector {
 }
 
 enum BorderStyle { none, solid, hidden, dashed, dotted, double, inset, outset, groove, ridge }
+
+enum Overflow { visible, hidden, scroll, auto }
+
+enum Visibility { visible, hidden, collapse, inherit }
+
+enum Display {
+  none("none"),
+  block("block"),
+  inline("inline"),
+  inlineBlock("inline-block"),
+  ;
+
+  final String value;
+  const Display(this.value);
+}

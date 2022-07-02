@@ -23,7 +23,7 @@ class BackgroundStyle extends MultipleStyle {
       if (color != null) Style('background-color', color!.value),
       if (imageUrl != null) Style('background-image', 'url("${imageUrl!}")'),
       if (repeat != null) Style('background-repeat', repeat!.value),
-      if (position != null) Style('background-position', position!.value),
+      if (position != null) Style('background-position', position!.position.getStyle()),
       if (fixed == true) Style('background-attachment', "fixed"),
       if (clip != null) Style('background-clip', clip!.value),
   ];

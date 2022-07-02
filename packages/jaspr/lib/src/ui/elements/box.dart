@@ -1,6 +1,7 @@
 import 'package:jaspr/src/ui/elements/base.dart';
 import 'package:jaspr/src/ui/models.dart';
 import 'package:jaspr/src/ui/styles.dart';
+import 'package:jaspr/ui.dart';
 
 class BoxConstraints {
   final Unit? maxWidth;
@@ -46,6 +47,11 @@ class Box extends BaseElement {
   final Outline? outline;
   final Unit? width;
   final Unit? height;
+  final Overflow? overflow;
+  final Display? display;
+  final Visibility? visibility;
+  final Position? position;
+  final double? opacity;
 
   const Box({
     this.padding,
@@ -54,6 +60,11 @@ class Box extends BaseElement {
     this.outline,
     this.width,
     this.height,
+    this.overflow,
+    this.display,
+    this.visibility,
+    this.position,
+    this.opacity,
     super.key,
     super.id,
     super.style,
@@ -73,5 +84,10 @@ class Box extends BaseElement {
     if (outline != null) ...outline!.getStyles(),
     if (width != null) Style('width', width.toString()),
     if (height != null) Style('height', height.toString()),
+    if (overflow != null) Style('overflow', overflow!.name),
+    if (display != null) Style('display', display!.value),
+    if (visibility != null) Style('visibility', visibility!.name),
+    if (position != null) ...position!.getStyles(),
+    if (opacity != null) Style('opacity', opacity.toString()),
   ]);
 }
