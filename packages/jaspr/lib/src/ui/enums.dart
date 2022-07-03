@@ -18,7 +18,6 @@ enum Repeat {
   const Repeat(this.value);
 }
 
-/*
 enum PositionEnum {
   topLeft("left top"), top("top"), topRight("right top"),
   left("left"), center("center"), right("right"),
@@ -27,7 +26,6 @@ enum PositionEnum {
   final String value;
   const PositionEnum(this.value);
 }
- */
 
 enum Clip {
   border("border-box"),

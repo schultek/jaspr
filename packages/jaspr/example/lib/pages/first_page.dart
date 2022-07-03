@@ -37,7 +37,18 @@ class FirstPage extends StatelessComponent {
               child: ListView(
                   //insideMarkers: true,
                   style: MultipleStyle(styles: [
-                    BackgroundStyle(color: Color.fromName(Colors.greenYellow)),
+                    BackgroundStyle(
+                      color: Color.fromName(Colors.greenYellow),
+                      gradient: RadialGradient(
+                        circle: Circle(
+                          position: PositionEnum.bottomRight,
+                          size: Pixels(200),
+                        ),
+                        color1: Color.fromName(Colors.red),
+                        color2: Color.fromName(Colors.green),
+                        color3: Color.fromName(Colors.blue),
+                      ),
+                    ),
                     TextStyle(align: TextAlign.left)
                   ]),
                   ordered: true,

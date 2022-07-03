@@ -12,6 +12,7 @@ class BoxStyle extends MultipleStyle {
   final Visibility? visibility;
   final Position? position;
   final double? opacity;
+  final Gradient? gradient;
 
   BoxStyle({
     this.padding,
@@ -25,6 +26,7 @@ class BoxStyle extends MultipleStyle {
     this.visibility,
     this.position,
     this.opacity,
+    this.gradient,
   });
 
   @override
@@ -40,5 +42,6 @@ class BoxStyle extends MultipleStyle {
     if (visibility != null) Style('visibility', visibility!.name),
     if (position != null) ...position!.getStyles(),
     if (opacity != null) Style('opacity', opacity.toString()),
+    if (gradient != null) Style('background', gradient!.getStyle()),
   ];
 }

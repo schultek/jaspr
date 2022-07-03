@@ -45,7 +45,7 @@ CSS3 Styles
 - [x] Border
 - [x] Color
 - [x] Background
-- [ ] Gradient
+- [x] Gradient
 - [ ] Text Overflow
 - [ ] Drop shadow
 - [ ] 2D Transforms
