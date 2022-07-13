@@ -43,5 +43,5 @@ class TextSpan extends Box {
   super.events,
   super.child,
   super.children,
-  }) : super(tag: 'p');
+  }) : super(tag: 'span');
 }
