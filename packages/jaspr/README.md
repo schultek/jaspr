@@ -1,5 +1,11 @@
 ![Banner](https://github.com/schultek/jaspr/raw/main/assets/jaspr_banner.png)
 
+<p align="center">
+  <a href="https://pub.dev/packages/jaspr"><img src="https://img.shields.io/pub/v/jaspr.svg" alt="pub"></a>
+  <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/stars/schultek/jaspr" alt="github"></a>
+  <a href="https://discord.gg/XGXrGEk4c6"><img src="https://img.shields.io/discord/993167615587520602" alt="discord"></a>
+</p>
+
 # jaspr
 
 Experimental web framework for Dart. Supports SPAs and SSR.
