@@ -1,6 +1,3 @@
-import 'package:jaspr/src/ui/elements/base.dart';
-import 'package:jaspr/src/ui/models.dart';
-import 'package:jaspr/src/ui/styles.dart';
 import 'package:jaspr/ui.dart';
 
 class BoxConstraints {
