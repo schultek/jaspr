@@ -23,8 +23,14 @@ void main() {
           content.writeln('/// - [$name]: ${attrs[attr]['doc'].split('\n').join('\n///   ')}');
         }
       }
+      content.write('Component $tag(');
 
-      content.write('Component $tag({');
+      var selfClosing = data['self_closing'] == true;
+
+      if (!selfClosing) {
+        content.write('List<Component> children, ');
+      }
+      content.write('{');
 
       if (attrs != null) {
         for (var attr in attrs.keys) {
@@ -65,14 +71,8 @@ void main() {
         }
       }
 
-      var selfClosing = data['self_closing'] == true;
-
       content.write(
-          'Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events');
-
-      if (!selfClosing) content.write(', Component? child, List<Component>? children');
-
-      content.write('}) {\n'
+          'Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
           '  return DomComponent(\n'
           '    tag: \'$tag\',\n'
           '    key: key,\n'
@@ -127,8 +127,7 @@ void main() {
           '    events: events,\n');
 
       if (!selfClosing) {
-        content.write('    child: child,\n'
-            '    children: children,\n');
+        content.write('    children: children,\n');
       }
 
       content.writeln('  );\n'

@@ -9,7 +9,7 @@ part of jaspr_html;
 /// - [muted]: Indicates whether the audio will be initially silenced. Its default value is false.
 /// - [preload]: Provides a hint to the browser about what the author thinks will lead to the best user experience.
 /// - [src]: The URL of the audio to embed. This is subject to HTTP access controls. This is optional; you may instead use the &lt;source&gt; element within the audio block to specify the audio to embed.
-Component audio({bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool? loop, bool? muted, Preload? preload, String? src, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events, Component? child, List<Component>? children}) {
+Component audio(List<Component> children, {bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool? loop, bool? muted, Preload? preload, String? src, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'audio',
     key: key,
@@ -27,7 +27,6 @@ Component audio({bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool?
       if (src != null) 'src': src,
     },
     events: events,
-    child: child,
     children: children,
   );
 }
@@ -110,7 +109,7 @@ enum MediaLoading {
 /// - [src]: The URL of the video to embed. This is optional; you may instead use the &lt;source&gt; element within the video block to specify the video to embed.
 /// - [width]: The width of the video's display area, in CSS pixels.
 /// - [height]: The height of the video's display area, in CSS pixels.
-Component video({bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool? loop, bool? muted, String? poster, Preload? preload, String? src, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events, Component? child, List<Component>? children}) {
+Component video(List<Component> children, {bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool? loop, bool? muted, String? poster, Preload? preload, String? src, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'video',
     key: key,
@@ -131,7 +130,6 @@ Component video({bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool?
       if (height != null) 'height': '$height',
     },
     events: events,
-    child: child,
     children: children,
   );
 }
@@ -171,7 +169,7 @@ Component embed({required String src, String? type, int? width, int? height, Key
 /// - [referrerPolicy]: Indicates which referrer to send when fetching the frame's resource.
 /// - [width]: The width of the frame in CSS pixels. Default is 300.
 /// - [height]: The height of the frame in CSS pixels. Default is 150.
-Component iframe({required String src, String? allow, String? csp, MediaLoading? loading, String? name, String? sandbox, ReferrerPolicy? referrerPolicy, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events, Component? child, List<Component>? children}) {
+Component iframe(List<Component> children, {required String src, String? allow, String? csp, MediaLoading? loading, String? name, String? sandbox, ReferrerPolicy? referrerPolicy, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'iframe',
     key: key,
@@ -191,7 +189,6 @@ Component iframe({required String src, String? allow, String? csp, MediaLoading?
       if (height != null) 'height': '$height',
     },
     events: events,
-    child: child,
     children: children,
   );
 }
@@ -226,7 +223,7 @@ enum ReferrerPolicy {
 /// - [type]: The content type of the resource specified by data. At least one of data and type must be defined.
 /// - [width]: The width of the displayed resource in CSS pixels.
 /// - [height]: The height of the displayed resource in CSS pixels.
-Component object({String? data, String? name, String? type, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events, Component? child, List<Component>? children}) {
+Component object(List<Component> children, {String? data, String? name, String? type, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'object',
     key: key,
@@ -242,7 +239,6 @@ Component object({String? data, String? name, String? type, int? width, int? hei
       if (height != null) 'height': '$height',
     },
     events: events,
-    child: child,
     children: children,
   );
 }
