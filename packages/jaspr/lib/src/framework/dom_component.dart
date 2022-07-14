@@ -8,7 +8,7 @@ typedef EventCallback = void Function(dynamic event);
 /// Can have a single [child] component or any amount of [children].
 class DomComponent extends Component {
   const DomComponent({
-    Key? key,
+    super.key,
     required this.tag,
     this.id,
     this.classes,
@@ -18,8 +18,7 @@ class DomComponent extends Component {
     Component? child,
     List<Component>? children,
   })  : _child = child,
-        _children = children,
-        super(key: key);
+        _children = children;
 
   final String tag;
   final String? id;
@@ -79,7 +78,7 @@ class DomElement extends MultiChildElement with BuildScheduler {
 ///
 /// Styling is done through the parent element(s) and their styles.
 class Text extends Component {
-  const Text(this.text, {this.rawHtml = false, Key? key}) : super(key: key);
+  const Text(this.text, {this.rawHtml = false, super.key});
 
   final String text;
   final bool rawHtml;

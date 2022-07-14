@@ -5,7 +5,7 @@ part of framework;
 /// Used by [DomComponent], [StatelessComponent] and [StatefulComponent].
 abstract class MultiChildElement extends Element {
   /// Creates an element that uses the given component as its configuration.
-  MultiChildElement(Component component) : super(component);
+  MultiChildElement(super.component);
 
   /// The current list of children of this element.
   ///

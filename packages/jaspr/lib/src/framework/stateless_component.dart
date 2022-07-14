@@ -70,7 +70,7 @@ part of framework;
 ///    be read by descendant components.
 abstract class StatelessComponent extends Component {
   /// Initializes [key] for subclasses.
-  const StatelessComponent({Key? key}) : super(key: key);
+  const StatelessComponent({super.key});
 
   /// Creates a [StatelessElement] to manage this component's location in the tree.
   ///

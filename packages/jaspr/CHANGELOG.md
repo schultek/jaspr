@@ -1,3 +1,12 @@
+# 0.2.0
+
+- Update to Dart 2.17
+
+# 0.1.5
+
+- Refactor cli code [#12](https://github.com/schultek/jaspr/pull/12)
+- Fixed issue with `jaspr serve`
+
 # 0.1.4
 
 - Added `--port` option to `jaspr serve` ([#6](https://github.com/schultek/jaspr/issues/6))
