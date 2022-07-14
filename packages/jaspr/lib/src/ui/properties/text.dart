@@ -1,41 +1,24 @@
-library enums;
+enum TextAlign {
+  start('start'),
+  end('end'),
+  left('left'),
+  right('right'),
+  center('center'),
+  justify('justify'),
+  justifyAll('justify-all'),
+  matchParent('match-parent'),
 
-enum StyleType {
-  color ('color'),
-  backgroundColor('background-color'),
-  ;
-  final String value;
-  const StyleType(this.value);
-}
-
-enum Repeat {
-  none("no-repeat"),
-  x("repeat-x"),
-  y("repeat-y"),
-  fill("repeat");
-
-  final String value;
-  const Repeat(this.value);
-}
-
-enum PositionEnum {
-  topLeft("left top"), top("top"), topRight("right top"),
-  left("left"), center("center"), right("right"),
-  bottomLeft("left bottom"), bottom("bottom"), bottomRight("right bottom");
+  inherit('inherit'),
+  initial('initial'),
+  revert('revert'),
+  revertLayer('revert-layer'),
+  unset('unset');
 
   final String value;
-  const PositionEnum(this.value);
+  const TextAlign(this.value);
 }
 
-enum Clip {
-  border("border-box"),
-  padding("padding-box"),
-  content("content-box");
-
-  final String value;
-  const Clip(this.value);
-}
-
+// TODO allow custom values, multiple values
 enum FontFamily {
   arial("Arial"),
   helvetica("Helvetica"),
@@ -66,19 +49,19 @@ enum FontFamily {
   oldtown("Oldtown"),
   blippo("Blippo"),
   brushstroke("Brushstroke"),
-  fantasy("fantasy"),
-  ;
+  fantasy("fantasy");
 
   final String value;
   const FontFamily(this.value);
 }
 
-enum TextAlign { left, center, right, justify }
-
+// TODO support global values, oblique with angle
 enum FontStyle { normal, italic, oblique }
 
+// TODO support all keywords and global values
 enum TextTransform { uppercase, capitalize, lowercase }
 
+// TODO support rest of global values
 enum FontWeight {
   normal("normal"),
   bold("bold"),
@@ -93,48 +76,19 @@ enum FontWeight {
   w700("700"),
   w800("800"),
   w900("900"),
-  inherit("inherit"),
-  ;
+  inherit("inherit");
 
   final String value;
   const FontWeight(this.value);
 }
 
+// TODO implement full shorthand spec
 enum TextDecoration {
   none("none"),
   underline("underline"),
   overline("overline"),
-  lineThrough("line-through"),
-  ;
+  lineThrough("line-through");
 
   final String value;
   const TextDecoration(this.value);
-}
-
-enum LinkSelector {
-  unvisited("a:link"),
-  visited("a:visited"),
-  hover("a:hover"),
-  active("a:active"),
-  ;
-
-  final String value;
-  const LinkSelector(this.value);
-}
-
-enum BorderStyle { none, solid, hidden, dashed, dotted, double, inset, outset, groove, ridge }
-
-enum Overflow { visible, hidden, scroll, auto }
-
-enum Visibility { visible, hidden, collapse, inherit }
-
-enum Display {
-  none("none"),
-  block("block"),
-  inline("inline"),
-  inlineBlock("inline-block"),
-  ;
-
-  final String value;
-  const Display(this.value);
 }

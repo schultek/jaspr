@@ -1,6 +1,6 @@
-import 'package:jaspr/ui.dart';
+part of style;
 
-class TextStyle extends MultipleStyle {
+class _TextStyle implements Style {
   final Color? color;
   final TextAlign? align;
   final FontFamily? fontFamily;
@@ -8,13 +8,13 @@ class TextStyle extends MultipleStyle {
   final Unit? fontSize;
   final FontWeight? fontWeight;
   final TextDecoration? decoration;
-  final TextTransform? transformation;
-  final Unit? indentation;
+  final TextTransform? transform;
+  final Unit? indent;
   final Unit? letterSpacing;
   final Unit? wordSpacing;
   final Unit? lineHeight;
 
-  TextStyle({
+  const _TextStyle({
     this.color,
     this.align,
     this.fontFamily,
@@ -22,27 +22,26 @@ class TextStyle extends MultipleStyle {
     this.fontSize,
     this.fontWeight,
     this.decoration,
-    this.transformation,
-    this.indentation,
+    this.transform,
+    this.indent,
     this.letterSpacing,
     this.wordSpacing,
     this.lineHeight,
-  }) : super();
-
+  });
 
   @override
-  List<Style> getStyles() => [
-      if (color != null) Style('color', color!.value),
-      if (fontFamily != null) Style('font-family', fontFamily!.value),
-      if (fontStyle != null) Style('font-style', fontStyle!.name),
-      if (fontSize != null) Style('font-size', fontSize!.toString()),
-      if (fontWeight != null) Style('font-weight', fontWeight!.name),
-      if (align != null) Style('text-align', align!.name),
-      if (decoration != null) Style('text-decoration', decoration!.value),
-      if (transformation != null) Style('text-transform', transformation!.name),
-      if (indentation != null) Style('text-indent', indentation!.toString()),
-      if (letterSpacing != null) Style('letter-spacing', letterSpacing!.toString()),
-      if (wordSpacing != null) Style('word-spacing', wordSpacing!.toString()),
-      if (lineHeight != null) Style('line-height', lineHeight!.toString()),
-  ];
+  Map<String, String> get styles => {
+        if (color != null) 'color': color!.value,
+        if (fontFamily != null) 'font-family': fontFamily!.value,
+        if (fontStyle != null) 'font-style': fontStyle!.name,
+        if (fontSize != null) 'font-size': fontSize!.toString(),
+        if (fontWeight != null) 'font-weight': fontWeight!.name,
+        if (align != null) 'text-align': align!.name,
+        if (decoration != null) 'text-decoration': decoration!.value,
+        if (transform != null) 'text-transform': transform!.name,
+        if (indent != null) 'text-indent': indent!.toString(),
+        if (letterSpacing != null) 'letter-spacing': letterSpacing!.toString(),
+        if (wordSpacing != null) 'word-spacing': wordSpacing!.toString(),
+        if (lineHeight != null) 'line-height': lineHeight!.toString(),
+      };
 }
