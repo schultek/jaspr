@@ -1,0 +1,368 @@
+{
+  "content": {
+    "article": {
+      "doc": "The &lt;article&gt; HTML element represents a self-contained composition in a document, page, application, or site, which is intended to be independently distributable or reusable (e.g., in syndication). Examples include: a forum post, a magazine or newspaper article, or a blog entry, a product card, a user-submitted comment, an interactive widget or gadget, or any other independent item of content."
+    },
+    "aside": {
+      "doc": "The &lt;aside&gt; HTML element represents a portion of a document whose content is only indirectly related to the document's main content. Asides are frequently presented as sidebars or call-out boxes."
+    },
+    "footer": {
+      "doc": "The &lt;footer&gt; HTML element represents a footer for its nearest ancestor sectioning content or sectioning root element. A &lt;footer&gt; typically contains information about the author of the section, copyright data or links to related documents."
+    },
+    "header": {
+      "doc": "The &lt;header&gt; HTML element represents introductory content, typically a group of introductory or navigational aids. It may contain some heading elements but also a logo, a search form, an author name, and other elements."
+    },
+    "h1": {
+      "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
+    },
+    "h2": {
+      "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
+    },
+    "h3": {
+      "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
+    },
+    "h4": {
+      "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
+    },
+    "h5": {
+      "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
+    },
+    "h6": {
+      "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
+    },
+    "main": {
+      "doc": "The &lt;main&gt; HTML element represents the dominant content of the &lt;body&gt; of a document. The main content area consists of content that is directly related to or expands upon the central topic of a document, or the central functionality of an application."
+    },
+    "nav": {
+      "doc": "The &lt;nav&gt; HTML element represents a section of a page whose purpose is to provide navigation links, either within the current document or to other documents. Common examples of navigation sections are menus, tables of contents, and indexes."
+    },
+    "section": {
+      "doc": "The &lt;section&gt; HTML element represents a generic standalone section of a document, which doesn't have a more specific semantic element to represent it. Sections should always have a heading, with very few exceptions."
+    },
+    "div": {
+      "doc": "The &lt;div&gt; HTML element is the generic container for flow content. It has no effect on the content or layout until styled in some way using CSS (e.g. styling is directly applied to it, or some kind of layout model like Flexbox is applied to its parent element)."
+    },
+    "ul": {
+      "doc": "The &lt;ul&gt; HTML element represents an unordered list of items, typically rendered as a bulleted list."
+    },
+    "ol": {
+      "doc": "The &lt;ol&gt; HTML element represents an ordered list of items — typically rendered as a numbered list.",
+      "attributes": {
+        "reversed": {
+          "doc": "This Boolean attribute specifies that the list's items are in reverse order. Items will be numbered from high to low.",
+          "type": "boolean"
+        },
+        "start": {
+          "doc": "An integer to start counting from for the list items. Always an Arabic numeral (1, 2, 3, etc.), even when the numbering type is letters or Roman numerals. For example, to start numbering elements from the letter \"d\" or the Roman numeral \"iv,\" use start=\"4\".",
+          "type": "int"
+        },
+        "type": {
+          "doc": "Sets the numbering type\nThe specified type is used for the entire list unless a different type attribute is used on an enclosed &lt;li&gt; element.",
+          "type": {
+            "name": "ListType",
+            "doc": "Them numbering type for a list element.",
+            "values": {
+              "lowercaseLetters": {
+                "value": "a",
+                "doc": "For lowercase letters"
+              },
+              "uppercaseLetters": {
+                "value": "A",
+                "doc": "For uppercase letters"
+              },
+              "lowercaseRomanNumerals": {
+                "value": "i",
+                "doc": "For lowercase Roman numerals"
+              },
+              "uppercaseRomanNumerals": {
+                "value": "I",
+                "doc": "For uppercase Roman numerals"
+              },
+              "numbers": {
+                "value": "1",
+                "doc": "For numbers (default)"
+              }
+            }
+          }
+        }
+      }
+    },
+    "li": {
+      "doc": "The &lt;li&gt; HTML element is used to represent an item in a list. It must be contained in a parent element: an ordered list (&lt;ol&gt;), an unordered list (&lt;ul&gt;), or a menu (&lt;menu&gt;). In menus and unordered lists, list items are usually displayed using bullet points. In ordered lists, they are usually displayed with an ascending counter on the left, such as a number or letter.",
+      "attributes": {
+        "value": {
+          "doc": "This integer attribute indicates the current ordinal value of the list item as defined by the &lt;ol&gt; element. The only allowed value for this attribute is a number, even if the list is displayed with Roman numerals or letters. List items that follow this one continue numbering from the value set. The value attribute has no meaning for unordered lists (&lt;ul&gt;) or for menus (&lt;menu&gt;).",
+          "type": "int"
+        }
+      }
+    },
+    "hr": {
+      "doc": "The &lt;hr&gt; HTML element represents a thematic break between paragraph-level elements: for example, a change of scene in a story, or a shift of topic within a section."
+    },
+    "p": {
+      "doc": "The &lt;p&gt; HTML element represents a paragraph. Paragraphs are usually represented in visual media as blocks of text separated from adjacent blocks by blank lines and/or first-line indentation, but HTML paragraphs can be any structural grouping of related content, such as images or form fields."
+    },
+    "pre": {
+      "doc": "The &lt;pre&gt; HTML element represents preformatted text which is to be presented exactly as written in the HTML file. The text is typically rendered using a non-proportional, or monospaced, font. Whitespace inside this element is displayed as written."
+    }
+  },
+  "text": {
+    "a": {
+      "doc": "The &lt;a&gt; HTML element (or anchor element), with its href attribute, creates a hyperlink to web pages, files, email addresses, locations in the same page, or anything else a URL can address.\n\nContent within each &lt;a&gt; should indicate the link's destination. If the href attribute is present, pressing the enter key while focused on the &lt;a&gt; element will activate it.",
+      "attributes":{
+        "download": {
+          "doc": "Causes the browser to treat the linked URL as a download. Can be used with or without a value:\n\nWithout a value, the browser will suggest a filename/extension, generated from various sources:\nThe Content-Disposition HTTP header\nThe final segment in the URL path\nThe media type (from the Content-Type header, the start of a data: URL, or Blob.type for a blob: URL)\nDefining a value suggests it as the filename. / and \\ characters are converted to underscores (_). Filesystems may forbid other characters in filenames, so browsers will adjust the suggested name if necessary.",
+          "type": "string"
+        },
+        "href": {
+          "doc": "The URL that the hyperlink points to. Links are not restricted to HTTP-based URLs — they can use any URL scheme supported by browsers:\n\nSections of a page with fragment URLs\nPieces of media files with media fragments\nTelephone numbers with tel: URLs\nEmail addresses with mailto: URLs\nWhile web browsers may not support other URL schemes, web sites can with registerProtocolHandler()",
+          "type": "string",
+          "required": true
+        },
+        "target": {
+          "doc": "Where to display the linked URL, as the name for a browsing context (a tab, window, or &lt;iframe&gt;).",
+          "type": {
+            "name": "Target",
+            "doc": "The target attribute for an anchor tag. Defines where to display the linked URL, as the name for a browsing context (a tab, window, or &lt;iframe&gt;).",
+            "values": {
+              "self": {
+                "value": "_self",
+                "doc": "The current browsing context. (Default)"
+              },
+              "blank": {
+                "value": "_blank",
+                "doc": "Usually a new tab, but users can configure browsers to open a new window instead."
+              },
+              "parent": {
+                "value": "_parent",
+                "doc": "The parent browsing context of the current one. If no parent, behaves as [Target.self]."
+              },
+              "top": {
+                "value": "_top",
+                "doc": "The topmost browsing context (the \"highest\" context that's an ancestor of the current one). If no ancestors, behaves as [Target.self]."
+              }
+            }
+          }
+        },
+        "type": {
+          "doc": "Hints at the linked URL's format with a MIME type. No built-in functionality.",
+          "type": "string"
+        }
+      }
+    },
+    "b": {
+      "doc": "The &lt;b&gt; HTML element is used to draw the reader's attention to the element's contents, which are not otherwise granted special importance. This was formerly known as the Boldface element, and most browsers still draw the text in boldface. However, you should not use &lt;b&gt; for styling text; instead, you should use the CSS font-weight property to create boldface text, or the &lt;strong&gt; element to indicate that text is of special importance."
+    },
+    "br": {
+      "doc": "The &lt;br&gt; HTML element produces a line break in text (carriage-return). It is useful for writing a poem or an address, where the division of lines is significant.",
+      "self_closing": true
+    },
+    "code": {
+      "doc": "The &lt;code&gt; HTML element displays its contents styled in a fashion intended to indicate that the text is a short fragment of computer code. By default, the content text is displayed using the user agent's default monospace font."
+    },
+    "em": {
+      "doc": "The &lt;em&gt; HTML element marks text that has stress emphasis. The &lt;em&gt; element can be nested, with each level of nesting indicating a greater degree of emphasis."
+    },
+    "i": {
+      "doc": "The &lt;i&gt; HTML element represents a range of text that is set off from the normal text for some reason, such as idiomatic text, technical terms, taxonomical designations, among others. Historically, these have been presented using italicized type, which is the original source of the &lt;i&gt; naming of this element."
+    },
+    "s": {
+      "doc": "The &lt;s&gt; HTML element renders text with a strikethrough, or a line through it. Use the &lt;s&gt; element to represent things that are no longer relevant or no longer accurate. However, &lt;s&gt; is not appropriate when indicating document edits; for that, use the &lt;del&gt; and &lt;ins&gt; elements, as appropriate."
+    },
+    "small": {
+      "doc": "The &lt;small&gt; HTML element represents side-comments and small print, like copyright and legal text, independent of its styled presentation. By default, it renders text within it one font-size smaller, such as from small to x-small."
+    },
+    "span": {
+      "doc": "The &lt;span&gt; HTML element is a generic inline container for phrasing content, which does not inherently represent anything. It can be used to group elements for styling purposes (using the class or id attributes), or because they share attribute values, such as lang. It should be used only when no other semantic element is appropriate. &lt;span&gt; is very much like a &lt;div&gt; element, but &lt;div&gt; is a block-level element whereas a &lt;span&gt; is an inline element."
+    },
+    "strong": {
+      "doc": "The &lt;strong&gt; HTML element indicates that its contents have strong importance, seriousness, or urgency. Browsers typically render the contents in bold type."
+    },
+    "u": {
+      "doc": "The &lt;u&gt; HTML element represents a span of inline text which should be rendered in a way that indicates that it has a non-textual annotation. This is rendered by default as a simple solid underline, but may be altered using CSS."
+    }
+  },
+  "media": {
+    "audio": {
+      "doc": "The &lt;audio&gt; HTML element is used to embed sound content in documents. It may contain one or more audio sources, represented using the src attribute or the &lt;source&gt; element: the browser will choose the most suitable one. It can also be the destination for streamed media, using a MediaStream.",
+      "attributes": {
+        "autoplay": {
+          "doc": "A Boolean attribute: if specified, the audio will automatically begin playback as soon as it can do so, without waiting for the entire audio file to finish downloading.",
+          "type": "boolean"
+        },
+        "controls": {
+          "doc": "If this attribute is present, the browser will offer controls to allow the user to control audio playback, including volume, seeking, and pause/resume playback.",
+          "type": "boolean"
+        },
+        "crossorigin": {
+          "name": "crossOrigin",
+          "doc": "Indicates whether to use CORS to fetch the related audio file.",
+          "type": {
+            "name": "CrossOrigin",
+            "doc": "Indicates if the fetching of the media must be done using a CORS request. Media data from a CORS request can be reused in the &lt;canvas&gt; element without being marked \"tainted\". If the crossorigin attribute is not specified, then a non-CORS request is sent (without the Origin request header), and the browser marks the media as tainted and restricts access to its data, preventing its usage in &lt;canvas&gt; elements. If the crossorigin attribute is specified, then a CORS request is sent (with the Origin request header); but if the server does not opt into allowing cross-origin access to the media data by the origin site (by not sending any Access-Control-Allow-Origin response header, or by not including the site's origin in any Access-Control-Allow-Origin response header it does send), then the browser blocks the media from loading, and logs a CORS error to the devtools console.",
+            "values": {
+              "anonymous": {
+                "doc": "Sends a cross-origin request without a credential. In other words, it sends the Origin: HTTP header without a cookie, X.509 certificate, or performing HTTP Basic authentication. If the server does not give credentials to the origin site (by not setting the Access-Control-Allow-Origin: HTTP header), the image will be tainted, and its usage restricted."
+              },
+              "useCredentials": {
+                "value": "use-credentials",
+                "doc": "Sends a cross-origin request with a credential. In other words, it sends the Origin: HTTP header with a cookie, a certificate, or performing HTTP Basic authentication. If the server does not give credentials to the origin site (through Access-Control-Allow-Credentials: HTTP header), the image will be tainted and its usage restricted."
+              }
+            }
+          }
+        },
+        "loop": {
+          "doc": "If specified, the audio player will automatically seek back to the start upon reaching the end of the audio.",
+          "type": "boolean"
+        },
+        "muted": {
+          "doc": "Indicates whether the audio will be initially silenced. Its default value is false.",
+          "type": "boolean"
+        },
+        "preload": {
+          "doc": "Provides a hint to the browser about what the author thinks will lead to the best user experience.",
+          "type": {
+            "name": "Preload",
+            "doc": "Intended to provide a hint to the browser about what the author thinks will lead to the best user experience when loading a media object.\nThe default value is different for each browser. The spec advises it to be set to [Preload.metadata].",
+            "values": {
+              "none": {
+                "doc": "Indicates that the audio should not be preloaded."
+              },
+              "metadata": {
+                "doc": "Indicates that only audio metadata (e.g. length) is fetched."
+              },
+              "auto": {
+                "doc": "Indicates that the whole audio file can be downloaded, even if the user is not expected to use it."
+              }
+            }
+          }
+        },
+        "src": {
+          "doc": "The URL of the audio to embed. This is subject to HTTP access controls. This is optional; you may instead use the &lt;source&gt; element within the audio block to specify the audio to embed.",
+          "type": "string"
+        }
+      }
+    },
+    "img": {
+      "doc": "The &lt;img&gt; HTML element embeds an image into the document.",
+      "attributes": {
+        "alt": {
+          "doc": "Defines an alternative text description of the image",
+          "type": "string"
+        },
+        "crossorigin": {
+          "name": "crossOrigin",
+          "doc": "Indicates if the fetching of the image must be done using a CORS request.",
+          "type": "enum:CrossOrigin"
+        },
+        "width": {
+          "doc": "The intrinsic width of the image in pixels.",
+          "type": "int"
+        },
+        "height": {
+          "doc": "The intrinsic height of the image, in pixels.",
+          "type": "int"
+        },
+        "loading": {
+          "doc": "Indicates how the browser should load the image.",
+          "type": {
+            "name": "ImageLoading",
+            "doc": "Indicates how the browser should load the image. Loading is only deferred when JavaScript is enabled.",
+            "values": {
+              "eager": {
+                "doc": "Loads the image immediately, regardless of whether or not the image is currently within the visible viewport (this is the default value)."
+              },
+              "lazy": {
+                "doc": "Defers loading the image until it reaches a calculated distance from the viewport, as defined by the browser. The intent is to avoid the network and storage bandwidth needed to handle the image until it's reasonably certain that it will be needed. This generally improves the performance of the content in most typical use cases."
+              }
+            }
+          }
+        },
+        "src": {
+          "doc": "The image URL.",
+          "type": "string",
+          "required": true
+        }
+      }
+    },
+    "video": {
+      "doc": "The &lt;video&gt; HTML element embeds a media player which supports video playback into the document. You can use &lt;video&gt; for audio content as well, but the &lt;audio&gt; element may provide a more appropriate user experience.",
+      "attributes": {
+        "autoplay": {
+          "doc": "Indicates if the video automatically begins to play back as soon as it can do so without stopping to finish loading the data.",
+          "type": "boolean"
+        },
+        "controls": {
+          "doc": "If this attribute is present, the browser will offer controls to allow the user to control video playback, including volume, seeking, and pause/resume playback.",
+          "type": "boolean"
+        },
+        "crossorigin": {
+          "name": "crossOrigin",
+          "doc": "Indicates whether to use CORS to fetch the related video.",
+          "type": "enum:CrossOrigin"
+        },
+        "loop": {
+          "doc": "If specified, the browser will automatically seek back to the start upon reaching the end of the video.",
+          "type": "boolean"
+        },
+        "muted": {
+          "doc": "Indicates the default setting of the audio contained in the video. If set, the audio will be initially silenced. Its default value is false, meaning that the audio will be played when the video is played.",
+          "type": "boolean"
+        },
+        "poster": {
+          "doc": "A URL for an image to be shown while the video is downloading. If this attribute isn't specified, nothing is displayed until the first frame is available, then the first frame is shown as the poster frame.",
+          "type": "string"
+        },
+        "preload": {
+          "doc": "Provides a hint to the browser about what the author thinks will lead to the best user experience with regards to what content is loaded before the video is played.",
+          "type": "enum:Preload"
+        },
+        "src": {
+          "doc": "The URL of the video to embed. This is optional; you may instead use the &lt;source&gt; element within the video block to specify the video to embed.",
+          "type": "string"
+        },
+        "width": {
+          "doc": "The width of the video's display area, in CSS pixels.",
+          "type": "int"
+        },
+        "height": {
+          "doc": "The height of the video's display area, in CSS pixels.",
+          "type": "int"
+        }
+      }
+    }
+  },
+  "forms": {
+    "button": {
+      "doc": "The &lt;button&gt; HTML element is an interactive element activated by a user with a mouse, keyboard, finger, voice command, or other assistive technology. Once activated, it then performs a programmable action, such as submitting a form or opening a dialog.",
+      "attributes": {
+        "autofocus": {
+          "doc": "Specifies that the button should have input focus when the page loads. Only one element in a document can have this attribute.",
+          "type": "boolean"
+        },
+        "disabled": {
+          "doc": "Prevents the user from interacting with the button: it cannot be pressed or focused.",
+          "type": "boolean"
+        },
+        "type": {
+          "doc": "The default behavior of the button.",
+          "type": {
+            "name": "ButtonType",
+            "doc": "Defines the default behavior of a button.",
+            "values": {
+              "submit": {
+                "doc": "The button submits the form data to the server. This is the default if the attribute is not specified for buttons associated with a &lt;form&gt;, or if the attribute is an empty or invalid value."
+              },
+              "reset": {
+                "doc": "The button resets all the controls to their initial values, like &lt;input type=\"reset\"&gt;. (This behavior tends to annoy users.)"
+              },
+              "button": {
+                "doc": "The button has no default behavior, and does nothing when pressed by default. It can have client-side scripts listen to the element's events, which are triggered when the events occur."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
