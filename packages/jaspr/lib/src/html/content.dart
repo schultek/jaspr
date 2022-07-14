@@ -1,4 +1,4 @@
-import '../../jaspr.dart';
+part of jaspr_html;
 
 /// The &lt;article&gt; HTML element represents a self-contained composition in a document, page, application, or site, which is intended to be independently distributable or reusable (e.g., in syndication). Examples include: a forum post, a magazine or newspaper article, or a blog entry, a product card, a user-submitted comment, an interactive widget or gadget, or any other independent item of content.
 Component article({Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events, Component? child, List<Component>? children}) {
@@ -195,6 +195,26 @@ Component section({Key? key, String? id, Iterable<String>? classes, Map<String, 
   );
 }
 
+/// The &lt;blockquote&gt; HTML element indicates that the enclosed text is an extended quotation. Usually, this is rendered visually by indentation. A URL for the source of the quotation may be given using the cite attribute, while a text representation of the source can be given using the &lt;cite&gt; element.
+///
+/// - [cite]: A URL that designates a source document or message for the information quoted. This attribute is intended to point to information explaining the context or the reference for the quote.
+Component blockquote({String? cite, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events, Component? child, List<Component>? children}) {
+  return DomComponent(
+    tag: 'blockquote',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: {
+      ...attributes ?? {},
+      if (cite != null) 'cite': cite,
+    },
+    events: events,
+    child: child,
+    children: children,
+  );
+}
+
 /// The &lt;div&gt; HTML element is the generic container for flow content. It has no effect on the content or layout until styled in some way using CSS (e.g. styling is directly applied to it, or some kind of layout model like Flexbox is applied to its parent element).
 Component div({Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events, Component? child, List<Component>? children}) {
   return DomComponent(
@@ -249,7 +269,6 @@ Component ol({bool? reversed, int? start, ListType? type, Key? key, String? id, 
     children: children,
   );
 }
-
 
 /// Them numbering type for a list element.
 enum ListType {

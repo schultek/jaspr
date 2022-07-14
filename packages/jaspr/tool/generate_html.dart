@@ -8,7 +8,7 @@ void main() {
   for (var key in specJson.keys) {
     var group = specJson[key] as Map<String, dynamic>;
     var file = File('lib/src/html/$key.dart');
-    var content = StringBuffer("import '../../jaspr.dart';\n");
+    var content = StringBuffer("part of jaspr_html;\n");
 
     for (var tag in group.keys) {
       var data = group[tag] as Map<String, dynamic>;
@@ -46,6 +46,8 @@ void main() {
             content.write('bool');
           } else if (type == 'int') {
             content.write('int');
+          } else if (type == 'double') {
+            content.write('double');
           } else if (type is String && type.startsWith('enum:')) {
             var name = type.split(':')[1];
             content.write(name);
@@ -63,8 +65,14 @@ void main() {
         }
       }
 
+      var selfClosing = data['self_closing'] == true;
+
       content.write(
-          'Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events, Component? child, List<Component>? children}) {\n'
+          'Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events');
+
+      if (!selfClosing) content.write(', Component? child, List<Component>? children');
+
+      content.write('}) {\n'
           '  return DomComponent(\n'
           '    tag: \'$tag\',\n'
           '    key: key,\n'
@@ -97,7 +105,7 @@ void main() {
             content.write('$name');
           } else if (type == 'boolean') {
             content.write("''");
-          } else if (type == 'int') {
+          } else if (type == 'int' || type == 'double') {
             content.write("'\$$name'");
           } else if (type is String && type.startsWith('enum:')) {
             content.write('$name.value');
@@ -115,11 +123,15 @@ void main() {
         content.write('attributes,\n');
       }
 
-      content.writeln(''
-          '    events: events,\n'
-          '    child: child,\n'
-          '    children: children,\n'
-          '  );\n'
+      content.write(''
+          '    events: events,\n');
+
+      if (!selfClosing) {
+        content.write('    child: child,\n'
+            '    children: children,\n');
+      }
+
+      content.writeln('  );\n'
           '}');
 
       if (attrs != null) {
@@ -130,8 +142,6 @@ void main() {
             if (type['values'] != null) {
               var name = type['name'] as String;
               var values = type['values'] as Map<String, dynamic>;
-
-              content.write('\n');
 
               content.write('\n${type['doc'].split('\n').map((t) => '/// $t\n').join()}');
 

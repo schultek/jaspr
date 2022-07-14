@@ -1,4 +1,9 @@
-export 'src/html/content.dart';
-export 'src/html/forms.dart';
-export 'src/html/media.dart';
-export 'src/html/text.dart';
+library jaspr_html;
+
+import 'src/framework/framework.dart';
+
+part 'src/html/content.dart';
+part 'src/html/forms.dart';
+part 'src/html/media.dart';
+part 'src/html/other.dart';
+part 'src/html/text.dart';

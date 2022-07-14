@@ -1,4 +1,4 @@
-import '../../jaspr.dart';
+part of jaspr_html;
 
 /// The &lt;a&gt; HTML element (or anchor element), with its href attribute, creates a hyperlink to web pages, files, email addresses, locations in the same page, or anything else a URL can address.
 /// 
@@ -20,7 +20,8 @@ import '../../jaspr.dart';
 ///   While web browsers may not support other URL schemes, web sites can with registerProtocolHandler()
 /// - [target]: Where to display the linked URL, as the name for a browsing context (a tab, window, or &lt;iframe&gt;).
 /// - [type]: Hints at the linked URL's format with a MIME type. No built-in functionality.
-Component a({String? download, required String href, Target? target, String? type, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events, Component? child, List<Component>? children}) {
+/// - [referrerPolicy]: How much of the referrer to send when following the link.
+Component a({String? download, required String href, Target? target, String? type, ReferrerPolicy? referrerPolicy, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events, Component? child, List<Component>? children}) {
   return DomComponent(
     tag: 'a',
     key: key,
@@ -33,6 +34,7 @@ Component a({String? download, required String href, Target? target, String? typ
       'href': href,
       if (target != null) 'target': target.value,
       if (type != null) 'type': type,
+      if (referrerPolicy != null) 'referrerpolicy': referrerPolicy.value,
     },
     events: events,
     child: child,
@@ -40,8 +42,7 @@ Component a({String? download, required String href, Target? target, String? typ
   );
 }
 
-
-/// The target attribute for an anchor tag. Defines where to display the linked URL, as the name for a browsing context (a tab, window, or &lt;iframe&gt;).
+/// The name/keyword for a browsing context (a tab, window, or &lt;iframe&gt;).
 enum Target {
   /// The current browsing context. (Default)
   self('_self'),
@@ -72,7 +73,7 @@ Component b({Key? key, String? id, Iterable<String>? classes, Map<String, String
 }
 
 /// The &lt;br&gt; HTML element produces a line break in text (carriage-return). It is useful for writing a poem or an address, where the division of lines is significant.
-Component br({Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events, Component? child, List<Component>? children}) {
+Component br({Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'br',
     key: key,
@@ -81,8 +82,6 @@ Component br({Key? key, String? id, Iterable<String>? classes, Map<String, Strin
     styles: styles,
     attributes: attributes,
     events: events,
-    child: child,
-    children: children,
   );
 }
 
