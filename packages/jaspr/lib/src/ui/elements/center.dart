@@ -1,4 +1,4 @@
-import 'package:jaspr/src/ui/elements/base.dart';
+import 'package:jaspr/ui.dart';
 
 class Center extends BaseElement {
   const Center({
@@ -10,5 +10,13 @@ class Center extends BaseElement {
     super.events,
     super.child,
     super.children,
-  }) : super(tag: 'center');
+  }) : super(tag: 'div');
+
+  @override
+  BaseStyle? getStyles() => MultipleStyle(styles: [
+    Style('display', 'flex'),
+    Style('justify-content', 'center'),
+    Style('align-items', 'center'),
+    if (style != null) style!,
+  ]);
 }
