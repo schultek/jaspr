@@ -4,7 +4,7 @@ part of framework;
 ///
 /// Used by [InheritedComponent].
 abstract class SingleChildElement extends Element {
-  SingleChildElement(Component component) : super(component);
+  SingleChildElement(super.component);
 
   /// The current child of this element.
   @protected
