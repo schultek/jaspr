@@ -26,6 +26,6 @@ dependencies:
 dev_dependencies:
   build_runner: ^2.1.7
   build_web_compilers: ^3.2.2
-  #jaspr_test: ^0.1.0
+  jaspr_test: ^0.1.0
   lints: ^1.0.1
   webdev: ^2.7.7
