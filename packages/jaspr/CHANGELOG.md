@@ -1,3 +1,7 @@
+# 0.2.0
+
+- Update to Dart 2.17
+
 # 0.1.5
 
 - Refactor cli code [#12](https://github.com/schultek/jaspr/pull/12)

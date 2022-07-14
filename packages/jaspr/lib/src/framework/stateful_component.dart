@@ -130,7 +130,7 @@ part of framework;
 ///    be read by descendant components.
 abstract class StatefulComponent extends Component {
   /// Initializes [key] for subclasses.
-  const StatefulComponent({Key? key}) : super(key: key);
+  const StatefulComponent({super.key});
 
   /// Creates a [StatefulElement] to manage this component's location in the tree.
   ///

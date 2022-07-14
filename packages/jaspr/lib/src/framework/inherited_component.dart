@@ -36,7 +36,7 @@ part of framework;
 abstract class InheritedComponent extends Component {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
-  const InheritedComponent({required this.child, Key? key}) : super(key: key);
+  const InheritedComponent({required this.child, super.key});
 
   /// The component below this component in the tree.
   final Component child;
