@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/ui.dart';
 
-class FirstPage extends StatelessComponent {
+class PageExample extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DivElement(
