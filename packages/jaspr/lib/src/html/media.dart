@@ -32,12 +32,31 @@ Component audio({bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool?
   );
 }
 
+
+/// Indicates if the fetching of the media must be done using a CORS request. Media data from a CORS request can be reused in the &lt;canvas&gt; element without being marked "tainted". If the crossorigin attribute is not specified, then a non-CORS request is sent (without the Origin request header), and the browser marks the media as tainted and restricts access to its data, preventing its usage in &lt;canvas&gt; elements. If the crossorigin attribute is specified, then a CORS request is sent (with the Origin request header); but if the server does not opt into allowing cross-origin access to the media data by the origin site (by not sending any Access-Control-Allow-Origin response header, or by not including the site's origin in any Access-Control-Allow-Origin response header it does send), then the browser blocks the media from loading, and logs a CORS error to the devtools console.
 enum CrossOrigin {
-  anonymous('anonymous'), useCredentials('use-credentials')
+  /// Sends a cross-origin request without a credential. In other words, it sends the Origin: HTTP header without a cookie, X.509 certificate, or performing HTTP Basic authentication. If the server does not give credentials to the origin site (by not setting the Access-Control-Allow-Origin: HTTP header), the image will be tainted, and its usage restricted.
+  anonymous('anonymous'),
+  /// Sends a cross-origin request with a credential. In other words, it sends the Origin: HTTP header with a cookie, a certificate, or performing HTTP Basic authentication. If the server does not give credentials to the origin site (through Access-Control-Allow-Credentials: HTTP header), the image will be tainted and its usage restricted.
+  useCredentials('use-credentials');
+
+  final String value;
+  const CrossOrigin(this.value);
 }
 
+
+/// Intended to provide a hint to the browser about what the author thinks will lead to the best user experience when loading a media object.
+/// The default value is different for each browser. The spec advises it to be set to [Preload.metadata].
 enum Preload {
-  none('none'), metadata('metadata'), auto('auto')
+  /// Indicates that the audio should not be preloaded.
+  none('none'),
+  /// Indicates that only audio metadata (e.g. length) is fetched.
+  metadata('metadata'),
+  /// Indicates that the whole audio file can be downloaded, even if the user is not expected to use it.
+  auto('auto');
+
+  final String value;
+  const Preload(this.value);
 }
 
 /// The &lt;img&gt; HTML element embeds an image into the document.
@@ -70,8 +89,16 @@ Component img({String? alt, CrossOrigin? crossOrigin, int? width, int? height, I
   );
 }
 
+
+/// Indicates how the browser should load the image. Loading is only deferred when JavaScript is enabled.
 enum ImageLoading {
-  eager('eager'), lazy('lazy')
+  /// Loads the image immediately, regardless of whether or not the image is currently within the visible viewport (this is the default value).
+  eager('eager'),
+  /// Defers loading the image until it reaches a calculated distance from the viewport, as defined by the browser. The intent is to avoid the network and storage bandwidth needed to handle the image until it's reasonably certain that it will be needed. This generally improves the performance of the content in most typical use cases.
+  lazy('lazy');
+
+  final String value;
+  const ImageLoading(this.value);
 }
 
 /// The &lt;video&gt; HTML element embeds a media player which supports video playback into the document. You can use &lt;video&gt; for audio content as well, but the &lt;audio&gt; element may provide a more appropriate user experience.

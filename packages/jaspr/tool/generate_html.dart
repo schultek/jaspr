@@ -131,17 +131,27 @@ void main() {
               var name = type['name'] as String;
               var values = type['values'] as Map<String, dynamic>;
 
-              content.write('\nenum $name {\n  ');
+              content.write('\n');
+
+              content.write('\n${type['doc'].split('\n').map((t) => '/// $t\n').join()}');
+
+              content.write('enum $name {\n');
 
               for (var name in values.keys) {
                 var value = values[name]['value'] ?? name;
-                content.write('$name(\'$value\')');
+                content.write('  /// ${values[name]['doc'].split('\n').join('\n  /// ')}\n');
+                content.write('  $name(\'$value\')');
                 if (values.keys.last != name) {
-                  content.write(', ');
+                  content.write(',\n');
+                } else {
+                  content.write(';\n');
                 }
               }
 
-              content.writeln('\n}');
+              content.writeln('\n'
+                  '  final String value;\n'
+                  '  const $name(this.value);\n'
+                  '}');
             }
           }
         }

@@ -250,8 +250,22 @@ Component ol({bool? reversed, int? start, ListType? type, Key? key, String? id, 
   );
 }
 
+
+/// Them numbering type for a list element.
 enum ListType {
-  lowercaseLetters('a'), uppercaseLetters('A'), lowercaseRomanNumerals('i'), uppercaseRomanNumerals('I'), numbers('1')
+  /// For lowercase letters
+  lowercaseLetters('a'),
+  /// For uppercase letters
+  uppercaseLetters('A'),
+  /// For lowercase Roman numerals
+  lowercaseRomanNumerals('i'),
+  /// For uppercase Roman numerals
+  uppercaseRomanNumerals('I'),
+  /// For numbers (default)
+  numbers('1');
+
+  final String value;
+  const ListType(this.value);
 }
 
 /// The &lt;li&gt; HTML element is used to represent an item in a list. It must be contained in a parent element: an ordered list (&lt;ol&gt;), an unordered list (&lt;ul&gt;), or a menu (&lt;menu&gt;). In menus and unordered lists, list items are usually displayed using bullet points. In ordered lists, they are usually displayed with an ascending counter on the left, such as a number or letter.
