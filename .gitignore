@@ -87,3 +87,6 @@ pubspec_overrides.yaml
 
 # Conventional directory for build outputs
 build/
+
+# Jaspr folders and files
+components_test/
