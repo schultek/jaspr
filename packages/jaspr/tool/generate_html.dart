@@ -7,7 +7,7 @@ void main() {
 
   for (var key in specJson.keys) {
     var group = specJson[key] as Map<String, dynamic>;
-    var file = File('lib/src/html/$key.dart');
+    var file = File('lib/src/ui/html/$key.dart');
     var content = StringBuffer("part of jaspr_html;\n");
 
     for (var tag in group.keys) {

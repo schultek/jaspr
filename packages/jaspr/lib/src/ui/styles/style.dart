@@ -4,7 +4,7 @@ import 'properties/color.dart';
 import 'properties/text.dart';
 import 'properties/unit.dart';
 
-part 'styles/text.dart';
+part 'text.dart';
 
 /// Represents a set of css styles by pairs of property and value
 abstract class Style {

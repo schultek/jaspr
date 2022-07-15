@@ -1,4 +1,6 @@
 library styles;
 
-export 'src/ui/styles/enums.dart';
-export 'src/ui/styles/models.dart';
+export 'src/ui/styles/properties/color.dart';
+export 'src/ui/styles/properties/text.dart';
+export 'src/ui/styles/properties/unit.dart';
+export 'src/ui/styles/style.dart';
