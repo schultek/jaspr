@@ -1,5 +1,5 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/ui.dart';
+import 'package:jaspr/components.dart';
 
 abstract class BaseElement extends StatelessComponent {
   final String? id;

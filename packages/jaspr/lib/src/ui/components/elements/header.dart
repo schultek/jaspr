@@ -1,5 +1,5 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/ui.dart';
+import 'package:jaspr/components.dart';
 
 enum HeaderSize { h1, h2, h3, h4, h5, h6 }
 

@@ -1,4 +1,4 @@
-import 'package:jaspr/src/ui/elements/base.dart';
+import 'package:jaspr/src/ui/components/elements/base.dart';
 
 enum LinkTarget { blank, parent, self, top }
 

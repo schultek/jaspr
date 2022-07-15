@@ -1,4 +1,4 @@
-import 'package:jaspr/ui.dart';
+import 'package:jaspr/components.dart';
 
 class TextStyle extends MultipleStyle {
   final Color? color;

@@ -1,4 +1,4 @@
-import 'package:jaspr/src/ui/elements/base.dart';
+import 'package:jaspr/src/ui/components/elements/base.dart';
 
 class Form extends BaseElement {
   const Form({

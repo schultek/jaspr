@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/src/ui/utils.dart';
-import 'package:jaspr/ui.dart';
+import 'package:jaspr/components.dart';
 
 class RadioButton extends BaseElement {
   final String? label;
