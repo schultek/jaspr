@@ -79,11 +79,11 @@ class Border {
   });
 
   List<Style> getStyles() => [
-    if (style != null) Style('border-style', style!.name),
-    if (width != null) Style('border-width', width.toString()),
-    if (color != null) Style('border-color', color!.value),
-    if (radius != null) Style('border-radius', radius.toString()),
-  ];
+        if (style != null) Style('border-style', style!.name),
+        if (width != null) Style('border-width', width.toString()),
+        if (color != null) Style('border-color', color!.value),
+        if (radius != null) Style('border-radius', radius.toString()),
+      ];
 }
 
 class Outline {
@@ -98,10 +98,10 @@ class Outline {
   });
 
   List<Style> getStyles() => [
-    if (style != null) Style('outline-style', style!.name),
-    if (width != null) Style('outline-width', width.toString()),
-    if (color != null) Style('outline-color', color!.value),
-  ];
+        if (style != null) Style('outline-style', style!.name),
+        if (width != null) Style('outline-width', width.toString()),
+        if (color != null) Style('outline-color', color!.value),
+      ];
 }
 
 class Position {
@@ -123,12 +123,12 @@ class Position {
   }
 
   List<Style> getStyles() => [
-    Style('position', type),
-    if (position.left != null) Style('left', position.left.toString()),
-    if (position.top != null) Style('top', position.top.toString()),
-    if (position.right != null) Style('right', position.right.toString()),
-    if (position.bottom != null) Style('bottom', position.bottom.toString()),
-  ];
+        Style('position', type),
+        if (position.left != null) Style('left', position.left.toString()),
+        if (position.top != null) Style('top', position.top.toString()),
+        if (position.right != null) Style('right', position.right.toString()),
+        if (position.bottom != null) Style('bottom', position.bottom.toString()),
+      ];
 }
 
 abstract class Gradient {
@@ -175,8 +175,7 @@ class Circle {
 
   Circle({this.size, this.position});
 
-  String getStyle() =>
-      "circle ${size?.toString() ?? ''} ${position != null ? ' at ' + position!.value : ''},";
+  String getStyle() => "circle ${size?.toString() ?? ''} ${position != null ? ' at ' + position!.value : ''},";
 }
 
 class RadialGradient extends Gradient {

@@ -1,9 +1,11 @@
 library style;
 
+import 'properties/background.dart';
 import 'properties/color.dart';
 import 'properties/text.dart';
 import 'properties/unit.dart';
 
+part 'background.dart';
 part 'text.dart';
 
 /// Represents a set of css styles by pairs of property and value
@@ -29,6 +31,18 @@ abstract class Style {
     Unit? wordSpacing,
     Unit? lineHeight,
   }) = _TextStyle;
+
+  /// Constructs a [Style] instance for common background style properties
+  const factory Style.background({
+    Color? color,
+    BackgroundAttachment attachment,
+    BackgroundClip? clip,
+    ImageStyle? image,
+    BackgroundOrigin? origin,
+    BackgroundPosition? position,
+    BackgroundRepeat? repeat,
+    BackgroundSize? size,
+  }) = _BackgroundStyle;
 
   Map<String, String> get styles;
 }
