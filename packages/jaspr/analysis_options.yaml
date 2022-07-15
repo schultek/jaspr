@@ -8,5 +8,5 @@ analyzer:
 linter:
   rules:
     sort_pub_dependencies: true
-    prefer_relative_imports: true
+    prefer_relative_imports: false
     directives_ordering: true

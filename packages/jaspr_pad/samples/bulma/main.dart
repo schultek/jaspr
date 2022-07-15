@@ -1,4 +1,4 @@
-// [sample=5] Bulma CSS
+// [sample=6] Bulma CSS
 import 'package:jaspr/jaspr.dart';
 
 import 'button.dart';
