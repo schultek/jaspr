@@ -4,10 +4,10 @@ version: 1.0.0
 publish_to: none
 
 environment:
-  sdk: '>=2.16.0 <3.0.0'
+  sdk: '>=2.17.0 <3.0.0'
 
 dependencies:
-  jaspr: ^0.1.0
+  jaspr: ^0.2.0
   jaspr_riverpod: ^0.1.0-dev.1
 
 dev_dependencies:
