@@ -123,8 +123,8 @@ class _ObliqueAngleFontStyle implements FontStyle {
 enum TextTransform {
   none('none'),
   capitalize('capitalize'),
-  uppercase('uppercase'),
-  lowercase('lowercase'),
+  upperCase('uppercase'),
+  lowerCase('lowercase'),
   fullWidth('full-width'),
   fullSizeKana('full-size-kana'),
 

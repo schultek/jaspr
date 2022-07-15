@@ -1,6 +1,6 @@
 part of style;
 
-class _TextStyle implements Style {
+class _TextStyles implements Styles {
   final Color? color;
   final TextAlign? align;
   final FontFamily? fontFamily;
@@ -14,7 +14,7 @@ class _TextStyle implements Style {
   final Unit? wordSpacing;
   final Unit? lineHeight;
 
-  const _TextStyle({
+  const _TextStyles({
     this.color,
     this.align,
     this.fontFamily,

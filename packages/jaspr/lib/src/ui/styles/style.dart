@@ -9,15 +9,15 @@ part 'background.dart';
 part 'text.dart';
 
 /// Represents a set of css styles by pairs of property and value
-abstract class Style {
-  /// Constructs a [Style] instance from a [Map] of raw css style properties and values
-  const factory Style.raw(Map<String, String> styles) = _RawStyle;
+abstract class Styles {
+  /// Constructs a [Styles] instance from a [Map] of raw css style properties and values
+  const factory Styles.raw(Map<String, String> styles) = _RawStyles;
 
-  /// Constructs a [Style] instance by combining multiple other [Style] instances
-  const factory Style.combine(List<Style> styles) = _CombinedStyle;
+  /// Constructs a [Styles] instance by combining multiple other [Styles] instances
+  const factory Styles.combine(List<Styles> styles) = _CombinedStyles;
 
-  /// Constructs a [Style] instance for common text-related style properties
-  const factory Style.text({
+  /// Constructs a [Styles] instance for common text-related style properties
+  const factory Styles.text({
     Color? color,
     TextAlign? align,
     FontFamily? fontFamily,
@@ -30,10 +30,10 @@ abstract class Style {
     Unit? letterSpacing,
     Unit? wordSpacing,
     Unit? lineHeight,
-  }) = _TextStyle;
+  }) = _TextStyles;
 
-  /// Constructs a [Style] instance for common background style properties
-  const factory Style.background({
+  /// Constructs a [Styles] instance for common background style properties
+  const factory Styles.background({
     Color? color,
     BackgroundAttachment attachment,
     BackgroundClip? clip,
@@ -42,22 +42,22 @@ abstract class Style {
     BackgroundPosition? position,
     BackgroundRepeat? repeat,
     BackgroundSize? size,
-  }) = _BackgroundStyle;
+  }) = _BackgroundStyles;
 
   Map<String, String> get styles;
 }
 
-class _RawStyle implements Style {
+class _RawStyles implements Styles {
   @override
   final Map<String, String> styles;
 
-  const _RawStyle(this.styles);
+  const _RawStyles(this.styles);
 }
 
-class _CombinedStyle implements Style {
-  final List<Style> _styles;
+class _CombinedStyles implements Styles {
+  final List<Styles> _styles;
 
-  const _CombinedStyle(this._styles);
+  const _CombinedStyles(this._styles);
 
   @override
   Map<String, String> get styles => _styles.fold({}, (v, s) => v..addAll(s.styles));

@@ -1,6 +1,6 @@
 part of style;
 
-class _BackgroundStyle implements Style {
+class _BackgroundStyles implements Styles {
   final Color? color;
   final BackgroundAttachment? attachment;
   final BackgroundClip? clip;
@@ -10,7 +10,7 @@ class _BackgroundStyle implements Style {
   final BackgroundRepeat? repeat;
   final BackgroundSize? size;
 
-  const _BackgroundStyle({
+  const _BackgroundStyles({
     this.color,
     this.attachment,
     this.clip,
