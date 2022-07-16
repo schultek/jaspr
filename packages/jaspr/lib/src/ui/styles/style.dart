@@ -1,11 +1,14 @@
 library style;
 
 import 'properties/background.dart';
+import 'properties/box.dart';
 import 'properties/color.dart';
+import 'properties/edge_insets.dart';
 import 'properties/text.dart';
 import 'properties/unit.dart';
 
 part 'background.dart';
+part 'box.dart';
 part 'text.dart';
 
 /// Represents a set of css styles by pairs of property and value
@@ -43,6 +46,21 @@ abstract class Styles {
     BackgroundRepeat? repeat,
     BackgroundSize? size,
   }) = _BackgroundStyles;
+
+  /// Constructs a [Styles] instance for common box style properties
+  const factory Styles.box({
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    Display? display,
+    Unit? width,
+    Unit? height,
+    Border? border,
+    // Outline? outline,
+    // Overflow? overflow,
+    // Visibility? visibility,
+    // Position? position,
+    double? opacity,
+  }) = _BoxStyles;
 
   Map<String, String> get styles;
 }

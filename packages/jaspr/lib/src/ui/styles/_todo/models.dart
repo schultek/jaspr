@@ -1,68 +1,14 @@
 import 'package:jaspr/ui.dart';
 
-class EdgeInsets {
-  final Unit? left;
-  final Unit? top;
-  final Unit? right;
-  final Unit? bottom;
-  final Unit? horizontal;
-  final Unit? vertical;
+class BoxConstraints {
+  final Unit? maxWidth;
+  final Unit? maxHeight;
+  final Unit? minWidth;
+  final Unit? minHeight;
 
-  EdgeInsets({this.left, this.top, this.right, this.bottom, this.horizontal, this.vertical});
+  const BoxConstraints({this.maxWidth, this.maxHeight, this.minWidth, this.minHeight});
 
-  const EdgeInsets.fromLTRB(this.left, this.top, this.right, this.bottom)
-      : horizontal = null,
-        vertical = null;
-
-  const EdgeInsets.all(Unit value)
-      : left = null,
-        top = null,
-        right = null,
-        bottom = null,
-        horizontal = value,
-        vertical = value;
-
-  const EdgeInsets.only({this.left, this.top, this.right, this.bottom})
-      : horizontal = null,
-        vertical = null;
-
-  const EdgeInsets.symmetric({
-    this.vertical,
-    this.horizontal,
-  })  : left = null,
-        top = null,
-        right = null,
-        bottom = null;
-
-  static const EdgeInsets zero = EdgeInsets.only();
-
-  getStyle() {
-    if (horizontal != null || vertical != null) {
-      return horizontal == vertical
-          ? vertical.toString()
-          : "${vertical?.toString() ?? '0px'} ${horizontal?.toString() ?? '0px'}";
-    } else {
-      return "${top?.toString() ?? '0px'} ${right?.toString() ?? '0px'} ${bottom?.toString() ?? '0px'} ${left?.toString() ?? '0px'}";
-    }
-  }
-
-  EdgeInsets copyWith({
-    Unit? left,
-    Unit? top,
-    Unit? right,
-    Unit? bottom,
-    Unit? horizontal,
-    Unit? vertical,
-  }) {
-    return EdgeInsets(
-      left: left ?? this.left,
-      top: top ?? this.top,
-      right: right ?? this.right,
-      bottom: bottom ?? this.bottom,
-      horizontal: horizontal ?? this.horizontal,
-      vertical: vertical ?? this.vertical,
-    );
-  }
+  static const BoxConstraints zero = BoxConstraints();
 }
 
 class Border {
