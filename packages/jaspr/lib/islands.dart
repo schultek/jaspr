@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'jaspr.dart';
@@ -29,6 +30,8 @@ class _Island<T> extends StatelessComponent {
   }
 }
 
+typedef IslandLoader = Future<Island> Function();
+
 class IslandsApp extends StatefulComponent {
   final Component child;
 
@@ -50,6 +53,27 @@ class IslandsApp extends StatefulComponent {
       var data = islandsState[id]!.split('|');
       var params = stateCodec.decode(data[1]);
       runApp(Builder.single(builder: (c) => _nameToEntry[data[0]]!.build(c, params)), attachTo: '#$id');
+    }
+  }
+
+  static void runDeferred(Map<String, IslandLoader> islands) {
+    final Map<String, Island> _islands = {};
+    AppBinding.ensureInitialized();
+    var islandsState = SyncBinding.instance!.getInitialState<Map>('islands') ?? {};
+
+    for (var id in islandsState.keys) {
+      var data = islandsState[id]!.split('|');
+      var name = data[0];
+      var params = stateCodec.decode(data[1]);
+
+      unawaited(Future(() async {
+        var island = _islands[name];
+        if (island == null) {
+          island = await islands[name]!();
+          _islands[name] = island;
+        }
+        runApp(Builder.single(builder: (c) => island!.build(c, params)), attachTo: '#$id');
+      }));
     }
   }
 }
