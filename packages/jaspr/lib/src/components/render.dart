@@ -2,7 +2,7 @@ import '../framework/framework.dart';
 
 /// Component that has a custom render function
 abstract class CustomRenderComponent extends Component {
-  const CustomRenderComponent();
+  const CustomRenderComponent({super.key});
 
   void render(DomBuilder b);
 
@@ -12,7 +12,7 @@ abstract class CustomRenderComponent extends Component {
 
 /// Element that lets the component perform the rendering
 class CustomRenderElement extends SingleChildElement {
-  CustomRenderElement(CustomRenderComponent component) : super(component);
+  CustomRenderElement(super.component);
 
   @override
   CustomRenderComponent get component => super.component as CustomRenderComponent;
@@ -27,8 +27,26 @@ class CustomRenderElement extends SingleChildElement {
   }
 }
 
+/// Component that skips rendering for a number of child nodes
+class SkipChildComponent extends CustomRenderComponent {
+  final int n;
+
+  SkipChildComponent({this.n = 1, super.key});
+
+  @override
+  void render(DomBuilder b) {
+    try {
+      for (var i = 0; i < n; i++) {
+        b.skipNode();
+      }
+    } on AssertionError {
+      // ignore
+    }
+  }
+}
+
 /// Component that skips rendering for all child nodes
-class SkipRenderComponent extends CustomRenderComponent {
+class SkipRemainingChildrenComponent extends CustomRenderComponent {
   @override
   void render(DomBuilder b) {
     try {

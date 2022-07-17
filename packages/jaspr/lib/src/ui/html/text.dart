@@ -21,7 +21,7 @@ part of jaspr_html;
 /// - [target]: Where to display the linked URL, as the name for a browsing context (a tab, window, or &lt;iframe&gt;).
 /// - [type]: Hints at the linked URL's format with a MIME type. No built-in functionality.
 /// - [referrerPolicy]: How much of the referrer to send when following the link.
-Component a(List<Component> children, {String? download, required String href, Target? target, String? type, ReferrerPolicy? referrerPolicy, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component a(List<Component> children, {String? download, required String href, Target? target, String? type, ReferrerPolicy? referrerPolicy, Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'a',
     key: key,
@@ -57,7 +57,7 @@ enum Target {
 }
 
 /// The &lt;b&gt; HTML element is used to draw the reader's attention to the element's contents, which are not otherwise granted special importance. This was formerly known as the Boldface element, and most browsers still draw the text in boldface. However, you should not use &lt;b&gt; for styling text; instead, you should use the CSS font-weight property to create boldface text, or the &lt;strong&gt; element to indicate that text is of special importance.
-Component b(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component b(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'b',
     key: key,
@@ -71,7 +71,7 @@ Component b(List<Component> children, {Key? key, String? id, Iterable<String>? c
 }
 
 /// The &lt;br&gt; HTML element produces a line break in text (carriage-return). It is useful for writing a poem or an address, where the division of lines is significant.
-Component br({Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component br({Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'br',
     key: key,
@@ -84,7 +84,7 @@ Component br({Key? key, String? id, Iterable<String>? classes, Map<String, Strin
 }
 
 /// The &lt;code&gt; HTML element displays its contents styled in a fashion intended to indicate that the text is a short fragment of computer code. By default, the content text is displayed using the user agent's default monospace font.
-Component code(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component code(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'code',
     key: key,
@@ -98,7 +98,7 @@ Component code(List<Component> children, {Key? key, String? id, Iterable<String>
 }
 
 /// The &lt;em&gt; HTML element marks text that has stress emphasis. The &lt;em&gt; element can be nested, with each level of nesting indicating a greater degree of emphasis.
-Component em(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component em(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'em',
     key: key,
@@ -112,7 +112,7 @@ Component em(List<Component> children, {Key? key, String? id, Iterable<String>? 
 }
 
 /// The &lt;i&gt; HTML element represents a range of text that is set off from the normal text for some reason, such as idiomatic text, technical terms, taxonomical designations, among others. Historically, these have been presented using italicized type, which is the original source of the &lt;i&gt; naming of this element.
-Component i(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component i(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'i',
     key: key,
@@ -126,7 +126,7 @@ Component i(List<Component> children, {Key? key, String? id, Iterable<String>? c
 }
 
 /// The &lt;s&gt; HTML element renders text with a strikethrough, or a line through it. Use the &lt;s&gt; element to represent things that are no longer relevant or no longer accurate. However, &lt;s&gt; is not appropriate when indicating document edits; for that, use the &lt;del&gt; and &lt;ins&gt; elements, as appropriate.
-Component s(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component s(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 's',
     key: key,
@@ -140,7 +140,7 @@ Component s(List<Component> children, {Key? key, String? id, Iterable<String>? c
 }
 
 /// The &lt;small&gt; HTML element represents side-comments and small print, like copyright and legal text, independent of its styled presentation. By default, it renders text within it one font-size smaller, such as from small to x-small.
-Component small(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component small(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'small',
     key: key,
@@ -154,7 +154,7 @@ Component small(List<Component> children, {Key? key, String? id, Iterable<String
 }
 
 /// The &lt;span&gt; HTML element is a generic inline container for phrasing content, which does not inherently represent anything. It can be used to group elements for styling purposes (using the class or id attributes), or because they share attribute values, such as lang. It should be used only when no other semantic element is appropriate. &lt;span&gt; is very much like a &lt;div&gt; element, but &lt;div&gt; is a block-level element whereas a &lt;span&gt; is an inline element.
-Component span(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component span(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'span',
     key: key,
@@ -168,7 +168,7 @@ Component span(List<Component> children, {Key? key, String? id, Iterable<String>
 }
 
 /// The &lt;strong&gt; HTML element indicates that its contents have strong importance, seriousness, or urgency. Browsers typically render the contents in bold type.
-Component strong(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component strong(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'strong',
     key: key,
@@ -182,7 +182,7 @@ Component strong(List<Component> children, {Key? key, String? id, Iterable<Strin
 }
 
 /// The &lt;u&gt; HTML element represents a span of inline text which should be rendered in a way that indicates that it has a non-textual annotation. This is rendered by default as a simple solid underline, but may be altered using CSS.
-Component u(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component u(List<Component> children, {Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'u',
     key: key,

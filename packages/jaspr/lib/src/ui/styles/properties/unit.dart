@@ -1,3 +1,11 @@
+extension UnitExt on num {
+  Unit get percent => Unit.percent(toDouble());
+  Unit get px => Unit.pixels(toDouble());
+  Unit get pt => Unit.points(toDouble());
+  Unit get em => Unit.em(toDouble());
+  Unit get rem => Unit.rem(toDouble());
+}
+
 abstract class Unit {
   static const Unit zero = _ZeroUnit();
 

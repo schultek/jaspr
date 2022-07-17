@@ -9,7 +9,7 @@ part of jaspr_html;
 /// - [muted]: Indicates whether the audio will be initially silenced. Its default value is false.
 /// - [preload]: Provides a hint to the browser about what the author thinks will lead to the best user experience.
 /// - [src]: The URL of the audio to embed. This is subject to HTTP access controls. This is optional; you may instead use the &lt;source&gt; element within the audio block to specify the audio to embed.
-Component audio(List<Component> children, {bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool? loop, bool? muted, Preload? preload, String? src, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component audio(List<Component> children, {bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool? loop, bool? muted, Preload? preload, String? src, Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'audio',
     key: key,
@@ -65,7 +65,7 @@ enum Preload {
 /// - [loading]: Indicates how the browser should load the image.
 /// - [src]: The image URL.
 /// - [referrerPolicy]: Indicates which referrer to send when fetching the resource.
-Component img({String? alt, CrossOrigin? crossOrigin, int? width, int? height, MediaLoading? loading, required String src, ReferrerPolicy? referrerPolicy, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component img({String? alt, CrossOrigin? crossOrigin, int? width, int? height, MediaLoading? loading, required String src, ReferrerPolicy? referrerPolicy, Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'img',
     key: key,
@@ -109,7 +109,7 @@ enum MediaLoading {
 /// - [src]: The URL of the video to embed. This is optional; you may instead use the &lt;source&gt; element within the video block to specify the video to embed.
 /// - [width]: The width of the video's display area, in CSS pixels.
 /// - [height]: The height of the video's display area, in CSS pixels.
-Component video(List<Component> children, {bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool? loop, bool? muted, String? poster, Preload? preload, String? src, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component video(List<Component> children, {bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool? loop, bool? muted, String? poster, Preload? preload, String? src, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'video',
     key: key,
@@ -140,7 +140,7 @@ Component video(List<Component> children, {bool? autoplay, bool? controls, Cross
 /// - [type]: The MIME type to use to select the plug-in to instantiate.
 /// - [width]: The displayed width of the resource, in CSS pixels.
 /// - [height]: The displayed height of the resource, in CSS pixels.
-Component embed({required String src, String? type, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component embed({required String src, String? type, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'embed',
     key: key,
@@ -169,7 +169,7 @@ Component embed({required String src, String? type, int? width, int? height, Key
 /// - [referrerPolicy]: Indicates which referrer to send when fetching the frame's resource.
 /// - [width]: The width of the frame in CSS pixels. Default is 300.
 /// - [height]: The height of the frame in CSS pixels. Default is 150.
-Component iframe(List<Component> children, {required String src, String? allow, String? csp, MediaLoading? loading, String? name, String? sandbox, ReferrerPolicy? referrerPolicy, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component iframe(List<Component> children, {required String src, String? allow, String? csp, MediaLoading? loading, String? name, String? sandbox, ReferrerPolicy? referrerPolicy, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'iframe',
     key: key,
@@ -223,7 +223,7 @@ enum ReferrerPolicy {
 /// - [type]: The content type of the resource specified by data. At least one of data and type must be defined.
 /// - [width]: The width of the displayed resource in CSS pixels.
 /// - [height]: The height of the displayed resource in CSS pixels.
-Component object(List<Component> children, {String? data, String? name, String? type, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component object(List<Component> children, {String? data, String? name, String? type, int? width, int? height, Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'object',
     key: key,
@@ -249,7 +249,7 @@ Component object(List<Component> children, {String? data, String? name, String? 
 /// - [src]: Address of the media resource.
 ///   
 ///   Required if the source element's parent is an &lt;audio&gt; and &lt;video&gt; element, but not allowed if the source element's parent is a &lt;picture&gt; element.
-Component source({String? type, String? src, Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component source({String? type, String? src, Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'source',
     key: key,

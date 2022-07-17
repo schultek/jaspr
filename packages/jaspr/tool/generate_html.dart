@@ -72,7 +72,7 @@ void main() {
       }
 
       content.write(
-          'Key? key, String? id, Iterable<String>? classes, Map<String, String>? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
+          'Key? key, String? id, Iterable<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
           '  return DomComponent(\n'
           '    tag: \'$tag\',\n'
           '    key: key,\n'

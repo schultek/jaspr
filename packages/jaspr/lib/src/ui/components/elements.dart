@@ -12,5 +12,4 @@ export 'elements/line_break.dart';
 export 'elements/link.dart';
 export 'elements/list.dart';
 export 'elements/paragraph.dart';
-export 'elements/style.dart';
 export 'elements/texts.dart';
