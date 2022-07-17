@@ -12,6 +12,7 @@ dependencies:
   build: ^2.0.0
   collection: ^1.15.0
   dart_style: ^2.2.3
+  jaspr: ^0.1.5
   path: ^1.8.0
   source_gen: ^1.2.0
 

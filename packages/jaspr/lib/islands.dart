@@ -3,34 +3,44 @@ import 'dart:math';
 
 import 'jaspr.dart';
 
-abstract class Island<T> {
-  final String name;
-
-  const Island({required this.name});
-
-  @protected
-  Component build(BuildContext context, T value);
-
-  static Component put<T>(Island<T> island, T value) {
-    return _Island<T>(island, value);
-  }
+class Island {
+  const Island();
 }
 
-class _Island<T> extends StatelessComponent {
-  final T value;
-  final Island<T> island;
+abstract class IslandComponent extends StatelessComponent {
+  final String name;
 
-  const _Island(this.island, this.value, {Key? key}) : super(key: key);
+  const IslandComponent({required this.name, this.containerBuilder, Key? key}) : super(key: key);
+
+  final Component Function(BuildContext context, String id, Component child)? containerBuilder;
+
+  Map<String, dynamic> get params;
+  Component buildChild(BuildContext context);
+
+  Component _buildContainer(BuildContext context, String id, Component child) {
+    return DomComponent(tag: 'div', id: id, child: child);
+  }
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    var islandsApp = context.findAncestorStateOfType<_IslandsAppState>()!;
-    var id = islandsApp.registerIsland(island.name, value);
-    yield DomComponent(tag: 'div', id: id, child: island.build(context, value));
+    var app = context.findAncestorStateOfType<_IslandsAppState>()!;
+    var id = app.registerIsland(name, params);
+    yield (containerBuilder ?? _buildContainer)(context, id, buildChild(context));
   }
 }
 
-typedef IslandLoader = Future<Island> Function();
+typedef IslandLoader = FutureOr<IslandBuilder> Function();
+typedef IslandBuilder = Component Function(BuildContext, IslandParams);
+
+class IslandParams {
+  final Map<String, dynamic> _params;
+
+  IslandParams(this._params);
+
+  T get<T>(String key) {
+    return _params[key];
+  }
+}
 
 class IslandsApp extends StatefulComponent {
   final Component child;
@@ -40,41 +50,41 @@ class IslandsApp extends StatefulComponent {
   @override
   State<IslandsApp> createState() => _IslandsAppState();
 
-  static void run(List<Island> islands) {
-    final Map<String, Island> _nameToEntry = {};
-    for (var island in islands) {
-      _nameToEntry[island.name] = island;
-    }
+  static void _runIsland(IslandBuilder builder, IslandParams params, String id) {
+    runApp(Builder.single(builder: (c) => builder(c, params)), attachTo: '#$id');
+  }
 
+  static void _applyIslands(FutureOr<IslandBuilder> Function(String) fn) {
     AppBinding.ensureInitialized();
     var islandsState = SyncBinding.instance!.getInitialState<Map>('islands') ?? {};
 
     for (var id in islandsState.keys) {
-      var data = islandsState[id]!.split('|');
-      var params = stateCodec.decode(data[1]);
-      runApp(Builder.single(builder: (c) => _nameToEntry[data[0]]!.build(c, params)), attachTo: '#$id');
+      var data = islandsState[id]!.split('=');
+      var name = data[0];
+      var params = IslandParams(stateCodec.decode(data[1]));
+      var builder = fn(name);
+      if (builder is IslandBuilder) {
+        _runIsland(builder, params, id);
+      } else {
+        builder.then((b) => _runIsland(b, params, id));
+      }
     }
   }
 
+  static void run(Map<String, IslandBuilder> islands) {
+    _applyIslands((name) => islands[name]!);
+  }
+
   static void runDeferred(Map<String, IslandLoader> islands) {
-    final Map<String, Island> _islands = {};
-    AppBinding.ensureInitialized();
-    var islandsState = SyncBinding.instance!.getInitialState<Map>('islands') ?? {};
-
-    for (var id in islandsState.keys) {
-      var data = islandsState[id]!.split('|');
-      var name = data[0];
-      var params = stateCodec.decode(data[1]);
-
-      unawaited(Future(() async {
-        var island = _islands[name];
-        if (island == null) {
-          island = await islands[name]!();
-          _islands[name] = island;
-        }
-        runApp(Builder.single(builder: (c) => island!.build(c, params)), attachTo: '#$id');
-      }));
-    }
+    final Map<String, IslandBuilder> _islands = {};
+    _applyIslands((name) {
+      var island = (_islands[name] ?? islands[name]!()) as FutureOr<IslandBuilder>;
+      if (island is IslandBuilder) {
+        return _islands[name] = island;
+      } else {
+        return island.then((b) => _islands[name] = b);
+      }
+    });
   }
 }
 

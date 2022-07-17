@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
-import 'counter.dart';
+import 'counter.island.g.dart';
 
 class App extends StatelessComponent {
   final int numCounters;
@@ -15,7 +15,7 @@ class App extends StatelessComponent {
     );
 
     for (var i = 0; i < numCounters; i++) {
-      yield CounterIsland.create(i * 2);
+      yield CounterIsland(initialValue: i * 2);
     }
   }
 }

@@ -1,22 +1,11 @@
 import 'package:jaspr/islands.dart';
 import 'package:jaspr/jaspr.dart';
 
-class CounterIsland extends Island<int> {
-  CounterIsland() : super(name: 'cnt');
-
-  Component build(BuildContext context, int value) {
-    return Counter(initialValue: value);
-  }
-
-  static Component create(int i) {
-    return Island.put(CounterIsland(), i);
-  }
-}
-
+@Island()
 class Counter extends StatefulComponent {
   final int initialValue;
 
-  const Counter({this.initialValue = 0, Key? key}) : super(key: key);
+  const Counter({this.initialValue = 0, super.key});
 
   @override
   State<Counter> createState() => _CounterState();
