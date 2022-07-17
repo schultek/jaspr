@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
+import 'package:shelf_gzip/shelf_gzip.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
@@ -102,7 +103,7 @@ class ServerApp {
         cascade = cascade.add(sseProxyHandler(sseUri, serverSseUri));
       }
 
-      cascade = cascade.add(fileHandler).add(proxyRootIndexHandler(fileHandler));
+      cascade = cascade.add(gzipMiddleware(fileHandler)).add(proxyRootIndexHandler(fileHandler));
 
       if (jasprHotreload) {
         await _reload(this, () => _createServer(this, cascade.handler));
