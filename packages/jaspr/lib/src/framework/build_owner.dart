@@ -29,7 +29,7 @@ class BuildOwner {
       return;
     }
     if (!_scheduledBuild) {
-      SchedulerBinding.instance!.scheduleBuild();
+      SchedulerBinding.instance!.scheduleBuild(performBuild);
       _scheduledBuild = true;
     }
 
@@ -191,17 +191,5 @@ class BuildOwner {
       }());
     }
     assert(_debugStateLockLevel >= 0);
-  }
-
-  final Map<GlobalKey, Element> _globalKeyRegistry = {};
-
-  void _registerGlobalKey(GlobalKey key, Element element) {
-    _globalKeyRegistry[key] = element;
-  }
-
-  void _unregisterGlobalKey(GlobalKey key, Element element) {
-    if (_globalKeyRegistry[key] == element) {
-      _globalKeyRegistry.remove(key);
-    }
   }
 }

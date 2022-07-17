@@ -10,6 +10,6 @@ mixin SchedulerBinding on BindingBase {
   static SchedulerBinding? _instance;
   static SchedulerBinding? get instance => _instance;
 
-  /// Schedules a build and ultimately calls [BuildOwner.performsBuild]
-  void scheduleBuild();
+  /// Schedules a build and ultimately calls [buildCallback]
+  void scheduleBuild(VoidCallback buildCallback);
 }

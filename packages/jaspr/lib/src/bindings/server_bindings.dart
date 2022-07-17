@@ -13,6 +13,7 @@ import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
+import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
@@ -358,7 +359,7 @@ class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, Schedu
 
     var document = parse(rawHtml);
     var appElement = document.querySelector(_targetId!)!;
-    appElement.innerHtml = renderMarkup(builderFn: rootElement!.render);
+    appElement.innerHtml = renderMarkup(builderFn: rootElements.values.first.render);
 
     document.body!.attributes['state-data'] = stateCodec.encode(getStateData());
     return document.outerHtml;
@@ -386,7 +387,7 @@ class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, Schedu
   }
 
   @override
-  void scheduleBuild() {
+  void scheduleBuild(VoidCallback buildCallback) {
     throw UnsupportedError('Scheduling a build is not supported on the server, and should never happen.');
   }
 }

@@ -231,7 +231,7 @@ abstract class Finder {
   /// See [collectAllElementsFrom].
   @protected
   Iterable<Element> get allCandidates {
-    return collectAllElementsFrom(ComponentsBinding.instance!.rootElement!);
+    return collectAllElementsFrom(ComponentsBinding.instance!.rootElements.values);
   }
 
   Iterable<Element>? _cachedResult;
@@ -534,7 +534,7 @@ class _DescendantFinder extends Finder {
   Iterable<Element> get allCandidates {
     final Iterable<Element> ancestorElements = ancestor.evaluate();
     final List<Element> candidates =
-        ancestorElements.expand<Element>((Element element) => collectAllElementsFrom(element)).toSet().toList();
+        ancestorElements.expand<Element>((Element element) => collectAllElementsFrom([element])).toSet().toList();
     if (matchRoot) candidates.insertAll(0, ancestorElements);
     return candidates;
   }

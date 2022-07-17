@@ -4,6 +4,7 @@ import 'dart:html';
 
 import 'package:domino/browser.dart' as domino;
 
+import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
@@ -75,11 +76,11 @@ class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, Schedu
   }
 
   @override
-  void scheduleBuild() {
+  void scheduleBuild(VoidCallback buildCallback) {
     // This seems to give the best results over futures and microtasks
     // Needs to be inspected in more detail
     window.requestAnimationFrame((highResTime) {
-      buildOwner.performBuild();
+      buildCallback();
     });
   }
 }
