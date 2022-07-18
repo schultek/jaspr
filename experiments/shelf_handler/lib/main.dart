@@ -11,7 +11,10 @@ void main() async {
 
   var handler = const Pipeline() //
       .addMiddleware(logRequests())
-      .addHandler(serveApp(App()));
+      .addHandler(serveApp((request, render) {
+    print("Request uri is ${request.requestedUri}");
+    return render(App());
+  }));
 
   server = await shelf_io.serve(handler, InternetAddress.anyIPv4, 8080);
 

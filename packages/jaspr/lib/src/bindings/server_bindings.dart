@@ -34,13 +34,22 @@ ServerApp runServer(Component app, {String attachTo = 'body'}) {
 }
 
 /// Returns a shelf handler that serves the provided component
-Handler serveApp(Component app, {String attachTo = 'body'}) {
-  return _createHandler(() {
-    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
+Handler serveApp(AppHandler handler) {
+  return _createHandler((request, render) {
+    return handler(request, (app, {String attachTo = 'body'}) => render(_createSetup(app, attachTo: attachTo)));
   });
 }
 
+SetupFunction _createSetup(Component app, {String attachTo = 'body'}) {
+  return () {
+    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
+  };
+}
+
+typedef Renderer = FutureOr<Response> Function(Component, {String attachTo});
+typedef AppHandler = FutureOr<Response> Function(Request, Renderer render);
 typedef SetupFunction = void Function();
+typedef SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
 class ServerApp {
@@ -94,7 +103,7 @@ class ServerApp {
     Future.microtask(() async {
       _running = true;
 
-      var handler = _createHandler(_setup, middleware: _middleware, fileHandler: _fileHandler);
+      var handler = _createHandler((_, render) => render(_setup), middleware: _middleware, fileHandler: _fileHandler);
 
       if (jasprHotreload) {
         await _reload(this, () => _createServer(this, handler));
@@ -234,7 +243,7 @@ Future<void> _reload(ServerApp app, FutureOr<HttpServer> Function() init) async 
 
 // coverage:ignore-end
 
-Handler _createHandler(SetupFunction setup, {List<Middleware> middleware = const [], Handler? fileHandler}) {
+Handler _createHandler(SetupHandler handle, {List<Middleware> middleware = const [], Handler? fileHandler}) {
   var portToProxy = Platform.environment['JASPR_PROXY_PORT'];
 
   var staticHandler = fileHandler ??
@@ -274,7 +283,7 @@ Handler _createHandler(SetupFunction setup, {List<Middleware> middleware = const
       return Response.internalServerError(body: 'Cannot handle request');
     }
 
-    return renderApp(setup, request, fileResponse);
+    return handle(request, (setup) => renderApp(setup, request, fileResponse));
   });
 
   return handler;
