@@ -33,6 +33,13 @@ ServerApp runServer(Component app, {String attachTo = 'body'}) {
   });
 }
 
+/// Returns a shelf handler that serves the provided component
+Handler serveApp(Component app, {String attachTo = 'body'}) {
+  return _createHandler(() {
+    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
+  });
+}
+
 typedef SetupFunction = void Function();
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
@@ -55,6 +62,9 @@ class ServerApp {
   bool _running = false;
 
   final List<Middleware> _middleware = [];
+
+  // The server origin. Must be set when the server was started, before the first incoming request
+  String? origin;
 
   /// Adds a custom shelf middleware to the server
   void addMiddleware(Middleware middleware) {
@@ -84,30 +94,12 @@ class ServerApp {
     Future.microtask(() async {
       _running = true;
 
-      var portToProxy = Platform.environment['JASPR_PROXY_PORT'];
-
-      var fileHandler = _fileHandler ??
-          (jasprDebugMode
-              ? webdevProxyHandler('http://localhost:$portToProxy/', this)
-              : createStaticHandler(join(dirname(Platform.script.path), 'web'), defaultDocument: 'index.html'));
-
-      var cascade = Cascade();
-
-      if (jasprDebugMode) {
-        final serverHostname = 'localhost';
-        final serverUri = Uri.parse('http://$serverHostname:$portToProxy');
-        final serverSseUri = serverUri.replace(path: r'/$dwdsSseHandler');
-        final sseUri = Uri.parse(r'/$dwdsSseHandler');
-
-        cascade = cascade.add(sseProxyHandler(sseUri, serverSseUri));
-      }
-
-      cascade = cascade.add(fileHandler).add(proxyRootIndexHandler(fileHandler));
+      var handler = _createHandler(_setup, middleware: _middleware, fileHandler: _fileHandler);
 
       if (jasprHotreload) {
-        await _reload(this, () => _createServer(this, cascade.handler));
+        await _reload(this, () => _createServer(this, handler));
       } else {
-        _server = await _createServer(this, cascade.handler);
+        _server = await _createServer(this, handler);
         _listener?.call(_server!);
       }
 
@@ -132,13 +124,13 @@ Handler proxyRootIndexHandler(Handler proxyHandler) {
 
 // coverage:ignore-start
 
-Handler webdevProxyHandler(String url, ServerApp app) {
-  var handler = proxyHandler(url);
+Handler webdevProxyHandler(String port) {
+  var handler = proxyHandler('http://localhost:$port/');
   return (Request req) async {
     var res = await handler(req);
-    if (res.statusCode == 200 && app.server != null && res.headers['content-type'] == 'application/javascript') {
+    if (res.statusCode == 200 && res.headers['content-type'] == 'application/javascript') {
       var body = await res.readAsString();
-      res = res.change(body: body.replaceAll('localhost:5467', '${app.server!.address.host}:${app.server!.port}'));
+      res = res.change(body: body.replaceAll('http://localhost:$port', ''));
     }
     return res;
   };
@@ -242,14 +234,35 @@ Future<void> _reload(ServerApp app, FutureOr<HttpServer> Function() init) async 
 
 // coverage:ignore-end
 
-/// Creates and runs the http server
-Future<HttpServer> _createServer(ServerApp app, Handler fileHandler) async {
+Handler _createHandler(SetupFunction setup, {List<Middleware> middleware = const [], Handler? fileHandler}) {
+  var portToProxy = Platform.environment['JASPR_PROXY_PORT'];
+
+  var staticHandler = fileHandler ??
+      (jasprDebugMode
+          ? webdevProxyHandler(portToProxy ?? '5467')
+          : createStaticHandler(join(dirname(Platform.script.path), 'web'), defaultDocument: 'index.html'));
+
+  var cascade = Cascade();
+
+  if (jasprDebugMode) {
+    final serverHostname = 'localhost';
+    final serverUri = Uri.parse('http://$serverHostname:$portToProxy');
+    final serverSseUri = serverUri.replace(path: r'/$dwdsSseHandler');
+    final sseUri = Uri.parse(r'/$dwdsSseHandler');
+
+    cascade = cascade.add(sseProxyHandler(sseUri, serverSseUri));
+  }
+
+  cascade = cascade.add(staticHandler).add(proxyRootIndexHandler(staticHandler));
+
+  var resourceHandler = cascade.handler;
+
   var pipeline = const Pipeline();
-  for (var middleware in app._middleware) {
+  for (var middleware in middleware) {
     pipeline = pipeline.addMiddleware(middleware);
   }
   var handler = pipeline.addHandler((Request request) async {
-    var fileResponse = await fileHandler(request);
+    var fileResponse = await resourceHandler(request);
 
     if (fileResponse.headers['content-type'] != 'text/html') {
       return fileResponse;
@@ -261,9 +274,14 @@ Future<HttpServer> _createServer(ServerApp app, Handler fileHandler) async {
       return Response.internalServerError(body: 'Cannot handle request');
     }
 
-    return renderApp(app, request, fileResponse);
+    return renderApp(setup, request, fileResponse);
   });
 
+  return handler;
+}
+
+/// Creates and runs the http server
+Future<HttpServer> _createServer(ServerApp app, Handler handler) async {
   if (app._builder != null) {
     return app._builder!.call(handler);
   } else {
@@ -273,13 +291,13 @@ Future<HttpServer> _createServer(ServerApp app, Handler fileHandler) async {
 }
 
 /// This spawns an isolate for each render, in order to avoid conflicts with static instances and multiple parallel requests
-Future<Response> renderApp(ServerApp app, Request request, Response fileResponse) async {
+Future<Response> renderApp(SetupFunction setup, Request request, Response fileResponse) async {
   var port = ReceivePort();
 
   /// We support two modes here, rendered-html and data-only
   /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
   if (request.headers['jaspr-mode'] == 'data-only') {
-    var message = RenderMessage(app._setup, request.requestedUri, port.sendPort);
+    var message = RenderMessage(setup, request.requestedUri, port.sendPort);
 
     await Isolate.spawn(renderData, message);
     var result = await port.first;
@@ -287,7 +305,7 @@ Future<Response> renderApp(ServerApp app, Request request, Response fileResponse
     return Response.ok(result, headers: {'Content-Type': 'application/json'});
   } else {
     var indexHtml = await fileResponse.readAsString();
-    var message = HtmlRenderMessage(app._setup, request.requestedUri, port.sendPort, indexHtml);
+    var message = HtmlRenderMessage(setup, request.requestedUri, port.sendPort, indexHtml);
 
     await Isolate.spawn(renderHtml, message);
     var result = await port.first;
