@@ -875,8 +875,8 @@ class IssueKindMapper extends EnumMapper<IssueKind> {
     }
   }
 
-  @override  dynamic encode(IssueKind value) {
-    switch (value) {
+  @override  dynamic encode(IssueKind self) {
+    switch (self) {
       case IssueKind.error: return 'error';
       case IssueKind.warning: return 'warning';
       case IssueKind.info: return 'info';
@@ -896,7 +896,7 @@ extension IssueKindMapperExtension on IssueKind {
 class Mapper {
   Mapper._();
 
-  static late MapperContainer i = MapperContainer(_mappers);
+  static MapperContainer i = MapperContainer(_mappers);
 
   static T fromValue<T>(dynamic value) => i.fromValue<T>(value);
   static T fromMap<T>(Map<String, dynamic> map) => i.fromMap<T>(map);

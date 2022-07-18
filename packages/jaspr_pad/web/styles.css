@@ -1,3 +1,8 @@
+.header-gist-name {
+  flex: 1;
+  text-align: center;
+}
+
 .issue-item {
   padding: 2px 0px;
   user-select: none;

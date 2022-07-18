@@ -1,0 +1,16 @@
+name: jaspr_bootstrap
+description: Bootstrap components for jaspr.
+version: 0.1.0
+
+environment:
+  sdk: '>=2.17.0 <3.0.0'
+
+dependencies:
+  jaspr:
+    git:
+      url: https://github.com/mjablecnik/jaspr.git
+      path: packages/jaspr
+      ref: bootstrap-components
+
+dev_dependencies:
+  lints: ^2.0.0

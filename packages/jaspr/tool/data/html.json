@@ -1,0 +1,931 @@
+{
+  "content": {
+    "article": {
+      "doc": "The &lt;article&gt; HTML element represents a self-contained composition in a document, page, application, or site, which is intended to be independently distributable or reusable (e.g., in syndication). Examples include: a forum post, a magazine or newspaper article, or a blog entry, a product card, a user-submitted comment, an interactive widget or gadget, or any other independent item of content."
+    },
+    "aside": {
+      "doc": "The &lt;aside&gt; HTML element represents a portion of a document whose content is only indirectly related to the document's main content. Asides are frequently presented as sidebars or call-out boxes."
+    },
+    "footer": {
+      "doc": "The &lt;footer&gt; HTML element represents a footer for its nearest ancestor sectioning content or sectioning root element. A &lt;footer&gt; typically contains information about the author of the section, copyright data or links to related documents."
+    },
+    "header": {
+      "doc": "The &lt;header&gt; HTML element represents introductory content, typically a group of introductory or navigational aids. It may contain some heading elements but also a logo, a search form, an author name, and other elements."
+    },
+    "h1": {
+      "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
+    },
+    "h2": {
+      "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
+    },
+    "h3": {
+      "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
+    },
+    "h4": {
+      "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
+    },
+    "h5": {
+      "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
+    },
+    "h6": {
+      "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
+    },
+    "nav": {
+      "doc": "The &lt;nav&gt; HTML element represents a section of a page whose purpose is to provide navigation links, either within the current document or to other documents. Common examples of navigation sections are menus, tables of contents, and indexes."
+    },
+    "section": {
+      "doc": "The &lt;section&gt; HTML element represents a generic standalone section of a document, which doesn't have a more specific semantic element to represent it. Sections should always have a heading, with very few exceptions."
+    },
+    "blockquote": {
+      "doc": "The &lt;blockquote&gt; HTML element indicates that the enclosed text is an extended quotation. Usually, this is rendered visually by indentation. A URL for the source of the quotation may be given using the cite attribute, while a text representation of the source can be given using the &lt;cite&gt; element.",
+      "attributes": {
+        "cite": {
+          "doc": "A URL that designates a source document or message for the information quoted. This attribute is intended to point to information explaining the context or the reference for the quote.",
+          "type": "string"
+        }
+      }
+    },
+    "div": {
+      "doc": "The &lt;div&gt; HTML element is the generic container for flow content. It has no effect on the content or layout until styled in some way using CSS (e.g. styling is directly applied to it, or some kind of layout model like Flexbox is applied to its parent element)."
+    },
+    "ul": {
+      "doc": "The &lt;ul&gt; HTML element represents an unordered list of items, typically rendered as a bulleted list."
+    },
+    "ol": {
+      "doc": "The &lt;ol&gt; HTML element represents an ordered list of items — typically rendered as a numbered list.",
+      "attributes": {
+        "reversed": {
+          "doc": "This Boolean attribute specifies that the list's items are in reverse order. Items will be numbered from high to low.",
+          "type": "boolean"
+        },
+        "start": {
+          "doc": "An integer to start counting from for the list items. Always an Arabic numeral (1, 2, 3, etc.), even when the numbering type is letters or Roman numerals. For example, to start numbering elements from the letter \"d\" or the Roman numeral \"iv,\" use start=\"4\".",
+          "type": "int"
+        },
+        "type": {
+          "doc": "Sets the numbering type\nThe specified type is used for the entire list unless a different type attribute is used on an enclosed &lt;li&gt; element.",
+          "type": {
+            "name": "ListType",
+            "doc": "Them numbering type for a list element.",
+            "values": {
+              "lowercaseLetters": {
+                "value": "a",
+                "doc": "For lowercase letters"
+              },
+              "uppercaseLetters": {
+                "value": "A",
+                "doc": "For uppercase letters"
+              },
+              "lowercaseRomanNumerals": {
+                "value": "i",
+                "doc": "For lowercase Roman numerals"
+              },
+              "uppercaseRomanNumerals": {
+                "value": "I",
+                "doc": "For uppercase Roman numerals"
+              },
+              "numbers": {
+                "value": "1",
+                "doc": "For numbers (default)"
+              }
+            }
+          }
+        }
+      }
+    },
+    "li": {
+      "doc": "The &lt;li&gt; HTML element is used to represent an item in a list. It must be contained in a parent element: an ordered list (&lt;ol&gt;), an unordered list (&lt;ul&gt;), or a menu (&lt;menu&gt;). In menus and unordered lists, list items are usually displayed using bullet points. In ordered lists, they are usually displayed with an ascending counter on the left, such as a number or letter.",
+      "attributes": {
+        "value": {
+          "doc": "This integer attribute indicates the current ordinal value of the list item as defined by the &lt;ol&gt; element. The only allowed value for this attribute is a number, even if the list is displayed with Roman numerals or letters. List items that follow this one continue numbering from the value set. The value attribute has no meaning for unordered lists (&lt;ul&gt;) or for menus (&lt;menu&gt;).",
+          "type": "int"
+        }
+      }
+    },
+    "hr": {
+      "doc": "The &lt;hr&gt; HTML element represents a thematic break between paragraph-level elements: for example, a change of scene in a story, or a shift of topic within a section.",
+      "self_closing": true
+    },
+    "p": {
+      "doc": "The &lt;p&gt; HTML element represents a paragraph. Paragraphs are usually represented in visual media as blocks of text separated from adjacent blocks by blank lines and/or first-line indentation, but HTML paragraphs can be any structural grouping of related content, such as images or form fields."
+    },
+    "pre": {
+      "doc": "The &lt;pre&gt; HTML element represents preformatted text which is to be presented exactly as written in the HTML file. The text is typically rendered using a non-proportional, or monospaced, font. Whitespace inside this element is displayed as written."
+    }
+  },
+  "text": {
+    "a": {
+      "doc": "The &lt;a&gt; HTML element (or anchor element), with its href attribute, creates a hyperlink to web pages, files, email addresses, locations in the same page, or anything else a URL can address.\n\nContent within each &lt;a&gt; should indicate the link's destination. If the href attribute is present, pressing the enter key while focused on the &lt;a&gt; element will activate it.",
+      "attributes":{
+        "download": {
+          "doc": "Causes the browser to treat the linked URL as a download. Can be used with or without a value:\n\nWithout a value, the browser will suggest a filename/extension, generated from various sources:\nThe Content-Disposition HTTP header\nThe final segment in the URL path\nThe media type (from the Content-Type header, the start of a data: URL, or Blob.type for a blob: URL)\nDefining a value suggests it as the filename. / and \\ characters are converted to underscores (_). Filesystems may forbid other characters in filenames, so browsers will adjust the suggested name if necessary.",
+          "type": "string"
+        },
+        "href": {
+          "doc": "The URL that the hyperlink points to. Links are not restricted to HTTP-based URLs — they can use any URL scheme supported by browsers:\n\nSections of a page with fragment URLs\nPieces of media files with media fragments\nTelephone numbers with tel: URLs\nEmail addresses with mailto: URLs\nWhile web browsers may not support other URL schemes, web sites can with registerProtocolHandler()",
+          "type": "string",
+          "required": true
+        },
+        "target": {
+          "doc": "Where to display the linked URL, as the name for a browsing context (a tab, window, or &lt;iframe&gt;).",
+          "type": {
+            "name": "Target",
+            "doc": "The name/keyword for a browsing context (a tab, window, or &lt;iframe&gt;).",
+            "values": {
+              "self": {
+                "value": "_self",
+                "doc": "The current browsing context. (Default)"
+              },
+              "blank": {
+                "value": "_blank",
+                "doc": "Usually a new tab, but users can configure browsers to open a new window instead."
+              },
+              "parent": {
+                "value": "_parent",
+                "doc": "The parent browsing context of the current one. If no parent, behaves as [Target.self]."
+              },
+              "top": {
+                "value": "_top",
+                "doc": "The topmost browsing context (the \"highest\" context that's an ancestor of the current one). If no ancestors, behaves as [Target.self]."
+              }
+            }
+          }
+        },
+        "type": {
+          "doc": "Hints at the linked URL's format with a MIME type. No built-in functionality.",
+          "type": "string"
+        },
+        "referrerpolicy": {
+          "name": "referrerPolicy",
+          "doc": "How much of the referrer to send when following the link.",
+          "type": "enum:ReferrerPolicy"
+        }
+      }
+    },
+    "b": {
+      "doc": "The &lt;b&gt; HTML element is used to draw the reader's attention to the element's contents, which are not otherwise granted special importance. This was formerly known as the Boldface element, and most browsers still draw the text in boldface. However, you should not use &lt;b&gt; for styling text; instead, you should use the CSS font-weight property to create boldface text, or the &lt;strong&gt; element to indicate that text is of special importance."
+    },
+    "br": {
+      "doc": "The &lt;br&gt; HTML element produces a line break in text (carriage-return). It is useful for writing a poem or an address, where the division of lines is significant.",
+      "self_closing": true
+    },
+    "code": {
+      "doc": "The &lt;code&gt; HTML element displays its contents styled in a fashion intended to indicate that the text is a short fragment of computer code. By default, the content text is displayed using the user agent's default monospace font."
+    },
+    "em": {
+      "doc": "The &lt;em&gt; HTML element marks text that has stress emphasis. The &lt;em&gt; element can be nested, with each level of nesting indicating a greater degree of emphasis."
+    },
+    "i": {
+      "doc": "The &lt;i&gt; HTML element represents a range of text that is set off from the normal text for some reason, such as idiomatic text, technical terms, taxonomical designations, among others. Historically, these have been presented using italicized type, which is the original source of the &lt;i&gt; naming of this element."
+    },
+    "s": {
+      "doc": "The &lt;s&gt; HTML element renders text with a strikethrough, or a line through it. Use the &lt;s&gt; element to represent things that are no longer relevant or no longer accurate. However, &lt;s&gt; is not appropriate when indicating document edits; for that, use the &lt;del&gt; and &lt;ins&gt; elements, as appropriate."
+    },
+    "small": {
+      "doc": "The &lt;small&gt; HTML element represents side-comments and small print, like copyright and legal text, independent of its styled presentation. By default, it renders text within it one font-size smaller, such as from small to x-small."
+    },
+    "span": {
+      "doc": "The &lt;span&gt; HTML element is a generic inline container for phrasing content, which does not inherently represent anything. It can be used to group elements for styling purposes (using the class or id attributes), or because they share attribute values, such as lang. It should be used only when no other semantic element is appropriate. &lt;span&gt; is very much like a &lt;div&gt; element, but &lt;div&gt; is a block-level element whereas a &lt;span&gt; is an inline element."
+    },
+    "strong": {
+      "doc": "The &lt;strong&gt; HTML element indicates that its contents have strong importance, seriousness, or urgency. Browsers typically render the contents in bold type."
+    },
+    "u": {
+      "doc": "The &lt;u&gt; HTML element represents a span of inline text which should be rendered in a way that indicates that it has a non-textual annotation. This is rendered by default as a simple solid underline, but may be altered using CSS."
+    }
+  },
+  "media": {
+    "audio": {
+      "doc": "The &lt;audio&gt; HTML element is used to embed sound content in documents. It may contain one or more audio sources, represented using the src attribute or the &lt;source&gt; element: the browser will choose the most suitable one. It can also be the destination for streamed media, using a MediaStream.",
+      "attributes": {
+        "autoplay": {
+          "doc": "A Boolean attribute: if specified, the audio will automatically begin playback as soon as it can do so, without waiting for the entire audio file to finish downloading.",
+          "type": "boolean"
+        },
+        "controls": {
+          "doc": "If this attribute is present, the browser will offer controls to allow the user to control audio playback, including volume, seeking, and pause/resume playback.",
+          "type": "boolean"
+        },
+        "crossorigin": {
+          "name": "crossOrigin",
+          "doc": "Indicates whether to use CORS to fetch the related audio file.",
+          "type": {
+            "name": "CrossOrigin",
+            "doc": "Indicates if the fetching of the media must be done using a CORS request. Media data from a CORS request can be reused in the &lt;canvas&gt; element without being marked \"tainted\". If the crossorigin attribute is not specified, then a non-CORS request is sent (without the Origin request header), and the browser marks the media as tainted and restricts access to its data, preventing its usage in &lt;canvas&gt; elements. If the crossorigin attribute is specified, then a CORS request is sent (with the Origin request header); but if the server does not opt into allowing cross-origin access to the media data by the origin site (by not sending any Access-Control-Allow-Origin response header, or by not including the site's origin in any Access-Control-Allow-Origin response header it does send), then the browser blocks the media from loading, and logs a CORS error to the devtools console.",
+            "values": {
+              "anonymous": {
+                "doc": "Sends a cross-origin request without a credential. In other words, it sends the Origin: HTTP header without a cookie, X.509 certificate, or performing HTTP Basic authentication. If the server does not give credentials to the origin site (by not setting the Access-Control-Allow-Origin: HTTP header), the image will be tainted, and its usage restricted."
+              },
+              "useCredentials": {
+                "value": "use-credentials",
+                "doc": "Sends a cross-origin request with a credential. In other words, it sends the Origin: HTTP header with a cookie, a certificate, or performing HTTP Basic authentication. If the server does not give credentials to the origin site (through Access-Control-Allow-Credentials: HTTP header), the image will be tainted and its usage restricted."
+              }
+            }
+          }
+        },
+        "loop": {
+          "doc": "If specified, the audio player will automatically seek back to the start upon reaching the end of the audio.",
+          "type": "boolean"
+        },
+        "muted": {
+          "doc": "Indicates whether the audio will be initially silenced. Its default value is false.",
+          "type": "boolean"
+        },
+        "preload": {
+          "doc": "Provides a hint to the browser about what the author thinks will lead to the best user experience.",
+          "type": {
+            "name": "Preload",
+            "doc": "Intended to provide a hint to the browser about what the author thinks will lead to the best user experience when loading a media object.\nThe default value is different for each browser. The spec advises it to be set to [Preload.metadata].",
+            "values": {
+              "none": {
+                "doc": "Indicates that the audio should not be preloaded."
+              },
+              "metadata": {
+                "doc": "Indicates that only audio metadata (e.g. length) is fetched."
+              },
+              "auto": {
+                "doc": "Indicates that the whole audio file can be downloaded, even if the user is not expected to use it."
+              }
+            }
+          }
+        },
+        "src": {
+          "doc": "The URL of the audio to embed. This is subject to HTTP access controls. This is optional; you may instead use the &lt;source&gt; element within the audio block to specify the audio to embed.",
+          "type": "string"
+        }
+      }
+    },
+    "img": {
+      "doc": "The &lt;img&gt; HTML element embeds an image into the document.",
+      "self_closing": true,
+      "attributes": {
+        "alt": {
+          "doc": "Defines an alternative text description of the image",
+          "type": "string"
+        },
+        "crossorigin": {
+          "name": "crossOrigin",
+          "doc": "Indicates if the fetching of the image must be done using a CORS request.",
+          "type": "enum:CrossOrigin"
+        },
+        "width": {
+          "doc": "The intrinsic width of the image in pixels.",
+          "type": "int"
+        },
+        "height": {
+          "doc": "The intrinsic height of the image, in pixels.",
+          "type": "int"
+        },
+        "loading": {
+          "doc": "Indicates how the browser should load the image.",
+          "type": {
+            "name": "MediaLoading",
+            "doc": "Indicates how the browser should load the media. Loading is only deferred when JavaScript is enabled.",
+            "values": {
+              "eager": {
+                "doc": "Loads the media immediately, regardless of whether or not the media is currently within the visible viewport (this is the default value)."
+              },
+              "lazy": {
+                "doc": "Defers loading the media until it reaches a calculated distance from the viewport, as defined by the browser. The intent is to avoid the network and storage bandwidth needed to handle the media until it's reasonably certain that it will be needed. This generally improves the performance of the media in most typical use cases."
+              }
+            }
+          }
+        },
+        "src": {
+          "doc": "The image URL.",
+          "type": "string",
+          "required": true
+        },
+        "referrerpolicy": {
+          "name": "referrerPolicy",
+          "doc": "Indicates which referrer to send when fetching the resource.",
+          "type": "enum:ReferrerPolicy"
+        }
+      }
+    },
+    "video": {
+      "doc": "The &lt;video&gt; HTML element embeds a media player which supports video playback into the document. You can use &lt;video&gt; for audio content as well, but the &lt;audio&gt; element may provide a more appropriate user experience.",
+      "attributes": {
+        "autoplay": {
+          "doc": "Indicates if the video automatically begins to play back as soon as it can do so without stopping to finish loading the data.",
+          "type": "boolean"
+        },
+        "controls": {
+          "doc": "If this attribute is present, the browser will offer controls to allow the user to control video playback, including volume, seeking, and pause/resume playback.",
+          "type": "boolean"
+        },
+        "crossorigin": {
+          "name": "crossOrigin",
+          "doc": "Indicates whether to use CORS to fetch the related video.",
+          "type": "enum:CrossOrigin"
+        },
+        "loop": {
+          "doc": "If specified, the browser will automatically seek back to the start upon reaching the end of the video.",
+          "type": "boolean"
+        },
+        "muted": {
+          "doc": "Indicates the default setting of the audio contained in the video. If set, the audio will be initially silenced. Its default value is false, meaning that the audio will be played when the video is played.",
+          "type": "boolean"
+        },
+        "poster": {
+          "doc": "A URL for an image to be shown while the video is downloading. If this attribute isn't specified, nothing is displayed until the first frame is available, then the first frame is shown as the poster frame.",
+          "type": "string"
+        },
+        "preload": {
+          "doc": "Provides a hint to the browser about what the author thinks will lead to the best user experience with regards to what content is loaded before the video is played.",
+          "type": "enum:Preload"
+        },
+        "src": {
+          "doc": "The URL of the video to embed. This is optional; you may instead use the &lt;source&gt; element within the video block to specify the video to embed.",
+          "type": "string"
+        },
+        "width": {
+          "doc": "The width of the video's display area, in CSS pixels.",
+          "type": "int"
+        },
+        "height": {
+          "doc": "The height of the video's display area, in CSS pixels.",
+          "type": "int"
+        }
+      }
+    },
+    "embed": {
+      "doc": "The &lt;embed&gt; HTML element embeds external content at the specified point in the document. This content is provided by an external application or other source of interactive content such as a browser plug-in.",
+      "self_closing": true,
+      "attributes": {
+        "src": {
+          "doc": "The URL of the resource being embedded.",
+          "type": "string",
+          "required": true
+        },
+        "type": {
+          "doc": "The MIME type to use to select the plug-in to instantiate.",
+          "type": "string"
+        },
+        "width": {
+          "doc": "The displayed width of the resource, in CSS pixels.",
+          "type": "int"
+        },
+        "height": {
+          "doc": "The displayed height of the resource, in CSS pixels.",
+          "type": "int"
+        }
+      }
+    },
+    "iframe": {
+      "doc": "The &lt;iframe&gt; HTML element represents a nested browsing context, embedding another HTML page into the current one.",
+      "attributes": {
+        "src": {
+          "doc": "The URL of the page to embed. Use a value of about:blank to embed an empty page that conforms to the same-origin policy. Also note that programmatically removing an &lt;iframe&gt;'s src attribute (e.g. via Element.removeAttribute()) causes about:blank to be loaded in the frame in Firefox (from version 65), Chromium-based browsers, and Safari/iOS.",
+          "type": "string",
+          "required": true
+        },
+        "allow": {
+          "doc": "Specifies a feature policy for the &lt;iframe&gt;. The policy defines what features are available to the &lt;iframe&gt; based on the origin of the request (e.g. access to the microphone, camera, battery, web-share API, etc.).",
+          "type": "string"
+        },
+        "csp": {
+          "doc": "A Content Security Policy enforced for the embedded resource.",
+          "type": "string"
+        },
+        "loading": {
+          "doc": "Indicates how the browser should load the iframe.",
+          "type": "enum:MediaLoading"
+        },
+        "name": {
+          "doc": "A targetable name for the embedded browsing context. This can be used in the target attribute of the &lt;a&gt;, &lt;form&gt;, or &lt;base&gt; elements; the formtarget attribute of the &lt;input&gt; or &lt;button&gt; elements; or the windowName parameter in the window.open() method.",
+          "type": "string"
+        },
+        "sandbox": {
+          "doc": "Applies extra restrictions to the content in the frame. The value of the attribute can either be empty to apply all restrictions, or space-separated tokens to lift particular restrictions.",
+          "type": "string"
+        },
+        "referrerpolicy": {
+          "name": "referrerPolicy",
+          "doc": "Indicates which referrer to send when fetching the frame's resource.",
+          "type": {
+            "name": "ReferrerPolicy",
+            "doc": "The Referrer-Policy controls how much referrer information (sent with the Referer header) should be included with requests.",
+            "values": {
+              "noReferrer": {
+                "value": "no-referrer",
+                "doc": "The Referer header will not be sent."
+              },
+              "noReferrerWhenDowngrade": {
+                "value": "no-referrer-when-downgrade",
+                "doc": "The Referer header will not be sent to origins without TLS (HTTPS)."
+              },
+              "origin": {
+                "doc": "The sent referrer will be limited to the origin of the referring page: its scheme, host, and port."
+              },
+              "originWhenCrossOrigin": {
+                "value": "origin-when-cross-origin",
+                "doc": "The referrer sent to other origins will be limited to the scheme, the host, and the port. Navigations on the same origin will still include the path."
+              },
+              "sameOrigin": {
+                "value": "same-origin",
+                "doc": "A referrer will be sent for same origin, but cross-origin requests will contain no referrer information."
+              },
+              "strictOrigin": {
+                "value": "strict-origin",
+                "doc": "Only send the origin of the document as the referrer when the protocol security level stays the same (HTTPS→HTTPS), but don't send it to a less secure destination (HTTPS→HTTP)."
+              },
+              "strictOriginWhenCrossOrigin": {
+                "value": "strict-origin-when-cross-origin",
+                "doc": "(default): Send a full URL when performing a same-origin request, only send the origin when the protocol security level stays the same (HTTPS→HTTPS), and send no header to a less secure destination (HTTPS→HTTP)."
+              },
+              "unsafeUrl": {
+                "value": "unsafe-url",
+                "doc": "The referrer will include the origin and the path (but not the fragment, password, or username). This value is unsafe, because it leaks origins and paths from TLS-protected resources to insecure origins."
+              }
+            }
+          }
+        },
+        "width": {
+          "doc": "The width of the frame in CSS pixels. Default is 300.",
+          "type": "int"
+        },
+        "height": {
+          "doc": "The height of the frame in CSS pixels. Default is 150.",
+          "type": "int"
+        }
+      }
+    },
+    "object": {
+      "doc": "The &lt;object&gt; HTML element represents an external resource, which can be treated as an image, a nested browsing context, or a resource to be handled by a plugin.",
+      "attributes": {
+        "data": {
+          "doc": "The address of the resource as a valid URL. At least one of data and type must be defined.",
+          "type": "string"
+        },
+        "name": {
+          "doc": "The name of valid browsing context (HTML5).",
+          "type": "string"
+        },
+        "type": {
+          "doc": "The content type of the resource specified by data. At least one of data and type must be defined.",
+          "type": "string"
+        },
+        "width": {
+          "doc": "The width of the displayed resource in CSS pixels.",
+          "type": "int"
+        },
+        "height": {
+          "doc": "The height of the displayed resource in CSS pixels.",
+          "type": "int"
+        }
+      }
+    },
+    "source": {
+      "doc": "The &lt;source&gt; HTML element specifies multiple media resources for the &lt;picture&gt;, the &lt;audio&gt; element, or the &lt;video&gt; element. It is an empty element, meaning that it has no content and does not have a closing tag. It is commonly used to offer the same media content in multiple file formats in order to provide compatibility with a broad range of browsers given their differing support for image file formats and media file formats.",
+      "self_closing": true,
+      "attributes": {
+        "type": {
+          "doc": "The MIME media type of the resource, optionally with a codecs parameter.",
+          "type": "string"
+        },
+        "src": {
+          "doc": "Address of the media resource.\n\nRequired if the source element's parent is an &lt;audio&gt; and &lt;video&gt; element, but not allowed if the source element's parent is a &lt;picture&gt; element.",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "forms": {
+    "button": {
+      "doc": "The &lt;button&gt; HTML element is an interactive element activated by a user with a mouse, keyboard, finger, voice command, or other assistive technology. Once activated, it then performs a programmable action, such as submitting a form or opening a dialog.",
+      "attributes": {
+        "autofocus": {
+          "doc": "Specifies that the button should have input focus when the page loads. Only one element in a document can have this attribute.",
+          "type": "boolean"
+        },
+        "disabled": {
+          "doc": "Prevents the user from interacting with the button: it cannot be pressed or focused.",
+          "type": "boolean"
+        },
+        "type": {
+          "doc": "The default behavior of the button.",
+          "type": {
+            "name": "ButtonType",
+            "doc": "Defines the default behavior of a button.",
+            "values": {
+              "submit": {
+                "doc": "The button submits the form data to the server. This is the default if the attribute is not specified for buttons associated with a &lt;form&gt;, or if the attribute is an empty or invalid value."
+              },
+              "reset": {
+                "doc": "The button resets all the controls to their initial values, like &lt;input type=\"reset\"&gt;. (This behavior tends to annoy users.)"
+              },
+              "button": {
+                "doc": "The button has no default behavior, and does nothing when pressed by default. It can have client-side scripts listen to the element's events, which are triggered when the events occur."
+              }
+            }
+          }
+        }
+      }
+    },
+    "form": {
+      "doc": "The &lt;form&gt; HTML element represents a document section containing interactive controls for submitting information.",
+      "attributes": {
+        "action": {
+          "doc": "The URL that processes the form submission. This value can be overridden by a formaction attribute on a &lt;button&gt;, &lt;input type=\"submit\"&gt;, or &lt;input type=\"image\"&gt; element. This attribute is ignored when method=\"dialog\" is set.",
+          "type": "string"
+        },
+        "method": {
+          "doc": "The HTTP method to submit the form with.\n\nThis value is overridden by formmethod attributes on &lt;button&gt;, &lt;input type=\"submit\"&gt;, or &lt;input type=\"image\"&gt; elements.",
+          "type": {
+            "name": "FormMethod",
+            "doc": "The HTTP method to submit a form with.",
+            "values": {
+              "post": {
+                "doc": "The POST method; form data sent as the request body."
+              },
+              "get": {
+                "doc": "The GET method; form data appended to the action URL with a ? separator. Use this method when the form has no side-effects."
+              },
+              "dialog": {
+                "doc": "When the form is inside a &lt;dialog&gt;, closes the dialog and throws a submit event on submission without submitting data or clearing the form."
+              }
+            }
+          }
+        },
+        "enctype": {
+          "name": "encType",
+          "doc": "If the value of the method attribute is post, enctype is the MIME type of the form submission.",
+          "type": {
+            "name": "FormEncType",
+            "doc": "The MIME type of a form submission.",
+            "values": {
+              "formUrlEncoded": {
+                "value": "application/x-www-form-urlencoded",
+                "doc": "The default value"
+              },
+              "multiPart": {
+                "value": "multipart/form-data",
+                "doc": "Use this if the form contains &lt;input&gt; elements with type=file."
+              },
+              "text": {
+                "value": "text/plain",
+                "doc": "Introduced by HTML5 for debugging purposes."
+              }
+            }
+          }
+        },
+        "autocomplete": {
+          "name": "autoComplete",
+          "doc": "Indicates whether input elements can by default have their values automatically completed by the browser. autocomplete attributes on form elements override it on &lt;form&gt;.",
+          "type": {
+            "name": "AutoComplete",
+            "doc": "Indicates whether input elements can by default have their values automatically completed by the browser. autocomplete attributes on form elements override it on &lt;form&gt;.",
+            "values": {
+              "off": {
+                "doc": "The browser may not automatically complete entries."
+              },
+              "on": {
+                "doc": "The browser may automatically complete entries."
+              }
+            }
+          }
+        },
+        "name": {
+          "doc": "The name of the form. The value must not be the empty string, and must be unique among the form elements in the forms collection that it is in, if any.",
+          "type": "string"
+        },
+        "novalidate": {
+          "name": "noValidate",
+          "doc": "Indicates that the form shouldn't be validated when submitted. If this attribute is not set (and therefore the form is validated), it can be overridden by a formnovalidate attribute on a &lt;button&gt;, &lt;input type=\"submit\"&gt;, or &lt;input type=\"image\"&gt; element belonging to the form.",
+          "type": "boolean"
+        },
+        "target": {
+          "doc": "Indicates where to display the response after submitting the form. In HTML 4, this is the name/keyword for a frame. In HTML5, it is a name/keyword for a browsing context (for example, tab, window, or iframe).",
+          "type": "enum:Target"
+        }
+      }
+    },
+    "input": {
+      "doc": "The &lt;input&gt; HTML element is used to create interactive controls for web-based forms in order to accept data from the user; a wide variety of types of input data and control widgets are available, depending on the device and user agent. The &lt;input&gt; element is one of the most powerful and complex in all of HTML due to the sheer number of combinations of input types and attributes.",
+      "attributes": {
+        "type": {
+          "doc": "Defines how an &lt;input&gt; works. If this attribute is not specified, the default type adopted is text.",
+          "type": {
+            "name": "InputType",
+            "doc": "The type for an &lt;input&gt; element.",
+            "values": {
+              "button": {
+                "doc": "A push button with no default behavior displaying the value of the value attribute, empty by default."
+              },
+              "checkbox": {
+                "doc": "A check box allowing single values to be selected/deselected."
+              },
+              "color": {
+                "doc": "A control for specifying a color; opening a color picker when active in supporting browsers."
+              },
+              "date": {
+                "doc": "A control for entering a date (year, month, and day, with no time). Opens a date picker or numeric wheels for year, month, day when active in supporting browsers."
+              },
+              "dateTimeLocal": {
+                "value": "datetime-local",
+                "doc": "A control for entering a date and time, with no time zone. Opens a date picker or numeric wheels for date- and time-components when active in supporting browsers."
+              },
+              "email": {
+                "doc": "A field for editing an email address. Looks like a text input, but has validation parameters and relevant keyboard in supporting browsers and devices with dynamic keyboards."
+              },
+              "file": {
+                "doc": "A control that lets the user select a file. Use the accept attribute to define the types of files that the control can select."
+              },
+              "hidden": {
+                "doc": "A control that is not displayed but whose value is submitted to the server."
+              },
+              "image": {
+                "doc": "A graphical submit button. Displays an image defined by the src attribute. The alt attribute displays if the image src is missing."
+              },
+              "month": {
+                "doc": "A control for entering a month and year, with no time zone."
+              },
+              "number": {
+                "doc": "A control for entering a number. Displays a spinner and adds default validation when supported. Displays a numeric keypad in some devices with dynamic keypads."
+              },
+              "password": {
+                "doc": "A single-line text field whose value is obscured. Will alert user if site is not secure."
+              },
+              "radio": {
+                "doc": "A radio button, allowing a single value to be selected out of multiple choices with the same name value."
+              },
+              "range": {
+                "doc": "A control for entering a number whose exact value is not important. Displays as a range widget defaulting to the middle value. Used in conjunction min and max to define the range of acceptable values."
+              },
+              "reset": {
+                "doc": "A button that resets the contents of the form to default values. Not recommended."
+              },
+              "search": {
+                "doc": "A single-line text field for entering search strings. Line-breaks are automatically removed from the input value. May include a delete icon in supporting browsers that can be used to clear the field. Displays a search icon instead of enter key on some devices with dynamic keypads."
+              },
+              "submit": {
+                "doc": "A button that submits the form."
+              },
+              "tel": {
+                "doc": "A control for entering a telephone number. Displays a telephone keypad in some devices with dynamic keypads."
+              },
+              "text": {
+                "doc": "The default value. A single-line text field. Line-breaks are automatically removed from the input value."
+              },
+              "time": {
+                "doc": "A control for entering a time value with no time zone."
+              },
+              "url": {
+                "doc": "A field for entering a URL. Looks like a text input, but has validation parameters and relevant keyboard in supporting browsers and devices with dynamic keyboards."
+              },
+              "week": {
+                "doc": "A control for entering a date consisting of a week-year number and a week number with no time zone."
+              }
+            }
+          }
+        },
+        "name": {
+          "doc": "Name of the form control. Submitted with the form as part of a name/value pair",
+          "type": "string"
+        },
+        "value": {
+          "doc": "The initial value of the control",
+          "type": "string"
+        },
+        "disabled": {
+          "doc": "Indicates that the user should not be able to interact with the input. Disabled inputs are typically rendered with a dimmer color or using some other form of indication that the field is not available for use.",
+          "type": "boolean"
+        }
+      }
+    },
+    "label": {
+      "doc": "The &lt;label&gt; HTML element represents a caption for an item in a user interface.",
+      "attributes": {
+        "for": {
+          "name": "htmlFor",
+          "doc": "The value of the for attribute must be a single id for a labelable form-related element in the same document as the &lt;label&gt; element. So, any given label element can be associated with only one form control.",
+          "type": "string"
+        }
+      }
+    },
+    "datalist": {
+      "doc": "The &lt;datalist&gt; HTML element contains a set of &lt;option&gt; elements that represent the permissible or recommended options available to choose from within other controls."
+    },
+    "legend": {
+      "doc": "The &lt;legend&gt; HTML element represents a caption for the content of its parent &lt;fieldset&gt;."
+    },
+    "meter": {
+      "doc": "The &lt;meter&gt; HTML element represents either a scalar value within a known range or a fractional value.",
+      "attributes": {
+        "value": {
+          "doc": "The current numeric value. This must be between the minimum and maximum values (min attribute and max attribute) if they are specified. If unspecified or malformed, the value is 0. If specified, but not within the range given by the min attribute and max attribute, the value is equal to the nearest end of the range.",
+          "type": "double"
+        },
+        "min": {
+          "doc": "The lower numeric bound of the measured range. This must be less than the maximum value (max attribute), if specified. If unspecified, the minimum value is 0.",
+          "type": "double"
+        },
+        "max": {
+          "doc": "The upper numeric bound of the measured range. This must be greater than the minimum value (min attribute), if specified. If unspecified, the maximum value is 1.",
+          "type": "double"
+        },
+        "low": {
+          "doc": "The upper numeric bound of the low end of the measured range. This must be greater than the minimum value (min attribute), and it also must be less than the high value and maximum value (high attribute and max attribute, respectively), if any are specified. If unspecified, or if less than the minimum value, the low value is equal to the minimum value.",
+          "type": "double"
+        },
+        "high": {
+          "doc": "The lower numeric bound of the high end of the measured range. This must be less than the maximum value (max attribute), and it also must be greater than the low value and minimum value (low attribute and min attribute, respectively), if any are specified. If unspecified, or if greater than the maximum value, the high value is equal to the maximum value.",
+          "type": "double"
+        },
+        "optimum": {
+          "doc": "Indicates the optimal numeric value. It must be within the range (as defined by the min attribute and max attribute). When used with the low attribute and high attribute, it gives an indication where along the range is considered preferable. For example, if it is between the min attribute and the low attribute, then the lower range is considered preferred. The browser may color the meter's bar differently depending on whether the value is less than or equal to the optimum value.",
+          "type": "double"
+        }
+      }
+    },
+    "progress": {
+      "doc": "The &lt;progress&gt; HTML element displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
+      "attributes": {
+        "value": {
+          "doc": "This attribute specifies how much of the task that has been completed. It must be a valid floating point number between 0 and max, or between 0 and 1 if max is omitted. If there is no value attribute, the progress bar is indeterminate; this indicates that an activity is ongoing with no indication of how long it is expected to take.",
+          "type": "double"
+        },
+        "max": {
+          "doc": "This attribute describes how much work the task indicated by the progress element requires. The max attribute, if present, must have a value greater than 0 and be a valid floating point number. The default value is 1.",
+          "type": "double"
+        }
+      }
+    },
+    "optgroup": {
+      "doc": "The &lt;optgroup&gt; HTML element creates a grouping of options within a &lt;select&gt; element.",
+      "attributes": {
+        "label": {
+          "doc": "The name of the group of options, which the browser can use when labeling the options in the user interface.",
+          "required": true,
+          "type": "string"
+        },
+        "disabled": {
+          "doc": "If this attribute is set, none of the items in this option group is selectable. Often browsers grey out such control and it won't receive any browsing events, like mouse clicks or focus-related ones.",
+          "type": "boolean"
+        }
+      }
+    },
+    "option": {
+      "doc": "The &lt;option&gt; HTML element is used to define an item contained in a &lt;select&gt;, an &lt;optgroup&gt;, or a &lt;datalist&gt; element. As such, &lt;option&gt; can represent menu items in popups and other lists of items in an HTML document.",
+      "attributes": {
+        "label": {
+          "doc": "This attribute is text for the label indicating the meaning of the option. If the label attribute isn't defined, its value is that of the element text content.",
+          "type": "string"
+        },
+        "value": {
+          "doc": "The content of this attribute represents the value to be submitted with the form, should this option be selected. If this attribute is omitted, the value is taken from the text content of the option element.",
+          "type": "string"
+        },
+        "selected": {
+          "doc": "Indicates that the option is initially selected. If the &lt;option&gt; element is the descendant of a &lt;select&gt; element whose multiple attribute is not set, only one single &lt;option&gt; of this &lt;select&gt; element may have the selected attribute.",
+          "type": "boolean"
+        },
+        "disabled": {
+          "doc": "If this attribute is set, this option is not checkable. Often browsers grey out such control and it won't receive any browsing event, like mouse clicks or focus-related ones. If this attribute is not set, the element can still be disabled if one of its ancestors is a disabled &lt;optgroup&gt; element.",
+          "type": "boolean"
+        }
+      }
+    },
+    "select": {
+      "doc": "The <select> HTML element represents a control that provides a menu of options.",
+      "attributes": {
+        "name": {
+          "doc": "This attribute is used to specify the name of the control.",
+          "type": "string"
+        },
+        "multiple": {
+          "doc": "Indicates that multiple options can be selected in the list. If it is not specified, then only one option can be selected at a time. When multiple is specified, most browsers will show a scrolling list box instead of a single line dropdown.",
+          "type": "boolean"
+        },
+        "required": {
+          "doc": "Indicating that an option with a non-empty string value must be selected.",
+          "type": "boolean"
+        },
+        "disabled": {
+          "doc": "Indicates that the user cannot interact with the control. If this attribute is not specified, the control inherits its setting from the containing element, for example <fieldset>; if there is no containing element with the disabled attribute set, then the control is enabled.",
+          "type": "boolean"
+        },
+        "autofocus": {
+          "doc": "This attribute lets you specify that a form control should have input focus when the page loads. Only one form element in a document can have the autofocus attribute.",
+          "type": "boolean"
+        },
+        "autocomplete": {
+          "doc": "A string providing a hint for a user agent's autocomplete feature.",
+          "type": "string"
+        },
+        "size": {
+          "doc": "If the control is presented as a scrolling list box (e.g. when multiple is specified), this attribute represents the number of rows in the list that should be visible at one time. Browsers are not required to present a select element as a scrolled list box. The default value is 0.",
+          "type": "int"
+        }
+      }
+    },
+    "textarea": {
+      "doc": "The &lt;textarea&gt; HTML element represents a multi-line plain-text editing control, useful when you want to allow users to enter a sizeable amount of free-form text, for example a comment on a review or feedback form.",
+      "attributes": {
+        "autocomplete": {
+          "name": "autoComplete",
+          "doc": "Indicates whether the value of the control can be automatically completed by the browser.",
+          "type": "enum:AutoComplete"
+        },
+        "autofocus": {
+          "doc": "This attribute lets you specify that a form control should have input focus when the page loads. Only one form-associated element in a document can have this attribute specified.",
+          "type": "boolean"
+        },
+        "cols": {
+          "doc": "The visible width of the text control, in average character widths. If it is specified, it must be a positive integer. If it is not specified, the default value is 20.",
+          "type": "int"
+        },
+        "disabled": {
+          "doc": "Indicates that the user cannot interact with the control. If this attribute is not specified, the control inherits its setting from the containing element, for example &lt;fieldset&gt;; if there is no containing element when the disabled attribute is set, the control is enabled.",
+          "type": "boolean"
+        },
+        "minlength": {
+          "name": "minLength",
+          "doc": "The minimum number of characters (UTF-16 code units) required that the user should enter.",
+          "type": "int"
+        },
+        "name": {
+          "doc": "The name of the control",
+          "type": "string"
+        },
+        "placeholder": {
+          "doc": "A hint to the user of what can be entered in the control. Carriage returns or line-feeds within the placeholder text must be treated as line breaks when rendering the hint.",
+          "type": "string"
+        },
+        "readonly": {
+          "doc": "Indicates that the user cannot modify the value of the control. Unlike the disabled attribute, the readonly attribute does not prevent the user from clicking or selecting in the control. The value of a read-only control is still submitted with the form.",
+          "type": "boolean"
+        },
+        "required": {
+          "doc": "This attribute specifies that the user must fill in a value before submitting a form.",
+          "type": "boolean"
+        },
+        "rows": {
+          "doc": "The number of visible text lines for the control. If it is specified, it must be a positive integer. If it is not specified, the default value is 2.",
+          "type": "int"
+        },
+        "spellcheck": {
+          "name": "spellCheck",
+          "doc": "Specifies whether the &lt;textarea&gt; is subject to spell checking by the underlying browser/OS.",
+          "type": {
+            "name": "SpellCheck",
+            "doc": "Specifies whether an element is subject to spell checking by the underlying browser/OS.",
+            "values": {
+              "isTrue": {
+                "value": "true",
+                "doc": "Indicates that the element needs to have its spelling and grammar checked."
+              },
+              "isDefault": {
+                "value": "default",
+                "doc": "Indicates that the element is to act according to a default behavior, possibly based on the parent element's own spellcheck value."
+              },
+              "isFalse": {
+                "value": "false",
+                "doc": "Indicates that the element should not be spell checked."
+              }
+            }
+          }
+        },
+        "wrap": {
+          "doc": "Indicates how the control wraps text. If this attribute is not specified, soft is its default value.",
+          "type": {
+            "name": "TextWrap",
+            "doc": "Indicates how the control wraps text.",
+            "values": {
+              "hard": {
+                "doc": "The browser automatically inserts line breaks (CR+LF) so that each line has no more than the width of the control; the cols attribute must also be specified for this to take effect."
+              },
+              "soft": {
+                "doc": "The browser ensures that all line breaks in the value consist of a CR+LF pair, but does not insert any additional line breaks."
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "other": {
+    "details": {
+      "doc": "The &lt;details&gt; HTML element creates a disclosure widget in which information is visible only when the widget is toggled into an \"open\" state. A summary or label must be provided using the &lt;summary&gt; element.",
+      "attributes": {
+        "open": {
+          "doc": "Indicates whether or not the details — that is, the contents of the &lt;details&gt; element — are currently visible.",
+          "type": "boolean"
+        }
+      }
+    },
+    "dialog": {
+      "doc": "The &lt;dialog&gt; HTML element represents a dialog box or other interactive component, such as a dismissible alert, inspector, or subwindow.",
+      "attributes": {
+        "open": {
+          "doc": "Indicates that the dialog is active and can be interacted with. When the open attribute is not set, the dialog shouldn't be shown to the user.",
+          "type": "boolean"
+        }
+      }
+    },
+    "summary": {
+      "doc": "The &lt;summary&gt; HTML element specifies a summary, caption, or legend for a &lt;details&gt; element's disclosure box. Clicking the &lt;summary&gt; element toggles the state of the parent &lt;details&gt; element open and closed."
+    }
+  }
+}

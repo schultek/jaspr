@@ -60,6 +60,7 @@ Rather it embraces these differences to give the best of both worlds.
   - **/jaspr_riverpod**: Riverpod implementation for jaspr.
   - **/jaspr_router**: A router implementation for jaspr.
   - **/jaspr_test**: A testing package for jaspr.
+  - **/jaspr_ui**: UI components for jaspr.
   
 ## Roadmap
 
