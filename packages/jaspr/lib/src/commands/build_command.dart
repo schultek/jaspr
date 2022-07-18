@@ -11,6 +11,11 @@ class BuildCommand extends BaseCommand {
       help: 'Specify the input file for the web app',
       defaultsTo: 'lib/main.dart',
     );
+    argParser.addFlag(
+      'ssr',
+      defaultsTo: true,
+      help: 'Optionally disables server-side rendering and runs as a pure client-side app.',
+    );
     argParser.addOption(
       'target',
       abbr: 't',
@@ -34,13 +39,23 @@ class BuildCommand extends BaseCommand {
   Future<void> run() async {
     await super.run();
 
-    var dir = Directory('build');
-    if (!await dir.exists()) {
-      await dir.create();
+    var useSSR = argResults!['ssr'] as bool;
+
+    if (useSSR) {
+      var dir = Directory('build');
+      if (!await dir.exists()) {
+        await dir.create();
+      }
     }
 
-    var webProcess = await runWebdev(['build', '--output=web:build/web']);
-    unawaited(watchProcess(webProcess));
+    var webProcess = await runWebdev(['build', '--output=web:build${useSSR ? '/web' : ''}']);
+
+    var webResult = watchProcess(webProcess);
+    if (useSSR) {
+      unawaited(webResult);
+    } else {
+      return webResult;
+    }
 
     String? entryPoint = await getEntryPoint(argResults!['input']);
 
