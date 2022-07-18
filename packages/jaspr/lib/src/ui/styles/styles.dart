@@ -55,6 +55,7 @@ abstract class Styles {
     Unit? width,
     Unit? height,
     Border? border,
+    // BorderRadius radius,
     // Outline? outline,
     // Overflow? overflow,
     // Visibility? visibility,

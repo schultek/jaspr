@@ -29,12 +29,18 @@ class _BoxStyles implements Styles {
 
   @override
   Map<String, String> get styles => {
-        if (padding != null) 'padding': padding!.value,
-        if (margin != null) 'margin': margin!.value,
+        if (padding != null) ...padding!.styles._prefixed('padding'),
+        if (margin != null) ...margin!.styles._prefixed('margin'),
         if (display != null) 'display': display!.value,
         if (width != null) 'width': width!.value,
         if (height != null) 'height': height!.value,
         if (border != null) ...border!.styles,
         if (opacity != null) 'opacity': opacity!.toString(),
       };
+}
+
+extension on Map<String, String> {
+  Map<String, String> _prefixed(String prefix) {
+    return map((k, v) => MapEntry(prefix + (k.isNotEmpty ? '-$k' : ''), v));
+  }
 }

@@ -11,27 +11,6 @@ class BoxConstraints {
   static const BoxConstraints zero = BoxConstraints();
 }
 
-class Border {
-  final BorderStyle? style;
-  final Unit? width;
-  final Color? color;
-  final Unit? radius;
-
-  const Border({
-    this.style,
-    this.width,
-    this.color,
-    this.radius,
-  });
-
-  List<Style> getStyles() => [
-        if (style != null) Style('border-style', style!.name),
-        if (width != null) Style('border-width', width.toString()),
-        if (color != null) Style('border-color', color!.value),
-        if (radius != null) Style('border-radius', radius.toString()),
-      ];
-}
-
 class Outline {
   final BorderStyle? style;
   final Unit? width;

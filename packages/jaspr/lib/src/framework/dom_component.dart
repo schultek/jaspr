@@ -23,7 +23,7 @@ class DomComponent extends Component {
   final String tag;
   final String? id;
   final Iterable<String>? classes;
-  final Map<String, String>? styles;
+  final Styles? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
   final Component? _child;
@@ -62,7 +62,7 @@ class DomElement extends MultiChildElement with BuildScheduler {
       key: component.key?.hashCode.toString(),
       id: component.id,
       classes: component.classes,
-      styles: component.styles,
+      styles: component.styles?.styles,
       attributes: component.attributes,
       events: component.events?.map((k, v) => MapEntry(k, (e) => v(e.event))),
     );

@@ -15,6 +15,7 @@ import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
+import '../ui/styles/styles.dart';
 
 export 'package:domino/domino.dart'
     show DomBuilder, DomEvent, DomEventFn, DomLifecycleEvent, DomLifecycleEventFn, DomView, DomBuilderFn;

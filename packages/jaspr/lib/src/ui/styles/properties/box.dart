@@ -97,9 +97,34 @@ class _SymmetricBorder implements Border {
   const _SymmetricBorder({this.vertical, this.horizontal});
 
   @override
-  Map<String, String> get styles => {
-        // TODO
-      };
+  Map<String, String> get styles {
+    return {
+      if (vertical?.style != null && horizontal?.style != null)
+        'border-style': '${vertical!.style!.value} ${horizontal!.style!.value}'
+      else ...{
+        if (vertical?.style != null) 'border-top-style': vertical!.style!.value,
+        if (vertical?.style != null) 'border-bottom-style': vertical!.style!.value,
+        if (horizontal?.style != null) 'border-left-style': horizontal!.style!.value,
+        if (horizontal?.style != null) 'border-right-style': horizontal!.style!.value,
+      },
+      if (vertical?.color != null && horizontal?.color != null)
+        'border-color': '${vertical!.color!.value} ${horizontal!.color!.value}'
+      else ...{
+        if (vertical?.color != null) 'border-top-color': vertical!.color!.value,
+        if (vertical?.color != null) 'border-bottom-color': vertical!.color!.value,
+        if (horizontal?.color != null) 'border-left-color': horizontal!.color!.value,
+        if (horizontal?.color != null) 'border-right-color': horizontal!.color!.value,
+      },
+      if (vertical?.width != null && horizontal?.width != null)
+        'border-width': '${vertical!.width!.value} ${horizontal!.width!.value}'
+      else ...{
+        if (vertical?.width != null) 'border-top-width': vertical!.width!.value,
+        if (vertical?.width != null) 'border-bottom-width': vertical!.width!.value,
+        if (horizontal?.width != null) 'border-left-width': horizontal!.width!.value,
+        if (horizontal?.width != null) 'border-right-width': horizontal!.width!.value,
+      },
+    };
+  }
 }
 
 class BorderSide {
