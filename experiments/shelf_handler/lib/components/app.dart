@@ -5,7 +5,7 @@ class App extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'p',
-      child: Text('Hello World'),
+      child: Text('Hello World from Jaspr'),
     );
   }
 }

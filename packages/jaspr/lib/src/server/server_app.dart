@@ -131,7 +131,7 @@ Handler _webdevProxyHandler(String port) {
     var res = await handler(req);
     if (res.statusCode == 200 && res.headers['content-type'] == 'application/javascript') {
       var body = await res.readAsString();
-      res = res.change(body: body.replaceAll('http://localhost:$port', ''));
+      res = res.change(body: body.replaceAll('http://localhost:$port/', ''));
     }
     return res;
   };
@@ -187,7 +187,8 @@ Handler _sseProxyHandler(Uri proxyUri, Uri serverUri) {
   }
 
   return (Request req) async {
-    final path = req.requestedUri.path;
+    var path = req.url.path;
+    if (!path.startsWith('/')) path = '/$path';
     if (path != proxyUri.path) {
       return Response.notFound('');
     }
@@ -251,8 +252,7 @@ Handler _createHandler(_SetupHandler handle, {List<Middleware> middleware = cons
   var cascade = Cascade();
 
   if (kServerDebugMode) {
-    final serverHostname = 'localhost';
-    final serverUri = Uri.parse('http://$serverHostname:$portToProxy');
+    final serverUri = Uri.parse('http://localhost:$portToProxy');
     final serverSseUri = serverUri.replace(path: r'/$dwdsSseHandler');
     final sseUri = Uri.parse(r'/$dwdsSseHandler');
 

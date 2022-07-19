@@ -10,12 +10,21 @@ import 'components/hello.dart';
 void main() async {
   HttpServer? server;
 
-  var router = Router(notFoundHandler: serveApp((request, render) {
-    print("Request uri is ${request.requestedUri}");
+  var router = Router();
+
+  router.get('/', (request) => Response.ok('Hello World from Shelf'));
+
+  // binding to a different path than '/' only works because we set the
+  // <base href="/app/"> tag in index.html
+  router.mount('/app', serveApp((request, render) {
+    // Optionally do something with `request`
+    print("Request uri is ${request.requestedUri} (${request.url})");
+    // Return a server-rendered response by calling `render()` with your root component
     return render(App());
   }));
 
   router.get('/hello', (request) {
+    // Render a single component
     return renderComponent(Hello());
   });
 
