@@ -1,6 +1,8 @@
 # 0.2.0
 
 - Update to Dart 2.17
+- Added support for custom backend & server setup.
+  Use the new `serveApp` method to wrap your app as a simple shelf handler
 
 # 0.1.5
 
