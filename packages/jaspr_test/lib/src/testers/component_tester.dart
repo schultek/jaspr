@@ -102,6 +102,8 @@ class TestComponentsBinding extends BindingBase with ComponentsBinding, SyncBind
 
   late dom.Document _document;
 
+  SingleChildElement? get rootElement => rootElements[_attachTo];
+
   @override
   void didAttachRootElement(BuildScheduler element, {required String to}) async {
     _document = parse(_html ?? '<html><head></head><body></body></html>');
@@ -132,7 +134,7 @@ class TestComponentsBinding extends BindingBase with ComponentsBinding, SyncBind
   void updateRawState(String id, dynamic state) {}
 
   @override
-  void scheduleBuild() {
-    Future(buildOwner.performBuild);
+  void scheduleBuild(VoidCallback buildCallback) {
+    Future(buildCallback);
   }
 }

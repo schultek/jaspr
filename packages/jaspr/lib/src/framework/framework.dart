@@ -348,7 +348,7 @@ abstract class Element implements BuildContext {
 
     final Key? key = component.key;
     if (key is GlobalKey) {
-      owner._registerGlobalKey(key, this);
+      ComponentsBinding.instance!._registerGlobalKey(key, this);
     }
     _updateInheritance();
   }
@@ -589,7 +589,7 @@ abstract class Element implements BuildContext {
 
     final Key? key = component.key;
     if (key is GlobalKey) {
-      owner._unregisterGlobalKey(key, this);
+      ComponentsBinding.instance!._unregisterGlobalKey(key, this);
     }
 
     _component = null;

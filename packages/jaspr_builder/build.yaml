@@ -1,12 +1,32 @@
 builders:
-  jaspr_builder:
+  jaspr_builder:web_mock:
     import: "package:jaspr_builder/builder.dart"
-    builder_factories: [ "buildWebFake" ]
+    builder_factories: [ "buildWebMock" ]
     build_extensions: { ".web.dart": [ ".stub.dart", ".dart" ] }
     auto_apply: dependents
     build_to: source
     runs_before:
       - build_web_compilers
+  jaspr_builder:island:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildIsland" ]
+    build_extensions: { ".dart": [ ".island.g.dart" ] }
+    auto_apply: dependents
+    build_to: source
+    runs_before:
+      - build_web_compilers
+  jaspr_builder:islands_app:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildIslandsApp" ]
+    build_extensions: { "main.dart": [ "islands.g.dart", ] }
+    auto_apply: dependents
+    build_to: source
+    required_inputs: [ ".island.dart" ]
+    runs_before:
+      - build_web_compilers
+    defaults:
+      generate_for:
+        - lib/main.dart
 targets:
   $default:
     builders:

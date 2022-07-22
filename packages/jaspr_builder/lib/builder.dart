@@ -1,6 +1,13 @@
 import 'package:build/build.dart';
 
-import '../src/jaspr_web_builder.dart';
+import 'src/islands_builder.dart';
+import 'src/jaspr_web_builder.dart';
 
-/// Entry point for the builder
-JasprWebBuilder buildWebFake(BuilderOptions options) => JasprWebBuilder(options);
+/// Builder for mocking web-only libraries
+JasprWebBuilder buildWebMock(BuilderOptions options) => JasprWebBuilder(options);
+
+/// Builder for a single island component
+Builder buildIsland(BuilderOptions options) => IslandBuilder(options);
+
+/// Builder for the registry of all island components
+Builder buildIslandsApp(BuilderOptions options) => IslandsAppBuilder(options);

@@ -15,7 +15,7 @@ extension on BrowserTester {
       }
     }
 
-    binding.rootElement!.visitChildren(findRouter);
+    binding.rootElements.values.first.visitChildren(findRouter);
     if (router != null) {
       navigate(router!);
       if (pump) {

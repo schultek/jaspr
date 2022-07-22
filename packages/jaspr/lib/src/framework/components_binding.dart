@@ -11,25 +11,22 @@ mixin ComponentsBinding on BindingBase {
   void initInstances() {
     super.initInstances();
     _instance = this;
-    _buildOwner = BuildOwner();
   }
 
   static ComponentsBinding? _instance;
   static ComponentsBinding? get instance => _instance;
-
-  late BuildOwner _buildOwner;
-  BuildOwner get buildOwner => _buildOwner;
 
   /// Whether the current app is run on the client (in the browser)
   bool get isClient;
 
   /// Sets [app] as the new root of the component tree and performs an initial build
   Future<void> attachRootComponent(Component app, {required String attachTo}) async {
+    var buildOwner = _rootElements[attachTo]?._owner ?? BuildOwner();
     return buildOwner.lockState(() async {
       buildOwner._isFirstBuild = true;
 
       var element = _Root(child: app).createElement();
-      element._owner = _buildOwner;
+      element._owner = buildOwner;
 
       element.mount(null);
 
@@ -37,7 +34,7 @@ mixin ComponentsBinding on BindingBase {
         await element._asyncFirstBuild;
       }
 
-      _rootElement = element;
+      _rootElements[attachTo] = element;
       buildOwner._isFirstBuild = false;
 
       didAttachRootElement(element, to: attachTo);
@@ -50,10 +47,22 @@ mixin ComponentsBinding on BindingBase {
   /// The [Element] that is at the root of the hierarchy.
   ///
   /// This is initialized the first time [runApp] is called.
-  SingleChildElement? get rootElement => _rootElement;
-  SingleChildElement? _rootElement;
+  Map<String, SingleChildElement> get rootElements => _rootElements;
+  final Map<String, _RootElement> _rootElements = {};
 
   DomView registerView(covariant dynamic root, DomBuilderFn builderFn, bool initialRender);
+
+  final Map<GlobalKey, Element> _globalKeyRegistry = {};
+
+  void _registerGlobalKey(GlobalKey key, Element element) {
+    _globalKeyRegistry[key] = element;
+  }
+
+  void _unregisterGlobalKey(GlobalKey key, Element element) {
+    if (_globalKeyRegistry[key] == element) {
+      _globalKeyRegistry.remove(key);
+    }
+  }
 }
 
 /// In difference to Flutter, we have multiple build schedulers instead of one global build owner

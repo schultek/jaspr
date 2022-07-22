@@ -1,14 +1,20 @@
-# jaspr_builder
+Builders for [jaspr](https://pub.dev/packages/jaspr)
 
-Polyfill builder for integrating js libraries with jaspr.
-
-## How to Use
+# Setup
 
 First, add `jaspr_builder` as a dev dependency to your project:
 
 ```shell
 dart pub add jaspr_builder --dev
 ```
+
+# Builders
+
+## web_mock
+
+Builder for mocking web-only libraries. Used for integrating js-libraries with jaspr.
+
+### How to use
 
 Next, create a new file named `<libname>.web.dart` and export any
 element from the targeted js library:
@@ -26,9 +32,18 @@ Finally run code generation:
 dart run build_runner build
 ```
 
+> You don't need the code-generation step if you are running `jaspr serve`, since it will automatically
+> build and watch your files for changes.
+
 This will generate two files:
 
 - `<libname>.stub.dart` contains interface-stubs for all the exported elements
 - `<libname>.dart` combines the stub and web file with conditional imports
 
 In you project, you should the only import the `<libname>.dart` file.
+
+## islands_app
+
+Builder for automatic setup of island components.
+View [islands architecture](https://github.com/schultek/jaspr/wiki) for documentation.
+
