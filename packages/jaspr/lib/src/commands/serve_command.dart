@@ -19,7 +19,7 @@ class ServeCommand extends BaseCommand {
         'reload': 'Reloads js modules without server reload (loses current state)',
         'refresh': 'Performs a full page refresh and server reload',
       },
-      defaultsTo: 'reload',
+      defaultsTo: 'refresh',
     );
     argParser.addOption(
       'port',
@@ -28,11 +28,20 @@ class ServeCommand extends BaseCommand {
       defaultsTo: '8080',
     );
     argParser.addFlag(
+      'ssr',
+      defaultsTo: true,
+      help: 'Optionally disables server-side rendering and runs as a pure client-side app.',
+    );
+    argParser.addFlag(
       'debug',
       abbr: 'd',
       help: 'Serves the app in debug mode.',
     );
-    argParser.addFlag('verbose', abbr: 'v', help: 'Enable verbose logging.');
+    argParser.addFlag(
+      'verbose',
+      abbr: 'v',
+      help: 'Enable verbose logging.',
+    );
   }
 
   @override
@@ -46,13 +55,19 @@ class ServeCommand extends BaseCommand {
   Future<void> run() async {
     await super.run();
 
+    var useSSR = argResults!['ssr'] as bool;
+
     var webProcess = await runWebdev([
       'serve',
       '--auto=${argResults!['mode'] == 'reload' ? 'restart' : 'refresh'}',
-      'web:5467',
+      'web:${useSSR ? '5467' : argResults!['port']}',
       '--',
       '--delete-conflicting-outputs'
     ]);
+
+    if (!useSSR) {
+      return watchProcess(webProcess);
+    }
 
     print("Starting jaspr development server...");
 
