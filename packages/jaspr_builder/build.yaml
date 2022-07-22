@@ -1,7 +1,7 @@
 builders:
-  jaspr_builder:
+  jaspr_builder:web_mock:
     import: "package:jaspr_builder/builder.dart"
-    builder_factories: [ "buildWebFake" ]
+    builder_factories: [ "buildWebMock" ]
     build_extensions: { ".web.dart": [ ".stub.dart", ".dart" ] }
     auto_apply: dependents
     build_to: source

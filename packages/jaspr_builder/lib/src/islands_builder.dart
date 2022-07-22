@@ -40,7 +40,7 @@ class IslandBuilder extends Builder {
             '  Map<String, dynamic> get params => {${params.map((p) => "'${p.name}': ${p.name}").join(', ')}};\n\n'
             '  @override\n'
             '  Component buildChild(BuildContext context) {\n'
-            '    return ${e.name}(${params.where((p) => p.isPositional).map((p) => '${p.name}').followedBy(params.where((p) => p.isNamed).map((p) => '${p.name}: ${p.name}')).join(', ')});\n'
+            '    return ${e.name}(${params.where((p) => p.isPositional).map((p) => p.name).followedBy(params.where((p) => p.isNamed).map((p) => '${p.name}: ${p.name}')).join(', ')});\n'
             '  }\n\n'
             '  static Component instantiate(BuildContext context, IslandParams params) {\n'
             '    return ${e.name}(${params.where((p) => p.isPositional).map((p) => 'params.get(\'${p.name}\')').followedBy(params.where((p) => p.isNamed).map((p) => '${p.name}: params.get(\'${p.name}\')')).join(', ')});\n'

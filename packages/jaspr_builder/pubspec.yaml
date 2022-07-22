@@ -1,11 +1,11 @@
 name: jaspr_builder
-description: Polyfill builder for integrating js libraries with jaspr
-version: 0.1.0
+description: Builders for jaspr
+version: 0.2.0
 homepage: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
 
 environment:
-  sdk: '>=2.16.0 <3.0.0'
+  sdk: '>=2.17.0 <3.0.0'
 
 dependencies:
   analyzer: ^3.0.0
