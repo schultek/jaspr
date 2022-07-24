@@ -35,6 +35,44 @@ class DomComponent extends Component {
   Element createElement() => DomElement(this);
 }
 
+abstract class DomNode {
+
+  dynamic _node;
+  dynamic get node => _node;
+
+  BuildContext get context;
+
+  @protected
+  void updateNode(String tag, Map<String, String> attrs, Map<String, EventCallback> events) {
+    var builder = DomBuilder.of(context);
+    builder.updateNode(this, tag, attrs, events);
+  }
+
+}
+
+class InheritedDomBuilder extends InheritedComponent {
+  const InheritedDomBuilder({required this.builder, required super.child, super.key});
+
+  final DomBuilder builder;
+
+  @override
+  bool updateShouldNotify(covariant InheritedDomBuilder oldComponent) {
+    return builder != oldComponent.builder;
+  }
+}
+
+abstract class DomBuilder {
+
+  static DomBuilder of(BuildContext context) {
+    return context.dependOnInheritedComponentOfExactType<InheritedDomBuilder>()!.builder;
+  }
+
+  void updateNode(DomNode node, String tag, Map<String, String> attrs, Map<String, EventCallback> events) {
+
+  }
+
+}
+
 class DomElement extends MultiChildElement with BuildScheduler {
   DomElement(DomComponent component) : super(component);
 
@@ -52,6 +90,14 @@ class DomElement extends MultiChildElement with BuildScheduler {
     super.update(newComponent);
     _dirty = true;
     rebuild();
+  }
+
+  @override
+  void performRebuild() {
+    super.performRebuild();
+
+    // update / create dom element
+    updateNode(tag, attrs, events)
   }
 
   @override
