@@ -24,8 +24,8 @@ abstract class MultiChildElement extends Element {
   bool get debugDoingBuild => _debugDoingBuild;
 
   @override
-  void mount(Element? parent, Slot? slot) {
-    super.mount(parent, slot);
+  void mount(Element? parent, Element? prevSibling) {
+    super.mount(parent, prevSibling);
     assert(_children == null);
     assert(_lifecycleState == _ElementLifecycle.active);
     _firstBuild();
@@ -132,27 +132,27 @@ abstract class MultiChildElement extends Element {
         ? oldChildren
         : List<Element?>.filled(newComponents.length, null, growable: true);
 
-    Element? nextChild;
+    Element? prevChild;
 
-    // Update the bottom of the list.
-    while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
-      final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenBottom]);
-      final Component newComponent = newComponents[newChildrenBottom];
-      if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
-      final Element newChild = updateChild(oldChild, newComponent, Slot(nextChild))!;
-      newChildren[newChildrenBottom] = newChild;
-      nextChild = newChild;
-      newChildrenBottom -= 1;
-      oldChildrenBottom -= 1;
-    }
-
-    // Scan the top of the list.
+    // Update the top of the list.
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
       final Component newComponent = newComponents[newChildrenTop];
       if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
-      oldChildrenTop += 1;
+      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      newChildren[newChildrenTop] = newChild;
+      prevChild = newChild;
       newChildrenTop += 1;
+      oldChildrenTop += 1;
+    }
+
+    // Scan the bottom of the list.
+    while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
+      final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenBottom]);
+      final Component newComponent = newComponents[newChildrenBottom];
+      if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
+      oldChildrenBottom -= 1;
+      newChildrenBottom -= 1;
     }
 
     // Scan the old children in the middle of the list.
@@ -161,7 +161,7 @@ abstract class MultiChildElement extends Element {
     if (haveOldChildren) {
       oldKeyedChildren = <Key, Element>{};
       while (oldChildrenTop <= oldChildrenBottom) {
-        final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenBottom]);
+        final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
         if (oldChild != null) {
           if (oldChild.component.key != null) {
             oldKeyedChildren[oldChild.component.key!] = oldChild;
@@ -169,14 +169,14 @@ abstract class MultiChildElement extends Element {
             deactivateChild(oldChild);
           }
         }
-        oldChildrenBottom -= 1;
+        oldChildrenTop += 1;
       }
     }
 
     // Update the middle of the list.
     while (newChildrenTop <= newChildrenBottom) {
       Element? oldChild;
-      final Component newComponent = newComponents[newChildrenBottom];
+      final Component newComponent = newComponents[newChildrenTop];
       if (haveOldChildren) {
         final Key? key = newComponent.key;
         if (key != null) {
@@ -193,25 +193,25 @@ abstract class MultiChildElement extends Element {
           }
         }
       }
-      final Element newChild = updateChild(oldChild, newComponent, Slot(nextChild))!;
-      newChildren[newChildrenBottom] = newChild;
-      nextChild = newChild;
-      newChildrenBottom -= 1;
+      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      newChildren[newChildrenTop] = newChild;
+      prevChild = newChild;
+      newChildrenTop += 1;
     }
 
     // We've scanned the whole list.
-    newChildrenTop = 0;
-    oldChildrenTop = 0;
+    newChildrenBottom = newComponents.length - 1;
+    oldChildrenTop = oldChildren.length - 1;
 
-    // Update the top of the list.
+    // Update the bottom of the list.
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
-      final Element oldChild = oldChildren[oldChildrenBottom];
-      final Component newComponent = newComponents[newChildrenBottom];
-      final Element newChild = updateChild(oldChild, newComponent, Slot(nextChild))!;
-      newChildren[newChildrenBottom] = newChild;
-      nextChild = newChild;
-      newChildrenBottom -= 1;
-      oldChildrenBottom -= 1;
+      final Element oldChild = oldChildren[oldChildrenTop];
+      final Component newComponent = newComponents[newChildrenTop];
+      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      newChildren[newChildrenTop] = newChild;
+      prevChild = newChild;
+      newChildrenTop += 1;
+      oldChildrenTop += 1;
     }
 
     // Clean up any of the remaining middle nodes from the old list.

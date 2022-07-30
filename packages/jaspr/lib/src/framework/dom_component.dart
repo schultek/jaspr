@@ -86,32 +86,22 @@ class Text extends Component {
   Element createElement() => TextElement(this);
 }
 
-class TextElement extends Element with DomNode {
-  TextElement(Text component) : super(component);
-
-  @override
-  Text get component => super.component as Text;
+abstract class NoChildElement extends Element {
+  NoChildElement(Component component) : super(component);
 
   @override
   bool get debugDoingBuild => false;
 
   @override
-  void mount(Element? parent, Slot? slot) {
-    super.mount(parent, slot);
+  void mount(Element? parent, Element? prevSibling) {
+    super.mount(parent, prevSibling);
     assert(_lifecycleState == _ElementLifecycle.active);
     _firstBuild();
   }
 
   @mustCallSuper
   void _firstBuild() {
-    mountNode();
     rebuild();
-  }
-
-  @override
-  void renderNode(DomBuilder builder) {
-    // TODO raw html
-    builder.renderTextNode(this, component.text);
   }
 
   @override
@@ -121,4 +111,23 @@ class TextElement extends Element with DomNode {
 
   @override
   void visitChildren(ElementVisitor visitor) {}
+}
+
+class TextElement extends NoChildElement with DomNode {
+  TextElement(Text component) : super(component);
+
+  @override
+  Text get component => super.component as Text;
+
+  @override
+  void _firstBuild() {
+    mountNode();
+    super._firstBuild();
+  }
+
+  @override
+  void renderNode(DomBuilder builder) {
+    // TODO raw html
+    builder.renderTextNode(this, component.text);
+  }
 }

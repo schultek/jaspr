@@ -5,6 +5,7 @@ import 'package:html/parser.dart';
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
+import '../foundation/constants.dart';
 import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
 import '../framework/framework.dart';
@@ -85,23 +86,155 @@ class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, Schedu
   void updateRawState(String id, dynamic state) {}
 
   @override
-  DomView registerView(dynamic root, DomBuilderFn builderFn, bool initialRender) {
-    return NullDomView();
-  }
-
-  @override
   void scheduleBuild(VoidCallback buildCallback) {
     throw UnsupportedError('Scheduling a build is not supported on the server, and should never happen.');
   }
 }
 
-class NullDomView implements DomView {
-  @override
-  Future<void>? dispose() => null;
+final _nodesExpando = Expando<DomNodeData>();
+
+class DomNodeData {
+  String? tag;
+  Map<String, String>? attrs;
+  String? text;
+  List<DomNode> children = [];
+}
+
+extension on DomNode {
+  DomNodeData get data => _nodesExpando[this] ??= DomNodeData();
+}
+
+class MarkupDomBuilder extends DomBuilder {
+  DomNode? root;
 
   @override
-  Future<void>? invalidate() => null;
+  void setRootNode(DomNode node) {
+    root = node;
+  }
 
   @override
-  void update() {}
+  void renderNode(DomNode node, String tag, Map<String, String> attrs, Map<String, EventCallback> events) {
+    node.data
+      ..tag = tag
+      ..attrs = attrs;
+  }
+
+  @override
+  void renderTextNode(DomNode node, String text) {
+    node.data.text = text;
+  }
+
+  @override
+  void renderChildNode(DomNode node, DomNode child, DomNode? after) {
+    var children = node.data.children;
+    children.remove(child);
+    if (after == null) {
+      children.insert(0, child);
+    } else {
+      var index = children.indexOf(after);
+      children.insert(index + 1, child);
+    }
+  }
+
+  @override
+  void didPerformRebuild(DomNode node) {}
+
+  @override
+  void removeChild(DomNode parent, DomNode child) {
+    parent.data.children.remove(child);
+  }
+
+  String renderHtml() {
+    return root != null ? renderNodeHtml(root!) : '';
+  }
+
+  String renderNodeHtml(DomNode node, [int inset = 0]) {
+    var data = node.data;
+    var insetStr = '';
+    if (data.text != null) {
+      return insetStr + htmlEscape.convert(data.text!);
+    } else if (data.tag != null) {
+      var output = StringBuffer();
+      var tag = data.tag!.toLowerCase();
+      _domValidator.validateElementName(tag);
+      output.write('$insetStr<$tag');
+      if (data.attrs != null) {
+        for (var attr in data.attrs!.entries) {
+          _domValidator.validateAttributeName(attr.key);
+          output.write(' ${attr.key}="${_attributeEscape.convert(attr.value)}"');
+        }
+      }
+      var selfClosing = _domValidator.isSelfClosing(tag);
+      if (selfClosing) {
+        output.write('/>');
+      } else {
+        output.write('>');
+        for (var child in data.children) {
+          output.write(renderNodeHtml(child, kDebugMode ? inset + 2 : inset));
+        }
+        if (kDebugMode && data.children.isNotEmpty) {
+          output.write(insetStr);
+        }
+        output.write('</$tag>');
+      }
+      return output.toString();
+    } else {
+      assert(node == root);
+      var output = StringBuffer();
+      for (var child in data.children) {
+        output.write(renderNodeHtml(child, kDebugMode ? inset + 2 : inset));
+      }
+      return output.toString();
+    }
+  }
+
+  final _attributeEscape = HtmlEscape(HtmlEscapeMode.attribute);
+  final _domValidator = DomValidator();
+}
+
+/// DOM validator with sane defaults.
+class DomValidator {
+  static final _attributeRegExp = RegExp(r'^[a-z](?:[a-z0-9\-\_]*[a-z0-9]+)?$');
+  static final _elementRegExp = _attributeRegExp;
+  static const _selfClosing = <String>{
+    'area',
+    'base',
+    'br',
+    'col',
+    'embed',
+    'hr',
+    'img',
+    'input',
+    'link',
+    'meta',
+    'param',
+    'path',
+    'source',
+    'track',
+    'wbr',
+  };
+  final _tags = <String>{};
+  final _attrs = <String>{};
+
+  void validateElementName(String tag) {
+    if (_tags.contains(tag)) return;
+    if (_elementRegExp.matchAsPrefix(tag) != null) {
+      _tags.add(tag);
+    } else {
+      throw ArgumentError('"$tag" is not a valid element name.');
+    }
+  }
+
+  void validateAttributeName(String name) {
+    if (_attrs.contains(name)) return;
+    if (_attributeRegExp.matchAsPrefix(name) != null) {
+      _attrs.add(name);
+    } else {
+      throw ArgumentError('"$name" is not a valid attribute name.');
+    }
+  }
+
+  bool isSelfClosing(String tag) {
+    return _selfClosing.contains(tag);
+  }
 }

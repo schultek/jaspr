@@ -159,9 +159,6 @@ abstract class Element implements BuildContext {
 
   Element? _parent;
 
-  Slot? get slot => _slot;
-  Slot? _slot;
-
   /// Compare two components for equality.
   ///
   /// When a component is rebuilt with another that compares equal according
@@ -228,12 +225,32 @@ abstract class Element implements BuildContext {
   BuildOwner? _owner;
   BuildOwner get owner => _owner!;
 
+  /// The previous sibling element.
+  Element? _prevSibling;
+
+  /// The previous ancestor sibling
+  Element? _prevAncestorSibling;
+
+  /// The last child element.
+  Element? _lastChild;
+
+  /// The last child dom node.
+  DomNode? _lastNode;
+
   /// The nearest ancestor dom node.
-  DomNode? _node;
+  DomNode? _parentNode;
 
   // This is used to verify that Element objects move through life in an
   // orderly fashion.
   _ElementLifecycle _lifecycleState = _ElementLifecycle.initial;
+
+  void updateLastChild(Element? child) {
+    _lastChild = child;
+    _lastNode = _lastChild?._lastNode;
+    if (_parent?._lastChild == this && _parent?._lastNode != _lastNode) {
+      _parent!.updateLastChild(this);
+    }
+  }
 
   /// Calls the argument for each child.
   ///
@@ -283,9 +300,12 @@ abstract class Element implements BuildContext {
   /// |  **child == null**  |  Returns null.         |  Returns new [Element]. |
   /// |  **child != null**  |  Old child is removed, returns null. | Old child updated if possible, returns child or new [Element]. |
   @protected
-  Element? updateChild(Element? child, Component? newComponent, Slot newSlot) {
+  Element? updateChild(Element? child, Component? newComponent, Element? prevSibling) {
     if (newComponent == null) {
       if (child != null) {
+        if (_lastChild == child) {
+          updateLastChild(prevSibling);
+        }
         deactivateChild(child);
       }
       return null;
@@ -293,13 +313,13 @@ abstract class Element implements BuildContext {
     final Element newChild;
     if (child != null) {
       if (child._component == newComponent) {
-        if (child.slot != newSlot) {
-          child.updateSlot(newSlot);
+        if (child._prevSibling != prevSibling) {
+          child.updatePrevSibling(prevSibling);
         }
         newChild = child;
       } else if (Component.canUpdate(child.component, newComponent)) {
-        if (child.slot != newSlot) {
-          child.updateSlot(newSlot);
+        if (child._prevSibling != prevSibling) {
+          child.updatePrevSibling(prevSibling);
         }
         child.update(newComponent);
         assert(child.component == newComponent);
@@ -307,10 +327,14 @@ abstract class Element implements BuildContext {
       } else {
         deactivateChild(child);
         assert(child._parent == null);
-        newChild = inflateComponent(newComponent, newSlot);
+        newChild = inflateComponent(newComponent, prevSibling);
       }
     } else {
-      newChild = inflateComponent(newComponent, newSlot);
+      newChild = inflateComponent(newComponent, prevSibling);
+    }
+
+    if (_lastChild == prevSibling) {
+      updateLastChild(newChild);
     }
 
     return newChild;
@@ -332,15 +356,16 @@ abstract class Element implements BuildContext {
   /// Implementations of this method should start with a call to the inherited
   /// method, as in `super.mount(parent)`.
   @mustCallSuper
-  void mount(Element? parent, Slot? slot) {
+  void mount(Element? parent, Element? prevSibling) {
     assert(_lifecycleState == _ElementLifecycle.initial);
     assert(_component != null);
     assert(_parent == null);
     assert(parent == null || parent._lifecycleState == _ElementLifecycle.active);
 
     _parent = parent;
-    _slot = slot;
-    _node = parent is DomNode ? parent : parent?._node;
+    _prevSibling = prevSibling;
+    _prevAncestorSibling = _prevSibling ?? (_parent is DomNode ? null : _parent?._prevAncestorSibling);
+    _parentNode = parent is DomNode ? parent : parent?._parentNode;
 
     _lifecycleState = _ElementLifecycle.active;
     _depth = parent != null ? parent.depth + 1 : 1;
@@ -384,14 +409,22 @@ abstract class Element implements BuildContext {
     }
   }
 
-  void updateSlot(Slot newSlot) {
+  void updatePrevSibling(Element? prevSibling) {
     assert(_lifecycleState == _ElementLifecycle.active);
     assert(_component != null);
     assert(_parent != null);
     assert(_parent!._lifecycleState == _ElementLifecycle.active);
     assert(_depth != null);
-    assert(_node != null);
-    _slot = newSlot;
+    assert(_parentNode != null);
+    _prevSibling = prevSibling;
+    _prevAncestorSibling = _prevSibling ?? (_parent is DomNode ? null : _parent?._prevAncestorSibling);
+  }
+
+  void _updateAncestorSiblingRecursively(Element elem) {
+    elem.updatePrevSibling(elem._prevSibling);
+    if (elem is! DomNode) {
+      elem.visitChildren(_updateAncestorSiblingRecursively);
+    }
   }
 
   Element? _retakeInactiveElement(GlobalKey key, Component newComponent) {
@@ -427,20 +460,21 @@ abstract class Element implements BuildContext {
   /// The element returned by this function will already have been mounted and
   /// will be in the "active" lifecycle state.
   @protected
-  Element inflateComponent(Component newComponent, Slot newSlot) {
+  Element inflateComponent(Component newComponent, Element? nextChild) {
     final Key? key = newComponent.key;
     if (key is GlobalKey) {
       final Element? newChild = _retakeInactiveElement(key, newComponent);
       if (newChild != null) {
         assert(newChild._parent == null);
         newChild._activateWithParent(this);
-        final Element? updatedChild = updateChild(newChild, newComponent, newSlot);
+        _updateAncestorSiblingRecursively(newChild);
+        final Element? updatedChild = updateChild(newChild, newComponent, nextChild);
         assert(newChild == updatedChild);
         return updatedChild!;
       }
     }
     final Element newChild = newComponent.createElement();
-    newChild.mount(this, newSlot);
+    newChild.mount(this, nextChild);
     assert(newChild._lifecycleState == _ElementLifecycle.active);
     return newChild;
   }
@@ -463,8 +497,8 @@ abstract class Element implements BuildContext {
   void deactivateChild(Element child) {
     assert(child._parent == this);
     child._parent = null;
-    child._node = null;
-    child._slot = null;
+    child._prevSibling = null;
+    child._prevAncestorSibling = null;
     owner._inactiveElements.add(child);
   }
 
@@ -487,7 +521,7 @@ abstract class Element implements BuildContext {
   void _activateWithParent(Element parent) {
     assert(_lifecycleState == _ElementLifecycle.inactive);
     _parent = parent;
-    _node = parent is DomNode ? parent : parent._node;
+    _parentNode = parent is DomNode ? parent : parent._parentNode;
     _updateDepth(_parent!.depth);
     _activateRecursively(this);
     assert(_lifecycleState == _ElementLifecycle.active);
@@ -514,10 +548,13 @@ abstract class Element implements BuildContext {
     assert(_lifecycleState == _ElementLifecycle.inactive);
     assert(_component != null);
     assert(_owner != null);
-    assert(_node != null);
+    assert(_parent != null);
     assert(_depth != null);
     final bool hadDependencies = (_dependencies != null && _dependencies!.isNotEmpty) || _hadUnsatisfiedDependencies;
     _lifecycleState = _ElementLifecycle.active;
+
+    var parent = _parent!;
+    _parentNode = parent is DomNode ? parent : parent._parentNode;
 
     _dependencies?.clear();
     _hadUnsatisfiedDependencies = false;
@@ -581,6 +618,7 @@ abstract class Element implements BuildContext {
       ComponentsBinding.instance!._unregisterGlobalKey(key, this);
     }
 
+    _parentNode = null;
     _component = null;
     _dependencies = null;
     _lifecycleState = _ElementLifecycle.defunct;
@@ -690,7 +728,7 @@ abstract class Element implements BuildContext {
   void markNeedsBuild() {
     assert(_lifecycleState != _ElementLifecycle.defunct);
     if (_lifecycleState != _ElementLifecycle.active) return;
-    assert(_node != null);
+    assert(_parentNode != null);
     assert(_lifecycleState == _ElementLifecycle.active);
     assert(() {
       if (owner._debugBuilding) {

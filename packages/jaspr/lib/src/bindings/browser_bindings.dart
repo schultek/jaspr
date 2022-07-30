@@ -86,6 +86,7 @@ final _nodesExpando = Expando<DomNodeData>();
 
 class DomNodeData {
   Node? node;
+  List<Node> toHydrate = [];
   Map<String, _EventBinding>? events;
 
   void clearEvents() {
@@ -116,8 +117,7 @@ class _EventBinding {
 }
 
 extension on DomNode {
-  DomNodeData? get data => _nodesExpando[this];
-  set data(DomNodeData? data) => _nodesExpando[this] = data;
+  DomNodeData get data => _nodesExpando[this] ??= DomNodeData();
 }
 
 extension on html.Element {
@@ -140,27 +140,44 @@ class BrowserDomBuilder extends DomBuilder {
 
   @override
   void setRootNode(DomNode node) {
-    (node.data ??= DomNodeData()).node = container;
+    node.data.node = container;
+    node.data.toHydrate = [...container.nodes];
   }
 
   @override
   void renderNode(DomNode node, String tag, Map<String, String> attrs, Map<String, EventCallback> events) {
-    var data = node.data ??= DomNodeData();
+    var data = node.data;
 
     late Set<String> attributesToRemove;
     late html.Element elem;
 
+    diff:
     if (data.node == null) {
+      var toHydrate = node.parentNode?.data.toHydrate ?? [];
+      if (toHydrate.isNotEmpty) {
+        for (var e in toHydrate) {
+          if (e is html.Element && e.tagName.toLowerCase() == tag) {
+            print("Hydrate html node: $e");
+            elem = data.node = e;
+            attributesToRemove = elem.attributes.keys.toSet();
+            toHydrate.remove(e);
+            data.toHydrate = [...e.nodes];
+            break diff;
+          }
+        }
+      }
+
       elem = data.node = document.createElement(tag);
       attributesToRemove = {};
       print("Create html node: $elem");
     } else {
-      if (data.node is! html.Element) {
+      if (data.node is! html.Element || (data.node as html.Element).tagName.toLowerCase() != tag) {
         elem = document.createElement(tag);
+        var old = data.node;
         data.node!.replaceWith(elem);
         data.node = elem;
         attributesToRemove = {};
-        print("Replace html node: $elem");
+        print("Replace html node: $elem for $old");
       } else {
         elem = data.node as html.Element;
         attributesToRemove = elem.attributes.keys.toSet();
@@ -199,9 +216,26 @@ class BrowserDomBuilder extends DomBuilder {
 
   @override
   void renderTextNode(DomNode node, String text) {
-    var data = node.data ??= DomNodeData();
+    var data = node.data;
 
+    diff:
     if (data.node == null) {
+      var toHydrate = node.parentNode?.data.toHydrate ?? [];
+      if (toHydrate.isNotEmpty) {
+        for (var e in toHydrate) {
+          if (e is html.Text) {
+            print("Hydrate text node: $e");
+            data.node = e;
+            if (e.text != text) {
+              e.text = text;
+              print("Update text node: $text");
+            }
+            toHydrate.remove(e);
+            break diff;
+          }
+        }
+      }
+
       data.node = html.Text(text);
       print("Create text node: $text");
     } else {
@@ -221,20 +255,47 @@ class BrowserDomBuilder extends DomBuilder {
   }
 
   @override
-  void renderChildNode(DomNode node, DomNode child, DomNode? before) {
-    var parentNode = node.data?.node;
-    var childNode = child.data?.node;
+  void renderChildNode(DomNode node, DomNode child, DomNode? after) {
+    var parentNode = node.data.node;
+    var childNode = child.data.node;
 
     assert(parentNode is html.Element);
     assert(childNode != null);
 
-    print("ATTACH CHILD $child OF $parentNode BEFORE ${before?.data?.node}");
+    var afterNode = after?.data.node;
 
-    parentNode!.insertBefore(childNode!, before?.data?.node);
+    if (childNode!.previousNode == afterNode && childNode.parentNode == parentNode) {
+      return;
+    }
+
+    print("Attach node $childNode of $parentNode after $afterNode");
+
+    if (afterNode == null) {
+      if (parentNode!.childNodes.isEmpty) {
+        parentNode.append(childNode);
+      } else {
+        parentNode.insertBefore(childNode, parentNode.childNodes.first);
+      }
+    } else {
+      parentNode!.insertBefore(childNode, afterNode.nextNode);
+    }
   }
 
   @override
-  void removeNode(DomNode node) {
-    node.data?.node?.remove();
+  void didPerformRebuild(DomNode node) {
+    if (node.data.toHydrate.isNotEmpty) {
+      print("Clear ${node.data.toHydrate.length} nodes not hydrated (${node.data.toHydrate})");
+    }
+    for (var node in node.data.toHydrate) {
+      node.remove();
+    }
+    node.data.toHydrate.clear();
+  }
+
+  @override
+  void removeChild(DomNode parent, DomNode child) {
+    var node = child.data.node;
+    print("Remove child $node of ${parent.data.node}");
+    node?.remove();
   }
 }

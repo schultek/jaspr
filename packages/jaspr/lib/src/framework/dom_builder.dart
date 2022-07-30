@@ -5,6 +5,11 @@ mixin DomNode on Element {
   late DomBuilder _builder;
 
   @override
+  DomNode get _lastNode => this;
+
+  DomNode? get parentNode => _parentNode;
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _builder = builder;
@@ -13,7 +18,7 @@ mixin DomNode on Element {
   void mountNode() {
     _builder = builder;
     renderNode(builder);
-    _node?.renderChildNode(this);
+    _parentNode?.renderChildNode(this);
   }
 
   @override
@@ -24,54 +29,32 @@ mixin DomNode on Element {
 
   @override
   void unmount() {
+    _builder.removeChild(_parentNode!, this);
     super.unmount();
-    _builder.removeNode(this);
   }
 
   @protected
   void renderNode(DomBuilder builder);
 
   @override
-  void updateSlot(Slot newSlot) {
-    super.updateSlot(newSlot);
-    _node!.renderChildNode(this);
+  void updatePrevSibling(Element? prevSibling) {
+    super.updatePrevSibling(prevSibling);
+    _parentNode!.renderChildNode(this);
+  }
+
+  @override
+  void performRebuild() {
+    super.performRebuild();
+    _builder.didPerformRebuild(this);
   }
 
   void renderChildNode(DomNode child) {
-    Element? beforeElem = child.slot!.nextSibling;
-
-    if (beforeElem == null) {
-      child.visitAncestorElements((element) {
-        if (element == this) return false;
-        beforeElem = element.slot!.nextSibling;
-        return beforeElem == null;
-      });
+    Element? prevElem = child._prevAncestorSibling;
+    while (prevElem != null && prevElem._lastNode == null) {
+      prevElem = prevElem._prevAncestorSibling;
     }
-
-    DomNode? before;
-
-    while (beforeElem != null && before == null) {
-      if (beforeElem is DomNode) {
-        before = beforeElem as DomNode;
-      } else {
-        visitor(element) {
-          if (before != null) return;
-          if (element is DomNode) {
-            before = element;
-          } else {
-            element.visitChildren(visitor);
-          }
-        }
-
-        beforeElem!.visitChildren(visitor);
-      }
-
-      if (before == null) {
-        beforeElem = beforeElem!.slot?.nextSibling;
-      }
-    }
-
-    builder.renderChildNode(this, child, before);
+    var after = prevElem?._lastNode;
+    builder.renderChildNode(this, child, after);
   }
 }
 
@@ -97,9 +80,11 @@ abstract class DomBuilder {
 
   void renderTextNode(DomNode node, String text);
 
-  void renderChildNode(DomNode node, DomNode child, DomNode? before);
+  void renderChildNode(DomNode node, DomNode child, DomNode? after);
 
-  void removeNode(DomNode node);
+  void didPerformRebuild(DomNode node);
+
+  void removeChild(DomNode parent, DomNode child);
 }
 
 class Slot {
