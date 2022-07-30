@@ -35,55 +35,20 @@ class DomComponent extends Component {
   Element createElement() => DomElement(this);
 }
 
-abstract class DomNode {
-
-  dynamic _node;
-  dynamic get node => _node;
-
-  BuildContext get context;
-
-  @protected
-  void updateNode(String tag, Map<String, String> attrs, Map<String, EventCallback> events) {
-    var builder = DomBuilder.of(context);
-    builder.updateNode(this, tag, attrs, events);
-  }
-
-}
-
-class InheritedDomBuilder extends InheritedComponent {
-  const InheritedDomBuilder({required this.builder, required super.child, super.key});
-
-  final DomBuilder builder;
-
-  @override
-  bool updateShouldNotify(covariant InheritedDomBuilder oldComponent) {
-    return builder != oldComponent.builder;
-  }
-}
-
-abstract class DomBuilder {
-
-  static DomBuilder of(BuildContext context) {
-    return context.dependOnInheritedComponentOfExactType<InheritedDomBuilder>()!.builder;
-  }
-
-  void updateNode(DomNode node, String tag, Map<String, String> attrs, Map<String, EventCallback> events) {
-
-  }
-
-}
-
-class DomElement extends MultiChildElement with BuildScheduler {
+class DomElement extends MultiChildElement with DomNode {
   DomElement(DomComponent component) : super(component);
 
   @override
   DomComponent get component => super.component as DomComponent;
 
-  dynamic _source;
-  dynamic get source => _source;
-
   @override
   Iterable<Component> build() => component.children;
+
+  @override
+  void _firstBuild() {
+    mountNode();
+    super._firstBuild();
+  }
 
   @override
   void update(DomComponent newComponent) {
@@ -93,30 +58,18 @@ class DomElement extends MultiChildElement with BuildScheduler {
   }
 
   @override
-  void performRebuild() {
-    super.performRebuild();
-
-    // update / create dom element
-    updateNode(tag, attrs, events)
-  }
-
-  @override
-  void render(DomBuilder b) {
-    b.open(
+  void renderNode(DomBuilder builder) {
+    builder.renderNode(
+      this,
       component.tag,
-      // TODO currently this does not really work on first render, find better solution
-      key: component.key?.hashCode.toString(),
-      id: component.id,
-      classes: component.classes,
-      styles: component.styles,
-      attributes: component.attributes,
-      events: component.events?.map((k, v) => MapEntry(k, (e) => v(e.event))),
+      {
+        if (component.id != null) 'id': component.id!,
+        if (component.classes != null) 'class': component.classes!.join(' '),
+        if (component.styles != null) 'style': component.styles!.entries.map((e) => '${e.key}: ${e.value}').join('; '),
+        if (component.attributes != null) ...component.attributes!,
+      },
+      component.events ?? {},
     );
-
-    super.render(b);
-
-    _source = b.close(tag: component.tag);
-    _view = ComponentsBinding.instance!.registerView(_source, super.render, false);
   }
 }
 
@@ -133,14 +86,33 @@ class Text extends Component {
   Element createElement() => TextElement(this);
 }
 
-class TextElement extends Element {
+class TextElement extends Element with DomNode {
   TextElement(Text component) : super(component);
 
   @override
-  Text get _component => super._component as Text;
+  Text get component => super.component as Text;
 
   @override
   bool get debugDoingBuild => false;
+
+  @override
+  void mount(Element? parent, Slot? slot) {
+    super.mount(parent, slot);
+    assert(_lifecycleState == _ElementLifecycle.active);
+    _firstBuild();
+  }
+
+  @mustCallSuper
+  void _firstBuild() {
+    mountNode();
+    rebuild();
+  }
+
+  @override
+  void renderNode(DomBuilder builder) {
+    // TODO raw html
+    builder.renderTextNode(this, component.text);
+  }
 
   @override
   void performRebuild() {
@@ -149,13 +121,4 @@ class TextElement extends Element {
 
   @override
   void visitChildren(ElementVisitor visitor) {}
-
-  @override
-  void render(DomBuilder b) {
-    if (_component.rawHtml) {
-      b.innerHtml(_component.text);
-    } else {
-      b.text(_component.text);
-    }
-  }
 }

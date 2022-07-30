@@ -35,7 +35,6 @@ class BuildOwner {
 
     _dirtyElements.add(element);
     element._inDirtyList = true;
-    element._scheduler!._willUpdate = true;
   }
 
   /// Whether this widget tree is in the build phase.
@@ -145,6 +144,7 @@ class BuildOwner {
         } catch (e) {
           // TODO: properly report error
           print("Error on rebuilding component: $e");
+          rethrow;
         }
 
         index += 1;
@@ -169,11 +169,6 @@ class BuildOwner {
       for (final Element element in _dirtyElements) {
         assert(element._inDirtyList);
         element._inDirtyList = false;
-
-        if (element._scheduler?._willUpdate ?? false) {
-          element._scheduler!.view.update();
-          element._scheduler!._willUpdate = false;
-        }
       }
 
       _dirtyElements.clear();

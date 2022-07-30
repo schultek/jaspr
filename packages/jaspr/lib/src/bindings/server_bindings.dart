@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:domino/markup.dart' hide DomComponent, DomElement;
 import 'package:html/parser.dart';
 
 import '../foundation/basic_types.dart';
@@ -48,9 +47,14 @@ class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, Schedu
   final rootCompleter = Completer.sync();
 
   @override
-  void didAttachRootElement(BuildScheduler element, {required String to}) {
+  void didAttachRootElement(Element element, {required String to}) {
     _targetId = to;
     rootCompleter.complete();
+  }
+
+  @override
+  DomBuilder attachBuilder(String to) {
+    return MarkupDomBuilder();
   }
 
   Future<String> render(String rawHtml) async {
@@ -58,7 +62,7 @@ class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, Schedu
 
     var document = parse(rawHtml);
     var appElement = document.querySelector(_targetId!)!;
-    appElement.innerHtml = renderMarkup(builderFn: rootElements.values.first.render);
+    appElement.innerHtml = (rootElements.values.first.builder as MarkupDomBuilder).renderHtml();
 
     document.body!.attributes['state-data'] = stateCodec.encode(getStateData());
     return document.outerHtml;

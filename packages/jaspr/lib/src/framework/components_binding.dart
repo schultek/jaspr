@@ -25,10 +25,12 @@ mixin ComponentsBinding on BindingBase {
     return buildOwner.lockState(() async {
       buildOwner._isFirstBuild = true;
 
-      var element = _Root(child: app).createElement();
+      var builder = attachBuilder(attachTo);
+
+      var element = _Root(child: app, builder: builder).createElement();
       element._owner = buildOwner;
 
-      element.mount(null);
+      element.mount(null, null);
 
       if (element._asyncFirstBuild != null) {
         await element._asyncFirstBuild;
@@ -42,15 +44,15 @@ mixin ComponentsBinding on BindingBase {
   }
 
   @protected
-  void didAttachRootElement(BuildScheduler element, {required String to});
+  void didAttachRootElement(Element element, {required String to});
 
   /// The [Element] that is at the root of the hierarchy.
   ///
   /// This is initialized the first time [runApp] is called.
-  Map<String, SingleChildElement> get rootElements => _rootElements;
-  final Map<String, _RootElement> _rootElements = {};
+  Map<String, DomNode> get rootElements => _rootElements;
+  final Map<String, DomNode> _rootElements = {};
 
-  DomView registerView(covariant dynamic root, DomBuilderFn builderFn, bool initialRender);
+  DomBuilder attachBuilder(String to);
 
   final Map<GlobalKey, Element> _globalKeyRegistry = {};
 
@@ -65,41 +67,36 @@ mixin ComponentsBinding on BindingBase {
   }
 }
 
-/// In difference to Flutter, we have multiple build schedulers instead of one global build owner
-/// Particularly each dom element is a build scheduler and manages its subtree of components
-mixin BuildScheduler on Element {
-  DomView? _view;
-
-  // ignore: prefer_final_fields
-  bool _willUpdate = false;
-
-  DomView get view => _view!;
-  set view(DomView v) {
-    _view = v;
-  }
-
-  @override
-  void render(DomBuilder b) {
-    _willUpdate = false;
-    super.render(b);
-  }
-}
-
 class _Root extends Component {
-  _Root({required this.child});
+  _Root({required this.child, required this.builder});
 
   final Component child;
+  final DomBuilder builder;
 
   @override
   _RootElement createElement() => _RootElement(this);
 }
 
-class _RootElement extends SingleChildElement with BuildScheduler {
+class _RootElement extends SingleChildElement with DomNode {
   _RootElement(_Root component) : super(component);
 
   @override
   _Root get component => super.component as _Root;
 
   @override
-  Component build() => component.child;
+  DomBuilder get builder => component.builder;
+
+  @override
+  void _firstBuild() {
+    mountNode();
+    super._firstBuild();
+  }
+
+  @override
+  Component build() => InheritedDomBuilder(builder: builder, child: component.child);
+
+  @override
+  void renderNode(DomBuilder builder) {
+    builder.setRootNode(this);
+  }
 }
