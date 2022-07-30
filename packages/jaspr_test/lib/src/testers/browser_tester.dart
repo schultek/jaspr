@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:html' as html;
 
-import 'package:domino/browser.dart' show registerView;
 import 'package:jaspr/jaspr_browser.dart';
 
 import '../../jaspr_test.dart';
@@ -46,7 +45,7 @@ class BrowserTester {
   void dispatchEvent(Finder finder, String event, dynamic data) {
     var element = _findDomElement(finder);
 
-    var source = element.source as html.Element;
+    var source = element.data.node as html.Element;
     source.dispatchEvent(html.MouseEvent('click'));
   }
 
@@ -88,11 +87,6 @@ class BrowserTester {
 
 class TestBrowserComponentsBinding extends AppBinding {
   TestBrowserComponentsBinding(this._onFetchState);
-
-  @override
-  void didAttachRootElement(BuildScheduler element, {required String to}) {
-    element.view = registerView(root: html.document.querySelector(to)!, builderFn: element.render);
-  }
 
   final Map<String, dynamic> Function(String url)? _onFetchState;
 

@@ -354,7 +354,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
   }
 
   @override
-  void mount(Element? parent) {
+  void mount(Element? parent, Element? prevSibling) {
     assert(() {
       component.container.debugCanModifyProviders = _debugCanModifyProviders;
       return true;
@@ -365,7 +365,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     );
     component.container.vsyncOverride = _flutterVsync;
 
-    super.mount(parent);
+    super.mount(parent, prevSibling);
   }
 
   @override

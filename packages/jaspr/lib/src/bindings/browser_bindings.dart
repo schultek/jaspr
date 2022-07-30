@@ -116,7 +116,7 @@ class _EventBinding {
   }
 }
 
-extension on DomNode {
+extension DomNodeDataExt on DomNode {
   DomNodeData get data => _nodesExpando[this] ??= DomNodeData();
 }
 
