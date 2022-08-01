@@ -1,4 +1,4 @@
-Basic HTML Tags
+## Basic HTML Tags
 - [x] Header
 - [x] Paragraph
 - [x] Link
@@ -10,54 +10,51 @@ Basic HTML Tags
 - [?] Iframe
 - [x] Style
 
-HTML5 Tags
+## HTML5 Tags
 - [ ] New input types
 - [ ] Canvas
 - [ ] SVG
 - [ ] Audio
 - [ ] Video
 
-Basic CSS Styles
-- [x] Color
-- [x] Background
-- [x] Fonts
-- [x] Text
-- [x] Link
-- [x] Lists
-- [ ] Table
-- [x] Box Model
+## Style Groups
 
-Advanced CSS Styles:
-- [x] Outline
-- [x] Cursor
-- [x] Overflow
-- [x] Units
-- [x] Display
-- [x] Visibility
-- [x] Position
-- [?] Float
-- [x] Alignment
-- [?] Sprite
-- [x] Opacity
-- [?] Attribute selector
+> x = group exists
+> sublist = additional missing properties
 
-CSS3 Styles
-- [x] Border
-- [x] Color
-- [x] Background
-- [x] Gradient
-- [ ] Text Overflow
-- [ ] Drop shadow
-- [ ] 2D Transforms
-- [ ] 3D Transforms
-- [ ] Transitions
+- [x] text
+  - shadow
+  - overflow
+- [x] background
+  - gradients
+- [x] box
+  - outline
+  - overflow
+  - position
+  - visibility
+  - constraints
+  - box sizing
+  - shadow
+  - cursor
+- [ ] flexbox
+  - direction, justify, align, ...
+- [ ] flex item (child of flexbox)
+  - basis, grow, shrink
+- [ ] grid
+  - rows, columns, ...
+- [ ] grid item (child of grid)
+  - row, column or area
+- [ ] transform
+  - translate, scale, ...
+- [ ] table
+- [ ] transition
+
+## Advanced Styling
+
 - [ ] Animations
-- [ ] Box Sizing
-- [ ] Flexbox
+- [ ] Sprites
 - [ ] Filters
 - [ ] Media Queries
-- [ ] Resize
-- [ ] Outline offset
 
 Sources:
 - [HTML Tags](https://www.tutorialrepublic.com/html-tutorial/)

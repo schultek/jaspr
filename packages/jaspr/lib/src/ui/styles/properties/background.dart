@@ -82,7 +82,7 @@ class ImageStyle {
   const ImageStyle.url(String url) : value = 'url($url)';
 
   // TODO
-  const ImageStyle.gradient() : value = '';
+  // const ImageStyle.gradient() : value = '';
 
   // TODO element, image, crossFade, imageSet
 }
