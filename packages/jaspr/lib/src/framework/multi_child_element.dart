@@ -201,7 +201,7 @@ abstract class MultiChildElement extends Element {
 
     // We've scanned the whole list.
     newChildrenBottom = newComponents.length - 1;
-    oldChildrenTop = oldChildren.length - 1;
+    oldChildrenBottom = oldChildren.length - 1;
 
     // Update the bottom of the list.
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
@@ -220,6 +220,8 @@ abstract class MultiChildElement extends Element {
         if (forgottenChildren == null || !forgottenChildren.contains(oldChild)) deactivateChild(oldChild);
       }
     }
+
+    assert(newChildren.every((element) => element != null));
 
     return newChildren.cast<Element>();
   }

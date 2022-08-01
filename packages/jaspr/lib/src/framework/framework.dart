@@ -313,12 +313,12 @@ abstract class Element implements BuildContext {
     final Element newChild;
     if (child != null) {
       if (child._component == newComponent) {
-        if (child._prevSibling != prevSibling) {
+        if (child._parentChanged || child._prevSibling != prevSibling) {
           child.updatePrevSibling(prevSibling);
         }
         newChild = child;
-      } else if (Component.canUpdate(child.component, newComponent)) {
-        if (child._prevSibling != prevSibling) {
+      } else if (child._parentChanged || Component.canUpdate(child.component, newComponent)) {
+        if (child._parentChanged || child._prevSibling != prevSibling) {
           child.updatePrevSibling(prevSibling);
         }
         child.update(newComponent);
@@ -409,6 +409,8 @@ abstract class Element implements BuildContext {
     }
   }
 
+  var _parentChanged = false;
+
   void updatePrevSibling(Element? prevSibling) {
     assert(_lifecycleState == _ElementLifecycle.active);
     assert(_component != null);
@@ -417,13 +419,21 @@ abstract class Element implements BuildContext {
     assert(_depth != null);
     assert(_parentNode != null);
     _prevSibling = prevSibling;
-    _prevAncestorSibling = _prevSibling ?? (_parent is DomNode ? null : _parent?._prevAncestorSibling);
+    _updateAncestorSiblingRecursively(_parentChanged);
+    _parentChanged = false;
   }
 
-  void _updateAncestorSiblingRecursively(Element elem) {
-    elem.updatePrevSibling(elem._prevSibling);
-    if (elem is! DomNode) {
-      elem.visitChildren(_updateAncestorSiblingRecursively);
+  @mustCallSuper
+  void _didChangeAncestorSibling() {}
+
+  void _updateAncestorSiblingRecursively(bool didReorderParent) {
+    var newAncestorSibling = _prevSibling ?? (_parent is DomNode ? null : _parent?._prevAncestorSibling);
+    if (didReorderParent || newAncestorSibling != _prevAncestorSibling) {
+      _prevAncestorSibling = newAncestorSibling;
+      _didChangeAncestorSibling();
+      if (this is! DomNode) {
+        visitChildren((e) => e._updateAncestorSiblingRecursively(true));
+      }
     }
   }
 
@@ -467,7 +477,7 @@ abstract class Element implements BuildContext {
       if (newChild != null) {
         assert(newChild._parent == null);
         newChild._activateWithParent(this);
-        _updateAncestorSiblingRecursively(newChild);
+        newChild._parentChanged = true;
         final Element? updatedChild = updateChild(newChild, newComponent, nextChild);
         assert(newChild == updatedChild);
         return updatedChild!;

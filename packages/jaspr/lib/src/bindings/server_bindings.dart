@@ -24,7 +24,7 @@ ServerApp runServer(Component app, {String attachTo = 'body'}) {
 }
 
 /// Global component binding for the server
-class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, SchedulerBinding {
+class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, SyncBinding {
   static AppBinding ensureInitialized() {
     if (ComponentsBinding.instance == null) {
       AppBinding();
@@ -95,12 +95,16 @@ final _nodesExpando = Expando<DomNodeData>();
 
 class DomNodeData {
   String? tag;
-  Map<String, String>? attrs;
+  String? id;
+  List<String>? classes;
+  Map<String, String>? styles;
+  Map<String, String>? attributes;
   String? text;
+  bool? rawHtml;
   List<DomNode> children = [];
 }
 
-extension on DomNode {
+extension DomNodeDataExt on DomNode {
   DomNodeData get data => _nodesExpando[this] ??= DomNodeData();
 }
 
@@ -113,15 +117,20 @@ class MarkupDomBuilder extends DomBuilder {
   }
 
   @override
-  void renderNode(DomNode node, String tag, Map<String, String> attrs, Map<String, EventCallback> events) {
+  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+      Map<String, String>? attributes, Map<String, EventCallback>? events) {
     node.data
       ..tag = tag
-      ..attrs = attrs;
+      ..id = id
+      ..classes = classes
+      ..styles = styles
+      ..attributes = attributes;
   }
 
   @override
-  void renderTextNode(DomNode node, String text) {
+  void renderTextNode(DomNode node, String text, [bool rawHtml = false]) {
     node.data.text = text;
+    node.data.rawHtml = rawHtml;
   }
 
   @override
@@ -152,14 +161,28 @@ class MarkupDomBuilder extends DomBuilder {
     var data = node.data;
     var insetStr = '';
     if (data.text != null) {
-      return insetStr + htmlEscape.convert(data.text!);
+      if (data.rawHtml == true) {
+        return insetStr + data.text!;
+      } else {
+        return insetStr + htmlEscape.convert(data.text!);
+      }
     } else if (data.tag != null) {
       var output = StringBuffer();
       var tag = data.tag!.toLowerCase();
       _domValidator.validateElementName(tag);
       output.write('$insetStr<$tag');
-      if (data.attrs != null) {
-        for (var attr in data.attrs!.entries) {
+      if (data.id != null) {
+        output.write(' id="${_attributeEscape.convert(data.id!)}"');
+      }
+      if (data.classes != null && data.classes!.isNotEmpty) {
+        output.write(' class="${_attributeEscape.convert(data.classes!.join(' '))}"');
+      }
+      if (data.styles != null && data.styles!.isNotEmpty) {
+        output.write(
+            ' style="${_attributeEscape.convert(data.styles!.entries.map((e) => '${e.key}: ${e.value}').join('; '))}"');
+      }
+      if (data.attributes != null && data.attributes!.isNotEmpty) {
+        for (var attr in data.attributes!.entries) {
           _domValidator.validateAttributeName(attr.key);
           output.write(' ${attr.key}="${_attributeEscape.convert(attr.value)}"');
         }
@@ -190,6 +213,11 @@ class MarkupDomBuilder extends DomBuilder {
 
   final _attributeEscape = HtmlEscape(HtmlEscapeMode.attribute);
   final _domValidator = DomValidator();
+
+  @override
+  bool updateShouldNotify(covariant DomBuilder builder) {
+    return true;
+  }
 }
 
 /// DOM validator with sane defaults.

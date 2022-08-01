@@ -22,7 +22,7 @@ class DomComponent extends Component {
 
   final String tag;
   final String? id;
-  final Iterable<String>? classes;
+  final List<String>? classes;
   final Map<String, String>? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
@@ -62,13 +62,11 @@ class DomElement extends MultiChildElement with DomNode {
     builder.renderNode(
       this,
       component.tag,
-      {
-        if (component.id != null) 'id': component.id!,
-        if (component.classes != null) 'class': component.classes!.join(' '),
-        if (component.styles != null) 'style': component.styles!.entries.map((e) => '${e.key}: ${e.value}').join('; '),
-        if (component.attributes != null) ...component.attributes!,
-      },
-      component.events ?? {},
+      component.id,
+      component.classes,
+      component.styles,
+      component.attributes,
+      component.events,
     );
   }
 }
@@ -127,7 +125,6 @@ class TextElement extends NoChildElement with DomNode {
 
   @override
   void renderNode(DomBuilder builder) {
-    // TODO raw html
-    builder.renderTextNode(this, component.text);
+    builder.renderTextNode(this, component.text, component.rawHtml);
   }
 }

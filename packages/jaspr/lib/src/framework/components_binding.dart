@@ -1,7 +1,7 @@
 part of framework;
 
 /// Main app binding, controls the root component and global state
-mixin ComponentsBinding on BindingBase {
+mixin ComponentsBinding on BindingBase, SchedulerBinding {
   /// The currently active uri.
   /// On the server, this is the requested uri. On the client, this is the
   /// currently visited uri in the browser.
@@ -93,7 +93,7 @@ class _RootElement extends SingleChildElement with DomNode {
   }
 
   @override
-  Component build() => InheritedDomBuilder(builder: builder, child: component.child);
+  Component build() => _InheritedDomBuilder(builder: builder, child: component.child);
 
   @override
   void renderNode(DomBuilder builder) {

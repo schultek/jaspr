@@ -15,7 +15,7 @@ void runApp(Component app, {String attachTo = 'body'}) {
 }
 
 /// Global component binding for the browser
-class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, SchedulerBinding {
+class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, SyncBinding {
   static AppBinding ensureInitialized() {
     if (ComponentsBinding.instance == null) {
       AppBinding();
@@ -77,7 +77,7 @@ class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, Schedu
     // This seems to give the best results over futures and microtasks
     // Needs to be inspected in more detail
     window.requestAnimationFrame((highResTime) {
-      buildCallback();
+      handleFrame(buildCallback);
     });
   }
 }
@@ -145,7 +145,8 @@ class BrowserDomBuilder extends DomBuilder {
   }
 
   @override
-  void renderNode(DomNode node, String tag, Map<String, String> attrs, Map<String, EventCallback> events) {
+  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+      Map<String, String>? attributes, Map<String, EventCallback>? events) {
     var data = node.data;
 
     late Set<String> attributesToRemove;
@@ -153,7 +154,7 @@ class BrowserDomBuilder extends DomBuilder {
 
     diff:
     if (data.node == null) {
-      var toHydrate = node.parentNode?.data.toHydrate ?? [];
+      var toHydrate = node.parentNode.data.toHydrate;
       if (toHydrate.isNotEmpty) {
         for (var e in toHydrate) {
           if (e is html.Element && e.tagName.toLowerCase() == tag) {
@@ -176,6 +177,11 @@ class BrowserDomBuilder extends DomBuilder {
         var old = data.node;
         data.node!.replaceWith(elem);
         data.node = elem;
+        if (old != null && old.childNodes.isNotEmpty) {
+          for (var child in old.childNodes) {
+            elem.append(child);
+          }
+        }
         attributesToRemove = {};
         print("Replace html node: $elem for $old");
       } else {
@@ -184,16 +190,24 @@ class BrowserDomBuilder extends DomBuilder {
       }
     }
 
-    for (var attr in attrs.entries) {
-      elem.clearOrSetAttribute(attr.key, attr.value);
-      attributesToRemove.remove(attr.key);
+    elem.clearOrSetAttribute('id', id);
+    elem.clearOrSetAttribute('class', classes == null || classes.isEmpty ? null : classes.join(' '));
+    elem.clearOrSetAttribute('style',
+        styles == null || styles.isEmpty ? null : styles.entries.map((e) => '${e.key}: ${e.value}').join('; '));
+
+    if (attributes != null) {
+      for (var attr in attributes.entries) {
+        elem.clearOrSetAttribute(attr.key, attr.value);
+      }
     }
+
+    attributesToRemove.removeAll(['id', 'class', 'style', ...?attributes?.keys]);
     for (final name in attributesToRemove) {
       elem.removeAttribute(name);
       print("Remove attribute: $name");
     }
 
-    if (events.isNotEmpty) {
+    if (events != null && events.isNotEmpty) {
       final prevEventTypes = data.events?.keys.toSet();
       data.events ??= <String, _EventBinding>{};
       final dataEvents = data.events!;
@@ -215,12 +229,24 @@ class BrowserDomBuilder extends DomBuilder {
   }
 
   @override
-  void renderTextNode(DomNode node, String text) {
+  void renderTextNode(DomNode node, String text, [bool rawHtml = false]) {
     var data = node.data;
+
+    if (rawHtml) {
+      var parent = node.parentNode.data.node;
+      if (parent is html.Element) {
+        if (parent.innerHtml != text) {
+          parent.innerHtml = text;
+          data.node = parent.childNodes.first;
+          print("Update inner html: $text");
+        }
+      }
+      return;
+    }
 
     diff:
     if (data.node == null) {
-      var toHydrate = node.parentNode?.data.toHydrate ?? [];
+      var toHydrate = node.parentNode.data.toHydrate;
       if (toHydrate.isNotEmpty) {
         for (var e in toHydrate) {
           if (e is html.Text) {
@@ -297,5 +323,10 @@ class BrowserDomBuilder extends DomBuilder {
     var node = child.data.node;
     print("Remove child $node of ${parent.data.node}");
     node?.remove();
+  }
+
+  @override
+  bool updateShouldNotify(covariant DomBuilder builder) {
+    return true;
   }
 }

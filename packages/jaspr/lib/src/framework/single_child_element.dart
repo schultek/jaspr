@@ -18,8 +18,8 @@ abstract class SingleChildElement extends Element {
   bool get debugDoingBuild => _debugDoingBuild;
 
   @override
-  void mount(Element? parent, Element? nextSibling) {
-    super.mount(parent, nextSibling);
+  void mount(Element? parent, Element? prevSibling) {
+    super.mount(parent, prevSibling);
     assert(_child == null);
     assert(_lifecycleState == _ElementLifecycle.active);
     _firstBuild();
