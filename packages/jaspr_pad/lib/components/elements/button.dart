@@ -4,7 +4,7 @@ import '../../adapters/mdc.dart';
 
 enum IconAffinity { left, right }
 
-class Button extends StatelessComponent {
+class Button extends StatefulComponent {
   const Button(
       {this.id,
       this.label,
@@ -31,58 +31,54 @@ class Button extends StatelessComponent {
   final VoidCallback onPressed;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'button',
-      classes: [
-        if (label != null) 'mdc-button',
-        if (label == null && icon != null) 'mdc-icon-button',
-        if (label == null && icon != null) 'material-icons',
-        if (raised) 'mdc-button--raised',
-        if (dense) 'mdc-button--dense',
-        if (dialog) 'mdc-dialog__button'
-      ],
-      id: id,
-      attributes: {if (label != null) 'type': 'button', if (disabled) 'disabled': ''},
-      events: {'click': (e) => onPressed()},
-      children: [
-        if (label != null && iconAffinity == IconAffinity.right)
-          DomComponent(
-            tag: 'span',
-            classes: ['mdc-button__label'],
-            child: Text(label!),
-          ),
-        if (label != null && icon != null)
-          DomComponent(
-            tag: 'i',
-            classes: ['material-icons mdc-button__icon'],
-            attributes: {if (hideIcon) 'aria-hidden': 'true'},
-            child: Text(icon!),
-          ),
-        if (label == null && icon != null) Text(icon!),
-        if (label != null && iconAffinity == IconAffinity.left) Text(label!),
-      ],
-    );
-  }
-
-  @override
-  Element createElement() => ButtonElement(this);
+  State<StatefulComponent> createState() => ButtonState();
 }
 
-class ButtonElement extends StatelessElement {
-  ButtonElement(Button component) : super(component);
-
-  @override
-  Button get component => super.component as Button;
-
+class ButtonState extends State<Button> {
   MDCRipple? _ripple;
 
   @override
-  void render(DomBuilder b) {
-    super.render(b);
-    if (kIsWeb && component.label != null) {
-      _ripple?.destroy();
-      _ripple = MDCRipple((children.first as DomElement).source);
-    }
+  Iterable<Component> build(BuildContext context) sync* {
+    yield FindChildNode(
+      onNodeFound: (DomNode node) {
+        if (kIsWeb) {
+          _ripple?.destroy();
+          if (component.label != null) {
+            _ripple = MDCRipple(node.nativeElement);
+          }
+        }
+      },
+      child: DomComponent(
+        tag: 'button',
+        classes: [
+          if (component.label != null) 'mdc-button',
+          if (component.label == null && component.icon != null) 'mdc-icon-button',
+          if (component.label == null && component.icon != null) 'material-icons',
+          if (component.raised) 'mdc-button--raised',
+          if (component.dense) 'mdc-button--dense',
+          if (component.dialog) 'mdc-dialog__button'
+        ],
+        id: component.id,
+        attributes: {if (component.label != null) 'type': 'button', if (component.disabled) 'disabled': ''},
+        events: {'click': (e) => component.onPressed()},
+        children: [
+          if (component.label != null && component.iconAffinity == IconAffinity.right)
+            DomComponent(
+              tag: 'span',
+              classes: ['mdc-button__label'],
+              child: Text(component.label!),
+            ),
+          if (component.label != null && component.icon != null)
+            DomComponent(
+              tag: 'i',
+              classes: ['material-icons mdc-button__icon'],
+              attributes: {if (component.hideIcon) 'aria-hidden': 'true'},
+              child: Text(component.icon!),
+            ),
+          if (component.label == null && component.icon != null) Text(component.icon!),
+          if (component.label != null && component.iconAffinity == IconAffinity.left) Text(component.label!),
+        ],
+      ),
+    );
   }
 }

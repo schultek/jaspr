@@ -4,7 +4,7 @@ import '../elements/button.dart';
 import '../elements/dialog.dart';
 
 class ResetDialog extends StatelessComponent {
-  const ResetDialog({Key? key}) : super(key: key);
+  const ResetDialog({super.key}) : super();
 
   static Future<bool?> show(BuildContext context) {
     return showDialog(context, slotId: 'dialog', builder: (_) => ResetDialog());

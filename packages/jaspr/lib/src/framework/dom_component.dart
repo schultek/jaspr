@@ -22,7 +22,7 @@ class DomComponent extends Component {
 
   final String tag;
   final String? id;
-  final Iterable<String>? classes;
+  final List<String>? classes;
   final Styles? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
@@ -35,17 +35,20 @@ class DomComponent extends Component {
   Element createElement() => DomElement(this);
 }
 
-class DomElement extends MultiChildElement with BuildScheduler {
+class DomElement extends MultiChildElement with DomNode {
   DomElement(DomComponent component) : super(component);
 
   @override
   DomComponent get component => super.component as DomComponent;
 
-  dynamic _source;
-  dynamic get source => _source;
-
   @override
   Iterable<Component> build() => component.children;
+
+  @override
+  void _firstBuild() {
+    mountNode();
+    super._firstBuild();
+  }
 
   @override
   void update(DomComponent newComponent) {
@@ -55,22 +58,16 @@ class DomElement extends MultiChildElement with BuildScheduler {
   }
 
   @override
-  void render(DomBuilder b) {
-    b.open(
+  void renderNode(DomBuilder builder) {
+    builder.renderNode(
+      this,
       component.tag,
-      // TODO currently this does not really work on first render, find better solution
-      key: component.key?.hashCode.toString(),
-      id: component.id,
-      classes: component.classes,
-      styles: component.styles?.styles,
-      attributes: component.attributes,
-      events: component.events?.map((k, v) => MapEntry(k, (e) => v(e.event))),
+      component.id,
+      component.classes,
+      component.styles?.styles,
+      component.attributes,
+      component.events,
     );
-
-    super.render(b);
-
-    _source = b.close(tag: component.tag);
-    _view = ComponentsBinding.instance!.registerView(_source, super.render, false);
   }
 }
 
@@ -87,14 +84,23 @@ class Text extends Component {
   Element createElement() => TextElement(this);
 }
 
-class TextElement extends Element {
-  TextElement(Text component) : super(component);
-
-  @override
-  Text get _component => super._component as Text;
+abstract class NoChildElement extends Element {
+  NoChildElement(Component component) : super(component);
 
   @override
   bool get debugDoingBuild => false;
+
+  @override
+  void mount(Element? parent, Element? prevSibling) {
+    super.mount(parent, prevSibling);
+    assert(_lifecycleState == _ElementLifecycle.active);
+    _firstBuild();
+  }
+
+  @mustCallSuper
+  void _firstBuild() {
+    rebuild();
+  }
 
   @override
   void performRebuild() {
@@ -103,13 +109,22 @@ class TextElement extends Element {
 
   @override
   void visitChildren(ElementVisitor visitor) {}
+}
+
+class TextElement extends NoChildElement with DomNode {
+  TextElement(Text component) : super(component);
 
   @override
-  void render(DomBuilder b) {
-    if (_component.rawHtml) {
-      b.innerHtml(_component.text);
-    } else {
-      b.text(_component.text);
-    }
+  Text get component => super.component as Text;
+
+  @override
+  void _firstBuild() {
+    mountNode();
+    super._firstBuild();
+  }
+
+  @override
+  void renderNode(DomBuilder builder) {
+    builder.renderTextNode(this, component.text, component.rawHtml);
   }
 }

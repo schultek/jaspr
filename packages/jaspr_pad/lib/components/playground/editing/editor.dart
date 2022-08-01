@@ -15,7 +15,7 @@ class EditorDocument {
   EditorDocument({required this.key, required this.source, required this.mode, this.issues = const [], this.selection});
 }
 
-class Editor extends StatelessComponent {
+class Editor extends StatefulComponent {
   const Editor(
       {required this.activeDoc, required this.documents, this.onDocumentChanged, this.onSelectionChanged, Key? key})
       : super(key: key);
@@ -26,32 +26,19 @@ class Editor extends StatelessComponent {
   final void Function(String key, int index, bool isWhitespace, bool shouldNotify)? onSelectionChanged;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      id: 'editor-host',
-      child: SkipRenderComponent(),
-    );
-  }
-
-  @override
-  Element createElement() => EditorElement(this);
+  State createState() => EditorState();
 }
 
-class EditorElement extends StatelessElement {
-  EditorElement(Editor component) : super(component);
-
-  @override
-  Editor get component => super.component as Editor;
-
+class EditorState extends State<Editor> {
   CodeMirror? _editor;
+  dynamic _editorElement;
   String? _activeDoc;
   Map<String, Doc> docs = {};
   bool _lockIsUpdating = false;
 
   @override
-  void mount(Element? parent) {
-    super.mount(parent);
+  void initState() {
+    super.initState();
     docs = {
       for (var doc in component.documents) doc.key: createDoc(doc.key, doc.source, doc.mode),
     };
@@ -59,14 +46,38 @@ class EditorElement extends StatelessElement {
   }
 
   @override
-  void update(covariant Editor newComponent) {
+  Iterable<Component> build(BuildContext context) sync* {
+    yield FindChildNode(
+      onNodeFound: (node) {
+        if (kIsWeb) {
+          if (_editor == null || node.nativeElement != _editorElement) {
+            _editor?.dispose();
+            _editorElement = node.nativeElement;
+            _editor = CodeMirror.fromElement(_editorElement!, options: codeMirrorOptions);
+            if (_activeDoc != null) {
+              _editor!.swapDoc(docs[_activeDoc!]!);
+            }
+          }
+        }
+      },
+      child: DomComponent(
+        tag: 'div',
+        id: 'editor-host',
+      ),
+    );
+  }
+
+  @override
+  void didUpdateComponent(covariant Editor oldComponent) {
+    super.didUpdateComponent(oldComponent);
+
     if (kIsWeb && _editor != null) {
       _lockIsUpdating = true;
       try {
         var oldDocs = {...docs};
         docs = {};
 
-        for (var document in newComponent.documents) {
+        for (var document in component.documents) {
           if (oldDocs.containsKey(document.key)) {
             var doc = oldDocs.remove(document.key)!;
             if (doc.getValue() != document.source) {
@@ -107,16 +118,15 @@ class EditorElement extends StatelessElement {
           doc.dispose();
         }
 
-        if (newComponent.activeDoc != null && newComponent.activeDoc != _activeDoc) {
-          assert(docs.containsKey(newComponent.activeDoc));
-          _editor!.swapDoc(docs[newComponent.activeDoc!]!);
-          _activeDoc = newComponent.activeDoc!;
+        if (component.activeDoc != null && component.activeDoc != _activeDoc) {
+          assert(docs.containsKey(component.activeDoc));
+          _editor!.swapDoc(docs[component.activeDoc!]!);
+          _activeDoc = component.activeDoc!;
         }
       } finally {
         _lockIsUpdating = false;
       }
     }
-    super.update(newComponent);
   }
 
   Doc createDoc(String key, String source, String mode) {
@@ -134,18 +144,5 @@ class EditorElement extends StatelessElement {
       component.onSelectionChanged?.call(key, index, isWhitespace, !_lockIsUpdating);
     });
     return doc;
-  }
-
-  @override
-  void render(DomBuilder b) {
-    super.render(b);
-
-    if (kIsWeb && _editor == null) {
-      var element = (children.first as DomElement).source;
-      _editor = CodeMirror.fromElement(element, options: codeMirrorOptions);
-      if (_activeDoc != null) {
-        _editor!.swapDoc(docs[_activeDoc!]!);
-      }
-    }
   }
 }

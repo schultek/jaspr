@@ -12,7 +12,6 @@ abstract class MultiChildElement extends Element {
   /// This list is filtered to hide elements that have been forgotten (using
   /// [forgetChild]).
   @protected
-  @visibleForTesting
   Iterable<Element> get children => _children!.where((Element child) => !_forgottenChildren.contains(child));
 
   List<Element>? _children;
@@ -25,8 +24,8 @@ abstract class MultiChildElement extends Element {
   bool get debugDoingBuild => _debugDoingBuild;
 
   @override
-  void mount(Element? parent) {
-    super.mount(parent);
+  void mount(Element? parent, Element? prevSibling) {
+    super.mount(parent, prevSibling);
     assert(_children == null);
     assert(_lifecycleState == _ElementLifecycle.active);
     _firstBuild();
@@ -133,13 +132,16 @@ abstract class MultiChildElement extends Element {
         ? oldChildren
         : List<Element?>.filled(newComponents.length, null, growable: true);
 
+    Element? prevChild;
+
     // Update the top of the list.
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
       final Component newComponent = newComponents[newChildrenTop];
       if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
-      final Element newChild = updateChild(oldChild, newComponent)!;
+      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
+      prevChild = newChild;
       newChildrenTop += 1;
       oldChildrenTop += 1;
     }
@@ -191,8 +193,9 @@ abstract class MultiChildElement extends Element {
           }
         }
       }
-      final Element newChild = updateChild(oldChild, newComponent)!;
+      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
+      prevChild = newChild;
       newChildrenTop += 1;
     }
 
@@ -204,8 +207,9 @@ abstract class MultiChildElement extends Element {
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element oldChild = oldChildren[oldChildrenTop];
       final Component newComponent = newComponents[newChildrenTop];
-      final Element newChild = updateChild(oldChild, newComponent)!;
+      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
+      prevChild = newChild;
       newChildrenTop += 1;
       oldChildrenTop += 1;
     }
@@ -217,14 +221,9 @@ abstract class MultiChildElement extends Element {
       }
     }
 
-    return newChildren.cast<Element>();
-  }
+    assert(newChildren.every((element) => element != null));
 
-  @override
-  void render(DomBuilder b) {
-    for (var child in _children!) {
-      child.render(b);
-    }
+    return newChildren.cast<Element>();
   }
 
   /// Subclasses should override this function to actually call the appropriate

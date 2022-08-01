@@ -82,51 +82,28 @@ class Dialog extends StatelessComponent {
   }
 }
 
-class DialogSlot extends StatelessComponent {
+class DialogSlot extends StatefulComponent {
   const DialogSlot({required this.slotId, Key? key}) : super(key: key);
 
   final String slotId;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    var state = context.watch(_dialogStateProvider(slotId));
-
-    yield DomComponent(
-      tag: 'div',
-      classes: ['mdc-dialog', if (state != null) 'mdc-dialog--open'],
-      attributes: {'role': 'alertdialog', 'aria-modal': 'true'},
-      children: [
-        if (state != null) state.builder(context) else Dialog(content: Text(''), title: '', actions: []),
-        DomComponent(
-          tag: 'div',
-          classes: ['mdc-dialog__scrim'],
-        ),
-      ],
-    );
-  }
-
-  @override
-  Element createElement() => DialogSlotElement(this);
+  State createState() => DialogState();
 }
 
-class DialogSlotElement extends StatelessElement {
-  DialogSlotElement(DialogSlot component) : super(component);
-
-  @override
-  DialogSlot get component => super.component as DialogSlot;
-
-  ProviderSubscription<_DialogState?>? _sub;
+class DialogState extends State<DialogSlot> {
   MDCDialog? _dialog;
+  ProviderSubscription<_DialogState?>? _sub;
 
   @override
-  void mount(Element? parent) {
-    super.mount(parent);
+  void initState() {
+    super.initState();
     subscribeToOpenState();
   }
 
   void subscribeToOpenState() {
     _sub?.close();
-    _sub = subscribe<_DialogState?>(_dialogStateProvider(component.slotId), (_, state) {
+    _sub = context.subscribe<_DialogState?>(_dialogStateProvider(component.slotId), (_, state) {
       if (state != null && _dialog != null && !_dialog!.isOpen) {
         _dialog!.open();
       } else if (state == null && _dialog != null && _dialog!.isOpen) {
@@ -136,28 +113,44 @@ class DialogSlotElement extends StatelessElement {
   }
 
   @override
-  void update(covariant Dialog newComponent) {
-    var oldComponent = component;
-    super.update(newComponent);
+  void didUpdateComponent(covariant DialogSlot oldComponent) {
+    super.didUpdateComponent(oldComponent);
     if (oldComponent.slotId != component.slotId) {
       subscribeToOpenState();
     }
   }
 
   @override
-  void unmount() {
+  void dispose() {
     _sub?.close();
-    super.unmount();
+    super.dispose();
   }
 
   @override
-  void render(DomBuilder b) {
-    super.render(b);
-    if (kIsWeb && _dialog == null) {
-      _dialog = MDCDialog((children.first as DomElement).source);
-      _dialog!.listen('MDCDialog:closed', (e) {
-        read(_dialogStateProvider(component.slotId))?.onResult(null);
-      });
-    }
+  Iterable<Component> build(BuildContext context) sync* {
+    var state = context.watch(_dialogStateProvider(component.slotId));
+
+    yield FindChildNode(
+      onNodeFound: (node) {
+        if (kIsWeb) {
+          _dialog ??= MDCDialog(node.nativeElement);
+          _dialog!.listen('MDCDialog:closed', (event) {
+            context.read(_dialogStateProvider(component.slotId))?.onResult(null);
+          });
+        }
+      },
+      child: DomComponent(
+        tag: 'div',
+        classes: ['mdc-dialog', if (state != null) 'mdc-dialog--open'],
+        attributes: {'role': 'alertdialog', 'aria-modal': 'true'},
+        children: [
+          if (state != null) state.builder(context) else Dialog(content: Text(''), title: '', actions: []),
+          DomComponent(
+            tag: 'div',
+            classes: ['mdc-dialog__scrim'],
+          ),
+        ],
+      ),
+    );
   }
 }
