@@ -1,83 +1,63 @@
 import 'dart:math' as math;
+
+import 'package:mobx/mobx.dart'
+    show Atom, AtomSpyReporter, Derivation, mainContext;
+
 import 'package:jaspr/jaspr.dart';
-import 'package:mobx/mobx.dart' show Observable, mainContext;
 // ignore: implementation_imports
 import 'package:mobx/src/core.dart' show ReactionImpl;
 
-abstract class StatelessObserverComponent extends StatelessComponent {
+class MobXHooksObserverComponent extends ObserverComponent {
   /// Initializes [key] for subclasses.
-  const StatelessObserverComponent({super.key});
+  const MobXHooksObserverComponent({required super.child});
 
   @override
-  Element createElement() => StatelessObserverElement(this);
+  MobXHooksObserverElement createElement() => MobXHooksObserverElement(this);
 }
 
-class StatelessObserverElement extends StatelessElement {
-  StatelessObserverElement(super.component);
+class MobXHooksObserverElement extends ObserverElement {
+  MobXHooksObserverElement(super.component);
 
-  final HookCtx ctx = HookCtx();
-
-  List<Component> _build() => super.build().toList();
+  final Map<Element, HookCtx> hookContexts = {};
 
   @override
   void unmount() {
-    ctx.dispose();
+    for (final hook in hookContexts.values) {
+      hook._dispose();
+    }
+    hookContexts.clear();
     super.unmount();
   }
 
   @override
-  Iterable<Component> build() {
-    final children = _mobxHooksWrapper(ctx, markNeedsBuild, _build);
-    // TODO: test hook effect execution timing
+  void willRebuildElement(Element element) {
+    final ctx = hookContexts.putIfAbsent(
+      element,
+      () => HookCtx(element.markNeedsBuild),
+    );
+    ctx._previous = _ctx;
+    _ctx = ctx;
+    ctx._startTracking();
+
+    print('willRebuildElement ${ctx.hashCode} ${element.hashCode}');
+  }
+
+  @override
+  void didRebuildElement(Element element) {
+    print('didRebuildElement ${ctx.hashCode} ${element.hashCode}');
+
     ctx._afterRender();
-    return children;
-  }
-}
-
-abstract class StatefulObserverComponent extends StatefulComponent {
-  /// Initializes [key] for subclasses.
-  const StatefulObserverComponent({super.key});
-
-  @override
-  Element createElement() => StatefulObserverElement(this);
-}
-
-class StatefulObserverElement extends StatefulElement {
-  StatefulObserverElement(super.component);
-
-  final HookCtx ctx = HookCtx();
-
-  List<Component> _build() => super.build().toList();
-
-  @override
-  void unmount() {
-    ctx.dispose();
-    super.unmount();
+    _ctx = ctx._previous;
   }
 
   @override
-  Iterable<Component> build() {
-    final children = _mobxHooksWrapper(ctx, markNeedsBuild, _build);
-    // TODO: test hook effect execution timing
-    ctx._afterRender();
-    return children;
+  void didUnmountElement(Element element) {
+    final ctx = hookContexts.remove(element);
+    print('didUnmountElement ${ctx?.hashCode} ${element.hashCode}');
+    if (ctx != null) {
+      ctx._dispose();
+    }
   }
-}
-
-List<Component> _mobxHooksWrapper(
-  HookCtx ctx,
-  void Function() markNeedsBuild,
-  List<Component> Function() next,
-) {
-  final previousCtx = _ctx;
-  _ctx = ctx;
-  final List<Component> children = useTrack(
-    next,
-    markNeedsBuild,
-    name: ctx.hashCode.toString(),
-  );
-  _ctx = previousCtx;
-  return children;
 }
 
 T useTrack<T>(
@@ -118,7 +98,32 @@ class Ref<T> {
   T value;
 }
 
-typedef Obs<T> = Observable<T>;
+class Obs<T> {
+  Obs(
+    this._value, {
+    String? name,
+  }) : _atom = Atom(name: name);
+
+  final Atom _atom;
+  String get name => _atom.name;
+  T _value;
+
+  T get value {
+    _atom.reportObserved();
+    return _value;
+  }
+
+  set value(T v) {
+    if (_value == v) return;
+    _atom.reportWrite(v, _value, () {
+      _value = v;
+    });
+  }
+
+  void set(T v) {
+    value = v;
+  }
+}
 
 /// A function to be called to cleanup an effect.
 typedef Cleanup = void Function();
@@ -160,8 +165,29 @@ class HookCtx {
   List<HookEffect> _previousHookEffects = [];
   bool _disposed = false;
   bool get disposed => _disposed;
-  // bool _rendering = false;
-  // bool get rendering => _rendering;
+  HookCtx? _previous;
+
+  HookCtx(this._onDependencyChange);
+  final void Function() _onDependencyChange;
+
+  String get _name => hashCode.toString();
+
+  late final _reaction = ReactionImpl(
+    mainContext,
+    () {
+      print('$_name dependency-change');
+      _onDependencyChange();
+    },
+    name: _name,
+    onError: (err, stackTrace) =>
+        print('ReactionImplError $_name $err $stackTrace'),
+  );
+
+  Derivation? _derivation;
+
+  void _startTracking() {
+    _derivation = _reaction.startTracking();
+  }
 
   static bool areKeysDifferent(
     List<Object?>? prevKeys,
@@ -175,7 +201,10 @@ class HookCtx {
             prevKeys.any((e) => !isEqual(e, newKeys[i++])));
   }
 
+  // TODO: test timing
   void _afterRender() {
+    _reaction.endTracking(_derivation);
+
     for (int i = 0;
         i < math.max(_hookEffects.length, _previousHookEffects.length);
         i++) {
@@ -207,12 +236,13 @@ class HookCtx {
     _hookObsIndex = 0;
   }
 
-  void dispose() {
+  void _dispose() {
     if (disposed) return;
     _disposed = true;
     for (final hook in _previousHookEffects) {
       hook.cleanup?.call();
     }
+    _reaction.dispose();
   }
 }
 
