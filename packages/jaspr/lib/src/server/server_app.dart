@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
+import 'package:shelf_gzip/shelf_gzip.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
@@ -259,7 +260,7 @@ Handler _createHandler(_SetupHandler handle, {List<Middleware> middleware = cons
     cascade = cascade.add(_sseProxyHandler(sseUri, serverSseUri));
   }
 
-  cascade = cascade.add(staticHandler).add(_proxyRootIndexHandler(staticHandler));
+  cascade = cascade.add(gzipMiddleware(staticHandler)).add(proxyRootIndexHandler(staticHandler));
 
   var resourceHandler = cascade.handler;
 
