@@ -12,3 +12,7 @@ html, body {
   padding: 20px;
   text-align: center;
 }
+
+button, input, select {
+  padding: 4px 6px;
+}
