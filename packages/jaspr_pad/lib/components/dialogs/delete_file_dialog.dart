@@ -4,7 +4,7 @@ import '../elements/button.dart';
 import '../elements/dialog.dart';
 
 class DeleteFileDialog extends StatelessComponent {
-  const DeleteFileDialog({required this.file, Key? key}) : super(key: key);
+  const DeleteFileDialog({required this.file, super.key});
 
   final String file;
 

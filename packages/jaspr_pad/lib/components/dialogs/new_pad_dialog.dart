@@ -4,7 +4,7 @@ import '../elements/button.dart';
 import '../elements/dialog.dart';
 
 class NewPadDialog extends StatelessComponent {
-  const NewPadDialog({Key? key}) : super(key: key);
+  const NewPadDialog({super.key});
 
   static Future<bool?> show(BuildContext context) {
     return showDialog(context, slotId: 'dialog', builder: (_) => NewPadDialog());

@@ -8,40 +8,24 @@ class ExecutionIFrame extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'iframe',
-      id: 'frame',
-      attributes: {
-        'sandbox': 'allow-scripts allow-popups',
-        'flex': '',
-        'src': 'https://dartpad.dev/scripts/frame_dark.html',
-      },
-    );
-  }
-
-  @override
-  Element createElement() => ExecutionIFrameElement(this);
-}
-
-class ExecutionIFrameElement extends StatelessElement {
-  ExecutionIFrameElement(ExecutionIFrame component) : super(component);
-
-  dynamic element;
-
-  @override
-  void render(DomBuilder b) {
-    if (element == null) {
-      super.render(b);
-
-      if (kIsWeb) {
-        element = (children.first as DomElement).source;
-        var iframe = read(iframeProvider);
-        if (iframe == null || iframe != element) {
-          read(iframeProvider.notifier).state = element;
+    yield FindChildNode(
+      onNodeFound: (node) {
+        if (kIsWeb) {
+          var iframe = context.read(iframeProvider);
+          if (iframe == null || iframe != node.nativeElement) {
+            context.read(iframeProvider.notifier).state = node.nativeElement;
+          }
         }
-      }
-    } else {
-      b.skipRemainingNodes();
-    }
+      },
+      child: DomComponent(
+        tag: 'iframe',
+        id: 'frame',
+        attributes: {
+          'sandbox': 'allow-scripts allow-popups',
+          'flex': '',
+          'src': 'https://dartpad.dev/scripts/frame_dark.html',
+        },
+      ),
+    );
   }
 }

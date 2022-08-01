@@ -4,7 +4,7 @@ import 'package:jaspr/jaspr.dart';
 
 import '../../adapters/html.dart' as html;
 
-class Splitter extends StatelessComponent {
+class Splitter extends StatefulComponent {
   const Splitter({required this.children, this.horizontal = true, this.initialSizes, Key? key}) : super(key: key);
 
   final List<Component> children;
@@ -12,17 +12,116 @@ class Splitter extends StatelessComponent {
   final List<double>? initialSizes;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield* children;
+  State createState() => SplitterState();
+}
+
+class SplitterState extends State<Splitter> {
+  late var sizes = component.initialSizes ?? <double>[];
+  var splitPairs = <SplitPair>[];
+
+  @override
+  void initState() {
+    super.initState();
+    updatePairs();
   }
 
   @override
-  Element createElement() => SplitterElement(this);
+  void didUpdateComponent(Splitter oldComponent) {
+    super.didUpdateComponent(oldComponent);
+    updatePairs();
+  }
+
+  void updatePairs() {
+    if (sizes.length != component.children.length) {
+      sizes = List.filled(component.children.length, 100 / component.children.length);
+    }
+    splitPairs = List.generate(component.children.length - 1, (i) => SplitPair(this, i));
+  }
+
+  void adjustSizes(double offset, int index) {
+    var percentage = sizes[index] + sizes[index + 1];
+
+    sizes[index] = (offset * percentage * 100).roundToDouble() / 100;
+    sizes[index + 1] = ((percentage - offset * percentage) * 100).roundToDouble() / 100;
+
+    setState(() {});
+  }
+
+  void updateSelf() {
+    setState(() {});
+  }
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    for (var i = 0; i < component.children.length; i++) {
+      if (i > 0) {
+        var pair = splitPairs[i - 1];
+        yield DomComponent(
+          tag: 'div',
+          classes: ['gutter', 'gutter-${component.horizontal ? 'horizontal' : 'vertical'}'],
+          styles: {'flex-basis': '6px'},
+          events: {'mousedown': (e) => pair.startDragging(e)},
+        );
+      }
+
+      var dragging =
+          (i > 0 ? splitPairs[i - 1].dragging : false) || (i < splitPairs.length ? splitPairs[i].dragging : false);
+
+      yield DomBuilder.delegate(
+        builder: SplitElementBuilder(
+          size: sizes[i],
+          dragging: dragging,
+          onNode: (node) {
+            if (i > 0) splitPairs[i - 1].b = node;
+            if (i < splitPairs.length) splitPairs[i].a = node;
+          },
+        ),
+        child: component.children[i],
+      );
+    }
+  }
+}
+
+class SplitElementBuilder extends DelegatingDomBuilder {
+  SplitElementBuilder({required this.size, required this.dragging, required this.onNode});
+
+  final double size;
+  final bool dragging;
+  final void Function(DomNode) onNode;
+
+  @override
+  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+      Map<String, String>? attributes, Map<String, EventCallback>? events) {
+    if (isDirectChild(node)) {
+      styles = {
+        ...?styles,
+        'flex-basis': 'calc($size% - 3px)',
+        if (dragging) ...{
+          'user-select': 'none',
+          'pointer-events': 'none',
+        }
+      };
+    }
+    super.renderNode(node, tag, id, classes, styles, attributes, events);
+    if (isDirectChild(node)) {
+      onNode(node);
+    }
+  }
+
+  @override
+  bool updateShouldNotify(covariant SplitElementBuilder oldBuilder) {
+    return size != oldBuilder.size || dragging != oldBuilder.dragging || super.updateShouldNotify(oldBuilder);
+  }
+
+  @override
+  bool shouldNotifyDependent(DomNode dependent) {
+    return isDirectChild(dependent);
+  }
 }
 
 class SplitPair {
-  SplitterElement parent;
-  DomElement a, b;
+  SplitterState parent;
+  DomNode? a, b;
   bool dragging;
   int index;
 
@@ -31,7 +130,7 @@ class SplitPair {
   double? _end;
   double? _dragOffset;
 
-  SplitPair(this.parent, this.index, this.a, this.b, {this.dragging = false});
+  SplitPair(this.parent, this.index, {this.dragging = false});
 
   void drag(html.Event e) {
     if (!dragging) return;
@@ -52,6 +151,12 @@ class SplitPair {
       return;
     }
 
+    print("START DRAG ${this.a} ${this.b}");
+
+    if (this.a == null || this.b == null) {
+      return;
+    }
+
     e.preventDefault();
 
     dragging = true;
@@ -61,8 +166,8 @@ class SplitPair {
     var h = parent.component.horizontal;
     html.document.body!.style.cursor = h ? 'col-resize' : 'row-resize';
 
-    var a = (this.a.source as html.Element).getBoundingClientRect();
-    var b = (this.b.source as html.Element).getBoundingClientRect();
+    var a = (this.a!.nativeElement).getBoundingClientRect();
+    var b = (this.b!.nativeElement).getBoundingClientRect();
 
     _size = (h ? (a.width + b.width) : (a.height + b.height)) + 6;
     _start = (h ? a.left : a.top) + 0.0;
@@ -70,7 +175,7 @@ class SplitPair {
 
     _dragOffset = (h ? e.client.x : e.client.y) - _end!;
 
-    parent.invalidateSelf();
+    parent.updateSelf();
   }
 
   void stopDragging(html.Event e) {
@@ -81,137 +186,6 @@ class SplitPair {
 
     html.document.body!.style.cursor = '';
 
-    parent.invalidateSelf();
-  }
-}
-
-class SplitterElement extends StatelessElement {
-  SplitterElement(Splitter component) : super(component);
-
-  @override
-  Splitter get component => super.component as Splitter;
-
-  late var sizes = component.initialSizes ?? <double>[];
-  var splitPairs = <SplitPair>[];
-
-  Map<String, String> getElementStyle(int childIndex) {
-    var size = sizes[childIndex];
-    var dragging = (childIndex > 0 ? splitPairs[childIndex - 1].dragging : false) ||
-        (childIndex < splitPairs.length ? splitPairs[childIndex].dragging : false);
-    return {
-      'flex-basis': 'calc($size% - 3px)',
-      if (dragging) ...{
-        'user-select': 'none',
-        'pointer-events': 'none',
-      },
-    };
-  }
-
-  void renderGutter(DomBuilder b, int gutterIndex) {
-    var pair = splitPairs[gutterIndex];
-    b.open(
-      'div',
-      classes: ['gutter', 'gutter-${component.horizontal ? 'horizontal' : 'vertical'}'],
-      styles: {'flex-basis': '6px'},
-      events: {'mousedown': (e) => pair.startDragging(e.event)},
-    );
-    b.close();
-  }
-
-  void adjustSizes(double offset, int index) {
-    var percentage = sizes[index] + sizes[index + 1];
-
-    sizes[index] = (offset * percentage * 100).roundToDouble() / 100;
-    sizes[index + 1] = ((percentage - offset * percentage) * 100).roundToDouble() / 100;
-
-    invalidate();
-  }
-
-  @override
-  void performRebuild() {
-    super.performRebuild();
-
-    var elements = <DomElement>[];
-
-    visitDomChild(Element child) {
-      if (child is DomElement) {
-        elements.add(child);
-      } else {
-        child.visitChildren(visitDomChild);
-      }
-    }
-
-    visitChildren(visitDomChild);
-
-    if (sizes.length != elements.length) {
-      sizes = List.filled(elements.length, 100 / elements.length);
-    }
-    splitPairs = List.generate(elements.length - 1, (i) => SplitPair(this, i, elements[i], elements[i + 1]));
-  }
-
-  @override
-  void render(DomBuilder b) {
-    super.render(SplitterBuilder(this, b));
-  }
-
-  void invalidateSelf() {
-    invalidate();
-  }
-}
-
-class SplitterBuilder extends WrappedDomBuilder {
-  SplitterElement element;
-
-  SplitterBuilder(this.element, DomBuilder builder) : super(builder);
-
-  int depth = 0;
-  int childIndex = 0;
-
-  @override
-  void open(
-    String tag, {
-    String? key,
-    String? id,
-    Iterable<String>? classes,
-    Map<String, String>? styles,
-    Map<String, String>? attributes,
-    Map<String, DomEventFn>? events,
-    DomLifecycleEventFn? onCreate,
-    DomLifecycleEventFn? onUpdate,
-    DomLifecycleEventFn? onRemove,
-  }) {
-    if (depth == 0 && childIndex != 0) {
-      element.renderGutter(builder, childIndex - 1);
-    }
-
-    if (depth == 0) {
-      styles = {...element.getElementStyle(childIndex), ...styles ?? {}};
-    }
-
-    super.open(
-      tag,
-      key: key,
-      id: id,
-      classes: classes,
-      styles: styles,
-      attributes: attributes,
-      events: events,
-      onCreate: onCreate,
-      onUpdate: onUpdate,
-      onRemove: onRemove,
-    );
-
-    depth++;
-  }
-
-  @override
-  dynamic close({String? tag}) {
-    var e = super.close(tag: tag);
-    depth--;
-
-    if (depth == 0) {
-      childIndex++;
-    }
-    return e;
+    parent.updateSelf();
   }
 }

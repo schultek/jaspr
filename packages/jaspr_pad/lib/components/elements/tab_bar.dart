@@ -6,7 +6,7 @@ import '../../adapters/mdc.dart';
 final tabSelectedProvider = Provider<bool>((ref) => false);
 final tabCallbackProvider = Provider<VoidCallback>((ref) => () {});
 
-class TabBar extends StatelessComponent {
+class TabBar extends StatefulComponent {
   const TabBar(
       {required this.id, required this.selected, required this.onSelected, required this.tabs, this.leading, Key? key})
       : super(key: key);
@@ -17,65 +17,59 @@ class TabBar extends StatelessComponent {
   final List<Tab> tabs;
   final Component? leading;
 
+
+  @override
+  State createState() => TabBarState();
+}
+
+class TabBarState extends State<TabBar> {
+  MDCTabBar? _tabBar;
+
   void _select(int tab) {
-    onSelected(tab);
+    component.onSelected(tab);
   }
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      id: id,
-      classes: ['mdc-tab-bar'],
-      styles: {'min-width': '1px'},
-      attributes: {'role': 'tablist'},
+    yield FindChildNode(
+      onNodeFound: (node) {
+        if (kIsWeb && _tabBar == null) {
+          _tabBar = MDCTabBar(node.nativeElement)
+            ..activateTab(component.selected + (component.leading != null ? 1 : 0));
+        }
+      },
       child: DomComponent(
         tag: 'div',
-        classes: ['mdc-tab-scroller'],
+        id: component.id,
+        classes: ['mdc-tab-bar'],
+        styles: {'min-width': '1px'},
+        attributes: {'role': 'tablist'},
         child: DomComponent(
           tag: 'div',
-          classes: ['mdc-tab-scroller__scroll-area'],
+          classes: ['mdc-tab-scroller'],
           child: DomComponent(
             tag: 'div',
-            classes: ['mdc-tab-scroller__scroll-content'],
-            children: [
-              if (leading != null) leading!,
-              for (var i = 0; i < tabs.length; i++)
-                ProviderScope(
-                  key: ValueKey('tab-provider'),
-                  overrides: [
-                    tabSelectedProvider.overrideWithValue(i == selected),
-                    tabCallbackProvider.overrideWithValue(() => _select(i)),
-                  ],
-                  child: tabs[i],
-                ),
-            ],
+            classes: ['mdc-tab-scroller__scroll-area'],
+            child: DomComponent(
+              tag: 'div',
+              classes: ['mdc-tab-scroller__scroll-content'],
+              children: [
+                if (component.leading != null) component.leading!,
+                for (var i = 0; i < component.tabs.length; i++)
+                  ProviderScope(
+                    key: ValueKey('tab-provider'),
+                    overrides: [
+                      tabSelectedProvider.overrideWithValue(i == component.selected),
+                      tabCallbackProvider.overrideWithValue(() => _select(i)),
+                    ],
+                    child: component.tabs[i],
+                  ),
+              ],
+            ),
           ),
         ),
       ),
     );
-  }
-
-  @override
-  Element createElement() => TabBarElement(this);
-}
-
-class TabBarElement extends StatelessElement {
-  TabBarElement(TabBar component) : super(component);
-
-  @override
-  TabBar get component => super.component as TabBar;
-
-  MDCTabBar? _tabBar;
-
-  @override
-  void render(DomBuilder b) {
-    super.render(b);
-
-    if (kIsWeb && _tabBar == null) {
-      var tabBarRoot = (children.first as DomElement).source;
-      _tabBar = MDCTabBar(tabBarRoot)..activateTab(component.selected + (component.leading != null ? 1 : 0));
-    }
   }
 }
 

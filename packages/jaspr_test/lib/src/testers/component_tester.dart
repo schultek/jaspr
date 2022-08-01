@@ -77,7 +77,7 @@ class ComponentTester {
   }
 }
 
-class TestComponentsBinding extends BindingBase with ComponentsBinding, SyncBinding, SchedulerBinding {
+class TestComponentsBinding extends BindingBase with SchedulerBinding, ComponentsBinding, SyncBinding {
   static TestComponentsBinding get instance => ComponentsBinding.instance as TestComponentsBinding;
 
   TestComponentsBinding(this._currentUri, this._isClient);
@@ -115,7 +115,7 @@ class TestComponentsBinding extends BindingBase with ComponentsBinding, SyncBind
 
   @override
   void scheduleBuild(VoidCallback buildCallback) {
-    Future(buildCallback);
+    Future(() => handleFrame(buildCallback));
   }
 }
 
@@ -123,9 +123,13 @@ final _nodesExpando = Expando<DomNodeData>();
 
 class DomNodeData {
   String? tag;
-  Map<String, String>? attrs;
+  String? id;
+  List<String>? classes;
+  Map<String, String>? styles;
+  Map<String, String>? attributes;
   Map<String, EventCallback>? events;
   String? text;
+  bool? rawHtml;
   List<DomNode> children = [];
 }
 
@@ -142,16 +146,22 @@ class TestDomBuilder extends DomBuilder {
   }
 
   @override
-  void renderNode(DomNode node, String tag, Map<String, String> attrs, Map<String, EventCallback> events) {
+  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+      Map<String, String>? attributes, Map<String, EventCallback>? events) {
     node.testData
       ..tag = tag
-      ..attrs = attrs
+      ..id = id
+      ..classes = classes
+      ..styles = styles
+      ..attributes = attributes
       ..events = events;
   }
 
   @override
-  void renderTextNode(DomNode node, String text) {
-    node.testData.text = text;
+  void renderTextNode(DomNode node, String text, [bool rawHtml = false]) {
+    node.testData
+      ..text = text
+      ..rawHtml = rawHtml;
   }
 
   @override
