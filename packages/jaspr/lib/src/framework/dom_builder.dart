@@ -136,6 +136,8 @@ abstract class DomBuilder {
 
   void renderTextNode(DomNode node, String text, [bool rawHtml = false]);
 
+  void skipContent(DomNode node);
+
   void renderChildNode(DomNode node, DomNode child, DomNode? after);
 
   void didPerformRebuild(DomNode node);
@@ -177,6 +179,13 @@ abstract class DelegatingDomBuilder implements DomBuilder {
   @mustCallSuper
   void renderTextNode(DomNode node, String text, [bool rawHtml = false]) {
     _parent!.renderTextNode(node, text, rawHtml);
+  }
+
+  @override
+  @protected
+  @mustCallSuper
+  void skipContent(DomNode node) {
+    _parent!.skipContent(node);
   }
 
   @override

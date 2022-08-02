@@ -281,16 +281,21 @@ class BrowserDomBuilder extends DomBuilder {
   }
 
   @override
+  void skipContent(DomNode node) {
+    node.parentNode.data.toHydrate.clear();
+  }
+
+  @override
   void renderChildNode(DomNode node, DomNode child, DomNode? after) {
     var parentNode = node.data.node;
     var childNode = child.data.node;
 
     assert(parentNode is html.Element);
-    assert(childNode != null);
+    if (childNode == null) return;
 
     var afterNode = after?.data.node;
 
-    if (childNode!.previousNode == afterNode && childNode.parentNode == parentNode) {
+    if (childNode.previousNode == afterNode && childNode.parentNode == parentNode) {
       return;
     }
 
