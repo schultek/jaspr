@@ -7,10 +7,11 @@ class _BoxStyles implements Styles {
   final Unit? width;
   final Unit? height;
   final Border? border;
-  // final Outline? outline;
-  // final Overflow? overflow;
-  // final Visibility? visibility;
-  // final Position? position;
+  final BorderRadius? radius;
+  final Outline? outline;
+  final Overflow? overflow;
+  final Visibility? visibility;
+  final Position? position;
   final double? opacity;
 
   const _BoxStyles({
@@ -20,22 +21,27 @@ class _BoxStyles implements Styles {
     this.width,
     this.height,
     this.border,
-    // this.outline,
-    // this.overflow,
-    // this.visibility,
-    // this.position,
+    this.radius,
+    this.outline,
+    this.overflow,
+    this.visibility,
+    this.position,
     this.opacity,
   });
 
   @override
   Map<String, String> get styles => {
-        if (padding != null) ...padding!.styles._prefixed('padding'),
-        if (margin != null) ...margin!.styles._prefixed('margin'),
+        ...?padding?.styles._prefixed('padding'),
+        ...?margin?.styles._prefixed('margin'),
         if (display != null) 'display': display!.value,
         if (width != null) 'width': width!.value,
         if (height != null) 'height': height!.value,
-        if (border != null) ...border!.styles,
+        ...?border?.styles,
         if (opacity != null) 'opacity': opacity!.toString(),
+        ...?outline?.styles,
+        ...?radius?.styles,
+        ...?overflow?.styles,
+        ...?position?.styles,
       };
 }
 

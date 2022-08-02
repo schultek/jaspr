@@ -4,6 +4,7 @@ import 'properties/background.dart';
 import 'properties/box.dart';
 import 'properties/color.dart';
 import 'properties/edge_insets.dart';
+import 'properties/position.dart';
 import 'properties/text.dart';
 import 'properties/unit.dart';
 
@@ -55,11 +56,11 @@ abstract class Styles {
     Unit? width,
     Unit? height,
     Border? border,
-    // BorderRadius radius,
-    // Outline? outline,
-    // Overflow? overflow,
-    // Visibility? visibility,
-    // Position? position,
+    BorderRadius? radius,
+    Outline? outline,
+    Overflow? overflow,
+    Visibility? visibility,
+    Position? position,
     double? opacity,
   }) = _BoxStyles;
 
