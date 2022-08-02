@@ -260,7 +260,7 @@ Handler _createHandler(_SetupHandler handle, {List<Middleware> middleware = cons
     cascade = cascade.add(_sseProxyHandler(sseUri, serverSseUri));
   }
 
-  cascade = cascade.add(gzipMiddleware(staticHandler)).add(proxyRootIndexHandler(staticHandler));
+  cascade = cascade.add(gzipMiddleware(staticHandler)).add(_proxyRootIndexHandler(staticHandler));
 
   var resourceHandler = cascade.handler;
 
