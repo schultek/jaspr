@@ -23,7 +23,7 @@ class _BackgroundStyles implements Styles {
 
   @override
   Map<String, String> get styles => {
-        if (color != null) 'color': color!.value,
+        if (color != null) 'background-color': color!.value,
         if (attachment != null) 'background-attachment': attachment!.value,
         if (clip != null) 'background-clip': clip!.value,
         if (image != null) 'background-image': image!.value,
