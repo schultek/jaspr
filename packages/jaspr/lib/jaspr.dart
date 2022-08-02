@@ -5,7 +5,6 @@ export 'src/bindings/bindings.dart';
 export 'src/components/async.dart';
 export 'src/components/basic.dart';
 export 'src/components/child_node.dart';
-export 'src/components/render.dart';
 export 'src/foundation/basic_types.dart';
 export 'src/foundation/binding.dart';
 export 'src/foundation/change_notifier.dart';

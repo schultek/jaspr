@@ -128,3 +128,28 @@ class TextElement extends NoChildElement with DomNode {
     builder.renderTextNode(this, component.text, component.rawHtml);
   }
 }
+
+class SkipContent extends Component {
+  const SkipContent();
+
+  @override
+  Element createElement() => SkipContentElement(this);
+}
+
+class SkipContentElement extends NoChildElement with DomNode {
+  SkipContentElement(SkipContent component) : super(component);
+
+  @override
+  SkipContent get component => super.component as SkipContent;
+
+  @override
+  void _firstBuild() {
+    mountNode();
+    super._firstBuild();
+  }
+
+  @override
+  void renderNode(DomBuilder builder) {
+    builder.skipContent(this);
+  }
+}

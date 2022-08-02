@@ -134,6 +134,11 @@ class MarkupDomBuilder extends DomBuilder {
   }
 
   @override
+  void skipContent(DomNode node) {
+    // noop
+  }
+
+  @override
   void renderChildNode(DomNode node, DomNode child, DomNode? after) {
     var children = node.data.children;
     children.remove(child);
