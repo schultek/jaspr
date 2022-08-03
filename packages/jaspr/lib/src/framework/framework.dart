@@ -566,7 +566,6 @@ abstract class Element implements BuildContext {
       }
     }
     _inheritedElements = null;
-    _observerElements = null;
     _lifecycleState = _ElementLifecycle.inactive;
   }
 
@@ -591,6 +590,13 @@ abstract class Element implements BuildContext {
     assert(_depth != null);
     assert(_owner != null);
 
+    if (_observerElements != null) {
+      for (var observer in _observerElements!) {
+        observer.didUnmountElement(this);
+      }
+      _observerElements = null;
+    }
+
     final Key? key = component.key;
     if (key is GlobalKey) {
       owner._unregisterGlobalKey(key, this);
@@ -599,11 +605,6 @@ abstract class Element implements BuildContext {
     _component = null;
     _dependencies = null;
     _lifecycleState = _ElementLifecycle.defunct;
-    if (_observerElements != null) {
-      for (var observer in _observerElements!) {
-        observer.didUnmountElement(this);
-      }
-    }
   }
 
   List<ObserverElement>? _observerElements;
