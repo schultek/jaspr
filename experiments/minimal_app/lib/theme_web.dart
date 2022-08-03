@@ -1,4 +1,5 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/styles.dart';
 
 class StaticTheme extends InheritedComponent {
   StaticTheme({required this.theme, required Component child}) : super(child: child);
@@ -30,37 +31,22 @@ abstract class ThemeData {
   final String name;
 
   const ThemeData(this.name);
-  const factory ThemeData.variant(String name, dynamic styles) = _VariantThemeData;
+  const factory ThemeData.variant(String name, Styles styles) = _VariantThemeData;
 
-  dynamic get styles;
-  List<ThemeData> get variants;
+  Styles buildStyles();
+  List<ThemeData> buildVariants();
 
-  ResolvedThemeData resolve({bool isOutlined = false}) => applyVariants([]);
-
-  @protected
-  ResolvedThemeData applyVariants(List<String> variants) {
-    var v = this.variants.where((v) => variants.contains(v.name));
-    return ResolvedThemeData(this, v.toList());
-  }
+  List<String> resolve() => [this.name];
 }
 
 class _VariantThemeData extends ThemeData {
   const _VariantThemeData(super.name, this.styles);
 
-  final dynamic styles;
+  final Styles styles;
 
   @override
-  List<ThemeData> get variants => [];
-}
+  Styles buildStyles() => styles;
 
-class ResolvedThemeData {
-  ResolvedThemeData(this.base, this.variants);
-
-  final ThemeData base;
-  final List<ThemeData> variants;
-
-  List<String> get classes => [
-        base.name,
-        ...variants.map((v) => v.name),
-      ];
+  @override
+  List<ThemeData> buildVariants() => [];
 }

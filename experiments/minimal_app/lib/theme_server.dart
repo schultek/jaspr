@@ -27,12 +27,12 @@ class StaticThemeElement extends InheritedElement {
       yield Style(styles: [
         StyleRule(
           selector: Selector.dot(component.theme.name),
-          styles: component.theme.styles,
+          styles: component.theme.buildStyles(),
         ),
-        for (var variant in component.theme.variants)
+        for (var variant in component.theme.buildVariants())
           StyleRule(
             selector: Selector.dot(component.theme.name).dot(variant.name),
-            styles: variant.styles,
+            styles: variant.buildStyles(),
           ),
       ]);
       yield component.child;
@@ -46,16 +46,10 @@ abstract class ThemeData {
   const ThemeData(this.name);
   const factory ThemeData.variant(String name, Styles styles) = _VariantThemeData;
 
-  Styles get styles;
-  List<ThemeData> get variants;
+  Styles buildStyles();
+  List<ThemeData> buildVariants();
 
-  ResolvedThemeData resolve({bool isOutlined = false}) => applyVariants([]);
-
-  @protected
-  ResolvedThemeData applyVariants(List<String> variants) {
-    var v = this.variants.where((v) => variants.contains(v.name));
-    return ResolvedThemeData(this, v.toList());
-  }
+  List<String> resolve() => [this.name];
 }
 
 class _VariantThemeData extends ThemeData {
@@ -64,17 +58,8 @@ class _VariantThemeData extends ThemeData {
   final Styles styles;
 
   @override
-  List<ThemeData> get variants => [];
-}
+  Styles buildStyles() => styles;
 
-class ResolvedThemeData {
-  ResolvedThemeData(this.base, this.variants);
-
-  final ThemeData base;
-  final List<ThemeData> variants;
-
-  List<String> get classes => [
-        base.name,
-        ...variants.map((v) => v.name),
-      ];
+  @override
+  List<ThemeData> buildVariants() => [];
 }
