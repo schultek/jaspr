@@ -1,11 +1,13 @@
 import 'dart:math' as math;
 
-import 'package:mobx/mobx.dart'
-    show Atom, AtomSpyReporter, Derivation, mainContext;
-
 import 'package:jaspr/jaspr.dart';
+import 'package:mobx/mobx.dart' as mobx;
 // ignore: implementation_imports
 import 'package:mobx/src/core.dart' show ReactionImpl;
+
+import 'obs.dart';
+
+export 'obs.dart';
 
 class MobXHooksObserverComponent extends ObserverComponent {
   /// Initializes [key] for subclasses.
@@ -35,19 +37,17 @@ class MobXHooksObserverElement extends ObserverElement {
       element,
       () => HookCtx(element.markNeedsBuild),
     );
-    ctx._previous = _ctx;
-    _ctx = ctx;
-    ctx._startTracking();
+    ctx.startTracking();
 
     print('willRebuildElement ${ctx.hashCode} ${element.hashCode}');
   }
 
   @override
   void didRebuildElement(Element element) {
-    print('didRebuildElement ${ctx.hashCode} ${element.hashCode}');
+    print(
+        'didRebuildElement ${globalHookContext.hashCode} ${element.hashCode}');
 
-    ctx._afterRender();
-    _ctx = ctx._previous;
+    globalHookContext.endTracking();
   }
 
   @override
@@ -67,9 +67,9 @@ T useTrack<T>(
 }) {
   final reaction = useRef<ReactionImpl>(
     () {
-      final _name = name ?? mainContext.nameFor('useTrack');
+      final _name = name ?? mobx.mainContext.nameFor('useTrack');
       return ReactionImpl(
-        mainContext,
+        mobx.mainContext,
         () {
           print('$_name dependency-change');
           onDependencyChange();
@@ -127,10 +127,13 @@ class HookEffect {
 
 bool defaultKeysEquals(Object? a, Object? b) => a == b;
 
-HookCtx? _ctx;
-HookCtx get ctx {
-  assert(_ctx != null, 'Current HookCtx is null ${StackTrace.current}');
-  return _ctx!;
+HookCtx? __globalHookContext;
+HookCtx get globalHookContext {
+  assert(
+    __globalHookContext != null,
+    'Current HookCtx is null ${StackTrace.current}',
+  );
+  return __globalHookContext!;
 }
 
 class HookCtx {
@@ -144,6 +147,8 @@ class HookCtx {
   bool _disposed = false;
   bool get disposed => _disposed;
   HookCtx? _previous;
+  HookCtx? _next;
+  bool _scheduled = false;
 
   HookCtx(this._onDependencyChange);
   final void Function() _onDependencyChange;
@@ -151,7 +156,7 @@ class HookCtx {
   String get _name => hashCode.toString();
 
   late final _reaction = ReactionImpl(
-    mainContext,
+    mobx.mainContext,
     () {
       print('$_name dependency-change');
       _onDependencyChange();
@@ -161,10 +166,73 @@ class HookCtx {
         print('ReactionImplError $_name $err $stackTrace'),
   );
 
-  Derivation? _derivation;
+  mobx.Derivation? _derivation;
 
-  void _startTracking() {
+  void startTracking() {
+    assert(!_scheduled);
+    assert(_derivation == null);
+    _previous = __globalHookContext;
+    if (_previous != null) {
+      _previous!._next = this;
+    }
+    __globalHookContext = this;
     _derivation = _reaction.startTracking();
+  }
+
+  // TODO: test timing
+  void endTracking() {
+    assert(__globalHookContext == this);
+    _reaction.endTracking(_derivation);
+    _derivation = null;
+    __globalHookContext = _previous;
+    _scheduled = true;
+    Future.microtask(_executeHooksLogic);
+  }
+
+  void _executeHooksLogic() {
+    _scheduled = false;
+    for (int i = 0;
+        i < math.max(_hookEffects.length, _previousHookEffects.length);
+        i++) {
+      _executeHookItem(i);
+    }
+
+    _previousHookEffects = _hookEffects;
+    _hookEffects = [];
+
+    _hookRefIndex = 0;
+    _hookObsIndex = 0;
+  }
+
+  void _executeHookItem(int i) {
+    final previous =
+        _previousHookEffects.length > i ? _previousHookEffects[i] : null;
+    final current = _hookEffects.length > i ? _hookEffects[i] : null;
+    if (previous != null && current != null) {
+      assert(previous.isEqual == current.isEqual);
+      final prevKeys = previous.keys;
+      final newKeys = current.keys;
+
+      if (areKeysDifferent(prevKeys, newKeys, current.isEqual)) {
+        previous.cleanup?.call();
+        current.cleanup = current.effect();
+      } else {
+        current.cleanup = previous.cleanup;
+      }
+    } else if (current != null) {
+      current.cleanup = current.effect();
+    } else if (previous != null) {
+      previous.cleanup?.call();
+    }
+  }
+
+  void _dispose() {
+    if (disposed) return;
+    _disposed = true;
+    for (final hook in _previousHookEffects) {
+      hook.cleanup?.call();
+    }
+    _reaction.dispose();
   }
 
   static bool areKeysDifferent(
@@ -178,50 +246,6 @@ class HookCtx {
         (prevKeys.length != newKeys.length ||
             prevKeys.any((e) => !isEqual(e, newKeys[i++])));
   }
-
-  // TODO: test timing
-  void _afterRender() {
-    _reaction.endTracking(_derivation);
-
-    for (int i = 0;
-        i < math.max(_hookEffects.length, _previousHookEffects.length);
-        i++) {
-      final previous =
-          _previousHookEffects.length > i ? _previousHookEffects[i] : null;
-      final current = _hookEffects.length > i ? _hookEffects[i] : null;
-      if (previous != null && current != null) {
-        assert(previous.isEqual == current.isEqual);
-        final prevKeys = previous.keys;
-        final newKeys = current.keys;
-
-        if (areKeysDifferent(prevKeys, newKeys, current.isEqual)) {
-          previous.cleanup?.call();
-          current.cleanup = current.effect();
-        } else {
-          current.cleanup = previous.cleanup;
-        }
-      } else if (current != null) {
-        current.cleanup = current.effect();
-      } else if (previous != null) {
-        previous.cleanup?.call();
-      }
-    }
-
-    _previousHookEffects = _hookEffects;
-    _hookEffects = [];
-
-    _hookRefIndex = 0;
-    _hookObsIndex = 0;
-  }
-
-  void _dispose() {
-    if (disposed) return;
-    _disposed = true;
-    for (final hook in _previousHookEffects) {
-      hook.cleanup?.call();
-    }
-    _reaction.dispose();
-  }
 }
 
 void useEffect(
@@ -234,31 +258,35 @@ void useEffect(
     keys: keys,
     isEqual: isEqual,
   );
-  ctx._hookEffects.add(_hook);
+  globalHookContext._hookEffects.add(_hook);
 }
 
 Ref<T> useRef<T>(T Function() builder) {
   final Ref<T> ref;
-  if (ctx._hookRefIndex == null) {
+  final ctx = globalHookContext;
+  final index = ctx._hookRefIndex;
+  if (index == null) {
     ref = Ref._(builder());
     ctx._hookRefs.add(ref);
   } else {
-    final _ref = ctx._hookRefs[ctx._hookRefIndex!];
+    final _ref = ctx._hookRefs[index];
     ref = _ref as Ref<T>;
-    ctx._hookRefIndex = ctx._hookRefIndex! + 1;
+    ctx._hookRefIndex = index + 1;
   }
   return ref;
 }
 
 Obs<T> useObs<T>(T Function() builder) {
   final Obs<T> ref;
-  if (ctx._hookObsIndex == null) {
+  final ctx = globalHookContext;
+  final index = ctx._hookObsIndex;
+  if (index == null) {
     ref = Obs(builder());
     ctx._hookObs.add(ref);
   } else {
-    final _ref = ctx._hookObs[ctx._hookObsIndex!];
+    final _ref = ctx._hookObs[index];
     ref = _ref as Obs<T>;
-    ctx._hookObsIndex = ctx._hookObsIndex! + 1;
+    ctx._hookObsIndex = index + 1;
   }
   return ref;
 }
