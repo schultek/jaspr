@@ -93,12 +93,11 @@ class SecondsInput extends StatelessComponent {
     print('build SecondsInput');
     final inputElement = useRef<dynamic>(() => null);
 
-    useMobXEffect(() {
+    useAutorun((_) {
       final newValue = seconds.value.toString();
       if (inputElement.value != null) {
         inputElement.value.value = newValue;
       }
-      return null;
     });
 
     yield DomComponent(
