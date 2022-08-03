@@ -44,6 +44,13 @@ abstract class ObserverElement extends SingleChildElement {
   void didUnmountElement(Element element);
 
   @override
+  void update(ObserverComponent newComponent) {
+    super.update(newComponent);
+    _dirty = true;
+    rebuild();
+  }
+
+  @override
   void _updateObservers() {
     assert(_lifecycleState == _ElementLifecycle.active);
     final List<ObserverElement>? incomingElements = _parent?._observerElements;
