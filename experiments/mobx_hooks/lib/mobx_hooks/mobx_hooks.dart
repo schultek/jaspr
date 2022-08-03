@@ -96,32 +96,10 @@ T useTrack<T>(
 class Ref<T> {
   Ref._(this.value);
   T value;
-}
 
-class Obs<T> {
-  Obs(
-    this._value, {
-    String? name,
-  }) : _atom = Atom(name: name);
-
-  final Atom _atom;
-  String get name => _atom.name;
-  T _value;
-
-  T get value {
-    _atom.reportObserved();
-    return _value;
-  }
-
-  set value(T v) {
-    if (_value == v) return;
-    _atom.reportWrite(v, _value, () {
-      _value = v;
-    });
-  }
-
-  void set(T v) {
-    value = v;
+  @override
+  String toString() {
+    return 'Ref($value)';
   }
 }
 
