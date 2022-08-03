@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:jaspr/jaspr.dart';
 import 'package:mobx/mobx.dart' as mobx;
 // ignore: implementation_imports
 import 'package:mobx/src/core.dart' show ReactionImpl;
@@ -8,57 +7,6 @@ import 'package:mobx/src/core.dart' show ReactionImpl;
 import 'obs.dart';
 
 export 'obs.dart';
-
-class MobXHooksObserverComponent extends ObserverComponent {
-  /// Initializes [key] for subclasses.
-  const MobXHooksObserverComponent({required super.child});
-
-  @override
-  MobXHooksObserverElement createElement() => MobXHooksObserverElement(this);
-}
-
-class MobXHooksObserverElement extends ObserverElement {
-  MobXHooksObserverElement(super.component);
-
-  final Map<Element, HookCtx> hookContexts = {};
-
-  @override
-  void unmount() {
-    for (final hook in hookContexts.values) {
-      hook._dispose();
-    }
-    hookContexts.clear();
-    super.unmount();
-  }
-
-  @override
-  void willRebuildElement(Element element) {
-    final ctx = hookContexts.putIfAbsent(
-      element,
-      () => HookCtx(element.markNeedsBuild),
-    );
-    ctx.startTracking();
-
-    print('willRebuildElement ${ctx.hashCode} ${element.hashCode}');
-  }
-
-  @override
-  void didRebuildElement(Element element) {
-    print(
-        'didRebuildElement ${globalHookContext.hashCode} ${element.hashCode}');
-
-    globalHookContext.endTracking();
-  }
-
-  @override
-  void didUnmountElement(Element element) {
-    final ctx = hookContexts.remove(element);
-    print('didUnmountElement ${ctx?.hashCode} ${element.hashCode}');
-    if (ctx != null) {
-      ctx._dispose();
-    }
-  }
-}
 
 T useTrack<T>(
   T Function() compute,
@@ -226,7 +174,7 @@ class HookCtx {
     }
   }
 
-  void _dispose() {
+  void dispose() {
     if (disposed) return;
     _disposed = true;
     for (final hook in _previousHookEffects) {
