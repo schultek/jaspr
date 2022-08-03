@@ -42,7 +42,7 @@ T useTrack<T>(
 }
 
 class Ref<T> {
-  Ref._(this.value);
+  Ref(this.value);
   T value;
 
   @override
@@ -84,7 +84,7 @@ HookCtx get globalHookContext {
   return __globalHookContext!;
 }
 
-class HookCtx {
+class _HookCtxState {
   int? _hookRefIndex;
   final List<Ref> _hookRefs = [];
   int? _hookObsIndex;
@@ -92,6 +92,21 @@ class HookCtx {
 
   List<HookEffect> _hookEffects = [];
   List<HookEffect> _previousHookEffects = [];
+
+  void _reset() {
+    _previousHookEffects = _hookEffects;
+    _hookEffects = [];
+
+    _hookRefIndex = 0;
+    _hookObsIndex = 0;
+  }
+}
+
+class HookCtx {
+  _HookCtxState? __state;
+  _HookCtxState get _state => __state ??= _HookCtxState();
+  bool get hasState => __state != null;
+
   bool _disposed = false;
   bool get disposed => _disposed;
   HookCtx? _previous;
@@ -133,26 +148,29 @@ class HookCtx {
     _reaction.endTracking(_derivation);
     _derivation = null;
     __globalHookContext = _previous;
-    _scheduled = true;
-    Future.microtask(_executeHooksLogic);
+    if (hasState) {
+      _scheduled = true;
+      Future.microtask(_executeHooksLogic);
+    }
   }
 
   void _executeHooksLogic() {
     _scheduled = false;
-    for (int i = 0;
-        i < math.max(_hookEffects.length, _previousHookEffects.length);
-        i++) {
-      _executeHookItem(i);
+
+    final maxLength = math.max(
+      _state._hookEffects.length,
+      _state._previousHookEffects.length,
+    );
+    for (int i = 0; i < maxLength; i++) {
+      _executeEffectItem(i);
     }
-
-    _previousHookEffects = _hookEffects;
-    _hookEffects = [];
-
-    _hookRefIndex = 0;
-    _hookObsIndex = 0;
+    _state._reset();
   }
 
-  void _executeHookItem(int i) {
+  void _executeEffectItem(int i) {
+    final _previousHookEffects = _state._previousHookEffects;
+    final _hookEffects = _state._hookEffects;
+
     final previous =
         _previousHookEffects.length > i ? _previousHookEffects[i] : null;
     final current = _hookEffects.length > i ? _hookEffects[i] : null;
@@ -175,10 +193,13 @@ class HookCtx {
   }
 
   void dispose() {
+    assert(_derivation == null);
     if (disposed) return;
     _disposed = true;
-    for (final hook in _previousHookEffects) {
-      hook.cleanup?.call();
+    if (hasState) {
+      for (final hook in _state._previousHookEffects) {
+        hook.cleanup?.call();
+      }
     }
     _reaction.dispose();
   }
@@ -206,15 +227,15 @@ void useEffect(
     keys: keys,
     isEqual: isEqual,
   );
-  globalHookContext._hookEffects.add(_hook);
+  globalHookContext._state._hookEffects.add(_hook);
 }
 
 Ref<T> useRef<T>(T Function() builder) {
   final Ref<T> ref;
-  final ctx = globalHookContext;
+  final ctx = globalHookContext._state;
   final index = ctx._hookRefIndex;
   if (index == null) {
-    ref = Ref._(builder());
+    ref = Ref(builder());
     ctx._hookRefs.add(ref);
   } else {
     final _ref = ctx._hookRefs[index];
@@ -226,7 +247,7 @@ Ref<T> useRef<T>(T Function() builder) {
 
 Obs<T> useObs<T>(T Function() builder) {
   final Obs<T> ref;
-  final ctx = globalHookContext;
+  final ctx = globalHookContext._state;
   final index = ctx._hookObsIndex;
   if (index == null) {
     ref = Obs(builder());
