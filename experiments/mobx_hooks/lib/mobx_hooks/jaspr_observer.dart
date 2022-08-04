@@ -1,10 +1,21 @@
 import 'package:jaspr/jaspr.dart';
 
-import 'mobx_hooks.dart';
+import 'mobx_hooks.dart' show HookCtx, globalHookContext;
 
+/// Tracks dependencies using MobX and allows for Hooks usage
+/// in every [Component] children of this one.
+///
+/// There should only be one instance of this within a given subtree.
+/// A [MobXHooksObserverComponent] should not have a component
+/// of the same type as children.
 class MobXHooksObserverComponent extends ObserverComponent {
-  /// Initializes [key] for subclasses.
-  const MobXHooksObserverComponent({required super.child});
+  /// Tracks dependencies using MobX and allows for Hooks usage
+  /// in every [Component] children of this one.
+  ///
+  /// There should only be one instance of this within a given subtree.
+  /// A [MobXHooksObserverComponent] should not have a component
+  /// of the same type as children.
+  const MobXHooksObserverComponent({required super.child, super.key});
 
   @override
   MobXHooksObserverElement createElement() => MobXHooksObserverElement(this);

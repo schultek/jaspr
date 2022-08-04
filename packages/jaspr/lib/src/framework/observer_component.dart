@@ -15,7 +15,7 @@ part of framework;
 abstract class ObserverComponent extends Component {
   /// Abstract constant constructor with the [child]
   /// which will be below this in the tree.
-  const ObserverComponent({required this.child});
+  const ObserverComponent({required this.child, super.key});
 
   /// The component below this component in the tree.
   final Component child;
