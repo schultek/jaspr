@@ -64,8 +64,9 @@ void main() {
           return a == b;
         });
         expect(isEvenMemo, isEven);
-        useAutorun((_) {
+        useAutorun(() {
           isEvenAutorunList.add(obs.value % 2 == 0);
+          return null;
         });
 
         hookContext(() {

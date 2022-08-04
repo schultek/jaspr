@@ -169,9 +169,9 @@ T useComputed<T>(
 /// and tracked again. The Component on which this is used
 /// will not be rebuilt.
 ///
-/// For more information in [autorun].
+/// More information in [autorun].
 void useAutorun(
-  void Function(Reaction) function, {
+  void Function()? Function() function, {
   String? name,
   ReactiveContext? context,
   Duration? delay,
@@ -179,12 +179,22 @@ void useAutorun(
   void Function(Object, Reaction)? onError,
 }) {
   useEffect(() {
-    return autorun(
-      function,
+    void Function()? dispose;
+    void _func(Reaction reaction) {
+      dispose?.call();
+      dispose = function();
+    }
+
+    final cancel = autorun(
+      _func,
       name: name,
       context: context,
       delay: delay?.inMilliseconds,
       onError: onError,
     );
+    return () {
+      cancel();
+      dispose?.call();
+    };
   }, keys);
 }

@@ -24,16 +24,15 @@ class App extends StatelessComponent {
       }
     }, const []);
 
-    useEffect(() {
+    useAutorun(() {
       final random = Random(text.value.hashCode);
       final subs =
           Stream.periodic(Duration(seconds: seconds.value)).listen((event) {
         print('event seconds: ${seconds.value}, text: "${text.value}"');
         output.value = random.nextInt(9000) + 1000;
       });
-
       return subs.cancel;
-    }, [seconds.value, text.value]);
+    });
 
     yield DomComponent(
       tag: 'div',
@@ -93,11 +92,12 @@ class SecondsInput extends StatelessComponent {
     print('build SecondsInput');
     final inputElement = useRef<dynamic>(() => null);
 
-    useAutorun((_) {
+    useAutorun(() {
       final newValue = seconds.value.toString();
       if (inputElement.value != null) {
         inputElement.value.value = newValue;
       }
+      return null;
     });
 
     yield DomComponent(
