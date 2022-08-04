@@ -95,14 +95,9 @@ void main() {
 
     expect(valueChanged, [null]);
     expect(equalsArg, null);
-    expect(isEvenAutorunList, []);
+    expect(isEvenAutorunList, [true]);
     expect(streamValues, [Result.value(0)]);
     expect(futureValues, [Result.value(false)]);
-    clearLists();
-
-    // TODO: define async/sync use effect
-    await Future.delayed(Duration.zero);
-    expect(isEvenAutorunList, [true]);
     clearLists();
 
     obs.value = 2;

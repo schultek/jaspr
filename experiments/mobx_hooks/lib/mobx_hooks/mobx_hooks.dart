@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'dart:math' as math;
 
 import 'package:mobx/mobx.dart' as mobx;
@@ -84,6 +85,18 @@ HookCtx get globalHookContext {
   return __globalHookContext!;
 }
 
+@experimental
+class HookCtxConfig {
+  final void Function(HookCtx? previous, void Function() execute)?
+      effectsScheduler;
+
+  const HookCtxConfig({
+    this.effectsScheduler,
+  });
+
+  static HookCtxConfig global = const HookCtxConfig();
+}
+
 class _HookCtxState {
   int? _hookRefIndex;
   final List<Ref> _hookRefs = [];
@@ -142,27 +155,32 @@ class HookCtx {
     _derivation = _reaction.startTracking();
   }
 
-  // TODO: test timing
   void endTracking() {
     assert(__globalHookContext == this);
     _reaction.endTracking(_derivation);
     _derivation = null;
     __globalHookContext = _previous;
     if (hasState) {
-      _scheduled = true;
-      Future.microtask(_executeHooksLogic);
+      final effectsScheduler = HookCtxConfig.global.effectsScheduler;
+      if (effectsScheduler != null) {
+        _scheduled = true;
+        effectsScheduler(_previous, _executeHooksLogic);
+      } else {
+        _executeHooksLogic();
+      }
     }
   }
 
   void _executeHooksLogic() {
-    _scheduled = false;
-
-    final maxLength = math.max(
-      _state._hookEffects.length,
-      _state._previousHookEffects.length,
-    );
-    for (int i = 0; i < maxLength; i++) {
-      _executeEffectItem(i);
+    if (HookCtxConfig.global.effectsScheduler != null && _scheduled) {
+      _scheduled = false;
+      final maxLength = math.max(
+        _state._hookEffects.length,
+        _state._previousHookEffects.length,
+      );
+      for (int i = 0; i < maxLength; i++) {
+        _executeEffectItem(i);
+      }
     }
     _state._reset();
   }
@@ -197,6 +215,7 @@ class HookCtx {
     if (disposed) return;
     _disposed = true;
     if (hasState) {
+      _scheduled = false;
       for (final hook in _state._previousHookEffects) {
         hook.cleanup?.call();
       }
@@ -217,19 +236,38 @@ class HookCtx {
   }
 }
 
+/// Executes [effect] and optionally disposes it using the function
+/// that it returns. [effect] will be executed every time the [keys] change.
+/// The previous effect will be disposed before a new one is executed.
+///
+/// If [keys] is null, [effect] will be executed every time, you can
+/// pass an empty list if it should be executed only once.
+/// The provided [keysEquals] will be used to compare the items
+/// in the [keys] list.
+///
+/// By default, [useEffect] will be executed synchronously, however
+/// one can (this is experimental) change th behavior with [HookCtxConfig].
 void useEffect(
   Effect effect, [
   List<Object?>? keys,
-  KeysEquals isEqual = defaultKeysEquals,
+  KeysEquals keysEquals = defaultKeysEquals,
 ]) {
   final _hook = HookEffect(
     effect: effect,
     keys: keys,
-    isEqual: isEqual,
+    isEqual: keysEquals,
   );
-  globalHookContext._state._hookEffects.add(_hook);
+  final _hookEffects = globalHookContext._state._hookEffects;
+  _hookEffects.add(_hook);
+  if (HookCtxConfig.global.effectsScheduler == null) {
+    final index = _hookEffects.length - 1;
+    globalHookContext._executeEffectItem(index);
+  }
 }
 
+/// Saved a mutable reference to a value.
+/// If the value is mutated, it will not rebuild the component.
+/// The initial value is provided by [builder] which will only be executed once.
 Ref<T> useRef<T>(T Function() builder) {
   final Ref<T> ref;
   final ctx = globalHookContext._state;
@@ -245,6 +283,12 @@ Ref<T> useRef<T>(T Function() builder) {
   return ref;
 }
 
+/// Saved a mutable reference to a value.
+/// If the value is mutated, it will rebuild the component
+/// that uses it (not necessarily the one that created it).
+/// If the component in which the [Obs] is created does not access the value,
+/// it will not rebuild when mutated the [Obs] is mutated.
+/// The initial value is provided by [builder] which will only be executed once.
 Obs<T> useObs<T>(T Function() builder) {
   final Obs<T> ref;
   final ctx = globalHookContext._state;
