@@ -40,9 +40,26 @@ T? usePrevious<T>(T value) {
   return toReturn;
 }
 
+/// Returns the value passed as argument on the previous execution
+/// that is different from [value].
+/// Returns null on the first execution.
+T? usePreviousDistinct<T>(T value) {
+  final previousDistinct = useRef<T?>(() => null);
+  final previous = useRef<T>(() => value);
+  final p = previous.value;
+  if (p != value) {
+    previous.value = value;
+    previousDistinct.value = p;
+  }
+  return previousDistinct.value;
+}
+
+/// Executes [onChanged] when [value] changes.
+/// The result of [onChanged] is saved and returned.
+/// The result on the first execution will be null.
 R? useValueChanged<T, R>(
   T value,
-  R? Function(T previous, R? oldResult) onChanged,
+  R Function(T previous, R? oldResult) onChanged,
 ) {
   final previous = usePrevious(value);
   bool isInitial = false;
@@ -56,6 +73,7 @@ R? useValueChanged<T, R>(
   return result.value;
 }
 
+// TODO:
 bool Function() useIsMounted() {
   final isMounted = useRef(() => false);
   useEffect(
@@ -71,8 +89,8 @@ bool Function() useIsMounted() {
   return isMountedFn;
 }
 
-/// Subscribes to [stream] and rebuilds on every change.
-/// Unsubscribes to the previous [stream] it a new one is passed.
+/// Subscribes to [stream] and rebuilds with the new result on every event.
+/// Unsubscribes to the previous [stream] if a new one is passed.
 Result<T> useStream<T>(
   Stream<T> stream, {
   required T Function() initialValue,
@@ -94,7 +112,7 @@ Result<T> useStream<T>(
   return result.value;
 }
 
-/// Results the result of [future].
+/// Returns the result of [future].
 /// The component will rebuild when the future completes.
 /// If another [future] is passed, the previous one's result will
 /// not we set when it is complete.
@@ -122,6 +140,9 @@ Result<T> useFuture<T>(
   return result.value;
 }
 
+/// Same as [useFuture], but the future is taken from [futureFunc].
+/// [futureFunc] will be re-executed (and it's future observed)
+/// when [keys] changes.
 Result<T>? useFutureFunc<T>(
   Future<T> Function() futureFunc, {
   List<Object?> keys = const [],
@@ -149,7 +170,7 @@ Result<T>? useFutureFunc<T>(
 /// changes, the Component on which this is used will be rebuilt
 /// and the new value will be returned on the next build execution.
 ///
-/// For more information in [Computed].
+/// More information in [Computed].
 T useComputed<T>(
   T Function() function, {
   String? name,
@@ -197,4 +218,13 @@ void useAutorun(
       dispose?.call();
     };
   }, keys);
+}
+
+void useEffectSync<T>(
+  void Function()? Function() effect, [
+  List<Object?> keys = const [],
+  KeysEquals keysEquals = defaultKeysEquals,
+]) {
+  final dispose = useMemo(effect, keys, keysEquals);
+  useEffect(() => dispose, [dispose]);
 }
