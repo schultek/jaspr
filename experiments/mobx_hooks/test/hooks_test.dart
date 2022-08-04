@@ -130,7 +130,7 @@ void main() {
     clearLists();
   });
 
-  test('hooks in jaspr context', () async {
+  group('hooks in jaspr context', () {
     late ComponentTester tester;
 
     setUp(() {
