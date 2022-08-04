@@ -28,7 +28,7 @@ abstract class ObserverComponent extends Component {
 /// You can override [willRebuildElement], [didRebuildElement] and [didUnmountElement]
 /// to execute the required logic.
 abstract class ObserverElement extends SingleChildElement {
-  ObserverElement(super.component);
+  ObserverElement(ObserverComponent super.component);
 
   @override
   ObserverComponent get component => super.component as ObserverComponent;
