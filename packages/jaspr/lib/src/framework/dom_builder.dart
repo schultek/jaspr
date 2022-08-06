@@ -131,7 +131,7 @@ abstract class DomBuilder {
 
   void setRootNode(DomNode node);
 
-  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void renderNode(DomNode node, String tag, String? id, Iterable<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events);
 
   void renderTextNode(DomNode node, String text, [bool rawHtml = false]);
@@ -167,7 +167,7 @@ abstract class DelegatingDomBuilder implements DomBuilder {
   @override
   @protected
   @mustCallSuper
-  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void renderNode(DomNode node, String tag, String? id, Iterable<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     _parent!.renderNode(node, tag, id, classes, styles, attributes, events);
   }

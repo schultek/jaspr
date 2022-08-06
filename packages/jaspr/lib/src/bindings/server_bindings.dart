@@ -96,7 +96,7 @@ final _nodesExpando = Expando<DomNodeData>();
 class DomNodeData {
   String? tag;
   String? id;
-  List<String>? classes;
+  Iterable<String>? classes;
   Map<String, String>? styles;
   Map<String, String>? attributes;
   String? text;
@@ -117,7 +117,7 @@ class MarkupDomBuilder extends DomBuilder {
   }
 
   @override
-  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void renderNode(DomNode node, String tag, String? id, Iterable<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     node.data
       ..tag = tag

@@ -40,7 +40,7 @@ class ChildNodeBuilder extends DelegatingDomBuilder {
   final ChildNodeComponent component;
 
   @override
-  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void renderNode(DomNode node, String tag, String? id, Iterable<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     super.renderNode(node, tag, id, classes, styles, attributes, events);
     if (isDirectChild(node)) {

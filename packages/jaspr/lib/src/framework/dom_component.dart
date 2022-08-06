@@ -22,7 +22,7 @@ class DomComponent extends Component {
 
   final String tag;
   final String? id;
-  final List<String>? classes;
+  final Iterable<String>? classes;
   final Styles? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
