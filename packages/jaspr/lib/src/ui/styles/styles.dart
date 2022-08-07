@@ -4,12 +4,14 @@ import 'properties/background.dart';
 import 'properties/box.dart';
 import 'properties/color.dart';
 import 'properties/edge_insets.dart';
+import 'properties/flexbox.dart';
 import 'properties/position.dart';
 import 'properties/text.dart';
 import 'properties/unit.dart';
 
 part 'groups/background.dart';
 part 'groups/box.dart';
+part 'groups/flexbox.dart';
 part 'groups/text.dart';
 
 /// Represents a set of css styles by pairs of property and value
@@ -63,6 +65,14 @@ abstract class Styles {
     Position? position,
     double? opacity,
   }) = _BoxStyles;
+
+  /// Constructs a [Styles] instance for common flexbox style properties
+  const factory Styles.flexbox({
+    FlexDirection? direction,
+    FlexWrap? wrap,
+    JustifyContent? justifyContent,
+    AlignItems? alignItems,
+  }) = _FlexBoxStyles;
 
   Map<String, String> get styles;
 }

@@ -32,8 +32,7 @@
   - box sizing
   - shadow
   - cursor
-- [ ] flexbox
-  - direction, justify, align, ...
+- [x] flexbox
 - [ ] flex item (child of flexbox)
   - basis, grow, shrink
 - [ ] grid
