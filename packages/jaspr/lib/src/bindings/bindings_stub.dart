@@ -9,7 +9,7 @@ import '../framework/framework.dart';
 void runApp(Component app, {String attachTo = 'body'}) {}
 
 /// Global component binding for the app
-abstract class AppBinding extends BindingBase with ComponentsBinding, SyncBinding, SchedulerBinding {
+abstract class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, SyncBinding {
   static AppBinding ensureInitialized() {
     throw UnimplementedError('Should be overridden on client and server.');
   }

@@ -7,7 +7,7 @@ import '../elements/dialog.dart';
 import '../elements/textfield.dart';
 
 class NewFileDialog extends StatefulComponent {
-  const NewFileDialog({Key? key}) : super(key: key);
+  const NewFileDialog({super.key});
 
   static Future<String?> show(BuildContext context) {
     return showDialog(context, slotId: 'dialog', builder: (_) => NewFileDialog());

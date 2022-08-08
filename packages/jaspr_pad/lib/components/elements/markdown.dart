@@ -1,7 +1,8 @@
 import 'dart:convert' as convert;
 
-import 'package:jaspr/jaspr.dart' hide Element, Text;
-import 'package:markdown/markdown.dart';
+import 'package:jaspr/jaspr.dart';
+import 'package:markdown/markdown.dart' hide Text, Element;
+import 'package:markdown/markdown.dart' as md show Text, Element;
 
 import '../../adapters/hljs.dart' as hljs;
 
@@ -12,7 +13,7 @@ class InlineBracketsColon extends InlineSyntax {
 
   @override
   bool onMatch(InlineParser parser, Match match) {
-    final element = Element.text('code', htmlEscape(match[1]!));
+    final element = md.Element.text('code', htmlEscape(match[1]!));
     parser.addNode(element);
     return true;
   }
@@ -32,7 +33,7 @@ class InlineBrackets extends InlineSyntax {
 
   @override
   bool onMatch(InlineParser parser, Match match) {
-    final element = Element.text('code', '<em>${htmlEscape(match[1]!)}</em>');
+    final element = md.Element.text('code', '<em>${htmlEscape(match[1]!)}</em>');
     parser.addNode(element);
     return true;
   }
@@ -78,54 +79,26 @@ class _MarkdownState extends State<Markdown> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield MarkdownRenderer(nodes);
-  }
-}
-
-class MarkdownRenderer extends CustomRenderComponent {
-  MarkdownRenderer(this.nodes);
-
-  final List<Node> nodes;
-
-  @override
-  void render(DomBuilder b) {
-    MarkdownDomVisitor(b).render(nodes);
     if (kIsWeb) {
-      hljs.highlightAll();
+      ComponentsBinding.instance!.addPostFrameCallback(() {
+        hljs.highlightAll();
+      });
     }
+    yield* buildMarkdown(nodes);
   }
-}
 
-class MarkdownDomVisitor implements NodeVisitor {
-  MarkdownDomVisitor(this.builder);
-
-  final DomBuilder builder;
-
-  void render(List<Node> nodes) {
+  Iterable<Component> buildMarkdown(Iterable<Node> nodes) sync* {
     for (var node in nodes) {
-      node.accept(this);
+      if (node is md.Text) {
+        yield DomComponent(tag: 'span', child: Text(node.text, rawHtml: true));
+      } else if (node is md.Element) {
+        yield DomComponent(
+          tag: node.tag,
+          id: node.generatedId,
+          attributes: node.attributes,
+          children: node.children != null ? buildMarkdown(node.children!).toList() : null,
+        );
+      }
     }
-  }
-
-  @override
-  void visitText(Text text) {
-    builder.open('span');
-    builder.innerHtml(text.text);
-    builder.close();
-  }
-
-  @override
-  bool visitElementBefore(Element element) {
-    builder.open(
-      element.tag,
-      attributes: element.attributes,
-      id: element.generatedId,
-    );
-    return true;
-  }
-
-  @override
-  void visitElementAfter(Element element) {
-    builder.close(tag: element.tag);
   }
 }

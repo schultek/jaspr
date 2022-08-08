@@ -5,61 +5,57 @@ import '../../adapters/mdc.dart';
 
 final snackBarProvider = StateProvider<String?>((ref) => null);
 
-class SnackBar extends StatelessComponent {
+class SnackBar extends StatefulComponent {
   const SnackBar({Key? key}) : super(key: key);
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      classes: ['mdc-snackbar'],
-      children: [
-        DomComponent(
-          tag: 'div',
-          classes: ['mdc-snackbar__surface'],
-          children: [
-            DomComponent(
-                tag: 'div', classes: ['mdc-snackbar__label'], attributes: {'role': 'status', 'aria-live': 'polite'}),
-          ],
-        ),
-      ],
-    );
-  }
-
-  @override
-  Element createElement() => SnackBarElement(this);
+  State createState() => SnackBarState();
 }
 
-class SnackBarElement extends StatelessElement {
-  SnackBarElement(SnackBar component) : super(component);
-
+class SnackBarState extends State<SnackBar> {
   ProviderSubscription<String?>? _sub;
   MDCSnackbar? _snackbar;
 
   @override
-  void mount(Element? parent) {
-    super.mount(parent);
-    _sub = subscribe<String?>(snackBarProvider, (_, msg) {
+  void initState() {
+    super.initState();
+    _sub = context.subscribe<String?>(snackBarProvider, (_, msg) {
       if (msg != null) _snackbar?.showMessage(msg);
     });
   }
 
   @override
-  void unmount() {
+  void dispose() {
     _sub?.close();
-    super.unmount();
+    super.dispose();
   }
 
   @override
-  void render(DomBuilder b) {
-    if (_snackbar == null) {
-      super.render(b);
-      if (kIsWeb) {
-        _snackbar = MDCSnackbar((children.first as DomElement).source);
-      }
-    } else {
-      b.skipNode();
-    }
+  Iterable<Component> build(BuildContext context) sync* {
+    yield FindChildNode(
+      onNodeFound: (node) {
+        if (kIsWeb && _snackbar == null) {
+          _snackbar = MDCSnackbar(node.nativeElement);
+        }
+      },
+      child: DomComponent(
+        tag: 'div',
+        classes: ['mdc-snackbar'],
+        children: [
+          DomComponent(
+            tag: 'div',
+            classes: ['mdc-snackbar__surface'],
+            children: [
+              DomComponent(
+                tag: 'div',
+                classes: ['mdc-snackbar__label'],
+                attributes: {'role': 'status', 'aria-live': 'polite'},
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
 

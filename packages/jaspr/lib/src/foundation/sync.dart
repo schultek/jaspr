@@ -83,6 +83,11 @@ mixin SyncBinding on BindingBase {
       _globalSyncRegistry.remove(syncState.syncId);
     }
   }
+
+  T? getInitialState<T>(String id, {Codec<T, dynamic>? codec}) {
+    var data = getRawState(id);
+    return data == null || codec == null ? data : codec.decode(data);
+  }
 }
 
 /// Interface to sync state across server and client

@@ -50,6 +50,22 @@ class MenuElement extends StatelessElement {
   Menu get component => super.component as Menu;
 
   MDCMenu? _menu;
+  DomNode? _menuNode, _buttonNode;
+
+  void setMenuNodes(DomNode? menu, DomNode? button) {
+    _menuNode ??= menu;
+    _buttonNode ??= button;
+    if (kIsWeb && _menuNode != null && _buttonNode != null) {
+      _menu = MDCMenu(_menuNode!.nativeElement)
+        ..setAnchorCorner(AnchorCorner.bottomLeft)
+        ..setAnchorElement(_buttonNode!.nativeElement);
+
+      _menu!.listen('MDCMenu:selected', (e) {
+        final index = (e as CustomEvent).detail['index'] as int;
+        component.onItemSelected(index);
+      });
+    }
+  }
 
   @override
   Iterable<Component> build() sync* {
@@ -57,67 +73,42 @@ class MenuElement extends StatelessElement {
       tag: 'div',
       styles: {'position': 'relative'},
       children: [
-        Button(
-          id: 'samples-dropdown-button',
-          label: 'Samples',
-          icon: 'expand_more',
-          hideIcon: true,
-          iconAffinity: IconAffinity.right,
-          onPressed: () {
-            if (_menu != null) {
-              _menu!.open = !(_menu!.open ?? false);
-            }
+        FindChildNode(
+          onNodeFound: (node) {
+            setMenuNodes(null, node);
           },
+          child: Button(
+            id: 'samples-dropdown-button',
+            label: 'Samples',
+            icon: 'expand_more',
+            hideIcon: true,
+            iconAffinity: IconAffinity.right,
+            onPressed: () {
+              if (_menu != null) {
+                _menu!.open = !(_menu!.open ?? false);
+              }
+            },
+          ),
         ),
-        DomComponent(
-          tag: 'div',
-          id: 'samples-menu',
-          classes: ['mdc-menu', 'mdc-menu-surface'],
-          children: [
-            DomComponent(
-              tag: 'ul',
-              classes: ['mdc-list'],
-              attributes: {'aria-hidden': 'true', 'aria-orientation': 'vertical', 'tabindex': '-1'},
-              children: component.items,
-            ),
-          ],
+        FindChildNode(
+          onNodeFound: (node) {
+            setMenuNodes(node, null);
+          },
+          child: DomComponent(
+            tag: 'div',
+            id: 'samples-menu',
+            classes: ['mdc-menu', 'mdc-menu-surface'],
+            children: [
+              DomComponent(
+                tag: 'ul',
+                classes: ['mdc-list'],
+                attributes: {'aria-hidden': 'true', 'aria-orientation': 'vertical', 'tabindex': '-1'},
+                children: component.items,
+              ),
+            ],
+          ),
         ),
       ],
     );
-  }
-
-  @override
-  void render(DomBuilder b) {
-    if (_menu == null) {
-      super.render(b);
-      if (kIsWeb) {
-        DomElement? menuElement, buttonElement;
-
-        void childVisitor(Element element) {
-          if (element is DomElement) {
-            if (buttonElement == null) {
-              buttonElement = element;
-            } else {
-              menuElement = element;
-            }
-          } else {
-            element.visitChildren(childVisitor);
-          }
-        }
-
-        children.first.visitChildren(childVisitor);
-
-        _menu = MDCMenu(menuElement!.source)
-          ..setAnchorCorner(AnchorCorner.bottomLeft)
-          ..setAnchorElement(buttonElement!.source);
-
-        _menu!.listen('MDCMenu:selected', (e) {
-          final index = (e as CustomEvent).detail['index'] as int;
-          component.onItemSelected(index);
-        });
-      }
-    } else {
-      b.skipNode();
-    }
   }
 }
