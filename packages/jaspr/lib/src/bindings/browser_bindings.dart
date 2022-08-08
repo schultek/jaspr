@@ -125,10 +125,8 @@ extension on html.Element {
     final current = getAttribute(name);
     if (current == value) return;
     if (value == null) {
-      print("Remove attribute: $name");
       removeAttribute(name);
     } else {
-      print("Update attribute: $name - $value");
       setAttribute(name, value);
     }
   }
@@ -158,7 +156,6 @@ class BrowserDomBuilder extends DomBuilder {
       if (toHydrate.isNotEmpty) {
         for (var e in toHydrate) {
           if (e is html.Element && e.tagName.toLowerCase() == tag) {
-            print("Hydrate html node: $e");
             elem = data.node = e;
             attributesToRemove = elem.attributes.keys.toSet();
             toHydrate.remove(e);
@@ -170,7 +167,6 @@ class BrowserDomBuilder extends DomBuilder {
 
       elem = data.node = document.createElement(tag);
       attributesToRemove = {};
-      print("Create html node: $elem");
     } else {
       if (data.node is! html.Element || (data.node as html.Element).tagName.toLowerCase() != tag) {
         elem = document.createElement(tag);
@@ -183,7 +179,6 @@ class BrowserDomBuilder extends DomBuilder {
           }
         }
         attributesToRemove = {};
-        print("Replace html node: $elem for $old");
       } else {
         elem = data.node as html.Element;
         attributesToRemove = elem.attributes.keys.toSet();
@@ -204,7 +199,6 @@ class BrowserDomBuilder extends DomBuilder {
     attributesToRemove.removeAll(['id', 'class', 'style', ...?attributes?.keys]);
     for (final name in attributesToRemove) {
       elem.removeAttribute(name);
-      print("Remove attribute: $name");
     }
 
     if (events != null && events.isNotEmpty) {
@@ -238,7 +232,6 @@ class BrowserDomBuilder extends DomBuilder {
         if (parent.innerHtml != text) {
           parent.innerHtml = text;
           data.node = parent.childNodes.first;
-          print("Update inner html: $text");
         }
       }
       return;
@@ -250,11 +243,9 @@ class BrowserDomBuilder extends DomBuilder {
       if (toHydrate.isNotEmpty) {
         for (var e in toHydrate) {
           if (e is html.Text) {
-            print("Hydrate text node: $e");
             data.node = e;
             if (e.text != text) {
               e.text = text;
-              print("Update text node: $text");
             }
             toHydrate.remove(e);
             break diff;
@@ -263,18 +254,15 @@ class BrowserDomBuilder extends DomBuilder {
       }
 
       data.node = html.Text(text);
-      print("Create text node: $text");
     } else {
       if (data.node is! html.Text) {
         var elem = html.Text(text);
         data.node!.replaceWith(elem);
         data.node = elem;
-        print("Replace text node: $text");
       } else {
         var node = data.node as html.Text;
         if (node.text != text) {
           node.text = text;
-          print("Update text node: $text");
         }
       }
     }
@@ -298,8 +286,6 @@ class BrowserDomBuilder extends DomBuilder {
     if (childNode.previousNode == afterNode && childNode.parentNode == parentNode) {
       return;
     }
-
-    print("Attach node $childNode of $parentNode after $afterNode");
 
     if (afterNode == null) {
       if (parentNode!.childNodes.isEmpty) {
@@ -326,7 +312,6 @@ class BrowserDomBuilder extends DomBuilder {
   @override
   void removeChild(DomNode parent, DomNode child) {
     var node = child.data.node;
-    print("Remove child $node of ${parent.data.node}");
     node?.remove();
   }
 
