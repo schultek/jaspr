@@ -18,7 +18,7 @@ void main() {
       final controller = await tester.pumpTestComponent(App(params));
 
       // phase 1: observer component should be mounted
-      expect(find.text('Leaf true'), findsOneComponent);
+      expect(find.text('Leaf true false'), findsOneComponent);
 
       MyChildState state =
           (find.byType(MyChildComponent).evaluate().first as StatefulElement)
@@ -63,7 +63,7 @@ void main() {
 
       await controller.rebuild();
 
-      expect(find.text('Leaf true'), findsOneComponent);
+      expect(find.text('Leaf true false'), findsOneComponent);
       // lifecycle: state should be updated
       expect(state.lifecycle, equals(['didUpdateComponent', 'build']));
 
@@ -95,7 +95,7 @@ void main() {
               .state as MyChildState;
       expect(state, isNot(newState));
       state = newState;
-      expect(find.text('Leaf false'), findsOneComponent);
+      expect(find.text('Leaf false false'), findsOneComponent);
       // lifecycle: state should be initialized and built a first time
       expect(state.lifecycle,
           equals(['initState', 'didChangeDependencies', 'build']));
@@ -125,7 +125,7 @@ void main() {
 
       await controller.rebuild();
 
-      expect(find.text('Leaf false'), findsOneComponent);
+      expect(find.text('Leaf false false'), findsOneComponent);
       // lifecycle: state should not be updated
       expect(state.lifecycle, equals([]));
 
@@ -139,7 +139,7 @@ void main() {
       state.notifier.value = !state.notifier.value;
       await tester.pump();
 
-      expect(find.text('Leaf false'), findsOneComponent);
+      expect(find.text('Leaf false true'), findsOneComponent);
       // lifecycle: state should be updated
       expect(state.lifecycle, equals(['build']));
       state.lifecycle.clear();

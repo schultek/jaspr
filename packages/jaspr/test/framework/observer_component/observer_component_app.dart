@@ -100,6 +100,6 @@ class MyChildState extends State<MyChildComponent>
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield* super.build(context);
-    yield Text('Leaf ${component.value}');
+    yield Text('Leaf ${component.value} ${notifier.value}');
   }
 }
