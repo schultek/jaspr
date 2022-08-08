@@ -11,18 +11,33 @@ class App extends StatelessComponent {
       child: Builder(builder: (context) sync* {
         yield DomComponent(
           tag: 'button',
-          classes: ButtonTheme.of(context).resolve(),
+          classes: context.theme.button.resolve(),
           child: Text('Standard'),
         );
 
         yield DomComponent(
           tag: 'button',
-          classes: ButtonTheme.of(context).resolve(isOutlined: true),
+          classes: context.theme.button.resolve(isOutlined: true),
           child: Text('Outlined'),
         );
       }),
     );
   }
+}
+
+extension ContextTheme on BuildContext {
+  AppTheme get theme => AppTheme._(this);
+}
+
+class AppTheme {
+  final BuildContext _context;
+  AppTheme._(this._context);
+
+  T get<T extends ThemeData>() => Theme.of(_context);
+}
+
+extension on AppTheme {
+  ButtonTheme get button => get<ButtonTheme>();
 }
 
 class ButtonTheme extends ThemeData {
