@@ -46,6 +46,10 @@ void main() {
         MapEntry(isA<DomElement>(), ObserverElementEvent.willRebuild),
         MapEntry(isA<StatefulElement>(), ObserverElementEvent.willRebuild),
         MapEntry(isA<StatefulElement>(), ObserverElementEvent.willRebuild),
+        MapEntry(isA<TextElement>(), ObserverElementEvent.willRebuild),
+        MapEntry(isA<TextElement>(), ObserverElementEvent.willRebuild),
+        MapEntry(isA<TextElement>(), ObserverElementEvent.didRebuild),
+        MapEntry(isA<TextElement>(), ObserverElementEvent.didRebuild),
         MapEntry(isA<StatefulElement>(), ObserverElementEvent.didRebuild),
         MapEntry(isA<StatefulElement>(), ObserverElementEvent.didRebuild),
         MapEntry(isA<DomElement>(), ObserverElementEvent.didRebuild),
@@ -60,11 +64,26 @@ void main() {
       await controller.rebuild();
 
       expect(find.text('Leaf true'), findsOneComponent);
-      // lifecycle: state should not be updated
+      // lifecycle: state should be updated
       expect(state.lifecycle, equals(['didUpdateComponent', 'build']));
 
       // Same events as the first time on rebuild
-      checkEvents(initialEvents);
+      checkEvents([
+        MapEntry(isA<MyObserverElement>(), ObserverElementEvent.willRebuild),
+        MapEntry(isA<MyObserverElement>(), ObserverElementEvent.willRebuild),
+        MapEntry(isA<MyObserverElement>(), ObserverElementEvent.willRebuild),
+        MapEntry(isA<DomElement>(), ObserverElementEvent.willRebuild),
+        MapEntry(isA<DomElement>(), ObserverElementEvent.willRebuild),
+        MapEntry(isA<StatefulElement>(), ObserverElementEvent.willRebuild),
+        MapEntry(isA<StatefulElement>(), ObserverElementEvent.willRebuild),
+        MapEntry(isA<StatefulElement>(), ObserverElementEvent.didRebuild),
+        MapEntry(isA<StatefulElement>(), ObserverElementEvent.didRebuild),
+        MapEntry(isA<DomElement>(), ObserverElementEvent.didRebuild),
+        MapEntry(isA<DomElement>(), ObserverElementEvent.didRebuild),
+        MapEntry(isA<MyObserverElement>(), ObserverElementEvent.didRebuild),
+        MapEntry(isA<MyObserverElement>(), ObserverElementEvent.didRebuild),
+        MapEntry(isA<MyObserverElement>(), ObserverElementEvent.didRebuild),
+      ]);
       events.clear();
 
       params = ObserverParam(renderBoth: false, events: events);
@@ -87,6 +106,8 @@ void main() {
         MapEntry(isA<MyObserverElement>(), ObserverElementEvent.willRebuild),
         MapEntry(isA<DomElement>(), ObserverElementEvent.willRebuild),
         MapEntry(isA<StatefulElement>(), ObserverElementEvent.willRebuild),
+        MapEntry(isA<TextElement>(), ObserverElementEvent.willRebuild),
+        MapEntry(isA<TextElement>(), ObserverElementEvent.didRebuild),
         MapEntry(isA<StatefulElement>(), ObserverElementEvent.didRebuild),
         MapEntry(isA<DomElement>(), ObserverElementEvent.didRebuild),
         MapEntry(isA<MyObserverElement>(), ObserverElementEvent.didRebuild),

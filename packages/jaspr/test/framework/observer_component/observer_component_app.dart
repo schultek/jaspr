@@ -17,7 +17,7 @@ class App extends TestComponent<ObserverParam> {
   App(ObserverParam param) : super(initialValue: param);
 
   final child = DomComponent(
-    tag: 'tag',
+    tag: 'div',
     child: MyChildComponent(value: false),
   );
 
