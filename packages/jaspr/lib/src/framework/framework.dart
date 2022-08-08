@@ -626,7 +626,7 @@ abstract class Element implements BuildContext {
     assert(_depth != null);
     assert(_owner != null);
 
-    if (_observerElements != null) {
+    if (_observerElements != null && _observerElements!.isNotEmpty) {
       for (var observer in _observerElements!) {
         observer.didUnmountElement(this);
       }
@@ -810,7 +810,7 @@ abstract class Element implements BuildContext {
       owner._debugCurrentBuildTarget = this;
       return true;
     }());
-    if (_observerElements != null) {
+    if (_observerElements != null && _observerElements!.isNotEmpty) {
       for (var observer in _observerElements!) {
         observer.willRebuildElement(this);
       }
@@ -827,7 +827,7 @@ abstract class Element implements BuildContext {
           dependency.didRebuildDependent(this);
         }
       }
-      if (_observerElements != null) {
+      if (_observerElements != null && _observerElements!.isNotEmpty) {
         for (var observer in _observerElements!) {
           observer.didRebuildElement(this);
         }
