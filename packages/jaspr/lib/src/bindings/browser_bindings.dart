@@ -9,6 +9,8 @@ import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
 import '../framework/framework.dart';
 
+const kBrowserDebugMode = bool.fromEnvironment('jaspr.web.debug');
+
 /// Main entry point for the browser app
 void runApp(Component app, {String attachTo = 'body'}) {
   AppBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
@@ -125,10 +127,14 @@ extension on html.Element {
     final current = getAttribute(name);
     if (current == value) return;
     if (value == null) {
-      print("Remove attribute: $name");
+      if (kBrowserDebugMode) {
+        print("Remove attribute: $name");
+      }
       removeAttribute(name);
     } else {
-      print("Update attribute: $name - $value");
+      if (kBrowserDebugMode) {
+        print("Update attribute: $name - $value");
+      }
       setAttribute(name, value);
     }
   }
@@ -158,7 +164,9 @@ class BrowserDomBuilder extends DomBuilder {
       if (toHydrate.isNotEmpty) {
         for (var e in toHydrate) {
           if (e is html.Element && e.tagName.toLowerCase() == tag) {
-            print("Hydrate html node: $e");
+            if (kBrowserDebugMode) {
+              print("Hydrate html node: $e");
+            }
             elem = data.node = e;
             attributesToRemove = elem.attributes.keys.toSet();
             toHydrate.remove(e);
@@ -170,7 +178,9 @@ class BrowserDomBuilder extends DomBuilder {
 
       elem = data.node = document.createElement(tag);
       attributesToRemove = {};
-      print("Create html node: $elem");
+      if (kBrowserDebugMode) {
+        print("Create html node: $elem");
+      }
     } else {
       if (data.node is! html.Element || (data.node as html.Element).tagName.toLowerCase() != tag) {
         elem = document.createElement(tag);
@@ -183,7 +193,9 @@ class BrowserDomBuilder extends DomBuilder {
           }
         }
         attributesToRemove = {};
-        print("Replace html node: $elem for $old");
+        if (kBrowserDebugMode) {
+          print("Replace html node: $elem for $old");
+        }
       } else {
         elem = data.node as html.Element;
         attributesToRemove = elem.attributes.keys.toSet();
@@ -204,7 +216,9 @@ class BrowserDomBuilder extends DomBuilder {
     attributesToRemove.removeAll(['id', 'class', 'style', ...?attributes?.keys]);
     for (final name in attributesToRemove) {
       elem.removeAttribute(name);
-      print("Remove attribute: $name");
+      if (kBrowserDebugMode) {
+        print("Remove attribute: $name");
+      }
     }
 
     if (events != null && events.isNotEmpty) {
@@ -238,7 +252,9 @@ class BrowserDomBuilder extends DomBuilder {
         if (parent.innerHtml != text) {
           parent.innerHtml = text;
           data.node = parent.childNodes.first;
-          print("Update inner html: $text");
+          if (kBrowserDebugMode) {
+            print("Update inner html: $text");
+          }
         }
       }
       return;
@@ -250,11 +266,15 @@ class BrowserDomBuilder extends DomBuilder {
       if (toHydrate.isNotEmpty) {
         for (var e in toHydrate) {
           if (e is html.Text) {
-            print("Hydrate text node: $e");
+            if (kBrowserDebugMode) {
+              print("Hydrate text node: $e");
+            }
             data.node = e;
             if (e.text != text) {
               e.text = text;
-              print("Update text node: $text");
+              if (kBrowserDebugMode) {
+                print("Update text node: $text");
+              }
             }
             toHydrate.remove(e);
             break diff;
@@ -263,18 +283,24 @@ class BrowserDomBuilder extends DomBuilder {
       }
 
       data.node = html.Text(text);
-      print("Create text node: $text");
+      if (kBrowserDebugMode) {
+        print("Create text node: $text");
+      }
     } else {
       if (data.node is! html.Text) {
         var elem = html.Text(text);
         data.node!.replaceWith(elem);
         data.node = elem;
-        print("Replace text node: $text");
+        if (kBrowserDebugMode) {
+          print("Replace text node: $text");
+        }
       } else {
         var node = data.node as html.Text;
         if (node.text != text) {
           node.text = text;
-          print("Update text node: $text");
+          if (kBrowserDebugMode) {
+            print("Update text node: $text");
+          }
         }
       }
     }
