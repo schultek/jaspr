@@ -16,9 +16,11 @@ class RichText extends BaseElement {
 
 class TextSpan extends BaseElement {
   final String text;
+  final bool rawHtml;
 
   const TextSpan({
   required this.text,
+  this.rawHtml = false,
   super.key,
   super.id,
   super.styles,
@@ -28,5 +30,5 @@ class TextSpan extends BaseElement {
   }) : super(tag: 'span');
 
   @override
-  List<Component> getChildren() => [Text(text)];
+  List<Component> getChildren() => [Text(text, rawHtml: rawHtml)];
 }
