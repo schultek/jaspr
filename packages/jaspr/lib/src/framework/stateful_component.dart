@@ -614,7 +614,7 @@ class StatefulElement extends MultiChildElement {
   State get state => _state!;
 
   @override
-  void _firstBuild() {
+  void _firstBuild([VoidCallback? onBuilt]) {
     assert(state._debugLifecycleState == _StateLifecycle.created);
 
     // We check if state uses on of the mixins that support async initialization,
@@ -642,7 +642,7 @@ class StatefulElement extends MultiChildElement {
       _initState();
     }
 
-    super._firstBuild();
+    super._firstBuild(onBuilt);
   }
 
   void _initState() {

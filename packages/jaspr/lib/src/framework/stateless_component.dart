@@ -137,7 +137,7 @@ class StatelessElement extends MultiChildElement {
   Iterable<Component> build() => component.build(this);
 
   @override
-  void _firstBuild() {
+  void _firstBuild([VoidCallback? onBuilt]) {
     if (owner.isFirstBuild && component is OnFirstBuild) {
       var result = (component as OnFirstBuild).onFirstBuild(this);
       if (result is Future) {
@@ -146,7 +146,7 @@ class StatelessElement extends MultiChildElement {
         });
       }
     }
-    super._firstBuild();
+    super._firstBuild(onBuilt);
   }
 
   @override

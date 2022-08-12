@@ -35,7 +35,7 @@ class DomComponent extends Component {
   Element createElement() => DomElement(this);
 }
 
-class DomElement extends MultiChildElement with DomNode {
+class DomElement extends MultiChildElement with RenderElement {
   DomElement(DomComponent component) : super(component);
 
   @override
@@ -45,9 +45,12 @@ class DomElement extends MultiChildElement with DomNode {
   Iterable<Component> build() => component.children;
 
   @override
-  void _firstBuild() {
+  void _firstBuild([VoidCallback? onBuilt]) {
     mountNode();
-    super._firstBuild();
+    super._firstBuild(() {
+      attachNode();
+      onBuilt?.call();
+    });
   }
 
   @override
@@ -58,7 +61,7 @@ class DomElement extends MultiChildElement with DomNode {
   }
 
   @override
-  void renderNode(DomBuilder builder) {
+  void renderNode(Renderer builder) {
     builder.renderNode(
       this,
       component.tag,
@@ -98,8 +101,8 @@ abstract class NoChildElement extends Element {
   }
 
   @mustCallSuper
-  void _firstBuild() {
-    rebuild();
+  void _firstBuild([VoidCallback? onBuilt]) {
+    rebuild(onBuilt);
   }
 
   @override
@@ -111,20 +114,23 @@ abstract class NoChildElement extends Element {
   void visitChildren(ElementVisitor visitor) {}
 }
 
-class TextElement extends NoChildElement with DomNode {
+class TextElement extends NoChildElement with RenderElement {
   TextElement(Text component) : super(component);
 
   @override
   Text get component => super.component as Text;
 
   @override
-  void _firstBuild() {
+  void _firstBuild([VoidCallback? onBuilt]) {
     mountNode();
-    super._firstBuild();
+    super._firstBuild(() {
+      attachNode();
+      onBuilt?.call();
+    });
   }
 
   @override
-  void renderNode(DomBuilder builder) {
+  void renderNode(Renderer builder) {
     builder.renderTextNode(this, component.text, component.rawHtml);
   }
 }
@@ -136,20 +142,20 @@ class SkipContent extends Component {
   Element createElement() => SkipContentElement(this);
 }
 
-class SkipContentElement extends NoChildElement with DomNode {
+class SkipContentElement extends NoChildElement with RenderElement {
   SkipContentElement(SkipContent component) : super(component);
 
   @override
   SkipContent get component => super.component as SkipContent;
 
   @override
-  void _firstBuild() {
+  void _firstBuild([VoidCallback? onBuilt]) {
     mountNode();
-    super._firstBuild();
+    super._firstBuild(onBuilt);
   }
 
   @override
-  void renderNode(DomBuilder builder) {
+  void renderNode(Renderer builder) {
     builder.skipContent(this);
   }
 }

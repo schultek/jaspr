@@ -1,5 +1,5 @@
 import '../../jaspr.dart';
 
-extension NativeDomNode on DomNode {
+extension NativeDomNode on RenderElement {
   dynamic get nativeElement => null;
 }

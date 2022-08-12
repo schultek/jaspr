@@ -10,6 +10,7 @@ import 'dart:convert';
 
 import 'package:meta/meta.dart';
 
+import '../../jaspr.dart';
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../foundation/scheduler.dart';
@@ -21,7 +22,7 @@ export 'package:domino/domino.dart'
 part 'build_context.dart';
 part 'build_owner.dart';
 part 'components_binding.dart';
-part 'dom_builder.dart';
+part 'render_element.dart';
 part 'dom_component.dart';
 part 'inactive_elements.dart';
 part 'inherited_component.dart';
@@ -225,6 +226,9 @@ abstract class Element implements BuildContext {
   BuildOwner? _owner;
   BuildOwner get owner => _owner!;
 
+  Renderer? _renderer;
+  Renderer? _inheritRenderer() => _renderer;
+
   /// The previous sibling element.
   Element? _prevSibling;
 
@@ -235,10 +239,10 @@ abstract class Element implements BuildContext {
   Element? _lastChild;
 
   /// The last child dom node.
-  DomNode? _lastNode;
+  RenderElement? _lastNode;
 
   /// The nearest ancestor dom node.
-  DomNode? _parentNode;
+  RenderElement? _parentNode;
 
   // This is used to verify that Element objects move through life in an
   // orderly fashion.
@@ -364,14 +368,15 @@ abstract class Element implements BuildContext {
 
     _parent = parent;
     _prevSibling = prevSibling;
-    _prevAncestorSibling = _prevSibling ?? (_parent is DomNode ? null : _parent?._prevAncestorSibling);
-    _parentNode = parent is DomNode ? parent : parent?._parentNode;
+    _prevAncestorSibling = _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
+    _parentNode = parent is RenderElement ? parent : parent?._parentNode;
 
     _lifecycleState = _ElementLifecycle.active;
     _depth = parent != null ? parent.depth + 1 : 1;
 
     if (parent != null) {
       _owner = parent.owner;
+      _renderer = parent._inheritRenderer();
     }
     assert(_owner != null);
 
@@ -427,11 +432,11 @@ abstract class Element implements BuildContext {
   void _didChangeAncestorSibling() {}
 
   void _updateAncestorSiblingRecursively(bool didReorderParent) {
-    var newAncestorSibling = _prevSibling ?? (_parent is DomNode ? null : _parent?._prevAncestorSibling);
+    var newAncestorSibling = _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
     if (didReorderParent || newAncestorSibling != _prevAncestorSibling) {
       _prevAncestorSibling = newAncestorSibling;
       _didChangeAncestorSibling();
-      if (this is! DomNode) {
+      if (this is! RenderElement) {
         visitChildren((e) => e._updateAncestorSiblingRecursively(true));
       }
     }
@@ -531,7 +536,7 @@ abstract class Element implements BuildContext {
   void _activateWithParent(Element parent) {
     assert(_lifecycleState == _ElementLifecycle.inactive);
     _parent = parent;
-    _parentNode = parent is DomNode ? parent : parent._parentNode;
+    _parentNode = parent is RenderElement ? parent : parent._parentNode;
     _updateDepth(_parent!.depth);
     _activateRecursively(this);
     assert(_lifecycleState == _ElementLifecycle.active);
@@ -564,7 +569,7 @@ abstract class Element implements BuildContext {
     _lifecycleState = _ElementLifecycle.active;
 
     var parent = _parent!;
-    _parentNode = parent is DomNode ? parent : parent._parentNode;
+    _parentNode = parent is RenderElement ? parent : parent._parentNode;
 
     _dependencies?.clear();
     _hadUnsatisfiedDependencies = false;
@@ -778,7 +783,7 @@ abstract class Element implements BuildContext {
   ///
   /// Called by the [BuildOwner] when rebuilding, by [mount] when the element is first
   /// built, and by [update] when the component has changed.
-  void rebuild() {
+  void rebuild([VoidCallback? onRebuilt]) {
     assert(_lifecycleState != _ElementLifecycle.initial);
     if (_lifecycleState != _ElementLifecycle.active || !_dirty) {
       return;
@@ -803,6 +808,7 @@ abstract class Element implements BuildContext {
           dependency.didRebuildDependent(this);
         }
       }
+      onRebuilt?.call();
     });
   }
 
@@ -814,4 +820,6 @@ abstract class Element implements BuildContext {
 
   /// Can be set by the element to signal that the first build should be performed asynchronous.
   Future? _asyncFirstBuild;
+
+  List<Future> _asyncFirstBuildChildren = [];
 }
