@@ -44,3 +44,46 @@ class TextSpan extends BaseElement {
     return children;
   }
 }
+
+class Title extends BaseElement {
+  final String text;
+  final int _size;
+
+  Title({
+  required this.text,
+  size = 1,
+  super.key,
+  super.id,
+  super.styles,
+  super.classes,
+  super.attributes,
+  super.events,
+}) : _size = size,
+     super(tag: '');
+
+get size {
+  if (_size < 1) {
+    print('Warning: Title have too low size!');
+    return 1;
+  }
+  else if (_size > 6) {
+    print('Warning: Title have too high size!');
+    return 6;
+  } else {
+    return _size;
+  }
+}
+
+@override
+Iterable<Component> build(BuildContext context) sync* {
+  yield DomComponent(
+    id: id,
+    tag: 'h$size',
+    styles: getStyles(),
+    classes: getClasses(),
+    attributes: getAttributes(),
+    events: getEvents(),
+    child: Text(text),
+  );
+}
+}
