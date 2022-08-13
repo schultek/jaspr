@@ -1,6 +1,43 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/src/ui/components/base.dart';
 
+class Image extends BaseComponent {
+  final double width;
+  final double height;
+  final Uri source;
+  final String? description;
+  final String? tooltip;
+  final bool lazyLoading;
+
+  const Image({
+    required this.source,
+    this.width = 320,
+    this.height = 240,
+    this.description,
+    this.tooltip,
+    this.lazyLoading = false,
+    super.key,
+    super.id,
+    super.styles,
+    super.classes,
+    super.attributes,
+    super.events,
+    super.child,
+    super.children,
+  }) : super(tag: 'img');
+
+  @override
+  Map<String, String> getAttributes() => {
+    'width': width.toString(),
+    'height': height.toString(),
+    'src': source.toString(),
+    if (description != null) 'alt': description!,
+    if (tooltip != null) 'title': tooltip!,
+    if (lazyLoading) 'loading': 'lazy',
+    ...super.attributes ?? {},
+  };
+}
+
 class Video extends BaseComponent {
   final double width;
   final double height;
