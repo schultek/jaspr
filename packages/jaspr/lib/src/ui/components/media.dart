@@ -84,3 +84,41 @@ class Video extends BaseComponent {
       ...super.attributes ?? {},
   };
 }
+
+class Audio extends BaseComponent {
+  final Uri source;
+  final String defaultText;
+  final bool showControls;
+  final bool autoplay;
+  final bool loop;
+  final bool muted;
+
+  const Audio({
+    required this.source,
+    this.defaultText = 'Audio cannot be played.',
+    this.showControls = true,
+    this.autoplay = false,
+    this.loop = false,
+    this.muted = false,
+    super.key,
+    super.id,
+    super.styles,
+    super.classes,
+    super.attributes,
+    super.events,
+  }) : super(tag: 'audio');
+
+
+  @override
+  List<Component> getChildren() => [Text(defaultText)];
+
+  @override
+  Map<String, String> getAttributes() => {
+    'src': source.toString(),
+    if (showControls) 'controls': '',
+    if (autoplay) 'autoplay': '',
+    if (loop) 'loop': '',
+    if (muted) 'muted': '',
+    ...super.attributes ?? {},
+  };
+}
