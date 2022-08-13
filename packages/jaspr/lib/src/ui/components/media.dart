@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/src/ui/components/base.dart';
 
-class Video extends BaseElement {
+class Video extends BaseComponent {
   final double width;
   final double height;
   final String source;

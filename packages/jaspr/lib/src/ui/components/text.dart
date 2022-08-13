@@ -1,7 +1,7 @@
 import 'package:jaspr/components.dart';
 import 'package:jaspr/jaspr.dart';
 
-class RichText extends BaseElement {
+class RichText extends BaseComponent {
   const RichText({
   super.key,
   super.id,
@@ -14,7 +14,7 @@ class RichText extends BaseElement {
   }) : super(tag: 'p');
 }
 
-class TextSpan extends BaseElement {
+class TextSpan extends BaseComponent {
   final String text;
   final bool rawHtml;
   final bool breakLine;
@@ -45,7 +45,7 @@ class TextSpan extends BaseElement {
   }
 }
 
-class Title extends BaseElement {
+class Title extends BaseComponent {
   final String text;
   final int _size;
 

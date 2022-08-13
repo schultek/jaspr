@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/styles.dart';
 
-abstract class BaseElement extends StatelessComponent {
+abstract class BaseComponent extends StatelessComponent {
   final String? id;
   final String tag;
   final Styles? styles;
@@ -12,7 +12,7 @@ abstract class BaseElement extends StatelessComponent {
   final Component? _child;
   final List<Component>? _children;
 
-  const BaseElement({
+  const BaseComponent({
     Key? key,
     Component? child,
     List<Component>? children,

@@ -1,6 +1,6 @@
 import 'package:jaspr/src/ui/components/base.dart';
 
-class Link extends BaseElement {
+class Link extends BaseComponent {
   final String href;
   final bool openInNewTab;
 
