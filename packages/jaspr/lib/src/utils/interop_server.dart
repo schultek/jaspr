@@ -1,5 +1,5 @@
 import '../../jaspr_server.dart';
 
-extension NativeDomNode on DomNode {
-  dynamic get nativeElement => data;
+extension NativeDomNode on RenderElement {
+  dynamic get nativeElement => getData();
 }

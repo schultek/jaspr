@@ -54,8 +54,8 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
   }
 
   @override
-  DomBuilder attachBuilder(String to) {
-    return MarkupDomBuilder();
+  Renderer attachRenderer(String to) {
+    return MarkupDomRenderer();
   }
 
   Future<String> render(String rawHtml) async {
@@ -63,7 +63,7 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
 
     var document = parse(rawHtml);
     var appElement = document.querySelector(_targetId!)!;
-    appElement.innerHtml = (rootElements.values.first.builder as MarkupDomBuilder).renderHtml();
+    appElement.innerHtml = (rootElements.values.first.renderer as MarkupDomRenderer).renderHtml();
 
     document.body!.attributes['state-data'] = stateCodec.encode(getStateData());
     return document.outerHtml;
@@ -91,8 +91,6 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
   }
 }
 
-final _nodesExpando = Expando<DomNodeData>();
-
 class DomNodeData {
   String? tag;
   String? id;
@@ -101,25 +99,25 @@ class DomNodeData {
   Map<String, String>? attributes;
   String? text;
   bool? rawHtml;
-  List<DomNode> children = [];
+  List<RenderElement> children = [];
 }
 
-extension DomNodeDataExt on DomNode {
-  DomNodeData get data => _nodesExpando[this] ??= DomNodeData();
+extension DomNodeDataExt on RenderElement {
+  DomNodeData get data => getData() ?? setData(DomNodeData());
 }
 
-class MarkupDomBuilder extends DomBuilder {
-  DomNode? root;
+class MarkupDomRenderer extends Renderer {
+  RenderElement? root;
 
   @override
-  void setRootNode(DomNode node) {
-    root = node;
+  void setRootNode(RenderElement element) {
+    root = element;
   }
 
   @override
-  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
-    node.data
+    element.data
       ..tag = tag
       ..id = id
       ..classes = classes
@@ -128,19 +126,20 @@ class MarkupDomBuilder extends DomBuilder {
   }
 
   @override
-  void renderTextNode(DomNode node, String text, [bool rawHtml = false]) {
-    node.data.text = text;
-    node.data.rawHtml = rawHtml;
+  void renderTextNode(RenderElement element, String text, [bool rawHtml = false]) {
+    element.data
+      ..text = text
+      ..rawHtml = rawHtml;
   }
 
   @override
-  void skipContent(DomNode node) {
+  void skipContent(RenderElement element) {
     // noop
   }
 
   @override
-  void renderChildNode(DomNode node, DomNode child, DomNode? after) {
-    var children = node.data.children;
+  void renderChildNode(RenderElement element, RenderElement child, RenderElement? after) {
+    var children = element.data.children;
     children.remove(child);
     if (after == null) {
       children.insert(0, child);
@@ -151,10 +150,10 @@ class MarkupDomBuilder extends DomBuilder {
   }
 
   @override
-  void didPerformRebuild(DomNode node) {}
+  void didPerformRebuild(RenderElement element) {}
 
   @override
-  void removeChild(DomNode parent, DomNode child) {
+  void removeChild(RenderElement parent, RenderElement child) {
     parent.data.children.remove(child);
   }
 
@@ -162,8 +161,8 @@ class MarkupDomBuilder extends DomBuilder {
     return root != null ? renderNodeHtml(root!) : '';
   }
 
-  String renderNodeHtml(DomNode node, [int inset = 0]) {
-    var data = node.data;
+  String renderNodeHtml(RenderElement element, [int inset = 0]) {
+    var data = element.data;
     var insetStr = '';
     if (data.text != null) {
       if (data.rawHtml == true) {
@@ -207,7 +206,7 @@ class MarkupDomBuilder extends DomBuilder {
       }
       return output.toString();
     } else {
-      assert(node == root);
+      assert(element == root);
       var output = StringBuffer();
       for (var child in data.children) {
         output.write(renderNodeHtml(child, kDebugMode ? inset + 2 : inset));
@@ -219,10 +218,6 @@ class MarkupDomBuilder extends DomBuilder {
   final _attributeEscape = HtmlEscape(HtmlEscapeMode.attribute);
   final _domValidator = DomValidator();
 
-  @override
-  bool updateShouldNotify(covariant DomBuilder builder) {
-    return true;
-  }
 }
 
 /// DOM validator with sane defaults.

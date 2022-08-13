@@ -9,36 +9,30 @@ class Hidden extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomBuilder.delegate(
-      builder: HiddenBuilder(hidden, visibilityMode),
+    yield RenderScope(
+      delegate: HiddenRenderDelegate(hidden, visibilityMode),
       child: child,
     );
   }
 }
 
-class HiddenBuilder extends DelegatingDomBuilder {
-  HiddenBuilder(this.hidden, this.visibilityMode);
+class HiddenRenderDelegate extends RenderDelegate {
+  HiddenRenderDelegate(this.hidden, this.visibilityMode);
 
   final bool hidden;
   final bool visibilityMode;
 
   @override
-  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void renderNode(RenderElement node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
-    var hide = isDirectChild(node) && hidden;
-    super.renderNode(node, tag, id, classes, {...?styles, if (hide && visibilityMode) 'visibility': 'hidden'},
-        {...?attributes, if (hide && !visibilityMode) 'hidden': ''}, events);
+    super.renderNode(node, tag, id, classes, {...?styles, if (hidden && visibilityMode) 'visibility': 'hidden'},
+        {...?attributes, if (hidden && !visibilityMode) 'hidden': ''}, events);
   }
 
   @override
-  bool updateShouldNotify(covariant HiddenBuilder oldBuilder) {
-    return hidden != oldBuilder.hidden ||
-        visibilityMode != oldBuilder.visibilityMode ||
-        super.updateShouldNotify(oldBuilder);
+  bool updateShouldNotify(covariant HiddenRenderDelegate oldDelegate) {
+    return hidden != oldDelegate.hidden ||
+        visibilityMode != oldDelegate.visibilityMode;
   }
 
-  @override
-  bool shouldNotifyDependent(DomNode dependent) {
-    return isDirectChild(dependent);
-  }
 }
