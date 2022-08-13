@@ -10,19 +10,16 @@ import 'dart:convert';
 
 import 'package:meta/meta.dart';
 
-import '../../jaspr.dart';
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
 
-export 'package:domino/domino.dart'
-    show DomBuilder, DomEvent, DomEventFn, DomLifecycleEvent, DomLifecycleEventFn, DomView, DomBuilderFn;
-
 part 'build_context.dart';
 part 'build_owner.dart';
 part 'components_binding.dart';
 part 'render_element.dart';
+part 'render_scope.dart';
 part 'dom_component.dart';
 part 'inactive_elements.dart';
 part 'inherited_component.dart';

@@ -360,9 +360,4 @@ class BrowserDomRenderer extends Renderer {
     }
     node?.remove();
   }
-
-  @override
-  bool updateShouldNotify(covariant Renderer renderer) {
-    return true;
-  }
 }

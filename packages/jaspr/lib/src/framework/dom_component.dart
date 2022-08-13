@@ -46,9 +46,9 @@ class DomElement extends MultiChildElement with RenderElement {
 
   @override
   void _firstBuild([VoidCallback? onBuilt]) {
-    mountNode();
+    _render();
     super._firstBuild(() {
-      attachNode();
+      _attach();
       onBuilt?.call();
     });
   }
@@ -61,8 +61,8 @@ class DomElement extends MultiChildElement with RenderElement {
   }
 
   @override
-  void renderNode(Renderer builder) {
-    builder.renderNode(
+  void renderNode(Renderer renderer) {
+    renderer.renderNode(
       this,
       component.tag,
       component.id,
@@ -122,16 +122,16 @@ class TextElement extends NoChildElement with RenderElement {
 
   @override
   void _firstBuild([VoidCallback? onBuilt]) {
-    mountNode();
+    _render();
     super._firstBuild(() {
-      attachNode();
+      _attach();
       onBuilt?.call();
     });
   }
 
   @override
-  void renderNode(Renderer builder) {
-    builder.renderTextNode(this, component.text, component.rawHtml);
+  void renderNode(Renderer renderer) {
+    renderer.renderTextNode(this, component.text, component.rawHtml);
   }
 }
 
@@ -150,12 +150,12 @@ class SkipContentElement extends NoChildElement with RenderElement {
 
   @override
   void _firstBuild([VoidCallback? onBuilt]) {
-    mountNode();
+    _render();
     super._firstBuild(onBuilt);
   }
 
   @override
-  void renderNode(Renderer builder) {
-    builder.skipContent(this);
+  void renderNode(Renderer renderer) {
+    renderer.skipContent(this);
   }
 }

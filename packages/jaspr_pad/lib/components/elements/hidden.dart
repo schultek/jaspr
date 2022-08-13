@@ -10,14 +10,14 @@ class Hidden extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield RenderScope(
-      renderer: HiddenRenderer(hidden, visibilityMode),
-      children: [child],
+      delegate: HiddenRenderDelegate(hidden, visibilityMode),
+      child: child,
     );
   }
 }
 
-class HiddenRenderer extends DelegatingRenderer {
-  HiddenRenderer(this.hidden, this.visibilityMode);
+class HiddenRenderDelegate extends RenderDelegate {
+  HiddenRenderDelegate(this.hidden, this.visibilityMode);
 
   final bool hidden;
   final bool visibilityMode;
@@ -30,9 +30,9 @@ class HiddenRenderer extends DelegatingRenderer {
   }
 
   @override
-  bool updateShouldNotify(covariant HiddenRenderer oldRenderer) {
-    return hidden != oldRenderer.hidden ||
-        visibilityMode != oldRenderer.visibilityMode;
+  bool updateShouldNotify(covariant HiddenRenderDelegate oldDelegate) {
+    return hidden != oldDelegate.hidden ||
+        visibilityMode != oldDelegate.visibilityMode;
   }
 
 }

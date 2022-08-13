@@ -12,7 +12,6 @@ export 'src/foundation/constants.dart';
 export 'src/foundation/object.dart';
 export 'src/foundation/scheduler.dart';
 export 'src/foundation/sync.dart';
-export 'src/foundation/wrapped_builder.dart';
 export 'src/framework/framework.dart';
 export 'src/utils/interop_stub.dart' //
     if (dart.library.html) 'src/utils/interop_browser.dart'

@@ -68,7 +68,7 @@ class SplitterState extends State<Splitter> {
           (i > 0 ? splitPairs[i - 1].dragging : false) || (i < splitPairs.length ? splitPairs[i].dragging : false);
 
       yield RenderScope(
-        renderer: SplitElementRenderer(
+        delegate: SplitElementRenderDelegate(
           size: sizes[i],
           dragging: dragging,
           onNode: (node) {
@@ -76,14 +76,14 @@ class SplitterState extends State<Splitter> {
             if (i < splitPairs.length) splitPairs[i].a = node;
           },
         ),
-        children: [component.children[i]],
+        child: component.children[i],
       );
     }
   }
 }
 
-class SplitElementRenderer extends DelegatingRenderer {
-  SplitElementRenderer({required this.size, required this.dragging, required this.onNode});
+class SplitElementRenderDelegate extends RenderDelegate {
+  SplitElementRenderDelegate({required this.size, required this.dragging, required this.onNode});
 
   final double size;
   final bool dragging;
@@ -105,8 +105,8 @@ class SplitElementRenderer extends DelegatingRenderer {
   }
 
   @override
-  bool updateShouldNotify(covariant SplitElementRenderer oldRenderer) {
-    return size != oldRenderer.size || dragging != oldRenderer.dragging;
+  bool updateShouldNotify(covariant SplitElementRenderDelegate oldDelegate) {
+    return size != oldDelegate.size || dragging != oldDelegate.dragging;
   }
 }
 

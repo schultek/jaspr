@@ -24,8 +24,8 @@ abstract class ChildNodeComponent extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield RenderScope(
-      renderer: ChildNodeRenderer(this),
-      children: [child],
+      delegate: ChildNodeDelegate(this),
+      child: child,
     );
   }
 
@@ -34,8 +34,8 @@ abstract class ChildNodeComponent extends StatelessComponent {
   bool hasChanged(covariant ChildNodeComponent oldComponent);
 }
 
-class ChildNodeRenderer extends DelegatingRenderer {
-  ChildNodeRenderer(this.component);
+class ChildNodeDelegate extends RenderDelegate {
+  ChildNodeDelegate(this.component);
 
   final ChildNodeComponent component;
 
@@ -47,8 +47,8 @@ class ChildNodeRenderer extends DelegatingRenderer {
   }
 
   @override
-  bool updateShouldNotify(covariant ChildNodeRenderer oldBuilder) {
-    return component.runtimeType != oldBuilder.component.runtimeType ||
-        component.hasChanged(oldBuilder.component);
+  bool updateShouldNotify(covariant ChildNodeDelegate oldDelegate) {
+    return component.runtimeType != oldDelegate.component.runtimeType ||
+        component.hasChanged(oldDelegate.component);
   }
 }

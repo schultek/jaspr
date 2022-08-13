@@ -85,7 +85,7 @@ class _RootElement extends SingleChildElement with RenderElement {
 
   @override
   void _firstBuild() {
-    mountNode();
+    _render();
     super._firstBuild();
   }
 

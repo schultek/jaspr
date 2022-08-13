@@ -218,10 +218,6 @@ class MarkupDomRenderer extends Renderer {
   final _attributeEscape = HtmlEscape(HtmlEscapeMode.attribute);
   final _domValidator = DomValidator();
 
-  @override
-  bool updateShouldNotify(covariant Renderer renderer) {
-    return true;
-  }
 }
 
 /// DOM validator with sane defaults.
