@@ -19,8 +19,8 @@ class Link extends BaseComponent {
 
   @override
   Map<String, String> getAttributes() => {
-        'href': target.toString(),
-        if (openInNewTab) 'target': '_blank',
-        ...super.attributes ?? {},
-      };
+    'href': target.toString(),
+    if (openInNewTab) 'target': '_blank',
+    ...super.attributes ?? {},
+  };
 }

@@ -73,14 +73,14 @@ class Video extends BaseComponent {
 
   @override
   Map<String, String> getAttributes() => {
-      'width': width.toString(),
-      'height': height.toString(),
-      'src': source.toString(),
-      if (showControls) 'controls': '',
-      if (autoplay) 'autoplay': '',
-      if (loop) 'loop': '',
-      if (muted) 'muted': '',
-      if (poster != null) 'poster': poster.toString(),
-        ...super.attributes ?? {},
-      };
+    'width': width.toString(),
+    'height': height.toString(),
+    'src': source.toString(),
+    if (showControls) 'controls': '',
+    if (autoplay) 'autoplay': '',
+    if (loop) 'loop': '',
+    if (muted) 'muted': '',
+    if (poster != null) 'poster': poster.toString(),
+      ...super.attributes ?? {},
+  };
 }
