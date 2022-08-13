@@ -4,13 +4,13 @@ import 'package:jaspr/src/ui/components/base.dart';
 class Video extends BaseComponent {
   final double width;
   final double height;
-  final String source;
+  final Uri source;
   final String defaultText;
   final bool showControls;
   final bool autoplay;
   final bool loop;
   final bool muted;
-  final String? poster;
+  final Uri? poster;
 
   const Video({
     required this.source,
@@ -38,7 +38,7 @@ class Video extends BaseComponent {
   Map<String, String> getAttributes() => {
       'width': width.toString(),
       'height': height.toString(),
-      'src': source,
+      'src': source.toString(),
       if (showControls) 'controls': '',
       if (autoplay) 'autoplay': '',
       if (loop) 'loop': '',

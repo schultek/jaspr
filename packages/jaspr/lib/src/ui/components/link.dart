@@ -1,11 +1,11 @@
 import 'package:jaspr/src/ui/components/base.dart';
 
 class Link extends BaseComponent {
-  final String href;
+  final Uri target;
   final bool openInNewTab;
 
   const Link({
-    required this.href,
+    required this.target,
     this.openInNewTab = false,
     super.key,
     super.id,
@@ -19,7 +19,7 @@ class Link extends BaseComponent {
 
   @override
   Map<String, String> getAttributes() => {
-        "href": href,
+        "href": target.toString(),
         if (openInNewTab) "target": "_blank",
         ...super.attributes ?? {},
       };
