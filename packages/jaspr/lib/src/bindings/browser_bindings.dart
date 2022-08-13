@@ -257,6 +257,7 @@ class BrowserDomRenderer extends Renderer {
             print("Update inner html: $text");
           }
         }
+        element.parentNode.data.toHydrate.clear();
       }
       return;
     }
