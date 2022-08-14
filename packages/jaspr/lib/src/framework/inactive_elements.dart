@@ -3,12 +3,15 @@ part of framework;
 class _InactiveElements {
   final Set<Element> _elements = HashSet<Element>();
 
-  void _unmount(Element element) {
+  void _unmount(Element element, bool detachNode) {
     assert(element._lifecycleState == _ElementLifecycle.inactive);
     element.visitChildren((Element child) {
       assert(child._parent == element);
-      _unmount(child);
+      _unmount(child, detachNode && element is! RenderElement);
     });
+    if (element is RenderElement && detachNode) {
+      element._remove();
+    }
     element.unmount();
     assert(element._lifecycleState == _ElementLifecycle.defunct);
   }
@@ -17,7 +20,9 @@ class _InactiveElements {
     final List<Element> elements = _elements.toList()..sort(Element._sort);
     _elements.clear();
 
-    elements.reversed.forEach(_unmount);
+    for (var e in elements.reversed) {
+      _unmount(e, true);
+    }
     assert(_elements.isEmpty);
   }
 

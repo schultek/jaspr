@@ -67,8 +67,8 @@ class SplitterState extends State<Splitter> {
       var dragging =
           (i > 0 ? splitPairs[i - 1].dragging : false) || (i < splitPairs.length ? splitPairs[i].dragging : false);
 
-      yield DomBuilder.delegate(
-        builder: SplitElementBuilder(
+      yield RenderScope(
+        delegate: SplitElementRenderDelegate(
           size: sizes[i],
           dragging: dragging,
           onNode: (node) {
@@ -82,46 +82,37 @@ class SplitterState extends State<Splitter> {
   }
 }
 
-class SplitElementBuilder extends DelegatingDomBuilder {
-  SplitElementBuilder({required this.size, required this.dragging, required this.onNode});
+class SplitElementRenderDelegate extends RenderDelegate {
+  SplitElementRenderDelegate({required this.size, required this.dragging, required this.onNode});
 
   final double size;
   final bool dragging;
-  final void Function(DomNode) onNode;
+  final void Function(RenderElement) onNode;
 
   @override
-  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void renderNode(RenderElement node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
-    if (isDirectChild(node)) {
-      styles = {
-        ...?styles,
-        'flex-basis': 'calc($size% - 3px)',
-        if (dragging) ...{
-          'user-select': 'none',
-          'pointer-events': 'none',
-        }
-      };
-    }
+    styles = {
+      ...?styles,
+      'flex-basis': 'calc($size% - 3px)',
+      if (dragging) ...{
+        'user-select': 'none',
+        'pointer-events': 'none',
+      }
+    };
     super.renderNode(node, tag, id, classes, styles, attributes, events);
-    if (isDirectChild(node)) {
-      onNode(node);
-    }
+    onNode(node);
   }
 
   @override
-  bool updateShouldNotify(covariant SplitElementBuilder oldBuilder) {
-    return size != oldBuilder.size || dragging != oldBuilder.dragging || super.updateShouldNotify(oldBuilder);
-  }
-
-  @override
-  bool shouldNotifyDependent(DomNode dependent) {
-    return isDirectChild(dependent);
+  bool updateShouldNotify(covariant SplitElementRenderDelegate oldDelegate) {
+    return size != oldDelegate.size || dragging != oldDelegate.dragging;
   }
 }
 
 class SplitPair {
   SplitterState parent;
-  DomNode? a, b;
+  RenderElement? a, b;
   bool dragging;
   int index;
 

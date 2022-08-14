@@ -50,9 +50,9 @@ class MenuElement extends StatelessElement {
   Menu get component => super.component as Menu;
 
   MDCMenu? _menu;
-  DomNode? _menuNode, _buttonNode;
+  RenderElement? _menuNode, _buttonNode;
 
-  void setMenuNodes(DomNode? menu, DomNode? button) {
+  void setMenuNodes(RenderElement? menu, RenderElement? button) {
     _menuNode ??= menu;
     _buttonNode ??= button;
     if (kIsWeb && _menuNode != null && _buttonNode != null) {

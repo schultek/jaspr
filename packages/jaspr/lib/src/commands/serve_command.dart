@@ -56,13 +56,15 @@ class ServeCommand extends BaseCommand {
     await super.run();
 
     var useSSR = argResults!['ssr'] as bool;
+    var debug = argResults!['debug'];
 
     var webProcess = await runWebdev([
       'serve',
       '--auto=${argResults!['mode'] == 'reload' ? 'restart' : 'refresh'}',
       'web:${useSSR ? '5467' : argResults!['port']}',
       '--',
-      '--delete-conflicting-outputs'
+      '--delete-conflicting-outputs',
+      '--define=build_web_compilers:ddc=environment={"jaspr.web.debug":$debug}'
     ]);
 
     if (!useSSR) {
@@ -102,7 +104,7 @@ class ServeCommand extends BaseCommand {
       '-Djaspr.hotreload=true',
     ];
 
-    if (argResults!['debug']) {
+    if (debug) {
       args.add('--pause-isolates-on-start');
     }
 

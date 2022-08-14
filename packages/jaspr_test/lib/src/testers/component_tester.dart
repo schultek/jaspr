@@ -90,11 +90,11 @@ class TestComponentsBinding extends BindingBase with SchedulerBinding, Component
   @override
   bool get isClient => _isClient;
 
-  DomNode? get rootElement => rootElements['body'];
+  RenderElement? get rootElement => rootElements['body'];
 
   @override
-  DomBuilder attachBuilder(String to) {
-    return TestDomBuilder();
+  Renderer attachRenderer(String to) {
+    return TestDomRenderer();
   }
 
   @override
@@ -119,8 +119,6 @@ class TestComponentsBinding extends BindingBase with SchedulerBinding, Component
   }
 }
 
-final _nodesExpando = Expando<DomNodeData>();
-
 class DomNodeData {
   String? tag;
   String? id;
@@ -130,25 +128,25 @@ class DomNodeData {
   Map<String, EventCallback>? events;
   String? text;
   bool? rawHtml;
-  List<DomNode> children = [];
+  List<RenderElement> children = [];
 }
 
-extension TestDomNodeData on DomNode {
-  DomNodeData get testData => _nodesExpando[this] ??= DomNodeData();
+extension TestDomNodeData on RenderElement {
+  DomNodeData get testData => getData() ?? setData(DomNodeData());
 }
 
-class TestDomBuilder extends DomBuilder {
-  DomNode? root;
+class TestDomRenderer extends Renderer {
+  RenderElement? root;
 
   @override
-  void setRootNode(DomNode node) {
-    root = node;
+  void setRootNode(RenderElement element) {
+    root = element;
   }
 
   @override
-  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
-    node.testData
+    element.testData
       ..tag = tag
       ..id = id
       ..classes = classes
@@ -158,15 +156,15 @@ class TestDomBuilder extends DomBuilder {
   }
 
   @override
-  void renderTextNode(DomNode node, String text, [bool rawHtml = false]) {
-    node.testData
+  void renderTextNode(RenderElement element, String text, [bool rawHtml = false]) {
+    element.testData
       ..text = text
       ..rawHtml = rawHtml;
   }
 
   @override
-  void renderChildNode(DomNode node, DomNode child, DomNode? after) {
-    var children = node.testData.children;
+  void renderChildNode(RenderElement element, RenderElement child, RenderElement? after) {
+    var children = element.testData.children;
     children.remove(child);
     if (after == null) {
       children.insert(0, child);
@@ -177,10 +175,15 @@ class TestDomBuilder extends DomBuilder {
   }
 
   @override
-  void didPerformRebuild(DomNode node) {}
+  void didPerformRebuild(RenderElement element) {}
 
   @override
-  void removeChild(DomNode parent, DomNode child) {
+  void removeChild(RenderElement parent, RenderElement child) {
     parent.testData.children.remove(child);
+  }
+
+  @override
+  void skipContent(RenderElement element) {
+    // noop
   }
 }
