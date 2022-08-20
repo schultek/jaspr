@@ -57,7 +57,7 @@ class StyleElement extends StatefulElement {
   StyleElement(Style component) : super(component);
 
   @override
-  void render(DomBuilder b) {
+  void render(Renderer b) {
     if ((component as Style).scoped) {
       super.render(ScopedDomBuilder(b, state as StyleState));
     } else {
@@ -88,10 +88,10 @@ class _ScopedVisitor extends Visitor {
   }
 }
 
-class ScopedDomBuilder extends DomBuilder {
+class ScopedDomBuilder extends Renderer {
   ScopedDomBuilder(this.builder, this.state);
 
-  final DomBuilder builder;
+  final Renderer builder;
   final StyleState state;
 
   @override

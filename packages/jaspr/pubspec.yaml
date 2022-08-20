@@ -13,7 +13,6 @@ executables:
 dependencies:
   args: ^2.3.0
   binary_codec: ^2.0.3
-  domino: ^0.8.2
   hotreloader: ^3.0.4
   html: ^0.15.0
   http: ^0.13.4

@@ -25,10 +25,11 @@ mixin ComponentsBinding on BindingBase, SchedulerBinding {
     return buildOwner.lockState(() async {
       buildOwner._isFirstBuild = true;
 
-      var builder = attachBuilder(attachTo);
+      var renderer = attachRenderer(attachTo);
 
-      var element = _Root(child: app, builder: builder).createElement();
+      var element = _Root(child: app).createElement();
       element._owner = buildOwner;
+      element._renderer = renderer;
 
       element.mount(null, null);
 
@@ -49,10 +50,10 @@ mixin ComponentsBinding on BindingBase, SchedulerBinding {
   /// The [Element] that is at the root of the hierarchy.
   ///
   /// This is initialized the first time [runApp] is called.
-  Map<String, DomNode> get rootElements => _rootElements;
-  final Map<String, DomNode> _rootElements = {};
+  Map<String, RenderElement> get rootElements => _rootElements;
+  final Map<String, RenderElement> _rootElements = {};
 
-  DomBuilder attachBuilder(String to);
+  Renderer attachRenderer(String to);
 
   final Map<GlobalKey, Element> _globalKeyRegistry = {};
 
@@ -68,35 +69,31 @@ mixin ComponentsBinding on BindingBase, SchedulerBinding {
 }
 
 class _Root extends Component {
-  _Root({required this.child, required this.builder});
+  _Root({required this.child});
 
   final Component child;
-  final DomBuilder builder;
 
   @override
   _RootElement createElement() => _RootElement(this);
 }
 
-class _RootElement extends SingleChildElement with DomNode {
+class _RootElement extends SingleChildElement with RenderElement {
   _RootElement(_Root component) : super(component);
 
   @override
   _Root get component => super.component as _Root;
 
   @override
-  DomBuilder get builder => component.builder;
-
-  @override
   void _firstBuild() {
-    mountNode();
+    _render();
     super._firstBuild();
   }
 
   @override
-  Component build() => _InheritedDomBuilder(builder: builder, child: component.child);
+  Component build() => component.child;
 
   @override
-  void renderNode(DomBuilder builder) {
-    builder.setRootNode(this);
+  void renderNode(Renderer renderer) {
+    renderer.setRootNode(this);
   }
 }

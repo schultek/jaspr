@@ -82,6 +82,7 @@ class BuildOwner {
       assert(isFirstBuild, 'Only the first build is allowed to be asynchronous.');
       var buildCompleter = Completer.sync()..future.whenComplete(whenComplete);
       child._asyncFirstBuild = buildCompleter.future;
+      child._parent?._asyncFirstBuildChildren.add(buildCompleter.future);
       asyncFirstBuild.whenComplete(() {
         child.performRebuild();
         _waitChildren(child, buildCompleter);
@@ -98,17 +99,12 @@ class BuildOwner {
   }
 
   void _waitChildren(Element child, Completer buildCompleter) {
-    var remaining = 0;
-    child.visitChildren((element) {
-      if (element._asyncFirstBuild is Future) {
-        remaining++;
-        element._asyncFirstBuild!.whenComplete(() {
-          remaining--;
-          if (remaining == 0) buildCompleter.complete();
-        });
-      }
-    });
-    if (remaining == 0) {
+    var asyncChildren = child._asyncFirstBuildChildren;
+    child._asyncFirstBuildChildren = [];
+
+    if (asyncChildren.isNotEmpty) {
+      Future.wait(asyncChildren).whenComplete(() => buildCompleter.complete());
+    } else {
       buildCompleter.complete();
     }
   }
