@@ -143,13 +143,6 @@ class BrowserDomRenderer extends Renderer {
   BrowserDomRenderer(this.container);
 
   @override
-  void setRootNode(RenderElement element) {
-    element.data
-        ..node = container
-    ..toHydrate = [...container.nodes];
-  }
-
-  @override
   void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     var data = element.data;
@@ -314,8 +307,15 @@ class BrowserDomRenderer extends Renderer {
   }
 
   @override
-  void renderChildNode(RenderElement element, RenderElement child, RenderElement? after) {
-    var parentNode = element.data.node;
+  void attachNode(RenderElement? parent, RenderElement child, RenderElement? after) {
+    if (parent == null) {
+      child.data
+        ..node = container
+        ..toHydrate = [...container.nodes];
+      return;
+    }
+
+    var parentNode = parent.data.node;
     var childNode = child.data.node;
 
     assert(parentNode is html.Element);
@@ -343,7 +343,7 @@ class BrowserDomRenderer extends Renderer {
   }
 
   @override
-  void didPerformRebuild(RenderElement element) {
+  void finalizeNode(RenderElement element) {
     if (kBrowserDebugMode && element.data.toHydrate.isNotEmpty) {
       print("Clear ${element.data.toHydrate.length} nodes not hydrated (${element.data.toHydrate})");
     }

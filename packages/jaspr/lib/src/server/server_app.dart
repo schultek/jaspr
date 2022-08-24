@@ -16,6 +16,7 @@ import 'package:shelf_static/shelf_static.dart';
 
 import '../bindings/server_bindings.dart';
 import '../framework/framework.dart';
+import 'document.dart';
 
 part 'server_renderer.dart';
 
@@ -25,23 +26,25 @@ const kServerHotReload = bool.fromEnvironment('jaspr.hotreload');
 /// Returns a shelf handler that serves the provided component and related assets
 Handler serveApp(AppHandler handler) {
   return _createHandler((request, render) {
-    return handler(request, (app, {String attachTo = 'body'}) {
-      return render(_createSetup(app, attachTo));
+    return handler(request, (app) {
+      return render(_createSetup(app));
     });
   });
 }
 
 /// Directly renders the provided component into a html response
-Future<Response> renderComponent(Component app, {String attachTo = 'body', String templateFile = 'index.html'}) async {
-  var response = await staticFileHandler(Request('get', Uri.parse('https://0.0.0.0/$templateFile')));
-  return _renderApp(_createSetup(app, attachTo), Request('get', Uri.parse('https://0.0.0.0/')), response);
+Future<Response> renderComponent(Component app) async {
+  return _renderApp(_createSetup(app), Request('get', Uri.parse('https://0.0.0.0/')), (name) async {
+    var response = await staticFileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
+    return response.readAsString();
+  });
 }
 
-typedef RenderFunction = FutureOr<Response> Function(Component, {String attachTo});
+typedef RenderFunction = FutureOr<Response> Function(Component);
 typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render);
 
-SetupFunction _createSetup(Component app, String attachTo) {
-  return () => AppBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
+SetupFunction _createSetup(Component app) {
+  return () => AppBinding.ensureInitialized().attachRootComponent(app, attachTo: '_');
 }
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
@@ -116,9 +119,9 @@ class ServerApp {
   }
 }
 
-Handler _proxyRootIndexHandler(Handler proxyHandler) {
-  return (Request req) {
-    final indexRequest = Request('GET', req.requestedUri.replace(path: '/'),
+FutureOr<Response> Function(Request, String) _proxyFileLoader(Handler proxyHandler) {
+  return (Request req, String fileName) {
+    final indexRequest = Request('GET', req.requestedUri.replace(path: '/$fileName'),
         context: req.context, encoding: req.encoding, headers: req.headers, protocolVersion: req.protocolVersion);
     return proxyHandler(indexRequest);
   };
@@ -260,31 +263,20 @@ Handler _createHandler(_SetupHandler handle, {List<Middleware> middleware = cons
     cascade = cascade.add(_sseProxyHandler(sseUri, serverSseUri));
   }
 
-  cascade = cascade.add(gzipMiddleware(staticHandler)).add(_proxyRootIndexHandler(staticHandler));
-
-  var resourceHandler = cascade.handler;
-
-  var pipeline = const Pipeline();
-  for (var middleware in middleware) {
-    pipeline = pipeline.addMiddleware(middleware);
-  }
-  var handler = pipeline.addHandler((Request request) async {
-    var fileResponse = await resourceHandler(request);
-
-    if (fileResponse.headers['content-type'] != 'text/html') {
-      return fileResponse;
-    }
-
-    if (request.url.path.endsWith('.dart') ||
-        request.url.path.endsWith('.js.map') ||
-        request.url.path.endsWith('.js')) {
-      return Response.internalServerError(body: 'Cannot handle request');
-    }
-
-    return handle(request, (setup) => _renderApp(setup, request, fileResponse));
+  var fileLoader = _proxyFileLoader(staticHandler);
+  cascade = cascade.add(gzipMiddleware(staticHandler)).add((request) async {
+    return handle(request, (setup) => _renderApp(setup, request, (name) async {
+      var response = await fileLoader(request, name);
+      return response.readAsString();
+    }));
   });
 
-  return handler;
+  var pipeline = const Pipeline();
+  for (var m in middleware) {
+    pipeline = pipeline.addMiddleware(m);
+  }
+
+  return pipeline.addHandler(cascade.handler);
 }
 
 /// Creates and runs the http server

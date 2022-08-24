@@ -85,15 +85,15 @@ class _RootElement extends SingleChildElement with RenderElement {
 
   @override
   void _firstBuild() {
-    _render();
+    _attach();
     super._firstBuild();
+  }
+
+  @override
+  void renderNode(Renderer renderer) {
   }
 
   @override
   Component build() => component.child;
 
-  @override
-  void renderNode(Renderer renderer) {
-    renderer.setRootNode(this);
-  }
 }

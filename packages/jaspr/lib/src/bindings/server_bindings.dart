@@ -1,30 +1,30 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:html/parser.dart';
-
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../foundation/constants.dart';
 import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
 import '../framework/framework.dart';
+import '../server/document.dart';
 import '../server/server_app.dart';
 
 /// Main entry point on the server
-void runApp(Component app, {String attachTo = 'body'}) {
-  runServer(app, attachTo: attachTo);
+/// TODO: Add hint about usage of global variables and isolate state
+void runApp(Component app) {
+  runServer(app);
 }
 
 /// Same as [runApp] but returns an instance of [ServerApp] to control aspects of the http server
-ServerApp runServer(Component app, {String attachTo = 'body'}) {
+ServerApp runServer(Component app) {
   return ServerApp.run(() {
-    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
+    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: '_');
   });
 }
 
 /// Global component binding for the server
-class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, SyncBinding {
+class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, SyncBinding, DocumentBinding {
   static AppBinding ensureInitialized() {
     if (ComponentsBinding.instance == null) {
       AppBinding();
@@ -40,8 +40,6 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
     _currentUri = uri;
   }
 
-  String? _targetId;
-
   @override
   bool get isClient => false;
 
@@ -49,7 +47,6 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
 
   @override
   void didAttachRootElement(Element element, {required String to}) {
-    _targetId = to;
     rootCompleter.complete();
   }
 
@@ -58,15 +55,13 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
     return MarkupDomRenderer();
   }
 
-  Future<String> render(String rawHtml) async {
+  Future<String> render() async {
     await rootCompleter.future;
 
-    var document = parse(rawHtml);
-    var appElement = document.querySelector(_targetId!)!;
-    appElement.innerHtml = (rootElements.values.first.renderer as MarkupDomRenderer).renderHtml();
+    var state = stateCodec.encode(getStateData());
+    var renderer = rootElements.values.first.renderer as MarkupDomRenderer;
 
-    document.body!.attributes['state-data'] = stateCodec.encode(getStateData());
-    return document.outerHtml;
+    return renderDocument(state, renderer);
   }
 
   Future<String> data() async {
@@ -110,11 +105,6 @@ class MarkupDomRenderer extends Renderer {
   RenderElement? root;
 
   @override
-  void setRootNode(RenderElement element) {
-    root = element;
-  }
-
-  @override
   void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     element.data
@@ -138,8 +128,13 @@ class MarkupDomRenderer extends Renderer {
   }
 
   @override
-  void renderChildNode(RenderElement element, RenderElement child, RenderElement? after) {
-    var children = element.data.children;
+  void attachNode(RenderElement? parent, RenderElement child, RenderElement? after) {
+    if (parent == null) {
+      root = child;
+      return;
+    }
+
+    var children = parent.data.children;
     children.remove(child);
     if (after == null) {
       children.insert(0, child);
@@ -150,7 +145,7 @@ class MarkupDomRenderer extends Renderer {
   }
 
   @override
-  void didPerformRebuild(RenderElement element) {}
+  void finalizeNode(RenderElement element) {}
 
   @override
   void removeChild(RenderElement parent, RenderElement child) {
@@ -188,7 +183,11 @@ class MarkupDomRenderer extends Renderer {
       if (data.attributes != null && data.attributes!.isNotEmpty) {
         for (var attr in data.attributes!.entries) {
           _domValidator.validateAttributeName(attr.key);
-          output.write(' ${attr.key}="${_attributeEscape.convert(attr.value)}"');
+          if (attr.value.isNotEmpty) {
+            output.write(' ${attr.key}="${_attributeEscape.convert(attr.value)}"');
+          } else {
+            output.write(' ${attr.key}');
+          }
         }
       }
       var selfClosing = _domValidator.isSelfClosing(tag);

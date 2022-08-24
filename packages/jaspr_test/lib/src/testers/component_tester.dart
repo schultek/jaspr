@@ -163,7 +163,7 @@ class TestDomRenderer extends Renderer {
   }
 
   @override
-  void renderChildNode(RenderElement element, RenderElement child, RenderElement? after) {
+  void attachNode(RenderElement element, RenderElement child, RenderElement? after) {
     var children = element.testData.children;
     children.remove(child);
     if (after == null) {
@@ -175,7 +175,7 @@ class TestDomRenderer extends Renderer {
   }
 
   @override
-  void didPerformRebuild(RenderElement element) {}
+  void finalizeNode(RenderElement element) {}
 
   @override
   void removeChild(RenderElement parent, RenderElement child) {

@@ -323,13 +323,6 @@ packages:
       relative: true
     source: path
     version: "0.2.0"
-  jaspr_gen:
-    dependency: "direct overridden"
-    description:
-      path: ".dart_tool/jaspr_gen"
-      relative: true
-    source: path
-    version: "1.0.0"
   jaspr_test:
     dependency: "direct overridden"
     description:
@@ -463,6 +456,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.1"
+  shelf_gzip:
+    dependency: transitive
+    description:
+      name: shelf_gzip
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.0"
   shelf_packages_handler:
     dependency: transitive
     description:
