@@ -2,6 +2,22 @@ part of server;
 
 typedef SetupFunction = void Function();
 
+class ComponentEntry {
+  final String name;
+
+  ComponentEntry(this.name);
+}
+
+typedef ComponentRegistryData = Map<Type, ComponentEntry>;
+
+class ComponentRegistry {
+  static final ComponentRegistryData _components = {};
+
+  static void initialize({required Map<Type, ComponentEntry> components}) {
+    _components.addAll(components);
+  }
+}
+
 /// This spawns an isolate for each render, in order to avoid conflicts with static instances and multiple parallel requests
 Future<Response> _renderApp(SetupFunction setup, Request request, Future<String> Function(String) loadFile) async {
   var port = ReceivePort();
@@ -9,14 +25,14 @@ Future<Response> _renderApp(SetupFunction setup, Request request, Future<String>
   /// We support two modes here, rendered-html and data-only
   /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
   if (request.headers['jaspr-mode'] == 'data-only') {
-    var message = _RenderMessage(setup, request.url, port.sendPort);
+    var message = _RenderMessage(setup, ComponentRegistry._components, request.url, port.sendPort);
 
     await Isolate.spawn(_renderData, message);
     var result = await port.first;
 
     return Response.ok(result, headers: {'Content-Type': 'application/json'});
   } else {
-    var message = _RenderMessage(setup, request.url, port.sendPort);
+    var message = _RenderMessage(setup, ComponentRegistry._components, request.url, port.sendPort);
 
     await Isolate.spawn(_renderHtml, message);
 
@@ -39,27 +55,32 @@ Future<Response> _renderApp(SetupFunction setup, Request request, Future<String>
 
 class _RenderMessage {
   SetupFunction setup;
+  ComponentRegistryData registryData;
   Uri requestUri;
   SendPort sendPort;
 
-  _RenderMessage(this.setup, this.requestUri, this.sendPort);
+  _RenderMessage(this.setup, this.registryData, this.requestUri, this.sendPort);
 }
 
 /// Runs the app and returns the rendered html
 void _renderHtml(_RenderMessage message) async {
   AppBinding.ensureInitialized()
-      ..setCurrentUri(message.requestUri)
+    ..setRegistryData(message.registryData)
+    ..setCurrentUri(message.requestUri)
     ..setSendPort(message.sendPort);
   message.setup();
-  var html = await AppBinding.ensureInitialized().render();
 
+  var html = await AppBinding.ensureInitialized().render();
   message.sendPort.send(html);
 }
 
 /// Runs the app and returns the preloaded state data as json
 void _renderData(_RenderMessage message) async {
-  AppBinding.ensureInitialized().setCurrentUri(message.requestUri);
+  AppBinding.ensureInitialized()
+    ..setRegistryData(message.registryData)
+    ..setCurrentUri(message.requestUri);
   message.setup();
+
   var data = await AppBinding.ensureInitialized().data();
   message.sendPort.send(data);
 }

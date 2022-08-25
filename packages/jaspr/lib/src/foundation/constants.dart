@@ -75,3 +75,12 @@ const double precisionErrorTolerance = 1e-10;
 /// to an integer `0`. This is not true for Dart code running in AOT or on the
 /// VM.
 const bool kIsWeb = identical(0, 0.0);
+
+
+
+class AppAnnotation {
+  const AppAnnotation._();
+}
+
+/// Used to annotate an app component
+const app = AppAnnotation._();

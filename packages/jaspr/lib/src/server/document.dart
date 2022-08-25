@@ -23,6 +23,17 @@ abstract class Document extends StatefulComponent {
     required Component body,
   }) = _BaseDocument;
 
+  const factory Document.app({
+    String? title,
+    String? base,
+    String? charset,
+    String? viewport,
+    Map<String, String>? meta,
+    List<StyleRule>? styles,
+    List<Component> head,
+    required Component body,
+  }) = _AppDocument;
+
   const factory Document.file({
     String name,
     String attachTo,
@@ -68,6 +79,19 @@ class _BaseDocument extends _ManualDocument {
   });
 }
 
+class _AppDocument extends _ManualDocument {
+  const _AppDocument({
+    super.title,
+    super.base,
+    super.charset,
+    super.viewport,
+    super.meta,
+    super.styles,
+    super.head,
+    required super.body,
+  }) : super(scriptName: r'__$auto$__');
+}
+
 abstract class _ManualDocument extends Document {
   const _ManualDocument({
     this.title,
@@ -100,6 +124,7 @@ abstract class _ManualDocument extends Document {
 
 class _ManualDocumentState extends State<_ManualDocument> {
   RenderElement? _body;
+  RenderElement? _script;
 
   String? get _normalizedBase {
     var base = component.base;
@@ -117,7 +142,7 @@ class _ManualDocumentState extends State<_ManualDocument> {
         DomComponent(
           tag: 'head',
           children: [
-            DomComponent(tag: 'meta', attributes: {'charset': 'utf-8'}),
+            if (component.charset != null) DomComponent(tag: 'meta', attributes: {'charset': component.charset!}),
             if (component.base != null) //
               DomComponent(tag: 'base', attributes: {'href': _normalizedBase!}),
             if (component.viewport != null)
@@ -131,20 +156,43 @@ class _ManualDocumentState extends State<_ManualDocument> {
               Style(styles: component.styles!),
             ...component.head,
             if (component.scriptName != null)
-              DomComponent(tag: 'script', attributes: {'defer': '', 'src': '${component.scriptName}.dart.js'}),
+              FindChildNode(
+                onNodeFound: (element) {
+                  _script = element;
+                },
+                child: DomComponent(tag: 'script', attributes: {'defer': '', 'src': '${component.scriptName}.dart.js'}),
+              ),
           ],
         ),
         FindChildNode(
           onNodeFound: (element) {
             _body = element;
           },
-          child: DomComponent(
-            tag: 'body',
-            child: component.body,
+          child: ComponentObserver(
+            child: DomComponent(
+              tag: 'body',
+              child: component.body,
+            ),
           ),
         ),
       ],
     );
+  }
+
+  void _setData(String injectState) {
+    if (_body != null) {
+      (_body!.data.attributes ??= {})['state-data'] = injectState;
+    }
+  }
+
+  void _setScript(String? name) {
+    if (_script != null) {
+      if (name == null) {
+        _script!.renderer.removeChild(_script!.parentNode, _script!);
+      } else {
+        (_script!.data.attributes ??= {})['src'] = '$name.g.dart.js';
+      }
+    }
   }
 }
 
@@ -192,6 +240,30 @@ class _IslandsDocument extends _ManualDocument {
   }) : super(scriptName: 'main.islands');
 }
 
+class ComponentObserver extends ObserverComponent {
+  ComponentObserver({required super.child});
+
+  @override
+  ObserverElement createElement() => ComponentObserverElement(this);
+}
+
+class ComponentObserverElement extends ObserverElement {
+  ComponentObserverElement(super.component);
+
+  @override
+  void willRebuildElement(Element element) {}
+
+  @override
+  void didRebuildElement(Element element) {
+    if (DocumentBinding.instance!._registryData.containsKey(element.component.runtimeType)) {
+      DocumentBinding.instance!._registerElement(element);
+    }
+  }
+
+  @override
+  void didUnmountElement(Element element) {}
+}
+
 mixin DocumentBinding on BindingBase {
   @override
   void initInstances() {
@@ -203,6 +275,7 @@ mixin DocumentBinding on BindingBase {
   static DocumentBinding? get instance => _instance!;
 
   late SendPort _sendPort;
+  late ComponentRegistryData _registryData;
   ReceivePort? _receivePort;
 
   void setSendPort(SendPort sendPort) {
@@ -218,10 +291,33 @@ mixin DocumentBinding on BindingBase {
     _fileRequest = _receivePort!.first.then((value) => value);
   }
 
+  void setRegistryData(ComponentRegistryData registryData) {
+    _registryData = registryData;
+  }
+
+  final Set<Element> _registryElements = {};
+
+  void _registerElement(Element element) {
+    _registryElements.add(element);
+  }
+
   Future<String> renderDocument(String injectState, MarkupDomRenderer renderer) async {
     var state = _document?.state;
-    if (state is _ManualDocumentState && state._body != null) {
-      (state._body!.data.attributes ??= {})['state-data'] = injectState;
+    if (state is _ManualDocumentState) {
+      state._setData(injectState);
+
+      if (state.component is _AppDocument) {
+        String? componentName;
+        if (_registryElements.isEmpty) {
+          print("[WARNING] Used Document.app() but no app component was provided.");
+        } else {
+          if (_registryElements.length > 1) {
+            print("[WARNING] Used Document.app() but multiple app components were provided.");
+          }
+          componentName = _registryData[_registryElements.first.component.runtimeType]!.name;
+        }
+        state._setScript(componentName);
+      }
     }
 
     var content = renderer.renderHtml();

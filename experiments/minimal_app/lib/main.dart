@@ -4,7 +4,7 @@ import 'package:jaspr/styles.dart';
 import 'app.dart';
 
 void main() {
-  runApp(Document(
+  runApp(Document.app(
     title: 'minimal_app',
     styles: [
       StyleRule.import('https://fonts.googleapis.com/css?family=Roboto'),
@@ -24,6 +24,6 @@ void main() {
       ),
     ],
     body: App(),
-    scriptName: 'main'
+    //scriptName: 'main'
   ));
 }

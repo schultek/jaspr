@@ -58,7 +58,7 @@ class IslandsApp extends StatefulComponent {
   State<IslandsApp> createState() => _IslandsAppState();
 
   static void _runIsland(IslandBuilder builder, IslandParams params, String id) {
-    runApp(Builder.single(builder: (c) => builder(c, params)), attachTo: '#$id');
+    //runApp(Builder.single(builder: (c) => builder(c, params)), attachTo: '#$id');
   }
 
   static void _applyIslands(FutureOr<IslandBuilder> Function(String) fn) {
