@@ -14,7 +14,7 @@ class IssuesPanel extends StatelessComponent {
 
     yield DomComponent(
       tag: 'div',
-      styles: {'display': 'flex', 'flex-direction': 'column'},
+      styles: Styles.flexbox(direction: FlexDirection.column),
       children: [
         for (var issue in issues) IssueItem(issue),
       ],

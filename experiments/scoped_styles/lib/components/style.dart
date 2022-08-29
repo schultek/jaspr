@@ -1,6 +1,6 @@
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart';
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/jaspr.dart' hide Selector;
 import 'package:uuid/uuid.dart';
 
 class Style extends StatefulComponent {
@@ -12,9 +12,6 @@ class Style extends StatefulComponent {
 
   @override
   State<StatefulComponent> createState() => StyleState();
-
-  @override
-  Element createElement() => StyleElement(this);
 }
 
 class StyleState extends State<Style> {
@@ -49,19 +46,14 @@ class StyleState extends State<Style> {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(tag: 'style', child: Text(style));
-    yield component.child;
-  }
-}
-
-class StyleElement extends StatefulElement {
-  StyleElement(Style component) : super(component);
-
-  @override
-  void render(Renderer b) {
-    if ((component as Style).scoped) {
-      super.render(ScopedDomBuilder(b, state as StyleState));
+    if (component.scoped) {
+      yield RenderScope(
+        delegate: _ScopedDelegate(id),
+        shallow: false,
+        child: component.child,
+      );
     } else {
-      super.render(b);
+      yield component.child;
     }
   }
 }
@@ -88,47 +80,13 @@ class _ScopedVisitor extends Visitor {
   }
 }
 
-class ScopedDomBuilder extends Renderer {
-  ScopedDomBuilder(this.builder, this.state);
+class _ScopedDelegate extends RenderDelegate {
+  _ScopedDelegate(this.id);
 
-  final Renderer builder;
-  final StyleState state;
-
+  final String id;
   @override
-  void open(String tag,
-      {String? key,
-      String? id,
-      Iterable<String>? classes,
-      Map<String, String>? styles,
-      Map<String, String>? attributes,
-      Map<String, DomEventFn>? events,
-      DomLifecycleEventFn? onCreate,
-      DomLifecycleEventFn? onUpdate,
-      DomLifecycleEventFn? onRemove}) {
-    builder.open(tag,
-        key: key,
-        id: id,
-        classes: classes,
-        styles: styles,
-        attributes: {'data-j-${state.id}': '', ...attributes ?? {}},
-        events: events,
-        onCreate: onCreate,
-        onUpdate: onUpdate,
-        onRemove: onRemove);
+  void renderNode(RenderElement node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+      Map<String, String>? attributes, Map<String, EventCallback>? events) {
+    super.renderNode(node, tag, id, classes, styles, {'data-j-${id}': '', ...attributes ?? {}}, events);
   }
-
-  @override
-  void close({String? tag}) => builder.close(tag: tag);
-
-  @override
-  void innerHtml(String value) => builder.innerHtml(value);
-
-  @override
-  void skipNode() => builder.skipNode();
-
-  @override
-  void skipRemainingNodes() => builder.skipRemainingNodes();
-
-  @override
-  void text(String value) => builder.text(value);
 }

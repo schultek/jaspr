@@ -1,5 +1,4 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/styles.dart';
 
 class App extends StatelessComponent {
   @override

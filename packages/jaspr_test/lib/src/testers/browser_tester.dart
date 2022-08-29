@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:html' as html;
 
-import 'package:jaspr/jaspr_browser.dart';
+import 'package:jaspr/browser.dart';
 
 import '../../jaspr_test.dart';
 

@@ -13,6 +13,8 @@ export 'src/foundation/object.dart';
 export 'src/foundation/scheduler.dart';
 export 'src/foundation/sync.dart';
 export 'src/framework/framework.dart';
+export 'src/ui/styles.dart';
 export 'src/utils/interop_stub.dart' //
     if (dart.library.html) 'src/utils/interop_browser.dart'
     if (dart.library.io) 'src/utils/interop_server.dart';
+

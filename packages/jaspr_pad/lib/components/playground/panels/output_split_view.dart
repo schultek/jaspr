@@ -99,18 +99,18 @@ class EditorTabs extends StatelessComponent {
               children: [
                 Builder(builder: (context) sync* {
                   var isConsole = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.console));
-                  yield DomComponent(tag: 'button', id: 'left-console-clear-button', classes: [
-                    'console-clear-icon',
-                    'mdc-icon-button'
-                  ], styles: {
-                    if (!isConsole) 'visibility': 'hidden'
-                  }, attributes: {
-                    'title': 'Clear console'
-                  }, events: {
-                    'click': (e) {
-                      context.read(consoleMessagesProvider.notifier).state = [];
-                    }
-                  });
+                  yield DomComponent(
+                    tag: 'button',
+                    id: 'left-console-clear-button',
+                    classes: ['console-clear-icon', 'mdc-icon-button'],
+                    styles: !isConsole ? Styles.box(visibility: Visibility.hidden) : null,
+                    attributes: {'title': 'Clear console'},
+                    events: {
+                      'click': (e) {
+                        context.read(consoleMessagesProvider.notifier).state = [];
+                      }
+                    },
+                  );
                 }),
                 DomComponent(
                   tag: 'button',
@@ -131,7 +131,7 @@ class EditorTabs extends StatelessComponent {
         DomComponent(
           tag: 'div',
           id: 'editor-panel-tab-host',
-          styles: {'overflow': 'scroll'},
+          styles: Styles.box(overflow: Overflow.scroll),
           child: EditorTabWindow(),
         ),
       ],

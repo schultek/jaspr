@@ -3,7 +3,6 @@ import 'dart:isolate';
 import 'package:html/parser.dart';
 
 import '../../server.dart';
-import '../../styles.dart';
 
 // only allow a single document
 const _documentKey = GlobalKey();
