@@ -141,3 +141,26 @@ class Row extends BaseComponent {
     if (styles != null) styles!
   ]);
 }
+
+class Grid extends BaseComponent {
+  const Grid({
+  required this.columns,
+  this.gap,
+  this.spread = false,
+  super.children,
+  }) : super(tag: 'div');
+
+  final int columns;
+  final Unit? gap;
+  final bool spread;
+
+  @override
+  Styles getStyles() => Styles.combine([
+    Styles.raw({
+      "display": "grid",
+      "grid-template-columns": "repeat($columns, ${spread ? "1fr" : "0fr"})",
+      if (gap != null) "gap": gap!.value,
+    }),
+    if (styles != null) styles!
+  ]);
+}
