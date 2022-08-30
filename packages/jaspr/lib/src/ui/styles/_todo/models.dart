@@ -1,3 +1,4 @@
+/*
 import 'package:jaspr/ui.dart';
 
 class BoxConstraints {
@@ -91,3 +92,4 @@ class RadialGradient extends Gradient {
     return startFunction + setupPart + color1Part + color2Part + color3Part + endFunction;
   }
 }
+*/
