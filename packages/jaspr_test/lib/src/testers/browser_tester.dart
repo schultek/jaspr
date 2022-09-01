@@ -17,15 +17,11 @@ class BrowserTester {
     Map<String, dynamic>? initialStateData,
     Map<String, dynamic> Function(String url)? onFetchState,
   }) {
-    if (initialStateData != null) {
-      // TODO set initial state
-    }
-
     if (html.window.location.pathname != location) {
       html.window.history.replaceState(null, 'Test', location);
     }
 
-    var binding = TestBrowserComponentsBinding(onFetchState);
+    var binding = TestBrowserComponentsBinding(onFetchState, initialStateData);
     return BrowserTester._(binding, attachTo);
   }
 
@@ -86,9 +82,15 @@ class BrowserTester {
 }
 
 class TestBrowserComponentsBinding extends AppBinding {
-  TestBrowserComponentsBinding(this._onFetchState);
+  TestBrowserComponentsBinding(this._onFetchState, this._initialSyncState);
 
+  final Map<String, dynamic>? _initialSyncState;
   final Map<String, dynamic> Function(String url)? _onFetchState;
+
+  @override
+  Map<String, dynamic>? loadSyncState() {
+    return _initialSyncState;
+  }
 
   @override
   Future<Map<String, dynamic>> fetchState(String url) async {

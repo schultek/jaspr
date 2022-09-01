@@ -6,6 +6,19 @@ import 'js_data.dart';
 typedef IslandLoader = FutureOr<IslandBuilder> Function();
 typedef IslandBuilder = Component Function(ConfigParams);
 
+class ConfigParams {
+  final Map<String, dynamic> _params;
+
+  ConfigParams(this._params);
+
+  T get<T>(String key) {
+    if (_params[key] is! T) {
+      print("$key is not $T: ${_params[key]}");
+    }
+    return _params[key];
+  }
+}
+
 void runIslands(Map<String, IslandBuilder> islands) {
   _applyIslands((name) => islands[name]!);
 }
@@ -31,21 +44,21 @@ void _runIsland(IslandBuilder builder, ConfigParams params, String id) {
 }
 
 void _applyIslands(FutureOr<IslandBuilder> Function(String) fn) {
-  var islands = jasprConfig?.islands;
+  var islands = jasprConfig.islands;
   if (islands == null) return;
 
   for (var island in islands) {
     print("ISLAND $island");
     var builder = fn(island.name);
     if (builder is IslandBuilder) {
-      _runIsland(builder, island.config, island.id);
+      _runIsland(builder, ConfigParams(island.params), island.id);
     } else {
-      builder.then((b) => _runIsland(b, island.config, island.id));
+      builder.then((b) => _runIsland(b, ConfigParams(island.params), island.id));
     }
   }
 }
 
 void runAppWithParams(IslandBuilder appBuilder) {
-  var appConfig = jasprConfig?.app;
-  _runIsland(appBuilder, appConfig.config, appConfig?.id ?? 'body');
+  var appConfig = jasprConfig.app;
+  _runIsland(appBuilder, ConfigParams(appConfig?.params ?? {}), appConfig?.id ?? 'body');
 }

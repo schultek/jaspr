@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:html' as html show Element, Text;
 
+import 'package:meta/meta.dart';
+
 import '../browser/js_data.dart';
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
@@ -47,8 +49,14 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
 
   final Map<String, dynamic> _rawState = {};
 
+  @protected
+  @visibleForOverriding
+  Map<String, dynamic>? loadSyncState() {
+    return jasprConfig.sync;
+  }
+
   void _loadRawState() {
-    var stateData = decodeConfig(jasprConfig?.sync);
+    var stateData = loadSyncState();
     if (stateData != null) {
       _rawState.addAll(stateData);
     }

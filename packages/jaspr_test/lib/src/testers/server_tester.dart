@@ -31,9 +31,9 @@ class DataResponse {
   Map<String, dynamic>? data;
 }
 
-ServerApp _runTestApp(Component app, String id, Handler fileHandler) {
+ServerApp _runTestApp(Component app, Handler fileHandler) {
   return ServerApp.run(() {
-    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: id);
+    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: '');
   }, fileHandler);
 }
 
@@ -42,13 +42,11 @@ class ServerTester {
 
   static Future<ServerTester> setUp(
     Component app, {
-    String attachTo = 'body',
-    String? html,
     bool virtual = true,
     List<Middleware>? middleware,
   }) async {
     var tester = ServerTester._();
-    await tester._start(app, attachTo, html, virtual, middleware);
+    await tester._start(app, virtual, middleware);
     return tester;
   }
 
@@ -60,19 +58,14 @@ class ServerTester {
   Handler? _handler;
   http.Client? _client;
 
-  Future<void> _start(Component comp, String attachTo, String? html, bool virtual, List<Middleware>? middleware) async {
-    var _html = html ?? '<html><head></head><body></body></html>';
+  Future<void> _start(Component comp, bool virtual, List<Middleware>? middleware) async {
 
     fileHandler(Request request) {
-      if (request.requestedUri.path == '/') {
-        return Response.ok(_html, headers: {'content-type': 'text/html'});
-      } else {
-        return Response.notFound('Not Found');
-      }
+      return Response.notFound('Not Found');
     }
 
     var appCompleter = Completer();
-    app = _runTestApp(comp, attachTo, fileHandler)
+    app = _runTestApp(comp, fileHandler)
       ..setListener((server) {
         if (!appCompleter.isCompleted) appCompleter.complete();
       });

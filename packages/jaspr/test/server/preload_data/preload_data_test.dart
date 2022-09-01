@@ -1,4 +1,5 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
 import 'package:shelf/shelf.dart';
 
@@ -18,7 +19,7 @@ void main() {
     }
 
     setUp(() async {
-      tester = await ServerTester.setUp(App(), middleware: [testMiddleware]);
+      tester = await ServerTester.setUp(Document(body: App()), middleware: [testMiddleware]);
     });
 
     tearDown(() async {
@@ -34,13 +35,7 @@ void main() {
       expect(body, isNotNull);
 
       var appHtml = '<div>App<button>Click Me</button>Count: 202</div>';
-      expect(body!.innerHtml, equals(appHtml));
-
-      expect(
-          body.attributes,
-          equals({
-            'state-data': stateCodec.encode({'counter': 202})
-          }));
+      expect(body!.innerHtml.trim(), equals(appHtml));
     });
 
     test('should fetch data', () async {

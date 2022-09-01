@@ -93,7 +93,7 @@ class TestComponentsBinding extends BindingBase with SchedulerBinding, Component
   RenderElement? get rootElement => rootElements['body'];
 
   @override
-  Renderer attachRenderer(String to) {
+  Renderer attachRenderer(String target, {int? from, int? to}) {
     return TestDomRenderer();
   }
 

@@ -1,4 +1,5 @@
 part of document;
+
 abstract class _ManualDocument extends Document {
   const _ManualDocument({
     this.title,
@@ -29,7 +30,6 @@ abstract class _ManualDocument extends Document {
   Element createElement() => _DocumentElement(this);
 }
 
-
 class _DocumentElement extends StatefulElement {
   _DocumentElement(Document component) : super(component);
 
@@ -44,7 +44,6 @@ class _DocumentElement extends StatefulElement {
 }
 
 class _ManualDocumentState extends State<_ManualDocument> {
-  RenderElement? _body;
   RenderElement? _script;
   RenderElement? _dataScript;
 
@@ -94,16 +93,11 @@ class _ManualDocumentState extends State<_ManualDocument> {
               ),
           ],
         ),
-        FindChildNode(
-          onNodeFound: (element) {
-            _body = element;
-          },
-          child: ComponentObserver(
-            onElementRegistered: onElementRegistered,
-            child: DomComponent(
-              tag: 'body',
-              child: component.body,
-            ),
+        ComponentObserver(
+          onElementRegistered: onElementRegistered,
+          child: DomComponent(
+            tag: 'body',
+            child: component.body,
           ),
         ),
       ],
