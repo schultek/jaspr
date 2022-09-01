@@ -5,8 +5,6 @@ mixin RenderElement on Element {
   @override
   RenderElement get _lastNode => this;
 
-  RenderElement get parentNode => _parentNode!;
-
   Renderer get renderer => _renderer!;
 
   /// Arbitrary data the renderer can use

@@ -233,15 +233,18 @@ abstract class Element implements BuildContext {
 
   /// The previous ancestor sibling
   Element? _prevAncestorSibling;
+  Element? get prevAncestorSibling => _prevAncestorSibling;
 
   /// The last child element.
   Element? _lastChild;
 
   /// The last child dom node.
   RenderElement? _lastNode;
+  RenderElement? get lastNode => _lastNode;
 
   /// The nearest ancestor dom node.
   RenderElement? _parentNode;
+  RenderElement? get parentNode => _parentNode;
 
   // This is used to verify that Element objects move through life in an
   // orderly fashion.

@@ -1,10 +1,12 @@
-import 'package:jaspr/islands.dart';
+
 import 'package:jaspr/jaspr.dart';
 
+@island
 class Counter extends StatefulComponent {
   final int initialValue;
+  final String someText;
 
-  const Counter({this.initialValue = 0});
+  const Counter({this.initialValue = 0, this.someText = 'hello_test'});
 
   @override
   State<Counter> createState() => _CounterState();
@@ -21,7 +23,10 @@ class _CounterState extends State<Counter> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield Text('Count is $count');
+    yield DomComponent(
+      tag: 'span',
+      child: Text('Count is $count'),
+    );
 
     yield DomComponent(
       tag: 'button',

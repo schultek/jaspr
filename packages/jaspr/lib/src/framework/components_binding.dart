@@ -1,5 +1,7 @@
 part of framework;
 
+final _queryReg = RegExp(r'^(.*?)(?:\((\d+):(\d+)\))?$');
+
 /// Main app binding, controls the root component and global state
 mixin ComponentsBinding on BindingBase, SchedulerBinding {
   /// The currently active uri.
@@ -25,7 +27,8 @@ mixin ComponentsBinding on BindingBase, SchedulerBinding {
     return buildOwner.lockState(() async {
       buildOwner._isFirstBuild = true;
 
-      var renderer = attachRenderer(attachTo);
+      var attachMatch = _queryReg.firstMatch(attachTo)!;
+      var renderer = attachRenderer(attachMatch.group(1)!, from: int.tryParse(attachMatch.group(2) ?? ''), to: int.tryParse(attachMatch.group(3) ?? ''));
 
       var element = _Root(child: app).createElement();
       element._owner = buildOwner;
@@ -53,7 +56,7 @@ mixin ComponentsBinding on BindingBase, SchedulerBinding {
   Map<String, RenderElement> get rootElements => _rootElements;
   final Map<String, RenderElement> _rootElements = {};
 
-  Renderer attachRenderer(String to);
+  Renderer attachRenderer(String target, {int? from, int? to});
 
   final Map<GlobalKey, Element> _globalKeyRegistry = {};
 

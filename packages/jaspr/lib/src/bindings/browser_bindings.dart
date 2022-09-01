@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:html' as html show Element, Text;
 
+import '../browser/js_data.dart';
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
+import '../foundation/constants.dart';
 import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
 import '../framework/framework.dart';
-
-const kBrowserDebugMode = bool.fromEnvironment('jaspr.web.debug');
 
 /// Main entry point for the browser app
 void runApp(Component app, {String attachTo = 'body'}) {
@@ -38,8 +38,8 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
   void didAttachRootElement(Element element, {required String to}) {}
 
   @override
-  Renderer attachRenderer(String to) {
-    return BrowserDomRenderer(document.querySelector(to)!);
+  Renderer attachRenderer(String target, {int? from, int? to}) {
+    return BrowserDomRenderer(document.querySelector(target)!, from, to);
   }
 
   @override
@@ -48,9 +48,9 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
   final Map<String, dynamic> _rawState = {};
 
   void _loadRawState() {
-    var stateData = document.body!.attributes.remove('state-data');
+    var stateData = decodeConfig(jasprConfig?.sync);
     if (stateData != null) {
-      _rawState.addAll(stateCodec.decode(stateData).cast<String, dynamic>());
+      _rawState.addAll(stateData);
     }
   }
 
@@ -125,12 +125,12 @@ extension on html.Element {
     final current = getAttribute(name);
     if (current == value) return;
     if (value == null) {
-      if (kBrowserDebugMode) {
+      if (kVerboseMode) {
         print("Remove attribute: $name");
       }
       removeAttribute(name);
     } else {
-      if (kBrowserDebugMode) {
+      if (kVerboseMode) {
         print("Update attribute: $name - $value");
       }
       setAttribute(name, value);
@@ -140,7 +140,10 @@ extension on html.Element {
 
 class BrowserDomRenderer extends Renderer {
   final html.Element container;
-  BrowserDomRenderer(this.container);
+  final int? from;
+  final int? to;
+
+  BrowserDomRenderer(this.container, this.from, this.to);
 
   @override
   void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
@@ -152,17 +155,21 @@ class BrowserDomRenderer extends Renderer {
 
     diff:
     if (data.node == null) {
-      var toHydrate = element.parentNode.data.toHydrate;
+      var toHydrate = element.parentNode!.data.toHydrate;
       if (toHydrate.isNotEmpty) {
         for (var e in toHydrate) {
           if (e is html.Element && e.tagName.toLowerCase() == tag) {
-            if (kBrowserDebugMode) {
+            if (kVerboseMode) {
               print("Hydrate html node: $e");
             }
             elem = data.node = e;
             attributesToRemove = elem.attributes.keys.toSet();
             toHydrate.remove(e);
-            data.toHydrate = [...e.nodes];
+            Iterable<Node> nodes = e.nodes;
+            if (kDebugMode) {
+              nodes = nodes.where((node) => node is! html.Text || (node.text ?? '').trim().isNotEmpty);
+            }
+            data.toHydrate = nodes.toList();
             break diff;
           }
         }
@@ -170,7 +177,7 @@ class BrowserDomRenderer extends Renderer {
 
       elem = data.node = document.createElement(tag);
       attributesToRemove = {};
-      if (kBrowserDebugMode) {
+      if (kVerboseMode) {
         print("Create html node: $elem");
       }
     } else {
@@ -185,7 +192,7 @@ class BrowserDomRenderer extends Renderer {
           }
         }
         attributesToRemove = {};
-        if (kBrowserDebugMode) {
+        if (kVerboseMode) {
           print("Replace html node: $elem for $old");
         }
       } else {
@@ -209,7 +216,7 @@ class BrowserDomRenderer extends Renderer {
     if (attributesToRemove.isNotEmpty) {
       for (final name in attributesToRemove) {
         elem.removeAttribute(name);
-        if (kBrowserDebugMode) {
+        if (kVerboseMode) {
           print("Remove attribute: $name");
         }
       }
@@ -241,33 +248,33 @@ class BrowserDomRenderer extends Renderer {
     var data = element.data;
 
     if (rawHtml) {
-      var parent = element.parentNode.data.node;
+      var parent = element.parentNode!.data.node;
       if (parent is html.Element) {
         if (parent.innerHtml != text) {
           parent.innerHtml = text;
           data.node = parent.childNodes.first;
-          if (kBrowserDebugMode) {
+          if (kVerboseMode) {
             print("Update inner html: $text");
           }
         }
-        element.parentNode.data.toHydrate.clear();
+        element.parentNode!.data.toHydrate.clear();
       }
       return;
     }
 
     diff:
     if (data.node == null) {
-      var toHydrate = element.parentNode.data.toHydrate;
+      var toHydrate = element.parentNode!.data.toHydrate;
       if (toHydrate.isNotEmpty) {
         for (var e in toHydrate) {
           if (e is html.Text) {
-            if (kBrowserDebugMode) {
+            if (kVerboseMode) {
               print("Hydrate text node: $e");
             }
             data.node = e;
             if (e.text != text) {
               e.text = text;
-              if (kBrowserDebugMode) {
+              if (kVerboseMode) {
                 print("Update text node: $text");
               }
             }
@@ -278,7 +285,7 @@ class BrowserDomRenderer extends Renderer {
       }
 
       data.node = html.Text(text);
-      if (kBrowserDebugMode) {
+      if (kVerboseMode) {
         print("Create text node: $text");
       }
     } else {
@@ -286,14 +293,14 @@ class BrowserDomRenderer extends Renderer {
         var elem = html.Text(text);
         data.node!.replaceWith(elem);
         data.node = elem;
-        if (kBrowserDebugMode) {
+        if (kVerboseMode) {
           print("Replace text node: $text");
         }
       } else {
         var node = data.node as html.Text;
         if (node.text != text) {
           node.text = text;
-          if (kBrowserDebugMode) {
+          if (kVerboseMode) {
             print("Update text node: $text");
           }
         }
@@ -303,15 +310,23 @@ class BrowserDomRenderer extends Renderer {
 
   @override
   void skipContent(RenderElement element) {
-    element.parentNode.data.toHydrate.clear();
+    element.parentNode!.data.toHydrate.clear();
   }
 
   @override
   void attachNode(RenderElement? parent, RenderElement child, RenderElement? after) {
     if (parent == null) {
+      Iterable<Node> nodes = container.nodes;
+      if (kDebugMode) {
+        nodes = nodes.where((node) => node is! html.Text || (node.text ?? '').trim().isNotEmpty);
+      }
+      nodes = nodes.skip(from ?? 0);
+      if (to != null) {
+        nodes = nodes.take(to! - (from ?? 0));
+      }
       child.data
         ..node = container
-        ..toHydrate = [...container.nodes];
+        ..toHydrate = nodes.toList();
       return;
     }
 
@@ -322,12 +337,15 @@ class BrowserDomRenderer extends Renderer {
     if (childNode == null) return;
 
     var afterNode = after?.data.node;
+    if (afterNode == null && parentNode == container && from != null && from! > 0) {
+      afterNode = container.childNodes[from! - 1];
+    }
 
     if (childNode.previousNode == afterNode && childNode.parentNode == parentNode) {
       return;
     }
 
-    if (kBrowserDebugMode) {
+    if (kVerboseMode) {
       print("Attach node $childNode of $parentNode after $afterNode");
     }
 
@@ -344,7 +362,7 @@ class BrowserDomRenderer extends Renderer {
 
   @override
   void finalizeNode(RenderElement element) {
-    if (kBrowserDebugMode && element.data.toHydrate.isNotEmpty) {
+    if (kVerboseMode && element.data.toHydrate.isNotEmpty) {
       print("Clear ${element.data.toHydrate.length} nodes not hydrated (${element.data.toHydrate})");
     }
     for (var node in element.data.toHydrate) {
@@ -356,7 +374,7 @@ class BrowserDomRenderer extends Renderer {
   @override
   void removeChild(RenderElement parent, RenderElement child) {
     var node = child.data.node;
-    if (kBrowserDebugMode) {
+    if (kVerboseMode) {
       print("Remove child $node of ${parent.data.node}");
     }
     node?.remove();

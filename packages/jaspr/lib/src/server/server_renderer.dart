@@ -2,19 +2,52 @@ part of server;
 
 typedef SetupFunction = void Function();
 
-class ComponentEntry {
+class ComponentEntry<T extends Component> {
   final String name;
+  final ComponentEntryType type;
+  final Map<String, dynamic> Function(T component)? getParams;
 
-  ComponentEntry(this.name);
+  ComponentEntry.app(this.name, {this.getParams}): type = ComponentEntryType.app;
+  ComponentEntry.island(this.name, {this.getParams}): type = ComponentEntryType.island;
+  ComponentEntry.appAndIsland(this.name, {this.getParams}): type = ComponentEntryType.appAndIsland;
+
+  bool get isApp => type == ComponentEntryType.app || type == ComponentEntryType.appAndIsland;
+  bool get isIsland => type == ComponentEntryType.island || type == ComponentEntryType.appAndIsland;
+
+  Map<String, dynamic> loadParams(Component component) {
+    if (getParams != null) {
+      var params = getParams!(component as T);
+      return {'params': kDebugMode ? params : stateCodec.encode(params)};
+    } else {
+      return {};
+    }
+  }
 }
 
-typedef ComponentRegistryData = Map<Type, ComponentEntry>;
+enum ComponentEntryType {
+
+  app(true, false),
+  island(false, true),
+  appAndIsland(true, true);
+
+  final bool isApp;
+  final bool isIsland;
+
+  const ComponentEntryType(this.isApp, this.isIsland);
+}
+
+class ComponentRegistryData {
+  final String target;
+  final Map<Type, ComponentEntry> components;
+
+  ComponentRegistryData(this.target, this.components);
+}
 
 class ComponentRegistry {
-  static final ComponentRegistryData _components = {};
+  static ComponentRegistryData? _data;
 
-  static void initialize({required Map<Type, ComponentEntry> components}) {
-    _components.addAll(components);
+  static void initialize(String target, {required Map<Type, ComponentEntry> components}) {
+    _data = ComponentRegistryData(target, components);
   }
 }
 
@@ -25,14 +58,14 @@ Future<Response> _renderApp(SetupFunction setup, Request request, Future<String>
   /// We support two modes here, rendered-html and data-only
   /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
   if (request.headers['jaspr-mode'] == 'data-only') {
-    var message = _RenderMessage(setup, ComponentRegistry._components, request.url, port.sendPort);
+    var message = _RenderMessage(setup, ComponentRegistry._data, request.url, port.sendPort);
 
     await Isolate.spawn(_renderData, message);
     var result = await port.first;
 
     return Response.ok(result, headers: {'Content-Type': 'application/json'});
   } else {
-    var message = _RenderMessage(setup, ComponentRegistry._components, request.url, port.sendPort);
+    var message = _RenderMessage(setup, ComponentRegistry._data, request.url, port.sendPort);
 
     await Isolate.spawn(_renderHtml, message);
 
@@ -55,7 +88,7 @@ Future<Response> _renderApp(SetupFunction setup, Request request, Future<String>
 
 class _RenderMessage {
   SetupFunction setup;
-  ComponentRegistryData registryData;
+  ComponentRegistryData? registryData;
   Uri requestUri;
   SendPort sendPort;
 

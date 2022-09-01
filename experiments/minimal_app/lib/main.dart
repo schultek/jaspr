@@ -3,7 +3,7 @@ import 'package:jaspr/server.dart';
 import 'app.dart';
 
 void main() {
-  runApp(Document.app(
+  runApp(Document.islands(
     title: 'minimal_app',
     styles: [
       StyleRule.import('https://fonts.googleapis.com/css?family=Roboto'),
@@ -22,7 +22,6 @@ void main() {
         ]),
       ),
     ],
-    body: App(),
-    //scriptName: 'main'
+    body: App(3),
   ));
 }

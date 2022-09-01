@@ -18,7 +18,7 @@ class BrowserTester {
     Map<String, dynamic> Function(String url)? onFetchState,
   }) {
     if (initialStateData != null) {
-      html.document.body!.attributes['state-data'] = stateCodec.encode(initialStateData);
+      // TODO set initial state
     }
 
     if (html.window.location.pathname != location) {

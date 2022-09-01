@@ -7,7 +7,7 @@ import '../foundation/constants.dart';
 import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
 import '../framework/framework.dart';
-import '../server/document.dart';
+import '../server/document/document.dart';
 import '../server/server_app.dart';
 
 /// Main entry point on the server
@@ -51,17 +51,16 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
   }
 
   @override
-  Renderer attachRenderer(String to) {
+  Renderer attachRenderer(String target, {int? from, int? to}) {
     return MarkupDomRenderer();
   }
 
   Future<String> render() async {
     await rootCompleter.future;
 
-    var state = stateCodec.encode(getStateData());
     var renderer = rootElements.values.first.renderer as MarkupDomRenderer;
 
-    return renderDocument(state, renderer);
+    return renderDocument(renderer);
   }
 
   Future<String> data() async {
@@ -156,20 +155,19 @@ class MarkupDomRenderer extends Renderer {
     return root != null ? renderNodeHtml(root!) : '';
   }
 
-  String renderNodeHtml(RenderElement element, [int inset = 0]) {
+  String renderNodeHtml(RenderElement element) {
     var data = element.data;
-    var insetStr = '';
     if (data.text != null) {
       if (data.rawHtml == true) {
-        return insetStr + data.text!;
+        return data.text!;
       } else {
-        return insetStr + htmlEscape.convert(data.text!);
+        return htmlEscape.convert(data.text!);
       }
     } else if (data.tag != null) {
       var output = StringBuffer();
       var tag = data.tag!.toLowerCase();
       _domValidator.validateElementName(tag);
-      output.write('$insetStr<$tag');
+      output.write('<$tag');
       if (data.id != null) {
         output.write(' id="${_attributeEscape.convert(data.id!)}"');
       }
@@ -195,11 +193,18 @@ class MarkupDomRenderer extends Renderer {
         output.write('/>');
       } else {
         output.write('>');
+        var childOutput = <String>[];
         for (var child in data.children) {
-          output.write(renderNodeHtml(child, kDebugMode ? inset + 2 : inset));
+          childOutput.add(renderNodeHtml(child));
         }
-        if (kDebugMode && data.children.isNotEmpty) {
-          output.write(insetStr);
+        var fullChildOutput = childOutput.fold<String>('', (s, o) => s + o);
+        if (kDebugMode && (fullChildOutput.length > 80 || fullChildOutput.contains('\n'))) {
+          output.write('\n');
+          for (var child in childOutput) {
+            output.writeln('  ' + child.replaceAll('\n', '\n  '));
+          }
+        } else {
+          output.write(fullChildOutput);
         }
         output.write('</$tag>');
       }
@@ -208,7 +213,7 @@ class MarkupDomRenderer extends Renderer {
       assert(element == root);
       var output = StringBuffer();
       for (var child in data.children) {
-        output.write(renderNodeHtml(child, kDebugMode ? inset + 2 : inset));
+        output.writeln(renderNodeHtml(child));
       }
       return output.toString();
     }
