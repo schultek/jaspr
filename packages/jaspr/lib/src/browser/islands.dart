@@ -48,7 +48,6 @@ void _applyIslands(FutureOr<IslandBuilder> Function(String) fn) {
   if (islands == null) return;
 
   for (var island in islands) {
-    print("ISLAND $island");
     var builder = fn(island.name);
     if (builder is IslandBuilder) {
       _runIsland(builder, ConfigParams(island.params), island.id);
