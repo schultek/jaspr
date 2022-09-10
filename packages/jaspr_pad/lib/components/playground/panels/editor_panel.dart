@@ -87,7 +87,7 @@ class EditorPanelState extends State<EditorPanel> {
         var activeFile = context.watch(activeDocKeyProvider);
         return DomComponent(
           tag: 'div',
-          styles: {'position': 'relative', 'display': 'flex', 'flex': '1', 'flex-flow': 'column'},
+          styles: Styles.raw({'position': 'relative', 'display': 'flex', 'flex': '1', 'flex-flow': 'column'}),
           children: [
             Builder.single(
               key: ValueKey('output-builder'),
@@ -139,16 +139,16 @@ class EditorPanelState extends State<EditorPanel> {
               DomComponent(
                 tag: 'button',
                 classes: ["mdc-icon-button", "material-icons"],
-                styles: {
-                  'position': 'absolute',
-                  'right': '4px',
-                  'top': '4px',
-                  'width': '32px',
-                  'height': '32px',
-                  'padding': '8px',
-                  'font-size': '16px',
-                  'opacity': '0.5',
-                },
+                styles: Styles.combine([
+                  Styles.box(
+                    position: Position.absolute(top: 4.px, right: 4.px),
+                    width: 32.px,
+                    height: 32.px,
+                    padding: EdgeInsets.all(8.px),
+                    opacity: 0.5,
+                  ),
+                  Styles.text(fontSize: 16.px),
+                ]),
                 events: {
                   'click': (e) async {
                     var result = await DeleteFileDialog.show(context, activeFile);

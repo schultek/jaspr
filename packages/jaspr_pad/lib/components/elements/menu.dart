@@ -71,7 +71,7 @@ class MenuElement extends StatelessElement {
   Iterable<Component> build() sync* {
     yield DomComponent(
       tag: 'div',
-      styles: {'position': 'relative'},
+      styles: Styles.box(position: Position.relative()),
       children: [
         FindChildNode(
           onNodeFound: (node) {

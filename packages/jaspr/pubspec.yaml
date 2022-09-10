@@ -16,6 +16,7 @@ dependencies:
   hotreloader: ^3.0.4
   html: ^0.15.0
   http: ^0.13.4
+  mason: ^0.1.0-dev.31
   meta: ^1.7.0
   path: ^1.8.0
   shelf: ^1.2.0

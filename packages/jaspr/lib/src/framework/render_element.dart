@@ -5,8 +5,6 @@ mixin RenderElement on Element {
   @override
   RenderElement get _lastNode => this;
 
-  RenderElement get parentNode => _parentNode!;
-
   Renderer get renderer => _renderer!;
 
   /// Arbitrary data the renderer can use
@@ -29,7 +27,12 @@ mixin RenderElement on Element {
   }
 
   void _attach() {
-    _parentNode?.renderChildNode(this);
+    Element? prevElem = _prevAncestorSibling;
+    while (prevElem != null && prevElem._lastNode == null) {
+      prevElem = prevElem._prevAncestorSibling;
+    }
+    var after = prevElem?._lastNode;
+    _renderer!.attachNode(_parentNode, this, after);
   }
 
   void _remove() {
@@ -55,7 +58,7 @@ mixin RenderElement on Element {
   @override
   void performRebuild() {
     super.performRebuild();
-    _renderer!.didPerformRebuild(this);
+    _renderer!.finalizeNode(this);
   }
 
   @override
@@ -66,20 +69,9 @@ mixin RenderElement on Element {
       renderer._release(this);
     }
   }
-
-  void renderChildNode(RenderElement child) {
-    Element? prevElem = child._prevAncestorSibling;
-    while (prevElem != null && prevElem._lastNode == null) {
-      prevElem = prevElem._prevAncestorSibling;
-    }
-    var after = prevElem?._lastNode;
-    _renderer!.renderChildNode(this, child, after);
-  }
 }
 
 abstract class Renderer {
-  void setRootNode(RenderElement element);
-
   void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events);
 
@@ -87,9 +79,9 @@ abstract class Renderer {
 
   void skipContent(RenderElement element);
 
-  void renderChildNode(RenderElement element, RenderElement child, RenderElement? after);
+  void attachNode(RenderElement? parent, RenderElement child, RenderElement? after);
 
-  void didPerformRebuild(RenderElement element);
+  void finalizeNode(RenderElement element);
 
   void removeChild(RenderElement parent, RenderElement child);
 }

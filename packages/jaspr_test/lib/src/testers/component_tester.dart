@@ -93,7 +93,7 @@ class TestComponentsBinding extends BindingBase with SchedulerBinding, Component
   RenderElement? get rootElement => rootElements['body'];
 
   @override
-  Renderer attachRenderer(String to) {
+  Renderer attachRenderer(String target, {int? from, int? to}) {
     return TestDomRenderer();
   }
 
@@ -139,11 +139,6 @@ class TestDomRenderer extends Renderer {
   RenderElement? root;
 
   @override
-  void setRootNode(RenderElement element) {
-    root = element;
-  }
-
-  @override
   void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     element.testData
@@ -163,8 +158,12 @@ class TestDomRenderer extends Renderer {
   }
 
   @override
-  void renderChildNode(RenderElement element, RenderElement child, RenderElement? after) {
-    var children = element.testData.children;
+  void attachNode(RenderElement? parent, RenderElement child, RenderElement? after) {
+    if (parent == null) {
+      root = child;
+      return;
+    }
+    var children = parent.testData.children;
     children.remove(child);
     if (after == null) {
       children.insert(0, child);
@@ -175,7 +174,7 @@ class TestDomRenderer extends Renderer {
   }
 
   @override
-  void didPerformRebuild(RenderElement element) {}
+  void finalizeNode(RenderElement element) {}
 
   @override
   void removeChild(RenderElement parent, RenderElement child) {

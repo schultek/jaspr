@@ -30,6 +30,7 @@ part 'single_child_element.dart';
 part 'state_mixins.dart';
 part 'stateful_component.dart';
 part 'stateless_component.dart';
+part 'observer_component.dart';
 
 /// Describes the configuration for an [Element].
 ///
@@ -232,15 +233,18 @@ abstract class Element implements BuildContext {
 
   /// The previous ancestor sibling
   Element? _prevAncestorSibling;
+  Element? get prevAncestorSibling => _prevAncestorSibling;
 
   /// The last child element.
   Element? _lastChild;
 
   /// The last child dom node.
   RenderElement? _lastNode;
+  RenderElement? get lastNode => _lastNode;
 
   /// The nearest ancestor dom node.
   RenderElement? _parentNode;
+  RenderElement? get parentNode => _parentNode;
 
   // This is used to verify that Element objects move through life in an
   // orderly fashion.
@@ -383,6 +387,7 @@ abstract class Element implements BuildContext {
       ComponentsBinding.instance!._registerGlobalKey(key, this);
     }
     _updateInheritance();
+    _updateObservers();
   }
 
   /// Change the component used to configure this element.
@@ -572,6 +577,7 @@ abstract class Element implements BuildContext {
     _dependencies?.clear();
     _hadUnsatisfiedDependencies = false;
     _updateInheritance();
+    _updateObservers();
     if (_dirty) {
       owner.scheduleBuildFor(this);
     }
@@ -626,6 +632,13 @@ abstract class Element implements BuildContext {
     assert(_depth != null);
     assert(_owner != null);
 
+    if (_observerElements != null && _observerElements!.isNotEmpty) {
+      for (var observer in _observerElements!) {
+        observer.didUnmountElement(this);
+      }
+      _observerElements = null;
+    }
+
     final Key? key = component.key;
     if (key is GlobalKey) {
       ComponentsBinding.instance!._unregisterGlobalKey(key, this);
@@ -636,6 +649,8 @@ abstract class Element implements BuildContext {
     _dependencies = null;
     _lifecycleState = _ElementLifecycle.defunct;
   }
+
+  List<ObserverElement>? _observerElements;
 
   Map<Type, InheritedElement>? _inheritedElements;
   Set<InheritedElement>? _dependencies;
@@ -668,6 +683,13 @@ abstract class Element implements BuildContext {
   void _updateInheritance() {
     assert(_lifecycleState == _ElementLifecycle.active);
     _inheritedElements = _parent?._inheritedElements;
+  }
+
+  /// Populates [_observerElements] when this Element is mounted or activated.
+  /// [ObserverElement]s will register themselves for their children.
+  void _updateObservers() {
+    assert(_lifecycleState == _ElementLifecycle.active);
+    _observerElements = _parent?._observerElements;
   }
 
   @override
@@ -794,6 +816,11 @@ abstract class Element implements BuildContext {
       owner._debugCurrentBuildTarget = this;
       return true;
     }());
+    if (_observerElements != null && _observerElements!.isNotEmpty) {
+      for (var observer in _observerElements!) {
+        observer.willRebuildElement(this);
+      }
+    }
     owner.performRebuildOn(this, () {
       assert(() {
         assert(owner._debugCurrentBuildTarget == this);
@@ -804,6 +831,11 @@ abstract class Element implements BuildContext {
       if (_dependencies != null && _dependencies!.isNotEmpty) {
         for (var dependency in _dependencies!) {
           dependency.didRebuildDependent(this);
+        }
+      }
+      if (_observerElements != null && _observerElements!.isNotEmpty) {
+        for (var observer in _observerElements!) {
+          observer.didRebuildElement(this);
         }
       }
       onRebuilt?.call();

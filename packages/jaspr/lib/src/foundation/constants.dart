@@ -5,7 +5,7 @@
 /// A constant that is true if the application was compiled in release mode.
 ///
 /// More specifically, this is a constant that is true if the application was
-/// compiled in Dart with the '-Ddart.vm.product=true' flag.
+/// compiled in Dart with the '-Djaspr.flags.release=true' flag.
 ///
 /// Since this is a const value, it can be used to indicate to the compiler that
 /// a particular block of code will not be executed in release mode, and hence
@@ -18,23 +18,22 @@
 /// See also:
 ///
 ///  * [kDebugMode], which is true in debug builds.
-///  * [kProfileMode], which is true in profile builds.
-const bool kReleaseMode = bool.fromEnvironment('dart.vm.product');
+const bool kReleaseMode = bool.fromEnvironment('jaspr.flags.release');
 
-/// A constant that is true if the application was compiled in profile mode.
+/// A constant that is true if the application was run in verbose mode.
 ///
 /// More specifically, this is a constant that is true if the application was
-/// compiled in Dart with the '-Ddart.vm.profile=true' flag.
+/// compiled in Dart with the '-Djaspr.flags.verbose=true' flag.
 ///
 /// Since this is a const value, it can be used to indicate to the compiler that
-/// a particular block of code will not be executed in profile mode, an hence
+/// a particular block of code will not be executed in release mode, and hence
 /// can be removed.
 ///
 /// See also:
 ///
-///  * [kDebugMode], which is true in debug builds.
-///  * [kReleaseMode], which is true in release builds.
-const bool kProfileMode = bool.fromEnvironment('dart.vm.profile');
+///  * [kReleaseMode], which is true in debug builds.
+const bool kVerboseMode = bool.fromEnvironment('jaspr.flags.verbose');
+
 
 /// A constant that is true if the application was compiled in debug mode.
 ///
@@ -57,8 +56,7 @@ const bool kProfileMode = bool.fromEnvironment('dart.vm.profile');
 /// See also:
 ///
 ///  * [kReleaseMode], which is true in release builds.
-///  * [kProfileMode], which is true in profile builds.
-const bool kDebugMode = !kReleaseMode && !kProfileMode;
+const bool kDebugMode = !kReleaseMode;
 
 /// The epsilon of tolerable double precision error.
 ///

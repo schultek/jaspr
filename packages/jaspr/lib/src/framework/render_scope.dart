@@ -20,13 +20,13 @@ class _RenderScopeElement extends SingleChildElement {
   RenderScope get component => super.component as RenderScope;
 
   @override
-  void mount(Element? parent, Element? prevSibling) {
-    super.mount(parent, prevSibling);
+  void _firstBuild() {
     _renderer = _DelegatingRenderer(
         _renderer!,
         component.shallow,
         component.delegate
     );
+    super._firstBuild();
   }
 
   @override
@@ -100,13 +100,6 @@ class _DelegatingRenderer implements Renderer {
   @override
   @protected
   @mustCallSuper
-  void setRootNode(RenderElement element) {
-    _parent.setRootNode(element);
-  }
-
-  @override
-  @protected
-  @mustCallSuper
   void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     _dependents.add(element);
@@ -133,15 +126,15 @@ class _DelegatingRenderer implements Renderer {
   @override
   @protected
   @mustCallSuper
-  void renderChildNode(RenderElement element, RenderElement child, RenderElement? after) {
-    _parent.renderChildNode(element, child, after);
+  void attachNode(RenderElement? element, RenderElement child, RenderElement? after) {
+    _parent.attachNode(element, child, after);
   }
 
   @override
   @protected
   @mustCallSuper
-  void didPerformRebuild(RenderElement element) {
-    _parent.didPerformRebuild(element);
+  void finalizeNode(RenderElement element) {
+    _parent.finalizeNode(element);
   }
 
   @override

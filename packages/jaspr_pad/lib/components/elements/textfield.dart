@@ -29,7 +29,7 @@ class TextFieldState extends State<TextField> {
       child: DomComponent(
         tag: 'div',
         classes: ['mdc-text-field'],
-        styles: component.expand ? {'width': '100%'} : null,
+        styles: component.expand ? Styles.box(width: 100.percent) : null,
         children: [
           DomComponent(
             tag: 'span',

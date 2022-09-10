@@ -94,6 +94,7 @@ class BuildOwner {
       _waitChildren(child, buildCompleter);
       if (!buildCompleter.isCompleted) {
         child._asyncFirstBuild = buildCompleter.future;
+        child._parent?._asyncFirstBuildChildren.add(buildCompleter.future);
       }
     }
   }
