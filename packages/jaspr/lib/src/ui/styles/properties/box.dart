@@ -25,6 +25,24 @@ enum Display {
   const Display(this.value);
 }
 
+class BoxConstraints {
+  final Unit? maxWidth;
+  final Unit? maxHeight;
+  final Unit? minWidth;
+  final Unit? minHeight;
+
+  const BoxConstraints({this.minWidth, this.maxWidth, this.minHeight, this.maxHeight});
+
+  Map<String, String> get styles {
+    return {
+      if (minWidth != null) 'min-width': minWidth!.value,
+      if (maxWidth != null) 'max-width': maxWidth!.value,
+      if (minHeight != null) 'min-height': minHeight!.value,
+      if (maxHeight != null) 'max-height': maxHeight!.value,
+    };
+  }
+}
+
 abstract class Border {
   const factory Border.all(BorderSide side) = _AllBorder;
   const factory Border.only({BorderSide? left, BorderSide? top, BorderSide? right, BorderSide? bottom}) = _OnlyBorder;
@@ -417,4 +435,208 @@ enum Visibility {
   /// The css value
   final String value;
   const Visibility(this.value);
+}
+
+enum BoxSizing {
+  borderBox('border-box'),
+  contentBox('content-box'),
+
+  inherit('inherit'),
+  initial('initial'),
+  revert('revert'),
+  revertLayer('revert-layer'),
+  unset('unset');
+
+  /// The css value
+  final String value;
+  const BoxSizing(this.value);
+}
+
+abstract class BoxShadow {
+  const factory BoxShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Unit? spread, Color? color}) =
+      _BoxShadow;
+
+  const factory BoxShadow.inset(
+      {required Unit offsetX, required Unit offsetY, Unit? blur, Unit? spread, Color? color}) = _InsetBoxShadow;
+
+  const factory BoxShadow.combine(List<BoxShadow> shadows) = _CombineBoxShadow;
+
+  String get value;
+}
+
+class _BoxShadow implements BoxShadow {
+  const _BoxShadow(
+      {required this.offsetX, required this.offsetY, this.blur, this.spread, this.color, this.inset = false});
+
+  final Unit offsetX;
+  final Unit offsetY;
+  final Unit? blur;
+  final Unit? spread;
+  final Color? color;
+  final bool inset;
+
+  @override
+  String get value => [
+        if (inset) 'inset',
+        offsetX.value,
+        offsetY.value,
+        if (blur != null || spread != null) blur?.value ?? '0',
+        if (spread != null) spread!.value,
+        if (color != null) color!.value
+      ].join(' ');
+}
+
+class _InsetBoxShadow extends _BoxShadow {
+  const _InsetBoxShadow({required super.offsetX, required super.offsetY, super.blur, super.spread, super.color}) : super(inset: true);
+}
+
+class _CombineBoxShadow implements BoxShadow {
+  const _CombineBoxShadow(this.shadows);
+
+  final List<BoxShadow> shadows;
+
+  @override
+  String get value => shadows.map((s) => s.value).join(', ');
+}
+
+class Cursor {
+
+  const Cursor._(this.value);
+
+  final String value;
+
+  static const Cursor auto = Cursor._('auto');
+  static const Cursor defaultCursor = Cursor._('default');
+  static const Cursor none = Cursor._('none');
+  static const Cursor contextMenu = Cursor._('context-menu');
+  static const Cursor help = Cursor._('help');
+  static const Cursor pointer = Cursor._('pointer');
+  static const Cursor progress = Cursor._('progress');
+  static const Cursor wait = Cursor._('wait');
+  static const Cursor cell = Cursor._('cell');
+  static const Cursor crosshair = Cursor._('crosshair');
+  static const Cursor text = Cursor._('text');
+  static const Cursor verticalText = Cursor._('vertical-text');
+  static const Cursor alias = Cursor._('alias');
+  static const Cursor copy = Cursor._('copy');
+  static const Cursor move = Cursor._('move');
+  static const Cursor noDrop = Cursor._('no-drop');
+  static const Cursor notAllowed = Cursor._('not-allowed');
+  static const Cursor grab = Cursor._('grab');
+  static const Cursor grabbing = Cursor._('grabbing');
+  static const Cursor allScroll = Cursor._('all-scroll');
+  static const Cursor colResize = Cursor._('col-resize');
+  static const Cursor rowResize = Cursor._('row-resize');
+  static const Cursor nResize = Cursor._('n-resize');
+  static const Cursor eResize = Cursor._('e-resize');
+  static const Cursor sResize = Cursor._('s-resize');
+  static const Cursor wResize = Cursor._('w-resize');
+  static const Cursor neResize = Cursor._('ne-resize');
+  static const Cursor nwResize = Cursor._('nw-resize');
+  static const Cursor seResize = Cursor._('se-resize');
+  static const Cursor swResize = Cursor._('sw-resize');
+  static const Cursor ewResize = Cursor._('ew-resize');
+  static const Cursor nsResize = Cursor._('ns-resize');
+  static const Cursor neswResize = Cursor._('nesw-resize');
+  static const Cursor nwseResize = Cursor._('nwse-resize');
+  static const Cursor zoomIn = Cursor._('zoom-in');
+  static const Cursor zoomOut = Cursor._('zoom-out');
+
+  const factory Cursor.url(String url, {double? x, double? y, required Cursor fallback}) = _UrlCursor;
+}
+
+class _UrlCursor implements Cursor {
+
+  const _UrlCursor(this.url, {this.x, this.y, required this.fallback});
+
+  final String url;
+  final double? x;
+  final double? y;
+  final Cursor fallback;
+
+  @override
+  String get value => 'url($url)${x != null || y != null ? ' ${x ?? 0} ${y ?? 0}' : ''}, ${fallback.value}';
+}
+
+abstract class Transition {
+
+  const factory Transition(String property, {required double duration, Curve? curve, double? delay}) = _Transition;
+  const factory Transition.combine(List<Transition> transitions) = _CombineTransition;
+
+  String get value;
+}
+
+class _Transition implements Transition {
+
+  const _Transition(this.property, {required this.duration, this.curve, this.delay});
+
+  final String property;
+  final double duration;
+  final Curve? curve;
+  final double? delay;
+
+  @override
+  String get value => [property, '${duration}ms', if (curve != null) curve!.value, if (delay != null) '${delay}ms'].join(' ');
+}
+
+class _CombineTransition implements Transition {
+  const _CombineTransition(this.transitions);
+
+  final List<Transition> transitions;
+
+  @override
+  String get value => transitions.map((t) => t.value).join(', ');
+}
+
+class Curve {
+  const Curve._(this.value);
+
+  final String value;
+
+  static const Curve ease = Curve._('ease');
+  static const Curve easeIn = Curve._('ease-in');
+  static const Curve easeOut = Curve._('ease-out');
+  static const Curve easeInOut = Curve._('ease-in-out');
+  static const Curve linear = Curve._('linear');
+  static const Curve stepStart = Curve._('step-start');
+  static const Curve stepEnd = Curve._('step-end');
+
+  const factory Curve.cubicBezier(double p1, double p2, double p3, double p4) = _CubicBezierCurve;
+
+  const factory Curve.steps(int steps, {required StepJump jump}) = _StepsCurve;
+}
+
+class _CubicBezierCurve implements Curve {
+
+  const _CubicBezierCurve(this.p1, this.p2, this.p3, this.p4);
+
+  final double p1;
+  final double p2;
+  final double p3;
+  final double p4;
+
+  @override
+  String get value => 'cubic-bezier($p1, $p2, $p3, $p4)';
+}
+
+class _StepsCurve implements Curve {
+
+  const _StepsCurve(this.steps, {required this.jump});
+
+  final int steps;
+  final StepJump jump;
+
+  @override
+  String get value => 'steps($steps, ${jump.value})';
+}
+
+enum StepJump {
+  start('jump-start'),
+  end('jump-end'),
+  none('jump-none'),
+  both('jump-both');
+
+  /// The css value
+  final String value;
+  const StepJump(this.value);
 }
