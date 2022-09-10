@@ -66,7 +66,7 @@ class _BaseDocument extends _ManualDocument {
     super.viewport,
     super.meta,
     super.styles,
-    super.scriptName = 'main',
+    super.scriptName,
     super.head,
     required super.body,
   });

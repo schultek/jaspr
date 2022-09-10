@@ -1,5 +1,5 @@
 name: {{name}}
-description: A minimal jaspr web app.
+description: A basic pure-dart web app with ssr & automatic client hydration.
 version: 0.0.1
 
 environment:

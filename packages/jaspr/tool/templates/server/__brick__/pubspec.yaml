@@ -1,5 +1,5 @@
 name: {{name}}
-description: A classic web app using separate html, css and dart files with ssr & manual client hydration.
+description: A purely server-side rendered app without client hydration.
 version: 0.0.1
 
 environment:
