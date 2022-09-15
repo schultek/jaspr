@@ -36,11 +36,19 @@ class ServeCommand extends BaseCommand {
       'debug',
       abbr: 'd',
       help: 'Serves the app in debug mode.',
+      negatable: false,
+    );
+    argParser.addFlag(
+      'release',
+      abbr: 'r',
+      help: 'Serves the app in release mode.',
+      negatable: false,
     );
     argParser.addFlag(
       'verbose',
       abbr: 'v',
       help: 'Enable verbose logging.',
+      negatable: false,
     );
   }
 
@@ -56,20 +64,27 @@ class ServeCommand extends BaseCommand {
     await super.run();
 
     var useSSR = argResults!['ssr'] as bool;
+    var debug = argResults!['debug'] as bool;
+    var release = argResults!['release'] as bool;
 
     var webProcess = await runWebdev([
       'serve',
       '--auto=${argResults!['mode'] == 'reload' ? 'restart' : 'refresh'}',
       'web:${useSSR ? '5467' : argResults!['port']}',
+      if (release) '--release',
       '--',
-      '--delete-conflicting-outputs'
+      '--delete-conflicting-outputs',
+      if (!release)
+        '--define=build_web_compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
+      else
+        '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
     ]);
 
     if (!useSSR) {
       return watchProcess(webProcess);
     }
 
-    print("Starting jaspr development server...");
+    print("Starting jaspr development server in ${release ? 'release' : 'debug'} mode...");
 
     var buildCompleted = StreamController<int>.broadcast();
     var build = 0;
@@ -96,13 +111,17 @@ class ServeCommand extends BaseCommand {
 
     var args = [
       'run',
-      '--enable-vm-service',
-      '--enable-asserts',
-      '-Djaspr.debug=true',
-      '-Djaspr.hotreload=true',
+      if (!release) ...[
+        '--enable-vm-service',
+        '--enable-asserts',
+        '-Djaspr.dev.hotreload=true',
+      ] else
+        '-Djaspr.flags.release=true',
+      '-Djaspr.dev.proxy=5467',
+      '-Djaspr.flags.verbose=$debug',
     ];
 
-    if (argResults!['debug']) {
+    if (debug) {
       args.add('--pause-isolates-on-start');
     }
 

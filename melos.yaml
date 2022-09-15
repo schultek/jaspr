@@ -17,3 +17,11 @@ scripts:
       find $MELOS_ROOT_PATH/coverage -type f -empty -print -delete
       genhtml -o $MELOS_ROOT_PATH/coverage/report $MELOS_ROOT_PATH/coverage/*_lcov.info
       open $MELOS_ROOT_PATH/coverage/report/index.html
+  generate:html:
+    run: |
+      cd packages/jaspr
+      dart run tool/generate_html.dart
+  generate:templates:
+    run: |
+      cd packages/jaspr
+      dart run tool/generate_templates.dart

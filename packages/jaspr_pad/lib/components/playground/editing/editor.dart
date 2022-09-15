@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/jaspr.dart' hide Position;
 
 import '../../../adapters/codemirror.dart';
 import '../../../models/api_models.dart';

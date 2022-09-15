@@ -1,9 +1,13 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/styles.dart';
 
 import 'theme.dart';
 
+@app
 class App extends StatelessComponent {
+  final int numCounters;
+
+  const App(this.numCounters);
+
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield StaticTheme(
@@ -22,6 +26,22 @@ class App extends StatelessComponent {
         );
       }),
     );
+
+    yield Padding(
+      padding: const EdgeInsets.all(Unit.pixels(5)),
+
+    );
+  }
+}
+
+class Padding extends StatelessComponent {
+  const Padding({required this.padding, Key? key}) : super(key: key);
+
+  final EdgeInsets padding;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield ;
   }
 }
 
@@ -40,14 +60,13 @@ extension on AppTheme {
   ButtonTheme get button => get<ButtonTheme>();
 }
 
-class ButtonTheme extends ThemeData {
-  const ButtonTheme(this.primary) : super('button');
+@theme
+class ButtonTheme extends _$ButtonTheme {
+  const ButtonTheme(this.primary);
 
   final Color primary;
 
-  static ButtonTheme of(BuildContext context) => Theme.of(context);
-
-  Styles buildStyles() {
+  Styles get styles {
     return Styles.combine([
       Styles.box(
         border: Border.all(BorderSide(style: BorderStyle.none)),
@@ -56,22 +75,34 @@ class ButtonTheme extends ThemeData {
     ]);
   }
 
+  @variant
+  Styles get isOutlined => Styles.combine([
+    Styles.box(
+      border: Border.all(BorderSide(
+        color: primary,
+        width: Unit.pixels(2),
+        style: BorderStyle.solid,
+      )),
+    ),
+    Styles.background(color: Colors.white),
+  ]);
+}
+
+const theme = 0;
+const variant = 1;
+
+abstract class _$ButtonTheme extends ThemeData {
+
+  const _$ButtonTheme() : super('button');
+
+  Styles get styles;
+
+  @override
+  List<Styles> build() => styles;
+
+  @override
   List<ThemeData> buildVariants() {
-    return [
-      ThemeData.variant(
-        'is-outlined',
-        Styles.combine([
-          Styles.box(
-            border: Border.all(BorderSide(
-              color: primary,
-              width: Unit.pixels(2),
-              style: BorderStyle.solid,
-            )),
-          ),
-          Styles.background(color: Colors.white),
-        ]),
-      ),
-    ];
+    return [is]
   }
 
   @override

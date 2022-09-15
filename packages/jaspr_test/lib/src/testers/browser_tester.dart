@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:html' as html;
 
-import 'package:jaspr/jaspr_browser.dart';
+import 'package:jaspr/browser.dart';
 
 import '../../jaspr_test.dart';
 
@@ -17,15 +17,11 @@ class BrowserTester {
     Map<String, dynamic>? initialStateData,
     Map<String, dynamic> Function(String url)? onFetchState,
   }) {
-    if (initialStateData != null) {
-      html.document.body!.attributes['state-data'] = stateCodec.encode(initialStateData);
-    }
-
     if (html.window.location.pathname != location) {
       html.window.history.replaceState(null, 'Test', location);
     }
 
-    var binding = TestBrowserComponentsBinding(onFetchState);
+    var binding = TestBrowserComponentsBinding(onFetchState, initialStateData);
     return BrowserTester._(binding, attachTo);
   }
 
@@ -86,9 +82,15 @@ class BrowserTester {
 }
 
 class TestBrowserComponentsBinding extends AppBinding {
-  TestBrowserComponentsBinding(this._onFetchState);
+  TestBrowserComponentsBinding(this._onFetchState, this._initialSyncState);
 
+  final Map<String, dynamic>? _initialSyncState;
   final Map<String, dynamic> Function(String url)? _onFetchState;
+
+  @override
+  Map<String, dynamic>? loadSyncState() {
+    return _initialSyncState;
+  }
 
   @override
   Future<Map<String, dynamic>> fetchState(String url) async {

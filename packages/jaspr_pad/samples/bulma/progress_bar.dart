@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/jaspr.dart' hide Color;
 
 import 'colors.dart';
 

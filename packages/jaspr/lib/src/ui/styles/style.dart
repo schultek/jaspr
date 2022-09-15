@@ -1,5 +1,4 @@
 import '../../../jaspr.dart';
-import 'styles.dart';
 
 class Style extends StatelessComponent {
   final List<StyleRule> styles;
@@ -10,7 +9,7 @@ class Style extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'style',
-      child: Text(styles.map((s) => s.toCss()).join('\n'), rawHtml: true),
+      child: Text(styles.map((s) => s.toCss()).join(cssPropSpace), rawHtml: true),
     );
   }
 }

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
-import 'package:jaspr/jaspr_server.dart';
+import 'package:jaspr/server.dart';
 import 'package:path/path.dart' as path;
 
 import '../main.mapper.g.dart';

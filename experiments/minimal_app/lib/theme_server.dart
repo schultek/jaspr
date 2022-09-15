@@ -1,5 +1,4 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/styles.dart';
 
 class StaticTheme extends InheritedComponent {
   StaticTheme({required this.theme, required Component child}) : super(child: child);
@@ -46,8 +45,7 @@ abstract class ThemeData {
   const ThemeData(this.name);
   const factory ThemeData.variant(String name, Styles styles) = _VariantThemeData;
 
-  Styles buildStyles();
-  List<ThemeData> buildVariants();
+  List<Styles> build();
 
   List<String> resolve() => [this.name];
 }
@@ -62,4 +60,17 @@ class _VariantThemeData extends ThemeData {
 
   @override
   List<ThemeData> buildVariants() => [];
+}
+
+
+class ApplyStyles extends StatelessComponent {
+  const ApplyStyles({required this.apply, required this.child, Key? key}) : super(key: key);
+
+  final Styles Function() apply;
+  final Component child;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield child;
+  }
 }

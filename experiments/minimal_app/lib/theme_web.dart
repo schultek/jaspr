@@ -1,5 +1,4 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/styles.dart';
 
 class StaticTheme extends InheritedComponent {
   StaticTheme({required this.theme, required Component child}) : super(child: child);

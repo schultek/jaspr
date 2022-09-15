@@ -4,12 +4,21 @@ import 'properties/background.dart';
 import 'properties/box.dart';
 import 'properties/color.dart';
 import 'properties/edge_insets.dart';
+import 'properties/flex_item.dart';
+import 'properties/flexbox.dart';
+import 'properties/grid.dart';
+import 'properties/grid_item.dart';
 import 'properties/position.dart';
 import 'properties/text.dart';
+import 'properties/transform.dart';
 import 'properties/unit.dart';
 
 part 'groups/background.dart';
 part 'groups/box.dart';
+part 'groups/flexbox.dart';
+part 'groups/flexitem.dart';
+part 'groups/grid.dart';
+part 'groups/grid_item.dart';
 part 'groups/text.dart';
 
 /// Represents a set of css styles by pairs of property and value
@@ -34,6 +43,8 @@ abstract class Styles {
     Unit? letterSpacing,
     Unit? wordSpacing,
     Unit? lineHeight,
+    TextShadow? shadow,
+    TextOverflow? overflow,
   }) = _TextStyles;
 
   /// Constructs a [Styles] instance for common background style properties
@@ -53,8 +64,10 @@ abstract class Styles {
     EdgeInsets? padding,
     EdgeInsets? margin,
     Display? display,
+    BoxSizing? boxSizing,
     Unit? width,
     Unit? height,
+    BoxConstraints? constraints,
     Border? border,
     BorderRadius? radius,
     Outline? outline,
@@ -62,7 +75,37 @@ abstract class Styles {
     Visibility? visibility,
     Position? position,
     double? opacity,
+    Transform? transform,
+    BoxShadow? shadow,
+    Cursor? cursor,
+    Transition? transition,
   }) = _BoxStyles;
+
+  /// Constructs a [Styles] instance for common flexbox style properties
+  const factory Styles.flexbox({
+    FlexDirection? direction,
+    FlexWrap? wrap,
+    JustifyContent? justifyContent,
+    AlignItems? alignItems,
+  }) = _FlexBoxStyles;
+
+  /// Constructs a [Styles] instance for children of a flex-box parent
+  const factory Styles.flexItem({
+    Flex? flex,
+    int? order,
+    AlignSelf? alignSelf,
+  }) = _FlexItemStyles;
+
+  const factory Styles.grid({
+    GridTemplate? template,
+    GridGap? gap,
+    List<TrackSize>? autoRows,
+    List<TrackSize>? autoColumns,
+  }) = _GridStyles;
+
+  const factory Styles.gridItem({
+    GridPlacement? placement,
+  }) = _GridItemStyles;
 
   Map<String, String> get styles;
 }

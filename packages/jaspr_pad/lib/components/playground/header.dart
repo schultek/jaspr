@@ -101,18 +101,19 @@ class PlaygroundHeader extends StatelessComponent {
       },
     );
 
-    yield DomComponent(tag: 'div', styles: {'width': '10px'});
+    yield DomComponent(tag: 'div', styles: Styles.box(width: 10.px));
 
     yield SamplesMenuButton();
 
     yield DomComponent(
       tag: 'div',
-      styles: {
-        'display': 'flex',
-        'justify-content': 'center',
-        'align-items': 'center',
-        'padding': '0 10px',
-      },
+      styles: Styles.combine([
+        Styles.box(padding: EdgeInsets.symmetric(vertical: Unit.zero, horizontal: 10.px)),
+        Styles.flexbox(
+          justifyContent: JustifyContent.center,
+          alignItems: AlignItems.center,
+        ),
+      ]),
       children: [
         DomComponent(
           tag: 'a',
@@ -120,7 +121,7 @@ class PlaygroundHeader extends StatelessComponent {
           children: [
             DomComponent(
               tag: 'img',
-              styles: {'width': '40px', '-webkit-backface-visibility': 'hidden'},
+              styles: Styles.raw({'width': '40px', '-webkit-backface-visibility': 'hidden'}),
               attributes: {'src': 'https://findicons.com/files/icons/2779/simple_icons/128/github.png'},
             ),
           ],

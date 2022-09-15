@@ -42,7 +42,7 @@ class TabBarState extends State<TabBar> {
         tag: 'div',
         id: component.id,
         classes: ['mdc-tab-bar'],
-        styles: {'min-width': '1px'},
+        styles: Styles.raw({'min-width': '1px'}),
         attributes: {'role': 'tablist'},
         child: DomComponent(
           tag: 'div',
@@ -89,7 +89,7 @@ class ButtonTab extends Tab {
         'role': 'tab',
         'tabindex': '0',
       },
-      styles: {'padding': '0 16px'},
+      styles: Styles.box(padding: EdgeInsets.symmetric(vertical: Unit.zero, horizontal: 16.px)),
       children: [
         DomComponent(
           tag: 'span',
@@ -98,12 +98,12 @@ class ButtonTab extends Tab {
             DomComponent(
               tag: 'span',
               classes: ['mdc-tab__text-label'],
-              styles: {'display': 'inline-flex', 'align-items': 'center'},
+              styles: Styles.raw({'display': 'inline-flex', 'align-items': 'center'}),
               children: [
                 DomComponent(
                   tag: 'i',
                   classes: ['material-icons', 'mdc-tab__icon'],
-                  styles: {'font-size': '20px', if (label.isNotEmpty) 'margin-right': '4px'},
+                  styles: Styles.raw({'font-size': '20px', if (label.isNotEmpty) 'margin-right': '4px'}),
                   child: Text(icon),
                 ),
                 Text(label),

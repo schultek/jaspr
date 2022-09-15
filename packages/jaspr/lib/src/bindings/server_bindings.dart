@@ -1,30 +1,30 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:html/parser.dart';
-
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../foundation/constants.dart';
 import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
 import '../framework/framework.dart';
+import '../server/document/document.dart';
 import '../server/server_app.dart';
 
 /// Main entry point on the server
-void runApp(Component app, {String attachTo = 'body'}) {
-  runServer(app, attachTo: attachTo);
+/// TODO: Add hint about usage of global variables and isolate state
+void runApp(Component app) {
+  runServer(app);
 }
 
 /// Same as [runApp] but returns an instance of [ServerApp] to control aspects of the http server
-ServerApp runServer(Component app, {String attachTo = 'body'}) {
+ServerApp runServer(Component app) {
   return ServerApp.run(() {
-    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
+    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: '_');
   });
 }
 
 /// Global component binding for the server
-class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, SyncBinding {
+class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, SyncBinding, DocumentBinding {
   static AppBinding ensureInitialized() {
     if (ComponentsBinding.instance == null) {
       AppBinding();
@@ -40,8 +40,6 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
     _currentUri = uri;
   }
 
-  String? _targetId;
-
   @override
   bool get isClient => false;
 
@@ -49,24 +47,20 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
 
   @override
   void didAttachRootElement(Element element, {required String to}) {
-    _targetId = to;
     rootCompleter.complete();
   }
 
   @override
-  DomBuilder attachBuilder(String to) {
-    return MarkupDomBuilder();
+  Renderer attachRenderer(String target, {int? from, int? to}) {
+    return MarkupDomRenderer();
   }
 
-  Future<String> render(String rawHtml) async {
+  Future<String> render() async {
     await rootCompleter.future;
 
-    var document = parse(rawHtml);
-    var appElement = document.querySelector(_targetId!)!;
-    appElement.innerHtml = (rootElements.values.first.builder as MarkupDomBuilder).renderHtml();
+    var renderer = rootElements.values.first.renderer as MarkupDomRenderer;
 
-    document.body!.attributes['state-data'] = stateCodec.encode(getStateData());
-    return document.outerHtml;
+    return renderDocument(renderer);
   }
 
   Future<String> data() async {
@@ -91,8 +85,6 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
   }
 }
 
-final _nodesExpando = Expando<DomNodeData>();
-
 class DomNodeData {
   String? tag;
   String? id;
@@ -101,25 +93,20 @@ class DomNodeData {
   Map<String, String>? attributes;
   String? text;
   bool? rawHtml;
-  List<DomNode> children = [];
+  List<RenderElement> children = [];
 }
 
-extension DomNodeDataExt on DomNode {
-  DomNodeData get data => _nodesExpando[this] ??= DomNodeData();
+extension DomNodeDataExt on RenderElement {
+  DomNodeData get data => getData() ?? setData(DomNodeData());
 }
 
-class MarkupDomBuilder extends DomBuilder {
-  DomNode? root;
+class MarkupDomRenderer extends Renderer {
+  RenderElement? root;
 
   @override
-  void setRootNode(DomNode node) {
-    root = node;
-  }
-
-  @override
-  void renderNode(DomNode node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
-    node.data
+    element.data
       ..tag = tag
       ..id = id
       ..classes = classes
@@ -128,19 +115,25 @@ class MarkupDomBuilder extends DomBuilder {
   }
 
   @override
-  void renderTextNode(DomNode node, String text, [bool rawHtml = false]) {
-    node.data.text = text;
-    node.data.rawHtml = rawHtml;
+  void renderTextNode(RenderElement element, String text, [bool rawHtml = false]) {
+    element.data
+      ..text = text
+      ..rawHtml = rawHtml;
   }
 
   @override
-  void skipContent(DomNode node) {
+  void skipContent(RenderElement element) {
     // noop
   }
 
   @override
-  void renderChildNode(DomNode node, DomNode child, DomNode? after) {
-    var children = node.data.children;
+  void attachNode(RenderElement? parent, RenderElement child, RenderElement? after) {
+    if (parent == null) {
+      root = child;
+      return;
+    }
+
+    var children = parent.data.children;
     children.remove(child);
     if (after == null) {
       children.insert(0, child);
@@ -151,10 +144,10 @@ class MarkupDomBuilder extends DomBuilder {
   }
 
   @override
-  void didPerformRebuild(DomNode node) {}
+  void finalizeNode(RenderElement element) {}
 
   @override
-  void removeChild(DomNode parent, DomNode child) {
+  void removeChild(RenderElement parent, RenderElement child) {
     parent.data.children.remove(child);
   }
 
@@ -162,20 +155,19 @@ class MarkupDomBuilder extends DomBuilder {
     return root != null ? renderNodeHtml(root!) : '';
   }
 
-  String renderNodeHtml(DomNode node, [int inset = 0]) {
-    var data = node.data;
-    var insetStr = '';
+  String renderNodeHtml(RenderElement element) {
+    var data = element.data;
     if (data.text != null) {
       if (data.rawHtml == true) {
-        return insetStr + data.text!;
+        return data.text!;
       } else {
-        return insetStr + htmlEscape.convert(data.text!);
+        return htmlEscape.convert(data.text!);
       }
     } else if (data.tag != null) {
       var output = StringBuffer();
       var tag = data.tag!.toLowerCase();
       _domValidator.validateElementName(tag);
-      output.write('$insetStr<$tag');
+      output.write('<$tag');
       if (data.id != null) {
         output.write(' id="${_attributeEscape.convert(data.id!)}"');
       }
@@ -189,7 +181,11 @@ class MarkupDomBuilder extends DomBuilder {
       if (data.attributes != null && data.attributes!.isNotEmpty) {
         for (var attr in data.attributes!.entries) {
           _domValidator.validateAttributeName(attr.key);
-          output.write(' ${attr.key}="${_attributeEscape.convert(attr.value)}"');
+          if (attr.value.isNotEmpty) {
+            output.write(' ${attr.key}="${_attributeEscape.convert(attr.value)}"');
+          } else {
+            output.write(' ${attr.key}');
+          }
         }
       }
       var selfClosing = _domValidator.isSelfClosing(tag);
@@ -197,20 +193,27 @@ class MarkupDomBuilder extends DomBuilder {
         output.write('/>');
       } else {
         output.write('>');
+        var childOutput = <String>[];
         for (var child in data.children) {
-          output.write(renderNodeHtml(child, kDebugMode ? inset + 2 : inset));
+          childOutput.add(renderNodeHtml(child));
         }
-        if (kDebugMode && data.children.isNotEmpty) {
-          output.write(insetStr);
+        var fullChildOutput = childOutput.fold<String>('', (s, o) => s + o);
+        if (kDebugMode && (fullChildOutput.length > 80 || fullChildOutput.contains('\n'))) {
+          output.write('\n');
+          for (var child in childOutput) {
+            output.writeln('  ' + child.replaceAll('\n', '\n  '));
+          }
+        } else {
+          output.write(fullChildOutput);
         }
         output.write('</$tag>');
       }
       return output.toString();
     } else {
-      assert(node == root);
+      assert(element == root);
       var output = StringBuffer();
       for (var child in data.children) {
-        output.write(renderNodeHtml(child, kDebugMode ? inset + 2 : inset));
+        output.writeln(renderNodeHtml(child));
       }
       return output.toString();
     }
@@ -219,10 +222,6 @@ class MarkupDomBuilder extends DomBuilder {
   final _attributeEscape = HtmlEscape(HtmlEscapeMode.attribute);
   final _domValidator = DomValidator();
 
-  @override
-  bool updateShouldNotify(covariant DomBuilder builder) {
-    return true;
-  }
 }
 
 /// DOM validator with sane defaults.
