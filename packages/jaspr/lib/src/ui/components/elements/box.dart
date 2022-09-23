@@ -1,41 +1,5 @@
 import 'package:jaspr/components.dart';
-
-class BoxConstraints {
-  final Unit? maxWidth;
-  final Unit? maxHeight;
-  final Unit? minWidth;
-  final Unit? minHeight;
-
-  const BoxConstraints({this.maxWidth, this.maxHeight, this.minWidth, this.minHeight});
-
-  static const BoxConstraints zero = BoxConstraints();
-}
-
-class ConstrainedBox extends Box {
-  final BoxConstraints constraints;
-
-  const ConstrainedBox({
-    required this.constraints,
-    super.padding,
-    super.margin,
-    super.key,
-    super.id,
-    super.style,
-    super.classes,
-    super.attributes,
-    super.events,
-    super.child,
-    super.children,
-  });
-
-  @override
-  BaseStyle? getStyles() => MultipleStyle(styles: [
-    if (constraints.maxWidth != null) Style('max-width', constraints.maxWidth.toString()),
-    if (constraints.maxHeight != null) Style('max-height', constraints.maxHeight.toString()),
-    if (constraints.minWidth != null) Style('min-width', constraints.minWidth.toString()),
-    if (constraints.minHeight != null) Style('min-height', constraints.minHeight.toString()),
-  ]);
-}
+import 'package:jaspr/styles.dart';
 
 class Box extends BaseElement {
   final EdgeInsets? padding;
@@ -74,17 +38,41 @@ class Box extends BaseElement {
   });
 
   @override
-  BaseStyle? getStyles() => MultipleStyle(styles: [
-    if (padding != null) Style('padding', padding!.getStyle()),
-    if (margin != null) Style('margin', margin!.getStyle()),
-    if (border != null) ...border!.getStyles(),
-    if (outline != null) ...outline!.getStyles(),
-    if (width != null) Style('width', width.toString()),
-    if (height != null) Style('height', height.toString()),
-    if (overflow != null) Style('overflow', overflow!.name),
-    if (display != null) Style('display', display!.value),
-    if (visibility != null) Style('visibility', visibility!.name),
-    if (position != null) ...position!.getStyles(),
-    if (opacity != null) Style('opacity', opacity.toString()),
-  ]);
+  Styles getStyles() => Styles.combine([
+        super.getStyles(),
+        Styles.box(
+          padding: padding,
+          margin: margin,
+          border: border,
+          outline: outline,
+          width: width,
+          height: height,
+          overflow: overflow,
+          display: display,
+          visibility: visibility,
+          position: position,
+          opacity: opacity,
+        )
+      ]);
+}
+
+class ConstrainedBox extends Box {
+  final BoxConstraints constraints;
+
+  const ConstrainedBox({
+    required this.constraints,
+    super.padding,
+    super.margin,
+    super.key,
+    super.id,
+    super.style,
+    super.classes,
+    super.attributes,
+    super.events,
+    super.child,
+    super.children,
+  });
+
+  @override
+  Styles getStyles() => Styles.combine([super.getStyles(), Styles.box(constraints: constraints)]);
 }

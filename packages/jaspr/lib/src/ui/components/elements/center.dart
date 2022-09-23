@@ -1,4 +1,5 @@
 import 'package:jaspr/components.dart';
+import 'package:jaspr/styles.dart';
 
 class Center extends BaseElement {
   const Center({
@@ -13,10 +14,6 @@ class Center extends BaseElement {
   }) : super(tag: 'div');
 
   @override
-  BaseStyle? getStyles() => MultipleStyle(styles: [
-    Style('display', 'flex'),
-    Style('justify-content', 'center'),
-    Style('align-items', 'center'),
-    if (style != null) style!,
-  ]);
+  Styles getStyles() =>
+      Styles.combine([super.getStyles(), Styles.flexbox(alignItems: AlignItems.center, justifyContent: JustifyContent.center)]);
 }

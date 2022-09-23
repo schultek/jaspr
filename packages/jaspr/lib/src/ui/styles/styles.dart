@@ -8,6 +8,7 @@ import 'properties/flex_item.dart';
 import 'properties/flexbox.dart';
 import 'properties/grid.dart';
 import 'properties/grid_item.dart';
+import 'properties/list.dart';
 import 'properties/position.dart';
 import 'properties/text.dart';
 import 'properties/transform.dart';
@@ -19,10 +20,14 @@ part 'groups/flexbox.dart';
 part 'groups/flexitem.dart';
 part 'groups/grid.dart';
 part 'groups/grid_item.dart';
+part 'groups/list.dart';
 part 'groups/text.dart';
 
 /// Represents a set of css styles by pairs of property and value
 abstract class Styles {
+  /// Constructs a empty [Styles] instance
+  const factory Styles.empty() = _EmptyStyles;
+
   /// Constructs a [Styles] instance from a [Map] of raw css style properties and values
   const factory Styles.raw(Map<String, String> styles) = _RawStyles;
 
@@ -107,7 +112,20 @@ abstract class Styles {
     GridPlacement? placement,
   }) = _GridItemStyles;
 
+  const factory Styles.list({
+    ListMarkerPosition? markerPosition,
+    ListMarkerType? markerType,
+    ListMarkerImage? markerImage,
+  }) = _ListStyles;
+
   Map<String, String> get styles;
+}
+
+class _EmptyStyles implements Styles {
+  const _EmptyStyles();
+
+  @override
+  Map<String, String> get styles => {};
 }
 
 class _RawStyles implements Styles {

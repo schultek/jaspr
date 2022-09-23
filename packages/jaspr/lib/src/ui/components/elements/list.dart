@@ -1,16 +1,17 @@
 import 'package:jaspr/components.dart';
+import 'package:jaspr/styles.dart';
 
 class ListView extends Box {
   final bool ordered;
-  final bool? defaultType;
-  final bool? insideMarkers;
-  final String? markerImageUrl;
+  final ListMarkerType? markerType;
+  final ListMarkerPosition? markerPosition;
+  final ListMarkerImage? markerImage;
 
   const ListView({
     this.ordered = false,
-    this.defaultType,
-    this.insideMarkers,
-    this.markerImageUrl,
+    this.markerType,
+    this.markerPosition,
+    this.markerImage,
     super.key,
     super.id,
     super.style,
@@ -21,13 +22,8 @@ class ListView extends Box {
   }) : super(tag: ordered ? 'ol' : 'ul');
 
   @override
-  BaseStyle getStyles() => MultipleStyle(
-    styles: [
-      if(defaultType == false) Style('list-style-type', ordered ? 'upper-roman' : 'square'),
-      if(insideMarkers != null) Style('list-style-position', insideMarkers! ? 'inside' : 'outside'),
-      if(markerImageUrl != null) Style('list-style-image', 'url("$markerImageUrl")'),
-    ]
-  );
+  Styles getStyles() => Styles.combine(
+      [super.getStyles(), Styles.list(markerType: markerType, markerPosition: markerPosition, markerImage: markerImage)]);
 }
 
 class ListItem extends Box {
