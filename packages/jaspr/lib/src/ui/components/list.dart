@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/src/ui/components/base.dart';
-import 'package:jaspr/styles.dart';
+import 'package:jaspr/src/ui/styles/properties/list.dart';
 
 class ListView extends BaseComponent {
   final bool? insideMarkers;

@@ -48,7 +48,7 @@ class BuildCommand extends BaseCommand {
       }
     }
 
-    var webProcess = await runWebdev(['build', '--output=web:build${useSSR ? '/web' : ''}']);
+    var webProcess = await runWebdev(['build', '--output=web:build${useSSR ? '/web' : ''}', '--', '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]']);
 
     var webResult = watchProcess(webProcess);
     if (useSSR) {
@@ -66,7 +66,7 @@ class BuildCommand extends BaseCommand {
 
     var process = await Process.start(
       'dart',
-      ['compile', argResults!['target'], entryPoint, '-o', './build/app'],
+      ['compile', argResults!['target'], entryPoint, '-o', './build/app', '-Djaspr.flags.release=true'],
     );
 
     unawaited(watchProcess(process));

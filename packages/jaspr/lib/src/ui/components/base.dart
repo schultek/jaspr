@@ -1,5 +1,4 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/styles.dart';
 
 abstract class BaseComponent extends StatelessComponent {
   final String? id;

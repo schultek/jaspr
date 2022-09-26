@@ -12,13 +12,13 @@ class ConsolePanel extends StatelessComponent {
 
     yield DomComponent(
       tag: 'div',
-      styles: {'display': 'flex', 'flex-direction': 'column'},
+      styles: Styles.flexbox(direction: FlexDirection.column),
       classes: ['console', 'custom-scrollbar'],
       children: [
         for (var msg in messages)
           DomComponent(
             tag: 'span',
-            styles: {'width': '0'},
+            styles: Styles.box(width: Unit.zero),
             child: Text(msg, rawHtml: true),
           ),
       ],

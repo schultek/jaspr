@@ -1,5 +1,5 @@
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/src/ui/components/base.dart';
-import 'package:jaspr/styles.dart';
 
 
 class Page extends BaseComponent {

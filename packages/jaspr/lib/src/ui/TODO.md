@@ -23,26 +23,13 @@
 > sublist = additional missing properties
 
 - [x] text
-  - shadow
-  - overflow
 - [x] background
   - gradients
 - [x] box
-  - constraints
-  - box sizing
-  - shadow
-  - cursor
 - [x] flexbox
-- [ ] flex item (child of flexbox)
-  - basis, grow, shrink
-- [ ] grid
-  - rows, columns, ...
-- [ ] grid item (child of grid)
-  - row, column or area
-- [ ] transform
-  - translate, scale, ...
-- [ ] table
-- [ ] transition
+- [x] flex item (child of flexbox)
+- [x] grid
+- [x] grid item (child of grid)
 
 ## Advanced Styling
 

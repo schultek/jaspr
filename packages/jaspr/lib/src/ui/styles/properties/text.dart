@@ -264,3 +264,49 @@ class TextDecoration {
         if (thickness != null) thickness!.value,
       ].join(' ');
 }
+
+abstract class TextShadow {
+  const factory TextShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Color? color }) = _TextShadow;
+
+  const factory TextShadow.combine(List<TextShadow> shadows) = _CombineTextShadow;
+
+  String get value;
+}
+
+class _TextShadow implements TextShadow {
+
+  const _TextShadow({required this.offsetX, required this.offsetY, this.blur, this.color});
+
+  final Unit offsetX;
+  final Unit offsetY;
+  final Unit? blur;
+  final Color? color;
+
+  @override
+  String get value => [offsetX.value, offsetY.value, if (blur != null) blur!.value, if (color != null) color!.value].join(' ');
+}
+
+class _CombineTextShadow implements TextShadow {
+
+  const _CombineTextShadow(this.shadows);
+
+  final List<TextShadow> shadows;
+
+  @override
+  String get value => shadows.map((s) => s.value).join(', ');
+}
+
+enum TextOverflow {
+  clip('clip'),
+  ellipsis('ellipsis'),
+
+  inherit('inherit'),
+  initial('initial'),
+  revert('revert'),
+  revertLayer('revert-layer'),
+  unset('unset');
+
+  /// The css value
+  final String value;
+  const TextOverflow(this.value);
+}

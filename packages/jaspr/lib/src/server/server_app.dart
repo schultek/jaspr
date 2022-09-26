@@ -8,40 +8,61 @@ import 'dart:isolate';
 import 'package:hotreloader/hotreloader.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
-import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_gzip/shelf_gzip.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
-import '../bindings/server_bindings.dart';
-import '../framework/framework.dart';
+import '../../server.dart';
 
 part 'server_renderer.dart';
 
-const kServerDebugMode = bool.fromEnvironment('jaspr.debug');
-const kServerHotReload = bool.fromEnvironment('jaspr.hotreload');
+const String _kDevProxy = String.fromEnvironment('jaspr.dev.proxy');
+const bool _kDevHotreload = bool.fromEnvironment('jaspr.dev.hotreload');
+
+
+/// A [Handler] that can be refreshed to update any used resources
+class RefreshableHandler {
+
+  final Handler _handler;
+  final void Function()? onRefresh;
+
+  RefreshableHandler(this._handler, {this.onRefresh});
+
+  void refresh() {
+    if (_handler is RefreshableHandler) {
+      (_handler as RefreshableHandler).refresh();
+    }
+    if (onRefresh != null) {
+      onRefresh!();
+    }
+  }
+
+  FutureOr<Response> call(Request request) => _handler(request);
+}
 
 /// Returns a shelf handler that serves the provided component and related assets
 Handler serveApp(AppHandler handler) {
   return _createHandler((request, render) {
-    return handler(request, (app, {String attachTo = 'body'}) {
-      return render(_createSetup(app, attachTo));
+    return handler(request, (app) {
+      return render(_createSetup(app));
     });
   });
 }
 
 /// Directly renders the provided component into a html response
-Future<Response> renderComponent(Component app, {String attachTo = 'body', String templateFile = 'index.html'}) async {
-  var response = await staticFileHandler(Request('get', Uri.parse('https://0.0.0.0/$templateFile')));
-  return _renderApp(_createSetup(app, attachTo), Request('get', Uri.parse('https://0.0.0.0/')), response);
+Future<Response> renderComponent(Component app) async {
+  return _renderApp(_createSetup(app), Request('get', Uri.parse('https://0.0.0.0/')), (name) async {
+    var response = await staticFileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
+    return response.readAsString();
+  });
 }
 
-typedef RenderFunction = FutureOr<Response> Function(Component, {String attachTo});
+typedef RenderFunction = FutureOr<Response> Function(Component);
 typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render);
 
-SetupFunction _createSetup(Component app, String attachTo) {
-  return () => AppBinding.ensureInitialized().attachRootComponent(app, attachTo: attachTo);
+SetupFunction _createSetup(Component app) {
+  return () => AppBinding.ensureInitialized().attachRootComponent(app, attachTo: '_');
 }
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
@@ -98,14 +119,19 @@ class ServerApp {
 
       var handler = _createHandler((_, render) => render(_setup), middleware: _middleware, fileHandler: _fileHandler);
 
-      if (kServerHotReload) {
-        await _reload(this, () => _createServer(this, handler));
+      if (_kDevHotreload) {
+        await _reload(this, () {
+          if (handler is RefreshableHandler) {
+            (handler as RefreshableHandler).refresh();
+          }
+          return _createServer(this, handler);
+        });
       } else {
         _server = await _createServer(this, handler);
         _listener?.call(_server!);
       }
 
-      print('[INFO] Running app in ${kServerDebugMode ? 'debug' : 'release'} mode');
+      print('[INFO] Running app in ${kDebugMode ? 'debug' : 'release'} mode');
       print('[INFO] Serving at http://${server!.address.host}:${server!.port}');
     });
   }
@@ -116,9 +142,9 @@ class ServerApp {
   }
 }
 
-Handler _proxyRootIndexHandler(Handler proxyHandler) {
-  return (Request req) {
-    final indexRequest = Request('GET', req.requestedUri.replace(path: '/'),
+FutureOr<Response> Function(Request, String) _proxyFileLoader(Handler proxyHandler) {
+  return (Request req, String fileName) {
+    final indexRequest = Request('GET', req.requestedUri.replace(path: '/$fileName'),
         context: req.context, encoding: req.encoding, headers: req.headers, protocolVersion: req.protocolVersion);
     return proxyHandler(indexRequest);
   };
@@ -127,15 +153,20 @@ Handler _proxyRootIndexHandler(Handler proxyHandler) {
 // coverage:ignore-start
 
 Handler _webdevProxyHandler(String port) {
-  var handler = proxyHandler('http://localhost:$port/');
-  return (Request req) async {
+  var client = http.Client();
+  var handler = proxyHandler('http://localhost:$port/', client: client);
+  return RefreshableHandler((Request req) async {
     var res = await handler(req);
     if (res.statusCode == 200 && res.headers['content-type'] == 'application/javascript') {
       var body = await res.readAsString();
       res = res.change(body: body.replaceAll('http://localhost:$port/', ''));
     }
     return res;
-  };
+  }, onRefresh: () {
+    client.close();
+    client = http.Client();
+    handler = proxyHandler('http://localhost:$port/', client: client);
+  });
 }
 
 String _sseHeaders(String? origin) => 'HTTP/1.1 200 OK\r\n'
@@ -237,54 +268,43 @@ Future<void> _reload(ServerApp app, FutureOr<HttpServer> Function() init) async 
 
 // coverage:ignore-end
 
-final portToProxy = Platform.environment['JASPR_PROXY_PORT'];
-
-final staticFileHandler = kServerDebugMode
-    ? _webdevProxyHandler(portToProxy ?? '5467')
+final staticFileHandler = _kDevProxy.isNotEmpty
+    ? _webdevProxyHandler(_kDevProxy)
     : createStaticHandler(join(dirname(Platform.script.path), 'web'), defaultDocument: 'index.html');
 
 typedef _SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
 
 Handler _createHandler(_SetupHandler handle, {List<Middleware> middleware = const [], Handler? fileHandler}) {
-  var portToProxy = Platform.environment['JASPR_PROXY_PORT'];
-
   var staticHandler = fileHandler ?? staticFileHandler;
 
   var cascade = Cascade();
 
-  if (kServerDebugMode) {
-    final serverUri = Uri.parse('http://localhost:$portToProxy');
+  if (_kDevProxy.isNotEmpty) {
+    final serverUri = Uri.parse('http://localhost:$_kDevProxy');
     final serverSseUri = serverUri.replace(path: r'/$dwdsSseHandler');
     final sseUri = Uri.parse(r'/$dwdsSseHandler');
 
     cascade = cascade.add(_sseProxyHandler(sseUri, serverSseUri));
   }
 
-  cascade = cascade.add(gzipMiddleware(staticHandler)).add(_proxyRootIndexHandler(staticHandler));
-
-  var resourceHandler = cascade.handler;
-
-  var pipeline = const Pipeline();
-  for (var middleware in middleware) {
-    pipeline = pipeline.addMiddleware(middleware);
-  }
-  var handler = pipeline.addHandler((Request request) async {
-    var fileResponse = await resourceHandler(request);
-
-    if (fileResponse.headers['content-type'] != 'text/html') {
-      return fileResponse;
-    }
-
-    if (request.url.path.endsWith('.dart') ||
-        request.url.path.endsWith('.js.map') ||
-        request.url.path.endsWith('.js')) {
-      return Response.internalServerError(body: 'Cannot handle request');
-    }
-
-    return handle(request, (setup) => _renderApp(setup, request, fileResponse));
+  var fileLoader = _proxyFileLoader(staticHandler);
+  cascade = cascade.add(gzipMiddleware(staticHandler)).add((request) async {
+    return handle(request, (setup) => _renderApp(setup, request, (name) async {
+      var response = await fileLoader(request, name);
+      return response.readAsString();
+    }));
   });
 
-  return handler;
+  var pipeline = const Pipeline();
+  for (var m in middleware) {
+    pipeline = pipeline.addMiddleware(m);
+  }
+
+  return RefreshableHandler(pipeline.addHandler(cascade.handler), onRefresh: () {
+    if (staticHandler is RefreshableHandler) {
+      (staticHandler as RefreshableHandler).refresh();
+    }
+  });
 }
 
 /// Creates and runs the http server

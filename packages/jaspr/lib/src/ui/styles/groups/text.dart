@@ -13,6 +13,8 @@ class _TextStyles implements Styles {
   final Unit? letterSpacing;
   final Unit? wordSpacing;
   final Unit? lineHeight;
+  final TextShadow? shadow;
+  final TextOverflow? overflow;
 
   const _TextStyles({
     this.color,
@@ -27,6 +29,8 @@ class _TextStyles implements Styles {
     this.letterSpacing,
     this.wordSpacing,
     this.lineHeight,
+    this.shadow,
+    this.overflow,
   });
 
   @override
@@ -43,5 +47,7 @@ class _TextStyles implements Styles {
         if (letterSpacing != null) 'letter-spacing': letterSpacing!.value,
         if (wordSpacing != null) 'word-spacing': wordSpacing!.value,
         if (lineHeight != null) 'line-height': lineHeight!.value,
+        if (shadow != null) 'text-shadow': shadow!.value,
+        if (overflow != null) 'text-overflow': overflow!.value,
       };
 }
