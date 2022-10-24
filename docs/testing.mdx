@@ -1,0 +1,39 @@
+# 🧪 Testing
+
+> 🚧 WIP 🚧
+
+`jaspr` comes with it's own testing package `jaspr_test`.
+
+```shell
+dart pub add jaspr_test --dev
+```
+
+A simple component test looks like this:
+
+```dart
+import 'package:jaspr_test/jaspr_test.dart';
+
+import 'app.dart';
+
+void main() {
+  group('simple component test', () {
+    late ComponentTester tester;
+
+    setUp(() {
+      tester = ComponentTester.setUp();
+    });
+
+    test('should render component', () async {
+      await tester.pumpComponent(App());
+
+      expect(find.text('Count: 0'), findsOneComponent);
+
+      await tester.click(find.tag('button'));
+
+      expect(find.text('Count: 1'), findsOneComponent);
+    });
+  });
+}
+```
+
+For more examples on how to use the testing package, check out the [tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/jaspr/test).

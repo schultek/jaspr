@@ -1,5 +1,27 @@
 {
   "name": "Jaspr",
   "logo": "https://jasprpad.schultek.de/jaspr-192.png",
-  "favicon": "https://jasprpad.schultek.de/jaspr-32.png"
+  "logoDark": "https://jasprpad.schultek.de/jaspr-192.png",
+  "favicon": "https://jasprpad.schultek.de/jaspr-32.png",
+  "sidebar": [
+    ["Overview", "/"],
+    ["Quick Start", "/quick-start"],
+    ["Jaspr vs Flutter Web", "/jaspr-vs-flutter-web"],
+    ["Jaspr CLI", "/cli"],
+    ["Core Concepts", [
+      ["Component System", "/core/components"],
+      ["Writing HTML in Jaspr", "/core/html"],
+      ["Styling in Jaspr", "/core/styling"],
+      ["Server-Side Rendering", "/core/ssr"],
+      ["Routing", "/core/routing"]
+    ]],
+    ["Advanced Concepts", [
+      ["Islands Architecture", "/advanced/islands"]
+    ]],
+    ["Ecosystem", [
+      ["Riverpod", "/eco/riverpod"],
+      ["Third-Party Packages", "/eco/packages"]
+    ]],
+    ["Testing", "/testing"]
+  ]
 }
