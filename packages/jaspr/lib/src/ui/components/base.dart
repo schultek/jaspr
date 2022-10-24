@@ -1,10 +1,9 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/components.dart';
 
-abstract class BaseElement extends StatelessComponent {
+abstract class BaseComponent extends StatelessComponent {
   final String? id;
   final String tag;
-  final BaseStyle? style;
+  final Styles? styles;
   final List<String>? classes;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
@@ -12,13 +11,13 @@ abstract class BaseElement extends StatelessComponent {
   final Component? _child;
   final List<Component>? _children;
 
-  const BaseElement({
+  const BaseComponent({
     Key? key,
     Component? child,
     List<Component>? children,
     this.id,
     required this.tag,
-    this.style,
+    this.styles,
     this.classes,
     this.attributes,
     this.events,
@@ -30,7 +29,7 @@ abstract class BaseElement extends StatelessComponent {
 
   List<String> getClasses() => classes ?? [];
 
-  BaseStyle? getStyles() => style;
+  Styles getStyles() => styles ?? Styles.raw({});
 
   Map<String, String> getAttributes() => attributes ?? {};
 
@@ -41,7 +40,7 @@ abstract class BaseElement extends StatelessComponent {
     yield DomComponent(
       id: id,
       tag: tag,
-      styles: {...getStyles()?.asMap() ?? {}, ...style?.asMap() ?? {} },
+      styles: getStyles(),
       classes: getClasses(),
       attributes: getAttributes(),
       events: getEvents(),
