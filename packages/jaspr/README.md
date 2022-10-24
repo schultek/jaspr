@@ -20,7 +20,7 @@ Experimental web framework for Dart. Supports SPAs and SSR.
 
 > I'm looking for contributors. Don't hesitate to contact me if you want to help in any way.
 
-- [Wiki & Documentation](https://github.com/schultek/jaspr/wiki)
+- [Documentation](https://docs.page/schultek/jaspr)
 - [Demo & Playground](https://jasprpad.schultek.de)
 
 ![JasprPad Screenshot](https://user-images.githubusercontent.com/13920539/170837732-9e09d5f3-e79e-4ddd-b118-72e49456a7cd.png)
@@ -92,7 +92,7 @@ In addition to these base components, there are two more components that don't e
 - **Text**: A simple component that renders a text node.
   `var text = Text('Hello World!');`
   
-[Check the Wiki for more](https://github.com/schultek/jaspr/wiki)
+[Check the Wiki for more](https://docs.page/schultek/jaspr)
 
 ## Differences to Flutter(-Web)
 

@@ -45,5 +45,5 @@ In you project, you should the only import the `<libname>.dart` file.
 ## islands_app
 
 Builder for automatic setup of island components.
-View [islands architecture](https://github.com/schultek/jaspr/wiki) for documentation.
+View [islands architecture](https://docs.page/schultek/jaspr) for documentation.
 
