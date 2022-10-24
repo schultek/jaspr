@@ -1,5 +1,5 @@
 {
   "name": "Jaspr",
-  "logo": "/assets/jaspr_icon.png",
-  "favicon": "assets/jaspr_favicon.png"
+  "logo": "../assets/jaspr_icon.png",
+  "favicon": "../assets/jaspr_favicon.png"
 }
