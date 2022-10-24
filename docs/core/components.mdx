@@ -1,0 +1,173 @@
+# 🔩 Component System
+
+**Jaspr** comes with a component system that is very similar to Flutters widgets. This is a core design decision of jaspr, in order to look and feel very familiar to developers coming from Flutter. You might think of it as just replacing the word 'Widget' with 'Component' *(which actually was a small part of jasprs development process 😉)*, while keeping the same structure and behavior.
+
+> The following page and other documentation assumes, that you have already a basic understanding of Flutters widget system, especially the widget tree and the three base widgets: StatelessWidget, StatefulWidget and InheritedWidget.
+
+**🧱 Base Components**
+
+When building an app or website with **jaspr** you will mostly use these **five** basic components:
+
+### 1️⃣ DomComponent
+
+This component will render a single html element to the webpage. It takes a tag, and optionally some attributes and events.
+It also takes a single child or a list of children, since html elements can have multiple child nodes.
+
+```dart
+  var component = DomComponent(
+    tag: 'div',
+    id: 'my-id',
+    classes: ['class-a', 'class-b'],
+    attributes: {'my-attribute': 'my-value'},
+    events: {'click': (e) => print('clicked')},
+    children: [
+      ...
+    ],
+  );
+```
+
+Using this component would render the following html:
+
+```html
+<div id="my-id" class="class-a class-b" my-attribute="my-value">
+  ...
+</div>  
+```
+
+This gives you the most flexibility over how you structure your html. Especially **Jaspr** does have separate components for each html tag,
+since these would be easy to add for yourself either as simple functions or as `StatelessComponent`s.
+
+### 2️⃣ Text
+
+A simple component that renders a text node.
+
+A text node in html is just some standalone string, that is placed inside another html element. Therefore the `Text` component also only receives a single string to render to the page.
+
+```dart
+  var text = Text('Hello World!');
+```
+
+As usual for web, styling is done through a combination of CSS attributes, either in a **Stylesheet** or inline though the **`style` attribute** of the parent elements. For example rendering a simple heading would look like this:
+
+```dart
+  var heading = DomComponent(
+    tag: 'h1',
+    styles: {'color': 'blue'},
+    child: Text('Hello World!'),
+  );
+```
+
+rendering:
+
+```html
+<h1 style="color: blue;">Hello World!</h1>
+```
+
+### 3️⃣ StatelessComponent
+
+A custom component that does not required any mutable state and looks like this:
+
+```dart
+class MyComponent extends StatelessComponent {
+
+  const MyComponent({Key? key}): super(key: key);
+
+  Iterable<Component> build(BuildContext context) sync* {
+    yield DomComponent(tag: 'div', ...);
+  }
+}
+```
+
+Similar to Flutter, this component:
+
+- extends the abstract `StatelessComponent` class,
+- has a constructor receiving a `Key` and optionally some custom parameters,
+- has a `build()` method receiving a `BuildContext`.
+
+Different to Flutter is that the `build()` method does not return a single `Component`, but rather multiple `Component`s as an `Iterable<Component>`. This is again because a HTML element can always have multiple child elements.
+
+> This design decision was made based on the core principles of jaspr, explained [here](https://github.com/schultek/jaspr/wiki#-jaspr-vs-flutter-web)
+
+The recommended way to write `build()` methods with **jaspr** is to use the [**synchronous generator**](https://dart.dev/guides/language/language-tour#generators) pattern. It allows us to return multiple child components in a declarative way by `yield`ing each component without needing to deal with `List`s or `Iterable`s directly.
+
+To write a sync generator, simply use the `sync*` keyword in the method definition and `yield` one or multiple components:
+
+```dart
+  class MyComponent extends StatelessComponent {
+
+    @override
+    Iterable<Component> build(BuildContext context) sync* {
+      yield ChildA();
+      yield ChildB();
+
+      // use if to render a component conditionally
+      if (myCondition) {
+        yield ChildC();
+      }
+      
+      // use for to render a list of components
+      for (var i = 0; i < 10; i++) {
+        yield SomeItem(index: i);
+      }
+    } 
+  }
+```
+
+In every other aspect, this component behaves the same as Flutters `StatelessWidget`.
+
+### 4️⃣ StatefulComponent
+
+A custom component that has mutable state and looks like this:
+
+```dart
+class MyComponent extends StatefulComponent {
+
+  const MyComponent({Key? key}): super(key: key);
+
+  State createState() => MyComponentState();
+}
+
+class MyComponentState extends State<MyComponent> {
+
+  Iterable<Component> build(BuildContext context) sync* {
+    yield DomComponent(tag: 'div', ...);
+  }
+}
+```
+
+Similar to Flutter, this component:
+
+- extends the abstract `StatefulComponent` class,
+- has a constructor receiving a `Key` and optionally some custom parameters,
+- has a `createState()` method returning an instance of its custom state class
+
+and has an associated state class that:
+
+- extends the abstract `State<T>` class,
+- has a `build()` method inside the state class receiving a `BuildContext`,
+- can have optional `initState()`, `didChangeDependencies()`, and other lifecycle methods.
+
+Different to Flutter, this component:
+
+- can return multiple components inside the `build()` method, just like the [`StatelessComponent`](#3️⃣-statelesscomponent)
+
+In every other aspect, this component behaves the same as Flutters `StatefulWidget`.
+
+### 5️⃣ InheritedComponent
+
+A base class for components that efficiently propagate information down the tree and looks like this:
+
+```dart
+class MyInheritedComponent extends InheritedComponent {
+
+  const MyInheritedComponent({required Component child, Key? key}) 
+    : super(child: child, key: key);
+
+  @override
+  bool updateShouldNotify(covariant MyInheritedComponent oldComponent) {
+    return ...;
+  }
+}
+```
+
+In every aspect, this component behaves the same as Flutters `InheritedWidget`.
