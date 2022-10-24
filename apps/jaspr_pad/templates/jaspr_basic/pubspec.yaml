@@ -18,6 +18,6 @@ dev_dependencies:
 
 dependency_overrides:
   jaspr:
-    path: ../../../jaspr
+    path: ../../../../packages/jaspr
   jaspr_riverpod:
-    path: ../../../jaspr_riverpod
+    path: ../../../../packages/jaspr_riverpod

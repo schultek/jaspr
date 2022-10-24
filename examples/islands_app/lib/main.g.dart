@@ -3,8 +3,8 @@
 
 import 'package:jaspr/server.dart';
 import 'main.dart' as e;
-import 'package:minimal_app_experiment/app.dart' as c0;
-import 'package:minimal_app_experiment/counter.dart' as c1;
+import 'package:islands_app/app.dart' as c0;
+import 'package:islands_app/counter.dart' as c1;
 
 void main() {
   ComponentRegistry.initialize('main', components: {

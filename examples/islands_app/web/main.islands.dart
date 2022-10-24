@@ -2,7 +2,7 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/browser.dart';
-import 'package:minimal_app_experiment/counter.dart' deferred as c0;
+import 'package:islands_app/counter.dart' deferred as c0;
 
 void main() {
   runIslandsDeferred({

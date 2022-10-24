@@ -1,5 +1,5 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:server_handling_experiment/app.dart';
+import 'package:custom_server_middleware/app.dart';
 
 void main() {
   runApp(App());

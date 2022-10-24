@@ -22,7 +22,7 @@ class App extends StatelessComponent {
       tag: 'button',
       events: {
         'click': (e) {
-          context.read(counterProvider.notifier).state++;
+          context.read(counterProvider.state).state++;
         },
       },
       child: Text('Press Me'),

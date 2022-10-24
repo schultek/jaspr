@@ -2,8 +2,9 @@ name: jaspr_project
 
 packages:
   - packages/*/*
-  - experiments/**
   - apps/*/*
+  - examples/*/*
+  - experiments/*/*
 
 command:
   bootstrap:

@@ -217,7 +217,7 @@ class BrowserDomRenderer extends Renderer {
     if (attributes != null && attributes.isNotEmpty) {
       for (var attr in attributes.entries) {
         if (attr.key == 'value' && elem is InputElement && elem.value != attr.value) {
-          if (kBrowserDebugMode) {
+          if (kVerboseMode) {
             print("Set input value: ${attr.value}");
           }
           elem.value = attr.value;

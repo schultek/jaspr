@@ -1,4 +1,4 @@
-name: minimal_app_experiment
+name: custom_server_middleware
 description: An absolute bare-bones web app.
 version: 1.0.0
 publish_to: none
@@ -10,7 +10,6 @@ dependencies:
   jaspr: ^0.1.0
 
 dev_dependencies:
-  jaspr_builder: ^0.1.0
   build_runner: ^2.1.4
   build_web_compilers: ^3.2.1
   lints: ^1.0.0

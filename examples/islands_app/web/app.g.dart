@@ -2,7 +2,7 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/browser.dart';
-import 'package:minimal_app_experiment/app.dart' as a;
+import 'package:islands_app/app.dart' as a;
 
 void main() {
   runAppWithParams((p) {
