@@ -14,13 +14,12 @@ final editProjectProvider = StateProvider((ref) {
   var loadedProject = ref.watch(loadedProjectProvider).value;
 
   if (kIsWeb) {
-    ref.listenSelf((_, controller) {
-      controller.addListener(debounce((ProjectData? project) {
-        if (project != null) {
-          ref.read(storageProvider)['project'] = project.toJson();
-        }
-      }, Duration(seconds: 1)));
-    });
+    var update = debounce((ProjectData? project) {
+      if (project != null) {
+        ref.read(storageProvider)['project'] = project.toJson();
+      }
+    }, Duration(seconds: 1));
+    ref.listenSelf((_, data) => update(data));
   }
 
   return loadedProject;
