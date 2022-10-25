@@ -45,7 +45,7 @@ void main() {
           );
         });
         yield ProviderScope(
-          overrides: [counter.overrideWithValue(StateController(10))],
+          overrides: [counter.overrideWithProvider(StateProvider((ref) => 10))],
           child: Builder(builder: (context) sync* {
             yield Button(
               key: const ValueKey('b'),

@@ -2,13 +2,18 @@ part of framework;
 
 extension ProviderContext on BuildContext {
   /// Reads a provider without listening to it
-  T read<T>(ProviderBase<T> provider) {
-    return ProviderScope._scopeOf(this, listen: false)._read(provider);
+  T read<T>(ProviderListenable<T> provider) {
+    return ProviderScope.containerOf(this, listen: false).read(provider);
   }
 
   /// Refreshes a provider
-  T refresh<T>(ProviderBase<T> provider) {
-    return ProviderScope._scopeOf(this, listen: false)._refresh(provider);
+  T refresh<T>(Refreshable<T> provider) {
+    return ProviderScope.containerOf(this, listen: false).refresh(provider);
+  }
+
+  /// Invalidates a provider
+  void invalidate(ProviderOrFamily provider) {
+    ProviderScope.containerOf(this, listen: false).invalidate(provider);
   }
 
   /// Watches a provider and rebuilds the current context on change
@@ -47,10 +52,6 @@ extension ProviderContext on BuildContext {
       onError: onError,
       fireImmediately: fireImmediately,
     );
-  }
-
-  void invalidate(ProviderBase<Object?> provider) {
-    ProviderScope.containerOf(this, listen: false).invalidate(provider);
   }
 
   Future<void> preload(ProviderBase provider) async {

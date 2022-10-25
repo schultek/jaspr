@@ -84,14 +84,12 @@ part 'provider_dependencies.dart';
 class ProviderScope extends StatefulComponent {
   /// {@macro riverpod.providerscope}
   const ProviderScope({
-    Key? key,
+    super.key,
     this.overrides = const [],
     this.observers,
-    this.cacheTime,
-    this.disposeDelay,
     this.parent,
     required this.child,
-  }) : super(key: key);
+  });
 
   /// Read the current [ProviderContainer] for a [BuildContext].
   static ProviderContainer containerOf(BuildContext context, {bool listen = true}) {
@@ -112,26 +110,6 @@ class ProviderScope extends StatefulComponent {
 
     return element;
   }
-
-  /// The minimum amount of time before an `autoDispose` provider can be
-  /// disposed if not listened.
-  ///
-  /// If the provider rebuilds (such as when using `ref.watch` or `ref.refresh`),
-  /// the timer will be refreshed.
-  ///
-  /// If null, use the nearest ancestor [ProviderScope]'s [cacheTime].
-  /// If no ancestor is found, fallbacks to [Duration.zero].
-  final Duration? cacheTime;
-
-  /// The amount of time before a provider is disposed after its last listener
-  /// is removed.
-  ///
-  /// If a new listener is added within that duration, the provider will not be
-  /// disposed.
-  ///
-  /// If null, use the nearest ancestor [ProviderContainer]'s [disposeDelay].
-  /// If no ancestor is found, fallbacks to [Duration.zero].
-  final Duration? disposeDelay;
 
   /// Explicitly override the parent [ProviderContainer] that this [ProviderScope]
   /// would be a descendant of.
@@ -167,7 +145,7 @@ class ProviderScope extends StatefulComponent {
   /// The listeners that subscribes to changes on providers stored on this [ProviderScope].
   final List<ProviderObserver>? observers;
 
-  /// Informations on how to override a provider/family.
+  /// Information on how to override a provider/family.
   final List<Override> overrides;
 
   @override
@@ -215,8 +193,6 @@ class ProviderScopeState extends State<ProviderScope> with SyncStateMixin<Provid
       parent: parent,
       overrides: component.overrides,
       observers: component.observers,
-      cacheTime: component.cacheTime,
-      disposeDelay: component.disposeDelay,
     );
 
     super.initState();
@@ -286,10 +262,10 @@ class ProviderScopeState extends State<ProviderScope> with SyncStateMixin<Provid
 class UncontrolledProviderScope extends InheritedComponent {
   /// {@macro riverpod.UncontrolledProviderScope}
   const UncontrolledProviderScope({
-    Key? key,
+    super.key,
     required this.container,
-    required Component child,
-  }) : super(key: key, child: child);
+    required super.child,
+  });
 
   /// The [ProviderContainer] exposed to the component tree.
   final ProviderContainer container;
@@ -316,14 +292,6 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
 
   @override
   UncontrolledProviderScope get component => super.component as UncontrolledProviderScope;
-
-  T _read<T>(ProviderBase<T> provider) {
-    return component.container.read(provider);
-  }
-
-  T _refresh<T>(ProviderBase<T> provider) {
-    return component.container.refresh(provider);
-  }
 
   T _watch<T>(Object dependent, ProviderListenable<T> target) {
     return getDependencies(dependent)!.watch(target);
