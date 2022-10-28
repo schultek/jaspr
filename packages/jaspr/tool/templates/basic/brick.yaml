@@ -1,5 +1,5 @@
 name: basic
-description: A basic pure-dart web app with ssr & automatic client hydration.
+description: (Recommended) A basic pure-dart web app with ssr & automatic client hydration.
 
 version: 0.1.0+1
 

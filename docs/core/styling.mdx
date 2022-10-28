@@ -1,1 +1,174 @@
-TODO
+# 🎨 Styling
+
+Jaspr gives you a strongly-types styles system that wraps the most common css properties. You can
+access these various properties through the `Styles` class that is exported by the core package.
+
+To pass style attributes to an html component, construct a `Styles` object and pass it as the `styles` 
+attribute like this:
+
+```dart
+DomComponent(
+  tag: 'div',
+  styles: const Styles.background(color: Colors.red),
+);
+```
+
+This will render as:
+
+```html
+<div style="background: red"></div>
+```
+
+> Generally it is recommended to make styles **constant** wherever you can. This can improve performance 
+> and reduce the bundle-size of your application.
+
+## Style Groups
+
+Css properties are grouped semantically into *style groups* that can be accessed through the `Styles` class as shown above.
+For example, the `background` group gives you the set of css properties related to the background style, like color, position or size.
+
+Currently the following groups exist:
+
+#### `Styles.background()`
+
+Groups various css properties related to styling the background of an element.
+
+```dart
+const Styles.background({
+  Color? color,
+  BackgroundAttachment attachment,
+  BackgroundClip? clip,
+  ImageStyle? image,
+  BackgroundOrigin? origin,
+  BackgroundPosition? position,
+  BackgroundRepeat? repeat,
+  BackgroundSize? size,
+})
+```
+
+#### `Styles.text()`
+
+Groups various css properties related to styling text.
+
+```dart
+const Styles.text({
+  Color? color,
+  TextAlign? align,
+  FontFamily? fontFamily,
+  FontStyle? fontStyle,
+  Unit? fontSize,
+  FontWeight? fontWeight,
+  TextDecoration? decoration,
+  TextTransform? transform,
+  Unit? indent,
+  Unit? letterSpacing,
+  Unit? wordSpacing,
+  Unit? lineHeight,
+  TextShadow? shadow,
+  TextOverflow? overflow,
+})
+```
+
+#### `Styles.box()`
+
+Groups various css properties related to the css box model.
+
+```dart
+const Styles.box({
+  EdgeInsets? padding,
+  EdgeInsets? margin,
+  Display? display,
+  BoxSizing? boxSizing,
+  Unit? width,
+  Unit? height,
+  BoxConstraints? constraints,
+  Border? border,
+  BorderRadius? radius,
+  Outline? outline,
+  Overflow? overflow,
+  Visibility? visibility, 
+  Position? position,
+  double? opacity,
+  Transform? transform,
+  BoxShadow? shadow,
+  Cursor? cursor,
+  Transition? transition,
+})
+```
+
+#### `Styles.flexbox()`
+
+Groups various css properties related to the flexbox layout system.
+
+```dart
+const Styles.flexbox({
+  FlexDirection? direction,
+  FlexWrap? wrap,
+  JustifyContent? justifyContent,
+  AlignItems? alignItems,
+})
+```
+
+#### `Styles.flexItem()`
+
+Groups various css properties that can be applied to a direct child of a flexbox parent.
+
+```dart
+const Styles.flexItem({
+  Flex? flex,
+  int? order,
+  AlignSelf? alignSelf,
+})
+```
+
+#### `Styles.grid()`
+
+Groups various css properties related to the grid layout system.
+
+```dart
+const Styles.grid({
+  GridTemplate? template,
+  GridGap? gap,
+  List<TrackSize>? autoRows,
+  List<TrackSize>? autoColumns,
+})
+```
+
+#### `Styles.gridItem()`
+
+Groups various css properties that can be applied to a direct child of a grid parent.
+
+```dart
+const Styles.gridItem({
+  GridPlacement? placement,
+})
+```
+
+### Combining Styles
+
+When you want to combine styles from multiple groups, use the `Styles.combine()` method:
+
+```dart
+const myStyle = Styles.combine([
+  Styles.text(color: Colors.red),
+  Styles.background(color: Colors.blue),
+]);
+```
+
+You can also store styles in variables and mix'n'match:
+
+```dart
+const redText = Styles.text(color: Colors.red);
+
+const redBlueTest = Styles.combine([
+  redText,
+  Styles.background(color: Colors.blue),
+]);
+
+const redGreenTest = Styles.combine([
+  redText,
+  Styles.background(color: Colors.green),
+]);
+```
+
+

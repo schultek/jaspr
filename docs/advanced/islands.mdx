@@ -16,7 +16,15 @@ You can read more about this architecture pattern at these resources:
 
 ## Getting Started
 
-Jaspr supports this architecture out of the box by allowing **multiple parallel apps** on the client.
+For an easy start, use the `islands' template when creating a new jaspr project.
+
+```shell
+jaspr create -t islands my_app
+```
+
+## Manual setup
+
+Jaspr supports this architecture by allowing **multiple parallel apps** on the client.
 For example in your `web/main.dart` you can do this:
 
 ```dart
@@ -45,8 +53,3 @@ out of the bundled javascript and thereby reducing loading and startup time.
 
 **Be aware** that on the server, you must still construct the complete app layout and and render the
 targeted island components manually at the right location.
-
-## Automatic setup of island components
-
-Jaspr makes this even more convenient by giving you automated builders that set this up for you.
-For an easy start, use the `islands' template when creating a new jaspr project.

@@ -4,24 +4,25 @@
   "logoDark": "https://jasprpad.schultek.de/jaspr-192.png",
   "favicon": "https://jasprpad.schultek.de/jaspr-32.png",
   "sidebar": [
-    ["Overview", "/"],
-    ["Quick Start", "/quick-start"],
-    ["Jaspr vs Flutter Web", "/jaspr-vs-flutter-web"],
-    ["Jaspr CLI", "/cli"],
+    ["\uD83D\uDCD6 Overview", "/"],
+    ["\uD83D\uDEEB Quick Start", "/quick-start"],
+    ["\uD83E\uDD4A Jaspr vs Flutter Web", "/jaspr-vs-flutter-web"],
+    ["\uD83D\uDD79 Jaspr CLI", "/cli"],
     ["Core Concepts", [
-      ["Component System", "/core/components"],
-      ["Writing HTML in Jaspr", "/core/html"],
-      ["Styling in Jaspr", "/core/styling"],
-      ["Server-Side Rendering", "/core/ssr"],
-      ["Routing", "/core/routing"]
+      ["\uD83E\uDDF1 Component System", "/core/components"],
+      ["\uD83D\uDD8D Writing HTML in Jaspr", "/core/html"],
+      ["\uD83C\uDFA8 Styling in Jaspr", "/core/styling"],
+      ["\uD83C\uDFD7 Server-Side Rendering", "/core/ssr"],
+      ["\uD83E\uDDED Routing", "/core/routing"]
     ]],
     ["Advanced Concepts", [
-      ["Islands Architecture", "/advanced/islands"]
+      ["\uD83C\uDFDD Islands Architecture", "/advanced/islands"]
     ]],
     ["Ecosystem", [
-      ["Riverpod", "/eco/riverpod"],
-      ["Third-Party Packages", "/eco/packages"]
+      ["\uD83C\uDF0A Riverpod", "/eco/riverpod"],
+      ["\uD83D\uDCDA Third-Party Packages", "/eco/packages"],
+      ["\uD83D\uDC99 Contributing", "/eco/contributing"]
     ]],
-    ["Testing", "/testing"]
+    ["\uD83E\uDDEA Testing", "/testing"]
   ]
 }
