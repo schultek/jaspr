@@ -13,7 +13,9 @@ on Riverpod 2 and supports all providers and modifiers.
 **TLDR: Differences to flutter_riverpod**
 
 - No `Consumer` / `ConsumerComponent`, just use `context.read` / `context.watch`
-- Additional `.onSync()` and `.onPreload()` available on a providers `ref`.
+- Additional `SyncProvider` to sync values between server and client.
+
+> Also check out [this example](https://github.com/schultek/jaspr/tree/develop/examples/riverpod_app).
 
 ## 🪄 Accessing Providers
 
@@ -83,40 +85,22 @@ Jaspr allows `StatefulComponent`s to preload state as well as sync state between
 (when using server-side rendering).
 
 Since providers often are used to replace `StatefulComponent`s, `jaspr_riverpod` offers the same
-mechanisms inside a provider, using the `ref.onPreload()` and `ref.onSync()` methods:
-
-Preload state like this:
+mechanisms inside a special provider, called `SyncProvider`:
 
 ```dart
-final myProvider = Provider<int>((ref) {
-  
-  ref.onPreload(() async {
-    // do some async work on the server
-    ref.state = 100;
-  });
-
-  return 0;
-});
+final mySyncProvider = SyncProvider<int>((ref) async {
+  // do some async work on the server, like fetching data from a database
+  await Future.delayed(Duration(seconds: 1));
+  return 100;
+}, id: 'initial_count');
 ```
 
-Sync state like this:
+This provider needs an additional id to be synced with the client.
+The create function of a `SyncProvider` is only executed on the server, and
+never on the client. Instead the synced value is returned.
 
-```dart
-final myProvider = Provider<int>((ref) {
-  
-  ref.onSync<int>(
-    id: 'my-provider-id',
-    onUpdate: (int? value) {
-      ref.state = value ?? ref.state;
-    },
-    onSave: () {
-      return ref.state;
-    },
-  );
-
-  return 0;
-});
-```
+It then can be used like any other provider. It functions like a `FutureProvider` and exposes a 
+value of type `AsyncValue<T>`.
 
 ## 📜 Backstory: Why context extensions instead of Consumer?
 

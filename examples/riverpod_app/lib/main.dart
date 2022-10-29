@@ -1,8 +1,8 @@
-import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr/server.dart';
 
 import 'app.dart';
 
 void main() async {
-  runApp(ProviderScope(child: App()));
+  // runs the app component on both server and client
+  runApp(Document.app(body: App()));
 }

@@ -54,10 +54,6 @@ extension ProviderContext on BuildContext {
     );
   }
 
-  Future<void> preload(ProviderBase provider) async {
-    return ProviderScope._scopeOf(this, listen: false)._preload(provider);
-  }
-
   void _ensureDebugDoingBuild(String method) {
     assert(() {
       if (!debugDoingBuild) {

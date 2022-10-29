@@ -1,14 +1,13 @@
 library framework;
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:meta/meta.dart';
 import 'package:riverpod/riverpod.dart';
 
-part 'jaspr/sync_provider.dart';
-part 'jaspr/sync_ref.dart';
+import 'sync_provider.dart';
+
 part 'provider_context.dart';
 part 'provider_dependencies.dart';
 
@@ -155,30 +154,16 @@ class ProviderScope extends StatefulComponent {
 /// Do not use: The [State] of [ProviderScope]
 @visibleForTesting
 @sealed
-class ProviderScopeState extends State<ProviderScope> with SyncStateMixin<ProviderScope, Map<String, dynamic>> {
+class ProviderScopeState extends State<ProviderScope> with
+    SyncStateMixin<ProviderScope, Map<String, dynamic>>, SyncScopeMixin {
   /// The [ProviderContainer] exposed to [ProviderScope.child].
+  @override
   @visibleForTesting
   // ignore: diagnostic_describe_all_properties
   late final ProviderContainer container;
+
   ProviderContainer? _debugParentOwner;
   var _dirty = false;
-
-  @override
-  String syncId = 'provider_scope';
-
-  late bool _isRoot;
-  @override
-  bool wantsSync() => _isRoot;
-
-  @override
-  Map<String, dynamic> getState() {
-    return container.read(_syncProvider.notifier)._saveState();
-  }
-
-  @override
-  void updateState(Map? value) {
-    container.read(_syncProvider.notifier)._updateState(value?.cast());
-  }
 
   @override
   void initState() {
@@ -188,7 +173,6 @@ class ProviderScopeState extends State<ProviderScope> with SyncStateMixin<Provid
       return true;
     }(), '');
 
-    _isRoot = parent == null;
     container = ProviderContainer(
       parent: parent,
       overrides: component.overrides,
@@ -314,11 +298,6 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     bool fireImmediately = false,
   }) {
     return component.container.listen(provider, listener, onError: onError, fireImmediately: fireImmediately);
-  }
-
-  Future<void> _preload(ProviderBase provider) async {
-    component.container.read(provider); // create if not exists
-    return component.container.read(_syncProvider.notifier)._preload();
   }
 
   @override
