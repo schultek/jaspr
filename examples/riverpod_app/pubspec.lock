@@ -287,7 +287,7 @@ packages:
       path: "../../packages/jaspr_riverpod"
       relative: true
     source: path
-    version: "0.1.0-dev.1"
+    version: "0.1.0"
   jaspr_test:
     dependency: "direct overridden"
     description:
@@ -427,7 +427,7 @@ packages:
       name: riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0-dev.4"
+    version: "2.0.2"
   scratch_space:
     dependency: transitive
     description:
@@ -611,4 +611,4 @@ packages:
     source: hosted
     version: "3.1.0"
 sdks:
-  dart: ">=2.16.0 <3.0.0"
+  dart: ">=2.17.0 <3.0.0"

@@ -12,6 +12,10 @@ command:
 
 scripts:
   analyze: melos exec -- "dart analyze ."
+  test:
+    run: |
+      melos exec --ignore=*experiment* -- "dart test"
+      melos exec --ignore=*experiment* --scope=jaspr --scope=jaspr_router -- "dart test --preset=browser"
   coverage:
     run: |
       melos exec --ignore=*experiment* -- "dart test --coverage=coverage" | melos exec --ignore=*experiment* --scope=jaspr --scope=jaspr_router -- "dart test --preset=browser --coverage=coverage"
