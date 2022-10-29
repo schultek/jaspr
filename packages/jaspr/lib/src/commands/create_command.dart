@@ -66,7 +66,11 @@ class CreateCommand extends BaseCommand {
 
     var progress = logger.progress('Bootstrapping');
     var generator = await MasonGenerator.fromBundle(template);
-    final files = await generator.generate(DirectoryGeneratorTarget(directory), vars: {'name': name}, logger: logger);
+    final files = await generator.generate(
+      DirectoryGeneratorTarget(directory),
+      vars: {'name': name, 'jasprCoreVersion': '0.1.0', 'jasprBuilderVersion': '0.1.0'},
+      logger: logger,
+    );
     progress.complete('Generated ${files.length} file(s)');
 
     var process = await Process.start('dart', ['pub', 'get'], workingDirectory: directory.absolute.path);

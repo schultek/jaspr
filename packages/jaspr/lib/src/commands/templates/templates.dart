@@ -4,4 +4,4 @@ import './islands_bundle.dart';
 import './server_bundle.dart';
 import './client_bundle.dart';
 
-var templates = [basicBundle, classicBundle, islandsBundle, clientBundle, serverBundle];
+var templates = [classicBundle, basicBundle, islandsBundle, serverBundle, clientBundle];
