@@ -35,10 +35,16 @@ also strong in terms of type-safety and null-safety compared to JS.
 
 ### Differences to Flutter and Design Principles
 
-As you might know Flutter renders Widgets by manually painting pixels to a canvas. However rendering web-pages
-with HTML & CSS works fundamentally different to Flutters painting approach. Also Flutter has a vast variety 
-of widgets with different purposes and styling, whereas in html you can uniquely style each html element however 
-you like.
+Jaspr is an **alternative to Flutter Web**, when you want to **build any kind of website with Dart**.
+
+The Flutter team itself has stated on multiple occasions that
+> Flutter Web is for building **Web-Apps**, not **Web-Sites**.
+
+That just means that while Flutter Web is a great technology for sharing your apps across multiple
+platforms including the web, it may not be suited for all types of websites that you want to build.
+
+Jaspr works by giving you the familiar look and feel of the Flutter framework, while using native web
+technologies, like HTML, the DOM and CSS to enable you building **all** kinds of websites using **Dart**.
 
 Instead of trying to mirror every little thing from Flutter, `jaspr` tries to give a general Fluttery feeling 
 by matching features where it makes sense without compromising on the unique properties of the web platform.
@@ -48,23 +54,14 @@ Rather it embraces these differences to give the best of both worlds.
 
 ## Directories
 
-- **/experiments**: Experimental apps or features, that are not part of the core framework (yet?).
-  - **/minimal_app**: A minimal example with a single entry point for both client and server.
-  - **/preload_images**: A component that automatically preloads images for a next route.
-  - **/riverpod**: Riverpod example for jaspr.
-  - **/scoped_styles**: A component that introduces scoped styles.
-  - **/server_handling**: An app that uses custom middleware on the server to host an api.
+- **/apps**: Production apps built with jaspr
+  - **/jaspr_pad**: Online Editor and Playground inspired by DartPad, built with jaspr.
+- **/docs**: Documentation hosted at [docs.page/schultek/jaspr](https://docs.page/schultek/jaspr~develop)
+- **/examples**: Well-maintained and documented examples
+- **/experiments**: Experimental apps or features, that are not part of the core framework (yet?) (may be broken).
 - **/packages**:
-  - [**/jaspr**](https://github.com/schultek/jaspr/tree/main/packages/jaspr): The main framework package.
-  - **/jaspr_builder**: Polyfill builder for integrating js libraries with jaspr.
-  - **/jaspr_pad**: DartPad inspired online playground for jaspr apps.
+  - [**/jaspr**](https://github.com/schultek/jaspr/tree/main/packages/jaspr): The core framework package.
+  - **/jaspr_builder**: Code-generation builders for jaspr.
   - **/jaspr_riverpod**: Riverpod implementation for jaspr.
   - **/jaspr_router**: A router implementation for jaspr.
   - **/jaspr_test**: A testing package for jaspr.
-  
-## Roadmap
-
-- 🚧 Add helpful examples
-- 🚧 Bump test coverage over 80%
-- 🔜 Improve router package
-- 🔜 Add ssg support
