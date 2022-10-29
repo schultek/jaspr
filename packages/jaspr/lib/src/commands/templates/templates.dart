@@ -1,3 +1,5 @@
+// ignore_for_file: directives_ordering
+
 import './classic_bundle.dart';
 import './basic_bundle.dart';
 import './islands_bundle.dart';

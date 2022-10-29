@@ -1,5 +1,5 @@
-import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/src/ui/components/base.dart';
+import '../../../jaspr.dart';
+import 'base.dart';
 
 class Image extends BaseComponent {
   final double width;

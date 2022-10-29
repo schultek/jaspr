@@ -123,7 +123,7 @@ class HookCtx {
   bool _disposed = false;
   bool get disposed => _disposed;
   HookCtx? _previous;
-  HookCtx? _next;
+  HookCtx? next;
   bool _scheduled = false;
 
   HookCtx(this._onDependencyChange);
@@ -149,7 +149,7 @@ class HookCtx {
     assert(_derivation == null);
     _previous = __globalHookContext;
     if (_previous != null) {
-      _previous!._next = this;
+      _previous!.next = this;
     }
     __globalHookContext = this;
     _derivation = _reaction.startTracking();

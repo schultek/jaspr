@@ -30,6 +30,7 @@ void main() {
     });
 
     late Obs<int> obs;
+    // ignore: unused_local_variable
     late Obs<bool> obs2;
     late StreamController<int> streamController;
 

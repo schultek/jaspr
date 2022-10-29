@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
-import 'package:jaspr/jaspr_server.dart';
+import 'package:jaspr/server.dart';
 
 import 'app.dart';
 import 'services/service.dart';

@@ -16,7 +16,7 @@ import 'server/tutorial.dart';
 void main() {
   runServer(Builder.single(builder: (context) {
     return ProviderScope(
-      overrides: [samplesProvider.overrideWithProvider(loadSamplesProvider)],
+      overrides: [syncSamplesProvider.overrideWithProvider(loadSamplesProvider)],
       child: Playground(),
     );
   }))

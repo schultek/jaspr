@@ -851,5 +851,6 @@ abstract class Element implements BuildContext {
   /// Can be set by the element to signal that the first build should be performed asynchronous.
   Future? _asyncFirstBuild;
 
+  // ignore: prefer_final_fields
   List<Future> _asyncFirstBuildChildren = [];
 }

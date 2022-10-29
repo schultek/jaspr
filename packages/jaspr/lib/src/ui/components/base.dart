@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import '../../../jaspr.dart';
 
 abstract class BaseComponent extends StatelessComponent {
   final String? id;

@@ -1,4 +1,4 @@
-import 'package:jaspr/src/ui/components/base.dart';
+import 'base.dart';
 
 class Link extends BaseComponent {
   final Uri target;

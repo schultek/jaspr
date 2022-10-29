@@ -1,5 +1,5 @@
-import 'package:jaspr/components.dart';
-import 'package:jaspr/jaspr.dart';
+import '../../../components.dart';
+import '../../../jaspr.dart';
 
 class RichText extends BaseComponent {
   const RichText({

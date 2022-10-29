@@ -50,46 +50,34 @@ Future<Response> getSample(Request request, String id) async {
   return Response.ok(Mapper.toJson(result), headers: {'Content-Type': 'application/json'});
 }
 
-final loadSamplesProvider = Provider<List<Sample>>((ref) {
-  var samples = <Sample>[];
+final loadSamplesProvider = SyncProvider<List<Sample>>((ref) async {
+  var dirs = await Directory(samplesPath).list().toList();
 
-  ref.onPreload(() async {
-    var dirs = await Directory(samplesPath).list().toList();
+  var loadedSamples = (await Future.wait(dirs.map((dir) async {
+    var id = path.basename(dir.path);
+    var description = id;
+    int? index;
+    var mainFile = File(path.join(dir.path, 'main.dart'));
 
-    var loadedSamples = (await Future.wait(dirs.map((dir) async {
-      var id = path.basename(dir.path);
-      var description = id;
-      int? index;
-      var mainFile = File(path.join(dir.path, 'main.dart'));
-
-      if (await mainFile.exists()) {
-        var config = SampleConfig.from(await mainFile.readAsString());
-        if (config != null) {
-          if (config.hidden) {
-            return null;
-          }
-          description = config.description;
-          index = config.index;
+    if (await mainFile.exists()) {
+      var config = SampleConfig.from(await mainFile.readAsString());
+      if (config != null) {
+        if (config.hidden) {
+          return null;
         }
-      } else {
-        return null;
+        description = config.description;
+        index = config.index;
       }
+    } else {
+      return null;
+    }
 
-      return Sample(id, description, index);
-    })))
-        .whereType<Sample>()
-        .toList();
+    return Sample(id, description, index);
+  })))
+      .whereType<Sample>()
+      .toList();
 
-    loadedSamples.sort();
-    samples.addAll(loadedSamples);
-  });
+  loadedSamples.sort();
 
-  ref.onSync<List<Sample>>(
-    id: 'samples',
-    onUpdate: (_) {},
-    onSave: () => samples,
-    codec: MapperCodec(),
-  );
-
-  return samples;
-});
+  return loadedSamples;
+}, id: 'samples', codec: MapperCodec());

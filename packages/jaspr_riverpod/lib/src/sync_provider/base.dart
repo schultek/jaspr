@@ -23,6 +23,7 @@ class SyncProvider<T> extends _SyncProviderBase<T>
   SyncProvider(
     this._createFn, {
     required this.id,
+    this.codec,
     super.name,
     super.from,
     super.argument,
@@ -38,13 +39,21 @@ class SyncProvider<T> extends _SyncProviderBase<T>
   /// The unique id to sync between server and client.
   final String id;
 
+  final Codec<T, dynamic>? codec;
+
   @override
   late final AlwaysAliveRefreshable<Future<T>> future = _future(this);
 
   @override
   FutureOr<T> _create(SyncProviderElement<T> ref) {
     if (kIsWeb) {
-      return ref.watch(_syncStateProvider.select((s) => s.containsKey(id) ? s[id] : Completer().future));
+      return ref.watch(_syncStateProvider.select((s) {
+        if (!s.containsKey(id)) {
+          return Completer<T>().future;
+        }
+        var value = s[id];
+        return value != null ? (codec ?? CastCodec()).decode(value) : value;
+      }));
     }
     return _createFn(ref);
   }

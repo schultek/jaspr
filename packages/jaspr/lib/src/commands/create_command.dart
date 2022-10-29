@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:mason/mason.dart';
 import 'package:path/path.dart' as path;
-import 'package:yaml/yaml.dart';
 
 import 'command.dart';
 import 'templates/templates.dart';

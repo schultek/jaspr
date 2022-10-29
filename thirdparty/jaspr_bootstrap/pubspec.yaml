@@ -1,6 +1,7 @@
 name: jaspr_bootstrap
 description: Bootstrap components for jaspr.
 version: 0.1.0
+publish_to: none
 
 environment:
   sdk: '>=2.17.0 <3.0.0'

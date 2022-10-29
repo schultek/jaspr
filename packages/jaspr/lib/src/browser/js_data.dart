@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'dart:js';
 
 import 'package:js/js.dart';
-import 'package:meta/meta.dart';
 import '../foundation/sync.dart';
 
 @JS('jaspr')

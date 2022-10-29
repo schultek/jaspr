@@ -4,7 +4,7 @@ class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     if (kIsWeb) {
-      yield SkipChildComponent();
+      yield SkipContent();
     } else {
       yield Style(styles: [
         StyleRule.import('https://fonts.googleapis.com/css?family=Roboto'),

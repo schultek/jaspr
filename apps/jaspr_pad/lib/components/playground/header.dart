@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
@@ -131,17 +129,15 @@ class PlaygroundHeader extends StatelessComponent {
   }
 }
 
-class SamplesMenuButton extends StatelessComponent with OnFirstBuild {
+class SamplesMenuButton extends StatelessComponent with SyncProviderDependencies {
   const SamplesMenuButton({Key? key}) : super(key: key);
 
   @override
-  FutureOr<void> onFirstBuild(BuildContext context) {
-    return context.preload(samplesProvider);
-  }
+  Iterable<SyncProvider> get preloadDependencies =>[syncSamplesProvider];
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    var samples = context.watch(samplesProvider);
+    var samples = context.watch(syncSamplesProvider).valueOrNull ?? [];
 
     yield Menu(
       items: [
@@ -152,4 +148,5 @@ class SamplesMenuButton extends StatelessComponent with OnFirstBuild {
       },
     );
   }
+
 }

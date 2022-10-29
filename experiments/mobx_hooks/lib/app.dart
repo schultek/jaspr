@@ -36,7 +36,7 @@ class App extends StatelessComponent {
 
     yield DomComponent(
       tag: 'div',
-      styles: {
+      styles: Styles.raw({
         'display': 'flex',
         'flex-direction': 'column',
         'justify-content': 'center',
@@ -44,14 +44,14 @@ class App extends StatelessComponent {
         'height': '100%',
         'width': '270px',
         'margin': 'auto',
-      },
+      }),
       children: [
         DomComponent(
           tag: 'div',
           children: [
             DomComponent(
               tag: 'label',
-              styles: {'padding': '0 10px;'},
+              styles: Styles.raw({'padding': '0 10px;'}),
               attributes: {'for': 'seed'},
               child: Text('seed'),
             ),
@@ -68,11 +68,11 @@ class App extends StatelessComponent {
             ),
           ],
         ),
-        DomComponent(tag: 'span', styles: {'height': '10px;'}),
+        DomComponent(tag: 'span', styles: Styles.raw({'height': '10px;'})),
         SecondsInput(seconds: seconds),
         DomComponent(
           tag: 'button',
-          styles: {'margin': '10px 0;'},
+          styles: Styles.raw({'margin': '10px 0;'}),
           events: {'click': reset},
           child: Text('reset'),
         ),
@@ -105,7 +105,7 @@ class SecondsInput extends StatelessComponent {
       children: [
         DomComponent(
           tag: 'label',
-          styles: {'padding': '0 10px;'},
+          styles: Styles.raw({'padding': '0 10px;'}),
           attributes: {'for': 'seconds'},
           child: Text('seconds'),
         ),
@@ -144,7 +144,7 @@ class OutputText extends StatelessComponent {
       children: [
         DomComponent(
           tag: 'h1',
-          styles: {'padding': '0 10px;', 'font-family': 'mono'},
+          styles: Styles.raw({'padding': '0 10px;', 'font-family': 'mono'}),
           child: Text('output: ${output.value}'),
         ),
       ],

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as path;
 
@@ -8,7 +7,7 @@ void main() async {
   var subDirs = await templatesDir.list().toList();
   var templates = <String>[];
 
-  var output = StringBuffer();
+  var output = StringBuffer('// ignore_for_file: directives_ordering\n\n');
   
   for (var templateDir in subDirs) {
     if (templateDir is Directory) {
