@@ -1,4 +1,4 @@
-import '../../../jaspr.dart';
+import '../../jaspr.dart';
 
 class Style extends StatelessComponent {
   final List<StyleRule> styles;

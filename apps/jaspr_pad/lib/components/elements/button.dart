@@ -1,3 +1,4 @@
+import 'package:jaspr/components.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../../adapters/mdc.dart';

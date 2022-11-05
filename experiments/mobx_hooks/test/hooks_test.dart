@@ -1,5 +1,5 @@
 import 'package:async/async.dart' show Result;
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/components.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 import 'dart:async';
 

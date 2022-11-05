@@ -36,48 +36,56 @@ For example, the `background` group gives you the set of css properties related 
 
 Currently the following groups exist:
 
-#### `Styles.background()`
+<Tabs defaultValue="background" values={[
+        {label: 'Background', value: 'background'},
+        {label: 'Text', value: 'text'},
+        {label: 'Box', value: 'box'},
+        {label: 'FlexBox', value: 'flexbox'},
+        {label: 'FlexItem', value: 'flexItem'},
+        {label: 'Grid', value: 'grid'},
+        {label: 'GridItem', value: 'gridItem'}
+    ]}
+>
+ <TabItem value="background">
+    Groups various css properties related to styling the background of an element.
 
-Groups various css properties related to styling the background of an element.
-
-```dart
-const Styles.background({
-  Color? color,
-  BackgroundAttachment attachment,
-  BackgroundClip? clip,
-  ImageStyle? image,
-  BackgroundOrigin? origin,
-  BackgroundPosition? position,
-  BackgroundRepeat? repeat,
-  BackgroundSize? size,
-})
-```
-
-#### `Styles.text()`
-
-Groups various css properties related to styling text.
-
-```dart
-const Styles.text({
-  Color? color,
-  TextAlign? align,
-  FontFamily? fontFamily,
-  FontStyle? fontStyle,
-  Unit? fontSize,
-  FontWeight? fontWeight,
-  TextDecoration? decoration,
-  TextTransform? transform,
-  Unit? indent,
-  Unit? letterSpacing,
-  Unit? wordSpacing,
-  Unit? lineHeight,
-  TextShadow? shadow,
-  TextOverflow? overflow,
-})
-```
-
-#### `Styles.box()`
-
+    ```dart
+    const Styles.background({
+      Color? color,
+      BackgroundAttachment attachment,
+      BackgroundClip? clip,
+      ImageStyle? image,
+      BackgroundOrigin? origin,
+      BackgroundPosition? position,
+      BackgroundRepeat? repeat,
+      BackgroundSize? size,
+    })
+    ```
+</TabItem>
+<TabItem value="text">
+    Groups various css properties related to styling text.
+    
+    ```dart
+    const Styles.text({
+      Color? color,
+      TextAlign? align,
+      FontFamily? fontFamily,
+      FontStyle? fontStyle,
+      Unit? fontSize,
+      FontWeight? fontWeight,
+      TextDecoration? decoration,
+      TextTransform? transform,
+      Unit? indent,
+      Unit? letterSpacing,
+      Unit? wordSpacing,
+      Unit? lineHeight,
+      TextShadow? shadow,
+      TextOverflow? overflow,
+    })
+    ```
+</TabItem>
+<TabItem value="box">
+    
 Groups various css properties related to the css box model.
 
 ```dart
@@ -103,7 +111,8 @@ const Styles.box({
 })
 ```
 
-#### `Styles.flexbox()`
+</TabItem>
+<TabItem value="flexbox">
 
 Groups various css properties related to the flexbox layout system.
 
@@ -116,7 +125,8 @@ const Styles.flexbox({
 })
 ```
 
-#### `Styles.flexItem()`
+</TabItem>
+<TabItem value="flexItem">
 
 Groups various css properties that can be applied to a direct child of a flexbox parent.
 
@@ -128,7 +138,8 @@ const Styles.flexItem({
 })
 ```
 
-#### `Styles.grid()`
+</TabItem>
+<TabItem value="grid">
 
 Groups various css properties related to the grid layout system.
 
@@ -141,7 +152,8 @@ const Styles.grid({
 })
 ```
 
-#### `Styles.gridItem()`
+</TabItem>
+<TabItem value="gridItem">
 
 Groups various css properties that can be applied to a direct child of a grid parent.
 
@@ -149,6 +161,22 @@ Groups various css properties that can be applied to a direct child of a grid pa
 const Styles.gridItem({
   GridPlacement? placement,
 })
+```
+
+</TabItem>
+</Tabs>
+
+### Raw Styles
+
+If you want to work with raw CSS properties or need to use a property that is not supported by the 
+current style groups, use the `Styles.raw()` method and provide a map of
+properties and values:
+
+```dart
+const myStyle = Styles.raw({
+  'color': 'blue',
+  'some_advanced_css_property': 'special_value',
+});
 ```
 
 ### Combining Styles
@@ -176,6 +204,46 @@ const redGreenTest = Styles.combine([
   redText,
   Styles.background(color: Colors.green),
 ]);
+```
+
+## Style Component
+
+The `Styles` class is great for defining a single set of css properties e.g. to be used as 
+**inline styles** for a single html element or `DomComponent`.
+
+To define a stylesheet with a set of style rules use the `Style` (without *s*) component.
+
+```dart
+Style(rules: [
+    StyleRule(
+        selector: const Selector.id('content'),
+        styles: Styles.box(
+            width: 100.percent,
+            height: 100.percent,
+        ),
+    ),
+    StyleRule(
+        selector: const Selector.dot('red-text'),
+        styles: Styles.text(
+            color: Colors.red,
+        ),
+    ),
+]);
+```
+
+will render as:
+
+```html
+<style>
+  #content {
+    width: 100%;
+    height: 100%;
+  }
+    
+  .red-text {
+    color: red;
+  }
+</style>
 ```
 
 

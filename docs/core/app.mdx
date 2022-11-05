@@ -1,0 +1,119 @@
+## 🚀 Run your App
+
+To run your app, use the `runApp` function and provide your root component.
+
+```dart
+runApp(MyComponent());
+```
+
+This function is not available under the normal `package:jaspr/jaspr.dart` import. Instead, you
+must use the platform-specific `package:jaspr/browser.dart` or `package:jaspr/server.dart` import
+in your web and server entrypoints, respectively.
+
+We have separate imports since the `runApp` method works slightly different depending on whether
+we are on the server or client.
+
+1. **On the server** this starts a http server that renders the given component to html for every
+   incoming request.
+   
+2. **On the client** this attaches the given component to the DOM and thereby making your app interactive.
+
+---
+
+Let's look at a simple example on how this works in practice. A minimal file structure looks like this:
+
+```text
+├── lib/
+│   ├── app.dart
+│   └── main.dart
+└── web/
+    └── main.dart
+```
+
+This consists of
+
+- an `lib/app.dart` with an `App` component that we want to use both for server-side rendering and 
+client-side hydration,
+  
+- a `lib/main.dart` file that is the entrypoint on the server for our app
+
+    ```dart
+    // Server-specific import
+    import 'package:jaspr/server.dart';
+    
+    // Our main component
+    import 'app.dart';
+    
+    void main() {
+      // Starts the server and renders the app component
+      runApp(
+        // Special component that sets up the main document tags
+        // like <html>, <head>, and <body>.
+        // More on this later
+        Document(
+          // Renders the component inside the <body> tag
+          body: App(),
+        ),
+      );
+    }
+    ```
+
+- a `web/main.dart` file that is the entrypoint on the client for our app
+
+  ```dart
+  // Client-specific import
+  import 'package:jaspr/browser.dart';
+  
+  // Our main component
+  import 'lib/app.dart';
+  
+  void main() {
+    // Attaches the app component to the <body> tag
+    // and hydrates the component / makes it interactive.
+    runApp(App(), attachTo: 'body');
+  }
+  ```
+
+  It is important that you attach your component on the client to the same location in the tree 
+  where you rendered it on the server. This does not need to be &lt;body&gt;, but must be the same.
+
+## 📋 The Document
+
+The `Document` component helps you to set up a basic document structure at the root of your app.
+It renders the main `<html>`, `<head>` and `<body>` tags and takes a set of standard parameters, 
+e.g. to set the `title` or `meta` attributes inside the `<head>`.
+
+The standard `Document` constructor takes the following arguments:
+
+- `String? title`: Sets the title of your website.
+- `String? base`: Sets the `<base>` tag of your website.
+- `String? charset`: Sets the charset, defaults to 'utf-8'.
+- `String? viewport`: Sets the viewport for mobile devices, defaults to 'width=device-width, initial-scale=1.0'.
+- `Map<String, String>? meta`: Sets additional `<meta>` properties.
+- `List<StyleRule>? styles`: A global set of style-rules, rendered as a `<style>` section inside `<head>`.
+- `String? scriptName`: The name of the script that corresponds to your web entrypoint, e.g. `main` for `web/main.dart`.
+- `List<Component> head`: Additional components to render inside `<head>`.
+- `Component body`: The component to render inside `<body>`.
+
+---
+
+There are also three other constructors that you can use instead:
+
+- **Document.file()** where you can use an external html file that defines the document markup.
+  
+  See the `classic` template for an example setup.
+  
+- **Document.app()** automatically detects your main app component and sets the script name accordingly.
+  It works together with the `@App()` annotation that you must apply to your main app component. 
+  
+  See the `basic` template for an example setup.
+  
+- **Document.islands()** where you can use multiple independent island components that are automatically
+  detected and hydrated on the client. It works together with the `@Island()` annotation that you 
+  can apply to any component that should function as an island.
+
+  See the `islands` template for an example setup.
+
+
+
+

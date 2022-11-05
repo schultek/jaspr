@@ -1,5 +1,5 @@
 // [sample=6] Bulma CSS
-import 'package:jaspr/jaspr.dart' hide Color;
+import 'package:jaspr/browser.dart' hide Color;
 
 import 'button.dart';
 import 'colors.dart';

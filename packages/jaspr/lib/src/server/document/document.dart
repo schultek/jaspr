@@ -6,7 +6,13 @@ import 'dart:math';
 
 import 'package:html/parser.dart';
 
-import '../../../server.dart';
+import '../../../jaspr.dart';
+import '../../components/child_node.dart';
+import '../../components/style.dart';
+import '../component_registry.dart';
+import '../markup_renderer.dart';
+
+export '../../components/style.dart' hide Style;
 
 part 'document_binding.dart';
 part 'manual_document.dart';

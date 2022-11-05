@@ -1,5 +1,6 @@
 // [sample=2] Jaspr Riverpod
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/browser.dart';
+import 'package:jaspr/components.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 void main() {

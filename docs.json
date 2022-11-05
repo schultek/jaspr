@@ -10,6 +10,7 @@
     ["\uD83D\uDD79 Jaspr CLI", "/cli"],
     ["Core Concepts", [
       ["\uD83E\uDDF1 Component System", "/core/components"],
+      ["\uD83D\uDC7E App & Document", "/core/app"],
       ["\uD83D\uDD8D Writing HTML in Jaspr", "/core/html"],
       ["\uD83C\uDFA8 Styling in Jaspr", "/core/styling"],
       ["\uD83C\uDFD7 Server-Side Rendering", "/core/ssr"],

@@ -13,5 +13,4 @@ export 'styles/properties/position.dart';
 export 'styles/properties/text.dart';
 export 'styles/properties/transform.dart';
 export 'styles/properties/unit.dart';
-export 'styles/style.dart';
 export 'styles/styles.dart';

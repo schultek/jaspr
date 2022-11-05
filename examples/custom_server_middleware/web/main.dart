@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/browser.dart';
 import 'package:custom_server_middleware/app.dart';
 
 void main() {

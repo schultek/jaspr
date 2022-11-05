@@ -1,9 +1,6 @@
-library server;
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:hotreloader/hotreloader.dart';
 import 'package:http/http.dart' as http;
@@ -14,56 +11,10 @@ import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
 import '../../server.dart';
+import 'server_handler.dart';
+import 'server_renderer.dart';
 
-part 'server_renderer.dart';
-
-const String _kDevProxy = String.fromEnvironment('jaspr.dev.proxy');
-const bool _kDevHotreload = bool.fromEnvironment('jaspr.dev.hotreload');
-
-
-/// A [Handler] that can be refreshed to update any used resources
-class RefreshableHandler {
-
-  final Handler _handler;
-  final void Function()? onRefresh;
-
-  RefreshableHandler(this._handler, {this.onRefresh});
-
-  void refresh() {
-    if (_handler is RefreshableHandler) {
-      (_handler as RefreshableHandler).refresh();
-    }
-    if (onRefresh != null) {
-      onRefresh!();
-    }
-  }
-
-  FutureOr<Response> call(Request request) => _handler(request);
-}
-
-/// Returns a shelf handler that serves the provided component and related assets
-Handler serveApp(AppHandler handler) {
-  return _createHandler((request, render) {
-    return handler(request, (app) {
-      return render(_createSetup(app));
-    });
-  });
-}
-
-/// Directly renders the provided component into a html response
-Future<Response> renderComponent(Component app) async {
-  return _renderApp(_createSetup(app), Request('get', Uri.parse('https://0.0.0.0/')), (name) async {
-    var response = await staticFileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
-    return response.readAsString();
-  });
-}
-
-typedef RenderFunction = FutureOr<Response> Function(Component);
-typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render);
-
-SetupFunction _createSetup(Component app) {
-  return () => AppBinding.ensureInitialized().attachRootComponent(app, attachTo: '_');
-}
+typedef SetupFunction = void Function();
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
 class ServerApp {
@@ -117,9 +68,9 @@ class ServerApp {
     Future.microtask(() async {
       _running = true;
 
-      var handler = _createHandler((_, render) => render(_setup), middleware: _middleware, fileHandler: _fileHandler);
+      var handler = createHandler((_, render) => render(_setup), middleware: _middleware, fileHandler: _fileHandler);
 
-      if (_kDevHotreload) {
+      if (kDevHotreload) {
         await _reload(this, () {
           if (handler is RefreshableHandler) {
             (handler as RefreshableHandler).refresh();
@@ -140,101 +91,6 @@ class ServerApp {
     await _server?.close();
     await _reloader?.stop();
   }
-}
-
-FutureOr<Response> Function(Request, String) _proxyFileLoader(Handler proxyHandler) {
-  return (Request req, String fileName) {
-    final indexRequest = Request('GET', req.requestedUri.replace(path: '/$fileName'),
-        context: req.context, encoding: req.encoding, headers: req.headers, protocolVersion: req.protocolVersion);
-    return proxyHandler(indexRequest);
-  };
-}
-
-// coverage:ignore-start
-
-Handler _webdevProxyHandler(String port) {
-  var client = http.Client();
-  var handler = proxyHandler('http://localhost:$port/', client: client);
-  return RefreshableHandler((Request req) async {
-    var res = await handler(req);
-    if (res.statusCode == 200 && res.headers['content-type'] == 'application/javascript') {
-      var body = await res.readAsString();
-      res = res.change(body: body.replaceAll('http://localhost:$port/', ''));
-    }
-    return res;
-  }, onRefresh: () {
-    client.close();
-    client = http.Client();
-    handler = proxyHandler('http://localhost:$port/', client: client);
-  });
-}
-
-String _sseHeaders(String? origin) => 'HTTP/1.1 200 OK\r\n'
-    'Content-Type: text/event-stream\r\n'
-    'Cache-Control: no-cache\r\n'
-    'Connection: keep-alive\r\n'
-    'Access-Control-Allow-Credentials: true\r\n'
-    'Access-Control-Allow-Origin: $origin\r\n'
-    '\r\n';
-
-Handler _sseProxyHandler(Uri proxyUri, Uri serverUri) {
-  Handler? _incomingMessageProxyHandler;
-  var _httpClient = http.Client();
-
-  Future<Response> _createSseConnection(Request req, String path) async {
-    final serverReq = http.StreamedRequest(req.method, serverUri.replace(query: req.requestedUri.query))
-      ..followRedirects = false
-      ..headers.addAll(req.headers)
-      ..headers['Host'] = serverUri.authority
-      ..sink.close();
-
-    final serverResponse = await _httpClient.send(serverReq);
-
-    req.hijack((channel) {
-      final sink = utf8.encoder.startChunkedConversion(channel.sink)..add(_sseHeaders(req.headers['origin']));
-
-      StreamSubscription? serverSseSub;
-      StreamSubscription? reqChannelSub;
-
-      serverSseSub = utf8.decoder.bind(serverResponse.stream).listen(sink.add, onDone: () {
-        reqChannelSub?.cancel();
-        sink.close();
-      });
-
-      reqChannelSub = channel.stream.listen((_) {
-        // SSE is unidirectional.
-      }, onDone: () {
-        serverSseSub?.cancel();
-        sink.close();
-      });
-    });
-  }
-
-  Future<Response> _handleIncomingMessage(Request req) async {
-    _incomingMessageProxyHandler ??= proxyHandler(
-      serverUri,
-      client: _httpClient,
-    );
-    return _incomingMessageProxyHandler!(req);
-  }
-
-  return (Request req) async {
-    var path = req.url.path;
-    if (!path.startsWith('/')) path = '/$path';
-    if (path != proxyUri.path) {
-      return Response.notFound('');
-    }
-
-    if (req.headers['accept'] == 'text/event-stream' && req.method == 'GET') {
-      return _createSseConnection(req, path);
-    }
-
-    if (req.headers['accept'] != 'text/event-stream' && req.method == 'POST') {
-      return _handleIncomingMessage(req);
-    }
-
-    return Response.notFound('');
-  };
 }
 
 /// Wraps the http server creation and enables hotreload
@@ -264,47 +120,6 @@ Future<void> _reload(ServerApp app, FutureOr<HttpServer> Function() init) async 
       rethrow;
     }
   }
-}
-
-// coverage:ignore-end
-
-final staticFileHandler = _kDevProxy.isNotEmpty
-    ? _webdevProxyHandler(_kDevProxy)
-    : createStaticHandler(join(dirname(Platform.script.path), 'web'), defaultDocument: 'index.html');
-
-typedef _SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
-
-Handler _createHandler(_SetupHandler handle, {List<Middleware> middleware = const [], Handler? fileHandler}) {
-  var staticHandler = fileHandler ?? staticFileHandler;
-
-  var cascade = Cascade();
-
-  if (_kDevProxy.isNotEmpty) {
-    final serverUri = Uri.parse('http://localhost:$_kDevProxy');
-    final serverSseUri = serverUri.replace(path: r'/$dwdsSseHandler');
-    final sseUri = Uri.parse(r'/$dwdsSseHandler');
-
-    cascade = cascade.add(_sseProxyHandler(sseUri, serverSseUri));
-  }
-
-  var fileLoader = _proxyFileLoader(staticHandler);
-  cascade = cascade.add(gzipMiddleware(staticHandler)).add((request) async {
-    return handle(request, (setup) => _renderApp(setup, request, (name) async {
-      var response = await fileLoader(request, name);
-      return response.readAsString();
-    }));
-  });
-
-  var pipeline = const Pipeline();
-  for (var m in middleware) {
-    pipeline = pipeline.addMiddleware(m);
-  }
-
-  return RefreshableHandler(pipeline.addHandler(cascade.handler), onRefresh: () {
-    if (staticHandler is RefreshableHandler) {
-      (staticHandler as RefreshableHandler).refresh();
-    }
-  });
 }
 
 /// Creates and runs the http server

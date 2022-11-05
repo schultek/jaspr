@@ -1,7 +1,7 @@
 // [sample=4] Jaspr Html
 // import this file for html utilities
+import 'package:jaspr/browser.dart';
 import 'package:jaspr/html.dart';
-import 'package:jaspr/jaspr.dart';
 
 void main() {
   runApp(App());

@@ -1,7 +1,8 @@
 import 'dart:async';
 
-import '../../browser.dart';
+import '../framework/framework.dart';
 import 'js_data.dart';
+import 'run_app.dart';
 
 typedef IslandLoader = FutureOr<IslandBuilder> Function();
 typedef IslandBuilder = Component Function(ConfigParams);
