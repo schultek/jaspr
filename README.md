@@ -4,11 +4,16 @@
   <a href="https://pub.dev/packages/jaspr"><img src="https://img.shields.io/pub/v/jaspr.svg" alt="pub"></a>
   <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/stars/schultek/jaspr" alt="github"></a>
   <a href="https://discord.gg/XGXrGEk4c6"><img src="https://img.shields.io/discord/993167615587520602" alt="discord"></a>
+  <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/contributors/schultek/jaspr" alt="contributors"></a>
+</p>
+
+<p align="center">
+<a href="https://github.com/sponsors/schultek"><img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white" alt="sponsor"></a>
 </p>
 
 # jaspr
 
-Experimental web framework for Dart. Supports SPAs and SSR. 
+Modern web framework for building websites in Dart. Supports SPAs and SSR.
 
 **Core Features:**
 
@@ -19,6 +24,8 @@ Experimental web framework for Dart. Supports SPAs and SSR.
 - Well tested (~70% test coverage)
 
 > I'm looking for contributors. Don't hesitate to contact me if you want to help in any way.
+> Also check out the [Contributing Guide](https://docs.page/schultek/jaspr~develop/eco/contributing) 
+> or join our [Discord Server](https://discord.gg/XGXrGEk4c6)
 
 - [Documentation](https://docs.page/schultek/jaspr)
 - [Demo & Playground](https://jasprpad.schultek.de)

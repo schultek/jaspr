@@ -23,7 +23,9 @@ Modern web framework for building websites in Dart. Supports SPAs and SSR.
 - Fast incremental DOM updates
 - Well tested (~70% test coverage)
 
-> I'm looking for contributors. Don't hesitate to contact me if you want to help in any way.
+> I'm looking for contributors. Don't hesitate to contact me if you want to help in any way. 
+> Also check out the [Contributing Guide](https://docs.page/schultek/jaspr~develop/eco/contributing)
+> or join our [Discord Server](https://discord.gg/XGXrGEk4c6)
 
 - [Documentation](https://docs.page/schultek/jaspr)
 - [Demo & Playground](https://jasprpad.schultek.de)
