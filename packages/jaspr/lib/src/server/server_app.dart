@@ -1,18 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:hotreloader/hotreloader.dart';
-import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
-import 'package:shelf_gzip/shelf_gzip.dart';
-import 'package:shelf_proxy/shelf_proxy.dart';
-import 'package:shelf_static/shelf_static.dart';
 
 import '../../server.dart';
 import 'server_handler.dart';
-import 'server_renderer.dart';
 
 typedef SetupFunction = void Function();
 

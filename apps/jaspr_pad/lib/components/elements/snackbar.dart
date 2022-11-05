@@ -1,5 +1,4 @@
 import 'package:jaspr/components.dart';
-import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../../adapters/mdc.dart';

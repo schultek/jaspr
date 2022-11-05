@@ -17,7 +17,8 @@
       ["\uD83E\uDDED Routing", "/core/routing"]
     ]],
     ["Advanced Concepts", [
-      ["\uD83C\uDFDD Islands Architecture", "/advanced/islands"]
+      ["\uD83C\uDFDD Islands Architecture", "/advanced/islands"],
+      ["\uD83E\uDE90 Custom Backend", "/advanced/backend"]
     ]],
     ["Ecosystem", [
       ["\uD83C\uDF0A Riverpod", "/eco/riverpod"],

@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart' hide Style;
+import 'package:jaspr/jaspr.dart';
 
 import 'components/style.dart';
 

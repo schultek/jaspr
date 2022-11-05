@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:hotreloader/hotreloader.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
-import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_gzip/shelf_gzip.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
@@ -13,12 +11,11 @@ import 'package:shelf_static/shelf_static.dart';
 import '../../server.dart';
 import 'server_renderer.dart';
 
-const String kDevProxy = String.fromEnvironment('jaspr.dev.proxy');
+final String kDevProxy = String.fromEnvironment('jaspr.dev.proxy', defaultValue: Platform.environment['jaspr_dev_proxy'] ?? '');
 const bool kDevHotreload = bool.fromEnvironment('jaspr.dev.hotreload');
 
 /// A [Handler] that can be refreshed to update any used resources
 class RefreshableHandler {
-
   final Handler _handler;
   final void Function()? onRefresh;
 
@@ -35,7 +32,6 @@ class RefreshableHandler {
 
   FutureOr<Response> call(Request request) => _handler(request);
 }
-
 
 FutureOr<Response> Function(Request, String) _proxyFileLoader(Handler proxyHandler) {
   return (Request req, String fileName) {
@@ -72,12 +68,12 @@ String _sseHeaders(String? origin) => 'HTTP/1.1 200 OK\r\n'
     'Access-Control-Allow-Origin: $origin\r\n'
     '\r\n';
 
-Handler _sseProxyHandler(Uri proxyUri, Uri serverUri) {
+Handler _sseProxyHandler(String proxyPath, Uri serverUri) {
   Handler? _incomingMessageProxyHandler;
   var _httpClient = http.Client();
 
   Future<Response> _createSseConnection(Request req, String path) async {
-    final serverReq = http.StreamedRequest(req.method, serverUri.replace(query: req.requestedUri.query))
+    final serverReq = http.StreamedRequest(req.method, serverUri.replace(path: path, query: req.requestedUri.query))
       ..followRedirects = false
       ..headers.addAll(req.headers)
       ..headers['Host'] = serverUri.authority
@@ -105,7 +101,7 @@ Handler _sseProxyHandler(Uri proxyUri, Uri serverUri) {
     });
   }
 
-  Future<Response> _handleIncomingMessage(Request req) async {
+  Future<Response> _handleIncomingMessage(Request req, String path) async {
     _incomingMessageProxyHandler ??= proxyHandler(
       serverUri,
       client: _httpClient,
@@ -115,8 +111,8 @@ Handler _sseProxyHandler(Uri proxyUri, Uri serverUri) {
 
   return (Request req) async {
     var path = req.url.path;
-    if (!path.startsWith('/')) path = '/$path';
-    if (path != proxyUri.path) {
+
+    if (!path.endsWith(proxyPath)) {
       return Response.notFound('');
     }
 
@@ -125,7 +121,7 @@ Handler _sseProxyHandler(Uri proxyUri, Uri serverUri) {
     }
 
     if (req.headers['accept'] != 'text/event-stream' && req.method == 'POST') {
-      return _handleIncomingMessage(req);
+      return _handleIncomingMessage(req, path);
     }
 
     return Response.notFound('');
@@ -134,9 +130,19 @@ Handler _sseProxyHandler(Uri proxyUri, Uri serverUri) {
 
 // coverage:ignore-end
 
+final projectDir = _findRootProjectDir();
+
+String _findRootProjectDir() {
+  var dir = dirname(Platform.script.path);
+  while (dir.isNotEmpty && !File(join(dir, 'pubspec.yaml')).existsSync()) {
+    dir = dirname(dir);
+  }
+  return dir;
+}
+
 final staticFileHandler = kDevProxy.isNotEmpty
     ? _webdevProxyHandler(kDevProxy)
-    : createStaticHandler(join(dirname(Platform.script.path), 'web'), defaultDocument: 'index.html');
+    : createStaticHandler(join(projectDir, 'web'), defaultDocument: 'index.html');
 
 typedef _SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
 
@@ -147,24 +153,40 @@ Handler createHandler(_SetupHandler handle, {List<Middleware> middleware = const
 
   if (kDevProxy.isNotEmpty) {
     final serverUri = Uri.parse('http://localhost:$kDevProxy');
-    final serverSseUri = serverUri.replace(path: r'/$dwdsSseHandler');
-    final sseUri = Uri.parse(r'/$dwdsSseHandler');
+    final ssePath = r'/$dwdsSseHandler';
 
-    cascade = cascade.add(_sseProxyHandler(sseUri, serverSseUri));
+    cascade = cascade.add(_sseProxyHandler(ssePath, serverUri));
   }
 
   var fileLoader = _proxyFileLoader(staticHandler);
   cascade = cascade.add(gzipMiddleware(staticHandler)).add((request) async {
-    return handle(request, (setup) => renderApp(setup, request, (name) async {
-      var response = await fileLoader(request, name);
-      return response.readAsString();
-    }));
+    return handle(request, (setup) async {
+      /// We support two modes here, rendered-html and data-only
+      /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
+      var isDataMode = request.headers['jaspr-mode'] == 'data-only';
+
+      if (isDataMode) {
+        return Response.ok(
+          await renderData(setup, request.url),
+          headers: {'Content-Type': 'application/json'},
+        );
+      } else {
+        return Response.ok(
+          await renderHtml(setup, request.url, (name) async {
+            var response = await fileLoader(request, name);
+            return response.readAsString();
+          }),
+          headers: {'Content-Type': 'text/html'},
+        );
+      }
+    });
   });
 
   var pipeline = const Pipeline();
   for (var m in middleware) {
     pipeline = pipeline.addMiddleware(m);
   }
+  pipeline = pipeline.addMiddleware(logRequests());
 
   return RefreshableHandler(pipeline.addHandler(cascade.handler), onRefresh: () {
     if (staticHandler is RefreshableHandler) {

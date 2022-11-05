@@ -15,17 +15,28 @@ void main() async {
   router.get('/', (request) => Response.ok('Hello World from Shelf'));
 
   // binding to a different path than '/' only works because we set the
-  // <base href="/app/"> tag in index.html
+  // base: '/app' parameter on the document
   router.mount('/app', serveApp((request, render) {
     // Optionally do something with `request`
     print("Request uri is ${request.requestedUri} (${request.url})");
     // Return a server-rendered response by calling `render()` with your root component
-    return render(App());
+    return render(Document.app(
+      base: '/app',
+      body: App(),
+    ));
   }));
 
-  router.get('/hello', (request) {
-    // Render a single component
-    return renderComponent(Hello());
+  router.get('/hello', (request) async {
+    // Render a single component manually
+    return Response.ok(
+      await renderComponent(Document.app(
+        // we still point to /app to correctly load all other resources,
+        // like js, css or image files
+        base: '/app',
+        body: Hello(),
+      )),
+      headers: {'Content-Type': 'text/html'},
+    );
   });
 
   var handler = const Pipeline() //

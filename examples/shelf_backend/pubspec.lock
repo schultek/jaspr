@@ -7,14 +7,14 @@ packages:
       name: _fe_analyzer_shared
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "34.0.0"
+    version: "38.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.2.0"
+    version: "3.4.1"
   archive:
     dependency: transitive
     description:
@@ -148,13 +148,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
-  cli_util:
-    dependency: transitive
-    description:
-      name: cli_util
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.5"
   code_builder:
     dependency: transitive
     description:
@@ -203,7 +196,7 @@ packages:
       name: dart_style
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.1"
+    version: "2.2.3"
   dds:
     dependency: transitive
     description:
@@ -327,6 +320,13 @@ packages:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr"
+      relative: true
+    source: path
+    version: "0.2.0"
+  jaspr_builder:
+    dependency: "direct dev"
+    description:
+      path: "../../packages/jaspr_builder"
       relative: true
     source: path
     version: "0.2.0"
@@ -533,6 +533,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
+  source_gen:
+    dependency: transitive
+    description:
+      name: source_gen
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.2"
   source_map_stack_trace:
     dependency: transitive
     description:

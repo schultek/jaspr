@@ -1,50 +1,45 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import 'package:shelf/shelf.dart';
 
-import '../foundation/constants.dart';
-import '../foundation/sync.dart';
-import '../framework/framework.dart';
 import 'component_registry.dart';
 import 'document/document.dart';
 import 'server_app.dart';
 import 'server_binding.dart';
 
-
 /// This spawns an isolate for each render, in order to avoid conflicts with static instances and multiple parallel requests
-Future<Response> renderApp(SetupFunction setup, Request request, Future<String> Function(String) loadFile) async {
+Future<String> renderHtml(SetupFunction setup, Uri requestUri, Future<String> Function(String) loadFile) async {
   var port = ReceivePort();
 
-  /// We support two modes here, rendered-html and data-only
-  /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
-  if (request.headers['jaspr-mode'] == 'data-only') {
-    var message = _RenderMessage(setup, ComponentRegistry.data, request.url, port.sendPort);
+  var message = _RenderMessage(setup, ComponentRegistry.data, requestUri, port.sendPort);
 
-    await Isolate.spawn(_renderData, message);
-    var result = await port.first;
+  await Isolate.spawn(_renderHtml, message);
 
-    return Response.ok(result, headers: {'Content-Type': 'application/json'});
-  } else {
-    var message = _RenderMessage(setup, ComponentRegistry.data, request.url, port.sendPort);
+  var resultCompleter = Completer<String>.sync();
 
-    await Isolate.spawn(_renderHtml, message);
+  var sub = port.listen((message) async {
+    if (message is String) {
+      resultCompleter.complete(message);
+    } else if (message is LoadFileRequest) {
+      message.sendPort.send(await loadFile(message.name));
+    }
+  });
 
-    var resultCompleter = Completer<String>.sync();
+  var result = await resultCompleter.future;
+  sub.cancel();
 
-    var sub = port.listen((message) async {
-      if (message is String) {
-        resultCompleter.complete(message);
-      } else if (message is LoadFileRequest) {
-        message.sendPort.send(await loadFile(message.name));
-      }
-    });
+  return result;
+}
 
-    var result = await resultCompleter.future;
-    sub.cancel();
+/// This spawns an isolate for each render, in order to avoid conflicts with static instances and multiple parallel requests
+Future<String> renderData(SetupFunction setup, Uri requestUri) async {
+  var port = ReceivePort();
+  var message = _RenderMessage(setup, ComponentRegistry.data, requestUri, port.sendPort);
 
-    return Response.ok(result, headers: {'Content-Type': 'text/html'});
-  }
+  await Isolate.spawn(_renderData, message);
+  var result = await port.first;
+
+  return result;
 }
 
 class _RenderMessage {

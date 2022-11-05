@@ -34,9 +34,9 @@ Handler serveApp(AppHandler handler) {
 typedef RenderFunction = FutureOr<Response> Function(Component);
 typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render);
 
-/// Directly renders the provided component into a html response
-Future<Response> renderComponent(Component app) async {
-  return renderApp(_createSetup(app), Request('get', Uri.parse('https://0.0.0.0/')), (name) async {
+/// Directly renders the provided component into a html string
+Future<String> renderComponent(Component app) async {
+  return renderHtml(_createSetup(app), Uri.parse('https://0.0.0.0/'), (name) async {
     var response = await staticFileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
     return response.readAsString();
   });
