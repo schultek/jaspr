@@ -6,7 +6,7 @@ import 'package:jaspr/src/commands/create_command.dart';
 import 'package:jaspr/src/commands/serve_command.dart';
 
 void main(List<String> args) async {
-  var runner = CommandRunner<void>("jaspr", "An experimental web framework for dart apps, supporting SPA and SSR.")
+  var runner = CommandRunner<void>("jaspr", "A modern web framework for building websites in Dart.")
     ..addCommand(CreateCommand())
     ..addCommand(ServeCommand())
     ..addCommand(BuildCommand());

@@ -9,7 +9,7 @@ issues on [Github](https://github.com/schultek/jaspr).
 
 ## What is Jaspr?
 
-[Jaspr] is an experimental web framework for **Dart**, with the premise to look and feel just like Flutter 
+[Jaspr] is a modern web framework for building websites in **Dart**, with the premise to look and feel just like Flutter 
 while building native web-apps rendering normal html/css like **Vue** or **React**. It is targeted mainly at 
 Flutter developers and Dart enthusiasts that want to build native interactive websites. It is made to 
 be server-side rendering first but also supports single page applications.
