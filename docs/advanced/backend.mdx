@@ -72,9 +72,22 @@ There are two main functions, that enable this:
 > When you are not using `jaspr serve`, you need to run webdev manually with 
 > `dart run webdev serve web:5467` and provide the `jaspr_dev_proxy=5467` env var to your server process.
 
+## Example: Shelf
+
+[`shelf`](https://pub.dev/packages/shelf) is a widely-used package for building server apps with dart that is 
+maintained by the Dart team.
+
+> Shelf makes it easy to create and compose web servers and parts of web servers.
+
+Since jaspr used shelf internally, it is pretty straightforward to built a custom backend for jaspr using
+shelf. 
+
+Check out our [shelf_backend example](https://github.com/schultek/jaspr/tree/develop/examples/shelf_backend)
+to see this in action.
+
 ## Example: Dart Frog
 
-[`dart_frog`](https://dartfrog.vgv.dev/) is a popular backend framework built by Very Good Ventures. You
+[`dart_frog`](https://dartfrog.vgv.dev/) is a new backend framework built by Very Good Ventures. You
 can combine it with jaspr to build powerful fullstack web applications that use dart_frog for managing
 the backend api and jaspr for rendering the frontend app.
 

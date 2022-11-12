@@ -29,9 +29,15 @@ For an easy start, use the `islands' template when creating a new jaspr project.
 jaspr create -t islands my_app
 ```
 
+This will use a combination of the `Document.islands` constructor and the `@island` component 
+annotation for an easy automated setup of the islands architecture.
+
 ## Manual setup
 
-Jaspr supports this architecture by allowing **multiple parallel apps** on the client.
+If you choose not to use the recommended approach using the `@island` annotation or want to build a 
+purely client-side app, you can also set this up manually.
+
+In general, jaspr supports this architecture by allowing **multiple parallel apps** on the client.
 For example in your `web/main.dart` you can do this:
 
 ```dart
