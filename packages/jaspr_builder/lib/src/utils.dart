@@ -1,3 +1,5 @@
+import 'package:analyzer/dart/analysis/results.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
@@ -30,5 +32,16 @@ extension TransitiveTypeElements on DartType {
       return ['dart.core', 'dart.async'].contains(element?.library?.name);
     }
     return false;
+  }
+}
+
+extension ElementNode on Element {
+  AstNode? get node {
+    var result = session?.getParsedLibraryByElement(library!);
+    if (result is ParsedLibraryResult) {
+      return result.getElementDeclaration(this)?.node;
+    } else {
+      return null;
+    }
   }
 }

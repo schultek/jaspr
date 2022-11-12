@@ -5,7 +5,9 @@ import 'package:jaspr/browser.dart';
 import 'package:riverpod_app/app.dart' as a;
 
 void main() {
-  runAppWithParams((p) {
-    return a.App();
-  });
+  runAppWithParams(getComponentForParams);
+}
+
+Component getComponentForParams(ConfigParams p) {
+  return a.App();
 }

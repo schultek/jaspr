@@ -5,7 +5,9 @@ import 'package:jaspr/browser.dart';
 import 'package:shelf_handler/components/hello.dart' as a;
 
 void main() {
-  runAppWithParams((p) {
-    return a.Hello();
-  });
+  runAppWithParams(getComponentForParams);
+}
+
+Component getComponentForParams(ConfigParams p) {
+  return a.Hello();
 }

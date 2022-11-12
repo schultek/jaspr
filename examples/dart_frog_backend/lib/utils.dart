@@ -8,7 +8,7 @@ Middleware serveJasprApp() {
   return fromShelfMiddleware((handler) {
     return serveApp((request, _) {
       return handler(request.change(
-        context: {...request.context, '$_Base': () => _Base(request.handlerPath)},
+        context: {...request.context, '$BasePath': () => BasePath(request.handlerPath)},
       ));
     });
   });
@@ -16,20 +16,12 @@ Middleware serveJasprApp() {
 
 /// Renders a jaspr component and returns a dart_frog response
 Future<Response> renderJasprComponent(RequestContext context, Component child) async {
-
-  // this is normally auto-generated, but does not work together with dart_frog
-  // TODO: find a way to automate this
-  ComponentRegistry.initialize('server', components: {
-    App: ComponentEntry.app('components/app'),
-    Hello: ComponentEntry<Hello>.app('components/hello', getParams: (c) => {'name': c.name}),
-  });
-
-  var base = context.read<_Base>();
+  var base = context.read<BasePath>();
 
   return Response(
     body: await renderComponent(
       Document.app(
-        base: base.base,
+        base: base.path,
         body: child,
       ),
     ),
@@ -37,7 +29,7 @@ Future<Response> renderJasprComponent(RequestContext context, Component child) a
   );
 }
 
-class _Base {
-  _Base(this.base);
-  final String base;
+class BasePath {
+  BasePath(this.path);
+  final String path;
 }

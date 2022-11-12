@@ -1,7 +1,9 @@
 import 'package:jaspr/html.dart';
 
+part 'app.g.dart';
+
 @app
-class App extends StatefulComponent {
+class App extends StatefulComponent with _$App {
   const App({Key? key}) : super(key: key);
 
   @override

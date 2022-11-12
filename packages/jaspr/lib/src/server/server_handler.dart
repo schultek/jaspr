@@ -134,6 +134,7 @@ final projectDir = _findRootProjectDir();
 
 String _findRootProjectDir() {
   var dir = dirname(Platform.script.path);
+  if (Platform.resolvedExecutable == Platform.script.path) return dir;
   while (dir.isNotEmpty && !File(join(dir, 'pubspec.yaml')).existsSync()) {
     dir = dirname(dir);
   }

@@ -9,7 +9,6 @@ import 'package:html/parser.dart';
 import '../../../jaspr.dart';
 import '../../components/child_node.dart';
 import '../../components/style.dart';
-import '../component_registry.dart';
 import '../markup_renderer.dart';
 
 export '../../components/style.dart' hide Style;
@@ -132,7 +131,7 @@ class _AppDocumentState extends _ManualDocumentState with _ComponentEntryStateMi
     var id = getIdFor(element);
     _appData = {
       'id': id,
-      ...entry.loadParams(element.component),
+      if (entry.params != null) 'params': kDebugMode ? entry.params : stateCodec.encode(entry.params),
     };
   }
 
@@ -155,7 +154,7 @@ class _AppDocumentState extends _ManualDocumentState with _ComponentEntryStateMi
       print("[WARNING] Used Document.app() but multiple app components were provided.");
     }
 
-    return apps.first.value.name + '.g';
+    return apps.first.value.name + (apps.first.value.isIsland ? '.island' : '.app');
   }
 }
 
@@ -183,7 +182,7 @@ class _IslandsDocumentState extends _ManualDocumentState with _ComponentEntrySta
     _islands.add({
       'id': id,
       'name': entry.name,
-      ...entry.loadParams(element.component),
+      if (entry.params != null) 'params': kDebugMode ? entry.params : stateCodec.encode(entry.params),
     });
   }
 
@@ -203,7 +202,7 @@ class _IslandsDocumentState extends _ManualDocumentState with _ComponentEntrySta
       return null;
     }
 
-    return DocumentBinding.instance!._registryData!.target + '.islands';
+    return 'main.islands';
   }
 }
 

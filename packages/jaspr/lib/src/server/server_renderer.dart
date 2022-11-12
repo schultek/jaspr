@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:isolate';
 
-
-import 'component_registry.dart';
 import 'document/document.dart';
 import 'server_app.dart';
 import 'server_binding.dart';
@@ -11,7 +9,7 @@ import 'server_binding.dart';
 Future<String> renderHtml(SetupFunction setup, Uri requestUri, Future<String> Function(String) loadFile) async {
   var port = ReceivePort();
 
-  var message = _RenderMessage(setup, ComponentRegistry.data, requestUri, port.sendPort);
+  var message = _RenderMessage(setup, requestUri, port.sendPort);
 
   await Isolate.spawn(_renderHtml, message);
 
@@ -34,7 +32,7 @@ Future<String> renderHtml(SetupFunction setup, Uri requestUri, Future<String> Fu
 /// This spawns an isolate for each render, in order to avoid conflicts with static instances and multiple parallel requests
 Future<String> renderData(SetupFunction setup, Uri requestUri) async {
   var port = ReceivePort();
-  var message = _RenderMessage(setup, ComponentRegistry.data, requestUri, port.sendPort);
+  var message = _RenderMessage(setup, requestUri, port.sendPort);
 
   await Isolate.spawn(_renderData, message);
   var result = await port.first;
@@ -44,17 +42,15 @@ Future<String> renderData(SetupFunction setup, Uri requestUri) async {
 
 class _RenderMessage {
   SetupFunction setup;
-  ComponentRegistryData? registryData;
   Uri requestUri;
   SendPort sendPort;
 
-  _RenderMessage(this.setup, this.registryData, this.requestUri, this.sendPort);
+  _RenderMessage(this.setup, this.requestUri, this.sendPort);
 }
 
 /// Runs the app and returns the rendered html
 void _renderHtml(_RenderMessage message) async {
   AppBinding.ensureInitialized()
-    ..setRegistryData(message.registryData)
     ..setCurrentUri(message.requestUri)
     ..setSendPort(message.sendPort);
   message.setup();
@@ -65,9 +61,7 @@ void _renderHtml(_RenderMessage message) async {
 
 /// Runs the app and returns the preloaded state data as json
 void _renderData(_RenderMessage message) async {
-  AppBinding.ensureInitialized()
-    ..setRegistryData(message.registryData)
-    ..setCurrentUri(message.requestUri);
+  AppBinding.ensureInitialized().setCurrentUri(message.requestUri);
   message.setup();
 
   var data = await AppBinding.ensureInitialized().data();

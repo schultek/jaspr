@@ -1,12 +1,16 @@
 import 'dart:async';
 
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_style/dart_style.dart';
+import 'package:glob/glob.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
+
+import 'utils.dart';
 
 var appChecker = TypeChecker.fromRuntime(AppAnnotation);
 var islandChecker = TypeChecker.fromRuntime(IslandAnnotation);
@@ -19,26 +23,12 @@ class EntrypointBuilder implements Builder {
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
-    var inputId = buildStep.inputId;
-    var outputId = inputId.changeExtension('.g.dart');
-    var islandsId = AssetId(inputId.package, inputId.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.islands.dart'));
-
-
     try {
-      var targets = await generateTargets(buildStep);
-
-      var entrypointSource = await generateEntrypoint(targets, buildStep);
-      if (entrypointSource != null) {
+      var islandsSource = await generateIslands(buildStep);
+      if (islandsSource != null) {
+        var outputId = AssetId(buildStep.inputId.package, 'web/main.islands.dart');
         await buildStep.writeAsString(
           outputId,
-          entrypointSource,
-        );
-      }
-
-      var islandsSource = await generateIslands(targets, buildStep);
-      if (islandsSource != null) {
-        await buildStep.writeAsString(
-          islandsId,
           islandsSource,
         );
       }
@@ -54,80 +44,14 @@ class EntrypointBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-        '^lib/{{file}}.dart': ['lib/{{file}}.g.dart', 'web/{{file}}.islands.dart']
+        'lib/\$lib\$': ['web/main.islands.dart']
       };
 
   String get generationHeader => "// GENERATED FILE, DO NOT MODIFY\n"
       "// Generated with jaspr_builder\n";
 
-  Future<Map<ClassElement, int>> generateTargets(BuildStep buildStep) async {
-
-    var targets = <ClassElement, int>{};
-
-    await for (var lib in buildStep.resolver.libraries) {
-      if (lib.isInSdk) continue;
-
-      var reader = LibraryReader(lib);
-
-      for (var e in reader.allElements) {
-        if (e is ClassElement && componentChecker.isAssignableFrom(e)) {
-          var a = 0;
-          if (appChecker.hasAnnotationOf(e)) {
-            a |= 1;
-          }
-          if (islandChecker.hasAnnotationOf(e)) {
-            a |= 2;
-          }
-          if (a != 0) {
-            targets[e] = a;
-          }
-        }
-      }
-    }
-
-    return targets;
-  }
-
-  Future<String?> generateEntrypoint(Map<ClassElement, int> targets, BuildStep buildStep) async {
-
-    if (targets.isEmpty) {
-      return null;
-    }
-
-    var name = path.basenameWithoutExtension(buildStep.inputId.path);
-
-    return DartFormatter(pageWidth: 120).format('''
-      $generationHeader
-      
-      import 'package:jaspr/server.dart';
-      import '$name.dart' as e;
-      ${targets.entries.mapIndexed((index, c) => "import '${c.key.librarySource.uri}' as c$index;").join('\n')}
-      
-      void main() {
-        ComponentRegistry.initialize('$name', components: {
-          ${targets.entries.mapIndexed((index, c) {
-            var className = 'c$index.${c.key.thisType.getDisplayString(withNullability: false)}';
-            var params = getParamsFor(c.key);
-            return '''
-              $className: ComponentEntry${params.isNotEmpty ? '<$className>' : ''}.${c.value == 1 ? 'app' : c.value == 2 ? 'island' : 'appAndIsland'}(
-                '${c.key.librarySource.uri.path.split('/').skip(1).join('/').replaceFirst('.dart', '')}'
-                ${params.isNotEmpty ? ', getParams: (c) { return {${params.map((p) => "'${p.name}': c.${p.name}").join(', ')}}; }' : ''}
-              ),
-            ''';
-          }).join('\n')}
-        });
-        e.main();
-      }
-    ''');
-  }
-
-  Future<String?> generateIslands(Map<ClassElement, int> targets, BuildStep buildStep) async {
-
-    if (targets.isEmpty) {
-      return null;
-    }
-
-    var islands = targets.entries.where((e) => e.value & 2 != 0).map((e) => e.key);
+  Future<String?> generateIslands(BuildStep buildStep) async {
+    var islands = await buildStep.findAssets(Glob('web/**.island.dart')).toList();
 
     if (islands.isEmpty) {
       return null;
@@ -137,24 +61,22 @@ class EntrypointBuilder implements Builder {
       $generationHeader
       
       import 'package:jaspr/browser.dart';
-      ${islands.mapIndexed((index, c) => "import '${c.librarySource.uri}' deferred as c$index;").join('\n')}
+      ${islands.mapIndexed((index, c) => "import '${path.url.relative(c.path, from: 'web')}' deferred as i$index;").join('\n')}
       
       void main() {
         runIslandsDeferred({
           ${islands.mapIndexed((index, c) {
-            var params = getParamsFor(c);
-            return '''
-              '${c.librarySource.uri.path.split('/').skip(1).join('/').replaceFirst('.dart', '')}': loadIsland(c$index.loadLibrary, (p) { 
-                return c$index.${c.thisType.getDisplayString(withNullability: false)}(${params.where((p) => p.isPositional).map((p) => 'p.get(\'${p.name}\')').followedBy(params.where((p) => p.isNamed).map((p) => '${p.name}: p.get(\'${p.name}\')')).join(', ')}); 
-              }),
+      return '''
+              '${path.url.relative(path.url.withoutExtension(path.url.withoutExtension(c.path)), from: 'web')}': loadIsland(i$index.loadLibrary, 
+              (p) => i$index.getComponentForParams(p),
+              ),
             ''';
-          }).join('\n')}
+    }).join('\n')}
         });
       }
     ''');
   }
 }
-
 
 /// Builds web entrypoints for components annotated with @app
 class AppsBuilder implements Builder {
@@ -162,17 +84,8 @@ class AppsBuilder implements Builder {
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
-    var inputId = buildStep.inputId;
-
-    var outputId = AssetId(inputId.package, inputId.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.g.dart'));
-
     try {
-      var webSource = await generateWebEntrypoint(buildStep);
-      if (webSource == null) return;
-      await buildStep.writeAsString(
-        outputId,
-        webSource,
-      );
+      await generateAppOutputs(buildStep);
     } catch (e, st) {
       print('An unexpected error occurred.\n'
           'This is probably a bug in jaspr_builder.\n'
@@ -185,46 +98,117 @@ class AppsBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-    'lib/{{file}}.dart': ['web/{{file}}.g.dart']
-  };
+        'lib/{{file}}.dart': ['lib/{{file}}.g.dart', 'web/{{file}}.app.dart', 'web/{{file}}.island.dart']
+      };
 
   String get generationHeader => "// GENERATED FILE, DO NOT MODIFY\n"
       "// Generated with jaspr_builder\n";
 
-  Future<String?> generateWebEntrypoint(BuildStep buildStep) async {
+  Future<void> generateAppOutputs(BuildStep buildStep) async {
+    var library = await buildStep.inputLibrary;
+    var reader = LibraryReader(library);
 
-    var reader = LibraryReader(await buildStep.inputLibrary);
+    var apps = reader.annotatedWithExact(appChecker).map((e) => e.element);
+    var islands = reader.annotatedWithExact(islandChecker).map((e) => e.element);
 
-    var annotated = reader.annotatedWithExact(appChecker).map((e) => e.element).whereType<ClassElement>().where((c) =>componentChecker.isAssignableFrom(c));
+    var annotated = apps.followedBy(islands).toSet();
 
     if (annotated.isEmpty) {
-      return null;
+      return;
     }
+
+    var usedAnnotation = [if (apps.isNotEmpty) '@app', if (islands.isNotEmpty) '@island'].join(' or ');
 
     if (annotated.length > 1) {
-      print("[WARNING] Cannot have multiple components annotated with @app in a single library.");
+      log.warning("Cannot have multiple components annotated with $usedAnnotation in a single library.");
     }
 
-    var c = annotated.first;
-    var params = getParamsFor(c);
+    var part = path.url.basenameWithoutExtension(buildStep.inputId.path) + '.g.dart';
+
+    final libraryUnit = await buildStep.resolver.compilationUnitFor(buildStep.inputId);
+    final hasPartDirective = libraryUnit.directives.whereType<PartDirective>().any((e) => e.uri.stringValue == part);
+
+    if (!hasPartDirective) {
+      log.warning(
+        '$part must be included as a part directive in '
+        'the input library with:\n    part \'$part\';',
+      );
+    }
+
+    var element = annotated.first;
+
+    if (element is! ClassElement) {
+      log.warning('$usedAnnotation can only be applied on classes. Failing element: ${element.name}');
+      return;
+    }
+
+    if (!componentChecker.isAssignableFrom(element)) {
+      log.warning(
+          '$usedAnnotation can only be applied on classes extending Component. Failing element: ${element.name}');
+      return;
+    }
+
+    var mixinName = '_\$${element.name}';
+    var usesMixin =
+        (element.node as ClassDeclaration).withClause?.mixinTypes.any((type) => type.name.name == mixinName) ??
+            false;
+
+    if (!usesMixin) {
+      log.warning('Your class ${element.name} must mixin the generated \'$mixinName\' mixin.');
+    }
+
+    var params = getParamsFor(element);
 
     var uri = (await buildStep.inputLibrary).source.uri;
 
-    return DartFormatter(pageWidth: 120).format('''
+    var isApp = appChecker.hasAnnotationOfExact(element);
+    var isIsland = islandChecker.hasAnnotationOfExact(element);
+
+    var partId = buildStep.inputId.changeExtension('.g.dart');
+    var partSource = DartFormatter(pageWidth: 120).format('''
+      $generationHeader
+      
+      part of '${path.url.basename(buildStep.inputId.path)}';
+      
+      mixin $mixinName implements ComponentEntryMixin<${element.name}> {
+        @override
+        ComponentEntry<${element.name}> get entry {
+          var self = this as ${element.name};
+          return ComponentEntry.${isApp ? isIsland ? 'appAndIsland' : 'app' : 'island'}(
+            '${path.url.relative(path.url.withoutExtension(buildStep.inputId.path), from: 'lib')}'
+            ${params.isNotEmpty ? ', params: {${params.map((p) => "'${p.name}': self.${p.name}").join(', ')}},' : ''}
+          );
+        }
+      }
+    ''');
+
+    await buildStep.writeAsString(partId, partSource);
+
+    var webId = AssetId(
+        buildStep.inputId.package,
+        buildStep.inputId.path
+            .replaceFirst('lib/', 'web/')
+            .replaceFirst('.dart', '.${islands.isNotEmpty ? 'island' : 'app'}.dart'));
+    var webSource = DartFormatter(pageWidth: 120).format('''
       $generationHeader
       
       import 'package:jaspr/browser.dart';
       import '$uri' as a;
       
+      ${isApp ? '''
       void main() {
-        runAppWithParams((p) {
-          return a.${c.thisType.getDisplayString(withNullability: false)}(${params.where((p) => p.isPositional).map((p) => 'p.get(\'${p.name}\')').followedBy(params.where((p) => p.isNamed).map((p) => '${p.name}: p.get(\'${p.name}\')')).join(', ')});
-        });
+        runAppWithParams(getComponentForParams);
+      }
+      ''' : ''}
+      
+      Component getComponentForParams(ConfigParams p) {
+        return a.${element.thisType.getDisplayString(withNullability: false)}(${params.where((p) => p.isPositional).map((p) => 'p.get(\'${p.name}\')').followedBy(params.where((p) => p.isNamed).map((p) => '${p.name}: p.get(\'${p.name}\')')).join(', ')});
       }
     ''');
+
+    await buildStep.writeAsString(webId, webSource);
   }
 }
-
 
 List<ParameterElement> getParamsFor(ClassElement e) {
   var params = e.constructors.first.parameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();

@@ -11,7 +11,6 @@ mixin DocumentBinding on BindingBase, SyncBinding {
   static DocumentBinding? get instance => _instance!;
 
   late SendPort _sendPort;
-  ComponentRegistryData? _registryData;
   ReceivePort? _receivePort;
 
   void setSendPort(SendPort sendPort) {
@@ -27,18 +26,14 @@ mixin DocumentBinding on BindingBase, SyncBinding {
     _fileRequest = _receivePort!.first.then((value) => value);
   }
 
-  void setRegistryData(ComponentRegistryData? registryData) {
-    _registryData = registryData;
-  }
-
   final Map<Element, ComponentEntry> _registryElements = {};
 
   ComponentEntry? _registerElement(Element element) {
-    var data = _registryData?.components[element.component.runtimeType];
-    if (data != null) {
-      _registryElements[element] = data;
+    if (element.component is ComponentEntryMixin) {
+      var entry = (element.component as ComponentEntryMixin).entry;
+      return _registryElements[element] = entry;
     }
-    return data;
+    return null;
   }
 
   Future<String> renderDocument(MarkupDomRenderer renderer) async {
