@@ -7,7 +7,7 @@ next: /eco/packages
 
 # 🌊 Riverpod for Jaspr
 
-Jaspr comes with a riverpod package that ports over flutter_riverpod to Jaspr. It is based
+Jaspr comes with a Riverpod package that ports over flutter_riverpod to Jaspr. It is based
 on Riverpod 2 and supports all providers and modifiers.
 
 **TLDR: Differences to flutter_riverpod**
@@ -26,7 +26,7 @@ on the `Consumer` side. Mainly:
 does not rely on `WidgetRef` to access providers but instead comes with **context extensions** on the
 `BuildContext` of **any** component.
 
-As an example, this:
+As an example, this (in Flutter):
 
 ```dart
 // (Flutter)
@@ -41,14 +41,14 @@ class MyWidget extends ConsumerWidget {
 }
 ```
 
-can simply be written as
+is equivalent to this (in Jaspr)
 
 ```dart 
 // (Jaspr)
 // just extends the normal component
 class MyComponent extends StatelessComponent {
   // no extra parameter
-  Iterable<Component>(BuildContext context) sync* {
+  Iterable<Component> build(BuildContext context) sync* {
     // uses context to access providers
     var value = context.watch(myProvider);
     yield Text(value);
@@ -106,10 +106,10 @@ value of type `AsyncValue<T>`.
 
 Put simply: Because they are easier and more flexible to use and require less boilerplate.
 
-The actual question would be why they are not in flutter_riverpod in the first place.
+The actual question would be why they are not part of flutter_riverpod in the first place.
 This is because mainly `context.watch` is [not feasible in `flutter_riverpod`](https://github.com/rrousselGit/riverpod/issues/134).
 
-This is a limitation by Flutter itself, not riverpod. There are [long standing bugs](https://github.com/flutter/flutter/issues/62861) 
+This is a limitation by Flutter itself, not Riverpod. There are [long standing bugs](https://github.com/flutter/flutter/issues/62861) 
 (or [missing features](https://github.com/flutter/flutter/issues/12992) depending on how you view it) 
 in flutter with `InheritedWidget` that make it impossible for `context.watch` to work properly. 
 Recently there have been [efforts](https://github.com/flutter/flutter/issues/106549) by the creator 
