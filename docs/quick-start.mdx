@@ -22,12 +22,15 @@ cd my_web_app
 jaspr serve
 ```
 
-This will spin up a server at `localhost:8080`. You can now start developing your web app.
-Also observe that the browser automatically refreshes the page when you change something in your code, like the `Hello World` text.
+This will generate some additional files and spin up a server at `localhost:8080`. 
+You can now start developing your web app.
+
+> Observe that the browser automatically refreshes the page when you change something in your 
+> code, like the `Hello World` text.
 
 ## 🪆 Project structure
 
-Depending on your chosen template, a typical jaspr project will have the following project structure:
+Depending on your chosen template, a typical jaspr project could have the following project structure:
 
 ```markdown
 ├── lib/
@@ -48,8 +51,8 @@ Depending on your chosen template, a typical jaspr project will have the followi
 depending on your architecture.
 
 - The `lib/main.dart` file is the standard entry point for your **server** application, if you use
-server-side rendering. It usually contains the `void main()` method with a single call to `runApp(App())`,
-with `App()` being your root component.
+server-side rendering. It usually contains the `void main()` method with a single call to `runApp()`,
+and provides your root app component.
 
 - The `web` folder contains all files that should be shipped to the browser. Files inside the `web` directory
 are later accessible through their relative url, e.g. `<domain>/styles.css`, so it makes sense to put

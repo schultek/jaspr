@@ -8,7 +8,7 @@ runApp(MyComponent());
 
 This function is not available under the normal `package:jaspr/jaspr.dart` import. Instead, you
 must use the platform-specific `package:jaspr/browser.dart` or `package:jaspr/server.dart` import
-in your web and server entrypoints, respectively.
+in your web and server entrypoint, respectively.
 
 We have separate imports since the `runApp` method works slightly different depending on whether
 we are on the server or client.
@@ -114,6 +114,7 @@ There are also three other constructors that you can use instead:
 
   See the `islands` template for an example setup.
 
-
+When you use the **app** or **islands** variant with the appropriate annotations, your web entrypoints
+will be automatically generated and used in your server-rendered markup.
 
 

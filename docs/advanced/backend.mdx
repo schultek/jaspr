@@ -81,3 +81,11 @@ the backend api and jaspr for rendering the frontend app.
 Check out our [dart_frog_backend example](https://github.com/schultek/jaspr/tree/develop/examples/dart_frog_backend)
 to see this in action.
 
+With this, a `dart_frog` route that renders a jaspr component can be as simple as:
+
+```dart
+// routes/[my_component_path]/index.dart
+Future<Response> onRequest(RequestContext context) {
+  return renderJasprComponent(context, MyComponent());
+}
+```

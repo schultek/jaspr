@@ -6,7 +6,7 @@ import 'package:jaspr/server.dart';
 import 'app.dart';
 
 void main() async {
-  runServer(App())
+  runServer(Document(body: App()))
     ..addMiddleware(logRequests()) // add any shelf middleware
     ..addMiddleware((handler) {
       return (request) {
