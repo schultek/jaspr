@@ -1,34 +1,62 @@
-![Banner](https://github.com/schultek/jaspr/raw/main/assets/jaspr_banner.png)
+![Banner](/assets/jaspr_banner.png)
 
 <p align="center">
-  <a href="https://pub.dev/packages/jaspr"><img src="https://img.shields.io/pub/v/jaspr.svg" alt="pub"></a>
-  <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/stars/schultek/jaspr" alt="stars"></a>
-  <a href="https://discord.gg/XGXrGEk4c6"><img src="https://img.shields.io/discord/993167615587520602?label=discord" alt="discord"></a>
-  <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/contributors/schultek/jaspr" alt="contributors"></a>
+  <a href="https://github.com/sponsors/schultek"><img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white" alt="sponsor"></a>
 </p>
 
 <p align="center">
-    <a href="https://github.com/sponsors/schultek"><img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white" alt="sponsor"></a>
+  <a href="https://pub.dev/packages/jaspr"><img src="https://img.shields.io/pub/v/jaspr?label=pub.dev&logo=dart" alt="pub"></a>
+  <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/stars/schultek/jaspr?logo=github" alt="github"></a>
+  <a href="https://discord.gg/XGXrGEk4c6"><img src="https://img.shields.io/discord/993167615587520602?logo=discord" alt="discord"></a>
+  <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/contributors/schultek/jaspr?logo=github" alt="contributors"></a>
 </p>
 
-# jaspr
+<p align="center">
+  <a href="https://docs.page/schultek/jaspr~develop/quick-start">Quickstart</a> •
+  <a href="https://docs.page/schultek/jaspr~develop">Documentation</a> •
+  <a href="https://jasprpad.schultek.de">Playground</a> •
+  <a href="https://github.com/schultek/jaspr/tree/develop/examples/">Examples</a> •
+  <a href="https://discord.gg/XGXrGEk4c6">Community & Support</a> •
+  <a href="https://jaspr-benchmarks.web.app">Benchmarks</a>
+</p>
 
-Modern web framework for building websites in Dart. Supports SPAs and SSR.
+# Jaspr
 
-**Core Features:**
+> A modern web framework for building websites in Dart with support for both **client-side** and **server-side rendering**.
 
-- Familiar component model similar to Flutter widgets
-- Easy Server Side Rendering
-- Automatic hydration of component data on the client
-- Fast incremental DOM updates
-- Well tested (~70% test coverage)
+### Core Features
 
-> I'm looking for contributors. Don't hesitate to contact me if you want to help in any way. 
-> Also check out the [Contributing Guide](https://docs.page/schultek/jaspr~develop/eco/contributing)
-> or join our [Discord Server](https://discord.gg/XGXrGEk4c6)
+- 💙 Familiar component model similar to Flutter widgets.
+- 🏗 Easy Server Side Rendering.
+- ♻️ Automatic sync of component data between server and client.
+- ⚡️ Fast incremental DOM updates.
+- 🧪 Well tested (~70% test coverage).
 
-- [Documentation](https://docs.page/schultek/jaspr)
-- [Demo & Playground](https://jasprpad.schultek.de)
+If you want to say thank you, star the project on GitHub and like the package on pub.dev 🙌💙
+
+> Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of
+> developers around Jaspr that want to push the boundaries of Dart on the web and server. Also
+> check out the [Contributing Guide](https://docs.page/schultek/jaspr~develop/eco/contributing).
+
+### About
+
+- 🔮 **Why?**: Jaspr was made with the premise to make a web-framework that looks and feels just like Flutter, but
+  renders normal html/css like Vue or React.
+- 👥 **Who?**: Jaspr is targeted mainly at Flutter developers that want to build any type of websites
+  (especially ones that are not suitable for Flutter Web).
+- 🚀 **What?**: Jaspr wants to push the boundaries of Dart on the web and server, by giving you a tought-through fullstack
+  web framework written completely in Dart.
+
+### Online Editor & Playground
+
+Inspired by DartPad, **Jaspr** has it's own online editor and playground, called **JasprPad**.
+
+[Check it out here!](https://jasprpad.schultek.de)
+
+You can check out the samples, take the tutorial or try out jaspr for yourself, all live in the browser.
+When you want to continue coding offline, you can quickly download the current files bundled in a complete dart project, ready to start coding locally.
+
+JasprPad is also built with **Jaspr** itself, so you can [**check out its source code**](https://github.com/schultek/jaspr/tree/develop/apps/jaspr_pad) to get a feel for how jaspr would be used in a larger app.
 
 ![JasprPad Screenshot](https://user-images.githubusercontent.com/13920539/170837732-9e09d5f3-e79e-4ddd-b118-72e49456a7cd.png)
 
@@ -164,6 +192,7 @@ cd build
 ## Testing
 
 `jaspr` comes with it's own testing package `jaspr_test`.
+It is built as a layer on top of `package:test` and has a similar api to `flutter_test`.
 
 A simple component test looks like this:
 
@@ -194,4 +223,5 @@ void main() {
 ```
 
 For more examples on how to use the testing package, check out the 
+[documentation](https://docs.page/schultek/jaspr~develop/testing) and the 
 [tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/jaspr/test).

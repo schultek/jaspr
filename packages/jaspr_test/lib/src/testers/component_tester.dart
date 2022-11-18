@@ -4,6 +4,10 @@ import 'package:jaspr/jaspr.dart';
 
 import '../../jaspr_test.dart';
 
+/// Tests any jaspr component in a simulated testing environment.
+///
+/// Unit-test components using the [pumpComponent] method and
+/// simulate dom events using the [click] method.
 class ComponentTester {
   ComponentTester._(this.binding);
 
@@ -25,6 +29,8 @@ class ComponentTester {
     return binding.attachRootComponent(component, attachTo: 'body');
   }
 
+  /// Simulates a 'click' event on the given element
+  /// and pumps the next frame.
   Future<void> click(Finder finder, {bool pump = true}) async {
     dispatchEvent(finder, 'click', null);
     if (pump) {
@@ -36,6 +42,7 @@ class ComponentTester {
     await pumpEventQueue();
   }
 
+  /// Simulates [event] on the given element.
   void dispatchEvent(Finder finder, String event, dynamic data) {
     var element = _findDomElement(finder);
     element.testData.events?[event]?.call(data);

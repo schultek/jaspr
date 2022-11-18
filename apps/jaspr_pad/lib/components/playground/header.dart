@@ -133,7 +133,7 @@ class SamplesMenuButton extends StatelessComponent with SyncProviderDependencies
   const SamplesMenuButton({Key? key}) : super(key: key);
 
   @override
-  Iterable<SyncProvider> get preloadDependencies =>[syncSamplesProvider];
+  Iterable<SyncProvider> get preloadDependencies => [syncSamplesProvider];
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

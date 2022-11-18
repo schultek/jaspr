@@ -10,6 +10,12 @@ dart pub add jaspr_builder --dev
 
 # Builders
 
+## Apps and Islands
+
+Builder for automatic setup of app and island components.
+
+View [islands architecture](https://docs.page/schultek/jaspr~develop/advanced/islands) for documentation.
+
 ## web_mock
 
 Builder for mocking web-only libraries. Used for integrating js-libraries with jaspr.
@@ -41,9 +47,3 @@ This will generate two files:
 - `<libname>.dart` combines the stub and web file with conditional imports
 
 In you project, you should the only import the `<libname>.dart` file.
-
-## islands_app
-
-Builder for automatic setup of island components.
-View [islands architecture](https://docs.page/schultek/jaspr) for documentation.
-

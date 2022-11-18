@@ -14,7 +14,7 @@ part 'provider_dependencies.dart';
 /// {@template riverpod.providerscope}
 /// A component that stores the state of providers.
 ///
-/// All Flutter applications using Riverpod must contain a [ProviderScope] at
+/// All Jaspr applications using Riverpod must contain a [ProviderScope] at
 /// the root of their component tree. It is done as followed:
 ///
 /// ```dart
@@ -310,7 +310,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
       component.container.vsyncOverride == null,
       'The ProviderContainer was already associated with a different component',
     );
-    component.container.vsyncOverride = _flutterVsync;
+    component.container.vsyncOverride = _jasprVsync;
 
     super.mount(parent, prevSibling);
   }
@@ -333,12 +333,12 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
       newComponent.container.vsyncOverride == null,
       'The ProviderContainer was already associated with a different component',
     );
-    newComponent.container.vsyncOverride = _flutterVsync;
+    newComponent.container.vsyncOverride = _jasprVsync;
 
     super.update(newComponent);
   }
 
-  void _flutterVsync(void Function() task) {
+  void _jasprVsync(void Function() task) {
     assert(_task == null, 'Only one task can be scheduled at a time');
     _task = task;
 

@@ -16,10 +16,10 @@ abstract class SyncProviderRef<State> implements Ref<AsyncValue<State>> {
   set state(AsyncValue<State> newState);
 }
 
-/// {@macro riverpod.futureprovider}
+/// {@macro riverpod.syncprovider}
 class SyncProvider<T> extends _SyncProviderBase<T>
     with AlwaysAliveProviderBase<AsyncValue<T>>, AlwaysAliveAsyncSelector<T> {
-  /// {@macro riverpod.futureprovider}
+  /// {@macro riverpod.syncprovider}
   SyncProvider(
     this._createFn, {
     required this.id,

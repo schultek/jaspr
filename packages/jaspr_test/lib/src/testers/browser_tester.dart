@@ -5,6 +5,7 @@ import 'package:jaspr/browser.dart';
 
 import '../../jaspr_test.dart';
 
+/// Tests any jaspr app in a headless browser environment.
 class BrowserTester {
   BrowserTester._(this.binding, this._attachTo);
 

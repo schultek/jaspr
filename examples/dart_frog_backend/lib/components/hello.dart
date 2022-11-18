@@ -11,7 +11,5 @@ class Hello extends StatelessComponent with _$Hello {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield p([text('Hello $name')]);
-
-    yield a([text('Go To App')], href: '/app');
   }
 }

@@ -26,7 +26,16 @@ ProviderElementProxy<AsyncValue<T>, Future<T>> _future<T>(
 /// {@template jaspr_riverpod.syncprovider}
 /// A provider that preloads a value on the server and syncs it to the client.
 ///
-/// [SyncProvider] can be considered as a [FutureProvider].
+/// This provider takes an additional [id] to uniquely identify this provider between the
+/// client and server. This id must be unique across your app.
+///
+/// - On the server, a [SyncProvider] can be considered as a normal [FutureProvider]
+/// that returns a future. Thus, the exposed state of a [SyncProvider<T>] is an [AsyncValue<T>].
+/// - On the client, the value of a [SyncProvider] is automatically inserted and it's create function
+/// is never executed.
+///
+/// To properly preload a sync provider on the server, use the [SyncProviderDependencies] mixin
+/// on your component and populate the [preloadDependencies] with your provider.
 ///
 /// It can then be combined with:
 /// - [SyncProvider.family], for parameterizing the loading function.

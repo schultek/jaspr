@@ -2,12 +2,12 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/browser.dart';
-import 'package:dart_frog_backend/components/app.dart' as a;
+import 'package:dart_frog_backend/components/counter.dart' as a;
 
 void main() {
   runAppWithParams(getComponentForParams);
 }
 
 Component getComponentForParams(ConfigParams p) {
-  return a.App();
+  return a.Counter();
 }

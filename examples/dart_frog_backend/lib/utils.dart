@@ -1,9 +1,10 @@
 import 'package:dart_frog/dart_frog.dart';
-import 'package:dart_frog_backend/components/app.dart';
-import 'package:dart_frog_backend/components/hello.dart';
 import 'package:jaspr/server.dart' hide Middleware, Response;
 
-/// Creates a dart_frog middleware to serve a jaspr app
+/// Wraps jasprs [serveApp] as a dart_frog middleware.
+///
+/// This also keeps track of the base path in case this is
+/// mounted under a different path than '/'.
 Middleware serveJasprApp() {
   return fromShelfMiddleware((handler) {
     return serveApp((request, _) {
@@ -14,7 +15,10 @@ Middleware serveJasprApp() {
   });
 }
 
-/// Renders a jaspr component and returns a dart_frog response
+/// Wraps jasprs [renderComponent] method to return a dart_frog response.
+///
+/// Renders the component wrapped in the default document and
+/// uses the base path provided by the middleware.
 Future<Response> renderJasprComponent(RequestContext context, Component child) async {
   var base = context.read<BasePath>();
 
