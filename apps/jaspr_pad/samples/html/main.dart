@@ -31,7 +31,7 @@ class App extends StatelessComponent {
       hr(),
       // you can add events as usual
       select(events: {
-        'change': (e) => print(e.target.value),
+        'change': (e) => print(e.targetUrl.value),
       }, [
         option(value: 'test', [text('Select me!')]),
         option(value: 'other', selected: true, [text('Or me!')])

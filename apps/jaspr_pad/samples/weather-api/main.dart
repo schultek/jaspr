@@ -108,7 +108,7 @@ class SearchBarState extends State<SearchBar> {
           attributes: {'type': 'text', if (component.placeholder != null) 'placeholder': component.placeholder!},
           events: {
             'input': (e) {
-              setState(() => search = e.target.value);
+              setState(() => search = e.targetUrl.value);
             }
           },
         ),

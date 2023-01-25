@@ -61,7 +61,7 @@ class App extends StatelessComponent {
               attributes: {'type': 'text', 'value': text.value},
               events: {
                 'input': (event) {
-                  inputElement.value = event.target;
+                  inputElement.value = event.targetUrl;
                   text.value = inputElement.value.value;
                 }
               },
@@ -118,8 +118,8 @@ class SecondsInput extends StatelessComponent {
           },
           events: {
             'input': (event) {
-              inputElement.value = event.target;
-              final value = int.tryParse(event.target.value);
+              inputElement.value = event.targetUrl;
+              final value = int.tryParse(event.targetUrl.value);
               if (value != null && value > 0) {
                 seconds.value = value;
               }

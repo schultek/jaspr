@@ -16,14 +16,33 @@ builders:
     runs_before:
       - jaspr_builder:apps
       - build_web_compilers
-  jaspr_builder:web_mock:
+  jaspr_builder:imports:
     import: "package:jaspr_builder/builder.dart"
-    builder_factories: [ "buildWebMock" ]
-    build_extensions: { ".web.dart": [ ".stub.dart", ".dart" ] }
+    builder_factories: [ "findPlatformImports" ]
+    build_extensions: { ".dart": [ ".import.json" ] }
+    auto_apply: dependents
+    build_to: cache
+    runs_before: [ "build_web_compilers", ":import_parts" ]
+    applies_builders: [ ":stub" ]
+  jaspr_builder:import_parts:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "writePlatformImports" ]
+    build_extensions: { ".import.json": [ ".import.dart" ] }
     auto_apply: dependents
     build_to: source
-    runs_before:
-      - build_web_compilers
+    runs_before: [ "build_web_compilers" ]
+    applies_builders: [ ":stub" ]
+  jaspr_builder:stub:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildPlatformStubs" ]
+    build_extensions: { "lib/$lib$": [
+      "lib/generated/imports/_web.dart",
+      "lib/generated/imports/_vm.dart",
+      "lib/generated/imports/_stubs.dart"
+    ] }
+    auto_apply: dependents
+    build_to: source
+    runs_before: [ "build_web_compilers" ]
 targets:
   $default:
     builders:

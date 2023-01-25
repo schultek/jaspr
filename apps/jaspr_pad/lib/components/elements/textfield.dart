@@ -39,7 +39,7 @@ class TextFieldState extends State<TextField> {
           DomComponent(
             tag: 'input',
             attributes: {'type': 'text', if (component.placeholder != null) 'placeholder': component.placeholder!},
-            events: {'input': (e) => component.onChange?.call(e.target.value)},
+            events: {'input': (e) => component.onChange?.call(e.targetUrl.value)},
             classes: ['mdc-text-field__input'],
           ),
         ],

@@ -32,8 +32,7 @@
   web framework written completely in Dart.
 
 > Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of
-> developers around Jaspr that want to push the boundaries of Dart on the web and server. Also
-> check out the [Contributing Guide](https://docs.page/schultek/jaspr~develop/eco/contributing).
+> developers around Jaspr and check out the [Contributing Guide](https://docs.page/schultek/jaspr~develop/eco/contributing).
 
 ### Core Features
 

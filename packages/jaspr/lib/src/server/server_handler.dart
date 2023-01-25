@@ -154,7 +154,7 @@ Handler createHandler(_SetupHandler handle, {List<Middleware> middleware = const
 
   if (kDevProxy.isNotEmpty) {
     final serverUri = Uri.parse('http://localhost:$kDevProxy');
-    final ssePath = r'/$dwdsSseHandler';
+    final ssePath = r'$dwdsSseHandler';
 
     cascade = cascade.add(_sseProxyHandler(ssePath, serverUri));
   }
