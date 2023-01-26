@@ -19,8 +19,8 @@ class ImportsStubsBuilder implements Builder {
         .expand((e) => e as Iterable)
         .toList();
 
-    var webImports = <String, List<String>>{};
-    var vmImports = <String, List<String>>{};
+    var webImports = <String, Set<String>>{};
+    var vmImports = <String, Set<String>>{};
 
     var stubs = <String>{};
 
@@ -34,12 +34,10 @@ class ImportsStubsBuilder implements Builder {
       var types = show.where((n) => n.substring(0, 1).toLowerCase() != n.substring(0, 1));
       stubs.addAll(types.map((n) => 'typedef ${n}OrStubbed = dynamic;'));
 
-
-
       if (platform == 0) {
-        (webImports[url] ??= []).addAll(show.cast());
+        (webImports[url] ??= {}).addAll(show.cast());
       } else {
-        (vmImports[url] ??= []).addAll(show.cast());
+        (vmImports[url] ??= {}).addAll(show.cast());
       }
     }
 
@@ -48,7 +46,7 @@ class ImportsStubsBuilder implements Builder {
       DartFormatter().format("""
         $generationHeader
         
-        ${vmImports.entries.map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
+        ${vmImports.entries.where((e) => e.value.any((v) => v.isType)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
         ${vmImports.entries.map((e) => "export '${e.key}' show ${e.value.join(', ')};").join('\n')}
         
         ${vmImports.values.expand((v) => v.where((e) => e.isType)).map((e) => 'typedef ${e}OrStubbed = $e;').join('\n')}
@@ -60,7 +58,7 @@ class ImportsStubsBuilder implements Builder {
       DartFormatter().format("""
         $generationHeader
         
-        ${webImports.entries.map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
+        ${webImports.entries.where((e) => e.value.any((v) => v.isType)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
         ${webImports.entries.map((e) => "export '${e.key}' show ${e.value.join(', ')};").join('\n')}
         
         ${webImports.values.expand((v) => v.where((e) => e.isType)).map((e) => 'typedef ${e}OrStubbed = $e;').join('\n')}

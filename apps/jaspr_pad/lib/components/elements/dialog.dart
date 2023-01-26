@@ -5,6 +5,7 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../../adapters/mdc.dart';
 
+
 final _dialogStateProvider = StateProvider.family<_DialogState?, String>((ref, String id) => null);
 
 class _DialogState<T> {
@@ -92,7 +93,7 @@ class DialogSlot extends StatefulComponent {
 }
 
 class DialogState extends State<DialogSlot> {
-  MDCDialog? _dialog;
+  MDCDialogOrStubbed? _dialog;
   ProviderSubscription<_DialogState?>? _sub;
 
   @override

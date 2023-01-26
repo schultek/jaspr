@@ -1,9 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:jaspr/components.dart' hide Position;
 
-import '../../../adapters/codemirror.dart';
 import '../../../models/api_models.dart';
 import 'codemirror_options.dart';
+
+@Import.onWeb('package:codemirror/codemirror.dart', show: [#CodeMirror, #Doc, #Position])
+import 'editor.imports.dart';
 
 class EditorDocument {
   final String key;
@@ -30,10 +32,10 @@ class Editor extends StatefulComponent {
 }
 
 class EditorState extends State<Editor> {
-  CodeMirror? _editor;
+  CodeMirrorOrStubbed? _editor;
   dynamic _editorElement;
   String? _activeDoc;
-  Map<String, Doc> docs = {};
+  Map<String, DocOrStubbed> docs = {};
   bool _lockIsUpdating = false;
 
   @override

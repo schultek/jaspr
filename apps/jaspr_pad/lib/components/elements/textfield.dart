@@ -16,7 +16,7 @@ class TextField extends StatefulComponent {
 }
 
 class TextFieldState extends State<TextField> {
-  MDCTextField? _textField;
+  MDCTextFieldOrStubbed? _textField;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

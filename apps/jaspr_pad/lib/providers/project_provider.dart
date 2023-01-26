@@ -4,7 +4,6 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../adapters/html.dart';
 import '../components/elements/snackbar.dart';
-import '../main.mapper.g.dart';
 import '../models/gist.dart';
 import '../models/project.dart';
 import '../models/tutorial.dart';
@@ -16,7 +15,7 @@ final fetchedGistProvider = FutureProvider.family((ref, String id) async {
     if (response.statusCode == 404) throw 'Gist does not exist';
     if (response.statusCode != 200) throw 'Unknown error ${response.statusCode}';
 
-    var gist = Mapper.fromJson<GistData>(response.body);
+    var gist = GistDataMapper.fromJson(response.body);
     return ProjectData.fromGist(gist);
   } catch (e) {
     ref.read(snackBarProvider.notifier).state = 'Error loading gist $id: $e.';
@@ -56,7 +55,7 @@ final storageProvider = Provider((ref) => window.localStorage);
 
 final storedProjectProvider = Provider.autoDispose((ref) {
   return window.localStorage.containsKey('project') //
-      ? Mapper.fromJson<ProjectData>(window.localStorage['project']!)
+      ? ProjectDataMapper.fromJson(window.localStorage['project']!)
       : null;
 });
 

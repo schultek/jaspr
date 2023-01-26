@@ -1,10 +1,11 @@
 import 'package:dart_mappable/dart_mappable.dart';
 
-import '../main.mapper.g.dart';
 import 'gist.dart';
 
+part 'project.mapper.dart';
+
 @MappableClass(discriminatorKey: 'type')
-class ProjectData {
+class ProjectData with ProjectDataMappable {
   final String? id;
   final String? description;
 

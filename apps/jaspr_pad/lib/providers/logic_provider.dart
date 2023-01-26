@@ -3,7 +3,6 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../adapters/html.dart';
 import '../components/playground/output/execution_service.dart';
-import '../main.mapper.g.dart';
 import '../models/sample.dart';
 import '../models/tutorial.dart';
 import 'dart_service_provider.dart';
@@ -141,10 +140,10 @@ class Logic {
     var currentProject = ref.read(editProjectProvider);
     if (currentProject == null) return;
 
-    var doc = window.document as HtmlDocument;
+    var doc = window.document as HtmlDocumentOrStubbed;
     var element = doc.createElement('a');
     element.setAttribute(
-        'href', '${window.location.origin}/api/download?project=${stateCodec.encode(Mapper.toValue(currentProject))}');
+        'href', '${window.location.origin}/api/download?project=${stateCodec.encode(currentProject.toMap())}');
     element.setAttribute('download', 'jaspr_${currentProject.id}.zip');
 
     element.style.display = 'none';

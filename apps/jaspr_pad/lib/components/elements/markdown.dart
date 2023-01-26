@@ -4,7 +4,8 @@ import 'package:jaspr/jaspr.dart';
 import 'package:markdown/markdown.dart' hide Text, Element;
 import 'package:markdown/markdown.dart' as md show Text, Element;
 
-import '../../adapters/hljs.dart' as hljs;
+@Import.onWeb('../../adapters/hljs.dart', show: [#highlightAll])
+import 'markdown.imports.dart' as hljs;
 
 class InlineBracketsColon extends InlineSyntax {
   InlineBracketsColon() : super(r'\[:\s?((?:.|\n)*?)\s?:\]');

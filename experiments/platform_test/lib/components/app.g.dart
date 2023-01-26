@@ -7,6 +7,6 @@ mixin _$App implements ComponentEntryMixin<App> {
   @override
   ComponentEntry<App> get entry {
     var self = this as App;
-    return ComponentEntry.app('app');
+    return ComponentEntry.app('components/app');
   }
 }

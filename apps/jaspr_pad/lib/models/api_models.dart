@@ -1,14 +1,16 @@
 import 'package:dart_mappable/dart_mappable.dart';
 
+part 'api_models.mapper.dart';
+
 @MappableClass()
-class CompileRequest {
+class CompileRequest with CompileRequestMappable {
   Map<String, String> sources;
 
   CompileRequest(this.sources);
 }
 
 @MappableClass()
-class CompileResponse {
+class CompileResponse with CompileResponseMappable {
   String? result;
   String? error;
 
@@ -16,14 +18,14 @@ class CompileResponse {
 }
 
 @MappableClass()
-class AnalyzeRequest {
+class AnalyzeRequest with AnalyzeRequestMappable {
   Map<String, String> sources;
 
   AnalyzeRequest(this.sources);
 }
 
 @MappableClass()
-class FormatResponse {
+class FormatResponse with FormatResponseMappable {
   final String newString;
   final int newOffset;
 
@@ -31,7 +33,7 @@ class FormatResponse {
 }
 
 @MappableClass()
-class FormatRequest {
+class FormatRequest with FormatRequestMappable {
   final String source;
   final int offset;
 
@@ -39,7 +41,7 @@ class FormatRequest {
 }
 
 @MappableClass()
-class AnalyzeResponse {
+class AnalyzeResponse with AnalyzeResponseMappable {
   final List<Issue> issues;
 
   AnalyzeResponse([this.issues = const []]);
@@ -49,7 +51,7 @@ class AnalyzeResponse {
 enum IssueKind { error, warning, info }
 
 @MappableClass()
-class Issue with Comparable<Issue> {
+class Issue with Comparable<Issue>, IssueMappable {
   final IssueKind kind;
   final IssueLocation location;
   final String message;
@@ -75,7 +77,7 @@ class Issue with Comparable<Issue> {
 }
 
 @MappableClass()
-class IssueLocation {
+class IssueLocation with IssueLocationMappable {
   final int startLine, endLine;
   final int startColumn, endColumn;
 
@@ -83,7 +85,7 @@ class IssueLocation {
 }
 
 @MappableClass()
-class DocumentResponse {
+class DocumentResponse with DocumentResponseMappable {
   final HoverInfo info;
   final String? error;
 
@@ -91,7 +93,7 @@ class DocumentResponse {
 }
 
 @MappableClass()
-class HoverInfo {
+class HoverInfo with HoverInfoMappable {
   final String? description;
   final String? kind;
   final String? dartdoc;
@@ -115,7 +117,7 @@ class HoverInfo {
 }
 
 @MappableClass()
-class DocumentRequest {
+class DocumentRequest with DocumentRequestMappable {
   final Map<String, String> sources;
   final String name;
   final int offset;

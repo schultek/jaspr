@@ -1,6 +1,0 @@
-targets:
-  $default:
-    builders:
-      dart_mappable_builder:
-        generate_for:
-          - lib/main.dart

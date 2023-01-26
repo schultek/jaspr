@@ -5,12 +5,11 @@ import 'package:archive/archive_io.dart';
 import 'package:jaspr/server.dart';
 import 'package:path/path.dart' as path;
 
-import '../main.mapper.g.dart';
 import '../models/project.dart';
 import 'project.dart';
 
 Future<Response> downloadProject(Request request) async {
-  var project = Mapper.fromValue<ProjectData>(
+  var project = ProjectDataMapper.fromMap(
     stateCodec.decode(request.url.queryParameters['project']!).cast<String, dynamic>(),
   );
 

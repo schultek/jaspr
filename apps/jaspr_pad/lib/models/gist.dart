@@ -1,7 +1,9 @@
 import 'package:dart_mappable/dart_mappable.dart';
 
+part 'gist.mapper.dart';
+
 @MappableClass()
-class GistData {
+class GistData with GistDataMappable {
   final String? id;
   final String? description;
   final Map<String, GistFile> files;
@@ -10,7 +12,7 @@ class GistData {
 }
 
 @MappableClass()
-class GistFile {
+class GistFile with GistFileMappable {
   @MappableField(key: 'filename')
   String name;
   String content;

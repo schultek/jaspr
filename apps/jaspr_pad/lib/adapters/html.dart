@@ -1,4 +1,11 @@
-// GENERATED FILE, DO NOT MODIFY
-// Generated with jaspr_web_builder
+import 'package:jaspr/jaspr.dart';
 
-export 'html.stub.dart' if (dart.library.html) 'html.web.dart';
+@Import.onWeb('dart:html', show: [
+  #window,
+  #document,
+  #HtmlDocument,
+  #CustomEvent,
+  #MouseEvent,
+  #Event,
+])
+export 'html.imports.dart';

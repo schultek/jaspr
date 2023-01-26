@@ -23,7 +23,7 @@ class TabBar extends StatefulComponent {
 }
 
 class TabBarState extends State<TabBar> {
-  MDCTabBar? _tabBar;
+  MDCTabBarOrStubbed? _tabBar;
 
   void _select(int tab) {
     component.onSelected(tab);

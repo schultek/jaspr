@@ -14,7 +14,7 @@ class SnackBar extends StatefulComponent {
 
 class SnackBarState extends State<SnackBar> {
   ProviderSubscription<String?>? _sub;
-  MDCSnackbar? _snackbar;
+  MDCSnackbarOrStubbed? _snackbar;
 
   @override
   void initState() {
@@ -59,7 +59,7 @@ class SnackBarState extends State<SnackBar> {
   }
 }
 
-extension SnackbarExtension on MDCSnackbar {
+extension SnackbarExtension on MDCSnackbarOrStubbed {
   void showMessage(String message) {
     labelText = message;
     open();

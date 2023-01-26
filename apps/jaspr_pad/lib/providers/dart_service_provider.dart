@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../adapters/html.dart';
-import '../main.mapper.g.dart';
+import '../main.container.dart';
 import '../models/api_models.dart';
 import '../models/sample.dart';
 import '../models/tutorial.dart';
@@ -29,11 +29,11 @@ class DartService {
 
   Future<T> _get<T>(String path) async {
     var response = await client.get(Uri.parse('${window.location.origin}/api/$path'));
-    return Mapper.fromJson<T>(response.body);
+    return mainContainer.fromJson<T>(response.body);
   }
 
   Future<T> _request<T>(String action, Object body) async {
-    var response = await client.post(Uri.parse('${window.location.origin}/api/$action'), body: Mapper.toJson(body));
-    return Mapper.fromJson<T>(response.body);
+    var response = await client.post(Uri.parse('${window.location.origin}/api/$action'), body: mainContainer.toJson(body));
+    return mainContainer.fromJson<T>(response.body);
   }
 }

@@ -4,7 +4,6 @@ import 'package:jaspr/server.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart' as yaml;
 
-import '../main.mapper.g.dart';
 import '../models/project.dart';
 import '../models/tutorial.dart';
 import 'project.dart';
@@ -51,5 +50,5 @@ Future<Response> getTutorial(Request request, String? stepId) async {
     result = TutorialResponse(TutorialConfig('tutorial', name, steps, initialStep), null);
   }
 
-  return Response.ok(Mapper.toJson(result), headers: {'Content-Type': 'application/json'});
+  return Response.ok(result.toJson(), headers: {'Content-Type': 'application/json'});
 }

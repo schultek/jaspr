@@ -123,9 +123,9 @@ class SplitPair {
 
   SplitPair(this.parent, this.index, {this.dragging = false});
 
-  void drag(html.Event e) {
+  void drag(html.EventOrStubbed e) {
     if (!dragging) return;
-    if (e is! html.MouseEvent) return;
+    if (e is! html.MouseEventOrStubbed) return;
 
     var h = parent.component.horizontal;
 
@@ -136,7 +136,7 @@ class SplitPair {
 
   StreamSubscription? _mouseUpSub, _mouseMoveSub;
 
-  void startDragging(html.MouseEvent e) {
+  void startDragging(html.MouseEventOrStubbed e) {
     // Right-clicking can't start dragging.
     if (e.button != 0) {
       return;
@@ -169,7 +169,7 @@ class SplitPair {
     parent.updateSelf();
   }
 
-  void stopDragging(html.Event e) {
+  void stopDragging(html.EventOrStubbed e) {
     dragging = false;
 
     _mouseUpSub?.cancel();

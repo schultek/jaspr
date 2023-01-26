@@ -2,8 +2,10 @@ import 'package:dart_mappable/dart_mappable.dart';
 
 import 'project.dart';
 
+part 'sample.mapper.dart';
+
 @MappableClass()
-class Sample implements Comparable<Sample> {
+class Sample with Comparable<Sample>, SampleMappable {
   String id;
   String description;
   int? index;
@@ -18,7 +20,7 @@ class Sample implements Comparable<Sample> {
 }
 
 @MappableClass()
-class SampleResponse {
+class SampleResponse with SampleResponseMappable {
   ProjectData? project;
   String? error;
 

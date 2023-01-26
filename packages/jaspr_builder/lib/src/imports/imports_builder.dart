@@ -3,9 +3,12 @@ import 'dart:convert';
 
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
+import 'package:path/path.dart' as p;
+
 
 import '../utils.dart';
 
+var path = p.posix;
 
 class ImportsOutputBuilder implements Builder {
   ImportsOutputBuilder(BuilderOptions options);
@@ -15,7 +18,6 @@ class ImportsOutputBuilder implements Builder {
     try {
       var json = jsonDecode(await buildStep.readAsString(buildStep.inputId));
       var outputId = buildStep.inputId.changeExtension('.dart');
-
 
       var webShow = <String>{};
       var vmShow = <String>{};
@@ -32,18 +34,21 @@ class ImportsOutputBuilder implements Builder {
         }
       }
 
+      var outputDir = 'lib/generated/imports';
+      var relativeDir = path.relative(outputDir, from: path.dirname(buildStep.inputId.path));
+
       await buildStep.writeAsString(outputId, DartFormatter().format("""
         $generationHeader
         
         ${webShow.isNotEmpty ? """
-          export 'generated/imports/_web.dart' 
-            if (dart.library.io) 'generated/imports/_stubs.dart' 
+          export '$relativeDir/_web.dart' 
+            if (dart.library.io) '$relativeDir/_stubs.dart' 
             show ${webShow.join(', ')};
         """ : ''}
         
         ${vmShow.isNotEmpty ? """
-          export 'generated/imports/_vm.dart' 
-            if (dart.library.html) 'generated/imports/_stubs.dart' 
+          export '$relativeDir/_vm.dart' 
+            if (dart.library.html) '$relativeDir/_stubs.dart' 
             show ${vmShow.join(', ')};
         """ : ''}
       """));

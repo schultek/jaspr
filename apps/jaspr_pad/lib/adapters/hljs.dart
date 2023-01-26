@@ -1,4 +1,7 @@
-// GENERATED FILE, DO NOT MODIFY
-// Generated with jaspr_web_builder
+@JS()
+library hljs;
 
-export 'hljs.stub.dart' if (dart.library.html) 'hljs.web.dart';
+import 'package:js/js.dart';
+
+@JS('hljs.highlightAll')
+external void highlightAll();

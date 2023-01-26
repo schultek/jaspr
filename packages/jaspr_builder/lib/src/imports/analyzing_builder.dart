@@ -20,10 +20,24 @@ class ImportsAnalyzingBuilder implements Builder {
         var outputId = buildStep.inputId.changeExtension('.imports.json');
         var partId = buildStep.inputId.changeExtension('.imports.dart');
 
+        bool hasAnnotation(Element e) => importChecker.hasAnnotationOf(e);
+        bool hasImportsUri(Element e) {
+          var uri = e is LibraryImportElement
+              ? e.uri
+              : e is LibraryExportElement
+                  ? e.uri
+                  : null;
+          if (uri is DirectiveUriWithRelativeUriString) {
+            return uri.relativeUriString == path.basename(partId.path);
+          }
+          return false;
+        }
+
         var import = lib.libraryImports
-            .where((i) =>
-        (i.uri is DirectiveUriWithRelativeUriString) &&
-            (i.uri as DirectiveUriWithRelativeUriString).relativeUriString == path.basename(partId.path))
+            .cast<Element>()
+            .followedBy(lib.libraryExports)
+            .where(hasAnnotation)
+            .where(hasImportsUri)
             .firstOrNull;
 
         if (import == null) {
@@ -58,6 +72,6 @@ class ImportsAnalyzingBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-    '.dart': ['.imports.json']
-  };
+        '.dart': ['.imports.json']
+      };
 }

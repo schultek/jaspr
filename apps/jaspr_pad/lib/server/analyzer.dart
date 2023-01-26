@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:analysis_server_lib/analysis_server_lib.dart';
 import 'package:path/path.dart' as path;
 
-import '../main.mapper.g.dart';
 import '../models/api_models.dart';
 import 'project.dart';
 import 'scheduler.dart';
@@ -64,7 +63,7 @@ class Analyzer {
         var endColumn = error.location.offset + error.location.length - offsetForEndLine;
 
         return Issue(
-          kind: Mapper.fromValue(error.severity.toLowerCase()),
+          kind: IssueKindMapper.fromValue(error.severity.toLowerCase()),
           location: IssueLocation(
             startLine: error.location.startLine - 1,
             startColumn: error.location.startColumn - 1,

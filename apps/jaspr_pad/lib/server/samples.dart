@@ -4,7 +4,6 @@ import 'package:jaspr/server.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:path/path.dart' as path;
 
-import '../main.mapper.g.dart';
 import '../models/sample.dart';
 import '../providers/utils.dart';
 import 'project.dart';
@@ -47,7 +46,7 @@ Future<Response> getSample(Request request, String id) async {
     result = SampleResponse(null, 'Missing main.dart in sample $id');
   }
 
-  return Response.ok(Mapper.toJson(result), headers: {'Content-Type': 'application/json'});
+  return Response.ok(result.toJson(), headers: {'Content-Type': 'application/json'});
 }
 
 final loadSamplesProvider = SyncProvider<List<Sample>>((ref) async {

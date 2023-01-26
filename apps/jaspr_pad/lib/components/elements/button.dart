@@ -35,7 +35,7 @@ class Button extends StatefulComponent {
 }
 
 class ButtonState extends State<Button> {
-  MDCRipple? _ripple;
+  MDCRippleOrStubbed? _ripple;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

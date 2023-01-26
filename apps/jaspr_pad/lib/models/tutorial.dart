@@ -1,10 +1,11 @@
 import 'package:dart_mappable/dart_mappable.dart';
 
-import '../main.mapper.g.dart';
 import 'project.dart';
 
+part 'tutorial.mapper.dart';
+
 @MappableClass()
-class TutorialData implements ProjectData {
+class TutorialData with TutorialDataMappable implements ProjectData {
   @override
   final String id;
   @override
@@ -66,7 +67,7 @@ class TutorialData implements ProjectData {
 }
 
 @MappableClass()
-class TutorialStep implements ProjectData {
+class TutorialStep with TutorialStepMappable implements ProjectData {
   @override
   final String id;
   final String name;
@@ -123,7 +124,7 @@ class TutorialStep implements ProjectData {
 }
 
 @MappableClass()
-class TutorialResponse {
+class TutorialResponse with TutorialResponseMappable {
   TutorialConfig? tutorial;
   String? error;
 
@@ -131,7 +132,7 @@ class TutorialResponse {
 }
 
 @MappableClass()
-class TutorialConfig {
+class TutorialConfig with TutorialConfigMappable {
   String id;
   String name;
   List<TutorialStepConfig> steps;
@@ -141,7 +142,7 @@ class TutorialConfig {
 }
 
 @MappableClass()
-class TutorialStepConfig {
+class TutorialStepConfig with TutorialStepConfigMappable {
   String id;
   String name;
 

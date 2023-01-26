@@ -39,6 +39,10 @@ class AppsBuilder implements Builder {
       "// Generated with jaspr_builder\n";
 
   Future<void> generateAppOutputs(BuildStep buildStep) async {
+    if (!await buildStep.resolver.isLibrary(buildStep.inputId)) {
+      return;
+    }
+
     var library = await buildStep.inputLibrary;
     var reader = LibraryReader(library);
 

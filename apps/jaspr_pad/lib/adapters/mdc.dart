@@ -1,4 +1,12 @@
-// GENERATED FILE, DO NOT MODIFY
-// Generated with jaspr_web_builder
+import 'package:jaspr/jaspr.dart';
 
-export 'mdc.stub.dart' if (dart.library.html) 'mdc.web.dart';
+@Import.onWeb('package:mdc_web/mdc_web.dart', show: [
+  #MDCRipple,
+  #MDCDialog,
+  #MDCMenu,
+  #AnchorCorner,
+  #MDCSnackbar,
+  #MDCTabBar,
+  #MDCTextField,
+])
+export 'mdc.imports.dart';

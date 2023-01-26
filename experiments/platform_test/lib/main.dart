@@ -1,5 +1,5 @@
 import 'package:jaspr/server.dart';
-import './app.dart';
+import 'components/app.dart';
 
 void main() {
   runApp(Document.app(

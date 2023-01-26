@@ -4,7 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
-import '../main.mapper.g.dart';
 import '../models/api_models.dart';
 import '../models/project.dart';
 import 'project_provider.dart';

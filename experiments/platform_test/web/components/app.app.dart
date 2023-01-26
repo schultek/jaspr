@@ -2,7 +2,7 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/browser.dart';
-import 'package:platform_test/app.dart' as a;
+import 'package:platform_test/components/app.dart' as a;
 
 void main() {
   runAppWithParams(getComponentForParams);
