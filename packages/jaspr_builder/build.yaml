@@ -19,7 +19,7 @@ builders:
   jaspr_builder:imports:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "findPlatformImports" ]
-    build_extensions: { ".dart": [ ".import.json" ] }
+    build_extensions: { ".dart": [ ".imports.json" ] }
     auto_apply: dependents
     build_to: cache
     runs_before: [ "build_web_compilers", ":import_parts" ]
@@ -27,7 +27,7 @@ builders:
   jaspr_builder:import_parts:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "writePlatformImports" ]
-    build_extensions: { ".import.json": [ ".import.dart" ] }
+    build_extensions: { ".import.json": [ ".imports.dart" ] }
     auto_apply: dependents
     build_to: source
     runs_before: [ "build_web_compilers" ]

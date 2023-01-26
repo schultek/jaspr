@@ -3,6 +3,11 @@
   "logo": "https://jasprpad.schultek.de/jaspr-192.png",
   "logoDark": "https://jasprpad.schultek.de/jaspr-192.png",
   "favicon": "https://jasprpad.schultek.de/jaspr-32.png",
+  "anchors": [
+    { "title": "Github", "icon": "github", "link": "https://github.com/schultek/jaspr" },
+    { "title": "Discord", "icon": "discord", "link": "https://discord.gg/XGXrGEk4c6" },
+    { "title": "Playground", "icon": "code", "link": "https://jasprpad.schultek.de" }
+  ],
   "sidebar": [
     ["\uD83D\uDCD6 Overview", "/"],
     ["\uD83D\uDEEB Quick Start", "/quick-start"],

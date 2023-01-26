@@ -1,8 +1,10 @@
 import 'package:jaspr/jaspr.dart';
 
+//import 'dart:io';
+
 @Import.onWeb('dart:html', show: [#window, #HtmlDocument])
 @Import.onServer('dart:io', show: [#Platform])
-import 'app.import.dart';
+import 'app.imports.dart';
 
 part 'app.g.dart';
 
@@ -14,7 +16,7 @@ class App extends StatelessComponent with _$App {
     if (kIsWeb) {
       print(window.name);
       if (window.document is HtmlDocumentOrStubbed) {
-        window.alert('His');
+        window.alert('Hi Jaspr');
       }
     } else {
       op = Platform.operatingSystem;
