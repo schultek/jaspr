@@ -4,7 +4,6 @@
   "logoDark": "https://jasprpad.schultek.de/jaspr-192.png",
   "favicon": "https://jasprpad.schultek.de/jaspr-32.png",
   "anchors": [
-    { "title": "Github", "icon": "github", "link": "https://github.com/schultek/jaspr" },
     { "title": "Discord", "icon": "discord", "link": "https://discord.gg/XGXrGEk4c6" },
     { "title": "Playground", "icon": "code", "link": "https://jasprpad.schultek.de" }
   ],
@@ -23,7 +22,8 @@
     ]],
     ["Advanced Concepts", [
       ["\uD83C\uDFDD Islands Architecture", "/advanced/islands"],
-      ["\uD83E\uDE90 Custom Backend", "/advanced/backend"]
+      ["\uD83E\uDE90 Custom Backend", "/advanced/backend"],
+      ["\uD83D\uDCCE Platform Imports", "/advanced/imports"]
     ]],
     ["Ecosystem", [
       ["\uD83C\uDF0A Riverpod", "/eco/riverpod"],
