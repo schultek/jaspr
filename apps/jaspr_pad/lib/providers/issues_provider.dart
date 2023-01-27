@@ -10,12 +10,12 @@ import 'utils.dart';
 final issuesProvider = Provider<List<Issue>>((ref) {
   if (!kIsWeb) return [];
 
-  var fetchIssues = debounce((ProjectData proj) async {
+  var fetchIssues = debounce((ProjectDataBase proj) async {
     var response = await ref.read(dartServiceProvider).analyze(proj.allDartFiles);
     ref.state = response.issues;
   }, Duration(milliseconds: 500));
 
-  ref.listen<ProjectData?>(editProjectProvider, (_, proj) {
+  ref.listen<ProjectDataBase?>(editProjectProvider, (_, proj) {
     if (proj != null) fetchIssues(proj);
   }, fireImmediately: true);
 

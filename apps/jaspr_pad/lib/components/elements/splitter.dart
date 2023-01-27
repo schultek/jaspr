@@ -157,8 +157,8 @@ class SplitPair {
     var h = parent.component.horizontal;
     html.document.body!.style.cursor = h ? 'col-resize' : 'row-resize';
 
-    var a = (this.a!.nativeElement).getBoundingClientRect();
-    var b = (this.b!.nativeElement).getBoundingClientRect();
+    var a = (this.a!.nativeElement as html.ElementOrStubbed).getBoundingClientRect();
+    var b = (this.b!.nativeElement as html.ElementOrStubbed).getBoundingClientRect();
 
     _size = (h ? (a.width + b.width) : (a.height + b.height)) + 6;
     _start = (h ? a.left : a.top) + 0.0;

@@ -1,6 +1,7 @@
 import 'package:jaspr/components.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
+import '../../adapters/html.dart';
 import '../../adapters/mdc.dart';
 
 final tabSelectedProvider = Provider<bool>((ref) => false);
@@ -34,7 +35,7 @@ class TabBarState extends State<TabBar> {
     yield FindChildNode(
       onNodeFound: (node) {
         if (kIsWeb && _tabBar == null) {
-          _tabBar = MDCTabBar(node.nativeElement)
+          _tabBar = MDCTabBar(node.nativeElement as ElementOrStubbed)
             ..activateTab(component.selected + (component.leading != null ? 1 : 0));
         }
       },

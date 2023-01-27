@@ -61,7 +61,7 @@ final storedProjectProvider = Provider.autoDispose((ref) {
 
 final selectedSampleProvider = StateProvider<ProjectData?>((ref) => null);
 
-final loadedProjectProvider = Provider<AsyncValue<ProjectData>>((ref) {
+final loadedProjectProvider = Provider<AsyncValue<ProjectDataBase>>((ref) {
   if (!kIsWeb) {
     return AsyncValue.loading(); // Don't load on server
   }
@@ -82,7 +82,7 @@ final loadedProjectProvider = Provider<AsyncValue<ProjectData>>((ref) {
     var sampleId = uri.queryParameters['sample'];
     var tutorialId = uri.queryParameters['tutorial'];
 
-    AsyncValue<ProjectData?> project;
+    AsyncValue<ProjectDataBase?> project;
 
     if (gistId != null) {
       project = ref.watch(fetchedGistProvider(gistId));
@@ -102,7 +102,7 @@ final projectNameProvider = Provider<String?>((ref) => ref.watch(loadedProjectPr
 
 final isTutorialProvider = Provider((ref) => ref.watch(loadedProjectProvider.select((l) => l.value is TutorialData)));
 
-ProjectData createDefaultProject() {
+ProjectDataBase createDefaultProject() {
   return ProjectData(
     id: 'basic',
     description: 'jaspr_basic',

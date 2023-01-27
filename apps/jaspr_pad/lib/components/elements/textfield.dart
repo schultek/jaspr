@@ -1,5 +1,6 @@
 import 'package:jaspr/components.dart';
 
+import '../../adapters/html.dart';
 import '../../adapters/mdc.dart';
 
 class TextField extends StatefulComponent {
@@ -23,7 +24,7 @@ class TextFieldState extends State<TextField> {
     yield FindChildNode(
       onNodeFound: (node) {
         if (kIsWeb && _textField == null) {
-          _textField = MDCTextField(node.nativeElement);
+          _textField = MDCTextField(node.nativeElement as ElementOrStubbed);
         }
       },
       child: DomComponent(

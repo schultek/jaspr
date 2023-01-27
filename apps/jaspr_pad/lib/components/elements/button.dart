@@ -1,5 +1,6 @@
 import 'package:jaspr/components.dart';
 
+import '../../adapters/html.dart';
 import '../../adapters/mdc.dart';
 
 enum IconAffinity { left, right }
@@ -44,7 +45,7 @@ class ButtonState extends State<Button> {
         if (kIsWeb) {
           _ripple?.destroy();
           if (component.label != null) {
-            _ripple = MDCRipple(node.nativeElement);
+            _ripple = MDCRipple(node.nativeElement as ElementOrStubbed);
           }
         }
       },

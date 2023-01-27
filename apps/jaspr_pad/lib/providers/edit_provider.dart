@@ -9,11 +9,11 @@ import '../models/project.dart';
 import 'project_provider.dart';
 import 'utils.dart';
 
-final editProjectProvider = StateProvider((ref) {
+final editProjectProvider = StateProvider<ProjectDataBase?>((ref) {
   var loadedProject = ref.watch(loadedProjectProvider).value;
 
   if (kIsWeb) {
-    var update = debounce((ProjectData? project) {
+    var update = debounce((ProjectDataBase? project) {
       if (project != null) {
         ref.read(storageProvider)['project'] = project.toJson();
       }

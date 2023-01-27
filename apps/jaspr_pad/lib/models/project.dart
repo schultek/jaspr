@@ -4,14 +4,41 @@ import 'gist.dart';
 
 part 'project.mapper.dart';
 
+abstract class ProjectDataBase {
+  String? get id;
+  String? get description;
+
+  String? get htmlFile;
+  String? get cssFile;
+  String get mainDartFile;
+  Map<String, String> get dartFiles;
+
+  List<String> get fileNames;
+  Map<String, String> get allDartFiles;
+
+  bool isDart(String key);
+  ProjectDataBase copy();
+  String? fileContentFor(String key);
+  ProjectDataBase updateContent(String key, String? content);
+
+  Map<String, dynamic> toMap();
+  String toJson();
+}
+
 @MappableClass(discriminatorKey: 'type')
-class ProjectData with ProjectDataMappable {
+class ProjectData with ProjectDataMappable implements ProjectDataBase {
+  @override
   final String? id;
+  @override
   final String? description;
 
+  @override
   final String? htmlFile;
+  @override
   final String? cssFile;
+  @override
   final String mainDartFile;
+  @override
   final Map<String, String> dartFiles;
 
   ProjectData({
@@ -54,13 +81,17 @@ class ProjectData with ProjectDataMappable {
     );
   }
 
+  @override
   List<String> get fileNames =>
       ['main.dart', ...dartFiles.keys, if (htmlFile != null) 'index.html', if (cssFile != null) 'styles.css'];
 
+  @override
   Map<String, String> get allDartFiles => {'main.dart': mainDartFile, ...dartFiles};
 
+  @override
   ProjectData copy() => copyWith();
 
+  @override
   String? fileContentFor(String key) {
     return switchFile(
       key,
@@ -71,6 +102,7 @@ class ProjectData with ProjectDataMappable {
     );
   }
 
+  @override
   ProjectData updateContent(String key, String? content) {
     return switchFile(
       key,
@@ -100,6 +132,7 @@ class ProjectData with ProjectDataMappable {
     }
   }
 
+  @override
   bool isDart(String key) {
     return key == 'main.dart' || dartFiles.keys.contains(key);
   }

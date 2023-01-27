@@ -35,8 +35,8 @@ class ExecutionService {
   final StreamController<TestResult> _testResultsController = StreamController<TestResult>.broadcast();
 
   final Ref ref;
-  final IFrameElement _frame;
-  IFrameElement get frame => _frame;
+  final IFrameElementOrStubbed _frame;
+  IFrameElementOrStubbed get frame => _frame;
   final Completer<void> _readyCompleter = Completer();
 
   Map<String, Object>? lastCommand;

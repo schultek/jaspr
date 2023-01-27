@@ -12,12 +12,13 @@ import 'package:mdc_web/mdc_web.dart'
         MDCTextField;
 import 'dart:html'
     show
-        IFrameElement,
-        MessageEvent,
         HtmlDocument,
+        Element,
         CustomEvent,
         MouseEvent,
-        Event;
+        Event,
+        IFrameElement,
+        MessageEvent;
 import 'package:codemirror/codemirror.dart' show CodeMirror, Doc, Position;
 export 'package:mdc_web/mdc_web.dart'
     show
@@ -30,14 +31,15 @@ export 'package:mdc_web/mdc_web.dart'
         MDCTextField;
 export 'dart:html'
     show
-        IFrameElement,
         window,
-        MessageEvent,
         document,
         HtmlDocument,
+        Element,
         CustomEvent,
         MouseEvent,
-        Event;
+        Event,
+        IFrameElement,
+        MessageEvent;
 export 'package:codemirror/codemirror.dart' show CodeMirror, Doc, Position;
 export '../../adapters/hljs.dart' show highlightAll;
 
@@ -48,12 +50,13 @@ typedef AnchorCornerOrStubbed = AnchorCorner;
 typedef MDCSnackbarOrStubbed = MDCSnackbar;
 typedef MDCTabBarOrStubbed = MDCTabBar;
 typedef MDCTextFieldOrStubbed = MDCTextField;
-typedef IFrameElementOrStubbed = IFrameElement;
-typedef MessageEventOrStubbed = MessageEvent;
 typedef HtmlDocumentOrStubbed = HtmlDocument;
+typedef ElementOrStubbed = Element;
 typedef CustomEventOrStubbed = CustomEvent;
 typedef MouseEventOrStubbed = MouseEvent;
 typedef EventOrStubbed = Event;
+typedef IFrameElementOrStubbed = IFrameElement;
+typedef MessageEventOrStubbed = MessageEvent;
 typedef CodeMirrorOrStubbed = CodeMirror;
 typedef DocOrStubbed = Doc;
 typedef PositionOrStubbed = Position;

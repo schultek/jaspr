@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:jaspr/components.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
+import '../../adapters/html.dart';
 import '../../adapters/mdc.dart';
 
 
@@ -134,7 +135,7 @@ class DialogState extends State<DialogSlot> {
     yield FindChildNode(
       onNodeFound: (node) {
         if (kIsWeb) {
-          _dialog ??= MDCDialog(node.nativeElement);
+          _dialog ??= MDCDialog(node.nativeElement as ElementOrStubbed);
           _dialog!.listen('MDCDialog:closed', (event) {
             context.read(_dialogStateProvider(component.slotId))?.onResult(null);
           });

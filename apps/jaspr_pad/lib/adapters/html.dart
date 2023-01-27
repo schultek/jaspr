@@ -4,6 +4,7 @@ import 'package:jaspr/jaspr.dart';
   #window,
   #document,
   #HtmlDocument,
+  #Element,
   #CustomEvent,
   #MouseEvent,
   #Event,

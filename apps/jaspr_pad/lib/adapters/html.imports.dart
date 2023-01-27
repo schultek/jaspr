@@ -7,10 +7,12 @@ export '../generated/imports/_web.dart'
         window,
         document,
         HtmlDocument,
+        Element,
         CustomEvent,
         MouseEvent,
         Event,
         HtmlDocumentOrStubbed,
+        ElementOrStubbed,
         CustomEventOrStubbed,
         MouseEventOrStubbed,
         EventOrStubbed;

@@ -5,7 +5,7 @@ import 'project.dart';
 part 'tutorial.mapper.dart';
 
 @MappableClass()
-class TutorialData with TutorialDataMappable implements ProjectData {
+class TutorialData with TutorialDataMappable implements ProjectDataBase {
   @override
   final String id;
   @override
@@ -53,7 +53,7 @@ class TutorialData with TutorialDataMappable implements ProjectData {
   }
 
   @override
-  ProjectData copy() => copyWith();
+  TutorialData copy() => copyWith();
 
   static TutorialData fromConfig(TutorialConfig config) {
     return TutorialData(
@@ -67,7 +67,7 @@ class TutorialData with TutorialDataMappable implements ProjectData {
 }
 
 @MappableClass()
-class TutorialStep with TutorialStepMappable implements ProjectData {
+class TutorialStep with TutorialStepMappable implements ProjectDataBase {
   @override
   final String id;
   final String name;
@@ -120,7 +120,7 @@ class TutorialStep with TutorialStepMappable implements ProjectData {
   }
 
   @override
-  ProjectData copy() => copyWith();
+  TutorialStep copy() => copyWith();
 }
 
 @MappableClass()

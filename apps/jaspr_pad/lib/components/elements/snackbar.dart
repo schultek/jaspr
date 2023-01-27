@@ -1,6 +1,7 @@
 import 'package:jaspr/components.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
+import '../../adapters/html.dart';
 import '../../adapters/mdc.dart';
 
 final snackBarProvider = StateProvider<String?>((ref) => null);
@@ -35,7 +36,7 @@ class SnackBarState extends State<SnackBar> {
     yield FindChildNode(
       onNodeFound: (node) {
         if (kIsWeb && _snackbar == null) {
-          _snackbar = MDCSnackbar(node.nativeElement);
+          _snackbar = MDCSnackbar(node.nativeElement as ElementOrStubbed);
         }
       },
       child: DomComponent(

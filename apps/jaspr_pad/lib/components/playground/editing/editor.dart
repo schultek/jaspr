@@ -131,7 +131,7 @@ class EditorState extends State<Editor> {
     }
   }
 
-  Doc createDoc(String key, String source, String mode) {
+  DocOrStubbed createDoc(String key, String source, String mode) {
     var doc = Doc(source, mode);
     doc.onChange.listen((event) {
       if (!_lockIsUpdating) {

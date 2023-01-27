@@ -1,6 +1,6 @@
 import 'package:jaspr/components.dart';
 
-import '../../adapters/html.dart';
+import '../../adapters/html.dart' hide Element;
 import '../../adapters/mdc.dart';
 import 'button.dart';
 
@@ -51,19 +51,19 @@ class MenuElement extends StatelessElement {
   @override
   Menu get component => super.component as Menu;
 
-  MDCMenu? _menu;
+  MDCMenuOrStubbed? _menu;
   RenderElement? _menuNode, _buttonNode;
 
   void setMenuNodes(RenderElement? menu, RenderElement? button) {
     _menuNode ??= menu;
     _buttonNode ??= button;
     if (kIsWeb && _menuNode != null && _buttonNode != null) {
-      _menu = MDCMenu(_menuNode!.nativeElement)
+      _menu = MDCMenu(_menuNode!.nativeElement as ElementOrStubbed)
         ..setAnchorCorner(AnchorCorner.bottomLeft)
-        ..setAnchorElement(_buttonNode!.nativeElement);
+        ..setAnchorElement(_buttonNode!.nativeElement as ElementOrStubbed);
 
       _menu!.listen('MDCMenu:selected', (e) {
-        final index = (e as CustomEvent).detail['index'] as int;
+        final index = (e as CustomEventOrStubbed).detail['index'] as int;
         component.onItemSelected(index);
       });
     }

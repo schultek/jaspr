@@ -6,16 +6,10 @@
 part of 'tutorial.dart';
 
 class TutorialDataMapper extends MapperBase<TutorialData> {
-  static MapperContainer? _c;
-  static MapperContainer container = _c ??
-      ((_c = MapperContainer(
-        mappers: {TutorialDataMapper()},
-      ))
-        ..linkAll({
-          ProjectDataMapper.container,
-          TutorialStepConfigMapper.container,
-          TutorialStepMapper.container,
-        }));
+  static MapperContainer container = MapperContainer(
+    mappers: {TutorialDataMapper()},
+  )..linkAll(
+      {TutorialStepConfigMapper.container, TutorialStepMapper.container});
 
   @override
   TutorialDataMapperElement createElement(MapperContainer container) {
@@ -51,21 +45,14 @@ class TutorialDataMapperElement extends MapperElementBase<TutorialData> {
         'description': container.$enc(t.description, 'description'),
         'currentStep': container.$enc(t.currentStep, 'currentStep'),
         'configs': container.$enc(t.configs, 'configs'),
-        'steps': container.$enc(t.steps, 'steps'),
-        'type': 'TutorialData'
+        'steps': container.$enc(t.steps, 'steps')
       };
 
   @override
   String stringify(TutorialData self) =>
-      'TutorialData(id: ${container.asString(self.id)}, description: ${container.asString(self.description)}, htmlFile: ${container.asString(self.htmlFile)}, cssFile: ${container.asString(self.cssFile)}, mainDartFile: ${container.asString(self.mainDartFile)}, dartFiles: ${container.asString(self.dartFiles)}, id: ${container.asString(self.id)}, description: ${container.asString(self.description)}, currentStep: ${container.asString(self.currentStep)}, configs: ${container.asString(self.configs)}, steps: ${container.asString(self.steps)})';
+      'TutorialData(id: ${container.asString(self.id)}, description: ${container.asString(self.description)}, currentStep: ${container.asString(self.currentStep)}, configs: ${container.asString(self.configs)}, steps: ${container.asString(self.steps)})';
   @override
   int hash(TutorialData self) =>
-      container.hash(self.id) ^
-      container.hash(self.description) ^
-      container.hash(self.htmlFile) ^
-      container.hash(self.cssFile) ^
-      container.hash(self.mainDartFile) ^
-      container.hash(self.dartFiles) ^
       container.hash(self.id) ^
       container.hash(self.description) ^
       container.hash(self.currentStep) ^
@@ -73,12 +60,6 @@ class TutorialDataMapperElement extends MapperElementBase<TutorialData> {
       container.hash(self.steps);
   @override
   bool equals(TutorialData self, TutorialData other) =>
-      container.isEqual(self.id, other.id) &&
-      container.isEqual(self.description, other.description) &&
-      container.isEqual(self.htmlFile, other.htmlFile) &&
-      container.isEqual(self.cssFile, other.cssFile) &&
-      container.isEqual(self.mainDartFile, other.mainDartFile) &&
-      container.isEqual(self.dartFiles, other.dartFiles) &&
       container.isEqual(self.id, other.id) &&
       container.isEqual(self.description, other.description) &&
       container.isEqual(self.currentStep, other.currentStep) &&
@@ -103,17 +84,17 @@ mixin TutorialDataMappable {
   int get hashCode => TutorialDataMapper.container.hash(this);
 }
 
-extension TutorialDataValueCopy<$R, $Out extends ProjectData>
+extension TutorialDataValueCopy<$R, $Out extends TutorialData>
     on ObjectCopyWith<$R, TutorialData, $Out> {
   TutorialDataCopyWith<$R, TutorialData, $Out> get asTutorialData =>
       base.as((v, t, t2) => _TutorialDataCopyWithImpl(v, t, t2));
 }
 
-typedef TutorialDataCopyWithBound = ProjectData;
+typedef TutorialDataCopyWithBound = TutorialData;
 
 abstract class TutorialDataCopyWith<$R, $In extends TutorialData,
-    $Out extends ProjectData> implements ProjectDataCopyWith<$R, $In, $Out> {
-  TutorialDataCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends ProjectData>(
+    $Out extends TutorialData> implements ObjectCopyWith<$R, $In, $Out> {
+  TutorialDataCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends TutorialData>(
       Then<TutorialData, $Out2> t, Then<$Out2, $R2> t2);
   ListCopyWith<
       $R,
@@ -122,7 +103,6 @@ abstract class TutorialDataCopyWith<$R, $In extends TutorialData,
           TutorialStepConfig>> get configs;
   MapCopyWith<$R, String, TutorialStep,
       TutorialStepCopyWith<$R, TutorialStep, TutorialStep>> get steps;
-  @override
   $R call(
       {String? id,
       String? description,
@@ -131,13 +111,13 @@ abstract class TutorialDataCopyWith<$R, $In extends TutorialData,
       Map<String, TutorialStep>? steps});
 }
 
-class _TutorialDataCopyWithImpl<$R, $Out extends ProjectData>
+class _TutorialDataCopyWithImpl<$R, $Out extends TutorialData>
     extends CopyWithBase<$R, TutorialData, $Out>
     implements TutorialDataCopyWith<$R, TutorialData, $Out> {
   _TutorialDataCopyWithImpl(super.value, super.then, super.then2);
   @override
   TutorialDataCopyWith<$R2, TutorialData, $Out2>
-      chain<$R2, $Out2 extends ProjectData>(
+      chain<$R2, $Out2 extends TutorialData>(
               Then<TutorialData, $Out2> t, Then<$Out2, $R2> t2) =>
           _TutorialDataCopyWithImpl($value, t, t2);
 
@@ -173,12 +153,9 @@ class _TutorialDataCopyWithImpl<$R, $Out extends ProjectData>
 }
 
 class TutorialStepMapper extends MapperBase<TutorialStep> {
-  static MapperContainer? _c;
-  static MapperContainer container = _c ??
-      ((_c = MapperContainer(
-        mappers: {TutorialStepMapper()},
-      ))
-        ..linkAll({ProjectDataMapper.container}));
+  static MapperContainer container = MapperContainer(
+    mappers: {TutorialStepMapper()},
+  )..linkAll({ProjectDataMapper.container});
 
   @override
   TutorialStepMapperElement createElement(MapperContainer container) {
@@ -216,21 +193,14 @@ class TutorialStepMapperElement extends MapperElementBase<TutorialStep> {
         'text': container.$enc(t.text, 'text'),
         'step': container.$enc(t.step, 'step'),
         'solution': container.$enc(t.solution, 'solution'),
-        'showSolution': container.$enc(t.showSolution, 'showSolution'),
-        'type': 'TutorialStep'
+        'showSolution': container.$enc(t.showSolution, 'showSolution')
       };
 
   @override
   String stringify(TutorialStep self) =>
-      'TutorialStep(id: ${container.asString(self.id)}, description: ${container.asString(self.description)}, htmlFile: ${container.asString(self.htmlFile)}, cssFile: ${container.asString(self.cssFile)}, mainDartFile: ${container.asString(self.mainDartFile)}, dartFiles: ${container.asString(self.dartFiles)}, id: ${container.asString(self.id)}, name: ${container.asString(self.name)}, text: ${container.asString(self.text)}, step: ${container.asString(self.step)}, solution: ${container.asString(self.solution)}, showSolution: ${container.asString(self.showSolution)})';
+      'TutorialStep(id: ${container.asString(self.id)}, name: ${container.asString(self.name)}, text: ${container.asString(self.text)}, step: ${container.asString(self.step)}, solution: ${container.asString(self.solution)}, showSolution: ${container.asString(self.showSolution)})';
   @override
   int hash(TutorialStep self) =>
-      container.hash(self.id) ^
-      container.hash(self.description) ^
-      container.hash(self.htmlFile) ^
-      container.hash(self.cssFile) ^
-      container.hash(self.mainDartFile) ^
-      container.hash(self.dartFiles) ^
       container.hash(self.id) ^
       container.hash(self.name) ^
       container.hash(self.text) ^
@@ -239,12 +209,6 @@ class TutorialStepMapperElement extends MapperElementBase<TutorialStep> {
       container.hash(self.showSolution);
   @override
   bool equals(TutorialStep self, TutorialStep other) =>
-      container.isEqual(self.id, other.id) &&
-      container.isEqual(self.description, other.description) &&
-      container.isEqual(self.htmlFile, other.htmlFile) &&
-      container.isEqual(self.cssFile, other.cssFile) &&
-      container.isEqual(self.mainDartFile, other.mainDartFile) &&
-      container.isEqual(self.dartFiles, other.dartFiles) &&
       container.isEqual(self.id, other.id) &&
       container.isEqual(self.name, other.name) &&
       container.isEqual(self.text, other.text) &&
@@ -270,21 +234,20 @@ mixin TutorialStepMappable {
   int get hashCode => TutorialStepMapper.container.hash(this);
 }
 
-extension TutorialStepValueCopy<$R, $Out extends ProjectData>
+extension TutorialStepValueCopy<$R, $Out extends TutorialStep>
     on ObjectCopyWith<$R, TutorialStep, $Out> {
   TutorialStepCopyWith<$R, TutorialStep, $Out> get asTutorialStep =>
       base.as((v, t, t2) => _TutorialStepCopyWithImpl(v, t, t2));
 }
 
-typedef TutorialStepCopyWithBound = ProjectData;
+typedef TutorialStepCopyWithBound = TutorialStep;
 
 abstract class TutorialStepCopyWith<$R, $In extends TutorialStep,
-    $Out extends ProjectData> implements ProjectDataCopyWith<$R, $In, $Out> {
-  TutorialStepCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends ProjectData>(
+    $Out extends TutorialStep> implements ObjectCopyWith<$R, $In, $Out> {
+  TutorialStepCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends TutorialStep>(
       Then<TutorialStep, $Out2> t, Then<$Out2, $R2> t2);
   ProjectDataCopyWith<$R, ProjectData, ProjectData> get step;
   ProjectDataCopyWith<$R, ProjectData, ProjectData>? get solution;
-  @override
   $R call(
       {String? id,
       String? name,
@@ -294,13 +257,13 @@ abstract class TutorialStepCopyWith<$R, $In extends TutorialStep,
       bool? showSolution});
 }
 
-class _TutorialStepCopyWithImpl<$R, $Out extends ProjectData>
+class _TutorialStepCopyWithImpl<$R, $Out extends TutorialStep>
     extends CopyWithBase<$R, TutorialStep, $Out>
     implements TutorialStepCopyWith<$R, TutorialStep, $Out> {
   _TutorialStepCopyWithImpl(super.value, super.then, super.then2);
   @override
   TutorialStepCopyWith<$R2, TutorialStep, $Out2>
-      chain<$R2, $Out2 extends ProjectData>(
+      chain<$R2, $Out2 extends TutorialStep>(
               Then<TutorialStep, $Out2> t, Then<$Out2, $R2> t2) =>
           _TutorialStepCopyWithImpl($value, t, t2);
 
