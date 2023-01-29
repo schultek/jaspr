@@ -1,10 +1,12 @@
 import 'package:dart_mappable/dart_mappable.dart';
 
 import 'gist.dart';
+import 'tutorial.dart';
 
 part 'project.mapper.dart';
 
-abstract class ProjectDataBase {
+@MappableClass(discriminatorKey: 'type', generateMethods: GenerateMethods.decode, includeSubClasses: [TutorialData])
+abstract class ProjectDataBase with ProjectDataBaseMappable {
   String? get id;
   String? get description;
 
@@ -25,7 +27,7 @@ abstract class ProjectDataBase {
   String toJson();
 }
 
-@MappableClass(discriminatorKey: 'type')
+@MappableClass()
 class ProjectData with ProjectDataMappable implements ProjectDataBase {
   @override
   final String? id;

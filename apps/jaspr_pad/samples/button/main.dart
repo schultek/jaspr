@@ -1,5 +1,5 @@
 // [sample=3] Simple Button
-import 'package:jaspr/browser.dart';
+import 'package:jaspr/jaspr.dart';
 
 void main() {
   runApp(App());

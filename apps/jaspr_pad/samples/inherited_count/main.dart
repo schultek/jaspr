@@ -1,5 +1,5 @@
 // [sample=1] Inherited Counter
-import 'package:jaspr/browser.dart';
+import 'package:jaspr/jaspr.dart';
 
 void main() {
   runApp(App());

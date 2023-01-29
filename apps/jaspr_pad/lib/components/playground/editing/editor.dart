@@ -25,7 +25,7 @@ class Editor extends StatefulComponent {
   final String? activeDoc;
   final List<EditorDocument> documents;
   final void Function(String key, String content)? onDocumentChanged;
-  final void Function(String key, int index, bool isWhitespace, bool shouldNotify)? onSelectionChanged;
+  final void Function(String key, int index, bool isWhitespace)? onSelectionChanged;
 
   @override
   State createState() => EditorState();
@@ -34,39 +34,44 @@ class Editor extends StatefulComponent {
 class EditorState extends State<Editor> {
   CodeMirrorOrStubbed? _editor;
   dynamic _editorElement;
-  String? _activeDoc;
+
   Map<String, DocOrStubbed> docs = {};
-  bool _lockIsUpdating = false;
 
   @override
   void initState() {
     super.initState();
     docs = {
-      for (var doc in component.documents) doc.key: createDoc(doc.key, doc.source, doc.mode),
+      for (var doc in component.documents) //
+        doc.key: createDoc(doc.key, doc.source, doc.mode),
     };
-    _activeDoc = component.activeDoc;
+  }
+
+  void createEditor(RenderElement node) {
+    if (_editor != null && node.nativeElement == _editorElement) {
+      return;
+    }
+    _editor?.dispose();
+    _editorElement = node.nativeElement;
+    _editor = CodeMirror.fromElement(_editorElement!, options: codeMirrorOptions);
+    if (component.activeDoc != null) {
+      Future.microtask(() => _editor!.swapDoc(docs[component.activeDoc!]!));
+    }
   }
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield FindChildNode(
-      onNodeFound: (node) {
-        if (kIsWeb) {
-          if (_editor == null || node.nativeElement != _editorElement) {
-            _editor?.dispose();
-            _editorElement = node.nativeElement;
-            _editor = CodeMirror.fromElement(_editorElement!, options: codeMirrorOptions);
-            if (_activeDoc != null) {
-              _editor!.swapDoc(docs[_activeDoc!]!);
-            }
-          }
-        }
-      },
-      child: DomComponent(
-        tag: 'div',
-        id: 'editor-host',
-      ),
+    Component child = DomComponent(
+      tag: 'div',
+      id: 'editor-host',
     );
+
+    if (kIsWeb) {
+      child = FindChildNode(
+        onNodeAttached: createEditor,
+        child: child,
+      );
+    }
+    yield child;
   }
 
   @override
@@ -74,59 +79,55 @@ class EditorState extends State<Editor> {
     super.didUpdateComponent(oldComponent);
 
     if (kIsWeb && _editor != null) {
-      _lockIsUpdating = true;
-      try {
-        var oldDocs = {...docs};
-        docs = {};
+      var oldDocs = {...docs};
+      docs = {};
 
-        for (var document in component.documents) {
-          if (oldDocs.containsKey(document.key)) {
-            var doc = oldDocs.remove(document.key)!;
-            if (doc.getValue() != document.source) {
-              doc.setValue(document.source);
-            }
-            docs[document.key] = doc;
-          } else {
-            docs[document.key] = createDoc(document.key, document.source, document.mode);
+      for (var document in component.documents) {
+        if (oldDocs.containsKey(document.key)) {
+          var doc = oldDocs.remove(document.key)!;
+          if (doc.getValue() != document.source) {
+            doc.dispose();
+            doc = createDoc(document.key, document.source, document.mode);
           }
-          var doc = docs[document.key]!;
+          docs[document.key] = doc;
+        } else {
+          docs[document.key] = createDoc(document.key, document.source, document.mode);
+        }
+        var doc = docs[document.key]!;
 
-          // TODO check diff
-          for (final marker in doc.getAllMarks()) {
-            marker.clear();
-          }
-          for (final issue in document.issues) {
-            // Create in-line squiggles.
-            doc.markText(Position(issue.location.startLine, issue.location.startColumn),
-                Position(issue.location.endLine, issue.location.endColumn),
-                className: 'squiggle-${issue.kind.name}', title: issue.message);
-          }
-
-          if (document.selection != null) {
-            var sel = document.selection!;
-            doc.setSelection(
-              Position(sel.startLine, sel.startColumn),
-              head: Position(sel.endLine, sel.endColumn),
-            );
-            _editor!.focus();
-          }
+        // TODO check diff
+        for (final marker in doc.getAllMarks()) {
+          marker.clear();
+        }
+        for (final issue in document.issues) {
+          // Create in-line squiggles.
+          doc.markText(Position(issue.location.startLine, issue.location.startColumn),
+              Position(issue.location.endLine, issue.location.endColumn),
+              className: 'squiggle-${issue.kind.name}', title: issue.message);
         }
 
-        for (var doc in oldDocs.values) {
-          if (_editor!.doc == doc) {
-            _editor!.swapDoc(docs.values.firstOrNull ?? Doc(''));
-            _activeDoc = docs.keys.firstOrNull;
-          }
-          doc.dispose();
+        if (document.selection != null) {
+          var sel = document.selection!;
+          doc.setSelection(
+            Position(sel.startLine, sel.startColumn),
+            head: Position(sel.endLine, sel.endColumn),
+          );
+          _editor!.focus();
         }
+      }
 
-        if (component.activeDoc != null && component.activeDoc != _activeDoc) {
-          assert(docs.containsKey(component.activeDoc));
+      for (var doc in oldDocs.values) {
+        if (_editor!.doc == doc) {
+          _editor!.swapDoc(docs.values.firstOrNull ?? Doc(''));
+        }
+        doc.dispose();
+      }
+
+      if (component.activeDoc != null) {
+        assert(docs.containsKey(component.activeDoc));
+        if (_editor!.doc != docs[component.activeDoc!]!) {
           _editor!.swapDoc(docs[component.activeDoc!]!);
-          _activeDoc = component.activeDoc!;
         }
-      } finally {
-        _lockIsUpdating = false;
       }
     }
   }
@@ -134,16 +135,14 @@ class EditorState extends State<Editor> {
   DocOrStubbed createDoc(String key, String source, String mode) {
     var doc = Doc(source, mode);
     doc.onChange.listen((event) {
-      if (!_lockIsUpdating) {
-        component.onDocumentChanged?.call(key, doc.getValue() ?? '');
-      }
+      component.onDocumentChanged?.call(key, doc.getValue() ?? '');
     });
     doc.onEvent('cursorActivity').listen((event) {
       var index = doc.indexFromPos(doc.getCursor()) ?? 0;
       final str = doc.getValue() ?? '';
       var char = index < 0 || index >= str.length ? '' : str[index];
       var isWhitespace = char != char.trim();
-      component.onSelectionChanged?.call(key, index, isWhitespace, !_lockIsUpdating);
+      component.onSelectionChanged?.call(key, index, isWhitespace);
     });
     return doc;
   }

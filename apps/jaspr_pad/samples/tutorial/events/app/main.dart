@@ -1,5 +1,5 @@
 // [sample][hidden] Tutorial
-import 'package:jaspr/browser.dart';
+import 'package:jaspr/jaspr.dart';
 
 import 'counter.dart';
 

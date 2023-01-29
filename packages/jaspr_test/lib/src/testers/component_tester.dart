@@ -121,8 +121,8 @@ class TestComponentsBinding extends BindingBase with SchedulerBinding, Component
   void updateRawState(String id, dynamic state) {}
 
   @override
-  void scheduleBuild(VoidCallback buildCallback) {
-    Future(() => handleFrame(buildCallback));
+  void scheduleFrame(VoidCallback frameCallback) {
+    Future.microtask(frameCallback);
   }
 }
 

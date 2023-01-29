@@ -76,7 +76,7 @@ class MenuElement extends StatelessElement {
       styles: Styles.box(position: Position.relative()),
       children: [
         FindChildNode(
-          onNodeFound: (node) {
+          onNodeAttached: (node) {
             setMenuNodes(null, node);
           },
           child: Button(
@@ -93,7 +93,7 @@ class MenuElement extends StatelessElement {
           ),
         ),
         FindChildNode(
-          onNodeFound: (node) {
+          onNodeAttached: (node) {
             setMenuNodes(node, null);
           },
           child: DomComponent(

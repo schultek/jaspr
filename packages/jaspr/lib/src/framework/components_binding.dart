@@ -24,11 +24,12 @@ mixin ComponentsBinding on BindingBase, SchedulerBinding {
   /// Sets [app] as the new root of the component tree and performs an initial build
   Future<void> attachRootComponent(Component app, {required String attachTo}) async {
     var buildOwner = _rootElements[attachTo]?._owner ?? BuildOwner();
-    return buildOwner.lockState(() async {
+    await buildOwner.lockState(() async {
       buildOwner._isFirstBuild = true;
 
       var attachMatch = _queryReg.firstMatch(attachTo)!;
-      var renderer = attachRenderer(attachMatch.group(1)!, from: int.tryParse(attachMatch.group(2) ?? ''), to: int.tryParse(attachMatch.group(3) ?? ''));
+      var renderer = attachRenderer(attachMatch.group(1)!,
+          from: int.tryParse(attachMatch.group(2) ?? ''), to: int.tryParse(attachMatch.group(3) ?? ''));
 
       var element = _Root(child: app).createElement();
       element._owner = buildOwner;
@@ -87,16 +88,14 @@ class _RootElement extends SingleChildElement with RenderElement {
   _Root get component => super.component as _Root;
 
   @override
-  void _firstBuild() {
+  void _firstBuild([VoidCallback? onBuilt]) {
     _attach();
-    super._firstBuild();
+    super._firstBuild(onBuilt);
   }
 
   @override
-  void renderNode(Renderer renderer) {
-  }
+  void renderNode(Renderer renderer) {}
 
   @override
   Component build() => component.child;
-
 }

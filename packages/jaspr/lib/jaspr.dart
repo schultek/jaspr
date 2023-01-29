@@ -13,6 +13,10 @@ export 'src/foundation/interop_stub.dart' //
     if (dart.library.html) 'src/browser/native_interop.dart'
     if (dart.library.io) 'src/server/native_interop.dart';
 export 'src/foundation/object.dart';
+export 'src/foundation/run_app_stub.dart'
+    if (dart.library.html) 'src/browser/run_app.dart'
+    if (dart.library.io) 'src/server/run_app.dart'
+    show runApp;
 export 'src/foundation/scheduler.dart';
 export 'src/foundation/sync.dart';
 export 'src/framework/framework.dart';

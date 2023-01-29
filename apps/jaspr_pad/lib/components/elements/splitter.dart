@@ -105,6 +105,12 @@ class SplitElementRenderDelegate extends RenderDelegate {
   }
 
   @override
+  void attachNode(RenderElement? element, RenderElement child, RenderElement? after) {
+    super.attachNode(element, child, after);
+    onNode(child);
+  }
+
+  @override
   bool updateShouldNotify(covariant SplitElementRenderDelegate oldDelegate) {
     return size != oldDelegate.size || dragging != oldDelegate.dragging;
   }
@@ -141,8 +147,6 @@ class SplitPair {
     if (e.button != 0) {
       return;
     }
-
-    print("START DRAG ${this.a} ${this.b}");
 
     if (this.a == null || this.b == null) {
       return;

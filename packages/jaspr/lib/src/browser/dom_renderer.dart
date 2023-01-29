@@ -108,7 +108,8 @@ class BrowserDomRenderer extends Renderer {
         data.node!.replaceWith(elem);
         data.node = elem;
         if (old != null && old.childNodes.isNotEmpty) {
-          for (var child in old.childNodes) {
+          var oldChildren = [...old.childNodes];
+          for (var child in oldChildren) {
             elem.append(child);
           }
         }

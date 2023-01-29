@@ -1,7 +1,6 @@
 part of framework;
 
 class RenderScope extends Component {
-
   const RenderScope({required this.delegate, this.shallow = true, this.child, super.key});
 
   final RenderDelegate delegate;
@@ -13,20 +12,14 @@ class RenderScope extends Component {
 }
 
 class _RenderScopeElement extends SingleChildElement {
-
   _RenderScopeElement(RenderScope component) : super(component);
 
   @override
   RenderScope get component => super.component as RenderScope;
 
   @override
-  void _firstBuild() {
-    _renderer = _DelegatingRenderer(
-        _renderer!,
-        component.shallow,
-        component.delegate
-    );
-    super._firstBuild();
+  Renderer _inheritRendererFromParent() {
+    return _ScopedRenderer(super._inheritRendererFromParent(), this);
   }
 
   @override
@@ -41,16 +34,14 @@ class _RenderScopeElement extends SingleChildElement {
       return true;
     }());
 
+    var oldComponent = component;
     super.update(newComponent);
 
-    var renderer = _renderer as _DelegatingRenderer;
-    var oldDelegate = renderer._delegate;
-    renderer._delegate = component.delegate;
-
-    var shouldReRenderChildren = oldDelegate.runtimeType != component.delegate.runtimeType
-        || component.delegate.updateShouldNotify(oldDelegate);
+    var shouldReRenderChildren = oldComponent.delegate.runtimeType != component.delegate.runtimeType ||
+        component.delegate.updateShouldNotify(oldComponent.delegate);
 
     if (shouldReRenderChildren) {
+      var renderer = _renderer as _ScopedRenderer;
       for (var element in renderer._dependents) {
         element._render();
       }
@@ -60,7 +51,6 @@ class _RenderScopeElement extends SingleChildElement {
     rebuild();
   }
 }
-
 
 abstract class RenderDelegate {
   Renderer? _parent;
@@ -85,17 +75,22 @@ abstract class RenderDelegate {
   }
 
   @protected
+  @mustCallSuper
+  void attachNode(RenderElement? element, RenderElement child, RenderElement? after) {
+    _parent!.attachNode(element, child, after);
+  }
+
+  @protected
   bool updateShouldNotify(covariant RenderDelegate oldDelegate) => false;
 }
 
-class _DelegatingRenderer implements Renderer {
+class _ScopedRenderer implements Renderer {
   final Renderer _parent;
-  final bool _shallow;
+  final _RenderScopeElement _scope;
 
-  RenderDelegate _delegate;
   final Set<RenderElement> _dependents = {};
 
-  _DelegatingRenderer(this._parent, this._shallow, this._delegate);
+  _ScopedRenderer(this._parent, this._scope);
 
   @override
   @protected
@@ -103,31 +98,32 @@ class _DelegatingRenderer implements Renderer {
   void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     _dependents.add(element);
-    _delegate._parent = _parent;
-    _delegate.renderNode(element, tag, id, classes, styles, attributes, events);
+    _scope.component.delegate._parent = _parent;
+    _scope.component.delegate.renderNode(element, tag, id, classes, styles, attributes, events);
   }
 
   @override
   @protected
   @mustCallSuper
   void renderTextNode(RenderElement element, String text, [bool rawHtml = false]) {
-    _delegate._parent = _parent;
-    _delegate.renderTextNode(element, text, rawHtml);
+    _scope.component.delegate._parent = _parent;
+    _scope.component.delegate.renderTextNode(element, text, rawHtml);
   }
 
   @override
   @protected
   @mustCallSuper
   void skipContent(RenderElement element) {
-    _delegate._parent = _parent;
-    _delegate.skipContent(element);
+    _scope.component.delegate._parent = _parent;
+    _scope.component.delegate.skipContent(element);
   }
 
   @override
   @protected
   @mustCallSuper
   void attachNode(RenderElement? element, RenderElement child, RenderElement? after) {
-    _parent.attachNode(element, child, after);
+    _scope.component.delegate._parent = _parent;
+    _scope.component.delegate.attachNode(element, child, after);
   }
 
   @override
@@ -148,4 +144,12 @@ class _DelegatingRenderer implements Renderer {
     _dependents.remove(element);
   }
 
+  @override
+  Renderer inherit(Element parent) {
+    if (_scope.component.shallow && parent is RenderElement) {
+      return _parent;
+    } else {
+      return this;
+    }
+  }
 }

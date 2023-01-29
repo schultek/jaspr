@@ -45,15 +45,6 @@ class DomElement extends MultiChildElement with RenderElement {
   Iterable<Component> build() => component.children;
 
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
-    _render();
-    super._firstBuild(() {
-      _attach();
-      onBuilt?.call();
-    });
-  }
-
-  @override
   void update(DomComponent newComponent) {
     super.update(newComponent);
     _dirty = true;
@@ -100,8 +91,9 @@ abstract class NoChildElement extends Element {
     _firstBuild();
   }
 
-  @mustCallSuper
+  @override
   void _firstBuild([VoidCallback? onBuilt]) {
+    super._firstBuild(onBuilt);
     rebuild(onBuilt);
   }
 
@@ -121,15 +113,6 @@ class TextElement extends NoChildElement with RenderElement {
   Text get component => super.component as Text;
 
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
-    _render();
-    super._firstBuild(() {
-      _attach();
-      onBuilt?.call();
-    });
-  }
-
-  @override
   void renderNode(Renderer renderer) {
     renderer.renderTextNode(this, component.text, component.rawHtml);
   }
@@ -147,12 +130,6 @@ class SkipContentElement extends NoChildElement with RenderElement {
 
   @override
   SkipContent get component => super.component as SkipContent;
-
-  @override
-  void _firstBuild([VoidCallback? onBuilt]) {
-    _render();
-    super._firstBuild(onBuilt);
-  }
 
   @override
   void renderNode(Renderer renderer) {

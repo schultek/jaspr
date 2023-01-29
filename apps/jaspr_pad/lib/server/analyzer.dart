@@ -13,7 +13,7 @@ const Duration _analysisServerTimeout = Duration(seconds: 35);
 const Duration _analysisWarmupTimeout = Duration(seconds: 60);
 
 const String _warmupSrc = 'main() { int b = 2;  b++;   b. }';
-final mainPath = path.join(jasprBasicTemplatePath, 'main.dart');
+final mainPath = path.join(jasprBasicTemplatePath, 'lib', 'main.dart');
 
 class Analyzer {
   final TaskScheduler serverScheduler = TaskScheduler();
@@ -46,8 +46,7 @@ class Analyzer {
 
   Future<AnalyzeResponse> analyze(AnalyzeRequest request) {
     return serverScheduler.schedule(ClosureTask<AnalyzeResponse>(() async {
-      var sources = request.sources.map((k, v) => MapEntry(path.join(jasprBasicTemplatePath, k), v));
-
+      var sources = request.sources.map((k, v) => MapEntry(path.join(jasprBasicTemplatePath, 'lib', k), v));
       await _loadSources(sources);
       final errors = (await analysisServer.analysis.getErrors(mainPath)).errors;
       await _unloadSources();
@@ -104,11 +103,13 @@ class Analyzer {
 
   Future<DocumentResponse> document(DocumentRequest request) async {
     return serverScheduler.schedule(ClosureTask<DocumentResponse>(() async {
-      var sources = request.sources.map((k, v) => MapEntry(path.join(jasprBasicTemplatePath, k), v));
+      var sources = request.sources.map((k, v) => MapEntry(path.join(jasprBasicTemplatePath, 'lib', k), v));
       await _loadSources(sources);
 
-      final result =
-          await analysisServer.analysis.getHover(path.join(jasprBasicTemplatePath, request.name), request.offset);
+      final result = await analysisServer.analysis.getHover(
+        path.join(jasprBasicTemplatePath, 'lib', request.name),
+        request.offset,
+      );
       await _unloadSources();
 
       if (result.hovers.isEmpty) {

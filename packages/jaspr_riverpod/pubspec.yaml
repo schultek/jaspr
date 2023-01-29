@@ -10,7 +10,7 @@ environment:
 dependencies:
   jaspr: ^0.1.0
   meta: ^1.8.0
-  riverpod: ^2.0.2
+  riverpod: ^2.1.3
 
 dev_dependencies:
   jaspr_test: ^0.1.0

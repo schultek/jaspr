@@ -133,7 +133,7 @@ class DialogState extends State<DialogSlot> {
     var state = context.watch(_dialogStateProvider(component.slotId));
 
     yield FindChildNode(
-      onNodeFound: (node) {
+      onNodeAttached: (node) {
         if (kIsWeb) {
           _dialog ??= MDCDialog(node.nativeElement as ElementOrStubbed);
           _dialog!.listen('MDCDialog:closed', (event) {

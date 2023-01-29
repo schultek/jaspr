@@ -5,10 +5,62 @@
 
 part of 'project.dart';
 
+class ProjectDataBaseMapper extends MapperBase<ProjectDataBase> {
+  static MapperContainer? _c;
+  static MapperContainer container = _c ??
+      ((_c = MapperContainer(
+        mappers: {ProjectDataBaseMapper()},
+      ))
+        ..linkAll({
+          TutorialDataMapper.container,
+          TutorialStepMapper.container,
+          ProjectDataMapper.container,
+        }));
+
+  @override
+  ProjectDataBaseMapperElement createElement(MapperContainer container) {
+    return ProjectDataBaseMapperElement._(this, container);
+  }
+
+  @override
+  String get id => 'ProjectDataBase';
+
+  static final fromMap = container.fromMap<ProjectDataBase>;
+  static final fromJson = container.fromJson<ProjectDataBase>;
+}
+
+class ProjectDataBaseMapperElement extends MapperElementBase<ProjectDataBase> {
+  ProjectDataBaseMapperElement._(super.mapper, super.container);
+
+  @override
+  Function get decoder => decode;
+  ProjectDataBase decode(dynamic v) =>
+      checkedType(v, (Map<String, dynamic> map) {
+        switch (map['type']) {
+          case 'ProjectData':
+            return ProjectDataMapper().createElement(container).decode(map);
+          case 'TutorialData':
+            return TutorialDataMapper().createElement(container).decode(map);
+          case 'TutorialStep':
+            return TutorialStepMapper().createElement(container).decode(map);
+          default:
+            return fromMap(map);
+        }
+      });
+  ProjectDataBase fromMap(Map<String, dynamic> map) =>
+      throw MapperException.missingSubclass(
+          'ProjectDataBase', 'type', '${map['type']}');
+}
+
+mixin ProjectDataBaseMappable {}
+
 class ProjectDataMapper extends MapperBase<ProjectData> {
-  static MapperContainer container = MapperContainer(
-    mappers: {ProjectDataMapper()},
-  );
+  static MapperContainer? _c;
+  static MapperContainer container = _c ??
+      ((_c = MapperContainer(
+        mappers: {ProjectDataMapper()},
+      ))
+        ..linkAll({ProjectDataBaseMapper.container}));
 
   @override
   ProjectDataMapperElement createElement(MapperContainer container) {
@@ -46,7 +98,8 @@ class ProjectDataMapperElement extends MapperElementBase<ProjectData> {
         'htmlFile': container.$enc(p.htmlFile, 'htmlFile'),
         'cssFile': container.$enc(p.cssFile, 'cssFile'),
         'mainDartFile': container.$enc(p.mainDartFile, 'mainDartFile'),
-        'dartFiles': container.$enc(p.dartFiles, 'dartFiles')
+        'dartFiles': container.$enc(p.dartFiles, 'dartFiles'),
+        'type': 'ProjectData'
       };
 
   @override
@@ -87,18 +140,19 @@ mixin ProjectDataMappable {
   int get hashCode => ProjectDataMapper.container.hash(this);
 }
 
-extension ProjectDataValueCopy<$R, $Out extends ProjectData>
+extension ProjectDataValueCopy<$R, $Out extends ProjectDataBase>
     on ObjectCopyWith<$R, ProjectData, $Out> {
   ProjectDataCopyWith<$R, ProjectData, $Out> get asProjectData =>
       base.as((v, t, t2) => _ProjectDataCopyWithImpl(v, t, t2));
 }
 
-typedef ProjectDataCopyWithBound = ProjectData;
+typedef ProjectDataCopyWithBound = ProjectDataBase;
 
 abstract class ProjectDataCopyWith<$R, $In extends ProjectData,
-    $Out extends ProjectData> implements ObjectCopyWith<$R, $In, $Out> {
-  ProjectDataCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends ProjectData>(
-      Then<ProjectData, $Out2> t, Then<$Out2, $R2> t2);
+    $Out extends ProjectDataBase> implements ObjectCopyWith<$R, $In, $Out> {
+  ProjectDataCopyWith<$R2, $In, $Out2>
+      chain<$R2, $Out2 extends ProjectDataBase>(
+          Then<ProjectData, $Out2> t, Then<$Out2, $R2> t2);
   MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>>
       get dartFiles;
   $R call(
@@ -110,13 +164,13 @@ abstract class ProjectDataCopyWith<$R, $In extends ProjectData,
       Map<String, String>? dartFiles});
 }
 
-class _ProjectDataCopyWithImpl<$R, $Out extends ProjectData>
+class _ProjectDataCopyWithImpl<$R, $Out extends ProjectDataBase>
     extends CopyWithBase<$R, ProjectData, $Out>
     implements ProjectDataCopyWith<$R, ProjectData, $Out> {
   _ProjectDataCopyWithImpl(super.value, super.then, super.then2);
   @override
   ProjectDataCopyWith<$R2, ProjectData, $Out2>
-      chain<$R2, $Out2 extends ProjectData>(
+      chain<$R2, $Out2 extends ProjectDataBase>(
               Then<ProjectData, $Out2> t, Then<$Out2, $R2> t2) =>
           _ProjectDataCopyWithImpl($value, t, t2);
 

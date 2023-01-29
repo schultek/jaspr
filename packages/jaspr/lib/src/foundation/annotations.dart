@@ -1,6 +1,4 @@
 import '../framework/framework.dart';
-import 'constants.dart';
-import 'sync.dart';
 
 class AppAnnotation {
   const AppAnnotation._();

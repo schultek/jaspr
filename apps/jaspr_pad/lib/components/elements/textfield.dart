@@ -22,7 +22,7 @@ class TextFieldState extends State<TextField> {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield FindChildNode(
-      onNodeFound: (node) {
+      onNodeAttached: (node) {
         if (kIsWeb && _textField == null) {
           _textField = MDCTextField(node.nativeElement as ElementOrStubbed);
         }

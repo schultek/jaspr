@@ -25,6 +25,7 @@ final mainContainer = MapperContainer(linked: {
   p0.IssueKindMapper.container,
   p1.GistDataMapper.container,
   p1.GistFileMapper.container,
+  p2.ProjectDataBaseMapper.container,
   p2.ProjectDataMapper.container,
   p3.SampleMapper.container,
   p3.SampleResponseMapper.container,

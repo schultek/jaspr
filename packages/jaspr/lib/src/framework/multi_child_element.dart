@@ -31,8 +31,9 @@ abstract class MultiChildElement extends Element {
     _firstBuild();
   }
 
-  @mustCallSuper
+  @override
   void _firstBuild([VoidCallback? onBuilt]) {
+    super._firstBuild(onBuilt);
     rebuild(onBuilt);
   }
 

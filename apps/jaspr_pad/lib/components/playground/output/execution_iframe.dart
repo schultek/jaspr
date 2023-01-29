@@ -10,7 +10,7 @@ class ExecutionIFrame extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield FindChildNode(
-      onNodeFound: (node) {
+      onNodeAttached: (node) {
         if (kIsWeb) {
           var iframe = context.read(iframeProvider);
           if (iframe == null || iframe != node.nativeElement) {

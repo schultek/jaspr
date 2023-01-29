@@ -22,22 +22,22 @@ class Logic {
   void newPad() async {
     ref.read(storageProvider).remove('project');
     window.history.pushState(null, 'JasprPad', window.location.origin);
-    ref.refresh(loadedProjectProvider);
+    ref.invalidate(loadedProjectProvider);
   }
 
   void refresh() {
     ref.read(storageProvider).remove('project');
-    ref.refresh(loadedProjectProvider);
+    ref.invalidate(loadedProjectProvider);
   }
 
   void selectSample(Sample data) async {
     window.history.pushState(null, 'JasprPad', window.location.origin + '?sample=${data.id}');
-    ref.refresh(loadedProjectProvider);
+    ref.invalidate(loadedProjectProvider);
   }
 
   void selectTutorial() async {
     window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=intro');
-    ref.refresh(loadedProjectProvider);
+    ref.invalidate(loadedProjectProvider);
   }
 
   Future<TutorialData> changeStep(TutorialData tutorial, String newId) async {

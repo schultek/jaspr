@@ -226,7 +226,7 @@ abstract class Element implements BuildContext {
   BuildOwner get owner => _owner!;
 
   Renderer? _renderer;
-  Renderer? _inheritRenderer() => _renderer;
+  Renderer get renderer => _renderer!;
 
   /// The previous sibling element.
   Element? _prevSibling;
@@ -378,7 +378,7 @@ abstract class Element implements BuildContext {
 
     if (parent != null) {
       _owner = parent.owner;
-      _renderer = parent._inheritRenderer();
+      _renderer = _inheritRendererFromParent();
     }
     assert(_owner != null);
 
@@ -389,6 +389,9 @@ abstract class Element implements BuildContext {
     _updateInheritance();
     _updateObservers();
   }
+
+  @mustCallSuper
+  void _firstBuild([VoidCallback? onBuilt]) {}
 
   /// Change the component used to configure this element.
   ///
@@ -573,6 +576,7 @@ abstract class Element implements BuildContext {
 
     var parent = _parent!;
     _parentNode = parent is RenderElement ? parent : parent._parentNode;
+    _renderer = _inheritRendererFromParent();
 
     _dependencies?.clear();
     _hadUnsatisfiedDependencies = false;
@@ -582,6 +586,10 @@ abstract class Element implements BuildContext {
       owner.scheduleBuildFor(this);
     }
     if (hadDependencies) didChangeDependencies();
+  }
+
+  Renderer _inheritRendererFromParent() {
+    return _parent!._renderer!.inherit(_parent!);
   }
 
   /// Transition from the "active" to the "inactive" lifecycle state.

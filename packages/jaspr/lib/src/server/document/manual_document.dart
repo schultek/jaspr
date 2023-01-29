@@ -79,14 +79,14 @@ class _ManualDocumentState extends State<_ManualDocument> {
               Style(styles: component.styles!),
             ...component.head,
             FindChildNode(
-              onNodeFound: (element) {
+              onNodeRendered: (element) {
                 _dataScript = element;
               },
               child: DomComponent(tag: 'script', child: Text('', rawHtml: true)),
             ),
             if (component.scriptName != null)
               FindChildNode(
-                onNodeFound: (element) {
+                onNodeRendered: (element) {
                   _script = element;
                 },
                 child: DomComponent(tag: 'script', attributes: {'defer': '', 'src': '${component.scriptName}.dart.js'}),

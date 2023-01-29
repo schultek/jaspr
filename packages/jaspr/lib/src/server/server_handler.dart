@@ -48,7 +48,7 @@ Handler _webdevProxyHandler(String port) {
   var handler = proxyHandler('http://localhost:$port/', client: client);
   return RefreshableHandler((Request req) async {
     var res = await handler(req);
-    if (res.statusCode == 200 && res.headers['content-type'] == 'application/javascript') {
+    if (res.statusCode == 200 && RegExp(r'(application|text)/javascript').hasMatch(res.headers['content-type'] ?? '')) {
       var body = await res.readAsString();
       res = res.change(body: body.replaceAll('http://localhost:$port/', ''));
     }

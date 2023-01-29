@@ -33,7 +33,7 @@ class TabBarState extends State<TabBar> {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield FindChildNode(
-      onNodeFound: (node) {
+      onNodeAttached: (node) {
         if (kIsWeb && _tabBar == null) {
           _tabBar = MDCTabBar(node.nativeElement as ElementOrStubbed)
             ..activateTab(component.selected + (component.leading != null ? 1 : 0));

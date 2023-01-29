@@ -77,29 +77,35 @@ class BuildOwner {
   /// We want the component and element apis to stay synchronous, so this delays
   /// the execution of [child.performRebuild()] instead of calling it directly.
   void performRebuildOn(Element child, void Function() whenComplete) {
-    var asyncFirstBuild = child._asyncFirstBuild;
-    if (asyncFirstBuild is Future) {
-      assert(isFirstBuild, 'Only the first build is allowed to be asynchronous.');
-      var buildCompleter = Completer.sync()..future.whenComplete(whenComplete);
-      child._asyncFirstBuild = buildCompleter.future;
-      child._parent?._asyncFirstBuildChildren.add(buildCompleter.future);
-      asyncFirstBuild.whenComplete(() {
-        child.performRebuild();
-        _waitChildren(child, buildCompleter);
-      });
-    } else {
+    if (!isFirstBuild) {
+      assert(child._asyncFirstBuild == null && child._asyncFirstBuildChildren.isEmpty, 'Only the first build is allowed to be asynchronous.',);
       child.performRebuild();
-      var buildCompleter = Completer.sync()..future.whenComplete(whenComplete);
+      whenComplete();
+      return;
+    }
 
-      _waitChildren(child, buildCompleter);
-      if (!buildCompleter.isCompleted) {
-        child._asyncFirstBuild = buildCompleter.future;
-        child._parent?._asyncFirstBuildChildren.add(buildCompleter.future);
-      }
+    var asyncFirstBuild = child._asyncFirstBuild;
+
+    var buildCompleter = Completer.sync();
+    buildCompleter.future.whenComplete(() {
+      child._asyncFirstBuild = null;
+      child._parent?._asyncFirstBuildChildren.remove(buildCompleter.future);
+      whenComplete();
+    });
+
+    child._asyncFirstBuild = buildCompleter.future;
+    child._parent?._asyncFirstBuildChildren.add(buildCompleter.future);
+
+    if (asyncFirstBuild != null) {
+      asyncFirstBuild.whenComplete(() => _rebuildAndWait(child, buildCompleter));
+    } else {
+      _rebuildAndWait(child, buildCompleter);
     }
   }
 
-  void _waitChildren(Element child, Completer buildCompleter) {
+  void _rebuildAndWait(Element child, Completer buildCompleter) {
+    child.performRebuild();
+
     var asyncChildren = child._asyncFirstBuildChildren;
     child._asyncFirstBuildChildren = [];
 

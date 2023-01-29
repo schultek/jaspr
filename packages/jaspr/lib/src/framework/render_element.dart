@@ -5,22 +5,11 @@ mixin RenderElement on Element {
   @override
   RenderElement get _lastNode => this;
 
-  Renderer get renderer => _renderer!;
-
   /// Arbitrary data the renderer can use
   dynamic _data;
 
   dynamic getData() => _data;
   dynamic setData(dynamic data) => _data = data;
-
-  @override
-  Renderer? _inheritRenderer() {
-    var renderer = _renderer;
-    if (renderer is _DelegatingRenderer && renderer._shallow == true) {
-      return renderer._parent;
-    }
-    return renderer;
-  }
 
   void _render() {
     renderNode(_renderer!);
@@ -37,6 +26,15 @@ mixin RenderElement on Element {
 
   void _remove() {
     _renderer!.removeChild(_parentNode!, this);
+  }
+
+  @override
+  void _firstBuild([VoidCallback? onBuilt]) {
+    _render();
+    super._firstBuild(() {
+      _attach();
+      onBuilt?.call();
+    });
   }
 
   @override
@@ -65,7 +63,7 @@ mixin RenderElement on Element {
   void unmount() {
     super.unmount();
     var renderer = _renderer;
-    if (renderer is _DelegatingRenderer) {
+    if (renderer is _ScopedRenderer) {
       renderer._release(this);
     }
   }
@@ -84,4 +82,6 @@ abstract class Renderer {
   void finalizeNode(RenderElement element);
 
   void removeChild(RenderElement parent, RenderElement child);
+
+  Renderer inherit(Element parent) => this;
 }

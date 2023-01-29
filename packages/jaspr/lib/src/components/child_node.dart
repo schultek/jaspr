@@ -1,14 +1,16 @@
 import '../../jaspr.dart';
 
 class FindChildNode extends ChildNodeComponent {
-  FindChildNode({required this.onNodeFound, required super.child});
+  FindChildNode({this.onNodeRendered, this.onNodeAttached, required super.child});
 
-  final void Function(RenderElement) onNodeFound;
+  final void Function(RenderElement)? onNodeRendered;
+  final void Function(RenderElement)? onNodeAttached;
 
   @override
-  void handleChildNode(RenderElement node) {
-    onNodeFound(node);
-  }
+  void didRenderNode(RenderElement node) => onNodeRendered?.call(node);
+
+  @override
+  void didAttachNode(RenderElement node) => onNodeAttached?.call(node);
 
   @override
   bool hasChanged(covariant ChildNodeComponent oldComponent) {
@@ -29,7 +31,8 @@ abstract class ChildNodeComponent extends StatelessComponent {
     );
   }
 
-  void handleChildNode(RenderElement node);
+  void didRenderNode(RenderElement node);
+  void didAttachNode(RenderElement node);
 
   bool hasChanged(covariant ChildNodeComponent oldComponent);
 }
@@ -43,7 +46,21 @@ class ChildNodeDelegate extends RenderDelegate {
   void renderNode(RenderElement node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     super.renderNode(node, tag, id, classes, styles, attributes, events);
-    component.handleChildNode(node);
+    try {
+      component.didRenderNode(node);
+    } catch (e) {
+      print("[WARNING] Error inside [ChildNodeComponent.didRenderNode]: $e");
+    }
+  }
+
+  @override
+  void attachNode(RenderElement? element, RenderElement child, RenderElement? after) {
+    super.attachNode(element, child, after);
+    try {
+      component.didAttachNode(child);
+    } catch (e) {
+      print("[WARNING] Error inside [ChildNodeComponent.didAttachNode]: $e");
+    }
   }
 
   @override

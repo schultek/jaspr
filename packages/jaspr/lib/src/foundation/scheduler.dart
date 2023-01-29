@@ -1,5 +1,7 @@
 import '../../jaspr.dart';
 
+enum SchedulerPhase { idle, midFrameCallback, postFrameCallbacks }
+
 mixin SchedulerBinding on BindingBase {
   @override
   void initInstances() {
@@ -10,12 +12,26 @@ mixin SchedulerBinding on BindingBase {
   static SchedulerBinding? _instance;
   static SchedulerBinding? get instance => _instance;
 
-  /// Schedules a build and ultimately calls [handleFrame] with the provided [buildCallback]
-  void scheduleBuild(VoidCallback buildCallback);
+  SchedulerPhase _schedulerPhase = SchedulerPhase.idle;
+  SchedulerPhase get schedulerPhase => _schedulerPhase;
 
-  @protected
-  void handleFrame(VoidCallback buildCallback) {
+  /// Schedules a frame with the provided [frameCallback]
+  void scheduleFrame(VoidCallback frameCallback);
+
+  /// Schedules a build and ultimately calls [handleFrame] with the provided [buildCallback]
+  void scheduleBuild(VoidCallback buildCallback) {
+    scheduleFrame(() => _handleFrame(buildCallback));
+  }
+
+  void _handleFrame(VoidCallback buildCallback) {
+    _schedulerPhase = SchedulerPhase.midFrameCallback;
     buildCallback();
+    _schedulerPhase = SchedulerPhase.postFrameCallbacks;
+    _flushPostFrameCallbacks();
+    _schedulerPhase = SchedulerPhase.idle;
+  }
+
+  void _flushPostFrameCallbacks() {
     var localPostFrameCallbacks = List<VoidCallback>.of(_postFrameCallbacks);
     _postFrameCallbacks.clear();
     for (var callback in localPostFrameCallbacks) {

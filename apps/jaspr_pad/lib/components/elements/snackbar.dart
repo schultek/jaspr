@@ -34,7 +34,7 @@ class SnackBarState extends State<SnackBar> {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield FindChildNode(
-      onNodeFound: (node) {
+      onNodeAttached: (node) {
         if (kIsWeb && _snackbar == null) {
           _snackbar = MDCSnackbar(node.nativeElement as ElementOrStubbed);
         }

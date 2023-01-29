@@ -66,7 +66,7 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
   void updateRawState(String id, dynamic state) {}
 
   @override
-  void scheduleBuild(VoidCallback buildCallback) {
-    throw UnsupportedError('Scheduling a build is not supported on the server, and should never happen.');
+  void scheduleFrame(VoidCallback frameCallback) {
+    throw UnsupportedError('Scheduling a frame is not supported on the server, and should never happen.');
   }
 }

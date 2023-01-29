@@ -56,6 +56,7 @@ class _BoxStyles implements Styles {
         ...?radius?.styles,
         ...?overflow?.styles,
         ...?position?.styles,
+        if (visibility != null) 'visibility': visibility!.value,
         if (transform != null) 'transform': transform!.value,
         if (shadow != null) 'box-shadow': shadow!.value,
         if (cursor != null) 'cursor': cursor!.value,

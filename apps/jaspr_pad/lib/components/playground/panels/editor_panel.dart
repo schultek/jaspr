@@ -124,10 +124,9 @@ class EditorPanelState extends State<EditorPanel> {
                   onDocumentChanged: (String key, String content) {
                     context.read(editProjectProvider.notifier).update((state) => state?.updateContent(key, content));
                   },
-                  onSelectionChanged: (key, index, isWhitespace, shouldNotify) {
-                    if (shouldNotify) {
-                      context.read(fileSelectionProvider(key).notifier).state = null;
-                    }
+                  onSelectionChanged: (key, index, isWhitespace) {
+                    context.read(fileSelectionProvider(key).notifier).state = null;
+
                     if (!isWhitespace && proj.isDart(key)) {
                       context.read(logicProvider).document(key, index);
                     }

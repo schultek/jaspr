@@ -1,11 +1,13 @@
+// ignore_for_file: invalid_use_of_internal_member
+
 library framework;
 
 import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:meta/meta.dart';
-import 'package:riverpod/riverpod.dart';
 
+import 'internals.dart';
 import 'sync_provider.dart';
 
 part 'provider_context.dart';
@@ -302,16 +304,11 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
 
   @override
   void mount(Element? parent, Element? prevSibling) {
-    assert(() {
-      component.container.debugCanModifyProviders = _debugCanModifyProviders;
-      return true;
-    }());
-    assert(
-      component.container.vsyncOverride == null,
-      'The ProviderContainer was already associated with a different component',
-    );
-    component.container.vsyncOverride = _jasprVsync;
+    if (kDebugMode) {
+      debugCanModifyProviders ??= _debugCanModifyProviders;
+    }
 
+    vsyncOverride ??= _jasprVsync;
     super.mount(parent, prevSibling);
   }
 
@@ -320,39 +317,21 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     setDependencies(dependent, getDependencies(dependent) ?? ProviderDependencies(dependent, this));
   }
 
-  @override
-  void update(UncontrolledProviderScope newComponent) {
-    assert(() {
-      component.container.debugCanModifyProviders = null;
-      newComponent.container.debugCanModifyProviders = _debugCanModifyProviders;
-      return true;
-    }());
-
-    component.container.vsyncOverride = null;
-    assert(
-      newComponent.container.vsyncOverride == null,
-      'The ProviderContainer was already associated with a different component',
-    );
-    newComponent.container.vsyncOverride = _jasprVsync;
-
-    super.update(newComponent);
-  }
-
   void _jasprVsync(void Function() task) {
     assert(_task == null, 'Only one task can be scheduled at a time');
     _task = task;
 
-    // TODO: From my testing, we don't schedule a build here as opposed to flutter_riverpod.
-    //  Find out why this was done originally and if this has any other implications.
-    Future.microtask(() {
-      _task?.call();
-      _task = null;
+    Future.microtask(() async {
+      while (owner.isFirstBuild) {
+        await Future.microtask(() {});
+      }
+      if (_mounted) markNeedsBuild();
     });
   }
 
   void _debugCanModifyProviders() {
-    // TODO: Scheduling a build here lead to some weird bugs. For now we just ignore this as
-    //  it is a debug check only anyways
+    // TODO: Scheduling a build here lead to some weird bugs.
+    // For now we just ignore this as it is only a debug check anyways.
   }
 
   @override
@@ -380,12 +359,14 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
   @override
   void unmount() {
     _mounted = false;
-    assert(() {
-      component.container.debugCanModifyProviders = null;
-      return true;
-    }());
 
-    component.container.vsyncOverride = null;
+    if (kDebugMode && debugCanModifyProviders == _debugCanModifyProviders) {
+      debugCanModifyProviders = null;
+    }
+
+    if (vsyncOverride == _jasprVsync) {
+      vsyncOverride = null;
+    }
     super.unmount();
   }
 

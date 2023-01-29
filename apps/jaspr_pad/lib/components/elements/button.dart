@@ -41,7 +41,7 @@ class ButtonState extends State<Button> {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield FindChildNode(
-      onNodeFound: (RenderElement node) {
+      onNodeAttached: (RenderElement node) {
         if (kIsWeb) {
           _ripple?.destroy();
           if (component.label != null) {
