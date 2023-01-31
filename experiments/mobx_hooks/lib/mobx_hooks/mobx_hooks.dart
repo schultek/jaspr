@@ -87,8 +87,7 @@ HookCtx get globalHookContext {
 
 @experimental
 class HookCtxConfig {
-  final void Function(HookCtx? previous, void Function() execute)?
-      effectsScheduler;
+  final void Function(HookCtx? previous, void Function() execute)? effectsScheduler;
 
   const HookCtxConfig({
     this.effectsScheduler,
@@ -138,8 +137,7 @@ class HookCtx {
       _onDependencyChange();
     },
     name: _name,
-    onError: (err, stackTrace) =>
-        print('ReactionImplError $_name $err $stackTrace'),
+    onError: (err, stackTrace) => print('ReactionImplError $_name $err $stackTrace'),
   );
 
   mobx.Derivation? _derivation;
@@ -189,8 +187,7 @@ class HookCtx {
     final _previousHookEffects = _state._previousHookEffects;
     final _hookEffects = _state._hookEffects;
 
-    final previous =
-        _previousHookEffects.length > i ? _previousHookEffects[i] : null;
+    final previous = _previousHookEffects.length > i ? _previousHookEffects[i] : null;
     final current = _hookEffects.length > i ? _hookEffects[i] : null;
     if (previous != null && current != null) {
       assert(previous.isEqual == current.isEqual);
@@ -231,8 +228,7 @@ class HookCtx {
     int i = 0;
     return newKeys == null ||
         prevKeys == null ||
-        (prevKeys.length != newKeys.length ||
-            prevKeys.any((e) => !isEqual(e, newKeys[i++])));
+        (prevKeys.length != newKeys.length || prevKeys.any((e) => !isEqual(e, newKeys[i++])));
   }
 }
 

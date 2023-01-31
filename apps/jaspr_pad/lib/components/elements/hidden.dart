@@ -31,8 +31,6 @@ class HiddenRenderDelegate extends RenderDelegate {
 
   @override
   bool updateShouldNotify(covariant HiddenRenderDelegate oldDelegate) {
-    return hidden != oldDelegate.hidden ||
-        visibilityMode != oldDelegate.visibilityMode;
+    return hidden != oldDelegate.hidden || visibilityMode != oldDelegate.visibilityMode;
   }
-
 }

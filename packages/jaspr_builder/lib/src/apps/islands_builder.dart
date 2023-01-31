@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:build/build.dart';
@@ -33,8 +32,8 @@ class IslandsBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-    'lib/\$lib\$': ['web/main.islands.dart']
-  };
+        'lib/\$lib\$': ['web/main.islands.dart']
+      };
 
   String get generationHeader => "// GENERATED FILE, DO NOT MODIFY\n"
       "// Generated with jaspr_builder\n";

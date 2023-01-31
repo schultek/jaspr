@@ -3,10 +3,8 @@
 part of '../change_notifier_provider.dart';
 
 /// {@macro riverpod.providerrefbase}
-abstract class AutoDisposeChangeNotifierProviderRef<
-        NotifierT extends ChangeNotifier?>
-    extends ChangeNotifierProviderRef<NotifierT>
-    implements AutoDisposeRef<NotifierT> {}
+abstract class AutoDisposeChangeNotifierProviderRef<NotifierT extends ChangeNotifier?>
+    extends ChangeNotifierProviderRef<NotifierT> implements AutoDisposeRef<NotifierT> {}
 
 // ignore: subtype_of_sealed_class
 /// {@macro riverpod.ChangeNotifierprovider}
@@ -25,8 +23,7 @@ class AutoDisposeChangeNotifierProvider<NotifierT extends ChangeNotifier?>
   /// {@macro riverpod.family}
   static const family = AutoDisposeChangeNotifierProviderFamily.new;
 
-  final NotifierT Function(AutoDisposeChangeNotifierProviderRef<NotifierT> ref)
-      _createFn;
+  final NotifierT Function(AutoDisposeChangeNotifierProviderRef<NotifierT> ref) _createFn;
 
   @override
   NotifierT _create(AutoDisposeChangeNotifierProviderElement<NotifierT> ref) {
@@ -43,21 +40,19 @@ class AutoDisposeChangeNotifierProvider<NotifierT extends ChangeNotifier?>
 }
 
 /// The element of [AutoDisposeChangeNotifierProvider].
-class AutoDisposeChangeNotifierProviderElement<
-        NotifierT extends ChangeNotifier?> = ChangeNotifierProviderElement<NotifierT>
+class AutoDisposeChangeNotifierProviderElement<NotifierT extends ChangeNotifier?> = ChangeNotifierProviderElement<
+        NotifierT>
     with AutoDisposeProviderElementMixin<NotifierT>
     implements AutoDisposeChangeNotifierProviderRef<NotifierT>;
 
 // ignore: subtype_of_sealed_class
 /// The [Family] of [AutoDisposeChangeNotifierProvider].
-class AutoDisposeChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?,
-        Arg>
-    extends AutoDisposeFamilyBase<
-        AutoDisposeChangeNotifierProviderRef<NotifierT>,
-        NotifierT,
-        Arg,
-        NotifierT,
-        AutoDisposeChangeNotifierProvider<NotifierT>> {
+class AutoDisposeChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?, Arg> extends AutoDisposeFamilyBase<
+    AutoDisposeChangeNotifierProviderRef<NotifierT>,
+    NotifierT,
+    Arg,
+    NotifierT,
+    AutoDisposeChangeNotifierProvider<NotifierT>> {
   /// The [Family] of [AutoDisposeChangeNotifierProvider].
   AutoDisposeChangeNotifierProviderFamily(
     super.create, {

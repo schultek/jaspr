@@ -2,44 +2,13 @@
 // Generated with jaspr_builder
 
 import 'package:mdc_web/mdc_web.dart'
-    show
-        MDCRipple,
-        MDCDialog,
-        MDCMenu,
-        AnchorCorner,
-        MDCSnackbar,
-        MDCTabBar,
-        MDCTextField;
-import 'dart:html'
-    show
-        HtmlDocument,
-        Element,
-        CustomEvent,
-        MouseEvent,
-        Event,
-        IFrameElement,
-        MessageEvent;
+    show MDCRipple, MDCDialog, MDCMenu, AnchorCorner, MDCSnackbar, MDCTabBar, MDCTextField;
+import 'dart:html' show HtmlDocument, Element, CustomEvent, MouseEvent, Event, IFrameElement, MessageEvent;
 import 'package:codemirror/codemirror.dart' show CodeMirror, Doc, Position;
 export 'package:mdc_web/mdc_web.dart'
-    show
-        MDCRipple,
-        MDCDialog,
-        MDCMenu,
-        AnchorCorner,
-        MDCSnackbar,
-        MDCTabBar,
-        MDCTextField;
+    show MDCRipple, MDCDialog, MDCMenu, AnchorCorner, MDCSnackbar, MDCTabBar, MDCTextField;
 export 'dart:html'
-    show
-        window,
-        document,
-        HtmlDocument,
-        Element,
-        CustomEvent,
-        MouseEvent,
-        Event,
-        IFrameElement,
-        MessageEvent;
+    show window, document, HtmlDocument, Element, CustomEvent, MouseEvent, Event, IFrameElement, MessageEvent;
 export 'package:codemirror/codemirror.dart' show CodeMirror, Doc, Position;
 export '../../adapters/hljs.dart' show highlightAll;
 

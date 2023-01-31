@@ -85,8 +85,7 @@ class AppsBuilder implements Builder {
 
     var mixinName = '_\$${element.name}';
     var usesMixin =
-        (element.node as ClassDeclaration).withClause?.mixinTypes.any((type) => type.name.name == mixinName) ??
-            false;
+        (element.node as ClassDeclaration).withClause?.mixinTypes.any((type) => type.name.name == mixinName) ?? false;
 
     if (!usesMixin) {
       log.warning('Your class ${element.name} must mixin the generated \'$mixinName\' mixin.');

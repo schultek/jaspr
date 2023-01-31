@@ -34,13 +34,13 @@ class ListView extends BaseComponent {
 
   @override
   Styles getStyles() => Styles.combine([
-    Styles.raw({
-      if(markerType != null) 'list-style-type': markerType!.value,
-      if(insideMarkers != null) 'list-style-position': insideMarkers! ? 'inside' : 'outside',
-      if(markerImageUrl != null) 'list-style-image': 'url("$markerImageUrl")',
-    }),
-    if (styles != null) styles!
-  ]);
+        Styles.raw({
+          if (markerType != null) 'list-style-type': markerType!.value,
+          if (insideMarkers != null) 'list-style-position': insideMarkers! ? 'inside' : 'outside',
+          if (markerImageUrl != null) 'list-style-image': 'url("$markerImageUrl")',
+        }),
+        if (styles != null) styles!
+      ]);
 }
 
 class ListItem extends BaseComponent {

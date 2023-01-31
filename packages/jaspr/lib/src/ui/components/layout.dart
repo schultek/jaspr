@@ -1,7 +1,6 @@
 import '../../../jaspr.dart';
 import 'base.dart';
 
-
 class Page extends BaseComponent {
   const Page({
     this.overflow = Overflow.initial,
@@ -13,10 +12,7 @@ class Page extends BaseComponent {
   final Overflow overflow;
 
   @override
-  Styles getStyles() => Styles.combine([
-    Styles.box(overflow: overflow),
-    if (styles != null) styles!
-  ]);
+  Styles getStyles() => Styles.combine([Styles.box(overflow: overflow), if (styles != null) styles!]);
 }
 
 class Center extends BaseComponent {
@@ -27,12 +23,12 @@ class Center extends BaseComponent {
 
   @override
   Styles getStyles() => Styles.combine([
-    Styles.flexbox(
-      justifyContent: JustifyContent.center,
-      alignItems: AlignItems.center,
-    ),
-    if (styles != null) styles!
-  ]);
+        Styles.flexbox(
+          justifyContent: JustifyContent.center,
+          alignItems: AlignItems.center,
+        ),
+        if (styles != null) styles!
+      ]);
 }
 
 class Spacer extends BaseComponent {
@@ -46,11 +42,11 @@ class Spacer extends BaseComponent {
 
   @override
   Styles getStyles() => Styles.combine([
-    Styles.box(
-      width: width,
-      height: height,
-    ),
-  ]);
+        Styles.box(
+          width: width,
+          height: height,
+        ),
+      ]);
 }
 
 class Padding extends BaseComponent {
@@ -63,8 +59,8 @@ class Padding extends BaseComponent {
 
   @override
   Styles getStyles() => Styles.combine([
-    Styles.box(padding: padding),
-  ]);
+        Styles.box(padding: padding),
+      ]);
 }
 
 class Container extends BaseComponent {
@@ -97,22 +93,22 @@ class Container extends BaseComponent {
 
   @override
   Styles getStyles() => Styles.combine([
-    Styles.box(
-      width: width,
-      height: height,
-      padding: padding,
-      margin: margin,
-      overflow: overflow,
-      border: border,
-    ),
-    Styles.background(color: color),
-    if (center)
-      Styles.flexbox(
-        justifyContent: JustifyContent.center,
-        alignItems: AlignItems.center,
-      ),
-    if (styles != null) styles!
-  ]);
+        Styles.box(
+          width: width,
+          height: height,
+          padding: padding,
+          margin: margin,
+          overflow: overflow,
+          border: border,
+        ),
+        Styles.background(color: color),
+        if (center)
+          Styles.flexbox(
+            justifyContent: JustifyContent.center,
+            alignItems: AlignItems.center,
+          ),
+        if (styles != null) styles!
+      ]);
 }
 
 class Column extends BaseComponent {
@@ -122,9 +118,9 @@ class Column extends BaseComponent {
 
   @override
   Styles getStyles() => Styles.combine([
-    Styles.flexbox(direction: FlexDirection.column, wrap: FlexWrap.wrap),
-    if (styles != null) styles!,
-  ]);
+        Styles.flexbox(direction: FlexDirection.column, wrap: FlexWrap.wrap),
+        if (styles != null) styles!,
+      ]);
 }
 
 class Row extends BaseComponent {
@@ -136,18 +132,16 @@ class Row extends BaseComponent {
   final FlexWrap? wrap;
 
   @override
-  Styles getStyles() => Styles.combine([
-    Styles.flexbox(direction: FlexDirection.row, wrap: wrap),
-    if (styles != null) styles!
-  ]);
+  Styles getStyles() =>
+      Styles.combine([Styles.flexbox(direction: FlexDirection.row, wrap: wrap), if (styles != null) styles!]);
 }
 
 class Grid extends BaseComponent {
   const Grid({
-  required this.columns,
-  this.gap,
-  this.spread = false,
-  super.children,
+    required this.columns,
+    this.gap,
+    this.spread = false,
+    super.children,
   }) : super(tag: 'div');
 
   final int columns;
@@ -156,11 +150,11 @@ class Grid extends BaseComponent {
 
   @override
   Styles getStyles() => Styles.combine([
-    Styles.raw({
-      "display": "grid",
-      "grid-template-columns": "repeat($columns, ${spread ? "1fr" : "0fr"})",
-      if (gap != null) "gap": gap!.value,
-    }),
-    if (styles != null) styles!
-  ]);
+        Styles.raw({
+          "display": "grid",
+          "grid-template-columns": "repeat($columns, ${spread ? "1fr" : "0fr"})",
+          if (gap != null) "gap": gap!.value,
+        }),
+        if (styles != null) styles!
+      ]);
 }

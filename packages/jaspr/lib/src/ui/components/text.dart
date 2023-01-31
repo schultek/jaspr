@@ -2,14 +2,14 @@ import '../../../components.dart';
 
 class RichText extends BaseComponent {
   const RichText({
-  super.key,
-  super.id,
-  super.styles,
-  super.classes,
-  super.attributes,
-  super.events,
-  super.child,
-  super.children,
+    super.key,
+    super.id,
+    super.styles,
+    super.classes,
+    super.attributes,
+    super.events,
+    super.child,
+    super.children,
   }) : super(tag: 'p');
 }
 
@@ -20,16 +20,16 @@ class TextSpan extends BaseComponent {
   final bool newLine;
 
   const TextSpan({
-  required this.text,
-  this.rawHtml = false,
-  this.breakLine = false,
-  this.newLine = false,
-  super.key,
-  super.id,
-  super.styles,
-  super.classes,
-  super.attributes,
-  super.events,
+    required this.text,
+    this.rawHtml = false,
+    this.breakLine = false,
+    this.newLine = false,
+    super.key,
+    super.id,
+    super.styles,
+    super.classes,
+    super.attributes,
+    super.events,
   }) : super(tag: 'span');
 
   @override
@@ -61,15 +61,14 @@ class Title extends BaseComponent {
     super.classes,
     super.attributes,
     super.events,
-  }) : _size = size,
-       super(tag: '');
+  })  : _size = size,
+        super(tag: '');
 
   get size {
     if (_size < 1) {
       print('Warning: Title have too low size!');
       return 1;
-    }
-    else if (_size > 6) {
+    } else if (_size > 6) {
       print('Warning: Title have too high size!');
       return 6;
     } else {

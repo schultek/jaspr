@@ -1,4 +1,3 @@
-
 abstract class GridPlacement {
   const factory GridPlacement.area(String name) = _GridPlacement;
 
@@ -6,9 +5,9 @@ abstract class GridPlacement {
 
   const factory GridPlacement(
       {LinePlacement? rowStart,
-        LinePlacement? rowEnd,
-        LinePlacement? columnStart,
-        LinePlacement? columnEnd}) = _LineGridPlacement;
+      LinePlacement? rowEnd,
+      LinePlacement? columnStart,
+      LinePlacement? columnEnd}) = _LineGridPlacement;
 
   Map<String, String> get styles;
 }

@@ -21,7 +21,6 @@ ServerApp runServer(Component app) {
   });
 }
 
-
 /// Returns a shelf handler that serves the provided component and related assets
 Handler serveApp(AppHandler handler) {
   return createHandler((request, render) {

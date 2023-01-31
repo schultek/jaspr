@@ -9,15 +9,13 @@ import 'builders.dart';
 part 'change_notifier_provider/auto_dispose.dart';
 part 'change_notifier_provider/base.dart';
 
-ProviderElementProxy<NotifierT, NotifierT>
-    _notifier<NotifierT extends ChangeNotifier?>(
+ProviderElementProxy<NotifierT, NotifierT> _notifier<NotifierT extends ChangeNotifier?>(
   _ChangeNotifierProviderBase<NotifierT> that,
 ) {
   return ProviderElementProxy<NotifierT, NotifierT>(
     that,
     (element) {
-      return (element as ChangeNotifierProviderElement<NotifierT>)
-          ._notifierNotifier;
+      return (element as ChangeNotifierProviderElement<NotifierT>)._notifierNotifier;
     },
   );
 }
@@ -29,8 +27,7 @@ ProviderElementProxy<NotifierT, NotifierT>
 /// Note: By using Riverpod, [ChangeNotifier] will no longer be O(N^2) for
 /// dispatching notifications, but instead O(N)
 /// {@endtemplate}
-abstract class _ChangeNotifierProviderBase<NotifierT extends ChangeNotifier?>
-    extends ProviderBase<NotifierT> {
+abstract class _ChangeNotifierProviderBase<NotifierT extends ChangeNotifier?> extends ProviderBase<NotifierT> {
   _ChangeNotifierProviderBase({
     required super.name,
     required super.from,

@@ -148,5 +148,4 @@ class SamplesMenuButton extends StatelessComponent with SyncProviderDependencies
       },
     );
   }
-
 }

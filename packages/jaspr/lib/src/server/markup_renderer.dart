@@ -139,7 +139,6 @@ class MarkupDomRenderer extends Renderer {
 
   final _attributeEscape = HtmlEscape(HtmlEscapeMode.attribute);
   final _domValidator = DomValidator();
-
 }
 
 /// DOM validator with sane defaults.

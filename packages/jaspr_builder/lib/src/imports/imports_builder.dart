@@ -5,7 +5,6 @@ import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
 
-
 import '../utils.dart';
 
 var path = p.posix;
@@ -37,7 +36,9 @@ class ImportsOutputBuilder implements Builder {
       var outputDir = 'lib/generated/imports';
       var relativeDir = path.relative(outputDir, from: path.dirname(buildStep.inputId.path));
 
-      await buildStep.writeAsString(outputId, DartFormatter().format("""
+      await buildStep.writeAsString(
+          outputId,
+          DartFormatter().format("""
         $generationHeader
         
         ${webShow.isNotEmpty ? """
@@ -60,7 +61,6 @@ class ImportsOutputBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-    '.imports.json': ['.imports.dart']
-  };
+        '.imports.json': ['.imports.dart']
+      };
 }
-

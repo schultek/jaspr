@@ -59,7 +59,6 @@ class ServerTester {
   http.Client? _client;
 
   Future<void> _start(Component comp, bool virtual, List<Middleware>? middleware) async {
-
     fileHandler(Request request) {
       return Response.notFound('Not Found');
     }

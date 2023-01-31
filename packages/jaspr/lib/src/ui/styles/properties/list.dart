@@ -1,4 +1,3 @@
-
 enum ListStyleType {
   circle('circle'),
   disc('disc'),

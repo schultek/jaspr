@@ -76,8 +76,6 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
         .then((data) => jsonDecode(data));
   }
 
-
-
   @override
   void scheduleFrame(VoidCallback frameCallback) {
     // This seems to give the best results over futures and microtasks

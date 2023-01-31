@@ -11,7 +11,8 @@ import 'package:shelf_static/shelf_static.dart';
 import '../../server.dart';
 import 'server_renderer.dart';
 
-final String kDevProxy = String.fromEnvironment('jaspr.dev.proxy', defaultValue: Platform.environment['jaspr_dev_proxy'] ?? '');
+final String kDevProxy =
+    String.fromEnvironment('jaspr.dev.proxy', defaultValue: Platform.environment['jaspr_dev_proxy'] ?? '');
 const bool kDevHotreload = bool.fromEnvironment('jaspr.dev.hotreload');
 
 /// A [Handler] that can be refreshed to update any used resources

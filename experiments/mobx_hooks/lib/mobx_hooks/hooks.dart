@@ -1,8 +1,6 @@
 import 'package:async/async.dart' show Result;
-import 'package:mobx/mobx.dart'
-    show Computed, Reaction, ReactiveContext, autorun;
-import 'mobx_hooks.dart'
-    show HookCtx, KeysEquals, defaultKeysEquals, useEffect, useObs, useRef;
+import 'package:mobx/mobx.dart' show Computed, Reaction, ReactiveContext, autorun;
+import 'mobx_hooks.dart' show HookCtx, KeysEquals, defaultKeysEquals, useEffect, useObs, useRef;
 
 /// Memoizes (caches) the value returned by [valueFactory]
 /// as long as [keys] are the same.
@@ -13,8 +11,7 @@ T useMemo<T>(
 ]) {
   final prevKeys = usePrevious(keys);
   final ref = useRef(valueFactory);
-  if (prevKeys != null &&
-      HookCtx.areKeysDifferent(prevKeys, keys, keysEquals)) {
+  if (prevKeys != null && HookCtx.areKeysDifferent(prevKeys, keys, keysEquals)) {
     ref.value = valueFactory();
   }
   return ref.value;

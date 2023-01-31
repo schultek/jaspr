@@ -20,7 +20,6 @@ final counterProvider = StateProvider<int>((ref) {
 });
 
 class Counter extends StatelessComponent with SyncProviderDependencies {
-
   /// Specify which SyncProviders to preload before executing build().
   ///
   /// This makes sure that the value of the specified providers is directly

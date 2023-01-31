@@ -91,21 +91,24 @@ class SyncProviderElement<T> extends ProviderElementBase<AsyncValue<T>>
 }
 
 /// The [Family] of a [SyncProvider]
-class SyncProviderFamily<R, Arg> extends FamilyBase<SyncProviderRef<R>,
-    AsyncValue<R>, Arg, FutureOr<R>, SyncProvider<R>> {
+class SyncProviderFamily<R, Arg>
+    extends FamilyBase<SyncProviderRef<R>, AsyncValue<R>, Arg, FutureOr<R>, SyncProvider<R>> {
   /// The [Family] of a [SyncProvider]
   SyncProviderFamily(
     super.create, {
     required this.id,
     super.name,
     super.dependencies,
-  }) : super(providerFactory: (
-      Create<FutureOr<R>, SyncProviderRef<R>> create, {
-        String? name,
-        Family? from,
-        Object? argument,
-        List<ProviderOrFamily>? dependencies,
-      }) => SyncProvider<R>(create, id: id, name: name, from: from, argument: argument, dependencies: dependencies));
+  }) : super(
+            providerFactory: (
+          Create<FutureOr<R>, SyncProviderRef<R>> create, {
+          String? name,
+          Family? from,
+          Object? argument,
+          List<ProviderOrFamily>? dependencies,
+        }) =>
+                SyncProvider<R>(create,
+                    id: id, name: name, from: from, argument: argument, dependencies: dependencies));
 
   final String id;
 }
@@ -117,11 +120,11 @@ class SyncProviderFamilyBuilder {
 
   /// {@macro riverpod.family}
   SyncProviderFamily<State, Arg> call<State, Arg>(
-      FamilyCreate<FutureOr<State>, SyncProviderRef<State>, Arg> create, {
-        required String id,
-        String? name,
-        List<ProviderOrFamily>? dependencies,
-      }) {
+    FamilyCreate<FutureOr<State>, SyncProviderRef<State>, Arg> create, {
+    required String id,
+    String? name,
+    List<ProviderOrFamily>? dependencies,
+  }) {
     return SyncProviderFamily<State, Arg>(
       create,
       id: id,

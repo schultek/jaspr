@@ -1,4 +1,3 @@
-
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
@@ -13,4 +12,3 @@ class App extends StatelessComponent with _$App {
     yield ProviderScope(child: Counter());
   }
 }
-
