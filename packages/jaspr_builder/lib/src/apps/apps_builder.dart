@@ -58,7 +58,7 @@ class AppsBuilder implements Builder {
       log.warning("Cannot have multiple components annotated with $usedAnnotation in a single library.");
     }
 
-    var part = path.url.basenameWithoutExtension(buildStep.inputId.path) + '.g.dart';
+    var part = '${path.url.basenameWithoutExtension(buildStep.inputId.path)}.g.dart';
 
     final libraryUnit = await buildStep.resolver.compilationUnitFor(buildStep.inputId);
     final hasPartDirective = libraryUnit.directives.whereType<PartDirective>().any((e) => e.uri.stringValue == part);
