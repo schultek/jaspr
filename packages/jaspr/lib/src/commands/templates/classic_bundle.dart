@@ -20,13 +20,13 @@ final classicBundle = MasonBundle.fromJson(<String, dynamic>{
     {
       "path": "lib/app.dart",
       "data":
-          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2phc3ByLmRhcnQnOwoKY2xhc3MgQXBwIGV4dGVuZHMgU3RhdGVsZXNzQ29tcG9uZW50IHsKICBAb3ZlcnJpZGUKICBJdGVyYWJsZTxDb21wb25lbnQ+IGJ1aWxkKEJ1aWxkQ29udGV4dCBjb250ZXh0KSBzeW5jKiB7CiAgICB5aWVsZCBEb21Db21wb25lbnQoCiAgICAgIHRhZzogJ3AnLAogICAgICBjaGlsZDogVGV4dCgnSGVsbG8gV29ybGQnKSwKICAgICk7CiAgfQp9",
+          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2phc3ByLmRhcnQnOwoKY2xhc3MgQXBwIGV4dGVuZHMgU3RhdGVsZXNzQ29tcG9uZW50IHsKICBAb3ZlcnJpZGUKICBJdGVyYWJsZTxDb21wb25lbnQ+IGJ1aWxkKEJ1aWxkQ29udGV4dCBjb250ZXh0KSBzeW5jKiB7CiAgICB5aWVsZCBEb21Db21wb25lbnQoCiAgICAgIHRhZzogJ3AnLAogICAgICBjaGlsZDogVGV4dCgnSGVsbG8gV29ybGQnKSwKICAgICk7CiAgfQp9Cg==",
       "type": "text"
     },
     {
       "path": "lib/main.dart",
       "data":
-          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL3NlcnZlci5kYXJ0JzsKaW1wb3J0ICcuL2FwcC5kYXJ0JzsKCnZvaWQgbWFpbigpIHsKICBydW5BcHAoRG9jdW1lbnQuZmlsZSgKICAgIG5hbWU6ICdpbmRleC5odG1sJywKICAgIGF0dGFjaFRvOiAnYm9keScsCiAgICBjaGlsZDogQXBwKCksCiAgKSk7Cn0=",
+          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL3NlcnZlci5kYXJ0JzsKaW1wb3J0ICcuL2FwcC5kYXJ0JzsKCnZvaWQgbWFpbigpIHsKICBydW5BcHAoRG9jdW1lbnQuZmlsZSgKICAgIG5hbWU6ICdpbmRleC5odG1sJywKICAgIGF0dGFjaFRvOiAnYm9keScsCiAgICBjaGlsZDogQXBwKCksCiAgKSk7Cn0K",
       "type": "text"
     },
     {
@@ -50,7 +50,7 @@ final classicBundle = MasonBundle.fromJson(<String, dynamic>{
     {
       "path": "web/main.dart",
       "data":
-          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2Jyb3dzZXIuZGFydCc7CmltcG9ydCAncGFja2FnZTp7e25hbWV9fS9hcHAuZGFydCc7Cgp2b2lkIG1haW4oKSB7CiAgcnVuQXBwKEFwcCgpKTsKfQ==",
+          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2Jyb3dzZXIuZGFydCc7CmltcG9ydCAncGFja2FnZTp7e25hbWV9fS9hcHAuZGFydCc7Cgp2b2lkIG1haW4oKSB7CiAgcnVuQXBwKEFwcCgpKTsKfQo=",
       "type": "text"
     },
     {
