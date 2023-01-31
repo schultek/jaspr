@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:html' as html;
 
-import 'package:domino/browser.dart' show registerView;
-import 'package:jaspr/jaspr_browser.dart';
+import 'package:jaspr/browser.dart';
 
 import '../../jaspr_test.dart';
 
+/// Tests any jaspr app in a headless browser environment.
 class BrowserTester {
   BrowserTester._(this.binding, this._attachTo);
 
@@ -18,15 +18,11 @@ class BrowserTester {
     Map<String, dynamic>? initialStateData,
     Map<String, dynamic> Function(String url)? onFetchState,
   }) {
-    if (initialStateData != null) {
-      html.document.body!.attributes['state-data'] = stateCodec.encode(initialStateData);
-    }
-
     if (html.window.location.pathname != location) {
       html.window.history.replaceState(null, 'Test', location);
     }
 
-    var binding = TestBrowserComponentsBinding(onFetchState);
+    var binding = TestBrowserComponentsBinding(onFetchState, initialStateData);
     return BrowserTester._(binding, attachTo);
   }
 
@@ -46,7 +42,7 @@ class BrowserTester {
   void dispatchEvent(Finder finder, String event, dynamic data) {
     var element = _findDomElement(finder);
 
-    var source = element.source as html.Element;
+    var source = element.nativeElement!;
     source.dispatchEvent(html.MouseEvent('click'));
   }
 
@@ -87,14 +83,15 @@ class BrowserTester {
 }
 
 class TestBrowserComponentsBinding extends AppBinding {
-  TestBrowserComponentsBinding(this._onFetchState);
+  TestBrowserComponentsBinding(this._onFetchState, this._initialSyncState);
+
+  final Map<String, dynamic>? _initialSyncState;
+  final Map<String, dynamic> Function(String url)? _onFetchState;
 
   @override
-  void didAttachRootElement(BuildScheduler element, {required String to}) {
-    element.view = registerView(root: html.document.querySelector(to)!, builderFn: element.render);
+  Map<String, dynamic>? loadSyncState() {
+    return _initialSyncState;
   }
-
-  final Map<String, dynamic> Function(String url)? _onFetchState;
 
   @override
   Future<Map<String, dynamic>> fetchState(String url) async {

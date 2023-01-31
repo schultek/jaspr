@@ -19,7 +19,7 @@ class ServeCommand extends BaseCommand {
         'reload': 'Reloads js modules without server reload (loses current state)',
         'refresh': 'Performs a full page refresh and server reload',
       },
-      defaultsTo: 'reload',
+      defaultsTo: 'refresh',
     );
     argParser.addOption(
       'port',
@@ -28,11 +28,28 @@ class ServeCommand extends BaseCommand {
       defaultsTo: '8080',
     );
     argParser.addFlag(
+      'ssr',
+      defaultsTo: true,
+      help: 'Optionally disables server-side rendering and runs as a pure client-side app.',
+    );
+    argParser.addFlag(
       'debug',
       abbr: 'd',
       help: 'Serves the app in debug mode.',
+      negatable: false,
     );
-    argParser.addFlag('verbose', abbr: 'v', help: 'Enable verbose logging.');
+    argParser.addFlag(
+      'release',
+      abbr: 'r',
+      help: 'Serves the app in release mode.',
+      negatable: false,
+    );
+    argParser.addFlag(
+      'verbose',
+      abbr: 'v',
+      help: 'Enable verbose logging.',
+      negatable: false,
+    );
   }
 
   @override
@@ -46,15 +63,28 @@ class ServeCommand extends BaseCommand {
   Future<void> run() async {
     await super.run();
 
+    var useSSR = argResults!['ssr'] as bool;
+    var debug = argResults!['debug'] as bool;
+    var release = argResults!['release'] as bool;
+
     var webProcess = await runWebdev([
       'serve',
       '--auto=${argResults!['mode'] == 'reload' ? 'restart' : 'refresh'}',
-      'web:5467',
+      'web:${useSSR ? '5467' : argResults!['port']}',
+      if (release) '--release',
       '--',
-      '--delete-conflicting-outputs'
+      '--delete-conflicting-outputs',
+      if (!release)
+        '--define=build_web_compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
+      else
+        '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
     ]);
 
-    print("Starting jaspr development server...");
+    if (!useSSR) {
+      return watchProcess(webProcess);
+    }
+
+    print("Starting jaspr development server in ${release ? 'release' : 'debug'} mode...");
 
     var buildCompleted = StreamController<int>.broadcast();
     var build = 0;
@@ -81,13 +111,17 @@ class ServeCommand extends BaseCommand {
 
     var args = [
       'run',
-      '--enable-vm-service',
-      '--enable-asserts',
-      '-Djaspr.debug=true',
-      '-Djaspr.hotreload=true',
+      if (!release) ...[
+        '--enable-vm-service',
+        '--enable-asserts',
+        '-Djaspr.dev.hotreload=true',
+      ] else
+        '-Djaspr.flags.release=true',
+      '-Djaspr.dev.proxy=5467',
+      '-Djaspr.flags.verbose=$debug',
     ];
 
-    if (argResults!['debug']) {
+    if (debug) {
       args.add('--pause-isolates-on-start');
     }
 

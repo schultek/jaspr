@@ -1,0 +1,251 @@
+---
+title: Jaspr Styling
+description: How to do styling in jaspr.
+previous: /core/html
+next: /core/ssr
+---
+
+# 🎨 Styling
+
+Jaspr gives you a strongly-types styles system that wraps the most common css properties. You can
+access these various properties through the `Styles` class that is exported by the core package.
+
+To pass style attributes to an html component, construct a `Styles` object and pass it as the `styles` 
+attribute like this:
+
+```dart
+DomComponent(
+  tag: 'div',
+  styles: const Styles.background(color: Colors.red),
+);
+```
+
+This will render as:
+
+```html
+<div style="background: red"></div>
+```
+
+<Info>
+Generally it is recommended to make styles **constant** wherever you can. This can improve performance 
+and reduce the bundle-size of your application.
+</Info>
+
+## Style Groups
+
+Css properties are grouped semantically into *style groups* that can be accessed through the `Styles` class as shown above.
+For example, the `background` group gives you the set of css properties related to the background style, like color, position or size.
+
+Currently the following groups exist:
+
+<Tabs defaultValue="background" values={[
+        {label: 'Background', value: 'background'},
+        {label: 'Text', value: 'text'},
+        {label: 'Box', value: 'box'},
+        {label: 'FlexBox', value: 'flexbox'},
+        {label: 'FlexItem', value: 'flexItem'},
+        {label: 'Grid', value: 'grid'},
+        {label: 'GridItem', value: 'gridItem'}
+    ]}
+>
+ <TabItem value="background">
+    Groups various css properties related to styling the background of an element.
+
+    ```dart
+    const Styles.background({
+      Color? color,
+      BackgroundAttachment attachment,
+      BackgroundClip? clip,
+      ImageStyle? image,
+      BackgroundOrigin? origin,
+      BackgroundPosition? position,
+      BackgroundRepeat? repeat,
+      BackgroundSize? size,
+    })
+    ```
+</TabItem>
+<TabItem value="text">
+    Groups various css properties related to styling text.
+    
+    ```dart
+    const Styles.text({
+      Color? color,
+      TextAlign? align,
+      FontFamily? fontFamily,
+      FontStyle? fontStyle,
+      Unit? fontSize,
+      FontWeight? fontWeight,
+      TextDecoration? decoration,
+      TextTransform? transform,
+      Unit? indent,
+      Unit? letterSpacing,
+      Unit? wordSpacing,
+      Unit? lineHeight,
+      TextShadow? shadow,
+      TextOverflow? overflow,
+    })
+    ```
+</TabItem>
+<TabItem value="box">
+    
+Groups various css properties related to the css box model.
+
+```dart
+const Styles.box({
+  EdgeInsets? padding,
+  EdgeInsets? margin,
+  Display? display,
+  BoxSizing? boxSizing,
+  Unit? width,
+  Unit? height,
+  BoxConstraints? constraints,
+  Border? border,
+  BorderRadius? radius,
+  Outline? outline,
+  Overflow? overflow,
+  Visibility? visibility, 
+  Position? position,
+  double? opacity,
+  Transform? transform,
+  BoxShadow? shadow,
+  Cursor? cursor,
+  Transition? transition,
+})
+```
+
+</TabItem>
+<TabItem value="flexbox">
+
+Groups various css properties related to the flexbox layout system.
+
+```dart
+const Styles.flexbox({
+  FlexDirection? direction,
+  FlexWrap? wrap,
+  JustifyContent? justifyContent,
+  AlignItems? alignItems,
+})
+```
+
+</TabItem>
+<TabItem value="flexItem">
+
+Groups various css properties that can be applied to a direct child of a flexbox parent.
+
+```dart
+const Styles.flexItem({
+  Flex? flex,
+  int? order,
+  AlignSelf? alignSelf,
+})
+```
+
+</TabItem>
+<TabItem value="grid">
+
+Groups various css properties related to the grid layout system.
+
+```dart
+const Styles.grid({
+  GridTemplate? template,
+  GridGap? gap,
+  List<TrackSize>? autoRows,
+  List<TrackSize>? autoColumns,
+})
+```
+
+</TabItem>
+<TabItem value="gridItem">
+
+Groups various css properties that can be applied to a direct child of a grid parent.
+
+```dart
+const Styles.gridItem({
+  GridPlacement? placement,
+})
+```
+
+</TabItem>
+</Tabs>
+
+### Raw Styles
+
+If you want to work with raw CSS properties or need to use a property that is not supported by the 
+current style groups, use the `Styles.raw()` method and provide a map of
+properties and values:
+
+```dart
+const myStyle = Styles.raw({
+  'color': 'blue',
+  'some_advanced_css_property': 'special_value',
+});
+```
+
+### Combining Styles
+
+When you want to combine styles from multiple groups, use the `Styles.combine()` method:
+
+```dart
+const myStyle = Styles.combine([
+  Styles.text(color: Colors.red),
+  Styles.background(color: Colors.blue),
+]);
+```
+
+You can also store styles in variables and mix'n'match:
+
+```dart
+const redText = Styles.text(color: Colors.red);
+
+const redBlueTest = Styles.combine([
+  redText,
+  Styles.background(color: Colors.blue),
+]);
+
+const redGreenTest = Styles.combine([
+  redText,
+  Styles.background(color: Colors.green),
+]);
+```
+
+## Style Component
+
+The `Styles` class is great for defining a single set of css properties e.g. to be used as 
+**inline styles** for a single html element or `DomComponent`.
+
+To define a stylesheet with a set of style rules use the `Style` (without *s*) component.
+
+```dart
+Style(rules: [
+    StyleRule(
+        selector: const Selector.id('content'),
+        styles: Styles.box(
+            width: 100.percent,
+            height: 100.percent,
+        ),
+    ),
+    StyleRule(
+        selector: const Selector.dot('red-text'),
+        styles: Styles.text(
+            color: Colors.red,
+        ),
+    ),
+]);
+```
+
+will render as:
+
+```html
+<style>
+  #content {
+    width: 100%;
+    height: 100%;
+  }
+    
+  .red-text {
+    color: red;
+  }
+</style>
+```
+
+

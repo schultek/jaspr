@@ -1,52 +1,67 @@
 # 🌊 Riverpod for Jaspr
 
+Jaspr comes with a Riverpod package that ports over flutter_riverpod to Jaspr. It is based
+on Riverpod 2 and supports all providers and modifiers.
+
 **TLDR: Differences to flutter_riverpod**
 
-- No ConsumerComponent, just use `context.read` / `context.watch`
-- Additional `.onSync()` and `.onPreload()` available on a providers `ref`.
+- No `Consumer` / `ConsumerComponent`, just use `context.read` / `context.watch`
+- Additional `SyncProvider` to sync values between server and client.
 
-## 👀 Reading and Watching Providers
+> Also check out [this example](https://github.com/schultek/jaspr/tree/main/examples/riverpod_app).
 
-`jaspr_riverpod` does not have `ConsumerWidget`, `StatefulConsumerWidget` or `Consumer`. This is
-because `jaspr_riverpod` relies on the `BuildContext` to read or watch providers instead of 
-requiring a separate `WidgetRef` instance.
+## 🪄 Accessing Providers
 
-You can simply read and watch a provider like this:
+While it has feature-parity for defining `Provider`s, it comes with some quality-of-life improvements
+on the `Consumer` side. Mainly:
+
+**It does not have `Comsumer`, `ComsumerWidget` or `StatefulConsumerWidget`.** This is because it
+does not rely on `WidgetRef` to access providers but instead comes with **context extensions** on the
+`BuildContext` of **any** component.
+
+As an example, this (in Flutter):
 
 ```dart
-final countProvider = StateProvider((ref) => 0);
-
-class Counter extends StatelessComponent {
-  Iterable<Component> build(BuildContext context) sync* {
-    var value = context.watch(countProvider);
-    
-    yield Text('Value is $value');
-    yield DomComponent(
-      tag: 'button',
-      events: {'click': (e) => context.read(countProvider.notifier).state++},
-      child: Text('Increase'),
-    );
+// (Flutter)
+// need to extend custom ConsumerWidget
+class MyWidget extends ConsumerWidget {
+  // need to accept custom WidgetRef
+  Widget build(BuildContext context, WidgetRef ref) {
+    // uses ref to access providers
+    var value = ref.watch(myProvider);
+    return Text(value);
   }
 }
 ```
 
-**Why context extensions instead of ConsumerComponent?**
+is equivalent to this (in Jaspr)
 
-`context.watch` is not feasible in `flutter_riverpod` as explained here:
-[github.com/rrousselGit/riverpod/issues/134](https://github.com/rrousselGit/riverpod/issues/134#issuecomment-832600716)
+```dart 
+// (Jaspr)
+// just extends the normal component
+class MyComponent extends StatelessComponent {
+  // no extra parameter
+  Iterable<Component> build(BuildContext context) sync* {
+    // uses context to access providers
+    var value = context.watch(myProvider);
+    yield Text(value);
+  }
+}
+```
 
-There are long standing bugs (or missing features depending on how you view it) in flutter
-with `InheritedWidget` that make it impossible for `context.watch` to work properly (Mainly
-here: [github.com/flutter/flutter/issues/62861](https://github.com/flutter/flutter/issues/62861)).
+The extension on `BuildContext` supports all the normal methods from `WidgetRef``
 
-As `jaspr` is basically a complete rewrite of flutters core framework, I went ahead and fixed
-these bugs and thereby making `context.watch` feasible again.
+- `context.read()`,
+- `context.watch()`,
+- `context.refresh()`,
+- `context.invalidate()`,
+- `context.listen()`
 
-**Replacement for Consumer**
+#### Replacement for Consumer
 
-Same as with ConsumerComponent, we don't need the Consumer anymore. If you want only parts of your
+Same as with `ConsumerComponent`, we don't need the `Consumer` anymore. If you want only parts of your
 component tree to rebuild when watching a provider, simply use the `Builder` component. This will
-give you a new context on which you can call `context.watch`:
+give you a new context which you can call `context.watch` on:
 
 ```dart
 Builder(
@@ -59,41 +74,40 @@ Builder(
 
 ## ♻️ Preloading and Syncing Provider State
 
-Jaspr allows `StatefulComponent`s to preload state as well as sync state between server and client 
+Jaspr allows `StatefulComponent`s to preload state as well as sync state between server and client
 (when using server-side rendering).
 
 Since providers often are used to replace `StatefulComponent`s, `jaspr_riverpod` offers the same
-mechanisms inside a provider, using the `ref.onPreload()` and `ref.onSync()` methods:
-
-Preload state like this:
+mechanisms inside a special provider, called `SyncProvider`:
 
 ```dart
-final myProvider = Provider<int>((ref) {
-  
-  ref.onPreload(() async {
-    // do some async work on the server
-    ref.state = 100;
-  });
-
-  return 0;
-});
+final mySyncProvider = SyncProvider<int>((ref) async {
+  // do some async work on the server, like fetching data from a database
+  await Future.delayed(Duration(seconds: 1));
+  return 100;
+}, id: 'initial_count');
 ```
 
-Sync state like this:
+This provider needs an additional id to be synced with the client.
+The create function of a `SyncProvider` is only executed on the server, and
+never on the client. Instead the synced value is returned.
 
-```dart
-final myProvider = Provider<int>((ref) {
-  
-  ref.onSync<int>(
-    id: 'my-provider-id',
-    onUpdate: (int? value) {
-      ref.state = value ?? ref.state;
-    },
-    onSave: () {
-      return ref.state;
-    },
-  );
+It then can be used like any other provider. It functions like a `FutureProvider` and exposes a
+value of type `AsyncValue<T>`.
 
-  return 0;
-});
-```
+## 📜 Backstory: Why context extensions instead of Consumer?
+
+Put simply: Because they are easier and more flexible to use and require less boilerplate.
+
+The actual question would be why they are not part of flutter_riverpod in the first place.
+This is because mainly `context.watch` is [not feasible in `flutter_riverpod`](https://github.com/rrousselGit/riverpod/issues/134).
+
+This is a limitation by Flutter itself, not Riverpod. There are [long standing bugs](https://github.com/flutter/flutter/issues/62861)
+(or [missing features](https://github.com/flutter/flutter/issues/12992) depending on how you view it)
+in flutter with `InheritedWidget` that make it impossible for `context.watch` to work properly.
+Recently there have been [efforts](https://github.com/flutter/flutter/issues/106549) by the creator
+of riverpod to [fix](https://github.com/flutter/flutter/issues/106546) these bugs,
+but [without success](https://github.com/flutter/flutter/pull/107112).
+
+As `jaspr` is basically a complete rewrite of flutters core framework, I went ahead and fixed
+these bugs and thereby making `context.watch` feasible.

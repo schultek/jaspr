@@ -63,19 +63,20 @@ abstract class BaseCommand extends Command<void> {
 
   Future<String?> getEntryPoint(String? input) async {
     var entryPoints = [input, 'lib/main.dart', 'web/main.dart'];
-    String? entryPoint;
 
     for (var path in entryPoints) {
       if (path == null) continue;
-      if (await File(path).exists()) {
-        entryPoint = path;
-        break;
+      var genPath = path.replaceFirst('.dart', '.g.dart');
+      if (await File(genPath).exists()) {
+        return genPath;
+      } else if (await File(path).exists()) {
+        return path;
       } else if (path == input) {
         return null;
       }
     }
 
-    return entryPoint;
+    return null;
   }
 
   Future<void> watchProcess(

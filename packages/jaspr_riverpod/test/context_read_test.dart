@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/components.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
@@ -32,7 +32,7 @@ void main() {
         await tester.pumpComponent(providerApp((context) sync* {
           yield Text('a ${context.read(counter)}');
           yield ProviderScope(
-            overrides: [counter.overrideWithValue(StateController(1))],
+            overrides: [counter.overrideWith((ref) => 1)],
             child: Builder(builder: (context) sync* {
               yield Text('b ${context.read(counter)}');
             }),

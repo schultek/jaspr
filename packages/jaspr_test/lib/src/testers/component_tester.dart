@@ -1,20 +1,21 @@
 import 'dart:async';
 
-import 'package:html/dom.dart' as dom;
-import 'package:html/parser.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../../jaspr_test.dart';
-import '../dom_tester.dart';
 
+/// Tests any jaspr component in a simulated testing environment.
+///
+/// Unit-test components using the [pumpComponent] method and
+/// simulate dom events using the [click] method.
 class ComponentTester {
   ComponentTester._(this.binding);
 
   final TestComponentsBinding binding;
 
-  static ComponentTester setUp({String? html, String attachTo = 'body', Uri? currentUri, bool isClient = false}) {
+  static ComponentTester setUp({Uri? currentUri, bool isClient = false}) {
     tearDown();
-    var binding = TestComponentsBinding(html, attachTo, currentUri, isClient);
+    var binding = TestComponentsBinding(currentUri, isClient);
     return ComponentTester._(binding);
   }
 
@@ -25,9 +26,11 @@ class ComponentTester {
   }
 
   Future<void> pumpComponent(Component component) {
-    return binding.attachRootComponent(component, attachTo: binding._attachTo);
+    return binding.attachRootComponent(component, attachTo: 'body');
   }
 
+  /// Simulates a 'click' event on the given element
+  /// and pumps the next frame.
   Future<void> click(Finder finder, {bool pump = true}) async {
     dispatchEvent(finder, 'click', null);
     if (pump) {
@@ -39,13 +42,10 @@ class ComponentTester {
     await pumpEventQueue();
   }
 
+  /// Simulates [event] on the given element.
   void dispatchEvent(Finder finder, String event, dynamic data) {
     var element = _findDomElement(finder);
-
-    var source = element.source as dom.Element;
-    var data = source.getData();
-
-    data?.events?[event]?.dispatch(data);
+    element.testData.events?[event]?.call(data);
   }
 
   DomElement _findDomElement(Finder finder) {
@@ -84,13 +84,10 @@ class ComponentTester {
   }
 }
 
-class TestComponentsBinding extends BindingBase with ComponentsBinding, SyncBinding, SchedulerBinding {
+class TestComponentsBinding extends BindingBase with SchedulerBinding, ComponentsBinding, SyncBinding {
   static TestComponentsBinding get instance => ComponentsBinding.instance as TestComponentsBinding;
 
-  TestComponentsBinding(this._html, this._attachTo, this._currentUri, this._isClient);
-
-  final String? _html;
-  final String _attachTo;
+  TestComponentsBinding(this._currentUri, this._isClient);
 
   final Uri? _currentUri;
   @override
@@ -100,23 +97,15 @@ class TestComponentsBinding extends BindingBase with ComponentsBinding, SyncBind
   @override
   bool get isClient => _isClient;
 
-  late dom.Document _document;
+  RenderElement? get rootElement => rootElements['body'];
 
   @override
-  void didAttachRootElement(BuildScheduler element, {required String to}) async {
-    _document = parse(_html ?? '<html><head></head><body></body></html>');
-    element.view = registerView(_document.querySelector(to)!, element.render, true);
+  Renderer attachRenderer(String target, {int? from, int? to}) {
+    return TestDomRenderer();
   }
 
   @override
-  DomView registerView(dom.Element root, DomBuilderFn builderFn, bool initialRender) {
-    return registerTestView(
-      document: _document,
-      root: root,
-      builderFn: builderFn,
-      skipInitialUpdate: !initialRender,
-    );
-  }
+  void didAttachRootElement(Element element, {required String to}) {}
 
   @override
   Future<Map<String, String>> fetchState(String url) {
@@ -132,7 +121,75 @@ class TestComponentsBinding extends BindingBase with ComponentsBinding, SyncBind
   void updateRawState(String id, dynamic state) {}
 
   @override
-  void scheduleBuild() {
-    Future(buildOwner.performBuild);
+  void scheduleFrame(VoidCallback frameCallback) {
+    Future.microtask(frameCallback);
+  }
+}
+
+class DomNodeData {
+  String? tag;
+  String? id;
+  List<String>? classes;
+  Map<String, String>? styles;
+  Map<String, String>? attributes;
+  Map<String, EventCallback>? events;
+  String? text;
+  bool? rawHtml;
+  List<RenderElement> children = [];
+}
+
+extension TestDomNodeData on RenderElement {
+  DomNodeData get testData => getData() ?? setData(DomNodeData());
+}
+
+class TestDomRenderer extends Renderer {
+  RenderElement? root;
+
+  @override
+  void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+      Map<String, String>? attributes, Map<String, EventCallback>? events) {
+    element.testData
+      ..tag = tag
+      ..id = id
+      ..classes = classes
+      ..styles = styles
+      ..attributes = attributes
+      ..events = events;
+  }
+
+  @override
+  void renderTextNode(RenderElement element, String text, [bool rawHtml = false]) {
+    element.testData
+      ..text = text
+      ..rawHtml = rawHtml;
+  }
+
+  @override
+  void attachNode(RenderElement? parent, RenderElement child, RenderElement? after) {
+    if (parent == null) {
+      root = child;
+      return;
+    }
+    var children = parent.testData.children;
+    children.remove(child);
+    if (after == null) {
+      children.insert(0, child);
+    } else {
+      var index = children.indexOf(after);
+      children.insert(index + 1, child);
+    }
+  }
+
+  @override
+  void finalizeNode(RenderElement element) {}
+
+  @override
+  void removeChild(RenderElement parent, RenderElement child) {
+    parent.testData.children.remove(child);
+  }
+
+  @override
+  void skipContent(RenderElement element) {
+    // noop
   }
 }

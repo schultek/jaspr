@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'package:jaspr_test/jaspr_test.dart';
 
 import '../../utils/test_component.dart';

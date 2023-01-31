@@ -1,0 +1,70 @@
+---
+title: Islands Architecture
+description: How to use the islands architecture in Jaspr.
+previous: /core/routing
+next: /advanced/backend
+---
+
+# 🏝 Islands Architecture
+
+When running jaspr on the client, the Dart source code of your app will be compiled to javascript
+and shipped to the browser. This javascript bundle might get quite large for a more complex app or website.
+
+When you are building a more content-heavy or mostly static website (static meaning without much user interaction)
+you probably don't need to ship your whole app structure to the client, but rather only relevant parts of your
+app - so called **Islands** - to allow certain parts to be interactive.
+
+<Info>
+The 'Islands Architecture' pattern became popular again with recent web development trends.
+Islands are interactive parts of the page, that can be loaded and hydrated separately from each other.
+</Info>
+
+You can read more about this architecture pattern at these resources:
+- [patterns.dev/posts/islands-architecture](https://www.patterns.dev/posts/islands-architecture/)
+- [jasonformat.com/islands-architecture](https://jasonformat.com/islands-architecture/)
+
+## Getting Started
+
+For an easy start, use the `islands' template when creating a new jaspr project.
+
+```shell
+jaspr create -t islands my_app
+```
+
+This will use a combination of the `Document.islands` constructor and the `@island` component 
+annotation for an easy automated setup of the islands architecture.
+
+## Manual setup
+
+If you choose not to use the recommended approach using the `@island` annotation or want to build a 
+purely client-side app, you can also set this up manually.
+
+In general, jaspr supports this architecture by allowing **multiple parallel apps** on the client.
+For example in your `web/main.dart` you can do this:
+
+```dart
+void main() {
+  runApp(Header(), attachTo: '#header');
+  runApp(Sidebar(), attachTo: '#sidebar');
+  runApp(Content(), attachTo: '#content');
+}
+```
+
+This will run three apps simultaneously, attached to the specified root elements.
+This example might expect a page layout like this:
+
+```html
+<body>
+  <div id="header"></div>
+  <div>
+    <div id="content"></div>
+    <div id="sidebar"></div>
+  </div>
+</body>
+```
+
+The advantage of this approach is that you can leave other parts of your app, e.g. a static footer,
+out of the bundled javascript and thereby reducing loading and startup time.
+
+**Be aware** that on the server, you must still construct the complete app layout and and render the
+targeted island components manually at the right location.

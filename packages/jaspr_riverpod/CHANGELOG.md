@@ -1,3 +1,8 @@
-## 0.1.0-dev.1
+## 0.2.0
 
-- Initial version.
+- Update riverpod to `v2.1.3`
+- Update jaspr to `v0.2.0`
+
+## 0.1.0
+
+- Initial release with `riverpod: 2.0.2`

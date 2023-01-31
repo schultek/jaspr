@@ -8,20 +8,19 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:domino/domino.dart';
 import 'package:meta/meta.dart';
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
-
-export 'package:domino/domino.dart'
-    show DomBuilder, DomEvent, DomEventFn, DomLifecycleEvent, DomLifecycleEventFn, DomView, DomBuilderFn;
+import '../ui/styles/styles.dart';
 
 part 'build_context.dart';
 part 'build_owner.dart';
 part 'components_binding.dart';
+part 'render_element.dart';
+part 'render_scope.dart';
 part 'dom_component.dart';
 part 'inactive_elements.dart';
 part 'inherited_component.dart';
@@ -31,6 +30,7 @@ part 'single_child_element.dart';
 part 'state_mixins.dart';
 part 'stateful_component.dart';
 part 'stateless_component.dart';
+part 'observer_component.dart';
 
 /// Describes the configuration for an [Element].
 ///
@@ -225,12 +225,38 @@ abstract class Element implements BuildContext {
   BuildOwner? _owner;
   BuildOwner get owner => _owner!;
 
-  /// The nearest ancestor build scheduler that can rebuild its children.
-  BuildScheduler? _scheduler;
+  Renderer? _renderer;
+  Renderer get renderer => _renderer!;
+
+  /// The previous sibling element.
+  Element? _prevSibling;
+
+  /// The previous ancestor sibling
+  Element? _prevAncestorSibling;
+  Element? get prevAncestorSibling => _prevAncestorSibling;
+
+  /// The last child element.
+  Element? _lastChild;
+
+  /// The last child dom node.
+  RenderElement? _lastNode;
+  RenderElement? get lastNode => _lastNode;
+
+  /// The nearest ancestor dom node.
+  RenderElement? _parentNode;
+  RenderElement? get parentNode => _parentNode;
 
   // This is used to verify that Element objects move through life in an
   // orderly fashion.
   _ElementLifecycle _lifecycleState = _ElementLifecycle.initial;
+
+  void updateLastChild(Element? child) {
+    _lastChild = child;
+    _lastNode = _lastChild?._lastNode;
+    if (_parent?._lastChild == this && _parent?._lastNode != _lastNode) {
+      _parent!.updateLastChild(this);
+    }
+  }
 
   /// Calls the argument for each child.
   ///
@@ -280,9 +306,12 @@ abstract class Element implements BuildContext {
   /// |  **child == null**  |  Returns null.         |  Returns new [Element]. |
   /// |  **child != null**  |  Old child is removed, returns null. | Old child updated if possible, returns child or new [Element]. |
   @protected
-  Element? updateChild(Element? child, Component? newComponent) {
+  Element? updateChild(Element? child, Component? newComponent, Element? prevSibling) {
     if (newComponent == null) {
       if (child != null) {
+        if (_lastChild == child) {
+          updateLastChild(prevSibling);
+        }
         deactivateChild(child);
       }
       return null;
@@ -290,18 +319,28 @@ abstract class Element implements BuildContext {
     final Element newChild;
     if (child != null) {
       if (child._component == newComponent) {
+        if (child._parentChanged || child._prevSibling != prevSibling) {
+          child.updatePrevSibling(prevSibling);
+        }
         newChild = child;
-      } else if (Component.canUpdate(child.component, newComponent)) {
+      } else if (child._parentChanged || Component.canUpdate(child.component, newComponent)) {
+        if (child._parentChanged || child._prevSibling != prevSibling) {
+          child.updatePrevSibling(prevSibling);
+        }
         child.update(newComponent);
         assert(child.component == newComponent);
         newChild = child;
       } else {
         deactivateChild(child);
         assert(child._parent == null);
-        newChild = inflateComponent(newComponent);
+        newChild = inflateComponent(newComponent, prevSibling);
       }
     } else {
-      newChild = inflateComponent(newComponent);
+      newChild = inflateComponent(newComponent, prevSibling);
+    }
+
+    if (_lastChild == prevSibling) {
+      updateLastChild(newChild);
     }
 
     return newChild;
@@ -323,35 +362,36 @@ abstract class Element implements BuildContext {
   /// Implementations of this method should start with a call to the inherited
   /// method, as in `super.mount(parent)`.
   @mustCallSuper
-  void mount(Element? parent) {
+  void mount(Element? parent, Element? prevSibling) {
     assert(_lifecycleState == _ElementLifecycle.initial);
     assert(_component != null);
     assert(_parent == null);
     assert(parent == null || parent._lifecycleState == _ElementLifecycle.active);
 
     _parent = parent;
-    _scheduler = this is BuildScheduler
-        ? this as BuildScheduler
-        : parent is BuildScheduler
-            ? parent
-            : parent?._scheduler;
-
-    assert(_scheduler != null);
+    _prevSibling = prevSibling;
+    _prevAncestorSibling = _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
+    _parentNode = parent is RenderElement ? parent : parent?._parentNode;
 
     _lifecycleState = _ElementLifecycle.active;
     _depth = parent != null ? parent.depth + 1 : 1;
 
     if (parent != null) {
       _owner = parent.owner;
+      _renderer = _inheritRendererFromParent();
     }
     assert(_owner != null);
 
     final Key? key = component.key;
     if (key is GlobalKey) {
-      owner._registerGlobalKey(key, this);
+      ComponentsBinding.instance!._registerGlobalKey(key, this);
     }
     _updateInheritance();
+    _updateObservers();
   }
+
+  @mustCallSuper
+  void _firstBuild([VoidCallback? onBuilt]) {}
 
   /// Change the component used to configure this element.
   ///
@@ -380,30 +420,32 @@ abstract class Element implements BuildContext {
     }
   }
 
-  /// Remove [_scheduler] from the render tree.
-  ///
-  /// This is called by [deactivateChild].
-  void detachScheduler() {
-    visitChildren((Element child) {
-      child.detachScheduler();
-    });
-    _scheduler = null;
+  var _parentChanged = false;
+
+  void updatePrevSibling(Element? prevSibling) {
+    assert(_lifecycleState == _ElementLifecycle.active);
+    assert(_component != null);
+    assert(_parent != null);
+    assert(_parent!._lifecycleState == _ElementLifecycle.active);
+    assert(_depth != null);
+    assert(_parentNode != null);
+    _prevSibling = prevSibling;
+    _updateAncestorSiblingRecursively(_parentChanged);
+    _parentChanged = false;
   }
 
-  /// Add [_scheduler] to the render tree.
-  ///
-  /// If this or the parent element is a [BuildScheduler] it will use that element, otherwise
-  /// it will take the parents [_scheduler] element.
-  void attachScheduler() {
-    var parent = _parent!;
-    _scheduler = this is BuildScheduler
-        ? this as BuildScheduler
-        : parent is BuildScheduler
-            ? parent
-            : parent._scheduler;
-    visitChildren((Element child) {
-      child.attachScheduler();
-    });
+  @mustCallSuper
+  void _didChangeAncestorSibling() {}
+
+  void _updateAncestorSiblingRecursively(bool didReorderParent) {
+    var newAncestorSibling = _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
+    if (didReorderParent || newAncestorSibling != _prevAncestorSibling) {
+      _prevAncestorSibling = newAncestorSibling;
+      _didChangeAncestorSibling();
+      if (this is! RenderElement) {
+        visitChildren((e) => e._updateAncestorSiblingRecursively(true));
+      }
+    }
   }
 
   Element? _retakeInactiveElement(GlobalKey key, Component newComponent) {
@@ -439,20 +481,21 @@ abstract class Element implements BuildContext {
   /// The element returned by this function will already have been mounted and
   /// will be in the "active" lifecycle state.
   @protected
-  Element inflateComponent(Component newComponent) {
+  Element inflateComponent(Component newComponent, Element? nextChild) {
     final Key? key = newComponent.key;
     if (key is GlobalKey) {
       final Element? newChild = _retakeInactiveElement(key, newComponent);
       if (newChild != null) {
         assert(newChild._parent == null);
         newChild._activateWithParent(this);
-        final Element? updatedChild = updateChild(newChild, newComponent);
+        newChild._parentChanged = true;
+        final Element? updatedChild = updateChild(newChild, newComponent, nextChild);
         assert(newChild == updatedChild);
         return updatedChild!;
       }
     }
     final Element newChild = newComponent.createElement();
-    newChild.mount(this);
+    newChild.mount(this, nextChild);
     assert(newChild._lifecycleState == _ElementLifecycle.active);
     return newChild;
   }
@@ -475,7 +518,8 @@ abstract class Element implements BuildContext {
   void deactivateChild(Element child) {
     assert(child._parent == this);
     child._parent = null;
-    child.detachScheduler();
+    child._prevSibling = null;
+    child._prevAncestorSibling = null;
     owner._inactiveElements.add(child);
   }
 
@@ -498,8 +542,8 @@ abstract class Element implements BuildContext {
   void _activateWithParent(Element parent) {
     assert(_lifecycleState == _ElementLifecycle.inactive);
     _parent = parent;
+    _parentNode = parent is RenderElement ? parent : parent._parentNode;
     _updateDepth(_parent!.depth);
-    attachScheduler();
     _activateRecursively(this);
     assert(_lifecycleState == _ElementLifecycle.active);
   }
@@ -525,18 +569,27 @@ abstract class Element implements BuildContext {
     assert(_lifecycleState == _ElementLifecycle.inactive);
     assert(_component != null);
     assert(_owner != null);
-    assert(_scheduler != null);
+    assert(_parent != null);
     assert(_depth != null);
     final bool hadDependencies = (_dependencies != null && _dependencies!.isNotEmpty) || _hadUnsatisfiedDependencies;
     _lifecycleState = _ElementLifecycle.active;
 
+    var parent = _parent!;
+    _parentNode = parent is RenderElement ? parent : parent._parentNode;
+    _renderer = _inheritRendererFromParent();
+
     _dependencies?.clear();
     _hadUnsatisfiedDependencies = false;
     _updateInheritance();
+    _updateObservers();
     if (_dirty) {
       owner.scheduleBuildFor(this);
     }
     if (hadDependencies) didChangeDependencies();
+  }
+
+  Renderer _inheritRendererFromParent() {
+    return _parent!._renderer!.inherit(_parent!);
   }
 
   /// Transition from the "active" to the "inactive" lifecycle state.
@@ -587,15 +640,25 @@ abstract class Element implements BuildContext {
     assert(_depth != null);
     assert(_owner != null);
 
-    final Key? key = component.key;
-    if (key is GlobalKey) {
-      owner._unregisterGlobalKey(key, this);
+    if (_observerElements != null && _observerElements!.isNotEmpty) {
+      for (var observer in _observerElements!) {
+        observer.didUnmountElement(this);
+      }
+      _observerElements = null;
     }
 
+    final Key? key = component.key;
+    if (key is GlobalKey) {
+      ComponentsBinding.instance!._unregisterGlobalKey(key, this);
+    }
+
+    _parentNode = null;
     _component = null;
     _dependencies = null;
     _lifecycleState = _ElementLifecycle.defunct;
   }
+
+  List<ObserverElement>? _observerElements;
 
   Map<Type, InheritedElement>? _inheritedElements;
   Set<InheritedElement>? _dependencies;
@@ -628,6 +691,13 @@ abstract class Element implements BuildContext {
   void _updateInheritance() {
     assert(_lifecycleState == _ElementLifecycle.active);
     _inheritedElements = _parent?._inheritedElements;
+  }
+
+  /// Populates [_observerElements] when this Element is mounted or activated.
+  /// [ObserverElement]s will register themselves for their children.
+  void _updateObservers() {
+    assert(_lifecycleState == _ElementLifecycle.active);
+    _observerElements = _parent?._observerElements;
   }
 
   @override
@@ -701,7 +771,7 @@ abstract class Element implements BuildContext {
   void markNeedsBuild() {
     assert(_lifecycleState != _ElementLifecycle.defunct);
     if (_lifecycleState != _ElementLifecycle.active) return;
-    assert(_scheduler != null);
+    assert(_parentNode != null);
     assert(_lifecycleState == _ElementLifecycle.active);
     assert(() {
       if (owner._debugBuilding) {
@@ -726,12 +796,6 @@ abstract class Element implements BuildContext {
     owner.scheduleBuildFor(this);
   }
 
-  /// Invalidates the element and schedules a re-render
-  @protected
-  Future<void> invalidate() {
-    return _scheduler!.view.invalidate() ?? Future.value();
-  }
-
   bool _debugIsInScope(Element target) {
     Element? current = this;
     while (current != null) {
@@ -747,7 +811,7 @@ abstract class Element implements BuildContext {
   ///
   /// Called by the [BuildOwner] when rebuilding, by [mount] when the element is first
   /// built, and by [update] when the component has changed.
-  void rebuild() {
+  void rebuild([VoidCallback? onRebuilt]) {
     assert(_lifecycleState != _ElementLifecycle.initial);
     if (_lifecycleState != _ElementLifecycle.active || !_dirty) {
       return;
@@ -760,6 +824,11 @@ abstract class Element implements BuildContext {
       owner._debugCurrentBuildTarget = this;
       return true;
     }());
+    if (_observerElements != null && _observerElements!.isNotEmpty) {
+      for (var observer in _observerElements!) {
+        observer.willRebuildElement(this);
+      }
+    }
     owner.performRebuildOn(this, () {
       assert(() {
         assert(owner._debugCurrentBuildTarget == this);
@@ -772,6 +841,12 @@ abstract class Element implements BuildContext {
           dependency.didRebuildDependent(this);
         }
       }
+      if (_observerElements != null && _observerElements!.isNotEmpty) {
+        for (var observer in _observerElements!) {
+          observer.didRebuildElement(this);
+        }
+      }
+      onRebuilt?.call();
     });
   }
 
@@ -781,12 +856,9 @@ abstract class Element implements BuildContext {
   @protected
   void performRebuild();
 
-  /// Renders the element to the DOM.
-  ///
-  /// This is typically called after a completed build by the [BuildScheduler].
-  @mustCallSuper
-  void render(DomBuilder b);
-
   /// Can be set by the element to signal that the first build should be performed asynchronous.
   Future? _asyncFirstBuild;
+
+  // ignore: prefer_final_fields
+  List<Future> _asyncFirstBuildChildren = [];
 }

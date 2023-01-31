@@ -11,6 +11,11 @@ class BuildCommand extends BaseCommand {
       help: 'Specify the input file for the web app',
       defaultsTo: 'lib/main.dart',
     );
+    argParser.addFlag(
+      'ssr',
+      defaultsTo: true,
+      help: 'Optionally disables server-side rendering and runs as a pure client-side app.',
+    );
     argParser.addOption(
       'target',
       abbr: 't',
@@ -34,13 +39,29 @@ class BuildCommand extends BaseCommand {
   Future<void> run() async {
     await super.run();
 
-    var dir = Directory('build');
-    if (!await dir.exists()) {
-      await dir.create();
+    var useSSR = argResults!['ssr'] as bool;
+
+    if (useSSR) {
+      var dir = Directory('build');
+      if (!await dir.exists()) {
+        await dir.create();
+      }
     }
 
-    var webProcess = await runWebdev(['build', '--output=web:build/web']);
-    unawaited(watchProcess(webProcess));
+    var webProcess = await runWebdev([
+      'build',
+      '--output=web:build${useSSR ? '/web' : ''}',
+      '--',
+      '--delete-conflicting-outputs',
+      '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
+    ]);
+
+    var webResult = watchProcess(webProcess);
+    if (useSSR) {
+      unawaited(webResult);
+    } else {
+      return webResult;
+    }
 
     String? entryPoint = await getEntryPoint(argResults!['input']);
 
@@ -51,7 +72,7 @@ class BuildCommand extends BaseCommand {
 
     var process = await Process.start(
       'dart',
-      ['compile', argResults!['target'], entryPoint, '-o', './build/app'],
+      ['compile', argResults!['target'], entryPoint, '-o', './build/app', '-Djaspr.flags.release=true'],
     );
 
     unawaited(watchProcess(process));

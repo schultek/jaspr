@@ -1,21 +1,22 @@
+// ignore_for_file: invalid_use_of_internal_member
+
 library framework;
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:meta/meta.dart';
-import 'package:riverpod/riverpod.dart';
 
-part 'jaspr/sync_provider.dart';
-part 'jaspr/sync_ref.dart';
+import 'internals.dart';
+import 'sync_provider.dart';
+
 part 'provider_context.dart';
 part 'provider_dependencies.dart';
 
 /// {@template riverpod.providerscope}
 /// A component that stores the state of providers.
 ///
-/// All Flutter applications using Riverpod must contain a [ProviderScope] at
+/// All Jaspr applications using Riverpod must contain a [ProviderScope] at
 /// the root of their component tree. It is done as followed:
 ///
 /// ```dart
@@ -84,14 +85,12 @@ part 'provider_dependencies.dart';
 class ProviderScope extends StatefulComponent {
   /// {@macro riverpod.providerscope}
   const ProviderScope({
-    Key? key,
+    super.key,
     this.overrides = const [],
     this.observers,
-    this.cacheTime,
-    this.disposeDelay,
     this.parent,
     required this.child,
-  }) : super(key: key);
+  });
 
   /// Read the current [ProviderContainer] for a [BuildContext].
   static ProviderContainer containerOf(BuildContext context, {bool listen = true}) {
@@ -112,26 +111,6 @@ class ProviderScope extends StatefulComponent {
 
     return element;
   }
-
-  /// The minimum amount of time before an `autoDispose` provider can be
-  /// disposed if not listened.
-  ///
-  /// If the provider rebuilds (such as when using `ref.watch` or `ref.refresh`),
-  /// the timer will be refreshed.
-  ///
-  /// If null, use the nearest ancestor [ProviderScope]'s [cacheTime].
-  /// If no ancestor is found, fallbacks to [Duration.zero].
-  final Duration? cacheTime;
-
-  /// The amount of time before a provider is disposed after its last listener
-  /// is removed.
-  ///
-  /// If a new listener is added within that duration, the provider will not be
-  /// disposed.
-  ///
-  /// If null, use the nearest ancestor [ProviderContainer]'s [disposeDelay].
-  /// If no ancestor is found, fallbacks to [Duration.zero].
-  final Duration? disposeDelay;
 
   /// Explicitly override the parent [ProviderContainer] that this [ProviderScope]
   /// would be a descendant of.
@@ -167,7 +146,7 @@ class ProviderScope extends StatefulComponent {
   /// The listeners that subscribes to changes on providers stored on this [ProviderScope].
   final List<ProviderObserver>? observers;
 
-  /// Informations on how to override a provider/family.
+  /// Information on how to override a provider/family.
   final List<Override> overrides;
 
   @override
@@ -177,30 +156,16 @@ class ProviderScope extends StatefulComponent {
 /// Do not use: The [State] of [ProviderScope]
 @visibleForTesting
 @sealed
-class ProviderScopeState extends State<ProviderScope> with SyncStateMixin<ProviderScope, Map<String, dynamic>> {
+class ProviderScopeState extends State<ProviderScope>
+    with SyncStateMixin<ProviderScope, Map<String, dynamic>>, SyncScopeMixin {
   /// The [ProviderContainer] exposed to [ProviderScope.child].
+  @override
   @visibleForTesting
   // ignore: diagnostic_describe_all_properties
   late final ProviderContainer container;
+
   ProviderContainer? _debugParentOwner;
   var _dirty = false;
-
-  @override
-  String syncId = 'provider_scope';
-
-  late bool _isRoot;
-  @override
-  bool wantsSync() => _isRoot;
-
-  @override
-  Map<String, dynamic> getState() {
-    return container.read(_syncProvider.notifier)._saveState();
-  }
-
-  @override
-  void updateState(Map? value) {
-    container.read(_syncProvider.notifier)._updateState(value?.cast());
-  }
 
   @override
   void initState() {
@@ -210,13 +175,10 @@ class ProviderScopeState extends State<ProviderScope> with SyncStateMixin<Provid
       return true;
     }(), '');
 
-    _isRoot = parent == null;
     container = ProviderContainer(
       parent: parent,
       overrides: component.overrides,
       observers: component.observers,
-      cacheTime: component.cacheTime,
-      disposeDelay: component.disposeDelay,
     );
 
     super.initState();
@@ -286,10 +248,10 @@ class ProviderScopeState extends State<ProviderScope> with SyncStateMixin<Provid
 class UncontrolledProviderScope extends InheritedComponent {
   /// {@macro riverpod.UncontrolledProviderScope}
   const UncontrolledProviderScope({
-    Key? key,
+    super.key,
     required this.container,
-    required Component child,
-  }) : super(key: key, child: child);
+    required super.child,
+  });
 
   /// The [ProviderContainer] exposed to the component tree.
   final ProviderContainer container;
@@ -317,14 +279,6 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
   @override
   UncontrolledProviderScope get component => super.component as UncontrolledProviderScope;
 
-  T _read<T>(ProviderBase<T> provider) {
-    return component.container.read(provider);
-  }
-
-  T _refresh<T>(ProviderBase<T> provider) {
-    return component.container.refresh(provider);
-  }
-
   T _watch<T>(Object dependent, ProviderListenable<T> target) {
     return getDependencies(dependent)!.watch(target);
   }
@@ -348,24 +302,14 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     return component.container.listen(provider, listener, onError: onError, fireImmediately: fireImmediately);
   }
 
-  Future<void> _preload(ProviderBase provider) async {
-    component.container.read(provider); // create if not exists
-    return component.container.read(_syncProvider.notifier)._preload();
-  }
-
   @override
-  void mount(Element? parent) {
-    assert(() {
-      component.container.debugCanModifyProviders = _debugCanModifyProviders;
-      return true;
-    }());
-    assert(
-      component.container.vsyncOverride == null,
-      'The ProviderContainer was already associated with a different component',
-    );
-    component.container.vsyncOverride = _flutterVsync;
+  void mount(Element? parent, Element? prevSibling) {
+    if (kDebugMode) {
+      debugCanModifyProviders ??= _debugCanModifyProviders;
+    }
 
-    super.mount(parent);
+    vsyncOverride ??= _jasprVsync;
+    super.mount(parent, prevSibling);
   }
 
   @override
@@ -373,39 +317,21 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     setDependencies(dependent, getDependencies(dependent) ?? ProviderDependencies(dependent, this));
   }
 
-  @override
-  void update(UncontrolledProviderScope newComponent) {
-    assert(() {
-      component.container.debugCanModifyProviders = null;
-      newComponent.container.debugCanModifyProviders = _debugCanModifyProviders;
-      return true;
-    }());
-
-    component.container.vsyncOverride = null;
-    assert(
-      newComponent.container.vsyncOverride == null,
-      'The ProviderContainer was already associated with a different component',
-    );
-    newComponent.container.vsyncOverride = _flutterVsync;
-
-    super.update(newComponent);
-  }
-
-  void _flutterVsync(void Function() task) {
+  void _jasprVsync(void Function() task) {
     assert(_task == null, 'Only one task can be scheduled at a time');
     _task = task;
 
-    // TODO: From my testing, we don't schedule a build here as opposed to flutter_riverpod.
-    //  Find out why this was done originally and if this has any other implications.
-    Future.microtask(() {
-      _task?.call();
-      _task = null;
+    Future.microtask(() async {
+      while (owner.isFirstBuild) {
+        await Future.microtask(() {});
+      }
+      if (_mounted) markNeedsBuild();
     });
   }
 
   void _debugCanModifyProviders() {
-    // TODO: Scheduling a build here lead to some weird bugs. For now we just ignore this as
-    //  it is a debug check only anyways
+    // TODO: Scheduling a build here lead to some weird bugs.
+    // For now we just ignore this as it is only a debug check anyways.
   }
 
   @override
@@ -433,12 +359,14 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
   @override
   void unmount() {
     _mounted = false;
-    assert(() {
-      component.container.debugCanModifyProviders = null;
-      return true;
-    }());
 
-    component.container.vsyncOverride = null;
+    if (kDebugMode && debugCanModifyProviders == _debugCanModifyProviders) {
+      debugCanModifyProviders = null;
+    }
+
+    if (vsyncOverride == _jasprVsync) {
+      vsyncOverride = null;
+    }
     super.unmount();
   }
 

@@ -1,0 +1,171 @@
+---
+title: Jaspr Server-Side Rendering
+description: How to setup server-side rendering and sync data between server and client in Jaspr.
+previous: /core/styling
+next: /core/routing
+---
+
+# 🏗 Server Side Rendering
+
+**Jaspr** is built to be server-side-rendering first. It leverages the power of Darts
+cross-compilation to both js and native executables to execute the same app on the server and client.
+
+For each target (server and client) you need to have a separate entrypoint to start your app. However 
+depending on what project setup you choose, the web entrypoint might be automatically generated for you.
+
+1. The entrypoint on the web will always be the corresponding file inside the `web` directory,
+   usually `web/main.dart`. This file will be compiled to js and is included in the `index.html` file
+   as a script: `<script defer src="main.dart.js"></script>`
+
+2. The entrypoint on the server will:
+    - be the file specified using the `-i (--input)` option when running `jaspr serve` or `jaspr build` or
+    - default to `lib/main.dart`
+
+## 💽 Loading Data on the Server
+
+When using server side rendering, you want the ability to load some data data before rendering the html.
+With `jaspr` this is build into the package and easy to do.
+
+Start by using the `PreloadStateMixin` on a `StatefulComponent`s `State` class and implement the `Future<T> preloadState()` method.
+
+```dart
+class MyState extends State<MyStatefulComponent> with PreloadStateMixin {
+  
+  @override
+  Future<void> preloadState() async {
+    ...
+  }
+}
+```
+
+This method will only be executed on the server and will be called before `initState()`. It will defer
+`initState()` as well as building the component until the future returned by the method is completed.
+
+<Warning>
+While it is only executed on the server it still will be compiled for the client, since Dart does not have
+selective compilation. So you have to make sure it will compile on the client, e.g. by using service locators
+and providing mock services on the client. (**TODO**: More explanation and How To)
+</Warning>
+
+<Info>
+This is a great use-case for jasprs [platform-specific imports](/advanced/imports)
+</Info>
+
+## ♻️ Syncing Data to the Client
+
+Alongside with preloading some data on the server, you often want to also sync the data with the client.
+You can simply add the `SyncStateMixin` which will automatically sync state from the server with the client.
+
+The `SyncStateMixin` accepts a second type argument for the data type that you want to sync. You the have to
+implement the the `getState` and `updateState()` methods.
+
+```dart
+class MyState extends State<MyStatefulComponent> with SyncStateMixin<MyStatefulComponent, MyStateModel> {
+
+  MyStateModel? model;
+  
+  // a globally unique id that is used to identify the state
+  @override
+  String get syncId => 'my_id';
+
+  // this will get the state to be sent to the client
+  // and is only executed on the server
+  @override
+  MyStateModel? getState() {
+    return model;
+  }
+
+  // this will receive the state on the client
+  // and it is safe to call setState
+  void updateState(MyStateModel? value) {
+    setState(() {
+      model = value;
+    });
+  }
+}
+```
+
+In order to send the data, it needs to be serialized on the server and deserialized on the client.
+The serialization format is defined by the `syncCodec` getter defined in `SyncStateMixin`.
+
+The codec must encode to a primitive or object value of one of the supported types: `Null, bool,
+double, int, Uint8List, String, Map, List`. By default, the codec is null and your state must
+already be one of the supported types.
+
+When you want to use another type like a custom model class, you have to override the `syncCodec` getter, which
+has to return a `Codec` that encodes to `String`. This can be any codec, however a typical use would be to
+encode your model to `Map<String, dynamic>` and the fuse this with the json codec to get a json string.
+
+```dart
+
+class MyState extends State<MyStatefulComponent> with SyncStateMixin<MyStatefulComponent, MyStateModel> {
+
+  @override
+  Codec<MyStateModel, String> get syncCodec => MyStateModelCodec();
+
+  ...
+}
+
+// codec that encodes a value of MyStateModel to Map<String, dynamic>
+class MyStateModelCodec extends Codec<MyStateModel, Map<String, dynamic>> {
+  
+  ...
+  
+}
+```
+
+## 🔀 Integrate with other backend framework
+
+When you use `runApp(App())` on the server-side, jaspr spins up its own http server to serve all
+incoming requests. However depending on your app, you may want to add your own request handling and
+server setup, e.g. if you want to add an api to your application.
+
+Jaspr provides two ways to control the server setup:
+
+#### 1. Extend the default request handling by adding middleware to `ServerApp`.
+
+On the server, the `runApp()` function will actually return an instance of `ServerApp` where you can
+extend the server and request handling of your application.
+To make this available, change your jaspr import to `import 'package:jaspr/jaspr_server.dart';`. Then
+chain some calls after the `runApp()` function, e.g. `runApp(App()).addMiddleware(someShelfMiddleware)`.
+Jaspr uses `package:shelf` for this to be compatible with most common dart backends. You can also:
+
+- add a listener using `.setListener((server) { ... })`.
+  This will run the callback when the http server first started listening for requests, and then
+  each time the app is reloaded through auto-reload.
+
+- add a builder using `.setBuilder((handler) => myHttpServerImpl(handler))`.
+  A builder has to return a `HttpServer`, which will completely replace the default server created
+  by jaspr.
+
+- check out [the server_handling example](https://github.com/schultek/jaspr/tree/main/experiments/server_handling) to see this in action.
+
+
+#### 2. Add jaspr to any existing backend implementation / framework as a **shelf handler**.
+
+Instead of letting jaspr run your app and manage your http server, you can also use your favourite
+backend package or framework, and simply add jaspr as a request handler to your implementation.
+
+To do this, remove the `runApp()` call and setup your backend as you normally would. When defining your
+route handlers, create a handler for jaspr by using `serveApp` like this:
+```dart
+var handler = serveApp((request, render) {
+// Optionally do something with `request`
+print("Request uri is ${request.requestedUri}");
+// Return a server-rendered response by calling `render()` with your root component
+return render(App());
+});
+
+// provide `handler` to your app, e.g.
+await shelf_io.serve(handler, InternetAddress.anyIPv4, 8080);
+```
+
+Check out [the shelf_handler example](https://github.com/schultek/jaspr/tree/main/experiments/shelf_handler) to see this in action.
+
+**Be aware** that using the `serveApp` handler does not work with auto-reload. When building a simple
+shelf backend, it is better to use `runApp()` with a custom `.setBuilder()` to keep this functionality.
+
+**Make sure** that you set the base path of your app when mounting the `serveApp` handler to
+any other route prefix than `/`, otherwise your static resources like `styles.css` or `main.dart.js`
+can't be loaded correctly. Add the `<base href="/<route_prefix>/">` tag to the `head` of your
+`index.html`, as demonstrated in the example.

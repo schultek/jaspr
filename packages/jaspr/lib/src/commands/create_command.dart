@@ -1,11 +1,30 @@
 import 'dart:io';
 
+import 'package:mason/mason.dart';
 import 'package:path/path.dart' as path;
 
 import 'command.dart';
+import 'templates/templates.dart';
+
+final RegExp _packageRegExp = RegExp(r'^[a-z_][a-z0-9_]*$');
 
 class CreateCommand extends BaseCommand {
-  CreateCommand();
+  CreateCommand() {
+    argParser.addOption(
+      'template',
+      abbr: 't',
+      help: 'The template used to generate this new project.',
+      mandatory: true,
+      allowed: templates.map((element) => element.name).toList(),
+      allowedHelp: templates.fold<Map<String, String>>(
+        {},
+        (h, e) => {
+          ...h,
+          e.name: e.description,
+        },
+      ),
+    );
+  }
 
   @override
   String get invocation {
@@ -29,38 +48,31 @@ class CreateCommand extends BaseCommand {
     var targetPath = argResults!.rest.first;
 
     var directory = Directory(targetPath);
-    var dir = path.basename(targetPath);
+    var dir = path.basenameWithoutExtension(directory.path);
     var name = dir.replaceAll('-', '_');
 
     if (await directory.exists()) {
       usageException('Directory $targetPath already exists.');
     }
 
-    var process = await Process.start('dart', ['create', '-t', 'web-simple', '--no-pub', directory.absolute.path]);
+    if (name.isEmpty || !_packageRegExp.hasMatch(name)) {
+      usageException('"$name" is not a valid package name.');
+    }
 
-    await watchProcess(process, until: (s) => s.contains('Created project'));
+    var logger = Logger();
+    final templateName = argResults!['template'] as String?;
+    var template = templates.firstWhere((element) => element.name == templateName);
 
-    var webMain = File(path.join(directory.absolute.path, 'web/main.dart'));
-    var pubspecFile = File(path.join(directory.absolute.path, 'pubspec.yaml'));
-    var libMain = File(path.join(directory.absolute.path, 'lib/main.dart'));
-    var appDart = File(path.join(directory.absolute.path, 'lib/app.dart'));
+    var progress = logger.progress('Bootstrapping');
+    var generator = await MasonGenerator.fromBundle(template);
+    final files = await generator.generate(
+      DirectoryGeneratorTarget(directory),
+      vars: {'name': name, 'jasprCoreVersion': '0.1.0', 'jasprBuilderVersion': '0.1.0'},
+      logger: logger,
+    );
+    progress.complete('Generated ${files.length} file(s)');
 
-    await Future.wait([
-      webMain.writeAsString(mainFileContent('package:$name')),
-      pubspecFile.writeAsString(pubspecYaml(name)),
-      libMain
-          .create(recursive: true)
-          .then((_) => libMain.writeAsString(mainFileContent('.')))
-          .then((_) => print('  lib/main.dart')),
-      appDart
-          .create(recursive: true)
-          .then((_) => appDart.writeAsString(appFileContent()))
-          .then((_) => print('  lib/app.dart')),
-    ]);
-
-    print('');
-
-    process = await Process.start('dart', ['pub', 'get'], workingDirectory: directory.absolute.path);
+    var process = await Process.start('dart', ['pub', 'get'], workingDirectory: directory.absolute.path);
 
     await watchProcess(process, hide: (s) => s.contains('+'));
 
@@ -70,39 +82,3 @@ class CreateCommand extends BaseCommand {
         '  jaspr serve\n');
   }
 }
-
-String mainFileContent(package) => ""
-    "import 'package:jaspr/jaspr.dart';\n"
-    "import '$package/app.dart';\n"
-    "\n"
-    "void main() {\n"
-    "  runApp(App());\n"
-    "}";
-String appFileContent() => ""
-    "import 'package:jaspr/jaspr.dart';\n"
-    "\n"
-    "class App extends StatelessComponent {\n"
-    "  @override\n"
-    "  Iterable<Component> build(BuildContext context) sync* {\n"
-    "    yield DomComponent(\n"
-    "      tag: 'p',\n"
-    "      child: Text('Hello World'),\n"
-    "    );\n"
-    "  }\n"
-    "}";
-String pubspecYaml(String name) => ""
-    "name: $name\n"
-    "description: A minimal jaspr web app.\n"
-    "version: 0.0.1\n"
-    "\n"
-    "environment:\n"
-    "  sdk: '>=2.16.0 <3.0.0'\n"
-    "\n"
-    "dependencies:\n"
-    "  jaspr: ^0.1.0\n"
-    "\n"
-    "dev_dependencies:\n"
-    "  build_runner: ^2.1.4\n"
-    "  build_web_compilers: ^3.2.1\n"
-    "  lints: ^1.0.0\n"
-    "  webdev: 2.7.7";
