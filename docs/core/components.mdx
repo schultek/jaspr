@@ -96,7 +96,7 @@ Similar to Flutter, this component:
 Different to Flutter is that the `build()` method does not return a single `Component`, but rather multiple `Component`s as an `Iterable<Component>`. This is again because a HTML element can always have multiple child elements.
 
 <Info>
-This design decision was made based on the core principles of jaspr, explained [here](../jaspr-vs-flutter-web)
+This design decision was made based on the core principles of jaspr, explained [here](/jaspr-vs-flutter-web)
 </Info>
 
 The recommended way to write `build()` methods with **jaspr** is to use the [**synchronous generator**](https://dart.dev/guides/language/language-tour#generators) pattern. It allows us to return multiple child components in a declarative way by `yield`ing each component without needing to deal with `List`s or `Iterable`s directly.
