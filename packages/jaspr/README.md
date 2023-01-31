@@ -38,13 +38,13 @@
 
 ### Core Features
 
-- 💙 Familiar component model similar to Flutter widgets.
-- 🏗 Easy Server Side Rendering.
-- ♻️ Automatic sync of component data between server and client.
-- ⚡️ Fast incremental DOM updates.
-- 🧪 Well tested (~70% test coverage).
+- 💙 **Familiar**: Works with a similar component model to flutter widgets.
+- 🏗 **Powerful**: Comes with server side rendering out of the box.
+- ♻️ **Easy**: Syncs component state between server and client automatically.
+- ⚡️ **Fast**: Performs incremental DOM updates only where needed.
+- 🎛 **Flexible**: Runs on the server, client or both with manual or automatic setup. You decide.
 
-If you want to say thank you, star the project on GitHub and like the package on pub.dev 🙌💙
+> If you want to say thank you, star the project on GitHub and like the package on pub.dev 🙌💙
 
 ### Online Editor & Playground
 
