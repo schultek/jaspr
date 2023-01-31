@@ -1,29 +1,28 @@
-import 'package:js/js.dart';
+/// This library is split up into an implementation part and a stubbing part.
+/// The implementation is loaded on web and the stubbing on the server.
+///
+/// This is only due to platform-interop (web vs server) and not
+/// js-interop. For the js-interop part check out [AppStateNotifierImpl].
+library app_state;
 
-import '../interop/state.dart';
+import 'package:riverpod/riverpod.dart';
+
+import 'app_state_impl.dart'
+  if (dart.library.io) 'app_state_stub.dart';
+
+export 'app_state_impl.dart'
+  if (dart.library.io) 'app_state_stub.dart'
+  show AppState;
 
 enum DemoScreen { counter, textField, custom }
 
-@JS()
-@anonymous
-class AppState {
-  external factory AppState({int count, String screen});
-
-  external int count;
-  external String screen;
+extension AppStateScreen on AppState {
+  DemoScreen get currentScreen => DemoScreen.values.byName(screen);
 }
 
-class AppStateNotifier extends InteropStateNotifier<AppState> {
-  AppStateNotifier() : super(AppState(count: 0, screen: DemoScreen.counter.name));
+abstract class AppStateNotifier implements Notifier<AppState> {
+  factory AppStateNotifier() = AppStateNotifierImpl;
 
-  int get count => state.count;
-  DemoScreen get currentScreen => DemoScreen.values.byName(state.screen);
-
-  void increment() {
-    state = AppState(count: state.count + 1, screen: state.screen);
-  }
-
-  void changeDemoScreenTo(DemoScreen screen) {
-    state = AppState(count: state.count, screen: screen.name);
-  }
+  void increment();
+  void changeDemoScreenTo(DemoScreen screen);
 }

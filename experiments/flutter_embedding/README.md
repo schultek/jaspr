@@ -8,10 +8,11 @@ Sneath. [See the replay here](https://www.youtube.com/watch?v=zKQYGKAe5W8&t=5799
 
 ## Running the demo
 
-The demo is a Flutter web app, so it can be run as:
+The demo is a Jaspr app with an embedded flutter web app. 
+It can be run with:
 
 ```terminal
-$ flutter run -d chrome
+$ dart run jaspr serve --input=lib/main_jaspr.dart --flutter=lib/main_flutter.dart
 ```
 
 ## Points of Interest
@@ -22,4 +23,6 @@ $ flutter run -d chrome
 * See how the Flutter web application is embedded into the page now:
   * Find `hostElement` in `web/index.html`.
 
-_(Built by @ditman, @kevmoo and @malloc-error)_
+_(Original built by @ditman, @kevmoo and @malloc-error)_
+
+_(Pure-Dart version built by @schultek)_

@@ -1,25 +1,32 @@
-import 'package:jaspr/server.dart';
 import 'package:jaspr/html.dart';
+import 'package:jaspr/server.dart';
 
-import 'components/demo_controls.dart';
-import 'components/flutter_target.dart';
+import 'components/app.dart';
 
 void main() {
   runApp(Document(
     title: 'Element embedding',
     meta: {
       'description': 'A Flutter Web Element embedding demo.',
+      // iOS meta tags & icons
+      'apple-mobile-web-app-capable': 'yes',
+      'apple-mobile-web-app-status-bar-style': 'black',
+      'apple-mobile-web-app-title': 'Flutter Element embedding',
     },
     head: [
-      DomComponent(tag: 'script', attributes: {'src': 'flutter.js', 'defer': ''}),
-      DomComponent(tag: 'link', attributes: {'rel': 'stylesheet', 'href': 'css/style.css', 'type': 'text/css'}),
+      link(rel: 'apple-touch-icon', href: 'icons/Icon-192.png'),
+      link(rel: 'preload', as: 'image', href: 'icons/unsplash-x9WGMWwp1NM.png'),
+
+      // Favicon
+      link(rel: 'icon', href: 'icons/favicon.png', type: 'image/png'),
+
+      link(rel: 'manifest', href: 'manifest.json'),
+
+      // This script adds the flutter initialization JS code
+      script(src: 'flutter.js', defer: true, []),
+      link(rel: 'stylesheet', href: 'css/style.css', type: 'text/css'),
     ],
     scriptName: 'main_jaspr',
-    body: section(classes: [
-      'contents'
-    ], [
-      FlutterTarget(),
-      aside(id: 'demo_controls', [DemoControls()]),
-    ]),
+    body: App(),
   ));
 }

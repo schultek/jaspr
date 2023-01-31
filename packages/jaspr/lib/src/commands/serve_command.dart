@@ -89,10 +89,10 @@ class ServeCommand extends BaseCommand {
             : null,
       ));
 
-      // buildCompleted.stream.listen((event) {
-      //   // trigger reload
-      //   flutterProcess.stdin.writeln('r');
-      // });
+      buildCompleted.stream.listen((event) {
+        // trigger reload
+        flutterProcess.stdin.writeln('r');
+      });
     }
 
     var webProcess = await runWebdev([

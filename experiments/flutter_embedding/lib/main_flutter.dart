@@ -1,9 +1,11 @@
+import 'package:element_embedding_demo/interop/state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'shared/app_state.dart';
+import 'providers/app_state_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -13,34 +15,12 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
+/// Here the widget state does not know or care about interoperability,
+/// since this is handled by the riverpod provider.
+///
+/// Therefore this implementation is a standard riverpod app without
+/// any special bits. For those, check out the [AppStateNotifier] and [InteropNotifier].
 class _MyAppState extends State<MyApp> {
-
-  late AppStateNotifier _state;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _state = AppStateNotifier();
-    _state.addListener(_setState);
-  }
-
-  void _setState() {
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _state.removeListener(_setState);
-    super.dispose();
-  }
-
-  void increment() {
-    if (_state.currentScreen == DemoScreen.counter) {
-      _state.increment();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -49,18 +29,19 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: demoScreenRouter(_state.currentScreen),
+      home: Consumer(
+        builder: (context, ref, _) {
+          var screen = ref.watch(appStateProvider).currentScreen;
+          return demoScreenRouter(screen);
+        },
+      ),
     );
   }
 
   Widget demoScreenRouter(DemoScreen which) {
     switch (which) {
       case DemoScreen.counter:
-        return CounterDemo(
-          title: 'Counter Hot',
-          numToDisplay: _state.count,
-          incrementHandler: increment,
-        );
+        return CounterDemo(title: 'Counter');
       case DemoScreen.textField:
         return const TextFieldDemo(title: 'Note to Self');
       case DemoScreen.custom:
@@ -69,23 +50,16 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class CounterDemo extends StatefulWidget {
+class CounterDemo extends ConsumerStatefulWidget {
   final String title;
-  final int numToDisplay;
-  final VoidCallback incrementHandler;
 
-  const CounterDemo({
-    super.key,
-    required this.title,
-    required this.numToDisplay,
-    required this.incrementHandler,
-  });
+  const CounterDemo({super.key, required this.title});
 
   @override
-  State<CounterDemo> createState() => _CounterDemoState();
+  ConsumerState<CounterDemo> createState() => _CounterDemoState();
 }
 
-class _CounterDemoState extends State<CounterDemo> {
+class _CounterDemoState extends ConsumerState<CounterDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,14 +74,16 @@ class _CounterDemoState extends State<CounterDemo> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '${widget.numToDisplay}',
+              '${ref.watch(appStateProvider).count}',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: widget.incrementHandler,
+        onPressed: () {
+          ref.read(appStateProvider.notifier).increment();
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
