@@ -1,0 +1,28 @@
+name: element_embedding_demo
+description: A small app to be embedded into a HTML element (see web/index.html)
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0-0 <4.0.0'
+
+dependencies:
+  cupertino_icons: 1.0.5
+  flutter:
+    sdk: flutter
+  jaspr: ^0.1.0
+  js: ^0.6.6
+
+dev_dependencies:
+  build_runner: ^2.4.0
+  build_web_compilers: ^4.0.0
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  jaspr_builder: ^0.1.0
+  webdev: 2.7.12
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/dash.png

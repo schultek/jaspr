@@ -50,6 +50,9 @@ class ServeCommand extends BaseCommand {
       help: 'Enable verbose logging.',
       negatable: false,
     );
+    argParser.addOption('flutter',
+      help: 'Launch a embedded flutter app from the specified entrypoint.'
+    );
   }
 
   @override
@@ -66,6 +69,31 @@ class ServeCommand extends BaseCommand {
     var useSSR = argResults!['ssr'] as bool;
     var debug = argResults!['debug'] as bool;
     var release = argResults!['release'] as bool;
+    var verbose = argResults!['verbose'] as bool;
+    var flutter = argResults!['flutter'] as String?;
+
+    var buildCompleted = StreamController<int>.broadcast();
+    var build = 0;
+
+    if (flutter != null) {
+      var flutterProcess = await Process.start(
+        'flutter',
+        ['run', '--device-id=web-server', '-t', flutter, '--web-port=5678'],
+      );
+      unawaited(watchProcess(
+        flutterProcess,
+        pipeStdout: verbose,
+        pipeStderr: true,
+        onExit: !verbose //
+            ? () => print('flutter run exited unexpectedly. Run again with -v to see verbose output')
+            : null,
+      ));
+
+      // buildCompleted.stream.listen((event) {
+      //   // trigger reload
+      //   flutterProcess.stdin.writeln('r');
+      // });
+    }
 
     var webProcess = await runWebdev([
       'serve',
@@ -86,16 +114,12 @@ class ServeCommand extends BaseCommand {
 
     print("Starting jaspr development server in ${release ? 'release' : 'debug'} mode...");
 
-    var buildCompleted = StreamController<int>.broadcast();
-    var build = 0;
 
     checkWebdevStarted(String str) {
       if (str.contains('Running build completed')) {
         buildCompleted.add(build++);
       }
     }
-
-    var verbose = argResults!['verbose'] as bool;
 
     unawaited(watchProcess(
       webProcess,
@@ -118,6 +142,7 @@ class ServeCommand extends BaseCommand {
       ] else
         '-Djaspr.flags.release=true',
       '-Djaspr.dev.proxy=5467',
+      if (flutter != null) '-Djaspr.dev.flutter=5678',
       '-Djaspr.flags.verbose=$debug',
     ];
 

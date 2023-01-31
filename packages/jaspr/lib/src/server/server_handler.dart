@@ -12,6 +12,7 @@ import '../../server.dart';
 import 'server_renderer.dart';
 
 final String kDevProxy = String.fromEnvironment('jaspr.dev.proxy', defaultValue: Platform.environment['jaspr_dev_proxy'] ?? '');
+final String kDevFlutter = String.fromEnvironment('jaspr.dev.flutter');
 const bool kDevHotreload = bool.fromEnvironment('jaspr.dev.hotreload');
 
 /// A [Handler] that can be refreshed to update any used resources
@@ -43,20 +44,53 @@ FutureOr<Response> Function(Request, String) _proxyFileLoader(Handler proxyHandl
 
 // coverage:ignore-start
 
-Handler _webdevProxyHandler(String port) {
+Handler _proxyHandler() {
   var client = http.Client();
-  var handler = proxyHandler('http://localhost:$port/', client: client);
+  var webdevHandler = proxyHandler('http://localhost:$kDevProxy/', client: client);
+  var flutterHandler = kDevFlutter.isNotEmpty ? proxyHandler('http://localhost:$kDevFlutter/', client: client) : null;
   return RefreshableHandler((Request req) async {
-    var res = await handler(req);
-    if (res.statusCode == 200 && RegExp(r'(application|text)/javascript').hasMatch(res.headers['content-type'] ?? '')) {
-      var body = await res.readAsString();
-      res = res.change(body: body.replaceAll('http://localhost:$port/', ''));
+    if (posix.extension(req.url.path).isEmpty && !req.url.path.startsWith(r'$')) {
+      return Response.notFound('');
     }
+
+    // Each proxyHandler will read the body, so we have to duplicate the stream beforehand,
+    // or else this will throw.
+    // This is also the reason why Cascade() won't work here.
+    var body = await req.read().toList();
+
+    Response? res;
+
+    // This dart sdk module must be loaded from the flutter process, because it contains the dart:ui library.
+    if (flutterHandler != null && req.url.path == 'packages/build_web_compilers/src/dev_compiler/dart_sdk.js') {
+      res = await flutterHandler!(req.change(path: 'packages/build_web_compilers/src/dev_compiler/', body: body));
+    }
+
+    // First try to load the resource from the webdev process.
+    if (res == null || res.statusCode == 404) {
+      res = await webdevHandler(req.change(body: body));
+    }
+
+    // The bootstrap script hardcodes the host:port url for the dwds handler endpoint,
+    // so we have to change it to our server url to be able to intercept it.
+    if (res.statusCode == 200 && req.url.path.endsWith('.dart.bootstrap.js')) {
+      var body = await res.readAsString();
+      // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:5467/$dwdsSseHandler";'
+      return res.change(body: body.replaceAll('http://localhost:$kDevProxy/', '/'));
+    }
+
+    // Second try to load the resource from the flutter process.
+    if (flutterHandler != null && res.statusCode == 404) {
+      res = await flutterHandler!(req.change(body: body));
+    }
+
     return res;
   }, onRefresh: () {
     client.close();
     client = http.Client();
-    handler = proxyHandler('http://localhost:$port/', client: client);
+    webdevHandler = proxyHandler('http://localhost:$kDevProxy/', client: client);
+    if (flutterHandler != null) {
+      flutterHandler = proxyHandler('http://localhost:$kDevFlutter/', client: client);
+    }
   });
 }
 
@@ -68,7 +102,10 @@ String _sseHeaders(String? origin) => 'HTTP/1.1 200 OK\r\n'
     'Access-Control-Allow-Origin: $origin\r\n'
     '\r\n';
 
-Handler _sseProxyHandler(String proxyPath, Uri serverUri) {
+Handler _sseProxyHandler() {
+  var serverUri = Uri.parse('http://localhost:$kDevProxy');
+  var proxyPath = r'$dwdsSseHandler';
+
   Handler? _incomingMessageProxyHandler;
   var _httpClient = http.Client();
 
@@ -142,7 +179,7 @@ String _findRootProjectDir() {
 }
 
 final staticFileHandler = kDevProxy.isNotEmpty
-    ? _webdevProxyHandler(kDevProxy)
+    ? _proxyHandler()
     : createStaticHandler(join(projectDir, 'web'), defaultDocument: 'index.html');
 
 typedef _SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
@@ -153,10 +190,7 @@ Handler createHandler(_SetupHandler handle, {List<Middleware> middleware = const
   var cascade = Cascade();
 
   if (kDevProxy.isNotEmpty) {
-    final serverUri = Uri.parse('http://localhost:$kDevProxy');
-    final ssePath = r'$dwdsSseHandler';
-
-    cascade = cascade.add(_sseProxyHandler(ssePath, serverUri));
+    cascade = cascade.add(_sseProxyHandler());
   }
 
   var fileLoader = _proxyFileLoader(staticHandler);
