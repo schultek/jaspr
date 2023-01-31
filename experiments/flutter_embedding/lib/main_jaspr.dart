@@ -3,6 +3,7 @@ import 'package:jaspr/server.dart';
 
 import 'components/app.dart';
 
+/// The server entrypoint for the jaspr app.
 void main() {
   runApp(Document(
     title: 'Element embedding',

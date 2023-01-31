@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'providers/app_state_provider.dart';
 
+/// The entrypoint for the flutter app.
 void main() {
   runApp(ProviderScope(child: const MyApp()));
 }

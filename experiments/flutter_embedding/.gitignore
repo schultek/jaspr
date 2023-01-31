@@ -49,3 +49,5 @@ app.*.map.json
 
 .fvm/
 .flutter/
+
+!pubspec_overrides.yaml

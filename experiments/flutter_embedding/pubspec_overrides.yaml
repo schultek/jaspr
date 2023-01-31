@@ -1,0 +1,19 @@
+# melos_managed_dependency_overrides: jaspr,jaspr_test
+dependency_overrides:
+  jaspr:
+    path: ../../packages/jaspr
+  jaspr_builder:
+    path: ../../packages/jaspr_builder
+  jaspr_test:
+    path: ../../packages/jaspr_test
+  jaspr_riverpod:
+    path: ../../packages/jaspr_riverpod
+  webdev:
+    git:
+      url: https://github.com/dart-lang/webdev
+      path: webdev
+  dwds:
+    git:
+      url: https://github.com/dart-lang/webdev
+      path: dwds
+  vm_service: 10.1.2
