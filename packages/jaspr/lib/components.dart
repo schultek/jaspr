@@ -1,6 +1,6 @@
 library components;
 
-export 'jaspr.dart';
+export 'jaspr.dart' hide runApp;
 
 export 'src/components/async.dart';
 export 'src/components/basic.dart';

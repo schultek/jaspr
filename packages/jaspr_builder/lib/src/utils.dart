@@ -1,7 +1,11 @@
+// ignore_for_file: implementation_imports
+
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:jaspr/jaspr.dart' show AppAnnotation, Component, Import, IslandAnnotation, Key;
+import 'package:jaspr/src/foundation/annotations.dart' show AppAnnotation, Import, IslandAnnotation;
+import 'package:jaspr/src/framework/framework.dart'  show Component, Key;
+
 import 'package:source_gen/source_gen.dart';
 
 const String generationHeader = "// GENERATED FILE, DO NOT MODIFY\n"
