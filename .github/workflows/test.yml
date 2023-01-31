@@ -1,0 +1,85 @@
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - '.github/workflows/test.yml'
+      - 'packages/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - '.github/workflows/test.yml'
+      - 'packages/**'
+
+name: Test Pipeline
+
+jobs:
+  cli:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    name: Verify CLI Tool
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - uses: dart-lang/setup-dart@v1.3
+
+      - name: Activate Jaspr
+        run: |
+          cd packages
+          dart pub global activate jaspr --source=path
+
+      - name: Create & Build Project
+        run: |
+          jaspr create my_app
+          cd my_app
+          jaspr build
+
+  analyze:
+    name: Analyze Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - uses: dart-lang/setup-dart@v1.3
+
+      - name: Bootstrap
+        run: |
+          dart pub global activate melos
+          melos bootstrap
+
+      - name: Check formatting
+        run: melos format
+
+      - name: Check linting
+        run: melos analyze
+
+  test:
+    name: Test Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - uses: dart-lang/setup-dart@v1.3
+
+      - name: Bootstrap
+        run: |
+          dart pub global activate melos
+          dart pub global activate coverage
+          melos bootstrap
+
+      - name: Run Unit tests
+        run: melos coverage:ci
+
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage/*_lcov.info
