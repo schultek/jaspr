@@ -52,6 +52,7 @@ class BuildCommand extends BaseCommand {
       'build',
       '--output=web:build${useSSR ? '/web' : ''}',
       '--',
+      '--delete-conflicting-outputs',
       '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
     ]);
 
