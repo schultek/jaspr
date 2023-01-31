@@ -60,14 +60,18 @@ FutureOr<Response> handleApi(Request request) {
 This code will respond `FROM API` to all requests under the `/api` endpoint, and render
 the `App()` component for all other requests.
 
-> For a complete app check out the [custom_middleware example](https://github.com/schultek/jaspr/tree/develop/examples/custom_server_middleware)
+<Info>
+For a complete app check out the [custom_middleware example](https://github.com/schultek/jaspr/tree/develop/examples/custom_server_middleware)
+</Info>
 
 ## Custom Backend
 
 If this is not enough, you can go one step further and use a custom backend framework.
 
-> Since `jaspr` is built with `shelf`, this works best when the backend framework is also compatible with shelf.
-> However you can work around this if that is not the case.
+<Info>
+Since `jaspr` is built with `shelf`, this works best when the backend framework is also compatible with shelf.
+However you can work around this if that is not the case.
+</Info>
 
 There are two main functions, that enable this:
 
@@ -75,11 +79,15 @@ There are two main functions, that enable this:
   The handler can then be passed to your backend or server implementation.
 - `String renderComponent(Component app)` directly renders the provided component into a html string.
 
-> When using your own backend setup, you can still do `jaspr serve`, however auto-reload won't work 
-> on the server then.
+<Warning>
+When using your own backend setup, you can still do `jaspr serve`, however auto-reload won't work 
+on the server then.
+</Warning>
 
-> When you are not using `jaspr serve`, you need to run webdev manually with 
-> `dart run webdev serve web:5467` and provide the `jaspr_dev_proxy=5467` env var to your server process.
+<Warning>
+When you are not using `jaspr serve`, you need to run webdev manually with 
+`dart run webdev serve web:5467` and provide the `jaspr_dev_proxy=5467` env var to your server process.
+</Warning>
 
 ## Example: Shelf
 
