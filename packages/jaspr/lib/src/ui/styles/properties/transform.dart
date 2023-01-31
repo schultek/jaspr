@@ -11,6 +11,7 @@ class Transform {
   const factory Transform.combine(List<Transform> transforms) = _CombineTransform;
 
   const factory Transform.rotate(Angle angle) = _RotateTransform;
+  const factory Transform.rotateAxis({Angle? x, Angle? y, Angle? z}) = _RotateAxisTransform;
 
   const factory Transform.translate({Unit? x, Unit? y}) = _TranslateTransform;
 
@@ -45,6 +46,21 @@ class _RotateTransform implements Transform {
 
   @override
   String get value => 'rotate(${angle.value})';
+}
+
+class _RotateAxisTransform implements Transform {
+  const _RotateAxisTransform({this.x, this.y, this.z});
+
+  final Angle? x;
+  final Angle? y;
+  final Angle? z;
+
+  @override
+  String get value => [
+        if (x != null) 'rotateX(${x!.value})',
+        if (y != null) 'rotateY(${y!.value})',
+        if (z != null) 'rotateZ(${z!.value})',
+      ].join(' ');
 }
 
 class _TranslateTransform implements Transform {
@@ -107,7 +123,6 @@ class _MatrixTransform implements Transform {
   @override
   String get value => 'matrix($a, $b, $c, $d, $tx, $ty)';
 }
-
 
 class _PerspectiveTransform implements Transform {
   const _PerspectiveTransform(this.perspective);

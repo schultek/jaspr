@@ -356,6 +356,27 @@ Component select(List<Component> children, {String? name, bool? multiple, bool? 
   );
 }
 
+/// The <fieldset> HTML element is used to group several controls as well as labels (<label>) within a web form.
+///
+/// - [name]: The name associated with the group.
+/// - [disabled]: If this Boolean attribute is set, all form controls that are descendants of the <fieldset>, are disabled, meaning they are not editable and won't be submitted along with the <form>. They won't receive any browsing events, like mouse clicks or focus-related events. By default browsers display such controls grayed out. Note that form elements inside the <legend> element won't be disabled.
+Component fieldset(List<Component> children, {String? name, bool? disabled, Key? key, String? id, List<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+  return DomComponent(
+    tag: 'fieldset',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: {
+      ...attributes ?? {},
+      if (name != null) 'name': name,
+      if (disabled == true) 'disabled': '',
+    },
+    events: events,
+    children: children,
+  );
+}
+
 /// The &lt;textarea&gt; HTML element represents a multi-line plain-text editing control, useful when you want to allow users to enter a sizeable amount of free-form text, for example a comment on a review or feedback form.
 ///
 /// - [autoComplete]: Indicates whether the value of the control can be automatically completed by the browser.
