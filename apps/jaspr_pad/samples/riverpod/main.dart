@@ -1,5 +1,5 @@
 // [sample=2] Jaspr Riverpod
-import 'package:jaspr/components.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 void main() {
@@ -22,7 +22,7 @@ class App extends StatelessComponent {
       tag: 'button',
       events: {
         'click': (e) {
-          context.read(counterProvider.state).state++;
+          context.read(counterProvider.notifier).state++;
         },
       },
       child: Text('Press Me'),

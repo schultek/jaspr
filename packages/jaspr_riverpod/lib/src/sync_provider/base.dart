@@ -60,6 +60,20 @@ class SyncProvider<T> extends _SyncProviderBase<T>
 
   @override
   SyncProviderElement<T> createElement() => SyncProviderElement._(this);
+
+  /// {@macro riverpod.overridewith}
+  Override overrideWith(Create<FutureOr<T>, SyncProviderRef<T>> create) {
+    return ProviderOverride(
+      origin: this,
+      override: SyncProvider(
+        create,
+        id: id,
+        codec: codec,
+        from: from,
+        argument: argument,
+      ),
+    );
+  }
 }
 
 /// The element of a [SyncProvider]
@@ -111,6 +125,21 @@ class SyncProviderFamily<R, Arg>
                     id: id, name: name, from: from, argument: argument, dependencies: dependencies));
 
   final String id;
+
+  /// {@macro riverpod.overridewith}
+  Override overrideWith(
+    FutureOr<R> Function(SyncProviderRef<R> ref, Arg arg) create,
+  ) {
+    return FamilyOverrideImpl<AsyncValue<R>, Arg, SyncProvider<R>>(
+      this,
+      (arg) => SyncProvider<R>(
+        (ref) => create(ref, arg),
+        id: id,
+        from: from,
+        argument: arg,
+      ),
+    );
+  }
 }
 
 /// Builds a [SyncProviderFamily].

@@ -107,7 +107,7 @@ class AppsBuilder implements Builder {
       mixin $mixinName implements ComponentEntryMixin<${element.name}> {
         @override
         ComponentEntry<${element.name}> get entry {
-          var self = this as ${element.name};
+          ${params.isNotEmpty ? 'var self = this as ${element.name};' : ''}
           return ComponentEntry.${isApp ? isIsland ? 'appAndIsland' : 'app' : 'island'}(
             '${path.url.relative(path.url.withoutExtension(buildStep.inputId.path), from: 'lib')}'
             ${params.isNotEmpty ? ', params: {${params.map((p) => "'${p.name}': self.${p.name}").join(', ')}},' : ''}

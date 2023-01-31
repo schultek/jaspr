@@ -30,6 +30,11 @@ jobs:
 
       - uses: dart-lang/setup-dart@v1.3
 
+      - name: Bootstrap
+        run: |
+          dart pub global activate melos
+          melos bootstrap
+
       - name: Activate Jaspr
         run: |
           cd packages

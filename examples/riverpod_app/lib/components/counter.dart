@@ -32,7 +32,7 @@ class Counter extends StatelessComponent with SyncProviderDependencies {
     yield Button(
       label: 'Click Me',
       onPressed: () {
-        context.read(counterProvider.state).state++;
+        context.read(counterProvider.notifier).state++;
       },
     );
 

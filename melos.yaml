@@ -11,7 +11,7 @@ command:
     usePubspecOverrides: true
 
 scripts:
-  format: melos exec -- 'dart format . --set-exit-if-changed'
+  format: melos exec -- 'dart format . --set-exit-if-changed --line-length=120'
   analyze: melos exec -- "dart analyze . --fatal-infos"
   test:
     run: |
@@ -28,6 +28,11 @@ scripts:
       melos run coverage:ci
       genhtml -o $MELOS_ROOT_PATH/coverage/report $MELOS_ROOT_PATH/coverage/*_lcov.info
       open $MELOS_ROOT_PATH/coverage/report/index.html
+  generate:build:
+    select-package:
+      depends-on: build_runner
+    run: |
+      melos exec --depends-on=build_runner -- "dart run build_runner build --delete-conflicting-outputs"
   generate:html:
     run: |
       cd packages/jaspr

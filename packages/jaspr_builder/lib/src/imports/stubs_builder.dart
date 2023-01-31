@@ -34,7 +34,8 @@ class ImportsStubsBuilder implements Builder {
         var types = show.where((n) => n.substring(0, 1).toLowerCase() != n.substring(0, 1));
         stubs.addAll(types.map((n) => 'typedef ${n}OrStubbed = dynamic;'));
 
-        if (path.isRelative(url)) {
+        var uri = Uri.parse(url);
+        if (uri.scheme.isEmpty && path.isRelative(uri.path)) {
           var absUrl = path.join(path.dirname(id.path), url);
           url = path.relative(absUrl, from: 'lib/generated/imports/_.dart');
         }
@@ -52,6 +53,7 @@ class ImportsStubsBuilder implements Builder {
         AssetId(buildStep.inputId.package, 'lib/generated/imports/_vm.dart'),
         DartFormatter().format("""
           $generationHeader
+          // ignore_for_file: directives_ordering
           
           ${vmImports.entries.where((e) => e.value.any((v) => v.isType)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
           ${vmImports.entries.map((e) => "export '${e.key}' show ${e.value.join(', ')};").join('\n')}
@@ -66,6 +68,7 @@ class ImportsStubsBuilder implements Builder {
         AssetId(buildStep.inputId.package, 'lib/generated/imports/_web.dart'),
         DartFormatter().format("""
           $generationHeader
+          // ignore_for_file: directives_ordering
           
           ${webImports.entries.where((e) => e.value.any((v) => v.isType)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
           ${webImports.entries.map((e) => "export '${e.key}' show ${e.value.join(', ')};").join('\n')}
@@ -80,7 +83,7 @@ class ImportsStubsBuilder implements Builder {
         AssetId(buildStep.inputId.package, 'lib/generated/imports/_stubs.dart'),
         DartFormatter().format("""
          $generationHeader
-         // ignore_for_file: non_constant_identifier_names
+         // ignore_for_file: directives_ordering, non_constant_identifier_names
          
          ${stubs.join('\n')}
         """),

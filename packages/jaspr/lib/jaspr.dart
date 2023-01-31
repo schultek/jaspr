@@ -1,6 +1,11 @@
 export 'package:meta/meta.dart'
     show factory, immutable, mustCallSuper, nonVirtual, optionalTypeArgs, protected, required, visibleForTesting;
 
+export 'src/components/async.dart';
+export 'src/components/basic.dart';
+export 'src/components/child_node.dart';
+export 'src/components/style.dart';
+
 export 'src/foundation/annotations.dart';
 export 'src/foundation/basic_types.dart';
 export 'src/foundation/binding.dart';
@@ -18,5 +23,7 @@ export 'src/foundation/run_app_stub.dart'
     if (dart.library.io) 'src/server/run_app.dart' show runApp;
 export 'src/foundation/scheduler.dart';
 export 'src/foundation/sync.dart';
+
 export 'src/framework/framework.dart';
+
 export 'src/ui/styles.dart';
