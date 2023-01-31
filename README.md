@@ -14,10 +14,10 @@
 </p>
 
 <p align="center">
-  <a href="https://docs.page/schultek/jaspr~develop/quick-start">Quickstart</a> •
-  <a href="https://docs.page/schultek/jaspr~develop">Documentation</a> •
+  <a href="https://docs.page/schultek/jaspr/quick-start">Quickstart</a> •
+  <a href="https://docs.page/schultek/jaspr">Documentation</a> •
   <a href="https://jasprpad.schultek.de">Playground</a> •
-  <a href="https://github.com/schultek/jaspr/tree/develop/examples/">Examples</a> •
+  <a href="https://github.com/schultek/jaspr/tree/main/examples/">Examples</a> •
   <a href="https://discord.gg/XGXrGEk4c6">Community & Support</a> •
   <a href="https://jaspr-benchmarks.web.app">Benchmarks</a>
 </p>
@@ -34,7 +34,7 @@
   web framework written completely in Dart.
 
 > Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of
-> developers around Jaspr and check out the [Contributing Guide](https://docs.page/schultek/jaspr~develop/eco/contributing).
+> developers around Jaspr and check out the [Contributing Guide](https://docs.page/schultek/jaspr/eco/contributing).
 
 ### Core Features
 
@@ -55,7 +55,7 @@ Inspired by DartPad, **Jaspr** has it's own online editor and playground, called
 You can check out the samples, take the tutorial or try out jaspr for yourself, all live in the browser.
 When you want to continue coding offline, you can quickly download the current files bundled in a complete dart project, ready to start coding locally.
 
-JasprPad is also built with **Jaspr** itself, so you can [**check out its source code**](https://github.com/schultek/jaspr/tree/develop/apps/jaspr_pad) to get a feel for how jaspr would be used in a larger app.
+JasprPad is also built with **Jaspr** itself, so you can [**check out its source code**](https://github.com/schultek/jaspr/tree/main/apps/jaspr_pad) to get a feel for how jaspr would be used in a larger app.
 
 ![JasprPad Screenshot](https://user-images.githubusercontent.com/13920539/170837732-9e09d5f3-e79e-4ddd-b118-72e49456a7cd.png)
 
@@ -82,7 +82,7 @@ Rather it embraces these differences to give the best of both worlds.
 
 - **/apps**: Production apps built with jaspr
   - **/jaspr_pad**: Online Editor and Playground inspired by DartPad, built with jaspr.
-- **/docs**: Documentation hosted at [docs.page/schultek/jaspr](https://docs.page/schultek/jaspr~develop)
+- **/docs**: Documentation hosted at [docs.page/schultek/jaspr](https://docs.page/schultek/jaspr)
 - **/examples**: Well-maintained and documented examples
 - **/experiments**: Experimental apps or features, that are not part of the core framework (yet?) (may be broken).
 - **/packages**:

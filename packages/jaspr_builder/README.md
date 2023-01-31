@@ -14,7 +14,7 @@ dart pub add jaspr_builder --dev
 
 Builder for automatic setup of app and island components.
 
-View [islands architecture](https://docs.page/schultek/jaspr~develop/advanced/islands) for documentation.
+View [islands architecture](https://docs.page/schultek/jaspr/advanced/islands) for documentation.
 
 ## web_mock
 

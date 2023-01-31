@@ -1,14 +1,9 @@
 # Roadmap
 
-## v0.2
+## v0.3
 
-- 🚧 Finish documentation
-- 🚧 Add helpful examples
 - 🚧 Bump test coverage over 80%
 - 🔜 Rewrite router package
-  
-## > v0.2
-
 - 🔜 Add inherited / hoisted styles
 - 🔜 Add theming
 - 🔜 Improve common ui component library

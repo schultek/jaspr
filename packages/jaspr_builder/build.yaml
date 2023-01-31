@@ -43,9 +43,3 @@ builders:
     auto_apply: dependents
     build_to: source
     runs_before: [ "build_web_compilers" ]
-targets:
-  $default:
-    builders:
-      jaspr_builder:
-        generate_for:
-          - test/native_interfaces.web.dart
