@@ -42,7 +42,7 @@ jobs:
 
       - name: Create & Build Project
         run: |
-          jaspr create my_app
+          jaspr create -t basic my_app
           cd my_app
           jaspr build
 
