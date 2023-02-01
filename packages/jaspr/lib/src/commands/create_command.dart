@@ -67,7 +67,11 @@ class CreateCommand extends BaseCommand {
     var generator = await MasonGenerator.fromBundle(template);
     final files = await generator.generate(
       DirectoryGeneratorTarget(directory),
-      vars: {'name': name, 'jasprCoreVersion': '0.1.0', 'jasprBuilderVersion': '0.1.0'},
+      vars: {
+        'name': name,
+        'jasprCoreVersion': jasprCoreVersion,
+        'jasprBuilderVersion': jasprBuilderVersion,
+      },
       logger: logger,
     );
     progress.complete('Generated ${files.length} file(s)');
