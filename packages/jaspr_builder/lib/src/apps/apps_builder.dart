@@ -58,7 +58,7 @@ class AppsBuilder implements Builder {
       log.warning("Cannot have multiple components annotated with $usedAnnotation in a single library.");
     }
 
-    var part = path.url.basenameWithoutExtension(buildStep.inputId.path) + '.g.dart';
+    var part = '${path.url.basenameWithoutExtension(buildStep.inputId.path)}.g.dart';
 
     final libraryUnit = await buildStep.resolver.compilationUnitFor(buildStep.inputId);
     final hasPartDirective = libraryUnit.directives.whereType<PartDirective>().any((e) => e.uri.stringValue == part);
@@ -85,8 +85,7 @@ class AppsBuilder implements Builder {
 
     var mixinName = '_\$${element.name}';
     var usesMixin =
-        (element.node as ClassDeclaration).withClause?.mixinTypes.any((type) => type.name.name == mixinName) ??
-            false;
+        (element.node as ClassDeclaration).withClause?.mixinTypes.any((type) => type.name.name == mixinName) ?? false;
 
     if (!usesMixin) {
       log.warning('Your class ${element.name} must mixin the generated \'$mixinName\' mixin.');
@@ -108,7 +107,7 @@ class AppsBuilder implements Builder {
       mixin $mixinName implements ComponentEntryMixin<${element.name}> {
         @override
         ComponentEntry<${element.name}> get entry {
-          var self = this as ${element.name};
+          ${params.isNotEmpty ? 'var self = this as ${element.name};' : ''}
           return ComponentEntry.${isApp ? isIsland ? 'appAndIsland' : 'app' : 'island'}(
             '${path.url.relative(path.url.withoutExtension(buildStep.inputId.path), from: 'lib')}'
             ${params.isNotEmpty ? ', params: {${params.map((p) => "'${p.name}': self.${p.name}").join(', ')}},' : ''}

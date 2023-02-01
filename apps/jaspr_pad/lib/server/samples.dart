@@ -5,7 +5,6 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:path/path.dart' as path;
 
 import '../models/sample.dart';
-import '../providers/utils.dart';
 import 'project.dart';
 
 final sampleHeader = RegExp(r'//\s?\[sample(?:=(\d+))?\](\[hidden\])?(?:\s*)(.*)');
@@ -49,7 +48,7 @@ Future<Response> getSample(Request request, String id) async {
   return Response.ok(result.toJson(), headers: {'Content-Type': 'application/json'});
 }
 
-final loadSamplesProvider = SyncProvider<List<Sample>>((ref) async {
+Future<List<Sample>> loadSamplesProviderOverride(SyncProviderRef<List<Sample>> ref) async {
   var dirs = await Directory(samplesPath).list().toList();
 
   var loadedSamples = (await Future.wait(dirs.map((dir) async {
@@ -79,4 +78,4 @@ final loadSamplesProvider = SyncProvider<List<Sample>>((ref) async {
   loadedSamples.sort();
 
   return loadedSamples;
-}, id: 'samples', codec: MapperCodec());
+}

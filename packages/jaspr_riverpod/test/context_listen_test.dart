@@ -28,7 +28,7 @@ void main() {
           yield Button(
             label: 'tap',
             onPressed: () {
-              context.read(counter.state).state++;
+              context.read(counter.notifier).state++;
             },
           );
         }));
@@ -55,7 +55,7 @@ void main() {
           yield Button(
             label: '${context.watch(counter)}',
             onPressed: () {
-              context.read(counter.state).state++;
+              context.read(counter.notifier).state++;
             },
           );
         }));
@@ -85,7 +85,7 @@ void main() {
                 yield Button(
                   label: 'a ${context.watch(counter)}',
                   onPressed: () {
-                    context.read(counter.state).state++;
+                    context.read(counter.notifier).state++;
                   },
                 );
               },
@@ -94,7 +94,7 @@ void main() {
             yield Button(
               label: 'b ${context.watch(counter)}',
               onPressed: () {
-                context.read(counter.state).state++;
+                context.read(counter.notifier).state++;
               },
             );
           }
@@ -145,7 +145,7 @@ void main() {
         expect(element.read(counterB), equals(0));
 
         // increase counter
-        element.read(counterB.state).state = 1;
+        element.read(counterB.notifier).state = 1;
 
         expect(wasCalledWith, equals([0, 1]));
 

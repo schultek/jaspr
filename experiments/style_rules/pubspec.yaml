@@ -1,4 +1,5 @@
 name: style_rules
+publish_to: none
 description: A minimal jaspr web app.
 version: 0.0.1
 

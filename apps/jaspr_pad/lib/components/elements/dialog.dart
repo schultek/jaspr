@@ -6,7 +6,6 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import '../../adapters/html.dart';
 import '../../adapters/mdc.dart';
 
-
 final _dialogStateProvider = StateProvider.family<_DialogState?, String>((ref, String id) => null);
 
 class _DialogState<T> {

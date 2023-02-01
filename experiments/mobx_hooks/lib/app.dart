@@ -26,8 +26,7 @@ class App extends StatelessComponent {
 
     useAutorun(() {
       final random = Random(text.value.hashCode);
-      final subs =
-          Stream.periodic(Duration(seconds: seconds.value)).listen((event) {
+      final subs = Stream.periodic(Duration(seconds: seconds.value)).listen((event) {
         print('event seconds: ${seconds.value}, text: "${text.value}"');
         output.value = random.nextInt(9000) + 1000;
       });

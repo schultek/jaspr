@@ -18,7 +18,6 @@ class TabBar extends StatefulComponent {
   final List<Tab> tabs;
   final Component? leading;
 
-
   @override
   State createState() => TabBarState();
 }

@@ -1,6 +1,8 @@
 ## 0.2.0
 
-- Added builders for island components
+- Updated jaspr to `v0.2.0`
+- Added builders for app & island components
+- Added builders for platform imports
 
 ## 0.1.0
 

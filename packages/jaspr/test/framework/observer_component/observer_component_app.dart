@@ -39,8 +39,7 @@ class App extends TestComponent<ObserverParam> {
 }
 
 class MyObserverComponent extends ObserverComponent {
-  MyObserverComponent({required this.value, required Component child})
-      : super(child: child);
+  MyObserverComponent({required this.value, required Component child}) : super(child: child);
 
   final ObserverParam value;
 
@@ -84,8 +83,7 @@ class MyChildComponent extends StatefulComponent {
   State<StatefulComponent> createState() => MyChildState();
 }
 
-class MyChildState extends State<MyChildComponent>
-    with TrackStateLifecycle<MyChildComponent> {
+class MyChildState extends State<MyChildComponent> with TrackStateLifecycle<MyChildComponent> {
   late final ValueNotifier<bool> notifier;
 
   @override

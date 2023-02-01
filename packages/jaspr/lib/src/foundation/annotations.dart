@@ -14,10 +14,7 @@ class IslandAnnotation {
 /// Used to annotate an island component
 const island = IslandAnnotation._();
 
-
-enum ImportPlatform {
-  web, server
-}
+enum ImportPlatform { web, server }
 
 /// Define a platform specific import with auto-generated stubbing.
 ///
@@ -66,16 +63,15 @@ class ComponentEntry<T extends Component> {
   final ComponentEntryType type;
   final Map<String, dynamic>? params;
 
-  ComponentEntry.app(this.name, {this.params}): type = ComponentEntryType.app;
-  ComponentEntry.island(this.name, {this.params}): type = ComponentEntryType.island;
-  ComponentEntry.appAndIsland(this.name, {this.params}): type = ComponentEntryType.appAndIsland;
+  ComponentEntry.app(this.name, {this.params}) : type = ComponentEntryType.app;
+  ComponentEntry.island(this.name, {this.params}) : type = ComponentEntryType.island;
+  ComponentEntry.appAndIsland(this.name, {this.params}) : type = ComponentEntryType.appAndIsland;
 
   bool get isApp => type == ComponentEntryType.app || type == ComponentEntryType.appAndIsland;
   bool get isIsland => type == ComponentEntryType.island || type == ComponentEntryType.appAndIsland;
 }
 
 enum ComponentEntryType {
-
   app(true, false),
   island(false, true),
   appAndIsland(true, true);

@@ -487,7 +487,8 @@ class _BoxShadow implements BoxShadow {
 }
 
 class _InsetBoxShadow extends _BoxShadow {
-  const _InsetBoxShadow({required super.offsetX, required super.offsetY, super.blur, super.spread, super.color}) : super(inset: true);
+  const _InsetBoxShadow({required super.offsetX, required super.offsetY, super.blur, super.spread, super.color})
+      : super(inset: true);
 }
 
 class _CombineBoxShadow implements BoxShadow {
@@ -500,7 +501,6 @@ class _CombineBoxShadow implements BoxShadow {
 }
 
 class Cursor {
-
   const Cursor._(this.value);
 
   final String value;
@@ -546,7 +546,6 @@ class Cursor {
 }
 
 class _UrlCursor implements Cursor {
-
   const _UrlCursor(this.url, {this.x, this.y, required this.fallback});
 
   final String url;
@@ -559,7 +558,6 @@ class _UrlCursor implements Cursor {
 }
 
 abstract class Transition {
-
   const factory Transition(String property, {required double duration, Curve? curve, double? delay}) = _Transition;
   const factory Transition.combine(List<Transition> transitions) = _CombineTransition;
 
@@ -567,7 +565,6 @@ abstract class Transition {
 }
 
 class _Transition implements Transition {
-
   const _Transition(this.property, {required this.duration, this.curve, this.delay});
 
   final String property;
@@ -576,7 +573,8 @@ class _Transition implements Transition {
   final double? delay;
 
   @override
-  String get value => [property, '${duration}ms', if (curve != null) curve!.value, if (delay != null) '${delay}ms'].join(' ');
+  String get value =>
+      [property, '${duration}ms', if (curve != null) curve!.value, if (delay != null) '${delay}ms'].join(' ');
 }
 
 class _CombineTransition implements Transition {
@@ -607,7 +605,6 @@ class Curve {
 }
 
 class _CubicBezierCurve implements Curve {
-
   const _CubicBezierCurve(this.p1, this.p2, this.p3, this.p4);
 
   final double p1;
@@ -620,7 +617,6 @@ class _CubicBezierCurve implements Curve {
 }
 
 class _StepsCurve implements Curve {
-
   const _StepsCurve(this.steps, {required this.jump});
 
   final int steps;

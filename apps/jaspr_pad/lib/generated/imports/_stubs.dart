@@ -1,7 +1,7 @@
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: directives_ordering, non_constant_identifier_names
 
 dynamic MDCRipple;
 dynamic MDCDialog;

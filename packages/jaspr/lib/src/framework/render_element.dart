@@ -1,7 +1,6 @@
 part of framework;
 
 mixin RenderElement on Element {
-
   @override
   RenderElement get _lastNode => this;
 

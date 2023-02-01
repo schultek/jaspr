@@ -54,8 +54,8 @@ mixin DocumentBinding on BindingBase, SyncBinding {
       var syncState = getStateData();
       var stateScript = document.createElement('script');
       stateScript.innerHtml = 'window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert({
-        if (syncState.isNotEmpty) 'sync': kDebugMode ? syncState : stateCodec.encode(syncState),
-      })};';
+            if (syncState.isNotEmpty) 'sync': kDebugMode ? syncState : stateCodec.encode(syncState),
+          })};';
 
       document.head!.append(stateScript);
       content = document.outerHtml;

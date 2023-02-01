@@ -266,7 +266,7 @@ class TextDecoration {
 }
 
 abstract class TextShadow {
-  const factory TextShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Color? color }) = _TextShadow;
+  const factory TextShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Color? color}) = _TextShadow;
 
   const factory TextShadow.combine(List<TextShadow> shadows) = _CombineTextShadow;
 
@@ -274,7 +274,6 @@ abstract class TextShadow {
 }
 
 class _TextShadow implements TextShadow {
-
   const _TextShadow({required this.offsetX, required this.offsetY, this.blur, this.color});
 
   final Unit offsetX;
@@ -283,11 +282,11 @@ class _TextShadow implements TextShadow {
   final Color? color;
 
   @override
-  String get value => [offsetX.value, offsetY.value, if (blur != null) blur!.value, if (color != null) color!.value].join(' ');
+  String get value =>
+      [offsetX.value, offsetY.value, if (blur != null) blur!.value, if (color != null) color!.value].join(' ');
 }
 
 class _CombineTextShadow implements TextShadow {
-
   const _CombineTextShadow(this.shadows);
 
   final List<TextShadow> shadows;

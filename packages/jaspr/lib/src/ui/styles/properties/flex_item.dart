@@ -71,7 +71,6 @@ class _FlexBasis implements FlexBasis {
   String get value => _value.value;
 }
 
-
 enum AlignSelf {
   auto('auto'),
   normal('normal'),

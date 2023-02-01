@@ -2,7 +2,6 @@ import '../../../foundation/constants.dart';
 import 'unit.dart';
 
 class GridTemplate {
-
   const GridTemplate({this.columns, this.rows, this.areas});
 
   final GridTracks? columns;
@@ -19,7 +18,6 @@ class GridTemplate {
 }
 
 class GridTracks {
-
   const GridTracks._(this.value);
 
   final String value;
@@ -33,7 +31,6 @@ class GridTracks {
 }
 
 class _GridTracks implements GridTracks {
-
   const _GridTracks(this.tracks);
 
   final List<GridTrack> tracks;
@@ -43,7 +40,6 @@ class _GridTracks implements GridTracks {
 }
 
 class GridAreas {
-
   const GridAreas(this.lines);
 
   final List<String> lines;
@@ -62,7 +58,6 @@ abstract class GridTrack {
 }
 
 class _LineGridTrack implements GridTrack {
-
   const _LineGridTrack(this.name);
 
   final String name;
@@ -72,7 +67,6 @@ class _LineGridTrack implements GridTrack {
 }
 
 class _GridTrack implements GridTrack {
-
   const _GridTrack(this.size);
 
   final TrackSize size;
@@ -82,7 +76,6 @@ class _GridTrack implements GridTrack {
 }
 
 class _RepeatGridTrack implements GridTrack {
-
   const _RepeatGridTrack(this.repeat, this.tracks);
 
   final TrackRepeat repeat;
@@ -93,7 +86,6 @@ class _RepeatGridTrack implements GridTrack {
 }
 
 class TrackSize {
-
   const TrackSize._(this.value);
 
   final String value;
@@ -110,7 +102,6 @@ class TrackSize {
 }
 
 class _TrackSize implements TrackSize {
-
   const _TrackSize(this._value);
 
   final Unit _value;
@@ -120,7 +111,6 @@ class _TrackSize implements TrackSize {
 }
 
 class _FrTrackSize implements TrackSize {
-
   const _FrTrackSize(this._value);
 
   final double _value;
@@ -130,7 +120,6 @@ class _FrTrackSize implements TrackSize {
 }
 
 class _MinMaxTrackSize implements TrackSize {
-
   const _MinMaxTrackSize(this.min, this.max);
 
   final TrackSize min;
@@ -141,7 +130,6 @@ class _MinMaxTrackSize implements TrackSize {
 }
 
 class _FitContentTrackSize implements TrackSize {
-
   const _FitContentTrackSize(this._value);
 
   final Unit _value;
@@ -162,10 +150,11 @@ class TrackRepeat {
 }
 
 class GridGap {
-
   const GridGap({this.row, this.column});
 
-  const GridGap.all(Unit value) : row = value, column = value;
+  const GridGap.all(Unit value)
+      : row = value,
+        column = value;
 
   final Unit? row;
   final Unit? column;
@@ -182,5 +171,4 @@ class GridGap {
       };
     }
   }
-
 }

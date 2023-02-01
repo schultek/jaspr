@@ -65,7 +65,6 @@ class ChildNodeDelegate extends RenderDelegate {
 
   @override
   bool updateShouldNotify(covariant ChildNodeDelegate oldDelegate) {
-    return component.runtimeType != oldDelegate.component.runtimeType ||
-        component.hasChanged(oldDelegate.component);
+    return component.runtimeType != oldDelegate.component.runtimeType || component.hasChanged(oldDelegate.component);
   }
 }

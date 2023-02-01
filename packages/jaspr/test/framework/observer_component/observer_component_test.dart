@@ -20,17 +20,13 @@ void main() {
       // phase 1: observer component should be mounted
       expect(find.text('Leaf true false'), findsOneComponent);
 
-      MyChildState state =
-          (find.byType(MyChildComponent).evaluate().first as StatefulElement)
-              .state as MyChildState;
+      MyChildState state = (find.byType(MyChildComponent).evaluate().first as StatefulElement).state as MyChildState;
 
       // lifecycle: state should be initialized and built a first time
-      expect(state.lifecycle,
-          equals(['initState', 'didChangeDependencies', 'build']));
+      expect(state.lifecycle, equals(['initState', 'didChangeDependencies', 'build']));
       state.lifecycle.clear();
 
-      void checkEvents(
-          List<MapEntry<TypeMatcher<Element>, ObserverElementEvent>> expected) {
+      void checkEvents(List<MapEntry<TypeMatcher<Element>, ObserverElementEvent>> expected) {
         expect(
           events.map((e) => {'elem': e.key, 'event': e.value}),
           expected.map((e) => {'elem': e.key, 'event': e.value}),
@@ -90,15 +86,12 @@ void main() {
       // phase 2: Remove child MyObserverElement
       await controller.rebuildWith(params);
 
-      final newState =
-          (find.byType(MyChildComponent).evaluate().first as StatefulElement)
-              .state as MyChildState;
+      final newState = (find.byType(MyChildComponent).evaluate().first as StatefulElement).state as MyChildState;
       expect(state, isNot(newState));
       state = newState;
       expect(find.text('Leaf false false'), findsOneComponent);
       // lifecycle: state should be initialized and built a first time
-      expect(state.lifecycle,
-          equals(['initState', 'didChangeDependencies', 'build']));
+      expect(state.lifecycle, equals(['initState', 'didChangeDependencies', 'build']));
       state.lifecycle.clear();
 
       // Second build with one MyObserverElement and unmount the others
@@ -152,9 +145,7 @@ void main() {
       events.clear();
 
       // observer value should be updated, but without notifying dependants
-      expect(
-          find.byComponentPredicate((component) =>
-              component is MyObserverComponent && component.value == params),
+      expect(find.byComponentPredicate((component) => component is MyObserverComponent && component.value == params),
           findsOneComponent);
     });
   });

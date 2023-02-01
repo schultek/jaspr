@@ -28,14 +28,14 @@ class Image extends BaseComponent {
 
   @override
   Map<String, String> getAttributes() => {
-    'width': width.toString(),
-    'height': height.toString(),
-    'src': source.toString(),
-    if (description != null) 'alt': description!,
-    if (tooltip != null) 'title': tooltip!,
-    if (lazyLoading) 'loading': 'lazy',
-    ...super.attributes ?? {},
-  };
+        'width': width.toString(),
+        'height': height.toString(),
+        'src': source.toString(),
+        if (description != null) 'alt': description!,
+        if (tooltip != null) 'title': tooltip!,
+        if (lazyLoading) 'loading': 'lazy',
+        ...super.attributes ?? {},
+      };
 }
 
 class Video extends BaseComponent {
@@ -67,22 +67,21 @@ class Video extends BaseComponent {
     super.events,
   }) : super(tag: 'video');
 
-
   @override
   List<Component> getChildren() => [Text(defaultText)];
 
   @override
   Map<String, String> getAttributes() => {
-    'width': width.toString(),
-    'height': height.toString(),
-    'src': source.toString(),
-    if (showControls) 'controls': '',
-    if (autoplay) 'autoplay': '',
-    if (loop) 'loop': '',
-    if (muted) 'muted': '',
-    if (poster != null) 'poster': poster.toString(),
-      ...super.attributes ?? {},
-  };
+        'width': width.toString(),
+        'height': height.toString(),
+        'src': source.toString(),
+        if (showControls) 'controls': '',
+        if (autoplay) 'autoplay': '',
+        if (loop) 'loop': '',
+        if (muted) 'muted': '',
+        if (poster != null) 'poster': poster.toString(),
+        ...super.attributes ?? {},
+      };
 }
 
 class Audio extends BaseComponent {
@@ -108,17 +107,16 @@ class Audio extends BaseComponent {
     super.events,
   }) : super(tag: 'audio');
 
-
   @override
   List<Component> getChildren() => [Text(defaultText)];
 
   @override
   Map<String, String> getAttributes() => {
-    'src': source.toString(),
-    if (showControls) 'controls': '',
-    if (autoplay) 'autoplay': '',
-    if (loop) 'loop': '',
-    if (muted) 'muted': '',
-    ...super.attributes ?? {},
-  };
+        'src': source.toString(),
+        if (showControls) 'controls': '',
+        if (autoplay) 'autoplay': '',
+        if (loop) 'loop': '',
+        if (muted) 'muted': '',
+        ...super.attributes ?? {},
+      };
 }

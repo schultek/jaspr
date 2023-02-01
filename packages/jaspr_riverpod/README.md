@@ -8,7 +8,7 @@ on Riverpod 2 and supports all providers and modifiers.
 - No `Consumer` / `ConsumerComponent`, just use `context.read` / `context.watch`
 - Additional `SyncProvider` to sync values between server and client.
 
-> Also check out [this example](https://github.com/schultek/jaspr/tree/develop/examples/riverpod_app).
+> Also check out [this example](https://github.com/schultek/jaspr/tree/main/examples/riverpod_app).
 
 ## 🪄 Accessing Providers
 

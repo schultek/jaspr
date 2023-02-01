@@ -78,7 +78,10 @@ class BuildOwner {
   /// the execution of [child.performRebuild()] instead of calling it directly.
   void performRebuildOn(Element child, void Function() whenComplete) {
     if (!isFirstBuild) {
-      assert(child._asyncFirstBuild == null && child._asyncFirstBuildChildren.isEmpty, 'Only the first build is allowed to be asynchronous.',);
+      assert(
+        child._asyncFirstBuild == null && child._asyncFirstBuildChildren.isEmpty,
+        'Only the first build is allowed to be asynchronous.',
+      );
       child.performRebuild();
       whenComplete();
       return;

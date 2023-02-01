@@ -3,7 +3,7 @@ include: package:lints/recommended.yaml
 analyzer:
   exclude:
     - lib/**.g.dart
-    - templates/jaspr_export
+    - templates/**
 
 linter:
   rules:

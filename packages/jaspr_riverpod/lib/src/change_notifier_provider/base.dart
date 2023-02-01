@@ -3,8 +3,7 @@
 part of '../change_notifier_provider.dart';
 
 /// {@macro riverpod.providerrefbase}
-abstract class ChangeNotifierProviderRef<NotifierT extends ChangeNotifier?>
-    implements Ref<NotifierT> {
+abstract class ChangeNotifierProviderRef<NotifierT extends ChangeNotifier?> implements Ref<NotifierT> {
   /// The [ChangeNotifier] currently exposed by this provider.
   ///
   /// Cannot be accessed while creating the provider.
@@ -76,8 +75,7 @@ abstract class ChangeNotifierProviderRef<NotifierT extends ChangeNotifier?>
 /// }
 /// ```
 /// {@endtemplate}
-class ChangeNotifierProvider<NotifierT extends ChangeNotifier?>
-    extends _ChangeNotifierProviderBase<NotifierT>
+class ChangeNotifierProvider<NotifierT extends ChangeNotifier?> extends _ChangeNotifierProviderBase<NotifierT>
     with AlwaysAliveProviderBase<NotifierT> {
   /// {@macro riverpod.ChangeNotifierprovider}
   ChangeNotifierProvider(
@@ -108,13 +106,11 @@ class ChangeNotifierProvider<NotifierT extends ChangeNotifier?>
   }
 
   @override
-  late final AlwaysAliveRefreshable<NotifierT> notifier =
-      _notifier<NotifierT>(this);
+  late final AlwaysAliveRefreshable<NotifierT> notifier = _notifier<NotifierT>(this);
 }
 
 /// The element of [ChangeNotifierProvider].
-class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?>
-    extends ProviderElementBase<NotifierT>
+class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?> extends ProviderElementBase<NotifierT>
     implements ChangeNotifierProviderRef<NotifierT> {
   ChangeNotifierProviderElement._(
     _ChangeNotifierProviderBase<NotifierT> super.provider,
@@ -130,8 +126,7 @@ class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?>
   void create({required bool didChangeDependency}) {
     final provider = this.provider as _ChangeNotifierProviderBase<NotifierT>;
 
-    final notifierResult =
-        _notifierNotifier.result = Result.guard(() => provider._create(this));
+    final notifierResult = _notifierNotifier.result = Result.guard(() => provider._create(this));
 
     // TODO test requireState, as ref.read(p) is expected to throw if notifier creation failed
     final notifier = notifierResult.requireState;
@@ -178,9 +173,8 @@ class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?>
 
 // ignore: subtype_of_sealed_class
 /// The [Family] of [ChangeNotifierProvider].
-class ChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?, Arg>
-    extends FamilyBase<ChangeNotifierProviderRef<NotifierT>, NotifierT, Arg,
-        NotifierT, ChangeNotifierProvider<NotifierT>> {
+class ChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?, Arg> extends FamilyBase<
+    ChangeNotifierProviderRef<NotifierT>, NotifierT, Arg, NotifierT, ChangeNotifierProvider<NotifierT>> {
   /// The [Family] of [ChangeNotifierProvider].
   ChangeNotifierProviderFamily(
     super.create, {

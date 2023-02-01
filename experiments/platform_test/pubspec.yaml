@@ -1,4 +1,5 @@
 name: platform_test
+publish_to: none
 description: A basic pure-dart web app with ssr & automatic client hydration.
 version: 0.0.1
 

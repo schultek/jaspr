@@ -9,7 +9,6 @@ part 'content.g.dart';
 // - will be hydrated on the client
 @island
 class Content extends StatelessComponent with _$Content {
-
   // Island components can have additional parameters
   // - which must be json-serializable
   // - and will be inserted during hydration

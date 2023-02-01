@@ -20,7 +20,7 @@ void main() {
         yield Button(
           label: '${context.watch(counter)}',
           onPressed: () {
-            context.read(counter.state).state++;
+            context.read(counter.notifier).state++;
           },
         );
       }));
@@ -40,18 +40,18 @@ void main() {
             key: const ValueKey('a'),
             label: 'a ${context.watch(counter)}',
             onPressed: () {
-              context.read(counter.state).state++;
+              context.read(counter.notifier).state++;
             },
           );
         });
         yield ProviderScope(
-          overrides: [counter.overrideWithProvider(StateProvider((ref) => 10))],
+          overrides: [counter.overrideWith((ref) => 10)],
           child: Builder(builder: (context) sync* {
             yield Button(
               key: const ValueKey('b'),
               label: 'b ${context.watch(counter)}',
               onPressed: () {
-                context.read(counter.state).state++;
+                context.read(counter.notifier).state++;
               },
             );
           }),
@@ -82,7 +82,7 @@ void main() {
             yield Button(
               label: showCounter ? '${context.watch(autoDisposeCounter)}' : 'hidden',
               onPressed: () {
-                context.read(autoDisposeCounter.state).state++;
+                context.read(autoDisposeCounter.notifier).state++;
               },
             );
             yield Button(

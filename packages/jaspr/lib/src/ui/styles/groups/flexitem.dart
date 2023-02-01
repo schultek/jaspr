@@ -9,8 +9,8 @@ class _FlexItemStyles implements Styles {
 
   @override
   Map<String, String> get styles => {
-    ...?flex?.styles,
-    if (order != null) 'order': order!.toString(),
-    if (alignSelf != null) 'align-self': alignSelf!.value,
+        ...?flex?.styles,
+        if (order != null) 'order': order!.toString(),
+        if (alignSelf != null) 'align-self': alignSelf!.value,
       };
 }

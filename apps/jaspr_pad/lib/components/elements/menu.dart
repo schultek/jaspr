@@ -4,7 +4,6 @@ import '../../adapters/html.dart' hide Element;
 import '../../adapters/mdc.dart';
 import 'button.dart';
 
-
 class MenuItem extends StatelessComponent {
   const MenuItem({required this.label, Key? key}) : super(key: key);
 

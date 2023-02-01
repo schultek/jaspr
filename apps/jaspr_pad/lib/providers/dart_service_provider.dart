@@ -33,7 +33,8 @@ class DartService {
   }
 
   Future<T> _request<T>(String action, Object body) async {
-    var response = await client.post(Uri.parse('${window.location.origin}/api/$action'), body: mainContainer.toJson(body));
+    var response =
+        await client.post(Uri.parse('${window.location.origin}/api/$action'), body: mainContainer.toJson(body));
     return mainContainer.fromJson<T>(response.body);
   }
 }

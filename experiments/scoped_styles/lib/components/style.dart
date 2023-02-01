@@ -1,6 +1,6 @@
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart';
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/jaspr.dart' hide Selector;
 import 'package:uuid/uuid.dart';
 
 class Style extends StatefulComponent {

@@ -9,7 +9,10 @@ next: /core/html
 
 **Jaspr** comes with a component system that is very similar to Flutters widgets. This is a core design decision of jaspr, in order to look and feel very familiar to developers coming from Flutter. You might think of it as just replacing the word 'Widget' with 'Component' *(which actually was a small part of jasprs development process 😉)*, while keeping the same structure and behavior.
 
-> The following page and other documentation assumes, that you have already a basic understanding of Flutters widget system, especially the widget tree and the three base widgets: StatelessWidget, StatefulWidget and InheritedWidget.
+<Warning>
+The following page and other documentation assumes, that you have already a basic understanding of Flutters widget 
+system, especially the widget tree and the three base widgets: StatelessWidget, StatefulWidget and InheritedWidget.
+</Warning>
 
 When building an app or website with **jaspr** you will mostly use these **five** basic components:
 
@@ -92,7 +95,9 @@ Similar to Flutter, this component:
 
 Different to Flutter is that the `build()` method does not return a single `Component`, but rather multiple `Component`s as an `Iterable<Component>`. This is again because a HTML element can always have multiple child elements.
 
-> This design decision was made based on the core principles of jaspr, explained [here](https://github.com/schultek/jaspr/wiki#-jaspr-vs-flutter-web)
+<Info>
+This design decision was made based on the core principles of jaspr, explained [here](/jaspr-vs-flutter-web)
+</Info>
 
 The recommended way to write `build()` methods with **jaspr** is to use the [**synchronous generator**](https://dart.dev/guides/language/language-tour#generators) pattern. It allows us to return multiple child components in a declarative way by `yield`ing each component without needing to deal with `List`s or `Iterable`s directly.
 

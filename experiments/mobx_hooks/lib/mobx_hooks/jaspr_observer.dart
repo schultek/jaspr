@@ -49,8 +49,7 @@ class MobXHooksObserverElement extends ObserverElement {
   @override
   void didRebuildElement(Element element) {
     assert(globalHookContext == hookContexts[element]);
-    print(
-        'didRebuildElement ${globalHookContext.hashCode} ${element.hashCode}');
+    print('didRebuildElement ${globalHookContext.hashCode} ${element.hashCode}');
 
     globalHookContext.endTracking();
   }

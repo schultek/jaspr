@@ -9,7 +9,20 @@ part of jaspr_html;
 /// - [muted]: Indicates whether the audio will be initially silenced. Its default value is false.
 /// - [preload]: Provides a hint to the browser about what the author thinks will lead to the best user experience.
 /// - [src]: The URL of the audio to embed. This is subject to HTTP access controls. This is optional; you may instead use the &lt;source&gt; element within the audio block to specify the audio to embed.
-Component audio(List<Component> children, {bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool? loop, bool? muted, Preload? preload, String? src, Key? key, String? id, List<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component audio(List<Component> children,
+    {bool? autoplay,
+    bool? controls,
+    CrossOrigin? crossOrigin,
+    bool? loop,
+    bool? muted,
+    Preload? preload,
+    String? src,
+    Key? key,
+    String? id,
+    List<String>? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'audio',
     key: key,
@@ -35,6 +48,7 @@ Component audio(List<Component> children, {bool? autoplay, bool? controls, Cross
 enum CrossOrigin {
   /// Sends a cross-origin request without a credential. In other words, it sends the Origin: HTTP header without a cookie, X.509 certificate, or performing HTTP Basic authentication. If the server does not give credentials to the origin site (by not setting the Access-Control-Allow-Origin: HTTP header), the image will be tainted, and its usage restricted.
   anonymous('anonymous'),
+
   /// Sends a cross-origin request with a credential. In other words, it sends the Origin: HTTP header with a cookie, a certificate, or performing HTTP Basic authentication. If the server does not give credentials to the origin site (through Access-Control-Allow-Credentials: HTTP header), the image will be tainted and its usage restricted.
   useCredentials('use-credentials');
 
@@ -47,8 +61,10 @@ enum CrossOrigin {
 enum Preload {
   /// Indicates that the audio should not be preloaded.
   none('none'),
+
   /// Indicates that only audio metadata (e.g. length) is fetched.
   metadata('metadata'),
+
   /// Indicates that the whole audio file can be downloaded, even if the user is not expected to use it.
   auto('auto');
 
@@ -65,7 +81,20 @@ enum Preload {
 /// - [loading]: Indicates how the browser should load the image.
 /// - [src]: The image URL.
 /// - [referrerPolicy]: Indicates which referrer to send when fetching the resource.
-Component img({String? alt, CrossOrigin? crossOrigin, int? width, int? height, MediaLoading? loading, required String src, ReferrerPolicy? referrerPolicy, Key? key, String? id, List<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component img(
+    {String? alt,
+    CrossOrigin? crossOrigin,
+    int? width,
+    int? height,
+    MediaLoading? loading,
+    required String src,
+    ReferrerPolicy? referrerPolicy,
+    Key? key,
+    String? id,
+    List<String>? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'img',
     key: key,
@@ -90,6 +119,7 @@ Component img({String? alt, CrossOrigin? crossOrigin, int? width, int? height, M
 enum MediaLoading {
   /// Loads the media immediately, regardless of whether or not the media is currently within the visible viewport (this is the default value).
   eager('eager'),
+
   /// Defers loading the media until it reaches a calculated distance from the viewport, as defined by the browser. The intent is to avoid the network and storage bandwidth needed to handle the media until it's reasonably certain that it will be needed. This generally improves the performance of the media in most typical use cases.
   lazy('lazy');
 
@@ -109,7 +139,23 @@ enum MediaLoading {
 /// - [src]: The URL of the video to embed. This is optional; you may instead use the &lt;source&gt; element within the video block to specify the video to embed.
 /// - [width]: The width of the video's display area, in CSS pixels.
 /// - [height]: The height of the video's display area, in CSS pixels.
-Component video(List<Component> children, {bool? autoplay, bool? controls, CrossOrigin? crossOrigin, bool? loop, bool? muted, String? poster, Preload? preload, String? src, int? width, int? height, Key? key, String? id, List<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component video(List<Component> children,
+    {bool? autoplay,
+    bool? controls,
+    CrossOrigin? crossOrigin,
+    bool? loop,
+    bool? muted,
+    String? poster,
+    Preload? preload,
+    String? src,
+    int? width,
+    int? height,
+    Key? key,
+    String? id,
+    List<String>? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'video',
     key: key,
@@ -140,7 +186,17 @@ Component video(List<Component> children, {bool? autoplay, bool? controls, Cross
 /// - [type]: The MIME type to use to select the plug-in to instantiate.
 /// - [width]: The displayed width of the resource, in CSS pixels.
 /// - [height]: The displayed height of the resource, in CSS pixels.
-Component embed({required String src, String? type, int? width, int? height, Key? key, String? id, List<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component embed(
+    {required String src,
+    String? type,
+    int? width,
+    int? height,
+    Key? key,
+    String? id,
+    List<String>? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'embed',
     key: key,
@@ -169,7 +225,22 @@ Component embed({required String src, String? type, int? width, int? height, Key
 /// - [referrerPolicy]: Indicates which referrer to send when fetching the frame's resource.
 /// - [width]: The width of the frame in CSS pixels. Default is 300.
 /// - [height]: The height of the frame in CSS pixels. Default is 150.
-Component iframe(List<Component> children, {required String src, String? allow, String? csp, MediaLoading? loading, String? name, String? sandbox, ReferrerPolicy? referrerPolicy, int? width, int? height, Key? key, String? id, List<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component iframe(List<Component> children,
+    {required String src,
+    String? allow,
+    String? csp,
+    MediaLoading? loading,
+    String? name,
+    String? sandbox,
+    ReferrerPolicy? referrerPolicy,
+    int? width,
+    int? height,
+    Key? key,
+    String? id,
+    List<String>? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'iframe',
     key: key,
@@ -197,18 +268,25 @@ Component iframe(List<Component> children, {required String src, String? allow, 
 enum ReferrerPolicy {
   /// The Referer header will not be sent.
   noReferrer('no-referrer'),
+
   /// The Referer header will not be sent to origins without TLS (HTTPS).
   noReferrerWhenDowngrade('no-referrer-when-downgrade'),
+
   /// The sent referrer will be limited to the origin of the referring page: its scheme, host, and port.
   origin('origin'),
+
   /// The referrer sent to other origins will be limited to the scheme, the host, and the port. Navigations on the same origin will still include the path.
   originWhenCrossOrigin('origin-when-cross-origin'),
+
   /// A referrer will be sent for same origin, but cross-origin requests will contain no referrer information.
   sameOrigin('same-origin'),
+
   /// Only send the origin of the document as the referrer when the protocol security level stays the same (HTTPS→HTTPS), but don't send it to a less secure destination (HTTPS→HTTP).
   strictOrigin('strict-origin'),
+
   /// (default): Send a full URL when performing a same-origin request, only send the origin when the protocol security level stays the same (HTTPS→HTTPS), and send no header to a less secure destination (HTTPS→HTTP).
   strictOriginWhenCrossOrigin('strict-origin-when-cross-origin'),
+
   /// The referrer will include the origin and the path (but not the fragment, password, or username). This value is unsafe, because it leaks origins and paths from TLS-protected resources to insecure origins.
   unsafeUrl('unsafe-url');
 
@@ -223,7 +301,18 @@ enum ReferrerPolicy {
 /// - [type]: The content type of the resource specified by data. At least one of data and type must be defined.
 /// - [width]: The width of the displayed resource in CSS pixels.
 /// - [height]: The height of the displayed resource in CSS pixels.
-Component object(List<Component> children, {String? data, String? name, String? type, int? width, int? height, Key? key, String? id, List<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component object(List<Component> children,
+    {String? data,
+    String? name,
+    String? type,
+    int? width,
+    int? height,
+    Key? key,
+    String? id,
+    List<String>? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'object',
     key: key,
@@ -247,9 +336,17 @@ Component object(List<Component> children, {String? data, String? name, String? 
 ///
 /// - [type]: The MIME media type of the resource, optionally with a codecs parameter.
 /// - [src]: Address of the media resource.
-///   
+///
 ///   Required if the source element's parent is an &lt;audio&gt; and &lt;video&gt; element, but not allowed if the source element's parent is a &lt;picture&gt; element.
-Component source({String? type, String? src, Key? key, String? id, List<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {
+Component source(
+    {String? type,
+    String? src,
+    Key? key,
+    String? id,
+    List<String>? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'source',
     key: key,

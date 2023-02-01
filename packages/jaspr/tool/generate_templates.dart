@@ -3,15 +3,16 @@ import 'package:path/path.dart' as path;
 
 void main() async {
   var templatesDir = Directory('tool/templates');
-  
+
   var subDirs = await templatesDir.list().toList();
   var templates = <String>[];
 
   var output = StringBuffer('// ignore_for_file: directives_ordering\n\n');
-  
+
   for (var templateDir in subDirs) {
     if (templateDir is Directory) {
-      var result = await Process.run('mason', 'bundle -t dart -o lib/src/commands/templates ${templateDir.path}'.split(' '));
+      var result =
+          await Process.run('mason', 'bundle -t dart -o lib/src/commands/templates ${templateDir.path}'.split(' '));
       stdout.write(result.stdout);
       stderr.write(result.stderr);
 
@@ -31,8 +32,7 @@ void main() async {
   await templatesFile.writeAsString(output.toString());
 }
 
-
 String toCamelCase(String s) {
   var c = s.split('_');
-  return [c.first, ...c.skip(1).map((c) => c[0].toUpperCase()+c.substring(1))].join();
+  return [c.first, ...c.skip(1).map((c) => c[0].toUpperCase() + c.substring(1))].join();
 }

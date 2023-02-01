@@ -7,8 +7,6 @@ import 'dart:math';
 import 'package:html/parser.dart';
 
 import '../../../jaspr.dart';
-import '../../components/child_node.dart';
-import '../../components/style.dart';
 import '../markup_renderer.dart';
 
 export '../../components/style.dart' hide Style;

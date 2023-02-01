@@ -6,7 +6,6 @@ import './content.dart';
 // - will not be bundled to javascript
 // - will not be hydrated and made interactive on the client
 class App extends StatelessComponent {
-
   const App({super.key});
 
   @override

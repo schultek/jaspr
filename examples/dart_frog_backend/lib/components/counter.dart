@@ -20,10 +20,12 @@ class _CounterState extends State<Counter> {
     ]);
 
     yield button(
-      events: {'click': (_) {
-        print("clicked $count");
-        setState(() => count++);
-      }},
+      events: {
+        'click': (_) {
+          print("clicked $count");
+          setState(() => count++);
+        }
+      },
       [text('Increment')],
     );
   }

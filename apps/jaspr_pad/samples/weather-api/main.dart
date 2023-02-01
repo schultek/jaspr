@@ -1,5 +1,5 @@
 // [sample=5] Weather Api
-import 'package:jaspr/components.dart';
+import 'package:jaspr/jaspr.dart';
 
 import 'api.dart';
 

@@ -12,11 +12,12 @@ dependencies:
   build: ^2.0.0
   collection: ^1.15.0
   dart_style: ^2.2.3
-  jaspr: ^0.1.5
+  glob: ^2.1.1
+  jaspr: ^0.2.0
   path: ^1.8.0
   source_gen: ^1.2.0
 
 dev_dependencies:
-  build_runner: ^2.1.7
-  lints: ^1.0.1
+  build_runner: ^2.3.3
+  lints: ^2.0.1
   test: ^1.21.0

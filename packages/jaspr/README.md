@@ -7,15 +7,17 @@
 <p align="center">
   <a href="https://pub.dev/packages/jaspr"><img src="https://img.shields.io/pub/v/jaspr?label=pub.dev&logo=dart" alt="pub"></a>
   <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/stars/schultek/jaspr?logo=github" alt="github"></a>
+  <a href="https://github.com/schultek/jaspr/actions/workflows/test.yaml"><img src="https://img.shields.io/github/actions/workflow/status/schultek/jaspr/test.yaml?branch=main&label=tests&labelColor=333940&logo=github" alt="tests"></a>
+  <a href="https://app.codecov.io/gh/schultek/jaspr"><img src="https://img.shields.io/codecov/c/github/schultek/jaspr?logo=codecov&logoColor=fff&labelColor=333940" alt="codecov"></a>
   <a href="https://discord.gg/XGXrGEk4c6"><img src="https://img.shields.io/discord/993167615587520602?logo=discord" alt="discord"></a>
   <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/contributors/schultek/jaspr?logo=github" alt="contributors"></a>
 </p>
 
 <p align="center">
-  <a href="https://docs.page/schultek/jaspr~develop/quick-start">Quickstart</a> •
-  <a href="https://docs.page/schultek/jaspr~develop">Documentation</a> •
+  <a href="https://docs.page/schultek/jaspr/quick-start">Quickstart</a> •
+  <a href="https://docs.page/schultek/jaspr">Documentation</a> •
   <a href="https://jasprpad.schultek.de">Playground</a> •
-  <a href="https://github.com/schultek/jaspr/tree/develop/examples/">Examples</a> •
+  <a href="https://github.com/schultek/jaspr/tree/main/examples/">Examples</a> •
   <a href="https://discord.gg/XGXrGEk4c6">Community & Support</a> •
   <a href="https://jaspr-benchmarks.web.app">Benchmarks</a>
 </p>
@@ -32,17 +34,17 @@
   web framework written completely in Dart.
 
 > Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of
-> developers around Jaspr and check out the [Contributing Guide](https://docs.page/schultek/jaspr~develop/eco/contributing).
+> developers around Jaspr and check out the [Contributing Guide](https://docs.page/schultek/jaspr/eco/contributing).
 
 ### Core Features
 
-- 💙 Familiar component model similar to Flutter widgets.
-- 🏗 Easy Server Side Rendering.
-- ♻️ Automatic sync of component data between server and client.
-- ⚡️ Fast incremental DOM updates.
-- 🧪 Well tested (~70% test coverage).
+- 💙 **Familiar**: Works with a similar component model to flutter widgets.
+- 🏗 **Powerful**: Comes with server side rendering out of the box.
+- ♻️ **Easy**: Syncs component state between server and client automatically.
+- ⚡️ **Fast**: Performs incremental DOM updates only where needed.
+- 🎛 **Flexible**: Runs on the server, client or both with manual or automatic setup. You decide.
 
-If you want to say thank you, star the project on GitHub and like the package on pub.dev 🙌💙
+> If you want to say thank you, star the project on GitHub and like the package on pub.dev 🙌💙
 
 ### Online Editor & Playground
 
@@ -53,7 +55,7 @@ Inspired by DartPad, **Jaspr** has it's own online editor and playground, called
 You can check out the samples, take the tutorial or try out jaspr for yourself, all live in the browser.
 When you want to continue coding offline, you can quickly download the current files bundled in a complete dart project, ready to start coding locally.
 
-JasprPad is also built with **Jaspr** itself, so you can [**check out its source code**](https://github.com/schultek/jaspr/tree/develop/apps/jaspr_pad) to get a feel for how jaspr would be used in a larger app.
+JasprPad is also built with **Jaspr** itself, so you can [**check out its source code**](https://github.com/schultek/jaspr/tree/main/apps/jaspr_pad) to get a feel for how jaspr would be used in a larger app.
 
 ![JasprPad Screenshot](https://user-images.githubusercontent.com/13920539/170837732-9e09d5f3-e79e-4ddd-b118-72e49456a7cd.png)
 
@@ -220,5 +222,5 @@ void main() {
 ```
 
 For more examples on how to use the testing package, check out the 
-[documentation](https://docs.page/schultek/jaspr~develop/testing) and the 
+[documentation](https://docs.page/schultek/jaspr/testing) and the 
 [tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/jaspr/test).

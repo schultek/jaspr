@@ -4,7 +4,6 @@ library main;
 import 'dart:async';
 
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:jaspr/components.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:shelf_router/shelf_router.dart';
@@ -21,7 +20,7 @@ import 'server/tutorial.dart';
 void main() {
   runServer(Builder.single(builder: (context) {
     return ProviderScope(
-      overrides: [syncSamplesProvider.overrideWithProvider(loadSamplesProvider)],
+      overrides: [syncSamplesProvider.overrideWith(loadSamplesProviderOverride)],
       child: Playground(),
     );
   }))

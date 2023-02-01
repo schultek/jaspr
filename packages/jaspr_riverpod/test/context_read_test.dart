@@ -32,7 +32,7 @@ void main() {
         await tester.pumpComponent(providerApp((context) sync* {
           yield Text('a ${context.read(counter)}');
           yield ProviderScope(
-            overrides: [counter.overrideWithProvider(StateProvider((ref) => 1))],
+            overrides: [counter.overrideWith((ref) => 1)],
             child: Builder(builder: (context) sync* {
               yield Text('b ${context.read(counter)}');
             }),
