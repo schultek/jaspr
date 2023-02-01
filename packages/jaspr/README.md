@@ -1,13 +1,9 @@
-![Banner](/assets/jaspr_banner.png)
-
-<p align="center">
-  <a href="https://github.com/sponsors/schultek"><img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white" alt="sponsor"></a>
-</p>
+![Banner](https://github.com/schultek/jaspr/raw/main/assets/jaspr_banner.png)
 
 <p align="center">
   <a href="https://pub.dev/packages/jaspr"><img src="https://img.shields.io/pub/v/jaspr?label=pub.dev&logo=dart" alt="pub"></a>
   <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/stars/schultek/jaspr?logo=github" alt="github"></a>
-  <a href="https://github.com/schultek/jaspr/actions/workflows/test.yaml"><img src="https://img.shields.io/github/actions/workflow/status/schultek/jaspr/test.yaml?branch=main&label=tests&labelColor=333940&logo=github" alt="tests"></a>
+  <a href="https://github.com/schultek/jaspr/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/schultek/jaspr/test.yml?branch=main&label=tests&labelColor=333940&logo=github" alt="tests"></a>
   <a href="https://app.codecov.io/gh/schultek/jaspr"><img src="https://img.shields.io/codecov/c/github/schultek/jaspr?logo=codecov&logoColor=fff&labelColor=333940" alt="codecov"></a>
   <a href="https://discord.gg/XGXrGEk4c6"><img src="https://img.shields.io/discord/993167615587520602?logo=discord" alt="discord"></a>
   <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/contributors/schultek/jaspr?logo=github" alt="contributors"></a>
@@ -20,6 +16,10 @@
   <a href="https://github.com/schultek/jaspr/tree/main/examples/">Examples</a> •
   <a href="https://discord.gg/XGXrGEk4c6">Community & Support</a> •
   <a href="https://jaspr-benchmarks.web.app">Benchmarks</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/sponsors/schultek"><img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white" alt="sponsor"></a>
 </p>
 
 # Jaspr
