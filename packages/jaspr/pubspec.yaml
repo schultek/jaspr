@@ -1,6 +1,6 @@
 name: jaspr
 description: Modern web framework for building websites in Dart that feels like Flutter but supports server-side rendering.
-version: 0.2.0+2
+version: 0.2.0+3
 homepage: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
 
@@ -16,7 +16,7 @@ dependencies:
   hotreloader: ^3.0.4
   html: ^0.15.0
   http: ^0.13.4
-  js: ^0.6.7
+  js: ^0.6.5
   mason: ^0.1.0-dev.31
   meta: ^1.7.0
   path: ^1.8.0
