@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as path;
 
@@ -27,6 +28,15 @@ void main() async {
   }
 
   output.writeln('\nvar templates = [${templates.map((t) => '${toCamelCase(t)}Bundle').join(', ')}];');
+
+  var packages = await Process.run('melos', 'list --no-private --json'.split(' '), stdoutEncoding: utf8);
+  var packagesJson = jsonDecode(packages.stdout) as List;
+
+  var jasprVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr')['version'];
+  var jasprBuilderVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr_builder')['version'];
+
+  output.writeln('\nconst jasprCoreVersion = "$jasprVersion";\n'
+      'const jasprBuilderVersion = "$jasprBuilderVersion";');
 
   var templatesFile = File('lib/src/commands/templates/templates.dart');
   await templatesFile.writeAsString(output.toString());
