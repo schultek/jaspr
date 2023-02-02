@@ -8,12 +8,4 @@ dependency_overrides:
     path: ../../packages/jaspr_test
   jaspr_riverpod:
     path: ../../packages/jaspr_riverpod
-  webdev:
-    git:
-      url: https://github.com/dart-lang/webdev
-      path: webdev
-  dwds:
-    git:
-      url: https://github.com/dart-lang/webdev
-      path: dwds
   vm_service: 10.1.2
