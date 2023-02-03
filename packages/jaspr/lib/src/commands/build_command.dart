@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:path/path.dart' as p;
 
 import 'command.dart';
 
@@ -27,6 +28,8 @@ class BuildCommand extends BaseCommand {
       },
       defaultsTo: 'exe',
     );
+    argParser.addOption('flutter',
+        help: 'Build an embedded flutter app from the specified entrypoint.');
   }
 
   @override
@@ -39,44 +42,131 @@ class BuildCommand extends BaseCommand {
   Future<void> run() async {
     await super.run();
 
+    var dir = Directory('build');
+    if (!await dir.exists()) {
+      await dir.create();
+    }
+
     var useSSR = argResults!['ssr'] as bool;
+    var flutter = argResults!['flutter'] as String?;
 
     if (useSSR) {
-      var dir = Directory('build');
-      if (!await dir.exists()) {
-        await dir.create();
+      var webDir = Directory('build/web');
+      if (!await webDir.exists()) {
+        await webDir.create();
       }
+    }
+
+    var webTargetPath = 'build${useSSR ? '/web' : ''}';
+
+    var indexHtml = File('web/index.html');
+    var targetIndexHtml = File('build/web/index.html');
+
+    var dummyIndex = false;
+    if (flutter != null && !await indexHtml.exists()) {
+      dummyIndex = true;
+      await indexHtml.create();
     }
 
     var webProcess = await runWebdev([
       'build',
-      '--output=web:build${useSSR ? '/web' : ''}',
+      '--output=web:$webTargetPath',
       '--',
       '--delete-conflicting-outputs',
       '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
     ]);
 
     var webResult = watchProcess(webProcess);
-    if (useSSR) {
-      unawaited(webResult);
-    } else {
-      return webResult;
+    var flutterResult = Future<void>.value();
+
+    if (flutter != null) {
+      var flutterProcess = await Process.start(
+        'flutter',
+        ['build', 'web', '-t', flutter, '--output=build/flutter'],
+      );
+
+      var moveTargets = [
+        'version.json',
+        'main.dart.js',
+        'flutter_service_worker.js',
+        'flutter.js',
+        'canvaskit/',
+      ];
+
+      flutterResult = Future(() async {
+        await watchProcess(flutterProcess);
+
+        var moves = <Future>[];
+        while (moveTargets.isNotEmpty) {
+          var moveTarget = moveTargets.removeAt(0);
+          if (moveTarget.endsWith('/')) {
+            await Directory('build/web/$moveTarget').create(recursive: true);
+
+            var files = Directory('build/flutter/$moveTarget').list(recursive: true);
+            await for (var file in files) {
+              final path = p.relative(file.path, from: 'build/flutter');
+              if (file is Directory) {
+                moveTargets.add(path);
+              } else {
+                moveTargets.add(path);
+              }
+            }
+          } else {
+            moves.add(File('./build/flutter/$moveTarget').copy('./build/web/$moveTarget'));
+          }
+        }
+
+        await Future.wait(moves);
+      });
+    }
+
+    if (!useSSR) {
+      await Future.wait([
+        webResult,
+        flutterResult,
+      ]);
+
+      if (dummyIndex) {
+        await indexHtml.delete();
+        if (await targetIndexHtml.exists()) {
+          await targetIndexHtml.delete();
+        }
+      }
+
+      return;
     }
 
     String? entryPoint = await getEntryPoint(argResults!['input']);
 
     if (entryPoint == null) {
-      print("Cannot find entry point. Create a main.dart in lib/ or web/, or specify a file using --input.");
+      print(
+          "Cannot find entry point. Create a main.dart in lib/ or web/, or specify a file using --input.");
       shutdown(1);
     }
 
     var process = await Process.start(
       'dart',
-      ['compile', argResults!['target'], entryPoint, '-o', './build/app', '-Djaspr.flags.release=true'],
+      [
+        'compile',
+        argResults!['target'],
+        entryPoint,
+        '-o',
+        './build/app',
+        '-Djaspr.flags.release=true'
+      ],
     );
 
-    unawaited(watchProcess(process));
+    await Future.wait([
+      webResult,
+      flutterResult,
+      watchProcess(process),
+    ]);
 
-    await waitActiveProcesses();
+    if (dummyIndex) {
+      await indexHtml.delete();
+      if (await targetIndexHtml.exists()) {
+        await targetIndexHtml.delete();
+      }
+    }
   }
 }

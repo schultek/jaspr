@@ -51,7 +51,7 @@ class ServeCommand extends BaseCommand {
       negatable: false,
     );
     argParser.addOption('flutter',
-      help: 'Launch a embedded flutter app from the specified entrypoint.'
+      help: 'Launch an embedded flutter app from the specified entrypoint.'
     );
   }
 

@@ -18,6 +18,21 @@ It can be run with:
 $ dart run jaspr serve --input=lib/main_jaspr.dart --flutter=lib/main_flutter.dart
 ```
 
+## Building the website + app
+
+The project cal be built with:
+
+```terminal
+$ dart run jaspr build --input=lib/main_jaspr.dart --flutter=lib/main_flutter.dart
+```
+
+Run the built app with:
+
+```terminal
+$ cd build
+$ ./app
+```
+
 ## Points of Interest
 
 * Check the entrypoints for both dart apps
