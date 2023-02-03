@@ -23,7 +23,7 @@ https://user-images.githubusercontent.com/13920539/216588968-97797efe-47cc-47c7-
 
 ## Building the website + app
 
-The project cal be built with:
+The project can be built with:
 
 ```terminal
 $ dart run jaspr build --input=lib/main_jaspr.dart --flutter=lib/main_flutter.dart
