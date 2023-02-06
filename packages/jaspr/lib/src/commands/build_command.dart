@@ -27,6 +27,12 @@ class BuildCommand extends BaseCommand {
       },
       defaultsTo: 'exe',
     );
+    argParser.addOption(
+      'output',
+      abbr: 'o',
+      defaultsTo: 'build',
+      help: 'The directory to write the build output to.',
+    );
   }
 
   @override
@@ -39,18 +45,19 @@ class BuildCommand extends BaseCommand {
   Future<void> run() async {
     await super.run();
 
+    var output = argResults!['output'] as String;
     var useSSR = argResults!['ssr'] as bool;
 
     if (useSSR) {
-      var dir = Directory('build');
+      var dir = Directory(output);
       if (!await dir.exists()) {
-        await dir.create();
+        await dir.create(recursive: true);
       }
     }
 
     var webProcess = await runWebdev([
       'build',
-      '--output=web:build${useSSR ? '/web' : ''}',
+      '--output=web:$output${useSSR ? '/web' : ''}',
       '--',
       '--delete-conflicting-outputs',
       '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
@@ -72,7 +79,7 @@ class BuildCommand extends BaseCommand {
 
     var process = await Process.start(
       'dart',
-      ['compile', argResults!['target'], entryPoint, '-o', './build/app', '-Djaspr.flags.release=true'],
+      ['compile', argResults!['target'], entryPoint, '-o', './$output/app', '-Djaspr.flags.release=true'],
     );
 
     unawaited(watchProcess(process));

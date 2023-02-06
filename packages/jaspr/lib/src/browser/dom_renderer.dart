@@ -267,7 +267,8 @@ class BrowserDomRenderer extends Renderer {
 
     var afterNode = after?.data.node;
     if (afterNode == null && parentNode == container && from != null && from! > 0) {
-      afterNode = container.childNodes[from! - 1];
+      var trimmedNodes = container.childNodes.where((n) => n is! html.Text || (n.data?.trim().isNotEmpty ?? false)).toList();
+      afterNode = trimmedNodes[from!-1];
     }
 
     if (childNode.previousNode == afterNode && childNode.parentNode == parentNode) {

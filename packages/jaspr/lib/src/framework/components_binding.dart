@@ -24,6 +24,7 @@ mixin ComponentsBinding on BindingBase, SchedulerBinding {
   /// Sets [app] as the new root of the component tree and performs an initial build
   Future<void> attachRootComponent(Component app, {required String attachTo}) async {
     var buildOwner = _rootElements[attachTo]?._owner ?? BuildOwner();
+    print("ATTACH $attachTo $_rootElements");
     await buildOwner.lockState(() async {
       buildOwner._isFirstBuild = true;
 
