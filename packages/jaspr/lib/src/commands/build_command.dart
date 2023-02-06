@@ -67,7 +67,7 @@ class BuildCommand extends BaseCommand {
 
     if (entryPoint == null) {
       print("Cannot find entry point. Create a main.dart in lib/ or web/, or specify a file using --input.");
-      shutdown(1);
+      await shutdown(1);
     }
 
     var process = await Process.start(

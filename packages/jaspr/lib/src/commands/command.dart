@@ -7,6 +7,7 @@ import '../../jaspr.dart';
 
 abstract class BaseCommand extends Command<void> {
   Set<Process> activeProcesses = {};
+  Set<Future<void> Function()> guards = {};
 
   @override
   @mustCallSuper
@@ -20,12 +21,18 @@ abstract class BaseCommand extends Command<void> {
     return Future.wait(activeProcesses.map((p) => p.exitCode));
   }
 
-  Never shutdown([int exitCode = 1]) {
+  Future<Never> shutdown([int exitCode = 1]) async {
     // for (var process in activeProcesses) {
     // this would leave open files and ports broken
     // we should wait for https://github.com/dart-lang/sdk/issues/49234 to implement a better way
     // process.kill();
     // }
+    
+    await Future.wait([
+      for (var g in guards)
+        g()
+    ]);
+    
     exit(exitCode);
   }
 
@@ -52,7 +59,7 @@ abstract class BaseCommand extends Command<void> {
       } else {
         print("Jaspr needs webdev as a dev dependency in your project.\n"
             "Please run `dart pub add webdev --dev` and try again.");
-        shutdown(1);
+        await shutdown(1);
       }
     } else {
       process = await Process.start('dart', ['run', 'webdev', ...args]);
@@ -77,6 +84,10 @@ abstract class BaseCommand extends Command<void> {
     }
 
     return null;
+  }
+  
+  void guardResource(Future<void> Function() fn) {
+    guards.add(fn);
   }
 
   Future<void> watchProcess(

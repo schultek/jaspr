@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:io';
-
+import 'package:webdev/src/serve/dev_workflow.dart';
+import 'package:webdev/src/command/configuration.dart';
+import 'package:dwds/src/loaders/strategy.dart';
+import 'package:dwds/data/build_result.dart';
 import 'command.dart';
 
 class ServeCommand extends BaseCommand {
@@ -63,51 +66,25 @@ class ServeCommand extends BaseCommand {
   Future<void> run() async {
     await super.run();
 
+    var verbose = argResults!['verbose'] as bool;
     var useSSR = argResults!['ssr'] as bool;
     var debug = argResults!['debug'] as bool;
     var release = argResults!['release'] as bool;
+    var mode = argResults!['mode'] as String;
+    var port = argResults!['port'] as String;
 
-    var webProcess = await runWebdev([
-      'serve',
-      '--auto=${argResults!['mode'] == 'reload' ? 'restart' : 'refresh'}',
-      'web:${useSSR ? '5467' : argResults!['port']}',
-      if (release) '--release',
-      '--',
-      '--delete-conflicting-outputs',
-      if (!release)
-        '--define=build_web_compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
-      else
-        '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
-    ]);
+    var workflow = await _runWebdev(release, debug, mode, useSSR ? '5467' : port);
+    guardResource(() => workflow.shutDown());
 
     if (!useSSR) {
-      return watchProcess(webProcess);
+      return workflow.done;
     }
 
     print("Starting jaspr development server in ${release ? 'release' : 'debug'} mode...");
 
-    var buildCompleted = StreamController<int>.broadcast();
-    var build = 0;
-
-    checkWebdevStarted(String str) {
-      if (str.contains('Running build completed')) {
-        buildCompleted.add(build++);
-      }
-    }
-
-    var verbose = argResults!['verbose'] as bool;
-
-    unawaited(watchProcess(
-      webProcess,
-      pipeStdout: verbose,
-      pipeStderr: true,
-      listen: checkWebdevStarted,
-      onExit: !verbose //
-          ? () => print('webdev serve exited unexpectedly. Run again with -v to see verbose output')
-          : null,
-    ));
-
-    await buildCompleted.stream.first;
+    await workflow.serverManager.servers.first.buildResults
+        .where((event) => event.status == BuildStatus.succeeded)
+        .first;
 
     var args = [
       'run',
@@ -128,8 +105,9 @@ class ServeCommand extends BaseCommand {
     String? entryPoint = await getEntryPoint(argResults!['input']);
 
     if (entryPoint == null) {
-      print("Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.");
-      shutdown(1);
+      print(
+          "Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.");
+      await shutdown(1);
     }
 
     args.add(entryPoint);
@@ -144,4 +122,26 @@ class ServeCommand extends BaseCommand {
 
     await watchProcess(process);
   }
+}
+
+Future<DevWorkflow> _runWebdev(bool release, bool debug, String mode, String port) {
+  var configuration = Configuration(
+    //outputPath: port,
+    //outputInput: 'web',
+    reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
+  );
+
+  return DevWorkflow.start(configuration, [
+    if (release) '--release',
+    '--verbose',
+    '--define',
+    'build_web_compilers|ddc=generate-full-dill=true',
+    '--delete-conflicting-outputs',
+    if (!release)
+      '--define=build_web_compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
+    else
+      '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
+  ], {
+    'web': int.parse(port)
+  });
 }
