@@ -2,12 +2,12 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/browser.dart';
-import 'package:dart_edge/button.dart' as a;
+import 'package:dart_edge/counter.dart' as a;
 
 void main() {
   runAppWithParams(getComponentForParams);
 }
 
 Component getComponentForParams(ConfigParams p) {
-  return a.Button();
+  return a.Counter();
 }

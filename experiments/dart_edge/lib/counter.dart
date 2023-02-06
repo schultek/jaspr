@@ -1,16 +1,16 @@
 import 'package:jaspr/html.dart';
 
-part 'button.g.dart';
+part 'counter.g.dart';
 
 @app
-class Button extends StatefulComponent with _$Button {
-  const Button({Key? key}) : super(key: key);
+class Counter extends StatefulComponent with _$Counter {
+  const Counter({Key? key}) : super(key: key);
 
   @override
-  State<Button> createState() => _ButtonState();
+  State<Counter> createState() => _CounterState();
 }
 
-class _ButtonState extends State<Button> {
+class _CounterState extends State<Counter> {
 
   int count = 0;
 
