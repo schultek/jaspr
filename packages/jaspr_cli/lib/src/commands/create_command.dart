@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:mason/mason.dart';
 import 'package:path/path.dart' as path;
 
-import 'command.dart';
-import 'templates/templates.dart';
+import '../version.dart';
+import 'base_command.dart';
 
 final RegExp _packageRegExp = RegExp(r'^[a-z_][a-z0-9_]*$');
 
 class CreateCommand extends BaseCommand {
-  CreateCommand() {
+  CreateCommand({super.logger}) {
     argParser.addOption(
       'template',
       abbr: 't',
@@ -38,7 +38,7 @@ class CreateCommand extends BaseCommand {
   String get name => 'create';
 
   @override
-  Future<void> run() async {
+  Future<int> run() async {
     await super.run();
 
     if (argResults!.rest.isEmpty) {
@@ -59,7 +59,6 @@ class CreateCommand extends BaseCommand {
       usageException('"$name" is not a valid package name.');
     }
 
-    var logger = Logger();
     final templateName = argResults!['template'] as String?;
     var template = templates.firstWhere((element) => element.name == templateName);
 
@@ -78,11 +77,13 @@ class CreateCommand extends BaseCommand {
 
     var process = await Process.start('dart', ['pub', 'get'], workingDirectory: directory.absolute.path);
 
-    await watchProcess(process, hide: (s) => s.contains('+'));
+    await watchProcess(process, progress: 'Resolving dependencies...', hide: (s) => s.contains('+'));
 
-    print('\n'
+    logger.info('\n'
         'Created project $name in $dir! In order to get started, run the following commands:\n\n'
         '  cd $dir\n'
         '  jaspr serve\n');
+
+    return ExitCode.success.code;
   }
 }

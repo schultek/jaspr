@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'command.dart';
+import 'package:mason/mason.dart';
+import 'package:webdev/src/command/build_command.dart' as wd;
+
+import 'base_command.dart';
 
 class BuildCommand extends BaseCommand {
-  BuildCommand() {
+  BuildCommand({super.logger}) {
     argParser.addOption(
       'input',
       abbr: 'i',
@@ -36,7 +39,7 @@ class BuildCommand extends BaseCommand {
   String get name => 'build';
 
   @override
-  Future<void> run() async {
+  Future<int> run() async {
     await super.run();
 
     var useSSR = argResults!['ssr'] as bool;
@@ -47,6 +50,8 @@ class BuildCommand extends BaseCommand {
         await dir.create();
       }
     }
+
+    wd.BuildCommand();
 
     var webProcess = await runWebdev([
       'build',
@@ -60,13 +65,14 @@ class BuildCommand extends BaseCommand {
     if (useSSR) {
       unawaited(webResult);
     } else {
-      return webResult;
+      await webResult;
+      return ExitCode.success.code;
     }
 
     String? entryPoint = await getEntryPoint(argResults!['input']);
 
     if (entryPoint == null) {
-      print("Cannot find entry point. Create a main.dart in lib/ or web/, or specify a file using --input.");
+      logger.warn("Cannot find entry point. Create a main.dart in lib/ or web/, or specify a file using --input.");
       await shutdown(1);
     }
 
@@ -78,5 +84,7 @@ class BuildCommand extends BaseCommand {
     unawaited(watchProcess(process));
 
     await waitActiveProcesses();
+
+    return ExitCode.success.code;
   }
 }

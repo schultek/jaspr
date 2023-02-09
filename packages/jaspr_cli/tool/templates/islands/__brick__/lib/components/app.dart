@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
-import './content.dart';
+import 'content.dart';
 
 // A normal component wich is not part of a island subtree
 // - will not be bundled to javascript

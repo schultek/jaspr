@@ -39,5 +39,5 @@ scripts:
       dart run tool/generate_html.dart
   generate:templates:
     run: |
-      cd packages/jaspr
+      cd packages/jaspr_cli
       dart run tool/generate_templates.dart

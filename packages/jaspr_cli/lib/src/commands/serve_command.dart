@@ -1,13 +1,18 @@
+// ignore_for_file: implementation_imports
+
 import 'dart:async';
 import 'dart:io';
-import 'package:webdev/src/serve/dev_workflow.dart';
-import 'package:webdev/src/command/configuration.dart';
-import 'package:dwds/src/loaders/strategy.dart';
+
 import 'package:dwds/data/build_result.dart';
-import 'command.dart';
+import 'package:dwds/src/loaders/strategy.dart';
+import 'package:mason/mason.dart';
+import 'package:webdev/src/command/configuration.dart';
+import 'package:webdev/src/serve/dev_workflow.dart';
+
+import 'base_command.dart';
 
 class ServeCommand extends BaseCommand {
-  ServeCommand() {
+  ServeCommand({super.logger}) {
     argParser.addOption(
       'input',
       abbr: 'i',
@@ -47,12 +52,6 @@ class ServeCommand extends BaseCommand {
       help: 'Serves the app in release mode.',
       negatable: false,
     );
-    argParser.addFlag(
-      'verbose',
-      abbr: 'v',
-      help: 'Enable verbose logging.',
-      negatable: false,
-    );
   }
 
   @override
@@ -63,10 +62,9 @@ class ServeCommand extends BaseCommand {
   String get name => 'serve';
 
   @override
-  Future<void> run() async {
+  Future<int> run() async {
     await super.run();
 
-    var verbose = argResults!['verbose'] as bool;
     var useSSR = argResults!['ssr'] as bool;
     var debug = argResults!['debug'] as bool;
     var release = argResults!['release'] as bool;
@@ -77,10 +75,18 @@ class ServeCommand extends BaseCommand {
     guardResource(() => workflow.shutDown());
 
     if (!useSSR) {
-      return workflow.done;
+      await workflow.done;
+      return ExitCode.success.code;
     }
 
-    print("Starting jaspr development server in ${release ? 'release' : 'debug'} mode...");
+    var msg = "Starting jaspr development server in ${release ? 'release' : 'debug'} mode...";
+    Progress? progress;
+
+    if (verbose) {
+      logger.info(msg);
+    } else {
+      progress = logger.progress(msg);
+    }
 
     await workflow.serverManager.servers.first.buildResults
         .where((event) => event.status == BuildStatus.succeeded)
@@ -105,7 +111,8 @@ class ServeCommand extends BaseCommand {
     String? entryPoint = await getEntryPoint(argResults!['input']);
 
     if (entryPoint == null) {
-      print(
+      progress?.cancel();
+      logger.err(
           "Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.");
       await shutdown(1);
     }
@@ -120,15 +127,19 @@ class ServeCommand extends BaseCommand {
       environment: {'PORT': argResults!['port'], 'JASPR_PROXY_PORT': '5467'},
     );
 
+    progress?.complete();
+
     await watchProcess(process);
+
+    return ExitCode.success.code;
   }
 }
 
 Future<DevWorkflow> _runWebdev(bool release, bool debug, String mode, String port) {
   var configuration = Configuration(
-    //outputPath: port,
-    //outputInput: 'web',
+    debug: debug,
     reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
+    release: release,
   );
 
   return DevWorkflow.start(configuration, [

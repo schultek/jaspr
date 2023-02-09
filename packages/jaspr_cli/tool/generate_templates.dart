@@ -13,7 +13,7 @@ void main() async {
   for (var templateDir in subDirs) {
     if (templateDir is Directory) {
       var result =
-          await Process.run('mason', 'bundle -t dart -o lib/src/commands/templates ${templateDir.path}'.split(' '));
+          await Process.run('mason', 'bundle -t dart -o lib/src/templates ${templateDir.path}'.split(' '));
       stdout.write(result.stdout);
       stderr.write(result.stderr);
 
@@ -23,7 +23,7 @@ void main() async {
 
       var name = path.basenameWithoutExtension(templateDir.path);
       templates.add(name);
-      output.writeln("import './${name}_bundle.dart';");
+      output.writeln("import './templates/${name}_bundle.dart';");
     }
   }
 
@@ -32,13 +32,15 @@ void main() async {
   var packages = await Process.run('melos', 'list --no-private --json'.split(' '), stdoutEncoding: utf8);
   var packagesJson = jsonDecode(packages.stdout) as List;
 
+  var jasprCliVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr_cli')['version'];
   var jasprVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr')['version'];
   var jasprBuilderVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr_builder')['version'];
 
-  output.writeln('\nconst jasprCoreVersion = "$jasprVersion";\n'
+  output.writeln('\nconst jasprCliVersion = "$jasprCliVersion";\n'
+      'const jasprCoreVersion = "$jasprVersion";\n'
       'const jasprBuilderVersion = "$jasprBuilderVersion";');
 
-  var templatesFile = File('lib/src/commands/templates/templates.dart');
+  var templatesFile = File('lib/src/version.dart');
   await templatesFile.writeAsString(output.toString());
 }
 

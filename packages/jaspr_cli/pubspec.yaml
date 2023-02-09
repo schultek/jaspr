@@ -1,0 +1,29 @@
+name: jaspr_cli
+description: A command line interface to create, serve and build jaspr applications.
+version: 0.1.0
+homepage: https://github.com/schultek/jaspr
+issue_tracker: https://github.com/schultek/jaspr/issues
+documentation: https://docs.page/schultek/jaspr
+funding:
+  - https://github.com/sponsors/schultek
+
+environment:
+  sdk: '>=2.17.0 <3.0.0'
+
+executables:
+  jaspr:
+
+dependencies:
+  ansi_styles: ^0.3.2+1
+  args: ^2.3.0
+  cli_completion: ^0.2.0
+  cli_util: ^0.3.5
+  dwds: ^16.0.1
+  mason: ^0.1.0-dev.31
+  meta: ^1.7.0
+  path: ^1.8.0
+  webdev: ^2.7.12
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.21.0

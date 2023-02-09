@@ -188,7 +188,6 @@ Handler createHandler(_SetupHandler handle, {List<Middleware> middleware = const
   for (var m in middleware) {
     pipeline = pipeline.addMiddleware(m);
   }
-  pipeline = pipeline.addMiddleware(logRequests());
 
   return RefreshableHandler(pipeline.addHandler(cascade.handler), onRefresh: () {
     if (staticHandler is RefreshableHandler) {
