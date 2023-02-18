@@ -133,26 +133,28 @@ class ServeCommand extends BaseCommand {
 
     return ExitCode.success.code;
   }
-}
 
-Future<DevWorkflow> _runWebdev(bool release, bool debug, String mode, String port) {
-  var configuration = Configuration(
-    debug: debug,
-    reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
-    release: release,
-  );
 
-  return DevWorkflow.start(configuration, [
-    if (release) '--release',
-    '--verbose',
-    '--define',
-    'build_web_compilers|ddc=generate-full-dill=true',
-    '--delete-conflicting-outputs',
-    if (!release)
-      '--define=build_web_compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
-    else
-      '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
-  ], {
-    'web': int.parse(port)
-  });
+  Future<DevWorkflow> _runWebdev(bool release, bool debug, String mode, String port) {
+    var configuration = Configuration(
+      debug: debug,
+      reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
+      release: release,
+    );
+
+    return DevWorkflow.start(configuration, [
+      if (release) '--release',
+      '--verbose',
+      '--define',
+      'build_web_compilers|ddc=generate-full-dill=true',
+      '--delete-conflicting-outputs',
+      if (!release)
+        '--define=build_web_compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
+      else
+        '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
+    ], {
+      'web': int.parse(port)
+    });
+  }
+
 }
