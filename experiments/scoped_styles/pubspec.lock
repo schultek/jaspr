@@ -311,14 +311,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.2.0"
+    version: "0.2.0+4"
   jaspr_test:
     dependency: "direct overridden"
     description:
       path: "../../packages/jaspr_test"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.2.0"
   js:
     dependency: transitive
     description:
@@ -351,22 +351,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
-  mason:
-    dependency: transitive
-    description:
-      name: mason
-      sha256: e7b919e7d1f300504017d168d0d4d253cd06ef812149561d984abd3af8ad3ee2
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.0-dev.41"
-  mason_logger:
-    dependency: transitive
-    description:
-      name: mason_logger
-      sha256: "893b47be5628aa97ec802111e64799b90bfeaf74f03976b0ca0fc19ecd0044c9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.4"
   matcher:
     dependency: transitive
     description:
@@ -391,14 +375,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
-  mustache_template:
-    dependency: transitive
-    description:
-      name: mustache_template
-      sha256: a46e26f91445bfb0b60519be280555b06792460b27b19e2b19ad5b9740df5d1c
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   node_preamble:
     dependency: transitive
     description:
@@ -463,14 +439,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1"
-  recase:
-    dependency: transitive
-    description:
-      name: recase
-      sha256: e4eb4ec2dcdee52dcf99cb4ceabaffc631d7424ee55e56f280bc039737f89213
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.0"
   scratch_space:
     dependency: transitive
     description:
