@@ -70,10 +70,10 @@ JasprPad is also built with **Jaspr** itself, so you can [**check out its source
 
 ## Get Started
 
-To get started simply activate the `jasper` command line tool and run `jaspr create`:
+To get started simply activate the `jasper_cli` command line tool and run `jaspr create`:
 
 ```shell
-dart pub global activate jaspr
+dart pub global activate jaspr_cli
 jaspr create my_web_app
 ```
 
