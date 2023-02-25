@@ -1,3 +1,12 @@
+# 0.3.0
+
+- **BREAKING** The cli is now a separate package: `jaspr_cli`. To migrate run:
+  ```shell
+    dart pub global deactivate jaspr
+    dart pub global activate jaspr_cli
+  ```
+  The usage stays the same with `jaspr create`, `jaspr serve` and `jaspr build`.
+
 # 0.2.0
 
 **BREAKING**: This is the first major release after the initial publish and contains several breaking changes.
