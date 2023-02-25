@@ -35,8 +35,8 @@ abstract class BaseCommand extends Command<int> {
       if (!verbose) return;
       if (level.value < 800) return;
 
-      var log = formatLog(level, message,
-          error: error, loggerName: loggerName, stackTrace: stackTrace, withColors: true);
+      var log =
+          formatLog(level, message, error: error, loggerName: loggerName, stackTrace: stackTrace, withColors: true);
 
       if (!log.endsWith('\n')) {
         log += '\n';

@@ -13,6 +13,5 @@ void main(List<String> args) async {
 /// exited already. This is useful to prevent Future chains from proceeding
 /// after you've decided to exit.
 Future<dynamic> flushThenExit(int status) {
-  return Future.wait<void>([stdout.close(), stderr.close()])
-      .then<void>((_) => exit(status));
+  return Future.wait<void>([stdout.close(), stderr.close()]).then<void>((_) => exit(status));
 }

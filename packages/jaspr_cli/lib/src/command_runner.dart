@@ -18,7 +18,6 @@ const executableName = 'jaspr';
 
 /// A [CommandRunner] for the Jaspr CLI.
 class JasprCommandRunner extends CompletionCommandRunner<int> {
-
   JasprCommandRunner({
     Logger? logger,
   })  : _logger = logger ?? Logger(),
@@ -78,5 +77,4 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
     //if (topLevelResults.command?.name != 'update') await _checkForUpdates();
     return exitCode;
   }
-
 }

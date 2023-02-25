@@ -112,8 +112,7 @@ class ServeCommand extends BaseCommand {
 
     if (entryPoint == null) {
       progress?.cancel();
-      logger.err(
-          "Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.");
+      logger.err("Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.");
       await shutdown(1);
     }
 
@@ -133,7 +132,6 @@ class ServeCommand extends BaseCommand {
 
     return ExitCode.success.code;
   }
-
 
   Future<DevWorkflow> _runWebdev(bool release, bool debug, String mode, String port) {
     var configuration = Configuration(
@@ -156,5 +154,4 @@ class ServeCommand extends BaseCommand {
       'web': int.parse(port)
     });
   }
-
 }

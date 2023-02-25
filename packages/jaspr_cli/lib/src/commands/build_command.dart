@@ -63,8 +63,7 @@ class BuildCommand extends BaseCommand {
       String? entryPoint = await getEntryPoint(argResults!['input']);
 
       if (entryPoint == null) {
-        logger.warn(
-            "Cannot find entry point. Create a main.dart in lib/ or web/, or specify a file using --input.");
+        logger.warn("Cannot find entry point. Create a main.dart in lib/ or web/, or specify a file using --input.");
         await shutdown(1);
       }
 
@@ -72,14 +71,7 @@ class BuildCommand extends BaseCommand {
 
       var process = await Process.start(
         'dart',
-        [
-          'compile',
-          argResults!['target'],
-          entryPoint,
-          '-o',
-          './build/app',
-          '-Djaspr.flags.release=true'
-        ],
+        ['compile', argResults!['target'], entryPoint, '-o', './build/app', '-Djaspr.flags.release=true'],
       );
 
       await watchProcess(process);
@@ -132,8 +124,7 @@ class BuildCommand extends BaseCommand {
     var exitCode = 0;
     var gotBuildStart = false;
     await for (final result in client.buildResults) {
-      var targetResult =
-          result.results.firstWhereOrNull((buildResult) => buildResult.target == 'web');
+      var targetResult = result.results.firstWhereOrNull((buildResult) => buildResult.target == 'web');
       if (targetResult == null) continue;
       // We ignore any builds that happen before we get a `started` event,
       // because those could be stale (from some other client).

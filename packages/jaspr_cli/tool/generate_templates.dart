@@ -12,8 +12,7 @@ void main() async {
 
   for (var templateDir in subDirs) {
     if (templateDir is Directory) {
-      var result =
-          await Process.run('mason', 'bundle -t dart -o lib/src/templates ${templateDir.path}'.split(' '));
+      var result = await Process.run('mason', 'bundle -t dart -o lib/src/templates ${templateDir.path}'.split(' '));
       stdout.write(result.stdout);
       stderr.write(result.stderr);
 
