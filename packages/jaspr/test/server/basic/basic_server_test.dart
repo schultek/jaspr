@@ -27,7 +27,7 @@ void main() {
           expect(response.statusCode, equals(200));
           expect(response.document?.body, isNotNull);
 
-          var appHtml = '<div>App<button>Click Me</button>Count: 101</div>';
+          var appHtml = '<div>App<button>Click Me</button>Count: 101</div>\n';
 
           expect(response.document!.body!.innerHtml, equals(appHtml));
         });
