@@ -38,7 +38,7 @@ jobs:
       - name: Activate Jaspr
         run: |
           cd packages
-          dart pub global activate jaspr --source=path
+          dart pub global activate jaspr_cli --source=path
 
       - name: Create & Build Project
         run: |
