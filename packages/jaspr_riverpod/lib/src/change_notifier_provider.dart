@@ -1,6 +1,7 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 import 'package:jaspr/jaspr.dart';
+import 'package:meta/meta.dart';
 // ignore: implementation_imports
 import 'package:riverpod/src/internals.dart';
 
@@ -27,17 +28,16 @@ ProviderElementProxy<NotifierT, NotifierT> _notifier<NotifierT extends ChangeNot
 /// Note: By using Riverpod, [ChangeNotifier] will no longer be O(N^2) for
 /// dispatching notifications, but instead O(N)
 /// {@endtemplate}
-abstract class _ChangeNotifierProviderBase<NotifierT extends ChangeNotifier?> extends ProviderBase<NotifierT> {
+abstract class _ChangeNotifierProviderBase<NotifierT extends ChangeNotifier?>
+    extends ProviderBase<NotifierT> {
   _ChangeNotifierProviderBase({
     required super.name,
     required super.from,
     required super.argument,
-    required this.dependencies,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
   });
-
-  @override
-  final List<ProviderOrFamily>? dependencies;
 
   /// Obtains the [ChangeNotifier] associated with this provider, without listening
   /// to state changes.

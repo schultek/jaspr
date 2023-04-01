@@ -14,10 +14,24 @@ class AutoDisposeChangeNotifierProvider<NotifierT extends ChangeNotifier?>
   AutoDisposeChangeNotifierProvider(
     this._createFn, {
     super.name,
+    super.dependencies,
+    @Deprecated('Will be removed in 3.0.0') super.from,
+    @Deprecated('Will be removed in 3.0.0') super.argument,
+    @Deprecated('Will be removed in 3.0.0') super.debugGetCreateSourceHash,
+  }) : super(
+          allTransitiveDependencies: computeAllTransitiveDependencies(dependencies),
+        );
+
+  /// An implementation detail of Riverpod
+  @internal
+  AutoDisposeChangeNotifierProvider.internal(
+    this._createFn, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
     super.from,
     super.argument,
-    super.dependencies,
-    super.debugGetCreateSourceHash,
   });
 
   /// {@macro riverpod.family}
@@ -37,26 +51,72 @@ class AutoDisposeChangeNotifierProvider<NotifierT extends ChangeNotifier?>
 
   @override
   late final Refreshable<NotifierT> notifier = _notifier<NotifierT>(this);
+
+  /// {@macro riverpod.overridewith}
+  Override overrideWith(
+    Create<NotifierT, AutoDisposeChangeNotifierProviderRef<NotifierT>> create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AutoDisposeChangeNotifierProvider<NotifierT>.internal(
+        create,
+        from: from,
+        argument: argument,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+      ),
+    );
+  }
 }
 
 /// The element of [AutoDisposeChangeNotifierProvider].
-class AutoDisposeChangeNotifierProviderElement<NotifierT extends ChangeNotifier?> = ChangeNotifierProviderElement<
-        NotifierT>
+class AutoDisposeChangeNotifierProviderElement<NotifierT extends ChangeNotifier?>
+    extends ChangeNotifierProviderElement<NotifierT>
     with AutoDisposeProviderElementMixin<NotifierT>
-    implements AutoDisposeChangeNotifierProviderRef<NotifierT>;
+    implements AutoDisposeChangeNotifierProviderRef<NotifierT> {
+  /// The [ProviderElementBase] for [ChangeNotifier]
+  AutoDisposeChangeNotifierProviderElement._(
+    AutoDisposeChangeNotifierProvider<NotifierT> super.provider,
+  ) : super._();
+}
 
 // ignore: subtype_of_sealed_class
 /// The [Family] of [AutoDisposeChangeNotifierProvider].
-class AutoDisposeChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?, Arg> extends AutoDisposeFamilyBase<
-    AutoDisposeChangeNotifierProviderRef<NotifierT>,
-    NotifierT,
-    Arg,
-    NotifierT,
-    AutoDisposeChangeNotifierProvider<NotifierT>> {
+class AutoDisposeChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?, Arg>
+    extends AutoDisposeFamilyBase<AutoDisposeChangeNotifierProviderRef<NotifierT>, NotifierT, Arg,
+        NotifierT, AutoDisposeChangeNotifierProvider<NotifierT>> {
   /// The [Family] of [AutoDisposeChangeNotifierProvider].
   AutoDisposeChangeNotifierProviderFamily(
     super.create, {
     super.name,
     super.dependencies,
-  }) : super(providerFactory: AutoDisposeChangeNotifierProvider.new);
+  }) : super(
+          providerFactory: AutoDisposeChangeNotifierProvider.internal,
+          debugGetCreateSourceHash: null,
+          allTransitiveDependencies: computeAllTransitiveDependencies(dependencies),
+        );
+
+  /// {@macro riverpod.overridewith}
+  Override overrideWith(
+    NotifierT Function(
+      AutoDisposeChangeNotifierProviderRef<NotifierT> ref,
+      Arg arg,
+    )
+        create,
+  ) {
+    return FamilyOverrideImpl<NotifierT, Arg, AutoDisposeChangeNotifierProvider<NotifierT>>(
+      this,
+      (arg) => AutoDisposeChangeNotifierProvider<NotifierT>.internal(
+        (ref) => create(ref, arg),
+        from: from,
+        argument: arg,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+      ),
+    );
+  }
 }

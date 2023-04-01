@@ -3,7 +3,8 @@
 part of '../change_notifier_provider.dart';
 
 /// {@macro riverpod.providerrefbase}
-abstract class ChangeNotifierProviderRef<NotifierT extends ChangeNotifier?> implements Ref<NotifierT> {
+abstract class ChangeNotifierProviderRef<NotifierT extends ChangeNotifier?>
+    implements Ref<NotifierT> {
   /// The [ChangeNotifier] currently exposed by this provider.
   ///
   /// Cannot be accessed while creating the provider.
@@ -75,16 +76,30 @@ abstract class ChangeNotifierProviderRef<NotifierT extends ChangeNotifier?> impl
 /// }
 /// ```
 /// {@endtemplate}
-class ChangeNotifierProvider<NotifierT extends ChangeNotifier?> extends _ChangeNotifierProviderBase<NotifierT>
-    with AlwaysAliveProviderBase<NotifierT> {
+class ChangeNotifierProvider<NotifierT extends ChangeNotifier?>
+    extends _ChangeNotifierProviderBase<NotifierT> with AlwaysAliveProviderBase<NotifierT> {
   /// {@macro riverpod.ChangeNotifierprovider}
   ChangeNotifierProvider(
     this._createFn, {
     super.name,
+    super.dependencies,
+    @Deprecated('Will be removed in 3.0.0') super.from,
+    @Deprecated('Will be removed in 3.0.0') super.argument,
+    @Deprecated('Will be removed in 3.0.0') super.debugGetCreateSourceHash,
+  }) : super(
+          allTransitiveDependencies: computeAllTransitiveDependencies(dependencies),
+        );
+
+  /// An implementation detail of Riverpod
+  @internal
+  ChangeNotifierProvider.internal(
+    this._createFn, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
     super.from,
     super.argument,
-    super.dependencies,
-    super.debugGetCreateSourceHash,
   });
 
   /// {@macro riverpod.autoDispose}
@@ -107,11 +122,62 @@ class ChangeNotifierProvider<NotifierT extends ChangeNotifier?> extends _ChangeN
 
   @override
   late final AlwaysAliveRefreshable<NotifierT> notifier = _notifier<NotifierT>(this);
+
+  /// {@template riverpod.overridewith}
+  /// Override the provider with a new initialization function.
+  ///
+  /// This will also disable the auto-scoping mechanism, meaning that if the
+  /// overridden provider specified `dependencies`, it will have no effect.
+  ///
+  /// The override must not specify a `dependencies`.
+  ///
+  /// Some common use-cases are:
+  /// - testing, by replacing a service with a fake implementation, or to reach
+  ///   a very specific state easily.
+  /// - multiple environments, by changing the implementation of a class
+  ///   based on the platform or other parameters.
+  ///
+  /// This function should be used in combination with `ProviderScope.overrides`
+  /// or `ProviderContainer.overrides`:
+  ///
+  /// ```dart
+  /// final myService = Provider((ref) => MyService());
+  ///
+  /// runApp(
+  ///   ProviderScope(
+  ///     overrides: [
+  ///       // Replace the implementation of the provider with a different one
+  ///       myService.overrideWithProvider((ref) {
+  ///         ref.watch('other');
+  ///         return MyFakeService(),
+  ///       })),
+  ///     ],
+  ///     child: MyApp(),
+  ///   ),
+  /// );
+  /// ```
+  /// {@endtemplate}
+  Override overrideWith(
+    Create<NotifierT, ChangeNotifierProviderRef<NotifierT>> create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: ChangeNotifierProvider<NotifierT>.internal(
+        create,
+        from: from,
+        argument: argument,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+      ),
+    );
+  }
 }
 
 /// The element of [ChangeNotifierProvider].
-class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?> extends ProviderElementBase<NotifierT>
-    implements ChangeNotifierProviderRef<NotifierT> {
+class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?>
+    extends ProviderElementBase<NotifierT> implements ChangeNotifierProviderRef<NotifierT> {
   ChangeNotifierProviderElement._(
     _ChangeNotifierProviderBase<NotifierT> super.provider,
   );
@@ -174,11 +240,37 @@ class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?> extends P
 // ignore: subtype_of_sealed_class
 /// The [Family] of [ChangeNotifierProvider].
 class ChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?, Arg> extends FamilyBase<
-    ChangeNotifierProviderRef<NotifierT>, NotifierT, Arg, NotifierT, ChangeNotifierProvider<NotifierT>> {
+    ChangeNotifierProviderRef<NotifierT>,
+    NotifierT,
+    Arg,
+    NotifierT,
+    ChangeNotifierProvider<NotifierT>> {
   /// The [Family] of [ChangeNotifierProvider].
   ChangeNotifierProviderFamily(
     super.create, {
     super.name,
     super.dependencies,
-  }) : super(providerFactory: ChangeNotifierProvider.new);
+  }) : super(
+          providerFactory: ChangeNotifierProvider.internal,
+          debugGetCreateSourceHash: null,
+          allTransitiveDependencies: computeAllTransitiveDependencies(dependencies),
+        );
+
+  /// {@macro riverpod.overridewith}
+  Override overrideWith(
+    NotifierT Function(ChangeNotifierProviderRef<NotifierT> ref, Arg arg) create,
+  ) {
+    return FamilyOverrideImpl<NotifierT, Arg, ChangeNotifierProvider<NotifierT>>(
+      this,
+      (arg) => ChangeNotifierProvider<NotifierT>.internal(
+        (ref) => create(ref, arg),
+        from: from,
+        argument: arg,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+      ),
+    );
+  }
 }

@@ -4,11 +4,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:jaspr/jaspr.dart';
+import 'package:meta/meta.dart';
 
 import 'internals.dart';
 
-part 'sync_provider/sync_scope.dart';
 part 'sync_provider/base.dart';
+part 'sync_provider/sync_scope.dart';
 
 ProviderElementProxy<AsyncValue<T>, Future<T>> _future<T>(
   _SyncProviderBase<T> that,
@@ -49,15 +50,13 @@ ProviderElementProxy<AsyncValue<T>, Future<T>> _future<T>(
 /// {@endtemplate}
 abstract class _SyncProviderBase<T> extends ProviderBase<AsyncValue<T>> {
   _SyncProviderBase({
-    required this.dependencies,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
     required super.name,
     required super.from,
     required super.argument,
     required super.debugGetCreateSourceHash,
   });
-
-  @override
-  final List<ProviderOrFamily>? dependencies;
 
   /// Obtains the [Future] associated with a [SyncProvider].
   ///
