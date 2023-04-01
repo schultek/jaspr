@@ -1,14 +1,11 @@
-name: jaspr_project
+name: jaspr_workspace
+repository: https://github.com/schultek/jaspr
 
 packages:
-  - packages/*/*
-  - apps/*/*
-  - examples/*/*
-  - experiments/*/*
-
-command:
-  bootstrap:
-    usePubspecOverrides: true
+  - packages/*
+  - apps/*
+  - examples/*
+  - experiments/*
 
 scripts:
   format: melos exec -- 'dart format . --set-exit-if-changed --line-length=120'
@@ -29,8 +26,8 @@ scripts:
       genhtml -o $MELOS_ROOT_PATH/coverage/report $MELOS_ROOT_PATH/coverage/*_lcov.info
       open $MELOS_ROOT_PATH/coverage/report/index.html
   generate:build:
-    select-package:
-      depends-on: build_runner
+    packageFilters:
+      dependsOn: build_runner
     run: |
       melos exec --depends-on=build_runner -- "dart run build_runner build --delete-conflicting-outputs"
   generate:html:
