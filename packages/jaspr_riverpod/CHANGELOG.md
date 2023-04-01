@@ -1,3 +1,7 @@
+## 0.3.0
+
+- Update riverpod to `v2.3.2`
+
 ## 0.2.0
 
 - Update riverpod to `v2.1.3`
