@@ -303,7 +303,7 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.2.0+4"
+    version: "0.3.0"
   jaspr_test:
     dependency: "direct dev"
     description:
