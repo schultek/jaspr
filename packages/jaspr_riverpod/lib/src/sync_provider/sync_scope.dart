@@ -15,8 +15,7 @@ mixin SyncProviderDependencies on StatelessComponent implements OnFirstBuild {
 
 final _syncStateProvider = StateProvider<Map<String, dynamic>>((ref) => {});
 
-mixin SyncScopeMixin on State<ProviderScope>
-    implements SyncStateMixin<ProviderScope, Map<String, dynamic>> {
+mixin SyncScopeMixin on State<ProviderScope> implements SyncStateMixin<ProviderScope, Map<String, dynamic>> {
   @override
   String syncId = 'provider_scope';
 

@@ -28,8 +28,7 @@ ProviderElementProxy<NotifierT, NotifierT> _notifier<NotifierT extends ChangeNot
 /// Note: By using Riverpod, [ChangeNotifier] will no longer be O(N^2) for
 /// dispatching notifications, but instead O(N)
 /// {@endtemplate}
-abstract class _ChangeNotifierProviderBase<NotifierT extends ChangeNotifier?>
-    extends ProviderBase<NotifierT> {
+abstract class _ChangeNotifierProviderBase<NotifierT extends ChangeNotifier?> extends ProviderBase<NotifierT> {
   _ChangeNotifierProviderBase({
     required super.name,
     required super.from,

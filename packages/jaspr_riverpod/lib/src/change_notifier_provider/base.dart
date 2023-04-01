@@ -3,8 +3,7 @@
 part of '../change_notifier_provider.dart';
 
 /// {@macro riverpod.providerrefbase}
-abstract class ChangeNotifierProviderRef<NotifierT extends ChangeNotifier?>
-    implements Ref<NotifierT> {
+abstract class ChangeNotifierProviderRef<NotifierT extends ChangeNotifier?> implements Ref<NotifierT> {
   /// The [ChangeNotifier] currently exposed by this provider.
   ///
   /// Cannot be accessed while creating the provider.
@@ -76,8 +75,8 @@ abstract class ChangeNotifierProviderRef<NotifierT extends ChangeNotifier?>
 /// }
 /// ```
 /// {@endtemplate}
-class ChangeNotifierProvider<NotifierT extends ChangeNotifier?>
-    extends _ChangeNotifierProviderBase<NotifierT> with AlwaysAliveProviderBase<NotifierT> {
+class ChangeNotifierProvider<NotifierT extends ChangeNotifier?> extends _ChangeNotifierProviderBase<NotifierT>
+    with AlwaysAliveProviderBase<NotifierT> {
   /// {@macro riverpod.ChangeNotifierprovider}
   ChangeNotifierProvider(
     this._createFn, {
@@ -176,8 +175,8 @@ class ChangeNotifierProvider<NotifierT extends ChangeNotifier?>
 }
 
 /// The element of [ChangeNotifierProvider].
-class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?>
-    extends ProviderElementBase<NotifierT> implements ChangeNotifierProviderRef<NotifierT> {
+class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?> extends ProviderElementBase<NotifierT>
+    implements ChangeNotifierProviderRef<NotifierT> {
   ChangeNotifierProviderElement._(
     _ChangeNotifierProviderBase<NotifierT> super.provider,
   );
@@ -240,11 +239,7 @@ class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?>
 // ignore: subtype_of_sealed_class
 /// The [Family] of [ChangeNotifierProvider].
 class ChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?, Arg> extends FamilyBase<
-    ChangeNotifierProviderRef<NotifierT>,
-    NotifierT,
-    Arg,
-    NotifierT,
-    ChangeNotifierProvider<NotifierT>> {
+    ChangeNotifierProviderRef<NotifierT>, NotifierT, Arg, NotifierT, ChangeNotifierProvider<NotifierT>> {
   /// The [Family] of [ChangeNotifierProvider].
   ChangeNotifierProviderFamily(
     super.create, {

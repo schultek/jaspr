@@ -84,9 +84,12 @@ class AutoDisposeChangeNotifierProviderElement<NotifierT extends ChangeNotifier?
 
 // ignore: subtype_of_sealed_class
 /// The [Family] of [AutoDisposeChangeNotifierProvider].
-class AutoDisposeChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?, Arg>
-    extends AutoDisposeFamilyBase<AutoDisposeChangeNotifierProviderRef<NotifierT>, NotifierT, Arg,
-        NotifierT, AutoDisposeChangeNotifierProvider<NotifierT>> {
+class AutoDisposeChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?, Arg> extends AutoDisposeFamilyBase<
+    AutoDisposeChangeNotifierProviderRef<NotifierT>,
+    NotifierT,
+    Arg,
+    NotifierT,
+    AutoDisposeChangeNotifierProvider<NotifierT>> {
   /// The [Family] of [AutoDisposeChangeNotifierProvider].
   AutoDisposeChangeNotifierProviderFamily(
     super.create, {
