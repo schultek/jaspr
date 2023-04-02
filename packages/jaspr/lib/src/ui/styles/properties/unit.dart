@@ -35,10 +35,7 @@ class _ZeroUnit implements Unit {
   String get value => '0';
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _Unit && other._value == 0 ||
-      other is _ZeroUnit && runtimeType == other.runtimeType;
+  bool operator ==(Object other) => identical(this, other) || other is _Unit && other._value == 0;
 
   @override
   int get hashCode => 0;
@@ -51,16 +48,16 @@ class _Unit implements Unit {
   const _Unit(this._value, this._unit);
 
   @override
-  String get value => '${_value.toNumberString()}$_unit';
+  String get value => '${_value.numstr}$_unit';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _ZeroUnit && _value == 0 ||
+      _value == 0 && (other is _ZeroUnit || (other is _Unit && other._value == 0)) ||
       other is _Unit && runtimeType == other.runtimeType && _unit == other._unit && _value == other._value;
 
   @override
-  int get hashCode => _unit.hashCode ^ _value.hashCode;
+  int get hashCode => _value == 0 ? 0 : _unit.hashCode ^ _value.hashCode;
 }
 
 class _PercentUnit extends _Unit {
@@ -84,7 +81,7 @@ class _RemUnit extends _Unit {
 }
 
 extension NumberString on double {
-  String toNumberString() {
+  String get numstr {
     return roundToDouble() == this ? round().toString() : toString();
   }
 }

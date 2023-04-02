@@ -35,20 +35,20 @@ class _Flex implements Flex {
   Map<String, String> get styles {
     if (grow != null) {
       if (shrink == null && basis == null) {
-        return {'flex': grow!.toNumberString()};
+        return {'flex': grow!.numstr};
       } else if (basis == null) {
-        return {'flex': '${grow!.toNumberString()} ${shrink!.toNumberString()}'};
+        return {'flex': '${grow!.numstr} ${shrink!.numstr}'};
       } else if (shrink == null) {
-        return {'flex': '${grow!.toNumberString()} ${basis!.value}'};
+        return {'flex': '${grow!.numstr} ${basis!.value}'};
       } else {
-        return {'flex': '${grow!.toNumberString()} ${shrink!.toNumberString()} ${basis!.value}'};
+        return {'flex': '${grow!.numstr} ${shrink!.numstr} ${basis!.value}'};
       }
     } else if (basis != null && shrink == null) {
       return {'flex': basis!.value};
     }
     return {
-      if (grow != null) 'flex-grow': grow!.toNumberString(),
-      if (shrink != null) 'flex-shrink': shrink!.toNumberString(),
+      if (grow != null) 'flex-grow': grow!.numstr,
+      if (shrink != null) 'flex-shrink': shrink!.numstr,
       if (basis != null) 'flex-basis': basis!.value,
     };
   }

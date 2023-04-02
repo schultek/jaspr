@@ -39,6 +39,30 @@ void main() {
         gap = GridGap.all(10.px);
         expect(gap.styles, equals({'gap': '10px'}));
       });
+
+      test('placement', () {
+        var placement = GridPlacement(
+          rowStart: LinePlacement.auto,
+          rowEnd: LinePlacement.named('test'),
+          columnStart: LinePlacement.span(2),
+          columnEnd: LinePlacement(3, lineName: 'other'),
+        );
+
+        expect(
+          placement.styles,
+          equals({'grid-area': 'auto / span 2 / test / 3 other'}),
+        );
+
+        placement = GridPlacement(
+          rowStart: LinePlacement.span(3, lineName: 'test'),
+          columnEnd: LinePlacement.auto,
+        );
+
+        expect(
+          placement.styles,
+          equals({'grid-row': 'span 3 test', 'grid-column-end': 'auto'}),
+        );
+      });
     });
   });
 }

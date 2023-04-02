@@ -11,6 +11,18 @@ void main() {
         expect(100.em, equals(Unit.em(100)));
         expect(100.rem, equals(Unit.rem(100)));
       });
+
+      test('compares equal', () {
+        expect(Unit.zero, equals(0.px));
+        expect(0.px, equals(Unit.zero));
+        expect(0.px, equals(0.pt));
+        expect(0.px, isNot(equals(1.px)));
+
+        expect(Unit.zero.hashCode, equals(0.px.hashCode));
+        expect(0.px.hashCode, equals(Unit.zero.hashCode));
+        expect(0.px.hashCode, equals(0.pt.hashCode));
+        expect(0.px.hashCode, isNot(equals(1.px.hashCode)));
+      });
     });
 
     group('angle', () {
@@ -26,9 +38,32 @@ void main() {
         expect(100.rad, equals(Angle.rad(100)));
         expect(100.turn, equals(Angle.turn(100)));
       });
+
+      test('compares equal', () {
+        expect(Angle.zero, equals(0.deg));
+        expect(0.deg, equals(Angle.zero));
+        expect(0.deg, equals(0.rad));
+        expect(0.deg, isNot(equals(1.rad)));
+
+        expect(Angle.zero.hashCode, equals(0.deg.hashCode));
+        expect(0.deg.hashCode, equals(Angle.zero.hashCode));
+        expect(0.deg.hashCode, equals(0.rad.hashCode));
+        expect(0.deg.hashCode, isNot(equals(1.rad.hashCode)));
+      });
     });
 
     group('edge_insets', () {
+      test('base', () {
+        var insets = EdgeInsets.inherit;
+
+        expect(insets.styles, equals({'': 'inherit'}));
+
+        expect(insets.left, equals(0.px));
+        expect(insets.top, equals(0.px));
+        expect(insets.right, equals(0.px));
+        expect(insets.bottom, equals(0.px));
+      });
+
       test('from ltrm', () {
         var insets = EdgeInsets.fromLTRB(10.px, 20.px, 30.px, 40.px);
 
@@ -71,6 +106,15 @@ void main() {
         expect(insets.bottom, equals(10.px));
 
         expect(insets.styles, equals({'': '10px 20px'}));
+
+        insets = EdgeInsets.symmetric(vertical: 10.px);
+
+        expect(insets.left, equals(0.px));
+        expect(insets.top, equals(10.px));
+        expect(insets.right, equals(0.px));
+        expect(insets.bottom, equals(10.px));
+
+        expect(insets.styles, equals({'top': '10px', 'bottom': '10px'}));
       });
     });
   });

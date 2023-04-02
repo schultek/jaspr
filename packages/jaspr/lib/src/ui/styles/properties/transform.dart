@@ -88,7 +88,7 @@ class _ScaleTransform implements Transform {
   final double scale;
 
   @override
-  String get value => 'scale(${scale.toNumberString()})';
+  String get value => 'scale(${scale.numstr})';
 }
 
 class _SkewTransform implements Transform {
@@ -121,7 +121,8 @@ class _MatrixTransform implements Transform {
   final double ty;
 
   @override
-  String get value => 'matrix($a, $b, $c, $d, $tx, $ty)';
+  String get value => 'matrix(${a.numstr}, ${b.numstr}, ${c.numstr}, '
+      '${d.numstr}, ${tx.numstr}, ${ty.numstr})';
 }
 
 class _PerspectiveTransform implements Transform {

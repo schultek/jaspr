@@ -29,10 +29,7 @@ class _ZeroAngle implements Angle {
   String get value => '0';
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _Angle && other._value == 0 ||
-      other is _ZeroAngle && runtimeType == other.runtimeType;
+  bool operator ==(Object other) => identical(this, other) || other is _Angle && other._value == 0;
 
   @override
   int get hashCode => 0;
@@ -45,16 +42,16 @@ class _Angle implements Angle {
   const _Angle(this._value, this._unit);
 
   @override
-  String get value => '${_value.toNumberString()}$_unit';
+  String get value => '${_value.numstr}$_unit';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _ZeroAngle && _value == 0 ||
+      _value == 0 && (other is _ZeroAngle || (other is _Angle && other._value == 0)) ||
       other is _Angle && runtimeType == other.runtimeType && _unit == other._unit && _value == other._value;
 
   @override
-  int get hashCode => _unit.hashCode ^ _value.hashCode;
+  int get hashCode => _value == 0 ? 0 : _unit.hashCode ^ _value.hashCode;
 }
 
 class _DegreeAngle extends _Angle {
