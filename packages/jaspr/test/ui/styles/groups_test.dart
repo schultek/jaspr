@@ -2,7 +2,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
 void main() {
-  group('styles', () {
+  group('style group', () {
     group('raw', () {
       test('outputs raw styles', () {
         var styles = const Styles.raw({'a': 'b', 'c': 'd'});
@@ -43,7 +43,7 @@ void main() {
           styles.styles,
           equals({
             'font-size': '14px',
-            'font-family': 'Roboto',
+            'font-family': '"Roboto"',
           }),
         );
       });
@@ -62,7 +62,7 @@ void main() {
           transform: TextTransform.lowerCase,
           indent: Unit.pixels(8),
           letterSpacing: Unit.em(0.5),
-          wordSpacing: Unit.em(1),
+          wordSpacing: Unit.points(10),
           lineHeight: Unit.rem(1.5),
           shadow: TextShadow(offsetX: Unit.zero, offsetY: Unit.zero, blur: Unit.pixels(10)),
           overflow: TextOverflow.ellipsis,
@@ -75,15 +75,15 @@ void main() {
             'text-align': 'center',
             'font-family': '"Roboto"',
             'font-style': 'italic',
-            'font-size': '12.0px',
+            'font-size': '12px',
             'font-weight': 'bold',
             'text-decoration': 'underline',
             'text-transform': 'lowercase',
-            'text-indent': '8.0px',
+            'text-indent': '8px',
             'letter-spacing': '0.5em',
-            'word-spacing': '1.0em',
+            'word-spacing': '10pt',
             'line-height': '1.5rem',
-            'text-shadow': '0 0 10.0px',
+            'text-shadow': '0 0 10px',
             'text-overflow': 'ellipsis'
           }),
         );
@@ -115,7 +115,7 @@ void main() {
             'background-clip': 'border-box',
             'background-image': 'url(abc.png)',
             'background-origin': 'content-box',
-            'background-position': 'left 20.0% center',
+            'background-position': 'left 20% center',
             'background-repeat': 'no-repeat',
             'background-size': 'cover'
           }),
@@ -149,26 +149,26 @@ void main() {
         expect(
           styles.styles,
           equals({
-            'padding': '20.0px',
+            'padding': '20px',
             'margin': '0',
             'display': 'inline-block',
             'box-sizing': 'border-box',
-            'width': '80.0%',
-            'height': '70.0%',
-            'max-width': '1000.0px',
+            'width': '80%',
+            'height': '70%',
+            'max-width': '1000px',
             'border-top-style': 'solid',
             'border-top-color': 'green',
-            'border-radius': '20.0px',
+            'border-radius': '20px',
             'outline-color': 'yellow',
             'overflow': 'visible',
             'visibility': 'visible',
             'position': 'absolute',
-            'top': '100.0px',
+            'top': '100px',
             'opacity': '0.5',
-            'transform': 'scale(2.0)',
-            'box-shadow': '0 0 10.0px',
+            'transform': 'scale(2)',
+            'box-shadow': '0 0 10px',
             'cursor': 'crosshair',
-            'transition': 'width 500.0ms',
+            'transition': 'width 500ms',
           }),
         );
       });
@@ -207,7 +207,7 @@ void main() {
         expect(
           styles.styles,
           equals({
-            'flex': '2.0 1.0 auto',
+            'flex': '2 1 auto',
             'order': '2',
             'align-self': 'start',
           }),
@@ -236,8 +236,8 @@ void main() {
             'grid-template-areas': '"header header"\n'
                 '"side content"\n'
                 '"side content"',
-            'grid-auto-rows': '20.0% auto',
-            'grid-auto-columns': '100.0px auto auto'
+            'grid-auto-rows': '20% auto',
+            'grid-auto-columns': '100px auto auto'
           }),
         );
       });

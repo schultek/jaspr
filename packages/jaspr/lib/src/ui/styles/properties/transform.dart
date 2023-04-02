@@ -19,7 +19,8 @@ class Transform {
 
   const factory Transform.skew({Angle? x, Angle? y}) = _SkewTransform;
 
-  const factory Transform.matrix(double a, double b, double c, double d, double tx, double ty) = _MatrixTransform;
+  const factory Transform.matrix(double a, double b, double c, double d, double tx, double ty) =
+      _MatrixTransform;
 
   const factory Transform.perspective(Unit value) = _PerspectiveTransform;
 
@@ -88,7 +89,7 @@ class _ScaleTransform implements Transform {
   final double scale;
 
   @override
-  String get value => 'scale($scale)';
+  String get value => 'scale(${scale.toNumberString()})';
 }
 
 class _SkewTransform implements Transform {

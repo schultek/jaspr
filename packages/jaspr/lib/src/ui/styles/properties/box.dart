@@ -45,7 +45,8 @@ class BoxConstraints {
 
 abstract class Border {
   const factory Border.all(BorderSide side) = _AllBorder;
-  const factory Border.only({BorderSide? left, BorderSide? top, BorderSide? right, BorderSide? bottom}) = _OnlyBorder;
+  const factory Border.only(
+      {BorderSide? left, BorderSide? top, BorderSide? right, BorderSide? bottom}) = _OnlyBorder;
   const factory Border.symmetric({BorderSide? vertical, BorderSide? horizontal}) = _SymmetricBorder;
 
   static const Border inherit = _Border('inherit');
@@ -173,12 +174,16 @@ enum BorderStyle {
 abstract class BorderRadius {
   const factory BorderRadius.all(Radius radius) = _AllBorderRadius;
   const factory BorderRadius.circular(Unit radius) = _CircularBorderRadius;
-  const factory BorderRadius.only({Radius? topLeft, Radius? topRight, Radius? bottomLeft, Radius? bottomRight}) =
-      _OnlyBorderRadius;
+  const factory BorderRadius.only(
+      {Radius? topLeft,
+      Radius? topRight,
+      Radius? bottomLeft,
+      Radius? bottomRight}) = _OnlyBorderRadius;
 
   const factory BorderRadius.vertical({Radius? top, Radius? bottom}) = _OnlyBorderRadius.vertical;
 
-  const factory BorderRadius.horizontal({Radius? left, Radius? right}) = _OnlyBorderRadius.horizontal;
+  const factory BorderRadius.horizontal({Radius? left, Radius? right}) =
+      _OnlyBorderRadius.horizontal;
 
   /// The css styles
   Map<String, String> get styles;
@@ -229,7 +234,10 @@ class _OnlyBorderRadius implements BorderRadius {
       if (values.every((v) => v.length == 1)) {
         return {'border-radius': values.map((v) => v.first).join(' ')};
       } else {
-        return {'border-radius': '${values.map((v) => v.first).join(' ')} / ${values.map((v) => v.last).join(' ')}'};
+        return {
+          'border-radius':
+              '${values.map((v) => v.first).join(' ')} / ${values.map((v) => v.last).join(' ')}'
+        };
       }
     } else {
       return {
@@ -275,7 +283,8 @@ class _EllipticalRadius implements Radius {
 }
 
 abstract class Outline {
-  const factory Outline({Color? color, OutlineStyle? style, OutlineWidth? width, Unit? offset}) = _Outline;
+  const factory Outline({Color? color, OutlineStyle? style, OutlineWidth? width, Unit? offset}) =
+      _Outline;
 
   static const Outline inherit = _KeywordOutline('inherit');
   static const Outline initial = _KeywordOutline('initial');
@@ -453,11 +462,19 @@ enum BoxSizing {
 }
 
 abstract class BoxShadow {
-  const factory BoxShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Unit? spread, Color? color}) =
-      _BoxShadow;
+  const factory BoxShadow(
+      {required Unit offsetX,
+      required Unit offsetY,
+      Unit? blur,
+      Unit? spread,
+      Color? color}) = _BoxShadow;
 
   const factory BoxShadow.inset(
-      {required Unit offsetX, required Unit offsetY, Unit? blur, Unit? spread, Color? color}) = _InsetBoxShadow;
+      {required Unit offsetX,
+      required Unit offsetY,
+      Unit? blur,
+      Unit? spread,
+      Color? color}) = _InsetBoxShadow;
 
   const factory BoxShadow.combine(List<BoxShadow> shadows) = _CombineBoxShadow;
 
@@ -466,7 +483,12 @@ abstract class BoxShadow {
 
 class _BoxShadow implements BoxShadow {
   const _BoxShadow(
-      {required this.offsetX, required this.offsetY, this.blur, this.spread, this.color, this.inset = false});
+      {required this.offsetX,
+      required this.offsetY,
+      this.blur,
+      this.spread,
+      this.color,
+      this.inset = false});
 
   final Unit offsetX;
   final Unit offsetY;
@@ -487,7 +509,8 @@ class _BoxShadow implements BoxShadow {
 }
 
 class _InsetBoxShadow extends _BoxShadow {
-  const _InsetBoxShadow({required super.offsetX, required super.offsetY, super.blur, super.spread, super.color})
+  const _InsetBoxShadow(
+      {required super.offsetX, required super.offsetY, super.blur, super.spread, super.color})
       : super(inset: true);
 }
 
@@ -542,7 +565,8 @@ class Cursor {
   static const Cursor zoomIn = Cursor._('zoom-in');
   static const Cursor zoomOut = Cursor._('zoom-out');
 
-  const factory Cursor.url(String url, {double? x, double? y, required Cursor fallback}) = _UrlCursor;
+  const factory Cursor.url(String url, {double? x, double? y, required Cursor fallback}) =
+      _UrlCursor;
 }
 
 class _UrlCursor implements Cursor {
@@ -554,85 +578,6 @@ class _UrlCursor implements Cursor {
   final Cursor fallback;
 
   @override
-  String get value => 'url($url)${x != null || y != null ? ' ${x ?? 0} ${y ?? 0}' : ''}, ${fallback.value}';
-}
-
-abstract class Transition {
-  const factory Transition(String property, {required double duration, Curve? curve, double? delay}) = _Transition;
-  const factory Transition.combine(List<Transition> transitions) = _CombineTransition;
-
-  String get value;
-}
-
-class _Transition implements Transition {
-  const _Transition(this.property, {required this.duration, this.curve, this.delay});
-
-  final String property;
-  final double duration;
-  final Curve? curve;
-  final double? delay;
-
-  @override
   String get value =>
-      [property, '${duration}ms', if (curve != null) curve!.value, if (delay != null) '${delay}ms'].join(' ');
-}
-
-class _CombineTransition implements Transition {
-  const _CombineTransition(this.transitions);
-
-  final List<Transition> transitions;
-
-  @override
-  String get value => transitions.map((t) => t.value).join(', ');
-}
-
-class Curve {
-  const Curve._(this.value);
-
-  final String value;
-
-  static const Curve ease = Curve._('ease');
-  static const Curve easeIn = Curve._('ease-in');
-  static const Curve easeOut = Curve._('ease-out');
-  static const Curve easeInOut = Curve._('ease-in-out');
-  static const Curve linear = Curve._('linear');
-  static const Curve stepStart = Curve._('step-start');
-  static const Curve stepEnd = Curve._('step-end');
-
-  const factory Curve.cubicBezier(double p1, double p2, double p3, double p4) = _CubicBezierCurve;
-
-  const factory Curve.steps(int steps, {required StepJump jump}) = _StepsCurve;
-}
-
-class _CubicBezierCurve implements Curve {
-  const _CubicBezierCurve(this.p1, this.p2, this.p3, this.p4);
-
-  final double p1;
-  final double p2;
-  final double p3;
-  final double p4;
-
-  @override
-  String get value => 'cubic-bezier($p1, $p2, $p3, $p4)';
-}
-
-class _StepsCurve implements Curve {
-  const _StepsCurve(this.steps, {required this.jump});
-
-  final int steps;
-  final StepJump jump;
-
-  @override
-  String get value => 'steps($steps, ${jump.value})';
-}
-
-enum StepJump {
-  start('jump-start'),
-  end('jump-end'),
-  none('jump-none'),
-  both('jump-both');
-
-  /// The css value
-  final String value;
-  const StepJump(this.value);
+      'url($url)${x != null || y != null ? ' ${x ?? 0} ${y ?? 0}' : ''}, ${fallback.value}';
 }
