@@ -7,7 +7,7 @@ abstract class Route {
 
   const factory Route(String path, ComponentBuilder builder) = ResolvedRoute;
 
-  bool matches(String path);
+  bool matches(Uri uri);
 }
 
 /// Interface for a resolved route that does not require any loading
@@ -42,11 +42,12 @@ class LazyRoute implements Route {
   }
 
   @override
-  bool matches(String path) => _path == path;
+  bool matches(Uri uri) => _path == uri.path;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is LazyRoute && runtimeType == other.runtimeType && _path == other._path;
+      identical(this, other) ||
+      other is LazyRoute && runtimeType == other.runtimeType && _path == other._path;
 
   @override
   int get hashCode => _path.hashCode;
@@ -62,7 +63,7 @@ class _ResolvedRoute implements ResolvedRoute {
   Iterable<Component> build(BuildContext context) => _builder(context);
 
   @override
-  bool matches(String path) => _path == path;
+  bool matches(Uri uri) => _path == uri.path;
 
   @override
   String toString() {

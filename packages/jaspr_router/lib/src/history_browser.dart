@@ -1,25 +1,25 @@
 import 'dart:html' hide Element;
 
-import 'router.dart';
+import 'history.dart';
 
 /// Browser implementation of HistoryManager
 /// Accesses the window.history api
 class HistoryManagerImpl implements HistoryManager {
   @override
-  void init(void Function(String) onChange) {
+  void init(void Function(Uri) onChange) {
     window.onPopState.listen((event) {
-      onChange(window.location.pathname!);
+      onChange(Uri.parse(window.location.href));
     });
   }
 
   @override
-  void push(String path, {String? title}) {
-    window.history.pushState(null, title ?? path, path);
+  void push(Uri uri, {String? title}) {
+    window.history.pushState(null, title ?? uri.path, uri.toString());
   }
 
   @override
-  void replace(String path, {String? title}) {
-    window.history.replaceState(null, title ?? path, path);
+  void replace(Uri uri, {String? title}) {
+    window.history.replaceState(null, title ?? uri.path, uri.toString());
   }
 
   @override
