@@ -1,8 +1,7 @@
 import 'unit.dart';
 
 abstract class Transition {
-  const factory Transition(String property,
-      {required double duration, Curve? curve, double? delay}) = _Transition;
+  const factory Transition(String property, {required double duration, Curve? curve, double? delay}) = _Transition;
   const factory Transition.combine(List<Transition> transitions) = _CombineTransition;
 
   String get value;

@@ -51,10 +51,7 @@ class _Angle implements Angle {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is _ZeroAngle && _value == 0 ||
-      other is _Angle &&
-          runtimeType == other.runtimeType &&
-          _unit == other._unit &&
-          _value == other._value;
+      other is _Angle && runtimeType == other.runtimeType && _unit == other._unit && _value == other._value;
 
   @override
   int get hashCode => _unit.hashCode ^ _value.hashCode;

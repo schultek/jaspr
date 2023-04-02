@@ -45,8 +45,7 @@ class BoxConstraints {
 
 abstract class Border {
   const factory Border.all(BorderSide side) = _AllBorder;
-  const factory Border.only(
-      {BorderSide? left, BorderSide? top, BorderSide? right, BorderSide? bottom}) = _OnlyBorder;
+  const factory Border.only({BorderSide? left, BorderSide? top, BorderSide? right, BorderSide? bottom}) = _OnlyBorder;
   const factory Border.symmetric({BorderSide? vertical, BorderSide? horizontal}) = _SymmetricBorder;
 
   static const Border inherit = _Border('inherit');
@@ -174,16 +173,12 @@ enum BorderStyle {
 abstract class BorderRadius {
   const factory BorderRadius.all(Radius radius) = _AllBorderRadius;
   const factory BorderRadius.circular(Unit radius) = _CircularBorderRadius;
-  const factory BorderRadius.only(
-      {Radius? topLeft,
-      Radius? topRight,
-      Radius? bottomLeft,
-      Radius? bottomRight}) = _OnlyBorderRadius;
+  const factory BorderRadius.only({Radius? topLeft, Radius? topRight, Radius? bottomLeft, Radius? bottomRight}) =
+      _OnlyBorderRadius;
 
   const factory BorderRadius.vertical({Radius? top, Radius? bottom}) = _OnlyBorderRadius.vertical;
 
-  const factory BorderRadius.horizontal({Radius? left, Radius? right}) =
-      _OnlyBorderRadius.horizontal;
+  const factory BorderRadius.horizontal({Radius? left, Radius? right}) = _OnlyBorderRadius.horizontal;
 
   /// The css styles
   Map<String, String> get styles;
@@ -234,10 +229,7 @@ class _OnlyBorderRadius implements BorderRadius {
       if (values.every((v) => v.length == 1)) {
         return {'border-radius': values.map((v) => v.first).join(' ')};
       } else {
-        return {
-          'border-radius':
-              '${values.map((v) => v.first).join(' ')} / ${values.map((v) => v.last).join(' ')}'
-        };
+        return {'border-radius': '${values.map((v) => v.first).join(' ')} / ${values.map((v) => v.last).join(' ')}'};
       }
     } else {
       return {
@@ -283,8 +275,7 @@ class _EllipticalRadius implements Radius {
 }
 
 abstract class Outline {
-  const factory Outline({Color? color, OutlineStyle? style, OutlineWidth? width, Unit? offset}) =
-      _Outline;
+  const factory Outline({Color? color, OutlineStyle? style, OutlineWidth? width, Unit? offset}) = _Outline;
 
   static const Outline inherit = _KeywordOutline('inherit');
   static const Outline initial = _KeywordOutline('initial');
@@ -462,19 +453,11 @@ enum BoxSizing {
 }
 
 abstract class BoxShadow {
-  const factory BoxShadow(
-      {required Unit offsetX,
-      required Unit offsetY,
-      Unit? blur,
-      Unit? spread,
-      Color? color}) = _BoxShadow;
+  const factory BoxShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Unit? spread, Color? color}) =
+      _BoxShadow;
 
   const factory BoxShadow.inset(
-      {required Unit offsetX,
-      required Unit offsetY,
-      Unit? blur,
-      Unit? spread,
-      Color? color}) = _InsetBoxShadow;
+      {required Unit offsetX, required Unit offsetY, Unit? blur, Unit? spread, Color? color}) = _InsetBoxShadow;
 
   const factory BoxShadow.combine(List<BoxShadow> shadows) = _CombineBoxShadow;
 
@@ -483,12 +466,7 @@ abstract class BoxShadow {
 
 class _BoxShadow implements BoxShadow {
   const _BoxShadow(
-      {required this.offsetX,
-      required this.offsetY,
-      this.blur,
-      this.spread,
-      this.color,
-      this.inset = false});
+      {required this.offsetX, required this.offsetY, this.blur, this.spread, this.color, this.inset = false});
 
   final Unit offsetX;
   final Unit offsetY;
@@ -509,8 +487,7 @@ class _BoxShadow implements BoxShadow {
 }
 
 class _InsetBoxShadow extends _BoxShadow {
-  const _InsetBoxShadow(
-      {required super.offsetX, required super.offsetY, super.blur, super.spread, super.color})
+  const _InsetBoxShadow({required super.offsetX, required super.offsetY, super.blur, super.spread, super.color})
       : super(inset: true);
 }
 
@@ -565,8 +542,7 @@ class Cursor {
   static const Cursor zoomIn = Cursor._('zoom-in');
   static const Cursor zoomOut = Cursor._('zoom-out');
 
-  const factory Cursor.url(String url, {double? x, double? y, required Cursor fallback}) =
-      _UrlCursor;
+  const factory Cursor.url(String url, {double? x, double? y, required Cursor fallback}) = _UrlCursor;
 }
 
 class _UrlCursor implements Cursor {
@@ -578,6 +554,5 @@ class _UrlCursor implements Cursor {
   final Cursor fallback;
 
   @override
-  String get value =>
-      'url($url)${x != null || y != null ? ' ${x ?? 0} ${y ?? 0}' : ''}, ${fallback.value}';
+  String get value => 'url($url)${x != null || y != null ? ' ${x ?? 0} ${y ?? 0}' : ''}, ${fallback.value}';
 }

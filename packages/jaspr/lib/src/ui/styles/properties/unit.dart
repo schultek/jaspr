@@ -57,10 +57,7 @@ class _Unit implements Unit {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is _ZeroUnit && _value == 0 ||
-      other is _Unit &&
-          runtimeType == other.runtimeType &&
-          _unit == other._unit &&
-          _value == other._value;
+      other is _Unit && runtimeType == other.runtimeType && _unit == other._unit && _value == other._value;
 
   @override
   int get hashCode => _unit.hashCode ^ _value.hashCode;

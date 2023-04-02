@@ -19,8 +19,7 @@ class Transform {
 
   const factory Transform.skew({Angle? x, Angle? y}) = _SkewTransform;
 
-  const factory Transform.matrix(double a, double b, double c, double d, double tx, double ty) =
-      _MatrixTransform;
+  const factory Transform.matrix(double a, double b, double c, double d, double tx, double ty) = _MatrixTransform;
 
   const factory Transform.perspective(Unit value) = _PerspectiveTransform;
 
