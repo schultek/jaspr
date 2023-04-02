@@ -40,6 +40,8 @@ class _Flex implements Flex {
         return {'flex': '$grow $shrink'};
       } else if (shrink == null) {
         return {'flex': '$grow ${basis!.value}'};
+      } else {
+        return {'flex': '$grow $shrink ${basis!.value}'};
       }
     } else if (basis != null && shrink == null) {
       return {'flex': basis!.value};
