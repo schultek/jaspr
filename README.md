@@ -30,7 +30,7 @@
   renders normal html/css like Vue or React.
 - 👥 **Who?**: Jaspr is targeted mainly at Flutter developers that want to build any type of websites
   (especially ones that are not suitable for Flutter Web).
-- 🚀 **What?**: Jaspr wants to push the boundaries of Dart on the web and server, by giving you a tought-through fullstack
+- 🚀 **What?**: Jaspr wants to push the boundaries of Dart on the web and server, by giving you a thought-through fullstack
   web framework written completely in Dart.
 
 > Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of
