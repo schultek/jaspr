@@ -52,7 +52,7 @@ Jaspr uses [Melos](https://github.com/invertase/melos) to manage the project and
 To install Melos, run the following command:
 
 ```dart
-dart global activate melos
+dart pub global activate melos
 ```
 
 Next, at the root of your locally cloned repository run the bootstrap command:
