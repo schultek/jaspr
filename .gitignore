@@ -91,5 +91,6 @@ build/
 
 # Jaspr folders and files
 components_test/
+example_app/
 NOTES.md
 
