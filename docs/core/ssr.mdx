@@ -138,7 +138,7 @@ Jaspr uses `package:shelf` for this to be compatible with most common dart backe
   A builder has to return a `HttpServer`, which will completely replace the default server created
   by jaspr.
 
-- check out [the server_handling example](https://github.com/schultek/jaspr/tree/main/experiments/server_handling) to see this in action.
+- check out [the server_handling example](https://github.com/schultek/jaspr/tree/main/examples/shelf_backend) to see this in action.
 
 
 #### 2. Add jaspr to any existing backend implementation / framework as a **shelf handler**.
@@ -160,7 +160,7 @@ return render(App());
 await shelf_io.serve(handler, InternetAddress.anyIPv4, 8080);
 ```
 
-Check out [the shelf_handler example](https://github.com/schultek/jaspr/tree/main/experiments/shelf_handler) to see this in action.
+Check out [the shelf_handler example](https://github.com/schultek/jaspr/tree/main/examples/custom_server_middleware) to see this in action.
 
 **Be aware** that using the `serveApp` handler does not work with auto-reload. When building a simple
 shelf backend, it is better to use `runApp()` with a custom `.setBuilder()` to keep this functionality.
