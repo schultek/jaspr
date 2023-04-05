@@ -6,6 +6,7 @@ packages:
   - apps/*
   - examples/*
   - experiments/*
+  - thirdparty/*
 
 scripts:
   format: melos exec -- 'dart format . --set-exit-if-changed --line-length=120'
