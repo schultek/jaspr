@@ -140,7 +140,7 @@ class TextList extends BaseComponent {
     List<String>? classes,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events,
-    List<Component>? children,
+    List<TextListItem>? children,
     TextListMarker? marker,
   }) {
     return TextList(
@@ -163,7 +163,7 @@ class TextList extends BaseComponent {
     List<String>? classes,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events,
-    List<Component>? children,
+    List<TextListItem>? children,
     TextListMarker? marker,
   }) {
     return TextList(
