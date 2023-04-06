@@ -25,7 +25,7 @@ want to work on and discuss any details.
 
 #### Solve an issue
 
-Scan through our [existing issues](https://github.com/github/docs/issues) to find one that interests you. 
+Scan through our [existing issues](https://github.com/schultek/jaspr/issues) to find one that interests you. 
 If you find an issue to work on, first comment on it to express interest in solving it. 
 Then you are welcome to open a PR with a fix.
 
