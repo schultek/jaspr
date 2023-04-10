@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:path/path.dart' as path;
 
 void main() async {
@@ -26,6 +27,7 @@ void main() async {
     }
   }
 
+  templates.sort();
   output.writeln('\nvar templates = [${templates.map((t) => '${toCamelCase(t)}Bundle').join(', ')}];');
 
   var packages = await Process.run('melos', 'list --no-private --json'.split(' '), stdoutEncoding: utf8);
