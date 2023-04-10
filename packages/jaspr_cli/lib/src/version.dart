@@ -6,7 +6,7 @@ import './templates/client_bundle.dart';
 import './templates/basic_bundle.dart';
 import './templates/classic_bundle.dart';
 
-var templates = [serverBundle, islandsBundle, clientBundle, basicBundle, classicBundle];
+var templates = [basicBundle, classicBundle, clientBundle, islandsBundle, serverBundle];
 
 const jasprCliVersion = "0.3.1";
 const jasprCoreVersion = "0.3.1";
