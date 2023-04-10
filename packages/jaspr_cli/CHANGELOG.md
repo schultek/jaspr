@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.3.1 - 2023-04-10
 
 - Test
 
