@@ -223,4 +223,4 @@ void main() {
 
 For more examples on how to use the testing package, check out the 
 [documentation](https://docs.page/schultek/jaspr/testing) and the 
-[tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/jaspr/test).
+[tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/packages/jaspr/test).
