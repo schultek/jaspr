@@ -24,7 +24,14 @@ jobs:
           melos bootstrap
 
       - name: Bump Package Versions
-        run: version bump
+        id: bump
+        run: |
+          echo 'commit_message<<EOF' >> $GITHUB_OUTPUT
+          echo 'Bump package versions\n\n' >> $GITHUB_OUTPUT
+          version bump --scope="packages/*" | tee output.txt
+          cat output.txt >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+          rm -rf output.txt
 
       - name: Update CLI
         run: |
@@ -33,4 +40,4 @@ jobs:
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Bump Version
+          commit_message: ${{ steps.bump.outputs.commit_message }}
