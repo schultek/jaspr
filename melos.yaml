@@ -18,7 +18,7 @@ packages:
   - experiments/*
 
 scripts:
-  format: melos exec -- 'dart format . --set-exit-if-changed --line-length=120'
+  format: melos exec -- 'dart format . --line-length=120'
   analyze: melos exec -- "dart analyze . --fatal-infos"
   test:
     run: |

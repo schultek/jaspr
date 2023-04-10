@@ -58,7 +58,7 @@ jobs:
           melos bootstrap
 
       - name: Check formatting
-        run: melos format
+        run: melos format -- --set-exit-if-changed
 
       - name: Check linting
         run: melos analyze
