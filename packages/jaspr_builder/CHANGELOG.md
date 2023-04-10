@@ -1,1 +1,1 @@
-jaspr/CHANGELOG.md
+../jaspr/CHANGELOG.md
