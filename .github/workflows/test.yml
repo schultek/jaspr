@@ -35,11 +35,6 @@ jobs:
           dart pub global activate melos
           melos bootstrap
 
-      - name: Activate Jaspr
-        run: |
-          cd packages
-          dart pub global activate jaspr_cli --source=path
-
       - name: Create & Build Project
         run: |
           cd apps
@@ -80,7 +75,6 @@ jobs:
       - name: Bootstrap
         run: |
           dart pub global activate melos
-          dart pub global activate coverage
           melos bootstrap
 
       - name: Run Unit tests

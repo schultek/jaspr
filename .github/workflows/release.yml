@@ -1,0 +1,36 @@
+on:
+  workflow_dispatch:
+
+
+name: Release Pipeline
+
+jobs:
+  release:
+    name: Bump Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: dart-lang/setup-dart@v1.3
+
+      - name: Bootstrap
+        run: |
+          dart pub global activate melos
+          melos bootstrap
+
+      - name: Bump Package Versions
+        run: version bump
+
+      - name: Update CLI
+        run: |
+          melos generate:templates
+          melos format
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Bump Version

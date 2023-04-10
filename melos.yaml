@@ -1,6 +1,15 @@
 name: jaspr_workspace
 repository: https://github.com/schultek/jaspr
 
+command:
+  bootstrap:
+    hooks:
+      post: |
+        cd packages
+        dart pub global activate jaspr_cli --source=path
+        dart pub global activate -s git https://github.com/schultek/semantic_changelog
+        dart pub global activate coverage
+
 packages:
   - packages/*
   - apps/*

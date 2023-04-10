@@ -8,6 +8,6 @@ import './templates/client_bundle.dart';
 
 var templates = [classicBundle, basicBundle, islandsBundle, serverBundle, clientBundle];
 
-const jasprCliVersion = "0.1.0";
-const jasprCoreVersion = "0.2.0+4";
-const jasprBuilderVersion = "0.2.0";
+const jasprCliVersion = "0.3.0";
+const jasprCoreVersion = "0.3.0";
+const jasprBuilderVersion = "0.3.0";
