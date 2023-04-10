@@ -105,6 +105,7 @@ jobs:
         run: |
           version bump --dry-run --scope="packages/*" | tee output.txt
           echo 'version_report<<EOF' >> $GITHUB_OUTPUT
+          echo '## Package Version Report' >> $GITHUB_OUTPUT
           cat output.txt >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
           rm -rf output.txt
