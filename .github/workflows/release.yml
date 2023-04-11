@@ -42,6 +42,7 @@ jobs:
 
       - name: Update CLI
         run: |
+          echo ${{ steps.bump.outputs.did_bump }}
           melos generate:versions
           melos format
 
