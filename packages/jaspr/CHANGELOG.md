@@ -1,7 +1,3 @@
-## 0.3.1 - 2023-04-10
-
-- Test
-
 # 0.3.0
 
 - **BREAKING** The cli is now a separate package: `jaspr_cli`. To migrate run:

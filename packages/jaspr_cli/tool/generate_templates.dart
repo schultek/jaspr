@@ -23,11 +23,13 @@ void main() async {
 
       var name = path.basenameWithoutExtension(templateDir.path);
       templates.add(name);
-      output.writeln("import './templates/${name}_bundle.dart';");
     }
   }
 
   templates.sort();
+  for (var t in templates) {
+    output.writeln("import './templates/${t}_bundle.dart';");
+  }
   output.writeln('\nvar templates = [${templates.map((t) => '${toCamelCase(t)}Bundle').join(', ')}];');
 
   var packages = await Process.run('melos', 'list --no-private --json'.split(' '), stdoutEncoding: utf8);
