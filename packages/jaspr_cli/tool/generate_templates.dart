@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
@@ -9,7 +8,8 @@ void main() async {
   var subDirs = await templatesDir.list().toList();
   var templates = <String>[];
 
-  var output = StringBuffer('// ignore_for_file: directives_ordering\n\n');
+  var output = StringBuffer('// ignore_for_file: directives_ordering\n'
+      '// GENERATED FILE - DO NOT MODIFY\n\n');
 
   for (var templateDir in subDirs) {
     if (templateDir is Directory) {
@@ -32,18 +32,7 @@ void main() async {
   }
   output.writeln('\nvar templates = [${templates.map((t) => '${toCamelCase(t)}Bundle').join(', ')}];');
 
-  var packages = await Process.run('melos', 'list --no-private --json'.split(' '), stdoutEncoding: utf8);
-  var packagesJson = jsonDecode(packages.stdout) as List;
-
-  var jasprCliVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr_cli')['version'];
-  var jasprVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr')['version'];
-  var jasprBuilderVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr_builder')['version'];
-
-  output.writeln('\nconst jasprCliVersion = "$jasprCliVersion";\n'
-      'const jasprCoreVersion = "$jasprVersion";\n'
-      'const jasprBuilderVersion = "$jasprBuilderVersion";');
-
-  var templatesFile = File('lib/src/version.dart');
+  var templatesFile = File('lib/src/templates.dart');
   await templatesFile.writeAsString(output.toString());
 }
 

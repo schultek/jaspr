@@ -48,3 +48,11 @@ scripts:
     run: |
       cd packages/jaspr_cli
       dart run tool/generate_templates.dart
+  generate:versions:
+    run: |
+      cd packages/jaspr_cli
+      dart run tool/generate_versions.dart
+  generate:cli:
+    run: |
+      melos run generate:versions
+      melos run generate:templates

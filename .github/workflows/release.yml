@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      # - main
+      - main
       - develop
     paths:
       - '.github/workflows/release.yml'
@@ -37,13 +37,15 @@ jobs:
           echo 'Bump package versions' >> $GITHUB_OUTPUT
           cat output.txt >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
+          echo 'did_bump=$(grep -q "No packages" output.txt; echo $?)\n' >> $GITHUB_OUTPUT
           rm -rf output.txt
 
       - name: Update CLI
         run: |
-          melos generate:templates
+          melos generate:versions
           melos format
 
       - uses: stefanzweifel/git-auto-commit-action@v4
+        if: steps.bump.outputs.did_bump != '0'
         with:
           commit_message: ${{ steps.bump.outputs.commit_message }}
