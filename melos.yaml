@@ -16,6 +16,7 @@ packages:
   - apps/*
   - examples/*
   - experiments/*
+  - thirdparty/*
 
 scripts:
   format: melos exec -- 'dart format . --line-length=120'
