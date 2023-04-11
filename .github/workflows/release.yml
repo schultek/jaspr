@@ -27,7 +27,8 @@ jobs:
       - name: Bootstrap
         run: |
           dart pub global activate melos
-          melos bootstrap
+          dart pub global activate -s git https://github.com/schultek/semantic_changelog
+          melos bootstrap --no-private
 
       - name: Bump Package Versions
         id: bump
@@ -42,6 +43,7 @@ jobs:
           rm -rf output.txt
 
       - name: Update CLI
+        if: steps.bump.outputs.did_bump != '0'
         run: |
           melos generate:versions
           melos format

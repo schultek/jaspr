@@ -25,7 +25,7 @@ jobs:
       - name: Bootstrap
         run: |
           dart pub global activate melos
-          melos bootstrap
+          melos bootstrap --no-private
 
       - name: Create & Build Project
         run: |
@@ -67,7 +67,8 @@ jobs:
       - name: Bootstrap
         run: |
           dart pub global activate melos
-          melos bootstrap
+          dart pub global activate coverage
+          melos bootstrap --no-private
 
       - name: Run Unit tests
         run: melos coverage:ci
@@ -90,7 +91,8 @@ jobs:
       - name: Bootstrap
         run: |
           dart pub global activate melos
-          melos bootstrap
+          dart pub global activate -s git https://github.com/schultek/semantic_changelog
+          melos bootstrap --no-private
 
       - name: Bump Package Versions
         id: bump
