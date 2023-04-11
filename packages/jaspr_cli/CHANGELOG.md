@@ -1,3 +1,1 @@
-## 0.1.0
-
-- Initial version.
+../jaspr/CHANGELOG.md

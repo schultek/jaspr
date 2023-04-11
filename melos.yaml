@@ -1,6 +1,16 @@
 name: jaspr_workspace
 repository: https://github.com/schultek/jaspr
 
+command:
+  bootstrap:
+    hooks:
+      post: |
+        dart pub global activate mason_cli
+        dart pub global activate coverage
+        dart pub global activate -s git https://github.com/schultek/semantic_changelog
+        cd packages
+        dart pub global activate jaspr_cli --source=path
+
 packages:
   - packages/*
   - apps/*
@@ -8,7 +18,7 @@ packages:
   - experiments/*
 
 scripts:
-  format: melos exec -- 'dart format . --set-exit-if-changed --line-length=120'
+  format: melos exec -- 'dart format . --line-length=120'
   analyze: melos exec -- "dart analyze . --fatal-infos"
   test:
     run: |
@@ -38,3 +48,11 @@ scripts:
     run: |
       cd packages/jaspr_cli
       dart run tool/generate_templates.dart
+  generate:versions:
+    run: |
+      cd packages/jaspr_cli
+      dart run tool/generate_versions.dart
+  generate:cli:
+    run: |
+      melos run generate:versions
+      melos run generate:templates

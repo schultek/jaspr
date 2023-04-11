@@ -1,0 +1,51 @@
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - '.github/workflows/release.yml'
+      - 'packages/**'
+
+name: Release Pipeline
+
+jobs:
+  release:
+    name: Bump Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: dart-lang/setup-dart@v1.3
+
+      - name: Bootstrap
+        run: |
+          dart pub global activate melos
+          melos bootstrap
+
+      - name: Bump Package Versions
+        id: bump
+        run: |
+          version bump --scope="packages/*" | tee output.txt
+          echo 'commit_message<<EOF' >> $GITHUB_OUTPUT
+          echo 'Bump package versions' >> $GITHUB_OUTPUT
+          cat output.txt >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+          echo 'did_bump=$(grep -q "No packages" output.txt; echo $?)\n' >> $GITHUB_OUTPUT
+          rm -rf output.txt
+
+      - name: Update CLI
+        run: |
+          melos generate:versions
+          melos format
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        if: steps.bump.outputs.did_bump != '0'
+        with:
+          commit_message: ${{ steps.bump.outputs.commit_message }}

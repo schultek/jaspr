@@ -35,11 +35,6 @@ jobs:
           dart pub global activate melos
           melos bootstrap
 
-      - name: Activate Jaspr
-        run: |
-          cd packages
-          dart pub global activate jaspr_cli --source=path
-
       - name: Create & Build Project
         run: |
           cd apps
@@ -63,7 +58,7 @@ jobs:
           melos bootstrap
 
       - name: Check formatting
-        run: melos format
+        run: melos format -- --set-exit-if-changed
 
       - name: Check linting
         run: melos analyze
@@ -80,7 +75,6 @@ jobs:
       - name: Bootstrap
         run: |
           dart pub global activate melos
-          dart pub global activate coverage
           melos bootstrap
 
       - name: Run Unit tests
@@ -90,3 +84,34 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: coverage/*_lcov.info
+
+  report:
+    name: Version Report
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - uses: dart-lang/setup-dart@v1.3
+
+      - name: Bootstrap
+        run: |
+          dart pub global activate melos
+          melos bootstrap
+
+      - name: Bump Package Versions
+        id: bump
+        run: |
+          version bump --dry-run --scope="packages/*" | tee output.txt
+          echo 'version_report<<EOF' >> $GITHUB_OUTPUT
+          echo '## Package Version Report' >> $GITHUB_OUTPUT
+          cat output.txt >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+          rm -rf output.txt
+
+      - name: Create PR comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: ${{ steps.bump.outputs.version_report }}
+          comment_tag: version_report

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:mason/mason.dart';
 import 'package:path/path.dart' as path;
 
+import '../templates.dart';
 import '../version.dart';
 import 'base_command.dart';
 
