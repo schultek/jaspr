@@ -35,7 +35,8 @@ jobs:
         run: |
           version bump --scope="packages/*" | tee output.txt
           echo 'commit_message<<EOF' >> $GITHUB_OUTPUT
-          echo "Bump package versions\n" >> $GITHUB_OUTPUT
+          echo "Bump package versions" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
           cat output.txt >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
           echo "did_bump=$(grep -q "No packages" output.txt; echo $?)" >> $GITHUB_OUTPUT
