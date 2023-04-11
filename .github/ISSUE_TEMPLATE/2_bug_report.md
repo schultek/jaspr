@@ -1,6 +1,6 @@
 ---
-name: Bug Report
-about: Create a report to help us improve
+name: I have discovered a bug within some jaspr package
+about: You want to create a bug report to help us improve the framework.
 title: "fix: "
 labels: bug
 ---

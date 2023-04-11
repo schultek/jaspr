@@ -1,6 +1,6 @@
 ---
-name: Feature Request
-about: A new feature to be added to the project
+name: I want to suggest a new feature
+about: You have an idea to improve the jaspr framework.
 title: "feat: "
 labels: feature
 ---
