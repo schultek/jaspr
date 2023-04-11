@@ -35,19 +35,19 @@ jobs:
         run: |
           version bump --scope="packages/*" | tee output.txt
           echo 'commit_message<<EOF' >> $GITHUB_OUTPUT
-          echo 'Bump package versions' >> $GITHUB_OUTPUT
+          echo "Bump package versions\n" >> $GITHUB_OUTPUT
           cat output.txt >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
-          echo "did_bump=$(grep -q "No packages" output.txt; echo $?)\n" >> $GITHUB_OUTPUT
+          echo "did_bump=$(grep -q "No packages" output.txt; echo $?)" >> $GITHUB_OUTPUT
           rm -rf output.txt
 
       - name: Update CLI
         run: |
-          echo ${{ steps.bump.outputs.did_bump }}
           melos generate:versions
           melos format
+          echo "${{ steps.bump.outputs.commit_message }}"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
-        #if: steps.bump.outputs.did_bump != '0'
+        if: steps.bump.outputs.did_bump != '0'
         with:
           commit_message: ${{ steps.bump.outputs.commit_message }}
