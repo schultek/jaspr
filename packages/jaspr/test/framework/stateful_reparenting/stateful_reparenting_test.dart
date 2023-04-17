@@ -13,8 +13,7 @@ void main() {
       expect(find.byType(MyStatefulComponent), findsOneComponent);
       expect(find.tag('div'), findsNothing);
 
-      var state =
-          (find.byType(MyStatefulComponent).evaluate().first as StatefulElement).state as MyState;
+      var state = (find.byType(MyStatefulComponent).evaluate().first as StatefulElement).state as MyState;
 
       // lifecycle: state should be initialized and built a first time
       expect(state.lifecycle, equals(['initState', 'didChangeDependencies', 'build']));
@@ -22,14 +21,11 @@ void main() {
 
       // phase 2: component should be mounted as child of a div element
       await controller.rebuildWith(2);
-      expect(find.descendant(of: find.tag('div'), matching: find.byType(MyStatefulComponent)),
-          findsOneComponent);
+      expect(find.descendant(of: find.tag('div'), matching: find.byType(MyStatefulComponent)), findsOneComponent);
 
       // lifecycle: state should be reparented, updated and built again
       expect(
-          state.lifecycle,
-          equals(
-              ['deactivate', 'activate', 'didUpdateComponent', 'didChangeDependencies', 'build']));
+          state.lifecycle, equals(['deactivate', 'activate', 'didUpdateComponent', 'didChangeDependencies', 'build']));
       state.lifecycle.clear();
 
       // phase 3: component should be unmounted

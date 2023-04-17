@@ -43,8 +43,7 @@ class BrowserTester {
 
   final TestBrowserComponentsBinding binding;
 
-  Future<void> pumpComponent(Component component,
-      {Map<String, dynamic>? initialSyncState, String attachTo = 'body'}) {
+  Future<void> pumpComponent(Component component, {Map<String, dynamic>? initialSyncState, String attachTo = 'body'}) {
     binding._initialSyncState = initialSyncState;
     return binding.attachRootComponent(component, attachTo: attachTo);
   }

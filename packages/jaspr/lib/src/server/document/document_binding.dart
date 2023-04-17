@@ -44,8 +44,7 @@ mixin DocumentBinding on AppBinding {
 
       var syncState = getStateData();
       var stateScript = document.createElement('script');
-      stateScript.innerHtml =
-          'window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert({
+      stateScript.innerHtml = 'window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert({
             if (syncState.isNotEmpty) 'sync': kDebugMode ? syncState : stateCodec.encode(syncState),
           })};';
 

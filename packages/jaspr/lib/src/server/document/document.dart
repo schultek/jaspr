@@ -129,8 +129,7 @@ class _AppDocumentState extends _ManualDocumentState with _ComponentEntryStateMi
     var id = getIdFor(element);
     _appData = {
       'id': id,
-      if (entry.params != null)
-        'params': kDebugMode ? entry.params : stateCodec.encode(entry.params),
+      if (entry.params != null) 'params': kDebugMode ? entry.params : stateCodec.encode(entry.params),
     };
   }
 
@@ -143,11 +142,7 @@ class _AppDocumentState extends _ManualDocumentState with _ComponentEntryStateMi
 
   @override
   String? get scriptName {
-    var apps = (context.binding as DocumentBinding)
-        ._registryElements
-        .entries
-        .where((c) => c.value.isApp)
-        .toList();
+    var apps = (context.binding as DocumentBinding)._registryElements.entries.where((c) => c.value.isApp).toList();
 
     if (apps.isEmpty) {
       print("[WARNING] Used Document.app() but no app component was provided.");
@@ -177,8 +172,7 @@ class _IslandsDocument extends _ManualDocument {
   State<Document> createState() => _IslandsDocumentState();
 }
 
-class _IslandsDocumentState extends _ManualDocumentState
-    with _ComponentEntryStateMixin<Map<String, String>> {
+class _IslandsDocumentState extends _ManualDocumentState with _ComponentEntryStateMixin<Map<String, String>> {
   @override
   void onElementRegistered(Element element, ComponentEntry entry) {
     if (!entry.isIsland) return;
@@ -186,8 +180,7 @@ class _IslandsDocumentState extends _ManualDocumentState
     _islands.add({
       'id': id,
       'name': entry.name,
-      if (entry.params != null)
-        'params': kDebugMode ? entry.params : stateCodec.encode(entry.params),
+      if (entry.params != null) 'params': kDebugMode ? entry.params : stateCodec.encode(entry.params),
     });
   }
 
@@ -200,11 +193,8 @@ class _IslandsDocumentState extends _ManualDocumentState
 
   @override
   String? get scriptName {
-    var islands = (context.binding as DocumentBinding)
-        ._registryElements
-        .entries
-        .where((e) => e.value.isIsland)
-        .toList();
+    var islands =
+        (context.binding as DocumentBinding)._registryElements.entries.where((e) => e.value.isIsland).toList();
 
     if (islands.isEmpty) {
       print("[WARNING] Used Document.islands() but no island components were provided.");

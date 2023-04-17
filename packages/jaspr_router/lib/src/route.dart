@@ -46,8 +46,7 @@ class LazyRoute implements Route {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is LazyRoute && runtimeType == other.runtimeType && _path == other._path;
+      identical(this, other) || other is LazyRoute && runtimeType == other.runtimeType && _path == other._path;
 
   @override
   int get hashCode => _path.hashCode;

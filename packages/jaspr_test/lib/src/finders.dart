@@ -536,10 +536,8 @@ class _DescendantFinder extends Finder {
   @override
   Iterable<Element> get allCandidates {
     final Iterable<Element> ancestorElements = ancestor.evaluate();
-    final List<Element> candidates = ancestorElements
-        .expand<Element>((Element element) => collectAllElementsFrom(element))
-        .toSet()
-        .toList();
+    final List<Element> candidates =
+        ancestorElements.expand<Element>((Element element) => collectAllElementsFrom(element)).toSet().toList();
     if (matchRoot) candidates.insertAll(0, ancestorElements);
     return candidates;
   }

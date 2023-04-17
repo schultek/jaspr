@@ -12,8 +12,7 @@ mixin ComponentsBinding on AppBinding {
 
       var attachMatch = _queryReg.firstMatch(attachTo)!;
       var renderer = attachRenderer(attachMatch.group(1)!,
-          from: int.tryParse(attachMatch.group(2) ?? ''),
-          to: int.tryParse(attachMatch.group(3) ?? ''));
+          from: int.tryParse(attachMatch.group(2) ?? ''), to: int.tryParse(attachMatch.group(3) ?? ''));
 
       var element = _Root(child: app).createElement();
       element._binding = this;

@@ -191,9 +191,8 @@ class ProviderScopeState extends State<ProviderScope>
     if (component.parent != null) {
       return component.parent;
     } else {
-      final scope = context
-          .getElementForInheritedComponentOfExactType<UncontrolledProviderScope>()
-          ?.component as UncontrolledProviderScope?;
+      final scope = context.getElementForInheritedComponentOfExactType<UncontrolledProviderScope>()?.component
+          as UncontrolledProviderScope?;
 
       return scope?.container;
     }
@@ -297,8 +296,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     void Function(Object error, StackTrace stackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    getDependencies(dependent)!
-        .listen(target, listener, onError: onError, fireImmediately: fireImmediately);
+    getDependencies(dependent)!.listen(target, listener, onError: onError, fireImmediately: fireImmediately);
   }
 
   ProviderSubscription<T> _subscribe<T>(
@@ -307,8 +305,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     void Function(Object error, StackTrace stackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    return component.container
-        .listen(provider, listener, onError: onError, fireImmediately: fireImmediately);
+    return component.container.listen(provider, listener, onError: onError, fireImmediately: fireImmediately);
   }
 
   @override
@@ -391,5 +388,4 @@ extension BindingRef on Ref {
   AppBinding get binding => watch(_bindingProvider);
 }
 
-final _bindingProvider =
-    Provider<AppBinding>((_) => throw UnimplementedError('Overridden by ProviderScope.'));
+final _bindingProvider = Provider<AppBinding>((_) => throw UnimplementedError('Overridden by ProviderScope.'));

@@ -1,13 +1,5 @@
 export 'package:meta/meta.dart'
-    show
-        factory,
-        immutable,
-        mustCallSuper,
-        nonVirtual,
-        optionalTypeArgs,
-        protected,
-        required,
-        visibleForTesting;
+    show factory, immutable, mustCallSuper, nonVirtual, optionalTypeArgs, protected, required, visibleForTesting;
 
 export 'src/components/async.dart';
 export 'src/components/basic.dart';

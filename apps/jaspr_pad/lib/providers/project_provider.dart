@@ -98,11 +98,9 @@ final loadedProjectProvider = Provider<AsyncValue<ProjectDataBase>>((ref) {
   }
 });
 
-final projectNameProvider =
-    Provider<String?>((ref) => ref.watch(loadedProjectProvider).value?.description);
+final projectNameProvider = Provider<String?>((ref) => ref.watch(loadedProjectProvider).value?.description);
 
-final isTutorialProvider =
-    Provider((ref) => ref.watch(loadedProjectProvider.select((l) => l.value is TutorialData)));
+final isTutorialProvider = Provider((ref) => ref.watch(loadedProjectProvider.select((l) => l.value is TutorialData)));
 
 ProjectDataBase createDefaultProject() {
   return ProjectData(

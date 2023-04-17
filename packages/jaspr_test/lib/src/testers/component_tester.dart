@@ -156,14 +156,8 @@ class TestDomRenderer extends Renderer {
   RenderElement? root;
 
   @override
-  void renderNode(
-      RenderElement element,
-      String tag,
-      String? id,
-      List<String>? classes,
-      Map<String, String>? styles,
-      Map<String, String>? attributes,
-      Map<String, EventCallback>? events) {
+  void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+      Map<String, String>? attributes, Map<String, EventCallback>? events) {
     element.testData
       ..tag = tag
       ..id = id

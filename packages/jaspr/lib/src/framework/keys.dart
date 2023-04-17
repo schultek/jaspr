@@ -205,9 +205,7 @@ class GlobalObjectKey<T extends State<StatefulComponent>> extends GlobalKey<T> {
 
   @override
   bool operator ==(Object other) {
-    return other.runtimeType == runtimeType &&
-        other is GlobalObjectKey<T> &&
-        identical(other.value, value);
+    return other.runtimeType == runtimeType && other is GlobalObjectKey<T> && identical(other.value, value);
   }
 
   @override

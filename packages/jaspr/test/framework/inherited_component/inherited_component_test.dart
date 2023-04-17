@@ -12,8 +12,7 @@ void main() {
       // phase 1: inherited component should be mounted
       expect(find.text('Inherited value: 0'), findsOneComponent);
 
-      var state =
-          (find.byType(MyChildComponent).evaluate().first as StatefulElement).state as MyChildState;
+      var state = (find.byType(MyChildComponent).evaluate().first as StatefulElement).state as MyChildState;
 
       // lifecycle: state should be initialized and built a first time
       expect(state.lifecycle, equals(['initState', 'didChangeDependencies', 'build']));
@@ -32,9 +31,7 @@ void main() {
       expect(find.text('Inherited value: 1'), findsOneComponent);
 
       // inherited value should be updated, but without notifying dependants
-      expect(
-          find.byComponentPredicate(
-              (component) => component is MyInheritedComponent && component.value == 2),
+      expect(find.byComponentPredicate((component) => component is MyInheritedComponent && component.value == 2),
           findsOneComponent);
 
       // lifecycle: state should not be updated

@@ -115,8 +115,7 @@ abstract class Component {
   /// match if they have the same type, even if their children are completely
   /// different.
   static bool canUpdate(Component oldComponent, Component newComponent) {
-    return oldComponent.runtimeType == newComponent.runtimeType &&
-        oldComponent.key == newComponent.key;
+    return oldComponent.runtimeType == newComponent.runtimeType && oldComponent.key == newComponent.key;
   }
 }
 
@@ -374,8 +373,7 @@ abstract class Element implements BuildContext {
 
     _parent = parent;
     _prevSibling = prevSibling;
-    _prevAncestorSibling =
-        _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
+    _prevAncestorSibling = _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
     _parentNode = parent is RenderElement ? parent : parent?._parentNode;
 
     _lifecycleState = _ElementLifecycle.active;
@@ -445,8 +443,7 @@ abstract class Element implements BuildContext {
   void _didChangeAncestorSibling() {}
 
   void _updateAncestorSiblingRecursively(bool didReorderParent) {
-    var newAncestorSibling =
-        _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
+    var newAncestorSibling = _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
     if (didReorderParent || newAncestorSibling != _prevAncestorSibling) {
       _prevAncestorSibling = newAncestorSibling;
       _didChangeAncestorSibling();
@@ -580,8 +577,7 @@ abstract class Element implements BuildContext {
     assert(_binding != null);
     assert(_parent != null);
     assert(_depth != null);
-    final bool hadDependencies =
-        (_dependencies != null && _dependencies!.isNotEmpty) || _hadUnsatisfiedDependencies;
+    final bool hadDependencies = (_dependencies != null && _dependencies!.isNotEmpty) || _hadUnsatisfiedDependencies;
     _lifecycleState = _ElementLifecycle.active;
 
     var parent = _parent!;

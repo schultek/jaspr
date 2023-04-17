@@ -6,8 +6,7 @@ import 'server_app.dart';
 import 'server_binding.dart';
 
 /// This spawns an isolate for each render, in order to avoid conflicts with static instances and multiple parallel requests
-Future<String> renderHtml(
-    SetupFunction setup, Uri requestUri, Future<String> Function(String) loadFile) async {
+Future<String> renderHtml(SetupFunction setup, Uri requestUri, Future<String> Function(String) loadFile) async {
   var port = ReceivePort();
 
   var message = _RenderMessage(setup, requestUri, port.sendPort);

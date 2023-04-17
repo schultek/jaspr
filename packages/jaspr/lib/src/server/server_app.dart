@@ -61,8 +61,7 @@ class ServerApp {
     Future.microtask(() async {
       _running = true;
 
-      var handler = createHandler((_, render) => render(_setup),
-          middleware: _middleware, fileHandler: _fileHandler);
+      var handler = createHandler((_, render) => render(_setup), middleware: _middleware, fileHandler: _fileHandler);
 
       if (kDevHotreload) {
         await _reload(this, () {
@@ -109,8 +108,7 @@ Future<void> _reload(ServerApp app, FutureOr<HttpServer> Function() init) async 
     print('[INFO] Server hot reload is enabled.');
   } on StateError catch (e) {
     if (e.message.contains('VM service not available')) {
-      print(
-          '[WARNING] Server hot reload not enabled. Run with --enable-vm-service to enable hot reload.');
+      print('[WARNING] Server hot reload not enabled. Run with --enable-vm-service to enable hot reload.');
     } else {
       rethrow;
     }

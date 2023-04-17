@@ -103,8 +103,7 @@ class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin
   }) async {
     var nextRoute = _matchRoute(path);
     if (nextRoute is LazyRoute) {
-      nextRoute =
-          _resolvedRoutes[nextRoute] = await nextRoute.load(context, eager: eager, preload: true);
+      nextRoute = _resolvedRoutes[nextRoute] = await nextRoute.load(context, eager: eager, preload: true);
     }
     assert(nextRoute is ResolvedRoute);
     setState(() {
@@ -136,10 +135,7 @@ class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin
     if (component.onUnknownRoute != null) {
       return Route(path, (context) => [component.onUnknownRoute!(path, context)]);
     } else {
-      return Route(
-          path,
-          (context) =>
-              [DomComponent(tag: 'span', child: Text('No route specified for path $path.'))]);
+      return Route(path, (context) => [DomComponent(tag: 'span', child: Text('No route specified for path $path.'))]);
     }
   }
 
