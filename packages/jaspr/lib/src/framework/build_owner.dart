@@ -29,7 +29,7 @@ class BuildOwner {
       return;
     }
     if (!_scheduledBuild) {
-      SchedulerBinding.instance!.scheduleBuild(performBuild);
+      element.binding.scheduleBuild(performBuild);
       _scheduledBuild = true;
     }
 
@@ -165,8 +165,8 @@ class BuildOwner {
       }
 
       assert(() {
-        if (_dirtyElements
-            .any((Element element) => element._lifecycleState == _ElementLifecycle.active && element.dirty)) {
+        if (_dirtyElements.any((Element element) =>
+            element._lifecycleState == _ElementLifecycle.active && element.dirty)) {
           throw 'performBuild missed some dirty elements.';
         }
         return true;

@@ -1,8 +1,37 @@
 import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
+import 'package:meta/meta.dart';
+import 'package:test/test.dart';
 
-import '../../jaspr_test.dart';
+import '../binding.dart';
+import '../finders.dart';
+
+@isTest
+void testComponents(
+  String description,
+  FutureOr<void> Function(ComponentTester tester) callback, {
+  Uri? uri,
+  bool isClient = false,
+  bool? skip,
+  Timeout? timeout,
+  dynamic tags,
+}) {
+  test(
+    description,
+    () async {
+      var binding = TestComponentsBinding(uri, isClient);
+      var tester = ComponentTester._(binding);
+
+      return binding.runTest(() async {
+        await callback(tester);
+      });
+    },
+    skip: skip,
+    timeout: timeout,
+    tags: tags,
+  );
+}
 
 /// Tests any jaspr component in a simulated testing environment.
 ///
@@ -12,18 +41,6 @@ class ComponentTester {
   ComponentTester._(this.binding);
 
   final TestComponentsBinding binding;
-
-  static ComponentTester setUp({Uri? currentUri, bool isClient = false}) {
-    tearDown();
-    var binding = TestComponentsBinding(currentUri, isClient);
-    return ComponentTester._(binding);
-  }
-
-  static void tearDown() {
-    if (ComponentsBinding.instance is TestComponentsBinding) {
-      // TODO release any resources
-    }
-  }
 
   Future<void> pumpComponent(Component component) {
     return binding.attachRootComponent(component, attachTo: 'body');
@@ -84,9 +101,7 @@ class ComponentTester {
   }
 }
 
-class TestComponentsBinding extends BindingBase with SchedulerBinding, ComponentsBinding, SyncBinding {
-  static TestComponentsBinding get instance => ComponentsBinding.instance as TestComponentsBinding;
-
+class TestComponentsBinding extends AppBinding with ComponentsBinding {
   TestComponentsBinding(this._currentUri, this._isClient);
 
   final Uri? _currentUri;
@@ -97,15 +112,10 @@ class TestComponentsBinding extends BindingBase with SchedulerBinding, Component
   @override
   bool get isClient => _isClient;
 
-  RenderElement? get rootElement => rootElements['body'];
-
   @override
   Renderer attachRenderer(String target, {int? from, int? to}) {
     return TestDomRenderer();
   }
-
-  @override
-  void didAttachRootElement(Element element, {required String to}) {}
 
   @override
   Future<Map<String, String>> fetchState(String url) {
@@ -146,8 +156,14 @@ class TestDomRenderer extends Renderer {
   RenderElement? root;
 
   @override
-  void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
-      Map<String, String>? attributes, Map<String, EventCallback>? events) {
+  void renderNode(
+      RenderElement element,
+      String tag,
+      String? id,
+      List<String>? classes,
+      Map<String, String>? styles,
+      Map<String, String>? attributes,
+      Map<String, EventCallback>? events) {
     element.testData
       ..tag = tag
       ..id = id

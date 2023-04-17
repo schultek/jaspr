@@ -6,6 +6,9 @@ abstract class BuildContext {
   /// The current configuration of the [Element] that is this [BuildContext].
   Component get component;
 
+  /// The root component binding that manages the component tree.
+  AppBinding get binding;
+
   /// Whether the [component] is currently updating the component or render tree.
   ///
   /// For [StatefulComponent]s and [StatelessComponent]s this flag is true while

@@ -1,3 +1,12 @@
+## Unreleased breaking
+
+- **BREAKING** Bindings are no longer singletons. 
+  - `ComponentsBinding.instance`, `SchedulerBinding.instance` etc. were removed.
+  - You can access the current binding through `BuildContext`s `context.binding` property.
+
+- **BREAKING** Removed `ComponentTester.setUp()`, `BrowserTester.setUp()` and `ServerTester.setUp()`.
+  - Use `testComponents()`, `testBrowser()` and `testServer()` instead.
+
 # 0.3.0
 
 - **BREAKING** The cli is now a separate package: `jaspr_cli`. To migrate run:

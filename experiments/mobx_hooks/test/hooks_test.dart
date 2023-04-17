@@ -1,8 +1,8 @@
+import 'dart:async';
+
 import 'package:async/async.dart' show Result;
 import 'package:jaspr/components.dart';
 import 'package:jaspr_test/jaspr_test.dart';
-import 'dart:async';
-
 import 'package:mobx_hooks_experiment/mobx_hooks/hooks.dart';
 import 'package:mobx_hooks_experiment/mobx_hooks/jaspr_observer.dart';
 import 'package:mobx_hooks_experiment/mobx_hooks/mobx_hooks.dart';
@@ -157,17 +157,11 @@ void main() {
     });
 
     group('jaspr context', () {
-      late ComponentTester tester;
-
-      setUp(() {
-        tester = ComponentTester.setUp();
-      });
-
       //   test('App', () async {
       //     await tester.pumpComponent(MobXHooksObserverComponent(child: App()));
       //   });
 
-      test('custom flow', () async {
+      testComponents('custom flow', (tester) async {
         await tester.pumpComponent(
           MobXHooksObserverComponent(
             child: Builder(

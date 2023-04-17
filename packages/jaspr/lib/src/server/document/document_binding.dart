@@ -1,15 +1,6 @@
 part of document;
 
-mixin DocumentBinding on BindingBase, SyncBinding {
-  @override
-  void initInstances() {
-    super.initInstances();
-    _instance = this;
-  }
-
-  static DocumentBinding? _instance;
-  static DocumentBinding? get instance => _instance!;
-
+mixin DocumentBinding on AppBinding {
   late SendPort _sendPort;
   ReceivePort? _receivePort;
 
@@ -53,7 +44,8 @@ mixin DocumentBinding on BindingBase, SyncBinding {
 
       var syncState = getStateData();
       var stateScript = document.createElement('script');
-      stateScript.innerHtml = 'window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert({
+      stateScript.innerHtml =
+          'window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert({
             if (syncState.isNotEmpty) 'sync': kDebugMode ? syncState : stateCodec.encode(syncState),
           })};';
 

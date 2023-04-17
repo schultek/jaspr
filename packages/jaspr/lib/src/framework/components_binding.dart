@@ -3,35 +3,20 @@ part of framework;
 final _queryReg = RegExp(r'^(.*?)(?:\((\d+):(\d+)\))?$');
 
 /// Main app binding, controls the root component and global state
-mixin ComponentsBinding on BindingBase, SchedulerBinding {
-  /// The currently active uri.
-  /// On the server, this is the requested uri. On the client, this is the
-  /// currently visited uri in the browser.
-  Uri get currentUri;
-
-  @override
-  void initInstances() {
-    super.initInstances();
-    _instance = this;
-  }
-
-  static ComponentsBinding? _instance;
-  static ComponentsBinding? get instance => _instance;
-
-  /// Whether the current app is run on the client (in the browser)
-  bool get isClient;
-
+mixin ComponentsBinding on AppBinding {
   /// Sets [app] as the new root of the component tree and performs an initial build
   Future<void> attachRootComponent(Component app, {required String attachTo}) async {
-    var buildOwner = _rootElements[attachTo]?._owner ?? BuildOwner();
+    var buildOwner = _rootElement?._owner ?? BuildOwner();
     await buildOwner.lockState(() async {
       buildOwner._isFirstBuild = true;
 
       var attachMatch = _queryReg.firstMatch(attachTo)!;
       var renderer = attachRenderer(attachMatch.group(1)!,
-          from: int.tryParse(attachMatch.group(2) ?? ''), to: int.tryParse(attachMatch.group(3) ?? ''));
+          from: int.tryParse(attachMatch.group(2) ?? ''),
+          to: int.tryParse(attachMatch.group(3) ?? ''));
 
       var element = _Root(child: app).createElement();
+      element._binding = this;
       element._owner = buildOwner;
       element._renderer = renderer;
 
@@ -41,7 +26,7 @@ mixin ComponentsBinding on BindingBase, SchedulerBinding {
         await element._asyncFirstBuild;
       }
 
-      _rootElements[attachTo] = element;
+      _rootElement = element;
       buildOwner._isFirstBuild = false;
 
       didAttachRootElement(element, to: attachTo);
@@ -49,23 +34,24 @@ mixin ComponentsBinding on BindingBase, SchedulerBinding {
   }
 
   @protected
-  void didAttachRootElement(Element element, {required String to});
+  void didAttachRootElement(Element element, {required String to}) {}
 
   /// The [Element] that is at the root of the hierarchy.
   ///
-  /// This is initialized the first time [runApp] is called.
-  Map<String, RenderElement> get rootElements => _rootElements;
-  final Map<String, RenderElement> _rootElements = {};
+  /// This is initialized when [runApp] is called.
+  @override
+  RenderElement? get rootElement => _rootElement;
+  RenderElement? _rootElement;
 
   Renderer attachRenderer(String target, {int? from, int? to});
 
-  final Map<GlobalKey, Element> _globalKeyRegistry = {};
+  static final Map<GlobalKey, Element> _globalKeyRegistry = {};
 
-  void _registerGlobalKey(GlobalKey key, Element element) {
+  static void _registerGlobalKey(GlobalKey key, Element element) {
     _globalKeyRegistry[key] = element;
   }
 
-  void _unregisterGlobalKey(GlobalKey key, Element element) {
+  static void _unregisterGlobalKey(GlobalKey key, Element element) {
     if (_globalKeyRegistry[key] == element) {
       _globalKeyRegistry.remove(key);
     }

@@ -12,25 +12,24 @@ import 'package:meta/meta.dart';
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
-import '../foundation/scheduler.dart';
 import '../foundation/sync.dart';
 import '../ui/styles/styles.dart';
 
 part 'build_context.dart';
 part 'build_owner.dart';
 part 'components_binding.dart';
-part 'render_element.dart';
-part 'render_scope.dart';
 part 'dom_component.dart';
 part 'inactive_elements.dart';
 part 'inherited_component.dart';
 part 'keys.dart';
 part 'multi_child_element.dart';
+part 'observer_component.dart';
+part 'render_element.dart';
+part 'render_scope.dart';
 part 'single_child_element.dart';
 part 'state_mixins.dart';
 part 'stateful_component.dart';
 part 'stateless_component.dart';
-part 'observer_component.dart';
 
 /// Describes the configuration for an [Element].
 ///
@@ -116,7 +115,8 @@ abstract class Component {
   /// match if they have the same type, even if their children are completely
   /// different.
   static bool canUpdate(Component oldComponent, Component newComponent) {
-    return oldComponent.runtimeType == newComponent.runtimeType && oldComponent.key == newComponent.key;
+    return oldComponent.runtimeType == newComponent.runtimeType &&
+        oldComponent.key == newComponent.key;
   }
 }
 
@@ -222,6 +222,10 @@ abstract class Element implements BuildContext {
   Component? _component;
 
   /// The root component binding that manages the component tree.
+  AppBinding? _binding;
+  AppBinding get binding => _binding!;
+
+  /// The root build owner that manages the build cycle.
   BuildOwner? _owner;
   BuildOwner get owner => _owner!;
 
@@ -370,7 +374,8 @@ abstract class Element implements BuildContext {
 
     _parent = parent;
     _prevSibling = prevSibling;
-    _prevAncestorSibling = _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
+    _prevAncestorSibling =
+        _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
     _parentNode = parent is RenderElement ? parent : parent?._parentNode;
 
     _lifecycleState = _ElementLifecycle.active;
@@ -378,13 +383,15 @@ abstract class Element implements BuildContext {
 
     if (parent != null) {
       _owner = parent.owner;
+      _binding = parent.binding;
       _renderer = _inheritRendererFromParent();
     }
     assert(_owner != null);
+    assert(_binding != null);
 
     final Key? key = component.key;
     if (key is GlobalKey) {
-      ComponentsBinding.instance!._registerGlobalKey(key, this);
+      ComponentsBinding._registerGlobalKey(key, this);
     }
     _updateInheritance();
     _updateObservers();
@@ -438,7 +445,8 @@ abstract class Element implements BuildContext {
   void _didChangeAncestorSibling() {}
 
   void _updateAncestorSiblingRecursively(bool didReorderParent) {
-    var newAncestorSibling = _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
+    var newAncestorSibling =
+        _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
     if (didReorderParent || newAncestorSibling != _prevAncestorSibling) {
       _prevAncestorSibling = newAncestorSibling;
       _didChangeAncestorSibling();
@@ -569,9 +577,11 @@ abstract class Element implements BuildContext {
     assert(_lifecycleState == _ElementLifecycle.inactive);
     assert(_component != null);
     assert(_owner != null);
+    assert(_binding != null);
     assert(_parent != null);
     assert(_depth != null);
-    final bool hadDependencies = (_dependencies != null && _dependencies!.isNotEmpty) || _hadUnsatisfiedDependencies;
+    final bool hadDependencies =
+        (_dependencies != null && _dependencies!.isNotEmpty) || _hadUnsatisfiedDependencies;
     _lifecycleState = _ElementLifecycle.active;
 
     var parent = _parent!;
@@ -649,7 +659,7 @@ abstract class Element implements BuildContext {
 
     final Key? key = component.key;
     if (key is GlobalKey) {
-      ComponentsBinding.instance!._unregisterGlobalKey(key, this);
+      ComponentsBinding._unregisterGlobalKey(key, this);
     }
 
     _parentNode = null;

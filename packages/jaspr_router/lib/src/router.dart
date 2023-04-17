@@ -55,15 +55,15 @@ class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin
 
   @override
   Future<void> beforeFirstRender() async {
-    var route = _matchRoute(ComponentsBinding.instance!.currentUri.path);
-    if (route is LazyRoute) route = _resolvedRoutes[route] = await route.load();
+    var route = _matchRoute(context.binding.currentUri.path);
+    if (route is LazyRoute) route = _resolvedRoutes[route] = await route.load(context);
     _currentRoute = route as ResolvedRoute;
   }
 
   @override
   Future<void> preloadState() async {
-    var route = _matchRoute(ComponentsBinding.instance!.currentUri.path);
-    if (route is LazyRoute) route = _resolvedRoutes[route] = await route.load();
+    var route = _matchRoute(context.binding.currentUri.path);
+    if (route is LazyRoute) route = _resolvedRoutes[route] = await route.load(context);
     _currentRoute = route as ResolvedRoute;
   }
 
@@ -79,7 +79,7 @@ class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin
   Future<void> preload(String path) async {
     var nextRoute = _matchRoute(path);
     if (nextRoute is LazyRoute) {
-      _resolvedRoutes[nextRoute] = await nextRoute.load(preload: true);
+      _resolvedRoutes[nextRoute] = await nextRoute.load(context, preload: true);
     }
   }
 
@@ -103,7 +103,8 @@ class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin
   }) async {
     var nextRoute = _matchRoute(path);
     if (nextRoute is LazyRoute) {
-      nextRoute = _resolvedRoutes[nextRoute] = await nextRoute.load(eager: eager, preload: true);
+      nextRoute =
+          _resolvedRoutes[nextRoute] = await nextRoute.load(context, eager: eager, preload: true);
     }
     assert(nextRoute is ResolvedRoute);
     setState(() {
@@ -135,7 +136,10 @@ class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin
     if (component.onUnknownRoute != null) {
       return Route(path, (context) => [component.onUnknownRoute!(path, context)]);
     } else {
-      return Route(path, (context) => [DomComponent(tag: 'span', child: Text('No route specified for path $path.'))]);
+      return Route(
+          path,
+          (context) =>
+              [DomComponent(tag: 'span', child: Text('No route specified for path $path.'))]);
     }
   }
 

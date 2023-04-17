@@ -8,15 +8,9 @@ final counter = StateProvider((ref) => 0);
 
 void main() {
   group('context.read', () {
-    late ComponentTester tester;
-
-    setUp(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test(
+    testComponents(
       'context.read returns provider state',
-      () async {
+      (tester) async {
         await tester.pumpComponent(providerApp((context) sync* {
           yield Text('${context.read(counter)}');
         }));
@@ -26,9 +20,9 @@ void main() {
       },
     );
 
-    test(
+    testComponents(
       'context.read returns overridden provider state',
-      () async {
+      (tester) async {
         await tester.pumpComponent(providerApp((context) sync* {
           yield Text('a ${context.read(counter)}');
           yield ProviderScope(

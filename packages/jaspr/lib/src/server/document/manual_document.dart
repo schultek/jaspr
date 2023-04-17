@@ -39,7 +39,7 @@ class _DocumentElement extends StatefulElement {
   @override
   void mount(Element? parent, Element? prevSibling) {
     super.mount(parent, prevSibling);
-    DocumentBinding.instance?._document = this;
+    (binding as DocumentBinding)._document = this;
   }
 }
 
@@ -65,11 +65,13 @@ class _ManualDocumentState extends State<_ManualDocument> {
         DomComponent(
           tag: 'head',
           children: [
-            if (component.charset != null) DomComponent(tag: 'meta', attributes: {'charset': component.charset!}),
+            if (component.charset != null)
+              DomComponent(tag: 'meta', attributes: {'charset': component.charset!}),
             if (component.base != null) //
               DomComponent(tag: 'base', attributes: {'href': _normalizedBase!}),
             if (component.viewport != null)
-              DomComponent(tag: 'meta', attributes: {'name': 'viewport', 'content': component.viewport!}),
+              DomComponent(
+                  tag: 'meta', attributes: {'name': 'viewport', 'content': component.viewport!}),
             if (component.meta != null)
               for (var e in component.meta!.entries)
                 DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
@@ -89,7 +91,9 @@ class _ManualDocumentState extends State<_ManualDocument> {
                 onNodeRendered: (element) {
                   _script = element;
                 },
-                child: DomComponent(tag: 'script', attributes: {'defer': '', 'src': '${component.scriptName}.dart.js'}),
+                child: DomComponent(
+                    tag: 'script',
+                    attributes: {'defer': '', 'src': '${component.scriptName}.dart.js'}),
               ),
           ],
         ),
@@ -110,7 +114,8 @@ class _ManualDocumentState extends State<_ManualDocument> {
       if (syncState.isNotEmpty) 'sync': kDebugMode ? syncState : stateCodec.encode(syncState),
       ..._getExtendedConfig(),
     };
-    _setState('window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert(jasprConfig)};');
+    _setState(
+        'window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert(jasprConfig)};');
   }
 
   @protected
@@ -157,7 +162,7 @@ class ComponentObserverElement extends ObserverElement {
 
   @override
   void didRebuildElement(Element element) {
-    var entry = DocumentBinding.instance!._registerElement(element);
+    var entry = (binding as DocumentBinding)._registerElement(element);
     if (entry != null) {
       component.onElementRegistered(element, entry);
     }

@@ -6,13 +6,7 @@ import 'observer_component_app.dart';
 
 void main() {
   group('observer component', () {
-    late ComponentTester tester;
-
-    setUp(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test('should track elements', () async {
+    testComponents('should track elements', (tester) async {
       ObserverParam params = ObserverParam(renderBoth: true, events: []);
       final events = params.events;
       final controller = await tester.pumpTestComponent(App(params));
@@ -20,7 +14,8 @@ void main() {
       // phase 1: observer component should be mounted
       expect(find.text('Leaf true false'), findsOneComponent);
 
-      MyChildState state = (find.byType(MyChildComponent).evaluate().first as StatefulElement).state as MyChildState;
+      MyChildState state =
+          (find.byType(MyChildComponent).evaluate().first as StatefulElement).state as MyChildState;
 
       // lifecycle: state should be initialized and built a first time
       expect(state.lifecycle, equals(['initState', 'didChangeDependencies', 'build']));
@@ -86,7 +81,8 @@ void main() {
       // phase 2: Remove child MyObserverElement
       await controller.rebuildWith(params);
 
-      final newState = (find.byType(MyChildComponent).evaluate().first as StatefulElement).state as MyChildState;
+      final newState =
+          (find.byType(MyChildComponent).evaluate().first as StatefulElement).state as MyChildState;
       expect(state, isNot(newState));
       state = newState;
       expect(find.text('Leaf false false'), findsOneComponent);
@@ -145,7 +141,9 @@ void main() {
       events.clear();
 
       // observer value should be updated, but without notifying dependants
-      expect(find.byComponentPredicate((component) => component is MyObserverComponent && component.value == params),
+      expect(
+          find.byComponentPredicate(
+              (component) => component is MyObserverComponent && component.value == params),
           findsOneComponent);
     });
   });
