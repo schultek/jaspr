@@ -4,17 +4,32 @@ import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
 
-import 'history.dart';
-
-part 'route.dart';
+import 'configuration.dart';
+import 'history/history.dart';
+import 'misc/inherited_router.dart';
+import 'path_utils.dart';
+import 'route.dart';
+import 'typedefs.dart';
 
 /// Simple router component
 class Router extends StatefulComponent {
-  final List<Route>? routes;
-  final Route? Function(Uri, BuildContext)? onGenerateRoute;
-  final Component Function(Uri, BuildContext)? onUnknownRoute;
+  Router({
+    required this.routes,
+    this.redirect,
+    this.redirectLimit = 5,
+  }) {
+    _configuration = RouteConfiguration(
+      routes: routes,
+      redirectLimit: redirectLimit,
+      topRedirect: redirect ?? (_, __) => null,
+    );
+  }
 
-  Router({this.routes, this.onGenerateRoute, this.onUnknownRoute});
+  final List<RouteBase> routes;
+  final RouterRedirect? redirect;
+  final int redirectLimit;
+
+  late final RouteConfiguration _configuration;
 
   @override
   State<StatefulComponent> createState() => RouterState();
@@ -23,7 +38,7 @@ class Router extends StatefulComponent {
     if (context is StatefulElement && context.state is RouterState) {
       return context.state as RouterState;
     }
-    return context.findAncestorStateOfType<RouterState>()!;
+    return context.dependOnInheritedComponentOfExactType<InheritedRouter>()!.router;
   }
 }
 
@@ -66,11 +81,11 @@ class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin
     }
   }
 
-  Future<void> push(String path, {String? title, bool eager = true}) {
+  Future<void> push(String location, {String? title, bool eager = true}) {
     return _update(Uri.parse(path), title: title, eager: eager);
   }
 
-  Future<void> replace(String path, {String? title, bool eager = true}) {
+  Future<void> replace(String location, {String? title, bool eager = true}) {
     return _update(Uri.parse(path), title: title, eager: eager, action: _HistoryAction.replace);
   }
 
@@ -126,7 +141,10 @@ class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin
   }
 
   @override
-  Iterable<Component> build(BuildContext context) {
-    return currentRoute.build(context);
+  Iterable<Component> build(BuildContext context) sync* {
+    yield InheritedRouter(
+      router: this,
+      child: currentRoute.build(context),
+    );
   }
 }

@@ -6,13 +6,13 @@ abstract class HistoryManager {
   static HistoryManager instance = HistoryManagerImpl();
 
   /// Initialize the history manager and setup any listeners to history changes
-  void init(void Function(Uri) onChange);
+  void init(void Function(String url) onChange);
 
   /// Push a new state to the history
-  void push(Uri uri, {String? title});
+  void push(String url, {String? title, Object? data});
 
   /// Replace the current history state
-  void replace(Uri uri, {String? title});
+  void replace(String url, {String? title, Object? data});
 
   /// Go back in the history
   void back();
