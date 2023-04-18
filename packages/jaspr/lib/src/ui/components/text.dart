@@ -1,7 +1,7 @@
 import '../../../components.dart';
 
-class RichText extends BaseComponent {
-  const RichText({
+class TextParagraph extends BaseComponent {
+  const TextParagraph({
     super.key,
     super.id,
     super.styles,
