@@ -13,10 +13,10 @@ class ListItemMarker {
   });
 }
 
-class ListBox extends BaseComponent {
+class ListView extends BaseComponent {
   final ListItemMarker? marker;
 
-  const ListBox({
+  const ListView({
     this.marker,
     required super.tag,
     super.key,
@@ -28,7 +28,7 @@ class ListBox extends BaseComponent {
     super.children,
   });
 
-  factory ListBox.ordered({
+  factory ListView.ordered({
     Key? key,
     String? id,
     Styles? styles,
@@ -38,7 +38,7 @@ class ListBox extends BaseComponent {
     List<ListItem>? children,
     ListItemMarker? marker,
   }) {
-    return ListBox(
+    return ListView(
       key: key,
       id: id,
       styles: styles,
@@ -51,7 +51,7 @@ class ListBox extends BaseComponent {
     );
   }
 
-  factory ListBox.unordered({
+  factory ListView.unordered({
     Key? key,
     String? id,
     Styles? styles,
@@ -61,7 +61,7 @@ class ListBox extends BaseComponent {
     List<ListItem>? children,
     ListItemMarker? marker,
   }) {
-    return ListBox(
+    return ListView(
       key: key,
       id: id,
       styles: styles,
