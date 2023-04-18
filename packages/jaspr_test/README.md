@@ -73,4 +73,4 @@ Since jaspr is a fullstack-framework, there are **3** tester classes to choose f
   See [here](https://pub.dev/documentation/jaspr_test/latest/server_test/ServerTester-class.html) for a full api reference.
 
 
-For more examples on how to use the testing package, check out the [tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/jaspr/test).
+For more examples on how to use the testing package, check out the [tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/packages/jaspr/test).

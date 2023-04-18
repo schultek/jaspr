@@ -294,7 +294,7 @@ packages:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.2.0"
+    version: "0.3.0"
   js:
     dependency: transitive
     description:

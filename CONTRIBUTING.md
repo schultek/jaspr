@@ -25,7 +25,7 @@ want to work on and discuss any details.
 
 #### Solve an issue
 
-Scan through our [existing issues](https://github.com/github/docs/issues) to find one that interests you. 
+Scan through our [existing issues](https://github.com/schultek/jaspr/issues) to find one that interests you. 
 If you find an issue to work on, first comment on it to express interest in solving it. 
 Then you are welcome to open a PR with a fix.
 
@@ -96,3 +96,28 @@ When you change or add a template, re-generate the template bundles for the cli 
 ```shell
 melos run generate:templates
 ```
+
+## Pull Requests & Versioning
+
+Packages inside the /packages directory are versioned using the 
+[semantic changelog](https://github.com/rrousselGit/semantic_changelog) approach.
+
+That means that the owner of a pull request is responsible for declaring which package versions should be increased based
+on the changes in the pull request. To mark a version change, edit the CHANGELOG.md file of the given package like this:
+
+```markdown
+## Unreleased <breaking/major/minor/patch>
+
+/_ insert description about the changes done by this PR _/
+
+## 1.2.3
+
+/_ content of the changelog before this PR _/
+```
+
+If there is already a `Unreleased ...` section, simply add your changes to this section.
+
+If you have changes in multiple packages, edit the changelogs of each affected package. Note that the `jaspr`, 
+`jaspr_builder`, `jaspr_cli` and `jaspr_test` share a single changelog, so you only have to edit this once.
+
+For a more detailed explanation of this, go to [semantic changelog](https://github.com/rrousselGit/semantic_changelog).
