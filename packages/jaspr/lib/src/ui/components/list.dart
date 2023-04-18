@@ -76,15 +76,15 @@ class ListView extends BaseComponent {
 
   @override
   Styles getStyles() => Styles.combine([
-    Styles.raw({
-      if (marker?.type == ListStyleType.none) 'margin': '0',
-      if (marker?.type == ListStyleType.none) 'padding': '0',
-      if (marker?.type != null) 'list-style-type': marker!.type!.value,
-      if (marker?.isInside != null) 'list-style-position': marker!.isInside! ? 'inside' : 'outside',
-      if (marker?.imageUrl != null) 'list-style-image': 'url("${marker?.imageUrl}")',
-    }),
-    if (styles != null) styles!
-  ]);
+        Styles.raw({
+          if (marker?.type == ListStyleType.none) 'margin': '0',
+          if (marker?.type == ListStyleType.none) 'padding': '0',
+          if (marker?.type != null) 'list-style-type': marker!.type!.value,
+          if (marker?.isInside != null) 'list-style-position': marker!.isInside! ? 'inside' : 'outside',
+          if (marker?.imageUrl != null) 'list-style-image': 'url("${marker?.imageUrl}")',
+        }),
+        if (styles != null) styles!
+      ]);
 }
 
 class ListItem extends BaseComponent {
