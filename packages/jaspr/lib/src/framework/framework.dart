@@ -221,33 +221,34 @@ abstract class Element implements BuildContext {
   Component? _component;
 
   /// The root component binding that manages the component tree.
-  AppBinding? _binding;
+  @override
   AppBinding get binding => _binding!;
+  AppBinding? _binding;
 
   /// The root build owner that manages the build cycle.
-  BuildOwner? _owner;
   BuildOwner get owner => _owner!;
+  BuildOwner? _owner;
 
-  Renderer? _renderer;
   Renderer get renderer => _renderer!;
+  Renderer? _renderer;
 
   /// The previous sibling element.
   Element? _prevSibling;
 
   /// The previous ancestor sibling
-  Element? _prevAncestorSibling;
   Element? get prevAncestorSibling => _prevAncestorSibling;
+  Element? _prevAncestorSibling;
 
   /// The last child element.
   Element? _lastChild;
 
   /// The last child dom node.
-  RenderElement? _lastNode;
   RenderElement? get lastNode => _lastNode;
+  RenderElement? _lastNode;
 
   /// The nearest ancestor dom node.
-  RenderElement? _parentNode;
   RenderElement? get parentNode => _parentNode;
+  RenderElement? _parentNode;
 
   // This is used to verify that Element objects move through life in an
   // orderly fashion.
