@@ -39,7 +39,7 @@ class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, S
   }
 
   @override
-  Uri get currentUri => Uri.parse(window.location.toString());
+  Uri get currentUri => Uri.parse(window.location.href.substring(window.location.origin.length));
 
   final Map<String, dynamic> _rawState = {};
 

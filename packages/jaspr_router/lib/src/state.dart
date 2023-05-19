@@ -1,5 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
+import 'misc/inherited_router.dart';
+
 @immutable
 class RouteState {
   const RouteState({
@@ -62,6 +64,10 @@ class RouteState {
   }
 
   @override
-  int get hashCode => Object.hash(location, subloc, name, path, fullpath, params, queryParams,
-      queryParametersAll, extra, error);
+  int get hashCode =>
+      Object.hash(location, subloc, name, path, fullpath, params, queryParams, queryParametersAll, extra, error);
+
+  static RouteState of(BuildContext context) {
+    return context.dependOnInheritedComponentOfExactType<InheritedRouteState>()!.state;
+  }
 }

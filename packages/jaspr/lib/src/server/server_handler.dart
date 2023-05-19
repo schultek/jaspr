@@ -167,14 +167,19 @@ Handler createHandler(_SetupHandler handle, {List<Middleware> middleware = const
       /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
       var isDataMode = request.headers['jaspr-mode'] == 'data-only';
 
+      var requestUri = request.url.normalizePath();
+      if (!requestUri.path.startsWith('/')) {
+        requestUri = requestUri.replace(path: '/${requestUri.path}');
+      }
+
       if (isDataMode) {
         return Response.ok(
-          await renderData(setup, request.url),
+          await renderData(setup, requestUri),
           headers: {'Content-Type': 'application/json'},
         );
       } else {
         return Response.ok(
-          await renderHtml(setup, request.url, (name) async {
+          await renderHtml(setup, requestUri, (name) async {
             var response = await fileLoader(request, name);
             return response.readAsString();
           }),

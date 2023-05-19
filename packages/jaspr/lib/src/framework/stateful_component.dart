@@ -634,8 +634,8 @@ class StatefulElement extends MultiChildElement {
     }
 
     if (_asyncFirstBuild != null) {
-      this._asyncFirstBuild = _asyncFirstBuild.then((_) {
-        _initState();
+      this._asyncFirstBuild = _asyncFirstBuild.then((_) => _initState());
+      _asyncFirstBuild.whenComplete(() {
         this._asyncFirstBuild = null;
       });
     } else {

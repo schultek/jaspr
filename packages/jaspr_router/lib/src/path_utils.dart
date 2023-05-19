@@ -1,3 +1,5 @@
+import 'route.dart';
+
 final RegExp _parameterRegExp = RegExp(r':(\w+)(\((?:\\.|[^\\()])+\))?');
 
 /// Converts a [pattern] such as `/user/:id` into [RegExp].
@@ -25,8 +27,7 @@ RegExp patternToRegExp(String pattern, List<String> parameters) {
     }
     final String name = match[1]!;
     final String? optionalPattern = match[2];
-    final String regex =
-        optionalPattern != null ? _escapeGroup(optionalPattern, name) : '(?<$name>[^/]+)';
+    final String regex = optionalPattern != null ? _escapeGroup(optionalPattern, name) : '(?<$name>[^/]+)';
     buffer.write(regex);
     parameters.add(name);
     start = match.end;
@@ -73,8 +74,7 @@ String patternToPath(String pattern, Map<String, String> pathParameters) {
 }
 
 String _escapeGroup(String group, [String? name]) {
-  final String escapedGroup =
-      group.replaceFirstMapped(RegExp(r'[:=!]'), (Match match) => '\\${match[0]}');
+  final String escapedGroup = group.replaceFirstMapped(RegExp(r'[:=!]'), (Match match) => '\\${match[0]}');
   if (name != null) {
     return '(?<$name>$escapedGroup)';
   }
@@ -97,4 +97,40 @@ String concatenatePaths(String parentPath, String childPath) {
   assert(!childPath.startsWith('/'));
   assert(!childPath.endsWith('/'));
   return '${parentPath == '/' ? '' : parentPath}/$childPath';
+}
+
+/// Extracts arguments from the `match` and maps them by parameter name.
+///
+/// The [parameters] should originate from the call to [patternToRegExp] that
+/// creates the [RegExp].
+Map<String, String> extractPathParameters(List<String> parameters, RegExpMatch match) {
+  return <String, String>{for (int i = 0; i < parameters.length; ++i) parameters[i]: match.namedGroup(parameters[i])!};
+}
+
+/// Normalizes the location string.
+String canonicalUri(String loc) {
+  String canon = Uri.parse(loc).toString();
+  canon = canon.endsWith('?') ? canon.substring(0, canon.length - 1) : canon;
+
+  // remove trailing slash except for when you shouldn't, e.g.
+  // /profile/ => /profile
+  // / => /
+  // /login?from=/ => login?from=/
+  canon = canon.endsWith('/') && canon != '/' && !canon.contains('?') ? canon.substring(0, canon.length - 1) : canon;
+
+  // /login/?from=/ => /login?from=/
+  // /?from=/ => /?from=/
+  canon = canon.replaceFirst('/?', '?', 1);
+
+  return canon;
+}
+
+/// Match this route against a location.
+RegExpMatch? matchPatternAsPrefix(Route route, String loc) {
+  return route.pathRegex.matchAsPrefix(loc) as RegExpMatch?;
+}
+
+/// Extract the path parameters from a match.
+Map<String, String> extractPathParams(Route route, RegExpMatch match) {
+  return extractPathParameters(route.pathParams, match);
 }

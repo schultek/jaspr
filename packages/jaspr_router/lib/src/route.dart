@@ -1,7 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
 import 'path_utils.dart';
-import 'state.dart';
 import 'typedefs.dart';
 
 abstract class RouteBase {
@@ -16,6 +15,7 @@ class Route extends RouteBase {
   Route({
     required this.path,
     this.name,
+    this.title,
     this.builder,
     this.redirect,
     super.routes = const <RouteBase>[],
@@ -27,9 +27,20 @@ class Route extends RouteBase {
     _pathRE = patternToRegExp(path, pathParams);
   }
 
+  factory Route.lazy({
+    required String path,
+    String? name,
+    RouterComponentBuilder? builder,
+    RouterRedirect? redirect,
+    required AsyncCallback load,
+    List<RouteBase> routes,
+  }) = LazyRoute;
+
   final String? name;
 
   final String path;
+
+  final String? title;
 
   final RouterComponentBuilder? builder;
 
@@ -41,10 +52,30 @@ class Route extends RouteBase {
   RegExp get pathRegex => _pathRE;
 
   late final RegExp _pathRE;
+}
 
-  static RouteState of(BuildContext context) {
-    // TODO
-    throw UnimplementedError();
+class LazyRoute extends Route {
+  LazyRoute({
+    required super.path,
+    super.name,
+    super.title,
+    super.builder,
+    super.redirect,
+    required AsyncCallback load,
+    super.routes = const <RouteBase>[],
+  }) : _load = load;
+
+  final AsyncCallback _load;
+
+  bool _loaded = false;
+  bool get loaded => _loaded;
+
+  Future<void> load() async {
+    try {
+      await _load();
+    } finally {
+      _loaded = true;
+    }
   }
 }
 

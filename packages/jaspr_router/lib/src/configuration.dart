@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:jaspr/jaspr.dart';
 
 import 'misc/errors.dart';
@@ -38,8 +40,7 @@ class RouteConfiguration {
     return true;
   }
 
-  static bool _debugVerifyNoDuplicatePathParameter(
-      List<RouteBase> routes, Map<String, Route> usedPathParams) {
+  static bool _debugVerifyNoDuplicatePathParameter(List<RouteBase> routes, Map<String, Route> usedPathParams) {
     for (final RouteBase route in routes) {
       if (route is! Route) {
         continue;
@@ -75,13 +76,13 @@ class RouteConfiguration {
     Map<String, String> params = const <String, String>{},
     Map<String, dynamic> queryParams = const <String, dynamic>{},
   }) {
-    // assert(() {
-    //   log.info('getting location for name: '
-    //       '"$name"'
-    //       '${params.isEmpty ? '' : ', params: $params'}'
-    //       '${queryParams.isEmpty ? '' : ', queryParams: $queryParams'}');
-    //   return true;
-    // }());
+    assert(() {
+      log('getting location for name: '
+          '"$name"'
+          '${params.isEmpty ? '' : ', params: $params'}'
+          '${queryParams.isEmpty ? '' : ', queryParams: $queryParams'}');
+      return true;
+    }());
     final String keyName = name.toLowerCase();
     assert(_nameToPath.containsKey(keyName), 'unknown route name: $name');
     final String path = _nameToPath[keyName]!;
@@ -100,12 +101,10 @@ class RouteConfiguration {
       return true;
     }());
     final Map<String, String> encodedParams = <String, String>{
-      for (final MapEntry<String, String> param in params.entries)
-        param.key: Uri.encodeComponent(param.value)
+      for (final MapEntry<String, String> param in params.entries) param.key: Uri.encodeComponent(param.value)
     };
     final String location = patternToPath(path, encodedParams);
-    return Uri(path: location, queryParameters: queryParams.isEmpty ? null : queryParams)
-        .toString();
+    return Uri(path: location, queryParameters: queryParams.isEmpty ? null : queryParams).toString();
   }
 
   @override
@@ -133,8 +132,7 @@ class RouteConfiguration {
     return sb.toString();
   }
 
-  void _debugFullPathsFor(
-      List<RouteBase> routes, String parentFullpath, int depth, StringBuffer sb) {
+  void _debugFullPathsFor(List<RouteBase> routes, String parentFullpath, int depth, StringBuffer sb) {
     for (final RouteBase route in routes) {
       if (route is Route) {
         final String fullpath = concatenatePaths(parentFullpath, route.path);
