@@ -5,7 +5,7 @@ import 'project.dart';
 part 'sample.mapper.dart';
 
 @MappableClass()
-class Sample with Comparable<Sample>, SampleMappable {
+class Sample with SampleMappable implements Comparable<Sample> {
   String id;
   String description;
   int? index;

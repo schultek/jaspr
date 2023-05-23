@@ -82,23 +82,23 @@ class BrowserTester {
       return element;
     }
 
-    DomElement? _foundElement;
+    DomElement? foundElement;
 
-    void _findFirstDomElement(Element e) {
+    void findFirstDomElement(Element e) {
       if (e is DomElement) {
-        _foundElement = e;
+        foundElement = e;
         return;
       }
-      e.visitChildren(_findFirstDomElement);
+      e.visitChildren(findFirstDomElement);
     }
 
-    _findFirstDomElement(element);
+    findFirstDomElement(element);
 
-    if (_foundElement == null) {
+    if (foundElement == null) {
       throw 'The finder "$finder" could not find a dom element.';
     }
 
-    return _foundElement!;
+    return foundElement!;
   }
 }
 
