@@ -76,10 +76,9 @@ packages:
   jaspr:
     dependency: "direct main"
     description:
-      name: jaspr
-      sha256: "8659e79ac2aa902d643b0b06860d207d2648465448fdb2c0b22872ec38a54a31"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../packages/jaspr"
+      relative: true
+    source: path
     version: "0.3.0"
   js:
     dependency: transitive
@@ -234,4 +233,4 @@ packages:
     source: hosted
     version: "1.0.1"
 sdks:
-  dart: ">=2.19.0 <4.0.0"
+  dart: ">=3.0.0 <4.0.0"

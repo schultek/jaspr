@@ -7,6 +7,8 @@
 - **BREAKING** Removed `ComponentTester.setUp()`, `BrowserTester.setUp()` and `ServerTester.setUp()`.
   - Use `testComponents()`, `testBrowser()` and `testServer()` instead.
 
+- Requires Dart 3.0 or later.
+
 # 0.3.0
 
 - **BREAKING** The cli is now a separate package: `jaspr_cli`. To migrate run:
