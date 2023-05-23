@@ -15,7 +15,7 @@ extension on BrowserTester {
       }
     }
 
-    binding.rootElements.values.first.visitChildren(findRouter);
+    binding.rootElement!.visitChildren(findRouter);
     if (router != null) {
       navigate(router!);
       if (pump) {
@@ -27,16 +27,12 @@ extension on BrowserTester {
 
 void main() {
   group('routing test', () {
-    late BrowserTester tester;
-
-    setUp(() async {
-      tester = BrowserTester.setUp(onFetchState: (url) {
+    testBrowser('should handle routing', (tester) async {
+      tester.stubFetchState((url) {
         if (url == '/contact') return {'contact': 'Tom'};
         return {};
       });
-    });
 
-    test('should handle routing', () async {
       await tester.pumpComponent(App());
 
       expect(find.text('Home'), findsOneComponent);

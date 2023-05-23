@@ -4,17 +4,9 @@ import 'routing_app.dart';
 
 void main() {
   group('routing test', () {
-    late ServerTester tester;
+    testServer('should handle routing', (tester) async {
+      tester.pumpComponent(App());
 
-    setUp(() async {
-      tester = await ServerTester.setUp(App());
-    });
-
-    tearDown(() async {
-      await tester.tearDown();
-    });
-
-    test('should handle routing', () async {
       var response = await tester.request('/');
 
       expect(response.statusCode, equals(200));

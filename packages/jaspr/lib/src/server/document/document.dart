@@ -97,7 +97,7 @@ class _FileDocumentState extends State<_FileDocument> {
   @override
   void initState() {
     super.initState();
-    DocumentBinding.instance?._loadFile(component.name);
+    (context.binding as DocumentBinding)._loadFile(component.name);
   }
 
   @override
@@ -142,7 +142,7 @@ class _AppDocumentState extends _ManualDocumentState with _ComponentEntryStateMi
 
   @override
   String? get scriptName {
-    var apps = DocumentBinding.instance!._registryElements.entries.where((c) => c.value.isApp).toList();
+    var apps = (context.binding as DocumentBinding)._registryElements.entries.where((c) => c.value.isApp).toList();
 
     if (apps.isEmpty) {
       print("[WARNING] Used Document.app() but no app component was provided.");
@@ -193,7 +193,8 @@ class _IslandsDocumentState extends _ManualDocumentState with _ComponentEntrySta
 
   @override
   String? get scriptName {
-    var islands = DocumentBinding.instance!._registryElements.entries.where((e) => e.value.isIsland).toList();
+    var islands =
+        (context.binding as DocumentBinding)._registryElements.entries.where((e) => e.value.isIsland).toList();
 
     if (islands.isEmpty) {
       print("[WARNING] Used Document.islands() but no island components were provided.");

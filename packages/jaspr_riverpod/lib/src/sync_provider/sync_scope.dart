@@ -5,7 +5,7 @@ part of '../sync_provider.dart';
 mixin SyncProviderDependencies on StatelessComponent implements OnFirstBuild {
   @override
   FutureOr<void> onFirstBuild(BuildContext context) async {
-    if (!ComponentsBinding.instance!.isClient) {
+    if (!context.binding.isClient) {
       await Future.wait(preloadDependencies.map((p) => context.read(p.future)));
     }
   }

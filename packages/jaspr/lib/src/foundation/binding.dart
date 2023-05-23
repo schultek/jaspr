@@ -1,47 +1,22 @@
-import 'package:meta/meta.dart';
+import '../framework/framework.dart';
+import 'scheduler.dart';
+import 'sync.dart';
 
-/// Base class for mixins that provide singleton services (also known as
+/// Main class that provide services (also known as
 /// "bindings").
-///
-/// To use this class in an `on` clause of a mixin, inherit from it and implement
-/// [initInstances()]. The mixin is guaranteed to only be constructed once in
-/// the lifetime of the app (more precisely, it will assert if constructed twice
-/// in debug mode).
-///
-/// The top-most layer used to write the application will have a concrete class
-/// that inherits from [BindingBase] and uses all the various [BindingBase]
-/// mixins (such as [ComponentsBinding]). The relevant library defines how to
-/// create the binding. It could be implied (for example,
-/// [ComponentsBinding] is automatically started from [runApp]), or the
-/// application might be required to explicitly call the constructor.
-abstract class BindingBase {
-  /// Default abstract constructor for bindings.
-  ///
-  /// First calls [initInstances] to have bindings initialize their
-  /// instance pointers and other state.
-  BindingBase() {
-    assert(!_debugInitialized);
-    initInstances();
-    assert(_debugInitialized);
-  }
+abstract class AppBinding with SchedulerBinding, SyncBinding {
+  AppBinding();
 
-  static bool _debugInitialized = false;
+  /// The currently active uri.
+  /// On the server, this is the requested uri. On the client, this is the
+  /// currently visited uri in the browser.
+  Uri get currentUri;
 
-  /// The initialization method. Subclasses override this method to hook into
-  /// the platform and otherwise configure their services. Subclasses must call
-  /// "super.initInstances()".
+  /// Whether the current app is run on the client (in the browser)
+  bool get isClient;
+
+  /// The [Element] that is at the root of the hierarchy.
   ///
-  /// By convention, if the service is to be provided as a singleton, it should
-  /// be exposed as `MixinClassName.instance`, a static getter that returns
-  /// `MixinClassName._instance`, a static field that is set by
-  /// `initInstances()`.
-  @protected
-  @mustCallSuper
-  void initInstances() {
-    assert(!_debugInitialized);
-    assert(() {
-      _debugInitialized = true;
-      return true;
-    }());
-  }
+  /// This is initialized when [runApp] is called.
+  Element? get rootElement;
 }

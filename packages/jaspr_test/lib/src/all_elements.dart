@@ -6,8 +6,8 @@ import 'package:jaspr/jaspr.dart';
 
 /// Provides an iterable that efficiently returns all the elements
 /// rooted at the given element.
-Iterable<Element> collectAllElementsFrom(Iterable<Element> elements) {
-  return _DepthFirstChildIterator(elements).collect();
+Iterable<Element> collectAllElementsFrom(Element element) {
+  return _DepthFirstChildIterator(element).collect();
 }
 
 extension CollectIterator<E> on Iterator<E> {
@@ -22,8 +22,8 @@ extension CollectIterator<E> on Iterator<E> {
 
 /// Provides a recursive, efficient, depth first search of an element tree.
 class _DepthFirstChildIterator implements Iterator<Element> {
-  _DepthFirstChildIterator(Iterable<Element> elements) {
-    elements.forEach(_fillChildren);
+  _DepthFirstChildIterator(Element element) {
+    _fillChildren(element);
   }
 
   late Element _current;

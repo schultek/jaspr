@@ -1,15 +1,6 @@
 part of document;
 
-mixin DocumentBinding on BindingBase, SyncBinding {
-  @override
-  void initInstances() {
-    super.initInstances();
-    _instance = this;
-  }
-
-  static DocumentBinding? _instance;
-  static DocumentBinding? get instance => _instance!;
-
+mixin DocumentBinding on AppBinding {
   late SendPort _sendPort;
   ReceivePort? _receivePort;
 

@@ -177,7 +177,10 @@ class ProviderScopeState extends State<ProviderScope>
 
     container = ProviderContainer(
       parent: parent,
-      overrides: component.overrides,
+      overrides: [
+        _bindingProvider.overrideWithValue(context.binding),
+        ...component.overrides,
+      ],
       observers: component.observers,
     );
 
@@ -223,7 +226,10 @@ class ProviderScopeState extends State<ProviderScope>
     }(), '');
     if (_dirty) {
       _dirty = false;
-      container.updateOverrides(component.overrides);
+      container.updateOverrides([
+        _bindingProvider.overrideWithValue(context.binding),
+        ...component.overrides,
+      ]);
     }
 
     yield UncontrolledProviderScope(
@@ -377,3 +383,9 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     return super.build();
   }
 }
+
+extension BindingRef on Ref {
+  AppBinding get binding => watch(_bindingProvider);
+}
+
+final _bindingProvider = Provider<AppBinding>((_) => throw UnimplementedError('Overridden by ProviderScope.'));
