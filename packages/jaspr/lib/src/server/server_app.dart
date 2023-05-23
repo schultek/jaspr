@@ -7,7 +7,7 @@ import 'package:shelf/shelf_io.dart' as shelf_io;
 import '../../server.dart';
 import 'server_handler.dart';
 
-typedef SetupFunction = void Function();
+typedef SetupFunction = void Function(ServerAppBinding binding);
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
 class ServerApp {

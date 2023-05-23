@@ -5,9 +5,6 @@ command:
   bootstrap:
     hooks:
       post: |
-        dart pub global activate mason_cli
-        dart pub global activate coverage
-        dart pub global activate -s git https://github.com/schultek/semantic_changelog
         cd packages
         dart pub global activate jaspr_cli --source=path
 
@@ -16,6 +13,7 @@ packages:
   - apps/*
   - examples/*
   - experiments/*
+  - thirdparty/*
 
 scripts:
   format: melos exec -- 'dart format . --line-length=120'

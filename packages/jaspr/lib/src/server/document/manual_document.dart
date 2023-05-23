@@ -39,7 +39,7 @@ class _DocumentElement extends StatefulElement {
   @override
   void mount(Element? parent, Element? prevSibling) {
     super.mount(parent, prevSibling);
-    DocumentBinding.instance?._document = this;
+    (binding as DocumentBinding)._document = this;
   }
 }
 
@@ -157,7 +157,7 @@ class ComponentObserverElement extends ObserverElement {
 
   @override
   void didRebuildElement(Element element) {
-    var entry = DocumentBinding.instance!._registerElement(element);
+    var entry = (binding as DocumentBinding)._registerElement(element);
     if (entry != null) {
       component.onElementRegistered(element, entry);
     }

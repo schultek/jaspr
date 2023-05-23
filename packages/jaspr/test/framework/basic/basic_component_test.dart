@@ -4,13 +4,7 @@ import 'basic_app.dart';
 
 void main() {
   group('basic component test', () {
-    late ComponentTester tester;
-
-    setUp(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test('should render component', () async {
+    testComponents('should render component', (tester) async {
       await tester.pumpComponent(App());
 
       expect(find.text('Count: 0'), findsOneComponent);

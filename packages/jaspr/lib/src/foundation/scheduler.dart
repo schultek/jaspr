@@ -2,16 +2,7 @@ import '../../jaspr.dart';
 
 enum SchedulerPhase { idle, midFrameCallback, postFrameCallbacks }
 
-mixin SchedulerBinding on BindingBase {
-  @override
-  void initInstances() {
-    super.initInstances();
-    _instance = this;
-  }
-
-  static SchedulerBinding? _instance;
-  static SchedulerBinding? get instance => _instance;
-
+mixin SchedulerBinding {
   SchedulerPhase _schedulerPhase = SchedulerPhase.idle;
   SchedulerPhase get schedulerPhase => _schedulerPhase;
 

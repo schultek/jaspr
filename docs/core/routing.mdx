@@ -29,8 +29,8 @@ class App extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield Router(
       routes: [
-        Route('/', (context) => Home()),
-        Route('/about', (context) => About()),
+        Route('/', (context) => [Home()]),
+        Route('/about', (context) => [About()]),
       ],
     );
   }
@@ -55,8 +55,8 @@ class App extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield Router(
       routes: [
-        Route.lazy('/', (context) => home.Home(), home.loadLibrary),
-        Route.lazy('/about', (context) => About(), about.loadLibrary),
+        Route.lazy('/', (context) => [home.Home()], home.loadLibrary),
+        Route.lazy('/about', (context) => [about.About()], about.loadLibrary),
       ],
     );
   }

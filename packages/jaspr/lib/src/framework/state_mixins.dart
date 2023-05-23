@@ -42,12 +42,12 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> implements Sync
   @override
   void initState() {
     super.initState();
-    SyncBinding.instance!.registerSyncState(this, initialUpdate: ComponentsBinding.instance!.isClient);
+    context.binding.registerSyncState(this, initialUpdate: context.binding.isClient);
   }
 
   @override
   void dispose() {
-    SyncBinding.instance!.unregisterSyncState(this);
+    context.binding.unregisterSyncState(this);
     super.dispose();
   }
 }
