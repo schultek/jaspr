@@ -58,5 +58,5 @@ jobs:
       - name: Tag Packages
         run: |
           version tag -f
-          git push origin
+          git push --tags origin
 
