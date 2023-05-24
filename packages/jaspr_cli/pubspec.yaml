@@ -7,6 +7,11 @@ documentation: https://docs.page/schultek/jaspr
 funding:
   - https://github.com/sponsors/schultek
 
+topics:
+  - jaspr
+  - web
+  - cli
+
 environment:
   sdk: '>=3.0.0 <4.0.0'
 

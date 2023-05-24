@@ -7,6 +7,12 @@ issue_tracker: https://github.com/schultek/jaspr/issues
 environment:
   sdk: '>=3.0.0 <4.0.0'
 
+topics:
+  - jaspr
+  - web
+  - codegen
+  - build_runner
+
 dependencies:
   analyzer: ^5.4.0
   build: ^2.0.0

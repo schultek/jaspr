@@ -4,6 +4,10 @@ version: 0.3.1
 homepage: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
 
+topics:
+  - jaspr
+  - web
+
 environment:
   sdk: '>=3.0.0 <4.0.0'
 
