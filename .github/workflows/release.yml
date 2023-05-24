@@ -48,12 +48,13 @@ jobs:
           melos generate:versions
           melos format
 
+      - name: Publish Packages
+        if: steps.bump.outputs.did_bump != '0'
+        run: |
+          version publish
+
       - uses: stefanzweifel/git-auto-commit-action@v4
         if: steps.bump.outputs.did_bump != '0'
         with:
           commit_message: ${{ steps.bump.outputs.commit_message }}
 
-      - name: Publish Packages
-        if: false && steps.bump.outputs.did_bump != '0'
-        run: |
-          version publish
