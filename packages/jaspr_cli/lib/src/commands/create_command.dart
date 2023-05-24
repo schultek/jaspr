@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:mason/mason.dart';
 import 'package:path/path.dart' as path;
 
+import '../templates.dart';
 import '../version.dart';
 import 'base_command.dart';
 
@@ -55,8 +56,11 @@ class CreateCommand extends BaseCommand {
       usageException('Directory $targetPath already exists.');
     }
 
-    if (name.isEmpty || !_packageRegExp.hasMatch(name)) {
-      usageException('"$name" is not a valid package name.');
+    if (name.isEmpty) {
+      usageException('You must specify a snake_case package name.');
+    } else if (!_packageRegExp.hasMatch(name)) {
+      usageException('"$name" is not a valid package name.\n\n'
+          'You should use snake_case for the package name e.g. my_jaspr_project');
     }
 
     final templateName = argResults!['template'] as String?;

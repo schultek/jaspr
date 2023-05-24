@@ -106,8 +106,7 @@ class AutoDisposeChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?,
     NotifierT Function(
       AutoDisposeChangeNotifierProviderRef<NotifierT> ref,
       Arg arg,
-    )
-        create,
+    ) create,
   ) {
     return FamilyOverrideImpl<NotifierT, Arg, AutoDisposeChangeNotifierProvider<NotifierT>>(
       this,

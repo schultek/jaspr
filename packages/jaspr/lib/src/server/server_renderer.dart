@@ -50,20 +50,20 @@ class _RenderMessage {
 
 /// Runs the app and returns the rendered html
 void _renderHtml(_RenderMessage message) async {
-  AppBinding.ensureInitialized()
+  var binding = ServerAppBinding()
     ..setCurrentUri(message.requestUri)
     ..setSendPort(message.sendPort);
-  message.setup();
+  message.setup(binding);
 
-  var html = await AppBinding.ensureInitialized().render();
+  var html = await binding.render();
   message.sendPort.send(html);
 }
 
 /// Runs the app and returns the preloaded state data as json
 void _renderData(_RenderMessage message) async {
-  AppBinding.ensureInitialized().setCurrentUri(message.requestUri);
-  message.setup();
+  var binding = ServerAppBinding()..setCurrentUri(message.requestUri);
+  message.setup(binding);
 
-  var data = await AppBinding.ensureInitialized().data();
+  var data = await binding.data();
   message.sendPort.send(data);
 }

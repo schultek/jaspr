@@ -29,7 +29,7 @@ class BuildOwner {
       return;
     }
     if (!_scheduledBuild) {
-      SchedulerBinding.instance!.scheduleBuild(performBuild);
+      element.binding.scheduleBuild(performBuild);
       _scheduledBuild = true;
     }
 

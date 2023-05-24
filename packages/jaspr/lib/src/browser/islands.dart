@@ -25,13 +25,13 @@ void runIslands(Map<String, IslandBuilder> islands) {
 }
 
 void runIslandsDeferred(Map<String, IslandLoader> islands) {
-  final Map<String, IslandBuilder> _islands = {};
+  final Map<String, IslandBuilder> builders = {};
   _applyIslands((name) {
-    var island = (_islands[name] ?? islands[name]!()) as FutureOr<IslandBuilder>;
+    var island = (builders[name] ?? islands[name]!()) as FutureOr<IslandBuilder>;
     if (island is IslandBuilder) {
-      return _islands[name] = island;
+      return builders[name] = island;
     } else {
-      return island.then((b) => _islands[name] = b);
+      return island.then((b) => builders[name] = b);
     }
   });
 }

@@ -6,13 +6,7 @@ import 'stateful_reparenting_app.dart';
 
 void main() {
   group('stateful reparenting test', () {
-    late ComponentTester tester;
-
-    setUp(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test('should keep state on reparenting', () async {
+    testComponents('should keep state on reparenting', (tester) async {
       var controller = await tester.pumpTestComponent(App());
 
       // phase 1: component should be mounted directly

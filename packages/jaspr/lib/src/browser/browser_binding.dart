@@ -6,40 +6,28 @@ import 'package:meta/meta.dart';
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
-import '../foundation/scheduler.dart';
-import '../foundation/sync.dart';
 import '../framework/framework.dart';
 import 'dom_renderer.dart';
 import 'js_data.dart';
 
 /// Global component binding for the browser
-class AppBinding extends BindingBase with SchedulerBinding, ComponentsBinding, SyncBinding {
-  static AppBinding ensureInitialized() {
-    if (ComponentsBinding.instance == null) {
-      AppBinding();
-    }
-    return ComponentsBinding.instance! as AppBinding;
-  }
-
-  @override
-  void initInstances() {
-    super.initInstances();
-    _loadRawState();
-  }
-
+class BrowserAppBinding extends AppBinding with ComponentsBinding {
   @override
   bool get isClient => true;
 
   @override
-  void didAttachRootElement(Element element, {required String to}) {}
+  Uri get currentUri => Uri.parse(window.location.href.substring(window.location.origin.length));
+
+  @override
+  Future<void> attachRootComponent(Component app, {required String attachTo}) {
+    _loadRawState();
+    return super.attachRootComponent(app, attachTo: attachTo);
+  }
 
   @override
   Renderer attachRenderer(String target, {int? from, int? to}) {
     return BrowserDomRenderer(document.querySelector(target)!, from, to);
   }
-
-  @override
-  Uri get currentUri => Uri.parse(window.location.href.substring(window.location.origin.length));
 
   final Map<String, dynamic> _rawState = {};
 

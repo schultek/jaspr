@@ -4,7 +4,6 @@ import 'package:shelf/shelf.dart';
 
 import '../framework/framework.dart';
 import 'server_app.dart';
-import 'server_binding.dart';
 import 'server_handler.dart';
 import 'server_renderer.dart';
 
@@ -16,8 +15,8 @@ void runApp(Component app) {
 
 /// Same as [runApp] but returns an instance of [ServerApp] to control aspects of the http server
 ServerApp runServer(Component app) {
-  return ServerApp.run(() {
-    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: '_');
+  return ServerApp.run((binding) {
+    binding.attachRootComponent(app, attachTo: '_');
   });
 }
 
@@ -42,5 +41,5 @@ Future<String> renderComponent(Component app) async {
 }
 
 SetupFunction _createSetup(Component app) {
-  return () => AppBinding.ensureInitialized().attachRootComponent(app, attachTo: '_');
+  return (binding) => binding.attachRootComponent(app, attachTo: '_');
 }

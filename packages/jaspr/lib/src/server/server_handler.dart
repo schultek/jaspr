@@ -70,17 +70,17 @@ String _sseHeaders(String? origin) => 'HTTP/1.1 200 OK\r\n'
     '\r\n';
 
 Handler _sseProxyHandler(String proxyPath, Uri serverUri) {
-  Handler? _incomingMessageProxyHandler;
-  var _httpClient = http.Client();
+  Handler? incomingMessageProxyHandler;
+  var httpClient = http.Client();
 
-  Future<Response> _createSseConnection(Request req, String path) async {
+  Future<Response> createSseConnection(Request req, String path) async {
     final serverReq = http.StreamedRequest(req.method, serverUri.replace(path: path, query: req.requestedUri.query))
       ..followRedirects = false
       ..headers.addAll(req.headers)
       ..headers['Host'] = serverUri.authority
       ..sink.close();
 
-    final serverResponse = await _httpClient.send(serverReq);
+    final serverResponse = await httpClient.send(serverReq);
 
     req.hijack((channel) {
       final sink = utf8.encoder.startChunkedConversion(channel.sink)..add(_sseHeaders(req.headers['origin']));
@@ -102,12 +102,12 @@ Handler _sseProxyHandler(String proxyPath, Uri serverUri) {
     });
   }
 
-  Future<Response> _handleIncomingMessage(Request req, String path) async {
-    _incomingMessageProxyHandler ??= proxyHandler(
+  Future<Response> handleIncomingMessage(Request req, String path) async {
+    incomingMessageProxyHandler ??= proxyHandler(
       serverUri,
-      client: _httpClient,
+      client: httpClient,
     );
-    return _incomingMessageProxyHandler!(req);
+    return incomingMessageProxyHandler!(req);
   }
 
   return (Request req) async {
@@ -118,11 +118,11 @@ Handler _sseProxyHandler(String proxyPath, Uri serverUri) {
     }
 
     if (req.headers['accept'] == 'text/event-stream' && req.method == 'GET') {
-      return _createSseConnection(req, path);
+      return createSseConnection(req, path);
     }
 
     if (req.headers['accept'] != 'text/event-stream' && req.method == 'POST') {
-      return _handleIncomingMessage(req, path);
+      return handleIncomingMessage(req, path);
     }
 
     return Response.notFound('');
@@ -146,9 +146,9 @@ final staticFileHandler = kDevProxy.isNotEmpty
     ? _webdevProxyHandler(kDevProxy)
     : createStaticHandler(join(projectDir, 'web'), defaultDocument: 'index.html');
 
-typedef _SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
+typedef SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
 
-Handler createHandler(_SetupHandler handle, {List<Middleware> middleware = const [], Handler? fileHandler}) {
+Handler createHandler(SetupHandler handle, {List<Middleware> middleware = const [], Handler? fileHandler}) {
   var staticHandler = fileHandler ?? staticFileHandler;
 
   var cascade = Cascade();

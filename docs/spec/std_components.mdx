@@ -1,0 +1,103 @@
+# Design Document - Jaspr Standard Component Library
+
+### Purpose:
+
+This document outlines the design principles for the components contained in the standard component library
+that is part of the core jaspr package.
+
+### Goal:
+
+The goal of this document is to give a clear set of rules and guiding principles around the design of components
+in the standard library. It should be taken into account when creating a new component, modifying an existing one
+or reviewing changes regarding any of the components.
+
+---
+
+## Design of the "Standard Component Library"
+
+The standard component library should contain a set of components that can be used by any developer either for
+building an application or as the basis for further component packages.
+
+The library should contain components in the following categories:
+
+- **Layout**: Components helping with layouting other components.
+- **Text**: Components displaying text.
+- **Forms & Input**: Components for (form) input and other interactions.
+- ... (TODO)
+
+The library is not meant to be exhaustive in either of the category, as it will be implemented and extended over time.
+
+Where possible it should be oriented at the standard flutter widgets for familiarity, but should not recreate
+every widget be default. Rather it should be decided on a case by case basis whether a given widget should be
+recreated and added to the library, based on the component design requirements defined further down in this document.
+
+## Component Design
+
+A component inside the library should have the following qualities:
+
+### 1. Well documented
+
+Each component in the library should be well documented directly in the code using documentation comments.
+
+### 2. Intuitive
+
+Ideally the function and behavior of a component should be immediately clear to the developer who is using it. Besides
+documentation, the main factor of this is the name and properties of a component.
+
+When a component is named equal or similar to a Flutter widget, it should also behave similar and have similar properties,
+otherwise the developer will be confused.
+
+### 3. Best practices
+
+One of the biggest challenges for jaspr is the gap between best practices both in Flutter and on the native web. Our primary
+goal is to make a framework that is appealing to Flutter devs while also adhering to modern web standards. When designing
+components inspired from Flutter widgets, we must be careful to not use bad practices regarding web development.
+
+One key aspect of this is to use semantically correct html tags for components. While its possible to use e.g. divs
+everywhere (mostly), we should try and use the semantically meaningful tags, like `ul`, `p`, `section`, etc.
+
+This is also important for accessibility and SEO to some extend.
+
+Related to this it is probably a good idea to add some sort of css reset functionality when building a theming system.
+
+### 4. Unopinionated
+
+Components should be unopinionated in styling and be greatly customizable and flexible. One way to achieve this is to
+keep the option to use custom css classes, styles and attributes on a component.
+
+## Discussion
+
+## General Implementation
+
+Currently we have a `BaseComponent` class that most library components extend. The base component renders a single
+dom component based on the provided properties, and has overridable methods like `getStyles()`.
+
+I have a couple of points that bother me with this.
+
+- The extra class has very little value. It would be just as much code, if not less when the components directly render
+  a dom component in their build method, instead of extending this class.
+- Components that implement the base component are not easily inspectable. When a developer looks inside a component to
+  understand its implementation, he cannot see a build method but instead has to understand the inheritance system.
+- The inheritance structure goes against the core Flutter (and Jaspr) design principle, which is composability. A custom
+  component should be built by composing other components in the build method, not by inheriting other components.
+
+Therefore I plan to remove this `BaseComponent` class.
+
+## Specific Components
+
+The following section contains specifications and discussions around single components.
+
+### ListView
+
+A few discussion points:
+
+- Everything can have multiple children and can be made scrollable on web, so we should be clear on the
+  purpose of a ListView component.
+- I'm strongly for using the correct `ul` / `ol` tag with `li` items for this, based on **3**.
+- By default on web, lists have some type of marker: bullets for `ul` and numbers for `ol`. In Flutter lists have no
+  marker. Based on **2** I would suggest defaulting to `ul` with marker type set to `none`, and then have an additional
+  property to specify a different marker type (which includes `numbered` for `ol`).
+- ...
+
+
+

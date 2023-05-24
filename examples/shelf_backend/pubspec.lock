@@ -295,14 +295,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.3.0"
+    version: "0.4.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.2.0"
+    version: "0.4.0"
   js:
     dependency: transitive
     description:
@@ -584,4 +584,4 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.19.0 <4.0.0"
+  dart: ">=3.0.0 <4.0.0"

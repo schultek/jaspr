@@ -4,7 +4,7 @@ description: A MobX and Hooks enabled jaspr web app.
 version: 0.0.1
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   mobx: ^2.0.7+5

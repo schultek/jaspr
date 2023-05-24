@@ -14,7 +14,6 @@ builders:
     auto_apply: dependents
     build_to: source
     runs_before:
-      - jaspr_builder:apps
       - build_web_compilers
   jaspr_builder:imports:
     import: "package:jaspr_builder/builder.dart"

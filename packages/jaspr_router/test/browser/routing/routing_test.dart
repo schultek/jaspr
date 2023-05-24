@@ -1,20 +1,12 @@
-import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:jaspr_test/browser_test.dart';
 
 import '../utils.dart';
 import 'routing_app.dart';
 
-
 void main() {
   group('routing test', () {
-    late BrowserTester tester;
-
-    setUp(() async {
-      tester = BrowserTester.setUp();
-    });
-
-    test('should handle routing', () async {
+    testBrowser('should handle routing', (tester) async {
       await tester.pumpComponent(App());
 
       expect(find.text('Home'), findsOneComponent);

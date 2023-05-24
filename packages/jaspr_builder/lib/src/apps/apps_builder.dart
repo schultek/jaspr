@@ -85,6 +85,7 @@ class AppsBuilder implements Builder {
 
     var mixinName = '_\$${element.name}';
     var usesMixin =
+        // ignore: deprecated_member_use
         (element.node as ClassDeclaration).withClause?.mixinTypes.any((type) => type.name.name == mixinName) ?? false;
 
     if (!usesMixin) {

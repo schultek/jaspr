@@ -61,7 +61,7 @@ class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin
 
   @override
   Future<void> beforeFirstRender() {
-    var location = ComponentsBinding.instance!.currentUri.toString();
+    var location = context.binding.currentUri.toString();
     return _matchRoute(location).then((match) => _matchList = match);
   }
 
@@ -146,7 +146,7 @@ class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin
           if (!replace) {
             HistoryManager.instance.push(match.uri.toString(), title: match.title);
           } else {
-            HistoryManager.instance.replace(location, title: match.title);
+            HistoryManager.instance.replace(match.uri.toString(), title: match.title);
           }
         }
       });

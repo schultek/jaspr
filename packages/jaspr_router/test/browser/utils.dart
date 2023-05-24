@@ -1,5 +1,3 @@
-
-
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:jaspr_test/browser_test.dart';
@@ -15,7 +13,7 @@ extension BrowserRouter on BrowserTester {
       }
     }
 
-    binding.rootElements.values.first.visitChildren(findRouter);
+    binding.rootElement?.visitChildren(findRouter);
     if (router != null) {
       navigate(router!);
       if (pump) {

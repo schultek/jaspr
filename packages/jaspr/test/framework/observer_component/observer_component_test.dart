@@ -6,13 +6,7 @@ import 'observer_component_app.dart';
 
 void main() {
   group('observer component', () {
-    late ComponentTester tester;
-
-    setUp(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test('should track elements', () async {
+    testComponents('should track elements', (tester) async {
       ObserverParam params = ObserverParam(renderBoth: true, events: []);
       final events = params.events;
       final controller = await tester.pumpTestComponent(App(params));
