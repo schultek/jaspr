@@ -54,6 +54,6 @@ jobs:
           commit_message: ${{ steps.bump.outputs.commit_message }}
 
       - name: Publish Packages
-        if: steps.bump.outputs.did_bump != '0'
+        if: false && steps.bump.outputs.did_bump != '0'
         run: |
           version publish
