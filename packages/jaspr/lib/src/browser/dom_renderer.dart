@@ -38,7 +38,7 @@ class EventBinding {
 }
 
 extension DomNodeDataExt on RenderElement {
-  DomNodeData get data => getData() ?? setData(DomNodeData());
+  DomNodeData get data => renderData ??= DomNodeData();
 }
 
 extension on html.Element {

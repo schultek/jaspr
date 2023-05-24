@@ -15,7 +15,7 @@ class DomNodeData {
 }
 
 extension DomNodeDataExt on RenderElement {
-  DomNodeData get data => getData() ?? setData(DomNodeData());
+  DomNodeData get data => renderData ??= DomNodeData();
 }
 
 class MarkupDomRenderer extends Renderer {

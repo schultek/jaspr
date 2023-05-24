@@ -149,7 +149,7 @@ class DomNodeData {
 }
 
 extension TestDomNodeData on RenderElement {
-  DomNodeData get testData => getData() ?? setData(DomNodeData());
+  DomNodeData get testData => renderData ??= DomNodeData();
 }
 
 class TestDomRenderer extends Renderer {
