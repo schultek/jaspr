@@ -54,8 +54,6 @@ jobs:
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -m "${{ steps.bump.outputs.commit_message }}" \
             --author="${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
-        with:
-          commit_message: ${{ steps.bump.outputs.commit_message }}
 
       - name: Tag Packages
         run: |
