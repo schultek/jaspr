@@ -32,7 +32,7 @@ final classicBundle = MasonBundle.fromJson(<String, dynamic>{
     {
       "path": "pubspec.yaml",
       "data":
-          "bmFtZToge3tuYW1lfX0KZGVzY3JpcHRpb246IEEgY2xhc3NpYyB3ZWIgYXBwIHVzaW5nIHNlcGFyYXRlIGh0bWwsIGNzcyBhbmQgZGFydCBmaWxlcyB3aXRoIHNzciAmIG1hbnVhbCBjbGllbnQgaHlkcmF0aW9uLgp2ZXJzaW9uOiAwLjAuMQoKZW52aXJvbm1lbnQ6CiAgc2RrOiAnPj0yLjE3LjAgPDMuMC4wJwoKZGVwZW5kZW5jaWVzOgogIGphc3ByOiBee3tqYXNwckNvcmVWZXJzaW9ufX0KCmRldl9kZXBlbmRlbmNpZXM6CiAgYnVpbGRfcnVubmVyOiBeMi4yLjAKICBidWlsZF93ZWJfY29tcGlsZXJzOiBeMy4yLjEKICBqYXNwcl9idWlsZGVyOiBee3tqYXNwckJ1aWxkZXJWZXJzaW9ufX0KICBsaW50czogXjIuMC4xCg==",
+          "bmFtZToge3tuYW1lfX0KZGVzY3JpcHRpb246IEEgY2xhc3NpYyB3ZWIgYXBwIHVzaW5nIHNlcGFyYXRlIGh0bWwsIGNzcyBhbmQgZGFydCBmaWxlcyB3aXRoIHNzciAmIG1hbnVhbCBjbGllbnQgaHlkcmF0aW9uLgp2ZXJzaW9uOiAwLjAuMQoKZW52aXJvbm1lbnQ6CiAgc2RrOiAnPj0zLjAuMCA8NC4wLjAnCgpkZXBlbmRlbmNpZXM6CiAgamFzcHI6IF57e2phc3ByQ29yZVZlcnNpb259fQoKZGV2X2RlcGVuZGVuY2llczoKICBidWlsZF9ydW5uZXI6IF4yLjQuMAogIGJ1aWxkX3dlYl9jb21waWxlcnM6IF40LjAuMAogIGphc3ByX2J1aWxkZXI6IF57e2phc3ByQnVpbGRlclZlcnNpb259fQogIGxpbnRzOiBeMi4xLjAK",
       "type": "text"
     },
     {

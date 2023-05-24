@@ -33,7 +33,7 @@ jobs:
           jaspr create -t basic my_app
           melos bootstrap
           cd my_app
-          jaspr build
+          jaspr build -v
 
   analyze:
     name: Analyze Code

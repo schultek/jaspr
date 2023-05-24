@@ -8,7 +8,7 @@ import '../framework/framework.dart';
 class DomNodeData {
   Node? node;
   List<Node> toHydrate = [];
-  Map<String, _EventBinding>? events;
+  Map<String, EventBinding>? events;
 
   void clearEvents() {
     events?.forEach((type, binding) {
@@ -20,12 +20,12 @@ class DomNodeData {
 
 typedef DomEventCallback = void Function(Event event);
 
-class _EventBinding {
+class EventBinding {
   final String type;
   DomEventCallback fn;
   StreamSubscription? subscription;
 
-  _EventBinding(html.Element element, this.type, this.fn) {
+  EventBinding(html.Element element, this.type, this.fn) {
     subscription = element.on[type].listen((event) {
       fn(event);
     });
@@ -153,7 +153,7 @@ class BrowserDomRenderer extends Renderer {
 
     if (events != null && events.isNotEmpty) {
       final prevEventTypes = data.events?.keys.toSet();
-      data.events ??= <String, _EventBinding>{};
+      data.events ??= <String, EventBinding>{};
       final dataEvents = data.events!;
       events.forEach((type, fn) {
         prevEventTypes?.remove(type);
@@ -161,7 +161,7 @@ class BrowserDomRenderer extends Renderer {
         if (currentBinding != null) {
           currentBinding.fn = fn;
         } else {
-          dataEvents[type] = _EventBinding(elem, type, fn);
+          dataEvents[type] = EventBinding(elem, type, fn);
         }
       });
       prevEventTypes?.forEach((type) {

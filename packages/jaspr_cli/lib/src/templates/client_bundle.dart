@@ -26,7 +26,7 @@ final clientBundle = MasonBundle.fromJson(<String, dynamic>{
     {
       "path": "pubspec.yaml",
       "data":
-          "bmFtZToge3tuYW1lfX0KZGVzY3JpcHRpb246IEEgcHVyZSBjbGllbnQtc2lkZSBhcHAgd2l0aG91dCBzc3IuCnZlcnNpb246IDAuMC4xCgplbnZpcm9ubWVudDoKICBzZGs6ICc+PTIuMTcuMCA8My4wLjAnCgpkZXBlbmRlbmNpZXM6CiAgamFzcHI6IF57e2phc3ByQ29yZVZlcnNpb259fQoKZGV2X2RlcGVuZGVuY2llczoKICBidWlsZF9ydW5uZXI6IF4yLjIuMAogIGJ1aWxkX3dlYl9jb21waWxlcnM6IF4zLjIuMQogIGxpbnRzOiBeMi4wLjEK",
+          "bmFtZToge3tuYW1lfX0KZGVzY3JpcHRpb246IEEgcHVyZSBjbGllbnQtc2lkZSBhcHAgd2l0aG91dCBzc3IuCnZlcnNpb246IDAuMC4xCgplbnZpcm9ubWVudDoKICBzZGs6ICc+PTMuMC4wIDw0LjAuMCcKCmRlcGVuZGVuY2llczoKICBqYXNwcjogXnt7amFzcHJDb3JlVmVyc2lvbn19CgpkZXZfZGVwZW5kZW5jaWVzOgogIGJ1aWxkX3J1bm5lcjogXjIuNC4wCiAgYnVpbGRfd2ViX2NvbXBpbGVyczogXjQuMC4wCiAgbGludHM6IF4yLjEuMAo=",
       "type": "text"
     },
     {

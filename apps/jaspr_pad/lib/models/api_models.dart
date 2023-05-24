@@ -51,7 +51,7 @@ class AnalyzeResponse with AnalyzeResponseMappable {
 enum IssueKind { error, warning, info }
 
 @MappableClass()
-class Issue with Comparable<Issue>, IssueMappable {
+class Issue with IssueMappable implements Comparable<Issue> {
   final IssueKind kind;
   final IssueLocation location;
   final String message;
