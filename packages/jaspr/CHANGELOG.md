@@ -1,4 +1,4 @@
-## Unreleased breaking
+## 0.4.0 - 2023-05-24
 
 - **BREAKING** Bindings are no longer singletons. 
   - `ComponentsBinding.instance`, `SchedulerBinding.instance` etc. were removed.
