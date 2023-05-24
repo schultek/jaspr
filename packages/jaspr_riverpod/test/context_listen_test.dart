@@ -9,15 +9,9 @@ final counterB = StateProvider.autoDispose((ref) => 0);
 
 void main() {
   group('context.listen', () {
-    late ComponentTester tester;
-
-    setUp(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test(
+    testComponents(
       'listens to provider state',
-      () async {
+      (tester) async {
         int? wasCalledWith;
 
         await tester.pumpComponent(providerApp((context) sync* {
@@ -42,9 +36,9 @@ void main() {
       },
     );
 
-    test(
+    testComponents(
       'context.listen re-listens on rebuild',
-      () async {
+      (tester) async {
         List<int> wasCalledWith = [];
 
         await tester.pumpComponent(providerApp((context) sync* {
@@ -69,9 +63,9 @@ void main() {
       },
     );
 
-    test(
+    testComponents(
       'context.listen un-listens on dispose',
-      () async {
+      (tester) async {
         List<int> wasCalledWith = [];
 
         await tester.pumpComponent(providerApp((context) sync* {
@@ -123,9 +117,9 @@ void main() {
       },
     );
 
-    test(
+    testComponents(
       'omitting closes an active listener',
-      () async {
+      (tester) async {
         List<int> wasCalledWith = [];
 
         late Element element;

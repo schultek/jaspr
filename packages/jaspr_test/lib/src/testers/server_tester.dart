@@ -6,7 +6,36 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:jaspr/server.dart' hide Document;
+import 'package:meta/meta.dart';
 import 'package:test/fake.dart';
+import 'package:test/test.dart';
+
+@isTest
+void testServer(
+  String description,
+  FutureOr<void> Function(ServerTester tester) callback, {
+  bool virtual = true,
+  List<Middleware>? middleware,
+  bool? skip,
+  Timeout? timeout,
+  dynamic tags,
+}) {
+  test(
+    description,
+    () async {
+      var tester = ServerTester._();
+      try {
+        await tester._start(virtual, middleware);
+        await callback(tester);
+      } finally {
+        await tester.app.close();
+      }
+    },
+    skip: skip,
+    timeout: timeout,
+    tags: tags,
+  );
+}
 
 /// A virtual response object containing the server-rendered html document.
 class DocumentResponse {
@@ -40,31 +69,19 @@ class DataResponse {
 class ServerTester {
   ServerTester._();
 
-  static Future<ServerTester> setUp(
-    Component app, {
-    bool virtual = true,
-    List<Middleware>? middleware,
-  }) async {
-    var tester = ServerTester._();
-    await tester._start(app, virtual, middleware);
-    return tester;
-  }
-
-  Future<void> tearDown() async {
-    await app.close();
-  }
-
   late ServerApp app;
+
   Handler? _handler;
   http.Client? _client;
+  final _LateComponent _comp = _LateComponent();
 
-  Future<void> _start(Component comp, bool virtual, List<Middleware>? middleware) async {
+  Future<void> _start(bool virtual, List<Middleware>? middleware) async {
     fileHandler(Request request) {
       return Response.notFound('Not Found');
     }
 
     var appCompleter = Completer();
-    app = _runTestApp(comp, fileHandler)
+    app = _runTestApp(_comp, fileHandler)
       ..setListener((server) {
         if (!appCompleter.isCompleted) appCompleter.complete();
       });
@@ -83,6 +100,10 @@ class ServerTester {
     }
 
     await appCompleter.future;
+  }
+
+  void pumpComponent(Component component) {
+    _comp.component = component;
   }
 
   /// Perform a virtual request to your app that renders the components and returns the
@@ -146,10 +167,14 @@ class ServerTester {
   }
 }
 
-ServerApp _runTestApp(Component app, Handler fileHandler) {
-  return ServerApp.run(() {
-    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: '');
+ServerApp _runTestApp(_LateComponent app, Handler fileHandler) {
+  return ServerApp.run((binding) {
+    binding.attachRootComponent(app.component ?? Builder(builder: (_) => []), attachTo: '');
   }, fileHandler);
+}
+
+class _LateComponent {
+  Component? component;
 }
 
 class FakeHttpServer extends Fake implements HttpServer {

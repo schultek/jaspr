@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:js';
 
 import 'package:js/js.dart';
+
 import '../foundation/sync.dart';
 
 @JS('jaspr')
@@ -18,17 +19,18 @@ class JasprConfig {
   }
 
   List<IslandConfig>? get islands {
-    return _config?.islands?.map((c) => IslandConfig(c)).toList();
+    return _config?.islands?.map((c) => IslandConfig._(c)).toList();
   }
 
   AppConfig? get app {
-    return _config?.app != null ? AppConfig(_config!.app!) : null;
+    return _config?.app != null ? AppConfig._(_config!.app!) : null;
   }
 }
 
 class IslandConfig {
   final _IslandConfig _config;
-  IslandConfig(this._config);
+
+  IslandConfig._(this._config);
 
   String get id => _config.id;
   String get name => _config.name;
@@ -37,7 +39,7 @@ class IslandConfig {
 
 class AppConfig {
   final _AppConfig _config;
-  AppConfig(this._config);
+  AppConfig._(this._config);
 
   String get id => _config.id;
   Map<String, dynamic> get params => decodeConfig(_config.params) ?? {};

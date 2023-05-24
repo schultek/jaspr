@@ -30,7 +30,7 @@
   renders normal html/css like Vue or React.
 - 👥 **Who?**: Jaspr is targeted mainly at Flutter developers that want to build any type of websites
   (especially ones that are not suitable for Flutter Web).
-- 🚀 **What?**: Jaspr wants to push the boundaries of Dart on the web and server, by giving you a tought-through fullstack
+- 🚀 **What?**: Jaspr wants to push the boundaries of Dart on the web and server, by giving you a thought-through fullstack
   web framework written completely in Dart.
 
 > Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of
@@ -70,10 +70,10 @@ JasprPad is also built with **Jaspr** itself, so you can [**check out its source
 
 ## Get Started
 
-To get started simply activate the `jasper` command line tool and run `jaspr create`:
+To get started simply activate the `jasper_cli` command line tool and run `jaspr create`:
 
 ```shell
-dart pub global activate jaspr
+dart pub global activate jaspr_cli
 jaspr create my_web_app
 ```
 
@@ -223,4 +223,4 @@ void main() {
 
 For more examples on how to use the testing package, check out the 
 [documentation](https://docs.page/schultek/jaspr/testing) and the 
-[tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/jaspr/test).
+[tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/packages/jaspr/test).

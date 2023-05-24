@@ -27,11 +27,11 @@ class LazyRoute implements Route {
 
   Future<ResolvedRoute>? _resolved;
 
-  Future<ResolvedRoute> load({bool eager = true, bool preload = false}) {
+  Future<ResolvedRoute> load(BuildContext context, {bool eager = true, bool preload = false}) {
     if (_resolved == null) {
       List<Future> loading = [_loader()];
       if (preload) {
-        var preloaded = SyncBinding.instance!.loadState(_path);
+        var preloaded = context.binding.loadState(_path);
         if (!eager) loading.add(preloaded);
       }
       _resolved = Future.wait(loading).then((_) {

@@ -11,6 +11,7 @@ import 'properties/grid_item.dart';
 import 'properties/position.dart';
 import 'properties/text.dart';
 import 'properties/transform.dart';
+import 'properties/transition.dart';
 import 'properties/unit.dart';
 
 part 'groups/background.dart';

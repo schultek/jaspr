@@ -15,7 +15,7 @@ class DomNodeData {
 }
 
 extension DomNodeDataExt on RenderElement {
-  DomNodeData get data => getData() ?? setData(DomNodeData());
+  DomNodeData get data => renderData ??= DomNodeData();
 }
 
 class MarkupDomRenderer extends Renderer {
@@ -119,7 +119,7 @@ class MarkupDomRenderer extends Renderer {
         if (kDebugMode && (fullChildOutput.length > 80 || fullChildOutput.contains('\n'))) {
           output.write('\n');
           for (var child in childOutput) {
-            output.writeln('  ' + child.replaceAll('\n', '\n  '));
+            output.writeln('  ${child.replaceAll('\n', '\n  ')}');
           }
         } else {
           output.write(fullChildOutput);

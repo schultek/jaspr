@@ -3,18 +3,7 @@ import 'dart:convert';
 import 'package:binary_codec/binary_codec.dart';
 import 'package:meta/meta.dart';
 
-import 'binding.dart';
-
-mixin SyncBinding on BindingBase {
-  @override
-  void initInstances() {
-    super.initInstances();
-    _instance = this;
-  }
-
-  static SyncBinding? _instance;
-  static SyncBinding? get instance => _instance!;
-
+mixin SyncBinding {
   /// Returns the accumulated data from all active [State]s that use the [SyncStateMixin]
   @protected
   Map<String, dynamic> getStateData() {

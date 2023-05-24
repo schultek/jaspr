@@ -1,0 +1,12 @@
+name: Publish jaspr_test
+
+on:
+  push:
+    tags:
+      - 'jaspr_test-v[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  publish:
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+    with:
+      working-directory: packages/jaspr_test

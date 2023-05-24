@@ -18,7 +18,7 @@ class TestComponentController<T> {
   final Element _element;
   StatefulElement get element => _element as StatefulElement;
 
-  _TestState get state => element.state as _TestState;
+  TestState get state => element.state as TestState;
 
   Future<void> rebuild() {
     _element.markNeedsBuild();
@@ -40,10 +40,10 @@ abstract class TestComponent<T> extends StatefulComponent {
   Iterable<Component> build(BuildContext context, T value);
 
   @override
-  State<StatefulComponent> createState() => _TestState();
+  State<StatefulComponent> createState() => TestState();
 }
 
-class _TestState<T> extends State<TestComponent> {
+class TestState<T> extends State<TestComponent> {
   late T value;
 
   @override

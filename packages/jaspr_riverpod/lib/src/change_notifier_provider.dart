@@ -1,6 +1,7 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 import 'package:jaspr/jaspr.dart';
+import 'package:meta/meta.dart';
 // ignore: implementation_imports
 import 'package:riverpod/src/internals.dart';
 
@@ -32,12 +33,10 @@ abstract class _ChangeNotifierProviderBase<NotifierT extends ChangeNotifier?> ex
     required super.name,
     required super.from,
     required super.argument,
-    required this.dependencies,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
   });
-
-  @override
-  final List<ProviderOrFamily>? dependencies;
 
   /// Obtains the [ChangeNotifier] associated with this provider, without listening
   /// to state changes.

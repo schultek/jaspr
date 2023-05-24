@@ -1,16 +1,8 @@
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-      - develop
-    paths:
-      - '.github/workflows/test.yml'
-      - 'packages/**'
   pull_request:
     branches:
       - main
-      - develop
     paths:
       - '.github/workflows/test.yml'
       - 'packages/**'
@@ -33,12 +25,7 @@ jobs:
       - name: Bootstrap
         run: |
           dart pub global activate melos
-          melos bootstrap
-
-      - name: Activate Jaspr
-        run: |
-          cd packages
-          dart pub global activate jaspr --source=path
+          melos bootstrap --no-private
 
       - name: Create & Build Project
         run: |
@@ -46,7 +33,7 @@ jobs:
           jaspr create -t basic my_app
           melos bootstrap
           cd my_app
-          jaspr build
+          jaspr build -v
 
   analyze:
     name: Analyze Code
@@ -63,7 +50,7 @@ jobs:
           melos bootstrap
 
       - name: Check formatting
-        run: melos format
+        run: melos format -- --set-exit-if-changed
 
       - name: Check linting
         run: melos analyze
@@ -81,7 +68,7 @@ jobs:
         run: |
           dart pub global activate melos
           dart pub global activate coverage
-          melos bootstrap
+          melos bootstrap --no-private
 
       - name: Run Unit tests
         run: melos coverage:ci
