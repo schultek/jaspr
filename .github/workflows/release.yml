@@ -43,15 +43,13 @@ jobs:
           rm -rf output.txt
 
       - name: Update CLI
-        if: steps.bump.outputs.did_bump != '0'
         run: |
           melos generate:versions
           melos format
 
       - name: Publish Packages
-        if: steps.bump.outputs.did_bump != '0'
         run: |
-          version publish
+          echo "y" | version publish
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         if: steps.bump.outputs.did_bump != '0'
