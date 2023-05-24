@@ -50,6 +50,7 @@ jobs:
       - name: Publish Packages
         run: |
           echo "y" | version publish
+          git push origin
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         if: steps.bump.outputs.did_bump != '0'
