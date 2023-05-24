@@ -82,22 +82,10 @@ class BuildCommand extends BaseCommand {
     var flutterResult = Future<void>.value();
 
     if (flutter != null) {
-      flutterResult = (await _buildFlutter(flutter))();
+      flutterResult = _buildFlutter(flutter);
     }
 
-    if (!useSSR) {
-      await Future.wait([
-        webResult,
-        flutterResult,
-      ]);
-
-      if (dummyIndex) {
-        await indexHtml.delete();
-        if (await targetIndexHtml.exists()) {
-          await targetIndexHtml.delete();
-        }
-      }
-    } else {
+    if (useSSR) {
       String? entryPoint = await getEntryPoint(argResults!['input']);
 
       if (entryPoint == null) {
@@ -107,15 +95,28 @@ class BuildCommand extends BaseCommand {
 
       logger.info('Building server app...');
 
+      await webResult;
+
       var process = await Process.start(
         'dart',
         ['compile', argResults!['target'], entryPoint, '-o', './build/app', '-Djaspr.flags.release=true'],
       );
 
       await watchProcess(process);
-
-      await webResult;
     }
+
+    await Future.wait([
+      webResult,
+      flutterResult,
+    ]);
+
+    if (dummyIndex) {
+      await indexHtml.delete();
+      if (await targetIndexHtml.exists()) {
+        await targetIndexHtml.delete();
+      }
+    }
+
     logger.success('Completed building project to /build.');
     return ExitCode.success.code;
   }
@@ -188,7 +189,7 @@ class BuildCommand extends BaseCommand {
     return exitCode;
   }
 
-  Future<Future<void> Function()> _buildFlutter(String flutter) async {
+  Future<void> _buildFlutter(String flutter) async {
     var flutterProcess = await Process.start(
       'flutter',
       ['build', 'web', '-t', flutter, '--output=build/flutter'],
@@ -202,30 +203,30 @@ class BuildCommand extends BaseCommand {
       'canvaskit/',
     ];
 
-    return () async {
-      await watchProcess(flutterProcess);
+    await watchProcess(flutterProcess);
 
-      var moves = <Future>[];
-      while (moveTargets.isNotEmpty) {
-        var moveTarget = moveTargets.removeAt(0);
-        if (moveTarget.endsWith('/')) {
-          await Directory('build/web/$moveTarget').create(recursive: true);
+    var moves = <Future>[];
+    while (moveTargets.isNotEmpty) {
+      var moveTarget = moveTargets.removeAt(0);
+      var file = File('./build/flutter/$moveTarget');
+      var isDir = file.statSync().type == FileSystemEntityType.directory;
+      if (isDir) {
+        await Directory('build/web/$moveTarget').create(recursive: true);
 
-          var files = Directory('build/flutter/$moveTarget').list(recursive: true);
-          await for (var file in files) {
-            final path = p.relative(file.path, from: 'build/flutter');
-            if (file is Directory) {
-              moveTargets.add(path);
-            } else {
-              moveTargets.add(path);
-            }
+        var files = Directory('build/flutter/$moveTarget').list(recursive: true);
+        await for (var file in files) {
+          final path = p.relative(file.path, from: 'build/flutter');
+          if (file is Directory) {
+            moveTargets.add(path);
+          } else {
+            moveTargets.add(path);
           }
-        } else {
-          moves.add(File('./build/flutter/$moveTarget').copy('./build/web/$moveTarget'));
         }
+      } else {
+        moves.add(file.copy('./build/web/$moveTarget'));
       }
+    }
 
-      await Future.wait(moves);
-    };
+    await Future.wait(moves);
   }
 }

@@ -1,12 +1,12 @@
 # element_embedding_demo
 
 This package contains the application used to demonstrate the
-upcoming Flutter web feature: "Element Embedding" in combination with 
+new Flutter web feature: "Element Embedding" in combination with 
 the [jaspr](https://github.com/schultek/jaspr) web framework.
 
 This was first shown on the Flutter Forward event in Nairobi (Kenya), by Tim
 Sneath. [See the replay here](https://www.youtube.com/watch?v=zKQYGKAe5W8&t=5799s).
-The original implementation can be found [here](https://github.com/flutter/samples/tree/main/experimental/element_embedding_demo)
+The original implementation can be found [here](https://github.com/flutter/samples/tree/main/web_embedding/element_embedding_demo)
 
 ## Running the demo
 
@@ -14,7 +14,7 @@ The demo is a jaspr app with an embedded flutter web app.
 It can be run with:
 
 ```terminal
-$ dart run jaspr serve --input=lib/main_jaspr.dart --flutter=lib/main_flutter.dart
+$ jaspr serve --input=lib/main_jaspr.dart --flutter=lib/main_flutter.dart
 ```
 
 https://user-images.githubusercontent.com/13920539/216588813-a06ac091-e897-4ebe-a9d4-806bfaf8759d.mov
@@ -26,7 +26,7 @@ https://user-images.githubusercontent.com/13920539/216588968-97797efe-47cc-47c7-
 The project can be built with:
 
 ```terminal
-$ dart run jaspr build --input=lib/main_jaspr.dart --flutter=lib/main_flutter.dart
+$ jaspr build --input=lib/main_jaspr.dart --flutter=lib/main_flutter.dart
 ```
 
 Run the built app with:
