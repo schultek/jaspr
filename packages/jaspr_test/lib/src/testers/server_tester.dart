@@ -169,7 +169,7 @@ class ServerTester {
 
 ServerApp _runTestApp(_LateComponent app, Handler fileHandler) {
   return ServerApp.run((binding) {
-    binding.attachRootComponent(app.component ?? Builder(builder: (_) => []), attachTo: '');
+    binding.attachRootComponent(app.component ?? Builder(builder: (_) => []));
   }, fileHandler);
 }
 

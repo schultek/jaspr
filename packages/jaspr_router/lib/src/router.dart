@@ -47,7 +47,7 @@ class Router extends StatefulComponent {
 
 enum _HistoryAction { none, push, replace }
 
-class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin {
+class RouterState extends State<Router> with PreloadStateMixin {
   ResolvedRoute? _currentRoute;
   ResolvedRoute get currentRoute => _currentRoute!;
 

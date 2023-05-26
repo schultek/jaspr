@@ -9,7 +9,7 @@ import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
 import '../../server.dart';
-import 'server_renderer.dart';
+import 'render_functions.dart';
 
 final String kDevProxy =
     String.fromEnvironment('jaspr.dev.proxy', defaultValue: Platform.environment['jaspr_dev_proxy'] ?? '');

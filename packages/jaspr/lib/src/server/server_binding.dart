@@ -23,12 +23,12 @@ class ServerAppBinding extends AppBinding with ComponentsBinding, DocumentBindin
   final rootCompleter = Completer.sync();
 
   @override
-  void didAttachRootElement(Element element, {required String to}) {
+  void didAttachRootElement(Element element) {
     rootCompleter.complete();
   }
 
   @override
-  Renderer attachRenderer(String target, {int? from, int? to}) {
+  Renderer createRenderer() {
     return MarkupDomRenderer();
   }
 
