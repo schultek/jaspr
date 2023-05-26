@@ -54,40 +54,51 @@ class Route extends RouteBase {
   late final RegExp _pathRE;
 }
 
-class LazyRoute extends Route {
+class LazyRoute extends Route with LazyRouteMixin {
   LazyRoute({
     required super.path,
     super.name,
     super.title,
     super.builder,
     super.redirect,
-    required AsyncCallback load,
+    required this.load,
     super.routes = const <RouteBase>[],
-  }) : _load = load;
+  });
 
-  final AsyncCallback _load;
-
-  bool _loaded = false;
-  bool get loaded => _loaded;
-
-  Future<void> load() async {
-    try {
-      await _load();
-    } finally {
-      _loaded = true;
-    }
-  }
+  @override
+  final AsyncCallback load;
 }
 
 class ShellRoute extends RouteBase {
   /// Constructs a [ShellRoute].
   ShellRoute({
-    this.builder,
+    required this.builder,
     super.routes,
   })  : assert(routes.isNotEmpty),
         super._();
 
-  final ShellRouteBuilder? builder;
+  factory ShellRoute.lazy({
+    required ShellRouteBuilder builder,
+    required AsyncCallback load,
+    List<RouteBase> routes,
+  }) = LazyShellRoute;
+
+  final ShellRouteBuilder builder;
+}
+
+class LazyShellRoute extends ShellRoute with LazyRouteMixin {
+  LazyShellRoute({
+    required super.builder,
+    required this.load,
+    super.routes,
+  });
+
+  @override
+  final AsyncCallback load;
+}
+
+mixin LazyRouteMixin {
+  AsyncCallback get load;
 }
 
 // /// Interface for any Route

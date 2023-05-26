@@ -55,19 +55,16 @@ class Router extends StatefulComponent {
   }
 }
 
-class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin {
+class RouterState extends State<Router> with PreloadStateMixin {
   RouteMatchList? _matchList;
   RouteMatchList get matchList => _matchList!;
 
-  @override
-  Future<void> beforeFirstRender() {
-    var location = context.binding.currentUri.toString();
-    return _matchRoute(location).then((match) => _matchList = match);
-  }
+  Map<Object, Future> routeLoaders = {};
 
   @override
   Future<void> preloadState() {
-    return beforeFirstRender();
+    var location = context.binding.currentUri.toString();
+    return _matchRoute(location).then((match) => _matchList = match);
   }
 
   @override
@@ -76,16 +73,29 @@ class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin
     HistoryManager.instance.init((uri) {
       _update(uri, updateHistory: false);
     });
-    assert(_matchList != null);
+    if (_matchList == null) {
+      assert(context.binding.isClient);
+      preloadState();
+    }
   }
 
-  // Future<void> preload(String location) async {
-  //   var uri = Uri.parse(path);
-  //   var nextRoute = _matchRoute(uri);
-  //   if (nextRoute is LazyRoute) {
-  //     _resolvedRoutes[nextRoute] = await nextRoute.load(preload: true);
-  //   }
-  // }
+  Future<void> preload(String location) async {
+    return _matchRoute(location).then((match) async {
+      var loaders = <Future>[];
+      for (var i = 0; i < match.matches.length; i++) {
+        var m = match.matches[i];
+        var r = m.route;
+        var hasNext = i < match.matches.length - 1;
+
+        if (r is LazyRouteMixin && (!hasNext || r is ShellRoute)) {
+          var key = m.subloc;
+          var l = (routeLoaders[key] ??= (r as LazyRouteMixin).load());
+          loaders.add(l);
+        }
+      }
+      await Future.wait(loaders);
+    });
+  }
 
   /// Get a location from route name and parameters.
   /// This is useful for redirecting to a named location.

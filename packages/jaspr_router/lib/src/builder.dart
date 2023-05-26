@@ -41,14 +41,14 @@ class RouteBuilder {
     yield InheritedRouter(
       router: router,
       child: Builder.single(builder: (context) {
-        return _buildRoute(context, router.matchList);
+        return _buildRoute(context, router.matchList, router.routeLoaders);
       }),
     );
   }
 
-  Component _buildRoute(BuildContext context, RouteMatchList matchList) {
+  Component _buildRoute(BuildContext context, RouteMatchList matchList, Map<Object, Future> loaders) {
     try {
-      return _buildRecursive(context, matchList, 0);
+      return _buildRecursive(context, matchList, 0, loaders);
     } on _RouteBuilderError catch (e) {
       return _buildErrorPage(context, e, matchList.uri);
     }
@@ -58,6 +58,7 @@ class RouteBuilder {
     BuildContext context,
     RouteMatchList matchList,
     int startIndex,
+    Map<Object, Future> loaders,
   ) {
     final RouteMatch match = matchList.matches[startIndex];
 
@@ -69,14 +70,14 @@ class RouteBuilder {
     final RouteState state = buildState(matchList, match);
     if (route is Route) {
       if (matchList.matches.length > startIndex + 1) {
-        return _buildRecursive(context, matchList, startIndex + 1);
+        return _buildRecursive(context, matchList, startIndex + 1, loaders);
       }
 
-      return _callRouteBuilder(context, state, route);
+      return _callRouteBuilder(context, state, route, loaders);
     } else if (route is ShellRoute) {
-      var child = _buildRecursive(context, matchList, startIndex + 1);
+      var child = _buildRecursive(context, matchList, startIndex + 1, loaders);
 
-      return _callShellRouteBuilder(context, state, route, child: child);
+      return _callShellRouteBuilder(context, state, route, loaders, child: child);
     }
 
     throw _RouteBuilderException('Unsupported route type $route');
@@ -108,35 +109,76 @@ class RouteBuilder {
   }
 
   /// Calls the user-provided route builder from the [RouteMatch]'s [RouteBase].
-  Component _callRouteBuilder(BuildContext context, RouteState state, Route route) {
+  Component _callRouteBuilder(BuildContext context, RouteState state, Route route, Map<Object, Future> loaders) {
     final RouterComponentBuilder? builder = route.builder;
 
     if (builder == null) {
       throw _RouteBuilderError('No routeBuilder provided to Route: $route');
     }
 
-    return InheritedRouteState(
-      state: state,
-      child: Builder.single(builder: (context) {
-        return builder(context, state);
-      }),
-    );
-  }
+    Component child = Builder.single(builder: (c) => builder(c, state));
 
-  /// Calls the user-provided route builder from the [RouteMatch]'s [RouteBase].
-  Component _callShellRouteBuilder(BuildContext context, RouteState state, ShellRoute route,
-      {required Component child}) {
-    final ShellRouteBuilder? builder = route.builder;
-
-    if (builder == null) {
-      throw _RouteBuilderError('No builder provided to ShellRoute: $route');
+    if (route is LazyRoute) {
+      var l = loaders[state.subloc] ??= route.load();
+      var c = child;
+      print("BUILD LAZY");
+      child = FutureBuilder(
+        future: l,
+        builder: (context, snapshot) sync* {
+          print("FUTURE LAZY ${snapshot.connectionState}");
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError) {
+              yield _buildErrorPage(
+                context,
+                _RouteBuilderError('Failed to load lazy route'),
+                Uri.parse(state.location),
+              );
+              return;
+            }
+            yield c;
+          }
+        },
+      );
     }
 
     return InheritedRouteState(
       state: state,
-      child: Builder.single(builder: (context) {
-        return builder(context, state, child);
-      }),
+      child: child,
+    );
+  }
+
+  /// Calls the user-provided route builder from the [RouteMatch]'s [RouteBase].
+  Component _callShellRouteBuilder(
+      BuildContext context, RouteState state, ShellRoute route, Map<Object, Future> loaders,
+      {required Component child}) {
+    final ShellRouteBuilder builder = route.builder;
+
+    Component routeChild = Builder.single(builder: (c) => builder(c, state, child));
+
+    if (route is LazyShellRoute) {
+      var l = loaders[state.subloc] ??= route.load();
+      var c = routeChild;
+      routeChild = FutureBuilder(
+        future: l,
+        builder: (context, snapshot) sync* {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError) {
+              yield _buildErrorPage(
+                context,
+                _RouteBuilderError('Failed to load lazy shell route'),
+                Uri.parse(state.location),
+              );
+              return;
+            }
+            yield c;
+          }
+        },
+      );
+    }
+
+    return InheritedRouteState(
+      state: state,
+      child: routeChild,
     );
   }
 
