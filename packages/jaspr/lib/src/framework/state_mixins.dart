@@ -52,12 +52,6 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> implements Sync
   }
 }
 
-/// This defers the first rendering on the client for an async task
-mixin DeferRenderMixin<T extends StatefulComponent> on State<T> {
-  /// Called on the client before initState() to perform some asynchronous task
-  Future<void> beforeFirstRender();
-}
-
 /// Mixin on [State] that preloads state on the server
 mixin PreloadStateMixin<T extends StatefulComponent> on State<T> {
   /// Called on the server before initState() to preload asynchronous data

@@ -138,12 +138,11 @@ class StatelessElement extends MultiChildElement {
 
   @override
   void _firstBuild([VoidCallback? onBuilt]) {
-    if (owner.isFirstBuild && component is OnFirstBuild) {
+    if (owner.isFirstBuild && !binding.isClient && component is OnFirstBuild) {
       var result = (component as OnFirstBuild).onFirstBuild(this);
       if (result is Future) {
-        _asyncFirstBuild = result.then((_) {
-          _asyncFirstBuild = null;
-        });
+        _asyncFirstBuild = result;
+        result.whenComplete(() => _asyncFirstBuild = null);
       }
     }
     super._firstBuild(onBuilt);
