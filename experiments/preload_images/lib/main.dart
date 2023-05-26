@@ -31,9 +31,12 @@ class ServerImageService implements ImageService {
 }
 
 void main() {
-  runServer(Builder.single(builder: (context) {
+  runApp(Builder.single(builder: (context) {
     // create a service instance
     ImageService.instance = ServerImageService();
-    return App();
+    return Document.file(
+      name: 'main.html',
+      child: App(),
+    );
   }));
 }

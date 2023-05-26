@@ -64,10 +64,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
   @override
   Future<void> preloadState() {
     var location = context.binding.currentUri.toString();
-    return _matchRoute(location).then((match) async {
-      await _preload(match);
-      _matchList = match;
-    });
+    return _matchRoute(location).then(_preload).then((match) => _matchList = match);
   }
 
   @override
@@ -84,13 +81,11 @@ class RouterState extends State<Router> with PreloadStateMixin {
     }
   }
 
-  Future<void> preload(String location) async {
-    return _matchRoute(location).then((match) async {
-      await _preload(match);
-    });
+  Future<void> preload(String location) {
+    return _matchRoute(location).then(_preload);
   }
 
-  Future<void> _preload(RouteMatchList match) async {
+  Future<RouteMatchList> _preload(RouteMatchList match) {
     var loaders = <RouteLoader>[];
     for (var i = 0; i < match.matches.length; i++) {
       var m = match.matches[i];
@@ -103,7 +98,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
         loaders.add(l);
       }
     }
-    await RouteLoader.wait(loaders);
+    return RouteLoader.wait(loaders).then((_) => match);
   }
 
   /// Get a location from route name and parameters.
@@ -193,10 +188,12 @@ class RouteLoader {
 
   bool isPending;
 
-  static Future<void> wait(Iterable<RouteLoader> loaders) async {
+  static Future<void> wait(Iterable<RouteLoader> loaders) {
     var l = loaders.where((l) => l.isPending).map((l) => l.future);
     if (l.isNotEmpty) {
-      await Future.wait(l);
+      return Future.wait(l);
+    } else {
+      return SynchronousFuture(null);
     }
   }
 }
