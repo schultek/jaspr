@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:meta/meta.dart';
+import 'package:stack_trace/stack_trace.dart';
 
 import 'internals.dart';
 import 'sync_provider.dart';
@@ -327,12 +328,22 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     assert(_task == null, 'Only one task can be scheduled at a time');
     _task = task;
 
-    Future.microtask(() async {
-      while (owner.isFirstBuild) {
-        await Future.microtask(() {});
-      }
-      if (_mounted) markNeedsBuild();
-    });
+    if (binding.isClient) {
+      Chain.capture(() {
+        Future.microtask(() async {
+          while (owner.isFirstBuild) {
+            await Future.microtask(() {});
+          }
+          if (_mounted) markNeedsBuild();
+        });
+      }, onError: (error, stack) {
+        //print(new Trace.from(stack).terse);
+        Error.throwWithStackTrace(error, stack);
+      });
+    } else {
+      _task?.call();
+      _task = null;
+    }
   }
 
   void _debugCanModifyProviders() {

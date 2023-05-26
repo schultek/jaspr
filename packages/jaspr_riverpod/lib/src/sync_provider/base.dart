@@ -4,7 +4,7 @@ part of '../sync_provider.dart';
 
 /// {@macro riverpod.providerrefbase}
 /// - [state], the value currently exposed by this provider.
-abstract class SyncProviderRef<State> implements Ref<AsyncValue<State>> {
+abstract class SyncProviderRef<State> implements Ref<State> {
   /// Obtains the state currently exposed by this provider.
   ///
   /// Mutating this property will notify the provider listeners.
@@ -12,8 +12,8 @@ abstract class SyncProviderRef<State> implements Ref<AsyncValue<State>> {
   /// Cannot be called while a provider is creating, unless the setter was called first.
   ///
   /// Will throw if the provider threw during creation.
-  AsyncValue<State> get state;
-  set state(AsyncValue<State> newState);
+  AsyncValue<State> get value;
+  set value(AsyncValue<State> newState);
 
   /// Obtains the [Future] associated to this provider.
   ///
@@ -23,8 +23,7 @@ abstract class SyncProviderRef<State> implements Ref<AsyncValue<State>> {
 }
 
 /// {@macro riverpod.syncprovider}
-class SyncProvider<T> extends _SyncProviderBase<T>
-    with AlwaysAliveProviderBase<AsyncValue<T>>, AlwaysAliveAsyncSelector<T> {
+class SyncProvider<T> extends _SyncProviderBase<T> with AlwaysAliveProviderBase<T> {
   /// {@macro riverpod.syncprovider}
   SyncProvider(
     this._createFn, {
@@ -67,16 +66,10 @@ class SyncProvider<T> extends _SyncProviderBase<T>
   late final AlwaysAliveRefreshable<Future<T>> future = _future(this);
 
   @override
+  late final AlwaysAliveRefreshable<AsyncValue<T>> value = _value(this);
+
+  @override
   FutureOr<T> _create(SyncProviderElement<T> ref) {
-    if (kIsWeb) {
-      return ref.watch(_syncStateProvider.select((s) {
-        if (!s.containsKey(id)) {
-          return Completer<T>().future;
-        }
-        var value = s[id];
-        return value != null ? (codec ?? CastCodec()).decode(value) : value;
-      }));
-    }
     return _createFn(ref);
   }
 
@@ -103,10 +96,247 @@ class SyncProvider<T> extends _SyncProviderBase<T>
 }
 
 /// The element of a [SyncProvider]
-class SyncProviderElement<T> extends ProviderElementBase<AsyncValue<T>>
-    with FutureHandlerProviderElementMixin<T>
-    implements SyncProviderRef<T> {
+class SyncProviderElement<T> extends ProviderElementBase<T> implements SyncProviderRef<T> {
   SyncProviderElement._(_SyncProviderBase<T> super.provider);
+
+  /// An observable for [SyncProvider.future].
+  @internal
+  final futureNotifier = ProxyElementValueNotifier<Future<T>>();
+  Completer<T>? _futureCompleter;
+  Future<T>? _lastFuture;
+  CancelAsyncSubscription? _lastFutureSub;
+  CancelAsyncSubscription? _cancelSubscription;
+
+  /// Handles manual state change (as opposed to automatic state change from
+  /// listening to the [Future]).
+  @protected
+  AsyncValue<T> get state => requireState;
+
+  @protected
+  set state(AsyncValue<T> newState) {
+    // TODO assert Notifier isn't disposed
+    newState.map(
+      loading: _onLoading,
+      error: onError,
+      data: onData,
+    );
+  }
+
+  void _onLoading(AsyncLoading<T> value, {bool seamless = false}) {
+    asyncTransition(value, seamless: seamless);
+    if (_futureCompleter == null) {
+      final completer = _futureCompleter = Completer();
+      futureNotifier.result = ResultData(completer.future);
+    }
+  }
+
+  /// Life-cycle for when an error from the provider's "build" method is received.
+  ///
+  /// Might be invokved after the element is disposed in the case where `provider.future`
+  /// has yet to complete.
+  @internal
+  void onError(AsyncError<T> value, {bool seamless = false}) {
+    if (mounted) {
+      asyncTransition(value, seamless: seamless);
+    }
+
+    final completer = _futureCompleter;
+    if (completer != null) {
+      completer
+        // TODO test ignore
+        ..future.ignore()
+        ..completeError(
+          value.error,
+          value.stackTrace,
+        );
+      _futureCompleter = null;
+      // TODO SynchronousFuture.error
+    } else if (mounted) {
+      futureNotifier.result = Result.data(
+        // TODO test ignore
+        Future.error(
+          value.error,
+          value.stackTrace,
+        )..ignore(),
+      );
+    }
+  }
+
+  /// Life-cycle for when a data from the provider's "build" method is received.
+  ///
+  /// Might be invokved after the element is disposed in the case where `provider.future`
+  /// has yet to complete.
+  @internal
+  void onData(AsyncData<T> value, {bool seamless = false}) {
+    if (mounted) {
+      asyncTransition(value, seamless: seamless);
+    }
+
+    final completer = _futureCompleter;
+    if (completer != null) {
+      completer.complete(value.value);
+      _futureCompleter = null;
+    } else if (mounted) {
+      futureNotifier.result = Result.data(Future.value(value.value));
+    }
+  }
+
+  /// Listens to a [Future] and convert it into an [AsyncValue].
+  @internal
+  void handleFuture(
+    FutureOr<T> Function() create, {
+    required bool didChangeDependency,
+  }) {
+    _handleAsync(didChangeDependency: didChangeDependency, ({
+      required data,
+      required done,
+      required error,
+      required last,
+    }) {
+      final futureOr = create();
+      if (futureOr is! Future<T>) {
+        data(futureOr);
+        done();
+        return null;
+      }
+      // Received a Future<T>
+
+      var running = true;
+      void cancel() {
+        running = false;
+      }
+
+      futureOr.then(
+        (value) {
+          if (!running) return;
+          data(value);
+          done();
+        },
+        // ignore: avoid_types_on_closure_parameters
+        onError: (Object err, StackTrace stackTrace) {
+          if (!running) return;
+          error(err, stackTrace);
+          done();
+        },
+      );
+
+      last(futureOr, cancel);
+
+      return cancel;
+    });
+  }
+
+  /// Listens to a [Future] and transforms it into an [AsyncValue].
+  void _handleAsync(
+    // Stream<T> Function({required void Function(T) fireImmediately}) create,
+    CancelAsyncSubscription? Function({
+      required void Function(T) data,
+      required void Function(Object, StackTrace) error,
+      required void Function() done,
+      required void Function(Future<T>, CancelAsyncSubscription) last,
+    }) listen, {
+    required bool didChangeDependency,
+  }) {
+    _onLoading(AsyncLoading<T>(), seamless: !didChangeDependency);
+
+    try {
+      final sub = _cancelSubscription = listen(
+        data: (value) {
+          onData(AsyncData(value), seamless: !didChangeDependency);
+        },
+        error: (error, stack) {
+          onError(AsyncError(error, stack), seamless: !didChangeDependency);
+        },
+        last: (last, sub) {
+          assert(_lastFuture == null, 'bad state');
+          assert(_lastFutureSub == null, 'bad state');
+          _lastFuture = last;
+          _lastFutureSub = sub;
+        },
+        done: () {
+          _lastFutureSub?.call();
+          _lastFutureSub = null;
+          _lastFuture = null;
+        },
+      );
+      assert(
+        sub == null || _lastFuture != null,
+        'An async operation is pending but the state for provider.future was not initialized.',
+      );
+
+      // TODO test build throws -> provider emits AsyncError synchronously & .future emits Future.error
+      // TODO test build resolves with error -> emits AsyncError & .future emits Future.error
+      // TODO test build emits value -> .future emits value & provider emits AsyncData
+    } catch (error, stackTrace) {
+      onError(
+        AsyncError<T>(error, stackTrace),
+        seamless: !didChangeDependency,
+      );
+    }
+  }
+
+  @override
+  @internal
+  void runOnDispose() {
+    // Stops listening to the previous async operation
+    _lastFutureSub?.call();
+    _lastFutureSub = null;
+    _lastFuture = null;
+    _cancelSubscription?.call();
+    _cancelSubscription = null;
+    super.runOnDispose();
+  }
+
+  @override
+  void dispose() {
+    final completer = _futureCompleter;
+    if (completer != null) {
+      // Whatever happens after this, the error is emitted post dispose of the provider.
+      // So the error doesn't matter anymore.
+      completer.future.ignore();
+
+      final lastFuture = _lastFuture;
+      if (lastFuture != null) {
+        // The completer will be completed by the while loop in handleStream
+
+        final cancelSubscription = _cancelSubscription;
+        if (cancelSubscription != null) {
+          completer.future
+              .then(
+                (_) {},
+                // ignore: avoid_types_on_closure_parameters
+                onError: (Object _) {},
+              )
+              .whenComplete(cancelSubscription);
+        }
+
+        // Prevent super.dispose from cancelling the subscription on the "last"
+        // stream value, so that it can be sent to `provider.future`.
+        _lastFuture = null;
+        _lastFutureSub = null;
+        _cancelSubscription = null;
+      } else {
+        // The listened stream completed during a "loading" state.
+        completer.completeError(
+          _missingLastValueError(),
+          StackTrace.current,
+        );
+      }
+    }
+    super.dispose();
+  }
+
+  @override
+  void visitChildren({
+    required void Function(ProviderElementBase<Object?> element) elementVisitor,
+    required void Function(ProxyElementValueNotifier<Object?> element) notifierVisitor,
+  }) {
+    super.visitChildren(
+      elementVisitor: elementVisitor,
+      notifierVisitor: notifierVisitor,
+    );
+    notifierVisitor(futureNotifier);
+  }
 
   @override
   Future<T> get future {
@@ -115,16 +345,18 @@ class SyncProviderElement<T> extends ProviderElementBase<AsyncValue<T>>
   }
 
   @override
-  bool updateShouldNotify(AsyncValue<T> previous, AsyncValue<T> next) {
-    return FutureHandlerProviderElementMixin.handleUpdateShouldNotify(
-      previous,
-      next,
-    );
-  }
-
-  @override
   void create({required bool didChangeDependency}) {
     final provider = this.provider as _SyncProviderBase<T>;
+
+    if (ref.binding.isClient) {
+      return ref.watch(_syncStateProvider.select((s) {
+        if (!s.containsKey(id)) {
+          return Completer<T>().future;
+        }
+        var value = s[id];
+        return value != null ? (codec ?? CastCodec()).decode(value) : value;
+      }));
+    }
 
     return handleFuture(
       () => provider._create(this),
@@ -134,8 +366,7 @@ class SyncProviderElement<T> extends ProviderElementBase<AsyncValue<T>>
 }
 
 /// The [Family] of a [SyncProvider]
-class SyncProviderFamily<R, Arg>
-    extends FamilyBase<SyncProviderRef<R>, AsyncValue<R>, Arg, FutureOr<R>, SyncProvider<R>> {
+class SyncProviderFamily<R, Arg> extends FamilyBase<SyncProviderRef<R>, R, Arg, FutureOr<R>, SyncProvider<R>> {
   /// The [Family] of a [SyncProvider]
   SyncProviderFamily(
     super.create, {

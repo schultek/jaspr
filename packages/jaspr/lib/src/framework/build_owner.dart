@@ -82,7 +82,14 @@ class BuildOwner {
         child._asyncFirstBuild == null && child._asyncFirstBuildChildren.isEmpty,
         'Only the first build on the server is allowed to be asynchronous.',
       );
-      child.performRebuild();
+      try {
+        child.performRebuild();
+      } on DeferAsyncBuildException catch (_, st) {
+        Error.throwWithStackTrace(
+          AssertionError('Only the first build on the server is allowed to be asynchronous.'),
+          st,
+        );
+      }
       whenComplete();
       return;
     }
@@ -107,7 +114,17 @@ class BuildOwner {
   }
 
   void _rebuildAndWait(Element child, Completer buildCompleter) {
-    child.performRebuild();
+    try {
+      child.performRebuild();
+    } on DeferAsyncBuildException catch (e, _) {
+      print("DEFERRING BUILD");
+      var c = Stopwatch()..start();
+      e.future.whenComplete(() {
+        print("TRYING AGAIN after ${(c..stop()).elapsedMilliseconds}ms");
+        _rebuildAndWait(child, buildCompleter);
+      });
+      return;
+    }
 
     var asyncChildren = child._asyncFirstBuildChildren;
     child._asyncFirstBuildChildren = [];
@@ -193,4 +210,10 @@ class BuildOwner {
     }
     assert(_debugStateLockLevel >= 0);
   }
+}
+
+class DeferAsyncBuildException {
+  DeferAsyncBuildException(this.future);
+
+  final Future future;
 }
