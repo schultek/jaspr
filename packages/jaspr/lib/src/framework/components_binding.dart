@@ -7,7 +7,11 @@ mixin ComponentsBinding on AppBinding {
   /// Sets [app] as the new root of the component tree and performs an initial build
   Future<void> attachRootComponent(Component app, {required String attachTo}) async {
     var buildOwner = _rootElement?._owner ?? BuildOwner();
-    await buildOwner.lockState(() async {
+    await buildOwner.lockState(() {
+      assert(() {
+        buildOwner._debugBuilding = true;
+        return true;
+      }());
       buildOwner._isFirstBuild = true;
 
       var attachMatch = _queryReg.firstMatch(attachTo)!;
@@ -21,14 +25,23 @@ mixin ComponentsBinding on AppBinding {
 
       element.mount(null, null);
 
-      if (element._asyncFirstBuild != null) {
-        await element._asyncFirstBuild;
+      end() {
+        _rootElement = element;
+        buildOwner._isFirstBuild = false;
+        assert(() {
+          buildOwner._debugBuilding = false;
+          return true;
+        }());
+
+        didAttachRootElement(element, to: attachTo);
       }
 
-      _rootElement = element;
-      buildOwner._isFirstBuild = false;
+      if (element._asyncFirstBuild != null) {
+        assert(!isClient);
+        return element._asyncFirstBuild!.then((_) => end());
+      }
 
-      didAttachRootElement(element, to: attachTo);
+      end();
     });
   }
 
