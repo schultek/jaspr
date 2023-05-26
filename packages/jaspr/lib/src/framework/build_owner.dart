@@ -52,7 +52,7 @@ class BuildOwner {
   ///
   /// This mechanism is used to ensure that, for instance, [State.dispose] does
   /// not call [State.setState].
-  Future<void> lockState(VoidCallback callback) async {
+  Future<void> lockState(dynamic Function() callback) async {
     assert(_debugStateLockLevel >= 0);
     assert(() {
       _debugStateLockLevel += 1;
@@ -77,10 +77,10 @@ class BuildOwner {
   /// We want the component and element apis to stay synchronous, so this delays
   /// the execution of [child.performRebuild()] instead of calling it directly.
   void performRebuildOn(Element child, void Function() whenComplete) {
-    if (!isFirstBuild) {
+    if (!isFirstBuild || child.binding.isClient) {
       assert(
         child._asyncFirstBuild == null && child._asyncFirstBuildChildren.isEmpty,
-        'Only the first build is allowed to be asynchronous.',
+        'Only the first build on the server is allowed to be asynchronous.',
       );
       child.performRebuild();
       whenComplete();

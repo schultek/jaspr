@@ -417,11 +417,11 @@ abstract class State<T extends StatefulComponent> {
     assert(_debugLifecycleState != _StateLifecycle.defunct);
     Object? result = fn() as dynamic;
     assert(
-      result is! Future,
-      'setState() callback argument returned a Future.\n\n'
-      'Instead of performing asynchronous work inside a call to setState(), first '
-      'execute the work (without updating the component state), and then synchronously '
-      'update the state inside a call to setState().',
+    result is! Future,
+    'setState() callback argument returned a Future.\n\n'
+        'Instead of performing asynchronous work inside a call to setState(), first '
+        'execute the work (without updating the component state), and then synchronously '
+        'update the state inside a call to setState().',
     );
     _element!.markNeedsBuild();
   }
@@ -593,10 +593,10 @@ class StatefulElement extends MultiChildElement {
     assert(state._element == null);
     state._element = this;
     assert(
-      state._component == null,
-      'The createState function for $component returned an old or invalid state '
-      'instance: ${state._component}, which is not null, violating the contract '
-      'for createState.',
+    state._component == null,
+    'The createState function for $component returned an old or invalid state '
+        'instance: ${state._component}, which is not null, violating the contract '
+        'for createState.',
     );
     state._component = component;
     assert(state._debugLifecycleState == _StateLifecycle.created);
@@ -624,13 +624,8 @@ class StatefulElement extends MultiChildElement {
 
     Future? asyncFirstBuild;
 
-    if (owner.isFirstBuild) {
-      if (state is DeferRenderMixin && binding.isClient) {
-        asyncFirstBuild = (state as DeferRenderMixin).beforeFirstRender();
-      }
-      if (state is PreloadStateMixin && !binding.isClient) {
-        asyncFirstBuild = (state as PreloadStateMixin).preloadState();
-      }
+    if (owner.isFirstBuild && state is PreloadStateMixin && !binding.isClient) {
+      asyncFirstBuild = (state as PreloadStateMixin).preloadState();
     }
 
     if (asyncFirstBuild != null) {
@@ -649,11 +644,11 @@ class StatefulElement extends MultiChildElement {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
       Object? result = state.initState() as dynamic;
       assert(
-        result is! Future,
-        '${state.runtimeType}.initState() returned a Future.\n\n'
-        'Rather than awaiting on asynchronous work directly inside of initState, '
-        'call a separate method to do this work without awaiting it.\n\n'
-        'If you need to do some async work before the first render, use PreloadStateMixin or DeferRenderMixin on State.',
+      result is! Future,
+      '${state.runtimeType}.initState() returned a Future.\n\n'
+          'Rather than awaiting on asynchronous work directly inside of initState, '
+          'call a separate method to do this work without awaiting it.\n\n'
+          'If you need to do some async work before the first render, use PreloadStateMixin or DeferRenderMixin on State.',
       );
     } finally {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
