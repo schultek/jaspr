@@ -57,14 +57,17 @@ class Router extends StatefulComponent {
 
 class RouterState extends State<Router> with PreloadStateMixin {
   RouteMatchList? _matchList;
-  RouteMatchList get matchList => _matchList!;
+  RouteMatchList get matchList => _matchList ?? RouteMatchList.empty;
 
-  Map<Object, Future> routeLoaders = {};
+  Map<Object, RouteLoader> routeLoaders = {};
 
   @override
   Future<void> preloadState() {
     var location = context.binding.currentUri.toString();
-    return _matchRoute(location).then((match) => _matchList = match);
+    return _matchRoute(location).then((match) async {
+      await _preload(match);
+      _matchList = match;
+    });
   }
 
   @override
@@ -75,26 +78,32 @@ class RouterState extends State<Router> with PreloadStateMixin {
     });
     if (_matchList == null) {
       assert(context.binding.isClient);
-      preloadState();
+      preloadState().then((_) {
+        setState(() {});
+      });
     }
   }
 
   Future<void> preload(String location) async {
     return _matchRoute(location).then((match) async {
-      var loaders = <Future>[];
-      for (var i = 0; i < match.matches.length; i++) {
-        var m = match.matches[i];
-        var r = m.route;
-        var hasNext = i < match.matches.length - 1;
-
-        if (r is LazyRouteMixin && (!hasNext || r is ShellRoute)) {
-          var key = m.subloc;
-          var l = (routeLoaders[key] ??= (r as LazyRouteMixin).load());
-          loaders.add(l);
-        }
-      }
-      await Future.wait(loaders);
+      await _preload(match);
     });
+  }
+
+  Future<void> _preload(RouteMatchList match) async {
+    var loaders = <RouteLoader>[];
+    for (var i = 0; i < match.matches.length; i++) {
+      var m = match.matches[i];
+      var r = m.route;
+      var hasNext = i < match.matches.length - 1;
+
+      if (r is LazyRouteMixin && (!hasNext || r is ShellRoute)) {
+        var key = m.subloc;
+        var l = (routeLoaders[key] ??= RouteLoader.from((r as LazyRouteMixin).load()));
+        loaders.add(l);
+      }
+    }
+    await RouteLoader.wait(loaders);
   }
 
   /// Get a location from route name and parameters.
@@ -170,5 +179,24 @@ class RouterState extends State<Router> with PreloadStateMixin {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield* component._builder.build(context, this);
+  }
+}
+
+class RouteLoader {
+  RouteLoader.from(this.future) : isPending = true {
+    future.whenComplete(() {
+      isPending = false;
+    });
+  }
+
+  final Future future;
+
+  bool isPending;
+
+  static Future<void> wait(Iterable<RouteLoader> loaders) async {
+    var l = loaders.where((l) => l.isPending).map((l) => l.future);
+    if (l.isNotEmpty) {
+      await Future.wait(l);
+    }
   }
 }
