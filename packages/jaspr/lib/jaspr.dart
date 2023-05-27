@@ -13,6 +13,7 @@ export 'src/foundation/constants.dart';
 export 'src/foundation/object.dart';
 export 'src/foundation/scheduler.dart';
 export 'src/foundation/sync.dart';
+export 'src/foundation/synchronous_future.dart';
 export 'src/framework/framework.dart';
 export 'src/stub/interop_stub.dart' //
     if (dart.library.html) 'src/browser/native_interop.dart'

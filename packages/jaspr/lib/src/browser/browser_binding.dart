@@ -18,7 +18,7 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
   bool get isClient => true;
 
   @override
-  Uri get currentUri => Uri.parse(window.location.toString());
+  Uri get currentUri => Uri.parse(window.location.href.substring(window.location.origin.length));
 
   late String attachTarget;
 
