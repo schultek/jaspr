@@ -6,7 +6,7 @@ abstract class HistoryManager {
   static HistoryManager instance = HistoryManagerImpl();
 
   /// Initialize the history manager and setup any listeners to history changes
-  void init(void Function(String url) onChange);
+  void init(String location, void Function(String url) onChange);
 
   /// Push a new state to the history
   void push(String url, {String? title, Object? data});

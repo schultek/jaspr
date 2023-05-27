@@ -123,11 +123,9 @@ class RouteBuilder {
 
       if (l.isPending) {
         var c = child;
-        print("BUILD LAZY");
         child = FutureBuilder(
           future: l.future,
           builder: (context, snapshot) sync* {
-            print("FUTURE LAZY ${snapshot.connectionState}");
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError) {
                 yield _buildErrorPage(

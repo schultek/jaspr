@@ -6,7 +6,7 @@ import 'history.dart';
 /// Accesses the window.history api
 class HistoryManagerImpl implements HistoryManager {
   @override
-  void init(void Function(String url) onChange) {
+  void init(String locationn, void Function(String url) onChange) {
     window.onPopState.listen((event) {
       onChange(window.location.href.substring(window.location.origin.length));
     });

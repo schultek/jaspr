@@ -70,7 +70,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
   @override
   void initState() {
     super.initState();
-    HistoryManager.instance.init((uri) {
+    HistoryManager.instance.init(context.binding.currentUri.toString(), (uri) {
       _update(uri, updateHistory: false);
     });
     if (_matchList == null) {

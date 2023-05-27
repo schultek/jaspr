@@ -19,8 +19,8 @@ typedef RouteRedirector = FutureOr<RouteMatchList> Function(
 
 /// Processes redirects by returning a new [RouteMatchList] representing the new
 /// location.
-FutureOr<RouteMatchList> redirect(BuildContext context, RouteMatchList prevMatchListFuture,
-    RouteConfiguration configuration, RouteMatcher matcher,
+FutureOr<RouteMatchList> redirect(
+    BuildContext context, RouteMatchList prevMatchListFuture, RouteConfiguration configuration, RouteMatcher matcher,
     {List<RouteMatchList>? redirectHistory, Object? extra}) {
   FutureOr<RouteMatchList> processRedirect(RouteMatchList prevMatchList) {
     final String prevLocation = prevMatchList.uri.toString();

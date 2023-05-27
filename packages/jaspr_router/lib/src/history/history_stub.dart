@@ -19,7 +19,7 @@ class HistoryManagerImpl implements HistoryManager {
   }
 
   @override
-  void init(void Function(String) onChange) {
+  void init(String location, void Function(String) onChange) {
     // No-op
   }
 }

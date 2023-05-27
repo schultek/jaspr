@@ -1,30 +1,32 @@
-@TestOn('browser')
-
 import 'package:jaspr_router/jaspr_router.dart';
-import 'package:jaspr_test/browser_test.dart';
+import 'package:jaspr_test/jaspr_test.dart';
 
-import '../../utils.dart';
 import '../utils.dart';
 
 void main() {
   group('router', () {
-    testBrowser('should push route', (tester) async {
+    setUpAll(() {
+      mockHistory();
+    });
+
+    testComponents('should push named route', (tester) async {
       await tester.pumpComponent(Router(routes: [
         homeRoute(),
-        route('/a'),
+        route('/a', [], 'alicia'),
+        route('/b', [], 'bob'),
       ]));
 
       expect(find.text('home'), findsOneComponent);
 
-      await tester.router.push('/a');
+      await tester.router.pushNamed('alicia');
       await pumpEventQueue();
 
       expect(find.text('a'), findsOneComponent);
 
-      await tester.router.push('/');
+      await tester.router.pushNamed('bob');
       await pumpEventQueue();
 
-      expect(find.text('home'), findsOneComponent);
+      expect(find.text('b'), findsOneComponent);
 
       tester.router.back();
       await pumpEventQueue();
@@ -32,21 +34,21 @@ void main() {
       expect(find.text('a'), findsOneComponent);
     });
 
-    testBrowser('should replace route', (tester) async {
+    testComponents('should replace named route', (tester) async {
       await tester.pumpComponent(Router(routes: [
         homeRoute(),
-        route('/a'),
-        route('/b'),
+        route('/a', [], 'alicia'),
+        route('/b', [], 'bob'),
       ]));
 
       expect(find.text('home'), findsOneComponent);
 
-      await tester.router.push('/a');
+      await tester.router.pushNamed('alicia');
       await pumpEventQueue();
 
       expect(find.text('a'), findsOneComponent);
 
-      await tester.router.replace('/b');
+      await tester.router.replaceNamed('bob');
       await pumpEventQueue();
 
       expect(find.text('b'), findsOneComponent);

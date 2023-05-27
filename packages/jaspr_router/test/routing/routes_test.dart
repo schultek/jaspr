@@ -1,14 +1,15 @@
-@TestOn('browser')
-
 import 'package:jaspr_router/jaspr_router.dart';
-import 'package:jaspr_test/browser_test.dart';
+import 'package:jaspr_test/jaspr_test.dart';
 
-import '../../utils.dart';
 import '../utils.dart';
 
 void main() {
   group('router', () {
-    testBrowser('should push route', (tester) async {
+    setUpAll(() {
+      mockHistory();
+    });
+
+    testComponents('should push route', (tester) async {
       await tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a'),
@@ -32,7 +33,7 @@ void main() {
       expect(find.text('a'), findsOneComponent);
     });
 
-    testBrowser('should replace route', (tester) async {
+    testComponents('should replace route', (tester) async {
       await tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a'),
@@ -55,6 +56,33 @@ void main() {
       await pumpEventQueue();
 
       expect(find.text('home'), findsOneComponent);
+    });
+
+    testComponents('should build shell route', (tester) async {
+      await tester.pumpComponent(Router(routes: [
+        homeRoute(),
+        route('/a', [
+          shellRoute('b', [
+            route('c'),
+          ]),
+        ]),
+      ]));
+
+      expect(find.text('home'), findsOneComponent);
+
+      await tester.router.push('/a');
+      await pumpEventQueue();
+
+      expect(find.text('a'), findsOneComponent);
+      expect(find.text('b'), findsNothing);
+      expect(find.text('c'), findsNothing);
+
+      await tester.router.push('/a/c');
+      await pumpEventQueue();
+
+      expect(find.text('a'), findsNothing);
+      expect(find.text('b'), findsOneComponent);
+      expect(find.text('c'), findsOneComponent);
     });
   });
 }

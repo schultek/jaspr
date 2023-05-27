@@ -20,7 +20,7 @@ void testComponents(
   test(
     description,
     () async {
-      var binding = TestComponentsBinding(uri, isClient);
+      var binding = TestComponentsBinding(uri ?? Uri.parse('/'), isClient);
       var tester = ComponentTester._(binding);
 
       return binding.runTest(() async {
