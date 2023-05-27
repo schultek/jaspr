@@ -43,11 +43,12 @@ jobs:
         uses: actions/checkout@v3
 
       - uses: dart-lang/setup-dart@v1.3
+      - uses: subosito/flutter-action@v2
 
       - name: Bootstrap
         run: |
           dart pub global activate melos
-          melos bootstrap --no-private
+          melos bootstrap
 
       - name: Check formatting
         run: melos format -- --set-exit-if-changed
