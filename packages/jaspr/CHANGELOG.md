@@ -1,4 +1,4 @@
-## Unreleased breaking
+## 0.5.0
 
 - **BREAKING** Added `@client` as replacement for both `@app` and `@island`.
 

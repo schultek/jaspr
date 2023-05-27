@@ -1,4 +1,4 @@
-## Unreleased breaking
+## 0.2.0
 
 - **BREAKING** Complete overhaul of the router package.
 
