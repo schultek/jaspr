@@ -1,3 +1,8 @@
+## Unreleased minor
+
+- Fixed handling of initial uri
+- Added `SynchronousFuture`
+
 ## 0.4.0
 
 - **BREAKING** Bindings are no longer singletons. 
