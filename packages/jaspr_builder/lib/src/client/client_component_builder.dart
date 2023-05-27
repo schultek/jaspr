@@ -9,14 +9,14 @@ import 'package:source_gen/source_gen.dart';
 
 import '../utils.dart';
 
-/// Builds web entrypoints for components annotated with @app
-class AppsBuilder implements Builder {
-  AppsBuilder(BuilderOptions options);
+/// Builds web entrypoints for components annotated with @client
+class ClientComponentBuilder implements Builder {
+  ClientComponentBuilder(BuilderOptions options);
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     try {
-      await generateAppOutputs(buildStep);
+      await generateComponentOutputs(buildStep);
     } catch (e, st) {
       print('An unexpected error occurred.\n'
           'This is probably a bug in jaspr_builder.\n'
@@ -29,13 +29,13 @@ class AppsBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-        'lib/{{file}}.dart': ['lib/{{file}}.g.dart', 'web/{{file}}.app.dart', 'web/{{file}}.island.dart']
+        'lib/{{file}}.dart': ['lib/{{file}}.g.dart', 'web/{{file}}.client.dart'],
       };
 
   String get generationHeader => "// GENERATED FILE, DO NOT MODIFY\n"
       "// Generated with jaspr_builder\n";
 
-  Future<void> generateAppOutputs(BuildStep buildStep) async {
+  Future<void> generateComponentOutputs(BuildStep buildStep) async {
     if (!await buildStep.resolver.isLibrary(buildStep.inputId)) {
       return;
     }
@@ -43,19 +43,16 @@ class AppsBuilder implements Builder {
     var library = await buildStep.inputLibrary;
     var reader = LibraryReader(library);
 
-    var apps = reader.annotatedWithExact(appChecker).map((e) => e.element);
-    var islands = reader.annotatedWithExact(islandChecker).map((e) => e.element);
+    var clients = reader.annotatedWithExact(clientChecker).map((e) => e.element);
 
-    var annotated = apps.followedBy(islands).toSet();
+    var annotated = clients.toSet();
 
     if (annotated.isEmpty) {
       return;
     }
 
-    var usedAnnotation = [if (apps.isNotEmpty) '@app', if (islands.isNotEmpty) '@island'].join(' or ');
-
     if (annotated.length > 1) {
-      log.warning("Cannot have multiple components annotated with $usedAnnotation in a single library.");
+      log.warning("Cannot have multiple components annotated with @client in a single library.");
     }
 
     var part = '${path.url.basenameWithoutExtension(buildStep.inputId.path)}.g.dart';
@@ -73,13 +70,12 @@ class AppsBuilder implements Builder {
     var element = annotated.first;
 
     if (element is! ClassElement) {
-      log.warning('$usedAnnotation can only be applied on classes. Failing element: ${element.name}');
+      log.warning('@client can only be applied on classes. Failing element: ${element.name}');
       return;
     }
 
     if (!componentChecker.isAssignableFrom(element)) {
-      log.warning(
-          '$usedAnnotation can only be applied on classes extending Component. Failing element: ${element.name}');
+      log.warning('@client can only be applied on classes extending Component. Failing element: ${element.name}');
       return;
     }
 
@@ -96,8 +92,7 @@ class AppsBuilder implements Builder {
 
     var uri = (await buildStep.inputLibrary).source.uri;
 
-    var isApp = appChecker.hasAnnotationOfExact(element);
-    var isIsland = islandChecker.hasAnnotationOfExact(element);
+    var isApp = clientChecker.hasAnnotationOfExact(element);
 
     var partId = buildStep.inputId.changeExtension('.g.dart');
     var partSource = DartFormatter(pageWidth: 120).format('''
@@ -109,7 +104,7 @@ class AppsBuilder implements Builder {
         @override
         ComponentEntry<${element.name}> get entry {
           ${params.isNotEmpty ? 'var self = this as ${element.name};' : ''}
-          return ComponentEntry.${isApp ? isIsland ? 'appAndIsland' : 'app' : 'island'}(
+          return ComponentEntry.client(
             '${path.url.relative(path.url.withoutExtension(buildStep.inputId.path), from: 'lib')}'
             ${params.isNotEmpty ? ', params: {${params.map((p) => "'${p.name}': self.${p.name}").join(', ')}},' : ''}
           );
@@ -119,11 +114,8 @@ class AppsBuilder implements Builder {
 
     await buildStep.writeAsString(partId, partSource);
 
-    var webId = AssetId(
-        buildStep.inputId.package,
-        buildStep.inputId.path
-            .replaceFirst('lib/', 'web/')
-            .replaceFirst('.dart', '.${islands.isNotEmpty ? 'island' : 'app'}.dart'));
+    var webId = AssetId(buildStep.inputId.package,
+        buildStep.inputId.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.client.dart'));
     var webSource = DartFormatter(pageWidth: 120).format('''
       $generationHeader
       

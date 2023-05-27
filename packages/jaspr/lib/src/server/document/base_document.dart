@@ -1,7 +1,7 @@
-part of document;
+part of 'document.dart';
 
-abstract class _ManualDocument extends Document {
-  const _ManualDocument({
+class _BaseDocument extends Document {
+  const _BaseDocument({
     this.title,
     this.base,
     this.charset = 'utf-8',
@@ -24,7 +24,7 @@ abstract class _ManualDocument extends Document {
   final Component body;
 
   @override
-  State<Document> createState() => _ManualDocumentState();
+  State<Document> createState() => _BaseDocumentState();
 
   @override
   Element createElement() => _DocumentElement(this);
@@ -43,9 +43,45 @@ class _DocumentElement extends StatefulElement {
   }
 }
 
-class _ManualDocumentState extends State<_ManualDocument> {
+class _BaseDocumentState extends State<_BaseDocument> {
+  final Map<Element, ComponentEntry> _registryElements = {};
+
+  void registerElement(Element element) {
+    if (element.component is ComponentEntryMixin) {
+      var entry = (element.component as ComponentEntryMixin).entry;
+      _registryElements[element] = entry;
+    }
+  }
+
+  Map<String, dynamic> _getExtendedConfig() {
+    return {
+      'comp': [
+        for (var e in _registryElements.entries)
+          {
+            'id': getIdFor(e.key),
+            'name': e.value.name,
+            if (e.value.params != null) 'params': kDebugMode ? e.value.params : stateCodec.encode(e.value.params),
+          }
+      ]
+    };
+  }
+
+  String? get scriptName {
+    var comps = _registryElements.entries.toList();
+
+    if (comps.isEmpty) {
+      return null;
+    }
+
+    if (comps.length == 1) {
+      return '${comps.first.value.name}.client';
+    }
+
+    return 'main.clients';
+  }
+
   RenderElement? _script;
-  RenderElement? _dataScript;
+  RenderElement? _data;
 
   String? get _normalizedBase {
     var base = component.base;
@@ -54,8 +90,6 @@ class _ManualDocumentState extends State<_ManualDocument> {
     if (!base.endsWith('/')) base = '$base/';
     return base;
   }
-
-  void onElementRegistered(Element element, ComponentEntry entry) {}
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -80,21 +114,20 @@ class _ManualDocumentState extends State<_ManualDocument> {
             ...component.head,
             FindChildNode(
               onNodeRendered: (element) {
-                _dataScript = element;
+                _data = element;
               },
               child: DomComponent(tag: 'script', child: Text('', rawHtml: true)),
             ),
-            if (component.scriptName != null)
-              FindChildNode(
-                onNodeRendered: (element) {
-                  _script = element;
-                },
-                child: DomComponent(tag: 'script', attributes: {'defer': '', 'src': '${component.scriptName}.dart.js'}),
-              ),
+            FindChildNode(
+              onNodeRendered: (element) {
+                _script = element;
+              },
+              child: DomComponent(tag: 'script', attributes: {'defer': '', 'src': '${component.scriptName}.dart.js'}),
+            ),
           ],
         ),
         ComponentObserver(
-          onElementRegistered: onElementRegistered,
+          registerElement: registerElement,
           child: DomComponent(
             tag: 'body',
             child: component.body,
@@ -106,15 +139,13 @@ class _ManualDocumentState extends State<_ManualDocument> {
 
   @mustCallSuper
   void _prepareRender(Map<String, dynamic> syncState) {
+    _setScript(scriptName);
     var jasprConfig = {
       if (syncState.isNotEmpty) 'sync': kDebugMode ? syncState : stateCodec.encode(syncState),
       ..._getExtendedConfig(),
     };
-    _setState('window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert(jasprConfig)};');
+    _setData('window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert(jasprConfig)};');
   }
-
-  @protected
-  Map<String, dynamic> _getExtendedConfig() => {};
 
   void _setScript(String? name) {
     if (_script != null) {
@@ -126,43 +157,49 @@ class _ManualDocumentState extends State<_ManualDocument> {
     }
   }
 
-  void _setState(String? source) {
-    if (_dataScript != null) {
+  void _setData(String? source) {
+    if (_data != null) {
       if (source == null) {
-        _dataScript!.renderer.removeChild(_dataScript!.parentNode!, _dataScript!);
+        _data!.renderer.removeChild(_data!.parentNode!, _data!);
       } else {
-        _dataScript!.data.children.first.data.text = source;
+        _data!.data.children.first.data.text = source;
       }
     }
   }
-}
 
-class ComponentObserver extends ObserverComponent {
-  ComponentObserver({required this.onElementRegistered, required super.child});
-
-  final void Function(Element, ComponentEntry) onElementRegistered;
-
-  @override
-  ObserverElement createElement() => ComponentObserverElement(this);
-}
-
-class ComponentObserverElement extends ObserverElement {
-  ComponentObserverElement(super.component);
-
-  @override
-  ComponentObserver get component => super.component as ComponentObserver;
-
-  @override
-  void willRebuildElement(Element element) {}
-
-  @override
-  void didRebuildElement(Element element) {
-    var entry = (binding as DocumentBinding)._registerElement(element);
-    if (entry != null) {
-      component.onElementRegistered(element, entry);
+  String getIdFor(Element element) {
+    var container = element.parentNode;
+    if (container == null) {
+      return 'body';
     }
-  }
 
-  @override
-  void didUnmountElement(Element element) {}
+    String selector;
+
+    if (container.data.tag == 'body') {
+      selector = 'body';
+    } else if (container.data.id != null) {
+      selector = '#${container.data.id}';
+    } else {
+      var id = _randomId();
+      container.data.id = id;
+      selector = '#$id';
+    }
+
+    Element? prevElem = element.prevAncestorSibling;
+    while (prevElem != null && prevElem.lastNode == null) {
+      prevElem = prevElem.prevAncestorSibling;
+    }
+
+    var firstChild = prevElem?.lastNode;
+    var lastChild = element.lastNode;
+
+    var firstIndex = (firstChild != null ? container.data.children.indexOf(firstChild) : -1) + 1;
+    var lastIndex = (lastChild != null ? container.data.children.indexOf(lastChild) : -1) + 1;
+
+    if (firstIndex > lastIndex) {
+      lastIndex = firstIndex;
+    }
+
+    return '$selector($firstIndex:$lastIndex)';
+  }
 }

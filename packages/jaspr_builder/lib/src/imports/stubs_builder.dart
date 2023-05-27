@@ -16,7 +16,7 @@ class ImportsStubsBuilder implements Builder {
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     var imports = buildStep.findAssets(Glob('**/*.imports.json'));
-
+   
     var webImports = <String, Set<String>>{};
     var vmImports = <String, Set<String>>{};
 
