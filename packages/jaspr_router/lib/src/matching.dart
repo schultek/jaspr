@@ -123,32 +123,6 @@ class RouteMatchList {
   /// Returns true if there are matches.
   bool get isNotEmpty => _matches.isNotEmpty;
 
-  /// Pushes a match onto the list of matches.
-  void push(RouteMatch match) {
-    _matches.add(match);
-  }
-
-  /// Removes the match from the list.
-  void remove(RouteMatch match) {
-    final int index = _matches.indexOf(match);
-    assert(index != -1);
-    _matches.removeRange(index, _matches.length);
-
-    // Also pop ShellRoutes when there are no subsequent route matches
-    while (_matches.isNotEmpty && _matches.last.route is ShellRoute) {
-      _matches.removeLast();
-    }
-
-    final String fullPath = _generateFullPath(_matches);
-    // Need to remove path parameters that are no longer in the fullPath.
-    final List<String> newParameters = <String>[];
-    patternToRegExp(fullPath, newParameters);
-    final Set<String> validParameters = newParameters.toSet();
-    pathParameters.removeWhere((String key, String value) => !validParameters.contains(key));
-
-    _uri = _uri.replace(path: patternToPath(fullPath, pathParameters));
-  }
-
   /// An optional object provided by the app during navigation.
   Object? get extra => _matches.isEmpty ? null : _matches.last.extra;
 

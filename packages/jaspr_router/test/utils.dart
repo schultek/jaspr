@@ -65,21 +65,21 @@ Route route(String path, [List<RouteBase> routes = const [], String? name, Route
       path: path,
       name: name,
       redirect: redirect,
-      builder: (_, __) => Page(path: path),
+      builder: (_, s) => Page(path: s.subloc),
       routes: routes,
     );
 Route lazyRoute(String path, Future future, [List<RouteBase> routes = const []]) => Route.lazy(
       path: path,
-      builder: (_, __) => Page(path: path),
+      builder: (_, s) => Page(path: s.subloc),
       load: () => future,
       routes: routes,
     );
-ShellRoute shellRoute(String name, [List<RouteBase> routes = const []]) => ShellRoute(
-      builder: (_, __, c) => Page(path: name, child: c),
+ShellRoute shellRoute(String name, List<RouteBase> routes) => ShellRoute(
+      builder: (_, s, c) => Page(path: name, child: c),
       routes: routes,
     );
-ShellRoute lazyShellRoute(String name, Future future, [List<RouteBase> routes = const []]) => ShellRoute.lazy(
-      builder: (_, __, c) => Page(path: name, child: c),
+ShellRoute lazyShellRoute(String name, Future future, List<RouteBase> routes) => ShellRoute.lazy(
+      builder: (_, s, c) => Page(path: name, child: c),
       load: () => future,
       routes: routes,
     );
@@ -94,6 +94,12 @@ class Page extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     var label = path.startsWith('/') ? path.substring(1) : path;
     yield span([text(label)]);
+
+    var state = RouteState.of(context);
+    if (state.params.isNotEmpty) {
+      yield span([text(state.params.entries.map((e) => '${e.key}=${e.value}').join(','))]);
+    }
+
     if (child != null) {
       yield div([child!]);
     }

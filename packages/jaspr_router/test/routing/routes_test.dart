@@ -75,14 +75,14 @@ void main() {
 
       expect(find.text('a'), findsOneComponent);
       expect(find.text('b'), findsNothing);
-      expect(find.text('c'), findsNothing);
+      expect(find.text('a/c'), findsNothing);
 
       await tester.router.push('/a/c');
       await pumpEventQueue();
 
       expect(find.text('a'), findsNothing);
       expect(find.text('b'), findsOneComponent);
-      expect(find.text('c'), findsOneComponent);
+      expect(find.text('a/c'), findsOneComponent);
     });
   });
 }

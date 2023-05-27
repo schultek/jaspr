@@ -59,12 +59,14 @@ void main() {
       await tester.router.push('/c');
       await pumpEventQueue();
 
+      expect(find.text('a'), findsNothing);
       expect(find.text('b'), findsNothing);
       expect(find.text('c'), findsNothing);
 
       bCompleter.complete();
       await pumpEventQueue();
 
+      expect(find.text('a'), findsNothing);
       expect(find.text('b'), findsOneComponent);
       expect(find.text('c'), findsOneComponent);
     });

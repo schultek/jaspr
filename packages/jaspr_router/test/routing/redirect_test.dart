@@ -9,7 +9,7 @@ void main() {
       mockHistory();
     });
 
-    testComponents('should redirect globally', (tester) async {
+    testComponents('should redirect toplevel', (tester) async {
       await tester.pumpComponent(Router(
         routes: [
           homeRoute(),
