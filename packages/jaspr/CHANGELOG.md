@@ -1,9 +1,23 @@
 ## Unreleased breaking
 
+- **BREAKING** Added `@client` as replacement for both `@app` and `@island`.
+
+  Components annotated with `@client` act as entry points for the client application and are
+  automatically detected, compiled and shipped to the client when using the `Document()` component.
+
+  This combines the behaviour of the now removed `@app` and `@island` annotations, as well as the
+  removed `Document.app()` and `Document.islands()` constructors. Use the default `Document()` constructor instead.
+ 
 - **BREAKING** Removed `DeferRenderMixin` as async first builds are no longer permitted on clients.
-- **BREAKING** Removed `@app` and `@island` annotations in favor of `@client`.
-- **BREAKING** Removed `Document.app()` and `Document.islands()` constructors. Use the default constructor instead.
-- Added support for flutter element embedding.
+
+- Added support for **Flutter element embedding**.
+
+  Flutter apps can now easily be embedded within jaspr sites. The cli supports the `--flutter` argument for both
+  the `serve` and `build` commands to specify the entrypoint of the flutter application.
+
+  The complete setup is demonstrated in the [flutter_embedding](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding) 
+  example.
+
 - Fixed handling of initial uri.
 - Added `SynchronousFuture`.
 
