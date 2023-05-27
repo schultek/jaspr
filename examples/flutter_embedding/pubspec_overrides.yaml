@@ -1,9 +1,0 @@
-# melos_managed_dependency_overrides: jaspr
-dependency_overrides:
-  jaspr:
-    path: ../../packages/jaspr
-  jaspr_builder:
-    path: ../../packages/jaspr_builder
-  jaspr_riverpod:
-    path: ../../packages/jaspr_riverpod
-  vm_service: 10.1.2
