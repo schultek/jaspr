@@ -2,11 +2,11 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/browser.dart';
-import 'components/content.island.dart' deferred as i0;
+import 'app.client.dart' deferred as i0;
 
 void main() {
-  runIslandsDeferred({
-    'components/content': loadIsland(
+  registerClients({
+    'app': loadClient(
       i0.loadLibrary,
       (p) => i0.getComponentForParams(p),
     ),
