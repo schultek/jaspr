@@ -8,6 +8,7 @@ import 'package:build_daemon/data/build_target.dart';
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart' as ll;
 import 'package:mason/mason.dart';
+import 'package:path/path.dart' as p;
 import 'package:webdev/src/daemon_client.dart' as d;
 import 'package:webdev/src/logging.dart' as l;
 
@@ -37,6 +38,10 @@ class BuildCommand extends BaseCommand {
       },
       defaultsTo: 'exe',
     );
+    argParser.addOption(
+      'flutter',
+      help: 'Build an embedded flutter app from the specified entrypoint.',
+    );
   }
 
   @override
@@ -49,16 +54,37 @@ class BuildCommand extends BaseCommand {
   Future<int> run() async {
     await super.run();
 
+    var dir = Directory('build');
+    if (!await dir.exists()) {
+      await dir.create();
+    }
+
     var useSSR = argResults!['ssr'] as bool;
+    var flutter = argResults!['flutter'] as String?;
 
     if (useSSR) {
-      var dir = Directory('build');
-      if (!await dir.exists()) {
-        await dir.create();
+      var webDir = Directory('build/web');
+      if (!await webDir.exists()) {
+        await webDir.create();
       }
     }
 
+    var indexHtml = File('web/index.html');
+    var targetIndexHtml = File('build/web/index.html');
+
+    var dummyIndex = false;
+    if (flutter != null && !await indexHtml.exists()) {
+      dummyIndex = true;
+      await indexHtml.create();
+    }
+
     var webResult = _buildWeb(true, useSSR);
+    var flutterResult = Future<void>.value();
+
+    if (flutter != null) {
+      flutterResult = _buildFlutter(flutter);
+    }
+
     if (useSSR) {
       String? entryPoint = await getEntryPoint(argResults!['input']);
 
@@ -69,6 +95,8 @@ class BuildCommand extends BaseCommand {
 
       logger.info('Building server app...');
 
+      await webResult;
+
       var process = await Process.start(
         'dart',
         ['compile', argResults!['target'], entryPoint, '-o', './build/app', '-Djaspr.flags.release=true'],
@@ -77,7 +105,17 @@ class BuildCommand extends BaseCommand {
       await watchProcess(process);
     }
 
-    await webResult;
+    await Future.wait([
+      webResult,
+      flutterResult,
+    ]);
+
+    if (dummyIndex) {
+      await indexHtml.delete();
+      if (await targetIndexHtml.exists()) {
+        await targetIndexHtml.delete();
+      }
+    }
 
     logger.success('Completed building project to /build.');
     return ExitCode.success.code;
@@ -149,5 +187,46 @@ class BuildCommand extends BaseCommand {
       logger.info('Completed building web assets.');
     }
     return exitCode;
+  }
+
+  Future<void> _buildFlutter(String flutter) async {
+    var flutterProcess = await Process.start(
+      'flutter',
+      ['build', 'web', '-t', flutter, '--output=build/flutter'],
+    );
+
+    var moveTargets = [
+      'version.json',
+      'main.dart.js',
+      'flutter_service_worker.js',
+      'flutter.js',
+      'canvaskit/',
+    ];
+
+    await watchProcess(flutterProcess);
+
+    var moves = <Future>[];
+    while (moveTargets.isNotEmpty) {
+      var moveTarget = moveTargets.removeAt(0);
+      var file = File('./build/flutter/$moveTarget');
+      var isDir = file.statSync().type == FileSystemEntityType.directory;
+      if (isDir) {
+        await Directory('build/web/$moveTarget').create(recursive: true);
+
+        var files = Directory('build/flutter/$moveTarget').list(recursive: true);
+        await for (var file in files) {
+          final path = p.relative(file.path, from: 'build/flutter');
+          if (file is Directory) {
+            moveTargets.add(path);
+          } else {
+            moveTargets.add(path);
+          }
+        }
+      } else {
+        moves.add(file.copy('./build/web/$moveTarget'));
+      }
+    }
+
+    await Future.wait(moves);
   }
 }

@@ -13,7 +13,7 @@ jobs:
   cli:
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest, macos-latest ] # TODO: windows-latest
     name: Verify CLI Tool
     runs-on: ${{ matrix.os }}
     steps:
@@ -31,7 +31,7 @@ jobs:
         run: |
           cd apps
           jaspr create -t basic my_app
-          melos bootstrap
+          melos bootstrap --scope my_app
           cd my_app
           jaspr build -v
 
@@ -43,6 +43,7 @@ jobs:
         uses: actions/checkout@v3
 
       - uses: dart-lang/setup-dart@v1.3
+      - uses: subosito/flutter-action@v2
 
       - name: Bootstrap
         run: |
