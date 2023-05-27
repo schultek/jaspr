@@ -1,5 +1,6 @@
 paths:
   - test/server
+  - test/routing
 
 presets:
   browser:

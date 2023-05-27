@@ -20,19 +20,46 @@ typedef RouteRedirector = FutureOr<RouteMatchList> Function(
 /// Processes redirects by returning a new [RouteMatchList] representing the new
 /// location.
 FutureOr<RouteMatchList> redirect(
-    BuildContext context, RouteMatchList prevMatchListFuture, RouteConfiguration configuration, RouteMatcher matcher,
-    {List<RouteMatchList>? redirectHistory, Object? extra}) {
-  FutureOr<RouteMatchList> processRedirect(RouteMatchList prevMatchList) {
-    final String prevLocation = prevMatchList.uri.toString();
-    FutureOr<RouteMatchList> processTopLevelRedirect(String? topRedirectLocation) {
-      if (topRedirectLocation != null && topRedirectLocation != prevLocation) {
+  BuildContext context,
+  RouteMatchList prevMatchList,
+  RouteConfiguration configuration,
+  RouteMatcher matcher, {
+  List<RouteMatchList>? redirectHistory,
+  Object? extra,
+}) {
+  final String prevLocation = prevMatchList.uri.toString();
+  FutureOr<RouteMatchList> processTopLevelRedirect(String? topRedirectLocation) {
+    if (topRedirectLocation != null && topRedirectLocation != prevLocation) {
+      final RouteMatchList newMatch = _getNewMatches(
+        topRedirectLocation,
+        prevMatchList.uri,
+        configuration,
+        matcher,
+        redirectHistory!,
+      );
+      if (newMatch.isError) {
+        return newMatch;
+      }
+      return redirect(
+        context,
+        newMatch,
+        configuration,
+        matcher,
+        redirectHistory: redirectHistory,
+        extra: extra,
+      );
+    }
+
+    FutureOr<RouteMatchList> processRouteLevelRedirect(String? routeRedirectLocation) {
+      if (routeRedirectLocation != null && routeRedirectLocation != prevLocation) {
         final RouteMatchList newMatch = _getNewMatches(
-          topRedirectLocation,
+          routeRedirectLocation,
           prevMatchList.uri,
           configuration,
           matcher,
           redirectHistory!,
         );
+
         if (newMatch.isError) {
           return newMatch;
         }
@@ -45,63 +72,36 @@ FutureOr<RouteMatchList> redirect(
           extra: extra,
         );
       }
-
-      FutureOr<RouteMatchList> processRouteLevelRedirect(String? routeRedirectLocation) {
-        if (routeRedirectLocation != null && routeRedirectLocation != prevLocation) {
-          final RouteMatchList newMatch = _getNewMatches(
-            routeRedirectLocation,
-            prevMatchList.uri,
-            configuration,
-            matcher,
-            redirectHistory!,
-          );
-
-          if (newMatch.isError) {
-            return newMatch;
-          }
-          return redirect(
-            context,
-            newMatch,
-            configuration,
-            matcher,
-            redirectHistory: redirectHistory,
-            extra: extra,
-          );
-        }
-        return prevMatchList;
-      }
-
-      final FutureOr<String?> routeLevelRedirectResult =
-          _getRouteLevelRedirect(context, configuration, prevMatchList, 0);
-      if (routeLevelRedirectResult is String?) {
-        return processRouteLevelRedirect(routeLevelRedirectResult);
-      }
-      return routeLevelRedirectResult.then<RouteMatchList>(processRouteLevelRedirect);
+      return prevMatchList;
     }
 
-    redirectHistory ??= <RouteMatchList>[prevMatchList];
-    // Check for top-level redirect
-    final FutureOr<String?> topRedirectResult = configuration.topRedirect(
-      context,
-      RouteState(
-        location: prevLocation,
-        name: null,
-        // No name available at the top level trim the query params off the
-        // sub-location to match route.redirect
-        subloc: prevMatchList.uri.path,
-        queryParams: prevMatchList.uri.queryParameters,
-        queryParametersAll: prevMatchList.uri.queryParametersAll,
-        extra: extra,
-      ),
-    );
-
-    if (topRedirectResult is String?) {
-      return processTopLevelRedirect(topRedirectResult);
+    final FutureOr<String?> routeLevelRedirectResult = _getRouteLevelRedirect(context, configuration, prevMatchList, 0);
+    if (routeLevelRedirectResult is String?) {
+      return processRouteLevelRedirect(routeLevelRedirectResult);
     }
-    return topRedirectResult.then<RouteMatchList>(processTopLevelRedirect);
+    return routeLevelRedirectResult.then<RouteMatchList>(processRouteLevelRedirect);
   }
 
-  return processRedirect(prevMatchListFuture);
+  redirectHistory ??= <RouteMatchList>[prevMatchList];
+  // Check for top-level redirect
+  final FutureOr<String?> topRedirectResult = configuration.topRedirect(
+    context,
+    RouteState(
+      location: prevLocation,
+      name: null,
+      // No name available at the top level trim the query params off the
+      // sub-location to match route.redirect
+      subloc: prevMatchList.uri.path,
+      queryParams: prevMatchList.uri.queryParameters,
+      queryParametersAll: prevMatchList.uri.queryParametersAll,
+      extra: extra,
+    ),
+  );
+
+  if (topRedirectResult is String?) {
+    return processTopLevelRedirect(topRedirectResult);
+  }
+  return topRedirectResult.then<RouteMatchList>(processTopLevelRedirect);
 }
 
 FutureOr<String?> _getRouteLevelRedirect(
