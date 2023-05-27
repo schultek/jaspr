@@ -47,7 +47,7 @@ jobs:
       - name: Bootstrap
         run: |
           dart pub global activate melos
-          melos bootstrap
+          melos bootstrap --no-private
 
       - name: Check formatting
         run: melos format -- --set-exit-if-changed
