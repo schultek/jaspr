@@ -31,7 +31,7 @@ jobs:
         run: |
           cd apps
           jaspr create -t basic my_app
-          melos bootstrap
+          melos bootstrap --scope my_app
           cd my_app
           jaspr build -v
 
