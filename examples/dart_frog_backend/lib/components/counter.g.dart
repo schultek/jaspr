@@ -6,6 +6,6 @@ part of 'counter.dart';
 mixin _$Counter implements ComponentEntryMixin<Counter> {
   @override
   ComponentEntry<Counter> get entry {
-    return ComponentEntry.app('components/counter');
+    return ComponentEntry.client('components/counter');
   }
 }

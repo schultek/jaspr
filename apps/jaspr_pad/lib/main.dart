@@ -1,4 +1,4 @@
-@MappableLib(createCombinedContainer: true, discoveryMode: DiscoveryMode.package)
+@MappableLib(generateInitializerForScope: InitializerScope.package)
 library main;
 
 import 'dart:async';
@@ -9,7 +9,7 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 import 'components/playground/playground.dart';
-import 'main.container.dart';
+import 'main.init.dart';
 import 'providers/samples_provider.dart';
 import 'server/analyzer.dart';
 import 'server/compiler.dart';
@@ -33,6 +33,7 @@ void main() {
 }
 
 Handler get apiRouter {
+  initializeMappers();
   var router = Router();
 
   var compiler = Compiler();
@@ -52,7 +53,7 @@ Handler get apiRouter {
 Handler mappedHandler<R, T>(FutureOr<R> Function(T request) handler) {
   return (Request request) async {
     var body = await request.readAsString();
-    var result = await handler(mainContainer.fromJson(body));
-    return Response.ok(mainContainer.toJson(result), headers: {'Content-Type': 'application/json'});
+    var result = await handler(MapperContainer.globals.fromJson(body));
+    return Response.ok(MapperContainer.globals.toJson(result), headers: {'Content-Type': 'application/json'});
   };
 }

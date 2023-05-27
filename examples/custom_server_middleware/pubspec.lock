@@ -77,18 +77,18 @@ packages:
     dependency: transitive
     description:
       name: build_daemon
-      sha256: "6bc5544ea6ce4428266e7ea680e945c68806c4aae2da0eb5e9ccf38df8d6acbf"
+      sha256: "5f02d73eb2ba16483e693f80bee4f088563a820e47d1027d4cdfe62b5bb43e65"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "4.0.0"
   build_modules:
     dependency: transitive
     description:
       name: build_modules
-      sha256: d02a5b40720692c8c4c385741afb1cc50b53f192a33fa5da1f2bdaec3ec6db3e
+      sha256: "017226b2fd3eef4e5f31839c930efad33110cdfe71b6255c7dca298b38dba61c"
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.7"
+    version: "5.0.2"
   build_resolvers:
     dependency: transitive
     description:
@@ -101,10 +101,10 @@ packages:
     dependency: "direct dev"
     description:
       name: build_runner
-      sha256: b0a8a7b8a76c493e85f1b84bffa0588859a06197863dba8c9036b15581fd9727
+      sha256: "220ae4553e50d7c21a17c051afc7b183d28a24a420502e842f303f8e4e6edced"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.3"
+    version: "2.4.4"
   build_runner_core:
     dependency: transitive
     description:
@@ -117,10 +117,10 @@ packages:
     dependency: "direct dev"
     description:
       name: build_web_compilers
-      sha256: ee45348ba9c2dfd2e165c0adf69311970fa620c6669c345ab533e16d0d119e3d
+      sha256: e614f5e1317fe9b2574429e3e651951a1c38943416c047e02815a7d6ade264c9
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.7"
+    version: "4.0.3"
   built_collection:
     dependency: transitive
     description:
@@ -287,7 +287,7 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.3.0"
+    version: "0.4.0"
   js:
     dependency: transitive
     description:
@@ -308,10 +308,10 @@ packages:
     dependency: "direct dev"
     description:
       name: lints
-      sha256: a2c3d198cb5ea2e179926622d433331d8b58374ab8f29cdda6e863bd62fd369c
+      sha256: "6b0206b0bf4f04961fc5438198ccb3a885685cd67d4d4a32cc20ad7f8adbe015"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "2.1.0"
   logging:
     dependency: transitive
     description:
@@ -553,4 +553,4 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=3.0.0 <4.0.0"
+  dart: ">=3.0.0 <3.2.0"

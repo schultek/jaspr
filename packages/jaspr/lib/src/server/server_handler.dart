@@ -9,7 +9,7 @@ import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
 import '../../server.dart';
-import 'server_renderer.dart';
+import 'render_functions.dart';
 
 final String kDevProxy =
     String.fromEnvironment('jaspr.dev.proxy', defaultValue: Platform.environment['jaspr_dev_proxy'] ?? '');
@@ -201,14 +201,19 @@ Handler createHandler(SetupHandler handle, {List<Middleware> middleware = const 
       /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
       var isDataMode = request.headers['jaspr-mode'] == 'data-only';
 
+      var requestUri = request.url.normalizePath();
+      if (!requestUri.path.startsWith('/')) {
+        requestUri = requestUri.replace(path: '/${requestUri.path}');
+      }
+
       if (isDataMode) {
         return Response.ok(
-          await renderData(setup, request.url),
+          await renderData(setup, requestUri),
           headers: {'Content-Type': 'application/json'},
         );
       } else {
         return Response.ok(
-          await renderHtml(setup, request.url, (name) async {
+          await renderHtml(setup, requestUri, (name) async {
             var response = await fileLoader(request, name);
             return response.readAsString();
           }),

@@ -1,18 +1,18 @@
 part of framework;
 
-final _queryReg = RegExp(r'^(.*?)(?:\((\d+):(\d+)\))?$');
-
 /// Main app binding, controls the root component and global state
 mixin ComponentsBinding on AppBinding {
   /// Sets [app] as the new root of the component tree and performs an initial build
-  Future<void> attachRootComponent(Component app, {required String attachTo}) async {
+  Future<void> attachRootComponent(Component app) async {
     var buildOwner = _rootElement?._owner ?? BuildOwner();
-    await buildOwner.lockState(() async {
+    await buildOwner.lockState(() {
+      assert(() {
+        buildOwner._debugBuilding = true;
+        return true;
+      }());
       buildOwner._isFirstBuild = true;
 
-      var attachMatch = _queryReg.firstMatch(attachTo)!;
-      var renderer = attachRenderer(attachMatch.group(1)!,
-          from: int.tryParse(attachMatch.group(2) ?? ''), to: int.tryParse(attachMatch.group(3) ?? ''));
+      var renderer = createRenderer();
 
       var element = _Root(child: app).createElement();
       element._binding = this;
@@ -21,19 +21,28 @@ mixin ComponentsBinding on AppBinding {
 
       element.mount(null, null);
 
-      if (element._asyncFirstBuild != null) {
-        await element._asyncFirstBuild;
+      end() {
+        _rootElement = element;
+        buildOwner._isFirstBuild = false;
+        assert(() {
+          buildOwner._debugBuilding = false;
+          return true;
+        }());
+
+        didAttachRootElement(element);
       }
 
-      _rootElement = element;
-      buildOwner._isFirstBuild = false;
+      if (element._asyncFirstBuild != null) {
+        assert(!isClient);
+        return element._asyncFirstBuild!.then((_) => end());
+      }
 
-      didAttachRootElement(element, to: attachTo);
+      end();
     });
   }
 
   @protected
-  void didAttachRootElement(Element element, {required String to}) {}
+  void didAttachRootElement(Element element) {}
 
   /// The [Element] that is at the root of the hierarchy.
   ///
@@ -42,7 +51,7 @@ mixin ComponentsBinding on AppBinding {
   RenderElement? get rootElement => _rootElement;
   RenderElement? _rootElement;
 
-  Renderer attachRenderer(String target, {int? from, int? to});
+  Renderer createRenderer();
 
   static final Map<GlobalKey, Element> _globalKeyRegistry = {};
 

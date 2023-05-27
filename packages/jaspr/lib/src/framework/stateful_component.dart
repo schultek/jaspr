@@ -624,20 +624,13 @@ class StatefulElement extends MultiChildElement {
 
     Future? asyncFirstBuild;
 
-    if (owner.isFirstBuild) {
-      if (state is DeferRenderMixin && binding.isClient) {
-        asyncFirstBuild = (state as DeferRenderMixin).beforeFirstRender();
-      }
-      if (state is PreloadStateMixin && !binding.isClient) {
-        asyncFirstBuild = (state as PreloadStateMixin).preloadState();
-      }
+    if (owner.isFirstBuild && state is PreloadStateMixin && !binding.isClient) {
+      asyncFirstBuild = (state as PreloadStateMixin).preloadState();
     }
 
     if (asyncFirstBuild != null) {
-      _asyncFirstBuild = asyncFirstBuild.then((_) {
-        _initState();
-        _asyncFirstBuild = null;
-      });
+      _asyncFirstBuild = asyncFirstBuild.then((_) => _initState());
+      asyncFirstBuild.whenComplete(() => _asyncFirstBuild = null);
     } else {
       _initState();
     }

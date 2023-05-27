@@ -2,7 +2,7 @@ import 'package:jaspr/html.dart';
 
 part 'hello.g.dart';
 
-@app
+@client
 class Hello extends StatelessComponent with _$Hello {
   Hello({required this.name, super.key});
 
