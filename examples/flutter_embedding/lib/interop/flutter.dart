@@ -3,6 +3,7 @@ library flutter_interop;
 
 import 'dart:html';
 
+import 'package:jaspr/browser.dart' show kDebugMode;
 import 'package:js/js.dart';
 
 /// Starts a flutter app and attaches it to the [attachTo] dom element.
@@ -21,15 +22,17 @@ void runFlutterApp({required String attachTo}) {
     }),
   ));
 
-  // This promise will resolve once the 'main.dart.js' file is fetched, but before the
-  // [onEntrypointLoaded] callback is called.
-  promise.then(allowInterop((_) {
-    // Normally this module would be set as 'data-main' for require.js by 'main.dart.js' and
-    // loaded automatically, however since the script is already loaded for 'main_jaspr.dart.js'
-    // this has no effect and we have to require this module manually.
-    require(['main_module.bootstrap']);
-    // By requiring this, flutter will continue to initialize and eventually call [onEntrypointLoaded].
-  }));
+  if (kDebugMode) {
+    // This promise will resolve once the 'main.dart.js' file is fetched, but before the
+    // [onEntrypointLoaded] callback is called.
+    promise.then(allowInterop((_) {
+      // Normally this module would be set as 'data-main' for require.js by 'main.dart.js' and
+      // loaded automatically, however since the script is already loaded for 'main_jaspr.dart.js'
+      // this has no effect and we have to require this module manually.
+      require(['main_module.bootstrap']);
+      // By requiring this, flutter will continue to initialize and eventually call [onEntrypointLoaded].
+    }));
+  }
 }
 
 /// Handle to the [require()] function from RequireJS

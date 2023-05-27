@@ -70,7 +70,7 @@ class _BaseDocumentState extends State<_BaseDocument> {
     var comps = _registryElements.entries.toList();
 
     if (comps.isEmpty) {
-      return null;
+      return component.scriptName;
     }
 
     if (comps.length == 1) {
@@ -122,7 +122,7 @@ class _BaseDocumentState extends State<_BaseDocument> {
               onNodeRendered: (element) {
                 _script = element;
               },
-              child: DomComponent(tag: 'script', attributes: {'defer': '', 'src': '${component.scriptName}.dart.js'}),
+              child: DomComponent(tag: 'script', attributes: {'defer': ''}),
             ),
           ],
         ),
