@@ -11,7 +11,6 @@ class AppState {
 }
 
 class AppStateNotifierImpl extends Notifier<a.AppState> implements a.AppStateNotifier {
-
   @override
   a.AppState build() => a.AppState();
 

@@ -7,12 +7,9 @@ library app_state;
 
 import 'package:riverpod/riverpod.dart';
 
-import 'app_state_impl.dart'
-  if (dart.library.io) 'app_state_stub.dart';
+import 'app_state_impl.dart' if (dart.library.io) 'app_state_stub.dart';
 
-export 'app_state_impl.dart'
-  if (dart.library.io) 'app_state_stub.dart'
-  show AppState;
+export 'app_state_impl.dart' if (dart.library.io) 'app_state_stub.dart' show AppState;
 
 enum DemoScreen { counter, textField, custom }
 

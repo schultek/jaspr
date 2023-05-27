@@ -23,7 +23,6 @@ class AppState {
 
 /// See the [InteropNotifier] (where the magic happens).
 class AppStateNotifierImpl extends InteropNotifier<AppState> implements AppStateNotifier {
-
   @override
   AppState buildState() {
     return AppState(count: 0, screen: DemoScreen.counter.name);
