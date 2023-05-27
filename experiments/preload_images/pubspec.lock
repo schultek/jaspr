@@ -193,14 +193,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.4"
-  domino:
-    dependency: "direct main"
-    description:
-      name: domino
-      sha256: "769365c06002c7af379f01902e976bd612391e1963792d44694a35a90fc66a2c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.8.3"
   file:
     dependency: transitive
     description:
@@ -261,10 +253,10 @@ packages:
     dependency: "direct main"
     description:
       name: http
-      sha256: "6aa2946395183537c8b880962d935877325d6a09a2867c3970c05c0fed6ac482"
+      sha256: "4c3f04bfb64d3efd508d06b41b825542f08122d30bda4933fb95c069d22a4fa3"
       url: "https://pub.dev"
     source: hosted
-    version: "0.13.5"
+    version: "1.0.0"
   http_multi_server:
     dependency: transitive
     description:
@@ -323,10 +315,10 @@ packages:
     dependency: "direct dev"
     description:
       name: lints
-      sha256: a2c3d198cb5ea2e179926622d433331d8b58374ab8f29cdda6e863bd62fd369c
+      sha256: "6b0206b0bf4f04961fc5438198ccb3a885685cd67d4d4a32cc20ad7f8adbe015"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "2.1.0"
   logging:
     dependency: transitive
     description:
@@ -443,10 +435,10 @@ packages:
     dependency: transitive
     description:
       name: shelf_proxy
-      sha256: "3cdbff721092c755927d8695f696e13cff4b3ceb43306de136e69c38d5f574b8"
+      sha256: a71d2307f4393211930c590c3d2c00630f6c5a7a77edc1ef6436dfd85a6a7ee3
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.2"
+    version: "1.0.4"
   shelf_static:
     dependency: transitive
     description:

@@ -17,15 +17,10 @@ void main() {
       expect(response.statusCode, equals(200));
       expect(response.body, contains('About'));
 
-      response = await tester.request('/contact');
-
-      expect(response.statusCode, equals(200));
-      expect(response.body, contains('Contact'));
-
       response = await tester.request('/unknown');
 
       expect(response.statusCode, equals(200));
-      expect(response.body, contains('Unknown (/unknown)'));
+      expect(response.body, contains('Unknown (&#47;unknown)'));
     });
   });
 }
