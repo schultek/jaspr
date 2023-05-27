@@ -49,7 +49,7 @@ class RouteMatcher {
 /// This corresponds to the GoRouter's history.
 class RouteMatchList {
   /// RouteMatchList constructor.
-  RouteMatchList(List<RouteMatch> matches, this._uri, this.pathParameters)
+  RouteMatchList(List<RouteMatch> matches, this.uri, this.pathParameters)
       : _matches = matches,
         fullpath = _generateFullPath(matches);
 
@@ -114,8 +114,7 @@ class RouteMatchList {
   final Map<String, String> pathParameters;
 
   /// The uri of the current match.
-  Uri get uri => _uri;
-  Uri _uri;
+  final Uri uri;
 
   /// Returns true if there are no matches.
   bool get isEmpty => _matches.isEmpty;
