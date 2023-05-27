@@ -135,7 +135,6 @@ class ServeCommand extends BaseCommand {
 
   Future<DevWorkflow> _runWebdev(bool release, bool debug, String mode, String port) {
     var configuration = Configuration(
-      debug: debug,
       reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
       release: release,
     );

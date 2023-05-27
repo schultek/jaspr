@@ -43,7 +43,7 @@ class ComponentTester {
   final TestComponentsBinding binding;
 
   Future<void> pumpComponent(Component component) {
-    return binding.attachRootComponent(component, attachTo: 'body');
+    return binding.attachRootComponent(component);
   }
 
   /// Simulates a 'click' event on the given element
@@ -113,7 +113,7 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   bool get isClient => _isClient;
 
   @override
-  Renderer attachRenderer(String target, {int? from, int? to}) {
+  Renderer createRenderer() {
     return TestDomRenderer();
   }
 
