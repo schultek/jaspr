@@ -7,7 +7,7 @@ mixin _$Hello implements ComponentEntryMixin<Hello> {
   @override
   ComponentEntry<Hello> get entry {
     var self = this as Hello;
-    return ComponentEntry.app(
+    return ComponentEntry.client(
       'components/hello',
       params: {'name': self.name},
     );

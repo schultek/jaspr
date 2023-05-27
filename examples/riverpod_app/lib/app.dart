@@ -5,7 +5,7 @@ import 'components/counter.dart';
 
 part 'app.g.dart';
 
-@app
+@client
 class App extends StatelessComponent with _$App {
   @override
   Iterable<Component> build(BuildContext context) sync* {

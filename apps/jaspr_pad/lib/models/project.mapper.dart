@@ -5,146 +5,156 @@
 
 part of 'project.dart';
 
-class ProjectDataBaseMapper extends MapperBase<ProjectDataBase> {
-  static MapperContainer? _c;
-  static MapperContainer container = _c ??
-      ((_c = MapperContainer(
-        mappers: {ProjectDataBaseMapper()},
-      ))
-        ..linkAll({
-          TutorialDataMapper.container,
-          TutorialStepMapper.container,
-          ProjectDataMapper.container,
-        }));
+class ProjectDataBaseMapper extends ClassMapperBase<ProjectDataBase> {
+  ProjectDataBaseMapper._();
 
-  @override
-  ProjectDataBaseMapperElement createElement(MapperContainer container) {
-    return ProjectDataBaseMapperElement._(this, container);
+  static ProjectDataBaseMapper? _instance;
+  static ProjectDataBaseMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = ProjectDataBaseMapper._());
+      TutorialDataMapper.ensureInitialized();
+      TutorialStepMapper.ensureInitialized();
+      ProjectDataMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
   }
 
   @override
-  String get id => 'ProjectDataBase';
-
-  static final fromMap = container.fromMap<ProjectDataBase>;
-  static final fromJson = container.fromJson<ProjectDataBase>;
-}
-
-class ProjectDataBaseMapperElement extends MapperElementBase<ProjectDataBase> {
-  ProjectDataBaseMapperElement._(super.mapper, super.container);
+  final String id = 'ProjectDataBase';
 
   @override
-  Function get decoder => decode;
-  ProjectDataBase decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) {
-        switch (map['type']) {
-          case 'ProjectData':
-            return ProjectDataMapper().createElement(container).decode(map);
-          case 'TutorialData':
-            return TutorialDataMapper().createElement(container).decode(map);
-          case 'TutorialStep':
-            return TutorialStepMapper().createElement(container).decode(map);
-          default:
-            return fromMap(map);
-        }
-      });
-  ProjectDataBase fromMap(Map<String, dynamic> map) =>
-      throw MapperException.missingSubclass('ProjectDataBase', 'type', '${map['type']}');
+  final Map<Symbol, Field<ProjectDataBase, dynamic>> fields = const {};
+
+  static ProjectDataBase _instantiate(DecodingData data) {
+    throw MapperException.missingSubclass('ProjectDataBase', 'type', '${data.value['type']}');
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static ProjectDataBase fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<ProjectDataBase>(map));
+  }
+
+  static ProjectDataBase fromJson(String json) {
+    return _guard((c) => c.fromJson<ProjectDataBase>(json));
+  }
 }
 
 mixin ProjectDataBaseMappable {}
 
-class ProjectDataMapper extends MapperBase<ProjectData> {
-  static MapperContainer? _c;
-  static MapperContainer container = _c ??
-      ((_c = MapperContainer(
-        mappers: {ProjectDataMapper()},
-      ))
-        ..linkAll({ProjectDataBaseMapper.container}));
+class ProjectDataMapper extends SubClassMapperBase<ProjectData> {
+  ProjectDataMapper._();
 
-  @override
-  ProjectDataMapperElement createElement(MapperContainer container) {
-    return ProjectDataMapperElement._(this, container);
+  static ProjectDataMapper? _instance;
+  static ProjectDataMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = ProjectDataMapper._());
+      ProjectDataBaseMapper.ensureInitialized().addSubMapper(_instance!);
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
   }
 
   @override
-  String get id => 'ProjectData';
+  final String id = 'ProjectData';
 
-  static final fromMap = container.fromMap<ProjectData>;
-  static final fromJson = container.fromJson<ProjectData>;
-}
-
-class ProjectDataMapperElement extends MapperElementBase<ProjectData> {
-  ProjectDataMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  ProjectData decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  ProjectData fromMap(Map<String, dynamic> map) => ProjectData(
-      id: container.$getOpt(map, 'id'),
-      description: container.$getOpt(map, 'description'),
-      htmlFile: container.$getOpt(map, 'htmlFile'),
-      cssFile: container.$getOpt(map, 'cssFile'),
-      mainDartFile: container.$get(map, 'mainDartFile'),
-      dartFiles: container.$getOpt(map, 'dartFiles') ?? const {});
+  static String? _$id(ProjectData v) => v.id;
+  static const Field<ProjectData, String> _f$id = Field('id', _$id, opt: true);
+  static String? _$description(ProjectData v) => v.description;
+  static const Field<ProjectData, String> _f$description = Field('description', _$description, opt: true);
+  static String? _$htmlFile(ProjectData v) => v.htmlFile;
+  static const Field<ProjectData, String> _f$htmlFile = Field('htmlFile', _$htmlFile, opt: true);
+  static String? _$cssFile(ProjectData v) => v.cssFile;
+  static const Field<ProjectData, String> _f$cssFile = Field('cssFile', _$cssFile, opt: true);
+  static String _$mainDartFile(ProjectData v) => v.mainDartFile;
+  static const Field<ProjectData, String> _f$mainDartFile = Field('mainDartFile', _$mainDartFile);
+  static Map<String, String> _$dartFiles(ProjectData v) => v.dartFiles;
+  static const Field<ProjectData, Map<String, String>> _f$dartFiles =
+      Field('dartFiles', _$dartFiles, opt: true, def: const {});
 
   @override
-  Function get encoder => encode;
-  dynamic encode(ProjectData v) => toMap(v);
-  Map<String, dynamic> toMap(ProjectData p) => {
-        'id': container.$enc(p.id, 'id'),
-        'description': container.$enc(p.description, 'description'),
-        'htmlFile': container.$enc(p.htmlFile, 'htmlFile'),
-        'cssFile': container.$enc(p.cssFile, 'cssFile'),
-        'mainDartFile': container.$enc(p.mainDartFile, 'mainDartFile'),
-        'dartFiles': container.$enc(p.dartFiles, 'dartFiles'),
-        'type': 'ProjectData'
-      };
+  final Map<Symbol, Field<ProjectData, dynamic>> fields = const {
+    #id: _f$id,
+    #description: _f$description,
+    #htmlFile: _f$htmlFile,
+    #cssFile: _f$cssFile,
+    #mainDartFile: _f$mainDartFile,
+    #dartFiles: _f$dartFiles,
+  };
 
   @override
-  String stringify(ProjectData self) =>
-      'ProjectData(id: ${container.asString(self.id)}, description: ${container.asString(self.description)}, htmlFile: ${container.asString(self.htmlFile)}, cssFile: ${container.asString(self.cssFile)}, mainDartFile: ${container.asString(self.mainDartFile)}, dartFiles: ${container.asString(self.dartFiles)})';
+  final String discriminatorKey = 'type';
   @override
-  int hash(ProjectData self) =>
-      container.hash(self.id) ^
-      container.hash(self.description) ^
-      container.hash(self.htmlFile) ^
-      container.hash(self.cssFile) ^
-      container.hash(self.mainDartFile) ^
-      container.hash(self.dartFiles);
+  final dynamic discriminatorValue = 'ProjectData';
   @override
-  bool equals(ProjectData self, ProjectData other) =>
-      container.isEqual(self.id, other.id) &&
-      container.isEqual(self.description, other.description) &&
-      container.isEqual(self.htmlFile, other.htmlFile) &&
-      container.isEqual(self.cssFile, other.cssFile) &&
-      container.isEqual(self.mainDartFile, other.mainDartFile) &&
-      container.isEqual(self.dartFiles, other.dartFiles);
+  late final ClassMapperBase superMapper = ProjectDataBaseMapper.ensureInitialized();
+
+  static ProjectData _instantiate(DecodingData data) {
+    return ProjectData(
+        id: data.dec(_f$id),
+        description: data.dec(_f$description),
+        htmlFile: data.dec(_f$htmlFile),
+        cssFile: data.dec(_f$cssFile),
+        mainDartFile: data.dec(_f$mainDartFile),
+        dartFiles: data.dec(_f$dartFiles));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static ProjectData fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<ProjectData>(map));
+  }
+
+  static ProjectData fromJson(String json) {
+    return _guard((c) => c.fromJson<ProjectData>(json));
+  }
 }
 
 mixin ProjectDataMappable {
-  String toJson() => ProjectDataMapper.container.toJson(this as ProjectData);
-  Map<String, dynamic> toMap() => ProjectDataMapper.container.toMap(this as ProjectData);
+  String toJson() {
+    return ProjectDataMapper._guard((c) => c.toJson(this as ProjectData));
+  }
+
+  Map<String, dynamic> toMap() {
+    return ProjectDataMapper._guard((c) => c.toMap(this as ProjectData));
+  }
+
   ProjectDataCopyWith<ProjectData, ProjectData, ProjectData> get copyWith =>
       _ProjectDataCopyWithImpl(this as ProjectData, $identity, $identity);
   @override
-  String toString() => ProjectDataMapper.container.asString(this);
+  String toString() {
+    return ProjectDataMapper._guard((c) => c.asString(this));
+  }
+
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) || (runtimeType == other.runtimeType && ProjectDataMapper.container.isEqual(this, other));
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && ProjectDataMapper._guard((c) => c.isEqual(this, other)));
+  }
+
   @override
-  int get hashCode => ProjectDataMapper.container.hash(this);
+  int get hashCode {
+    return ProjectDataMapper._guard((c) => c.hash(this));
+  }
 }
 
-extension ProjectDataValueCopy<$R, $Out extends ProjectDataBase> on ObjectCopyWith<$R, ProjectData, $Out> {
-  ProjectDataCopyWith<$R, ProjectData, $Out> get asProjectData =>
-      base.as((v, t, t2) => _ProjectDataCopyWithImpl(v, t, t2));
+extension ProjectDataValueCopy<$R, $Out> on ObjectCopyWith<$R, ProjectData, $Out> {
+  ProjectDataCopyWith<$R, ProjectData, $Out> get $asProjectData =>
+      $base.as((v, t, t2) => _ProjectDataCopyWithImpl(v, t, t2));
 }
 
-typedef ProjectDataCopyWithBound = ProjectDataBase;
-
-abstract class ProjectDataCopyWith<$R, $In extends ProjectData, $Out extends ProjectDataBase>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  ProjectDataCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends ProjectDataBase>(
-      Then<ProjectData, $Out2> t, Then<$Out2, $R2> t2);
+abstract class ProjectDataCopyWith<$R, $In extends ProjectData, $Out> implements ClassCopyWith<$R, $In, $Out> {
   MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get dartFiles;
   $R call(
       {String? id,
@@ -153,16 +163,15 @@ abstract class ProjectDataCopyWith<$R, $In extends ProjectData, $Out extends Pro
       String? cssFile,
       String? mainDartFile,
       Map<String, String>? dartFiles});
+  ProjectDataCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _ProjectDataCopyWithImpl<$R, $Out extends ProjectDataBase> extends CopyWithBase<$R, ProjectData, $Out>
+class _ProjectDataCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, ProjectData, $Out>
     implements ProjectDataCopyWith<$R, ProjectData, $Out> {
   _ProjectDataCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  ProjectDataCopyWith<$R2, ProjectData, $Out2> chain<$R2, $Out2 extends ProjectDataBase>(
-          Then<ProjectData, $Out2> t, Then<$Out2, $R2> t2) =>
-      _ProjectDataCopyWithImpl($value, t, t2);
 
+  @override
+  late final ClassMapperBase<ProjectData> $mapper = ProjectDataMapper.ensureInitialized();
   @override
   MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get dartFiles =>
       MapCopyWith($value.dartFiles, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(dartFiles: v));
@@ -174,11 +183,24 @@ class _ProjectDataCopyWithImpl<$R, $Out extends ProjectDataBase> extends CopyWit
           Object? cssFile = $none,
           String? mainDartFile,
           Map<String, String>? dartFiles}) =>
-      $then(ProjectData(
-          id: or(id, $value.id),
-          description: or(description, $value.description),
-          htmlFile: or(htmlFile, $value.htmlFile),
-          cssFile: or(cssFile, $value.cssFile),
-          mainDartFile: mainDartFile ?? $value.mainDartFile,
-          dartFiles: dartFiles ?? $value.dartFiles));
+      $apply(FieldCopyWithData({
+        if (id != $none) #id: id,
+        if (description != $none) #description: description,
+        if (htmlFile != $none) #htmlFile: htmlFile,
+        if (cssFile != $none) #cssFile: cssFile,
+        if (mainDartFile != null) #mainDartFile: mainDartFile,
+        if (dartFiles != null) #dartFiles: dartFiles
+      }));
+  @override
+  ProjectData $make(CopyWithData data) => ProjectData(
+      id: data.get(#id, or: $value.id),
+      description: data.get(#description, or: $value.description),
+      htmlFile: data.get(#htmlFile, or: $value.htmlFile),
+      cssFile: data.get(#cssFile, or: $value.cssFile),
+      mainDartFile: data.get(#mainDartFile, or: $value.mainDartFile),
+      dartFiles: data.get(#dartFiles, or: $value.dartFiles));
+
+  @override
+  ProjectDataCopyWith<$R2, ProjectData, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _ProjectDataCopyWithImpl($value, $cast, t);
 }

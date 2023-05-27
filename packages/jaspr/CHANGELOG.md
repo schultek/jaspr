@@ -1,5 +1,8 @@
-## Unreleased patch
+## Unreleased breaking
 
+- **BREAKING** Removed `DeferRenderMixin` as async first builds are no longer permitted on clients.
+- **BREAKING** Removed `@app` and `@island` annotations in favor of `@client`.
+- **BREAKING** Removed `Document.app()` and `Document.islands()` constructors. Use the default constructor instead.
 - Fixed handling of initial uri
 - Added `SynchronousFuture`
 

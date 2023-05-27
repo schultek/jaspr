@@ -20,7 +20,7 @@ void main() async {
     // Optionally do something with `request`
     print("Request uri is ${request.requestedUri} (${request.url})");
     // Return a server-rendered response by calling `render()` with your root component
-    return render(Document.app(
+    return render(Document(
       base: '/app',
       body: App(),
     ));
@@ -29,7 +29,7 @@ void main() async {
   router.get('/hello', (request) async {
     // Render a single component manually
     return Response.ok(
-      await renderComponent(Document.app(
+      await renderComponent(Document(
         // we still point to /app to correctly load all other resources,
         // like js, css or image files
         base: '/app',
