@@ -6,6 +6,6 @@ part of 'hello.dart';
 mixin _$Hello implements ComponentEntryMixin<Hello> {
   @override
   ComponentEntry<Hello> get entry {
-    return ComponentEntry.app('components/hello');
+    return ComponentEntry.client('components/hello');
   }
 }

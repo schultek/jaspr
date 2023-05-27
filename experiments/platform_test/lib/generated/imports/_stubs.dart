@@ -8,4 +8,3 @@ dynamic HtmlDocument;
 typedef HtmlDocumentOrStubbed = dynamic;
 dynamic Platform;
 typedef PlatformOrStubbed = dynamic;
-dynamic test;
