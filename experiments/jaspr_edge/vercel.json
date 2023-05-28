@@ -1,0 +1,5 @@
+{
+  "buildCommand": "jaspr build --no-ssr --output=.vercel/output/static && dart run edge build vercel_edge --use-filesystem",
+  "devCommand": "dart run edge build vercel_edge --dev",
+  "outputDirectory": "build"
+}

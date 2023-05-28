@@ -4,16 +4,8 @@ import 'sync_data_app.dart';
 
 void main() {
   group('preload data test', () {
-    late BrowserTester tester;
-
-    setUp(() {
-      tester = BrowserTester.setUp(
-        initialStateData: {'counter': 123},
-      );
-    });
-
-    test('should preload data', () async {
-      await tester.pumpComponent(App());
+    testBrowser('should preload data', (tester) async {
+      await tester.pumpComponent(App(), initialSyncState: {'counter': 123});
 
       expect(find.text('Count: 123'), findsOneComponent);
 

@@ -4,34 +4,25 @@ import 'package:jaspr_test/server_test.dart';
 import 'basic_app.dart';
 
 void main() {
-  makeTest(bool virtual) => () {
-        late ServerTester tester;
+  makeTest(bool virtual) {
+    return () {
+      testServer('should serve component', virtual: virtual, (tester) async {
+        tester.pumpComponent(Builder.single(builder: (context) {
+          Counter.initialValue = 101;
+          return App();
+        }));
 
-        setUp(() async {
-          tester = await ServerTester.setUp(
-            Builder.single(builder: (context) {
-              Counter.initialValue = 101;
-              return App();
-            }),
-            virtual: virtual,
-          );
-        });
+        var response = await tester.request('/');
 
-        tearDown(() async {
-          await tester.tearDown();
-        });
+        expect(response.statusCode, equals(200));
+        expect(response.document?.body, isNotNull);
 
-        test('should serve component', () async {
-          var response = await tester.request('/');
+        var appHtml = '<div>App<button>Click Me</button>Count: 101</div>\n';
 
-          expect(response.statusCode, equals(200));
-          expect(response.document?.body, isNotNull);
-
-          var appHtml = '<div>App<button>Click Me</button>Count: 101</div>';
-
-          expect(response.document!.body!.innerHtml, equals(appHtml));
-        });
-      };
+        expect(response.document!.body!.innerHtml, equals(appHtml));
+      });
+    };
+  }
 
   group('basic virtual server test', makeTest(true));
 

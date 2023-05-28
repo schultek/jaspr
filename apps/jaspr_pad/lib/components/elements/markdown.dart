@@ -81,7 +81,7 @@ class _MarkdownState extends State<Markdown> {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     if (kIsWeb) {
-      ComponentsBinding.instance!.addPostFrameCallback(() {
+      context.binding.addPostFrameCallback(() {
         hljs.highlightAll();
       });
     }

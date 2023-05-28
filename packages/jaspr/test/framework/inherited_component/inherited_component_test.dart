@@ -6,13 +6,7 @@ import 'inherited_component_app.dart';
 
 void main() {
   group('inherited component test', () {
-    late ComponentTester tester;
-
-    setUp(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test('should inherit component', () async {
+    testComponents('should inherit component', (tester) async {
       var controller = await tester.pumpTestComponent(App());
 
       // phase 1: inherited component should be mounted

@@ -6,13 +6,7 @@ import 'async_app.dart';
 
 void main() {
   group('async component test', () {
-    late ComponentTester tester;
-
-    setUpAll(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test('should render future with data', () async {
+    testComponents('should render future with data', (tester) async {
       var completer = Completer<String>();
 
       await tester.pumpComponent(FutureTester(completer.future));
@@ -25,7 +19,7 @@ void main() {
       expect(find.text('DATA: Completed'), findsOneComponent);
     });
 
-    test('should render future with error', () async {
+    testComponents('should render future with error', (tester) async {
       var completer = Completer<String>();
 
       await tester.pumpComponent(FutureTester(completer.future));
@@ -38,7 +32,7 @@ void main() {
       expect(find.text('ERROR: Failed'), findsOneComponent);
     });
 
-    test('should render stream', () async {
+    testComponents('should render stream', (tester) async {
       var controller = StreamController<String>();
 
       await tester.pumpComponent(StreamTester(controller.stream));

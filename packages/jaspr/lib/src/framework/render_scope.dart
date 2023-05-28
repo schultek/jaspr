@@ -8,11 +8,11 @@ class RenderScope extends Component {
   final Component? child;
 
   @override
-  _RenderScopeElement createElement() => _RenderScopeElement(this);
+  RenderScopeElement createElement() => RenderScopeElement(this);
 }
 
-class _RenderScopeElement extends SingleChildElement {
-  _RenderScopeElement(RenderScope component) : super(component);
+class RenderScopeElement extends SingleChildElement {
+  RenderScopeElement(RenderScope component) : super(component);
 
   @override
   RenderScope get component => super.component as RenderScope;
@@ -86,7 +86,7 @@ abstract class RenderDelegate {
 
 class _ScopedRenderer implements Renderer {
   final Renderer _parent;
-  final _RenderScopeElement _scope;
+  final RenderScopeElement _scope;
 
   final Set<RenderElement> _dependents = {};
 

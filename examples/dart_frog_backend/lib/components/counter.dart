@@ -2,7 +2,7 @@ import 'package:jaspr/html.dart';
 
 part 'counter.g.dart';
 
-@app
+@client
 class Counter extends StatefulComponent with _$Counter {
   const Counter({Key? key}) : super(key: key);
 

@@ -4,35 +4,45 @@ import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
 
-import 'history_stub.dart' if (dart.library.html) 'history_browser.dart';
+import 'builder.dart';
+import 'configuration.dart';
+import 'history/history.dart';
+import 'matching.dart';
+import 'misc/inherited_router.dart';
+import 'parser.dart';
+import 'route.dart';
+import 'typedefs.dart';
 
-part 'route.dart';
-
-/// Interface for history management
-/// Will be implemented separately on browser and server
-abstract class HistoryManager {
-  static HistoryManager instance = HistoryManagerImpl();
-
-  /// Initialize the history manager and setup any listeners to history changes
-  void init(void Function(String) onChange);
-
-  /// Push a new state to the history
-  void push(String path, {String? title});
-
-  /// Replace the current history state
-  void replace(String path, {String? title});
-
-  /// Go back in the history
-  void back();
-}
-
-/// Simple router component
+/// Router component.
 class Router extends StatefulComponent {
-  final List<Route>? routes;
-  final Route? Function(String, BuildContext)? onGenerateRoute;
-  final Component Function(String, BuildContext)? onUnknownRoute;
+  Router({
+    required this.routes,
+    this.errorBuilder,
+    this.redirect,
+    this.redirectLimit = 5,
+  }) {
+    _configuration = RouteConfiguration(
+      routes: routes,
+      redirectLimit: redirectLimit,
+      topRedirect: redirect ?? (_, __) => null,
+    );
+    _parser = RouteInformationParser(
+      configuration: _configuration,
+    );
+    _builder = RouteBuilder(
+      configuration: _configuration,
+      errorBuilder: errorBuilder,
+    );
+  }
 
-  Router({this.routes, this.onGenerateRoute, this.onUnknownRoute});
+  final List<RouteBase> routes;
+  final RouterComponentBuilder? errorBuilder;
+  final RouterRedirect? redirect;
+  final int redirectLimit;
+
+  late final RouteConfiguration _configuration;
+  late final RouteInformationParser _parser;
+  late final RouteBuilder _builder;
 
   @override
   State<StatefulComponent> createState() => RouterState();
@@ -41,54 +51,96 @@ class Router extends StatefulComponent {
     if (context is StatefulElement && context.state is RouterState) {
       return context.state as RouterState;
     }
-    return context.findAncestorStateOfType<RouterState>()!;
+    return context.dependOnInheritedComponentOfExactType<InheritedRouter>()!.router;
   }
 }
 
-enum _HistoryAction { none, push, replace }
+class RouterState extends State<Router> with PreloadStateMixin {
+  RouteMatchList? _matchList;
+  RouteMatchList get matchList => _matchList ?? RouteMatchList.empty;
 
-class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin {
-  ResolvedRoute? _currentRoute;
-  ResolvedRoute get currentRoute => _currentRoute!;
-
-  final Map<LazyRoute, ResolvedRoute> _resolvedRoutes = {};
+  Map<Object, RouteLoader> routeLoaders = {};
 
   @override
-  Future<void> beforeFirstRender() async {
-    var route = _matchRoute(ComponentsBinding.instance!.currentUri.path);
-    if (route is LazyRoute) route = _resolvedRoutes[route] = await route.load();
-    _currentRoute = route as ResolvedRoute;
-  }
-
-  @override
-  Future<void> preloadState() async {
-    var route = _matchRoute(ComponentsBinding.instance!.currentUri.path);
-    if (route is LazyRoute) route = _resolvedRoutes[route] = await route.load();
-    _currentRoute = route as ResolvedRoute;
+  Future<void> preloadState() {
+    var location = context.binding.currentUri.toString();
+    return _matchRoute(location).then(_preload).then((match) => _matchList = match);
   }
 
   @override
   void initState() {
     super.initState();
-    HistoryManager.instance.init((path) {
-      _update(path, action: _HistoryAction.none);
+    HistoryManager.instance.init(context.binding.currentUri.toString(), (uri) {
+      _update(uri, updateHistory: false);
     });
-    assert(_currentRoute != null);
-  }
-
-  Future<void> preload(String path) async {
-    var nextRoute = _matchRoute(path);
-    if (nextRoute is LazyRoute) {
-      _resolvedRoutes[nextRoute] = await nextRoute.load(preload: true);
+    if (_matchList == null) {
+      assert(context.binding.isClient);
+      preloadState().then((_) {
+        setState(() {});
+      });
     }
   }
 
-  Future<void> push(String path, {String? title, bool eager = true}) {
-    return _update(path, title: title, eager: eager);
+  Future<void> preload(String location) {
+    return _matchRoute(location).then(_preload);
   }
 
-  Future<void> replace(String path, {String? title, bool eager = true}) {
-    return _update(path, title: title, eager: eager, action: _HistoryAction.replace);
+  Future<RouteMatchList> _preload(RouteMatchList match) {
+    var loaders = <RouteLoader>[];
+    for (var i = 0; i < match.matches.length; i++) {
+      var m = match.matches[i];
+      var r = m.route;
+      var hasNext = i < match.matches.length - 1;
+
+      if (r is LazyRouteMixin && (!hasNext || r is ShellRoute)) {
+        var key = m.subloc;
+        var l = (routeLoaders[key] ??= RouteLoader.from((r as LazyRouteMixin).load()));
+        loaders.add(l);
+      }
+    }
+    return RouteLoader.wait(loaders).then((_) => match);
+  }
+
+  /// Get a location from route name and parameters.
+  /// This is useful for redirecting to a named location.
+  String namedLocation(
+    String name, {
+    Map<String, String> params = const <String, String>{},
+    Map<String, dynamic> queryParams = const <String, dynamic>{},
+  }) {
+    return component._configuration.namedLocation(name, params: params, queryParams: queryParams);
+  }
+
+  Future<void> push(String location, {Object? extra}) {
+    return _update(location, extra: extra);
+  }
+
+  Future<void> pushNamed(
+    String name, {
+    Map<String, String> params = const <String, String>{},
+    Map<String, dynamic> queryParams = const <String, dynamic>{},
+    Object? extra,
+  }) {
+    return push(
+      namedLocation(name, params: params, queryParams: queryParams),
+      extra: extra,
+    );
+  }
+
+  Future<void> replace(String location, {Object? extra}) {
+    return _update(location, extra: extra, replace: true);
+  }
+
+  Future<void> replaceNamed(
+    String name, {
+    Map<String, String> params = const <String, String>{},
+    Map<String, dynamic> queryParams = const <String, dynamic>{},
+    Object? extra,
+  }) {
+    return replace(
+      namedLocation(name, params: params, queryParams: queryParams),
+      extra: extra,
+    );
   }
 
   void back() {
@@ -96,51 +148,52 @@ class RouterState extends State<Router> with PreloadStateMixin, DeferRenderMixin
   }
 
   Future<void> _update(
-    String path, {
-    String? title,
-    _HistoryAction action = _HistoryAction.push,
-    bool eager = true,
-  }) async {
-    var nextRoute = _matchRoute(path);
-    if (nextRoute is LazyRoute) {
-      nextRoute = _resolvedRoutes[nextRoute] = await nextRoute.load(eager: eager, preload: true);
-    }
-    assert(nextRoute is ResolvedRoute);
-    setState(() {
-      _currentRoute = nextRoute as ResolvedRoute;
-      if (action == _HistoryAction.push) {
-        HistoryManager.instance.push(path, title: title);
-      } else if (action == _HistoryAction.replace) {
-        HistoryManager.instance.replace(path, title: title);
-      }
+    String location, {
+    Object? extra,
+    bool updateHistory = true,
+    bool replace = false,
+  }) {
+    return _matchRoute(location, extra: extra).then((match) {
+      setState(() {
+        _matchList = match;
+        if (updateHistory) {
+          if (!replace) {
+            HistoryManager.instance.push(match.uri.toString(), title: match.title);
+          } else {
+            HistoryManager.instance.replace(match.uri.toString(), title: match.title);
+          }
+        }
+      });
     });
   }
 
-  Route _matchRoute(String path) {
-    Route? route;
-    if (component.routes != null) {
-      for (var r in component.routes!) {
-        if (r.matches(path)) {
-          route = r;
-          break;
-        }
-      }
-    }
-    route ??= component.onGenerateRoute?.call(path, context);
-    route ??= _generateUnknownRoute(path);
-    return _resolvedRoutes[route] ?? route;
-  }
-
-  Route _generateUnknownRoute(String path) {
-    if (component.onUnknownRoute != null) {
-      return Route(path, (context) => [component.onUnknownRoute!(path, context)]);
-    } else {
-      return Route(path, (context) => [DomComponent(tag: 'span', child: Text('No route specified for path $path.'))]);
-    }
+  Future<RouteMatchList> _matchRoute(String location, {Object? extra}) {
+    return component._parser.parseRouteInformation(location, context, extra: extra);
   }
 
   @override
-  Iterable<Component> build(BuildContext context) {
-    return currentRoute.build(context);
+  Iterable<Component> build(BuildContext context) sync* {
+    yield* component._builder.build(context, this);
+  }
+}
+
+class RouteLoader {
+  RouteLoader.from(this.future) : isPending = true {
+    future.whenComplete(() {
+      isPending = false;
+    });
+  }
+
+  final Future future;
+
+  bool isPending;
+
+  static Future<void> wait(Iterable<RouteLoader> loaders) {
+    var l = loaders.where((l) => l.isPending).map((l) => l.future);
+    if (l.isNotEmpty) {
+      return Future.wait(l);
+    } else {
+      return SynchronousFuture(null);
+    }
   }
 }

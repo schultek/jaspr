@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import '../main.container.dart';
+import 'package:dart_mappable/dart_mappable.dart';
+
+import '../main.init.dart';
 
 void Function(void Function()) _debounce<T>(Duration duration) {
   Timer? timer;
@@ -30,6 +32,10 @@ extension DebounceStream<T> on Stream<T> {
 }
 
 class MapperCodec<T> extends Codec<T, dynamic> {
+  MapperCodec() {
+    initializeMappers();
+  }
+
   @override
   Converter<dynamic, T> get decoder => MapperDecoder();
 
@@ -40,13 +46,13 @@ class MapperCodec<T> extends Codec<T, dynamic> {
 class MapperDecoder<T> extends Converter<dynamic, T> {
   @override
   T convert(input) {
-    return mainContainer.fromJson(input);
+    return MapperContainer.globals.fromJson(input);
   }
 }
 
 class MapperEncoder<T> extends Converter<T, dynamic> {
   @override
   dynamic convert(T input) {
-    return mainContainer.toJson(input);
+    return MapperContainer.globals.toJson(input);
   }
 }

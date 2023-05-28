@@ -1,15 +1,6 @@
 part of document;
 
-mixin DocumentBinding on BindingBase, SyncBinding {
-  @override
-  void initInstances() {
-    super.initInstances();
-    _instance = this;
-  }
-
-  static DocumentBinding? _instance;
-  static DocumentBinding? get instance => _instance!;
-
+mixin DocumentBinding on AppBinding {
   late SendPort _sendPort;
   ReceivePort? _receivePort;
 
@@ -26,19 +17,9 @@ mixin DocumentBinding on BindingBase, SyncBinding {
     _fileRequest = _receivePort!.first.then((value) => value);
   }
 
-  final Map<Element, ComponentEntry> _registryElements = {};
-
-  ComponentEntry? _registerElement(Element element) {
-    if (element.component is ComponentEntryMixin) {
-      var entry = (element.component as ComponentEntryMixin).entry;
-      return _registryElements[element] = entry;
-    }
-    return null;
-  }
-
   Future<String> renderDocument(MarkupDomRenderer renderer) async {
     var state = _document?.state;
-    if (state is _ManualDocumentState) {
+    if (state is _BaseDocumentState) {
       state._prepareRender(getStateData());
     }
 

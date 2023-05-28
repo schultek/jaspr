@@ -4,17 +4,9 @@ import 'routing_app.dart';
 
 void main() {
   group('routing test', () {
-    late ServerTester tester;
+    testServer('should handle routing', (tester) async {
+      tester.pumpComponent(App());
 
-    setUp(() async {
-      tester = await ServerTester.setUp(App());
-    });
-
-    tearDown(() async {
-      await tester.tearDown();
-    });
-
-    test('should handle routing', () async {
       var response = await tester.request('/');
 
       expect(response.statusCode, equals(200));
@@ -25,15 +17,10 @@ void main() {
       expect(response.statusCode, equals(200));
       expect(response.body, contains('About'));
 
-      response = await tester.request('/contact');
-
-      expect(response.statusCode, equals(200));
-      expect(response.body, contains('Contact'));
-
       response = await tester.request('/unknown');
 
       expect(response.statusCode, equals(200));
-      expect(response.body, contains('Unknown (/unknown)'));
+      expect(response.body, contains('Unknown (&#47;unknown)'));
     });
   });
 }

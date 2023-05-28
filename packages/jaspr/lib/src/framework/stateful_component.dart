@@ -622,22 +622,15 @@ class StatefulElement extends MultiChildElement {
     // In this case we don't call [_initState()] directly here, but rather let it
     // be called by the mixins implementation.
 
-    Future? _asyncFirstBuild;
+    Future? asyncFirstBuild;
 
-    if (owner.isFirstBuild) {
-      if (state is DeferRenderMixin && ComponentsBinding.instance!.isClient) {
-        _asyncFirstBuild = (state as DeferRenderMixin).beforeFirstRender();
-      }
-      if (state is PreloadStateMixin && !ComponentsBinding.instance!.isClient) {
-        _asyncFirstBuild = (state as PreloadStateMixin).preloadState();
-      }
+    if (owner.isFirstBuild && state is PreloadStateMixin && !binding.isClient) {
+      asyncFirstBuild = (state as PreloadStateMixin).preloadState();
     }
 
-    if (_asyncFirstBuild != null) {
-      this._asyncFirstBuild = _asyncFirstBuild.then((_) {
-        _initState();
-        this._asyncFirstBuild = null;
-      });
+    if (asyncFirstBuild != null) {
+      _asyncFirstBuild = asyncFirstBuild.then((_) => _initState());
+      asyncFirstBuild.whenComplete(() => _asyncFirstBuild = null);
     } else {
       _initState();
     }

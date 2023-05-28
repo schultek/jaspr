@@ -1,69 +1,60 @@
-import 'package:jaspr/jaspr.dart';
+@TestOn('browser')
+
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:jaspr_test/browser_test.dart';
 
-import 'routing_app.dart';
-
-extension on BrowserTester {
-  Future<void> navigate(Function(RouterState) navigate, {bool pump = true}) async {
-    RouterState? router;
-    findRouter(Element element) {
-      if (element is StatefulElement && element.state is RouterState) {
-        router = element.state as RouterState;
-      } else {
-        element.visitChildren(findRouter);
-      }
-    }
-
-    binding.rootElements.values.first.visitChildren(findRouter);
-    if (router != null) {
-      navigate(router!);
-      if (pump) {
-        await pumpEventQueue();
-      }
-    }
-  }
-}
+import '../../utils.dart';
+import '../utils.dart';
 
 void main() {
-  group('routing test', () {
-    late BrowserTester tester;
+  group('router', () {
+    testBrowser('should push route', (tester) async {
+      await tester.pumpComponent(Router(routes: [
+        homeRoute(),
+        route('/a'),
+      ]));
 
-    setUp(() async {
-      tester = BrowserTester.setUp(onFetchState: (url) {
-        if (url == '/contact') return {'contact': 'Tom'};
-        return {};
-      });
+      expect(find.text('home'), findsOneComponent);
+
+      await tester.router.push('/a');
+      await pumpEventQueue();
+
+      expect(find.text('a'), findsOneComponent);
+
+      await tester.router.push('/');
+      await pumpEventQueue();
+
+      expect(find.text('home'), findsOneComponent);
+
+      tester.router.back();
+      await pumpEventQueue();
+
+      expect(find.text('a'), findsOneComponent);
     });
 
-    test('should handle routing', () async {
-      await tester.pumpComponent(App());
+    testBrowser('should replace route', (tester) async {
+      await tester.pumpComponent(Router(routes: [
+        homeRoute(),
+        route('/a'),
+        route('/b'),
+      ]));
 
-      expect(find.text('Home'), findsOneComponent);
+      expect(find.text('home'), findsOneComponent);
 
-      await tester.navigate((router) => router.preload('/about'));
+      await tester.router.push('/a');
+      await pumpEventQueue();
 
-      expect(find.text('Home'), findsOneComponent);
+      expect(find.text('a'), findsOneComponent);
 
-      await tester.navigate((router) {
-        return Router.of(router.context).replace('/about');
-      });
+      await tester.router.replace('/b');
+      await pumpEventQueue();
 
-      expect(find.text('About'), findsOneComponent);
+      expect(find.text('b'), findsOneComponent);
 
-      await tester.click(find.tag('button'));
+      tester.router.back();
+      await pumpEventQueue();
 
-      expect(find.text('Contact'), findsOneComponent);
-      expect(find.text('Tom'), findsOneComponent);
-
-      await tester.navigate((router) => router.push('/unknown'));
-
-      expect(find.text('No route specified for path /unknown.'), findsOneComponent);
-
-      await tester.navigate((router) => router.back());
-
-      expect(find.text('Contact'), findsOneComponent);
-      expect(find.text('Tom'), findsOneComponent);
+      expect(find.text('home'), findsOneComponent);
     });
   });
 }

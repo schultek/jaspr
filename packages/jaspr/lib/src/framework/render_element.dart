@@ -5,10 +5,7 @@ mixin RenderElement on Element {
   RenderElement get _lastNode => this;
 
   /// Arbitrary data the renderer can use
-  dynamic _data;
-
-  dynamic getData() => _data;
-  dynamic setData(dynamic data) => _data = data;
+  dynamic renderData;
 
   void _render() {
     renderNode(_renderer!);

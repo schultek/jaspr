@@ -42,20 +42,14 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> implements Sync
   @override
   void initState() {
     super.initState();
-    SyncBinding.instance!.registerSyncState(this, initialUpdate: ComponentsBinding.instance!.isClient);
+    context.binding.registerSyncState(this, initialUpdate: context.binding.isClient);
   }
 
   @override
   void dispose() {
-    SyncBinding.instance!.unregisterSyncState(this);
+    context.binding.unregisterSyncState(this);
     super.dispose();
   }
-}
-
-/// This defers the first rendering on the client for an async task
-mixin DeferRenderMixin<T extends StatefulComponent> on State<T> {
-  /// Called on the client before initState() to perform some asynchronous task
-  Future<void> beforeFirstRender();
 }
 
 /// Mixin on [State] that preloads state on the server

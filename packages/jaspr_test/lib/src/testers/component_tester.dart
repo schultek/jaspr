@@ -1,8 +1,37 @@
 import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
+import 'package:meta/meta.dart';
+import 'package:test/test.dart';
 
-import '../../jaspr_test.dart';
+import '../binding.dart';
+import '../finders.dart';
+
+@isTest
+void testComponents(
+  String description,
+  FutureOr<void> Function(ComponentTester tester) callback, {
+  Uri? uri,
+  bool isClient = false,
+  bool? skip,
+  Timeout? timeout,
+  dynamic tags,
+}) {
+  test(
+    description,
+    () async {
+      var binding = TestComponentsBinding(uri ?? Uri.parse('/'), isClient);
+      var tester = ComponentTester._(binding);
+
+      return binding.runTest(() async {
+        await callback(tester);
+      });
+    },
+    skip: skip,
+    timeout: timeout,
+    tags: tags,
+  );
+}
 
 /// Tests any jaspr component in a simulated testing environment.
 ///
@@ -13,20 +42,8 @@ class ComponentTester {
 
   final TestComponentsBinding binding;
 
-  static ComponentTester setUp({Uri? currentUri, bool isClient = false}) {
-    tearDown();
-    var binding = TestComponentsBinding(currentUri, isClient);
-    return ComponentTester._(binding);
-  }
-
-  static void tearDown() {
-    if (ComponentsBinding.instance is TestComponentsBinding) {
-      // TODO release any resources
-    }
-  }
-
   Future<void> pumpComponent(Component component) {
-    return binding.attachRootComponent(component, attachTo: 'body');
+    return binding.attachRootComponent(component);
   }
 
   /// Simulates a 'click' event on the given element
@@ -64,29 +81,27 @@ class ComponentTester {
       return element;
     }
 
-    DomElement? _foundElement;
+    DomElement? foundElement;
 
-    void _findFirstDomElement(Element e) {
+    void findFirstDomElement(Element e) {
       if (e is DomElement) {
-        _foundElement = e;
+        foundElement = e;
         return;
       }
-      e.visitChildren(_findFirstDomElement);
+      e.visitChildren(findFirstDomElement);
     }
 
-    _findFirstDomElement(element);
+    findFirstDomElement(element);
 
-    if (_foundElement == null) {
+    if (foundElement == null) {
       throw 'The finder "$finder" could not find a dom element.';
     }
 
-    return _foundElement!;
+    return foundElement!;
   }
 }
 
-class TestComponentsBinding extends BindingBase with SchedulerBinding, ComponentsBinding, SyncBinding {
-  static TestComponentsBinding get instance => ComponentsBinding.instance as TestComponentsBinding;
-
+class TestComponentsBinding extends AppBinding with ComponentsBinding {
   TestComponentsBinding(this._currentUri, this._isClient);
 
   final Uri? _currentUri;
@@ -97,15 +112,10 @@ class TestComponentsBinding extends BindingBase with SchedulerBinding, Component
   @override
   bool get isClient => _isClient;
 
-  RenderElement? get rootElement => rootElements['body'];
-
   @override
-  Renderer attachRenderer(String target, {int? from, int? to}) {
+  Renderer createRenderer() {
     return TestDomRenderer();
   }
-
-  @override
-  void didAttachRootElement(Element element, {required String to}) {}
 
   @override
   Future<Map<String, String>> fetchState(String url) {
@@ -139,7 +149,7 @@ class DomNodeData {
 }
 
 extension TestDomNodeData on RenderElement {
-  DomNodeData get testData => getData() ?? setData(DomNodeData());
+  DomNodeData get testData => renderData ??= DomNodeData();
 }
 
 class TestDomRenderer extends Renderer {

@@ -5,8 +5,6 @@ import 'preload_data_app.dart';
 
 void main() {
   group('preload data test', () {
-    late ServerTester tester;
-
     testMiddleware(Handler innerHandler) {
       return (Request request) {
         if (request.url.path.startsWith('api')) {
@@ -16,15 +14,9 @@ void main() {
       };
     }
 
-    setUp(() async {
-      tester = await ServerTester.setUp(Document(body: App()), middleware: [testMiddleware]);
-    });
+    testServer('should preload data', (tester) async {
+      tester.pumpComponent(Document(body: App()));
 
-    tearDown(() async {
-      await tester.tearDown();
-    });
-
-    test('should preload data', () async {
       var response = await tester.request('/');
 
       expect(response.statusCode, equals(200));
@@ -36,14 +28,16 @@ void main() {
       expect(body!.innerHtml.trim(), equals(appHtml));
     });
 
-    test('should fetch data', () async {
+    testServer('should fetch data', (tester) async {
+      tester.pumpComponent(Document(body: App()));
+
       var response = await tester.fetchData('/');
 
       expect(response.statusCode, equals(200));
       expect(response.data, equals({'counter': 202}));
     });
 
-    test('should fetch api', () async {
+    testServer('should fetch api', middleware: [testMiddleware], (tester) async {
       var response = await tester.request('/api');
 
       expect(response.statusCode, equals(200));

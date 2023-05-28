@@ -45,11 +45,11 @@ class TutorialData with TutorialDataMappable implements ProjectDataBase {
 
   @override
   TutorialData updateContent(String key, String? content) {
-    return copyWith.steps.get(currentStepId)!.apply((s) => s.updateContent(key, content));
+    return copyWith.steps.get(currentStepId)!.$update((s) => s.updateContent(key, content));
   }
 
   TutorialData toggleSolution() {
-    return copyWith.steps.get(currentStepId)!.apply((s) => s.copyWith(showSolution: !s.showSolution));
+    return copyWith.steps.get(currentStepId)!.$update((s) => s.copyWith(showSolution: !s.showSolution));
   }
 
   @override
@@ -113,9 +113,9 @@ class TutorialStep with TutorialStepMappable implements ProjectDataBase {
   @override
   TutorialStep updateContent(String key, String? content) {
     if (showSolution) {
-      return copyWith.solution?.apply((s) => s.updateContent(key, content)) ?? copyWith();
+      return copyWith.solution?.$update((s) => s.updateContent(key, content)) ?? copyWith();
     } else {
-      return copyWith.step.apply((s) => s.updateContent(key, content));
+      return copyWith.step.$update((s) => s.updateContent(key, content));
     }
   }
 

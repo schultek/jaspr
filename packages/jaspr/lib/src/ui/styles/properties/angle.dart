@@ -1,3 +1,5 @@
+import 'unit.dart';
+
 extension AngleExt on num {
   Angle get deg => Angle.deg(toDouble());
   Angle get rad => Angle.rad(toDouble());
@@ -25,6 +27,12 @@ class _ZeroAngle implements Angle {
 
   @override
   String get value => '0';
+
+  @override
+  bool operator ==(Object other) => identical(this, other) || other is _Angle && other._value == 0;
+
+  @override
+  int get hashCode => 0;
 }
 
 class _Angle implements Angle {
@@ -34,7 +42,16 @@ class _Angle implements Angle {
   const _Angle(this._value, this._unit);
 
   @override
-  String get value => '$_value$_unit';
+  String get value => '${_value.numstr}$_unit';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      _value == 0 && (other is _ZeroAngle || (other is _Angle && other._value == 0)) ||
+      other is _Angle && runtimeType == other.runtimeType && _unit == other._unit && _value == other._value;
+
+  @override
+  int get hashCode => _value == 0 ? 0 : _unit.hashCode ^ _value.hashCode;
 }
 
 class _DegreeAngle extends _Angle {

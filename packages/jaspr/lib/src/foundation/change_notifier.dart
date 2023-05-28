@@ -95,7 +95,7 @@ abstract class ValueListenable<T> extends Listenable {
 /// See also:
 ///
 ///  * [ValueNotifier], which is a [ChangeNotifier] that wraps a single value.
-class ChangeNotifier implements Listenable {
+mixin class ChangeNotifier implements Listenable {
   int _count = 0;
   List<VoidCallback?> _listeners = List<VoidCallback?>.filled(0, null);
   int _notificationCallStackDepth = 0;
@@ -226,8 +226,8 @@ class ChangeNotifier implements Listenable {
   void removeListener(VoidCallback listener) {
     assert(_debugAssertNotDisposed());
     for (int i = 0; i < _count; i++) {
-      final VoidCallback? _listener = _listeners[i];
-      if (_listener == listener) {
+      final VoidCallback? l = _listeners[i];
+      if (l == listener) {
         if (_notificationCallStackDepth > 0) {
           // We don't resize the list during notifyListeners iterations
           // but we set to null, the listeners we want to remove. We will

@@ -24,7 +24,7 @@ Future<Response> renderJasprComponent(RequestContext context, Component child) a
 
   return Response(
     body: await renderComponent(
-      Document.app(
+      Document(
         base: base.path,
         body: child,
       ),

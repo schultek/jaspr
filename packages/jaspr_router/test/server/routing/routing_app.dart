@@ -6,12 +6,11 @@ class App extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield Router(
       routes: [
-        Route('/', (_) => [Home()]),
-        Route('/about', (_) => [About()]),
-        Route.lazy('/contact', (_) => [Contact()], () => Future.delayed(Duration(milliseconds: 10))),
+        Route(path: '/', builder: (_, __) => Home()),
+        Route(path: '/about', builder: (_, __) => About()),
       ],
-      onUnknownRoute: (route, context) {
-        return DomComponent(tag: 'span', child: Text('Unknown ($route)'));
+      errorBuilder: (_, state) {
+        return DomComponent(tag: 'span', child: Text('Unknown (${state.location})'));
       },
     );
   }

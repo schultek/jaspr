@@ -1,16 +1,24 @@
-import '../../../jaspr.dart';
+import '../../../components.dart';
 import '../styles/properties/list.dart';
-import 'base.dart';
+
+class ListItemMarker {
+  final bool? isInside;
+  final Uri? imageUrl;
+  final ListStyleType? type;
+
+  const ListItemMarker({
+    this.isInside,
+    this.imageUrl,
+    this.type,
+  });
+}
 
 class ListView extends BaseComponent {
-  final bool? insideMarkers;
-  final Uri? markerImageUrl;
-  final ListStyleType? markerType;
+  final ListItemMarker? marker;
 
   const ListView({
-    this.insideMarkers,
-    this.markerImageUrl,
-    this.markerType,
+    this.marker,
+    required super.tag,
     super.key,
     super.id,
     super.styles,
@@ -18,26 +26,62 @@ class ListView extends BaseComponent {
     super.attributes,
     super.events,
     super.children,
-  }) : super(tag: 'ul');
+  });
 
-  factory ListView.basic({List<Component>? children}) {
-    return ListView(markerType: ListStyleType.none, children: children);
+  factory ListView.ordered({
+    Key? key,
+    String? id,
+    Styles? styles,
+    List<String>? classes,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+    List<ListItem>? children,
+    ListItemMarker? marker,
+  }) {
+    return ListView(
+      key: key,
+      id: id,
+      styles: styles,
+      classes: classes,
+      attributes: attributes,
+      events: events,
+      children: children,
+      tag: 'ol',
+      marker: marker,
+    );
   }
 
-  factory ListView.standard({List<Component>? children, ListStyleType? type}) {
-    return ListView(markerType: type, children: children);
-  }
-
-  factory ListView.own({List<Component>? children, required Uri imageUrl}) {
-    return ListView(markerImageUrl: imageUrl, children: children);
+  factory ListView.unordered({
+    Key? key,
+    String? id,
+    Styles? styles,
+    List<String>? classes,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+    List<ListItem>? children,
+    ListItemMarker? marker,
+  }) {
+    return ListView(
+      key: key,
+      id: id,
+      styles: styles,
+      classes: classes,
+      attributes: attributes,
+      events: events,
+      children: children,
+      tag: 'ul',
+      marker: marker,
+    );
   }
 
   @override
   Styles getStyles() => Styles.combine([
         Styles.raw({
-          if (markerType != null) 'list-style-type': markerType!.value,
-          if (insideMarkers != null) 'list-style-position': insideMarkers! ? 'inside' : 'outside',
-          if (markerImageUrl != null) 'list-style-image': 'url("$markerImageUrl")',
+          if (marker?.type == ListStyleType.none) 'margin': '0',
+          if (marker?.type == ListStyleType.none) 'padding': '0',
+          if (marker?.type != null) 'list-style-type': marker!.type!.value,
+          if (marker?.isInside != null) 'list-style-position': marker!.isInside! ? 'inside' : 'outside',
+          if (marker?.imageUrl != null) 'list-style-image': 'url("${marker?.imageUrl}")',
         }),
         if (styles != null) styles!
       ]);

@@ -7,7 +7,7 @@ import 'package:shelf/shelf_io.dart' as shelf_io;
 import '../../server.dart';
 import 'server_handler.dart';
 
-typedef SetupFunction = void Function();
+typedef SetupFunction = void Function(ServerAppBinding binding);
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
 class ServerApp {
@@ -95,7 +95,7 @@ Future<void> _reload(ServerApp app, FutureOr<HttpServer> Function() init) async 
   // ignore: prefer_function_declarations_over_variables
   var obtainNewServer = (FutureOr<HttpServer> Function() initializer) async {
     await app.server?.close(force: true);
-    print('[INFO] Application reloaded.');
+    print('[INFO] Server application reloaded.');
     app._server = await initializer();
     app._listener?.call(app._server!);
   };
@@ -105,10 +105,10 @@ Future<void> _reload(ServerApp app, FutureOr<HttpServer> Function() init) async 
       debounceInterval: Duration.zero,
       onAfterReload: (ctx) => obtainNewServer(init),
     );
-    print('[INFO] Hot reload is enabled.');
+    print('[INFO] Server hot reload is enabled.');
   } on StateError catch (e) {
     if (e.message.contains('VM service not available')) {
-      print('[INFO] Hot reload not enabled. Run with --enable-vm-service to enable hot reload.');
+      print('[WARNING] Server hot reload not enabled. Run with --enable-vm-service to enable hot reload.');
     } else {
       rethrow;
     }

@@ -2,34 +2,54 @@ import 'dart:async';
 import 'dart:html' as html;
 
 import 'package:jaspr/browser.dart';
+import 'package:meta/meta.dart';
+import 'package:test/test.dart';
 
-import '../../jaspr_test.dart';
+import '../binding.dart';
+import '../finders.dart';
+
+@isTest
+void testBrowser(
+  String description,
+  FutureOr<void> Function(BrowserTester tester) callback, {
+  String location = '/',
+  bool? skip,
+  Timeout? timeout,
+  dynamic tags,
+}) {
+  test(
+    description,
+    () async {
+      if (html.window.location.pathname != location) {
+        html.window.history.replaceState(null, 'Test', location);
+      }
+
+      var binding = TestBrowserComponentsBinding();
+      var tester = BrowserTester._(binding);
+
+      return binding.runTest(() async {
+        await callback(tester);
+      });
+    },
+    skip: skip,
+    timeout: timeout,
+    tags: tags,
+  );
+}
 
 /// Tests any jaspr app in a headless browser environment.
 class BrowserTester {
-  BrowserTester._(this.binding, this._attachTo);
+  BrowserTester._(this.binding);
 
   final TestBrowserComponentsBinding binding;
-  final String _attachTo;
 
-  static BrowserTester setUp({
-    String attachTo = 'body',
-    String location = '/',
-    Map<String, dynamic>? initialStateData,
-    Map<String, dynamic> Function(String url)? onFetchState,
-  }) {
-    if (html.window.location.pathname != location) {
-      html.window.history.replaceState(null, 'Test', location);
-    }
-
-    var binding = TestBrowserComponentsBinding(onFetchState, initialStateData);
-    return BrowserTester._(binding, attachTo);
+  Future<void> pumpComponent(Component component, {Map<String, dynamic>? initialSyncState, String attachTo = 'body'}) {
+    binding._initialSyncState = initialSyncState;
+    return binding.attachRootComponent(component, attachTo: attachTo);
   }
 
-  static void tearDown() {}
-
-  Future<void> pumpComponent(Component component) {
-    return binding.attachRootComponent(component, attachTo: _attachTo);
+  void stubFetchState(Map<String, dynamic> Function(String url) onFetchState) {
+    binding._onFetchState = onFetchState;
   }
 
   Future<void> click(Finder finder, {bool pump = true}) async {
@@ -62,31 +82,29 @@ class BrowserTester {
       return element;
     }
 
-    DomElement? _foundElement;
+    DomElement? foundElement;
 
-    void _findFirstDomElement(Element e) {
+    void findFirstDomElement(Element e) {
       if (e is DomElement) {
-        _foundElement = e;
+        foundElement = e;
         return;
       }
-      e.visitChildren(_findFirstDomElement);
+      e.visitChildren(findFirstDomElement);
     }
 
-    _findFirstDomElement(element);
+    findFirstDomElement(element);
 
-    if (_foundElement == null) {
+    if (foundElement == null) {
       throw 'The finder "$finder" could not find a dom element.';
     }
 
-    return _foundElement!;
+    return foundElement!;
   }
 }
 
-class TestBrowserComponentsBinding extends AppBinding {
-  TestBrowserComponentsBinding(this._onFetchState, this._initialSyncState);
-
-  final Map<String, dynamic>? _initialSyncState;
-  final Map<String, dynamic> Function(String url)? _onFetchState;
+class TestBrowserComponentsBinding extends BrowserAppBinding {
+  Map<String, dynamic>? _initialSyncState;
+  Map<String, dynamic> Function(String url)? _onFetchState;
 
   @override
   Map<String, dynamic>? loadSyncState() {
