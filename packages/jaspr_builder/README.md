@@ -10,40 +10,29 @@ dart pub add jaspr_builder --dev
 
 # Builders
 
-## Apps and Islands
+## @client
 
-Builder for automatic setup of app and island components.
+Builder for automatic setup of client components.
 
-View [islands architecture](https://docs.page/schultek/jaspr/advanced/islands) for documentation.
+View [client components](https://docs.page/schultek/jaspr/core/app#client-components) for documentation.
 
-## web_mock
+## @Import
 
-Builder for mocking web-only libraries. Used for integrating js-libraries with jaspr.
+Builder for mocking platform-specific libraries. Used for integrating js-libraries with jaspr.
 
 ### How to use
 
-Next, create a new file named `<libname>.web.dart` and export any
-element from the targeted js library:
-
-> For example purpose, dart:html is used.
+Instead of importing those libraries directly, use the `@Import.onWeb` or `@Import.onServer` annotation.
 
 ```dart
-export 'dart:html' show window, Window, Storage;
+@Import.onWeb('dart:html', show: [#window, #HtmlDocument])
+@Import.onServer('dart:io', show: [#Platform])
+import 'app.imports.dart';
 ```
 
-The export directive **must** contain an explicit **show** constraint.
+The actual import directive **must** be the filename plus `.imports.dart`.
 
-Finally run code generation:
-```shell
-dart run build_runner build
-```
+Finally, run code generation using `dart run build_runner build`.
 
 > You don't need the code-generation step if you are running `jaspr serve`, since it will automatically
 > build and watch your files for changes.
-
-This will generate two files:
-
-- `<libname>.stub.dart` contains interface-stubs for all the exported elements
-- `<libname>.dart` combines the stub and web file with conditional imports
-
-In you project, you should the only import the `<libname>.dart` file.

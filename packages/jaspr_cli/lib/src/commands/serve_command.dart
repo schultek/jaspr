@@ -52,6 +52,7 @@ class ServeCommand extends BaseCommand {
       help: 'Serves the app in release mode.',
       negatable: false,
     );
+    argParser.addOption('flutter', help: 'Launch an embedded flutter app from the specified entrypoint.');
   }
 
   @override
@@ -68,6 +69,8 @@ class ServeCommand extends BaseCommand {
     var useSSR = argResults!['ssr'] as bool;
     var debug = argResults!['debug'] as bool;
     var release = argResults!['release'] as bool;
+    var verbose = argResults!['verbose'] as bool;
+    var flutter = argResults!['flutter'] as String?;
     var mode = argResults!['mode'] as String;
     var port = argResults!['port'] as String;
 
@@ -92,6 +95,26 @@ class ServeCommand extends BaseCommand {
         .where((event) => event.status == BuildStatus.succeeded)
         .first;
 
+    if (flutter != null) {
+      var flutterProcess = await Process.start(
+        'flutter',
+        ['run', '--device-id=web-server', '-t', flutter, '--web-port=5678'],
+      );
+      unawaited(watchProcess(
+        flutterProcess,
+        onFail: !verbose //
+            ? () => logger.info('flutter run exited unexpectedly. Run again with -v to see verbose output')
+            : null,
+      ));
+
+      workflow.serverManager.servers.first.buildResults
+          .where((event) => event.status == BuildStatus.succeeded)
+          .listen((event) {
+        // trigger reload
+        flutterProcess.stdin.writeln('r');
+      });
+    }
+
     var args = [
       'run',
       if (!release) ...[
@@ -101,6 +124,7 @@ class ServeCommand extends BaseCommand {
       ] else
         '-Djaspr.flags.release=true',
       '-Djaspr.dev.proxy=5467',
+      if (flutter != null) '-Djaspr.dev.flutter=5678',
       '-Djaspr.flags.verbose=$debug',
     ];
 
@@ -135,7 +159,6 @@ class ServeCommand extends BaseCommand {
 
   Future<DevWorkflow> _runWebdev(bool release, bool debug, String mode, String port) {
     var configuration = Configuration(
-      debug: debug,
       reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
       release: release,
     );

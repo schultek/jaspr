@@ -80,6 +80,7 @@ abstract class BaseCommand extends Command<int> {
     Process process, {
     String? progress,
     bool Function(String)? hide,
+    void Function()? onFail,
   }) async {
     Progress? pg;
     if (progress != null) {
@@ -110,6 +111,7 @@ abstract class BaseCommand extends Command<int> {
       pg?.complete();
     } else {
       pg?.fail();
+      onFail?.call();
       shutdown(exitCode);
     }
   }

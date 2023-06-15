@@ -2,7 +2,7 @@ import 'package:jaspr/server.dart';
 import './app.dart';
 
 void main() {
-  runApp(Document.app(
+  runApp(Document(
     title: '{{name}}',
     styles: [
       StyleRule.import('https://fonts.googleapis.com/css?family=Roboto'),

@@ -25,18 +25,15 @@ You can read more about this architecture pattern at these resources:
 
 ## Getting Started
 
-For an easy start, use the `islands' template when creating a new jaspr project.
+You should already be familiar with the `@client` annotation for components and the `Document()` component.
+Using these concepts jaspr already supports the islands architecture out of the box and there is no additional
+setup required.
 
-```shell
-jaspr create -t islands my_app
-```
-
-This will use a combination of the `Document.islands` constructor and the `@island` component 
-annotation for an easy automated setup of the islands architecture.
+Simply use one or multiple `@client` components when rendering the app on the server.
 
 ## Manual setup
 
-If you choose not to use the recommended approach using the `@island` annotation or want to build a 
+If you choose not to use the recommended approach using the `@client` annotation or want to build a
 purely client-side app, you can also set this up manually.
 
 In general, jaspr supports this architecture by allowing **multiple parallel apps** on the client.

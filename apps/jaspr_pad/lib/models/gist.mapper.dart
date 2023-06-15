@@ -5,178 +5,218 @@
 
 part of 'gist.dart';
 
-class GistDataMapper extends MapperBase<GistData> {
-  static MapperContainer container = MapperContainer(
-    mappers: {GistDataMapper()},
-  )..linkAll({GistFileMapper.container});
+class GistDataMapper extends ClassMapperBase<GistData> {
+  GistDataMapper._();
 
-  @override
-  GistDataMapperElement createElement(MapperContainer container) {
-    return GistDataMapperElement._(this, container);
+  static GistDataMapper? _instance;
+  static GistDataMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = GistDataMapper._());
+      GistFileMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
   }
 
   @override
-  String get id => 'GistData';
+  final String id = 'GistData';
 
-  static final fromMap = container.fromMap<GistData>;
-  static final fromJson = container.fromJson<GistData>;
-}
-
-class GistDataMapperElement extends MapperElementBase<GistData> {
-  GistDataMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  GistData decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  GistData fromMap(Map<String, dynamic> map) =>
-      GistData(container.$getOpt(map, 'id'), container.$getOpt(map, 'description'), container.$get(map, 'files'));
+  static String? _$id(GistData v) => v.id;
+  static const Field<GistData, String> _f$id = Field('id', _$id);
+  static String? _$description(GistData v) => v.description;
+  static const Field<GistData, String> _f$description = Field('description', _$description);
+  static Map<String, GistFile> _$files(GistData v) => v.files;
+  static const Field<GistData, Map<String, GistFile>> _f$files = Field('files', _$files);
 
   @override
-  Function get encoder => encode;
-  dynamic encode(GistData v) => toMap(v);
-  Map<String, dynamic> toMap(GistData g) => {
-        'id': container.$enc(g.id, 'id'),
-        'description': container.$enc(g.description, 'description'),
-        'files': container.$enc(g.files, 'files')
-      };
+  final Map<Symbol, Field<GistData, dynamic>> fields = const {
+    #id: _f$id,
+    #description: _f$description,
+    #files: _f$files,
+  };
+
+  static GistData _instantiate(DecodingData data) {
+    return GistData(data.dec(_f$id), data.dec(_f$description), data.dec(_f$files));
+  }
 
   @override
-  String stringify(GistData self) =>
-      'GistData(id: ${container.asString(self.id)}, description: ${container.asString(self.description)}, files: ${container.asString(self.files)})';
-  @override
-  int hash(GistData self) => container.hash(self.id) ^ container.hash(self.description) ^ container.hash(self.files);
-  @override
-  bool equals(GistData self, GistData other) =>
-      container.isEqual(self.id, other.id) &&
-      container.isEqual(self.description, other.description) &&
-      container.isEqual(self.files, other.files);
+  final Function instantiate = _instantiate;
+
+  static GistData fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<GistData>(map));
+  }
+
+  static GistData fromJson(String json) {
+    return _guard((c) => c.fromJson<GistData>(json));
+  }
 }
 
 mixin GistDataMappable {
-  String toJson() => GistDataMapper.container.toJson(this as GistData);
-  Map<String, dynamic> toMap() => GistDataMapper.container.toMap(this as GistData);
+  String toJson() {
+    return GistDataMapper._guard((c) => c.toJson(this as GistData));
+  }
+
+  Map<String, dynamic> toMap() {
+    return GistDataMapper._guard((c) => c.toMap(this as GistData));
+  }
+
   GistDataCopyWith<GistData, GistData, GistData> get copyWith =>
       _GistDataCopyWithImpl(this as GistData, $identity, $identity);
   @override
-  String toString() => GistDataMapper.container.asString(this);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) || (runtimeType == other.runtimeType && GistDataMapper.container.isEqual(this, other));
-  @override
-  int get hashCode => GistDataMapper.container.hash(this);
-}
-
-extension GistDataValueCopy<$R, $Out extends GistData> on ObjectCopyWith<$R, GistData, $Out> {
-  GistDataCopyWith<$R, GistData, $Out> get asGistData => base.as((v, t, t2) => _GistDataCopyWithImpl(v, t, t2));
-}
-
-typedef GistDataCopyWithBound = GistData;
-
-abstract class GistDataCopyWith<$R, $In extends GistData, $Out extends GistData>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  GistDataCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends GistData>(Then<GistData, $Out2> t, Then<$Out2, $R2> t2);
-  MapCopyWith<$R, String, GistFile, GistFileCopyWith<$R, GistFile, GistFile>> get files;
-  $R call({String? id, String? description, Map<String, GistFile>? files});
-}
-
-class _GistDataCopyWithImpl<$R, $Out extends GistData> extends CopyWithBase<$R, GistData, $Out>
-    implements GistDataCopyWith<$R, GistData, $Out> {
-  _GistDataCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  GistDataCopyWith<$R2, GistData, $Out2> chain<$R2, $Out2 extends GistData>(
-          Then<GistData, $Out2> t, Then<$Out2, $R2> t2) =>
-      _GistDataCopyWithImpl($value, t, t2);
-
-  @override
-  MapCopyWith<$R, String, GistFile, GistFileCopyWith<$R, GistFile, GistFile>> get files =>
-      MapCopyWith($value.files, (v, t) => v.copyWith.chain<$R, GistFile>($identity, t), (v) => call(files: v));
-  @override
-  $R call({Object? id = $none, Object? description = $none, Map<String, GistFile>? files}) =>
-      $then(GistData(or(id, $value.id), or(description, $value.description), files ?? $value.files));
-}
-
-class GistFileMapper extends MapperBase<GistFile> {
-  static MapperContainer container = MapperContainer(
-    mappers: {GistFileMapper()},
-  );
-
-  @override
-  GistFileMapperElement createElement(MapperContainer container) {
-    return GistFileMapperElement._(this, container);
+  String toString() {
+    return GistDataMapper._guard((c) => c.asString(this));
   }
 
   @override
-  String get id => 'GistFile';
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && GistDataMapper._guard((c) => c.isEqual(this, other)));
+  }
 
-  static final fromMap = container.fromMap<GistFile>;
-  static final fromJson = container.fromJson<GistFile>;
+  @override
+  int get hashCode {
+    return GistDataMapper._guard((c) => c.hash(this));
+  }
 }
 
-class GistFileMapperElement extends MapperElementBase<GistFile> {
-  GistFileMapperElement._(super.mapper, super.container);
+extension GistDataValueCopy<$R, $Out> on ObjectCopyWith<$R, GistData, $Out> {
+  GistDataCopyWith<$R, GistData, $Out> get $asGistData => $base.as((v, t, t2) => _GistDataCopyWithImpl(v, t, t2));
+}
+
+abstract class GistDataCopyWith<$R, $In extends GistData, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  MapCopyWith<$R, String, GistFile, GistFileCopyWith<$R, GistFile, GistFile>> get files;
+  $R call({String? id, String? description, Map<String, GistFile>? files});
+  GistDataCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _GistDataCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, GistData, $Out>
+    implements GistDataCopyWith<$R, GistData, $Out> {
+  _GistDataCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  Function get decoder => decode;
-  GistFile decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  GistFile fromMap(Map<String, dynamic> map) =>
-      GistFile(container.$get(map, 'filename'), container.$get(map, 'content'), container.$get(map, 'type'));
+  late final ClassMapperBase<GistData> $mapper = GistDataMapper.ensureInitialized();
+  @override
+  MapCopyWith<$R, String, GistFile, GistFileCopyWith<$R, GistFile, GistFile>> get files =>
+      MapCopyWith($value.files, (v, t) => v.copyWith.$chain(t), (v) => call(files: v));
+  @override
+  $R call({Object? id = $none, Object? description = $none, Map<String, GistFile>? files}) => $apply(FieldCopyWithData({
+        if (id != $none) #id: id,
+        if (description != $none) #description: description,
+        if (files != null) #files: files
+      }));
+  @override
+  GistData $make(CopyWithData data) => GistData(
+      data.get(#id, or: $value.id), data.get(#description, or: $value.description), data.get(#files, or: $value.files));
 
   @override
-  Function get encoder => encode;
-  dynamic encode(GistFile v) => toMap(v);
-  Map<String, dynamic> toMap(GistFile g) => {
-        'filename': container.$enc(g.name, 'name'),
-        'content': container.$enc(g.content, 'content'),
-        'type': container.$enc(g.type, 'type')
-      };
+  GistDataCopyWith<$R2, GistData, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _GistDataCopyWithImpl($value, $cast, t);
+}
+
+class GistFileMapper extends ClassMapperBase<GistFile> {
+  GistFileMapper._();
+
+  static GistFileMapper? _instance;
+  static GistFileMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = GistFileMapper._());
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
 
   @override
-  String stringify(GistFile self) =>
-      'GistFile(name: ${container.asString(self.name)}, content: ${container.asString(self.content)}, type: ${container.asString(self.type)})';
+  final String id = 'GistFile';
+
+  static String _$name(GistFile v) => v.name;
+  static const Field<GistFile, String> _f$name = Field('name', _$name, key: 'filename');
+  static String _$content(GistFile v) => v.content;
+  static const Field<GistFile, String> _f$content = Field('content', _$content);
+  static String _$type(GistFile v) => v.type;
+  static const Field<GistFile, String> _f$type = Field('type', _$type);
+
   @override
-  int hash(GistFile self) => container.hash(self.name) ^ container.hash(self.content) ^ container.hash(self.type);
+  final Map<Symbol, Field<GistFile, dynamic>> fields = const {
+    #name: _f$name,
+    #content: _f$content,
+    #type: _f$type,
+  };
+
+  static GistFile _instantiate(DecodingData data) {
+    return GistFile(data.dec(_f$name), data.dec(_f$content), data.dec(_f$type));
+  }
+
   @override
-  bool equals(GistFile self, GistFile other) =>
-      container.isEqual(self.name, other.name) &&
-      container.isEqual(self.content, other.content) &&
-      container.isEqual(self.type, other.type);
+  final Function instantiate = _instantiate;
+
+  static GistFile fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<GistFile>(map));
+  }
+
+  static GistFile fromJson(String json) {
+    return _guard((c) => c.fromJson<GistFile>(json));
+  }
 }
 
 mixin GistFileMappable {
-  String toJson() => GistFileMapper.container.toJson(this as GistFile);
-  Map<String, dynamic> toMap() => GistFileMapper.container.toMap(this as GistFile);
+  String toJson() {
+    return GistFileMapper._guard((c) => c.toJson(this as GistFile));
+  }
+
+  Map<String, dynamic> toMap() {
+    return GistFileMapper._guard((c) => c.toMap(this as GistFile));
+  }
+
   GistFileCopyWith<GistFile, GistFile, GistFile> get copyWith =>
       _GistFileCopyWithImpl(this as GistFile, $identity, $identity);
   @override
-  String toString() => GistFileMapper.container.asString(this);
+  String toString() {
+    return GistFileMapper._guard((c) => c.asString(this));
+  }
+
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) || (runtimeType == other.runtimeType && GistFileMapper.container.isEqual(this, other));
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && GistFileMapper._guard((c) => c.isEqual(this, other)));
+  }
+
   @override
-  int get hashCode => GistFileMapper.container.hash(this);
+  int get hashCode {
+    return GistFileMapper._guard((c) => c.hash(this));
+  }
 }
 
-extension GistFileValueCopy<$R, $Out extends GistFile> on ObjectCopyWith<$R, GistFile, $Out> {
-  GistFileCopyWith<$R, GistFile, $Out> get asGistFile => base.as((v, t, t2) => _GistFileCopyWithImpl(v, t, t2));
+extension GistFileValueCopy<$R, $Out> on ObjectCopyWith<$R, GistFile, $Out> {
+  GistFileCopyWith<$R, GistFile, $Out> get $asGistFile => $base.as((v, t, t2) => _GistFileCopyWithImpl(v, t, t2));
 }
 
-typedef GistFileCopyWithBound = GistFile;
-
-abstract class GistFileCopyWith<$R, $In extends GistFile, $Out extends GistFile>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  GistFileCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends GistFile>(Then<GistFile, $Out2> t, Then<$Out2, $R2> t2);
+abstract class GistFileCopyWith<$R, $In extends GistFile, $Out> implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? name, String? content, String? type});
+  GistFileCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _GistFileCopyWithImpl<$R, $Out extends GistFile> extends CopyWithBase<$R, GistFile, $Out>
+class _GistFileCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, GistFile, $Out>
     implements GistFileCopyWith<$R, GistFile, $Out> {
   _GistFileCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  GistFileCopyWith<$R2, GistFile, $Out2> chain<$R2, $Out2 extends GistFile>(
-          Then<GistFile, $Out2> t, Then<$Out2, $R2> t2) =>
-      _GistFileCopyWithImpl($value, t, t2);
 
   @override
-  $R call({String? name, String? content, String? type}) =>
-      $then(GistFile(name ?? $value.name, content ?? $value.content, type ?? $value.type));
+  late final ClassMapperBase<GistFile> $mapper = GistFileMapper.ensureInitialized();
+  @override
+  $R call({String? name, String? content, String? type}) => $apply(FieldCopyWithData(
+      {if (name != null) #name: name, if (content != null) #content: content, if (type != null) #type: type}));
+  @override
+  GistFile $make(CopyWithData data) => GistFile(
+      data.get(#name, or: $value.name), data.get(#content, or: $value.content), data.get(#type, or: $value.type));
+
+  @override
+  GistFileCopyWith<$R2, GistFile, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _GistFileCopyWithImpl($value, $cast, t);
 }

@@ -5,1065 +5,21 @@
 
 part of 'api_models.dart';
 
-class CompileRequestMapper extends MapperBase<CompileRequest> {
-  static MapperContainer container = MapperContainer(
-    mappers: {CompileRequestMapper()},
-  );
-
-  @override
-  CompileRequestMapperElement createElement(MapperContainer container) {
-    return CompileRequestMapperElement._(this, container);
-  }
-
-  @override
-  String get id => 'CompileRequest';
-
-  static final fromMap = container.fromMap<CompileRequest>;
-  static final fromJson = container.fromJson<CompileRequest>;
-}
-
-class CompileRequestMapperElement extends MapperElementBase<CompileRequest> {
-  CompileRequestMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  CompileRequest decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  CompileRequest fromMap(Map<String, dynamic> map) => CompileRequest(container.$get(map, 'sources'));
-
-  @override
-  Function get encoder => encode;
-  dynamic encode(CompileRequest v) => toMap(v);
-  Map<String, dynamic> toMap(CompileRequest c) => {'sources': container.$enc(c.sources, 'sources')};
-
-  @override
-  String stringify(CompileRequest self) => 'CompileRequest(sources: ${container.asString(self.sources)})';
-  @override
-  int hash(CompileRequest self) => container.hash(self.sources);
-  @override
-  bool equals(CompileRequest self, CompileRequest other) => container.isEqual(self.sources, other.sources);
-}
-
-mixin CompileRequestMappable {
-  String toJson() => CompileRequestMapper.container.toJson(this as CompileRequest);
-  Map<String, dynamic> toMap() => CompileRequestMapper.container.toMap(this as CompileRequest);
-  CompileRequestCopyWith<CompileRequest, CompileRequest, CompileRequest> get copyWith =>
-      _CompileRequestCopyWithImpl(this as CompileRequest, $identity, $identity);
-  @override
-  String toString() => CompileRequestMapper.container.asString(this);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (runtimeType == other.runtimeType && CompileRequestMapper.container.isEqual(this, other));
-  @override
-  int get hashCode => CompileRequestMapper.container.hash(this);
-}
-
-extension CompileRequestValueCopy<$R, $Out extends CompileRequest> on ObjectCopyWith<$R, CompileRequest, $Out> {
-  CompileRequestCopyWith<$R, CompileRequest, $Out> get asCompileRequest =>
-      base.as((v, t, t2) => _CompileRequestCopyWithImpl(v, t, t2));
-}
-
-typedef CompileRequestCopyWithBound = CompileRequest;
-
-abstract class CompileRequestCopyWith<$R, $In extends CompileRequest, $Out extends CompileRequest>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  CompileRequestCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends CompileRequest>(
-      Then<CompileRequest, $Out2> t, Then<$Out2, $R2> t2);
-  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources;
-  $R call({Map<String, String>? sources});
-}
-
-class _CompileRequestCopyWithImpl<$R, $Out extends CompileRequest> extends CopyWithBase<$R, CompileRequest, $Out>
-    implements CompileRequestCopyWith<$R, CompileRequest, $Out> {
-  _CompileRequestCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  CompileRequestCopyWith<$R2, CompileRequest, $Out2> chain<$R2, $Out2 extends CompileRequest>(
-          Then<CompileRequest, $Out2> t, Then<$Out2, $R2> t2) =>
-      _CompileRequestCopyWithImpl($value, t, t2);
-
-  @override
-  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources =>
-      MapCopyWith($value.sources, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(sources: v));
-  @override
-  $R call({Map<String, String>? sources}) => $then(CompileRequest(sources ?? $value.sources));
-}
-
-class CompileResponseMapper extends MapperBase<CompileResponse> {
-  static MapperContainer container = MapperContainer(
-    mappers: {CompileResponseMapper()},
-  );
-
-  @override
-  CompileResponseMapperElement createElement(MapperContainer container) {
-    return CompileResponseMapperElement._(this, container);
-  }
-
-  @override
-  String get id => 'CompileResponse';
-
-  static final fromMap = container.fromMap<CompileResponse>;
-  static final fromJson = container.fromJson<CompileResponse>;
-}
-
-class CompileResponseMapperElement extends MapperElementBase<CompileResponse> {
-  CompileResponseMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  CompileResponse decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  CompileResponse fromMap(Map<String, dynamic> map) =>
-      CompileResponse(container.$getOpt(map, 'result'), container.$getOpt(map, 'error'));
-
-  @override
-  Function get encoder => encode;
-  dynamic encode(CompileResponse v) => toMap(v);
-  Map<String, dynamic> toMap(CompileResponse c) =>
-      {'result': container.$enc(c.result, 'result'), 'error': container.$enc(c.error, 'error')};
-
-  @override
-  String stringify(CompileResponse self) =>
-      'CompileResponse(result: ${container.asString(self.result)}, error: ${container.asString(self.error)})';
-  @override
-  int hash(CompileResponse self) => container.hash(self.result) ^ container.hash(self.error);
-  @override
-  bool equals(CompileResponse self, CompileResponse other) =>
-      container.isEqual(self.result, other.result) && container.isEqual(self.error, other.error);
-}
-
-mixin CompileResponseMappable {
-  String toJson() => CompileResponseMapper.container.toJson(this as CompileResponse);
-  Map<String, dynamic> toMap() => CompileResponseMapper.container.toMap(this as CompileResponse);
-  CompileResponseCopyWith<CompileResponse, CompileResponse, CompileResponse> get copyWith =>
-      _CompileResponseCopyWithImpl(this as CompileResponse, $identity, $identity);
-  @override
-  String toString() => CompileResponseMapper.container.asString(this);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (runtimeType == other.runtimeType && CompileResponseMapper.container.isEqual(this, other));
-  @override
-  int get hashCode => CompileResponseMapper.container.hash(this);
-}
-
-extension CompileResponseValueCopy<$R, $Out extends CompileResponse> on ObjectCopyWith<$R, CompileResponse, $Out> {
-  CompileResponseCopyWith<$R, CompileResponse, $Out> get asCompileResponse =>
-      base.as((v, t, t2) => _CompileResponseCopyWithImpl(v, t, t2));
-}
-
-typedef CompileResponseCopyWithBound = CompileResponse;
-
-abstract class CompileResponseCopyWith<$R, $In extends CompileResponse, $Out extends CompileResponse>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  CompileResponseCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends CompileResponse>(
-      Then<CompileResponse, $Out2> t, Then<$Out2, $R2> t2);
-  $R call({String? result, String? error});
-}
-
-class _CompileResponseCopyWithImpl<$R, $Out extends CompileResponse> extends CopyWithBase<$R, CompileResponse, $Out>
-    implements CompileResponseCopyWith<$R, CompileResponse, $Out> {
-  _CompileResponseCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  CompileResponseCopyWith<$R2, CompileResponse, $Out2> chain<$R2, $Out2 extends CompileResponse>(
-          Then<CompileResponse, $Out2> t, Then<$Out2, $R2> t2) =>
-      _CompileResponseCopyWithImpl($value, t, t2);
-
-  @override
-  $R call({Object? result = $none, Object? error = $none}) =>
-      $then(CompileResponse(or(result, $value.result), or(error, $value.error)));
-}
-
-class AnalyzeRequestMapper extends MapperBase<AnalyzeRequest> {
-  static MapperContainer container = MapperContainer(
-    mappers: {AnalyzeRequestMapper()},
-  );
-
-  @override
-  AnalyzeRequestMapperElement createElement(MapperContainer container) {
-    return AnalyzeRequestMapperElement._(this, container);
-  }
-
-  @override
-  String get id => 'AnalyzeRequest';
-
-  static final fromMap = container.fromMap<AnalyzeRequest>;
-  static final fromJson = container.fromJson<AnalyzeRequest>;
-}
-
-class AnalyzeRequestMapperElement extends MapperElementBase<AnalyzeRequest> {
-  AnalyzeRequestMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  AnalyzeRequest decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  AnalyzeRequest fromMap(Map<String, dynamic> map) => AnalyzeRequest(container.$get(map, 'sources'));
-
-  @override
-  Function get encoder => encode;
-  dynamic encode(AnalyzeRequest v) => toMap(v);
-  Map<String, dynamic> toMap(AnalyzeRequest a) => {'sources': container.$enc(a.sources, 'sources')};
-
-  @override
-  String stringify(AnalyzeRequest self) => 'AnalyzeRequest(sources: ${container.asString(self.sources)})';
-  @override
-  int hash(AnalyzeRequest self) => container.hash(self.sources);
-  @override
-  bool equals(AnalyzeRequest self, AnalyzeRequest other) => container.isEqual(self.sources, other.sources);
-}
-
-mixin AnalyzeRequestMappable {
-  String toJson() => AnalyzeRequestMapper.container.toJson(this as AnalyzeRequest);
-  Map<String, dynamic> toMap() => AnalyzeRequestMapper.container.toMap(this as AnalyzeRequest);
-  AnalyzeRequestCopyWith<AnalyzeRequest, AnalyzeRequest, AnalyzeRequest> get copyWith =>
-      _AnalyzeRequestCopyWithImpl(this as AnalyzeRequest, $identity, $identity);
-  @override
-  String toString() => AnalyzeRequestMapper.container.asString(this);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (runtimeType == other.runtimeType && AnalyzeRequestMapper.container.isEqual(this, other));
-  @override
-  int get hashCode => AnalyzeRequestMapper.container.hash(this);
-}
-
-extension AnalyzeRequestValueCopy<$R, $Out extends AnalyzeRequest> on ObjectCopyWith<$R, AnalyzeRequest, $Out> {
-  AnalyzeRequestCopyWith<$R, AnalyzeRequest, $Out> get asAnalyzeRequest =>
-      base.as((v, t, t2) => _AnalyzeRequestCopyWithImpl(v, t, t2));
-}
-
-typedef AnalyzeRequestCopyWithBound = AnalyzeRequest;
-
-abstract class AnalyzeRequestCopyWith<$R, $In extends AnalyzeRequest, $Out extends AnalyzeRequest>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  AnalyzeRequestCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends AnalyzeRequest>(
-      Then<AnalyzeRequest, $Out2> t, Then<$Out2, $R2> t2);
-  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources;
-  $R call({Map<String, String>? sources});
-}
-
-class _AnalyzeRequestCopyWithImpl<$R, $Out extends AnalyzeRequest> extends CopyWithBase<$R, AnalyzeRequest, $Out>
-    implements AnalyzeRequestCopyWith<$R, AnalyzeRequest, $Out> {
-  _AnalyzeRequestCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  AnalyzeRequestCopyWith<$R2, AnalyzeRequest, $Out2> chain<$R2, $Out2 extends AnalyzeRequest>(
-          Then<AnalyzeRequest, $Out2> t, Then<$Out2, $R2> t2) =>
-      _AnalyzeRequestCopyWithImpl($value, t, t2);
-
-  @override
-  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources =>
-      MapCopyWith($value.sources, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(sources: v));
-  @override
-  $R call({Map<String, String>? sources}) => $then(AnalyzeRequest(sources ?? $value.sources));
-}
-
-class FormatResponseMapper extends MapperBase<FormatResponse> {
-  static MapperContainer container = MapperContainer(
-    mappers: {FormatResponseMapper()},
-  );
-
-  @override
-  FormatResponseMapperElement createElement(MapperContainer container) {
-    return FormatResponseMapperElement._(this, container);
-  }
-
-  @override
-  String get id => 'FormatResponse';
-
-  static final fromMap = container.fromMap<FormatResponse>;
-  static final fromJson = container.fromJson<FormatResponse>;
-}
-
-class FormatResponseMapperElement extends MapperElementBase<FormatResponse> {
-  FormatResponseMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  FormatResponse decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  FormatResponse fromMap(Map<String, dynamic> map) =>
-      FormatResponse(container.$get(map, 'newString'), container.$get(map, 'newOffset'));
-
-  @override
-  Function get encoder => encode;
-  dynamic encode(FormatResponse v) => toMap(v);
-  Map<String, dynamic> toMap(FormatResponse f) =>
-      {'newString': container.$enc(f.newString, 'newString'), 'newOffset': container.$enc(f.newOffset, 'newOffset')};
-
-  @override
-  String stringify(FormatResponse self) =>
-      'FormatResponse(newString: ${container.asString(self.newString)}, newOffset: ${container.asString(self.newOffset)})';
-  @override
-  int hash(FormatResponse self) => container.hash(self.newString) ^ container.hash(self.newOffset);
-  @override
-  bool equals(FormatResponse self, FormatResponse other) =>
-      container.isEqual(self.newString, other.newString) && container.isEqual(self.newOffset, other.newOffset);
-}
-
-mixin FormatResponseMappable {
-  String toJson() => FormatResponseMapper.container.toJson(this as FormatResponse);
-  Map<String, dynamic> toMap() => FormatResponseMapper.container.toMap(this as FormatResponse);
-  FormatResponseCopyWith<FormatResponse, FormatResponse, FormatResponse> get copyWith =>
-      _FormatResponseCopyWithImpl(this as FormatResponse, $identity, $identity);
-  @override
-  String toString() => FormatResponseMapper.container.asString(this);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (runtimeType == other.runtimeType && FormatResponseMapper.container.isEqual(this, other));
-  @override
-  int get hashCode => FormatResponseMapper.container.hash(this);
-}
-
-extension FormatResponseValueCopy<$R, $Out extends FormatResponse> on ObjectCopyWith<$R, FormatResponse, $Out> {
-  FormatResponseCopyWith<$R, FormatResponse, $Out> get asFormatResponse =>
-      base.as((v, t, t2) => _FormatResponseCopyWithImpl(v, t, t2));
-}
-
-typedef FormatResponseCopyWithBound = FormatResponse;
-
-abstract class FormatResponseCopyWith<$R, $In extends FormatResponse, $Out extends FormatResponse>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  FormatResponseCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends FormatResponse>(
-      Then<FormatResponse, $Out2> t, Then<$Out2, $R2> t2);
-  $R call({String? newString, int? newOffset});
-}
-
-class _FormatResponseCopyWithImpl<$R, $Out extends FormatResponse> extends CopyWithBase<$R, FormatResponse, $Out>
-    implements FormatResponseCopyWith<$R, FormatResponse, $Out> {
-  _FormatResponseCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  FormatResponseCopyWith<$R2, FormatResponse, $Out2> chain<$R2, $Out2 extends FormatResponse>(
-          Then<FormatResponse, $Out2> t, Then<$Out2, $R2> t2) =>
-      _FormatResponseCopyWithImpl($value, t, t2);
-
-  @override
-  $R call({String? newString, int? newOffset}) =>
-      $then(FormatResponse(newString ?? $value.newString, newOffset ?? $value.newOffset));
-}
-
-class FormatRequestMapper extends MapperBase<FormatRequest> {
-  static MapperContainer container = MapperContainer(
-    mappers: {FormatRequestMapper()},
-  );
-
-  @override
-  FormatRequestMapperElement createElement(MapperContainer container) {
-    return FormatRequestMapperElement._(this, container);
-  }
-
-  @override
-  String get id => 'FormatRequest';
-
-  static final fromMap = container.fromMap<FormatRequest>;
-  static final fromJson = container.fromJson<FormatRequest>;
-}
-
-class FormatRequestMapperElement extends MapperElementBase<FormatRequest> {
-  FormatRequestMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  FormatRequest decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  FormatRequest fromMap(Map<String, dynamic> map) =>
-      FormatRequest(container.$get(map, 'source'), container.$get(map, 'offset'));
-
-  @override
-  Function get encoder => encode;
-  dynamic encode(FormatRequest v) => toMap(v);
-  Map<String, dynamic> toMap(FormatRequest f) =>
-      {'source': container.$enc(f.source, 'source'), 'offset': container.$enc(f.offset, 'offset')};
-
-  @override
-  String stringify(FormatRequest self) =>
-      'FormatRequest(source: ${container.asString(self.source)}, offset: ${container.asString(self.offset)})';
-  @override
-  int hash(FormatRequest self) => container.hash(self.source) ^ container.hash(self.offset);
-  @override
-  bool equals(FormatRequest self, FormatRequest other) =>
-      container.isEqual(self.source, other.source) && container.isEqual(self.offset, other.offset);
-}
-
-mixin FormatRequestMappable {
-  String toJson() => FormatRequestMapper.container.toJson(this as FormatRequest);
-  Map<String, dynamic> toMap() => FormatRequestMapper.container.toMap(this as FormatRequest);
-  FormatRequestCopyWith<FormatRequest, FormatRequest, FormatRequest> get copyWith =>
-      _FormatRequestCopyWithImpl(this as FormatRequest, $identity, $identity);
-  @override
-  String toString() => FormatRequestMapper.container.asString(this);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (runtimeType == other.runtimeType && FormatRequestMapper.container.isEqual(this, other));
-  @override
-  int get hashCode => FormatRequestMapper.container.hash(this);
-}
-
-extension FormatRequestValueCopy<$R, $Out extends FormatRequest> on ObjectCopyWith<$R, FormatRequest, $Out> {
-  FormatRequestCopyWith<$R, FormatRequest, $Out> get asFormatRequest =>
-      base.as((v, t, t2) => _FormatRequestCopyWithImpl(v, t, t2));
-}
-
-typedef FormatRequestCopyWithBound = FormatRequest;
-
-abstract class FormatRequestCopyWith<$R, $In extends FormatRequest, $Out extends FormatRequest>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  FormatRequestCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends FormatRequest>(
-      Then<FormatRequest, $Out2> t, Then<$Out2, $R2> t2);
-  $R call({String? source, int? offset});
-}
-
-class _FormatRequestCopyWithImpl<$R, $Out extends FormatRequest> extends CopyWithBase<$R, FormatRequest, $Out>
-    implements FormatRequestCopyWith<$R, FormatRequest, $Out> {
-  _FormatRequestCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  FormatRequestCopyWith<$R2, FormatRequest, $Out2> chain<$R2, $Out2 extends FormatRequest>(
-          Then<FormatRequest, $Out2> t, Then<$Out2, $R2> t2) =>
-      _FormatRequestCopyWithImpl($value, t, t2);
-
-  @override
-  $R call({String? source, int? offset}) => $then(FormatRequest(source ?? $value.source, offset ?? $value.offset));
-}
-
-class AnalyzeResponseMapper extends MapperBase<AnalyzeResponse> {
-  static MapperContainer container = MapperContainer(
-    mappers: {AnalyzeResponseMapper()},
-  )..linkAll({IssueMapper.container});
-
-  @override
-  AnalyzeResponseMapperElement createElement(MapperContainer container) {
-    return AnalyzeResponseMapperElement._(this, container);
-  }
-
-  @override
-  String get id => 'AnalyzeResponse';
-
-  static final fromMap = container.fromMap<AnalyzeResponse>;
-  static final fromJson = container.fromJson<AnalyzeResponse>;
-}
-
-class AnalyzeResponseMapperElement extends MapperElementBase<AnalyzeResponse> {
-  AnalyzeResponseMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  AnalyzeResponse decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  AnalyzeResponse fromMap(Map<String, dynamic> map) => AnalyzeResponse(container.$getOpt(map, 'issues') ?? const []);
-
-  @override
-  Function get encoder => encode;
-  dynamic encode(AnalyzeResponse v) => toMap(v);
-  Map<String, dynamic> toMap(AnalyzeResponse a) => {'issues': container.$enc(a.issues, 'issues')};
-
-  @override
-  String stringify(AnalyzeResponse self) => 'AnalyzeResponse(issues: ${container.asString(self.issues)})';
-  @override
-  int hash(AnalyzeResponse self) => container.hash(self.issues);
-  @override
-  bool equals(AnalyzeResponse self, AnalyzeResponse other) => container.isEqual(self.issues, other.issues);
-}
-
-mixin AnalyzeResponseMappable {
-  String toJson() => AnalyzeResponseMapper.container.toJson(this as AnalyzeResponse);
-  Map<String, dynamic> toMap() => AnalyzeResponseMapper.container.toMap(this as AnalyzeResponse);
-  AnalyzeResponseCopyWith<AnalyzeResponse, AnalyzeResponse, AnalyzeResponse> get copyWith =>
-      _AnalyzeResponseCopyWithImpl(this as AnalyzeResponse, $identity, $identity);
-  @override
-  String toString() => AnalyzeResponseMapper.container.asString(this);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (runtimeType == other.runtimeType && AnalyzeResponseMapper.container.isEqual(this, other));
-  @override
-  int get hashCode => AnalyzeResponseMapper.container.hash(this);
-}
-
-extension AnalyzeResponseValueCopy<$R, $Out extends AnalyzeResponse> on ObjectCopyWith<$R, AnalyzeResponse, $Out> {
-  AnalyzeResponseCopyWith<$R, AnalyzeResponse, $Out> get asAnalyzeResponse =>
-      base.as((v, t, t2) => _AnalyzeResponseCopyWithImpl(v, t, t2));
-}
-
-typedef AnalyzeResponseCopyWithBound = AnalyzeResponse;
-
-abstract class AnalyzeResponseCopyWith<$R, $In extends AnalyzeResponse, $Out extends AnalyzeResponse>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  AnalyzeResponseCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends AnalyzeResponse>(
-      Then<AnalyzeResponse, $Out2> t, Then<$Out2, $R2> t2);
-  ListCopyWith<$R, Issue, IssueCopyWith<$R, Issue, Issue>> get issues;
-  $R call({List<Issue>? issues});
-}
-
-class _AnalyzeResponseCopyWithImpl<$R, $Out extends AnalyzeResponse> extends CopyWithBase<$R, AnalyzeResponse, $Out>
-    implements AnalyzeResponseCopyWith<$R, AnalyzeResponse, $Out> {
-  _AnalyzeResponseCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  AnalyzeResponseCopyWith<$R2, AnalyzeResponse, $Out2> chain<$R2, $Out2 extends AnalyzeResponse>(
-          Then<AnalyzeResponse, $Out2> t, Then<$Out2, $R2> t2) =>
-      _AnalyzeResponseCopyWithImpl($value, t, t2);
-
-  @override
-  ListCopyWith<$R, Issue, IssueCopyWith<$R, Issue, Issue>> get issues =>
-      ListCopyWith($value.issues, (v, t) => v.copyWith.chain<$R, Issue>($identity, t), (v) => call(issues: v));
-  @override
-  $R call({List<Issue>? issues}) => $then(AnalyzeResponse(issues ?? $value.issues));
-}
-
-class IssueMapper extends MapperBase<Issue> {
-  static MapperContainer container = MapperContainer(
-    mappers: {IssueMapper()},
-  )..linkAll({IssueKindMapper.container, IssueLocationMapper.container});
-
-  @override
-  IssueMapperElement createElement(MapperContainer container) {
-    return IssueMapperElement._(this, container);
-  }
-
-  @override
-  String get id => 'Issue';
-
-  static final fromMap = container.fromMap<Issue>;
-  static final fromJson = container.fromJson<Issue>;
-}
-
-class IssueMapperElement extends MapperElementBase<Issue> {
-  IssueMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  Issue decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  Issue fromMap(Map<String, dynamic> map) => Issue(
-      kind: container.$get(map, 'kind'),
-      location: container.$get(map, 'location'),
-      message: container.$get(map, 'message'),
-      hasFixes: container.$get(map, 'hasFixes'),
-      sourceName: container.$get(map, 'sourceName'),
-      correction: container.$getOpt(map, 'correction'),
-      url: container.$getOpt(map, 'url'));
-
-  @override
-  Function get encoder => encode;
-  dynamic encode(Issue v) => toMap(v);
-  Map<String, dynamic> toMap(Issue i) => {
-        'kind': container.$enc(i.kind, 'kind'),
-        'location': container.$enc(i.location, 'location'),
-        'message': container.$enc(i.message, 'message'),
-        'hasFixes': container.$enc(i.hasFixes, 'hasFixes'),
-        'sourceName': container.$enc(i.sourceName, 'sourceName'),
-        'correction': container.$enc(i.correction, 'correction'),
-        'url': container.$enc(i.url, 'url')
-      };
-
-  @override
-  String stringify(Issue self) =>
-      'Issue(kind: ${container.asString(self.kind)}, location: ${container.asString(self.location)}, message: ${container.asString(self.message)}, hasFixes: ${container.asString(self.hasFixes)}, sourceName: ${container.asString(self.sourceName)}, correction: ${container.asString(self.correction)}, url: ${container.asString(self.url)})';
-  @override
-  int hash(Issue self) =>
-      container.hash(self.kind) ^
-      container.hash(self.location) ^
-      container.hash(self.message) ^
-      container.hash(self.hasFixes) ^
-      container.hash(self.sourceName) ^
-      container.hash(self.correction) ^
-      container.hash(self.url);
-  @override
-  bool equals(Issue self, Issue other) =>
-      container.isEqual(self.kind, other.kind) &&
-      container.isEqual(self.location, other.location) &&
-      container.isEqual(self.message, other.message) &&
-      container.isEqual(self.hasFixes, other.hasFixes) &&
-      container.isEqual(self.sourceName, other.sourceName) &&
-      container.isEqual(self.correction, other.correction) &&
-      container.isEqual(self.url, other.url);
-}
-
-mixin IssueMappable {
-  String toJson() => IssueMapper.container.toJson(this as Issue);
-  Map<String, dynamic> toMap() => IssueMapper.container.toMap(this as Issue);
-  IssueCopyWith<Issue, Issue, Issue> get copyWith => _IssueCopyWithImpl(this as Issue, $identity, $identity);
-  @override
-  String toString() => IssueMapper.container.asString(this);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) || (runtimeType == other.runtimeType && IssueMapper.container.isEqual(this, other));
-  @override
-  int get hashCode => IssueMapper.container.hash(this);
-}
-
-extension IssueValueCopy<$R, $Out extends Issue> on ObjectCopyWith<$R, Issue, $Out> {
-  IssueCopyWith<$R, Issue, $Out> get asIssue => base.as((v, t, t2) => _IssueCopyWithImpl(v, t, t2));
-}
-
-typedef IssueCopyWithBound = Issue;
-
-abstract class IssueCopyWith<$R, $In extends Issue, $Out extends Issue> implements ObjectCopyWith<$R, $In, $Out> {
-  IssueCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends Issue>(Then<Issue, $Out2> t, Then<$Out2, $R2> t2);
-  IssueLocationCopyWith<$R, IssueLocation, IssueLocation> get location;
-  $R call(
-      {IssueKind? kind,
-      IssueLocation? location,
-      String? message,
-      bool? hasFixes,
-      String? sourceName,
-      String? correction,
-      String? url});
-}
-
-class _IssueCopyWithImpl<$R, $Out extends Issue> extends CopyWithBase<$R, Issue, $Out>
-    implements IssueCopyWith<$R, Issue, $Out> {
-  _IssueCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  IssueCopyWith<$R2, Issue, $Out2> chain<$R2, $Out2 extends Issue>(Then<Issue, $Out2> t, Then<$Out2, $R2> t2) =>
-      _IssueCopyWithImpl($value, t, t2);
-
-  @override
-  IssueLocationCopyWith<$R, IssueLocation, IssueLocation> get location =>
-      $value.location.copyWith.chain($identity, (v) => call(location: v));
-  @override
-  $R call(
-          {IssueKind? kind,
-          IssueLocation? location,
-          String? message,
-          bool? hasFixes,
-          String? sourceName,
-          Object? correction = $none,
-          Object? url = $none}) =>
-      $then(Issue(
-          kind: kind ?? $value.kind,
-          location: location ?? $value.location,
-          message: message ?? $value.message,
-          hasFixes: hasFixes ?? $value.hasFixes,
-          sourceName: sourceName ?? $value.sourceName,
-          correction: or(correction, $value.correction),
-          url: or(url, $value.url)));
-}
-
-class IssueLocationMapper extends MapperBase<IssueLocation> {
-  static MapperContainer container = MapperContainer(
-    mappers: {IssueLocationMapper()},
-  );
-
-  @override
-  IssueLocationMapperElement createElement(MapperContainer container) {
-    return IssueLocationMapperElement._(this, container);
-  }
-
-  @override
-  String get id => 'IssueLocation';
-
-  static final fromMap = container.fromMap<IssueLocation>;
-  static final fromJson = container.fromJson<IssueLocation>;
-}
-
-class IssueLocationMapperElement extends MapperElementBase<IssueLocation> {
-  IssueLocationMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  IssueLocation decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  IssueLocation fromMap(Map<String, dynamic> map) => IssueLocation(
-      startLine: container.$get(map, 'startLine'),
-      endLine: container.$get(map, 'endLine'),
-      startColumn: container.$get(map, 'startColumn'),
-      endColumn: container.$get(map, 'endColumn'));
-
-  @override
-  Function get encoder => encode;
-  dynamic encode(IssueLocation v) => toMap(v);
-  Map<String, dynamic> toMap(IssueLocation i) => {
-        'startLine': container.$enc(i.startLine, 'startLine'),
-        'endLine': container.$enc(i.endLine, 'endLine'),
-        'startColumn': container.$enc(i.startColumn, 'startColumn'),
-        'endColumn': container.$enc(i.endColumn, 'endColumn')
-      };
-
-  @override
-  String stringify(IssueLocation self) =>
-      'IssueLocation(startLine: ${container.asString(self.startLine)}, endLine: ${container.asString(self.endLine)}, startColumn: ${container.asString(self.startColumn)}, endColumn: ${container.asString(self.endColumn)})';
-  @override
-  int hash(IssueLocation self) =>
-      container.hash(self.startLine) ^
-      container.hash(self.endLine) ^
-      container.hash(self.startColumn) ^
-      container.hash(self.endColumn);
-  @override
-  bool equals(IssueLocation self, IssueLocation other) =>
-      container.isEqual(self.startLine, other.startLine) &&
-      container.isEqual(self.endLine, other.endLine) &&
-      container.isEqual(self.startColumn, other.startColumn) &&
-      container.isEqual(self.endColumn, other.endColumn);
-}
-
-mixin IssueLocationMappable {
-  String toJson() => IssueLocationMapper.container.toJson(this as IssueLocation);
-  Map<String, dynamic> toMap() => IssueLocationMapper.container.toMap(this as IssueLocation);
-  IssueLocationCopyWith<IssueLocation, IssueLocation, IssueLocation> get copyWith =>
-      _IssueLocationCopyWithImpl(this as IssueLocation, $identity, $identity);
-  @override
-  String toString() => IssueLocationMapper.container.asString(this);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (runtimeType == other.runtimeType && IssueLocationMapper.container.isEqual(this, other));
-  @override
-  int get hashCode => IssueLocationMapper.container.hash(this);
-}
-
-extension IssueLocationValueCopy<$R, $Out extends IssueLocation> on ObjectCopyWith<$R, IssueLocation, $Out> {
-  IssueLocationCopyWith<$R, IssueLocation, $Out> get asIssueLocation =>
-      base.as((v, t, t2) => _IssueLocationCopyWithImpl(v, t, t2));
-}
-
-typedef IssueLocationCopyWithBound = IssueLocation;
-
-abstract class IssueLocationCopyWith<$R, $In extends IssueLocation, $Out extends IssueLocation>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  IssueLocationCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends IssueLocation>(
-      Then<IssueLocation, $Out2> t, Then<$Out2, $R2> t2);
-  $R call({int? startLine, int? endLine, int? startColumn, int? endColumn});
-}
-
-class _IssueLocationCopyWithImpl<$R, $Out extends IssueLocation> extends CopyWithBase<$R, IssueLocation, $Out>
-    implements IssueLocationCopyWith<$R, IssueLocation, $Out> {
-  _IssueLocationCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  IssueLocationCopyWith<$R2, IssueLocation, $Out2> chain<$R2, $Out2 extends IssueLocation>(
-          Then<IssueLocation, $Out2> t, Then<$Out2, $R2> t2) =>
-      _IssueLocationCopyWithImpl($value, t, t2);
-
-  @override
-  $R call({int? startLine, int? endLine, int? startColumn, int? endColumn}) => $then(IssueLocation(
-      startLine: startLine ?? $value.startLine,
-      endLine: endLine ?? $value.endLine,
-      startColumn: startColumn ?? $value.startColumn,
-      endColumn: endColumn ?? $value.endColumn));
-}
-
-class DocumentResponseMapper extends MapperBase<DocumentResponse> {
-  static MapperContainer container = MapperContainer(
-    mappers: {DocumentResponseMapper()},
-  )..linkAll({HoverInfoMapper.container});
-
-  @override
-  DocumentResponseMapperElement createElement(MapperContainer container) {
-    return DocumentResponseMapperElement._(this, container);
-  }
-
-  @override
-  String get id => 'DocumentResponse';
-
-  static final fromMap = container.fromMap<DocumentResponse>;
-  static final fromJson = container.fromJson<DocumentResponse>;
-}
-
-class DocumentResponseMapperElement extends MapperElementBase<DocumentResponse> {
-  DocumentResponseMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  DocumentResponse decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  DocumentResponse fromMap(Map<String, dynamic> map) =>
-      DocumentResponse(container.$get(map, 'info'), container.$getOpt(map, 'error'));
-
-  @override
-  Function get encoder => encode;
-  dynamic encode(DocumentResponse v) => toMap(v);
-  Map<String, dynamic> toMap(DocumentResponse d) =>
-      {'info': container.$enc(d.info, 'info'), 'error': container.$enc(d.error, 'error')};
-
-  @override
-  String stringify(DocumentResponse self) =>
-      'DocumentResponse(info: ${container.asString(self.info)}, error: ${container.asString(self.error)})';
-  @override
-  int hash(DocumentResponse self) => container.hash(self.info) ^ container.hash(self.error);
-  @override
-  bool equals(DocumentResponse self, DocumentResponse other) =>
-      container.isEqual(self.info, other.info) && container.isEqual(self.error, other.error);
-}
-
-mixin DocumentResponseMappable {
-  String toJson() => DocumentResponseMapper.container.toJson(this as DocumentResponse);
-  Map<String, dynamic> toMap() => DocumentResponseMapper.container.toMap(this as DocumentResponse);
-  DocumentResponseCopyWith<DocumentResponse, DocumentResponse, DocumentResponse> get copyWith =>
-      _DocumentResponseCopyWithImpl(this as DocumentResponse, $identity, $identity);
-  @override
-  String toString() => DocumentResponseMapper.container.asString(this);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (runtimeType == other.runtimeType && DocumentResponseMapper.container.isEqual(this, other));
-  @override
-  int get hashCode => DocumentResponseMapper.container.hash(this);
-}
-
-extension DocumentResponseValueCopy<$R, $Out extends DocumentResponse> on ObjectCopyWith<$R, DocumentResponse, $Out> {
-  DocumentResponseCopyWith<$R, DocumentResponse, $Out> get asDocumentResponse =>
-      base.as((v, t, t2) => _DocumentResponseCopyWithImpl(v, t, t2));
-}
-
-typedef DocumentResponseCopyWithBound = DocumentResponse;
-
-abstract class DocumentResponseCopyWith<$R, $In extends DocumentResponse, $Out extends DocumentResponse>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  DocumentResponseCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends DocumentResponse>(
-      Then<DocumentResponse, $Out2> t, Then<$Out2, $R2> t2);
-  HoverInfoCopyWith<$R, HoverInfo, HoverInfo> get info;
-  $R call({HoverInfo? info, String? error});
-}
-
-class _DocumentResponseCopyWithImpl<$R, $Out extends DocumentResponse> extends CopyWithBase<$R, DocumentResponse, $Out>
-    implements DocumentResponseCopyWith<$R, DocumentResponse, $Out> {
-  _DocumentResponseCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  DocumentResponseCopyWith<$R2, DocumentResponse, $Out2> chain<$R2, $Out2 extends DocumentResponse>(
-          Then<DocumentResponse, $Out2> t, Then<$Out2, $R2> t2) =>
-      _DocumentResponseCopyWithImpl($value, t, t2);
-
-  @override
-  HoverInfoCopyWith<$R, HoverInfo, HoverInfo> get info => $value.info.copyWith.chain($identity, (v) => call(info: v));
-  @override
-  $R call({HoverInfo? info, Object? error = $none}) =>
-      $then(DocumentResponse(info ?? $value.info, or(error, $value.error)));
-}
-
-class HoverInfoMapper extends MapperBase<HoverInfo> {
-  static MapperContainer container = MapperContainer(
-    mappers: {HoverInfoMapper()},
-  );
-
-  @override
-  HoverInfoMapperElement createElement(MapperContainer container) {
-    return HoverInfoMapperElement._(this, container);
-  }
-
-  @override
-  String get id => 'HoverInfo';
-
-  static final fromMap = container.fromMap<HoverInfo>;
-  static final fromJson = container.fromJson<HoverInfo>;
-}
-
-class HoverInfoMapperElement extends MapperElementBase<HoverInfo> {
-  HoverInfoMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  HoverInfo decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  HoverInfo fromMap(Map<String, dynamic> map) => HoverInfo(
-      description: container.$getOpt(map, 'description'),
-      kind: container.$getOpt(map, 'kind'),
-      dartdoc: container.$getOpt(map, 'dartdoc'),
-      enclosingClassName: container.$getOpt(map, 'enclosingClassName'),
-      libraryName: container.$getOpt(map, 'libraryName'),
-      parameter: container.$getOpt(map, 'parameter'),
-      deprecated: container.$getOpt(map, 'deprecated'),
-      staticType: container.$getOpt(map, 'staticType'),
-      propagatedType: container.$getOpt(map, 'propagatedType'));
-
-  @override
-  Function get encoder => encode;
-  dynamic encode(HoverInfo v) => toMap(v);
-  Map<String, dynamic> toMap(HoverInfo h) => {
-        'description': container.$enc(h.description, 'description'),
-        'kind': container.$enc(h.kind, 'kind'),
-        'dartdoc': container.$enc(h.dartdoc, 'dartdoc'),
-        'enclosingClassName': container.$enc(h.enclosingClassName, 'enclosingClassName'),
-        'libraryName': container.$enc(h.libraryName, 'libraryName'),
-        'parameter': container.$enc(h.parameter, 'parameter'),
-        'deprecated': container.$enc(h.deprecated, 'deprecated'),
-        'staticType': container.$enc(h.staticType, 'staticType'),
-        'propagatedType': container.$enc(h.propagatedType, 'propagatedType')
-      };
-
-  @override
-  String stringify(HoverInfo self) =>
-      'HoverInfo(description: ${container.asString(self.description)}, kind: ${container.asString(self.kind)}, dartdoc: ${container.asString(self.dartdoc)}, enclosingClassName: ${container.asString(self.enclosingClassName)}, libraryName: ${container.asString(self.libraryName)}, parameter: ${container.asString(self.parameter)}, deprecated: ${container.asString(self.deprecated)}, staticType: ${container.asString(self.staticType)}, propagatedType: ${container.asString(self.propagatedType)})';
-  @override
-  int hash(HoverInfo self) =>
-      container.hash(self.description) ^
-      container.hash(self.kind) ^
-      container.hash(self.dartdoc) ^
-      container.hash(self.enclosingClassName) ^
-      container.hash(self.libraryName) ^
-      container.hash(self.parameter) ^
-      container.hash(self.deprecated) ^
-      container.hash(self.staticType) ^
-      container.hash(self.propagatedType);
-  @override
-  bool equals(HoverInfo self, HoverInfo other) =>
-      container.isEqual(self.description, other.description) &&
-      container.isEqual(self.kind, other.kind) &&
-      container.isEqual(self.dartdoc, other.dartdoc) &&
-      container.isEqual(self.enclosingClassName, other.enclosingClassName) &&
-      container.isEqual(self.libraryName, other.libraryName) &&
-      container.isEqual(self.parameter, other.parameter) &&
-      container.isEqual(self.deprecated, other.deprecated) &&
-      container.isEqual(self.staticType, other.staticType) &&
-      container.isEqual(self.propagatedType, other.propagatedType);
-}
-
-mixin HoverInfoMappable {
-  String toJson() => HoverInfoMapper.container.toJson(this as HoverInfo);
-  Map<String, dynamic> toMap() => HoverInfoMapper.container.toMap(this as HoverInfo);
-  HoverInfoCopyWith<HoverInfo, HoverInfo, HoverInfo> get copyWith =>
-      _HoverInfoCopyWithImpl(this as HoverInfo, $identity, $identity);
-  @override
-  String toString() => HoverInfoMapper.container.asString(this);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) || (runtimeType == other.runtimeType && HoverInfoMapper.container.isEqual(this, other));
-  @override
-  int get hashCode => HoverInfoMapper.container.hash(this);
-}
-
-extension HoverInfoValueCopy<$R, $Out extends HoverInfo> on ObjectCopyWith<$R, HoverInfo, $Out> {
-  HoverInfoCopyWith<$R, HoverInfo, $Out> get asHoverInfo => base.as((v, t, t2) => _HoverInfoCopyWithImpl(v, t, t2));
-}
-
-typedef HoverInfoCopyWithBound = HoverInfo;
-
-abstract class HoverInfoCopyWith<$R, $In extends HoverInfo, $Out extends HoverInfo>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  HoverInfoCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends HoverInfo>(Then<HoverInfo, $Out2> t, Then<$Out2, $R2> t2);
-  $R call(
-      {String? description,
-      String? kind,
-      String? dartdoc,
-      String? enclosingClassName,
-      String? libraryName,
-      String? parameter,
-      bool? deprecated,
-      String? staticType,
-      String? propagatedType});
-}
-
-class _HoverInfoCopyWithImpl<$R, $Out extends HoverInfo> extends CopyWithBase<$R, HoverInfo, $Out>
-    implements HoverInfoCopyWith<$R, HoverInfo, $Out> {
-  _HoverInfoCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  HoverInfoCopyWith<$R2, HoverInfo, $Out2> chain<$R2, $Out2 extends HoverInfo>(
-          Then<HoverInfo, $Out2> t, Then<$Out2, $R2> t2) =>
-      _HoverInfoCopyWithImpl($value, t, t2);
-
-  @override
-  $R call(
-          {Object? description = $none,
-          Object? kind = $none,
-          Object? dartdoc = $none,
-          Object? enclosingClassName = $none,
-          Object? libraryName = $none,
-          Object? parameter = $none,
-          Object? deprecated = $none,
-          Object? staticType = $none,
-          Object? propagatedType = $none}) =>
-      $then(HoverInfo(
-          description: or(description, $value.description),
-          kind: or(kind, $value.kind),
-          dartdoc: or(dartdoc, $value.dartdoc),
-          enclosingClassName: or(enclosingClassName, $value.enclosingClassName),
-          libraryName: or(libraryName, $value.libraryName),
-          parameter: or(parameter, $value.parameter),
-          deprecated: or(deprecated, $value.deprecated),
-          staticType: or(staticType, $value.staticType),
-          propagatedType: or(propagatedType, $value.propagatedType)));
-}
-
-class DocumentRequestMapper extends MapperBase<DocumentRequest> {
-  static MapperContainer container = MapperContainer(
-    mappers: {DocumentRequestMapper()},
-  );
-
-  @override
-  DocumentRequestMapperElement createElement(MapperContainer container) {
-    return DocumentRequestMapperElement._(this, container);
-  }
-
-  @override
-  String get id => 'DocumentRequest';
-
-  static final fromMap = container.fromMap<DocumentRequest>;
-  static final fromJson = container.fromJson<DocumentRequest>;
-}
-
-class DocumentRequestMapperElement extends MapperElementBase<DocumentRequest> {
-  DocumentRequestMapperElement._(super.mapper, super.container);
-
-  @override
-  Function get decoder => decode;
-  DocumentRequest decode(dynamic v) => checkedType(v, (Map<String, dynamic> map) => fromMap(map));
-  DocumentRequest fromMap(Map<String, dynamic> map) =>
-      DocumentRequest(container.$get(map, 'sources'), container.$get(map, 'name'), container.$get(map, 'offset'));
-
-  @override
-  Function get encoder => encode;
-  dynamic encode(DocumentRequest v) => toMap(v);
-  Map<String, dynamic> toMap(DocumentRequest d) => {
-        'sources': container.$enc(d.sources, 'sources'),
-        'name': container.$enc(d.name, 'name'),
-        'offset': container.$enc(d.offset, 'offset')
-      };
-
-  @override
-  String stringify(DocumentRequest self) =>
-      'DocumentRequest(sources: ${container.asString(self.sources)}, name: ${container.asString(self.name)}, offset: ${container.asString(self.offset)})';
-  @override
-  int hash(DocumentRequest self) =>
-      container.hash(self.sources) ^ container.hash(self.name) ^ container.hash(self.offset);
-  @override
-  bool equals(DocumentRequest self, DocumentRequest other) =>
-      container.isEqual(self.sources, other.sources) &&
-      container.isEqual(self.name, other.name) &&
-      container.isEqual(self.offset, other.offset);
-}
-
-mixin DocumentRequestMappable {
-  String toJson() => DocumentRequestMapper.container.toJson(this as DocumentRequest);
-  Map<String, dynamic> toMap() => DocumentRequestMapper.container.toMap(this as DocumentRequest);
-  DocumentRequestCopyWith<DocumentRequest, DocumentRequest, DocumentRequest> get copyWith =>
-      _DocumentRequestCopyWithImpl(this as DocumentRequest, $identity, $identity);
-  @override
-  String toString() => DocumentRequestMapper.container.asString(this);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (runtimeType == other.runtimeType && DocumentRequestMapper.container.isEqual(this, other));
-  @override
-  int get hashCode => DocumentRequestMapper.container.hash(this);
-}
-
-extension DocumentRequestValueCopy<$R, $Out extends DocumentRequest> on ObjectCopyWith<$R, DocumentRequest, $Out> {
-  DocumentRequestCopyWith<$R, DocumentRequest, $Out> get asDocumentRequest =>
-      base.as((v, t, t2) => _DocumentRequestCopyWithImpl(v, t, t2));
-}
-
-typedef DocumentRequestCopyWithBound = DocumentRequest;
-
-abstract class DocumentRequestCopyWith<$R, $In extends DocumentRequest, $Out extends DocumentRequest>
-    implements ObjectCopyWith<$R, $In, $Out> {
-  DocumentRequestCopyWith<$R2, $In, $Out2> chain<$R2, $Out2 extends DocumentRequest>(
-      Then<DocumentRequest, $Out2> t, Then<$Out2, $R2> t2);
-  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources;
-  $R call({Map<String, String>? sources, String? name, int? offset});
-}
-
-class _DocumentRequestCopyWithImpl<$R, $Out extends DocumentRequest> extends CopyWithBase<$R, DocumentRequest, $Out>
-    implements DocumentRequestCopyWith<$R, DocumentRequest, $Out> {
-  _DocumentRequestCopyWithImpl(super.value, super.then, super.then2);
-  @override
-  DocumentRequestCopyWith<$R2, DocumentRequest, $Out2> chain<$R2, $Out2 extends DocumentRequest>(
-          Then<DocumentRequest, $Out2> t, Then<$Out2, $R2> t2) =>
-      _DocumentRequestCopyWithImpl($value, t, t2);
-
-  @override
-  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources =>
-      MapCopyWith($value.sources, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(sources: v));
-  @override
-  $R call({Map<String, String>? sources, String? name, int? offset}) =>
-      $then(DocumentRequest(sources ?? $value.sources, name ?? $value.name, offset ?? $value.offset));
-}
-
 class IssueKindMapper extends EnumMapper<IssueKind> {
-  static MapperContainer container = MapperContainer(
-    mappers: {IssueKindMapper()},
-  );
+  IssueKindMapper._();
 
-  static final fromValue = container.fromValue<IssueKind>;
+  static IssueKindMapper? _instance;
+  static IssueKindMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = IssueKindMapper._());
+    }
+    return _instance!;
+  }
+
+  static IssueKind fromValue(dynamic value) {
+    ensureInitialized();
+    return MapperContainer.globals.fromValue(value);
+  }
 
   @override
   IssueKind decode(dynamic value) {
@@ -1093,5 +49,1276 @@ class IssueKindMapper extends EnumMapper<IssueKind> {
 }
 
 extension IssueKindMapperExtension on IssueKind {
-  String toValue() => IssueKindMapper.container.toValue(this) as String;
+  String toValue() {
+    IssueKindMapper.ensureInitialized();
+    return MapperContainer.globals.toValue(this) as String;
+  }
+}
+
+class CompileRequestMapper extends ClassMapperBase<CompileRequest> {
+  CompileRequestMapper._();
+
+  static CompileRequestMapper? _instance;
+  static CompileRequestMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = CompileRequestMapper._());
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'CompileRequest';
+
+  static Map<String, String> _$sources(CompileRequest v) => v.sources;
+  static const Field<CompileRequest, Map<String, String>> _f$sources = Field('sources', _$sources);
+
+  @override
+  final Map<Symbol, Field<CompileRequest, dynamic>> fields = const {
+    #sources: _f$sources,
+  };
+
+  static CompileRequest _instantiate(DecodingData data) {
+    return CompileRequest(data.dec(_f$sources));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static CompileRequest fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<CompileRequest>(map));
+  }
+
+  static CompileRequest fromJson(String json) {
+    return _guard((c) => c.fromJson<CompileRequest>(json));
+  }
+}
+
+mixin CompileRequestMappable {
+  String toJson() {
+    return CompileRequestMapper._guard((c) => c.toJson(this as CompileRequest));
+  }
+
+  Map<String, dynamic> toMap() {
+    return CompileRequestMapper._guard((c) => c.toMap(this as CompileRequest));
+  }
+
+  CompileRequestCopyWith<CompileRequest, CompileRequest, CompileRequest> get copyWith =>
+      _CompileRequestCopyWithImpl(this as CompileRequest, $identity, $identity);
+  @override
+  String toString() {
+    return CompileRequestMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && CompileRequestMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return CompileRequestMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension CompileRequestValueCopy<$R, $Out> on ObjectCopyWith<$R, CompileRequest, $Out> {
+  CompileRequestCopyWith<$R, CompileRequest, $Out> get $asCompileRequest =>
+      $base.as((v, t, t2) => _CompileRequestCopyWithImpl(v, t, t2));
+}
+
+abstract class CompileRequestCopyWith<$R, $In extends CompileRequest, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources;
+  $R call({Map<String, String>? sources});
+  CompileRequestCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _CompileRequestCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, CompileRequest, $Out>
+    implements CompileRequestCopyWith<$R, CompileRequest, $Out> {
+  _CompileRequestCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<CompileRequest> $mapper = CompileRequestMapper.ensureInitialized();
+  @override
+  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources =>
+      MapCopyWith($value.sources, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(sources: v));
+  @override
+  $R call({Map<String, String>? sources}) => $apply(FieldCopyWithData({if (sources != null) #sources: sources}));
+  @override
+  CompileRequest $make(CopyWithData data) => CompileRequest(data.get(#sources, or: $value.sources));
+
+  @override
+  CompileRequestCopyWith<$R2, CompileRequest, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _CompileRequestCopyWithImpl($value, $cast, t);
+}
+
+class CompileResponseMapper extends ClassMapperBase<CompileResponse> {
+  CompileResponseMapper._();
+
+  static CompileResponseMapper? _instance;
+  static CompileResponseMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = CompileResponseMapper._());
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'CompileResponse';
+
+  static String? _$result(CompileResponse v) => v.result;
+  static const Field<CompileResponse, String> _f$result = Field('result', _$result);
+  static String? _$error(CompileResponse v) => v.error;
+  static const Field<CompileResponse, String> _f$error = Field('error', _$error);
+
+  @override
+  final Map<Symbol, Field<CompileResponse, dynamic>> fields = const {
+    #result: _f$result,
+    #error: _f$error,
+  };
+
+  static CompileResponse _instantiate(DecodingData data) {
+    return CompileResponse(data.dec(_f$result), data.dec(_f$error));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static CompileResponse fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<CompileResponse>(map));
+  }
+
+  static CompileResponse fromJson(String json) {
+    return _guard((c) => c.fromJson<CompileResponse>(json));
+  }
+}
+
+mixin CompileResponseMappable {
+  String toJson() {
+    return CompileResponseMapper._guard((c) => c.toJson(this as CompileResponse));
+  }
+
+  Map<String, dynamic> toMap() {
+    return CompileResponseMapper._guard((c) => c.toMap(this as CompileResponse));
+  }
+
+  CompileResponseCopyWith<CompileResponse, CompileResponse, CompileResponse> get copyWith =>
+      _CompileResponseCopyWithImpl(this as CompileResponse, $identity, $identity);
+  @override
+  String toString() {
+    return CompileResponseMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && CompileResponseMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return CompileResponseMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension CompileResponseValueCopy<$R, $Out> on ObjectCopyWith<$R, CompileResponse, $Out> {
+  CompileResponseCopyWith<$R, CompileResponse, $Out> get $asCompileResponse =>
+      $base.as((v, t, t2) => _CompileResponseCopyWithImpl(v, t, t2));
+}
+
+abstract class CompileResponseCopyWith<$R, $In extends CompileResponse, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  $R call({String? result, String? error});
+  CompileResponseCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _CompileResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, CompileResponse, $Out>
+    implements CompileResponseCopyWith<$R, CompileResponse, $Out> {
+  _CompileResponseCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<CompileResponse> $mapper = CompileResponseMapper.ensureInitialized();
+  @override
+  $R call({Object? result = $none, Object? error = $none}) =>
+      $apply(FieldCopyWithData({if (result != $none) #result: result, if (error != $none) #error: error}));
+  @override
+  CompileResponse $make(CopyWithData data) =>
+      CompileResponse(data.get(#result, or: $value.result), data.get(#error, or: $value.error));
+
+  @override
+  CompileResponseCopyWith<$R2, CompileResponse, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _CompileResponseCopyWithImpl($value, $cast, t);
+}
+
+class AnalyzeRequestMapper extends ClassMapperBase<AnalyzeRequest> {
+  AnalyzeRequestMapper._();
+
+  static AnalyzeRequestMapper? _instance;
+  static AnalyzeRequestMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = AnalyzeRequestMapper._());
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'AnalyzeRequest';
+
+  static Map<String, String> _$sources(AnalyzeRequest v) => v.sources;
+  static const Field<AnalyzeRequest, Map<String, String>> _f$sources = Field('sources', _$sources);
+
+  @override
+  final Map<Symbol, Field<AnalyzeRequest, dynamic>> fields = const {
+    #sources: _f$sources,
+  };
+
+  static AnalyzeRequest _instantiate(DecodingData data) {
+    return AnalyzeRequest(data.dec(_f$sources));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static AnalyzeRequest fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<AnalyzeRequest>(map));
+  }
+
+  static AnalyzeRequest fromJson(String json) {
+    return _guard((c) => c.fromJson<AnalyzeRequest>(json));
+  }
+}
+
+mixin AnalyzeRequestMappable {
+  String toJson() {
+    return AnalyzeRequestMapper._guard((c) => c.toJson(this as AnalyzeRequest));
+  }
+
+  Map<String, dynamic> toMap() {
+    return AnalyzeRequestMapper._guard((c) => c.toMap(this as AnalyzeRequest));
+  }
+
+  AnalyzeRequestCopyWith<AnalyzeRequest, AnalyzeRequest, AnalyzeRequest> get copyWith =>
+      _AnalyzeRequestCopyWithImpl(this as AnalyzeRequest, $identity, $identity);
+  @override
+  String toString() {
+    return AnalyzeRequestMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && AnalyzeRequestMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return AnalyzeRequestMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension AnalyzeRequestValueCopy<$R, $Out> on ObjectCopyWith<$R, AnalyzeRequest, $Out> {
+  AnalyzeRequestCopyWith<$R, AnalyzeRequest, $Out> get $asAnalyzeRequest =>
+      $base.as((v, t, t2) => _AnalyzeRequestCopyWithImpl(v, t, t2));
+}
+
+abstract class AnalyzeRequestCopyWith<$R, $In extends AnalyzeRequest, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources;
+  $R call({Map<String, String>? sources});
+  AnalyzeRequestCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _AnalyzeRequestCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, AnalyzeRequest, $Out>
+    implements AnalyzeRequestCopyWith<$R, AnalyzeRequest, $Out> {
+  _AnalyzeRequestCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<AnalyzeRequest> $mapper = AnalyzeRequestMapper.ensureInitialized();
+  @override
+  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources =>
+      MapCopyWith($value.sources, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(sources: v));
+  @override
+  $R call({Map<String, String>? sources}) => $apply(FieldCopyWithData({if (sources != null) #sources: sources}));
+  @override
+  AnalyzeRequest $make(CopyWithData data) => AnalyzeRequest(data.get(#sources, or: $value.sources));
+
+  @override
+  AnalyzeRequestCopyWith<$R2, AnalyzeRequest, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _AnalyzeRequestCopyWithImpl($value, $cast, t);
+}
+
+class FormatResponseMapper extends ClassMapperBase<FormatResponse> {
+  FormatResponseMapper._();
+
+  static FormatResponseMapper? _instance;
+  static FormatResponseMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = FormatResponseMapper._());
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'FormatResponse';
+
+  static String _$newString(FormatResponse v) => v.newString;
+  static const Field<FormatResponse, String> _f$newString = Field('newString', _$newString);
+  static int _$newOffset(FormatResponse v) => v.newOffset;
+  static const Field<FormatResponse, int> _f$newOffset = Field('newOffset', _$newOffset);
+
+  @override
+  final Map<Symbol, Field<FormatResponse, dynamic>> fields = const {
+    #newString: _f$newString,
+    #newOffset: _f$newOffset,
+  };
+
+  static FormatResponse _instantiate(DecodingData data) {
+    return FormatResponse(data.dec(_f$newString), data.dec(_f$newOffset));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static FormatResponse fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<FormatResponse>(map));
+  }
+
+  static FormatResponse fromJson(String json) {
+    return _guard((c) => c.fromJson<FormatResponse>(json));
+  }
+}
+
+mixin FormatResponseMappable {
+  String toJson() {
+    return FormatResponseMapper._guard((c) => c.toJson(this as FormatResponse));
+  }
+
+  Map<String, dynamic> toMap() {
+    return FormatResponseMapper._guard((c) => c.toMap(this as FormatResponse));
+  }
+
+  FormatResponseCopyWith<FormatResponse, FormatResponse, FormatResponse> get copyWith =>
+      _FormatResponseCopyWithImpl(this as FormatResponse, $identity, $identity);
+  @override
+  String toString() {
+    return FormatResponseMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && FormatResponseMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return FormatResponseMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension FormatResponseValueCopy<$R, $Out> on ObjectCopyWith<$R, FormatResponse, $Out> {
+  FormatResponseCopyWith<$R, FormatResponse, $Out> get $asFormatResponse =>
+      $base.as((v, t, t2) => _FormatResponseCopyWithImpl(v, t, t2));
+}
+
+abstract class FormatResponseCopyWith<$R, $In extends FormatResponse, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  $R call({String? newString, int? newOffset});
+  FormatResponseCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _FormatResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FormatResponse, $Out>
+    implements FormatResponseCopyWith<$R, FormatResponse, $Out> {
+  _FormatResponseCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<FormatResponse> $mapper = FormatResponseMapper.ensureInitialized();
+  @override
+  $R call({String? newString, int? newOffset}) => $apply(
+      FieldCopyWithData({if (newString != null) #newString: newString, if (newOffset != null) #newOffset: newOffset}));
+  @override
+  FormatResponse $make(CopyWithData data) =>
+      FormatResponse(data.get(#newString, or: $value.newString), data.get(#newOffset, or: $value.newOffset));
+
+  @override
+  FormatResponseCopyWith<$R2, FormatResponse, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _FormatResponseCopyWithImpl($value, $cast, t);
+}
+
+class FormatRequestMapper extends ClassMapperBase<FormatRequest> {
+  FormatRequestMapper._();
+
+  static FormatRequestMapper? _instance;
+  static FormatRequestMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = FormatRequestMapper._());
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'FormatRequest';
+
+  static String _$source(FormatRequest v) => v.source;
+  static const Field<FormatRequest, String> _f$source = Field('source', _$source);
+  static int _$offset(FormatRequest v) => v.offset;
+  static const Field<FormatRequest, int> _f$offset = Field('offset', _$offset);
+
+  @override
+  final Map<Symbol, Field<FormatRequest, dynamic>> fields = const {
+    #source: _f$source,
+    #offset: _f$offset,
+  };
+
+  static FormatRequest _instantiate(DecodingData data) {
+    return FormatRequest(data.dec(_f$source), data.dec(_f$offset));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static FormatRequest fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<FormatRequest>(map));
+  }
+
+  static FormatRequest fromJson(String json) {
+    return _guard((c) => c.fromJson<FormatRequest>(json));
+  }
+}
+
+mixin FormatRequestMappable {
+  String toJson() {
+    return FormatRequestMapper._guard((c) => c.toJson(this as FormatRequest));
+  }
+
+  Map<String, dynamic> toMap() {
+    return FormatRequestMapper._guard((c) => c.toMap(this as FormatRequest));
+  }
+
+  FormatRequestCopyWith<FormatRequest, FormatRequest, FormatRequest> get copyWith =>
+      _FormatRequestCopyWithImpl(this as FormatRequest, $identity, $identity);
+  @override
+  String toString() {
+    return FormatRequestMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && FormatRequestMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return FormatRequestMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension FormatRequestValueCopy<$R, $Out> on ObjectCopyWith<$R, FormatRequest, $Out> {
+  FormatRequestCopyWith<$R, FormatRequest, $Out> get $asFormatRequest =>
+      $base.as((v, t, t2) => _FormatRequestCopyWithImpl(v, t, t2));
+}
+
+abstract class FormatRequestCopyWith<$R, $In extends FormatRequest, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  $R call({String? source, int? offset});
+  FormatRequestCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _FormatRequestCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FormatRequest, $Out>
+    implements FormatRequestCopyWith<$R, FormatRequest, $Out> {
+  _FormatRequestCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<FormatRequest> $mapper = FormatRequestMapper.ensureInitialized();
+  @override
+  $R call({String? source, int? offset}) =>
+      $apply(FieldCopyWithData({if (source != null) #source: source, if (offset != null) #offset: offset}));
+  @override
+  FormatRequest $make(CopyWithData data) =>
+      FormatRequest(data.get(#source, or: $value.source), data.get(#offset, or: $value.offset));
+
+  @override
+  FormatRequestCopyWith<$R2, FormatRequest, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _FormatRequestCopyWithImpl($value, $cast, t);
+}
+
+class AnalyzeResponseMapper extends ClassMapperBase<AnalyzeResponse> {
+  AnalyzeResponseMapper._();
+
+  static AnalyzeResponseMapper? _instance;
+  static AnalyzeResponseMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = AnalyzeResponseMapper._());
+      IssueMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'AnalyzeResponse';
+
+  static List<Issue> _$issues(AnalyzeResponse v) => v.issues;
+  static const Field<AnalyzeResponse, List<Issue>> _f$issues = Field('issues', _$issues, opt: true, def: const []);
+
+  @override
+  final Map<Symbol, Field<AnalyzeResponse, dynamic>> fields = const {
+    #issues: _f$issues,
+  };
+
+  static AnalyzeResponse _instantiate(DecodingData data) {
+    return AnalyzeResponse(data.dec(_f$issues));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static AnalyzeResponse fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<AnalyzeResponse>(map));
+  }
+
+  static AnalyzeResponse fromJson(String json) {
+    return _guard((c) => c.fromJson<AnalyzeResponse>(json));
+  }
+}
+
+mixin AnalyzeResponseMappable {
+  String toJson() {
+    return AnalyzeResponseMapper._guard((c) => c.toJson(this as AnalyzeResponse));
+  }
+
+  Map<String, dynamic> toMap() {
+    return AnalyzeResponseMapper._guard((c) => c.toMap(this as AnalyzeResponse));
+  }
+
+  AnalyzeResponseCopyWith<AnalyzeResponse, AnalyzeResponse, AnalyzeResponse> get copyWith =>
+      _AnalyzeResponseCopyWithImpl(this as AnalyzeResponse, $identity, $identity);
+  @override
+  String toString() {
+    return AnalyzeResponseMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && AnalyzeResponseMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return AnalyzeResponseMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension AnalyzeResponseValueCopy<$R, $Out> on ObjectCopyWith<$R, AnalyzeResponse, $Out> {
+  AnalyzeResponseCopyWith<$R, AnalyzeResponse, $Out> get $asAnalyzeResponse =>
+      $base.as((v, t, t2) => _AnalyzeResponseCopyWithImpl(v, t, t2));
+}
+
+abstract class AnalyzeResponseCopyWith<$R, $In extends AnalyzeResponse, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, Issue, IssueCopyWith<$R, Issue, Issue>> get issues;
+  $R call({List<Issue>? issues});
+  AnalyzeResponseCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _AnalyzeResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, AnalyzeResponse, $Out>
+    implements AnalyzeResponseCopyWith<$R, AnalyzeResponse, $Out> {
+  _AnalyzeResponseCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<AnalyzeResponse> $mapper = AnalyzeResponseMapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, Issue, IssueCopyWith<$R, Issue, Issue>> get issues =>
+      ListCopyWith($value.issues, (v, t) => v.copyWith.$chain(t), (v) => call(issues: v));
+  @override
+  $R call({List<Issue>? issues}) => $apply(FieldCopyWithData({if (issues != null) #issues: issues}));
+  @override
+  AnalyzeResponse $make(CopyWithData data) => AnalyzeResponse(data.get(#issues, or: $value.issues));
+
+  @override
+  AnalyzeResponseCopyWith<$R2, AnalyzeResponse, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _AnalyzeResponseCopyWithImpl($value, $cast, t);
+}
+
+class IssueMapper extends ClassMapperBase<Issue> {
+  IssueMapper._();
+
+  static IssueMapper? _instance;
+  static IssueMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = IssueMapper._());
+      IssueKindMapper.ensureInitialized();
+      IssueLocationMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'Issue';
+
+  static IssueKind _$kind(Issue v) => v.kind;
+  static const Field<Issue, IssueKind> _f$kind = Field('kind', _$kind);
+  static IssueLocation _$location(Issue v) => v.location;
+  static const Field<Issue, IssueLocation> _f$location = Field('location', _$location);
+  static String _$message(Issue v) => v.message;
+  static const Field<Issue, String> _f$message = Field('message', _$message);
+  static bool _$hasFixes(Issue v) => v.hasFixes;
+  static const Field<Issue, bool> _f$hasFixes = Field('hasFixes', _$hasFixes);
+  static String _$sourceName(Issue v) => v.sourceName;
+  static const Field<Issue, String> _f$sourceName = Field('sourceName', _$sourceName);
+  static String? _$correction(Issue v) => v.correction;
+  static const Field<Issue, String> _f$correction = Field('correction', _$correction, opt: true);
+  static String? _$url(Issue v) => v.url;
+  static const Field<Issue, String> _f$url = Field('url', _$url, opt: true);
+
+  @override
+  final Map<Symbol, Field<Issue, dynamic>> fields = const {
+    #kind: _f$kind,
+    #location: _f$location,
+    #message: _f$message,
+    #hasFixes: _f$hasFixes,
+    #sourceName: _f$sourceName,
+    #correction: _f$correction,
+    #url: _f$url,
+  };
+
+  static Issue _instantiate(DecodingData data) {
+    return Issue(
+        kind: data.dec(_f$kind),
+        location: data.dec(_f$location),
+        message: data.dec(_f$message),
+        hasFixes: data.dec(_f$hasFixes),
+        sourceName: data.dec(_f$sourceName),
+        correction: data.dec(_f$correction),
+        url: data.dec(_f$url));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static Issue fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<Issue>(map));
+  }
+
+  static Issue fromJson(String json) {
+    return _guard((c) => c.fromJson<Issue>(json));
+  }
+}
+
+mixin IssueMappable {
+  String toJson() {
+    return IssueMapper._guard((c) => c.toJson(this as Issue));
+  }
+
+  Map<String, dynamic> toMap() {
+    return IssueMapper._guard((c) => c.toMap(this as Issue));
+  }
+
+  IssueCopyWith<Issue, Issue, Issue> get copyWith => _IssueCopyWithImpl(this as Issue, $identity, $identity);
+  @override
+  String toString() {
+    return IssueMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && IssueMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return IssueMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension IssueValueCopy<$R, $Out> on ObjectCopyWith<$R, Issue, $Out> {
+  IssueCopyWith<$R, Issue, $Out> get $asIssue => $base.as((v, t, t2) => _IssueCopyWithImpl(v, t, t2));
+}
+
+abstract class IssueCopyWith<$R, $In extends Issue, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  IssueLocationCopyWith<$R, IssueLocation, IssueLocation> get location;
+  $R call(
+      {IssueKind? kind,
+      IssueLocation? location,
+      String? message,
+      bool? hasFixes,
+      String? sourceName,
+      String? correction,
+      String? url});
+  IssueCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _IssueCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Issue, $Out>
+    implements IssueCopyWith<$R, Issue, $Out> {
+  _IssueCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<Issue> $mapper = IssueMapper.ensureInitialized();
+  @override
+  IssueLocationCopyWith<$R, IssueLocation, IssueLocation> get location =>
+      $value.location.copyWith.$chain((v) => call(location: v));
+  @override
+  $R call(
+          {IssueKind? kind,
+          IssueLocation? location,
+          String? message,
+          bool? hasFixes,
+          String? sourceName,
+          Object? correction = $none,
+          Object? url = $none}) =>
+      $apply(FieldCopyWithData({
+        if (kind != null) #kind: kind,
+        if (location != null) #location: location,
+        if (message != null) #message: message,
+        if (hasFixes != null) #hasFixes: hasFixes,
+        if (sourceName != null) #sourceName: sourceName,
+        if (correction != $none) #correction: correction,
+        if (url != $none) #url: url
+      }));
+  @override
+  Issue $make(CopyWithData data) => Issue(
+      kind: data.get(#kind, or: $value.kind),
+      location: data.get(#location, or: $value.location),
+      message: data.get(#message, or: $value.message),
+      hasFixes: data.get(#hasFixes, or: $value.hasFixes),
+      sourceName: data.get(#sourceName, or: $value.sourceName),
+      correction: data.get(#correction, or: $value.correction),
+      url: data.get(#url, or: $value.url));
+
+  @override
+  IssueCopyWith<$R2, Issue, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) => _IssueCopyWithImpl($value, $cast, t);
+}
+
+class IssueLocationMapper extends ClassMapperBase<IssueLocation> {
+  IssueLocationMapper._();
+
+  static IssueLocationMapper? _instance;
+  static IssueLocationMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = IssueLocationMapper._());
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'IssueLocation';
+
+  static int _$startLine(IssueLocation v) => v.startLine;
+  static const Field<IssueLocation, int> _f$startLine = Field('startLine', _$startLine);
+  static int _$endLine(IssueLocation v) => v.endLine;
+  static const Field<IssueLocation, int> _f$endLine = Field('endLine', _$endLine);
+  static int _$startColumn(IssueLocation v) => v.startColumn;
+  static const Field<IssueLocation, int> _f$startColumn = Field('startColumn', _$startColumn);
+  static int _$endColumn(IssueLocation v) => v.endColumn;
+  static const Field<IssueLocation, int> _f$endColumn = Field('endColumn', _$endColumn);
+
+  @override
+  final Map<Symbol, Field<IssueLocation, dynamic>> fields = const {
+    #startLine: _f$startLine,
+    #endLine: _f$endLine,
+    #startColumn: _f$startColumn,
+    #endColumn: _f$endColumn,
+  };
+
+  static IssueLocation _instantiate(DecodingData data) {
+    return IssueLocation(
+        startLine: data.dec(_f$startLine),
+        endLine: data.dec(_f$endLine),
+        startColumn: data.dec(_f$startColumn),
+        endColumn: data.dec(_f$endColumn));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static IssueLocation fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<IssueLocation>(map));
+  }
+
+  static IssueLocation fromJson(String json) {
+    return _guard((c) => c.fromJson<IssueLocation>(json));
+  }
+}
+
+mixin IssueLocationMappable {
+  String toJson() {
+    return IssueLocationMapper._guard((c) => c.toJson(this as IssueLocation));
+  }
+
+  Map<String, dynamic> toMap() {
+    return IssueLocationMapper._guard((c) => c.toMap(this as IssueLocation));
+  }
+
+  IssueLocationCopyWith<IssueLocation, IssueLocation, IssueLocation> get copyWith =>
+      _IssueLocationCopyWithImpl(this as IssueLocation, $identity, $identity);
+  @override
+  String toString() {
+    return IssueLocationMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && IssueLocationMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return IssueLocationMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension IssueLocationValueCopy<$R, $Out> on ObjectCopyWith<$R, IssueLocation, $Out> {
+  IssueLocationCopyWith<$R, IssueLocation, $Out> get $asIssueLocation =>
+      $base.as((v, t, t2) => _IssueLocationCopyWithImpl(v, t, t2));
+}
+
+abstract class IssueLocationCopyWith<$R, $In extends IssueLocation, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  $R call({int? startLine, int? endLine, int? startColumn, int? endColumn});
+  IssueLocationCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _IssueLocationCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, IssueLocation, $Out>
+    implements IssueLocationCopyWith<$R, IssueLocation, $Out> {
+  _IssueLocationCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<IssueLocation> $mapper = IssueLocationMapper.ensureInitialized();
+  @override
+  $R call({int? startLine, int? endLine, int? startColumn, int? endColumn}) => $apply(FieldCopyWithData({
+        if (startLine != null) #startLine: startLine,
+        if (endLine != null) #endLine: endLine,
+        if (startColumn != null) #startColumn: startColumn,
+        if (endColumn != null) #endColumn: endColumn
+      }));
+  @override
+  IssueLocation $make(CopyWithData data) => IssueLocation(
+      startLine: data.get(#startLine, or: $value.startLine),
+      endLine: data.get(#endLine, or: $value.endLine),
+      startColumn: data.get(#startColumn, or: $value.startColumn),
+      endColumn: data.get(#endColumn, or: $value.endColumn));
+
+  @override
+  IssueLocationCopyWith<$R2, IssueLocation, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _IssueLocationCopyWithImpl($value, $cast, t);
+}
+
+class DocumentResponseMapper extends ClassMapperBase<DocumentResponse> {
+  DocumentResponseMapper._();
+
+  static DocumentResponseMapper? _instance;
+  static DocumentResponseMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = DocumentResponseMapper._());
+      HoverInfoMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'DocumentResponse';
+
+  static HoverInfo _$info(DocumentResponse v) => v.info;
+  static const Field<DocumentResponse, HoverInfo> _f$info = Field('info', _$info);
+  static String? _$error(DocumentResponse v) => v.error;
+  static const Field<DocumentResponse, String> _f$error = Field('error', _$error);
+
+  @override
+  final Map<Symbol, Field<DocumentResponse, dynamic>> fields = const {
+    #info: _f$info,
+    #error: _f$error,
+  };
+
+  static DocumentResponse _instantiate(DecodingData data) {
+    return DocumentResponse(data.dec(_f$info), data.dec(_f$error));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static DocumentResponse fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<DocumentResponse>(map));
+  }
+
+  static DocumentResponse fromJson(String json) {
+    return _guard((c) => c.fromJson<DocumentResponse>(json));
+  }
+}
+
+mixin DocumentResponseMappable {
+  String toJson() {
+    return DocumentResponseMapper._guard((c) => c.toJson(this as DocumentResponse));
+  }
+
+  Map<String, dynamic> toMap() {
+    return DocumentResponseMapper._guard((c) => c.toMap(this as DocumentResponse));
+  }
+
+  DocumentResponseCopyWith<DocumentResponse, DocumentResponse, DocumentResponse> get copyWith =>
+      _DocumentResponseCopyWithImpl(this as DocumentResponse, $identity, $identity);
+  @override
+  String toString() {
+    return DocumentResponseMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && DocumentResponseMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return DocumentResponseMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension DocumentResponseValueCopy<$R, $Out> on ObjectCopyWith<$R, DocumentResponse, $Out> {
+  DocumentResponseCopyWith<$R, DocumentResponse, $Out> get $asDocumentResponse =>
+      $base.as((v, t, t2) => _DocumentResponseCopyWithImpl(v, t, t2));
+}
+
+abstract class DocumentResponseCopyWith<$R, $In extends DocumentResponse, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
+  HoverInfoCopyWith<$R, HoverInfo, HoverInfo> get info;
+  $R call({HoverInfo? info, String? error});
+  DocumentResponseCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _DocumentResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, DocumentResponse, $Out>
+    implements DocumentResponseCopyWith<$R, DocumentResponse, $Out> {
+  _DocumentResponseCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<DocumentResponse> $mapper = DocumentResponseMapper.ensureInitialized();
+  @override
+  HoverInfoCopyWith<$R, HoverInfo, HoverInfo> get info => $value.info.copyWith.$chain((v) => call(info: v));
+  @override
+  $R call({HoverInfo? info, Object? error = $none}) =>
+      $apply(FieldCopyWithData({if (info != null) #info: info, if (error != $none) #error: error}));
+  @override
+  DocumentResponse $make(CopyWithData data) =>
+      DocumentResponse(data.get(#info, or: $value.info), data.get(#error, or: $value.error));
+
+  @override
+  DocumentResponseCopyWith<$R2, DocumentResponse, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _DocumentResponseCopyWithImpl($value, $cast, t);
+}
+
+class HoverInfoMapper extends ClassMapperBase<HoverInfo> {
+  HoverInfoMapper._();
+
+  static HoverInfoMapper? _instance;
+  static HoverInfoMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = HoverInfoMapper._());
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'HoverInfo';
+
+  static String? _$description(HoverInfo v) => v.description;
+  static const Field<HoverInfo, String> _f$description = Field('description', _$description, opt: true);
+  static String? _$kind(HoverInfo v) => v.kind;
+  static const Field<HoverInfo, String> _f$kind = Field('kind', _$kind, opt: true);
+  static String? _$dartdoc(HoverInfo v) => v.dartdoc;
+  static const Field<HoverInfo, String> _f$dartdoc = Field('dartdoc', _$dartdoc, opt: true);
+  static String? _$enclosingClassName(HoverInfo v) => v.enclosingClassName;
+  static const Field<HoverInfo, String> _f$enclosingClassName =
+      Field('enclosingClassName', _$enclosingClassName, opt: true);
+  static String? _$libraryName(HoverInfo v) => v.libraryName;
+  static const Field<HoverInfo, String> _f$libraryName = Field('libraryName', _$libraryName, opt: true);
+  static String? _$parameter(HoverInfo v) => v.parameter;
+  static const Field<HoverInfo, String> _f$parameter = Field('parameter', _$parameter, opt: true);
+  static bool? _$deprecated(HoverInfo v) => v.deprecated;
+  static const Field<HoverInfo, bool> _f$deprecated = Field('deprecated', _$deprecated, opt: true);
+  static String? _$staticType(HoverInfo v) => v.staticType;
+  static const Field<HoverInfo, String> _f$staticType = Field('staticType', _$staticType, opt: true);
+  static String? _$propagatedType(HoverInfo v) => v.propagatedType;
+  static const Field<HoverInfo, String> _f$propagatedType = Field('propagatedType', _$propagatedType, opt: true);
+
+  @override
+  final Map<Symbol, Field<HoverInfo, dynamic>> fields = const {
+    #description: _f$description,
+    #kind: _f$kind,
+    #dartdoc: _f$dartdoc,
+    #enclosingClassName: _f$enclosingClassName,
+    #libraryName: _f$libraryName,
+    #parameter: _f$parameter,
+    #deprecated: _f$deprecated,
+    #staticType: _f$staticType,
+    #propagatedType: _f$propagatedType,
+  };
+
+  static HoverInfo _instantiate(DecodingData data) {
+    return HoverInfo(
+        description: data.dec(_f$description),
+        kind: data.dec(_f$kind),
+        dartdoc: data.dec(_f$dartdoc),
+        enclosingClassName: data.dec(_f$enclosingClassName),
+        libraryName: data.dec(_f$libraryName),
+        parameter: data.dec(_f$parameter),
+        deprecated: data.dec(_f$deprecated),
+        staticType: data.dec(_f$staticType),
+        propagatedType: data.dec(_f$propagatedType));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static HoverInfo fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<HoverInfo>(map));
+  }
+
+  static HoverInfo fromJson(String json) {
+    return _guard((c) => c.fromJson<HoverInfo>(json));
+  }
+}
+
+mixin HoverInfoMappable {
+  String toJson() {
+    return HoverInfoMapper._guard((c) => c.toJson(this as HoverInfo));
+  }
+
+  Map<String, dynamic> toMap() {
+    return HoverInfoMapper._guard((c) => c.toMap(this as HoverInfo));
+  }
+
+  HoverInfoCopyWith<HoverInfo, HoverInfo, HoverInfo> get copyWith =>
+      _HoverInfoCopyWithImpl(this as HoverInfo, $identity, $identity);
+  @override
+  String toString() {
+    return HoverInfoMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && HoverInfoMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return HoverInfoMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension HoverInfoValueCopy<$R, $Out> on ObjectCopyWith<$R, HoverInfo, $Out> {
+  HoverInfoCopyWith<$R, HoverInfo, $Out> get $asHoverInfo => $base.as((v, t, t2) => _HoverInfoCopyWithImpl(v, t, t2));
+}
+
+abstract class HoverInfoCopyWith<$R, $In extends HoverInfo, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  $R call(
+      {String? description,
+      String? kind,
+      String? dartdoc,
+      String? enclosingClassName,
+      String? libraryName,
+      String? parameter,
+      bool? deprecated,
+      String? staticType,
+      String? propagatedType});
+  HoverInfoCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _HoverInfoCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, HoverInfo, $Out>
+    implements HoverInfoCopyWith<$R, HoverInfo, $Out> {
+  _HoverInfoCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<HoverInfo> $mapper = HoverInfoMapper.ensureInitialized();
+  @override
+  $R call(
+          {Object? description = $none,
+          Object? kind = $none,
+          Object? dartdoc = $none,
+          Object? enclosingClassName = $none,
+          Object? libraryName = $none,
+          Object? parameter = $none,
+          Object? deprecated = $none,
+          Object? staticType = $none,
+          Object? propagatedType = $none}) =>
+      $apply(FieldCopyWithData({
+        if (description != $none) #description: description,
+        if (kind != $none) #kind: kind,
+        if (dartdoc != $none) #dartdoc: dartdoc,
+        if (enclosingClassName != $none) #enclosingClassName: enclosingClassName,
+        if (libraryName != $none) #libraryName: libraryName,
+        if (parameter != $none) #parameter: parameter,
+        if (deprecated != $none) #deprecated: deprecated,
+        if (staticType != $none) #staticType: staticType,
+        if (propagatedType != $none) #propagatedType: propagatedType
+      }));
+  @override
+  HoverInfo $make(CopyWithData data) => HoverInfo(
+      description: data.get(#description, or: $value.description),
+      kind: data.get(#kind, or: $value.kind),
+      dartdoc: data.get(#dartdoc, or: $value.dartdoc),
+      enclosingClassName: data.get(#enclosingClassName, or: $value.enclosingClassName),
+      libraryName: data.get(#libraryName, or: $value.libraryName),
+      parameter: data.get(#parameter, or: $value.parameter),
+      deprecated: data.get(#deprecated, or: $value.deprecated),
+      staticType: data.get(#staticType, or: $value.staticType),
+      propagatedType: data.get(#propagatedType, or: $value.propagatedType));
+
+  @override
+  HoverInfoCopyWith<$R2, HoverInfo, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _HoverInfoCopyWithImpl($value, $cast, t);
+}
+
+class DocumentRequestMapper extends ClassMapperBase<DocumentRequest> {
+  DocumentRequestMapper._();
+
+  static DocumentRequestMapper? _instance;
+  static DocumentRequestMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = DocumentRequestMapper._());
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'DocumentRequest';
+
+  static Map<String, String> _$sources(DocumentRequest v) => v.sources;
+  static const Field<DocumentRequest, Map<String, String>> _f$sources = Field('sources', _$sources);
+  static String _$name(DocumentRequest v) => v.name;
+  static const Field<DocumentRequest, String> _f$name = Field('name', _$name);
+  static int _$offset(DocumentRequest v) => v.offset;
+  static const Field<DocumentRequest, int> _f$offset = Field('offset', _$offset);
+
+  @override
+  final Map<Symbol, Field<DocumentRequest, dynamic>> fields = const {
+    #sources: _f$sources,
+    #name: _f$name,
+    #offset: _f$offset,
+  };
+
+  static DocumentRequest _instantiate(DecodingData data) {
+    return DocumentRequest(data.dec(_f$sources), data.dec(_f$name), data.dec(_f$offset));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static DocumentRequest fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<DocumentRequest>(map));
+  }
+
+  static DocumentRequest fromJson(String json) {
+    return _guard((c) => c.fromJson<DocumentRequest>(json));
+  }
+}
+
+mixin DocumentRequestMappable {
+  String toJson() {
+    return DocumentRequestMapper._guard((c) => c.toJson(this as DocumentRequest));
+  }
+
+  Map<String, dynamic> toMap() {
+    return DocumentRequestMapper._guard((c) => c.toMap(this as DocumentRequest));
+  }
+
+  DocumentRequestCopyWith<DocumentRequest, DocumentRequest, DocumentRequest> get copyWith =>
+      _DocumentRequestCopyWithImpl(this as DocumentRequest, $identity, $identity);
+  @override
+  String toString() {
+    return DocumentRequestMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && DocumentRequestMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return DocumentRequestMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension DocumentRequestValueCopy<$R, $Out> on ObjectCopyWith<$R, DocumentRequest, $Out> {
+  DocumentRequestCopyWith<$R, DocumentRequest, $Out> get $asDocumentRequest =>
+      $base.as((v, t, t2) => _DocumentRequestCopyWithImpl(v, t, t2));
+}
+
+abstract class DocumentRequestCopyWith<$R, $In extends DocumentRequest, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources;
+  $R call({Map<String, String>? sources, String? name, int? offset});
+  DocumentRequestCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _DocumentRequestCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, DocumentRequest, $Out>
+    implements DocumentRequestCopyWith<$R, DocumentRequest, $Out> {
+  _DocumentRequestCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<DocumentRequest> $mapper = DocumentRequestMapper.ensureInitialized();
+  @override
+  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources =>
+      MapCopyWith($value.sources, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(sources: v));
+  @override
+  $R call({Map<String, String>? sources, String? name, int? offset}) => $apply(FieldCopyWithData(
+      {if (sources != null) #sources: sources, if (name != null) #name: name, if (offset != null) #offset: offset}));
+  @override
+  DocumentRequest $make(CopyWithData data) => DocumentRequest(
+      data.get(#sources, or: $value.sources), data.get(#name, or: $value.name), data.get(#offset, or: $value.offset));
+
+  @override
+  DocumentRequestCopyWith<$R2, DocumentRequest, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _DocumentRequestCopyWithImpl($value, $cast, t);
 }

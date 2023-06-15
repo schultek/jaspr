@@ -24,11 +24,17 @@ jobs:
 
       - uses: dart-lang/setup-dart@v1.3
 
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.PUB_PUBLISH_KEY }}
+
       - name: Bootstrap
         run: |
           dart pub global activate melos
           dart pub global activate -s git https://github.com/schultek/semantic_changelog
           melos bootstrap --no-private
+          gcloud auth print-identity-token --audiences=https://pub.dev | dart pub token add https://pub.dev
 
       - name: Bump Package Versions
         id: bump
@@ -50,13 +56,13 @@ jobs:
       - name: Commit Versions
         if: steps.bump.outputs.did_bump != '0'
         run: |
-          git add .
+          git add packages/
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -m "${{ steps.bump.outputs.commit_message }}" \
             --author="${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
 
       - name: Tag Packages
         run: |
-          version tag -f
-          git push --tags origin
+          version publish -f
+          git push --tags origin stable
 
