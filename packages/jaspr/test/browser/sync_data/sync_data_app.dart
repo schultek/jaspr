@@ -17,19 +17,50 @@ class Counter extends StatefulComponent {
   State<StatefulComponent> createState() => CounterState();
 }
 
-class CounterState extends State<Counter> with SyncStateMixin<Counter, int> {
-  int counter = 0;
+const sync = Object();
+
+mixin _$CounterState on State<Counter> implements SyncState<Map<String, dynamic>> {
+  int get counter;
+  set counter(int c);
 
   @override
-  int getState() => throw UnimplementedError();
-
-  @override
-  String get syncId => 'counter';
-
-  @override
-  void updateState(int? value) {
-    counter = value ?? counter;
+  Map<String, dynamic> getState() {
+    return {'counter': counter};
   }
+
+  @override
+  String get syncId => r'CounterState#123';
+
+  @override
+  void updateState(Map<String, dynamic>? state) {
+    if (state == null) return;
+    if (state.containsKey('counter')) {
+      counter = state['counter'];
+    }
+  }
+
+  @override
+  final syncCodec = CastCodec();
+
+  @override
+  bool wantsSync() => true;
+
+  @override
+  void initState() {
+    super.initState();
+    context.binding.registerSyncState(this, initialUpdate: context.binding.isClient);
+  }
+
+  @override
+  void dispose() {
+    context.binding.unregisterSyncState(this);
+    super.dispose();
+  }
+}
+
+@sync
+class CounterState extends State<Counter> with _$CounterState {
+  int counter = 0;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
