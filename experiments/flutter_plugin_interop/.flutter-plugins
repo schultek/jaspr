@@ -1,0 +1,13 @@
+# This is a generated file; do not edit or check into version control.
+firebase_auth=/Users/kilian/.puro/shared/pub_cache/hosted/pub.dev/firebase_auth-4.7.1/
+firebase_auth_web=/Users/kilian/.puro/shared/pub_cache/hosted/pub.dev/firebase_auth_web-5.6.1/
+firebase_core=/Users/kilian/.puro/shared/pub_cache/hosted/pub.dev/firebase_core-2.15.0/
+firebase_core_web=/Users/kilian/.puro/shared/pub_cache/hosted/pub.dev/firebase_core_web-2.6.0/
+path_provider_linux=/Users/kilian/.puro/shared/pub_cache/hosted/pub.dev/path_provider_linux-2.1.11/
+path_provider_windows=/Users/kilian/.puro/shared/pub_cache/hosted/pub.dev/path_provider_windows-2.1.7/
+shared_preferences=/Users/kilian/.puro/shared/pub_cache/hosted/pub.dev/shared_preferences-2.2.0/
+shared_preferences_android=/Users/kilian/.puro/shared/pub_cache/hosted/pub.dev/shared_preferences_android-2.2.0/
+shared_preferences_foundation=/Users/kilian/.puro/shared/pub_cache/hosted/pub.dev/shared_preferences_foundation-2.3.2/
+shared_preferences_linux=/Users/kilian/.puro/shared/pub_cache/hosted/pub.dev/shared_preferences_linux-2.3.0/
+shared_preferences_web=/Users/kilian/.puro/shared/pub_cache/hosted/pub.dev/shared_preferences_web-2.2.0/
+shared_preferences_windows=/Users/kilian/.puro/shared/pub_cache/hosted/pub.dev/shared_preferences_windows-2.3.0/

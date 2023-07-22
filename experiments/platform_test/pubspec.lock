@@ -17,6 +17,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.10.0"
+  archive:
+    dependency: transitive
+    description:
+      name: archive
+      sha256: "0c8368c9b3f0abbc193b9d6133649a614204b528982bebc7026372d61677ce3a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.7"
   args:
     dependency: transitive
     description:
@@ -33,6 +41,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.10.0"
+  bazel_worker:
+    dependency: transitive
+    description:
+      name: bazel_worker
+      sha256: "6aa1de567844e1a1db3ac16959159b31a71128fdd27d63d861ad5aa7299e48c5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   binary_codec:
     dependency: transitive
     description:
@@ -65,6 +81,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  build_modules:
+    dependency: transitive
+    description:
+      name: build_modules
+      sha256: "409fc1be491612bc1e2262f4c7fec6c91c683560662a34cfeedfcd1f7c13470b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.3"
   build_resolvers:
     dependency: transitive
     description:
@@ -89,6 +113,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.2.7"
+  build_web_compilers:
+    dependency: "direct dev"
+    description:
+      name: build_web_compilers
+      sha256: "544333e7f16eddc6f260c426ba8ea5a8fdf1809acc555b2c1c8c8446d1b61ea7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.4"
   built_collection:
     dependency: transitive
     description:
@@ -255,14 +287,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.4.0"
+    version: "0.5.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.4.0"
+    version: "0.5.0"
   js:
     dependency: transitive
     description:
@@ -335,6 +367,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.3"
+  pointycastle:
+    dependency: transitive
+    description:
+      name: pointycastle
+      sha256: "7c1e5f0d23c9016c5bbd8b1473d0d3fb3fc851b876046039509e18e0c7485f2c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.7.3"
   pool:
     dependency: transitive
     description:
@@ -343,6 +383,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.1"
+  protobuf:
+    dependency: transitive
+    description:
+      name: protobuf
+      sha256: "4034a02b7e231e7e60bff30a8ac13a7347abfdac0798595fae0b90a3f0afe759"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   pub_semver:
     dependency: transitive
     description:
@@ -359,6 +407,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1"
+  scratch_space:
+    dependency: transitive
+    description:
+      name: scratch_space
+      sha256: "8510fbff458d733a58fc427057d1ac86303b376d609d6e1bc43f240aad9aa445"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   shelf:
     dependency: transitive
     description:
@@ -407,6 +463,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.7"
+  source_maps:
+    dependency: transitive
+    description:
+      name: source_maps
+      sha256: "708b3f6b97248e5781f493b765c3337db11c5d2c81c3094f10904bfa8004c703"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.12"
   source_span:
     dependency: transitive
     description:
@@ -504,4 +568,4 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=3.0.0 <4.0.0"
+  dart: ">=3.0.0 <3.2.0"
