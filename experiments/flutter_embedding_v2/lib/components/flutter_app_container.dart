@@ -1,15 +1,15 @@
 import 'package:jaspr/html.dart';
 
-class FlutterBridge extends StatelessComponent {
-  const FlutterBridge({this.loader, Key? key}) : super(key: key);
+import 'ripple_loader.dart';
 
-  final Component? loader;
+class FlutterAppContainer extends StatelessComponent {
+  const FlutterAppContainer({Key? key}) : super(key: key);
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield article([
       div(id: 'flutter_target', [
-        if (loader != null) loader!,
+        RippleLoader(),
       ])
     ]);
   }
