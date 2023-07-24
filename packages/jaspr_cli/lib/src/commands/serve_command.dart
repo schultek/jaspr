@@ -77,20 +77,6 @@ class ServeCommand extends BaseCommand {
     var workflow = await _runWebdev(release, debug, mode, useSSR ? '5467' : port);
     guardResource(() => workflow.shutDown());
 
-    if (!useSSR) {
-      await workflow.done;
-      return ExitCode.success.code;
-    }
-
-    var msg = "Starting jaspr development server in ${release ? 'release' : 'debug'} mode...";
-    Progress? progress;
-
-    if (verbose) {
-      logger.info(msg);
-    } else {
-      progress = logger.progress(msg);
-    }
-
     await workflow.serverManager.servers.first.buildResults
         .where((event) => event.status == BuildStatus.succeeded)
         .first;
@@ -113,6 +99,20 @@ class ServeCommand extends BaseCommand {
         // trigger reload
         flutterProcess.stdin.writeln('r');
       });
+    }
+
+    if (!useSSR) {
+      await workflow.done;
+      return ExitCode.success.code;
+    }
+
+    var msg = "Starting jaspr development server in ${release ? 'release' : 'debug'} mode...";
+    Progress? progress;
+
+    if (verbose) {
+      logger.info(msg);
+    } else {
+      progress = logger.progress(msg);
     }
 
     var args = [
