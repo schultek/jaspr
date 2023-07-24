@@ -102,7 +102,7 @@ class BuildCommand extends BaseCommand {
 
       var process = await Process.start(
         'dart',
-        ['compile', argResults!['target'], entryPoint, '-o', './build/app', '-Djaspr.flags.release=true'],
+        ['compile', argResults!['target'], entryPoint, '-o', './build/jaspr/app', '-Djaspr.flags.release=true'],
       );
 
       await watchProcess(process);
@@ -132,7 +132,7 @@ class BuildCommand extends BaseCommand {
         '--release',
         '--verbose',
         '--delete-conflicting-outputs',
-        '--define=jaspr_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
+        '--define=${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
       ],
       (serverLog) {
         if (!verbose) return;

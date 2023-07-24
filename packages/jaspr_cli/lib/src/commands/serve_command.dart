@@ -163,16 +163,18 @@ class ServeCommand extends BaseCommand {
       release: release,
     );
 
+    var compilers = '${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+
     return DevWorkflow.start(configuration, [
       if (release) '--release',
       '--verbose',
       '--define',
-      'jaspr_web_compilers:ddc=generate-full-dill=true',
+      '$compilers:ddc=generate-full-dill=true',
       '--delete-conflicting-outputs',
       if (!release)
-        '--define=jaspr_web_compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
+        '--define=$compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
       else
-        '--define=jaspr_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
+        '--define=$compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
     ], {
       'web': int.parse(port)
     });

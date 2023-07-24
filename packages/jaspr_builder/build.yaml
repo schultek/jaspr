@@ -35,7 +35,7 @@ builders:
     build_extensions: { ".imports.json": [ ".imports.dart" ] }
     auto_apply: dependents
     build_to: source
-    runs_before: [ "build_web_compilers" ]
+    runs_before: [ "build_web_compilers", "jaspr_web_compilers" ]
     applies_builders: [ ":stub" ]
   jaspr_builder:stub:
     import: "package:jaspr_builder/builder.dart"
