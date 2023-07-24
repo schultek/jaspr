@@ -22,9 +22,6 @@ void main() {
       link(rel: 'icon', href: 'icons/favicon.png', type: 'image/png'),
 
       link(rel: 'manifest', href: 'manifest.json'),
-
-      // This script adds the flutter initialization JS code
-      script(src: 'flutter.js', defer: true, []),
       link(rel: 'stylesheet', href: 'css/style.css', type: 'text/css'),
     ],
     scriptName: 'main_jaspr',

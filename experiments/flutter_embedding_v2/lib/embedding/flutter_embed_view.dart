@@ -1,13 +1,13 @@
 import 'package:flutter/widgets.dart' as flt;
 import 'package:jaspr/html.dart';
 
-import 'flutter_loader.dart';
+import 'run_flutter_app.dart';
 
 class FlutterEmbedView extends StatefulComponent {
-  const FlutterEmbedView({required this.app, this.loaderBuilder, this.classes, this.styles, super.key});
+  const FlutterEmbedView({required this.app, this.loader, this.classes, this.styles, super.key});
 
   final flt.Widget app;
-  final SingleComponentBuilder? loaderBuilder;
+  final Component? loader;
   final List<String>? classes;
   final Styles? styles;
 
@@ -42,6 +42,8 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div([], id: 'flutter_target', classes: component.classes, styles: component.styles);
+    yield div(id: 'flutter_target', classes: component.classes, styles: component.styles, [
+      if (component.loader != null) component.loader!,
+    ]);
   }
 }
