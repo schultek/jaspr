@@ -2,7 +2,7 @@ import 'package:jaspr/html.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import 'effects_controls.dart';
-import 'flutter_app_container.dart' if (dart.library.html) 'flutter_app_container.dart';
+import 'flutter_app_container.dart' if (dart.library.html) 'flutter_app_container_web.dart';
 import 'interop_controls.dart';
 
 class App extends StatelessComponent {

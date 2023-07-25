@@ -1,5 +1,5 @@
 builders:
-  jaspr_builder:clients:
+  clients:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "buildClient" ]
     build_extensions: {
@@ -9,7 +9,7 @@ builders:
     build_to: source
     runs_before:
       - build_web_compilers
-  jaspr_builder:registry:
+  registry:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "buildRegistry" ]
     build_extensions: {
@@ -21,7 +21,7 @@ builders:
       - '.client.dart'
     runs_before:
       - build_web_compilers
-  jaspr_builder:imports:
+  imports:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "findPlatformImports" ]
     build_extensions: { ".dart": [ ".imports.json" ] }
@@ -29,15 +29,17 @@ builders:
     build_to: cache
     runs_before: [ "build_web_compilers", ":import_parts" ]
     applies_builders: [ ":stub" ]
-  jaspr_builder:import_parts:
+  import_parts:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "writePlatformImports" ]
     build_extensions: { ".imports.json": [ ".imports.dart" ] }
     auto_apply: dependents
+    required_inputs:
+      - '.imports.json'
     build_to: source
-    runs_before: [ "build_web_compilers", "jaspr_web_compilers" ]
+    runs_before: [ "build_web_compilers", "jaspr_web_compilers", ":stub" ]
     applies_builders: [ ":stub" ]
-  jaspr_builder:stub:
+  stub:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "buildPlatformStubs" ]
     build_extensions: { "lib/$lib$": [
