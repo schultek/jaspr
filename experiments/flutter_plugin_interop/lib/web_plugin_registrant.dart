@@ -21,4 +21,3 @@ void registerPlugins([final Registrar? pluginRegistrar]) {
 
   registrar.registerMessageHandler();
 }
-    
