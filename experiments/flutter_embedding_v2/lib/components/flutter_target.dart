@@ -1,10 +1,10 @@
-import 'package:element_embedding_demo/providers/effects_provider.dart';
 import 'package:flutter/widgets.dart' show Widget;
 import 'package:flutter_riverpod/flutter_riverpod.dart' as fr;
 import 'package:jaspr/html.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../embedding/flutter_embed_view.dart';
+import '../providers/effects_provider.dart';
 
 class FlutterTarget extends StatelessComponent {
   const FlutterTarget({required this.app, this.loader, Key? key}) : super(key: key);
