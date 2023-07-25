@@ -22,10 +22,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^2.0.0
   jaspr_builder: ^0.4.0
-  jaspr_web_compilers:
-    git:
-      url: https://github.com/schultek/build
-      path: build_web_compilers
+  jaspr_web_compilers: ^4.0.4
 
 flutter:
   uses-material-design: true

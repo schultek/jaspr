@@ -322,7 +322,7 @@ packages:
     source: hosted
     version: "1.1.0"
   flutter:
-    dependency: "direct main"
+    dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.0"
@@ -425,9 +425,10 @@ packages:
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
-      path: "../../modules/build/build_web_compilers"
-      relative: true
-    source: path
+      name: jaspr_web_compilers
+      sha256: "1aefd4806e2ba35390efe22197a96047bd13645bc3849076b25292d2d5c346c3"
+      url: "https://pub.dev"
+    source: hosted
     version: "4.0.4"
   js:
     dependency: transitive

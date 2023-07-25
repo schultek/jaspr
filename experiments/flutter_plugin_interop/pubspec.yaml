@@ -16,8 +16,5 @@ dependencies:
 dev_dependencies:
   build_runner: ^2.4.0
   jaspr_builder: ^0.5.0
-  jaspr_web_compilers:
-    git:
-      url: https://github.com/schultek/build
-      path: build_web_compilers
+  jaspr_web_compilers: ^4.0.4
   lints: ^2.1.0
