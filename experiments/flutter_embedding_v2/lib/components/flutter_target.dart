@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart' show Widget;
-import 'package:flutter_riverpod/flutter_riverpod.dart' as fr;
 import 'package:jaspr/html.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
@@ -31,10 +30,7 @@ class FlutterTarget extends StatelessComponent {
             )
           : null,
       loader: loader,
-      app: fr.ProviderScope(
-        parent: ProviderScope.containerOf(context),
-        child: app,
-      ),
+      app: app,
     );
 
     if (isHandheld) {

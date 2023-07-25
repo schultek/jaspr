@@ -1,4 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart' as fr;
 import 'package:jaspr/html.dart';
+import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../widgets/app.dart';
 import 'flutter_target.dart';
@@ -11,7 +13,10 @@ class FlutterAppContainer extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield FlutterTarget(
       loader: RippleLoader(),
-      app: MyApp(),
+      app: fr.ProviderScope(
+        parent: ProviderScope.containerOf(context),
+        child: MyApp(),
+      ),
     );
   }
 }

@@ -24,6 +24,8 @@
 
   For an example see `experiments/flutter_embedding_v2`](https://github.com/schultek/jaspr/tree/main/experiments/flutter_embedding_v2).
 
+- `jaspr build` now outputs to `/build/jaspr` instead of `/build`.
+
 ## 0.5.0
 
 - **BREAKING** Added `@client` as replacement for both `@app` and `@island`.
