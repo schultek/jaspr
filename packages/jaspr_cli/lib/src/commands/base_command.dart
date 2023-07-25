@@ -6,6 +6,7 @@ import 'package:mason/mason.dart';
 import 'package:meta/meta.dart';
 // ignore: implementation_imports
 import 'package:webdev/src/logging.dart';
+import 'package:yaml/yaml.dart';
 
 abstract class BaseCommand extends Command<int> {
   Set<Future<void> Function()> guards = {};
@@ -26,10 +27,19 @@ abstract class BaseCommand extends Command<int> {
 
   bool get verbose => argResults?['verbose'] as bool? ?? false;
 
+  late YamlMap pubspecYaml;
+
+  bool get usesJasprWebCompilers => switch (pubspecYaml) {
+        {'dev_dependencies': {'jaspr_web_compilers': _}} => true,
+        _ => false,
+      };
+
   @override
   @mustCallSuper
   Future<int> run() async {
     logger.level = verbose ? Level.verbose : Level.info;
+
+    pubspecYaml = await getPubspec();
 
     configureLogWriter(false, customLogWriter: (level, message, {loggerName, error, stackTrace}) {
       if (!verbose) return;
@@ -70,6 +80,17 @@ abstract class BaseCommand extends Command<int> {
     }
 
     return null;
+  }
+
+  Future<YamlMap> getPubspec() async {
+    var pubspecPath = 'pubspec.yaml';
+    var pubspecFile = File(pubspecPath);
+    if (!(await pubspecFile.exists())) {
+      throw 'Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.';
+    }
+
+    var parsed = loadYaml(await pubspecFile.readAsString());
+    return parsed as YamlMap;
   }
 
   void guardResource(Future<void> Function() fn) {

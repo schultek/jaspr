@@ -1,3 +1,29 @@
+## Unreleased minor
+
+- Added support for **flutter web plugins**.
+
+  Jaspr apps can now depend-on and import flutter plugins that work on web. This is achieved by 
+  using a modified compiler toolchain: `jaspr_web_compilers`.
+
+  To enable support for flutter plugins simply exchange your `build_web_compilers` dependency for `jaspr_web_compilers`:
+
+  ```yaml
+  dev_dependencies:
+    jaspr_web_compilers: ^4.0.4
+  ```
+  
+  For an example see `experiments/flutter_plugin_interop`](https://github.com/schultek/jaspr/tree/main/experiments/flutter_plugin_interop).
+  
+- Improved **flutter element embedding**.
+
+  Flutter apps can now be directly embedded from your jaspr codebase and integrated into
+  the existing jaspr component tree.
+
+  This removes the need for any kind of interop between apps as they can directly communicate
+  through the usual primitives of passing properties and callbacks.
+
+  For an example see `experiments/flutter_embedding_v2`](https://github.com/schultek/jaspr/tree/main/experiments/flutter_embedding_v2).
+
 ## 0.5.0
 
 - **BREAKING** Added `@client` as replacement for both `@app` and `@island`.

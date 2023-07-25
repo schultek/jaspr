@@ -54,23 +54,23 @@ class BuildCommand extends BaseCommand {
   Future<int> run() async {
     await super.run();
 
-    var dir = Directory('build');
+    var dir = Directory('build/jaspr');
     if (!await dir.exists()) {
-      await dir.create();
+      await dir.create(recursive: true);
     }
 
     var useSSR = argResults!['ssr'] as bool;
     var flutter = argResults!['flutter'] as String?;
 
     if (useSSR) {
-      var webDir = Directory('build/web');
+      var webDir = Directory('build/jaspr/web');
       if (!await webDir.exists()) {
         await webDir.create();
       }
     }
 
     var indexHtml = File('web/index.html');
-    var targetIndexHtml = File('build/web/index.html');
+    var targetIndexHtml = File('build/jaspr/web/index.html');
 
     var dummyIndex = false;
     if (flutter != null && !await indexHtml.exists()) {
@@ -82,7 +82,10 @@ class BuildCommand extends BaseCommand {
     var flutterResult = Future<void>.value();
 
     if (flutter != null) {
-      flutterResult = _buildFlutter(flutter);
+      if (!useSSR) {
+        await webResult;
+      }
+      flutterResult = _buildFlutter(flutter, useSSR);
     }
 
     if (useSSR) {
@@ -99,7 +102,7 @@ class BuildCommand extends BaseCommand {
 
       var process = await Process.start(
         'dart',
-        ['compile', argResults!['target'], entryPoint, '-o', './build/app', '-Djaspr.flags.release=true'],
+        ['compile', argResults!['target'], entryPoint, '-o', './build/jaspr/app', '-Djaspr.flags.release=true'],
       );
 
       await watchProcess(process);
@@ -129,7 +132,7 @@ class BuildCommand extends BaseCommand {
         '--release',
         '--verbose',
         '--delete-conflicting-outputs',
-        '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
+        '--define=${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
       ],
       (serverLog) {
         if (!verbose) return;
@@ -149,7 +152,7 @@ class BuildCommand extends BaseCommand {
       },
     );
     OutputLocation outputLocation = OutputLocation((b) => b
-      ..output = 'build${useSSR ? '/web' : ''}'
+      ..output = 'build/jaspr${useSSR ? '/web' : ''}'
       ..useSymlinks = false
       ..hoist = true);
 
@@ -189,17 +192,18 @@ class BuildCommand extends BaseCommand {
     return exitCode;
   }
 
-  Future<void> _buildFlutter(String flutter) async {
+  Future<void> _buildFlutter(String flutter, bool useSSR) async {
     var flutterProcess = await Process.start(
       'flutter',
       ['build', 'web', '-t', flutter, '--output=build/flutter'],
     );
 
+    var target = useSSR ? 'build/jaspr/web' : 'build/jaspr';
+
     var moveTargets = [
       'version.json',
-      'main.dart.js',
       'flutter_service_worker.js',
-      'flutter.js',
+      'assets/',
       'canvaskit/',
     ];
 
@@ -211,7 +215,7 @@ class BuildCommand extends BaseCommand {
       var file = File('./build/flutter/$moveTarget');
       var isDir = file.statSync().type == FileSystemEntityType.directory;
       if (isDir) {
-        await Directory('build/web/$moveTarget').create(recursive: true);
+        await Directory('$target/$moveTarget').create(recursive: true);
 
         var files = Directory('build/flutter/$moveTarget').list(recursive: true);
         await for (var file in files) {
@@ -223,7 +227,7 @@ class BuildCommand extends BaseCommand {
           }
         }
       } else {
-        moves.add(file.copy('./build/web/$moveTarget'));
+        moves.add(file.copy('./$target/$moveTarget'));
       }
     }
 

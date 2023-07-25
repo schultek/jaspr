@@ -37,7 +37,7 @@ builders:
     required_inputs:
       - '.imports.json'
     build_to: source
-    runs_before: [ "build_web_compilers", ":stub" ]
+    runs_before: [ "build_web_compilers", "jaspr_web_compilers", ":stub" ]
     applies_builders: [ ":stub" ]
   stub:
     import: "package:jaspr_builder/builder.dart"
