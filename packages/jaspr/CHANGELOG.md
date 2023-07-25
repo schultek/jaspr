@@ -1,4 +1,4 @@
-## Unreleased mayor
+## Unreleased major
 
 - Added support for **flutter web plugins**.
 
