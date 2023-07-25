@@ -1,4 +1,4 @@
-name: element_embedding_demo
+name: element_embedding_demo_v2
 description: A small app to be embedded into a HTML element
 version: 1.0.0
 publish_to: none
