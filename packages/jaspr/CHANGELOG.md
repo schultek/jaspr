@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.6.0
 
 - Added support for **flutter web plugins**.
 
