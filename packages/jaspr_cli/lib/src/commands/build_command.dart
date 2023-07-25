@@ -42,6 +42,12 @@ class BuildCommand extends BaseCommand {
       'flutter',
       help: 'Build an embedded flutter app from the specified entrypoint.',
     );
+    argParser.addOption(
+      'output',
+      abbr: 'o',
+      defaultsTo: 'build',
+      help: 'The directory to write the build output to.',
+    );
   }
 
   @override
@@ -54,23 +60,24 @@ class BuildCommand extends BaseCommand {
   Future<int> run() async {
     await super.run();
 
-    var dir = Directory('build');
-    if (!await dir.exists()) {
-      await dir.create();
-    }
-
+    var output = argResults!['output'] as String;
     var useSSR = argResults!['ssr'] as bool;
     var flutter = argResults!['flutter'] as String?;
 
+    var dir = Directory(output);
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+
     if (useSSR) {
-      var webDir = Directory('build/web');
+      var webDir = Directory(p.join(output, 'web'));
       if (!await webDir.exists()) {
-        await webDir.create();
+        await webDir.create(recursive: true);
       }
     }
 
     var indexHtml = File('web/index.html');
-    var targetIndexHtml = File('build/web/index.html');
+    var targetIndexHtml = File(p.join(output, 'web/index.html'));
 
     var dummyIndex = false;
     if (flutter != null && !await indexHtml.exists()) {
@@ -78,11 +85,11 @@ class BuildCommand extends BaseCommand {
       await indexHtml.create();
     }
 
-    var webResult = _buildWeb(true, useSSR);
+    var webResult = _buildWeb(true, output, useSSR);
     var flutterResult = Future<void>.value();
 
     if (flutter != null) {
-      flutterResult = _buildFlutter(flutter);
+      flutterResult = _buildFlutter(flutter, output);
     }
 
     if (useSSR) {
@@ -99,7 +106,7 @@ class BuildCommand extends BaseCommand {
 
       var process = await Process.start(
         'dart',
-        ['compile', argResults!['target'], entryPoint, '-o', './build/app', '-Djaspr.flags.release=true'],
+        ['compile', argResults!['target'], entryPoint, '-o', p.join(output, 'app'), '-Djaspr.flags.release=true'],
       );
 
       await watchProcess(process);
@@ -117,11 +124,11 @@ class BuildCommand extends BaseCommand {
       }
     }
 
-    logger.success('Completed building project to /build.');
+    logger.success('Completed building project to /$output.');
     return ExitCode.success.code;
   }
 
-  Future<int> _buildWeb(bool release, bool useSSR) async {
+  Future<int> _buildWeb(bool release, String output, bool useSSR) async {
     logger.info('Building web assets...');
     var client = await d.connectClient(
       Directory.current.path,
@@ -149,7 +156,7 @@ class BuildCommand extends BaseCommand {
       },
     );
     OutputLocation outputLocation = OutputLocation((b) => b
-      ..output = 'build${useSSR ? '/web' : ''}'
+      ..output = useSSR ? p.join(output, 'web') : output
       ..useSymlinks = false
       ..hoist = true);
 
@@ -189,10 +196,11 @@ class BuildCommand extends BaseCommand {
     return exitCode;
   }
 
-  Future<void> _buildFlutter(String flutter) async {
+  Future<void> _buildFlutter(String flutter, String output) async {
+    var flutterOutput = p.join(output, 'flutter');
     var flutterProcess = await Process.start(
       'flutter',
-      ['build', 'web', '-t', flutter, '--output=build/flutter'],
+      ['build', 'web', '-t', flutter, '--output=$flutterOutput'],
     );
 
     var moveTargets = [
@@ -208,14 +216,16 @@ class BuildCommand extends BaseCommand {
     var moves = <Future>[];
     while (moveTargets.isNotEmpty) {
       var moveTarget = moveTargets.removeAt(0);
-      var file = File('./build/flutter/$moveTarget');
+      var targetInput = p.join(flutterOutput, moveTarget);
+      var targetOutput = p.join(output, 'web', moveTarget);
+      var file = File(targetInput);
       var isDir = file.statSync().type == FileSystemEntityType.directory;
       if (isDir) {
-        await Directory('build/web/$moveTarget').create(recursive: true);
+        await Directory(targetOutput).create(recursive: true);
 
-        var files = Directory('build/flutter/$moveTarget').list(recursive: true);
+        var files = Directory(targetInput).list(recursive: true);
         await for (var file in files) {
-          final path = p.relative(file.path, from: 'build/flutter');
+          final path = p.relative(file.path, from: flutterOutput);
           if (file is Directory) {
             moveTargets.add(path);
           } else {
@@ -223,7 +233,7 @@ class BuildCommand extends BaseCommand {
           }
         }
       } else {
-        moves.add(file.copy('./build/web/$moveTarget'));
+        moves.add(file.copy(targetOutput));
       }
     }
 
