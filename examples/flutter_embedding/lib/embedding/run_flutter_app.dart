@@ -2,38 +2,33 @@
 @JS()
 library flutter_interop;
 
+import 'dart:async';
 import 'dart:html';
 
-import 'package:jaspr/browser.dart' show kDebugMode;
+import 'package:jaspr/browser.dart' show BrowserAppBinding, kDebugMode;
 import 'package:js/js.dart';
 
 /// Starts a flutter app and attaches it to the [attachTo] dom element.
-void runFlutterApp({required String attachTo}) {
-  var target = querySelector(attachTo);
-  var promise = flutter.loader.loadEntrypoint(LoadEntrypointOptions(
-    entrypointUrl: 'main.dart.js',
-    onEntrypointLoaded: allowInterop((engineInitializer) {
-      return engineInitializer
-          .initializeEngine(InitializeEngineOptions(hostElement: target!))
-          .then(allowInterop((runner) => runner.runApp()))
-          .then(allowInterop((_) {
-        // We have to manually dispatch this event to hide the loader bar.
-        window.document.dispatchEvent(Event('dart-app-ready'));
-      }));
-    }),
-  ));
+Future<void> runFlutterApp({required String attachTo}) {
+  var completer = Completer();
 
-  if (kDebugMode) {
-    // This promise will resolve once the 'main.dart.js' file is fetched, but before the
-    // [onEntrypointLoaded] callback is called.
-    promise.then(allowInterop((_) {
-      // Normally this module would be set as 'data-main' for require.js by 'main.dart.js' and
-      // loaded automatically, however since the script is already loaded for 'main_jaspr.dart.js'
-      // this has no effect and we have to require this module manually.
-      require(['main_module.bootstrap']);
-      // By requiring this, flutter will continue to initialize and eventually call [onEntrypointLoaded].
+  var target = querySelector(attachTo);
+
+  flutter ??= FlutterInterop();
+  flutter!.loader ??= FlutterLoader();
+
+  flutter!.loader!.didCreateEngineInitializer = allowInterop((engineInitializer) {
+    return engineInitializer
+        .initializeEngine(InitializeEngineOptions(hostElement: target!))
+        .then(allowInterop((runner) {
+      runner.runApp();
+      completer.complete();
     }));
-  }
+  });
+
+  BrowserAppBinding.warmupFlutterEngine();
+
+  return completer.future;
 }
 
 /// Handle to the [require()] function from RequireJS
@@ -42,23 +37,27 @@ external void Function(List<String>) require;
 
 /// Handle to the [_flutter] object defined by the 'flutter.js' script.
 @JS('_flutter')
-external FlutterInterop get flutter;
+external FlutterInterop? flutter;
 
 // Below are some js bindings to interact with the flutter loader script
 // from dart in a type-safe way.
 
 @JS()
+@anonymous
 class FlutterInterop {
   external factory FlutterInterop();
 
-  external FlutterLoader get loader;
+  external FlutterLoader? loader;
 }
 
 @JS()
+@anonymous
 class FlutterLoader {
   external factory FlutterLoader();
 
   external Promise<dynamic> loadEntrypoint(LoadEntrypointOptions options);
+
+  external OnEntrypointLoaded? didCreateEngineInitializer;
 }
 
 typedef OnEntrypointLoaded = Promise<void> Function(EngineInitializer engineInitializer);

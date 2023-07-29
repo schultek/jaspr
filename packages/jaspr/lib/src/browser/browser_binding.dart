@@ -82,4 +82,6 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
       frameCallback();
     });
   }
+
+  static late Future<void> Function({Function? runApp}) warmupFlutterEngine;
 }

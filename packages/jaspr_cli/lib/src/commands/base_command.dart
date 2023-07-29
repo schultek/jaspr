@@ -27,7 +27,9 @@ abstract class BaseCommand extends Command<int> {
 
   bool get verbose => argResults?['verbose'] as bool? ?? false;
 
-  late YamlMap pubspecYaml;
+  final bool requiresPubspec = true;
+
+  late YamlMap? pubspecYaml;
 
   bool get usesJasprWebCompilers => switch (pubspecYaml) {
         {'dev_dependencies': {'jaspr_web_compilers': _}} => true,
@@ -82,11 +84,15 @@ abstract class BaseCommand extends Command<int> {
     return null;
   }
 
-  Future<YamlMap> getPubspec() async {
+  Future<YamlMap?> getPubspec() async {
     var pubspecPath = 'pubspec.yaml';
     var pubspecFile = File(pubspecPath);
     if (!(await pubspecFile.exists())) {
-      throw 'Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.';
+      if (requiresPubspec) {
+        throw 'Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.';
+      } else {
+        return null;
+      }
     }
 
     var parsed = loadYaml(await pubspecFile.readAsString());

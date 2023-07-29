@@ -39,6 +39,9 @@ class CreateCommand extends BaseCommand {
   String get name => 'create';
 
   @override
+  final bool requiresPubspec = false;
+
+  @override
   Future<int> run() async {
     await super.run();
 

@@ -1,9 +1,15 @@
-import 'package:element_embedding_demo/providers/effects_provider.dart';
+import 'package:flutter/widgets.dart' show Widget;
 import 'package:jaspr/html.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
+import '../embedding/flutter_embed_view.dart';
+import '../providers/effects_provider.dart';
+
 class FlutterTarget extends StatelessComponent {
-  const FlutterTarget({Key? key}) : super(key: key);
+  const FlutterTarget({required this.app, this.loader, Key? key}) : super(key: key);
+
+  final Widget app;
+  final Component? loader;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -12,9 +18,8 @@ class FlutterTarget extends StatelessComponent {
 
     var isHandheld = effects.contains('handheld');
 
-    Component child = div(
+    Component child = FlutterEmbedView(
       key: GlobalObjectKey('flutter_target'),
-      id: 'flutter_target',
       classes: isHandheld ? ['handheld'] : effects.toList(),
       styles: rotation != 0
           ? Styles.box(
@@ -24,7 +29,8 @@ class FlutterTarget extends StatelessComponent {
               ]),
             )
           : null,
-      [],
+      loader: loader,
+      app: app,
     );
 
     if (isHandheld) {
