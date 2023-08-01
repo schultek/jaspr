@@ -1,3 +1,10 @@
+## Unreleased patch
+
+- Fixed bug with `jaspr create`.
+
+- Added prompts when running `jaspr create` without any arguments.
+  This way the developer is guided through the creation process more dynamically.
+
 ## 0.6.0
 
 - Added support for **flutter web plugins**.
