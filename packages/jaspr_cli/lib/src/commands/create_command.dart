@@ -21,6 +21,13 @@ class CreateCommand extends BaseCommand {
       allowed: templatesByName.keys,
       allowedHelp: templateDescriptionByName,
     );
+    argParser.addFlag(
+      'experimental-web-compilers',
+      abbr: 'c',
+      help:
+          'Use jaspr web compilers (experimental)? This enables the use of flutter web plugins and direct flutter embedding.',
+      defaultsTo: null,
+    );
   }
 
   @override
@@ -65,7 +72,8 @@ class CreateCommand extends BaseCommand {
 
     var template = templatesByName[templateName]!;
 
-    var useJasprCompilers = logger.confirm(
+    var useJasprCompilers = argResults!['experimental-web-compilers'] as bool?;
+    useJasprCompilers ??= logger.confirm(
         'Use jaspr web compilers (experimental)? This enables the use of flutter web plugins and direct flutter embedding.',
         defaultValue: true);
 
