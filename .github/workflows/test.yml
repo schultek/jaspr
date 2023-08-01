@@ -35,7 +35,7 @@ jobs:
 
       - name: Build Project
         run: |
-          cd my_app
+          cd apps/my_app
           jaspr build -v
 
   analyze:
