@@ -30,7 +30,7 @@ jobs:
       - name: Create & Build Project
         run: |
           cd apps
-          jaspr create -t basic my_app
+          jaspr create -t basic -c my_app
           melos bootstrap --scope my_app
           cd my_app
           jaspr build -v
