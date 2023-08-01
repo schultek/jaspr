@@ -9,21 +9,17 @@ import 'base_command.dart';
 
 final RegExp _packageRegExp = RegExp(r'^[a-z_][a-z0-9_]*$');
 
+final templatesByName = {for (var t in templates) t.name: t};
+final templateDescriptionByName = {for (var t in templates) t.name: t.description};
+
 class CreateCommand extends BaseCommand {
   CreateCommand({super.logger}) {
     argParser.addOption(
       'template',
       abbr: 't',
       help: 'The template used to generate this new project.',
-      mandatory: true,
-      allowed: templates.map((element) => element.name).toList(),
-      allowedHelp: templates.fold<Map<String, String>>(
-        {},
-        (h, e) => {
-          ...h,
-          e.name: e.description,
-        },
-      ),
+      allowed: templatesByName.keys,
+      allowedHelp: templateDescriptionByName,
     );
   }
 
@@ -39,17 +35,14 @@ class CreateCommand extends BaseCommand {
   String get name => 'create';
 
   @override
-  final bool requiresPubspec = false;
+  bool get requiresPubspec => false;
 
   @override
   Future<int> run() async {
     await super.run();
 
-    if (argResults!.rest.isEmpty) {
-      usageException('Specify a target directory.');
-    }
-
-    var targetPath = argResults!.rest.first;
+    var targetPath = argResults!.rest.firstOrNull;
+    targetPath ??= logger.prompt('Specify a target directory:');
 
     var directory = Directory(targetPath);
     var dir = path.basenameWithoutExtension(directory.path);
@@ -66,8 +59,15 @@ class CreateCommand extends BaseCommand {
           'You should use snake_case for the package name e.g. my_jaspr_project');
     }
 
-    final templateName = argResults!['template'] as String?;
-    var template = templates.firstWhere((element) => element.name == templateName);
+    var templateName = argResults!['template'] as String?;
+    templateName ??= logger.chooseOne('Choose a template:',
+        choices: templatesByName.keys.toList(), display: (name) => '$name: ${templateDescriptionByName[name]}');
+
+    var template = templatesByName[templateName]!;
+
+    var useJasprCompilers = logger.confirm(
+        'Use jaspr web compilers (experimental)? This enables the use of flutter web plugins and direct flutter embedding.',
+        defaultValue: true);
 
     var progress = logger.progress('Bootstrapping');
     var generator = await MasonGenerator.fromBundle(template);
@@ -77,6 +77,8 @@ class CreateCommand extends BaseCommand {
         'name': name,
         'jasprCoreVersion': jasprCoreVersion,
         'jasprBuilderVersion': jasprBuilderVersion,
+        'webCompilersPackage': useJasprCompilers ? 'jaspr_web_compilers' : 'build_web_compilers',
+        'webCompilersVersion': useJasprCompilers ? '4.0.4' : '4.0.4', // TODO get latest version from pub
       },
       logger: logger,
     );
