@@ -20,7 +20,7 @@ class BuildCommand extends BaseCommand {
       'input',
       abbr: 'i',
       help: 'Specify the input file for the web app',
-      defaultsTo: 'lib/main.dart',
+      defaultsTo: p.join('lib', 'main.dart'),
     );
     argParser.addFlag(
       'ssr',
@@ -54,7 +54,10 @@ class BuildCommand extends BaseCommand {
   Future<int> run() async {
     await super.run();
 
-    var dir = Directory('build/jaspr');
+    var buildDirPath = p.join('build', 'jaspr');
+    var webDirPath = p.join(buildDirPath, 'web');
+
+    var dir = Directory(buildDirPath);
     if (!await dir.exists()) {
       await dir.create(recursive: true);
     }
@@ -63,14 +66,14 @@ class BuildCommand extends BaseCommand {
     var flutter = argResults!['flutter'] as String?;
 
     if (useSSR) {
-      var webDir = Directory('build/jaspr/web');
+      var webDir = Directory(webDirPath);
       if (!await webDir.exists()) {
         await webDir.create();
       }
     }
 
-    var indexHtml = File('web/index.html');
-    var targetIndexHtml = File('build/jaspr/web/index.html');
+    var indexHtml = File(p.join('web', 'index.html'));
+    var targetIndexHtml = File(p.join(webDirPath, 'index.html'));
 
     var dummyIndex = false;
     if (flutter != null && !await indexHtml.exists()) {
@@ -102,7 +105,7 @@ class BuildCommand extends BaseCommand {
 
       var process = await Process.start(
         'dart',
-        ['compile', argResults!['target'], entryPoint, '-o', './build/jaspr/app', '-Djaspr.flags.release=true'],
+        ['compile', argResults!['target'], entryPoint, '-o', p.join(buildDirPath, 'app'), '-Djaspr.flags.release=true'],
       );
 
       await watchProcess(process);

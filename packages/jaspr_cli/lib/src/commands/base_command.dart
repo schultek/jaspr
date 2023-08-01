@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:mason/mason.dart';
 import 'package:meta/meta.dart';
+import 'package:path/path.dart' as p;
 // ignore: implementation_imports
 import 'package:webdev/src/logging.dart';
 import 'package:yaml/yaml.dart';
@@ -70,7 +71,7 @@ abstract class BaseCommand extends Command<int> {
   }
 
   Future<String?> getEntryPoint(String? input) async {
-    var entryPoints = [input, 'lib/main.dart', 'web/main.dart'];
+    var entryPoints = [input, p.join('lib', 'main.dart'), p.join('web', 'main.dart')];
 
     for (var path in entryPoints) {
       if (path == null) continue;
