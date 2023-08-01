@@ -30,13 +30,13 @@ jobs:
       - name: Create Project
         run: |
           cd apps
-          jaspr create -t basic -c my_app
+          jaspr create -t basic --no-experimental-web-compilers my_app
           melos bootstrap --scope my_app
 
       - name: Build Project
         run: |
           cd apps/my_app
-          jaspr build -v
+          jaspr build -v --no-ssr
 
   analyze:
     name: Analyze Code
