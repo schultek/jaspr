@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.6.1
 
 - Fixed bug with `jaspr create`.
 
