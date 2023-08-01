@@ -27,11 +27,14 @@ jobs:
           dart pub global activate melos
           melos bootstrap --no-private
 
-      - name: Create & Build Project
+      - name: Create Project
         run: |
           cd apps
           jaspr create -t basic -c my_app
           melos bootstrap --scope my_app
+
+      - name: Build Project
+        run: |
           cd my_app
           jaspr build -v
 
