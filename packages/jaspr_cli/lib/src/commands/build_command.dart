@@ -24,8 +24,8 @@ class BuildCommand extends BaseCommand {
     );
     argParser.addFlag(
       'ssr',
-      defaultsTo: true,
-      help: 'Optionally disables server-side rendering and runs as a pure client-side app.',
+      defaultsTo: null,
+      help: '(Deprecated) Optionally disables server-side rendering and runs as a pure client-side app.',
     );
     argParser.addOption(
       'target',
@@ -59,7 +59,14 @@ class BuildCommand extends BaseCommand {
       await dir.create(recursive: true);
     }
 
-    var useSSR = argResults!['ssr'] as bool;
+    var useSSR = argResults!['ssr'] as bool?;
+    if (useSSR != null) {
+      logger.alert(
+          '"--ssr" is deprecated and will be removed in the next version. Use the "jaspr.ssr" configuration option in pubspec.yaml instead.');
+    } else {
+      useSSR = config.ssr.enabled;
+    }
+
     var flutter = argResults!['flutter'] as String?;
 
     if (useSSR) {

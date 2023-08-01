@@ -8,6 +8,8 @@ import 'package:meta/meta.dart';
 import 'package:webdev/src/logging.dart';
 import 'package:yaml/yaml.dart';
 
+import '../config.dart';
+
 abstract class BaseCommand extends Command<int> {
   Set<Future<void> Function()> guards = {};
 
@@ -30,6 +32,7 @@ abstract class BaseCommand extends Command<int> {
   final bool requiresPubspec = true;
 
   late YamlMap? pubspecYaml;
+  late JasprConfig config;
 
   bool get usesJasprWebCompilers => switch (pubspecYaml) {
         {'dev_dependencies': {'jaspr_web_compilers': _}} => true,
@@ -42,6 +45,7 @@ abstract class BaseCommand extends Command<int> {
     logger.level = verbose ? Level.verbose : Level.info;
 
     pubspecYaml = await getPubspec();
+    config = getConfig();
 
     configureLogWriter(false, customLogWriter: (level, message, {loggerName, error, stackTrace}) {
       if (!verbose) return;
@@ -97,6 +101,50 @@ abstract class BaseCommand extends Command<int> {
 
     var parsed = loadYaml(await pubspecFile.readAsString());
     return parsed as YamlMap;
+  }
+
+  JasprConfig getConfig() {
+    if (pubspecYaml case {'jaspr': var configYaml}) {
+      try {
+        if (configYaml is! YamlMap) {
+          throw "'jaspr' must be a map.";
+        }
+
+        JasprSSRConfig? ssr;
+        if (configYaml['ssr'] case var ssrYaml) {
+          if (ssrYaml is! bool && ssrYaml is! Map) throw "'jaspr.ssr' must be a boolean or map.";
+
+          if (ssrYaml is bool) {
+            ssr = JasprSSRConfig(enabled: ssrYaml);
+          } else {
+            var enabled = ssrYaml['enabled'];
+            if (enabled == null) {
+              ssr = JasprSSRConfig(enabled: true);
+            } else {
+              if (enabled is! bool) throw "'jaspr.ssr.enabled' must be a boolean.";
+              ssr = JasprSSRConfig(enabled: enabled);
+            }
+          }
+        }
+
+        bool? usesFlutter;
+        if (configYaml['uses-flutter'] case var flutterYaml) {
+          if (flutterYaml != null) {
+            if (flutterYaml is! bool) throw "'jaspr.uses-flutter' must be a boolean.";
+
+            usesFlutter = flutterYaml;
+          } else {
+            usesFlutter = false;
+          }
+        }
+
+        return JasprConfig(ssr: ssr, usesFlutter: usesFlutter);
+      } catch (e) {
+        logger.alert('Invalid jaspr configuration in pubspec.yaml: $e');
+      }
+    }
+
+    return JasprConfig();
   }
 
   void guardResource(Future<void> Function() fn) {
