@@ -23,6 +23,7 @@ jobs:
           token: ${{ secrets.PUSH_TOKEN }}
 
       - uses: dart-lang/setup-dart@v1.3
+      - uses: subosito/flutter-action@v2
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
@@ -47,6 +48,10 @@ jobs:
           echo 'EOF' >> $GITHUB_OUTPUT
           echo "did_bump=$(grep -q "No packages" output.txt; echo $?)" >> $GITHUB_OUTPUT
           rm -rf output.txt
+
+      - name: Apply Versions
+        run: |
+          melos bootstrap
 
       - name: Update CLI
         run: |
