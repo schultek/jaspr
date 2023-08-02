@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart' show Widget;
 import 'package:jaspr/html.dart';
+import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
-import '../embedding/flutter_embed_view.dart';
 import '../providers/effects_provider.dart';
 
 class FlutterTarget extends StatelessComponent {

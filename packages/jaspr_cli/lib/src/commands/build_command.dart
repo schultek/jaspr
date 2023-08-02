@@ -82,9 +82,7 @@ class BuildCommand extends BaseCommand {
     var flutterResult = Future<void>.value();
 
     if (flutter != null) {
-      if (!useSSR) {
-        await webResult;
-      }
+      await webResult;
       flutterResult = _buildFlutter(flutter, useSSR);
     }
 

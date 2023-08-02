@@ -5,8 +5,9 @@ library flutter_interop;
 import 'dart:async';
 import 'dart:html';
 
-import 'package:jaspr/browser.dart' show BrowserAppBinding, kDebugMode;
 import 'package:js/js.dart';
+
+import 'flutter_embed_binding.dart';
 
 /// Starts a flutter app and attaches it to the [attachTo] dom element.
 Future<void> runFlutterApp({required String attachTo}) {
@@ -26,7 +27,7 @@ Future<void> runFlutterApp({required String attachTo}) {
     }));
   });
 
-  BrowserAppBinding.warmupFlutterEngine();
+  FlutterEmbedBinding.warmupFlutterEngine();
 
   return completer.future;
 }

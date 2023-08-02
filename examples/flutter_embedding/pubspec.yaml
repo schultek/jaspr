@@ -13,6 +13,7 @@ dependencies:
     sdk: flutter
   flutter_riverpod: ^2.1.3
   jaspr: ^0.4.0
+  jaspr_flutter_embed: ^0.1.0
   jaspr_riverpod: ^0.2.0
   js: ^0.6.7
   riverpod: ^2.1.3
