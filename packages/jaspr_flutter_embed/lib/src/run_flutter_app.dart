@@ -5,8 +5,9 @@ library flutter_interop;
 import 'dart:async';
 import 'dart:html';
 
-import 'package:jaspr/browser.dart' show kDebugMode;
 import 'package:js/js.dart';
+
+import 'flutter_embed_binding.dart';
 
 /// Starts a flutter app and attaches it to the [attachTo] dom element.
 Future<void> runFlutterApp({required String attachTo}) {
@@ -20,21 +21,13 @@ Future<void> runFlutterApp({required String attachTo}) {
   flutter!.loader!.didCreateEngineInitializer = allowInterop((engineInitializer) {
     return engineInitializer
         .initializeEngine(InitializeEngineOptions(hostElement: target!))
-        .then(allowInterop((runner) => runner.runApp()))
-        .then(allowInterop((_) {
+        .then(allowInterop((runner) {
+      runner.runApp();
       completer.complete();
     }));
   });
 
-  if (kDebugMode) {
-    require(['main_module.bootstrap']);
-  } else {
-    var script = document.createElement('script')
-      ..attributes.addAll({
-        'src': 'main.dart.js',
-      });
-    document.head!.append(script);
-  }
+  FlutterEmbedBinding.warmupFlutterEngine();
 
   return completer.future;
 }
@@ -103,6 +96,6 @@ class AppRunner {
 
 @JS()
 class Promise<T> {
-  external Promise(void executor(void resolve(T result), Function reject));
-  external Promise then(void onFulfilled(T result), [Function onRejected]);
+  external Promise(void Function(void Function(T result) resolve, Function reject) executor);
+  external Promise then(void Function(T result) onFulfilled, [Function onRejected]);
 }

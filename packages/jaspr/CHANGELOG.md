@@ -1,3 +1,8 @@
+## Unreleased patch
+
+- Added integrated support for seamless **flutter element embedding**.
+  Refer to [Flutter Embedding Docs](https://docs.page/schultek/jaspr/eco/flutter_embedding) on how to setup and use this.
+
 ## 0.6.1
 
 - Fixed bug with `jaspr create`.
