@@ -32,7 +32,7 @@ final serverBundle = MasonBundle.fromJson(<String, dynamic>{
     {
       "path": "pubspec.yaml",
       "data":
-          "bmFtZToge3tuYW1lfX0KZGVzY3JpcHRpb246IEEgcHVyZWx5IHNlcnZlci1zaWRlIHJlbmRlcmVkIGFwcCB3aXRob3V0IGNsaWVudCBoeWRyYXRpb24uCnZlcnNpb246IDAuMC4xCgplbnZpcm9ubWVudDoKICBzZGs6ICc+PTMuMC4wIDw0LjAuMCcKCmRlcGVuZGVuY2llczoKICBqYXNwcjogXnt7amFzcHJDb3JlVmVyc2lvbn19CgpkZXZfZGVwZW5kZW5jaWVzOgogIGJ1aWxkX3J1bm5lcjogXjIuNC4wCiAgYnVpbGRfd2ViX2NvbXBpbGVyczogXjQuMC4wCiAgbGludHM6IF4yLjEuMAo=",
+          "bmFtZToge3tuYW1lfX0KZGVzY3JpcHRpb246IEEgcHVyZWx5IHNlcnZlci1zaWRlIHJlbmRlcmVkIGFwcCB3aXRob3V0IGNsaWVudCBoeWRyYXRpb24uCnZlcnNpb246IDAuMC4xCgplbnZpcm9ubWVudDoKICBzZGs6ICc+PTMuMC4wIDw0LjAuMCcKCmRlcGVuZGVuY2llczoKICBqYXNwcjogXnt7amFzcHJDb3JlVmVyc2lvbn19CgpkZXZfZGVwZW5kZW5jaWVzOgogIGJ1aWxkX3J1bm5lcjogXjIuNC4wCiAge3t3ZWJDb21waWxlcnNQYWNrYWdlfX06IF57e3dlYkNvbXBpbGVyc1ZlcnNpb259fQogIGxpbnRzOiBeMi4xLjAK",
       "type": "text"
     },
     {
