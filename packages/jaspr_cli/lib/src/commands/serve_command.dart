@@ -74,6 +74,15 @@ class ServeCommand extends BaseCommand {
     var mode = argResults!['mode'] as String;
     var port = argResults!['port'] as String;
 
+    var msg = "Starting jaspr in ${release ? 'release' : debug ? 'debug' : 'development'} mode...";
+    Progress? progress;
+
+    if (verbose) {
+      logger.info(msg);
+    } else {
+      progress = logger.progress(msg);
+    }
+
     var workflow = await _runWebdev(release, debug, mode, useSSR ? '5467' : port);
     guardResource(() => workflow.shutDown());
 
@@ -106,13 +115,12 @@ class ServeCommand extends BaseCommand {
       return ExitCode.success.code;
     }
 
-    var msg = "Starting jaspr development server in ${release ? 'release' : 'debug'} mode...";
-    Progress? progress;
+    msg = "Starting server...";
 
     if (verbose) {
       logger.info(msg);
     } else {
-      progress = logger.progress(msg);
+      progress?.update(msg);
     }
 
     var args = [
@@ -150,7 +158,7 @@ class ServeCommand extends BaseCommand {
       environment: {'PORT': argResults!['port'], 'JASPR_PROXY_PORT': '5467'},
     );
 
-    progress?.complete();
+    progress?.complete('Server started.');
 
     await watchProcess(process);
 
