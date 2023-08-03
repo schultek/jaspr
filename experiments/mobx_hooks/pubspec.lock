@@ -57,14 +57,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
-  boolean_selector:
-    dependency: transitive
-    description:
-      name: boolean_selector
-      sha256: "6cfb5af12253eaf2b368f07bacc5a80d1301a071c73360d746b7f2e32d762c66"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.1"
   build:
     dependency: transitive
     description:
@@ -177,14 +169,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.1"
-  coverage:
-    dependency: transitive
-    description:
-      name: coverage
-      sha256: ad538fa2e8f6b828d54c04a438af816ce814de404690136d3b9dfb3a436cd01c
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
   crypto:
     dependency: transitive
     description:
@@ -303,14 +287,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.6.1"
+    version: "0.6.2"
   jaspr_test:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_test"
       relative: true
     source: path
-    version: "0.6.1"
+    version: "0.6.2"
   js:
     dependency: transitive
     description:
@@ -375,14 +359,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
-  node_preamble:
-    dependency: transitive
-    description:
-      name: node_preamble
-      sha256: "8ebdbaa3b96d5285d068f80772390d27c21e1fa10fb2df6627b1b9415043608d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.1"
   package_config:
     dependency: transitive
     description:
@@ -463,14 +439,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.1"
-  shelf_packages_handler:
-    dependency: transitive
-    description:
-      name: shelf_packages_handler
-      sha256: aef74dc9195746a384843102142ab65b6a4735bb3beea791e63527b88cc83306
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
   shelf_proxy:
     dependency: transitive
     description:
@@ -495,14 +463,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.3"
-  source_map_stack_trace:
-    dependency: transitive
-    description:
-      name: source_map_stack_trace
-      sha256: "84cf769ad83aa6bb61e0aa5a18e53aea683395f196a6f39c4c881fb90ed4f7ae"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.1"
   source_maps:
     dependency: transitive
     description:
@@ -562,27 +522,10 @@ packages:
   test:
     dependency: "direct dev"
     description:
-      name: test
-      sha256: b54d427664c00f2013ffb87797a698883c46aee9288e027a50b46eaee7486fa2
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.22.2"
-  test_api:
-    dependency: transitive
-    description:
-      name: test_api
-      sha256: "6182294da5abf431177fccc1ee02401f6df30f766bc6130a0852c6b6d7ee6b2d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.18"
-  test_core:
-    dependency: transitive
-    description:
-      name: test_core
-      sha256: "95ecc12692d0dd59080ab2d38d9cf32c7e9844caba23ff6cd285690398ee8ef4"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.22"
+      path: "../../apps/test"
+      relative: true
+    source: path
+    version: "0.0.1"
   timing:
     dependency: transitive
     description:
@@ -623,14 +566,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
-  webkit_inspection_protocol:
-    dependency: transitive
-    description:
-      name: webkit_inspection_protocol
-      sha256: "67d3a8b6c79e1987d19d848b0892e582dbb0c66c57cc1fef58a177dd2aa2823d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
   yaml:
     dependency: transitive
     description:
