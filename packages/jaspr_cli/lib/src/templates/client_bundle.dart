@@ -26,15 +26,10 @@ final clientBundle = MasonBundle.fromJson(<String, dynamic>{
     {
       "path": "pubspec.yaml",
       "data":
-          "bmFtZToge3tuYW1lfX0KZGVzY3JpcHRpb246IEEgcHVyZSBjbGllbnQtc2lkZSBhcHAgd2l0aG91dCBzc3IuCnZlcnNpb246IDAuMC4xCgplbnZpcm9ubWVudDoKICBzZGs6ICc+PTMuMC4wIDw0LjAuMCcKCmRlcGVuZGVuY2llczoKICBqYXNwcjogXnt7amFzcHJDb3JlVmVyc2lvbn19CgpkZXZfZGVwZW5kZW5jaWVzOgogIGJ1aWxkX3J1bm5lcjogXjIuNC4wCiAge3t3ZWJDb21waWxlcnNQYWNrYWdlfX06IF57e3dlYkNvbXBpbGVyc1ZlcnNpb259fQogIGxpbnRzOiBeMi4xLjAK",
+          "bmFtZToge3tuYW1lfX0KZGVzY3JpcHRpb246IEEgcHVyZSBjbGllbnQtc2lkZSBhcHAgd2l0aG91dCBzc3IuCnZlcnNpb246IDAuMC4xCgplbnZpcm9ubWVudDoKICBzZGs6ICc+PTMuMC4wIDw0LjAuMCcKCmRlcGVuZGVuY2llczoKICBqYXNwcjogXnt7amFzcHJDb3JlVmVyc2lvbn19CgpkZXZfZGVwZW5kZW5jaWVzOgogIGJ1aWxkX3J1bm5lcjogXjIuNC4wCiAge3t3ZWJDb21waWxlcnNQYWNrYWdlfX06IF57e3dlYkNvbXBpbGVyc1ZlcnNpb259fQogIGxpbnRzOiBeMi4xLjAKCmphc3ByOgogIHNzcjogZmFsc2UK",
       "type": "text"
     },
-    {
-      "path": "README.md",
-      "data":
-          "IyB7e25hbWV9fQoKQSBwdXJlIGNsaWVudC1zaWRlIGFwcCB3aXRob3V0IHNzci4KCiMgUnVubmluZwoKUnVuIHdpdGggYGphc3ByIHNlcnZlIC0tbm8tc3NyYAoKQnVpbGQgd2l0aCBgamFzcHIgYnVpbGQgLS1uby1zc3Jg",
-      "type": "text"
-    },
+    {"path": "README.md", "data": "IyB7e25hbWV9fQoKQSBwdXJlIGNsaWVudC1zaWRlIGFwcCB3aXRob3V0IHNzci4K", "type": "text"},
     {
       "path": "web/index.html",
       "data":
