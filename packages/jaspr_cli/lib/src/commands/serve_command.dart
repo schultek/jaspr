@@ -5,10 +5,11 @@ import 'dart:io';
 
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/src/loaders/strategy.dart';
-import 'package:mason/mason.dart';
+import 'package:mason/mason.dart' show ExitCode;
 import 'package:webdev/src/command/configuration.dart';
 import 'package:webdev/src/serve/dev_workflow.dart';
 
+import '../logging.dart';
 import 'base_command.dart';
 
 class ServeCommand extends BaseCommand {
@@ -69,8 +70,9 @@ class ServeCommand extends BaseCommand {
     var useSSR = argResults!['ssr'] as bool?;
 
     if (useSSR != null) {
-      logger.alert(
-          '"--ssr" is deprecated and will be removed in the next version. Use the "jaspr.ssr" configuration option in pubspec.yaml instead.');
+      logger.write(
+          '"--ssr" is deprecated and will be removed in the next version. Use the "jaspr.ssr" configuration option in pubspec.yaml instead.',
+          level: Level.warning);
     } else {
       useSSR = config.ssr.enabled;
     }
@@ -82,33 +84,63 @@ class ServeCommand extends BaseCommand {
     var mode = argResults!['mode'] as String;
     var port = argResults!['port'] as String;
 
-    var msg = "Starting jaspr in ${release ? 'release' : debug ? 'debug' : 'development'} mode...";
-    Progress? progress;
-
-    if (verbose) {
-      logger.info(msg);
-    } else {
-      progress = logger.progress(msg);
-    }
+    logger.write(
+        "Starting jaspr in ${release ? 'release' : debug ? 'debug' : 'development'} mode...",
+        progress: ProgressState.running);
 
     var workflow = await _runWebdev(release, debug, mode, useSSR ? '5467' : port);
     guardResource(() => workflow.shutDown());
 
-    await workflow.serverManager.servers.first.buildResults
-        .where((event) => event.status == BuildStatus.succeeded)
-        .first;
+    logger.complete(true);
+    logger.write('Starting web builder...', progress: ProgressState.running);
+
+    var buildCompleter = Completer();
+
+    var timer = Timer(Duration(seconds: 30), () {
+      if (!buildCompleter.isCompleted) {
+        logger.write('Building web assets... (This might take longer for the initial build)',
+            progress: ProgressState.running);
+      }
+    });
+
+    workflow.serverManager.servers.first.buildResults.listen((event) {
+      if (event.status == BuildStatus.succeeded) {
+        if (!buildCompleter.isCompleted) {
+          buildCompleter.complete();
+        } else {
+          logger.write('Rebuilt web assets.', progress: ProgressState.completed);
+        }
+      } else if (event.status == BuildStatus.failed) {
+        if (!verbose) {
+          logger.write('Building web assets failed unexpectedly. Run again with -v to see full output.',
+              level: Level.critical, progress: ProgressState.completed);
+        }
+        shutdown();
+      } else if (event.status == BuildStatus.started) {
+        if (buildCompleter.isCompleted) {
+          logger.write('Rebuilding web assets...', progress: ProgressState.running);
+        } else {
+          logger.write('Building web assets...', progress: ProgressState.running);
+        }
+      }
+    });
+
+    await buildCompleter.future;
+    timer.cancel();
+
+    logger.write('Done building web assets.', progress: ProgressState.completed);
 
     if (flutter != null) {
       var flutterProcess = await Process.start(
         'flutter',
         ['run', '--device-id=web-server', '-t', flutter, '--web-port=5678'],
       );
-      unawaited(watchProcess(
-        flutterProcess,
-        onFail: !verbose //
-            ? () => logger.info('flutter run exited unexpectedly. Run again with -v to see verbose output')
-            : null,
-      ));
+      unawaited(watchProcess(flutterProcess, tag: Tag.flutter, onFail: () {
+        if (!verbose) {
+          logger.write('flutter run exited unexpectedly. Run again with -v to see verbose output',
+              level: Level.critical, progress: ProgressState.completed);
+        }
+      }));
 
       workflow.serverManager.servers.first.buildResults
           .where((event) => event.status == BuildStatus.succeeded)
@@ -123,13 +155,7 @@ class ServeCommand extends BaseCommand {
       return ExitCode.success.code;
     }
 
-    msg = "Starting server...";
-
-    if (verbose) {
-      logger.info(msg);
-    } else {
-      progress?.update(msg);
-    }
+    logger.write("Starting server...", progress: ProgressState.running);
 
     var args = [
       'run',
@@ -151,9 +177,10 @@ class ServeCommand extends BaseCommand {
     String? entryPoint = await getEntryPoint(argResults!['input']);
 
     if (entryPoint == null) {
-      progress?.cancel();
-      logger.err("Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.");
-      await shutdown(1);
+      logger.complete(false);
+      logger.write("Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.",
+          level: Level.critical);
+      await shutdown();
     }
 
     args.add(entryPoint);
@@ -166,14 +193,14 @@ class ServeCommand extends BaseCommand {
       environment: {'PORT': argResults!['port'], 'JASPR_PROXY_PORT': '5467'},
     );
 
-    progress?.complete('Server started.');
+    logger.write('Server started.', progress: ProgressState.completed);
 
-    await watchProcess(process);
+    await watchProcess(process, tag: Tag.server);
 
     return ExitCode.success.code;
   }
 
-  Future<DevWorkflow> _runWebdev(bool release, bool debug, String mode, String port) {
+  Future<DevWorkflow> _runWebdev(bool release, bool debug, String mode, String port) async {
     var configuration = Configuration(
       reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
       release: release,
@@ -181,7 +208,7 @@ class ServeCommand extends BaseCommand {
 
     var compilers = '${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
 
-    return DevWorkflow.start(configuration, [
+    var workflow = await DevWorkflow.start(configuration, [
       if (release) '--release',
       '--verbose',
       '--define',
@@ -194,5 +221,7 @@ class ServeCommand extends BaseCommand {
     ], {
       'web': int.parse(port)
     });
+
+    return workflow;
   }
 }

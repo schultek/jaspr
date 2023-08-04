@@ -6,12 +6,11 @@ import 'dart:io';
 import 'package:build_daemon/data/build_status.dart';
 import 'package:build_daemon/data/build_target.dart';
 import 'package:collection/collection.dart';
-import 'package:logging/logging.dart' as ll;
-import 'package:mason/mason.dart';
+import 'package:mason/mason.dart' show ExitCode;
 import 'package:path/path.dart' as p;
 import 'package:webdev/src/daemon_client.dart' as d;
-import 'package:webdev/src/logging.dart' as l;
 
+import '../logging.dart';
 import 'base_command.dart';
 
 class BuildCommand extends BaseCommand {
@@ -61,8 +60,9 @@ class BuildCommand extends BaseCommand {
 
     var useSSR = argResults!['ssr'] as bool?;
     if (useSSR != null) {
-      logger.alert(
-          '"--ssr" is deprecated and will be removed in the next version. Use the "jaspr.ssr" configuration option in pubspec.yaml instead.');
+      logger.write(
+          '"--ssr" is deprecated and will be removed in the next version. Use the "jaspr.ssr" configuration option in pubspec.yaml instead.',
+          level: Level.warning);
     } else {
       useSSR = config.ssr.enabled;
     }
@@ -97,20 +97,21 @@ class BuildCommand extends BaseCommand {
       String? entryPoint = await getEntryPoint(argResults!['input']);
 
       if (entryPoint == null) {
-        logger.warn("Cannot find entry point. Create a main.dart in lib/ or web/, or specify a file using --input.");
+        logger.write("Cannot find entry point. Create a main.dart in lib/ or web/, or specify a file using --input.",
+            level: Level.critical);
         await shutdown(1);
       }
 
-      logger.info('Building server app...');
-
       await webResult;
+
+      logger.write('Building server app...', progress: ProgressState.running);
 
       var process = await Process.start(
         'dart',
         ['compile', argResults!['target'], entryPoint, '-o', './build/jaspr/app', '-Djaspr.flags.release=true'],
       );
 
-      await watchProcess(process);
+      await watchProcess(process, tag: Tag.cli, progress: 'Building server app...');
     }
 
     await Future.wait([
@@ -125,12 +126,12 @@ class BuildCommand extends BaseCommand {
       }
     }
 
-    logger.success('Completed building project to /build.');
+    logger.write('Completed building project to /build.', progress: ProgressState.completed);
     return ExitCode.success.code;
   }
 
   Future<int> _buildWeb(bool release, bool useSSR) async {
-    logger.info('Building web assets...');
+    logger.write('Building web assets...', progress: ProgressState.running);
     var client = await d.connectClient(
       Directory.current.path,
       [
@@ -139,22 +140,7 @@ class BuildCommand extends BaseCommand {
         '--delete-conflicting-outputs',
         '--define=${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
       ],
-      (serverLog) {
-        if (!verbose) return;
-        //if (serverLog.level < Level.INFO) return;
-
-        var log = l.formatLog(ll.Level.INFO, serverLog.message,
-            error: serverLog.error,
-            loggerName: serverLog.loggerName,
-            stackTrace: serverLog.stackTrace,
-            withColors: true);
-
-        if (!log.endsWith('\n')) {
-          log += '\n';
-        }
-
-        logger.write(log);
-      },
+      logger.writeServerLog,
     );
     OutputLocation outputLocation = OutputLocation((b) => b
       ..output = 'build/jaspr${useSSR ? '/web' : ''}'
@@ -186,13 +172,14 @@ class BuildCommand extends BaseCommand {
 
       var error = targetResult.error ?? '';
       if (error.isNotEmpty) {
-        logger.alert(error);
+        logger.complete(false);
+        logger.write(error, level: Level.error);
       }
       break;
     }
     await client.close();
     if (exitCode == 0) {
-      logger.info('Completed building web assets.');
+      logger.write('Completed building web assets.', progress: ProgressState.completed);
     }
     return exitCode;
   }
@@ -212,7 +199,7 @@ class BuildCommand extends BaseCommand {
       'canvaskit/',
     ];
 
-    await watchProcess(flutterProcess);
+    await watchProcess(flutterProcess, tag: Tag.flutter);
 
     var moves = <Future>[];
     while (moveTargets.isNotEmpty) {
