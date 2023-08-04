@@ -63,10 +63,7 @@ class ServeCommand extends BaseCommand {
   @override
   String get name => 'serve';
 
-  @override
-  Future<int> run() async {
-    await super.run();
-
+  late final useSSR = () {
     var useSSR = argResults!['ssr'] as bool?;
 
     if (useSSR != null) {
@@ -76,19 +73,24 @@ class ServeCommand extends BaseCommand {
     } else {
       useSSR = config.ssr.enabled;
     }
+    return useSSR;
+  }();
 
-    var debug = argResults!['debug'] as bool;
-    var release = argResults!['release'] as bool;
-    var verbose = argResults!['verbose'] as bool;
-    var flutter = argResults!['flutter'] as String?;
-    var mode = argResults!['mode'] as String;
-    var port = argResults!['port'] as String;
+  late final debug = argResults!['debug'] as bool;
+  late final release = argResults!['release'] as bool;
+  late final flutter = argResults!['flutter'] as String?;
+  late final mode = argResults!['mode'] as String;
+  late final port = argResults!['port'] as String;
+
+  @override
+  Future<int> run() async {
+    await super.run();
 
     logger.write(
         "Starting jaspr in ${release ? 'release' : debug ? 'debug' : 'development'} mode...",
         progress: ProgressState.running);
 
-    var workflow = await _runWebdev(release, debug, mode, useSSR ? '5467' : port);
+    var workflow = await _runWebdev();
     guardResource(() => workflow.shutDown());
 
     logger.complete(true);
@@ -133,7 +135,7 @@ class ServeCommand extends BaseCommand {
     if (flutter != null) {
       var flutterProcess = await Process.start(
         'flutter',
-        ['run', '--device-id=web-server', '-t', flutter, '--web-port=5678'],
+        ['run', '--device-id=web-server', '-t', flutter!, '--web-port=5678'],
       );
       unawaited(watchProcess(flutterProcess, tag: Tag.flutter, onFail: () {
         if (!verbose) {
@@ -155,6 +157,11 @@ class ServeCommand extends BaseCommand {
       return ExitCode.success.code;
     }
 
+    await _runServer();
+    return ExitCode.success.code;
+  }
+
+  Future<void> _runServer() async {
     logger.write("Starting server...", progress: ProgressState.running);
 
     var args = [
@@ -196,11 +203,11 @@ class ServeCommand extends BaseCommand {
     logger.write('Server started.', progress: ProgressState.completed);
 
     await watchProcess(process, tag: Tag.server);
-
-    return ExitCode.success.code;
   }
 
-  Future<DevWorkflow> _runWebdev(bool release, bool debug, String mode, String port) async {
+  Future<DevWorkflow> _runWebdev() async {
+    var builderPort = useSSR ? '5467' : port;
+
     var configuration = Configuration(
       reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
       release: release,
@@ -219,7 +226,7 @@ class ServeCommand extends BaseCommand {
       else
         '--define=$compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
     ], {
-      'web': int.parse(port)
+      'web': int.parse(builderPort)
     });
 
     return workflow;

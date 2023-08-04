@@ -25,7 +25,7 @@ abstract class BaseCommand extends Command<int> {
   Logger get logger => _logger ??= Logger(verbose);
   Logger? _logger;
 
-  bool get verbose => argResults?['verbose'] as bool? ?? false;
+  late final bool verbose = argResults?['verbose'] as bool? ?? false;
 
   final bool requiresPubspec = true;
 

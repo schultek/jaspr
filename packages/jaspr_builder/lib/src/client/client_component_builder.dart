@@ -36,6 +36,12 @@ class ClientComponentBuilder implements Builder {
       "// Generated with jaspr_builder\n";
 
   Future<void> generateComponentOutputs(BuildStep buildStep) async {
+    // Performance optimization
+    var file = await buildStep.readAsString(buildStep.inputId);
+    if (!file.contains('@client')) {
+      return;
+    }
+
     if (!await buildStep.resolver.isLibrary(buildStep.inputId)) {
       return;
     }
