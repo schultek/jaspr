@@ -98,9 +98,9 @@ class ServeCommand extends BaseCommand {
 
     var buildCompleter = Completer();
 
-    var timer = Timer(Duration(seconds: 30), () {
+    var timer = Timer(Duration(seconds: 20), () {
       if (!buildCompleter.isCompleted) {
-        logger.write('Building web assets... (This might take longer for the initial build)',
+        logger.write('Building web assets... (This takes longer for the initial build)',
             progress: ProgressState.running);
       }
     });
