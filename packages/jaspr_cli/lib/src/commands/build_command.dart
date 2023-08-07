@@ -7,24 +7,20 @@ import 'package:build_daemon/data/build_status.dart';
 import 'package:build_daemon/data/build_target.dart';
 import 'package:collection/collection.dart';
 import 'package:mason/mason.dart' show ExitCode;
-import 'package:path/path.dart' as p;
 import 'package:webdev/src/daemon_client.dart' as d;
 
+import '../helpers/flutter_helpers.dart';
+import '../helpers/ssr_helper.dart';
 import '../logging.dart';
 import 'base_command.dart';
 
-class BuildCommand extends BaseCommand {
+class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
   BuildCommand({super.logger}) {
     argParser.addOption(
       'input',
       abbr: 'i',
       help: 'Specify the input file for the web app',
       defaultsTo: 'lib/main.dart',
-    );
-    argParser.addFlag(
-      'ssr',
-      defaultsTo: null,
-      help: '(Deprecated) Optionally disables server-side rendering and runs as a pure client-side app.',
     );
     argParser.addOption(
       'target',
@@ -36,10 +32,6 @@ class BuildCommand extends BaseCommand {
         'jit-snapshot': 'Compile Dart to a JIT snapshot.',
       },
       defaultsTo: 'exe',
-    );
-    argParser.addOption(
-      'flutter',
-      help: 'Build an embedded flutter app from the specified entrypoint.',
     );
   }
 
@@ -58,17 +50,6 @@ class BuildCommand extends BaseCommand {
       await dir.create(recursive: true);
     }
 
-    var useSSR = argResults!['ssr'] as bool?;
-    if (useSSR != null) {
-      logger.write(
-          '"--ssr" is deprecated and will be removed in the next version. Use the "jaspr.ssr" configuration option in pubspec.yaml instead.',
-          level: Level.warning);
-    } else {
-      useSSR = config.ssr.enabled;
-    }
-
-    var flutter = argResults!['flutter'] as String?;
-
     if (useSSR) {
       var webDir = Directory('build/jaspr/web');
       if (!await webDir.exists()) {
@@ -80,7 +61,7 @@ class BuildCommand extends BaseCommand {
     var targetIndexHtml = File('build/jaspr/web/index.html');
 
     var dummyIndex = false;
-    if (flutter != null && !await indexHtml.exists()) {
+    if (usesFlutter && !await indexHtml.exists()) {
       dummyIndex = true;
       await indexHtml.create();
     }
@@ -88,9 +69,9 @@ class BuildCommand extends BaseCommand {
     var webResult = _buildWeb(true, useSSR);
     var flutterResult = Future<void>.value();
 
-    if (flutter != null) {
+    if (usesFlutter) {
       await webResult;
-      flutterResult = _buildFlutter(flutter, useSSR);
+      flutterResult = buildFlutter(useSSR);
     }
 
     if (useSSR) {
@@ -182,47 +163,5 @@ class BuildCommand extends BaseCommand {
       logger.write('Completed building web assets.', progress: ProgressState.completed);
     }
     return exitCode;
-  }
-
-  Future<void> _buildFlutter(String flutter, bool useSSR) async {
-    var flutterProcess = await Process.start(
-      'flutter',
-      ['build', 'web', '-t', flutter, '--output=build/flutter'],
-    );
-
-    var target = useSSR ? 'build/jaspr/web' : 'build/jaspr';
-
-    var moveTargets = [
-      'version.json',
-      'flutter_service_worker.js',
-      'assets/',
-      'canvaskit/',
-    ];
-
-    await watchProcess(flutterProcess, tag: Tag.flutter);
-
-    var moves = <Future>[];
-    while (moveTargets.isNotEmpty) {
-      var moveTarget = moveTargets.removeAt(0);
-      var file = File('./build/flutter/$moveTarget');
-      var isDir = file.statSync().type == FileSystemEntityType.directory;
-      if (isDir) {
-        await Directory('$target/$moveTarget').create(recursive: true);
-
-        var files = Directory('build/flutter/$moveTarget').list(recursive: true);
-        await for (var file in files) {
-          final path = p.relative(file.path, from: 'build/flutter');
-          if (file is Directory) {
-            moveTargets.add(path);
-          } else {
-            moveTargets.add(path);
-          }
-        }
-      } else {
-        moves.add(file.copy('./$target/$moveTarget'));
-      }
-    }
-
-    await Future.wait(moves);
   }
 }

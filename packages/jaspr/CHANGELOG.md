@@ -1,3 +1,19 @@
+## Unreleased minor
+
+- Improved cli experience with better logging and progress indicators.
+- Removed `--ssr` and `--flutter` cli options.
+- Added support `jaspr` config section in `pubspec.yaml`.
+
+  It is now possible to define certain configuration options for the jaspr cli
+  directly inside the `pubspec.yaml` file under the `jaspr` section.
+  Initially supported options are:
+
+  ```yaml
+  jaspr:
+    uses-ssr: true # or false; Toggles server-side-rendering on or off.
+    uses-flutter: true # or false; Whether the project uses flutter element embedding.
+  ```
+
 ## 0.6.2
 
 - Added integrated support for seamless **flutter element embedding**.

@@ -9,10 +9,12 @@ import 'package:mason/mason.dart' show ExitCode;
 import 'package:webdev/src/command/configuration.dart';
 import 'package:webdev/src/serve/dev_workflow.dart';
 
+import '../helpers/flutter_helpers.dart';
+import '../helpers/ssr_helper.dart';
 import '../logging.dart';
 import 'base_command.dart';
 
-class ServeCommand extends BaseCommand {
+class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
   ServeCommand({super.logger}) {
     argParser.addOption(
       'input',
@@ -37,11 +39,6 @@ class ServeCommand extends BaseCommand {
       defaultsTo: '8080',
     );
     argParser.addFlag(
-      'ssr',
-      defaultsTo: null,
-      help: '(Deprecated) Optionally disables server-side rendering and runs as a pure client-side app.',
-    );
-    argParser.addFlag(
       'debug',
       abbr: 'd',
       help: 'Serves the app in debug mode.',
@@ -53,7 +50,6 @@ class ServeCommand extends BaseCommand {
       help: 'Serves the app in release mode.',
       negatable: false,
     );
-    argParser.addOption('flutter', help: 'Launch an embedded flutter app from the specified entrypoint.');
   }
 
   @override
@@ -63,22 +59,8 @@ class ServeCommand extends BaseCommand {
   @override
   String get name => 'serve';
 
-  late final useSSR = () {
-    var useSSR = argResults!['ssr'] as bool?;
-
-    if (useSSR != null) {
-      logger.write(
-          '"--ssr" is deprecated and will be removed in the next version. Use the "jaspr.ssr" configuration option in pubspec.yaml instead.',
-          level: Level.warning);
-    } else {
-      useSSR = config.ssr.enabled;
-    }
-    return useSSR;
-  }();
-
   late final debug = argResults!['debug'] as bool;
   late final release = argResults!['release'] as bool;
-  late final flutter = argResults!['flutter'] as String?;
   late final mode = argResults!['mode'] as String;
   late final port = argResults!['port'] as String;
 
@@ -132,17 +114,8 @@ class ServeCommand extends BaseCommand {
 
     logger.write('Done building web assets.', progress: ProgressState.completed);
 
-    if (flutter != null) {
-      var flutterProcess = await Process.start(
-        'flutter',
-        ['run', '--device-id=web-server', '-t', flutter!, '--web-port=5678'],
-      );
-      unawaited(watchProcess(flutterProcess, tag: Tag.flutter, onFail: () {
-        if (!verbose) {
-          logger.write('flutter run exited unexpectedly. Run again with -v to see verbose output',
-              level: Level.critical, progress: ProgressState.completed);
-        }
-      }));
+    if (usesFlutter) {
+      var flutterProcess = await serveFlutter();
 
       workflow.serverManager.servers.first.buildResults
           .where((event) => event.status == BuildStatus.succeeded)
@@ -173,7 +146,7 @@ class ServeCommand extends BaseCommand {
       ] else
         '-Djaspr.flags.release=true',
       '-Djaspr.dev.proxy=5467',
-      if (flutter != null) '-Djaspr.dev.flutter=5678',
+      if (usesFlutter) '-Djaspr.dev.flutter=5678',
       '-Djaspr.flags.verbose=$debug',
     ];
 

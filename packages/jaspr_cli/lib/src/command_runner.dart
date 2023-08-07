@@ -8,6 +8,7 @@ import 'package:mason/mason.dart';
 import 'commands/build_command.dart';
 import 'commands/create_command.dart';
 import 'commands/serve_command.dart';
+import 'helpers/clean_helper.dart';
 import 'version.dart';
 
 /// The package name.
@@ -24,6 +25,10 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
       abbr: 'v',
       negatable: false,
       help: 'Print the current version.',
+    );
+    argParser.addFlag(
+      'clean',
+      hide: true,
     );
     addCommand(CreateCommand());
     addCommand(ServeCommand());
@@ -67,6 +72,9 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
     int? exitCode = ExitCode.unavailable.code;
     if (topLevelResults['version'] == true) {
       _logger.info(jasprCliVersion);
+      exitCode = ExitCode.success.code;
+    } else if (topLevelResults['clean'] == true) {
+      await cleanProject(_logger);
       exitCode = ExitCode.success.code;
     } else {
       exitCode = await super.runCommand(topLevelResults);

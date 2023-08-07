@@ -41,7 +41,7 @@ abstract class BaseCommand extends Command<int> {
   @mustCallSuper
   Future<int> run() async {
     pubspecYaml = await getPubspec();
-    config = getConfig();
+    config = JasprConfig.fromYaml(pubspecYaml, logger);
 
     ProcessSignal.sigint.watch().listen((signal) {
       shutdown();
@@ -83,50 +83,6 @@ abstract class BaseCommand extends Command<int> {
 
     var parsed = loadYaml(await pubspecFile.readAsString());
     return parsed as YamlMap;
-  }
-
-  JasprConfig getConfig() {
-    if (pubspecYaml case {'jaspr': var configYaml}) {
-      try {
-        if (configYaml is! YamlMap) {
-          throw "'jaspr' must be a map.";
-        }
-
-        JasprSSRConfig? ssr;
-        if (configYaml['ssr'] case var ssrYaml) {
-          if (ssrYaml is! bool && ssrYaml is! Map) throw "'jaspr.ssr' must be a boolean or map.";
-
-          if (ssrYaml is bool) {
-            ssr = JasprSSRConfig(enabled: ssrYaml);
-          } else {
-            var enabled = ssrYaml['enabled'];
-            if (enabled == null) {
-              ssr = JasprSSRConfig(enabled: true);
-            } else {
-              if (enabled is! bool) throw "'jaspr.ssr.enabled' must be a boolean.";
-              ssr = JasprSSRConfig(enabled: enabled);
-            }
-          }
-        }
-
-        bool? usesFlutter;
-        if (configYaml['uses-flutter'] case var flutterYaml) {
-          if (flutterYaml != null) {
-            if (flutterYaml is! bool) throw "'jaspr.uses-flutter' must be a boolean.";
-
-            usesFlutter = flutterYaml;
-          } else {
-            usesFlutter = false;
-          }
-        }
-
-        return JasprConfig(ssr: ssr, usesFlutter: usesFlutter);
-      } catch (e) {
-        logger.write('Invalid jaspr configuration in pubspec.yaml: $e', level: Level.critical);
-      }
-    }
-
-    return JasprConfig();
   }
 
   void guardResource(Future<void> Function() fn) {

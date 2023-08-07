@@ -14,7 +14,7 @@ The demo is a jaspr app with an embedded flutter web app.
 It can be run with:
 
 ```terminal
-$ jaspr serve --input=lib/main_jaspr.dart --flutter=lib/main_flutter.dart
+$ jaspr serve --input=lib/main_jaspr.dart
 ```
 
 https://user-images.githubusercontent.com/13920539/216588813-a06ac091-e897-4ebe-a9d4-806bfaf8759d.mov
@@ -26,7 +26,7 @@ https://user-images.githubusercontent.com/13920539/216588968-97797efe-47cc-47c7-
 The project can be built with:
 
 ```terminal
-$ jaspr build --input=lib/main_jaspr.dart --flutter=lib/main_flutter.dart
+$ jaspr build --input=lib/main_jaspr.dart
 ```
 
 Run the built app with:
