@@ -6,7 +6,7 @@ import 'package:dart_style/dart_style.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as path;
 
-/// Builds web entrypoints for components annotated with @app
+/// Builds the registry for client components.
 class ClientRegistryBuilder implements Builder {
   ClientRegistryBuilder(BuilderOptions options);
 
@@ -40,23 +40,25 @@ class ClientRegistryBuilder implements Builder {
       "// Generated with jaspr_builder\n";
 
   Future<String?> generateApps(BuildStep buildStep) async {
-    var apps = await buildStep.findAssets(Glob('web/**.client.dart')).toList();
+    var moduleFiles = await buildStep.findAssets(Glob('lib/**.client.json')).toList();
 
-    if (apps.isEmpty) {
+    if (moduleFiles.isEmpty) {
       return null;
     }
+
+    var modules = moduleFiles.map((id) => id.changeExtension('.dart'));
 
     return DartFormatter(pageWidth: 120).format('''
       $generationHeader
       
       import 'package:jaspr/browser.dart';
-      ${apps.mapIndexed((index, c) => "import '${path.url.relative(c.path, from: 'web')}' deferred as i$index;").join('\n')}
+      ${modules.mapIndexed((index, c) => "import '${path.url.relative(c.path, from: 'lib')}' deferred as i$index;").join('\n')}
       
       void main() {
         registerClients({
-          ${apps.mapIndexed((index, c) {
+          ${modules.mapIndexed((index, c) {
       return '''
-              '${path.url.relative(path.url.withoutExtension(path.url.withoutExtension(c.path)), from: 'web')}': loadClient(i$index.loadLibrary, 
+              '${path.url.relative(path.url.withoutExtension(path.url.withoutExtension(c.path)), from: 'lib')}': loadClient(i$index.loadLibrary, 
               (p) => i$index.getComponentForParams(p),
               ),
             ''';

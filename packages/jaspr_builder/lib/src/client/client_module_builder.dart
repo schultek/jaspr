@@ -1,22 +1,22 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
-import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
 
 import '../utils.dart';
 
-/// Builds web entrypoints for components annotated with @client
-class ClientComponentBuilder implements Builder {
-  ClientComponentBuilder(BuilderOptions options);
+/// Builds modules for components annotated with @client
+class ClientModuleBuilder implements Builder {
+  ClientModuleBuilder(BuilderOptions options);
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     try {
-      await generateComponentOutputs(buildStep);
+      await generateClientModule(buildStep);
     } catch (e, st) {
       print('An unexpected error occurred.\n'
           'This is probably a bug in jaspr_builder.\n'
@@ -29,13 +29,10 @@ class ClientComponentBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-        'lib/{{file}}.dart': ['lib/{{file}}.g.dart', 'web/{{file}}.client.dart'],
+        'lib/{{file}}.dart': ['lib/{{file}}.client.json', 'web/{{file}}.client.dart'],
       };
 
-  String get generationHeader => "// GENERATED FILE, DO NOT MODIFY\n"
-      "// Generated with jaspr_builder\n";
-
-  Future<void> generateComponentOutputs(BuildStep buildStep) async {
+  Future<void> generateClientModule(BuildStep buildStep) async {
     // Performance optimization
     var file = await buildStep.readAsString(buildStep.inputId);
     if (!file.contains('@client')) {
@@ -61,18 +58,6 @@ class ClientComponentBuilder implements Builder {
       log.warning("Cannot have multiple components annotated with @client in a single library.");
     }
 
-    var part = '${path.url.basenameWithoutExtension(buildStep.inputId.path)}.g.dart';
-
-    final libraryUnit = await buildStep.resolver.compilationUnitFor(buildStep.inputId);
-    final hasPartDirective = libraryUnit.directives.whereType<PartDirective>().any((e) => e.uri.stringValue == part);
-
-    if (!hasPartDirective) {
-      log.warning(
-        '$part must be included as a part directive in '
-        'the input library with:\n    part \'$part\';',
-      );
-    }
-
     var element = annotated.first;
 
     if (element is! ClassElement) {
@@ -94,48 +79,32 @@ class ClientComponentBuilder implements Builder {
       log.warning('Your class ${element.name} must mixin the generated \'$mixinName\' mixin.');
     }
 
-    var params = getParamsFor(element);
+    var module = await ClientModule.fromElement(element, buildStep);
 
-    var uri = (await buildStep.inputLibrary).source.uri;
+    var outputId = buildStep.inputId.changeExtension('.client.json');
+    await buildStep.writeAsString(outputId, jsonEncode(module.serialize()));
 
-    var isApp = clientChecker.hasAnnotationOfExact(element);
+    await generateWebEntrypoint(module, buildStep);
+  }
 
-    var partId = buildStep.inputId.changeExtension('.g.dart');
-    var partSource = DartFormatter(pageWidth: 120).format('''
-      $generationHeader
-      
-      part of '${path.url.basename(buildStep.inputId.path)}';
-      
-      mixin $mixinName implements ComponentEntryMixin<${element.name}> {
-        @override
-        ComponentEntry<${element.name}> get entry {
-          ${params.isNotEmpty ? 'var self = this as ${element.name};' : ''}
-          return ComponentEntry.client(
-            '${path.url.relative(path.url.withoutExtension(buildStep.inputId.path), from: 'lib')}'
-            ${params.isNotEmpty ? ', params: {${params.map((p) => "'${p.name}': self.${p.name}").join(', ')}},' : ''}
-          );
-        }
-      }
-    ''');
+  Future<void> generateWebEntrypoint(ClientModule module, BuildStep buildStep) async {
+    var webId =
+        AssetId(module.id.package, module.id.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.client.dart'));
 
-    await buildStep.writeAsString(partId, partSource);
+    var moduleImport = 'package:${module.id.package}/${module.id.path.replaceFirst('lib/', '')}';
 
-    var webId = AssetId(buildStep.inputId.package,
-        buildStep.inputId.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.client.dart'));
     var webSource = DartFormatter(pageWidth: 120).format('''
       $generationHeader
       
       import 'package:jaspr/browser.dart';
-      import '$uri' as a;
+      import '$moduleImport' as a;
       
-      ${isApp ? '''
       void main() {
         runAppWithParams(getComponentForParams);
       }
-      ''' : ''}
       
       Component getComponentForParams(ConfigParams p) {
-        return a.${element.thisType.getDisplayString(withNullability: false)}(${params.where((p) => p.isPositional).map((p) => 'p.get(\'${p.name}\')').followedBy(params.where((p) => p.isNamed).map((p) => '${p.name}: p.get(\'${p.name}\')')).join(', ')});
+        return a.${module.name}(${module.params.where((p) => !p.isNamed).map((p) => 'p.get(\'${p.name}\')').followedBy(module.params.where((p) => p.isNamed).map((p) => '${p.name}: p.get(\'${p.name}\')')).join(', ')});
       }
     ''');
 
@@ -143,14 +112,63 @@ class ClientComponentBuilder implements Builder {
   }
 }
 
-List<ParameterElement> getParamsFor(ClassElement e) {
+class ClientModule {
+  final String name;
+  final AssetId id;
+  final List<ClientParam> params;
+
+  ClientModule({required this.name, required this.id, required this.params});
+
+  static Future<ClientModule> fromElement(ClassElement element, BuildStep buildStep) async {
+    var params = getParamsFor(element);
+
+    return ClientModule(
+      name: element.name,
+      id: buildStep.inputId,
+      params: params,
+    );
+  }
+
+  factory ClientModule.deserialize(Map<String, dynamic> map) {
+    return ClientModule(
+      name: map['name'],
+      id: AssetId.deserialize(map['id']),
+      params: [
+        for (var p in map['params']) ClientParam.deserialize(p),
+      ],
+    );
+  }
+
+  Map<String, dynamic> serialize() => {
+        'name': name,
+        'id': id.serialize(),
+        'params': [
+          for (var p in params) p.serialize(),
+        ],
+      };
+}
+
+class ClientParam {
+  final String name;
+  final bool isNamed;
+
+  ClientParam({required this.name, this.isNamed = false});
+
+  ClientParam.deserialize(Map<String, dynamic> map)
+      : name = map['name'],
+        isNamed = map['isNamed'];
+
+  Map<String, dynamic> serialize() => {'name': name, 'isNamed': isNamed};
+}
+
+List<ClientParam> getParamsFor(ClassElement e) {
   var params = e.constructors.first.parameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
 
   for (var param in params) {
     if (!param.isInitializingFormal) {
-      throw UnsupportedError('Island components only support initializing formal constructor parameters.');
+      throw UnsupportedError('Client components only support initializing formal constructor parameters.');
     }
   }
 
-  return params;
+  return params.map((p) => ClientParam(name: p.name, isNamed: p.isNamed)).toList();
 }
