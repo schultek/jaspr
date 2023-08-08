@@ -13,3 +13,6 @@ dev_dependencies:
   {{webCompilersPackage}}: ^{{webCompilersVersion}}
   jaspr_builder: ^{{jasprBuilderVersion}}
   lints: ^2.1.0
+
+jaspr:
+  uses-ssr: true

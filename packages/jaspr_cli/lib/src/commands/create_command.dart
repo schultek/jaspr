@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:mason/mason.dart';
 import 'package:path/path.dart' as path;
 
+import '../logging.dart';
 import '../templates.dart';
 import '../version.dart';
 import 'base_command.dart';
@@ -49,7 +50,7 @@ class CreateCommand extends BaseCommand {
     await super.run();
 
     var targetPath = argResults!.rest.firstOrNull;
-    targetPath ??= logger.prompt('Specify a target directory:');
+    targetPath ??= logger.logger.prompt('Specify a target directory:');
 
     var directory = Directory(targetPath);
     var dir = path.basenameWithoutExtension(directory.path);
@@ -67,17 +68,17 @@ class CreateCommand extends BaseCommand {
     }
 
     var templateName = argResults!['template'] as String?;
-    templateName ??= logger.chooseOne('Choose a template:',
+    templateName ??= logger.logger.chooseOne('Choose a template:',
         choices: templatesByName.keys.toList(), display: (name) => '$name: ${templateDescriptionByName[name]}');
 
     var template = templatesByName[templateName]!;
 
     var useJasprCompilers = argResults!['experimental-web-compilers'] as bool?;
-    useJasprCompilers ??= logger.confirm(
+    useJasprCompilers ??= logger.logger.confirm(
         'Use jaspr web compilers (experimental)? This enables the use of flutter web plugins and direct flutter embedding.',
         defaultValue: true);
 
-    var progress = logger.progress('Bootstrapping');
+    var progress = logger.logger.progress('Bootstrapping');
     var generator = await MasonGenerator.fromBundle(template);
     final files = await generator.generate(
       DirectoryGeneratorTarget(directory),
@@ -88,15 +89,15 @@ class CreateCommand extends BaseCommand {
         'webCompilersPackage': useJasprCompilers ? 'jaspr_web_compilers' : 'build_web_compilers',
         'webCompilersVersion': useJasprCompilers ? '4.0.4' : '4.0.4', // TODO get latest version from pub
       },
-      logger: logger,
+      logger: logger.logger,
     );
     progress.complete('Generated ${files.length} file(s)');
 
     var process = await Process.start('dart', ['pub', 'get'], workingDirectory: directory.absolute.path);
 
-    await watchProcess(process, progress: 'Resolving dependencies...', hide: (s) => s.contains('+'));
+    await watchProcess(process, tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s.contains('+'));
 
-    logger.info('\n'
+    logger.write('\n'
         'Created project $name in $dir! In order to get started, run the following commands:\n\n'
         '  cd $dir\n'
         '  jaspr serve\n');

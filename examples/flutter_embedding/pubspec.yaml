@@ -30,3 +30,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/dash.png
+
+jaspr:
+  uses-ssr: true
+  uses-flutter: true
