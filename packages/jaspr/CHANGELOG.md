@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.7.0
 
 - Improved cli experience with better logging and progress indicators.
 - Removed `--ssr` and `--flutter` cli options.
