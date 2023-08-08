@@ -14,7 +14,7 @@ The demo is a jaspr app with an embedded flutter web app.
 It can be run with:
 
 ```terminal
-$ jaspr serve --input=lib/main_jaspr.dart --flutter=lib/main_flutter.dart
+$ jaspr serve --input=lib/main_jaspr.dart
 ```
 
 https://user-images.githubusercontent.com/13920539/216588813-a06ac091-e897-4ebe-a9d4-806bfaf8759d.mov
@@ -26,30 +26,31 @@ https://user-images.githubusercontent.com/13920539/216588968-97797efe-47cc-47c7-
 The project can be built with:
 
 ```terminal
-$ jaspr build --input=lib/main_jaspr.dart --flutter=lib/main_flutter.dart
+$ jaspr build --input=lib/main_jaspr.dart
 ```
 
 Run the built app with:
 
 ```terminal
-$ cd build
+$ cd build/jaspr
 $ ./app
 ```
 
 ## Points of Interest
 
-* Check the entrypoints for both dart apps
-  * For flutter: `lib/main_flutter.dart`
-  * For jaspr: `lib/main_jaspr.dart` and `web/main_jaspr.dart`
-
-* Check the new JS Interop:
-  * Look at `lib/shared/app_state.dart` and `lib/interop/state.dart`.
-  * Find the `appStateProvider` and where it is used
-    * `lib/components/interop_controls.dart` for the jaspr app
-    * `lib/main_flutter.dart` for the flutter app
+* Check the files for both dart apps
+  * For flutter: `lib/widgets/app.dart`
+  * For jaspr: `lib/components/app.dart`
 
 * See how the Flutter web application is embedded into the page now:
-  * Find `FlutterTarget` in `lib/components/flutter_target.dart`.
+  * Find `FlutterAppContainer` in `lib/components/flutter_app_container_web.dart`.
+  * Find `FlutterEmbedView` in `lib/embedding/flutter_embed_view.dart`.
+
+* Check the new data binding:
+  * Look at the usage of `ProviderScope` in `lib/components/flutter_app_container_web.dart`.
+  * Find the `appStateProvider` and where it is used
+    * `lib/components/interop_controls.dart` for the jaspr app
+    * `lib/widgets/app.dart` for the flutter app
 
 _(Original built by @ditman, @kevmoo and @malloc-error)_
 _(Pure-Dart version built by @schultek)_

@@ -38,25 +38,13 @@ final basicBundle = MasonBundle.fromJson(<String, dynamic>{
     {
       "path": "pubspec.yaml",
       "data":
-          "bmFtZToge3tuYW1lfX0KZGVzY3JpcHRpb246IEEgYmFzaWMgcHVyZS1kYXJ0IHdlYiBhcHAgd2l0aCBzc3IgJiBhdXRvbWF0aWMgY2xpZW50IGh5ZHJhdGlvbi4KdmVyc2lvbjogMC4wLjEKCmVudmlyb25tZW50OgogIHNkazogJz49My4wLjAgPDQuMC4wJwoKZGVwZW5kZW5jaWVzOgogIGphc3ByOiBee3tqYXNwckNvcmVWZXJzaW9ufX0KCmRldl9kZXBlbmRlbmNpZXM6CiAgYnVpbGRfcnVubmVyOiBeMi40LjAKICBidWlsZF93ZWJfY29tcGlsZXJzOiBeNC4wLjAKICBqYXNwcl9idWlsZGVyOiBee3tqYXNwckJ1aWxkZXJWZXJzaW9ufX0KICBsaW50czogXjIuMS4wCg==",
+          "bmFtZToge3tuYW1lfX0KZGVzY3JpcHRpb246IEEgYmFzaWMgcHVyZS1kYXJ0IHdlYiBhcHAgd2l0aCBzc3IgJiBhdXRvbWF0aWMgY2xpZW50IGh5ZHJhdGlvbi4KdmVyc2lvbjogMC4wLjEKCmVudmlyb25tZW50OgogIHNkazogJz49My4wLjAgPDQuMC4wJwoKZGVwZW5kZW5jaWVzOgogIGphc3ByOiBee3tqYXNwckNvcmVWZXJzaW9ufX0KCmRldl9kZXBlbmRlbmNpZXM6CiAgYnVpbGRfcnVubmVyOiBeMi40LjAKICB7e3dlYkNvbXBpbGVyc1BhY2thZ2V9fTogXnt7d2ViQ29tcGlsZXJzVmVyc2lvbn19CiAgamFzcHJfYnVpbGRlcjogXnt7amFzcHJCdWlsZGVyVmVyc2lvbn19CiAgbGludHM6IF4yLjEuMAoKamFzcHI6CiAgdXNlcy1zc3I6IHRydWUK",
       "type": "text"
     },
     {
       "path": "README.md",
       "data":
           "IyB7e25hbWV9fQoKQSBiYXNpYyBwdXJlLWRhcnQgd2ViIGFwcCB3aXRoIHNzciAmIGF1dG9tYXRpYyBjbGllbnQgaHlkcmF0aW9uLgo=",
-      "type": "text"
-    },
-    {
-      "path": "web/app.client.dart",
-      "data":
-          "Ly8gR0VORVJBVEVEIEZJTEUsIERPIE5PVCBNT0RJRlkKLy8gR2VuZXJhdGVkIHdpdGggamFzcHJfYnVpbGRlcgoKaW1wb3J0ICdwYWNrYWdlOmphc3ByL2Jyb3dzZXIuZGFydCc7CmltcG9ydCAncGFja2FnZTp7e25hbWV9fS9hcHAuZGFydCcgYXMgYTsKCnZvaWQgbWFpbigpIHsKICBydW5BcHBXaXRoUGFyYW1zKGdldENvbXBvbmVudEZvclBhcmFtcyk7Cn0KCkNvbXBvbmVudCBnZXRDb21wb25lbnRGb3JQYXJhbXMoQ29uZmlnUGFyYW1zIHApIHsKICByZXR1cm4gYS5BcHAoKTsKfQo=",
-      "type": "text"
-    },
-    {
-      "path": "web/main.clients.dart",
-      "data":
-          "Ly8gR0VORVJBVEVEIEZJTEUsIERPIE5PVCBNT0RJRlkKLy8gR2VuZXJhdGVkIHdpdGggamFzcHJfYnVpbGRlcgoKaW1wb3J0ICdwYWNrYWdlOmphc3ByL2Jyb3dzZXIuZGFydCc7CmltcG9ydCAnYXBwLmNsaWVudC5kYXJ0JyBkZWZlcnJlZCBhcyBpMDsKCnZvaWQgbWFpbigpIHsKICByZWdpc3RlckNsaWVudHMoewogICAgJ2FwcCc6IGxvYWRDbGllbnQoCiAgICAgIGkwLmxvYWRMaWJyYXJ5LAogICAgICAocCkgPT4gaTAuZ2V0Q29tcG9uZW50Rm9yUGFyYW1zKHApLAogICAgKSwKICB9KTsKfQo=",
       "type": "text"
     }
   ],

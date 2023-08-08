@@ -5,13 +5,16 @@ import 'dart:io';
 
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/src/loaders/strategy.dart';
-import 'package:mason/mason.dart';
+import 'package:mason/mason.dart' show ExitCode;
 import 'package:webdev/src/command/configuration.dart';
 import 'package:webdev/src/serve/dev_workflow.dart';
 
+import '../helpers/flutter_helpers.dart';
+import '../helpers/ssr_helper.dart';
+import '../logging.dart';
 import 'base_command.dart';
 
-class ServeCommand extends BaseCommand {
+class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
   ServeCommand({super.logger}) {
     argParser.addOption(
       'input',
@@ -36,11 +39,6 @@ class ServeCommand extends BaseCommand {
       defaultsTo: '8080',
     );
     argParser.addFlag(
-      'ssr',
-      defaultsTo: true,
-      help: 'Optionally disables server-side rendering and runs as a pure client-side app.',
-    );
-    argParser.addFlag(
       'debug',
       abbr: 'd',
       help: 'Serves the app in debug mode.',
@@ -52,7 +50,6 @@ class ServeCommand extends BaseCommand {
       help: 'Serves the app in release mode.',
       negatable: false,
     );
-    argParser.addOption('flutter', help: 'Launch an embedded flutter app from the specified entrypoint.');
   }
 
   @override
@@ -62,50 +59,63 @@ class ServeCommand extends BaseCommand {
   @override
   String get name => 'serve';
 
+  late final debug = argResults!['debug'] as bool;
+  late final release = argResults!['release'] as bool;
+  late final mode = argResults!['mode'] as String;
+  late final port = argResults!['port'] as String;
+
   @override
   Future<int> run() async {
     await super.run();
 
-    var useSSR = argResults!['ssr'] as bool;
-    var debug = argResults!['debug'] as bool;
-    var release = argResults!['release'] as bool;
-    var verbose = argResults!['verbose'] as bool;
-    var flutter = argResults!['flutter'] as String?;
-    var mode = argResults!['mode'] as String;
-    var port = argResults!['port'] as String;
+    logger.write(
+        "Starting jaspr in ${release ? 'release' : debug ? 'debug' : 'development'} mode...",
+        progress: ProgressState.running);
 
-    var workflow = await _runWebdev(release, debug, mode, useSSR ? '5467' : port);
+    var workflow = await _runWebdev();
     guardResource(() => workflow.shutDown());
 
-    if (!useSSR) {
-      await workflow.done;
-      return ExitCode.success.code;
-    }
+    logger.complete(true);
+    logger.write('Starting web builder...', progress: ProgressState.running);
 
-    var msg = "Starting jaspr development server in ${release ? 'release' : 'debug'} mode...";
-    Progress? progress;
+    var buildCompleter = Completer();
 
-    if (verbose) {
-      logger.info(msg);
-    } else {
-      progress = logger.progress(msg);
-    }
+    var timer = Timer(Duration(seconds: 20), () {
+      if (!buildCompleter.isCompleted) {
+        logger.write('Building web assets... (This takes longer for the initial build)',
+            progress: ProgressState.running);
+      }
+    });
 
-    await workflow.serverManager.servers.first.buildResults
-        .where((event) => event.status == BuildStatus.succeeded)
-        .first;
+    workflow.serverManager.servers.first.buildResults.listen((event) {
+      if (event.status == BuildStatus.succeeded) {
+        if (!buildCompleter.isCompleted) {
+          buildCompleter.complete();
+        } else {
+          logger.write('Rebuilt web assets.', progress: ProgressState.completed);
+        }
+      } else if (event.status == BuildStatus.failed) {
+        if (!verbose) {
+          logger.write('Building web assets failed unexpectedly. Run again with -v to see full output.',
+              level: Level.critical, progress: ProgressState.completed);
+        }
+        shutdown();
+      } else if (event.status == BuildStatus.started) {
+        if (buildCompleter.isCompleted) {
+          logger.write('Rebuilding web assets...', progress: ProgressState.running);
+        } else {
+          logger.write('Building web assets...', progress: ProgressState.running);
+        }
+      }
+    });
 
-    if (flutter != null) {
-      var flutterProcess = await Process.start(
-        'flutter',
-        ['run', '--device-id=web-server', '-t', flutter, '--web-port=5678'],
-      );
-      unawaited(watchProcess(
-        flutterProcess,
-        onFail: !verbose //
-            ? () => logger.info('flutter run exited unexpectedly. Run again with -v to see verbose output')
-            : null,
-      ));
+    await buildCompleter.future;
+    timer.cancel();
+
+    logger.write('Done building web assets.', progress: ProgressState.completed);
+
+    if (usesFlutter) {
+      var flutterProcess = await serveFlutter();
 
       workflow.serverManager.servers.first.buildResults
           .where((event) => event.status == BuildStatus.succeeded)
@@ -114,6 +124,18 @@ class ServeCommand extends BaseCommand {
         flutterProcess.stdin.writeln('r');
       });
     }
+
+    if (!useSSR) {
+      await workflow.done;
+      return ExitCode.success.code;
+    }
+
+    await _runServer();
+    return ExitCode.success.code;
+  }
+
+  Future<void> _runServer() async {
+    logger.write("Starting server...", progress: ProgressState.running);
 
     var args = [
       'run',
@@ -124,7 +146,7 @@ class ServeCommand extends BaseCommand {
       ] else
         '-Djaspr.flags.release=true',
       '-Djaspr.dev.proxy=5467',
-      if (flutter != null) '-Djaspr.dev.flutter=5678',
+      if (usesFlutter) '-Djaspr.dev.flutter=5678',
       '-Djaspr.flags.verbose=$debug',
     ];
 
@@ -135,9 +157,10 @@ class ServeCommand extends BaseCommand {
     String? entryPoint = await getEntryPoint(argResults!['input']);
 
     if (entryPoint == null) {
-      progress?.cancel();
-      logger.err("Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.");
-      await shutdown(1);
+      logger.complete(false);
+      logger.write("Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.",
+          level: Level.critical);
+      await shutdown();
     }
 
     args.add(entryPoint);
@@ -150,31 +173,35 @@ class ServeCommand extends BaseCommand {
       environment: {'PORT': argResults!['port'], 'JASPR_PROXY_PORT': '5467'},
     );
 
-    progress?.complete();
+    logger.write('Server started.', progress: ProgressState.completed);
 
-    await watchProcess(process);
-
-    return ExitCode.success.code;
+    await watchProcess(process, tag: Tag.server);
   }
 
-  Future<DevWorkflow> _runWebdev(bool release, bool debug, String mode, String port) {
+  Future<DevWorkflow> _runWebdev() async {
+    var builderPort = useSSR ? '5467' : port;
+
     var configuration = Configuration(
       reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
       release: release,
     );
 
-    return DevWorkflow.start(configuration, [
+    var compilers = '${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+
+    var workflow = await DevWorkflow.start(configuration, [
       if (release) '--release',
       '--verbose',
       '--define',
-      'build_web_compilers|ddc=generate-full-dill=true',
+      '$compilers:ddc=generate-full-dill=true',
       '--delete-conflicting-outputs',
       if (!release)
-        '--define=build_web_compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
+        '--define=$compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
       else
-        '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
+        '--define=$compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
     ], {
-      'web': int.parse(port)
+      'web': int.parse(builderPort)
     });
+
+    return workflow;
   }
 }

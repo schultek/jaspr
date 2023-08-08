@@ -14,6 +14,12 @@ class ImportsAnalyzingBuilder implements Builder {
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     try {
+      // Performance optimization
+      var file = await buildStep.readAsString(buildStep.inputId);
+      if (!file.contains('@Import')) {
+        return;
+      }
+
       if (await buildStep.resolver.isLibrary(buildStep.inputId)) {
         var lib = await buildStep.resolver.libraryFor(buildStep.inputId, allowSyntaxErrors: true);
 

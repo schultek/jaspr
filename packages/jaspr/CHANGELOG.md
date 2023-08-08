@@ -1,3 +1,59 @@
+## 0.7.0
+
+- Improved cli experience with better logging and progress indicators.
+- Removed `--ssr` and `--flutter` cli options.
+- Added support `jaspr` config section in `pubspec.yaml`.
+
+  It is now possible to define certain configuration options for the jaspr cli
+  directly inside the `pubspec.yaml` file under the `jaspr` section.
+  Initially supported options are:
+
+  ```yaml
+  jaspr:
+    uses-ssr: true # or false; Toggles server-side-rendering on or off.
+    uses-flutter: true # or false; Whether the project uses flutter element embedding.
+  ```
+
+## 0.6.2
+
+- Added integrated support for seamless **flutter element embedding**.
+  Refer to [Flutter Embedding Docs](https://docs.page/schultek/jaspr/eco/flutter_embedding) on how to setup and use this.
+
+## 0.6.1
+
+- Fixed bug with `jaspr create`.
+
+- Added prompts when running `jaspr create` without any arguments.
+  This way the developer is guided through the creation process more dynamically.
+
+## 0.6.0
+
+- Added support for **flutter web plugins**.
+
+  Jaspr apps can now depend-on and import flutter plugins that work on web. This is achieved by 
+  using a modified compiler toolchain: `jaspr_web_compilers`.
+
+  To enable support for flutter plugins simply exchange your `build_web_compilers` dependency for `jaspr_web_compilers`:
+
+  ```yaml
+  dev_dependencies:
+    jaspr_web_compilers: ^4.0.4
+  ```
+  
+  For an example see `experiments/flutter_plugin_interop`](https://github.com/schultek/jaspr/tree/main/experiments/flutter_plugin_interop).
+  
+- Improved **flutter element embedding**.
+
+  Flutter apps can now be directly embedded from your jaspr codebase and integrated into
+  the existing jaspr component tree.
+
+  This removes the need for any kind of interop between apps as they can directly communicate
+  through the usual primitives of passing properties and callbacks.
+
+  For an example see `experiments/flutter_embedding_v2`](https://github.com/schultek/jaspr/tree/main/experiments/flutter_embedding_v2).
+
+- `jaspr build` now outputs to `/build/jaspr` instead of `/build`.
+
 ## 0.5.0
 
 - **BREAKING** Added `@client` as replacement for both `@app` and `@island`.

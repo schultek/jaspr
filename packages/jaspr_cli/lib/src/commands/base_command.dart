@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:mason/mason.dart';
+import 'package:mason/mason.dart' show ExitCode;
 import 'package:meta/meta.dart';
-// ignore: implementation_imports
-import 'package:webdev/src/logging.dart';
+import 'package:yaml/yaml.dart';
+
+import '../config.dart';
+import '../logging.dart';
 
 abstract class BaseCommand extends Command<int> {
   Set<Future<void> Function()> guards = {};
@@ -20,30 +22,26 @@ abstract class BaseCommand extends Command<int> {
   }
 
   /// [Logger] instance used to wrap stdout.
-  Logger get logger => _logger ??= Logger();
-
+  Logger get logger => _logger ??= Logger(verbose);
   Logger? _logger;
 
-  bool get verbose => argResults?['verbose'] as bool? ?? false;
+  late final bool verbose = argResults?['verbose'] as bool? ?? false;
+
+  final bool requiresPubspec = true;
+
+  late YamlMap? pubspecYaml;
+  late JasprConfig config;
+
+  bool get usesJasprWebCompilers => switch (pubspecYaml) {
+        {'dev_dependencies': {'jaspr_web_compilers': _}} => true,
+        _ => false,
+      };
 
   @override
   @mustCallSuper
   Future<int> run() async {
-    logger.level = verbose ? Level.verbose : Level.info;
-
-    configureLogWriter(false, customLogWriter: (level, message, {loggerName, error, stackTrace}) {
-      if (!verbose) return;
-      if (level.value < 800) return;
-
-      var log =
-          formatLog(level, message, error: error, loggerName: loggerName, stackTrace: stackTrace, withColors: true);
-
-      if (!log.endsWith('\n')) {
-        log += '\n';
-      }
-
-      logger.write(log);
-    });
+    pubspecYaml = await getPubspec();
+    config = JasprConfig.fromYaml(pubspecYaml, logger);
 
     ProcessSignal.sigint.watch().listen((signal) {
       shutdown();
@@ -72,45 +70,55 @@ abstract class BaseCommand extends Command<int> {
     return null;
   }
 
+  Future<YamlMap?> getPubspec() async {
+    var pubspecPath = 'pubspec.yaml';
+    var pubspecFile = File(pubspecPath);
+    if (!(await pubspecFile.exists())) {
+      if (requiresPubspec) {
+        throw 'Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.';
+      } else {
+        return null;
+      }
+    }
+
+    var parsed = loadYaml(await pubspecFile.readAsString());
+    return parsed as YamlMap;
+  }
+
   void guardResource(Future<void> Function() fn) {
     guards.add(fn);
   }
 
   Future<void> watchProcess(
     Process process, {
+    required Tag tag,
     String? progress,
     bool Function(String)? hide,
     void Function()? onFail,
   }) async {
-    Progress? pg;
     if (progress != null) {
-      pg = logger.progress(progress);
+      logger.write(progress, tag: tag, progress: ProgressState.running);
     }
 
     process.stderr.listen((event) {
-      if (pg != null) {
-        pg!.fail(utf8.decode(event).trimRight());
-        pg = null;
-        return;
-      }
-      logger.err(utf8.decode(event));
+      logger.write(utf8.decode(event), tag: tag, level: Level.error, progress: ProgressState.completed);
     });
 
     process.stdout.map(utf8.decode).listen((log) {
       if (hide != null && hide.call(log)) return;
 
-      if (pg != null) {
-        pg!.update(log.trimRight());
+      if (progress != null) {
+        logger.write(log, tag: tag, progress: ProgressState.running);
       } else {
-        logger.write(log);
+        logger.write(log, tag: tag);
       }
     });
 
     var exitCode = await process.exitCode;
     if (exitCode == 0) {
-      pg?.complete();
+      logger.complete(true);
     } else {
-      pg?.fail();
+      logger.complete(false);
       onFail?.call();
       shutdown(exitCode);
     }

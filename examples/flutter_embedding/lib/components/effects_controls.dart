@@ -1,6 +1,7 @@
-import 'package:element_embedding_demo/providers/effects_provider.dart';
 import 'package:jaspr/html.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+
+import '../providers/effects_provider.dart';
 
 class EffectsControls extends StatelessComponent {
   const EffectsControls({

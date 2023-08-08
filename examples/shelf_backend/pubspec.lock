@@ -85,10 +85,10 @@ packages:
     dependency: transitive
     description:
       name: build_modules
-      sha256: "017226b2fd3eef4e5f31839c930efad33110cdfe71b6255c7dca298b38dba61c"
+      sha256: "409fc1be491612bc1e2262f4c7fec6c91c683560662a34cfeedfcd1f7c13470b"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.2"
+    version: "5.0.3"
   build_resolvers:
     dependency: transitive
     description:
@@ -117,10 +117,10 @@ packages:
     dependency: "direct dev"
     description:
       name: build_web_compilers
-      sha256: e614f5e1317fe9b2574429e3e651951a1c38943416c047e02815a7d6ade264c9
+      sha256: "544333e7f16eddc6f260c426ba8ea5a8fdf1809acc555b2c1c8c8446d1b61ea7"
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.3"
+    version: "4.0.4"
   built_collection:
     dependency: transitive
     description:
@@ -295,14 +295,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.4.0"
+    version: "0.6.2"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.4.0"
+    version: "0.6.2"
   js:
     dependency: transitive
     description:
