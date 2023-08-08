@@ -1,25 +1,35 @@
 builders:
-  clients:
+  client_module:
     import: "package:jaspr_builder/builder.dart"
-    builder_factories: [ "buildClient" ]
+    builder_factories: [ "buildClientModule" ]
     build_extensions:
-      "^lib/{{file}}.dart":
-        - "lib/{{file}}.g.dart"
+      "lib/{{file}}.dart":
+        - "lib/{{file}}.client.json"
         - "web/{{file}}.client.dart"
+    auto_apply: dependents
+    build_to: cache
+  client_component:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildClientPart" ]
+    build_extensions:
+      "^lib/{{file}}.client.json":
+        - "lib/{{file}}.g.dart"
+    required_inputs:
+      - '.client.json'
     auto_apply: dependents
     build_to: source
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap
-  registry:
+  client_registry:
     import: "package:jaspr_builder/builder.dart"
-    builder_factories: [ "buildRegistry" ]
+    builder_factories: [ "buildClientRegistry" ]
     build_extensions:
       "lib/$lib$":
         - "web/main.clients.dart"
+    required_inputs:
+      - '.client.json'
     auto_apply: dependents
     build_to: cache
-    required_inputs:
-      - '.client.dart'
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap
   imports:
