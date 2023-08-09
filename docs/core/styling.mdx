@@ -10,7 +10,7 @@ next: /core/ssr
 Jaspr gives you a strongly-typed styles system that wraps the most common css properties. You can
 access these various properties through the `Styles` class that is exported by the core package.
 
-To pass style attributes to an html component, construct a `Styles` object and pass it as the `styles` 
+To pass style attributes to a html component, construct a `Styles` object and pass it as the `styles`
 attribute like this:
 
 ```dart
@@ -36,7 +36,7 @@ and reduce the bundle-size of your application.
 Css properties are grouped semantically into *style groups* that can be accessed through the `Styles` class as shown above.
 For example, the `background` group gives you the set of css properties related to the background style, like color, position or size.
 
-Currently the following groups exist:
+Currently, the following groups exist:
 
 <Tabs defaultValue="background" values={[
         {label: 'Background', value: 'background'},
@@ -248,4 +248,10 @@ will render as:
 </style>
 ```
 
+A normal style rule takes a `Selector` and a `Styles` property.
+
+There are also additional `StyleRule` variants that support other css features:
+
+- `StyleRule.import(String url)` renders a `@import url(...)` statement.
+- `StyleRule.media({MediaRuleQuery query, List<StyleRule> styles})` renders a `@media ... { ... }` statement.
 
