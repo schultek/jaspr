@@ -9,7 +9,7 @@ class Style extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'style',
-      child: Text(styles.map((s) => s.toCss()).join(cssPropSpace), rawHtml: true),
+      child: Text(styles.map((s) => s._toCss()).join(cssPropSpace), rawHtml: true),
     );
   }
 }
@@ -23,7 +23,7 @@ abstract class StyleRule {
   const factory StyleRule.import(String url) = _ImportStyleRule;
   const factory StyleRule.media({required MediaRuleQuery query, required List<StyleRule> styles}) = _MediaStyleRule;
 
-  String toCss();
+  String _toCss([String indent]);
 }
 
 class _BlockStyleRule implements StyleRule {
@@ -33,10 +33,10 @@ class _BlockStyleRule implements StyleRule {
   final Styles styles;
 
   @override
-  String toCss() {
-    return '${selector.selector} {$cssPropSpace'
-        '${styles.styles.entries.map((e) => '$cssBlockInset${e.key}: ${e.value};').join(cssPropSpace)}'
-        '$cssPropSpace}';
+  String _toCss([String indent = '']) {
+    return '$indent${selector.selector} {$cssPropSpace'
+        '${styles.styles.entries.map((e) => '$indent$cssBlockInset${e.key}: ${e.value};$cssPropSpace').join()}'
+        '$indent}';
   }
 }
 
@@ -47,10 +47,10 @@ class _MediaStyleRule implements StyleRule {
   final List<StyleRule> styles;
 
   @override
-  String toCss() {
-    return '@media ${query.value} {$cssPropSpace'
-        '${styles.map((r) => r.toCss()).join(cssPropSpace)}'
-        '$cssPropSpace}';
+  String _toCss([String indent = '']) {
+    return '$indent@media ${query._value} {$cssPropSpace'
+        '${styles.map((r) => r._toCss(kDebugMode ? '$indent  ' : '') + cssPropSpace).join()}'
+        '$indent}';
   }
 }
 
@@ -60,10 +60,8 @@ enum MediaRuleTarget {
   print;
 }
 
-class MediaRuleQuery {
-  const MediaRuleQuery._(this.value);
-
-  final String value;
+abstract class MediaRuleQuery {
+  String get _value;
 
   static const MediaRuleQuery all = MediaRuleQuery();
   static const MediaRuleQuery screen = MediaRuleQuery(target: MediaRuleTarget.screen);
@@ -108,7 +106,7 @@ class _MediaRuleQuery implements MediaRuleQuery {
   final String? aspectRatio;
 
   @override
-  String get value => '${target.name}'
+  String get _value => '${target.name}'
       '${minWidth != null ? ' and (min-width: ${minWidth!.value})' : ''}'
       '${maxWidth != null ? ' and (max-width: ${maxWidth!.value})' : ''}'
       '${minHeight != null ? ' and (min-height: ${minHeight!.value})' : ''}'
@@ -124,7 +122,7 @@ class _NotMediaRuleQuery implements MediaRuleQuery {
   final MediaRuleQuery query;
 
   @override
-  String get value {
+  String get _value {
     assert((() {
       if (query is _AnyMediaRuleQuery) {
         throw 'Cannot apply MediaRuleQuery.not() on MediaRuleQuery.any(). Apply on each individual rule instead.';
@@ -134,7 +132,7 @@ class _NotMediaRuleQuery implements MediaRuleQuery {
       }
       return true;
     })());
-    return 'not ${query.value}';
+    return 'not ${query._value}';
   }
 }
 
@@ -144,7 +142,7 @@ class _AnyMediaRuleQuery implements MediaRuleQuery {
   final List<MediaRuleQuery> queries;
 
   @override
-  String get value => queries.join(', ');
+  String get _value => queries.join(', ');
 }
 
 class _ImportStyleRule implements StyleRule {
@@ -152,8 +150,8 @@ class _ImportStyleRule implements StyleRule {
   const _ImportStyleRule(this.url);
 
   @override
-  String toCss() {
-    return '@import url($url);';
+  String _toCss([String indent = '']) {
+    return '$indent@import url($url);';
   }
 }
 
@@ -173,6 +171,11 @@ extension SelectorMixin on Selector {
   Selector id(String id) {
     assert(unallowedList(this));
     return Selector.chain([this, Selector.id(id)]);
+  }
+
+  Selector className(String className) {
+    assert(unallowedList(this));
+    return Selector.chain([this, Selector.className(className)]);
   }
 
   Selector dot(String className) {
@@ -212,6 +215,7 @@ class Selector {
   const Selector.tag(String tag) : selector = tag;
   const Selector.id(String id) : selector = '#$id';
   const Selector.dot(String className) : selector = '.$className';
+  const Selector.className(String className) : selector = '.$className';
   const factory Selector.attr(String attr, {AttrCheck check}) = _AttrSelector;
 
   const Selector.pseudoClass(String name) : selector = ':$name';
