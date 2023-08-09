@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Added `StyleRule.media({MediaRuleQuery query, List<StyleRule> styles})` to support `@media` css statements.
+
 ## 0.7.0
 
 - Improved cli experience with better logging and progress indicators.
