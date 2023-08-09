@@ -17,17 +17,22 @@ class Style extends StatelessComponent {
 const cssBlockInset = kDebugMode ? '  ' : '';
 const cssPropSpace = kDebugMode ? '\n' : ' ';
 
-class StyleRule {
+abstract class StyleRule {
+  const factory StyleRule({required Selector selector, required Styles styles}) = _BlockStyleRule;
+
+  const factory StyleRule.import(String url) = _ImportStyleRule;
+  const factory StyleRule.media({required MediaRuleQuery query, required List<StyleRule> styles}) = _MediaStyleRule;
+
+  String toCss();
+}
+
+class _BlockStyleRule implements StyleRule {
+  const _BlockStyleRule({required this.selector, required this.styles});
+
   final Selector selector;
   final Styles styles;
 
-  const StyleRule({
-    required this.selector,
-    required this.styles,
-  });
-
-  const factory StyleRule.import(String url) = _ImportStyleRule;
-
+  @override
   String toCss() {
     return '${selector.selector} {$cssPropSpace'
         '${styles.styles.entries.map((e) => '$cssBlockInset${e.key}: ${e.value};').join(cssPropSpace)}'
@@ -35,14 +40,116 @@ class StyleRule {
   }
 }
 
+class _MediaStyleRule implements StyleRule {
+  const _MediaStyleRule({required this.query, required this.styles});
+
+  final MediaRuleQuery query;
+  final List<StyleRule> styles;
+
+  @override
+  String toCss() {
+    return '@media ${query.value} {$cssPropSpace'
+        '${styles.map((r) => r.toCss()).join(cssPropSpace)}'
+        '$cssPropSpace}';
+  }
+}
+
+enum MediaRuleTarget {
+  all,
+  screen,
+  print;
+}
+
+class MediaRuleQuery {
+  const MediaRuleQuery._(this.value);
+
+  final String value;
+
+  static const MediaRuleQuery all = MediaRuleQuery();
+  static const MediaRuleQuery screen = MediaRuleQuery(target: MediaRuleTarget.screen);
+  static const MediaRuleQuery print = MediaRuleQuery(target: MediaRuleTarget.print);
+
+  const factory MediaRuleQuery({
+    MediaRuleTarget target,
+    Unit? minWidth,
+    Unit? maxWidth,
+    Unit? minHeight,
+    Unit? maxHeight,
+    Orientation? orientation,
+    bool? canHover,
+    String? aspectRatio,
+  }) = _MediaRuleQuery;
+
+  const factory MediaRuleQuery.not(MediaRuleQuery query) = _NotMediaRuleQuery;
+  const factory MediaRuleQuery.any(List<MediaRuleQuery> queries) = _AnyMediaRuleQuery;
+}
+
+enum Orientation { portrait, landscape }
+
+class _MediaRuleQuery implements MediaRuleQuery {
+  const _MediaRuleQuery({
+    this.target = MediaRuleTarget.all,
+    this.minWidth,
+    this.maxWidth,
+    this.minHeight,
+    this.maxHeight,
+    this.orientation,
+    this.canHover,
+    this.aspectRatio,
+  });
+
+  final MediaRuleTarget target;
+  final Unit? minWidth;
+  final Unit? maxWidth;
+  final Unit? minHeight;
+  final Unit? maxHeight;
+  final Orientation? orientation;
+  final bool? canHover;
+  final String? aspectRatio;
+
+  @override
+  String get value => '${target.name}'
+      '${minWidth != null ? ' and (min-width: ${minWidth!.value})' : ''}'
+      '${maxWidth != null ? ' and (max-width: ${maxWidth!.value})' : ''}'
+      '${minHeight != null ? ' and (min-height: ${minHeight!.value})' : ''}'
+      '${maxHeight != null ? ' and (max-height: ${maxHeight!.value})' : ''}'
+      '${orientation != null ? ' and (orientation: ${orientation!.name})' : ''}'
+      '${canHover != null ? ' and (hover: ${canHover! ? 'hover' : 'none'})' : ''}'
+      '${aspectRatio != null ? ' and (aspect-ratio: ${aspectRatio!})' : ''}';
+}
+
+class _NotMediaRuleQuery implements MediaRuleQuery {
+  const _NotMediaRuleQuery(this.query);
+
+  final MediaRuleQuery query;
+
+  @override
+  String get value {
+    assert((() {
+      if (query is _AnyMediaRuleQuery) {
+        throw 'Cannot apply MediaRuleQuery.not() on MediaRuleQuery.any(). Apply on each individual rule instead.';
+      }
+      if (query is _NotMediaRuleQuery) {
+        throw 'Cannot apply MediaRuleQuery.not() twice.';
+      }
+      return true;
+    })());
+    return 'not ${query.value}';
+  }
+}
+
+class _AnyMediaRuleQuery implements MediaRuleQuery {
+  const _AnyMediaRuleQuery(this.queries);
+
+  final List<MediaRuleQuery> queries;
+
+  @override
+  String get value => queries.join(', ');
+}
+
 class _ImportStyleRule implements StyleRule {
   final String url;
   const _ImportStyleRule(this.url);
-
-  @override
-  Selector get selector => throw UnimplementedError();
-  @override
-  Styles get styles => throw UnimplementedError();
 
   @override
   String toCss() {
