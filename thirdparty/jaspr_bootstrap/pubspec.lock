@@ -79,7 +79,7 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.7.0"
+    version: "0.8.0"
   js:
     dependency: transitive
     description:
