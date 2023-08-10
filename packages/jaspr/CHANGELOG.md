@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.8.0
 
 - Added `StyleRule.media({MediaRuleQuery query, List<StyleRule> styles})` to support `@media` css statements.
 

@@ -1,3 +1,7 @@
+## 0.2.3
+
+- `jaspr` upgraded to `0.8.0`
+
 ## 0.2.2
 
 - `jaspr` upgraded to `0.7.0`
