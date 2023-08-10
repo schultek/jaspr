@@ -9,7 +9,7 @@ class Style extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'style',
-      child: Text(styles.map((s) => s.toCss()).join(cssPropSpace), rawHtml: true),
+      child: Text(styles.map((s) => s._toCss()).join(cssPropSpace), rawHtml: true),
     );
   }
 }
@@ -17,22 +17,132 @@ class Style extends StatelessComponent {
 const cssBlockInset = kDebugMode ? '  ' : '';
 const cssPropSpace = kDebugMode ? '\n' : ' ';
 
-class StyleRule {
+abstract class StyleRule {
+  const factory StyleRule({required Selector selector, required Styles styles}) = _BlockStyleRule;
+
+  const factory StyleRule.import(String url) = _ImportStyleRule;
+  const factory StyleRule.media({required MediaRuleQuery query, required List<StyleRule> styles}) = _MediaStyleRule;
+
+  String _toCss([String indent]);
+}
+
+class _BlockStyleRule implements StyleRule {
+  const _BlockStyleRule({required this.selector, required this.styles});
+
   final Selector selector;
   final Styles styles;
 
-  const StyleRule({
-    required this.selector,
-    required this.styles,
+  @override
+  String _toCss([String indent = '']) {
+    return '$indent${selector.selector} {$cssPropSpace'
+        '${styles.styles.entries.map((e) => '$indent$cssBlockInset${e.key}: ${e.value};$cssPropSpace').join()}'
+        '$indent}';
+  }
+}
+
+class _MediaStyleRule implements StyleRule {
+  const _MediaStyleRule({required this.query, required this.styles});
+
+  final MediaRuleQuery query;
+  final List<StyleRule> styles;
+
+  @override
+  String _toCss([String indent = '']) {
+    return '$indent@media ${query._value} {$cssPropSpace'
+        '${styles.map((r) => r._toCss(kDebugMode ? '$indent  ' : '') + cssPropSpace).join()}'
+        '$indent}';
+  }
+}
+
+enum MediaRuleTarget {
+  all,
+  screen,
+  print;
+}
+
+abstract class MediaRuleQuery {
+  String get _value;
+
+  static const MediaRuleQuery all = MediaRuleQuery();
+  static const MediaRuleQuery screen = MediaRuleQuery(target: MediaRuleTarget.screen);
+  static const MediaRuleQuery print = MediaRuleQuery(target: MediaRuleTarget.print);
+
+  const factory MediaRuleQuery({
+    MediaRuleTarget target,
+    Unit? minWidth,
+    Unit? maxWidth,
+    Unit? minHeight,
+    Unit? maxHeight,
+    Orientation? orientation,
+    bool? canHover,
+    String? aspectRatio,
+  }) = _MediaRuleQuery;
+
+  const factory MediaRuleQuery.not(MediaRuleQuery query) = _NotMediaRuleQuery;
+  const factory MediaRuleQuery.any(List<MediaRuleQuery> queries) = _AnyMediaRuleQuery;
+}
+
+enum Orientation { portrait, landscape }
+
+class _MediaRuleQuery implements MediaRuleQuery {
+  const _MediaRuleQuery({
+    this.target = MediaRuleTarget.all,
+    this.minWidth,
+    this.maxWidth,
+    this.minHeight,
+    this.maxHeight,
+    this.orientation,
+    this.canHover,
+    this.aspectRatio,
   });
 
-  const factory StyleRule.import(String url) = _ImportStyleRule;
+  final MediaRuleTarget target;
+  final Unit? minWidth;
+  final Unit? maxWidth;
+  final Unit? minHeight;
+  final Unit? maxHeight;
+  final Orientation? orientation;
+  final bool? canHover;
+  final String? aspectRatio;
 
-  String toCss() {
-    return '${selector.selector} {$cssPropSpace'
-        '${styles.styles.entries.map((e) => '$cssBlockInset${e.key}: ${e.value};').join(cssPropSpace)}'
-        '$cssPropSpace}';
+  @override
+  String get _value => '${target.name}'
+      '${minWidth != null ? ' and (min-width: ${minWidth!.value})' : ''}'
+      '${maxWidth != null ? ' and (max-width: ${maxWidth!.value})' : ''}'
+      '${minHeight != null ? ' and (min-height: ${minHeight!.value})' : ''}'
+      '${maxHeight != null ? ' and (max-height: ${maxHeight!.value})' : ''}'
+      '${orientation != null ? ' and (orientation: ${orientation!.name})' : ''}'
+      '${canHover != null ? ' and (hover: ${canHover! ? 'hover' : 'none'})' : ''}'
+      '${aspectRatio != null ? ' and (aspect-ratio: ${aspectRatio!})' : ''}';
+}
+
+class _NotMediaRuleQuery implements MediaRuleQuery {
+  const _NotMediaRuleQuery(this.query);
+
+  final MediaRuleQuery query;
+
+  @override
+  String get _value {
+    assert((() {
+      if (query is _AnyMediaRuleQuery) {
+        throw 'Cannot apply MediaRuleQuery.not() on MediaRuleQuery.any(). Apply on each individual rule instead.';
+      }
+      if (query is _NotMediaRuleQuery) {
+        throw 'Cannot apply MediaRuleQuery.not() twice.';
+      }
+      return true;
+    })());
+    return 'not ${query._value}';
   }
+}
+
+class _AnyMediaRuleQuery implements MediaRuleQuery {
+  const _AnyMediaRuleQuery(this.queries);
+
+  final List<MediaRuleQuery> queries;
+
+  @override
+  String get _value => queries.join(', ');
 }
 
 class _ImportStyleRule implements StyleRule {
@@ -40,13 +150,8 @@ class _ImportStyleRule implements StyleRule {
   const _ImportStyleRule(this.url);
 
   @override
-  Selector get selector => throw UnimplementedError();
-  @override
-  Styles get styles => throw UnimplementedError();
-
-  @override
-  String toCss() {
-    return '@import url($url);';
+  String _toCss([String indent = '']) {
+    return '$indent@import url($url);';
   }
 }
 
@@ -66,6 +171,11 @@ extension SelectorMixin on Selector {
   Selector id(String id) {
     assert(unallowedList(this));
     return Selector.chain([this, Selector.id(id)]);
+  }
+
+  Selector className(String className) {
+    assert(unallowedList(this));
+    return Selector.chain([this, Selector.className(className)]);
   }
 
   Selector dot(String className) {
@@ -105,6 +215,7 @@ class Selector {
   const Selector.tag(String tag) : selector = tag;
   const Selector.id(String id) : selector = '#$id';
   const Selector.dot(String className) : selector = '.$className';
+  const Selector.className(String className) : selector = '.$className';
   const factory Selector.attr(String attr, {AttrCheck check}) = _AttrSelector;
 
   const Selector.pseudoClass(String name) : selector = ':$name';
