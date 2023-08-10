@@ -1,1 +1,1 @@
-Tailwind integration for jaspr.
+Tailwind integration for [jaspr](https://pub.dev/packages/jaspr).
