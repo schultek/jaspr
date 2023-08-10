@@ -28,6 +28,7 @@
     ["Ecosystem", [
       ["\uD83D\uDDBC️ Flutter Embedding", "/eco/flutter_embedding"],
       ["\uD83C\uDF0A Riverpod", "/eco/riverpod"],
+      ["\uD83C\uDF2C️ Tailwind", "/eco/tailwind"],
       ["\uD83D\uDCDA Third-Party Packages", "/eco/packages"],
       ["\uD83D\uDC99 Contributing", "/eco/contributing"]
     ]],
