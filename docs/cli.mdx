@@ -60,8 +60,7 @@ A server-rendered app using the islands architecture for client hydration.
 
 #### Client Template
 
-A pure client-side app without ssr. Requires the `--no-ssr` flag to be passed to 
-both `jaspr serve` and `jaspr build`. Allows your site to be deployed to a static file hosting
+A pure client-side app without ssr. Allows your site to be deployed to a static file hosting
 provider, like Firebase Hosting.
 
 #### Server Template
@@ -77,12 +76,12 @@ When it's time to deploy your application, you can build it using the following 
 jaspr build
 ```
 
-This will build the app inside the `build` directory.
+This will build the app inside the `build/jaspr` directory.
 You can choose whether to build a standalone executable or an aot or jit snapshot with the `--target` option.
 
 If you are using jaspr with server-side rendering (default), you can run your app by starting the
-executable at `build/app` (when you deploy your app, make sure to also copy the `build/web` folder
-next to the executable). If you passed the `--no-ssr` flag, you can deploy the files inside
-the `build` directory to any static hosting provider.
+executable at `build/jaspr/app` (when you deploy your app, make sure to also copy the `build/jaspr/web` folder
+next to the executable). If you build with `uses-ssr: false`, you can deploy the files inside
+the `build/jaspr` directory to any static hosting provider.
 
 

@@ -88,6 +88,9 @@ Rather it embraces these differences to give the best of both worlds.
 - **/packages**:
   - [**/jaspr**](https://github.com/schultek/jaspr/tree/main/packages/jaspr): The core framework package.
   - **/jaspr_builder**: Code-generation builders for jaspr.
+  - **/jaspr_cli**: The command line interface of jaspr.
+  - **/jaspr_flutter_embed**: Flutter element embedding bindings for jaspr.
   - **/jaspr_riverpod**: Riverpod implementation for jaspr.
   - **/jaspr_router**: A router implementation for jaspr.
   - **/jaspr_test**: A testing package for jaspr.
+  - **/jaspr_tailwind**: A tailwind integration for jaspr.

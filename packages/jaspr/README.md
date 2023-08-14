@@ -81,7 +81,7 @@ Next, run the development server using the following command:
 
 ```shell
 cd my_web_app
-dart run jaspr serve
+jaspr serve
 ```
 
 This will spin up a server at `localhost:8080`. You can now start developing your web app. 
