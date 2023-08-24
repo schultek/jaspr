@@ -15,7 +15,7 @@ final String kDevProxy =
     String.fromEnvironment('jaspr.dev.proxy', defaultValue: Platform.environment['jaspr_dev_proxy'] ?? '');
 final String kDevFlutter = String.fromEnvironment('jaspr.dev.flutter');
 const bool kDevHotreload = bool.fromEnvironment('jaspr.dev.hotreload');
-const String kDevProject = String.fromEnvironment('jaspr.dev.project');
+const String kDevWeb = String.fromEnvironment('jaspr.dev.web');
 
 /// A [Handler] that can be refreshed to update any used resources
 class RefreshableHandler {
@@ -169,12 +169,9 @@ Handler _sseProxyHandler() {
 
 // coverage:ignore-end
 
-final projectDir = _findRootProjectDir();
+final webDir = kDevWeb.isNotEmpty ? kDevWeb : join(_findRootProjectDir(), 'web');
 
 String _findRootProjectDir() {
-  if (kDevProject.isNotEmpty) {
-    return kDevProject;
-  }
   var dir = dirname(Platform.script.path);
   if (Platform.resolvedExecutable == Platform.script.path) return dir;
   while (dir.isNotEmpty && !File(join(dir, 'pubspec.yaml')).existsSync()) {
@@ -183,9 +180,8 @@ String _findRootProjectDir() {
   return dir;
 }
 
-final staticFileHandler = kDevProxy.isNotEmpty
-    ? _proxyHandler()
-    : createStaticHandler(join(projectDir, 'web'), defaultDocument: 'index.html');
+final staticFileHandler =
+    kDevProxy.isNotEmpty ? _proxyHandler() : createStaticHandler(webDir, defaultDocument: 'index.html');
 
 typedef SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
 

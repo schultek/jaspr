@@ -69,7 +69,7 @@ class GenerateCommand extends BaseCommand with SsrHelper, FlutterHelper {
     await webResult;
 
     if (usesFlutter) {
-      flutterResult = buildFlutter(useSSR);
+      flutterResult = buildFlutter(false);
     }
 
     logger.write('Building server app...', progress: ProgressState.running);
@@ -81,7 +81,7 @@ class GenerateCommand extends BaseCommand with SsrHelper, FlutterHelper {
         '--enable-asserts',
         '-Djaspr.flags.release=true',
         '-Djaspr.flags.generate=true',
-        '-Djaspr.dev.project=build/jaspr',
+        '-Djaspr.dev.web=build/jaspr',
         entryPoint,
       ],
       environment: {'PORT': '8080', 'JASPR_PROXY_PORT': '5467'},
