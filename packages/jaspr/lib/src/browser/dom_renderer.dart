@@ -245,17 +245,19 @@ class BrowserDomRenderer extends Renderer {
   @override
   void attachNode(RenderElement? parent, RenderElement child, RenderElement? after) {
     if (parent == null) {
-      Iterable<Node> nodes = container.nodes;
-      if (kDebugMode) {
-        nodes = nodes.where((node) => node is! html.Text || (node.text ?? '').trim().isNotEmpty);
+      if (child.data.node == null) {
+        Iterable<Node> nodes = container.nodes;
+        if (kDebugMode) {
+          nodes = nodes.where((node) => node is! html.Text || (node.text ?? '').trim().isNotEmpty);
+        }
+        nodes = nodes.skip(from ?? 0);
+        if (to != null) {
+          nodes = nodes.take(to! - (from ?? 0));
+        }
+        child.data
+          ..node = container
+          ..toHydrate = nodes.toList();
       }
-      nodes = nodes.skip(from ?? 0);
-      if (to != null) {
-        nodes = nodes.take(to! - (from ?? 0));
-      }
-      child.data
-        ..node = container
-        ..toHydrate = nodes.toList();
       return;
     }
 
