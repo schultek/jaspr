@@ -130,7 +130,7 @@ part of framework;
 ///    be read by descendant components.
 abstract class StatefulComponent extends Component {
   /// Initializes [key] for subclasses.
-  const StatefulComponent({Key? key}) : super(key: key);
+  const StatefulComponent({super.key});
 
   /// Creates a [StatefulElement] to manage this component's location in the tree.
   ///
@@ -614,35 +614,28 @@ class StatefulElement extends MultiChildElement {
   State get state => _state!;
 
   @override
-  void _firstBuild() {
+  void _firstBuild([VoidCallback? onBuilt]) {
     assert(state._debugLifecycleState == _StateLifecycle.created);
 
     // We check if state uses on of the mixins that support async initialization,
-    // which will be handled by [BuildOwnner.preformRebuildOn].
+    // which will be handled by [BuildOwner.preformRebuildOn].
     // In this case we don't call [_initState()] directly here, but rather let it
     // be called by the mixins implementation.
 
-    Future? _asyncFirstBuild;
+    Future? asyncFirstBuild;
 
-    if (owner.isFirstBuild) {
-      if (state is DeferRenderMixin && ComponentsBinding.instance!.isClient) {
-        _asyncFirstBuild = (state as DeferRenderMixin).beforeFirstRender();
-      }
-      if (state is PreloadStateMixin && !ComponentsBinding.instance!.isClient) {
-        _asyncFirstBuild = (state as PreloadStateMixin).preloadState();
-      }
+    if (owner.isFirstBuild && state is PreloadStateMixin && !binding.isClient) {
+      asyncFirstBuild = (state as PreloadStateMixin).preloadState();
     }
 
-    if (_asyncFirstBuild != null) {
-      this._asyncFirstBuild = _asyncFirstBuild.then((_) {
-        _initState();
-        this._asyncFirstBuild = null;
-      });
+    if (asyncFirstBuild != null) {
+      _asyncFirstBuild = asyncFirstBuild.then((_) => _initState());
+      asyncFirstBuild.whenComplete(() => _asyncFirstBuild = null);
     } else {
       _initState();
     }
 
-    super._firstBuild();
+    super._firstBuild(onBuilt);
   }
 
   void _initState() {

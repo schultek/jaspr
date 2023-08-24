@@ -1,13 +1,58 @@
-name: jaspr_project
+name: jaspr_workspace
+repository: https://github.com/schultek/jaspr
+
+command:
+  bootstrap:
+    hooks:
+      post: |
+        dart pub global activate packages/jaspr_cli --source=path
 
 packages:
-  - packages/**
-  - experiments/**
-  - demo/**
+  - packages/*
+  - apps/*
+  - examples/*
+  - experiments/*
+  - thirdparty/*
 
 scripts:
-  analyze: melos exec -- "dart analyze ."
-  tools:
-    name: tools
-    run: melos exec -- "dart run $MELOS_ROOT_PATH/tools/bin/tools.dart"
-    select-package: {}
+  format: melos exec -- 'dart format . --line-length=120'
+  analyze: melos exec -- "dart analyze . --fatal-infos"
+  test:
+    run: |
+      melos exec --no-private -- "dart test"
+      melos exec --no-private --scope=jaspr --scope=jaspr_router -- "dart test --preset=browser"
+  coverage:ci:
+    run: |
+      melos exec --no-private -- "dart test --coverage=coverage"
+      melos exec --no-private --scope=jaspr --scope=jaspr_router -- "dart test --preset=browser --coverage=coverage"
+      melos exec --no-private -- "dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/$(echo "\$MELOS_PACKAGE_NAME")_lcov.info" -i ./coverage"
+      find $MELOS_ROOT_PATH/coverage -type f -empty -print -delete
+  coverage:
+    run: |
+      melos run coverage:ci
+      genhtml -o $MELOS_ROOT_PATH/coverage/report $MELOS_ROOT_PATH/coverage/*_lcov.info
+      open $MELOS_ROOT_PATH/coverage/report/index.html
+  generate:build:
+    packageFilters:
+      dependsOn: build_runner
+    run: |
+      melos exec --depends-on=build_runner -- "dart run build_runner build --delete-conflicting-outputs"
+  generate:html:
+    run: |
+      cd packages/jaspr
+      dart run tool/generate_html.dart
+  generate:templates:
+    run: |
+      cd packages/jaspr_cli
+      dart run tool/generate_templates.dart
+  generate:versions:
+    run: |
+      cd packages/jaspr_cli
+      dart run tool/generate_versions.dart
+  generate:cli:
+    run: |
+      melos run generate:versions
+      melos run generate:templates
+  activate:cli:
+    run: |
+      dart pub global activate packages/jaspr_cli --source=path

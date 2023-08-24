@@ -1,6 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
 import 'all_elements.dart';
+import 'binding.dart';
 
 /// Signature for [CommonFinders.byComponentPredicate].
 typedef ComponentPredicate = bool Function(Component component);
@@ -231,7 +232,7 @@ abstract class Finder {
   /// See [collectAllElementsFrom].
   @protected
   Iterable<Element> get allCandidates {
-    return collectAllElementsFrom(ComponentsBinding.instance!.rootElement!);
+    return collectAllElementsFrom(TestBinding.currentRootElement!);
   }
 
   Iterable<Element>? _cachedResult;
@@ -521,7 +522,9 @@ class _DescendantFinder extends Finder {
 
   @override
   String get description {
-    if (matchRoot) return '${descendant.description} in the subtree(s) beginning with ${ancestor.description}';
+    if (matchRoot) {
+      return '${descendant.description} in the subtree(s) beginning with ${ancestor.description}';
+    }
     return '${descendant.description} that has ancestor(s) with ${ancestor.description}';
   }
 
@@ -549,7 +552,9 @@ class _AncestorFinder extends Finder {
 
   @override
   String get description {
-    if (matchRoot) return 'ancestor ${ancestor.description} beginning with ${descendant.description}';
+    if (matchRoot) {
+      return 'ancestor ${ancestor.description} beginning with ${descendant.description}';
+    }
     return '${ancestor.description} which is an ancestor of ${descendant.description}';
   }
 

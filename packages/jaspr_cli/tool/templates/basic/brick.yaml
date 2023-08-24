@@ -1,0 +1,14 @@
+name: basic
+description: (Recommended) A basic pure-dart web app with ssr & automatic client hydration.
+
+version: 0.1.0+1
+
+environment:
+  mason: ">=0.1.0-dev.26 <0.1.0"
+
+vars:
+  name:
+    type: string
+    description: The project name
+    prompt: What is the project name?
+

@@ -1,0 +1,87 @@
+---
+title: Jaspr CLI
+description: Create, serve and build projects using the jaspr cli.
+previous: /jaspr-vs-flutter-web
+next: /core/components
+---
+
+# 🕹 Jaspr CLI
+
+Jaspr comes with a cli tool to create, serve and build your web app.
+
+- `jaspr create -t <template> <project-name>` will create a new jaspr project based on `<template>`inside the `<project-name>` directory
+- use `jaspr create` to see a list of available templates
+- `jaspr serve` will serve the web-app in the current directory, including hot-reloading
+- `jaspr build` will build the web-app containing the static web assets (compiled js, html, ...) and the server executable
+
+## 📟 Execution Mode
+
+**Jaspr** is a full-stack web framework, meaning it runs both on the server and the client. However
+depending on what you want to build you can choose how your app should be built and executed using jaspr.
+
+- **Server-side Rendering with client-side hydration:**
+  In the default mode jaspr runs both on the server and client. It renders your html on the server
+  including any dynamic data from an api or database and then hydrates that html on the client in order to
+  make it interactive. This is the default mode for the `basic`, `classic` and `islands` templates.
+
+- **Client-side only:**
+  If you want, you can skip the server part of jaspr completely and only use it as a client-side framework.
+  To use it like this, simply use the `client` template when creating a new project.
+
+- **Server-side only:**
+  If you are dealing with a fully static website without needing any interactivity through js, you can also
+  use jaspr as a purely server-side rendering framework. To set this up, use the `server` template when creating
+  a new project. Then you won't have any javascript shipped to the browser.
+
+## 🏗 Templates
+
+When generating a new project, you can choose from one of several templates to get started quickly.
+The templates showcase common configurations of jaspr and provide a ready-to use setup. 
+
+<Info>
+Templates do not lock you into a specific configuration. Starting from one template you can easily 
+modify your code to behave as any other template along the way. So if you are not sure yet what to
+pick, just start with the recommended 'basic' template.
+</Info>
+
+#### Basic Template
+
+The **recommended** template for a standard jaspr app. It gives you a pure-dart web app with ssr & 
+automatic client hydration.
+
+#### Classic Template
+
+Similar to the basic template, but with an additional `index.html` and `styles.css` file in case
+you prefer to write your template in html and global styles in css.
+
+#### Islands Template
+
+A server-rendered app using the islands architecture for client hydration.
+
+#### Client Template
+
+A pure client-side app without ssr. Allows your site to be deployed to a static file hosting
+provider, like Firebase Hosting.
+
+#### Server Template
+
+A purely server-side rendered app without client hydration. This means you will have no generated
+js and therefore no client interaction, but a completely static site, like a simple blog.
+
+## 🛠 Building
+
+When it's time to deploy your application, you can build it using the following command:
+
+```shell
+jaspr build
+```
+
+This will build the app inside the `build/jaspr` directory.
+You can choose whether to build a standalone executable or an aot or jit snapshot with the `--target` option.
+
+If you are using jaspr with server-side rendering (default), you can run your app by starting the
+executable at `build/jaspr/app` (when you deploy your app, make sure to also copy the `build/jaspr/web` folder
+next to the executable). If you build with `uses-ssr: false`, you can deploy the files inside
+the `build/jaspr` directory to any static hosting provider.
+
+

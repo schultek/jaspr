@@ -1,6 +1,7 @@
 paths:
   - test/framework
   - test/server
+  - test/ui
 
 presets:
   browser:

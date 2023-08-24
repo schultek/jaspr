@@ -143,7 +143,7 @@ class GlobalKey<T extends State<StatefulComponent>> extends Key {
   /// Creates a global key.
   const GlobalKey() : super.empty();
 
-  Element? get _currentElement => ComponentsBinding.instance!.buildOwner._globalKeyRegistry[this];
+  Element? get _currentElement => ComponentsBinding._globalKeyRegistry[this];
 
   /// The build context in which the component with this key builds.
   ///

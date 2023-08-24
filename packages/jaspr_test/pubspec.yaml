@@ -1,15 +1,23 @@
 name: jaspr_test
-version: 0.1.0
+description: Testing utilities for jaspr.
+version: 0.8.1
+homepage: https://github.com/schultek/jaspr
+issue_tracker: https://github.com/schultek/jaspr/issues
+
+topics:
+  - jaspr
+  - web
+  - testing
 
 environment:
-  sdk: '>=2.16.0 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  test: ^1.19.5
-  meta: ^1.7.0
-  jaspr: ^0.1.0
-  domino: ^0.8.1
   html: ^0.15.0
+  http: '>=0.13.0 <2.0.0'
+  jaspr: ^0.8.1
+  meta: ^1.7.0
+  test: ^1.22.0
 
 dev_dependencies:
-  lints: ^1.0.1
+  lints: ^2.1.0

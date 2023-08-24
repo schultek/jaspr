@@ -8,7 +8,7 @@ typedef EventCallback = void Function(dynamic event);
 /// Can have a single [child] component or any amount of [children].
 class DomComponent extends Component {
   const DomComponent({
-    Key? key,
+    super.key,
     required this.tag,
     this.id,
     this.classes,
@@ -18,13 +18,12 @@ class DomComponent extends Component {
     Component? child,
     List<Component>? children,
   })  : _child = child,
-        _children = children,
-        super(key: key);
+        _children = children;
 
   final String tag;
   final String? id;
-  final Iterable<String>? classes;
-  final Map<String, String>? styles;
+  final List<String>? classes;
+  final Styles? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
   final Component? _child;
@@ -36,14 +35,11 @@ class DomComponent extends Component {
   Element createElement() => DomElement(this);
 }
 
-class DomElement extends MultiChildElement with BuildScheduler {
+class DomElement extends MultiChildElement with RenderElement {
   DomElement(DomComponent component) : super(component);
 
   @override
   DomComponent get component => super.component as DomComponent;
-
-  dynamic _source;
-  dynamic get source => _source;
 
   @override
   Iterable<Component> build() => component.children;
@@ -56,22 +52,16 @@ class DomElement extends MultiChildElement with BuildScheduler {
   }
 
   @override
-  void render(DomBuilder b) {
-    b.open(
+  void renderNode(Renderer renderer) {
+    renderer.renderNode(
+      this,
       component.tag,
-      // TODO currently this does not really work on first render, find better solution
-      key: component.key?.hashCode.toString(),
-      id: component.id,
-      classes: component.classes,
-      styles: component.styles,
-      attributes: component.attributes,
-      events: component.events?.map((k, v) => MapEntry(k, (e) => v(e.event))),
+      component.id,
+      component.classes,
+      component.styles?.styles,
+      component.attributes,
+      component.events,
     );
-
-    super.render(b);
-
-    _source = b.close(tag: component.tag);
-    _view = ComponentsBinding.instance!.registerView(_source, super.render, false);
   }
 }
 
@@ -79,7 +69,7 @@ class DomElement extends MultiChildElement with BuildScheduler {
 ///
 /// Styling is done through the parent element(s) and their styles.
 class Text extends Component {
-  const Text(this.text, {this.rawHtml = false, Key? key}) : super(key: key);
+  const Text(this.text, {this.rawHtml = false, super.key});
 
   final String text;
   final bool rawHtml;
@@ -88,14 +78,24 @@ class Text extends Component {
   Element createElement() => TextElement(this);
 }
 
-class TextElement extends Element {
-  TextElement(Text component) : super(component);
-
-  @override
-  Text get _component => super._component as Text;
+abstract class NoChildElement extends Element {
+  NoChildElement(Component component) : super(component);
 
   @override
   bool get debugDoingBuild => false;
+
+  @override
+  void mount(Element? parent, Element? prevSibling) {
+    super.mount(parent, prevSibling);
+    assert(_lifecycleState == _ElementLifecycle.active);
+    _firstBuild();
+  }
+
+  @override
+  void _firstBuild([VoidCallback? onBuilt]) {
+    super._firstBuild(onBuilt);
+    rebuild(onBuilt);
+  }
 
   @override
   void performRebuild() {
@@ -104,13 +104,35 @@ class TextElement extends Element {
 
   @override
   void visitChildren(ElementVisitor visitor) {}
+}
+
+class TextElement extends NoChildElement with RenderElement {
+  TextElement(Text component) : super(component);
 
   @override
-  void render(DomBuilder b) {
-    if (_component.rawHtml) {
-      b.innerHtml(_component.text);
-    } else {
-      b.text(_component.text);
-    }
+  Text get component => super.component as Text;
+
+  @override
+  void renderNode(Renderer renderer) {
+    renderer.renderTextNode(this, component.text, component.rawHtml);
+  }
+}
+
+class SkipContent extends Component {
+  const SkipContent();
+
+  @override
+  Element createElement() => SkipContentElement(this);
+}
+
+class SkipContentElement extends NoChildElement with RenderElement {
+  SkipContentElement(SkipContent component) : super(component);
+
+  @override
+  SkipContent get component => super.component as SkipContent;
+
+  @override
+  void renderNode(Renderer renderer) {
+    renderer.skipContent(this);
   }
 }

@@ -1,0 +1,638 @@
+// coverage:ignore-file
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element
+
+part of 'tutorial.dart';
+
+class TutorialDataMapper extends SubClassMapperBase<TutorialData> {
+  TutorialDataMapper._();
+
+  static TutorialDataMapper? _instance;
+  static TutorialDataMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = TutorialDataMapper._());
+      ProjectDataBaseMapper.ensureInitialized().addSubMapper(_instance!);
+      TutorialStepConfigMapper.ensureInitialized();
+      TutorialStepMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'TutorialData';
+
+  static String _$id(TutorialData v) => v.id;
+  static const Field<TutorialData, String> _f$id = Field('id', _$id);
+  static String _$description(TutorialData v) => v.description;
+  static const Field<TutorialData, String> _f$description = Field('description', _$description);
+  static int _$currentStep(TutorialData v) => v.currentStep;
+  static const Field<TutorialData, int> _f$currentStep = Field('currentStep', _$currentStep);
+  static List<TutorialStepConfig> _$configs(TutorialData v) => v.configs;
+  static const Field<TutorialData, List<TutorialStepConfig>> _f$configs = Field('configs', _$configs);
+  static Map<String, TutorialStep> _$steps(TutorialData v) => v.steps;
+  static const Field<TutorialData, Map<String, TutorialStep>> _f$steps = Field('steps', _$steps);
+
+  @override
+  final Map<Symbol, Field<TutorialData, dynamic>> fields = const {
+    #id: _f$id,
+    #description: _f$description,
+    #currentStep: _f$currentStep,
+    #configs: _f$configs,
+    #steps: _f$steps,
+  };
+
+  @override
+  final String discriminatorKey = 'type';
+  @override
+  final dynamic discriminatorValue = 'TutorialData';
+  @override
+  late final ClassMapperBase superMapper = ProjectDataBaseMapper.ensureInitialized();
+
+  static TutorialData _instantiate(DecodingData data) {
+    return TutorialData(
+        data.dec(_f$id), data.dec(_f$description), data.dec(_f$currentStep), data.dec(_f$configs), data.dec(_f$steps));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static TutorialData fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<TutorialData>(map));
+  }
+
+  static TutorialData fromJson(String json) {
+    return _guard((c) => c.fromJson<TutorialData>(json));
+  }
+}
+
+mixin TutorialDataMappable {
+  String toJson() {
+    return TutorialDataMapper._guard((c) => c.toJson(this as TutorialData));
+  }
+
+  Map<String, dynamic> toMap() {
+    return TutorialDataMapper._guard((c) => c.toMap(this as TutorialData));
+  }
+
+  TutorialDataCopyWith<TutorialData, TutorialData, TutorialData> get copyWith =>
+      _TutorialDataCopyWithImpl(this as TutorialData, $identity, $identity);
+  @override
+  String toString() {
+    return TutorialDataMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && TutorialDataMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return TutorialDataMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension TutorialDataValueCopy<$R, $Out> on ObjectCopyWith<$R, TutorialData, $Out> {
+  TutorialDataCopyWith<$R, TutorialData, $Out> get $asTutorialData =>
+      $base.as((v, t, t2) => _TutorialDataCopyWithImpl(v, t, t2));
+}
+
+abstract class TutorialDataCopyWith<$R, $In extends TutorialData, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, TutorialStepConfig, TutorialStepConfigCopyWith<$R, TutorialStepConfig, TutorialStepConfig>>
+      get configs;
+  MapCopyWith<$R, String, TutorialStep, TutorialStepCopyWith<$R, TutorialStep, TutorialStep>> get steps;
+  $R call(
+      {String? id,
+      String? description,
+      int? currentStep,
+      List<TutorialStepConfig>? configs,
+      Map<String, TutorialStep>? steps});
+  TutorialDataCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _TutorialDataCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, TutorialData, $Out>
+    implements TutorialDataCopyWith<$R, TutorialData, $Out> {
+  _TutorialDataCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<TutorialData> $mapper = TutorialDataMapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, TutorialStepConfig, TutorialStepConfigCopyWith<$R, TutorialStepConfig, TutorialStepConfig>>
+      get configs => ListCopyWith($value.configs, (v, t) => v.copyWith.$chain(t), (v) => call(configs: v));
+  @override
+  MapCopyWith<$R, String, TutorialStep, TutorialStepCopyWith<$R, TutorialStep, TutorialStep>> get steps =>
+      MapCopyWith($value.steps, (v, t) => v.copyWith.$chain(t), (v) => call(steps: v));
+  @override
+  $R call(
+          {String? id,
+          String? description,
+          int? currentStep,
+          List<TutorialStepConfig>? configs,
+          Map<String, TutorialStep>? steps}) =>
+      $apply(FieldCopyWithData({
+        if (id != null) #id: id,
+        if (description != null) #description: description,
+        if (currentStep != null) #currentStep: currentStep,
+        if (configs != null) #configs: configs,
+        if (steps != null) #steps: steps
+      }));
+  @override
+  TutorialData $make(CopyWithData data) => TutorialData(
+      data.get(#id, or: $value.id),
+      data.get(#description, or: $value.description),
+      data.get(#currentStep, or: $value.currentStep),
+      data.get(#configs, or: $value.configs),
+      data.get(#steps, or: $value.steps));
+
+  @override
+  TutorialDataCopyWith<$R2, TutorialData, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _TutorialDataCopyWithImpl($value, $cast, t);
+}
+
+class TutorialStepMapper extends SubClassMapperBase<TutorialStep> {
+  TutorialStepMapper._();
+
+  static TutorialStepMapper? _instance;
+  static TutorialStepMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = TutorialStepMapper._());
+      ProjectDataBaseMapper.ensureInitialized().addSubMapper(_instance!);
+      ProjectDataMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'TutorialStep';
+
+  static String _$id(TutorialStep v) => v.id;
+  static const Field<TutorialStep, String> _f$id = Field('id', _$id);
+  static String _$name(TutorialStep v) => v.name;
+  static const Field<TutorialStep, String> _f$name = Field('name', _$name);
+  static String _$text(TutorialStep v) => v.text;
+  static const Field<TutorialStep, String> _f$text = Field('text', _$text);
+  static ProjectData _$step(TutorialStep v) => v.step;
+  static const Field<TutorialStep, ProjectData> _f$step = Field('step', _$step);
+  static ProjectData? _$solution(TutorialStep v) => v.solution;
+  static const Field<TutorialStep, ProjectData> _f$solution = Field('solution', _$solution);
+  static bool _$showSolution(TutorialStep v) => v.showSolution;
+  static const Field<TutorialStep, bool> _f$showSolution = Field('showSolution', _$showSolution, opt: true, def: false);
+
+  @override
+  final Map<Symbol, Field<TutorialStep, dynamic>> fields = const {
+    #id: _f$id,
+    #name: _f$name,
+    #text: _f$text,
+    #step: _f$step,
+    #solution: _f$solution,
+    #showSolution: _f$showSolution,
+  };
+
+  @override
+  final String discriminatorKey = 'type';
+  @override
+  final dynamic discriminatorValue = 'TutorialStep';
+  @override
+  late final ClassMapperBase superMapper = ProjectDataBaseMapper.ensureInitialized();
+
+  static TutorialStep _instantiate(DecodingData data) {
+    return TutorialStep(data.dec(_f$id), data.dec(_f$name), data.dec(_f$text), data.dec(_f$step), data.dec(_f$solution),
+        data.dec(_f$showSolution));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static TutorialStep fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<TutorialStep>(map));
+  }
+
+  static TutorialStep fromJson(String json) {
+    return _guard((c) => c.fromJson<TutorialStep>(json));
+  }
+}
+
+mixin TutorialStepMappable {
+  String toJson() {
+    return TutorialStepMapper._guard((c) => c.toJson(this as TutorialStep));
+  }
+
+  Map<String, dynamic> toMap() {
+    return TutorialStepMapper._guard((c) => c.toMap(this as TutorialStep));
+  }
+
+  TutorialStepCopyWith<TutorialStep, TutorialStep, TutorialStep> get copyWith =>
+      _TutorialStepCopyWithImpl(this as TutorialStep, $identity, $identity);
+  @override
+  String toString() {
+    return TutorialStepMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && TutorialStepMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return TutorialStepMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension TutorialStepValueCopy<$R, $Out> on ObjectCopyWith<$R, TutorialStep, $Out> {
+  TutorialStepCopyWith<$R, TutorialStep, $Out> get $asTutorialStep =>
+      $base.as((v, t, t2) => _TutorialStepCopyWithImpl(v, t, t2));
+}
+
+abstract class TutorialStepCopyWith<$R, $In extends TutorialStep, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  ProjectDataCopyWith<$R, ProjectData, ProjectData> get step;
+  ProjectDataCopyWith<$R, ProjectData, ProjectData>? get solution;
+  $R call({String? id, String? name, String? text, ProjectData? step, ProjectData? solution, bool? showSolution});
+  TutorialStepCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _TutorialStepCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, TutorialStep, $Out>
+    implements TutorialStepCopyWith<$R, TutorialStep, $Out> {
+  _TutorialStepCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<TutorialStep> $mapper = TutorialStepMapper.ensureInitialized();
+  @override
+  ProjectDataCopyWith<$R, ProjectData, ProjectData> get step => $value.step.copyWith.$chain((v) => call(step: v));
+  @override
+  ProjectDataCopyWith<$R, ProjectData, ProjectData>? get solution =>
+      $value.solution?.copyWith.$chain((v) => call(solution: v));
+  @override
+  $R call({String? id, String? name, String? text, ProjectData? step, Object? solution = $none, bool? showSolution}) =>
+      $apply(FieldCopyWithData({
+        if (id != null) #id: id,
+        if (name != null) #name: name,
+        if (text != null) #text: text,
+        if (step != null) #step: step,
+        if (solution != $none) #solution: solution,
+        if (showSolution != null) #showSolution: showSolution
+      }));
+  @override
+  TutorialStep $make(CopyWithData data) => TutorialStep(
+      data.get(#id, or: $value.id),
+      data.get(#name, or: $value.name),
+      data.get(#text, or: $value.text),
+      data.get(#step, or: $value.step),
+      data.get(#solution, or: $value.solution),
+      data.get(#showSolution, or: $value.showSolution));
+
+  @override
+  TutorialStepCopyWith<$R2, TutorialStep, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _TutorialStepCopyWithImpl($value, $cast, t);
+}
+
+class TutorialResponseMapper extends ClassMapperBase<TutorialResponse> {
+  TutorialResponseMapper._();
+
+  static TutorialResponseMapper? _instance;
+  static TutorialResponseMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = TutorialResponseMapper._());
+      TutorialConfigMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'TutorialResponse';
+
+  static TutorialConfig? _$tutorial(TutorialResponse v) => v.tutorial;
+  static const Field<TutorialResponse, TutorialConfig> _f$tutorial = Field('tutorial', _$tutorial);
+  static String? _$error(TutorialResponse v) => v.error;
+  static const Field<TutorialResponse, String> _f$error = Field('error', _$error);
+
+  @override
+  final Map<Symbol, Field<TutorialResponse, dynamic>> fields = const {
+    #tutorial: _f$tutorial,
+    #error: _f$error,
+  };
+
+  static TutorialResponse _instantiate(DecodingData data) {
+    return TutorialResponse(data.dec(_f$tutorial), data.dec(_f$error));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static TutorialResponse fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<TutorialResponse>(map));
+  }
+
+  static TutorialResponse fromJson(String json) {
+    return _guard((c) => c.fromJson<TutorialResponse>(json));
+  }
+}
+
+mixin TutorialResponseMappable {
+  String toJson() {
+    return TutorialResponseMapper._guard((c) => c.toJson(this as TutorialResponse));
+  }
+
+  Map<String, dynamic> toMap() {
+    return TutorialResponseMapper._guard((c) => c.toMap(this as TutorialResponse));
+  }
+
+  TutorialResponseCopyWith<TutorialResponse, TutorialResponse, TutorialResponse> get copyWith =>
+      _TutorialResponseCopyWithImpl(this as TutorialResponse, $identity, $identity);
+  @override
+  String toString() {
+    return TutorialResponseMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && TutorialResponseMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return TutorialResponseMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension TutorialResponseValueCopy<$R, $Out> on ObjectCopyWith<$R, TutorialResponse, $Out> {
+  TutorialResponseCopyWith<$R, TutorialResponse, $Out> get $asTutorialResponse =>
+      $base.as((v, t, t2) => _TutorialResponseCopyWithImpl(v, t, t2));
+}
+
+abstract class TutorialResponseCopyWith<$R, $In extends TutorialResponse, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
+  TutorialConfigCopyWith<$R, TutorialConfig, TutorialConfig>? get tutorial;
+  $R call({TutorialConfig? tutorial, String? error});
+  TutorialResponseCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _TutorialResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, TutorialResponse, $Out>
+    implements TutorialResponseCopyWith<$R, TutorialResponse, $Out> {
+  _TutorialResponseCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<TutorialResponse> $mapper = TutorialResponseMapper.ensureInitialized();
+  @override
+  TutorialConfigCopyWith<$R, TutorialConfig, TutorialConfig>? get tutorial =>
+      $value.tutorial?.copyWith.$chain((v) => call(tutorial: v));
+  @override
+  $R call({Object? tutorial = $none, Object? error = $none}) =>
+      $apply(FieldCopyWithData({if (tutorial != $none) #tutorial: tutorial, if (error != $none) #error: error}));
+  @override
+  TutorialResponse $make(CopyWithData data) =>
+      TutorialResponse(data.get(#tutorial, or: $value.tutorial), data.get(#error, or: $value.error));
+
+  @override
+  TutorialResponseCopyWith<$R2, TutorialResponse, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _TutorialResponseCopyWithImpl($value, $cast, t);
+}
+
+class TutorialConfigMapper extends ClassMapperBase<TutorialConfig> {
+  TutorialConfigMapper._();
+
+  static TutorialConfigMapper? _instance;
+  static TutorialConfigMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = TutorialConfigMapper._());
+      TutorialStepConfigMapper.ensureInitialized();
+      TutorialStepMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'TutorialConfig';
+
+  static String _$id(TutorialConfig v) => v.id;
+  static const Field<TutorialConfig, String> _f$id = Field('id', _$id);
+  static String _$name(TutorialConfig v) => v.name;
+  static const Field<TutorialConfig, String> _f$name = Field('name', _$name);
+  static List<TutorialStepConfig> _$steps(TutorialConfig v) => v.steps;
+  static const Field<TutorialConfig, List<TutorialStepConfig>> _f$steps = Field('steps', _$steps);
+  static TutorialStep _$initialStep(TutorialConfig v) => v.initialStep;
+  static const Field<TutorialConfig, TutorialStep> _f$initialStep = Field('initialStep', _$initialStep);
+
+  @override
+  final Map<Symbol, Field<TutorialConfig, dynamic>> fields = const {
+    #id: _f$id,
+    #name: _f$name,
+    #steps: _f$steps,
+    #initialStep: _f$initialStep,
+  };
+
+  static TutorialConfig _instantiate(DecodingData data) {
+    return TutorialConfig(data.dec(_f$id), data.dec(_f$name), data.dec(_f$steps), data.dec(_f$initialStep));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static TutorialConfig fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<TutorialConfig>(map));
+  }
+
+  static TutorialConfig fromJson(String json) {
+    return _guard((c) => c.fromJson<TutorialConfig>(json));
+  }
+}
+
+mixin TutorialConfigMappable {
+  String toJson() {
+    return TutorialConfigMapper._guard((c) => c.toJson(this as TutorialConfig));
+  }
+
+  Map<String, dynamic> toMap() {
+    return TutorialConfigMapper._guard((c) => c.toMap(this as TutorialConfig));
+  }
+
+  TutorialConfigCopyWith<TutorialConfig, TutorialConfig, TutorialConfig> get copyWith =>
+      _TutorialConfigCopyWithImpl(this as TutorialConfig, $identity, $identity);
+  @override
+  String toString() {
+    return TutorialConfigMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && TutorialConfigMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return TutorialConfigMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension TutorialConfigValueCopy<$R, $Out> on ObjectCopyWith<$R, TutorialConfig, $Out> {
+  TutorialConfigCopyWith<$R, TutorialConfig, $Out> get $asTutorialConfig =>
+      $base.as((v, t, t2) => _TutorialConfigCopyWithImpl(v, t, t2));
+}
+
+abstract class TutorialConfigCopyWith<$R, $In extends TutorialConfig, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, TutorialStepConfig, TutorialStepConfigCopyWith<$R, TutorialStepConfig, TutorialStepConfig>>
+      get steps;
+  TutorialStepCopyWith<$R, TutorialStep, TutorialStep> get initialStep;
+  $R call({String? id, String? name, List<TutorialStepConfig>? steps, TutorialStep? initialStep});
+  TutorialConfigCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _TutorialConfigCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, TutorialConfig, $Out>
+    implements TutorialConfigCopyWith<$R, TutorialConfig, $Out> {
+  _TutorialConfigCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<TutorialConfig> $mapper = TutorialConfigMapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, TutorialStepConfig, TutorialStepConfigCopyWith<$R, TutorialStepConfig, TutorialStepConfig>>
+      get steps => ListCopyWith($value.steps, (v, t) => v.copyWith.$chain(t), (v) => call(steps: v));
+  @override
+  TutorialStepCopyWith<$R, TutorialStep, TutorialStep> get initialStep =>
+      $value.initialStep.copyWith.$chain((v) => call(initialStep: v));
+  @override
+  $R call({String? id, String? name, List<TutorialStepConfig>? steps, TutorialStep? initialStep}) =>
+      $apply(FieldCopyWithData({
+        if (id != null) #id: id,
+        if (name != null) #name: name,
+        if (steps != null) #steps: steps,
+        if (initialStep != null) #initialStep: initialStep
+      }));
+  @override
+  TutorialConfig $make(CopyWithData data) => TutorialConfig(
+      data.get(#id, or: $value.id),
+      data.get(#name, or: $value.name),
+      data.get(#steps, or: $value.steps),
+      data.get(#initialStep, or: $value.initialStep));
+
+  @override
+  TutorialConfigCopyWith<$R2, TutorialConfig, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _TutorialConfigCopyWithImpl($value, $cast, t);
+}
+
+class TutorialStepConfigMapper extends ClassMapperBase<TutorialStepConfig> {
+  TutorialStepConfigMapper._();
+
+  static TutorialStepConfigMapper? _instance;
+  static TutorialStepConfigMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = TutorialStepConfigMapper._());
+    }
+    return _instance!;
+  }
+
+  static T _guard<T>(T Function(MapperContainer) fn) {
+    ensureInitialized();
+    return fn(MapperContainer.globals);
+  }
+
+  @override
+  final String id = 'TutorialStepConfig';
+
+  static String _$id(TutorialStepConfig v) => v.id;
+  static const Field<TutorialStepConfig, String> _f$id = Field('id', _$id);
+  static String _$name(TutorialStepConfig v) => v.name;
+  static const Field<TutorialStepConfig, String> _f$name = Field('name', _$name);
+
+  @override
+  final Map<Symbol, Field<TutorialStepConfig, dynamic>> fields = const {
+    #id: _f$id,
+    #name: _f$name,
+  };
+
+  static TutorialStepConfig _instantiate(DecodingData data) {
+    return TutorialStepConfig(data.dec(_f$id), data.dec(_f$name));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static TutorialStepConfig fromMap(Map<String, dynamic> map) {
+    return _guard((c) => c.fromMap<TutorialStepConfig>(map));
+  }
+
+  static TutorialStepConfig fromJson(String json) {
+    return _guard((c) => c.fromJson<TutorialStepConfig>(json));
+  }
+}
+
+mixin TutorialStepConfigMappable {
+  String toJson() {
+    return TutorialStepConfigMapper._guard((c) => c.toJson(this as TutorialStepConfig));
+  }
+
+  Map<String, dynamic> toMap() {
+    return TutorialStepConfigMapper._guard((c) => c.toMap(this as TutorialStepConfig));
+  }
+
+  TutorialStepConfigCopyWith<TutorialStepConfig, TutorialStepConfig, TutorialStepConfig> get copyWith =>
+      _TutorialStepConfigCopyWithImpl(this as TutorialStepConfig, $identity, $identity);
+  @override
+  String toString() {
+    return TutorialStepConfigMapper._guard((c) => c.asString(this));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (runtimeType == other.runtimeType && TutorialStepConfigMapper._guard((c) => c.isEqual(this, other)));
+  }
+
+  @override
+  int get hashCode {
+    return TutorialStepConfigMapper._guard((c) => c.hash(this));
+  }
+}
+
+extension TutorialStepConfigValueCopy<$R, $Out> on ObjectCopyWith<$R, TutorialStepConfig, $Out> {
+  TutorialStepConfigCopyWith<$R, TutorialStepConfig, $Out> get $asTutorialStepConfig =>
+      $base.as((v, t, t2) => _TutorialStepConfigCopyWithImpl(v, t, t2));
+}
+
+abstract class TutorialStepConfigCopyWith<$R, $In extends TutorialStepConfig, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({String? id, String? name});
+  TutorialStepConfigCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _TutorialStepConfigCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, TutorialStepConfig, $Out>
+    implements TutorialStepConfigCopyWith<$R, TutorialStepConfig, $Out> {
+  _TutorialStepConfigCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<TutorialStepConfig> $mapper = TutorialStepConfigMapper.ensureInitialized();
+  @override
+  $R call({String? id, String? name}) =>
+      $apply(FieldCopyWithData({if (id != null) #id: id, if (name != null) #name: name}));
+  @override
+  TutorialStepConfig $make(CopyWithData data) =>
+      TutorialStepConfig(data.get(#id, or: $value.id), data.get(#name, or: $value.name));
+
+  @override
+  TutorialStepConfigCopyWith<$R2, TutorialStepConfig, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _TutorialStepConfigCopyWithImpl($value, $cast, t);
+}

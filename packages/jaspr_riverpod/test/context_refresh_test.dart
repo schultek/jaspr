@@ -5,24 +5,17 @@ import 'package:jaspr_test/jaspr_test.dart';
 import 'utils.dart';
 
 final counter = StateProvider((ref) => 0);
-final counterB = StateProvider((ref) => 10);
 
 void main() {
   group('context.refresh', () {
-    late ComponentTester tester;
-
-    setUp(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test(
+    testComponents(
       'refreshes provider state',
-      () async {
+      (tester) async {
         await tester.pumpComponent(providerApp((context) sync* {
           yield Button(
             label: '${context.watch(counter)}',
             onPressed: () {
-              context.read(counter.state).state++;
+              context.read(counter.notifier).state++;
             },
           );
 
@@ -50,16 +43,16 @@ void main() {
       },
     );
 
-    test(
+    testComponents(
       'refreshes overridden provider state',
-      () async {
+      (tester) async {
         await tester.pumpComponent(providerApp((context) sync* {
           yield Builder(builder: (context) sync* {
             yield Button(
               key: const ValueKey('a'),
               label: 'a ${context.watch(counter)}',
               onPressed: () {
-                context.read(counter.state).state++;
+                context.read(counter.notifier).state++;
               },
             );
             yield Button(
@@ -70,13 +63,13 @@ void main() {
             );
           });
           yield ProviderScope(
-            overrides: [counter.overrideWithProvider(counterB)],
+            overrides: [counter.overrideWith((ref) => 10)],
             child: Builder(builder: (context) sync* {
               yield Button(
                 key: const ValueKey('b'),
                 label: 'b ${context.watch(counter)}',
                 onPressed: () {
-                  context.read(counter.state).state++;
+                  context.read(counter.notifier).state++;
                 },
               );
               yield Button(

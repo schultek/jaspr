@@ -70,7 +70,7 @@ part of framework;
 ///    be read by descendant components.
 abstract class StatelessComponent extends Component {
   /// Initializes [key] for subclasses.
-  const StatelessComponent({Key? key}) : super(key: key);
+  const StatelessComponent({super.key});
 
   /// Creates a [StatelessElement] to manage this component's location in the tree.
   ///
@@ -137,16 +137,15 @@ class StatelessElement extends MultiChildElement {
   Iterable<Component> build() => component.build(this);
 
   @override
-  void _firstBuild() {
-    if (owner.isFirstBuild && component is OnFirstBuild) {
+  void _firstBuild([VoidCallback? onBuilt]) {
+    if (owner.isFirstBuild && !binding.isClient && component is OnFirstBuild) {
       var result = (component as OnFirstBuild).onFirstBuild(this);
       if (result is Future) {
-        _asyncFirstBuild = result.then((_) {
-          _asyncFirstBuild = null;
-        });
+        _asyncFirstBuild = result;
+        result.whenComplete(() => _asyncFirstBuild = null);
       }
     }
-    super._firstBuild();
+    super._firstBuild(onBuilt);
   }
 
   @override

@@ -7,7 +7,9 @@
 /// Asynchronous computations are represented by [Future]s and [Stream]s.
 import 'dart:async' show StreamSubscription;
 
-import '../../foundation.dart';
+import 'package:meta/meta.dart';
+
+import '../foundation/object.dart';
 import '../framework/framework.dart';
 
 /// Base class for components that build themselves based on interaction with

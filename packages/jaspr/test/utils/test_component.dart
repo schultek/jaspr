@@ -2,20 +2,26 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
 extension PumpTestComponent on ComponentTester {
-  Future<TestComponentController> pumpTestComponent<T>(TestComponent<T> component) async {
+  Future<TestComponentController<T>> pumpTestComponent<T>(TestComponent<T> component) async {
     await pumpComponent(component);
-    return TestComponentController().._element = binding.rootElement!.child;
+    late Element testElem;
+    binding.rootElement!.visitChildren((element) {
+      testElem = element;
+    });
+    return TestComponentController(testElem);
   }
 }
 
 class TestComponentController<T> {
-  Element? _element;
-  StatefulElement get element => _element! as StatefulElement;
+  TestComponentController(this._element);
 
-  _TestState get state => element.state as _TestState;
+  final Element _element;
+  StatefulElement get element => _element as StatefulElement;
+
+  TestState get state => element.state as TestState;
 
   Future<void> rebuild() {
-    _element?.markNeedsBuild();
+    _element.markNeedsBuild();
     return pumpEventQueue();
   }
 
@@ -34,10 +40,10 @@ abstract class TestComponent<T> extends StatefulComponent {
   Iterable<Component> build(BuildContext context, T value);
 
   @override
-  State<StatefulComponent> createState() => _TestState();
+  State<StatefulComponent> createState() => TestState();
 }
 
-class _TestState<T> extends State<TestComponent> {
+class TestState<T> extends State<TestComponent> {
   late T value;
 
   @override

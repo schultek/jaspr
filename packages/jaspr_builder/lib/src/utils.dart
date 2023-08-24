@@ -1,34 +1,46 @@
+// ignore_for_file: implementation_imports
+
+import 'package:analyzer/dart/analysis/results.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
+import 'package:jaspr/src/foundation/annotations.dart' show ClientAnnotation, Import;
+import 'package:jaspr/src/framework/framework.dart' show Component, Key;
+import 'package:source_gen/source_gen.dart';
 
-extension TransitiveTypeElements on DartType {
-  Iterable<Element> get transitiveElements {
-    var t = this;
-    if (t is ParameterizedType) {
-      return [
-        if (!_standardType()) element!,
-        ...t.typeArguments.expand((t) => t.transitiveElements),
-      ];
-    } else if (t is VoidType || t is DynamicType) {
-      return [];
-    } else if (t is TypeParameterType) {
-      return t.bound.transitiveElements;
-    } else if (t is FunctionType) {
-      return [
-        ...t.returnType.transitiveElements,
-        ...t.parameters.expand((p) => p.type.transitiveElements),
-        ...t.typeFormals.expand((t) => t.bound?.transitiveElements ?? []),
-      ];
-    } else {
-      print("UNSUPPORTED ${t.runtimeType}");
-      return [if (t.element != null) t.element!];
-    }
+const String generationHeader = "// GENERATED FILE, DO NOT MODIFY\n"
+    "// Generated with jaspr_builder\n";
+
+var clientChecker = TypeChecker.fromRuntime(ClientAnnotation);
+var componentChecker = TypeChecker.fromRuntime(Component);
+final keyChecker = TypeChecker.fromRuntime(Key);
+var importChecker = TypeChecker.fromRuntime(Import);
+
+class ImportEntry {
+  String url;
+  List<String> show;
+  final int platform;
+
+  ImportEntry(this.url, this.show, this.platform);
+
+  Map<String, dynamic> toJson() {
+    return {'url': url, 'show': show, 'platform': platform};
   }
+}
 
-  bool _standardType() {
-    if (element?.library?.isInSdk ?? true) {
-      return ['dart.core', 'dart.async'].contains(element?.library?.name);
+extension TypeStub on String {
+  bool get isType {
+    var n = substring(0, 1);
+    return n.toLowerCase() != n;
+  }
+}
+
+extension ElementNode on Element {
+  AstNode? get node {
+    var result = session?.getParsedLibraryByElement(library!);
+    if (result is ParsedLibraryResult) {
+      return result.getElementDeclaration(this)?.node;
+    } else {
+      return null;
     }
-    return false;
   }
 }

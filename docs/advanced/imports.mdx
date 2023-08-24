@@ -1,0 +1,80 @@
+---
+title: Platform Imports
+description: How to use platform-specific imports in Jaspr.
+previous: /advanced/backend
+next: /eco/flutter_embedding
+---
+
+# 📎 Platform Imports
+
+Jaspr normally runs both on the server and client. The same code will be compiled twice for the server and
+the web. Most of the time this isn't an issue, however sometimes you might want to use a package or library that
+is only supported on one side, like:
+
+- `dart:html` will only work on the client,
+- `dart:io` will only work on the server.
+
+When you want to use such a library in your project, you would have to resort to *conditional imports*, 
+which are quite cumbersome to use since you have to create multiple files and stub everything you want to use.
+
+`Jaspr` can do this for you using the `@Import` annotation. Say you have the following component:
+
+```dart
+import 'dart:html' show window;
+
+import 'package:jaspr/jaspr.dart';
+
+class App extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    if (kIsWeb) {
+      window.alert('Hi Jaspr');
+    }
+    yield DomComponent(
+      tag: 'p',
+      child: Text('Hello World'),
+    );
+  }
+}
+```
+
+This component wants to show an alert when build, but only on web. We can correctly use the `kIsWeb`
+constant to check the platform **during runtime**, but this example would still lead to a 
+**compile time error** when running on the server - because `dart:html` is unsupported there.
+
+With jasprs **platform-specific imports** you can change the code to this:
+
+```dart
+@Import.onWeb('dart:html', show: [#window])
+import 'app.imports.dart';
+
+import 'package:jaspr/jaspr.dart';
+
+class App extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    if (kIsWeb) {
+      window.alert('Hi Jaspr');
+    }
+    yield DomComponent(
+      tag: 'p',
+      child: Text('Hello World'),
+    );
+  }
+}
+```
+
+This will auto-generate:
+
+- the `app.imports.dart` file
+- conditional imports for `dart:html` on the web
+- stubs on the server.
+
+You can extend this to multiple imports and mix web and server imports like this:
+
+```dart
+@Import.onWeb('dart:html', show: [#window])
+@Import.onWeb('package:some_js_package', show: [#someMember])
+@Import.onServer('dart:io', show: [#Platform])
+import 'app.imports.dart';
+```

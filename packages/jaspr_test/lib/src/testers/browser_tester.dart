@@ -1,58 +1,55 @@
 import 'dart:async';
 import 'dart:html' as html;
 
-import 'package:domino/browser.dart' show registerView;
 import 'package:jaspr/browser.dart';
+import 'package:meta/meta.dart';
+import 'package:test/test.dart';
 
-import '../../jaspr_test.dart';
+import '../binding.dart';
+import '../finders.dart';
 
+@isTest
+void testBrowser(
+  String description,
+  FutureOr<void> Function(BrowserTester tester) callback, {
+  String location = '/',
+  bool? skip,
+  Timeout? timeout,
+  dynamic tags,
+}) {
+  test(
+    description,
+    () async {
+      if (html.window.location.pathname != location) {
+        html.window.history.replaceState(null, 'Test', location);
+      }
+
+      var binding = TestBrowserComponentsBinding();
+      var tester = BrowserTester._(binding);
+
+      return binding.runTest(() async {
+        await callback(tester);
+      });
+    },
+    skip: skip,
+    timeout: timeout,
+    tags: tags,
+  );
+}
+
+/// Tests any jaspr app in a headless browser environment.
 class BrowserTester {
-  BrowserTester._(this.binding, this._attachTo);
+  BrowserTester._(this.binding);
 
   final TestBrowserComponentsBinding binding;
-  final String _attachTo;
 
-  static BrowserTester setUp({
-    String attachTo = 'body',
-    String location = '/',
-    Map<String, dynamic>? initialStateData,
-    Map<String, dynamic> Function(String url)? onFetchState,
-  }) {
-    if (initialStateData != null) {
-      html.document.body!.attributes['state-data'] = stateCodec.encode(initialStateData);
-    }
-
-    if (html.window.location.pathname != location) {
-      html.window.history.replaceState(null, 'Test', location);
-    }
-
-    var binding = TestBrowserComponentsBinding(onFetchState);
-    return BrowserTester._(binding, attachTo);
+  Future<void> pumpComponent(Component component, {Map<String, dynamic>? initialSyncState, String attachTo = 'body'}) {
+    binding._initialSyncState = initialSyncState;
+    return binding.attachRootComponent(component, attachTo: attachTo);
   }
 
-  static void tearDown() {}
-
-  Future<void> pumpComponent(Component component) {
-    return binding.attachRootComponent(component, attachTo: _attachTo);
-  }
-
-  Future<void> navigate(Function(RouterState) navigate, {bool pump = true}) async {
-    RouterState? router;
-    findRouter(Element element) {
-      if (element is StatefulElement && element.state is RouterState) {
-        router = element.state as RouterState;
-      } else {
-        element.visitChildren(findRouter);
-      }
-    }
-
-    binding.rootElement!.visitChildren(findRouter);
-    if (router != null) {
-      navigate(router!);
-      if (pump) {
-        await pumpEventQueue();
-      }
-    }
+  void stubFetchState(Map<String, dynamic> Function(String url) onFetchState) {
+    binding._onFetchState = onFetchState;
   }
 
   Future<void> click(Finder finder, {bool pump = true}) async {
@@ -65,7 +62,7 @@ class BrowserTester {
   void dispatchEvent(Finder finder, String event, dynamic data) {
     var element = _findDomElement(finder);
 
-    var source = element.source as html.Element;
+    var source = element.nativeElement!;
     source.dispatchEvent(html.MouseEvent('click'));
   }
 
@@ -85,35 +82,34 @@ class BrowserTester {
       return element;
     }
 
-    DomElement? _foundElement;
+    DomElement? foundElement;
 
-    void _findFirstDomElement(Element e) {
+    void findFirstDomElement(Element e) {
       if (e is DomElement) {
-        _foundElement = e;
+        foundElement = e;
         return;
       }
-      e.visitChildren(_findFirstDomElement);
+      e.visitChildren(findFirstDomElement);
     }
 
-    _findFirstDomElement(element);
+    findFirstDomElement(element);
 
-    if (_foundElement == null) {
+    if (foundElement == null) {
       throw 'The finder "$finder" could not find a dom element.';
     }
 
-    return _foundElement!;
+    return foundElement!;
   }
 }
 
-class TestBrowserComponentsBinding extends AppBinding {
-  TestBrowserComponentsBinding(this._onFetchState);
+class TestBrowserComponentsBinding extends BrowserAppBinding {
+  Map<String, dynamic>? _initialSyncState;
+  Map<String, dynamic> Function(String url)? _onFetchState;
 
   @override
-  void didAttachRootElement(BuildScheduler element, {required String to}) {
-    element.view = registerView(root: html.document.querySelector(to)!, builderFn: element.render);
+  Map<String, dynamic>? loadSyncState() {
+    return _initialSyncState;
   }
-
-  final Map<String, dynamic> Function(String url)? _onFetchState;
 
   @override
   Future<Map<String, dynamic>> fetchState(String url) async {

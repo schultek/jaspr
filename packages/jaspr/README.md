@@ -1,39 +1,79 @@
-![Banner](/assets/jaspr_banner.png)
+![Banner](https://github.com/schultek/jaspr/raw/main/assets/jaspr_banner.png)
 
-# jaspr
+<p align="center">
+  <a href="https://pub.dev/packages/jaspr"><img src="https://img.shields.io/pub/v/jaspr?label=pub.dev&logo=dart" alt="pub"></a>
+  <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/stars/schultek/jaspr?logo=github" alt="github"></a>
+  <a href="https://github.com/schultek/jaspr/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/schultek/jaspr/test.yml?branch=main&label=tests&labelColor=333940&logo=github" alt="tests"></a>
+  <a href="https://app.codecov.io/gh/schultek/jaspr"><img src="https://img.shields.io/codecov/c/github/schultek/jaspr?logo=codecov&logoColor=fff&labelColor=333940" alt="codecov"></a>
+  <a href="https://discord.gg/XGXrGEk4c6"><img src="https://img.shields.io/discord/993167615587520602?logo=discord" alt="discord"></a>
+  <a href="https://github.com/schultek/jaspr"><img src="https://img.shields.io/github/contributors/schultek/jaspr?logo=github" alt="contributors"></a>
+</p>
 
-Experimental web framework for Dart. Supports SPAs and SSR.
+<p align="center">
+  <a href="https://docs.page/schultek/jaspr/quick-start">Quickstart</a> •
+  <a href="https://docs.page/schultek/jaspr">Documentation</a> •
+  <a href="https://jasprpad.schultek.de">Playground</a> •
+  <a href="https://github.com/schultek/jaspr/tree/main/examples/">Examples</a> •
+  <a href="https://discord.gg/XGXrGEk4c6">Community & Support</a> •
+  <a href="https://jaspr-benchmarks.web.app">Benchmarks</a>
+</p>
 
-**Main Features:**
+<p align="center">
+  <a href="https://github.com/sponsors/schultek"><img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white" alt="sponsor"></a>
+</p>
 
-- Familiar component model similar to Flutter widgets
-- Easy Server Side Rendering
-- Automatic hydration of component data on the client
-- Fast incremental DOM updates
-- Well tested (>70% test coverage)
+# Jaspr
 
-> I'm looking for contributors. Don't hesitate to contact me if you want to help in any way.
+> A modern web framework for building websites in Dart with support for both **client-side** and **server-side rendering**.
+
+- 🔮 **Why?**: Jaspr was made with the premise to make a web-framework that looks and feels just like Flutter, but
+  renders normal html/css like Vue or React.
+- 👥 **Who?**: Jaspr is targeted mainly at Flutter developers that want to build any type of websites
+  (especially ones that are not suitable for Flutter Web).
+- 🚀 **What?**: Jaspr wants to push the boundaries of Dart on the web and server, by giving you a thought-through fullstack
+  web framework written completely in Dart.
+
+> Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of
+> developers around Jaspr and check out the [Contributing Guide](https://docs.page/schultek/jaspr/eco/contributing).
+
+### Core Features
+
+- 💙 **Familiar**: Works with a similar component model to flutter widgets.
+- 🏗 **Powerful**: Comes with server side rendering out of the box.
+- ♻️ **Easy**: Syncs component state between server and client automatically.
+- ⚡️ **Fast**: Performs incremental DOM updates only where needed.
+- 🎛 **Flexible**: Runs on the server, client or both with manual or automatic setup. You decide.
+
+> If you want to say thank you, star the project on GitHub and like the package on pub.dev 🙌💙
+
+### Online Editor & Playground
+
+Inspired by DartPad, **Jaspr** has it's own online editor and playground, called **JasprPad**.
+
+[Check it out here!](https://jasprpad.schultek.de)
+
+You can check out the samples, take the tutorial or try out jaspr for yourself, all live in the browser.
+When you want to continue coding offline, you can quickly download the current files bundled in a complete dart project, ready to start coding locally.
+
+JasprPad is also built with **Jaspr** itself, so you can [**check out its source code**](https://github.com/schultek/jaspr/tree/main/apps/jaspr_pad) to get a feel for how jaspr would be used in a larger app.
+
+![JasprPad Screenshot](https://user-images.githubusercontent.com/13920539/170837732-9e09d5f3-e79e-4ddd-b118-72e49456a7cd.png)
 
 ## Outline
 
 - [Get Started](#get-started)
 - [CLI Tool](#cli-tool)
 - [Framework](#framework)
-  - [Components](#components)
-  - [Differences to Flutter](#differences-to-flutter)
-  - [Preloading Data](#preloading-data)
-  - [Syncing Data](#syncing-data)
-  - [Routing](#routing)
-    - [Lazy Routes](#lazy-routes)
+- [Differences to Flutter(-Web)](#differences-to-flutter-web)
 - [Building](#building)
 - [Testing](#testing)
 
 ## Get Started
 
-To get started simply activate the `jasper` command line tool and run `jaspr create`:
+To get started simply activate the `jasper_cli` command line tool and run `jaspr create`:
 
 ```shell
-dart pub global activate jaspr
+dart pub global activate jaspr_cli
 jaspr create my_web_app
 ```
 
@@ -41,13 +81,11 @@ Next, run the development server using the following command:
 
 ```shell
 cd my_web_app
-dart run jaspr serve
+jaspr serve
 ```
 
 This will spin up a server at `localhost:8080`. You can now start developing your web app. 
 Also observe that the browser automatically refreshes the page when you change something in your code, like the `Hello World` text.
-
-**I also highly recommend having a look at the example [here](https://github.com/schultek/jaspr/tree/main/jaspr/example)**
 
 ## CLI Tool
 
@@ -60,9 +98,7 @@ Jaspr comes with a cli tool to create, serve and build your web app.
 ## Framework
 
 Jaspr was developed with the premise to look and feel just like Flutter. Therefore when you know Flutter
-you probably already know jaspr.
-
-### Components
+you probably already know jaspr (in large parts).
 
 The core building block of UIs build with jaspr are **Components**. These are just what you know 
 as **Widgets** from Flutter. jaspr comes with all three base types of Components, namely:
@@ -89,9 +125,10 @@ In addition to these base components, there are two more components that don't e
   
 - **Text**: A simple component that renders a text node.
   `var text = Text('Hello World!');`
+  
+[Check the Wiki for more](https://docs.page/schultek/jaspr)
 
-
-### Differences to Flutter
+## Differences to Flutter(-Web)
 
 As you might know Flutter renders Widgets by manually painting pixels to a canvas. However rendering web-pages
 with HTML & CSS works fundamentally different to Flutters painting approach. Also Flutter has a vast variety
@@ -133,139 +170,6 @@ Rather it embraces these differences to give the best of both worlds.
    *Trade-Off: Giving `Text` a style option would be superficial and not native to web, and thereby not
     a good practice.*
    
-
-### Preloading Data
-
-When using server side rendering, you have the ability to preload data for your stateful components before rendering the html.
-With `jaspr` this is build into the package and easy to do.
-
-Start by using the `PreloadStateMixin` on your component state and implement the `Future<T> preloadState()` method.
-
-```dart
-class MyState extends State<MyStatefulComponent> with PreloadStateMixin<MyStatefulComponent> {
-  
-  @override
-  Future<void> preloadState() async {
-    ...
-  }
-}
-```
-
-### Syncing Data
-
-Alongside with preloading some data on the server, you often want to sync the data with the client.
-You can simply add the `SyncStateMixin` which will automatically sync state from the server with the client.
-
-The `SyncStateMixin` accepts a second type argument for the data type that you want to sync. You the have to
-implement the the `saveState` and `updateState()` methods.
-
-```dart
-class MyState extends State<MyStatefulComponent> with SyncStateMixin<MyStatefulComponent, MyStateModel> {
-
-  MyStateModel? model;
-  
-  // a globally unique id that is used to identify the state
-  @override
-  String get syncId => 'my_id';
-
-  // this will save the state to be sent to the client
-  // and is only executed on the server
-  @override
-  MyStateModel? saveState() {
-    return model;
-  }
-
-  // this will receive the state on the client
-  // and it is safe to call setState
-  void updateState(MyStateModel? value) {
-    setState(() {
-      model = value;
-    });
-  }
-}
-```
-
-In order to send the data, it needs to be serialized on the server and deserialized on the client.
-The serialization format is defined by the `syncCodec` getter defined in `SyncStateMixin`.
-
-By default, this is set to `StateJsonCodec()` which will encode your state to JSON. Be aware that this 
-only works for JSON-encodable types, like primitives, `List`s and `Map`s.
-
-When you want to use another type like a custom model class, you have to override the `syncCodec` getter, which
-has to return a `Codec` that encodes to `String`. This can be any codec, however a typical use would be to 
-encode your model to `Map<String, dynamic>` and the fuse this with the json codec to get a json string.
-
-```dart
-
-class MyState extends State<MyStatefulComponent> with SyncStateMixin<MyStatefulComponent, MyStateModel> {
-
-  @override
-  Codec<MyStateModel, String> get syncCodec => MyStateModelCodec().fuse(StateJsonCodec());
-
-  ...
-}
-
-// codec that encodes a value of MyStateModel to Map<String, dynamic>
-class MyStateModelCodec extends Codec<MyStateModel, Map<String, dynamic>> {
-  
-  ...
-  
-}
-```
-
-### Routing
-
-Use can use the `Router` component for some basic routing. It takes a list of `Route`s or 
-optionally a `onGenerateRoute` callback.
-
-A simple use looks like this:
-
-```dart
-import 'pages/home.dart';
-import 'pages/about.dart' ;
-
-class App extends StatelessComponent {
-  @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Router(
-      routes: [
-        Route('/', (context) => Home()),
-        Route('/about', (context) => About()),
-      ],
-    );
-  }
-}
-```
-
-To push a new route call `Router.of(context).push('/path');` inside your child components. Similarly you can call `.replace()` or `.back()`.
-
-#### Lazy Routes
-
-For larger web apps, we don't want to load everything together, but rather split our pages into smaller chunks.
-`jaspr` can do this automatically using `LazyRoutes` and deferred imports.
-
-To use lazy routes, change the above code to the following:
-
-```dart
-import 'pages/home.dart' deferred as home;
-import 'pages/about.dart' deferred as about;
-
-class App extends StatelessComponent {
-  @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Router(
-      routes: [
-        Route.lazy('/', (context) => home.Home(), home.loadLibrary),
-        Route.lazy('/about', (context) => About(), about.loadLibrary),
-      ],
-    );
-  }
-}
-```
-
-This will lazy load the appropriate javascript files for each route when navigating to it. 
-You can also mix normal and lazy routes.
-
 ## Building
 
 You can build your application using the following command:
@@ -287,6 +191,7 @@ cd build
 ## Testing
 
 `jaspr` comes with it's own testing package `jaspr_test`.
+It is built as a layer on top of `package:test` and has a similar api to `flutter_test`.
 
 A simple component test looks like this:
 
@@ -316,4 +221,6 @@ void main() {
 }
 ```
 
-For more examples on how to use the testing package, check out the [tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/jaspr/test).
+For more examples on how to use the testing package, check out the 
+[documentation](https://docs.page/schultek/jaspr/testing) and the 
+[tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/packages/jaspr/test).

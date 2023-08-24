@@ -1,15 +1,68 @@
 builders:
-  jaspr_builder:
+  client_module:
     import: "package:jaspr_builder/builder.dart"
-    builder_factories: [ "buildWebFake" ]
-    build_extensions: { ".web.dart": [ ".stub.dart", ".dart" ] }
+    builder_factories: [ "buildClientModule" ]
+    build_extensions:
+      "lib/{{file}}.dart":
+        - "lib/{{file}}.client.json"
+        - "web/{{file}}.client.dart"
+    auto_apply: dependents
+    build_to: cache
+  client_component:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildClientPart" ]
+    build_extensions:
+      "^lib/{{file}}.client.json":
+        - "lib/{{file}}.g.dart"
+    required_inputs:
+      - '.client.json'
     auto_apply: dependents
     build_to: source
     runs_before:
-      - build_web_compilers
-targets:
-  $default:
-    builders:
-      jaspr_builder:
-        generate_for:
-          - test/native_interfaces.web.dart
+      - jaspr_web_compilers:entrypoint_bootstrap
+  client_registry:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildClientRegistry" ]
+    build_extensions:
+      "lib/$lib$":
+        - "web/main.clients.dart"
+    required_inputs:
+      - '.client.json'
+    auto_apply: dependents
+    build_to: cache
+    runs_before:
+      - jaspr_web_compilers:entrypoint_bootstrap
+  imports:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "findPlatformImports" ]
+    build_extensions:
+      ".dart":
+        - ".imports.json"
+    auto_apply: dependents
+    build_to: cache
+  import_parts:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "writePlatformImports" ]
+    build_extensions:
+      ".imports.json":
+        - ".imports.dart"
+    auto_apply: dependents
+    build_to: source
+    required_inputs:
+      - '.imports.json'
+    runs_before:
+      - jaspr_web_compilers:entrypoint_bootstrap
+  stub:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildPlatformStubs" ]
+    build_extensions:
+      "lib/$lib$":
+        - "lib/generated/imports/_web.dart"
+        - "lib/generated/imports/_vm.dart"
+        - "lib/generated/imports/_stubs.dart"
+    auto_apply: dependents
+    build_to: source
+    required_inputs:
+      - .imports.json
+    runs_before:
+      - jaspr_web_compilers:entrypoint_bootstrap

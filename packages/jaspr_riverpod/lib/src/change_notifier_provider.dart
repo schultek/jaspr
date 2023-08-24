@@ -1,4 +1,6 @@
-import 'package:jaspr/foundation.dart';
+// ignore_for_file: invalid_use_of_internal_member
+
+import 'package:jaspr/jaspr.dart';
 import 'package:meta/meta.dart';
 // ignore: implementation_imports
 import 'package:riverpod/src/internals.dart';
@@ -8,47 +10,50 @@ import 'builders.dart';
 part 'change_notifier_provider/auto_dispose.dart';
 part 'change_notifier_provider/base.dart';
 
+ProviderElementProxy<NotifierT, NotifierT> _notifier<NotifierT extends ChangeNotifier?>(
+  _ChangeNotifierProviderBase<NotifierT> that,
+) {
+  return ProviderElementProxy<NotifierT, NotifierT>(
+    that,
+    (element) {
+      return (element as ChangeNotifierProviderElement<NotifierT>)._notifierNotifier;
+    },
+  );
+}
+
+// ignore: subtype_of_sealed_class
 /// {@template riverpod.changenotifierprovider}
 /// Creates a [ChangeNotifier] and subscribes to it.
 ///
 /// Note: By using Riverpod, [ChangeNotifier] will no longer be O(N^2) for
 /// dispatching notifications, but instead O(N)
 /// {@endtemplate}
-T _listenNotifier<T extends ChangeNotifier?>(
-  T notifier,
-  ProviderElementBase<T> ref,
-) {
-  if (notifier != null) {
-    void listener() {
-      ref.setState(notifier);
-    }
+abstract class _ChangeNotifierProviderBase<NotifierT extends ChangeNotifier?> extends ProviderBase<NotifierT> {
+  _ChangeNotifierProviderBase({
+    required super.name,
+    required super.from,
+    required super.argument,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+  });
 
-    notifier.addListener(listener);
-    ref.onDispose(() {
-      try {
-        notifier.removeListener(listener);
-        // ignore: empty_catches, may throw if called after the notifier is dispose, but this is safe to ignore.
-      } catch (err) {}
-    });
-  }
-
-  return notifier;
-}
-
-// ignore: subtype_of_sealed_class
-/// Add [overrideWithValue] to [AutoDisposeStateNotifierProvider]
-mixin ChangeNotifierProviderOverrideMixin<Notifier extends ChangeNotifier?> on ProviderBase<Notifier> {
+  /// Obtains the [ChangeNotifier] associated with this provider, without listening
+  /// to state changes.
   ///
-  ProviderBase<Notifier> get notifier;
+  /// This is typically used to invoke methods on a [ChangeNotifier]. For example:
+  ///
+  /// ```dart
+  /// Button(
+  ///   onTap: () => ref.read(changeNotifierProvider.notifer).increment(),
+  /// )
+  /// ```
+  ///
+  /// This listenable will notify its notifiers if the [ChangeNotifier] instance
+  /// changes.
+  /// This may happen if the provider is refreshed or one of its dependencies
+  /// has changes.
+  ProviderListenable<NotifierT> get notifier;
 
-  @override
-  late final List<ProviderOrFamily>? dependencies = [notifier];
-
-  /// {@macro riverpod.overrridewithvalue}
-  Override overrideWithValue(Notifier value) {
-    return ProviderOverride(
-      origin: notifier,
-      override: ValueProvider<Notifier>(value),
-    );
-  }
+  NotifierT _create(covariant ChangeNotifierProviderElement<NotifierT> ref);
 }

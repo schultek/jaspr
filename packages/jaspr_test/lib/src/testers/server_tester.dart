@@ -5,9 +5,39 @@ import 'dart:io';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
-import 'package:jaspr/server.dart';
+import 'package:jaspr/server.dart' hide Document;
+import 'package:meta/meta.dart';
 import 'package:test/fake.dart';
+import 'package:test/test.dart';
 
+@isTest
+void testServer(
+  String description,
+  FutureOr<void> Function(ServerTester tester) callback, {
+  bool virtual = true,
+  List<Middleware>? middleware,
+  bool? skip,
+  Timeout? timeout,
+  dynamic tags,
+}) {
+  test(
+    description,
+    () async {
+      var tester = ServerTester._();
+      try {
+        await tester._start(virtual, middleware);
+        await callback(tester);
+      } finally {
+        await tester.app.close();
+      }
+    },
+    skip: skip,
+    timeout: timeout,
+    tags: tags,
+  );
+}
+
+/// A virtual response object containing the server-rendered html document.
 class DocumentResponse {
   DocumentResponse({required this.statusCode, required this.body, this.document});
 
@@ -21,6 +51,7 @@ class DocumentResponse {
   Document? document;
 }
 
+/// A virtual response object for a data request containing the fetched data.
 class DataResponse {
   DataResponse({required this.statusCode, required this.data});
 
@@ -31,48 +62,26 @@ class DataResponse {
   Map<String, dynamic>? data;
 }
 
-ServerApp _runTestApp(Component app, String id, Handler fileHandler) {
-  return ServerApp.run(() {
-    AppBinding.ensureInitialized().attachRootComponent(app, attachTo: id);
-  }, fileHandler);
-}
-
+/// Tests a jaspr app in a simulated server environment.
+///
+/// You can send requests using the [request] or [fetchData] methods and evaluate the
+/// server-rendered response for the given url.
 class ServerTester {
   ServerTester._();
 
-  static Future<ServerTester> setUp(
-    Component app, {
-    String attachTo = 'body',
-    String? html,
-    bool virtual = true,
-    List<Middleware>? middleware,
-  }) async {
-    var tester = ServerTester._();
-    await tester._start(app, attachTo, html, virtual, middleware);
-    return tester;
-  }
-
-  Future<void> tearDown() async {
-    await app.close();
-  }
-
   late ServerApp app;
+
   Handler? _handler;
   http.Client? _client;
+  final _LateComponent _comp = _LateComponent();
 
-  Future<void> _start(Component comp, String attachTo, String? html, bool virtual, List<Middleware>? middleware) async {
-    var _html = html ?? '<html><head></head><body></body></html>';
-
+  Future<void> _start(bool virtual, List<Middleware>? middleware) async {
     fileHandler(Request request) {
-      if (request.requestedUri.path == '/') {
-        return Response.ok(_html, headers: {'content-type': 'text/html'});
-      } else {
-        return Response.notFound('Not Found');
-      }
+      return Response.notFound('Not Found');
     }
 
     var appCompleter = Completer();
-    app = _runTestApp(comp, attachTo, fileHandler)
+    app = _runTestApp(_comp, fileHandler)
       ..setListener((server) {
         if (!appCompleter.isCompleted) appCompleter.complete();
       });
@@ -93,6 +102,12 @@ class ServerTester {
     await appCompleter.future;
   }
 
+  void pumpComponent(Component component) {
+    _comp.component = component;
+  }
+
+  /// Perform a virtual request to your app that renders the components and returns the
+  /// resulting document.
   Future<DocumentResponse> request(String location) async {
     var uri = Uri.parse('http://${app.server!.address.host}:${app.server!.port}$location');
 
@@ -118,6 +133,8 @@ class ServerTester {
     );
   }
 
+  /// Perform a virtual data request to your app that collects all the sync-data from
+  /// the rendered components.
   Future<DataResponse> fetchData(String location) async {
     var uri = Uri.parse('http://${app.server!.address.host}:${app.server!.port}$location');
 
@@ -148,6 +165,16 @@ class ServerTester {
       data: data,
     );
   }
+}
+
+ServerApp _runTestApp(_LateComponent app, Handler fileHandler) {
+  return ServerApp.run((binding) {
+    binding.attachRootComponent(app.component ?? Builder(builder: (_) => []));
+  }, fileHandler);
+}
+
+class _LateComponent {
+  Component? component;
 }
 
 class FakeHttpServer extends Fake implements HttpServer {

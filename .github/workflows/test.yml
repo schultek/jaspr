@@ -1,0 +1,85 @@
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/test.yml'
+      - 'packages/**'
+
+name: Test Pipeline
+
+jobs:
+  cli:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest] # TODO: windows-latest
+    name: Verify CLI Tool
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - uses: dart-lang/setup-dart@v1.3
+      - uses: subosito/flutter-action@v2
+
+      - name: Bootstrap
+        run: |
+          dart pub global activate melos
+          melos bootstrap --no-private
+
+      - name: Create Project
+        run: |
+          cd apps
+          jaspr create -t basic -c my_app
+          melos bootstrap --scope my_app
+
+      - name: Build Project
+        run: |
+          cd apps/my_app
+          jaspr build -v
+
+  analyze:
+    name: Analyze Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - uses: dart-lang/setup-dart@v1.3
+      - uses: subosito/flutter-action@v2
+
+      - name: Bootstrap
+        run: |
+          dart pub global activate melos
+          melos bootstrap
+
+      - name: Check formatting
+        run: melos format -- --set-exit-if-changed
+
+      - name: Check linting
+        run: melos analyze
+
+  test:
+    name: Test Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - uses: dart-lang/setup-dart@v1.3
+      - uses: subosito/flutter-action@v2
+
+      - name: Bootstrap
+        run: |
+          dart pub global activate melos
+          dart pub global activate coverage
+          melos bootstrap --no-private
+
+      - name: Run Unit tests
+        run: melos coverage:ci
+
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage/*_lcov.info

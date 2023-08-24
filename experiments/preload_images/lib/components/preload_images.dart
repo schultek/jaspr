@@ -13,7 +13,7 @@ class PreloadImagesState extends State<PreloadImages> with SyncStateMixin<Preloa
   Set<String> preloadImages = {};
 
   @override
-  List saveState() {
+  List getState() {
     visitImages(Element e) {
       if (e is DomElement &&
           e.component.tag == 'img' &&
@@ -42,7 +42,7 @@ class PreloadImagesState extends State<PreloadImages> with SyncStateMixin<Preloa
   Iterable<Component> build(BuildContext context) sync* {
     yield component.child;
 
-    if (ComponentsBinding.instance!.isClient) {
+    if (context.binding.isClient) {
       for (var image in preloadImages) {
         yield DomComponent(
           tag: 'link',

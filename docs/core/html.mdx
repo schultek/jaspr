@@ -1,0 +1,104 @@
+---
+title: Jaspr HTML
+description: How to write concise HTML markup in Jaspr.
+previous: /core/components
+next: /core/styling
+---
+
+## 🖍 Writing concise HTML
+
+Every html element in jaspr is represented by a `DomComponent`, which takes a **tag**, some other parameters and a list of children, which can again be other `DomComponents`. While this gives you great low-level control over your html structure, building up larger html trees can feel verbose and boilerplaty.
+
+Let's look at the following html snippet:
+
+```html
+<div>
+  <h1>This is a title</h1>
+  <p>Hello <b>World!</b></p>
+</div>
+```
+
+When this is built using `DomComponent`s it might look like the following:
+
+```dart
+return DomComponent(
+  tag: 'div',
+  children: [
+    DomComponent(
+      tag: 'h1', 
+      child: Text('This is a title'),
+    ),
+    DomComponent(
+      tag: 'p',
+      children: [
+         Text('Hello '),
+         DomComponent(
+           tag: 'b',
+           child: Text('World!'),
+        ),
+      ],
+    ),
+  ],
+);
+```
+
+Through its use of `tag` and `children`/`child`, it gets a lot longer than the original markup and looks kind of messy. 
+In order to solve this, jaspr includes a set of **html utility methods** in order to write html structures in a more concise and clean way:
+
+## 🎁 Import jaspr/html.dart
+
+In order to use these utility methods, simply import `package:jaspr/html.dart` in your code. There are methods for the most common html tags, like `div`, `a`, `p`, `img` as well as more special tags like `video`, `form`, `input` and others.
+
+The methods can be added to your component tree and the following parameters:
+
+- any tag-specific attributes, like `src` for `img` or `href` for `a`,  
+  (These are always typed and may be required depending on the tag.)
+- any general parameters, like `id`, `styles`, `attributes` or `events`,  
+  (These are always options.)
+- a list of child components.  
+  (Recommended to be specified at the end. For no children specify an empty list. Some tags omit this, e.g. `img`.)
+
+For text content, use the `text()` utility method - this does not add a html tag but is needed to work with other components.
+
+Our above example would then be reduced to this:
+
+```dart
+return div([
+  h1([text('This is a title')]),
+  p([text('Hello '), b([text('World!')])]),
+]);
+```
+
+---
+
+A more elaborate component tree using these methods may look like this:
+
+[Check it out on JasprPad](https://jasprpad.schultek.de/?sample=html)
+
+```dart
+return div([
+  // each element gets a list of child elements
+  h1([text('jaspr/html')]),
+  p([
+    // wrap your strings with `text()` to add alongside other components
+    text('This is some '),
+    b([text('html')]),
+    text(' content.'),
+  ]),
+  // some elements have typed attributes for easy access
+  a(href: "https://github.com/schultek/jaspr", target: Target.blank, [
+    img(src: "https://jasprpad.schultek.de/jaspr-192.png"),
+  ]),
+  // some elements don't have children
+  hr(),
+  // you can add events as usual
+  select(events: {
+    'change': (e) => print(e.target.value),
+  }, [
+    option(value: 'test', [text('Select me!')]),
+    option(value: 'other', selected: true, [text('Or me!')])
+  ]),
+  // most common and some uncommon elements are supported
+  progress(value: 85, max: 100, [])
+]);
+```

@@ -1,78 +1,68 @@
 part of framework;
 
 /// Main app binding, controls the root component and global state
-mixin ComponentsBinding on BindingBase {
-  /// The currently active uri.
-  /// On the server, this is the requested uri. On the client, this is the
-  /// currently visited uri in the browser.
-  Uri get currentUri;
-
-  @override
-  void initInstances() {
-    super.initInstances();
-    _instance = this;
-    _buildOwner = BuildOwner();
-  }
-
-  static ComponentsBinding? _instance;
-  static ComponentsBinding? get instance => _instance;
-
-  late BuildOwner _buildOwner;
-  BuildOwner get buildOwner => _buildOwner;
-
-  /// Whether the current app is run on the client (in the browser)
-  bool get isClient;
-
+mixin ComponentsBinding on AppBinding {
   /// Sets [app] as the new root of the component tree and performs an initial build
-  Future<void> attachRootComponent(Component app, {required String attachTo}) async {
-    return buildOwner.lockState(() async {
+  Future<void> attachRootComponent(Component app) async {
+    var buildOwner = _rootElement?._owner ?? BuildOwner();
+    await buildOwner.lockState(() {
+      assert(() {
+        buildOwner._debugBuilding = true;
+        return true;
+      }());
       buildOwner._isFirstBuild = true;
 
+      var renderer = createRenderer();
+
       var element = _Root(child: app).createElement();
-      element._owner = _buildOwner;
+      element._binding = this;
+      element._owner = buildOwner;
+      element._renderer = renderer;
 
-      element.mount(null);
+      element.mount(null, null);
 
-      if (element._asyncFirstBuild != null) {
-        await element._asyncFirstBuild;
+      end() {
+        _rootElement = element;
+        buildOwner._isFirstBuild = false;
+        assert(() {
+          buildOwner._debugBuilding = false;
+          return true;
+        }());
+
+        didAttachRootElement(element);
       }
 
-      _rootElement = element;
-      buildOwner._isFirstBuild = false;
+      if (element._asyncFirstBuild != null) {
+        assert(!isClient);
+        return element._asyncFirstBuild!.then((_) => end());
+      }
 
-      didAttachRootElement(element, to: attachTo);
+      end();
     });
   }
 
   @protected
-  void didAttachRootElement(BuildScheduler element, {required String to});
+  void didAttachRootElement(Element element) {}
 
   /// The [Element] that is at the root of the hierarchy.
   ///
-  /// This is initialized the first time [runApp] is called.
-  SingleChildElement? get rootElement => _rootElement;
-  SingleChildElement? _rootElement;
+  /// This is initialized when [runApp] is called.
+  @override
+  RenderElement? get rootElement => _rootElement;
+  RenderElement? _rootElement;
 
-  DomView registerView(covariant dynamic root, DomBuilderFn builderFn, bool initialRender);
-}
+  Renderer createRenderer();
 
-/// In difference to Flutter, we have multiple build schedulers instead of one global build owner
-/// Particularly each dom element is a build scheduler and manages its subtree of components
-mixin BuildScheduler on Element {
-  DomView? _view;
+  static final Map<GlobalKey, Element> _globalKeyRegistry = {};
 
-  // ignore: prefer_final_fields
-  bool _willUpdate = false;
-
-  DomView get view => _view!;
-  set view(DomView v) {
-    _view = v;
+  static void _registerGlobalKey(GlobalKey key, Element element) {
+    _globalKeyRegistry[key] = element;
   }
 
-  @override
-  void render(DomBuilder b) {
-    _willUpdate = false;
-    super.render(b);
+  static void _unregisterGlobalKey(GlobalKey key, Element element) {
+    if (_globalKeyRegistry[key] == element) {
+      _globalKeyRegistry.remove(key);
+    }
   }
 }
 
@@ -85,11 +75,20 @@ class _Root extends Component {
   _RootElement createElement() => _RootElement(this);
 }
 
-class _RootElement extends SingleChildElement with BuildScheduler {
+class _RootElement extends SingleChildElement with RenderElement {
   _RootElement(_Root component) : super(component);
 
   @override
   _Root get component => super.component as _Root;
+
+  @override
+  void _firstBuild([VoidCallback? onBuilt]) {
+    _attach();
+    super._firstBuild(onBuilt);
+  }
+
+  @override
+  void renderNode(Renderer renderer) {}
 
   @override
   Component build() => component.child;

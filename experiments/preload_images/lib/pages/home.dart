@@ -1,4 +1,5 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_router/jaspr_router.dart';
 
 import '../services/service.dart';
 
@@ -9,7 +10,7 @@ class Home extends StatefulComponent {
   State<StatefulComponent> createState() => HomeState();
 }
 
-class HomeState extends State<Home> with PreloadStateMixin<Home>, SyncStateMixin<Home, List> {
+class HomeState extends State<Home> with PreloadStateMixin, SyncStateMixin<Home, List> {
   late List images;
 
   @override
@@ -18,7 +19,7 @@ class HomeState extends State<Home> with PreloadStateMixin<Home>, SyncStateMixin
   }
 
   @override
-  List saveState() {
+  List getState() {
     return images;
   }
 

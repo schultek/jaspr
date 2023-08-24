@@ -1,0 +1,8 @@
+include: package:lints/recommended.yaml
+
+analyzer:
+  exclude:
+    - build/**
+linter:
+  rules:
+    file_names: false

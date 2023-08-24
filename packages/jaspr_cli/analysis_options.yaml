@@ -1,0 +1,12 @@
+include: package:lints/recommended.yaml
+
+analyzer:
+  exclude:
+    - tool/templates/**
+
+linter:
+  rules:
+    sort_pub_dependencies: true
+    prefer_relative_imports: true
+    directives_ordering: true
+    avoid_print: true

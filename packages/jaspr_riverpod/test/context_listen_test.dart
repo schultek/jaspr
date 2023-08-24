@@ -9,15 +9,9 @@ final counterB = StateProvider.autoDispose((ref) => 0);
 
 void main() {
   group('context.listen', () {
-    late ComponentTester tester;
-
-    setUp(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test(
+    testComponents(
       'listens to provider state',
-      () async {
+      (tester) async {
         int? wasCalledWith;
 
         await tester.pumpComponent(providerApp((context) sync* {
@@ -28,7 +22,7 @@ void main() {
           yield Button(
             label: 'tap',
             onPressed: () {
-              context.read(counter.state).state++;
+              context.read(counter.notifier).state++;
             },
           );
         }));
@@ -42,9 +36,9 @@ void main() {
       },
     );
 
-    test(
+    testComponents(
       'context.listen re-listens on rebuild',
-      () async {
+      (tester) async {
         List<int> wasCalledWith = [];
 
         await tester.pumpComponent(providerApp((context) sync* {
@@ -55,7 +49,7 @@ void main() {
           yield Button(
             label: '${context.watch(counter)}',
             onPressed: () {
-              context.read(counter.state).state++;
+              context.read(counter.notifier).state++;
             },
           );
         }));
@@ -69,9 +63,9 @@ void main() {
       },
     );
 
-    test(
+    testComponents(
       'context.listen un-listens on dispose',
-      () async {
+      (tester) async {
         List<int> wasCalledWith = [];
 
         await tester.pumpComponent(providerApp((context) sync* {
@@ -85,7 +79,7 @@ void main() {
                 yield Button(
                   label: 'a ${context.watch(counter)}',
                   onPressed: () {
-                    context.read(counter.state).state++;
+                    context.read(counter.notifier).state++;
                   },
                 );
               },
@@ -94,7 +88,7 @@ void main() {
             yield Button(
               label: 'b ${context.watch(counter)}',
               onPressed: () {
-                context.read(counter.state).state++;
+                context.read(counter.notifier).state++;
               },
             );
           }
@@ -123,9 +117,9 @@ void main() {
       },
     );
 
-    test(
+    testComponents(
       'omitting closes an active listener',
-      () async {
+      (tester) async {
         List<int> wasCalledWith = [];
 
         late Element element;
@@ -145,7 +139,7 @@ void main() {
         expect(element.read(counterB), equals(0));
 
         // increase counter
-        element.read(counterB.state).state = 1;
+        element.read(counterB.notifier).state = 1;
 
         expect(wasCalledWith, equals([0, 1]));
 

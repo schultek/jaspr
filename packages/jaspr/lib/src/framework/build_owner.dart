@@ -29,13 +29,12 @@ class BuildOwner {
       return;
     }
     if (!_scheduledBuild) {
-      SchedulerBinding.instance!.scheduleBuild();
+      element.binding.scheduleBuild(performBuild);
       _scheduledBuild = true;
     }
 
     _dirtyElements.add(element);
     element._inDirtyList = true;
-    element._scheduler!._willUpdate = true;
   }
 
   /// Whether this widget tree is in the build phase.
@@ -53,7 +52,7 @@ class BuildOwner {
   ///
   /// This mechanism is used to ensure that, for instance, [State.dispose] does
   /// not call [State.setState].
-  Future<void> lockState(VoidCallback callback) async {
+  Future<void> lockState(dynamic Function() callback) async {
     assert(_debugStateLockLevel >= 0);
     assert(() {
       _debugStateLockLevel += 1;
@@ -78,38 +77,44 @@ class BuildOwner {
   /// We want the component and element apis to stay synchronous, so this delays
   /// the execution of [child.performRebuild()] instead of calling it directly.
   void performRebuildOn(Element child, void Function() whenComplete) {
-    var asyncFirstBuild = child._asyncFirstBuild;
-    if (asyncFirstBuild is Future) {
-      assert(isFirstBuild, 'Only the first build is allowed to be asynchronous.');
-      var buildCompleter = Completer.sync()..future.whenComplete(whenComplete);
-      child._asyncFirstBuild = buildCompleter.future;
-      asyncFirstBuild.whenComplete(() {
-        child.performRebuild();
-        _waitChildren(child, buildCompleter);
-      });
-    } else {
+    if (!isFirstBuild || child.binding.isClient) {
+      assert(
+        child._asyncFirstBuild == null && child._asyncFirstBuildChildren.isEmpty,
+        'Only the first build on the server is allowed to be asynchronous.',
+      );
       child.performRebuild();
-      var buildCompleter = Completer.sync()..future.whenComplete(whenComplete);
+      whenComplete();
+      return;
+    }
 
-      _waitChildren(child, buildCompleter);
-      if (!buildCompleter.isCompleted) {
-        child._asyncFirstBuild = buildCompleter.future;
-      }
+    var asyncFirstBuild = child._asyncFirstBuild;
+
+    var buildCompleter = Completer.sync();
+    buildCompleter.future.whenComplete(() {
+      child._asyncFirstBuild = null;
+      child._parent?._asyncFirstBuildChildren.remove(buildCompleter.future);
+      whenComplete();
+    });
+
+    child._asyncFirstBuild = buildCompleter.future;
+    child._parent?._asyncFirstBuildChildren.add(buildCompleter.future);
+
+    if (asyncFirstBuild != null) {
+      asyncFirstBuild.whenComplete(() => _rebuildAndWait(child, buildCompleter));
+    } else {
+      _rebuildAndWait(child, buildCompleter);
     }
   }
 
-  void _waitChildren(Element child, Completer buildCompleter) {
-    var remaining = 0;
-    child.visitChildren((element) {
-      if (element._asyncFirstBuild is Future) {
-        remaining++;
-        element._asyncFirstBuild!.whenComplete(() {
-          remaining--;
-          if (remaining == 0) buildCompleter.complete();
-        });
-      }
-    });
-    if (remaining == 0) {
+  void _rebuildAndWait(Element child, Completer buildCompleter) {
+    child.performRebuild();
+
+    var asyncChildren = child._asyncFirstBuildChildren;
+    child._asyncFirstBuildChildren = [];
+
+    if (asyncChildren.isNotEmpty) {
+      Future.wait(asyncChildren).whenComplete(() => buildCompleter.complete());
+    } else {
       buildCompleter.complete();
     }
   }
@@ -145,6 +150,7 @@ class BuildOwner {
         } catch (e) {
           // TODO: properly report error
           print("Error on rebuilding component: $e");
+          rethrow;
         }
 
         index += 1;
@@ -169,11 +175,6 @@ class BuildOwner {
       for (final Element element in _dirtyElements) {
         assert(element._inDirtyList);
         element._inDirtyList = false;
-
-        if (element._scheduler?._willUpdate ?? false) {
-          element._scheduler!.view.update();
-          element._scheduler!._willUpdate = false;
-        }
       }
 
       _dirtyElements.clear();
@@ -191,17 +192,5 @@ class BuildOwner {
       }());
     }
     assert(_debugStateLockLevel >= 0);
-  }
-
-  final Map<GlobalKey, Element> _globalKeyRegistry = {};
-
-  void _registerGlobalKey(GlobalKey key, Element element) {
-    _globalKeyRegistry[key] = element;
-  }
-
-  void _unregisterGlobalKey(GlobalKey key, Element element) {
-    if (_globalKeyRegistry[key] == element) {
-      _globalKeyRegistry.remove(key);
-    }
   }
 }

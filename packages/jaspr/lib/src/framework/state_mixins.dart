@@ -7,7 +7,7 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> implements Sync
   /// Codec used to serialize the state data on the server and deserialize on the client
   /// Should convert the state to any dynamic type: Null, bool, double, int, Uint8List, String, Map, List
   @override
-  Codec<U, dynamic> get syncCodec => CastCodec();
+  Codec<U, dynamic>? get syncCodec => null;
 
   /// Globally unique id used to identify the state data between server and client
   /// Returns null if state should not be synced
@@ -42,20 +42,14 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> implements Sync
   @override
   void initState() {
     super.initState();
-    SyncBinding.instance!.registerSyncState(this, initialUpdate: ComponentsBinding.instance!.isClient);
+    context.binding.registerSyncState(this, initialUpdate: context.binding.isClient);
   }
 
   @override
   void dispose() {
-    SyncBinding.instance!.unregisterSyncState(this);
+    context.binding.unregisterSyncState(this);
     super.dispose();
   }
-}
-
-/// This defers the first rendering on the client for an async task
-mixin DeferRenderMixin<T extends StatefulComponent> on State<T> {
-  /// Called on the client before initState() to perform some asynchronous task
-  Future<void> beforeFirstRender();
 }
 
 /// Mixin on [State] that preloads state on the server

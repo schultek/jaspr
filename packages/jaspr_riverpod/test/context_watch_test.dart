@@ -9,18 +9,12 @@ final autoDisposeCounter = StateProvider.autoDispose((ref) => 0);
 
 void main() {
   group('context.watch', () {
-    late ComponentTester tester;
-
-    setUp(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test('context.watch returns provider state and rebuilds on change', () async {
+    testComponents('context.watch returns provider state and rebuilds on change', (tester) async {
       await tester.pumpComponent(providerApp((context) sync* {
         yield Button(
           label: '${context.watch(counter)}',
           onPressed: () {
-            context.read(counter.state).state++;
+            context.read(counter.notifier).state++;
           },
         );
       }));
@@ -33,25 +27,25 @@ void main() {
       expect(find.text('1'), findsOneComponent);
     });
 
-    test('context.watch returns overridden provider state', () async {
+    testComponents('context.watch returns overridden provider state', (tester) async {
       await tester.pumpComponent(providerApp((context) sync* {
         yield Builder(builder: (context) sync* {
           yield Button(
             key: const ValueKey('a'),
             label: 'a ${context.watch(counter)}',
             onPressed: () {
-              context.read(counter.state).state++;
+              context.read(counter.notifier).state++;
             },
           );
         });
         yield ProviderScope(
-          overrides: [counter.overrideWithValue(StateController(10))],
+          overrides: [counter.overrideWith((ref) => 10)],
           child: Builder(builder: (context) sync* {
             yield Button(
               key: const ValueKey('b'),
               label: 'b ${context.watch(counter)}',
               onPressed: () {
-                context.read(counter.state).state++;
+                context.read(counter.notifier).state++;
               },
             );
           }),
@@ -74,7 +68,7 @@ void main() {
       expect(find.text('b 11'), findsOneComponent);
     });
 
-    test('provider is autodisposed when no longer watched', () async {
+    testComponents('provider is autodisposed when no longer watched', (tester) async {
       await tester.pumpComponent(providerApp((context) sync* {
         var showCounter = true;
         yield StatefulBuilder(
@@ -82,7 +76,7 @@ void main() {
             yield Button(
               label: showCounter ? '${context.watch(autoDisposeCounter)}' : 'hidden',
               onPressed: () {
-                context.read(autoDisposeCounter.state).state++;
+                context.read(autoDisposeCounter.notifier).state++;
               },
             );
             yield Button(

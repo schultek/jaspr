@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'package:jaspr_test/jaspr_test.dart';
 
 import '../../utils/test_component.dart';
@@ -5,13 +7,7 @@ import 'reorder_children_app.dart';
 
 void main() {
   group('reorder children test', () {
-    late ComponentTester tester;
-
-    setUp(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test('should keep child state on reordering', () async {
+    testComponents('should keep child state on reordering', (tester) async {
       var controller = await tester.pumpTestComponent(App());
       var app = controller.element;
 

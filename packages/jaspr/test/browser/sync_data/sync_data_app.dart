@@ -21,7 +21,7 @@ class CounterState extends State<Counter> with SyncStateMixin<Counter, int> {
   int counter = 0;
 
   @override
-  int saveState() => throw UnimplementedError();
+  int getState() => throw UnimplementedError();
 
   @override
   String get syncId => 'counter';

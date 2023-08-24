@@ -1,0 +1,44 @@
+on:
+  pull_request_target:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/report.yml'
+      - 'packages/**'
+
+name: Report Pipeline
+
+jobs:
+  report:
+    name: Version Report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
+
+      - uses: dart-lang/setup-dart@v1.3
+      - uses: subosito/flutter-action@v2
+
+      - name: Bootstrap
+        run: |
+          dart pub global activate melos
+          dart pub global activate -s git https://github.com/schultek/semantic_changelog
+          melos bootstrap --no-private
+
+      - name: Bump Package Versions
+        id: bump
+        run: |
+          version bump --dry-run --scope="packages/*" | tee output.txt
+          echo 'version_report<<EOF' >> $GITHUB_OUTPUT
+          echo '## Package Version Report' >> $GITHUB_OUTPUT
+          cat output.txt >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+          rm -rf output.txt
+
+      - name: Create PR comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: ${{ steps.bump.outputs.version_report }}
+          comment_tag: version_report
