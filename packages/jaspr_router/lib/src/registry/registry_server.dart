@@ -6,7 +6,6 @@ import 'registry.dart';
 class RouteRegistryImpl implements RouteRegistry {
   @override
   void registerRoutes(List<RouteBase> routes) {
-    print("REGISTER $routes");
     Set<String> paths = {};
 
     void registerRoute(RouteBase route, String path) {
