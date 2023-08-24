@@ -77,12 +77,20 @@ class ServerApp {
 
       print('[INFO] Running app in ${kDebugMode ? 'debug' : 'release'} mode');
       print('[INFO] Serving at http://${server!.address.host}:${server!.port}');
+
+      requestRouteGeneration('/');
     });
   }
 
   Future<void> close() async {
     await _server?.close();
     await _reloader?.stop();
+  }
+
+  static void requestRouteGeneration(String route) {
+    if (kGenerateMode) {
+      print('[DAEMON] {"route": "$route"}');
+    }
   }
 }
 

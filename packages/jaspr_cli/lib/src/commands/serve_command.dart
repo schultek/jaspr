@@ -53,7 +53,7 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
   }
 
   @override
-  String get description => 'Runs a development server that serves the web app with SSR and '
+  String get description => 'Runs a development server that serves the jaspr app and '
       'reloads based on file system updates.';
 
   @override

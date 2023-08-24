@@ -1,0 +1,2 @@
+⠋ [CLI] Building web assets......[2K⠙ [CLI] Building web assets...... (6ms)[2K✓ [CLI] Completed building web assets. (5.0s)
+⠋ [CLI] Building server app......[2K⠙ [CLI] Building server app...... (0ms)[2K⠹ [SERVER] Running server app...... (29ms)

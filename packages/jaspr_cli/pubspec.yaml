@@ -26,6 +26,7 @@ dependencies:
   cli_util: ^0.4.0
   collection: ^1.17.1
   dwds: ^19.0.0
+  http: ^0.13.6
   io: ^1.0.4
   logging: ^1.1.1
   mason: ^0.1.0-dev.31

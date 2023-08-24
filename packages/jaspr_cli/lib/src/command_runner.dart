@@ -7,6 +7,7 @@ import 'package:mason/mason.dart';
 
 import 'commands/build_command.dart';
 import 'commands/create_command.dart';
+import 'commands/generate_command.dart';
 import 'commands/serve_command.dart';
 import 'helpers/clean_helper.dart';
 import 'version.dart';
@@ -33,6 +34,7 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
     addCommand(CreateCommand());
     addCommand(ServeCommand());
     addCommand(BuildCommand());
+    addCommand(GenerateCommand());
   }
 
   final Logger _logger = Logger();

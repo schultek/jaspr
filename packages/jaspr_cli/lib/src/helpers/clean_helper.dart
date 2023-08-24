@@ -17,6 +17,8 @@ Future<void> cleanProject(Logger logger) async {
     await buildDir.delete(recursive: true);
   }
 
+  // server
+  await closeProcesses('8080', logger);
   // vm service
   await closeProcesses('8181', logger);
   // build runner

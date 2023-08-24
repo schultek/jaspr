@@ -1,7 +1,8 @@
 import 'dart:convert';
 
-import '../foundation/constants.dart';
-import '../framework/framework.dart';
+import '../../server.dart';
+
+const formatOutput = kDebugMode || kGenerateMode;
 
 class DomNodeData {
   String? tag;
@@ -116,7 +117,7 @@ class MarkupDomRenderer extends Renderer {
           childOutput.add(renderNodeHtml(child));
         }
         var fullChildOutput = childOutput.fold<String>('', (s, o) => s + o);
-        if (kDebugMode && (fullChildOutput.length > 80 || fullChildOutput.contains('\n'))) {
+        if (formatOutput && (fullChildOutput.length > 80 || fullChildOutput.contains('\n'))) {
           output.write('\n');
           for (var child in childOutput) {
             output.writeln('  ${child.replaceAll('\n', '\n  ')}');

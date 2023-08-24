@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -104,7 +105,7 @@ abstract class BaseCommand extends Command<int> {
       logger.write(utf8.decode(event), tag: tag, level: Level.error, progress: ProgressState.completed);
     });
 
-    process.stdout.map(utf8.decode).listen((log) {
+    process.stdout.map(utf8.decode).splitLines().listen((log) {
       if (hide != null && hide.call(log)) return;
 
       if (progress != null) {
@@ -122,5 +123,24 @@ abstract class BaseCommand extends Command<int> {
       onFail?.call();
       shutdown(exitCode);
     }
+  }
+}
+
+extension on Stream<String> {
+  Stream<String> splitLines() {
+    var data = '';
+    return transform(StreamTransformer.fromHandlers(
+      handleData: (d, s) {
+        data += d;
+        int index;
+        while ((index = data.indexOf('\n')) != -1) {
+          s.add(data.substring(0, index + 1));
+          data = data.substring(index + 1);
+        }
+      },
+      handleDone: (s) {
+        s.add(data);
+      },
+    ));
   }
 }
