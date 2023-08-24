@@ -4,3 +4,6 @@
 [submodule "modules/build"]
 	path = modules/build
 	url = https://github.com/schultek/build.git
+[submodule "apps/fluttercommunity"]
+	path = apps/fluttercommunity
+	url = https://github.com/fluttercommunity/site.git
