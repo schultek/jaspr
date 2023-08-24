@@ -1,4 +1,5 @@
 import 'package:jaspr/server.dart';
+import 'package:jaspr_router/jaspr_router.dart';
 
 import './app.dart';
 
@@ -22,10 +23,10 @@ void main() {
         ]),
       ),
     ],
-    body: Builder.single(builder: (_) {
-      ServerApp.requestRouteGeneration('/home');
-      ServerApp.requestRouteGeneration('/about');
-      return App();
-    }),
+    body: Router(routes: [
+      Route(path: '/', builder: (_, __) => App('Home')),
+      Route(path: '/about', builder: (_, __) => App('About')),
+      Route(path: '/contact', builder: (_, __) => App('Contact')),
+    ]),
   ));
 }

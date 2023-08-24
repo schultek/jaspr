@@ -6,6 +6,10 @@ part of 'app.dart';
 mixin _$App implements ComponentEntryMixin<App> {
   @override
   ComponentEntry<App> get entry {
-    return ComponentEntry.client('app');
+    var self = this as App;
+    return ComponentEntry.client(
+      'app',
+      params: {'title': self.title},
+    );
   }
 }

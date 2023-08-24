@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Added *Static Site Generation* support. Pages are automatically generated for each route.
+
 ## 0.2.3
 
 - `jaspr` upgraded to `0.8.0`

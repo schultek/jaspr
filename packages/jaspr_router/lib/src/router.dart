@@ -10,6 +10,7 @@ import 'history/history.dart';
 import 'matching.dart';
 import 'misc/inherited_router.dart';
 import 'parser.dart';
+import 'registry/registry.dart';
 import 'route.dart';
 import 'typedefs.dart';
 
@@ -70,6 +71,9 @@ class RouterState extends State<Router> with PreloadStateMixin {
   @override
   void initState() {
     super.initState();
+    if (kGenerateMode) {
+      RouteRegistry.instance.registerRoutes(component.routes);
+    }
     HistoryManager.instance.init(context.binding.currentUri.toString(), (uri) {
       _update(uri, updateHistory: false);
     });

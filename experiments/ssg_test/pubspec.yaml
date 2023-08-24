@@ -7,6 +7,7 @@ environment:
 
 dependencies:
   jaspr: ^0.8.0
+  jaspr_router: ^0.2.3
 
 dev_dependencies:
   build_runner: ^2.4.0

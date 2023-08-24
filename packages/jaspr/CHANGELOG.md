@@ -1,3 +1,12 @@
+## Unreleased minor
+
+- Added *Static Site Generation* support.
+
+  With the new `jaspr generate` command you can generate static pages from your jaspr app. This requires a normal 
+  server-rendered jaspr app and will output separate `.html` pages for each of your routes.
+
+  To specify which routes your application should handle, either use `jaspr_router` or call `ServerApp.requestRouteGeneration('/home');`.
+
 ## 0.8.1
 
 - Fixed bug with rebuilding the root component.
