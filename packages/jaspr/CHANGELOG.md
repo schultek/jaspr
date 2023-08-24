@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.8.1
 
 - Fixed bug with rebuilding the root component.
 
