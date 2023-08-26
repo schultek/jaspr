@@ -12,6 +12,7 @@ import 'package:meta/meta.dart';
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
+import '../foundation/object.dart';
 import '../foundation/sync.dart';
 import '../ui/styles/styles.dart';
 
@@ -23,6 +24,7 @@ part 'inactive_elements.dart';
 part 'inherited_component.dart';
 part 'keys.dart';
 part 'multi_child_element.dart';
+part 'notification.dart';
 part 'observer_component.dart';
 part 'render_element.dart';
 part 'render_scope.dart';
@@ -157,6 +159,7 @@ abstract class Element implements BuildContext {
   Element(Component component) : _component = component;
 
   Element? _parent;
+  _NotificationNode? _notificationTree;
 
   /// Compare two components for equality.
   ///
@@ -394,6 +397,7 @@ abstract class Element implements BuildContext {
     }
     _updateInheritance();
     _updateObservers();
+    attachNotificationTree();
   }
 
   @mustCallSuper
@@ -589,6 +593,7 @@ abstract class Element implements BuildContext {
     _hadUnsatisfiedDependencies = false;
     _updateInheritance();
     _updateObservers();
+    attachNotificationTree();
     if (_dirty) {
       owner.scheduleBuildFor(this);
     }
@@ -705,6 +710,20 @@ abstract class Element implements BuildContext {
   void _updateObservers() {
     assert(_lifecycleState == _ElementLifecycle.active);
     _observerElements = _parent?._observerElements;
+  }
+
+  /// Called in [Element.mount] and [Element.activate] to register this element in
+  /// the notification tree.
+  ///
+  /// This method is only exposed so that [NotifiableElementMixin] can be implemented.
+  /// Subclasses of [Element] that wish to respond to notifications should mix that
+  /// in instead.
+  ///
+  /// See also:
+  ///   * [NotificationListener], a component that allows listening to notifications.
+  @protected
+  void attachNotificationTree() {
+    _notificationTree = _parent?._notificationTree;
   }
 
   @override
@@ -868,4 +887,9 @@ abstract class Element implements BuildContext {
 
   // ignore: prefer_final_fields
   List<Future> _asyncFirstBuildChildren = [];
+
+  @override
+  void dispatchNotification(Notification notification) {
+    _notificationTree?.dispatchNotification(notification);
+  }
 }
