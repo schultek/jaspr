@@ -182,15 +182,6 @@ mixin RenderElement on Element {
     assert(_parentNode != null);
     _attach();
   }
-
-  @override
-  void unmount() {
-    super.unmount();
-    var renderer = _renderer;
-    if (renderer is _ScopedRenderer) {
-      renderer._release(this);
-    }
-  }
 }
 
 abstract class Renderer {

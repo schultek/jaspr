@@ -27,8 +27,6 @@ part 'multi_child_element.dart';
 part 'notification.dart';
 part 'observer_component.dart';
 part 'render_element.dart';
-part 'render_object.dart';
-part 'render_object_element.dart';
 part 'single_child_element.dart';
 part 'state_mixins.dart';
 part 'stateful_component.dart';
@@ -245,68 +243,6 @@ abstract class Element implements BuildContext {
   Renderer get renderer => _renderer!;
   Renderer? _renderer;
 
-  /// The previous sibling element.
-  ///
-  /// This references the element that is in the parents list of children before the current element.
-  /// If the current element is the first child, this is null.
-  Element? _prevSibling;
-
-  /// The previous ancestor sibling.
-  ///
-  /// If the current element is not the first child of the parent, this is the same as [_prevSibling].
-  /// If it is the first child, this references the previous sibling of the parent element, recursively, but never
-  /// outside of the parent render object.
-  ///
-  /// The following tree shows this: (RenderElements are marked with [R])
-  ///
-  /// A[R](
-  ///   B(
-  ///     C()
-  ///   )
-  ///   D(
-  ///     E()
-  ///   )
-  ///   F[R](
-  ///     G()
-  ///   )
-  /// )
-  ///
-  /// For this tree:
-  /// - The prevAncestorSibling of E is B
-  /// - The prevAncestorSibling of G is null
-  Element? get prevAncestorSibling => _prevAncestorSibling;
-  Element? _prevAncestorSibling;
-
-  /// The last child element.
-  ///
-  /// If this element has children, this referst to the last one. Else this is null.
-  Element? _lastChild;
-
-  /// The last child dom node.
-  ///
-  /// This refers to the last RenderElement of the last child of this element.
-  /// If the element has no children, or the last child has no RenderElement children, this
-  /// is null.
-  ///
-  /// Also if the last child has no children, but the second to last does, this is still null.
-  RenderElement? get lastNode => _lastNode;
-  RenderElement? _lastNode;
-
-  /// The nearest ancestor dom node.
-  ///
-  /// The nearest parent element that is also a RenderElement.
-  RenderElement? get parentNode => _parentNode;
-  RenderElement? _parentNode;
-
-  /// The previous render element
-  RenderElement? get _prevNode {
-    Element? prevElem = _prevAncestorSibling;
-    while (prevElem != null && prevElem._lastNode == null) {
-      prevElem = prevElem._prevAncestorSibling;
-    }
-    return prevElem?._lastNode;
-  }
-
   // This is used to verify that Element objects move through life in an
   // orderly fashion.
   _ElementLifecycle _lifecycleState = _ElementLifecycle.initial;
@@ -369,12 +305,12 @@ abstract class Element implements BuildContext {
     final Element newChild;
     if (child != null) {
       if (child._component == newComponent) {
-        if (child._parentChanged || child.slot != newSlot) {
+        if (child.slot != newSlot) {
           updateSlotForChild(child, newSlot);
         }
         newChild = child;
-      } else if (child._parentChanged || Component.canUpdate(child.component, newComponent)) {
-        if (child._parentChanged || child.slot != newSlot) {
+      } else if (Component.canUpdate(child.component, newComponent)) {
+        if (child.slot != newSlot) {
           updateSlotForChild(child, newSlot);
         }
         child.update(newComponent);
@@ -422,7 +358,7 @@ abstract class Element implements BuildContext {
     if (parent != null) {
       _owner = parent.owner;
       _binding = parent.binding;
-      _renderer = _inheritRendererFromParent();
+      _renderer = parent.renderer;
     }
     assert(_owner != null);
     assert(_binding != null);
@@ -491,34 +427,6 @@ abstract class Element implements BuildContext {
     }
   }
 
-  var _parentChanged = false;
-
-  void updatePrevSibling(Element? prevSibling) {
-    assert(_lifecycleState == _ElementLifecycle.active);
-    assert(_component != null);
-    assert(_parent != null);
-    assert(_parent!._lifecycleState == _ElementLifecycle.active);
-    assert(_depth != null);
-    assert(_parentNode != null);
-    _prevSibling = prevSibling;
-    _updateAncestorSiblingRecursively(_parentChanged);
-    _parentChanged = false;
-  }
-
-  @mustCallSuper
-  void _didChangeAncestorSibling() {}
-
-  void _updateAncestorSiblingRecursively(bool didReorderParent) {
-    var newAncestorSibling = _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
-    if (didReorderParent || newAncestorSibling != _prevAncestorSibling) {
-      _prevAncestorSibling = newAncestorSibling;
-      _didChangeAncestorSibling();
-      if (this is! RenderElement) {
-        visitChildren((e) => e._updateAncestorSiblingRecursively(true));
-      }
-    }
-  }
-
   Element? _retakeInactiveElement(GlobalKey key, Component newComponent) {
     final Element? element = key._currentElement;
     if (element == null) {
@@ -559,7 +467,6 @@ abstract class Element implements BuildContext {
       if (newChild != null) {
         assert(newChild._parent == null);
         newChild._activateWithParent(this);
-        newChild._parentChanged = true;
         final Element? updatedChild = updateChild(newChild, newComponent, newSlot);
         assert(newChild == updatedChild);
         return updatedChild!;
@@ -613,9 +520,9 @@ abstract class Element implements BuildContext {
   void _activateWithParent(Element parent) {
     assert(_lifecycleState == _ElementLifecycle.inactive);
     _parent = parent;
-    _parentNode = parent is RenderElement ? parent : parent._parentNode;
     _updateDepth(_parent!.depth);
     _activateRecursively(this);
+    attachRenderObject(newSlot);
     assert(_lifecycleState == _ElementLifecycle.active);
   }
 
@@ -647,7 +554,6 @@ abstract class Element implements BuildContext {
     _lifecycleState = _ElementLifecycle.active;
 
     var parent = _parent!;
-    _parentNode = parent is RenderElement ? parent : parent._parentNode;
     _renderer = parent._renderer;
 
     _dependencies?.clear();
@@ -721,7 +627,6 @@ abstract class Element implements BuildContext {
       ComponentsBinding._unregisterGlobalKey(key, this);
     }
 
-    _parentNode = null;
     _component = null;
     _dependencies = null;
     _lifecycleState = _ElementLifecycle.defunct;
@@ -854,7 +759,6 @@ abstract class Element implements BuildContext {
   void markNeedsBuild() {
     assert(_lifecycleState != _ElementLifecycle.defunct);
     if (_lifecycleState != _ElementLifecycle.active) return;
-    assert(_parentNode != null);
     assert(_lifecycleState == _ElementLifecycle.active);
     assert(() {
       if (owner._debugBuilding) {
