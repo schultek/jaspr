@@ -18,8 +18,8 @@ abstract class SingleChildElement extends Element {
   bool get debugDoingBuild => _debugDoingBuild;
 
   @override
-  void mount(Element? parent, Element? prevSibling) {
-    super.mount(parent, prevSibling);
+  void mount(Element? parent, ElementSlot? newSlot) {
+    super.mount(parent, newSlot);
     assert(_child == null);
     assert(_lifecycleState == _ElementLifecycle.active);
     _firstBuild();
@@ -58,7 +58,7 @@ abstract class SingleChildElement extends Element {
       assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(false));
     }
 
-    _child = updateChild(_child, built, null);
+    _child = updateChild(_child, built, slot);
   }
 
   /// Subclasses should override this function to return the current configuration of

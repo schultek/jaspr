@@ -85,8 +85,8 @@ abstract class NoChildElement extends Element {
   bool get debugDoingBuild => false;
 
   @override
-  void mount(Element? parent, Element? prevSibling) {
-    super.mount(parent, prevSibling);
+  void mount(Element? parent, ElementSlot? newSlot) {
+    super.mount(parent, newSlot);
     assert(_lifecycleState == _ElementLifecycle.active);
     _firstBuild();
   }

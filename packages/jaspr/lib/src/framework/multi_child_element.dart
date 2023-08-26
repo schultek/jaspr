@@ -24,8 +24,8 @@ abstract class MultiChildElement extends Element {
   bool get debugDoingBuild => _debugDoingBuild;
 
   @override
-  void mount(Element? parent, Element? prevSibling) {
-    super.mount(parent, prevSibling);
+  void mount(Element? parent, ElementSlot? newSlot) {
+    super.mount(parent, newSlot);
     assert(_children == null);
     assert(_lifecycleState == _ElementLifecycle.active);
     _firstBuild();
@@ -93,6 +93,10 @@ abstract class MultiChildElement extends Element {
       return forgottenChildren != null && forgottenChildren.contains(child) ? null : child;
     }
 
+    ElementSlot? slotFor(Element? previousChild) {
+      return previousChild != null ? ElementSlot(previousChild) : null;
+    }
+
     // This attempts to diff the new child list (newComponents) with
     // the old child list (oldChildren), and produce a new list of elements to
     // be the new list of child elements of this element. The called of this
@@ -140,7 +144,7 @@ abstract class MultiChildElement extends Element {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
       final Component newComponent = newComponents[newChildrenTop];
       if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
-      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      final Element newChild = updateChild(oldChild, newComponent, slotFor(prevChild))!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
@@ -194,7 +198,7 @@ abstract class MultiChildElement extends Element {
           }
         }
       }
-      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      final Element newChild = updateChild(oldChild, newComponent, slotFor(prevChild))!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
@@ -208,7 +212,7 @@ abstract class MultiChildElement extends Element {
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element oldChild = oldChildren[oldChildrenTop];
       final Component newComponent = newComponents[newChildrenTop];
-      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      final Element newChild = updateChild(oldChild, newComponent, slotFor(prevChild))!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;

@@ -27,7 +27,8 @@ part 'multi_child_element.dart';
 part 'notification.dart';
 part 'observer_component.dart';
 part 'render_element.dart';
-part 'render_scope.dart';
+part 'render_object.dart';
+part 'render_object_element.dart';
 part 'single_child_element.dart';
 part 'state_mixins.dart';
 part 'stateful_component.dart';
@@ -200,6 +201,15 @@ abstract class Element implements BuildContext {
   final int _cachedHash = _nextHashCode = (_nextHashCode + 1) % 0xffffff;
   static int _nextHashCode = 1;
 
+  /// Information set by parent to define where this child fits in its parent's
+  /// child list.
+  ///
+  /// A child components's slot is determined when the parent's [updateChild] method
+  /// is called to inflate the child component. See [RenderObjectElement] for more
+  /// details on slots.
+  ElementSlot? get slot => _slot;
+  ElementSlot? _slot;
+
   /// An integer that is guaranteed to be greater than the parent's, if any.
   /// The element at the root of the tree must have a depth greater than 0.
   int get depth => _depth!;
@@ -236,34 +246,70 @@ abstract class Element implements BuildContext {
   Renderer? _renderer;
 
   /// The previous sibling element.
+  ///
+  /// This references the element that is in the parents list of children before the current element.
+  /// If the current element is the first child, this is null.
   Element? _prevSibling;
 
-  /// The previous ancestor sibling
+  /// The previous ancestor sibling.
+  ///
+  /// If the current element is not the first child of the parent, this is the same as [_prevSibling].
+  /// If it is the first child, this references the previous sibling of the parent element, recursively, but never
+  /// outside of the parent render object.
+  ///
+  /// The following tree shows this: (RenderElements are marked with [R])
+  ///
+  /// A[R](
+  ///   B(
+  ///     C()
+  ///   )
+  ///   D(
+  ///     E()
+  ///   )
+  ///   F[R](
+  ///     G()
+  ///   )
+  /// )
+  ///
+  /// For this tree:
+  /// - The prevAncestorSibling of E is B
+  /// - The prevAncestorSibling of G is null
   Element? get prevAncestorSibling => _prevAncestorSibling;
   Element? _prevAncestorSibling;
 
   /// The last child element.
+  ///
+  /// If this element has children, this referst to the last one. Else this is null.
   Element? _lastChild;
 
   /// The last child dom node.
+  ///
+  /// This refers to the last RenderElement of the last child of this element.
+  /// If the element has no children, or the last child has no RenderElement children, this
+  /// is null.
+  ///
+  /// Also if the last child has no children, but the second to last does, this is still null.
   RenderElement? get lastNode => _lastNode;
   RenderElement? _lastNode;
 
   /// The nearest ancestor dom node.
+  ///
+  /// The nearest parent element that is also a RenderElement.
   RenderElement? get parentNode => _parentNode;
   RenderElement? _parentNode;
+
+  /// The previous render element
+  RenderElement? get _prevNode {
+    Element? prevElem = _prevAncestorSibling;
+    while (prevElem != null && prevElem._lastNode == null) {
+      prevElem = prevElem._prevAncestorSibling;
+    }
+    return prevElem?._lastNode;
+  }
 
   // This is used to verify that Element objects move through life in an
   // orderly fashion.
   _ElementLifecycle _lifecycleState = _ElementLifecycle.initial;
-
-  void updateLastChild(Element? child) {
-    _lastChild = child;
-    _lastNode = _lastChild?._lastNode;
-    if (_parent?._lastChild == this && _parent?._lastNode != _lastNode) {
-      _parent!.updateLastChild(this);
-    }
-  }
 
   /// Calls the argument for each child.
   ///
@@ -313,12 +359,9 @@ abstract class Element implements BuildContext {
   /// |  **child == null**  |  Returns null.         |  Returns new [Element]. |
   /// |  **child != null**  |  Old child is removed, returns null. | Old child updated if possible, returns child or new [Element]. |
   @protected
-  Element? updateChild(Element? child, Component? newComponent, Element? prevSibling) {
+  Element? updateChild(Element? child, Component? newComponent, ElementSlot? newSlot) {
     if (newComponent == null) {
       if (child != null) {
-        if (_lastChild == child) {
-          updateLastChild(prevSibling);
-        }
         deactivateChild(child);
       }
       return null;
@@ -326,13 +369,13 @@ abstract class Element implements BuildContext {
     final Element newChild;
     if (child != null) {
       if (child._component == newComponent) {
-        if (child._parentChanged || child._prevSibling != prevSibling) {
-          child.updatePrevSibling(prevSibling);
+        if (child._parentChanged || child.slot != newSlot) {
+          updateSlotForChild(child, newSlot);
         }
         newChild = child;
       } else if (child._parentChanged || Component.canUpdate(child.component, newComponent)) {
-        if (child._parentChanged || child._prevSibling != prevSibling) {
-          child.updatePrevSibling(prevSibling);
+        if (child._parentChanged || child.slot != newSlot) {
+          updateSlotForChild(child, newSlot);
         }
         child.update(newComponent);
         assert(child.component == newComponent);
@@ -340,14 +383,10 @@ abstract class Element implements BuildContext {
       } else {
         deactivateChild(child);
         assert(child._parent == null);
-        newChild = inflateComponent(newComponent, prevSibling);
+        newChild = inflateComponent(newComponent, newSlot);
       }
     } else {
-      newChild = inflateComponent(newComponent, prevSibling);
-    }
-
-    if (_lastChild == prevSibling) {
-      updateLastChild(newChild);
+      newChild = inflateComponent(newComponent, newSlot);
     }
 
     return newChild;
@@ -369,17 +408,14 @@ abstract class Element implements BuildContext {
   /// Implementations of this method should start with a call to the inherited
   /// method, as in `super.mount(parent)`.
   @mustCallSuper
-  void mount(Element? parent, Element? prevSibling) {
+  void mount(Element? parent, ElementSlot? newSlot) {
     assert(_lifecycleState == _ElementLifecycle.initial);
     assert(_component != null);
     assert(_parent == null);
     assert(parent == null || parent._lifecycleState == _ElementLifecycle.active);
 
     _parent = parent;
-    _prevSibling = prevSibling;
-    _prevAncestorSibling = _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
-    _parentNode = parent is RenderElement ? parent : parent?._parentNode;
-
+    _slot = newSlot;
     _lifecycleState = _ElementLifecycle.active;
     _depth = parent != null ? parent.depth + 1 : 1;
 
@@ -418,6 +454,31 @@ abstract class Element implements BuildContext {
     assert(_depth != null);
     assert(Component.canUpdate(component, newComponent));
     _component = newComponent;
+  }
+
+  /// Change the slot that the given child occupies in its parent.
+  ///
+  /// Called by [RenderObjectElement], when child moves from one position
+  /// to another in this element's child list.
+  @protected
+  void updateSlotForChild(Element child, ElementSlot? newSlot) {
+    assert(_lifecycleState == _ElementLifecycle.active);
+    assert(child._parent == this);
+    void visit(Element element) {
+      element._updateSlot(newSlot);
+      if (element is! RenderObjectElement) {
+        element.visitChildren(visit);
+      }
+    }
+
+    visit(child);
+  }
+
+  void _updateSlot(ElementSlot? newSlot) {
+    assert(_lifecycleState == _ElementLifecycle.active);
+    assert(_parent != null);
+    assert(_parent!._lifecycleState == _ElementLifecycle.active);
+    _slot = newSlot;
   }
 
   void _updateDepth(int parentDepth) {
@@ -491,7 +552,7 @@ abstract class Element implements BuildContext {
   /// The element returned by this function will already have been mounted and
   /// will be in the "active" lifecycle state.
   @protected
-  Element inflateComponent(Component newComponent, Element? nextChild) {
+  Element inflateComponent(Component newComponent, ElementSlot? newSlot) {
     final Key? key = newComponent.key;
     if (key is GlobalKey) {
       final Element? newChild = _retakeInactiveElement(key, newComponent);
@@ -499,13 +560,13 @@ abstract class Element implements BuildContext {
         assert(newChild._parent == null);
         newChild._activateWithParent(this);
         newChild._parentChanged = true;
-        final Element? updatedChild = updateChild(newChild, newComponent, nextChild);
+        final Element? updatedChild = updateChild(newChild, newComponent, newSlot);
         assert(newChild == updatedChild);
         return updatedChild!;
       }
     }
     final Element newChild = newComponent.createElement();
-    newChild.mount(this, nextChild);
+    newChild.mount(this, newSlot);
     assert(newChild._lifecycleState == _ElementLifecycle.active);
     return newChild;
   }
@@ -587,7 +648,7 @@ abstract class Element implements BuildContext {
 
     var parent = _parent!;
     _parentNode = parent is RenderElement ? parent : parent._parentNode;
-    _renderer = _inheritRendererFromParent();
+    _renderer = parent._renderer;
 
     _dependencies?.clear();
     _hadUnsatisfiedDependencies = false;
@@ -598,10 +659,6 @@ abstract class Element implements BuildContext {
       owner.scheduleBuildFor(this);
     }
     if (hadDependencies) didChangeDependencies();
-  }
-
-  Renderer _inheritRendererFromParent() {
-    return _parent!._renderer!.inherit(_parent!);
   }
 
   /// Transition from the "active" to the "inactive" lifecycle state.
@@ -892,4 +949,13 @@ abstract class Element implements BuildContext {
   void dispatchNotification(Notification notification) {
     _notificationTree?.dispatchNotification(notification);
   }
+}
+
+/// A value for [Element.slot] used for child elements.
+///
+/// A slot is defined by the previous sibling of the parent.
+class ElementSlot {
+  const ElementSlot(this.previousSibling);
+
+  final Element previousSibling;
 }
