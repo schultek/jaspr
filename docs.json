@@ -33,5 +33,10 @@
       ["\uD83D\uDC99 Contributing", "/eco/contributing"]
     ]],
     ["\uD83E\uDDEA Testing", "/testing"]
-  ]
+  ],
+  "docsearch": {
+    "appId": "0JMHSW1KVQ",
+    "apiKey": "d3788bd8dae4fad302fc6fe34fd5399f",
+    "indexName": "schultek"
+  }
 }
