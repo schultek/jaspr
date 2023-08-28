@@ -9,29 +9,35 @@ next: /core/components
 
 Jaspr comes with a cli tool to create, serve and build your web app.
 
-- `jaspr create -t <template> <project-name>` will create a new jaspr project based on `<template>`inside the `<project-name>` directory
-- use `jaspr create` to see a list of available templates
-- `jaspr serve` will serve the web-app in the current directory, including hot-reloading
-- `jaspr build` will build the web-app containing the static web assets (compiled js, html, ...) and the server executable
+- `jaspr create` will create a new jaspr project. The cli will prompt you for a project name and template to use.
+- `jaspr serve` will serve the web-app in the current directory, including hot-reloading.
+- `jaspr build` will build the web-app containing the static web assets (compiled js, html, ...) and the server executable.
+- `jaspr generate` will generate all routes of your website at build time and build the web-app as a static site.
 
 ## 📟 Execution Mode
 
-**Jaspr** is a full-stack web framework, meaning it runs both on the server and the client. However
-depending on what you want to build you can choose how your app should be built and executed using jaspr.
+**Jaspr** is a full-stack web framework, meaning it can run both on the server and the client. Depending on what you
+want to build you can choose how your app should be built and executed using jaspr.
 
 - **Server-side Rendering with client-side hydration:**
   In the default mode jaspr runs both on the server and client. It renders your html on the server
   including any dynamic data from an api or database and then hydrates that html on the client in order to
-  make it interactive. This is the default mode for the `basic`, `classic` and `islands` templates.
+  make it interactive. This is the default mode for the `basic` and `classic` templates.
 
 - **Client-side only:**
-  If you want, you can skip the server part of jaspr completely and only use it as a client-side framework.
+  If you want, you can skip the server part of jaspr completely and use it as a client-side only framework. This way
+  you can deploy your built app to any static hosting provider (like firebase hosting) without needing an extra server.
   To use it like this, simply use the `client` template when creating a new project.
 
 - **Server-side only:**
   If you are dealing with a fully static website without needing any interactivity through js, you can also
   use jaspr as a purely server-side rendering framework. To set this up, use the `server` template when creating
   a new project. Then you won't have any javascript shipped to the browser.
+
+- **Static site generation:**
+  Jaspr can also perform static site generation, meaning it can generate static pages at build time from your server-side
+  components. This can be used with any project that has server-side rendering setup, simply by using `jaspr generate`
+  instead of `jaspr build` when building and deploying your app.
 
 ## 🏗 Templates
 
@@ -53,10 +59,6 @@ automatic client hydration.
 
 Similar to the basic template, but with an additional `index.html` and `styles.css` file in case
 you prefer to write your template in html and global styles in css.
-
-#### Islands Template
-
-A server-rendered app using the islands architecture for client hydration.
 
 #### Client Template
 
