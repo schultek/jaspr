@@ -44,6 +44,21 @@ abstract class MultiChildRenderObject extends RenderObject {
     }
   }
 
+  /// Insert child into this render object's child list after the given child.
+  ///
+  /// If `after` is null, then this inserts the child at the start of the list,
+  /// and the child becomes the new [firstChild].
+  void insert(RenderObject child, {RenderObject? after}) {
+    assert(child != this, 'A RenderObject cannot be inserted into itself.');
+    assert(after != this,
+        'A RenderObject cannot simultaneously be both the parent and the sibling of another RenderObject.');
+    assert(child != after, 'A RenderObject cannot be inserted after itself.');
+    assert(child != _firstChild);
+    assert(child != _lastChild);
+    child._parent = this;
+    _insertIntoChildList(child, after: after);
+  }
+
   void _insertIntoChildList(RenderObject child, {RenderObject? after}) {
     assert(child.nextSibling == null);
     assert(child.previousSibling == null);
@@ -79,6 +94,35 @@ abstract class MultiChildRenderObject extends RenderObject {
         assert(after.nextSibling == child);
       }
     }
+  }
+
+  /// Remove this child from the child list.
+  ///
+  /// Requires the child to be present in the child list.
+  void remove(RenderObject child) {
+    _removeFromChildList(child);
+    child._parent = null;
+  }
+
+  void _removeFromChildList(RenderObject child) {
+    assert(_debugUltimatePreviousSiblingOf(child, equals: _firstChild));
+    assert(_debugUltimateNextSiblingOf(child, equals: _lastChild));
+    assert(_childCount >= 0);
+    if (child.previousSibling == null) {
+      assert(_firstChild == child);
+      _firstChild = child.nextSibling;
+    } else {
+      child.previousSibling!.nextSibling = child.nextSibling;
+    }
+    if (child.nextSibling == null) {
+      assert(_lastChild == child);
+      _lastChild = child.previousSibling;
+    } else {
+      child.nextSibling!.previousSibling = child.previousSibling;
+    }
+    child.previousSibling = null;
+    child.nextSibling = null;
+    _childCount -= 1;
   }
 
   bool _debugUltimatePreviousSiblingOf(RenderObject child, {RenderObject? equals}) {
@@ -134,53 +178,21 @@ mixin RenderObjectElement on Element {
     assert(_ancestorRenderObjectElement == null);
     _slot = newSlot;
     _ancestorRenderObjectElement = _findAncestorRenderObjectElement();
-    // renderer.attach(_ancestorRenderObjectElement, renderObject, newSlot);
-    //_ancestorRenderObjectElement?.insertRenderObjectChild(renderObject, newSlot);
-  }
-}
-
-mixin RenderElement on Element {
-  @override
-  RenderElement get _lastNode => this;
-
-  /// Arbitrary data the renderer can use
-  dynamic renderData;
-
-  void _render() {
-    renderNode(_renderer!);
-  }
-
-  void _attach() {
-    _renderer!.attachNode(_parentNode, this, _prevNode);
-  }
-
-  void _remove() {
-    _renderer!.removeChild(_parentNode!, this);
+    if (_ancestorRenderObjectElement case MultiChildRenderObject ancestor) {
+      ancestor.insert(renderObject, newSlot.previousSibling.lastChildRenderObject);
+    }
   }
 
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
-    _render();
-    super._firstBuild(() {
-      _attach();
-      onBuilt?.call();
-    });
-  }
-
-  @override
-  void update(Component newComponent) {
-    super.update(newComponent);
-    _render();
-  }
-
-  @protected
-  void renderNode(Renderer renderer);
-
-  @override
-  void _didChangeAncestorSibling() {
-    super._didChangeAncestorSibling();
-    assert(_parentNode != null);
-    _attach();
+  void detachRenderObject() {
+    if (_ancestorRenderObjectElement != null) {
+      if (_ancestorRenderObjectElement case MultiChildRenderObject ancestor) {
+        renderer.remove(renderObject);
+        ancestor.remove(renderObject);
+      }
+      _ancestorRenderObjectElement = null;
+    }
+    _slot = null;
   }
 }
 

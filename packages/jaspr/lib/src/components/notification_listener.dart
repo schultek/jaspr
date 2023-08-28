@@ -33,15 +33,6 @@ class NotificationListener<T extends Notification> extends Component {
   ///
   /// Return true to cancel the notification bubbling. Return false to
   /// allow the notification to continue to be dispatched to further ancestors.
-  ///
-  /// Notifications vary in terms of when they are dispatched. There are two
-  /// main possibilities: dispatch between frames, and dispatch during layout.
-  ///
-  /// For notifications that dispatch during layout, such as those that inherit
-  /// from [LayoutChangedNotification], it is too late to call [State.setState]
-  /// in response to the notification (as layout is currently happening in a
-  /// descendant, by definition, since notifications bubble up the tree). For
-  /// components that depend on layout, consider a [LayoutBuilder] instead.
   final NotificationListenerCallback<T>? onNotification;
 
   @override
@@ -64,7 +55,5 @@ class _NotificationElement<T extends Notification> extends SingleChildElement wi
   }
 
   @override
-  void notifyClients(covariant Component oldComponent) {
-    // Notification tree does not need to notify clients.
-  }
+  Component? build() => (component as NotificationListener<T>).child;
 }

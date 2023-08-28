@@ -427,6 +427,37 @@ abstract class Element implements BuildContext {
     }
   }
 
+  /// Add [renderObject] to the render tree at the location specified by `newSlot`.
+  ///
+  /// The default implementation of this function calls
+  /// [attachRenderObject] recursively on each child. The
+  /// [RenderObjectElement.attachRenderObject] override does the actual work of
+  /// adding [renderObject] to the render tree.
+  ///
+  /// The `newSlot` argument specifies the new value for this element's [slot].
+  void attachRenderObject(ElementSlot? newSlot) {
+    assert(_slot == null);
+    // visitChildren((Element child) {
+    //   child.attachRenderObject(newSlot);
+    // });
+    _slot = newSlot;
+  }
+
+  /// Remove [renderObject] from the render tree.
+  ///
+  /// The default implementation of this function calls
+  /// [detachRenderObject] recursively on each child. The
+  /// [RenderObjectElement.detachRenderObject] override does the actual work of
+  /// removing [renderObject] from the render tree.
+  ///
+  /// This is called by [deactivateChild].
+  void detachRenderObject() {
+    // visitChildren((Element child) {
+    //   child.detachRenderObject();
+    // });
+    _slot = null;
+  }
+
   Element? _retakeInactiveElement(GlobalKey key, Component newComponent) {
     final Element? element = key._currentElement;
     if (element == null) {
@@ -496,8 +527,7 @@ abstract class Element implements BuildContext {
   void deactivateChild(Element child) {
     assert(child._parent == this);
     child._parent = null;
-    child._prevSibling = null;
-    child._prevAncestorSibling = null;
+    child.detachRenderObject();
     owner._inactiveElements.add(child);
   }
 
@@ -517,7 +547,7 @@ abstract class Element implements BuildContext {
   @mustCallSuper
   void forgetChild(Element child) {}
 
-  void _activateWithParent(Element parent) {
+  void _activateWithParent(Element parent, ElementSlot? newSlot) {
     assert(_lifecycleState == _ElementLifecycle.inactive);
     _parent = parent;
     _updateDepth(_parent!.depth);

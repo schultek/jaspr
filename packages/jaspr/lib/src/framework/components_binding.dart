@@ -48,8 +48,8 @@ mixin ComponentsBinding on AppBinding {
   ///
   /// This is initialized when [runApp] is called.
   @override
-  RenderElement? get rootElement => _rootElement;
-  RenderElement? _rootElement;
+  RenderObjectElement? get rootElement => _rootElement;
+  RenderObjectElement? _rootElement;
 
   Renderer createRenderer();
 
@@ -75,7 +75,7 @@ class _Root extends Component {
   _RootElement createElement() => _RootElement(this);
 }
 
-class _RootElement extends SingleChildElement with RenderElement {
+class _RootElement extends SingleChildElement with RenderObjectElement {
   _RootElement(_Root component) : super(component);
 
   @override
@@ -92,4 +92,10 @@ class _RootElement extends SingleChildElement with RenderElement {
 
   @override
   Component build() => component.child;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    // TODO: implement createRenderObject
+    throw UnimplementedError();
+  }
 }
