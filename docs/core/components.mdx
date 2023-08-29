@@ -42,20 +42,26 @@ Using this component would render the following html:
 </div>  
 ```
 
-This gives you the most flexibility over how you structure your html. Especially **Jaspr** does have separate components for each html tag,
-since these would be easy to add for yourself either as simple functions or as `StatelessComponent`s.
+<Info>
+`DomComponent` is the lowest-level component for rendering html tags and gives you the most flexibility. However it is
+also very verbose. Therefore jaspr comes with a set of utility functions for creating most common html tags, like `div`,
+`button` etc. See [Writing Html](/core/html) for more details.
+</Info>
 
 ## Text
 
 A simple component that renders a text node.
 
-A text node in html is just some standalone string, that is placed inside another html element. Therefore the `Text` component also only receives a single string to render to the page.
+A text node in html is just some standalone string that is placed inside another html element. Therefore the `Text`
+component also only receives a single string to render to the page.
 
 ```dart
   var text = Text('Hello World!');
 ```
 
-As usual for web, styling is done through a combination of CSS attributes, either in a **Stylesheet** or inline though the **`style` attribute** of the parent elements. 
+As usual for web, styling is done through a combination of CSS attributes, either in a **Stylesheet** or inline though
+the **`style` attribute** of the parent elements.
+
 For example rendering a simple heading would look like this:
 
 ```dart
@@ -74,7 +80,7 @@ rendering:
 
 ## StatelessComponent
 
-A custom component that does not required any mutable state and looks like this:
+A custom component that does not require any mutable state and looks like this:
 
 ```dart
 class MyComponent extends StatelessComponent {
@@ -93,13 +99,15 @@ Similar to Flutter, this component:
 - has a constructor receiving a `Key` and optionally some custom parameters,
 - has a `build()` method receiving a `BuildContext`.
 
-Different to Flutter is that the `build()` method does not return a single `Component`, but rather multiple `Component`s as an `Iterable<Component>`. This is again because a HTML element can always have multiple child elements.
+Different to Flutter is that the `build()` method does not return a single `Component`, but rather multiple
+`Component`s as an `Iterable<Component>`. This is again because a HTML element can always have multiple child elements.
 
 <Info>
 This design decision was made based on the core principles of jaspr, explained [here](/jaspr-vs-flutter-web)
 </Info>
 
-The recommended way to write `build()` methods with **jaspr** is to use the [**synchronous generator**](https://dart.dev/guides/language/language-tour#generators) pattern. It allows us to return multiple child components in a declarative way by `yield`ing each component without needing to deal with `List`s or `Iterable`s directly.
+The recommended way to write `build()` methods with **jaspr** is to use the [**synchronous generator**](https://dart.dev/guides/language/language-tour#generators) pattern.
+It allows us to return multiple child components in a declarative way by `yield`ing each component without needing to deal with `List`s or `Iterable`s directly.
 
 To write a sync generator, simply use the `sync*` keyword in the method definition and `yield` one or multiple components:
 
@@ -122,6 +130,19 @@ To write a sync generator, simply use the `sync*` keyword in the method definiti
       }
     } 
   }
+```
+
+If you don't like to use the `sync*` / `yield` syntax, you can always just return a normal `List` from the build method,
+like this:
+
+```dart
+@override
+Iterable<Component> build(BuildContext context) {
+  return [
+    ChildA(),
+    ChildB(),
+  ];
+}
 ```
 
 In every other aspect, this component behaves the same as Flutters `StatelessWidget`.

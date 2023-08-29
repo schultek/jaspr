@@ -7,6 +7,10 @@
 
   To specify which routes your application should handle, either use `jaspr_router` or call `ServerApp.requestRouteGeneration('/home');`.
 
+## 0.8.2
+
+- Fixed client template to set `uses-ssr: false` correctly.
+
 ## 0.8.1
 
 - Fixed bug with rebuilding the root component.
