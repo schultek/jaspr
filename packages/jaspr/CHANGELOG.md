@@ -1,4 +1,4 @@
-## 0.8.2
+## Unreleased patch
 
 - Fixed client template to set `uses-ssr: false` correctly.
 
