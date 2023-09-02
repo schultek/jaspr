@@ -66,7 +66,7 @@ For a complete app check out the [custom_middleware example](https://github.com/
 
 ## Custom Backend
 
-If this is not enough, you can go one step further and use a custom backend framework.
+If this is not enough, you can go one step further and spin up your own server or use a custom backend framework.
 
 <Info>
 Since `jaspr` is built with `shelf`, this works best when the backend framework is also compatible with shelf.
@@ -81,12 +81,7 @@ There are two main functions, that enable this:
 
 <Warning>
 When using your own backend setup, you can still do `jaspr serve`, however auto-reload won't work 
-on the server then.
-</Warning>
-
-<Warning>
-When you are not using `jaspr serve`, you need to run webdev manually with 
-`dart run webdev serve web:5467` and provide the `jaspr_dev_proxy=5467` env var to your server process.
+on the server automatically.
 </Warning>
 
 ## Example: Shelf
@@ -99,8 +94,27 @@ maintained by the Dart team.
 Since jaspr used shelf internally, it is pretty straightforward to built a custom backend for jaspr using
 shelf. 
 
+```dart
+void main() async {
+  var handler = serveApp((request, render) {
+    // Optionally do something with `request`
+    print("Request uri is ${request.requestedUri}");
+    // Return a server-rendered response by calling `render()` with your root component
+    return render(App());
+  });
+
+  // provide `handler` to your app, e.g.
+  await shelf_io.serve(handler, InternetAddress.anyIPv4, 8080);
+}
+```
+
 Check out our [shelf_backend example](https://github.com/schultek/jaspr/tree/main/examples/shelf_backend)
 to see this in action.
+
+**Make sure** that you set the base path of your app when mounting the `serveApp` handler to
+any other route prefix than `/`, otherwise your static resources like `styles.css` or `main.dart.js`
+can't be loaded correctly. Add the `<base href="/<route_prefix>/">` tag to the `head` of your
+`index.html`, as demonstrated in the example.
 
 ## Example: Dart Frog
 
