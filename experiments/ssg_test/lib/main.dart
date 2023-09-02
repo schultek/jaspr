@@ -25,7 +25,10 @@ void main() {
     ],
     body: Router(routes: [
       Route(path: '/', builder: (_, __) => App('Home')),
-      Route(path: '/about', builder: (_, __) => App('About')),
+      Route(path: '/about', builder: (_, __) => App('About'), routes: [
+        Route(path: 'what_we_do', builder: (_, __) => App('What We Do')),
+        Route(path: 'portfolio', builder: (_, __) => App('Portfolio')),
+      ]),
       Route(path: '/contact', builder: (_, __) => App('Contact')),
     ]),
   ));

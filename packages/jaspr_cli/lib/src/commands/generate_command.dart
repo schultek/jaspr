@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:mason/mason.dart' show ExitCode;
 import 'package:webdev/src/daemon_client.dart' as d;
 
+import '../helpers/copy_helper.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/ssr_helper.dart';
 import '../logging.dart';
@@ -42,9 +43,10 @@ class GenerateCommand extends BaseCommand with SsrHelper, FlutterHelper {
         'If you want to build a purely client-rendered application use "jaspr build" instead.');
 
     var dir = Directory('build/jaspr');
-    if (!await dir.exists()) {
-      await dir.create(recursive: true);
+    if (await dir.exists()) {
+      await dir.delete(recursive: true);
     }
+    await dir.create(recursive: true);
 
     String? entryPoint = await getEntryPoint(argResults!['input']);
 
@@ -67,6 +69,7 @@ class GenerateCommand extends BaseCommand with SsrHelper, FlutterHelper {
     var flutterResult = Future<void>.value();
 
     await webResult;
+    await copyFiles('./build/web', './build/jaspr');
 
     if (usesFlutter) {
       flutterResult = buildFlutter(false);
@@ -81,7 +84,7 @@ class GenerateCommand extends BaseCommand with SsrHelper, FlutterHelper {
         '--enable-asserts',
         '-Djaspr.flags.release=true',
         '-Djaspr.flags.generate=true',
-        '-Djaspr.dev.web=build/jaspr',
+        '-Djaspr.dev.web=build/web',
         entryPoint,
       ],
       environment: {'PORT': '8080', 'JASPR_PROXY_PORT': '5467'},
@@ -165,7 +168,7 @@ class GenerateCommand extends BaseCommand with SsrHelper, FlutterHelper {
       logger.writeServerLog,
     );
     OutputLocation outputLocation = OutputLocation((b) => b
-      ..output = 'build/jaspr'
+      ..output = 'build/web'
       ..useSymlinks = false
       ..hoist = true);
 
