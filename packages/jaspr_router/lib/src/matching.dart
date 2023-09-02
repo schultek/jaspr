@@ -128,7 +128,12 @@ class RouteMatchList {
   /// The last matching route.
   RouteMatch get last => _matches.last;
 
-  String? get title => _matches.reversed.fold(null, (t, r) => t ?? (r is Route ? (r as Route).title : null));
+  // Returns the title of the deepest matching route
+  String? get title {
+    return _matches.reversed.fold(null, (String? t, RouteMatch r) {
+      return t ?? (r.route is Route ? (r.route as Route).title : null);
+    });
+  }
 
   /// The route matches.
   List<RouteMatch> get matches => _matches;
