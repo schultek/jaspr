@@ -1,4 +1,4 @@
-## 0.2.4
+## Unreleased patch
 
 - `jaspr_router` fixed bug where `Router.of(context).matchList.title` always returned null.
 
