@@ -26,7 +26,7 @@
       ["\uD83D\uDCCE Platform Imports", "/advanced/imports"]
     ]],
     ["Ecosystem", [
-      ["\uD83E\uDDED Routing", "/core/routing"],
+      ["\uD83E\uDDED Routing", "/eco/routing"],
       ["\uD83C\uDF0A Riverpod", "/eco/riverpod"],
       ["\uD83D\uDDBC️ Flutter Embedding", "/eco/flutter_embedding"],
       ["\uD83C\uDF2C️ Tailwind", "/eco/tailwind"],
