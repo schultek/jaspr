@@ -17,7 +17,6 @@
       ["\uD83D\uDC7E App & Document", "/core/app"],
       ["\uD83D\uDD8D Writing HTML in Jaspr", "/core/html"],
       ["\uD83C\uDFA8 Styling in Jaspr", "/core/styling"],
-      ["\uD83E\uDDED Routing", "/core/routing"],
       ["\uD83C\uDFD7 Server Side Rendering", "/core/ssr"],
       ["\uD83D\uDCD1 Static Site Generation", "/core/ssg"]
     ]],
@@ -27,8 +26,9 @@
       ["\uD83D\uDCCE Platform Imports", "/advanced/imports"]
     ]],
     ["Ecosystem", [
-      ["\uD83D\uDDBC️ Flutter Embedding", "/eco/flutter_embedding"],
+      ["\uD83E\uDDED Routing", "/core/routing"],
       ["\uD83C\uDF0A Riverpod", "/eco/riverpod"],
+      ["\uD83D\uDDBC️ Flutter Embedding", "/eco/flutter_embedding"],
       ["\uD83C\uDF2C️ Tailwind", "/eco/tailwind"],
       ["\uD83D\uDCDA Third-Party Packages", "/eco/packages"],
       ["\uD83D\uDC99 Contributing", "/eco/contributing"]
