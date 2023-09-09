@@ -1,4 +1,3 @@
-
 ## Unreleased minor
 
 - Added *Static Site Generation* support. Pages are automatically generated for each route.
