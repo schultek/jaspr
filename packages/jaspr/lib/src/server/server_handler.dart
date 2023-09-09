@@ -194,11 +194,16 @@ Handler createHandler(SetupHandler handle, {List<Middleware> middleware = const 
     cascade = cascade.add(_sseProxyHandler());
   }
 
+  // We skip static file handling in generate mode to always generate fresh content on the server.
+  if (!kGenerateMode) {
+    cascade = cascade.add(gzipMiddleware(staticHandler));
+  }
+
   var fileLoader = _proxyFileLoader(staticHandler);
-  cascade = cascade.add(gzipMiddleware(staticHandler)).add((request) async {
+  cascade = cascade.add((request) async {
     return handle(request, (setup) async {
-      /// We support two modes here, rendered-html and data-only
-      /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
+      // We support two modes here, rendered-html and data-only
+      // rendered-html does normal ssr, but data-only only returns the preloaded state data as json
       var isDataMode = request.headers['jaspr-mode'] == 'data-only';
 
       var requestUri = request.url.normalizePath();

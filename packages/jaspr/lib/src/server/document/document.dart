@@ -12,9 +12,9 @@ import '../markup_renderer.dart';
 export '../../components/style.dart' hide Style;
 
 part 'base_document.dart';
+part 'component_observer.dart';
 part 'document_binding.dart';
 part 'file_document.dart';
-part 'component_observer.dart';
 
 // only allow a single document
 const _documentKey = GlobalKey();
