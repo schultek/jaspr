@@ -27,6 +27,5 @@ abstract class HistoryManager {
 }
 
 abstract class RouteRegistry {
-  @override
   void registerRoutes(List<RouteBase> routes);
 }
