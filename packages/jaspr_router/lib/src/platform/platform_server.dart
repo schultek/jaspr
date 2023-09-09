@@ -5,10 +5,10 @@ import 'platform.dart';
 
 class PlatformRouterImpl implements PlatformRouter {
   @override
-  HistoryManager get history => HistoryManagerImpl();
+  final HistoryManager history = HistoryManagerImpl();
 
   @override
-  RouteRegistry get registry => RouteRegistryImpl();
+  final RouteRegistry registry = RouteRegistryImpl();
 }
 
 /// Server implementation of HistoryManager
