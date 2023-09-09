@@ -1,6 +1,15 @@
-import 'dart:html' hide Element;
+import 'dart:html';
 
-import 'history.dart';
+import '../route.dart';
+import 'platform.dart';
+
+class PlatformRouterImpl implements PlatformRouter {
+  @override
+  HistoryManager get history => HistoryManagerImpl();
+
+  @override
+  RouteRegistry get registry => RouteRegistryImpl();
+}
 
 /// Browser implementation of HistoryManager
 /// Accesses the window.history api
@@ -26,4 +35,9 @@ class HistoryManagerImpl implements HistoryManager {
   void back() {
     window.history.back();
   }
+}
+
+class RouteRegistryImpl implements RouteRegistry {
+  @override
+  void registerRoutes(List<RouteBase> routes) {}
 }

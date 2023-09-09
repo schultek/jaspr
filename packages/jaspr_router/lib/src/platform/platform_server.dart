@@ -1,7 +1,39 @@
 import 'package:jaspr/server.dart';
 
 import '../route.dart';
-import 'registry.dart';
+import 'platform.dart';
+
+class PlatformRouterImpl implements PlatformRouter {
+  @override
+  HistoryManager get history => HistoryManagerImpl();
+
+  @override
+  RouteRegistry get registry => RouteRegistryImpl();
+}
+
+/// Server implementation of HistoryManager
+/// This will just throw on each method, since routing is not supported on the server
+class HistoryManagerImpl implements HistoryManager {
+  @override
+  void push(String url, {String? title, Object? data}) {
+    throw UnimplementedError('Routing unavailable on the server');
+  }
+
+  @override
+  void replace(String url, {String? title, Object? data}) {
+    throw UnimplementedError('Routing unavailable on the server');
+  }
+
+  @override
+  void back() {
+    throw UnimplementedError('Routing unavailable on the server');
+  }
+
+  @override
+  void init(String location, void Function(String) onChange) {
+    // No-op
+  }
+}
 
 class RouteRegistryImpl implements RouteRegistry {
   @override
