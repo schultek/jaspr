@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.9.0
 
 - Added *Static Site Generation* support.
 
