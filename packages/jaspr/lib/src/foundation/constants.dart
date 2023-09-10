@@ -72,3 +72,6 @@ const double precisionErrorTolerance = 1e-10;
 /// to an integer `0`. This is not true for Dart code running in AOT or on the
 /// VM.
 const bool kIsWeb = identical(0, 0.0);
+
+/// A constant that is true if the application is running in static-site-generation mode.
+const bool kGenerateMode = bool.fromEnvironment('jaspr.flags.generate');

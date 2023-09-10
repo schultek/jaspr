@@ -15,6 +15,7 @@ final String kDevProxy =
     String.fromEnvironment('jaspr.dev.proxy', defaultValue: Platform.environment['jaspr_dev_proxy'] ?? '');
 final String kDevFlutter = String.fromEnvironment('jaspr.dev.flutter');
 const bool kDevHotreload = bool.fromEnvironment('jaspr.dev.hotreload');
+const String kDevWeb = String.fromEnvironment('jaspr.dev.web');
 
 /// A [Handler] that can be refreshed to update any used resources
 class RefreshableHandler {
@@ -168,7 +169,7 @@ Handler _sseProxyHandler() {
 
 // coverage:ignore-end
 
-final projectDir = _findRootProjectDir();
+final webDir = kDevWeb.isNotEmpty ? kDevWeb : join(_findRootProjectDir(), 'web');
 
 String _findRootProjectDir() {
   var dir = dirname(Platform.script.path);
@@ -179,9 +180,8 @@ String _findRootProjectDir() {
   return dir;
 }
 
-final staticFileHandler = kDevProxy.isNotEmpty
-    ? _proxyHandler()
-    : createStaticHandler(join(projectDir, 'web'), defaultDocument: 'index.html');
+final staticFileHandler =
+    kDevProxy.isNotEmpty ? _proxyHandler() : createStaticHandler(webDir, defaultDocument: 'index.html');
 
 typedef SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
 
@@ -194,11 +194,16 @@ Handler createHandler(SetupHandler handle, {List<Middleware> middleware = const 
     cascade = cascade.add(_sseProxyHandler());
   }
 
+  // We skip static file handling in generate mode to always generate fresh content on the server.
+  if (!kGenerateMode) {
+    cascade = cascade.add(gzipMiddleware(staticHandler));
+  }
+
   var fileLoader = _proxyFileLoader(staticHandler);
-  cascade = cascade.add(gzipMiddleware(staticHandler)).add((request) async {
+  cascade = cascade.add((request) async {
     return handle(request, (setup) async {
-      /// We support two modes here, rendered-html and data-only
-      /// rendered-html does normal ssr, but data-only only returns the preloaded state data as json
+      // We support two modes here, rendered-html and data-only
+      // rendered-html does normal ssr, but data-only only returns the preloaded state data as json
       var isDataMode = request.headers['jaspr-mode'] == 'data-only';
 
       var requestUri = request.url.normalizePath();

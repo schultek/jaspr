@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:path/path.dart' as p;
-
 import '../commands/base_command.dart';
 import '../logging.dart';
+import 'copy_helper.dart';
 
 mixin FlutterHelper on BaseCommand {
   late final usesFlutter = () {
@@ -57,29 +56,7 @@ mixin FlutterHelper on BaseCommand {
 
     await watchProcess(flutterProcess, tag: Tag.flutter);
 
-    var moves = <Future>[];
-    while (moveTargets.isNotEmpty) {
-      var moveTarget = moveTargets.removeAt(0);
-      var file = File('./build/flutter/$moveTarget');
-      var isDir = file.statSync().type == FileSystemEntityType.directory;
-      if (isDir) {
-        await Directory('$target/$moveTarget').create(recursive: true);
-
-        var files = Directory('build/flutter/$moveTarget').list(recursive: true);
-        await for (var file in files) {
-          final path = p.relative(file.path, from: 'build/flutter');
-          if (file is Directory) {
-            moveTargets.add(path);
-          } else {
-            moveTargets.add(path);
-          }
-        }
-      } else {
-        moves.add(file.copy('./$target/$moveTarget'));
-      }
-    }
-
-    await Future.wait(moves);
+    await copyFiles('./build/flutter', target, moveTargets);
   }
 
   Future<void> _ensureTarget() async {

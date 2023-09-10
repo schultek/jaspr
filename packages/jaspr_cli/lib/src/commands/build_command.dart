@@ -19,7 +19,7 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
     argParser.addOption(
       'input',
       abbr: 'i',
-      help: 'Specify the input file for the web app',
+      help: 'Specify the input file for the server app',
       defaultsTo: 'lib/main.dart',
     );
     argParser.addOption(
@@ -36,7 +36,7 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
   }
 
   @override
-  String get description => 'Performs a single build on the specified target and then exits.';
+  String get description => 'Builds the full project.';
 
   @override
   String get name => 'build';

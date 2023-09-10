@@ -1,10 +1,18 @@
-import 'history_stub.dart' if (dart.library.html) 'history_browser.dart';
+import '../route.dart';
+import 'platform_server.dart' if (dart.library.html) 'platform_web.dart';
+
+/// Interface for platform router.
+abstract class PlatformRouter {
+  static PlatformRouter instance = PlatformRouterImpl();
+
+  HistoryManager get history;
+
+  RouteRegistry get registry;
+}
 
 /// Interface for history management
 /// Will be implemented separately on browser and server
 abstract class HistoryManager {
-  static HistoryManager instance = HistoryManagerImpl();
-
   /// Initialize the history manager and setup any listeners to history changes
   void init(String location, void Function(String url) onChange);
 
@@ -16,4 +24,8 @@ abstract class HistoryManager {
 
   /// Go back in the history
   void back();
+}
+
+abstract class RouteRegistry {
+  void registerRoutes(List<RouteBase> routes);
 }

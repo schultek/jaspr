@@ -14,8 +14,8 @@ class Style extends StatelessComponent {
   }
 }
 
-const cssBlockInset = kDebugMode ? '  ' : '';
-const cssPropSpace = kDebugMode ? '\n' : ' ';
+const cssBlockInset = kDebugMode || kGenerateMode ? '  ' : '';
+const cssPropSpace = kDebugMode || kGenerateMode ? '\n' : ' ';
 
 abstract class StyleRule {
   const factory StyleRule({required Selector selector, required Styles styles}) = _BlockStyleRule;
