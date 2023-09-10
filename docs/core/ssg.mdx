@@ -41,7 +41,7 @@ Router(
 
 You may want to generate dynamic routes based on some data for your application.
 
-Take for example a typical blog site, where each blog post has its own route, e.g. '/posts/postId', and you want
+Take for example a typical blog site, where each blog post has its own route, e.g. `/posts/{postId}`, and you want
 to render these as separate pages when running `jaspr generate`. Normally you could use routes with path parameters for this,
 however for static-site generation, path parameters are not supported, since all routes need to be resolvable when initializing the router.
 
