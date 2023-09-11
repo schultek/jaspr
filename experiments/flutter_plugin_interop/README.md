@@ -4,6 +4,6 @@ A pure client-side app without ssr.
 
 # Running
 
-Run with `jaspr serve --no-ssr`
+Run with `jaspr serve`
 
-Build with `jaspr build --no-ssr`
+Build with `jaspr build`

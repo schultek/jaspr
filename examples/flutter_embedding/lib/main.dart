@@ -24,7 +24,7 @@ void main() {
       link(rel: 'manifest', href: 'manifest.json'),
       link(rel: 'stylesheet', href: 'css/style.css', type: 'text/css'),
     ],
-    scriptName: 'main_jaspr',
+    scriptName: 'main',
     body: App(),
   ));
 }
