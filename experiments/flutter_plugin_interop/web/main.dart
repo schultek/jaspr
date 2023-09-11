@@ -1,18 +1,9 @@
-//import 'package:firebase_auth/firebase_auth.dart';
-// ignore: depend_on_referenced_packages
-//import 'package:firebase_auth_web/firebase_auth_web.dart';
-//import 'package:firebase_core/firebase_core.dart';
-// ignore: depend_on_referenced_packages
-//import 'package:firebase_core_web/firebase_core_web.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_plugin_interop/app.dart';
-import 'package:flutter_plugin_interop/web_plugin_registrant.dart';
 import 'package:jaspr/browser.dart';
 
 void main() async {
-  registerPlugins();
-
   await Firebase.initializeApp(
     options: FirebaseOptions(
       apiKey: "AIzaSyBWFqH6yhMamn40w2Y5ln1mpgCJQoWgOcs",
