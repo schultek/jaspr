@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.1.4
 
 - Support `flutter >= 3.13.0`
 
