@@ -53,6 +53,9 @@ abstract class MultiChildElement extends Element {
       }());
     } catch (e, st) {
       _debugDoingBuild = false;
+      if (e is DeferAsyncBuildException) {
+        rethrow;
+      }
       // TODO: implement actual error component
       built = [
         DomComponent(

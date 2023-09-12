@@ -2,17 +2,6 @@
 
 part of '../sync_provider.dart';
 
-mixin SyncProviderDependencies on StatelessComponent implements OnFirstBuild {
-  @override
-  FutureOr<void> onFirstBuild(BuildContext context) async {
-    if (!context.binding.isClient) {
-      await Future.wait(preloadDependencies.map((p) => context.read(p.future)));
-    }
-  }
-
-  Iterable<SyncProvider> get preloadDependencies;
-}
-
 final _syncStateProvider = StateProvider<Map<String, dynamic>>((ref) => {});
 
 mixin SyncScopeMixin on State<ProviderScope> implements SyncStateMixin<ProviderScope, Map<String, dynamic>> {

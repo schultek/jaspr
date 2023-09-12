@@ -11,10 +11,23 @@ import 'internals.dart';
 part 'sync_provider/base.dart';
 part 'sync_provider/sync_scope.dart';
 
-ProviderElementProxy<AsyncValue<T>, Future<T>> _future<T>(
+ProviderElementProxy<T, Future<T>> _future<T>(
   _SyncProviderBase<T> that,
 ) {
-  return ProviderElementProxy<AsyncValue<T>, Future<T>>(
+  return ProviderElementProxy<T, Future<T>>(
+    that,
+    (element) {
+      return FutureHandlerProviderElementMixin.futureNotifierOf(
+        element as FutureHandlerProviderElementMixin<T>,
+      );
+    },
+  );
+}
+
+ProviderElementProxy<T, AsyncValue<T>> _value<T>(
+  _SyncProviderBase<T> that,
+) {
+  return ProviderElementProxy<T, AsyncValue<T>>(
     that,
     (element) {
       return FutureHandlerProviderElementMixin.futureNotifierOf(
@@ -48,7 +61,7 @@ ProviderElementProxy<AsyncValue<T>, Future<T>> _future<T>(
 ///   can change over time.
 /// - [SyncProvider.family], to create a [SyncProvider] from external parameters
 /// {@endtemplate}
-abstract class _SyncProviderBase<T> extends ProviderBase<AsyncValue<T>> {
+abstract class _SyncProviderBase<T> extends ProviderBase<T> {
   _SyncProviderBase({
     required super.dependencies,
     required super.allTransitiveDependencies,
@@ -66,6 +79,9 @@ abstract class _SyncProviderBase<T> extends ProviderBase<AsyncValue<T>> {
   /// This provider allows using `async`/`await` to easily combine
   /// [FutureProvider] together.
   ProviderListenable<Future<T>> get future;
+
+  /// Obtains the [AsyncValue] associated with a [SyncProvider].
+  ProviderListenable<AsyncValue<T>> get value;
 
   FutureOr<T> _create(covariant SyncProviderElement<T> ref);
 }

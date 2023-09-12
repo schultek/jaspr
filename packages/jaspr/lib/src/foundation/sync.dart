@@ -181,3 +181,14 @@ class StateEncoder extends Converter<dynamic, String> {
     return base64UrlEncode(binary);
   }
 }
+
+abstract class SyncCodec<T> extends Codec<T, Map<String, dynamic>> {
+  Map<String, dynamic> toMap(T value);
+  T fromMap(Map<String, dynamic> map);
+
+  @override
+  late Converter<Map<String, dynamic>, T> decoder = SimpleConverter(fromMap);
+
+  @override
+  late Converter<T, Map<String, dynamic>> encoder = SimpleConverter(toMap);
+}

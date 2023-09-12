@@ -648,7 +648,7 @@ class StatefulElement extends MultiChildElement {
         '${state.runtimeType}.initState() returned a Future.\n\n'
         'Rather than awaiting on asynchronous work directly inside of initState, '
         'call a separate method to do this work without awaiting it.\n\n'
-        'If you need to do some async work before the first render, use PreloadStateMixin or DeferRenderMixin on State.',
+        'If you need to do some async work before the first render, use PreloadStateMixin on State.',
       );
     } finally {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(false);

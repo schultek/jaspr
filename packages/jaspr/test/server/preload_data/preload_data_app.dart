@@ -1,8 +1,10 @@
 import 'package:jaspr/jaspr.dart';
 
-class App extends StatelessComponent {
+class AsyncStatelessComponent extends StatelessComponent {}
+
+class App extends AsyncStatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Stream<Component> build(BuildContext context) async* {
     yield DomComponent(tag: 'div', children: [
       Text('App'),
       Counter(),
@@ -17,6 +19,7 @@ class Counter extends StatefulComponent {
   State<StatefulComponent> createState() => CounterState();
 }
 
+@sync
 class CounterState extends State<Counter> with PreloadStateMixin, SyncStateMixin<Counter, int> {
   int counter = 0;
 
@@ -38,6 +41,13 @@ class CounterState extends State<Counter> with PreloadStateMixin, SyncStateMixin
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
+    if (!kIsWeb) {
+      counter = context.load(() async {
+        await Future.delayed(Duration(milliseconds: 10));
+        return 202;
+      });
+    }
+
     yield Button(
       label: 'Click Me',
       onPressed: () {

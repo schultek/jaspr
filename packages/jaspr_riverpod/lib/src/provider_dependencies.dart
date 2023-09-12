@@ -76,7 +76,12 @@ class ProviderDependencies {
       }
     }
 
-    return watchers[target]!.read();
+    try {
+      return watchers[target]!.read();
+    } on DeferAsyncBuildException catch (_) {
+      watchers.remove(target)?.close();
+      rethrow;
+    }
   }
 
   void listen<T>(ProviderListenable<T> target, void Function(T? previous, T value) listener,
