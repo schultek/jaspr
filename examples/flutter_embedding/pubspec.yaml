@@ -1,6 +1,6 @@
-name: element_embedding_demo
-description: A small app to be embedded into a HTML element
-version: 1.0.0
+name: flutter_embedding_demo
+description: A demo of embedding a flutter app into a jaspr website.
+version: 0.1.0
 publish_to: none
 
 environment:
