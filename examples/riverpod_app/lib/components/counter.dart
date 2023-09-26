@@ -8,8 +8,9 @@ import 'button.dart';
 /// The create function of a SyncProvider is only executed on the server, and
 /// never on the client. Instead the synced value is returned.
 final initialCountProvider = SyncProvider<int>((ref) async {
-  await Future.delayed(Duration(seconds: 1));
-  return 200;
+  // get the initial count from the request uri
+  var countParam = ref.binding.currentUri.queryParameters['count'];
+  return int.tryParse(countParam ?? '') ?? 0;
 }, id: 'initial_count');
 
 /// A provider that holds the current count.

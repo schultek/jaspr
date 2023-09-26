@@ -1,4 +1,4 @@
-# element_embedding_demo
+# Flutter Element Embedding Demo
 
 This package contains the application used to demonstrate the
 new Flutter web feature: "Element Embedding" in combination with 

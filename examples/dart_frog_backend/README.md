@@ -1,4 +1,4 @@
-# dart_frog_backend
+# Dart Frog Backend Example
 
 An example application built with dart_frog & jaspr.
 

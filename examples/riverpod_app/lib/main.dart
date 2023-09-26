@@ -2,7 +2,7 @@ import 'package:jaspr/server.dart';
 
 import 'app.dart';
 
+/// Entrypoint for the server
 void main() async {
-  // runs the app component on both server and client
   runApp(Document(body: App()));
 }
