@@ -1,6 +1,6 @@
 ## unreleased 0.9.1
 
-- Corrected information returned by the CLI after using `jaspr create -t client` from `jaspr serve` to `jaspr serve -no-ssr`
+- Corrected information returned by the CLI after using `jaspr create -t client` from `jaspr serve` to `jaspr serve --no-ssr`
 
 ## 0.9.0
 
