@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . .
 WORKDIR /app/apps/jaspr_pad
 RUN dart pub get
-RUN dart run jaspr build
+RUN jaspr build
 
 FROM dart:stable
 
