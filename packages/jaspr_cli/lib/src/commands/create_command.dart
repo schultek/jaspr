@@ -96,11 +96,16 @@ class CreateCommand extends BaseCommand {
     var process = await Process.start('dart', ['pub', 'get'], workingDirectory: directory.absolute.path);
 
     await watchProcess(process, tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s.contains('+'));
-
+    
+    String necessaryServeFlag = '';
+    if(templateName == 'client'){
+      necessaryServeFlag = ' --no-ssr';
+    }
+    
     logger.write('\n'
         'Created project $name in $dir! In order to get started, run the following commands:\n\n'
         '  cd $dir\n'
-        '  jaspr serve\n');
+        '  jaspr serve$necessaryServeFlag\n');
 
     return ExitCode.success.code;
   }
