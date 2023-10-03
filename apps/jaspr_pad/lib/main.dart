@@ -18,12 +18,15 @@ import 'server/samples.dart';
 import 'server/tutorial.dart';
 
 void main() {
-  runServer(Document.file(child: Builder.single(builder: (context) {
-    return ProviderScope(
-      overrides: [syncSamplesProvider.overrideWith(loadSamplesProviderOverride)],
-      child: Playground(),
-    );
-  })))
+  runServer(Document.file(
+    name: 'main.html',
+    child: Builder.single(builder: (context) {
+      return ProviderScope(
+        overrides: [syncSamplesProvider.overrideWith(loadSamplesProviderOverride)],
+        child: Playground(),
+      );
+    }),
+  ))
     ..addMiddleware(logRequests())
     ..addMiddleware((handler) {
       var router = Router(notFoundHandler: handler);
