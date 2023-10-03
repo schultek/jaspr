@@ -73,7 +73,10 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
         progress: ProgressState.running);
 
     var workflow = await _runWebdev();
-    guardResource(() => workflow.shutDown());
+    guardResource(() {
+      logger.write('Terminating web builder...');
+      return workflow.shutDown();
+    });
 
     logger.complete(true);
     logger.write('Starting web builder...', progress: ProgressState.running);
@@ -95,11 +98,8 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
           logger.write('Rebuilt web assets.', progress: ProgressState.completed);
         }
       } else if (event.status == BuildStatus.failed) {
-        if (!verbose) {
-          logger.write('Building web assets failed unexpectedly. Run again with -v to see full output.',
-              level: Level.critical, progress: ProgressState.completed);
-        }
-        shutdown();
+        logger.write('Failed building web assets. There is probably more output above.',
+            level: Level.error, progress: ProgressState.completed);
       } else if (event.status == BuildStatus.started) {
         if (buildCompleter.isCompleted) {
           logger.write('Rebuilding web assets...', progress: ProgressState.running);
@@ -113,6 +113,10 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
     timer.cancel();
 
     logger.write('Done building web assets.', progress: ProgressState.completed);
+
+    if (!useSSR) {
+      logger.write('Serving `web` on http://localhost:$port');
+    }
 
     if (usesFlutter) {
       var flutterProcess = await serveFlutter();
@@ -175,7 +179,7 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
 
     logger.write('Server started.', progress: ProgressState.completed);
 
-    await watchProcess(process, tag: Tag.server);
+    await watchProcess('server', process, tag: Tag.server);
   }
 
   Future<DevWorkflow> _runWebdev() async {
@@ -190,7 +194,6 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
 
     var workflow = await DevWorkflow.start(configuration, [
       if (release) '--release',
-      '--verbose',
       '--define',
       '$compilers:ddc=generate-full-dill=true',
       '--delete-conflicting-outputs',

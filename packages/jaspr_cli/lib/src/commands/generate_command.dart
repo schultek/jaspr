@@ -106,8 +106,7 @@ class GenerateCommand extends BaseCommand with SsrHelper, FlutterHelper {
       generatedRoutes.add(route);
     }
 
-    guardResource(() async => process.kill());
-    watchProcess(process, tag: Tag.server, progress: 'Running server app...', hide: (s) {
+    watchProcess('server', process, tag: Tag.server, progress: 'Running server app...', hide: (s) {
       if (s.startsWith('[DAEMON] ')) {
         var message = jsonDecode(s.substring(9));
         if (message case {'route': String route}) {
