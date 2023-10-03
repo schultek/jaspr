@@ -41,7 +41,7 @@ mixin SyncScopeMixin on State<ProviderScope> implements SyncStateMixin<ProviderS
             "The error is: ${elem.state.error}");
         continue;
       }
-      map[provider.id] = elem.state.value;
+      map[provider.id] = (provider.codec ?? CastCodec()).encode(elem.state.value);
     }
     return map;
   }

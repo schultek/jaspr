@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed bug with SyncProvider.
+
 ## 0.3.6
 
 - `jaspr` upgraded to `0.9.0`
