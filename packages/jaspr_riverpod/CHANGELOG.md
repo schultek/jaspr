@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.3.7
 
 - Fixed bug with SyncProvider.
 
