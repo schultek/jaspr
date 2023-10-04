@@ -1,3 +1,12 @@
+## Unreleased patch
+
+- Improved the stability of the cli and added the functions:
+  - `clean` command to clean your project directory
+  - `update` command to automatically update the cli to the latest version
+  - `doctor` command to print information about the environment and project
+  
+  We also added a lightweight anonymous usage tracking to the cli.
+
 ## 0.9.0
 
 - Added *Static Site Generation* support.
