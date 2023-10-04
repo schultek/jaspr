@@ -29,6 +29,6 @@ Future<void> trackEvent(
           }
         }
       ]),
-    );
+    ).timeout(Duration(milliseconds: 300));
   } catch (_) {}
 }

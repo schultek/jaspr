@@ -37,10 +37,13 @@ class CreateCommand extends BaseCommand {
   }
 
   @override
-  String get description => 'Create a new jaspr project.';
+  String get description => 'Creates a new jaspr project.';
 
   @override
   String get name => 'create';
+
+  @override
+  String get category => 'Project';
 
   @override
   bool get requiresPubspec => false;

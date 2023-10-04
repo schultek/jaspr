@@ -14,10 +14,13 @@ class UpdateCommand extends BaseCommand {
   final PubUpdater _updater = PubUpdater();
 
   @override
-  final String description = 'Update jaspr.';
+  final String description = 'Updates the jaspr cli.';
 
   @override
   final String name = 'update';
+
+  @override
+  String get category => 'Tooling';
 
   @override
   bool get requiresPubspec => false;

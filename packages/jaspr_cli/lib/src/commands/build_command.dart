@@ -42,6 +42,9 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
   String get name => 'build';
 
   @override
+  String get category => 'Project';
+
+  @override
   Future<int> run() async {
     await super.run();
 

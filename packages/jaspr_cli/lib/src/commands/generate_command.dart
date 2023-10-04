@@ -34,6 +34,9 @@ class GenerateCommand extends BaseCommand with SsrHelper, FlutterHelper {
   String get name => 'generate';
 
   @override
+  String get category => 'Project';
+
+  @override
   Future<int> run() async {
     await super.run();
 

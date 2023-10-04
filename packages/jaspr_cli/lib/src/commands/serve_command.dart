@@ -59,6 +59,9 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
   @override
   String get name => 'serve';
 
+  @override
+  String get category => 'Project';
+
   late final debug = argResults!['debug'] as bool;
   late final release = argResults!['release'] as bool;
   late final mode = argResults!['mode'] as String;

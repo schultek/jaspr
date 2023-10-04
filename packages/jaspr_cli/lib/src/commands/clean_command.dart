@@ -14,6 +14,9 @@ class CleanCommand extends BaseCommand {
   String get name => 'clean';
 
   @override
+  String get category => 'Tooling';
+
+  @override
   Future<int> run() async {
     await super.run();
 
