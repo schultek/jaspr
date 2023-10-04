@@ -1,6 +1,6 @@
 ## Unreleased patch
 
-- Improved the stability of the cli and added the functions:
+- Improved the stability and logging of the cli and added the commands:
   - `clean` command to clean your project directory
   - `update` command to automatically update the cli to the latest version
   - `doctor` command to print information about the environment and project
