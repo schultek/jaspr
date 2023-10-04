@@ -7,6 +7,7 @@ import 'package:mason/mason.dart' show ExitCode;
 import 'package:meta/meta.dart';
 import 'package:yaml/yaml.dart';
 
+import '../analytics.dart';
 import '../config.dart';
 import '../logging.dart';
 
@@ -43,6 +44,8 @@ abstract class BaseCommand extends Command<int> {
   Future<int> run() async {
     pubspecYaml = await getPubspec();
     config = JasprConfig.fromYaml(pubspecYaml, logger);
+
+    trackEvent(name, projectName: pubspecYaml?['name']);
 
     ProcessSignal.sigint.watch().listen((signal) => shutdown());
     ProcessSignal.sigterm.watch().listen((signal) => shutdown());
