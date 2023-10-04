@@ -45,7 +45,7 @@ abstract class BaseCommand extends Command<int> {
     pubspecYaml = await getPubspec();
     config = JasprConfig.fromYaml(pubspecYaml, logger);
 
-    trackEvent(name, projectName: pubspecYaml?['name']);
+    await trackEvent(name, projectName: pubspecYaml?['name']);
 
     ProcessSignal.sigint.watch().listen((signal) => shutdown());
     ProcessSignal.sigterm.watch().listen((signal) => shutdown());
