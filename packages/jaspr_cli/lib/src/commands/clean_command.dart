@@ -8,11 +8,6 @@ class CleanCommand extends BaseCommand {
   CleanCommand({super.logger});
 
   @override
-  String get invocation {
-    return "jaspr clean";
-  }
-
-  @override
   String get description => 'Cleans the project directory.';
 
   @override
