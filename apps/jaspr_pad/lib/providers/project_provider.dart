@@ -1,3 +1,4 @@
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:http/http.dart' as http;
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
@@ -54,9 +55,15 @@ final fetchedTutorialProvider = FutureProvider.family((ref, String id) async {
 final storageProvider = Provider((ref) => window.localStorage);
 
 final storedProjectProvider = Provider.autoDispose((ref) {
-  return window.localStorage.containsKey('project') //
-      ? ProjectDataBaseMapper.fromJson(window.localStorage['project']!)
-      : null;
+  if (!window.localStorage.containsKey('project')) {
+    return null;
+  }
+  try {
+    return ProjectDataBaseMapper.fromJson(window.localStorage['project']!);
+  } on MapperException catch (_) {
+    window.localStorage.remove('project');
+    return null;
+  }
 });
 
 final selectedSampleProvider = StateProvider<ProjectData?>((ref) => null);
