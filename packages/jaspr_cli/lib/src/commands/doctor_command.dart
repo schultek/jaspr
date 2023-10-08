@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:mason/mason.dart';
 
+import '../analytics.dart';
 import '../version.dart';
 import 'base_command.dart';
 
@@ -29,6 +30,7 @@ class DoctorCommand extends BaseCommand {
       items: [
         'Dart Version ${Platform.version} at ${Platform.executable}',
         'Running on ${Platform.operatingSystem} ${Platform.operatingSystemVersion} - Locale ${Platform.localeName}',
+        'Analytics: ${analyticsEnabled ? 'Enabled' : 'Disabled'}',
       ]
     ));
 

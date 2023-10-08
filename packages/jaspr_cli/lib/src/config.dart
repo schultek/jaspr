@@ -4,7 +4,7 @@ import 'logging.dart';
 
 class JasprConfig {
   const JasprConfig({
-    this.usesSsr = true,
+    this.usesSsr = false,
     this.usesFlutter = false,
   });
 

@@ -7,6 +7,7 @@ import 'package:cli_completion/cli_completion.dart';
 import 'package:mason/mason.dart';
 import 'package:pub_updater/pub_updater.dart';
 
+import 'analytics.dart';
 import 'commands/build_command.dart';
 import 'commands/clean_command.dart';
 import 'commands/create_command.dart';
@@ -31,6 +32,8 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
       negatable: false,
       help: 'Print the current version info.',
     );
+    argParser.addFlag('enable-analytics', negatable: false, help: 'Enable anonymous analytics.');
+    argParser.addFlag('disable-analytics', negatable: false, help: 'Disable anonymous analytics.');
     addCommand(CreateCommand());
     addCommand(ServeCommand());
     addCommand(BuildCommand());
@@ -85,7 +88,13 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
       await _checkForUpdates();
     }
     if (!isVersionCommand) {
-      exitCode = await super.runCommand(topLevelResults);
+      if (topLevelResults['disable-analytics']) {
+        disableAnalytics(_logger);
+      } else if (topLevelResults['enable-analytics']) {
+        enableAnalytics(_logger);
+      } else {
+        exitCode = await super.runCommand(topLevelResults);
+      }
     }
     return exitCode;
   }
