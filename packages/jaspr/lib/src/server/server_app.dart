@@ -76,7 +76,7 @@ class ServerApp {
       }
 
       print('[INFO] Running app in ${kDebugMode ? 'debug' : 'release'} mode');
-      print('[INFO] Serving at http://${server!.address.host}:${server!.port}');
+      print('[INFO] Serving at http://${kDebugMode ? 'localhost' : server!.address.host}:${server!.port}');
 
       requestRouteGeneration('/');
     });

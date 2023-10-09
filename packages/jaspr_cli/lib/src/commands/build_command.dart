@@ -42,6 +42,9 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
   String get name => 'build';
 
   @override
+  String get category => 'Project';
+
+  @override
   Future<int> run() async {
     await super.run();
 
@@ -92,7 +95,7 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
         ['compile', argResults!['target'], entryPoint, '-o', './build/jaspr/app', '-Djaspr.flags.release=true'],
       );
 
-      await watchProcess(process, tag: Tag.cli, progress: 'Building server app...');
+      await watchProcess('server build', process, tag: Tag.cli, progress: 'Building server app...');
     }
 
     await Future.wait([

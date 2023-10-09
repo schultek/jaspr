@@ -18,6 +18,10 @@ labels: bug
 3. Scroll down to '....'
 4. See error
 
+**Doctor Output**
+
+<!-- Please run `jaspr doctor` and paste the output below. -->
+
 **Expected Behavior**
 
 <!-- A clear and concise description of what you expected to happen. -->

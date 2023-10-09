@@ -34,6 +34,9 @@ class GenerateCommand extends BaseCommand with SsrHelper, FlutterHelper {
   String get name => 'generate';
 
   @override
+  String get category => 'Project';
+
+  @override
   Future<int> run() async {
     await super.run();
 
@@ -106,8 +109,7 @@ class GenerateCommand extends BaseCommand with SsrHelper, FlutterHelper {
       generatedRoutes.add(route);
     }
 
-    guardResource(() async => process.kill());
-    watchProcess(process, tag: Tag.server, progress: 'Running server app...', hide: (s) {
+    watchProcess('server', process, tag: Tag.server, progress: 'Running server app...', hide: (s) {
       if (s.startsWith('[DAEMON] ')) {
         var message = jsonDecode(s.substring(9));
         if (message case {'route': String route}) {

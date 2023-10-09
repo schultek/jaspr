@@ -18,21 +18,7 @@ mixin FlutterHelper on BaseCommand {
       ['run', '--device-id=web-server', '-t', '.dart_tool/jaspr/flutter_target.dart', '--web-port=5678'],
     );
 
-    if (verbose) {
-      unawaited(watchProcess(flutterProcess, tag: Tag.flutter, onFail: () {
-        if (!verbose) {}
-      }));
-    } else {
-      flutterProcess.exitCode.then((code) {
-        if (code != 0) {
-          logger.write('flutter exited unexpectedly. Run again with -v to see verbose output',
-              level: Level.critical, progress: ProgressState.completed);
-          shutdown(code);
-        }
-      });
-    }
-
-    guardResource(() async => flutterProcess.kill());
+    unawaited(watchProcess('flutter run', flutterProcess, tag: Tag.flutter, hide: (_) => !verbose));
 
     return flutterProcess;
   }
@@ -54,7 +40,7 @@ mixin FlutterHelper on BaseCommand {
       'canvaskit/',
     ];
 
-    await watchProcess(flutterProcess, tag: Tag.flutter);
+    await watchProcess('flutter build', flutterProcess, tag: Tag.flutter);
 
     await copyFiles('./build/flutter', target, moveTargets);
   }
