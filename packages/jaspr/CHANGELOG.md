@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.9.1
 
 - Improved the stability and logging of the cli and added the commands:
   - `clean` command to clean your project directory
