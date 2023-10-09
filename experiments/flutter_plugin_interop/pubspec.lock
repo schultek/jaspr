@@ -414,21 +414,21 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.9.0"
+    version: "0.9.1"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.9.0"
+    version: "0.9.1"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
       path: "../../modules/build/jaspr_web_compilers"
       relative: true
     source: path
-    version: "4.0.5+2"
+    version: "4.0.5+5"
   js:
     dependency: transitive
     description:

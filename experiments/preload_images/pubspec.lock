@@ -287,14 +287,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.8.0"
+    version: "0.9.1"
   jaspr_router:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_router"
       relative: true
     source: path
-    version: "0.2.3"
+    version: "0.3.0"
   js:
     dependency: transitive
     description:
