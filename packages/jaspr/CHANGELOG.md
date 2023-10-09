@@ -5,7 +5,10 @@
   - `update` command to automatically update the cli to the latest version
   - `doctor` command to print information about the environment and project
   
-  We also added a lightweight anonymous usage tracking to the cli.
+- We added lightweight anonymous usage tracking to the cli. We use [mixpanel.com](https://mixpanel.com/home) and
+  only process anonymized data. The usage statistics are made public and can be viewed here (TODO: Link will be added in next release).
+
+  To opt out of usage tracking, use `jaspr --disable-analytics`.
 
 ## 0.9.0
 
