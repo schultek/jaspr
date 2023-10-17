@@ -37,13 +37,13 @@ jobs:
       - name: Create Project
         run: |
           cd apps
-          jaspr create -t basic -c my_app
+          dart pub global run jaspr_cli:jaspr create -t basic -c my_app
           melos bootstrap --scope my_app
 
       - name: Build Project
         run: |
           cd apps/my_app
-          jaspr build -v
+          dart pub global run jaspr_cli:jaspr build -v
 
   analyze:
     name: Analyze Code
