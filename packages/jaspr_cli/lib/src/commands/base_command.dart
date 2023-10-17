@@ -48,7 +48,9 @@ abstract class BaseCommand extends Command<int> {
     await trackEvent(name, projectName: pubspecYaml?['name']);
 
     ProcessSignal.sigint.watch().listen((signal) => shutdown());
-    ProcessSignal.sigterm.watch().listen((signal) => shutdown());
+    if (!Platform.isWindows) {
+      ProcessSignal.sigterm.watch().listen((signal) => shutdown());
+    }
 
     return ExitCode.success.code;
   }

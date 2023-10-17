@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed cli execution on windows
+
 ## 0.9.1
 
 - Improved the stability and logging of the cli and added the commands:
