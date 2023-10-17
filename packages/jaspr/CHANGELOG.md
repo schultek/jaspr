@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.9.2
 
 - Fixed cli execution on windows
 
