@@ -7,7 +7,10 @@ This package is a first-class tailwind integration for [jaspr](https://github.co
 
 ## Setup
 
-Simply add `jaspr_tailwind` as a dev dependency to your project:
+To use this package, you need both `node` and `npm` installed. 
+See [this guide](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for instructions.
+
+To start, add `jaspr_tailwind` as a dev dependency to your project:
 
 `dart pub add jaspr_tailwind --dev`
 
