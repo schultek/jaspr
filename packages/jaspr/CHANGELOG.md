@@ -2,6 +2,7 @@
 
 - Fixed `melos format` on Windows
 - Fixed infinite loop attempting to find root directory on Windows when running a built jaspr executable
+- Add `.exe` extension to the output of `jaspr build` on Windows.
 
 ## 0.9.2
 
