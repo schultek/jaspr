@@ -51,7 +51,9 @@ Future<void> trackEvent(
       return;
     }
 
-    var systemId = hash(join(Platform.localHostname, Platform.operatingSystem, Platform.operatingSystemVersion));
+    var distinctId =
+        hash(join(Platform.localHostname, Platform.operatingSystem, Platform.operatingSystemVersion)).toString();
+    var projectHash = projectName != null ? hash(join(distinctId, projectName)).toString() : null;
 
     await post(
       Uri.parse('https://api-eu.mixpanel.com/track'),
@@ -61,10 +63,10 @@ Future<void> trackEvent(
           'event': 'cli_usage',
           'properties': {
             'token': '4de26246ad502c15ea6b0e5b9137a95c',
-            'distinct_id': '$systemId',
+            'distinct_id': distinctId,
             'command': command,
             'cli_version': jasprCliVersion,
-            if (projectName != null) 'project_id': '${hash(projectName)}',
+            if (projectHash != null) 'project_id': projectHash,
             'os': Platform.operatingSystem,
           }
         }
