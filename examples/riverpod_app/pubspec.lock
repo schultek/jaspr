@@ -295,14 +295,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.9.1"
+    version: "0.9.2"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.9.1"
+    version: "0.9.2"
   jaspr_riverpod:
     dependency: "direct main"
     description:
@@ -310,6 +310,13 @@ packages:
       relative: true
     source: path
     version: "0.3.7"
+  jaspr_web_compilers:
+    dependency: "direct overridden"
+    description:
+      path: "../../modules/build/jaspr_web_compilers"
+      relative: true
+    source: path
+    version: "4.0.6"
   js:
     dependency: transitive
     description:
