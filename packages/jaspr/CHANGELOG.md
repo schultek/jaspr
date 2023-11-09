@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.9.3
 
 - Fixed `melos format` on Windows.
 - Fixed infinite loop attempting to find root directory on Windows when running a built jaspr executable.
