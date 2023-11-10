@@ -103,10 +103,10 @@ class ButtonTab extends Tab {
                 DomComponent(
                   tag: 'i',
                   classes: ['material-icons', 'mdc-tab__icon'],
-                  styles: Styles.raw({'font-size': '20px', if (label.isNotEmpty) 'margin-right': '4px'}),
+                  styles: Styles.raw({'font-size': '20px', if (this.label.isNotEmpty) 'margin-right': '4px'}),
                   child: Text(icon),
                 ),
-                Text(label),
+                Text(this.label),
               ],
             ),
           ],

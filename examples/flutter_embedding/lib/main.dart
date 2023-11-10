@@ -1,4 +1,3 @@
-import 'package:jaspr/html.dart';
 import 'package:jaspr/server.dart';
 
 import 'components/app.dart';

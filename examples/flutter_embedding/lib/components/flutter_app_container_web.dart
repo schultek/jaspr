@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart' as fr;
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../widgets/app.dart';

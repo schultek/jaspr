@@ -1,4 +1,4 @@
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 
 class RippleLoader extends StatelessComponent {
   const RippleLoader({Key? key}) : super(key: key);
