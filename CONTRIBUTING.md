@@ -40,7 +40,9 @@ Clone the project with the following command:
 git clone https://github.com/schultek/jaspr.git
 ```
 
-Next activate the jaspr command globally for this local project:
+#### 1.1. Activate Jaspr and Melos
+##### 1.1.1. Using existing Dart or Flutter installations
+Activate the `jaspr` command globally for this local project:
 ```shell
 cd jaspr/packages
 dart pub global activate jaspr --source path
@@ -55,8 +57,21 @@ To install Melos, run the following command:
 dart pub global activate melos
 ```
 
-Next, at the root of your locally cloned repository run the bootstrap command:
+##### 1.1.2. Using Nix package manager
+If you have the [Nix Package Manager](https://nixos.org) installed, you can skip the steps in 1.1.1. 
+Your `nix` manager must have [Flake support enabled](https://nixos.wiki/wiki/Flakes).
+```shell
+cd jaspr
+nix develop
+```
+This command will enter a Nix environment and provide the following packages:
+* Flutter / Dart
+* NodeJS 20 (for Tailwind support)
+* Jaspr
+* Melos
 
+#### 1.2. Bootstrap the project
+Next, at the root of your locally cloned repository run the bootstrap command:
 ```dart
 melos bootstrap
 ```
