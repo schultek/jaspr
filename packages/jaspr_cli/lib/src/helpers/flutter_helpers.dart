@@ -15,10 +15,18 @@ mixin FlutterHelper on BaseCommand {
 
     var flutterProcess = await Process.start(
       'flutter',
-      ['run', '--device-id=web-server', '-t', '.dart_tool/jaspr/flutter_target.dart', '--web-port=5678'],
+      [
+        'run',
+        '--device-id=web-server',
+        '-t',
+        '.dart_tool/jaspr/flutter_target.dart',
+        '--web-port=5678'
+      ],
+      runInShell: true,
     );
 
-    unawaited(watchProcess('flutter run', flutterProcess, tag: Tag.flutter, hide: (_) => !verbose));
+    unawaited(watchProcess('flutter run', flutterProcess,
+        tag: Tag.flutter, hide: (_) => !verbose));
 
     return flutterProcess;
   }
@@ -28,7 +36,14 @@ mixin FlutterHelper on BaseCommand {
 
     var flutterProcess = await Process.start(
       'flutter',
-      ['build', 'web', '-t', '.dart_tool/jaspr/flutter_target.dart', '--output=build/flutter'],
+      [
+        'build',
+        'web',
+        '-t',
+        '.dart_tool/jaspr/flutter_target.dart',
+        '--output=build/flutter'
+      ],
+      runInShell: true,
     );
 
     var target = useSSR ? 'build/jaspr/web' : 'build/jaspr';
