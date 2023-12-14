@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart' as flt;
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 
 import 'run_flutter_app.dart';
 
