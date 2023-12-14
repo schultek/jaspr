@@ -314,7 +314,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
       debugCanModifyProviders ??= _debugCanModifyProviders;
     }
 
-    vsyncOverride ??= _jasprVsync;
+    flutterVsyncs.add(_jasprVsync);
     super.mount(parent, prevSibling);
   }
 
@@ -370,9 +370,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
       debugCanModifyProviders = null;
     }
 
-    if (vsyncOverride == _jasprVsync) {
-      vsyncOverride = null;
-    }
+    flutterVsyncs.remove(_jasprVsync);
     super.unmount();
   }
 
