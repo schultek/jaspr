@@ -1,7 +1,20 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
-import 'button.dart';
+part 'app.g.dart';
+
+/// App component that displays a simple counter.
+///
+/// The [@client] annotation will render this component
+/// on the client (additionally to being server rendered)
+/// and make it interactive.
+@client
+class App extends StatelessComponent with _$App {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield ProviderScope(child: Counter());
+  }
+}
 
 /// A provider that preloads its value on the server, and syncs with the client.
 ///
@@ -40,6 +53,23 @@ class Counter extends StatelessComponent with SyncProviderDependencies {
     yield DomComponent(
       tag: 'span',
       child: Text('Counter: ${context.watch(counterProvider)}'),
+    );
+  }
+}
+
+/// Simple button component
+class Button extends StatelessComponent {
+  Button({required this.label, required this.onPressed});
+
+  final String label;
+  final void Function() onPressed;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield DomComponent(
+      tag: 'button',
+      events: {'click': (e) => onPressed()},
+      child: Text(label),
     );
   }
 }

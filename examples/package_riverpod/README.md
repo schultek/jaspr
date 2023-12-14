@@ -1,4 +1,4 @@
-# Jaspr Riverpod Example
+# Riverpod Example
 
 This example shows how to use Riverpod with Jaspr. 
 
