@@ -21,4 +21,5 @@ export 'src/stub/interop_stub.dart' //
 export 'src/stub/run_app_stub.dart'
     if (dart.library.html) 'src/browser/run_app.dart'
     if (dart.library.io) 'src/server/run_app.dart' show runApp;
+export 'src/ui/html/html.dart';
 export 'src/ui/styles.dart';

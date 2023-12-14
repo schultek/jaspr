@@ -1,4 +1,4 @@
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 
 part 'counter.g.dart';
 

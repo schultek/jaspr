@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // A simple [StatelessComponent] with a [build] method
