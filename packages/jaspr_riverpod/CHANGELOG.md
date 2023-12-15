@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.3.8
 
 - Upgrade `riverpod` to `v2.4.8`
 - Update `jaspr_riverpod`'s dependency on `riverpod`'s `vsyncOverride` to `flutterVsyncs`
