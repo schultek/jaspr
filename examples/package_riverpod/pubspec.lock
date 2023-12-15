@@ -309,7 +309,7 @@ packages:
       path: "../../packages/jaspr_riverpod"
       relative: true
     source: path
-    version: "0.3.7"
+    version: "0.3.8"
   jaspr_web_compilers:
     dependency: "direct overridden"
     description:
@@ -433,10 +433,10 @@ packages:
     dependency: transitive
     description:
       name: riverpod
-      sha256: "80e48bebc83010d5e67a11c9514af6b44bbac1ec77b4333c8ea65dbc79e2d8ef"
+      sha256: "942999ee48b899f8a46a860f1e13cee36f2f77609eb54c5b7a669bb20d550b11"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.6"
+    version: "2.4.9"
   scratch_space:
     dependency: transitive
     description:
