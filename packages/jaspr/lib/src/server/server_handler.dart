@@ -180,8 +180,11 @@ String _findRootProjectDir() {
   return dir;
 }
 
-final staticFileHandler =
-    kDevProxy.isNotEmpty ? _proxyHandler() : createStaticHandler(webDir, defaultDocument: 'index.html');
+final staticFileHandler = kDevProxy.isNotEmpty
+    ? _proxyHandler()
+    : Directory(webDir).existsSync()
+        ? createStaticHandler(webDir, defaultDocument: 'index.html')
+        : (_) => Response.notFound('');
 
 typedef SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
 
