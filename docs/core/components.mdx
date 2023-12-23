@@ -14,69 +14,7 @@ The following page and other documentation assumes, that you have already a basi
 system, especially the widget tree and the three base widgets: StatelessWidget, StatefulWidget and InheritedWidget.
 </Warning>
 
-When building an app or website with **jaspr** you will mostly use these **five** basic components:
-
-## DomComponent
-
-This component will render a single html element to the webpage. It takes a tag, and optionally some attributes and events.
-It also takes a single child or a list of children, since html elements can have multiple child nodes.
-
-```dart
-  var component = DomComponent(
-    tag: 'div',
-    id: 'my-id',
-    classes: ['class-a', 'class-b'],
-    attributes: {'my-attribute': 'my-value'},
-    events: {'click': (e) => print('clicked')},
-    children: [
-      ...
-    ],
-  );
-```
-
-Using this component would render the following html:
-
-```html
-<div id="my-id" class="class-a class-b" my-attribute="my-value">
-  ...
-</div>  
-```
-
-<Info>
-`DomComponent` is the lowest-level component for rendering html tags and gives you the most flexibility. However it is
-also very verbose. Therefore jaspr comes with a set of utility functions for creating most common html tags, like `div`,
-`button` etc. See [Writing Html](/core/html) for more details.
-</Info>
-
-## Text
-
-A simple component that renders a text node.
-
-A text node in html is just some standalone string that is placed inside another html element. Therefore the `Text`
-component also only receives a single string to render to the page.
-
-```dart
-  var text = Text('Hello World!');
-```
-
-As usual for web, styling is done through a combination of CSS attributes, either in a **Stylesheet** or inline though
-the **`style` attribute** of the parent elements.
-
-For example rendering a simple heading would look like this:
-
-```dart
-  var heading = DomComponent(
-    tag: 'h1',
-    styles: Styles.text(color: Colors.blue),
-    child: Text('Hello World!'),
-  );
-```
-
-rendering:
-
-```html
-<h1 style="color: blue;">Hello World!</h1>
-```
+When building an app or website with **jaspr** you will mostly use these **three** basic components:
 
 ## StatelessComponent
 
@@ -88,7 +26,7 @@ class MyComponent extends StatelessComponent {
   const MyComponent({Key? key}): super(key: key);
 
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'div', ...);
+    yield p([text('Hello World')]);
   }
 }
 ```
@@ -162,7 +100,7 @@ class MyComponent extends StatefulComponent {
 class MyComponentState extends State<MyComponent> {
 
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'div', ...);
+    yield p([text('Hello World')]);
   }
 }
 ```
@@ -197,7 +135,7 @@ class MyInheritedComponent extends InheritedComponent {
 
   @override
   bool updateShouldNotify(covariant MyInheritedComponent oldComponent) {
-    return ...;
+    return false;
   }
 }
 ```

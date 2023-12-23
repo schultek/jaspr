@@ -93,10 +93,10 @@ packages:
     dependency: transitive
     description:
       name: build_modules
-      sha256: "409fc1be491612bc1e2262f4c7fec6c91c683560662a34cfeedfcd1f7c13470b"
+      sha256: bd2e3693a33761fce4260704fcfa519042573457c8cf61c50249a7dde2fbe5e1
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.3"
+    version: "5.0.5"
   build_resolvers:
     dependency: transitive
     description:
@@ -125,10 +125,10 @@ packages:
     dependency: "direct dev"
     description:
       name: build_web_compilers
-      sha256: "544333e7f16eddc6f260c426ba8ea5a8fdf1809acc555b2c1c8c8446d1b61ea7"
+      sha256: "70d67a571b068aa0b8f5569fea8f2d91647731643ad6d744f9035b47eefb2ace"
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.4"
+    version: "4.0.7"
   built_collection:
     dependency: transitive
     description:
@@ -309,14 +309,14 @@ packages:
       path: "../../packages/jaspr_riverpod"
       relative: true
     source: path
-    version: "0.3.7"
+    version: "0.3.8"
   jaspr_web_compilers:
     dependency: "direct overridden"
     description:
       path: "../../modules/build/jaspr_web_compilers"
       relative: true
     source: path
-    version: "4.0.6"
+    version: "4.0.7"
   js:
     dependency: transitive
     description:
@@ -433,10 +433,10 @@ packages:
     dependency: transitive
     description:
       name: riverpod
-      sha256: "80e48bebc83010d5e67a11c9514af6b44bbac1ec77b4333c8ea65dbc79e2d8ef"
+      sha256: "942999ee48b899f8a46a860f1e13cee36f2f77609eb54c5b7a669bb20d550b11"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.6"
+    version: "2.4.9"
   scratch_space:
     dependency: transitive
     description:
@@ -614,4 +614,4 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.0.0 <3.2.0"
+  dart: ">=3.1.0 <3.4.0"

@@ -30,10 +30,7 @@ class App extends StatelessComponent {
     if (kIsWeb) {
       window.alert('Hi Jaspr');
     }
-    yield DomComponent(
-      tag: 'p',
-      child: Text('Hello World'),
-    );
+    yield p([text('Hello World')]);
   }
 }
 ```
@@ -56,10 +53,7 @@ class App extends StatelessComponent {
     if (kIsWeb) {
       window.alert('Hi Jaspr');
     }
-    yield DomComponent(
-      tag: 'p',
-      child: Text('Hello World'),
-    );
+    yield p([text('Hello World')]);
   }
 }
 ```

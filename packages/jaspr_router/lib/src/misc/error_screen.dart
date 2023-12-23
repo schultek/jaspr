@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 
 /// Default error page implementation.
 class ErrorScreen extends StatelessComponent {

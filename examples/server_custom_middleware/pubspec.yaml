@@ -1,4 +1,4 @@
-name: custom_server_middleware
+name: server_custom_middleware
 description: An example to demonstrate the use of custom server middleware in a jaspr app.
 version: 0.1.0
 publish_to: none
