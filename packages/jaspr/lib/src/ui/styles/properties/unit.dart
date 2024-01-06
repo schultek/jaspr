@@ -9,6 +9,7 @@ extension UnitExt on num {
 abstract class Unit {
   static const Unit zero = _ZeroUnit();
 
+  ///auto represents the style attribute unit 'auto'
   static const Unit auto = _AutoUnit();
 
   /// Constructs a [Unit] in the form '100%'
@@ -44,6 +45,7 @@ class _ZeroUnit implements Unit {
   int get hashCode => 0;
 }
 
+///_AutoUnit represents the style attribute unit 'auto'
 class _AutoUnit implements Unit {
   const _AutoUnit();
 
