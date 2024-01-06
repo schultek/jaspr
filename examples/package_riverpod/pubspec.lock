@@ -310,13 +310,6 @@ packages:
       relative: true
     source: path
     version: "0.3.8"
-  jaspr_web_compilers:
-    dependency: "direct overridden"
-    description:
-      path: "../../modules/build/jaspr_web_compilers"
-      relative: true
-    source: path
-    version: "4.0.7"
   js:
     dependency: transitive
     description:

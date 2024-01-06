@@ -1,3 +1,7 @@
+## Unreleased minor
+- Added StyleSheet object to jaspr/lib/src/components/style.dart, so you can add custom CSS StyleSheets
+- Modified _BaseDocument to inlcude option StyleSheet list attribute
+
 ## 0.9.3
 
 - Fixed `melos format` on Windows.

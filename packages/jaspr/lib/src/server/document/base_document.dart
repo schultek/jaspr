@@ -8,6 +8,9 @@ class _BaseDocument extends Document {
     this.viewport = 'width=device-width, initial-scale=1.0',
     this.meta,
     this.styles,
+
+    /// List of StyleSheet Components
+    this.styleSheets = const [],
     this.scriptName,
     this.head = const [],
     required this.body,
@@ -19,6 +22,9 @@ class _BaseDocument extends Document {
   final String? viewport;
   final Map<String, String>? meta;
   final List<StyleRule>? styles;
+
+  /// List of CSS Links use StyleSheet Component
+  final List<StyleSheet> styleSheets;
   final String? scriptName;
   final List<Component> head;
   final Component body;
@@ -60,7 +66,10 @@ class _BaseDocumentState extends State<_BaseDocument> {
           {
             'id': getIdFor(e.key),
             'name': e.value.name,
-            if (e.value.params != null) 'params': kDebugMode ? e.value.params : stateCodec.encode(e.value.params),
+            if (e.value.params != null)
+              'params': kDebugMode
+                  ? e.value.params
+                  : stateCodec.encode(e.value.params),
           }
       ]
     };
@@ -99,24 +108,33 @@ class _BaseDocumentState extends State<_BaseDocument> {
         DomComponent(
           tag: 'head',
           children: [
-            if (component.charset != null) DomComponent(tag: 'meta', attributes: {'charset': component.charset!}),
+            if (component.charset != null)
+              DomComponent(
+                  tag: 'meta', attributes: {'charset': component.charset!}),
             if (component.base != null) //
               DomComponent(tag: 'base', attributes: {'href': _normalizedBase!}),
             if (component.viewport != null)
-              DomComponent(tag: 'meta', attributes: {'name': 'viewport', 'content': component.viewport!}),
+              DomComponent(tag: 'meta', attributes: {
+                'name': 'viewport',
+                'content': component.viewport!
+              }),
             if (component.meta != null)
               for (var e in component.meta!.entries)
-                DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+                DomComponent(
+                    tag: 'meta',
+                    attributes: {'name': e.key, 'content': e.value}),
             if (component.title != null) //
               DomComponent(tag: 'title', child: Text(component.title!)),
             if (component.styles != null) //
               Style(styles: component.styles!),
+            ...component.styleSheets,
             ...component.head,
             FindChildNode(
               onNodeRendered: (element) {
                 _data = element;
               },
-              child: DomComponent(tag: 'script', child: Text('', rawHtml: true)),
+              child:
+                  DomComponent(tag: 'script', child: Text('', rawHtml: true)),
             ),
             FindChildNode(
               onNodeRendered: (element) {
@@ -141,10 +159,12 @@ class _BaseDocumentState extends State<_BaseDocument> {
   void _prepareRender(Map<String, dynamic> syncState) {
     _setScript(scriptName);
     var jasprConfig = {
-      if (syncState.isNotEmpty) 'sync': kDebugMode ? syncState : stateCodec.encode(syncState),
+      if (syncState.isNotEmpty)
+        'sync': kDebugMode ? syncState : stateCodec.encode(syncState),
       ..._getExtendedConfig(),
     };
-    _setData('window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert(jasprConfig)};');
+    _setData(
+        'window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert(jasprConfig)};');
   }
 
   void _setScript(String? name) {
@@ -193,8 +213,13 @@ class _BaseDocumentState extends State<_BaseDocument> {
     var firstChild = prevElem?.lastNode;
     var lastChild = element.lastNode;
 
-    var firstIndex = (firstChild != null ? container.data.children.indexOf(firstChild) : -1) + 1;
-    var lastIndex = (lastChild != null ? container.data.children.indexOf(lastChild) : -1) + 1;
+    var firstIndex = (firstChild != null
+            ? container.data.children.indexOf(firstChild)
+            : -1) +
+        1;
+    var lastIndex =
+        (lastChild != null ? container.data.children.indexOf(lastChild) : -1) +
+            1;
 
     if (firstIndex > lastIndex) {
       lastIndex = firstIndex;
