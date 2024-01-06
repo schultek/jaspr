@@ -1,3 +1,8 @@
+## Unreleased minor
+
+- Had to resort for using Style.Raw for this, So I added a new Unit called Unit.auto
+- Simply emmits the value 'auto', use this for responsive styling
+
 ## 0.9.3
 
 - Fixed `melos format` on Windows.
