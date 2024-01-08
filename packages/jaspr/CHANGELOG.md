@@ -1,3 +1,6 @@
+## Unreleased minor
+- Added _FontFaceStyleRule to add external font files
+
 ## 0.9.3
 
 - Fixed `melos format` on Windows.
