@@ -175,7 +175,7 @@ Rather it embraces these differences to give the best of both worlds.
 You can build your application using the following command:
 
 ```shell
-dart run jaspr build
+jaspr build
 ```
 
 This will build the app inside the `build` directory. 

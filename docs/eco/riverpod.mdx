@@ -1,8 +1,8 @@
 ---
 title: Jaspr Riverpod
 description: A port of the riverpod package for jaspr.
-previous: /eco/flutter_embedding
-next: /eco/tailwind
+previous: /eco/routing
+next: /eco/flutter_embedding
 ---
 
 # 🌊 Riverpod for Jaspr
@@ -10,14 +10,14 @@ next: /eco/tailwind
 Jaspr comes with a Riverpod package that ports over flutter_riverpod to Jaspr. It is based
 on Riverpod 2 and supports all providers and modifiers.
 
-**TLDR: Differences to flutter_riverpod**
+<Accordion title="TLDR: Differences to flutter_riverpod">
+  - No `Consumer` / `ConsumerComponent`, just use `context.read` / `context.watch` in normal components.
+  - Additional `SyncProvider` to sync values between server and client.
 
-- No `Consumer` / `ConsumerComponent`, just use `context.read` / `context.watch`
-- Additional `SyncProvider` to sync values between server and client.
-
-<Info>
-Also check out [this example](https://github.com/schultek/jaspr/tree/main/examples/riverpod_app).
-</Info>
+  <Info>
+    Also check out [this example](https://github.com/schultek/jaspr/tree/main/examples/riverpod_app).
+  </Info>
+</Accordion>
 
 ## 🪄 Accessing Providers
 
@@ -73,12 +73,10 @@ component tree to rebuild when watching a provider, simply use the `Builder` com
 give you a new context which you can call `context.watch` on:
 
 ```dart
-Builder(
-  builder: (context) sync* {
-    var value = context.watch(...);
-    yield ...;
-  },
-);
+Builder(builder: (context) sync* {
+  var value = context.watch(...);
+  yield ...;
+});
 ```
 
 ## ♻️ Preloading and Syncing Provider State

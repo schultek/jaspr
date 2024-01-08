@@ -19,7 +19,7 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
     argParser.addOption(
       'input',
       abbr: 'i',
-      help: 'Specify the input file for the web app',
+      help: 'Specify the input file for the server app',
       defaultsTo: 'lib/main.dart',
     );
     argParser.addOption(
@@ -36,10 +36,13 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
   }
 
   @override
-  String get description => 'Performs a single build on the specified target and then exits.';
+  String get description => 'Builds the full project.';
 
   @override
   String get name => 'build';
+
+  @override
+  String get category => 'Project';
 
   @override
   Future<int> run() async {
@@ -86,13 +89,25 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
       await webResult;
 
       logger.write('Building server app...', progress: ProgressState.running);
+      String extension = '';
+      final target = argResults!['target'];
+      if (Platform.isWindows && target == 'exe') {
+        extension = '.exe';
+      }
 
       var process = await Process.start(
         'dart',
-        ['compile', argResults!['target'], entryPoint, '-o', './build/jaspr/app', '-Djaspr.flags.release=true'],
+        [
+          'compile',
+          argResults!['target'],
+          entryPoint,
+          '-o',
+          './build/jaspr/app$extension',
+          '-Djaspr.flags.release=true',
+        ],
       );
 
-      await watchProcess(process, tag: Tag.cli, progress: 'Building server app...');
+      await watchProcess('server build', process, tag: Tag.cli, progress: 'Building server app...');
     }
 
     await Future.wait([

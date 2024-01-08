@@ -32,7 +32,7 @@ class ZipProjectEncoder {
     _encoder.startEncode(_output);
 
     var replacements = {
-      'project_name': project.id ?? 'jaspr_app',
+      'project_name': project.id?.replaceAll('-', '_') ?? 'jaspr_app',
       'project_description': project.description ?? 'Simple jaspr project',
       'project_title': project.description ?? 'Jaspr',
       'project_html': project.htmlFile?.indent('    ') ?? '',

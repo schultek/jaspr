@@ -6,10 +6,10 @@ import 'package:jaspr/jaspr.dart';
 
 import 'builder.dart';
 import 'configuration.dart';
-import 'history/history.dart';
 import 'matching.dart';
 import 'misc/inherited_router.dart';
 import 'parser.dart';
+import 'platform/platform.dart';
 import 'route.dart';
 import 'typedefs.dart';
 
@@ -70,7 +70,10 @@ class RouterState extends State<Router> with PreloadStateMixin {
   @override
   void initState() {
     super.initState();
-    HistoryManager.instance.init(context.binding.currentUri.toString(), (uri) {
+    if (kGenerateMode) {
+      PlatformRouter.instance.registry.registerRoutes(component.routes);
+    }
+    PlatformRouter.instance.history.init(context.binding.currentUri.toString(), (uri) {
       _update(uri, updateHistory: false);
     });
     if (_matchList == null) {
@@ -144,7 +147,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
   }
 
   void back() {
-    HistoryManager.instance.back();
+    PlatformRouter.instance.history.back();
   }
 
   Future<void> _update(
@@ -158,9 +161,9 @@ class RouterState extends State<Router> with PreloadStateMixin {
         _matchList = match;
         if (updateHistory) {
           if (!replace) {
-            HistoryManager.instance.push(match.uri.toString(), title: match.title);
+            PlatformRouter.instance.history.push(match.uri.toString(), title: match.title);
           } else {
-            HistoryManager.instance.replace(match.uri.toString(), title: match.title);
+            PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title);
           }
         }
       });

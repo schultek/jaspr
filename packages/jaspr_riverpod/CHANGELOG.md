@@ -1,3 +1,16 @@
+## 0.3.8
+
+- Upgrade `riverpod` to `v2.4.8`
+- Update `jaspr_riverpod`'s dependency on `riverpod`'s `vsyncOverride` to `flutterVsyncs`
+
+## 0.3.7
+
+- Fixed bug with SyncProvider.
+
+## 0.3.6
+
+- `jaspr` upgraded to `0.9.0`
+
 ## 0.3.5
 
 - `jaspr` upgraded to `0.8.0`

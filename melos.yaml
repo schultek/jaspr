@@ -15,7 +15,7 @@ packages:
   - thirdparty/*
 
 scripts:
-  format: melos exec -- 'dart format . --line-length=120'
+  format: melos exec -- "dart format . --line-length=120"
   analyze: melos exec -- "dart analyze . --fatal-infos"
   test:
     run: |
@@ -56,3 +56,6 @@ scripts:
   activate:cli:
     run: |
       dart pub global activate packages/jaspr_cli --source=path
+  deploy:jasprpad:
+    run: |
+      dart run apps/jaspr_pad/tool/deploy.dart

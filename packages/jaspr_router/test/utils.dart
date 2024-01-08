@@ -1,6 +1,6 @@
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
-import 'package:jaspr_router/src/history/history.dart';
+import 'package:jaspr_router/src/platform/platform.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
 RouterState findRouter(Element root) {
@@ -27,8 +27,16 @@ extension TestRouter on ComponentTester {
   }
 }
 
-void mockHistory() {
-  HistoryManager.instance = MockHistoryManager();
+void mockPlatform() {
+  PlatformRouter.instance = MockPlatformRouter();
+}
+
+class MockPlatformRouter implements PlatformRouter {
+  @override
+  final HistoryManager history = MockHistoryManager();
+
+  @override
+  final RouteRegistry registry = MockRouteRegistry();
 }
 
 class MockHistoryManager implements HistoryManager {
@@ -58,6 +66,11 @@ class MockHistoryManager implements HistoryManager {
     history.removeLast();
     onChange(history.last);
   }
+}
+
+class MockRouteRegistry implements RouteRegistry {
+  @override
+  void registerRoutes(List<RouteBase> routes) {}
 }
 
 Route homeRoute() => Route(path: '/', builder: (_, __) => Page(path: 'home'));

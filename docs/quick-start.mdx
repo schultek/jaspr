@@ -11,10 +11,16 @@ To get started simply activate the `jaspr` command line tool and run `jaspr crea
 
 ```shell
 dart pub global activate jaspr_cli
-jaspr create -t basic my_web_app
+jaspr create my_web_app
 ```
 
-This will setup a new jaspr project using the `basic` template inside the `my_web_app` folder.
+This will setup a new jaspr project inside the `my_web_app` folder. The cli will prompt you to choose a template.
+
+<Info>
+Templates give you a minimal project to get started. Later on you can easily adapt your project for every
+architecture and rendering mode. So don't worry if you are not sure yet what to choose.
+</Info>
+
 Next, run the development server using the following commands:
 
 ```shell
@@ -22,8 +28,8 @@ cd my_web_app
 jaspr serve
 ```
 
-This will generate some additional files and spin up a server at `localhost:8080`. 
-You can now start developing your web app.
+This will spin up a developmet server at `localhost:8080`.
+You can now start developing your web app. 🎉
 
 <Success>
 Observe that the browser automatically refreshes the page when you change something in your 

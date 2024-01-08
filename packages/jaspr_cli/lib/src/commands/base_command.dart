@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -6,11 +7,12 @@ import 'package:mason/mason.dart' show ExitCode;
 import 'package:meta/meta.dart';
 import 'package:yaml/yaml.dart';
 
+import '../analytics.dart';
 import '../config.dart';
 import '../logging.dart';
 
 abstract class BaseCommand extends Command<int> {
-  Set<Future<void> Function()> guards = {};
+  Set<FutureOr<void> Function()> guards = {};
 
   BaseCommand({Logger? logger}) : _logger = logger {
     argParser.addFlag(
@@ -43,15 +45,22 @@ abstract class BaseCommand extends Command<int> {
     pubspecYaml = await getPubspec();
     config = JasprConfig.fromYaml(pubspecYaml, logger);
 
-    ProcessSignal.sigint.watch().listen((signal) {
-      shutdown();
-    });
+    await trackEvent(name, projectName: pubspecYaml?['name']);
+
+    ProcessSignal.sigint.watch().listen((signal) => shutdown());
+    if (!Platform.isWindows) {
+      ProcessSignal.sigterm.watch().listen((signal) => shutdown());
+    }
 
     return ExitCode.success.code;
   }
 
   Future<Never> shutdown([int exitCode = 1]) async {
-    await Future.wait([for (var g in guards) g()]);
+    logger.complete(false);
+    logger.write('Shutting down...');
+    for (var g in guards) {
+      await g();
+    }
     exit(exitCode);
   }
 
@@ -85,17 +94,29 @@ abstract class BaseCommand extends Command<int> {
     return parsed as YamlMap;
   }
 
-  void guardResource(Future<void> Function() fn) {
+  void guardResource(FutureOr<void> Function() fn) {
     guards.add(fn);
   }
 
   Future<void> watchProcess(
+    String name,
     Process process, {
     required Tag tag,
     String? progress,
     bool Function(String)? hide,
     void Function()? onFail,
   }) async {
+    int? exitCode;
+    bool wasKilled = false;
+    guardResource(() async {
+      if (exitCode == null) {
+        logger.write("Terminating $name...");
+        process.kill();
+        wasKilled = true;
+        await process.exitCode;
+      }
+    });
+
     if (progress != null) {
       logger.write(progress, tag: tag, progress: ProgressState.running);
     }
@@ -104,7 +125,7 @@ abstract class BaseCommand extends Command<int> {
       logger.write(utf8.decode(event), tag: tag, level: Level.error, progress: ProgressState.completed);
     });
 
-    process.stdout.map(utf8.decode).listen((log) {
+    process.stdout.map(utf8.decode).splitLines().listen((log) {
       if (hide != null && hide.call(log)) return;
 
       if (progress != null) {
@@ -114,7 +135,10 @@ abstract class BaseCommand extends Command<int> {
       }
     });
 
-    var exitCode = await process.exitCode;
+    exitCode = await process.exitCode;
+    if (wasKilled) {
+      return;
+    }
     if (exitCode == 0) {
       logger.complete(true);
     } else {
@@ -122,5 +146,24 @@ abstract class BaseCommand extends Command<int> {
       onFail?.call();
       shutdown(exitCode);
     }
+  }
+}
+
+extension on Stream<String> {
+  Stream<String> splitLines() {
+    var data = '';
+    return transform(StreamTransformer.fromHandlers(
+      handleData: (d, s) {
+        data += d;
+        int index;
+        while ((index = data.indexOf('\n')) != -1) {
+          s.add(data.substring(0, index + 1));
+          data = data.substring(index + 1);
+        }
+      },
+      handleDone: (s) {
+        s.add(data);
+      },
+    ));
   }
 }

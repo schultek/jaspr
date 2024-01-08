@@ -37,10 +37,13 @@ class CreateCommand extends BaseCommand {
   }
 
   @override
-  String get description => 'Create a new jaspr project.';
+  String get description => 'Creates a new jaspr project.';
 
   @override
   String get name => 'create';
+
+  @override
+  String get category => 'Project';
 
   @override
   bool get requiresPubspec => false;
@@ -95,7 +98,8 @@ class CreateCommand extends BaseCommand {
 
     var process = await Process.start('dart', ['pub', 'get'], workingDirectory: directory.absolute.path);
 
-    await watchProcess(process, tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s.contains('+'));
+    await watchProcess('pub', process,
+        tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s.contains('+'));
 
     logger.write('\n'
         'Created project $name in $dir! In order to get started, run the following commands:\n\n'

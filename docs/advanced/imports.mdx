@@ -2,7 +2,7 @@
 title: Platform Imports
 description: How to use platform-specific imports in Jaspr.
 previous: /advanced/backend
-next: /eco/flutter_embedding
+next: /eco/routing
 ---
 
 # 📎 Platform Imports
@@ -30,10 +30,7 @@ class App extends StatelessComponent {
     if (kIsWeb) {
       window.alert('Hi Jaspr');
     }
-    yield DomComponent(
-      tag: 'p',
-      child: Text('Hello World'),
-    );
+    yield p([text('Hello World')]);
   }
 }
 ```
@@ -56,10 +53,7 @@ class App extends StatelessComponent {
     if (kIsWeb) {
       window.alert('Hi Jaspr');
     }
-    yield DomComponent(
-      tag: 'p',
-      child: Text('Hello World'),
-    );
+    yield p([text('Hello World')]);
   }
 }
 ```
@@ -78,3 +72,6 @@ You can extend this to multiple imports and mix web and server imports like this
 @Import.onServer('dart:io', show: [#Platform])
 import 'app.imports.dart';
 ```
+
+The `show` list must contain all the variables and types you want to access in your code, similar to
+the `import ... show ...;` syntax. Here each item in the list must be a symbol starting with `#`.

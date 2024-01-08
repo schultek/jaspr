@@ -29,8 +29,14 @@ enum ProgressState { running, completed }
 class Logger {
   Logger(this.verbose) {
     configureLogWriter(false, customLogWriter: (level, message, {loggerName, error, stackTrace}) {
-      if (!verbose) return;
       if (level.value < l.Level.INFO.value) return;
+
+      if (!verbose && level.value < l.Level.SEVERE.value) return;
+
+      // We log our own server and don't want to confuse the user.
+      if (message.startsWith('Serving `web` on')) {
+        return;
+      }
 
       var buffer = StringBuffer(message);
       if (error != null) {

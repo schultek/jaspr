@@ -1,3 +1,39 @@
+## 0.9.3
+
+- Fixed `melos format` on Windows.
+- Fixed infinite loop attempting to find root directory on Windows when running a built jaspr executable.
+- Add `.exe` extension to the output of `jaspr build` on Windows.
+
+## 0.9.2
+
+- Fixed cli execution on windows.
+
+## 0.9.1
+
+- Improved the stability and logging of the cli and added the commands:
+  - `clean` command to clean your project directory
+  - `update` command to automatically update the cli to the latest version
+  - `doctor` command to print information about the environment and project
+  
+- We added lightweight anonymous usage tracking to the cli. We use [mixpanel.com](https://mixpanel.com/home) and
+  only process anonymized data. The usage statistics are made public and can be viewed here (TODO: Link will be added in next release).
+
+  To opt out of usage tracking, use `jaspr --disable-analytics`.
+
+## 0.9.0
+
+- Added *Static Site Generation* support.
+
+  With the new `jaspr generate` command you can generate static pages from your jaspr app. This requires a normal 
+  server-rendered jaspr app and will output separate `.html` pages for each of your routes.
+
+  To specify which routes your application should handle, either use `jaspr_router` or call 
+  `ServerApp.requestRouteGeneration('/my/route');` for each target route.
+
+## 0.8.2
+
+- Fixed client template to set `uses-ssr: false` correctly.
+
 ## 0.8.1
 
 - Fixed bug with rebuilding the root component.

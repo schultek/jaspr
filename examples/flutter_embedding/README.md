@@ -1,4 +1,4 @@
-# element_embedding_demo
+# Flutter Element Embedding Demo
 
 This package contains the application used to demonstrate the
 new Flutter web feature: "Element Embedding" in combination with 
@@ -14,7 +14,7 @@ The demo is a jaspr app with an embedded flutter web app.
 It can be run with:
 
 ```terminal
-$ jaspr serve --input=lib/main_jaspr.dart
+$ jaspr serve
 ```
 
 https://user-images.githubusercontent.com/13920539/216588813-a06ac091-e897-4ebe-a9d4-806bfaf8759d.mov
@@ -26,14 +26,13 @@ https://user-images.githubusercontent.com/13920539/216588968-97797efe-47cc-47c7-
 The project can be built with:
 
 ```terminal
-$ jaspr build --input=lib/main_jaspr.dart
+$ jaspr build
 ```
 
 Run the built app with:
 
 ```terminal
-$ cd build/jaspr
-$ ./app
+$ ./build/jaspr/app
 ```
 
 ## Points of Interest
@@ -44,7 +43,7 @@ $ ./app
 
 * See how the Flutter web application is embedded into the page now:
   * Find `FlutterAppContainer` in `lib/components/flutter_app_container_web.dart`.
-  * Find `FlutterEmbedView` in `lib/embedding/flutter_embed_view.dart`.
+  * Find `FlutterEmbedView` in `lib/components/flutter_target.dart`.
 
 * Check the new data binding:
   * Look at the usage of `ProviderScope` in `lib/components/flutter_app_container_web.dart`.

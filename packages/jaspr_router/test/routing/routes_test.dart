@@ -6,7 +6,7 @@ import '../utils.dart';
 void main() {
   group('router', () {
     setUpAll(() {
-      mockHistory();
+      mockPlatform();
     });
 
     testComponents('should push route', (tester) async {

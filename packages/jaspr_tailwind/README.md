@@ -7,7 +7,10 @@ This package is a first-class tailwind integration for [jaspr](https://github.co
 
 ## Setup
 
-Simply add `jaspr_tailwind` as a dev dependency to your project:
+To use this package, you need both `node` and `npm` installed. 
+See [this guide](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for instructions.
+
+To start, add `jaspr_tailwind` as a dev dependency to your project:
 
 `dart pub add jaspr_tailwind --dev`
 
@@ -24,7 +27,6 @@ Finally, link the generated `styles.css` in your document, or otherwise add it t
 ```dart
 // This file is lib/main.dart
 
-import 'package:jaspr/html.dart';
 import 'package:jaspr/server.dart';
 
 import './app.dart';
@@ -51,7 +53,7 @@ The `jaspr_tailwind` integration comes preconfigured, so you can use any tailwin
 A jaspr card component using tailwind would look like this:
 
 ```dart
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 
 class SimpleCard extends StatelessComponent {
   const SimpleCard({required this.title, required this.message});

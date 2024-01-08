@@ -1,3 +1,9 @@
+## 0.3.0
+
+- Added *Static Site Generation* support. Pages are automatically generated for each route.
+
+- Fixed bug where `Router.of(context).matchList.title` always returned null.
+
 ## 0.2.3
 
 - `jaspr` upgraded to `0.8.0`

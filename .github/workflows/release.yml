@@ -40,7 +40,7 @@ jobs:
       - name: Bump Package Versions
         id: bump
         run: |
-          version bump --scope="packages/*" | tee output.txt
+          version bump | tee output.txt
           echo 'commit_message<<EOF' >> $GITHUB_OUTPUT
           echo "Bump package versions" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT

@@ -14,9 +14,9 @@
 
 <!-- Put an `x` in all the boxes that apply: -->
 
-- [ ] ✨ New feature (non-breaking change which adds functionality)
-- [ ] 🛠️ Bug fix (non-breaking change which fixes an issue)
-- [ ] ❌ Breaking change (fix or feature that would cause existing functionality to change)
+- [ ] ❌ Breaking change
+- [ ] ✨ New feature or improvement
+- [ ] 🛠️ Bug fix
 - [ ] 🧹 Code refactor
 - [ ] 📝 Documentation
 - [ ] 🗑️ Chore
@@ -27,5 +27,6 @@
 - [ ] In case this PR changes one of the core packages, I've modified the respective **CHANGELOG.md** file using
       the [semantic_changelog](https://github.com/rrousselGit/semantic_changelog) format.
 - [ ] I updated/added relevant documentation (doc comments with `///`).
+- [ ] I added myself to the AUTHORS file (optional, if you want to).
 
 If you need help, consider asking for advice on the *#contribute* channel on [Discord](https://discord.gg/XGXrGEk4c6).

@@ -3,20 +3,19 @@ FROM dart:stable as build
 
 # Resolve app dependencies.
 WORKDIR /app
-COPY . .
+COPY /apps/jaspr_pad /app/apps/jaspr_pad
 WORKDIR /app/apps/jaspr_pad
+RUN rm pubspec_overrides.yaml
 RUN dart pub get
-RUN dart run jaspr build
+RUN dart pub global activate jaspr_cli
+RUN jaspr build
 
 FROM dart:stable
 
-COPY --from=build /runtime/ /
-COPY --from=build /app/apps/jaspr_pad/build/ /app/apps/jaspr_pad/
+COPY --from=build /app/apps/jaspr_pad/build/jaspr/ /app/apps/jaspr_pad/
 COPY --from=build /app/apps/jaspr_pad/serviceAccountKey.json /app/apps/jaspr_pad/
 COPY --from=build /app/apps/jaspr_pad/templates /app/apps/jaspr_pad/templates
 COPY --from=build /app/apps/jaspr_pad/samples /app/apps/jaspr_pad/samples
-COPY --from=build /app/packages/jaspr /app/packages/jaspr
-COPY --from=build /app/packages/jaspr_riverpod /app/packages/jaspr_riverpod
 
 WORKDIR /app/apps/jaspr_pad/templates/jaspr_basic
 RUN dart pub get

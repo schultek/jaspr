@@ -6,6 +6,12 @@ on:
     paths:
       - '.github/workflows/test.yml'
       - 'packages/**'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/test.yml'
+      - 'packages/**'
 
 name: Test Pipeline
 
@@ -13,7 +19,7 @@ jobs:
   cli:
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest] # TODO: windows-latest
+        os: [ ubuntu-latest, macos-latest, windows-latest]
     name: Verify CLI Tool
     runs-on: ${{ matrix.os }}
     steps:
@@ -31,13 +37,13 @@ jobs:
       - name: Create Project
         run: |
           cd apps
-          jaspr create -t basic -c my_app
+          dart pub global run jaspr_cli:jaspr create -t basic -c my_app
           melos bootstrap --scope my_app
 
       - name: Build Project
         run: |
           cd apps/my_app
-          jaspr build -v
+          dart pub global run jaspr_cli:jaspr build -v
 
   analyze:
     name: Analyze Code
