@@ -81,7 +81,7 @@ class _RootElement extends SingleChildElement with RenderObjectElement {
 
   @override
   void _firstBuild([VoidCallback? onBuilt]) {
-    attachRenderObject(slot);
+    attachRenderObject();
     super._firstBuild(onBuilt);
   }
 

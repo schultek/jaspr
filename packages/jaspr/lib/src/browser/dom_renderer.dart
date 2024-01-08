@@ -5,7 +5,8 @@ import 'dart:html';
 import '../foundation/constants.dart';
 import '../framework/framework.dart';
 
-class DomRenderObject extends RenderObject<DomRenderObject> {
+class DomRenderObject extends RenderObject {
+  DomRenderObject? parent;
   Node? node;
   List<Node> toHydrate = [];
   Map<String, EventBinding>? events;
@@ -18,7 +19,7 @@ class DomRenderObject extends RenderObject<DomRenderObject> {
   }
 
   @override
-  DomRenderObject createChildRenderObject() => DomRenderObject();
+  DomRenderObject createChildRenderObject() => DomRenderObject()..parent = this;
 
   @override
   void updateElement(String tag, String? id, List<String>? classes, Map<String, String>? styles,
@@ -193,51 +194,41 @@ class DomRenderObject extends RenderObject<DomRenderObject> {
   }
 
   @override
-  void attach(ElementSlot? slot) {
-    if (parent == null) {
-      if (child.data.node == null) {
-        Iterable<Node> nodes = container.nodes;
-        if (kDebugMode) {
-          nodes = nodes.where((node) => node is! html.Text || (node.text ?? '').trim().isNotEmpty);
-        }
-        nodes = nodes.skip(from ?? 0);
-        if (to != null) {
-          nodes = nodes.take(to! - (from ?? 0));
-        }
-        child.data
-          ..node = container
-          ..toHydrate = nodes.toList();
+  void attach(DomRenderObject? parent, DomRenderObject? after) {
+    try {
+      this.parent = parent;
+      if (parent == null) return;
+
+      var parentNode = parent.node;
+      var childNode = node;
+
+      assert(parentNode is html.Element);
+      if (childNode == null) return;
+
+      var afterNode = after?.node;
+      if ((afterNode, parent) case (null, RootDomRenderObject p) when p.from != null && p.from! > 0) {
+        afterNode = p.container.childNodes[p.from! - 1];
       }
-      return;
-    }
 
-    var parentNode = parent.data.node;
-    var childNode = child.data.node;
+      if (childNode.previousNode == afterNode && childNode.parentNode == parentNode) {
+        return;
+      }
 
-    assert(parentNode is html.Element);
-    if (childNode == null) return;
+      if (kVerboseMode) {
+        print("Attach node $childNode of $parentNode after $afterNode");
+      }
 
-    var afterNode = after?.data.node;
-    if (afterNode == null && parentNode == container && from != null && from! > 0) {
-      afterNode = container.childNodes[from! - 1];
-    }
-
-    if (childNode.previousNode == afterNode && childNode.parentNode == parentNode) {
-      return;
-    }
-
-    if (kVerboseMode) {
-      print("Attach node $childNode of $parentNode after $afterNode");
-    }
-
-    if (afterNode == null) {
-      if (parentNode!.childNodes.isEmpty) {
-        parentNode.append(childNode);
+      if (afterNode == null) {
+        if (parentNode!.childNodes.isEmpty) {
+          parentNode.append(childNode);
+        } else {
+          parentNode.insertBefore(childNode, parentNode.childNodes.first);
+        }
       } else {
-        parentNode.insertBefore(childNode, parentNode.childNodes.first);
+        parentNode!.insertBefore(childNode, afterNode.nextNode);
       }
-    } else {
-      parentNode!.insertBefore(childNode, afterNode.nextNode);
+    } finally {
+      _finalize();
     }
   }
 
@@ -247,7 +238,17 @@ class DomRenderObject extends RenderObject<DomRenderObject> {
       print("Remove child $node of ${parent?.node}");
     }
     node?.remove();
-    super.remove();
+    parent = null;
+  }
+
+  void _finalize() {
+    if (kVerboseMode && toHydrate.isNotEmpty) {
+      print("Clear ${toHydrate.length} nodes not hydrated (${toHydrate})");
+    }
+    for (var node in toHydrate) {
+      node.remove();
+    }
+    toHydrate.clear();
   }
 }
 
@@ -257,6 +258,24 @@ class RootDomRenderObject extends DomRenderObject {
   final int? to;
 
   RootDomRenderObject(this.container, this.from, this.to);
+
+  @override
+  void attach(DomRenderObject? parent, DomRenderObject? after) {
+    assert(parent == null);
+    if (node == null) {
+      Iterable<Node> nodes = container.nodes;
+      if (kDebugMode) {
+        nodes = nodes.where((node) => node is! html.Text || (node.text ?? '').trim().isNotEmpty);
+      }
+      nodes = nodes.skip(from ?? 0);
+      if (to != null) {
+        nodes = nodes.take(to! - (from ?? 0));
+      }
+      node = container;
+      toHydrate = nodes.toList();
+    }
+    super.attach(parent, after);
+  }
 }
 
 typedef DomEventCallback = void Function(Event event);
@@ -293,18 +312,5 @@ extension on html.Element {
       }
       setAttribute(name, value);
     }
-  }
-}
-
-class BrowserDomRenderer extends Renderer {
-  @override
-  void finalizeNode(RenderElement element) {
-    if (kVerboseMode && element.data.toHydrate.isNotEmpty) {
-      print("Clear ${element.data.toHydrate.length} nodes not hydrated (${element.data.toHydrate})");
-    }
-    for (var node in element.data.toHydrate) {
-      node.remove();
-    }
-    element.data.toHydrate.clear();
   }
 }

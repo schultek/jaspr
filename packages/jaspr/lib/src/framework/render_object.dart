@@ -7,21 +7,8 @@ part of framework;
 /// The `child` argument must not be null.
 typedef RenderObjectVisitor = void Function(RenderObject child);
 
-abstract class RenderObject<T extends RenderObject<T>> {
-  /// The parent of this node in the tree.
-  T? get parent => _parent;
-  T? _parent;
-
-  T? previousSibling;
-
-  T? nextSibling;
-
-  /// Calls visitor for each immediate child of this render object.
-  ///
-  /// Override in subclasses with children and call the visitor for each child.
-  void visitChildren(RenderObjectVisitor visitor) {}
-
-  T createChildRenderObject();
+abstract class RenderObject {
+  RenderObject createChildRenderObject();
 
   void updateElement(String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events);
@@ -30,56 +17,48 @@ abstract class RenderObject<T extends RenderObject<T>> {
 
   void skipChildren();
 
-  void attach(ElementSlot? slot);
+  void attach(covariant RenderObject? parent, covariant RenderObject? after);
 
-  @mustCallSuper
-  void remove() {
-    _parent = null;
-  }
+  void remove();
 }
 
 mixin RenderObjectElement on Element {
   void updateRenderObject();
 
-  RenderObject<dynamic> get renderObject => _renderObject!;
-  RenderObject<dynamic>? _renderObject;
-
-  RenderObjectElement? _ancestorRenderObjectElement;
-
-  RenderObjectElement? _findAncestorRenderObjectElement() {
-    Element? ancestor = _parent;
-    while (ancestor != null && ancestor is! RenderObjectElement) {
-      ancestor = ancestor._parent;
-    }
-    return ancestor as RenderObjectElement?;
-  }
+  RenderObject get renderObject => _renderObject!;
+  RenderObject? _renderObject;
 
   @override
   void _firstBuild([VoidCallback? onBuilt]) {
     if (_renderObject == null) {
-      _ancestorRenderObjectElement = _findAncestorRenderObjectElement();
-      _renderObject = _ancestorRenderObjectElement!.renderObject.createChildRenderObject();
+      _renderObject = _parentRenderObjectElement!.renderObject.createChildRenderObject();
       updateRenderObject();
     }
     super._firstBuild(() {
-      attachRenderObject(slot);
+      attachRenderObject();
       onBuilt?.call();
     });
   }
 
-  @override
-  void attachRenderObject(ElementSlot? newSlot) {
-    assert(_ancestorRenderObjectElement == null);
-    _slot = newSlot;
-    renderObject.attach(newSlot);
+  void attachRenderObject() {
+    Element? prevElem = _prevAncestorSibling;
+    while (prevElem != null && prevElem._lastRenderObjectElement == null) {
+      prevElem = prevElem._prevAncestorSibling;
+    }
+    var after = prevElem?._lastRenderObjectElement;
+    renderObject.attach(_parentRenderObjectElement?.renderObject, after?.renderObject);
+  }
+
+  void detachRenderObject() {
+    renderObject.remove();
   }
 
   @override
-  void detachRenderObject() {
-    renderObject.remove();
-    if (_ancestorRenderObjectElement != null) {
-      _ancestorRenderObjectElement = null;
-    }
-    _slot = null;
+  void _didUpdateSlot() {
+    super._didUpdateSlot();
+    attachRenderObject();
   }
+
+  @override
+  RenderObjectElement get _lastRenderObjectElement => this;
 }
