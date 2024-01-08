@@ -35,7 +35,7 @@ class DomComponent extends Component {
   Element createElement() => DomElement(this);
 }
 
-class DomElement extends MultiChildElement with RenderElement {
+class DomElement extends MultiChildElement with RenderObjectElement {
   DomElement(DomComponent component) : super(component);
 
   @override
@@ -52,9 +52,8 @@ class DomElement extends MultiChildElement with RenderElement {
   }
 
   @override
-  void renderNode(Renderer renderer) {
-    renderer.renderNode(
-      this,
+  void updateRenderObject() {
+    renderObject.updateElement(
       component.tag,
       component.id,
       component.classes,
@@ -106,15 +105,15 @@ abstract class NoChildElement extends Element {
   void visitChildren(ElementVisitor visitor) {}
 }
 
-class TextElement extends NoChildElement with RenderElement {
+class TextElement extends NoChildElement with RenderObjectElement {
   TextElement(Text component) : super(component);
 
   @override
   Text get component => super.component as Text;
 
   @override
-  void renderNode(Renderer renderer) {
-    renderer.renderTextNode(this, component.text, component.rawHtml);
+  void updateRenderObject() {
+    renderObject.updateText(component.text, component.rawHtml);
   }
 }
 
@@ -125,14 +124,14 @@ class SkipContent extends Component {
   Element createElement() => SkipContentElement(this);
 }
 
-class SkipContentElement extends NoChildElement with RenderElement {
+class SkipContentElement extends NoChildElement with RenderObjectElement {
   SkipContentElement(SkipContent component) : super(component);
 
   @override
   SkipContent get component => super.component as SkipContent;
 
   @override
-  void renderNode(Renderer renderer) {
-    renderer.skipContent(this);
+  void updateRenderObject() {
+    renderObject.skipChildren();
   }
 }

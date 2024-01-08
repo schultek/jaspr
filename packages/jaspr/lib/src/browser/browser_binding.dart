@@ -30,13 +30,13 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
   }
 
   @override
-  Renderer createRenderer() {
+  RenderObject createRootRenderObject() {
     var attachMatch = _queryReg.firstMatch(attachTarget)!;
     var target = attachMatch.group(1)!;
     var from = int.tryParse(attachMatch.group(2) ?? '');
     var to = int.tryParse(attachMatch.group(3) ?? '');
 
-    return BrowserDomRenderer(document.querySelector(target)!, from, to);
+    return RootDomRenderObject(document.querySelector(target)!, from, to);
   }
 
   final Map<String, dynamic> _rawState = {};

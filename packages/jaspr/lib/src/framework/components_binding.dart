@@ -12,12 +12,10 @@ mixin ComponentsBinding on AppBinding {
       }());
       buildOwner._isFirstBuild = true;
 
-      var renderer = createRenderer();
-
       var element = _Root(child: app).createElement();
       element._binding = this;
       element._owner = buildOwner;
-      element._renderer = renderer;
+      element._renderObject = createRootRenderObject();
 
       element.mount(null, null);
 
@@ -44,14 +42,14 @@ mixin ComponentsBinding on AppBinding {
   @protected
   void didAttachRootElement(Element element) {}
 
+  RenderObject createRootRenderObject();
+
   /// The [Element] that is at the root of the hierarchy.
   ///
   /// This is initialized when [runApp] is called.
   @override
   RenderObjectElement? get rootElement => _rootElement;
   RenderObjectElement? _rootElement;
-
-  Renderer createRenderer();
 
   static final Map<GlobalKey, Element> _globalKeyRegistry = {};
 
@@ -83,19 +81,15 @@ class _RootElement extends SingleChildElement with RenderObjectElement {
 
   @override
   void _firstBuild([VoidCallback? onBuilt]) {
-    _attach();
+    attachRenderObject(slot);
     super._firstBuild(onBuilt);
   }
-
-  @override
-  void renderNode(Renderer renderer) {}
 
   @override
   Component build() => component.child;
 
   @override
-  RenderObject createRenderObject(BuildContext context) {
-    // TODO: implement createRenderObject
+  void updateRenderObject() {
     throw UnimplementedError();
   }
 }

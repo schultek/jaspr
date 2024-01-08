@@ -26,7 +26,7 @@ part 'keys.dart';
 part 'multi_child_element.dart';
 part 'notification.dart';
 part 'observer_component.dart';
-part 'render_element.dart';
+part 'render_object.dart';
 part 'single_child_element.dart';
 part 'state_mixins.dart';
 part 'stateful_component.dart';
@@ -240,9 +240,6 @@ abstract class Element implements BuildContext {
   BuildOwner get owner => _owner!;
   BuildOwner? _owner;
 
-  Renderer get renderer => _renderer!;
-  Renderer? _renderer;
-
   // This is used to verify that Element objects move through life in an
   // orderly fashion.
   _ElementLifecycle _lifecycleState = _ElementLifecycle.initial;
@@ -358,7 +355,6 @@ abstract class Element implements BuildContext {
     if (parent != null) {
       _owner = parent.owner;
       _binding = parent.binding;
-      _renderer = parent.renderer;
     }
     assert(_owner != null);
     assert(_binding != null);
@@ -584,7 +580,6 @@ abstract class Element implements BuildContext {
     _lifecycleState = _ElementLifecycle.active;
 
     var parent = _parent!;
-    _renderer = parent._renderer;
 
     _dependencies?.clear();
     _hadUnsatisfiedDependencies = false;
