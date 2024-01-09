@@ -141,10 +141,10 @@ packages:
     dependency: "direct dev"
     description:
       name: melos
-      sha256: "993ac467e7a36bd832a6cdabbe18a0487c30bc52b5cca14e476a824679ebdce0"
+      sha256: "96e64bbade5712c3f010137e195bca9f1b351fac34ab1f322af492ae34032067"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.1"
+    version: "3.4.0"
   meta:
     dependency: transitive
     description:
@@ -213,10 +213,10 @@ packages:
     dependency: transitive
     description:
       name: pub_updater
-      sha256: "42890302ab2672adf567dc2b20e55b4ecc29d7e19c63b6b98143ab68dd717d3a"
+      sha256: "05ae70703e06f7fdeb05f7f02dd680b8aad810e87c756a618f33e1794635115c"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.4"
+    version: "0.3.0"
   pubspec:
     dependency: transitive
     description:
