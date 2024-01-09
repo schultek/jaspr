@@ -28,11 +28,9 @@ class GistDataMapper extends ClassMapperBase<GistData> {
   static String? _$id(GistData v) => v.id;
   static const Field<GistData, String> _f$id = Field('id', _$id);
   static String? _$description(GistData v) => v.description;
-  static const Field<GistData, String> _f$description =
-      Field('description', _$description);
+  static const Field<GistData, String> _f$description = Field('description', _$description);
   static Map<String, GistFile> _$files(GistData v) => v.files;
-  static const Field<GistData, Map<String, GistFile>> _f$files =
-      Field('files', _$files);
+  static const Field<GistData, Map<String, GistFile>> _f$files = Field('files', _$files);
 
   @override
   final Map<Symbol, Field<GistData, dynamic>> fields = const {
@@ -42,8 +40,7 @@ class GistDataMapper extends ClassMapperBase<GistData> {
   };
 
   static GistData _instantiate(DecodingData data) {
-    return GistData(
-        data.dec(_f$id), data.dec(_f$description), data.dec(_f$files));
+    return GistData(data.dec(_f$id), data.dec(_f$description), data.dec(_f$files));
   }
 
   @override
@@ -77,8 +74,7 @@ mixin GistDataMappable {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            GistDataMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType && GistDataMapper._guard((c) => c.isEqual(this, other)));
   }
 
   @override
@@ -88,49 +84,36 @@ mixin GistDataMappable {
 }
 
 extension GistDataValueCopy<$R, $Out> on ObjectCopyWith<$R, GistData, $Out> {
-  GistDataCopyWith<$R, GistData, $Out> get $asGistData =>
-      $base.as((v, t, t2) => _GistDataCopyWithImpl(v, t, t2));
+  GistDataCopyWith<$R, GistData, $Out> get $asGistData => $base.as((v, t, t2) => _GistDataCopyWithImpl(v, t, t2));
 }
 
-abstract class GistDataCopyWith<$R, $In extends GistData, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
-  MapCopyWith<$R, String, GistFile, GistFileCopyWith<$R, GistFile, GistFile>>
-      get files;
+abstract class GistDataCopyWith<$R, $In extends GistData, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  MapCopyWith<$R, String, GistFile, GistFileCopyWith<$R, GistFile, GistFile>> get files;
   $R call({String? id, String? description, Map<String, GistFile>? files});
   GistDataCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _GistDataCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, GistData, $Out>
+class _GistDataCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, GistData, $Out>
     implements GistDataCopyWith<$R, GistData, $Out> {
   _GistDataCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<GistData> $mapper =
-      GistDataMapper.ensureInitialized();
+  late final ClassMapperBase<GistData> $mapper = GistDataMapper.ensureInitialized();
   @override
-  MapCopyWith<$R, String, GistFile, GistFileCopyWith<$R, GistFile, GistFile>>
-      get files => MapCopyWith(
-          $value.files, (v, t) => v.copyWith.$chain(t), (v) => call(files: v));
+  MapCopyWith<$R, String, GistFile, GistFileCopyWith<$R, GistFile, GistFile>> get files =>
+      MapCopyWith($value.files, (v, t) => v.copyWith.$chain(t), (v) => call(files: v));
   @override
-  $R call(
-          {Object? id = $none,
-          Object? description = $none,
-          Map<String, GistFile>? files}) =>
-      $apply(FieldCopyWithData({
+  $R call({Object? id = $none, Object? description = $none, Map<String, GistFile>? files}) => $apply(FieldCopyWithData({
         if (id != $none) #id: id,
         if (description != $none) #description: description,
         if (files != null) #files: files
       }));
   @override
   GistData $make(CopyWithData data) => GistData(
-      data.get(#id, or: $value.id),
-      data.get(#description, or: $value.description),
-      data.get(#files, or: $value.files));
+      data.get(#id, or: $value.id), data.get(#description, or: $value.description), data.get(#files, or: $value.files));
 
   @override
-  GistDataCopyWith<$R2, GistData, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
+  GistDataCopyWith<$R2, GistData, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _GistDataCopyWithImpl($value, $cast, t);
 }
 
@@ -154,8 +137,7 @@ class GistFileMapper extends ClassMapperBase<GistFile> {
   final String id = 'GistFile';
 
   static String _$name(GistFile v) => v.name;
-  static const Field<GistFile, String> _f$name =
-      Field('name', _$name, key: 'filename');
+  static const Field<GistFile, String> _f$name = Field('name', _$name, key: 'filename');
   static String _$content(GistFile v) => v.content;
   static const Field<GistFile, String> _f$content = Field('content', _$content);
   static String _$type(GistFile v) => v.type;
@@ -203,8 +185,7 @@ mixin GistFileMappable {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            GistFileMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType && GistFileMapper._guard((c) => c.isEqual(this, other)));
   }
 
   @override
@@ -214,39 +195,28 @@ mixin GistFileMappable {
 }
 
 extension GistFileValueCopy<$R, $Out> on ObjectCopyWith<$R, GistFile, $Out> {
-  GistFileCopyWith<$R, GistFile, $Out> get $asGistFile =>
-      $base.as((v, t, t2) => _GistFileCopyWithImpl(v, t, t2));
+  GistFileCopyWith<$R, GistFile, $Out> get $asGistFile => $base.as((v, t, t2) => _GistFileCopyWithImpl(v, t, t2));
 }
 
-abstract class GistFileCopyWith<$R, $In extends GistFile, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
+abstract class GistFileCopyWith<$R, $In extends GistFile, $Out> implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? name, String? content, String? type});
   GistFileCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _GistFileCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, GistFile, $Out>
+class _GistFileCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, GistFile, $Out>
     implements GistFileCopyWith<$R, GistFile, $Out> {
   _GistFileCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<GistFile> $mapper =
-      GistFileMapper.ensureInitialized();
+  late final ClassMapperBase<GistFile> $mapper = GistFileMapper.ensureInitialized();
   @override
-  $R call({String? name, String? content, String? type}) =>
-      $apply(FieldCopyWithData({
-        if (name != null) #name: name,
-        if (content != null) #content: content,
-        if (type != null) #type: type
-      }));
+  $R call({String? name, String? content, String? type}) => $apply(FieldCopyWithData(
+      {if (name != null) #name: name, if (content != null) #content: content, if (type != null) #type: type}));
   @override
   GistFile $make(CopyWithData data) => GistFile(
-      data.get(#name, or: $value.name),
-      data.get(#content, or: $value.content),
-      data.get(#type, or: $value.type));
+      data.get(#name, or: $value.name), data.get(#content, or: $value.content), data.get(#type, or: $value.type));
 
   @override
-  GistFileCopyWith<$R2, GistFile, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
+  GistFileCopyWith<$R2, GistFile, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _GistFileCopyWithImpl($value, $cast, t);
 }
