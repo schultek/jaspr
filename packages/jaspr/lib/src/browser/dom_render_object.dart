@@ -43,7 +43,7 @@ class DomRenderObject extends RenderObject {
             if (kDebugMode) {
               nodes = nodes.where((node) => node is! html.Text || (node.text ?? '').trim().isNotEmpty);
             }
-            toHydrate = nodes.toList();
+            this.toHydrate = nodes.toList();
             break diff;
           }
         }
