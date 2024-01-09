@@ -31,12 +31,12 @@ class Logic {
   }
 
   void selectSample(Sample data) async {
-    window.history.pushState(null, 'JasprPad', window.location.origin + '?sample=${data.id}');
+    window.history.pushState(null, 'JasprPad', '${window.location.origin}?sample=${data.id}');
     ref.invalidate(loadedProjectProvider);
   }
 
   void selectTutorial() async {
-    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=intro');
+    window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=intro');
     ref.invalidate(loadedProjectProvider);
   }
 
@@ -59,7 +59,7 @@ class Logic {
     var tut = ref.read(editProjectProvider) as TutorialData;
     var updated = await changeStep(tut, tut.configs[tut.currentStep - 1].id);
     ref.read(editProjectProvider.notifier).state = updated;
-    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=${updated.step.id}');
+    window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=${updated.step.id}');
     compileFiles();
   }
 
@@ -67,7 +67,7 @@ class Logic {
     var tut = ref.read(editProjectProvider) as TutorialData;
     var updated = await changeStep(tut, tut.configs[tut.currentStep + 1].id);
     ref.read(editProjectProvider.notifier).state = updated;
-    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=${updated.step.id}');
+    window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=${updated.step.id}');
     compileFiles();
   }
 
@@ -75,7 +75,7 @@ class Logic {
     var tut = ref.read(editProjectProvider) as TutorialData;
     var updated = await changeStep(tut, id);
     ref.read(editProjectProvider.notifier).state = updated;
-    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=${updated.step.id}');
+    window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=${updated.step.id}');
     compileFiles();
   }
 
