@@ -1,5 +1,8 @@
 ## Unreleased minor
 
+- Promoted `jaspr_web_compilers` to non-experimental status and changed cli command `jaspr create --experimental-web-compilers` 
+  to `jaspr create --jaspr-web-compilers`
+- Fixed error on windows when running `jaspr build`.
 - Had to resort for using Style.Raw for this, So I added a new Unit called Unit.auto
 - Simply emmits the value 'auto', use this for responsive styling
 

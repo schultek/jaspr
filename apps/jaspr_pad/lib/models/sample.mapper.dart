@@ -27,8 +27,7 @@ class SampleMapper extends ClassMapperBase<Sample> {
   static String _$id(Sample v) => v.id;
   static const Field<Sample, String> _f$id = Field('id', _$id);
   static String _$description(Sample v) => v.description;
-  static const Field<Sample, String> _f$description =
-      Field('description', _$description);
+  static const Field<Sample, String> _f$description = Field('description', _$description);
   static int? _$index(Sample v) => v.index;
   static const Field<Sample, int> _f$index = Field('index', _$index);
 
@@ -40,8 +39,7 @@ class SampleMapper extends ClassMapperBase<Sample> {
   };
 
   static Sample _instantiate(DecodingData data) {
-    return Sample(
-        data.dec(_f$id), data.dec(_f$description), data.dec(_f$index));
+    return Sample(data.dec(_f$id), data.dec(_f$description), data.dec(_f$index));
   }
 
   @override
@@ -65,8 +63,7 @@ mixin SampleMappable {
     return SampleMapper._guard((c) => c.toMap(this as Sample));
   }
 
-  SampleCopyWith<Sample, Sample, Sample> get copyWith =>
-      _SampleCopyWithImpl(this as Sample, $identity, $identity);
+  SampleCopyWith<Sample, Sample, Sample> get copyWith => _SampleCopyWithImpl(this as Sample, $identity, $identity);
   @override
   String toString() {
     return SampleMapper._guard((c) => c.asString(this));
@@ -75,8 +72,7 @@ mixin SampleMappable {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            SampleMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType && SampleMapper._guard((c) => c.isEqual(this, other)));
   }
 
   @override
@@ -86,12 +82,10 @@ mixin SampleMappable {
 }
 
 extension SampleValueCopy<$R, $Out> on ObjectCopyWith<$R, Sample, $Out> {
-  SampleCopyWith<$R, Sample, $Out> get $asSample =>
-      $base.as((v, t, t2) => _SampleCopyWithImpl(v, t, t2));
+  SampleCopyWith<$R, Sample, $Out> get $asSample => $base.as((v, t, t2) => _SampleCopyWithImpl(v, t, t2));
 }
 
-abstract class SampleCopyWith<$R, $In extends Sample, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
+abstract class SampleCopyWith<$R, $In extends Sample, $Out> implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? id, String? description, int? index});
   SampleCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -103,21 +97,17 @@ class _SampleCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Sample, $Out>
   @override
   late final ClassMapperBase<Sample> $mapper = SampleMapper.ensureInitialized();
   @override
-  $R call({String? id, String? description, Object? index = $none}) =>
-      $apply(FieldCopyWithData({
+  $R call({String? id, String? description, Object? index = $none}) => $apply(FieldCopyWithData({
         if (id != null) #id: id,
         if (description != null) #description: description,
         if (index != $none) #index: index
       }));
   @override
   Sample $make(CopyWithData data) => Sample(
-      data.get(#id, or: $value.id),
-      data.get(#description, or: $value.description),
-      data.get(#index, or: $value.index));
+      data.get(#id, or: $value.id), data.get(#description, or: $value.description), data.get(#index, or: $value.index));
 
   @override
-  SampleCopyWith<$R2, Sample, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _SampleCopyWithImpl($value, $cast, t);
+  SampleCopyWith<$R2, Sample, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) => _SampleCopyWithImpl($value, $cast, t);
 }
 
 class SampleResponseMapper extends ClassMapperBase<SampleResponse> {
@@ -141,8 +131,7 @@ class SampleResponseMapper extends ClassMapperBase<SampleResponse> {
   final String id = 'SampleResponse';
 
   static ProjectData? _$project(SampleResponse v) => v.project;
-  static const Field<SampleResponse, ProjectData> _f$project =
-      Field('project', _$project);
+  static const Field<SampleResponse, ProjectData> _f$project = Field('project', _$project);
   static String? _$error(SampleResponse v) => v.error;
   static const Field<SampleResponse, String> _f$error = Field('error', _$error);
 
@@ -177,9 +166,8 @@ mixin SampleResponseMappable {
     return SampleResponseMapper._guard((c) => c.toMap(this as SampleResponse));
   }
 
-  SampleResponseCopyWith<SampleResponse, SampleResponse, SampleResponse>
-      get copyWith => _SampleResponseCopyWithImpl(
-          this as SampleResponse, $identity, $identity);
+  SampleResponseCopyWith<SampleResponse, SampleResponse, SampleResponse> get copyWith =>
+      _SampleResponseCopyWithImpl(this as SampleResponse, $identity, $identity);
   @override
   String toString() {
     return SampleResponseMapper._guard((c) => c.asString(this));
@@ -188,8 +176,7 @@ mixin SampleResponseMappable {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            SampleResponseMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType && SampleResponseMapper._guard((c) => c.isEqual(this, other)));
   }
 
   @override
@@ -198,44 +185,34 @@ mixin SampleResponseMappable {
   }
 }
 
-extension SampleResponseValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, SampleResponse, $Out> {
+extension SampleResponseValueCopy<$R, $Out> on ObjectCopyWith<$R, SampleResponse, $Out> {
   SampleResponseCopyWith<$R, SampleResponse, $Out> get $asSampleResponse =>
       $base.as((v, t, t2) => _SampleResponseCopyWithImpl(v, t, t2));
 }
 
-abstract class SampleResponseCopyWith<$R, $In extends SampleResponse, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
+abstract class SampleResponseCopyWith<$R, $In extends SampleResponse, $Out> implements ClassCopyWith<$R, $In, $Out> {
   ProjectDataCopyWith<$R, ProjectData, ProjectData>? get project;
   $R call({ProjectData? project, String? error});
-  SampleResponseCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-      Then<$Out2, $R2> t);
+  SampleResponseCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _SampleResponseCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, SampleResponse, $Out>
+class _SampleResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, SampleResponse, $Out>
     implements SampleResponseCopyWith<$R, SampleResponse, $Out> {
   _SampleResponseCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<SampleResponse> $mapper =
-      SampleResponseMapper.ensureInitialized();
+  late final ClassMapperBase<SampleResponse> $mapper = SampleResponseMapper.ensureInitialized();
   @override
   ProjectDataCopyWith<$R, ProjectData, ProjectData>? get project =>
       $value.project?.copyWith.$chain((v) => call(project: v));
   @override
   $R call({Object? project = $none, Object? error = $none}) =>
-      $apply(FieldCopyWithData({
-        if (project != $none) #project: project,
-        if (error != $none) #error: error
-      }));
+      $apply(FieldCopyWithData({if (project != $none) #project: project, if (error != $none) #error: error}));
   @override
-  SampleResponse $make(CopyWithData data) => SampleResponse(
-      data.get(#project, or: $value.project),
-      data.get(#error, or: $value.error));
+  SampleResponse $make(CopyWithData data) =>
+      SampleResponse(data.get(#project, or: $value.project), data.get(#error, or: $value.error));
 
   @override
-  SampleResponseCopyWith<$R2, SampleResponse, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
+  SampleResponseCopyWith<$R2, SampleResponse, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _SampleResponseCopyWithImpl($value, $cast, t);
 }

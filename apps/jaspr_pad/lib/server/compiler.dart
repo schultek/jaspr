@@ -111,7 +111,7 @@ Future<void> fixPathPackages(String from, String to) async {
     if (package['name'] == 'jaspr_basic_template') continue;
     var uri = package['rootUri'];
     if (!uri.startsWith('file://') && path.isRelative(uri)) {
-      package['rootUri'] = 'file://' + path.normalize(path.join(from, '.dart_tool', uri));
+      package['rootUri'] = 'file://${path.normalize(path.join(from, '.dart_tool', uri))}';
       hasChanged = true;
     }
   }
