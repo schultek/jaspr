@@ -30,6 +30,7 @@ abstract class Document extends StatefulComponent {
     Map<String, String>? meta,
     List<StyleRule>? styles,
     String? scriptName,
+    List<StyleSheet> styleSheets,
     List<Component> head,
     required Component body,
   }) = _BaseDocument;

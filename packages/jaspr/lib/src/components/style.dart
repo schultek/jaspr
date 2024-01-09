@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import '../../jaspr.dart';
 
 class Style extends StatelessComponent {
@@ -9,7 +11,8 @@ class Style extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'style',
-      child: Text(styles.map((s) => s._toCss()).join(cssPropSpace), rawHtml: true),
+      child:
+          Text(styles.map((s) => s._toCss()).join(cssPropSpace), rawHtml: true),
     );
   }
 }
@@ -18,10 +21,13 @@ const cssBlockInset = kDebugMode || kGenerateMode ? '  ' : '';
 const cssPropSpace = kDebugMode || kGenerateMode ? '\n' : ' ';
 
 abstract class StyleRule {
-  const factory StyleRule({required Selector selector, required Styles styles}) = _BlockStyleRule;
+  const factory StyleRule(
+      {required Selector selector, required Styles styles}) = _BlockStyleRule;
 
   const factory StyleRule.import(String url) = _ImportStyleRule;
-  const factory StyleRule.media({required MediaRuleQuery query, required List<StyleRule> styles}) = _MediaStyleRule;
+  const factory StyleRule.media(
+      {required MediaRuleQuery query,
+      required List<StyleRule> styles}) = _MediaStyleRule;
 
   String _toCss([String indent]);
 }
@@ -64,8 +70,10 @@ abstract class MediaRuleQuery {
   String get _value;
 
   static const MediaRuleQuery all = MediaRuleQuery();
-  static const MediaRuleQuery screen = MediaRuleQuery(target: MediaRuleTarget.screen);
-  static const MediaRuleQuery print = MediaRuleQuery(target: MediaRuleTarget.print);
+  static const MediaRuleQuery screen =
+      MediaRuleQuery(target: MediaRuleTarget.screen);
+  static const MediaRuleQuery print =
+      MediaRuleQuery(target: MediaRuleTarget.print);
 
   const factory MediaRuleQuery({
     MediaRuleTarget target,
@@ -79,7 +87,8 @@ abstract class MediaRuleQuery {
   }) = _MediaRuleQuery;
 
   const factory MediaRuleQuery.not(MediaRuleQuery query) = _NotMediaRuleQuery;
-  const factory MediaRuleQuery.any(List<MediaRuleQuery> queries) = _AnyMediaRuleQuery;
+  const factory MediaRuleQuery.any(List<MediaRuleQuery> queries) =
+      _AnyMediaRuleQuery;
 }
 
 enum Orientation { portrait, landscape }
@@ -200,7 +209,8 @@ extension SelectorMixin on Selector {
 
   Selector adjacentSibling(Selector next) {
     assert(unallowedList(this));
-    return Selector.combine([this, next], combinator: Combinator.adjacentSibling);
+    return Selector.combine([this, next],
+        combinator: Combinator.adjacentSibling);
   }
 }
 
@@ -223,7 +233,8 @@ class Selector {
 
   const factory Selector.chain(List<Selector> selectors) = _ChainSelector;
 
-  const factory Selector.combine(List<Selector> selectors, {Combinator combinator}) = _CombineSelector;
+  const factory Selector.combine(List<Selector> selectors,
+      {Combinator combinator}) = _CombineSelector;
 
   const factory Selector.list(List<Selector> selectors) = _ListSelector;
 }
@@ -235,7 +246,8 @@ class _AttrSelector implements Selector {
   const _AttrSelector(this.attr, {this.check = const AttrCheck.exists()});
 
   @override
-  String get selector => '[$attr${check.value}${!check.caseSensitive ? ' i' : ''}]';
+  String get selector =>
+      '[$attr${check.value}${!check.caseSensitive ? ' i' : ''}]';
 }
 
 class AttrCheck {
@@ -245,12 +257,18 @@ class AttrCheck {
   const AttrCheck.exists()
       : value = '',
         caseSensitive = true;
-  const AttrCheck.exactly(String value, {this.caseSensitive = true}) : value = '="$value"';
-  const AttrCheck.containsWord(String value, {this.caseSensitive = true}) : value = '~="$value"';
-  const AttrCheck.startsWith(String prefix, {this.caseSensitive = true}) : value = '^="$prefix"';
-  const AttrCheck.endsWith(String suffix, {this.caseSensitive = true}) : value = '\$="$suffix"';
-  const AttrCheck.dashPrefixed(String prefix, {this.caseSensitive = true}) : value = '|="$prefix"';
-  const AttrCheck.contains(String prefix, {this.caseSensitive = true}) : value = '*="$prefix"';
+  const AttrCheck.exactly(String value, {this.caseSensitive = true})
+      : value = '="$value"';
+  const AttrCheck.containsWord(String value, {this.caseSensitive = true})
+      : value = '~="$value"';
+  const AttrCheck.startsWith(String prefix, {this.caseSensitive = true})
+      : value = '^="$prefix"';
+  const AttrCheck.endsWith(String suffix, {this.caseSensitive = true})
+      : value = '\$="$suffix"';
+  const AttrCheck.dashPrefixed(String prefix, {this.caseSensitive = true})
+      : value = '|="$prefix"';
+  const AttrCheck.contains(String prefix, {this.caseSensitive = true})
+      : value = '*="$prefix"';
 }
 
 class _ChainSelector implements Selector {
@@ -284,10 +302,12 @@ class _CombineSelector implements Selector {
   final List<Selector> selectors;
   final Combinator combinator;
 
-  const _CombineSelector(this.selectors, {this.combinator = Combinator.descendant});
+  const _CombineSelector(this.selectors,
+      {this.combinator = Combinator.descendant});
 
   @override
-  String get selector => selectors.map((s) => s.selector).join(combinator.separator);
+  String get selector =>
+      selectors.map((s) => s.selector).join(combinator.separator);
 }
 
 class _ListSelector implements Selector {
@@ -297,4 +317,20 @@ class _ListSelector implements Selector {
 
   @override
   String get selector => selectors.map((s) => s.selector).join(', ');
+}
+
+//<link rel="stylesheet" href="mystyle.css">
+///StyleSheet Components to link CSS StyleSheets to Document
+class StyleSheet extends StatelessComponent {
+  final String src;
+
+  const StyleSheet({required this.src, super.key});
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield DomComponent(
+      tag: 'link',
+      attributes: {"rel": "stylesheet", "href": src},
+    );
+  }
 }
