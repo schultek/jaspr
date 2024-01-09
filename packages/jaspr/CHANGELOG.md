@@ -1,4 +1,8 @@
 ## Unreleased minor
+
+- Promoted `jaspr_web_compilers` to non-experimental status and changed cli command `jaspr create --experimental-web-compilers` 
+  to `jaspr create --jaspr-web-compilers`
+- Fixed error on windows when running `jaspr build`.
 - Added _FontFaceStyleRule to add external font files
 
 ## 0.9.3
