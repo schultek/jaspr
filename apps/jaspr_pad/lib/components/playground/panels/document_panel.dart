@@ -44,10 +44,9 @@ class __DocumentHintMarkdownState extends State<_DocumentHintMarkdown> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'p',
+    yield p(
       classes: ['documentation', 'custom-scrollbar'],
-      child: Markdown(markdown: markdown),
+      [Markdown(markdown: markdown)],
     );
   }
 

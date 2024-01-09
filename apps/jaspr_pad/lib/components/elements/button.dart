@@ -2,23 +2,24 @@ import 'package:jaspr/components.dart';
 
 import '../../adapters/html.dart';
 import '../../adapters/mdc.dart';
+import '../utils/node_reader.dart';
 
 enum IconAffinity { left, right }
 
 class Button extends StatefulComponent {
-  const Button(
-      {this.id,
-      this.label,
-      this.icon,
-      required this.onPressed,
-      this.raised = false,
-      this.dense = false,
-      this.disabled = false,
-      this.hideIcon = false,
-      this.dialog = false,
-      this.iconAffinity = IconAffinity.left,
-      Key? key})
-      : super(key: key);
+  const Button({
+    this.id,
+    this.label,
+    this.icon,
+    required this.onPressed,
+    this.raised = false,
+    this.dense = false,
+    this.disabled = false,
+    this.hideIcon = false,
+    this.dialog = false,
+    this.iconAffinity = IconAffinity.left,
+    Key? key,
+  }) : super(key: key);
 
   final String? id;
   final String? label;
@@ -40,17 +41,14 @@ class ButtonState extends State<Button> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield FindChildNode(
-      onNodeAttached: (RenderElement node) {
-        if (kIsWeb) {
-          _ripple?.destroy();
-          if (component.label != null) {
-            _ripple = MDCRipple(node.nativeElement as ElementOrStubbed);
-          }
+    yield DomNodeReader(
+      onNode: (Object node) {
+        _ripple?.destroy();
+        if (component.label != null) {
+          _ripple = MDCRipple(node as ElementOrStubbed);
         }
       },
-      child: DomComponent(
-        tag: 'button',
+      child: button(
         classes: [
           if (component.label != null) 'mdc-button',
           if (component.label == null && component.icon != null) 'mdc-icon-button',
@@ -62,19 +60,17 @@ class ButtonState extends State<Button> {
         id: component.id,
         attributes: {if (component.label != null) 'type': 'button', if (component.disabled) 'disabled': ''},
         events: {'click': (e) => component.onPressed()},
-        children: [
+        [
           if (component.label != null && component.iconAffinity == IconAffinity.right)
-            DomComponent(
-              tag: 'span',
+            span(
               classes: ['mdc-button__label'],
-              child: Text(component.label!),
+              [text(component.label!)],
             ),
           if (component.label != null && component.icon != null)
-            DomComponent(
-              tag: 'i',
+            i(
               classes: ['material-icons mdc-button__icon'],
               attributes: {if (component.hideIcon) 'aria-hidden': 'true'},
-              child: Text(component.icon!),
+              [text(component.icon!)],
             ),
           if (component.label == null && component.icon != null) Text(component.icon!),
           if (component.label != null && component.iconAffinity == IconAffinity.left) Text(component.label!),

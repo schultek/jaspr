@@ -12,19 +12,10 @@ class App extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      children: [
-        DomComponent(
-          tag: 'h1',
-          child: Text('Hello World!'),
-        ),
-        DomComponent(
-          tag: 'p',
-          child: Text('You\'re great!'),
-        ),
-      ],
-    );
+    yield div([
+      h1([text('Hello World!')]),
+      p([text('You\'re great!')]),
+    ]);
 
     yield Counter();
   }

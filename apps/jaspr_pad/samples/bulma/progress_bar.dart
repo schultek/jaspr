@@ -15,11 +15,11 @@ class ProgressBar extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'progress',
+    yield progress(
       classes: ['progress', if (color != null) 'is-${color!.name}'],
-      attributes: {if (value != null) 'value': value!.toString(), 'max': max.toString()},
-      child: child,
+      value: value,
+      max: max,
+      [if (child != null) child!],
     );
   }
 }

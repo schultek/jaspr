@@ -1,9 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:jaspr/components.dart' hide Position;
 
+import '../../../adapters/html.dart';
 import '../../../models/api_models.dart';
+import '../../utils/node_reader.dart';
 import 'codemirror_options.dart';
-
 @Import.onWeb('package:codemirror/codemirror.dart', show: [#CodeMirror, #Doc, #Position])
 import 'editor.imports.dart';
 
@@ -14,13 +15,23 @@ class EditorDocument {
   final List<Issue> issues;
   final IssueLocation? selection;
 
-  EditorDocument({required this.key, required this.source, required this.mode, this.issues = const [], this.selection});
+  EditorDocument({
+    required this.key,
+    required this.source,
+    required this.mode,
+    this.issues = const [],
+    this.selection,
+  });
 }
 
 class Editor extends StatefulComponent {
-  const Editor(
-      {required this.activeDoc, required this.documents, this.onDocumentChanged, this.onSelectionChanged, Key? key})
-      : super(key: key);
+  const Editor({
+    required this.activeDoc,
+    required this.documents,
+    this.onDocumentChanged,
+    this.onSelectionChanged,
+    Key? key,
+  }) : super(key: key);
 
   final String? activeDoc;
   final List<EditorDocument> documents;
@@ -46,12 +57,12 @@ class EditorState extends State<Editor> {
     };
   }
 
-  void createEditor(RenderElement node) {
-    if (_editor != null && node.nativeElement == _editorElement) {
+  void createEditor(ElementOrStubbed node) {
+    if (_editor != null && node == _editorElement) {
       return;
     }
     _editor?.dispose();
-    _editorElement = node.nativeElement;
+    _editorElement = node;
     _editor = CodeMirror.fromElement(_editorElement!, options: codeMirrorOptions);
     if (component.activeDoc != null) {
       Future.microtask(() => _editor!.swapDoc(docs[component.activeDoc!]!));
@@ -60,14 +71,11 @@ class EditorState extends State<Editor> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    Component child = DomComponent(
-      tag: 'div',
-      id: 'editor-host',
-    );
+    Component child = div(id: 'editor-host', []);
 
     if (kIsWeb) {
-      child = FindChildNode(
-        onNodeAttached: createEditor,
+      child = DomNodeReader(
+        onNode: createEditor,
         child: child,
       );
     }

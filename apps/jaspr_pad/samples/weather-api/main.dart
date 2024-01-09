@@ -59,27 +59,17 @@ class SimpleWeather extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      classes: ['weather'],
-      children: [
-        DomComponent(
-          tag: 'img',
-          attributes: {'src': weather.condition.icon},
-        ),
-        DomComponent(
-          tag: 'div',
-          classes: ['info'],
-          children: [
-            DomComponent(tag: 'h1', child: Text('${weather.temp}°')),
-            DomComponent(
-              tag: 'span',
-              child: Text('${weather.location.name}, ${weather.location.country}'),
-            )
-          ],
-        )
-      ],
-    );
+    yield div(classes: [
+      'weather'
+    ], [
+      img(src: weather.condition.icon),
+      div(classes: [
+        'info'
+      ], [
+        h1([text('${weather.temp}°')]),
+        span([text('${weather.location.name}, ${weather.location.country}')])
+      ])
+    ]);
   }
 }
 
@@ -98,27 +88,26 @@ class SearchBarState extends State<SearchBar> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
+    yield div(
       classes: ['searchbar'],
-      children: [
-        DomComponent(
-          tag: 'input',
-          attributes: {'type': 'text', if (component.placeholder != null) 'placeholder': component.placeholder!},
+      [
+        input(
+          type: InputType.text,
+          attributes: {if (component.placeholder != null) 'placeholder': component.placeholder!},
           events: {
             'input': (e) {
               setState(() => search = e.targetUrl.value);
             }
           },
+          [],
         ),
-        DomComponent(
-          tag: 'button',
+        button(
           events: {
             'click': (e) {
               component.onSearch(search);
             }
           },
-          child: Text('Search'),
+          [text('Search')],
         ),
       ],
     );

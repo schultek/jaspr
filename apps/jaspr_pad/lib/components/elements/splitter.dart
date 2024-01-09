@@ -56,11 +56,11 @@ class SplitterState extends State<Splitter> {
     for (var i = 0; i < component.children.length; i++) {
       if (i > 0) {
         var pair = splitPairs[i - 1];
-        yield DomComponent(
-          tag: 'div',
+        yield div(
           classes: ['gutter', 'gutter-${component.horizontal ? 'horizontal' : 'vertical'}'],
           styles: Styles.raw({'flex-basis': '6px'}),
           events: {'mousedown': (e) => pair.startDragging(e)},
+          [],
         );
       }
 
