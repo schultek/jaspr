@@ -20,6 +20,16 @@ class DomComponent extends Component {
   })  : _child = child,
         _children = children;
 
+  const factory DomComponent.wrap({
+    Key? key,
+    String? id,
+    List<String>? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+    required Component child,
+  }) = _WrapDomComponent;
+
   final String tag;
   final String? id;
   final List<String>? classes;
@@ -41,6 +51,20 @@ class DomElement extends MultiChildElement with RenderObjectElement {
   @override
   DomComponent get component => super.component as DomComponent;
 
+  InheritedElement? _wrapElement;
+
+  @override
+  void _updateInheritance() {
+    super._updateInheritance();
+    _wrapElement = _inheritedElements?.remove(_WrapDomComponent);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    updateRenderObject();
+  }
+
   @override
   Iterable<Component> build() => component.children;
 
@@ -53,14 +77,60 @@ class DomElement extends MultiChildElement with RenderObjectElement {
 
   @override
   void updateRenderObject() {
+    DomComponent? wrap;
+    if (_wrapElement != null) {
+      wrap = dependOnInheritedElement(_wrapElement!) as _WrapDomComponent;
+    }
+
     renderObject.updateElement(
       component.tag,
-      component.id,
-      component.classes,
-      component.styles?.styles,
-      component.attributes,
-      component.events,
+      component.id ?? wrap?.id,
+      [...wrap?.classes ?? [], ...component.classes ?? []],
+      {...wrap?.styles?.styles ?? {}, ...component.styles?.styles ?? {}},
+      {...wrap?.attributes ?? {}, ...component.attributes ?? {}},
+      {...wrap?.events ?? {}, ...component.events ?? {}},
     );
+  }
+}
+
+class _WrapDomComponent extends InheritedComponent implements DomComponent {
+  const _WrapDomComponent({
+    super.key,
+    this.id,
+    this.classes,
+    this.styles,
+    this.attributes,
+    this.events,
+    required super.child,
+  });
+
+  @override
+  final String tag = '';
+  @override
+  final String? id;
+  @override
+  final List<String>? classes;
+  @override
+  final Styles? styles;
+  @override
+  final Map<String, String>? attributes;
+  @override
+  final Map<String, EventCallback>? events;
+  @override
+  final Component? _child = null;
+  @override
+  final List<Component> _children = const [];
+
+  @override
+  List<Component> get children => [child];
+
+  @override
+  bool updateShouldNotify(_WrapDomComponent oldComponent) {
+    return oldComponent.id != id ||
+        oldComponent.classes != classes ||
+        oldComponent.styles != styles ||
+        oldComponent.attributes != attributes ||
+        oldComponent.events != events;
   }
 }
 
