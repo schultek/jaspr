@@ -1,3 +1,8 @@
+## Unreleased minor
+
+- Refactored rendering implementation to use `RenderObject`s.
+- Added `NotificationListener` component.
+
 ## 0.9.3
 
 - Fixed `melos format` on Windows.
