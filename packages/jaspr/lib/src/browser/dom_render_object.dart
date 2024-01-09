@@ -243,7 +243,7 @@ class DomRenderObject extends RenderObject {
 
   void _finalize() {
     if (kVerboseMode && toHydrate.isNotEmpty) {
-      print("Clear ${toHydrate.length} nodes not hydrated (${toHydrate})");
+      print("Clear ${toHydrate.length} nodes not hydrated ($toHydrate)");
     }
     for (var node in toHydrate) {
       node.remove();
