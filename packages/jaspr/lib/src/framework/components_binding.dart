@@ -80,16 +80,8 @@ class _RootElement extends SingleChildElement with RenderObjectElement {
   _Root get component => super.component as _Root;
 
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
-    attachRenderObject();
-    super._firstBuild(onBuilt);
-  }
-
-  @override
   Component build() => component.child;
 
   @override
-  void updateRenderObject() {
-    throw UnimplementedError();
-  }
+  void updateRenderObject() {}
 }

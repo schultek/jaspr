@@ -40,6 +40,12 @@ mixin RenderObjectElement on Element {
     });
   }
 
+  @override
+  void update(Component newComponent) {
+    super.update(newComponent);
+    updateRenderObject();
+  }
+
   void attachRenderObject() {
     Element? prevElem = _prevAncestorSibling;
     while (prevElem != null && prevElem._lastRenderObjectElement == null) {

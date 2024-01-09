@@ -257,24 +257,17 @@ class RootDomRenderObject extends DomRenderObject {
   final int? from;
   final int? to;
 
-  RootDomRenderObject(this.container, this.from, this.to);
-
-  @override
-  void attach(DomRenderObject? parent, DomRenderObject? after) {
-    assert(parent == null);
-    if (node == null) {
-      Iterable<Node> nodes = container.nodes;
-      if (kDebugMode) {
-        nodes = nodes.where((node) => node is! html.Text || (node.text ?? '').trim().isNotEmpty);
-      }
-      nodes = nodes.skip(from ?? 0);
-      if (to != null) {
-        nodes = nodes.take(to! - (from ?? 0));
-      }
-      node = container;
-      toHydrate = nodes.toList();
+  RootDomRenderObject(this.container, this.from, this.to) {
+    Iterable<Node> nodes = container.nodes;
+    if (kDebugMode) {
+      nodes = nodes.where((node) => node is! html.Text || (node.text ?? '').trim().isNotEmpty);
     }
-    super.attach(parent, after);
+    nodes = nodes.skip(from ?? 0);
+    if (to != null) {
+      nodes = nodes.take(to! - (from ?? 0));
+    }
+    node = container;
+    toHydrate = nodes.toList();
   }
 }
 

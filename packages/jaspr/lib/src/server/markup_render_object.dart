@@ -20,8 +20,7 @@ class MarkupRenderObject extends RenderObject {
 
   @override
   RenderObject createChildRenderObject() {
-    // TODO: implement createChildRenderObject
-    throw UnimplementedError();
+    return MarkupRenderObject();
   }
 
   @override
