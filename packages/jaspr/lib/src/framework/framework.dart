@@ -832,6 +832,7 @@ abstract class Element implements BuildContext {
 
   /// The nearest ancestor dom node.
   RenderObjectElement? _parentRenderObjectElement;
+  RenderObjectElement? get parentRenderObjectElement => _parentRenderObjectElement;
 
   /// The direct previous sibling element.
   Element? _prevSibling;
@@ -843,12 +844,14 @@ abstract class Element implements BuildContext {
   /// If no element is found until the nearest ancestor render object
   /// element, this is null.
   Element? _prevAncestorSibling;
+  Element? get prevAncestorSibling => _prevAncestorSibling;
 
   /// The last direct child element.
   Element? _lastChild;
 
   /// The last direct child element that is also a render object element.
   RenderObjectElement? _lastRenderObjectElement;
+  RenderObjectElement? get lastRenderObjectElement => _lastRenderObjectElement;
 
   void updateLastChild(Element? child) {
     _lastChild = child;

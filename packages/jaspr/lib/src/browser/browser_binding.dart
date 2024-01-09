@@ -7,7 +7,7 @@ import 'package:meta/meta.dart';
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../framework/framework.dart';
-import 'dom_renderer.dart';
+import 'dom_render_object.dart';
 import 'js_data.dart';
 
 final _queryReg = RegExp(r'^(.*?)(?:\((\d+):(\d+)\))?$');
