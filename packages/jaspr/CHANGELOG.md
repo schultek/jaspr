@@ -3,6 +3,7 @@
 - Promoted `jaspr_web_compilers` to non-experimental status and changed cli command `jaspr create --experimental-web-compilers` 
   to `jaspr create --jaspr-web-compilers`
 - Fixed error on windows when running `jaspr build`.
+- Fixed error with `jaspr serve` related to the use of `webdev`.
 
 ## 0.9.3
 
