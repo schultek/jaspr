@@ -1,7 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
-// ignore_for_file: unused_element
+// ignore_for_file: unused_element, unnecessary_cast
+// ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
 part of 'gist.dart';
 
@@ -17,11 +18,6 @@ class GistDataMapper extends ClassMapperBase<GistData> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'GistData';
 
@@ -33,7 +29,7 @@ class GistDataMapper extends ClassMapperBase<GistData> {
   static const Field<GistData, Map<String, GistFile>> _f$files = Field('files', _$files);
 
   @override
-  final Map<Symbol, Field<GistData, dynamic>> fields = const {
+  final MappableFields<GistData> fields = const {
     #id: _f$id,
     #description: _f$description,
     #files: _f$files,
@@ -47,39 +43,39 @@ class GistDataMapper extends ClassMapperBase<GistData> {
   final Function instantiate = _instantiate;
 
   static GistData fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<GistData>(map));
+    return ensureInitialized().decodeMap<GistData>(map);
   }
 
   static GistData fromJson(String json) {
-    return _guard((c) => c.fromJson<GistData>(json));
+    return ensureInitialized().decodeJson<GistData>(json);
   }
 }
 
 mixin GistDataMappable {
   String toJson() {
-    return GistDataMapper._guard((c) => c.toJson(this as GistData));
+    return GistDataMapper.ensureInitialized().encodeJson<GistData>(this as GistData);
   }
 
   Map<String, dynamic> toMap() {
-    return GistDataMapper._guard((c) => c.toMap(this as GistData));
+    return GistDataMapper.ensureInitialized().encodeMap<GistData>(this as GistData);
   }
 
   GistDataCopyWith<GistData, GistData, GistData> get copyWith =>
       _GistDataCopyWithImpl(this as GistData, $identity, $identity);
   @override
   String toString() {
-    return GistDataMapper._guard((c) => c.asString(this));
+    return GistDataMapper.ensureInitialized().stringifyValue(this as GistData);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && GistDataMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType && GistDataMapper.ensureInitialized().isValueEqual(this as GistData, other));
   }
 
   @override
   int get hashCode {
-    return GistDataMapper._guard((c) => c.hash(this));
+    return GistDataMapper.ensureInitialized().hashValue(this as GistData);
   }
 }
 
@@ -128,11 +124,6 @@ class GistFileMapper extends ClassMapperBase<GistFile> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'GistFile';
 
@@ -144,7 +135,7 @@ class GistFileMapper extends ClassMapperBase<GistFile> {
   static const Field<GistFile, String> _f$type = Field('type', _$type);
 
   @override
-  final Map<Symbol, Field<GistFile, dynamic>> fields = const {
+  final MappableFields<GistFile> fields = const {
     #name: _f$name,
     #content: _f$content,
     #type: _f$type,
@@ -158,39 +149,39 @@ class GistFileMapper extends ClassMapperBase<GistFile> {
   final Function instantiate = _instantiate;
 
   static GistFile fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<GistFile>(map));
+    return ensureInitialized().decodeMap<GistFile>(map);
   }
 
   static GistFile fromJson(String json) {
-    return _guard((c) => c.fromJson<GistFile>(json));
+    return ensureInitialized().decodeJson<GistFile>(json);
   }
 }
 
 mixin GistFileMappable {
   String toJson() {
-    return GistFileMapper._guard((c) => c.toJson(this as GistFile));
+    return GistFileMapper.ensureInitialized().encodeJson<GistFile>(this as GistFile);
   }
 
   Map<String, dynamic> toMap() {
-    return GistFileMapper._guard((c) => c.toMap(this as GistFile));
+    return GistFileMapper.ensureInitialized().encodeMap<GistFile>(this as GistFile);
   }
 
   GistFileCopyWith<GistFile, GistFile, GistFile> get copyWith =>
       _GistFileCopyWithImpl(this as GistFile, $identity, $identity);
   @override
   String toString() {
-    return GistFileMapper._guard((c) => c.asString(this));
+    return GistFileMapper.ensureInitialized().stringifyValue(this as GistFile);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && GistFileMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType && GistFileMapper.ensureInitialized().isValueEqual(this as GistFile, other));
   }
 
   @override
   int get hashCode {
-    return GistFileMapper._guard((c) => c.hash(this));
+    return GistFileMapper.ensureInitialized().hashValue(this as GistFile);
   }
 }
 

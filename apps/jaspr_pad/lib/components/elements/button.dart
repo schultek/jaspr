@@ -42,10 +42,10 @@ class ButtonState extends State<Button> {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomNodeReader(
-      onNode: (Object node) {
+      onNode: (ElementOrStubbed node) {
         _ripple?.destroy();
         if (component.label != null) {
-          _ripple = MDCRipple(node as ElementOrStubbed);
+          _ripple = MDCRipple(node);
         }
       },
       child: button(

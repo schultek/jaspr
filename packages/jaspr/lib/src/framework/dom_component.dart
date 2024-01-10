@@ -56,6 +56,9 @@ class DomElement extends MultiChildElement with RenderObjectElement {
   @override
   void _updateInheritance() {
     super._updateInheritance();
+    if (_inheritedElements != null && _inheritedElements!.containsKey(_WrapDomComponent)) {
+      _inheritedElements = HashMap<Type, InheritedElement>.from(_inheritedElements!);
+    }
     _wrapElement = _inheritedElements?.remove(_WrapDomComponent);
   }
 

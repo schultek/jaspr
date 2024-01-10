@@ -1,5 +1,4 @@
 // [sample=4] Jaspr Html
-// import this file for html utilities
 import 'package:jaspr/jaspr.dart';
 
 void main() {
@@ -12,7 +11,7 @@ class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     // you can then use the utility methods
-    // to write more simple & concise html
+    // to write concise html-like markup
     yield div([
       // each element gets a list of child elements
       h1([text('jaspr/html')]),

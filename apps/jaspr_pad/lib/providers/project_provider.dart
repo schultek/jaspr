@@ -123,10 +123,9 @@ ProjectDataBase createDefaultProject() {
         '}',
     mainDartFile: "import 'package:jaspr/jaspr.dart';\n\n"
         "void main() {\n"
-        "  runApp(DomComponent(\n"
-        "    tag: 'h1',\n"
-        "    child: Text('Hello World!'),\n"
-        "  ));\n"
+        "  runApp(h1([\n"
+        "    text('Hello World!'),\n"
+        "  ]));\n"
         "}",
   );
 }
