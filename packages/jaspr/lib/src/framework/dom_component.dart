@@ -28,7 +28,7 @@ class DomComponent extends Component {
     Map<String, String>? attributes,
     Map<String, EventCallback>? events,
     required Component child,
-  }) = _WrapDomComponent;
+  }) = _WrappingDomComponent;
 
   final String tag;
   final String? id;
@@ -51,12 +51,15 @@ class DomElement extends MultiChildElement with RenderObjectElement {
   @override
   DomComponent get component => super.component as DomComponent;
 
-  InheritedElement? _wrapElement;
+  InheritedElement? _wrappingElement;
 
   @override
   void _updateInheritance() {
     super._updateInheritance();
-    _wrapElement = _inheritedElements?.remove(_WrapDomComponent);
+    if (_inheritedElements != null && _inheritedElements!.containsKey(_WrappingDomComponent)) {
+      _inheritedElements = HashMap<Type, InheritedElement>.from(_inheritedElements!);
+    }
+    _wrappingElement = _inheritedElements?.remove(_WrappingDomComponent);
   }
 
   @override
@@ -77,24 +80,24 @@ class DomElement extends MultiChildElement with RenderObjectElement {
 
   @override
   void updateRenderObject() {
-    DomComponent? wrap;
-    if (_wrapElement != null) {
-      wrap = dependOnInheritedElement(_wrapElement!) as _WrapDomComponent;
+    DomComponent? wrappingComponent;
+    if (_wrappingElement != null) {
+      wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
     }
 
     renderObject.updateElement(
       component.tag,
-      component.id ?? wrap?.id,
-      [...wrap?.classes ?? [], ...component.classes ?? []],
-      {...wrap?.styles?.styles ?? {}, ...component.styles?.styles ?? {}},
-      {...wrap?.attributes ?? {}, ...component.attributes ?? {}},
-      {...wrap?.events ?? {}, ...component.events ?? {}},
+      component.id ?? wrappingComponent?.id,
+      [...wrappingComponent?.classes ?? [], ...component.classes ?? []],
+      {...wrappingComponent?.styles?.styles ?? {}, ...component.styles?.styles ?? {}},
+      {...wrappingComponent?.attributes ?? {}, ...component.attributes ?? {}},
+      {...wrappingComponent?.events ?? {}, ...component.events ?? {}},
     );
   }
 }
 
-class _WrapDomComponent extends InheritedComponent implements DomComponent {
-  const _WrapDomComponent({
+class _WrappingDomComponent extends InheritedComponent implements DomComponent {
+  const _WrappingDomComponent({
     super.key,
     this.id,
     this.classes,
@@ -125,7 +128,7 @@ class _WrapDomComponent extends InheritedComponent implements DomComponent {
   List<Component> get children => [child];
 
   @override
-  bool updateShouldNotify(_WrapDomComponent oldComponent) {
+  bool updateShouldNotify(_WrappingDomComponent oldComponent) {
     return oldComponent.id != id ||
         oldComponent.classes != classes ||
         oldComponent.styles != styles ||
