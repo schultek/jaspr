@@ -6,13 +6,11 @@ library framework;
 
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert';
 
 import 'package:meta/meta.dart';
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
-import '../foundation/sync.dart';
 import '../ui/styles/styles.dart';
 
 part 'build_context.dart';
@@ -27,7 +25,6 @@ part 'observer_component.dart';
 part 'render_element.dart';
 part 'render_scope.dart';
 part 'single_child_element.dart';
-part 'state_mixins.dart';
 part 'stateful_component.dart';
 part 'stateless_component.dart';
 
