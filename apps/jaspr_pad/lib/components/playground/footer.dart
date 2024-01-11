@@ -5,43 +5,28 @@ class PlaygroundFooter extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'footer',
-      children: buildChildren(context).toList(),
-    );
-  }
-
-  Iterable<Component> buildChildren(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'i',
-      id: 'keyboard-button',
-      classes: ['material-icons', 'footer-item'],
-      attributes: {'aria-hidden': 'true'},
-      child: Text('keyboard'),
-    );
-
-    yield DomComponent(
-      tag: 'div',
-      classes: ['footer-item'],
-      children: [
-        DomComponent(
-          tag: 'a',
+    yield footer([
+      i(
+        id: 'keyboard-button',
+        classes: ['material-icons', 'footer-item'],
+        attributes: {'aria-hidden': 'true'},
+        [text('keyboard')],
+      ),
+      div(classes: [
+        'footer-item'
+      ], [
+        a(
+          href: 'https://dart.dev/tools/dartpad/privacy',
+          target: Target.blank,
           classes: ['footer-item'],
-          attributes: {
-            'href': 'https://dart.dev/tools/dartpad/privacy',
-            'target': 'repo',
-          },
-          child: Text('Privacy notice'),
+          [text('Privacy notice')],
         ),
-        DomComponent(
-          tag: 'a',
-          attributes: {
-            'href': 'https://github.com/schultek/jaspr/issues',
-            'target': 'repo',
-          },
-          child: Text('Send feedback'),
+        a(
+          href: 'https://github.com/schultek/jaspr/issues',
+          target: Target.blank,
+          [text('Send feedback')],
         ),
-      ],
-    );
+      ])
+    ]);
   }
 }

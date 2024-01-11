@@ -27,8 +27,7 @@ class Button extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'button',
+    yield button(
       classes: [
         'button',
         if (color != null) 'is-${color!.name}',
@@ -36,11 +35,11 @@ class Button extends StatelessComponent {
         if (isLoading) 'is-loading',
         if (isBlock) 'block',
       ],
-      attributes: {if (isDisabled) 'disabled': ''},
+      disabled: isDisabled,
       events: {
         'click': (e) => onPressed(),
       },
-      child: child,
+      [child],
     );
   }
 }
@@ -53,17 +52,12 @@ class IconLabel extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-        tag: 'span',
-        classes: ['icon'],
-        child: DomComponent(
-          tag: 'i',
-          classes: ['fas', 'fa-$icon'],
-        ));
-    yield DomComponent(
-      tag: 'span',
-      child: Text(label),
-    );
+    yield span(classes: [
+      'icon'
+    ], [
+      i(classes: ['fas', 'fa-$icon'], [])
+    ]);
+    yield span([text(label)]);
   }
 }
 
@@ -76,10 +70,6 @@ class ButtonGroup extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      classes: ['buttons', if (isAttached) 'has-addons', 'block'],
-      children: children,
-    );
+    yield div(classes: ['buttons', if (isAttached) 'has-addons', 'block'], children);
   }
 }

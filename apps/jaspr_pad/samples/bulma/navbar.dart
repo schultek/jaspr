@@ -11,10 +11,9 @@ class NavBar extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'nav',
+    yield nav(
       classes: ['navbar', 'block'],
-      children: [
+      [
         if (brand != null) brand!,
         if (menu != null) menu!,
       ],
@@ -29,11 +28,7 @@ class NavbarBrand extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      classes: ['navbar-brand'],
-      children: children,
-    );
+    yield div(classes: ['navbar-brand'], children);
   }
 }
 
@@ -45,20 +40,11 @@ class NavbarMenu extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
+    yield div(
       classes: ['navbar-menu', 'is-active'],
-      children: [
-        DomComponent(
-          tag: 'div',
-          classes: ['navbar-start'],
-          children: items,
-        ),
-        DomComponent(
-          tag: 'div',
-          classes: ['navbar-end'],
-          children: endItems,
-        ),
+      [
+        div(classes: ['navbar-start'], items),
+        div(classes: ['navbar-end'], endItems),
       ],
     );
   }
@@ -80,27 +66,13 @@ class NavbarItem extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     if (items == null) {
-      yield DomComponent(
-        tag: 'a',
-        classes: ['navbar-item'],
-        attributes: {if (href != null) 'href': ''},
-        child: child,
-      );
+      yield a(href: href ?? '', classes: ['navbar-item'], [child]);
     } else {
-      yield DomComponent(
-        tag: 'div',
+      yield div(
         classes: ['navbar-item', 'has-dropdown', 'is-hoverable'],
-        children: [
-          DomComponent(
-            tag: 'a',
-            classes: ['navbar-link'],
-            child: child,
-          ),
-          DomComponent(
-            tag: 'div',
-            classes: ['navbar-dropdown'],
-            children: items,
-          ),
+        [
+          a(href: '', classes: ['navbar-link'], [child]),
+          div(classes: ['navbar-dropdown'], items!),
         ],
       );
     }
@@ -112,9 +84,6 @@ class NavbarDivider extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'hr',
-      classes: ['navbar-divider'],
-    );
+    yield hr(classes: ['navbar-divider']);
   }
 }

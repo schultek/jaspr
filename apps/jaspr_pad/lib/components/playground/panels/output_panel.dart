@@ -11,11 +11,10 @@ class OutputPanel extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     var isTutorial = context.watch(isTutorialProvider);
 
-    yield DomComponent(
-      tag: 'div',
+    yield div(
       id: 'output-panel',
       styles: isTutorial ? Styles.raw({'width': 'auto'}) : null,
-      child: ExecutionIFrame(),
+      [ExecutionIFrame()],
     );
   }
 }

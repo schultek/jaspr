@@ -12,13 +12,9 @@ class IssuesPanel extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     var issues = context.watch(issuesProvider);
 
-    yield DomComponent(
-      tag: 'div',
-      styles: Styles.flexbox(direction: FlexDirection.column),
-      children: [
-        for (var issue in issues) IssueItem(issue),
-      ],
-    );
+    yield div(styles: Styles.flexbox(direction: FlexDirection.column), [
+      for (var issue in issues) IssueItem(issue),
+    ]);
   }
 }
 
@@ -29,24 +25,20 @@ class IssueItem extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'span',
-      classes: ['issue-item', issue.kind.name],
-      events: {
-        'click': (e) {
-          context.read(fileSelectionProvider(issue.sourceName).notifier).state = issue.location;
-          context.read(activeDocIndexProvider.notifier).state =
-              context.read(fileNamesProvider).indexOf(issue.sourceName);
-        }
-      },
-      children: [
-        DomComponent(
-          tag: 'i',
-          classes: ['material-icons'],
-          child: Text(issue.kind.name),
-        ),
-        Text(issue.message),
-      ],
-    );
+    yield span(classes: [
+      'issue-item',
+      issue.kind.name
+    ], events: {
+      'click': (e) {
+        context.read(fileSelectionProvider(issue.sourceName).notifier).state = issue.location;
+        context.read(activeDocIndexProvider.notifier).state = context.read(fileNamesProvider).indexOf(issue.sourceName);
+      }
+    }, [
+      i(
+        classes: ['material-icons'],
+        [text(issue.kind.name)],
+      ),
+      text(issue.message),
+    ]);
   }
 }

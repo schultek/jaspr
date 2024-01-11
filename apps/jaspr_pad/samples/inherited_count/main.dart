@@ -33,14 +33,13 @@ class _AppState extends State<App> {
       child: CountLabel(),
     );
 
-    yield DomComponent(
-      tag: 'button',
+    yield button(
       events: {
         'click': (e) {
           setState(() => count++);
         },
       },
-      child: Text('Press Me'),
+      [text('Press Me')],
     );
   }
 }

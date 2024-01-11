@@ -18,14 +18,13 @@ class App extends StatelessComponent {
       yield Text('Count is $count');
     });
 
-    yield DomComponent(
-      tag: 'button',
+    yield button(
       events: {
         'click': (e) {
           context.read(counterProvider.notifier).state++;
         },
       },
-      child: Text('Press Me'),
+      [text('Press Me')],
     );
   }
 }

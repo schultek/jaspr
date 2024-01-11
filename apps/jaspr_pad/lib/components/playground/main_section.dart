@@ -15,21 +15,20 @@ class MainSection extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     var isTutorial = context.watch(isTutorialProvider);
 
-    yield DomComponent(
-      tag: 'section',
+    yield section(
       classes: ['main-section'],
-      children: [
-        DomComponent(
-          tag: 'div',
-          classes: ['panels'],
-          child: Splitter(
+      [
+        div(classes: [
+          'panels'
+        ], [
+          Splitter(
             children: [
               if (isTutorial) TutorialPanel(),
               EditorPanel(),
               if (!isTutorial) OutputPanel(),
             ],
-          ),
-        ),
+          )
+        ]),
         SnackBar(),
       ],
     );

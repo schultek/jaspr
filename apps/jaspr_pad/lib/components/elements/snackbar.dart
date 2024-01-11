@@ -1,8 +1,8 @@
 import 'package:jaspr/components.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
-import '../../adapters/html.dart';
 import '../../adapters/mdc.dart';
+import '../utils/node_reader.dart';
 
 final snackBarProvider = StateProvider<String?>((ref) => null);
 
@@ -33,29 +33,21 @@ class SnackBarState extends State<SnackBar> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield FindChildNode(
-      onNodeAttached: (node) {
+    yield DomNodeReader(
+      onNode: (node) {
         if (kIsWeb && _snackbar == null) {
-          _snackbar = MDCSnackbar(node.nativeElement as ElementOrStubbed);
+          _snackbar = MDCSnackbar(node);
         }
       },
-      child: DomComponent(
-        tag: 'div',
-        classes: ['mdc-snackbar'],
-        children: [
-          DomComponent(
-            tag: 'div',
-            classes: ['mdc-snackbar__surface'],
-            children: [
-              DomComponent(
-                tag: 'div',
-                classes: ['mdc-snackbar__label'],
-                attributes: {'role': 'status', 'aria-live': 'polite'},
-              ),
-            ],
-          ),
-        ],
-      ),
+      child: div(classes: [
+        'mdc-snackbar'
+      ], [
+        div(classes: [
+          'mdc-snackbar__surface'
+        ], [
+          div(classes: ['mdc-snackbar__label'], attributes: {'role': 'status', 'aria-live': 'polite'}, []),
+        ]),
+      ]),
     );
   }
 }

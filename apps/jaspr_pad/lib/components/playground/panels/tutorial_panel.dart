@@ -19,86 +19,71 @@ class TutorialPanel extends StatelessComponent {
       return;
     }
 
-    yield DomComponent(
-      tag: 'div',
-      id: 'steps-panel',
-      children: [
-        DomComponent(
-          tag: 'div',
-          id: 'markdown-content',
-          classes: ['custom-scrollbar'],
-          children: [
-            Markdown(markdown: tutorial.step.text),
-          ],
-        ),
-        DomComponent(
-          tag: 'div',
-          id: 'steps-row',
-          children: [
-            DomComponent(
-              tag: 'div',
-              id: 'step-button-container',
-              children: [
-                Button(
-                  icon: 'keyboard_arrow_left',
-                  disabled: tutorial.currentStep == 0,
-                  onPressed: () {
-                    context.read(logicProvider).prevTutorialStep();
-                  },
+    yield div(id: 'steps-panel', [
+      div(id: 'markdown-content', classes: [
+        'custom-scrollbar'
+      ], [
+        Markdown(markdown: tutorial.step.text),
+      ]),
+      div(id: 'steps-row', [
+        div(
+          id: 'step-button-container',
+          [
+            Button(
+              icon: 'keyboard_arrow_left',
+              disabled: tutorial.currentStep == 0,
+              onPressed: () {
+                context.read(logicProvider).prevTutorialStep();
+              },
+            ),
+            div(
+              id: 'steps-container',
+              [
+                div(
+                  id: 'steps-label',
+                  [text(tutorial.configs[tutorial.currentStep].name)],
                 ),
-                DomComponent(
-                  tag: 'div',
-                  id: 'steps-container',
-                  children: [
-                    DomComponent(
-                      tag: 'div',
-                      id: 'steps-label',
-                      child: Text(tutorial.configs[tutorial.currentStep].name),
-                    ),
-                    DomComponent(
-                      tag: 'div',
-                      id: 'steps-menu-items',
-                      children: [
-                        for (var step in tutorial.configs.reversed)
-                          DomComponent(
-                            tag: 'a',
-                            classes: ['step-menu-item'],
-                            events: {
-                              'click': (_) {
-                                context.read(logicProvider).selectTutorialStep(step.id);
-                              }
-                            },
-                            child: Text(step.name),
-                          ),
-                      ],
-                    ),
+                div(
+                  id: 'steps-menu-items',
+                  [
+                    for (var step in tutorial.configs.reversed)
+                      a(
+                        href: '',
+                        classes: ['step-menu-item'],
+                        events: {
+                          'click': (_) {
+                            context.read(logicProvider).selectTutorialStep(step.id);
+                          }
+                        },
+                        [text(step.name)],
+                      ),
                   ],
-                ),
-                Button(
-                  icon: 'keyboard_arrow_right',
-                  disabled: tutorial.currentStep == tutorial.configs.length - 1,
-                  onPressed: () {
-                    context.read(logicProvider).nextTutorialStep();
-                  },
                 ),
               ],
             ),
-            Hidden(
-              visibilityMode: true,
-              hidden: tutorial.step.solution == null,
-              child: Button(
-                id: 'show-solution-btn',
-                label: 'Show ${tutorial.step.showSolution ? 'Source' : 'Solution'}',
-                raised: true,
-                dense: true,
-                onPressed: () {
-                  context.read(logicProvider).toggleSolution();
-                },
-              ),
+            Button(
+              icon: 'keyboard_arrow_right',
+              disabled: tutorial.currentStep == tutorial.configs.length - 1,
+              onPressed: () {
+                context.read(logicProvider).nextTutorialStep();
+              },
             ),
           ],
-        )
-      ],
-    );
+        ),
+        Hidden(
+          visibilityMode: true,
+          hidden: tutorial.step.solution == null,
+          child: Button(
+            id: 'show-solution-btn',
+            label: 'Show ${tutorial.step.showSolution ? 'Source' : 'Solution'}',
+            raised: true,
+            dense: true,
+            onPressed: () {
+              context.read(logicProvider).toggleSolution();
+            },
+          ),
+        ),
+      ])
+    ]);
   }
 }

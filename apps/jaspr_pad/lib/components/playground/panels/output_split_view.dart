@@ -57,83 +57,70 @@ class EditorTabs extends StatelessComponent {
     var isTutorial = context.watch(isTutorialProvider);
     var isClosed = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.closed));
 
-    yield DomComponent(
-      tag: 'div',
+    yield div(
       id: 'editor-panel-footer',
       classes: ['editor-tab-host', if (isClosed) 'border-top'],
-      children: [
-        DomComponent(
-          tag: 'div',
-          classes: ['editor-tabs'],
-          children: [
-            DomComponent(
-              tag: 'div',
-              classes: ['tab-group'],
-              children: [
-                if (isTutorial)
-                  EditorTab(
-                    id: 'editor-panel-ui-tab',
-                    label: 'UI Output',
-                    value: OutputTabsState.ui,
-                  ),
-                EditorTab(
-                  id: 'editor-panel-console-tab',
-                  label: 'Console',
-                  value: OutputTabsState.console,
-                ),
-                EditorTab(
-                  id: 'editor-panel-docs-tab',
-                  label: 'Documentation',
-                  value: OutputTabsState.docs,
-                ),
-                EditorTab(
-                  id: 'editor-panel-issues-tab',
-                  label: 'Issues',
-                  value: OutputTabsState.issues,
-                ),
-              ],
+      [
+        div(classes: [
+          'editor-tabs'
+        ], [
+          div(classes: [
+            'tab-group'
+          ], [
+            if (isTutorial)
+              EditorTab(
+                id: 'editor-panel-ui-tab',
+                label: 'UI Output',
+                value: OutputTabsState.ui,
+              ),
+            EditorTab(
+              id: 'editor-panel-console-tab',
+              label: 'Console',
+              value: OutputTabsState.console,
             ),
-            DomComponent(
-              tag: 'div',
-              id: 'console-expand-icon-container',
-              children: [
-                Builder(builder: (context) sync* {
-                  var isConsole = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.console));
-                  yield DomComponent(
-                    tag: 'button',
-                    id: 'left-console-clear-button',
-                    classes: ['console-clear-icon', 'mdc-icon-button'],
-                    styles: !isConsole ? Styles.box(visibility: Visibility.hidden) : null,
-                    attributes: {'title': 'Clear console'},
-                    events: {
-                      'click': (e) {
-                        context.read(consoleMessagesProvider.notifier).state = [];
-                      }
-                    },
-                  );
-                }),
-                DomComponent(
-                  tag: 'button',
-                  id: "editor-panel-close-button",
-                  classes: ["mdc-icon-button", "material-icons"],
-                  attributes: {if (isClosed) 'hidden': ''},
-                  events: {
-                    'click': (e) {
-                      context.read(tabsStateProvider.notifier).state = OutputTabsState.closed;
-                    }
-                  },
-                  child: Text('close'),
-                ),
-              ],
+            EditorTab(
+              id: 'editor-panel-docs-tab',
+              label: 'Documentation',
+              value: OutputTabsState.docs,
             ),
-          ],
-        ),
-        DomComponent(
-          tag: 'div',
-          id: 'editor-panel-tab-host',
-          styles: Styles.box(overflow: Overflow.scroll),
-          child: EditorTabWindow(),
-        ),
+            EditorTab(
+              id: 'editor-panel-issues-tab',
+              label: 'Issues',
+              value: OutputTabsState.issues,
+            ),
+          ]),
+          div(id: 'console-expand-icon-container', [
+            Builder(builder: (context) sync* {
+              var isConsole = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.console));
+              yield button(
+                id: 'left-console-clear-button',
+                classes: ['console-clear-icon', 'mdc-icon-button'],
+                styles: !isConsole ? Styles.box(visibility: Visibility.hidden) : null,
+                attributes: {'title': 'Clear console'},
+                events: {
+                  'click': (e) {
+                    context.read(consoleMessagesProvider.notifier).state = [];
+                  }
+                },
+                [],
+              );
+            }),
+            button(
+              id: "editor-panel-close-button",
+              classes: ["mdc-icon-button", "material-icons"],
+              attributes: {if (isClosed) 'hidden': ''},
+              events: {
+                'click': (e) {
+                  context.read(tabsStateProvider.notifier).state = OutputTabsState.closed;
+                }
+              },
+              [text('close')],
+            ),
+          ]),
+        ]),
+        div(id: 'editor-panel-tab-host', styles: Styles.box(overflow: Overflow.scroll), [
+          EditorTabWindow(),
+        ]),
       ],
     );
   }
@@ -150,8 +137,7 @@ class EditorTab extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     var selected = context.watch(tabsStateProvider.select((state) => state == value));
 
-    yield DomComponent(
-      tag: 'button',
+    yield button(
       id: id,
       classes: ['editor-tab', 'mdc-button', if (selected) 'active'],
       events: {
@@ -164,7 +150,7 @@ class EditorTab extends StatelessComponent {
           }
         }
       },
-      children: [Text(label)],
+      [text(label)],
     );
   }
 }
