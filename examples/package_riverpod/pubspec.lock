@@ -316,7 +316,7 @@ packages:
       path: "../../modules/build/jaspr_web_compilers"
       relative: true
     source: path
-    version: "4.0.7"
+    version: "4.0.7+1"
   js:
     dependency: transitive
     description:
