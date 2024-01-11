@@ -61,6 +61,7 @@ class MarkupRenderObject extends RenderObject {
   @override
   void remove() {
     parent?.children.remove(this);
+    parent = null;
   }
 
   String renderToHtml() {

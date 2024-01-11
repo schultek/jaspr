@@ -62,8 +62,10 @@ class BrowserTester {
   void dispatchEvent(Finder finder, String event, dynamic data) {
     var element = _findDomElement(finder);
 
-    var source = element.nativeElement!;
-    source.dispatchEvent(html.MouseEvent('click'));
+    var source = (element.renderObject as DomRenderObject).node;
+    if (source is html.Element) {
+      source.dispatchEvent(html.MouseEvent('click'));
+    }
   }
 
   DomElement _findDomElement(Finder finder) {
