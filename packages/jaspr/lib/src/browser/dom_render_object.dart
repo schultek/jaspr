@@ -5,8 +5,13 @@ import 'dart:html';
 import '../foundation/constants.dart';
 import '../framework/framework.dart';
 
+const xmlns = {
+  'svg': 'http://www.w3.org/2000/svg',
+};
+
 class DomRenderObject extends RenderObject {
   DomRenderObject? parent;
+  String? namespace;
   Node? node;
   List<Node> toHydrate = [];
   Map<String, EventBinding>? events;
@@ -19,7 +24,19 @@ class DomRenderObject extends RenderObject {
   }
 
   @override
-  DomRenderObject createChildRenderObject() => DomRenderObject()..parent = this;
+  DomRenderObject createChildRenderObject() {
+    return DomRenderObject()
+      ..parent = this
+      ..namespace = namespace;
+  }
+
+  html.Element _createElement(String tag) {
+    namespace = xmlns[tag] ?? namespace;
+    if (namespace != null) {
+      return document.createElementNS(namespace!, tag);
+    }
+    return document.createElement(tag);
+  }
 
   @override
   void updateElement(String tag, String? id, List<String>? classes, Map<String, String>? styles,
@@ -49,14 +66,14 @@ class DomRenderObject extends RenderObject {
         }
       }
 
-      elem = node = document.createElement(tag);
+      elem = node = _createElement(tag);
       attributesToRemove = {};
       if (kVerboseMode) {
         print("Create html node: $elem");
       }
     } else {
       if (node is! html.Element || (node as html.Element).tagName.toLowerCase() != tag) {
-        elem = document.createElement(tag);
+        elem = _createElement(tag);
         var old = node;
         node!.replaceWith(elem);
         node = elem;
@@ -197,6 +214,7 @@ class DomRenderObject extends RenderObject {
   void attach(DomRenderObject? parent, DomRenderObject? after) {
     try {
       this.parent = parent;
+      namespace = parent?.namespace;
       if (parent == null) return;
 
       var parentNode = parent.node;
@@ -239,6 +257,7 @@ class DomRenderObject extends RenderObject {
     }
     node?.remove();
     parent = null;
+    namespace = null;
   }
 
   void _finalize() {
