@@ -3,7 +3,7 @@ import 'package:jaspr/jaspr.dart';
 import '../../adapters/html.dart' hide Element;
 
 class DomNodeReader extends StatefulComponent {
-  const DomNodeReader({required this.onNode, required this.child, Key? key}) : super(key: key);
+  const DomNodeReader({required this.onNode, required this.child, super.key});
 
   final void Function(ElementOrStubbed node) onNode;
   final Component child;
