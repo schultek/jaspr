@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
 class PlaygroundFooter extends StatelessComponent {
-  const PlaygroundFooter({Key? key}) : super(key: key);
+  const PlaygroundFooter({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

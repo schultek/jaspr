@@ -5,8 +5,8 @@ class Hidden extends StatelessComponent {
     required this.hidden,
     required this.child,
     this.visibilityMode = false,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final bool hidden;
   final Component child;

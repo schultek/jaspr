@@ -10,7 +10,7 @@ import '../elements/button.dart';
 import '../elements/menu.dart';
 
 class PlaygroundHeader extends StatelessComponent {
-  const PlaygroundHeader({Key? key}) : super(key: key);
+  const PlaygroundHeader({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -100,7 +100,7 @@ class PlaygroundHeader extends StatelessComponent {
 }
 
 class SamplesMenuButton extends StatelessComponent with SyncProviderDependencies {
-  const SamplesMenuButton({Key? key}) : super(key: key);
+  const SamplesMenuButton({super.key});
 
   @override
   Iterable<SyncProvider> get preloadDependencies => [syncSamplesProvider];

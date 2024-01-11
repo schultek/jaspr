@@ -9,7 +9,7 @@ import '../../elements/hidden.dart';
 import '../../elements/markdown.dart';
 
 class TutorialPanel extends StatelessComponent {
-  const TutorialPanel({Key? key}) : super(key: key);
+  const TutorialPanel({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

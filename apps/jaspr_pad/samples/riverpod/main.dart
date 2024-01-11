@@ -9,7 +9,7 @@ void main() {
 final counterProvider = StateProvider((ref) => 0);
 
 class App extends StatelessComponent {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

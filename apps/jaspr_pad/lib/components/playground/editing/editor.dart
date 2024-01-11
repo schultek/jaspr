@@ -30,8 +30,8 @@ class Editor extends StatefulComponent {
     required this.documents,
     this.onDocumentChanged,
     this.onSelectionChanged,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final String? activeDoc;
   final List<EditorDocument> documents;

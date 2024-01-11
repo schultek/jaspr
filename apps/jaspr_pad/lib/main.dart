@@ -31,7 +31,7 @@ void main() {
     ..addMiddleware((handler) {
       var router = Router(notFoundHandler: handler);
       router.mount('/api', apiRouter);
-      return router;
+      return router.call;
     });
 }
 
@@ -50,7 +50,7 @@ Handler get apiRouter {
   router.get('/tutorial/<stepId>', getTutorial);
   router.get('/download', downloadProject);
 
-  return router;
+  return router.call;
 }
 
 Handler mappedHandler<R, T>(FutureOr<R> Function(T request) handler) {

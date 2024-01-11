@@ -5,7 +5,7 @@ import '../../../providers/project_provider.dart';
 import '../output/execution_iframe.dart';
 
 class OutputPanel extends StatelessComponent {
-  const OutputPanel({Key? key}) : super(key: key);
+  const OutputPanel({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

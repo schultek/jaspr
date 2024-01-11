@@ -6,7 +6,7 @@ import 'execution_service.dart';
 import 'execution_service.imports.dart';
 
 class ExecutionIFrame extends StatelessComponent {
-  const ExecutionIFrame({Key? key}) : super(key: key);
+  const ExecutionIFrame({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

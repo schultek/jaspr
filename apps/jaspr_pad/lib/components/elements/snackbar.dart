@@ -7,7 +7,7 @@ import '../utils/node_reader.dart';
 final snackBarProvider = StateProvider<String?>((ref) => null);
 
 class SnackBar extends StatefulComponent {
-  const SnackBar({Key? key}) : super(key: key);
+  const SnackBar({super.key});
 
   @override
   State createState() => SnackBarState();

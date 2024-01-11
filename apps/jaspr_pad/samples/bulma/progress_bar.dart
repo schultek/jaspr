@@ -6,7 +6,7 @@ import 'colors.dart';
 /// Supports a limited subset of the available options
 /// See https://bulma.io/documentation/elements/progress/ for a detailed description
 class ProgressBar extends StatelessComponent {
-  const ProgressBar({this.child, this.value, this.max = 100, this.color, Key? key}) : super(key: key);
+  const ProgressBar({this.child, this.value, this.max = 100, this.color, super.key});
 
   final Component? child;
   final double? value;

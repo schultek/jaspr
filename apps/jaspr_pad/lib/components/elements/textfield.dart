@@ -4,8 +4,7 @@ import '../../adapters/mdc.dart';
 import '../utils/node_reader.dart';
 
 class TextField extends StatefulComponent {
-  const TextField({required this.label, this.placeholder, this.onChange, this.expand = false, Key? key})
-      : super(key: key);
+  const TextField({required this.label, this.placeholder, this.onChange, this.expand = false, super.key});
 
   final String label;
   final String? placeholder;

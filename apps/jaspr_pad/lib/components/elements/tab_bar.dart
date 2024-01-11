@@ -14,8 +14,8 @@ class TabBar extends StatefulComponent {
     required this.onSelected,
     required this.tabs,
     this.leading,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final String id;
   final int selected;

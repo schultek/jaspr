@@ -17,7 +17,7 @@ enum OutputTabsState { closed, ui, issues, docs, console }
 final tabsStateProvider = StateProvider((ref) => OutputTabsState.closed);
 
 class OutputSplitView extends StatelessComponent {
-  const OutputSplitView({required this.child, Key? key}) : super(key: key);
+  const OutputSplitView({required this.child, super.key});
 
   final Component child;
 
@@ -50,7 +50,7 @@ class OutputSplitView extends StatelessComponent {
 }
 
 class EditorTabs extends StatelessComponent {
-  const EditorTabs({Key? key}) : super(key: key);
+  const EditorTabs({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -127,7 +127,7 @@ class EditorTabs extends StatelessComponent {
 }
 
 class EditorTab extends StatelessComponent {
-  const EditorTab({required this.id, required this.label, required this.value, Key? key}) : super(key: key);
+  const EditorTab({required this.id, required this.label, required this.value, super.key});
 
   final String id;
   final String label;
@@ -156,7 +156,7 @@ class EditorTab extends StatelessComponent {
 }
 
 class EditorTabWindow extends StatelessComponent {
-  const EditorTabWindow({Key? key}) : super(key: key);
+  const EditorTabWindow({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

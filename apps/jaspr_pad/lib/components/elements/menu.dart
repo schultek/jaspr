@@ -6,7 +6,7 @@ import '../utils/node_reader.dart';
 import 'button.dart';
 
 class MenuItem extends StatelessComponent {
-  const MenuItem({required this.label, Key? key}) : super(key: key);
+  const MenuItem({required this.label, super.key});
 
   final String label;
 
@@ -30,7 +30,7 @@ class MenuItem extends StatelessComponent {
 }
 
 class Menu extends StatelessComponent {
-  const Menu({required this.items, required this.onItemSelected, Key? key}) : super(key: key);
+  const Menu({required this.items, required this.onItemSelected, super.key});
 
   final List<MenuItem> items;
   final void Function(int) onItemSelected;
@@ -43,7 +43,7 @@ class Menu extends StatelessComponent {
 }
 
 class MenuElement extends StatelessElement {
-  MenuElement(Menu component) : super(component);
+  MenuElement(Menu super.component);
 
   @override
   Menu get component => super.component as Menu;

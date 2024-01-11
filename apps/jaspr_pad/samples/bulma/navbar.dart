@@ -4,7 +4,7 @@ import 'package:jaspr/jaspr.dart';
 /// Supports a limited subset of the available options
 /// See https://bulma.io/documentation/components/navbar/ for a detailed description
 class NavBar extends StatelessComponent {
-  const NavBar({this.brand, this.menu, Key? key}) : super(key: key);
+  const NavBar({this.brand, this.menu, super.key});
 
   final NavbarBrand? brand;
   final NavbarMenu? menu;
@@ -22,7 +22,7 @@ class NavBar extends StatelessComponent {
 }
 
 class NavbarBrand extends StatelessComponent {
-  const NavbarBrand({required this.children, Key? key}) : super(key: key);
+  const NavbarBrand({required this.children, super.key});
 
   final List<Component> children;
 
@@ -33,7 +33,7 @@ class NavbarBrand extends StatelessComponent {
 }
 
 class NavbarMenu extends StatelessComponent {
-  const NavbarMenu({required this.items, this.endItems = const [], Key? key}) : super(key: key);
+  const NavbarMenu({required this.items, this.endItems = const [], super.key});
 
   final List<Component> items;
   final List<Component> endItems;
@@ -51,13 +51,9 @@ class NavbarMenu extends StatelessComponent {
 }
 
 class NavbarItem extends StatelessComponent {
-  const NavbarItem({required this.child, this.href, Key? key})
-      : items = null,
-        super(key: key);
+  const NavbarItem({required this.child, this.href, super.key}) : items = null;
 
-  const NavbarItem.dropdown({required this.child, required this.items, Key? key})
-      : href = null,
-        super(key: key);
+  const NavbarItem.dropdown({required this.child, required this.items, super.key}) : href = null;
 
   final Component child;
   final String? href;
@@ -80,7 +76,7 @@ class NavbarItem extends StatelessComponent {
 }
 
 class NavbarDivider extends StatelessComponent {
-  const NavbarDivider({Key? key}) : super(key: key);
+  const NavbarDivider({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

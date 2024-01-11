@@ -41,7 +41,7 @@ class InlineBrackets extends InlineSyntax {
 }
 
 class Markdown extends StatefulComponent {
-  const Markdown({required this.markdown, this.blockSyntaxes, Key? key}) : super(key: key);
+  const Markdown({required this.markdown, this.blockSyntaxes, super.key});
 
   final String markdown;
 

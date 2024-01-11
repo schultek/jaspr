@@ -4,8 +4,7 @@ import 'package:jaspr/jaspr.dart';
 /// Supports a limited subset of the available options
 /// See https://bulma.io/documentation/components/tabs/ for a detailed description
 class Tabs extends StatefulComponent {
-  const Tabs({required this.tabs, required this.onSelected, this.isBoxed = false, this.isToggle = false, Key? key})
-      : super(key: key);
+  const Tabs({required this.tabs, required this.onSelected, this.isBoxed = false, this.isToggle = false, super.key});
 
   final List<Component> tabs;
   final ValueChanged<int> onSelected;
@@ -42,7 +41,7 @@ class _TabsState extends State<Tabs> {
 }
 
 class Tab extends StatelessComponent {
-  const Tab({required this.selected, required this.onSelected, required this.child, Key? key}) : super(key: key);
+  const Tab({required this.selected, required this.onSelected, required this.child, super.key});
 
   final bool selected;
   final VoidCallback onSelected;

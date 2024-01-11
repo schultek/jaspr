@@ -18,8 +18,8 @@ class Button extends StatefulComponent {
     this.hideIcon = false,
     this.dialog = false,
     this.iconAffinity = IconAffinity.left,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final String? id;
   final String? label;

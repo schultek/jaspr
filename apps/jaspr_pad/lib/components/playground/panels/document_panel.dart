@@ -6,7 +6,7 @@ import '../../../providers/docu_provider.dart';
 import '../../elements/markdown.dart';
 
 class DocumentPanel extends StatelessComponent {
-  const DocumentPanel({Key? key}) : super(key: key);
+  const DocumentPanel({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -19,7 +19,7 @@ class DocumentPanel extends StatelessComponent {
 }
 
 class _DocumentHintMarkdown extends StatefulComponent {
-  const _DocumentHintMarkdown(this.info, {Key? key}) : super(key: key);
+  const _DocumentHintMarkdown(this.info);
 
   final HoverInfo info;
 

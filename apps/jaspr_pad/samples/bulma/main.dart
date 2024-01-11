@@ -66,7 +66,7 @@ class App extends StatelessComponent {
 }
 
 class BulmaLogo extends StatelessComponent {
-  const BulmaLogo({Key? key}) : super(key: key);
+  const BulmaLogo({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

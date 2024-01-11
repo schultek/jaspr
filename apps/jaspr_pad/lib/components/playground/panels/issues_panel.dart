@@ -6,7 +6,7 @@ import '../../../providers/edit_provider.dart';
 import '../../../providers/issues_provider.dart';
 
 class IssuesPanel extends StatelessComponent {
-  const IssuesPanel({Key? key}) : super(key: key);
+  const IssuesPanel({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -19,7 +19,7 @@ class IssuesPanel extends StatelessComponent {
 }
 
 class IssueItem extends StatelessComponent {
-  const IssueItem(this.issue, {Key? key}) : super(key: key);
+  const IssueItem(this.issue, {super.key});
 
   final Issue issue;
 

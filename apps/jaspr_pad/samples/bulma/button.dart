@@ -14,8 +14,8 @@ class Button extends StatelessComponent {
     this.isLoading = false,
     this.isBlock = false,
     this.isDisabled = false,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Component child;
   final VoidCallback onPressed;
@@ -45,7 +45,7 @@ class Button extends StatelessComponent {
 }
 
 class IconLabel extends StatelessComponent {
-  const IconLabel({required this.icon, required this.label, Key? key}) : super(key: key);
+  const IconLabel({required this.icon, required this.label, super.key});
 
   final String icon;
   final String label;
@@ -63,7 +63,7 @@ class IconLabel extends StatelessComponent {
 
 /// Bulma Button Group Component
 class ButtonGroup extends StatelessComponent {
-  const ButtonGroup({required this.children, this.isAttached = false, Key? key}) : super(key: key);
+  const ButtonGroup({required this.children, this.isAttached = false, super.key});
 
   final List<Button> children;
   final bool isAttached;

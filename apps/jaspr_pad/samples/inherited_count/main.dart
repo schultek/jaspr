@@ -6,7 +6,7 @@ void main() {
 }
 
 class InheritedCount extends InheritedComponent {
-  InheritedCount(this.count, {required Component child}) : super(child: child);
+  InheritedCount(this.count, {required super.child});
 
   final int count;
 
@@ -17,7 +17,7 @@ class InheritedCount extends InheritedComponent {
 }
 
 class App extends StatefulComponent {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   State<App> createState() => _AppState();
@@ -45,7 +45,7 @@ class _AppState extends State<App> {
 }
 
 class CountLabel extends StatelessComponent {
-  const CountLabel({Key? key}) : super(key: key);
+  const CountLabel({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

@@ -9,7 +9,7 @@ import 'panels/output_panel.dart';
 import 'panels/tutorial_panel.dart';
 
 class MainSection extends StatelessComponent {
-  const MainSection({Key? key}) : super(key: key);
+  const MainSection({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

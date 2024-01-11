@@ -45,7 +45,7 @@ void closeDialog(BuildContext context, {required String slotId, dynamic result})
 }
 
 class Dialog extends StatelessComponent {
-  const Dialog({required this.title, required this.content, required this.actions, Key? key}) : super(key: key);
+  const Dialog({required this.title, required this.content, required this.actions, super.key});
 
   final String title;
   final Component content;
@@ -68,7 +68,7 @@ class Dialog extends StatelessComponent {
 }
 
 class DialogSlot extends StatefulComponent {
-  const DialogSlot({required this.slotId, Key? key}) : super(key: key);
+  const DialogSlot({required this.slotId, super.key});
 
   final String slotId;
 

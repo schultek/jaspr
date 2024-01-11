@@ -8,7 +8,7 @@ void main() {
 }
 
 class App extends StatefulComponent {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   State<App> createState() => _AppState();
@@ -53,7 +53,7 @@ class _AppState extends State<App> {
 }
 
 class SimpleWeather extends StatelessComponent {
-  const SimpleWeather(this.weather, {Key? key}) : super(key: key);
+  const SimpleWeather(this.weather, {super.key});
 
   final CurrentWeather weather;
 
@@ -74,7 +74,7 @@ class SimpleWeather extends StatelessComponent {
 }
 
 class SearchBar extends StatefulComponent {
-  const SearchBar({required this.onSearch, this.placeholder, Key? key}) : super(key: key);
+  const SearchBar({required this.onSearch, this.placeholder, super.key});
 
   final ValueChanged<String> onSearch;
   final String? placeholder;

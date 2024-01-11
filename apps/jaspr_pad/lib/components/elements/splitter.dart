@@ -6,7 +6,7 @@ import '../../adapters/html.dart' as html;
 import '../utils/node_reader.dart';
 
 class Splitter extends StatefulComponent {
-  const Splitter({required this.children, this.horizontal = true, this.initialSizes, Key? key}) : super(key: key);
+  const Splitter({required this.children, this.horizontal = true, this.initialSizes, super.key});
 
   final List<Component> children;
   final bool horizontal;
