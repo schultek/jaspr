@@ -26,7 +26,7 @@ class FontFamily {
   final String value;
 
   /// Constructs a [FontFamily] from a custom font name
-  const FontFamily(String value) : value = '"$value"';
+  const FontFamily(this.value);
 
   const FontFamily._generic(this.value);
 
@@ -74,7 +74,8 @@ class FontFamilies {
   static const FontFamily timesNewRoman = FontFamily('Times New Roman');
   static const FontFamily palatino = FontFamily('Palatino');
   static const FontFamily bookman = FontFamily('Bookman');
-  static const FontFamily newCenturySchoolbook = FontFamily('New Century Schoolbook');
+  static const FontFamily newCenturySchoolbook =
+      FontFamily('New Century Schoolbook');
   static const FontFamily andaleMono = FontFamily('Andale Mono');
   static const FontFamily courierNew = FontFamily('Courier New');
   static const FontFamily courier = FontFamily('Courier');
@@ -173,16 +174,21 @@ class TextDecorationLine {
 
   static const TextDecorationLine none = TextDecorationLine._('none');
 
-  static const TextDecorationLineKeyword underline = TextDecorationLineKeyword.underline;
-  static const TextDecorationLineKeyword overline = TextDecorationLineKeyword.overline;
-  static const TextDecorationLineKeyword lineThrough = TextDecorationLineKeyword.lineThrough;
+  static const TextDecorationLineKeyword underline =
+      TextDecorationLineKeyword.underline;
+  static const TextDecorationLineKeyword overline =
+      TextDecorationLineKeyword.overline;
+  static const TextDecorationLineKeyword lineThrough =
+      TextDecorationLineKeyword.lineThrough;
 
-  const factory TextDecorationLine.multi(List<TextDecorationLineKeyword> lines) = _MultiTextDecorationLine;
+  const factory TextDecorationLine.multi(
+      List<TextDecorationLineKeyword> lines) = _MultiTextDecorationLine;
 
   static const TextDecorationLine inherit = TextDecorationLine._('inherit');
   static const TextDecorationLine initial = TextDecorationLine._('initial');
   static const TextDecorationLine revert = TextDecorationLine._('revert');
-  static const TextDecorationLine revertLayer = TextDecorationLine._('revert-layer');
+  static const TextDecorationLine revertLayer =
+      TextDecorationLine._('revert-layer');
   static const TextDecorationLine unset = TextDecorationLine._('unset');
 }
 
@@ -230,15 +236,22 @@ class TextDecorationThickness {
   const TextDecorationThickness._(this.value);
 
   static const TextDecorationThickness auto = TextDecorationThickness._('auto');
-  static const TextDecorationThickness fromFont = TextDecorationThickness._('from-font');
+  static const TextDecorationThickness fromFont =
+      TextDecorationThickness._('from-font');
 
-  const factory TextDecorationThickness.value(Unit value) = _ValueTextDecorationThickness;
+  const factory TextDecorationThickness.value(Unit value) =
+      _ValueTextDecorationThickness;
 
-  static const TextDecorationThickness inherit = TextDecorationThickness._('inherit');
-  static const TextDecorationThickness initial = TextDecorationThickness._('initial');
-  static const TextDecorationThickness revert = TextDecorationThickness._('revert');
-  static const TextDecorationThickness revertLayer = TextDecorationThickness._('revert-layer');
-  static const TextDecorationThickness unset = TextDecorationThickness._('unset');
+  static const TextDecorationThickness inherit =
+      TextDecorationThickness._('inherit');
+  static const TextDecorationThickness initial =
+      TextDecorationThickness._('initial');
+  static const TextDecorationThickness revert =
+      TextDecorationThickness._('revert');
+  static const TextDecorationThickness revertLayer =
+      TextDecorationThickness._('revert-layer');
+  static const TextDecorationThickness unset =
+      TextDecorationThickness._('unset');
 }
 
 class _ValueTextDecorationThickness implements TextDecorationThickness {
@@ -266,15 +279,21 @@ class TextDecoration {
 }
 
 abstract class TextShadow {
-  const factory TextShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Color? color}) = _TextShadow;
+  const factory TextShadow(
+      {required Unit offsetX,
+      required Unit offsetY,
+      Unit? blur,
+      Color? color}) = _TextShadow;
 
-  const factory TextShadow.combine(List<TextShadow> shadows) = _CombineTextShadow;
+  const factory TextShadow.combine(List<TextShadow> shadows) =
+      _CombineTextShadow;
 
   String get value;
 }
 
 class _TextShadow implements TextShadow {
-  const _TextShadow({required this.offsetX, required this.offsetY, this.blur, this.color});
+  const _TextShadow(
+      {required this.offsetX, required this.offsetY, this.blur, this.color});
 
   final Unit offsetX;
   final Unit offsetY;
@@ -282,8 +301,12 @@ class _TextShadow implements TextShadow {
   final Color? color;
 
   @override
-  String get value =>
-      [offsetX.value, offsetY.value, if (blur != null) blur!.value, if (color != null) color!.value].join(' ');
+  String get value => [
+        offsetX.value,
+        offsetY.value,
+        if (blur != null) blur!.value,
+        if (color != null) color!.value
+      ].join(' ');
 }
 
 class _CombineTextShadow implements TextShadow {
