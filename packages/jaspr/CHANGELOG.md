@@ -7,6 +7,7 @@
 - Fixed error on windows when running `jaspr build`.
 - Fixed error with `jaspr serve` related to the use of `webdev`.
 - Added support for rendering `svg`.
+- Added new color - Colors.transparent
 
 ## 0.9.3
 
