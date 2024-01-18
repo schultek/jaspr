@@ -40,6 +40,26 @@ Component aside(List<Component> children,
   );
 }
 
+/// The &lt;body&gt; HTML element represents the content of an HTML document. There can be only one &lt;body&gt; element in a document.
+Component body(List<Component> children,
+    {Key? key,
+    String? id,
+    List<String>? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
+  return DomComponent(
+    tag: 'body',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: attributes,
+    events: events,
+    children: children,
+  );
+}
+
 /// The &lt;footer&gt; HTML element represents a footer for its nearest ancestor sectioning content or sectioning root element. A &lt;footer&gt; typically contains information about the author of the section, copyright data or links to related documents.
 Component footer(List<Component> children,
     {Key? key,
@@ -60,6 +80,26 @@ Component footer(List<Component> children,
   );
 }
 
+/// The &lt;head&gt; HTML element contains machine-readable information (metadata) about the document, like its title, scripts, and style sheets.
+Component head(List<Component> children,
+    {Key? key,
+    String? id,
+    List<String>? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
+  return DomComponent(
+    tag: 'head',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: attributes,
+    events: events,
+    children: children,
+  );
+}
+
 /// The &lt;header&gt; HTML element represents introductory content, typically a group of introductory or navigational aids. It may contain some heading elements but also a logo, a search form, an author name, and other elements.
 Component header(List<Component> children,
     {Key? key,
@@ -70,6 +110,26 @@ Component header(List<Component> children,
     Map<String, EventCallback>? events}) {
   return DomComponent(
     tag: 'header',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: attributes,
+    events: events,
+    children: children,
+  );
+}
+
+/// The &lt;html&gt; HTML element represents the root (top-level element) of an HTML document, so it is also referred to as the root element. All other elements must be descendants of this element.
+Component html(List<Component> children,
+    {Key? key,
+    String? id,
+    List<String>? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
+  return DomComponent(
+    tag: 'html',
     key: key,
     id: id,
     classes: classes,
