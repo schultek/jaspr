@@ -90,8 +90,32 @@ abstract class BaseCommand extends Command<int> {
       }
     }
 
-    var parsed = loadYaml(await pubspecFile.readAsString());
-    return parsed as YamlMap;
+    var parsed = loadYaml(await pubspecFile.readAsString()) as YamlMap;
+
+    if (parsed case {'dependencies': {'jaspr': _}}) {
+      // ok
+    } else {
+      throw 'Missing dependency on jaspr in pubspec.yaml file. Make sure to add jaspr to your dependencies.';
+    }
+
+    if (parsed case {'dev_dependencies': {'jaspr_builder': _}}) {
+      // ok
+    } else {
+      var result = logger.logger.confirm(
+          'Missing dependency on jaspr_builder package. Do you want to add jaspr_builder to your dev_dependencies now?',
+          defaultValue: true);
+      if (result) {
+        var result = Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
+        if (result.exitCode != 0) {
+          logger.logger.err(result.stderr);
+          throw 'Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.';
+        }
+
+        logger.logger.success('Successfully added jaspr_builder to your dev_dependencies.');
+      }
+    }
+
+    return parsed;
   }
 
   void guardResource(FutureOr<void> Function() fn) {
