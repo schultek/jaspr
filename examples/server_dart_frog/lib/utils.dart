@@ -1,11 +1,14 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:jaspr/server.dart' hide Middleware, Response;
+import 'package:server_dart_frog/jaspr_options.dart';
 
 /// Wraps jasprs [serveApp] as a dart_frog middleware.
 ///
 /// This also keeps track of the base path in case this is
 /// mounted under a different path than '/'.
 Middleware serveJasprApp() {
+  initializeApp(options: defaultJasprOptions);
+
   return fromShelfMiddleware((handler) {
     return serveApp((request, _) {
       return handler(request.change(

@@ -59,8 +59,7 @@ class _BaseDocumentState extends State<_BaseDocument> {
         for (var e in _registryElements.entries)
           {
             'id': getIdFor(e.key),
-            'name': e.value.name,
-            if (e.value.params != null) 'params': kDebugMode ? e.value.params : stateCodec.encode(e.value.params),
+            ...e.value.encode(e.key.component),
           }
       ]
     };

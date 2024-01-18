@@ -8,7 +8,11 @@ class JasprOptions {
 
 class ComponentEntry<T extends Component> {
   final String name;
-  final Map<String, dynamic>? params;
+  final Map<String, dynamic> Function(T component)? params;
 
   const ComponentEntry.client(this.name, {this.params});
+
+  Map<String, dynamic> encode(T component) {
+    return {'name': name, if (params != null) 'params': params!(component)};
+  }
 }

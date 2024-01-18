@@ -1,6 +1,6 @@
 import 'package:jaspr/server.dart';
 
-import 'app.dart';
+import 'components/app.dart';
 import 'jaspr_options.dart';
 
 /// Entrypoint for the server

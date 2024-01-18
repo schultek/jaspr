@@ -42,12 +42,22 @@ class JasprOptionsBuilder implements Builder {
         .map((c) => ClientModule.deserialize(jsonDecode(c)))
         .toList();
 
+    if (clients.isEmpty) {
+      return;
+    }
+
     var clientImports = clients.mapIndexed((i, c) => "import '${path.url.relative(c.id.path, from: 'lib')}' as c$i;");
 
+    var clientParamsGetters = clients
+        .mapIndexed((i, c) => c.params.isNotEmpty
+            ? 'Map<String, dynamic> _params$i${c.name}(c$i.${c.name} c) => {${c.params.map((p) => "'${p.name}': c.${p.name}").join(', ')}};'
+            : null)
+        .whereType<String>();
+
     var clientEntries = clients.mapIndexed((i, c) => '''
-      c$i.${c.name}: ComponentEntry.client(
+      c$i.${c.name}: ComponentEntry<c$i.${c.name}>.client(
         '${path.url.relative(path.url.withoutExtension(c.id.path), from: 'lib')}'
-        ${c.params.isNotEmpty ? ', params: {${c.params.map((p) => "'${p.name}': self.${p.name}").join(', ')}},' : ''}
+        ${c.params.isNotEmpty ? ', params: _params$i${c.name}' : ''}
       ),
     ''').join("\n");
 
@@ -64,6 +74,9 @@ class JasprOptionsBuilder implements Builder {
           $clientEntries
         },
       );
+      
+      ${clientParamsGetters.join("\n")}
+      
     ''');
 
     await buildStep.writeAsString(optionsId, optionsSource);

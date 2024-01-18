@@ -3,10 +3,10 @@
 
 import 'package:jaspr/jaspr.dart';
 
-import 'app.dart' as c0;
+import 'components/app.dart' as c0;
 
 const defaultJasprOptions = JasprOptions(
   clientComponents: {
-    c0.App: ComponentEntry.client('app'),
+    c0.App: ComponentEntry<c0.App>.client('components/app'),
   },
 );

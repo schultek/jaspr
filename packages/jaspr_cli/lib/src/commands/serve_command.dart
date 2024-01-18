@@ -137,7 +137,11 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
       return ExitCode.success.code;
     }
 
-    await _runServer();
+    if (config.devCommand != null) {
+      await _runDevCommand(config.devCommand!);
+    } else {
+      await _runServer();
+    }
     return ExitCode.success.code;
   }
 
@@ -178,6 +182,29 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
       'dart',
       args,
       environment: {'PORT': argResults!['port'], 'JASPR_PROXY_PORT': '5467'},
+    );
+
+    logger.write('Server started.', progress: ProgressState.completed);
+
+    await watchProcess('server', process, tag: Tag.server);
+  }
+
+  Future<void> _runDevCommand(String command) async {
+    logger.write("Starting server...", progress: ProgressState.running);
+
+    if (release) {
+      logger.write("Ignoring --release flag since custom dev command is used.", level: Level.warning);
+    }
+    if (debug) {
+      logger.write("Ignoring --debug flag since custom dev command is used.", level: Level.warning);
+    }
+
+    var [exec, ...args] = command.split(" ");
+
+    var process = await Process.start(
+      exec,
+      args,
+      environment: {'PORT': argResults!['port'], 'jaspr_dev_proxy': '5467'},
     );
 
     logger.write('Server started.', progress: ProgressState.completed);

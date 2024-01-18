@@ -1,9 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
-part 'counter.g.dart';
-
 @client
-class Counter extends StatefulComponent with _$Counter {
+class Counter extends StatefulComponent {
   const Counter({Key? key}) : super(key: key);
 
   @override

@@ -77,7 +77,7 @@ Handler _proxyHandler() {
     if (res.statusCode == 200 && req.url.path.endsWith('.dart.bootstrap.js')) {
       var body = await res.readAsString();
       // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:5467/$dwdsSseHandler";'
-      return res.change(body: body.replaceAll('http://localhost:$kDevProxy/', '/'));
+      return res.change(body: body.replaceAll('http://localhost:$kDevProxy/', './'));
     }
 
     // Second try to load the resource from the flutter process.
