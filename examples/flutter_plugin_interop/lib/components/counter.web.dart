@@ -1,15 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// A simple [StatelessComponent] with a [build] method
-class App extends StatefulComponent {
+class Counter extends StatefulComponent {
+  const Counter({super.key});
+
   @override
-  AppState createState() => AppState();
+  State<Counter> createState() => _CounterState();
 }
 
-class AppState extends State<App> {
+class _CounterState extends State<Counter> {
   SharedPreferences? store;
   DocumentReference<Map<String, dynamic>>? countDoc;
   int _remoteCount = 0;
@@ -21,6 +23,23 @@ class AppState extends State<App> {
     SharedPreferences.getInstance().then((s) {
       setState(() => store = s);
     });
+
+    initFirestore();
+  }
+
+  Future<void> initFirestore() async {
+    await Firebase.initializeApp(
+      options: FirebaseOptions(
+        apiKey: "AIzaSyBWFqH6yhMamn40w2Y5ln1mpgCJQoWgOcs",
+        authDomain: "jaspr-demo.firebaseapp.com",
+        projectId: "jaspr-demo",
+        storageBucket: "jaspr-demo.appspot.com",
+        messagingSenderId: "1022309922786",
+        appId: "1:1022309922786:web:57753e5507fd58cb656bbb",
+      ),
+    );
+
+    await FirebaseAuth.instance.signInAnonymously();
 
     var userId = FirebaseAuth.instance.currentUser?.uid;
     countDoc = FirebaseFirestore.instance.doc('counts/$userId');

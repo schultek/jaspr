@@ -46,7 +46,13 @@ Future<String> renderComponent(Component app) async {
 JasprOptions? _globalOptions;
 
 SetupFunction _createSetup(Component app) {
-  assert(_globalOptions != null, '[initializeApp] must be called before [runApp]');
+  assert(() {
+    if (_globalOptions == null) {
+      throw 'Missing call to [initializeApp]. '
+          '[initializeApp] must be called before [runApp].';
+    }
+    return true;
+  }());
   var options = _globalOptions!;
   return (binding) {
     binding.initializeOptions(options);
