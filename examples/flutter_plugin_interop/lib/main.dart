@@ -4,7 +4,7 @@ import 'package:jaspr/server.dart';
 import 'components/app.dart';
 
 void main() {
-  initializeApp(options: defaultJasprOptions);
+  Jaspr.initializeApp(options: defaultJasprOptions);
 
   runApp(Document(
     title: "Flutter Plugin Interop",

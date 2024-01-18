@@ -1,11 +1,11 @@
-import 'package:flutter_embedding_demo/jaspr_options.dart';
 import 'package:jaspr/server.dart';
 
 import 'components/app.dart';
+import 'jaspr_options.dart';
 
 /// The server entrypoint for the jaspr app.
 void main() {
-  initializeApp(options: defaultJasprOptions);
+  Jaspr.initializeApp(options: defaultJasprOptions);
 
   runApp(Document(
     title: 'Element embedding',

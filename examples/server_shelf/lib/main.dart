@@ -9,7 +9,7 @@ import 'components/app.dart';
 import 'components/hello.dart';
 
 void main() async {
-  initializeApp(options: defaultJasprOptions);
+  Jaspr.initializeApp(options: defaultJasprOptions);
 
   HttpServer? server;
 

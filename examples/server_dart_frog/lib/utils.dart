@@ -7,7 +7,7 @@ import 'package:server_dart_frog/jaspr_options.dart';
 /// This also keeps track of the base path in case this is
 /// mounted under a different path than '/'.
 Middleware serveJasprApp() {
-  initializeApp(options: defaultJasprOptions);
+  Jaspr.initializeApp(options: defaultJasprOptions);
 
   return fromShelfMiddleware((handler) {
     return serveApp((request, _) {

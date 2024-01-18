@@ -3,7 +3,7 @@
 
 import 'package:jaspr/jaspr.dart';
 
-import 'components/app.dart' as c0;
+import 'app.dart' as c0;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
@@ -23,6 +23,6 @@ import 'components/app.dart' as c0;
 /// ```
 const defaultJasprOptions = JasprOptions(
   targets: {
-    c0.App: ClientTarget<c0.App>('components/app'),
+    c0.App: ClientTarget<c0.App>('app'),
   },
 );

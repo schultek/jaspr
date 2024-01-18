@@ -5,8 +5,24 @@ import 'package:jaspr/jaspr.dart';
 
 import 'components/app.dart' as c0;
 
+/// Default [JasprOptions] for use with your jaspr project.
+///
+/// Use this to initialize jaspr **before** calling [runApp].
+///
+/// Example:
+/// ```dart
+/// import 'jaspr_options.dart';
+///
+/// void main() {
+///   Jaspr.initializeApp(
+///     options: defaultJasprOptions,
+///   );
+///
+///   runApp(...);
+/// }
+/// ```
 const defaultJasprOptions = JasprOptions(
-  clientComponents: {
-    c0.App: ComponentEntry<c0.App>.client('components/app'),
+  targets: {
+    c0.App: ClientTarget<c0.App>('components/app'),
   },
 );
