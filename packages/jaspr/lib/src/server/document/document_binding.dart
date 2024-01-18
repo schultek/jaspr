@@ -1,20 +1,17 @@
 part of document;
 
 mixin DocumentBinding on AppBinding {
-  late SendPort _sendPort;
-  ReceivePort? _receivePort;
+  late Future<String> Function(String) _fileHandler;
 
-  void setSendPort(SendPort sendPort) {
-    _sendPort = sendPort;
+  void setFileHandler(Future<String> Function(String) handler) {
+    _fileHandler = handler;
   }
 
   _DocumentElement? _document;
   Future<String>? _fileRequest;
 
   void _loadFile(String name) {
-    _receivePort ??= ReceivePort();
-    _sendPort.send(LoadFileRequest(name, _receivePort!.sendPort));
-    _fileRequest = _receivePort!.first.then((value) => value);
+    _fileRequest = _fileHandler(name);
   }
 
   Future<String> renderDocument(MarkupRenderObject root) async {

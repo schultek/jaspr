@@ -55,7 +55,7 @@ class JasprOptionsBuilder implements Builder {
         .whereType<String>();
 
     var clientEntries = clients.mapIndexed((i, c) => '''
-      c$i.${c.name}: ComponentEntry<c$i.${c.name}>.client(
+      c$i.${c.name}: ClientTarget<c$i.${c.name}>(
         '${path.url.relative(path.url.withoutExtension(c.id.path), from: 'lib')}'
         ${c.params.isNotEmpty ? ', params: _params$i${c.name}' : ''}
       ),
@@ -69,8 +69,24 @@ class JasprOptionsBuilder implements Builder {
       
       ${clientImports.join("\n")}
       
+      /// Default [JasprOptions] for use with your jaspr project.
+      ///
+      /// Use this to initialize jaspr **before** calling [runApp].
+      ///
+      /// Example:
+      /// ```dart
+      /// import 'jaspr_options.dart';
+      /// 
+      /// void main() {
+      ///   Jaspr.initializeApp(
+      ///     options: defaultJasprOptions,
+      ///   );
+      ///   
+      ///   runApp(...);
+      /// }
+      /// ```
       const defaultJasprOptions = JasprOptions(
-        clientComponents: {
+        targets: {
           $clientEntries
         },
       );

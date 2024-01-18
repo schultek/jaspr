@@ -44,10 +44,10 @@ class _DocumentElement extends StatefulElement {
 }
 
 class _BaseDocumentState extends State<_BaseDocument> {
-  final Map<Element, ComponentEntry> _registryElements = {};
+  final Map<Element, ClientTarget> _registryElements = {};
 
   void registerElement(Element element) {
-    var entry = (context.binding as ServerAppBinding).options.clientComponents[element.component.runtimeType];
+    var entry = (context.binding as ServerAppBinding).options.targets[element.component.runtimeType];
     if (entry != null) {
       _registryElements[element] = entry;
     }
