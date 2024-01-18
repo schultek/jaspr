@@ -47,8 +47,8 @@ class _BaseDocumentState extends State<_BaseDocument> {
   final Map<Element, ComponentEntry> _registryElements = {};
 
   void registerElement(Element element) {
-    if (element.component is ComponentEntryMixin) {
-      var entry = (element.component as ComponentEntryMixin).entry;
+    var entry = (context.binding as ServerAppBinding).options.clientComponents[element.component.runtimeType];
+    if (entry != null) {
       _registryElements[element] = entry;
     }
   }

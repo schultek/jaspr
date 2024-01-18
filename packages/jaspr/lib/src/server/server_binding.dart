@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
+import '../foundation/options.dart';
 import '../framework/framework.dart';
 import 'document/document.dart';
 import 'markup_render_object.dart';
@@ -58,5 +59,12 @@ class ServerAppBinding extends AppBinding with ComponentsBinding, DocumentBindin
   @override
   RenderObject createRootRenderObject() {
     return MarkupRenderObject();
+  }
+
+  JasprOptions get options => _options!;
+  JasprOptions? _options;
+
+  void initializeOptions(JasprOptions options) {
+    _options = options;
   }
 }

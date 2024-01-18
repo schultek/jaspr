@@ -1,4 +1,22 @@
 builders:
+# =====================
+# === Jaspr Options ===
+# =====================
+  jaspr_options:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildJasprOptions" ]
+    build_extensions:
+      "lib/$lib$":
+        - "lib/jaspr_options.dart"
+    auto_apply: dependents
+    build_to: source
+    required_inputs:
+      - '.client.json'
+    runs_before:
+      - jaspr_web_compilers:entrypoint_bootstrap
+# ========================
+# === Client Component ===
+# ========================
   client_module:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "buildClientModule" ]
@@ -8,18 +26,6 @@ builders:
         - "web/{{file}}.client.dart"
     auto_apply: dependents
     build_to: cache
-  client_component:
-    import: "package:jaspr_builder/builder.dart"
-    builder_factories: [ "buildClientPart" ]
-    build_extensions:
-      "^lib/{{file}}.client.json":
-        - "lib/{{file}}.g.dart"
-    required_inputs:
-      - '.client.json'
-    auto_apply: dependents
-    build_to: source
-    runs_before:
-      - jaspr_web_compilers:entrypoint_bootstrap
   client_registry:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "buildClientRegistry" ]
@@ -32,6 +38,9 @@ builders:
     build_to: cache
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap
+# ========================
+# === Platform Imports ===
+# ========================
   imports:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "findPlatformImports" ]
