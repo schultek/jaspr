@@ -14,7 +14,6 @@ Provide documentation for all aspects of the framework.
 
 Goals: Provide a great developer experience for code web development aspects like writing document markup, styling elements and accessing web apis.
 
-- Add svg support
 - Improve styling experience
 - Add support for head scoping
 - Add hoisted stylesheets
