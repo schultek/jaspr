@@ -42,8 +42,7 @@ class _ZeroUnit implements Unit {
   String get value => '0';
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) || other is _Unit && other._value == 0;
+  bool operator ==(Object other) => identical(this, other) || other is _Unit && other._value == 0;
 
   @override
   int get hashCode => 0;
@@ -57,8 +56,7 @@ class _AutoUnit implements Unit {
   String get value => 'auto';
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) || other is _AutoUnit;
+  bool operator ==(Object other) => identical(this, other) || other is _AutoUnit;
 
   @override
   int get hashCode => 0;
@@ -76,12 +74,8 @@ class _Unit implements Unit {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      _value == 0 &&
-          (other is _ZeroUnit || (other is _Unit && other._value == 0)) ||
-      other is _Unit &&
-          runtimeType == other.runtimeType &&
-          _unit == other._unit &&
-          _value == other._value;
+      _value == 0 && (other is _ZeroUnit || (other is _Unit && other._value == 0)) ||
+      other is _Unit && runtimeType == other.runtimeType && _unit == other._unit && _value == other._value;
 
   @override
   int get hashCode => _value == 0 ? 0 : _unit.hashCode ^ _value.hashCode;
