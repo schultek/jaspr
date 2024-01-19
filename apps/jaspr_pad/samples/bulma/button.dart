@@ -36,9 +36,7 @@ class Button extends StatelessComponent {
         if (isBlock) 'block',
       ],
       disabled: isDisabled,
-      events: {
-        'click': (e) => onPressed(),
-      },
+      onClick: onPressed,
       [child],
     );
   }

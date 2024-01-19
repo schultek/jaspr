@@ -28,12 +28,15 @@ class App extends StatelessComponent {
       // some elements don't have children
       hr(),
       // you can add events as usual
-      select(events: {
-        'change': (e) => print((e.target as dynamic).value),
-      }, [
-        option(value: 'test', [text('Select me!')]),
-        option(value: 'other', selected: true, [text('Or me!')])
-      ]),
+      select(
+        onChange: (value) {
+          print(value);
+        },
+        [
+          option(value: 'test', [text('Select me!')]),
+          option(value: 'other', selected: true, [text('Or me!')])
+        ],
+      ),
       // most common and some uncommon elements are supported
       progress(value: 85, max: 100, [])
     ]);

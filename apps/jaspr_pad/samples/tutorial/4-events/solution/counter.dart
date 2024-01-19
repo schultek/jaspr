@@ -10,18 +10,16 @@ class Counter extends StatefulComponent {
 class _CounterState extends State<Counter> {
   int count = 0;
 
-  void increment() {
-    setState(() {
-      count++;
-    });
-  }
-
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield text('Count: $count');
 
     yield button(
-      events: {'click': (e) => increment()},
+      onClick: () {
+        setState(() {
+          count++;
+        });
+      },
       [text('Counter')],
     );
   }

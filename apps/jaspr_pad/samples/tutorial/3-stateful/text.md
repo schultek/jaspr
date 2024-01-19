@@ -17,7 +17,7 @@ class MyComponent extends StatefulComponent {
 class MyComponentState extends State<MyComponent> {
 
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'div', ...);
+    yield div([...]);
   }
 }
 ```
@@ -29,7 +29,7 @@ It again defines the `build()` method using the [**Sync Generator**](https://dar
 1. Create a new file called `counter.dart`
 2. Add a new [StatefulComponent] called `Counter` inside the new file. 
    Let it render a single [Text] component for now.
-3. Import the new file in your `main.dart` and use the [Counter] component beneath the `div` element.
+3. Import the new file in your `main.dart` and use the [Counter] component beneath the `div` component.
    <details>
      <summary>Tip</summary>
      Use `yield` a second time inside the `App`s build method.

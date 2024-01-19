@@ -94,18 +94,14 @@ class SearchBarState extends State<SearchBar> {
         input(
           type: InputType.text,
           attributes: {if (component.placeholder != null) 'placeholder': component.placeholder!},
-          events: {
-            'input': (e) {
-              setState(() => search = (e.target as dynamic).value);
-            }
+          onInput: (value) {
+            setState(() => search = value);
           },
           [],
         ),
         button(
-          events: {
-            'click': (e) {
-              component.onSearch(search);
-            }
+          onClick: () {
+            component.onSearch(search);
           },
           [text('Search')],
         ),

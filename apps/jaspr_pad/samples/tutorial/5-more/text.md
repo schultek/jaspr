@@ -1,5 +1,7 @@
 # Coming Soon
 
+🎉 Hooray, you've made it all the way through (for now).
+
 Stay tuned for more content.
 
 In the meantime:

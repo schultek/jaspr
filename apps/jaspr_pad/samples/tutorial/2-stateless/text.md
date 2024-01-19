@@ -12,7 +12,7 @@ class MyComponent extends StatelessComponent {
   const MyComponent({Key? key}) : super(key: key);
 
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(...);
+    yield div([...]);
   }
 }
 ```
@@ -23,6 +23,15 @@ of Jaspr to better match the unique properties of the web platform compared to F
 
 > The recommended way to write build methods with Jaspr is using the [**Sync Generator**](https://dart.dev/guides/language/language-tour#generators) pattern.
 > Simply use the `sync*` keyword in the method definition and `yield` one or multiple components (instead of returning).
+> 
+> The same can also be written using a normal `List`:
+> ```dart
+> Iterable<Component> build(BuildContext context) {
+>   return [
+>     div([...]),
+>   ];
+> }
+> ```
 
 # Task
 

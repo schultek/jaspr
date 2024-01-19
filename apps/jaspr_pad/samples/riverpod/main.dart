@@ -19,10 +19,8 @@ class App extends StatelessComponent {
     });
 
     yield button(
-      events: {
-        'click': (e) {
-          context.read(counterProvider.notifier).state++;
-        },
+      onClick: () {
+        context.read(counterProvider.notifier).state++;
       },
       [text('Press Me')],
     );

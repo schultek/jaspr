@@ -36,7 +36,7 @@ class Logic {
   }
 
   void selectTutorial() async {
-    window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=intro');
+    window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=0-intro');
     _refreshProject();
   }
 
@@ -65,6 +65,7 @@ class Logic {
     var updated = await changeStep(tut, tut.configs[tut.currentStep - 1].id);
     ref.read(editProjectProvider.notifier).state = updated;
     window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=${updated.step.id}');
+    ref.invalidate(activeDocIndexProvider);
     compileFiles();
   }
 
@@ -73,6 +74,7 @@ class Logic {
     var updated = await changeStep(tut, tut.configs[tut.currentStep + 1].id);
     ref.read(editProjectProvider.notifier).state = updated;
     window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=${updated.step.id}');
+    ref.invalidate(activeDocIndexProvider);
     compileFiles();
   }
 
@@ -81,6 +83,7 @@ class Logic {
     var updated = await changeStep(tut, id);
     ref.read(editProjectProvider.notifier).state = updated;
     window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=${updated.step.id}');
+    ref.invalidate(activeDocIndexProvider);
     compileFiles();
   }
 

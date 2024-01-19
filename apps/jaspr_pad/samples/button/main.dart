@@ -35,7 +35,7 @@ class Button extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield button(
-      events: {'click': (e) => onPressed()},
+      onClick: onPressed,
       [text(label)],
     );
   }
