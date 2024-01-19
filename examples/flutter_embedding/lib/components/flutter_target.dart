@@ -21,7 +21,7 @@ class FlutterTarget extends StatelessComponent {
     Component child = FlutterEmbedView(
       key: GlobalObjectKey('flutter_target'),
       classes: isHandheld ? ['handheld'] : effects.toList(),
-      styles: rotation != 0
+      styles: !isHandheld && rotation != 0
           ? Styles.box(
               transform: Transform.combine([
                 Transform.perspective(1000.px),

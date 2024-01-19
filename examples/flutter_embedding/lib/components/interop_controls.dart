@@ -19,12 +19,8 @@ class _InteropControlsState extends State<InteropControls> {
       legend([text('JS Interop')]),
       label(htmlFor: 'screen-selector', [
         text('Screen'),
-        select(name: 'screen-select', id: 'screen-selector', classes: [
-          'screen'
-        ], events: {
-          'change': (e) {
-            context.read(appStateProvider.notifier).changeDemoScreenTo(DemoScreen.values.byName(e.target.value));
-          }
+        select(name: 'screen-select', id: 'screen-selector', classes: ['screen'], onChange: (value) {
+          context.read(appStateProvider.notifier).changeDemoScreenTo(DemoScreen.values.byName(value.first));
         }, [
           option(value: 'counter', [text('Counter')]),
           option(value: 'textField', [text('TextField')]),

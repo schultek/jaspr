@@ -24,7 +24,7 @@ class EffectsControls extends StatelessComponent {
 
     yield fieldset(id: 'fx', events: {
       'click': (event) {
-        var fx = event.target.dataset['fx'];
+        var fx = (event.target as dynamic).dataset['fx'];
         if (fx != null) {
           context.read(effectsProvider.notifier).update((e) {
             return e.contains(fx) ? ({...e}..remove(fx)) : {...e, fx};
@@ -32,9 +32,9 @@ class EffectsControls extends StatelessComponent {
         }
       },
       'input': (event) {
-        if (event.target.id == 'rotation') {
+        if ((event.target as dynamic).id == 'rotation') {
           context.read(effectsProvider.notifier).update((e) => {...e}..remove('spin'));
-          context.read(rotationProvider.notifier).state = double.parse(event.target.value);
+          context.read(rotationProvider.notifier).state = double.parse((event.target as dynamic).value);
         }
       },
     }, [
