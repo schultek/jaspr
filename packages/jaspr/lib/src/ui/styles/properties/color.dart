@@ -12,15 +12,13 @@ abstract class Color {
   const factory Color.rgb(int red, int green, int blue) = _RGBColor;
 
   /// Constructs a [Color] from red, green, blue and alpha values
-  const factory Color.rgba(int red, int green, int blue, double alpha) =
-      _RGBAColor;
+  const factory Color.rgba(int red, int green, int blue, double alpha) = _RGBAColor;
 
   /// Constructs a [Color] from hue, saturation and lightness values
   const factory Color.hsl(int hue, int saturation, int lightness) = _HSLColor;
 
   /// Constructs a [Color] from hue, saturation, lightness and alpha values
-  const factory Color.hsla(
-      int hue, int saturation, int lightness, double alpha) = _HSLAColor;
+  const factory Color.hsla(int hue, int saturation, int lightness, double alpha) = _HSLAColor;
 
   static const Color inherit = Color.named('inherit');
   static const Color initial = Color.named('initial');
