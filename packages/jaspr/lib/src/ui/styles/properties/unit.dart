@@ -10,6 +10,8 @@ extension UnitExt on num {
   Unit get rem => Unit.rem(toDouble());
 
   Unit get vw => Unit.vw(toDouble());
+
+  Unit get vh => Unit.vh(toDouble());
 }
 
 abstract class Unit {
@@ -36,6 +38,9 @@ abstract class Unit {
   /// Constructs a [Unit] in the form '100vw'
   const factory Unit.vw(double value) = _VwUnit;
 
+  /// Constructs a [Unit] in the form '100vh'
+  const factory Unit.vh(double value) = _VhUnit;
+
   /// The css value
   String get value;
 }
@@ -47,8 +52,7 @@ class _ZeroUnit implements Unit {
   String get value => '0';
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) || other is _Unit && other._value == 0;
+  bool operator ==(Object other) => identical(this, other) || other is _Unit && other._value == 0;
 
   @override
   int get hashCode => 0;
@@ -80,12 +84,8 @@ class _Unit implements Unit {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      _value == 0 &&
-          (other is _ZeroUnit || (other is _Unit && other._value == 0)) ||
-      other is _Unit &&
-          runtimeType == other.runtimeType &&
-          _unit == other._unit &&
-          _value == other._value;
+      _value == 0 && (other is _ZeroUnit || (other is _Unit && other._value == 0)) ||
+      other is _Unit && runtimeType == other.runtimeType && _unit == other._unit && _value == other._value;
 
   @override
   int get hashCode => _value == 0 ? 0 : _unit.hashCode ^ _value.hashCode;
@@ -113,6 +113,10 @@ class _RemUnit extends _Unit {
 
 class _VwUnit extends _Unit {
   const _VwUnit(double value) : super(value, 'vw');
+}
+
+class _VhUnit extends _Unit {
+  const _VhUnit(double value) : super(value, 'vh');
 }
 
 extension NumberString on double {
