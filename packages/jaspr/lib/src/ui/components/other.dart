@@ -1,26 +1,19 @@
-import 'base.dart';
+import '../../../jaspr.dart';
 
-class Link extends BaseComponent {
-  final Uri target;
-  final bool openInNewTab;
-
+class Link extends StatelessComponent {
   const Link({
-    required this.target,
-    this.openInNewTab = false,
     super.key,
-    super.id,
-    super.styles,
-    super.classes,
-    super.attributes,
-    super.events,
-    super.child,
-    super.children,
-  }) : super(tag: 'a');
+    required this.url,
+    this.openInNewTab = false,
+    required this.children,
+  });
+
+  final Uri url;
+  final bool openInNewTab;
+  final List<Component> children;
 
   @override
-  Map<String, String> getAttributes() => {
-        'href': target.toString(),
-        if (openInNewTab) 'target': '_blank',
-        ...super.attributes ?? {},
-      };
+  Iterable<Component> build(BuildContext context) sync* {
+    yield a(href: url.toString(), target: openInNewTab ? Target.blank : null, children);
+  }
 }

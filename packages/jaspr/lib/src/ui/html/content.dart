@@ -370,12 +370,12 @@ Component ul(List<Component> children,
 ///
 /// - [reversed]: This Boolean attribute specifies that the list's items are in reverse order. Items will be numbered from high to low.
 /// - [start]: An integer to start counting from for the list items. Always an Arabic numeral (1, 2, 3, etc.), even when the numbering type is letters or Roman numerals. For example, to start numbering elements from the letter "d" or the Roman numeral "iv," use start="4".
-/// - [type]: Sets the numbering type
+/// - [type]: Sets the numbering type.
 ///   The specified type is used for the entire list unless a different type attribute is used on an enclosed &lt;li&gt; element.
 Component ol(List<Component> children,
     {bool? reversed,
     int? start,
-    ListType? type,
+    NumberingType? type,
     Key? key,
     String? id,
     List<String>? classes,
@@ -399,8 +399,8 @@ Component ol(List<Component> children,
   );
 }
 
-/// Them numbering type for a list element.
-enum ListType {
+/// The numbering type for a list element.
+enum NumberingType {
   /// For lowercase letters
   lowercaseLetters('a'),
 
@@ -417,7 +417,7 @@ enum ListType {
   numbers('1');
 
   final String value;
-  const ListType(this.value);
+  const NumberingType(this.value);
 }
 
 /// The &lt;li&gt; HTML element is used to represent an item in a list. It must be contained in a parent element: an ordered list (&lt;ol&gt;), an unordered list (&lt;ul&gt;), or a menu (&lt;menu&gt;). In menus and unordered lists, list items are usually displayed using bullet points. In ordered lists, they are usually displayed with an ascending counter on the left, such as a number or letter.

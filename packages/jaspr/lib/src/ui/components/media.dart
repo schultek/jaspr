@@ -1,122 +1,99 @@
 import '../../../jaspr.dart';
-import 'base.dart';
 
-class Image extends BaseComponent {
-  final double width;
-  final double height;
+class Image extends StatelessComponent {
+  const Image({
+    super.key,
+    required this.source,
+    this.width,
+    this.height,
+    this.description,
+    this.tooltip,
+    this.lazyLoading = false,
+  });
+
+  final int? width;
+  final int? height;
   final Uri source;
   final String? description;
   final String? tooltip;
   final bool lazyLoading;
 
-  const Image({
-    required this.source,
-    this.width = 320,
-    this.height = 240,
-    this.description,
-    this.tooltip,
-    this.lazyLoading = false,
-    super.key,
-    super.id,
-    super.styles,
-    super.classes,
-    super.attributes,
-    super.events,
-    super.child,
-    super.children,
-  }) : super(tag: 'img');
-
   @override
-  Map<String, String> getAttributes() => {
-        'width': width.toString(),
-        'height': height.toString(),
-        'src': source.toString(),
-        if (description != null) 'alt': description!,
-        if (tooltip != null) 'title': tooltip!,
-        if (lazyLoading) 'loading': 'lazy',
-        ...super.attributes ?? {},
-      };
+  Iterable<Component> build(BuildContext context) sync* {
+    yield img(src: source.toString(), width: width, height: height, alt: description, attributes: {
+      if (tooltip != null) 'title': tooltip!,
+      if (lazyLoading) 'loading': 'lazy',
+    });
+  }
 }
 
-class Video extends BaseComponent {
-  final double width;
-  final double height;
-  final Uri source;
-  final String defaultText;
-  final bool showControls;
-  final bool autoplay;
-  final bool loop;
-  final bool muted;
-  final Uri? poster;
-
+class Video extends StatelessComponent {
   const Video({
+    super.key,
     required this.source,
-    this.width = 320,
-    this.height = 240,
+    this.width,
+    this.height,
     this.defaultText = 'Video cannot be played.',
     this.showControls = true,
     this.autoplay = false,
     this.loop = false,
     this.muted = false,
     this.poster,
-    super.key,
-    super.id,
-    super.styles,
-    super.classes,
-    super.attributes,
-    super.events,
-  }) : super(tag: 'video');
+  });
 
-  @override
-  List<Component> getChildren() => [Text(defaultText)];
-
-  @override
-  Map<String, String> getAttributes() => {
-        'width': width.toString(),
-        'height': height.toString(),
-        'src': source.toString(),
-        if (showControls) 'controls': '',
-        if (autoplay) 'autoplay': '',
-        if (loop) 'loop': '',
-        if (muted) 'muted': '',
-        if (poster != null) 'poster': poster.toString(),
-        ...super.attributes ?? {},
-      };
-}
-
-class Audio extends BaseComponent {
   final Uri source;
-  final String defaultText;
+  final int? width;
+  final int? height;
+  final String? defaultText;
   final bool showControls;
   final bool autoplay;
   final bool loop;
   final bool muted;
+  final Uri? poster;
 
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield video(
+      src: source.toString(),
+      width: width,
+      height: height,
+      autoplay: autoplay,
+      loop: loop,
+      muted: muted,
+      controls: showControls,
+      poster: poster?.toString(),
+      [if (defaultText != null) text(defaultText!)],
+    );
+  }
+}
+
+class Audio extends StatelessComponent {
   const Audio({
+    super.key,
     required this.source,
     this.defaultText = 'Audio cannot be played.',
     this.showControls = true,
     this.autoplay = false,
     this.loop = false,
     this.muted = false,
-    super.key,
-    super.id,
-    super.styles,
-    super.classes,
-    super.attributes,
-    super.events,
-  }) : super(tag: 'audio');
+  });
+
+  final Uri source;
+  final String? defaultText;
+  final bool showControls;
+  final bool autoplay;
+  final bool loop;
+  final bool muted;
 
   @override
-  List<Component> getChildren() => [Text(defaultText)];
-
-  @override
-  Map<String, String> getAttributes() => {
-        'src': source.toString(),
-        if (showControls) 'controls': '',
-        if (autoplay) 'autoplay': '',
-        if (loop) 'loop': '',
-        if (muted) 'muted': '',
-        ...super.attributes ?? {},
-      };
+  Iterable<Component> build(BuildContext context) sync* {
+    yield audio(
+      src: source.toString(),
+      autoplay: autoplay,
+      loop: loop,
+      muted: muted,
+      controls: showControls,
+      [if (defaultText != null) text(defaultText!)],
+    );
+  }
 }

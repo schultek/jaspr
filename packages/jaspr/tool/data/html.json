@@ -72,10 +72,10 @@
           "type": "int"
         },
         "type": {
-          "doc": "Sets the numbering type\nThe specified type is used for the entire list unless a different type attribute is used on an enclosed &lt;li&gt; element.",
+          "doc": "Sets the numbering type.\nThe specified type is used for the entire list unless a different type attribute is used on an enclosed &lt;li&gt; element.",
           "type": {
-            "name": "ListType",
-            "doc": "Them numbering type for a list element.",
+            "name": "NumberingType",
+            "doc": "The numbering type for a list element.",
             "values": {
               "lowercaseLetters": {
                 "value": "a",

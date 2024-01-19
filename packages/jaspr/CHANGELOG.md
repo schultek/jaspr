@@ -10,6 +10,7 @@
 - Added new `Colors.transparent` color.
 - Added `Unit.auto`, `Unit.vw` and `Unit.vh` for responsive styling.
 - Added `StyleRule.fontFace` to add external font files.
+- Refactored components from `jaspr/components`.
 
 ## 0.9.3
 
