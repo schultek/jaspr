@@ -24,7 +24,7 @@ class PlaygroundHeader extends StatelessComponent {
           span([text('JasprPad')]),
         ],
       ),
-      div([
+      div(styles: Styles.text(whiteSpace: WhiteSpace.noWrap), [
         Button(
           id: 'jnew-button',
           label: 'New Pad',
@@ -108,7 +108,6 @@ class SamplesMenuButton extends StatelessComponent with SyncProviderDependencies
   @override
   Iterable<Component> build(BuildContext context) sync* {
     var samples = context.watch(syncSamplesProvider).valueOrNull ?? [];
-    print("SAMPLES $samples");
 
     yield Menu(
       items: [

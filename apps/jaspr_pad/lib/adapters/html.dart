@@ -8,5 +8,6 @@ import 'package:jaspr/jaspr.dart';
   #CustomEvent,
   #MouseEvent,
   #Event,
+  #InputElement,
 ])
 export 'html.imports.dart';

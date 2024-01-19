@@ -31,19 +31,21 @@ class NewFileDialogState extends State<NewFileDialog> {
     return false;
   }
 
+  late final textField = TextField(
+    label: 'Name',
+    expand: true,
+    onChange: (value) {
+      setState(() {
+        filename = value;
+      });
+    },
+  );
+
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield Dialog(
       title: 'New File',
-      content: TextField(
-        label: 'Name',
-        expand: true,
-        onChange: (value) {
-          setState(() {
-            filename = value;
-          });
-        },
-      ),
+      content: textField,
       actions: [
         Button(
           label: 'Cancel',

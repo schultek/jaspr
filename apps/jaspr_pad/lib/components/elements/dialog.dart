@@ -90,7 +90,9 @@ class DialogState extends State<DialogSlot> {
     _sub?.close();
     _sub = context.subscribe<_DialogState?>(_dialogStateProvider(component.slotId), (_, state) {
       if (state != null && _dialog != null && !_dialog!.isOpen) {
-        _dialog!.open();
+        context.binding.addPostFrameCallback(() {
+          _dialog!.open();
+        });
       } else if (state == null && _dialog != null && _dialog!.isOpen) {
         _dialog!.close();
       }
@@ -123,7 +125,7 @@ class DialogState extends State<DialogSlot> {
         });
       },
       child: div(
-        classes: ['mdc-dialog', if (state != null) 'mdc-dialog--open'],
+        classes: ['mdc-dialog'],
         attributes: {'role': 'alertdialog', 'aria-modal': 'true'},
         [
           if (state != null) state.builder(context) else Dialog(content: Text(''), title: '', actions: []),
