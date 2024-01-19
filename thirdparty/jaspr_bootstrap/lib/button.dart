@@ -1,17 +1,12 @@
 import 'package:jaspr/components.dart';
 
-class Button extends BaseComponent {
+class Button extends StatelessComponent {
   const Button({
     super.key,
-    super.id,
-    super.styles,
-    super.classes,
-    super.attributes,
-    super.events,
-    super.child,
-    super.children,
-  }) : super(tag: 'button');
+  });
 
   @override
-  List<String> getClasses() => ['btn', 'btn-primary'];
+  Iterable<Component> build(BuildContext context) sync* {
+    yield button(classes: ['btn', 'btn-primary'], []);
+  }
 }
