@@ -16,6 +16,9 @@ dev_dependencies:
   jaspr_builder: ^0.9.0
   lints: ^2.1.0
 
+dependency_overrides:
+  hotreloader: ^4.1.0
+  
 jaspr:
   use-ssr: true
   dev-command: dart_frog dev
