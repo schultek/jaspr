@@ -11,6 +11,7 @@ import 'package:meta/meta.dart';
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
+import '../foundation/events.dart';
 import '../foundation/object.dart';
 import '../ui/styles/styles.dart';
 

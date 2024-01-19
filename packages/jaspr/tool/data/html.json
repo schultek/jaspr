@@ -520,6 +520,10 @@
               }
             }
           }
+        },
+        "onClick": {
+          "doc": "Callback for the 'click' event.",
+          "type": "event:onClick:VoidCallback"
         }
       }
     },
@@ -691,6 +695,14 @@
         "disabled": {
           "doc": "Indicates that the user should not be able to interact with the input. Disabled inputs are typically rendered with a dimmer color or using some other form of indication that the field is not available for use.",
           "type": "boolean"
+        },
+        "onInput": {
+          "doc": "Callback for the 'input' event. The type of [value] depends on [type].",
+          "type": "event:onInput:ValueChanged<dynamic>"
+        },
+        "onChange": {
+          "doc": "Callback for the 'change' event. The type of [value] depends on [type].",
+          "type": "event:onChange:ValueChanged<dynamic>"
         }
       }
     },
@@ -817,6 +829,14 @@
         "size": {
           "doc": "If the control is presented as a scrolling list box (e.g. when multiple is specified), this attribute represents the number of rows in the list that should be visible at one time. Browsers are not required to present a select element as a scrolled list box. The default value is 0.",
           "type": "int"
+        },
+        "onInput": {
+          "doc": "Callback for the 'input' event.",
+          "type": "event:onInput:ValueChanged<List<String>>"
+        },
+        "onChange": {
+          "doc": "Callback for the 'change' event.",
+          "type": "event:onChange:ValueChanged<List<String>>"
         }
       }
     },
@@ -914,6 +934,14 @@
               }
             }
           }
+        },
+        "onInput": {
+          "doc": "Callback for the 'input' event.",
+          "type": "event:onInput:ValueChanged<String>"
+        },
+        "onChange": {
+          "doc": "Callback for the 'change' event.",
+          "type": "event:onChange:ValueChanged<String>"
         }
       }
     }

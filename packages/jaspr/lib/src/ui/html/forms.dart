@@ -5,10 +5,12 @@ part of jaspr_html;
 /// - [autofocus]: Specifies that the button should have input focus when the page loads. Only one element in a document can have this attribute.
 /// - [disabled]: Prevents the user from interacting with the button: it cannot be pressed or focused.
 /// - [type]: The default behavior of the button.
+/// - [onClick]: Callback for the 'click' event.
 Component button(List<Component> children,
     {bool? autofocus,
     bool? disabled,
     ButtonType? type,
+    VoidCallback? onClick,
     Key? key,
     String? id,
     List<String>? classes,
@@ -27,7 +29,10 @@ Component button(List<Component> children,
       if (disabled == true) 'disabled': '',
       if (type != null) 'type': type.value,
     },
-    events: events,
+    events: {
+      ...?events,
+      ..._events(onClick: onClick),
+    },
     children: children,
   );
 }
@@ -141,11 +146,15 @@ enum AutoComplete {
 /// - [name]: Name of the form control. Submitted with the form as part of a name/value pair
 /// - [value]: The initial value of the control
 /// - [disabled]: Indicates that the user should not be able to interact with the input. Disabled inputs are typically rendered with a dimmer color or using some other form of indication that the field is not available for use.
+/// - [onInput]: Callback for the 'input' event. The type of [value] depends on [type].
+/// - [onChange]: Callback for the 'change' event. The type of [value] depends on [type].
 Component input(List<Component> children,
     {InputType? type,
     String? name,
     String? value,
     bool? disabled,
+    ValueChanged<dynamic>? onInput,
+    ValueChanged<dynamic>? onChange,
     Key? key,
     String? id,
     List<String>? classes,
@@ -165,7 +174,10 @@ Component input(List<Component> children,
       if (value != null) 'value': value,
       if (disabled == true) 'disabled': '',
     },
-    events: events,
+    events: {
+      ...?events,
+      ..._events(onInput: onInput, onChange: onChange),
+    },
     children: children,
   );
 }
@@ -451,6 +463,8 @@ Component option(List<Component> children,
 /// - [autofocus]: This attribute lets you specify that a form control should have input focus when the page loads. Only one form element in a document can have the autofocus attribute.
 /// - [autocomplete]: A string providing a hint for a user agent's autocomplete feature.
 /// - [size]: If the control is presented as a scrolling list box (e.g. when multiple is specified), this attribute represents the number of rows in the list that should be visible at one time. Browsers are not required to present a select element as a scrolled list box. The default value is 0.
+/// - [onInput]: Callback for the 'input' event.
+/// - [onChange]: Callback for the 'change' event.
 Component select(List<Component> children,
     {String? name,
     bool? multiple,
@@ -459,6 +473,8 @@ Component select(List<Component> children,
     bool? autofocus,
     String? autocomplete,
     int? size,
+    ValueChanged<List<String>>? onInput,
+    ValueChanged<List<String>>? onChange,
     Key? key,
     String? id,
     List<String>? classes,
@@ -481,7 +497,10 @@ Component select(List<Component> children,
       if (autocomplete != null) 'autocomplete': autocomplete,
       if (size != null) 'size': '$size',
     },
-    events: events,
+    events: {
+      ...?events,
+      ..._events(onInput: onInput, onChange: onChange),
+    },
     children: children,
   );
 }
@@ -529,6 +548,8 @@ Component fieldset(List<Component> children,
 /// - [rows]: The number of visible text lines for the control. If it is specified, it must be a positive integer. If it is not specified, the default value is 2.
 /// - [spellCheck]: Specifies whether the &lt;textarea&gt; is subject to spell checking by the underlying browser/OS.
 /// - [wrap]: Indicates how the control wraps text. If this attribute is not specified, soft is its default value.
+/// - [onInput]: Callback for the 'input' event.
+/// - [onChange]: Callback for the 'change' event.
 Component textarea(List<Component> children,
     {AutoComplete? autoComplete,
     bool? autofocus,
@@ -542,6 +563,8 @@ Component textarea(List<Component> children,
     int? rows,
     SpellCheck? spellCheck,
     TextWrap? wrap,
+    ValueChanged<String>? onInput,
+    ValueChanged<String>? onChange,
     Key? key,
     String? id,
     List<String>? classes,
@@ -569,7 +592,10 @@ Component textarea(List<Component> children,
       if (spellCheck != null) 'spellcheck': spellCheck.value,
       if (wrap != null) 'wrap': wrap.value,
     },
-    events: events,
+    events: {
+      ...?events,
+      ..._events(onInput: onInput, onChange: onChange),
+    },
     children: children,
   );
 }

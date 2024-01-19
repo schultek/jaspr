@@ -3,6 +3,7 @@ import 'dart:html' as html show Element, Text;
 import 'dart:html';
 
 import '../foundation/constants.dart';
+import '../foundation/events.dart';
 import '../framework/framework.dart';
 
 const xmlns = {
