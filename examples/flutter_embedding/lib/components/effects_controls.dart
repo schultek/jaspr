@@ -16,7 +16,9 @@ class EffectsControls extends StatelessComponent {
       return input(
         value: label,
         type: InputType.button,
-        classes: ['fx', if (alignTop) 'align-top', if (fx != 'handheld' && effects.contains('handheld')) 'disabled'],
+        classes: 'fx'
+            '${alignTop ? ' align-top' : ''}'
+            '${fx != 'handheld' && effects.contains('handheld') ? ' disabled' : ''}',
         attributes: {'data-fx': fx},
         [],
       );
@@ -42,15 +44,13 @@ class EffectsControls extends StatelessComponent {
       effectButton('Shadow', 'shadow'),
       effectButton('Mirror 🧪', 'mirror'),
       effectButton('Resize', 'resize', true),
-      div(classes: [
-        'tight'
-      ], [
+      div(classes: 'tight', [
         effectButton('Spin', 'spin'),
         input(
           value: context.watch(rotationProvider).toString(),
           type: InputType.range,
           id: 'rotation',
-          classes: ['tight', if (effects.contains('handheld')) 'disabled'],
+          classes: 'tight${effects.contains('handheld') ? ' disabled' : ''}',
           attributes: {'min': '-180', 'max': '180', 'list': 'markers'},
           [],
         ),

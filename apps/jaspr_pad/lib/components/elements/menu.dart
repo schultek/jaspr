@@ -13,15 +13,15 @@ class MenuItem extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield li(
-      classes: ['mdc-list-item', 'channel-menu-list'],
+      classes: 'mdc-list-item channel-menu-list',
       attributes: {'role': 'menuitem'},
       [
         img(
-          classes: ['mdc-list-item__graphic'],
+          classes: 'mdc-list-item__graphic',
           src: 'https://dartpad.dev/pictures/logo_dart.png',
         ),
         span(
-          classes: ['mdc-list-item__text'],
+          classes: 'mdc-list-item__text',
           [text(label)],
         ),
       ],
@@ -94,10 +94,10 @@ class MenuElement extends StatelessElement {
           },
           child: div(
             id: 'samples-menu',
-            classes: ['mdc-menu', 'mdc-menu-surface'],
+            classes: 'mdc-menu mdc-menu-surface',
             [
               ul(
-                classes: ['mdc-list'],
+                classes: 'mdc-list',
                 attributes: {'aria-hidden': 'true', 'aria-orientation': 'vertical', 'tabindex': '-1'},
                 component.items,
               ),

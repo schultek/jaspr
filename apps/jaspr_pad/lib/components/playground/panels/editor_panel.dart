@@ -25,9 +25,7 @@ class EditorPanelState extends State<EditorPanel> {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield div(id: 'editor-panel', [
-      div(id: 'editor-panel-header', classes: [
-        'header'
-      ], [
+      div(id: 'editor-panel-header', classes: 'header', [
         nav([
           TabBar(
             key: ValueKey(context.watch(editProjectProvider)?.id),
@@ -50,9 +48,7 @@ class EditorPanelState extends State<EditorPanel> {
             ],
           )
         ]),
-        div(classes: [
-          'button-group'
-        ], [
+        div(classes: 'button-group', [
           Builder(builder: (context) sync* {
             yield Button(
               id: 'run-button',
@@ -122,7 +118,7 @@ class EditorPanelState extends State<EditorPanel> {
               ),
               if (activeFile != null && ProjectData.canDelete(activeFile))
                 button(
-                  classes: ["mdc-icon-button", "material-icons"],
+                  classes: '"mdc-icon-button material-icons',
                   styles: Styles.combine([
                     Styles.box(
                       position: Position.absolute(top: 4.px, right: 4.px),

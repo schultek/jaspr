@@ -39,13 +39,9 @@ class SnackBarState extends State<SnackBar> {
           _snackbar = MDCSnackbar(node);
         }
       },
-      child: div(classes: [
-        'mdc-snackbar'
-      ], [
-        div(classes: [
-          'mdc-snackbar__surface'
-        ], [
-          div(classes: ['mdc-snackbar__label'], attributes: {'role': 'status', 'aria-live': 'polite'}, []),
+      child: div(classes: 'mdc-snackbar', [
+        div(classes: 'mdc-snackbar__surface', [
+          div(classes: 'mdc-snackbar__label', attributes: {'role': 'status', 'aria-live': 'polite'}, []),
         ]),
       ]),
     );

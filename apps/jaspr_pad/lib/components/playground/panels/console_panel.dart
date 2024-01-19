@@ -10,15 +10,11 @@ class ConsolePanel extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     var messages = context.watch(consoleMessagesProvider);
 
-    yield div(
-      styles: Styles.flexbox(direction: FlexDirection.column),
-      classes: ['console', 'custom-scrollbar'],
-      [
-        for (var msg in messages)
-          span(styles: Styles.box(width: Unit.zero), [
-            text(msg, rawHtml: true),
-          ]),
-      ],
-    );
+    yield div(classes: 'console custom-scrollbar', styles: Styles.flexbox(direction: FlexDirection.column), [
+      for (var msg in messages)
+        span(styles: Styles.box(width: Unit.zero), [
+          text(msg, rawHtml: true),
+        ]),
+    ]);
   }
 }

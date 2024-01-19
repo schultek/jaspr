@@ -12,9 +12,7 @@ class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield ProviderScope(
-      child: section(classes: [
-        'contents'
-      ], [
+      child: section(classes: 'contents', [
         FlutterAppContainer(),
         aside(id: 'demo_controls', [
           h1([text('Element embedding')]),

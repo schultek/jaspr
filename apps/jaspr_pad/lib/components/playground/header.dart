@@ -14,16 +14,11 @@ class PlaygroundHeader extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield header(classes: [
-      'mdc-elevation--z4'
-    ], [
-      div(
-        classes: ['header-title'],
-        [
-          img(classes: ['logo'], src: "jaspr-192.png", alt: "JasprPad Logo"),
-          span([text('JasprPad')]),
-        ],
-      ),
+    yield header(classes: 'mdc-elevation--z4', [
+      div(classes: 'header-title', [
+        img(classes: 'logo', src: "jaspr-192.png", alt: "JasprPad Logo"),
+        span([text('JasprPad')]),
+      ]),
       div(styles: Styles.text(whiteSpace: WhiteSpace.noWrap), [
         Button(
           id: 'jnew-button',
@@ -66,7 +61,7 @@ class PlaygroundHeader extends StatelessComponent {
       ]),
       Builder(builder: (context) sync* {
         var name = context.watch(projectNameProvider);
-        yield div(classes: ['header-gist-name'], [text(name ?? '')]);
+        yield div(classes: 'header-gist-name', [text(name ?? '')]);
       }),
       Button(
         dense: true,

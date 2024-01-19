@@ -12,9 +12,9 @@ class App extends StatelessComponent {
           background: blue;
         }
       ''',
-      child: DomComponent(tag: 'div', classes: ['content']), // this will be blue
+      child: div(classes: 'content', []), // this will be blue
     );
 
-    yield DomComponent(tag: 'div', classes: ['content']); // this not
+    yield div(classes: 'content', []); // this not
   }
 }

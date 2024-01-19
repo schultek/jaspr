@@ -12,26 +12,16 @@ class PlaygroundFooter extends StatelessComponent {
       //     attributes: {'aria-hidden': 'true'},
       //     [text('keyboard')],
       //   ),
-      div(classes: [
-        'footer-item'
-      ], [
-        a(
-          href: 'https://docs.page/schultek/jaspr',
-          target: Target.blank,
-          classes: ['footer-item'],
-          [text('Jaspr Docs')],
-        ),
-        a(
-          href: 'https://discord.gg/XGXrGEk4c6',
-          target: Target.blank,
-          classes: ['footer-item'],
-          [text('Join the Community')],
-        ),
-        a(
-          href: 'https://github.com/schultek/jaspr/issues',
-          target: Target.blank,
-          [text('Send feedback')],
-        ),
+      div(classes: 'footer-item', [
+        a(href: 'https://docs.page/schultek/jaspr', target: Target.blank, classes: 'footer-item', [
+          text('Jaspr Docs'),
+        ]),
+        a(href: 'https://discord.gg/XGXrGEk4c6', target: Target.blank, classes: 'footer-item', [
+          text('Join the Community'),
+        ]),
+        a(href: 'https://github.com/schultek/jaspr/issues', target: Target.blank, [
+          text('Send feedback'),
+        ]),
       ])
     ]);
   }

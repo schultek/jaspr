@@ -19,7 +19,7 @@ class _InteropControlsState extends State<InteropControls> {
       legend([text('JS Interop')]),
       label(htmlFor: 'screen-selector', [
         text('Screen'),
-        select(name: 'screen-select', id: 'screen-selector', classes: ['screen'], onChange: (value) {
+        select(name: 'screen-select', id: 'screen-selector', classes: 'screen', onChange: (value) {
           context.read(appStateProvider.notifier).changeDemoScreenTo(DemoScreen.values.byName(value.first));
         }, [
           option(value: 'counter', [text('Counter')]),
@@ -27,19 +27,20 @@ class _InteropControlsState extends State<InteropControls> {
           option(value: 'custom', [text('Custom App')]),
         ]),
       ]),
-      label(htmlFor: 'value', classes: [
-        if (state.currentScreen != DemoScreen.counter) 'disabled'
-      ], [
+      label(htmlFor: 'value', classes: state.currentScreen != DemoScreen.counter ? 'disabled' : null, [
         text('Value'),
         input(id: 'value', value: state.count.toString(), type: InputType.text, attributes: {'readonly': ''}, []),
       ]),
-      input(id: 'increment', value: 'Increment', type: InputType.button, classes: [
-        if (state.currentScreen != DemoScreen.counter) 'disabled'
-      ], events: {
-        'click': (_) {
+      input(
+        id: 'increment',
+        value: 'Increment',
+        type: InputType.button,
+        classes: state.currentScreen != DemoScreen.counter ? 'disabled' : null,
+        events: events(onClick: () {
           context.read(appStateProvider.notifier).increment();
-        }
-      }, []),
+        }),
+        [],
+      ),
     ]);
   }
 }

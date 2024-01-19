@@ -7,6 +7,6 @@ class Button extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield button(classes: ['btn', 'btn-primary'], []);
+    yield button(classes: 'btn btn-primary', []);
   }
 }

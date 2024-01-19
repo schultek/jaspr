@@ -25,19 +25,11 @@ class IssueItem extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield span(classes: [
-      'issue-item',
-      issue.kind.name
-    ], events: {
-      'click': (e) {
-        context.read(fileSelectionProvider(issue.sourceName).notifier).state = issue.location;
-        context.read(activeDocIndexProvider.notifier).state = context.read(fileNamesProvider).indexOf(issue.sourceName);
-      }
-    }, [
-      i(
-        classes: ['material-icons'],
-        [text(issue.kind.name)],
-      ),
+    yield span(classes: 'issue-item ${issue.kind.name}', events: events(onClick: () {
+      context.read(fileSelectionProvider(issue.sourceName).notifier).state = issue.location;
+      context.read(activeDocIndexProvider.notifier).state = context.read(fileNamesProvider).indexOf(issue.sourceName);
+    }), [
+      i(classes: 'material-icons', [text(issue.kind.name)]),
       text(issue.message),
     ]);
   }

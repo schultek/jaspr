@@ -20,56 +20,42 @@ class TutorialPanel extends StatelessComponent {
     }
 
     yield div(id: 'steps-panel', [
-      div(id: 'markdown-content', classes: [
-        'custom-scrollbar'
-      ], [
+      div(id: 'markdown-content', classes: 'custom-scrollbar', [
         Markdown(markdown: tutorial.step.text),
       ]),
       div(id: 'steps-row', [
-        div(
-          id: 'step-button-container',
-          [
-            Button(
-              icon: 'keyboard_arrow_left',
-              disabled: tutorial.currentStep == 0,
-              onPressed: () {
-                context.read(logicProvider).prevTutorialStep();
-              },
-            ),
-            div(
-              id: 'steps-container',
-              [
-                div(
-                  id: 'steps-label',
-                  [text(tutorial.configs[tutorial.currentStep].name)],
+        div(id: 'step-button-container', [
+          Button(
+            icon: 'keyboard_arrow_left',
+            disabled: tutorial.currentStep == 0,
+            onPressed: () {
+              context.read(logicProvider).prevTutorialStep();
+            },
+          ),
+          div(id: 'steps-container', [
+            div(id: 'steps-label', [
+              text(tutorial.configs[tutorial.currentStep].name),
+            ]),
+            div(id: 'steps-menu-items', [
+              for (var step in tutorial.configs.reversed)
+                a(
+                  href: '',
+                  classes: 'step-menu-item',
+                  events: events(onClick: () {
+                    context.read(logicProvider).selectTutorialStep(step.id);
+                  }),
+                  [text(step.name)],
                 ),
-                div(
-                  id: 'steps-menu-items',
-                  [
-                    for (var step in tutorial.configs.reversed)
-                      a(
-                        href: '',
-                        classes: ['step-menu-item'],
-                        events: {
-                          'click': (_) {
-                            context.read(logicProvider).selectTutorialStep(step.id);
-                          }
-                        },
-                        [text(step.name)],
-                      ),
-                  ],
-                ),
-              ],
-            ),
-            Button(
-              icon: 'keyboard_arrow_right',
-              disabled: tutorial.currentStep == tutorial.configs.length - 1,
-              onPressed: () {
-                context.read(logicProvider).nextTutorialStep();
-              },
-            ),
-          ],
-        ),
+            ]),
+          ]),
+          Button(
+            icon: 'keyboard_arrow_right',
+            disabled: tutorial.currentStep == tutorial.configs.length - 1,
+            onPressed: () {
+              context.read(logicProvider).nextTutorialStep();
+            },
+          ),
+        ]),
         Hidden(
           visibilityMode: true,
           hidden: tutorial.step.solution == null,

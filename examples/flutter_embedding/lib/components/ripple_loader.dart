@@ -12,7 +12,7 @@ class RippleLoader extends StatelessComponent {
         Styles.background(color: Colors.black),
       ]),
       [
-        div(classes: ['lds-ripple'], [div([]), div([])])
+        div(classes: 'lds-ripple', [div([]), div([])])
       ],
     );
   }

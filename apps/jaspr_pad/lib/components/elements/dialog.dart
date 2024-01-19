@@ -53,15 +53,11 @@ class Dialog extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: [
-      'mdc-dialog__container'
-    ], [
-      div(classes: [
-        'mdc-dialog__surface'
-      ], [
-        h2(classes: ['mdc-dialog__title'], [text(title)]),
-        div(classes: ['mdc-dialog__content'], [content]),
-        footer(classes: ['mdc-dialog__actions'], actions),
+    yield div(classes: 'mdc-dialog__container', [
+      div(classes: 'mdc-dialog__surface', [
+        h2(classes: 'mdc-dialog__title', [text(title)]),
+        div(classes: 'mdc-dialog__content', [content]),
+        footer(classes: 'mdc-dialog__actions', actions),
       ]),
     ]);
   }
@@ -125,11 +121,11 @@ class DialogState extends State<DialogSlot> {
         });
       },
       child: div(
-        classes: ['mdc-dialog'],
+        classes: 'mdc-dialog',
         attributes: {'role': 'alertdialog', 'aria-modal': 'true'},
         [
           if (state != null) state.builder(context) else Dialog(content: Text(''), title: '', actions: []),
-          div(classes: ['mdc-dialog__scrim'], []),
+          div(classes: 'mdc-dialog__scrim', []),
         ],
       ),
     );

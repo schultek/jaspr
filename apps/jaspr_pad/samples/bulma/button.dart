@@ -28,13 +28,11 @@ class Button extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield button(
-      classes: [
-        'button',
-        if (color != null) 'is-${color!.name}',
-        if (isOutlined) 'is-outlined',
-        if (isLoading) 'is-loading',
-        if (isBlock) 'block',
-      ],
+      classes: 'button'
+          '${color != null ? ' is-${color!.name}' : ''}'
+          '${isOutlined ? ' is-outlined' : ''}'
+          '${isLoading ? ' is-loading' : ''}'
+          '${isBlock ? ' block' : ''}',
       disabled: isDisabled,
       onClick: onPressed,
       [child],
@@ -50,11 +48,7 @@ class IconLabel extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield span(classes: [
-      'icon'
-    ], [
-      i(classes: ['fas', 'fa-$icon'], [])
-    ]);
+    yield span(classes: 'icon', [i(classes: 'fas fa-$icon', [])]);
     yield span([text(label)]);
   }
 }
@@ -68,6 +62,6 @@ class ButtonGroup extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: ['buttons', if (isAttached) 'has-addons', 'block'], children);
+    yield div(classes: 'buttons ${isAttached ? ' has-addons' : ''} block', children);
   }
 }

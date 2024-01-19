@@ -20,23 +20,24 @@ class _TabsState extends State<Tabs> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: [
-      'tabs',
-      if (component.isBoxed) 'is-boxed',
-      if (component.isToggle) 'is-toggle'
-    ], [
-      ul([
-        for (var i = 0; i < component.tabs.length; i++)
-          Tab(
-            selected: i == selected,
-            onSelected: () {
-              setState(() => selected = i);
-              component.onSelected(i);
-            },
-            child: component.tabs[i],
-          ),
-      ]),
-    ]);
+    yield div(
+      classes: 'tabs'
+          '${component.isBoxed ? ' is-boxed' : ''}'
+          '${component.isToggle ? ' is-toggle' : ''}',
+      [
+        ul([
+          for (var i = 0; i < component.tabs.length; i++)
+            Tab(
+              selected: i == selected,
+              onSelected: () {
+                setState(() => selected = i);
+                component.onSelected(i);
+              },
+              child: component.tabs[i],
+            ),
+        ]),
+      ],
+    );
   }
 }
 
@@ -50,7 +51,7 @@ class Tab extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield li(
-      classes: [if (selected) 'is-active'],
+      classes: selected ? 'is-active' : null,
       events: events(onClick: onSelected),
       [
         a(href: '', [child])

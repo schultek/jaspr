@@ -5,6 +5,6 @@ class Counter extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: ['container'], []);
+    yield div(classes: 'container', []);
   }
 }

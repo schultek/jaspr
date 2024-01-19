@@ -56,19 +56,18 @@ class ButtonState extends State<Button> {
           if (component.raised) 'mdc-button--raised',
           if (component.dense) 'mdc-button--dense',
           if (component.dialog) 'mdc-dialog__button'
-        ],
+        ].join(' '),
         id: component.id,
         attributes: {if (component.label != null) 'type': 'button', if (component.disabled) 'disabled': ''},
         events: {'click': (e) => component.onPressed()},
         [
           if (component.label != null && component.iconAffinity == IconAffinity.right)
-            span(
-              classes: ['mdc-button__label'],
-              [text(component.label!)],
-            ),
+            span(classes: 'mdc-button__label', [
+              text(component.label!),
+            ]),
           if (component.label != null && component.icon != null)
             i(
-              classes: ['material-icons mdc-button__icon'],
+              classes: 'material-icons mdc-button__icon',
               attributes: {if (component.hideIcon) 'aria-hidden': 'true'},
               [text(component.icon!)],
             ),

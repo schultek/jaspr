@@ -20,7 +20,7 @@ class FlutterTarget extends StatelessComponent {
 
     Component child = FlutterEmbedView(
       key: GlobalObjectKey('flutter_target'),
-      classes: isHandheld ? ['handheld'] : effects.toList(),
+      classes: isHandheld ? 'handheld' : effects.join(' '),
       styles: !isHandheld && rotation != 0
           ? Styles.box(
               transform: Transform.combine([
@@ -36,9 +36,7 @@ class FlutterTarget extends StatelessComponent {
     if (isHandheld) {
       child = div(id: 'handheld', [
         child,
-        span(classes: [
-          'imageAttribution'
-        ], [
+        span(classes: 'imageAttribution', [
           text('Photo by '),
           a(
             href: 'https://unsplash.com/photos/x9WGMWwp1NM',

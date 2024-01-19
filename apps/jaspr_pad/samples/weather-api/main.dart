@@ -59,13 +59,9 @@ class SimpleWeather extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: [
-      'weather'
-    ], [
+    yield div(classes: 'weather', [
       img(src: weather.condition.icon),
-      div(classes: [
-        'info'
-      ], [
+      div(classes: 'info', [
         h1([text('${weather.temp}°')]),
         span([text('${weather.location.name}, ${weather.location.country}')])
       ])
@@ -88,24 +84,21 @@ class SearchBarState extends State<SearchBar> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(
-      classes: ['searchbar'],
-      [
-        input(
-          type: InputType.text,
-          attributes: {if (component.placeholder != null) 'placeholder': component.placeholder!},
-          onInput: (value) {
-            setState(() => search = value);
-          },
-          [],
-        ),
-        button(
-          onClick: () {
-            component.onSearch(search);
-          },
-          [text('Search')],
-        ),
-      ],
-    );
+    yield div(classes: 'searchbar', [
+      input(
+        type: InputType.text,
+        attributes: {if (component.placeholder != null) 'placeholder': component.placeholder!},
+        onInput: (value) {
+          setState(() => search = value);
+        },
+        [],
+      ),
+      button(
+        onClick: () {
+          component.onSearch(search);
+        },
+        [text('Search')],
+      ),
+    ]);
   }
 }

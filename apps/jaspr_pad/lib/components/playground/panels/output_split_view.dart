@@ -59,14 +59,10 @@ class EditorTabs extends StatelessComponent {
 
     yield div(
       id: 'editor-panel-footer',
-      classes: ['editor-tab-host', if (isClosed) 'border-top'],
+      classes: 'editor-tab-host ${isClosed ? ' border-top' : ''}',
       [
-        div(classes: [
-          'editor-tabs'
-        ], [
-          div(classes: [
-            'tab-group'
-          ], [
+        div(classes: 'editor-tabs', [
+          div(classes: 'tab-group', [
             if (isTutorial)
               EditorTab(
                 id: 'editor-panel-ui-tab',
@@ -94,26 +90,22 @@ class EditorTabs extends StatelessComponent {
               var isConsole = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.console));
               yield button(
                 id: 'left-console-clear-button',
-                classes: ['console-clear-icon', 'mdc-icon-button'],
+                classes: 'console-clear-icon mdc-icon-button',
                 styles: !isConsole ? Styles.box(visibility: Visibility.hidden) : null,
                 attributes: {'title': 'Clear console'},
-                events: {
-                  'click': (e) {
-                    context.read(consoleMessagesProvider.notifier).state = [];
-                  }
-                },
+                events: events(onClick: () {
+                  context.read(consoleMessagesProvider.notifier).state = [];
+                }),
                 [],
               );
             }),
             button(
-              id: "editor-panel-close-button",
-              classes: ["mdc-icon-button", "material-icons"],
+              id: 'editor-panel-close-button',
+              classes: 'mdc-icon-button material-icons',
               attributes: {if (isClosed) 'hidden': ''},
-              events: {
-                'click': (e) {
-                  context.read(tabsStateProvider.notifier).state = OutputTabsState.closed;
-                }
-              },
+              events: events(onClick: () {
+                context.read(tabsStateProvider.notifier).state = OutputTabsState.closed;
+              }),
               [text('close')],
             ),
           ]),
@@ -139,17 +131,15 @@ class EditorTab extends StatelessComponent {
 
     yield button(
       id: id,
-      classes: ['editor-tab', 'mdc-button', if (selected) 'active'],
-      events: {
-        'click': (e) {
-          var notifier = context.read(tabsStateProvider.notifier);
-          if (selected) {
-            notifier.state = OutputTabsState.closed;
-          } else {
-            notifier.state = value;
-          }
+      classes: 'editor-tab mdc-button${selected ? ' active' : ''}',
+      events: events(onClick: () {
+        var notifier = context.read(tabsStateProvider.notifier);
+        if (selected) {
+          notifier.state = OutputTabsState.closed;
+        } else {
+          notifier.state = value;
         }
-      },
+      }),
       [text(label)],
     );
   }

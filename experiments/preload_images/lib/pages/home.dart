@@ -37,7 +37,7 @@ class HomeState extends State<Home> with PreloadStateMixin, SyncStateMixin<Home,
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'div',
-      classes: ['images-list'],
+      classes: 'images-list',
       children: [
         for (var image in images)
           DomComponent(

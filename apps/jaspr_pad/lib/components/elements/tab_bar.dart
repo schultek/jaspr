@@ -43,19 +43,13 @@ class TabBarState extends State<TabBar> {
       },
       child: div(
         id: component.id,
-        classes: ['mdc-tab-bar'],
+        classes: 'mdc-tab-bar',
         styles: Styles.raw({'min-width': '1px'}),
         attributes: {'role': 'tablist'},
         [
-          div(classes: [
-            'mdc-tab-scroller'
-          ], [
-            div(classes: [
-              'mdc-tab-scroller__scroll-area'
-            ], [
-              div(classes: [
-                'mdc-tab-scroller__scroll-content'
-              ], [
+          div(classes: 'mdc-tab-scroller', [
+            div(classes: 'mdc-tab-scroller__scroll-area', [
+              div(classes: 'mdc-tab-scroller__scroll-content', [
                 if (component.leading != null) component.leading!,
                 for (var i = 0; i < component.tabs.length; i++)
                   ProviderScope(
@@ -83,7 +77,7 @@ class ButtonTab extends Tab {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield button(
-      classes: ['mdc-tab'],
+      classes: 'mdc-tab',
       events: {'click': (e) => onPressed()},
       attributes: {
         'role': 'tab',
@@ -91,15 +85,13 @@ class ButtonTab extends Tab {
       },
       styles: Styles.box(padding: EdgeInsets.symmetric(vertical: Unit.zero, horizontal: 16.px)),
       [
-        span(classes: [
-          'mdc-tab__content'
-        ], [
+        span(classes: 'mdc-tab__content', [
           span(
-            classes: ['mdc-tab__text-label'],
+            classes: 'mdc-tab__text-label',
             styles: Styles.raw({'display': 'inline-flex', 'align-items': 'center'}),
             [
               i(
-                classes: ['material-icons', 'mdc-tab__icon'],
+                classes: 'material-icons mdc-tab__icon',
                 styles: Styles.raw({'font-size': '20px', if (this.label.isNotEmpty) 'margin-right': '4px'}),
                 [text(icon)],
               ),
@@ -107,12 +99,10 @@ class ButtonTab extends Tab {
             ],
           ),
         ]),
-        span(classes: [
-          'mdc-tab-indicator'
-        ], [
-          span(classes: ['mdc-tab-indicator__content', 'mdc-tab-indicator__content--underline'], []),
+        span(classes: 'mdc-tab-indicator', [
+          span(classes: 'mdc-tab-indicator__content mdc-tab-indicator__content--underline', []),
         ]),
-        span(classes: ['mdc-tab__ripple'], []),
+        span(classes: 'mdc-tab__ripple', []),
       ],
     );
   }
@@ -128,7 +118,7 @@ class Tab extends StatelessComponent {
     var (selected, index, onSelect) = context.watch(_tabProvider);
 
     yield button(
-      classes: ['mdc-tab', if (selected) 'mdc-tab--active'],
+      classes: 'mdc-tab ${selected ? ' mdc-tab--active' : ''}',
       events: {'click': (e) => onSelect()},
       attributes: {
         'role': 'tab',
@@ -136,18 +126,13 @@ class Tab extends StatelessComponent {
         if (selected) 'aria-selected': "true",
       },
       [
-        span(classes: [
-          'mdc-tab__content'
-        ], [
-          span(classes: ['mdc-tab__text-label'], [text(label)]),
+        span(classes: 'mdc-tab__content', [
+          span(classes: 'mdc-tab__text-label', [text(label)]),
         ]),
-        span(classes: [
-          'mdc-tab-indicator',
-          if (selected) 'mdc-tab-indicator--active'
-        ], [
-          span(classes: ['mdc-tab-indicator__content', 'mdc-tab-indicator__content--underline'], []),
+        span(classes: 'mdc-tab-indicator ${selected ? ' mdc-tab-indicator--active' : ''}', [
+          span(classes: 'mdc-tab-indicator__content mdc-tab-indicator__content--underline', []),
         ]),
-        span(classes: ['mdc-tab__ripple'], []),
+        span(classes: 'mdc-tab__ripple', []),
       ],
     );
   }
