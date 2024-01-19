@@ -18,7 +18,7 @@ environment:
 
 dependencies:
   binary_codec: ^2.0.3
-  hotreloader: ^3.0.4
+  hotreloader: ^4.1.0
   html: ^0.15.0
   http: '>=0.13.0 <2.0.0'
   js: ^0.6.5
@@ -35,4 +35,4 @@ dev_dependencies:
   build_runner: ^2.4.0
   build_web_compilers: ^4.0.0
   jaspr_test: '>=0.1.0 <1.0.0'
-  lints: ^2.1.0
+  lints: ^3.0.0
