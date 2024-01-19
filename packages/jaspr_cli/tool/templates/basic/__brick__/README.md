@@ -1,3 +1,3 @@
 # {{name}}
 
-A basic pure-dart web app with ssr & automatic client hydration.
+A basic jaspr app with ssr & automatic client hydration.

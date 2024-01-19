@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
-/// The root component for this app.
+// A simple [StatelessComponent] with a [build] method.
 class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {

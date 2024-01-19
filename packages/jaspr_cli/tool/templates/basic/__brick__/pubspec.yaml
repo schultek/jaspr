@@ -1,5 +1,5 @@
 name: {{name}}
-description: A basic pure-dart web app with ssr & automatic client hydration.
+description: A basic jaspr app with ssr & automatic client hydration.
 version: 0.0.1
 
 environment:
