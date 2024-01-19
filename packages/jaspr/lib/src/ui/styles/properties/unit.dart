@@ -13,6 +13,9 @@ extension UnitExt on num {
 abstract class Unit {
   static const Unit zero = _ZeroUnit();
 
+  ///auto represents the style attribute unit 'auto'
+  static const Unit auto = _AutoUnit();
+
   /// Constructs a [Unit] in the form '100%'
   const factory Unit.percent(double value) = _PercentUnit;
 
@@ -40,6 +43,20 @@ class _ZeroUnit implements Unit {
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is _Unit && other._value == 0;
+
+  @override
+  int get hashCode => 0;
+}
+
+///_AutoUnit represents the style attribute unit 'auto'
+class _AutoUnit implements Unit {
+  const _AutoUnit();
+
+  @override
+  String get value => 'auto';
+
+  @override
+  bool operator ==(Object other) => identical(this, other) || other is _AutoUnit;
 
   @override
   int get hashCode => 0;
