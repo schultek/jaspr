@@ -309,3 +309,22 @@ enum TextOverflow {
   final String value;
   const TextOverflow(this.value);
 }
+
+enum WhiteSpace {
+  normal('normal'),
+  noWrap('nowrap'),
+  pre('pre'),
+  preWrap('pre-wrap'),
+  preLine('pre-line'),
+  breakSpaces('break-spaces'),
+
+  inherit('inherit'),
+  initial('initial'),
+  revert('revert'),
+  revertLayer('revert-layer'),
+  unset('unset');
+
+  /// The css value
+  final String value;
+  const WhiteSpace(this.value);
+}

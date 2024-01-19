@@ -15,6 +15,7 @@ class _TextStyles implements Styles {
   final Unit? lineHeight;
   final TextShadow? shadow;
   final TextOverflow? overflow;
+  final WhiteSpace? whiteSpace;
 
   const _TextStyles({
     this.color,
@@ -31,6 +32,7 @@ class _TextStyles implements Styles {
     this.lineHeight,
     this.shadow,
     this.overflow,
+    this.whiteSpace,
   });
 
   @override
@@ -49,5 +51,6 @@ class _TextStyles implements Styles {
         if (lineHeight != null) 'line-height': lineHeight!.value,
         if (shadow != null) 'text-shadow': shadow!.value,
         if (overflow != null) 'text-overflow': overflow!.value,
+        if (whiteSpace != null) 'white-space': whiteSpace!.value,
       };
 }
