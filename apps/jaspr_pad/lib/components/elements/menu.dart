@@ -2,29 +2,27 @@ import 'package:jaspr/components.dart';
 
 import '../../adapters/html.dart' hide Element;
 import '../../adapters/mdc.dart';
+import '../utils/node_reader.dart';
 import 'button.dart';
 
 class MenuItem extends StatelessComponent {
-  const MenuItem({required this.label, Key? key}) : super(key: key);
+  const MenuItem({required this.label, super.key});
 
   final String label;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'li',
+    yield li(
       classes: ['mdc-list-item', 'channel-menu-list'],
       attributes: {'role': 'menuitem'},
-      children: [
-        DomComponent(
-          tag: 'img',
+      [
+        img(
           classes: ['mdc-list-item__graphic'],
-          attributes: {'src': 'https://dartpad.dev/pictures/logo_dart.png'},
+          src: 'https://dartpad.dev/pictures/logo_dart.png',
         ),
-        DomComponent(
-          tag: 'span',
+        span(
           classes: ['mdc-list-item__text'],
-          child: Text(label),
+          [text(label)],
         ),
       ],
     );
@@ -32,7 +30,7 @@ class MenuItem extends StatelessComponent {
 }
 
 class Menu extends StatelessComponent {
-  const Menu({required this.items, required this.onItemSelected, Key? key}) : super(key: key);
+  const Menu({required this.items, required this.onItemSelected, super.key});
 
   final List<MenuItem> items;
   final void Function(int) onItemSelected;
@@ -45,21 +43,21 @@ class Menu extends StatelessComponent {
 }
 
 class MenuElement extends StatelessElement {
-  MenuElement(Menu component) : super(component);
+  MenuElement(Menu super.component);
 
   @override
   Menu get component => super.component as Menu;
 
   MDCMenuOrStubbed? _menu;
-  RenderElement? _menuNode, _buttonNode;
+  ElementOrStubbed? _menuNode, _buttonNode;
 
-  void setMenuNodes(RenderElement? menu, RenderElement? button) {
+  void setMenuNodes(ElementOrStubbed? menu, ElementOrStubbed? button) {
     _menuNode ??= menu;
     _buttonNode ??= button;
     if (kIsWeb && _menuNode != null && _buttonNode != null) {
-      _menu = MDCMenu(_menuNode!.nativeElement as ElementOrStubbed)
+      _menu = MDCMenu(_menuNode!)
         ..setAnchorCorner(AnchorCorner.bottomLeft)
-        ..setAnchorElement(_buttonNode!.nativeElement as ElementOrStubbed);
+        ..setAnchorElement(_buttonNode!);
 
       _menu!.listen('MDCMenu:selected', (e) {
         final index = (e as CustomEventOrStubbed).detail['index'] as int;
@@ -70,12 +68,11 @@ class MenuElement extends StatelessElement {
 
   @override
   Iterable<Component> build() sync* {
-    yield DomComponent(
-      tag: 'div',
+    yield div(
       styles: Styles.box(position: Position.relative()),
-      children: [
-        FindChildNode(
-          onNodeAttached: (node) {
+      [
+        DomNodeReader(
+          onNode: (node) {
             setMenuNodes(null, node);
           },
           child: Button(
@@ -91,20 +88,18 @@ class MenuElement extends StatelessElement {
             },
           ),
         ),
-        FindChildNode(
-          onNodeAttached: (node) {
+        DomNodeReader(
+          onNode: (node) {
             setMenuNodes(node, null);
           },
-          child: DomComponent(
-            tag: 'div',
+          child: div(
             id: 'samples-menu',
             classes: ['mdc-menu', 'mdc-menu-surface'],
-            children: [
-              DomComponent(
-                tag: 'ul',
+            [
+              ul(
                 classes: ['mdc-list'],
                 attributes: {'aria-hidden': 'true', 'aria-orientation': 'vertical', 'tabindex': '-1'},
-                children: component.items,
+                component.items,
               ),
             ],
           ),

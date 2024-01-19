@@ -4,17 +4,16 @@ import 'package:jaspr/jaspr.dart';
 /// Supports a limited subset of the available options
 /// See https://bulma.io/documentation/components/navbar/ for a detailed description
 class NavBar extends StatelessComponent {
-  const NavBar({this.brand, this.menu, Key? key}) : super(key: key);
+  const NavBar({this.brand, this.menu, super.key});
 
   final NavbarBrand? brand;
   final NavbarMenu? menu;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'nav',
+    yield nav(
       classes: ['navbar', 'block'],
-      children: [
+      [
         if (brand != null) brand!,
         if (menu != null) menu!,
       ],
@@ -23,55 +22,38 @@ class NavBar extends StatelessComponent {
 }
 
 class NavbarBrand extends StatelessComponent {
-  const NavbarBrand({required this.children, Key? key}) : super(key: key);
+  const NavbarBrand({required this.children, super.key});
 
   final List<Component> children;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      classes: ['navbar-brand'],
-      children: children,
-    );
+    yield div(classes: ['navbar-brand'], children);
   }
 }
 
 class NavbarMenu extends StatelessComponent {
-  const NavbarMenu({required this.items, this.endItems = const [], Key? key}) : super(key: key);
+  const NavbarMenu({required this.items, this.endItems = const [], super.key});
 
   final List<Component> items;
   final List<Component> endItems;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
+    yield div(
       classes: ['navbar-menu', 'is-active'],
-      children: [
-        DomComponent(
-          tag: 'div',
-          classes: ['navbar-start'],
-          children: items,
-        ),
-        DomComponent(
-          tag: 'div',
-          classes: ['navbar-end'],
-          children: endItems,
-        ),
+      [
+        div(classes: ['navbar-start'], items),
+        div(classes: ['navbar-end'], endItems),
       ],
     );
   }
 }
 
 class NavbarItem extends StatelessComponent {
-  const NavbarItem({required this.child, this.href, Key? key})
-      : items = null,
-        super(key: key);
+  const NavbarItem({required this.child, this.href, super.key}) : items = null;
 
-  const NavbarItem.dropdown({required this.child, required this.items, Key? key})
-      : href = null,
-        super(key: key);
+  const NavbarItem.dropdown({required this.child, required this.items, super.key}) : href = null;
 
   final Component child;
   final String? href;
@@ -80,27 +62,13 @@ class NavbarItem extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     if (items == null) {
-      yield DomComponent(
-        tag: 'a',
-        classes: ['navbar-item'],
-        attributes: {if (href != null) 'href': ''},
-        child: child,
-      );
+      yield a(href: href ?? '', classes: ['navbar-item'], [child]);
     } else {
-      yield DomComponent(
-        tag: 'div',
+      yield div(
         classes: ['navbar-item', 'has-dropdown', 'is-hoverable'],
-        children: [
-          DomComponent(
-            tag: 'a',
-            classes: ['navbar-link'],
-            child: child,
-          ),
-          DomComponent(
-            tag: 'div',
-            classes: ['navbar-dropdown'],
-            children: items,
-          ),
+        [
+          a(href: '', classes: ['navbar-link'], [child]),
+          div(classes: ['navbar-dropdown'], items!),
         ],
       );
     }
@@ -108,13 +76,10 @@ class NavbarItem extends StatelessComponent {
 }
 
 class NavbarDivider extends StatelessComponent {
-  const NavbarDivider({Key? key}) : super(key: key);
+  const NavbarDivider({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'hr',
-      classes: ['navbar-divider'],
-    );
+    yield hr(classes: ['navbar-divider']);
   }
 }

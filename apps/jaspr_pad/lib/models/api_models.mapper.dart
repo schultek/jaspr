@@ -1,7 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
-// ignore_for_file: unused_element
+// ignore_for_file: unused_element, unnecessary_cast
+// ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
 part of 'api_models.dart';
 
@@ -66,11 +67,6 @@ class CompileRequestMapper extends ClassMapperBase<CompileRequest> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'CompileRequest';
 
@@ -78,7 +74,7 @@ class CompileRequestMapper extends ClassMapperBase<CompileRequest> {
   static const Field<CompileRequest, Map<String, String>> _f$sources = Field('sources', _$sources);
 
   @override
-  final Map<Symbol, Field<CompileRequest, dynamic>> fields = const {
+  final MappableFields<CompileRequest> fields = const {
     #sources: _f$sources,
   };
 
@@ -90,39 +86,40 @@ class CompileRequestMapper extends ClassMapperBase<CompileRequest> {
   final Function instantiate = _instantiate;
 
   static CompileRequest fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<CompileRequest>(map));
+    return ensureInitialized().decodeMap<CompileRequest>(map);
   }
 
   static CompileRequest fromJson(String json) {
-    return _guard((c) => c.fromJson<CompileRequest>(json));
+    return ensureInitialized().decodeJson<CompileRequest>(json);
   }
 }
 
 mixin CompileRequestMappable {
   String toJson() {
-    return CompileRequestMapper._guard((c) => c.toJson(this as CompileRequest));
+    return CompileRequestMapper.ensureInitialized().encodeJson<CompileRequest>(this as CompileRequest);
   }
 
   Map<String, dynamic> toMap() {
-    return CompileRequestMapper._guard((c) => c.toMap(this as CompileRequest));
+    return CompileRequestMapper.ensureInitialized().encodeMap<CompileRequest>(this as CompileRequest);
   }
 
   CompileRequestCopyWith<CompileRequest, CompileRequest, CompileRequest> get copyWith =>
       _CompileRequestCopyWithImpl(this as CompileRequest, $identity, $identity);
   @override
   String toString() {
-    return CompileRequestMapper._guard((c) => c.asString(this));
+    return CompileRequestMapper.ensureInitialized().stringifyValue(this as CompileRequest);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && CompileRequestMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            CompileRequestMapper.ensureInitialized().isValueEqual(this as CompileRequest, other));
   }
 
   @override
   int get hashCode {
-    return CompileRequestMapper._guard((c) => c.hash(this));
+    return CompileRequestMapper.ensureInitialized().hashValue(this as CompileRequest);
   }
 }
 
@@ -167,11 +164,6 @@ class CompileResponseMapper extends ClassMapperBase<CompileResponse> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'CompileResponse';
 
@@ -181,7 +173,7 @@ class CompileResponseMapper extends ClassMapperBase<CompileResponse> {
   static const Field<CompileResponse, String> _f$error = Field('error', _$error);
 
   @override
-  final Map<Symbol, Field<CompileResponse, dynamic>> fields = const {
+  final MappableFields<CompileResponse> fields = const {
     #result: _f$result,
     #error: _f$error,
   };
@@ -194,39 +186,40 @@ class CompileResponseMapper extends ClassMapperBase<CompileResponse> {
   final Function instantiate = _instantiate;
 
   static CompileResponse fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<CompileResponse>(map));
+    return ensureInitialized().decodeMap<CompileResponse>(map);
   }
 
   static CompileResponse fromJson(String json) {
-    return _guard((c) => c.fromJson<CompileResponse>(json));
+    return ensureInitialized().decodeJson<CompileResponse>(json);
   }
 }
 
 mixin CompileResponseMappable {
   String toJson() {
-    return CompileResponseMapper._guard((c) => c.toJson(this as CompileResponse));
+    return CompileResponseMapper.ensureInitialized().encodeJson<CompileResponse>(this as CompileResponse);
   }
 
   Map<String, dynamic> toMap() {
-    return CompileResponseMapper._guard((c) => c.toMap(this as CompileResponse));
+    return CompileResponseMapper.ensureInitialized().encodeMap<CompileResponse>(this as CompileResponse);
   }
 
   CompileResponseCopyWith<CompileResponse, CompileResponse, CompileResponse> get copyWith =>
       _CompileResponseCopyWithImpl(this as CompileResponse, $identity, $identity);
   @override
   String toString() {
-    return CompileResponseMapper._guard((c) => c.asString(this));
+    return CompileResponseMapper.ensureInitialized().stringifyValue(this as CompileResponse);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && CompileResponseMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            CompileResponseMapper.ensureInitialized().isValueEqual(this as CompileResponse, other));
   }
 
   @override
   int get hashCode {
-    return CompileResponseMapper._guard((c) => c.hash(this));
+    return CompileResponseMapper.ensureInitialized().hashValue(this as CompileResponse);
   }
 }
 
@@ -269,11 +262,6 @@ class AnalyzeRequestMapper extends ClassMapperBase<AnalyzeRequest> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'AnalyzeRequest';
 
@@ -281,7 +269,7 @@ class AnalyzeRequestMapper extends ClassMapperBase<AnalyzeRequest> {
   static const Field<AnalyzeRequest, Map<String, String>> _f$sources = Field('sources', _$sources);
 
   @override
-  final Map<Symbol, Field<AnalyzeRequest, dynamic>> fields = const {
+  final MappableFields<AnalyzeRequest> fields = const {
     #sources: _f$sources,
   };
 
@@ -293,39 +281,40 @@ class AnalyzeRequestMapper extends ClassMapperBase<AnalyzeRequest> {
   final Function instantiate = _instantiate;
 
   static AnalyzeRequest fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<AnalyzeRequest>(map));
+    return ensureInitialized().decodeMap<AnalyzeRequest>(map);
   }
 
   static AnalyzeRequest fromJson(String json) {
-    return _guard((c) => c.fromJson<AnalyzeRequest>(json));
+    return ensureInitialized().decodeJson<AnalyzeRequest>(json);
   }
 }
 
 mixin AnalyzeRequestMappable {
   String toJson() {
-    return AnalyzeRequestMapper._guard((c) => c.toJson(this as AnalyzeRequest));
+    return AnalyzeRequestMapper.ensureInitialized().encodeJson<AnalyzeRequest>(this as AnalyzeRequest);
   }
 
   Map<String, dynamic> toMap() {
-    return AnalyzeRequestMapper._guard((c) => c.toMap(this as AnalyzeRequest));
+    return AnalyzeRequestMapper.ensureInitialized().encodeMap<AnalyzeRequest>(this as AnalyzeRequest);
   }
 
   AnalyzeRequestCopyWith<AnalyzeRequest, AnalyzeRequest, AnalyzeRequest> get copyWith =>
       _AnalyzeRequestCopyWithImpl(this as AnalyzeRequest, $identity, $identity);
   @override
   String toString() {
-    return AnalyzeRequestMapper._guard((c) => c.asString(this));
+    return AnalyzeRequestMapper.ensureInitialized().stringifyValue(this as AnalyzeRequest);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && AnalyzeRequestMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            AnalyzeRequestMapper.ensureInitialized().isValueEqual(this as AnalyzeRequest, other));
   }
 
   @override
   int get hashCode {
-    return AnalyzeRequestMapper._guard((c) => c.hash(this));
+    return AnalyzeRequestMapper.ensureInitialized().hashValue(this as AnalyzeRequest);
   }
 }
 
@@ -370,11 +359,6 @@ class FormatResponseMapper extends ClassMapperBase<FormatResponse> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'FormatResponse';
 
@@ -384,7 +368,7 @@ class FormatResponseMapper extends ClassMapperBase<FormatResponse> {
   static const Field<FormatResponse, int> _f$newOffset = Field('newOffset', _$newOffset);
 
   @override
-  final Map<Symbol, Field<FormatResponse, dynamic>> fields = const {
+  final MappableFields<FormatResponse> fields = const {
     #newString: _f$newString,
     #newOffset: _f$newOffset,
   };
@@ -397,39 +381,40 @@ class FormatResponseMapper extends ClassMapperBase<FormatResponse> {
   final Function instantiate = _instantiate;
 
   static FormatResponse fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<FormatResponse>(map));
+    return ensureInitialized().decodeMap<FormatResponse>(map);
   }
 
   static FormatResponse fromJson(String json) {
-    return _guard((c) => c.fromJson<FormatResponse>(json));
+    return ensureInitialized().decodeJson<FormatResponse>(json);
   }
 }
 
 mixin FormatResponseMappable {
   String toJson() {
-    return FormatResponseMapper._guard((c) => c.toJson(this as FormatResponse));
+    return FormatResponseMapper.ensureInitialized().encodeJson<FormatResponse>(this as FormatResponse);
   }
 
   Map<String, dynamic> toMap() {
-    return FormatResponseMapper._guard((c) => c.toMap(this as FormatResponse));
+    return FormatResponseMapper.ensureInitialized().encodeMap<FormatResponse>(this as FormatResponse);
   }
 
   FormatResponseCopyWith<FormatResponse, FormatResponse, FormatResponse> get copyWith =>
       _FormatResponseCopyWithImpl(this as FormatResponse, $identity, $identity);
   @override
   String toString() {
-    return FormatResponseMapper._guard((c) => c.asString(this));
+    return FormatResponseMapper.ensureInitialized().stringifyValue(this as FormatResponse);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && FormatResponseMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            FormatResponseMapper.ensureInitialized().isValueEqual(this as FormatResponse, other));
   }
 
   @override
   int get hashCode {
-    return FormatResponseMapper._guard((c) => c.hash(this));
+    return FormatResponseMapper.ensureInitialized().hashValue(this as FormatResponse);
   }
 }
 
@@ -472,11 +457,6 @@ class FormatRequestMapper extends ClassMapperBase<FormatRequest> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'FormatRequest';
 
@@ -486,7 +466,7 @@ class FormatRequestMapper extends ClassMapperBase<FormatRequest> {
   static const Field<FormatRequest, int> _f$offset = Field('offset', _$offset);
 
   @override
-  final Map<Symbol, Field<FormatRequest, dynamic>> fields = const {
+  final MappableFields<FormatRequest> fields = const {
     #source: _f$source,
     #offset: _f$offset,
   };
@@ -499,39 +479,40 @@ class FormatRequestMapper extends ClassMapperBase<FormatRequest> {
   final Function instantiate = _instantiate;
 
   static FormatRequest fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<FormatRequest>(map));
+    return ensureInitialized().decodeMap<FormatRequest>(map);
   }
 
   static FormatRequest fromJson(String json) {
-    return _guard((c) => c.fromJson<FormatRequest>(json));
+    return ensureInitialized().decodeJson<FormatRequest>(json);
   }
 }
 
 mixin FormatRequestMappable {
   String toJson() {
-    return FormatRequestMapper._guard((c) => c.toJson(this as FormatRequest));
+    return FormatRequestMapper.ensureInitialized().encodeJson<FormatRequest>(this as FormatRequest);
   }
 
   Map<String, dynamic> toMap() {
-    return FormatRequestMapper._guard((c) => c.toMap(this as FormatRequest));
+    return FormatRequestMapper.ensureInitialized().encodeMap<FormatRequest>(this as FormatRequest);
   }
 
   FormatRequestCopyWith<FormatRequest, FormatRequest, FormatRequest> get copyWith =>
       _FormatRequestCopyWithImpl(this as FormatRequest, $identity, $identity);
   @override
   String toString() {
-    return FormatRequestMapper._guard((c) => c.asString(this));
+    return FormatRequestMapper.ensureInitialized().stringifyValue(this as FormatRequest);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && FormatRequestMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            FormatRequestMapper.ensureInitialized().isValueEqual(this as FormatRequest, other));
   }
 
   @override
   int get hashCode {
-    return FormatRequestMapper._guard((c) => c.hash(this));
+    return FormatRequestMapper.ensureInitialized().hashValue(this as FormatRequest);
   }
 }
 
@@ -575,11 +556,6 @@ class AnalyzeResponseMapper extends ClassMapperBase<AnalyzeResponse> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'AnalyzeResponse';
 
@@ -587,7 +563,7 @@ class AnalyzeResponseMapper extends ClassMapperBase<AnalyzeResponse> {
   static const Field<AnalyzeResponse, List<Issue>> _f$issues = Field('issues', _$issues, opt: true, def: const []);
 
   @override
-  final Map<Symbol, Field<AnalyzeResponse, dynamic>> fields = const {
+  final MappableFields<AnalyzeResponse> fields = const {
     #issues: _f$issues,
   };
 
@@ -599,39 +575,40 @@ class AnalyzeResponseMapper extends ClassMapperBase<AnalyzeResponse> {
   final Function instantiate = _instantiate;
 
   static AnalyzeResponse fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<AnalyzeResponse>(map));
+    return ensureInitialized().decodeMap<AnalyzeResponse>(map);
   }
 
   static AnalyzeResponse fromJson(String json) {
-    return _guard((c) => c.fromJson<AnalyzeResponse>(json));
+    return ensureInitialized().decodeJson<AnalyzeResponse>(json);
   }
 }
 
 mixin AnalyzeResponseMappable {
   String toJson() {
-    return AnalyzeResponseMapper._guard((c) => c.toJson(this as AnalyzeResponse));
+    return AnalyzeResponseMapper.ensureInitialized().encodeJson<AnalyzeResponse>(this as AnalyzeResponse);
   }
 
   Map<String, dynamic> toMap() {
-    return AnalyzeResponseMapper._guard((c) => c.toMap(this as AnalyzeResponse));
+    return AnalyzeResponseMapper.ensureInitialized().encodeMap<AnalyzeResponse>(this as AnalyzeResponse);
   }
 
   AnalyzeResponseCopyWith<AnalyzeResponse, AnalyzeResponse, AnalyzeResponse> get copyWith =>
       _AnalyzeResponseCopyWithImpl(this as AnalyzeResponse, $identity, $identity);
   @override
   String toString() {
-    return AnalyzeResponseMapper._guard((c) => c.asString(this));
+    return AnalyzeResponseMapper.ensureInitialized().stringifyValue(this as AnalyzeResponse);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && AnalyzeResponseMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            AnalyzeResponseMapper.ensureInitialized().isValueEqual(this as AnalyzeResponse, other));
   }
 
   @override
   int get hashCode {
-    return AnalyzeResponseMapper._guard((c) => c.hash(this));
+    return AnalyzeResponseMapper.ensureInitialized().hashValue(this as AnalyzeResponse);
   }
 }
 
@@ -678,11 +655,6 @@ class IssueMapper extends ClassMapperBase<Issue> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'Issue';
 
@@ -702,7 +674,7 @@ class IssueMapper extends ClassMapperBase<Issue> {
   static const Field<Issue, String> _f$url = Field('url', _$url, opt: true);
 
   @override
-  final Map<Symbol, Field<Issue, dynamic>> fields = const {
+  final MappableFields<Issue> fields = const {
     #kind: _f$kind,
     #location: _f$location,
     #message: _f$message,
@@ -727,38 +699,38 @@ class IssueMapper extends ClassMapperBase<Issue> {
   final Function instantiate = _instantiate;
 
   static Issue fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<Issue>(map));
+    return ensureInitialized().decodeMap<Issue>(map);
   }
 
   static Issue fromJson(String json) {
-    return _guard((c) => c.fromJson<Issue>(json));
+    return ensureInitialized().decodeJson<Issue>(json);
   }
 }
 
 mixin IssueMappable {
   String toJson() {
-    return IssueMapper._guard((c) => c.toJson(this as Issue));
+    return IssueMapper.ensureInitialized().encodeJson<Issue>(this as Issue);
   }
 
   Map<String, dynamic> toMap() {
-    return IssueMapper._guard((c) => c.toMap(this as Issue));
+    return IssueMapper.ensureInitialized().encodeMap<Issue>(this as Issue);
   }
 
   IssueCopyWith<Issue, Issue, Issue> get copyWith => _IssueCopyWithImpl(this as Issue, $identity, $identity);
   @override
   String toString() {
-    return IssueMapper._guard((c) => c.asString(this));
+    return IssueMapper.ensureInitialized().stringifyValue(this as Issue);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && IssueMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType && IssueMapper.ensureInitialized().isValueEqual(this as Issue, other));
   }
 
   @override
   int get hashCode {
-    return IssueMapper._guard((c) => c.hash(this));
+    return IssueMapper.ensureInitialized().hashValue(this as Issue);
   }
 }
 
@@ -831,11 +803,6 @@ class IssueLocationMapper extends ClassMapperBase<IssueLocation> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'IssueLocation';
 
@@ -849,7 +816,7 @@ class IssueLocationMapper extends ClassMapperBase<IssueLocation> {
   static const Field<IssueLocation, int> _f$endColumn = Field('endColumn', _$endColumn);
 
   @override
-  final Map<Symbol, Field<IssueLocation, dynamic>> fields = const {
+  final MappableFields<IssueLocation> fields = const {
     #startLine: _f$startLine,
     #endLine: _f$endLine,
     #startColumn: _f$startColumn,
@@ -868,39 +835,40 @@ class IssueLocationMapper extends ClassMapperBase<IssueLocation> {
   final Function instantiate = _instantiate;
 
   static IssueLocation fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<IssueLocation>(map));
+    return ensureInitialized().decodeMap<IssueLocation>(map);
   }
 
   static IssueLocation fromJson(String json) {
-    return _guard((c) => c.fromJson<IssueLocation>(json));
+    return ensureInitialized().decodeJson<IssueLocation>(json);
   }
 }
 
 mixin IssueLocationMappable {
   String toJson() {
-    return IssueLocationMapper._guard((c) => c.toJson(this as IssueLocation));
+    return IssueLocationMapper.ensureInitialized().encodeJson<IssueLocation>(this as IssueLocation);
   }
 
   Map<String, dynamic> toMap() {
-    return IssueLocationMapper._guard((c) => c.toMap(this as IssueLocation));
+    return IssueLocationMapper.ensureInitialized().encodeMap<IssueLocation>(this as IssueLocation);
   }
 
   IssueLocationCopyWith<IssueLocation, IssueLocation, IssueLocation> get copyWith =>
       _IssueLocationCopyWithImpl(this as IssueLocation, $identity, $identity);
   @override
   String toString() {
-    return IssueLocationMapper._guard((c) => c.asString(this));
+    return IssueLocationMapper.ensureInitialized().stringifyValue(this as IssueLocation);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && IssueLocationMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            IssueLocationMapper.ensureInitialized().isValueEqual(this as IssueLocation, other));
   }
 
   @override
   int get hashCode {
-    return IssueLocationMapper._guard((c) => c.hash(this));
+    return IssueLocationMapper.ensureInitialized().hashValue(this as IssueLocation);
   }
 }
 
@@ -951,11 +919,6 @@ class DocumentResponseMapper extends ClassMapperBase<DocumentResponse> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'DocumentResponse';
 
@@ -965,7 +928,7 @@ class DocumentResponseMapper extends ClassMapperBase<DocumentResponse> {
   static const Field<DocumentResponse, String> _f$error = Field('error', _$error);
 
   @override
-  final Map<Symbol, Field<DocumentResponse, dynamic>> fields = const {
+  final MappableFields<DocumentResponse> fields = const {
     #info: _f$info,
     #error: _f$error,
   };
@@ -978,39 +941,40 @@ class DocumentResponseMapper extends ClassMapperBase<DocumentResponse> {
   final Function instantiate = _instantiate;
 
   static DocumentResponse fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<DocumentResponse>(map));
+    return ensureInitialized().decodeMap<DocumentResponse>(map);
   }
 
   static DocumentResponse fromJson(String json) {
-    return _guard((c) => c.fromJson<DocumentResponse>(json));
+    return ensureInitialized().decodeJson<DocumentResponse>(json);
   }
 }
 
 mixin DocumentResponseMappable {
   String toJson() {
-    return DocumentResponseMapper._guard((c) => c.toJson(this as DocumentResponse));
+    return DocumentResponseMapper.ensureInitialized().encodeJson<DocumentResponse>(this as DocumentResponse);
   }
 
   Map<String, dynamic> toMap() {
-    return DocumentResponseMapper._guard((c) => c.toMap(this as DocumentResponse));
+    return DocumentResponseMapper.ensureInitialized().encodeMap<DocumentResponse>(this as DocumentResponse);
   }
 
   DocumentResponseCopyWith<DocumentResponse, DocumentResponse, DocumentResponse> get copyWith =>
       _DocumentResponseCopyWithImpl(this as DocumentResponse, $identity, $identity);
   @override
   String toString() {
-    return DocumentResponseMapper._guard((c) => c.asString(this));
+    return DocumentResponseMapper.ensureInitialized().stringifyValue(this as DocumentResponse);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && DocumentResponseMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            DocumentResponseMapper.ensureInitialized().isValueEqual(this as DocumentResponse, other));
   }
 
   @override
   int get hashCode {
-    return DocumentResponseMapper._guard((c) => c.hash(this));
+    return DocumentResponseMapper.ensureInitialized().hashValue(this as DocumentResponse);
   }
 }
 
@@ -1057,11 +1021,6 @@ class HoverInfoMapper extends ClassMapperBase<HoverInfo> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'HoverInfo';
 
@@ -1086,7 +1045,7 @@ class HoverInfoMapper extends ClassMapperBase<HoverInfo> {
   static const Field<HoverInfo, String> _f$propagatedType = Field('propagatedType', _$propagatedType, opt: true);
 
   @override
-  final Map<Symbol, Field<HoverInfo, dynamic>> fields = const {
+  final MappableFields<HoverInfo> fields = const {
     #description: _f$description,
     #kind: _f$kind,
     #dartdoc: _f$dartdoc,
@@ -1115,39 +1074,40 @@ class HoverInfoMapper extends ClassMapperBase<HoverInfo> {
   final Function instantiate = _instantiate;
 
   static HoverInfo fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<HoverInfo>(map));
+    return ensureInitialized().decodeMap<HoverInfo>(map);
   }
 
   static HoverInfo fromJson(String json) {
-    return _guard((c) => c.fromJson<HoverInfo>(json));
+    return ensureInitialized().decodeJson<HoverInfo>(json);
   }
 }
 
 mixin HoverInfoMappable {
   String toJson() {
-    return HoverInfoMapper._guard((c) => c.toJson(this as HoverInfo));
+    return HoverInfoMapper.ensureInitialized().encodeJson<HoverInfo>(this as HoverInfo);
   }
 
   Map<String, dynamic> toMap() {
-    return HoverInfoMapper._guard((c) => c.toMap(this as HoverInfo));
+    return HoverInfoMapper.ensureInitialized().encodeMap<HoverInfo>(this as HoverInfo);
   }
 
   HoverInfoCopyWith<HoverInfo, HoverInfo, HoverInfo> get copyWith =>
       _HoverInfoCopyWithImpl(this as HoverInfo, $identity, $identity);
   @override
   String toString() {
-    return HoverInfoMapper._guard((c) => c.asString(this));
+    return HoverInfoMapper.ensureInitialized().stringifyValue(this as HoverInfo);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && HoverInfoMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            HoverInfoMapper.ensureInitialized().isValueEqual(this as HoverInfo, other));
   }
 
   @override
   int get hashCode {
-    return HoverInfoMapper._guard((c) => c.hash(this));
+    return HoverInfoMapper.ensureInitialized().hashValue(this as HoverInfo);
   }
 }
 
@@ -1225,11 +1185,6 @@ class DocumentRequestMapper extends ClassMapperBase<DocumentRequest> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'DocumentRequest';
 
@@ -1241,7 +1196,7 @@ class DocumentRequestMapper extends ClassMapperBase<DocumentRequest> {
   static const Field<DocumentRequest, int> _f$offset = Field('offset', _$offset);
 
   @override
-  final Map<Symbol, Field<DocumentRequest, dynamic>> fields = const {
+  final MappableFields<DocumentRequest> fields = const {
     #sources: _f$sources,
     #name: _f$name,
     #offset: _f$offset,
@@ -1255,39 +1210,40 @@ class DocumentRequestMapper extends ClassMapperBase<DocumentRequest> {
   final Function instantiate = _instantiate;
 
   static DocumentRequest fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<DocumentRequest>(map));
+    return ensureInitialized().decodeMap<DocumentRequest>(map);
   }
 
   static DocumentRequest fromJson(String json) {
-    return _guard((c) => c.fromJson<DocumentRequest>(json));
+    return ensureInitialized().decodeJson<DocumentRequest>(json);
   }
 }
 
 mixin DocumentRequestMappable {
   String toJson() {
-    return DocumentRequestMapper._guard((c) => c.toJson(this as DocumentRequest));
+    return DocumentRequestMapper.ensureInitialized().encodeJson<DocumentRequest>(this as DocumentRequest);
   }
 
   Map<String, dynamic> toMap() {
-    return DocumentRequestMapper._guard((c) => c.toMap(this as DocumentRequest));
+    return DocumentRequestMapper.ensureInitialized().encodeMap<DocumentRequest>(this as DocumentRequest);
   }
 
   DocumentRequestCopyWith<DocumentRequest, DocumentRequest, DocumentRequest> get copyWith =>
       _DocumentRequestCopyWithImpl(this as DocumentRequest, $identity, $identity);
   @override
   String toString() {
-    return DocumentRequestMapper._guard((c) => c.asString(this));
+    return DocumentRequestMapper.ensureInitialized().stringifyValue(this as DocumentRequest);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && DocumentRequestMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            DocumentRequestMapper.ensureInitialized().isValueEqual(this as DocumentRequest, other));
   }
 
   @override
   int get hashCode {
-    return DocumentRequestMapper._guard((c) => c.hash(this));
+    return DocumentRequestMapper.ensureInitialized().hashValue(this as DocumentRequest);
   }
 }
 

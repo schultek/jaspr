@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
 class Counter extends StatefulComponent {
-  const Counter({Key? key}) : super(key: key);
+  const Counter({super.key});
 
   @override
   State<Counter> createState() => _CounterState();

@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:jaspr/jaspr.dart';
 
 import '../../adapters/html.dart' as html;
+import '../utils/node_reader.dart';
 
 class Splitter extends StatefulComponent {
-  const Splitter({required this.children, this.horizontal = true, this.initialSizes, Key? key}) : super(key: key);
+  const Splitter({required this.children, this.horizontal = true, this.initialSizes, super.key});
 
   final List<Component> children;
   final bool horizontal;
@@ -56,69 +57,40 @@ class SplitterState extends State<Splitter> {
     for (var i = 0; i < component.children.length; i++) {
       if (i > 0) {
         var pair = splitPairs[i - 1];
-        yield DomComponent(
-          tag: 'div',
+        yield div(
           classes: ['gutter', 'gutter-${component.horizontal ? 'horizontal' : 'vertical'}'],
           styles: Styles.raw({'flex-basis': '6px'}),
           events: {'mousedown': (e) => pair.startDragging(e)},
+          [],
         );
       }
 
       var dragging =
           (i > 0 ? splitPairs[i - 1].dragging : false) || (i < splitPairs.length ? splitPairs[i].dragging : false);
 
-      yield RenderScope(
-        delegate: SplitElementRenderDelegate(
-          size: sizes[i],
-          dragging: dragging,
+      yield DomComponent.wrap(
+        styles: Styles.raw({
+          'flex-basis': 'calc(${sizes[i]}% - 3px)',
+          if (dragging) ...{
+            'user-select': 'none',
+            'pointer-events': 'none',
+          }
+        }),
+        child: DomNodeReader(
           onNode: (node) {
             if (i > 0) splitPairs[i - 1].b = node;
             if (i < splitPairs.length) splitPairs[i].a = node;
           },
+          child: component.children[i],
         ),
-        child: component.children[i],
       );
     }
   }
 }
 
-class SplitElementRenderDelegate extends RenderDelegate {
-  SplitElementRenderDelegate({required this.size, required this.dragging, required this.onNode});
-
-  final double size;
-  final bool dragging;
-  final void Function(RenderElement) onNode;
-
-  @override
-  void renderNode(RenderElement node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
-      Map<String, String>? attributes, Map<String, EventCallback>? events) {
-    styles = {
-      ...?styles,
-      'flex-basis': 'calc($size% - 3px)',
-      if (dragging) ...{
-        'user-select': 'none',
-        'pointer-events': 'none',
-      }
-    };
-    super.renderNode(node, tag, id, classes, styles, attributes, events);
-    onNode(node);
-  }
-
-  @override
-  void attachNode(RenderElement? element, RenderElement child, RenderElement? after) {
-    super.attachNode(element, child, after);
-    onNode(child);
-  }
-
-  @override
-  bool updateShouldNotify(covariant SplitElementRenderDelegate oldDelegate) {
-    return size != oldDelegate.size || dragging != oldDelegate.dragging;
-  }
-}
-
 class SplitPair {
   SplitterState parent;
-  RenderElement? a, b;
+  html.ElementOrStubbed? a, b;
   bool dragging;
   int index;
 
@@ -161,8 +133,8 @@ class SplitPair {
     var h = parent.component.horizontal;
     html.document.body!.style.cursor = h ? 'col-resize' : 'row-resize';
 
-    var a = (this.a!.nativeElement as html.ElementOrStubbed).getBoundingClientRect();
-    var b = (this.b!.nativeElement as html.ElementOrStubbed).getBoundingClientRect();
+    var a = (this.a!).getBoundingClientRect();
+    var b = (this.b!).getBoundingClientRect();
 
     _size = (h ? (a.width + b.width) : (a.height + b.height)) + 6;
     _start = (h ? a.left : a.top) + 0.0;

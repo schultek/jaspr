@@ -6,22 +6,13 @@ void main() {
 }
 
 class App extends StatelessComponent {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      children: [
-        DomComponent(
-          tag: 'h1',
-          child: Text('Hello World!'),
-        ),
-        DomComponent(
-          tag: 'p',
-          child: Text('You\'re great!'),
-        ),
-      ],
-    );
+    yield div([
+      h1([text('Hello World!')]),
+      p([text('You\'re great!')]),
+    ]);
   }
 }

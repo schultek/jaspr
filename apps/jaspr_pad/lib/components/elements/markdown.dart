@@ -1,8 +1,8 @@
 import 'dart:convert' as convert;
 
 import 'package:jaspr/jaspr.dart';
-import 'package:markdown/markdown.dart' hide Text, Element;
 import 'package:markdown/markdown.dart' as md show Text, Element;
+import 'package:markdown/markdown.dart' hide Text, Element;
 
 @Import.onWeb('../../adapters/hljs.dart', show: [#highlightAll])
 import 'markdown.imports.dart' as hljs;
@@ -41,7 +41,7 @@ class InlineBrackets extends InlineSyntax {
 }
 
 class Markdown extends StatefulComponent {
-  const Markdown({required this.markdown, this.blockSyntaxes, Key? key}) : super(key: key);
+  const Markdown({required this.markdown, this.blockSyntaxes, super.key});
 
   final String markdown;
 
@@ -91,7 +91,7 @@ class _MarkdownState extends State<Markdown> {
   Iterable<Component> buildMarkdown(Iterable<Node> nodes) sync* {
     for (var node in nodes) {
       if (node is md.Text) {
-        yield DomComponent(tag: 'span', child: Text(node.text, rawHtml: true));
+        yield span([text(node.text, rawHtml: true)]);
       } else if (node is md.Element) {
         yield DomComponent(
           tag: node.tag,

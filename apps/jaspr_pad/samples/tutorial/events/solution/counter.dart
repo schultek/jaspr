@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
 class Counter extends StatefulComponent {
-  const Counter({Key? key}) : super(key: key);
+  const Counter({super.key});
 
   @override
   State<Counter> createState() => _CounterState();
@@ -18,12 +18,11 @@ class _CounterState extends State<Counter> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield Text('Count: $count');
+    yield text('Count: $count');
 
-    yield DomComponent(
-      tag: 'button',
+    yield button(
       events: {'click': (e) => increment()},
-      child: Text('Counter'),
+      [text('Counter')],
     );
   }
 }

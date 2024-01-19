@@ -5,7 +5,7 @@ import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../framework/framework.dart';
 import 'document/document.dart';
-import 'markup_renderer.dart';
+import 'markup_render_object.dart';
 
 /// Global component binding for the server
 class ServerAppBinding extends AppBinding with ComponentsBinding, DocumentBinding {
@@ -27,17 +27,11 @@ class ServerAppBinding extends AppBinding with ComponentsBinding, DocumentBindin
     rootCompleter.complete();
   }
 
-  @override
-  Renderer createRenderer() {
-    return MarkupDomRenderer();
-  }
-
   Future<String> render() async {
     await rootCompleter.future;
 
-    var renderer = rootElement!.renderer as MarkupDomRenderer;
-
-    return renderDocument(renderer);
+    var renderObject = rootElement!.renderObject as MarkupRenderObject;
+    return renderDocument(renderObject);
   }
 
   Future<String> data() async {
@@ -59,5 +53,10 @@ class ServerAppBinding extends AppBinding with ComponentsBinding, DocumentBindin
   @override
   void scheduleFrame(VoidCallback frameCallback) {
     throw UnsupportedError('Scheduling a frame is not supported on the server, and should never happen.');
+  }
+
+  @override
+  RenderObject createRootRenderObject() {
+    return MarkupRenderObject();
   }
 }

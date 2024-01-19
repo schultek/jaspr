@@ -575,6 +575,13 @@ abstract class State<T extends StatefulComponent> {
   void didChangeDependencies() {}
 }
 
+/// Mixin on [State] that preloads state on the server
+mixin PreloadStateMixin<T extends StatefulComponent> on State<T> {
+  /// Called on the server before initState() to preload asynchronous data
+  @protected
+  Future<void> preloadState();
+}
+
 /// An [Element] that uses a [StatefulComponent] as its configuration.
 class StatefulElement extends MultiChildElement {
   /// Creates an element that uses the given component as its configuration.

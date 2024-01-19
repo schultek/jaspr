@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:jaspr/components.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
-import '../../adapters/html.dart';
 import '../../adapters/mdc.dart';
+import '../utils/node_reader.dart';
 
 final _dialogStateProvider = StateProvider.family<_DialogState?, String>((ref, String id) => null);
 
@@ -45,7 +45,7 @@ void closeDialog(BuildContext context, {required String slotId, dynamic result})
 }
 
 class Dialog extends StatelessComponent {
-  const Dialog({required this.title, required this.content, required this.actions, Key? key}) : super(key: key);
+  const Dialog({required this.title, required this.content, required this.actions, super.key});
 
   final String title;
   final Component content;
@@ -53,38 +53,22 @@ class Dialog extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      classes: ['mdc-dialog__container'],
-      children: [
-        DomComponent(
-          tag: 'div',
-          classes: ['mdc-dialog__surface'],
-          children: [
-            DomComponent(
-              tag: 'h2',
-              classes: ['mdc-dialog__title'],
-              child: Text(title),
-            ),
-            DomComponent(
-              tag: 'div',
-              classes: ['mdc-dialog__content'],
-              child: content,
-            ),
-            DomComponent(
-              tag: 'footer',
-              classes: ['mdc-dialog__actions'],
-              children: actions,
-            ),
-          ],
-        ),
-      ],
-    );
+    yield div(classes: [
+      'mdc-dialog__container'
+    ], [
+      div(classes: [
+        'mdc-dialog__surface'
+      ], [
+        h2(classes: ['mdc-dialog__title'], [text(title)]),
+        div(classes: ['mdc-dialog__content'], [content]),
+        footer(classes: ['mdc-dialog__actions'], actions),
+      ]),
+    ]);
   }
 }
 
 class DialogSlot extends StatefulComponent {
-  const DialogSlot({required this.slotId, Key? key}) : super(key: key);
+  const DialogSlot({required this.slotId, super.key});
 
   final String slotId;
 
@@ -131,25 +115,19 @@ class DialogState extends State<DialogSlot> {
   Iterable<Component> build(BuildContext context) sync* {
     var state = context.watch(_dialogStateProvider(component.slotId));
 
-    yield FindChildNode(
-      onNodeAttached: (node) {
-        if (kIsWeb) {
-          _dialog ??= MDCDialog(node.nativeElement as ElementOrStubbed);
-          _dialog!.listen('MDCDialog:closed', (event) {
-            context.read(_dialogStateProvider(component.slotId))?.onResult(null);
-          });
-        }
+    yield DomNodeReader(
+      onNode: (node) {
+        _dialog ??= MDCDialog(node);
+        _dialog!.listen('MDCDialog:closed', (event) {
+          context.read(_dialogStateProvider(component.slotId))?.onResult(null);
+        });
       },
-      child: DomComponent(
-        tag: 'div',
+      child: div(
         classes: ['mdc-dialog', if (state != null) 'mdc-dialog--open'],
         attributes: {'role': 'alertdialog', 'aria-modal': 'true'},
-        children: [
+        [
           if (state != null) state.builder(context) else Dialog(content: Text(''), title: '', actions: []),
-          DomComponent(
-            tag: 'div',
-            classes: ['mdc-dialog__scrim'],
-          ),
+          div(classes: ['mdc-dialog__scrim'], []),
         ],
       ),
     );

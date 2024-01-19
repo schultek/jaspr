@@ -66,13 +66,10 @@ class App extends StatelessComponent {
 }
 
 class BulmaLogo extends StatelessComponent {
-  const BulmaLogo({Key? key}) : super(key: key);
+  const BulmaLogo({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'img',
-      attributes: {'src': 'https://bulma.io/images/bulma-logo.png', 'width': '112', 'height': '20'},
-    );
+    yield img(src: 'https://bulma.io/images/bulma-logo.png', attributes: {'width': '112', 'height': '20'});
   }
 }

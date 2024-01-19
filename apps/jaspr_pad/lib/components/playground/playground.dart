@@ -9,7 +9,7 @@ import 'header.dart';
 import 'main_section.dart';
 
 class Playground extends StatelessComponent {
-  const Playground({Key? key}) : super(key: key);
+  const Playground({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

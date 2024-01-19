@@ -4,8 +4,7 @@ import 'package:jaspr/jaspr.dart';
 /// Supports a limited subset of the available options
 /// See https://bulma.io/documentation/components/tabs/ for a detailed description
 class Tabs extends StatefulComponent {
-  const Tabs({required this.tabs, required this.onSelected, this.isBoxed = false, this.isToggle = false, Key? key})
-      : super(key: key);
+  const Tabs({required this.tabs, required this.onSelected, this.isBoxed = false, this.isToggle = false, super.key});
 
   final List<Component> tabs;
   final ValueChanged<int> onSelected;
@@ -21,29 +20,28 @@ class _TabsState extends State<Tabs> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      classes: ['tabs', if (component.isBoxed) 'is-boxed', if (component.isToggle) 'is-toggle'],
-      child: DomComponent(
-        tag: 'ul',
-        children: [
-          for (var i = 0; i < component.tabs.length; i++)
-            Tab(
-              selected: i == selected,
-              onSelected: () {
-                setState(() => selected = i);
-                component.onSelected(i);
-              },
-              child: component.tabs[i],
-            ),
-        ],
-      ),
-    );
+    yield div(classes: [
+      'tabs',
+      if (component.isBoxed) 'is-boxed',
+      if (component.isToggle) 'is-toggle'
+    ], [
+      ul([
+        for (var i = 0; i < component.tabs.length; i++)
+          Tab(
+            selected: i == selected,
+            onSelected: () {
+              setState(() => selected = i);
+              component.onSelected(i);
+            },
+            child: component.tabs[i],
+          ),
+      ]),
+    ]);
   }
 }
 
 class Tab extends StatelessComponent {
-  const Tab({required this.selected, required this.onSelected, required this.child, Key? key}) : super(key: key);
+  const Tab({required this.selected, required this.onSelected, required this.child, super.key});
 
   final bool selected;
   final VoidCallback onSelected;
@@ -51,14 +49,12 @@ class Tab extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'li',
+    yield li(
       classes: [if (selected) 'is-active'],
       events: {'click': (e) => onSelected()},
-      child: DomComponent(
-        tag: 'a',
-        child: child,
-      ),
+      [
+        a(href: '', [child])
+      ],
     );
   }
 }

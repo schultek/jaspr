@@ -9,27 +9,26 @@ import 'panels/output_panel.dart';
 import 'panels/tutorial_panel.dart';
 
 class MainSection extends StatelessComponent {
-  const MainSection({Key? key}) : super(key: key);
+  const MainSection({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     var isTutorial = context.watch(isTutorialProvider);
 
-    yield DomComponent(
-      tag: 'section',
+    yield section(
       classes: ['main-section'],
-      children: [
-        DomComponent(
-          tag: 'div',
-          classes: ['panels'],
-          child: Splitter(
+      [
+        div(classes: [
+          'panels'
+        ], [
+          Splitter(
             children: [
               if (isTutorial) TutorialPanel(),
               EditorPanel(),
               if (!isTutorial) OutputPanel(),
             ],
-          ),
-        ),
+          )
+        ]),
         SnackBar(),
       ],
     );
