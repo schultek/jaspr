@@ -10,7 +10,7 @@ typedef RenderObjectVisitor = void Function(RenderObject child);
 abstract class RenderObject {
   RenderObject createChildRenderObject();
 
-  void updateElement(String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events);
 
   void updateText(String text, [bool rawHtml = false]);

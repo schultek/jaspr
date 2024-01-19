@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- **BREAKING** Changed `FlutterEmbedView.classes` type from `List<String>` to `String`.
+
 ## 0.1.4
 
 - Support `flutter >= 3.13.0`

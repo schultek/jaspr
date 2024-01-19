@@ -40,7 +40,7 @@ class DomRenderObject extends RenderObject {
   }
 
   @override
-  void updateElement(String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     late Set<String> attributesToRemove;
     late html.Element elem;
@@ -95,7 +95,7 @@ class DomRenderObject extends RenderObject {
     }
 
     elem.clearOrSetAttribute('id', id);
-    elem.clearOrSetAttribute('class', classes == null || classes.isEmpty ? null : classes.join(' '));
+    elem.clearOrSetAttribute('class', classes == null || classes.isEmpty ? null : classes);
     elem.clearOrSetAttribute('style',
         styles == null || styles.isEmpty ? null : styles.entries.map((e) => '${e.key}: ${e.value}').join('; '));
 

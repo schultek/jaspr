@@ -14,14 +14,10 @@
 
   *Note:* Calling `Jaspr.initializeApp()` will be required in a future version of jaspr, and the cli will warn you
   when it's not called.
+
+- **BREAKING** Changed type of the `classes` property of html components from `List<String>` to `String`. Multiple class
+  names can be set using a single space-delimited string, e.g. `classes: 'class1 class2'`.
   
-- **BREAKING** Promoted `jaspr_web_compilers` to non-experimental status.
-
-  This also changes the respective cli option from `jaspr create --experimental-web-compilers` (old) to `jaspr create --jaspr-web-compilers` (new).
-
-- **BREAKING** Refactored components inside the `package:jaspr/components` library. Some component properties have changed 
-  or been discontinued. Check the separate components for details.
-
 - **BREAKING** Event callbacks are now typed. The `events` property of html components now expects a `Map<String, void Function(Event)>`
   instead of the old `Map<String, void Function(dynamic)>`.
 
@@ -55,7 +51,14 @@
     [...]
   )
   ```
-  
+
+- **BREAKING** Refactored components inside the `package:jaspr/components` library. Some component properties have changed
+  or been discontinued. Check the separate components for details.
+
+- **BREAKING** Promoted `jaspr_web_compilers` to non-experimental status.
+
+  This also changes the respective cli option from `jaspr create --experimental-web-compilers` (old) to `jaspr create --jaspr-web-compilers` (new).
+
 - Added support for rendering `svg` elements.
 
 - Refactored rendering implementation to use `RenderObject`s.

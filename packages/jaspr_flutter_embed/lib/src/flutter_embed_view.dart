@@ -8,7 +8,7 @@ class FlutterEmbedView extends StatefulComponent {
 
   final flt.Widget app;
   final Component? loader;
-  final List<String>? classes;
+  final String? classes;
   final Styles? styles;
 
   @override

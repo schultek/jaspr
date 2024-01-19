@@ -7,7 +7,7 @@ const formatOutput = kDebugMode || kGenerateMode;
 class MarkupRenderObject extends RenderObject {
   String? tag;
   String? id;
-  List<String>? classes;
+  String? classes;
   Map<String, String>? styles;
   Map<String, String>? attributes;
 
@@ -24,7 +24,7 @@ class MarkupRenderObject extends RenderObject {
   }
 
   @override
-  void updateElement(String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     this.tag = tag;
     this.id = id;
@@ -65,30 +65,29 @@ class MarkupRenderObject extends RenderObject {
   }
 
   String renderToHtml() {
-    var data = this;
-    if (data.text != null) {
-      if (data.rawHtml == true) {
-        return data.text!;
+    if (text case var text?) {
+      if (rawHtml == true) {
+        return text;
       } else {
-        return htmlEscape.convert(data.text!);
+        return htmlEscape.convert(text);
       }
-    } else if (data.tag != null) {
+    } else if (tag case var tag?) {
       var output = StringBuffer();
-      var tag = data.tag!.toLowerCase();
+      tag = tag.toLowerCase();
       _domValidator.validateElementName(tag);
       output.write('<$tag');
-      if (data.id != null) {
-        output.write(' id="${_attributeEscape.convert(data.id!)}"');
+      if (id case String id) {
+        output.write(' id="${_attributeEscape.convert(id)}"');
       }
-      if (data.classes != null && data.classes!.isNotEmpty) {
-        output.write(' class="${_attributeEscape.convert(data.classes!.join(' '))}"');
+      if (classes case String classes when classes.isNotEmpty) {
+        output.write(' class="${_attributeEscape.convert(classes)}"');
       }
-      if (data.styles != null && data.styles!.isNotEmpty) {
-        output.write(
-            ' style="${_attributeEscape.convert(data.styles!.entries.map((e) => '${e.key}: ${e.value}').join('; '))}"');
+      if (styles case var styles? when styles.isNotEmpty) {
+        var props = styles.entries.map((e) => '${e.key}: ${e.value}');
+        output.write(' style="${_attributeEscape.convert(props.join('; '))}"');
       }
-      if (data.attributes != null && data.attributes!.isNotEmpty) {
-        for (var attr in data.attributes!.entries) {
+      if (attributes case var attrs? when attrs.isNotEmpty) {
+        for (var attr in attrs.entries) {
           _domValidator.validateAttributeName(attr.key);
           if (attr.value.isNotEmpty) {
             output.write(' ${attr.key}="${_attributeEscape.convert(attr.value)}"');
@@ -103,7 +102,7 @@ class MarkupRenderObject extends RenderObject {
       } else {
         output.write('>');
         var childOutput = <String>[];
-        for (var child in data.children) {
+        for (var child in children) {
           childOutput.add(child.renderToHtml());
         }
         var fullChildOutput = childOutput.fold<String>('', (s, o) => s + o);
@@ -121,7 +120,7 @@ class MarkupRenderObject extends RenderObject {
     } else {
       assert(parent == null);
       var output = StringBuffer();
-      for (var child in data.children) {
+      for (var child in children) {
         output.writeln(child.renderToHtml());
       }
       return output.toString();
@@ -134,7 +133,7 @@ class MarkupRenderObject extends RenderObject {
 
 /// DOM validator with sane defaults.
 class DomValidator {
-  static final _attributeRegExp = RegExp(r'^[a-z](?:[a-z0-9\-\_]*[a-z0-9]+)?$');
+  static final _attributeRegExp = RegExp(r'^[a-z](?:[a-z0-9\-_]*[a-z0-9]+)?$');
   static final _elementRegExp = _attributeRegExp;
   static const _selfClosing = <String>{
     'area',

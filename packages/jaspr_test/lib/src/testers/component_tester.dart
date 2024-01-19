@@ -141,7 +141,7 @@ class TestRenderObject extends RenderObject {
 
   String? tag;
   String? id;
-  List<String>? classes;
+  String? classes;
   Map<String, String>? styles;
   Map<String, String>? attributes;
   Map<String, EventCallback>? events;
@@ -155,7 +155,7 @@ class TestRenderObject extends RenderObject {
   }
 
   @override
-  void updateElement(String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     this
       ..tag = tag

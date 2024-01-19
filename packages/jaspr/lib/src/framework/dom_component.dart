@@ -21,7 +21,7 @@ class DomComponent extends Component {
   const factory DomComponent.wrap({
     Key? key,
     String? id,
-    List<String>? classes,
+    String? classes,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events,
@@ -30,7 +30,7 @@ class DomComponent extends Component {
 
   final String tag;
   final String? id;
-  final List<String>? classes;
+  final String? classes;
   final Styles? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
@@ -86,11 +86,15 @@ class DomElement extends MultiChildElement with RenderObjectElement {
     renderObject.updateElement(
       component.tag,
       component.id ?? wrappingComponent?.id,
-      [...wrappingComponent?.classes ?? [], ...component.classes ?? []],
-      {...wrappingComponent?.styles?.styles ?? {}, ...component.styles?.styles ?? {}},
-      {...wrappingComponent?.attributes ?? {}, ...component.attributes ?? {}},
-      {...wrappingComponent?.events ?? {}, ...component.events ?? {}},
+      _join(wrappingComponent?.classes, component.classes, (a, b) => '$a $b'),
+      _join(wrappingComponent?.styles?.styles, component.styles?.styles, (a, b) => {...a, ...b}),
+      _join(wrappingComponent?.attributes, component.attributes, (a, b) => {...a, ...b}),
+      _join(wrappingComponent?.events, component.events, (a, b) => {...a, ...b}),
     );
+  }
+
+  T? _join<T>(T? a, T? b, T Function(T a, T b) joiner) {
+    return a != null && b != null ? joiner(a, b) : a ?? b;
   }
 }
 
@@ -110,7 +114,7 @@ class _WrappingDomComponent extends InheritedComponent implements DomComponent {
   @override
   final String? id;
   @override
-  final List<String>? classes;
+  final String? classes;
   @override
   final Styles? styles;
   @override
