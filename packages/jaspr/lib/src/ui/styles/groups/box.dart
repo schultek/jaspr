@@ -1,4 +1,4 @@
-part of style;
+part of '../styles.dart';
 
 class _BoxStyles implements Styles {
   final EdgeInsets? padding;

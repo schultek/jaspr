@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 /// Base class for components that observes the build execution of
 /// it's descendants in the Component tree.

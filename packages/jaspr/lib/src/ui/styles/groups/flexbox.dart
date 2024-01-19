@@ -1,4 +1,4 @@
-part of style;
+part of '../styles.dart';
 
 class _FlexBoxStyles implements Styles {
   final FlexDirection? direction;

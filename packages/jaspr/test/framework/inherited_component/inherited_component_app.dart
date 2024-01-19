@@ -23,7 +23,7 @@ class App extends TestComponent<int> {
 }
 
 class MyInheritedComponent extends InheritedComponent {
-  MyInheritedComponent({required this.value, required Component child}) : super(child: child);
+  MyInheritedComponent({required this.value, required super.child});
 
   final dynamic value;
 

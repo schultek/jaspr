@@ -1,5 +1,3 @@
-library jaspr_html;
-
 import '../../framework/framework.dart';
 import '../styles/styles.dart';
 

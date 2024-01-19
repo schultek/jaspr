@@ -22,7 +22,7 @@ class App extends TestComponent<int> {
 }
 
 class Child extends StatefulComponent {
-  Child({Key? key}) : super(key: key);
+  Child({super.key});
 
   @override
   State createState() => ChildState();

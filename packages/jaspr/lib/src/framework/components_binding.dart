@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 /// Main app binding, controls the root component and global state
 mixin ComponentsBinding on AppBinding {
@@ -74,7 +74,7 @@ class _Root extends Component {
 }
 
 class _RootElement extends SingleChildElement with RenderObjectElement {
-  _RootElement(_Root component) : super(component);
+  _RootElement(_Root super.component);
 
   @override
   _Root get component => super.component as _Root;

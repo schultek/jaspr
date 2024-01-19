@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 /// A component that has mutable state.
 ///

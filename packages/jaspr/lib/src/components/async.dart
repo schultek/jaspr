@@ -5,6 +5,8 @@
 /// Components that handle interaction with asynchronous computations.
 ///
 /// Asynchronous computations are represented by [Future]s and [Stream]s.
+library;
+
 import 'dart:async' show StreamSubscription;
 
 import 'package:meta/meta.dart';
@@ -44,7 +46,7 @@ import '../framework/framework.dart';
 ///    recent interaction is needed for component building.
 abstract class StreamBuilderBase<T, S> extends StatefulComponent {
   /// Creates a [StreamBuilderBase] connected to the specified [stream].
-  const StreamBuilderBase({Key? key, this.stream}) : super(key: key);
+  const StreamBuilderBase({super.key, this.stream});
 
   /// The asynchronous computation to which this builder is currently connected,
   /// possibly null. When changed, the current summary is updated using
@@ -387,11 +389,11 @@ class StreamBuilder<T> extends StreamBuilderBase<T, AsyncSnapshot<T>> {
   ///
   /// The [builder] must not be null.
   const StreamBuilder({
-    Key? key,
+    super.key,
     this.initialData,
-    Stream<T>? stream,
+    super.stream,
     required this.builder,
-  }) : super(key: key, stream: stream);
+  });
 
   /// The build strategy currently used by this builder.
   ///
@@ -517,11 +519,11 @@ class FutureBuilder<T> extends StatefulComponent {
   ///
   /// The [builder] must not be null.
   const FutureBuilder({
-    Key? key,
+    super.key,
     this.future,
     this.initialData,
     required this.builder,
-  }) : super(key: key);
+  });
 
   /// The asynchronous computation to which this builder is currently connected,
   /// possibly null.

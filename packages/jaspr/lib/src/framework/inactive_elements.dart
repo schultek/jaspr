@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 class _InactiveElements {
   final Set<Element> _elements = HashSet<Element>();

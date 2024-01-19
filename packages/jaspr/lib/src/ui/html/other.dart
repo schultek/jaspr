@@ -1,4 +1,4 @@
-part of jaspr_html;
+part of 'html.dart';
 
 /// The &lt;details&gt; HTML element creates a disclosure widget in which information is visible only when the widget is toggled into an "open" state. A summary or label must be provided using the &lt;summary&gt; element.
 ///

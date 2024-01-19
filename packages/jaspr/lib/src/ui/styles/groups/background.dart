@@ -1,4 +1,4 @@
-part of style;
+part of '../styles.dart';
 
 class _BackgroundStyles implements Styles {
   final Color? color;

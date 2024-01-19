@@ -31,7 +31,7 @@ class _BaseDocument extends Document {
 }
 
 class _DocumentElement extends StatefulElement {
-  _DocumentElement(Document component) : super(component);
+  _DocumentElement(Document super.component);
 
   @override
   Document get component => super.component as Document;

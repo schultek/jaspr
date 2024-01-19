@@ -1,3 +1,5 @@
+// ignore_for_file: implicit_call_tearoffs
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';

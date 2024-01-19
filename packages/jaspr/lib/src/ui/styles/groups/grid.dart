@@ -1,4 +1,4 @@
-part of style;
+part of '../styles.dart';
 
 class _GridStyles implements Styles {
   const _GridStyles({this.template, this.gap, this.autoRows, this.autoColumns});

@@ -1,4 +1,4 @@
-part of document;
+part of 'document.dart';
 
 mixin DocumentBinding on AppBinding {
   late SendPort _sendPort;

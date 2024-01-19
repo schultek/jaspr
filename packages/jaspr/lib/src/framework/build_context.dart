@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 /// The BuildContext supplied to a Components build() method,
 /// as known from Flutter

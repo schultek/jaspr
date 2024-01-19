@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 typedef EventCallback = void Function(dynamic event);
 
@@ -46,7 +46,7 @@ class DomComponent extends Component {
 }
 
 class DomElement extends MultiChildElement with RenderObjectElement {
-  DomElement(DomComponent component) : super(component);
+  DomElement(DomComponent super.component);
 
   @override
   DomComponent get component => super.component as DomComponent;
@@ -151,7 +151,7 @@ class Text extends Component {
 }
 
 abstract class NoChildElement extends Element {
-  NoChildElement(Component component) : super(component);
+  NoChildElement(super.component);
 
   @override
   bool get debugDoingBuild => false;
@@ -179,7 +179,7 @@ abstract class NoChildElement extends Element {
 }
 
 class TextElement extends NoChildElement with RenderObjectElement {
-  TextElement(Text component) : super(component);
+  TextElement(Text super.component);
 
   @override
   Text get component => super.component as Text;
@@ -198,7 +198,7 @@ class SkipContent extends Component {
 }
 
 class SkipContentElement extends NoChildElement with RenderObjectElement {
-  SkipContentElement(SkipContent component) : super(component);
+  SkipContentElement(SkipContent super.component);
 
   @override
   SkipContent get component => super.component as SkipContent;

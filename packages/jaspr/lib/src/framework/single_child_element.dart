@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 /// An [Element] that has a single children.
 ///

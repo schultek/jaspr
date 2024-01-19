@@ -1,4 +1,4 @@
-part of document;
+part of 'document.dart';
 
 class ComponentObserver extends ObserverComponent {
   ComponentObserver({required this.registerElement, required super.child});

@@ -1,4 +1,4 @@
-part of jaspr_html;
+part of 'html.dart';
 
 /// The &lt;button&gt; HTML element is an interactive element activated by a user with a mouse, keyboard, finger, voice command, or other assistive technology. Once activated, it then performs a programmable action, such as submitting a form or opening a dialog.
 ///
