@@ -21,6 +21,8 @@ abstract class StyleRule {
   const factory StyleRule({required Selector selector, required Styles styles}) = _BlockStyleRule;
 
   const factory StyleRule.import(String url) = _ImportStyleRule;
+  const factory StyleRule.fontFace({required String fontFamily, FontStyle? fontStyle, required String url}) =
+      _FontFaceStyleRule;
   const factory StyleRule.media({required MediaRuleQuery query, required List<StyleRule> styles}) = _MediaStyleRule;
 
   String _toCss([String indent]);
@@ -152,6 +154,23 @@ class _ImportStyleRule implements StyleRule {
   @override
   String _toCss([String indent = '']) {
     return '$indent@import url($url);';
+  }
+}
+
+class _FontFaceStyleRule implements StyleRule {
+  const _FontFaceStyleRule({required this.fontFamily, this.fontStyle, required this.url});
+
+  final String fontFamily;
+  final FontStyle? fontStyle;
+  final String url;
+
+  @override
+  String _toCss([String indent = '']) {
+    return '$indent@font-face {$cssPropSpace'
+        '$indent${cssBlockInset}font-family: "$fontFamily";$cssPropSpace'
+        '${fontStyle != null ? '$indent${cssBlockInset}font-style: ${fontStyle!.value};$cssPropSpace' : ''}'
+        '$indent${cssBlockInset}src: url($url);$cssPropSpace'
+        '$indent}';
   }
 }
 
