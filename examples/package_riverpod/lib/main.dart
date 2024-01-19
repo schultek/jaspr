@@ -1,8 +1,15 @@
 import 'package:jaspr/server.dart';
 
-import 'app.dart';
+import 'components/app.dart';
+import 'jaspr_options.dart';
 
 /// Entrypoint for the server
 void main() async {
-  runApp(Document(body: App()));
+  Jaspr.initializeApp(
+    options: defaultJasprOptions,
+  );
+
+  runApp(
+    Document(body: App()),
+  );
 }

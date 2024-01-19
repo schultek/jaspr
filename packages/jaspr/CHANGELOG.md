@@ -11,6 +11,9 @@
 - Added `Unit.auto`, `Unit.vw` and `Unit.vh` for responsive styling.
 - Added `StyleRule.fontFace` to add external font files.
 - Refactored components from `jaspr/components`.
+- Added `events()` method for using typed event handlers like `onClick` or `onInput`.
+- Added typed event handlers to `button`, `input`, `textarea` and `select` components.
+- Added `Jaspr.initializeApp()` method and generate `jaspr_options.dart` file.
 
 ## 0.9.3
 

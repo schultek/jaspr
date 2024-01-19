@@ -32,6 +32,8 @@ void main() {
       }
       content.write('{');
 
+      var events = <String>{};
+
       if (attrs != null) {
         for (var attr in attrs.keys) {
           var name = attrs[attr]['name'] ?? attr;
@@ -57,6 +59,10 @@ void main() {
           } else if (type is String && type.startsWith('enum:')) {
             var name = type.split(':')[1];
             content.write(name);
+          } else if (type is String && type.startsWith('event:')) {
+            var [_, name, t] = type.split(':');
+            events.add(name);
+            content.write(t);
           } else if (type is Map<String, dynamic>) {
             var name = type['name'];
             content.write(name);
@@ -88,6 +94,8 @@ void main() {
         for (var attr in attrs.keys) {
           var name = attrs[attr]['name'] ?? attr;
           var type = attrs[attr]['type'];
+
+          if (type is String && type.startsWith('event:')) continue;
 
           content.write('      ');
 
@@ -123,8 +131,16 @@ void main() {
         content.write('attributes,\n');
       }
 
-      content.write(''
-          '    events: events,\n');
+      content.write('    events: ');
+
+      if (events.isNotEmpty) {
+        content.write('{\n'
+            '      ...?events,\n'
+            '      ..._events(${events.map((e) => '$e: $e').join(', ')}),\n'
+            '    },\n');
+      } else {
+        content.write('events,\n');
+      }
 
       if (!selfClosing) {
         content.write('    children: children,\n');

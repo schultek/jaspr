@@ -1,14 +1,14 @@
 name: Jaspr Tutorial
 steps:
   - name: Introduction
-    id: intro
+    id: 0-intro
   - name: Hello World
-    id: hello
+    id: 1-hello
   - name: StatelessComponent
-    id: stateless
+    id: 2-stateless
   - name: StatefulComponent
-    id: stateful
+    id: 3-stateful
   - name: Events and Rebuilds
-    id: events
+    id: 4-events
   - name: Coming Soon
-    id: more
+    id: 5-more

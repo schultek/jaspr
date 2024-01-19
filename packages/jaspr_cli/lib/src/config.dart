@@ -6,10 +6,12 @@ class JasprConfig {
   const JasprConfig({
     this.usesSsr = false,
     this.usesFlutter = false,
+    this.devCommand,
   });
 
   final bool usesSsr;
   final bool usesFlutter;
+  final String? devCommand;
 
   factory JasprConfig.fromYaml(YamlMap? pubspecYaml, Logger logger) {
     var configYaml = pubspecYaml?['jaspr'];
@@ -42,7 +44,15 @@ class JasprConfig {
         usesFlutter = false;
       }
 
-      return JasprConfig(usesSsr: usesSsr, usesFlutter: usesFlutter);
+      String? devCommand;
+      var devCommandYaml = configYaml['dev-command'];
+      if (devCommandYaml != null) {
+        if (devCommandYaml is! String) throw "'jaspr.dev-command' must be a string.";
+
+        devCommand = devCommandYaml;
+      }
+
+      return JasprConfig(usesSsr: usesSsr, usesFlutter: usesFlutter, devCommand: devCommand);
     } catch (e) {
       logger.write('Invalid jaspr configuration in pubspec.yaml: $e', level: Level.critical);
     }

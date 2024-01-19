@@ -6,20 +6,26 @@ class PlaygroundFooter extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield footer([
-      i(
-        id: 'keyboard-button',
-        classes: ['material-icons', 'footer-item'],
-        attributes: {'aria-hidden': 'true'},
-        [text('keyboard')],
-      ),
+      //   i(
+      //     id: 'keyboard-button',
+      //     classes: ['material-icons', 'footer-item'],
+      //     attributes: {'aria-hidden': 'true'},
+      //     [text('keyboard')],
+      //   ),
       div(classes: [
         'footer-item'
       ], [
         a(
-          href: 'https://dart.dev/tools/dartpad/privacy',
+          href: 'https://docs.page/schultek/jaspr',
           target: Target.blank,
           classes: ['footer-item'],
-          [text('Privacy notice')],
+          [text('Jaspr Docs')],
+        ),
+        a(
+          href: 'https://discord.gg/XGXrGEk4c6',
+          target: Target.blank,
+          classes: ['footer-item'],
+          [text('Join the Community')],
         ),
         a(
           href: 'https://github.com/schultek/jaspr/issues',

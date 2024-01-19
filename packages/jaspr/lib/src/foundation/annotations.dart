@@ -1,5 +1,3 @@
-import '../framework/framework.dart';
-
 class ClientAnnotation {
   const ClientAnnotation._();
 }
@@ -45,15 +43,4 @@ class Import {
   final ImportPlatform platform;
   final String import;
   final List<dynamic> show;
-}
-
-abstract class ComponentEntryMixin<T extends Component> {
-  ComponentEntry<T> get entry;
-}
-
-class ComponentEntry<T extends Component> {
-  final String name;
-  final Map<String, dynamic>? params;
-
-  ComponentEntry.client(this.name, {this.params});
 }

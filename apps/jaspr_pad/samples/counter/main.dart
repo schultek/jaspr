@@ -20,10 +20,8 @@ class _AppState extends State<App> {
     yield text('Count is $count');
 
     yield button(
-      events: {
-        'click': (e) {
-          setState(() => count++);
-        },
+      onClick: () {
+        setState(() => count++);
       },
       [text('Press Me')],
     );

@@ -2,8 +2,11 @@
 import 'package:jaspr/server.dart';
 
 import 'app.dart';
+import 'jaspr_options.dart';
 
 void main() async {
+  Jaspr.initializeApp(options: defaultJasprOptions);
+
   // Uses [runServer] in place of [runApp] to retrieve the [ServerApp] instance.
   ServerApp app = runServer(Document(body: App()));
 

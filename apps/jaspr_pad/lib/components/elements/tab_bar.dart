@@ -4,8 +4,7 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import '../../adapters/mdc.dart';
 import '../utils/node_reader.dart';
 
-final tabSelectedProvider = Provider<bool>((ref) => false);
-final tabCallbackProvider = Provider<VoidCallback>((ref) => () {});
+final _tabProvider = Provider<(bool, int, VoidCallback)>((ref) => (false, 0, () {}));
 
 class TabBar extends StatefulComponent {
   const TabBar({
@@ -62,8 +61,7 @@ class TabBarState extends State<TabBar> {
                   ProviderScope(
                     key: ValueKey('tab-provider'),
                     overrides: [
-                      tabSelectedProvider.overrideWithValue(i == component.selected),
-                      tabCallbackProvider.overrideWithValue(() => _select(i)),
+                      _tabProvider.overrideWithValue((i == component.selected, i, () => _select(i))),
                     ],
                     child: component.tabs[i],
                   ),
@@ -127,15 +125,14 @@ class Tab extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    var selected = context.watch(tabSelectedProvider);
-    var onSelect = context.watch(tabCallbackProvider);
+    var (selected, index, onSelect) = context.watch(_tabProvider);
 
     yield button(
       classes: ['mdc-tab', if (selected) 'mdc-tab--active'],
       events: {'click': (e) => onSelect()},
       attributes: {
         'role': 'tab',
-        'tabindex': '0',
+        'tabindex': '$index',
         if (selected) 'aria-selected': "true",
       },
       [

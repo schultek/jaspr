@@ -30,6 +30,7 @@ class EditorPanelState extends State<EditorPanel> {
       ], [
         nav([
           TabBar(
+            key: ValueKey(context.watch(editProjectProvider)?.id),
             id: 'web-tab-bar',
             selected: context.watch(activeDocIndexProvider),
             onSelected: (index) {

@@ -44,11 +44,11 @@ class _DocumentElement extends StatefulElement {
 }
 
 class _BaseDocumentState extends State<_BaseDocument> {
-  final Map<Element, ComponentEntry> _registryElements = {};
+  final Map<Element, ClientTarget> _registryElements = {};
 
   void registerElement(Element element) {
-    if (element.component is ComponentEntryMixin) {
-      var entry = (element.component as ComponentEntryMixin).entry;
+    var entry = (context.binding as ServerAppBinding).options.targets[element.component.runtimeType];
+    if (entry != null) {
       _registryElements[element] = entry;
     }
   }
@@ -59,8 +59,7 @@ class _BaseDocumentState extends State<_BaseDocument> {
         for (var e in _registryElements.entries)
           {
             'id': getIdFor(e.key),
-            'name': e.value.name,
-            if (e.value.params != null) 'params': kDebugMode ? e.value.params : stateCodec.encode(e.value.params),
+            ...e.value.encode(e.key.component),
           }
       ]
     };

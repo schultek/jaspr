@@ -46,6 +46,7 @@ abstract class Styles {
     Unit? lineHeight,
     TextShadow? shadow,
     TextOverflow? overflow,
+    WhiteSpace? whiteSpace,
   }) = _TextStyles;
 
   /// Constructs a [Styles] instance for common background style properties

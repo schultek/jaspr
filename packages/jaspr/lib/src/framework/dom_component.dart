@@ -1,7 +1,5 @@
 part of 'framework.dart';
 
-typedef EventCallback = void Function(dynamic event);
-
 /// Represents a html element in the DOM
 ///
 /// Must have a [tag] and any number of attributes.

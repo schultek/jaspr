@@ -10,8 +10,10 @@ export '../generated/imports/_web.dart' if (dart.library.io) '../generated/impor
         CustomEvent,
         MouseEvent,
         Event,
+        InputElement,
         HtmlDocumentOrStubbed,
         ElementOrStubbed,
         CustomEventOrStubbed,
         MouseEventOrStubbed,
-        EventOrStubbed;
+        EventOrStubbed,
+        InputElementOrStubbed;

@@ -1,9 +1,12 @@
 import 'package:jaspr/server.dart';
 
 import 'components/app.dart';
+import 'jaspr_options.dart';
 
 /// The server entrypoint for the jaspr app.
 void main() {
+  Jaspr.initializeApp(options: defaultJasprOptions);
+
   runApp(Document(
     title: 'Element embedding',
     meta: {
@@ -23,7 +26,6 @@ void main() {
       link(rel: 'manifest', href: 'manifest.json'),
       link(rel: 'stylesheet', href: 'css/style.css', type: 'text/css'),
     ],
-    scriptName: 'main',
     body: App(),
   ));
 }

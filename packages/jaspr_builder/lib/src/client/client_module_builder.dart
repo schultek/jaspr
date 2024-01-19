@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
@@ -68,15 +67,6 @@ class ClientModuleBuilder implements Builder {
     if (!componentChecker.isAssignableFrom(element)) {
       log.warning('@client can only be applied on classes extending Component. Failing element: ${element.name}');
       return;
-    }
-
-    var mixinName = '_\$${element.name}';
-    var usesMixin =
-        // ignore: deprecated_member_use
-        (element.node as ClassDeclaration).withClause?.mixinTypes.any((type) => type.name.name == mixinName) ?? false;
-
-    if (!usesMixin) {
-      log.warning('Your class ${element.name} must mixin the generated \'$mixinName\' mixin.');
     }
 
     var module = await ClientModule.fromElement(element, buildStep);

@@ -1,5 +1,6 @@
 import 'package:jaspr/components.dart';
 
+import '../../adapters/html.dart' as html;
 import '../../adapters/mdc.dart';
 import '../utils/node_reader.dart';
 
@@ -35,7 +36,7 @@ class TextFieldState extends State<TextField> {
           input(
             type: InputType.text,
             attributes: {if (component.placeholder != null) 'placeholder': component.placeholder!},
-            events: {'input': (e) => component.onChange?.call(e.targetUrl.value)},
+            events: {'input': (e) => component.onChange?.call((e.target as html.InputElementOrStubbed).value!)},
             classes: ['mdc-text-field__input'],
             [],
           ),
