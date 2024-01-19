@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:async/async.dart' show Result;
-import 'package:jaspr/components.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 import 'package:mobx_hooks_experiment/mobx_hooks/hooks.dart';
 import 'package:mobx_hooks_experiment/mobx_hooks/jaspr_observer.dart';

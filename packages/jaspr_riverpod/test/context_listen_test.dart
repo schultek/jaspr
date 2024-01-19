@@ -1,4 +1,4 @@
-import 'package:jaspr/components.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
@@ -76,12 +76,9 @@ void main() {
                   wasCalledWith.add(next);
                 }, fireImmediately: true);
 
-                yield Button(
-                  label: 'a ${context.watch(counter)}',
-                  onPressed: () {
-                    context.read(counter.notifier).state++;
-                  },
-                );
+                yield button(onClick: () {
+                  context.read(counter.notifier).state++;
+                }, [text('a ${context.watch(counter)}')]);
               },
             );
           } else {

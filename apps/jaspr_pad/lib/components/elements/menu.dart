@@ -1,4 +1,4 @@
-import 'package:jaspr/components.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../../adapters/html.dart' hide Element;
 import '../../adapters/mdc.dart';
