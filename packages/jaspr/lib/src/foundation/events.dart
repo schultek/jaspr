@@ -8,26 +8,29 @@ export 'events/events_web.dart' if (dart.library.ffi) 'events/events_vm.dart'
 typedef EventCallback = void Function(Event event);
 typedef EventCallbacks = Map<String, EventCallback>;
 
+/// Helper function to provide typed event handlers to the `events` property of html components.
 EventCallbacks events<V1, V2>({
   /// Listens to the 'click' event.
   VoidCallback? onClick,
 
-  /// Listens to the 'input' event. The type of value depends on the input element.
-  ///
-  /// Type 'checkbox' or 'radio': bool?
-  /// Type 'number': num?
-  /// Type 'date' or 'dateTimeLocal': DateTime
-  /// Type 'file': List<File>?
-  /// Other type: String?
+  /// Listens to the 'input' event. When providing a generic type for [value], it must be according to the target element:
+  /// - `bool?` for checkbox or radio input elements
+  /// - `num?` for number input elements
+  /// - `DateTime` for date input elements
+  /// - `List<File>?` for file input elements
+  /// - `List<String>` for select elements
+  /// - `String` for text input and textarea elements
+  /// - `Null` for all other elements
   ValueChanged<V1>? onInput,
 
-  /// Listens to the 'change' event. The type of value depends on the input element.
-  ///
-  /// Type 'checkbox' or 'radio': bool?
-  /// Type 'number': num?
-  /// Type 'date' or 'dateTimeLocal': DateTime
-  /// Type 'file': List<File>?
-  /// Other type: String?
+  /// Listens to the 'change' event. When providing a generic type for [value], it must be according to the target element:
+  /// - `bool?` for checkbox or radio input elements
+  /// - `num?` for number input elements
+  /// - `DateTime` for date input elements
+  /// - `List<File>?` for file input elements
+  /// - `List<String>` for select elements
+  /// - `String` for text input and textarea elements
+  /// - `Null` for all other elements
   ValueChanged<V2>? onChange,
 }) =>
     {

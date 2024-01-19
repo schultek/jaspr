@@ -1,19 +1,67 @@
-## Unreleased minor
+## Unreleased breaking
+
+- **BREAKING** Updated `@client` components for a more streamlined usage.
+  
+  Annotated components no longer generate a `.g.dart` file and don't need to implement any generated mixin anymore.
+  Instead, a single `lib/jaspr_options.dart` file is generated when using `@client` components.
+
+  You must now call `Jaspr.initializeApp(options: defaultJasprOptions)` at the start of your app, where 
+  `defaultJasprOptions` is part of the newly generated `jaspr_options.dart` file.
+
+  *Note:* Calling `Jaspr.initializeApp()` will be required in a future version of jaspr, and the cli will warn you
+  when it's not called.
+  
+- **BREAKING** Promoted `jaspr_web_compilers` to non-experimental status.
+
+  This also changes the respective cli option from `jaspr create --experimental-web-compilers` (old) to `jaspr create --jaspr-web-compilers` (new).
+
+- **BREAKING** Refactored components inside the `package:jaspr/components` library. Some component properties have changed 
+  or been discontinued. Check the separate components for details.
+
+- **BREAKING** Event callbacks are now typed. The `events` property of html components now expects a `Map<String, void Function(Event)>`
+  instead of the old `Map<String, void Function(dynamic)>`.
+
+  In addition to this jaspr comes with a new `events()` function to provide typed event handlers for common events, like 
+  `onClick`, `onInput` and `onChange`. Use it like this:
+
+  ```dart
+  anyelement(
+    // Uses the [events] method to provide typed event handlers.
+    events: events(
+      onClick: () {
+        print("Clicked");
+      },
+      // [value] can be typed depending on the element, e.g. `String` for text inputs or `bool` for checkboxes.
+      onInput: (String value) {
+        print("Value: $value");
+      },
+    ),
+    [...]
+  )
+  ```
+  
+  Moreover, the html components `button`, `input`, `textarea` and `select` now also come with additional shorthand properties 
+  for their supported event handlers:
+
+  ```dart
+  button(
+    onClick: () {
+      print("Clicked");  
+    },
+    [...]
+  )
+  ```
+  
+- Added support for rendering `svg` elements.
 
 - Refactored rendering implementation to use `RenderObject`s.
 - Added `NotificationListener` component.
-- Promoted `jaspr_web_compilers` to non-experimental status and changed cli command `jaspr create --experimental-web-compilers` 
-  to `jaspr create --jaspr-web-compilers`
-- Fixed error on windows when running `jaspr build`.
-- Fixed error with `jaspr serve` related to the use of `webdev`.
-- Added support for rendering `svg`.
-- Added new `Colors.transparent` color.
-- Added `Unit.auto`, `Unit.vw` and `Unit.vh` for responsive styling.
-- Added `StyleRule.fontFace` to add external font files.
-- Refactored components from `jaspr/components`.
-- Added `events()` method for using typed event handlers like `onClick` or `onInput`.
-- Added typed event handlers to `button`, `input`, `textarea` and `select` components.
-- Added `Jaspr.initializeApp()` method and generate `jaspr_options.dart` file.
+
+- Added `Colors.transparent`.
+- Added `Unit.auto`, `Unit.vw()` and `Unit.vh()` for responsive styling.
+- Added `StyleRule.fontFace()` to add external font files.
+
+- Several bug fixes and stability improvements when running `jaspr serve` or `jaspr build`.
 
 ## 0.9.3
 
