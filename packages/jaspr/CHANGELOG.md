@@ -8,6 +8,7 @@
 - Fixed error with `jaspr serve` related to the use of `webdev`.
 - Added support for rendering `svg`.
 - Added `Unit.auto` for responsive styling using the 'auto' css unit.
+- Added new `Colors.transparent` color.
 
 ## 0.9.3
 
