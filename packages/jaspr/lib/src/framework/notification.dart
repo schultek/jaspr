@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 /// A notification that can bubble up the component tree.
 ///

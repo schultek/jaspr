@@ -276,7 +276,7 @@ class UncontrolledProviderScope extends InheritedComponent {
 
 @sealed
 class _UncontrolledProviderScopeElement extends InheritedElement {
-  _UncontrolledProviderScopeElement(UncontrolledProviderScope component) : super(component);
+  _UncontrolledProviderScopeElement(UncontrolledProviderScope super.component);
 
   void Function()? _task;
   // ignore: unused_field

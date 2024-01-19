@@ -45,10 +45,10 @@ packages:
     dependency: transitive
     description:
       name: hotreloader
-      sha256: "906f81803b6e81d9908e95fac387daa5a6ba779ff494b438f0c82eca16f6da28"
+      sha256: "94ee21a60ea2836500799f3af035dc3212b1562027f1e0031c14e087f0231449"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.4"
+    version: "4.1.0"
   html:
     dependency: transitive
     description:
@@ -228,9 +228,9 @@ packages:
     dependency: transitive
     description:
       name: watcher
-      sha256: e42dfcc48f67618344da967b10f62de57e04bae01d9d3af4c2596f3712a88c99
+      sha256: "3d2ad6751b3c16cf07c7fca317a1413b3f26530319181b37e3b9039b84fc01d8"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.1.0"
 sdks:
   dart: ">=3.0.0 <4.0.0"

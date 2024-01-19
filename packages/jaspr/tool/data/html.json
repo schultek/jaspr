@@ -6,11 +6,20 @@
     "aside": {
       "doc": "The &lt;aside&gt; HTML element represents a portion of a document whose content is only indirectly related to the document's main content. Asides are frequently presented as sidebars or call-out boxes."
     },
+    "body": {
+      "doc": "The &lt;body&gt; HTML element represents the content of an HTML document. There can be only one &lt;body&gt; element in a document."
+    },
     "footer": {
       "doc": "The &lt;footer&gt; HTML element represents a footer for its nearest ancestor sectioning content or sectioning root element. A &lt;footer&gt; typically contains information about the author of the section, copyright data or links to related documents."
     },
+    "head": {
+      "doc": "The &lt;head&gt; HTML element contains machine-readable information (metadata) about the document, like its title, scripts, and style sheets."
+    },
     "header": {
       "doc": "The &lt;header&gt; HTML element represents introductory content, typically a group of introductory or navigational aids. It may contain some heading elements but also a logo, a search form, an author name, and other elements."
+    },
+    "html": {
+      "doc": "The &lt;html&gt; HTML element represents the root (top-level element) of an HTML document, so it is also referred to as the root element. All other elements must be descendants of this element."
     },
     "h1": {
       "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
@@ -63,10 +72,10 @@
           "type": "int"
         },
         "type": {
-          "doc": "Sets the numbering type\nThe specified type is used for the entire list unless a different type attribute is used on an enclosed &lt;li&gt; element.",
+          "doc": "Sets the numbering type.\nThe specified type is used for the entire list unless a different type attribute is used on an enclosed &lt;li&gt; element.",
           "type": {
-            "name": "ListType",
-            "doc": "Them numbering type for a list element.",
+            "name": "NumberingType",
+            "doc": "The numbering type for a list element.",
             "values": {
               "lowercaseLetters": {
                 "value": "a",

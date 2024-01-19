@@ -35,7 +35,7 @@ class Home extends StatelessComponent {
 }
 
 class InheritedData extends InheritedComponent {
-  InheritedData({required Component child}) : super(child: child);
+  InheritedData({required super.child});
 
   @override
   bool updateShouldNotify(covariant InheritedData oldComponent) {
@@ -44,7 +44,7 @@ class InheritedData extends InheritedComponent {
 }
 
 class MyStatefulComponent extends StatefulComponent {
-  MyStatefulComponent({Key? key}) : super(key: key);
+  MyStatefulComponent({super.key});
   @override
   State<StatefulComponent> createState() => MyState();
 }

@@ -1,4 +1,4 @@
-part of style;
+part of '../styles.dart';
 
 class _FlexItemStyles implements Styles {
   final Flex? flex;

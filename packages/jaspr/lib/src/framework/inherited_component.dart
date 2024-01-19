@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 /// Base class for components that efficiently propagate information down the tree.
 ///
@@ -63,7 +63,7 @@ abstract class InheritedComponent extends Component {
 /// An [Element] that uses an [InheritedComponent] as its configuration.
 class InheritedElement extends SingleChildElement {
   /// Creates an element that uses the given component as its configuration.
-  InheritedElement(InheritedComponent component) : super(component);
+  InheritedElement(InheritedComponent super.component);
 
   @override
   InheritedComponent get component => super.component as InheritedComponent;

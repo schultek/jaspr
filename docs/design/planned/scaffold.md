@@ -9,12 +9,22 @@ We already do this for the compiler choice. This should be extended to be a sing
 The flow is modeled below:
 
 1. Project Name
-2. Select Mode (SSR, CSR, SSG)
-3. Setup routing for a multi page application? (Y/n)
-4. (If 3 is Yes And 2 is not CSR) Use client side routing? (y/N)
-5. Use Flutter Embedding? (y/N)
-6. (If 5 Is No) Use custom compiler (Enabled Flutter Plugins) (y/N)
-7. (If 2 Is SSR) Use custom backend? (None, Shelf, Dart Frog)
+2. Select Mode (Auto, Static, Server, Client, Hybrid, ?)
+  - Auto: Let jaspr automatically determine the rendering modes based on the used smart components.
+  - Static: Build a statically rendered site with optional client-side rendering.
+  - Server: Build a server-rendered site with optional client-side hydration.
+  - Client: Build a purely client-rendered website.
+  - Hybrid: Use static and server mode for separate pages of your site.
+3. Setup routing? (Y/n/?)
+  - Uses jaspr_router to route to different pages of your app.
+4. (If 3 is Yes And 2 is not Client) Use multipage routing? (Y/n/?)
+  - Sets up routing on the server. Choosing No sets up client-side routing. 
+5. Use Flutter Embedding? (y/N/?)
+  - Sets up Flutter web embedding for your project. 
+6. (If 5 Is No) Use Flutter Plugin Interop? (Y/n/?)
+  - Sets up the project to be able to use flutter web plugins (not Flutter widgets). 
+7. (If 2 Is Auto|Server) Use custom backend? (None, Shelf, Dart Frog, ?)
+  - Sets up a custom backend framework to use for the server part of your project. 
 
 Additional options to be considered:
 

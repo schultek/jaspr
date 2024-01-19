@@ -1,5 +1,4 @@
-import '../../../components.dart';
-import '../styles/properties/list.dart';
+import '../../../jaspr.dart';
 
 class ListItemMarker {
   final bool? isInside;
@@ -13,88 +12,87 @@ class ListItemMarker {
   });
 }
 
-class ListView extends BaseComponent {
-  final ListItemMarker? marker;
+enum ListType {
+  ordered,
+  unordered;
+}
 
+class ListView extends StatelessComponent {
   const ListView({
-    this.marker,
-    required super.tag,
     super.key,
-    super.id,
-    super.styles,
-    super.classes,
-    super.attributes,
-    super.events,
-    super.children,
+    this.type = ListType.unordered,
+    this.marker,
+    required this.children,
   });
 
   factory ListView.ordered({
     Key? key,
-    String? id,
-    Styles? styles,
-    List<String>? classes,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events,
-    List<ListItem>? children,
     ListItemMarker? marker,
+    required List<Component> children,
   }) {
     return ListView(
       key: key,
-      id: id,
-      styles: styles,
-      classes: classes,
-      attributes: attributes,
-      events: events,
-      children: children,
-      tag: 'ol',
+      type: ListType.ordered,
       marker: marker,
+      children: children,
     );
   }
 
   factory ListView.unordered({
     Key? key,
-    String? id,
-    Styles? styles,
-    List<String>? classes,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events,
-    List<ListItem>? children,
     ListItemMarker? marker,
+    required List<Component> children,
   }) {
     return ListView(
       key: key,
-      id: id,
-      styles: styles,
-      classes: classes,
-      attributes: attributes,
-      events: events,
+      type: ListType.unordered,
+      marker: marker ?? ListItemMarker(type: ListStyleType.none),
       children: children,
-      tag: 'ul',
-      marker: marker,
     );
   }
 
+  final ListType type;
+  final ListItemMarker? marker;
+  final List<Component> children;
+
   @override
-  Styles getStyles() => Styles.combine([
-        Styles.raw({
+  Iterable<Component> build(BuildContext context) sync* {
+    if (type == ListType.unordered) {
+      yield ul(
+        styles: Styles.raw({
           if (marker?.type == ListStyleType.none) 'margin': '0',
           if (marker?.type == ListStyleType.none) 'padding': '0',
           if (marker?.type != null) 'list-style-type': marker!.type!.value,
           if (marker?.isInside != null) 'list-style-position': marker!.isInside! ? 'inside' : 'outside',
           if (marker?.imageUrl != null) 'list-style-image': 'url("${marker?.imageUrl}")',
         }),
-        if (styles != null) styles!
-      ]);
+        children,
+      );
+    } else {
+      yield ol(
+        styles: Styles.raw({
+          if (marker?.type == ListStyleType.none) 'margin': '0',
+          if (marker?.type == ListStyleType.none) 'padding': '0',
+          if (marker?.type != null) 'list-style-type': marker!.type!.value,
+          if (marker?.isInside != null) 'list-style-position': marker!.isInside! ? 'inside' : 'outside',
+          if (marker?.imageUrl != null) 'list-style-image': 'url("${marker?.imageUrl}")',
+        }),
+        children,
+      );
+    }
+  }
 }
 
-class ListItem extends BaseComponent {
+class ListItem extends StatelessComponent {
   const ListItem({
     super.key,
-    super.id,
-    super.styles,
-    super.classes,
-    super.attributes,
-    super.events,
-    super.child,
-  }) : super(tag: 'li');
+    required this.children,
+  });
+
+  final List<Component> children;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield li(children);
+  }
 }

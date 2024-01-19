@@ -1,4 +1,4 @@
-part of style;
+part of '../styles.dart';
 
 class _GridItemStyles implements Styles {
   const _GridItemStyles({this.placement});

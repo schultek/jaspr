@@ -311,7 +311,7 @@ abstract class ChainedFinder extends Finder {
 }
 
 class _FirstFinder extends ChainedFinder {
-  _FirstFinder(Finder parent) : super(parent);
+  _FirstFinder(super.parent);
 
   @override
   String get description => '${parent.description} (ignoring all but first)';
@@ -323,7 +323,7 @@ class _FirstFinder extends ChainedFinder {
 }
 
 class _LastFinder extends ChainedFinder {
-  _LastFinder(Finder parent) : super(parent);
+  _LastFinder(super.parent);
 
   @override
   String get description => '${parent.description} (ignoring all but last)';
@@ -335,7 +335,7 @@ class _LastFinder extends ChainedFinder {
 }
 
 class _IndexFinder extends ChainedFinder {
-  _IndexFinder(Finder parent, this.index) : super(parent);
+  _IndexFinder(super.parent, this.index);
 
   final int index;
 

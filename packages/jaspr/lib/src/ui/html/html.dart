@@ -1,5 +1,3 @@
-library jaspr_html;
-
 import '../../foundation/basic_types.dart';
 import '../../foundation/events.dart';
 import '../../framework/framework.dart';

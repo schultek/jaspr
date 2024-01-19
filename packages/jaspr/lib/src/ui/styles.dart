@@ -9,6 +9,7 @@ export 'styles/properties/flex_item.dart';
 export 'styles/properties/flexbox.dart';
 export 'styles/properties/grid.dart';
 export 'styles/properties/grid_item.dart';
+export 'styles/properties/list.dart';
 export 'styles/properties/position.dart';
 export 'styles/properties/text.dart';
 export 'styles/properties/transform.dart';

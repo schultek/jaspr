@@ -1,92 +1,66 @@
 import '../../../components.dart';
 
-class TextParagraph extends BaseComponent {
+class TextParagraph extends StatelessComponent {
   const TextParagraph({
     super.key,
-    super.id,
-    super.styles,
-    super.classes,
-    super.attributes,
-    super.events,
-    super.child,
-    super.children,
-  }) : super(tag: 'p');
-}
+    required this.children,
+  });
 
-class TextSpan extends BaseComponent {
-  final String text;
-  final bool rawHtml;
-  final bool breakLine;
-  final bool newLine;
-
-  const TextSpan({
-    required this.text,
-    this.rawHtml = false,
-    this.breakLine = false,
-    this.newLine = false,
-    super.key,
-    super.id,
-    super.styles,
-    super.classes,
-    super.attributes,
-    super.events,
-  }) : super(tag: 'span');
-
-  @override
-  List<Component> getChildren() {
-    List<Component> children = [];
-    if (newLine) children.add(DomComponent(tag: 'br'));
-
-    final lines = text.split('\n');
-    for (var i = 0; i < lines.length; i++) {
-      children.add(Text(lines[i], rawHtml: rawHtml));
-      if (i < lines.length - 1 || breakLine) {
-        children.add(DomComponent(tag: 'br'));
-      }
-    }
-    return children;
-  }
-}
-
-class Title extends BaseComponent {
-  final String text;
-  final int _size;
-
-  Title({
-    required this.text,
-    size = 1,
-    super.key,
-    super.id,
-    super.styles,
-    super.classes,
-    super.attributes,
-    super.events,
-  })  : _size = size,
-        super(tag: '');
-
-  get size {
-    if (_size < 1) {
-      print('Warning: Title have too low size!');
-      return 1;
-    } else if (_size > 6) {
-      print('Warning: Title have too high size!');
-      return 6;
-    } else {
-      return _size;
-    }
-  }
+  final List<Component> children;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      id: id,
-      tag: 'h$size',
-      styles: getStyles(),
-      classes: getClasses(),
-      attributes: getAttributes(),
-      events: getEvents(),
-      child: Text(text),
-    );
+    yield p(children);
+  }
+}
+
+class TextSpan extends StatelessComponent {
+  const TextSpan({
+    super.key,
+    required this.text,
+    this.breakLine = false,
+    this.newLine = false,
+  });
+
+  final String text;
+  final bool breakLine;
+  final bool newLine;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    if (newLine) yield br();
+
+    final lines = text.split('\n');
+    for (var i = 0; i < lines.length; i++) {
+      yield Text(lines[i]);
+      if (i < lines.length - 1 || breakLine) {
+        yield br();
+      }
+    }
+  }
+}
+
+class Heading extends StatelessComponent {
+  const Heading({
+    super.key,
+    this.size = 1,
+    required this.text,
+  }) : assert(size >= 1 && size <= 6);
+
+  final String text;
+  final int size;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield switch (size) {
+      1 => h1([Text(text)]),
+      2 => h2([Text(text)]),
+      3 => h3([Text(text)]),
+      4 => h4([Text(text)]),
+      5 => h5([Text(text)]),
+      6 => h6([Text(text)]),
+      _ => throw UnimplementedError(),
+    };
   }
 }
 
@@ -100,7 +74,7 @@ class BreakLine extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     for (var i = 0; i < numberLines; i++) {
-      yield DomComponent(tag: 'br');
+      yield br();
     }
   }
 }

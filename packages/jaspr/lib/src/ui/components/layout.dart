@@ -1,70 +1,68 @@
 import '../../../jaspr.dart';
-import 'base.dart';
 
-class Page extends BaseComponent {
-  const Page({
-    this.overflow = Overflow.initial,
-    super.styles,
-    super.events,
-    super.children,
-  }) : super(tag: 'div');
+class Page extends StatelessComponent {
+  const Page({super.key, this.overflow = Overflow.initial, this.children = const []});
 
   final Overflow overflow;
+  final List<Component> children;
 
   @override
-  Styles getStyles() => Styles.combine([Styles.box(overflow: overflow), if (styles != null) styles!]);
+  Iterable<Component> build(BuildContext context) sync* {
+    yield div(
+      styles: Styles.box(overflow: overflow),
+      children,
+    );
+  }
 }
 
-class Center extends BaseComponent {
-  const Center({
-    super.child,
-    super.children,
-  }) : super(tag: 'div');
+class Center extends StatelessComponent {
+  const Center({super.key, this.children = const []});
+
+  final List<Component> children;
 
   @override
-  Styles getStyles() => Styles.combine([
-        Styles.flexbox(
-          justifyContent: JustifyContent.center,
-          alignItems: AlignItems.center,
-        ),
-        if (styles != null) styles!
-      ]);
+  Iterable<Component> build(BuildContext context) sync* {
+    yield div(
+      styles: Styles.flexbox(
+        justifyContent: JustifyContent.center,
+        alignItems: AlignItems.center,
+      ),
+      children,
+    );
+  }
 }
 
-class Spacer extends BaseComponent {
-  const Spacer({
-    this.width,
-    this.height,
-  }) : super(tag: 'div');
+class Spacer extends StatelessComponent {
+  const Spacer({super.key, this.width, this.height});
 
   final Unit? width;
   final Unit? height;
 
   @override
-  Styles getStyles() => Styles.combine([
-        Styles.box(
-          width: width,
-          height: height,
-        ),
-      ]);
+  Iterable<Component> build(BuildContext context) sync* {
+    yield div(styles: Styles.box(width: width, height: height), []);
+  }
 }
 
-class Padding extends BaseComponent {
+class Padding extends StatelessComponent {
   const Padding({
+    super.key,
     required this.padding,
-    super.child,
-  }) : super(tag: 'div');
+    required this.children,
+  });
 
   final EdgeInsets padding;
+  final List<Component> children;
 
   @override
-  Styles getStyles() => Styles.combine([
-        Styles.box(padding: padding),
-      ]);
+  Iterable<Component> build(BuildContext context) sync* {
+    yield div(styles: Styles.box(padding: padding), children);
+  }
 }
 
-class Container extends BaseComponent {
+class Container extends StatelessComponent {
   const Container({
+    super.key,
     this.width,
     this.height,
     this.padding,
@@ -73,14 +71,8 @@ class Container extends BaseComponent {
     this.color,
     this.border,
     this.center = false,
-    super.key,
-    super.id,
-    super.styles,
-    super.classes,
-    super.attributes,
-    super.events,
-    super.child,
-  }) : super(tag: 'div');
+    this.children = const [],
+  });
 
   final Unit? width;
   final Unit? height;
@@ -90,9 +82,12 @@ class Container extends BaseComponent {
   final Color? color;
   final Border? border;
   final bool center;
+  final List<Component> children;
 
   @override
-  Styles getStyles() => Styles.combine([
+  Iterable<Component> build(BuildContext context) sync* {
+    yield div(
+      styles: Styles.combine([
         Styles.box(
           width: width,
           height: height,
@@ -101,60 +96,92 @@ class Container extends BaseComponent {
           overflow: overflow,
           border: border,
         ),
-        Styles.background(color: color),
+        if (color != null) Styles.background(color: color),
         if (center)
           Styles.flexbox(
             justifyContent: JustifyContent.center,
             alignItems: AlignItems.center,
           ),
-        if (styles != null) styles!
-      ]);
+      ]),
+      children,
+    );
+  }
 }
 
-class Column extends BaseComponent {
+class Column extends StatelessComponent {
   const Column({
-    super.children,
-  }) : super(tag: 'div');
+    super.key,
+    this.mainAxisAlignment,
+    this.crossAxisAlignment,
+    required this.children,
+  });
+
+  final JustifyContent? mainAxisAlignment;
+  final AlignItems? crossAxisAlignment;
+  final List<Component> children;
 
   @override
-  Styles getStyles() => Styles.combine([
-        Styles.flexbox(direction: FlexDirection.column, wrap: FlexWrap.wrap),
-        if (styles != null) styles!,
-      ]);
+  Iterable<Component> build(BuildContext context) sync* {
+    yield div(
+      styles: Styles.flexbox(
+        direction: FlexDirection.column,
+        wrap: FlexWrap.nowrap,
+        justifyContent: mainAxisAlignment,
+        alignItems: crossAxisAlignment,
+      ),
+      children,
+    );
+  }
 }
 
-class Row extends BaseComponent {
+class Row extends StatelessComponent {
   const Row({
-    this.wrap,
-    super.children,
-  }) : super(tag: 'div');
+    super.key,
+    this.mainAxisAlignment,
+    this.crossAxisAlignment,
+    required this.children,
+  });
 
-  final FlexWrap? wrap;
+  final JustifyContent? mainAxisAlignment;
+  final AlignItems? crossAxisAlignment;
+  final List<Component> children;
 
   @override
-  Styles getStyles() =>
-      Styles.combine([Styles.flexbox(direction: FlexDirection.row, wrap: wrap), if (styles != null) styles!]);
+  Iterable<Component> build(BuildContext context) sync* {
+    yield div(
+      styles: Styles.flexbox(
+        direction: FlexDirection.row,
+        wrap: FlexWrap.nowrap,
+        justifyContent: mainAxisAlignment,
+        alignItems: crossAxisAlignment,
+      ),
+      children,
+    );
+  }
 }
 
-class Grid extends BaseComponent {
+class Grid extends StatelessComponent {
   const Grid({
     required this.columns,
     this.gap,
     this.spread = false,
-    super.children,
-  }) : super(tag: 'div');
+    required this.children,
+  });
 
   final int columns;
   final Unit? gap;
   final bool spread;
+  final List<Component> children;
 
   @override
-  Styles getStyles() => Styles.combine([
-        Styles.raw({
-          "display": "grid",
-          "grid-template-columns": "repeat($columns, ${spread ? "1fr" : "0fr"})",
-          if (gap != null) "gap": gap!.value,
-        }),
-        if (styles != null) styles!
-      ]);
+  Iterable<Component> build(BuildContext context) sync* {
+    yield div(
+      styles: Styles.raw({
+        "display": "grid",
+        "grid-template-columns": "repeat($columns, ${spread ? "1fr" : "0fr"})",
+        if (gap != null) "gap": gap!.value,
+      }),
+      children,
+    );
+  }
 }

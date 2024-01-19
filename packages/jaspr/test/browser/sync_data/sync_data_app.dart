@@ -11,7 +11,7 @@ class App extends StatelessComponent {
 }
 
 class Counter extends StatefulComponent {
-  Counter({Key? key}) : super(key: key);
+  Counter({super.key});
 
   @override
   State<StatefulComponent> createState() => CounterState();

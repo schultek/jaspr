@@ -61,7 +61,7 @@ class App extends TestComponent<int> {
 }
 
 class ChildComponent extends Component {
-  ChildComponent({Key? key, required this.num}) : super(key: key);
+  ChildComponent({super.key, required this.num});
 
   final int num;
 
@@ -70,7 +70,7 @@ class ChildComponent extends Component {
 }
 
 class ChildElement extends SingleChildElement {
-  ChildElement(ChildComponent component) : super(component);
+  ChildElement(ChildComponent super.component);
 
   @override
   ChildComponent get component => super.component as ChildComponent;

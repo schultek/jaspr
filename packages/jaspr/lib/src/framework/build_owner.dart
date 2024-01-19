@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 class BuildOwner {
   final List<Element> _dirtyElements = <Element>[];

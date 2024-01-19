@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 /// Signature for a function that is called for each [RenderObject].
 ///
