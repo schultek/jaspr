@@ -7,6 +7,9 @@
 - Fixed error on windows when running `jaspr build`.
 - Fixed error with `jaspr serve` related to the use of `webdev`.
 - Added support for rendering `svg`.
+- Added typed event handlers to `button`, `input`, `textarea` and `select` components.
+- Added `events()` method for using typed event handlers like `onClick` or `onInput`.
+- Added `Jaspr.initializeApp()` method and generate `jaspr_options.dart` file.
 
 ## 0.9.3
 
