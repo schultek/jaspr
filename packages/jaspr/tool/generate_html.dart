@@ -7,7 +7,7 @@ void main() {
 
   for (var key in specJson.keys) {
     var group = specJson[key] as Map<String, dynamic>;
-    var file = File('lib/src/ui/html/$key.dart');
+    var file = File('lib/src/components/html/$key.dart');
     var content = StringBuffer("part of 'html.dart';\n");
 
     for (var tag in group.keys) {

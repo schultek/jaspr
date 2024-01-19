@@ -1,4 +1,4 @@
-import '../../../jaspr.dart';
+import '../../jaspr.dart';
 
 class Link extends StatelessComponent {
   const Link({

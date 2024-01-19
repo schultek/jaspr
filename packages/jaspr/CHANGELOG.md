@@ -1,5 +1,9 @@
 ## Unreleased breaking
 
+- **BREAKING** Restructured core libraries:
+  - Removed `package:jaspr/html.dart` -> Use `package:jaspr/jaspr.dart` instead.
+  - Renamed `package:jaspr/components.dart` to `package:jaspr/ui.dart`.
+
 - **BREAKING** Updated `@client` components for a more streamlined usage.
   
   Annotated components no longer generate a `.g.dart` file and don't need to implement any generated mixin anymore.

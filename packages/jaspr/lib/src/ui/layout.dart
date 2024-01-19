@@ -1,4 +1,4 @@
-import '../../../jaspr.dart';
+import '../../jaspr.dart';
 
 class Page extends StatelessComponent {
   const Page({super.key, this.overflow = Overflow.initial, this.children = const []});

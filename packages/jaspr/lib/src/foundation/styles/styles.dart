@@ -1,18 +1,8 @@
 library style;
 
-import 'properties/background.dart';
-import 'properties/box.dart';
-import 'properties/color.dart';
-import 'properties/edge_insets.dart';
-import 'properties/flex_item.dart';
-import 'properties/flexbox.dart';
-import 'properties/grid.dart';
-import 'properties/grid_item.dart';
-import 'properties/position.dart';
-import 'properties/text.dart';
-import 'properties/transform.dart';
-import 'properties/transition.dart';
-import 'properties/unit.dart';
+import 'properties/all.dart';
+
+export 'properties/all.dart' hide NumberString;
 
 part 'groups/background.dart';
 part 'groups/box.dart';

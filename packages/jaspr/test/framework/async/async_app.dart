@@ -1,4 +1,4 @@
-import 'package:jaspr/components.dart';
+import 'package:jaspr/jaspr.dart';
 
 class FutureTester<T> extends StatelessComponent {
   FutureTester(this.future);

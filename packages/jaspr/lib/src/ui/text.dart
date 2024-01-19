@@ -1,4 +1,4 @@
-import '../../../components.dart';
+import '../../jaspr.dart';
 
 class TextParagraph extends StatelessComponent {
   const TextParagraph({

@@ -1,7 +1,7 @@
 import '../../foundation/basic_types.dart';
-import '../../foundation/events.dart';
+import '../../foundation/events/events.dart';
+import '../../foundation/styles/styles.dart';
 import '../../framework/framework.dart';
-import '../styles/styles.dart';
 
 part 'content.dart';
 part 'forms.dart';
