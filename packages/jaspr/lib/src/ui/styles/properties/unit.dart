@@ -8,6 +8,10 @@ extension UnitExt on num {
   Unit get em => Unit.em(toDouble());
 
   Unit get rem => Unit.rem(toDouble());
+
+  Unit get vw => Unit.vw(toDouble());
+
+  Unit get vh => Unit.vh(toDouble());
 }
 
 abstract class Unit {
@@ -30,6 +34,12 @@ abstract class Unit {
 
   /// Constructs a [Unit] in the form '100rem'
   const factory Unit.rem(double value) = _RemUnit;
+
+  /// Constructs a [Unit] in the form '100vw'
+  const factory Unit.vw(double value) = _VwUnit;
+
+  /// Constructs a [Unit] in the form '100vh'
+  const factory Unit.vh(double value) = _VhUnit;
 
   /// The css value
   String get value;
@@ -99,6 +109,14 @@ class _EmUnit extends _Unit {
 
 class _RemUnit extends _Unit {
   const _RemUnit(double value) : super(value, 'rem');
+}
+
+class _VwUnit extends _Unit {
+  const _VwUnit(double value) : super(value, 'vw');
+}
+
+class _VhUnit extends _Unit {
+  const _VhUnit(double value) : super(value, 'vh');
 }
 
 extension NumberString on double {
