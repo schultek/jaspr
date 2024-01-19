@@ -9,7 +9,7 @@ void main() {
 final counterProvider = StateProvider((ref) => 0);
 
 class App extends StatelessComponent {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -18,14 +18,13 @@ class App extends StatelessComponent {
       yield Text('Count is $count');
     });
 
-    yield DomComponent(
-      tag: 'button',
+    yield button(
       events: {
         'click': (e) {
           context.read(counterProvider.notifier).state++;
         },
       },
-      child: Text('Press Me'),
+      [text('Press Me')],
     );
   }
 }

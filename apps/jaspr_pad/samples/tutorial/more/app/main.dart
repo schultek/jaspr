@@ -2,8 +2,7 @@
 import 'package:jaspr/jaspr.dart';
 
 void main() {
-  runApp(DomComponent(
-    tag: 'h2',
-    child: Text('Thanks for trying out Jaspr ❤️'),
-  ));
+  runApp(h2([
+    text('Thanks for trying out Jaspr ❤️'),
+  ]));
 }

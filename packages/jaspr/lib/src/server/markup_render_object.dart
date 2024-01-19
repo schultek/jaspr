@@ -4,78 +4,68 @@ import '../../server.dart';
 
 const formatOutput = kDebugMode || kGenerateMode;
 
-class DomNodeData {
+class MarkupRenderObject extends RenderObject {
   String? tag;
   String? id;
   List<String>? classes;
   Map<String, String>? styles;
   Map<String, String>? attributes;
+
   String? text;
   bool? rawHtml;
-  List<RenderElement> children = [];
-}
 
-extension DomNodeDataExt on RenderElement {
-  DomNodeData get data => renderData ??= DomNodeData();
-}
+  List<MarkupRenderObject> children = [];
 
-class MarkupDomRenderer extends Renderer {
-  RenderElement? root;
+  MarkupRenderObject? parent;
 
   @override
-  void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  RenderObject createChildRenderObject() {
+    return MarkupRenderObject();
+  }
+
+  @override
+  void updateElement(String tag, String? id, List<String>? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
-    element.data
-      ..tag = tag
-      ..id = id
-      ..classes = classes
-      ..styles = styles
-      ..attributes = attributes;
+    this.tag = tag;
+    this.id = id;
+    this.classes = classes;
+    this.styles = styles;
+    this.attributes = attributes;
   }
 
   @override
-  void renderTextNode(RenderElement element, String text, [bool rawHtml = false]) {
-    element.data
-      ..text = text
-      ..rawHtml = rawHtml;
+  void updateText(String text, [bool rawHtml = false]) {
+    this.text = text;
+    this.rawHtml = rawHtml;
   }
 
   @override
-  void skipContent(RenderElement element) {
+  void skipChildren() {
     // noop
   }
 
   @override
-  void attachNode(RenderElement? parent, RenderElement child, RenderElement? after) {
-    if (parent == null) {
-      root = child;
-      return;
-    }
+  void attach(MarkupRenderObject? parent, MarkupRenderObject? after) {
+    if (parent == null) return;
 
-    var children = parent.data.children;
-    children.remove(child);
+    var children = parent.children;
+    children.remove(this);
     if (after == null) {
-      children.insert(0, child);
+      children.insert(0, this);
     } else {
       var index = children.indexOf(after);
-      children.insert(index + 1, child);
+      children.insert(index + 1, this);
     }
   }
 
   @override
-  void finalizeNode(RenderElement element) {}
-
-  @override
-  void removeChild(RenderElement parent, RenderElement child) {
-    parent.data.children.remove(child);
+  void remove() {
+    parent?.children.remove(this);
+    parent = null;
   }
 
-  String renderHtml() {
-    return root != null ? renderNodeHtml(root!) : '';
-  }
-
-  String renderNodeHtml(RenderElement element) {
-    var data = element.data;
+  String renderToHtml() {
+    var data = this;
     if (data.text != null) {
       if (data.rawHtml == true) {
         return data.text!;
@@ -114,7 +104,7 @@ class MarkupDomRenderer extends Renderer {
         output.write('>');
         var childOutput = <String>[];
         for (var child in data.children) {
-          childOutput.add(renderNodeHtml(child));
+          childOutput.add(child.renderToHtml());
         }
         var fullChildOutput = childOutput.fold<String>('', (s, o) => s + o);
         if (formatOutput && (fullChildOutput.length > 80 || fullChildOutput.contains('\n'))) {
@@ -129,10 +119,10 @@ class MarkupDomRenderer extends Renderer {
       }
       return output.toString();
     } else {
-      assert(element == root);
+      assert(parent == null);
       var output = StringBuffer();
       for (var child in data.children) {
-        output.writeln(renderNodeHtml(child));
+        output.writeln(child.renderToHtml());
       }
       return output.toString();
     }

@@ -1,8 +1,12 @@
 ## Unreleased minor
 
+- Refactored rendering implementation to use `RenderObject`s.
+- Added `NotificationListener` component.
 - Promoted `jaspr_web_compilers` to non-experimental status and changed cli command `jaspr create --experimental-web-compilers` 
   to `jaspr create --jaspr-web-compilers`
 - Fixed error on windows when running `jaspr build`.
+- Fixed error with `jaspr serve` related to the use of `webdev`.
+- Added support for rendering `svg`.
 - Added `Unit.auto` for responsive styling using the 'auto' css unit.
 
 ## 0.9.3

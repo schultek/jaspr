@@ -47,11 +47,11 @@ class StyleState extends State<Style> {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(tag: 'style', child: Text(style));
     if (component.scoped) {
-      yield RenderScope(
-        delegate: _ScopedDelegate(id),
-        shallow: false,
-        child: component.child,
-      );
+      // yield RenderScope(
+      //   delegate: _ScopedDelegate(id),
+      //   shallow: false,
+      //   child: component.child,
+      // );
     } else {
       yield component.child;
     }
@@ -80,13 +80,13 @@ class _ScopedVisitor extends Visitor {
   }
 }
 
-class _ScopedDelegate extends RenderDelegate {
-  _ScopedDelegate(this.id);
-
-  final String id;
-  @override
-  void renderNode(RenderElement node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
-      Map<String, String>? attributes, Map<String, EventCallback>? events) {
-    super.renderNode(node, tag, id, classes, styles, {'data-j-${id}': '', ...attributes ?? {}}, events);
-  }
-}
+// class _ScopedDelegate extends RenderDelegate {
+//   _ScopedDelegate(this.id);
+//
+//   final String id;
+//   @override
+//   void renderNode(RenderElement node, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+//       Map<String, String>? attributes, Map<String, EventCallback>? events) {
+//     super.renderNode(node, tag, id, classes, styles, {'data-j-${id}': '', ...attributes ?? {}}, events);
+//   }
+// }

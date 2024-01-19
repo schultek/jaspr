@@ -21,21 +21,23 @@ executables:
 dependencies:
   ansi_styles: ^0.3.2
   args: ^2.3.0
-  build_daemon: ^4.0.0
-  cli_completion: ^0.3.0
+  cli_completion: ^0.4.0
   cli_util: ^0.4.0
   collection: ^1.17.1
-  dwds: ^19.0.0
-  http: ^0.13.6
+  http: ^0.13.4
   io: ^1.0.4
   logging: ^1.1.1
   mason: ^0.1.0-dev.31
   meta: ^1.7.0
   path: ^1.8.0
   pub_updater: ^0.3.0
-  webdev: ^3.0.0
   yaml: ^3.1.0
+  # The following packages don't adhere to semantic versioning and might ship breaking changes in minor versions.
+  # Therefore, we depend on fixed versions of these packages.
+  build_daemon: 4.0.1
+  dwds: 23.0.0
+  webdev: 3.3.0
 
 dev_dependencies:
-  lints: ^2.1.0
+  lints: ^3.0.0
   test: ^1.22.0

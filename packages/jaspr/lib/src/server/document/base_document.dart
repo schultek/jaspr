@@ -80,9 +80,6 @@ class _BaseDocumentState extends State<_BaseDocument> {
     return 'main.clients';
   }
 
-  RenderElement? _script;
-  RenderElement? _data;
-
   String? get _normalizedBase {
     var base = component.base;
     if (base == null) return null;
@@ -90,6 +87,9 @@ class _BaseDocumentState extends State<_BaseDocument> {
     if (!base.endsWith('/')) base = '$base/';
     return base;
   }
+
+  final _dataKey = GlobalKey();
+  final _scriptKey = GlobalKey();
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -112,18 +112,8 @@ class _BaseDocumentState extends State<_BaseDocument> {
             if (component.styles != null) //
               Style(styles: component.styles!),
             ...component.head,
-            FindChildNode(
-              onNodeRendered: (element) {
-                _data = element;
-              },
-              child: DomComponent(tag: 'script', child: Text('', rawHtml: true)),
-            ),
-            FindChildNode(
-              onNodeRendered: (element) {
-                _script = element;
-              },
-              child: DomComponent(tag: 'script', attributes: {'defer': ''}),
-            ),
+            DomComponent(key: _dataKey, tag: 'script', child: Text('', rawHtml: true)),
+            DomComponent(key: _scriptKey, tag: 'script', attributes: {'defer': ''}),
           ],
         ),
         ComponentObserver(
@@ -148,53 +138,51 @@ class _BaseDocumentState extends State<_BaseDocument> {
   }
 
   void _setScript(String? name) {
-    if (_script != null) {
-      if (name == null) {
-        _script!.renderer.removeChild(_script!.parentNode!, _script!);
-      } else {
-        (_script!.data.attributes ??= {})['src'] = '$name.dart.js';
-      }
+    var renderObject = (_scriptKey.currentContext as RenderObjectElement).renderObject as MarkupRenderObject;
+    if (name == null) {
+      renderObject.remove();
+    } else {
+      (renderObject.attributes ??= {})['src'] = '$name.dart.js';
     }
   }
 
   void _setData(String? source) {
-    if (_data != null) {
-      if (source == null) {
-        _data!.renderer.removeChild(_data!.parentNode!, _data!);
-      } else {
-        _data!.data.children.first.data.text = source;
-      }
+    var renderObject = (_dataKey.currentContext as RenderObjectElement).renderObject as MarkupRenderObject;
+    if (source == null) {
+      renderObject.remove();
+    } else {
+      renderObject.children.first.text = source;
     }
   }
 
   String getIdFor(Element element) {
-    var container = element.parentNode;
+    var container = element.parentRenderObjectElement?.renderObject as MarkupRenderObject?;
     if (container == null) {
       return 'body';
     }
 
     String selector;
 
-    if (container.data.tag == 'body') {
+    if (container.tag == 'body') {
       selector = 'body';
-    } else if (container.data.id != null) {
-      selector = '#${container.data.id}';
+    } else if (container.id != null) {
+      selector = '#${container.id}';
     } else {
       var id = _randomId();
-      container.data.id = id;
+      container.id = id;
       selector = '#$id';
     }
 
     Element? prevElem = element.prevAncestorSibling;
-    while (prevElem != null && prevElem.lastNode == null) {
+    while (prevElem != null && prevElem.lastRenderObjectElement == null) {
       prevElem = prevElem.prevAncestorSibling;
     }
 
-    var firstChild = prevElem?.lastNode;
-    var lastChild = element.lastNode;
+    var firstChild = prevElem?.lastRenderObjectElement?.renderObject as MarkupRenderObject?;
+    var lastChild = element.lastRenderObjectElement?.renderObject as MarkupRenderObject?;
 
-    var firstIndex = (firstChild != null ? container.data.children.indexOf(firstChild) : -1) + 1;
-    var lastIndex = (lastChild != null ? container.data.children.indexOf(lastChild) : -1) + 1;
+    var firstIndex = (firstChild != null ? container.children.indexOf(firstChild) : -1) + 1;
+    var lastIndex = (lastChild != null ? container.children.indexOf(lastChild) : -1) + 1;
 
     if (firstIndex > lastIndex) {
       lastIndex = firstIndex;

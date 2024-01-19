@@ -95,4 +95,11 @@ abstract class BuildContext {
   /// pull data down, than it is to use [visitChildElements] recursively to push
   /// data down to them.
   void visitChildElements(ElementVisitor visitor);
+
+  /// Start bubbling this notification at the given build context.
+  ///
+  /// The notification will be delivered to any [NotificationListener] components
+  /// with the appropriate type parameters that are ancestors of the given
+  /// [BuildContext].
+  void dispatchNotification(Notification notification);
 }

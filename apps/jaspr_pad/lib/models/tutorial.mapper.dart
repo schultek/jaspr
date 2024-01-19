@@ -1,7 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
-// ignore_for_file: unused_element
+// ignore_for_file: unused_element, unnecessary_cast
+// ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
 part of 'tutorial.dart';
 
@@ -19,11 +20,6 @@ class TutorialDataMapper extends SubClassMapperBase<TutorialData> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'TutorialData';
 
@@ -39,7 +35,7 @@ class TutorialDataMapper extends SubClassMapperBase<TutorialData> {
   static const Field<TutorialData, Map<String, TutorialStep>> _f$steps = Field('steps', _$steps);
 
   @override
-  final Map<Symbol, Field<TutorialData, dynamic>> fields = const {
+  final MappableFields<TutorialData> fields = const {
     #id: _f$id,
     #description: _f$description,
     #currentStep: _f$currentStep,
@@ -63,39 +59,40 @@ class TutorialDataMapper extends SubClassMapperBase<TutorialData> {
   final Function instantiate = _instantiate;
 
   static TutorialData fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<TutorialData>(map));
+    return ensureInitialized().decodeMap<TutorialData>(map);
   }
 
   static TutorialData fromJson(String json) {
-    return _guard((c) => c.fromJson<TutorialData>(json));
+    return ensureInitialized().decodeJson<TutorialData>(json);
   }
 }
 
 mixin TutorialDataMappable {
   String toJson() {
-    return TutorialDataMapper._guard((c) => c.toJson(this as TutorialData));
+    return TutorialDataMapper.ensureInitialized().encodeJson<TutorialData>(this as TutorialData);
   }
 
   Map<String, dynamic> toMap() {
-    return TutorialDataMapper._guard((c) => c.toMap(this as TutorialData));
+    return TutorialDataMapper.ensureInitialized().encodeMap<TutorialData>(this as TutorialData);
   }
 
   TutorialDataCopyWith<TutorialData, TutorialData, TutorialData> get copyWith =>
       _TutorialDataCopyWithImpl(this as TutorialData, $identity, $identity);
   @override
   String toString() {
-    return TutorialDataMapper._guard((c) => c.asString(this));
+    return TutorialDataMapper.ensureInitialized().stringifyValue(this as TutorialData);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && TutorialDataMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            TutorialDataMapper.ensureInitialized().isValueEqual(this as TutorialData, other));
   }
 
   @override
   int get hashCode {
-    return TutorialDataMapper._guard((c) => c.hash(this));
+    return TutorialDataMapper.ensureInitialized().hashValue(this as TutorialData);
   }
 }
 
@@ -167,11 +164,6 @@ class TutorialStepConfigMapper extends ClassMapperBase<TutorialStepConfig> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'TutorialStepConfig';
 
@@ -181,7 +173,7 @@ class TutorialStepConfigMapper extends ClassMapperBase<TutorialStepConfig> {
   static const Field<TutorialStepConfig, String> _f$name = Field('name', _$name);
 
   @override
-  final Map<Symbol, Field<TutorialStepConfig, dynamic>> fields = const {
+  final MappableFields<TutorialStepConfig> fields = const {
     #id: _f$id,
     #name: _f$name,
   };
@@ -194,39 +186,40 @@ class TutorialStepConfigMapper extends ClassMapperBase<TutorialStepConfig> {
   final Function instantiate = _instantiate;
 
   static TutorialStepConfig fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<TutorialStepConfig>(map));
+    return ensureInitialized().decodeMap<TutorialStepConfig>(map);
   }
 
   static TutorialStepConfig fromJson(String json) {
-    return _guard((c) => c.fromJson<TutorialStepConfig>(json));
+    return ensureInitialized().decodeJson<TutorialStepConfig>(json);
   }
 }
 
 mixin TutorialStepConfigMappable {
   String toJson() {
-    return TutorialStepConfigMapper._guard((c) => c.toJson(this as TutorialStepConfig));
+    return TutorialStepConfigMapper.ensureInitialized().encodeJson<TutorialStepConfig>(this as TutorialStepConfig);
   }
 
   Map<String, dynamic> toMap() {
-    return TutorialStepConfigMapper._guard((c) => c.toMap(this as TutorialStepConfig));
+    return TutorialStepConfigMapper.ensureInitialized().encodeMap<TutorialStepConfig>(this as TutorialStepConfig);
   }
 
   TutorialStepConfigCopyWith<TutorialStepConfig, TutorialStepConfig, TutorialStepConfig> get copyWith =>
       _TutorialStepConfigCopyWithImpl(this as TutorialStepConfig, $identity, $identity);
   @override
   String toString() {
-    return TutorialStepConfigMapper._guard((c) => c.asString(this));
+    return TutorialStepConfigMapper.ensureInitialized().stringifyValue(this as TutorialStepConfig);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && TutorialStepConfigMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            TutorialStepConfigMapper.ensureInitialized().isValueEqual(this as TutorialStepConfig, other));
   }
 
   @override
   int get hashCode {
-    return TutorialStepConfigMapper._guard((c) => c.hash(this));
+    return TutorialStepConfigMapper.ensureInitialized().hashValue(this as TutorialStepConfig);
   }
 }
 
@@ -272,11 +265,6 @@ class TutorialStepMapper extends SubClassMapperBase<TutorialStep> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'TutorialStep';
 
@@ -294,7 +282,7 @@ class TutorialStepMapper extends SubClassMapperBase<TutorialStep> {
   static const Field<TutorialStep, bool> _f$showSolution = Field('showSolution', _$showSolution, opt: true, def: false);
 
   @override
-  final Map<Symbol, Field<TutorialStep, dynamic>> fields = const {
+  final MappableFields<TutorialStep> fields = const {
     #id: _f$id,
     #name: _f$name,
     #text: _f$text,
@@ -319,39 +307,40 @@ class TutorialStepMapper extends SubClassMapperBase<TutorialStep> {
   final Function instantiate = _instantiate;
 
   static TutorialStep fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<TutorialStep>(map));
+    return ensureInitialized().decodeMap<TutorialStep>(map);
   }
 
   static TutorialStep fromJson(String json) {
-    return _guard((c) => c.fromJson<TutorialStep>(json));
+    return ensureInitialized().decodeJson<TutorialStep>(json);
   }
 }
 
 mixin TutorialStepMappable {
   String toJson() {
-    return TutorialStepMapper._guard((c) => c.toJson(this as TutorialStep));
+    return TutorialStepMapper.ensureInitialized().encodeJson<TutorialStep>(this as TutorialStep);
   }
 
   Map<String, dynamic> toMap() {
-    return TutorialStepMapper._guard((c) => c.toMap(this as TutorialStep));
+    return TutorialStepMapper.ensureInitialized().encodeMap<TutorialStep>(this as TutorialStep);
   }
 
   TutorialStepCopyWith<TutorialStep, TutorialStep, TutorialStep> get copyWith =>
       _TutorialStepCopyWithImpl(this as TutorialStep, $identity, $identity);
   @override
   String toString() {
-    return TutorialStepMapper._guard((c) => c.asString(this));
+    return TutorialStepMapper.ensureInitialized().stringifyValue(this as TutorialStep);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && TutorialStepMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            TutorialStepMapper.ensureInitialized().isValueEqual(this as TutorialStep, other));
   }
 
   @override
   int get hashCode {
-    return TutorialStepMapper._guard((c) => c.hash(this));
+    return TutorialStepMapper.ensureInitialized().hashValue(this as TutorialStep);
   }
 }
 
@@ -414,11 +403,6 @@ class TutorialResponseMapper extends ClassMapperBase<TutorialResponse> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'TutorialResponse';
 
@@ -428,7 +412,7 @@ class TutorialResponseMapper extends ClassMapperBase<TutorialResponse> {
   static const Field<TutorialResponse, String> _f$error = Field('error', _$error);
 
   @override
-  final Map<Symbol, Field<TutorialResponse, dynamic>> fields = const {
+  final MappableFields<TutorialResponse> fields = const {
     #tutorial: _f$tutorial,
     #error: _f$error,
   };
@@ -441,39 +425,40 @@ class TutorialResponseMapper extends ClassMapperBase<TutorialResponse> {
   final Function instantiate = _instantiate;
 
   static TutorialResponse fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<TutorialResponse>(map));
+    return ensureInitialized().decodeMap<TutorialResponse>(map);
   }
 
   static TutorialResponse fromJson(String json) {
-    return _guard((c) => c.fromJson<TutorialResponse>(json));
+    return ensureInitialized().decodeJson<TutorialResponse>(json);
   }
 }
 
 mixin TutorialResponseMappable {
   String toJson() {
-    return TutorialResponseMapper._guard((c) => c.toJson(this as TutorialResponse));
+    return TutorialResponseMapper.ensureInitialized().encodeJson<TutorialResponse>(this as TutorialResponse);
   }
 
   Map<String, dynamic> toMap() {
-    return TutorialResponseMapper._guard((c) => c.toMap(this as TutorialResponse));
+    return TutorialResponseMapper.ensureInitialized().encodeMap<TutorialResponse>(this as TutorialResponse);
   }
 
   TutorialResponseCopyWith<TutorialResponse, TutorialResponse, TutorialResponse> get copyWith =>
       _TutorialResponseCopyWithImpl(this as TutorialResponse, $identity, $identity);
   @override
   String toString() {
-    return TutorialResponseMapper._guard((c) => c.asString(this));
+    return TutorialResponseMapper.ensureInitialized().stringifyValue(this as TutorialResponse);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && TutorialResponseMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            TutorialResponseMapper.ensureInitialized().isValueEqual(this as TutorialResponse, other));
   }
 
   @override
   int get hashCode {
-    return TutorialResponseMapper._guard((c) => c.hash(this));
+    return TutorialResponseMapper.ensureInitialized().hashValue(this as TutorialResponse);
   }
 }
 
@@ -523,11 +508,6 @@ class TutorialConfigMapper extends ClassMapperBase<TutorialConfig> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'TutorialConfig';
 
@@ -541,7 +521,7 @@ class TutorialConfigMapper extends ClassMapperBase<TutorialConfig> {
   static const Field<TutorialConfig, TutorialStep> _f$initialStep = Field('initialStep', _$initialStep);
 
   @override
-  final Map<Symbol, Field<TutorialConfig, dynamic>> fields = const {
+  final MappableFields<TutorialConfig> fields = const {
     #id: _f$id,
     #name: _f$name,
     #steps: _f$steps,
@@ -556,39 +536,40 @@ class TutorialConfigMapper extends ClassMapperBase<TutorialConfig> {
   final Function instantiate = _instantiate;
 
   static TutorialConfig fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<TutorialConfig>(map));
+    return ensureInitialized().decodeMap<TutorialConfig>(map);
   }
 
   static TutorialConfig fromJson(String json) {
-    return _guard((c) => c.fromJson<TutorialConfig>(json));
+    return ensureInitialized().decodeJson<TutorialConfig>(json);
   }
 }
 
 mixin TutorialConfigMappable {
   String toJson() {
-    return TutorialConfigMapper._guard((c) => c.toJson(this as TutorialConfig));
+    return TutorialConfigMapper.ensureInitialized().encodeJson<TutorialConfig>(this as TutorialConfig);
   }
 
   Map<String, dynamic> toMap() {
-    return TutorialConfigMapper._guard((c) => c.toMap(this as TutorialConfig));
+    return TutorialConfigMapper.ensureInitialized().encodeMap<TutorialConfig>(this as TutorialConfig);
   }
 
   TutorialConfigCopyWith<TutorialConfig, TutorialConfig, TutorialConfig> get copyWith =>
       _TutorialConfigCopyWithImpl(this as TutorialConfig, $identity, $identity);
   @override
   String toString() {
-    return TutorialConfigMapper._guard((c) => c.asString(this));
+    return TutorialConfigMapper.ensureInitialized().stringifyValue(this as TutorialConfig);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && TutorialConfigMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            TutorialConfigMapper.ensureInitialized().isValueEqual(this as TutorialConfig, other));
   }
 
   @override
   int get hashCode {
-    return TutorialConfigMapper._guard((c) => c.hash(this));
+    return TutorialConfigMapper.ensureInitialized().hashValue(this as TutorialConfig);
   }
 }
 

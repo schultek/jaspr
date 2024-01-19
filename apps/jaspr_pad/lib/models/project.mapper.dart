@@ -1,7 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
-// ignore_for_file: unused_element
+// ignore_for_file: unused_element, unnecessary_cast
+// ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
 part of 'project.dart';
 
@@ -19,16 +20,11 @@ class ProjectDataBaseMapper extends ClassMapperBase<ProjectDataBase> {
     return _instance!;
   }
 
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
-  }
-
   @override
   final String id = 'ProjectDataBase';
 
   @override
-  final Map<Symbol, Field<ProjectDataBase, dynamic>> fields = const {};
+  final MappableFields<ProjectDataBase> fields = const {};
 
   static ProjectDataBase _instantiate(DecodingData data) {
     throw MapperException.missingSubclass('ProjectDataBase', 'type', '${data.value['type']}');
@@ -38,11 +34,11 @@ class ProjectDataBaseMapper extends ClassMapperBase<ProjectDataBase> {
   final Function instantiate = _instantiate;
 
   static ProjectDataBase fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<ProjectDataBase>(map));
+    return ensureInitialized().decodeMap<ProjectDataBase>(map);
   }
 
   static ProjectDataBase fromJson(String json) {
-    return _guard((c) => c.fromJson<ProjectDataBase>(json));
+    return ensureInitialized().decodeJson<ProjectDataBase>(json);
   }
 }
 
@@ -58,11 +54,6 @@ class ProjectDataMapper extends SubClassMapperBase<ProjectData> {
       ProjectDataBaseMapper.ensureInitialized().addSubMapper(_instance!);
     }
     return _instance!;
-  }
-
-  static T _guard<T>(T Function(MapperContainer) fn) {
-    ensureInitialized();
-    return fn(MapperContainer.globals);
   }
 
   @override
@@ -83,7 +74,7 @@ class ProjectDataMapper extends SubClassMapperBase<ProjectData> {
       Field('dartFiles', _$dartFiles, opt: true, def: const {});
 
   @override
-  final Map<Symbol, Field<ProjectData, dynamic>> fields = const {
+  final MappableFields<ProjectData> fields = const {
     #id: _f$id,
     #description: _f$description,
     #htmlFile: _f$htmlFile,
@@ -113,39 +104,40 @@ class ProjectDataMapper extends SubClassMapperBase<ProjectData> {
   final Function instantiate = _instantiate;
 
   static ProjectData fromMap(Map<String, dynamic> map) {
-    return _guard((c) => c.fromMap<ProjectData>(map));
+    return ensureInitialized().decodeMap<ProjectData>(map);
   }
 
   static ProjectData fromJson(String json) {
-    return _guard((c) => c.fromJson<ProjectData>(json));
+    return ensureInitialized().decodeJson<ProjectData>(json);
   }
 }
 
 mixin ProjectDataMappable {
   String toJson() {
-    return ProjectDataMapper._guard((c) => c.toJson(this as ProjectData));
+    return ProjectDataMapper.ensureInitialized().encodeJson<ProjectData>(this as ProjectData);
   }
 
   Map<String, dynamic> toMap() {
-    return ProjectDataMapper._guard((c) => c.toMap(this as ProjectData));
+    return ProjectDataMapper.ensureInitialized().encodeMap<ProjectData>(this as ProjectData);
   }
 
   ProjectDataCopyWith<ProjectData, ProjectData, ProjectData> get copyWith =>
       _ProjectDataCopyWithImpl(this as ProjectData, $identity, $identity);
   @override
   String toString() {
-    return ProjectDataMapper._guard((c) => c.asString(this));
+    return ProjectDataMapper.ensureInitialized().stringifyValue(this as ProjectData);
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (runtimeType == other.runtimeType && ProjectDataMapper._guard((c) => c.isEqual(this, other)));
+        (runtimeType == other.runtimeType &&
+            ProjectDataMapper.ensureInitialized().isValueEqual(this as ProjectData, other));
   }
 
   @override
   int get hashCode {
-    return ProjectDataMapper._guard((c) => c.hash(this));
+    return ProjectDataMapper.ensureInitialized().hashValue(this as ProjectData);
   }
 }
 
