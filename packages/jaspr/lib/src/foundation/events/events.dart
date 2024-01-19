@@ -1,9 +1,8 @@
 import '../../components/html/html.dart';
 import '../basic_types.dart';
-import 'events_web.dart' if (dart.library.ffi) 'events/events_vm.dart';
+import 'events_web.dart' if (dart.library.ffi) 'events_vm.dart';
 
-export 'events_web.dart' if (dart.library.ffi) 'events/events_vm.dart'
-    hide InputElement, TextAreaElement, SelectElement;
+export 'events_web.dart' if (dart.library.ffi) 'events_vm.dart' hide InputElement, TextAreaElement, SelectElement;
 
 typedef EventCallback = void Function(Event event);
 typedef EventCallbacks = Map<String, EventCallback>;
