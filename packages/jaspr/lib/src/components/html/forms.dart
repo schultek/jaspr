@@ -454,12 +454,12 @@ Component option(List<Component> children,
   );
 }
 
-/// The <select> HTML element represents a control that provides a menu of options.
+/// The &lt;select&gt; HTML element represents a control that provides a menu of options.
 ///
 /// - [name]: This attribute is used to specify the name of the control.
 /// - [multiple]: Indicates that multiple options can be selected in the list. If it is not specified, then only one option can be selected at a time. When multiple is specified, most browsers will show a scrolling list box instead of a single line dropdown.
 /// - [required]: Indicating that an option with a non-empty string value must be selected.
-/// - [disabled]: Indicates that the user cannot interact with the control. If this attribute is not specified, the control inherits its setting from the containing element, for example <fieldset>; if there is no containing element with the disabled attribute set, then the control is enabled.
+/// - [disabled]: Indicates that the user cannot interact with the control. If this attribute is not specified, the control inherits its setting from the containing element, for example &lt;fieldset&gt;; if there is no containing element with the disabled attribute set, then the control is enabled.
 /// - [autofocus]: This attribute lets you specify that a form control should have input focus when the page loads. Only one form element in a document can have the autofocus attribute.
 /// - [autocomplete]: A string providing a hint for a user agent's autocomplete feature.
 /// - [size]: If the control is presented as a scrolling list box (e.g. when multiple is specified), this attribute represents the number of rows in the list that should be visible at one time. Browsers are not required to present a select element as a scrolled list box. The default value is 0.
@@ -505,10 +505,10 @@ Component select(List<Component> children,
   );
 }
 
-/// The <fieldset> HTML element is used to group several controls as well as labels (<label>) within a web form.
+/// The &lt;fieldset&gt; HTML element is used to group several controls as well as labels (&lt;label&gt;) within a web form.
 ///
 /// - [name]: The name associated with the group.
-/// - [disabled]: If this Boolean attribute is set, all form controls that are descendants of the <fieldset>, are disabled, meaning they are not editable and won't be submitted along with the <form>. They won't receive any browsing events, like mouse clicks or focus-related events. By default browsers display such controls grayed out. Note that form elements inside the <legend> element won't be disabled.
+/// - [disabled]: If this Boolean attribute is set, all form controls that are descendants of the &lt;fieldset&gt;, are disabled, meaning they are not editable and won't be submitted along with the &lt;form&gt;. They won't receive any browsing events, like mouse clicks or focus-related events. By default browsers display such controls grayed out. Note that form elements inside the &lt;legend&gt; element won't be disabled.
 Component fieldset(List<Component> children,
     {String? name,
     bool? disabled,

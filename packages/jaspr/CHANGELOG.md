@@ -59,7 +59,8 @@
 
   This also changes the respective cli option from `jaspr create --experimental-web-compilers` (old) to `jaspr create --jaspr-web-compilers` (new).
 
-- Added support for rendering `svg` elements.
+- Added support for rendering `svg` elements. 
+  Also added `svg()`, `rect()`, `circle()`, `ellipse()`, `line()`, `path()` and `polygon()` components.
 
 - Refactored rendering implementation to use `RenderObject`s.
 - Added `NotificationListener` component.

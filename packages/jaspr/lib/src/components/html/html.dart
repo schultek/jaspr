@@ -7,6 +7,7 @@ part 'content.dart';
 part 'forms.dart';
 part 'media.dart';
 part 'other.dart';
+part 'svg.dart';
 part 'text.dart';
 
 final _events = events;

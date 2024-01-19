@@ -10,11 +10,24 @@ void main() {
     var file = File('lib/src/components/html/$key.dart');
     var content = StringBuffer("part of 'html.dart';\n");
 
+    var schemas = <String, Map<String, dynamic>>{};
+
     for (var tag in group.keys) {
       var data = group[tag] as Map<String, dynamic>;
-      var attrs = data['attributes'] as Map<String, dynamic>?;
+      if (tag.startsWith(':')) {
+        schemas[tag.substring(1)] = data;
+        continue;
+      }
 
       content.write('\n${data['doc'].split('\n').map((t) => '/// $t\n').join()}');
+
+      var attrs = data['attributes'] as Map<String, dynamic>?;
+
+      var inherit = data['inherit'];
+
+      if (inherit != null) {
+        (attrs ??= {}).addAll(schemas[inherit]!);
+      }
 
       if (attrs != null) {
         content.writeln('///');
@@ -63,6 +76,9 @@ void main() {
             var [_, name, t] = type.split(':');
             events.add(name);
             content.write(t);
+          } else if (type is String && type.startsWith('css:')) {
+            var [_, name] = type.split(':');
+            content.write(name);
           } else if (type is Map<String, dynamic>) {
             var name = type['name'];
             content.write(name);
@@ -116,6 +132,8 @@ void main() {
           } else if (type == 'int' || type == 'double') {
             content.write("'\$$name'");
           } else if (type is String && type.startsWith('enum:')) {
+            content.write('$name.value');
+          } else if (type is String && type.startsWith('css:')) {
             content.write('$name.value');
           } else if (type is Map<String, dynamic>) {
             content.write('$name.value');
