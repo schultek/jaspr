@@ -236,4 +236,5 @@ class Colors {
   static const Color whiteSmoke = Color.named('whiteSmoke');
   static const Color yellow = Color.named('yellow');
   static const Color yellowGreen = Color.named('yellowGreen');
+  static const Color transparent = Color.named('transparent');
 }

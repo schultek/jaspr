@@ -7,7 +7,8 @@
 - Fixed error on windows when running `jaspr build`.
 - Fixed error with `jaspr serve` related to the use of `webdev`.
 - Added support for rendering `svg`.
-- Added support for `Unit.vw`
+- Added new `Colors.transparent` color.
+- Added `Unit.auto` and `Unit.vw` for responsive styling.
 
 ## 0.9.3
 
