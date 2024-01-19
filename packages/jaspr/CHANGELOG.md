@@ -18,8 +18,8 @@
 - **BREAKING** Changed type of the `classes` property of html components from `List<String>` to `String`. Multiple class
   names can be set using a single space-delimited string, e.g. `classes: 'class1 class2'`.
   
-- **BREAKING** Event callbacks are now typed. The `events` property of html components now expects a `Map<String, void Function(Event)>`
-  instead of the old `Map<String, void Function(dynamic)>`.
+- **BREAKING** Event callbacks are now typed. The `events` property of html components now expects a 
+  `Map<String, void Function(Event)>` instead of the old `Map<String, void Function(dynamic)>`.
 
   In addition to this jaspr comes with a new `events()` function to provide typed event handlers for common events, like 
   `onClick`, `onInput` and `onChange`. Use it like this:
@@ -40,8 +40,8 @@
   )
   ```
   
-  Moreover, the html components `button`, `input`, `textarea` and `select` now also come with additional shorthand properties 
-  for their supported event handlers:
+  Moreover, the html components `button`, `input`, `textarea` and `select` now also come with additional shorthand 
+  properties for their supported event handlers:
 
   ```dart
   button(
@@ -52,12 +52,13 @@
   )
   ```
 
-- **BREAKING** Refactored components inside the `package:jaspr/components` library. Some component properties have changed
-  or been discontinued. Check the separate components for details.
+- **BREAKING** Refactored components inside the `package:jaspr/ui.dart` library. Some component properties have 
+  changed or been discontinued. Check the separate components for details.
 
 - **BREAKING** Promoted `jaspr_web_compilers` to non-experimental status.
 
-  This also changes the respective cli option from `jaspr create --experimental-web-compilers` (old) to `jaspr create --jaspr-web-compilers` (new).
+  This also changes the respective cli option from `jaspr create --experimental-web-compilers` (old) to 
+  `jaspr create --jaspr-web-compilers` (new).
 
 - Added support for rendering `svg` elements. 
   Also added `svg()`, `rect()`, `circle()`, `ellipse()`, `line()`, `path()` and `polygon()` components.
