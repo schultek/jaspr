@@ -25,7 +25,7 @@ void main() {
         // Override jaspr dependencies from path.
         await bootstrap(config.name, dirs.root());
 
-        await run('jaspr clean --kill', dir: dirs.app());
+        await run('jaspr clean${Platform.isWindows ? '' : ' --kill'}', dir: dirs.app());
         var stop = await start('jaspr serve -v', dir: dirs.app());
 
         // Wait until server is started.
@@ -51,7 +51,7 @@ void main() {
 
         await stop();
 
-        await run('jaspr clean --kill', dir: dirs.app());
+        await run('jaspr clean${Platform.isWindows ? '' : ' --kill'}', dir: dirs.app());
         await run('jaspr build -v', dir: dirs.app());
 
         for (var file in config.outputs) {

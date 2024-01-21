@@ -82,5 +82,6 @@ Future<Future<void> Function()> start(String command, {required Directory dir}) 
     print("Stopping <$prefix>.");
     process.kill(ProcessSignal.sigint);
     await done.future.timeout(Duration(seconds: 10), onTimeout: () {});
+    await Future.delayed(Duration(seconds: 10));
   };
 }
