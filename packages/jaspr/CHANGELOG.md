@@ -162,7 +162,7 @@
     jaspr_web_compilers: ^4.0.4
   ```
   
-  For an example see `experiments/flutter_plugin_interop`](https://github.com/schultek/jaspr/tree/main/experiments/flutter_plugin_interop).
+  For an example see `examples/flutter_plugin_interop`](https://github.com/schultek/jaspr/tree/main/examples/flutter_plugin_interop).
   
 - Improved **flutter element embedding**.
 
@@ -172,7 +172,7 @@
   This removes the need for any kind of interop between apps as they can directly communicate
   through the usual primitives of passing properties and callbacks.
 
-  For an example see `experiments/flutter_embedding_v2`](https://github.com/schultek/jaspr/tree/main/experiments/flutter_embedding_v2).
+  For an example see `examples/flutter_embedding`](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding).
 
 - `jaspr build` now outputs to `/build/jaspr` instead of `/build`.
 
