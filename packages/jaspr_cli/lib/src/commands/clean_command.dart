@@ -5,7 +5,17 @@ import 'package:mason/mason.dart';
 import 'base_command.dart';
 
 class CleanCommand extends BaseCommand {
-  CleanCommand({super.logger});
+  CleanCommand({super.logger}) {
+    if (Platform.isMacOS || Platform.isLinux) {
+      argParser.addFlag(
+        'kill',
+        abbr: 'k',
+        help: 'Kill runaway processes.',
+        defaultsTo: null,
+        negatable: false,
+      );
+    }
+  }
 
   @override
   String get description => 'Cleans the project directory.';
@@ -45,7 +55,15 @@ class CleanCommand extends BaseCommand {
       ]);
 
       if (pids.isNotEmpty) {
-        var kill = logger.logger.confirm('Kill ${pids.length} runaway processes?');
+        bool kill;
+        if (argResults!['kill'] != null) {
+          kill = argResults!['kill'];
+          if (kill) {
+            logger.write("Killing ${pids.length} runaway processes.");
+          }
+        } else {
+          kill = logger.logger.confirm('Kill ${pids.length} runaway processes?');
+        }
 
         if (kill) {
           for (var pid in pids) {

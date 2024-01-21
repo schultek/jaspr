@@ -42,7 +42,7 @@ abstract class BaseCommand extends Command<int> {
   @override
   @mustCallSuper
   Future<int> run() async {
-    pubspecYaml = await getPubspec();
+    pubspecYaml = requiresPubspec ? await getPubspec() : null;
     config = JasprConfig.fromYaml(pubspecYaml, logger);
 
     await trackEvent(name, projectName: pubspecYaml?['name']);
@@ -83,11 +83,7 @@ abstract class BaseCommand extends Command<int> {
     var pubspecPath = 'pubspec.yaml';
     var pubspecFile = File(pubspecPath);
     if (!(await pubspecFile.exists())) {
-      if (requiresPubspec) {
-        throw 'Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.';
-      } else {
-        return null;
-      }
+      throw 'Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.';
     }
 
     var parsed = loadYaml(await pubspecFile.readAsString()) as YamlMap;

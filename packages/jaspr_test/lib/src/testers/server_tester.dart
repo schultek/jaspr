@@ -172,7 +172,9 @@ class ServerTester {
 }
 
 ServerApp _runTestApp(_LateComponent app, Handler fileHandler) {
+  var options = Jaspr.options;
   return ServerApp.run((binding) {
+    binding.initializeOptions(options);
     binding.attachRootComponent(app.component ?? Builder(builder: (_) => []));
   }, fileHandler);
 }

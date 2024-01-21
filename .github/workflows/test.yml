@@ -34,16 +34,8 @@ jobs:
           dart pub global activate melos
           melos bootstrap --no-private
 
-      - name: Create Project
-        run: |
-          cd apps
-          dart pub global run jaspr_cli:jaspr create -t basic -c my_app
-          melos bootstrap --scope my_app
-
-      - name: Build Project
-        run: |
-          cd apps/my_app
-          dart pub global run jaspr_cli:jaspr build -v
+      - name: Test CLI
+        run: melos run test:cli
 
   analyze:
     name: Analyze Code
