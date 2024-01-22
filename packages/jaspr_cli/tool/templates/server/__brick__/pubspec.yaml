@@ -11,6 +11,7 @@ dependencies:
 dev_dependencies:
   build_runner: ^2.4.0
   {{webCompilersPackage}}: ^{{webCompilersVersion}}
+  jaspr_builder: ^{{jasprBuilderVersion}}
   lints: ^2.1.0
 
 jaspr:
