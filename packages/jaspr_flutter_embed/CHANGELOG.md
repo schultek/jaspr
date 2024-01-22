@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.2.0
 
 - **BREAKING** Changed `FlutterEmbedView.classes` type from `List<String>` to `String`.
 

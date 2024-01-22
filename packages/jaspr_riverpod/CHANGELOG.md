@@ -1,3 +1,7 @@
+## 0.3.9
+
+- `jaspr` upgraded to `0.10.0`
+
 ## 0.3.8
 
 - Upgrade `riverpod` to `v2.4.8`

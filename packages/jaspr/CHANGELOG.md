@@ -1,4 +1,4 @@
-## Unreleased breaking
+## 0.10.0
 
 - **BREAKING** Restructured core libraries:
   - Removed `package:jaspr/html.dart` -> Use `package:jaspr/jaspr.dart` instead.
