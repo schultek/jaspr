@@ -12,7 +12,7 @@
   You must now call `Jaspr.initializeApp(options: defaultJasprOptions)` at the start of your app, where 
   `defaultJasprOptions` is part of the newly generated `jaspr_options.dart` file.
 
-  *Note:* Calling `Jaspr.initializeApp()` will be required in a future version of jaspr, and the cli will warn you
+  *Note:* Calling `Jaspr.initializeApp()` will be required in a future version of Jaspr, and the cli will warn you
   when it's not called.
 
 - **BREAKING** Changed type of the `classes` property of html components from `List<String>` to `String`. Multiple class
@@ -21,7 +21,7 @@
 - **BREAKING** Event callbacks are now typed. The `events` property of html components now expects a 
   `Map<String, void Function(Event)>` instead of the old `Map<String, void Function(dynamic)>`.
 
-  In addition to this jaspr comes with a new `events()` function to provide typed event handlers for common events, like 
+  In addition to this Jaspr comes with a new `events()` function to provide typed event handlers for common events, like 
   `onClick`, `onInput` and `onChange`. Use it like this:
 
   ```dart
@@ -75,7 +75,7 @@
 ## 0.9.3
 
 - Fixed `melos format` on Windows.
-- Fixed infinite loop attempting to find root directory on Windows when running a built jaspr executable.
+- Fixed infinite loop attempting to find root directory on Windows when running a built Jaspr executable.
 - Add `.exe` extension to the output of `jaspr build` on Windows.
 
 ## 0.9.2
@@ -98,8 +98,8 @@
 
 - Added *Static Site Generation* support.
 
-  With the new `jaspr generate` command you can generate static pages from your jaspr app. This requires a normal 
-  server-rendered jaspr app and will output separate `.html` pages for each of your routes.
+  With the new `jaspr generate` command you can generate static pages from your Jaspr app. This requires a normal 
+  server-rendered Jaspr app and will output separate `.html` pages for each of your routes.
 
   To specify which routes your application should handle, either use `jaspr_router` or call 
   `ServerApp.requestRouteGeneration('/my/route');` for each target route.
@@ -117,7 +117,7 @@
 - Added `StyleRule.media({MediaRuleQuery query, List<StyleRule> styles})` to support `@media` css statements.
 
 - Added support for Tailwind using the `jaspr_tailwind` integration.  
-  Simply run `dart pub add jaspr_tailwind --dev` and start using tailwind classes in your jaspr components.  
+  Simply run `dart pub add jaspr_tailwind --dev` and start using tailwind classes in your Jaspr components.  
   For a full setup and usage guide see [Tailwind Integration Docs](https://docs.page/schultek/jaspr/eco/tailwind).
 
 ## 0.7.0
@@ -126,7 +126,7 @@
 - Removed `--ssr` and `--flutter` cli options.
 - Added support `jaspr` config section in `pubspec.yaml`.
 
-  It is now possible to define certain configuration options for the jaspr cli
+  It is now possible to define certain configuration options for the Jaspr cli
   directly inside the `pubspec.yaml` file under the `jaspr` section.
   Initially supported options are:
 
@@ -162,12 +162,12 @@
     jaspr_web_compilers: ^4.0.4
   ```
   
-  For an example see `examples/flutter_plugin_interop`](https://github.com/schultek/jaspr/tree/main/examples/flutter_plugin_interop).
+  For an example see `examples/flutter_plugin_interop`](https://github.com/schultek/Jaspr/tree/main/examples/flutter_plugin_interop).
   
 - Improved **flutter element embedding**.
 
-  Flutter apps can now be directly embedded from your jaspr codebase and integrated into
-  the existing jaspr component tree.
+  Flutter apps can now be directly embedded from your Jaspr codebase and integrated into
+  the existing Jaspr component tree.
 
   This removes the need for any kind of interop between apps as they can directly communicate
   through the usual primitives of passing properties and callbacks.
@@ -190,7 +190,7 @@
 
 - Added support for **Flutter element embedding**.
 
-  Flutter apps can now easily be embedded within jaspr sites. The cli supports the `--flutter` argument for both
+  Flutter apps can now easily be embedded within Jaspr sites. The cli supports the `--flutter` argument for both
   the `serve` and `build` commands to specify the entrypoint of the flutter application.
 
   The complete setup is demonstrated in the [flutter_embedding](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding) 
