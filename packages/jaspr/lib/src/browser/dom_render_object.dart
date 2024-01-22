@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:html' as html show Element, Text;
-import 'dart:html';
+
+import 'package:web/web.dart' as web;
 
 import '../foundation/constants.dart';
 import '../foundation/events/events.dart';
@@ -13,8 +13,8 @@ const xmlns = {
 class DomRenderObject extends RenderObject {
   DomRenderObject? parent;
   String? namespace;
-  Node? node;
-  List<Node> toHydrate = [];
+  web.Node? node;
+  List<web.Node> toHydrate = [];
   Map<String, EventBinding>? events;
 
   void clearEvents() {
@@ -31,35 +31,38 @@ class DomRenderObject extends RenderObject {
       ..namespace = namespace;
   }
 
-  html.Element _createElement(String tag) {
+  web.Element _createElement(String tag) {
     namespace = xmlns[tag] ?? namespace;
     if (namespace != null) {
-      return document.createElementNS(namespace!, tag);
+      return web.document.createElementNS(namespace!, tag);
     }
-    return document.createElement(tag);
+    return web.document.createElement(tag);
   }
 
   @override
   void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     late Set<String> attributesToRemove;
-    late html.Element elem;
+    late web.Element elem;
 
     diff:
     if (node == null) {
       var toHydrate = parent!.toHydrate;
       if (toHydrate.isNotEmpty) {
         for (var e in toHydrate) {
-          if (e is html.Element && e.tagName.toLowerCase() == tag) {
+          if (e is web.Element && e.tagName.toLowerCase() == tag) {
             if (kVerboseMode) {
               print("Hydrate html node: $e");
             }
             elem = node = e;
-            attributesToRemove = elem.attributes.keys.toSet();
+            attributesToRemove = {};
+            for (var i = 0; i < elem.attributes.length; i++) {
+              attributesToRemove.add(elem.attributes.item(i)!.name);
+            }
             toHydrate.remove(e);
-            Iterable<Node> nodes = e.nodes;
+            var nodes = e.childNodes.toIterable();
             if (kDebugMode) {
-              nodes = nodes.where((node) => node is! html.Text || (node.text ?? '').trim().isNotEmpty);
+              nodes = nodes.where((node) => node is! web.Text || (node.textContent ?? '').trim().isNotEmpty);
             }
             this.toHydrate = nodes.toList();
             break diff;
@@ -73,15 +76,19 @@ class DomRenderObject extends RenderObject {
         print("Create html node: $elem");
       }
     } else {
-      if (node is! html.Element || (node as html.Element).tagName.toLowerCase() != tag) {
+      if (node is! web.Element || (node as web.Element).tagName.toLowerCase() != tag) {
         elem = _createElement(tag);
         var old = node;
-        node!.replaceWith(elem);
+        if (node case web.Element node) {
+          node.replaceWith(elem as dynamic);
+        } else if (node case web.Text node) {
+          node.replaceWith(elem as dynamic);
+        }
         node = elem;
-        if (old != null && old.childNodes.isNotEmpty) {
-          var oldChildren = [...old.childNodes];
+        if (old != null && old.childNodes.length > 0) {
+          var oldChildren = old.childNodes.toIterable();
           for (var child in oldChildren) {
-            elem.append(child);
+            elem.append(child as dynamic);
           }
         }
         attributesToRemove = {};
@@ -89,8 +96,11 @@ class DomRenderObject extends RenderObject {
           print("Replace html node: $elem for $old");
         }
       } else {
-        elem = node as html.Element;
-        attributesToRemove = elem.attributes.keys.toSet();
+        elem = node as web.Element;
+        attributesToRemove = {};
+        for (var i = 0; i < elem.attributes.length; i++) {
+          attributesToRemove.add(elem.attributes.item(i)!.name);
+        }
       }
     }
 
@@ -101,7 +111,7 @@ class DomRenderObject extends RenderObject {
 
     if (attributes != null && attributes.isNotEmpty) {
       for (var attr in attributes.entries) {
-        if (attr.key == 'value' && elem is InputElement && elem.value != attr.value) {
+        if (attr.key == 'value' && elem is web.HTMLInputElement && elem.value != attr.value) {
           if (kVerboseMode) {
             print("Set input value: ${attr.value}");
           }
@@ -130,9 +140,9 @@ class DomRenderObject extends RenderObject {
         prevEventTypes?.remove(type);
         final currentBinding = dataEvents[type];
         if (currentBinding != null) {
-          currentBinding.fn = fn;
+          currentBinding.fn = fn as dynamic;
         } else {
-          dataEvents[type] = EventBinding(elem, type, fn);
+          dataEvents[type] = EventBinding(elem, type, fn as dynamic);
         }
       });
       prevEventTypes?.forEach((type) {
@@ -145,12 +155,13 @@ class DomRenderObject extends RenderObject {
 
   @override
   void updateText(String text, [bool rawHtml = false]) {
+    print("UPDATE TEXT $text");
     if (rawHtml) {
       var parent = this.parent!.node;
-      if (parent is html.Element) {
-        if (parent.innerHtml != text) {
-          parent.innerHtml = text;
-          node = parent.childNodes.first;
+      if (parent is web.Element) {
+        if (parent.innerHTML != text) {
+          parent.innerHTML = text;
+          node = parent.childNodes.item(0);
           if (kVerboseMode) {
             print("Update inner html: $text");
           }
@@ -165,13 +176,13 @@ class DomRenderObject extends RenderObject {
       var toHydrate = parent!.toHydrate;
       if (toHydrate.isNotEmpty) {
         for (var e in toHydrate) {
-          if (e is html.Text) {
+          if (e is web.Text) {
             if (kVerboseMode) {
               print("Hydrate text node: $e");
             }
             node = e;
-            if (e.text != text) {
-              e.text = text;
+            if (e.textContent != text) {
+              e.textContent = text;
               if (kVerboseMode) {
                 print("Update text node: $text");
               }
@@ -182,22 +193,22 @@ class DomRenderObject extends RenderObject {
         }
       }
 
-      node = html.Text(text);
+      node = web.Text(text);
       if (kVerboseMode) {
         print("Create text node: $text");
       }
     } else {
-      if (node is! html.Text) {
-        var elem = html.Text(text);
-        node!.replaceWith(elem);
+      if (node is! web.Text) {
+        var elem = web.Text(text);
+        (node as web.Element).replaceWith(elem as dynamic);
         node = elem;
         if (kVerboseMode) {
           print("Replace text node: $text");
         }
       } else {
-        var node = this.node as html.Text;
-        if (node.text != text) {
-          node.text = text;
+        var node = this.node as web.Text;
+        if (node.textContent != text) {
+          node.textContent = text;
           if (kVerboseMode) {
             print("Update text node: $text");
           }
@@ -221,15 +232,15 @@ class DomRenderObject extends RenderObject {
       var parentNode = parent.node;
       var childNode = node;
 
-      assert(parentNode is html.Element);
+      assert(parentNode is web.Element);
       if (childNode == null) return;
 
       var afterNode = after?.node;
       if ((afterNode, parent) case (null, RootDomRenderObject p) when p.from != null && p.from! > 0) {
-        afterNode = p.container.childNodes[p.from! - 1];
+        afterNode = p.container.childNodes.item(p.from! - 1);
       }
 
-      if (childNode.previousNode == afterNode && childNode.parentNode == parentNode) {
+      if (childNode.previousSibling == afterNode && childNode.parentNode == parentNode) {
         return;
       }
 
@@ -238,13 +249,13 @@ class DomRenderObject extends RenderObject {
       }
 
       if (afterNode == null) {
-        if (parentNode!.childNodes.isEmpty) {
+        if (parentNode!.childNodes.length == 0) {
           parentNode.append(childNode);
         } else {
-          parentNode.insertBefore(childNode, parentNode.childNodes.first);
+          parentNode.insertBefore(childNode, parentNode.childNodes.item(0));
         }
       } else {
-        parentNode!.insertBefore(childNode, afterNode.nextNode);
+        parentNode!.insertBefore(childNode, afterNode.nextSibling);
       }
     } finally {
       _finalize();
@@ -273,14 +284,14 @@ class DomRenderObject extends RenderObject {
 }
 
 class RootDomRenderObject extends DomRenderObject {
-  final html.Element container;
+  final web.Element container;
   final int? from;
   final int? to;
 
   RootDomRenderObject(this.container, this.from, this.to) {
-    Iterable<Node> nodes = container.nodes;
+    Iterable<web.Node> nodes = container.childNodes.toIterable();
     if (kDebugMode) {
-      nodes = nodes.where((node) => node is! html.Text || (node.text ?? '').trim().isNotEmpty);
+      nodes = nodes.where((node) => node is! web.Text || (node.textContent ?? '').trim().isNotEmpty);
     }
     nodes = nodes.skip(from ?? 0);
     if (to != null) {
@@ -291,15 +302,15 @@ class RootDomRenderObject extends DomRenderObject {
   }
 }
 
-typedef DomEventCallback = void Function(Event event);
+typedef DomEventCallback = void Function(web.Event event);
 
 class EventBinding {
   final String type;
   DomEventCallback fn;
   StreamSubscription? subscription;
 
-  EventBinding(html.Element element, this.type, this.fn) {
-    subscription = element.on[type].listen((event) {
+  EventBinding(web.Element element, this.type, this.fn) {
+    web.EventStreamProvider<web.Event>(type).forElement(element).listen((event) {
       fn(event);
     });
   }
@@ -310,7 +321,7 @@ class EventBinding {
   }
 }
 
-extension on html.Element {
+extension on web.Element {
   void clearOrSetAttribute(String name, String? value) {
     final current = getAttribute(name);
     if (current == value) return;
@@ -324,6 +335,24 @@ extension on html.Element {
         print("Update attribute: $name - $value");
       }
       setAttribute(name, value);
+    }
+  }
+}
+
+extension on web.Node {
+  void remove() {
+    (switch (this) {
+      web.Element() => remove(),
+      web.CharacterData() => remove(),
+      _ => (),
+    });
+  }
+}
+
+extension on web.NodeList {
+  Iterable<web.Node> toIterable() sync* {
+    for (var i = 0; i < length; i++) {
+      yield item(i)!;
     }
   }
 }

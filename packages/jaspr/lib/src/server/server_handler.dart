@@ -6,7 +6,6 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
-import 'package:shelf_gzip/shelf_gzip.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
@@ -201,7 +200,7 @@ Handler createHandler(SetupHandler handle, {List<Middleware> middleware = const 
 
   // We skip static file handling in generate mode to always generate fresh content on the server.
   if (!kGenerateMode) {
-    cascade = cascade.add(gzipMiddleware(staticHandler));
+    cascade = cascade.add(staticHandler);
   }
 
   var fileLoader = _proxyFileLoader(staticHandler);

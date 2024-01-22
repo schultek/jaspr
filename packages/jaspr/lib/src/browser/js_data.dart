@@ -2,9 +2,7 @@
 library js_data;
 
 import 'dart:convert';
-import 'dart:js';
-
-import 'package:js/js.dart';
+import 'dart:js_interop';
 
 import '../foundation/sync.dart';
 
@@ -19,7 +17,7 @@ class JasprConfig {
   }
 
   List<ComponentConfig>? get comp {
-    return _config?.comps?.map((c) => ComponentConfig._(c)).toList();
+    return (_config?.comps as dynamic)?.map((c) => ComponentConfig._(c)).toList();
   }
 }
 
@@ -33,19 +31,25 @@ class ComponentConfig {
 }
 
 @JS('JSON.stringify')
-external String _jsonStringify(Object obj);
+external String _jsonStringify(JSAny obj);
 
 @JS()
-class _JasprConfig {
-  external dynamic get sync;
-  external JsArray<_ComponentConfig>? get comps;
+@staticInterop
+class _JasprConfig {}
+
+extension _JasprConfigExtension on _JasprConfig {
+  external JSObject? get sync;
+  external JSObject? get comps;
 }
 
 @JS()
-class _ComponentConfig {
-  external String id;
-  external String name;
-  external dynamic params;
+@staticInterop
+class _ComponentConfig {}
+
+extension _ComponentConfigExtension on _ComponentConfig {
+  external String get id;
+  external String get name;
+  external JSObject? get params;
 }
 
 Map<String, dynamic>? decodeConfig(dynamic config) {

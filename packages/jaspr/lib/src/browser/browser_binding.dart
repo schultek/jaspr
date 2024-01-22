@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html';
+import 'dart:js_interop';
 
 import 'package:meta/meta.dart';
+import 'package:web/web.dart';
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
@@ -66,10 +67,11 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
 
   @override
   Future<Map<String, dynamic>> fetchState(String url) {
-    return window
-        .fetch(url, {
-          'headers': {'jaspr-mode': 'data-only'}
-        })
+    return (window.fetch(
+            url as dynamic,
+            {
+              'headers': {'jaspr-mode': 'data-only'}
+            } as dynamic) as dynamic)
         .then((result) => result.text())
         .then((data) => jsonDecode(data));
   }
@@ -78,9 +80,9 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
   void scheduleFrame(VoidCallback frameCallback) {
     // This seems to give the best results over futures and microtasks
     // Needs to be inspected in more detail
-    window.requestAnimationFrame((highResTime) {
+    window.requestAnimationFrame(((JSAny _) {
       frameCallback();
-    });
+    }).toJS);
   }
 
   static late Future<void> Function({Function? runApp}) warmupFlutterEngine;
