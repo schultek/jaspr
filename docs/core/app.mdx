@@ -133,7 +133,7 @@ class App extends StatelessComponent {
 When you use the **@client** annotation, your web entrypoints will be automatically generated and used in your
 server-rendered markup. Therefore, you don't need to have a `web/main.dart` file and don't need to set `Document.scriptName`.
 
-Additionally, in your `main.dart` modify the code to call `initializeApp()` **before** `runApp()`:
+Additionally, in your `main.dart` modify the code to call `Jaspr.initializeApp()` **before** `runApp()`:
 
 ```dart
 import 'package:jaspr/server.dart';
@@ -142,7 +142,7 @@ import 'package:jaspr/server.dart';
 import 'jaspr_options.dart';
 
 void main() {
-  initializeApp(options: defaultJasprOptions);
+  Jaspr.initializeApp(options: defaultJasprOptions);
   runApp(Document(...));
 }
 ```
