@@ -133,7 +133,8 @@ control over your html structure, but is more verbose.
   var component = DomComponent(
     tag: 'div',
     id: 'my-id',
-    classes: ['class-a', 'class-b'],
+    classes: 'class-a class-b',
+    styles: Styles.text(color: Colors.black),
     attributes: {'my-attribute': 'my-value'},
     events: {'click': (e) => print('clicked')},
     children: [
@@ -145,7 +146,7 @@ control over your html structure, but is more verbose.
 Using this component would render the following html:
 
 ```html
-<div id="my-id" class="class-a class-b" my-attribute="my-value">
+<div id="my-id" style="color: red" class="class-a class-b" my-attribute="my-value">
   ...
 </div>
 ```
@@ -162,4 +163,4 @@ component also only receives a single string to render to the page.
 ```
 
 As usual for web, styling is done through a combination of CSS attributes, either in a **Stylesheet** or inline though
-the **`style` attribute** of the parent elements.
+the **`styles` attribute** of the parent elements.
