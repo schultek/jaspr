@@ -77,12 +77,11 @@ Depending on your chosen template, your jaspr project will have the following pr
     <TabItem value="client">
         ```markdown
         ├── lib/
-        │   ├── components/
-        │   │   └── app.dart
-        │   ├── styles.dart
-        │   └── main.dart
+        │   └── app.dart
         ├── web/
-        │   └── ...
+        │   ├── index.html
+        │   ├── styles.css
+        │   └── main.dart
         ├── pubspec.lock
         └── pubspec.yaml
         ```
@@ -98,11 +97,12 @@ Depending on your chosen template, your jaspr project will have the following pr
     <TabItem value="server">
         ```markdown
         ├── lib/
-        │   └── app.dart
-        ├── web/
-        │   ├── index.html
-        │   ├── styles.css
+        │   ├── components/
+        │   │   └── app.dart
+        │   ├── styles.dart
         │   └── main.dart
+        ├── web/
+        │   └── ...
         ├── pubspec.lock
         └── pubspec.yaml
         ```
