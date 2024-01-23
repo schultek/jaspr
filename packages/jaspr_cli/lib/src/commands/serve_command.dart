@@ -9,12 +9,13 @@ import 'package:mason/mason.dart' show ExitCode;
 import 'package:webdev/src/command/configuration.dart';
 import 'package:webdev/src/serve/dev_workflow.dart';
 
+import '../config.dart';
 import '../helpers/flutter_helpers.dart';
-import '../helpers/ssr_helper.dart';
+import '../helpers/proxy_helper.dart';
 import '../logging.dart';
 import 'base_command.dart';
 
-class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
+class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   ServeCommand({super.logger}) {
     argParser.addOption(
       'input',
@@ -71,9 +72,7 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
   Future<int> run() async {
     await super.run();
 
-    logger.write(
-        "Starting jaspr in ${release ? 'release' : debug ? 'debug' : 'development'} mode...",
-        progress: ProgressState.running);
+    logger.write("Starting jaspr in ${config!.mode.name} rendering mode...", progress: ProgressState.running);
 
     var workflow = await _runWebdev();
     guardResource(() {
@@ -117,11 +116,11 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
 
     logger.write('Done building web assets.', progress: ProgressState.completed);
 
-    if (!useSSR) {
+    if (config!.mode == JasprMode.client) {
       logger.write('Serving `web` on http://localhost:$port');
     }
 
-    if (usesFlutter) {
+    if (config!.usesFlutter) {
       var flutterProcess = await serveFlutter();
 
       workflow.serverManager.servers.first.buildResults
@@ -132,13 +131,19 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
       });
     }
 
-    if (!useSSR) {
+    var proxyPort = config!.mode == JasprMode.client ? int.parse(port) : 5567;
+
+    await startProxy(proxyPort, 5467, config!.usesFlutter ? 5678 : null);
+
+    if (config!.mode == JasprMode.client) {
+      logger.write('Serving on http://localhost:$proxyPort');
+
       await workflow.done;
       return ExitCode.success.code;
     }
 
-    if (config.devCommand != null) {
-      await _runDevCommand(config.devCommand!);
+    if (config!.devCommand != null) {
+      await _runDevCommand(config!.devCommand!);
     } else {
       await _runServer();
     }
@@ -156,8 +161,7 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
         '-Djaspr.dev.hotreload=true',
       ] else
         '-Djaspr.flags.release=true',
-      '-Djaspr.dev.proxy=5467',
-      if (usesFlutter) '-Djaspr.dev.flutter=5678',
+      '-Djaspr.dev.proxy=5567',
       '-Djaspr.flags.verbose=$debug',
     ];
 
@@ -213,14 +217,14 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
   }
 
   Future<DevWorkflow> _runWebdev() async {
-    var builderPort = useSSR ? '5467' : port;
+    var builderPort = '5467';
 
     var configuration = Configuration(
       reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
       release: release,
     );
 
-    var compilers = '${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    var compilers = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
 
     var workflow = await DevWorkflow.start(configuration, [
       if (release) '--release',

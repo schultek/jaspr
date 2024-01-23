@@ -1,20 +1,22 @@
 // ignore_for_file: depend_on_referenced_packages, implementation_imports
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:build_daemon/data/build_status.dart';
 import 'package:build_daemon/data/build_target.dart';
 import 'package:collection/collection.dart';
+import 'package:http/http.dart' as http;
 import 'package:mason/mason.dart' show ExitCode;
 import 'package:webdev/src/daemon_client.dart' as d;
 
+import '../config.dart';
 import '../helpers/flutter_helpers.dart';
-import '../helpers/ssr_helper.dart';
 import '../logging.dart';
 import 'base_command.dart';
 
-class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
+class BuildCommand extends BaseCommand with FlutterHelper {
   BuildCommand({super.logger}) {
     argParser.addOption(
       'input',
@@ -25,6 +27,7 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
     argParser.addOption(
       'target',
       abbr: 't',
+      help: 'Specify the compilation target for the executable (only in server mode)',
       allowed: ['aot-snapshot', 'exe', 'jit-snapshot'],
       allowedHelp: {
         'aot-snapshot': 'Compile Dart to an AOT snapshot.',
@@ -48,47 +51,47 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
   Future<int> run() async {
     await super.run();
 
+    logger.write("Building jaspr for ${config!.mode.name} rendering mode...");
+
     var dir = Directory('build/jaspr');
-    if (!await dir.exists()) {
-      await dir.create(recursive: true);
+    var webDir = config!.mode == JasprMode.server ? Directory('build/jaspr/web') : dir;
+
+    String? entryPoint = await getEntryPoint(argResults!['input']);
+
+    if (config!.mode != JasprMode.client && entryPoint == null) {
+      logger.write("Cannot find entry point. Create a main.dart in lib/ or specify a file using --input.",
+          level: Level.critical);
+      await shutdown(1);
     }
 
-    if (useSSR) {
-      var webDir = Directory('build/jaspr/web');
-      if (!await webDir.exists()) {
-        await webDir.create();
-      }
+    if (await dir.exists()) {
+      await dir.delete(recursive: true);
     }
+    await webDir.create(recursive: true);
 
     var indexHtml = File('web/index.html');
-    var targetIndexHtml = File('build/jaspr/web/index.html');
+    var targetIndexHtml = File('${webDir.path}/index.html');
 
     var dummyIndex = false;
-    if (usesFlutter && !await indexHtml.exists()) {
+    var dummyTargetIndex = false;
+    if (config!.usesFlutter && !await indexHtml.exists()) {
       dummyIndex = true;
+      dummyTargetIndex = true;
       await indexHtml.create();
     }
 
-    var webResult = _buildWeb(true, useSSR);
+    var webResult = _buildWeb();
     var flutterResult = Future<void>.value();
 
-    if (usesFlutter) {
-      await webResult;
-      flutterResult = buildFlutter(useSSR);
+    await webResult;
+
+    if (config!.usesFlutter) {
+      flutterResult = buildFlutter();
     }
 
-    if (useSSR) {
-      String? entryPoint = await getEntryPoint(argResults!['input']);
-
-      if (entryPoint == null) {
-        logger.write("Cannot find entry point. Create a main.dart in lib/ or web/, or specify a file using --input.",
-            level: Level.critical);
-        await shutdown(1);
-      }
-
-      await webResult;
-
+    if (config!.mode == JasprMode.server) {
       logger.write('Building server app...', progress: ProgressState.running);
+
       String extension = '';
       final target = argResults!['target'];
       if (Platform.isWindows && target == 'exe') {
@@ -100,33 +103,105 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
         [
           'compile',
           argResults!['target'],
-          entryPoint,
+          entryPoint!,
           '-o',
           './build/jaspr/app$extension',
           '-Djaspr.flags.release=true',
         ],
+        runInShell: true,
       );
 
       await watchProcess('server build', process, tag: Tag.cli, progress: 'Building server app...');
+    } else if (config!.mode == JasprMode.static) {
+      logger.write('Building server app...', progress: ProgressState.running);
+
+      var process = await Process.start(
+        'dart',
+        [
+          'run',
+          '--enable-asserts',
+          '-Djaspr.flags.release=true',
+          '-Djaspr.flags.generate=true',
+          '-Djaspr.dev.proxy=5467',
+          '-Djaspr.dev.web=build/jaspr',
+          entryPoint!,
+        ],
+        runInShell: true,
+        environment: {'PORT': '8080', 'JASPR_PROXY_PORT': '5467'},
+      );
+
+      Set<String> generatedRoutes = {};
+      List<String> queuedRoutes = [];
+
+      var serverStartedCompleter = Completer();
+
+      void queryTargetRoute(String route) {
+        if (!serverStartedCompleter.isCompleted) {
+          serverStartedCompleter.complete();
+        }
+        if (generatedRoutes.contains(route)) {
+          return;
+        }
+        queuedRoutes.insert(0, route);
+        generatedRoutes.add(route);
+      }
+
+      watchProcess('server', process, tag: Tag.server, progress: 'Running server app...', hide: (s) {
+        if (s.startsWith('[DAEMON] ')) {
+          var message = jsonDecode(s.substring(9));
+          if (message case {'route': String route}) {
+            queryTargetRoute(route);
+          }
+          return true;
+        }
+        return false;
+      }, onFail: () async {
+        print("SERVER EXITED WITH ${await process.exitCode}");
+      });
+
+      await serverStartedCompleter.future;
+
+      logger.complete(true);
+
+      logger.write('Generating routes...', progress: ProgressState.running);
+
+      while (queuedRoutes.isNotEmpty) {
+        var route = queuedRoutes.removeLast();
+
+        logger.write('Generating route "$route"...', progress: ProgressState.running);
+
+        var response = await http.get(Uri.parse('http://0.0.0.0:8080$route'));
+
+        var filename = route.endsWith('/') ? '${route}index.html' : '$route.html';
+
+        var file = File('build/jaspr$filename');
+
+        await file.create(recursive: true);
+        await file.writeAsBytes(response.bodyBytes);
+      }
+
+      process.kill();
+      print("PROCESS EXITED ${await process.exitCode}");
+
+      logger.complete(true);
+
+      dummyTargetIndex &= !(generatedRoutes.contains('/') || generatedRoutes.contains('/index'));
     }
 
-    await Future.wait([
-      webResult,
-      flutterResult,
-    ]);
+    await flutterResult;
 
     if (dummyIndex) {
       await indexHtml.delete();
-      if (await targetIndexHtml.exists()) {
+      if (dummyTargetIndex && await targetIndexHtml.exists()) {
         await targetIndexHtml.delete();
       }
     }
 
-    logger.write('Completed building project to /build.', progress: ProgressState.completed);
+    logger.write('Completed building project to /build/jaspr.', progress: ProgressState.completed);
     return ExitCode.success.code;
   }
 
-  Future<int> _buildWeb(bool release, bool useSSR) async {
+  Future<int> _buildWeb() async {
     logger.write('Building web assets...', progress: ProgressState.running);
     var client = await d.connectClient(
       Directory.current.path,
@@ -134,12 +209,12 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
         '--release',
         '--verbose',
         '--delete-conflicting-outputs',
-        '--define=${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
+        '--define=${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
       ],
       logger.writeServerLog,
     );
     OutputLocation outputLocation = OutputLocation((b) => b
-      ..output = 'build/jaspr${useSSR ? '/web' : ''}'
+      ..output = 'build/jaspr${config!.mode == JasprMode.server ? '/web' : ''}'
       ..useSymlinks = false
       ..hoist = true);
 

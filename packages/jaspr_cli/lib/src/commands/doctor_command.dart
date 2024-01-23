@@ -36,9 +36,9 @@ class DoctorCommand extends BaseCommand {
 
     String? findDependency(String name, {bool reportMissing = false}) {
       var isDev = false;
-      var dep = pubspecYaml?['dependencies']?[name];
+      var dep = config!.pubspecYaml['dependencies']?[name];
       if (dep == null) {
-        dep = pubspecYaml?['dev_dependencies']?[name];
+        dep = config!.pubspecYaml['dev_dependencies']?[name];
         isDev = true;
       }
       if (dep == null) {
@@ -68,9 +68,9 @@ class DoctorCommand extends BaseCommand {
       details: null,
       items: [
         'Dependencies on core packages:${dependencies.join()}',
-        'Uses server-side rendering: ${config.usesSsr}',
-        'Uses experimental compilers: $usesJasprWebCompilers',
-        'Uses flutter embedding: ${config.usesFlutter}',
+        'Rendering mode: ${config!.mode}',
+        'Uses jaspr compilers: ${config!.usesJasprWebCompilers}',
+        'Uses flutter embedding: ${config!.usesFlutter}',
       ]
     ));
 

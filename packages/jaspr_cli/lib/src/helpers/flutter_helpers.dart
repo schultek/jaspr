@@ -2,14 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import '../commands/base_command.dart';
+import '../config.dart';
 import '../logging.dart';
 import 'copy_helper.dart';
 
 mixin FlutterHelper on BaseCommand {
-  late final usesFlutter = () {
-    return config.usesFlutter;
-  }();
-
   Future<Process> serveFlutter() async {
     await _ensureTarget();
 
@@ -24,7 +21,7 @@ mixin FlutterHelper on BaseCommand {
     return flutterProcess;
   }
 
-  Future<void> buildFlutter(bool useSSR) async {
+  Future<void> buildFlutter() async {
     await _ensureTarget();
 
     var flutterProcess = await Process.start(
@@ -33,7 +30,7 @@ mixin FlutterHelper on BaseCommand {
       runInShell: true,
     );
 
-    var target = useSSR ? 'build/jaspr/web' : 'build/jaspr';
+    var target = config!.mode == JasprMode.client ? 'build/jaspr' : 'build/jaspr/web';
 
     var moveTargets = [
       'version.json',

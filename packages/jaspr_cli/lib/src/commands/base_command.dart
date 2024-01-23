@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:mason/mason.dart' show ExitCode;
 import 'package:meta/meta.dart';
-import 'package:yaml/yaml.dart';
 
 import '../analytics.dart';
 import '../config.dart';
@@ -30,22 +29,14 @@ abstract class BaseCommand extends Command<int> {
   late final bool verbose = argResults?['verbose'] as bool? ?? false;
 
   final bool requiresPubspec = true;
-
-  late YamlMap? pubspecYaml;
-  late JasprConfig config;
-
-  bool get usesJasprWebCompilers => switch (pubspecYaml) {
-        {'dev_dependencies': {'jaspr_web_compilers': _}} => true,
-        _ => false,
-      };
+  late JasprConfig? config;
 
   @override
   @mustCallSuper
   Future<int> run() async {
-    pubspecYaml = requiresPubspec ? await getPubspec() : null;
-    config = JasprConfig.fromYaml(pubspecYaml, logger);
+    config = requiresPubspec ? await getConfig(logger) : null;
 
-    await trackEvent(name, projectName: pubspecYaml?['name']);
+    await trackEvent(name, projectName: config?.pubspecYaml['name']);
 
     ProcessSignal.sigint.watch().listen((signal) => shutdown());
     if (!Platform.isWindows) {
@@ -61,11 +52,12 @@ abstract class BaseCommand extends Command<int> {
     for (var g in guards) {
       await g();
     }
+    guards.clear();
     exit(exitCode);
   }
 
   Future<String?> getEntryPoint(String? input) async {
-    var entryPoints = [input, 'lib/main.dart', 'web/main.dart'];
+    var entryPoints = [input, 'lib/main.dart'];
 
     for (var path in entryPoints) {
       if (path == null) continue;
@@ -77,41 +69,6 @@ abstract class BaseCommand extends Command<int> {
     }
 
     return null;
-  }
-
-  Future<YamlMap?> getPubspec() async {
-    var pubspecPath = 'pubspec.yaml';
-    var pubspecFile = File(pubspecPath);
-    if (!(await pubspecFile.exists())) {
-      throw 'Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.';
-    }
-
-    var parsed = loadYaml(await pubspecFile.readAsString()) as YamlMap;
-
-    if (parsed case {'dependencies': {'jaspr': _}}) {
-      // ok
-    } else {
-      throw 'Missing dependency on jaspr in pubspec.yaml file. Make sure to add jaspr to your dependencies.';
-    }
-
-    if (parsed case {'dev_dependencies': {'jaspr_builder': _}}) {
-      // ok
-    } else {
-      var result = logger.logger.confirm(
-          'Missing dependency on jaspr_builder package. Do you want to add jaspr_builder to your dev_dependencies now?',
-          defaultValue: true);
-      if (result) {
-        var result = Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
-        if (result.exitCode != 0) {
-          logger.logger.err(result.stderr);
-          throw 'Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.';
-        }
-
-        logger.logger.success('Successfully added jaspr_builder to your dev_dependencies.');
-      }
-    }
-
-    return parsed;
   }
 
   void guardResource(FutureOr<void> Function() fn) {
@@ -126,26 +83,15 @@ abstract class BaseCommand extends Command<int> {
     bool Function(String)? hide,
     void Function()? onFail,
   }) async {
-    int? exitCode;
-    bool wasKilled = false;
-    guardResource(() async {
-      if (exitCode == null) {
-        logger.write("Terminating $name...");
-        process.kill();
-        wasKilled = true;
-        await process.exitCode;
-      }
-    });
-
     if (progress != null) {
       logger.write(progress, tag: tag, progress: ProgressState.running);
     }
 
-    process.stderr.listen((event) {
+    var errSub = process.stderr.listen((event) {
       logger.write(utf8.decode(event), tag: tag, level: Level.error, progress: ProgressState.completed);
     });
 
-    process.stdout.map(utf8.decode).splitLines().listen((log) {
+    var outSub = process.stdout.map(utf8.decode).splitLines().listen((log) {
       if (hide != null && hide.call(log)) return;
 
       if (progress != null) {
@@ -155,7 +101,23 @@ abstract class BaseCommand extends Command<int> {
       }
     });
 
+    int? exitCode;
+    bool wasKilled = false;
+    guardResource(() async {
+      if (exitCode == null) {
+        logger.write("Terminating $name...");
+        process.kill();
+        wasKilled = true;
+        await process.exitCode;
+        await errSub.asFuture();
+        await outSub.asFuture();
+      }
+    });
+
     exitCode = await process.exitCode;
+    await errSub.asFuture();
+    await outSub.asFuture();
+
     if (wasKilled) {
       return;
     }

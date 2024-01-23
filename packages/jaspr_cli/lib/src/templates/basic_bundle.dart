@@ -44,7 +44,7 @@ final basicBundle = MasonBundle.fromJson(<String, dynamic>{
     {
       "path": "pubspec.yaml",
       "data":
-          "bmFtZToge3tuYW1lfX0KZGVzY3JpcHRpb246IEEgYmFzaWMgamFzcHIgYXBwIHdpdGggc3NyICYgYXV0b21hdGljIGNsaWVudCBoeWRyYXRpb24uCnZlcnNpb246IDAuMC4xCgplbnZpcm9ubWVudDoKICBzZGs6ICc+PTMuMC4wIDw0LjAuMCcKCmRlcGVuZGVuY2llczoKICBqYXNwcjogXnt7amFzcHJDb3JlVmVyc2lvbn19CgpkZXZfZGVwZW5kZW5jaWVzOgogIGJ1aWxkX3J1bm5lcjogXjIuNC4wCiAge3t3ZWJDb21waWxlcnNQYWNrYWdlfX06IF57e3dlYkNvbXBpbGVyc1ZlcnNpb259fQogIGphc3ByX2J1aWxkZXI6IF57e2phc3ByQnVpbGRlclZlcnNpb259fQogIGxpbnRzOiBeMi4xLjAKCmphc3ByOgogIHVzZXMtc3NyOiB0cnVlCg==",
+          "bmFtZToge3tuYW1lfX0KZGVzY3JpcHRpb246IEEgYmFzaWMgamFzcHIgYXBwIHdpdGggc3NyICYgYXV0b21hdGljIGNsaWVudCBoeWRyYXRpb24uCnZlcnNpb246IDAuMC4xCgplbnZpcm9ubWVudDoKICBzZGs6ICc+PTMuMC4wIDw0LjAuMCcKCmRlcGVuZGVuY2llczoKICBqYXNwcjogXnt7amFzcHJDb3JlVmVyc2lvbn19CgpkZXZfZGVwZW5kZW5jaWVzOgogIGJ1aWxkX3J1bm5lcjogXjIuNC4wCiAge3t3ZWJDb21waWxlcnNQYWNrYWdlfX06IF57e3dlYkNvbXBpbGVyc1ZlcnNpb259fQogIGphc3ByX2J1aWxkZXI6IF57e2phc3ByQnVpbGRlclZlcnNpb259fQogIGxpbnRzOiBeMi4xLjAKCmphc3ByOgogIG1vZGU6IHNlcnZlcgo=",
       "type": "text"
     },
     {

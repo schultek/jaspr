@@ -12,7 +12,6 @@ import 'commands/build_command.dart';
 import 'commands/clean_command.dart';
 import 'commands/create_command.dart';
 import 'commands/doctor_command.dart';
-import 'commands/generate_command.dart';
 import 'commands/serve_command.dart';
 import 'commands/update_command.dart';
 import 'version.dart';
@@ -37,7 +36,6 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
     addCommand(CreateCommand());
     addCommand(ServeCommand());
     addCommand(BuildCommand());
-    addCommand(GenerateCommand());
     addCommand(CleanCommand());
     addCommand(UpdateCommand());
     addCommand(DoctorCommand());
