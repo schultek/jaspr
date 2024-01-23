@@ -13,7 +13,7 @@ import 'package:shelf_static/shelf_static.dart';
 import '../../server.dart';
 import 'render_functions.dart';
 
-final String? _proxyPort = Platform.environment['JASPR_PROXY_PORT'];
+final String? jasprProxyPort = Platform.environment['JASPR_PROXY_PORT'];
 const bool kDevHotreload = bool.fromEnvironment('jaspr.dev.hotreload');
 const String kDevWeb = String.fromEnvironment('jaspr.dev.web');
 
@@ -28,22 +28,22 @@ String _findRootProjectDir() {
   return dir;
 }
 
-Handler staticFileHandler([http.Client? client]) => _proxyPort != null
-    ? proxyHandler('http://localhost:$_proxyPort/', client: client)
+Handler staticFileHandler([http.Client? client]) => jasprProxyPort != null
+    ? proxyHandler('http://localhost:$jasprProxyPort/', client: client)
     : Directory(webDir).existsSync()
         ? createStaticHandler(webDir, defaultDocument: 'index.html')
         : (_) => Response.notFound('');
 
 typedef SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
 
-Handler createHandler(SetupHandler handle, {List<Middleware> middleware = const [], Handler? fileHandler}) {
-  var client = http.Client();
+Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHandler}) {
+  client ??= http.Client();
   var staticHandler = fileHandler ?? staticFileHandler(client);
 
   var cascade = Cascade();
 
-  if (_proxyPort != null) {
-    cascade = cascade.add(_sseProxyHandler(client, _proxyPort!));
+  if (jasprProxyPort != null) {
+    cascade = cascade.add(_sseProxyHandler(client, jasprProxyPort!));
   }
 
   // We skip static file handling in generate mode to always generate fresh content on the server.
@@ -77,12 +77,7 @@ Handler createHandler(SetupHandler handle, {List<Middleware> middleware = const 
     });
   });
 
-  var pipeline = const Pipeline();
-  for (var m in middleware) {
-    pipeline = pipeline.addMiddleware(m);
-  }
-
-  return pipeline.addHandler(cascade.handler);
+  return cascade.handler;
 }
 
 Future<String> Function(String) _proxyFileLoader(Request req, Handler proxyHandler) {
