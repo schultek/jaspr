@@ -60,10 +60,18 @@ class ServerApp {
     await _reloader?.stop();
   }
 
-  static void requestRouteGeneration(String route) {
+  static void requestRouteGeneration(String route) async {
     if (kGenerateMode) {
-      print('[DAEMON] {"route": "$route"}');
+      _sendDebugMessage({'route': route});
     }
+  }
+
+  static Future<void> _sendDebugMessage(Object message) async {
+    assert(_client != null, 'No server running, did you call "runApp()"?');
+    await _client!.post(
+      Uri.parse('http://localhost:$jasprProxyPort/\$jasprMessageHandler'),
+      body: jsonEncode(message),
+    );
   }
 }
 

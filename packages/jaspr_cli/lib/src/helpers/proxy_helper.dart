@@ -11,12 +11,18 @@ import '../commands/base_command.dart';
 import '../logging.dart';
 
 mixin ProxyHelper on BaseCommand {
-  Future<HttpServer> startProxy(String port, String webPort, String? flutterPort) async {
+  Future<HttpServer> startProxy(String port, String webPort, String? flutterPort,
+      {void Function(dynamic)? onMessage}) async {
     var client = http.Client();
     var webdevHandler = proxyHandler(Uri.parse('http://localhost:$webPort'), client: client);
     var flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
 
     var cascade = Cascade().add(_sseProxyHandler(client, webPort, logger)).add((req) async {
+      if (req.url.path == r'$jasprMessageHandler') {
+        onMessage?.call(jsonDecode(await req.readAsString()));
+        return Response.ok(null);
+      }
+
       // Each proxyHandler will read the body, so we have to duplicate the stream beforehand,
       // or else this will throw.
       // This is also the reason why Cascade() won't work here.

@@ -1,7 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, implementation_imports
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:build_daemon/data/build_status.dart';
@@ -13,10 +12,11 @@ import 'package:webdev/src/daemon_client.dart' as d;
 
 import '../config.dart';
 import '../helpers/flutter_helpers.dart';
+import '../helpers/proxy_helper.dart';
 import '../logging.dart';
 import 'base_command.dart';
 
-class BuildCommand extends BaseCommand with FlutterHelper {
+class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   BuildCommand({super.logger}) {
     argParser.addOption(
       'input',
@@ -115,6 +115,24 @@ class BuildCommand extends BaseCommand with FlutterHelper {
     } else if (config!.mode == JasprMode.static) {
       logger.write('Building server app...', progress: ProgressState.running);
 
+      Set<String> generatedRoutes = {};
+      List<String> queuedRoutes = [];
+
+      var serverStartedCompleter = Completer();
+
+      await startProxy('5567', '0', null, onMessage: (message) {
+        if (message case {'route': String route}) {
+          if (!serverStartedCompleter.isCompleted) {
+            serverStartedCompleter.complete();
+          }
+          if (generatedRoutes.contains(route)) {
+            return;
+          }
+          queuedRoutes.insert(0, route);
+          generatedRoutes.add(route);
+        }
+      });
+
       var process = await Process.start(
         'dart',
         [
@@ -122,42 +140,14 @@ class BuildCommand extends BaseCommand with FlutterHelper {
           '--enable-asserts',
           '-Djaspr.flags.release=true',
           '-Djaspr.flags.generate=true',
-          '-Djaspr.dev.proxy=5467',
           '-Djaspr.dev.web=build/jaspr',
           entryPoint!,
         ],
         runInShell: true,
-        environment: {'PORT': '8080', 'JASPR_PROXY_PORT': '5467'},
+        environment: {'PORT': '8080', 'JASPR_PROXY_PORT': '5567'},
       );
 
-      Set<String> generatedRoutes = {};
-      List<String> queuedRoutes = [];
-
-      var serverStartedCompleter = Completer();
-
-      void queryTargetRoute(String route) {
-        if (!serverStartedCompleter.isCompleted) {
-          serverStartedCompleter.complete();
-        }
-        if (generatedRoutes.contains(route)) {
-          return;
-        }
-        queuedRoutes.insert(0, route);
-        generatedRoutes.add(route);
-      }
-
-      watchProcess('server', process, tag: Tag.server, progress: 'Running server app...', hide: (s) {
-        if (s.startsWith('[DAEMON] ')) {
-          var message = jsonDecode(s.substring(9));
-          if (message case {'route': String route}) {
-            queryTargetRoute(route);
-          }
-          return true;
-        }
-        return false;
-      }, onFail: () async {
-        print("SERVER EXITED WITH ${await process.exitCode}");
-      });
+      watchProcess('server', process, tag: Tag.server, progress: 'Running server app...');
 
       await serverStartedCompleter.future;
 
@@ -181,7 +171,6 @@ class BuildCommand extends BaseCommand with FlutterHelper {
       }
 
       process.kill();
-      print("PROCESS EXITED ${await process.exitCode}");
 
       logger.complete(true);
 
