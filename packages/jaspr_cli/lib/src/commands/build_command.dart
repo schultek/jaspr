@@ -51,7 +51,7 @@ class BuildCommand extends BaseCommand with FlutterHelper {
   Future<int> run() async {
     await super.run();
 
-    logger.write("Building jaspr for ${config!.mode.name} rendering mode...");
+    logger.write("Building jaspr for ${config!.mode.name} rendering mode.");
 
     var dir = Directory('build/jaspr');
     var webDir = config!.mode == JasprMode.server ? Directory('build/jaspr/web') : dir;

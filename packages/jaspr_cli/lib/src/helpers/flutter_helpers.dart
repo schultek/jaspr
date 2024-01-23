@@ -7,12 +7,12 @@ import '../logging.dart';
 import 'copy_helper.dart';
 
 mixin FlutterHelper on BaseCommand {
-  Future<Process> serveFlutter() async {
+  Future<Process> serveFlutter(String flutterPort) async {
     await _ensureTarget();
 
     var flutterProcess = await Process.start(
       'flutter',
-      ['run', '--device-id=web-server', '-t', '.dart_tool/jaspr/flutter_target.dart', '--web-port=5678'],
+      ['run', '--device-id=web-server', '-t', '.dart_tool/jaspr/flutter_target.dart', '--web-port=$flutterPort'],
       runInShell: true,
     );
 

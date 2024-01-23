@@ -72,16 +72,134 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   Future<int> run() async {
     await super.run();
 
-    logger.write("Starting jaspr in ${config!.mode.name} rendering mode...", progress: ProgressState.running);
+    logger.write("Running jaspr in ${config!.mode.name} rendering mode.");
 
-    var workflow = await _runWebdev();
-    guardResource(() {
-      logger.write('Terminating web builder...');
-      return workflow.shutDown();
+    var proxyPort = config!.mode == JasprMode.client ? port : '5567';
+    var flutterPort = '5678';
+    var webPort = '5467';
+
+    var workflow = await _runWebCompiler(webPort);
+
+    if (config!.usesFlutter) {
+      var flutterProcess = await serveFlutter(flutterPort);
+
+      workflow.serverManager.servers.first.buildResults
+          .where((event) => event.status == BuildStatus.succeeded)
+          .listen((event) {
+        // trigger reload
+        flutterProcess.stdin.writeln('r');
+      });
+    }
+
+    await startProxy(proxyPort, webPort, config!.usesFlutter ? flutterPort : null);
+
+    if (config!.mode == JasprMode.client) {
+      logger.write('Serving at http://localhost:$proxyPort');
+
+      await workflow.done;
+      return ExitCode.success.code;
+    }
+
+    if (config!.devCommand != null) {
+      await _runDevCommand(config!.devCommand!, proxyPort);
+    } else {
+      await _runServer(proxyPort);
+    }
+    return ExitCode.success.code;
+  }
+
+  Future<void> _runServer(String proxyPort) async {
+    logger.write("Starting server...", progress: ProgressState.running);
+
+    var args = [
+      'run',
+      if (!release) ...[
+        '--enable-vm-service',
+        '--enable-asserts',
+        '-Djaspr.dev.hotreload=true',
+      ] else
+        '-Djaspr.flags.release=true',
+      '-Djaspr.flags.verbose=$debug',
+    ];
+
+    if (debug) {
+      args.add('--pause-isolates-on-start');
+    }
+
+    String? entryPoint = await getEntryPoint(argResults!['input']);
+
+    if (entryPoint == null) {
+      logger.complete(false);
+      logger.write("Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.",
+          level: Level.critical);
+      await shutdown();
+    }
+
+    args.add(entryPoint);
+
+    args.addAll(argResults!.rest);
+
+    var process = await Process.start(
+      'dart',
+      args,
+      environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
+    );
+
+    logger.write('Server started.', progress: ProgressState.completed);
+
+    await watchProcess('server', process, tag: Tag.server);
+  }
+
+  Future<void> _runDevCommand(String command, String proxyPort) async {
+    logger.write("Starting server...", progress: ProgressState.running);
+
+    if (release) {
+      logger.write("Ignoring --release flag since custom dev command is used.", level: Level.warning);
+    }
+    if (debug) {
+      logger.write("Ignoring --debug flag since custom dev command is used.", level: Level.warning);
+    }
+
+    var [exec, ...args] = command.split(" ");
+
+    var process = await Process.start(
+      exec,
+      args,
+      environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
+    );
+
+    logger.write('Server started.', progress: ProgressState.completed);
+
+    await watchProcess('server', process, tag: Tag.server);
+  }
+
+  Future<DevWorkflow> _runWebCompiler(String webPort) async {
+    logger.write('Starting web compiler...', progress: ProgressState.running);
+
+    var configuration = Configuration(
+      reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
+      release: release,
+    );
+
+    var compilers = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+
+    var workflow = await DevWorkflow.start(configuration, [
+      if (release) '--release',
+      '--define',
+      '$compilers:ddc=generate-full-dill=true',
+      '--delete-conflicting-outputs',
+      if (!release)
+        '--define=$compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
+      else
+        '--define=$compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
+    ], {
+      'web': int.parse(webPort)
     });
 
-    logger.complete(true);
-    logger.write('Starting web builder...', progress: ProgressState.running);
+    guardResource(() async {
+      logger.write('Terminating web compiler...');
+      await workflow.shutDown();
+    });
 
     var buildCompleter = Completer();
 
@@ -115,129 +233,6 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     timer.cancel();
 
     logger.write('Done building web assets.', progress: ProgressState.completed);
-
-    if (config!.mode == JasprMode.client) {
-      logger.write('Serving `web` on http://localhost:$port');
-    }
-
-    if (config!.usesFlutter) {
-      var flutterProcess = await serveFlutter();
-
-      workflow.serverManager.servers.first.buildResults
-          .where((event) => event.status == BuildStatus.succeeded)
-          .listen((event) {
-        // trigger reload
-        flutterProcess.stdin.writeln('r');
-      });
-    }
-
-    var proxyPort = config!.mode == JasprMode.client ? int.parse(port) : 5567;
-
-    await startProxy(proxyPort, 5467, config!.usesFlutter ? 5678 : null);
-
-    if (config!.mode == JasprMode.client) {
-      logger.write('Serving on http://localhost:$proxyPort');
-
-      await workflow.done;
-      return ExitCode.success.code;
-    }
-
-    if (config!.devCommand != null) {
-      await _runDevCommand(config!.devCommand!);
-    } else {
-      await _runServer();
-    }
-    return ExitCode.success.code;
-  }
-
-  Future<void> _runServer() async {
-    logger.write("Starting server...", progress: ProgressState.running);
-
-    var args = [
-      'run',
-      if (!release) ...[
-        '--enable-vm-service',
-        '--enable-asserts',
-        '-Djaspr.dev.hotreload=true',
-      ] else
-        '-Djaspr.flags.release=true',
-      '-Djaspr.dev.proxy=5567',
-      '-Djaspr.flags.verbose=$debug',
-    ];
-
-    if (debug) {
-      args.add('--pause-isolates-on-start');
-    }
-
-    String? entryPoint = await getEntryPoint(argResults!['input']);
-
-    if (entryPoint == null) {
-      logger.complete(false);
-      logger.write("Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.",
-          level: Level.critical);
-      await shutdown();
-    }
-
-    args.add(entryPoint);
-
-    args.addAll(argResults!.rest);
-
-    var process = await Process.start(
-      'dart',
-      args,
-      environment: {'PORT': argResults!['port'], 'JASPR_PROXY_PORT': '5467'},
-    );
-
-    logger.write('Server started.', progress: ProgressState.completed);
-
-    await watchProcess('server', process, tag: Tag.server);
-  }
-
-  Future<void> _runDevCommand(String command) async {
-    logger.write("Starting server...", progress: ProgressState.running);
-
-    if (release) {
-      logger.write("Ignoring --release flag since custom dev command is used.", level: Level.warning);
-    }
-    if (debug) {
-      logger.write("Ignoring --debug flag since custom dev command is used.", level: Level.warning);
-    }
-
-    var [exec, ...args] = command.split(" ");
-
-    var process = await Process.start(
-      exec,
-      args,
-      environment: {'PORT': argResults!['port'], 'jaspr_dev_proxy': '5467'},
-    );
-
-    logger.write('Server started.', progress: ProgressState.completed);
-
-    await watchProcess('server', process, tag: Tag.server);
-  }
-
-  Future<DevWorkflow> _runWebdev() async {
-    var builderPort = '5467';
-
-    var configuration = Configuration(
-      reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
-      release: release,
-    );
-
-    var compilers = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
-
-    var workflow = await DevWorkflow.start(configuration, [
-      if (release) '--release',
-      '--define',
-      '$compilers:ddc=generate-full-dill=true',
-      '--delete-conflicting-outputs',
-      if (!release)
-        '--define=$compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
-      else
-        '--define=$compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
-    ], {
-      'web': int.parse(builderPort)
-    });
 
     return workflow;
   }

@@ -108,19 +108,21 @@ abstract class BaseCommand extends Command<int> {
         logger.write("Terminating $name...");
         process.kill();
         wasKilled = true;
+        await errSub.cancel();
+        await outSub.cancel();
         await process.exitCode;
-        await errSub.asFuture();
-        await outSub.asFuture();
       }
     });
 
     exitCode = await process.exitCode;
-    await errSub.asFuture();
-    await outSub.asFuture();
 
     if (wasKilled) {
       return;
     }
+
+    await errSub.asFuture();
+    await outSub.asFuture();
+
     if (exitCode == 0) {
       logger.complete(true);
     } else {

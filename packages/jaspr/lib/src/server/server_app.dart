@@ -61,22 +61,18 @@ class ServerApp {
     Future.microtask(() async {
       _running = true;
 
-      var handler = createHandler((_, render) => render(_setup), middleware: _middleware, fileHandler: _fileHandler);
+      Future<HttpServer> newServer() => _createServer(
+          this, createHandler((_, render) => render(_setup), middleware: _middleware, fileHandler: _fileHandler));
 
       if (kDevHotreload) {
-        await _reload(this, () {
-          if (handler is RefreshableHandler) {
-            (handler as RefreshableHandler).refresh();
-          }
-          return _createServer(this, handler);
-        });
+        await _reload(this, newServer);
       } else {
-        _server = await _createServer(this, handler);
+        _server = await newServer();
         _listener?.call(_server!);
       }
 
-      print('[INFO] Running app in ${kDebugMode ? 'debug' : 'release'} mode');
-      print('[INFO] Serving at http://${kDebugMode ? 'localhost' : server!.address.host}:${server!.port}');
+      print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');
+      print('Serving at http://${kDebugMode ? 'localhost' : server!.address.host}:${server!.port}');
 
       requestRouteGeneration('/');
     });
