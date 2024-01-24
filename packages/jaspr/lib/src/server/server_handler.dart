@@ -1,17 +1,17 @@
-// ignore_for_file: implicit_call_tearoffs
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
+import 'package:shelf/shelf.dart';
 import 'package:shelf_gzip/shelf_gzip.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
-import '../../server.dart';
+import '../foundation/constants.dart';
 import 'render_functions.dart';
+import 'server_app.dart';
 
 final String? jasprProxyPort = Platform.environment['JASPR_PROXY_PORT'];
 const bool kDevHotreload = bool.fromEnvironment('jaspr.dev.hotreload');

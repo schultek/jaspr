@@ -13,15 +13,15 @@ typedef SetupFunction = void Function(ServerAppBinding binding);
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
 class ServerApp {
-  ServerApp._(this._setup, [this._fileHandler]);
+  ServerApp._(this._setup);
 
-  factory ServerApp.run(SetupFunction setup, [Handler? fileHandler]) {
-    return ServerApp._(setup, fileHandler).._run();
+  factory ServerApp.run(SetupFunction setup) {
+    return ServerApp._(setup).._run();
   }
 
-  final SetupFunction _setup;
+  static final createTestHandler = createHandler;
 
-  final Handler? _fileHandler;
+  final SetupFunction _setup;
 
   HotReloader? _reloader;
 
@@ -30,29 +30,27 @@ class ServerApp {
 
   static http.Client? _client;
 
-  void _run() {
-    Future.microtask(() async {
-      Future<HttpServer> newServer() {
-        var port = int.parse(Platform.environment['PORT'] ?? '8080');
-        _client?.close();
-        _client = http.Client();
-        var handler = createHandler((_, render) => render(_setup), client: _client, fileHandler: _fileHandler);
-        return shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true);
-      }
+  void _run() async {
+    if (kDevHotreload) {
+      await _reload(this, _createServer);
+    } else {
+      _server = await _createServer();
+    }
 
-      if (kDevHotreload) {
-        await _reload(this, newServer);
-      } else {
-        _server = await newServer();
-      }
+    print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');
+    print('Serving at http://${kDebugMode ? 'localhost' : server!.address.host}:${server!.port}');
 
-      print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');
-      print('Serving at http://${kDebugMode ? 'localhost' : server!.address.host}:${server!.port}');
+    if (kGenerateMode) {
+      requestRouteGeneration('/');
+    }
+  }
 
-      if (kGenerateMode) {
-        requestRouteGeneration('/');
-      }
-    });
+  Future<HttpServer> _createServer() {
+    var port = int.parse(Platform.environment['PORT'] ?? '8080');
+    _client?.close();
+    _client = http.Client();
+    var handler = createHandler((_, render) => render(_setup), client: _client);
+    return shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true);
   }
 
   Future<void> close() async {
