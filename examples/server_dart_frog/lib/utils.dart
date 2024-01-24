@@ -1,5 +1,5 @@
 import 'package:dart_frog/dart_frog.dart';
-import 'package:jaspr/server.dart' hide Middleware, Response;
+import 'package:jaspr/server.dart' hide Response;
 import 'package:server_dart_frog/jaspr_options.dart';
 
 /// Wraps jasprs [serveApp] as a dart_frog middleware.

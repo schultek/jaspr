@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:jaspr/server.dart';
 import 'package:server_shelf/jaspr_options.dart';
+import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart';
 

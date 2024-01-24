@@ -32,5 +32,4 @@ flutter:
     - assets/dash.png
 
 jaspr:
-  uses-ssr: true
-  uses-flutter: true
+  mode: server

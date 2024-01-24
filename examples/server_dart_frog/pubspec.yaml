@@ -20,5 +20,5 @@ dependency_overrides:
   hotreloader: ^4.1.0
   
 jaspr:
-  use-ssr: true
+  mode: server
   dev-command: dart_frog dev

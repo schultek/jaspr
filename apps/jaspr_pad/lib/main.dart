@@ -21,6 +21,8 @@ import 'server/samples.dart';
 import 'server/tutorial.dart';
 
 void main() {
+  Jaspr.initializeApp();
+
   var router = Router();
 
   router.mount('/api', apiRouter);
