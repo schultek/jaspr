@@ -295,14 +295,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.9.3"
+    version: "0.10.0"
   jaspr_builder:
-    dependency: "direct overridden"
+    dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.9.3"
+    version: "0.10.0"
   js:
     dependency: transitive
     description:
