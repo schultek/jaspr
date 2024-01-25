@@ -10,8 +10,9 @@
 # 'package:lints/core.yaml'. These are just the most critical lints
 # (the recommended set includes the core lints).
 # The core lints are also what is used by pub.dev for scoring packages.
-
-include: package:lints/recommended.yaml
+{{#flutter}}
+include: package:flutter_lints/flutter.yaml{{/flutter}}{{^flutter}}
+include: package:lints/recommended.yaml{{/flutter}}
 
 # Uncomment the following section to specify additional rules.
 

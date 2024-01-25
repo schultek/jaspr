@@ -3,17 +3,17 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 
 void main() async {
-  var templatesDir = Directory('tool/templates');
+  var scaffoldDir = Directory('tool/scaffold');
 
-  var subDirs = await templatesDir.list().toList();
-  var templates = <String>[];
+  var subDirs = await scaffoldDir.list().toList();
+  var scaffolds = <String>[];
 
   var output = StringBuffer('// ignore_for_file: directives_ordering\n'
       '// GENERATED FILE - DO NOT MODIFY\n\n');
 
   for (var templateDir in subDirs) {
     if (templateDir is Directory) {
-      var result = await Process.run('mason', 'bundle -t dart -o lib/src/templates ${templateDir.path}'.split(' '));
+      var result = await Process.run('mason', 'bundle -t dart -o lib/src/scaffold ${templateDir.path}'.split(' '));
       stdout.write(result.stdout);
       stderr.write(result.stderr);
 
@@ -22,17 +22,17 @@ void main() async {
       }
 
       var name = path.basenameWithoutExtension(templateDir.path);
-      templates.add(name);
+      scaffolds.add(name);
     }
   }
 
-  templates.sort();
-  for (var t in templates) {
-    output.writeln("import './templates/${t}_bundle.dart';");
+  scaffolds.sort();
+  for (var t in scaffolds) {
+    output.writeln("import './scaffold/${t}_bundle.dart';");
   }
-  output.writeln('\nvar templates = [${templates.map((t) => '${toCamelCase(t)}Bundle').join(', ')}];');
+  output.writeln('\nvar scaffolds = [${scaffolds.map((t) => '${toCamelCase(t)}Bundle').join(', ')}];');
 
-  var templatesFile = File('lib/src/templates.dart');
+  var templatesFile = File('lib/src/scaffolds.dart');
   await templatesFile.writeAsString(output.toString());
 }
 

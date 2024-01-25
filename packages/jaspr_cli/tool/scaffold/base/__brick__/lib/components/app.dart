@@ -1,9 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
-/// The root interactive component for this app.
-///
-/// This is automatically rendered on the client by using the @client annotation.
-@client
+// A simple [StatelessComponent] with a [build] method.{{#hydration}}
+@client{{/hydration}}
 class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {

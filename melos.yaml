@@ -50,10 +50,10 @@ scripts:
     run: |
       cd packages/jaspr
       dart run tool/generate_html.dart
-  generate:templates:
+  generate:scaffold:
     run: |
       cd packages/jaspr_cli
-      dart run tool/generate_templates.dart
+      dart run tool/generate_scaffold.dart
   generate:versions:
     run: |
       cd packages/jaspr_cli

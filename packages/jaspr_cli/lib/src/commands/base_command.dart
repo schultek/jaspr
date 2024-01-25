@@ -120,8 +120,8 @@ abstract class BaseCommand extends Command<int> {
       return;
     }
 
-    await errSub.asFuture();
-    await outSub.asFuture();
+    await errSub.cancel();
+    await outSub.cancel();
 
     if (exitCode == 0) {
       logger.complete(true);
