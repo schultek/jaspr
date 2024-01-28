@@ -1,6 +1,8 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:myapp/components/header.dart';
 
+import 'components/app.dart';
+import 'components/counter.dart';
+import 'components/header.dart';
 import 'components/home.dart';
 
 const primaryColor = Color.hex('#01589B');
@@ -24,6 +26,7 @@ final styles = [
       ),
     ]),
   ),
-  ...headerStyles,
-  ...homeStyles,
+  ...App.styles,
+  ...Header.styles,
+  ...Counter.styles,
 ];

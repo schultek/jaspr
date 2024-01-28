@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
+import 'counter.dart';
 import 'header.dart';
 
 class Home extends StatelessComponent {
@@ -9,18 +10,8 @@ class Home extends StatelessComponent {
 
     yield section([
       h1([text('Welcome')]),
-      p([text('You successfully create a new Jaspr site.')])
+      p([text('You successfully create a new Jaspr site.')]),
+      Counter(),
     ]);
   }
 }
-
-final homeStyles = [
-  StyleRule(
-    selector: Selector('section'),
-    styles: Styles.flexbox(
-      direction: FlexDirection.column,
-      justifyContent: JustifyContent.center,
-      alignItems: AlignItems.center,
-    ),
-  ),
-];
