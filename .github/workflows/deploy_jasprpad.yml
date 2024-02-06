@@ -21,6 +21,12 @@ jobs:
         with:
           credentials_json: ${{ secrets.PUB_PUBLISH_KEY }}
 
+      - name: Write ServiceAccountKey File
+        run: 'echo "$SERVICE_ACCOUNT_KEY" > apps/jaspr_pad/serviceAccountKey.json'
+        shell: bash
+        env:
+          SERVICE_ACCOUNT_KEY: ${{secrets.JASPRPAD_SERVICE_ACCOUNT }}
+
       - name: Deploy
         run: |
           dart pub global activate melos
