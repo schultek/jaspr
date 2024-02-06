@@ -5,7 +5,7 @@ FROM dart:stable as build
 WORKDIR /app
 COPY /apps/jaspr_pad /app/apps/jaspr_pad
 WORKDIR /app/apps/jaspr_pad
-RUN rm pubspec_overrides.yaml
+RUN rm -f pubspec_overrides.yaml
 RUN dart pub get
 RUN dart pub global activate jaspr_cli
 RUN jaspr build
