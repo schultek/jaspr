@@ -1,0 +1,29 @@
+on:
+  workflow_dispatch:
+
+name: Deploy JasprPad
+
+jobs:
+  release:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.PUSH_TOKEN }}
+
+      - uses: dart-lang/setup-dart@v1.3Z
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.PUB_PUBLISH_KEY }}
+
+      - name: Deploy
+        run: |
+          dart pub global activate melos
+          dart pub global activate jaspr_cli
+          melos deploy:jasprpad
+
