@@ -14,7 +14,7 @@ jobs:
           ref: ${{ github.head_ref }}
           token: ${{ secrets.PUSH_TOKEN }}
 
-      - uses: dart-lang/setup-dart@v1.3Z
+      - uses: dart-lang/setup-dart@v1.3
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
