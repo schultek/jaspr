@@ -32,53 +32,32 @@ class Header extends StatelessComponent {
   }
 
   static final styles = [
-    StyleRule(
-      selector: Selector('header'),
-      styles: Styles.flexbox(justifyContent: JustifyContent.spaceBetween),
-    ),
-    StyleRule(
-      selector: Selector('.corner'),
-      styles: Styles.box(width: 3.em, height: 3.em),
-    ),
-    StyleRule(
-      selector: Selector('header .corner a'),
-      styles: Styles.combine([
-        Styles.box(width: 100.percent, height: 100.percent),
-        Styles.flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center),
+    css('header', [
+      css('&').flexbox(justifyContent: JustifyContent.spaceBetween),
+      css('.corner', [
+        css('&').box(width: 3.em, height: 3.em),
+        css('a')
+            .box(width: 100.percent, height: 100.percent)
+            .flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center),
+        css('img').box(width: 2.em, height: 2.em)
       ]),
-    ),
-    StyleRule(
-      selector: Selector('header .corner img'),
-      styles: Styles.box(width: 2.em, height: 2.em),
-    ),
-    StyleRule(
-      selector: Selector('nav'),
-      styles: Styles.combine([
-        Styles.background(color: primaryColor),
-        Styles.box(radius: BorderRadius.vertical(bottom: Radius.circular(10.px))),
-        Styles.flexbox(justifyContent: JustifyContent.spaceBetween),
+      css('nav', [
+        css('&')
+            .background(color: primaryColor)
+            .box(radius: BorderRadius.vertical(bottom: Radius.circular(10.px)))
+            .flexbox(justifyContent: JustifyContent.spaceBetween),
+        css('a', [
+          css('&')
+              .text(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                decoration: TextDecoration(line: TextDecorationLine.none),
+              )
+              .box(height: 100.percent, padding: EdgeInsets.symmetric(horizontal: 1.em))
+              .flexbox(alignItems: AlignItems.center),
+          css('&:hover').text(color: secondaryColor),
+        ])
       ]),
-    ),
-    StyleRule(
-      selector: Selector('nav a'),
-      styles: Styles.combine([
-        Styles.text(
-          color: Colors.white,
-          fontWeight: FontWeight.w700,
-          decoration: TextDecoration(line: TextDecorationLine.none),
-        ),
-        Styles.box(
-          height: 100.percent,
-          padding: EdgeInsets.symmetric(horizontal: 1.em),
-        ),
-        Styles.flexbox(alignItems: AlignItems.center),
-      ]),
-    ),
-    StyleRule(
-      selector: Selector('nav a:hover'),
-      styles: Styles.combine([
-        Styles.text(color: secondaryColor),
-      ]),
-    ),
+    ]),
   ];
 }

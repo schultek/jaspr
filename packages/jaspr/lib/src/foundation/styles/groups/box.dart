@@ -1,6 +1,6 @@
 part of '../styles.dart';
 
-class _BoxStyles implements Styles {
+class _BoxStyles extends Styles {
   final EdgeInsets? padding;
   final EdgeInsets? margin;
   final Display? display;
@@ -39,7 +39,7 @@ class _BoxStyles implements Styles {
     this.shadow,
     this.cursor,
     this.transition,
-  });
+  }) : super._();
 
   @override
   Map<String, String> get styles => {

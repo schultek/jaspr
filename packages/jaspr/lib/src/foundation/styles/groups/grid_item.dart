@@ -1,7 +1,7 @@
 part of '../styles.dart';
 
-class _GridItemStyles implements Styles {
-  const _GridItemStyles({this.placement});
+class _GridItemStyles extends Styles {
+  const _GridItemStyles({this.placement}) : super._();
 
   final GridPlacement? placement;
 
