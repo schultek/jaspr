@@ -4,9 +4,7 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import '../providers/effects_provider.dart';
 
 class EffectsControls extends StatelessComponent {
-  const EffectsControls({
-    Key? key,
-  }) : super(key: key);
+  const EffectsControls({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

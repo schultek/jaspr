@@ -6,7 +6,7 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import '../providers/effects_provider.dart';
 
 class FlutterTarget extends StatelessComponent {
-  const FlutterTarget({required this.app, this.loader, Key? key}) : super(key: key);
+  const FlutterTarget({required this.app, this.loader, super.key});
 
   final Widget app;
   final Component? loader;

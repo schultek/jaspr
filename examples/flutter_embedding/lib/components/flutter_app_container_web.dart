@@ -8,7 +8,7 @@ import 'flutter_target.dart';
 import 'ripple_loader.dart';
 
 class FlutterAppContainer extends StatelessComponent {
-  const FlutterAppContainer({Key? key}) : super(key: key);
+  const FlutterAppContainer({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
