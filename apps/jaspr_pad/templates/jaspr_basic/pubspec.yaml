@@ -7,9 +7,9 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  http: ^1.1.0
-  jaspr: ^0.9.3
-  jaspr_riverpod: ^0.3.8
+  http: ^1.2.0
+  jaspr: ^0.10.0
+  jaspr_riverpod: ^0.3.9
 
 dev_dependencies:
   build_runner: ^2.4.0

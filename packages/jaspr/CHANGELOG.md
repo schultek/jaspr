@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed bug with `DomValidator`.
+
 ## 0.10.0
 
 - **BREAKING** Restructured core libraries:
