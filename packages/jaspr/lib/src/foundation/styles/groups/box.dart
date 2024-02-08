@@ -7,7 +7,10 @@ class _BoxStyles extends Styles {
   final BoxSizing? boxSizing;
   final Unit? width;
   final Unit? height;
-  final BoxConstraints? constraints;
+  final Unit? maxWidth;
+  final Unit? maxHeight;
+  final Unit? minWidth;
+  final Unit? minHeight;
   final Border? border;
   final BorderRadius? radius;
   final Outline? outline;
@@ -27,7 +30,10 @@ class _BoxStyles extends Styles {
     this.boxSizing,
     this.width,
     this.height,
-    this.constraints,
+    this.minWidth,
+    this.maxWidth,
+    this.minHeight,
+    this.maxHeight,
     this.border,
     this.radius,
     this.outline,
@@ -49,7 +55,10 @@ class _BoxStyles extends Styles {
         if (boxSizing != null) 'box-sizing': boxSizing!.value,
         if (width != null) 'width': width!.value,
         if (height != null) 'height': height!.value,
-        ...?constraints?.styles,
+        if (minWidth != null) 'min-width': minWidth!.value,
+        if (maxWidth != null) 'max-width': maxWidth!.value,
+        if (minHeight != null) 'min-height': minHeight!.value,
+        if (maxHeight != null) 'max-height': maxHeight!.value,
         ...?border?.styles,
         if (opacity != null) 'opacity': opacity!.toString(),
         ...?outline?.styles,
