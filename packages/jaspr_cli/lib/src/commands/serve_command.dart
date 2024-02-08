@@ -111,12 +111,16 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   Future<void> _runServer(String proxyPort) async {
     logger.write("Starting server...", progress: ProgressState.running);
 
+    var serverTarget = File('.dart_tool/jaspr/server_target.dart');
+    if (!serverTarget.existsSync()) {
+      serverTarget.createSync(recursive: true);
+    }
+
     var args = [
       'run',
       if (!release) ...[
         '--enable-vm-service',
         '--enable-asserts',
-        '-Djaspr.dev.hotreload=true',
       ] else
         '-Djaspr.flags.release=true',
       '-Djaspr.flags.verbose=$debug',
@@ -126,16 +130,16 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       args.add('--pause-isolates-on-start');
     }
 
-    String? entryPoint = await getEntryPoint(argResults!['input']);
+    var entryPoint = await getEntryPoint(argResults!['input']);
 
-    if (entryPoint == null) {
-      logger.complete(false);
-      logger.write("Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.",
-          level: Level.critical);
-      await shutdown();
+    if (!release) {
+      var import = entryPoint.replaceFirst('lib', 'package:${config!.projectName}');
+      serverTarget.writeAsStringSync(serverEntrypoint(import));
+
+      args.add(serverTarget.path);
+    } else {
+      args.add(entryPoint);
     }
-
-    args.add(entryPoint);
 
     args.addAll(argResults!.rest);
 
@@ -237,3 +241,26 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     return workflow;
   }
 }
+
+String serverEntrypoint(String import) => '''
+  import '$import' as m;
+  import 'package:hotreloader/hotreloader.dart';
+      
+  void main() async {
+    try {
+      await HotReloader.create(
+        debounceInterval: Duration.zero,
+        onAfterReload: (ctx) => m.main(),
+      );
+      print('[INFO] Server hot reload is enabled.');
+    } on StateError catch (e) {
+      if (e.message.contains('VM service not available')) {
+        print('[WARNING] Server hot reload not enabled. Run with --enable-vm-service to enable hot reload.');
+      } else {
+        rethrow;
+      }
+    }
+    
+    m.main();
+  }
+''';

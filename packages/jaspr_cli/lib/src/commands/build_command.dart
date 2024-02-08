@@ -56,12 +56,9 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     var dir = Directory('build/jaspr');
     var webDir = config!.mode == JasprMode.server ? Directory('build/jaspr/web') : dir;
 
-    String? entryPoint = await getEntryPoint(argResults!['input']);
-
-    if (config!.mode != JasprMode.client && entryPoint == null) {
-      logger.write("Cannot find entry point. Create a main.dart in lib/ or specify a file using --input.",
-          level: Level.critical);
-      await shutdown(1);
+    String? entryPoint;
+    if (config!.mode != JasprMode.client) {
+      entryPoint = await getEntryPoint(argResults!['input']);
     }
 
     if (await dir.exists()) {

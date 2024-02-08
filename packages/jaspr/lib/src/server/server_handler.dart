@@ -14,7 +14,6 @@ import 'render_functions.dart';
 import 'server_app.dart';
 
 final String? jasprProxyPort = Platform.environment['JASPR_PROXY_PORT'];
-const bool kDevHotreload = bool.fromEnvironment('jaspr.dev.hotreload');
 const String kDevWeb = String.fromEnvironment('jaspr.dev.web');
 
 final webDir = kDevWeb.isNotEmpty ? kDevWeb : join(_findRootProjectDir(), 'web');

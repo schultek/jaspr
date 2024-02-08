@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:hotreloader/hotreloader.dart';
 import 'package:http/http.dart' as http;
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
@@ -23,25 +22,24 @@ class ServerApp {
 
   final SetupFunction _setup;
 
-  HotReloader? _reloader;
-
-  HttpServer? _server;
-  HttpServer? get server => _server;
-
+  static HttpServer? _server;
   static http.Client? _client;
 
   void _run() async {
-    if (kDevHotreload) {
-      await _reload(this, _createServer);
+    var isFirstStartup = _server == null;
+
+    await _server?.close(force: true);
+    _server = await _createServer();
+
+    if (isFirstStartup) {
+      print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');
+      print('Serving at http://${kDebugMode ? 'localhost' : _server!.address.host}:${_server!.port}');
+
+      if (kGenerateMode) {
+        requestRouteGeneration('/');
+      }
     } else {
-      _server = await _createServer();
-    }
-
-    print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');
-    print('Serving at http://${kDebugMode ? 'localhost' : server!.address.host}:${server!.port}');
-
-    if (kGenerateMode) {
-      requestRouteGeneration('/');
+      print('[INFO] Server application reloaded.');
     }
   }
 
@@ -51,11 +49,6 @@ class ServerApp {
     _client = http.Client();
     var handler = createHandler((_, render) => render(_setup), client: _client);
     return shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true);
-  }
-
-  Future<void> close() async {
-    await _server?.close();
-    await _reloader?.stop();
   }
 
   static void requestRouteGeneration(String route) async {
@@ -70,31 +63,5 @@ class ServerApp {
       Uri.parse('http://localhost:$jasprProxyPort/\$jasprMessageHandler'),
       body: jsonEncode(message),
     );
-  }
-}
-
-/// Wraps the http server creation and enables hotreload.
-Future<void> _reload(ServerApp app, FutureOr<HttpServer> Function() init) async {
-  app._server = await init();
-
-  // ignore: prefer_function_declarations_over_variables
-  var obtainNewServer = (FutureOr<HttpServer> Function() initializer) async {
-    await app.server?.close(force: true);
-    print('[INFO] Server application reloaded.');
-    app._server = await initializer();
-  };
-
-  try {
-    app._reloader = await HotReloader.create(
-      debounceInterval: Duration.zero,
-      onAfterReload: (ctx) => obtainNewServer(init),
-    );
-    print('[INFO] Server hot reload is enabled.');
-  } on StateError catch (e) {
-    if (e.message.contains('VM service not available')) {
-      print('[WARNING] Server hot reload not enabled. Run with --enable-vm-service to enable hot reload.');
-    } else {
-      rethrow;
-    }
   }
 }

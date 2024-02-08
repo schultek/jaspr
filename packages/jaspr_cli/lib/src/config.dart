@@ -21,6 +21,8 @@ class JasprConfig {
   final bool usesFlutter;
   final bool usesJasprWebCompilers;
   final String? devCommand;
+
+  String? get projectName => pubspecYaml['name'];
 }
 
 Future<JasprConfig> getConfig(Logger logger) async {

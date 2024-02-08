@@ -56,19 +56,22 @@ abstract class BaseCommand extends Command<int> {
     exit(exitCode);
   }
 
-  Future<String?> getEntryPoint(String? input) async {
-    var entryPoints = [input, 'lib/main.dart'];
+  Future<String> getEntryPoint(String? input) async {
+    var entryPoint = input ?? 'lib/main.dart';
 
-    for (var path in entryPoints) {
-      if (path == null) continue;
-      if (await File(path).exists()) {
-        return path;
-      } else if (path == input) {
-        return null;
-      }
+    if (!File(entryPoint).existsSync()) {
+      logger.complete(false);
+      logger.write("Cannot find entry point. Create a lib/main.dart file, or specify a file using --input.",
+          level: Level.critical);
+      await shutdown();
     }
 
-    return null;
+    if (!entryPoint.startsWith('lib/')) {
+      logger.write("Entry point must be located inside lib/ folder, got '$entryPoint'.", level: Level.critical);
+      await shutdown();
+    }
+
+    return entryPoint;
   }
 
   void guardResource(FutureOr<void> Function() fn) {
