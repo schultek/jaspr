@@ -59,7 +59,7 @@ class CreateCommand extends BaseCommand {
     var mode = getMode();
     var useHydration = mode != 'client' ? getUseHydration() : false;
     var useRouting = getUseRouting();
-    var useMultiPageRouting = useRouting && mode != 'client' ? getUseMultiPageRouting() : false;
+    // var useMultiPageRouting = useRouting && mode != 'client' ? getUseMultiPageRouting() : false;
     var useFlutter = getUseFlutter();
     var useFlutterPlugins = useFlutter || getUseFlutterPlugins();
     var useBackend = mode == 'server' && getUseCustomBackend() ? getCustomBackend() : null;
@@ -156,8 +156,7 @@ class CreateCommand extends BaseCommand {
   }
 
   bool getUseHydration() {
-    return logger.logger
-        .confirm('(Recommended) Setup automatic client hydration for interactivity?', defaultValue: true);
+    return logger.logger.confirm('(Recommended) Enable automatic interactivity on the client?', defaultValue: true);
   }
 
   bool getUseRouting() {
