@@ -3,7 +3,7 @@
 
 import 'package:jaspr/jaspr.dart';
 
-import 'components/app.dart' as c0;
+import 'app.dart' as c0;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///

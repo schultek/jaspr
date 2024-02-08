@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
-import 'counter.dart';
-import 'header.dart';
+import '../components/counter.dart';
+import '../components/header.dart';
 
 class Home extends StatelessComponent {
   @override

@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
-import 'header.dart';
+import '../components/header.dart';
 
 class About extends StatelessComponent {
   @override

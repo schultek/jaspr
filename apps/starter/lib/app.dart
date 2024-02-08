@@ -1,8 +1,8 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
-import 'about.dart';
-import 'home.dart';
+import 'pages/about.dart';
+import 'pages/home.dart';
 
 // A simple [StatelessComponent] with a [build] method.
 @client

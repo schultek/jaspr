@@ -1,6 +1,6 @@
 import 'package:jaspr/server.dart';
 
-import 'components/app.dart';
+import 'app.dart';
 import 'jaspr_options.dart';
 import 'styles.dart';
 
