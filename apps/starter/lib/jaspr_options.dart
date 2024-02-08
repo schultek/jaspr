@@ -23,6 +23,6 @@ import 'app.dart' as c0;
 /// ```
 const defaultJasprOptions = JasprOptions(
   targets: {
-    c0.App: ClientTarget<c0.App>('components/app'),
+    c0.App: ClientTarget<c0.App>('app'),
   },
 );

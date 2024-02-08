@@ -8,37 +8,26 @@ class Counter extends StatefulComponent {
   @override
   State<Counter> createState() => _CounterState();
 
-  static final styles = [
-    StyleRule(
-      selector: Selector('.counter'),
-      styles: Styles.combine([
-        Styles.flexbox(),
-        Styles.box(
-          border: Border.symmetric(vertical: BorderSide(style: BorderStyle.solid, color: Colors.black, width: 1.px)),
-        ),
-      ]),
-    ),
-    StyleRule(
-      selector: Selector('.counter button'),
-      styles: Styles.combine([
-        Styles.text(fontSize: 3.rem),
-        Styles.box(width: 2.em, border: Border.unset),
-        Styles.flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center),
-        Styles.background(color: Colors.transparent),
-      ]),
-    ),
-    StyleRule(
-      selector: Selector('.counter button:hover'),
-      styles: Styles.background(color: primaryColor),
-    ),
-    StyleRule(
-      selector: Selector('.counter span'),
-      styles: Styles.combine([
-        Styles.box(padding: EdgeInsets.symmetric(horizontal: 2.rem)),
-        Styles.text(color: primaryColor, fontSize: 4.rem, fontWeight: FontWeight.w600),
-      ]),
-    ),
-  ];
+  static get styles => [
+        css('.counter', [
+          css('&').flexbox().box(
+                padding: EdgeInsets.symmetric(vertical: 10.px),
+                border: Border.symmetric(vertical: BorderSide.solid(color: primaryColor, width: 1.px)),
+              ),
+          css('button', [
+            css('&')
+                .text(fontSize: 3.rem)
+                .box(width: 2.em, border: Border.unset)
+                .box(radius: BorderRadius.all(Radius.circular(10.px)))
+                .flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center)
+                .background(color: Colors.transparent),
+            css('&:hover').text(color: Colors.white).background(color: primaryColor),
+          ]),
+          css('span') //
+              .box(padding: EdgeInsets.symmetric(horizontal: 2.rem))
+              .text(color: primaryColor, fontSize: 4.rem),
+        ]),
+      ];
 }
 
 class _CounterState extends State<Counter> {

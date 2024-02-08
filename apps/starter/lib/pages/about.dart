@@ -8,7 +8,7 @@ class About extends StatelessComponent {
     yield Header();
 
     yield section([
-      ol([
+      ol(styles: Styles.box(maxWidth: 500.px), [
         li([
           h3([text('Documentation')]),
           text('Jaspr\'s '),

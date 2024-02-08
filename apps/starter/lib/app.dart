@@ -17,24 +17,14 @@ class App extends StatelessComponent {
     ]);
   }
 
-  static final styles = [
-    StyleRule(
-      selector: Selector('.main'),
-      styles: Styles.combine([
-        Styles.flexbox(direction: FlexDirection.column),
-        Styles.box(height: 100.vh),
-      ]),
-    ),
-    StyleRule(
-      selector: Selector('section'),
-      styles: Styles.combine([
-        Styles.flexItem(flex: Flex(grow: 1)),
-        Styles.flexbox(
-          direction: FlexDirection.column,
-          justifyContent: JustifyContent.center,
-          alignItems: AlignItems.center,
-        ),
-      ]),
-    ),
-  ];
+  static get styles => [
+        css('.main', [
+          css('&').flexbox(direction: FlexDirection.column).box(height: 100.vh),
+          css('section').flexItem(flex: Flex(grow: 1)).flexbox(
+                direction: FlexDirection.column,
+                justifyContent: JustifyContent.center,
+                alignItems: AlignItems.center,
+              ),
+        ]),
+      ];
 }

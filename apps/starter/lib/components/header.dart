@@ -31,33 +31,33 @@ class Header extends StatelessComponent {
     ]);
   }
 
-  static final styles = [
-    css('header', [
-      css('&').flexbox(justifyContent: JustifyContent.spaceBetween),
-      css('.corner', [
-        css('&').box(width: 3.em, height: 3.em),
-        css('a')
-            .box(width: 100.percent, height: 100.percent)
-            .flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center),
-        css('img').box(width: 2.em, height: 2.em)
-      ]),
-      css('nav', [
-        css('&')
-            .background(color: primaryColor)
-            .box(radius: BorderRadius.vertical(bottom: Radius.circular(10.px)))
-            .flexbox(justifyContent: JustifyContent.spaceBetween),
-        css('a', [
-          css('&')
-              .text(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                decoration: TextDecoration(line: TextDecorationLine.none),
-              )
-              .box(height: 100.percent, padding: EdgeInsets.symmetric(horizontal: 1.em))
-              .flexbox(alignItems: AlignItems.center),
-          css('&:hover').text(color: secondaryColor),
-        ])
-      ]),
-    ]),
-  ];
+  static get styles => [
+        css('header', [
+          css('&').flexbox(justifyContent: JustifyContent.spaceBetween),
+          css('.corner', [
+            css('&').box(width: 3.em, height: 3.em),
+            css('a')
+                .box(width: 100.percent, height: 100.percent)
+                .flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center),
+            css('img').box(width: 2.em, height: 2.em)
+          ]),
+          css('nav', [
+            css('&')
+                .background(color: primaryColor)
+                .box(radius: BorderRadius.vertical(bottom: Radius.circular(10.px)))
+                .flexbox(justifyContent: JustifyContent.spaceBetween),
+            css('a', [
+              css('&')
+                  .text(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    decoration: TextDecoration(line: TextDecorationLine.none),
+                  )
+                  .box(height: 100.percent, padding: EdgeInsets.symmetric(horizontal: 1.em))
+                  .flexbox(alignItems: AlignItems.center),
+              css('&:hover').box(opacity: 0.5),
+            ])
+          ]),
+        ]),
+      ];
 }

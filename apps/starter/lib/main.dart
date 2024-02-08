@@ -9,13 +9,9 @@ void main() {
     options: defaultJasprOptions,
   );
 
-  runApp(
-    Builder.single(
-      builder: (_) => Document(
-        title: '{{name}}',
-        styles: styles,
-        body: App(),
-      ),
-    ),
-  );
+  runApp(Document(
+    title: '{{name}}',
+    styles: styles,
+    body: App(),
+  ));
 }

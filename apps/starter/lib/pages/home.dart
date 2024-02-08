@@ -11,6 +11,7 @@ class Home extends StatelessComponent {
     yield section([
       h1([text('Welcome')]),
       p([text('You successfully create a new Jaspr site.')]),
+      div(styles: Styles.box(height: 100.px), []),
       Counter(),
     ]);
   }
