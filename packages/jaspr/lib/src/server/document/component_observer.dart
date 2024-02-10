@@ -16,12 +16,12 @@ class ComponentObserverElement extends ObserverElement {
   ComponentObserver get component => super.component as ComponentObserver;
 
   @override
-  void willRebuildElement(Element element) {}
-
-  @override
-  void didRebuildElement(Element element) {
+  void willRebuildElement(Element element) {
     component.registerElement(element);
   }
+
+  @override
+  void didRebuildElement(Element element) {}
 
   @override
   void didUnmountElement(Element element) {}

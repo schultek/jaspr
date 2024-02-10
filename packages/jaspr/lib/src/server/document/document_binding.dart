@@ -16,11 +16,13 @@ mixin DocumentBinding on AppBinding {
 
   Future<String> renderDocument(MarkupRenderObject root) async {
     var state = _document?.state;
+    var adapters = <RenderAdapter>[];
     if (state is _BaseDocumentState) {
       state._prepareRender(getStateData());
+      adapters = state.adapters;
     }
 
-    var content = root.renderToHtml();
+    var content = root.renderToHtml(adapters);
 
     if (state is _FileDocumentState && _fileRequest != null) {
       var fileContent = await _fileRequest!;

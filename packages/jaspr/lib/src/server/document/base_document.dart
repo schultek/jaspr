@@ -44,36 +44,40 @@ class _DocumentElement extends StatefulElement {
 }
 
 class _BaseDocumentState extends State<_BaseDocument> {
-  final Map<Element, ClientTarget> _registryElements = {};
+  final List<Element> _clientElements = [];
 
   void registerElement(Element element) {
-    var entry = (context.binding as ServerAppBinding).options.targets[element.component.runtimeType];
-    if (entry != null) {
-      _registryElements[element] = entry;
+    if (!(context.binding as ServerAppBinding).options.targets.containsKey(element.component.runtimeType)) {
+      return;
     }
+
+    print("CHECK ${element.component}");
+
+    var isClientBoundary = true;
+    element.visitAncestorElements((e) {
+      return isClientBoundary = !_clientElements.contains(e);
+    });
+
+    if (!isClientBoundary) {
+      return;
+    }
+
+    _clientElements.add(element);
   }
 
-  Map<String, dynamic> _getExtendedConfig() {
-    return {
-      'comp': [
-        for (var e in _registryElements.entries)
-          {
-            'id': getIdFor(e.key),
-            ...e.value.encode(e.key.component),
-          }
-      ]
-    };
-  }
+  List<RenderAdapter> get adapters => _clientElements.map((e) {
+        var entry = (context.binding as ServerAppBinding).options.targets[_clientElements.first.component.runtimeType]!;
+        return AnchorRenderAdapter(entry.name, entry.dataFor(e.component), e);
+      }).toList();
 
   String? get scriptName {
-    var comps = _registryElements.entries.toList();
-
-    if (comps.isEmpty) {
+    if (_clientElements.isEmpty) {
       return component.scriptName;
     }
 
-    if (comps.length == 1) {
-      return '${comps.first.value.name}.client';
+    if (_clientElements.length == 1) {
+      var entry = (context.binding as ServerAppBinding).options.targets[_clientElements.first.component.runtimeType]!;
+      return '${entry.name}.client';
     }
 
     return 'main.clients';
@@ -131,7 +135,6 @@ class _BaseDocumentState extends State<_BaseDocument> {
     _setScript(scriptName);
     var jasprConfig = {
       if (syncState.isNotEmpty) 'sync': kDebugMode ? syncState : stateCodec.encode(syncState),
-      ..._getExtendedConfig(),
     };
     _setData('window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert(jasprConfig)};');
   }
@@ -152,41 +155,5 @@ class _BaseDocumentState extends State<_BaseDocument> {
     } else {
       renderObject.children.first.text = source;
     }
-  }
-
-  String getIdFor(Element element) {
-    var container = element.parentRenderObjectElement?.renderObject as MarkupRenderObject?;
-    if (container == null) {
-      return 'body';
-    }
-
-    String selector;
-
-    if (container.tag == 'body') {
-      selector = 'body';
-    } else if (container.id != null) {
-      selector = '#${container.id}';
-    } else {
-      var id = _randomId();
-      container.id = id;
-      selector = '#$id';
-    }
-
-    Element? prevElem = element.prevAncestorSibling;
-    while (prevElem != null && prevElem.lastRenderObjectElement == null) {
-      prevElem = prevElem.prevAncestorSibling;
-    }
-
-    var firstChild = prevElem?.lastRenderObjectElement?.renderObject as MarkupRenderObject?;
-    var lastChild = element.lastRenderObjectElement?.renderObject as MarkupRenderObject?;
-
-    var firstIndex = (firstChild != null ? container.children.indexOf(firstChild) : -1) + 1;
-    var lastIndex = (lastChild != null ? container.children.indexOf(lastChild) : -1) + 1;
-
-    if (firstIndex > lastIndex) {
-      lastIndex = firstIndex;
-    }
-
-    return '$selector($firstIndex:$lastIndex)';
   }
 }
