@@ -1,26 +1,23 @@
 library document;
 
-import 'dart:convert';
-import 'dart:isolate';
-import 'dart:math';
+import 'dart:async';
 
+import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 
-import '../../../jaspr.dart';
 import '../../../server.dart';
+import '../adapters/element_boundary_adapter.dart';
 import '../markup_render_object.dart';
 
 export '../../components/style.dart' hide Style;
 
 part 'base_document.dart';
-part 'component_observer.dart';
-part 'document_binding.dart';
 part 'file_document.dart';
 
 // only allow a single document
 const _documentKey = GlobalKey();
 
-abstract class Document extends StatefulComponent {
+abstract class Document extends StatelessComponent {
   const Document._() : super(key: _documentKey);
 
   const factory Document({
@@ -40,10 +37,4 @@ abstract class Document extends StatefulComponent {
     String attachTo,
     required Component child,
   }) = _FileDocument;
-}
-
-final _chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-String _randomId() {
-  var r = Random();
-  return List.generate(8, (i) => _chars[r.nextInt(_chars.length)]).join();
 }

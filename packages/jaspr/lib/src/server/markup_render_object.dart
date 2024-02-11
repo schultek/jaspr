@@ -19,8 +19,8 @@ class MarkupRenderObject extends RenderObject {
   MarkupRenderObject? parent;
 
   @override
-  RenderObject createChildRenderObject() {
-    return MarkupRenderObject();
+  MarkupRenderObject createChildRenderObject() {
+    return MarkupRenderObject()..parent = this;
   }
 
   @override
@@ -65,7 +65,7 @@ class MarkupRenderObject extends RenderObject {
     parent = null;
   }
 
-  String renderToHtml([List<RenderAdapter> adapters = const []]) {
+  String renderToHtml() {
     var output = StringBuffer();
     if (text case var text?) {
       if (rawHtml == true) {
@@ -76,9 +76,6 @@ class MarkupRenderObject extends RenderObject {
     } else if (tag case var tag?) {
       tag = tag.toLowerCase();
       _domValidator.validateElementName(tag);
-      for (var a in adapters) {
-        a.beforeElement(this, output);
-      }
       output.write('<$tag');
       if (id case String id) {
         output.write(' id="${_attributeEscape.convert(id)}"');
@@ -107,7 +104,7 @@ class MarkupRenderObject extends RenderObject {
         output.write('>');
         var childOutput = <String>[];
         for (var child in children) {
-          childOutput.add(child.renderToHtml(adapters));
+          childOutput.add(child.renderToHtml());
         }
         var fullChildOutput = childOutput.fold<String>('', (s, o) => s + o);
         if (formatOutput && (fullChildOutput.length > 80 || fullChildOutput.contains('\n'))) {
@@ -120,13 +117,10 @@ class MarkupRenderObject extends RenderObject {
         }
         output.write('</$tag>');
       }
-      for (var a in adapters.reversed) {
-        a.afterElement(this, output);
-      }
     } else {
       assert(parent == null);
       for (var child in children) {
-        output.writeln(child.renderToHtml(adapters));
+        output.writeln(child.renderToHtml());
       }
     }
     return output.toString();
@@ -180,48 +174,5 @@ class DomValidator {
 
   bool isSelfClosing(String tag) {
     return _selfClosing.contains(tag);
-  }
-}
-
-abstract class RenderAdapter {
-  void beforeElement(MarkupRenderObject renderObject, StringBuffer output);
-  void afterElement(MarkupRenderObject renderObject, StringBuffer output);
-}
-
-class AnchorRenderAdapter extends RenderAdapter {
-  AnchorRenderAdapter(this.name, this.data, this.element) {
-    Element? prevElem = element.prevAncestorSibling;
-    while (prevElem != null && prevElem.lastRenderObjectElement == null) {
-      prevElem = prevElem.prevAncestorSibling;
-    }
-    before = prevElem?.lastRenderObjectElement?.renderObject as MarkupRenderObject?;
-  }
-
-  final String name;
-  final String data;
-  final Element element;
-  late final MarkupRenderObject? before;
-
-  @override
-  void beforeElement(MarkupRenderObject renderObject, StringBuffer output) {
-    if (renderObject.parent != null && renderObject.parent == element.parentRenderObjectElement?.renderObject) {
-      var beforeIndex = before == null ? -1 : renderObject.parent!.children.indexOf(before!);
-      var selfIndex = renderObject.parent!.children.indexOf(renderObject);
-
-      if (beforeIndex == selfIndex - 1) {
-        output.write('<!-- \$$name $data  -->\n');
-      }
-    }
-  }
-
-  @override
-  void afterElement(MarkupRenderObject renderObject, StringBuffer output) {
-    if (renderObject.parent != null && renderObject.parent == element.parentRenderObjectElement?.renderObject) {
-      var last = element.lastRenderObjectElement?.renderObject;
-
-      if (renderObject == last) {
-        output.write('\n<!-- /\$$name -->');
-      }
-    }
   }
 }
