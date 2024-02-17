@@ -11,9 +11,9 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
   final String data;
 
   @override
-  void processBoundary(MarkupRenderObject parent, int start, int end) {
-    parent.children.insert(start, parent.createChildRenderObject()..updateText('<!-- \$$name $data  -->', true));
-    parent.children.insert(end + 1, parent.createChildRenderObject()..updateText('<!-- /\$$name -->', true));
+  void processBoundary(ChildListRange range) {
+    range.start.insertNext(ChildNodeData(MarkupRenderObject()..updateText('<!-- \$$name $data  -->', true)));
+    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!-- /\$$name -->', true)));
   }
 }
 

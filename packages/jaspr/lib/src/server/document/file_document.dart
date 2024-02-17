@@ -26,34 +26,43 @@ class _FileDocumentElement extends StatelessElement {
   Future<String>? _fileFuture;
 
   @override
-  void mount(Element? parent, Element? prevSibling) {
-    super.mount(parent, prevSibling);
+  Iterable<Component> build() {
     (binding as ServerAppBinding).addRenderAdapter(_FileDocumentAdapter(this));
     _fileFuture ??= (binding as ServerAppBinding).loadFile((component as _FileDocument).name);
+    return super.build();
   }
 }
 
 class _FileDocumentAdapter extends ElementBoundaryAdapter {
   _FileDocumentAdapter(super.element);
 
-  @override
-  Future<void> processBoundary(MarkupRenderObject parent, int start, int end) async {
-    var children = parent.children.sublist(start, end);
-    parent.children.removeRange(start, end);
-    var file = await (element as _FileDocumentElement)._fileFuture!;
+  late String file;
 
+  @override
+  FutureOr<void> prepare() async {
+    file = await (element as _FileDocumentElement)._fileFuture!;
+    return super.prepare();
+  }
+
+  @override
+  void processBoundary(ChildListRange range) {
+    var curr = range.start.prev!;
+    range.remove();
     var document = parse(file);
     var target = document.querySelector((element.component as _FileDocument).attachTo)!;
 
-    MarkupRenderObject createTree(dom.Node node) {
+    MarkupRenderObject? createTree(dom.Node node) {
       var n = element.parentRenderObjectElement!.renderObject.createChildRenderObject() as MarkupRenderObject;
 
       if (node is dom.Text) {
-        n.updateText(node.text);
+        if (node.text.trim().isEmpty) {
+          return null;
+        }
+        n.updateText(node.text.trim(), true);
       } else if (node is dom.Comment) {
         n.updateText('<!--${node.data}-->', true);
       } else if (node is dom.Element) {
-        n.updateElement(node.localName!, node.id, node.className, null, node.attributes.cast(), null);
+        n.updateElement(node.localName!, null, null, null, node.attributes.cast(), null);
       } else if (node is dom.DocumentType) {
         n.updateText(node.toString(), true);
       } else {
@@ -61,13 +70,26 @@ class _FileDocumentAdapter extends ElementBoundaryAdapter {
       }
 
       if (node == target) {
-        n.children = children;
+        n.children.insertRangeAfter(range);
       } else {
-        n.children = node.nodes.map(createTree).toList();
+        for (var c in node.nodes) {
+          var o = createTree(c);
+          if (o != null) {
+            n.children.insertBefore(o);
+          }
+        }
       }
+
       return n;
     }
 
-    parent.children.insertAll(start, document.nodes.map(createTree));
+    for (var n in document.nodes) {
+      var o = createTree(n);
+      if (o != null) {
+        var next = ChildNodeData(o);
+        curr.insertNext(next);
+        curr = next;
+      }
+    }
   }
 }

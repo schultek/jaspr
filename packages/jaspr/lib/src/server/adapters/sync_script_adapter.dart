@@ -18,10 +18,10 @@ class SyncScriptAdapter extends HeadScopeAdapter {
 
     var source = 'window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert(jasprConfig)};';
 
-    head.children.add(
+    head.children.insertBefore(
       head.createChildRenderObject()
         ..tag = 'script'
-        ..children.add(head.createChildRenderObject()..updateText(source, true))
+        ..children.insertAfter(head.createChildRenderObject()..updateText(source, true))
         ..updateElement('script', null, null, null, null, null),
     );
   }

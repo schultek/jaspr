@@ -23,7 +23,7 @@ class ClientScriptAdapter extends HeadScopeAdapter {
       source = 'main.clients';
     }
 
-    head.children.add(
+    head.children.insertBefore(
       head.createChildRenderObject()
         ..updateElement('script', null, null, null, {'src': '$source.dart.js', 'defer': ''}, null),
     );

@@ -3,12 +3,15 @@ import '../server_binding.dart';
 
 abstract class HeadScopeAdapter extends RenderAdapter {
   @override
+  void prepare() {}
+
+  @override
   void apply(MarkupRenderObject root) {
-    var html = root.children.where((c) => c.tag == 'html').firstOrNull ?? root;
-    var head = html.children.where((c) => c.tag == 'head').firstOrNull;
+    var html = root.children.findWhere((c) => c.tag == 'html')?.node ?? root;
+    var head = html.children.findWhere((c) => c.tag == 'head')?.node;
 
     if (head == null) {
-      html.children.insert(0, head = html.createChildRenderObject()..tag = 'head');
+      html.children.insertAfter(head = html.createChildRenderObject()..tag = 'head');
     }
 
     applyHead(head);

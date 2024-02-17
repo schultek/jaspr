@@ -3,34 +3,48 @@ import '../server_binding.dart';
 
 class DocumentAdapter extends RenderAdapter {
   @override
+  void prepare() {}
+
+  @override
   void apply(MarkupRenderObject root) {
-    var html = root.children.where((c) => c.tag == 'html').firstOrNull;
+    var html = root.children.findWhere((c) => c.tag == 'html')?.node;
     if (html == null) {
-      var children = root.children;
-      root.children = [
+      var range = root.children.range();
+      root.children.insertAfter(
         html = root.createChildRenderObject()
           ..tag = 'html'
-          ..children = children,
-      ];
+          ..children.insertRangeAfter(range),
+      );
     }
 
-    var head = html.children.where((c) => c.tag == 'head').firstOrNull;
-    var body = html.children.where((c) => c.tag == 'body').firstOrNull;
-    var rest = html.children.where((c) => c != head && c != body).toList();
+    var head = html.children.findWhere((c) => c.tag == 'head');
+    var body = html.children.findWhere((c) => c.tag == 'body');
 
-    print("HEAD $head BODY $body");
+    if (body == null && head == null) {
+      var range = html.children.range();
+      html.children.insertAfter(html.createChildRenderObject()..tag = 'head');
+      html.children.insertBefore(html.createChildRenderObject()
+        ..tag = 'body'
+        ..children.insertRangeAfter(range));
+    } else if (body != null && head == null) {
+      html.children.insertAfter(html.createChildRenderObject()..tag = 'head');
+    } else if (body == null && head != null) {
+      var rangeBefore = html.children.range(endBefore: head);
+      var rangeAfter = html.children.range(startAfter: head);
 
-    if (body == null) {
-      html.children = [
-        head ??= html.createChildRenderObject()..tag = 'head',
-        body = html.createChildRenderObject()
-          ..tag = 'body'
-          ..children = rest,
-      ];
+      var body = html.createChildRenderObject()..tag = 'body';
+      body.children
+        ..insertRangeAfter(rangeAfter)
+        ..insertRangeAfter(rangeBefore);
+      html.children.insertAfter(body, after: head.node);
     }
 
-    if (head == null) {
-      html.children.insert(0, head = html.createChildRenderObject()..tag = 'head');
+    var hasDoctype =
+        root.children.findWhere((r) => r.text != null && r.text!.startsWith('<!DOCTYPE') && (r.rawHtml ?? false)) !=
+            null;
+
+    if (!hasDoctype) {
+      root.children.insertAfter(root.createChildRenderObject()..updateText('<!DOCTYPE html>', true));
     }
   }
 }

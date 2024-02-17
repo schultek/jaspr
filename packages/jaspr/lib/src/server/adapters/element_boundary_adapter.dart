@@ -9,24 +9,18 @@ abstract class ElementBoundaryAdapter extends RenderAdapter {
 
   final Element element;
 
+  late ChildListRange range;
+
   @override
-  FutureOr<void> apply(MarkupRenderObject root) {
-    Element? prevElem = element.prevAncestorSibling;
-    while (prevElem != null && prevElem.lastRenderObjectElement == null) {
-      prevElem = prevElem.prevAncestorSibling;
-    }
-
+  FutureOr<void> prepare() {
     var parent = element.parentRenderObjectElement!.renderObject as MarkupRenderObject;
-    var beforeFirst = prevElem?.lastRenderObjectElement?.renderObject as MarkupRenderObject?;
-    var last = element.lastRenderObjectElement?.renderObject as MarkupRenderObject?;
-
-    assert((beforeFirst?.parent ?? parent) == parent && (last?.parent ?? parent) == parent);
-
-    var startIndex = beforeFirst == null ? 0 : parent.children.indexOf(beforeFirst) + 1;
-    var endIndex = last == null ? parent.children.length : parent.children.indexOf(last) + 1;
-
-    return processBoundary(parent, startIndex, endIndex);
+    range = parent.children.wrapElement(element);
   }
 
-  FutureOr<void> processBoundary(MarkupRenderObject parent, int start, int end);
+  @override
+  void apply(MarkupRenderObject root) {
+    return processBoundary(range);
+  }
+
+  void processBoundary(ChildListRange range);
 }

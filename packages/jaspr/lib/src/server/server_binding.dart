@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import '../../jaspr.dart';
 import 'adapters/client_component_adapter.dart';
-import 'adapters/doctype_adapter.dart';
 import 'adapters/document_adapter.dart';
 import 'adapters/sync_script_adapter.dart';
 import 'markup_render_object.dart';
@@ -32,13 +31,21 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     await rootCompleter.future;
 
     var root = rootElement!.renderObject as MarkupRenderObject;
-    var adapters = [..._adapters.reversed, SyncScriptAdapter(getStateData), DocumentAdapter(), DoctypeAdapter()];
+    var adapters = [
+      ..._adapters.reversed,
+      SyncScriptAdapter(getStateData),
+      DocumentAdapter(),
+    ];
 
-    for (var adapter in adapters) {
-      var r = adapter.apply(root);
+    for (var adapter in adapters.reversed) {
+      var r = adapter.prepare();
       if (r is Future) {
         await r;
       }
+    }
+
+    for (var adapter in adapters) {
+      adapter.apply(root);
     }
 
     return root.renderToHtml();
@@ -98,5 +105,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 }
 
 abstract class RenderAdapter {
-  FutureOr<void> apply(MarkupRenderObject root);
+  FutureOr<void> prepare();
+
+  void apply(MarkupRenderObject root);
 }
