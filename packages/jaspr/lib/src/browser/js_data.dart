@@ -15,10 +15,6 @@ class JasprConfig {
   Map<String, dynamic>? get sync {
     return decodeConfig(_config?.sync);
   }
-
-  List<ComponentConfig>? get comp {
-    return (_config?.comps as dynamic)?.map((c) => ComponentConfig._(c)).toList();
-  }
 }
 
 class ComponentConfig {
@@ -39,7 +35,6 @@ class _JasprConfig {}
 
 extension _JasprConfigExtension on _JasprConfig {
   external JSObject? get sync;
-  external JSObject? get comps;
 }
 
 @JS()

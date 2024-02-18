@@ -155,7 +155,6 @@ class DomRenderObject extends RenderObject {
 
   @override
   void updateText(String text, [bool rawHtml = false]) {
-    print("UPDATE TEXT $text");
     if (rawHtml) {
       var parent = this.parent!.node;
       if (parent is web.Element) {
@@ -236,8 +235,8 @@ class DomRenderObject extends RenderObject {
       if (childNode == null) return;
 
       var afterNode = after?.node;
-      if ((afterNode, parent) case (null, RootDomRenderObject p) when p.from != null && p.from! > 0) {
-        afterNode = p.container.childNodes.item(p.from! - 1);
+      if (afterNode == null && parent is RootDomRenderObject) {
+        afterNode = parent.beforeStart;
       }
 
       if (childNode.previousSibling == afterNode && childNode.parentNode == parentNode) {
@@ -285,20 +284,22 @@ class DomRenderObject extends RenderObject {
 
 class RootDomRenderObject extends DomRenderObject {
   final web.Element container;
-  final int? from;
-  final int? to;
+  late final web.Node? beforeStart;
 
-  RootDomRenderObject(this.container, this.from, this.to) {
-    Iterable<web.Node> nodes = container.childNodes.toIterable();
-    if (kDebugMode) {
-      nodes = nodes.where((node) => node is! web.Text || (node.textContent ?? '').trim().isNotEmpty);
-    }
-    nodes = nodes.skip(from ?? 0);
-    if (to != null) {
-      nodes = nodes.take(to! - (from ?? 0));
-    }
+  RootDomRenderObject(this.container, [List<web.Node>? nodes]) {
     node = container;
-    toHydrate = nodes.toList();
+    toHydrate = nodes ?? container.childNodes.toIterable().toList();
+    beforeStart = toHydrate.firstOrNull?.previousSibling;
+  }
+
+  factory RootDomRenderObject.between(web.Node start, web.Node end) {
+    var nodes = <web.Node>[];
+    web.Node? curr = start.nextSibling;
+    while (curr != null && curr != end) {
+      nodes.add(curr);
+      curr = curr.nextSibling;
+    }
+    return RootDomRenderObject(start.parentElement!, nodes);
   }
 }
 

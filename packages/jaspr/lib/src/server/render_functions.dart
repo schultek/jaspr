@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:isolate';
 
 import '../../jaspr.dart';
-import 'document/document.dart';
 import 'server_app.dart';
 import 'server_binding.dart';
 
@@ -89,4 +88,11 @@ void _renderData(_RenderMessage message) async {
 
   var data = await binding.data();
   message.sendPort.send(data);
+}
+
+class LoadFileRequest {
+  final String name;
+  final SendPort sendPort;
+
+  LoadFileRequest(this.name, this.sendPort);
 }

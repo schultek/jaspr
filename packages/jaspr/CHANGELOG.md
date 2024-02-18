@@ -1,3 +1,9 @@
+## Unreleased minor
+
+- Fixed bug with `DomValidator`.
+- `Document` is no longer required when using server-side rendering.
+- Improved how `@client` components are hydrated.
+
 ## 0.10.0
 
 - **BREAKING** Restructured core libraries:
