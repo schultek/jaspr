@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 /// A [Key] is an identifier for [Component]s, [Element]s and [SemanticsNode]s.
 ///

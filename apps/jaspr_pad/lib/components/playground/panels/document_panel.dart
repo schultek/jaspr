@@ -6,7 +6,7 @@ import '../../../providers/docu_provider.dart';
 import '../../elements/markdown.dart';
 
 class DocumentPanel extends StatelessComponent {
-  const DocumentPanel({Key? key}) : super(key: key);
+  const DocumentPanel({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -19,7 +19,7 @@ class DocumentPanel extends StatelessComponent {
 }
 
 class _DocumentHintMarkdown extends StatefulComponent {
-  const _DocumentHintMarkdown(this.info, {Key? key}) : super(key: key);
+  const _DocumentHintMarkdown(this.info);
 
   final HoverInfo info;
 
@@ -44,10 +44,9 @@ class __DocumentHintMarkdownState extends State<_DocumentHintMarkdown> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'p',
-      classes: ['documentation', 'custom-scrollbar'],
-      child: Markdown(markdown: markdown),
+    yield p(
+      classes: 'documentation custom-scrollbar',
+      [Markdown(markdown: markdown)],
     );
   }
 
@@ -64,7 +63,7 @@ class __DocumentHintMarkdownState extends State<_DocumentHintMarkdown> {
     final apiLink = _dartApiLink(libraryName);
 
     final propagatedType = info.propagatedType;
-    final _mdDocs = '''### `${info.description?.replaceAll('\n', ' ')}`\n\n
+    final mdDocs = '''### `${info.description?.replaceAll('\n', ' ')}`\n\n
 ${hasDartdoc ? "${info.dartdoc}\n\n" : ''}
 ${isVariable ? "$kind\n\n" : ''}
 ${(isVariable && propagatedType != null) ? "**Propagated type:** $propagatedType\n\n" : ''}
@@ -73,7 +72,7 @@ $apiLink\n\n''';
     // Append a 'launch' icon to the 'Open library docs' link.
     //_htmlDocs = _htmlDocs.replaceAll('library docs</a>', "library docs <span class='launch-icon'></span></a>");
 
-    return _mdDocs;
+    return mdDocs;
   }
 
   String _dartApiLink(String? libraryName) {

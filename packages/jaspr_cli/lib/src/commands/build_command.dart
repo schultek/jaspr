@@ -89,10 +89,22 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
       await webResult;
 
       logger.write('Building server app...', progress: ProgressState.running);
+      String extension = '';
+      final target = argResults!['target'];
+      if (Platform.isWindows && target == 'exe') {
+        extension = '.exe';
+      }
 
       var process = await Process.start(
         'dart',
-        ['compile', argResults!['target'], entryPoint, '-o', './build/jaspr/app', '-Djaspr.flags.release=true'],
+        [
+          'compile',
+          argResults!['target'],
+          entryPoint,
+          '-o',
+          './build/jaspr/app$extension',
+          '-Djaspr.flags.release=true',
+        ],
       );
 
       await watchProcess('server build', process, tag: Tag.cli, progress: 'Building server app...');

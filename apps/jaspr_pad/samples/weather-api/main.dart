@@ -8,7 +8,7 @@ void main() {
 }
 
 class App extends StatefulComponent {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   State<App> createState() => _AppState();
@@ -53,38 +53,24 @@ class _AppState extends State<App> {
 }
 
 class SimpleWeather extends StatelessComponent {
-  const SimpleWeather(this.weather, {Key? key}) : super(key: key);
+  const SimpleWeather(this.weather, {super.key});
 
   final CurrentWeather weather;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      classes: ['weather'],
-      children: [
-        DomComponent(
-          tag: 'img',
-          attributes: {'src': weather.condition.icon},
-        ),
-        DomComponent(
-          tag: 'div',
-          classes: ['info'],
-          children: [
-            DomComponent(tag: 'h1', child: Text('${weather.temp}°')),
-            DomComponent(
-              tag: 'span',
-              child: Text('${weather.location.name}, ${weather.location.country}'),
-            )
-          ],
-        )
-      ],
-    );
+    yield div(classes: 'weather', [
+      img(src: weather.condition.icon),
+      div(classes: 'info', [
+        h1([text('${weather.temp}°')]),
+        span([text('${weather.location.name}, ${weather.location.country}')])
+      ])
+    ]);
   }
 }
 
 class SearchBar extends StatefulComponent {
-  const SearchBar({required this.onSearch, this.placeholder, Key? key}) : super(key: key);
+  const SearchBar({required this.onSearch, this.placeholder, super.key});
 
   final ValueChanged<String> onSearch;
   final String? placeholder;
@@ -98,29 +84,21 @@ class SearchBarState extends State<SearchBar> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      classes: ['searchbar'],
-      children: [
-        DomComponent(
-          tag: 'input',
-          attributes: {'type': 'text', if (component.placeholder != null) 'placeholder': component.placeholder!},
-          events: {
-            'input': (e) {
-              setState(() => search = e.targetUrl.value);
-            }
-          },
-        ),
-        DomComponent(
-          tag: 'button',
-          events: {
-            'click': (e) {
-              component.onSearch(search);
-            }
-          },
-          child: Text('Search'),
-        ),
-      ],
-    );
+    yield div(classes: 'searchbar', [
+      input(
+        type: InputType.text,
+        attributes: {if (component.placeholder != null) 'placeholder': component.placeholder!},
+        onInput: (value) {
+          setState(() => search = value);
+        },
+        [],
+      ),
+      button(
+        onClick: () {
+          component.onSearch(search);
+        },
+        [text('Search')],
+      ),
+    ]);
   }
 }

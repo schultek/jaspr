@@ -61,8 +61,8 @@ class ComponentTester {
 
   /// Simulates [event] on the given element.
   void dispatchEvent(Finder finder, String event, dynamic data) {
-    var element = _findDomElement(finder);
-    element.testData.events?[event]?.call(data);
+    var renderObject = _findDomElement(finder).renderObject as TestRenderObject;
+    renderObject.events?[event]?.call(data);
   }
 
   DomElement _findDomElement(Finder finder) {
@@ -113,11 +113,6 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   bool get isClient => _isClient;
 
   @override
-  Renderer createRenderer() {
-    return TestDomRenderer();
-  }
-
-  @override
   Future<Map<String, String>> fetchState(String url) {
     throw UnimplementedError();
   }
@@ -134,31 +129,35 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   void scheduleFrame(VoidCallback frameCallback) {
     Future.microtask(frameCallback);
   }
+
+  @override
+  RenderObject createRootRenderObject() {
+    return TestRenderObject();
+  }
 }
 
-class DomNodeData {
+class TestRenderObject extends RenderObject {
+  TestRenderObject? parent;
+
   String? tag;
   String? id;
-  List<String>? classes;
+  String? classes;
   Map<String, String>? styles;
   Map<String, String>? attributes;
   Map<String, EventCallback>? events;
   String? text;
   bool? rawHtml;
-  List<RenderElement> children = [];
-}
-
-extension TestDomNodeData on RenderElement {
-  DomNodeData get testData => renderData ??= DomNodeData();
-}
-
-class TestDomRenderer extends Renderer {
-  RenderElement? root;
+  List<TestRenderObject> children = [];
 
   @override
-  void renderNode(RenderElement element, String tag, String? id, List<String>? classes, Map<String, String>? styles,
+  RenderObject createChildRenderObject() {
+    return TestRenderObject();
+  }
+
+  @override
+  void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
-    element.testData
+    this
       ..tag = tag
       ..id = id
       ..classes = classes
@@ -168,38 +167,36 @@ class TestDomRenderer extends Renderer {
   }
 
   @override
-  void renderTextNode(RenderElement element, String text, [bool rawHtml = false]) {
-    element.testData
+  void updateText(String text, [bool rawHtml = false]) {
+    this
       ..text = text
       ..rawHtml = rawHtml;
   }
 
   @override
-  void attachNode(RenderElement? parent, RenderElement child, RenderElement? after) {
+  void skipChildren() {
+    // noop
+  }
+
+  @override
+  void attach(TestRenderObject? parent, TestRenderObject? after) {
+    this.parent = parent;
     if (parent == null) {
-      root = child;
       return;
     }
-    var children = parent.testData.children;
-    children.remove(child);
+    var children = parent.children;
+    children.remove(this);
     if (after == null) {
-      children.insert(0, child);
+      children.insert(0, this);
     } else {
       var index = children.indexOf(after);
-      children.insert(index + 1, child);
+      children.insert(index + 1, this);
     }
   }
 
   @override
-  void finalizeNode(RenderElement element) {}
-
-  @override
-  void removeChild(RenderElement parent, RenderElement child) {
-    parent.testData.children.remove(child);
-  }
-
-  @override
-  void skipContent(RenderElement element) {
-    // noop
+  void remove() {
+    parent?.children.remove(this);
+    parent = null;
   }
 }

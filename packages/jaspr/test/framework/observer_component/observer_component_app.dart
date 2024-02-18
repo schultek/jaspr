@@ -39,7 +39,7 @@ class App extends TestComponent<ObserverParam> {
 }
 
 class MyObserverComponent extends ObserverComponent {
-  MyObserverComponent({required this.value, required Component child}) : super(child: child);
+  MyObserverComponent({required this.value, required super.child});
 
   final ObserverParam value;
 

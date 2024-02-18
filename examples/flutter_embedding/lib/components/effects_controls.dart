@@ -1,4 +1,4 @@
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../providers/effects_provider.dart';
@@ -16,7 +16,9 @@ class EffectsControls extends StatelessComponent {
       return input(
         value: label,
         type: InputType.button,
-        classes: ['fx', if (alignTop) 'align-top', if (fx != 'handheld' && effects.contains('handheld')) 'disabled'],
+        classes: 'fx'
+            '${alignTop ? ' align-top' : ''}'
+            '${fx != 'handheld' && effects.contains('handheld') ? ' disabled' : ''}',
         attributes: {'data-fx': fx},
         [],
       );
@@ -24,7 +26,7 @@ class EffectsControls extends StatelessComponent {
 
     yield fieldset(id: 'fx', events: {
       'click': (event) {
-        var fx = event.target.dataset['fx'];
+        var fx = (event.target as dynamic).dataset['fx'];
         if (fx != null) {
           context.read(effectsProvider.notifier).update((e) {
             return e.contains(fx) ? ({...e}..remove(fx)) : {...e, fx};
@@ -32,9 +34,9 @@ class EffectsControls extends StatelessComponent {
         }
       },
       'input': (event) {
-        if (event.target.id == 'rotation') {
+        if ((event.target as dynamic).id == 'rotation') {
           context.read(effectsProvider.notifier).update((e) => {...e}..remove('spin'));
-          context.read(rotationProvider.notifier).state = double.parse(event.target.value);
+          context.read(rotationProvider.notifier).state = double.parse((event.target as dynamic).value);
         }
       },
     }, [
@@ -42,15 +44,13 @@ class EffectsControls extends StatelessComponent {
       effectButton('Shadow', 'shadow'),
       effectButton('Mirror 🧪', 'mirror'),
       effectButton('Resize', 'resize', true),
-      div(classes: [
-        'tight'
-      ], [
+      div(classes: 'tight', [
         effectButton('Spin', 'spin'),
         input(
           value: context.watch(rotationProvider).toString(),
           type: InputType.range,
           id: 'rotation',
-          classes: ['tight', if (effects.contains('handheld')) 'disabled'],
+          classes: 'tight${effects.contains('handheld') ? ' disabled' : ''}',
           attributes: {'min': '-180', 'max': '180', 'list': 'markers'},
           [],
         ),

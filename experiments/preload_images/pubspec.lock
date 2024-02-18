@@ -85,10 +85,10 @@ packages:
     dependency: transitive
     description:
       name: build_modules
-      sha256: "017226b2fd3eef4e5f31839c930efad33110cdfe71b6255c7dca298b38dba61c"
+      sha256: bd2e3693a33761fce4260704fcfa519042573457c8cf61c50249a7dde2fbe5e1
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.2"
+    version: "5.0.5"
   build_resolvers:
     dependency: transitive
     description:
@@ -117,10 +117,10 @@ packages:
     dependency: "direct dev"
     description:
       name: build_web_compilers
-      sha256: e614f5e1317fe9b2574429e3e651951a1c38943416c047e02815a7d6ade264c9
+      sha256: ebd3db74f0d53ae9b91a214016e35733add484a1a3014e188754954e8d69843c
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.3"
+    version: "4.0.8"
   built_collection:
     dependency: transitive
     description:
@@ -237,10 +237,10 @@ packages:
     dependency: transitive
     description:
       name: hotreloader
-      sha256: "66b78edf340352fcdd2043ab6116e58ec018c5968cab6485cde0f1769d28e0b8"
+      sha256: "94ee21a60ea2836500799f3af035dc3212b1562027f1e0031c14e087f0231449"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.5"
+    version: "4.1.0"
   html:
     dependency: transitive
     description:
@@ -287,14 +287,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.9.1"
+    version: "0.10.0"
   jaspr_router:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_router"
       relative: true
     source: path
-    version: "0.3.0"
+    version: "0.3.1"
   js:
     dependency: transitive
     description:
@@ -539,10 +539,10 @@ packages:
     dependency: transitive
     description:
       name: watcher
-      sha256: "6a7f46926b01ce81bfc339da6a7f20afbe7733eff9846f6d6a5466aa4c6667c0"
+      sha256: "3d2ad6751b3c16cf07c7fca317a1413b3f26530319181b37e3b9039b84fc01d8"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.2"
+    version: "1.1.0"
   web_socket_channel:
     dependency: transitive
     description:
@@ -560,4 +560,4 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=3.0.0 <3.2.0"
+  dart: ">=3.1.0 <3.4.0"

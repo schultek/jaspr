@@ -27,7 +27,6 @@ Finally, link the generated `styles.css` in your document, or otherwise add it t
 ```dart
 // This file is lib/main.dart
 
-import 'package:jaspr/html.dart';
 import 'package:jaspr/server.dart';
 
 import './app.dart';
@@ -54,7 +53,7 @@ The `jaspr_tailwind` integration comes preconfigured, so you can use any tailwin
 A jaspr card component using tailwind would look like this:
 
 ```dart
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 
 class SimpleCard extends StatelessComponent {
   const SimpleCard({required this.title, required this.message});

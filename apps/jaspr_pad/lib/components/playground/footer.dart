@@ -1,47 +1,28 @@
 import 'package:jaspr/jaspr.dart';
 
 class PlaygroundFooter extends StatelessComponent {
-  const PlaygroundFooter({Key? key}) : super(key: key);
+  const PlaygroundFooter({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'footer',
-      children: buildChildren(context).toList(),
-    );
-  }
-
-  Iterable<Component> buildChildren(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'i',
-      id: 'keyboard-button',
-      classes: ['material-icons', 'footer-item'],
-      attributes: {'aria-hidden': 'true'},
-      child: Text('keyboard'),
-    );
-
-    yield DomComponent(
-      tag: 'div',
-      classes: ['footer-item'],
-      children: [
-        DomComponent(
-          tag: 'a',
-          classes: ['footer-item'],
-          attributes: {
-            'href': 'https://dart.dev/tools/dartpad/privacy',
-            'target': 'repo',
-          },
-          child: Text('Privacy notice'),
-        ),
-        DomComponent(
-          tag: 'a',
-          attributes: {
-            'href': 'https://github.com/schultek/jaspr/issues',
-            'target': 'repo',
-          },
-          child: Text('Send feedback'),
-        ),
-      ],
-    );
+    yield footer([
+      //   i(
+      //     id: 'keyboard-button',
+      //     classes: ['material-icons', 'footer-item'],
+      //     attributes: {'aria-hidden': 'true'},
+      //     [text('keyboard')],
+      //   ),
+      div(classes: 'footer-item', [
+        a(href: 'https://docs.page/schultek/jaspr', target: Target.blank, classes: 'footer-item', [
+          text('Jaspr Docs'),
+        ]),
+        a(href: 'https://discord.gg/XGXrGEk4c6', target: Target.blank, classes: 'footer-item', [
+          text('Join the Community'),
+        ]),
+        a(href: 'https://github.com/schultek/jaspr/issues', target: Target.blank, [
+          text('Send feedback'),
+        ]),
+      ])
+    ]);
   }
 }

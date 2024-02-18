@@ -6,7 +6,7 @@ void main() {
 }
 
 class App extends StatelessComponent {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -27,17 +27,16 @@ class App extends StatelessComponent {
 }
 
 class Button extends StatelessComponent {
-  const Button({required this.label, required this.onPressed, Key? key}) : super(key: key);
+  const Button({required this.label, required this.onPressed, super.key});
 
   final String label;
   final VoidCallback onPressed;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'button',
-      events: {'click': (e) => onPressed()},
-      child: Text(label),
+    yield button(
+      onClick: onPressed,
+      [text(label)],
     );
   }
 }

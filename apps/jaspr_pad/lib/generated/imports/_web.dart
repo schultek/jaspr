@@ -4,33 +4,12 @@
 // ignore_for_file: directives_ordering
 
 import 'package:mdc_web/mdc_web.dart'
-    show
-        MDCRipple,
-        MDCDialog,
-        MDCMenu,
-        AnchorCorner,
-        MDCSnackbar,
-        MDCTabBar,
-        MDCTextField;
+    show MDCRipple, MDCDialog, MDCMenu, AnchorCorner, MDCSnackbar, MDCTabBar, MDCTextField;
 import 'dart:html'
-    show
-        HtmlDocument,
-        Element,
-        CustomEvent,
-        MouseEvent,
-        Event,
-        IFrameElement,
-        MessageEvent;
+    show HtmlDocument, Element, CustomEvent, MouseEvent, Event, InputElement, IFrameElement, MessageEvent;
 import 'package:codemirror/codemirror.dart' show CodeMirror, Doc, Position;
 export 'package:mdc_web/mdc_web.dart'
-    show
-        MDCRipple,
-        MDCDialog,
-        MDCMenu,
-        AnchorCorner,
-        MDCSnackbar,
-        MDCTabBar,
-        MDCTextField;
+    show MDCRipple, MDCDialog, MDCMenu, AnchorCorner, MDCSnackbar, MDCTabBar, MDCTextField;
 export 'dart:html'
     show
         window,
@@ -40,6 +19,7 @@ export 'dart:html'
         CustomEvent,
         MouseEvent,
         Event,
+        InputElement,
         IFrameElement,
         MessageEvent;
 export 'package:codemirror/codemirror.dart' show CodeMirror, Doc, Position;
@@ -57,6 +37,7 @@ typedef ElementOrStubbed = Element;
 typedef CustomEventOrStubbed = CustomEvent;
 typedef MouseEventOrStubbed = MouseEvent;
 typedef EventOrStubbed = Event;
+typedef InputElementOrStubbed = InputElement;
 typedef IFrameElementOrStubbed = IFrameElement;
 typedef MessageEventOrStubbed = MessageEvent;
 typedef CodeMirrorOrStubbed = CodeMirror;

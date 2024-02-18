@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart' show Widget;
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
@@ -20,8 +20,8 @@ class FlutterTarget extends StatelessComponent {
 
     Component child = FlutterEmbedView(
       key: GlobalObjectKey('flutter_target'),
-      classes: isHandheld ? ['handheld'] : effects.toList(),
-      styles: rotation != 0
+      classes: isHandheld ? 'handheld' : effects.join(' '),
+      styles: !isHandheld && rotation != 0
           ? Styles.box(
               transform: Transform.combine([
                 Transform.perspective(1000.px),
@@ -36,9 +36,7 @@ class FlutterTarget extends StatelessComponent {
     if (isHandheld) {
       child = div(id: 'handheld', [
         child,
-        span(classes: [
-          'imageAttribution'
-        ], [
+        span(classes: 'imageAttribution', [
           text('Photo by '),
           a(
             href: 'https://unsplash.com/photos/x9WGMWwp1NM',

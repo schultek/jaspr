@@ -1,0 +1,33 @@
+on:
+  workflow_dispatch:
+
+name: Deploy JasprPad
+
+jobs:
+  release:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - uses: dart-lang/setup-dart@v1.3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.CLOUD_DEPLOY_KEY }}
+
+      - name: Write ServiceAccountKey File
+        run: 'echo "$SERVICE_ACCOUNT_KEY" > apps/jaspr_pad/serviceAccountKey.json'
+        shell: bash
+        env:
+          SERVICE_ACCOUNT_KEY: ${{secrets.JASPRPAD_SERVICE_ACCOUNT }}
+
+      - name: Deploy
+        run: |
+          dart pub global activate melos
+          dart pub global activate jaspr_cli
+          gcloud auth configure-docker
+          melos deploy:jasprpad
+

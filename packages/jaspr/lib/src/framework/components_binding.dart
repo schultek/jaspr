@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 /// Main app binding, controls the root component and global state
 mixin ComponentsBinding on AppBinding {
@@ -12,12 +12,10 @@ mixin ComponentsBinding on AppBinding {
       }());
       buildOwner._isFirstBuild = true;
 
-      var renderer = createRenderer();
-
       var element = _Root(child: app).createElement();
       element._binding = this;
       element._owner = buildOwner;
-      element._renderer = renderer;
+      element._renderObject = createRootRenderObject();
 
       element.mount(null, null);
 
@@ -44,14 +42,14 @@ mixin ComponentsBinding on AppBinding {
   @protected
   void didAttachRootElement(Element element) {}
 
+  RenderObject createRootRenderObject();
+
   /// The [Element] that is at the root of the hierarchy.
   ///
   /// This is initialized when [runApp] is called.
   @override
-  RenderElement? get rootElement => _rootElement;
-  RenderElement? _rootElement;
-
-  Renderer createRenderer();
+  RenderObjectElement? get rootElement => _rootElement;
+  RenderObjectElement? _rootElement;
 
   static final Map<GlobalKey, Element> _globalKeyRegistry = {};
 
@@ -75,21 +73,15 @@ class _Root extends Component {
   _RootElement createElement() => _RootElement(this);
 }
 
-class _RootElement extends SingleChildElement with RenderElement {
-  _RootElement(_Root component) : super(component);
+class _RootElement extends SingleChildElement with RenderObjectElement {
+  _RootElement(_Root super.component);
 
   @override
   _Root get component => super.component as _Root;
 
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
-    _attach();
-    super._firstBuild(onBuilt);
-  }
-
-  @override
-  void renderNode(Renderer renderer) {}
-
-  @override
   Component build() => component.child;
+
+  @override
+  void updateRenderObject() {}
 }

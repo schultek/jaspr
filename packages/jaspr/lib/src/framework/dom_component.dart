@@ -1,6 +1,4 @@
-part of framework;
-
-typedef EventCallback = void Function(dynamic event);
+part of 'framework.dart';
 
 /// Represents a html element in the DOM
 ///
@@ -20,9 +18,19 @@ class DomComponent extends Component {
   })  : _child = child,
         _children = children;
 
+  const factory DomComponent.wrap({
+    Key? key,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+    required Component child,
+  }) = _WrappingDomComponent;
+
   final String tag;
   final String? id;
-  final List<String>? classes;
+  final String? classes;
   final Styles? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
@@ -35,11 +43,28 @@ class DomComponent extends Component {
   Element createElement() => DomElement(this);
 }
 
-class DomElement extends MultiChildElement with RenderElement {
-  DomElement(DomComponent component) : super(component);
+class DomElement extends MultiChildElement with RenderObjectElement {
+  DomElement(DomComponent super.component);
 
   @override
   DomComponent get component => super.component as DomComponent;
+
+  InheritedElement? _wrappingElement;
+
+  @override
+  void _updateInheritance() {
+    super._updateInheritance();
+    if (_inheritedElements != null && _inheritedElements!.containsKey(_WrappingDomComponent)) {
+      _inheritedElements = HashMap<Type, InheritedElement>.from(_inheritedElements!);
+    }
+    _wrappingElement = _inheritedElements?.remove(_WrappingDomComponent);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    updateRenderObject();
+  }
 
   @override
   Iterable<Component> build() => component.children;
@@ -52,16 +77,65 @@ class DomElement extends MultiChildElement with RenderElement {
   }
 
   @override
-  void renderNode(Renderer renderer) {
-    renderer.renderNode(
-      this,
+  void updateRenderObject() {
+    DomComponent? wrappingComponent;
+    if (_wrappingElement != null) {
+      wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
+    }
+
+    renderObject.updateElement(
       component.tag,
-      component.id,
-      component.classes,
-      component.styles?.styles,
-      component.attributes,
-      component.events,
+      component.id ?? wrappingComponent?.id,
+      _join(wrappingComponent?.classes, component.classes, (a, b) => '$a $b'),
+      _join(wrappingComponent?.styles?.styles, component.styles?.styles, (a, b) => {...a, ...b}),
+      _join(wrappingComponent?.attributes, component.attributes, (a, b) => {...a, ...b}),
+      _join(wrappingComponent?.events, component.events, (a, b) => {...a, ...b}),
     );
+  }
+
+  T? _join<T>(T? a, T? b, T Function(T a, T b) joiner) {
+    return a != null && b != null ? joiner(a, b) : a ?? b;
+  }
+}
+
+class _WrappingDomComponent extends InheritedComponent implements DomComponent {
+  const _WrappingDomComponent({
+    super.key,
+    this.id,
+    this.classes,
+    this.styles,
+    this.attributes,
+    this.events,
+    required super.child,
+  });
+
+  @override
+  final String tag = '';
+  @override
+  final String? id;
+  @override
+  final String? classes;
+  @override
+  final Styles? styles;
+  @override
+  final Map<String, String>? attributes;
+  @override
+  final Map<String, EventCallback>? events;
+  @override
+  final Component? _child = null;
+  @override
+  final List<Component> _children = const [];
+
+  @override
+  List<Component> get children => [child];
+
+  @override
+  bool updateShouldNotify(_WrappingDomComponent oldComponent) {
+    return oldComponent.id != id ||
+        oldComponent.classes != classes ||
+        oldComponent.styles != styles ||
+        oldComponent.attributes != attributes ||
+        oldComponent.events != events;
   }
 }
 
@@ -79,7 +153,7 @@ class Text extends Component {
 }
 
 abstract class NoChildElement extends Element {
-  NoChildElement(Component component) : super(component);
+  NoChildElement(super.component);
 
   @override
   bool get debugDoingBuild => false;
@@ -106,15 +180,15 @@ abstract class NoChildElement extends Element {
   void visitChildren(ElementVisitor visitor) {}
 }
 
-class TextElement extends NoChildElement with RenderElement {
-  TextElement(Text component) : super(component);
+class TextElement extends NoChildElement with RenderObjectElement {
+  TextElement(Text super.component);
 
   @override
   Text get component => super.component as Text;
 
   @override
-  void renderNode(Renderer renderer) {
-    renderer.renderTextNode(this, component.text, component.rawHtml);
+  void updateRenderObject() {
+    renderObject.updateText(component.text, component.rawHtml);
   }
 }
 
@@ -125,14 +199,14 @@ class SkipContent extends Component {
   Element createElement() => SkipContentElement(this);
 }
 
-class SkipContentElement extends NoChildElement with RenderElement {
-  SkipContentElement(SkipContent component) : super(component);
+class SkipContentElement extends NoChildElement with RenderObjectElement {
+  SkipContentElement(SkipContent super.component);
 
   @override
   SkipContent get component => super.component as SkipContent;
 
   @override
-  void renderNode(Renderer renderer) {
-    renderer.skipContent(this);
+  void updateRenderObject() {
+    renderObject.skipChildren();
   }
 }

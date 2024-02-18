@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 extension ProviderContext on BuildContext {
   /// Reads a provider without listening to it

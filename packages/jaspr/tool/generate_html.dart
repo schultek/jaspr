@@ -7,14 +7,27 @@ void main() {
 
   for (var key in specJson.keys) {
     var group = specJson[key] as Map<String, dynamic>;
-    var file = File('lib/src/ui/html/$key.dart');
-    var content = StringBuffer("part of jaspr_html;\n");
+    var file = File('lib/src/components/html/$key.dart');
+    var content = StringBuffer("part of 'html.dart';\n");
+
+    var schemas = <String, Map<String, dynamic>>{};
 
     for (var tag in group.keys) {
       var data = group[tag] as Map<String, dynamic>;
-      var attrs = data['attributes'] as Map<String, dynamic>?;
+      if (tag.startsWith(':')) {
+        schemas[tag.substring(1)] = data;
+        continue;
+      }
 
       content.write('\n${data['doc'].split('\n').map((t) => '/// $t\n').join()}');
+
+      var attrs = data['attributes'] as Map<String, dynamic>?;
+
+      var inherit = data['inherit'];
+
+      if (inherit != null) {
+        (attrs ??= {}).addAll(schemas[inherit]!);
+      }
 
       if (attrs != null) {
         content.writeln('///');
@@ -31,6 +44,8 @@ void main() {
         content.write('List<Component> children, ');
       }
       content.write('{');
+
+      var events = <String>{};
 
       if (attrs != null) {
         for (var attr in attrs.keys) {
@@ -57,6 +72,13 @@ void main() {
           } else if (type is String && type.startsWith('enum:')) {
             var name = type.split(':')[1];
             content.write(name);
+          } else if (type is String && type.startsWith('event:')) {
+            var [_, name, t] = type.split(':');
+            events.add(name);
+            content.write(t);
+          } else if (type is String && type.startsWith('css:')) {
+            var [_, name] = type.split(':');
+            content.write(name);
           } else if (type is Map<String, dynamic>) {
             var name = type['name'];
             content.write(name);
@@ -72,7 +94,7 @@ void main() {
       }
 
       content.write(
-          'Key? key, String? id, List<String>? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
+          'Key? key, String? id, String? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
           '  return DomComponent(\n'
           '    tag: \'$tag\',\n'
           '    key: key,\n'
@@ -88,6 +110,8 @@ void main() {
         for (var attr in attrs.keys) {
           var name = attrs[attr]['name'] ?? attr;
           var type = attrs[attr]['type'];
+
+          if (type is String && type.startsWith('event:')) continue;
 
           content.write('      ');
 
@@ -109,6 +133,8 @@ void main() {
             content.write("'\$$name'");
           } else if (type is String && type.startsWith('enum:')) {
             content.write('$name.value');
+          } else if (type is String && type.startsWith('css:')) {
+            content.write('$name.value');
           } else if (type is Map<String, dynamic>) {
             content.write('$name.value');
           } else {
@@ -123,8 +149,16 @@ void main() {
         content.write('attributes,\n');
       }
 
-      content.write(''
-          '    events: events,\n');
+      content.write('    events: ');
+
+      if (events.isNotEmpty) {
+        content.write('{\n'
+            '      ...?events,\n'
+            '      ..._events(${events.map((e) => '$e: $e').join(', ')}),\n'
+            '    },\n');
+      } else {
+        content.write('events,\n');
+      }
 
       if (!selfClosing) {
         content.write('    children: children,\n');

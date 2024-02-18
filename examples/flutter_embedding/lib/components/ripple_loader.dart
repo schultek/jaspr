@@ -1,4 +1,4 @@
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 
 class RippleLoader extends StatelessComponent {
   const RippleLoader({Key? key}) : super(key: key);
@@ -12,7 +12,7 @@ class RippleLoader extends StatelessComponent {
         Styles.background(color: Colors.black),
       ]),
       [
-        div(classes: ['lds-ripple'], [div([]), div([])])
+        div(classes: 'lds-ripple', [div([]), div([])])
       ],
     );
   }

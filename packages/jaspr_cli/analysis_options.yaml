@@ -6,7 +6,7 @@ analyzer:
 
 linter:
   rules:
-    sort_pub_dependencies: true
+    sort_pub_dependencies: false # to group packages semantically
     prefer_relative_imports: true
     directives_ordering: true
     avoid_print: true

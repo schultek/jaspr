@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
-import '../foundation/basic_types.dart';
-import '../foundation/binding.dart';
-import '../framework/framework.dart';
-import 'document/document.dart';
-import 'markup_renderer.dart';
+import '../../jaspr.dart';
+import 'adapters/client_component_adapter.dart';
+import 'adapters/document_adapter.dart';
+import 'adapters/sync_script_adapter.dart';
+import 'markup_render_object.dart';
 
 /// Global component binding for the server
-class ServerAppBinding extends AppBinding with ComponentsBinding, DocumentBinding {
+class ServerAppBinding extends AppBinding with ComponentsBinding {
   @override
   Uri get currentUri => _currentUri!;
   Uri? _currentUri;
@@ -27,17 +27,28 @@ class ServerAppBinding extends AppBinding with ComponentsBinding, DocumentBindin
     rootCompleter.complete();
   }
 
-  @override
-  Renderer createRenderer() {
-    return MarkupDomRenderer();
-  }
-
   Future<String> render() async {
     await rootCompleter.future;
 
-    var renderer = rootElement!.renderer as MarkupDomRenderer;
+    var root = rootElement!.renderObject as MarkupRenderObject;
+    var adapters = [
+      ..._adapters.reversed,
+      SyncScriptAdapter(getStateData),
+      DocumentAdapter(),
+    ];
 
-    return renderDocument(renderer);
+    for (var adapter in adapters.reversed) {
+      var r = adapter.prepare();
+      if (r is Future) {
+        await r;
+      }
+    }
+
+    for (var adapter in adapters) {
+      adapter.apply(root);
+    }
+
+    return root.renderToHtml();
   }
 
   Future<String> data() async {
@@ -60,4 +71,41 @@ class ServerAppBinding extends AppBinding with ComponentsBinding, DocumentBindin
   void scheduleFrame(VoidCallback frameCallback) {
     throw UnsupportedError('Scheduling a frame is not supported on the server, and should never happen.');
   }
+
+  @override
+  RenderObject createRootRenderObject() {
+    return MarkupRenderObject();
+  }
+
+  late Future<String> Function(String) _fileHandler;
+
+  void setFileHandler(Future<String> Function(String) handler) {
+    _fileHandler = handler;
+  }
+
+  Future<String> loadFile(String name) => _fileHandler(name);
+
+  late final List<RenderAdapter> _adapters = [];
+
+  void addRenderAdapter(RenderAdapter adapter) {
+    _adapters.add(adapter);
+  }
+
+  JasprOptions get options => _options!;
+  JasprOptions? _options;
+
+  void initializeOptions(JasprOptions options) {
+    _options = options;
+  }
+
+  @override
+  Future<void> attachRootComponent(Component app) {
+    return super.attachRootComponent(ClientComponentRegistry(child: app));
+  }
+}
+
+abstract class RenderAdapter {
+  FutureOr<void> prepare();
+
+  void apply(MarkupRenderObject root);
 }

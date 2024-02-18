@@ -1,6 +1,92 @@
+## Unreleased minor
+
+- Fixed bug with `DomValidator`.
+- `Document` is no longer required when using server-side rendering.
+- Improved how `@client` components are hydrated.
+
+## 0.10.0
+
+- **BREAKING** Restructured core libraries:
+  - Removed `package:jaspr/html.dart` -> Use `package:jaspr/jaspr.dart` instead.
+  - Renamed `package:jaspr/components.dart` to `package:jaspr/ui.dart`.
+
+- **BREAKING** Updated `@client` components for a more streamlined usage.
+  
+  Annotated components no longer generate a `.g.dart` file and don't need to implement any generated mixin anymore.
+  Instead, a single `lib/jaspr_options.dart` file is generated when using `@client` components.
+
+  You must now call `Jaspr.initializeApp(options: defaultJasprOptions)` at the start of your app, where 
+  `defaultJasprOptions` is part of the newly generated `jaspr_options.dart` file.
+
+  *Note:* Calling `Jaspr.initializeApp()` will be required in a future version of Jaspr, and the cli will warn you
+  when it's not called.
+
+- **BREAKING** Changed type of the `classes` property of html components from `List<String>` to `String`. Multiple class
+  names can be set using a single space-delimited string, e.g. `classes: 'class1 class2'`.
+  
+- **BREAKING** Event callbacks are now typed. The `events` property of html components now expects a 
+  `Map<String, void Function(Event)>` instead of the old `Map<String, void Function(dynamic)>`.
+
+  In addition to this Jaspr comes with a new `events()` function to provide typed event handlers for common events, like 
+  `onClick`, `onInput` and `onChange`. Use it like this:
+
+  ```dart
+  anyelement(
+    // Uses the [events] method to provide typed event handlers.
+    events: events(
+      onClick: () {
+        print("Clicked");
+      },
+      // [value] can be typed depending on the element, e.g. `String` for text inputs or `bool` for checkboxes.
+      onInput: (String value) {
+        print("Value: $value");
+      },
+    ),
+    [...]
+  )
+  ```
+  
+  Moreover, the html components `button`, `input`, `textarea` and `select` now also come with additional shorthand 
+  properties for their supported event handlers:
+
+  ```dart
+  button(
+    onClick: () {
+      print("Clicked");  
+    },
+    [...]
+  )
+  ```
+
+- **BREAKING** Refactored components inside the `package:jaspr/ui.dart` library. Some component properties have 
+  changed or been discontinued. Check the separate components for details.
+
+- **BREAKING** Promoted `jaspr_web_compilers` to non-experimental status.
+
+  This also changes the respective cli option from `jaspr create --experimental-web-compilers` (old) to 
+  `jaspr create --jaspr-web-compilers` (new).
+
+- Added support for rendering `svg` elements. 
+  Also added `svg()`, `rect()`, `circle()`, `ellipse()`, `line()`, `path()` and `polygon()` components.
+
+- Refactored rendering implementation to use `RenderObject`s.
+- Added `NotificationListener` component.
+
+- Added `Colors.transparent`.
+- Added `Unit.auto`, `Unit.vw()` and `Unit.vh()` for responsive styling.
+- Added `StyleRule.fontFace()` to add external font files.
+
+- Several bug fixes and stability improvements when running `jaspr serve` or `jaspr build`.
+
+## 0.9.3
+
+- Fixed `melos format` on Windows.
+- Fixed infinite loop attempting to find root directory on Windows when running a built Jaspr executable.
+- Add `.exe` extension to the output of `jaspr build` on Windows.
+
 ## 0.9.2
 
-- Fixed cli execution on windows
+- Fixed cli execution on windows.
 
 ## 0.9.1
 
@@ -18,8 +104,8 @@
 
 - Added *Static Site Generation* support.
 
-  With the new `jaspr generate` command you can generate static pages from your jaspr app. This requires a normal 
-  server-rendered jaspr app and will output separate `.html` pages for each of your routes.
+  With the new `jaspr generate` command you can generate static pages from your Jaspr app. This requires a normal 
+  server-rendered Jaspr app and will output separate `.html` pages for each of your routes.
 
   To specify which routes your application should handle, either use `jaspr_router` or call 
   `ServerApp.requestRouteGeneration('/my/route');` for each target route.
@@ -37,7 +123,7 @@
 - Added `StyleRule.media({MediaRuleQuery query, List<StyleRule> styles})` to support `@media` css statements.
 
 - Added support for Tailwind using the `jaspr_tailwind` integration.  
-  Simply run `dart pub add jaspr_tailwind --dev` and start using tailwind classes in your jaspr components.  
+  Simply run `dart pub add jaspr_tailwind --dev` and start using tailwind classes in your Jaspr components.  
   For a full setup and usage guide see [Tailwind Integration Docs](https://docs.page/schultek/jaspr/eco/tailwind).
 
 ## 0.7.0
@@ -46,7 +132,7 @@
 - Removed `--ssr` and `--flutter` cli options.
 - Added support `jaspr` config section in `pubspec.yaml`.
 
-  It is now possible to define certain configuration options for the jaspr cli
+  It is now possible to define certain configuration options for the Jaspr cli
   directly inside the `pubspec.yaml` file under the `jaspr` section.
   Initially supported options are:
 
@@ -82,17 +168,17 @@
     jaspr_web_compilers: ^4.0.4
   ```
   
-  For an example see `experiments/flutter_plugin_interop`](https://github.com/schultek/jaspr/tree/main/experiments/flutter_plugin_interop).
+  For an example see `examples/flutter_plugin_interop`](https://github.com/schultek/Jaspr/tree/main/examples/flutter_plugin_interop).
   
 - Improved **flutter element embedding**.
 
-  Flutter apps can now be directly embedded from your jaspr codebase and integrated into
-  the existing jaspr component tree.
+  Flutter apps can now be directly embedded from your Jaspr codebase and integrated into
+  the existing Jaspr component tree.
 
   This removes the need for any kind of interop between apps as they can directly communicate
   through the usual primitives of passing properties and callbacks.
 
-  For an example see `experiments/flutter_embedding_v2`](https://github.com/schultek/jaspr/tree/main/experiments/flutter_embedding_v2).
+  For an example see `examples/flutter_embedding`](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding).
 
 - `jaspr build` now outputs to `/build/jaspr` instead of `/build`.
 
@@ -110,7 +196,7 @@
 
 - Added support for **Flutter element embedding**.
 
-  Flutter apps can now easily be embedded within jaspr sites. The cli supports the `--flutter` argument for both
+  Flutter apps can now easily be embedded within Jaspr sites. The cli supports the `--flutter` argument for both
   the `serve` and `build` commands to specify the entrypoint of the flutter application.
 
   The complete setup is demonstrated in the [flutter_embedding](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding) 

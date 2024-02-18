@@ -6,11 +6,20 @@
     "aside": {
       "doc": "The &lt;aside&gt; HTML element represents a portion of a document whose content is only indirectly related to the document's main content. Asides are frequently presented as sidebars or call-out boxes."
     },
+    "body": {
+      "doc": "The &lt;body&gt; HTML element represents the content of an HTML document. There can be only one &lt;body&gt; element in a document."
+    },
     "footer": {
       "doc": "The &lt;footer&gt; HTML element represents a footer for its nearest ancestor sectioning content or sectioning root element. A &lt;footer&gt; typically contains information about the author of the section, copyright data or links to related documents."
     },
+    "head": {
+      "doc": "The &lt;head&gt; HTML element contains machine-readable information (metadata) about the document, like its title, scripts, and style sheets."
+    },
     "header": {
       "doc": "The &lt;header&gt; HTML element represents introductory content, typically a group of introductory or navigational aids. It may contain some heading elements but also a logo, a search form, an author name, and other elements."
+    },
+    "html": {
+      "doc": "The &lt;html&gt; HTML element represents the root (top-level element) of an HTML document, so it is also referred to as the root element. All other elements must be descendants of this element."
     },
     "h1": {
       "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
@@ -63,10 +72,10 @@
           "type": "int"
         },
         "type": {
-          "doc": "Sets the numbering type\nThe specified type is used for the entire list unless a different type attribute is used on an enclosed &lt;li&gt; element.",
+          "doc": "Sets the numbering type.\nThe specified type is used for the entire list unless a different type attribute is used on an enclosed &lt;li&gt; element.",
           "type": {
-            "name": "ListType",
-            "doc": "Them numbering type for a list element.",
+            "name": "NumberingType",
+            "doc": "The numbering type for a list element.",
             "values": {
               "lowercaseLetters": {
                 "value": "a",
@@ -520,6 +529,10 @@
               }
             }
           }
+        },
+        "onClick": {
+          "doc": "Callback for the 'click' event.",
+          "type": "event:onClick:VoidCallback"
         }
       }
     },
@@ -691,6 +704,14 @@
         "disabled": {
           "doc": "Indicates that the user should not be able to interact with the input. Disabled inputs are typically rendered with a dimmer color or using some other form of indication that the field is not available for use.",
           "type": "boolean"
+        },
+        "onInput": {
+          "doc": "Callback for the 'input' event. The type of [value] depends on [type].",
+          "type": "event:onInput:ValueChanged<dynamic>"
+        },
+        "onChange": {
+          "doc": "Callback for the 'change' event. The type of [value] depends on [type].",
+          "type": "event:onChange:ValueChanged<dynamic>"
         }
       }
     },
@@ -788,7 +809,7 @@
       }
     },
     "select": {
-      "doc": "The <select> HTML element represents a control that provides a menu of options.",
+      "doc": "The &lt;select&gt; HTML element represents a control that provides a menu of options.",
       "attributes": {
         "name": {
           "doc": "This attribute is used to specify the name of the control.",
@@ -803,7 +824,7 @@
           "type": "boolean"
         },
         "disabled": {
-          "doc": "Indicates that the user cannot interact with the control. If this attribute is not specified, the control inherits its setting from the containing element, for example <fieldset>; if there is no containing element with the disabled attribute set, then the control is enabled.",
+          "doc": "Indicates that the user cannot interact with the control. If this attribute is not specified, the control inherits its setting from the containing element, for example &lt;fieldset&gt;; if there is no containing element with the disabled attribute set, then the control is enabled.",
           "type": "boolean"
         },
         "autofocus": {
@@ -817,18 +838,26 @@
         "size": {
           "doc": "If the control is presented as a scrolling list box (e.g. when multiple is specified), this attribute represents the number of rows in the list that should be visible at one time. Browsers are not required to present a select element as a scrolled list box. The default value is 0.",
           "type": "int"
+        },
+        "onInput": {
+          "doc": "Callback for the 'input' event.",
+          "type": "event:onInput:ValueChanged<List<String>>"
+        },
+        "onChange": {
+          "doc": "Callback for the 'change' event.",
+          "type": "event:onChange:ValueChanged<List<String>>"
         }
       }
     },
     "fieldset": {
-      "doc": "The <fieldset> HTML element is used to group several controls as well as labels (<label>) within a web form.",
+      "doc": "The &lt;fieldset&gt; HTML element is used to group several controls as well as labels (&lt;label&gt;) within a web form.",
       "attributes": {
         "name": {
           "doc": "The name associated with the group.",
           "type": "string"
         },
         "disabled": {
-          "doc": "If this Boolean attribute is set, all form controls that are descendants of the <fieldset>, are disabled, meaning they are not editable and won't be submitted along with the <form>. They won't receive any browsing events, like mouse clicks or focus-related events. By default browsers display such controls grayed out. Note that form elements inside the <legend> element won't be disabled.",
+          "doc": "If this Boolean attribute is set, all form controls that are descendants of the &lt;fieldset&gt;, are disabled, meaning they are not editable and won't be submitted along with the &lt;form&gt;. They won't receive any browsing events, like mouse clicks or focus-related events. By default browsers display such controls grayed out. Note that form elements inside the &lt;legend&gt; element won't be disabled.",
           "type": "boolean"
         }
       }
@@ -914,6 +943,14 @@
               }
             }
           }
+        },
+        "onInput": {
+          "doc": "Callback for the 'input' event.",
+          "type": "event:onInput:ValueChanged<String>"
+        },
+        "onChange": {
+          "doc": "Callback for the 'change' event.",
+          "type": "event:onChange:ValueChanged<String>"
         }
       }
     }
@@ -941,7 +978,7 @@
       "doc": "The &lt;summary&gt; HTML element specifies a summary, caption, or legend for a &lt;details&gt; element's disclosure box. Clicking the &lt;summary&gt; element toggles the state of the parent &lt;details&gt; element open and closed."
     },
     "link": {
-      "doc": "The <link> HTML element specifies relationships between the current document and an external resource. This element is most commonly used to link to stylesheets, but is also used to establish site icons (both \"favicon\" style icons and icons for the home screen and apps on mobile devices) among other things.",
+      "doc": "The &lt;link&gt; HTML element specifies relationships between the current document and an external resource. This element is most commonly used to link to stylesheets, but is also used to establish site icons (both \"favicon\" style icons and icons for the home screen and apps on mobile devices) among other things.",
       "self_closing": true,
       "attributes": {
         "href": {
@@ -958,13 +995,13 @@
           "type": "string"
         },
         "as": {
-          "doc": "This attribute is only used when rel=\"preload\" or rel=\"prefetch\" has been set on the <link> element. It specifies the type of content being loaded by the <link>, which is necessary for request matching, application of correct content security policy, and setting of correct Accept request header. Furthermore, rel=\"preload\" uses this as a signal for request prioritization.",
+          "doc": "This attribute is only used when rel=\"preload\" or rel=\"prefetch\" has been set on the &lt;link&gt; element. It specifies the type of content being loaded by the &lt;link&gt;, which is necessary for request matching, application of correct content security policy, and setting of correct Accept request header. Furthermore, rel=\"preload\" uses this as a signal for request prioritization.",
           "type": "string"
         }
       }
     },
     "script": {
-      "doc": "The <script> HTML element is used to embed executable code or data; this is typically used to embed or refer to JavaScript code. The <script> element can also be used with other languages, such as WebGL's GLSL shader programming language and JSON.",
+      "doc": "The &lt;script&gt; HTML element is used to embed executable code or data; this is typically used to embed or refer to JavaScript code. The &lt;script&gt; element can also be used with other languages, such as WebGL's GLSL shader programming language and JSON.",
       "attributes": {
         "async": {
           "doc": "For classic scripts, if the async attribute is present, then the classic script will be fetched in parallel to parsing and evaluated as soon as it is available.\n\nFor module scripts, if the async attribute is present then the scripts and all their dependencies will be executed in the defer queue, therefore they will get fetched in parallel to parsing and evaluated as soon as they are available.\n\nThis attribute allows the elimination of parser-blocking JavaScript where the browser would have to load and evaluate scripts before continuing to parse. defer has a similar effect in this case.",
@@ -980,6 +1017,172 @@
           "type": "string"
         }
       }
+    }
+  },
+  "svg": {
+    "svg": {
+      "doc": "The &lt;svg&gt; element is a container that defines a new coordinate system and viewport. It is used as the outermost element of SVG documents, but it can also be used to embed an SVG fragment inside an SVG or HTML document.",
+      "attributes": {
+        "viewBox": {
+          "doc": "The SVG viewport coordinates for the current SVG fragment.",
+          "type": "string"
+        },
+        "width": {
+          "doc": "The displayed width of the rectangular viewport. (Not the width of its coordinate system.)",
+          "type": "css:Unit"
+        },
+        "height": {
+          "doc": "The displayed height of the rectangular viewport. (Not the height of its coordinate system.)",
+          "type": "css:Unit"
+        }
+      }
+    },
+    ":shapes": {
+      "fill": {
+        "doc": "The color (or gradient or pattern) used to paint the shape.",
+        "type": "css:Color"
+      },
+      "stroke": {
+        "doc": "The color (or gradient or pattern) used to paint the outline of the shape.",
+        "type": "css:Color"
+      },
+      "stroke-width": {
+        "name": "strokeWidth",
+        "doc": "The width of the stroke to be applied to the shape.",
+        "type": "string"
+      }
+    },
+    "rect": {
+      "doc": "The &lt;rect&gt; element is a basic SVG shape that draws rectangles, defined by their position, width, and height. The rectangles may have their corners rounded.",
+      "attributes": {
+        "x": {
+          "doc": "The x coordinate of the rect.",
+          "type": "string",
+          "required": true
+        },
+        "y": {
+          "doc": "The y coordinate of the rect.",
+          "type": "string",
+          "required": true
+        },
+        "width": {
+          "doc": "The width of the rect.",
+          "type": "string",
+          "required": true
+        },
+        "height": {
+          "doc": "The height of the rect.",
+          "type": "string",
+          "required": true
+        }
+      },
+      "inherit": "shapes"
+    },
+    "circle": {
+      "doc": "The &lt;circle&gt; SVG element is an SVG basic shape, used to draw circles based on a center point and a radius.",
+      "attributes": {
+        "cx": {
+          "doc": "The x-axis coordinate of the center of the circle.",
+          "type": "string",
+          "required": true
+        },
+        "cy": {
+          "doc": "The y-axis coordinate of the center of the circle.",
+          "type": "string",
+          "required": true
+        },
+        "r": {
+          "doc": "The radius of the circle.",
+          "type": "string",
+          "required": true
+        }
+      },
+      "inherit": "shapes"
+    },
+    "ellipse": {
+      "doc": "The &lt;ellipse&gt; element is an SVG basic shape, used to create ellipses based on a center coordinate, and both their x and y radius.",
+      "attributes": {
+        "cx": {
+          "doc": "The x-axis coordinate of the center of the ellipse.",
+          "type": "string",
+          "required": true
+        },
+        "cy": {
+          "doc": "The y-axis coordinate of the center of the ellipse.",
+          "type": "string",
+          "required": true
+        },
+        "rx": {
+          "doc": "The radius of the ellipse on the x axis.",
+          "type": "string",
+          "required": true
+        },
+        "ry": {
+          "doc": "The radius of the ellipse on the y axis.",
+          "type": "string",
+          "required": true
+        }
+      },
+      "inherit": "shapes"
+    },
+    "line": {
+      "doc": "The &lt;line&gt; element is an SVG basic shape used to create a line connecting two points.",
+      "attributes": {
+        "x1": {
+          "doc": "Defines the x-axis coordinate of the line starting point.",
+          "type": "string",
+          "required": true
+        },
+        "y1": {
+          "doc": "Defines the y-axis coordinate of the line starting point.",
+          "type": "string",
+          "required": true
+        },
+        "x2": {
+          "doc": "Defines the x-axis coordinate of the line ending point.",
+          "type": "string",
+          "required": true
+        },
+        "y2": {
+          "doc": "Defines the y-axis coordinate of the line ending point.",
+          "type": "string",
+          "required": true
+        }
+      },
+      "inherit": "shapes"
+    },
+    "path": {
+      "doc": "The &lt;path&gt; SVG element is the generic element to define a shape. All the basic shapes can be created with a path element.",
+      "attributes": {
+        "d": {
+          "doc": "This attribute defines the shape of the path.",
+          "type": "string",
+          "required": true
+        }
+      },
+      "inherit": "shapes"
+    },
+    "polygon": {
+      "doc": "The &lt;polygon&gt; element defines a closed shape consisting of a set of connected straight line segments. The last point is connected to the first point.",
+      "attributes": {
+        "points": {
+          "doc": "This attribute defines the list of points (pairs of x,y absolute coordinates) required to draw the polygon.",
+          "type": "string",
+          "required": true
+        }
+      },
+      "inherit": "shapes"
+    },
+    "polyline": {
+      "doc": "The &lt;polyline&gt; SVG element is an SVG basic shape that creates straight lines connecting several points. Typically a polyline is used to create open shapes as the last point doesn't have to be connected to the first point.",
+      "attributes": {
+        "points": {
+          "doc": "This attribute defines the list of points (pairs of x,y absolute coordinates) required to draw the polyline.",
+          "type": "string",
+          "required": true
+        }
+      },
+      "inherit": "shapes"
     }
   }
 }

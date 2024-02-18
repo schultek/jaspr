@@ -276,7 +276,7 @@ class UncontrolledProviderScope extends InheritedComponent {
 
 @sealed
 class _UncontrolledProviderScopeElement extends InheritedElement {
-  _UncontrolledProviderScopeElement(UncontrolledProviderScope component) : super(component);
+  _UncontrolledProviderScopeElement(UncontrolledProviderScope super.component);
 
   void Function()? _task;
   // ignore: unused_field
@@ -314,7 +314,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
       debugCanModifyProviders ??= _debugCanModifyProviders;
     }
 
-    vsyncOverride ??= _jasprVsync;
+    component.container.scheduler.flutterVsyncs.add(_jasprVsync);
     super.mount(parent, prevSibling);
   }
 
@@ -370,9 +370,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
       debugCanModifyProviders = null;
     }
 
-    if (vsyncOverride == _jasprVsync) {
-      vsyncOverride = null;
-    }
+    component.container.scheduler.flutterVsyncs.remove(_jasprVsync);
     super.unmount();
   }
 

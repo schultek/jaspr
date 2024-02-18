@@ -22,22 +22,27 @@ class Logic {
   void newPad() async {
     ref.read(storageProvider).remove('project');
     window.history.pushState(null, 'JasprPad', window.location.origin);
-    ref.invalidate(loadedProjectProvider);
+    _refreshProject();
   }
 
   void refresh() {
     ref.read(storageProvider).remove('project');
-    ref.invalidate(loadedProjectProvider);
+    _refreshProject();
   }
 
   void selectSample(Sample data) async {
-    window.history.pushState(null, 'JasprPad', window.location.origin + '?sample=${data.id}');
-    ref.invalidate(loadedProjectProvider);
+    window.history.pushState(null, 'JasprPad', '${window.location.origin}?sample=${data.id}');
+    _refreshProject();
   }
 
   void selectTutorial() async {
-    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=intro');
+    window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=0-intro');
+    _refreshProject();
+  }
+
+  void _refreshProject() {
     ref.invalidate(loadedProjectProvider);
+    ref.invalidate(activeDocIndexProvider);
   }
 
   Future<TutorialData> changeStep(TutorialData tutorial, String newId) async {
@@ -59,7 +64,8 @@ class Logic {
     var tut = ref.read(editProjectProvider) as TutorialData;
     var updated = await changeStep(tut, tut.configs[tut.currentStep - 1].id);
     ref.read(editProjectProvider.notifier).state = updated;
-    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=${updated.step.id}');
+    window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=${updated.step.id}');
+    ref.invalidate(activeDocIndexProvider);
     compileFiles();
   }
 
@@ -67,7 +73,8 @@ class Logic {
     var tut = ref.read(editProjectProvider) as TutorialData;
     var updated = await changeStep(tut, tut.configs[tut.currentStep + 1].id);
     ref.read(editProjectProvider.notifier).state = updated;
-    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=${updated.step.id}');
+    window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=${updated.step.id}');
+    ref.invalidate(activeDocIndexProvider);
     compileFiles();
   }
 
@@ -75,7 +82,8 @@ class Logic {
     var tut = ref.read(editProjectProvider) as TutorialData;
     var updated = await changeStep(tut, id);
     ref.read(editProjectProvider.notifier).state = updated;
-    window.history.pushState(null, 'JasprPad', window.location.origin + '?tutorial=${updated.step.id}');
+    window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=${updated.step.id}');
+    ref.invalidate(activeDocIndexProvider);
     compileFiles();
   }
 

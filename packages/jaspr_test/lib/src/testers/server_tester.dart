@@ -109,7 +109,11 @@ class ServerTester {
   /// Perform a virtual request to your app that renders the components and returns the
   /// resulting document.
   Future<DocumentResponse> request(String location) async {
-    var uri = Uri.parse('http://${app.server!.address.host}:${app.server!.port}$location');
+    var serverHost = app.server!.address.host;
+    if (serverHost == '0.0.0.0') {
+      serverHost = 'localhost';
+    }
+    var uri = Uri.parse('http://$serverHost:${app.server!.port}$location');
 
     int statusCode;
     String body;
@@ -168,7 +172,9 @@ class ServerTester {
 }
 
 ServerApp _runTestApp(_LateComponent app, Handler fileHandler) {
+  var options = Jaspr.options;
   return ServerApp.run((binding) {
+    binding.initializeOptions(options);
     binding.attachRootComponent(app.component ?? Builder(builder: (_) => []));
   }, fileHandler);
 }

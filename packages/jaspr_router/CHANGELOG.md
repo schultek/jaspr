@@ -1,3 +1,7 @@
+## 0.3.1
+
+- `jaspr` upgraded to `0.10.0`
+
 ## 0.3.0
 
 - Added *Static Site Generation* support. Pages are automatically generated for each route.

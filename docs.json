@@ -15,8 +15,8 @@
     ["Core Concepts", [
       ["\uD83E\uDDF1 Component System", "/core/components"],
       ["\uD83D\uDC7E App & Document", "/core/app"],
-      ["\uD83D\uDD8D Writing HTML in Jaspr", "/core/html"],
-      ["\uD83C\uDFA8 Styling in Jaspr", "/core/styling"],
+      ["\uD83D\uDD8D Writing html", "/core/html"],
+      ["\uD83C\uDFA8 Styling", "/core/styling"],
       ["\uD83C\uDFD7 Server Side Rendering", "/core/ssr"],
       ["\uD83D\uDCD1 Static Site Generation", "/core/ssg"]
     ]],

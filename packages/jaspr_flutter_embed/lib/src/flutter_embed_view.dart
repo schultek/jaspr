@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart' as flt;
-import 'package:jaspr/html.dart';
+import 'package:jaspr/jaspr.dart';
 
 import 'run_flutter_app.dart';
 
@@ -8,7 +8,7 @@ class FlutterEmbedView extends StatefulComponent {
 
   final flt.Widget app;
   final Component? loader;
-  final List<String>? classes;
+  final String? classes;
   final Styles? styles;
 
   @override

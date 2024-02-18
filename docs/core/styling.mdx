@@ -1,6 +1,6 @@
 ---
-title: Jaspr Styling
-description: How to do styling in jaspr.
+title: Styling
+description: How to do styling in Jaspr.
 previous: /core/html
 next: /core/ssr
 ---
@@ -14,10 +14,7 @@ To pass style attributes to a html component, construct a `Styles` object and pa
 attribute like this:
 
 ```dart
-DomComponent(
-  tag: 'div',
-  styles: const Styles.background(color: Colors.red),
-);
+div(styles: const Styles.background(color: Colors.red), []);
 ```
 
 This will render as:
@@ -213,12 +210,12 @@ const redGreenTest = Styles.combine([
 ## Style Component
 
 The `Styles` class is great for defining a single set of css properties e.g. to be used as 
-**inline styles** for a single html element or `DomComponent`.
+**inline styles** for a single html element.
 
 To define a stylesheet with a set of style rules use the `Style` (without *s*) component.
 
 ```dart
-Style(rules: [
+Style(styles: [
     StyleRule(
         selector: const Selector.id('content'),
         styles: Styles.box(

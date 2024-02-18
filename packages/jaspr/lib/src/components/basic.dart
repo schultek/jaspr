@@ -90,19 +90,18 @@ class Builder extends StatelessComponent {
   ///
   /// The [builder] argument must not be null.
   const Builder({
-    Key? key,
+    super.key,
     required this.builder,
-  }) : super(key: key);
+  });
 
   /// Creates a component that delegates its build to a callback
   /// that returns a single child component.
   ///
   /// The [builder] argument must not be null.
   Builder.single({
-    Key? key,
+    super.key,
     required SingleComponentBuilder builder,
-  })  : builder = _WrappedComponentBuilder(builder),
-        super(key: key);
+  }) : builder = _WrappedComponentBuilder(builder).call;
 
   /// Called to obtain the child component.
   ///
@@ -148,9 +147,9 @@ class StatefulBuilder extends StatefulComponent {
   ///
   /// The [builder] argument must not be null.
   const StatefulBuilder({
-    Key? key,
+    super.key,
     required this.builder,
-  }) : super(key: key);
+  });
 
   /// Called to obtain the child component.
   ///

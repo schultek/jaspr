@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 /// A component that does not require mutable state.
 ///
@@ -128,7 +128,7 @@ mixin OnFirstBuild on StatelessComponent {
 /// An [Element] that uses a [StatelessComponent] as its configuration.
 class StatelessElement extends MultiChildElement {
   /// Creates an element that uses the given component as its configuration.
-  StatelessElement(StatelessComponent component) : super(component);
+  StatelessElement(StatelessComponent super.component);
 
   @override
   StatelessComponent get component => super.component as StatelessComponent;

@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 /// A component that has mutable state.
 ///
@@ -573,6 +573,13 @@ abstract class State<T extends StatefulComponent> {
   @protected
   @mustCallSuper
   void didChangeDependencies() {}
+}
+
+/// Mixin on [State] that preloads state on the server
+mixin PreloadStateMixin<T extends StatefulComponent> on State<T> {
+  /// Called on the server before initState() to preload asynchronous data
+  @protected
+  Future<void> preloadState();
 }
 
 /// An [Element] that uses a [StatefulComponent] as its configuration.

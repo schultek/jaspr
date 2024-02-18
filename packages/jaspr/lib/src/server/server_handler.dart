@@ -1,3 +1,5 @@
+// ignore_for_file: implicit_call_tearoffs
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -77,7 +79,7 @@ Handler _proxyHandler() {
     if (res.statusCode == 200 && req.url.path.endsWith('.dart.bootstrap.js')) {
       var body = await res.readAsString();
       // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:5467/$dwdsSseHandler";'
-      return res.change(body: body.replaceAll('http://localhost:$kDevProxy/', '/'));
+      return res.change(body: body.replaceAll('http://localhost:$kDevProxy/', './'));
     }
 
     // Second try to load the resource from the flutter process.
@@ -172,16 +174,19 @@ Handler _sseProxyHandler() {
 final webDir = kDevWeb.isNotEmpty ? kDevWeb : join(_findRootProjectDir(), 'web');
 
 String _findRootProjectDir() {
-  var dir = dirname(Platform.script.path);
-  if (Platform.resolvedExecutable == Platform.script.path) return dir;
+  var dir = dirname(Platform.script.toFilePath());
+  if (Platform.resolvedExecutable == Platform.script.toFilePath()) return dir;
   while (dir.isNotEmpty && !File(join(dir, 'pubspec.yaml')).existsSync()) {
     dir = dirname(dir);
   }
   return dir;
 }
 
-final staticFileHandler =
-    kDevProxy.isNotEmpty ? _proxyHandler() : createStaticHandler(webDir, defaultDocument: 'index.html');
+final staticFileHandler = kDevProxy.isNotEmpty
+    ? _proxyHandler()
+    : Directory(webDir).existsSync()
+        ? createStaticHandler(webDir, defaultDocument: 'index.html')
+        : (_) => Response.notFound('');
 
 typedef SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
 

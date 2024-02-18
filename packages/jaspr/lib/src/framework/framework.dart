@@ -6,14 +6,14 @@ library framework;
 
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert';
 
 import 'package:meta/meta.dart';
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
-import '../foundation/sync.dart';
-import '../ui/styles/styles.dart';
+import '../foundation/events/events.dart';
+import '../foundation/object.dart';
+import '../foundation/styles/styles.dart';
 
 part 'build_context.dart';
 part 'build_owner.dart';
@@ -23,11 +23,10 @@ part 'inactive_elements.dart';
 part 'inherited_component.dart';
 part 'keys.dart';
 part 'multi_child_element.dart';
+part 'notification.dart';
 part 'observer_component.dart';
-part 'render_element.dart';
-part 'render_scope.dart';
+part 'render_object.dart';
 part 'single_child_element.dart';
-part 'state_mixins.dart';
 part 'stateful_component.dart';
 part 'stateless_component.dart';
 
@@ -157,6 +156,7 @@ abstract class Element implements BuildContext {
   Element(Component component) : _component = component;
 
   Element? _parent;
+  _NotificationNode? _notificationTree;
 
   /// Compare two components for equality.
   ///
@@ -229,38 +229,9 @@ abstract class Element implements BuildContext {
   BuildOwner get owner => _owner!;
   BuildOwner? _owner;
 
-  Renderer get renderer => _renderer!;
-  Renderer? _renderer;
-
-  /// The previous sibling element.
-  Element? _prevSibling;
-
-  /// The previous ancestor sibling
-  Element? get prevAncestorSibling => _prevAncestorSibling;
-  Element? _prevAncestorSibling;
-
-  /// The last child element.
-  Element? _lastChild;
-
-  /// The last child dom node.
-  RenderElement? get lastNode => _lastNode;
-  RenderElement? _lastNode;
-
-  /// The nearest ancestor dom node.
-  RenderElement? get parentNode => _parentNode;
-  RenderElement? _parentNode;
-
   // This is used to verify that Element objects move through life in an
   // orderly fashion.
   _ElementLifecycle _lifecycleState = _ElementLifecycle.initial;
-
-  void updateLastChild(Element? child) {
-    _lastChild = child;
-    _lastNode = _lastChild?._lastNode;
-    if (_parent?._lastChild == this && _parent?._lastNode != _lastNode) {
-      _parent!.updateLastChild(this);
-    }
-  }
 
   /// Calls the argument for each child.
   ///
@@ -373,9 +344,10 @@ abstract class Element implements BuildContext {
     assert(parent == null || parent._lifecycleState == _ElementLifecycle.active);
 
     _parent = parent;
+    _parentRenderObjectElement = parent is RenderObjectElement ? parent : parent?._parentRenderObjectElement;
+
     _prevSibling = prevSibling;
-    _prevAncestorSibling = _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
-    _parentNode = parent is RenderElement ? parent : parent?._parentNode;
+    _prevAncestorSibling = _prevSibling ?? (_parent is RenderObjectElement ? null : _parent?._prevAncestorSibling);
 
     _lifecycleState = _ElementLifecycle.active;
     _depth = parent != null ? parent.depth + 1 : 1;
@@ -383,7 +355,6 @@ abstract class Element implements BuildContext {
     if (parent != null) {
       _owner = parent.owner;
       _binding = parent.binding;
-      _renderer = _inheritRendererFromParent();
     }
     assert(_owner != null);
     assert(_binding != null);
@@ -394,6 +365,7 @@ abstract class Element implements BuildContext {
     }
     _updateInheritance();
     _updateObservers();
+    attachNotificationTree();
   }
 
   @mustCallSuper
@@ -423,34 +395,6 @@ abstract class Element implements BuildContext {
       visitChildren((Element child) {
         child._updateDepth(expectedDepth);
       });
-    }
-  }
-
-  var _parentChanged = false;
-
-  void updatePrevSibling(Element? prevSibling) {
-    assert(_lifecycleState == _ElementLifecycle.active);
-    assert(_component != null);
-    assert(_parent != null);
-    assert(_parent!._lifecycleState == _ElementLifecycle.active);
-    assert(_depth != null);
-    assert(_parentNode != null);
-    _prevSibling = prevSibling;
-    _updateAncestorSiblingRecursively(_parentChanged);
-    _parentChanged = false;
-  }
-
-  @mustCallSuper
-  void _didChangeAncestorSibling() {}
-
-  void _updateAncestorSiblingRecursively(bool didReorderParent) {
-    var newAncestorSibling = _prevSibling ?? (_parent is RenderElement ? null : _parent?._prevAncestorSibling);
-    if (didReorderParent || newAncestorSibling != _prevAncestorSibling) {
-      _prevAncestorSibling = newAncestorSibling;
-      _didChangeAncestorSibling();
-      if (this is! RenderElement) {
-        visitChildren((e) => e._updateAncestorSiblingRecursively(true));
-      }
     }
   }
 
@@ -487,7 +431,7 @@ abstract class Element implements BuildContext {
   /// The element returned by this function will already have been mounted and
   /// will be in the "active" lifecycle state.
   @protected
-  Element inflateComponent(Component newComponent, Element? nextChild) {
+  Element inflateComponent(Component newComponent, Element? prevSibling) {
     final Key? key = newComponent.key;
     if (key is GlobalKey) {
       final Element? newChild = _retakeInactiveElement(key, newComponent);
@@ -495,13 +439,13 @@ abstract class Element implements BuildContext {
         assert(newChild._parent == null);
         newChild._activateWithParent(this);
         newChild._parentChanged = true;
-        final Element? updatedChild = updateChild(newChild, newComponent, nextChild);
+        final Element? updatedChild = updateChild(newChild, newComponent, prevSibling);
         assert(newChild == updatedChild);
         return updatedChild!;
       }
     }
     final Element newChild = newComponent.createElement();
-    newChild.mount(this, nextChild);
+    newChild.mount(this, prevSibling);
     assert(newChild._lifecycleState == _ElementLifecycle.active);
     return newChild;
   }
@@ -548,7 +492,7 @@ abstract class Element implements BuildContext {
   void _activateWithParent(Element parent) {
     assert(_lifecycleState == _ElementLifecycle.inactive);
     _parent = parent;
-    _parentNode = parent is RenderElement ? parent : parent._parentNode;
+    _parentRenderObjectElement = parent is RenderObjectElement ? parent : parent._parentRenderObjectElement;
     _updateDepth(_parent!.depth);
     _activateRecursively(this);
     assert(_lifecycleState == _ElementLifecycle.active);
@@ -582,21 +526,17 @@ abstract class Element implements BuildContext {
     _lifecycleState = _ElementLifecycle.active;
 
     var parent = _parent!;
-    _parentNode = parent is RenderElement ? parent : parent._parentNode;
-    _renderer = _inheritRendererFromParent();
+    _parentRenderObjectElement = parent is RenderObjectElement ? parent : parent._parentRenderObjectElement;
 
     _dependencies?.clear();
     _hadUnsatisfiedDependencies = false;
     _updateInheritance();
     _updateObservers();
+    attachNotificationTree();
     if (_dirty) {
       owner.scheduleBuildFor(this);
     }
     if (hadDependencies) didChangeDependencies();
-  }
-
-  Renderer _inheritRendererFromParent() {
-    return _parent!._renderer!.inherit(_parent!);
   }
 
   /// Transition from the "active" to the "inactive" lifecycle state.
@@ -659,7 +599,7 @@ abstract class Element implements BuildContext {
       ComponentsBinding._unregisterGlobalKey(key, this);
     }
 
-    _parentNode = null;
+    _parentRenderObjectElement = null;
     _component = null;
     _dependencies = null;
     _lifecycleState = _ElementLifecycle.defunct;
@@ -705,6 +645,20 @@ abstract class Element implements BuildContext {
   void _updateObservers() {
     assert(_lifecycleState == _ElementLifecycle.active);
     _observerElements = _parent?._observerElements;
+  }
+
+  /// Called in [Element.mount] and [Element.activate] to register this element in
+  /// the notification tree.
+  ///
+  /// This method is only exposed so that [NotifiableElementMixin] can be implemented.
+  /// Subclasses of [Element] that wish to respond to notifications should mix that
+  /// in instead.
+  ///
+  /// See also:
+  ///   * [NotificationListener], a component that allows listening to notifications.
+  @protected
+  void attachNotificationTree() {
+    _notificationTree = _parent?._notificationTree;
   }
 
   @override
@@ -778,7 +732,7 @@ abstract class Element implements BuildContext {
   void markNeedsBuild() {
     assert(_lifecycleState != _ElementLifecycle.defunct);
     if (_lifecycleState != _ElementLifecycle.active) return;
-    assert(_parentNode != null);
+    assert(_parentRenderObjectElement != null);
     assert(_lifecycleState == _ElementLifecycle.active);
     assert(() {
       if (owner._debugBuilding) {
@@ -868,4 +822,69 @@ abstract class Element implements BuildContext {
 
   // ignore: prefer_final_fields
   List<Future> _asyncFirstBuildChildren = [];
+
+  @override
+  void dispatchNotification(Notification notification) {
+    _notificationTree?.dispatchNotification(notification);
+  }
+
+  /// The nearest ancestor dom node.
+  RenderObjectElement? _parentRenderObjectElement;
+  RenderObjectElement? get parentRenderObjectElement => _parentRenderObjectElement;
+
+  /// The direct previous sibling element.
+  Element? _prevSibling;
+
+  /// The direct or indirect previous sibling element.
+  ///
+  /// If no direct previous sibling exist, this points to the nearest
+  /// previous sibling of the parent element recursively.
+  /// If no element is found until the nearest ancestor render object
+  /// element, this is null.
+  Element? _prevAncestorSibling;
+  Element? get prevAncestorSibling => _prevAncestorSibling;
+
+  /// The last direct child element.
+  Element? _lastChild;
+
+  /// The last direct child element that is also a render object element.
+  RenderObjectElement? _lastRenderObjectElement;
+  RenderObjectElement? get lastRenderObjectElement => _lastRenderObjectElement;
+
+  void updateLastChild(Element? child) {
+    _lastChild = child;
+    _lastRenderObjectElement = _lastChild?._lastRenderObjectElement;
+    if (_parent?._lastChild == this && _parent?._lastRenderObjectElement != _lastRenderObjectElement) {
+      _parent!.updateLastChild(this);
+    }
+  }
+
+  var _parentChanged = false;
+
+  void updatePrevSibling(Element? prevSibling) {
+    assert(_lifecycleState == _ElementLifecycle.active);
+    assert(_component != null);
+    assert(_parent != null);
+    assert(_parent!._lifecycleState == _ElementLifecycle.active);
+    assert(_depth != null);
+    assert(_parentRenderObjectElement != null);
+
+    _prevSibling = prevSibling;
+    _updateAncestorSiblingRecursively(_parentChanged);
+    _parentChanged = false;
+  }
+
+  @mustCallSuper
+  void _didUpdateSlot() {}
+
+  void _updateAncestorSiblingRecursively(bool didChangeAncestor) {
+    var newAncestorSibling = _prevSibling ?? (_parent is RenderObjectElement ? null : _parent?._prevAncestorSibling);
+    if (didChangeAncestor || newAncestorSibling != _prevAncestorSibling) {
+      _prevAncestorSibling = newAncestorSibling;
+      _didUpdateSlot();
+      if (this is! RenderObjectElement) {
+        visitChildren((e) => e._updateAncestorSiblingRecursively(true));
+      }
+    }
+  }
 }

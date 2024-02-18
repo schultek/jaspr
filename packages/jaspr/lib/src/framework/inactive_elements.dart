@@ -1,4 +1,4 @@
-part of framework;
+part of 'framework.dart';
 
 class _InactiveElements {
   final Set<Element> _elements = HashSet<Element>();
@@ -7,10 +7,10 @@ class _InactiveElements {
     assert(element._lifecycleState == _ElementLifecycle.inactive);
     element.visitChildren((Element child) {
       assert(child._parent == element);
-      _unmount(child, detachNode && element is! RenderElement);
+      _unmount(child, detachNode && element is! RenderObjectElement);
     });
-    if (element is RenderElement && detachNode) {
-      element._remove();
+    if (element is RenderObjectElement && detachNode) {
+      element.detachRenderObject();
     }
     element.unmount();
     assert(element._lifecycleState == _ElementLifecycle.defunct);

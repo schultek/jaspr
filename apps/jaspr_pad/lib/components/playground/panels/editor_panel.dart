@@ -1,4 +1,4 @@
-import 'package:jaspr/components.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../../../models/project.dart';
@@ -24,22 +24,11 @@ class EditorPanelState extends State<EditorPanel> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      id: 'editor-panel',
-      children: buildChildren(context).toList(),
-    );
-  }
-
-  Iterable<Component> buildChildren(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      id: 'editor-panel-header',
-      classes: ['header'],
-      children: [
-        DomComponent(
-          tag: 'nav',
-          child: TabBar(
+    yield div(id: 'editor-panel', [
+      div(id: 'editor-panel-header', classes: 'header', [
+        nav([
+          TabBar(
+            key: ValueKey(context.watch(editProjectProvider)?.id),
             id: 'web-tab-bar',
             selected: context.watch(activeDocIndexProvider),
             onSelected: (index) {
@@ -57,112 +46,103 @@ class EditorPanelState extends State<EditorPanel> {
             tabs: [
               for (var fileName in context.watch(fileNamesProvider)) Tab(label: fileName),
             ],
-          ),
-        ),
-        DomComponent(
-          tag: 'div',
-          classes: ['button-group'],
-          children: [
-            Builder(builder: (context) sync* {
-              yield Button(
-                id: 'run-button',
-                dense: true,
-                raised: true,
-                label: 'Run',
-                icon: 'play_arrow',
-                disabled: context.watch(isCompilingProvider),
-                onPressed: () {
-                  context.read(logicProvider).compileFiles();
-                },
-              );
-            }),
-          ],
-        ),
-      ],
-    );
+          )
+        ]),
+        div(classes: 'button-group', [
+          Builder(builder: (context) sync* {
+            yield Button(
+              id: 'run-button',
+              dense: true,
+              raised: true,
+              label: 'Run',
+              icon: 'play_arrow',
+              disabled: context.watch(isCompilingProvider),
+              onPressed: () {
+                context.read(logicProvider).compileFiles();
+              },
+            );
+          }),
+        ]),
+      ]),
+      OutputSplitView(
+        key: ValueKey('output-split'),
+        child: Builder.single(builder: (context) {
+          var activeFile = context.watch(activeDocKeyProvider);
+          return div(
+            styles: Styles.raw({'position': 'relative', 'display': 'flex', 'flex': '1', 'flex-flow': 'column'}),
+            [
+              Builder.single(
+                key: ValueKey('output-builder'),
+                builder: (context) {
+                  var proj = context.watch(editProjectProvider);
 
-    yield OutputSplitView(
-      key: ValueKey('output-split'),
-      child: Builder.single(builder: (context) {
-        var activeFile = context.watch(activeDocKeyProvider);
-        return DomComponent(
-          tag: 'div',
-          styles: Styles.raw({'position': 'relative', 'display': 'flex', 'flex': '1', 'flex-flow': 'column'}),
-          children: [
-            Builder.single(
-              key: ValueKey('output-builder'),
-              builder: (context) {
-                var proj = context.watch(editProjectProvider);
+                  if (proj == null) {
+                    return Editor(
+                      key: _editorKey,
+                      activeDoc: null,
+                      documents: [],
+                    );
+                  }
 
-                if (proj == null) {
+                  EditorDocument doc(String key, String mode) {
+                    return EditorDocument(
+                      key: key,
+                      source: proj.fileContentFor(key) ?? '',
+                      mode: mode,
+                      issues: mode == 'dart' ? context.watch(docIssuesProvider(key)) : [],
+                      selection: context.watch(fileSelectionProvider(key)),
+                    );
+                  }
+
                   return Editor(
                     key: _editorKey,
-                    activeDoc: null,
-                    documents: [],
+                    activeDoc: context.watch(activeDocKeyProvider),
+                    documents: [
+                      doc('main.dart', 'dart'),
+                      for (var key in proj.dartFiles.keys) doc(key, 'dart'),
+                      doc('index.html', 'text/html'),
+                      doc('styles.css', 'css'),
+                    ],
+                    onDocumentChanged: (String key, String content) {
+                      context.read(editProjectProvider.notifier).update((state) => state?.updateContent(key, content));
+                    },
+                    onSelectionChanged: (key, index, isWhitespace) {
+                      context.read(fileSelectionProvider(key).notifier).state = null;
+
+                      if (!isWhitespace && proj.isDart(key)) {
+                        context.read(logicProvider).document(key, index);
+                      }
+                    },
                   );
-                }
-
-                EditorDocument doc(String key, String mode) {
-                  return EditorDocument(
-                    key: key,
-                    source: proj.fileContentFor(key) ?? '',
-                    mode: mode,
-                    issues: mode == 'dart' ? context.watch(docIssuesProvider(key)) : [],
-                    selection: context.watch(fileSelectionProvider(key)),
-                  );
-                }
-
-                return Editor(
-                  key: _editorKey,
-                  activeDoc: context.watch(activeDocKeyProvider),
-                  documents: [
-                    doc('main.dart', 'dart'),
-                    for (var key in proj.dartFiles.keys) doc(key, 'dart'),
-                    doc('index.html', 'text/html'),
-                    doc('styles.css', 'css'),
-                  ],
-                  onDocumentChanged: (String key, String content) {
-                    context.read(editProjectProvider.notifier).update((state) => state?.updateContent(key, content));
-                  },
-                  onSelectionChanged: (key, index, isWhitespace) {
-                    context.read(fileSelectionProvider(key).notifier).state = null;
-
-                    if (!isWhitespace && proj.isDart(key)) {
-                      context.read(logicProvider).document(key, index);
-                    }
-                  },
-                );
-              },
-            ),
-            if (activeFile != null && ProjectData.canDelete(activeFile))
-              DomComponent(
-                tag: 'button',
-                classes: ["mdc-icon-button", "material-icons"],
-                styles: Styles.combine([
-                  Styles.box(
-                    position: Position.absolute(top: 4.px, right: 4.px),
-                    width: 32.px,
-                    height: 32.px,
-                    padding: EdgeInsets.all(8.px),
-                    opacity: 0.5,
-                  ),
-                  Styles.text(fontSize: 16.px),
-                ]),
-                events: {
-                  'click': (e) async {
-                    var result = await DeleteFileDialog.show(context, activeFile);
-                    if (result == true) {
-                      context.read(logicProvider).deleteFile(activeFile);
-                    }
-                  }
                 },
-                children: [
-                  Text('delete'),
-                ],
-              )
-          ],
-        );
-      }),
-    );
+              ),
+              if (activeFile != null && ProjectData.canDelete(activeFile))
+                button(
+                  classes: '"mdc-icon-button material-icons',
+                  styles: Styles.combine([
+                    Styles.box(
+                      position: Position.absolute(top: 4.px, right: 4.px),
+                      width: 32.px,
+                      height: 32.px,
+                      padding: EdgeInsets.all(8.px),
+                      opacity: 0.5,
+                    ),
+                    Styles.text(fontSize: 16.px),
+                  ]),
+                  events: {
+                    'click': (e) async {
+                      var result = await DeleteFileDialog.show(context, activeFile);
+                      if (result == true) {
+                        context.read(logicProvider).deleteFile(activeFile);
+                      }
+                    }
+                  },
+                  [text('delete')],
+                ),
+            ],
+          );
+        }),
+      ),
+    ]);
   }
 }

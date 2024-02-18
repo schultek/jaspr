@@ -1,4 +1,4 @@
-import 'package:jaspr/components.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 Component providerApp(ComponentBuilder builder) {
@@ -8,7 +8,7 @@ Component providerApp(ComponentBuilder builder) {
 }
 
 class Button extends StatelessComponent {
-  const Button({required this.label, required this.onPressed, Key? key}) : super(key: key);
+  const Button({required this.label, required this.onPressed, super.key});
 
   final String label;
   final void Function() onPressed;

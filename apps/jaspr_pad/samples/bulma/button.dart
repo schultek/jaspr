@@ -14,8 +14,8 @@ class Button extends StatelessComponent {
     this.isLoading = false,
     this.isBlock = false,
     this.isDisabled = false,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Component child;
   final VoidCallback onPressed;
@@ -27,59 +27,41 @@ class Button extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'button',
-      classes: [
-        'button',
-        if (color != null) 'is-${color!.name}',
-        if (isOutlined) 'is-outlined',
-        if (isLoading) 'is-loading',
-        if (isBlock) 'block',
-      ],
-      attributes: {if (isDisabled) 'disabled': ''},
-      events: {
-        'click': (e) => onPressed(),
-      },
-      child: child,
+    yield button(
+      classes: 'button'
+          '${color != null ? ' is-${color!.name}' : ''}'
+          '${isOutlined ? ' is-outlined' : ''}'
+          '${isLoading ? ' is-loading' : ''}'
+          '${isBlock ? ' block' : ''}',
+      disabled: isDisabled,
+      onClick: onPressed,
+      [child],
     );
   }
 }
 
 class IconLabel extends StatelessComponent {
-  const IconLabel({required this.icon, required this.label, Key? key}) : super(key: key);
+  const IconLabel({required this.icon, required this.label, super.key});
 
   final String icon;
   final String label;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-        tag: 'span',
-        classes: ['icon'],
-        child: DomComponent(
-          tag: 'i',
-          classes: ['fas', 'fa-$icon'],
-        ));
-    yield DomComponent(
-      tag: 'span',
-      child: Text(label),
-    );
+    yield span(classes: 'icon', [i(classes: 'fas fa-$icon', [])]);
+    yield span([text(label)]);
   }
 }
 
 /// Bulma Button Group Component
 class ButtonGroup extends StatelessComponent {
-  const ButtonGroup({required this.children, this.isAttached = false, Key? key}) : super(key: key);
+  const ButtonGroup({required this.children, this.isAttached = false, super.key});
 
   final List<Button> children;
   final bool isAttached;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'div',
-      classes: ['buttons', if (isAttached) 'has-addons', 'block'],
-      children: children,
-    );
+    yield div(classes: 'buttons ${isAttached ? ' has-addons' : ''} block', children);
   }
 }

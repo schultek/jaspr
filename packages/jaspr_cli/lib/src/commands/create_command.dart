@@ -23,10 +23,9 @@ class CreateCommand extends BaseCommand {
       allowedHelp: templateDescriptionByName,
     );
     argParser.addFlag(
-      'experimental-web-compilers',
+      'jaspr-web-compilers',
       abbr: 'c',
-      help:
-          'Use jaspr web compilers (experimental)? This enables the use of flutter web plugins and direct flutter embedding.',
+      help: 'Uses jaspr_web_compilers. This enables the use of flutter web plugins and direct flutter embedding.',
       defaultsTo: null,
     );
   }
@@ -76,10 +75,11 @@ class CreateCommand extends BaseCommand {
 
     var template = templatesByName[templateName]!;
 
-    var useJasprCompilers = argResults!['experimental-web-compilers'] as bool?;
+    var useJasprCompilers = argResults!['jaspr-web-compilers'] as bool?;
     useJasprCompilers ??= logger.logger.confirm(
-        'Use jaspr web compilers (experimental)? This enables the use of flutter web plugins and direct flutter embedding.',
-        defaultValue: true);
+      'Use jaspr_web_compilers? This enables the use of flutter web plugins and direct flutter embedding.',
+      defaultValue: false,
+    );
 
     var progress = logger.logger.progress('Bootstrapping');
     var generator = await MasonGenerator.fromBundle(template);
