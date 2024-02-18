@@ -75,7 +75,7 @@ class DomRenderObject extends RenderObject {
       if (!node.instanceOfString('Element') || (node as web.Element).tagName.toLowerCase() != tag) {
         elem = _createElement(tag);
         var old = node!;
-        node.parentNode!.replaceChild(elem, old);
+        node!.parentNode!.replaceChild(elem, old);
         node = elem;
         if (old.childNodes.length > 0) {
           var oldChildren = old.childNodes.toIterable();
