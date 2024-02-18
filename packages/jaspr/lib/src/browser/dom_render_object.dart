@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:js_interop';
 
 import 'package:web/web.dart' as web;
 
@@ -47,10 +48,9 @@ class DomRenderObject extends RenderObject {
 
     diff:
     if (node == null) {
-      var toHydrate = parent!.toHydrate;
-      if (toHydrate.isNotEmpty) {
-        for (var e in toHydrate) {
-          if (e is web.Element && e.tagName.toLowerCase() == tag) {
+      if (parent!.toHydrate.isNotEmpty) {
+        for (var e in parent!.toHydrate) {
+          if (e.instanceOfString('Element') && (e as web.Element).tagName.toLowerCase() == tag) {
             if (kVerboseMode) {
               print("Hydrate html node: $e");
             }
@@ -59,12 +59,8 @@ class DomRenderObject extends RenderObject {
             for (var i = 0; i < elem.attributes.length; i++) {
               attributesToRemove.add(elem.attributes.item(i)!.name);
             }
-            toHydrate.remove(e);
-            var nodes = e.childNodes.toIterable();
-            if (kDebugMode) {
-              nodes = nodes.where((node) => node is! web.Text || (node.textContent ?? '').trim().isNotEmpty);
-            }
-            this.toHydrate = nodes.toList();
+            parent!.toHydrate.remove(e);
+            toHydrate = e.childNodes.toIterable().toList();
             break diff;
           }
         }
@@ -76,16 +72,12 @@ class DomRenderObject extends RenderObject {
         print("Create html node: $elem");
       }
     } else {
-      if (node is! web.Element || (node as web.Element).tagName.toLowerCase() != tag) {
+      if (!node.instanceOfString('Element') || (node as web.Element).tagName.toLowerCase() != tag) {
         elem = _createElement(tag);
-        var old = node;
-        if (node case web.Element node) {
-          node.replaceWith(elem as dynamic);
-        } else if (node case web.Text node) {
-          node.replaceWith(elem as dynamic);
-        }
+        var old = node!;
+        node.parentNode!.replaceChild(elem, old);
         node = elem;
-        if (old != null && old.childNodes.length > 0) {
+        if (old.childNodes.length > 0) {
           var oldChildren = old.childNodes.toIterable();
           for (var child in oldChildren) {
             elem.append(child as dynamic);
@@ -111,7 +103,9 @@ class DomRenderObject extends RenderObject {
 
     if (attributes != null && attributes.isNotEmpty) {
       for (var attr in attributes.entries) {
-        if (attr.key == 'value' && elem is web.HTMLInputElement && elem.value != attr.value) {
+        if (attr.key == 'value' &&
+            elem.instanceOfString('HTMLInputElement') &&
+            (elem as web.HTMLInputElement).value != attr.value) {
           if (kVerboseMode) {
             print("Set input value: ${attr.value}");
           }
@@ -157,8 +151,8 @@ class DomRenderObject extends RenderObject {
   void updateText(String text, [bool rawHtml = false]) {
     if (rawHtml) {
       var parent = this.parent!.node;
-      if (parent is web.Element) {
-        if (parent.innerHTML != text) {
+      if (parent.instanceOfString('Element')) {
+        if ((parent as web.Element).innerHTML != text) {
           parent.innerHTML = text;
           node = parent.childNodes.item(0);
           if (kVerboseMode) {
@@ -175,7 +169,7 @@ class DomRenderObject extends RenderObject {
       var toHydrate = parent!.toHydrate;
       if (toHydrate.isNotEmpty) {
         for (var e in toHydrate) {
-          if (e is web.Text) {
+          if (e.instanceOfString('Text')) {
             if (kVerboseMode) {
               print("Hydrate text node: $e");
             }
@@ -197,7 +191,7 @@ class DomRenderObject extends RenderObject {
         print("Create text node: $text");
       }
     } else {
-      if (node is! web.Text) {
+      if (!node.instanceOfString('Text')) {
         var elem = web.Text(text);
         (node as web.Element).replaceWith(elem as dynamic);
         node = elem;
@@ -231,7 +225,7 @@ class DomRenderObject extends RenderObject {
       var parentNode = parent.node;
       var childNode = node;
 
-      assert(parentNode is web.Element);
+      assert(parentNode.instanceOfString('Element'));
       if (childNode == null) return;
 
       var afterNode = after?.node;
@@ -249,7 +243,7 @@ class DomRenderObject extends RenderObject {
 
       if (afterNode == null) {
         if (parentNode!.childNodes.length == 0) {
-          parentNode.append(childNode);
+          parentNode.appendChild(childNode);
         } else {
           parentNode.insertBefore(childNode, parentNode.childNodes.item(0));
         }
@@ -266,7 +260,7 @@ class DomRenderObject extends RenderObject {
     if (kVerboseMode) {
       print("Remove child $node of ${parent?.node}");
     }
-    node?.remove();
+    node?.parentNode!.removeChild(node!);
     parent = null;
     namespace = null;
   }
@@ -276,7 +270,7 @@ class DomRenderObject extends RenderObject {
       print("Clear ${toHydrate.length} nodes not hydrated ($toHydrate)");
     }
     for (var node in toHydrate) {
-      node.remove();
+      node.parentNode!.removeChild(node);
     }
     toHydrate.clear();
   }
@@ -337,16 +331,6 @@ extension on web.Element {
       }
       setAttribute(name, value);
     }
-  }
-}
-
-extension on web.Node {
-  void remove() {
-    (switch (this) {
-      web.Element() => remove(),
-      web.CharacterData() => remove(),
-      _ => (),
-    });
   }
 }
 
