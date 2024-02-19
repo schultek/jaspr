@@ -33,6 +33,7 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
       },
       defaultsTo: 'exe',
     );
+    argParser.addFlag('wasm', abbr: 'w', negatable: false, help: 'Uses experimental dart2wasm compilation.');
   }
 
   @override
@@ -69,7 +70,15 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
       await indexHtml.create();
     }
 
-    var webResult = _buildWeb(true, useSSR);
+    var wasm = argResults!['wasm'] as bool? ?? false;
+
+    Future<int> webResult;
+    if (!wasm) {
+      webResult = _buildWeb(true, useSSR);
+    } else {
+      webResult = _buildWeb(true, useSSR);
+    }
+
     var flutterResult = Future<void>.value();
 
     if (usesFlutter) {

@@ -50,10 +50,6 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
       help: 'Serves the app in release mode.',
       negatable: false,
     );
-    argParser.addFlag(
-      'wasm',
-      negatable: false,
-    );
   }
 
   @override
@@ -79,69 +75,65 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
         "Starting jaspr in ${release ? 'release' : debug ? 'debug' : 'development'} mode...",
         progress: ProgressState.running);
 
-    var wasm = argResults!['wasm'] as bool? ?? false;
+    var workflow = await _runWebdev();
+    guardResource(() {
+      logger.write('Terminating web builder...');
+      return workflow.shutDown();
+    });
 
-    if (!wasm) {
-      var workflow = await _runWebdev();
-      guardResource(() {
-        logger.write('Terminating web builder...');
-        return workflow.shutDown();
-      });
+    logger.complete(true);
+    logger.write('Starting web builder...', progress: ProgressState.running);
 
-      logger.complete(true);
-      logger.write('Starting web builder...', progress: ProgressState.running);
+    var buildCompleter = Completer();
 
-      var buildCompleter = Completer();
+    var timer = Timer(Duration(seconds: 20), () {
+      if (!buildCompleter.isCompleted) {
+        logger.write('Building web assets... (This takes longer for the initial build)',
+            progress: ProgressState.running);
+      }
+    });
 
-      var timer = Timer(Duration(seconds: 20), () {
+    workflow.serverManager.servers.first.buildResults.listen((event) {
+      if (event.status == BuildStatus.succeeded) {
         if (!buildCompleter.isCompleted) {
-          logger.write('Building web assets... (This takes longer for the initial build)',
-              progress: ProgressState.running);
+          buildCompleter.complete();
+        } else {
+          logger.write('Rebuilt web assets.', progress: ProgressState.completed);
         }
-      });
-
-      workflow.serverManager.servers.first.buildResults.listen((event) {
-        if (event.status == BuildStatus.succeeded) {
-          if (!buildCompleter.isCompleted) {
-            buildCompleter.complete();
-          } else {
-            logger.write('Rebuilt web assets.', progress: ProgressState.completed);
-          }
-        } else if (event.status == BuildStatus.failed) {
-          logger.write('Failed building web assets. There is probably more output above.',
-              level: Level.error, progress: ProgressState.completed);
-        } else if (event.status == BuildStatus.started) {
-          if (buildCompleter.isCompleted) {
-            logger.write('Rebuilding web assets...', progress: ProgressState.running);
-          } else {
-            logger.write('Building web assets...', progress: ProgressState.running);
-          }
+      } else if (event.status == BuildStatus.failed) {
+        logger.write('Failed building web assets. There is probably more output above.',
+            level: Level.error, progress: ProgressState.completed);
+      } else if (event.status == BuildStatus.started) {
+        if (buildCompleter.isCompleted) {
+          logger.write('Rebuilding web assets...', progress: ProgressState.running);
+        } else {
+          logger.write('Building web assets...', progress: ProgressState.running);
         }
+      }
+    });
+
+    await buildCompleter.future;
+    timer.cancel();
+
+    logger.write('Done building web assets.', progress: ProgressState.completed);
+
+    if (!useSSR) {
+      logger.write('Serving `web` on http://localhost:$port');
+    }
+
+    if (usesFlutter) {
+      var flutterProcess = await serveFlutter();
+
+      workflow.serverManager.servers.first.buildResults
+          .where((event) => event.status == BuildStatus.succeeded)
+          .listen((event) {
+        // trigger reload
+        flutterProcess.stdin.writeln('r');
       });
+    }
 
-      await buildCompleter.future;
-      timer.cancel();
-
-      logger.write('Done building web assets.', progress: ProgressState.completed);
-
-      if (!useSSR) {
-        logger.write('Serving `web` on http://localhost:$port');
-      }
-
-      if (usesFlutter) {
-        var flutterProcess = await serveFlutter();
-
-        workflow.serverManager.servers.first.buildResults
-            .where((event) => event.status == BuildStatus.succeeded)
-            .listen((event) {
-          // trigger reload
-          flutterProcess.stdin.writeln('r');
-        });
-      }
-
-      if (!useSSR) {
-        await workflow.done;
-      }
+    if (!useSSR) {
+      await workflow.done;
     }
 
     if (!useSSR) {

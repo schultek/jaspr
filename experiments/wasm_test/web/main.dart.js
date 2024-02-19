@@ -2,7 +2,7 @@
     let dart2wasm_runtime;
     let moduleInstance;
     try {
-        const dartModulePromise = WebAssembly.compileStreaming(fetch('main.wasm'));
+        const dartModulePromise = WebAssembly.compileStreaming(fetch('./main.wasm'));
         const imports = {};
         dart2wasm_runtime = await import('./main.mjs');
         moduleInstance = await dart2wasm_runtime.instantiate(dartModulePromise, imports);
