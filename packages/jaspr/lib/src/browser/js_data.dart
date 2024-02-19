@@ -17,10 +17,6 @@ class JasprConfig {
   Map<String, dynamic>? get sync {
     return decodeConfig(_config?.sync);
   }
-
-  List<ComponentConfig>? get comp {
-    return _config?.comps?.map((c) => ComponentConfig._(c)).toList();
-  }
 }
 
 class ComponentConfig {
