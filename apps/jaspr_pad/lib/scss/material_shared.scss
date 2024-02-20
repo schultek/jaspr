@@ -1,0 +1,20 @@
+// Styles shared between all editors that use material components mixins.
+//
+// This file must be imported after material-components-web to avoid overwriting
+// the color theme. For example:
+//
+// @import "package:mdc_web/material-components-web";
+// @import 'package:jaspr_pad/scss/material_shared';
+
+@import "package:mdc_web/material-components-web";
+
+// Small icon buttons
+.mdc-button-small {
+  @include mdc-icon-button-size(14px);
+  font-size: 14px !important;
+  margin: -2px 0 0 12px
+}
+
+.mdc-button-footer {
+  height: 24px;
+}
