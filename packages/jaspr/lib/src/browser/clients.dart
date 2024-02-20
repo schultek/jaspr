@@ -45,8 +45,8 @@ void _runClient(ClientBuilder builder, ConfigParams params, (Node, Node) between
   BrowserAppBinding().attachRootComponent(builder(params), attachBetween: between);
 }
 
-final _compStartRegex = RegExp(r'^\s*\$(\S+)(?:\s+data=(.*))?\s*$');
-final _compEndRegex = RegExp(r'^\s*/\$(\S+)\s*$');
+final _compStartRegex = RegExp(r'^\$(\S+)(?:\s+data=(.*))?$');
+final _compEndRegex = RegExp(r'^/\$(\S+)$');
 
 void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
   var iterator = NodeIterator(document, NodeFilter.SHOW_COMMENT);

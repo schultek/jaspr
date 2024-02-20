@@ -13,7 +13,7 @@ class DocumentAdapter extends RenderAdapter {
       root.children.insertAfter(
         html = root.createChildRenderObject()
           ..tag = 'html'
-          ..children.insertRangeAfter(range),
+          ..children.insertNodeAfter(range),
       );
     }
 
@@ -25,7 +25,7 @@ class DocumentAdapter extends RenderAdapter {
       html.children.insertAfter(html.createChildRenderObject()..tag = 'head');
       html.children.insertBefore(html.createChildRenderObject()
         ..tag = 'body'
-        ..children.insertRangeAfter(range));
+        ..children.insertNodeAfter(range));
     } else if (body != null && head == null) {
       html.children.insertAfter(html.createChildRenderObject()..tag = 'head');
     } else if (body == null && head != null) {
@@ -34,8 +34,8 @@ class DocumentAdapter extends RenderAdapter {
 
       var body = html.createChildRenderObject()..tag = 'body';
       body.children
-        ..insertRangeAfter(rangeAfter)
-        ..insertRangeAfter(rangeBefore);
+        ..insertNodeAfter(rangeAfter)
+        ..insertNodeAfter(rangeBefore);
       html.children.insertAfter(body, after: head.node);
     }
 

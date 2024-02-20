@@ -17,12 +17,38 @@ abstract class RenderObject {
 
   void skipChildren();
 
-  void attach(covariant RenderObject? parent, covariant RenderObject? after);
+  void attach(covariant RenderObject child, {covariant RenderObject? after});
 
   void remove();
 }
 
+abstract class MultiChildRenderObjectElement extends MultiChildElement with RenderObjectElement {
+  MultiChildRenderObjectElement(super.component);
+
+  @override
+  void update(covariant Component newComponent) {
+    super.update(newComponent);
+    _dirty = true;
+    rebuild();
+  }
+}
+
+abstract class SingleChildRenderObjectElement extends SingleChildElement with RenderObjectElement {
+  SingleChildRenderObjectElement(super.component);
+
+  @override
+  void update(covariant Component newComponent) {
+    super.update(newComponent);
+    _dirty = true;
+    rebuild();
+  }
+}
+
 mixin RenderObjectElement on Element {
+  RenderObject createRenderObject() {
+    return _parentRenderObjectElement!.renderObject.createChildRenderObject();
+  }
+
   void updateRenderObject();
 
   RenderObject get renderObject => _renderObject!;
@@ -31,7 +57,7 @@ mixin RenderObjectElement on Element {
   @override
   void _firstBuild([VoidCallback? onBuilt]) {
     if (_renderObject == null) {
-      _renderObject = _parentRenderObjectElement!.renderObject.createChildRenderObject();
+      _renderObject = createRenderObject();
       updateRenderObject();
     }
     super._firstBuild(() {
@@ -47,12 +73,15 @@ mixin RenderObjectElement on Element {
   }
 
   void attachRenderObject() {
-    Element? prevElem = _prevAncestorSibling;
-    while (prevElem != null && prevElem._lastRenderObjectElement == null) {
-      prevElem = prevElem._prevAncestorSibling;
+    var parent = _parentRenderObjectElement?.renderObject;
+    if (parent != null) {
+      Element? prevElem = _prevAncestorSibling;
+      while (prevElem != null && prevElem._lastRenderObjectElement == null) {
+        prevElem = prevElem._prevAncestorSibling;
+      }
+      var after = prevElem?._lastRenderObjectElement;
+      parent.attach(renderObject, after: after?.renderObject);
     }
-    var after = prevElem?._lastRenderObjectElement;
-    renderObject.attach(_parentRenderObjectElement?.renderObject, after?.renderObject);
   }
 
   void detachRenderObject() {

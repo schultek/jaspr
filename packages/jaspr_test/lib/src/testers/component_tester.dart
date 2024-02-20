@@ -179,18 +179,15 @@ class TestRenderObject extends RenderObject {
   }
 
   @override
-  void attach(TestRenderObject? parent, TestRenderObject? after) {
-    this.parent = parent;
-    if (parent == null) {
-      return;
-    }
-    var children = parent.children;
-    children.remove(this);
+  void attach(TestRenderObject child, {TestRenderObject? after}) {
+    child.parent = this;
+
+    children.remove(child);
     if (after == null) {
-      children.insert(0, this);
+      children.insert(0, child);
     } else {
       var index = children.indexOf(after);
-      children.insert(index + 1, this);
+      children.insert(index + 1, child);
     }
   }
 

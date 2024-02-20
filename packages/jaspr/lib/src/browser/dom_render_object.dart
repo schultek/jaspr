@@ -212,22 +212,18 @@ class DomRenderObject extends RenderObject {
   }
 
   @override
-  void attach(DomRenderObject? parent, DomRenderObject? after) {
+  void attach(DomRenderObject child, {DomRenderObject? after}) {
     try {
-      this.parent = parent;
-      namespace = parent?.namespace;
-      if (parent == null) return;
+      child.parent = this;
+      child.namespace = namespace;
 
-      var parentNode = parent.node;
-      var childNode = node;
+      var parentNode = node;
+      var childNode = child.node;
 
       assert(parentNode is html.Element);
       if (childNode == null) return;
 
       var afterNode = after?.node;
-      if (afterNode == null && parent is RootDomRenderObject) {
-        afterNode = parent.beforeStart;
-      }
 
       if (childNode.previousNode == afterNode && childNode.parentNode == parentNode) {
         return;
@@ -238,16 +234,12 @@ class DomRenderObject extends RenderObject {
       }
 
       if (afterNode == null) {
-        if (parentNode!.childNodes.isEmpty) {
-          parentNode.append(childNode);
-        } else {
-          parentNode.insertBefore(childNode, parentNode.childNodes.first);
-        }
+        parentNode!.insertBefore(childNode, parentNode.childNodes.firstOrNull);
       } else {
         parentNode!.insertBefore(childNode, afterNode.nextNode);
       }
     } finally {
-      _finalize();
+      child.finalize();
     }
   }
 
@@ -261,7 +253,7 @@ class DomRenderObject extends RenderObject {
     namespace = null;
   }
 
-  void _finalize() {
+  void finalize() {
     if (kVerboseMode && toHydrate.isNotEmpty) {
       print("Clear ${toHydrate.length} nodes not hydrated ($toHydrate)");
     }
@@ -290,6 +282,11 @@ class RootDomRenderObject extends DomRenderObject {
       curr = curr.nextNode;
     }
     return RootDomRenderObject(start.parentNode!, nodes);
+  }
+
+  @override
+  void attach(covariant DomRenderObject child, {covariant DomRenderObject? after}) {
+    super.attach(child, after: after?.node != null ? after : (DomRenderObject()..node = beforeStart));
   }
 }
 

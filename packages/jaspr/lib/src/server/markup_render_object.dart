@@ -46,11 +46,9 @@ class MarkupRenderObject extends RenderObject {
   }
 
   @override
-  void attach(MarkupRenderObject? parent, MarkupRenderObject? after) {
-    if (parent == null) return;
-
-    this.parent = parent;
-    parent.children.insertAfter(this, after: after);
+  void attach(MarkupRenderObject child, {MarkupRenderObject? after}) {
+    child.parent = this;
+    children.insertAfter(child, after: after);
   }
 
   @override

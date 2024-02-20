@@ -834,6 +834,7 @@ abstract class Element implements BuildContext {
 
   /// The direct previous sibling element.
   Element? _prevSibling;
+  Element? get prevSibling => _prevSibling;
 
   /// The direct or indirect previous sibling element.
   ///
