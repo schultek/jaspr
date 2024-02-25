@@ -1,9 +1,9 @@
-import 'package:web/web.dart' if (dart.library.ffi) 'events_vm.dart';
+import 'package:web/web.dart' if (dart.library.io) 'events_vm.dart';
 
 import '../../components/html/html.dart';
 import '../basic_types.dart';
 
-export 'package:web/web.dart' if (dart.library.ffi) 'events_vm.dart' show Event;
+export 'package:web/web.dart' if (dart.library.io) 'events_vm.dart' show Event;
 
 typedef EventCallback = void Function(Event event);
 typedef EventCallbacks = Map<String, EventCallback>;
