@@ -33,7 +33,12 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
       },
       defaultsTo: 'exe',
     );
-    argParser.addFlag('wasm', abbr: 'w', negatable: false, help: 'Uses experimental dart2wasm compilation.');
+    argParser.addFlag(
+      'wasm',
+      abbr: 'w',
+      negatable: false,
+      help: 'Uses experimental dart2wasm compilation.',
+    );
   }
 
   @override
@@ -71,13 +76,12 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
     }
 
     var wasm = argResults!['wasm'] as bool? ?? false;
-
-    Future<int> webResult;
-    if (!wasm) {
-      webResult = _buildWeb(true, useSSR);
-    } else {
-      webResult = _buildWeb(true, useSSR);
+    if (wasm && !usesJasprWebCompilers) {
+      logger.write("Compiling to wasm is only supported when using 'jaspr_web_compilers'.", level: Level.critical);
+      await shutdown(1);
     }
+
+    Future<int> webResult = _buildWeb(true, useSSR, wasm);
 
     var flutterResult = Future<void>.value();
 
@@ -135,15 +139,18 @@ class BuildCommand extends BaseCommand with SsrHelper, FlutterHelper {
     return ExitCode.success.code;
   }
 
-  Future<int> _buildWeb(bool release, bool useSSR) async {
+  Future<int> _buildWeb(bool release, bool useSSR, bool wasm) async {
     logger.write('Building web assets...', progress: ProgressState.running);
+    var entrypointArgsPath = '${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint';
+
     var client = await d.connectClient(
       Directory.current.path,
       [
         '--release',
         '--verbose',
         '--delete-conflicting-outputs',
-        '--define=${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
+        '--define=$entrypointArgsPath=dart2${wasm ? 'wasm' : 'js'}_args=["-Djaspr.flags.release=true"]',
+        if (wasm) '--define=$entrypointArgsPath=compiler=dart2wasm',
       ],
       logger.writeServerLog,
     );
