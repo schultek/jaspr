@@ -29,5 +29,6 @@ jobs:
           dart pub global activate melos
           dart pub global activate jaspr_cli
           gcloud auth configure-docker
+          jaspr --disable-analytics
           melos deploy:jasprpad
 
