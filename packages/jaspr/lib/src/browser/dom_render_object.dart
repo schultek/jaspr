@@ -282,7 +282,7 @@ class RootDomRenderObject extends DomRenderObject {
 
   RootDomRenderObject(this.container, [List<web.Node>? nodes]) {
     node = container;
-    toHydrate = nodes ?? container.childNodes.toIterable().toList();
+    toHydrate = [...nodes ?? container.childNodes.toIterable()];
     beforeStart = toHydrate.firstOrNull?.previousSibling;
   }
 

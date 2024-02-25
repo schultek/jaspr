@@ -1,0 +1,339 @@
+// Adapted from Polymer's iron-flex-layout :
+// https://github.com/PolymerElements/iron-flex-layout/blob/master/iron-flex-layout.js
+
+@mixin layout() {
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+};
+
+@mixin layout-inline() {
+  display: -ms-inline-flexbox;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+};
+
+@mixin layout-horizontal() {
+  @include layout();
+
+  -ms-flex-direction: row;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+};
+
+@mixin layout-horizontal-reverse() {
+  @include layout();
+
+  -ms-flex-direction: row-reverse;
+  -webkit-flex-direction: row-reverse;
+  flex-direction: row-reverse;
+};
+@mixin layout-vertical() {
+  @include layout();
+
+  -ms-flex-direction: column;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+};
+
+@mixin layout-vertical-reverse() {
+  @include layout();
+
+  -ms-flex-direction: column-reverse;
+  -webkit-flex-direction: column-reverse;
+  flex-direction: column-reverse;
+};
+
+@mixin layout-wrap() {
+  -ms-flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+};
+
+@mixin layout-wrap-reverse() {
+  -ms-flex-wrap: wrap-reverse;
+  -webkit-flex-wrap: wrap-reverse;
+  flex-wrap: wrap-reverse;
+};
+
+@mixin layout-flex-auto() {
+  -ms-flex: 1 1 auto;
+  -webkit-flex: 1 1 auto;
+  flex: 1 1 auto;
+};
+
+@mixin layout-flex-none() {
+  -ms-flex: none;
+  -webkit-flex: none;
+  flex: none;
+};
+
+@mixin layout-flex() {
+  -ms-flex: 1 1 0.000000001px;
+  -webkit-flex: 1;
+  flex: 1;
+  -webkit-flex-basis: 0.000000001px;
+  flex-basis: 0.000000001px;
+};
+
+@mixin layout-flex-2() {
+  -ms-flex: 2;
+  -webkit-flex: 2;
+  flex: 2;
+};
+
+@mixin layout-flex-3() {
+  -ms-flex: 3;
+  -webkit-flex: 3;
+  flex: 3;
+};
+
+@mixin layout-flex-4() {
+  -ms-flex: 4;
+  -webkit-flex: 4;
+  flex: 4;
+};
+
+@mixin layout-flex-5() {
+  -ms-flex: 5;
+  -webkit-flex: 5;
+  flex: 5;
+};
+
+@mixin layout-flex-6() {
+  -ms-flex: 6;
+  -webkit-flex: 6;
+  flex: 6;
+};
+
+@mixin layout-flex-7() {
+  -ms-flex: 7;
+  -webkit-flex: 7;
+  flex: 7;
+};
+
+@mixin layout-flex-8() {
+  -ms-flex: 8;
+  -webkit-flex: 8;
+  flex: 8;
+};
+
+@mixin layout-flex-9() {
+  -ms-flex: 9;
+  -webkit-flex: 9;
+  flex: 9;
+};
+
+@mixin layout-flex-10() {
+  -ms-flex: 10;
+  -webkit-flex: 10;
+  flex: 10;
+};
+
+@mixin layout-flex-11() {
+  -ms-flex: 11;
+  -webkit-flex: 11;
+  flex: 11;
+};
+
+@mixin layout-flex-12() {
+  -ms-flex: 12;
+  -webkit-flex: 12;
+  flex: 12;
+};
+
+// alignment in cross axis
+
+@mixin layout-start() {
+  -ms-flex-align: start;
+  -webkit-align-items: flex-start;
+  align-items: flex-start;
+};
+
+@mixin layout-center() {
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+};
+
+@mixin layout-end() {
+  -ms-flex-align: end;
+  -webkit-align-items: flex-end;
+  align-items: flex-end;
+};
+
+@mixin layout-baseline() {
+  -ms-flex-align: baseline;
+  -webkit-align-items: baseline;
+  align-items: baseline;
+};
+
+// alignment in main axis
+
+@mixin layout-start-justified() {
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
+};
+
+@mixin layout-center-justified() {
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+};
+
+@mixin layout-end-justified() {
+  -ms-flex-pack: end;
+  -webkit-justify-content: flex-end;
+  justify-content: flex-end;
+};
+
+@mixin layout-around-justified() {
+  -ms-flex-pack: distribute;
+  -webkit-justify-content: space-around;
+  justify-content: space-around;
+};
+
+@mixin layout-justified() {
+  -ms-flex-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+};
+
+@mixin layout-center-center() {
+  @include layout-center();
+  @include layout-center-justified();
+};
+
+// self alignment
+
+@mixin layout-self-start() {
+  -ms-align-self: flex-start;
+  -webkit-align-self: flex-start;
+  align-self: flex-start;
+};
+
+@mixin layout-self-center() {
+  -ms-align-self: center;
+  -webkit-align-self: center;
+  align-self: center;
+};
+
+@mixin layout-self-end() {
+  -ms-align-self: flex-end;
+  -webkit-align-self: flex-end;
+  align-self: flex-end;
+};
+
+@mixin layout-self-stretch() {
+  -ms-align-self: stretch;
+  -webkit-align-self: stretch;
+  align-self: stretch;
+};
+
+@mixin layout-self-baseline() {
+  -ms-align-self: baseline;
+  -webkit-align-self: baseline;
+  align-self: baseline;
+};
+
+// multi-line alignment in main axis
+
+@mixin layout-start-aligned() {
+  -ms-flex-line-pack: start; // IE10
+  -ms-align-content: flex-start;
+  -webkit-align-content: flex-start;
+  align-content: flex-start;
+};
+
+@mixin layout-end-aligned() {
+  -ms-flex-line-pack: end; // IE10
+  -ms-align-content: flex-end;
+  -webkit-align-content: flex-end;
+  align-content: flex-end;
+};
+
+@mixin layout-center-aligned() {
+  -ms-flex-line-pack: center; // IE10
+  -ms-align-content: center;
+  -webkit-align-content: center;
+  align-content: center;
+};
+
+@mixin layout-between-aligned() {
+  -ms-flex-line-pack: justify; // IE10
+  -ms-align-content: space-between;
+  -webkit-align-content: space-between;
+  align-content: space-between;
+};
+
+@mixin layout-around-aligned() {
+  -ms-flex-line-pack: distribute; // IE10
+  -ms-align-content: space-around;
+  -webkit-align-content: space-around;
+  align-content: space-around;
+};
+
+//////////////////////////////////
+//         Other Layout
+//////////////////////////////////
+
+@mixin layout-block() {
+  display: block;
+};
+
+@mixin layout-invisible() {
+  visibility: hidden !important;
+};
+
+@mixin layout-relative() {
+  position: relative;
+};
+
+@mixin layout-fit() {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+};
+
+@mixin layout-scroll() {
+  -webkit-overflow-scrolling: touch;
+  overflow: auto;
+};
+
+@mixin layout-fullbleed() {
+  margin: 0;
+  height: 100vh;
+};
+
+// fixed position
+
+@mixin layout-fixed-top() {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+};
+
+@mixin layout-fixed-right() {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+};
+
+@mixin layout-fixed-bottom() {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+};
+
+@mixin layout-fixed-left() {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+};

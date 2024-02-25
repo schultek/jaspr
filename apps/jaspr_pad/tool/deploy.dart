@@ -3,7 +3,7 @@ import 'dart:io';
 void main() async {
   var service = 'jasprpad';
 
-  await run('docker build -t $service -f apps/jaspr_pad/Dockerfile .');
+  await run('docker build --platform linux/amd64 -t $service -f apps/jaspr_pad/Dockerfile .');
   await run('docker tag $service gcr.io/jaspr-demo/$service');
   await run('docker push gcr.io/jaspr-demo/$service');
   await run('gcloud run deploy $service --image=gcr.io/jaspr-demo/$service '
