@@ -1,0 +1,445 @@
+@import 'package:jaspr_pad/scss/colors';
+@import 'package:jaspr_pad/scss/layout';
+@import 'package:jaspr_pad/scss/shared';
+@import 'package:jaspr_pad/scss/variables';
+
+// Material Design Web theme colors. Must be imported before importing
+// material-components-web.scss.
+$mdc-theme-primary: #168afd;
+$mdc-theme-on-primary: #0e161f;
+$mdc-theme-secondary: #676767;
+$mdc-theme-background: $playground-header-background-color;
+$mdc-theme-surface: $playground-header-background-color;
+$mdc-theme-error: $dark-red;
+
+@import 'package:mdc_web/material-components-web';
+@import 'shared';
+
+h1 { font-size: 2em; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1.17em; }
+h3 { font-size: 1em; }
+h4 { font-size: 1em; }
+h5 { font-size: 0.83em; }
+h6 { font-size: 0.75em; }
+
+header {
+  background-color: $playground-header-background-color;
+  height: 48px;
+  padding-left: 24px;
+  @include layout-center;
+  z-index: 4;
+  user-select: none;
+
+  .header-title {
+    @include layout;
+    @include layout-center;
+    font-family: $google-sans;
+    font-weight: 400;
+    font-size: 16pt;
+    margin-right: 8px;
+
+    img.logo {
+      height: 24px;
+      width: 24px;
+      margin-right: 8px;
+    }
+  }
+
+  button.mdc-button {
+    @include mdc-button-ink-color($button-text-color);
+    text-transform: none !important;
+    letter-spacing: normal;
+  }
+
+  #workshop-name {
+    @include layout-flex;
+    @include layout-horizontal;
+    @include layout-center-justified;
+    font-size: 14pt;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-left: 1em;
+    margin-right: 1em;
+    user-select: none;
+  }
+}
+
+body {
+  background-color: $playground-background-color;
+  color: $playground-text-color;
+  font-family: $normal-font;
+  font-size: 14px;
+  overflow: hidden;
+  @include layout-vertical;
+  @include layout-fit;
+}
+
+// Main section
+section.main-section {
+  @include layout-flex;
+  @include layout;
+  @include layout-relative;
+
+  .panels {
+    @include layout;
+    @include layout-fit;
+  }
+}
+
+// Panels
+#right-panel {
+  @include layout-vertical();
+
+  // Constrain the width of #console-panel
+  width: 0;
+}
+
+#editor-panel, #output-panel {
+  @include layout-flex;
+}
+
+// Steps panel
+#steps-row {
+  @include layout-horizontal();
+  @include layout-center();
+  @include layout-relative();
+  width: 100%;
+}
+
+#show-solution-btn {
+  margin: 8px;
+}
+
+#steps-panel {
+  @include layout-vertical();
+  @include layout-center();
+  min-width: 500px;
+}
+
+#markdown-content {
+  @include layout-flex();
+  width: 100%;
+  overflow-y: auto;
+
+  > * {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  // Add a border
+  table, th, td {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: 1px solid $workshop-table-border-color;
+  }
+
+  table {
+    font-size: 16px;
+    thead {
+      display: table-header-group;
+      vertical-align: middle;
+    }
+    
+    td, th {
+      padding: 6px 14px
+    }
+    
+    tr {
+      background-color: $workshop-table-bg-color;
+      &:nth-child(2n) {
+        background-color: lighten($workshop-table-bg-color, 3%);
+      }
+    }
+  }
+
+  code {
+    background-color: $workshop-code-bg-color;
+    border-radius: 4px;
+  }
+
+  // Inline <code> elements, not code blocks.
+  code:not(pre code) {
+    background-color: $workshop-code-bg-color;
+    color: opacify($dark-blue, 0.75);
+    padding: 4px 6px 4px 6px;
+    border-radius: 4px;
+  }
+
+  p {
+    font-size: 16px;
+    color: $dark-editor-text;
+    line-height: 28px;
+  }
+
+  img {
+    width: 100%;
+  }
+
+  blockquote {
+    margin: 0 30px 0 30px;
+    padding: 0 16px 0 10px;
+    border-left-width: 5px;
+    border-left-style: solid;
+    background: $workshop-blockquote-bg-color;
+    border-color: $workshop-blockquote-border-color;
+  }
+
+  ol li,
+  ul li {
+    padding: 4px 0;
+  }
+  ol li code,
+  ul li code {
+      line-height: 20px;
+  }
+}
+
+#step-button-container {
+  @include layout-horizontal();
+  @include layout-center();
+  @include layout-flex();
+  @include layout-center-justified();
+}
+
+#steps-label {
+  padding: 12px;
+}
+
+#next-step-btn, #previous-step-btn {
+  @include mdc-icon-button-size(32px, 32px);
+}
+
+// Editor panel
+#editor-panel {
+  @include layout-vertical;
+  @include layout-relative;
+}
+
+#editor-host {
+  @include layout-flex;
+  @include layout-relative;
+  margin: 8px 0 0 0;
+  padding: 0 8px;
+
+  .CodeMirror {
+    @include layout-fit;
+    height: 100%;
+    font-family: $editor-font;
+    font-size: $playground-editor-font-size;
+  }
+}
+
+.button-group {
+  @include layout-horizontal;
+  @include layout-center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 8px 24px 0 0;
+  z-index: 5;
+}
+
+// Tabs
+.mdc-tab {
+  @include mdc-tab-text-label-color($dark-tab-color);
+  @include mdc-tab-active-text-label-color($dark-tab-color-active);
+  @include mdc-tab-indicator-underline-color($dark-tab-color-active);
+}
+
+// Console panel
+#output-panel {
+  @include layout-vertical();
+}
+
+#output-panel-content {
+  @include layout-flex();
+  overflow-y: scroll;
+}
+
+.console {
+  @include layout-flex;
+  font-family: $editor-font;
+  font-size: 14px;
+  line-height: 20px;
+  min-height: 50px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  padding: $doc-console-padding;
+
+  .normal {
+    color: $dark-editor-text;
+  }
+
+  .error-output {
+    color: $dark-pink;
+  }
+}
+
+// iframe element
+
+iframe {
+  @include layout-flex;
+  border: none;
+}
+
+// Links
+a {
+  color: $playground-link-color;
+  fill: $playground-text-color;
+
+  &:visited {
+    color: $playground-link-color;
+    fill: $playground-link-color;
+  }
+
+  &:hover {
+    color: $playground-text-color;
+    fill: $playground-text-color;
+  }
+}
+
+// Footer
+body>footer {
+  background-color: $playground-footer-background-color;
+  @include layout-horizontal;
+  @include layout-center;
+  padding: 8px 24px;
+  .flex {
+    @include layout-flex;
+  }
+
+  .footer-item {
+    margin-right: 14px;
+  }
+
+  * {
+    margin-right: 4px;
+  }
+}
+
+// Issues
+#issues {
+  background-color: $dark-issues-background-color;
+  border: 8px solid $dark-issues-background-color;
+}
+
+.issue .issuelabel {
+  color: $dark-issue-label-color;
+}
+
+.issue:hover {
+  background-color: darken($dark-issues-background-color, 3%);
+}
+
+.issue .message {
+  color: $dark-issue-label-color;
+}
+
+#issues-toggle, .issue-anchor {
+  color: $mdc-theme-primary;
+  margin-right: 0;
+  &:visited {
+    color: $mdc-theme-primary;
+  }
+
+  &:hover {
+    color: darken($mdc-theme-primary, 12%);
+  }
+}
+
+button#show-solution-btn {
+  @include mdc-button-ink-color(#0e161f);
+  color: #442C2E;
+}
+
+// Splitter
+.gutter {
+  background-color: $dark-gutter-background-color;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.gutter.gutter-horizontal {
+  background-repeat: repeat-y;
+  cursor: col-resize;
+  height: 100%;
+}
+
+.gutter.gutter-vertical {
+  background-repeat: repeat-x;
+  cursor: row-resize;
+  width: 100%;
+}
+
+.border-top {
+  border-top: 6px solid $dark-gutter-background-color !important;
+}
+
+#editor-panel-close-button {
+  @include mdc-icon-button-size(16px, 16px, 8px);
+}
+
+// Scrollbars
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: $dark-scrollbar-color;
+}
+
+.custom-scrollbar::-webkit-scrollbar-corner { background: transparent; }
+
+// Steps menu popup
+#steps-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+#steps-label {
+  user-select: none;
+}
+
+#steps-menu-items {
+  display: none;
+  position: absolute;
+  background-color: $playground-background-color;
+  color: $playground-text-color;
+  font-family: $normal-font;
+  text-align: center;
+  font-size: 14px;
+  outline: 1px solid $dark-gutter-background-color;
+  box-shadow: 0px 8px 8px 0px rgba(0,0,0,0.4);
+  z-index: 1;
+}
+
+#steps-menu-items a {
+  color: $playground-text-color;
+  padding: 10px 12px;
+  text-decoration: none;
+  display: block;
+  user-select: none;
+}
+
+#steps-menu-items a:hover {
+  background-color: $playground-footer-background-color;
+}
+
+#steps-container:hover #steps-menu-items {
+  display: block;
+  bottom:100%;
+}
+
+// search dialog different position on workshop
+div#search-dialog {
+  position: absolute;
+  top: 0px !important;
+  right: 114px !important;
+}
+
+#revert-button, #redo-button, #show-solution-icon-button {
+  width: 48px;
+  height: 32px;
+  margin-top: -16px;
+  --mdc-ripple-top: 10px !important;
+}

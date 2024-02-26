@@ -24,12 +24,15 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
 
     if (kIsWeb) {
       Future.microtask(() {
-        runFlutterApp(attachTo: '#flutter_target').then((_) {
-          flt.runApp(flt.StatefulBuilder(builder: (context, setState) {
-            rebuildFlutterApp = () => setState(() {});
-            return component.app;
-          }));
-        });
+        runFlutterApp(
+          attachTo: '#flutter_target',
+          runApp: () {
+            flt.runApp(flt.StatefulBuilder(builder: (context, setState) {
+              rebuildFlutterApp = () => setState(() {});
+              return component.app;
+            }));
+          },
+        );
       });
     }
   }

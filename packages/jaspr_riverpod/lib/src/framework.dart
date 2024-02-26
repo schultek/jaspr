@@ -329,7 +329,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
 
     Future.microtask(() async {
       while (owner.isFirstBuild) {
-        await Future.microtask(() {});
+        await Future(() {});
       }
       if (_mounted) markNeedsBuild();
     });

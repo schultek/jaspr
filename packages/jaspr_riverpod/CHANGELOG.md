@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed bug with .autoDispose providers.
+
 ## 0.3.9
 
 - `jaspr` upgraded to `0.10.0`

@@ -18,7 +18,7 @@ class MenuItem extends StatelessComponent {
       [
         img(
           classes: 'mdc-list-item__graphic',
-          src: 'https://dartpad.dev/pictures/logo_dart.png',
+          src: './pictures/logo_dart.png',
         ),
         span(
           classes: 'mdc-list-item__text',

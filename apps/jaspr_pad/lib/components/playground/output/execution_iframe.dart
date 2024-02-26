@@ -19,7 +19,7 @@ class ExecutionIFrame extends StatelessComponent {
       },
       child: iframe(
         id: 'frame',
-        src: 'https://dartpad.dev/scripts/frame_dark.html',
+        src: './scripts/frame_dark.html',
         sandbox: 'allow-scripts allow-popups',
         attributes: {
           'flex': '',

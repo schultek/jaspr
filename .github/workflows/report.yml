@@ -26,6 +26,7 @@ jobs:
           dart pub global activate melos
           dart pub global activate -s git https://github.com/schultek/semantic_changelog
           melos bootstrap --no-private
+          jaspr --disable-analytics
 
       - name: Bump Package Versions
         id: bump
