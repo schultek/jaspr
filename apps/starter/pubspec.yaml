@@ -8,6 +8,9 @@ environment:
 dependencies:
   jaspr: ^0.10.0
   jaspr_router: ^0.3.1
+  flutter:
+    sdk: flutter
+  jaspr_flutter_embed: any
 
 dev_dependencies:
   build_runner: ^2.4.0

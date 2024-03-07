@@ -1,11 +1,8 @@
 import 'package:jaspr/jaspr.dart';
 
 import 'app.dart';
-import 'components/counter.dart';
-import 'components/header.dart';
 
 const primaryColor = Color.hex('#01589B');
-const secondaryColor = Color.hex('#41C3FE');
 
 /// The main styles for this app.
 List<StyleRule> get styles => [
@@ -16,6 +13,4 @@ List<StyleRule> get styles => [
           .box(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
       css('h1').text(fontSize: 4.rem).box(margin: EdgeInsets.unset),
       ...App.styles,
-      ...Header.styles,
-      ...Counter.styles,
     ];

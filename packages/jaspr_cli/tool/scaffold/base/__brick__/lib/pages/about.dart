@@ -32,9 +32,9 @@ class About extends StatelessComponent {
         ]),
       ]),
     ]);
-  }
+  }{{#server}}
 
   static get styles => [
-        css('ol').box(maxWidth: 400.px),
-      ];
+        css('ol').box(maxWidth: 500.px),
+      ];{{/server}}
 }

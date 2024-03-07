@@ -6,9 +6,9 @@ class Counter extends StatefulComponent {
   const Counter({super.key});
 
   @override
-  State<Counter> createState() => _CounterState();
+  State<Counter> createState() => _CounterState();{{#server}}
 
-  static get styles => _CounterState.styles;
+  static get styles => _CounterState.styles;{{/server}}
 }
 
 class _CounterState extends State<Counter> {
@@ -35,7 +35,7 @@ class _CounterState extends State<Counter> {
         [text('+')],
       ),
     ]);
-  }
+  }{{#server}}
 
   static get styles => [
         css('.counter', [
@@ -56,5 +56,5 @@ class _CounterState extends State<Counter> {
               .box(padding: EdgeInsets.symmetric(horizontal: 2.rem))
               .text(color: primaryColor, fontSize: 4.rem),
         ]),
-      ];
+      ];{{/server}}
 }

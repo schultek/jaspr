@@ -19,7 +19,7 @@ class Header extends StatelessComponent {
           ]),
       ]),
     ]);
-  }
+  }{{#server}}
 
   static get styles => [
         css('header', [
@@ -54,5 +54,5 @@ class Header extends StatelessComponent {
             ])
           ]),
         ]),
-      ];
+      ];{{/server}}
 }

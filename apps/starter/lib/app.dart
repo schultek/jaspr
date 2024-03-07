@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_router/jaspr_router.dart';
 
+import 'components/header.dart';
 import 'pages/about.dart';
 import 'pages/home.dart';
 
@@ -10,21 +10,22 @@ class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield div(classes: 'main', [
-      Router(routes: [
-        Route(path: '/', title: 'Home', builder: (context, state) => Home()),
-        Route(path: '/about', title: 'About', builder: (context, state) => About()),
-      ])
+      Home(),
+      About(),
     ]);
   }
 
   static get styles => [
         css('.main', [
-          css('&').flexbox(direction: FlexDirection.column).box(height: 100.vh),
-          css('section').flexItem(flex: Flex(grow: 1)).flexbox(
+          css('&').flexbox(direction: FlexDirection.row, wrap: FlexWrap.wrap).box(minHeight: 100.vh),
+          css('section').flexItem(flex: Flex(grow: 1, shrink: 0, basis: FlexBasis(400.px))).flexbox(
                 direction: FlexDirection.column,
                 justifyContent: JustifyContent.center,
                 alignItems: AlignItems.center,
               ),
         ]),
+        ...Header.styles,
+        ...Home.styles,
+        ...About.styles,
       ];
 }

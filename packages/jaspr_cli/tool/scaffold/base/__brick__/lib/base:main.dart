@@ -1,6 +1,6 @@
 import 'package:jaspr/server.dart';
 
-import 'components/app.dart';{{#hydration}}
+import 'app.dart';{{#hydration}}
 import 'jaspr_options.dart';{{/hydration}}
 import 'styles.dart';
 

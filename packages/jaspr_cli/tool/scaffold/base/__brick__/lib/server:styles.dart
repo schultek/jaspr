@@ -1,21 +1,16 @@
 import 'package:jaspr/jaspr.dart';
 
+import 'app.dart';
+
+const primaryColor = Color.hex('#01589B');
+
 /// The main styles for this app.
-const styles = [
-  StyleRule.import('https://fonts.googleapis.com/css?family=Roboto'),
-  StyleRule(
-    // Applies these styles to the html and body elements.
-    selector: Selector.list([Selector.tag('html'), Selector.tag('body')]),
-    styles: Styles.combine([
-      Styles.text(
-        fontFamily: FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]),
-      ),
-      Styles.box(
-        width: Unit.percent(100),
-        height: Unit.percent(100),
-        margin: EdgeInsets.zero,
-        padding: EdgeInsets.zero,
-      ),
-    ]),
-  ),
-];
+List<StyleRule> get styles => [
+      StyleRule.import('https://fonts.googleapis.com/css?family=Roboto'),
+      css('html, body')
+          .text(fontFamily: FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]))
+          .box(width: 100.percent, minHeight: 100.vh)
+          .box(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
+      css('h1').text(fontSize: 4.rem).box(margin: EdgeInsets.unset),
+      ...App.styles,
+    ];

@@ -59,7 +59,7 @@ class CreateCommand extends BaseCommand {
     var mode = getMode();
     var useHydration = mode != 'client' ? getUseHydration() : false;
     var useRouting = getUseRouting();
-    // var useMultiPageRouting = useRouting && mode != 'client' ? getUseMultiPageRouting() : false;
+    //var useMultiPageRouting = useRouting && mode != 'client' ? getUseMultiPageRouting() : false;
     var useFlutter = getUseFlutter();
     var useFlutterPlugins = useFlutter || getUseFlutterPlugins();
     var useBackend = mode == 'server' && getUseCustomBackend() ? getCustomBackend() : null;
@@ -69,6 +69,7 @@ class CreateCommand extends BaseCommand {
     var usedPrefixes = {
       if (mode == 'server' || mode == 'static') 'server',
       if (mode == 'client') 'client',
+      if (useRouting) 'routing',
       if (useHydration) 'hydration',
       if (useFlutter) 'flutter',
       useBackend ?? 'base',
@@ -94,6 +95,7 @@ class CreateCommand extends BaseCommand {
         'name': name,
         'description': description,
         'mode': mode,
+        'routing': useRouting,
         'flutter': useFlutter,
         'hydration': useHydration,
         'shelf': useBackend == 'shelf',
@@ -165,7 +167,7 @@ class CreateCommand extends BaseCommand {
 
   bool getUseMultiPageRouting() {
     return logger.logger.confirm(
-      '(Recommended) Use multi-page routing? '
+      '(Recommended) Use multi-page (server-side) routing? '
       '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',
       defaultValue: true,
     );
