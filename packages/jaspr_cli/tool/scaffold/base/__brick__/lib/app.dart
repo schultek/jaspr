@@ -30,8 +30,8 @@ class App extends StatelessComponent {
 
   static get styles => [
     css('.main', [
-      css('&').box(height: 100.vh).flexbox(direction: FlexDirection.{{#routing}}column{{/routing}}{{^routing}}row{{/routing}}),
-      css('section').flexItem(flex: Flex(grow: 1)).flexbox(
+      css('&').box(height: 100.vh).flexbox(direction: FlexDirection.{{#routing}}column{{/routing}}{{^routing}}row{{/routing}}, wrap: FlexWrap.wrap),
+      css('section').flexItem(flex: Flex(grow: 1{{^routing}}, shrink: 0, basis: FlexBasis(400.px){{/routing}})).flexbox(
         direction: FlexDirection.column,
         justifyContent: JustifyContent.center,
         alignItems: AlignItems.center,

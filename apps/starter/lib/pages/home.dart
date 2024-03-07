@@ -1,7 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
 import '../components/counter.dart';
-import '../components/embedded_counter.dart' if (dart.library.io) '../components/embedded_counter_fallback.dart';
 
 class Home extends StatelessComponent {
   @override
@@ -12,7 +11,6 @@ class Home extends StatelessComponent {
       p([text('You successfully create a new Jaspr site.')]),
       div(styles: Styles.box(height: 100.px), []),
       Counter(),
-      EmbeddedCounter(),
     ]);
   }
 

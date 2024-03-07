@@ -16,6 +16,7 @@ mixin ProxyHelper on BaseCommand {
     var client = http.Client();
     var webdevHandler = proxyHandler(Uri.parse('http://localhost:$webPort'), client: client);
     var flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
+    var allowedFlutterPaths = RegExp(r'^assets|^canvaskit|^packages|.js$|.wasm$');
 
     var cascade = Cascade().add(_sseProxyHandler(client, webPort, logger)).add((req) async {
       if (req.url.path == r'$jasprMessageHandler') {
@@ -40,7 +41,7 @@ mixin ProxyHelper on BaseCommand {
       }
 
       // Second try to load the resource from the flutter process.
-      if (flutterHandler != null && res.statusCode == 404) {
+      if (flutterHandler != null && res.statusCode == 404 && allowedFlutterPaths.hasMatch(req.url.path)) {
         res = await flutterHandler(req.change(body: body));
       }
 

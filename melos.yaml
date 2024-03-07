@@ -58,10 +58,6 @@ scripts:
     run: |
       cd packages/jaspr_cli
       dart run tool/generate_versions.dart
-  generate:cli:
-    run: |
-      melos run generate:versions
-      melos run generate:templates
   activate:cli:
     run: |
       dart pub global activate packages/jaspr_cli --source=path
