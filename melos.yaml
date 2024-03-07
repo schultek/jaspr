@@ -15,7 +15,10 @@ packages:
   - thirdparty/*
 
 scripts:
-  format: melos exec -- "dart format . --line-length=120"
+  format:
+    run: |
+      melos exec --ignore=jaspr_cli -- "dart format . --line-length=120"
+      melos exec --scope=jaspr_cli -- "dart format lib  --line-length=120"
   analyze: melos exec -- "dart analyze . --fatal-infos"
   test:
     run: |

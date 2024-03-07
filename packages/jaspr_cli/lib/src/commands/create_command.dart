@@ -74,7 +74,7 @@ class CreateCommand extends BaseCommand {
       if (useHydration) 'hydration',
       if (useFlutter) 'flutter',
       if (mode == 'client' || !useHydration) 'manual',
-      if (mode == 'server') useBackend ?? 'base',
+      if (useServer) useBackend ?? 'base',
     };
 
     var updater = PubUpdater();

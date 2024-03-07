@@ -117,7 +117,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       var serverStartedCompleter = Completer();
 
-      await startProxy('5567', '0', null, onMessage: (message) {
+      await startProxy('5567', webPort: '0', onMessage: (message) {
         if (message case {'route': String route}) {
           if (!serverStartedCompleter.isCompleted) {
             serverStartedCompleter.complete();

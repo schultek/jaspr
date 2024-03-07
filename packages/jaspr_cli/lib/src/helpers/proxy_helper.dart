@@ -11,8 +11,11 @@ import '../commands/base_command.dart';
 import '../logging.dart';
 
 mixin ProxyHelper on BaseCommand {
-  Future<HttpServer> startProxy(String port, String webPort, String? flutterPort,
-      {void Function(dynamic)? onMessage}) async {
+  Future<HttpServer> startProxy(String port,
+      {required String webPort,
+      String? flutterPort,
+      bool redirectNotFound = false,
+      void Function(dynamic)? onMessage}) async {
     var client = http.Client();
     var webdevHandler = proxyHandler(Uri.parse('http://localhost:$webPort'), client: client);
     var flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
@@ -43,6 +46,17 @@ mixin ProxyHelper on BaseCommand {
       // Second try to load the resource from the flutter process.
       if (flutterHandler != null && res.statusCode == 404 && allowedFlutterPaths.hasMatch(req.url.path)) {
         res = await flutterHandler(req.change(body: body));
+      }
+
+      if (res.statusCode == 404 && redirectNotFound) {
+        return webdevHandler(Request(
+          req.method,
+          req.requestedUri.replace(path: '/'),
+          protocolVersion: req.protocolVersion,
+          headers: req.headers,
+          body: body,
+          encoding: req.encoding,
+        ));
       }
 
       return res;

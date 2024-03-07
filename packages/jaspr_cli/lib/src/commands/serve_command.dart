@@ -91,7 +91,12 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       });
     }
 
-    await startProxy(proxyPort, webPort, config!.usesFlutter ? flutterPort : null);
+    await startProxy(
+      proxyPort,
+      webPort: webPort,
+      flutterPort: config!.usesFlutter ? flutterPort : null,
+      redirectNotFound: config!.mode == JasprMode.client,
+    );
 
     if (config!.mode == JasprMode.client) {
       logger.write('Serving at http://localhost:$proxyPort');
