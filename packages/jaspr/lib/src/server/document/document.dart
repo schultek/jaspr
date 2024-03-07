@@ -28,7 +28,6 @@ abstract class Document extends StatelessComponent {
     String? viewport,
     Map<String, String>? meta,
     List<StyleRule>? styles,
-    String? scriptName,
     List<Component> head,
     required Component body,
   }) = _BaseDocument;

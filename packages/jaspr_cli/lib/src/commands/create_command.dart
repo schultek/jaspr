@@ -57,6 +57,7 @@ class CreateCommand extends BaseCommand {
     var (dir, name) = getTargetDirectory();
 
     var mode = getMode();
+    var useServer = mode == 'server' || mode == 'static';
     var useHydration = mode != 'client' ? getUseHydration() : false;
     var useRouting = getUseRouting();
     //var useMultiPageRouting = useRouting && mode != 'client' ? getUseMultiPageRouting() : false;
@@ -67,12 +68,13 @@ class CreateCommand extends BaseCommand {
     var description = 'A new jaspr project.';
 
     var usedPrefixes = {
-      if (mode == 'server' || mode == 'static') 'server',
+      if (useServer) 'server',
       if (mode == 'client') 'client',
       if (useRouting) 'routing',
       if (useHydration) 'hydration',
       if (useFlutter) 'flutter',
-      useBackend ?? 'base',
+      if (mode == 'client' || !useHydration) 'manual',
+      if (mode == 'server') useBackend ?? 'base',
     };
 
     var updater = PubUpdater();
@@ -81,9 +83,11 @@ class CreateCommand extends BaseCommand {
 
     var [
       jasprFlutterEmbedVersion,
+      jasprRouterVersion,
       webCompilersVersion,
     ] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
+      updater.getLatestVersion('jaspr_router'),
       updater.getLatestVersion(webCompilersPackage),
     ]);
 
@@ -98,10 +102,12 @@ class CreateCommand extends BaseCommand {
         'routing': useRouting,
         'flutter': useFlutter,
         'hydration': useHydration,
+        'server': useServer,
         'shelf': useBackend == 'shelf',
         'jasprCoreVersion': jasprCoreVersion,
         'jasprBuilderVersion': jasprBuilderVersion,
         'jasprFlutterEmbedVersion': jasprFlutterEmbedVersion,
+        'jasprRouterVersion': jasprRouterVersion,
         'webCompilersPackage': webCompilersPackage,
         'webCompilersVersion': webCompilersVersion,
       },
@@ -115,8 +121,8 @@ class CreateCommand extends BaseCommand {
         tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s == '...' || s.contains('+'));
 
     logger.write('\n'
-        'Created project $name in $dir! In order to get started, run the following commands:\n\n'
-        '  cd $dir\n'
+        'Created project $name in ${dir.path}! In order to get started, run the following commands:\n\n'
+        '  cd ${dir.path}\n'
         '  jaspr serve\n');
 
     return ExitCode.success.code;
@@ -158,7 +164,7 @@ class CreateCommand extends BaseCommand {
   }
 
   bool getUseHydration() {
-    return logger.logger.confirm('(Recommended) Enable automatic interactivity on the client?', defaultValue: true);
+    return logger.logger.confirm('(Recommended) Enable automatic hydration on the client?', defaultValue: true);
   }
 
   bool getUseRouting() {

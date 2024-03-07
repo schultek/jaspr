@@ -16,29 +16,29 @@ class FlutterCounter extends StatelessComponent {
         debugShowCheckedModeBanner: false,
         home: Material(
           shape: RoundedRectangleBorder(
-            side: BorderSide(color: Color(0xFF01589B)),
+            side: const BorderSide(color: Color(0xFF01589B)),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                icon: Icon(Icons.remove),
+                icon: const Icon(Icons.remove),
                 onPressed: () {
                   onChange(count - 1);
                 },
               ),
-              SizedBox(width: 5),
+              const SizedBox(width: 5),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Flutter Counter'),
+                  const Text('Flutter Counter'),
                   Text('$count', style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
-              SizedBox(width: 5),
+              const SizedBox(width: 5),
               IconButton(
-                icon: Icon(Icons.add),
+                icon: const Icon(Icons.add),
                 onPressed: () {
                   onChange(count + 1);
                 },

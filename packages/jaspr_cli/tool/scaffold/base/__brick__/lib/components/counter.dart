@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-
-import '../styles.dart';{{#flutter}}
+{{#server}}
+import '../styles.dart';{{/server}}{{#flutter}}
 import 'flutter_counter.dart' if (dart.library.io) 'flutter_counter_fallback.dart';{{/flutter}}
 
 class Counter extends StatefulComponent {
@@ -54,7 +54,7 @@ class _CounterState extends State<Counter> {
                 .box(radius: BorderRadius.all(Radius.circular(2.em)))
                 .flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center)
                 .background(color: Colors.transparent),
-            css('&:hover').background(color: Color.hex('#0001')),
+            css('&:hover').background(color: const Color.hex('#0001')),
           ]),
           css('span') //
               .box(padding: EdgeInsets.symmetric(horizontal: 2.rem), boxSizing: BoxSizing.borderBox, minWidth: 2.5.em)

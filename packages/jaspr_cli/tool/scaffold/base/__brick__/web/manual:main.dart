@@ -2,7 +2,7 @@
 // and executed in the browser.
 
 import 'package:jaspr/jaspr.dart';
-import 'package:{{name}}/components/app.dart';
+import 'package:{{name}}/app.dart';
 
 void main() {
   // Attaches the [App] component to the <body> of the page.

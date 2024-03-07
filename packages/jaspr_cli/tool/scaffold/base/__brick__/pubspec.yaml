@@ -9,7 +9,8 @@ dependencies:{{#flutter}}
   flutter:
      sdk: flutter{{/flutter}}
   jaspr: ^{{jasprCoreVersion}}{{#flutter}}
-  jaspr_flutter_embed: ^{{jasprFlutterEmbedVersion}}{{/flutter}}{{#shelf}}
+  jaspr_flutter_embed: ^{{jasprFlutterEmbedVersion}}{{/flutter}}{{#routing}}
+  jaspr_router: ^{{jasprRouterVersion}}{{/routing}}{{#shelf}}
   shelf: ^1.4.0
   shelf_router: ^1.1.0{{/shelf}}
 

@@ -1,7 +1,7 @@
-import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_router/jaspr_router.dart';
-
-import 'components/header.dart';
+import 'package:jaspr/jaspr.dart';{{#routing}}
+import 'package:jaspr_router/jaspr_router.dart';{{/routing}}
+{{#routing}}
+import 'components/header.dart';{{/routing}}
 import 'pages/about.dart';
 import 'pages/home.dart';
 
@@ -14,17 +14,17 @@ class App extends StatelessComponent {
       Router(routes: [
         ShellRoute(
           builder: (context, state, child) => Builder(builder: (context) sync* {
-            yield Header();
+            yield const Header();
             yield child;
           }),
           routes: [
-            Route(path: '/', title: 'Home', builder: (context, state) => Home()),
-            Route(path: '/about', title: 'About', builder: (context, state) => About()),
+            Route(path: '/', title: 'Home', builder: (context, state) => const Home()),
+            Route(path: '/about', title: 'About', builder: (context, state) => const About()),
           ],
         ),
       ]),{{/routing}}{{^routing}}
-      Home(),
-      About(),{{/routing}}
+      const Home(),
+      const About(),{{/routing}}
     ]);
   }{{#server}}
 

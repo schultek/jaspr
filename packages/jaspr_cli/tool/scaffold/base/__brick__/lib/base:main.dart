@@ -11,10 +11,14 @@ void main() {
 
   runApp(Document(
     title: '{{name}}',
-    styles: styles,{{#flutter}}
+    styles: styles,{{^hydration}}
+    head: [
+      script(defer: true, src: 'main.dart.js', []),{{#flutter}}
+      link(rel: 'manifest', href: 'manifest.json'),{{/flutter}}
+    ],{{/hydration}}{{#hydration}}{{#flutter}}
     head: [
       link(rel: 'manifest', href: 'manifest.json'),
-    ],{{/flutter}}
+    ],{{/flutter}}{{/hydration}}
     body: App(),
   ));
 }

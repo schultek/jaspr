@@ -8,7 +8,6 @@ class _BaseDocument extends Document {
     this.viewport = 'width=device-width, initial-scale=1.0',
     this.meta,
     this.styles,
-    this.scriptName,
     this.head = const [],
     required this.body,
   }) : super._();
@@ -19,7 +18,6 @@ class _BaseDocument extends Document {
   final String? viewport;
   final Map<String, String>? meta;
   final List<StyleRule>? styles;
-  final String? scriptName;
   final List<Component> head;
   final Component body;
 
@@ -50,8 +48,6 @@ class _BaseDocument extends Document {
             if (styles != null) //
               Style(styles: styles!),
             ...head,
-            if (scriptName != null) //
-              script([], src: '$scriptName.dart.js', defer: true),
           ],
         ),
         DomComponent(tag: 'body', child: body),
