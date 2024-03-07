@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:html';
 
 import '../framework/framework.dart';
-import 'js_data.dart';
-import 'run_app.dart';
+import 'browser_binding.dart';
 
 typedef ClientLoader = FutureOr<ClientBuilder> Function();
 typedef ClientBuilder = Component Function(ConfigParams);
@@ -40,25 +41,52 @@ ClientLoader loadClient(Future<void> Function() loader, ClientBuilder builder) {
   return () => loader().then((_) => builder);
 }
 
-void _runClient(ClientBuilder builder, ConfigParams params, String id) {
-  runApp(builder(params), attachTo: id);
+void _runClient(ClientBuilder builder, ConfigParams params, (Node, Node) between) {
+  BrowserAppBinding().attachRootComponent(builder(params), attachBetween: between);
 }
 
-void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
-  var comps = jasprConfig.comp;
-  if (comps == null) return;
+final _compStartRegex = RegExp(r'^\s*\$(\S+)(?:\s+data=(.*))?\s*$');
+final _compEndRegex = RegExp(r'^\s*/\$(\S+)\s*$');
 
-  for (var comp in comps) {
-    var builder = fn(comp.name);
-    if (builder is ClientBuilder) {
-      _runClient(builder, ConfigParams(comp.params), comp.id);
-    } else {
-      builder.then((b) => _runClient(b, ConfigParams(comp.params), comp.id));
+void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
+  var iterator = NodeIterator(document, NodeFilter.SHOW_COMMENT);
+
+  List<(String, String?, Node)> nodes = [];
+
+  Comment? currNode;
+  while ((currNode = iterator.nextNode() as Comment?) != null) {
+    var value = currNode!.nodeValue ?? '';
+    var match = _compStartRegex.firstMatch(value);
+    if (match != null) {
+      var name = match.group(1)!;
+      var data = match.group(2);
+
+      nodes.add((name, data, currNode));
+    }
+
+    match = _compEndRegex.firstMatch(value);
+    if (match != null) {
+      var name = match.group(1)!;
+
+      if (nodes.last.$1 == name) {
+        var comp = nodes.removeLast();
+        var start = comp.$3;
+        assert(start.parentNode == currNode.parentNode);
+
+        var between = (start, currNode);
+        var params = ConfigParams(jsonDecode(comp.$2 ?? '{}'));
+
+        var builder = fn(name);
+        if (builder is ClientBuilder) {
+          _runClient(builder, params, between);
+        } else {
+          builder.then((b) => _runClient(b, params, between));
+        }
+      }
     }
   }
 }
 
 void runAppWithParams(ClientBuilder appBuilder) {
-  var appConfig = jasprConfig.comp?.firstOrNull;
-  _runClient(appBuilder, ConfigParams(appConfig?.params ?? {}), appConfig?.id ?? 'body');
+  _applyClients((_) => appBuilder);
 }

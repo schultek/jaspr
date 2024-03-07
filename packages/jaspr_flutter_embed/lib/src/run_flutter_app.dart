@@ -2,17 +2,13 @@
 @JS()
 library flutter_interop;
 
-import 'dart:async';
 import 'dart:html';
+import 'dart:ui_web' as ui_web;
 
 import 'package:js/js.dart';
 
-import 'flutter_embed_binding.dart';
-
 /// Starts a flutter app and attaches it to the [attachTo] dom element.
-Future<void> runFlutterApp({required String attachTo}) {
-  var completer = Completer();
-
+void runFlutterApp({required String attachTo, required void Function() runApp}) {
   var target = querySelector(attachTo);
 
   flutter ??= FlutterInterop();
@@ -23,13 +19,10 @@ Future<void> runFlutterApp({required String attachTo}) {
         .initializeEngine(InitializeEngineOptions(hostElement: target!))
         .then(allowInterop((runner) {
       runner.runApp();
-      completer.complete();
     }));
   });
 
-  FlutterEmbedBinding.warmupFlutterEngine();
-
-  return completer.future;
+  ui_web.bootstrapEngine(runApp: runApp);
 }
 
 /// Handle to the [require()] function from RequireJS

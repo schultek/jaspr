@@ -118,7 +118,7 @@ class EditorPanelState extends State<EditorPanel> {
               ),
               if (activeFile != null && ProjectData.canDelete(activeFile))
                 button(
-                  classes: '"mdc-icon-button material-icons',
+                  classes: 'mdc-icon-button material-icons',
                   styles: Styles.combine([
                     Styles.box(
                       position: Position.absolute(top: 4.px, right: 4.px),

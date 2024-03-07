@@ -225,8 +225,8 @@ class DomRenderObject extends RenderObject {
       if (childNode == null) return;
 
       var afterNode = after?.node;
-      if ((afterNode, parent) case (null, RootDomRenderObject p) when p.from != null && p.from! > 0) {
-        afterNode = p.container.childNodes[p.from! - 1];
+      if (afterNode == null && parent is RootDomRenderObject) {
+        afterNode = parent.beforeStart;
       }
 
       if (childNode.previousNode == afterNode && childNode.parentNode == parentNode) {
@@ -273,21 +273,23 @@ class DomRenderObject extends RenderObject {
 }
 
 class RootDomRenderObject extends DomRenderObject {
-  final html.Element container;
-  final int? from;
-  final int? to;
+  final Node container;
+  late final Node? beforeStart;
 
-  RootDomRenderObject(this.container, this.from, this.to) {
-    Iterable<Node> nodes = container.nodes;
-    if (kDebugMode) {
-      nodes = nodes.where((node) => node is! html.Text || (node.text ?? '').trim().isNotEmpty);
-    }
-    nodes = nodes.skip(from ?? 0);
-    if (to != null) {
-      nodes = nodes.take(to! - (from ?? 0));
-    }
+  RootDomRenderObject(this.container, [List<Node>? nodes]) {
     node = container;
-    toHydrate = nodes.toList();
+    toHydrate = [...nodes ?? container.nodes];
+    beforeStart = toHydrate.firstOrNull?.previousNode;
+  }
+
+  factory RootDomRenderObject.between(Node start, Node end) {
+    var nodes = <Node>[];
+    Node? curr = start.nextNode;
+    while (curr != null && curr != end) {
+      nodes.add(curr);
+      curr = curr.nextNode;
+    }
+    return RootDomRenderObject(start.parentNode!, nodes);
   }
 }
 

@@ -33,6 +33,7 @@ jobs:
         run: |
           dart pub global activate melos
           melos bootstrap --no-private
+          jaspr --disable-analytics
 
       - name: Test CLI
         run: melos run test:cli
@@ -51,6 +52,7 @@ jobs:
         run: |
           dart pub global activate melos
           melos bootstrap
+          jaspr --disable-analytics
 
       - name: Check formatting
         run: melos format -- --set-exit-if-changed
@@ -73,6 +75,7 @@ jobs:
           dart pub global activate melos
           dart pub global activate coverage
           melos bootstrap --no-private
+          jaspr --disable-analytics
 
       - name: Run Unit tests
         run: melos coverage:ci

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../server.dart';
+import 'child_nodes.dart';
 
 const formatOutput = kDebugMode || kGenerateMode;
 
@@ -14,13 +15,13 @@ class MarkupRenderObject extends RenderObject {
   String? text;
   bool? rawHtml;
 
-  List<MarkupRenderObject> children = [];
-
   MarkupRenderObject? parent;
 
+  late final ChildList children = ChildList(this);
+
   @override
-  RenderObject createChildRenderObject() {
-    return MarkupRenderObject();
+  MarkupRenderObject createChildRenderObject() {
+    return MarkupRenderObject()..parent = this;
   }
 
   @override
@@ -48,14 +49,8 @@ class MarkupRenderObject extends RenderObject {
   void attach(MarkupRenderObject? parent, MarkupRenderObject? after) {
     if (parent == null) return;
 
-    var children = parent.children;
-    children.remove(this);
-    if (after == null) {
-      children.insert(0, this);
-    } else {
-      var index = children.indexOf(after);
-      children.insert(index + 1, this);
-    }
+    this.parent = parent;
+    parent.children.insertAfter(this, after: after);
   }
 
   @override
@@ -65,14 +60,14 @@ class MarkupRenderObject extends RenderObject {
   }
 
   String renderToHtml() {
+    var output = StringBuffer();
     if (text case var text?) {
       if (rawHtml == true) {
-        return text;
+        output.write(text);
       } else {
-        return htmlEscape.convert(text);
+        output.write(htmlEscape.convert(text));
       }
     } else if (tag case var tag?) {
-      var output = StringBuffer();
       tag = tag.toLowerCase();
       _domValidator.validateElementName(tag);
       output.write('<$tag');
@@ -116,15 +111,13 @@ class MarkupRenderObject extends RenderObject {
         }
         output.write('</$tag>');
       }
-      return output.toString();
     } else {
       assert(parent == null);
-      var output = StringBuffer();
       for (var child in children) {
         output.writeln(child.renderToHtml());
       }
-      return output.toString();
     }
+    return output.toString();
   }
 
   final _attributeEscape = HtmlEscape(HtmlEscapeMode.attribute);

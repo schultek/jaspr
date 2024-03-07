@@ -1,0 +1,18 @@
+@import 'layout_mixins';
+
+body {
+  @include layout-fullbleed;
+  @include layout-vertical;
+
+  header {
+    @include layout-horizontal;
+  }
+
+  section {
+    @include layout-flex;
+  }
+
+  footer {
+    @include layout-horizontal;
+  }
+}
