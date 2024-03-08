@@ -16,20 +16,68 @@ final RegExp _packageRegExp = RegExp(r'^[a-z_][a-z0-9_]*$');
 final templatesByName = {for (var t in templates) t.name: t};
 final templateDescriptionByName = {for (var t in templates) t.name: t.description};
 
+enum RenderingMode {
+  static('Build a statically pre-rendered site'),
+  server('Build a server-rendered site'),
+  client('Build a purely client-rendered site');
+
+  const RenderingMode(this.help);
+
+  final String help;
+
+  bool get useServer => this == server || this == static;
+  String get recommend => this == static ? '(Recommended) ' : '';
+}
+
 class CreateCommand extends BaseCommand {
   CreateCommand({super.logger}) {
+    argParser.addSeparator('Project Presets:');
     argParser.addOption(
-      'template',
-      abbr: 't',
-      help: 'The template used to generate this new project.',
-      allowed: templatesByName.keys,
-      allowedHelp: templateDescriptionByName,
+      'mode',
+      abbr: 'm',
+      help: 'Choose a rendering mode for the project.',
+      allowed: [
+        for (var m in RenderingMode.values) ...[m.name, if (m.useServer) '${m.name}:auto']
+      ],
+      allowedHelp: {
+        for (var v in RenderingMode.values) ...{
+          v.name: '${v.help}.',
+          if (v.useServer) '${v.name}:auto': '${v.recommend}${v.help} with automatic client-side hydration.',
+        }
+      },
     );
-    argParser.addFlag(
-      'jaspr-web-compilers',
-      abbr: 'c',
-      help: 'Uses jaspr_web_compilers. This enables the use of flutter web plugins and direct flutter embedding.',
-      defaultsTo: null,
+    argParser.addOption(
+      'routing',
+      abbr: 'r',
+      help: 'Choose a routing strategy for the project.',
+      allowed: ['none', 'multi-page', 'single-page'],
+      allowedHelp: {
+        'none': 'No preconfigured routing.',
+        'multi-page': '(Recommended) Sets up multi-page (server-side) routing.',
+        'single-page': 'Sets up single-page (client-side) routing.',
+      },
+    );
+    argParser.addOption(
+      'flutter',
+      abbr: 'f',
+      help: 'Choose the Flutter support for the project.',
+      allowed: ['none', 'embedded', 'plugins-only'],
+      allowedHelp: {
+        'none': 'No preconfigured Flutter support.',
+        'embedded': 'Sets up an embedded Flutter app inside your site.',
+        'plugins-only': '(Recommended) Enables support for using Flutter web plugins.'
+      },
+    );
+    argParser.addOption(
+      'backend',
+      abbr: 'b',
+      help: 'Choose the backend setup for the project (only valid in "server" mode).',
+      allowed: ['none', 'shelf', 'dart_frog'],
+      allowedHelp: {
+        'none': 'No custom backend setup.',
+        'shelf': 'Sets up a custom backend using the shelf package.',
+        'dart_frog': 'Sets up a custom backend using the dart_frog framework.',
+      },
     );
   }
 
@@ -56,30 +104,26 @@ class CreateCommand extends BaseCommand {
 
     var (dir, name) = getTargetDirectory();
 
-    var mode = getMode();
-    var useServer = mode == 'server' || mode == 'static';
-    var useHydration = mode != 'client' ? getUseHydration() : false;
-    var useRouting = getUseRouting();
-    //var useMultiPageRouting = useRouting && mode != 'client' ? getUseMultiPageRouting() : false;
-    var useFlutter = getUseFlutter();
-    var useFlutterPlugins = useFlutter || getUseFlutterPlugins();
-    var useBackend = mode == 'server' && getUseCustomBackend() ? getCustomBackend() : null;
+    var (useMode, useHydration) = getRenderingMode();
+    var (useRouting, _ /* useMultiPageRouting */) = getRouting(useMode.useServer);
+    var (useFlutter, usePlugins) = getFlutter();
+    var useBackend = useMode == RenderingMode.server ? getBackend() : null;
 
     var description = 'A new jaspr project.';
 
     var usedPrefixes = {
-      if (useServer) 'server',
-      if (mode == 'client') 'client',
+      if (useMode.useServer) 'server',
+      if (useMode == RenderingMode.client) 'client',
       if (useRouting) 'routing',
       if (useHydration) 'hydration',
       if (useFlutter) 'flutter',
-      if (mode == 'client' || !useHydration) 'manual',
-      if (useServer) useBackend ?? 'base',
+      if (useMode == RenderingMode.client || !useHydration) 'manual',
+      if (useMode.useServer) useBackend ?? 'base',
     };
 
     var updater = PubUpdater();
 
-    var webCompilersPackage = useFlutterPlugins ? 'jaspr_web_compilers' : 'build_web_compilers';
+    var webCompilersPackage = usePlugins ? 'jaspr_web_compilers' : 'build_web_compilers';
 
     var [
       jasprFlutterEmbedVersion,
@@ -98,11 +142,11 @@ class CreateCommand extends BaseCommand {
       vars: {
         'name': name,
         'description': description,
-        'mode': mode,
+        'mode': useMode.name,
         'routing': useRouting,
         'flutter': useFlutter,
         'hydration': useHydration,
-        'server': useServer,
+        'server': useMode.useServer,
         'shelf': useBackend == 'shelf',
         'jasprCoreVersion': jasprCoreVersion,
         'jasprBuilderVersion': jasprBuilderVersion,
@@ -149,65 +193,93 @@ class CreateCommand extends BaseCommand {
     return (directory, name);
   }
 
-  String getMode() {
-    return logger.logger
-        .chooseOne(
-          'Select a rendering mode:',
-          choices: [
-            ('static', 'Build a statically prerendered site with optional client-side rendering.'),
-            ('server', 'Build a server-rendered site with optional client-side hydration.'),
-            ('client', 'Build a purely client-rendered site.'),
-          ],
-          display: (o) => '${o.$1}: ${o.$2}',
-        )
-        .$1;
+  (RenderingMode, bool) getRenderingMode() {
+    var opt = argResults!['mode'] as String?;
+    return switch (opt?.split(':')) {
+      ['client'] => (RenderingMode.client, false),
+      [var m, 'auto'] => (RenderingMode.values.byName(m), true),
+      [var m] => (RenderingMode.values.byName(m), false),
+      _ => () {
+          var mode = logger.logger.chooseOne(
+            'Select a rendering mode:',
+            choices: RenderingMode.values,
+            display: (o) => '${o.name}: ${o.help}.',
+          );
+          var hydration = mode.useServer &&
+              logger.logger.confirm('(Recommended) Enable automatic hydration on the client?', defaultValue: true);
+          return (mode, hydration);
+        }(),
+    };
   }
 
-  bool getUseHydration() {
-    return logger.logger.confirm('(Recommended) Enable automatic hydration on the client?', defaultValue: true);
+  (bool, bool) getRouting(bool useServer) {
+    var opt = argResults!['routing'] as String?;
+
+    return switch (opt) {
+      'none' => (false, false),
+      'single-page' => (true, false),
+      'multi-page' => (true, true),
+      _ => () {
+          var routing = logger.logger.confirm('Setup routing for different pages of your site?', defaultValue: true);
+          var multiPage = routing && useServer
+              ? logger.logger.confirm(
+                  '(Recommended) Use multi-page (server-side) routing? '
+                  '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',
+                  defaultValue: true,
+                )
+              : false;
+          return (routing, multiPage);
+        }(),
+    };
   }
 
-  bool getUseRouting() {
-    return logger.logger.confirm('Setup routing for different pages of your site?', defaultValue: true);
+  (bool, bool) getFlutter() {
+    var opt = argResults!['flutter'] as String?;
+
+    return switch (opt) {
+      'none' => (false, false),
+      'embedded' => (true, true),
+      'plugins-only' => (false, true),
+      _ => () {
+          var flutter = logger.logger.confirm('Setup Flutter web embedding?', defaultValue: false);
+          var plugins = flutter ||
+              logger.logger.confirm(
+                'Enable support for using Flutter web plugins in your project?',
+                defaultValue: true,
+              );
+          return (flutter, plugins);
+        }(),
+    };
   }
 
-  bool getUseMultiPageRouting() {
-    return logger.logger.confirm(
-      '(Recommended) Use multi-page (server-side) routing? '
-      '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',
-      defaultValue: true,
-    );
-  }
+  String? getBackend() {
+    var opt = argResults!['backend'] as String?;
 
-  bool getUseFlutter() {
-    return logger.logger.confirm('Setup Flutter web embedding?', defaultValue: false);
-  }
+    return switch (opt) {
+      'none' => null,
+      String b => b,
+      null => () {
+          var backend = logger.logger.confirm(
+            'Use a custom backend package or framework for the server part of your project?',
+            defaultValue: false,
+          );
+          if (!backend) return null;
 
-  bool getUseFlutterPlugins() {
-    return logger.logger.confirm(
-      'Enable support for using Flutter web plugins in your project?',
-      defaultValue: true,
-    );
-  }
-
-  bool getUseCustomBackend() {
-    return logger.logger.confirm(
-      'Use a custom backend package or framework for the server part of your project?',
-      defaultValue: false,
-    );
-  }
-
-  String getCustomBackend() {
-    return logger.logger
-        .chooseOne(
-          'Select a backend framework:',
-          choices: [
-            ('shelf', 'Shelf: An official and well-supported minimal server package by the Dart Team.'),
-            ('dartfrog', 'Dart Frog: A fast, minimalistic backend framework for Dart built by Very Good Ventures.'),
-          ],
-          display: (o) => o.$2,
-        )
-        .$1;
+          return logger.logger
+              .chooseOne(
+                'Select a backend framework:',
+                choices: [
+                  ('shelf', 'Shelf: An official and well-supported minimal server package by the Dart Team.'),
+                  (
+                    'dart_frog',
+                    'Dart Frog: A fast, minimalistic backend framework for Dart built by Very Good Ventures.'
+                  ),
+                ],
+                display: (o) => o.$2,
+              )
+              .$1;
+        }(),
+    };
   }
 }
 
