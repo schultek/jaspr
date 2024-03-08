@@ -44,7 +44,7 @@ final baseBundle = MasonBundle.fromJson(<String, dynamic>{
     {
       "path": "lib/components/flutter#flutter_counter_fallback.dart",
       "data":
-          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2phc3ByLmRhcnQnOwoKLy8gUmVuZGVycyBhbiBlbXB0eSBkaXYgYXMgZmFsbGJhY2sgb24gdGhlIHNlcnZlci4KQ29tcG9uZW50IEZsdXR0ZXJDb3VudGVyKHtpbnQ/IGNvdW50LCBGdW5jdGlvbj8gb25DaGFuZ2V9KSA9PgogICAgZGl2KHN0eWxlczogU3R5bGVzLmJveChtaW5IZWlnaHQ6IDUucmVtLCBtaW5XaWR0aDogMTgucmVtLCBtYXJnaW46IEVkZ2VJbnNldHMub25seSh0b3A6IDIucmVtKSksIFtdKTsK",
+          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2phc3ByLmRhcnQnOwoKLy8gUmVuZGVycyBhbiBlbXB0eSBkaXYgYXMgZmFsbGJhY2sgb24gdGhlIHNlcnZlci4KLy8gaWdub3JlOiBub25fY29uc3RhbnRfaWRlbnRpZmllcl9uYW1lcwpDb21wb25lbnQgRmx1dHRlckNvdW50ZXIoe2ludD8gY291bnQsIEZ1bmN0aW9uPyBvbkNoYW5nZX0pID0+CiAgICBkaXYoc3R5bGVzOiBTdHlsZXMuYm94KG1pbkhlaWdodDogNS5yZW0sIG1pbldpZHRoOiAxOC5yZW0sIG1hcmdpbjogRWRnZUluc2V0cy5vbmx5KHRvcDogMi5yZW0pKSwgW10pOwo=",
       "type": "text"
     },
     {
