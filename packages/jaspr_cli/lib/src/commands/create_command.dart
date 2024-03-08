@@ -220,14 +220,14 @@ class ScaffoldGeneratorTarget extends DirectoryGeneratorTarget {
   Future<GeneratedFile> createFile(String path, List<int> contents,
       {m.Logger? logger, OverwriteRule? overwriteRule}) async {
     var filename = p.basename(path);
-    if (filename.contains(':')) {
-      var [prefix, ...] = filename.split(':');
+    if (filename.contains('#')) {
+      var [prefix, ...] = filename.split('#');
 
       if (!prefixes.contains(prefix)) {
         return GeneratedFile.skipped(path: path);
       }
 
-      path = path.replaceFirst('$prefix:', '');
+      path = path.replaceFirst('$prefix#', '');
     }
 
     return await super.createFile(path, contents, logger: logger, overwriteRule: overwriteRule);

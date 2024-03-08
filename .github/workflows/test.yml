@@ -55,7 +55,7 @@ jobs:
           jaspr --disable-analytics
 
       - name: Check formatting
-        run: melos format -- --set-exit-if-changed
+        run: melos format
 
       - name: Check linting
         run: melos analyze

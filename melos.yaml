@@ -17,8 +17,8 @@ packages:
 scripts:
   format:
     run: |
-      melos exec --ignore=jaspr_cli -- "dart format . --line-length=120"
-      melos exec --scope=jaspr_cli -- "dart format lib  --line-length=120"
+      melos exec --ignore=jaspr_cli -- "dart format . --line-length=120 --set-exit-if-changed"
+      melos exec --scope=jaspr_cli -- "dart format lib  --line-length=120 --set-exit-if-changed"
   analyze: melos exec -- "dart analyze . --fatal-infos"
   test:
     run: |
