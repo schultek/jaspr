@@ -67,13 +67,13 @@ class SimpleCard extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4'.split(' '), [
-      div(classes: ['shrink-0'], [
-        img(classes: 'h-12 w-12'.split(' '), src: '/img/logo.svg', alt: '$title Logo'),
+    yield div(classes: 'p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4', [
+      div(classes: 'shrink-0', [
+        img(classes: 'h-12 w-12', src: '/img/logo.svg', alt: '$title Logo'),
       ]),
       div([
-        div(classes: 'text-xl font-medium text-black'.split(' '), [text(title)]),
-        p(classes: ['text-slate-500'], [text(message)]),
+        div(classes: 'text-xl font-medium text-black', [text(title)]),
+        p(classes: 'text-slate-500', [text(message)]),
       ])
     ]);
   }
