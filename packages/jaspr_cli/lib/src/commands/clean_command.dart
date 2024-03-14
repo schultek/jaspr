@@ -30,14 +30,14 @@ class CleanCommand extends BaseCommand {
   Future<int> run() async {
     await super.run();
 
-    var genDir = Directory('.dart_tool/jaspr/');
+    var genDir = Directory('.dart_tool/jaspr/').absolute;
 
     logger.write('Deleting .dart_tool/jaspr...');
     if (await genDir.exists()) {
       await genDir.delete(recursive: true);
     }
 
-    var buildDir = Directory('build/jaspr/');
+    var buildDir = Directory('build/jaspr/').absolute;
 
     logger.write('Deleting build/jaspr...');
     if (await buildDir.exists()) {

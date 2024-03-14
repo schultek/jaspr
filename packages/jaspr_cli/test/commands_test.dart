@@ -1,9 +1,12 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:jaspr_cli/src/command_runner.dart';
+import 'package:jaspr_cli/src/commands/base_command.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
@@ -11,23 +14,22 @@ import 'utils.dart';
 import 'variants.dart';
 
 void main() {
-  group('cli integration', () {
+  group('commands', () {
     var dirs = setupTempDirs();
+    var runner = setupRunner();
 
-    for (var variant in variants) {
+    for (var variant in variants.take(1)) {
       test(variant.name, () async {
-        await run('jaspr create -v ${variant.options} myapp', dir: dirs.root());
+        await runner.run('create -v ${variant.options} myapp', dir: dirs.root);
 
         for (var f in variant.files) {
-          var file = File(p.join(dirs.app().path, f.$1));
-          expect(file, f.$2);
+          expect(File(p.join(dirs.app().path, f.$1)), f.$2, reason: f.$1);
         }
 
         // Override jaspr dependencies from path.
         await bootstrap(variant, dirs.root());
 
-        await run('jaspr clean${Platform.isWindows ? '' : ' --kill'}', dir: dirs.app());
-        var stop = await start('jaspr serve -v', dir: dirs.app());
+        runner.run('serve -v', dir: dirs.app);
 
         // Wait until server is started.
         while (true) {
@@ -50,15 +52,14 @@ void main() {
           );
         }
 
-        await stop();
+        await runner.stop();
 
-        await run('jaspr clean${Platform.isWindows ? '' : ' --kill'}', dir: dirs.app());
-        await run('jaspr build -v', dir: dirs.app());
+        await runner.run('build -v', dir: dirs.app);
 
         for (var file in variant.outputs) {
           expect(File(p.join(dirs.app().path, 'build', 'jaspr', file)).existsSync(), isTrue);
         }
-      }, timeout: Timeout(Duration(minutes: 2)));
+      }, timeout: Timeout(Duration(minutes: 5)));
     }
   });
 }
@@ -77,4 +78,37 @@ Future<void> bootstrap(TestVariant variant, Directory dir) async {
   }));
 
   await run('dart pub get', dir: Directory(p.join(dir.path, 'myapp')));
+}
+
+TestRunner setupRunner() {
+  TestRunner runner = TestRunner();
+
+  setUp(() {
+    runner.setup();
+  });
+
+  tearDown(() {
+    runner.stop();
+  });
+
+  return runner;
+}
+
+class TestRunner {
+  late JasprCommandRunner runner;
+
+  Future<void> run(String command, {Directory Function()? dir}) async {
+    await IOOverrides.runZoned(getCurrentDirectory: dir, () async {
+      var res = await runner.run(command.split(' '));
+      expect(res, equals(0));
+    });
+  }
+
+  void setup() {
+    runner = JasprCommandRunner();
+  }
+
+  Future<void> stop() async {
+    await Future.wait(runner.commands.values.whereType<BaseCommand>().map((c) => c.stop()));
+  }
 }

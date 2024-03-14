@@ -53,8 +53,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     logger.write("Building jaspr for ${config!.mode.name} rendering mode.");
 
-    var dir = Directory('build/jaspr');
-    var webDir = config!.mode == JasprMode.server ? Directory('build/jaspr/web') : dir;
+    var dir = Directory('build/jaspr').absolute;
+    var webDir = config!.mode == JasprMode.server ? Directory('build/jaspr/web').absolute : dir;
 
     String? entryPoint;
     if (config!.mode != JasprMode.client) {
@@ -66,8 +66,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
     await webDir.create(recursive: true);
 
-    var indexHtml = File('web/index.html');
-    var targetIndexHtml = File('${webDir.path}/index.html');
+    var indexHtml = File('web/index.html').absolute;
+    var targetIndexHtml = File('${webDir.path}/index.html').absolute;
 
     var dummyIndex = false;
     var dummyTargetIndex = false;
@@ -142,6 +142,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         ],
         runInShell: true,
         environment: {'PORT': '8080', 'JASPR_PROXY_PORT': '5567'},
+        workingDirectory: Directory.current.absolute.path,
       );
 
       watchProcess('server', process, tag: Tag.server, progress: 'Running server app...');
@@ -157,11 +158,11 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
         logger.write('Generating route "$route"...', progress: ProgressState.running);
 
-        var response = await http.get(Uri.parse('http://0.0.0.0:8080$route'));
+        var response = await http.get(Uri.parse('http://localhost:8080$route'));
 
         var filename = route.endsWith('/') ? '${route}index.html' : '$route.html';
 
-        var file = File('build/jaspr$filename');
+        var file = File('build/jaspr$filename').absolute;
 
         await file.create(recursive: true);
         await file.writeAsBytes(response.bodyBytes);

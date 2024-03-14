@@ -116,7 +116,7 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   Future<void> _runServer(String proxyPort) async {
     logger.write("Starting server...", progress: ProgressState.running);
 
-    var serverTarget = File('.dart_tool/jaspr/server_target.dart');
+    var serverTarget = File('.dart_tool/jaspr/server_target.dart').absolute;
     if (!serverTarget.existsSync()) {
       serverTarget.createSync(recursive: true);
     }

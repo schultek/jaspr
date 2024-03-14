@@ -8,19 +8,15 @@ Future<void> copyFiles(String from, String to, [List<String> targets = const [''
   var moves = <Future>[];
   while (moveTargets.isNotEmpty) {
     var moveTarget = moveTargets.removeAt(0);
-    var file = File('$from/$moveTarget');
+    var file = File('$from/$moveTarget').absolute;
     var isDir = file.statSync().type == FileSystemEntityType.directory;
     if (isDir) {
-      await Directory('$to/$moveTarget').create(recursive: true);
+      await Directory('$to/$moveTarget').absolute.create(recursive: true);
 
-      var files = Directory('$from/$moveTarget').list(recursive: true);
+      var files = Directory('$from/$moveTarget').absolute.list(recursive: true);
       await for (var file in files) {
-        final path = p.relative(file.path, from: from);
-        if (file is Directory) {
-          moveTargets.add(path);
-        } else {
-          moveTargets.add(path);
-        }
+        final path = p.relative(file.absolute.path, from: p.join(Directory.current.path, from));
+        moveTargets.add(path);
       }
     } else {
       moves.add(file.copy('./$to/$moveTarget'));

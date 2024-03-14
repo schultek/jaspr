@@ -46,20 +46,24 @@ abstract class BaseCommand extends Command<int> {
     return ExitCode.success.code;
   }
 
-  Future<Never> shutdown([int exitCode = 1]) async {
-    logger.complete(false);
-    logger.write('Shutting down...');
+  Future<void> stop() async {
     for (var g in guards) {
       await g();
     }
     guards.clear();
+  }
+
+  Future<Never> shutdown([int exitCode = 1]) async {
+    logger.complete(false);
+    logger.write('Shutting down...');
+    await stop();
     exit(exitCode);
   }
 
   Future<String> getEntryPoint(String? input) async {
     var entryPoint = input ?? 'lib/main.dart';
 
-    if (!File(entryPoint).existsSync()) {
+    if (!File(entryPoint).absolute.existsSync()) {
       logger.complete(false);
       logger.write("Cannot find entry point. Create a lib/main.dart file, or specify a file using --input.",
           level: Level.critical);

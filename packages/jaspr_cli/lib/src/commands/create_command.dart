@@ -175,7 +175,7 @@ class CreateCommand extends BaseCommand {
   (Directory, String) getTargetDirectory() {
     var targetPath = argResults!.rest.firstOrNull ?? logger.logger.prompt('Specify a target directory:');
 
-    var directory = Directory(targetPath);
+    var directory = Directory(targetPath).absolute;
     var dir = p.basenameWithoutExtension(directory.path);
     var name = dir.replaceAll('-', '_');
 

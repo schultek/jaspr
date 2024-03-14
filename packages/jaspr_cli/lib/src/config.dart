@@ -27,7 +27,7 @@ class JasprConfig {
 
 Future<JasprConfig> getConfig(Logger logger) async {
   var pubspecPath = 'pubspec.yaml';
-  var pubspecFile = File(pubspecPath);
+  var pubspecFile = File(pubspecPath).absolute;
   if (!(await pubspecFile.exists())) {
     throw 'Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.';
   }

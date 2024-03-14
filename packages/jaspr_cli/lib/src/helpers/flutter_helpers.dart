@@ -45,7 +45,7 @@ mixin FlutterHelper on BaseCommand {
   }
 
   Future<void> _ensureTarget() async {
-    var flutterTarget = File('.dart_tool/jaspr/flutter_target.dart');
+    var flutterTarget = File('.dart_tool/jaspr/flutter_target.dart').absolute;
     if (!await flutterTarget.exists()) {
       await flutterTarget.create(recursive: true);
     }
