@@ -35,6 +35,8 @@ Handler staticFileHandler([http.Client? client]) => jasprProxyPort != null
 
 typedef SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
 
+final _allowedRenderPaths = RegExp(r'\.html?$|^[^.]*$');
+
 Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHandler}) {
   client ??= http.Client();
   var staticHandler = fileHandler ?? staticFileHandler(client);
@@ -51,6 +53,10 @@ Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHa
   }
 
   cascade = cascade.add((request) async {
+    if (!_allowedRenderPaths.hasMatch(request.url.pathSegments.lastOrNull ?? '')) {
+      return Response(404);
+    }
+
     var fileLoader = _proxyFileLoader(request, staticHandler);
     return handle(request, (setup) async {
       // We support two modes here, rendered-html and data-only
