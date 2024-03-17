@@ -121,6 +121,12 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       serverTarget.createSync(recursive: true);
     }
 
+    var serverPid = File('.dart_tool/jaspr/server.pid');
+    if (!serverPid.existsSync()) {
+      serverPid.createSync(recursive: true);
+    }
+    serverPid.writeAsStringSync('');
+
     var args = [
       'run',
       if (!release) ...[
@@ -156,7 +162,8 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     logger.write('Server started.', progress: ProgressState.completed);
 
-    await watchProcess('server', process, tag: Tag.server);
+    var pid = await waitForPid(serverPid);
+    await watchProcess('server', process, tag: Tag.server, childPid: pid);
   }
 
   Future<void> _runDevCommand(String command, String proxyPort) async {
@@ -248,11 +255,14 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 }
 
 String serverEntrypoint(String import) => '''
+  import 'dart:io';
+  
   import '$import' as m;
   import 'package:hotreloader/hotreloader.dart';
       
   void main() async {
     try {
+      File('.dart_tool/jaspr/server.pid').writeAsStringSync('\$pid');
       await HotReloader.create(
         debounceInterval: Duration.zero,
         onAfterReload: (ctx) => m.main(),
@@ -269,3 +279,16 @@ String serverEntrypoint(String import) => '''
     m.main();
   }
 ''';
+
+const _readDelay = Duration(milliseconds: 100);
+const _maxWait = Duration(seconds: 5);
+
+Future<int?> waitForPid(File file) async {
+  final end = DateTime.now().add(_maxWait);
+  while (!DateTime.now().isAfter(end)) {
+    var pid = int.tryParse(file.readAsStringSync());
+    if (pid != null) return pid;
+    await Future<void>.delayed(_readDelay);
+  }
+  return int.tryParse(file.readAsStringSync());
+}

@@ -18,7 +18,7 @@ void main() {
     var dirs = setupTempDirs();
     var runner = setupRunner();
 
-    for (var variant in variants.take(1)) {
+    for (var variant in variants) {
       test(variant.name, () async {
         await runner.run('create -v ${variant.options} myapp', dir: dirs.root);
 
@@ -59,7 +59,7 @@ void main() {
         for (var file in variant.outputs) {
           expect(File(p.join(dirs.app().path, 'build', 'jaspr', file)).existsSync(), isTrue);
         }
-      }, timeout: Timeout(Duration(minutes: 5)));
+      });
     }
   });
 }

@@ -10,7 +10,7 @@ final variants = [
         for (var flutter in FlutterOption.values)
           for (var backend in BackendOption.valuesFor(mode))
             TestVariant(mode: mode, hydration: hydration, routing: routing, flutter: flutter, backend: backend),
-];
+].take(1);
 
 class TestVariant {
   final RenderingMode mode;
