@@ -43,7 +43,7 @@ void main() {
           styles.styles,
           equals({
             'font-size': '14px',
-            'font-family': '"Roboto"',
+            'font-family': "'Roboto'",
           }),
         );
       });
@@ -73,7 +73,7 @@ void main() {
           equals({
             'color': 'blue',
             'text-align': 'center',
-            'font-family': '"Roboto"',
+            'font-family': "'Roboto'",
             'font-style': 'italic',
             'font-size': '12px',
             'font-weight': 'bold',
