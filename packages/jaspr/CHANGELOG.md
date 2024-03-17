@@ -1,5 +1,8 @@
 ## Unreleased minor
 
+- **BREAKING** Removed `rawHtml` flag from `Text` component and `text()` method, in favor of 
+  new `RawText` component and `raw()` method respectively, which fixes multiple bugs with the old implementation.
+
 - Fixed bug with `DomValidator`.
 - `Document` is no longer required when using server-side rendering.
 - Improved how `@client` components are hydrated.

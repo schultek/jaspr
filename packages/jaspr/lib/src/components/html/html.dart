@@ -13,11 +13,12 @@ part 'text.dart';
 
 final _events = events;
 
-/// Utility method to create a text component when using jaspr html methods
+/// Utility method to create a text component when using jaspr html methods.
 Component text(String text) {
   return Text(text);
 }
 
+/// Utility method to create a raw text component when using jaspr html methods.
 Component raw(String text) {
   return RawText(text);
 }
