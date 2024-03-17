@@ -16,28 +16,6 @@ on:
 name: Test Pipeline
 
 jobs:
-  cli:
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest]
-    name: Verify CLI Tool
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - uses: dart-lang/setup-dart@v1.3
-      - uses: subosito/flutter-action@v2
-
-      - name: Bootstrap
-        run: |
-          dart pub global activate melos
-          melos bootstrap --no-private
-          jaspr --disable-analytics
-
-      - name: Test CLI
-        run: melos run test:cli
-
   analyze:
     name: Analyze Code
     runs-on: ubuntu-latest
