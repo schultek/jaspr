@@ -20,16 +20,15 @@ scripts:
   test:
     run: |
       melos exec --scope=jaspr -- "dart test"
+      melos exec --scope=jaspr_cli -- "dart test"
       melos exec --scope=jaspr_riverpod -- "dart test"
       melos exec --scope=jaspr_router -- "dart test"
       melos exec --scope=jaspr -- "dart test --preset=browser"
       melos exec --scope=jaspr_router -- "dart test --preset=browser"
-  test:cli:
-    run: |
-      melos exec --scope=jaspr_cli -- "dart test"
   coverage:ci:
     run: |
       melos exec --scope=jaspr -- "dart test --coverage=coverage"
+      melos exec --scope=jaspr_cli -- "dart test --coverage=coverage"
       melos exec --scope=jaspr_riverpod -- "dart test --coverage=coverage"
       melos exec --scope=jaspr_router -- "dart test --coverage=coverage"
       melos exec --scope=jaspr -- "dart test --preset=browser --coverage=coverage"
