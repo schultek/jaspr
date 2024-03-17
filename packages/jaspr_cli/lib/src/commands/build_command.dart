@@ -8,6 +8,7 @@ import 'package:build_daemon/data/build_target.dart';
 import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 import 'package:mason/mason.dart' show ExitCode;
+import 'package:path/path.dart' as p;
 import 'package:webdev/src/daemon_client.dart' as d;
 
 import '../config.dart';
@@ -160,9 +161,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
         var response = await http.get(Uri.parse('http://localhost:8080$route'));
 
-        var filename = route.endsWith('/') ? '${route}index.html' : '$route.html';
-
-        var file = File('build/jaspr$filename').absolute;
+        var file = File(p.url.join('build/jaspr', route, 'index.html')).absolute;
 
         await file.create(recursive: true);
         await file.writeAsBytes(response.bodyBytes);
