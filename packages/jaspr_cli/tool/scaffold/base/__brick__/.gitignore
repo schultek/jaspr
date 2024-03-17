@@ -27,12 +27,12 @@ migrate_working_dir/
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
-#.vscode/{{#flutter}}
+#.vscode/{{#plugins}}
 
 # Flutter related
-**/ios/Flutter/.last_build_id
 .flutter-plugins
-.flutter-plugins-dependencies
+.flutter-plugins-dependencies{{/plugins}}{{#flutter}}
+**/ios/Flutter/.last_build_id
 
 # Symbolication related
 app.*.symbols

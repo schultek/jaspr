@@ -145,6 +145,7 @@ class CreateCommand extends BaseCommand {
         'mode': useMode.name,
         'routing': useRouting,
         'flutter': useFlutter,
+        'plugins': usePlugins,
         'hydration': useHydration,
         'server': useMode.useServer,
         'shelf': useBackend == 'shelf',
