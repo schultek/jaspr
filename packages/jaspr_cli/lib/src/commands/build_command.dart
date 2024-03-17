@@ -131,6 +131,12 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         }
       });
 
+      var serverPid = File('.dart_tool/jaspr/server.pid');
+      if (!serverPid.existsSync()) {
+        serverPid.createSync(recursive: true);
+      }
+      serverPid.writeAsStringSync('');
+
       var process = await Process.start(
         'dart',
         [
@@ -146,7 +152,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         workingDirectory: Directory.current.absolute.path,
       );
 
-      watchProcess('server', process, tag: Tag.server, progress: 'Running server app...');
+      var pid = await waitForPid(serverPid);
+      watchProcess('server', process, tag: Tag.server, progress: 'Running server app...', childPid: pid);
 
       await serverStartedCompleter.future;
 
@@ -161,13 +168,20 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
         var response = await http.get(Uri.parse('http://localhost:8080$route'));
 
-        var file = File(p.url.join('build/jaspr', route, 'index.html')).absolute;
+        var file = File(p.url.join(
+          'build/jaspr',
+          route.startsWith('/') ? route.substring(1) : route,
+          'index.html',
+        )).absolute;
 
-        await file.create(recursive: true);
-        await file.writeAsBytes(response.bodyBytes);
+        file.createSync(recursive: true);
+        file.writeAsBytesSync(response.bodyBytes);
       }
 
       process.kill();
+      if (pid != null) {
+        Process.killPid(pid);
+      }
 
       logger.complete(true);
 

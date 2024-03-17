@@ -166,8 +166,8 @@ class CreateCommand extends BaseCommand {
         tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s == '...' || s.contains('+'));
 
     logger.write('\n'
-        'Created project $name in ${dir.path}! In order to get started, run the following commands:\n\n'
-        '  cd ${dir.path}\n'
+        'Created project $name! In order to get started, run the following commands:\n\n'
+        '  cd ${p.relative(dir.path, from: Directory.current.absolute.path)}\n'
         '  jaspr serve\n');
 
     return ExitCode.success.code;

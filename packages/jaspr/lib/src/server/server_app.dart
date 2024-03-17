@@ -32,6 +32,8 @@ class ServerApp {
     _server = await _createServer();
 
     if (isFirstStartup) {
+      _writePid();
+
       print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');
       print('Serving at http://${kDebugMode ? 'localhost' : _server!.address.host}:${_server!.port}');
 
@@ -51,6 +53,13 @@ class ServerApp {
     return shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true);
   }
 
+  void _writePid() {
+    var file = File('.dart_tool/jaspr/server.pid');
+    if (file.existsSync()) {
+      file.writeAsStringSync('$pid');
+    }
+  }
+
   static void requestRouteGeneration(String route) async {
     if (kGenerateMode) {
       _sendDebugMessage({'route': route});
@@ -58,8 +67,7 @@ class ServerApp {
   }
 
   static Future<void> _sendDebugMessage(Object message) async {
-    assert(_client != null, 'No server running, did you call "runApp()"?');
-    await _client!.post(
+    await http.post(
       Uri.parse('http://localhost:$jasprProxyPort/\$jasprMessageHandler'),
       body: jsonEncode(message),
     );

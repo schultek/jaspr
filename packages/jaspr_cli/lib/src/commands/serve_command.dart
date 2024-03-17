@@ -255,14 +255,11 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 }
 
 String serverEntrypoint(String import) => '''
-  import 'dart:io';
-  
   import '$import' as m;
   import 'package:hotreloader/hotreloader.dart';
       
   void main() async {
     try {
-      File('.dart_tool/jaspr/server.pid').writeAsStringSync('\$pid');
       await HotReloader.create(
         debounceInterval: Duration.zero,
         onAfterReload: (ctx) => m.main(),
@@ -279,16 +276,3 @@ String serverEntrypoint(String import) => '''
     m.main();
   }
 ''';
-
-const _readDelay = Duration(milliseconds: 100);
-const _maxWait = Duration(seconds: 5);
-
-Future<int?> waitForPid(File file) async {
-  final end = DateTime.now().add(_maxWait);
-  while (!DateTime.now().isAfter(end)) {
-    var pid = int.tryParse(file.readAsStringSync());
-    if (pid != null) return pid;
-    await Future<void>.delayed(_readDelay);
-  }
-  return int.tryParse(file.readAsStringSync());
-}

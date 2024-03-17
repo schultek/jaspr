@@ -121,3 +121,16 @@ Handler _sseProxyHandler(http.Client client, String webPort, Logger logger) {
     return Response.notFound('');
   };
 }
+
+const _readDelay = Duration(milliseconds: 100);
+const _maxWait = Duration(seconds: 5);
+
+Future<int?> waitForPid(File file) async {
+  final end = DateTime.now().add(_maxWait);
+  while (!DateTime.now().isAfter(end)) {
+    var pid = int.tryParse(file.readAsStringSync());
+    if (pid != null) return pid;
+    await Future<void>.delayed(_readDelay);
+  }
+  return int.tryParse(file.readAsStringSync());
+}
