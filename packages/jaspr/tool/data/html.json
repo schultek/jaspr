@@ -1057,23 +1057,19 @@
       "attributes": {
         "x": {
           "doc": "The x coordinate of the rect.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "y": {
           "doc": "The y coordinate of the rect.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "width": {
           "doc": "The width of the rect.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "height": {
           "doc": "The height of the rect.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
@@ -1083,18 +1079,15 @@
       "attributes": {
         "cx": {
           "doc": "The x-axis coordinate of the center of the circle.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "cy": {
           "doc": "The y-axis coordinate of the center of the circle.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "r": {
           "doc": "The radius of the circle.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
@@ -1104,23 +1097,19 @@
       "attributes": {
         "cx": {
           "doc": "The x-axis coordinate of the center of the ellipse.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "cy": {
           "doc": "The y-axis coordinate of the center of the ellipse.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "rx": {
           "doc": "The radius of the ellipse on the x axis.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "ry": {
           "doc": "The radius of the ellipse on the y axis.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
@@ -1130,23 +1119,19 @@
       "attributes": {
         "x1": {
           "doc": "Defines the x-axis coordinate of the line starting point.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "y1": {
           "doc": "Defines the y-axis coordinate of the line starting point.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "x2": {
           "doc": "Defines the x-axis coordinate of the line ending point.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "y2": {
           "doc": "Defines the y-axis coordinate of the line ending point.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
@@ -1156,8 +1141,7 @@
       "attributes": {
         "d": {
           "doc": "This attribute defines the shape of the path.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
@@ -1167,8 +1151,7 @@
       "attributes": {
         "points": {
           "doc": "This attribute defines the list of points (pairs of x,y absolute coordinates) required to draw the polygon.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
@@ -1178,8 +1161,7 @@
       "attributes": {
         "points": {
           "doc": "This attribute defines the list of points (pairs of x,y absolute coordinates) required to draw the polyline.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
