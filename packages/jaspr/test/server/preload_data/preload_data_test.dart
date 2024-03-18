@@ -1,3 +1,5 @@
+@TestOn('vm')
+
 import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
 

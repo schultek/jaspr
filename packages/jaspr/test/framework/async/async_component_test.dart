@@ -1,3 +1,5 @@
+@TestOn('vm')
+
 import 'dart:async';
 
 import 'package:jaspr_test/jaspr_test.dart';

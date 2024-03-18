@@ -23,21 +23,20 @@ scripts:
   test:
     run: |
       melos exec --scope=jaspr -- "dart test" &&
-      melos exec --scope=jaspr_cli -- "dart test" &&
       melos exec --scope=jaspr_riverpod -- "dart test" &&
-      melos exec --scope=jaspr_router -- "dart test" &&
-      melos exec --scope=jaspr -- "dart test --preset=browser" &&
-      melos exec --scope=jaspr_router -- "dart test --preset=browser"
+      melos exec --scope=jaspr_router -- "dart test"
   coverage:ci:
     run: |
       melos exec --scope=jaspr -- "dart test --coverage=coverage" &&
-      melos exec --scope=jaspr_cli -- "dart test --coverage=coverage" &&
       melos exec --scope=jaspr_riverpod -- "dart test --coverage=coverage" &&
       melos exec --scope=jaspr_router -- "dart test --coverage=coverage" &&
-      melos exec --scope=jaspr -- "dart test --preset=browser --coverage=coverage" &&
-      melos exec --scope=jaspr_router -- "dart test --preset=browser --coverage=coverage" &&
       melos exec --no-private -- "dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/$(echo "\$MELOS_PACKAGE_NAME")_lcov.info" -i ./coverage" &&
       find $MELOS_ROOT_PATH/coverage -type f -empty -print -delete
+  coverage:cli:variant:
+    run: |
+      cd packages/jaspr_cli &&
+      dart test --coverage=coverage --tags="$VARIANT" &&
+      dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "../../coverage/jaspr_cli_$(echo $VARIANT)_lcov.info" -i ./coverage
   coverage:
     run: |
       melos run coverage:ci

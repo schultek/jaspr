@@ -4,20 +4,49 @@ import 'package:test/test.dart';
 import 'file_matchers.dart';
 
 final variants = [
-  for (var mode in RenderingMode.values)
-    for (var hydration in HydrationMode.valuesFor(mode))
-      for (var routing in RoutingOption.values)
-        for (var flutter in FlutterOption.values)
-          for (var backend in BackendOption.valuesFor(mode))
-            TestVariant(mode: mode, hydration: hydration, routing: routing, flutter: flutter, backend: backend),
-].take(1);
+  TestVariant(
+    mode: RenderingMode.static,
+    hydration: HydrationMode.auto,
+    routing: RoutingOption.singlePage,
+    flutter: FlutterOption.none,
+    backend: BackendOption.none,
+  ),
+  TestVariant(
+    mode: RenderingMode.server,
+    hydration: HydrationMode.none,
+    routing: RoutingOption.singlePage,
+    flutter: FlutterOption.none,
+    backend: BackendOption.none,
+  ),
+  TestVariant(
+    mode: RenderingMode.client,
+    hydration: HydrationMode.none,
+    routing: RoutingOption.singlePage,
+    flutter: FlutterOption.none,
+    backend: BackendOption.none,
+  ),
+  TestVariant(
+    mode: RenderingMode.client,
+    hydration: HydrationMode.none,
+    routing: RoutingOption.none,
+    flutter: FlutterOption.embedded,
+    backend: BackendOption.none,
+  ),
+  TestVariant(
+    mode: RenderingMode.server,
+    hydration: HydrationMode.auto,
+    routing: RoutingOption.none,
+    flutter: FlutterOption.none,
+    backend: BackendOption.shelf,
+  ),
+];
 
 class TestVariant {
   final RenderingMode mode;
   final HydrationMode hydration;
   final RoutingOption routing;
   final FlutterOption flutter;
-  final BackendOption? backend;
+  final BackendOption backend;
 
   const TestVariant({
     required this.mode,
@@ -28,10 +57,12 @@ class TestVariant {
   });
 
   String get name =>
-      '${mode.name}${hydration.option} routing:${routing.option} flutter:${flutter.option}${backend != null ? ' backend:${backend!.option}' : ''}';
+      '${mode.name}${hydration.option} routing:${routing.option} flutter:${flutter.option} backend:${backend.option}';
 
   String get options =>
-      '-m ${mode.name}${hydration.option} -r ${routing.option} -f ${flutter.option}${backend != null ? ' -b ${backend!.option}' : ''}';
+      '-m ${mode.name}${hydration.option} -r ${routing.option} -f ${flutter.option} -b ${backend.option}';
+
+  String get tag => '${mode.tag}${hydration.tag}${routing.tag}${flutter.tag}${backend.tag}';
 
   Set<String> get packages => {
         if (routing != RoutingOption.none) 'packages/jaspr_router',
@@ -45,25 +76,31 @@ class TestVariant {
         ...mode.files,
         ...routing.files,
         ...flutter.files,
-        ...?backend?.files,
+        ...backend.files,
       };
 
   Set<String> get resources => {
         ...mode.resources,
         ...routing.resources,
         ...flutter.resources,
-        ...?backend?.resources,
+        ...backend.resources,
       };
 
   Set<String> get outputs => {
         ...mode.outputs,
         ...routing.outputs,
         ...flutter.outputs,
-        ...?backend?.outputs,
+        ...backend.outputs,
       };
 }
 
 extension on RenderingMode {
+  String get tag => switch (this) {
+        RenderingMode.static => 's',
+        RenderingMode.server => 'v',
+        RenderingMode.client => 'c',
+      };
+
   Set<(String, Matcher)> get files => switch (this) {
         RenderingMode.static || RenderingMode.server => {
             ('lib/main.dart', fileExists),
@@ -88,6 +125,8 @@ enum HydrationMode {
   static List<HydrationMode> valuesFor(RenderingMode mode) =>
       switch (mode) { RenderingMode.client => [none], _ => [auto, none] };
 
+  String get tag => switch (this) { none => 'n', auto => 'a' };
+
   Set<(String, Matcher)> get files => switch (this) {
         none => {
             ('web/main.dart', fileExists),
@@ -108,6 +147,8 @@ enum RoutingOption {
   const RoutingOption(this.option);
   final String option;
 
+  String get tag => switch (this) { none => 'n', singlePage => 's', multiPage => 'm' };
+
   Set<(String, Matcher)> get files => switch (this) {
         singlePage || multiPage => {
             ('lib/components/header.dart', fileExists),
@@ -125,6 +166,8 @@ enum FlutterOption {
 
   const FlutterOption(this.option);
   final String option;
+
+  String get tag => switch (this) { none => 'n', embedded => 'e', pluginsOnly => 'p' };
 
   Set<(String, Matcher)> get files => switch (this) {
         none => {},
@@ -149,6 +192,8 @@ enum BackendOption {
 
   static List<BackendOption?> valuesFor(RenderingMode mode) =>
       switch (mode) { RenderingMode.server => values, _ => [null] };
+
+  String get tag => switch (this) { none => 'n', shelf => 's', dartFrog => 'f' };
 
   Set<(String, Matcher)> get files => {};
   Set<String> get resources => {};

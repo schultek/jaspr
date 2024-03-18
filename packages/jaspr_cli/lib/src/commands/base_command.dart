@@ -47,10 +47,11 @@ abstract class BaseCommand extends Command<int> {
   }
 
   Future<void> stop() async {
-    for (var g in guards) {
+    var gs = [...guards];
+    guards.clear();
+    for (var g in gs) {
       await g();
     }
-    guards.clear();
   }
 
   Future<Never> shutdown([int exitCode = 1]) async {

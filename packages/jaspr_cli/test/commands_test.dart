@@ -19,7 +19,7 @@ void main() {
     var runner = setupRunner();
 
     for (var variant in variants) {
-      test(variant.name, () async {
+      test(variant.name, tags: variant.tag, () async {
         await runner.run('create -v ${variant.options} myapp', dir: dirs.root);
 
         for (var f in variant.files) {
