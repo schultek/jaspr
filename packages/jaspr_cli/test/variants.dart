@@ -187,15 +187,19 @@ enum FlutterOption {
             ('lib/components/flutter_counter_fallback.dart', fileExists),
             ('web/manifest.json', fileExists),
           },
-        pluginsOnly => {}
+        pluginsOnly => {},
       };
   Set<String> get resources => {};
-  Set<(String, Matcher)> get outputs => {
-        ('manifest.json', fileExists),
-        ('version.json', fileExists),
-        ('flutter_service_worker.js', fileExists),
-        ('canvaskit/canvaskit.js', fileExists),
-        ('assets/AssetManifest.json', fileExists),
+  Set<(String, Matcher)> get outputs => switch (this) {
+        none => {},
+        embedded => {
+            ('manifest.json', fileExists),
+            ('version.json', fileExists),
+            ('flutter_service_worker.js', fileExists),
+            ('canvaskit/canvaskit.js', fileExists),
+            ('assets/AssetManifest.json', fileExists),
+          },
+        pluginsOnly => {},
       };
 }
 

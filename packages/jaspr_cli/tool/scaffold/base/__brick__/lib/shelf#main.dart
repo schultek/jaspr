@@ -44,7 +44,7 @@ void main() async {
       .addMiddleware(logRequests())
       .addHandler(router);
 
-  var server = await shelf_io.serve(handler, InternetAddress.anyIPv4, 8080);
+  var server = await shelf_io.serve(handler, InternetAddress.anyIPv4, 8080, shared: true);
 
   print('Serving at http://${server.address.host}:${server.port}');
 }
