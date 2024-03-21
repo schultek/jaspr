@@ -77,6 +77,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          submodules: 'true'
 
       - uses: dart-lang/setup-dart@v1.3
       - uses: subosito/flutter-action@v2
