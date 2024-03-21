@@ -1,8 +1,9 @@
+import 'package:web/web.dart' if (dart.library.io) 'events_vm.dart';
+
 import '../../components/html/html.dart';
 import '../basic_types.dart';
-import 'events_web.dart' if (dart.library.ffi) 'events_vm.dart';
 
-export 'events_web.dart' if (dart.library.ffi) 'events_vm.dart' hide InputElement, TextAreaElement, SelectElement;
+export 'package:web/web.dart' if (dart.library.io) 'events_vm.dart' show Event;
 
 typedef EventCallback = void Function(Event event);
 typedef EventCallbacks = Map<String, EventCallback>;
@@ -41,9 +42,8 @@ EventCallbacks events<V1, V2>({
 void Function(Event) _callWithValue<V>(String event, void Function(V) fn) {
   return (e) {
     var target = e.target;
-    print(target.runtimeType);
     var value = switch (target) {
-      InputElement() => () {
+      HTMLInputElement() => () {
           var type = InputType.values.where((v) => v.name == target.type).firstOrNull;
           return switch (type) {
             InputType.checkbox || InputType.radio => target.checked,
@@ -53,8 +53,9 @@ void Function(Event) _callWithValue<V>(String event, void Function(V) fn) {
             _ => target.value,
           };
         }(),
-      TextAreaElement() => target.value ?? '',
-      SelectElement() => target.selectedOptions.map((o) => o.value).toList(),
+      HTMLTextAreaElement() => target.value,
+      HTMLSelectElement() =>
+        target.selectedOptions.toIterable().map((o) => o is HTMLOptionElement ? o.value : null).toList(),
       _ => null,
     };
     assert(() {
@@ -66,4 +67,12 @@ void Function(Event) _callWithValue<V>(String event, void Function(V) fn) {
     }());
     fn(value as V);
   };
+}
+
+extension on HTMLCollection {
+  Iterable<Node> toIterable() sync* {
+    for (var i = 0; i < length; i++) {
+      yield item(i)!;
+    }
+  }
 }

@@ -7,7 +7,6 @@ environment:
   sdk: '>=3.0.0-0 <4.0.0'
 
 dependencies:
-  cupertino_icons: 1.0.6
   firebase_core: ^2.15.1
   flutter:
     sdk: flutter
@@ -15,7 +14,6 @@ dependencies:
   jaspr: ^0.9.0
   jaspr_flutter_embed: ^0.1.4
   jaspr_riverpod: ^0.3.6
-  js: ^0.6.7
   riverpod: ^2.4.0
 
 dev_dependencies:

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html';
+
+import 'package:web/web.dart' as web;
 
 import '../framework/framework.dart';
 import 'browser_binding.dart';
@@ -41,7 +42,7 @@ ClientLoader loadClient(Future<void> Function() loader, ClientBuilder builder) {
   return () => loader().then((_) => builder);
 }
 
-void _runClient(ClientBuilder builder, ConfigParams params, (Node, Node) between) {
+void _runClient(ClientBuilder builder, ConfigParams params, (web.Node, web.Node) between) {
   BrowserAppBinding().attachRootComponent(builder(params), attachBetween: between);
 }
 
@@ -49,12 +50,12 @@ final _compStartRegex = RegExp(r'^\s*\$(\S+)(?:\s+data=(.*))?\s*$');
 final _compEndRegex = RegExp(r'^\s*/\$(\S+)\s*$');
 
 void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
-  var iterator = NodeIterator(document, NodeFilter.SHOW_COMMENT);
+  var iterator = web.document.createNodeIterator(web.document, 128 /* NodeFilter.SHOW_COMMENT */);
 
-  List<(String, String?, Node)> nodes = [];
+  List<(String, String?, web.Node)> nodes = [];
 
-  Comment? currNode;
-  while ((currNode = iterator.nextNode() as Comment?) != null) {
+  web.Comment? currNode;
+  while ((currNode = iterator.nextNode() as web.Comment?) != null) {
     var value = currNode!.nodeValue ?? '';
     var match = _compStartRegex.firstMatch(value);
     if (match != null) {

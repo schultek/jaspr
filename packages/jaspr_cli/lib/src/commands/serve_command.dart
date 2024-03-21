@@ -134,6 +134,9 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
 
     if (!useSSR) {
       await workflow.done;
+    }
+
+    if (!useSSR) {
       return ExitCode.success.code;
     }
 
