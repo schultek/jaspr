@@ -3,42 +3,13 @@ import 'package:test/test.dart';
 
 import 'file_matchers.dart';
 
-final variants = [
-  TestVariant(
-    mode: RenderingMode.static,
-    hydration: HydrationMode.auto,
-    routing: RoutingOption.singlePage,
-    flutter: FlutterOption.none,
-    backend: BackendOption.none,
-  ),
-  TestVariant(
-    mode: RenderingMode.server,
-    hydration: HydrationMode.none,
-    routing: RoutingOption.singlePage,
-    flutter: FlutterOption.none,
-    backend: BackendOption.none,
-  ),
-  TestVariant(
-    mode: RenderingMode.client,
-    hydration: HydrationMode.none,
-    routing: RoutingOption.singlePage,
-    flutter: FlutterOption.none,
-    backend: BackendOption.none,
-  ),
-  TestVariant(
-    mode: RenderingMode.client,
-    hydration: HydrationMode.none,
-    routing: RoutingOption.none,
-    flutter: FlutterOption.embedded,
-    backend: BackendOption.none,
-  ),
-  TestVariant(
-    mode: RenderingMode.server,
-    hydration: HydrationMode.auto,
-    routing: RoutingOption.none,
-    flutter: FlutterOption.none,
-    backend: BackendOption.shelf,
-  ),
+final allVariants = [
+  for (var mode in RenderingMode.values)
+    for (var hydration in HydrationMode.valuesFor(mode))
+      for (var routing in RoutingOption.values)
+        for (var flutter in FlutterOption.values)
+          for (var backend in BackendOption.valuesFor(mode))
+            TestVariant(mode: mode, hydration: hydration, routing: routing, flutter: flutter, backend: backend),
 ];
 
 class TestVariant {
@@ -211,8 +182,8 @@ enum BackendOption {
   const BackendOption(this.option);
   final String option;
 
-  static List<BackendOption?> valuesFor(RenderingMode mode) =>
-      switch (mode) { RenderingMode.server => values, _ => [null] };
+  static List<BackendOption> valuesFor(RenderingMode mode) =>
+      switch (mode) { RenderingMode.server => values, _ => [none] };
 
   String get tag => switch (this) { none => 'n', shelf => 's', dartFrog => 'f' };
 

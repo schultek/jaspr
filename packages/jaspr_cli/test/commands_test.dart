@@ -19,7 +19,7 @@ void main() {
     var dirs = setupTempDirs();
     var runner = setupRunner();
 
-    for (var variant in variants) {
+    for (var variant in allVariants) {
       test(variant.name, tags: variant.tag, () async {
         await runner.run('create -v ${variant.options} myapp', dir: dirs.root);
 
