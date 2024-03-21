@@ -107,7 +107,7 @@ as **Widgets** from Flutter. jaspr comes with all three base types of Components
 - **StatefulComponent**: A component that holds state and can trigger rebuilds using `setState()`.
 - **InheritedComponent**: A component that can notify its dependents when its state changes.
 
-In addition to these base components, there are all **HTML** components to use:
+In addition to these base components, there are also all **html** elements available as components:
 
 ```dart
 div([
