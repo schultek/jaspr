@@ -7,14 +7,10 @@ import 'package:pub_updater/pub_updater.dart';
 
 import '../logging.dart';
 import '../scaffold/base_bundle.dart';
-import '../templates.dart';
 import '../version.dart';
 import 'base_command.dart';
 
 final RegExp _packageRegExp = RegExp(r'^[a-z_][a-z0-9_]*$');
-
-final templatesByName = {for (var t in templates) t.name: t};
-final templateDescriptionByName = {for (var t in templates) t.name: t.description};
 
 enum RenderingMode {
   static('Build a statically pre-rendered site'),
