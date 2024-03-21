@@ -13,13 +13,35 @@ abstract class RenderObject {
   void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events);
 
-  void updateText(String text, [bool rawHtml = false]);
+  void updateText(String text);
 
   void skipChildren();
 
   void attach(covariant RenderObject? parent, covariant RenderObject? after);
 
   void remove();
+}
+
+abstract class MultiChildRenderObjectElement extends MultiChildElement with RenderObjectElement {
+  MultiChildRenderObjectElement(super.component);
+
+  @override
+  void update(covariant Component newComponent) {
+    super.update(newComponent);
+    _dirty = true;
+    rebuild();
+  }
+}
+
+abstract class SingleChildRenderObjectElement extends SingleChildElement with RenderObjectElement {
+  SingleChildRenderObjectElement(super.component);
+
+  @override
+  void update(covariant Component newComponent) {
+    super.update(newComponent);
+    _dirty = true;
+    rebuild();
+  }
 }
 
 mixin RenderObjectElement on Element {

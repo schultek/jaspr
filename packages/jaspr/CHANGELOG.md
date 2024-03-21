@@ -28,6 +28,9 @@
 
 - Improved how `@client` components are hydrated.
 
+- **BREAKING** Removed `rawHtml` flag from `Text` component and `text()` method, in favor of 
+  new `RawText` component and `raw()` method respectively, which fixes multiple bugs with the old implementation.
+
 - Fixed bug with `DomValidator`.
 
 ## 0.10.0
