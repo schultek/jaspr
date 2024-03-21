@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:jaspr_cli/src/command_runner.dart';
 import 'package:jaspr_cli/src/commands/base_command.dart';
+import 'package:jaspr_cli/src/commands/create_command.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
@@ -56,8 +57,13 @@ void main() {
 
         await runner.run('build -v', dir: dirs.app);
 
-        for (var file in variant.outputs) {
-          expect(File(p.join(dirs.app().path, 'build', 'jaspr', file)).existsSync(), isTrue);
+        var outputPath = p.join(dirs.app().path, 'build', 'jaspr');
+        if (variant.mode == RenderingMode.server) {
+          outputPath = p.join(outputPath, 'web');
+        }
+
+        for (var f in variant.outputs) {
+          expect(File(p.join(outputPath, f.$1)), f.$2, reason: f.$1);
         }
       });
     }

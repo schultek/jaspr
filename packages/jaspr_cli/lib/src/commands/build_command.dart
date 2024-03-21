@@ -107,6 +107,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           '-Djaspr.flags.release=true',
         ],
         runInShell: true,
+        workingDirectory: Directory.current.absolute.path,
       );
 
       await watchProcess('server build', process, tag: Tag.cli, progress: 'Building server app...');
@@ -204,7 +205,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   Future<int> _buildWeb() async {
     logger.write('Building web assets...', progress: ProgressState.running);
     var client = await d.connectClient(
-      Directory.current.path,
+      Directory.current.absolute.path,
       [
         '--release',
         '--verbose',

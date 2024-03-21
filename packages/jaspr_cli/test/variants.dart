@@ -86,11 +86,12 @@ class TestVariant {
         ...backend.resources,
       };
 
-  Set<String> get outputs => {
+  Set<(String, Matcher)> get outputs => {
         ...mode.outputs,
         ...routing.outputs,
         ...flutter.outputs,
         ...backend.outputs,
+        if (mode == RenderingMode.static && routing != RoutingOption.none) ('about.html', fileExists),
       };
 }
 
@@ -112,7 +113,7 @@ extension on RenderingMode {
           },
       };
   Set<String> get resources => {};
-  Set<String> get outputs => {};
+  Set<(String, Matcher)> get outputs => {};
 }
 
 enum HydrationMode {
@@ -136,7 +137,13 @@ enum HydrationMode {
           }
       };
   Set<String> get resources => {};
-  Set<String> get outputs => {};
+  Set<(String, Matcher)> get outputs => switch (this) {
+        none => {('main.dart.js', fileExists)},
+        auto => {
+            ('main.clients.dart.js', fileExists),
+            ('components/app.client.dart.js', fileExists),
+          },
+      };
 }
 
 enum RoutingOption {
@@ -156,7 +163,7 @@ enum RoutingOption {
         none => {},
       };
   Set<String> get resources => {};
-  Set<String> get outputs => {};
+  Set<(String, Matcher)> get outputs => {};
 }
 
 enum FlutterOption {
@@ -179,7 +186,7 @@ enum FlutterOption {
         pluginsOnly => {}
       };
   Set<String> get resources => {};
-  Set<String> get outputs => {};
+  Set<(String, Matcher)> get outputs => {};
 }
 
 enum BackendOption {
@@ -197,5 +204,5 @@ enum BackendOption {
 
   Set<(String, Matcher)> get files => {};
   Set<String> get resources => {};
-  Set<String> get outputs => {};
+  Set<(String, Matcher)> get outputs => {};
 }
