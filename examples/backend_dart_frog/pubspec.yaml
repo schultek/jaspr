@@ -1,4 +1,4 @@
-name: server_dart_frog
+name: backend_dart_frog
 description: An example application built with dart_frog & jaspr.
 version: 0.1.0
 publish_to: none

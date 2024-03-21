@@ -1,4 +1,4 @@
-# Shelf Server Example
+# Shelf Backend Example
 
 This example shows how to use a custom shelf server with Jaspr. 
 
