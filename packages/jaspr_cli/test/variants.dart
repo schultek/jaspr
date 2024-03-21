@@ -92,7 +92,7 @@ class TestVariant {
         ...routing.outputs,
         ...flutter.outputs,
         ...backend.outputs,
-        if (mode == RenderingMode.static && routing != RoutingOption.none) ('about.html', fileExists),
+        if (mode == RenderingMode.static && routing != RoutingOption.none) ('about/index.html', fileExists),
       };
 }
 
