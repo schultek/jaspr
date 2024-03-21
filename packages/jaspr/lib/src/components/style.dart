@@ -14,8 +14,9 @@ class Style extends StatelessComponent {
   }
 }
 
-const cssBlockInset = kDebugMode || kGenerateMode ? '  ' : '';
-const cssPropSpace = kDebugMode || kGenerateMode ? '\n' : ' ';
+/// Utility method to create nested style definitions.
+NestedStyleRule css(String selector, [List<StyleRule> children = const []]) =>
+    NestedStyleRule._(_BlockStyleRule(selector: Selector(selector), styles: Styles()), children);
 
 abstract class StyleRule {
   const factory StyleRule({required Selector selector, required Styles styles}) = _BlockStyleRule;
@@ -26,6 +27,57 @@ abstract class StyleRule {
   const factory StyleRule.media({required MediaRuleQuery query, required List<StyleRule> styles}) = _MediaStyleRule;
 
   String _toCss([String indent]);
+}
+
+class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
+  NestedStyleRule._(this._self, this._children);
+
+  final _BlockStyleRule _self;
+  final List<StyleRule> _children;
+
+  @override
+  NestedStyleRule combine(Styles styles) {
+    return NestedStyleRule._(
+        _BlockStyleRule(selector: _self.selector, styles: _self.styles.combine(styles)), _children);
+  }
+
+  @override
+  String _toCss([String indent = '', String parent = '']) {
+    var rules = <String>[];
+
+    var self = _self;
+    var curr = self.selector.selector.startsWith('&') || parent.isEmpty
+        ? self.selector.selector.replaceFirst('&', parent)
+        : '$parent ${self.selector.selector}';
+
+    if (_self.styles.styles.isNotEmpty) {
+      rules.add(_self._toCssWithParent(indent, parent));
+    }
+
+    for (var child in _children) {
+      if (child is NestedStyleRule) {
+        rules.add(child._toCss(indent, curr));
+      } else if (child is _BlockStyleRule) {
+        rules.add(child._toCssWithParent(indent, curr));
+      } else {
+        throw UnsupportedError('Cannot nest ${child.runtimeType} inside other StyleRule.');
+      }
+    }
+
+    return rules.join(cssPropSpace);
+  }
+}
+
+extension on _BlockStyleRule {
+  String _toCssWithParent(String indent, String parent) {
+    var child = _BlockStyleRule(
+      selector: Selector(selector.selector.startsWith('&') || parent.isEmpty
+          ? selector.selector.replaceFirst('&', parent)
+          : '$parent ${selector.selector}'),
+      styles: styles,
+    );
+    return child._toCss(indent);
+  }
 }
 
 class _BlockStyleRule implements StyleRule {
@@ -317,3 +369,6 @@ class _ListSelector implements Selector {
   @override
   String get selector => selectors.map((s) => s.selector).join(', ');
 }
+
+const cssBlockInset = kDebugMode || kGenerateMode ? '  ' : '';
+const cssPropSpace = kDebugMode || kGenerateMode ? '\n' : ' ';

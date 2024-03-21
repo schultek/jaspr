@@ -41,7 +41,6 @@ EventCallbacks events<V1, V2>({
 void Function(Event) _callWithValue<V>(String event, void Function(V) fn) {
   return (e) {
     var target = e.target;
-    print(target.runtimeType);
     var value = switch (target) {
       InputElement() => () {
           var type = InputType.values.where((v) => v.name == target.type).firstOrNull;

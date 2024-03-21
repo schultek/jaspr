@@ -14,10 +14,10 @@ and builds all the routes for your website and outputs only static files that ca
 ---
 
 To use SSG with Jaspr, you need to setup your app the same way as for server-side rendering. Then instead of building the
-server as an executable, `jaspr generate` will run your app locally and request each route to be rendered into a separate `.html` file.
+server as an executable, `jaspr build` will run your app locally and request each route to be rendered into a separate `.html` file.
 
 Say you have a server-rendered app with the routes `/`, `/about` and `/contact`. Then running `jaspr generate` will
-output a `index.html`, `about.html` and `contact.html` file.
+output a `index.html`, `about/index.html` and `contact/index.html` file.
 
 To make sure all pages are generated for your site, you need to tell Jaspr about the routes of your website.
 

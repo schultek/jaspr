@@ -1,3 +1,5 @@
+@TestOn('vm')
+
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
@@ -43,7 +45,7 @@ void main() {
           styles.styles,
           equals({
             'font-size': '14px',
-            'font-family': '"Roboto"',
+            'font-family': "'Roboto'",
           }),
         );
       });
@@ -73,7 +75,7 @@ void main() {
           equals({
             'color': 'blue',
             'text-align': 'center',
-            'font-family': '"Roboto"',
+            'font-family': "'Roboto'",
             'font-style': 'italic',
             'font-size': '12px',
             'font-weight': 'bold',
@@ -132,7 +134,7 @@ void main() {
           boxSizing: BoxSizing.borderBox,
           width: Unit.percent(80),
           height: Unit.percent(70),
-          constraints: BoxConstraints(maxWidth: Unit.pixels(1000)),
+          maxWidth: Unit.pixels(1000),
           border: Border.only(top: BorderSide(style: BorderStyle.solid, color: Colors.green)),
           radius: BorderRadius.circular(Unit.pixels(20)),
           outline: Outline(color: Colors.yellow),

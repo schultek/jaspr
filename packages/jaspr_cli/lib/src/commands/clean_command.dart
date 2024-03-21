@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:mason/mason.dart';
-
 import 'base_command.dart';
 
 class CleanCommand extends BaseCommand {
@@ -27,17 +25,17 @@ class CleanCommand extends BaseCommand {
   String get category => 'Tooling';
 
   @override
-  Future<int> run() async {
+  Future<CommandResult?> run() async {
     await super.run();
 
-    var genDir = Directory('.dart_tool/jaspr/');
+    var genDir = Directory('.dart_tool/jaspr/').absolute;
 
     logger.write('Deleting .dart_tool/jaspr...');
     if (await genDir.exists()) {
       await genDir.delete(recursive: true);
     }
 
-    var buildDir = Directory('build/jaspr/');
+    var buildDir = Directory('build/jaspr/').absolute;
 
     logger.write('Deleting build/jaspr...');
     if (await buildDir.exists()) {
@@ -73,7 +71,7 @@ class CleanCommand extends BaseCommand {
       }
     }
 
-    return ExitCode.success.code;
+    return null;
   }
 }
 

@@ -4,7 +4,7 @@ import 'package:jaspr_router/jaspr_router.dart';
 import '../services/service.dart';
 
 class Home extends StatefulComponent {
-  Home({Key? key}) : super(key: key);
+  Home({super.key});
 
   @override
   State<StatefulComponent> createState() => HomeState();

@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:hotreloader/hotreloader.dart';
+import 'package:http/http.dart' as http;
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
 import '../../server.dart';
@@ -11,124 +12,65 @@ typedef SetupFunction = void Function(ServerAppBinding binding);
 
 /// An object to be returned from runApp on the server and provide access to the internal http server
 class ServerApp {
-  ServerApp._(this._setup, [this._fileHandler]);
+  ServerApp._(this._setup);
 
-  factory ServerApp.run(SetupFunction setup, [Handler? fileHandler]) {
-    return ServerApp._(setup, fileHandler).._run();
+  factory ServerApp.run(SetupFunction setup) {
+    return ServerApp._(setup).._run();
   }
+
+  static final createTestHandler = createHandler;
 
   final SetupFunction _setup;
 
-  final Handler? _fileHandler;
+  static HttpServer? _server;
+  static http.Client? _client;
 
-  HotReloader? _reloader;
+  void _run() async {
+    var isFirstStartup = _server == null;
 
-  HttpServer? _server;
-  HttpServer? get server => _server;
+    await _server?.close(force: true);
+    _server = await _createServer();
 
-  bool _running = false;
+    if (isFirstStartup) {
+      _writePid();
 
-  final List<Middleware> _middleware = [];
+      print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');
+      print('Serving at http://${kDebugMode ? 'localhost' : _server!.address.host}:${_server!.port}');
 
-  // The server origin. Must be set when the server was started, before the first incoming request
-  String? origin;
-
-  /// Adds a custom shelf middleware to the server
-  void addMiddleware(Middleware middleware) {
-    if (_running) throw 'Cannot attach middleware. Server is already running.';
-    _middleware.add(middleware);
-  }
-
-  Function(HttpServer server)? _listener;
-
-  /// Registers a listener to be called after the server has started.
-  /// Might be called multiple times when using hot reload.
-  void setListener(Function(HttpServer server) listener) {
-    if (_running) throw 'Cannot attach listener. Server is already running.';
-    _listener = listener;
-  }
-
-  Future<HttpServer> Function(Handler)? _builder;
-
-  /// Registers a custom function to spin up a http server,
-  /// which will be used instead of the default server.
-  void setBuilder(Future<HttpServer> Function(Handler) builder) {
-    if (_running) throw 'Cannot attach builder. Server is already running.';
-    _builder = builder;
-  }
-
-  void _run() {
-    Future.microtask(() async {
-      _running = true;
-
-      var handler = createHandler((_, render) => render(_setup), middleware: _middleware, fileHandler: _fileHandler);
-
-      if (kDevHotreload) {
-        await _reload(this, () {
-          if (handler is RefreshableHandler) {
-            (handler as RefreshableHandler).refresh();
-          }
-          return _createServer(this, handler);
-        });
-      } else {
-        _server = await _createServer(this, handler);
-        _listener?.call(_server!);
+      if (kGenerateMode) {
+        requestRouteGeneration('/');
       }
-
-      print('[INFO] Running app in ${kDebugMode ? 'debug' : 'release'} mode');
-      print('[INFO] Serving at http://${kDebugMode ? 'localhost' : server!.address.host}:${server!.port}');
-
-      requestRouteGeneration('/');
-    });
-  }
-
-  Future<void> close() async {
-    await _server?.close();
-    await _reloader?.stop();
-  }
-
-  static void requestRouteGeneration(String route) {
-    if (kGenerateMode) {
-      print('[DAEMON] {"route": "$route"}');
-    }
-  }
-}
-
-/// Wraps the http server creation and enables hotreload
-/// Modified from package:shelf_hotreload
-Future<void> _reload(ServerApp app, FutureOr<HttpServer> Function() init) async {
-  app._server = await init();
-  app._listener?.call(app._server!);
-
-  // ignore: prefer_function_declarations_over_variables
-  var obtainNewServer = (FutureOr<HttpServer> Function() initializer) async {
-    await app.server?.close(force: true);
-    print('[INFO] Server application reloaded.');
-    app._server = await initializer();
-    app._listener?.call(app._server!);
-  };
-
-  try {
-    app._reloader = await HotReloader.create(
-      debounceInterval: Duration.zero,
-      onAfterReload: (ctx) => obtainNewServer(init),
-    );
-    print('[INFO] Server hot reload is enabled.');
-  } on StateError catch (e) {
-    if (e.message.contains('VM service not available')) {
-      print('[WARNING] Server hot reload not enabled. Run with --enable-vm-service to enable hot reload.');
     } else {
-      rethrow;
+      print('[INFO] Server application reloaded.');
     }
   }
-}
 
-/// Creates and runs the http server
-Future<HttpServer> _createServer(ServerApp app, Handler handler) async {
-  if (app._builder != null) {
-    return app._builder!.call(handler);
-  } else {
+  Future<HttpServer> _createServer() {
     var port = int.parse(Platform.environment['PORT'] ?? '8080');
+    _client?.close();
+    _client = http.Client();
+    var handler = createHandler((_, render) => render(_setup), client: _client);
     return shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true);
+  }
+
+  void _writePid() {
+    // Workaround until https://github.com/dart-lang/sdk/issues/55219 is fixed.
+    var file = File('.dart_tool/jaspr/server.pid');
+    if (file.existsSync()) {
+      file.writeAsStringSync('$pid');
+    }
+  }
+
+  static void requestRouteGeneration(String route) async {
+    if (kGenerateMode) {
+      _sendDebugMessage({'route': route});
+    }
+  }
+
+  static Future<void> _sendDebugMessage(Object message) async {
+    await http.post(
+      Uri.parse('http://localhost:$jasprProxyPort/\$jasprMessageHandler'),
+      body: jsonEncode(message),
+    );
   }
 }

@@ -1,12 +1,12 @@
 part of '../styles.dart';
 
-class _FlexBoxStyles implements Styles {
+class _FlexBoxStyles extends Styles {
   final FlexDirection? direction;
   final FlexWrap? wrap;
   final JustifyContent? justifyContent;
   final AlignItems? alignItems;
 
-  const _FlexBoxStyles({this.direction, this.wrap, this.justifyContent, this.alignItems});
+  const _FlexBoxStyles({this.direction, this.wrap, this.justifyContent, this.alignItems}) : super._();
 
   @override
   Map<String, String> get styles => {
