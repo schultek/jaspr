@@ -120,22 +120,24 @@ enum HydrationMode {
 
 enum RoutingOption {
   none('none'),
-  singlePage('single-page'),
-  multiPage('multi-page');
+  pages('pages');
 
   const RoutingOption(this.option);
   final String option;
 
-  String get tag => switch (this) { none => 'n', singlePage => 's', multiPage => 'm' };
+  String get tag => switch (this) {
+        none => 'n',
+        pages => 'p',
+      };
 
   Set<(String, Matcher)> get files => switch (this) {
-        singlePage || multiPage => {
+        pages => {
             ('lib/components/header.dart', fileExists),
           },
         none => {},
       };
   Set<String> get resources => switch (this) {
-        singlePage || multiPage => {'/about'},
+        pages => {'/about'},
         none => {},
       };
   Set<(String, Matcher)> get outputs => {};
@@ -176,8 +178,7 @@ enum FlutterOption {
 
 enum BackendOption {
   none('none'),
-  shelf('shelf'),
-  dartFrog('dart_frog');
+  shelf('shelf');
 
   const BackendOption(this.option);
   final String option;
@@ -185,7 +186,7 @@ enum BackendOption {
   static List<BackendOption> valuesFor(RenderingMode mode) =>
       switch (mode) { RenderingMode.server => values, _ => [none] };
 
-  String get tag => switch (this) { none => 'n', shelf => 's', dartFrog => 'f' };
+  String get tag => switch (this) { none => 'n', shelf => 's' };
 
   Set<(String, Matcher)> get files => {};
   Set<String> get resources => {};

@@ -50,11 +50,10 @@ class CreateCommand extends BaseCommand {
       'routing',
       abbr: 'r',
       help: 'Choose a routing strategy for the project.',
-      allowed: ['none', 'multi-page', 'single-page'],
+      allowed: ['none', 'pages'],
       allowedHelp: {
         'none': 'No preconfigured routing.',
-        'multi-page': '(Recommended) Sets up multi-page (server-side) routing.',
-        'single-page': 'Sets up single-page (client-side) routing.',
+        'pages': '(Recommended) Sets up page based routing.',
       },
     );
     argParser.addOption(
@@ -72,11 +71,10 @@ class CreateCommand extends BaseCommand {
       'backend',
       abbr: 'b',
       help: 'Choose the backend setup for the project (only valid in "server" mode).',
-      allowed: ['none', 'shelf', 'dart_frog'],
+      allowed: ['none', 'shelf'],
       allowedHelp: {
         'none': 'No custom backend setup.',
         'shelf': 'Sets up a custom backend using the shelf package.',
-        'dart_frog': 'Sets up a custom backend using the dart_frog framework.',
       },
     );
   }
@@ -105,7 +103,7 @@ class CreateCommand extends BaseCommand {
     var (dir, name) = getTargetDirectory();
 
     var (useMode, useHydration) = getRenderingMode();
-    var (useRouting, _ /* useMultiPageRouting */) = getRouting(useMode.useServer);
+    var useRouting = getRouting(useMode.useServer);
     var (useFlutter, usePlugins) = getFlutter();
     var useBackend = useMode == RenderingMode.server ? getBackend() : null;
 
@@ -213,23 +211,15 @@ class CreateCommand extends BaseCommand {
     };
   }
 
-  (bool, bool) getRouting(bool useServer) {
+  bool getRouting(bool useServer) {
     var opt = argResults!['routing'] as String?;
 
     return switch (opt) {
-      'none' => (false, false),
-      'single-page' => (true, false),
-      'multi-page' => (true, true),
+      'none' => false,
+      'pages' => true,
       _ => () {
           var routing = logger.logger.confirm('Setup routing for different pages of your site?', defaultValue: true);
-          var multiPage = routing && useServer
-              ? logger.logger.confirm(
-                  '(Recommended) Use multi-page (server-side) routing? '
-                  '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',
-                  defaultValue: true,
-                )
-              : false;
-          return (routing, multiPage);
+          return routing;
         }(),
     };
   }
@@ -266,19 +256,25 @@ class CreateCommand extends BaseCommand {
           );
           if (!backend) return null;
 
-          return logger.logger
+          var b = logger.logger
               .chooseOne(
                 'Select a backend framework:',
                 choices: [
                   ('shelf', 'Shelf: An official and well-supported minimal server package by the Dart Team.'),
                   (
                     'dart_frog',
-                    'Dart Frog: A fast, minimalistic backend framework for Dart built by Very Good Ventures.'
+                    'Dart Frog: (Coming Soon) A fast, minimalistic backend framework for Dart built by Very Good Ventures.'
                   ),
                 ],
                 display: (o) => o.$2,
               )
               .$1;
+
+          if (b == 'dart_frog') {
+            usageException('Support for Dart Frog is coming soon.');
+          }
+
+          return b;
         }(),
     };
   }
