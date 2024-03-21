@@ -1,7 +1,7 @@
 part of '../styles.dart';
 
-class _GridStyles implements Styles {
-  const _GridStyles({this.template, this.gap, this.autoRows, this.autoColumns});
+class _GridStyles extends Styles {
+  const _GridStyles({this.template, this.gap, this.autoRows, this.autoColumns}) : super._();
 
   final GridTemplate? template;
   final GridGap? gap;

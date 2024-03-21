@@ -7,7 +7,7 @@ import 'interop_controls.dart';
 
 @client
 class App extends StatelessComponent {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

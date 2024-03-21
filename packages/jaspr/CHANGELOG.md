@@ -1,8 +1,34 @@
-## Unreleased minor
+## Unreleased breaking
+
+- **BREAKING** Changed jaspr configuration to require `jaspr.mode` in `pubspec.yaml`:
+  
+  The `jaspr.mode` option now sets the rendering mode and must be one of:
+  - static
+  - server
+  - client
+
+  This replaces the removed `jaspr.uses-ssr` option.
+
+- **BREAKING** Removed `jaspr.uses-flutter` option. This is now auto-detected based on the dependencies.
+
+- **BREAKING** Removed `jaspr generate` command in favor using the `jaspr build` command in combination with
+  the new `jaspr.mode = static` option in `pubspec.yaml`.
+
+- **BREAKING** Removed the `runServer()` method along with its support for adding middleware and listeners. Users should instead 
+  migrate to the custom backend setup using `package:shelf`.
+
+- Improved the `jaspr create` command by changing to a scaffolding system as replacement for templates.
+  You will now be walked through a configuration wizard that creates a starting project based on the selected options.
+
+- Styles can now be written more concise using the ability to chain style groups as well as the new `css()` method.
+
+- Changes made to `main.dart` are now also hot-reloaded on the server.
+
+- `Document` is no longer required when using server-side rendering.
+
+- Improved how `@client` components are hydrated.
 
 - Fixed bug with `DomValidator`.
-- `Document` is no longer required when using server-side rendering.
-- Improved how `@client` components are hydrated.
 
 ## 0.10.0
 
