@@ -163,7 +163,10 @@ enum RoutingOption {
           },
         none => {},
       };
-  Set<String> get resources => {};
+  Set<String> get resources => switch (this) {
+        singlePage || multiPage => {'/about'},
+        none => {},
+      };
   Set<(String, Matcher)> get outputs => {};
 }
 
@@ -187,7 +190,13 @@ enum FlutterOption {
         pluginsOnly => {}
       };
   Set<String> get resources => {};
-  Set<(String, Matcher)> get outputs => {};
+  Set<(String, Matcher)> get outputs => {
+        ('manifest.json', fileExists),
+        ('version.json', fileExists),
+        ('flutter_service_worker.js', fileExists),
+        ('canvaskit/canvaskit.js', fileExists),
+        ('assets/AssetManifest.json', fileExists),
+      };
 }
 
 enum BackendOption {
