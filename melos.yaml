@@ -29,7 +29,7 @@ scripts:
   coverage:
     run: |
       dart test --coverage=coverage &&
-      dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/$MELOS_PACKAGE_NAME_lcov.info" -i ./coverage
+      dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/\$MELOS_PACKAGE_NAME_lcov.info" -i ./coverage
     exec:
       concurrency: 1
     packageFilters:
