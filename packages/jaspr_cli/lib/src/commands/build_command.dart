@@ -180,7 +180,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         file.writeAsBytesSync(response.bodyBytes);
       }
 
-      print("DONE");
       done = true;
       process.kill();
       // Workaround until https://github.com/dart-lang/sdk/issues/55219 is fixed.
