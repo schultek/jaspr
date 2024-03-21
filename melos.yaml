@@ -30,7 +30,7 @@ scripts:
       melos exec --scope=jaspr -- "dart test --coverage=coverage" &&
       melos exec --scope=jaspr_riverpod -- "dart test --coverage=coverage" &&
       melos exec --scope=jaspr_router -- "dart test --coverage=coverage" &&
-      melos exec --no-private -- "dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/$(echo "\$MELOS_PACKAGE_NAME")_lcov.info" -i ./coverage" &&
+      melos exec --scope=jaspr{,_riverpod,_router} -- "dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/$(echo "\$MELOS_PACKAGE_NAME")_lcov.info" -i ./coverage" &&
       find $MELOS_ROOT_PATH/coverage -type f -empty -print -delete
   coverage:cli:variant:
     run: |
