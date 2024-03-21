@@ -15,11 +15,11 @@ Future<void> copyFiles(String from, String to, [List<String> targets = const [''
 
       var files = Directory('$from/$moveTarget').absolute.list(recursive: true);
       await for (var file in files) {
-        final path = p.relative(file.absolute.path, from: p.join(Directory.current.path, from));
+        final path = p.relative(file.absolute.path, from: p.join(Directory.current.absolute.path, from));
         moveTargets.add(path);
       }
     } else {
-      moves.add(file.copy('./$to/$moveTarget'));
+      moves.add(file.copy(File('$to/$moveTarget').absolute.path));
     }
   }
 
