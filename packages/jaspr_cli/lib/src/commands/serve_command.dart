@@ -71,7 +71,7 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   Future<CommandResult?> run() async {
     await super.run();
 
-    logger.write("Running jaspr in ${config!.mode.name} rendering mode TEST.");
+    logger.write("Running jaspr in ${config!.mode.name} rendering mode.");
 
     var proxyPort = config!.mode == JasprMode.client ? port : '5567';
     var flutterPort = '5678';
