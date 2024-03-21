@@ -12,8 +12,8 @@ import 'package:test/test.dart';
   late Directory appDir;
 
   setUp(() {
-    tempDir = Directory(Directory.systemTemp.createTempSync('jaspr_cli_test').resolveSymbolicLinksSync());
-    appDir = Directory(p.join(tempDir.path, 'myapp'));
+    tempDir = Directory(Directory.systemTemp.createTempSync('jaspr_cli_test').resolveSymbolicLinksSync()).absolute;
+    appDir = Directory(p.join(tempDir.path, 'myapp')).absolute;
   });
 
   tearDown(() {

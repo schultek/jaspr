@@ -54,6 +54,7 @@ class ServerApp {
   }
 
   void _writePid() {
+    // Workaround until https://github.com/dart-lang/sdk/issues/55219 is fixed.
     var file = File('.dart_tool/jaspr/server.pid');
     if (file.existsSync()) {
       file.writeAsStringSync('$pid');

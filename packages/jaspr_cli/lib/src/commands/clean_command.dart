@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:mason/mason.dart';
-
 import 'base_command.dart';
 
 class CleanCommand extends BaseCommand {
@@ -27,7 +25,7 @@ class CleanCommand extends BaseCommand {
   String get category => 'Tooling';
 
   @override
-  Future<int> run() async {
+  Future<CommandResult?> run() async {
     await super.run();
 
     var genDir = Directory('.dart_tool/jaspr/').absolute;
@@ -73,7 +71,7 @@ class CleanCommand extends BaseCommand {
       }
     }
 
-    return ExitCode.success.code;
+    return null;
   }
 }
 

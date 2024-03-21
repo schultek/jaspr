@@ -7,7 +7,6 @@ import 'package:build_daemon/data/build_status.dart';
 import 'package:build_daemon/data/build_target.dart';
 import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
-import 'package:mason/mason.dart' show ExitCode;
 import 'package:path/path.dart' as p;
 import 'package:webdev/src/daemon_client.dart' as d;
 
@@ -49,7 +48,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   String get category => 'Project';
 
   @override
-  Future<int> run() async {
+  Future<CommandResult?> run() async {
     await super.run();
 
     logger.write("Building jaspr for ${config!.mode.name} rendering mode.");
@@ -107,7 +106,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           '-Djaspr.flags.release=true',
         ],
         runInShell: true,
-        workingDirectory: Directory.current.absolute.path,
+        workingDirectory: Directory.current.path,
       );
 
       await watchProcess('server build', process, tag: Tag.cli, progress: 'Building server app...');
@@ -132,7 +131,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         }
       });
 
-      var serverPid = File('.dart_tool/jaspr/server.pid');
+      var serverPid = File('.dart_tool/jaspr/server.pid').absolute;
       if (!serverPid.existsSync()) {
         serverPid.createSync(recursive: true);
       }
@@ -150,11 +149,13 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         ],
         runInShell: true,
         environment: {'PORT': '8080', 'JASPR_PROXY_PORT': '5567'},
-        workingDirectory: Directory.current.absolute.path,
+        workingDirectory: Directory.current.path,
       );
 
       var pid = await waitForPid(serverPid);
-      watchProcess('server', process, tag: Tag.server, progress: 'Running server app...', childPid: pid);
+      bool done = false;
+      watchProcess('server', process,
+          tag: Tag.server, progress: 'Running server app...', childPid: pid, onFail: () => !done);
 
       await serverStartedCompleter.future;
 
@@ -179,7 +180,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         file.writeAsBytesSync(response.bodyBytes);
       }
 
+      print("DONE");
+      done = true;
       process.kill();
+      // Workaround until https://github.com/dart-lang/sdk/issues/55219 is fixed.
       if (pid != null) {
         Process.killPid(pid);
       }
@@ -199,13 +203,13 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     logger.write('Completed building project to /build/jaspr.', progress: ProgressState.completed);
-    return ExitCode.success.code;
+    return null;
   }
 
   Future<int> _buildWeb() async {
     logger.write('Building web assets...', progress: ProgressState.running);
     var client = await d.connectClient(
-      Directory.current.absolute.path,
+      Directory.current.path,
       [
         '--release',
         '--verbose',

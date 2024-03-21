@@ -30,7 +30,7 @@ void main() {
         // Override jaspr dependencies from path.
         await bootstrap(variant, dirs.root());
 
-        runner.run('serve -v', dir: dirs.app);
+        var serve = await runner.run('serve -v', dir: dirs.app) as RunningCommandResult;
         await Future.delayed(Duration(seconds: 10));
 
         // Wait until server is started.
@@ -54,8 +54,9 @@ void main() {
           );
         }
 
-        await runner.stop();
-        await Future.delayed(Duration(seconds: 5));
+        await serve.stop();
+
+        await Future.delayed(Duration(seconds: 10));
 
         await runner.run('build -v', dir: dirs.app);
 
@@ -95,8 +96,8 @@ TestRunner setupRunner() {
     runner.setup();
   });
 
-  tearDown(() {
-    runner.stop();
+  tearDown(() async {
+    await Future.wait(runner.runner.commands.values.whereType<BaseCommand>().map((c) => c.stop()));
   });
 
   return runner;
@@ -105,18 +106,20 @@ TestRunner setupRunner() {
 class TestRunner {
   late JasprCommandRunner runner;
 
-  Future<void> run(String command, {Directory Function()? dir}) async {
-    await IOOverrides.runZoned(getCurrentDirectory: dir, () async {
-      var res = await runner.run(command.split(' '));
-      expect(res, equals(0));
-    });
+  Future<CommandResult?> run(String command, {Directory Function()? dir}) async {
+    return await IOOverrides.runZoned(
+      getCurrentDirectory: dir,
+      () async {
+        var res = await runner.run(command.split(' '));
+        if (res is DoneCommandResult) {
+          expect(res.status, equals(0));
+        }
+        return res;
+      },
+    );
   }
 
   void setup() {
     runner = JasprCommandRunner();
-  }
-
-  Future<void> stop() async {
-    await Future.wait(runner.commands.values.whereType<BaseCommand>().map((c) => c.stop()));
   }
 }

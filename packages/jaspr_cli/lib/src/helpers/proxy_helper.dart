@@ -122,8 +122,8 @@ Handler _sseProxyHandler(http.Client client, String webPort, Logger logger) {
   };
 }
 
-const _readDelay = Duration(milliseconds: 100);
-const _maxWait = Duration(seconds: 5);
+const _readDelay = Duration(milliseconds: 1000);
+const _maxWait = Duration(seconds: 30);
 
 Future<int?> waitForPid(File file) async {
   final end = DateTime.now().add(_maxWait);

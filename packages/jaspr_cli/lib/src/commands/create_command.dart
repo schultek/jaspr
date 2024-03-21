@@ -99,7 +99,7 @@ class CreateCommand extends BaseCommand {
   bool get requiresPubspec => false;
 
   @override
-  Future<int> run() async {
+  Future<CommandResult?> run() async {
     await super.run();
 
     var (dir, name) = getTargetDirectory();
@@ -170,7 +170,7 @@ class CreateCommand extends BaseCommand {
         '  cd ${p.relative(dir.path, from: Directory.current.absolute.path)}\n'
         '  jaspr serve\n');
 
-    return ExitCode.success.code;
+    return null;
   }
 
   (Directory, String) getTargetDirectory() {

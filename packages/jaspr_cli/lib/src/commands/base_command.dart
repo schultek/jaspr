@@ -3,14 +3,39 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:mason/mason.dart' show ExitCode;
 import 'package:meta/meta.dart';
 
 import '../analytics.dart';
 import '../config.dart';
 import '../logging.dart';
 
-abstract class BaseCommand extends Command<int> {
+sealed class CommandResult {
+  const factory CommandResult.done(int status) = DoneCommandResult;
+  const factory CommandResult.running(Future<dynamic> future, Future<void> Function() stop) = RunningCommandResult;
+}
+
+extension CommandResultDone on CommandResult? {
+  FutureOr<int> get done async => switch (this) {
+        DoneCommandResult r => r.status as FutureOr<int>,
+        RunningCommandResult r => r.future.then((v) => v is int ? v : 0),
+        _ => 0,
+      };
+}
+
+class DoneCommandResult implements CommandResult {
+  final int status;
+
+  const DoneCommandResult(this.status);
+}
+
+class RunningCommandResult implements CommandResult {
+  final Future<dynamic> future;
+  final Future<void> Function() stop;
+
+  const RunningCommandResult(this.future, this.stop);
+}
+
+abstract class BaseCommand extends Command<CommandResult?> {
   Set<FutureOr<void> Function()> guards = {};
 
   BaseCommand({Logger? logger}) : _logger = logger {
@@ -33,7 +58,7 @@ abstract class BaseCommand extends Command<int> {
 
   @override
   @mustCallSuper
-  Future<int> run() async {
+  Future<CommandResult?> run() async {
     config = requiresPubspec ? await getConfig(logger) : null;
 
     await trackEvent(name, projectName: config?.pubspecYaml['name']);
@@ -43,7 +68,7 @@ abstract class BaseCommand extends Command<int> {
       ProcessSignal.sigterm.watch().listen((signal) => shutdown());
     }
 
-    return ExitCode.success.code;
+    return null;
   }
 
   Future<void> stop() async {
@@ -83,14 +108,14 @@ abstract class BaseCommand extends Command<int> {
     guards.add(fn);
   }
 
-  Future<void> watchProcess(
+  Future<int> watchProcess(
     String name,
     Process process, {
     required Tag tag,
     String? progress,
     int? childPid,
     bool Function(String)? hide,
-    void Function()? onFail,
+    bool Function()? onFail,
   }) async {
     if (progress != null) {
       logger.write(progress, tag: tag, progress: ProgressState.running);
@@ -129,19 +154,22 @@ abstract class BaseCommand extends Command<int> {
     exitCode = await process.exitCode;
 
     if (wasKilled) {
-      return;
+      return exitCode;
     }
+
+    await Future.delayed(Duration(seconds: 10));
 
     await errSub.cancel();
     await outSub.cancel();
 
-    if (exitCode == 0) {
-      logger.complete(true);
-    } else {
+    if (exitCode != 0 && (onFail == null || onFail())) {
       logger.complete(false);
-      onFail?.call();
       shutdown(exitCode);
     }
+
+    logger.complete(true);
+
+    return exitCode;
   }
 }
 

@@ -5,7 +5,6 @@ import 'dart:io';
 
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/src/loaders/strategy.dart';
-import 'package:mason/mason.dart' show ExitCode;
 import 'package:webdev/src/command/configuration.dart';
 import 'package:webdev/src/serve/dev_workflow.dart';
 
@@ -69,10 +68,10 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final port = argResults!['port'] as String;
 
   @override
-  Future<int> run() async {
+  Future<CommandResult?> run() async {
     await super.run();
 
-    logger.write("Running jaspr in ${config!.mode.name} rendering mode.");
+    logger.write("Running jaspr in ${config!.mode.name} rendering mode TEST.");
 
     var proxyPort = config!.mode == JasprMode.client ? port : '5567';
     var flutterPort = '5678';
@@ -101,19 +100,17 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (config!.mode == JasprMode.client) {
       logger.write('Serving at http://localhost:$proxyPort');
 
-      await workflow.done;
-      return ExitCode.success.code;
+      return CommandResult.running(workflow.done, stop);
     }
 
     if (config!.devCommand != null) {
-      await _runDevCommand(config!.devCommand!, proxyPort);
+      return await _runDevCommand(config!.devCommand!, proxyPort);
     } else {
-      await _runServer(proxyPort);
+      return await _runServer(proxyPort);
     }
-    return ExitCode.success.code;
   }
 
-  Future<void> _runServer(String proxyPort) async {
+  Future<CommandResult> _runServer(String proxyPort) async {
     logger.write("Starting server...", progress: ProgressState.running);
 
     var serverTarget = File('.dart_tool/jaspr/server_target.dart').absolute;
@@ -121,7 +118,7 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       serverTarget.createSync(recursive: true);
     }
 
-    var serverPid = File('.dart_tool/jaspr/server.pid');
+    var serverPid = File('.dart_tool/jaspr/server.pid').absolute;
     if (!serverPid.existsSync()) {
       serverPid.createSync(recursive: true);
     }
@@ -158,15 +155,16 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'dart',
       args,
       environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
+      workingDirectory: Directory.current.path,
     );
 
     logger.write('Server started.', progress: ProgressState.completed);
 
     var pid = await waitForPid(serverPid);
-    await watchProcess('server', process, tag: Tag.server, childPid: pid);
+    return CommandResult.running(watchProcess('server', process, tag: Tag.server, childPid: pid), stop);
   }
 
-  Future<void> _runDevCommand(String command, String proxyPort) async {
+  Future<CommandResult> _runDevCommand(String command, String proxyPort) async {
     logger.write("Starting server...", progress: ProgressState.running);
 
     if (release) {
@@ -182,11 +180,12 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       exec,
       args,
       environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
+      workingDirectory: Directory.current.path,
     );
 
     logger.write('Server started.', progress: ProgressState.completed);
 
-    await watchProcess('server', process, tag: Tag.server);
+    return CommandResult.running(watchProcess('server', process, tag: Tag.server), stop);
   }
 
   Future<DevWorkflow> _runWebCompiler(String webPort) async {
