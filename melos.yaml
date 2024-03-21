@@ -21,25 +21,27 @@ scripts:
       melos exec --scope=jaspr_cli -- "dart format lib  --line-length=120 --set-exit-if-changed"
   analyze: melos exec -- "dart analyze . --fatal-infos"
   test:
+    run: dart test
+    exec:
+      concurrency: 1
+    packageFilters:
+      scope: [ jaspr, jaspr_riverpod, jaspr_router ]
+  coverage:
     run: |
-      melos exec --scope=jaspr -- "dart test" &&
-      melos exec --scope=jaspr_riverpod -- "dart test" &&
-      melos exec --scope=jaspr_router -- "dart test"
-  coverage:ci:
-    run: |
-      melos exec --scope=jaspr -- "dart test --coverage=coverage" &&
-      melos exec --scope=jaspr_riverpod -- "dart test --coverage=coverage" &&
-      melos exec --scope=jaspr_router -- "dart test --coverage=coverage" &&
-      melos exec --scope=jaspr{,_riverpod,_router} -- "dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/$(echo "\$MELOS_PACKAGE_NAME")_lcov.info" -i ./coverage" &&
-      find $MELOS_ROOT_PATH/coverage -type f -empty -print -delete
-  coverage:cli:variant:
+      dart test --coverage=coverage &&
+      dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/$MELOS_PACKAGE_NAME_lcov.info" -i ./coverage
+    exec:
+      concurrency: 1
+    packageFilters:
+      scope: [jaspr, jaspr_riverpod, jaspr_router]
+  coverage:cli:
     run: |
       cd packages/jaspr_cli &&
       dart test --coverage=coverage --tags="$VARIANT" &&
       dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "../../coverage/jaspr_cli_$(echo $VARIANT)_lcov.info" -i ./coverage
-  coverage:
+  coverage:all:
     run: |
-      melos run coverage:ci
+      melos run coverage --no-select
       genhtml --ignore-errors unmapped -p $MELOS_ROOT_PATH/packages -o $MELOS_ROOT_PATH/coverage/report $MELOS_ROOT_PATH/coverage/*_lcov.info
       open $MELOS_ROOT_PATH/coverage/report/index.html
   generate:build:

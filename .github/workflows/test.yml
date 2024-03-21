@@ -56,7 +56,7 @@ jobs:
           jaspr --disable-analytics
 
       - name: Run Unit tests
-        run: melos coverage:ci
+        run: melos coverage --no-select
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v3
@@ -91,7 +91,7 @@ jobs:
           jaspr --disable-analytics
 
       - name: Run cli test
-        run: melos coverage:cli:variant
+        run: melos coverage:cli
         env:
           VARIANT: ${{matrix.VARIANT}}
 
