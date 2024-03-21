@@ -31,6 +31,7 @@ void main() {
         await bootstrap(variant, dirs.root());
 
         runner.run('serve -v', dir: dirs.app);
+        await Future.delayed(Duration(seconds: 10));
 
         // Wait until server is started.
         while (true) {
@@ -54,6 +55,7 @@ void main() {
         }
 
         await runner.stop();
+        await Future.delayed(Duration(seconds: 5));
 
         await runner.run('build -v', dir: dirs.app);
 

@@ -80,6 +80,7 @@ class TestVariant {
       };
 
   Set<String> get resources => {
+        '/',
         ...mode.resources,
         ...routing.resources,
         ...flutter.resources,
