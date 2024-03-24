@@ -63,8 +63,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
 
   @override
   Future<void> preloadState() {
-    var location = context.binding.currentUri.toString();
-    return _matchRoute(location).then(_preload).then((match) => _matchList = match);
+    return initRoutes();
   }
 
   @override
@@ -74,14 +73,31 @@ class RouterState extends State<Router> with PreloadStateMixin {
       PlatformRouter.instance.registry.registerRoutes(component.routes);
     }
     PlatformRouter.instance.history.init(context.binding.currentUri.toString(), (uri) {
-      _update(uri, updateHistory: false);
+      _update(uri, updateHistory: false, replace: true);
     });
     if (_matchList == null) {
       assert(context.binding.isClient);
-      preloadState().then((_) {
+      initRoutes().then((_) {
         setState(() {});
       });
     }
+  }
+
+  @override
+  void didUpdateComponent(Router oldComponent) {
+    super.didUpdateComponent(oldComponent);
+    if (component == oldComponent) return;
+    initRoutes();
+  }
+
+  Future<void> initRoutes() {
+    var location = context.binding.currentUri.toString();
+    return _matchRoute(location).then(_preload).then((match) {
+      _matchList = match;
+      if (match.uri.toString() != location) {
+        PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title);
+      }
+    });
   }
 
   Future<void> preload(String location) {
@@ -159,7 +175,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
     return _matchRoute(location, extra: extra).then((match) {
       setState(() {
         _matchList = match;
-        if (updateHistory) {
+        if (updateHistory || location != match.uri.toString()) {
           if (!replace) {
             PlatformRouter.instance.history.push(match.uri.toString(), title: match.title);
           } else {
