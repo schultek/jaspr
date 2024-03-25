@@ -20,7 +20,7 @@ class InheritedRouter extends InheritedComponent {
 
   @override
   bool updateShouldNotify(covariant InheritedRouter oldComponent) {
-    return router != oldComponent.router;
+    return true;
   }
 }
 

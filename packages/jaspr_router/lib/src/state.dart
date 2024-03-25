@@ -68,6 +68,10 @@ class RouteState {
       Object.hash(location, subloc, name, path, fullpath, params, queryParams, queryParametersAll, extra, error);
 
   static RouteState of(BuildContext context) {
-    return context.dependOnInheritedComponentOfExactType<InheritedRouteState>()!.state;
+    return maybeOf(context)!;
+  }
+
+  static RouteState? maybeOf(BuildContext context) {
+    return context.dependOnInheritedComponentOfExactType<InheritedRouteState>()?.state;
   }
 }

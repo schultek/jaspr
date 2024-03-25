@@ -48,10 +48,14 @@ class Router extends StatefulComponent {
   State<StatefulComponent> createState() => RouterState();
 
   static RouterState of(BuildContext context) {
+    return maybeOf(context)!;
+  }
+
+  static RouterState? maybeOf(BuildContext context) {
     if (context is StatefulElement && context.state is RouterState) {
       return context.state as RouterState;
     }
-    return context.dependOnInheritedComponentOfExactType<InheritedRouter>()!.router;
+    return context.dependOnInheritedComponentOfExactType<InheritedRouter>()?.router;
   }
 }
 
@@ -63,8 +67,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
 
   @override
   Future<void> preloadState() {
-    var location = context.binding.currentUri.toString();
-    return _matchRoute(location).then(_preload).then((match) => _matchList = match);
+    return initRoutes();
   }
 
   @override
@@ -73,15 +76,32 @@ class RouterState extends State<Router> with PreloadStateMixin {
     if (kGenerateMode) {
       PlatformRouter.instance.registry.registerRoutes(component.routes);
     }
-    PlatformRouter.instance.history.init(context.binding.currentUri.toString(), (uri) {
-      _update(uri, updateHistory: false);
+    PlatformRouter.instance.history.init(context.binding, onChangeState: (state, {url}) {
+      _update(url ?? context.binding.currentUri.toString(), extra: state, updateHistory: false, replace: true);
     });
     if (_matchList == null) {
       assert(context.binding.isClient);
-      preloadState().then((_) {
+      initRoutes().then((_) {
         setState(() {});
       });
     }
+  }
+
+  @override
+  void didUpdateComponent(Router oldComponent) {
+    super.didUpdateComponent(oldComponent);
+    if (component == oldComponent) return;
+    initRoutes();
+  }
+
+  Future<void> initRoutes() {
+    var location = context.binding.currentUri.toString();
+    return _matchRoute(location).then(_preload).then((match) {
+      _matchList = match;
+      if (match.uri.toString() != location) {
+        PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title);
+      }
+    });
   }
 
   Future<void> preload(String location) {
@@ -159,11 +179,11 @@ class RouterState extends State<Router> with PreloadStateMixin {
     return _matchRoute(location, extra: extra).then((match) {
       setState(() {
         _matchList = match;
-        if (updateHistory) {
+        if (updateHistory || location != match.uri.toString()) {
           if (!replace) {
-            PlatformRouter.instance.history.push(match.uri.toString(), title: match.title);
+            PlatformRouter.instance.history.push(match.uri.toString(), title: match.title, data: match.extra);
           } else {
-            PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title);
+            PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title, data: match.extra);
           }
         }
       });
@@ -176,7 +196,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield* component._builder.build(context, this);
+    yield* component._builder.build(this);
   }
 }
 

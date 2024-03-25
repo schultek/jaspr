@@ -15,8 +15,10 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
   @override
   bool get isClient => true;
 
+  late final String _baseOrigin = (document.querySelector('head>base') as BaseElement?)?.href ?? window.location.origin;
+
   @override
-  Uri get currentUri => Uri.parse(window.location.href.substring(window.location.origin.length));
+  Uri get currentUri => Uri.parse(window.location.href.substring(_baseOrigin.length));
 
   late String attachTarget;
   late (Node, Node)? attachBetween;
