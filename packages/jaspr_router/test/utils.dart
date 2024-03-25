@@ -41,12 +41,12 @@ class MockPlatformRouter implements PlatformRouter {
 
 class MockHistoryManager implements HistoryManager {
   List<String> history = [];
-  late void Function(String url) onChange;
+  late void Function(Object? state, {String? url})? onChangeState;
 
   @override
-  void init(String location, void Function(String url) onChange) {
-    history = [location];
-    this.onChange = onChange;
+  void init(AppBinding binding, {void Function(Object? state, {String? url})? onChangeState}) {
+    history = [binding.currentUri.toString()];
+    this.onChangeState = onChangeState;
   }
 
   @override
@@ -64,7 +64,7 @@ class MockHistoryManager implements HistoryManager {
   @override
   void back() {
     history.removeLast();
-    onChange(history.last);
+    onChangeState?.call(null, url: history.last);
   }
 }
 

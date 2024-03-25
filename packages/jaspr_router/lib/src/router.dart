@@ -48,10 +48,14 @@ class Router extends StatefulComponent {
   State<StatefulComponent> createState() => RouterState();
 
   static RouterState of(BuildContext context) {
+    return maybeOf(context)!;
+  }
+
+  static RouterState? maybeOf(BuildContext context) {
     if (context is StatefulElement && context.state is RouterState) {
       return context.state as RouterState;
     }
-    return context.dependOnInheritedComponentOfExactType<InheritedRouter>()!.router;
+    return context.dependOnInheritedComponentOfExactType<InheritedRouter>()?.router;
   }
 }
 
@@ -72,8 +76,8 @@ class RouterState extends State<Router> with PreloadStateMixin {
     if (kGenerateMode) {
       PlatformRouter.instance.registry.registerRoutes(component.routes);
     }
-    PlatformRouter.instance.history.init(context.binding.currentUri.toString(), (uri) {
-      _update(uri, updateHistory: false, replace: true);
+    PlatformRouter.instance.history.init(context.binding, onChangeState: (state, {url}) {
+      _update(url ?? context.binding.currentUri.toString(), extra: state, updateHistory: false, replace: true);
     });
     if (_matchList == null) {
       assert(context.binding.isClient);
@@ -177,9 +181,9 @@ class RouterState extends State<Router> with PreloadStateMixin {
         _matchList = match;
         if (updateHistory || location != match.uri.toString()) {
           if (!replace) {
-            PlatformRouter.instance.history.push(match.uri.toString(), title: match.title);
+            PlatformRouter.instance.history.push(match.uri.toString(), title: match.title, data: match.extra);
           } else {
-            PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title);
+            PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title, data: match.extra);
           }
         }
       });
@@ -192,7 +196,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield* component._builder.build(context, this);
+    yield* component._builder.build(this);
   }
 }
 

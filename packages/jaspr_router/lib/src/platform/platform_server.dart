@@ -30,7 +30,7 @@ class HistoryManagerImpl implements HistoryManager {
   }
 
   @override
-  void init(String location, void Function(String) onChange) {
+  void init(AppBinding binding, {void Function(Object? state, {String? url})? onChangeState}) {
     // No-op
   }
 }
