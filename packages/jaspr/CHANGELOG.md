@@ -33,6 +33,8 @@
 
 - Fixed bug with `DomValidator`.
 
+- The `jaspr build` command now accepts an optimization option. Minification (`-o 2`) enabled by default.
+
 ## 0.10.0
 
 - **BREAKING** Restructured core libraries:
