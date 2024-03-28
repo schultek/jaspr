@@ -126,7 +126,7 @@ class MarkupRenderObject extends RenderObject {
 
 /// DOM validator with sane defaults.
 class DomValidator {
-  static final _attributeRegExp = RegExp(r'^[a-z](?:[a-zA-Z0-9\-_]*[a-z0-9]+)?$');
+  static final _attributeRegExp = RegExp(r'^[a-z](?:[a-zA-Z0-9\-_:]*[a-z0-9]+)?$');
   static final _elementRegExp = _attributeRegExp;
   static const _selfClosing = <String>{
     'area',

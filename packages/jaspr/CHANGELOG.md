@@ -33,6 +33,8 @@
 
 - Fixed bug with `DomValidator`.
 
+- Support colon in DomValidator for attributes.
+
 ## 0.10.0
 
 - **BREAKING** Restructured core libraries:
