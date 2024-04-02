@@ -8,7 +8,7 @@ class Header extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    var activePath = RouteState.maybeOf(context)?.location ?? context.binding.currentUri.path;
+    var activePath = {{^multipage}}RouteState.of(context).location{{/multipage}}{{#multipage}}context.binding.currentUri.path{{/multipage}};
 
     yield header([
       nav([
@@ -17,7 +17,7 @@ class Header extends StatelessComponent {
           (label: 'About', path: '/about')
         ])
           div(classes: activePath == route.path ? 'active' : null, [
-            Link(to: route.path, [text(route.title)])
+            Link(to: route.path, [text(route.label)])
           ]),
       ]),
     ]);

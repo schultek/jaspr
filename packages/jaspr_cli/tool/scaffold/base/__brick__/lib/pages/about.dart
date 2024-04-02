@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-
+{{#hydration}}{{#multipage}}
+@client{{/multipage}}{{/hydration}}
 class About extends StatelessComponent {
   const About({super.key});
 

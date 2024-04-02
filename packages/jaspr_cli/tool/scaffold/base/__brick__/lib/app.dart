@@ -5,13 +5,16 @@ import 'components/header.dart';{{/routing}}
 import 'pages/about.dart';
 import 'pages/home.dart';
 
-// A simple [StatelessComponent] with a [build] method.{{#hydration}}
-@client{{/hydration}}
+// A simple [StatelessComponent] with a [build] method.{{#hydration}}{{^multipage}}
+@client{{/multipage}}{{/hydration}}
 class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'main', [{{#routing}}
-      Router(routes: [
+    yield div(classes: 'main', [{{#routing}}{{#multipage}}
+      const Header(),{{/multipage}}
+      Router(routes: [{{#multipage}}
+        Route(path: '/', title: 'Home', builder: (context, state) => const Home()),
+        Route(path: '/about', title: 'About', builder: (context, state) => const About()),{{/multipage}}{{^multipage}}
         ShellRoute(
           builder: (context, state, child) => Builder(builder: (context) sync* {
             yield const Header();
@@ -21,7 +24,7 @@ class App extends StatelessComponent {
             Route(path: '/', title: 'Home', builder: (context, state) => const Home()),
             Route(path: '/about', title: 'About', builder: (context, state) => const About()),
           ],
-        ),
+        ),{{/multipage}}
       ]),{{/routing}}{{^routing}}
       const Home(),
       const About(),{{/routing}}
