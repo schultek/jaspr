@@ -6,15 +6,20 @@ import 'server_app.dart';
 import 'server_binding.dart';
 
 /// This spawns an isolate for each render, in order to avoid conflicts with static instances and multiple parallel requests
-Future<String> renderHtml(SetupFunction setup, Uri requestUri, Future<String> Function(String) loadFile) async {
+Future<String> renderHtml(SetupFunction setup, Uri requestUri,
+    Future<String> Function(String) loadFile) async {
   if (Jaspr.useIsolates) {
     var port = ReceivePort();
+    var errorPort = ReceivePort();
+    var resultCompleter = Completer<String>.sync();
+    errorPort.listen((message) {
+      if (message is List) {
+        resultCompleter.completeError(message[0]);
+      }
+    });
 
     var message = _RenderMessage(setup, requestUri, port.sendPort);
-
-    await Isolate.spawn(_renderHtml, message);
-
-    var resultCompleter = Completer<String>.sync();
+    await Isolate.spawn(_renderHtml, message, onError: errorPort.sendPort);
 
     var sub = port.listen((message) async {
       if (message is String) {
@@ -24,10 +29,14 @@ Future<String> renderHtml(SetupFunction setup, Uri requestUri, Future<String> Fu
       }
     });
 
-    var result = await resultCompleter.future;
-    sub.cancel();
-
-    return result;
+    try {
+      var result = await resultCompleter.future;
+      return result;
+    } finally {
+      sub.cancel();
+      port.close();
+      errorPort.close();
+    }
   } else {
     var binding = ServerAppBinding()
       ..setCurrentUri(requestUri)

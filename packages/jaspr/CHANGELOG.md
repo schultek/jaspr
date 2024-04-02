@@ -33,6 +33,8 @@
 
 - Fixed bug with `DomValidator`.
 
+- Fixed an issue where exceptions thrown while during `renderHtml` would not be passed to the spawning isolate.
+
 - Support colon in DomValidator for attributes.
 
 ## 0.10.0
