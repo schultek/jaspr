@@ -35,6 +35,8 @@
 
 - Support colon in DomValidator for attributes.
 
+- The `jaspr build` command now accepts an optimization option. Minification (`-O 2`) enabled by default.
+
 ## 0.10.0
 
 - **BREAKING** Restructured core libraries:
