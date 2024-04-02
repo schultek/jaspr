@@ -67,8 +67,7 @@ mixin SampleMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType && SampleMapper.ensureInitialized().isValueEqual(this as Sample, other));
+    return SampleMapper.ensureInitialized().equalsValue(this as Sample, other);
   }
 
   @override
@@ -166,9 +165,7 @@ mixin SampleResponseMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            SampleResponseMapper.ensureInitialized().isValueEqual(this as SampleResponse, other));
+    return SampleResponseMapper.ensureInitialized().equalsValue(this as SampleResponse, other);
   }
 
   @override

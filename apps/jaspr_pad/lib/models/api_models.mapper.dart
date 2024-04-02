@@ -112,9 +112,7 @@ mixin CompileRequestMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            CompileRequestMapper.ensureInitialized().isValueEqual(this as CompileRequest, other));
+    return CompileRequestMapper.ensureInitialized().equalsValue(this as CompileRequest, other);
   }
 
   @override
@@ -212,9 +210,7 @@ mixin CompileResponseMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            CompileResponseMapper.ensureInitialized().isValueEqual(this as CompileResponse, other));
+    return CompileResponseMapper.ensureInitialized().equalsValue(this as CompileResponse, other);
   }
 
   @override
@@ -307,9 +303,7 @@ mixin AnalyzeRequestMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            AnalyzeRequestMapper.ensureInitialized().isValueEqual(this as AnalyzeRequest, other));
+    return AnalyzeRequestMapper.ensureInitialized().equalsValue(this as AnalyzeRequest, other);
   }
 
   @override
@@ -407,9 +401,7 @@ mixin FormatResponseMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            FormatResponseMapper.ensureInitialized().isValueEqual(this as FormatResponse, other));
+    return FormatResponseMapper.ensureInitialized().equalsValue(this as FormatResponse, other);
   }
 
   @override
@@ -505,9 +497,7 @@ mixin FormatRequestMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            FormatRequestMapper.ensureInitialized().isValueEqual(this as FormatRequest, other));
+    return FormatRequestMapper.ensureInitialized().equalsValue(this as FormatRequest, other);
   }
 
   @override
@@ -601,9 +591,7 @@ mixin AnalyzeResponseMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            AnalyzeResponseMapper.ensureInitialized().isValueEqual(this as AnalyzeResponse, other));
+    return AnalyzeResponseMapper.ensureInitialized().equalsValue(this as AnalyzeResponse, other);
   }
 
   @override
@@ -724,8 +712,7 @@ mixin IssueMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType && IssueMapper.ensureInitialized().isValueEqual(this as Issue, other));
+    return IssueMapper.ensureInitialized().equalsValue(this as Issue, other);
   }
 
   @override
@@ -861,9 +848,7 @@ mixin IssueLocationMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            IssueLocationMapper.ensureInitialized().isValueEqual(this as IssueLocation, other));
+    return IssueLocationMapper.ensureInitialized().equalsValue(this as IssueLocation, other);
   }
 
   @override
@@ -967,9 +952,7 @@ mixin DocumentResponseMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            DocumentResponseMapper.ensureInitialized().isValueEqual(this as DocumentResponse, other));
+    return DocumentResponseMapper.ensureInitialized().equalsValue(this as DocumentResponse, other);
   }
 
   @override
@@ -1100,9 +1083,7 @@ mixin HoverInfoMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            HoverInfoMapper.ensureInitialized().isValueEqual(this as HoverInfo, other));
+    return HoverInfoMapper.ensureInitialized().equalsValue(this as HoverInfo, other);
   }
 
   @override
@@ -1236,9 +1217,7 @@ mixin DocumentRequestMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            DocumentRequestMapper.ensureInitialized().isValueEqual(this as DocumentRequest, other));
+    return DocumentRequestMapper.ensureInitialized().equalsValue(this as DocumentRequest, other);
   }
 
   @override
