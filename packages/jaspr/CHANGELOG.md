@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.11.1
 
 - Fixed bug with base paths.
 
