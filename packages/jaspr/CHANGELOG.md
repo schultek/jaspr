@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed bug with base paths.
+
 ## 0.11.0
 
 - **BREAKING** Changed jaspr configuration to require `jaspr.mode` in `pubspec.yaml`:
