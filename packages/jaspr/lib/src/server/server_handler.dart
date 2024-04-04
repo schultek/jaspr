@@ -68,17 +68,10 @@ Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHa
         requestUri = requestUri.replace(path: '/${requestUri.path}');
       }
 
-      if (isDataMode) {
-        return Response.ok(
-          await renderData(setup, requestUri),
-          headers: {'Content-Type': 'application/json'},
-        );
-      } else {
-        return Response.ok(
-          await renderHtml(setup, requestUri, fileLoader),
-          headers: {'Content-Type': 'text/html'},
-        );
-      }
+      return Response.ok(
+        await render(isDataMode ? RenderMode.data : RenderMode.html, setup, requestUri, fileLoader),
+        headers: {'Content-Type': isDataMode ? 'application/json' : 'text/html'},
+      );
     });
   });
 

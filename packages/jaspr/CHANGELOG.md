@@ -31,9 +31,12 @@
 - **BREAKING** Removed `rawHtml` flag from `Text` component and `text()` method, in favor of 
   new `RawText` component and `raw()` method respectively, which fixes multiple bugs with the old implementation.
 
-- Fixed bug with `DomValidator`.
+- The `jaspr build` command now accepts an optimization option. Minification (`-O 2`) enabled by default.
+- 
+- Fixed `DomValidator` to allow special attributes with uppercase letters and colons.
 
-- Support colon in DomValidator for attributes.
+- Exceptions thrown during `renderHtml` are now correctly passed through to the spawning isolate.
+
 
 ## 0.10.0
 
