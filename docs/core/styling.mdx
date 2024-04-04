@@ -180,9 +180,18 @@ const myStyle = Styles.raw({
 });
 ```
 
-### Combining Styles
+### Chaining Styles
 
-When you want to combine styles from multiple groups, use the `Styles.combine()` method:
+You can chain multiple style group calls like this:
+
+```dart
+final myStyle = Styles()
+  .text(color: Colors.red)
+  .background(color: Colors.blue);
+```
+
+Note that this does not produce a constant value. Alternatively you can use the `Styles.combine()` method to get the same
+value as a constant:
 
 ```dart
 const myStyle = Styles.combine([
@@ -191,7 +200,7 @@ const myStyle = Styles.combine([
 ]);
 ```
 
-You can also store styles in variables and mix'n'match:
+Finally, you can store styles in variables and mix'n'match:
 
 ```dart
 const redText = Styles.text(color: Colors.red);
@@ -212,23 +221,16 @@ const redGreenTest = Styles.combine([
 The `Styles` class is great for defining a single set of css properties e.g. to be used as 
 **inline styles** for a single html element.
 
-To define a stylesheet with a set of style rules use the `Style` (without *s*) component.
+To define a stylesheet with a set of style rules use the `Style` (without *s*) component in combination with
+the `css()` method:
 
 ```dart
 Style(styles: [
-    StyleRule(
-        selector: const Selector.id('content'),
-        styles: Styles.box(
-            width: 100.percent,
-            height: 100.percent,
-        ),
-    ),
-    StyleRule(
-        selector: const Selector.dot('red-text'),
-        styles: Styles.text(
-            color: Colors.red,
-        ),
-    ),
+    css('.red-text').text(color: Colors.red),
+    css('#content', [
+      css('&').box(width: 100.percent, height: 100.percent),
+      css('a').text(color: Colors.green),
+    ]),
 ]);
 ```
 
@@ -240,6 +242,10 @@ will render as:
     width: 100%;
     height: 100%;
   }
+
+  #content a {
+    color: green;
+  }
     
   .red-text {
     color: red;
@@ -247,10 +253,17 @@ will render as:
 </style>
 ```
 
-A normal style rule takes a `Selector` and a `Styles` property.
+The `css()` method takes a selector and an optional list of children and returns a `StyleRule`. You can then use the
+same style group methods on that rule as you can with normal styles.
+
+Nested style rules will be scoped to the parent. Using the `&` symbol as part of a child selector
+referst to whatever the parent selected.
+
+---
 
 There are also additional `StyleRule` variants that support other css features:
 
 - `StyleRule.import(String url)` renders a `@import url(...)` statement.
 - `StyleRule.media({MediaRuleQuery query, List<StyleRule> styles})` renders a `@media ... { ... }` statement.
+- `StyleRule.fontFace({String fontFamily, FontStyle? fontStyle, String url})` renders a `@font-face { ... }` statement.
 

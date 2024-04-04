@@ -20,23 +20,39 @@ class DocumentAdapter extends RenderAdapter {
     var head = html.children.findWhere((c) => c.tag == 'head');
     var body = html.children.findWhere((c) => c.tag == 'body');
 
-    if (body == null && head == null) {
-      var range = html.children.range();
-      html.children.insertAfter(html.createChildRenderObject()..tag = 'head');
-      html.children.insertBefore(html.createChildRenderObject()
-        ..tag = 'body'
-        ..children.insertRangeAfter(range));
-    } else if (body != null && head == null) {
-      html.children.insertAfter(html.createChildRenderObject()..tag = 'head');
-    } else if (body == null && head != null) {
-      var rangeBefore = html.children.range(endBefore: head);
-      var rangeAfter = html.children.range(startAfter: head);
+    if (head == null) {
+      var head = html.createChildRenderObject()..tag = 'head';
+      head.children.insertAfter(head.createChildRenderObject()
+        ..tag = 'base'
+        ..attributes = {'href': '/'});
 
-      var body = html.createChildRenderObject()..tag = 'body';
-      body.children
-        ..insertRangeAfter(rangeAfter)
-        ..insertRangeAfter(rangeBefore);
-      html.children.insertAfter(body, after: head.node);
+      if (body == null) {
+        var range = html.children.range();
+        html.children.insertAfter(head);
+        html.children.insertBefore(html.createChildRenderObject()
+          ..tag = 'body'
+          ..children.insertRangeAfter(range));
+      } else {
+        html.children.insertAfter(head);
+      }
+    } else {
+      if (body == null) {
+        var rangeBefore = html.children.range(endBefore: head);
+        var rangeAfter = html.children.range(startAfter: head);
+
+        var body = html.createChildRenderObject()..tag = 'body';
+        body.children
+          ..insertRangeAfter(rangeAfter)
+          ..insertRangeAfter(rangeBefore);
+        html.children.insertAfter(body, after: head.node);
+      }
+
+      var base = head.node.children.findWhere((c) => c.tag == 'base');
+      if (base == null) {
+        head.node.children.insertAfter(head.node.createChildRenderObject()
+          ..tag = 'base'
+          ..attributes = {'href': '/'});
+      }
     }
 
     var hasDoctype =

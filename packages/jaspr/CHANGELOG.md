@@ -1,8 +1,48 @@
-## Unreleased minor
+## 0.11.1
 
-- Fixed bug with `DomValidator`.
-- `Document` is no longer required when using server-side rendering.
+- Fixed bug with base paths.
+
+## 0.11.0
+
+- **BREAKING** Changed jaspr configuration to require `jaspr.mode` in `pubspec.yaml`:
+  
+  The `jaspr.mode` option now sets the rendering mode and must be one of:
+
+  - **static**: For building a statically pre-rendered site (SSG) with optional client-side hydration.
+  - **server**: For building a server-rendered site (SSR) with optional client-side hydration.
+  - **client**: For building a purely client-rendered site (SPA).
+
+  This replaces the old `jaspr.uses-ssr` option.
+
+- **BREAKING** Removed `jaspr generate` command in favor using the `jaspr build` command in combination with
+  the new `jaspr.mode = static` option in `pubspec.yaml`.
+
+- **BREAKING** Removed the `runServer()` method along with its support for adding middleware and listeners. Users should instead 
+  migrate to the custom backend setup using `package:shelf`.
+
+- **BREAKING** Removed `rawHtml` flag from `Text` component and `text()` method, in favor of
+  new `RawText` component and `raw()` method respectively, which fixes multiple bugs with the old implementation.
+
+- Improved the `jaspr create` command by changing to a scaffolding system as replacement for templates.
+  You will now be walked through a configuration wizard that creates a starting project based on the selected options.
+
+- Removed `jaspr.uses-flutter` option. This is now auto-detected based on the dependencies.
+
+- Styles can now be written more concise using the ability to chain style groups as well as the new `css()` method.
+
+- Changes made to `main.dart` are now also hot-reloaded on the server.
+
+- `Document` is no longer required when using server-side rendering. A basic document structure (`<html><head>...<body>...`) 
+  is automatically filled in.
+
 - Improved how `@client` components are hydrated.
+
+- The `jaspr build` command now accepts an optimization option. Minification (`-O 2`) enabled by default.
+
+- Fixed `DomValidator` to allow special attributes with uppercase letters and colons.
+
+- Exceptions thrown during `renderHtml` are now correctly passed through to the spawning isolate.
+
 
 ## 0.10.0
 

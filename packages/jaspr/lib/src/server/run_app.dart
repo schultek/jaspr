@@ -15,12 +15,6 @@ void runApp(Component app) {
   ServerApp.run(_createSetup(app));
 }
 
-/// Same as [runApp] but returns an instance of [ServerApp] to control aspects of the http server
-ServerApp runServer(Component app) {
-  _checkInitialized('runServer');
-  return ServerApp.run(_createSetup(app));
-}
-
 /// Returns a shelf handler that serves the provided component and related assets
 Handler serveApp(AppHandler handler) {
   _checkInitialized('serveApp');
@@ -37,8 +31,9 @@ typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render)
 /// Directly renders the provided component into a html string
 Future<String> renderComponent(Component app) async {
   _checkInitialized('renderComponent');
-  return renderHtml(_createSetup(app), Uri.parse('https://0.0.0.0/'), (name) async {
-    var response = await staticFileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
+  var fileHandler = staticFileHandler();
+  return render(RenderMode.html, _createSetup(app), Uri.parse('https://0.0.0.0/'), (name) async {
+    var response = await fileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
     return response.readAsString();
   });
 }

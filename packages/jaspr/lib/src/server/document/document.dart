@@ -8,7 +8,6 @@ import 'package:html/parser.dart';
 import '../../../server.dart';
 import '../adapters/element_boundary_adapter.dart';
 import '../child_nodes.dart';
-import '../markup_render_object.dart';
 
 export '../../components/style.dart' hide Style;
 
@@ -28,7 +27,6 @@ abstract class Document extends StatelessComponent {
     String? viewport,
     Map<String, String>? meta,
     List<StyleRule>? styles,
-    String? scriptName,
     List<Component> head,
     required Component body,
   }) = _BaseDocument;

@@ -5,94 +5,88 @@ import '../../jaspr.dart';
 import 'server_app.dart';
 import 'server_binding.dart';
 
-/// This spawns an isolate for each render, in order to avoid conflicts with static instances and multiple parallel requests
-Future<String> renderHtml(SetupFunction setup, Uri requestUri, Future<String> Function(String) loadFile) async {
-  if (Jaspr.useIsolates) {
-    var port = ReceivePort();
+enum RenderMode { html, data }
 
-    var message = _RenderMessage(setup, requestUri, port.sendPort);
+typedef FileLoader = Future<String> Function(String);
 
-    await Isolate.spawn(_renderHtml, message);
-
-    var resultCompleter = Completer<String>.sync();
-
-    var sub = port.listen((message) async {
-      if (message is String) {
-        resultCompleter.complete(message);
-      } else if (message is LoadFileRequest) {
-        message.sendPort.send(await loadFile(message.name));
-      }
-    });
-
-    var result = await resultCompleter.future;
-    sub.cancel();
-
-    return result;
-  } else {
+/// Performs the rendering process and provides the created [AppBinding] to [setup].
+///
+/// If [Jaspr.useIsolates] is true, this spawns an isolate for each render.
+Future<String> render(RenderMode mode, SetupFunction setup, Uri requestUri, FileLoader loadFile) async {
+  if (!Jaspr.useIsolates) {
     var binding = ServerAppBinding()
       ..setCurrentUri(requestUri)
       ..setFileHandler(loadFile);
     setup(binding);
 
-    return binding.render();
+    return await switch (mode) {
+      RenderMode.html => binding.render(),
+      RenderMode.data => binding.data(),
+    };
+  }
+
+  var resultCompleter = Completer<String>.sync();
+
+  var port = ReceivePort();
+  var errorPort = ReceivePort();
+
+  var errorSub = errorPort.listen((message) {
+    var [error, stack] = message;
+    resultCompleter.completeError(error, StackTrace.fromString(stack));
+  });
+
+  var sub = port.listen((message) async {
+    if (message is String) {
+      resultCompleter.complete(message);
+    } else if (message is _LoadFileRequest) {
+      message.sendPort.send(await loadFile(message.name));
+    }
+  });
+
+  try {
+    var message = _RenderMessage(mode, setup, requestUri, port.sendPort);
+    await Isolate.spawn(_render, message, onError: errorPort.sendPort);
+
+    return await resultCompleter.future;
+  } finally {
+    sub.cancel();
+    errorSub.cancel();
+    port.close();
+    errorPort.close();
   }
 }
 
-/// This spawns an isolate for each render, in order to avoid conflicts with static instances and multiple parallel requests
-Future<String> renderData(SetupFunction setup, Uri requestUri) async {
-  if (Jaspr.useIsolates) {
-    var port = ReceivePort();
-    var message = _RenderMessage(setup, requestUri, port.sendPort);
-
-    await Isolate.spawn(_renderData, message);
-    var result = await port.first;
-
-    return result;
-  } else {
-    var binding = ServerAppBinding()..setCurrentUri(requestUri);
-    setup(binding);
-
-    return binding.data();
-  }
-}
-
-class _RenderMessage {
-  SetupFunction setup;
-  Uri requestUri;
-  SendPort sendPort;
-
-  _RenderMessage(this.setup, this.requestUri, this.sendPort);
-}
-
-/// Runs the app and returns the rendered html
-void _renderHtml(_RenderMessage message) async {
+void _render(_RenderMessage message) async {
   ReceivePort? receivePort;
 
   var binding = ServerAppBinding()
     ..setCurrentUri(message.requestUri)
     ..setFileHandler((name) {
       receivePort ??= ReceivePort();
-      message.sendPort.send(LoadFileRequest(name, receivePort!.sendPort));
+      message.sendPort.send(_LoadFileRequest(name, receivePort!.sendPort));
       return receivePort!.first.then((value) => value);
     });
   message.setup(binding);
 
-  var html = await binding.render();
-  message.sendPort.send(html);
+  var result = await switch (message.mode) {
+    RenderMode.html => binding.render(),
+    RenderMode.data => binding.data(),
+  };
+  message.sendPort.send(result);
 }
 
-/// Runs the app and returns the preloaded state data as json
-void _renderData(_RenderMessage message) async {
-  var binding = ServerAppBinding()..setCurrentUri(message.requestUri);
-  message.setup(binding);
+class _RenderMessage {
+  final RenderMode mode;
+  final SetupFunction setup;
+  final Uri requestUri;
+  final SendPort sendPort;
 
-  var data = await binding.data();
-  message.sendPort.send(data);
+  _RenderMessage(this.mode, this.setup, this.requestUri, this.sendPort);
 }
 
-class LoadFileRequest {
+class _LoadFileRequest {
   final String name;
   final SendPort sendPort;
 
-  LoadFileRequest(this.name, this.sendPort);
+  _LoadFileRequest(this.name, this.sendPort);
 }

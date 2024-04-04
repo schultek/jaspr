@@ -4,6 +4,7 @@ export 'package:meta/meta.dart'
 export 'src/components/async.dart';
 export 'src/components/basic.dart';
 export 'src/components/html/html.dart';
+export 'src/components/raw_text/raw_text.dart';
 export 'src/components/style.dart';
 export 'src/foundation/annotations.dart';
 export 'src/foundation/basic_types.dart';

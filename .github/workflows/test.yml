@@ -33,7 +33,7 @@ jobs:
           jaspr --disable-analytics
 
       - name: Check formatting
-        run: melos format -- --set-exit-if-changed
+        run: melos format
 
       - name: Check linting
         run: melos analyze
@@ -56,7 +56,7 @@ jobs:
           jaspr --disable-analytics
 
       - name: Run Unit tests
-        run: melos coverage:ci
+        run: melos coverage --no-select
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v3

@@ -85,9 +85,7 @@ mixin TutorialDataMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            TutorialDataMapper.ensureInitialized().isValueEqual(this as TutorialData, other));
+    return TutorialDataMapper.ensureInitialized().equalsValue(this as TutorialData, other);
   }
 
   @override
@@ -212,9 +210,7 @@ mixin TutorialStepConfigMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            TutorialStepConfigMapper.ensureInitialized().isValueEqual(this as TutorialStepConfig, other));
+    return TutorialStepConfigMapper.ensureInitialized().equalsValue(this as TutorialStepConfig, other);
   }
 
   @override
@@ -333,9 +329,7 @@ mixin TutorialStepMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            TutorialStepMapper.ensureInitialized().isValueEqual(this as TutorialStep, other));
+    return TutorialStepMapper.ensureInitialized().equalsValue(this as TutorialStep, other);
   }
 
   @override
@@ -451,9 +445,7 @@ mixin TutorialResponseMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            TutorialResponseMapper.ensureInitialized().isValueEqual(this as TutorialResponse, other));
+    return TutorialResponseMapper.ensureInitialized().equalsValue(this as TutorialResponse, other);
   }
 
   @override
@@ -562,9 +554,7 @@ mixin TutorialConfigMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            TutorialConfigMapper.ensureInitialized().isValueEqual(this as TutorialConfig, other));
+    return TutorialConfigMapper.ensureInitialized().equalsValue(this as TutorialConfig, other);
   }
 
   @override
