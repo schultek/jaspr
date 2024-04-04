@@ -1,7 +1,8 @@
 import 'package:jaspr/jaspr.dart';
 
 import '../components/counter.dart';
-
+{{#hydration}}{{#multipage}}
+@client{{/multipage}}{{/hydration}}
 class Home extends StatelessComponent {
   const Home({super.key});
 

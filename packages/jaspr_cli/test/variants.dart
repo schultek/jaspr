@@ -120,24 +120,22 @@ enum HydrationMode {
 
 enum RoutingOption {
   none('none'),
-  pages('pages');
+  singlePage('single-page'),
+  multiPage('multi-page');
 
   const RoutingOption(this.option);
   final String option;
 
-  String get tag => switch (this) {
-        none => 'n',
-        pages => 'p',
-      };
+  String get tag => switch (this) { none => 'n', singlePage => 's', multiPage => 'm' };
 
   Set<(String, Matcher)> get files => switch (this) {
-        pages => {
+        singlePage || multiPage => {
             ('lib/components/header.dart', fileExists),
           },
         none => {},
       };
   Set<String> get resources => switch (this) {
-        pages => {'/about'},
+        singlePage || multiPage => {'/about'},
         none => {},
       };
   Set<(String, Matcher)> get outputs => {};

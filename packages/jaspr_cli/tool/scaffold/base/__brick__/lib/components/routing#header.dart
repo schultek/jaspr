@@ -8,14 +8,16 @@ class Header extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    var routes = Router.of(context).component.routes.first.routes.whereType<Route>();
-    var currPath = Router.of(context).matchList.fullpath;
+    var activePath = {{^multipage}}RouteState.of(context).location{{/multipage}}{{#multipage}}context.binding.currentUri.path{{/multipage}};
 
     yield header([
       nav([
-        for (var route in routes)
-          div(classes: currPath == route.path ? 'active' : null, [
-            a(href: route.path, [text(route.title ?? '')])
+        for (var route in [
+          (label: 'Home', path: '/'),
+          (label: 'About', path: '/about')
+        ])
+          div(classes: activePath == route.path ? 'active' : null, [
+            Link(to: route.path, [text(route.label)])
           ]),
       ]),
     ]);
