@@ -36,6 +36,20 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: 'exe',
     );
+    argParser.addOption(
+      'optimize',
+      abbr: 'O',
+      help: 'Set the dart2js compiler optimization level',
+      allowed: ['0', '1', '2', '3', '4'],
+      allowedHelp: {
+        '0': 'No optimizations (only meant for debugging the compiler).',
+        '1': 'Includes whole program analyses and inlining.',
+        '2': 'Safe production-oriented optimizations (like minification).',
+        '3': 'Potentially unsafe optimizations.',
+        '4': 'More aggressive unsafe optimizations.',
+      },
+      defaultsTo: '2',
+    );
   }
 
   @override
@@ -213,7 +227,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--release',
         '--verbose',
         '--delete-conflicting-outputs',
-        '--define=${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]'
+        '--define=${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true","-O${argResults!['optimize']}"]'
       ],
       logger.writeServerLog,
     );
