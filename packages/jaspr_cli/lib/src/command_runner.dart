@@ -7,7 +7,6 @@ import 'package:cli_completion/cli_completion.dart';
 import 'package:mason/mason.dart';
 import 'package:pub_updater/pub_updater.dart';
 
-import 'analytics.dart';
 import 'commands/base_command.dart';
 import 'commands/build_command.dart';
 import 'commands/clean_command.dart';
@@ -15,6 +14,7 @@ import 'commands/create_command.dart';
 import 'commands/doctor_command.dart';
 import 'commands/serve_command.dart';
 import 'commands/update_command.dart';
+import 'helpers/analytics.dart';
 import 'version.dart';
 
 /// The package name.

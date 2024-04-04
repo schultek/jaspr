@@ -5,8 +5,8 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:meta/meta.dart';
 
-import '../analytics.dart';
 import '../config.dart';
+import '../helpers/analytics.dart';
 import '../logging.dart';
 
 sealed class CommandResult {
@@ -61,7 +61,7 @@ abstract class BaseCommand extends Command<CommandResult?> {
   Future<CommandResult?> run() async {
     config = requiresPubspec ? await getConfig(logger) : null;
 
-    await trackEvent(name, projectName: config?.pubspecYaml['name']);
+    await trackEvent(name, projectName: config?.pubspecYaml['name'], projectMode: config?.mode.name);
 
     ProcessSignal.sigint.watch().listen((signal) => shutdown());
     if (!Platform.isWindows) {

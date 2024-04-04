@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:mason/mason.dart';
 
-import '../analytics.dart';
+import '../helpers/analytics.dart';
 import '../version.dart';
 import 'base_command.dart';
 
@@ -68,7 +68,7 @@ class DoctorCommand extends BaseCommand {
       details: null,
       items: [
         'Dependencies on core packages:${dependencies.join()}',
-        'Rendering mode: ${config!.mode}',
+        'Rendering mode: ${config!.mode.name}',
         'Uses jaspr compilers: ${config!.usesJasprWebCompilers}',
         'Uses flutter embedding: ${config!.usesFlutter}',
       ]
