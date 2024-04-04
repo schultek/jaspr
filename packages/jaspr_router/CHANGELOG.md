@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.4.0
 
 - Added `Link` component to simplify router-aware navigation.
   

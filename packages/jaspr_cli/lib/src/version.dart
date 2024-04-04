@@ -1,6 +1,6 @@
 // ignore_for_file: directives_ordering
 // GENERATED FILE - DO NOT MODIFY
 
-const jasprCliVersion = "0.10.0";
-const jasprCoreVersion = "0.10.0";
-const jasprBuilderVersion = "0.10.0";
+const jasprCliVersion = "0.11.0";
+const jasprCoreVersion = "0.11.0";
+const jasprBuilderVersion = "0.11.0";

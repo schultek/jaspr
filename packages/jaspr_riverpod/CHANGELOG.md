@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.3.10
 
 - Fixed bug with .autoDispose providers.
 
