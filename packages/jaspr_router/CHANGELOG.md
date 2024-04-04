@@ -1,3 +1,14 @@
+## Unreleased minor
+
+- Added `Link` component to simplify router-aware navigation.
+  
+  The `Link` component lets the user navigate to another route by clicking or tapping on it. It uses client-side routing 
+  if possible and fall back to the default browser navigation if no `Router` component is present in the tree. It will render 
+  an accessible `<a>` element with a valid `href`, which means that things like right-clicking a `Link` work as you'd expect.
+
+- Fixed redirects on initial load.
+- Fixed proper handling of `<base>` path.
+
 ## 0.3.1
 
 - `jaspr` upgraded to `0.10.0`

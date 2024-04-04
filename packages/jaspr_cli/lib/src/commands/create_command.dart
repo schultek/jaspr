@@ -46,10 +46,11 @@ class CreateCommand extends BaseCommand {
       'routing',
       abbr: 'r',
       help: 'Choose a routing strategy for the project.',
-      allowed: ['none', 'pages'],
+      allowed: ['none', 'multi-page', 'single-page'],
       allowedHelp: {
         'none': 'No preconfigured routing.',
-        'pages': '(Recommended) Sets up page based routing.',
+        'multi-page': '(Recommended) Sets up multi-page (server-side) routing.',
+        'single-page': 'Sets up single-page (client-side) routing.',
       },
     );
     argParser.addOption(
@@ -99,7 +100,7 @@ class CreateCommand extends BaseCommand {
     var (dir, name) = getTargetDirectory();
 
     var (useMode, useHydration) = getRenderingMode();
-    var useRouting = getRouting(useMode.useServer);
+    var (useRouting, useMultiPageRouting) = getRouting(useMode.useServer);
     var (useFlutter, usePlugins) = getFlutter();
     var useBackend = useMode == RenderingMode.server ? getBackend() : null;
 
@@ -138,6 +139,7 @@ class CreateCommand extends BaseCommand {
         'description': description,
         'mode': useMode.name,
         'routing': useRouting,
+        'multipage': useMultiPageRouting,
         'flutter': useFlutter,
         'plugins': usePlugins,
         'hydration': useHydration,
@@ -207,15 +209,23 @@ class CreateCommand extends BaseCommand {
     };
   }
 
-  bool getRouting(bool useServer) {
+  (bool, bool) getRouting(bool useServer) {
     var opt = argResults!['routing'] as String?;
 
     return switch (opt) {
-      'none' => false,
-      'pages' => true,
+      'none' => (false, false),
+      'single-page' => (true, false),
+      'multi-page' => (true, true),
       _ => () {
           var routing = logger.logger.confirm('Setup routing for different pages of your site?', defaultValue: true);
-          return routing;
+          var multiPage = routing && useServer
+              ? logger.logger.confirm(
+                  '(Recommended) Use multi-page (server-side) routing? '
+                  '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',
+                  defaultValue: true,
+                )
+              : false;
+          return (routing, multiPage);
         }(),
     };
   }

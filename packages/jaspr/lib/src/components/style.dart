@@ -9,7 +9,7 @@ class Style extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'style',
-      child: Text(styles.map((s) => s._toCss()).join(cssPropSpace)),
+      child: RawText(styles.map((s) => s._toCss()).join(cssPropSpace)),
     );
   }
 }
