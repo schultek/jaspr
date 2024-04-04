@@ -33,6 +33,8 @@
 
 - Fixed bug with `DomValidator`.
 
+- Fixed an issue where exceptions thrown while during `renderHtml` would not be passed to the spawning isolate.
+
 - Support colon in DomValidator for attributes.
 
 - The `jaspr build` command now accepts an optimization option. Minification (`-O 2`) enabled by default.
