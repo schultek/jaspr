@@ -6,7 +6,7 @@ import 'package:path/path.dart' as p;
 import 'package:pub_updater/pub_updater.dart';
 
 import '../logging.dart';
-import '../scaffold/base_bundle.dart';
+import '../scaffold/scaffold_bundle.dart';
 import '../version.dart';
 import 'base_command.dart';
 
@@ -131,7 +131,7 @@ class CreateCommand extends BaseCommand {
     ]);
 
     var progress = logger.logger.progress('Generating project...');
-    var generator = await MasonGenerator.fromBundle(baseBundle);
+    var generator = await MasonGenerator.fromBundle(scaffoldBundle);
     final files = await generator.generate(
       ScaffoldGeneratorTarget(dir, usedPrefixes),
       vars: {

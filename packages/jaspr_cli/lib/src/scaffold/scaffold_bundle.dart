@@ -3,7 +3,7 @@
 
 import 'package:mason/mason.dart';
 
-final baseBundle = MasonBundle.fromJson(<String, dynamic>{
+final scaffoldBundle = MasonBundle.fromJson(<String, dynamic>{
   "files": [
     {
       "path": ".gitignore",
@@ -157,7 +157,7 @@ final baseBundle = MasonBundle.fromJson(<String, dynamic>{
     }
   ],
   "hooks": [],
-  "name": "base",
+  "name": "scaffold",
   "description": "A new brick created with the Mason CLI.",
   "version": "0.1.0",
   "environment": {"mason": ">=0.1.0-dev.52 <0.1.0"},
