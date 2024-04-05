@@ -1,3 +1,5 @@
+import 'package:jaspr/jaspr.dart';
+import 'jaspr_options.dart';
 import 'package:serverpod/serverpod.dart';
 
 import 'src/generated/endpoints.dart';
@@ -19,7 +21,9 @@ void run(List<String> args) async {
   // If you are using any future calls, they need to be registered here.
   // pod.registerFutureCall(ExampleFutureCall(), 'exampleFutureCall');
 
-  // Setup a default page at the web root.
+  Jaspr.initializeApp(options: defaultJasprOptions);
+
+  // Let Jaspr render all routes.
   pod.webServer.addRoute(RootRoute(), '/*');
 
   // Start the server.

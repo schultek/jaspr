@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
+@client
 class Counter extends StatefulComponent {
   const Counter({super.key});
 
@@ -17,6 +18,8 @@ class _CounterState extends State<Counter> {
       setState(() {
         counter++;
       });
-    }, [text("Increase")]);
+    }, [
+      text("Increase"),
+    ]);
   }
 }
