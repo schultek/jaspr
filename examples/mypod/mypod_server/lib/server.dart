@@ -1,8 +1,8 @@
-import 'package:mypod_server/src/web2/routes/root.dart';
 import 'package:serverpod/serverpod.dart';
 
-import 'generated/endpoints.dart';
-import 'generated/protocol.dart';
+import 'src/generated/endpoints.dart';
+import 'src/generated/protocol.dart';
+import 'src/web/routes/root.dart';
 
 // This is the starting point of your Serverpod server. In most cases, you will
 // only need to make additions to this file if you add future calls,  are

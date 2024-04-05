@@ -1,6 +1,6 @@
 import 'package:jaspr/server.dart';
 
-import '../../components/counter.dart';
+import 'counter.dart';
 
 class RootComponent extends StatelessComponent {
   const RootComponent({super.key});
