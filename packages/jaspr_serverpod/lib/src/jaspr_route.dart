@@ -5,8 +5,8 @@ import 'package:jaspr/server.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
-/// A [JasprRoute] is the most convienient way to create routes in your server.
-/// Override the [build] method and return an appropriate [Component].
+/// A [JasprRoute] is the most convenient way to render Jaspr components in your server.
+/// Override the [build] method and return a root [Component].
 abstract class JasprRoute extends Route {
   JasprRoute() {
     handler = serveApp(_handleRenderCall);
@@ -14,8 +14,7 @@ abstract class JasprRoute extends Route {
 
   late Handler handler;
 
-  /// Override this method to build your web [Component] from the current [session]
-  /// and [request].
+  /// Override this method to build your root [Component] from the current [session] and [request].
   Future<Component> build(Session session, HttpRequest request);
 
   Future<Response> _handleRenderCall(Request request, FutureOr<Response> Function(Component) render) async {

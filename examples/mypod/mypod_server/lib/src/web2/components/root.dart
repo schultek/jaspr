@@ -1,6 +1,6 @@
 import 'package:jaspr/server.dart';
 
-import '../../../counter.dart';
+import '../../components/counter.dart';
 
 class RootComponent extends StatelessComponent {
   const RootComponent({super.key});
@@ -27,8 +27,8 @@ class RootComponent extends StatelessComponent {
         hr(),
         div(classes: "info-box", [
           p([text("Served at ${DateTime.now()}")]),
+          div(id: "counter", [Counter()]),
         ]),
-        div(id: "counter", [Counter()]),
         hr(),
         div(classes: "link-box", [
           a(href: "https://serverpod.dev", [text("Serverpod")]),
@@ -36,6 +36,13 @@ class RootComponent extends StatelessComponent {
           a(href: "https://docs.serverpod.dev", [text("Get Started")]),
           text('•'),
           a(href: "https://github.com/serverpod/serverpod", [text("Github")]),
+        ]),
+        div(classes: "link-box", [
+          a(href: "https://docs.page/schultek/jaspr", [text("Jaspr")]),
+          text('•'),
+          a(href: "https://docs.page/schultek/jaspr/quick-start", [text("Get Started")]),
+          text('•'),
+          a(href: "https://github.com/schultek/jaspr", [text("Github")]),
         ])
       ]),
     );

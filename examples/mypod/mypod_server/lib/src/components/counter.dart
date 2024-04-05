@@ -17,6 +17,6 @@ class _CounterState extends State<Counter> {
       setState(() {
         counter++;
       });
-    }, [text("Increase --")]);
+    }, [text("Increase")]);
   }
 }

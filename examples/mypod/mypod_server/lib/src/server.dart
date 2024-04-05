@@ -1,8 +1,8 @@
-import 'package:mypod_server/src/web/routes/root.dart';
+import 'package:mypod_server/src/web2/routes/root.dart';
 import 'package:serverpod/serverpod.dart';
 
-import 'src/generated/endpoints.dart';
-import 'src/generated/protocol.dart';
+import 'generated/endpoints.dart';
+import 'generated/protocol.dart';
 
 // This is the starting point of your Serverpod server. In most cases, you will
 // only need to make additions to this file if you add future calls,  are
@@ -20,13 +20,7 @@ void run(List<String> args) async {
   // pod.registerFutureCall(ExampleFutureCall(), 'exampleFutureCall');
 
   // Setup a default page at the web root.
-  pod.webServer.addRoute(RouteRoot(), '/*');
-  // pod.webServer.addRoute(RouteRoot(), '/index.html');
-  // // Serve all files in the /static directory.
-  // pod.webServer.addRoute(
-  //   RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),
-  //   '/*',
-  // );
+  pod.webServer.addRoute(RootRoute(), '/*');
 
   // Start the server.
   await pod.start();

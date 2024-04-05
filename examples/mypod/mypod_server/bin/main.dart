@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:mypod_server/server.dart';
+import 'package:mypod_server/src/server.dart';
 
 /// This is the starting point for your Serverpod server. Typically, there is
 /// no need to modify this file.
