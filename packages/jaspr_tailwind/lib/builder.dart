@@ -37,28 +37,23 @@ class TailwindBuilder implements Builder {
     var configFile = File('tailwind.config.js');
     var hasCustomConfig = await configFile.exists();
 
-    // Content path
-    var contentPath = p.join(Directory.current.path, '{lib,web}', '**', '*.dart');
-    if (Platform.isWindows) {
-      contentPath = "'${contentPath.replaceAll("'", "'")}'";
-    }
-
     await Process.run(
       'npx',
       [
         'tailwindcss',
         '--input',
-        scratchSpace.fileFor(buildStep.inputId).path,
+        fixPath(scratchSpace.fileFor(buildStep.inputId).path),
         '--output',
-        scratchSpace.fileFor(outputId).path,
+        fixPath(scratchSpace.fileFor(outputId).path),
         '--content',
-        contentPath,
+        fixPath(p.join(Directory.current.path, '{lib,web}', '**', '*.dart')),
         if (hasCustomConfig) ...[
           '--config',
-          p.join(Directory.current.path, 'tailwind.config.js'),
+          fixPath(p.join(Directory.current.path, 'tailwind.config.js')),
         ],
       ],
       workingDirectory: root,
+      runInShell: true,
     );
 
     await scratchSpace.copyOutput(outputId, buildStep);
@@ -68,4 +63,12 @@ class TailwindBuilder implements Builder {
   Map<String, List<String>> get buildExtensions => {
         'web/{{file}}.tw.css': ['web/{{file}}.css']
       };
+
+  String fixPath(String path) {
+    var result = path;
+    if (Platform.isWindows) {
+      result = "'${result.replaceAll("'", "'")}'";
+    }
+    return result;
+  }
 }
