@@ -53,7 +53,6 @@ class TailwindBuilder implements Builder {
         ],
       ],
       workingDirectory: root,
-      runInShell: true,
     );
 
     await scratchSpace.copyOutput(outputId, buildStep);
