@@ -66,7 +66,7 @@ class TailwindBuilder implements Builder {
   String fixPath(String path) {
     var result = path;
     if (Platform.isWindows) {
-      result = "'${result.replaceAll("'", "'")}'";
+      result = '"${result.replaceAll("\\", "/")}"';
     }
     return result;
   }
