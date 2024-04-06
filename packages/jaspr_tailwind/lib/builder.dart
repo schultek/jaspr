@@ -40,7 +40,7 @@ class TailwindBuilder implements Builder {
     // Content path
     var contentPath = p.join(Directory.current.path, '{lib,web}', '**', '*.dart');
     if (Platform.isWindows) {
-      contentPath = '"${contentPath.replaceAll('"', '""')}"';
+      contentPath = "'${contentPath.replaceAll("'", "'")}'";
     }
 
     await Process.run(
