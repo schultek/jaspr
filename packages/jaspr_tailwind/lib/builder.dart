@@ -42,17 +42,18 @@ class TailwindBuilder implements Builder {
       [
         'tailwindcss',
         '--input',
-        fixPath(scratchSpace.fileFor(buildStep.inputId).path),
+        scratchSpace.fileFor(buildStep.inputId).path,
         '--output',
-        fixPath(scratchSpace.fileFor(outputId).path),
+        fixPathWindows(scratchSpace.fileFor(outputId).path),
         '--content',
-        fixPath(p.join(Directory.current.path, '{lib,web}', '**', '*.dart')),
+        quotePathIfNeeded(p.join(Directory.current.path, '{lib,web}', '**', '*.dart')),
         if (hasCustomConfig) ...[
           '--config',
-          fixPath(p.join(Directory.current.path, 'tailwind.config.js')),
+          p.join(Directory.current.path, 'tailwind.config.js'),
         ],
       ],
-      workingDirectory: root,
+      runInShell: Platform.isWindows,
+      workingDirectory: Platform.isWindows ? null : root,
     );
 
     await scratchSpace.copyOutput(outputId, buildStep);
@@ -63,10 +64,18 @@ class TailwindBuilder implements Builder {
         'web/{{file}}.tw.css': ['web/{{file}}.css']
       };
 
-  String fixPath(String path) {
+  String fixPathWindows(String path) {
     var result = path;
     if (Platform.isWindows) {
-      result = "'" + result.replaceAll("\\", "/") + "'";
+      result = result.replaceAll("\\", "/");
+    }
+    return result;
+  }
+
+  String quotePathIfNeeded(String path) {
+    var result = path;
+    if (Platform.isWindows) {
+      result = "'${fixPathWindows(result)}'";
     }
     return result;
   }
