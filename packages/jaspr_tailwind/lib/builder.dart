@@ -44,9 +44,9 @@ class TailwindBuilder implements Builder {
         '--input',
         scratchSpace.fileFor(buildStep.inputId).path,
         '--output',
-        scratchSpace.fileFor(outputId).path,
+        fixWindowsPath(scratchSpace.fileFor(outputId).path),
         '--content',
-        p.join(Directory.current.path, '{lib,web}', '**', '*.dart'),
+        quotePathIfNeeded(p.join(Directory.current.path, '{lib,web}', '**', '*.dart')),
         if (hasCustomConfig) ...[
           '--config',
           p.join(Directory.current.path, 'tailwind.config.js'),
@@ -62,4 +62,20 @@ class TailwindBuilder implements Builder {
   Map<String, List<String>> get buildExtensions => {
         'web/{{file}}.tw.css': ['web/{{file}}.css']
       };
+
+  String fixWindowsPath(String path) {
+    var result = path;
+    if (Platform.isWindows) {
+      result = result.replaceAll("\\", "/");
+    }
+    return result;
+  }
+
+  String quotePathIfNeeded(String path) {
+    var result = path;
+    if (Platform.isWindows) {
+      result = "'${fixWindowsPath(result)}'";
+    }
+    return result;
+  }
 }
