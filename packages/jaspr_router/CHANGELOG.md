@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fix issue where `replaceNamed` from `GoRouterHelper` was not passing parameters correctly.
+
 ## 0.4.0
 
 - Added `Link` component to simplify router-aware navigation.

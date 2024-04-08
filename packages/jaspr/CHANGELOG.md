@@ -1,5 +1,9 @@
 ## Unreleased patch
 
+- Fixed `DomValidator` to allow attributes with `.`.
+
+## 0.11.1
+
 - Fixed bug with base paths.
 
 ## 0.11.0
