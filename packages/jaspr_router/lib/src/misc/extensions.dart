@@ -36,7 +36,6 @@ extension GoRouterHelper on BuildContext {
   ///
   /// See also:
   /// * [push] which pushes the given location onto the page stack.
-  /// * [pushReplacement] which replaces the top-most page of the page stack but
   ///   always uses a new page key.
   void replace(String location, {Object? extra}) => Router.of(this).replace(location, extra: extra);
 
@@ -44,12 +43,11 @@ extension GoRouterHelper on BuildContext {
   /// preserving the page key.
   ///
   /// This will preserve the state and not run any page animation. Optional
-  /// parameters can be providded to the named route, e.g. `name='person',
+  /// parameters can be provided to the named route, e.g. `name='person',
   /// params={'fid': 'f2', 'pid': 'p1'}`.
   ///
   /// See also:
   /// * [pushNamed] which pushes the given location onto the page stack.
-  /// * [pushReplacementNamed] which replaces the top-most page of the page
   ///   stack but always uses a new page key.
   void replaceNamed(
     String name, {
@@ -57,5 +55,5 @@ extension GoRouterHelper on BuildContext {
     Map<String, dynamic> queryParams = const <String, dynamic>{},
     Object? extra,
   }) =>
-      Router.of(this).replaceNamed(name, extra: extra);
+      Router.of(this).replaceNamed(name, params: params, queryParams: queryParams, extra: extra);
 }
