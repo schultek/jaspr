@@ -16,6 +16,8 @@ class ClientModuleBuilder implements Builder {
   FutureOr<void> build(BuildStep buildStep) async {
     try {
       await generateClientModule(buildStep);
+    } on SyntaxErrorInAssetException catch (e) {
+      rethrow;
     } catch (e, st) {
       print('An unexpected error occurred.\n'
           'This is probably a bug in jaspr_builder.\n'
