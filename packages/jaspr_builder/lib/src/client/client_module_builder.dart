@@ -16,7 +16,7 @@ class ClientModuleBuilder implements Builder {
   FutureOr<void> build(BuildStep buildStep) async {
     try {
       await generateClientModule(buildStep);
-    } on SyntaxErrorInAssetException catch (e) {
+    } on SyntaxErrorInAssetException {
       rethrow;
     } catch (e, st) {
       print('An unexpected error occurred.\n'
