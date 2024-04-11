@@ -1,6 +1,7 @@
 ## Unreleased patch
 
 - Fixed `DomValidator` to allow attributes with `.`.
+- Added main to DOM components.
 
 ## 0.11.1
 
