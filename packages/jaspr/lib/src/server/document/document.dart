@@ -22,6 +22,7 @@ abstract class Document extends StatelessComponent {
 
   const factory Document({
     String? title,
+    String? lang,
     String? base,
     String? charset,
     String? viewport,
