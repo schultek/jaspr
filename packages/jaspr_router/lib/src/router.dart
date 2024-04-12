@@ -98,7 +98,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
     var location = context.binding.currentUri.toString();
     return _matchRoute(location).then(_preload).then((match) {
       _matchList = match;
-      if (match.uri.toString() != location) {
+      if (context.binding.isClient && match.uri.toString() != location) {
         PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title);
       }
     });
