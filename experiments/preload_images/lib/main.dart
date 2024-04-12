@@ -35,7 +35,7 @@ void main() {
     // create a service instance
     ImageService.instance = ServerImageService();
     return Document.template(
-      name: 'main.html',
+      name: 'main',
       child: App(),
     );
   }));

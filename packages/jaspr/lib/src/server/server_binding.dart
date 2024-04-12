@@ -77,13 +77,13 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     return MarkupRenderObject();
   }
 
-  late Future<String> Function(String) _fileHandler;
+  late Future<String?> Function(String) _fileHandler;
 
-  void setFileHandler(Future<String> Function(String) handler) {
+  void setFileHandler(Future<String?> Function(String) handler) {
     _fileHandler = handler;
   }
 
-  Future<String> loadFile(String name) => _fileHandler(name);
+  Future<String?> loadFile(String name) => _fileHandler(name);
 
   late final List<RenderAdapter> _adapters = [];
 

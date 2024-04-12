@@ -7,7 +7,7 @@ import 'server_binding.dart';
 
 enum RenderMode { html, data }
 
-typedef FileLoader = Future<String> Function(String);
+typedef FileLoader = Future<String?> Function(String);
 
 /// Performs the rendering process and provides the created [AppBinding] to [setup].
 ///

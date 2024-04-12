@@ -28,7 +28,7 @@ void main() {
   router.mount('/api', apiRouter);
   router.mount('/', serveApp((r, render) {
     return render(Document.template(
-      name: 'main.html',
+      name: 'main',
       child: Builder.single(builder: (context) {
         return ProviderScope(
           overrides: [syncSamplesProvider.overrideWith(loadSamplesProviderOverride)],

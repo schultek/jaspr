@@ -23,7 +23,7 @@ class _TemplateDocument extends Document {
 class _TemplateDocumentElement extends StatelessElement {
   _TemplateDocumentElement(_TemplateDocument super.component);
 
-  Future<String>? _templateFuture;
+  Future<String?>? _templateFuture;
 
   @override
   Iterable<Component> build() {
@@ -41,7 +41,11 @@ class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
 
   @override
   FutureOr<void> prepare() async {
-    template = await (element as _TemplateDocumentElement)._templateFuture!;
+    var template = await (element as _TemplateDocumentElement)._templateFuture!;
+    if (template == null) {
+      throw TemplateNotFoundError((element.component as _TemplateDocument).name);
+    }
+    this.template = template;
     return super.prepare();
   }
 
@@ -92,5 +96,16 @@ class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
         curr = next;
       }
     }
+  }
+}
+
+class TemplateNotFoundError extends Error {
+  TemplateNotFoundError(this.name);
+
+  final String name;
+
+  @override
+  String toString() {
+    return 'TemplateNotFoundError: The template "$name.template.html" was not found.';
   }
 }
