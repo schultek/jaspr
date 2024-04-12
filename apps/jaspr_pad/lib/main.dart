@@ -27,7 +27,7 @@ void main() {
 
   router.mount('/api', apiRouter);
   router.mount('/', serveApp((r, render) {
-    return render(Document.file(
+    return render(Document.template(
       name: 'main.html',
       child: Builder.single(builder: (context) {
         return ProviderScope(

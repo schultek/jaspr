@@ -12,7 +12,7 @@ import '../child_nodes.dart';
 export '../../components/style.dart' hide Style;
 
 part 'base_document.dart';
-part 'file_document.dart';
+part 'template_document.dart';
 
 // only allow a single document
 const _documentKey = GlobalKey();
@@ -31,9 +31,9 @@ abstract class Document extends StatelessComponent {
     required Component body,
   }) = _BaseDocument;
 
-  const factory Document.file({
+  const factory Document.template({
     String name,
     String attachTo,
     required Component child,
-  }) = _FileDocument;
+  }) = _TemplateDocument;
 }

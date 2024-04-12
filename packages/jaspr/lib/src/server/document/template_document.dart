@@ -1,8 +1,8 @@
 part of 'document.dart';
 
-class _FileDocument extends Document {
-  const _FileDocument({
-    this.name = 'index.html',
+class _TemplateDocument extends Document {
+  const _TemplateDocument({
+    this.name = 'index',
     this.attachTo = 'body',
     required this.child,
   }) : super._();
@@ -17,30 +17,31 @@ class _FileDocument extends Document {
   }
 
   @override
-  Element createElement() => _FileDocumentElement(this);
+  Element createElement() => _TemplateDocumentElement(this);
 }
 
-class _FileDocumentElement extends StatelessElement {
-  _FileDocumentElement(_FileDocument super.component);
+class _TemplateDocumentElement extends StatelessElement {
+  _TemplateDocumentElement(_TemplateDocument super.component);
 
-  Future<String>? _fileFuture;
+  Future<String>? _templateFuture;
 
   @override
   Iterable<Component> build() {
-    (binding as ServerAppBinding).addRenderAdapter(_FileDocumentAdapter(this));
-    _fileFuture ??= (binding as ServerAppBinding).loadFile((component as _FileDocument).name);
+    (binding as ServerAppBinding).addRenderAdapter(_TemplateDocumentAdapter(this));
+    _templateFuture ??=
+        (binding as ServerAppBinding).loadFile('${(component as _TemplateDocument).name}.template.html');
     return super.build();
   }
 }
 
-class _FileDocumentAdapter extends ElementBoundaryAdapter {
-  _FileDocumentAdapter(super.element);
+class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
+  _TemplateDocumentAdapter(super.element);
 
-  late String file;
+  late String template;
 
   @override
   FutureOr<void> prepare() async {
-    file = await (element as _FileDocumentElement)._fileFuture!;
+    template = await (element as _TemplateDocumentElement)._templateFuture!;
     return super.prepare();
   }
 
@@ -48,8 +49,8 @@ class _FileDocumentAdapter extends ElementBoundaryAdapter {
   void processBoundary(ChildListRange range) {
     var curr = range.start.prev!;
     range.remove();
-    var document = parse(file);
-    var target = document.querySelector((element.component as _FileDocument).attachTo)!;
+    var document = parse(template);
+    var target = document.querySelector((element.component as _TemplateDocument).attachTo)!;
 
     MarkupRenderObject? createTree(dom.Node node) {
       var n = element.parentRenderObjectElement!.renderObject.createChildRenderObject() as MarkupRenderObject;
