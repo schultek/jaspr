@@ -9,6 +9,10 @@ class BuildOwner {
   bool _isFirstBuild = false;
   bool get isFirstBuild => _isFirstBuild;
 
+  Future<void> performInitialBuild(Element element) async {
+    element.mount(null, null);
+  }
+
   final _InactiveElements _inactiveElements = _InactiveElements();
 
   /// Whether [_dirtyElements] need to be sorted again as a result of more
@@ -77,46 +81,14 @@ class BuildOwner {
   /// We want the component and element apis to stay synchronous, so this delays
   /// the execution of [child.performRebuild()] instead of calling it directly.
   void performRebuildOn(Element child, void Function() whenComplete) {
-    if (!isFirstBuild || child.binding.isClient) {
-      assert(
-        child._asyncFirstBuild == null && child._asyncFirstBuildChildren.isEmpty,
-        'Only the first build on the server is allowed to be asynchronous.',
-      );
-      child.performRebuild();
-      whenComplete();
-      return;
-    }
-
-    var asyncFirstBuild = child._asyncFirstBuild;
-
-    var buildCompleter = Completer.sync();
-    buildCompleter.future.whenComplete(() {
-      child._asyncFirstBuild = null;
-      child._parent?._asyncFirstBuildChildren.remove(buildCompleter.future);
-      whenComplete();
-    });
-
-    child._asyncFirstBuild = buildCompleter.future;
-    child._parent?._asyncFirstBuildChildren.add(buildCompleter.future);
-
-    if (asyncFirstBuild != null) {
-      asyncFirstBuild.whenComplete(() => _rebuildAndWait(child, buildCompleter));
-    } else {
-      _rebuildAndWait(child, buildCompleter);
-    }
-  }
-
-  void _rebuildAndWait(Element child, Completer buildCompleter) {
-    child.performRebuild();
-
-    var asyncChildren = child._asyncFirstBuildChildren;
-    child._asyncFirstBuildChildren = [];
-
-    if (asyncChildren.isNotEmpty) {
-      Future.wait(asyncChildren).whenComplete(() => buildCompleter.complete());
-    } else {
-      buildCompleter.complete();
-    }
+    Object? result = child.performRebuild() as dynamic;
+    assert(
+      result is! Future,
+      '${child.runtimeType}.performBuild() returned a Future while rebuilding.\n\n'
+      'Only server builds are allowed to be asynchronous.',
+    );
+    whenComplete();
+    child.attachRenderObject();
   }
 
   void performBuild() {

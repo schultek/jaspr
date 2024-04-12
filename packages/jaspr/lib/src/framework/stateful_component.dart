@@ -620,8 +620,10 @@ class StatefulElement extends MultiChildElement {
   State? _state;
   State get state => _state!;
 
+  Future? _asyncInitState;
+
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
+  void _firstBuild() {
     assert(state._debugLifecycleState == _StateLifecycle.created);
 
     // We check if state uses on of the mixins that support async initialization,
@@ -629,20 +631,13 @@ class StatefulElement extends MultiChildElement {
     // In this case we don't call [_initState()] directly here, but rather let it
     // be called by the mixins implementation.
 
-    Future? asyncFirstBuild;
-
     if (owner.isFirstBuild && state is PreloadStateMixin && !binding.isClient) {
-      asyncFirstBuild = (state as PreloadStateMixin).preloadState();
-    }
-
-    if (asyncFirstBuild != null) {
-      _asyncFirstBuild = asyncFirstBuild.then((_) => _initState());
-      asyncFirstBuild.whenComplete(() => _asyncFirstBuild = null);
+      _asyncInitState = (state as PreloadStateMixin).preloadState().then((_) => _initState());
     } else {
       _initState();
     }
 
-    super._firstBuild(onBuilt);
+    super._firstBuild();
   }
 
   void _initState() {
@@ -655,7 +650,7 @@ class StatefulElement extends MultiChildElement {
         '${state.runtimeType}.initState() returned a Future.\n\n'
         'Rather than awaiting on asynchronous work directly inside of initState, '
         'call a separate method to do this work without awaiting it.\n\n'
-        'If you need to do some async work before the first render, use PreloadStateMixin or DeferRenderMixin on State.',
+        'If you need to do some async work before the first render, use PreloadStateMixin on State.',
       );
     } finally {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
@@ -672,12 +667,22 @@ class StatefulElement extends MultiChildElement {
   }
 
   @override
-  void performRebuild() {
+  Object? performRebuild() {
+    if (owner.isFirstBuild && _asyncInitState != null) {
+      return _asyncInitState!.then((_) {
+        if (_didChangeDependencies) {
+          state.didChangeDependencies();
+          _didChangeDependencies = false;
+        }
+        super.performRebuild();
+      });
+    }
     if (_didChangeDependencies) {
       state.didChangeDependencies();
       _didChangeDependencies = false;
     }
     super.performRebuild();
+    return null;
   }
 
   @override

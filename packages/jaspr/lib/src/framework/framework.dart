@@ -156,6 +156,8 @@ abstract class Element implements BuildContext {
   Element(Component component) : _component = component;
 
   Element? _parent;
+  Element? get parent => _parent;
+
   _NotificationNode? _notificationTree;
 
   /// Compare two components for equality.
@@ -369,7 +371,7 @@ abstract class Element implements BuildContext {
   }
 
   @mustCallSuper
-  void _firstBuild([VoidCallback? onBuilt]) {}
+  void _firstBuild() {}
 
   /// Change the component used to configure this element.
   ///
@@ -772,7 +774,7 @@ abstract class Element implements BuildContext {
   ///
   /// Called by the [BuildOwner] when rebuilding, by [mount] when the element is first
   /// built, and by [update] when the component has changed.
-  void rebuild([VoidCallback? onRebuilt]) {
+  void rebuild() {
     assert(_lifecycleState != _ElementLifecycle.initial);
     if (_lifecycleState != _ElementLifecycle.active || !_dirty) {
       return;
@@ -781,6 +783,7 @@ abstract class Element implements BuildContext {
     assert(owner._debugStateLocked);
     Element? debugPreviousBuildTarget;
     assert(() {
+      if (!owner.isFirstBuild) return true;
       debugPreviousBuildTarget = owner._debugCurrentBuildTarget;
       owner._debugCurrentBuildTarget = this;
       return true;
@@ -792,6 +795,7 @@ abstract class Element implements BuildContext {
     }
     owner.performRebuildOn(this, () {
       assert(() {
+        if (!owner.isFirstBuild) return true;
         assert(owner._debugCurrentBuildTarget == this);
         owner._debugCurrentBuildTarget = debugPreviousBuildTarget;
         return true;
@@ -807,21 +811,15 @@ abstract class Element implements BuildContext {
           observer.didRebuildElement(this);
         }
       }
-      onRebuilt?.call();
     });
   }
 
   /// Cause the component to update itself.
   ///
-  /// Called by [rebuild] after the appropriate checks have been made.
-  @protected
+  /// Called by [BuildOwner] after the appropriate checks have been made.
   void performRebuild();
 
-  /// Can be set by the element to signal that the first build should be performed asynchronous.
-  Future? _asyncFirstBuild;
-
-  // ignore: prefer_final_fields
-  List<Future> _asyncFirstBuildChildren = [];
+  void attachRenderObject() {}
 
   @override
   void dispatchNotification(Notification notification) {

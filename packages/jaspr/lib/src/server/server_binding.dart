@@ -5,6 +5,7 @@ import '../../jaspr.dart';
 import 'adapters/client_component_adapter.dart';
 import 'adapters/document_adapter.dart';
 import 'adapters/sync_script_adapter.dart';
+import 'async_build_owner.dart';
 import 'markup_render_object.dart';
 
 /// Global component binding for the server
@@ -75,6 +76,11 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   @override
   RenderObject createRootRenderObject() {
     return MarkupRenderObject();
+  }
+
+  @override
+  BuildOwner createRootBuildOwner() {
+    return AsyncBuildOwner();
   }
 
   late Future<String> Function(String) _fileHandler;
