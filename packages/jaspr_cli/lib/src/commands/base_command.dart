@@ -113,7 +113,6 @@ abstract class BaseCommand extends Command<CommandResult?> {
     Process process, {
     required Tag tag,
     String? progress,
-    int? childPid,
     bool Function(String)? hide,
     bool Function()? onFail,
   }) async {
@@ -141,9 +140,6 @@ abstract class BaseCommand extends Command<CommandResult?> {
       if (exitCode == null) {
         logger.write("Terminating $name...");
         process.kill();
-        if (childPid != null) {
-          Process.killPid(childPid);
-        }
         wasKilled = true;
         await errSub.cancel();
         await outSub.cancel();

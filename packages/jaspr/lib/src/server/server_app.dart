@@ -45,8 +45,6 @@ class ServerApp {
     _client = client;
 
     if (isFirstStartup) {
-      _writePid();
-
       print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');
       print('Serving at http://${kDebugMode ? 'localhost' : _server!.address.host}:${_server!.port}');
 
@@ -63,14 +61,6 @@ class ServerApp {
     var client = http.Client();
     var handler = createHandler((_, render) => render(_setup), client: client);
     return (client, await shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true));
-  }
-
-  void _writePid() {
-    // Workaround until https://github.com/dart-lang/sdk/issues/55219 is fixed.
-    var file = File('.dart_tool/jaspr/server.pid');
-    if (file.existsSync()) {
-      file.writeAsStringSync('$pid');
-    }
   }
 
   static void requestRouteGeneration(String route) async {
