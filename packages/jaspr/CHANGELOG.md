@@ -1,9 +1,9 @@
 ## Unreleased patch
 
-- Fixed `DomValidator` to allow attributes with `.`.
-- Added main to DOM components.
-- Fixed jaspr_tailwind execution on Windows.
+- Added `<main>` as `main_()` to the standard html components.
+
 - Fixed crash with server hot-reload.
+- Fixed `DomValidator` to allow attributes with `.`.
 
 ## 0.11.1
 
