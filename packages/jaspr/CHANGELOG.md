@@ -2,6 +2,8 @@
 
 - Fixed `DomValidator` to allow attributes with `.`.
 - Added main to DOM components.
+- Fixed jaspr_tailwind execution on Windows.
+- Fixed crash with server hot-reload.
 
 ## 0.11.1
 
