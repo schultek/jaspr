@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import '../../browser.dart';
+import '../../server.dart';
 
 Expando<TaskChain> _asyncBuildLocks = Expando();
 
@@ -14,7 +14,7 @@ class AsyncBuildOwner extends BuildOwner {
   @override
   Future<void> performInitialBuild(Element element) async {
     await super.performInitialBuild(element);
-    await element._asyncBuildLock.asFuture;
+    await element._asyncBuildLock?.asFuture;
   }
 
   @override
@@ -24,9 +24,11 @@ class AsyncBuildOwner extends BuildOwner {
     var chain = TaskChain.start()
         .then(() => child.performRebuild())
         .then(() => whenComplete())
-        .then(() => child._asyncBuildLock)
+        // Wait on previous siblings
         .then(() => parentAsyncBuildLock)
-        .then(() => child.attachRenderObject());
+        .then(() => child.attachRenderObject())
+        // Wait on children
+        .then(() => child._asyncBuildLock);
 
     child.parent?._asyncBuildLock = chain;
   }
@@ -53,51 +55,29 @@ class TaskChain {
       _listeners.add(fn);
     }
   }
-}
 
-extension TaskChainThen on TaskChain? {
-  TaskChain? then(Object? Function() fn) {
-    var chain = this;
-    if (chain == null || chain._done) {
+  TaskChain then(Object? Function() fn) {
+    var c = TaskChain._();
+    _then(() {
       var r = fn();
       if (r is Future) {
-        var c = TaskChain._();
         r.then((_) {
           c._complete();
         });
-        return c;
-      } else if (r is TaskChain && !r._done) {
-        return r;
-      } else {
-        return null;
-      }
-    } else {
-      var c = TaskChain._();
-      chain._listeners.add(() {
-        var r = fn();
-        if (r is Future) {
-          r.then((_) {
-            c._complete();
-          });
-        } else if (r is TaskChain) {
-          r._then(() {
-            c._complete();
-          });
-        } else {
+      } else if (r is TaskChain) {
+        r._then(() {
           c._complete();
-        }
-      });
-      return c;
-    }
+        });
+      } else {
+        c._complete();
+      }
+    });
+    return c;
   }
 
   Future<void> get asFuture {
-    if (this == null) {
-      return Future.value();
-    } else {
-      var c = Completer.sync();
-      this!._then(c.complete);
-      return c.future;
-    }
+    var c = Completer.sync();
+    _then(c.complete);
+    return c.future;
   }
 }

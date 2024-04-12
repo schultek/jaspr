@@ -783,7 +783,7 @@ abstract class Element implements BuildContext {
     assert(owner._debugStateLocked);
     Element? debugPreviousBuildTarget;
     assert(() {
-      if (!owner.isFirstBuild) return true;
+      if (owner.isFirstBuild) return true;
       debugPreviousBuildTarget = owner._debugCurrentBuildTarget;
       owner._debugCurrentBuildTarget = this;
       return true;
@@ -795,7 +795,7 @@ abstract class Element implements BuildContext {
     }
     owner.performRebuildOn(this, () {
       assert(() {
-        if (!owner.isFirstBuild) return true;
+        if (owner.isFirstBuild) return true;
         assert(owner._debugCurrentBuildTarget == this);
         owner._debugCurrentBuildTarget = debugPreviousBuildTarget;
         return true;
