@@ -34,8 +34,8 @@ void main() {
   runApp(Builder.single(builder: (context) {
     // create a service instance
     ImageService.instance = ServerImageService();
-    return Document.file(
-      name: 'main.html',
+    return Document.template(
+      name: 'main',
       child: App(),
     );
   }));

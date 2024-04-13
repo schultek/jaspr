@@ -3,6 +3,7 @@ part of 'document.dart';
 class _BaseDocument extends Document {
   const _BaseDocument({
     this.title,
+    this.lang,
     this.base,
     this.charset = 'utf-8',
     this.viewport = 'width=device-width, initial-scale=1.0',
@@ -13,6 +14,7 @@ class _BaseDocument extends Document {
   }) : super._();
 
   final String? title;
+  final String? lang;
   final String? base;
   final String? charset;
   final String? viewport;
@@ -33,6 +35,9 @@ class _BaseDocument extends Document {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'html',
+      attributes: {
+        if (lang != null) 'lang': lang!,
+      },
       children: [
         DomComponent(
           tag: 'head',
