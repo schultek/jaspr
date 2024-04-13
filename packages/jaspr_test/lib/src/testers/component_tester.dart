@@ -139,7 +139,10 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
 
   @override
   BuildOwner createRootBuildOwner() {
-    return AsyncBuildOwner();
+    if (!isClient) {
+      return AsyncBuildOwner();
+    }
+    return super.createRootBuildOwner();
   }
 }
 
