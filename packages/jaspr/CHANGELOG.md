@@ -11,6 +11,7 @@
 - Added the `lang` attribute to `Document()` constructor.
 - Added `<main>` as `main_()` to the standard html components.
 
+- Fixed bug with `PreloadStateMixin` and improved async server builds.
 - Fixed crash with server hot-reload.
 - Improved the shelf backend template for proper handling of server hot-reload.
 - Fixed `DomValidator` to allow attributes with `.`.
