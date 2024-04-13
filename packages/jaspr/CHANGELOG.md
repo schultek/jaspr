@@ -1,8 +1,18 @@
-## Unreleased patch
+## Unreleased breaking
 
+- **BREAKING** Removed `Document.file()`, instead use new `Document.template()`.
+
+- Added `Document.template()` for loading template html files.
+
+  Files that should be used with `Document.template()` must have the `.template.html` extension to differentiate
+  between normal `.html` files that are served as-is. The `name` parameter provided to `Document.template()` must be the
+  simple name of the file without extension, e.g. `Document.template(name: 'index')` loads the `web/index.template.html` file.
+
+- Added the `lang` attribute to `Document()` constructor.
 - Added `<main>` as `main_()` to the standard html components.
 
 - Fixed crash with server hot-reload.
+- Improved the shelf backend template for proper handling of server hot-reload.
 - Fixed `DomValidator` to allow attributes with `.`.
 
 ## 0.11.1
