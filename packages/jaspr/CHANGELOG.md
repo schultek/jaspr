@@ -12,6 +12,7 @@
 - Added `<main>` as `main_()` to the standard html components.
 
 - Fixed crash with server hot-reload.
+- Improved the shelf backend template for proper handling of server hot-reload.
 - Fixed `DomValidator` to allow attributes with `.`.
 
 ## 0.11.1
