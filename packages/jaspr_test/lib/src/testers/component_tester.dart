@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
+// ignore: implementation_imports
+import 'package:jaspr/src/server/async_build_owner.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
@@ -133,6 +135,11 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   @override
   RenderObject createRootRenderObject() {
     return TestRenderObject();
+  }
+
+  @override
+  BuildOwner createRootBuildOwner() {
+    return AsyncBuildOwner();
   }
 }
 
