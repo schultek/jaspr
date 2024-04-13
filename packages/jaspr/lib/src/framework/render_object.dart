@@ -51,15 +51,12 @@ mixin RenderObjectElement on Element {
   RenderObject? _renderObject;
 
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
+  void _firstBuild() {
     if (_renderObject == null) {
       _renderObject = _parentRenderObjectElement!.renderObject.createChildRenderObject();
       updateRenderObject();
     }
-    super._firstBuild(() {
-      attachRenderObject();
-      onBuilt?.call();
-    });
+    super._firstBuild();
   }
 
   @override
@@ -68,6 +65,7 @@ mixin RenderObjectElement on Element {
     updateRenderObject();
   }
 
+  @override
   void attachRenderObject() {
     Element? prevElem = _prevAncestorSibling;
     while (prevElem != null && prevElem._lastRenderObjectElement == null) {
