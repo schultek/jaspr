@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.1.1
 
 - Fixed configuration paths on windows.
 

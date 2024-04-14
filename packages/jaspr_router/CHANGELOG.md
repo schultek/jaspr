@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.4.1
 
 - Fixed issue where `replaceNamed` from `GoRouterHelper` was not passing parameters correctly.
 - Fixed bug with redirects on the server.

@@ -1,4 +1,4 @@
-## Unreleased breaking
+## 0.12.0
 
 - **BREAKING** Removed `Document.file()`, instead use new `Document.template()`.
 
