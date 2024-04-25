@@ -304,8 +304,10 @@ abstract class Element implements BuildContext {
         if (child._parentChanged || child._prevSibling != prevSibling) {
           child.updatePrevSibling(prevSibling);
         }
+        var oldComponent = child.component;
         child.update(newComponent);
         assert(child.component == newComponent);
+        child.didUpdate(oldComponent);
         newChild = child;
       } else {
         deactivateChild(child);

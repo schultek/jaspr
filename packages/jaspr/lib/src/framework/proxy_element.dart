@@ -35,7 +35,6 @@ abstract class ProxyElement extends Element {
   void mount(Element? parent, Element? prevSibling) {
     super.mount(parent, prevSibling);
     assert(_children == null);
-    assert(_lifecycleState == _ElementLifecycle.active);
   }
 
   @override
