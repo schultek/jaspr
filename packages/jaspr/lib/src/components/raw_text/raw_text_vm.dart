@@ -9,11 +9,8 @@ class RawText extends Component {
   Element createElement() => RawTextElement(this);
 }
 
-class RawTextElement extends SingleChildRenderObjectElement {
+class RawTextElement extends LeafRenderObjectElement {
   RawTextElement(super.component);
-
-  @override
-  Component? build() => null;
 
   @override
   void updateRenderObject() {

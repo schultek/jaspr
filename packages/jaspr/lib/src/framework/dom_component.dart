@@ -4,7 +4,7 @@ part of 'framework.dart';
 ///
 /// Must have a [tag] and any number of attributes.
 /// Can have a single [child] component or any amount of [children].
-class DomComponent extends Component {
+class DomComponent extends ProxyComponent {
   const DomComponent({
     super.key,
     required this.tag,
@@ -13,10 +13,9 @@ class DomComponent extends Component {
     this.styles,
     this.attributes,
     this.events,
-    Component? child,
-    List<Component>? children,
-  })  : _child = child,
-        _children = children;
+    super.child,
+    super.children,
+  });
 
   const factory DomComponent.wrap({
     Key? key,
@@ -34,16 +33,12 @@ class DomComponent extends Component {
   final Styles? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
-  final Component? _child;
-  final List<Component>? _children;
-
-  List<Component> get children => [if (_child != null) _child!, ..._children ?? []];
 
   @override
   Element createElement() => DomElement(this);
 }
 
-class DomElement extends MultiChildElement with RenderObjectElement {
+class DomElement extends ProxyRenderObjectElement {
   DomElement(DomComponent super.component);
 
   @override
@@ -64,16 +59,6 @@ class DomElement extends MultiChildElement with RenderObjectElement {
   void didChangeDependencies() {
     super.didChangeDependencies();
     updateRenderObject();
-  }
-
-  @override
-  Iterable<Component> build() => component.children;
-
-  @override
-  void update(DomComponent newComponent) {
-    super.update(newComponent);
-    _dirty = true;
-    rebuild();
   }
 
   @override
@@ -121,13 +106,6 @@ class _WrappingDomComponent extends InheritedComponent implements DomComponent {
   final Map<String, String>? attributes;
   @override
   final Map<String, EventCallback>? events;
-  @override
-  final Component? _child = null;
-  @override
-  final List<Component> _children = const [];
-
-  @override
-  List<Component> get children => [child];
 
   @override
   bool updateShouldNotify(_WrappingDomComponent oldComponent) {
@@ -151,43 +129,12 @@ class Text extends Component {
   Element createElement() => TextElement(this);
 }
 
-abstract class NoChildElement extends Element {
-  NoChildElement(super.component);
-
-  @override
-  bool get debugDoingBuild => false;
-
-  @override
-  void mount(Element? parent, Element? prevSibling) {
-    super.mount(parent, prevSibling);
-    assert(_lifecycleState == _ElementLifecycle.active);
-    _firstBuild();
-  }
-
-  @override
-  void _firstBuild() {
-    super._firstBuild();
-    rebuild();
-  }
-
-  @override
-  void performRebuild() {
-    _dirty = false;
-  }
-
-  @override
-  void visitChildren(ElementVisitor visitor) {}
-}
-
-class TextElement extends NoChildElement with RenderObjectElement {
+class TextElement extends LeafRenderObjectElement {
   TextElement(Text super.component);
 
   @override
-  Text get component => super.component as Text;
-
-  @override
   void updateRenderObject() {
-    renderObject.updateText(component.text);
+    renderObject.updateText((component as Text).text);
   }
 }
 
@@ -198,11 +145,8 @@ class SkipContent extends Component {
   Element createElement() => SkipContentElement(this);
 }
 
-class SkipContentElement extends NoChildElement with RenderObjectElement {
+class SkipContentElement extends LeafRenderObjectElement {
   SkipContentElement(SkipContent super.component);
-
-  @override
-  SkipContent get component => super.component as SkipContent;
 
   @override
   void updateRenderObject() {

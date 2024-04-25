@@ -11,6 +11,7 @@ class BuildOwner {
 
   Future<void> performInitialBuild(Element element) async {
     element.mount(null, null);
+    element.didMount();
   }
 
   final _InactiveElements _inactiveElements = _InactiveElements();
