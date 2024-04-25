@@ -5,9 +5,6 @@ class ChildNodeData extends BaseChildNode {
   ChildNodeData(this.node);
 
   final MarkupRenderObject node;
-
-  @override
-  String get self => '<${node.tag ?? 'txt'}>';
 }
 
 class ChildNodeBoundary extends BaseChildNode {
@@ -15,9 +12,6 @@ class ChildNodeBoundary extends BaseChildNode {
 
   final Element element;
   late final ChildListRange range;
-
-  @override
-  String get self => '{${element.runtimeType}:${element.depth}:${element.hashCode}}';
 }
 
 class BaseChildNode extends ChildNode {
@@ -59,9 +53,6 @@ sealed class ChildNode {
     _prev = null;
     _next = null;
   }
-
-  String get str => '$self${next != null ? ', ${next!.str}' : ''}';
-  String get self => '($hashCode)';
 }
 
 class ChildListRange extends ChildNode {
@@ -87,18 +78,6 @@ class ChildListRange extends ChildNode {
   ChildNode get _start => start;
   @override
   ChildNode get _end => end;
-
-  @override
-  String get self {
-    var l = <String>[];
-    var curr = start;
-    while (curr != end) {
-      l.add(curr.self);
-      curr = curr.next!;
-    }
-    l.add(curr.self);
-    return '[${l.join(', ')}]';
-  }
 }
 
 class ChildList with Iterable<MarkupRenderObject> {
@@ -110,8 +89,6 @@ class ChildList with Iterable<MarkupRenderObject> {
 
   final ChildNode _first = BaseChildNode();
   final ChildNode _last = BaseChildNode();
-
-  String get str => '[${_first.str}]';
 
   void insertAfter(MarkupRenderObject child, {MarkupRenderObject? after}) {
     insertNodeAfter(find(child) ?? ChildNodeData(child), after: after);
