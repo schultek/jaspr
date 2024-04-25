@@ -130,9 +130,7 @@ mixin ProjectDataMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType &&
-            ProjectDataMapper.ensureInitialized().isValueEqual(this as ProjectData, other));
+    return ProjectDataMapper.ensureInitialized().equalsValue(this as ProjectData, other);
   }
 
   @override

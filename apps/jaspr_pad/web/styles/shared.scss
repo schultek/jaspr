@@ -1,0 +1,462 @@
+// This file contains styles shared between the Workshop UI (workshops.html) and
+// the Playground UI (index.html).
+//
+// Styles shared between all editors are located in
+// package:jaspr_pad/scss/shared.scss
+
+@import 'package:mdc_web/material-components-web';
+@import 'package:jaspr_pad/scss/colors';
+@import 'package:jaspr_pad/scss/layout';
+@import 'package:jaspr_pad/scss/shared';
+@import 'package:jaspr_pad/scss/variables';
+@import 'package:jaspr_pad/scss/material_shared';
+
+// Layout constants
+$doc-console-padding: 8px 24px 8px 24px;
+
+// documentation and parameter info styling
+.documentation {
+  padding: $doc-console-padding;
+  font-family: 'Roboto', sans-serif;
+  font-size: 11pt;
+  line-height: 20px;
+  position: relative;
+  display: block;
+  overflow: auto;
+  overflow-wrap: break-word;
+  margin-top: 0;
+  margin-left: 0;
+
+  * {
+    color: $dark-editor-text;
+  }
+
+  h1 {
+    margin-top: 0;
+    font-size: 12pt;
+    color: $dark-blue;
+  }
+
+  h2 {
+    margin-bottom: 0;
+  }
+
+  h2, strong {
+    font-weight: bold;
+    font-size: inherit;
+    color: #cdcdcd; /* little bit brigher than normal text*/
+  }
+
+  p {
+    margin-top: 0;
+  }
+
+  a {
+    color: #66d9ef;
+  }
+
+  a:hover {
+    color: #66d9ef;
+    text-decoration: underline;
+  }
+
+  a {
+    color: #66d9ef;
+  }
+
+  a:hover {
+    color: #66d9ef;
+    text-decoration: underline;
+  }
+
+  pre {
+    overflow-x: auto;
+    margin: 1em;
+  }
+
+  pre code {
+    white-space: inherit;
+    word-wrap: normal;
+  }
+
+  code, .parameter-hints code {
+    font-family: $editor-font;
+    font-size: 12pt;
+    color: $dark-blue;
+  }
+
+  code em {
+    color: $dark-orange;
+    font-style: normal;
+  }
+
+  .parameter-hints code {
+    color: $dark-orange;
+  }
+
+  code em {
+    color: $dark-orange;
+    font-style: normal;
+  }
+}
+
+.launch-icon {
+  display: inline-block;
+  background: url('../pictures/launch.svg') center no-repeat;
+  background-size: 100%;
+  width: 12px;
+  height: 12px;
+  margin-bottom: -1px;
+}
+
+#left-console-clear-button, #right-console-clear-button {
+  display: inline-block;
+  background: url('../pictures/clear-console.svg') center no-repeat;
+  background-size: 14px 14px;
+  width: 32px;
+  height: 32px;
+  padding: 8px 8px;
+}
+
+#samples-menu,
+#more-menu {
+  z-index: 100;
+}
+
+// grey out menu icons to match text
+.mdc-list-item--disabled .mdc-list-item__graphic {
+  opacity: 0.5;
+}
+
+#console-expand-icon-container {
+  height: 32px;
+  width: 77px;
+  display: flex;
+}
+
+.console-clear-icon {
+  // filter to make black SVG white for dark theme
+  filter: invert(100%);
+}
+
+// Buttons
+button.mdc-button {
+  @include mdc-button-ink-color($button-text-color); // TODO
+  text-transform: none !important;
+  letter-spacing: normal;
+}
+
+button#run-button {
+  @include mdc-button-ink-color(#0e161f);
+  color: #442C2E;
+}
+
+// Editor Tabs
+.editor-tab {
+  @include mdc-button-ink-color($button-text-color);
+  color: $button-text-color;
+
+  &.active {
+    color: $dark-blue;
+  }
+}
+
+.console {
+  white-space: pre !important;
+}
+
+
+#search-dialog {
+  position: absolute;
+  top: 0px;
+  right: 14px;
+  display: flex;
+  flex-direction: row;
+  background-color: $playground-header-background-color;
+  color: inherit;
+  border-left: 2px solid #454545;
+  box-shadow: 4px 4px 7px rgba(0,0,0,0.7);
+  z-index: 15;
+  overflow: hidden;
+}
+
+#search-dialog {
+  padding: 0;
+  max-height: 0;
+  transition: max-height 0.25s ease-out;
+}
+
+#search-dialog.revealed {
+  padding: 2px 0px;
+  max-height: 300px;
+  transition: max-height 0.35s ease-in;
+}
+
+#find-col1 {
+  width: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#find-row, #replace-row {
+  display: flex;
+  flex-direction: row;
+  height: 32px;
+}
+
+#replace-row[tim="hiding"]{
+  display: none;
+}
+
+#search-dialog input {
+  border: none;
+  outline: none;
+  background: #454545;
+  color: #cecece;
+  width: 20em;
+  font-family: $normal-font;
+  font-size: 14px;
+  width: 100%;
+  height: 26px;
+  padding-left: 8px;
+  padding-right: 8px;
+  overflow: hidden;
+}
+
+#find-text {
+  margin-right: 4px;
+}
+
+#find-options, #replace-options {
+  background: #454545;
+  color: #cecece; //#a6a6a6;
+  width: 245px;
+  display: flex;
+  flex-direction: row;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+#find-text, #replace-text {
+  background: #454545;
+  color: #a6a6a6;
+}
+
+#find-text:focus, #replace-text:focus {
+  border: 1px solid #517ed1;
+}
+
+#search-results {
+  color: $playground-text-color;
+  margin-top: 8px;
+  padding-left: 8px;
+  padding-right: 0px;
+  width: 80px;
+}
+
+#search-results.no-results {
+  color: #d78a73;
+}
+
+#find-col2 {
+  display: flex;
+  flex-direction: column;
+}
+
+#search-dialog button {
+  color: #ccc;
+}
+#search-dialog button[aria-pressed="true"] {
+  background-color: #b2a787; // Will invert to >>> #445778;
+}
+
+#open-replace, #find-previous, #find-next, #find-close {
+  @include mdc-icon-button-size(16px, 16px, 4px);
+  border-radius: 4px;
+  font-size: 16px;
+  margin: 1px 1px;
+}
+
+#find-match-case, #find-wholeword, #find-regex  {
+  display: inline-block;
+  border-radius: 4px;
+
+  height: 24px;
+  padding: 0px 0px;
+
+  width: 40px;
+  display: inline-block;
+  position: relative;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+
+  // filter to make black SVG white for dark theme
+  filter: invert(100%);
+}
+
+#replace-once, #replace-all {
+  display: inline-block;
+  border-radius: 4px;
+
+  height: 24px;
+  padding: 0px 0px;
+  width: 34px;
+  display: inline-block;
+  position: relative;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+
+  // filter to make black SVG white for dark theme
+  filter: invert(100%);
+}
+
+#find-previous[disabled], #find-next[disabled] {
+  filter: opacity(30%);
+}
+
+#replace-once[disabled], #replace-all[disabled] {
+  filter: invert(100%) opacity(30%);
+}
+
+#find-match-case {
+  background: url('../pictures/matchcase.svg') center no-repeat;
+  background-size: 20px 20px;
+}
+
+#find-wholeword {
+  background: url('../pictures/wholeword.svg') center no-repeat;
+  background-size: 20px 20px;
+}
+
+#find-regex {
+  background: url('../pictures/regex.svg') center no-repeat;
+  background-size: 20px 20px;
+}
+
+#replace-once {
+  background: url('../pictures/replace.svg') center no-repeat;
+  background-size: 22px 22px;
+}
+
+#replace-all {
+  background: url('../pictures/replaceall.svg') center no-repeat;
+  background-size: 22px 22px;
+}
+
+#find-match-case, #find-wholeword, #find-regex {
+  margin-top: 2px;
+}
+
+#find-previous, #find-next, #find-close {
+  margin-top: 2px;
+}
+
+#find-next {
+  margin-right: 10px;
+}
+
+#replace-once {
+  margin-top: 4px;
+}
+
+#replace-all {
+  margin-top: 4px;
+}
+
+
+.cm-s-dartpad .CodeMirror-focused .cm-matchhighlight,
+.cm-s-darkpad .CodeMirror-focused .cm-matchhighlight {
+	text-decoration: underline !important;
+	text-decoration-color: #0f0 !important;
+}
+
+.cm-s-dartpad span.cm-searching,
+.cm-s-darkpad span.cm-searching {
+  color: #FFFFFF;
+  background-color: rgba( 0,255,0,0.3);//kind of yellow//168, 157, 77, 0.3 ); //brown like vscode rgba(127, 90, 59, .7);
+  font-weight: normal;
+  outline: solid 1px rgb(0,255,0,0.6);
+}
+
+.cm-s-dartpad .cm-highlight-selection-matches, 
+.cm-s-darkpad .cm-highlight-selection-matches {
+  background-color: rgba(66,123,214,.48); //rgba(67, 89, 214, 0.479);
+}
+
+//.cm-s-dartpad .cm-matchhighlight,
+//.cm-s-darkpad .cm-matchhighlight {
+//  background-color: rgba(220, 0,0,0.8); //rgba(220, 220, 220, 0.4 );
+//}
+
+
+// selection highlight a little transparent so search will show through
+.cm-s-darkpad .CodeMirror-selection-highlight-scrollbar {
+  background-color: rgb(48,80,117);
+  border-top: 1px solid rgb(64,105,144);
+  border-bottom: 1px solid rgb(64,105,144);
+  width: 5px !important;
+}
+.cm-s-dartpad .CodeMirror-selection-highlight-scrollbar {
+  background-color: rgba(37, 100, 216);
+}
+
+// DARK THEME active search scrollbar highlight
+.cm-s-darkpad .CodeMirror-search-match {
+  background: rgb(0, 211, 0);
+  border-top: 1px solid rgb(145, 255, 0);
+  border-bottom: 1px solid rgb(145, 255, 0);
+  border-left: 1px solid rgb(145, 255, 0);
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+
+}
+
+// LIGHT THEME active search scrollbar highlight
+.cm-s-dartpad .CodeMirror-search-match {
+  background: rgb(0, 211, 0);
+  border-top: 1px solid rgb(0,255,0);
+  border-bottom: 1px solid rgb(0,255,0);
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+
+
+
+
+#search-dialog.search-playground {
+  position: absolute;
+  top: 0px;
+  right: 116px;
+}
+#search-dialog.search-playground-dart {
+  position: absolute;
+  top: 0px;
+  right: 116px;
+}
+#search-dialog.search-playground-html {
+  position: absolute;
+  top: 57px;
+  right: 14px;
+}
+#search-dialog.search-playground-flutter {
+  position: absolute;
+  top: 0px;
+  right: 116px;
+}
+#search-dialog.search-workshop {
+  position: absolute;
+  top: 0px;
+  right: 116px;
+}
+
+

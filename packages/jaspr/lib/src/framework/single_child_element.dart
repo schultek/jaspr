@@ -26,9 +26,9 @@ abstract class SingleChildElement extends Element {
   }
 
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
-    super._firstBuild(onBuilt);
-    rebuild(onBuilt);
+  void _firstBuild() {
+    super._firstBuild();
+    rebuild();
   }
 
   @override

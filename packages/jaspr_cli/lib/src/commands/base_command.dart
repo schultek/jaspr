@@ -3,15 +3,39 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:mason/mason.dart' show ExitCode;
 import 'package:meta/meta.dart';
-import 'package:yaml/yaml.dart';
 
-import '../analytics.dart';
 import '../config.dart';
+import '../helpers/analytics.dart';
 import '../logging.dart';
 
-abstract class BaseCommand extends Command<int> {
+sealed class CommandResult {
+  const factory CommandResult.done(int status) = DoneCommandResult;
+  const factory CommandResult.running(Future<dynamic> future, Future<void> Function() stop) = RunningCommandResult;
+}
+
+extension CommandResultDone on CommandResult? {
+  FutureOr<int> get done async => switch (this) {
+        DoneCommandResult r => r.status as FutureOr<int>,
+        RunningCommandResult r => r.future.then((v) => v is int ? v : 0),
+        _ => 0,
+      };
+}
+
+class DoneCommandResult implements CommandResult {
+  final int status;
+
+  const DoneCommandResult(this.status);
+}
+
+class RunningCommandResult implements CommandResult {
+  final Future<dynamic> future;
+  final Future<void> Function() stop;
+
+  const RunningCommandResult(this.future, this.stop);
+}
+
+abstract class BaseCommand extends Command<CommandResult?> {
   Set<FutureOr<void> Function()> guards = {};
 
   BaseCommand({Logger? logger}) : _logger = logger {
@@ -30,122 +54,77 @@ abstract class BaseCommand extends Command<int> {
   late final bool verbose = argResults?['verbose'] as bool? ?? false;
 
   final bool requiresPubspec = true;
-
-  late YamlMap? pubspecYaml;
-  late JasprConfig config;
-
-  bool get usesJasprWebCompilers => switch (pubspecYaml) {
-        {'dev_dependencies': {'jaspr_web_compilers': _}} => true,
-        _ => false,
-      };
+  late JasprConfig? config;
 
   @override
   @mustCallSuper
-  Future<int> run() async {
-    pubspecYaml = requiresPubspec ? await getPubspec() : null;
-    config = JasprConfig.fromYaml(pubspecYaml, logger);
+  Future<CommandResult?> run() async {
+    config = requiresPubspec ? await getConfig(logger) : null;
 
-    await trackEvent(name, projectName: pubspecYaml?['name']);
+    await trackEvent(name, projectName: config?.pubspecYaml['name'], projectMode: config?.mode.name);
 
     ProcessSignal.sigint.watch().listen((signal) => shutdown());
     if (!Platform.isWindows) {
       ProcessSignal.sigterm.watch().listen((signal) => shutdown());
     }
 
-    return ExitCode.success.code;
+    return null;
+  }
+
+  Future<void> stop() async {
+    var gs = [...guards];
+    guards.clear();
+    for (var g in gs) {
+      await g();
+    }
   }
 
   Future<Never> shutdown([int exitCode = 1]) async {
     logger.complete(false);
     logger.write('Shutting down...');
-    for (var g in guards) {
-      await g();
-    }
+    await stop();
     exit(exitCode);
   }
 
-  Future<String?> getEntryPoint(String? input) async {
-    var entryPoints = [input, 'lib/main.dart', 'web/main.dart'];
+  Future<String> getEntryPoint(String? input) async {
+    var entryPoint = input ?? 'lib/main.dart';
 
-    for (var path in entryPoints) {
-      if (path == null) continue;
-      if (await File(path).exists()) {
-        return path;
-      } else if (path == input) {
-        return null;
-      }
+    if (!File(entryPoint).absolute.existsSync()) {
+      logger.complete(false);
+      logger.write("Cannot find entry point. Create a lib/main.dart file, or specify a file using --input.",
+          level: Level.critical);
+      await shutdown();
     }
 
-    return null;
-  }
-
-  Future<YamlMap?> getPubspec() async {
-    var pubspecPath = 'pubspec.yaml';
-    var pubspecFile = File(pubspecPath);
-    if (!(await pubspecFile.exists())) {
-      throw 'Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.';
+    if (!entryPoint.startsWith('lib/')) {
+      logger.write("Entry point must be located inside lib/ folder, got '$entryPoint'.", level: Level.critical);
+      await shutdown();
     }
 
-    var parsed = loadYaml(await pubspecFile.readAsString()) as YamlMap;
-
-    if (parsed case {'dependencies': {'jaspr': _}}) {
-      // ok
-    } else {
-      throw 'Missing dependency on jaspr in pubspec.yaml file. Make sure to add jaspr to your dependencies.';
-    }
-
-    if (parsed case {'dev_dependencies': {'jaspr_builder': _}}) {
-      // ok
-    } else {
-      var result = logger.logger.confirm(
-          'Missing dependency on jaspr_builder package. Do you want to add jaspr_builder to your dev_dependencies now?',
-          defaultValue: true);
-      if (result) {
-        var result = Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
-        if (result.exitCode != 0) {
-          logger.logger.err(result.stderr);
-          throw 'Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.';
-        }
-
-        logger.logger.success('Successfully added jaspr_builder to your dev_dependencies.');
-      }
-    }
-
-    return parsed;
+    return entryPoint;
   }
 
   void guardResource(FutureOr<void> Function() fn) {
     guards.add(fn);
   }
 
-  Future<void> watchProcess(
+  Future<int> watchProcess(
     String name,
     Process process, {
     required Tag tag,
     String? progress,
     bool Function(String)? hide,
-    void Function()? onFail,
+    bool Function()? onFail,
   }) async {
-    int? exitCode;
-    bool wasKilled = false;
-    guardResource(() async {
-      if (exitCode == null) {
-        logger.write("Terminating $name...");
-        process.kill();
-        wasKilled = true;
-        await process.exitCode;
-      }
-    });
-
     if (progress != null) {
       logger.write(progress, tag: tag, progress: ProgressState.running);
     }
 
-    process.stderr.listen((event) {
+    var errSub = process.stderr.listen((event) {
       logger.write(utf8.decode(event), tag: tag, level: Level.error, progress: ProgressState.completed);
     });
 
-    process.stdout.map(utf8.decode).splitLines().listen((log) {
+    var outSub = process.stdout.map(utf8.decode).splitLines().listen((log) {
       if (hide != null && hide.call(log)) return;
 
       if (progress != null) {
@@ -155,17 +134,38 @@ abstract class BaseCommand extends Command<int> {
       }
     });
 
+    int? exitCode;
+    bool wasKilled = false;
+    guardResource(() async {
+      if (exitCode == null) {
+        logger.write("Terminating $name...");
+        process.kill();
+        wasKilled = true;
+        await errSub.cancel();
+        await outSub.cancel();
+        await process.exitCode;
+      }
+    });
+
     exitCode = await process.exitCode;
+
     if (wasKilled) {
-      return;
+      return exitCode;
     }
-    if (exitCode == 0) {
-      logger.complete(true);
-    } else {
+
+    await Future.delayed(Duration(seconds: 10));
+
+    await errSub.cancel();
+    await outSub.cancel();
+
+    if (exitCode != 0 && (onFail == null || onFail())) {
       logger.complete(false);
-      onFail?.call();
       shutdown(exitCode);
     }
+
+    logger.complete(true);
+
+    return exitCode;
   }
 }
 

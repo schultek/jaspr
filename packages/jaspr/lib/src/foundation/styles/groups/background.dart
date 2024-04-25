@@ -1,6 +1,6 @@
 part of '../styles.dart';
 
-class _BackgroundStyles implements Styles {
+class _BackgroundStyles extends Styles {
   final Color? color;
   final BackgroundAttachment? attachment;
   final BackgroundClip? clip;
@@ -19,7 +19,7 @@ class _BackgroundStyles implements Styles {
     this.position,
     this.repeat,
     this.size,
-  });
+  }) : super._();
 
   @override
   Map<String, String> get styles => {

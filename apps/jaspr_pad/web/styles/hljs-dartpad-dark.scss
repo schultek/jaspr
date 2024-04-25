@@ -1,0 +1,98 @@
+@import 'package:jaspr_pad/scss/colors';
+@import 'package:jaspr_pad/scss/variables';
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  background: $workshop-snippet-bg-color;
+  font-family: $editor-font;
+  font-weight: 400;
+  margin: 8px;
+  padding: 8px;
+  border-radius: 16px;
+
+}
+
+/* Base color: saturation 0; */
+
+.hljs,
+.hljs-subst {
+  color: $dark-editor-text;
+}
+
+.hljs-comment {
+  color: $dark-comment;
+}
+
+.hljs-keyword,
+.hljs-attribute,
+.hljs-selector-tag,
+.hljs-meta-keyword,
+.hljs-doctag,
+.hljs-name {
+  color: $dark-green;
+}
+
+/* User color: hue: 0 */
+.hljs-type,
+.hljs-string,
+.hljs-number,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion {
+  color: $dark-pink;
+}
+
+.hljs-title,
+.hljs-section {
+  color: $dark-orange-2;
+}
+
+.hljs-regexp,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: $dark-blue;
+}
+
+
+/* Language color: hue: 90; */
+
+.hljs-literal {
+  color: #78A960;
+}
+
+.hljs-built_in,
+.hljs-bullet,
+.hljs-code,
+.hljs-addition {
+  color: $dark-blue;
+}
+
+
+/* Meta color: hue: 200 */
+
+.hljs-meta {
+  color: $dark-teal;
+}
+
+.hljs-meta-string {
+  color: $dark-teal;
+}
+
+
+/* Misc effects */
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}

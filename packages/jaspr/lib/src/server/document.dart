@@ -7,7 +7,6 @@ import 'package:html/parser.dart';
 
 import '../../server.dart';
 import 'child_nodes.dart';
-import 'markup_render_object.dart';
 
 export '../components/style.dart' hide Style;
 
@@ -19,43 +18,43 @@ abstract class Document extends StatelessComponent {
 
   const factory Document({
     String? title,
+    String? lang,
     String? base,
     String? charset,
     String? viewport,
     Map<String, String>? meta,
     List<StyleRule>? styles,
-    String? scriptName,
     List<Component> head,
     required Component body,
   }) = _BaseDocument;
 
-  const factory Document.file({
+  const factory Document.template({
     String name,
     String attachTo,
     required Component child,
-  }) = _FileDocument;
+  }) = _TemplateDocument;
 }
 
 class _BaseDocument extends Document {
   const _BaseDocument({
     this.title,
+    this.lang,
     this.base,
     this.charset = 'utf-8',
     this.viewport = 'width=device-width, initial-scale=1.0',
     this.meta,
     this.styles,
-    this.scriptName,
     this.head = const [],
     required this.body,
   }) : super._();
 
   final String? title;
+  final String? lang;
   final String? base;
   final String? charset;
   final String? viewport;
   final Map<String, String>? meta;
   final List<StyleRule>? styles;
-  final String? scriptName;
   final List<Component> head;
   final Component body;
 
@@ -71,6 +70,9 @@ class _BaseDocument extends Document {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'html',
+      attributes: {
+        if (lang != null) 'lang': lang!,
+      },
       children: [
         DomComponent(
           tag: 'head',
@@ -86,8 +88,6 @@ class _BaseDocument extends Document {
             if (styles != null) //
               Style(styles: styles!),
             ...head,
-            if (scriptName != null) //
-              script([], src: '$scriptName.dart.js', defer: true),
           ],
         ),
         DomComponent(tag: 'body', child: body),
@@ -96,9 +96,9 @@ class _BaseDocument extends Document {
   }
 }
 
-class _FileDocument extends Document {
-  const _FileDocument({
-    this.name = 'index.html',
+class _TemplateDocument extends Document {
+  const _TemplateDocument({
+    this.name = 'index',
     this.attachTo = 'body',
     required this.child,
   }) : super._();
@@ -113,30 +113,35 @@ class _FileDocument extends Document {
   }
 
   @override
-  Element createElement() => _FileDocumentElement(this);
+  Element createElement() => _TemplateDocumentElement(this);
 }
 
-class _FileDocumentElement extends StatelessElement {
-  _FileDocumentElement(_FileDocument super.component);
+class _TemplateDocumentElement extends StatelessElement {
+  _TemplateDocumentElement(_TemplateDocument super.component);
 
-  Future<String>? _fileFuture;
+  Future<String?>? _templateFuture;
 
   @override
   Iterable<Component> build() {
-    (binding as ServerAppBinding).addRenderAdapter(_FileDocumentAdapter(this));
-    _fileFuture ??= (binding as ServerAppBinding).loadFile((component as _FileDocument).name);
+    (binding as ServerAppBinding).addRenderAdapter(_TemplateDocumentAdapter(this));
+    _templateFuture ??=
+        (binding as ServerAppBinding).loadFile('${(component as _TemplateDocument).name}.template.html');
     return super.build();
   }
 }
 
-class _FileDocumentAdapter extends ElementBoundaryAdapter {
-  _FileDocumentAdapter(super.element);
+class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
+  _TemplateDocumentAdapter(super.element);
 
-  late String file;
+  late String template;
 
   @override
   FutureOr<void> prepare() async {
-    file = await (element as _FileDocumentElement)._fileFuture!;
+    var template = await (element as _TemplateDocumentElement)._templateFuture!;
+    if (template == null) {
+      throw TemplateNotFoundError((element.component as _TemplateDocument).name);
+    }
+    this.template = template;
     return super.prepare();
   }
 
@@ -144,8 +149,8 @@ class _FileDocumentAdapter extends ElementBoundaryAdapter {
   void applyBoundary(ChildListRange range) {
     var curr = range.start.prev!;
     range.remove();
-    var document = parse(file);
-    var target = document.querySelector((element.component as _FileDocument).attachTo)!;
+    var document = parse(template);
+    var target = document.querySelector((element.component as _TemplateDocument).attachTo)!;
 
     MarkupRenderObject? createTree(dom.Node node) {
       var n = element.parentRenderObjectElement!.renderObject.createChildRenderObject() as MarkupRenderObject;
@@ -187,5 +192,16 @@ class _FileDocumentAdapter extends ElementBoundaryAdapter {
         curr = next;
       }
     }
+  }
+}
+
+class TemplateNotFoundError extends Error {
+  TemplateNotFoundError(this.name);
+
+  final String name;
+
+  @override
+  String toString() {
+    return 'TemplateNotFoundError: The template "$name.template.html" was not found.';
   }
 }

@@ -1,0 +1,117 @@
+@import 'package:jaspr_pad/scss/colors';
+@import 'package:jaspr_pad/scss/variables';
+
+// dart parser:
+// https://github.com/codemirror/CodeMirror/blob/0f437b9addb3e4308519d208a606c152d42cf0a2/mode/dart/dart.js
+
+.cm-s-dartpad span {
+  font-family: $editor-font;
+  font-weight: 400;
+}
+
+.cm-s-dartpad .CodeMirror-matchingbracket {outline: 1px solid #606060;color: $light-red !important;}
+.cm-s-dartpad .CodeMirror-selected {background: $light-selection-color !important;}
+
+.cm-s-dartpad .CodeMirror-gutters { background: $light-code-background-color !important; border-right: none}
+.cm-s-dartpad .CodeMirror-foldgutter-open, .CodeMirror-foldgutter-folded { color: $light-gutter-line-number-color; }
+.cm-s-dartpad .CodeMirror-linenumber { color: $light-gutter-line-number-color; }
+.cm-s-dartpad .CodeMirror-cursor { border-left: 1px solid $light-editor-text; }
+.cm-s-dartpad .CodeMirror-cursors.CodeMirror-overwrite .CodeMirror-cursor { margin-top: 2px; width: auto; border-left: none; background-color: rgba($light-editor-text,0.7); }
+.cm-s-dartpad { background-color: $light-code-background-color; color: $light-editor-text; }
+.cm-s-dartpad span.cm-builtin { color: $light-editor-text; }
+.cm-s-dartpad span.cm-comment { color: $light-comment; }
+.cm-s-dartpad span.cm-keyword { color: $light-green;}
+.cm-s-dartpad span.cm-atom { color: $light-dark-blue; }
+.cm-s-dartpad span.cm-variable { color: $light-blue; }
+.cm-s-dartpad span.cm-variable-2 { color: $light-red;}
+.cm-s-dartpad span.cm-string { color: $light-pink; }
+.cm-s-dartpad span.cm-string-2 { color: $light-pink-2; }
+.cm-s-dartpad span.cm-number { color: $light-teal; }
+.cm-s-dartpad span.cm-attribute { color: $light-blue; }
+.cm-s-dartpad span.cm-qualifier { color: $light-red-2; }
+.cm-s-dartpad span.cm-meta { color: $light-teal; }
+.cm-s-dartpad span.cm-header { color: $light-blue; }
+.cm-s-dartpad span.cm-operator { color: $light-editor-text; }
+.cm-s-dartpad span.cm-def { color: $light-editor-text; }
+.cm-s-dartpad span.cm-tag { color: $light-green; }
+.cm-s-dartpad span.cm-property { color: $light-red; }
+
+.CodeMirror-simplescroll-horizontal div, .CodeMirror-simplescroll-vertical div {
+  background: $light-scrollbar-color;
+}
+
+.CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
+  background-color: $light-code-background-color !important;
+}
+
+// code folding styles
+
+.cm-s-dartpad .CodeMirror-foldmarker {
+  background-color:rgb(82, 192, 155);
+  color: #000;
+  font-weight: bold !important;
+  cursor: pointer;
+}
+.cm-s-dartpad .CodeMirror-foldgutter {
+  width: .7em;
+}
+.cm-s-dartpad .CodeMirror-foldgutter-open,
+.cm-s-dartpad .CodeMirror-foldgutter-folded {
+  cursor: pointer;
+}
+.cm-s-dartpad .CodeMirror-foldgutter-open:after {
+  content: "\25BE";
+  font-size: 18px;
+  position: absolute;
+  top: -4px;
+  left: -2px;
+  color: $light-gutter-line-number-color;
+}
+.cm-s-dartpad .CodeMirror-foldgutter-folded:after {
+  content: "\25B8";
+  font-size: 18px;
+  position: absolute;
+  top: -4px;
+  left: -2px;
+  color: rgb(82, 192, 155);
+}
+.cm-s-dartpad span.CodeMirror-matchingtag {
+  background-color: #c4c4c4;
+}
+
+// dialogs used for vim keymapping
+
+.cm-s-dartpad .CodeMirror-dialog.CodeMirror-dialog-bottom {
+  border-top: 1px solid #eee;
+  position: absolute;
+  background:  $light-code-background-color;
+  color: $light-editor-text;
+  z-index: 990;
+  width: 100%;
+  bottom: 0px;
+  left: 0px;
+  padding-left: 35px;
+  padding-bottom: 3px;
+  padding-top: 3px;
+}
+
+.cm-s-dartpad .CodeMirror-dialog .cm-vim-message {
+  border-top: 1px solid $light-red;
+  border-bottom: 1px solid $light-red;
+  width: fit-content;
+  background:  $light-code-background-color;
+  color: $light-red;
+  font-weight: bold;
+  padding: 3px 35px 3px 35px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.cm-s-dartpad .CodeMirror-dialog input {
+    margin-left: 4px;
+    margin-right: 8px;
+    width: 200px;
+    max-width: max-content;
+    background: rgba(255,255,255,0.9);
+    color: black;
+}

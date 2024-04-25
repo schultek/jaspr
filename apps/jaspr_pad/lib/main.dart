@@ -2,10 +2,13 @@
 library main;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:shelf/shelf.dart';
+import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 import 'components/playground/playground.dart';
@@ -18,21 +21,27 @@ import 'server/samples.dart';
 import 'server/tutorial.dart';
 
 void main() {
-  runServer(Document.file(
-    name: 'main.html',
-    child: Builder.single(builder: (context) {
-      return ProviderScope(
-        overrides: [syncSamplesProvider.overrideWith(loadSamplesProviderOverride)],
-        child: Playground(),
-      );
-    }),
-  ))
-    ..addMiddleware(logRequests())
-    ..addMiddleware((handler) {
-      var router = Router(notFoundHandler: handler);
-      router.mount('/api', apiRouter);
-      return router.call;
-    });
+  Jaspr.initializeApp();
+
+  var router = Router();
+
+  router.mount('/api', apiRouter);
+  router.mount('/', serveApp((r, render) {
+    return render(Document.template(
+      name: 'main',
+      child: Builder.single(builder: (context) {
+        return ProviderScope(
+          overrides: [syncSamplesProvider.overrideWith(loadSamplesProviderOverride)],
+          child: Playground(),
+        );
+      }),
+    ));
+  }));
+
+  var handler = Pipeline().addMiddleware(logRequests()).addHandler(router.call);
+
+  var port = int.parse(Platform.environment['PORT'] ?? '8080');
+  serve(handler, InternetAddress.anyIPv4, port, shared: true);
 }
 
 Handler get apiRouter {

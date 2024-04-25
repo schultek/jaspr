@@ -93,10 +93,13 @@ void main() {
         }
       }
 
+      // Forced tag name
+      final tagValue = data["tag"] ?? tag;
+
       content.write(
           'Key? key, String? id, String? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
           '  return DomComponent(\n'
-          '    tag: \'$tag\',\n'
+          '    tag: \'$tagValue\',\n'
           '    key: key,\n'
           '    id: id,\n'
           '    classes: classes,\n'

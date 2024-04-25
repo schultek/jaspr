@@ -143,10 +143,9 @@ class _WrappingDomComponent extends InheritedComponent implements DomComponent {
 ///
 /// Styling is done through the parent element(s) and their styles.
 class Text extends Component {
-  const Text(this.text, {this.rawHtml = false, super.key});
+  const Text(this.text, {super.key});
 
   final String text;
-  final bool rawHtml;
 
   @override
   Element createElement() => TextElement(this);
@@ -166,9 +165,9 @@ abstract class NoChildElement extends Element {
   }
 
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
-    super._firstBuild(onBuilt);
-    rebuild(onBuilt);
+  void _firstBuild() {
+    super._firstBuild();
+    rebuild();
   }
 
   @override
@@ -188,7 +187,7 @@ class TextElement extends NoChildElement with RenderObjectElement {
 
   @override
   void updateRenderObject() {
-    renderObject.updateText(component.text, component.rawHtml);
+    renderObject.updateText(component.text);
   }
 }
 

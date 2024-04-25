@@ -144,22 +144,7 @@ class DomRenderObject extends RenderObject {
   }
 
   @override
-  void updateText(String text, [bool rawHtml = false]) {
-    if (rawHtml) {
-      var parent = this.parent!.node;
-      if (parent is html.Element) {
-        if (parent.innerHtml != text) {
-          parent.innerHtml = text;
-          node = parent.childNodes.first;
-          if (kVerboseMode) {
-            print("Update inner html: $text");
-          }
-        }
-        this.parent!.toHydrate.clear();
-      }
-      return;
-    }
-
+  void updateText(String text) {
     diff:
     if (node == null) {
       var toHydrate = parent!.toHydrate;
@@ -270,7 +255,7 @@ class RootDomRenderObject extends DomRenderObject {
 
   RootDomRenderObject(this.container, [List<Node>? nodes]) {
     node = container;
-    toHydrate = nodes ?? container.nodes;
+    toHydrate = [...nodes ?? container.nodes];
     beforeStart = toHydrate.firstOrNull?.previousNode;
   }
 

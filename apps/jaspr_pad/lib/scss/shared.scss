@@ -1,0 +1,345 @@
+// Styles shared between the playground and embeds
+
+@import 'colors';
+@import 'layout';
+@import 'variables';
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+  font-family: Roboto, sans-serif;
+}
+
+// Flashes
+#flash-container > div + div {
+  // Adds space between the flashes in the flash container, if more than one is displayed.
+  margin-top: 8px;
+}
+
+.flash {
+  border-radius: 0;
+  border: none;
+  padding: 6px;
+}
+
+#flash-container {
+  width: 420px;
+  z-index: 10;
+  bottom: 40px;
+  right: 8px;
+  position: fixed;
+}
+
+.message-container {
+  letter-spacing: 0.05em;
+  padding: 6px 18px 6px 6px;
+  min-height: 32px;
+  max-height: 120px;
+  overflow-y: auto;
+  font-family: Roboto Light, sans-serif;
+  font-weight: 300;
+  a {
+    font-weight: bold;
+  }
+}
+
+.info-message {
+  font-family: $normal-font;
+  font-size: $embed-editor-font-size;
+  cursor: default;
+  margin-right: 12px;
+}
+
+// Enabled features (e.g. null safety)
+#feature-message {
+  font-family: Roboto, sans-serif;
+  font-weight: bolder;
+}
+
+// Issues
+#issues {
+  overflow-y: auto;
+  max-height: 50vh;
+}
+
+#issues .issue {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  border-radius: 3px;
+  padding: 4px;
+  margin: 0;
+}
+
+.issue > .issue-column {
+  flex: 1;
+}
+
+// Keyboard button
+#keyboard-button {
+  cursor: pointer;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// Busy light
+.busylight {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin: 9px;
+
+  opacity: 0;
+  background-color: #fff;
+
+  -webkit-transition: all 100ms cubic-bezier(0.640, 0.125, 0.235, 0.885);
+  -moz-transition: all 100ms cubic-bezier(0.640, 0.125, 0.235, 0.885);
+  -o-transition: all 100ms cubic-bezier(0.640, 0.125, 0.235, 0.885);
+  transition: all 100ms cubic-bezier(0.640, 0.125, 0.235, 0.885);
+
+  -webkit-transition-timing-function: cubic-bezier(0.640, 0.125, 0.235, 0.885);
+  -moz-transition-timing-function: cubic-bezier(0.640, 0.125, 0.235, 0.885);
+  -o-transition-timing-function: cubic-bezier(0.640, 0.125, 0.235, 0.885);
+  transition-timing-function: cubic-bezier(0.640, 0.125, 0.235, 0.885);
+}
+
+.busylight.on {
+  opacity: 0.6;
+}
+
+// Code annotations
+
+.squiggle-info {
+  border-bottom: 2px solid $dark-squiggle-info-color;
+}
+
+.squiggle-warning {
+  border-bottom: 2px solid $dark-squiggle-warning-color;
+}
+
+.squiggle-error {
+  border-bottom: 2px solid $dark-squiggle-error-color;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+// Issues
+.issue + .issue {
+  margin-top: 4px;
+}
+
+.issue .issuelabel {
+  font-family: $editor-font;
+  font-size: $embed-editor-font-size;
+  display: inline-block;
+  border-radius: 3px;
+  padding: 0 5px 2px 5px;
+  min-width: 62px;
+}
+
+.issue-indent {
+  border: 1px;
+  padding: 2px 5px; // to match size of issuelabel
+  min-width: 62px;
+}
+
+.issue-anchor {
+  margin: 0 4px;
+}
+
+.issue .issuelabel.error {
+  color: $dark-issue-error-color;
+  border: 1px solid $dark-issue-error-color;
+  background-color: transparent;
+}
+
+.issue .issuelabel.warning {
+  color: $dark-issue-warning-color;
+  border: 1px solid $dark-issue-warning-color;
+  background-color: transparent;
+}
+
+.issue .issuelabel.info {
+  color: $dark-issue-info-color;
+  border: 1px solid $dark-issue-info-color;
+  background-color: transparent;
+}
+
+.issue .message {
+  padding-left: 5px;
+  line-height: 20px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.message + .message {
+  padding-top: 4px;
+}
+
+// Styles for footer items on the right
+@mixin footer-item-right {
+  margin-left: 12px;
+}
+
+// Versions
+#dartpad-version {
+  @include footer-item-right;
+}
+
+#dartpad-package-versions {
+  @include footer-item-right;
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// Keys dialog
+.mdc-dialog__surface {
+  // Make the dialog a minimum of 400px to best display the keyboard dialog
+  min-width: 512px !important;
+}
+
+.keys-dialog {
+  top: auto !important;
+  bottom: 20px;
+
+  dl {
+    padding: 0.5em;
+  }
+
+  dt {
+    float: left;
+    clear: left;
+  }
+  dd {
+    text-align: right;
+  }
+  dd > span {
+    font-family: "Helvetica Neue", "Inconsolata", monospace;
+    padding: 0 4px;
+    font-size: 10pt;
+    color: $dark-blue;
+    border: 1px solid $dark-blue;
+    border-radius: 2px;
+    margin: 2px 2px;
+    white-space: nowrap;
+    display: inline-block;
+  }
+}
+
+// Custom scrollbars
+.custom-scrollbar {
+  margin-right: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 9px;
+  height: 9px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+}
+
+// Editor Tabs
+.editor-tab-host {
+  @include layout-vertical;
+}
+
+.editor-tabs {
+  @include layout-horizontal;
+  @include layout-center;
+  @include layout-justified;
+  padding-left: 8px;
+
+  button {
+    margin-right: 8px;
+  }
+  .tab-group {
+    @include layout-horizontal;
+    @include layout-center;
+  }
+}
+
+.editor-tab {
+  text-transform: none !important;
+  letter-spacing: normal;
+
+  border-top: 2px solid transparent;
+  padding: 8px 4px;
+
+  &.active {
+    font-weight: bold;
+  }
+}
+
+.mdc-tab__content {
+  text-transform: none !important;
+}
+
+.mdc-tab--active {
+  .mdc-tab__text-label {
+    font-weight: normal;
+  }
+}
+
+#editor-panel-tab-host {
+  @include layout-flex;
+  @include layout-vertical;
+  .documentation {
+    @include layout-flex;
+  }
+}
+
+// Unread console counter
+.Counter {
+  margin-left: 4px;
+  display: inline-block;
+  padding: 2px 5px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  color: $dark-teal;
+  background-color: fade_out($dark-teal, 0.5);
+  border-radius: 20px;
+}
+
+// Channel selection menu
+.channel-item-group {
+  @include layout-horizontal();
+  @include layout-center();
+}
+
+.channel-menu-right {
+  @include layout-flex();
+  margin-bottom: 12px;
+}
+
+// Misc
+.view-label {
+  margin: 8px;
+  font-family: $normal-font;
+  font-size: $embed-editor-font-size;
+  white-space: normal;
+  &.absolute {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin-top: 8px;
+    margin-left: 8px;
+  }
+}
+
+// ie support for hidden
+html [hidden] {
+  display: none !important;
+}

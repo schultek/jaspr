@@ -1,0 +1,19 @@
+@import url(//fonts.googleapis.com/css?family=Google+Sans);
+
+$editor-font: 'Roboto Mono', monospace;
+$normal-font: 'Roboto', sans-serif;
+$google-sans: 'Google Sans', 'Roboto', sans-serif;
+$embed-editor-font-size: 14px;
+$playground-editor-font-size: 14px;
+$border-width: 6px;
+
+// resets button styles
+@mixin reset-button {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}

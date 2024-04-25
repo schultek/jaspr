@@ -26,7 +26,7 @@ class FontFamily {
   final String value;
 
   /// Constructs a [FontFamily] from a custom font name
-  const FontFamily(String value) : value = '"$value"';
+  const FontFamily(String value) : value = "'$value'";
 
   const FontFamily._generic(this.value);
 

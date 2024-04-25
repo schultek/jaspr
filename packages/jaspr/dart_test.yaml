@@ -1,19 +1,11 @@
-paths:
-  - test/framework
-  - test/server
-  - test/ui
-
-presets:
-  browser:
-    paths:
-      - test/browser
-    platforms:
-      - chrome
-    verbose_trace: false
-    js_trace: false
-
+platforms:
+  - vm
+  - chrome
 
 override_platforms:
   chrome:
     settings:
       headless: true
+
+verbose_trace: false
+js_trace: true

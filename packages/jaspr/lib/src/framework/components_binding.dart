@@ -4,8 +4,8 @@ part of 'framework.dart';
 mixin ComponentsBinding on AppBinding {
   /// Sets [app] as the new root of the component tree and performs an initial build
   Future<void> attachRootComponent(Component app) async {
-    var buildOwner = _rootElement?._owner ?? BuildOwner();
-    await buildOwner.lockState(() {
+    var buildOwner = _rootElement?._owner ?? createRootBuildOwner();
+    await buildOwner.lockState(() async {
       assert(() {
         buildOwner._debugBuilding = true;
         return true;
@@ -17,25 +17,17 @@ mixin ComponentsBinding on AppBinding {
       element._owner = buildOwner;
       element._renderObject = createRootRenderObject();
 
-      element.mount(null, null);
+      await buildOwner.performInitialBuild(element);
 
-      end() {
-        _rootElement = element;
-        buildOwner._isFirstBuild = false;
-        assert(() {
-          buildOwner._debugBuilding = false;
-          return true;
-        }());
+      _rootElement = element;
 
-        didAttachRootElement(element);
-      }
+      buildOwner._isFirstBuild = false;
+      assert(() {
+        buildOwner._debugBuilding = false;
+        return true;
+      }());
 
-      if (element._asyncFirstBuild != null) {
-        assert(!isClient);
-        return element._asyncFirstBuild!.then((_) => end());
-      }
-
-      end();
+      didAttachRootElement(element);
     });
   }
 
@@ -43,6 +35,10 @@ mixin ComponentsBinding on AppBinding {
   void didAttachRootElement(Element element) {}
 
   RenderObject createRootRenderObject();
+
+  BuildOwner createRootBuildOwner() {
+    return BuildOwner();
+  }
 
   /// The [Element] that is at the root of the hierarchy.
   ///

@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
 class RippleLoader extends StatelessComponent {
-  const RippleLoader({Key? key}) : super(key: key);
+  const RippleLoader({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

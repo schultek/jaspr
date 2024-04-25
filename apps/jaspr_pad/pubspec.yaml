@@ -23,6 +23,8 @@ dependencies:
   markdown: ^7.1.1
   mdc_web: ^0.6.0
   path: ^1.9.0
+  sass_builder: ^2.2.1
+  shelf: ^1.4.1
   shelf_router: ^1.1.2
   yaml: ^3.1.0
 
@@ -37,4 +39,4 @@ dev_dependencies:
   yaml_writer: ^1.0.1
 
 jaspr:
-  uses-ssr: true
+  mode: server

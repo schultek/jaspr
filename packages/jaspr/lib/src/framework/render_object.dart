@@ -13,7 +13,7 @@ abstract class RenderObject {
   void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events);
 
-  void updateText(String text, [bool rawHtml = false]);
+  void updateText(String text);
 
   void skipChildren();
 
@@ -55,15 +55,12 @@ mixin RenderObjectElement on Element {
   RenderObject? _renderObject;
 
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
+  void _firstBuild() {
     if (_renderObject == null) {
       _renderObject = createRenderObject();
       updateRenderObject();
     }
-    super._firstBuild(() {
-      attachRenderObject();
-      onBuilt?.call();
-    });
+    super._firstBuild();
   }
 
   @override
@@ -72,6 +69,7 @@ mixin RenderObjectElement on Element {
     updateRenderObject();
   }
 
+  @override
   void attachRenderObject() {
     var parent = _parentRenderObjectElement?.renderObject;
     if (parent != null) {

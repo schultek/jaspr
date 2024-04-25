@@ -35,6 +35,7 @@ jobs:
           dart pub global activate melos
           dart pub global activate -s git https://github.com/schultek/semantic_changelog
           melos bootstrap --no-private
+          jaspr --disable-analytics
           gcloud auth print-identity-token --audiences=https://pub.dev | dart pub token add https://pub.dev
 
       - name: Bump Package Versions

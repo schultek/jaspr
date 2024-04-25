@@ -5,16 +5,16 @@ import 'dart:io';
 
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/src/loaders/strategy.dart';
-import 'package:mason/mason.dart' show ExitCode;
 import 'package:webdev/src/command/configuration.dart';
 import 'package:webdev/src/serve/dev_workflow.dart';
 
+import '../config.dart';
 import '../helpers/flutter_helpers.dart';
-import '../helpers/ssr_helper.dart';
+import '../helpers/proxy_helper.dart';
 import '../logging.dart';
 import 'base_command.dart';
 
-class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
+class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   ServeCommand({super.logger}) {
     argParser.addOption(
       'input',
@@ -68,21 +68,151 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
   late final port = argResults!['port'] as String;
 
   @override
-  Future<int> run() async {
+  Future<CommandResult?> run() async {
     await super.run();
 
-    logger.write(
-        "Starting jaspr in ${release ? 'release' : debug ? 'debug' : 'development'} mode...",
-        progress: ProgressState.running);
+    logger.write("Running jaspr in ${config!.mode.name} rendering mode.");
 
-    var workflow = await _runWebdev();
-    guardResource(() {
-      logger.write('Terminating web builder...');
-      return workflow.shutDown();
+    var proxyPort = config!.mode == JasprMode.client ? port : '5567';
+    var flutterPort = '5678';
+    var webPort = '5467';
+
+    var workflow = await _runWebCompiler(webPort);
+
+    if (config!.usesFlutter) {
+      var flutterProcess = await serveFlutter(flutterPort);
+
+      workflow.serverManager.servers.first.buildResults
+          .where((event) => event.status == BuildStatus.succeeded)
+          .listen((event) {
+        // trigger reload
+        flutterProcess.stdin.writeln('r');
+      });
+    }
+
+    await startProxy(
+      proxyPort,
+      webPort: webPort,
+      flutterPort: config!.usesFlutter ? flutterPort : null,
+      redirectNotFound: config!.mode == JasprMode.client,
+    );
+
+    if (config!.mode == JasprMode.client) {
+      logger.write('Serving at http://localhost:$proxyPort');
+
+      return CommandResult.running(workflow.done, stop);
+    }
+
+    if (config!.devCommand != null) {
+      return await _runDevCommand(config!.devCommand!, proxyPort);
+    } else {
+      return await _runServer(proxyPort);
+    }
+  }
+
+  Future<CommandResult> _runServer(String proxyPort) async {
+    logger.write("Starting server...", progress: ProgressState.running);
+
+    var serverTarget = File('.dart_tool/jaspr/server_target.dart').absolute;
+    if (!serverTarget.existsSync()) {
+      serverTarget.createSync(recursive: true);
+    }
+
+    var serverPid = File('.dart_tool/jaspr/server.pid').absolute;
+    if (!serverPid.existsSync()) {
+      serverPid.createSync(recursive: true);
+    }
+    serverPid.writeAsStringSync('');
+
+    var args = [
+      'run',
+      if (!release) ...[
+        '--enable-vm-service',
+        '--enable-asserts',
+      ] else
+        '-Djaspr.flags.release=true',
+      '-Djaspr.flags.verbose=$debug',
+    ];
+
+    if (debug) {
+      args.add('--pause-isolates-on-start');
+    }
+
+    var entryPoint = await getEntryPoint(argResults!['input']);
+
+    if (!release) {
+      var import = entryPoint.replaceFirst('lib', 'package:${config!.projectName}');
+      serverTarget.writeAsStringSync(serverEntrypoint(import));
+
+      args.add(serverTarget.path);
+    } else {
+      args.add(entryPoint);
+    }
+
+    args.addAll(argResults!.rest);
+    var process = await Process.start(
+      Platform.executable,
+      args,
+      environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
+      workingDirectory: Directory.current.path,
+    );
+
+    logger.write('Server started.', progress: ProgressState.completed);
+
+    return CommandResult.running(watchProcess('server', process, tag: Tag.server), stop);
+  }
+
+  Future<CommandResult> _runDevCommand(String command, String proxyPort) async {
+    logger.write("Starting server...", progress: ProgressState.running);
+
+    if (release) {
+      logger.write("Ignoring --release flag since custom dev command is used.", level: Level.warning);
+    }
+    if (debug) {
+      logger.write("Ignoring --debug flag since custom dev command is used.", level: Level.warning);
+    }
+
+    var [exec, ...args] = command.split(" ");
+
+    var process = await Process.start(
+      exec,
+      args,
+      environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
+      workingDirectory: Directory.current.path,
+    );
+
+    logger.write('Server started.', progress: ProgressState.completed);
+
+    return CommandResult.running(watchProcess('server', process, tag: Tag.server), stop);
+  }
+
+  Future<DevWorkflow> _runWebCompiler(String webPort) async {
+    logger.write('Starting web compiler...', progress: ProgressState.running);
+
+    var configuration = Configuration(
+      reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
+      release: release,
+    );
+
+    var compilers = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+
+    var workflow = await DevWorkflow.start(configuration, [
+      if (release) '--release',
+      '--define',
+      '$compilers:ddc=generate-full-dill=true',
+      '--delete-conflicting-outputs',
+      if (!release)
+        '--define=$compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
+      else
+        '--define=$compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
+    ], {
+      'web': int.parse(webPort)
     });
 
-    logger.complete(true);
-    logger.write('Starting web builder...', progress: ProgressState.running);
+    guardResource(() async {
+      logger.write('Terminating web compiler...');
+      await workflow.shutDown();
+    });
 
     var buildCompleter = Completer();
 
@@ -117,124 +247,29 @@ class ServeCommand extends BaseCommand with SsrHelper, FlutterHelper {
 
     logger.write('Done building web assets.', progress: ProgressState.completed);
 
-    if (!useSSR) {
-      logger.write('Serving `web` on http://localhost:$port');
-    }
-
-    if (usesFlutter) {
-      var flutterProcess = await serveFlutter();
-
-      workflow.serverManager.servers.first.buildResults
-          .where((event) => event.status == BuildStatus.succeeded)
-          .listen((event) {
-        // trigger reload
-        flutterProcess.stdin.writeln('r');
-      });
-    }
-
-    if (!useSSR) {
-      await workflow.done;
-      return ExitCode.success.code;
-    }
-
-    if (config.devCommand != null) {
-      await _runDevCommand(config.devCommand!);
-    } else {
-      await _runServer();
-    }
-    return ExitCode.success.code;
-  }
-
-  Future<void> _runServer() async {
-    logger.write("Starting server...", progress: ProgressState.running);
-
-    var args = [
-      'run',
-      if (!release) ...[
-        '--enable-vm-service',
-        '--enable-asserts',
-        '-Djaspr.dev.hotreload=true',
-      ] else
-        '-Djaspr.flags.release=true',
-      '-Djaspr.dev.proxy=5467',
-      if (usesFlutter) '-Djaspr.dev.flutter=5678',
-      '-Djaspr.flags.verbose=$debug',
-    ];
-
-    if (debug) {
-      args.add('--pause-isolates-on-start');
-    }
-
-    String? entryPoint = await getEntryPoint(argResults!['input']);
-
-    if (entryPoint == null) {
-      logger.complete(false);
-      logger.write("Cannot find entry point. Create a main.dart in lib or web, or specify a file using --input.",
-          level: Level.critical);
-      await shutdown();
-    }
-
-    args.add(entryPoint);
-
-    args.addAll(argResults!.rest);
-
-    var process = await Process.start(
-      'dart',
-      args,
-      environment: {'PORT': argResults!['port'], 'JASPR_PROXY_PORT': '5467'},
-    );
-
-    logger.write('Server started.', progress: ProgressState.completed);
-
-    await watchProcess('server', process, tag: Tag.server);
-  }
-
-  Future<void> _runDevCommand(String command) async {
-    logger.write("Starting server...", progress: ProgressState.running);
-
-    if (release) {
-      logger.write("Ignoring --release flag since custom dev command is used.", level: Level.warning);
-    }
-    if (debug) {
-      logger.write("Ignoring --debug flag since custom dev command is used.", level: Level.warning);
-    }
-
-    var [exec, ...args] = command.split(" ");
-
-    var process = await Process.start(
-      exec,
-      args,
-      environment: {'PORT': argResults!['port'], 'jaspr_dev_proxy': '5467'},
-    );
-
-    logger.write('Server started.', progress: ProgressState.completed);
-
-    await watchProcess('server', process, tag: Tag.server);
-  }
-
-  Future<DevWorkflow> _runWebdev() async {
-    var builderPort = useSSR ? '5467' : port;
-
-    var configuration = Configuration(
-      reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
-      release: release,
-    );
-
-    var compilers = '${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
-
-    var workflow = await DevWorkflow.start(configuration, [
-      if (release) '--release',
-      '--define',
-      '$compilers:ddc=generate-full-dill=true',
-      '--delete-conflicting-outputs',
-      if (!release)
-        '--define=$compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
-      else
-        '--define=$compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
-    ], {
-      'web': int.parse(builderPort)
-    });
-
     return workflow;
   }
 }
+
+String serverEntrypoint(String import) => '''
+  import '$import' as m;
+  import 'package:hotreloader/hotreloader.dart';
+      
+  void main() async {
+    try {
+      await HotReloader.create(
+        debounceInterval: Duration.zero,
+        onAfterReload: (ctx) => m.main(),
+      );
+      print('[INFO] Server hot reload is enabled.');
+    } on StateError catch (e) {
+      if (e.message.contains('VM service not available')) {
+        print('[WARNING] Server hot reload not enabled. Run with --enable-vm-service to enable hot reload.');
+      } else {
+        rethrow;
+      }
+    }
+    
+    m.main();
+  }
+''';
