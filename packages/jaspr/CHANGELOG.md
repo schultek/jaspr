@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Added `Head` component.
+
 ## 0.12.0
 
 - **BREAKING** Removed `Document.file()`, instead use new `Document.template()`.
