@@ -8,6 +8,8 @@ part of 'framework.dart';
 typedef RenderObjectVisitor = void Function(RenderObject child);
 
 abstract class RenderObject {
+  RenderObject? get parent;
+
   RenderObject createChildRenderObject();
 
   void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
@@ -19,7 +21,7 @@ abstract class RenderObject {
 
   void attach(covariant RenderObject child, {covariant RenderObject? after});
 
-  void remove();
+  void remove(covariant RenderObject child);
 }
 
 abstract class MultiChildRenderObjectElement extends MultiChildElement with RenderObjectElement {
@@ -46,7 +48,9 @@ abstract class SingleChildRenderObjectElement extends SingleChildElement with Re
 
 mixin RenderObjectElement on Element {
   RenderObject createRenderObject() {
-    return _parentRenderObjectElement!.renderObject.createChildRenderObject();
+    var renderObject = _parentRenderObjectElement!.renderObject.createChildRenderObject();
+    assert(renderObject.parent == _parentRenderObjectElement!.renderObject);
+    return renderObject;
   }
 
   void updateRenderObject();
@@ -79,11 +83,16 @@ mixin RenderObjectElement on Element {
       }
       var after = prevElem?._lastRenderObjectElement;
       parent.attach(renderObject, after: after?.renderObject);
+      assert(renderObject.parent == parent);
     }
   }
 
   void detachRenderObject() {
-    renderObject.remove();
+    var parent = _parentRenderObjectElement?.renderObject;
+    if (parent != null) {
+      parent.remove(renderObject);
+      assert(renderObject.parent == null);
+    }
   }
 
   @override

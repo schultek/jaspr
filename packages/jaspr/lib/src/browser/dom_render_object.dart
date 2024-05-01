@@ -11,11 +11,13 @@ const xmlns = {
 };
 
 class DomRenderObject extends RenderObject {
-  DomRenderObject? parent;
   String? namespace;
   Node? node;
   List<Node> toHydrate = [];
   Map<String, EventBinding>? events;
+
+  @override
+  DomRenderObject? parent;
 
   void clearEvents() {
     events?.forEach((type, binding) {
@@ -229,13 +231,13 @@ class DomRenderObject extends RenderObject {
   }
 
   @override
-  void remove() {
+  void remove(DomRenderObject child) {
     if (kVerboseMode) {
-      print("Remove child $node of ${parent?.node}");
+      print("Remove child $child of $this");
     }
-    node?.remove();
-    parent = null;
-    namespace = null;
+    child.node?.remove();
+    child.parent = null;
+    child.namespace = null;
   }
 
   void finalize() {

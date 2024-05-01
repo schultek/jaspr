@@ -55,7 +55,7 @@ sealed class ChildNode {
   }
 }
 
-class ChildListRange extends ChildNode {
+class ChildListRange extends ChildNode with Iterable<MarkupRenderObject> {
   ChildListRange(this.start, this.end) {
     if (start case ChildNodeBoundary s) s.range = this;
     if (end case ChildNodeBoundary e) e.range = this;
@@ -78,6 +78,9 @@ class ChildListRange extends ChildNode {
   ChildNode get _start => start;
   @override
   ChildNode get _end => end;
+
+  @override
+  Iterator<MarkupRenderObject> get iterator => ChildListIterator(start, end.next);
 }
 
 class ChildList with Iterable<MarkupRenderObject> {
@@ -232,9 +235,10 @@ class ChildList with Iterable<MarkupRenderObject> {
 }
 
 class ChildListIterator implements Iterator<MarkupRenderObject> {
-  ChildListIterator(ChildNode? first) : _current = first;
+  ChildListIterator(ChildNode? first, [this._end]) : _current = first;
 
   ChildNode? _current;
+  final ChildNode? _end;
 
   @override
   late MarkupRenderObject current;
@@ -242,6 +246,9 @@ class ChildListIterator implements Iterator<MarkupRenderObject> {
   @override
   bool moveNext() {
     while (_current != null) {
+      if (_current == _end) {
+        return false;
+      }
       try {
         if (_current case ChildNodeData(:var node)) {
           current = node;

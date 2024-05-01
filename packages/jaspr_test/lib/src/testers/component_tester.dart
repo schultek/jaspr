@@ -147,8 +147,6 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
 }
 
 class TestRenderObject extends RenderObject {
-  TestRenderObject? parent;
-
   String? tag;
   String? id;
   String? classes;
@@ -160,8 +158,11 @@ class TestRenderObject extends RenderObject {
   List<TestRenderObject> children = [];
 
   @override
+  TestRenderObject? parent;
+
+  @override
   RenderObject createChildRenderObject() {
-    return TestRenderObject();
+    return TestRenderObject()..parent = this;
   }
 
   @override
@@ -202,8 +203,8 @@ class TestRenderObject extends RenderObject {
   }
 
   @override
-  void remove() {
-    parent?.children.remove(this);
-    parent = null;
+  void remove(TestRenderObject child) {
+    children.remove(child);
+    child.parent = null;
   }
 }

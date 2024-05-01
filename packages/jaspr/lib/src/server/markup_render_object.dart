@@ -15,6 +15,7 @@ class MarkupRenderObject extends RenderObject {
   String? text;
   bool? rawHtml;
 
+  @override
   MarkupRenderObject? parent;
 
   late final ChildList children = ChildList(this);
@@ -52,9 +53,9 @@ class MarkupRenderObject extends RenderObject {
   }
 
   @override
-  void remove() {
-    parent?.children.remove(this);
-    parent = null;
+  void remove(MarkupRenderObject child) {
+    children.remove(child);
+    child.parent = null;
   }
 
   String renderToHtml() {
