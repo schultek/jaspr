@@ -126,7 +126,7 @@ mixin OnFirstBuild on StatelessComponent {
 }
 
 /// An [Element] that uses a [StatelessComponent] as its configuration.
-class StatelessElement extends MultiChildElement {
+class StatelessElement extends BuildableElement {
   /// Creates an element that uses the given component as its configuration.
   StatelessElement(StatelessComponent super.component);
 

@@ -60,23 +60,15 @@ mixin ComponentsBinding on AppBinding {
   }
 }
 
-class _Root extends Component {
-  _Root({required this.child});
-
-  final Component child;
+class _Root extends ProxyComponent {
+  _Root({required Component super.child});
 
   @override
   _RootElement createElement() => _RootElement(this);
 }
 
-class _RootElement extends SingleChildElement with RenderObjectElement {
+class _RootElement extends ProxyElement with RenderObjectElement {
   _RootElement(_Root super.component);
-
-  @override
-  _Root get component => super.component as _Root;
-
-  @override
-  Component build() => component.child;
 
   @override
   void updateRenderObject() {}

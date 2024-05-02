@@ -1,3 +1,9 @@
+## Unreleased minor
+
+- Improved internal framework implementation of different element types.
+  - Added `BuildableElement` and `ProxyElement` as replacement for `MultiChildElement` and `SingleChildElement`.
+  - Added `Element.didMount()` and `Element.didUpdate()` lifecycle methods.
+
 ## 0.12.0
 
 - **BREAKING** Removed `Document.file()`, instead use new `Document.template()`.
