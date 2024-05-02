@@ -1,4 +1,4 @@
-# Serverpod Integration for Jaspr
+# 🚀 Serverpod integration for jaspr
 
 This package provides a `JasprRoute` to use in your Serverpod webserver to render Jaspr components.
 
