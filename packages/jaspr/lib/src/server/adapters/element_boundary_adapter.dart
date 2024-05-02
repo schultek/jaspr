@@ -16,12 +16,14 @@ abstract class ElementBoundaryAdapter extends RenderAdapter {
   FutureOr<void> prepare() {
     var parent = element.parentRenderObjectElement!.renderObject as MarkupRenderObject;
     range = parent.children.wrapElement(element);
+    prepareBoundary(range);
   }
 
   @override
   void apply(MarkupRenderObject root) {
-    return processBoundary(range);
+    return applyBoundary(range);
   }
 
-  void processBoundary(ChildListRange range);
+  void prepareBoundary(ChildListRange range) {}
+  void applyBoundary(ChildListRange range) {}
 }

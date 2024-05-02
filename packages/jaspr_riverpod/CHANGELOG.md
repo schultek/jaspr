@@ -1,3 +1,7 @@
+## 0.3.11
+
+- `jaspr` upgraded to `0.12.0`
+
 ## 0.3.10
 
 - Fixed bug with .autoDispose providers.

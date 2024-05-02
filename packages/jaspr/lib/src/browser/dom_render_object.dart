@@ -11,11 +11,13 @@ const xmlns = {
 };
 
 class DomRenderObject extends RenderObject {
-  DomRenderObject? parent;
   String? namespace;
   Node? node;
   List<Node> toHydrate = [];
   Map<String, EventBinding>? events;
+
+  @override
+  DomRenderObject? parent;
 
   void clearEvents() {
     events?.forEach((type, binding) {
@@ -197,22 +199,18 @@ class DomRenderObject extends RenderObject {
   }
 
   @override
-  void attach(DomRenderObject? parent, DomRenderObject? after) {
+  void attach(DomRenderObject child, {DomRenderObject? after}) {
     try {
-      this.parent = parent;
-      namespace = parent?.namespace;
-      if (parent == null) return;
+      child.parent = this;
+      child.namespace = namespace;
 
-      var parentNode = parent.node;
-      var childNode = node;
+      var parentNode = node;
+      var childNode = child.node;
 
       assert(parentNode is html.Element);
       if (childNode == null) return;
 
       var afterNode = after?.node;
-      if (afterNode == null && parent is RootDomRenderObject) {
-        afterNode = parent.beforeStart;
-      }
 
       if (childNode.previousNode == afterNode && childNode.parentNode == parentNode) {
         return;
@@ -223,30 +221,26 @@ class DomRenderObject extends RenderObject {
       }
 
       if (afterNode == null) {
-        if (parentNode!.childNodes.isEmpty) {
-          parentNode.append(childNode);
-        } else {
-          parentNode.insertBefore(childNode, parentNode.childNodes.first);
-        }
+        parentNode!.insertBefore(childNode, parentNode.childNodes.firstOrNull);
       } else {
         parentNode!.insertBefore(childNode, afterNode.nextNode);
       }
     } finally {
-      _finalize();
+      child.finalize();
     }
   }
 
   @override
-  void remove() {
+  void remove(DomRenderObject child) {
     if (kVerboseMode) {
-      print("Remove child $node of ${parent?.node}");
+      print("Remove child $child of $this");
     }
-    node?.remove();
-    parent = null;
-    namespace = null;
+    child.node?.remove();
+    child.parent = null;
+    child.namespace = null;
   }
 
-  void _finalize() {
+  void finalize() {
     if (kVerboseMode && toHydrate.isNotEmpty) {
       print("Clear ${toHydrate.length} nodes not hydrated ($toHydrate)");
     }
@@ -275,6 +269,11 @@ class RootDomRenderObject extends DomRenderObject {
       curr = curr.nextNode;
     }
     return RootDomRenderObject(start.parentNode!, nodes);
+  }
+
+  @override
+  void attach(covariant DomRenderObject child, {covariant DomRenderObject? after}) {
+    super.attach(child, after: after?.node != null ? after : (DomRenderObject()..node = beforeStart));
   }
 }
 

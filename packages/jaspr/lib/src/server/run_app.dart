@@ -34,7 +34,7 @@ Future<String> renderComponent(Component app) async {
   var fileHandler = staticFileHandler();
   return render(RenderMode.html, _createSetup(app), Uri.parse('https://0.0.0.0/'), (name) async {
     var response = await fileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
-    return response.readAsString();
+    return response.statusCode == 200 ? response.readAsString() : null;
   });
 }
 

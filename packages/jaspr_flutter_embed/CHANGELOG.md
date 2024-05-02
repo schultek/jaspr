@@ -1,3 +1,7 @@
+## 0.3.1
+
+- `jaspr` upgraded to `0.12.0`
+
 ## 0.3.0
 
 - Changed internal bootstrapping of flutter engine.

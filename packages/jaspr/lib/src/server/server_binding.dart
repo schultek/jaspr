@@ -5,6 +5,7 @@ import '../../jaspr.dart';
 import 'adapters/client_component_adapter.dart';
 import 'adapters/document_adapter.dart';
 import 'adapters/sync_script_adapter.dart';
+import 'async_build_owner.dart';
 import 'markup_render_object.dart';
 
 /// Global component binding for the server
@@ -77,13 +78,18 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     return MarkupRenderObject();
   }
 
-  late Future<String> Function(String) _fileHandler;
+  @override
+  BuildOwner createRootBuildOwner() {
+    return AsyncBuildOwner();
+  }
 
-  void setFileHandler(Future<String> Function(String) handler) {
+  late Future<String?> Function(String) _fileHandler;
+
+  void setFileHandler(Future<String?> Function(String) handler) {
     _fileHandler = handler;
   }
 
-  Future<String> loadFile(String name) => _fileHandler(name);
+  Future<String?> loadFile(String name) => _fileHandler(name);
 
   late final List<RenderAdapter> _adapters = [];
 
@@ -105,7 +111,6 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 }
 
 abstract class RenderAdapter {
-  FutureOr<void> prepare();
-
-  void apply(MarkupRenderObject root);
+  FutureOr<void> prepare() {}
+  void apply(MarkupRenderObject root) {}
 }

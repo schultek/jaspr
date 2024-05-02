@@ -1,3 +1,68 @@
+## Unreleased minor
+
+- Added `Head` component to render metadata inside the documents `<head>`.
+
+  You can specify a title, metadata or custom children: 
+  ```dart
+  Head(
+    title: 'My Title',
+    meta: {
+      'description': 'My Page Description',
+      'custom': 'my-custom-metadata',
+    },
+    children: [
+      link(rel: "canonical" href: "https://mysite.com/example"),
+    ],
+  )
+  ```
+  
+  Deeper or latter `Head` components will override duplicate elements:
+
+  ```dart
+  Parent(children: [
+    Head(
+      title: "My Title",
+      meta: {"description": "My Page Description"}
+    ),
+    Child(children: [
+      Head(
+        title: "Nested Title"
+      ),
+    ]),
+  ]),
+  ```
+  
+  will render:
+
+  ```html
+  <head>
+    <title>Nested Title</title>
+    <meta name="description" content="My Page Description">
+  </head>
+  ```
+
+- Improved internal framework implementation of different element types.
+  - Added `BuildableElement` and `ProxyElement` as replacement for `MultiChildElement` and `SingleChildElement`.
+  - Added `Element.didMount()` and `Element.didUpdate()` lifecycle methods.
+
+## 0.12.0
+
+- **BREAKING** Removed `Document.file()`, instead use new `Document.template()`.
+
+- Added `Document.template()` for loading template html files.
+
+  Files that should be used with `Document.template()` must have the `.template.html` extension to differentiate
+  between normal `.html` files that are served as-is. The `name` parameter provided to `Document.template()` must be the
+  simple name of the file without extension, e.g. `Document.template(name: 'index')` loads the `web/index.template.html` file.
+
+- Added the `lang` attribute to `Document()` constructor.
+- Added `<main>` as `main_()` to the standard html components.
+
+- Fixed bug with `PreloadStateMixin` and improved async server builds.
+- Fixed crash with server hot-reload.
+- Improved the shelf backend template for proper handling of server hot-reload.
+- Fixed `DomValidator` to allow attributes with `.`.
+
 ## 0.11.1
 
 - Fixed bug with base paths.

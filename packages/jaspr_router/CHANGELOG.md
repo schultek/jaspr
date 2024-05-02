@@ -1,3 +1,12 @@
+## Unreleased patch
+
+- The title of the browser tab will no be properly set to the `title` of the current route.
+
+## 0.4.1
+
+- Fixed issue where `replaceNamed` from `GoRouterHelper` was not passing parameters correctly.
+- Fixed bug with redirects on the server.
+
 ## 0.4.0
 
 - Added `Link` component to simplify router-aware navigation.

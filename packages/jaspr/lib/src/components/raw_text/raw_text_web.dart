@@ -36,7 +36,7 @@ class RawNode extends Component {
   Element createElement() => RawNodeElement(this);
 }
 
-class RawNodeElement extends MultiChildRenderObjectElement {
+class RawNodeElement extends BuildableRenderObjectElement {
   RawNodeElement(RawNode super.component);
 
   @override

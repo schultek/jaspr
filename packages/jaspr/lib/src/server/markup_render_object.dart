@@ -15,6 +15,7 @@ class MarkupRenderObject extends RenderObject {
   String? text;
   bool? rawHtml;
 
+  @override
   MarkupRenderObject? parent;
 
   late final ChildList children = ChildList(this);
@@ -46,17 +47,15 @@ class MarkupRenderObject extends RenderObject {
   }
 
   @override
-  void attach(MarkupRenderObject? parent, MarkupRenderObject? after) {
-    if (parent == null) return;
-
-    this.parent = parent;
-    parent.children.insertAfter(this, after: after);
+  void attach(MarkupRenderObject child, {MarkupRenderObject? after}) {
+    child.parent = this;
+    children.insertAfter(child, after: after);
   }
 
   @override
-  void remove() {
-    parent?.children.remove(this);
-    parent = null;
+  void remove(MarkupRenderObject child) {
+    children.remove(child);
+    child.parent = null;
   }
 
   String renderToHtml() {
@@ -126,7 +125,7 @@ class MarkupRenderObject extends RenderObject {
 
 /// DOM validator with sane defaults.
 class DomValidator {
-  static final _attributeRegExp = RegExp(r'^[a-z](?:[a-zA-Z0-9\-_:]*[a-z0-9]+)?$');
+  static final _attributeRegExp = RegExp(r'^[a-z](?:[a-zA-Z0-9\-_:.]*[a-z0-9]+)?$');
   static final _elementRegExp = _attributeRegExp;
   static const _selfClosing = <String>{
     'area',

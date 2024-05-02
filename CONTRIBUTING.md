@@ -40,14 +40,6 @@ Clone the project with the following command:
 git clone https://github.com/schultek/jaspr.git
 ```
 
-Next activate the jaspr command globally for this local project:
-```shell
-cd jaspr/packages
-dart pub global activate jaspr --source path
-```
-
-With this, whenever you use the `jaspr ...` command, it will use your local project.
-
 Jaspr uses [Melos](https://github.com/invertase/melos) to manage the project and dependencies.
 To install Melos, run the following command:
 
@@ -65,6 +57,10 @@ The bootstrap command locally links all dependencies within the project without 
 This allows all packages, examples and tests to build from the local clone project.
 
 > You do not need to run `dart pub get` once bootstrap has been completed.
+
+This also overrides the global `jaspr` command to use the local project, so you have the latest cli version.
+Whenever you change something in the `jaspr_cli` package and want to test it using the global `jaspr` command
+run `melos activate:cli` to re-activate the package.
 
 ### 2. Running tests and compute coverage
 
@@ -89,12 +85,12 @@ methods by running:
 melos run generate:html
 ```
 
-### 4. Generate templates
+### 4. Generate cli scaffold
 
-When you change or add a template, re-generate the template bundles for the cli by running:
+When you change or add the `jaspr create` scaffold, re-generate the bundle for the cli by running:
 
 ```shell
-melos run generate:templates
+melos run generate:scaffold
 ```
 
 ## Pull Requests & Versioning

@@ -78,12 +78,12 @@ Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHa
   return cascade.handler;
 }
 
-Future<String> Function(String) _proxyFileLoader(Request req, Handler proxyHandler) {
+Future<String?> Function(String) _proxyFileLoader(Request req, Handler proxyHandler) {
   return (name) async {
     final indexRequest = Request('GET', req.requestedUri.replace(path: '/$name'),
         context: req.context, encoding: req.encoding, headers: req.headers, protocolVersion: req.protocolVersion);
     var response = await proxyHandler(indexRequest);
-    return response.readAsString();
+    return response.statusCode == 200 ? response.readAsString() : null;
   };
 }
 
@@ -131,7 +131,7 @@ Handler _sseProxyHandler(http.Client client, String webPort) {
 
   return (Request req) async {
     if (req.headers['accept'] == 'text/event-stream' && req.method == 'GET') {
-      return createSseConnection(req);
+      return await createSseConnection(req);
     }
 
     return Response.notFound('');

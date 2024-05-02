@@ -152,7 +152,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       serverPid.writeAsStringSync('');
 
       var process = await Process.start(
-        'dart',
+        Platform.executable,
         [
           'run',
           '--enable-asserts',
@@ -166,10 +166,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         workingDirectory: Directory.current.path,
       );
 
-      var pid = await waitForPid(serverPid);
       bool done = false;
-      watchProcess('server', process,
-          tag: Tag.server, progress: 'Running server app...', childPid: pid, onFail: () => !done);
+      watchProcess('server', process, tag: Tag.server, progress: 'Running server app...', onFail: () => !done);
 
       await serverStartedCompleter.future;
 
@@ -196,10 +194,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       done = true;
       process.kill();
-      // Workaround until https://github.com/dart-lang/sdk/issues/55219 is fixed.
-      if (pid != null) {
-        Process.killPid(pid);
-      }
 
       logger.complete(true);
 

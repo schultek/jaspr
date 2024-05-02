@@ -150,9 +150,8 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     args.addAll(argResults!.rest);
-
     var process = await Process.start(
-      'dart',
+      Platform.executable,
       args,
       environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
       workingDirectory: Directory.current.path,
@@ -160,8 +159,7 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     logger.write('Server started.', progress: ProgressState.completed);
 
-    var pid = await waitForPid(serverPid);
-    return CommandResult.running(watchProcess('server', process, tag: Tag.server, childPid: pid), stop);
+    return CommandResult.running(watchProcess('server', process, tag: Tag.server), stop);
   }
 
   Future<CommandResult> _runDevCommand(String command, String proxyPort) async {

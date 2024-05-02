@@ -375,10 +375,10 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
   }
 
   @override
-  Component? build() {
+  void performRebuild() {
     _task?.call();
     _task = null;
-    return super.build();
+    return super.performRebuild();
   }
 }
 

@@ -260,6 +260,26 @@ Component h6(List<Component> children,
   );
 }
 
+/// The &lt;main&gt; HTML element represents the primary content of a document, distinct from content that is repeated across multiple pages such as site headers, footers, and navigation bars.
+Component main_(List<Component> children,
+    {Key? key,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
+  return DomComponent(
+    tag: 'main',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: attributes,
+    events: events,
+    children: children,
+  );
+}
+
 /// The &lt;nav&gt; HTML element represents a section of a page whose purpose is to provide navigation links, either within the current document or to other documents. Common examples of navigation sections are menus, tables of contents, and indexes.
 Component nav(List<Component> children,
     {Key? key,

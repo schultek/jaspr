@@ -36,9 +36,8 @@ class ClientTarget<T extends Component> {
 
   const ClientTarget(this.name, {this.params});
 
-  String dataFor(T component) {
-    if (params == null) return '';
-
-    return 'data=${HtmlEscape(HtmlEscapeMode(escapeLtGt: true)).convert(jsonEncode(params!(component)))}';
+  String? dataFor(T component) {
+    if (params == null) return null;
+    return HtmlEscape(HtmlEscapeMode(escapeLtGt: true)).convert(jsonEncode(params!(component)));
   }
 }

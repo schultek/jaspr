@@ -39,6 +39,10 @@
     "h6": {
       "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
     },
+    "main_": {
+      "tag": "main",
+      "doc": "The &lt;main&gt; HTML element represents the primary content of a document, distinct from content that is repeated across multiple pages such as site headers, footers, and navigation bars."
+    },    
     "nav": {
       "doc": "The &lt;nav&gt; HTML element represents a section of a page whose purpose is to provide navigation links, either within the current document or to other documents. Common examples of navigation sections are menus, tables of contents, and indexes."
     },
