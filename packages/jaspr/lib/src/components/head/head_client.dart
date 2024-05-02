@@ -2,16 +2,14 @@ import 'dart:html' as html;
 
 import '../../../browser.dart';
 
-class PlatformHead extends Component {
-  const PlatformHead(this.children, {super.key});
-
-  final List<Component> children;
+class PlatformHead extends ProxyComponent {
+  const PlatformHead({required super.children, super.key});
 
   @override
   Element createElement() => HeadElement(this);
 }
 
-class HeadElement extends MultiChildRenderObjectElement {
+class HeadElement extends ProxyRenderObjectElement {
   HeadElement(super.component);
 
   @override
@@ -32,11 +30,6 @@ class HeadElement extends MultiChildRenderObjectElement {
   void detachRenderObject() {
     super.detachRenderObject();
     (renderObject as HeadRenderObject).unregister();
-  }
-
-  @override
-  Iterable<Component> build() {
-    return (component as PlatformHead).children;
   }
 }
 
@@ -71,31 +64,32 @@ class HeadAdapter {
     return (start, end);
   }();
 
-  static List<html.Node> get liveHeadNodes {
-    var nodes = <html.Node>[];
+  static Iterable<html.Node> get liveHeadNodes sync* {
     html.Node? curr = headBoundary.$1.nextNode;
     while (curr != null && curr != headBoundary.$2) {
-      nodes.add(curr);
+      yield curr;
       curr = curr.nextNode;
     }
-    return nodes;
   }
 
-  static final List<html.Node> headNodes = liveHeadNodes;
+  static final Map<String, html.Node> initialKeyedHeadNodes = {
+    for (var node in liveHeadNodes)
+      if (keyFor(node) case String key) key: node,
+  };
+
+  static String? keyFor(html.Node node) {
+    return switch (node) {
+      html.Element(id: String id) when id.isNotEmpty => id,
+      html.Element(tagName: "TITLE" || "BASE") => '__${node.tagName}',
+      html.Element(tagName: "META", attributes: {'name': String name}) => '__meta:$name',
+      _ => null,
+    };
+  }
 
   HeadAdapter();
 
   final List<HeadRenderObject> _headRenderObjects = [];
   bool _needsResorting = true;
-
-  String? keyFor(html.Node node) {
-    return switch (node) {
-      html.Element(tagName: "TITLE" || "BASE") => node.tagName,
-      html.Element(tagName: "META", attributes: var attrs) =>
-        'meta:${attrs.containsKey('charset') ? 'charset' : attrs['name']}',
-      _ => null,
-    };
-  }
 
   void update() {
     if (_needsResorting) {
@@ -103,8 +97,8 @@ class HeadAdapter {
       _needsResorting = false;
     }
 
-    Map<String, html.Node> keyedNodes = {};
-    List<html.Node> children = [];
+    Map<String, html.Node> keyedNodes = Map.of(initialKeyedHeadNodes);
+    List<html.Node> children = List.of(initialKeyedHeadNodes.values);
 
     for (var renderObject in _headRenderObjects) {
       for (var node in renderObject.children) {
@@ -124,9 +118,11 @@ class HeadAdapter {
     html.Node? current = headBoundary.$1.nextNode;
 
     for (var node in children) {
-      if (current == node) {
-        current = current?.nextNode;
-      } else if (current != null && keyFor(node) == keyFor(current)) {
+      if (current == null || current == headBoundary.$2) {
+        head.insertBefore(node, current);
+      } else if (current == node) {
+        current = current.nextNode;
+      } else if (keyFor(node) != null && keyFor(node) == keyFor(current)) {
         current.replaceWith(node);
         current = node.nextNode;
       } else {
@@ -155,7 +151,6 @@ class HeadAdapter {
 class HeadRenderObject extends DomRenderObject {
   HeadRenderObject(this._depth) {
     node = html.Text('');
-    toHydrate = HeadAdapter.headNodes;
     HeadAdapter.instance.register(this);
   }
 
@@ -202,12 +197,5 @@ class HeadRenderObject extends DomRenderObject {
 
   void unregister() {
     HeadAdapter.instance.unregister(this);
-  }
-
-  @override
-  void finalize() {
-    html.window.requestAnimationFrame((highResTime) {
-      super.finalize();
-    });
   }
 }

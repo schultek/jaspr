@@ -77,14 +77,15 @@ class _BaseDocument extends Document {
         DomComponent(
           tag: 'head',
           children: [
+            if (base != null) DomComponent(tag: 'base', attributes: {'href': _normalizedBase!}),
             if (charset != null) DomComponent(tag: 'meta', attributes: {'charset': charset!}),
-            if (base != null) //
-              DomComponent(tag: 'base', attributes: {'href': _normalizedBase!}),
-            if (viewport != null) DomComponent(tag: 'meta', attributes: {'name': 'viewport', 'content': viewport!}),
-            if (meta != null)
-              for (var e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
-            if (title != null) //
-              DomComponent(tag: 'title', child: Text(title!)),
+            Head(
+              title: title,
+              meta: {
+                if (viewport != null) 'viewport': viewport!,
+                ...?meta,
+              },
+            ),
             if (styles != null) //
               Style(styles: styles!),
             ...head,

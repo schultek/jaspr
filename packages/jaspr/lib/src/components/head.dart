@@ -10,7 +10,7 @@ class Head extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield PlatformHead(key: key, [
+    yield PlatformHead(key: key, children: [
       if (title != null) DomComponent(tag: 'title', child: Text(title!)),
       if (meta != null)
         for (var e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),

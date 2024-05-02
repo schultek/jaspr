@@ -2,7 +2,8 @@ import '../../../server.dart';
 import '../../server/child_nodes.dart';
 
 class PlatformHead extends StatelessComponent {
-  const PlatformHead(this.children, {super.key});
+  const PlatformHead({required this.children, super.key});
+
   final List<Component> children;
 
   @override
@@ -36,16 +37,12 @@ class HeadAdapter extends HeadScopeAdapter {
     Map<String, (int, int)> indices = {};
 
     String? keyFor(MarkupRenderObject n) {
-      if (n.tag == 'title' || n.tag == 'base') {
-        return n.tag!;
-      } else if (n.tag == 'meta') {
-        if (n.attributes?.containsKey('charset') ?? false) {
-          return '${n.tag}:charset';
-        }
-        return '${n.tag}:${n.attributes?['name']}';
-      } else {
-        return null;
-      }
+      return switch (n) {
+        MarkupRenderObject(id: String id) when id.isNotEmpty => id,
+        MarkupRenderObject(tag: "title" || "base") => '__${n.tag}',
+        MarkupRenderObject(tag: "meta", attributes: {'name': String name}) => '__meta:$name',
+        _ => null,
+      };
     }
 
     for (var e in entries) {

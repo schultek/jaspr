@@ -1,6 +1,45 @@
 ## Unreleased minor
 
-- Added `Head` component.
+- Added `Head` component to render metadata inside the documents `<head>`.
+
+  You can specify a title, metadata or custom children: 
+  ```dart
+  Head(
+    title: 'My Title',
+    meta: {
+      'description': 'My Page Description',
+      'custom': 'my-custom-metadata',
+    },
+    children: [
+      link(rel: "canonical" href: "https://mysite.com/example"),
+    ],
+  )
+  ```
+  
+  Deeper or latter `Head` components will override duplicate elements:
+
+  ```dart
+  Parent(children: [
+    Head(
+      title: "My Title",
+      meta: {"description": "My Page Description"}
+    ),
+    Child(children: [
+      Head(
+        title: "Nested Title"
+      ),
+    ]),
+  ]),
+  ```
+  
+  will render:
+
+  ```html
+  <head>
+    <title>Nested Title</title>
+    <meta name="description" content="My Page Description">
+  </head>
+  ```
 
 - Improved internal framework implementation of different element types.
   - Added `BuildableElement` and `ProxyElement` as replacement for `MultiChildElement` and `SingleChildElement`.
