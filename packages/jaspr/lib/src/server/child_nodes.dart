@@ -1,50 +1,50 @@
 import '../framework/framework.dart';
 import 'markup_render_object.dart';
 
-class ChildNodeData extends ChildNode {
+class ChildNodeData extends BaseChildNode {
   ChildNodeData(this.node);
 
   final MarkupRenderObject node;
-
-  @override
-  String get self => '<${node.tag ?? 'txt'}>';
 }
 
-class ChildNodeBoundary extends ChildNode {
+class ChildNodeBoundary extends BaseChildNode {
   ChildNodeBoundary(this.element);
 
   final Element element;
-
-  @override
-  String get self => '{${element.depth}:${element.runtimeType}}';
+  late final ChildListRange range;
 }
 
-class ChildNode {
+class BaseChildNode extends ChildNode {
+  @override
   ChildNode? _prev;
+  @override
+  ChildNode? _next;
+}
+
+sealed class ChildNode {
+  ChildNode? get _prev;
+  set _prev(ChildNode? prev);
   ChildNode? get prev => _prev;
 
-  ChildNode? _next;
+  ChildNode? get _next;
+  set _next(ChildNode? next);
   ChildNode? get next => _next;
+
+  ChildNode get _start => this;
+  ChildNode get _end => this;
 
   void insertNext(ChildNode? node) {
     node?._prev = this;
     node?._next = next;
-    next?._prev = node;
-    _next = node;
+    next?._prev = node?._end;
+    _next = node?._start;
   }
 
   void insertPrev(ChildNode? node) {
     node?._next = this;
     node?._prev = prev;
-    prev?._next = node;
-    _prev = node;
-  }
-
-  void insertRangeNext(ChildListRange range) {
-    range.start._prev = this;
-    range.end._next = next;
-    next?._prev = range.end;
-    _next = range.start;
+    prev?._next = node?._start;
+    _prev = node?._end;
   }
 
   void remove() {
@@ -53,34 +53,34 @@ class ChildNode {
     _prev = null;
     _next = null;
   }
-
-  String get str => '$self${next != null ? ', ${next!.str}' : ''}';
-  String get self => '($hashCode)';
 }
 
-class ChildListRange {
-  ChildListRange(this.start, this.end);
+class ChildListRange extends ChildNode with Iterable<MarkupRenderObject> {
+  ChildListRange(this.start, this.end) {
+    if (start case ChildNodeBoundary s) s.range = this;
+    if (end case ChildNodeBoundary e) e.range = this;
+  }
 
   final ChildNode start;
   final ChildNode end;
 
-  String get str {
-    var l = <String>[];
-    var curr = start;
-    while (curr != end) {
-      l.add(curr.self);
-      curr = curr.next!;
-    }
-    l.add(curr.self);
-    return '[${l.join(', ')}]';
-  }
+  @override
+  ChildNode? get _prev => start._prev;
+  @override
+  set _prev(ChildNode? prev) => start._prev = prev;
 
-  void remove() {
-    start.prev?._next = end.next;
-    end.next?._prev = start.prev;
-    start._prev = null;
-    end._next = null;
-  }
+  @override
+  ChildNode? get _next => end._next;
+  @override
+  set _next(ChildNode? next) => end._next = next;
+
+  @override
+  ChildNode get _start => start;
+  @override
+  ChildNode get _end => end;
+
+  @override
+  Iterator<MarkupRenderObject> get iterator => ChildListIterator(start, end.next);
 }
 
 class ChildList with Iterable<MarkupRenderObject> {
@@ -90,18 +90,15 @@ class ChildList with Iterable<MarkupRenderObject> {
 
   final MarkupRenderObject parent;
 
-  final ChildNode _first = ChildNode();
-  final ChildNode _last = ChildNode();
-
-  String get str => '[${_first.str}]';
+  final ChildNode _first = BaseChildNode();
+  final ChildNode _last = BaseChildNode();
 
   void insertAfter(MarkupRenderObject child, {MarkupRenderObject? after}) {
-    var node = find(child);
-    if (node != null) {
-      node.remove();
-    } else {
-      node = ChildNodeData(child);
-    }
+    insertNodeAfter(find(child) ?? ChildNodeData(child), after: after);
+  }
+
+  void insertNodeAfter(ChildNode node, {MarkupRenderObject? after}) {
+    node.remove();
     var afterNode = find(after);
     if (afterNode == null) {
       _first.insertNext(node);
@@ -112,28 +109,16 @@ class ChildList with Iterable<MarkupRenderObject> {
   }
 
   void insertBefore(MarkupRenderObject child, {MarkupRenderObject? before}) {
-    var node = find(child);
-    if (node != null) {
-      node.remove();
-    } else {
-      node = ChildNodeData(child);
-    }
+    insertNodeBefore(find(child) ?? ChildNodeData(child), before: before);
+  }
+
+  void insertNodeBefore(ChildNode node, {MarkupRenderObject? before}) {
+    node.remove();
     var beforeNode = find(before);
     if (beforeNode == null) {
       _last.insertPrev(node);
     } else {
       beforeNode.insertPrev(node);
-    }
-    assert(_first.prev == null && _last.next == null);
-  }
-
-  void insertRangeAfter(ChildListRange range, {MarkupRenderObject? after}) {
-    range.remove();
-    var afterNode = find(after);
-    if (afterNode == null) {
-      _first.insertRangeNext(range);
-    } else {
-      afterNode.insertRangeNext(range);
     }
     assert(_first.prev == null && _last.next == null);
   }
@@ -151,8 +136,8 @@ class ChildList with Iterable<MarkupRenderObject> {
   Iterator<MarkupRenderObject> get iterator => ChildListIterator(_first);
 
   ChildListRange range({ChildNode? startAfter, ChildNode? endBefore}) {
-    var start = ChildNode();
-    var end = ChildNode();
+    var start = BaseChildNode();
+    var end = BaseChildNode();
 
     (startAfter ?? _first).insertNext(start);
     (endBefore ?? _last).insertPrev(end);
@@ -178,37 +163,82 @@ class ChildList with Iterable<MarkupRenderObject> {
     }
 
     var startAfter = findWhere((n) => n == prevElem?.lastRenderObjectElement?.renderObject) ?? _first;
-    var endBefore = findWhere((n) => n == element.lastRenderObjectElement?.renderObject)?.next ?? _last;
+    var endAfter = findWhere((n) => n == element.lastRenderObjectElement?.renderObject) ?? _last.prev!;
 
     while (true) {
-      if (startAfter.next case ChildNodeBoundary n when n.element.depth < element.depth) {
-        startAfter = n;
-      } else {
-        break;
+      if (startAfter.next case ChildNodeBoundary startNext) {
+        if (startNext.element.depth < element.depth) {
+          startAfter = startNext;
+          continue;
+        } else if (startNext.element.depth == element.depth) {
+          if (isOrdered(startNext.element, element)) {
+            startAfter = startNext.range.end;
+            continue;
+          }
+        }
       }
+      break;
     }
     while (true) {
-      if (endBefore.next case ChildNodeBoundary n when n.element.depth > element.depth) {
-        endBefore = n;
-      } else {
-        break;
+      if (endAfter.next case ChildNodeBoundary endNext) {
+        if (endNext.element.depth > element.depth) {
+          endAfter = endNext;
+          continue;
+        } else if (endNext.element.depth == element.depth) {
+          if (isOrdered(endNext.element, element)) {
+            endAfter = endNext.range.end;
+            continue;
+          }
+        }
       }
+      break;
     }
 
     var start = ChildNodeBoundary(element);
     var end = ChildNodeBoundary(element);
 
     startAfter.insertNext(start);
-    endBefore.insertPrev(end);
+    endAfter.insertNext(end);
 
-    return ChildListRange(start, end);
+    var range = ChildListRange(start, end);
+    return range;
+  }
+
+  bool isOrdered(Element a, Element b) {
+    assert(a.depth == b.depth);
+    late Element parentA, parentB;
+    a.visitAncestorElements((e) {
+      parentA = e;
+      return false;
+    });
+    b.visitAncestorElements((e) {
+      parentB = e;
+      return false;
+    });
+    if (parentA != parentB) {
+      return isOrdered(parentA, parentB);
+    }
+
+    Element currA = a, currB = b;
+    while (true) {
+      var prevA = currA.prevSibling, prevB = currB.prevSibling;
+      if (prevB == a || prevA == null) {
+        return true;
+      }
+      if (prevA == b || prevB == null) {
+        return false;
+      }
+      currA = prevA;
+      currB = prevB;
+    }
   }
 }
 
 class ChildListIterator implements Iterator<MarkupRenderObject> {
-  ChildListIterator(ChildNode? first) : _current = first;
+  ChildListIterator(ChildNode? first, [this._end]) : _current = first;
 
   ChildNode? _current;
+  final ChildNode? _end;
 
   @override
   late MarkupRenderObject current;
@@ -216,6 +246,9 @@ class ChildListIterator implements Iterator<MarkupRenderObject> {
   @override
   bool moveNext() {
     while (_current != null) {
+      if (_current == _end) {
+        return false;
+      }
       try {
         if (_current case ChildNodeData(:var node)) {
           current = node;

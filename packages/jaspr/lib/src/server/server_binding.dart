@@ -111,7 +111,6 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 }
 
 abstract class RenderAdapter {
-  FutureOr<void> prepare();
-
-  void apply(MarkupRenderObject root);
+  FutureOr<void> prepare() {}
+  void apply(MarkupRenderObject root) {}
 }

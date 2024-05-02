@@ -1,4 +1,101 @@
-part of 'document.dart';
+library document;
+
+import 'dart:async';
+
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart';
+
+import '../../server.dart';
+import 'child_nodes.dart';
+
+export '../components/style.dart' hide Style;
+
+// only allow a single document
+const _documentKey = GlobalKey();
+
+abstract class Document extends StatelessComponent {
+  const Document._() : super(key: _documentKey);
+
+  const factory Document({
+    String? title,
+    String? lang,
+    String? base,
+    String? charset,
+    String? viewport,
+    Map<String, String>? meta,
+    List<StyleRule>? styles,
+    List<Component> head,
+    required Component body,
+  }) = _BaseDocument;
+
+  const factory Document.template({
+    String name,
+    String attachTo,
+    required Component child,
+  }) = _TemplateDocument;
+}
+
+class _BaseDocument extends Document {
+  const _BaseDocument({
+    this.title,
+    this.lang,
+    this.base,
+    this.charset = 'utf-8',
+    this.viewport = 'width=device-width, initial-scale=1.0',
+    this.meta,
+    this.styles,
+    this.head = const [],
+    required this.body,
+  }) : super._();
+
+  final String? title;
+  final String? lang;
+  final String? base;
+  final String? charset;
+  final String? viewport;
+  final Map<String, String>? meta;
+  final List<StyleRule>? styles;
+  final List<Component> head;
+  final Component body;
+
+  String? get _normalizedBase {
+    var base = this.base;
+    if (base == null) return null;
+    if (!base.startsWith('/')) base = '/$base';
+    if (!base.endsWith('/')) base = '$base/';
+    return base;
+  }
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield DomComponent(
+      tag: 'html',
+      attributes: {
+        if (lang != null) 'lang': lang!,
+      },
+      children: [
+        DomComponent(
+          tag: 'head',
+          children: [
+            if (base != null) DomComponent(tag: 'base', attributes: {'href': _normalizedBase!}),
+            if (charset != null) DomComponent(tag: 'meta', attributes: {'charset': charset!}),
+            Head(
+              title: title,
+              meta: {
+                if (viewport != null) 'viewport': viewport!,
+                ...?meta,
+              },
+            ),
+            if (styles != null) //
+              Style(styles: styles!),
+            ...head,
+          ],
+        ),
+        DomComponent(tag: 'body', child: body),
+      ],
+    );
+  }
+}
 
 class _TemplateDocument extends Document {
   const _TemplateDocument({
@@ -50,7 +147,7 @@ class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
   }
 
   @override
-  void processBoundary(ChildListRange range) {
+  void applyBoundary(ChildListRange range) {
     var curr = range.start.prev!;
     range.remove();
     var document = parse(template);
@@ -75,7 +172,7 @@ class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
       }
 
       if (node == target) {
-        n.children.insertRangeAfter(range);
+        n.children.insertNodeAfter(range);
       } else {
         for (var c in node.nodes) {
           var o = createTree(c);
