@@ -1,10 +1,10 @@
-# Serverpod integration for Jaspr
+# Serverpod Integration for Jaspr
 
-This package provides a `JasprRoute` to use in your serverpod webserver to render Jaspr components.
+This package provides a `JasprRoute` to use in your Serverpod webserver to render Jaspr components.
 
 ## Setup
 
-Inside your serverpod `..._server` package perform the following setup steps:
+Inside your Serverpod `..._server` package perform the following setup steps:
 
 Run in your terminal:
 
@@ -163,7 +163,39 @@ You are now set to run your server and render a webpage using Serverpod and Jasp
 
 ---
 
-## Running the server
+## Running during development
 
-To start the server, simply run `jaspr serve` in your terminal. 
-This fully replaces the need to run `dart bin/main.dart`.
+To start your server, simply run `jaspr serve` in your terminal. 
+
+*This fully replaces the need to run `dart bin/main.dart` during development.*
+
+## Building and deploying
+
+To build your project, run `jaspr build -i bin/main.dart` in your terminal.
+If you are using docker to deploy your project, modify the `Dockerfile` like this:
+
+```diff
+  FROM dart:3.2.5 AS build
+
+  ...
+
++ RUN dart pub global activate jaspr_cli
+  RUN dart pub get
+- RUN dart compile exe bin/main.dart -o bin/main
++ RUN jaspr build -i lib/main.dart -v
+
+  ...
+  
+  FROM busybox:1.36.1-glibc  
+  
+  ...
+  
+  COPY --from=build /runtime/ /
+- COPY --from=build /app/bin/main /app/bin/main
++ COPY --from=build /app/build/jaspr/app /app/bin/main
+  COPY --from=build /app/config/ config/
+- COPY --from=build /app/web/ web/
++ COPY --from=build /app/build/jaspr/web/ web/
+
+  ...
+```
