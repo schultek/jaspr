@@ -12,13 +12,10 @@ part of 'framework.dart';
 ///  * [InheritedComponent], for components that introduce ambient state that can
 ///    be read by descendant components.
 ///  * [Component], for an overview of components in general.
-abstract class ObserverComponent extends Component {
-  /// Abstract constant constructor with the [child]
-  /// which will be below this in the tree.
-  const ObserverComponent({required this.child, super.key});
-
-  /// The component below this component in the tree.
-  final Component child;
+abstract class ObserverComponent extends ProxyComponent {
+  /// Abstract const constructor. This constructor enables subclasses to provide
+  /// const constructors so that they can be used in const expressions.
+  const ObserverComponent({super.child, super.children, super.key});
 
   @override
   ObserverElement createElement();
@@ -27,7 +24,7 @@ abstract class ObserverComponent extends Component {
 /// An [Element] that uses an [ObserverComponent] as its configuration.
 /// You can override [willRebuildElement], [didRebuildElement] and [didUnmountElement]
 /// to execute the required logic.
-abstract class ObserverElement extends SingleChildElement {
+abstract class ObserverElement extends ProxyElement {
   ObserverElement(ObserverComponent super.component);
 
   @override
@@ -44,13 +41,6 @@ abstract class ObserverElement extends SingleChildElement {
   void didUnmountElement(Element element);
 
   @override
-  void update(ObserverComponent newComponent) {
-    super.update(newComponent);
-    _dirty = true;
-    rebuild();
-  }
-
-  @override
   void _updateObservers() {
     assert(_lifecycleState == _ElementLifecycle.active);
     final List<ObserverElement>? incomingElements = _parent?._observerElements;
@@ -61,7 +51,4 @@ abstract class ObserverElement extends SingleChildElement {
     }
     _observerElements!.add(this);
   }
-
-  @override
-  Component? build() => component.child;
 }

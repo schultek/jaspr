@@ -33,13 +33,10 @@ part of 'framework.dart';
 ///  * [StatelessComponent], for components that always build the same way given a
 ///    particular configuration and ambient state.
 ///  * [Component], for an overview of components in general.
-abstract class InheritedComponent extends Component {
+abstract class InheritedComponent extends ProxyComponent {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
-  const InheritedComponent({required this.child, super.key});
-
-  /// The component below this component in the tree.
-  final Component child;
+  const InheritedComponent({super.child, super.children, super.key});
 
   @override
   InheritedElement createElement() => InheritedElement(this);
@@ -61,7 +58,7 @@ abstract class InheritedComponent extends Component {
 }
 
 /// An [Element] that uses an [InheritedComponent] as its configuration.
-class InheritedElement extends SingleChildElement {
+class InheritedElement extends ProxyElement {
   /// Creates an element that uses the given component as its configuration.
   InheritedElement(InheritedComponent super.component);
 
@@ -160,20 +157,11 @@ class InheritedElement extends SingleChildElement {
   }
 
   @override
-  void update(InheritedComponent newComponent) {
-    var oldComponent = component;
-    super.update(newComponent);
-    updated(oldComponent);
-    _dirty = true;
-    rebuild();
-  }
-
-  /// Called during build when the [component] has changed.
-  @protected
-  void updated(covariant InheritedComponent oldComponent) {
+  void didUpdate(covariant InheritedComponent oldComponent) {
     if (component.updateShouldNotify(oldComponent)) {
       notifyClients(oldComponent);
     }
+    super.didUpdate(oldComponent);
   }
 
   /// Notifies all dependent elements that this inherited component has changed, by
@@ -186,7 +174,7 @@ class InheritedElement extends SingleChildElement {
   /// Notify other objects that the component associated with this element has
   /// changed.
   ///
-  /// Called during [update] (via [updated]) after changing the component
+  /// Called during [didUpdate] after changing the component
   /// associated with this element but before rebuilding this element.
   @protected
   void notifyClients(covariant InheritedComponent oldComponent) {
@@ -230,7 +218,4 @@ class InheritedElement extends SingleChildElement {
     assert(_dependents.containsKey(dependent));
     _dependents.remove(dependent);
   }
-
-  @override
-  Component? build() => component.child;
 }

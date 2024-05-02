@@ -24,27 +24,9 @@ abstract class RenderObject {
   void remove(covariant RenderObject child);
 }
 
-abstract class MultiChildRenderObjectElement extends MultiChildElement with RenderObjectElement {
-  MultiChildRenderObjectElement(super.component);
-
-  @override
-  void update(covariant Component newComponent) {
-    super.update(newComponent);
-    _dirty = true;
-    rebuild();
-  }
-}
-
-abstract class SingleChildRenderObjectElement extends SingleChildElement with RenderObjectElement {
-  SingleChildRenderObjectElement(super.component);
-
-  @override
-  void update(covariant Component newComponent) {
-    super.update(newComponent);
-    _dirty = true;
-    rebuild();
-  }
-}
+abstract class BuildableRenderObjectElement = BuildableElement with RenderObjectElement;
+abstract class ProxyRenderObjectElement = ProxyElement with RenderObjectElement;
+abstract class LeafRenderObjectElement = LeafElement with RenderObjectElement;
 
 mixin RenderObjectElement on Element {
   RenderObject createRenderObject() {
@@ -59,12 +41,12 @@ mixin RenderObjectElement on Element {
   RenderObject? _renderObject;
 
   @override
-  void _firstBuild() {
+  void didMount() {
     if (_renderObject == null) {
       _renderObject = createRenderObject();
       updateRenderObject();
     }
-    super._firstBuild();
+    super.didMount();
   }
 
   @override

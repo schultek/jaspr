@@ -583,7 +583,7 @@ mixin PreloadStateMixin<T extends StatefulComponent> on State<T> {
 }
 
 /// An [Element] that uses a [StatefulComponent] as its configuration.
-class StatefulElement extends MultiChildElement {
+class StatefulElement extends BuildableElement {
   /// Creates an element that uses the given component as its configuration.
   StatefulElement(StatefulComponent component)
       : _state = component.createState(),
@@ -623,7 +623,7 @@ class StatefulElement extends MultiChildElement {
   Future? _asyncInitState;
 
   @override
-  void _firstBuild() {
+  void didMount() {
     assert(state._debugLifecycleState == _StateLifecycle.created);
 
     // We check if state uses on of the mixins that support async initialization,
@@ -637,7 +637,7 @@ class StatefulElement extends MultiChildElement {
       _initState();
     }
 
-    super._firstBuild();
+    super.didMount();
   }
 
   void _initState() {
@@ -689,13 +689,11 @@ class StatefulElement extends MultiChildElement {
   void update(StatefulComponent newComponent) {
     super.update(newComponent);
     assert(component == newComponent);
-    final StatefulComponent oldComponent = state.component;
-
-    // We mark ourselves as dirty before calling didUpdateWidget to
-    // let authors call setState from within didUpdateWidget without triggering
-    // asserts.
-    _dirty = true;
     state._component = newComponent;
+  }
+
+  @override
+  void didUpdate(StatefulComponent oldComponent) {
     try {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
       // TODO: check for returned future
@@ -703,7 +701,7 @@ class StatefulElement extends MultiChildElement {
     } finally {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
     }
-    rebuild();
+    super.didUpdate(oldComponent);
   }
 
   @override
