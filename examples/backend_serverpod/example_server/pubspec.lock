@@ -129,6 +129,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.3.0"
+  build_web_compilers:
+    dependency: "direct dev"
+    description:
+      name: build_web_compilers
+      sha256: "9071a94aa67787cebdd9e76837c9d2af61fb5242db541244f6a0b6249afafb46"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.10"
   built_collection:
     dependency: transitive
     description:
@@ -311,21 +319,21 @@ packages:
       path: "../../../packages/jaspr"
       relative: true
     source: path
-    version: "0.11.1"
+    version: "0.12.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.11.1"
+    version: "0.12.0"
   jaspr_riverpod:
     dependency: "direct overridden"
     description:
       path: "../../../packages/jaspr_riverpod"
       relative: true
     source: path
-    version: "0.3.10"
+    version: "0.3.11"
   jaspr_serverpod:
     dependency: "direct main"
     description:
@@ -333,14 +341,6 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
-  jaspr_web_compilers:
-    dependency: "direct dev"
-    description:
-      name: jaspr_web_compilers
-      sha256: "331ce48f512c994a9765093f1e12dacc8d8483fab85fbeddc3c4226fe03e28e9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.9"
   js:
     dependency: transitive
     description:
@@ -798,4 +798,4 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.3.0 <3.5.0"
+  dart: ">=3.3.0 <3.6.0"

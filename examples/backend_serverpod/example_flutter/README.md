@@ -1,4 +1,4 @@
-# mypod_flutter
+# example_flutter
 
 A new Flutter project with Serverpod.
 

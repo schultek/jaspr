@@ -1,4 +1,4 @@
-name: mypod_client
+name: example_client
 description: Starting point for a Serverpod client.
 
 environment:

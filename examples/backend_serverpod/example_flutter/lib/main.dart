@@ -1,4 +1,4 @@
-import 'package:mypod_client/mypod_client.dart';
+import 'package:example_client/example_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 

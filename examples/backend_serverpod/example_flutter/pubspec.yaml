@@ -1,4 +1,4 @@
-name: mypod_flutter
+name: example_flutter
 description: A new Flutter project with Serverpod.
 
 # The following line prevents the package from being accidentally published to
@@ -25,8 +25,8 @@ dependencies:
   flutter:
     sdk: flutter
   serverpod_flutter: 1.2.5
-  mypod_client:
-    path: ../mypod_client
+  example_client:
+    path: ../example_client
 
 
   # The following adds the Cupertino Icons font to your application.
