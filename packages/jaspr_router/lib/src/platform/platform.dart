@@ -29,5 +29,5 @@ abstract class HistoryManager {
 }
 
 abstract class RouteRegistry {
-  void registerRoutes(List<RouteBase> routes);
+  Future<void> registerRoutes(List<RouteBase> routes);
 }

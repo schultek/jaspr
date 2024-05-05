@@ -70,7 +70,7 @@ class MockHistoryManager implements HistoryManager {
 
 class MockRouteRegistry implements RouteRegistry {
   @override
-  void registerRoutes(List<RouteBase> routes) {}
+  Future<void> registerRoutes(List<RouteBase> routes) async {}
 }
 
 Route homeRoute() => Route(path: '/', builder: (_, __) => Page(path: 'home'));
