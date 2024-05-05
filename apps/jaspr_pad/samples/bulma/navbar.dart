@@ -32,15 +32,41 @@ class NavbarBrand extends StatelessComponent {
   }
 }
 
-class NavbarMenu extends StatelessComponent {
-  const NavbarMenu({required this.items, this.endItems = const [], super.key});
+class NavbarBurger extends StatelessComponent {
+  const NavbarBurger({required this.isActive, required this.onToggle});
 
+  final bool isActive;
+  final void Function() onToggle;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield a(
+      href: "",
+      classes: "navbar-burger${isActive ? ' is-active' : ''}",
+      attributes: {"role": "button", "data-target": "navMenu"},
+      events: events(onClick: () {
+        onToggle();
+      }),
+      [
+        span(attributes: {"aria-hidden": "true"}, []),
+        span(attributes: {"aria-hidden": "true"}, []),
+        span(attributes: {"aria-hidden": "true"}, []),
+        span(attributes: {"aria-hidden": "true"}, []),
+      ],
+    );
+  }
+}
+
+class NavbarMenu extends StatelessComponent {
+  const NavbarMenu({this.isActive = false, required this.items, this.endItems = const [], super.key});
+
+  final bool isActive;
   final List<Component> items;
   final List<Component> endItems;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'navbar-menu is-active', [
+    yield div(classes: 'navbar-menu${isActive ? ' is-active' : ''}', [
       div(classes: 'navbar-start', items),
       div(classes: 'navbar-end', endItems),
     ]);
