@@ -45,6 +45,8 @@
   - Added `BuildableElement` and `ProxyElement` as replacement for `MultiChildElement` and `SingleChildElement`.
   - Added `Element.didMount()` and `Element.didUpdate()` lifecycle methods.
 
+- Fixed race condition where routes were skipped during static rendering.
+
 ## 0.12.0
 
 - **BREAKING** Removed `Document.file()`, instead use new `Document.template()`.
