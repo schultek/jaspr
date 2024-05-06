@@ -46,6 +46,7 @@
   - Added `Element.didMount()` and `Element.didUpdate()` lifecycle methods.
 
 - Fixed race condition where routes were skipped during static rendering.
+- Fixed infinite loading bug for async server builds.
 
 ## 0.12.0
 
