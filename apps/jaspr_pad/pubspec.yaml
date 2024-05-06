@@ -33,7 +33,7 @@ dev_dependencies:
   build_web_compilers: ^4.0.0
   dart_mappable_builder: ^4.2.0
   jaspr_builder: ^0.12.0
-  jaspr_test: ^0.11.1
+  jaspr_test: ^0.12.0
   lints: ^3.0.0
   test: ^1.25.0
   yaml_writer: ^1.0.1
