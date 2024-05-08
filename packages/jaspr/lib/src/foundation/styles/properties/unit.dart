@@ -1,16 +1,47 @@
 extension UnitExt on num {
+  /// Refers to the CSS % (percent) unit.
+  /// 
+  /// This is used to specify a percentage of the parent's width or height.
   Unit get percent => Unit.percent(toDouble());
 
+  /// Refers to the CSS px (pixel) unit.
+  /// 
+  /// This is used to specify a length in pixels.
   Unit get px => Unit.pixels(toDouble());
 
+  /// Refers to the CSS pt (point) unit.
+  /// 
+  /// This is used to specify a font size in certain contexts.
+  /// Using pixel size may be preferred.
   Unit get pt => Unit.points(toDouble());
 
+  /// Refers to the CSS em (font size) unit.
+  /// 
+  /// This is used to specify a length relative to the font size of the parent.
+  /// For example, '2.em' is equal to twice the font size of the parent.
   Unit get em => Unit.em(toDouble());
 
+  /// Refers to the CSS rem (root em) unit.
+  /// 
+  /// This is used to specify a length relative to the font size of the 
+  /// root element (usually the <html> element). For example, '2.rem' is equal 
+  /// to twice the font size of the root element. If all child elements use 
+  /// rem units, then simply changing the value of the root element will 
+  /// proportionally adjust the values of the children.
   Unit get rem => Unit.rem(toDouble());
 
+  /// Refers to the CSS vw (viewport width) unit.
+  /// 
+  /// This is used to specify a percentage of the viewport width.
+  /// For example, 50.vw means 50% of the viewport (browser window) width.
+  /// This is useful for creating responsive layouts.
   Unit get vw => Unit.vw(toDouble());
 
+  /// Refers to the CSS vh (viewport height) unit.
+  /// 
+  /// This is used to specify a percentage of the viewport height.
+  /// For example, 50.vh means 50% of the viewport (browser window) height.
+  /// This is useful for creating responsive layouts.
   Unit get vh => Unit.vh(toDouble());
 }
 
