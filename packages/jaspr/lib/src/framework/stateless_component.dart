@@ -163,11 +163,4 @@ class StatelessElement extends BuildableElement {
     super.performRebuild();
     return null;
   }
-
-  @override
-  void update(StatelessComponent newComponent) {
-    super.update(newComponent);
-    _dirty = true;
-    rebuild();
-  }
 }
