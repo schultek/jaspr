@@ -14,7 +14,7 @@ class QuotePage extends AsyncStatelessComponent {
       a(href: "/", [text('Home')])
     ]);
 
-    var quote = await FirebaseService.instance.loadQuoteById(id);
+    var quote = await FirebaseService.instance.getQuoteById(id).single;
     if (quote == null) {
       yield div(classes: "center", [text("Not Found")]);
       return;
@@ -25,7 +25,7 @@ class QuotePage extends AsyncStatelessComponent {
         img(classes: "quotes-start", src: 'images/quote.jpg', width: 100),
         h1([text(quote.quote)]),
         h4([text(quote.author)]),
-        QuoteLikeButton(id: id, count: quote.likes.length),
+        QuoteLikeButton(id: id, initialCount: quote.likes.length),
         img(classes: "quotes-end", src: 'images/quote.jpg', width: 100),
       ])
     ]);

@@ -28,4 +28,4 @@ const defaultJasprOptions = JasprOptions(
   },
 );
 
-Map<String, dynamic> _params0QuoteLikeButton(c0.QuoteLikeButton c) => {'id': c.id, 'count': c.count};
+Map<String, dynamic> _params0QuoteLikeButton(c0.QuoteLikeButton c) => {'id': c.id, 'initialCount': c.initialCount};

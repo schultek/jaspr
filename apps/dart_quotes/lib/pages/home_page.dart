@@ -14,6 +14,7 @@ class HomePage extends StatelessComponent {
     yield ul([
       AsyncBuilder(builder: (context) async* {
         var quotes = await FirebaseService.instance.loadQuotes();
+        quotes.sort((a, b) => b.likes.length.compareTo(a.likes.length));
 
         for (var quote in quotes) {
           yield div(classes: "quote", [

@@ -5,7 +5,9 @@
 
 dynamic showConfetti;
 dynamic Firebase;
+dynamic FirebaseApp;
 typedef FirebaseOrStubbed = dynamic;
+typedef FirebaseAppOrStubbed = dynamic;
 dynamic FirebaseFirestore;
 dynamic FieldValue;
 dynamic DocumentSnapshot;

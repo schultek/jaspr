@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dart_quotes/data/quote.dart';
 import 'package:jaspr/jaspr.dart';
 
-@Import.onWeb('package:firebase_core/firebase_core.dart', show: [#Firebase])
+@Import.onWeb('package:firebase_core/firebase_core.dart', show: [#Firebase, #FirebaseApp])
 @Import.onWeb('package:cloud_firestore/cloud_firestore.dart',
     show: [#FirebaseFirestore, #FieldValue, #DocumentSnapshot])
 @Import.onWeb('package:firebase_auth/firebase_auth.dart', show: [#FirebaseAuth])
@@ -15,41 +15,61 @@ import 'firebase.imports.dart';
 class FirebaseService {
   static FirebaseService instance = FirebaseService();
 
-  // === server logic ===
+  // === server setup ===
 
-  final admin = FirebaseAdminApp.initializeApp(
+  late final FirebaseAdminAppOrStubbed adminApp = FirebaseAdminApp.initializeApp(
     'dart-quotes',
     Credential.fromServiceAccount(File('service-account.json')),
   );
-  late final firestore = Firestore(admin);
 
-  Future<List<Quote>> loadQuotes() async {
-    var query = await firestore.collection('quotes').get();
-
-    return query.docs.map((doc) => Quote.fromData(doc.id, doc.data())).toList();
-  }
-
-  Future<Quote?> loadQuoteById(String id) async {
-    var doc = await firestore.doc('quotes/$id').get();
-    if (!doc.exists) {
-      return null;
-    }
-
-    return Quote.fromData(doc.id, doc.data()!);
-  }
+  late final FirestoreOrStubbed adminFirestore = Firestore(adminApp);
 
   // === client logic ===
 
-  final initializeApp = Future(() async {
-    await Firebase.initializeApp(
+  late final Future<FirebaseAppOrStubbed> clientApp = Future(() async {
+    var app = await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
     await FirebaseAuth.instance.signInAnonymously();
+
+    return app;
   });
 
+  Future<List<Quote>> loadQuotes() async {
+    if (kIsWeb) {
+      throw UnimplementedError("[loadQuotes] is not implemented on the client.");
+    }
+
+    var query = await adminFirestore.collection('quotes').get();
+    return query.docs.map((doc) {
+      return Quote.fromData(doc.id, doc.data());
+    }).toList();
+  }
+
+  Stream<Quote?> getQuoteById(String id) async* {
+    if (kIsWeb) {
+      await clientApp;
+      var snapshots = FirebaseFirestore.instance.collection('quotes').doc(id).snapshots();
+      await for (var doc in snapshots) {
+        yield Quote.fromData(doc.id, doc.data()!);
+      }
+    } else {
+      var doc = await adminFirestore.doc('quotes/$id').get();
+      if (doc.exists) {
+        yield Quote.fromData(doc.id, doc.data()!);
+      } else {
+        yield null;
+      }
+    }
+  }
+
   Future<void> toggleLikeOnQuote(String id, bool liked) async {
-    await initializeApp;
+    if (!kIsWeb) {
+      throw UnimplementedError("[toggleLikeOnQuote] is not implemented on the server.");
+    }
+
+    await clientApp;
     var userId = FirebaseAuth.instance.currentUser!.uid;
     await FirebaseFirestore.instance.collection('quotes').doc(id).update({
       'likes': liked ? FieldValue.arrayUnion([userId]) : FieldValue.arrayRemove([userId]),
@@ -57,15 +77,10 @@ class FirebaseService {
   }
 
   String getUserId() {
-    if (!kIsWeb) throw UnsupportedError("UserId only available on client.");
-    return FirebaseAuth.instance.currentUser!.uid;
-  }
-
-  Stream<Quote> getQuoteStream(String id) async* {
-    await initializeApp;
-    var snapshots = FirebaseFirestore.instance.collection('quotes').doc(id).snapshots();
-    await for (var doc in snapshots) {
-      yield Quote.fromData(doc.id, doc.data()!);
+    if (!kIsWeb) {
+      throw UnimplementedError("[getUserId] is not implemented on the server.");
     }
+
+    return FirebaseAuth.instance.currentUser!.uid;
   }
 }
