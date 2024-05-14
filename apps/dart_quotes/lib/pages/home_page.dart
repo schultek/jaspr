@@ -6,8 +6,6 @@ class HomePage extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield Head(meta: {"description": "A collection of cool Dart quotes. Built for FullStackFlutter Conference."});
-
     yield header([
       img(src: 'images/quote.jpg', alt: "Quote symbol", width: 100),
       h1([text('Dart Quotes')]),

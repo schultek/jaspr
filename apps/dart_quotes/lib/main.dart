@@ -14,6 +14,9 @@ void main() {
   runApp(Document(
     title: 'Dart Quotes',
     lang: 'en',
+    meta: {
+      "description": "A collection of cool Dart quotes. Built for FullStackFlutter Conference.",
+    },
     styles: [
       // Include text font
       StyleRule.fontFace(fontFamily: "Roboto", url: "/fonts/Roboto-Regular.ttf"),

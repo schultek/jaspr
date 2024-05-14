@@ -11,7 +11,7 @@ class QuotePage extends AsyncStatelessComponent {
   @override
   Stream<Component> build(BuildContext context) async* {
     yield nav([
-      a(href: "/", [text('Home')])
+      a(href: "/", [text('Home')]),
     ]);
 
     var quote = await FirebaseService.instance.getQuoteById(id).single;
