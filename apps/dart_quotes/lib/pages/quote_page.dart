@@ -20,11 +20,13 @@ class QuotePage extends AsyncStatelessComponent {
       return;
     }
 
-    yield Head(meta: {
-      "description": '"${quote.quote}" - ${quote.author}'
-    }, children: [
-      script(src: "https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js", defer: true, []),
-    ]);
+    yield Head(
+      title: quote.quote,
+      meta: {"description": '"${quote.quote}" - ${quote.author}'},
+      children: [
+        script(src: "https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js", defer: true, []),
+      ],
+    );
 
     yield div(classes: "center", [
       div(classes: "quote-container", [

@@ -1,8 +1,7 @@
 import 'package:dart_quotes/data/firebase.dart';
 import 'package:jaspr/jaspr.dart';
 
-@Import.onWeb('package:dart_quotes/data/confetti.dart', show: [#showConfetti])
-import 'quote_like_button.imports.dart';
+import '../data/confetti.dart';
 
 @client
 class QuoteLikeButton extends StatelessComponent {
@@ -25,7 +24,7 @@ class QuoteLikeButton extends StatelessComponent {
             if (hasLiked == null) return;
             FirebaseService.instance.toggleLikeOnQuote(id, !hasLiked);
             if (!hasLiked) {
-              showConfetti(emojis: ['🎯', '💙']);
+              ConfettiService.instance.show(emojis: ['🎯', '💙']);
             }
           },
           [

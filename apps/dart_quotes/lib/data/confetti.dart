@@ -1,17 +1,12 @@
-import 'dart:js_interop';
+import 'package:jaspr/jaspr.dart';
 
-void showConfetti({List<String>? emojis}) {
-  JSConfetti.instance.addConfetti(ConfettiOptions(emojis: emojis.jsify()));
-}
+@Import.onWeb('../interop/confetti.dart', show: [#JSConfetti])
+import 'confetti.imports.dart';
 
-extension type JSConfetti._(JSObject _) {
-  external JSConfetti();
+class ConfettiService {
+  static ConfettiService instance = ConfettiService();
 
-  static JSConfetti instance = JSConfetti();
-
-  external void addConfetti([ConfettiOptions? options]);
-}
-
-extension type ConfettiOptions._(JSObject o) implements JSObject {
-  external ConfettiOptions({JSAny? emojis});
+  void show({List<String>? emojis}) {
+    JSConfetti.instance.show(emojis: emojis);
+  }
 }

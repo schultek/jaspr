@@ -10,12 +10,8 @@ class App extends StatelessComponent {
     yield div(classes: 'main', [
       Router(
         routes: [
-          Route(path: '/', title: 'Home', builder: (context, state) => HomePage()),
-          Route(
-            path: '/quote/:quoteId',
-            title: 'Quote',
-            builder: (context, state) => QuotePage(id: state.params['quoteId']!),
-          ),
+          Route(path: '/', builder: (context, state) => HomePage()),
+          Route(path: '/quote/:quoteId', builder: (context, state) => QuotePage(id: state.params['quoteId']!)),
         ],
       ),
     ]);
