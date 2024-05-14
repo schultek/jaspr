@@ -19,8 +19,10 @@ class App extends StatelessComponent {
         ],
       ),
     ]);
-    yield a(classes: "github-badge", href: "https://github.com/schultek/jaspr", [
-      img(src: '/images/github-badge.svg'),
+    yield a(classes: "github-badge", href: "https://github.com/schultek/jaspr", attributes: {
+      'aria-label': "Find the source on Github"
+    }, [
+      img(src: '/images/github-badge.svg', alt: "Github Badge"),
     ]);
   }
 

@@ -6,8 +6,10 @@ class HomePage extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
+    yield Head(meta: {"description": "A collection of cool Dart quotes. Built for FullStackFlutter Conference."});
+
     yield header([
-      img(src: 'images/quote.jpg', width: 100),
+      img(src: 'images/quote.jpg', alt: "Quote symbol", width: 100),
       h1([text('Dart Quotes')]),
     ]);
 
@@ -17,7 +19,7 @@ class HomePage extends StatelessComponent {
         quotes.sort((a, b) => b.likes.length.compareTo(a.likes.length));
 
         for (var quote in quotes) {
-          yield div(classes: "quote", [
+          yield li([
             a(href: '/quote/${quote.id}', [
               p([text(quote.quote)]),
               span([text(quote.author)]),
@@ -32,8 +34,8 @@ class HomePage extends StatelessComponent {
         css('header')
             .box(padding: EdgeInsets.only(top: 10.rem))
             .flexbox(direction: FlexDirection.column, alignItems: AlignItems.center),
-        css('ul').box(padding: EdgeInsets.zero),
-        css('.quote', [
+        css('ul').box(padding: EdgeInsets.zero).raw({'list-style': 'none'}),
+        css('li', [
           css('&').box(
             margin: EdgeInsets.symmetric(vertical: 1.em, horizontal: (-10).px),
             radius: BorderRadius.circular(10.px),

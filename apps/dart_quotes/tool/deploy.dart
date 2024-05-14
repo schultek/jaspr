@@ -4,7 +4,7 @@ void main() async {
   await run('docker build --platform linux/amd64 -t dart_quotes .');
   await run('docker tag dart_quotes gcr.io/dart-quotes/dart_quotes');
   await run('docker push gcr.io/dart-quotes/dart_quotes');
-  await run('gcloud run deploy dart_quotes --image=gcr.io/dart-quotes/dart_quotes '
+  await run('gcloud run deploy dart-quotes --image=gcr.io/dart-quotes/dart_quotes '
       '--region=europe-west1 --allow-unauthenticated --project=dart-quotes');
 }
 

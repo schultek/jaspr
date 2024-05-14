@@ -20,28 +20,35 @@ class QuotePage extends AsyncStatelessComponent {
       return;
     }
 
+    yield Head(meta: {
+      "description": '"${quote.quote}" - ${quote.author}'
+    }, children: [
+      script(src: "https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js", defer: true, []),
+    ]);
+
     yield div(classes: "center", [
       div(classes: "quote-container", [
-        img(classes: "quotes-start", src: 'images/quote.jpg', width: 100),
+        img(classes: "quotes-start", src: 'images/quote.jpg', alt: "Starting quote symbol", width: 100),
         h1([text(quote.quote)]),
-        h4([text(quote.author)]),
+        p([text(quote.author)]),
         QuoteLikeButton(id: id, initialCount: quote.likes.length),
-        img(classes: "quotes-end", src: 'images/quote.jpg', width: 100),
+        img(classes: "quotes-end", src: 'images/quote.jpg', alt: "Ending quote symbol", width: 100),
       ])
     ]);
   }
 
   static get styles => [
         css('nav').text(align: TextAlign.center).box(padding: EdgeInsets.all(20.px)),
-        css('.center').box(height: 100.vh).flexbox(
-              justifyContent: JustifyContent.center,
-              alignItems: AlignItems.center,
-            ),
-        css('.quote-container').box(position: Position.relative()).text(align: TextAlign.center),
-        css('.quotes-start')
-            .box(position: Position.absolute(top: (-100).px, left: (-10).px), transform: Transform.rotate(180.deg)),
-        css('.quotes-end').box(position: Position.absolute(right: (-10).px, bottom: (-50).px)),
-        css('h1').text(fontSize: 40.px),
-        css('h4').text(fontStyle: FontStyle.italic),
+        css('.center')
+            .box(height: 100.vh)
+            .flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center),
+        css('.quote-container', [
+          css('&').box(position: Position.relative()).text(align: TextAlign.center),
+          css('.quotes-start')
+              .box(position: Position.absolute(top: (-100).px, left: (-10).px), transform: Transform.rotate(180.deg)),
+          css('.quotes-end').box(position: Position.absolute(right: (-10).px, bottom: (-50).px)),
+          css('h1').text(fontSize: 40.px),
+          css('p').text(fontStyle: FontStyle.italic, fontWeight: FontWeight.normal),
+        ]),
       ];
 }

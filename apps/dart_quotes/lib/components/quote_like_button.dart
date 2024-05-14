@@ -29,7 +29,7 @@ class QuoteLikeButton extends StatelessComponent {
             }
           },
           [
-            i(classes: "fa-${hasLiked ?? false ? 'solid' : 'regular'} fa-heart", []),
+            span(classes: "icon-heart${hasLiked ?? false ? '' : '-o'}", []),
             text(' $count'),
           ],
         );
@@ -43,9 +43,9 @@ class QuoteLikeButton extends StatelessComponent {
               .box(border: Border.all(BorderSide.none()), outline: Outline(style: OutlineStyle.none))
               .background(color: Colors.transparent)
               .text(fontSize: 18.px),
-          css('&:hover i').box(transform: Transform.scale(1.2)),
-          css('&.active i').text(color: Colors.blue),
-          css('i').raw({'transition': 'transform 300ms ease'}),
+          css('&:hover span').box(transform: Transform.scale(1.2)),
+          css('&.active span').text(color: Colors.blue),
+          css('span').raw({'transition': 'transform 300ms ease'}),
         ])
       ];
 }

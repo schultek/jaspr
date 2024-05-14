@@ -483,24 +483,21 @@ packages:
   jaspr:
     dependency: "direct main"
     description:
-      path: "../../packages/jaspr"
-      relative: true
-    source: path
+      path: "packages/jaspr"
+      ref: HEAD
+      resolved-ref: b0bd09fedd79cb70644ea4a9fd0fabff7fb7ef71
+      url: "https://github.com/schultek/jaspr"
+    source: git
     version: "0.12.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
-      path: "../../packages/jaspr_builder"
-      relative: true
-    source: path
+      path: "packages/jaspr_builder"
+      ref: HEAD
+      resolved-ref: b0bd09fedd79cb70644ea4a9fd0fabff7fb7ef71
+      url: "https://github.com/schultek/jaspr"
+    source: git
     version: "0.12.0"
-  jaspr_riverpod:
-    dependency: "direct overridden"
-    description:
-      path: "../../packages/jaspr_riverpod"
-      relative: true
-    source: path
-    version: "0.3.11"
   jaspr_router:
     dependency: "direct main"
     description:
@@ -669,14 +666,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.3"
-  riverpod:
-    dependency: transitive
-    description:
-      name: riverpod
-      sha256: f21b32ffd26a36555e501b04f4a5dca43ed59e16343f1a30c13632b2351dfa4d
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.5.1"
   scratch_space:
     dependency: transitive
     description:
@@ -762,14 +751,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.1"
-  state_notifier:
-    dependency: transitive
-    description:
-      name: state_notifier
-      sha256: b8677376aa54f2d7c58280d5a007f9e8774f1968d1fb1c096adcb4792fba29bb
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   stream_channel:
     dependency: transitive
     description:
