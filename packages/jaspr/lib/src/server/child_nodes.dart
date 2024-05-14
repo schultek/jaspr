@@ -81,6 +81,17 @@ class ChildListRange extends ChildNode with Iterable<MarkupRenderObject> {
 
   @override
   Iterator<MarkupRenderObject> get iterator => ChildListIterator(start, end.next);
+
+  Iterable<ChildNode> get nodes sync* {
+    ChildNode? curr = start;
+
+    while (curr != null && curr != end) {
+      yield curr;
+      curr = curr.next;
+    }
+
+    yield end;
+  }
 }
 
 class ChildList with Iterable<MarkupRenderObject> {
@@ -166,12 +177,12 @@ class ChildList with Iterable<MarkupRenderObject> {
     var endBefore = findWhere((n) => n == element.lastRenderObjectElement?.renderObject)?.next ?? _last;
 
     while (true) {
-      if (startAfter.next case ChildNodeBoundary startNext when startNext.range.start == startNext) {
+      if (startAfter.next case ChildNodeBoundary startNext) {
         var compared = compareElements(element, startNext.element);
         if (compared == 1) {
-            startAfter = startNext.range.end;
-            continue;
-        } else if (compared == 3) {
+          startAfter = startNext.range.end;
+          continue;
+        } else if (compared == 3 && startNext.range.start == startNext) {
           startAfter = startNext;
           continue;
         }
@@ -179,16 +190,16 @@ class ChildList with Iterable<MarkupRenderObject> {
       break;
     }
     while (true) {
-      if (endBefore.prev case ChildNodeBoundary endPrev when endPrev.range.end == endPrev) {
+      if (endBefore.prev case ChildNodeBoundary endPrev) {
         var compared = compareElements(endPrev.element, element);
         if (compared == 1) {
           endBefore = endPrev.range.start;
           continue;
-        } else if (compared == 2) {
+        } else if (compared == 2 && endPrev.range.end == endPrev) {
           endBefore = endPrev;
-            continue;
-          }
+          continue;
         }
+      }
       break;
     }
 
