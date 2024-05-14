@@ -12,55 +12,60 @@ import 'package:jaspr/jaspr.dart';
 @Import.onServer('package:dart_firebase_admin/firestore.dart', show: [#Firestore])
 import 'firebase.imports.dart';
 
-// === server logic ===
+class FirebaseService {
+  static FirebaseService instance = FirebaseService();
 
-final admin = FirebaseAdminApp.initializeApp(
-  'dart-quotes',
-  Credential.fromServiceAccount(File('service-account.json')),
-);
-final firestore = Firestore(admin);
+  // === server logic ===
 
-Future<List<Quote>> loadQuotes() async {
-  var query = await firestore.collection('quotes').get();
+  final admin = FirebaseAdminApp.initializeApp(
+    'dart-quotes',
+    Credential.fromServiceAccount(File('service-account.json')),
+  );
+  late final firestore = Firestore(admin);
 
-  return query.docs.map((doc) => Quote.fromData(doc.id, doc.data())).toList();
-}
+  Future<List<Quote>> loadQuotes() async {
+    var query = await firestore.collection('quotes').get();
 
-Future<Quote?> loadQuoteById(String id) async {
-  var doc = await firestore.doc('quotes/$id').get();
-  if (!doc.exists) {
-    return null;
+    return query.docs.map((doc) => Quote.fromData(doc.id, doc.data())).toList();
   }
 
-  return Quote.fromData(doc.id, doc.data()!);
-}
+  Future<Quote?> loadQuoteById(String id) async {
+    var doc = await firestore.doc('quotes/$id').get();
+    if (!doc.exists) {
+      return null;
+    }
 
-// === client logic ===
-final initializeApp = Future(() async {
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+    return Quote.fromData(doc.id, doc.data()!);
+  }
 
-  await FirebaseAuth.instance.signInAnonymously();
-});
+  // === client logic ===
 
-Future<void> toggleLikeOnQuote(String id, bool liked) async {
-  await initializeApp;
-  var userId = FirebaseAuth.instance.currentUser!.uid;
-  await FirebaseFirestore.instance.collection('quotes').doc(id).update({
-    'likes': liked ? FieldValue.arrayUnion([userId]) : FieldValue.arrayRemove([userId]),
+  final initializeApp = Future(() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    await FirebaseAuth.instance.signInAnonymously();
   });
-}
 
-String getUserId() {
-  if (!kIsWeb) throw UnsupportedError("UserId only available on client.");
-  return FirebaseAuth.instance.currentUser!.uid;
-}
+  Future<void> toggleLikeOnQuote(String id, bool liked) async {
+    await initializeApp;
+    var userId = FirebaseAuth.instance.currentUser!.uid;
+    await FirebaseFirestore.instance.collection('quotes').doc(id).update({
+      'likes': liked ? FieldValue.arrayUnion([userId]) : FieldValue.arrayRemove([userId]),
+    });
+  }
 
-Stream<Quote> getQuoteStream(String id) async* {
-  await initializeApp;
-  var snapshots = FirebaseFirestore.instance.collection('quotes').doc(id).snapshots();
-  await for (var doc in snapshots) {
-    yield Quote.fromData(doc.id, doc.data()!);
+  String getUserId() {
+    if (!kIsWeb) throw UnsupportedError("UserId only available on client.");
+    return FirebaseAuth.instance.currentUser!.uid;
+  }
+
+  Stream<Quote> getQuoteStream(String id) async* {
+    await initializeApp;
+    var snapshots = FirebaseFirestore.instance.collection('quotes').doc(id).snapshots();
+    await for (var doc in snapshots) {
+      yield Quote.fromData(doc.id, doc.data()!);
+    }
   }
 }

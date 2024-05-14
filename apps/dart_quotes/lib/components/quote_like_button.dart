@@ -31,9 +31,9 @@ class _QuoteLikesState extends State<QuoteLikeButton> {
     count = component.count;
 
     if (kIsWeb) {
-      _snapshotSubscription = getQuoteStream(component.id).listen((quote) {
+      _snapshotSubscription = FirebaseService.instance.getQuoteStream(component.id).listen((quote) {
         setState(() {
-          hasLiked = quote.likes.contains(getUserId());
+          hasLiked = quote.likes.contains(FirebaseService.instance.getUserId());
           count = quote.likes.length;
         });
       });
@@ -51,7 +51,7 @@ class _QuoteLikesState extends State<QuoteLikeButton> {
     yield button(
       classes: "quote-like-btn${hasLiked == true ? ' active' : ''}",
       onClick: () {
-        toggleLikeOnQuote(component.id, !hasLiked!);
+        FirebaseService.instance.toggleLikeOnQuote(component.id, !hasLiked!);
         if (!hasLiked!) {
           showConfetti(emojis: ['🎯', '💙']);
         }

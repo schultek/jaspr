@@ -13,7 +13,7 @@ class HomePage extends StatelessComponent {
 
     yield ul([
       AsyncBuilder(builder: (context) async* {
-        var quotes = await loadQuotes();
+        var quotes = await FirebaseService.instance.loadQuotes();
 
         for (var quote in quotes) {
           yield div(classes: "quote", [
