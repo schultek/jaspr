@@ -52,6 +52,7 @@
 - Fixed race condition where routes were skipped during static rendering.
 - Fixed infinite loading bug for async server builds.
 - Fixed hydration bug with empty or nested client components.
+- Added documentation comments.
 
 ## 0.12.0
 
