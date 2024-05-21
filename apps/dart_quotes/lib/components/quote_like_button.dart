@@ -15,8 +15,8 @@ class QuoteLikeButton extends StatelessComponent {
     yield StreamBuilder(
       stream: FirebaseService.instance.getQuoteById(id),
       builder: (context, snapshot) sync* {
-        var count = snapshot.data?.likes.length ?? initialCount;
-        var hasLiked = snapshot.data?.likes.contains(FirebaseService.instance.getUserId());
+        int count = snapshot.data?.likes.length ?? initialCount;
+        bool? hasLiked = snapshot.data?.likes.contains(FirebaseService.instance.getUserId());
 
         yield button(
           classes: "quote-like-btn${hasLiked == true ? ' active' : ''}",
