@@ -40,15 +40,13 @@ class NavbarBurger extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield a(
-      href: "",
+    yield button(
       classes: "navbar-burger${isActive ? ' is-active' : ''}",
       attributes: {"role": "button", "data-target": "navMenu"},
       events: events(onClick: () {
         onToggle();
       }),
       [
-        span(attributes: {"aria-hidden": "true"}, []),
         span(attributes: {"aria-hidden": "true"}, []),
         span(attributes: {"aria-hidden": "true"}, []),
         span(attributes: {"aria-hidden": "true"}, []),
