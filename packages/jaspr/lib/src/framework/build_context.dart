@@ -1,8 +1,7 @@
 part of 'framework.dart';
 
-/// The BuildContext supplied to a Components build() method,
-/// as known from Flutter
-abstract class BuildContext {
+/// The BuildContext supplied to a Components build() method.
+sealed class BuildContext {
   /// The current configuration of the [Element] that is this [BuildContext].
   Component get component;
 
