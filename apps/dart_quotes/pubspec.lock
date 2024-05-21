@@ -483,28 +483,23 @@ packages:
   jaspr:
     dependency: "direct main"
     description:
-      path: "packages/jaspr"
-      ref: HEAD
-      resolved-ref: b0bd09fedd79cb70644ea4a9fd0fabff7fb7ef71
-      url: "https://github.com/schultek/jaspr"
-    source: git
+      path: "../../packages/jaspr"
+      relative: true
+    source: path
     version: "0.12.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
-      path: "packages/jaspr_builder"
-      ref: HEAD
-      resolved-ref: b0bd09fedd79cb70644ea4a9fd0fabff7fb7ef71
-      url: "https://github.com/schultek/jaspr"
-    source: git
+      path: "../../packages/jaspr_builder"
+      relative: true
+    source: path
     version: "0.12.0"
   jaspr_router:
     dependency: "direct main"
     description:
-      name: jaspr_router
-      sha256: a027d5e4cfd916a9a95a985e03f8bfe0c6bc0cdcfa51822b60a5647f5bc00296
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../packages/jaspr_router"
+      relative: true
+    source: path
     version: "0.4.1"
   jaspr_web_compilers:
     dependency: "direct dev"
