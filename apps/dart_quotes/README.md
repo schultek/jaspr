@@ -1,6 +1,8 @@
 # dart_quotes
 
-A new jaspr project.
+A collection of cool dart quotes, built for [FullStackFlutter Conference](https://fullstackflutter.dev/).
+
+See it live at https://quotes.schultek.de/
 
 ## Running the project
 
