@@ -41,11 +41,18 @@
   </head>
   ```
 
+- Added `AsyncStatelessComponent` and `AsyncBuilder`.
+  These are special components that are only available on the server (using `package:jaspr/server.dart`) and have an 
+  asynchronous build function.
+
 - Improved internal framework implementation of different element types.
   - Added `BuildableElement` and `ProxyElement` as replacement for `MultiChildElement` and `SingleChildElement`.
   - Added `Element.didMount()` and `Element.didUpdate()` lifecycle methods.
 
 - Fixed race condition where routes were skipped during static rendering.
+- Fixed infinite loading bug for async server builds.
+- Fixed hydration bug with empty or nested client components.
+- Added documentation comments.
 
 ## 0.12.0
 
