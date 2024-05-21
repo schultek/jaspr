@@ -665,7 +665,7 @@ class StatefulElement extends BuildableElement {
   }
 
   @override
-  Object? performRebuild() {
+  FutureOr<void> performRebuild() {
     if (owner.isFirstBuild && _asyncInitState != null) {
       return _asyncInitState!.then((_) {
         if (_didChangeDependencies) {
@@ -680,7 +680,6 @@ class StatefulElement extends BuildableElement {
       _didChangeDependencies = false;
     }
     super.performRebuild();
-    return null;
   }
 
   @override

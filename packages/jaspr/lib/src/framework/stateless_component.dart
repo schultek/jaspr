@@ -154,13 +154,12 @@ class StatelessElement extends BuildableElement {
   Iterable<Component> build() => component.build(this);
 
   @override
-  Object? performRebuild() {
+  FutureOr<void> performRebuild() {
     if (owner.isFirstBuild && _asyncFirstBuild != null) {
       return _asyncFirstBuild!.then((_) {
         super.performRebuild();
       });
     }
     super.performRebuild();
-    return null;
   }
 }
