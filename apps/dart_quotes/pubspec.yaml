@@ -1,6 +1,7 @@
 name: dart_quotes
-description: A new jaspr project.
-version: 0.0.1
+description: A collection of Dart quotes. Built for FullStackFlutter Conference.
+version: 0.1.0
+publish_to: none
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
