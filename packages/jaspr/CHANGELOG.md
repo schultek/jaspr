@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.13.0
 
 - Added `Head` component to render metadata inside the documents `<head>`.
 
