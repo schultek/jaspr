@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed namespace handling for nested svg elements.
+
 ## 0.13.0
 
 - Added `Head` component to render metadata inside the documents `<head>`.
