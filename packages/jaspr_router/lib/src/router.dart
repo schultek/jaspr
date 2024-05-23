@@ -66,16 +66,16 @@ class RouterState extends State<Router> with PreloadStateMixin {
   Map<Object, RouteLoader> routeLoaders = {};
 
   @override
-  Future<void> preloadState() {
+  Future<void> preloadState() async {
+    if (kGenerateMode) {
+      await PlatformRouter.instance.registry.registerRoutes(component.routes);
+    }
     return initRoutes();
   }
 
   @override
   void initState() {
     super.initState();
-    if (kGenerateMode) {
-      PlatformRouter.instance.registry.registerRoutes(component.routes);
-    }
     PlatformRouter.instance.history.init(context.binding, onChangeState: (state, {url}) {
       _update(url ?? context.binding.currentUri.toString(), extra: state, updateHistory: false, replace: true);
     });

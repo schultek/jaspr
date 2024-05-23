@@ -8,7 +8,7 @@ environment:
 dependencies:
   html: ^0.15.0
   csslib: ^0.17.1
-  jaspr: ^0.11.0
+  jaspr: ^0.13.0
   uuid: ^3.0.5
   domino: ^0.8.1
 

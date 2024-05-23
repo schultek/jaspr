@@ -6,12 +6,13 @@ import '../foundation/constants.dart';
 import '../foundation/events/events.dart';
 import '../framework/framework.dart';
 
+const htmlns = 'http://www.w3.org/1999/xhtml';
 const xmlns = {
   'svg': 'http://www.w3.org/2000/svg',
+  'math': 'http://www.w3.org/1998/Math/MathML',
 };
 
 class DomRenderObject extends RenderObject {
-  String? namespace;
   Node? node;
   List<Node> toHydrate = [];
   Map<String, EventBinding>? events;
@@ -28,15 +29,12 @@ class DomRenderObject extends RenderObject {
 
   @override
   DomRenderObject createChildRenderObject() {
-    return DomRenderObject()
-      ..parent = this
-      ..namespace = namespace;
+    return DomRenderObject()..parent = this;
   }
 
-  html.Element _createElement(String tag) {
-    namespace = xmlns[tag] ?? namespace;
-    if (namespace != null) {
-      return document.createElementNS(namespace!, tag);
+  html.Element _createElement(String tag, String? namespace) {
+    if (namespace != null && namespace != htmlns) {
+      return document.createElementNS(namespace, tag);
     }
     return document.createElement(tag);
   }
@@ -46,6 +44,11 @@ class DomRenderObject extends RenderObject {
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     late Set<String> attributesToRemove;
     late html.Element elem;
+
+    var namespace = xmlns[tag];
+    if ((namespace, parent?.node) case (== null, html.Element pnode)) {
+      namespace = pnode.namespaceUri;
+    }
 
     diff:
     if (node == null) {
@@ -69,14 +72,14 @@ class DomRenderObject extends RenderObject {
         }
       }
 
-      elem = node = _createElement(tag);
+      elem = node = _createElement(tag, namespace);
       attributesToRemove = {};
       if (kVerboseMode) {
         print("Create html node: $elem");
       }
     } else {
       if (node is! html.Element || (node as html.Element).tagName.toLowerCase() != tag) {
-        elem = _createElement(tag);
+        elem = _createElement(tag, namespace);
         var old = node;
         node!.replaceWith(elem);
         node = elem;
@@ -202,7 +205,6 @@ class DomRenderObject extends RenderObject {
   void attach(DomRenderObject child, {DomRenderObject? after}) {
     try {
       child.parent = this;
-      child.namespace = namespace;
 
       var parentNode = node;
       var childNode = child.node;
@@ -237,7 +239,6 @@ class DomRenderObject extends RenderObject {
     }
     child.node?.remove();
     child.parent = null;
-    child.namespace = null;
   }
 
   void finalize() {

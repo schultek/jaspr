@@ -43,5 +43,5 @@ class HistoryManagerImpl implements HistoryManager {
 
 class RouteRegistryImpl implements RouteRegistry {
   @override
-  void registerRoutes(List<RouteBase> routes) {}
+  Future<void> registerRoutes(List<RouteBase> routes) async {}
 }

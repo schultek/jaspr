@@ -37,7 +37,7 @@ class HistoryManagerImpl implements HistoryManager {
 
 class RouteRegistryImpl implements RouteRegistry {
   @override
-  void registerRoutes(List<RouteBase> routes) {
+  Future<void> registerRoutes(List<RouteBase> routes) async {
     Set<String> paths = {};
 
     void registerRoute(RouteBase route, String path) {
@@ -61,7 +61,7 @@ class RouteRegistryImpl implements RouteRegistry {
     }
 
     for (var path in paths) {
-      ServerApp.requestRouteGeneration(path);
+      await ServerApp.requestRouteGeneration(path);
     }
   }
 }

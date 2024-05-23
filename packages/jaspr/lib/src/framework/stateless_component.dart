@@ -133,25 +133,33 @@ class StatelessElement extends BuildableElement {
   @override
   StatelessComponent get component => super.component as StatelessComponent;
 
+  Future? _asyncFirstBuild;
+
+  @override
+  void didMount() {
+    // We check if the component uses on of the mixins that support async initialization,
+    // which will delay the call to [build()] until resolved during the first build.
+
+    if (owner.isFirstBuild && !binding.isClient && component is OnFirstBuild) {
+      var result = (component as OnFirstBuild).onFirstBuild(this);
+      if (result is Future) {
+        _asyncFirstBuild = result;
+      }
+    }
+
+    super.didMount();
+  }
+
   @override
   Iterable<Component> build() => component.build(this);
 
   @override
-  Object? performRebuild() {
-    if (owner.isFirstBuild && !binding.isClient && component is OnFirstBuild) {
-      var result = (component as OnFirstBuild).onFirstBuild(this);
-      if (result is Future) {
-        return result.then((_) => performRebuild());
-      }
+  FutureOr<void> performRebuild() {
+    if (owner.isFirstBuild && _asyncFirstBuild != null) {
+      return _asyncFirstBuild!.then((_) {
+        super.performRebuild();
+      });
     }
     super.performRebuild();
-    return null;
-  }
-
-  @override
-  void update(StatelessComponent newComponent) {
-    super.update(newComponent);
-    _dirty = true;
-    rebuild();
   }
 }

@@ -81,6 +81,17 @@ class ChildListRange extends ChildNode with Iterable<MarkupRenderObject> {
 
   @override
   Iterator<MarkupRenderObject> get iterator => ChildListIterator(start, end.next);
+
+  Iterable<ChildNode> get nodes sync* {
+    ChildNode? curr = start;
+
+    while (curr != null && curr != end) {
+      yield curr;
+      curr = curr.next;
+    }
+
+    yield end;
+  }
 }
 
 class ChildList with Iterable<MarkupRenderObject> {
@@ -163,32 +174,30 @@ class ChildList with Iterable<MarkupRenderObject> {
     }
 
     var startAfter = findWhere((n) => n == prevElem?.lastRenderObjectElement?.renderObject) ?? _first;
-    var endAfter = findWhere((n) => n == element.lastRenderObjectElement?.renderObject) ?? _last.prev!;
+    var endBefore = findWhere((n) => n == element.lastRenderObjectElement?.renderObject)?.next ?? _last;
 
     while (true) {
       if (startAfter.next case ChildNodeBoundary startNext) {
-        if (startNext.element.depth < element.depth) {
+        var compared = compareElements(element, startNext.element);
+        if (compared == 1) {
+          startAfter = startNext.range.end;
+          continue;
+        } else if (compared == 3 && startNext.range.start == startNext) {
           startAfter = startNext;
           continue;
-        } else if (startNext.element.depth == element.depth) {
-          if (isOrdered(startNext.element, element)) {
-            startAfter = startNext.range.end;
-            continue;
-          }
         }
       }
       break;
     }
     while (true) {
-      if (endAfter.next case ChildNodeBoundary endNext) {
-        if (endNext.element.depth > element.depth) {
-          endAfter = endNext;
+      if (endBefore.prev case ChildNodeBoundary endPrev) {
+        var compared = compareElements(endPrev.element, element);
+        if (compared == 1) {
+          endBefore = endPrev.range.start;
           continue;
-        } else if (endNext.element.depth == element.depth) {
-          if (isOrdered(endNext.element, element)) {
-            endAfter = endNext.range.end;
-            continue;
-          }
+        } else if (compared == 2 && endPrev.range.end == endPrev) {
+          endBefore = endPrev;
+          continue;
         }
       }
       break;
@@ -198,14 +207,17 @@ class ChildList with Iterable<MarkupRenderObject> {
     var end = ChildNodeBoundary(element);
 
     startAfter.insertNext(start);
-    endAfter.insertNext(end);
+    endBefore.insertPrev(end);
 
     var range = ChildListRange(start, end);
     return range;
   }
 
-  bool isOrdered(Element a, Element b) {
-    assert(a.depth == b.depth);
+  // 0: same parent, ordered
+  // 1: same parent, unordered
+  // 2: a parent of b
+  // 3: b parent of a
+  int compareElements(Element a, Element b) {
     late Element parentA, parentB;
     a.visitAncestorElements((e) {
       parentA = e;
@@ -216,17 +228,29 @@ class ChildList with Iterable<MarkupRenderObject> {
       return false;
     });
     if (parentA != parentB) {
-      return isOrdered(parentA, parentB);
+      if (a.depth == b.depth) {
+        return compareElements(parentA, parentB);
+      } else if (a.depth < b.depth) {
+        if (a == parentB) {
+          return 2;
+        }
+        return compareElements(a, parentB);
+      } else {
+        if (parentA == b) {
+          return 3;
+        }
+        return compareElements(parentA, b);
+      }
     }
 
     Element currA = a, currB = b;
     while (true) {
       var prevA = currA.prevSibling, prevB = currB.prevSibling;
       if (prevB == a || prevA == null) {
-        return true;
+        return 0;
       }
       if (prevA == b || prevB == null) {
-        return false;
+        return 1;
       }
       currA = prevA;
       currB = prevB;

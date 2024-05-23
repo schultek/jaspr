@@ -101,10 +101,10 @@ packages:
     dependency: transitive
     description:
       name: build_modules
-      sha256: "66f0f746a239ff6cceba9d235a679ec70a6d9037ddddb36a24a0791a639a8486"
+      sha256: "9987d67a29081872e730468295fc565e9a2b377ca3673337c1d4e41d57c6cd7c"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.7"
+    version: "5.0.8"
   build_resolvers:
     dependency: transitive
     description:
@@ -364,10 +364,10 @@ packages:
     dependency: transitive
     description:
       name: hotreloader
-      sha256: "94ee21a60ea2836500799f3af035dc3212b1562027f1e0031c14e087f0231449"
+      sha256: ed56fdc1f3a8ac924e717257621d09e9ec20e308ab6352a73a50a1d7a4d9158e
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.0"
+    version: "4.2.0"
   html:
     dependency: transitive
     description:
@@ -414,14 +414,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.11.0"
+    version: "0.13.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.11.0"
+    version: "0.13.0"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
@@ -875,5 +875,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.2.0 <3.5.0"
+  dart: ">=3.2.0 <3.6.0"
   flutter: ">=3.16.0"

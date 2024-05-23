@@ -627,9 +627,7 @@ class StatefulElement extends BuildableElement {
     assert(state._debugLifecycleState == _StateLifecycle.created);
 
     // We check if state uses on of the mixins that support async initialization,
-    // which will be handled by [BuildOwner.preformRebuildOn].
-    // In this case we don't call [_initState()] directly here, but rather let it
-    // be called by the mixins implementation.
+    // which will delay the call to [_initState()] until resolved during the first build.
 
     if (owner.isFirstBuild && state is PreloadStateMixin && !binding.isClient) {
       _asyncInitState = (state as PreloadStateMixin).preloadState().then((_) => _initState());
@@ -667,7 +665,7 @@ class StatefulElement extends BuildableElement {
   }
 
   @override
-  Object? performRebuild() {
+  FutureOr<void> performRebuild() {
     if (owner.isFirstBuild && _asyncInitState != null) {
       return _asyncInitState!.then((_) {
         if (_didChangeDependencies) {
@@ -682,7 +680,6 @@ class StatefulElement extends BuildableElement {
       _didChangeDependencies = false;
     }
     super.performRebuild();
-    return null;
   }
 
   @override

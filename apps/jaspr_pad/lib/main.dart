@@ -20,7 +20,7 @@ import 'server/download.dart';
 import 'server/samples.dart';
 import 'server/tutorial.dart';
 
-void main() {
+void main() async {
   Jaspr.initializeApp();
 
   var router = Router();
@@ -41,7 +41,9 @@ void main() {
   var handler = Pipeline().addMiddleware(logRequests()).addHandler(router.call);
 
   var port = int.parse(Platform.environment['PORT'] ?? '8080');
-  serve(handler, InternetAddress.anyIPv4, port, shared: true);
+  var server = await serve(handler, InternetAddress.anyIPv4, port, shared: true);
+
+  print('Serving at http://${server.address.host}:${server.port}');
 }
 
 Handler get apiRouter {

@@ -1,6 +1,7 @@
-## Unreleased patch
+## 0.4.2
 
 - The title of the browser tab will no be properly set to the `title` of the current route.
+- Fixed race condition where routes were skipped during static rendering.
 
 ## 0.4.1
 
