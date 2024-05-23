@@ -10,3 +10,4 @@ doc/api/
 
 # Passwords file
 config/passwords.yaml
+config/google_client_secret.json

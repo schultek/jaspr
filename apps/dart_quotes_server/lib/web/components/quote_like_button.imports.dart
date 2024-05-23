@@ -10,5 +10,10 @@ export '../../generated/imports/_web.dart'
         StreamingConnectionHandlerOrStubbed,
         ClientOrStubbed,
         QuoteInitOrStubbed,
+        FlutterAuthenticationKeyManager,
+        SessionManager,
+        FlutterAuthenticationKeyManagerOrStubbed,
+        SessionManagerOrStubbed,
         JSConfetti,
-        JSConfettiOrStubbed;
+        JSConfettiOrStubbed,
+        signInWithGoogle;

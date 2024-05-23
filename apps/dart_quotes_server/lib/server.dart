@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:serverpod_auth_server/module.dart' as auth;
 
 import 'jaspr_options.dart';
 import 'src/generated/endpoints.dart';
@@ -18,12 +19,12 @@ void run(List<String> args) async {
     Endpoints(),
   );
 
+  Jaspr.initializeApp(options: defaultJasprOptions, useIsolates: false);
+
   // If you are using any future calls, they need to be registered here.
   // pod.registerFutureCall(ExampleFutureCall(), 'exampleFutureCall');
 
-  Jaspr.initializeApp(options: defaultJasprOptions, useIsolates: false);
-
-  // Let Jaspr render all routes.
+  pod.webServer.addRoute(auth.RouteGoogleSignIn(), '/googlesignin');
   pod.webServer.addRoute(RootRoute(), '/*');
 
   // Start the server.

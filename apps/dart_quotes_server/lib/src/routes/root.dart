@@ -12,6 +12,7 @@ import '../../web/pages/quote_page.dart';
 class RootRoute extends JasprRoute {
   @override
   Future<Component> build(Session session, HttpRequest request) async {
+    print("RENDER ${await session.auth.authenticatedUserId}");
     return Document(
       title: 'Dart Quotes',
       lang: 'en',
@@ -20,8 +21,8 @@ class RootRoute extends JasprRoute {
       },
       styles: [
         // Include text font
-        StyleRule.fontFace(fontFamily: "Roboto", url: "/fonts/Roboto-Regular.ttf"),
-        StyleRule.fontFace(fontFamily: "Roboto", fontStyle: FontStyle.italic, url: "/fonts/Roboto-Italic.ttf"),
+        StyleRule.fontFace(fontFamily: "Roboto", url: "/fonts/Roboto-Regular.woff"),
+        StyleRule.fontFace(fontFamily: "Roboto", fontStyle: FontStyle.italic, url: "/fonts/Roboto-Italic.woff"),
 
         // Include icon font
         StyleRule.fontFace(fontFamily: "icomoon", url: "/fonts/icomoon.ttf"),

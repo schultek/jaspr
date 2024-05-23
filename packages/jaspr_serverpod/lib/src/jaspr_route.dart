@@ -5,6 +5,8 @@ import 'package:jaspr/server.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
+import '../jaspr_serverpod.dart';
+
 /// A [JasprRoute] is the most convenient way to render Jaspr components in your server.
 /// Override the [build] method and return a root [Component].
 abstract class JasprRoute extends Route {
@@ -21,7 +23,7 @@ abstract class JasprRoute extends Route {
     var session = request.context['session'] as Session;
     var req = request.context['request'] as HttpRequest;
     var component = await build(session, req);
-    return render(component);
+    return render(InheritedSession(session: session, child: component));
   }
 
   @override
