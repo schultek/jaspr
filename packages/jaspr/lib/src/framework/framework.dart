@@ -527,7 +527,7 @@ abstract class Element implements BuildContext {
     assert(_binding != null);
 
     final Key? key = component.key;
-    if (key is GlobalKey) {
+    if (key is GlobalKey && binding.isClient) {
       ComponentsBinding._registerGlobalKey(key, this);
     }
     _updateInheritance();
