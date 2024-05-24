@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.13.1
 
 - Fixed namespace handling for nested svg elements.
 - Fixed global key conflicts during server-side rendering by disabling them on the server.
