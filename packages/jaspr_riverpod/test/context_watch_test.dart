@@ -9,7 +9,7 @@ final autoDisposeCounter = StateProvider.autoDispose((ref) => 0);
 
 void main() {
   group('context.watch', () {
-    testComponents('context.watch returns provider state and rebuilds on change', (tester) async {
+    testComponents('returns provider state and rebuilds on change', (tester) async {
       await tester.pumpComponent(providerApp((context) sync* {
         yield Button(
           label: '${context.watch(counter)}',
@@ -27,7 +27,7 @@ void main() {
       expect(find.text('1'), findsOneComponent);
     });
 
-    testComponents('context.watch returns overridden provider state', (tester) async {
+    testComponents('returns overridden provider state', (tester) async {
       await tester.pumpComponent(providerApp((context) sync* {
         yield Builder(builder: (context) sync* {
           yield Button(

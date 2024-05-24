@@ -121,7 +121,8 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
 
   @override
   String? getRawState(String id) {
-    throw UnimplementedError();
+    if (!isClient) throw UnimplementedError();
+    return null;
   }
 
   @override
