@@ -14,7 +14,7 @@ void testComponents(
   String description,
   FutureOr<void> Function(ComponentTester tester) callback, {
   Uri? uri,
-  bool isClient = false,
+  bool isClient = true,
   bool? skip,
   Timeout? timeout,
   dynamic tags,

@@ -2,6 +2,7 @@
 
 - Fixed namespace handling for nested svg elements.
 - Fixed global key conflicts during server-side rendering by disabling them on the server.
+- Change `testComponents(isClient: _)` default to true.
 
 ## 0.13.0
 
