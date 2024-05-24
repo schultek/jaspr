@@ -38,9 +38,8 @@ class TailwindBuilder implements Builder {
     var hasCustomConfig = await configFile.exists();
 
     await Process.run(
-      'npx',
+      'tailwindcss',
       [
-        'tailwindcss',
         '--input',
         scratchSpace.fileFor(buildStep.inputId).path,
         '--output',
@@ -49,7 +48,7 @@ class TailwindBuilder implements Builder {
         p.join(Directory.current.path, '{lib,web}', '**', '*.dart').toPosix(true),
         if (hasCustomConfig) ...[
           '--config',
-          p.join(Directory.current.path, 'tailwind.config.js'),
+          p.join(Directory.current.path, 'tailwind.config.js').toPosix(),
         ],
       ],
       workingDirectory: root,
