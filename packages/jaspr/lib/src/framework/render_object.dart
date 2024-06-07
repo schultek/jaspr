@@ -49,10 +49,26 @@ mixin RenderObjectElement on Element {
     super.didMount();
   }
 
+  bool _dirtyRender = false;
+
+  bool shouldRerender(covariant Component newComponent) {
+    return true;
+  }
+
   @override
   void update(Component newComponent) {
+    if (shouldRerender(newComponent)) {
+      _dirtyRender = true;
+    }
     super.update(newComponent);
-    updateRenderObject();
+  }
+
+  @override
+  void didUpdate(Component oldComponent) {
+    if (_dirtyRender) {
+      updateRenderObject();
+    }
+    super.didUpdate(oldComponent);
   }
 
   @override

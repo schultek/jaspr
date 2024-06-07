@@ -553,10 +553,19 @@ abstract class Element implements BuildContext {
     assert(newComponent != component);
     assert(_depth != null);
     assert(Component.canUpdate(component, newComponent));
+    if (shouldRebuild(newComponent)) {
+      _dirty = true;
+    }
     _component = newComponent;
   }
 
-  void didUpdate(covariant Component oldComponent) {}
+  void didUpdate(covariant Component oldComponent) {
+    if (_dirty) {
+      rebuild();
+    }
+  }
+
+  bool shouldRebuild(covariant Component newComponent);
 
   void _updateDepth(int parentDepth) {
     final int expectedDepth = parentDepth + 1;

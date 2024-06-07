@@ -350,6 +350,10 @@ abstract class State<T extends StatefulComponent> {
     assert(_debugLifecycleState == _StateLifecycle.created);
   }
 
+  bool shouldRebuild(covariant T newComponent) {
+    return true;
+  }
+
   /// Called whenever the component configuration changes.
   ///
   /// If the parent component rebuilds and request that this location in the tree
@@ -680,6 +684,11 @@ class StatefulElement extends BuildableElement {
       _didChangeDependencies = false;
     }
     super.performRebuild();
+  }
+
+  @override
+  bool shouldRebuild(covariant StatefulComponent newComponent) {
+    return state.shouldRebuild(newComponent);
   }
 
   @override

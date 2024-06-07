@@ -118,6 +118,10 @@ abstract class StatelessComponent extends Component {
   ///  * [StatelessComponent], which contains the discussion on performance considerations.
   @protected
   Iterable<Component> build(BuildContext context);
+
+  bool shouldRebuild(covariant Component newComponent) {
+    return true;
+  }
 }
 
 /// Mixin on [StatelessComponent] that performs some async task on the first build
@@ -148,6 +152,11 @@ class StatelessElement extends BuildableElement {
     }
 
     super.didMount();
+  }
+
+  @override
+  bool shouldRebuild(covariant Component newComponent) {
+    return component.shouldRebuild(newComponent);
   }
 
   @override
