@@ -401,7 +401,6 @@ abstract class Element implements BuildContext {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
       final Component newComponent = newComponents[newChildrenTop];
       if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
-      print("UPDATE TOP $oldChildrenTop");
       final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
@@ -454,7 +453,6 @@ abstract class Element implements BuildContext {
         if (oldChild != null) {
           final Key? key = oldChild.component.key;
           if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
-            print("DEACTIVATE MIDDLE $oldChildrenTop");
             deactivateChild(oldChild);
           }
         }
@@ -468,7 +466,6 @@ abstract class Element implements BuildContext {
         oldChild = retakeOldKeyedChildren?[key];
       }
 
-      print("ACTIVATE MIDDLE $newChildrenTop (MATCH: ${oldChild != null})");
       final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
@@ -480,7 +477,6 @@ abstract class Element implements BuildContext {
       if (oldChild != null) {
         final Key? key = oldChild.component.key;
         if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
-          print("DEACTIVATE MIDDLE $oldChildrenTop");
           deactivateChild(oldChild);
         }
       }
@@ -495,7 +491,6 @@ abstract class Element implements BuildContext {
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element oldChild = oldChildren[oldChildrenTop];
       final Component newComponent = newComponents[newChildrenTop];
-      print("UPDATE BOTTOM $newChildrenTop");
       final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
