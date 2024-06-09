@@ -5,11 +5,12 @@ class _InactiveElements {
 
   void _unmount(Element element, bool detachNode) {
     assert(element._lifecycleState == _ElementLifecycle.inactive);
+    var isRenderObject = element is RenderObjectElement;
     element.visitChildren((Element child) {
       assert(child._parent == element);
-      _unmount(child, detachNode && element is! RenderObjectElement);
+      _unmount(child, detachNode && !isRenderObject);
     });
-    if (element is RenderObjectElement && detachNode) {
+    if (detachNode && isRenderObject) {
       element.detachRenderObject();
     }
     element.unmount();
