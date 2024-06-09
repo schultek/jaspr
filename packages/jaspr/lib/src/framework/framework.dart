@@ -1002,7 +1002,7 @@ abstract class Element implements BuildContext {
   void detachRenderObject() {
     visitChildren((Element child) {
       assert(child._parent == this);
-      detachRenderObject();
+      child.detachRenderObject();
     });
   }
 
