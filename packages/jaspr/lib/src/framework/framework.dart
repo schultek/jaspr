@@ -414,55 +414,77 @@ abstract class Element implements BuildContext {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenBottom]);
       final Component newComponent = newComponents[newChildrenBottom];
       if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
-      print("SKIP BOTTOM $oldChildrenBottom");
       oldChildrenBottom -= 1;
       newChildrenBottom -= 1;
     }
 
-    // Scan the old children in the middle of the list.
-    final bool haveOldChildren = oldChildrenTop <= oldChildrenBottom;
-    Map<Key, Element>? oldKeyedChildren;
-    if (haveOldChildren) {
-      oldKeyedChildren = <Key, Element>{};
-      while (oldChildrenTop <= oldChildrenBottom) {
-        final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
-        if (oldChild != null) {
-          if (oldChild.component.key != null) {
-            oldKeyedChildren[oldChild.component.key!] = oldChild;
-          } else {
-            deactivateChild(oldChild);
-          }
-        }
-        print("DEACTIVATE OR SKIP MIDDLE $oldChildrenTop");
-        oldChildrenTop += 1;
-      }
-    }
-
-    // Update the middle of the list.
-    while (newChildrenTop <= newChildrenBottom) {
-      Element? oldChild;
-      final Component newComponent = newComponents[newChildrenTop];
-      if (haveOldChildren) {
+    Map<Key, Element>? retakeOldKeyedChildren;
+    if (newChildrenTop <= newChildrenBottom && oldChildrenTop <= oldChildrenBottom) {
+      final Map<Key, Component> newKeyedChildren = {};
+      var newChildrenTopPeek = newChildrenTop;
+      while (newChildrenTopPeek <= newChildrenBottom) {
+        final Component newComponent = newComponents[newChildrenTop];
         final Key? key = newComponent.key;
         if (key != null) {
-          oldChild = oldKeyedChildren![key];
-          if (oldChild != null) {
-            if (Component.canUpdate(oldChild.component, newComponent)) {
-              // we found a match!
-              // remove it from oldKeyedChildren so we don't unsync it later
-              oldKeyedChildren.remove(key);
-            } else {
-              // Not a match, let's pretend we didn't see it for now.
-              oldChild = null;
+          newKeyedChildren[key] = component;
+        }
+        newChildrenTopPeek += 1;
+      }
+
+      retakeOldKeyedChildren = {};
+      var oldChildrenTopPeek = oldChildrenTop;
+      while (oldChildrenTopPeek <= oldChildrenBottom) {
+        final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
+        if (oldChild != null) {
+          final Key? key = oldChild.component.key;
+          if (key != null) {
+            final Component? newComponent = newKeyedChildren[key];
+            if (newComponent != null && Component.canUpdate(oldChild.component, newComponent)) {
+              retakeOldKeyedChildren[key] = oldChild;
             }
           }
         }
+        oldChildrenTopPeek += 1;
       }
+    }
+
+    while (newChildrenTop <= newChildrenBottom) {
+      if (newChildrenTop > oldChildrenTop && oldChildrenTop <= oldChildrenBottom) {
+        final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
+        if (oldChild != null) {
+          final Key? key = oldChild.component.key;
+          if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
+            print("DEACTIVATE MIDDLE $oldChildrenTop");
+            deactivateChild(oldChild);
+          }
+        }
+        oldChildrenTop += 1;
+      }
+
+      Element? oldChild;
+      final Component newComponent = newComponents[newChildrenTop];
+      final Key? key = newComponent.key;
+      if (key != null) {
+        oldChild = retakeOldKeyedChildren?[key];
+      }
+
       print("ACTIVATE MIDDLE $newChildrenTop (MATCH: ${oldChild != null})");
       final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
+    }
+
+    while (oldChildrenTop <= oldChildrenBottom) {
+      final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
+      if (oldChild != null) {
+        final Key? key = oldChild.component.key;
+        if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
+          print("DEACTIVATE MIDDLE $oldChildrenTop");
+          deactivateChild(oldChild);
+        }
+      }
+      oldChildrenTop += 1;
     }
 
     // We've scanned the whole list.
@@ -479,16 +501,6 @@ abstract class Element implements BuildContext {
       prevChild = newChild;
       newChildrenTop += 1;
       oldChildrenTop += 1;
-    }
-
-    // Clean up any of the remaining middle nodes from the old list.
-    if (haveOldChildren && oldKeyedChildren!.isNotEmpty) {
-      for (final Element oldChild in oldKeyedChildren.values) {
-        if (forgottenChildren == null || !forgottenChildren.contains(oldChild)) {
-          print("DEACTIVATE KEYED");
-          deactivateChild(oldChild);
-        }
-      }
     }
 
     assert(newChildren.every((element) => element != null));
