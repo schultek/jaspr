@@ -73,18 +73,28 @@ class DomElement extends ProxyRenderObjectElement {
 
   @override
   void updateRenderObject() {
-    DomComponent? wrappingComponent;
     if (_wrappingElement != null) {
-      wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
+      var wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
+
+      renderObject.updateElement(
+        component.tag,
+        component.id ?? wrappingComponent.id,
+        _join(wrappingComponent.classes, component.classes, (a, b) => '$a $b'),
+        _join(wrappingComponent.styles?.styles, component.styles?.styles, (a, b) => {...a, ...b}),
+        _join(wrappingComponent.attributes, component.attributes, (a, b) => {...a, ...b}),
+        _join(wrappingComponent.events, component.events, (a, b) => {...a, ...b}),
+      );
+
+      return;
     }
 
     renderObject.updateElement(
       component.tag,
-      component.id ?? wrappingComponent?.id,
-      _join(wrappingComponent?.classes, component.classes, (a, b) => '$a $b'),
-      _join(wrappingComponent?.styles?.styles, component.styles?.styles, (a, b) => {...a, ...b}),
-      _join(wrappingComponent?.attributes, component.attributes, (a, b) => {...a, ...b}),
-      _join(wrappingComponent?.events, component.events, (a, b) => {...a, ...b}),
+      component.id,
+      component.classes,
+      component.styles?.styles,
+      component.attributes,
+      component.events,
     );
   }
 
