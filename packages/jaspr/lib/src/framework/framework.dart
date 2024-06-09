@@ -401,6 +401,7 @@ abstract class Element implements BuildContext {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
       final Component newComponent = newComponents[newChildrenTop];
       if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
+      print("UPDATE TOP $oldChildrenTop");
       final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
@@ -413,6 +414,7 @@ abstract class Element implements BuildContext {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenBottom]);
       final Component newComponent = newComponents[newChildrenBottom];
       if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
+      print("SKIP BOTTOM $oldChildrenBottom");
       oldChildrenBottom -= 1;
       newChildrenBottom -= 1;
     }
@@ -431,6 +433,7 @@ abstract class Element implements BuildContext {
             deactivateChild(oldChild);
           }
         }
+        print("DEACTIVATE OR SKIP MIDDLE $oldChildrenTop");
         oldChildrenTop += 1;
       }
     }
@@ -455,6 +458,7 @@ abstract class Element implements BuildContext {
           }
         }
       }
+      print("ACTIVATE MIDDLE $newChildrenTop (MATCH: ${oldChild != null})");
       final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
@@ -469,6 +473,7 @@ abstract class Element implements BuildContext {
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element oldChild = oldChildren[oldChildrenTop];
       final Component newComponent = newComponents[newChildrenTop];
+      print("UPDATE BOTTOM $newChildrenTop");
       final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
@@ -479,7 +484,10 @@ abstract class Element implements BuildContext {
     // Clean up any of the remaining middle nodes from the old list.
     if (haveOldChildren && oldKeyedChildren!.isNotEmpty) {
       for (final Element oldChild in oldKeyedChildren.values) {
-        if (forgottenChildren == null || !forgottenChildren.contains(oldChild)) deactivateChild(oldChild);
+        if (forgottenChildren == null || !forgottenChildren.contains(oldChild)) {
+          print("DEACTIVATE KEYED");
+          deactivateChild(oldChild);
+        }
       }
     }
 
