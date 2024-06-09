@@ -3,16 +3,12 @@ part of 'framework.dart';
 class _InactiveElements {
   final Set<Element> _elements = HashSet<Element>();
 
-  void _unmount(Element element, bool detachNode) {
+  void _unmount(Element element) {
     assert(element._lifecycleState == _ElementLifecycle.inactive);
-    var isRenderObject = element is RenderObjectElement;
     element.visitChildren((Element child) {
       assert(child._parent == element);
-      _unmount(child, detachNode && !isRenderObject);
+      _unmount(child);
     });
-    if (detachNode && isRenderObject) {
-      element.detachRenderObject();
-    }
     element.unmount();
     assert(element._lifecycleState == _ElementLifecycle.defunct);
   }
@@ -21,8 +17,11 @@ class _InactiveElements {
     final List<Element> elements = _elements.toList()..sort(Element._sort);
     _elements.clear();
 
+    for (var e in elements) {
+      e.detachRenderObject();
+    }
     for (var e in elements.reversed) {
-      _unmount(e, true);
+      _unmount(e);
     }
     assert(_elements.isEmpty);
   }

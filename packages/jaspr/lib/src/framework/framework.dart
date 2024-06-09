@@ -999,6 +999,13 @@ abstract class Element implements BuildContext {
 
   void attachRenderObject() {}
 
+  void detachRenderObject() {
+    visitChildren((Element child) {
+      assert(child._parent == this);
+      detachRenderObject();
+    });
+  }
+
   @override
   void dispatchNotification(Notification notification) {
     _notificationTree?.dispatchNotification(notification);
