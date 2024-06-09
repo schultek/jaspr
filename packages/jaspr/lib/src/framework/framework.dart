@@ -422,7 +422,7 @@ abstract class Element implements BuildContext {
       final Map<Key, Component> newKeyedChildren = {};
       var newChildrenTopPeek = newChildrenTop;
       while (newChildrenTopPeek <= newChildrenBottom) {
-        final Component newComponent = newComponents[newChildrenTop];
+        final Component newComponent = newComponents[newChildrenTopPeek];
         final Key? key = newComponent.key;
         if (key != null) {
           newKeyedChildren[key] = newComponent;
@@ -434,7 +434,7 @@ abstract class Element implements BuildContext {
         retakeOldKeyedChildren = {};
         var oldChildrenTopPeek = oldChildrenTop;
         while (oldChildrenTopPeek <= oldChildrenBottom) {
-          final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
+          final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTopPeek]);
           if (oldChild != null) {
             final Key? key = oldChild.component.key;
             if (key != null) {
