@@ -425,25 +425,27 @@ abstract class Element implements BuildContext {
         final Component newComponent = newComponents[newChildrenTop];
         final Key? key = newComponent.key;
         if (key != null) {
-          newKeyedChildren[key] = component;
+          newKeyedChildren[key] = newComponent;
         }
         newChildrenTopPeek += 1;
       }
 
-      retakeOldKeyedChildren = {};
-      var oldChildrenTopPeek = oldChildrenTop;
-      while (oldChildrenTopPeek <= oldChildrenBottom) {
-        final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
-        if (oldChild != null) {
-          final Key? key = oldChild.component.key;
-          if (key != null) {
-            final Component? newComponent = newKeyedChildren[key];
-            if (newComponent != null && Component.canUpdate(oldChild.component, newComponent)) {
-              retakeOldKeyedChildren[key] = oldChild;
+      if (newKeyedChildren.isNotEmpty) {
+        retakeOldKeyedChildren = {};
+        var oldChildrenTopPeek = oldChildrenTop;
+        while (oldChildrenTopPeek <= oldChildrenBottom) {
+          final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
+          if (oldChild != null) {
+            final Key? key = oldChild.component.key;
+            if (key != null) {
+              final Component? newComponent = newKeyedChildren[key];
+              if (newComponent != null && Component.canUpdate(oldChild.component, newComponent)) {
+                retakeOldKeyedChildren[key] = oldChild;
+              }
             }
           }
+          oldChildrenTopPeek += 1;
         }
-        oldChildrenTopPeek += 1;
       }
     }
 
