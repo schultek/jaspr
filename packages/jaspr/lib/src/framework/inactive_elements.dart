@@ -17,9 +17,6 @@ class _InactiveElements {
     final List<Element> elements = _elements.toList()..sort(Element._sort);
     _elements.clear();
 
-    for (var e in elements) {
-      e.detachRenderObject();
-    }
     for (var e in elements.reversed) {
       _unmount(e);
     }
@@ -36,7 +33,10 @@ class _InactiveElements {
   void add(Element element) {
     assert(!_elements.contains(element));
     assert(element._parent == null);
-    if (element._lifecycleState == _ElementLifecycle.active) _deactivateRecursively(element);
+    if (element._lifecycleState == _ElementLifecycle.active) {
+      element.detachRenderObject();
+      _deactivateRecursively(element);
+    }
     _elements.add(element);
   }
 
