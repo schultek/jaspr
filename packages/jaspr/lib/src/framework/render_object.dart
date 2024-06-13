@@ -66,6 +66,7 @@ mixin RenderObjectElement on Element {
   @override
   void didUpdate(Component oldComponent) {
     if (_dirtyRender) {
+      _dirtyRender = false;
       updateRenderObject();
     }
     super.didUpdate(oldComponent);

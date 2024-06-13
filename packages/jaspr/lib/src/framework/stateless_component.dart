@@ -119,6 +119,13 @@ abstract class StatelessComponent extends Component {
   @protected
   Iterable<Component> build(BuildContext context);
 
+  /// Implement this method to determine whether a rebuild can be skipped.
+  ///
+  /// This method will be called whenever the component is about to update. If returned false, the subsequent rebuild will be skipped.
+  ///
+  /// This method exists only as a performance optimization and gives no guarantees about when the component is rebuilt.
+  /// Keep the implementation as efficient as possible and avoid deep (recursive) comparisons or performance heavy checks, as this might
+  /// have an opposite effect on performance.
   bool shouldRebuild(covariant Component newComponent) {
     return true;
   }
