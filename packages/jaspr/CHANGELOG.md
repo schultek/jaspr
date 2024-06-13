@@ -1,3 +1,8 @@
+## Unreleased minor
+
+- Improved the performance of the building and diffing algorithm, and other performance improvements.
+- Added `StatelessComponent.shouldRebuild` and `State.shouldRebuild` for possible skipping rebuilds as a performance improvement.
+
 ## 0.13.1
 
 - Fixed namespace handling for nested svg elements.

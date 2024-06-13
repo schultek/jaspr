@@ -89,11 +89,9 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
 
   @override
   void scheduleFrame(VoidCallback frameCallback) {
-    // This seems to give the best results over futures and microtasks
-    // Needs to be inspected in more detail
-    window.requestAnimationFrame((highResTime) {
-      frameCallback();
-    });
+    // We want the build to trigger asynchronously (to batch updates), but as soon as possible.
+    // Microtasks are run before other tasks or events.
+    scheduleMicrotask(frameCallback);
   }
 
   static late Future<void> Function({Function? runApp}) warmupFlutterEngine;
