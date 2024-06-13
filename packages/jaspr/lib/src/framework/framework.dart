@@ -450,7 +450,7 @@ abstract class Element implements BuildContext {
     }
 
     while (newChildrenTop <= newChildrenBottom) {
-      if (newChildrenTop > oldChildrenTop && oldChildrenTop <= oldChildrenBottom) {
+      if (oldChildrenTop <= oldChildrenBottom) {
         final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
         if (oldChild != null) {
           final Key? key = oldChild.component.key;
