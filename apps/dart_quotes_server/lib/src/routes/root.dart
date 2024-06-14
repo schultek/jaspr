@@ -12,7 +12,6 @@ import '../../web/pages/quote_page.dart';
 class RootRoute extends JasprRoute {
   @override
   Future<Component> build(Session session, HttpRequest request) async {
-    print("RENDER ${await session.auth.authenticatedUserId}");
     return Document(
       title: 'Dart Quotes',
       lang: 'en',

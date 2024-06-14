@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/module.dart' as auth;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 
 import 'jaspr_options.dart';
 import 'src/generated/endpoints.dart';
@@ -17,6 +17,7 @@ void run(List<String> args) async {
     args,
     Protocol(),
     Endpoints(),
+    authenticationHandler: auth.authenticationHandler,
   );
 
   Jaspr.initializeApp(options: defaultJasprOptions, useIsolates: false);

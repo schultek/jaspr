@@ -12,7 +12,7 @@ library protocol; // ignore_for_file: no_leading_underscores_for_library_prefixe
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'quote.dart' as _i2;
 import 'quote_init.dart' as _i3;
-import 'package:serverpod_auth_client/module.dart' as _i4;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i4;
 export 'quote.dart';
 export 'quote_init.dart';
 export 'client.dart';
@@ -22,8 +22,6 @@ class Protocol extends _i1.SerializationManager {
 
   factory Protocol() => _instance;
 
-  static final Map<Type, _i1.constructor> customConstructors = {};
-
   static final Protocol _instance = Protocol._();
 
   @override
@@ -32,27 +30,24 @@ class Protocol extends _i1.SerializationManager {
     Type? t,
   ]) {
     t ??= T;
-    if (customConstructors.containsKey(t)) {
-      return customConstructors[t]!(data, this) as T;
-    }
     if (t == _i2.Quote) {
-      return _i2.Quote.fromJson(data, this) as T;
+      return _i2.Quote.fromJson(data) as T;
     }
     if (t == _i3.QuoteInit) {
-      return _i3.QuoteInit.fromJson(data, this) as T;
+      return _i3.QuoteInit.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.Quote?>()) {
-      return (data != null ? _i2.Quote.fromJson(data, this) : null) as T;
+      return (data != null ? _i2.Quote.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i3.QuoteInit?>()) {
-      return (data != null ? _i3.QuoteInit.fromJson(data, this) : null) as T;
+      return (data != null ? _i3.QuoteInit.fromJson(data) : null) as T;
     }
     if (t == List<int>) {
       return (data as List).map((e) => deserialize<int>(e)).toList() as dynamic;
     }
     try {
       return _i4.Protocol().deserialize<T>(data, t);
-    } catch (_) {}
+    } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
 

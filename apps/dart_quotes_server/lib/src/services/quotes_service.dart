@@ -14,8 +14,9 @@ class QuotesService {
   }
 
   static Future<Quote?> toggleLikeOnQuote(Session session, int id, bool liked) async {
-    var userId = await session.auth.authenticatedUserId;
-    if (userId == null) return null;
+    var userInfo = await session.authenticated;
+    if (userInfo == null) return null;
+    var userId = userInfo.userId;
 
     var quote = await getQuoteById(session, id);
     if (quote == null) return null;

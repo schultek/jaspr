@@ -14,7 +14,7 @@ class QuotesEndpoint extends Endpoint {
   @override
   Future<void> handleStreamMessage(
     StreamingSession session,
-    SerializableEntity message,
+    SerializableModel message,
   ) async {
     if (message is QuoteInit) {
       var quote = await QuotesService.getQuoteById(session, message.id);

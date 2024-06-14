@@ -10,7 +10,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 
-abstract class Quote extends _i1.SerializableEntity {
+abstract class Quote implements _i1.SerializableModel {
   Quote._({
     this.id,
     required this.quote,
@@ -25,18 +25,12 @@ abstract class Quote extends _i1.SerializableEntity {
     required List<int> likes,
   }) = _QuoteImpl;
 
-  factory Quote.fromJson(
-    Map<String, dynamic> jsonSerialization,
-    _i1.SerializationManager serializationManager,
-  ) {
+  factory Quote.fromJson(Map<String, dynamic> jsonSerialization) {
     return Quote(
-      id: serializationManager.deserialize<int?>(jsonSerialization['id']),
-      quote:
-          serializationManager.deserialize<String>(jsonSerialization['quote']),
-      author:
-          serializationManager.deserialize<String>(jsonSerialization['author']),
-      likes: serializationManager
-          .deserialize<List<int>>(jsonSerialization['likes']),
+      id: jsonSerialization['id'] as int?,
+      quote: jsonSerialization['quote'] as String,
+      author: jsonSerialization['author'] as String,
+      likes: (jsonSerialization['likes'] as List).map((e) => e as int).toList(),
     );
   }
 
@@ -65,6 +59,11 @@ abstract class Quote extends _i1.SerializableEntity {
       'author': author,
       'likes': likes.toJson(),
     };
+  }
+
+  @override
+  String toString() {
+    return _i1.SerializationManager.encode(this);
   }
 }
 
