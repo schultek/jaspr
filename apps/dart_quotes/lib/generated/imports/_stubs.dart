@@ -3,6 +3,8 @@
 
 // ignore_for_file: directives_ordering, non_constant_identifier_names
 
+dynamic JSConfetti;
+typedef JSConfettiOrStubbed = dynamic;
 dynamic Firebase;
 dynamic FirebaseApp;
 typedef FirebaseOrStubbed = dynamic;
@@ -23,5 +25,3 @@ typedef FirebaseAdminAppOrStubbed = dynamic;
 typedef CredentialOrStubbed = dynamic;
 dynamic Firestore;
 typedef FirestoreOrStubbed = dynamic;
-dynamic JSConfetti;
-typedef JSConfettiOrStubbed = dynamic;

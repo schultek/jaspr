@@ -62,7 +62,9 @@ jobs:
       - name: Commit Versions
         if: steps.bump.outputs.did_bump != '0'
         run: |
-          git add .
+          git add apps/
+          git add examples/
+          git add packages/
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -m "${{ steps.bump.outputs.commit_message }}" \
             --author="${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"

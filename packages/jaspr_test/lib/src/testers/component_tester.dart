@@ -14,7 +14,7 @@ void testComponents(
   String description,
   FutureOr<void> Function(ComponentTester tester) callback, {
   Uri? uri,
-  bool isClient = false,
+  bool isClient = true,
   bool? skip,
   Timeout? timeout,
   dynamic tags,
@@ -121,7 +121,8 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
 
   @override
   String? getRawState(String id) {
-    throw UnimplementedError();
+    if (!isClient) throw UnimplementedError();
+    return null;
   }
 
   @override

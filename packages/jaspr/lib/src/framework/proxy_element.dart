@@ -44,14 +44,8 @@ abstract class ProxyElement extends Element {
   }
 
   @override
-  void update(ProxyComponent newComponent) {
-    super.update(newComponent);
-    _dirty = true;
-  }
-
-  @override
-  void didUpdate(ProxyComponent oldComponent) {
-    rebuild();
+  bool shouldRebuild(ProxyComponent newComponent) {
+    return true;
   }
 
   @override
@@ -100,6 +94,11 @@ abstract class LeafElement extends Element {
   void didMount() {
     rebuild();
     super.didMount();
+  }
+
+  @override
+  bool shouldRebuild(Component newComponent) {
+    return false;
   }
 
   @override

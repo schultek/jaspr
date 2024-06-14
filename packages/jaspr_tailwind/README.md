@@ -5,10 +5,33 @@ to write a lot of css.
 
 This package is a first-class tailwind integration for [jaspr](https://github.com/schultek/jaspr).
 
-## Setup
+## Prerequisites
 
-To use this package, you need both `node` and `npm` installed. 
-See [this guide](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for instructions.
+This package expects tailwind to be installed through the `tailwindcss` command. The recommended way is to use
+the [standalone tailwind cli](https://tailwindcss.com/blog/standalone-cli).
+
+To install it, download the executable for your platform from the [latest release](https://github.com/tailwindlabs/tailwindcss/releases/latest)
+on GitHub and give it executable permissions:
+
+```shell
+curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-<your-platform>
+chmod +x tailwindcss-<your-platform>
+```
+
+Next move it to a common executable location or add its location to your **PATH**:
+
+```shell
+# e.g. /usr/local/bin on unix based systems (linux, macos)
+mv tailwindcss-<your-platform> /usr/local/bin/tailwindcss
+```
+
+Test your installation by typing in your terminal:
+
+```shell
+tailwindcss -h
+```
+
+# Setup
 
 To start, add `jaspr_tailwind` as a dev dependency to your project:
 

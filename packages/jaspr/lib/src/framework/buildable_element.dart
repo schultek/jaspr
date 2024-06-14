@@ -36,14 +36,8 @@ abstract class BuildableElement extends Element {
   }
 
   @override
-  void update(Component newComponent) {
-    super.update(newComponent);
-    _dirty = true;
-  }
-
-  @override
-  void didUpdate(Component oldComponent) {
-    rebuild();
+  bool shouldRebuild(Component newComponent) {
+    return true;
   }
 
   @override

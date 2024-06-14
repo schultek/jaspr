@@ -1,6 +1,13 @@
-## Unreleased patch
+## 0.13.2
+
+- Improved the performance of the building and diffing algorithm, and other performance improvements.
+- Added `StatelessComponent.shouldRebuild` and `State.shouldRebuild` for possible skipping rebuilds as a performance improvement.
+
+## 0.13.1
 
 - Fixed namespace handling for nested svg elements.
+- Fixed global key conflicts during server-side rendering by disabling them on the server.
+- Change `testComponents(isClient: _)` default to true.
 
 ## 0.13.0
 

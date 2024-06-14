@@ -417,48 +417,72 @@ abstract class Element implements BuildContext {
       newChildrenBottom -= 1;
     }
 
-    // Scan the old children in the middle of the list.
-    final bool haveOldChildren = oldChildrenTop <= oldChildrenBottom;
-    Map<Key, Element>? oldKeyedChildren;
-    if (haveOldChildren) {
-      oldKeyedChildren = <Key, Element>{};
-      while (oldChildrenTop <= oldChildrenBottom) {
+    Map<Key, Element>? retakeOldKeyedChildren;
+    if (newChildrenTop <= newChildrenBottom && oldChildrenTop <= oldChildrenBottom) {
+      final Map<Key, Component> newKeyedChildren = {};
+      var newChildrenTopPeek = newChildrenTop;
+      while (newChildrenTopPeek <= newChildrenBottom) {
+        final Component newComponent = newComponents[newChildrenTopPeek];
+        final Key? key = newComponent.key;
+        if (key != null) {
+          newKeyedChildren[key] = newComponent;
+        }
+        newChildrenTopPeek += 1;
+      }
+
+      if (newKeyedChildren.isNotEmpty) {
+        retakeOldKeyedChildren = {};
+        var oldChildrenTopPeek = oldChildrenTop;
+        while (oldChildrenTopPeek <= oldChildrenBottom) {
+          final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTopPeek]);
+          if (oldChild != null) {
+            final Key? key = oldChild.component.key;
+            if (key != null) {
+              final Component? newComponent = newKeyedChildren[key];
+              if (newComponent != null && Component.canUpdate(oldChild.component, newComponent)) {
+                retakeOldKeyedChildren[key] = oldChild;
+              }
+            }
+          }
+          oldChildrenTopPeek += 1;
+        }
+      }
+    }
+
+    while (newChildrenTop <= newChildrenBottom) {
+      if (oldChildrenTop <= oldChildrenBottom) {
         final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
         if (oldChild != null) {
-          if (oldChild.component.key != null) {
-            oldKeyedChildren[oldChild.component.key!] = oldChild;
-          } else {
+          final Key? key = oldChild.component.key;
+          if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
             deactivateChild(oldChild);
           }
         }
         oldChildrenTop += 1;
       }
-    }
 
-    // Update the middle of the list.
-    while (newChildrenTop <= newChildrenBottom) {
       Element? oldChild;
       final Component newComponent = newComponents[newChildrenTop];
-      if (haveOldChildren) {
-        final Key? key = newComponent.key;
-        if (key != null) {
-          oldChild = oldKeyedChildren![key];
-          if (oldChild != null) {
-            if (Component.canUpdate(oldChild.component, newComponent)) {
-              // we found a match!
-              // remove it from oldKeyedChildren so we don't unsync it later
-              oldKeyedChildren.remove(key);
-            } else {
-              // Not a match, let's pretend we didn't see it for now.
-              oldChild = null;
-            }
-          }
-        }
+      final Key? key = newComponent.key;
+      if (key != null) {
+        oldChild = retakeOldKeyedChildren?[key];
       }
+
       final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
+    }
+
+    while (oldChildrenTop <= oldChildrenBottom) {
+      final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
+      if (oldChild != null) {
+        final Key? key = oldChild.component.key;
+        if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
+          deactivateChild(oldChild);
+        }
+      }
+      oldChildrenTop += 1;
     }
 
     // We've scanned the whole list.
@@ -474,13 +498,6 @@ abstract class Element implements BuildContext {
       prevChild = newChild;
       newChildrenTop += 1;
       oldChildrenTop += 1;
-    }
-
-    // Clean up any of the remaining middle nodes from the old list.
-    if (haveOldChildren && oldKeyedChildren!.isNotEmpty) {
-      for (final Element oldChild in oldKeyedChildren.values) {
-        if (forgottenChildren == null || !forgottenChildren.contains(oldChild)) deactivateChild(oldChild);
-      }
     }
 
     assert(newChildren.every((element) => element != null));
@@ -527,7 +544,7 @@ abstract class Element implements BuildContext {
     assert(_binding != null);
 
     final Key? key = component.key;
-    if (key is GlobalKey) {
+    if (key is GlobalKey && binding.isClient) {
       ComponentsBinding._registerGlobalKey(key, this);
     }
     _updateInheritance();
@@ -553,10 +570,26 @@ abstract class Element implements BuildContext {
     assert(newComponent != component);
     assert(_depth != null);
     assert(Component.canUpdate(component, newComponent));
+    if (shouldRebuild(newComponent)) {
+      _dirty = true;
+    }
     _component = newComponent;
   }
 
-  void didUpdate(covariant Component oldComponent) {}
+  void didUpdate(covariant Component oldComponent) {
+    if (_dirty) {
+      rebuild();
+    }
+  }
+
+  /// Implement this method to determine whether a rebuild can be skipped.
+  ///
+  /// This method will be called whenever the component is about to update. If returned false, the subsequent rebuild will be skipped.
+  ///
+  /// This method exists only as a performance optimization and gives no guarantees about when the component is rebuilt.
+  /// Keep the implementation as efficient as possible and avoid deep (recursive) comparisons or performance heavy checks, as this might
+  /// have an opposite effect on performance.
+  bool shouldRebuild(covariant Component newComponent);
 
   void _updateDepth(int parentDepth) {
     final int expectedDepth = parentDepth + 1;
@@ -989,6 +1022,13 @@ abstract class Element implements BuildContext {
   void performRebuild();
 
   void attachRenderObject() {}
+
+  void detachRenderObject() {
+    visitChildren((Element child) {
+      assert(child._parent == this);
+      child.detachRenderObject();
+    });
+  }
 
   @override
   void dispatchNotification(Notification notification) {

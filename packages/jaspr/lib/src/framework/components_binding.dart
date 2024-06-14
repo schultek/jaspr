@@ -67,7 +67,7 @@ class _Root extends ProxyComponent {
   _RootElement createElement() => _RootElement(this);
 }
 
-class _RootElement extends ProxyElement with RenderObjectElement {
+class _RootElement extends ProxyRenderObjectElement {
   _RootElement(_Root super.component);
 
   @override
