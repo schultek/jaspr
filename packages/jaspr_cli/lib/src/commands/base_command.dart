@@ -86,7 +86,7 @@ abstract class BaseCommand extends Command<CommandResult?> {
     exit(exitCode);
   }
 
-  Future<String> getEntryPoint(String? input) async {
+  Future<String> getEntryPoint(String? input, [bool forceInsideLib = false]) async {
     var entryPoint = input ?? 'lib/main.dart';
 
     if (!File(entryPoint).absolute.existsSync()) {
@@ -96,7 +96,7 @@ abstract class BaseCommand extends Command<CommandResult?> {
       await shutdown();
     }
 
-    if (!entryPoint.startsWith('lib/')) {
+    if (forceInsideLib && !entryPoint.startsWith('lib/')) {
       logger.write("Entry point must be located inside lib/ folder, got '$entryPoint'.", level: Level.critical);
       await shutdown();
     }

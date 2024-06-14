@@ -1,0 +1,22 @@
+name: example_server
+description: Starting point for a Serverpod server.
+# version: 1.0.0
+# homepage: https://www.example.com
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  jaspr: ^0.13.0
+  jaspr_serverpod: ^0.1.0
+  serverpod: ^1.2.7
+
+dev_dependencies:
+  build_runner: ^2.4.8
+  build_web_compilers: ^4.0.9
+  jaspr_builder: ^0.13.0
+  lints: ^3.0.0
+
+jaspr:
+  mode: server
+  dev-command: dart bin/main.dart
