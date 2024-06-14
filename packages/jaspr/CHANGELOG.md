@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.13.2
 
 - Improved the performance of the building and diffing algorithm, and other performance improvements.
 - Added `StatelessComponent.shouldRebuild` and `State.shouldRebuild` for possible skipping rebuilds as a performance improvement.
