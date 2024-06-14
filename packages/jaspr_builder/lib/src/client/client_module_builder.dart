@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
+import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
 
 import '../utils.dart';
@@ -92,7 +93,9 @@ class ClientModuleBuilder implements Builder {
       import '$moduleImport' as a;
       
       void main() {
-        runAppWithParams(getComponentForParams);
+        registerClientsSync({
+          '${path.url.relative(path.url.withoutExtension(path.url.withoutExtension(module.id.path)), from: 'lib')}': getComponentForParams,
+        });
       }
       
       Component getComponentForParams(ConfigParams p) {

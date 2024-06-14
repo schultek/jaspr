@@ -21,8 +21,7 @@ class SyncScriptAdapter extends HeadScopeAdapter {
     head.children.insertBefore(
       head.createChildRenderObject()
         ..tag = 'script'
-        ..children.insertAfter(head.createChildRenderObject()..updateText(source, true))
-        ..updateElement('script', null, null, null, null, null),
+        ..children.insertAfter(head.createChildRenderObject()..text = source),
     );
   }
 }

@@ -3,25 +3,39 @@ import 'dart:html' as html;
 import '../../../browser.dart';
 
 class RawText extends StatelessComponent {
-  const RawText(this.text, {super.key});
+  const RawText(this.text, {this.elementFactories = const {}, super.key});
 
   final String text;
+  final ElementFactories elementFactories;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     var fragment = html.document.createDocumentFragment()..setInnerHtml(text, validator: AllowAll());
     for (var node in fragment.childNodes) {
-      yield RawNode.withKey(node);
+      yield elementFactories.buildNode(node);
     }
   }
 }
 
-class RawNode extends Component {
-  RawNode(this.node, {super.key});
+typedef ElementFactories = Map<String, ElementFactory>;
+typedef ElementFactory = Component Function(html.Element);
 
-  factory RawNode.withKey(html.Node node) {
+extension on ElementFactories {
+  Component buildNode(html.Node node) {
+    if (node is html.Element && containsKey(node.tagName.toLowerCase())) {
+      return this[node.tagName.toLowerCase()]!(node);
+    }
+    return RawNode.withKey(node, this);
+  }
+}
+
+class RawNode extends Component {
+  RawNode(this.node, {this.elementFactories = const {}, super.key});
+
+  factory RawNode.withKey(html.Node node, ElementFactories elementFactories) {
     return RawNode(
       node,
+      elementFactories: elementFactories,
       key: switch (node) {
         html.Text() => ValueKey('text'),
         html.Element(:var tagName) => ValueKey('element:$tagName'),
@@ -31,6 +45,7 @@ class RawNode extends Component {
   }
 
   final html.Node node;
+  final ElementFactories elementFactories;
 
   @override
   Element createElement() => RawNodeElement(this);
@@ -45,19 +60,20 @@ class RawNodeElement extends BuildableRenderObjectElement {
   @override
   Iterable<Component> build() sync* {
     for (var node in component.node.childNodes) {
-      yield RawNode.withKey(node);
+      yield component.elementFactories.buildNode(node);
     }
   }
 
   @override
   void updateRenderObject() {
-    var next = component.node;
-    if (next is html.Text) {
-      renderObject.updateText(next.text ?? '');
-    } else if (next is html.Element) {
-      renderObject.updateElement(next.tagName.toLowerCase(), next.id, next.className, null, next.attributes, null);
+    var node = component.node;
+    if (node is html.Text) {
+      renderObject.updateText(node.text ?? '');
+    } else if (node is html.Element) {
+      renderObject.updateElement(node.tagName.toLowerCase(), node.id, node.className, null, node.attributes, null);
     } else {
       var curr = (renderObject as DomRenderObject).node;
+      var next = node.clone(true);
       if (curr != null) {
         curr.replaceWith(next);
       }

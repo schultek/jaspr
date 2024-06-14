@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import '../../jaspr.dart';
-import 'adapters/client_component_adapter.dart';
 import 'adapters/document_adapter.dart';
 import 'adapters/sync_script_adapter.dart';
 import 'async_build_owner.dart';
+import 'components/client_component_registry.dart';
 import 'markup_render_object.dart';
 
 /// Global component binding for the server
@@ -32,21 +32,18 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     await rootCompleter.future;
 
     var root = rootElement!.renderObject as MarkupRenderObject;
-    var adapters = [
-      ..._adapters.reversed,
-      SyncScriptAdapter(getStateData),
-      DocumentAdapter(),
-    ];
 
-    for (var adapter in adapters.reversed) {
-      var r = adapter.prepare();
+    // Prepare from outer to inner.
+    for (var i = 0; i < _adapters.length; i++) {
+      var r = _adapters[i].prepare();
       if (r is Future) {
         await r;
       }
     }
 
-    for (var adapter in adapters) {
-      adapter.apply(root);
+    // Apply from inner to outer;
+    for (var i = _adapters.length - 1; i >= 0; i--) {
+      _adapters[i].apply(root);
     }
 
     return root.renderToHtml();
@@ -91,10 +88,13 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   Future<String?> loadFile(String name) => _fileHandler(name);
 
-  late final List<RenderAdapter> _adapters = [];
+  late final List<RenderAdapter> _adapters = [
+    DocumentAdapter(),
+    SyncScriptAdapter(getStateData),
+  ];
 
   void addRenderAdapter(RenderAdapter adapter) {
-    _adapters.add(adapter);
+    _adapters.add(adapter..binding = this);
   }
 
   JasprOptions get options => _options!;
@@ -111,6 +111,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 }
 
 abstract class RenderAdapter {
+  late ServerAppBinding binding;
   FutureOr<void> prepare() {}
   void apply(MarkupRenderObject root) {}
 }

@@ -1,68 +1,74 @@
-import '../../framework/framework.dart';
+import 'dart:convert';
+
+import '../../../jaspr.dart';
 import '../child_nodes.dart';
 import '../markup_render_object.dart';
-import '../server_binding.dart';
 import 'client_script_adapter.dart';
 import 'element_boundary_adapter.dart';
+import 'server_component_adapter.dart';
 
 class ClientComponentAdapter extends ElementBoundaryAdapter {
-  ClientComponentAdapter(this.name, this.data, super.element);
+  ClientComponentAdapter(this.adapter, this.target, super.element);
 
-  final String name;
-  final String? data;
+  final ClientScriptAdapter adapter;
+  final ClientTarget target;
+
+  late String? data;
+
+  @override
+  void prepareBoundary(ChildListRange range) {
+    data = getData();
+  }
 
   @override
   void applyBoundary(ChildListRange range) {
-    range.start.insertNext(
-        ChildNodeData(MarkupRenderObject()..updateText('<!--\$$name${data != null ? ' data=$data' : ''}-->', true)));
-    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!--/\$$name-->', true)));
+    range.start.insertNext(ChildNodeData(
+        MarkupRenderObject()..updateText('<!--\$${target.name}${data != null ? ' data=$data' : ''}-->', true)));
+    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!--/\$${target.name}-->', true)));
   }
-}
 
-class ClientComponentRegistry extends ObserverComponent {
-  ClientComponentRegistry({required super.child, super.key});
-
-  @override
-  ObserverElement createElement() => ClientComponentRegistryElement(this);
-}
-
-class ClientComponentRegistryElement extends ObserverElement {
-  ClientComponentRegistryElement(super.component);
-
-  bool _didAddClientScript = false;
-  final List<Element> _clientElements = [];
-
-  @override
-  void willRebuildElement(Element element) {
-    var binding = this.binding as ServerAppBinding;
-
-    if (!_didAddClientScript) {
-      (binding).addRenderAdapter(ClientScriptAdapter(binding, _clientElements));
-      _didAddClientScript = true;
-    }
-
-    var entry = binding.options.targets[element.component.runtimeType];
-
-    if (entry == null) {
-      return;
-    }
-
-    var isClientBoundary = true;
-    element.visitAncestorElements((e) {
-      return isClientBoundary = !_clientElements.contains(e);
+  String? getData() {
+    var params = target.getParamsFor(element.component);
+    if (params == null) return null;
+    var data = jsonEncode(params, toEncodable: (o) {
+      if (o is Component) {
+        return getDataForServerComponent(o, element);
+      }
+      return o;
     });
-
-    if (!isClientBoundary) {
-      return;
-    }
-
-    _clientElements.add(element);
-    binding.addRenderAdapter(ClientComponentAdapter(entry.name, entry.dataFor(element.component), element));
+    return HtmlEscape(HtmlEscapeMode(escapeLtGt: true)).convert(data);
   }
 
-  @override
-  void didRebuildElement(Element element) {}
+  String getDataForServerComponent(Component component, Element parent) {
+    if (adapter.serverComponents[component] case var s?) {
+      return 's\$$s';
+    }
 
-  @override
-  void didUnmountElement(Element element) {}
+    Element? element;
+
+    void findElementFromContext(BuildContext context) {
+      context.visitChildElements((e) {
+        if (element != null) return;
+        if (identical(e.component, component)) {
+          element = e;
+        } else {
+          findElementFromContext(e);
+        }
+      });
+    }
+
+    findElementFromContext(parent);
+
+    if (element == null) {
+      adapter.serverComponents[component] = 0;
+      return '';
+    }
+
+    var s = adapter.serverComponents[component] = adapter.serverElementNum++;
+    adapter.serverElements[s] = element;
+
+    binding.addRenderAdapter(ServerComponentAdapter(s, element!));
+
+    return 's\$$s';
+  }
 }

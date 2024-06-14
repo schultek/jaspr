@@ -2,29 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 
-import '../framework/framework.dart';
-import 'browser_binding.dart';
+import '../../browser.dart';
 
-typedef ClientLoader = FutureOr<ClientBuilder> Function();
 typedef ClientBuilder = Component Function(ConfigParams);
+typedef ClientLoader = FutureOr<ClientBuilder> Function();
 
-class ConfigParams {
-  final Map<String, dynamic> _params;
-
-  ConfigParams(this._params);
-
-  T get<T>(String key) {
-    if (_params[key] is! T) {
-      print("$key is not $T: ${_params[key]}");
-    }
-    return _params[key];
-  }
-}
-
-void registerClientsSync(Map<String, ClientBuilder> clients) {
-  _applyClients((name) => clients[name]!);
-}
-
+/// Called by the shared client components entrypoint.
 void registerClients(Map<String, ClientLoader> clients) {
   final Map<String, ClientBuilder> builders = {};
   _applyClients((name) {
@@ -37,56 +20,131 @@ void registerClients(Map<String, ClientLoader> clients) {
   });
 }
 
+/// Helper method to get a client loader from a deferred import.
 ClientLoader loadClient(Future<void> Function() loader, ClientBuilder builder) {
   return () => loader().then((_) => builder);
 }
 
-void _runClient(ClientBuilder builder, ConfigParams params, (Node, Node) between) {
-  BrowserAppBinding().attachRootComponent(builder(params), attachBetween: between);
+/// Sync variant of [registerClients].
+void registerClientsSync(Map<String, ClientBuilder> clients) {
+  _applyClients((name) => clients[name]!);
 }
 
-final _compStartRegex = RegExp(r'^\$(\S+)(?:\s+data=(.*))?$');
-final _compEndRegex = RegExp(r'^/\$(\S+)$');
+class ConfigParams {
+  ConfigParams(this._params, this.serverComponents);
+
+  final Map<String, dynamic> _params;
+  final Map<String, (Node, Node)> serverComponents;
+
+  T get<T>(String key) {
+    if (T == Component) {
+      var sId = _params[key];
+      assert(sId is String && sId.startsWith(r's$'));
+      var s = serverComponents[sId.substring(2)];
+      if (s != null) {
+        var nodes = <Node>[];
+        Node? curr = s.$1.nextNode;
+        while (curr != null && curr != s.$2) {
+          nodes.add(curr.clone(true));
+          curr = curr.nextNode;
+        }
+
+        return Builder(builder: (context) {
+          return nodes.map((n) => RawNode(n));
+        }) as T;
+      } else {
+        return Text("") as T;
+      }
+    }
+    if (_params[key] is! T) {
+      print("$key is not $T: ${_params[key]}");
+    }
+    return _params[key];
+  }
+}
+
+final _clientStartRegex = RegExp(r'^\$(\S+)(?:\s+data=(.*))?$');
+final _clientEndRegex = RegExp(r'^/\$(\S+)$');
+
+final _serverStartRegex = RegExp(r'^s\$(\d+)$');
+final _serverEndRegex = RegExp(r'^/s\$(\d+)$');
 
 void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
   var iterator = NodeIterator(document, NodeFilter.SHOW_COMMENT);
 
-  List<(String, String?, Node)> nodes = [];
+  List<(String, String?, Node, Map<String, (Node, Node)>?, bool)> nodes = [];
 
   Comment? currNode;
   while ((currNode = iterator.nextNode() as Comment?) != null) {
     var value = currNode!.nodeValue ?? '';
-    var match = _compStartRegex.firstMatch(value);
+
+    print("VALUE $value");
+
+    var match = _clientStartRegex.firstMatch(value);
     if (match != null) {
+      assert(nodes.isEmpty || nodes.last.$5 == false,
+          "Found directly nested client component anchor, which is not allowed.");
+
       var name = match.group(1)!;
       var data = match.group(2);
+      nodes.add((name, data, currNode, {}, true));
 
-      nodes.add((name, data, currNode));
+      continue;
     }
 
-    match = _compEndRegex.firstMatch(value);
+    match = _clientEndRegex.firstMatch(value);
     if (match != null) {
       var name = match.group(1)!;
+      assert(nodes.isNotEmpty && nodes.last.$1 == name,
+          "Found client component end anchor without matching start anchor.");
 
-      if (nodes.last.$1 == name) {
-        var comp = nodes.removeLast();
-        var start = comp.$3;
-        assert(start.parentNode == currNode.parentNode);
+      var comp = nodes.removeLast();
+      var start = comp.$3;
+      assert(start.parentNode == currNode.parentNode, "Found client component anchors with different parent nodes.");
 
-        var between = (start, currNode);
-        var params = ConfigParams(jsonDecode(comp.$2 ?? '{}'));
+      var between = (start, currNode);
+      var params = ConfigParams(jsonDecode(comp.$2 ?? '{}'), comp.$4!);
 
-        var builder = fn(name);
-        if (builder is ClientBuilder) {
-          _runClient(builder, params, between);
-        } else {
-          builder.then((b) => _runClient(b, params, between));
-        }
+      var builder = fn(name);
+      if (builder is ClientBuilder) {
+        _runClient(builder, params, between);
+      } else {
+        builder.then((b) => _runClient(b, params, between));
       }
+      continue;
+    }
+
+    match = _serverStartRegex.firstMatch(value);
+    if (match != null) {
+      assert(nodes.isNotEmpty, "Found non-nested server component anchor, which is not allowed.");
+      assert(nodes.last.$5 == true, "Found directly nested server component anchor, which is not allowed.");
+
+      var name = match.group(1)!;
+      nodes.add((name, null, currNode, null, false));
+
+      continue;
+    }
+
+    match = _serverEndRegex.firstMatch(value);
+    if (match != null) {
+      var name = match.group(1)!;
+      assert(nodes.isNotEmpty && nodes.last.$1 == name,
+          "Found server component end anchor without matching start anchor.");
+
+      var comp = nodes.removeLast();
+      var start = comp.$3;
+      assert(start.parentNode == currNode.parentNode, "Found server component anchors with different parent nodes.");
+
+      assert(nodes.isNotEmpty && nodes.last.$4 != null, "Found server component without ancestor client component.");
+
+      var between = (start, currNode);
+      nodes.last.$4![name] = between;
+
+      continue;
     }
   }
 }
 
-void runAppWithParams(ClientBuilder appBuilder) {
-  _applyClients((_) => appBuilder);
+void _runClient(ClientBuilder builder, ConfigParams params, (Node, Node) between) {
+  BrowserAppBinding().attachRootComponent(builder(params), attachBetween: between);
 }

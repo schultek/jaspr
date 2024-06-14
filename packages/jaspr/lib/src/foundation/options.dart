@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import '../framework/framework.dart';
 
 /// Main class for initializing the jaspr framework.
@@ -36,8 +34,5 @@ class ClientTarget<T extends Component> {
 
   const ClientTarget(this.name, {this.params});
 
-  String? dataFor(T component) {
-    if (params == null) return null;
-    return HtmlEscape(HtmlEscapeMode(escapeLtGt: true)).convert(jsonEncode(params!(component)));
-  }
+  Map<String, dynamic>? getParamsFor(T component) => params?.call(component);
 }
