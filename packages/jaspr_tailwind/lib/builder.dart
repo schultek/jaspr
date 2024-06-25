@@ -46,6 +46,7 @@ class TailwindBuilder implements Builder {
         scratchSpace.fileFor(outputId).path.toPosix(),
         '--content',
         p.join(Directory.current.path, '{lib,web}', '**', '*.dart').toPosix(true),
+        '--minify',
         if (hasCustomConfig) ...[
           '--config',
           p.join(Directory.current.path, 'tailwind.config.js').toPosix(),
