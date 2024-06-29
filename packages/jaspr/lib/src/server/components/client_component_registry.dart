@@ -30,15 +30,6 @@ class ClientComponentRegistryElement extends ObserverElement {
       return;
     }
 
-    var isClientBoundary = true;
-    element.visitAncestorElements((e) {
-      return isClientBoundary = !_adapter.clientElements.contains(e);
-    });
-
-    if (!isClientBoundary) {
-      return;
-    }
-
     _adapter.clientElements.add(element);
     binding.addRenderAdapter(ClientComponentAdapter(_adapter, entry, element));
   }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:html' as html show Element;
 import 'dart:html';
 
 import '../../browser.dart';
@@ -7,10 +8,12 @@ import '../../browser.dart';
 typedef ClientBuilder = Component Function(ConfigParams);
 typedef ClientLoader = FutureOr<ClientBuilder> Function();
 
+typedef ClientByName = FutureOr<ClientBuilder> Function(String);
+
 /// Called by the shared client components entrypoint.
 void registerClients(Map<String, ClientLoader> clients) {
   final Map<String, ClientBuilder> builders = {};
-  _applyClients((name) {
+  _findAnchors(clientByName: (name) {
     var client = (builders[name] ?? clients[name]!()) as FutureOr<ClientBuilder>;
     if (client is ClientBuilder) {
       return builders[name] = client;
@@ -27,14 +30,14 @@ ClientLoader loadClient(Future<void> Function() loader, ClientBuilder builder) {
 
 /// Sync variant of [registerClients].
 void registerClientsSync(Map<String, ClientBuilder> clients) {
-  _applyClients((name) => clients[name]!);
+  _findAnchors(clientByName: (name) => clients[name]!);
 }
 
 class ConfigParams {
   ConfigParams(this._params, this.serverComponents);
 
   final Map<String, dynamic> _params;
-  final Map<String, (Node, Node)> serverComponents;
+  final Map<String, ServerComponentAnchor> serverComponents;
 
   T get<T>(String key) {
     if (T == Component) {
@@ -42,16 +45,7 @@ class ConfigParams {
       assert(sId is String && sId.startsWith(r's$'));
       var s = serverComponents[sId.substring(2)];
       if (s != null) {
-        var nodes = <Node>[];
-        Node? curr = s.$1.nextNode;
-        while (curr != null && curr != s.$2) {
-          nodes.add(curr.clone(true));
-          curr = curr.nextNode;
-        }
-
-        return Builder(builder: (context) {
-          return nodes.map((n) => RawNode(n));
-        }) as T;
+        return s.build() as T;
       } else {
         return Text("") as T;
       }
@@ -69,82 +63,188 @@ final _clientEndRegex = RegExp(r'^/\$(\S+)$');
 final _serverStartRegex = RegExp(r'^s\$(\d+)$');
 final _serverEndRegex = RegExp(r'^/s\$(\d+)$');
 
-void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
-  var iterator = NodeIterator(document, NodeFilter.SHOW_COMMENT);
+sealed class ComponentAnchor {
+  ComponentAnchor(this.name, this.startNode);
 
-  List<(String, String?, Node, Map<String, (Node, Node)>?, bool)> nodes = [];
+  final String name;
+  final Node startNode;
+  late Node endNode;
+}
+
+class ClientComponentAnchor extends ComponentAnchor {
+  ClientComponentAnchor(super.name, super.startNode, this.data);
+
+  final String? data;
+  late FutureOr<ClientBuilder> builder;
+  final Map<String, ServerComponentAnchor> serverAnchors = {};
+
+  Future<void> resolve() async {
+    var r = await (Future.value(builder), Future.wait(serverAnchors.values.map((a) => a.resolve()))).wait;
+    builder = r.$1;
+  }
+
+  Component build() {
+    assert(builder is ClientBuilder, "ClientComponentAnchor was not resolved before calling build()");
+    var params = ConfigParams(data != null ? jsonDecode(data!) : {}, serverAnchors);
+    return (builder as ClientBuilder)(params);
+  }
+
+  Future<void> run() async {
+    await resolve();
+    BrowserAppBinding().attachRootComponent(build(), attachBetween: (startNode, endNode));
+  }
+}
+
+class ServerComponentAnchor extends ComponentAnchor {
+  ServerComponentAnchor(super.name, super.startNode);
+
+  late final DocumentFragment fragment;
+  late final List<ClientComponentAnchor> clientAnchors;
+  final Map<String, Component Function(html.Element)> elementFactories = {};
+
+  Future<void> resolve() async {
+    await Future.wait(clientAnchors.map((a) => a.resolve()));
+  }
+
+  void recursivelyFindChildAnchors(ClientByName clientByName) {
+    fragment = document.createDocumentFragment();
+
+    Node? curr = startNode.nextNode;
+    while (curr != null && curr != endNode) {
+      fragment.append(curr.clone(true));
+      curr = curr.nextNode;
+    }
+
+    clientAnchors = _findAnchors(clientByName: clientByName, root: fragment, runEagerly: false);
+
+    window.console.log(fragment);
+
+    for (var client in clientAnchors) {
+      var name = client.name.toLowerCase().replaceAll('/', '_');
+      var n = 1;
+      while (elementFactories.containsKey('${name}_$n')) {
+        n++;
+      }
+
+      Component? child;
+
+      elementFactories['${name}_$n'] = (_) {
+        if (child == null) {
+          var c = client.build();
+          child = Builder.single(key: GlobalKey(), builder: (_) => c);
+        }
+        return child!;
+      };
+
+      while (client.startNode.nextNode != null && client.startNode.nextNode != client.endNode) {
+        client.startNode.nextNode!.remove();
+      }
+
+      client.startNode.replaceWith(document.createElement('${name}_$n'));
+      client.endNode.remove();
+    }
+
+    window.console.log(fragment);
+  }
+
+  Component build() {
+    return Builder(builder: (context) {
+      return fragment.childNodes.map((n) => RawNode(n, elementFactories: elementFactories));
+    });
+  }
+}
+
+List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, Node? root, bool runEagerly = true}) {
+  var iterator = NodeIterator(root ?? document, NodeFilter.SHOW_COMMENT);
+
+  List<ComponentAnchor> anchors = [];
+  List<ClientComponentAnchor> clientAnchors = [];
 
   Comment? currNode;
   while ((currNode = iterator.nextNode() as Comment?) != null) {
     var value = currNode!.nodeValue ?? '';
 
-    print("VALUE $value");
-
+    // Find client start anchor.
     var match = _clientStartRegex.firstMatch(value);
     if (match != null) {
-      assert(nodes.isEmpty || nodes.last.$5 == false,
+      assert(anchors.isEmpty || anchors.last is ServerComponentAnchor,
           "Found directly nested client component anchor, which is not allowed.");
 
       var name = match.group(1)!;
       var data = match.group(2);
-      nodes.add((name, data, currNode, {}, true));
+      anchors.add(ClientComponentAnchor(name, currNode, data));
 
       continue;
     }
 
+    // Find client end anchor.
     match = _clientEndRegex.firstMatch(value);
     if (match != null) {
       var name = match.group(1)!;
-      assert(nodes.isNotEmpty && nodes.last.$1 == name,
+      assert(anchors.isNotEmpty && anchors.last.name == name,
           "Found client component end anchor without matching start anchor.");
 
-      var comp = nodes.removeLast();
-      var start = comp.$3;
+      var comp = anchors.removeLast() as ClientComponentAnchor;
+
+      // Nested client components are handled recursively.
+      if (anchors.isNotEmpty) continue;
+
+      assert(anchors.isEmpty);
+
+      var start = comp.startNode;
       assert(start.parentNode == currNode.parentNode, "Found client component anchors with different parent nodes.");
 
-      var between = (start, currNode);
-      var params = ConfigParams(jsonDecode(comp.$2 ?? '{}'), comp.$4!);
+      comp.endNode = currNode;
+      comp.builder = clientByName(name);
 
-      var builder = fn(name);
-      if (builder is ClientBuilder) {
-        _runClient(builder, params, between);
-      } else {
-        builder.then((b) => _runClient(b, params, between));
+      if (runEagerly) {
+        // Instantly run the client component.
+        comp.run();
       }
+
+      clientAnchors.add(comp);
+
       continue;
     }
 
+    // Find server start anchor.
     match = _serverStartRegex.firstMatch(value);
     if (match != null) {
-      assert(nodes.isNotEmpty, "Found non-nested server component anchor, which is not allowed.");
-      assert(nodes.last.$5 == true, "Found directly nested server component anchor, which is not allowed.");
+      assert(anchors.isNotEmpty, "Found non-nested server component anchor, which is not allowed.");
+      assert(anchors.last is ClientComponentAnchor,
+          "Found directly nested server component anchor, which is not allowed.");
 
       var name = match.group(1)!;
-      nodes.add((name, null, currNode, null, false));
+      anchors.add(ServerComponentAnchor(name, currNode));
 
       continue;
     }
 
+    // Find server end anchor.
     match = _serverEndRegex.firstMatch(value);
     if (match != null) {
       var name = match.group(1)!;
-      assert(nodes.isNotEmpty && nodes.last.$1 == name,
+      assert(anchors.isNotEmpty && anchors.last.name == name,
           "Found server component end anchor without matching start anchor.");
 
-      var comp = nodes.removeLast();
-      var start = comp.$3;
+      var comp = anchors.removeLast() as ServerComponentAnchor;
+
+      // Nested client components are handled recursively.
+      if (anchors.length > 1) continue;
+
+      var start = comp.startNode;
       assert(start.parentNode == currNode.parentNode, "Found server component anchors with different parent nodes.");
 
-      assert(nodes.isNotEmpty && nodes.last.$4 != null, "Found server component without ancestor client component.");
+      comp.endNode = currNode;
 
-      var between = (start, currNode);
-      nodes.last.$4![name] = between;
+      assert(anchors.isNotEmpty, "Found server component without ancestor client component.");
+      (anchors.last as ClientComponentAnchor).serverAnchors[name] = comp;
+
+      comp.recursivelyFindChildAnchors(clientByName);
 
       continue;
     }
   }
-}
 
-void _runClient(ClientBuilder builder, ConfigParams params, (Node, Node) between) {
-  BrowserAppBinding().attachRootComponent(builder(params), attachBetween: between);
+  return clientAnchors;
 }

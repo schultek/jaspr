@@ -14,14 +14,34 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
   final ClientTarget target;
 
   late String? data;
+  bool isClientBoundary = true;
 
   @override
   void prepareBoundary(ChildListRange range) {
+    isClientBoundary = true;
+    element.visitAncestorElements((e) {
+      if (adapter.serverElements.containsValue(e)) {
+        return false;
+      } else if (adapter.clientElements.contains(e)) {
+        isClientBoundary = false;
+        return false;
+      }
+      return true;
+    });
+
+    if (!isClientBoundary) {
+      return;
+    }
+
     data = getData();
   }
 
   @override
   void applyBoundary(ChildListRange range) {
+    if (!isClientBoundary) {
+      return;
+    }
+
     range.start.insertNext(ChildNodeData(
         MarkupRenderObject()..updateText('<!--\$${target.name}${data != null ? ' data=$data' : ''}-->', true)));
     range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!--/\$${target.name}-->', true)));

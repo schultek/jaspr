@@ -18,20 +18,15 @@ class AppState extends State<App> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield p([text("Hello ${component.name} from App")]);
-
-    yield button([text('Toggle')], events: {'click': (e) => setState(() => toggled = !toggled)});
-
-    yield div(
-      classes: "client",
-      styles: Styles.text(color: toggled ? Colors.blue : Colors.red),
-      [component.child],
-    );
-
-    yield div(
-      classes: "client2",
-      styles: Styles.text(color: Colors.green),
-      [component.child],
-    );
+    yield div(classes: "client", [
+      text(component.name),
+      button([text('Toggle')], events: {'click': (e) => setState(() => toggled = !toggled)}),
+      if (!toggled) component.child else div(styles: Styles.text(color: Colors.white), [component.child]),
+      //div(styles: Styles.text(color: Colors.gray), [component.child]),
+      if (!component.name.endsWith("Nested"))
+        div([
+          App(name: "${component.name} Nested", child: div([text("Nest")])),
+        ]),
+    ]);
   }
 }
