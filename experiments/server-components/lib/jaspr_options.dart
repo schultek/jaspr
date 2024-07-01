@@ -3,7 +3,9 @@
 
 import 'package:jaspr/jaspr.dart';
 
-import 'app.dart' as c0;
+import 'root.dart' as c0;
+import 'counter.dart' as c1;
+import 'app.dart' as c2;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
@@ -23,8 +25,11 @@ import 'app.dart' as c0;
 /// ```
 const defaultJasprOptions = JasprOptions(
   targets: {
-    c0.App: ClientTarget<c0.App>('app', params: _params0App),
+    c0.Root: ClientTarget<c0.Root>('root', params: _params0Root),
+    c1.Counter: ClientTarget<c1.Counter>('counter'),
+    c2.App: ClientTarget<c2.App>('app', params: _params2App),
   },
 );
 
-Map<String, dynamic> _params0App(c0.App c) => {'name': c.name, 'child': c.child};
+Map<String, dynamic> _params0Root(c0.Root c) => {'child': c.child};
+Map<String, dynamic> _params2App(c2.App c) => {'name': c.name, 'child': c.child};

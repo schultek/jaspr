@@ -89,7 +89,7 @@ class ClientModuleBuilder implements Builder {
     var webSource = DartFormatter(pageWidth: 120).format('''
       $generationHeader
       
-      import 'package:jaspr/browser.dart';
+      import 'package:jaspr/browser.dart' show registerClientsSync, ConfigParams, Component;
       import '$moduleImport' as a;
       
       void main() {

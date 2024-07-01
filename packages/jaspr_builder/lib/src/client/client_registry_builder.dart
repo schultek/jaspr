@@ -51,7 +51,7 @@ class ClientRegistryBuilder implements Builder {
     return DartFormatter(pageWidth: 120).format('''
       $generationHeader
       
-      import 'package:jaspr/browser.dart';
+      import 'package:jaspr/browser.dart' show registerClients, loadClient;
       ${modules.mapIndexed((index, c) => "import '${path.url.relative(c.path, from: 'lib')}' deferred as i$index;").join('\n')}
       
       void main() {

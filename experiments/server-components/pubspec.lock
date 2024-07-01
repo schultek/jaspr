@@ -300,6 +300,14 @@ packages:
       relative: true
     source: path
     version: "0.13.2"
+  jaspr_riverpod:
+    dependency: "direct main"
+    description:
+      name: jaspr_riverpod
+      sha256: c830eb19514923bd6059008e73f08bdeab81067067047f322c064bf481d489e3
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.12"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
@@ -420,6 +428,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.0"
+  riverpod:
+    dependency: transitive
+    description:
+      name: riverpod
+      sha256: f21b32ffd26a36555e501b04f4a5dca43ed59e16343f1a30c13632b2351dfa4d
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.5.1"
   scratch_space:
     dependency: transitive
     description:
@@ -500,6 +516,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.1"
+  state_notifier:
+    dependency: transitive
+    description:
+      name: state_notifier
+      sha256: b8677376aa54f2d7c58280d5a007f9e8774f1968d1fb1c096adcb4792fba29bb
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   stream_channel:
     dependency: transitive
     description:
