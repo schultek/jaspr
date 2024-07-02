@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.13.3
 
 - Added support for custom models as parameters to `@client` components.
 
