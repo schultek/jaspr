@@ -10,6 +10,7 @@ part 'groups/flexbox.dart';
 part 'groups/flexitem.dart';
 part 'groups/grid.dart';
 part 'groups/grid_item.dart';
+part 'groups/list.dart';
 part 'groups/text.dart';
 
 /// Represents a set of css styles by pairs of property and value.
@@ -113,6 +114,13 @@ abstract class Styles with StylesMixin<Styles> {
   const factory Styles.gridItem({
     GridPlacement? placement,
   }) = _GridItemStyles;
+
+  /// Constructs a [Styles] instance for a list.
+  const factory Styles.list({
+    ListStyle? style,
+    ImageStyle? image,
+    ListStylePosition? position,
+  }) = _ListStyles;
 }
 
 class _EmptyStyles extends Styles {
@@ -286,6 +294,18 @@ abstract mixin class StylesMixin<T> {
   }) =>
       combine(Styles.gridItem(
         placement: placement,
+      ));
+
+  /// Combines the current styles with common list style properties.
+  T list({
+    ListStyle? style,
+    ImageStyle? image,
+    ListStylePosition? position,
+  }) =>
+      combine(Styles.list(
+        style: style,
+        image: image,
+        position: position,
       ));
 }
 
