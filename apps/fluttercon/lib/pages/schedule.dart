@@ -1,16 +1,22 @@
-import 'package:fluttercon/components/card.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../components/session_card.dart';
 import '../models/session.dart';
 
-@client
-class Home extends StatelessComponent {
-  Home({required this.sessions, super.key});
+class SchedulePage extends StatelessComponent {
+  SchedulePage({required this.day, required this.sessions, super.key});
 
+  final int day;
   final List<Session> sessions;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
+    yield nav([
+      a(href: '/day-1', [text("Day 1")]),
+      a(href: '/day-2', [text("Day 2")]),
+      a(href: '/day-3', [text("Day 3")]),
+    ]);
+
     yield ul(classes: "sessions", [
       for (final session in sessions)
         li([

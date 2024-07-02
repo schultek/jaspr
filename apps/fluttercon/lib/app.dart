@@ -5,7 +5,7 @@ import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
 import 'models/session.dart';
-import 'pages/home.dart';
+import 'pages/schedule.dart';
 import 'pages/session.dart';
 
 // A simple [StatelessComponent] with a [build] method.
@@ -19,7 +19,15 @@ class App extends AsyncStatelessComponent {
 
     yield div(classes: 'main', [
       Router(routes: [
-        Route(path: '/', title: 'Home', builder: (context, state) => Home(sessions: sessions)),
+        for (var i = 1; i < 4; i++)
+          Route(
+            path: '/day-$i',
+            title: 'Schedule Day $i',
+            builder: (context, state) => SchedulePage(
+              day: i,
+              sessions: sessions.where((s) => s.startsAt.day == i + 2).toList(),
+            ),
+          ),
         for (var session in sessions)
           Route(
             path: '/${session.slug}',
@@ -32,7 +40,7 @@ class App extends AsyncStatelessComponent {
 
   static get styles => [
         css('.main').box(minHeight: 100.vh),
-        ...Home.styles,
+        ...SchedulePage.styles,
         ...SessionPage.styles,
       ];
 }
