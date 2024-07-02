@@ -1,0 +1,25 @@
+name: fluttercon
+description: A new jaspr project.
+version: 0.0.1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  dart_mappable: ^4.2.2
+  http: ^1.2.1
+  intl: ^0.19.0
+  jaspr: ^0.13.2
+  jaspr_router: ^0.4.2
+  shared_preferences: ^2.2.3
+
+dev_dependencies:
+  build_runner: ^2.4.0
+  jaspr_web_compilers: ^4.0.9
+  jaspr_builder: ^0.13.2
+  lints: ^3.0.0
+  dart_mappable_builder: ^4.2.3
+
+jaspr:
+  mode: static
+
