@@ -14,18 +14,11 @@ import 'pages/session.dart';
 class App extends AsyncStatelessComponent {
   @override
   Stream<Component> build(BuildContext context) async* {
-    final List<Session> sessions;
+    final response = await get(
+        Uri.parse('https://sessionize.com/api/v2/${Platform.environment['FLUTTERCON_SESSIONIZE_ID']}/view/Sessions'));
 
-    if (File('sessions.json').existsSync()) {
-      sessions =
-          (jsonDecode(File('sessions.json').readAsStringSync()) as List).map((s) => SessionMapper.fromMap(s)).toList();
-    } else {
-      final response = await get(Uri.parse('https://sessionize.com/api/v2/aje9iuav/view/Sessions'));
-
-      final [{"sessions": sessionsJson}] = jsonDecode(response.body) as List;
-      sessions = (sessionsJson as List).map((s) => SessionMapper.fromMap(s)).toList();
-      File('sessions.json').writeAsStringSync(jsonEncode(sessionsJson));
-    }
+    final [{"sessions": sessionsJson}] = jsonDecode(response.body) as List;
+    final sessions = (sessionsJson as List).map((s) => SessionMapper.fromMap(s)).toList();
 
     yield div(classes: 'main', [
       Router(
