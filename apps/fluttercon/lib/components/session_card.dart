@@ -12,7 +12,7 @@ class SessionCard extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield a(href: '/${session.slug}', classes: "session-card", [
-      LikeButton(id: session.id),
+      LikeButton(session: session),
       span([text(session.timeFormatted)]),
       h2([text(session.title)]),
       p([text(session.speakers.map((s) => s.name).join(', '))]),
@@ -34,16 +34,14 @@ class SessionCard extends StatelessComponent {
                 border: Border.all(BorderSide.solid()),
                 padding: EdgeInsets.all(16.px),
               )
-              .text(
-                decoration: TextDecoration(line: TextDecorationLine.none),
-                color: Color.initial,
-              ),
+              .text(decoration: TextDecoration(line: TextDecorationLine.none), color: Color.initial),
           css('&:hover').background(color: Color.hex('#0001')),
           css('span').text(fontSize: 0.7.em),
           css('h2').text(fontSize: 1.2.em).box(margin: EdgeInsets.symmetric(vertical: 4.px)),
           css('div').flexbox(),
           css('button').box(position: Position.absolute(right: 10.px, top: 10.px)),
         ]),
+        ...LikeButton.styles,
         ...Tag.styles,
       ];
 }

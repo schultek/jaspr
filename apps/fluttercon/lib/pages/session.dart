@@ -10,6 +10,13 @@ class SessionPage extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
+    yield Head(meta: {
+      'description': session.description,
+      'keywords': "Fluttercon, Sessions, Jaspr, Dart, Flutter",
+      'og:title': session.title,
+      'og:image': "https://sessionize.com/image/1314-1140o400o3-h467LSBSMTzb8do1dJniEh.jpg"
+    });
+
     yield section(classes: 'session', [
       a(href: '/', [text('Home')]),
       h1([text(session.title)]),
@@ -41,10 +48,11 @@ class SessionPage extends StatelessComponent {
                 alignItems: AlignItems.center,
               )
               .text(align: TextAlign.center),
-          css('a').flexItem(alignSelf: AlignSelf.start),
+          css('a').flexItem(alignSelf: AlignSelf.start).text(color: Color.initial),
           css('h1').box(margin: EdgeInsets.only(top: 40.px, bottom: 20.px)).text(fontSize: 2.em),
           css('div').box(margin: EdgeInsets.symmetric(vertical: 20.px)),
-          css('p').text(align: TextAlign.justify),
+          css('ul').list(style: ListStyle.none).box(padding: EdgeInsets.zero),
+          css('p').text(align: TextAlign.justify, whiteSpace: WhiteSpace.preLine),
         ]),
       ];
 }

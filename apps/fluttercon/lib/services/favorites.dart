@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../models/session.dart';
 @Import.onWeb('package:shared_preferences/shared_preferences.dart', show: [#SharedPreferences])
 import 'favorites.imports.dart';
 
@@ -9,10 +11,11 @@ class FavoritesService extends ChangeNotifier {
   static FavoritesService instance = FavoritesService();
 
   FavoritesService() {
+    SessionMapper.ensureInitialized();
     if (kIsWeb) {
       prefs = SharedPreferences.getInstance()
         ..then((p) {
-          _favorites = p.getStringList('favorites')?.toSet() ?? {};
+          _favorites = MapperContainer.globals.fromJson(p.getString('favorites') ?? '{}');
           notifyListeners();
         });
     } else {
@@ -22,18 +25,18 @@ class FavoritesService extends ChangeNotifier {
 
   late Future<SharedPreferencesOrStubbed> prefs;
 
-  Set<String> _favorites = {};
-  Set<String> get favorites => _favorites;
+  Map<String, Session> _favorites = {};
+  Map<String, Session> get favorites => _favorites;
 
-  void toggle(String id) async {
+  void toggle(Session session) async {
     await prefs;
-    if (_favorites.contains(id)) {
-      _favorites.remove(id);
+    if (_favorites.containsKey(session.id)) {
+      _favorites.remove(session.id);
     } else {
-      _favorites.add(id);
+      _favorites[session.id] = session;
     }
 
-    (await prefs).setStringList('favorites', _favorites.toList());
+    (await prefs).setString('favorites', MapperContainer.globals.toJson(_favorites));
 
     notifyListeners();
   }

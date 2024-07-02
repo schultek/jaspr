@@ -32,7 +32,7 @@ class HomePage extends StatelessComponent {
         css('header')
             .box(padding: EdgeInsets.only(top: 10.rem))
             .flexbox(direction: FlexDirection.column, alignItems: AlignItems.center),
-        css('ul').box(padding: EdgeInsets.zero).raw({'list-style': 'none'}),
+        css('ul').box(padding: EdgeInsets.zero).list(style: ListStyle.none),
         css('li', [
           css('&').box(
             margin: EdgeInsets.symmetric(vertical: 1.em, horizontal: (-10).px),

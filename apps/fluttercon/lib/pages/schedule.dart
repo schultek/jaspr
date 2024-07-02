@@ -1,6 +1,8 @@
 import 'package:jaspr/jaspr.dart';
 
+import '../components/pages_nav.dart';
 import '../components/session_card.dart';
+import '../components/session_list.dart';
 import '../models/session.dart';
 
 class SchedulePage extends StatelessComponent {
@@ -11,25 +13,32 @@ class SchedulePage extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield nav([
-      a(href: '/day-1', [text("Day 1")]),
-      a(href: '/day-2', [text("Day 2")]),
-      a(href: '/day-3', [text("Day 3")]),
-    ]);
+    yield Head(meta: {
+      'description': "Schedule of all sessions on day $day.",
+      'keywords': "Fluttercon, Sessions, Jaspr, Dart, Flutter",
+      'og:title': "Fluttercon Berlin 2024 - Schedule for Day $day",
+      'og:image': "https://sessionize.com/image/1314-1140o400o3-h467LSBSMTzb8do1dJniEh.jpg"
+    });
 
-    yield ul(classes: "sessions", [
-      for (final session in sessions)
-        li([
-          SessionCard(session: session),
-        ])
+    yield PagesNav(day: day);
+
+    yield SessionList(sessions: sessions);
+
+    yield footer([
+      text('💙 Built with '),
+      a(href: "https://github.com/schultek/jaspr", [text('Jaspr')]),
+      text('💙'),
+      br(),
+      text('Join '),
+      a(href: "/jaspr_unleashing_the_power_of_dart_for_modern_web_development_642677", [text('my talk')]),
+      text(' to see this website being built live.'),
     ]);
   }
 
   static get styles => [
-        css('.sessions', [
-          css('&').raw({'list-style': 'none'}).box(padding: EdgeInsets.all(40.px)),
-          css('li').box(margin: EdgeInsets.only(bottom: 16.px))
-        ]),
+        ...PagesNav.styles,
+        ...SessionList.styles,
         ...SessionCard.styles,
+        css('footer').box(margin: EdgeInsets.all(40.px)).text(align: TextAlign.center, fontStyle: FontStyle.italic),
       ];
 }
