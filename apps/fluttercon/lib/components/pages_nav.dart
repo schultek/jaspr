@@ -13,7 +13,6 @@ class PagesNav extends StatelessComponent {
       a(href: '/day-3', classes: day == 3 ? 'active' : '', [text("Day 3")]),
       a(href: '/favorites', classes: day == null ? 'active' : '', [text('Favorites')]),
     ]);
-    ;
   }
 
   static get styles => [
