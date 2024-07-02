@@ -1,3 +1,27 @@
+## Unreleased patch
+
+- Added support for custom models as parameters to `@client` components.
+
+  To enable this a custom model class must have two methods: 
+  - An instance method that encodes the model to a primitive value and is annotated with `@encoder`:
+    ```dart
+    @encoder
+    String toJson() { ... }
+    ```
+  - A static method that decodes the model from a primitive value and is annotated with `@decoder`:
+    ```dart
+    @decoder
+    static MyModel fromJson(String json) { ... }
+    ```
+    
+  The method names can be freely chosen. 
+  The encoding type must be any primitive type (`String`, `int`, `List`, `Map`, etc.).
+
+- Added `ListenableBuilder` and `ValueListenableBuilder` components.
+
+- Added `Styles.list` for styling `ul` and `ol` elements.
+- Added `TextDecoration.none` shorthand.
+
 ## 0.13.2
 
 - Improved the performance of the building and diffing algorithm, and other performance improvements.
