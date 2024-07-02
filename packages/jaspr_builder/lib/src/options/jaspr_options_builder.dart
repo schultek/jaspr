@@ -50,7 +50,7 @@ class JasprOptionsBuilder implements Builder {
 
     var clientParamsGetters = clients
         .mapIndexed((i, c) => c.params.isNotEmpty
-            ? 'Map<String, dynamic> _params$i${c.name}(c$i.${c.name} c) => {${c.params.map((p) => "'${p.name}': c.${p.name}").join(', ')}};'
+            ? 'Map<String, dynamic> _params$i${c.name}(c$i.${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};'
             : null)
         .whereType<String>();
 
