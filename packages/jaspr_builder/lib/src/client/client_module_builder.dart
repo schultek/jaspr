@@ -233,7 +233,7 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<DecoderResult, Stri
         return ('($argument as Map).map((k, v) => MapEntry(k, ${nested.$1}))', nested.$2);
       }
     } else if (findAnnotatedDecoder(type) case final decoder?) {
-      return ('${type.getDisplayString(withNullability: false)}.$decoder($argument)', {type.element.library});
+      return ('${type.element.name}.$decoder($argument)', {type.element.library});
     }
     return super.visitInterfaceType(type, argument);
   }
