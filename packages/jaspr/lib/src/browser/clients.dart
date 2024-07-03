@@ -197,6 +197,9 @@ List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, No
       comp.endNode = currNode;
       comp.builder = clientByName(name);
 
+      // Remove the data string.
+      start.text = '\$${comp.name}';
+
       if (runEagerly) {
         // Instantly run the client component.
         comp.run();
