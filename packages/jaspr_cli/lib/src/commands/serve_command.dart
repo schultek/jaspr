@@ -53,8 +53,7 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   }
 
   @override
-  String get description => 'Runs a development server that serves the jaspr app and '
-      'reloads based on file system updates.';
+  String get description => 'Runs a development server that reloads based on file system updates.';
 
   @override
   String get name => 'serve';

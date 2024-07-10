@@ -53,7 +53,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   }
 
   @override
-  String get description => 'Builds the full project.';
+  String get description => 'Build the full project.';
 
   @override
   String get name => 'build';

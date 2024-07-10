@@ -9,9 +9,15 @@ next: /core/components
 
 Jaspr comes with a cli tool to create, serve and build your website.
 
-- `jaspr create` will create a new jaspr project. The cli will prompt you for a project name and setup options.
-- `jaspr serve` will serve the website in the current directory and automatically refresh when you make changes.
-- `jaspr build` will build the website according to the selected rendering mode.
+- `jaspr create`: Create a new jaspr project.
+- `jaspr serve`: Serve the project and automatically refresh when you make changes.
+- `jaspr build`: Build the project according to the selected rendering mode.
+
+Additionally, there are the following service commands available:
+
+- `jaspr doctor`: Show information about the environment and current project.
+- `jaspr clean`: Delete the `build/` and `.dart_tool/` directories.
+- `jaspr update`: Update the jaspr cli.
 
 ## 📟 Rendering Modes
 
@@ -58,7 +64,7 @@ When it's time to deploy your application, you can build it using the following 
 jaspr build
 ```
 
-This will build the app inside the `build/jaspr` directory according to your selected **Rendering Mode**:
+This will build the app inside the `build/jaspr/` directory according to your selected **Rendering Mode**:
 
 <Tabs defaultValue="st" values={[
     {label: 'static', value: 'st'},
@@ -76,7 +82,7 @@ Your server app will be compiled to `build/jaspr/app<.exe/.aot/.dill>`.
 
 Your static files and assets will be built to the `build/jaspr/web` directory, which must be kept alongside the server executable.
 </TabItem>
-<TabItem value="st">
+<TabItem value="c">
 All files are built to the `build/jaspr/` directory, which you can deploy to any static hosting provider.
 </TabItem>
 </Tabs>
