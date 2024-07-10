@@ -1,20 +1,20 @@
 ---
 title: Flutter Embedding
-description: Embedding a Flutter web app in a jaspr website.
+description: Embedding a Flutter web app in a Jaspr website.
 previous: /eco/riverpod
 next: /eco/tailwind
 ---
 
 # 🖼️ Flutter Embedding
 
-To embed a flutter app into your jaspr website you need the following setup:
+To embed a flutter app into your Jaspr website you need the following setup:
 
 1. Add `jaspr_flutter_embed` as a dependency:
     `dart pub add jaspr_flutter_embed`
 2. Replace `build_web_compilers` with `jaspr_web_compilers` as a dev dependency:
     `dart pub remove build_web_compilers`
     `dart pub add jaspr_web_compilers --dev`
-3. Add `uses-flutter: true` to your jaspr config inside `pubspec.yaml`:
+3. Add `uses-flutter: true` to your `jaspr` config inside `pubspec.yaml`:
   ```yaml
   jaspr:
     uses-flutter: true
