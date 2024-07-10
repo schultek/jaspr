@@ -30,8 +30,7 @@ does not rely on `WidgetRef` to access providers but instead comes with **contex
 
 As an example, this (in Flutter):
 
-```dart
-// (Flutter)
+```dart title="Flutter"
 // need to extend custom ConsumerWidget
 class MyWidget extends ConsumerWidget {
   // need to accept custom WidgetRef
@@ -45,8 +44,7 @@ class MyWidget extends ConsumerWidget {
 
 is equivalent to this (in Jaspr)
 
-```dart 
-// (Jaspr)
+```dart title="Jaspr"
 // just extends the normal component
 class MyComponent extends StatelessComponent {
   // no extra parameter

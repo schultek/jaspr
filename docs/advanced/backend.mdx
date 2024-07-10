@@ -39,7 +39,7 @@ maintained by the Dart team.
 Since jaspr used shelf internally, it is pretty straightforward to built a custom backend for jaspr using
 shelf. 
 
-```dart
+```dart title="lib/main.dart"
 void main() async {
   var handler = serveApp((request, render) {
     // Optionally do something with `request`
@@ -72,8 +72,7 @@ to see this in action.
 
 With this, a `dart_frog` route that renders a jaspr component can be as simple as:
 
-```dart
-// routes/[my_component_path]/index.dart
+```dart title="routes/[my_component_path]/index.dart"
 Future<Response> onRequest(RequestContext context) {
   return renderJasprComponent(context, MyComponent());
 }

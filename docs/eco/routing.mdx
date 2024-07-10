@@ -16,7 +16,7 @@ dart pub add jaspr_router
 Use can use the `Router` component for some basic routing. It takes a list of `Route`s.
 A simple use looks like this:
 
-```dart
+```dart title="lib/app.dart"
 import 'pages/home.dart';
 import 'pages/about.dart' ;
 
@@ -50,7 +50,7 @@ For larger web apps, we don't want to load everything together, but rather split
 
 To use lazy routes, change the above code to the following:
 
-```dart
+```dart title="lib/app.dart"
 import 'pages/home.dart';
 import 'pages/about.dart' deferred as about;
 

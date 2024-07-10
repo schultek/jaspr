@@ -20,7 +20,7 @@ Simply add `jaspr_tailwind` as a dev dependency to your project:
 
 Next add a `styles.tw.css` file inside the `web` directory with the following content:
 
-```css
+```css title="styles.tw.css"
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -28,9 +28,7 @@ Next add a `styles.tw.css` file inside the `web` directory with the following co
 
 Finally, link the generated `styles.css` in your document, or otherwise add it to your website:
 
-```dart
-// This file is lib/main.dart
-
+```dart title="lib/main.dart"
 import 'package:jaspr/server.dart';
 
 import './app.dart';
@@ -56,7 +54,7 @@ The `jaspr_tailwind` integration comes preconfigured, so you can use any tailwin
 
 A jaspr card component using tailwind would look like this:
 
-```dart
+```dart title="lib/simple_card.dart"
 import 'package:jaspr/jaspr.dart';
 
 class SimpleCard extends StatelessComponent {

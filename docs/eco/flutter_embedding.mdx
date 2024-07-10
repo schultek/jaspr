@@ -9,16 +9,11 @@ next: /eco/tailwind
 
 To embed a flutter app into your Jaspr website you need the following setup:
 
-1. Add `jaspr_flutter_embed` as a dependency:
-    `dart pub add jaspr_flutter_embed`
+1. Add `flutter` and `jaspr_flutter_embed` as a dependency:
+    `dart pub add flutter jaspr_flutter_embed`
 2. Replace `build_web_compilers` with `jaspr_web_compilers` as a dev dependency:
     `dart pub remove build_web_compilers`
     `dart pub add jaspr_web_compilers --dev`
-3. Add `uses-flutter: true` to your `jaspr` config inside `pubspec.yaml`:
-  ```yaml
-  jaspr:
-    uses-flutter: true
-  ```
 
 Next add the `FlutterEmbedView` component to your jaspr app like this:
 
@@ -59,5 +54,4 @@ when you use server-side rendering, you cannot directly import the above compone
 compilation error.
 
 Instead you need to use Darts conditional imports to only import the affected code on the client.
-
-**TODO**: Elaborate and add example snippet.
+See [Platform Imports](/advanced/imports).

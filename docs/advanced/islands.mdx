@@ -39,7 +39,7 @@ purely client-side app, you can also set this up manually.
 In general, jaspr supports this architecture by allowing **multiple parallel apps** on the client.
 For example in your `web/main.dart` you can do this:
 
-```dart
+```dart title="web/main.dart"
 void main() {
   runApp(Header(), attachTo: '#header');
   runApp(Sidebar(), attachTo: '#sidebar');
