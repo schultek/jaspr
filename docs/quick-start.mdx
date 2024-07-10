@@ -40,14 +40,14 @@ code, like the `Hello World` text.
 
 Depending on your chosen [**Rendering Mode**](/cli#-rendering-modes) and **Hydration** setting, your Jaspr project will have the following project structure:
 
-<Tabs defaultValue="sa" values={[
+<Tabs groupId: "mode" defaultValue="sa" values={[
     {label: 'Static/Server Mode & Automatic Hydration', value: 'sa'},
     {label: 'Static/Server Mode & Manual Hydration', value: 'sm'},
     {label: 'Client Mode', value: 'c'}
 ]}
 >
 <TabItem value="sa">
-    <Tabs defaultValue="s2" values={[
+    <Tabs groupId: "hyd" defaultValue="s2" values={[
         {label: 'S2', value: 's2'},
         {label: 'S1', value: 's1'}
     ]}
