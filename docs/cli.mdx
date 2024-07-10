@@ -58,13 +58,27 @@ When it's time to deploy your application, you can build it using the following 
 jaspr build
 ```
 
-This will build the app inside the `build/jaspr` directory.
+This will build the app inside the `build/jaspr` directory according to your selected **Rendering Mode**:
 
-If you build with the server rendering mode, you can choose whether to build a standalone executable or an aot or jit
-snapshot with the `--target` option. You can then run your app by starting the executable at `build/jaspr/app` and deploy
-it alongside the `build/jaspr/web` folder.
+<Tabs defaultValue="st" values={[
+    {label: 'static', value: 'st'},
+    {label: 'server', value: 'sv'},
+    {label: 'client', value: 'c'}
+]}
+>
+<TabItem value="st">
+All files are built to the `build/jaspr/` directory, which you can deploy to any static hosting provider.
+</TabItem>
+<TabItem value="sv">
+You can choose whether to build a standalone executable, an aot snapshot or kernel module with the `--target` option.
 
-If you build with the static or client mode, you can deploy the files inside
-the `build/jaspr` directory to any static hosting provider.
+Your server app will be compiled to `build/jaspr/app<.exe/.aot/.dill>`.
+
+Your static files and assets will be built to the `build/jaspr/web` directory, which must be kept alongside the server executable.
+</TabItem>
+<TabItem value="st">
+All files are built to the `build/jaspr/` directory, which you can deploy to any static hosting provider.
+</TabItem>
+</Tabs>
 
 

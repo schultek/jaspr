@@ -30,9 +30,9 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       help: 'Specify the compilation target for the executable (only in server mode)',
       allowed: ['aot-snapshot', 'exe', 'jit-snapshot'],
       allowedHelp: {
-        'aot-snapshot': 'Compile Dart to an AOT snapshot.',
-        'exe': 'Compile Dart to a self-contained executable.',
-        'jit-snapshot': 'Compile Dart to a JIT snapshot.',
+        'exe': 'Compile to a self-contained executable.',
+        'aot-snapshot': 'Compile to an AOT snapshot.',
+        'kernel': 'Compile to a portable kernel module.',
       },
       defaultsTo: 'exe',
     );
@@ -103,11 +103,13 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (config!.mode == JasprMode.server) {
       logger.write('Building server app...', progress: ProgressState.running);
 
-      String extension = '';
       final target = argResults!['target'];
-      if (Platform.isWindows && target == 'exe') {
-        extension = '.exe';
-      }
+      String extension = switch (target) {
+        'exe' when Platform.isWindows => '.exe',
+        'aot-snapshot' => '.aot',
+        'kernel' => '.dill',
+        _ => '',
+      };
 
       var process = await Process.start(
         'dart',
