@@ -14,7 +14,7 @@
     ["\uD83D\uDD79 Jaspr CLI", "/cli"],
     ["Core Concepts", [
       ["\uD83E\uDDF1 Component System", "/core/components"],
-      ["\uD83E\uDDF1 Rendering Modes & Hydration", "/core/modes"],
+      ["\uD83D\uDCDF Rendering Modes & Hydration", "/core/modes"],
       ["\uD83D\uDC7E App & Document", "/core/app"],
       ["\uD83D\uDD8D Writing html", "/core/html"],
       ["\uD83C\uDFA8 Styling", "/core/styling"],
