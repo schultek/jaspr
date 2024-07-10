@@ -19,7 +19,7 @@ which are quite cumbersome to use since you have to create multiple files and st
 
 `Jaspr` can do this for you using the `@Import` annotation. Say you have the following component:
 
-```dart
+```dart title="lib/app.dart"
 import 'dart:html' show window;
 
 import 'package:jaspr/jaspr.dart';
@@ -41,7 +41,7 @@ constant to check the platform **during runtime**, but this example would still 
 
 With jasprs **platform-specific imports** you can change the code to this:
 
-```dart
+```dart title="lib/app.dart"
 @Import.onWeb('dart:html', show: [#window])
 import 'app.imports.dart';
 
@@ -66,7 +66,7 @@ This will auto-generate:
 
 You can extend this to multiple imports and mix web and server imports like this:
 
-```dart
+```dart title="lib/app.dart"
 @Import.onWeb('dart:html', show: [#window])
 @Import.onWeb('package:some_js_package', show: [#someMember])
 @Import.onServer('dart:io', show: [#Platform])
