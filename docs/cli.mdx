@@ -10,8 +10,8 @@ next: /core/components
 Jaspr comes with a cli tool to create, serve and build your website.
 
 - `jaspr create` will create a new jaspr project. The cli will prompt you for a project name and setup options.
-- `jaspr serve` will serve the website in the current directory, including hot-reloading.
-- `jaspr build` will build the website containing the static assets (compiled js, html, images, etc.) and the optional server executable.
+- `jaspr serve` will serve the website in the current directory and automatically refresh when you make changes.
+- `jaspr build` will build the website according to the selected rendering mode.
 
 ## 📟 Rendering Modes
 
@@ -19,18 +19,21 @@ Jaspr comes with a cli tool to create, serve and build your website.
 want to build you can choose how your app should be built and executed using Jaspr.
 
 - **Static Mode**
-  Jaspr can also perform static site generation, meaning it can generate static pages at build time from your server-side
-  components. Jaspr will build a fully static site that you can host at any common website hosting service (like firebase hosting),
-  but you can still use server-side rendering to pre-render pages of your site.
+
+  With this mode, Jaspr will generate a fully static site when building your project that you can host at any common website hosting service.
+  You can write server-side code to pre-render components and pages at built time, outputting clean html and css to deploy anywhere.
+  Additionally, you can set up hydration on the client in order to make your site interactive.
 
 - **Server Mode**
-  In this mode Jaspr runs both on the server and optionally hydrates on the client. It renders your html on the server
-  for every incoming request, making it possible to use any dynamic data from an api or database to render your components.
-  Additionally you can setup hydration on the client in order to make your site interactive.
+
+  In this mode Jaspr runs and builds a server application that pre-renders your components for each incoming request.
+  You can use either Jasprs inbuilt webserver or choose to integrate it into your favorite Dart backend framework.
+  Additionally, you can set up hydration on the client in order to make your site interactive.
 
 - **Client Mode**
-  If you want, you can skip the server part of Jaspr completely and use it as a client-side only framework. This way
-  you can deploy your built app to any common website hosting service (like firebase hosting) without needing an extra server.
+
+  If you want, you can skip the server and pre-rendering part of Jaspr completely and use it as a client-side only framework.
+  Similar to static mode, you can deploy your built site to any common website hosting service without needing an extra server.
 
 ## 🏗 Project Scaffolding
 
