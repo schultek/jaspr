@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:serverpod_client/serverpod_client.dart';
 import 'package:web/web.dart';
 
+/// Monitors the browsers connectivity. Should be attached to the generated Serverpod client.
+///
+/// {@category Setup}
 class JasprConnectivityMonitor extends ConnectivityMonitor {
   JasprConnectivityMonitor() {
     _onlineSub = const EventStreamProvider<Event>('online').forTarget(window).listen((_) {

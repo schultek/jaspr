@@ -3,6 +3,7 @@ import 'package:serverpod/server.dart';
 
 export 'package:serverpod/server.dart' show Session;
 
+/// Provides the Serverpod session to the component tree.
 class InheritedSession extends InheritedComponent {
   const InheritedSession({
     required this.session,

@@ -9,6 +9,8 @@ import '../jaspr_serverpod.dart';
 
 /// A [JasprRoute] is the most convenient way to render Jaspr components in your server.
 /// Override the [build] method and return a root [Component].
+///
+/// {@category Setup}
 abstract class JasprRoute extends Route {
   JasprRoute() {
     handler = serveApp(_handleRenderCall);
