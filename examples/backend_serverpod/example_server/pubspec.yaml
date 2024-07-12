@@ -1,15 +1,15 @@
 name: example_server
 description: Starting point for a Serverpod server.
-# version: 1.0.0
-# homepage: https://www.example.com
+version: 0.1.0
+publish_to: none
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   jaspr: ^0.13.0
-  jaspr_serverpod: ^0.1.0
-  serverpod: ^1.2.7
+  jaspr_serverpod: ^0.3.0
+  serverpod: 2.0.2
 
 dev_dependencies:
   build_runner: ^2.4.8

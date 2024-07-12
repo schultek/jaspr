@@ -217,14 +217,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
-  executor:
-    dependency: transitive
-    description:
-      name: executor
-      sha256: "87d935b31b2bdf7fe2af0b77dd8ffe8864eaade25715e9c68bc49497e48c9851"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.3"
   file:
     dependency: transitive
     description:
@@ -319,28 +311,28 @@ packages:
       path: "../../../packages/jaspr"
       relative: true
     source: path
-    version: "0.12.0"
+    version: "0.13.2"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.12.0"
+    version: "0.13.2"
   jaspr_riverpod:
     dependency: "direct overridden"
     description:
       path: "../../../packages/jaspr_riverpod"
       relative: true
     source: path
-    version: "0.3.11"
+    version: "0.3.12"
   jaspr_serverpod:
     dependency: "direct main"
     description:
       path: "../../../packages/jaspr_serverpod"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.3.1"
   js:
     dependency: transitive
     description:
@@ -449,18 +441,10 @@ packages:
     dependency: transitive
     description:
       name: postgres
-      sha256: f8e4f14734d096277f77ed5dddefcbc1ce18f8f7db5b7ff4b5dd6df2d9db2730
+      sha256: ad94089c7f18f4fcae83f42b475c32dfe7619df2fa8c86e17b2309f6c547897b
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.4"
-  postgres_pool:
-    dependency: transitive
-    description:
-      name: postgres_pool
-      sha256: abc8f6abcae3e82c47bfbab0631b618e038b5b5cae767454e6a193796da415f4
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.6+1"
+    version: "3.2.1"
   protobuf:
     dependency: transitive
     description:
@@ -537,26 +521,34 @@ packages:
     dependency: "direct main"
     description:
       name: serverpod
-      sha256: "5e7f7c54cf448573b8e5b8f3eacad43d527a077e9a8139fce493518beff8e31c"
+      sha256: "45a33dc9cc25f3d70b41dea1e52c9bcfa9ecd7e93735c61d7d450c1eed19e45d"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.7"
+    version: "2.0.2"
+  serverpod_client:
+    dependency: transitive
+    description:
+      name: serverpod_client
+      sha256: "8aefc285ede74291375d0f4fe125bc8886ffc475769b6c60c8d10e83bbadd359"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   serverpod_serialization:
     dependency: transitive
     description:
       name: serverpod_serialization
-      sha256: "29731d08155ed4f73aca6c608343d97db3f2f6eaa6152a4c91a8684de616cf63"
+      sha256: e700eb909a03de7220540f92372b515c84b960eeefd954fd81851f57f03d5970
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.7"
+    version: "2.0.2"
   serverpod_shared:
     dependency: transitive
     description:
       name: serverpod_shared
-      sha256: "9c3bda8f974248e8128cb0dae4136b7b86f0f8c60d831aa205c0e9b1171944bf"
+      sha256: f6742eadae5dac9a7b596b800b929101c560725956825b7a4437a400966e69f3
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.7"
+    version: "2.0.2"
   shelf:
     dependency: transitive
     description:
