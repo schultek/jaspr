@@ -1,3 +1,7 @@
+## 0.3.1
+
+- Update readme, move setup guide to topics.
+
 ## 0.3.0
 
 - Updated `serverpod` to `2.0.2`.

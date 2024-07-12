@@ -1,0 +1,6 @@
+dartdoc:
+  categories:
+    "Setup":
+      markdown: "doc/setup.md"
+  categoryOrder:
+    - "Setup"
