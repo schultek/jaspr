@@ -1,14 +1,14 @@
 import '../../jaspr.dart';
 
 class ListItemMarker {
-  final bool? isInside;
-  final Uri? imageUrl;
-  final ListStyleType? type;
+  final ListStyle? style;
+  final ImageStyle? image;
+  final ListStylePosition? position;
 
   const ListItemMarker({
-    this.isInside,
-    this.imageUrl,
-    this.type,
+    this.style,
+    this.image,
+    this.position,
   });
 }
 
@@ -46,7 +46,7 @@ class ListView extends StatelessComponent {
     return ListView(
       key: key,
       type: ListType.unordered,
-      marker: marker ?? ListItemMarker(type: ListStyleType.none),
+      marker: marker ?? ListItemMarker(style: ListStyle.none),
       children: children,
     );
   }
@@ -57,26 +57,23 @@ class ListView extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
+    final styles = Styles.list(
+      style: marker?.style,
+      image: marker?.image,
+      position: marker?.position,
+    ).box(
+      margin: marker?.style == ListStyle.none ? EdgeInsets.zero : null,
+      padding: marker?.style == ListStyle.none ? EdgeInsets.zero : null,
+    );
+
     if (type == ListType.unordered) {
       yield ul(
-        styles: Styles.raw({
-          if (marker?.type == ListStyleType.none) 'margin': '0',
-          if (marker?.type == ListStyleType.none) 'padding': '0',
-          if (marker?.type != null) 'list-style-type': marker!.type!.value,
-          if (marker?.isInside != null) 'list-style-position': marker!.isInside! ? 'inside' : 'outside',
-          if (marker?.imageUrl != null) 'list-style-image': 'url("${marker?.imageUrl}")',
-        }),
+        styles: styles,
         children,
       );
     } else {
       yield ol(
-        styles: Styles.raw({
-          if (marker?.type == ListStyleType.none) 'margin': '0',
-          if (marker?.type == ListStyleType.none) 'padding': '0',
-          if (marker?.type != null) 'list-style-type': marker!.type!.value,
-          if (marker?.isInside != null) 'list-style-position': marker!.isInside! ? 'inside' : 'outside',
-          if (marker?.imageUrl != null) 'list-style-image': 'url("${marker?.imageUrl}")',
-        }),
+        styles: styles,
         children,
       );
     }

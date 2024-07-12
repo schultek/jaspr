@@ -1,0 +1,39 @@
+@font-face {
+    font-family: "Roboto";
+    src: url("/fonts/Roboto-Regular.ttf");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-weight: bold;
+    src: url("/fonts/Roboto-Bold.ttf");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-weight: bold;
+    font-style: italic;
+    src: url("/fonts/Roboto-BoldItalic.ttf");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: italic;
+    src: url("/fonts/Roboto-Italic.ttf");
+}
+
+@font-face {
+    font-family: "icomoon";
+    src: url("/fonts/icomoon.ttf");
+}
+
+[class^="icon-"], [class*=" icon-"] {
+    font-family: "icomoon";
+}
+
+.icon-heart:before {
+    content: "\e901";
+}
+.icon-heart-o:before {
+    content: "\e900";
+}
