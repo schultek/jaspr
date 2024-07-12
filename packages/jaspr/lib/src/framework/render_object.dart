@@ -49,10 +49,27 @@ mixin RenderObjectElement on Element {
     super.didMount();
   }
 
+  bool _dirtyRender = false;
+
+  bool shouldRerender(covariant Component newComponent) {
+    return true;
+  }
+
   @override
   void update(Component newComponent) {
+    if (shouldRerender(newComponent)) {
+      _dirtyRender = true;
+    }
     super.update(newComponent);
-    updateRenderObject();
+  }
+
+  @override
+  void didUpdate(Component oldComponent) {
+    if (_dirtyRender) {
+      _dirtyRender = false;
+      updateRenderObject();
+    }
+    super.didUpdate(oldComponent);
   }
 
   @override
@@ -69,6 +86,7 @@ mixin RenderObjectElement on Element {
     }
   }
 
+  @override
   void detachRenderObject() {
     var parent = _parentRenderObjectElement?.renderObject;
     if (parent != null) {

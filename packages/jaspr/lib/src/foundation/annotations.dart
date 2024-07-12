@@ -5,6 +5,20 @@ class ClientAnnotation {
 /// Used to annotate a client component
 const client = ClientAnnotation._();
 
+class EncoderAnnotation {
+  const EncoderAnnotation._();
+}
+
+/// Used to annotate an encoder function for a custom model.
+const encoder = EncoderAnnotation._();
+
+class DecoderAnnotation {
+  const DecoderAnnotation._();
+}
+
+/// Used to annotate an decoder function for a custom model.
+const decoder = DecoderAnnotation._();
+
 enum ImportPlatform { web, server }
 
 /// Define a platform specific import with auto-generated stubbing.

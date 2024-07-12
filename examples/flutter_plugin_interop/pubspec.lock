@@ -414,21 +414,20 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.13.1"
+    version: "0.13.3"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.13.1"
+    version: "0.13.3"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
-      name: jaspr_web_compilers
-      sha256: "331ce48f512c994a9765093f1e12dacc8d8483fab85fbeddc3c4226fe03e28e9"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../modules/build/jaspr_web_compilers"
+      relative: true
+    source: path
     version: "4.0.9"
   js:
     dependency: transitive
@@ -876,5 +875,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.3.0 <3.5.0"
+  dart: ">=3.3.0 <3.6.0"
   flutter: ">=3.18.0-18.0.pre.54"

@@ -1,4 +1,4 @@
-enum ListStyleType {
+enum ListStyle {
   circle('circle'),
   disc('disc'),
   square('square'),
@@ -18,5 +18,13 @@ enum ListStyleType {
   initial('initial');
 
   final String value;
-  const ListStyleType(this.value);
+  const ListStyle(this.value);
+}
+
+enum ListStylePosition {
+  inside('inside'),
+  outside('outside');
+
+  final String value;
+  const ListStylePosition(this.value);
 }

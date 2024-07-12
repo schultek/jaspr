@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "site": "fluttercon",
+    "public": "build/jaspr",
+    "ignore": [
+      "firebase.json",
+      "**/.*"
+    ]
+  }
+}
