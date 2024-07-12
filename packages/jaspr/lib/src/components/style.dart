@@ -47,7 +47,7 @@ class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
 
     var self = _self;
     var curr = self.selector.selector.startsWith('&') || parent.isEmpty
-        ? self.selector.selector.replaceFirst('&', parent)
+        ? self.selector.selector.replaceAll('&', parent)
         : '$parent ${self.selector.selector}';
 
     if (_self.styles.styles.isNotEmpty) {
@@ -72,7 +72,7 @@ extension on _BlockStyleRule {
   String _toCssWithParent(String indent, String parent) {
     var child = _BlockStyleRule(
       selector: Selector(selector.selector.startsWith('&') || parent.isEmpty
-          ? selector.selector.replaceFirst('&', parent)
+          ? selector.selector.replaceAll('&', parent)
           : '$parent ${selector.selector}'),
       styles: styles,
     );

@@ -250,13 +250,35 @@ class _ValueTextDecorationThickness implements TextDecorationThickness {
 }
 
 class TextDecoration {
+  /// The css value
+  final String value;
+
+  const TextDecoration._(this.value);
+
+  const factory TextDecoration({
+    TextDecorationLine? line,
+    Color? color,
+    TextDecorationStyle? style,
+    TextDecorationThickness? thickness,
+  }) = _TextDecoration;
+
+  static const TextDecoration none = TextDecoration._('none');
+  static const TextDecoration inherit = TextDecoration._('inherit');
+  static const TextDecoration initial = TextDecoration._('initial');
+  static const TextDecoration revert = TextDecoration._('revert');
+  static const TextDecoration revertLayer = TextDecoration._('revert-layer');
+  static const TextDecoration unset = TextDecoration._('unset');
+}
+
+class _TextDecoration implements TextDecoration {
   final TextDecorationLine? line;
   final Color? color;
   final TextDecorationStyle? style;
   final TextDecorationThickness? thickness;
 
-  const TextDecoration({this.line, this.color, this.style, this.thickness});
+  const _TextDecoration({this.line, this.color, this.style, this.thickness});
 
+  @override
   String get value => [
         if (line != null) line!.value,
         if (style != null) style!.value,

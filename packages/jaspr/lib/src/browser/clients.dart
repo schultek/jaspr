@@ -41,10 +41,6 @@ ClientLoader loadClient(Future<void> Function() loader, ClientBuilder builder) {
   return () => loader().then((_) => builder);
 }
 
-void _runClient(ClientBuilder builder, ConfigParams params, (Node, Node) between) {
-  BrowserAppBinding().attachRootComponent(builder(params), attachBetween: between);
-}
-
 final _compStartRegex = RegExp(r'^\$(\S+)(?:\s+data=(.*))?$');
 final _compEndRegex = RegExp(r'^/\$(\S+)$');
 
@@ -74,13 +70,17 @@ void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
         assert(start.parentNode == currNode.parentNode);
 
         var between = (start, currNode);
+
+        // Remove the data string.
+        start.text = '\$${comp.$1}';
+
         var params = ConfigParams(jsonDecode(comp.$2 ?? '{}'));
 
         var builder = fn(name);
         if (builder is ClientBuilder) {
-          _runClient(builder, params, between);
+          BrowserAppBinding().attachRootComponent(builder(params), attachBetween: between);
         } else {
-          builder.then((b) => _runClient(b, params, between));
+          builder.then((b) => BrowserAppBinding().attachRootComponent(b(params), attachBetween: between));
         }
       }
     }
