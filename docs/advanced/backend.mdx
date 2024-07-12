@@ -29,7 +29,7 @@ When using your own backend setup, you can still do `jaspr serve`, however auto-
 on the server automatically.
 </Warning>
 
-## Example: Shelf
+## Shelf
 
 [`shelf`](https://pub.dev/packages/shelf) is a widely-used package for building server apps with dart that is 
 maintained by the Dart team.
@@ -61,7 +61,16 @@ any other route prefix than `/`, otherwise your static resources like `styles.cs
 can't be loaded correctly. Add the `<base href="/<route_prefix>/">` tag to the `head` of your
 `index.html`, as demonstrated in the example.
 
-## Example: Dart Frog
+## Serverpod
+
+[Serverpod](https://serverpod.dev/) is an open-source, scalable app server, written in Dart for the Flutter community.
+You can use Serverpod and Jaspr together using our official [**Serverpod Integration**](https://pub.dev/packages/jaspr_serverpod)
+to build robust and scalable fullstack websites leveraging Serverpods builtin webserver and additional components.
+
+To get started with combining Jaspr and Serverpod head over to the [documentation of the integration package](https://pub.dev/packages/jaspr_serverpod)
+or checkout the [example](https://github.com/schultek/jaspr/tree/main/examples/backend_serverpod).
+
+## Dart Frog
 
 [`dart_frog`](https://dartfrog.vgv.dev/) is a new backend framework built by Very Good Ventures. You
 can combine it with jaspr to build powerful fullstack web applications that use dart_frog for managing

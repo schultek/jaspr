@@ -137,7 +137,7 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       args.add('--pause-isolates-on-start');
     }
 
-    var entryPoint = await getEntryPoint(argResults!['input']);
+    var entryPoint = await getEntryPoint(argResults!['input'], true);
 
     if (!release) {
       var import = entryPoint.replaceFirst('lib', 'package:${config!.projectName}');

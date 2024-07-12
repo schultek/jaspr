@@ -14,7 +14,7 @@ class SessionList extends StatelessComponent {
     var groups = sessions.groupListsBy((s) => s.startsAt);
 
     yield ul(classes: "sessions", [
-      for (final MapEntry(:key, value: sessions) in groups.entries)
+      for (final MapEntry(value: sessions) in groups.entries)
         div(classes: "group", [
           for (final session in sessions)
             li(key: ValueKey(session.id), [
