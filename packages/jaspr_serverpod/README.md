@@ -19,13 +19,19 @@ jaspr:
   dev-command: dart bin/main.dart
 ```
 
-Move everything from `web/static/` up to `web/`. Optionally remove the files inside the `web/templates/` directory.
+Move everything from `web/static/` up to `web/`:
+```shell
+mv web/static/* web/
+```
+
+> You can also delete the `web/templates/` directory if you don't need it.
 
 Now edit your `lib/server.dart` to use `RootRoute()` for all paths:
 
 ```dart
 import 'package:jaspr/jaspr.dart';
 
+// This will be generated when running `jaspr serve` later.
 import 'jaspr_options.dart';
 
 // ... Other imports
@@ -34,7 +40,10 @@ void run(List<String> args) async {
   
   // ... Other serverpod code
 
-  Jaspr.initializeApp(options: defaultJasprOptions);
+  Jaspr.initializeApp(options: defaultJasprOptions, useIsolates: false);
+  
+  // If you need other special routes, like authentication redirects, 
+  // add them before `RootRoute` above.
   
   // Point all paths to the root route.
   pod.webServer.addRoute(RootRoute(), '/*');
@@ -42,9 +51,6 @@ void run(List<String> args) async {
   // Remove all other routes like 
   // - `pod.webServer.addRoute(RootRoute(), '...')` 
   // - `pod.webServer.addRoute(RouteStaticDirectory(...), '/*')`
-
-  // If you need other special routes, like authentication redirects, 
-  // add them before `RootRoute` above.
 
   // ... Other serverpod code
 }
@@ -156,10 +162,9 @@ class _CounterState extends State<Counter> {
 }
 ```
 
-You are now set to run your server and render a webpage using Serverpod and Jaspr.
+> All Jaspr components must be kept outside of the `src/` directory to function properly!
 
-> When you start adding your own components, make sure to keep all jaspr components outside 
-> of the `src/` directory to function properly.
+You are now set to run your server and render a webpage using Serverpod and Jaspr.
 
 ---
 
@@ -167,7 +172,8 @@ You are now set to run your server and render a webpage using Serverpod and Jasp
 
 To start your server, simply run `jaspr serve` in your terminal. 
 
-*This fully replaces the need to run `dart bin/main.dart` during development.*
+*This fully replaces the need to run `dart bin/main.dart` during development. However on a fresh project or update
+your models, you might need to run `dart bin/main.dart --apply-migrations` from time to time.*
 
 ## Building and deploying
 

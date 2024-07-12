@@ -1,3 +1,8 @@
+## 0.3.0
+
+- Updated `serverpod` to `2.0.2`.
+- Improved the `README`.
+
 ## 0.2.0
 
 - Added `JasprConnectivityMonitor`.
