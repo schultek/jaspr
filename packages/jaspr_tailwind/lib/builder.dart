@@ -9,7 +9,9 @@ import 'package:path/path.dart' as p;
 Builder buildStylesheet(BuilderOptions options) => TailwindBuilder(options);
 
 class TailwindBuilder implements Builder {
-  TailwindBuilder(BuilderOptions options);
+  final BuilderOptions options;
+
+  TailwindBuilder(this.options);
 
   @override
   Future<void> build(BuildStep buildStep) async {
@@ -46,7 +48,7 @@ class TailwindBuilder implements Builder {
         scratchSpace.fileFor(outputId).path.toPosix(),
         '--content',
         p.join(Directory.current.path, '{lib,web}', '**', '*.dart').toPosix(true),
-        '--minify',
+        if (options.config.containsKey('tailwindcss')) options.config['tailwindcss'],
         if (hasCustomConfig) ...[
           '--config',
           p.join(Directory.current.path, 'tailwind.config.js').toPosix(),

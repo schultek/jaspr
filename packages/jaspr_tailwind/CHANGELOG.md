@@ -1,6 +1,6 @@
 ## Unreleased patch
 
-- Added minify option to tailwind.
+- Added minify option to tailwind in release mode.
 
 ## 0.2.0
 
