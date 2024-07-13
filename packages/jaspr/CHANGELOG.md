@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed missing html unescape in hydrated data.
+
 ## 0.13.3
 
 - Added support for custom models as parameters to `@client` components.

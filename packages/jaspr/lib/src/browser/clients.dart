@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 
+import 'package:html/parser.dart';
+
 import '../framework/framework.dart';
 import 'browser_binding.dart';
 
@@ -74,7 +76,7 @@ void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
         // Remove the data string.
         start.text = '\$${comp.$1}';
 
-        var params = ConfigParams(jsonDecode(comp.$2 ?? '{}'));
+        var params = ConfigParams(jsonDecode(parseFragment(comp.$2 ?? '{}').text!));
 
         var builder = fn(name);
         if (builder is ClientBuilder) {
