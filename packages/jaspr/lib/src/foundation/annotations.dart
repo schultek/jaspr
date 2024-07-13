@@ -1,25 +1,23 @@
-class ClientAnnotation {
-  const ClientAnnotation._();
-}
-
-/// Used to annotate a client component
+/// Used to annotate a client component.
 const client = ClientAnnotation._();
 
-class EncoderAnnotation {
-  const EncoderAnnotation._();
+class ClientAnnotation {
+  const ClientAnnotation._();
 }
 
 /// Used to annotate an encoder function for a custom model.
 const encoder = EncoderAnnotation._();
 
-class DecoderAnnotation {
-  const DecoderAnnotation._();
+class EncoderAnnotation {
+  const EncoderAnnotation._();
 }
 
 /// Used to annotate an decoder function for a custom model.
 const decoder = DecoderAnnotation._();
 
-enum ImportPlatform { web, server }
+class DecoderAnnotation {
+  const DecoderAnnotation._();
+}
 
 /// Define a platform specific import with auto-generated stubbing.
 ///
@@ -57,4 +55,13 @@ class Import {
   final ImportPlatform platform;
   final String import;
   final List<dynamic> show;
+}
+
+enum ImportPlatform { web, server }
+
+/// Used to annotate a set of style rules.
+const styles = StylesAnnotation._();
+
+class StylesAnnotation {
+  const StylesAnnotation._();
 }

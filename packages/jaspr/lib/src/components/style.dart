@@ -9,7 +9,7 @@ class Style extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(
       tag: 'style',
-      child: RawText(styles.map((s) => s._toCss()).join(cssPropSpace)),
+      child: RawText(styles.render()),
     );
   }
 }
@@ -27,6 +27,12 @@ abstract class StyleRule {
   const factory StyleRule.media({required MediaRuleQuery query, required List<StyleRule> styles}) = _MediaStyleRule;
 
   String _toCss([String indent]);
+}
+
+extension StyleRulesRender on Iterable<StyleRule> {
+  String render() {
+    return this.map((s) => s._toCss()).join(cssPropSpace);
+  }
 }
 
 class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
@@ -74,7 +80,7 @@ extension on _BlockStyleRule {
       selector: Selector(selector.selector.startsWith('&') || parent.isEmpty
           ? selector.selector.replaceAll('&', parent)
           : '$parent ${selector.selector}'),
-      styles: styles,
+      styles: this.styles,
     );
     return child._toCss(indent);
   }

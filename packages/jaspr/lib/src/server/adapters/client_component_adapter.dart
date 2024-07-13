@@ -41,7 +41,7 @@ class ClientComponentRegistryElement extends ObserverElement {
       _didAddClientScript = true;
     }
 
-    var entry = binding.options.targets[element.component.runtimeType];
+    var entry = binding.options.clients[element.component.runtimeType];
 
     if (entry == null) {
       return;
