@@ -9,7 +9,7 @@ want to build you can choose how your app should be built and executed using Jas
   You can write server-side code to pre-render components and pages at built time, outputting clean html and css to deploy anywhere.
   Additionally, you can set up hydration on the client in order to make your site interactive.
 
-  Read more about (**Static Site Generation**](/core/ssg).
+  Read more about [**Static Generation**](/core/static_generation).
 
 - **Server Mode**
 
@@ -22,13 +22,14 @@ want to build you can choose how your app should be built and executed using Jas
   If you want, you can skip the server and pre-rendering part of Jaspr completely and use it as a client-side only framework.
   Similar to static mode, you can deploy your built site to any common website hosting service without needing an extra server.
 
+---
 
 Here is also a tabular comparison of the three rendering modes:
 
 |                                               | **static**                        | **server**                         | **client** |
 |:----------------------------------------------|-----------------------------------|------------------------------------|------------|
 | **Pre-Rendering**                             | Yes (at build time)               | Yes (at request time)              | No         |
-| **Client-side rendering** / **Interactivity** | Yes (with [Hydration](#hydration)) | Yes (with [Hydration](#hydration)) | Yes        |
+| **Client-side rendering** / **Interactivity** | Yes (with [Hydration](/core/modes#hydration)) | Yes (with [Hydration](/core/modes#hydration)) | Yes        |
 | **Needs Server**                              | No                                | Yes                                | No         |
 | **Deploy to any Webhoster**                   | Yes                               | No                                 | Yes        |
 | **Custom backend**                            | No                                | [Yes](/advanced/backend)           | No         |
@@ -72,9 +73,9 @@ It is generally recommended to use automatic hydration.
 For automatic hydration simply use the `@client` annotation on any component.
 
 A component annotated with `@client` will be automatically hydrated on the client after it has been pre-rendered. In principle,
-this is like 'resuming' the rendering for a component and picking up where the server-side rendering has left off.
+this is like 'resuming' the rendering for a component on the client and picking up where the server-side rendering has left off.
 
-Read more on `@client` components, their features and best-practices [here](/core/at_client).
+Read more about `@client` components and how to best use them [here](/core/at_client).
 
 </TabItem>
 <TabItem value="man">

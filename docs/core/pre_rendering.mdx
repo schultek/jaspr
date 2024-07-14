@@ -2,25 +2,10 @@
 title: Jaspr Server-Side Rendering
 description: How to setup server-side rendering and sync data between server and client in Jaspr.
 previous: /core/styling
-next: /core/ssg
+next: /core/static_generation
 ---
 
-# 🏗 Server Side Rendering
-
-**Jaspr** is built to be server-side-rendering first. It leverages the power of Darts
-cross-compilation to both js and native executables to execute the same app on the server and client.
-
-For each target (server and client) you need to have a separate entrypoint to start your app. However,
-depending on what project setup you choose, the web entrypoint might be automatically generated for you.
-
-1. The entrypoint on the web will always be the corresponding file inside the `web` directory,
-   usually `web/main.dart`. This file will be compiled to js and is included in the `index.html` file
-   as a script: `<script defer src="main.dart.js"></script>`
-
-2. The entrypoint on the server will be `lib/main.dart` or the file specified using the `-i (--input)` option when
-   running `jaspr serve` or `jaspr build`.
-
-## 💽 Loading Data on the Server
+## 💽 Loading Data during Pre-Rendering
 
 When using server side rendering, you want the ability to load some data asychrously before rendering the components.
 With `jaspr` this is build into the framework and easy to do.

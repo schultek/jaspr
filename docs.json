@@ -19,11 +19,10 @@
       ["\uD83C\uDF00 @client Components", "/core/at_client"],
       ["\uD83D\uDD8D Writing html", "/core/html"],
       ["\uD83C\uDFA8 Styling", "/core/styling"],
-      ["\uD83C\uDFD7 Server Side Rendering", "/core/ssr"],
-      ["\uD83D\uDCD1 Static Site Generation", "/core/ssg"]
+      ["\uD83C\uDFD7 Pre-Rendering", "/core/pre_rendering"],
+      ["\uD83D\uDCD1 Static Generation", "/core/static_generation"]
     ]],
     ["Advanced Concepts", [
-      ["\uD83C\uDFDD Islands Architecture", "/advanced/islands"],
       ["\uD83E\uDE90 Custom Backend", "/advanced/backend"],
       ["\uD83D\uDCCE Platform Imports", "/advanced/imports"]
     ]],
