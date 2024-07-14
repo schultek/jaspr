@@ -1,0 +1,44 @@
+# `@client` components
+
+
+A component annotated with `@client` will be automatically hydrated on the client after it has been pre-rendered. In principle,
+this is like 'resuming' the rendering for a component and picking up where the server-side rendering has left off.
+
+A `@client` component acts as a 'boundary' between server and client. Components in the tree above will be rendered **only on
+the server**, while components in the tree below will be rendered **both on the server and client**.
+
+> For `@client` to work, make sure to call `Jaspr.initializeApp(options: defaultJasprOptions);`
+> before `runApp();` in your `main.dart`.
+
+---
+
+The following happens when you use a `@client` component:
+
+*on the server:*
+1. The component is built and pre-rendered normally.
+2. Jaspr adds a html marker around your components output.
+
+*on the client:*
+4. The browser loads the pre-rendered html and compiled js scripts.
+5. The used component is located based on the html marker.
+6. The component is mounted and built at the current location in the tree.
+
+---
+
+```dart
+import 'package:jaspr/jaspr.dart';
+
+// marks this as a client component
+@client
+class App extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield ...;
+  }
+}
+```
+
+
+You can also have multiple components annotated with `@client` to have separate interactive 'islands' on the client.
+However, nesting client components is currently not possible.
+

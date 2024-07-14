@@ -16,6 +16,7 @@
       ["\uD83E\uDDF1 Component System", "/core/components"],
       ["\uD83D\uDCDF Rendering Modes & Hydration", "/core/modes"],
       ["\uD83D\uDC7E App & Document", "/core/app"],
+      ["\uD83C\uDF00 @client Components", "/core/at_client"],
       ["\uD83D\uDD8D Writing html", "/core/html"],
       ["\uD83C\uDFA8 Styling", "/core/styling"],
       ["\uD83C\uDFD7 Server Side Rendering", "/core/ssr"],
