@@ -1,12 +1,8 @@
 import '../markup_render_object.dart';
 import '../server_binding.dart';
 
-class DocumentAdapter extends RenderAdapter {
-  @override
-  void prepare() {}
-
-  @override
-  void apply(MarkupRenderObject root) {
+mixin DocumentStructureMixin on RenderAdapter {
+  (MarkupRenderObject, MarkupRenderObject, MarkupRenderObject) createDocumentStructure(MarkupRenderObject root) {
     var html = root.children.findWhere((c) => c.tag == 'html')?.node;
     if (html == null) {
       var range = root.children.range();
@@ -17,11 +13,13 @@ class DocumentAdapter extends RenderAdapter {
       );
     }
 
-    var head = html.children.findWhere((c) => c.tag == 'head');
-    var body = html.children.findWhere((c) => c.tag == 'body');
+    var headNode = html.children.findWhere((c) => c.tag == 'head');
+    var head = headNode?.node;
+    var bodyNode = html.children.findWhere((c) => c.tag == 'body');
+    var body = bodyNode?.node;
 
     if (head == null) {
-      var head = html.createChildRenderObject()..tag = 'head';
+      head = html.createChildRenderObject()..tag = 'head';
       head.children.insertAfter(head.createChildRenderObject()
         ..tag = 'base'
         ..attributes = {'href': '/'});
@@ -29,7 +27,7 @@ class DocumentAdapter extends RenderAdapter {
       if (body == null) {
         var range = html.children.range();
         html.children.insertAfter(head);
-        html.children.insertBefore(html.createChildRenderObject()
+        html.children.insertBefore(body = html.createChildRenderObject()
           ..tag = 'body'
           ..children.insertNodeAfter(range));
       } else {
@@ -37,30 +35,45 @@ class DocumentAdapter extends RenderAdapter {
       }
     } else {
       if (body == null) {
-        var rangeBefore = html.children.range(endBefore: head);
-        var rangeAfter = html.children.range(startAfter: head);
+        var rangeBefore = html.children.range(endBefore: headNode);
+        var rangeAfter = html.children.range(startAfter: headNode);
 
-        var body = html.createChildRenderObject()..tag = 'body';
+        body = html.createChildRenderObject()..tag = 'body';
         body.children
           ..insertNodeAfter(rangeAfter)
           ..insertNodeAfter(rangeBefore);
-        html.children.insertAfter(body, after: head.node);
+        html.children.insertAfter(body, after: head);
       }
 
-      var base = head.node.children.findWhere((c) => c.tag == 'base');
+      var base = head.children.findWhere((c) => c.tag == 'base');
       if (base == null) {
-        head.node.children.insertAfter(head.node.createChildRenderObject()
+        head.children.insertAfter(head.createChildRenderObject()
           ..tag = 'base'
           ..attributes = {'href': '/'});
       }
     }
 
-    var hasDoctype =
-        root.children.findWhere((r) => r.text != null && r.text!.startsWith('<!DOCTYPE') && (r.rawHtml ?? false)) !=
-            null;
+    return (html, head, body);
+  }
+}
 
-    if (!hasDoctype) {
+class DocumentAdapter extends RenderAdapter with DocumentStructureMixin {
+  @override
+  (MarkupRenderObject, MarkupRenderObject, MarkupRenderObject) apply(MarkupRenderObject root) {
+    final (html, head, body) = createDocumentStructure(root);
+
+    var base = head.children.findWhere((c) => c.tag == 'base');
+    if (base == null) {
+      head.children.insertAfter(head.createChildRenderObject()
+        ..tag = 'base'
+        ..attributes = {'href': '/'});
+    }
+
+    var doctype = root.children.findWhere((r) => (r.text?.startsWith('<!DOCTYPE') ?? false) && (r.rawHtml ?? false));
+    if (doctype == null) {
       root.children.insertAfter(root.createChildRenderObject()..updateText('<!DOCTYPE html>', true));
     }
+
+    return (html, head, body);
   }
 }
