@@ -436,8 +436,8 @@ enum NumberingType {
   /// For numbers (default)
   numbers('1');
 
-  final String value;
   const NumberingType(this.value);
+  final String value;
 }
 
 /// The &lt;li&gt; HTML element is used to represent an item in a list. It must be contained in a parent element: an ordered list (&lt;ol&gt;), an unordered list (&lt;ul&gt;), or a menu (&lt;menu&gt;). In menus and unordered lists, list items are usually displayed using bullet points. In ordered lists, they are usually displayed with an ascending counter on the left, such as a number or letter.

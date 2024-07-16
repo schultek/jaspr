@@ -6,7 +6,7 @@ class App extends TestComponent<int> {
   App() : super(initialValue: 1);
 
   final child1Key = UniqueKey();
-  final child2Key = ValueKey(2);
+  final child2Key = const ValueKey(2);
   final child3Key = GlobalObjectKey(3);
 
   @override
@@ -61,7 +61,7 @@ class App extends TestComponent<int> {
 }
 
 class ChildComponent extends Component {
-  ChildComponent({super.key, required this.num});
+  const ChildComponent({super.key, required this.num});
 
   final int num;
 

@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -9,13 +10,13 @@ import 'stateful_reparenting_app.dart';
 void main() {
   group('stateful reparenting test', () {
     testComponents('should keep state on reparenting', (tester) async {
-      var controller = await tester.pumpTestComponent(App());
+      final controller = await tester.pumpTestComponent(const App());
 
       // phase 1: component should be mounted directly
       expect(find.byType(MyStatefulComponent), findsOneComponent);
       expect(find.tag('div'), findsNothing);
 
-      var state = (find.byType(MyStatefulComponent).evaluate().first as StatefulElement).state as MyState;
+      final state = (find.byType(MyStatefulComponent).evaluate().first as StatefulElement).state as MyState;
 
       // lifecycle: state should be initialized and built a first time
       expect(state.lifecycle, equals(['initState', 'didChangeDependencies', 'build']));

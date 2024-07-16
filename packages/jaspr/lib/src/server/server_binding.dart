@@ -10,13 +10,15 @@ import 'markup_render_object.dart';
 
 /// Global component binding for the server
 class ServerAppBinding extends AppBinding with ComponentsBinding {
-  @override
-  Uri get currentUri => _currentUri!;
-  Uri? _currentUri;
+  ServerAppBinding.init({required Uri uri, required Future<String?> Function(String) handler})
+      : _currentUri = uri,
+        _fileHandler = handler;
 
-  void setCurrentUri(Uri uri) {
-    _currentUri = uri;
-  }
+  final Uri _currentUri;
+  final Future<String?> Function(String) _fileHandler;
+
+  @override
+  Uri get currentUri => _currentUri;
 
   @override
   bool get isClient => false;
@@ -31,21 +33,21 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   Future<String> render() async {
     await rootCompleter.future;
 
-    var root = rootElement!.renderObject as MarkupRenderObject;
-    var adapters = [
+    final root = rootElement!.renderObject as MarkupRenderObject;
+    final adapters = [
       ..._adapters.reversed,
       SyncScriptAdapter(getStateData),
       DocumentAdapter(),
     ];
 
-    for (var adapter in adapters.reversed) {
-      var r = adapter.prepare();
+    for (final adapter in adapters.reversed) {
+      final r = adapter.prepare();
       if (r is Future) {
         await r;
       }
     }
 
-    for (var adapter in adapters) {
+    for (final adapter in adapters) {
       adapter.apply(root);
     }
 
@@ -83,12 +85,6 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     return AsyncBuildOwner();
   }
 
-  late Future<String?> Function(String) _fileHandler;
-
-  void setFileHandler(Future<String?> Function(String) handler) {
-    _fileHandler = handler;
-  }
-
   Future<String?> loadFile(String name) => _fileHandler(name);
 
   late final List<RenderAdapter> _adapters = [];
@@ -97,9 +93,10 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     _adapters.add(adapter);
   }
 
-  JasprOptions get options => _options!;
   JasprOptions? _options;
+  JasprOptions get options => _options!;
 
+  // ignore: use_setters_to_change_properties
   void initializeOptions(JasprOptions options) {
     _options = options;
   }

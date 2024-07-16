@@ -18,7 +18,7 @@ class HeadAdapter extends HeadScopeAdapter {
 
   static bool _registered = false;
   static void register(BuildContext context) {
-    var binding = (context.binding as ServerAppBinding);
+    final binding = context.binding as ServerAppBinding;
     if (!_registered) {
       binding.addRenderAdapter(instance);
       _registered = true;
@@ -33,27 +33,27 @@ class HeadAdapter extends HeadScopeAdapter {
   void applyHead(MarkupRenderObject head) {
     head.children.insertBefore(head.createChildRenderObject()..updateText(r'<!--$-->', true));
 
-    List<MarkupRenderObject> nodes = [];
-    Map<String, (int, int)> indices = {};
+    final List<MarkupRenderObject> nodes = [];
+    final Map<String, (int, int)> indices = {};
 
     String? keyFor(MarkupRenderObject n) {
       return switch (n) {
-        MarkupRenderObject(id: String id) when id.isNotEmpty => id,
-        MarkupRenderObject(tag: "title" || "base") => '__${n.tag}',
-        MarkupRenderObject(tag: "meta", attributes: {'name': String name}) => '__meta:$name',
+        MarkupRenderObject(id: final String id) when id.isNotEmpty => id,
+        MarkupRenderObject(tag: 'title' || 'base') => '__${n.tag}',
+        MarkupRenderObject(tag: 'meta', attributes: {'name': final String name}) => '__meta:$name',
         _ => null,
       };
     }
 
-    for (var e in entries) {
+    for (final e in entries) {
       e.$1.remove();
-      for (var n in e.$1) {
-        var key = keyFor(n);
+      for (final n in e.$1) {
+        final key = keyFor(n);
         if (key == null) {
           nodes.add(n);
           continue;
         }
-        var index = indices[key];
+        final index = indices[key];
         if (index == null) {
           nodes.add(n);
           indices[key] = (nodes.length - 1, e.$2);
@@ -64,11 +64,11 @@ class HeadAdapter extends HeadScopeAdapter {
       }
     }
 
-    for (var n in nodes) {
+    for (final n in nodes) {
       head.children.insertBefore(n);
     }
 
-    head.children.insertBefore(head.createChildRenderObject()..updateText(r'<!--/-->', true));
+    head.children.insertBefore(head.createChildRenderObject()..updateText('<!--/-->', true));
   }
 }
 

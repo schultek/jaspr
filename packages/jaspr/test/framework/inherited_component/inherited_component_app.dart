@@ -23,9 +23,9 @@ class App extends TestComponent<int> {
 }
 
 class MyInheritedComponent extends InheritedComponent {
-  MyInheritedComponent({required this.value, required super.child});
+  const MyInheritedComponent({required this.value, required super.child});
 
-  final dynamic value;
+  final int value;
 
   @override
   bool updateShouldNotify(covariant MyInheritedComponent oldComponent) {

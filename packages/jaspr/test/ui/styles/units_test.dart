@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -7,11 +8,11 @@ void main() {
   group('style', () {
     group('unit', () {
       test('extensions on num', () {
-        expect(100.px, equals(Unit.pixels(100)));
-        expect(100.pt, equals(Unit.points(100)));
-        expect(100.percent, equals(Unit.percent(100)));
-        expect(100.em, equals(Unit.em(100)));
-        expect(100.rem, equals(Unit.rem(100)));
+        expect(100.px, equals(const Unit.pixels(100)));
+        expect(100.pt, equals(const Unit.points(100)));
+        expect(100.percent, equals(const Unit.percent(100)));
+        expect(100.em, equals(const Unit.em(100)));
+        expect(100.rem, equals(const Unit.rem(100)));
       });
 
       test('compares equal', () {
@@ -30,15 +31,15 @@ void main() {
     group('angle', () {
       test('outputs style value', () {
         expect(Angle.zero.value, equals('0'));
-        expect(Angle.deg(12).value, equals('12deg'));
-        expect(Angle.rad(1.2).value, equals('1.2rad'));
-        expect(Angle.turn(3).value, equals('3turn'));
+        expect(const Angle.deg(12).value, equals('12deg'));
+        expect(const Angle.rad(1.2).value, equals('1.2rad'));
+        expect(const Angle.turn(3).value, equals('3turn'));
       });
 
       test('extensions on num', () {
-        expect(100.deg, equals(Angle.deg(100)));
-        expect(100.rad, equals(Angle.rad(100)));
-        expect(100.turn, equals(Angle.turn(100)));
+        expect(100.deg, equals(const Angle.deg(100)));
+        expect(100.rad, equals(const Angle.rad(100)));
+        expect(100.turn, equals(const Angle.turn(100)));
       });
 
       test('compares equal', () {
@@ -56,7 +57,7 @@ void main() {
 
     group('edge_insets', () {
       test('base', () {
-        var insets = EdgeInsets.inherit;
+        const insets = EdgeInsets.inherit;
 
         expect(insets.styles, equals({'': 'inherit'}));
 
@@ -67,7 +68,7 @@ void main() {
       });
 
       test('from ltrm', () {
-        var insets = EdgeInsets.fromLTRB(10.px, 20.px, 30.px, 40.px);
+        final insets = EdgeInsets.fromLTRB(10.px, 20.px, 30.px, 40.px);
 
         expect(insets.left, equals(10.px));
         expect(insets.top, equals(20.px));
@@ -78,7 +79,7 @@ void main() {
       });
 
       test('only', () {
-        var insets = EdgeInsets.only(left: 10.px, bottom: 40.px);
+        final insets = EdgeInsets.only(left: 10.px, bottom: 40.px);
 
         expect(insets.left, equals(10.px));
         expect(insets.top, equals(0.px));
@@ -89,7 +90,7 @@ void main() {
       });
 
       test('all', () {
-        var insets = EdgeInsets.all(10.px);
+        final insets = EdgeInsets.all(10.px);
 
         expect(insets.left, equals(10.px));
         expect(insets.top, equals(10.px));

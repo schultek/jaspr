@@ -304,7 +304,7 @@ abstract class Element implements BuildContext {
         if (child._parentChanged || child._prevSibling != prevSibling) {
           child.updatePrevSibling(prevSibling);
         }
-        var oldComponent = child.component;
+        final oldComponent = child.component;
         child.update(newComponent);
         assert(child.component == newComponent);
         child.didUpdate(oldComponent);
@@ -381,7 +381,7 @@ abstract class Element implements BuildContext {
 
     if (oldChildren.length <= 1 && newComponents.length <= 1) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren.firstOrNull);
-      var newChild = updateChild(oldChild, newComponents.firstOrNull, null);
+      final newChild = updateChild(oldChild, newComponents.firstOrNull, null);
       return [if (newChild != null) newChild];
     }
 
@@ -729,7 +729,7 @@ abstract class Element implements BuildContext {
     final bool hadDependencies = (_dependencies != null && _dependencies!.isNotEmpty) || _hadUnsatisfiedDependencies;
     _lifecycleState = _ElementLifecycle.active;
 
-    var parent = _parent!;
+    final parent = _parent!;
     _parentRenderObjectElement = parent is RenderObjectElement ? parent : parent._parentRenderObjectElement;
 
     _dependencies?.clear();
@@ -762,7 +762,7 @@ abstract class Element implements BuildContext {
     assert(_component != null);
     assert(_depth != null);
     if (_dependencies != null && _dependencies!.isNotEmpty) {
-      for (var dependency in _dependencies!) {
+      for (final dependency in _dependencies!) {
         dependency.deactivateDependent(this);
       }
     }
@@ -792,7 +792,7 @@ abstract class Element implements BuildContext {
     assert(_owner != null);
 
     if (_observerElements != null && _observerElements!.isNotEmpty) {
-      for (var observer in _observerElements!) {
+      for (final observer in _observerElements!) {
         observer.didUnmountElement(this);
       }
       _observerElements = null;
@@ -991,7 +991,7 @@ abstract class Element implements BuildContext {
       return true;
     }());
     if (_observerElements != null && _observerElements!.isNotEmpty) {
-      for (var observer in _observerElements!) {
+      for (final observer in _observerElements!) {
         observer.willRebuildElement(this);
       }
     }
@@ -1004,12 +1004,12 @@ abstract class Element implements BuildContext {
       }());
       assert(!_dirty);
       if (_dependencies != null && _dependencies!.isNotEmpty) {
-        for (var dependency in _dependencies!) {
+        for (final dependency in _dependencies!) {
           dependency.didRebuildDependent(this);
         }
       }
       if (_observerElements != null && _observerElements!.isNotEmpty) {
-        for (var observer in _observerElements!) {
+        for (final observer in _observerElements!) {
           observer.didRebuildElement(this);
         }
       }
@@ -1086,7 +1086,7 @@ abstract class Element implements BuildContext {
   void _didUpdateSlot() {}
 
   void _updateAncestorSiblingRecursively(bool didChangeAncestor) {
-    var newAncestorSibling = _prevSibling ?? (_parent is RenderObjectElement ? null : _parent?._prevAncestorSibling);
+    final newAncestorSibling = _prevSibling ?? (_parent is RenderObjectElement ? null : _parent?._prevAncestorSibling);
     if (didChangeAncestor || newAncestorSibling != _prevAncestorSibling) {
       _prevAncestorSibling = newAncestorSibling;
       _didUpdateSlot();

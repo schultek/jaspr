@@ -11,6 +11,7 @@
 /// [optimizedValue], which must be a simple constant string.
 String objectRuntimeType(Object? object, String optimizedValue) {
   assert(() {
+    // ignore: parameter_assignments
     optimizedValue = object.runtimeType.toString();
     return true;
   }());

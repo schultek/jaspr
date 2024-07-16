@@ -18,7 +18,7 @@ class ServerApp {
     return ServerApp._(setup).._run();
   }
 
-  static final createTestHandler = createHandler;
+  static const createTestHandler = createHandler;
 
   final SetupFunction _setup;
 
@@ -26,11 +26,11 @@ class ServerApp {
   static HttpServer? _server;
   static http.Client? _client;
 
-  void _run() async {
-    var isFirstStartup = _server == null;
+  Future<void> _run() async {
+    final isFirstStartup = _server == null;
 
-    var lock = _runLock = Object();
-    var (client, server) = await _createServer();
+    final lock = _runLock = Object();
+    final (client, server) = await _createServer();
 
     if (_runLock != lock) {
       server.close(force: true);
@@ -45,21 +45,23 @@ class ServerApp {
     _client = client;
 
     if (isFirstStartup) {
-      print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');
-      print('Serving at http://${kDebugMode ? 'localhost' : _server!.address.host}:${_server!.port}');
+      // ignore: avoid_print
+      print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode\n'
+          'Serving at http://${kDebugMode ? 'localhost' : _server!.address.host}:${_server!.port}');
 
       if (kGenerateMode) {
         requestRouteGeneration('/');
       }
     } else {
+      // ignore: avoid_print
       print('[INFO] Server application reloaded.');
     }
   }
 
   Future<(http.Client, HttpServer)> _createServer() async {
-    var port = int.parse(Platform.environment['PORT'] ?? '8080');
-    var client = http.Client();
-    var handler = createHandler((_, render) => render(_setup), client: client);
+    final port = int.parse(Platform.environment['PORT'] ?? '8080');
+    final client = http.Client();
+    final handler = createHandler((_, render) => render(_setup), client: client);
     return (client, await shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true));
   }
 

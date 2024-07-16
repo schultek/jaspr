@@ -1,15 +1,6 @@
 part of '../styles.dart';
 
 class _BackgroundStyles extends Styles {
-  final Color? color;
-  final BackgroundAttachment? attachment;
-  final BackgroundClip? clip;
-  final ImageStyle? image;
-  final BackgroundOrigin? origin;
-  final BackgroundPosition? position;
-  final BackgroundRepeat? repeat;
-  final BackgroundSize? size;
-
   const _BackgroundStyles({
     this.color,
     this.attachment,
@@ -20,6 +11,15 @@ class _BackgroundStyles extends Styles {
     this.repeat,
     this.size,
   }) : super._();
+
+  final Color? color;
+  final BackgroundAttachment? attachment;
+  final BackgroundClip? clip;
+  final ImageStyle? image;
+  final BackgroundOrigin? origin;
+  final BackgroundPosition? position;
+  final BackgroundRepeat? repeat;
+  final BackgroundSize? size;
 
   @override
   Map<String, String> get styles => {

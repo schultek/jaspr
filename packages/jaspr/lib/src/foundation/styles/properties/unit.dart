@@ -46,11 +46,6 @@ extension UnitExt on num {
 }
 
 abstract class Unit {
-  static const Unit zero = _ZeroUnit();
-
-  ///auto represents the style attribute unit 'auto'
-  static const Unit auto = _AutoUnit();
-
   /// Constructs a [Unit] in the form '100%'
   const factory Unit.percent(double value) = _PercentUnit;
 
@@ -71,6 +66,12 @@ abstract class Unit {
 
   /// Constructs a [Unit] in the form '100vh'
   const factory Unit.vh(double value) = _VhUnit;
+
+  /// Represents the style unit '0'
+  static const Unit zero = _ZeroUnit();
+
+  /// Represents the style unit 'auto'
+  static const Unit auto = _AutoUnit();
 
   /// The css value
   String get value;
@@ -104,10 +105,10 @@ class _AutoUnit implements Unit {
 }
 
 class _Unit implements Unit {
+  const _Unit(this._value, this._unit);
+
   final String _unit;
   final double _value;
-
-  const _Unit(this._value, this._unit);
 
   @override
   String get value => '${_value.numstr}$_unit';

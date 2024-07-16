@@ -48,8 +48,8 @@ enum ButtonType {
   /// The button has no default behavior, and does nothing when pressed by default. It can have client-side scripts listen to the element's events, which are triggered when the events occur.
   button('button');
 
-  final String value;
   const ButtonType(this.value);
+  final String value;
 }
 
 /// The &lt;form&gt; HTML element represents a document section containing interactive controls for submitting information.
@@ -109,8 +109,8 @@ enum FormMethod {
   /// When the form is inside a &lt;dialog&gt;, closes the dialog and throws a submit event on submission without submitting data or clearing the form.
   dialog('dialog');
 
-  final String value;
   const FormMethod(this.value);
+  final String value;
 }
 
 /// The MIME type of a form submission.
@@ -124,8 +124,8 @@ enum FormEncType {
   /// Introduced by HTML5 for debugging purposes.
   text('text/plain');
 
-  final String value;
   const FormEncType(this.value);
+  final String value;
 }
 
 /// Indicates whether input elements can by default have their values automatically completed by the browser. autocomplete attributes on form elements override it on &lt;form&gt;.
@@ -136,8 +136,8 @@ enum AutoComplete {
   /// The browser may automatically complete entries.
   on('on');
 
-  final String value;
   const AutoComplete(this.value);
+  final String value;
 }
 
 /// The &lt;input&gt; HTML element is used to create interactive controls for web-based forms in order to accept data from the user; a wide variety of types of input data and control widgets are available, depending on the device and user agent. The &lt;input&gt; element is one of the most powerful and complex in all of HTML due to the sheer number of combinations of input types and attributes.
@@ -250,8 +250,8 @@ enum InputType {
   /// A control for entering a date consisting of a week-year number and a week number with no time zone.
   week('week');
 
-  final String value;
   const InputType(this.value);
+  final String value;
 }
 
 /// The &lt;label&gt; HTML element represents a caption for an item in a user interface.
@@ -611,8 +611,8 @@ enum SpellCheck {
   /// Indicates that the element should not be spell checked.
   isFalse('false');
 
-  final String value;
   const SpellCheck(this.value);
+  final String value;
 }
 
 /// Indicates how the control wraps text.
@@ -623,6 +623,6 @@ enum TextWrap {
   /// The browser ensures that all line breaks in the value consist of a CR+LF pair, but does not insert any additional line breaks.
   soft('soft');
 
-  final String value;
   const TextWrap(this.value);
+  final String value;
 }

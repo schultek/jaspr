@@ -3,10 +3,10 @@ import 'unit.dart';
 
 /// The display CSS property sets whether an element is treated as a block or inline element and the layout used for its children, such as flow layout, grid or flex.
 enum Display {
-  none("none"),
-  block("block"),
-  inline("inline"),
-  inlineBlock("inline-block"),
+  none('none'),
+  block('block'),
+  inline('inline'),
+  inlineBlock('inline-block'),
   flex('flex'),
   inlineFlex('inline-flex'),
   grid('grid'),
@@ -20,9 +20,10 @@ enum Display {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const Display(this.value);
+
   /// The css value
   final String value;
-  const Display(this.value);
 }
 
 abstract class Border {
@@ -41,19 +42,18 @@ abstract class Border {
 }
 
 class _Border implements Border {
+  const _Border(this.value);
+
   /// The css value
   final String value;
-
-  const _Border(this.value);
 
   @override
   Map<String, String> get styles => {'border': value};
 }
 
 class _AllBorder implements Border {
-  final BorderSide side;
-
   const _AllBorder(this.side);
+  final BorderSide side;
 
   @override
   Map<String, String> get styles => {
@@ -66,12 +66,11 @@ class _AllBorder implements Border {
 }
 
 class _OnlyBorder implements Border {
+  const _OnlyBorder({this.left, this.top, this.right, this.bottom});
   final BorderSide? left;
   final BorderSide? top;
   final BorderSide? right;
   final BorderSide? bottom;
-
-  const _OnlyBorder({this.left, this.top, this.right, this.bottom});
 
   @override
   Map<String, String> get styles => {
@@ -91,10 +90,10 @@ class _OnlyBorder implements Border {
 }
 
 class _SymmetricBorder implements Border {
+  const _SymmetricBorder({this.vertical, this.horizontal});
+
   final BorderSide? vertical;
   final BorderSide? horizontal;
-
-  const _SymmetricBorder({this.vertical, this.horizontal});
 
   @override
   Map<String, String> get styles {
@@ -128,10 +127,6 @@ class _SymmetricBorder implements Border {
 }
 
 class BorderSide {
-  final BorderStyle? style;
-  final Color? color;
-  final Unit? width;
-
   const BorderSide({this.style, this.color, this.width});
 
   const BorderSide.none()
@@ -144,6 +139,10 @@ class BorderSide {
   const BorderSide.double({this.color, this.width}) : style = BorderStyle.double;
   const BorderSide.groove({this.color, this.width}) : style = BorderStyle.groove;
   const BorderSide.ridge({this.color, this.width}) : style = BorderStyle.ridge;
+
+  final BorderStyle? style;
+  final Color? color;
+  final Unit? width;
 }
 
 enum BorderStyle {
@@ -158,9 +157,10 @@ enum BorderStyle {
   inset('inset'),
   outset('outset');
 
+  const BorderStyle(this.value);
+
   /// The css value
   final String value;
-  const BorderStyle(this.value);
 }
 
 abstract class BorderRadius {
@@ -178,9 +178,8 @@ abstract class BorderRadius {
 }
 
 class _AllBorderRadius implements BorderRadius {
-  final Radius radius;
-
   const _AllBorderRadius(this.radius);
+  final Radius radius;
 
   @override
   Map<String, String> get styles => {
@@ -189,20 +188,14 @@ class _AllBorderRadius implements BorderRadius {
 }
 
 class _CircularBorderRadius implements BorderRadius {
-  final Unit radius;
-
   const _CircularBorderRadius(this.radius);
+  final Unit radius;
 
   @override
   Map<String, String> get styles => {'border-radius': radius.value};
 }
 
 class _OnlyBorderRadius implements BorderRadius {
-  final Radius? topLeft;
-  final Radius? topRight;
-  final Radius? bottomLeft;
-  final Radius? bottomRight;
-
   const _OnlyBorderRadius({this.topLeft, this.topRight, this.bottomLeft, this.bottomRight});
   const _OnlyBorderRadius.vertical({Radius? top, Radius? bottom})
       : topLeft = top,
@@ -215,10 +208,15 @@ class _OnlyBorderRadius implements BorderRadius {
         bottomLeft = left,
         bottomRight = right;
 
+  final Radius? topLeft;
+  final Radius? topRight;
+  final Radius? bottomLeft;
+  final Radius? bottomRight;
+
   @override
   Map<String, String> get styles {
     if (topLeft != null && topRight != null && bottomRight != null && bottomLeft != null) {
-      var values = [topLeft!, topRight!, bottomRight!, bottomLeft!].map((r) => r._values).toList();
+      final values = [topLeft!, topRight!, bottomRight!, bottomLeft!].map((r) => r._values).toList();
       if (values.every((v) => v.length == 1)) {
         return {'border-radius': values.map((v) => v.first).join(' ')};
       } else {
@@ -245,9 +243,8 @@ abstract class Radius {
 }
 
 class _CircularRadius implements Radius {
-  final Unit radius;
-
   const _CircularRadius(this.radius);
+  final Unit radius;
 
   @override
   List<String> get _values {
@@ -256,10 +253,9 @@ class _CircularRadius implements Radius {
 }
 
 class _EllipticalRadius implements Radius {
+  const _EllipticalRadius(this.x, this.y);
   final Unit x;
   final Unit y;
-
-  const _EllipticalRadius(this.x, this.y);
 
   @override
   List<String> get _values {
@@ -281,22 +277,22 @@ abstract class Outline {
 }
 
 class _KeywordOutline implements Outline {
+  const _KeywordOutline(this.value);
+
   /// The css value
   final String value;
-
-  const _KeywordOutline(this.value);
 
   @override
   Map<String, String> get styles => {'outline': value};
 }
 
 class _Outline implements Outline {
+  const _Outline({this.color, this.style, this.width, this.offset});
+
   final Color? color;
   final OutlineStyle? style;
   final OutlineWidth? width;
   final Unit? offset;
-
-  const _Outline({this.color, this.style, this.width, this.offset});
 
   @override
   Map<String, String> get styles => {
@@ -325,9 +321,10 @@ enum OutlineStyle {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const OutlineStyle(this.value);
+
   /// The css value
   final String value;
-  const OutlineStyle(this.value);
 }
 
 abstract class OutlineWidth {
@@ -348,29 +345,29 @@ abstract class OutlineWidth {
 }
 
 class _KeywordOutlineWidth implements OutlineWidth {
+  const _KeywordOutlineWidth(this.value);
+
   @override
   final String value;
-
-  const _KeywordOutlineWidth(this.value);
 }
 
 class _OutlineWidth implements OutlineWidth {
-  final Unit unit;
-
   const _OutlineWidth(this.unit);
+
+  final Unit unit;
 
   @override
   String get value => unit.value;
 }
 
 abstract class Overflow {
+  const factory Overflow.only({OverflowValue? x, OverflowValue? y}) = _OnlyOverflow;
+
   static const OverflowValue visible = OverflowValue._('visible');
   static const OverflowValue hidden = OverflowValue._('hidden');
   static const OverflowValue clip = OverflowValue._('clip');
   static const OverflowValue scroll = OverflowValue._('scroll');
   static const OverflowValue auto = OverflowValue._('auto');
-
-  const factory Overflow.only({OverflowValue? x, OverflowValue? y}) = _OnlyOverflow;
 
   static const Overflow inherit = _Overflow('inherit');
   static const Overflow initial = _Overflow('initial');
@@ -383,9 +380,9 @@ abstract class Overflow {
 }
 
 class _Overflow implements Overflow {
-  final String _value;
-
   const _Overflow(this._value);
+
+  final String _value;
 
   @override
   Map<String, String> get styles => {
@@ -398,10 +395,10 @@ class OverflowValue extends _Overflow {
 }
 
 class _OnlyOverflow implements Overflow {
+  const _OnlyOverflow({this.x, this.y});
+
   final OverflowValue? x;
   final OverflowValue? y;
-
-  const _OnlyOverflow({this.x, this.y});
 
   @override
   Map<String, String> get styles => {
@@ -425,9 +422,10 @@ enum Visibility {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const Visibility(this.value);
+
   /// The css value
   final String value;
-  const Visibility(this.value);
 }
 
 enum BoxSizing {
@@ -440,9 +438,10 @@ enum BoxSizing {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const BoxSizing(this.value);
+
   /// The css value
   final String value;
-  const BoxSizing(this.value);
 }
 
 abstract class BoxShadow {
@@ -494,6 +493,7 @@ class _CombineBoxShadow implements BoxShadow {
 }
 
 class Cursor {
+  const factory Cursor.url(String url, {double? x, double? y, required Cursor fallback}) = _UrlCursor;
   const Cursor._(this.value);
 
   final String value;
@@ -534,8 +534,6 @@ class Cursor {
   static const Cursor nwseResize = Cursor._('nwse-resize');
   static const Cursor zoomIn = Cursor._('zoom-in');
   static const Cursor zoomOut = Cursor._('zoom-out');
-
-  const factory Cursor.url(String url, {double? x, double? y, required Cursor fallback}) = _UrlCursor;
 }
 
 class _UrlCursor implements Cursor {

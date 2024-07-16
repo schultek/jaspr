@@ -3,8 +3,8 @@ import 'package:jaspr/jaspr.dart';
 class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield Head(title: 'a', meta: {'test': 'b', 'c': 'd'});
-    yield Page();
+    yield const Head(title: 'a', meta: {'test': 'b', 'c': 'd'});
+    yield const Page();
   }
 }
 
@@ -22,10 +22,10 @@ class _PageState extends State<Page> {
   Iterable<Component> build(BuildContext context) sync* {
     yield div([
       if (!pressed) ...[
-        Head(title: 'b', meta: {'c': 'e'}),
-        Head(title: 'c'),
+        const Head(title: 'b', meta: {'c': 'e'}),
+        const Head(title: 'c'),
       ] else ...[
-        Head(title: 'd'),
+        const Head(title: 'd'),
       ]
     ]);
     yield button(onClick: () {

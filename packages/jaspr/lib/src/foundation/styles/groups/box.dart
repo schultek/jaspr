@@ -1,28 +1,6 @@
 part of '../styles.dart';
 
 class _BoxStyles extends Styles {
-  final EdgeInsets? padding;
-  final EdgeInsets? margin;
-  final Display? display;
-  final BoxSizing? boxSizing;
-  final Unit? width;
-  final Unit? height;
-  final Unit? maxWidth;
-  final Unit? maxHeight;
-  final Unit? minWidth;
-  final Unit? minHeight;
-  final Border? border;
-  final BorderRadius? radius;
-  final Outline? outline;
-  final Overflow? overflow;
-  final Visibility? visibility;
-  final Position? position;
-  final double? opacity;
-  final Transform? transform;
-  final BoxShadow? shadow;
-  final Cursor? cursor;
-  final Transition? transition;
-
   const _BoxStyles({
     this.padding,
     this.margin,
@@ -46,6 +24,28 @@ class _BoxStyles extends Styles {
     this.cursor,
     this.transition,
   }) : super._();
+
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final Display? display;
+  final BoxSizing? boxSizing;
+  final Unit? width;
+  final Unit? height;
+  final Unit? maxWidth;
+  final Unit? maxHeight;
+  final Unit? minWidth;
+  final Unit? minHeight;
+  final Border? border;
+  final BorderRadius? radius;
+  final Outline? outline;
+  final Overflow? overflow;
+  final Visibility? visibility;
+  final Position? position;
+  final double? opacity;
+  final Transform? transform;
+  final BoxShadow? shadow;
+  final Cursor? cursor;
+  final Transition? transition;
 
   @override
   Map<String, String> get styles => {

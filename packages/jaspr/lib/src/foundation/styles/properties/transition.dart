@@ -36,7 +36,9 @@ class _CombineTransition implements Transition {
 class Curve {
   const Curve._(this.value);
 
-  final String value;
+  const factory Curve.cubicBezier(double p1, double p2, double p3, double p4) = _CubicBezierCurve;
+
+  const factory Curve.steps(int steps, {required StepJump jump}) = _StepsCurve;
 
   static const Curve ease = Curve._('ease');
   static const Curve easeIn = Curve._('ease-in');
@@ -46,9 +48,7 @@ class Curve {
   static const Curve stepStart = Curve._('step-start');
   static const Curve stepEnd = Curve._('step-end');
 
-  const factory Curve.cubicBezier(double p1, double p2, double p3, double p4) = _CubicBezierCurve;
-
-  const factory Curve.steps(int steps, {required StepJump jump}) = _StepsCurve;
+  final String value;
 }
 
 class _CubicBezierCurve implements Curve {
@@ -79,7 +79,8 @@ enum StepJump {
   none('jump-none'),
   both('jump-both');
 
+  const StepJump(this.value);
+
   /// The css value
   final String value;
-  const StepJump(this.value);
 }

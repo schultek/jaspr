@@ -46,18 +46,18 @@ class DomRenderObject extends RenderObject {
     late html.Element elem;
 
     var namespace = xmlns[tag];
-    if ((namespace, parent?.node) case (== null, html.Element pnode)) {
+    if ((namespace, parent?.node) case (== null, final html.Element pnode)) {
       namespace = pnode.namespaceUri;
     }
 
     diff:
     if (node == null) {
-      var toHydrate = parent!.toHydrate;
+      final toHydrate = parent!.toHydrate;
       if (toHydrate.isNotEmpty) {
-        for (var e in toHydrate) {
+        for (final e in toHydrate) {
           if (e is html.Element && e.tagName.toLowerCase() == tag) {
             if (kVerboseMode) {
-              print("Hydrate html node: $e");
+              window.console.log('Hydrate html node: $e');
             }
             elem = node = e;
             attributesToRemove = elem.attributes.keys.toSet();
@@ -75,40 +75,43 @@ class DomRenderObject extends RenderObject {
       elem = node = _createElement(tag, namespace);
       attributesToRemove = {};
       if (kVerboseMode) {
-        print("Create html node: $elem");
+        window.console.log('Create html node: $elem');
       }
     } else {
-      if (node is! html.Element || (node as html.Element).tagName.toLowerCase() != tag) {
+      if (node case final html.Element node when node.tagName.toLowerCase() == tag) {
+        elem = node;
+        attributesToRemove = elem.attributes.keys.toSet();
+      } else {
         elem = _createElement(tag, namespace);
-        var old = node;
+        final old = node;
         node!.replaceWith(elem);
         node = elem;
         if (old != null && old.childNodes.isNotEmpty) {
-          var oldChildren = [...old.childNodes];
-          for (var child in oldChildren) {
+          final oldChildren = [...old.childNodes];
+          for (final child in oldChildren) {
             elem.append(child);
           }
         }
         attributesToRemove = {};
         if (kVerboseMode) {
-          print("Replace html node: $elem for $old");
+          window.console.log('Replace html node: $elem for $old');
         }
-      } else {
-        elem = node as html.Element;
-        attributesToRemove = elem.attributes.keys.toSet();
       }
     }
 
     elem.clearOrSetAttribute('id', id);
     elem.clearOrSetAttribute('class', classes == null || classes.isEmpty ? null : classes);
-    elem.clearOrSetAttribute('style',
-        styles == null || styles.isEmpty ? null : styles.entries.map((e) => '${e.key}: ${e.value}').join('; '));
+
+    elem.clearOrSetAttribute(
+      'style',
+      styles == null || styles.isEmpty ? null : styles.entries.map((e) => '${e.key}: ${e.value}').join('; '),
+    );
 
     if (attributes != null && attributes.isNotEmpty) {
-      for (var attr in attributes.entries) {
+      for (final attr in attributes.entries) {
         if (attr.key == 'value' && elem is InputElement && elem.value != attr.value) {
           if (kVerboseMode) {
-            print("Set input value: ${attr.value}");
+            window.console.log('Set input value: ${attr.value}');
           }
           elem.value = attr.value;
           continue;
@@ -122,7 +125,7 @@ class DomRenderObject extends RenderObject {
       for (final name in attributesToRemove) {
         elem.removeAttribute(name);
         if (kVerboseMode) {
-          print("Remove attribute: $name");
+          window.console.log('Remove attribute: $name');
         }
       }
     }
@@ -152,18 +155,18 @@ class DomRenderObject extends RenderObject {
   void updateText(String text) {
     diff:
     if (node == null) {
-      var toHydrate = parent!.toHydrate;
+      final toHydrate = parent!.toHydrate;
       if (toHydrate.isNotEmpty) {
-        for (var e in toHydrate) {
+        for (final e in toHydrate) {
           if (e is html.Text) {
             if (kVerboseMode) {
-              print("Hydrate text node: $e");
+              window.console.log('Hydrate text node: $e');
             }
             node = e;
             if (e.text != text) {
               e.text = text;
               if (kVerboseMode) {
-                print("Update text node: $text");
+                window.console.log('Update text node: $text');
               }
             }
             toHydrate.remove(e);
@@ -174,23 +177,22 @@ class DomRenderObject extends RenderObject {
 
       node = html.Text(text);
       if (kVerboseMode) {
-        print("Create text node: $text");
+        window.console.log('Create text node: $text');
       }
     } else {
-      if (node is! html.Text) {
-        var elem = html.Text(text);
-        node!.replaceWith(elem);
-        node = elem;
-        if (kVerboseMode) {
-          print("Replace text node: $text");
-        }
-      } else {
-        var node = this.node as html.Text;
+      if (node case final html.Text node) {
         if (node.text != text) {
           node.text = text;
           if (kVerboseMode) {
-            print("Update text node: $text");
+            window.console.log('Update text node: $text');
           }
+        }
+      } else {
+        final elem = html.Text(text);
+        node!.replaceWith(elem);
+        node = elem;
+        if (kVerboseMode) {
+          window.console.log('Replace text node: $text');
         }
       }
     }
@@ -206,20 +208,20 @@ class DomRenderObject extends RenderObject {
     try {
       child.parent = this;
 
-      var parentNode = node;
-      var childNode = child.node;
+      final parentNode = node;
+      final childNode = child.node;
 
       assert(parentNode is html.Element);
       if (childNode == null) return;
 
-      var afterNode = after?.node;
+      final afterNode = after?.node;
 
       if (childNode.previousNode == afterNode && childNode.parentNode == parentNode) {
         return;
       }
 
       if (kVerboseMode) {
-        print("Attach node $childNode of $parentNode after $afterNode");
+        window.console.log('Attach node $childNode of $parentNode after $afterNode');
       }
 
       if (afterNode == null) {
@@ -235,7 +237,7 @@ class DomRenderObject extends RenderObject {
   @override
   void remove(DomRenderObject child) {
     if (kVerboseMode) {
-      print("Remove child $child of $this");
+      window.console.log('Remove child $child of $this');
     }
     child.node?.remove();
     child.parent = null;
@@ -243,9 +245,9 @@ class DomRenderObject extends RenderObject {
 
   void finalize() {
     if (kVerboseMode && toHydrate.isNotEmpty) {
-      print("Clear ${toHydrate.length} nodes not hydrated ($toHydrate)");
+      window.console.log('Clear ${toHydrate.length} nodes not hydrated ($toHydrate)');
     }
-    for (var node in toHydrate) {
+    for (final node in toHydrate) {
       node.remove();
     }
     toHydrate.clear();
@@ -253,9 +255,6 @@ class DomRenderObject extends RenderObject {
 }
 
 class RootDomRenderObject extends DomRenderObject {
-  final Node container;
-  late final Node? beforeStart;
-
   RootDomRenderObject(this.container, [List<Node>? nodes]) {
     node = container;
     toHydrate = [...nodes ?? container.nodes];
@@ -263,7 +262,7 @@ class RootDomRenderObject extends DomRenderObject {
   }
 
   factory RootDomRenderObject.between(Node start, Node end) {
-    var nodes = <Node>[];
+    final nodes = <Node>[];
     Node? curr = start.nextNode;
     while (curr != null && curr != end) {
       nodes.add(curr);
@@ -271,6 +270,9 @@ class RootDomRenderObject extends DomRenderObject {
     }
     return RootDomRenderObject(start.parentNode!, nodes);
   }
+
+  final Node container;
+  late final Node? beforeStart;
 
   @override
   void attach(covariant DomRenderObject child, {covariant DomRenderObject? after}) {
@@ -281,15 +283,15 @@ class RootDomRenderObject extends DomRenderObject {
 typedef DomEventCallback = void Function(Event event);
 
 class EventBinding {
-  final String type;
-  DomEventCallback fn;
-  StreamSubscription? subscription;
-
   EventBinding(html.Element element, this.type, this.fn) {
     subscription = element.on[type].listen((event) {
       fn(event);
     });
   }
+
+  final String type;
+  DomEventCallback fn;
+  StreamSubscription? subscription;
 
   void clear() {
     subscription?.cancel();
@@ -303,12 +305,12 @@ extension on html.Element {
     if (current == value) return;
     if (value == null) {
       if (kVerboseMode) {
-        print("Remove attribute: $name");
+        window.console.log('Remove attribute: $name');
       }
       removeAttribute(name);
     } else {
       if (kVerboseMode) {
-        print("Update attribute: $name - $value");
+        window.console.log('Update attribute: $name - $value');
       }
       setAttribute(name, value);
     }

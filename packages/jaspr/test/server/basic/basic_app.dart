@@ -3,14 +3,16 @@ import 'package:jaspr/jaspr.dart';
 class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'div', children: [
-      Text('App'),
-      Counter(),
+    yield div([
+      text('App'),
+      const Counter(),
     ]);
   }
 }
 
 class Counter extends StatefulComponent {
+  const Counter({super.key});
+
   static int initialValue = 0;
 
   @override

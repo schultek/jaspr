@@ -9,9 +9,9 @@ mixin SyncBinding {
   /// Returns the accumulated data from all active [State]s that use the [SyncStateMixin]
   @protected
   Map<String, dynamic> getStateData() {
-    var state = <String, dynamic>{};
-    for (var key in _globalSyncRegistry.keys) {
-      var syncState = _globalSyncRegistry[key]!;
+    final state = <String, dynamic>{};
+    for (final key in _globalSyncRegistry.keys) {
+      final syncState = _globalSyncRegistry[key]!;
       assert(syncState.syncId == key);
       if (syncState.wantsSync()) {
         state[key] = syncState._get();
@@ -37,16 +37,16 @@ mixin SyncBinding {
   /// This is called when a [LazyRoute] is loaded.
   Future<void> loadState(String path) async {
     _isLoadingState = true;
-    var data = await fetchState(path);
+    final data = await fetchState(path);
     _isLoadingState = false;
 
-    for (var id in data.keys) {
-      updateRawState(id, data[id]!);
+    for (final id in data.keys) {
+      updateRawState(id, data[id]);
     }
 
-    for (var key in _globalSyncRegistry.keys) {
+    for (final key in _globalSyncRegistry.keys) {
       if (data.containsKey(key)) {
-        var state = _globalSyncRegistry[key]!;
+        final state = _globalSyncRegistry[key]!;
         assert(state.syncId == key);
         if (state.wantsSync()) {
           state._update(data[key]);
@@ -64,7 +64,7 @@ mixin SyncBinding {
   void registerSyncState(SyncState syncState, {bool initialUpdate = true}) {
     _globalSyncRegistry[syncState.syncId] = syncState;
     if (initialUpdate && syncState.wantsSync()) {
-      var data = getRawState(syncState.syncId);
+      final data = getRawState(syncState.syncId);
       syncState._update(data);
     }
   }
@@ -76,8 +76,8 @@ mixin SyncBinding {
   }
 
   T? getInitialState<T>(String id, {Codec<T, dynamic>? codec}) {
-    var data = getRawState(id);
-    return data == null || codec == null ? data : codec.decode(data);
+    final data = getRawState(id);
+    return data == null || codec == null ? data as T? : codec.decode(data);
   }
 }
 
@@ -157,16 +157,16 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> implements Sync
 }
 
 extension _SyncEncoding<U> on SyncState<U> {
-  _update(dynamic data) {
+  void _update(dynamic data) {
     if (data == null || syncCodec == null) {
-      updateState(data);
+      updateState(data as U?);
     } else {
       updateState(syncCodec!.decode(data));
     }
   }
 
-  U _get() {
-    var state = getState();
+  dynamic _get() {
+    final state = getState();
     return syncCodec != null ? syncCodec!.encode(state) : state;
   }
 }
@@ -199,7 +199,7 @@ class CastCodec<T> extends Codec<T, dynamic> {
         if (T == typeOf<Map<String, dynamic>>() && v is Map) {
           v = v.cast<String, dynamic>();
         }
-        return v;
+        return v as T;
       });
 
   @override
@@ -212,9 +212,9 @@ class StateCodec extends Codec<dynamic, String> {
   const StateCodec();
 
   @override
-  final Converter<String, dynamic> decoder = const StateDecoder();
+  Converter<String, dynamic> get decoder => const StateDecoder();
   @override
-  final Converter<dynamic, String> encoder = const StateEncoder();
+  Converter<dynamic, String> get encoder => const StateEncoder();
 }
 
 class StateDecoder extends Converter<String, dynamic> {
@@ -222,7 +222,7 @@ class StateDecoder extends Converter<String, dynamic> {
 
   @override
   dynamic convert(String input) {
-    var binary = base64Decode(input);
+    final binary = base64Decode(input);
     return binaryCodec.decode(binary);
   }
 }
@@ -231,7 +231,7 @@ class StateEncoder extends Converter<dynamic, String> {
   const StateEncoder();
   @override
   String convert(dynamic input) {
-    var binary = binaryCodec.encode(input);
+    final binary = binaryCodec.encode(input);
     return base64UrlEncode(binary);
   }
 }

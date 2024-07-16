@@ -34,18 +34,21 @@ class HeadElement extends ProxyRenderObjectElement {
 }
 
 class HeadAdapter {
-  static HeadAdapter instance = HeadAdapter();
+  HeadAdapter._();
+
+  static HeadAdapter instance = HeadAdapter._();
 
   static final html.HeadElement head = html.document.head!;
 
   static final (html.Node, html.Node) headBoundary = () {
-    var iterator = html.NodeIterator(head, html.NodeFilter.SHOW_COMMENT);
+    final iterator = html.NodeIterator(head, html.NodeFilter.SHOW_COMMENT);
 
-    html.Node? start, end;
+    html.Node? start;
+    html.Node? end;
 
     html.Comment? currNode;
     while ((currNode = iterator.nextNode() as html.Comment?) != null) {
-      var value = currNode!.nodeValue ?? '';
+      final value = currNode!.nodeValue ?? '';
       if (value == r'$') {
         start = currNode;
       } else if (value == '/') {
@@ -79,14 +82,12 @@ class HeadAdapter {
 
   static String? keyFor(html.Node node) {
     return switch (node) {
-      html.Element(id: String id) when id.isNotEmpty => id,
-      html.Element(tagName: "TITLE" || "BASE") => '__${node.tagName}',
-      html.Element(tagName: "META", attributes: {'name': String name}) => '__meta:$name',
+      html.Element(id: final String id) when id.isNotEmpty => id,
+      html.Element(tagName: 'TITLE' || 'BASE') => '__${node.tagName}',
+      html.Element(tagName: 'META', attributes: {'name': final String name}) => '__meta:$name',
       _ => null,
     };
   }
-
-  HeadAdapter();
 
   final List<HeadRenderObject> _headRenderObjects = [];
   bool _needsResorting = true;
@@ -97,14 +98,14 @@ class HeadAdapter {
       _needsResorting = false;
     }
 
-    Map<String, html.Node> keyedNodes = Map.of(initialKeyedHeadNodes);
-    List<html.Node> children = List.of(initialKeyedHeadNodes.values);
+    final Map<String, html.Node> keyedNodes = Map.of(initialKeyedHeadNodes);
+    final List<html.Node> children = List.of(initialKeyedHeadNodes.values);
 
-    for (var renderObject in _headRenderObjects) {
-      for (var node in renderObject.children) {
-        var key = keyFor(node);
+    for (final renderObject in _headRenderObjects) {
+      for (final node in renderObject.children) {
+        final key = keyFor(node);
         if (key != null) {
-          var shadowedNode = keyedNodes[key];
+          final shadowedNode = keyedNodes[key];
           keyedNodes[key] = node;
           if (shadowedNode != null) {
             children[children.indexOf(shadowedNode)] = node;
@@ -117,7 +118,7 @@ class HeadAdapter {
 
     html.Node? current = headBoundary.$1.nextNode;
 
-    for (var node in children) {
+    for (final node in children) {
       if (current == null || current == headBoundary.$2) {
         head.insertBefore(node, current);
       } else if (current == node) {
@@ -131,7 +132,7 @@ class HeadAdapter {
     }
 
     while (current != null && current != headBoundary.$2) {
-      var next = current.nextNode;
+      final next = current.nextNode;
       current.remove();
       current = next;
     }
@@ -157,6 +158,7 @@ class HeadRenderObject extends DomRenderObject {
   final List<html.Node> children = [];
 
   int _depth;
+  int get depth => _depth;
   set depth(int depth) {
     if (_depth == depth) return;
     _depth = depth;
@@ -167,7 +169,7 @@ class HeadRenderObject extends DomRenderObject {
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
     try {
-      var childNode = child.node;
+      final childNode = child.node;
       if (childNode == null) return;
 
       var afterNode = after?.node;

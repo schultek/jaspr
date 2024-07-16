@@ -426,7 +426,7 @@ abstract class State<T extends StatefulComponent> {
   @protected
   void setState(VoidCallback fn) {
     assert(_debugLifecycleState != _StateLifecycle.defunct);
-    Object? result = fn() as dynamic;
+    final Object? result = fn() as dynamic;
     assert(
       result is! Future,
       'setState() callback argument returned a Future.\n\n'
@@ -653,7 +653,7 @@ class StatefulElement extends BuildableElement {
     assert(state._debugLifecycleState == _StateLifecycle.created);
     try {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
-      Object? result = state.initState() as dynamic;
+      final Object? result = state.initState() as dynamic;
       assert(
         result is! Future,
         '${state.runtimeType}.initState() returned a Future.\n\n'

@@ -32,7 +32,7 @@ class TestComponentController<T> {
 }
 
 abstract class TestComponent<T> extends StatefulComponent {
-  TestComponent({required this.initialValue});
+  const TestComponent({required this.initialValue});
 
   final T initialValue;
 
@@ -40,10 +40,10 @@ abstract class TestComponent<T> extends StatefulComponent {
   Iterable<Component> build(BuildContext context, T value);
 
   @override
-  State<StatefulComponent> createState() => TestState();
+  State<StatefulComponent> createState() => TestState<T>();
 }
 
-class TestState<T> extends State<TestComponent> {
+class TestState<T> extends State<TestComponent<T>> {
   late T value;
 
   @override

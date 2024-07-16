@@ -9,7 +9,7 @@ class DocumentAdapter extends RenderAdapter {
   void apply(MarkupRenderObject root) {
     var html = root.children.findWhere((c) => c.tag == 'html')?.node;
     if (html == null) {
-      var range = root.children.range();
+      final range = root.children.range();
       root.children.insertAfter(
         html = root.createChildRenderObject()
           ..tag = 'html'
@@ -17,17 +17,17 @@ class DocumentAdapter extends RenderAdapter {
       );
     }
 
-    var head = html.children.findWhere((c) => c.tag == 'head');
-    var body = html.children.findWhere((c) => c.tag == 'body');
+    final head = html.children.findWhere((c) => c.tag == 'head');
+    final body = html.children.findWhere((c) => c.tag == 'body');
 
     if (head == null) {
-      var head = html.createChildRenderObject()..tag = 'head';
+      final head = html.createChildRenderObject()..tag = 'head';
       head.children.insertAfter(head.createChildRenderObject()
         ..tag = 'base'
         ..attributes = {'href': '/'});
 
       if (body == null) {
-        var range = html.children.range();
+        final range = html.children.range();
         html.children.insertAfter(head);
         html.children.insertBefore(html.createChildRenderObject()
           ..tag = 'body'
@@ -37,17 +37,17 @@ class DocumentAdapter extends RenderAdapter {
       }
     } else {
       if (body == null) {
-        var rangeBefore = html.children.range(endBefore: head);
-        var rangeAfter = html.children.range(startAfter: head);
+        final rangeBefore = html.children.range(endBefore: head);
+        final rangeAfter = html.children.range(startAfter: head);
 
-        var body = html.createChildRenderObject()..tag = 'body';
+        final body = html.createChildRenderObject()..tag = 'body';
         body.children
           ..insertNodeAfter(rangeAfter)
           ..insertNodeAfter(rangeBefore);
         html.children.insertAfter(body, after: head.node);
       }
 
-      var base = head.node.children.findWhere((c) => c.tag == 'base');
+      final base = head.node.children.findWhere((c) => c.tag == 'base');
       if (base == null) {
         head.node.children.insertAfter(head.node.createChildRenderObject()
           ..tag = 'base'
@@ -55,7 +55,7 @@ class DocumentAdapter extends RenderAdapter {
       }
     }
 
-    var hasDoctype =
+    final hasDoctype =
         root.children.findWhere((r) => r.text != null && r.text!.startsWith('<!DOCTYPE') && (r.rawHtml ?? false)) !=
             null;
 

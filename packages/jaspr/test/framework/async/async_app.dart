@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
 class FutureTester<T> extends StatelessComponent {
-  FutureTester(this.future);
+  const FutureTester(this.future);
 
   final Future<T> future;
 
@@ -11,7 +11,7 @@ class FutureTester<T> extends StatelessComponent {
       future: future,
       builder: (context, snapshot) sync* {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          yield Text('LOADING');
+          yield const Text('LOADING');
         } else if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
             yield Text('DATA: ${snapshot.data}');
@@ -25,7 +25,7 @@ class FutureTester<T> extends StatelessComponent {
 }
 
 class StreamTester<T> extends StatelessComponent {
-  StreamTester(this.stream);
+  const StreamTester(this.stream);
 
   final Stream<T> stream;
 
@@ -35,9 +35,9 @@ class StreamTester<T> extends StatelessComponent {
       stream: stream,
       builder: (context, snapshot) sync* {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          yield Text('LOADING');
+          yield const Text('LOADING');
         } else if (snapshot.connectionState == ConnectionState.done) {
-          yield Text('DONE');
+          yield const Text('DONE');
         } else if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData) {
             yield Text('DATA: ${snapshot.data}');

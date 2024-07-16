@@ -8,7 +8,7 @@ class GridTemplate {
   final GridTracks? rows;
   final GridAreas? areas;
 
-  Map<String, dynamic> get styles {
+  Map<String, String> get styles {
     return {
       if (columns != null) 'grid-template-columns': columns!.value,
       if (rows != null) 'grid-template-rows': rows!.value,
@@ -18,16 +18,16 @@ class GridTemplate {
 }
 
 class GridTracks {
-  const GridTracks._(this.value);
-
-  final String value;
-
-  static const GridTracks none = GridTracks._('none');
-
   /// Constructs a list of grid tracks.
   ///
   /// When using [GridTrack.line], must be alternated with value tracks.
   const factory GridTracks(List<GridTrack> tracks) = _GridTracks;
+
+  const GridTracks._(this.value);
+
+  static const GridTracks none = GridTracks._('none');
+
+  final String value;
 }
 
 class _GridTracks implements GridTracks {
@@ -48,9 +48,9 @@ class GridAreas {
 }
 
 abstract class GridTrack {
-  const factory GridTrack.line(String name) = _LineGridTrack;
-
   const factory GridTrack(TrackSize size) = _GridTrack;
+
+  const factory GridTrack.line(String name) = _LineGridTrack;
 
   const factory GridTrack.repeat(TrackRepeat repeat, List<GridTrack> tracks) = _RepeatGridTrack;
 
@@ -86,11 +86,10 @@ class _RepeatGridTrack implements GridTrack {
 }
 
 class TrackSize {
+  const factory TrackSize(Unit value) = _TrackSize;
+
   const TrackSize._(this.value);
 
-  final String value;
-
-  const factory TrackSize(Unit value) = _TrackSize;
   const factory TrackSize.fr(double value) = _FrTrackSize;
 
   const factory TrackSize.minmax(TrackSize min, TrackSize max) = _MinMaxTrackSize;
@@ -99,6 +98,8 @@ class TrackSize {
   static const TrackSize minContent = TrackSize._('min-content');
   static const TrackSize maxContent = TrackSize._('max-content');
   static const TrackSize auto = TrackSize._('auto');
+
+  final String value;
 }
 
 class _TrackSize implements TrackSize {
@@ -139,11 +140,10 @@ class _FitContentTrackSize implements TrackSize {
 }
 
 class TrackRepeat {
+  const TrackRepeat(int times) : value = '$times';
   const TrackRepeat._(this.value);
 
   final String value;
-
-  const TrackRepeat(int times) : value = '$times';
 
   static const TrackRepeat autoFill = TrackRepeat._('auto-fill');
   static const TrackRepeat autoFit = TrackRepeat._('auto-fit');

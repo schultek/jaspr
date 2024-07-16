@@ -9,22 +9,22 @@ class RawText extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    var fragment = html.document.createDocumentFragment()..setInnerHtml(text, validator: AllowAll());
-    for (var node in fragment.childNodes) {
+    final fragment = html.document.createDocumentFragment()..setInnerHtml(text, validator: AllowAll());
+    for (final node in fragment.childNodes) {
       yield RawNode.withKey(node);
     }
   }
 }
 
 class RawNode extends Component {
-  RawNode(this.node, {super.key});
+  const RawNode(this.node, {super.key});
 
   factory RawNode.withKey(html.Node node) {
     return RawNode(
       node,
       key: switch (node) {
-        html.Text() => ValueKey('text'),
-        html.Element(:var tagName) => ValueKey('element:$tagName'),
+        html.Text() => const ValueKey('text'),
+        html.Element(:final tagName) => ValueKey('element:$tagName'),
         _ => null,
       },
     );
@@ -44,20 +44,20 @@ class RawNodeElement extends BuildableRenderObjectElement {
 
   @override
   Iterable<Component> build() sync* {
-    for (var node in component.node.childNodes) {
+    for (final node in component.node.childNodes) {
       yield RawNode.withKey(node);
     }
   }
 
   @override
   void updateRenderObject() {
-    var next = component.node;
+    final next = component.node;
     if (next is html.Text) {
       renderObject.updateText(next.text ?? '');
     } else if (next is html.Element) {
       renderObject.updateElement(next.tagName.toLowerCase(), next.id, next.className, null, next.attributes, null);
     } else {
-      var curr = (renderObject as DomRenderObject).node;
+      final curr = (renderObject as DomRenderObject).node;
       if (curr != null) {
         curr.replaceWith(next);
       }

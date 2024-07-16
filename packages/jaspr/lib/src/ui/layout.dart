@@ -23,7 +23,7 @@ class Center extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield div(
-      styles: Styles.flexbox(
+      styles: const Styles.flexbox(
         justifyContent: JustifyContent.center,
         alignItems: AlignItems.center,
       ),
@@ -98,7 +98,7 @@ class Container extends StatelessComponent {
         ),
         if (color != null) Styles.background(color: color),
         if (center)
-          Styles.flexbox(
+          const Styles.flexbox(
             justifyContent: JustifyContent.center,
             alignItems: AlignItems.center,
           ),
@@ -177,9 +177,9 @@ class Grid extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield div(
       styles: Styles.raw({
-        "display": "grid",
-        "grid-template-columns": "repeat($columns, ${spread ? "1fr" : "0fr"})",
-        if (gap != null) "gap": gap!.value,
+        'display': 'grid',
+        'grid-template-columns': "repeat($columns, ${spread ? "1fr" : "0fr"})",
+        if (gap != null) 'gap': gap!.value,
       }),
       children,
     );

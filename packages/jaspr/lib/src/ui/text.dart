@@ -65,11 +65,11 @@ class Heading extends StatelessComponent {
 }
 
 class BreakLine extends StatelessComponent {
-  final int numberLines;
-
   const BreakLine({
     this.numberLines = 1,
   });
+
+  final int numberLines;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

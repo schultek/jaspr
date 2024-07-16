@@ -53,7 +53,7 @@ class Head extends StatelessComponent {
     yield PlatformHead(key: key, children: [
       if (title != null) DomComponent(tag: 'title', child: Text(title!)),
       if (meta != null)
-        for (var e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+        for (final e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
       ...?children,
     ]);
   }

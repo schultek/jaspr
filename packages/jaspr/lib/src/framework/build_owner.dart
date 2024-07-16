@@ -64,7 +64,7 @@ class BuildOwner {
       return true;
     }());
     try {
-      var res = callback() as dynamic;
+      final res = callback() as dynamic;
       if (res is Future) {
         await res;
       }
@@ -82,7 +82,7 @@ class BuildOwner {
   /// We want the component and element apis to stay synchronous, so this delays
   /// the execution of [child.performRebuild()] instead of calling it directly.
   void performRebuildOn(Element child, void Function() whenComplete) {
-    Object? result = child.performRebuild() as dynamic;
+    final Object? result = child.performRebuild() as dynamic;
     assert(
       result is! Future,
       '${child.runtimeType}.performBuild() returned a Future while rebuilding.\n\n'
@@ -122,7 +122,8 @@ class BuildOwner {
           }
         } catch (e) {
           // TODO: properly report error
-          print("Error on rebuilding component: $e");
+          // ignore: avoid_print
+          print('Error on rebuilding component: $e');
           rethrow;
         }
 

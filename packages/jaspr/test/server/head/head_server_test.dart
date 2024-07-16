@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr_test/server_test.dart';
 
@@ -9,12 +10,12 @@ void main() {
     testServer('should serve component', (tester) async {
       tester.pumpComponent(App());
 
-      var response = await tester.request('/');
+      final response = await tester.request('/');
 
       expect(response.statusCode, equals(200));
 
       expect(response.document?.head, isNotNull);
-      var head = response.document!.head!;
+      final head = response.document!.head!;
 
       expect(head.children, hasLength(5));
 

@@ -1,9 +1,6 @@
 import 'unit.dart';
 
 class EdgeInsets {
-  /// The css styles
-  final Map<String, String> styles;
-
   const EdgeInsets._(this.styles);
 
   const factory EdgeInsets.fromLTRB(Unit left, Unit top, Unit right, Unit bottom) = _QuadEdgeInsets;
@@ -16,30 +13,33 @@ class EdgeInsets {
 
   static const EdgeInsets zero = EdgeInsets.all(Unit.zero);
 
-  Unit get left => Unit.zero;
-  Unit get right => Unit.zero;
-  Unit get top => Unit.zero;
-  Unit get bottom => Unit.zero;
-
   static const EdgeInsets inherit = EdgeInsets._({'': 'inherit'});
   static const EdgeInsets initial = EdgeInsets._({'': 'initial'});
   static const EdgeInsets revert = EdgeInsets._({'': 'revert'});
   static const EdgeInsets revertLayer = EdgeInsets._({'': 'revert-layer'});
   static const EdgeInsets unset = EdgeInsets._({'': 'unset'});
+
+  Unit get left => Unit.zero;
+  Unit get right => Unit.zero;
+  Unit get top => Unit.zero;
+  Unit get bottom => Unit.zero;
+
+  /// The css styles
+  final Map<String, String> styles;
 }
 
 class _QuadEdgeInsets implements EdgeInsets {
-  final Unit? _left;
-  final Unit? _top;
-  final Unit? _right;
-  final Unit? _bottom;
-
   const _QuadEdgeInsets(this._left, this._top, this._right, this._bottom);
   const _QuadEdgeInsets.only({Unit? left, Unit? top, Unit? right, Unit? bottom})
       : _left = left,
         _top = top,
         _right = right,
         _bottom = bottom;
+
+  final Unit? _left;
+  final Unit? _top;
+  final Unit? _right;
+  final Unit? _bottom;
 
   @override
   Unit get left => _left ?? Unit.zero;
@@ -66,9 +66,9 @@ class _QuadEdgeInsets implements EdgeInsets {
 }
 
 class _AllEdgeInsets implements EdgeInsets {
-  final Unit _value;
-
   const _AllEdgeInsets(this._value);
+
+  final Unit _value;
 
   @override
   Unit get left => _value;
@@ -84,10 +84,10 @@ class _AllEdgeInsets implements EdgeInsets {
 }
 
 class _SymmetricEdgeInsets implements EdgeInsets {
+  const _SymmetricEdgeInsets({this.vertical, this.horizontal});
+
   final Unit? vertical;
   final Unit? horizontal;
-
-  const _SymmetricEdgeInsets({this.vertical, this.horizontal});
 
   @override
   Map<String, String> get styles {

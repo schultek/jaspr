@@ -1,9 +1,9 @@
 import '../../jaspr.dart';
 
 class Style extends StatelessComponent {
-  final List<StyleRule> styles;
-
   const Style({required this.styles, super.key});
+
+  final List<StyleRule> styles;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -16,7 +16,7 @@ class Style extends StatelessComponent {
 
 /// Utility method to create nested style definitions.
 NestedStyleRule css(String selector, [List<StyleRule> children = const []]) =>
-    NestedStyleRule._(_BlockStyleRule(selector: Selector(selector), styles: Styles()), children);
+    NestedStyleRule._(_BlockStyleRule(selector: Selector(selector), styles: const Styles()), children);
 
 abstract class StyleRule {
   const factory StyleRule({required Selector selector, required Styles styles}) = _BlockStyleRule;
@@ -43,10 +43,10 @@ class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
 
   @override
   String _toCss([String indent = '', String parent = '']) {
-    var rules = <String>[];
+    final rules = <String>[];
 
-    var self = _self;
-    var curr = self.selector.selector.startsWith('&') || parent.isEmpty
+    final self = _self;
+    final curr = self.selector.selector.startsWith('&') || parent.isEmpty
         ? self.selector.selector.replaceAll('&', parent)
         : '$parent ${self.selector.selector}';
 
@@ -54,7 +54,7 @@ class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
       rules.add(_self._toCssWithParent(indent, parent));
     }
 
-    for (var child in _children) {
+    for (final child in _children) {
       if (child is NestedStyleRule) {
         rules.add(child._toCss(indent, curr));
       } else if (child is _BlockStyleRule) {
@@ -70,7 +70,7 @@ class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
 
 extension on _BlockStyleRule {
   String _toCssWithParent(String indent, String parent) {
-    var child = _BlockStyleRule(
+    final child = _BlockStyleRule(
       selector: Selector(selector.selector.startsWith('&') || parent.isEmpty
           ? selector.selector.replaceAll('&', parent)
           : '$parent ${selector.selector}'),
@@ -115,12 +115,6 @@ enum MediaRuleTarget {
 }
 
 abstract class MediaRuleQuery {
-  String get _value;
-
-  static const MediaRuleQuery all = MediaRuleQuery();
-  static const MediaRuleQuery screen = MediaRuleQuery(target: MediaRuleTarget.screen);
-  static const MediaRuleQuery print = MediaRuleQuery(target: MediaRuleTarget.print);
-
   const factory MediaRuleQuery({
     MediaRuleTarget target,
     Unit? minWidth,
@@ -134,6 +128,12 @@ abstract class MediaRuleQuery {
 
   const factory MediaRuleQuery.not(MediaRuleQuery query) = _NotMediaRuleQuery;
   const factory MediaRuleQuery.any(List<MediaRuleQuery> queries) = _AnyMediaRuleQuery;
+
+  static const MediaRuleQuery all = MediaRuleQuery();
+  static const MediaRuleQuery screen = MediaRuleQuery(target: MediaRuleTarget.screen);
+  static const MediaRuleQuery print = MediaRuleQuery(target: MediaRuleTarget.print);
+
+  String get _value;
 }
 
 enum Orientation { portrait, landscape }
@@ -200,8 +200,9 @@ class _AnyMediaRuleQuery implements MediaRuleQuery {
 }
 
 class _ImportStyleRule implements StyleRule {
-  final String url;
   const _ImportStyleRule(this.url);
+
+  final String url;
 
   @override
   String _toCss([String indent = '']) {
@@ -256,7 +257,7 @@ extension SelectorMixin on Selector {
 
   Selector descendant(Selector next) {
     assert(unallowedList(this));
-    return Selector.combine([this, next], combinator: Combinator.descendant);
+    return Selector.combine([this, next]);
   }
 
   Selector child(Selector next) {
@@ -276,12 +277,7 @@ extension SelectorMixin on Selector {
 }
 
 class Selector {
-  /// The css selector
-  final String selector;
-
   const Selector(this.selector);
-
-  static const Selector all = Selector('*');
 
   const Selector.tag(String tag) : selector = tag;
   const Selector.id(String id) : selector = '#$id';
@@ -297,22 +293,24 @@ class Selector {
   const factory Selector.combine(List<Selector> selectors, {Combinator combinator}) = _CombineSelector;
 
   const factory Selector.list(List<Selector> selectors) = _ListSelector;
+
+  static const Selector all = Selector('*');
+
+  /// The css selector
+  final String selector;
 }
 
 class _AttrSelector implements Selector {
+  const _AttrSelector(this.attr, {this.check = const AttrCheck.exists()});
+
   final String attr;
   final AttrCheck check;
-
-  const _AttrSelector(this.attr, {this.check = const AttrCheck.exists()});
 
   @override
   String get selector => '[$attr${check.value}${!check.caseSensitive ? ' i' : ''}]';
 }
 
 class AttrCheck {
-  final String value;
-  final bool caseSensitive;
-
   const AttrCheck.exists()
       : value = '',
         caseSensitive = true;
@@ -322,12 +320,15 @@ class AttrCheck {
   const AttrCheck.endsWith(String suffix, {this.caseSensitive = true}) : value = '\$="$suffix"';
   const AttrCheck.dashPrefixed(String prefix, {this.caseSensitive = true}) : value = '|="$prefix"';
   const AttrCheck.contains(String prefix, {this.caseSensitive = true}) : value = '*="$prefix"';
+
+  final String value;
+  final bool caseSensitive;
 }
 
 class _ChainSelector implements Selector {
-  final List<Selector> selectors;
-
   const _ChainSelector(this.selectors);
+
+  final List<Selector> selectors;
 
   @override
   String get selector {
@@ -337,7 +338,7 @@ class _ChainSelector implements Selector {
       }
       return true;
     })());
-    return selectors.map((s) => s.selector).join('');
+    return selectors.map((s) => s.selector).join();
   }
 }
 
@@ -347,24 +348,24 @@ enum Combinator {
   sibling(' ~ '),
   adjacentSibling(' + ');
 
-  final String separator;
   const Combinator(this.separator);
+  final String separator;
 }
 
 class _CombineSelector implements Selector {
+  const _CombineSelector(this.selectors, {this.combinator = Combinator.descendant});
+
   final List<Selector> selectors;
   final Combinator combinator;
-
-  const _CombineSelector(this.selectors, {this.combinator = Combinator.descendant});
 
   @override
   String get selector => selectors.map((s) => s.selector).join(combinator.separator);
 }
 
 class _ListSelector implements Selector {
-  final List<Selector> selectors;
-
   const _ListSelector(this.selectors);
+
+  final List<Selector> selectors;
 
   @override
   String get selector => selectors.map((s) => s.selector).join(', ');

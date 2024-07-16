@@ -7,8 +7,6 @@ extension AngleExt on num {
 }
 
 abstract class Angle {
-  static const Angle zero = _ZeroAngle();
-
   /// Constructs an [Angle] in the form '90deg'
   const factory Angle.deg(double value) = _DegreeAngle;
 
@@ -17,6 +15,8 @@ abstract class Angle {
 
   /// Constructs an [Angle] in the form '1turn'
   const factory Angle.turn(double value) = _TurnAngle;
+
+  static const Angle zero = _ZeroAngle();
 
   /// The css value
   String get value;
@@ -36,10 +36,10 @@ class _ZeroAngle implements Angle {
 }
 
 class _Angle implements Angle {
+  const _Angle(this._value, this._unit);
+
   final String _unit;
   final double _value;
-
-  const _Angle(this._value, this._unit);
 
   @override
   String get value => '${_value.numstr}$_unit';

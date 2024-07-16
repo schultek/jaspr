@@ -1,1 +1,1 @@
-export 'dart:html' show Event, MouseEvent, InputElement, TextAreaElement, SelectElement;
+export 'dart:html' show Event, InputElement, MouseEvent, SelectElement, TextAreaElement;

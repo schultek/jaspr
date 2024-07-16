@@ -20,7 +20,7 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 }
 
 class ClientComponentRegistry extends ObserverComponent {
-  ClientComponentRegistry({required super.child, super.key});
+  const ClientComponentRegistry({required super.child, super.key});
 
   @override
   ObserverElement createElement() => ClientComponentRegistryElement(this);
@@ -34,14 +34,14 @@ class ClientComponentRegistryElement extends ObserverElement {
 
   @override
   void willRebuildElement(Element element) {
-    var binding = this.binding as ServerAppBinding;
+    final binding = this.binding as ServerAppBinding;
 
     if (!_didAddClientScript) {
-      (binding).addRenderAdapter(ClientScriptAdapter(binding, _clientElements));
+      binding.addRenderAdapter(ClientScriptAdapter(binding, _clientElements));
       _didAddClientScript = true;
     }
 
-    var entry = binding.options.targets[element.component.runtimeType];
+    final entry = binding.options.targets[element.component.runtimeType];
 
     if (entry == null) {
       return;

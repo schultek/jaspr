@@ -4,7 +4,7 @@ import '../../utils/test_component.dart';
 import '../../utils/track_state_lifecycle.dart';
 
 class App extends TestComponent<int> {
-  App() : super(initialValue: 1);
+  const App() : super(initialValue: 1);
 
   @override
   Iterable<Component> build(BuildContext context, int phase) sync* {
@@ -22,7 +22,7 @@ class App extends TestComponent<int> {
 }
 
 class Child extends StatefulComponent {
-  Child({super.key});
+  const Child({super.key});
 
   @override
   State createState() => ChildState();
@@ -32,6 +32,6 @@ class ChildState extends State<Child> with TrackStateLifecycle<Child> {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield* super.build(context);
-    yield Text('Child');
+    yield const Text('Child');
   }
 }

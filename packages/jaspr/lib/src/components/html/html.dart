@@ -11,7 +11,7 @@ part 'other.dart';
 part 'svg.dart';
 part 'text.dart';
 
-final _events = events;
+const _events = events;
 
 /// Utility method to create a text component when using jaspr html methods.
 Component text(String text) {

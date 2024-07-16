@@ -10,13 +10,12 @@ import '../framework/framework.dart';
 import 'dom_render_object.dart';
 import 'js_data.dart';
 
-/// Global component binding for the browser
 class BrowserAppBinding extends AppBinding with ComponentsBinding {
   @override
   bool get isClient => true;
 
   late final String _baseOrigin = () {
-    var base = document.querySelector('head>base') as BaseElement?;
+    final base = document.querySelector('head>base') as BaseElement?;
     return base?.href ?? window.location.origin;
   }();
 
@@ -45,7 +44,7 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
 
   @override
   RenderObject createRootRenderObject() {
-    if (attachBetween case (var start, var end)) {
+    if (attachBetween case (final start, final end)) {
       return RootDomRenderObject.between(start, end);
     } else {
       return RootDomRenderObject(document.querySelector(attachTarget)!);
@@ -61,7 +60,7 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
   }
 
   void _loadRawState() {
-    var stateData = loadSyncState();
+    final stateData = loadSyncState();
     if (stateData != null) {
       _rawState.addAll(stateData);
     }
@@ -78,13 +77,14 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
   }
 
   @override
-  Future<Map<String, dynamic>> fetchState(String url) {
+  Future<Map<String, dynamic>> fetchState(String url) async {
     return window
         .fetch(url, {
           'headers': {'jaspr-mode': 'data-only'}
         })
-        .then((result) => result.text())
-        .then((data) => jsonDecode(data));
+        // ignore: avoid_dynamic_calls
+        .then((result) => result.text() as String)
+        .then((data) => jsonDecode(data) as Map<String, dynamic>);
   }
 
   @override

@@ -31,9 +31,9 @@ typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render)
 /// Directly renders the provided component into a html string
 Future<String> renderComponent(Component app) async {
   _checkInitialized('renderComponent');
-  var fileHandler = staticFileHandler();
+  final fileHandler = staticFileHandler();
   return render(RenderMode.html, _createSetup(app), Uri.parse('https://0.0.0.0/'), (name) async {
-    var response = await fileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
+    final response = await fileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
     return response.statusCode == 200 ? response.readAsString() : null;
   });
 }
@@ -41,15 +41,16 @@ Future<String> renderComponent(Component app) async {
 void _checkInitialized(String method) {
   assert(() {
     if (!Jaspr.isInitialized) {
-      print("[WARNING] Jaspr was not initialized. Call Jaspr.initializeApp() before calling $method(). "
-          "This will be required in a future version of jaspr and result in an error.");
+      // ignore: avoid_print
+      print('[WARNING] Jaspr was not initialized. Call Jaspr.initializeApp() before calling $method(). '
+          'This will be required in a future version of jaspr and result in an error.');
     }
     return true;
   }());
 }
 
 SetupFunction _createSetup(Component app) {
-  var options = Jaspr.options;
+  final options = Jaspr.options;
   return (binding) {
     binding.initializeOptions(options);
     binding.attachRootComponent(app);

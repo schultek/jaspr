@@ -30,7 +30,7 @@ abstract class LeafRenderObjectElement = LeafElement with RenderObjectElement;
 
 mixin RenderObjectElement on Element {
   RenderObject createRenderObject() {
-    var renderObject = _parentRenderObjectElement!.renderObject.createChildRenderObject();
+    final renderObject = _parentRenderObjectElement!.renderObject.createChildRenderObject();
     assert(renderObject.parent == _parentRenderObjectElement!.renderObject);
     return renderObject;
   }
@@ -74,13 +74,13 @@ mixin RenderObjectElement on Element {
 
   @override
   void attachRenderObject() {
-    var parent = _parentRenderObjectElement?.renderObject;
+    final parent = _parentRenderObjectElement?.renderObject;
     if (parent != null) {
       Element? prevElem = _prevAncestorSibling;
       while (prevElem != null && prevElem._lastRenderObjectElement == null) {
         prevElem = prevElem._prevAncestorSibling;
       }
-      var after = prevElem?._lastRenderObjectElement;
+      final after = prevElem?._lastRenderObjectElement;
       parent.attach(renderObject, after: after?.renderObject);
       assert(renderObject.parent == parent);
     }
@@ -88,7 +88,7 @@ mixin RenderObjectElement on Element {
 
   @override
   void detachRenderObject() {
-    var parent = _parentRenderObjectElement?.renderObject;
+    final parent = _parentRenderObjectElement?.renderObject;
     if (parent != null) {
       parent.remove(renderObject);
       assert(renderObject.parent == null);

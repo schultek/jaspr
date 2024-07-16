@@ -1,7 +1,11 @@
-include: package:lints/recommended.yaml
+include: package:lint/package.yaml
 
 linter:
   rules:
-    sort_pub_dependencies: true
+    always_use_package_imports: false
     prefer_relative_imports: true
-    directives_ordering: true
+    sort_constructors_first: true
+    prefer_single_quotes: true
+    use_late_for_private_fields_and_variables: false
+    require_trailing_commas: false
+    avoid_classes_with_only_static_members: false

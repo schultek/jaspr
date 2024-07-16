@@ -15,21 +15,16 @@ part 'groups/text.dart';
 
 /// Represents a set of css styles by pairs of property and value.
 abstract class Styles with StylesMixin<Styles> {
-  const Styles._();
-
-  Map<String, String> get styles;
-
   /// Constructs an empty [Styles] instance.
   const factory Styles() = _EmptyStyles;
+
+  const Styles._();
 
   /// Constructs a [Styles] instance from a [Map] of raw css style properties and values.
   const factory Styles.raw(Map<String, String> styles) = _RawStyles;
 
   /// Constructs a [Styles] instance by combining multiple other [Styles] instances.
   const factory Styles.combine(List<Styles> styles) = _CombinedStyles;
-
-  @override
-  Styles combine(Styles styles) => Styles.combine([this, styles]);
 
   /// Constructs a [Styles] instance for common text-related style properties.
   const factory Styles.text({
@@ -121,6 +116,11 @@ abstract class Styles with StylesMixin<Styles> {
     ImageStyle? image,
     ListStylePosition? position,
   }) = _ListStyles;
+
+  Map<String, String> get styles;
+
+  @override
+  Styles combine(Styles styles) => Styles.combine([this, styles]);
 }
 
 class _EmptyStyles extends Styles {
@@ -310,10 +310,10 @@ abstract mixin class StylesMixin<T> {
 }
 
 class _RawStyles extends Styles {
+  const _RawStyles(this.styles) : super._();
+
   @override
   final Map<String, String> styles;
-
-  const _RawStyles(this.styles) : super._();
 
   @override
   Styles raw(Map<String, String> styles) {
@@ -322,9 +322,9 @@ class _RawStyles extends Styles {
 }
 
 class _CombinedStyles extends Styles {
-  final List<Styles> _styles;
-
   const _CombinedStyles(this._styles) : super._();
+
+  final List<Styles> _styles;
 
   @override
   Map<String, String> get styles => _styles.fold({}, (v, s) => v..addAll(s.styles));

@@ -6,7 +6,7 @@ import '../../utils/track_state_lifecycle.dart';
 final myKey = GlobalKey();
 
 class App extends TestComponent<int> {
-  App() : super(initialValue: 1);
+  const App() : super(initialValue: 1);
 
   @override
   Iterable<Component> build(BuildContext context, int phase) sync* {
@@ -17,7 +17,7 @@ class App extends TestComponent<int> {
 }
 
 class Home extends StatelessComponent {
-  Home(this.phase);
+  const Home(this.phase);
 
   final int phase;
 
@@ -35,7 +35,7 @@ class Home extends StatelessComponent {
 }
 
 class InheritedData extends InheritedComponent {
-  InheritedData({required super.child});
+  const InheritedData({required super.child});
 
   @override
   bool updateShouldNotify(covariant InheritedData oldComponent) {
@@ -44,7 +44,7 @@ class InheritedData extends InheritedComponent {
 }
 
 class MyStatefulComponent extends StatefulComponent {
-  MyStatefulComponent({super.key});
+  const MyStatefulComponent({super.key});
   @override
   State<StatefulComponent> createState() => MyState();
 }

@@ -74,7 +74,7 @@ class DomElement extends ProxyRenderObjectElement {
   @override
   void updateRenderObject() {
     if (_wrappingElement != null) {
-      var wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
+      final wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
 
       renderObject.updateElement(
         component.tag,
@@ -115,7 +115,7 @@ class _WrappingDomComponent extends InheritedComponent implements DomComponent {
   });
 
   @override
-  final String tag = '';
+  String get tag => '';
   @override
   final String? id;
   @override

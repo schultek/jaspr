@@ -4,19 +4,19 @@ import '../../utils/test_component.dart';
 import '../../utils/track_state_lifecycle.dart';
 
 class ObserverParam {
-  final List<MapEntry<Element, ObserverElementEvent>> events;
-  final bool renderBoth;
-
   ObserverParam({
     required this.renderBoth,
     required this.events,
   });
+
+  final List<MapEntry<Element, ObserverElementEvent>> events;
+  final bool renderBoth;
 }
 
 class App extends TestComponent<ObserverParam> {
-  App(ObserverParam param) : super(initialValue: param);
+  const App(ObserverParam param) : super(initialValue: param);
 
-  final child = DomComponent(
+  static const child = DomComponent(
     tag: 'div',
     child: MyChildComponent(value: false),
   );
@@ -28,7 +28,7 @@ class App extends TestComponent<ObserverParam> {
       child: value.renderBoth
           ? MyObserverComponent(
               value: value,
-              child: DomComponent(
+              child: const DomComponent(
                 tag: 'div',
                 child: MyChildComponent(value: true),
               ),
@@ -39,7 +39,7 @@ class App extends TestComponent<ObserverParam> {
 }
 
 class MyObserverComponent extends ObserverComponent {
-  MyObserverComponent({required this.value, required super.child});
+  const MyObserverComponent({required this.value, required super.child});
 
   final ObserverParam value;
 
@@ -75,10 +75,10 @@ class MyObserverElement extends ObserverElement {
 }
 
 class MyChildComponent extends StatefulComponent {
-  final dynamic value;
-  MyChildComponent({
+  const MyChildComponent({
     required this.value,
   });
+  final dynamic value;
   @override
   State<StatefulComponent> createState() => MyChildState();
 }

@@ -17,9 +17,10 @@ enum BackgroundAttachment {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const BackgroundAttachment(this.value);
+
   /// The css value
   final String value;
-  const BackgroundAttachment(this.value);
 }
 
 /// The background-clip CSS property sets whether an element's background extends underneath its border box, padding box, or content box.
@@ -42,21 +43,19 @@ enum BackgroundClip {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const BackgroundClip(this.value);
+
   /// The css value
   final String value;
-  const BackgroundClip(this.value);
 }
 
 /// The background-image CSS property sets one or more background images on an element.
 class BackgroundImage {
-  /// The css value
-  final String value;
-
   const BackgroundImage._(this.value);
 
-  static const BackgroundImage none = BackgroundImage._('none');
-
   const factory BackgroundImage.image(ImageStyle image) = _ImageBackgroundImage;
+
+  static const BackgroundImage none = BackgroundImage._('none');
 
   // TODO multiple background images
 
@@ -65,26 +64,30 @@ class BackgroundImage {
   static const BackgroundImage revert = BackgroundImage._('revert');
   static const BackgroundImage revertLayer = BackgroundImage._('revert-layer');
   static const BackgroundImage unset = BackgroundImage._('unset');
+
+  /// The css value
+  final String value;
 }
 
 class _ImageBackgroundImage implements BackgroundImage {
-  final ImageStyle image;
   const _ImageBackgroundImage(this.image);
+
+  final ImageStyle image;
 
   @override
   String get value => image.value;
 }
 
 class ImageStyle {
-  /// The css value
-  final String value;
-
   const ImageStyle.url(String url) : value = 'url($url)';
 
   // TODO
   // const ImageStyle.gradient() : value = '';
 
   // TODO element, image, crossFade, imageSet
+
+  /// The css value
+  final String value;
 }
 
 /// The background-origin CSS property sets the background's origin: from the border start, inside the border, or inside the padding.
@@ -104,27 +107,29 @@ enum BackgroundOrigin {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const BackgroundOrigin(this.value);
+
   /// The css value
   final String value;
-  const BackgroundOrigin(this.value);
 }
 
 /// The background-position CSS property sets the initial position for each background image. The position is relative to the position layer set by background-origin.
 class BackgroundPosition {
-  /// The css value
-  final String value;
+  const factory BackgroundPosition({BackgroundAlignX? alignX, BackgroundAlignY? alignY, Unit? offsetX, Unit? offsetY}) =
+      _BackgroundPosition;
 
   const BackgroundPosition._(this.value);
 
   static const BackgroundPosition center = BackgroundPosition._('center');
-  const factory BackgroundPosition({BackgroundAlignX? alignX, BackgroundAlignY? alignY, Unit? offsetX, Unit? offsetY}) =
-      _BackgroundPosition;
 
   static const BackgroundPosition inherit = BackgroundPosition._('inherit');
   static const BackgroundPosition initial = BackgroundPosition._('initial');
   static const BackgroundPosition revert = BackgroundPosition._('revert');
   static const BackgroundPosition revertLayer = BackgroundPosition._('revert-layer');
   static const BackgroundPosition unset = BackgroundPosition._('unset');
+
+  /// The css value
+  final String value;
 }
 
 enum BackgroundAlignX { left, center, right }
@@ -132,17 +137,17 @@ enum BackgroundAlignX { left, center, right }
 enum BackgroundAlignY { top, center, bottom }
 
 class _BackgroundPosition implements BackgroundPosition {
+  const _BackgroundPosition({this.alignX, this.alignY, this.offsetX, this.offsetY});
+
   final BackgroundAlignX? alignX;
   final BackgroundAlignY? alignY;
   final Unit? offsetX;
   final Unit? offsetY;
 
-  const _BackgroundPosition({this.alignX, this.alignY, this.offsetX, this.offsetY});
-
   @override
   String get value {
-    var x = [if (alignX != null) alignX!.name, if (offsetX != null) offsetX!.value];
-    var y = [if (alignY != null) alignY!.name, if (offsetY != null) offsetY!.value];
+    final x = [if (alignX != null) alignX!.name, if (offsetX != null) offsetX!.value];
+    final y = [if (alignY != null) alignY!.name, if (offsetY != null) offsetY!.value];
     if (x.isEmpty) {
       x.add('left');
     } else if (x.length == 1 && y.length == 2 && alignX == null) {
@@ -156,10 +161,9 @@ class _BackgroundPosition implements BackgroundPosition {
 
 /// The background-repeat CSS property sets how background images are repeated. A background image can be repeated along the horizontal and vertical axes, or not repeated at all.
 class BackgroundRepeat {
-  /// The css value
-  final String value;
-
   const BackgroundRepeat._(this.value);
+
+  const factory BackgroundRepeat.axis(BackgroundAxisRepeat x, BackgroundAxisRepeat y) = _AxisBackgroundRepeat;
 
   static const BackgroundRepeat repeatX = BackgroundRepeat._('repeat-y');
   static const BackgroundRepeat repeatY = BackgroundRepeat._('repeat-y');
@@ -168,13 +172,14 @@ class BackgroundRepeat {
   static const BackgroundRepeat round = BackgroundRepeat._('round');
   static const BackgroundRepeat noRepeat = BackgroundRepeat._('no-repeat');
 
-  const factory BackgroundRepeat.axis(BackgroundAxisRepeat x, BackgroundAxisRepeat y) = _AxisBackgroundRepeat;
-
   static const BackgroundRepeat inherit = BackgroundRepeat._('inherit');
   static const BackgroundRepeat initial = BackgroundRepeat._('initial');
   static const BackgroundRepeat revert = BackgroundRepeat._('revert');
   static const BackgroundRepeat revertLayer = BackgroundRepeat._('revert-layer');
   static const BackgroundRepeat unset = BackgroundRepeat._('unset');
+
+  /// The css value
+  final String value;
 }
 
 /// The background-repeat CSS property sets how background images are repeated.
@@ -191,16 +196,17 @@ enum BackgroundAxisRepeat {
   /// The image is not repeated (and hence the background image painting area will not necessarily be entirely covered). The position of the non-repeated background image is defined by the background-position CSS property.
   noRepeat('no-repeat');
 
+  const BackgroundAxisRepeat(this.value);
+
   /// The css value
   final String value;
-  const BackgroundAxisRepeat(this.value);
 }
 
 class _AxisBackgroundRepeat implements BackgroundRepeat {
+  const _AxisBackgroundRepeat(this.x, this.y);
+
   final BackgroundAxisRepeat x;
   final BackgroundAxisRepeat y;
-
-  const _AxisBackgroundRepeat(this.x, this.y);
 
   @override
   String get value => '${x.value} ${y.value}';
@@ -208,36 +214,38 @@ class _AxisBackgroundRepeat implements BackgroundRepeat {
 
 /// The background-size CSS property sets the size of the element's background image. The image can be left to its natural size, stretched, or constrained to fit the available space.
 class BackgroundSize {
-  /// The css value
-  final String value;
-
   const BackgroundSize._(this.value);
-
-  static const BackgroundSize contain = BackgroundSize._('contain');
-  static const BackgroundSize cover = BackgroundSize._('cover');
 
   const factory BackgroundSize.width(Unit? width) = _WidthBackgroundSize;
   const factory BackgroundSize.sides(Unit? width, Unit? height) = _SidesBackgroundSize;
+
+  static const BackgroundSize contain = BackgroundSize._('contain');
+  static const BackgroundSize cover = BackgroundSize._('cover');
 
   static const BackgroundSize inherit = BackgroundSize._('inherit');
   static const BackgroundSize initial = BackgroundSize._('initial');
   static const BackgroundSize revert = BackgroundSize._('revert');
   static const BackgroundSize revertLayer = BackgroundSize._('revert-layer');
   static const BackgroundSize unset = BackgroundSize._('unset');
+
+  /// The css value
+  final String value;
 }
 
 class _WidthBackgroundSize implements BackgroundSize {
-  final Unit? width;
   const _WidthBackgroundSize(this.width);
+
+  final Unit? width;
 
   @override
   String get value => width?.value ?? 'auto';
 }
 
 class _SidesBackgroundSize implements BackgroundSize {
+  const _SidesBackgroundSize(this.width, this.height);
+
   final Unit? width;
   final Unit? height;
-  const _SidesBackgroundSize(this.width, this.height);
 
   @override
   String get value => '${width?.value ?? 'auto'} ${height?.value ?? 'auto'}';

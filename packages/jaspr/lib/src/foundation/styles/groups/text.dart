@@ -1,22 +1,6 @@
 part of '../styles.dart';
 
 class _TextStyles extends Styles {
-  final Color? color;
-  final TextAlign? align;
-  final FontFamily? fontFamily;
-  final FontStyle? fontStyle;
-  final Unit? fontSize;
-  final FontWeight? fontWeight;
-  final TextDecoration? decoration;
-  final TextTransform? transform;
-  final Unit? indent;
-  final Unit? letterSpacing;
-  final Unit? wordSpacing;
-  final Unit? lineHeight;
-  final TextShadow? shadow;
-  final TextOverflow? overflow;
-  final WhiteSpace? whiteSpace;
-
   const _TextStyles({
     this.color,
     this.align,
@@ -34,6 +18,22 @@ class _TextStyles extends Styles {
     this.overflow,
     this.whiteSpace,
   }) : super._();
+
+  final Color? color;
+  final TextAlign? align;
+  final FontFamily? fontFamily;
+  final FontStyle? fontStyle;
+  final Unit? fontSize;
+  final FontWeight? fontWeight;
+  final TextDecoration? decoration;
+  final TextTransform? transform;
+  final Unit? indent;
+  final Unit? letterSpacing;
+  final Unit? wordSpacing;
+  final Unit? lineHeight;
+  final TextShadow? shadow;
+  final TextOverflow? overflow;
+  final WhiteSpace? whiteSpace;
 
   @override
   Map<String, String> get styles => {

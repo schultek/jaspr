@@ -17,14 +17,11 @@ enum TextAlign {
   revertLayer('revert-layer'),
   unset('unset');
 
-  final String value;
   const TextAlign(this.value);
+  final String value;
 }
 
 class FontFamily {
-  /// The css value
-  final String value;
-
   /// Constructs a [FontFamily] from a custom font name
   const FontFamily(String value) : value = "'$value'";
 
@@ -32,6 +29,9 @@ class FontFamily {
 
   /// Constructs a [FontFamily] value from a list of families
   const factory FontFamily.list(List<FontFamily> families) = _ListFontFamily;
+
+  /// The css value
+  final String value;
 
   static const FontFamily inherit = FontFamily._generic('inherit');
   static const FontFamily initial = FontFamily._generic('initial');
@@ -41,8 +41,9 @@ class FontFamily {
 }
 
 class _ListFontFamily implements FontFamily {
-  final List<FontFamily> families;
   const _ListFontFamily(this.families);
+
+  final List<FontFamily> families;
 
   @override
   String get value => families.map((f) => f.value).join(', ');
@@ -92,17 +93,17 @@ class FontFamilies {
 }
 
 class FontStyle {
+  const FontStyle._(this.value);
+
+  // TODO Angle class
+  const factory FontStyle.obliqueAngle(double degrees) = _ObliqueAngleFontStyle;
+
   /// The css value
   final String value;
-
-  const FontStyle._(this.value);
 
   static const FontStyle normal = FontStyle._('normal');
   static const FontStyle italic = FontStyle._('italic');
   static const FontStyle oblique = FontStyle._('oblique');
-
-  // TODO Angle class
-  const factory FontStyle.obliqueAngle(double degrees) = _ObliqueAngleFontStyle;
 
   static const FontStyle inherit = FontStyle._('inherit');
   static const FontStyle initial = FontStyle._('initial');
@@ -112,9 +113,8 @@ class FontStyle {
 }
 
 class _ObliqueAngleFontStyle implements FontStyle {
-  final double angle;
-
   const _ObliqueAngleFontStyle(this.angle);
+  final double angle;
 
   @override
   String get value => 'oblique ${angle}deg';
@@ -134,26 +134,27 @@ enum TextTransform {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const TextTransform(this.value);
+
   /// The css value
   final String value;
-  const TextTransform(this.value);
 }
 
 enum FontWeight {
-  normal("normal"),
-  bold("bold"),
-  bolder("bolder"),
-  lighter("lighter"),
+  normal('normal'),
+  bold('bold'),
+  bolder('bolder'),
+  lighter('lighter'),
 
-  w100("100"),
-  w200("200"),
-  w300("300"),
-  w400("400"),
-  w500("500"),
-  w600("600"),
-  w700("700"),
-  w800("800"),
-  w900("900"),
+  w100('100'),
+  w200('200'),
+  w300('300'),
+  w400('400'),
+  w500('500'),
+  w600('600'),
+  w700('700'),
+  w800('800'),
+  w900('900'),
 
   inherit('inherit'),
   initial('initial'),
@@ -161,15 +162,14 @@ enum FontWeight {
   revertLayer('revert-layer'),
   unset('unset');
 
-  final String value;
   const FontWeight(this.value);
+  final String value;
 }
 
 class TextDecorationLine {
-  /// The css value
-  final String value;
-
   const TextDecorationLine._(this.value);
+
+  const factory TextDecorationLine.multi(List<TextDecorationLineKeyword> lines) = _MultiTextDecorationLine;
 
   static const TextDecorationLine none = TextDecorationLine._('none');
 
@@ -177,13 +177,14 @@ class TextDecorationLine {
   static const TextDecorationLineKeyword overline = TextDecorationLineKeyword.overline;
   static const TextDecorationLineKeyword lineThrough = TextDecorationLineKeyword.lineThrough;
 
-  const factory TextDecorationLine.multi(List<TextDecorationLineKeyword> lines) = _MultiTextDecorationLine;
-
   static const TextDecorationLine inherit = TextDecorationLine._('inherit');
   static const TextDecorationLine initial = TextDecorationLine._('initial');
   static const TextDecorationLine revert = TextDecorationLine._('revert');
   static const TextDecorationLine revertLayer = TextDecorationLine._('revert-layer');
   static const TextDecorationLine unset = TextDecorationLine._('unset');
+
+  /// The css value
+  final String value;
 }
 
 enum TextDecorationLineKeyword implements TextDecorationLine {
@@ -191,15 +192,16 @@ enum TextDecorationLineKeyword implements TextDecorationLine {
   overline('overline'),
   lineThrough('line-through');
 
+  const TextDecorationLineKeyword(this.value);
+
   @override
   final String value;
-  const TextDecorationLineKeyword(this.value);
 }
 
 class _MultiTextDecorationLine implements TextDecorationLine {
-  final List<TextDecorationLineKeyword> lines;
-
   const _MultiTextDecorationLine(this.lines);
+
+  final List<TextDecorationLineKeyword> lines;
 
   @override
   String get value => lines.map((l) => l.value).join(' ');
@@ -218,43 +220,40 @@ enum TextDecorationStyle {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const TextDecorationStyle(this.value);
+
   /// The css value
   final String value;
-  const TextDecorationStyle(this.value);
 }
 
 class TextDecorationThickness {
-  /// The css value
-  final String value;
-
   const TextDecorationThickness._(this.value);
+
+  const factory TextDecorationThickness.value(Unit value) = _ValueTextDecorationThickness;
 
   static const TextDecorationThickness auto = TextDecorationThickness._('auto');
   static const TextDecorationThickness fromFont = TextDecorationThickness._('from-font');
-
-  const factory TextDecorationThickness.value(Unit value) = _ValueTextDecorationThickness;
 
   static const TextDecorationThickness inherit = TextDecorationThickness._('inherit');
   static const TextDecorationThickness initial = TextDecorationThickness._('initial');
   static const TextDecorationThickness revert = TextDecorationThickness._('revert');
   static const TextDecorationThickness revertLayer = TextDecorationThickness._('revert-layer');
   static const TextDecorationThickness unset = TextDecorationThickness._('unset');
+
+  /// The css value
+  final String value;
 }
 
 class _ValueTextDecorationThickness implements TextDecorationThickness {
-  final Unit _value;
   const _ValueTextDecorationThickness(this._value);
+
+  final Unit _value;
 
   @override
   String get value => _value.value;
 }
 
 class TextDecoration {
-  /// The css value
-  final String value;
-
-  const TextDecoration._(this.value);
-
   const factory TextDecoration({
     TextDecorationLine? line,
     Color? color,
@@ -262,21 +261,26 @@ class TextDecoration {
     TextDecorationThickness? thickness,
   }) = _TextDecoration;
 
+  const TextDecoration._(this.value);
+
   static const TextDecoration none = TextDecoration._('none');
   static const TextDecoration inherit = TextDecoration._('inherit');
   static const TextDecoration initial = TextDecoration._('initial');
   static const TextDecoration revert = TextDecoration._('revert');
   static const TextDecoration revertLayer = TextDecoration._('revert-layer');
   static const TextDecoration unset = TextDecoration._('unset');
+
+  /// The css value
+  final String value;
 }
 
 class _TextDecoration implements TextDecoration {
+  const _TextDecoration({this.line, this.color, this.style, this.thickness});
+
   final TextDecorationLine? line;
   final Color? color;
   final TextDecorationStyle? style;
   final TextDecorationThickness? thickness;
-
-  const _TextDecoration({this.line, this.color, this.style, this.thickness});
 
   @override
   String get value => [
@@ -327,9 +331,10 @@ enum TextOverflow {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const TextOverflow(this.value);
+
   /// The css value
   final String value;
-  const TextOverflow(this.value);
 }
 
 enum WhiteSpace {
@@ -346,7 +351,8 @@ enum WhiteSpace {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const WhiteSpace(this.value);
+
   /// The css value
   final String value;
-  const WhiteSpace(this.value);
 }

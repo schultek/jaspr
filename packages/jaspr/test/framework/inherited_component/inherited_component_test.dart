@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -9,12 +10,12 @@ import 'inherited_component_app.dart';
 void main() {
   group('inherited component test', () {
     testComponents('should inherit component', (tester) async {
-      var controller = await tester.pumpTestComponent(App());
+      final controller = await tester.pumpTestComponent(App());
 
       // phase 1: inherited component should be mounted
       expect(find.text('Inherited value: 0'), findsOneComponent);
 
-      var state = (find.byType(MyChildComponent).evaluate().first as StatefulElement).state as MyChildState;
+      final state = (find.byType(MyChildComponent).evaluate().first as StatefulElement).state as MyChildState;
 
       // lifecycle: state should be initialized and built a first time
       expect(state.lifecycle, equals(['initState', 'didChangeDependencies', 'build']));

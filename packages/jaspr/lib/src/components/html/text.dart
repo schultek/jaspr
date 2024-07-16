@@ -66,8 +66,8 @@ enum Target {
   /// The topmost browsing context (the "highest" context that's an ancestor of the current one). If no ancestors, behaves as [Target.self].
   top('_top');
 
-  final String value;
   const Target(this.value);
+  final String value;
 }
 
 /// The &lt;b&gt; HTML element is used to draw the reader's attention to the element's contents, which are not otherwise granted special importance. This was formerly known as the Boldface element, and most browsers still draw the text in boldface. However, you should not use &lt;b&gt; for styling text; instead, you should use the CSS font-weight property to create boldface text, or the &lt;strong&gt; element to indicate that text is of special importance.

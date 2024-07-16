@@ -1,19 +1,21 @@
+// ignore_for_file: avoid_dynamic_calls
+
 import 'dart:convert';
 import 'dart:io';
 
 void main() {
-  var specFile = File('tool/data/html.json');
-  var specJson = jsonDecode(specFile.readAsStringSync()) as Map<String, dynamic>;
+  final specFile = File('tool/data/html.json');
+  final specJson = jsonDecode(specFile.readAsStringSync()) as Map<String, dynamic>;
 
-  for (var key in specJson.keys) {
-    var group = specJson[key] as Map<String, dynamic>;
-    var file = File('lib/src/components/html/$key.dart');
-    var content = StringBuffer("part of 'html.dart';\n");
+  for (final key in specJson.keys) {
+    final group = specJson[key] as Map<String, dynamic>;
+    final file = File('lib/src/components/html/$key.dart');
+    final content = StringBuffer("part of 'html.dart';\n");
 
-    var schemas = <String, Map<String, dynamic>>{};
+    final schemas = <String, Map<String, dynamic>>{};
 
-    for (var tag in group.keys) {
-      var data = group[tag] as Map<String, dynamic>;
+    for (final tag in group.keys) {
+      final data = group[tag] as Map<String, dynamic>;
       if (tag.startsWith(':')) {
         schemas[tag.substring(1)] = data;
         continue;
@@ -23,7 +25,7 @@ void main() {
 
       var attrs = data['attributes'] as Map<String, dynamic>?;
 
-      var inherit = data['inherit'];
+      final inherit = data['inherit'];
 
       if (inherit != null) {
         (attrs ??= {}).addAll(schemas[inherit]!);
@@ -31,31 +33,31 @@ void main() {
 
       if (attrs != null) {
         content.writeln('///');
-        for (var attr in attrs.keys) {
-          var name = attrs[attr]['name'] ?? attr;
+        for (final attr in attrs.keys) {
+          final name = attrs[attr]['name'] ?? attr;
           content.writeln('/// - [$name]: ${attrs[attr]['doc'].split('\n').join('\n///   ')}');
         }
       }
       content.write('Component $tag(');
 
-      var selfClosing = data['self_closing'] == true;
+      final selfClosing = data['self_closing'] == true;
 
       if (!selfClosing) {
         content.write('List<Component> children, ');
       }
       content.write('{');
 
-      var events = <String>{};
+      final events = <String>{};
 
       if (attrs != null) {
-        for (var attr in attrs.keys) {
-          var name = attrs[attr]['name'] ?? attr;
-          var type = attrs[attr]['type'];
+        for (final attr in attrs.keys) {
+          final name = attrs[attr]['name'] ?? attr;
+          final type = attrs[attr]['type'];
 
           if (type == null) {
             throw ArgumentError('Attribute type is required for attribute $key.$tag.$attr');
           }
-          var required = attrs[attr]['required'] == true;
+          final required = attrs[attr]['required'] == true;
 
           if (required) {
             content.write('required ');
@@ -70,17 +72,17 @@ void main() {
           } else if (type == 'double') {
             content.write('double');
           } else if (type is String && type.startsWith('enum:')) {
-            var name = type.split(':')[1];
+            final name = type.split(':')[1];
             content.write(name);
           } else if (type is String && type.startsWith('event:')) {
-            var [_, name, t] = type.split(':');
+            final [_, name, t] = type.split(':');
             events.add(name);
             content.write(t);
           } else if (type is String && type.startsWith('css:')) {
-            var [_, name] = type.split(':');
+            final [_, name] = type.split(':');
             content.write(name);
           } else if (type is Map<String, dynamic>) {
-            var name = type['name'];
+            final name = type['name'];
             content.write(name);
           } else {
             throw ArgumentError('Attribute type is unknown ($type) for attribute $key.$tag.$attr');
@@ -94,12 +96,12 @@ void main() {
       }
 
       // Forced tag name
-      final tagValue = data["tag"] ?? tag;
+      final tagValue = data['tag'] ?? tag;
 
       content.write(
           'Key? key, String? id, String? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
           '  return DomComponent(\n'
-          '    tag: \'$tagValue\',\n'
+          "    tag: '$tagValue',\n"
           '    key: key,\n'
           '    id: id,\n'
           '    classes: classes,\n'
@@ -110,15 +112,15 @@ void main() {
         content.write('{\n'
             '      ...attributes ?? {},\n');
 
-        for (var attr in attrs.keys) {
-          var name = attrs[attr]['name'] ?? attr;
-          var type = attrs[attr]['type'];
+        for (final attr in attrs.keys) {
+          final name = attrs[attr]['name'] ?? attr;
+          final type = attrs[attr]['type'];
 
           if (type is String && type.startsWith('event:')) continue;
 
           content.write('      ');
 
-          var required = attrs[attr]['required'] == true;
+          final required = attrs[attr]['required'] == true;
 
           if (type == 'boolean') {
             content.write('if ($name == true) ');
@@ -171,22 +173,22 @@ void main() {
           '}');
 
       if (attrs != null) {
-        for (var attr in attrs.keys) {
-          var type = attrs[attr]['type'];
+        for (final attr in attrs.keys) {
+          final type = attrs[attr]['type'];
 
           if (type is Map<String, dynamic>) {
             if (type['values'] != null) {
-              var name = type['name'] as String;
-              var values = type['values'] as Map<String, dynamic>;
+              final name = type['name'] as String;
+              final values = type['values'] as Map<String, dynamic>;
 
               content.write('\n${type['doc'].split('\n').map((t) => '/// $t\n').join()}');
 
               content.write('enum $name {\n');
 
-              for (var name in values.keys) {
-                var value = values[name]['value'] ?? name;
+              for (final name in values.keys) {
+                final value = values[name]['value'] ?? name;
                 content.write('  /// ${values[name]['doc'].split('\n').join('\n  /// ')}\n');
-                content.write('  $name(\'$value\')');
+                content.write("  $name('$value')");
                 if (values.keys.last != name) {
                   content.write(',\n');
                 } else {

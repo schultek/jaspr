@@ -1,13 +1,13 @@
 abstract class GridPlacement {
-  const factory GridPlacement.area(String name) = _GridPlacement;
-
-  static const GridPlacement auto = _GridPlacement('auto');
-
   const factory GridPlacement(
       {LinePlacement? rowStart,
       LinePlacement? rowEnd,
       LinePlacement? columnStart,
       LinePlacement? columnEnd}) = _LineGridPlacement;
+
+  const factory GridPlacement.area(String name) = _GridPlacement;
+
+  static const GridPlacement auto = _GridPlacement('auto');
 
   Map<String, String> get styles;
 }
@@ -56,17 +56,17 @@ class _LineGridPlacement implements GridPlacement {
 }
 
 class LinePlacement {
+  const factory LinePlacement(int index, {String? lineName}) = _NormalLinePlacement;
+
   const LinePlacement._(this.value);
-
-  final String value;
-
-  static const LinePlacement auto = LinePlacement._('auto');
 
   const factory LinePlacement.named(String name) = _NamedLinePlacement;
 
-  const factory LinePlacement(int index, {String? lineName}) = _NormalLinePlacement;
-
   const factory LinePlacement.span(int span, {String? lineName}) = _SpanLinePlacement;
+
+  static const LinePlacement auto = LinePlacement._('auto');
+
+  final String value;
 }
 
 class _LinePlacement implements LinePlacement {

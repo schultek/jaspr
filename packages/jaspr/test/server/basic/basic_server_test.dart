@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/server_test.dart';
@@ -13,12 +14,12 @@ void main() {
         return App();
       }));
 
-      var response = await tester.request('/');
+      final response = await tester.request('/');
 
       expect(response.statusCode, equals(200));
       expect(response.document?.body, isNotNull);
 
-      var appHtml = '<div>App<button>Click Me</button>Count: 101</div>\n\n';
+      const appHtml = '<div>App<button>Click Me</button>Count: 101</div>\n\n';
 
       expect(response.document!.body!.innerHtml, equals(appHtml));
     });

@@ -141,7 +141,8 @@ class UniqueKey extends LocalKey {
 @optionalTypeArgs
 class GlobalKey<T extends State<StatefulComponent>> extends Key {
   /// Creates a global key.
-  const GlobalKey() : super.empty();
+  // ignore: prefer_const_constructors_in_immutables
+  GlobalKey() : super.empty();
 
   Element? get _currentElement => ComponentsBinding._globalKeyRegistry[this];
 
@@ -198,7 +199,7 @@ class GlobalKey<T extends State<StatefulComponent>> extends Key {
 @optionalTypeArgs
 class GlobalObjectKey<T extends State<StatefulComponent>> extends GlobalKey<T> {
   /// Creates a global key that uses [identical] on [value] for its [operator==].
-  const GlobalObjectKey(this.value) : super();
+  GlobalObjectKey(this.value) : super();
 
   /// The object whose identity is used by this key's [operator==].
   final Object value;

@@ -31,65 +31,67 @@ abstract class Color {
 }
 
 class _HexColor implements Color {
-  final String hex;
-
   const _HexColor(this.hex);
+
+  final String hex;
 
   @override
   String get value => hex;
 }
 
 class _ValueColor implements Color {
-  final int _value;
   const _ValueColor(this._value);
+
+  final int _value;
 
   @override
   String get value => '#${_value.toRadixString(16).padLeft(6, '0')}';
 }
 
 class _NamedColor implements Color {
-  final String name;
   const _NamedColor(this.name);
+
+  final String name;
 
   @override
   String get value => name;
 }
 
 class _RGBColor implements Color {
+  const _RGBColor(this.red, this.green, this.blue);
+
   final int red;
   final int green;
   final int blue;
-
-  const _RGBColor(this.red, this.green, this.blue);
 
   @override
   String get value => 'rgb($red, $green, $blue)';
 }
 
 class _RGBAColor extends _RGBColor {
-  final double alpha;
-
   const _RGBAColor(super.red, super.green, super.blue, this.alpha);
+
+  final double alpha;
 
   @override
   String get value => 'rgba($red, $green, $blue, $alpha)';
 }
 
 class _HSLColor implements Color {
+  const _HSLColor(this.hue, this.saturation, this.lightness);
+
   final int hue;
   final int saturation;
   final int lightness;
-
-  const _HSLColor(this.hue, this.saturation, this.lightness);
 
   @override
   String get value => 'hsl($hue, $saturation%, $lightness%)';
 }
 
 class _HSLAColor extends _HSLColor {
-  final double alpha;
-
   const _HSLAColor(super.hue, super.saturation, super.lightness, this.alpha);
+
+  final double alpha;
 
   @override
   String get value => 'hsla($hue, $saturation%, $lightness%, $alpha)';

@@ -60,9 +60,10 @@ abstract class BuildableElement extends Element {
       built = [
         DomComponent(
           tag: 'div',
-          child: Text("Error on building component: $e"),
+          child: Text('Error on building component: $e'),
         ),
       ];
+      // ignore: avoid_print
       print('Error: $e $st');
     } finally {
       _dirty = false;
@@ -81,7 +82,7 @@ abstract class BuildableElement extends Element {
 
   @override
   void visitChildren(ElementVisitor visitor) {
-    for (var child in _children ?? []) {
+    for (final child in _children ?? <Element>[]) {
       if (!_forgottenChildren.contains(child)) {
         visitor(child);
       }

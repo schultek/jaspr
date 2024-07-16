@@ -1,11 +1,11 @@
 part of '../styles.dart';
 
 class _ListStyles extends Styles {
+  const _ListStyles({this.style, this.image, this.position}) : super._();
+
   final ListStyle? style;
   final ImageStyle? image;
   final ListStylePosition? position;
-
-  const _ListStyles({this.style, this.image, this.position}) : super._();
 
   @override
   Map<String, String> get styles => {

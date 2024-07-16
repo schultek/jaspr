@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr_test/jaspr_test.dart';
 

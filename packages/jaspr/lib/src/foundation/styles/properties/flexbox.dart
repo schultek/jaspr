@@ -10,9 +10,10 @@ enum FlexDirection {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const FlexDirection(this.value);
+
   /// The css value
   final String value;
-  const FlexDirection(this.value);
 }
 
 enum FlexWrap {
@@ -25,9 +26,10 @@ enum FlexWrap {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const FlexWrap(this.value);
+
   /// The css value
   final String value;
-  const FlexWrap(this.value);
 }
 
 enum JustifyContent {
@@ -47,9 +49,10 @@ enum JustifyContent {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const JustifyContent(this.value);
+
   /// The css value
   final String value;
-  const JustifyContent(this.value);
 }
 
 enum AlignItems {
@@ -65,7 +68,8 @@ enum AlignItems {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const AlignItems(this.value);
+
   /// The css value
   final String value;
-  const AlignItems(this.value);
 }

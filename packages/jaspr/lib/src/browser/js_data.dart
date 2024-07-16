@@ -20,8 +20,9 @@ class JasprConfig {
 }
 
 class ComponentConfig {
-  final _ComponentConfig _config;
   ComponentConfig._(this._config);
+
+  final _ComponentConfig _config;
 
   String get id => _config.id;
   String get name => _config.name;
@@ -29,7 +30,7 @@ class ComponentConfig {
 }
 
 @JS('JSON.stringify')
-external String _jsonStringify(Object obj);
+external String _jsonStringify(dynamic obj);
 
 @JS()
 class _JasprConfig {
@@ -48,8 +49,8 @@ Map<String, dynamic>? decodeConfig(dynamic config) {
   if (config == null) {
     return null;
   } else if (config is String) {
-    return stateCodec.decode(config).cast<String, dynamic>();
+    return (stateCodec.decode(config) as Map).cast<String, dynamic>();
   } else {
-    return jsonDecode(_jsonStringify(config));
+    return jsonDecode(_jsonStringify(config)) as Map<String, dynamic>;
   }
 }

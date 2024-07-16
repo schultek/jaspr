@@ -52,8 +52,8 @@ enum CrossOrigin {
   /// Sends a cross-origin request with a credential. In other words, it sends the Origin: HTTP header with a cookie, a certificate, or performing HTTP Basic authentication. If the server does not give credentials to the origin site (through Access-Control-Allow-Credentials: HTTP header), the image will be tainted and its usage restricted.
   useCredentials('use-credentials');
 
-  final String value;
   const CrossOrigin(this.value);
+  final String value;
 }
 
 /// Intended to provide a hint to the browser about what the author thinks will lead to the best user experience when loading a media object.
@@ -68,8 +68,8 @@ enum Preload {
   /// Indicates that the whole audio file can be downloaded, even if the user is not expected to use it.
   auto('auto');
 
-  final String value;
   const Preload(this.value);
+  final String value;
 }
 
 /// The &lt;img&gt; HTML element embeds an image into the document.
@@ -123,8 +123,8 @@ enum MediaLoading {
   /// Defers loading the media until it reaches a calculated distance from the viewport, as defined by the browser. The intent is to avoid the network and storage bandwidth needed to handle the media until it's reasonably certain that it will be needed. This generally improves the performance of the media in most typical use cases.
   lazy('lazy');
 
-  final String value;
   const MediaLoading(this.value);
+  final String value;
 }
 
 /// The &lt;video&gt; HTML element embeds a media player which supports video playback into the document. You can use &lt;video&gt; for audio content as well, but the &lt;audio&gt; element may provide a more appropriate user experience.
@@ -290,8 +290,8 @@ enum ReferrerPolicy {
   /// The referrer will include the origin and the path (but not the fragment, password, or username). This value is unsafe, because it leaks origins and paths from TLS-protected resources to insecure origins.
   unsafeUrl('unsafe-url');
 
-  final String value;
   const ReferrerPolicy(this.value);
+  final String value;
 }
 
 /// The &lt;object&gt; HTML element represents an external resource, which can be treated as an image, a nested browsing context, or a resource to be handled by a plugin.

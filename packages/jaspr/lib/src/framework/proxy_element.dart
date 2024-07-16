@@ -52,8 +52,8 @@ abstract class ProxyElement extends Element {
   void performRebuild() {
     _dirty = false;
 
-    var comp = (component as ProxyComponent);
-    var newComponents = comp.children ?? [if (comp.child != null) comp.child!];
+    final comp = component as ProxyComponent;
+    final newComponents = comp.children ?? [if (comp.child != null) comp.child!];
 
     _children = updateChildren(_children ?? [], newComponents, forgottenChildren: _forgottenChildren);
     _forgottenChildren.clear();
@@ -61,7 +61,7 @@ abstract class ProxyElement extends Element {
 
   @override
   void visitChildren(ElementVisitor visitor) {
-    for (var child in _children ?? []) {
+    for (final child in _children ?? <Element>[]) {
       if (!_forgottenChildren.contains(child)) {
         visitor(child);
       }

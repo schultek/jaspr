@@ -19,9 +19,9 @@ class AsyncBuildOwner extends BuildOwner {
 
   @override
   void performRebuildOn(Element child, void Function() whenComplete) {
-    var parentAsyncBuildLock = child.parent?._asyncBuildLock;
+    final parentAsyncBuildLock = child.parent?._asyncBuildLock;
 
-    var chain = TaskChain.start()
+    final chain = TaskChain.start()
         .then(() => child.performRebuild())
         .then(() => whenComplete())
         // Wait on previous siblings
@@ -43,7 +43,7 @@ class TaskChain {
 
   void _complete() {
     _done = true;
-    for (var l in _listeners) {
+    for (final l in _listeners) {
       l();
     }
   }
@@ -57,9 +57,9 @@ class TaskChain {
   }
 
   TaskChain then(Object? Function() fn) {
-    var c = TaskChain._();
+    final c = TaskChain._();
     _then(() {
-      var r = fn();
+      final r = fn();
       if (r is Future) {
         r.then((_) {
           c._complete();
@@ -76,7 +76,7 @@ class TaskChain {
   }
 
   Future<void> get asFuture {
-    var c = Completer.sync();
+    final c = Completer.sync();
     _then(c.complete);
     return c.future;
   }

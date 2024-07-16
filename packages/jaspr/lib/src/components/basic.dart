@@ -117,9 +117,9 @@ class Builder extends StatelessComponent {
 }
 
 class _WrappedComponentBuilder {
-  final SingleComponentBuilder _builder;
-
   const _WrappedComponentBuilder(this._builder);
+
+  final SingleComponentBuilder _builder;
 
   Iterable<Component> call(BuildContext context) sync* {
     yield _builder(context);

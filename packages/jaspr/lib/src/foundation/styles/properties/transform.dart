@@ -4,10 +4,6 @@ import 'unit.dart';
 class Transform {
   const Transform._(this.value);
 
-  final String value;
-
-  static const Transform none = Transform._('none');
-
   const factory Transform.combine(List<Transform> transforms) = _CombineTransform;
 
   const factory Transform.rotate(Angle angle) = _RotateTransform;
@@ -23,11 +19,15 @@ class Transform {
 
   const factory Transform.perspective(Unit value) = _PerspectiveTransform;
 
+  static const Transform none = Transform._('none');
+
   static const Transform inherit = Transform._('inherit');
   static const Transform initial = Transform._('initial');
   static const Transform revert = Transform._('revert');
   static const Transform revertLayer = Transform._('revert-layer');
   static const Transform unset = Transform._('unset');
+
+  final String value;
 }
 
 class _CombineTransform implements Transform {

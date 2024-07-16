@@ -39,7 +39,7 @@ final _allowedRenderPaths = RegExp(r'\.html?$|^[^.]*$');
 
 Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHandler}) {
   client ??= http.Client();
-  var staticHandler = fileHandler ?? staticFileHandler(client);
+  final staticHandler = fileHandler ?? staticFileHandler(client);
 
   var cascade = Cascade();
 
@@ -57,11 +57,11 @@ Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHa
       return Response(404);
     }
 
-    var fileLoader = _proxyFileLoader(request, staticHandler);
+    final fileLoader = _proxyFileLoader(request, staticHandler);
     return handle(request, (setup) async {
       // We support two modes here, rendered-html and data-only
       // rendered-html does normal ssr, but data-only only returns the preloaded state data as json
-      var isDataMode = request.headers['jaspr-mode'] == 'data-only';
+      final isDataMode = request.headers['jaspr-mode'] == 'data-only';
 
       var requestUri = request.url.normalizePath();
       if (!requestUri.path.startsWith('/')) {
@@ -82,7 +82,7 @@ Future<String?> Function(String) _proxyFileLoader(Request req, Handler proxyHand
   return (name) async {
     final indexRequest = Request('GET', req.requestedUri.replace(path: '/$name'),
         context: req.context, encoding: req.encoding, headers: req.headers, protocolVersion: req.protocolVersion);
-    var response = await proxyHandler(indexRequest);
+    final response = await proxyHandler(indexRequest);
     return response.statusCode == 200 ? response.readAsString() : null;
   };
 }
@@ -90,7 +90,7 @@ Future<String?> Function(String) _proxyFileLoader(Request req, Handler proxyHand
 // coverage:ignore-start
 
 Handler _sseProxyHandler(http.Client client, String webPort) {
-  var serverUri = Uri.parse('http://localhost:$webPort');
+  final serverUri = Uri.parse('http://localhost:$webPort');
 
   Future<Response> createSseConnection(Request req) async {
     final serverReq =

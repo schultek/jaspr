@@ -1,11 +1,11 @@
 part of '../styles.dart';
 
 class _FlexItemStyles extends Styles {
+  const _FlexItemStyles({this.flex, this.order, this.alignSelf}) : super._();
+
   final Flex? flex;
   final int? order;
   final AlignSelf? alignSelf;
-
-  const _FlexItemStyles({this.flex, this.order, this.alignSelf}) : super._();
 
   @override
   Map<String, String> get styles => {

@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -9,13 +10,13 @@ import 'global_key_schenanigans_app.dart';
 void main() {
   group('global key schenanigans test', () {
     testComponents('should keep state on reparenting', (tester) async {
-      var controller = await tester.pumpTestComponent(App());
+      final controller = await tester.pumpTestComponent(const App());
 
       // phase 1: component should be mounted directly
       expect(find.byType(Child), findsOneComponent);
       expect(find.tag('div'), findsNothing);
 
-      var state = (find.byType(Child).evaluate().first as StatefulElement).state as ChildState;
+      final state = (find.byType(Child).evaluate().first as StatefulElement).state as ChildState;
 
       // lifecycle: state should be initialized and built a first time
       expect(state.lifecycle, equals(['initState', 'didChangeDependencies', 'build']));

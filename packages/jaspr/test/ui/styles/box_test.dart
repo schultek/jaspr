@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -13,7 +14,7 @@ void main() {
         });
 
         test('all', () {
-          var border = Border.all(BorderSide(
+          final border = Border.all(BorderSide(
             style: BorderStyle.dashed,
             color: Colors.blue,
             width: 2.px,
@@ -23,7 +24,7 @@ void main() {
         });
 
         test('only', () {
-          var border = Border.only(
+          final border = Border.only(
             left: BorderSide(
               style: BorderStyle.solid,
               color: Colors.black,
@@ -42,8 +43,8 @@ void main() {
         });
 
         test('symmetric', () {
-          var border = Border.symmetric(
-            vertical: BorderSide(
+          final border = Border.symmetric(
+            vertical: const BorderSide(
               style: BorderStyle.solid,
               color: Colors.blue,
             ),
@@ -68,20 +69,20 @@ void main() {
 
       group('border-radius', () {
         test('all', () {
-          var radius = BorderRadius.all(Radius.circular(20.px));
+          final radius = BorderRadius.all(Radius.circular(20.px));
           expect(radius.styles, equals({'border-radius': '20px'}));
 
-          var radius2 = BorderRadius.all(Radius.elliptical(20.px, Unit.zero));
+          final radius2 = BorderRadius.all(Radius.elliptical(20.px, Unit.zero));
           expect(radius2.styles, equals({'border-radius': '20px / 0'}));
         });
 
         test('only single', () {
-          var radius = BorderRadius.only(topLeft: Radius.circular(20.px));
+          final radius = BorderRadius.only(topLeft: Radius.circular(20.px));
           expect(radius.styles, equals({'border-top-left-radius': '20px'}));
         });
 
         test('only double circle', () {
-          var radius = BorderRadius.only(
+          final radius = BorderRadius.only(
             topLeft: Radius.circular(20.px),
             topRight: Radius.circular(10.px),
           );
@@ -92,7 +93,7 @@ void main() {
         });
 
         test('only double mixed', () {
-          var radius = BorderRadius.only(
+          final radius = BorderRadius.only(
             topLeft: Radius.circular(20.px),
             topRight: Radius.elliptical(10.px, 5.px),
           );
@@ -103,7 +104,7 @@ void main() {
         });
 
         test('only all mixed', () {
-          var radius = BorderRadius.only(
+          final radius = BorderRadius.only(
             topLeft: Radius.circular(20.px),
             topRight: Radius.elliptical(10.px, 5.pt),
             bottomLeft: Radius.elliptical(Unit.zero, 25.px),

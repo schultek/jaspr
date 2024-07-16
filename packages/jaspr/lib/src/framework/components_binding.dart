@@ -4,7 +4,7 @@ part of 'framework.dart';
 mixin ComponentsBinding on AppBinding {
   /// Sets [app] as the new root of the component tree and performs an initial build
   Future<void> attachRootComponent(Component app) async {
-    var buildOwner = _rootElement?._owner ?? createRootBuildOwner();
+    final buildOwner = _rootElement?._owner ?? createRootBuildOwner();
     await buildOwner.lockState(() async {
       assert(() {
         buildOwner._debugBuilding = true;
@@ -12,7 +12,7 @@ mixin ComponentsBinding on AppBinding {
       }());
       buildOwner._isFirstBuild = true;
 
-      var element = _Root(child: app).createElement();
+      final element = _Root(child: app).createElement();
       element._binding = this;
       element._owner = buildOwner;
       element._renderObject = createRootRenderObject();
@@ -61,7 +61,7 @@ mixin ComponentsBinding on AppBinding {
 }
 
 class _Root extends ProxyComponent {
-  _Root({required Component super.child});
+  const _Root({required Component super.child});
 
   @override
   _RootElement createElement() => _RootElement(this);

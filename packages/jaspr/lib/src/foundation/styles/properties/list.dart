@@ -17,14 +17,14 @@ enum ListStyle {
   inherit('inherit'),
   initial('initial');
 
-  final String value;
   const ListStyle(this.value);
+  final String value;
 }
 
 enum ListStylePosition {
   inside('inside'),
   outside('outside');
 
-  final String value;
   const ListStylePosition(this.value);
+  final String value;
 }

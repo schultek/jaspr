@@ -1,4 +1,5 @@
-library components;
+/// UI library for jaspr.
+library ui;
 
 export 'jaspr.dart' hide runApp;
 export 'src/ui/layout.dart';

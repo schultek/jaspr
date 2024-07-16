@@ -1,10 +1,10 @@
 import 'unit.dart';
 
 abstract class Flex {
+  const factory Flex({double? grow, double? shrink, FlexBasis? basis}) = _Flex;
+
   static const Flex auto = _FlexKeyword('auto');
   static const Flex none = _FlexKeyword('none');
-
-  const factory Flex({double? grow, double? shrink, FlexBasis? basis}) = _Flex;
 
   static const Flex inherit = _FlexKeyword('inherit');
   static const Flex initial = _FlexKeyword('initial');
@@ -55,13 +55,12 @@ class _Flex implements Flex {
 }
 
 class FlexBasis {
+  const factory FlexBasis(Unit value) = _FlexBasis;
   const FlexBasis._(this.value);
 
   final String value;
 
   static const FlexBasis auto = FlexBasis._('auto');
-
-  const factory FlexBasis(Unit value) = _FlexBasis;
 }
 
 class _FlexBasis implements FlexBasis {
@@ -87,7 +86,8 @@ enum AlignSelf {
   revertLayer('revert-layer'),
   unset('unset');
 
+  const AlignSelf(this.value);
+
   /// The css value
   final String value;
-  const AlignSelf(this.value);
 }

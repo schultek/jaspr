@@ -2,7 +2,7 @@ import '../../components/html/html.dart';
 import '../basic_types.dart';
 import 'events_web.dart' if (dart.library.ffi) 'events_vm.dart';
 
-export 'events_web.dart' if (dart.library.ffi) 'events_vm.dart' hide InputElement, TextAreaElement, SelectElement;
+export 'events_web.dart' if (dart.library.ffi) 'events_vm.dart' hide InputElement, SelectElement, TextAreaElement;
 
 typedef EventCallback = void Function(Event event);
 typedef EventCallbacks = Map<String, EventCallback>;
@@ -40,10 +40,10 @@ EventCallbacks events<V1, V2>({
 
 void Function(Event) _callWithValue<V>(String event, void Function(V) fn) {
   return (e) {
-    var target = e.target;
-    var value = switch (target) {
+    final target = e.target;
+    final value = switch (target) {
       InputElement() => () {
-          var type = InputType.values.where((v) => v.name == target.type).firstOrNull;
+          final type = InputType.values.where((v) => v.name == target.type).firstOrNull;
           return switch (type) {
             InputType.checkbox || InputType.radio => target.checked,
             InputType.number => target.valueAsNumber,

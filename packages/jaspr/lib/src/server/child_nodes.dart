@@ -57,8 +57,8 @@ sealed class ChildNode {
 
 class ChildListRange extends ChildNode with Iterable<MarkupRenderObject> {
   ChildListRange(this.start, this.end) {
-    if (start case ChildNodeBoundary s) s.range = this;
-    if (end case ChildNodeBoundary e) e.range = this;
+    if (start case final ChildNodeBoundary s) s.range = this;
+    if (end case final ChildNodeBoundary e) e.range = this;
   }
 
   final ChildNode start;
@@ -110,7 +110,7 @@ class ChildList with Iterable<MarkupRenderObject> {
 
   void insertNodeAfter(ChildNode node, {MarkupRenderObject? after}) {
     node.remove();
-    var afterNode = find(after);
+    final afterNode = find(after);
     if (afterNode == null) {
       _first.insertNext(node);
     } else {
@@ -125,7 +125,7 @@ class ChildList with Iterable<MarkupRenderObject> {
 
   void insertNodeBefore(ChildNode node, {MarkupRenderObject? before}) {
     node.remove();
-    var beforeNode = find(before);
+    final beforeNode = find(before);
     if (beforeNode == null) {
       _last.insertPrev(node);
     } else {
@@ -147,8 +147,8 @@ class ChildList with Iterable<MarkupRenderObject> {
   Iterator<MarkupRenderObject> get iterator => ChildListIterator(_first);
 
   ChildListRange range({ChildNode? startAfter, ChildNode? endBefore}) {
-    var start = BaseChildNode();
-    var end = BaseChildNode();
+    final start = BaseChildNode();
+    final end = BaseChildNode();
 
     (startAfter ?? _first).insertNext(start);
     (endBefore ?? _last).insertPrev(end);
@@ -159,7 +159,7 @@ class ChildList with Iterable<MarkupRenderObject> {
   ChildNodeData? findWhere(bool Function(MarkupRenderObject) fn) {
     ChildNode? curr = _first;
     while (curr != null) {
-      if (curr case ChildNodeData(:var node) when fn(node)) {
+      if (curr case ChildNodeData(:final node) when fn(node)) {
         return curr;
       }
       curr = curr.next;
@@ -177,8 +177,8 @@ class ChildList with Iterable<MarkupRenderObject> {
     var endBefore = findWhere((n) => n == element.lastRenderObjectElement?.renderObject)?.next ?? _last;
 
     while (true) {
-      if (startAfter.next case ChildNodeBoundary startNext) {
-        var compared = compareElements(element, startNext.element);
+      if (startAfter.next case final ChildNodeBoundary startNext) {
+        final compared = compareElements(element, startNext.element);
         if (compared == 1) {
           startAfter = startNext.range.end;
           continue;
@@ -190,8 +190,8 @@ class ChildList with Iterable<MarkupRenderObject> {
       break;
     }
     while (true) {
-      if (endBefore.prev case ChildNodeBoundary endPrev) {
-        var compared = compareElements(endPrev.element, element);
+      if (endBefore.prev case final ChildNodeBoundary endPrev) {
+        final compared = compareElements(endPrev.element, element);
         if (compared == 1) {
           endBefore = endPrev.range.start;
           continue;
@@ -203,13 +203,13 @@ class ChildList with Iterable<MarkupRenderObject> {
       break;
     }
 
-    var start = ChildNodeBoundary(element);
-    var end = ChildNodeBoundary(element);
+    final start = ChildNodeBoundary(element);
+    final end = ChildNodeBoundary(element);
 
     startAfter.insertNext(start);
     endBefore.insertPrev(end);
 
-    var range = ChildListRange(start, end);
+    final range = ChildListRange(start, end);
     return range;
   }
 
@@ -218,7 +218,8 @@ class ChildList with Iterable<MarkupRenderObject> {
   // 2: a parent of b
   // 3: b parent of a
   int compareElements(Element a, Element b) {
-    late Element parentA, parentB;
+    late Element parentA;
+    late Element parentB;
     a.visitAncestorElements((e) {
       parentA = e;
       return false;
@@ -243,9 +244,11 @@ class ChildList with Iterable<MarkupRenderObject> {
       }
     }
 
-    Element currA = a, currB = b;
+    Element currA = a;
+    Element currB = b;
     while (true) {
-      var prevA = currA.prevSibling, prevB = currB.prevSibling;
+      final prevA = currA.prevSibling;
+      final prevB = currB.prevSibling;
       if (prevB == a || prevA == null) {
         return 0;
       }
@@ -274,7 +277,7 @@ class ChildListIterator implements Iterator<MarkupRenderObject> {
         return false;
       }
       try {
-        if (_current case ChildNodeData(:var node)) {
+        if (_current case ChildNodeData(:final node)) {
           current = node;
           return true;
         }

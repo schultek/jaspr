@@ -1,3 +1,6 @@
+/// Server specific library for jaspr.
+///
+/// Use only on the server.
 library server;
 
 export 'package:shelf/shelf.dart' show Handler, Request, Response;

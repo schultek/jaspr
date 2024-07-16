@@ -1,15 +1,15 @@
 import '../../jaspr.dart';
 
 class ListItemMarker {
-  final ListStyle? style;
-  final ImageStyle? image;
-  final ListStylePosition? position;
-
   const ListItemMarker({
     this.style,
     this.image,
     this.position,
   });
+
+  final ListStyle? style;
+  final ImageStyle? image;
+  final ListStylePosition? position;
 }
 
 enum ListType {
@@ -45,8 +45,7 @@ class ListView extends StatelessComponent {
   }) {
     return ListView(
       key: key,
-      type: ListType.unordered,
-      marker: marker ?? ListItemMarker(style: ListStyle.none),
+      marker: marker ?? const ListItemMarker(style: ListStyle.none),
       children: children,
     );
   }

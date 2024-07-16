@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -7,7 +8,7 @@ void main() {
   group('style group', () {
     group('raw', () {
       test('outputs raw styles', () {
-        var styles = const Styles.raw({'a': 'b', 'c': 'd'});
+        const styles = Styles.raw({'a': 'b', 'c': 'd'});
 
         expect(styles.styles, equals({'a': 'b', 'c': 'd'}));
       });
@@ -15,7 +16,7 @@ void main() {
 
     group('combine', () {
       test('combines raw styles', () {
-        var styles = const Styles.combine([
+        const styles = Styles.combine([
           Styles.raw({'a': 'b', 'c': 'd'}),
           Styles.raw({'c': 'e', 'f': 'g'}),
         ]);
@@ -31,7 +32,7 @@ void main() {
       });
 
       test('combines typed styles', () {
-        var styles = const Styles.combine([
+        const styles = Styles.combine([
           Styles.text(
             fontSize: Unit.pixels(12),
             fontFamily: FontFamily('Roboto'),
@@ -53,7 +54,7 @@ void main() {
 
     group('text', () {
       test('outputs all properties', () {
-        var styles = const Styles.text(
+        const styles = Styles.text(
           color: Colors.blue,
           align: TextAlign.center,
           fontFamily: FontFamily('Roboto'),
@@ -94,7 +95,7 @@ void main() {
 
     group('background', () {
       test('outputs all properties', () {
-        var styles = const Styles.background(
+        const styles = Styles.background(
           color: Colors.red,
           attachment: BackgroundAttachment.fixed,
           clip: BackgroundClip.borderBox,
@@ -127,7 +128,7 @@ void main() {
 
     group('box', () {
       test('outputs all properties', () {
-        var styles = const Styles.box(
+        const styles = Styles.box(
           padding: EdgeInsets.all(Unit.pixels(20)),
           margin: EdgeInsets.zero,
           display: Display.inlineBlock,
@@ -178,7 +179,7 @@ void main() {
 
     group('flexbox', () {
       test('outputs all properties', () {
-        var styles = const Styles.flexbox(
+        const styles = Styles.flexbox(
           direction: FlexDirection.column,
           wrap: FlexWrap.nowrap,
           justifyContent: JustifyContent.center,
@@ -200,7 +201,7 @@ void main() {
 
     group('flexitem', () {
       test('outputs all properties', () {
-        var styles = const Styles.flexItem(
+        const styles = Styles.flexItem(
           flex: Flex(grow: 2, shrink: 1, basis: FlexBasis.auto),
           order: 2,
           alignSelf: AlignSelf.start,
@@ -219,7 +220,7 @@ void main() {
 
     group('grid', () {
       test('outputs all properties', () {
-        var styles = const Styles.grid(
+        const styles = Styles.grid(
           template: GridTemplate(
               areas: GridAreas([
             'header header',
@@ -247,7 +248,7 @@ void main() {
 
     group('griditem', () {
       test('outputs all properties', () {
-        var styles = const Styles.gridItem(
+        const styles = Styles.gridItem(
           placement: GridPlacement.area('content'),
         );
 

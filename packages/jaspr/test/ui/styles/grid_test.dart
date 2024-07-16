@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -11,13 +12,13 @@ void main() {
         expect(tracks.value, equals('none'));
 
         tracks = GridTracks([
-          GridTrack(TrackSize.auto),
-          GridTrack.line('div'),
-          GridTrack.repeat(TrackRepeat(2), [
+          const GridTrack(TrackSize.auto),
+          const GridTrack.line('div'),
+          const GridTrack.repeat(TrackRepeat(2), [
             GridTrack(TrackSize.fr(0.2)),
             GridTrack(TrackSize.maxContent),
           ]),
-          GridTrack(TrackSize.minContent),
+          const GridTrack(TrackSize.minContent),
           GridTrack(TrackSize.fitContent(100.px)),
           GridTrack(TrackSize.minmax(TrackSize(10.px), TrackSize(100.px))),
         ]);
@@ -43,7 +44,7 @@ void main() {
       });
 
       test('placement', () {
-        var placement = GridPlacement(
+        var placement = const GridPlacement(
           rowStart: LinePlacement.auto,
           rowEnd: LinePlacement.named('test'),
           columnStart: LinePlacement.span(2),
@@ -55,7 +56,7 @@ void main() {
           equals({'grid-area': 'auto / span 2 / test / 3 other'}),
         );
 
-        placement = GridPlacement(
+        placement = const GridPlacement(
           rowStart: LinePlacement.span(3, lineName: 'test'),
           columnEnd: LinePlacement.auto,
         );

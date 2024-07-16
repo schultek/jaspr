@@ -1,5 +1,3 @@
-library document;
-
 import 'dart:async';
 
 import 'package:html/dom.dart' as dom;
@@ -10,12 +8,7 @@ import 'child_nodes.dart';
 
 export '../components/style.dart' hide Style;
 
-// only allow a single document
-const _documentKey = GlobalKey();
-
 abstract class Document extends StatelessComponent {
-  const Document._() : super(key: _documentKey);
-
   const factory Document({
     String? title,
     String? lang,
@@ -33,6 +26,14 @@ abstract class Document extends StatelessComponent {
     String attachTo,
     required Component child,
   }) = _TemplateDocument;
+
+  const Document._() : super();
+
+  // only allow a single document
+  static final _key = GlobalKey();
+
+  @override
+  Key get key => _key;
 }
 
 class _BaseDocument extends Document {
@@ -138,7 +139,7 @@ class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
 
   @override
   FutureOr<void> prepare() async {
-    var template = await (element as _TemplateDocumentElement)._templateFuture!;
+    final template = await (element as _TemplateDocumentElement)._templateFuture;
     if (template == null) {
       throw TemplateNotFoundError((element.component as _TemplateDocument).name);
     }
@@ -150,11 +151,11 @@ class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
   void applyBoundary(ChildListRange range) {
     var curr = range.start.prev!;
     range.remove();
-    var document = parse(template);
-    var target = document.querySelector((element.component as _TemplateDocument).attachTo)!;
+    final document = parse(template);
+    final target = document.querySelector((element.component as _TemplateDocument).attachTo)!;
 
     MarkupRenderObject? createTree(dom.Node node) {
-      var n = element.parentRenderObjectElement!.renderObject.createChildRenderObject() as MarkupRenderObject;
+      final n = element.parentRenderObjectElement!.renderObject.createChildRenderObject() as MarkupRenderObject;
 
       if (node is dom.Text) {
         if (node.text.trim().isEmpty) {
@@ -174,8 +175,8 @@ class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
       if (node == target) {
         n.children.insertNodeAfter(range);
       } else {
-        for (var c in node.nodes) {
-          var o = createTree(c);
+        for (final c in node.nodes) {
+          final o = createTree(c);
           if (o != null) {
             n.children.insertBefore(o);
           }
@@ -185,10 +186,10 @@ class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
       return n;
     }
 
-    for (var n in document.nodes) {
-      var o = createTree(n);
+    for (final n in document.nodes) {
+      final o = createTree(n);
       if (o != null) {
-        var next = ChildNodeData(o);
+        final next = ChildNodeData(o);
         curr.insertNext(next);
         curr = next;
       }

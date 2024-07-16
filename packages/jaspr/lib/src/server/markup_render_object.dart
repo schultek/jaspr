@@ -59,8 +59,8 @@ class MarkupRenderObject extends RenderObject {
   }
 
   String renderToHtml() {
-    var output = StringBuffer();
-    if (text case var text?) {
+    final output = StringBuffer();
+    if (text case final text?) {
       if (rawHtml == true) {
         output.write(text);
       } else {
@@ -70,18 +70,18 @@ class MarkupRenderObject extends RenderObject {
       tag = tag.toLowerCase();
       _domValidator.validateElementName(tag);
       output.write('<$tag');
-      if (id case String id) {
+      if (id case final String id) {
         output.write(' id="${_attributeEscape.convert(id)}"');
       }
-      if (classes case String classes when classes.isNotEmpty) {
+      if (classes case final String classes when classes.isNotEmpty) {
         output.write(' class="${_attributeEscape.convert(classes)}"');
       }
-      if (styles case var styles? when styles.isNotEmpty) {
-        var props = styles.entries.map((e) => '${e.key}: ${e.value}');
+      if (styles case final styles? when styles.isNotEmpty) {
+        final props = styles.entries.map((e) => '${e.key}: ${e.value}');
         output.write(' style="${_attributeEscape.convert(props.join('; '))}"');
       }
-      if (attributes case var attrs? when attrs.isNotEmpty) {
-        for (var attr in attrs.entries) {
+      if (attributes case final attrs? when attrs.isNotEmpty) {
+        for (final attr in attrs.entries) {
           _domValidator.validateAttributeName(attr.key);
           if (attr.value.isNotEmpty) {
             output.write(' ${attr.key}="${_attributeEscape.convert(attr.value)}"');
@@ -90,19 +90,19 @@ class MarkupRenderObject extends RenderObject {
           }
         }
       }
-      var selfClosing = _domValidator.isSelfClosing(tag);
+      final selfClosing = _domValidator.isSelfClosing(tag);
       if (selfClosing) {
         output.write('/>');
       } else {
         output.write('>');
-        var childOutput = <String>[];
-        for (var child in children) {
+        final childOutput = <String>[];
+        for (final child in children) {
           childOutput.add(child.renderToHtml());
         }
-        var fullChildOutput = childOutput.fold<String>('', (s, o) => s + o);
+        final fullChildOutput = childOutput.fold<String>('', (s, o) => s + o);
         if (formatOutput && (fullChildOutput.length > 80 || fullChildOutput.contains('\n'))) {
           output.write('\n');
-          for (var child in childOutput) {
+          for (final child in childOutput) {
             output.writeln('  ${child.replaceAll('\n', '\n  ')}');
           }
         } else {
@@ -112,14 +112,14 @@ class MarkupRenderObject extends RenderObject {
       }
     } else {
       assert(parent == null);
-      for (var child in children) {
+      for (final child in children) {
         output.writeln(child.renderToHtml());
       }
     }
     return output.toString();
   }
 
-  final _attributeEscape = HtmlEscape(HtmlEscapeMode.attribute);
+  final _attributeEscape = const HtmlEscape(HtmlEscapeMode.attribute);
   final _domValidator = DomValidator();
 }
 
