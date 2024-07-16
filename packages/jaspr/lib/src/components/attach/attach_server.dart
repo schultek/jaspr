@@ -2,11 +2,10 @@ import '../../../server.dart';
 import '../../server/adapters/document_adapter.dart';
 
 class PlatformAttach extends StatelessComponent {
-  const PlatformAttach({required this.target, this.attributes, this.events, super.key});
+  const PlatformAttach({required this.target, this.attributes, super.key});
 
   final String target;
   final Map<String, String>? attributes;
-  final EventCallbacks? events;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

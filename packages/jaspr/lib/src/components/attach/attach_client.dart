@@ -3,11 +3,10 @@ import 'dart:html' as html;
 import '../../../browser.dart';
 
 class PlatformAttach extends ProxyComponent {
-  const PlatformAttach({required this.target, this.attributes, this.events, super.key});
+  const PlatformAttach({required this.target, this.attributes, super.key});
 
   final String target;
   final Map<String, String>? attributes;
-  final EventCallbacks? events;
 
   @override
   Element createElement() => AttachElement(this);
@@ -18,17 +17,16 @@ class AttachElement extends ProxyRenderObjectElement {
 
   @override
   RenderObject createRenderObject() {
-    var PlatformAttach(:target, :attributes, :events) = component as PlatformAttach;
+    var PlatformAttach(:target, :attributes) = component as PlatformAttach;
     return AttachRenderObject(target, depth);
   }
 
   @override
   void updateRenderObject() {
-    var PlatformAttach(:target, :attributes, :events) = component as PlatformAttach;
+    var PlatformAttach(:target, :attributes) = component as PlatformAttach;
     (renderObject as AttachRenderObject)
       ..target = target
-      ..attributes = attributes
-      ..aevents = events;
+      ..attributes = attributes;
   }
 
   @override
@@ -67,13 +65,6 @@ class AttachRenderObject extends DomRenderObject {
     AttachAdapter.instanceFor(_target).update();
   }
 
-  EventCallbacks? _events;
-  set aevents(EventCallbacks? events) {
-    if (_events == events) return;
-    _events = events;
-    AttachAdapter.instanceFor(_target).update();
-  }
-
   int _depth;
   set depth(int depth) {
     if (_depth == depth) return;
@@ -101,8 +92,6 @@ class AttachAdapter {
   final List<AttachRenderObject> _attachRenderObjects = [];
   bool _needsResorting = true;
 
-  final Map<String, EventBinding> events = {};
-
   void update() {
     if (_needsResorting) {
       _attachRenderObjects.sort((a, b) => a._depth - b._depth);
@@ -110,43 +99,16 @@ class AttachAdapter {
     }
 
     Map<String, String> attributes = initialAttributes;
-    EventCallbacks events = {};
 
     for (var renderObject in _attachRenderObjects) {
       assert(renderObject._target == target);
       if (renderObject._attributes case final attrs?) {
         attributes.addAll(attrs);
       }
-
-      if (renderObject._events case final e?) {
-        events.addAll(e);
-      }
     }
 
     element?.attributes.clear();
     element?.attributes.addAll(attributes);
-
-    if (element != null && events.isNotEmpty) {
-      final prevEventTypes = this.events.keys.toSet();
-
-      events.forEach((type, fn) {
-        prevEventTypes.remove(type);
-        final currentBinding = this.events[type];
-        if (currentBinding != null) {
-          currentBinding.fn = fn;
-        } else {
-          this.events[type] = EventBinding(element!, type, fn);
-        }
-      });
-      prevEventTypes.forEach((type) {
-        this.events.remove(type)?.clear();
-      });
-    } else {
-      this.events.forEach((type, binding) {
-        binding.clear();
-      });
-      this.events.clear();
-    }
   }
 
   void register(AttachRenderObject renderObject) {
