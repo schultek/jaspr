@@ -75,7 +75,7 @@ void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
         start.text = '\$${comp.$1}';
 
         var params = ConfigParams(
-          jsonDecode(comp.$2?.replaceAll('&amp;', '&').replaceAll('&lt;', '<').replaceAll('&gt;', '>') ?? '{}'),
+          jsonDecode(comp.$2?.replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&') ?? '{}'),
         );
 
         var builder = fn(name);
