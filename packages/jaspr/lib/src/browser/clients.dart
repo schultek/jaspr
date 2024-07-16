@@ -74,7 +74,9 @@ void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
         // Remove the data string.
         start.text = '\$${comp.$1}';
 
-        var params = ConfigParams(jsonDecode(comp.$2 ?? '{}'));
+        var params = ConfigParams(
+          jsonDecode(comp.$2?.replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&') ?? '{}'),
+        );
 
         var builder = fn(name);
         if (builder is ClientBuilder) {
