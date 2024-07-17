@@ -43,6 +43,7 @@ class HeadRenderObject extends DomRenderObject with AttachRenderObjectMixin {
   final List<html.Node> children = [];
 
   int _depth;
+  @override
   int get depth => _depth;
   set depth(int depth) {
     if (_depth == depth) return;
@@ -137,6 +138,7 @@ class HeadAdapter with AttachAdapterMixin<HeadRenderObject> {
     };
   }
 
+  @override
   void performUpdate() {
     Map<String, html.Node> keyedNodes = Map.of(initialKeyedHeadNodes);
     List<html.Node> children = List.of(initialKeyedHeadNodes.values);

@@ -70,6 +70,7 @@ class AttachRenderObject extends DomRenderObject with AttachRenderObjectMixin {
   }
 
   int _depth;
+  @override
   int get depth => _depth;
   set depth(int depth) {
     if (_depth == depth) return;
@@ -120,6 +121,7 @@ class AttachAdapter with AttachAdapterMixin<AttachRenderObject> {
 
   late final Map<String, String> initialAttributes = {...?element?.attributes};
 
+  @override
   void performUpdate() {
     if (element == null) return;
 
