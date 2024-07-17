@@ -43,7 +43,11 @@ class AttachElement extends ProxyRenderObjectElement {
   }
 }
 
-class AttachRenderObject extends DomRenderObject {
+mixin AttachRenderObjectMixin on RenderObject {
+  int get depth;
+}
+
+class AttachRenderObject extends DomRenderObject with AttachRenderObjectMixin {
   AttachRenderObject(this._target, this._depth) {
     node = html.Text('');
     AttachAdapter.instanceFor(_target).register(this);
@@ -66,22 +70,49 @@ class AttachRenderObject extends DomRenderObject {
   }
 
   int _depth;
+  int get depth => _depth;
   set depth(int depth) {
     if (_depth == depth) return;
     _depth = depth;
-    AttachAdapter.instanceFor(_target)._needsResorting = true;
-    AttachAdapter.instanceFor(_target).update();
+    AttachAdapter.instanceFor(_target).update(needsResorting: true);
   }
 }
 
-class AttachAdapter {
+mixin AttachAdapterMixin<T extends AttachRenderObjectMixin> {
+  final List<T> _renderObjects = [];
+  List<T> get renderObjects => _renderObjects;
+  bool _needsResorting = true;
+
+  void update({bool needsResorting = false}) {
+    if (needsResorting || _needsResorting) {
+      _renderObjects.sort((a, b) => a.depth - b.depth);
+      _needsResorting = false;
+    }
+
+    performUpdate();
+  }
+
+  void performUpdate();
+
+  void register(T renderObject) {
+    _renderObjects.add(renderObject);
+    _needsResorting = true;
+  }
+
+  void unregister(T renderObject) {
+    _renderObjects.remove(renderObject);
+    update();
+  }
+}
+
+class AttachAdapter with AttachAdapterMixin<AttachRenderObject> {
+  AttachAdapter(this.target);
+
   static AttachAdapter instanceFor(String target) {
     return _instances[target] ??= AttachAdapter(target);
   }
 
   static final Map<String, AttachAdapter> _instances = {};
-
-  AttachAdapter(this.target);
 
   final String target;
 
@@ -89,35 +120,30 @@ class AttachAdapter {
 
   late final Map<String, String> initialAttributes = {...?element?.attributes};
 
-  final List<AttachRenderObject> _attachRenderObjects = [];
-  bool _needsResorting = true;
-
-  void update() {
-    if (_needsResorting) {
-      _attachRenderObjects.sort((a, b) => a._depth - b._depth);
-      _needsResorting = false;
-    }
+  void performUpdate() {
+    if (element == null) return;
 
     Map<String, String> attributes = initialAttributes;
 
-    for (var renderObject in _attachRenderObjects) {
+    for (var renderObject in renderObjects) {
       assert(renderObject._target == target);
       if (renderObject._attributes case final attrs?) {
         attributes.addAll(attrs);
       }
     }
 
-    element?.attributes.clear();
-    element?.attributes.addAll(attributes);
-  }
+    var attributesToRemove = element!.attributes.keys.toSet();
+    if (attributes.isNotEmpty) {
+      for (var attr in attributes.entries) {
+        element!.clearOrSetAttribute(attr.key, attr.value);
+        attributesToRemove.remove(attr.key);
+      }
+    }
 
-  void register(AttachRenderObject renderObject) {
-    _attachRenderObjects.add(renderObject);
-    _needsResorting = true;
-  }
-
-  void unregister(AttachRenderObject renderObject) {
-    _attachRenderObjects.remove(renderObject);
-    update();
+    if (attributesToRemove.isNotEmpty) {
+      for (final name in attributesToRemove) {
+        element!.removeAttribute(name);
+      }
+    }
   }
 }
