@@ -79,7 +79,7 @@ class StylesModuleBuilder implements Builder {
     //   return;
     // }
 
-    var module = await StylesModule(elements: annotated, id: buildStep.inputId);
+    var module = StylesModule(elements: annotated, id: buildStep.inputId);
 
     var outputId = buildStep.inputId.changeExtension('.styles.json');
     await buildStep.writeAsString(outputId, jsonEncode(module.serialize()));

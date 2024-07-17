@@ -2,8 +2,7 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/jaspr.dart';
-
-import 'web/components/quote_like_button.dart' as c0;
+import 'web/components/quote_like_button.dart' as prefix0;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
@@ -21,11 +20,9 @@ import 'web/components/quote_like_button.dart' as c0;
 ///   runApp(...);
 /// }
 /// ```
-const defaultJasprOptions = JasprOptions(
-  targets: {
-    c0.QuoteLikeButton:
-        ClientTarget<c0.QuoteLikeButton>('web/components/quote_like_button', params: _params0QuoteLikeButton),
-  },
-);
+final defaultJasprOptions = JasprOptions(clients: {
+  prefix0.QuoteLikeButton:
+      ClientTarget<prefix0.QuoteLikeButton>('web/components/quote_like_button', params: _params0QuoteLikeButton),
+}, styles: []);
 
-Map<String, dynamic> _params0QuoteLikeButton(c0.QuoteLikeButton c) => {'id': c.id, 'initialCount': c.initialCount};
+Map<String, dynamic> _params0QuoteLikeButton(prefix0.QuoteLikeButton c) => {'id': c.id, 'initialCount': c.initialCount};

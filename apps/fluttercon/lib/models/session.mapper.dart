@@ -27,22 +27,18 @@ class SessionMapper extends ClassMapperBase<Session> {
   static String _$id(Session v) => v.id;
   static const Field<Session, String> _f$id = Field('id', _$id);
   static String _$description(Session v) => v.description;
-  static const Field<Session, String> _f$description =
-      Field('description', _$description);
+  static const Field<Session, String> _f$description = Field('description', _$description);
   static DateTime _$startsAt(Session v) => v.startsAt;
-  static const Field<Session, DateTime> _f$startsAt =
-      Field('startsAt', _$startsAt);
+  static const Field<Session, DateTime> _f$startsAt = Field('startsAt', _$startsAt);
   static DateTime _$endsAt(Session v) => v.endsAt;
   static const Field<Session, DateTime> _f$endsAt = Field('endsAt', _$endsAt);
   static List<_t$_R0<String>> _$speakers(Session v) => v.speakers;
-  static const Field<Session, List<_t$_R0<String>>> _f$speakers =
-      Field('speakers', _$speakers);
+  static const Field<Session, List<_t$_R0<String>>> _f$speakers = Field('speakers', _$speakers);
   static String _$room(Session v) => v.room;
   static const Field<Session, String> _f$room = Field('room', _$room);
-  static List<_t$_R1<List<_t$_R0<String>>, String>> _$categories(Session v) =>
-      v.categories;
-  static const Field<Session, List<_t$_R1<List<_t$_R0<String>>, String>>>
-      _f$categories = Field('categories', _$categories);
+  static List<_t$_R1<List<_t$_R0<String>>, String>> _$categories(Session v) => v.categories;
+  static const Field<Session, List<_t$_R1<List<_t$_R0<String>>, String>>> _f$categories =
+      Field('categories', _$categories);
 
   @override
   final MappableFields<Session> fields = const {
@@ -82,13 +78,11 @@ class SessionMapper extends ClassMapperBase<Session> {
 
 mixin SessionMappable {
   String toJson() {
-    return SessionMapper.ensureInitialized()
-        .encodeJson<Session>(this as Session);
+    return SessionMapper.ensureInitialized().encodeJson<Session>(this as Session);
   }
 
   Map<String, dynamic> toMap() {
-    return SessionMapper.ensureInitialized()
-        .encodeMap<Session>(this as Session);
+    return SessionMapper.ensureInitialized().encodeMap<Session>(this as Session);
   }
 
   SessionCopyWith<Session, Session, Session> get copyWith =>
@@ -100,8 +94,7 @@ mixin SessionMappable {
 
   @override
   bool operator ==(Object other) {
-    return SessionMapper.ensureInitialized()
-        .equalsValue(this as Session, other);
+    return SessionMapper.ensureInitialized().equalsValue(this as Session, other);
   }
 
   @override
@@ -111,19 +104,13 @@ mixin SessionMappable {
 }
 
 extension SessionValueCopy<$R, $Out> on ObjectCopyWith<$R, Session, $Out> {
-  SessionCopyWith<$R, Session, $Out> get $asSession =>
-      $base.as((v, t, t2) => _SessionCopyWithImpl(v, t, t2));
+  SessionCopyWith<$R, Session, $Out> get $asSession => $base.as((v, t, t2) => _SessionCopyWithImpl(v, t, t2));
 }
 
-abstract class SessionCopyWith<$R, $In extends Session, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
-  ListCopyWith<$R, _t$_R0<String>,
-      ObjectCopyWith<$R, _t$_R0<String>, _t$_R0<String>>> get speakers;
-  ListCopyWith<
-      $R,
-      _t$_R1<List<_t$_R0<String>>, String>,
-      ObjectCopyWith<$R, _t$_R1<List<_t$_R0<String>>, String>,
-          _t$_R1<List<_t$_R0<String>>, String>>> get categories;
+abstract class SessionCopyWith<$R, $In extends Session, $Out> implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, _t$_R0<String>, ObjectCopyWith<$R, _t$_R0<String>, _t$_R0<String>>> get speakers;
+  ListCopyWith<$R, _t$_R1<List<_t$_R0<String>>, String>,
+      ObjectCopyWith<$R, _t$_R1<List<_t$_R0<String>>, String>, _t$_R1<List<_t$_R0<String>>, String>>> get categories;
   $R call(
       {String? title,
       String? id,
@@ -136,28 +123,20 @@ abstract class SessionCopyWith<$R, $In extends Session, $Out>
   SessionCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _SessionCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, Session, $Out>
+class _SessionCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Session, $Out>
     implements SessionCopyWith<$R, Session, $Out> {
   _SessionCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<Session> $mapper =
-      SessionMapper.ensureInitialized();
+  late final ClassMapperBase<Session> $mapper = SessionMapper.ensureInitialized();
   @override
-  ListCopyWith<$R, _t$_R0<String>,
-          ObjectCopyWith<$R, _t$_R0<String>, _t$_R0<String>>>
-      get speakers => ListCopyWith($value.speakers,
-          (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(speakers: v));
+  ListCopyWith<$R, _t$_R0<String>, ObjectCopyWith<$R, _t$_R0<String>, _t$_R0<String>>> get speakers =>
+      ListCopyWith($value.speakers, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(speakers: v));
   @override
-  ListCopyWith<
-      $R,
-      _t$_R1<List<_t$_R0<String>>, String>,
-      ObjectCopyWith<$R, _t$_R1<List<_t$_R0<String>>, String>,
-          _t$_R1<List<_t$_R0<String>>, String>>> get categories => ListCopyWith(
-      $value.categories,
-      (v, t) => ObjectCopyWith(v, $identity, t),
-      (v) => call(categories: v));
+  ListCopyWith<$R, _t$_R1<List<_t$_R0<String>>, String>,
+          ObjectCopyWith<$R, _t$_R1<List<_t$_R0<String>>, String>, _t$_R1<List<_t$_R0<String>>, String>>>
+      get categories =>
+          ListCopyWith($value.categories, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(categories: v));
   @override
   $R call(
           {String? title,
@@ -190,8 +169,7 @@ class _SessionCopyWithImpl<$R, $Out>
       categories: data.get(#categories, or: $value.categories));
 
   @override
-  SessionCopyWith<$R2, Session, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _SessionCopyWithImpl($value, $cast, t);
+  SessionCopyWith<$R2, Session, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) => _SessionCopyWithImpl($value, $cast, t);
 }
 
 typedef _t$_R1<A, B> = ({A categoryItems, B name});
@@ -214,8 +192,7 @@ class _t$_R1Mapper extends RecordMapperBase<_t$_R1> {
       Field('categoryItems', _$categoryItems, arg: _arg$categoryItems);
   static dynamic _$name(_t$_R1 v) => v.name;
   static dynamic _arg$name<A, B>(f) => f<B>();
-  static const Field<_t$_R1, dynamic> _f$name =
-      Field('name', _$name, arg: _arg$name);
+  static const Field<_t$_R1, dynamic> _f$name = Field('name', _$name, arg: _arg$name);
 
   @override
   final MappableFields<_t$_R1> fields = const {
@@ -258,8 +235,7 @@ class _t$_R0Mapper extends RecordMapperBase<_t$_R0> {
 
   static dynamic _$name(_t$_R0 v) => v.name;
   static dynamic _arg$name<A>(f) => f<A>();
-  static const Field<_t$_R0, dynamic> _f$name =
-      Field('name', _$name, arg: _arg$name);
+  static const Field<_t$_R0, dynamic> _f$name = Field('name', _$name, arg: _arg$name);
 
   @override
   final MappableFields<_t$_R0> fields = const {

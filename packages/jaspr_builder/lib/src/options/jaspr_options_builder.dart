@@ -55,7 +55,7 @@ class JasprOptionsBuilder implements Builder {
       $generationHeader
       
       import 'package:jaspr/jaspr.dart';
-      ${imports}
+      $imports
       
       /// Default [JasprOptions] for use with your jaspr project.
       ///

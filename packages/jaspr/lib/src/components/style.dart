@@ -31,7 +31,7 @@ abstract class StyleRule {
 
 extension StyleRulesRender on Iterable<StyleRule> {
   String render() {
-    return this.map((s) => s._toCss()).join(cssPropSpace);
+    return map((s) => s._toCss()).join(cssPropSpace);
   }
 }
 

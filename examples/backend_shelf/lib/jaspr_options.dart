@@ -2,9 +2,8 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/jaspr.dart';
-
-import 'components/hello.dart' as c0;
-import 'components/app.dart' as c1;
+import 'components/hello.dart' as prefix0;
+import 'components/app.dart' as prefix1;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
@@ -22,9 +21,7 @@ import 'components/app.dart' as c1;
 ///   runApp(...);
 /// }
 /// ```
-const defaultJasprOptions = JasprOptions(
-  targets: {
-    c0.Hello: ClientTarget<c0.Hello>('components/hello'),
-    c1.App: ClientTarget<c1.App>('components/app'),
-  },
-);
+final defaultJasprOptions = JasprOptions(clients: {
+  prefix0.Hello: ClientTarget<prefix0.Hello>('components/hello'),
+  prefix1.App: ClientTarget<prefix1.App>('components/app'),
+}, styles: []);
