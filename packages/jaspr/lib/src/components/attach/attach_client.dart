@@ -17,7 +17,7 @@ class AttachElement extends ProxyRenderObjectElement {
 
   @override
   RenderObject createRenderObject() {
-    var PlatformAttach(:target, :attributes) = component as PlatformAttach;
+    var PlatformAttach(:target) = component as PlatformAttach;
     return AttachRenderObject(target, depth);
   }
 
