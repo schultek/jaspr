@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 
 import '../utils.dart';
@@ -34,7 +35,7 @@ class StylesModuleBuilder implements Builder {
   Future<void> generateStylesModule(BuildStep buildStep) async {
     // Performance optimization
     var file = await buildStep.readAsString(buildStep.inputId);
-    if (!file.contains('@styles')) {
+    if (!file.contains('@css')) {
       return;
     }
 
@@ -60,6 +61,23 @@ class StylesModuleBuilder implements Builder {
           }
         })
         .where((element) => stylesChecker.firstAnnotationOfExact(element) != null)
+        .where((element) {
+          final type = switch (element) {
+            PropertyAccessorElement e => e.type.returnType,
+            PropertyInducingElement e => e.type,
+            _ => null,
+          };
+
+          if (type == null ||
+              !type.isDartCoreList ||
+              !styleRuleChecker.isAssignableFromType((type as InterfaceType).typeArguments.first)) {
+            log.warning(
+                '@css can only be applied on variables or getters of type List<StyleRule>. Failing element: ${element.name} with type $type');
+            return false;
+          }
+
+          return true;
+        })
         .map((e) {
           if (e.enclosingElement case ClassElement clazz) {
             return '${clazz.name}.${e.name}';
@@ -73,11 +91,6 @@ class StylesModuleBuilder implements Builder {
     if (annotated.isEmpty) {
       return;
     }
-
-    // if (!componentChecker.isAssignableFrom(element)) {
-    //   log.warning('@client can only be applied on classes extending Component. Failing element: ${element.name}');
-    //   return;
-    // }
 
     var module = StylesModule(elements: annotated, id: buildStep.inputId);
 

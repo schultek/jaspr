@@ -58,10 +58,3 @@ class Import {
 }
 
 enum ImportPlatform { web, server }
-
-/// Used to annotate a set of style rules.
-const styles = StylesAnnotation._();
-
-class StylesAnnotation {
-  const StylesAnnotation._();
-}
