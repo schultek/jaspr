@@ -4,6 +4,7 @@ import 'dart:convert';
 import '../../jaspr.dart';
 import 'adapters/client_component_adapter.dart';
 import 'adapters/document_adapter.dart';
+import 'adapters/global_styles_adapter.dart';
 import 'adapters/sync_script_adapter.dart';
 import 'async_build_owner.dart';
 import 'markup_render_object.dart';
@@ -34,6 +35,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     var root = rootElement!.renderObject as MarkupRenderObject;
     var adapters = [
       ..._adapters.reversed,
+      GlobalStylesAdapter(this),
       SyncScriptAdapter(getStateData),
       DocumentAdapter(),
     ];

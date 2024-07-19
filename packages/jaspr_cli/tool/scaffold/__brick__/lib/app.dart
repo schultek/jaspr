@@ -31,7 +31,8 @@ class App extends StatelessComponent {
     ]);
   }{{#server}}
 
-  static get styles => [
+  @css
+  static final styles = [
     css('.main', [
       css('&').box(height: 100.vh).flexbox(direction: FlexDirection.{{#routing}}column{{/routing}}{{^routing}}row{{/routing}}, wrap: FlexWrap.wrap),
       css('section').flexItem(flex: Flex(grow: 1{{^routing}}, shrink: 0, basis: FlexBasis(400.px){{/routing}})).flexbox(
@@ -39,9 +40,6 @@ class App extends StatelessComponent {
         justifyContent: JustifyContent.center,
         alignItems: AlignItems.center,
       ),
-    ]),{{#routing}}
-    ...Header.styles,{{/routing}}
-    ...Home.styles,
-    ...About.styles,
+    ]),
   ];{{/server}}
 }

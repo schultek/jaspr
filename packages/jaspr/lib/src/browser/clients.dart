@@ -44,6 +44,8 @@ ClientLoader loadClient(Future<void> Function() loader, ClientBuilder builder) {
 final _compStartRegex = RegExp(r'^\$(\S+)(?:\s+data=(.*))?$');
 final _compEndRegex = RegExp(r'^/\$(\S+)$');
 
+final _escapeRegex = RegExp(r'&(amp|lt|gt);');
+
 void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
   var iterator = NodeIterator(document, NodeFilter.SHOW_COMMENT);
 
@@ -74,7 +76,9 @@ void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
         // Remove the data string.
         start.text = '\$${comp.$1}';
 
-        var params = ConfigParams(jsonDecode(comp.$2 ?? '{}'));
+        final data = (comp.$2 ?? '{}').replaceAllMapped(_escapeRegex,
+            (match) => switch (match.group(1)) { 'amp' => '&', 'lt' => '<', 'gt' => '>', _ => match.group(0)! });
+        var params = ConfigParams(jsonDecode(data));
 
         var builder = fn(name);
         if (builder is ClientBuilder) {

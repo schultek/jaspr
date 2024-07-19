@@ -15,23 +15,24 @@ class PagesNav extends StatelessComponent {
     ]);
   }
 
-  static get styles => [
-        css('nav', [
-          css('&').box(padding: EdgeInsets.all(40.px)).flexbox(justifyContent: JustifyContent.center),
-          css('a', [
-            css('&')
-                .box(
-                  display: Display.block,
-                  padding: EdgeInsets.symmetric(horizontal: 8.px, vertical: 4.px),
-                  border: Border.all(BorderSide.solid()),
-                  margin: EdgeInsets.symmetric(horizontal: 2.px),
-                )
-                .text(decoration: TextDecoration.none, color: Color.initial),
-            css('&:first-child').box(radius: BorderRadius.horizontal(left: Radius.circular(0.6.em))),
-            css('&:last-child').box(radius: BorderRadius.horizontal(right: Radius.circular(0.6.em))),
-            css('&.active').background(color: Color.hex('#0002')),
-            css('&:hover').background(color: Color.hex('#0001')),
-          ]),
-        ]),
-      ];
+  @css
+  static final styles = [
+    css('nav', [
+      css('&').box(padding: EdgeInsets.all(40.px)).flexbox(justifyContent: JustifyContent.center),
+      css('a', [
+        css('&')
+            .box(
+              display: Display.block,
+              padding: EdgeInsets.symmetric(horizontal: 8.px, vertical: 4.px),
+              border: Border.all(BorderSide.solid()),
+              margin: EdgeInsets.symmetric(horizontal: 2.px),
+            )
+            .text(decoration: TextDecoration.none, color: Color.initial),
+        css('&:first-child').box(radius: BorderRadius.horizontal(left: Radius.circular(0.6.em))),
+        css('&:last-child').box(radius: BorderRadius.horizontal(right: Radius.circular(0.6.em))),
+        css('&.active').background(color: Color.hex('#0002')),
+        css('&:hover').background(color: Color.hex('#0001')),
+      ]),
+    ]),
+  ];
 }

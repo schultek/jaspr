@@ -59,18 +59,21 @@ class ClientModuleBuilder implements Builder {
     }
 
     if (annotated.length > 1) {
-      log.warning("Cannot have multiple components annotated with @client in a single library.");
+      log.severe(
+          "Cannot have multiple components annotated with @client in a single library. Failing library: ${library.source.fullName}.");
     }
 
     var element = annotated.first;
 
     if (element is! ClassElement) {
-      log.warning('@client can only be applied on classes. Failing element: ${element.name}');
+      log.severe(
+          '@client can only be applied on classes. Failing element: ${element.name} in library ${library.source.fullName}.');
       return;
     }
 
     if (!componentChecker.isAssignableFrom(element)) {
-      log.warning('@client can only be applied on classes extending Component. Failing element: ${element.name}');
+      log.severe(
+          '@client can only be applied on classes extending Component. Failing element: ${element.name} in library ${library.source.fullName}.');
       return;
     }
 
@@ -177,11 +180,13 @@ class ClientParam {
 }
 
 List<ClientParam> getParamsFor(ClassElement e) {
-  var params = e.constructors.first.parameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
+  final constr = e.constructors.first;
+  var params = constr.parameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
 
   for (var param in params) {
     if (!param.isInitializingFormal) {
-      throw UnsupportedError('Client components only support initializing formal constructor parameters.');
+      throw UnsupportedError('Client components only support initializing formal constructor parameters. '
+          'Failing element: ${e.name}.${constr.name}($param)');
     }
   }
 

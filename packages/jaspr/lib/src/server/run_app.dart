@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:shelf/shelf.dart';
 
@@ -39,13 +40,10 @@ Future<String> renderComponent(Component app) async {
 }
 
 void _checkInitialized(String method) {
-  assert(() {
-    if (!Jaspr.isInitialized) {
-      print("[WARNING] Jaspr was not initialized. Call Jaspr.initializeApp() before calling $method(). "
-          "This will be required in a future version of jaspr and result in an error.");
-    }
-    return true;
-  }());
+  if (!Jaspr.isInitialized) {
+    stderr.write("Error: Jaspr was not initialized. Call Jaspr.initializeApp() before calling $method()");
+    exit(-1);
+  }
 }
 
 SetupFunction _createSetup(Component app) {

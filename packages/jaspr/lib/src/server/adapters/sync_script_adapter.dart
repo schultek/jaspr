@@ -12,8 +12,12 @@ class SyncScriptAdapter extends HeadScopeAdapter {
   @override
   void applyHead(MarkupRenderObject head) {
     var state = getData();
+    if (state.isEmpty) {
+      return;
+    }
+
     var jasprConfig = {
-      if (state.isNotEmpty) 'sync': kDebugMode ? state : stateCodec.encode(state),
+      'sync': kDebugMode ? state : stateCodec.encode(state),
     };
 
     var source = 'window.jaspr = ${JsonEncoder.withIndent(kDebugMode ? '  ' : null).convert(jasprConfig)};';

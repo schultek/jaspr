@@ -16,7 +16,7 @@ void main() {
       expect(response.document?.head, isNotNull);
       var head = response.document!.head!;
 
-      expect(head.children, hasLength(5));
+      expect(head.children, hasLength(4));
 
       expect(head.children.first.localName, equals('base'));
       expect(head.children[1].outerHtml, equals('<title>c</title>'));

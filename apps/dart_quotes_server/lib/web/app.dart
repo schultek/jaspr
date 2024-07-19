@@ -24,13 +24,14 @@ class App extends StatelessComponent {
     ]);
   }
 
-  static get styles => [
-        css('.main').box(
-          minHeight: 100.vh,
-          maxWidth: 500.px,
-          margin: EdgeInsets.all(Unit.auto),
-          padding: EdgeInsets.symmetric(horizontal: 2.em),
-        ),
-        css('.github-badge').box(position: Position.absolute(top: 0.px, right: 0.px))
-      ];
+  @css
+  static final styles = [
+    css('.main').box(
+      minHeight: 100.vh,
+      maxWidth: 500.px,
+      margin: EdgeInsets.all(Unit.auto),
+      padding: EdgeInsets.symmetric(horizontal: 2.em),
+    ),
+    css('.github-badge').box(position: Position.absolute(top: 0.px, right: 0.px))
+  ];
 }
