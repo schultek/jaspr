@@ -1,6 +1,7 @@
 import 'dart:html' as html;
 
 import '../../../browser.dart';
+import '../attach/attach_client.dart';
 
 class PlatformHead extends ProxyComponent {
   const PlatformHead({required super.children, super.key});
@@ -29,16 +30,67 @@ class HeadElement extends ProxyRenderObjectElement {
   @override
   void detachRenderObject() {
     super.detachRenderObject();
-    (renderObject as HeadRenderObject).unregister();
+    HeadAdapter.instance.unregister(renderObject as HeadRenderObject);
   }
 }
 
-class HeadAdapter {
+class HeadRenderObject extends DomRenderObject with AttachRenderObjectMixin {
+  HeadRenderObject(this._depth) {
+    node = html.Text('');
+    HeadAdapter.instance.register(this);
+  }
+
+  final List<html.Node> children = [];
+
+  int _depth;
+  @override
+  int get depth => _depth;
+  set depth(int depth) {
+    if (_depth == depth) return;
+    _depth = depth;
+    HeadAdapter.instance.update(needsResorting: true);
+  }
+
+  @override
+  void attach(DomRenderObject child, {DomRenderObject? after}) {
+    try {
+      var childNode = child.node;
+      if (childNode == null) return;
+
+      var afterNode = after?.node;
+      if (afterNode == null && children.contains(childNode)) {
+        // Keep child in current place.
+        return;
+      }
+
+      if (afterNode != null && !children.contains(afterNode)) {
+        afterNode = null;
+      }
+
+      children.remove(childNode);
+      children.insert(afterNode != null ? children.indexOf(afterNode) + 1 : 0, childNode);
+      HeadAdapter.instance.update();
+    } finally {
+      child.finalize();
+    }
+  }
+
+  @override
+  void remove(DomRenderObject child) {
+    super.remove(child);
+    children.remove(child.node);
+    HeadAdapter.instance.update();
+  }
+}
+
+class HeadAdapter with AttachAdapterMixin<HeadRenderObject> {
+  HeadAdapter();
+
   static HeadAdapter instance = HeadAdapter();
 
-  static final html.HeadElement head = html.document.head!;
+  final html.HeadElement head = html.document.head!;
 
-  static final (html.Node, html.Node) headBoundary = () {
+  late final (html.Node, html.Node) headBoundary = () {
     var iterator = html.NodeIterator(head, html.NodeFilter.SHOW_COMMENT);
 
     html.Node? start, end;
@@ -64,7 +116,7 @@ class HeadAdapter {
     return (start, end);
   }();
 
-  static Iterable<html.Node> get liveHeadNodes sync* {
+  Iterable<html.Node> get liveHeadNodes sync* {
     html.Node? curr = headBoundary.$1.nextNode;
     while (curr != null && curr != headBoundary.$2) {
       yield curr;
@@ -72,12 +124,12 @@ class HeadAdapter {
     }
   }
 
-  static final Map<String, html.Node> initialKeyedHeadNodes = {
+  late final Map<String, html.Node> initialKeyedHeadNodes = {
     for (var node in liveHeadNodes)
       if (keyFor(node) case String key) key: node,
   };
 
-  static String? keyFor(html.Node node) {
+  String? keyFor(html.Node node) {
     return switch (node) {
       html.Element(id: String id) when id.isNotEmpty => id,
       html.Element(tagName: "TITLE" || "BASE") => '__${node.tagName}',
@@ -86,21 +138,12 @@ class HeadAdapter {
     };
   }
 
-  HeadAdapter();
-
-  final List<HeadRenderObject> _headRenderObjects = [];
-  bool _needsResorting = true;
-
-  void update() {
-    if (_needsResorting) {
-      _headRenderObjects.sort((a, b) => a._depth - b._depth);
-      _needsResorting = false;
-    }
-
+  @override
+  void performUpdate() {
     Map<String, html.Node> keyedNodes = Map.of(initialKeyedHeadNodes);
     List<html.Node> children = List.of(initialKeyedHeadNodes.values);
 
-    for (var renderObject in _headRenderObjects) {
+    for (var renderObject in renderObjects) {
       for (var node in renderObject.children) {
         var key = keyFor(node);
         if (key != null) {
@@ -135,67 +178,5 @@ class HeadAdapter {
       current.remove();
       current = next;
     }
-  }
-
-  void register(HeadRenderObject renderObject) {
-    _headRenderObjects.add(renderObject);
-    _needsResorting = true;
-  }
-
-  void unregister(HeadRenderObject renderObject) {
-    _headRenderObjects.remove(renderObject);
-    update();
-  }
-}
-
-class HeadRenderObject extends DomRenderObject {
-  HeadRenderObject(this._depth) {
-    node = html.Text('');
-    HeadAdapter.instance.register(this);
-  }
-
-  final List<html.Node> children = [];
-
-  int _depth;
-  set depth(int depth) {
-    if (_depth == depth) return;
-    _depth = depth;
-    HeadAdapter.instance._needsResorting = true;
-    HeadAdapter.instance.update();
-  }
-
-  @override
-  void attach(DomRenderObject child, {DomRenderObject? after}) {
-    try {
-      var childNode = child.node;
-      if (childNode == null) return;
-
-      var afterNode = after?.node;
-      if (afterNode == null && children.contains(childNode)) {
-        // Keep child in current place.
-        return;
-      }
-
-      if (afterNode != null && !children.contains(afterNode)) {
-        afterNode = null;
-      }
-
-      children.remove(childNode);
-      children.insert(afterNode != null ? children.indexOf(afterNode) + 1 : 0, childNode);
-      HeadAdapter.instance.update();
-    } finally {
-      child.finalize();
-    }
-  }
-
-  @override
-  void remove(DomRenderObject child) {
-    super.remove(child);
-    children.remove(child.node);
-    HeadAdapter.instance.update();
-  }
-
-  void unregister() {
-    HeadAdapter.instance.unregister(this);
   }
 }

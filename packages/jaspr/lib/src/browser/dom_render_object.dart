@@ -297,7 +297,7 @@ class EventBinding {
   }
 }
 
-extension on html.Element {
+extension AttributeOperation on html.Element {
   void clearOrSetAttribute(String name, String? value) {
     final current = getAttribute(name);
     if (current == value) return;

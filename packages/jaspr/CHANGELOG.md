@@ -10,6 +10,8 @@
 
 - Made `Jaspr.initializeApp()` required (static and server mode).
 
+- Add `Attach` component
+
 ## 0.13.3
 
 - Added support for custom models as parameters to `@client` components.

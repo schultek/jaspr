@@ -12,7 +12,7 @@ void main() {
     testBrowser('should serve component', (tester) async {
       await tester.pumpComponent(App());
 
-      var nodes = HeadAdapter.liveHeadNodes.toList();
+      var nodes = HeadAdapter.instance.liveHeadNodes.toList();
 
       expect(nodes, hasLength(3));
       expect((nodes[0] as Element).outerHtml, equals('<title>c</title>'));
@@ -21,7 +21,7 @@ void main() {
 
       await tester.click(find.tag('button'));
 
-      nodes = HeadAdapter.liveHeadNodes.toList();
+      nodes = HeadAdapter.instance.liveHeadNodes.toList();
 
       expect((nodes[0] as Element).outerHtml, equals('<title>d</title>'));
       expect((nodes[1] as Element).outerHtml, equals('<meta name="test" content="b">'));
