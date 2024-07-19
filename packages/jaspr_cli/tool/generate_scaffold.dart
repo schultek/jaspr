@@ -10,6 +10,8 @@ void main() async {
   if (result.exitCode != 0) {
     exit(result.exitCode);
   }
+
+  Process.runSync('dart', 'format lib/src/scaffold/ --line-length=120'.split(' '));
 }
 
 String toCamelCase(String s) {

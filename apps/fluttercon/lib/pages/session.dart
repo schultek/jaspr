@@ -38,21 +38,22 @@ class SessionPage extends StatelessComponent {
     ]);
   }
 
-  static get styles => [
-        css('section.session', [
-          css('&')
-              .box(padding: EdgeInsets.all(40.px))
-              .flexbox(
-                direction: FlexDirection.column,
-                justifyContent: JustifyContent.center,
-                alignItems: AlignItems.center,
-              )
-              .text(align: TextAlign.center),
-          css('a').flexItem(alignSelf: AlignSelf.start).text(color: Color.initial),
-          css('h1').box(margin: EdgeInsets.only(top: 40.px, bottom: 20.px)).text(fontSize: 2.em),
-          css('div').box(margin: EdgeInsets.symmetric(vertical: 20.px)),
-          css('ul').list(style: ListStyle.none).box(padding: EdgeInsets.zero),
-          css('p').text(align: TextAlign.justify, whiteSpace: WhiteSpace.preLine),
-        ]),
-      ];
+  @css
+  static final styles = [
+    css('section.session', [
+      css('&')
+          .box(padding: EdgeInsets.all(40.px))
+          .flexbox(
+            direction: FlexDirection.column,
+            justifyContent: JustifyContent.center,
+            alignItems: AlignItems.center,
+          )
+          .text(align: TextAlign.center),
+      css('a').flexItem(alignSelf: AlignSelf.start).text(color: Color.initial),
+      css('h1').box(margin: EdgeInsets.only(top: 40.px, bottom: 20.px)).text(fontSize: 2.em),
+      css('div').box(margin: EdgeInsets.symmetric(vertical: 20.px)),
+      css('ul').list(style: ListStyle.none).box(padding: EdgeInsets.zero),
+      css('p').text(align: TextAlign.justify, whiteSpace: WhiteSpace.preLine),
+    ]),
+  ];
 }

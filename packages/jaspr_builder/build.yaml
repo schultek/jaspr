@@ -12,6 +12,7 @@ builders:
     build_to: source
     required_inputs:
       - '.client.json'
+      - '.styles.json'
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap
 # ========================
@@ -38,6 +39,17 @@ builders:
     build_to: cache
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap
+# ========================
+# === Styles ===
+# ========================
+  styles_module:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildStylesModule" ]
+    build_extensions:
+      "lib/{{file}}.dart":
+        - "lib/{{file}}.styles.json"
+    auto_apply: dependents
+    build_to: cache
 # ========================
 # === Platform Imports ===
 # ========================

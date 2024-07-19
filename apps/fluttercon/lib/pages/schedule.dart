@@ -1,7 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
 import '../components/pages_nav.dart';
-import '../components/session_card.dart';
 import '../components/session_list.dart';
 import '../models/session.dart';
 
@@ -35,10 +34,8 @@ class SchedulePage extends StatelessComponent {
     ]);
   }
 
-  static get styles => [
-        ...PagesNav.styles,
-        ...SessionList.styles,
-        ...SessionCard.styles,
-        css('footer').box(margin: EdgeInsets.all(40.px)).text(align: TextAlign.center, fontStyle: FontStyle.italic),
-      ];
+  @css
+  static final styles = [
+    css('footer').box(margin: EdgeInsets.all(40.px)).text(align: TextAlign.center, fontStyle: FontStyle.italic),
+  ];
 }

@@ -5,8 +5,8 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart';
 
-import 'app.dart';{{#hydration}}
-import 'jaspr_options.dart';{{/hydration}}
+import 'app.dart';
+import 'jaspr_options.dart';
 import 'styles.dart';
 
 /// Initializes the custom shelf server.
@@ -15,9 +15,9 @@ import 'styles.dart';
 /// Custom backend implementations must take care of properly managing open http servers
 /// and other resources that might be re-created when hot-reloading.
 void main() async {
-  Jaspr.initializeApp({{#hydration}}
+  Jaspr.initializeApp(
     options: defaultJasprOptions,
-  {{/hydration}});
+  );
 
   var router = Router();
 

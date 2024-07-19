@@ -23,7 +23,7 @@ jobs:
       matrix:
         Variant:
           - sampn
-          - vnmnn
+          - vnsnn
           - cnsnn
           - vanen
           - cnnen
