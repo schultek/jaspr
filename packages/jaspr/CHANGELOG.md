@@ -1,6 +1,14 @@
-## Unreleased patch
+## Unreleased breaking
 
 - Fixed missing html unescape in hydrated data.
+
+- Added `@css` annotation.
+
+- Added `css.import()`, `css.fontFace()` and `css.media()` shorthands.
+
+- Removed `MediaRuleQuery` in favor of `MediaQuery`
+
+- Made `Jaspr.initializeApp()` required (static and server mode).
 
 ## 0.13.3
 
