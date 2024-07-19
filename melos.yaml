@@ -63,6 +63,7 @@ scripts:
       dart run tool/generate_versions.dart
   activate:cli:
     run: |
+      rm -r packages/jaspr_cli/.dart_tool
       dart pub global activate packages/jaspr_cli --source=path
   deploy:jasprpad:
     run: |

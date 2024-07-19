@@ -1,17 +1,15 @@
 import 'package:jaspr/server.dart';
 
-import 'app.dart';{{#hydration}}
-import 'jaspr_options.dart';{{/hydration}}
-import 'styles.dart';
+import 'app.dart';
+import 'jaspr_options.dart';
 
 void main() {
-  Jaspr.initializeApp({{#hydration}}
+  Jaspr.initializeApp(
     options: defaultJasprOptions,
-  {{/hydration}});
+  );
 
   runApp(Document(
-    title: '{{name}}',
-    styles: styles,{{^hydration}}
+    title: '{{name}}',{{^hydration}}
     head: [
       script(defer: true, src: 'main.dart.js', []),{{#flutter}}
       link(rel: 'manifest', href: 'manifest.json'),{{/flutter}}

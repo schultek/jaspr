@@ -47,14 +47,11 @@ class StylesModuleBuilder implements Builder {
 
     var annotated = library.topLevelElements
         .expand<Element>((e) {
-          if (e is ClassElement && e.isPublic) {
-            return [
-              ...e.accessors.where((a) => a.isStatic && a.isGetter && a.isPublic),
-              ...e.fields.where((f) => f.isStatic && f.isPublic),
-            ];
-          } else if (e is PropertyAccessorElement && e.isGetter && e.isPublic) {
+          if (e is ClassElement) {
+            return [...e.accessors.where((a) => a.isGetter), ...e.fields];
+          } else if (e is PropertyAccessorElement && e.isGetter) {
             return [e];
-          } else if (e is TopLevelVariableElement && e.isPublic) {
+          } else if (e is TopLevelVariableElement) {
             return [e];
           } else {
             return [];
@@ -62,6 +59,22 @@ class StylesModuleBuilder implements Builder {
         })
         .where((element) => stylesChecker.firstAnnotationOfExact(element) != null)
         .where((element) {
+          if (element.enclosingElement case ClassElement clazz when clazz.isPrivate || element.isPrivate) {
+            log.severe(
+                '@css cannot be used on private classes or members. Failing element: ${clazz.name}.${element.name} in library ${library.source.fullName}.');
+            return false;
+          } else if (element.enclosingElement case ClassElement clazz
+              when (element is FieldElement && !element.isStatic) ||
+                  (element is PropertyAccessorElement && !element.isStatic)) {
+            log.severe(
+                '@css cannot be used on non-static class members. Failing element: ${clazz.name}.${element.name} in library ${library.source.fullName}.');
+            return false;
+          } else if (element.isPrivate) {
+            log.severe(
+                '@css cannot be used on private variables or getters. Failing element: ${element.name} in library ${library.source.fullName}.');
+            return false;
+          }
+
           final type = switch (element) {
             PropertyAccessorElement e => e.type.returnType,
             PropertyInducingElement e => e.type,
@@ -71,8 +84,9 @@ class StylesModuleBuilder implements Builder {
           if (type == null ||
               !type.isDartCoreList ||
               !styleRuleChecker.isAssignableFromType((type as InterfaceType).typeArguments.first)) {
-            log.warning(
-                '@css can only be applied on variables or getters of type List<StyleRule>. Failing element: ${element.name} with type $type');
+            final prefix = switch (element.enclosingElement) { ClassElement(:var name) => '$name.', _ => '' };
+            log.severe(
+                '@css can only be applied on variables or getters of type List<StyleRule>. Failing element: $prefix${element.name} with type $type in library ${element.source?.fullName}.');
             return false;
           }
 
@@ -86,7 +100,8 @@ class StylesModuleBuilder implements Builder {
           }
         })
         .whereType<String>()
-        .toList();
+        .toList()
+      ..sort();
 
     if (annotated.isEmpty) {
       return;

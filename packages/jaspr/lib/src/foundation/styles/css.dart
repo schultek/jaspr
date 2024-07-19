@@ -110,7 +110,7 @@ extension on BlockStyleRule {
       selector: Selector(selector.selector.startsWith('&') || parent.isEmpty
           ? selector.selector.replaceAll('&', parent)
           : '$parent ${selector.selector}'),
-      styles: this.styles,
+      styles: styles,
     );
     return child.toCss(indent);
   }

@@ -47,8 +47,19 @@ class JasprOptionsBuilder implements Builder {
 
     final imports = ImportsWriter();
 
-    final client = await loadClientOptions(imports, buildStep);
-    final styles = await loadStylesOptions(imports, buildStep);
+    final clients = await loadClientModules(buildStep);
+    final styles = await loadStylesModules(buildStep);
+
+    for (var c in clients) {
+      imports.add(c.id);
+    }
+    for (var s in styles) {
+      imports.add(s.id);
+    }
+
+    imports.sort();
+    clients.sortBy((c) => '${imports.prefixOf(c.id)}.${c.name}');
+    styles.sortBy((s) => imports.prefixOf(s.id));
 
     final optionsId = AssetId(buildStep.inputId.package, 'lib/jaspr_options.dart');
     final optionsSource = DartFormatter(pageWidth: 120).format('''
@@ -75,65 +86,60 @@ class JasprOptionsBuilder implements Builder {
       /// ```
       final defaultJasprOptions = JasprOptions(
         clients: {
-          ${client.entries}
+          ${buildClientEntries(imports, clients)}
         },
         styles: [
-          $styles
-        ]
+          ${buildStylesEntries(imports, styles)}
+        ],
       );
       
-      ${client.paramGetters}
+      ${buildClientParamGetters(imports, clients)}
       
     ''');
 
     await buildStep.writeAsString(optionsId, optionsSource);
   }
 
-  Future<({String entries, String paramGetters})> loadClientOptions(ImportsWriter imports, BuildStep buildStep) async {
-    final clients = await buildStep
+  Future<List<ClientModule>> loadClientModules(BuildStep buildStep) {
+    return buildStep
         .findAssets(Glob('lib/**.client.json'))
         .asyncMap((id) => buildStep.readAsString(id))
         .map((c) => ClientModule.deserialize(jsonDecode(c)))
         .toList();
-
-    final entries = StringBuffer();
-    final paramGetters = StringBuffer();
-
-    for (final (i, c) in clients.indexed) {
-      final prefix = imports.add(c.id);
-
-      entries.writeln('''
-        $prefix.${c.name}: ClientTarget<$prefix.${c.name}>(
-          '${path.url.relative(path.url.withoutExtension(c.id.path), from: 'lib')}'
-          ${c.params.isNotEmpty ? ', params: _params$i${c.name}' : ''}
-        ),
-      ''');
-
-      if (c.params.isNotEmpty) {
-        paramGetters.writeln(
-            'Map<String, dynamic> _params$i${c.name}($prefix.${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};');
-      }
-    }
-
-    return (entries: entries.toString(), paramGetters: paramGetters.toString());
   }
 
-  Future<String> loadStylesOptions(ImportsWriter imports, BuildStep buildStep) async {
-    final styles = await buildStep
+  Future<List<StylesModule>> loadStylesModules(BuildStep buildStep) {
+    return buildStep
         .findAssets(Glob('lib/**.styles.json'))
         .asyncMap((id) => buildStep.readAsString(id))
         .map((c) => StylesModule.deserialize(jsonDecode(c)))
         .toList();
+  }
 
-    final entries = StringBuffer();
+  String buildClientEntries(ImportsWriter imports, List<ClientModule> clients) {
+    return clients.map((c) {
+      final prefix = imports.prefixOf(c.id);
+      return '''
+        $prefix.${c.name}: ClientTarget<$prefix.${c.name}>(
+          '${path.url.relative(path.url.withoutExtension(c.id.path), from: 'lib')}'
+          ${c.params.isNotEmpty ? ', params: _$prefix${c.name}' : ''}
+        ),
+      ''';
+    }).join('\n');
+  }
 
-    for (final s in styles) {
-      final prefix = imports.add(s.id);
+  String buildClientParamGetters(ImportsWriter imports, List<ClientModule> clients) {
+    return clients.where((c) => c.params.isNotEmpty).map((c) {
+      final prefix = imports.prefixOf(c.id);
+      return 'Map<String, dynamic> _$prefix${c.name}($prefix.${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};';
+    }).join('\n');
+  }
 
-      entries.writeln(s.elements.map((e) => '...$prefix.$e,').join('\n'));
-    }
-
-    return entries.toString();
+  String buildStylesEntries(ImportsWriter imports, List<StylesModule> styles) {
+    return styles.map((s) {
+      final prefix = imports.prefixOf(s.id);
+      return s.elements.map((e) => '...$prefix.$e,').join('\n');
+    }).join('\n');
   }
 }
 
@@ -141,19 +147,55 @@ class ImportsWriter {
   ImportsWriter();
 
   final List<String> imports = [];
+  bool _sorted = false;
 
-  String add(AssetId id) {
+  void add(AssetId id) {
+    assert(!_sorted);
+
     var url = path.url.relative(id.path, from: 'lib');
     var index = imports.indexOf(url);
     if (index == -1) {
       imports.add(url);
-      return 'prefix${imports.length - 1}';
     }
-    return 'prefix$index';
+  }
+
+  String prefixOf(AssetId id) {
+    assert(_sorted);
+
+    var url = path.url.relative(id.path, from: 'lib');
+    return 'prefix${imports.indexOf(url)}';
+  }
+
+  void sort() {
+    imports.sort((a, b) {
+      var ap = a.split('/');
+      var bp = b.split('/');
+      return comparePaths(ap, bp);
+    });
+    _sorted = true;
+  }
+
+  int comparePaths(List<String> a, List<String> b) {
+    if (a.length > 1 && b.length > 1) {
+      var comp = a.first.compareTo(b.first);
+      ;
+      if (comp == 0) {
+        return comparePaths(a.skip(1).toList(), b.skip(1).toList());
+      } else {
+        return comp;
+      }
+    } else if (a.length > 1) {
+      return -1;
+    } else if (b.length > 1) {
+      return 1;
+    } else {
+      return a.first.compareTo(b.first);
+    }
   }
 
   @override
   String toString() {
+    assert(_sorted);
     return imports.mapIndexed((index, url) => "import '$url' as prefix$index;").join('\n');
   }
 }
