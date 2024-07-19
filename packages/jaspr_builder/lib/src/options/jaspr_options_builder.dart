@@ -178,7 +178,6 @@ class ImportsWriter {
   int comparePaths(List<String> a, List<String> b) {
     if (a.length > 1 && b.length > 1) {
       var comp = a.first.compareTo(b.first);
-      ;
       if (comp == 0) {
         return comparePaths(a.skip(1).toList(), b.skip(1).toList());
       } else {
