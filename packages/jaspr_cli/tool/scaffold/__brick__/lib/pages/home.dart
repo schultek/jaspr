@@ -15,9 +15,5 @@ class Home extends StatelessComponent {
       div(styles: Styles.box(height: 100.px), []),
       const Counter(),
     ]);
-  }{{#server}}
-
-  static get styles => [
-        ...Counter.styles,
-      ];{{/server}}
+  }
 }

@@ -3,14 +3,15 @@
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:jaspr/src/foundation/annotations.dart' show ClientAnnotation, Import;
-import 'package:jaspr/src/framework/framework.dart' show Component, Key;
+import 'package:jaspr/jaspr.dart' show ClientAnnotation, CssUtility, Import, Component, Key, StyleRule;
 import 'package:source_gen/source_gen.dart';
 
 const String generationHeader = "// GENERATED FILE, DO NOT MODIFY\n"
     "// Generated with jaspr_builder\n";
 
 var clientChecker = TypeChecker.fromRuntime(ClientAnnotation);
+var stylesChecker = TypeChecker.fromRuntime(CssUtility);
+var styleRuleChecker = TypeChecker.fromRuntime(StyleRule);
 var componentChecker = TypeChecker.fromRuntime(Component);
 final keyChecker = TypeChecker.fromRuntime(Key);
 var importChecker = TypeChecker.fromRuntime(Import);

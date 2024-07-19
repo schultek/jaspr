@@ -18,7 +18,7 @@ export 'src/foundation/events/events.dart';
 export 'src/foundation/object.dart';
 export 'src/foundation/options.dart';
 export 'src/foundation/scheduler.dart';
-export 'src/foundation/styles/styles.dart';
+export 'src/foundation/style.dart';
 export 'src/foundation/sync.dart';
 export 'src/foundation/synchronous_future.dart';
 export 'src/framework/framework.dart';

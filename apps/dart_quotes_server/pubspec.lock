@@ -624,28 +624,20 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.13.2"
+    version: "0.13.3"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.13.2"
-  jaspr_riverpod:
-    dependency: "direct overridden"
-    description:
-      path: "../../packages/jaspr_riverpod"
-      relative: true
-    source: path
-    version: "0.3.12"
+    version: "0.13.3"
   jaspr_router:
     dependency: "direct main"
     description:
-      name: jaspr_router
-      sha256: "5a6df92dfdc38994121143b1e7defe0209f8c0b2ce51f1f83220feb963f3e731"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../packages/jaspr_router"
+      relative: true
+    source: path
     version: "0.4.2"
   jaspr_serverpod:
     dependency: "direct main"
@@ -653,7 +645,7 @@ packages:
       path: "../../packages/jaspr_serverpod"
       relative: true
     source: path
-    version: "0.2.0"
+    version: "0.3.1+1"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
@@ -722,10 +714,10 @@ packages:
     dependency: transitive
     description:
       name: meta
-      sha256: d584fa6707a52763a52446f02cc621b077888fb63b93bbcb1143a7be5a0c0c04
+      sha256: "7687075e408b093f36e6bbf6c91878cc0d4cd10f409506f7bc996f68220b9136"
       url: "https://pub.dev"
     source: hosted
-    version: "1.11.0"
+    version: "1.12.0"
   mime:
     dependency: transitive
     description:
@@ -926,14 +918,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
-  riverpod:
-    dependency: transitive
-    description:
-      name: riverpod
-      sha256: f21b32ffd26a36555e501b04f4a5dca43ed59e16343f1a30c13632b2351dfa4d
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.5.1"
   rxdart:
     dependency: transitive
     description:
@@ -970,67 +954,66 @@ packages:
     dependency: "direct main"
     description:
       name: serverpod
-      sha256: "0e5dd97a482aa750dfff00db22bef2b4cde53dfe2c798b56d06b2d78657631b6"
+      sha256: "45a33dc9cc25f3d70b41dea1e52c9bcfa9ecd7e93735c61d7d450c1eed19e45d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   serverpod_auth_client:
     dependency: transitive
     description:
       name: serverpod_auth_client
-      sha256: "9be048b5d1c8bcd9907ad6321b5495bdbb8db3263142d143101b9d1828fd1a53"
+      sha256: "805d84dab365b517bda96e1e3841ad9c53978b5dd7725428b121d1899e59c52f"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   serverpod_auth_google_flutter:
     dependency: "direct main"
     description:
       name: serverpod_auth_google_flutter
-      sha256: da863314c04c5d34e2450ddd7bcfd474dd626d1242b74194c4c91a6c0f535676
+      sha256: "55311c512715c48b05af23e51bec11299763072ed0cfc2a27780bc52d607d78f"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   serverpod_auth_server:
     dependency: "direct main"
     description:
       name: serverpod_auth_server
-      sha256: c81b6fc6dae87dba90856ef084ee149d5d462b032cf8cd70610ea6bae9e87e6c
+      sha256: "012b1728af35667859886d953625b58c9388403c4b8057ee2de8e05b99ebb6bb"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   serverpod_auth_shared_flutter:
     dependency: "direct main"
     description:
       name: serverpod_auth_shared_flutter
-      sha256: "4b651b1a2258cb9c70fee289c919d857bdac380712b8580f28cea1d203a1978d"
+      sha256: "73ac7e4f320e88db35e85d74d90b6362ae99e1063d0bee6f9af913953d6b0ac8"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   serverpod_client:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "packages/serverpod_client"
-      ref: HEAD
-      resolved-ref: "9344c29e0fd4d0b141b9538eefe156fcfa277c7e"
-      url: "https://github.com/schultek/serverpod"
-    source: git
-    version: "2.0.1"
+      name: serverpod_client
+      sha256: "8aefc285ede74291375d0f4fe125bc8886ffc475769b6c60c8d10e83bbadd359"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   serverpod_serialization:
     dependency: "direct main"
     description:
       name: serverpod_serialization
-      sha256: a1738598c6230d9f5c9630f762df5ba366d2129d8af4076718226059c19d112a
+      sha256: e700eb909a03de7220540f92372b515c84b960eeefd954fd81851f57f03d5970
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   serverpod_shared:
     dependency: transitive
     description:
       name: serverpod_shared
-      sha256: "7e480e6d0c6ac97700dfb843c25973472e84e943787228b406c4f2e23b85c579"
+      sha256: f6742eadae5dac9a7b596b800b929101c560725956825b7a4437a400966e69f3
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   shared_preferences:
     dependency: transitive
     description:
@@ -1188,14 +1171,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.1"
-  state_notifier:
-    dependency: transitive
-    description:
-      name: state_notifier
-      sha256: b8677376aa54f2d7c58280d5a007f9e8774f1968d1fb1c096adcb4792fba29bb
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   stream_channel:
     dependency: transitive
     description:
