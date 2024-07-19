@@ -39,7 +39,7 @@ import 'styles.dart';
 ///   ```dart
 ///   css.import('/some/external/styles.css');
 ///   css.fontFace(fontFamily: 'SomeFont', url: '/some/font.ttf');
-///   css.media(MediaRuleQuery.screen, [
+///   css.media(MediaQuery.screen(minWidth: 800.px), [
 ///     css('.someclass').box(width: 200.px),
 ///   ]);
 ///   ```
