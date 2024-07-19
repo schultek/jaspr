@@ -26,13 +26,47 @@ The options set your rendering mode, hydration strategy, routing, flutter intero
 
 <Info>
 If you are just starting out and are not sure what options to pick, just select the default one for each question
-(simply press Enter each time).
+(simply press **Enter** each time).
 </Info>
 
 <Info>
 Choosing a set of options do not lock you into a specific configuration. Starting from one setup you can easily
 modify your code to behave as any other setup along the way.
 </Info>
+
+You can choose from the following options:
+
+1. **Rendering Mode**:
+
+  Select one of the three rendering modes Jaspr supports. Read about the different modes [here](/core/modes#-rendering-modes).
+
+2. **Hydration** (Conditional Option):
+
+  Select the hydration strategy (automatic or manual). Read about hydration [here](/core/modes#-hydration).
+
+3. **Routing**:
+
+  Whether to setup routing. Selecting **Yes** will setup a basic `Routing` with two routes ('/home' and '/about'). This gives you a convenient
+  starting point when you plan to develop a website with multiple pages.
+
+4. **Multi-Page Routing** (Conditional Option):
+
+  Whether to setup multi-page or single-page routing, also called server-side or client-side routing respectively. This defined how navigating
+  between routes will behave. Either a "real" page-load is performed when navigating to a new route (aka. the browser requests the new page using its url from the server).
+  Or the routing happens purely on the client without any request to the server.
+
+  <Info>
+  There are different advantages and disadvantages for both types. To help you decide you can find many [articles](https://www.google.com/search?q=multi+page+vs+single+page+site) about this topic.
+  </Info>
+
+5. **Flutter Embedding**:
+
+  Whether to setup an embedded Flutter application with your site. This will use Jasprs first-party integration for [Flutter element embedding](https://docs.flutter.dev/deployment/web#embedding-a-flutter-app-into-an-html-page) and create a simple Flutter counter app that synchronizes its state with your Jaspr site.
+
+6. **Plugin Support**:
+
+  Whether to enable support for Flutter web plugins. This will switch to Jasprs custom compiler pipeline (replacing `build_web_compilers`) which allows the use of most Flutter web plugins in your Jaspr site without any additional setup.
+  *Flutter web plugins* refers to any Flutter plugin from pub.dev that supports web and is not concerned with widgets or rendering. This includes packages like `shared_preferences` or `firebase`.
 
 ## 🛠 Building
 
