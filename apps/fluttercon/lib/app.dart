@@ -44,9 +44,4 @@ class App extends AsyncStatelessComponent {
             ),
         ]);
   }
-
-  static get styles => [
-        ...SchedulePage.styles,
-        ...SessionPage.styles,
-      ];
 }

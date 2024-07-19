@@ -11,12 +11,11 @@ void main() {
   runApp(Document(
     title: 'Fluttercon Berlin 2024',
     styles: [
-      const StyleRule.import('fonts/fonts.css'),
+      css.import('fonts/fonts.css'),
       css('html, body')
           .text(fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]))
           .box(width: 100.percent, minHeight: 100.vh)
           .box(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
-      ...App.styles,
     ],
     body: App(),
   ));

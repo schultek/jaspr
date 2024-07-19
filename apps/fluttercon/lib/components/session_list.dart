@@ -24,15 +24,16 @@ class SessionList extends StatelessComponent {
     ]);
   }
 
-  static List<StyleRule> get styles => [
-        css('.sessions', [
-          css('&').list(style: ListStyle.none).box(padding: EdgeInsets.symmetric(horizontal: 40.px)),
-          css('li').box(margin: EdgeInsets.only(bottom: 8.px)),
-          css('.group').box(
-              radius: BorderRadius.circular(8.px),
-              border: Border.all(BorderSide.dashed(color: Colors.gray)),
-              padding: EdgeInsets.only(left: 8.px, right: 8.px, top: 8.px),
-              margin: EdgeInsets.symmetric(vertical: 20.px)),
-        ]),
-      ];
+  @css
+  static final styles = [
+    css('.sessions', [
+      css('&').list(style: ListStyle.none).box(padding: EdgeInsets.symmetric(horizontal: 40.px)),
+      css('li').box(margin: EdgeInsets.only(bottom: 8.px)),
+      css('.group').box(
+          radius: BorderRadius.circular(8.px),
+          border: Border.all(BorderSide.dashed(color: Colors.gray)),
+          padding: EdgeInsets.only(left: 8.px, right: 8.px, top: 8.px),
+          margin: EdgeInsets.symmetric(vertical: 20.px)),
+    ]),
+  ];
 }

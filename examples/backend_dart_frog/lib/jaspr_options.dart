@@ -2,8 +2,8 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/jaspr.dart';
-import 'components/hello.dart' as prefix0;
-import 'components/counter.dart' as prefix1;
+import 'components/counter.dart' as prefix0;
+import 'components/hello.dart' as prefix1;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
@@ -21,9 +21,12 @@ import 'components/counter.dart' as prefix1;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(clients: {
-  prefix0.Hello: ClientTarget<prefix0.Hello>('components/hello', params: _params0Hello),
-  prefix1.Counter: ClientTarget<prefix1.Counter>('components/counter'),
-}, styles: []);
+final defaultJasprOptions = JasprOptions(
+  clients: {
+    prefix0.Counter: ClientTarget<prefix0.Counter>('components/counter'),
+    prefix1.Hello: ClientTarget<prefix1.Hello>('components/hello', params: _prefix1Hello),
+  },
+  styles: [],
+);
 
-Map<String, dynamic> _params0Hello(prefix0.Hello c) => {'name': c.name};
+Map<String, dynamic> _prefix1Hello(prefix1.Hello c) => {'name': c.name};
