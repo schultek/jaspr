@@ -18,7 +18,18 @@ const cssPropSpace = kDebugMode || kGenerateMode ? '\n' : ' ';
 
 extension StyleRulesRender on Iterable<StyleRule> {
   String render() {
-    return map((s) => s.toCss()).join(cssPropSpace);
+    final imports = StringBuffer();
+    final rules = StringBuffer();
+    for (final rule in this) {
+      final output = rule.toCss() + cssPropSpace;
+      if (rule is ImportStyleRule) {
+        imports.write(output);
+      } else {
+        rules.write(output);
+      }
+    }
+
+    return (imports.toString() + rules.toString()).trimRight();
   }
 }
 

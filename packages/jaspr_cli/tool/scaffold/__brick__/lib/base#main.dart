@@ -20,23 +20,31 @@ void main() {
 
   // Starts the app.
   //
-  // [Document] renders the root document structure (<html><head><body>) with
-  // the provided parameters.
+  // [Document] renders the root document structure (<html>, <head> and <body>)
+  // with the provided parameters and components.
   runApp(Document(
-    title: '{{name}}',{{^hydration}}
-    // Components rendered inside <head>.
+    title: '{{name}}',
+    styles: [
+      // Special import rule to include to another css file.
+      css.import('https://fonts.googleapis.com/css?family=Roboto'),
+      // Each style rule takes a valid css selector and a set of styles.
+      // Styles are defined using type-safe css bindings and can be freely chained and nested.
+      css('html, body')
+          .text(fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]))
+          .box(width: 100.percent, minHeight: 100.vh)
+          .box(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
+      css('h1').text(fontSize: 4.rem).box(margin: EdgeInsets.unset),
+    ],{{^hydration}}
     head: [
       // Links to the compiled client entrypoint.
       script(defer: true, src: 'main.dart.js', []),{{#flutter}}
       // The generated flutter manifest.
       link(rel: 'manifest', href: 'manifest.json'),{{/flutter}}
     ],{{/hydration}}{{#hydration}}{{#flutter}}
-    // Components rendered inside <head>.
     head: [
       // The generated flutter manifest.
       link(rel: 'manifest', href: 'manifest.json'),
     ],{{/flutter}}{{/hydration}}
-    // The component to render inside <body>.
     body: App(),
   ));
 }
