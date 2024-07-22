@@ -5,7 +5,7 @@ previous: /core/app
 next: /core/html
 ---
 
-# `@client` components
+# @client Components
 
 A component annotated with `@client` will be automatically hydrated on the client after it has been pre-rendered. In principle,
 this is like 'resuming' the rendering for a component and picking up where the server-side rendering has left off.
@@ -101,8 +101,8 @@ The following happens when you use a `@client` component:
 
 *on the server:*
 2. The component is built and pre-rendered normally.
-3. Jaspr adds a html marker (<!--$<name> data=<serialized-parameters>-->) around your components output.
-4. Jaspr adds the components js target as a <script> tag to the documents <head>.
+3. Jaspr adds a html marker (`<!--$<name> data=<serialized-parameters>-->`) around your components output.
+4. Jaspr adds the components js target as a `<script>` tag to the documents `<head>`.
 
 *on the client:*
 5. The browser loads the pre-rendered html and compiled js scripts.
