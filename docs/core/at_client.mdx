@@ -13,10 +13,12 @@ this is like 'resuming' the rendering for a component and picking up where the s
 A `@client` component acts as a 'boundary' between server and client. Components in the tree above will be rendered **only on
 the server**, while components in the tree below will be rendered **both on the server and client**.
 
-> It is generally recommended to keep a 'mental note' about which components are only rendered on the server, and which are
-> also rendered on the client. This distinction may become important later when you develop your website and want to import some
-> server-specific or client-specific library or package. Then you need to make sure that your component compiles for all environments
-> it will be rendered in.
+<Info>
+It is generally recommended to keep a 'mental note' about which components are only rendered on the server, and which are
+also rendered on the client. This distinction may become important later when you develop your website and want to import some
+server-specific or client-specific library or package. Then you need to make sure that your component compiles for all environments
+it will be rendered in.
+</Info>
 
 ## Usage
 
@@ -40,7 +42,9 @@ class App extends StatelessComponent {
 }
 ```
 
-*Note: Only one `@client` component per file is allowed.*
+<Info>
+Only one `@client` component per file is allowed.
+</Info>
 
 You can use `@client` components normally as any other component. You can also have multiple components annotated with
 `@client` to have separate interactive parts on the client. However, nesting client components is currently not possible.
@@ -51,7 +55,7 @@ As any other component, `@client` components can have parameters, *with certain 
 serialized on the server and de-serialized on the client when hydrating the component. Therefore, using `@client` components
 with parameters are a **great way to pass data from the server to the client**. For this to work, the following requirements apply:
 
-1. All parameters must be **initializing field** parameters (`this.<fieldname>`):
+#### 1. All parameters must be **initializing field** parameters (`this.<fieldname>`):
 
   ```dart
   @client
@@ -64,7 +68,7 @@ with parameters are a **great way to pass data from the server to the client**. 
   }
   ```
 
-2. All parameters must be **serializable**:
+#### 2. All parameters must be **serializable**:
 
   Parameters must either have a primitive serializable type: `bool`, `int`, `double`, `String` or `List` / `Map`s of these.
 
@@ -88,7 +92,7 @@ with parameters are a **great way to pass data from the server to the client**. 
   The `@encoder` annotation must be used on an **instance method** that
   - returns the same type that the `@decoder` method takes in.
 
-  > Both methods can have any name.
+  <Info> Both methods can have any name.</Info>
 
   With this setup you can use this class as the parameter type of a `@client` component.
 
@@ -97,14 +101,17 @@ with parameters are a **great way to pass data from the server to the client**. 
 The following happens when you use a `@client` component:
 
 *during build:*
+
 1. The component (along with some framework bits) is compiled to a separate js entrypoint.
 
 *on the server:*
+
 2. The component is built and pre-rendered normally.
 3. Jaspr adds a html marker (`<!--$<name> data=<serialized-parameters>-->`) around your components output.
 4. Jaspr adds the components js target as a `<script>` tag to the documents `<head>`.
 
 *on the client:*
+
 5. The browser loads the pre-rendered html and compiled js scripts.
 6. The used component is located based on the html marker.
 7. The parameters are deserialized and the component is mounted to the target element.
