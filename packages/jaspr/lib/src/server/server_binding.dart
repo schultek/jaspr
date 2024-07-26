@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'package:shelf/src/headers.dart';
 
 import '../../jaspr.dart';
+import '../../server.dart';
 import 'adapters/client_component_adapter.dart';
 import 'adapters/document_adapter.dart';
 import 'adapters/global_styles_adapter.dart';
@@ -19,6 +22,9 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     _currentUri = uri;
   }
 
+  final Map<String, Object> _responseHeaders = {};
+  Map<String, Object> get responseHeaders => _responseHeaders;
+
   @override
   bool get isClient => false;
 
@@ -29,7 +35,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     rootCompleter.complete();
   }
 
-  Future<String> render() async {
+  Future<Response> render() async {
     await rootCompleter.future;
 
     var root = rootElement!.renderObject as MarkupRenderObject;
@@ -51,12 +57,19 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       adapter.apply(root);
     }
 
-    return root.renderToHtml();
+    return Response.ok(
+      root.renderToHtml(),
+      headers: responseHeaders..putIfAbsent('Content-Type', () => 'text/html'),
+    );
   }
 
-  Future<String> data() async {
+  Future<Response> data() async {
     await rootCompleter.future;
-    return jsonEncode(getStateData());
+
+    return Response.ok(
+      jsonEncode(getStateData()),
+      headers: responseHeaders..putIfAbsent('Content-Type', () => 'application/json'),
+    );
   }
 
   @override

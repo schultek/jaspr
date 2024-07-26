@@ -30,7 +30,7 @@ typedef RenderFunction = FutureOr<Response> Function(Component);
 typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render);
 
 /// Directly renders the provided component into a html string
-Future<String> renderComponent(Component app) async {
+Future<Response> renderComponent(Component app) async {
   _checkInitialized('renderComponent');
   var fileHandler = staticFileHandler();
   return render(RenderMode.html, _createSetup(app), Uri.parse('https://0.0.0.0/'), (name) async {

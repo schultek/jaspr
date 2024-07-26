@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:isolate';
 
 import '../../jaspr.dart';
+import '../../server.dart';
 import 'server_app.dart';
 import 'server_binding.dart';
 
@@ -12,7 +14,7 @@ typedef FileLoader = Future<String?> Function(String);
 /// Performs the rendering process and provides the created [AppBinding] to [setup].
 ///
 /// If [Jaspr.useIsolates] is true, this spawns an isolate for each render.
-Future<String> render(RenderMode mode, SetupFunction setup, Uri requestUri, FileLoader loadFile) async {
+Future<Response> render(RenderMode mode, SetupFunction setup, Uri requestUri, FileLoader loadFile) async {
   if (!Jaspr.useIsolates) {
     var binding = ServerAppBinding()
       ..setCurrentUri(requestUri)
@@ -25,7 +27,7 @@ Future<String> render(RenderMode mode, SetupFunction setup, Uri requestUri, File
     };
   }
 
-  var resultCompleter = Completer<String>.sync();
+  var resultCompleter = Completer<Response>.sync();
 
   var port = ReceivePort();
   var errorPort = ReceivePort();
@@ -36,8 +38,12 @@ Future<String> render(RenderMode mode, SetupFunction setup, Uri requestUri, File
   });
 
   var sub = port.listen((message) async {
-    if (message is String) {
-      resultCompleter.complete(message);
+    if (message is Map) {
+      resultCompleter.complete(Response(
+        message['statusCode'],
+        body: message['body'],
+        headers: message['headers'],
+      ));
     } else if (message is _LoadFileRequest) {
       message.sendPort.send(await loadFile(message.name));
     }
@@ -68,11 +74,16 @@ void _render(_RenderMessage message) async {
     });
   message.setup(binding);
 
-  var result = await switch (message.mode) {
+  Response response = await switch (message.mode) {
     RenderMode.html => binding.render(),
     RenderMode.data => binding.data(),
   };
-  message.sendPort.send(result);
+
+  message.sendPort.send({
+    'statusCode': response.statusCode,
+    'body': await response.readAsString(),
+    'headers': response.headers,
+  });
 }
 
 class _RenderMessage {

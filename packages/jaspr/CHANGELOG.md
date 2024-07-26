@@ -12,6 +12,11 @@
 
 - Add `Attach` component
 
+- Allow response headers to be overrided via server context.binding
+  ```dart
+  (context.binding as ServerAppBinding).responseHeaders['Your-Custom-Header'] = "This is value";
+  ```
+
 ## 0.13.3
 
 - Added support for custom models as parameters to `@client` components.

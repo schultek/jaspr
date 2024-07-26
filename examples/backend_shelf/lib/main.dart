@@ -32,15 +32,12 @@ void main() async {
 
   router.get('/hello', (request) async {
     // Render a single component manually
-    return Response.ok(
-      await renderComponent(Document(
-        // we still point to /app to correctly load all other resources,
-        // like js, css or image files
-        base: '/app',
-        body: Hello(),
-      )),
-      headers: {'Content-Type': 'text/html'},
-    );
+    return renderComponent(Document(
+      // we still point to /app to correctly load all other resources,
+      // like js, css or image files
+      base: '/app',
+      body: Hello(),
+    ));
   });
 
   var handler = const Pipeline() //

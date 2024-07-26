@@ -25,14 +25,11 @@ Middleware serveJasprApp() {
 Future<Response> renderJasprComponent(RequestContext context, Component child) async {
   var base = context.read<BasePath>();
 
-  return Response(
-    body: await renderComponent(
-      Document(
-        base: base.path,
-        body: child,
-      ),
+  return await renderComponent(
+    Document(
+      base: base.path,
+      body: child,
     ),
-    headers: {'Content-Type': 'text/html'},
   );
 }
 

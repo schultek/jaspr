@@ -22,7 +22,7 @@ There are two main functions, that enable this:
 
 - `Handler serveApp(AppHandler handler)` bundles everything jaspr does on the server into a custom shelf handler.
   The handler can then be passed to your backend or server implementation.
-- `String renderComponent(Component app)` directly renders the provided component into a html string.
+- `Response renderComponent(Component app)` directly renders the provided component into a Response.
 
 <Warning>
 When using your own backend setup, you can still do `jaspr serve`, however auto-reload won't work 
