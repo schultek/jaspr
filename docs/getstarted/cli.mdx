@@ -6,8 +6,7 @@ next: /getstarted/project_structure
 ---
 
 # Jaspr CLI
-#### Create, serve and build projects using the Jaspr CLI.
-
+*Create, serve and build projects using the Jaspr CLI.*
 
 ---
 
@@ -15,7 +14,7 @@ next: /getstarted/project_structure
 
 Jaspr comes with a cli tool to create, serve and build your website.
 
-- `jaspr create`: Create a new jaspr project.
+- `jaspr create`: Create a new jaspr project. See [Project Scaffolding](#project-scaffolding)
 - `jaspr serve`: Serve the project and automatically refresh when you make changes.
 - `jaspr build`: Build the project according to the selected rendering mode.
 
@@ -25,7 +24,7 @@ Additionally, there are the following service commands available:
 - `jaspr clean`: Delete the `build/` and `.dart_tool/` directories.
 - `jaspr update`: Update the jaspr cli.
 
-## 🏗 Project Scaffolding
+## Project Scaffolding
 
 When creating a new project, you will go through a set of questions to configure the project to your liking.
 The options set your rendering mode, hydration strategy, routing, flutter interoperability strategy and more.
@@ -74,7 +73,7 @@ You can choose from the following options:
   Whether to enable support for Flutter web plugins. This will switch to Jasprs custom compiler pipeline (replacing `build_web_compilers`) which allows the use of most Flutter web plugins in your Jaspr site without any additional setup.
   *Flutter web plugins* refers to any Flutter plugin from pub.dev that supports web and is not concerned with widgets or rendering. This includes packages like `shared_preferences` or `firebase`.
 
-## 🛠 Building
+## Building
 
 When it's time to deploy your application, you can build it using the following command:
 
