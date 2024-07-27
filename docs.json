@@ -9,9 +9,12 @@
   ],
   "sidebar": [
     ["\uD83D\uDCD6 Overview", "/"],
-    ["\uD83D\uDEEB Quick Start", "/quick-start"],
     ["\uD83E\uDD4A Jaspr vs Flutter Web", "/jaspr-vs-flutter-web"],
-    ["\uD83D\uDD79 Jaspr CLI", "/cli"],
+    ["Get Started", [
+      ["\uD83D\uDEEB Installation", "/getstarted/installation"],
+      ["\uD83D\uDD79 Jaspr CLI", "/getstarted/cli"],
+      ["\uD83D\uDD79 Project Structure", "/getstarted/project_structure"]
+    ]],
     ["Core Concepts", [
       ["\uD83E\uDDF1 Component System", "/core/components"],
       ["\uD83D\uDCDF Rendering Modes & Hydration", "/core/modes"],
