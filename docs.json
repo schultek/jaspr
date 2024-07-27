@@ -11,33 +11,57 @@
     ["\uD83D\uDCD6 Overview", "/"],
     ["\uD83E\uDD4A Jaspr vs Flutter Web", "/jaspr-vs-flutter-web"],
     ["Get Started", [
-      ["\uD83D\uDEEB Installation", "/getstarted/installation"],
-      ["\uD83D\uDD79 Jaspr CLI", "/getstarted/cli"],
-      ["\uD83D\uDD79 Project Structure", "/getstarted/project_structure"]
+      ["\uD83D\uDEEB Installation", "/get_started/installation"],
+      ["\uD83D\uDD79 Jaspr CLI", "/get_started/cli"],
+      ["\uD83D\uDCE6 Project Structure", "/get_started/project_structure"]
     ]],
-    ["Core Concepts", [
-      ["\uD83E\uDDF1 Component System", "/core/components"],
-      ["\uD83D\uDCDF Rendering Modes & Hydration", "/core/modes"],
-      ["\uD83D\uDC7E App & Document", "/core/app"],
-      ["\uD83C\uDF00 @client Components", "/core/at_client"],
-      ["\uD83D\uDD8D Writing html", "/core/html"],
-      ["\uD83C\uDFA8 Styling", "/core/styling"],
-      ["\uD83C\uDFD7 Pre-Rendering", "/core/pre_rendering"],
-      ["\uD83D\uDCD1 Static Generation", "/core/static_generation"]
+    ["Key Concepts", [
+      ["\uD83E\uDDF1 Component System", "/concepts/components"],
+      ["\uD83D\uDCDF Rendering Modes", "/concepts/modes"],
+      ["\uD83D\uDCA7 Hydration", "/concepts/hydration"],
+      ["\uD83D\uDD8D Writing HTML", "/concepts/html"],
+      ["\uD83C\uDFA8 Styling", "/concepts/styling"],
+      ["\uD83E\uDDED Routing", "/concepts/routing"],
+      ["\uD83D\uDD0E SEO & Meta", "/concepts/seo"],
+      ["\uD83D\uDCE1 Data Fetching", "/concepts/data_fetching"],
+      ["\uD83E\uDDEA Testing", "/concepts/testing"],
+      ["\uD83C\uDF10 Deploying", "/concepts/deploying"]
     ]],
-    ["Advanced Concepts", [
-      ["\uD83E\uDE90 Custom Backend", "/advanced/backend"],
-      ["\uD83D\uDCCE Platform Imports", "/advanced/imports"]
+    ["Going Further", [
+      ["\uD83D\uDC99 Flutter Embedding", "/going_further/flutter_embedding"],
+      ["\uD83E\uDE90 Custom Backend", "/going_further/backend"],
+      ["\uD83C\uDF1F Contributing", "/going_further/contributing"]
     ]],
     ["Ecosystem", [
-      ["\uD83E\uDDED Routing", "/eco/routing"],
       ["\uD83C\uDF0A Riverpod", "/eco/riverpod"],
-      ["\uD83D\uDDBC️ Flutter Embedding", "/eco/flutter_embedding"],
+      ["\uD83D\uDE80 Serverpod", "/eco/serverpod"],
       ["\uD83C\uDF2C️ Tailwind", "/eco/tailwind"],
-      ["\uD83D\uDCDA Third-Party Packages", "/eco/packages"],
-      ["\uD83D\uDC99 Contributing", "/eco/contributing"]
+      ["\uD83D\uDCDA Third-Party Packages", "/eco/packages"]
     ]],
-    ["\uD83E\uDDEA Testing", "/testing"]
+    ["Components", [
+      ["Document", "/components/document"],
+      ["RawText", "/components/raw_text"],
+      ["Head", "/components/head"],
+      ["[Stateful]Builder", "/components/builder"],
+      ["[Value]ListenableBuilder", "/components/listenable_builder"],
+      ["AsyncBuilder", "/components/async_builder"],
+      ["AsyncStatelessComponent", "/components/async_statelss_component"],
+      ["Style", "/components/style"],
+      ["Router", "/components/router"],
+      ["Link", "/components/link"],
+      ["FlutterEmbedView", "/components/flutter_embed_view"]
+    ]],
+    ["Utilities", [
+      ["runApp", "/utils/runApp"],
+      ["@client", "/utils/at_client"],
+      ["@css / css()", "/utils/at_css"],
+      ["Styles", "/utils/stykes"],
+      ["events()", "/utils/events"],
+      ["PreloadStateMixin", "/utils/PreloadStateMixin"],
+      ["SyncStateMixin", "/utils/SyncStateMixin"],
+      ["@Import", "/utils/import"],
+      ["test[Components/Browser/Server]", "/utils/tester"]
+    ]]
   ],
   "docsearch": {
     "appId": "0JMHSW1KVQ",
