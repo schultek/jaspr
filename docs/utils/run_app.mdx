@@ -1,0 +1,15 @@
+
+## 🚀 Run your App
+
+To run your app, use the `runApp` function and provide your root component.
+
+```dart
+runApp(MyComponent());
+```
+
+This function works both on the client and on the server when you use **static** or **server** mode.
+
+1. **On the server** this starts a http server that renders the given component to html for every
+incoming request.
+
+2. **On the client** this attaches the given component to the DOM and thereby making your app interactive.

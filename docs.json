@@ -13,12 +13,12 @@
     ["Get Started", [
       ["\uD83D\uDEEB Installation", "/get_started/installation"],
       ["\uD83D\uDD79 Jaspr CLI", "/get_started/cli"],
+      ["\uD83D\uDCDF Rendering Modes", "/get_started/modes"],
+      ["\uD83D\uDCA7 Hydration", "/get_started/hydration"],
       ["\uD83D\uDCE6 Project Structure", "/get_started/project_structure"]
     ]],
     ["Key Concepts", [
       ["\uD83E\uDDF1 Component System", "/concepts/components"],
-      ["\uD83D\uDCDF Rendering Modes", "/concepts/modes"],
-      ["\uD83D\uDCA7 Hydration", "/concepts/hydration"],
       ["\uD83D\uDD8D Writing HTML", "/concepts/html"],
       ["\uD83C\uDFA8 Styling", "/concepts/styling"],
       ["\uD83E\uDDED Routing", "/concepts/routing"],
@@ -55,11 +55,11 @@
       ["runApp", "/utils/runApp"],
       ["@client", "/utils/at_client"],
       ["@css / css()", "/utils/at_css"],
-      ["Styles", "/utils/stykes"],
+      ["Styles", "/utils/styles"],
       ["events()", "/utils/events"],
-      ["PreloadStateMixin", "/utils/PreloadStateMixin"],
-      ["SyncStateMixin", "/utils/SyncStateMixin"],
-      ["@Import", "/utils/import"],
+      ["PreloadStateMixin", "/utils/preload_state_mixin"],
+      ["SyncStateMixin", "/utils/sync_state_mixin"],
+      ["@Import", "/utils/at_import"],
       ["test[Components/Browser/Server]", "/utils/tester"]
     ]]
   ],
