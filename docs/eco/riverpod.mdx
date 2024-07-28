@@ -1,13 +1,14 @@
 ---
 title: Jaspr Riverpod
-description: A port of the riverpod package for jaspr.
-previous: /eco/routing
-next: /eco/flutter_embedding
+description: A port of the riverpod package for Jaspr.
 ---
 
-# 🌊 Riverpod for Jaspr
+# Jaspr Riverpod
+*A port of the riverpod package for Jaspr.*
 
-Jaspr comes with a Riverpod package that ports over flutter_riverpod to Jaspr. It is based
+---
+
+Jaspr comes with a Riverpod package that ports over `flutter_riverpod` to Jaspr. It is based
 on Riverpod 2 and supports all providers and modifiers.
 
 <Accordion title="TLDR: Differences to flutter_riverpod">
@@ -19,7 +20,7 @@ on Riverpod 2 and supports all providers and modifiers.
   </Info>
 </Accordion>
 
-## 🪄 Accessing Providers
+## Accessing Providers
 
 While it has feature-parity for defining `Provider`s, it comes with some quality-of-life improvements
 on the `Consumer` side. Mainly: 
@@ -77,7 +78,7 @@ Builder(builder: (context) sync* {
 });
 ```
 
-## ♻️ Preloading and Syncing Provider State
+## Preloading and Syncing Provider State
 
 Jaspr allows `StatefulComponent`s to preload state as well as sync state between server and client
 (when using server-side rendering).
@@ -100,7 +101,7 @@ never on the client. Instead the synced value is returned.
 It then can be used like any other provider. It functions like a `FutureProvider` and exposes a 
 value of type `AsyncValue<T>`.
 
-## 📜 Backstory: Why context extensions instead of Consumer?
+## Backstory: Why context extensions instead of Consumer?
 
 Put simply: Because they are easier and more flexible to use and require less boilerplate.
 

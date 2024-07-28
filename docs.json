@@ -53,7 +53,7 @@
       ["FlutterEmbedView", "/components/flutter_embed_view"]
     ]],
     ["Utilities", [
-      ["runApp", "/utils/runApp"],
+      ["runApp", "/utils/run_app"],
       ["@client", "/utils/at_client"],
       ["@css / css()", "/utils/at_css"],
       ["Styles", "/utils/styles"],

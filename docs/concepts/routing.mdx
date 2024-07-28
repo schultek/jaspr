@@ -1,17 +1,20 @@
 ---
 title: Jaspr Routing
 description: How to do routing in Jaspr.
-previous: /advanced/imports
-next: /eco/riverpod
 ---
 
-## 🧭 Router
+# Routing
+* How to do routing in Jaspr.*
 
-For a simple `Router` component, use the `jaspr_router` package.
+---
+
+To add routing to your website use the core `jaspr_router` package:
 
 ```shell
 dart pub add jaspr_router
 ```
+
+## Router
 
 Use can use the `Router` component for some basic routing. It takes a list of `Route`s.
 A simple use looks like this:
@@ -43,7 +46,7 @@ for orientation. Be aware that while many core concepts are similar, not everyth
 
 To push a new route call `Router.of(context).push('/path');` inside your child components. Similarly, you can call `.replace()` or `.back()`.
 
-## 🐨 Lazy Routes & Code Splitting
+## Lazy Routes & Code Splitting
 
 For larger web apps, we don't want to load everything together, but rather split our pages into smaller chunks.
 `jaspr` can do this automatically using `LazyRoutes` and deferred imports.
