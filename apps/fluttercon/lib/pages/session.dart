@@ -10,7 +10,7 @@ class SessionPage extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield Head(meta: {
+    yield Document.head(meta: {
       'description': session.description,
       'keywords': "Fluttercon, Sessions, Jaspr, Dart, Flutter",
       'og:title': session.title,
