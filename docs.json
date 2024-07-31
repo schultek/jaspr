@@ -42,11 +42,9 @@
     ["Components", [
       ["Document", "/components/document"],
       ["RawText", "/components/raw_text"],
-      ["Head", "/components/head"],
       ["[Stateful]Builder", "/components/builder"],
       ["[Value]ListenableBuilder", "/components/listenable_builder"],
-      ["AsyncBuilder", "/components/async_builder"],
-      ["AsyncStatelessComponent", "/components/async_statelss_component"],
+      ["Async[Builder/StatelessComponent]", "/components/async_component"],
       ["Style", "/components/style"],
       ["Router", "/components/router"],
       ["Link", "/components/link"],
@@ -60,8 +58,7 @@
       ["events()", "/utils/events"],
       ["PreloadStateMixin", "/utils/preload_state_mixin"],
       ["SyncStateMixin", "/utils/sync_state_mixin"],
-      ["@Import", "/utils/at_import"],
-      ["test[Components/Browser/Server]", "/utils/tester"]
+      ["@Import", "/utils/at_import"]
     ]]
   ],
   "docsearch": {

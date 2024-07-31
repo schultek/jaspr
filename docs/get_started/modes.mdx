@@ -1,6 +1,6 @@
 ---
 title: Rendering Modes
-description: Jaspr comes with three different rendering modes: static, server and client.
+description: Jaspr comes with three different rendering modes - static, server and client.
 ---
 
 # Rendering Modes
@@ -35,23 +35,23 @@ With this mode, Jaspr will generate a fully static site when building your proje
 You can write server-side code to pre-render components and pages at built time, outputting clean html and css to deploy anywhere.
 Additionally, you can set up hydration on the client in order to make your site interactive.
 
+> Even if you want to build a Single Page Application this can be a good choice over 'client' mode since you don't need
+> a `index.html` or `styles.css` and instead can write everything in Dart and let Jaspr do the rendering to actual html/css files during build.
+
+### Generating Pages
 
 Static-Site Generation (SSG) describes the process of generating all your website routes at build time. Different to SSR, this doesn't require
 a running server that generates your website on each request. Instead, `jaspr build` will generate all the routes for
-your website and outputs only static files that can be deployed to any static hosting provider.
+your website and outputs only static files (`.html`, etc.) that can be deployed to any static hosting provider.
 
-
-To use SSG with Jaspr, choose the `static` mode when creating a new project or set `jaspr.mode = static` in your `build.yaml` file.
-When executing then `jaspr build`, it will run your app locally and request each route to be rendered into a separate `.html` file.
-
-Say you have a server-rendered app with the routes `/`, `/about` and `/contact`. Then running `jaspr build` will
+Say you have a project in `static` mode with the routes `/`, `/about` and `/contact`. Then running `jaspr build` will
 output a `index.html`, `about/index.html` and `contact/index.html` file.
 
 To make sure all pages are generated for your site, you need to tell Jaspr about the routes of your website.
 
 ### Using `jaspr_router`
 
-It is recommended you use `jaspr_router` together with SSG, since it automatically renders all routes that you define.
+It is recommended you use `jaspr_router` together with `static` mode, since it automatically renders all routes that you define.
 
 The following shows a router that would render the above three routes:
 
@@ -85,7 +85,10 @@ Router(
 ```
 
 Here, the `posts` list may be loaded from a database before the component builds.
-Check the [Loading Data on the Server](/core/ssr#-loading-data-on-the-server) docs on how to do this.
+
+<Info>
+Check the [Data Fetching](/core/data-fetching) guide on how to do this.
+</Info>
 
 ### Manual usage
 
@@ -104,6 +107,9 @@ The method should be called during the initial build of your app, so putting it 
 In this mode Jaspr runs and builds a server application that pre-renders your components for each incoming request.
 You can use either Jasprs inbuilt webserver or choose to integrate it into your favorite Dart backend framework.
 Additionally, you can set up hydration on the client in order to make your site interactive.
+
+To deploy your site, you either need a service that supports Dart deployments or otherwise bundle your application with
+e.g. Docker. See the [Deploying](/core/deploying) guide for more information.
 
 ## Client Mode
 

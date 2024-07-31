@@ -1,0 +1,23 @@
+---
+title: \@css / css()
+description: Utility to write nested style rules.
+---
+
+# @css / css()
+*Utility to write nested style rules.*
+
+---
+
+The `css()` method takes a selector and an optional list of children and returns a `StyleRule`. You can then use the
+same style group methods on that rule as you can with normal styles.
+
+Nested style rules will be scoped to the parent. Using the `&` symbol as part of a child selector
+refers to whatever the parent selected.
+
+---
+
+There are also additional `StyleRule` variants that support other css features:
+
+- `StyleRule.import(String url)` renders a `@import url(...)` statement.
+- `StyleRule.media({MediaRuleQuery query, List<StyleRule> styles})` renders a `@media ... { ... }` statement.
+- `StyleRule.fontFace({String fontFamily, FontStyle? fontStyle, String url})` renders a `@font-face { ... }` statement.
