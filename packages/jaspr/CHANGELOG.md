@@ -10,7 +10,7 @@
 
 - Made `Jaspr.initializeApp()` required (static and server mode).
 
-- Add `Attach` component
+- Add `Document.head` and related constructors replacing `Head` component.
 
 ## 0.13.3
 
