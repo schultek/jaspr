@@ -1,7 +1,12 @@
+---
+title: PreloadStateMixin
+---
 
-## 💽 Loading Data during Pre-Rendering
+# PreloadStateMixin
 
-When using server side rendering, you want the ability to load some data asychrously before rendering the components.
+---
+
+When using server side rendering, you want the ability to load some data asynchronously before rendering the components.
 With `jaspr` this is build into the framework and easy to do.
 
 Start by using the `PreloadStateMixin` on a `StatefulComponent`s `State` class and implement the `Future<T> preloadState()` method.
@@ -26,5 +31,5 @@ This method will only be executed on the server and will be called before `initS
 </Warning>
 
 <Info>
-    This is a great use-case for jasprs [platform-specific imports](/advanced/imports)
+    This is a great use-case for jasprs [platform-specific imports](/utils/at_import)
 </Info>
