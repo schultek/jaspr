@@ -35,8 +35,10 @@ With this mode, Jaspr will generate a fully static site when building your proje
 You can write server-side code to pre-render components and pages at built time, outputting clean html and css to deploy anywhere.
 Additionally, you can set up hydration on the client in order to make your site interactive.
 
-> Even if you want to build a Single Page Application this can be a good choice over 'client' mode since you don't need
-> a `index.html` or `styles.css` and instead can write everything in Dart and let Jaspr do the rendering to actual html/css files during build.
+<Info>
+Even if you want to build a Single Page Application this can be a good choice over 'client' mode since you don't need
+a `index.html` or `styles.css` and instead can write everything in Dart and let Jaspr do the rendering to actual html/css files during build.
+</Info>
 
 ### Generating Pages
 
@@ -110,6 +112,8 @@ Additionally, you can set up hydration on the client in order to make your site 
 
 To deploy your site, you either need a service that supports Dart deployments or otherwise bundle your application with
 e.g. Docker. See the [Deploying](/core/deploying) guide for more information.
+
+---
 
 ## Client Mode
 

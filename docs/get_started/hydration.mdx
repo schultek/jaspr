@@ -58,6 +58,8 @@ This has the following implications:
 3. The import restrictions from (2) apply (obviously) also to all transitive imports of a component. One additional rule that
    follows that is that **client components can/should never import server components**.
 
+---
+
 ## Hydration Setup
 
 For hydration to happen seamlessly the initial client-side render has to match the previously pre-rendered html from the server exactly.
@@ -73,6 +75,8 @@ With Jaspr you can handle hydration in two ways:
     It is generally recommended to use automatic hydration.
 </Info>
 
+---
+
 ### Automatic Hydration (Recommended)
 
 For automatic hydration simply use the `@client` annotation on any component.
@@ -80,7 +84,7 @@ For automatic hydration simply use the `@client` annotation on any component.
 A component annotated with `@client` will be automatically hydrated on the client after it has been pre-rendered. In principle,
 this is like 'resuming' the rendering for a component on the client and picking up where the server-side rendering has left off.
 
-Read more about `@client` components and how to best use them [here](/core/at_client).
+Read more about `@client` components and how to best use them [here](/utils/at_client).
 
 ---
 
