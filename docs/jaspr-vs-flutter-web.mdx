@@ -1,14 +1,29 @@
 ---
-title: Jaspr vs Flutter Web
+title: Jaspr vs Flutter (Web)
 description: Why you should use Jaspr over Flutter Web and their differences.
 ---
 
-# Jaspr vs Flutter Web
+# Jaspr vs Flutter (Web)
 *Why you should use Jaspr over Flutter Web and their differences.*
 
 ---
 
-Jaspr is an **alternative to Flutter Web**, when you want to **build any kind of website with Dart**. 
+## Use-Cases
+
+### Jaspr
+
+Jaspr is an **alternative to Flutter Web**, when you want to **build any kind of website with Dart**.
+
+This includes (but is not limited to):
+
+- Static Sites
+- Server-Rendered Sites
+- Single-Page Applications
+
+Jaspr works by giving you the familiar look and feel of the Flutter framework, while using native web
+technologies, like HTML, the DOM and CSS to enable you building **all** kinds of websites using **Dart**.
+
+### Flutter
 
 The Flutter team itself has stated on multiple occasions that
 > Flutter Web is for building **Web-Apps**, not **Web-Sites**.
@@ -22,13 +37,12 @@ The [flutter docs](https://docs.flutter.dev/web) write in that regard:
 > static content such as blog articles benefit from the document-centric model that the web is built around, 
 > rather than the app-centric services that a UI framework like Flutter can deliver.
 
-Jaspr works by giving you the familiar look and feel of the Flutter framework, while using native web
-technologies, like HTML, the DOM and CSS to enable you building **all** kinds of websites using **Dart**.
+---
 
-## Differences between Jaspr and Flutter
+## Conceptual Differences
 
-As you might know Flutter renders Widgets by manually painting pixels to a canvas. However rendering web-pages
-with HTML & CSS works **fundamentally different** to Flutters painting approach. Also Flutter has a vast variety
+As you might know Flutter renders Widgets by manually painting pixels to a canvas. However, rendering web-pages
+with HTML & CSS works **fundamentally different** to Flutters painting approach. Also, Flutter has a vast variety
 of widgets with different purposes and styling, whereas in html you can uniquely style each html element however
 you like.
 
@@ -72,6 +86,8 @@ Rather it **embraces these differences** to give the best of both worlds.
    Trade-Off: Giving `Text` a style option would be superficial and not native to web, and thereby not
    a good practice.
    </Info>
+
+---
 
 ## Flutter Web Embedding
 
