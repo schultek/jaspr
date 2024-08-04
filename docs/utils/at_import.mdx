@@ -1,24 +1,24 @@
 ---
 title: \@Import Annotation
-description: How to use platform-specific imports in Jaspr.
+description: How to import platform-specific libraries in shared components.
 ---
 
 # @Import Annotation
-*How to use platform-specific imports in Jaspr.*
+*How to import platform-specific libraries in shared components.*
 
 ---
 
-Jaspr normally runs both on the server and client. The same code will be compiled twice for the server and
-the web. Most of the time this isn't an issue, however sometimes you might want to use a package or library that
-is only supported on one side, like:
+Jaspr components can be rendered both on the server and client. The same code will be compiled twice for the server and
+the web platform. Most of the time this isn't an issue, however sometimes you might want to use a package or library that
+is only supported on one side, e.g.:
 
-- `dart:html` will only work on the client,
-- `dart:io` will only work on the server.
+- `dart:html` is only supported on the client,
+- `dart:io` is only supported on the server.
 
 When you want to use such a library in your project, you would have to resort to *conditional imports*, 
 which are quite cumbersome to use since you have to create multiple files and stub everything you want to use.
 
-`Jaspr` can do this for you using the `@Import` annotation. Say you have the following component:
+Jaspr can do this for you using the `@Import` annotation. Say you have the following component:
 
 ```dart title="lib/app.dart"
 import 'dart:html' show window;
@@ -36,11 +36,11 @@ class App extends StatelessComponent {
 }
 ```
 
-This component wants to show an alert when build, but only on web. We can correctly use the `kIsWeb`
+This component wants to show an alert when being built, but only on web. We can correctly use the `kIsWeb`
 constant to check the platform **during runtime**, but this example would still lead to a 
 **compile time error** when running on the server - because `dart:html` is unsupported there.
 
-With jasprs **platform-specific imports** you can change the code to this:
+With Jasprs **platform-specific imports** you can change the code to this:
 
 ```dart title="lib/app.dart"
 @Import.onWeb('dart:html', show: [#window])
@@ -59,17 +59,19 @@ class App extends StatelessComponent {
 }
 ```
 
-This will auto-generate:
+This will:
 
-- the `app.imports.dart` file
-- conditional imports for `dart:html` on the web
-- stubs on the server.
+- generate the `app.imports.dart` file
+- setup conditional imports for `dart:html` on the web
+- write stubs on the server for all imported members.
+
+---
 
 You can extend this to multiple imports and mix web and server imports like this:
 
 ```dart title="lib/app.dart"
 @Import.onWeb('dart:html', show: [#window])
-@Import.onWeb('package:some_js_package', show: [#someMember])
+@Import.onWeb('package:some_package', show: [#someMember])
 @Import.onServer('dart:io', show: [#Platform])
 import 'app.imports.dart';
 ```

@@ -1,14 +1,13 @@
 ---
 title: runApp()
+description: Runs your Jaspr site on either the server or the client.
 ---
 
 # runApp()
-
+*Runs your Jaspr site on either the server or the client.*
 ---
 
-## 🚀 Run your App
-
-To run your app, use the `runApp` function and provide your root component.
+To run your site, use the `runApp` function and provide your root component.
 
 ```dart
 runApp(MyComponent());
@@ -20,3 +19,8 @@ This function works both on the client and on the server when you use **static**
 incoming request.
 
 2. **On the client** this attaches the given component to the DOM and thereby making your app interactive.
+
+---
+
+When you use static or server mode with [automatic hydration](/get_started/hydration), you don't call this
+function manually for the client-side part of your site and instead only use it on the server.
