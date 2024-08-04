@@ -1,27 +1,27 @@
 ---
 title: Style
-description: A component that renders a <style> element.
+description: Renders the provided StyleRules into css and wraps them with a <style> element.
 ---
 
 # Style
-*A component that renders a \<style\> element.*
+*Renders the provided `StyleRule`s into css and wraps them with a `<style>` element.*
 
 ---
 
-To define a global style element with a set of style rules use the `Style` (without *s*) component in combination with
-the `css()` method:
+To define a global `<style>` element with a set of style rules use the `Style` (without *s*) component in combination
+with a set of `StyleRule`s (e.g. using the [`css()`](/utils/at_css) utility):
 
 ```dart
 Style(styles: [
-    css('.red-text').text(color: Colors.red),
-    css('#content', [
-      css('&').box(width: 100.percent, height: 100.percent),
-      css('a').text(color: Colors.green),
-    ]),
+  css('#content', [
+    css('&').box(width: 100.percent, height: 100.percent),
+    css('a').text(color: Colors.green),
+  ]),
+  css('.red-text').text(color: Colors.red),
 ]);
 ```
 
-will render as:
+renders to:
 
 ```html
 <style>

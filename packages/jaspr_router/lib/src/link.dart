@@ -9,6 +9,8 @@ class Link extends StatelessComponent {
     this.replace = false,
     this.extra,
     this.preload = true,
+    this.target,
+    this.referrer,
     this.classes,
     this.styles,
     this.attributes,
@@ -20,6 +22,8 @@ class Link extends StatelessComponent {
   final bool replace;
   final Object? extra;
   final bool preload;
+  final Target? target;
+  final ReferrerPolicy? referrer;
   final String? classes;
   final Styles? styles;
   final Map<String, String>? attributes;
@@ -28,6 +32,8 @@ class Link extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield a(
       href: to,
+      target: target,
+      referrerPolicy: referrer,
       classes: classes,
       styles: styles,
       attributes: attributes,
