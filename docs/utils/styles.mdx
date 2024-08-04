@@ -32,14 +32,14 @@ Groups various css properties related to styling the background of an element.
 
 ```dart
 const Styles.background({
-Color? color,
-BackgroundAttachment attachment,
-BackgroundClip? clip,
-ImageStyle? image,
-BackgroundOrigin? origin,
-BackgroundPosition? position,
-BackgroundRepeat? repeat,
-BackgroundSize? size,
+  Color? color,
+  BackgroundAttachment attachment,
+  BackgroundClip? clip,
+  ImageStyle? image,
+  BackgroundOrigin? origin,
+  BackgroundPosition? position,
+  BackgroundRepeat? repeat,
+  BackgroundSize? size,
 })
 ```
 
@@ -176,10 +176,12 @@ properties and values:
 
 ```dart
 const myStyle = Styles.raw({
-'color': 'blue',
-'some_advanced_css_property': 'special_value',
+  'color': 'blue',
+  'some_advanced_css_property': 'special_value',
 });
 ```
+
+---
 
 ### Chaining Styles
 
@@ -200,6 +202,8 @@ const myStyle = Styles.combine([
   Styles.background(color: Colors.blue),
 ]);
 ```
+
+---
 
 ### Reusing Styles
 
