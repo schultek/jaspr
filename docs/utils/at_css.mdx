@@ -16,8 +16,6 @@ uses a combination of nested css selectors and Jasprs fully typed [CSS bindings]
 
 ---
 
-The css method can be used in a couple of different ways that combined gives you the full styling experience:
-
 ## Registering style rules
 
 When used as the `@css` annotation, you can register any amount of style definitions to be automatically included
@@ -35,8 +33,8 @@ This is then automatically rendered to css and included in your html output afte
 
 The `@css` annotation can be applied to the following elements:
 
-- global variables or static fields of type `List<StyleRule`
-- global or static getters returning `List<StyleRule`
+- global variables or static fields of type `List<StyleRule>`
+- global or static getters returning `List<StyleRule>`
 
 The recommended approach is to define your styles alongside your components `build()` method
 for better locality of your code:
@@ -64,17 +62,19 @@ class App extends StatelessComponent {
 
 <Warning>
 Styles defined in a component and registered using `@css` are **not** scoped to that component.
-You should try to use ids or unique class names as selectors to prevent unwanted affects on other components or conflicting style definitions.
+You should try to use ids or unique class names as selectors to prevent unwanted effects on other components or conflicting style definitions.
 </Warning>
 
 ---
 
 ## Defining style rules
 
-The default `css()` method takes a selector and a chaining of styles like this:
+The default `css()` method takes a selector and a chain of [Styles](/utils/styles).
 
 ```dart
-css('.main').box(width: 100.px, minHeight: 100.vh).text(color: Colors.black)
+css('.main')
+  .box(width: 100.px, minHeight: 100.vh)
+  .text(color: Colors.black)
 ```
 
 renders to:
@@ -122,7 +122,7 @@ Style rules can also be nested any level deep.
 
 In addition to the default style rule, the `css` utility also supports other rule variants:
 
-#### @import
+#### css.import()
 
 The `css.import()` function takes an url and renders a `@import` css rule:
 
@@ -136,7 +136,7 @@ renders to:
 @import url(https://fonts.googleapis.com/css?family=Roboto);
 ```
 
-#### @font-face
+#### css.fontFace()
 
 The `css.fontFace()` function renders a `@font-face` css rule.
 
@@ -158,7 +158,7 @@ renders to:
 }
 ```
 
-#### @media
+#### css.media()
 
 The `css.media()` function renders a `@media` css rule.
 
