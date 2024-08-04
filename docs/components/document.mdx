@@ -29,6 +29,38 @@ The `Document()` constructor helps you to set up a basic document structure at t
 It renders the main `<html>`, `<head>` and `<body>` tags and takes a set of standard parameters, 
 e.g. to set the `title` or `meta` attributes inside the `<head>`.
 
+```dart title="lib/main.dart"
+void main() {
+  runApp(Document(
+    title: "My Site",
+    meta: {
+      "description": "My site description",
+    },
+    body: div(id: "main", []),
+  ));
+}
+```
+
+renders to:
+
+```html title="index.html"
+<!DOCTYPE html>
+<html>
+  <head>
+    <base href="/"/>
+    <meta charset="utf-8"/>
+    <title>My Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="My site description"/>
+  </head>
+  <body>
+    <div id="main"></div>
+  </body>
+</html>
+```
+
+### Parameters
+
 It takes the following parameters:
 
 - `String? title`: Sets the title of your website.
