@@ -1,15 +1,22 @@
 ---
 title: PreloadStateMixin
+description: Asynchronously preloading the state of a StatefulComponent on the server.
 ---
 
 # PreloadStateMixin
-
+*Asynchronously preloading the state of a StatefulComponent on the server.*
 ---
 
-When using server side rendering, you want the ability to load some data asynchronously before rendering the components.
-With `jaspr` this is build into the framework and easy to do.
+The `PreloadStateMixin` lets you asynchronously load the state of a StatefulComponent before it is rendered on the server
+during pre-rendering.
 
-Start by using the `PreloadStateMixin` on a `StatefulComponent`s `State` class and implement the `Future<T> preloadState()` method.
+<Info>
+For a general guide about data-fetching on the server see [Data Fetching](/concepts/data_fetching).
+</Info>
+
+## Usage
+
+Start by adding the `PreloadStateMixin` on a `StatefulComponent`s `State` class and implement the `Future<T> preloadState()` method.
 
 ```dart
 class MyState extends State<MyStatefulComponent> with PreloadStateMixin {
@@ -24,12 +31,7 @@ class MyState extends State<MyStatefulComponent> with PreloadStateMixin {
 This method will only be executed on the server and will be called before `initState()`. It will defer
 `initState()` as well as building the component until the future returned by the method is completed.
 
-<Warning>
-    While it is only executed on the server it still will be compiled for the client, since Dart does not have
-    selective compilation. So you have to make sure it will compile on the client, e.g. by using service locators
-    and providing mock services on the client. (**TODO**: More explanation and How To)
-</Warning>
+## Alternatives
 
-<Info>
-    This is a great use-case for jasprs [platform-specific imports](/utils/at_import)
-</Info>
+If you are in a purely server-rendered component, you should also check out the
+[AsyncStatelessComponent or AsyncBuilder](/components/async_component) components.

@@ -1,13 +1,20 @@
 ---
 title: SyncStateMixin
+description: Syncing the state of a StatefulComponent from server to client.
 ---
 
 # SyncStateMixin
-
+*Syncing the state of a StatefulComponent from server to client.*
 ---
 
 Alongside with preloading some data on the server, you often want to also sync the data with the client.
-You can simply add the `SyncStateMixin` which will automatically sync state from the server with the client.
+The `SyncStateMixin` lets you sync state of a StatefulComponent from the server with the client.
+
+<Info>
+For a general guide about data-fetching on the server see [Data Fetching](/concepts/data_fetching).
+</Info>
+
+## Usage
 
 The `SyncStateMixin` accepts a second type argument for the data type that you want to sync. You then have to
 implement the `getState` and `updateState()` methods.
@@ -15,26 +22,26 @@ implement the `getState` and `updateState()` methods.
 ```dart
 class MyState extends State<MyStatefulComponent> with SyncStateMixin<MyStatefulComponent, MyStateModel> {
 
-MyStateModel? model;
+  MyStateModel? model;
 
-// a globally unique id that is used to identify the state
-@override
-String get syncId => 'my_id';
+  // a globally unique id that is used to identify the state
+  @override
+  String get syncId => 'my_id';
 
-// this will get the state to be sent to the client
-// and is only executed on the server
-@override
-MyStateModel? getState() {
-return model;
-}
+  // this will get the state to be sent to the client
+  // and is only executed on the server
+  @override
+  MyStateModel? getState() {
+    return model;
+  }
 
-// this will receive the state on the client
-// and it is safe to call setState
-void updateState(MyStateModel? value) {
-setState(() {
-model = value;
-});
-}
+  // this will receive the state on the client
+  // and it is safe to call setState
+  void updateState(MyStateModel? value) {
+    setState(() {
+      model = value;
+    });
+  }
 }
 ```
 
@@ -66,3 +73,8 @@ class MyStateModelCodec extends Codec<MyStateModel, Map<String, dynamic>> {
 
 }
 ```
+
+## Alternatives
+
+You should also check out [@client components](/utils/at_client) that support passing data
+from the server to the client, including easy support for custom types.
