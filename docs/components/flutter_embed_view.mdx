@@ -1,9 +1,45 @@
 ---
 title: FlutterEmbedView
+description: Embed a flutter app in your Jaspr side.
 ---
 
 # FlutterEmbedView
+*Embed a flutter app in your Jaspr side.*
 
 ---
 
-TODO
+<Info>
+This component is part of the `jaspr_flutter_embed` package. Make sure to add this to your dependencies
+before using the component.
+</Info>
+
+With the `FlutterEmbedView` component you can embed any Flutter widget as part of your
+Jaspr component tree. The component takes care of initializing the Flutter engine and attaching the provided widget
+to the root of Flutters widget tree. It internally calls Flutters `runApp` method with the provided widget.
+
+It renders a `<div id="flutter_target"></div>` element and mounts the flutter app inside.
+
+You can provide the following parameters:
+
+- `app`: The widget that will be run as your embedded Flutter app.
+- `loader`: An optional component that is displayed while the flutter app is initializing.
+- `classes`: Optional class name for the created `<div>` element.
+- `styles`: Optional styles for the created `<div>` element.
+
+```dart
+yield FlutterEmbedView(
+  // provide your flutter app widget
+  app: MyFlutterApp(
+    // provide any widget properties or callbacks
+    // this way you can pass and share state between jaspr and flutter
+    // without needing js interop
+    title: 'My Embedded Flutter App',
+  ),
+  // provide an optional loader component that will be displayed while the flutter app loads
+  loader: MyCustomLoader(),
+);
+```
+
+<Info>
+Read more about Jasprs support for [Flutter Embedding](/going_further/flutter_embedding).
+<Info/>
