@@ -8,9 +8,28 @@ description: Fetch data on the server during pre-rendering and sync data to the 
 
 ---
 
-TODO
-
-
 
 When using server side rendering, you want the ability to load some data asynchronously before rendering the components.
 With `jaspr` this is build into the framework and easy to do.
+
+## Loading Data on the Server
+
+- Async data sources, server-side code
+- Awaiting data loading on the server before pre-rendering
+
+Options:
+
+- Async components
+- PreloadStateMixin
+
+
+## Syncing Data to the Client
+
+- from server to client (one directional)
+
+- example. not enough to prerender html with the loaded data, also needed for mutations on the client
+
+Options:
+
+- @client annotation
+- SyncStateMixin
