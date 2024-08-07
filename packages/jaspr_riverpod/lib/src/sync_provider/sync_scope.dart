@@ -16,16 +16,12 @@ mixin SyncProviderDependencies on StatelessComponent implements OnFirstBuild {
 final _syncStateProvider = StateProvider<Map<String, dynamic>>((ref) => {});
 
 mixin SyncScopeMixin on State<ProviderScope> implements SyncStateMixin<ProviderScope, Map<String, dynamic>> {
-  @override
-  String syncId = 'provider_scope';
-
   ProviderContainer get container;
 
   @override
-  bool wantsSync() => container.depth == 0;
+  Map<String, dynamic>? getState() {
+    if (container.depth != 0) return null;
 
-  @override
-  Map<String, dynamic> getState() {
     var syncElements = container.getAllProviderElements().whereType<SyncProviderElement>();
     var map = <String, dynamic>{};
     for (var elem in syncElements) {
@@ -41,7 +37,7 @@ mixin SyncScopeMixin on State<ProviderScope> implements SyncStateMixin<ProviderS
             "The error is: ${elem.state.error}");
         continue;
       }
-      map[provider.id] = (provider.codec ?? CastCodec()).encode(elem.state.value);
+      map[provider.id] = provider.codec != null ? provider.codec!.encode(elem.state.value) : elem.state.value;
     }
     return map;
   }
