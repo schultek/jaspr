@@ -32,11 +32,12 @@ class Session with SessionMappable {
 
   String get timeFormatted => DateFormat("EEE, dd MMM 'at' h:mm a").format(startsAt.toLocal());
   String get durationFormatted => '${endsAt.difference(startsAt).inMinutes}m';
+}
 
+extension type SessionCodex(Session session) implements Session {
   @decoder
-  static Session fromJson(String json) => SessionMapper.fromJson(json);
+  SessionCodex.decode(String json) : session = SessionMapper.fromJson(json);
 
   @encoder
-  @override
-  String toJson() => super.toJson();
+  String encode() => session.toJson();
 }

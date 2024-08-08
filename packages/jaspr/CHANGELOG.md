@@ -12,6 +12,9 @@
 
 - Add `Document.head` and related constructors replacing `Head` component.
 
+- Changed `SyncStateMixin`, removed codex and id parameters.
+- Added `@sync` annotation.
+
 ## 0.13.3
 
 - Added support for custom models as parameters to `@client` components.

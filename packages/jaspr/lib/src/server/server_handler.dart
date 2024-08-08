@@ -59,18 +59,14 @@ Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHa
 
     var fileLoader = _proxyFileLoader(request, staticHandler);
     return handle(request, (setup) async {
-      // We support two modes here, rendered-html and data-only
-      // rendered-html does normal ssr, but data-only only returns the preloaded state data as json
-      var isDataMode = request.headers['jaspr-mode'] == 'data-only';
-
       var requestUri = request.url.normalizePath();
       if (!requestUri.path.startsWith('/')) {
         requestUri = requestUri.replace(path: '/${requestUri.path}');
       }
 
       return Response.ok(
-        await render(isDataMode ? RenderMode.data : RenderMode.html, setup, requestUri, fileLoader),
-        headers: {'Content-Type': isDataMode ? 'application/json' : 'text/html'},
+        await render(setup, requestUri, fileLoader),
+        headers: {'Content-Type': 'text/html'},
       );
     });
   });

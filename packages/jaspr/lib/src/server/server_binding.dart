@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 
 import '../../jaspr.dart';
 import 'adapters/client_component_adapter.dart';
 import 'adapters/document_adapter.dart';
 import 'adapters/global_styles_adapter.dart';
-import 'adapters/sync_script_adapter.dart';
 import 'async_build_owner.dart';
 import 'markup_render_object.dart';
 
@@ -36,7 +34,6 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     var adapters = [
       ..._adapters.reversed,
       GlobalStylesAdapter(this),
-      SyncScriptAdapter(getStateData),
       DocumentAdapter(),
     ];
 
@@ -53,22 +50,6 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
     return root.renderToHtml();
   }
-
-  Future<String> data() async {
-    await rootCompleter.future;
-    return jsonEncode(getStateData());
-  }
-
-  @override
-  dynamic getRawState(String id) => null;
-
-  @override
-  Future<Map<String, String>> fetchState(String url) {
-    throw 'Cannot fetch state on the server';
-  }
-
-  @override
-  void updateRawState(String id, dynamic state) {}
 
   @override
   void scheduleFrame(VoidCallback frameCallback) {

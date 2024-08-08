@@ -33,7 +33,7 @@ typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render)
 Future<String> renderComponent(Component app) async {
   _checkInitialized('renderComponent');
   var fileHandler = staticFileHandler();
-  return render(RenderMode.html, _createSetup(app), Uri.parse('https://0.0.0.0/'), (name) async {
+  return render(_createSetup(app), Uri.parse('https://0.0.0.0/'), (name) async {
     var response = await fileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
     return response.statusCode == 200 ? response.readAsString() : null;
   });
