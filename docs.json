@@ -42,9 +42,7 @@
     ["Components", [
       ["Document", "/components/document"],
       ["RawText", "/components/raw_text"],
-      ["[Stateful]Builder", "/components/builder"],
-      ["[Value]ListenableBuilder", "/components/listenable_builder"],
-      ["Async[Builder/StatelessComponent]", "/components/async_component"],
+      ["AsyncBuilder", "/components/async_builder"],
       ["Router", "/components/router"],
       ["Link", "/components/link"],
       ["Style", "/components/style"],
