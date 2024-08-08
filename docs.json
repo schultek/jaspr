@@ -42,7 +42,8 @@
     ["Components", [
       ["Document", "/components/document"],
       ["RawText", "/components/raw_text"],
-      ["AsyncBuilder", "/components/async_builder"],
+      ["AsyncBuilder", "/components/async_components"],
+      ["AsyncStatelessComponent", "/components/async_components"],
       ["Router", "/components/router"],
       ["Link", "/components/link"],
       ["Style", "/components/style"],
