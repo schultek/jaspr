@@ -1,6 +1,7 @@
-## Unreleased patch
+## Unreleased minor
 
 - Added minify option to tailwind in release mode.
+- Made the content section of the `tailwind.config.js` file active at build time.
 
 ## 0.2.0
 

@@ -31,7 +31,7 @@ Test your installation by typing in your terminal:
 tailwindcss -h
 ```
 
-# Setup
+## Setup
 
 To start, add `jaspr_tailwind` as a dev dependency to your project:
 
@@ -86,13 +86,13 @@ class SimpleCard extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4'.split(' '), [
-      div(classes: ['shrink-0'], [
-        img(classes: 'h-12 w-12'.split(' '), src: '/img/logo.svg', alt: '$title Logo'),
+    yield div(classes: 'p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4', [
+      div(classes: 'shrink-0', [
+        img(classes: 'h-12 w-12', src: '/img/logo.svg', alt: '$title Logo'),
       ]),
       div([
-        div(classes: 'text-xl font-medium text-black'.split(' '), [text(title)]),
-        p(classes: ['text-slate-500'], [text(message)]),
+        div(classes: 'text-xl font-medium text-black', [text(title)]),
+        p(classes: 'text-slate-500', [text(message)]),
       ])
     ]);
   }
@@ -101,10 +101,21 @@ class SimpleCard extends StatelessComponent {
 
 ## Config
 
-By default, you don't need a tailwind config file for your project. However, if you want to customize the
-default config like the theme or colors, you can add a `tailwind.config.js` file to the root directory of your project.
+By default, you don't need a tailwind config file for your project. The package automatically scans the project's Dart files and builds the CSS.
+However, if you want to customize the default config like the theme or colors, you can add a `tailwind.config.js` file to the root directory of your project.
 
-When using a custom config, you should leave out the `content` option, as the integration takes care of that.
+When using a custom config, you should explicitly set the `content` option to scan Tailwind class names from the Dart file:
+
+```javascript
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./{lib,web}/**/*.dart'],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
 
 ---
 
