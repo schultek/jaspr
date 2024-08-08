@@ -1,10 +1,10 @@
 import '../framework/framework.dart';
-import 'sync/sync_web.dart' if (dart.library.io) 'sync/sync_vm.dart';
+import 'sync/sync_web.dart' if (dart.library.io) 'sync/sync_vm.dart' as s;
 
 /// Mixin on [State] that syncs state data from the server to the client.
 mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> {
   /// Called on the server after the initial build, to retrieve the state data of this component.
-  U? getState();
+  U getState();
 
   /// Called on the client during [initState] to receive the synced state from the server.
   ///
@@ -20,7 +20,7 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> {
   ///   // do some post-initialization
   /// }
   /// ```
-  void updateState(U? value);
+  void updateState(U value);
 
   @override
   void initState() {
@@ -28,8 +28,11 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> {
     initSyncState(this);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  static initSyncState(SyncStateMixin mixin) => s.initSyncState(mixin);
+}
+
+const sync = SyncAnnotation._();
+
+class SyncAnnotation {
+  const SyncAnnotation._();
 }

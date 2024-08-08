@@ -156,8 +156,7 @@ class ProviderScope extends StatefulComponent {
 /// Do not use: The [State] of [ProviderScope]
 @visibleForTesting
 @sealed
-class ProviderScopeState extends State<ProviderScope>
-    with SyncStateMixin<ProviderScope, Map<String, dynamic>>, SyncScopeMixin {
+class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin {
   /// The [ProviderContainer] exposed to [ProviderScope.child].
   @override
   @visibleForTesting

@@ -15,7 +15,7 @@ mixin SyncProviderDependencies on StatelessComponent implements OnFirstBuild {
 
 final _syncStateProvider = StateProvider<Map<String, dynamic>>((ref) => {});
 
-mixin SyncScopeMixin on State<ProviderScope> implements SyncStateMixin<ProviderScope, Map<String, dynamic>> {
+mixin SyncScopeMixin on State<ProviderScope> implements SyncStateMixin<ProviderScope, Map<String, dynamic>?> {
   ProviderContainer get container;
 
   @override
@@ -43,7 +43,13 @@ mixin SyncScopeMixin on State<ProviderScope> implements SyncStateMixin<ProviderS
   }
 
   @override
-  void updateState(Map? value) {
+  void updateState(Map<String, dynamic>? value) {
     container.read(_syncStateProvider.notifier).update((s) => {...s, ...?value});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    SyncStateMixin.initSyncState(this);
   }
 }
