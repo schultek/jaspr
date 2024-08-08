@@ -22,11 +22,11 @@ When defining styles like this, you can use them to either write global styleshe
 
 You can define a global stylesheet from your Dart code using one of the following options:
 
-1. Passing [style rules](/utils/at_css#defining-style-rules) to the [Document](/components/document)`.styles` parameter.
+1. Passing [Style Rules](/utils/at_css#defining-style-rules) to [Document(styles: ...)](/components/document#parameters).
    This will render the provided styles into a global stylesheet inside the `<head>` element.
 
-2. Using the [@css](/utils/at_css#registering-style-rules) annotation to automatically render the annotated styles into a global stylesheet inside
-   the `<head>` element.
+2. Using the [@css](/utils/at_css#registering-style-rules) annotation to automatically render the annotated styles into
+   a global stylesheet inside the `<head>` element.
 
 3. Using the [Style](/components/style) component to manually define a `<style>` element anywhere in the tree.
 
@@ -55,7 +55,7 @@ Try to prefer `const` styles whenever possible, which will benefit the performan
 If you are writing `.css` stylesheets manually or have external stylesheets you want to use, you can add
 them as a `<link rel="stylesheet">` inside the `<head>` element.
 
-When you are in **static** or **server** mode, add this to the [Document](/components/document)s `head` parameter:
+When you are in **static** or **server** mode, add this to [Document(head: ...)](/components/document#parameters):
 
 ```dart title="lib/main.dart"
 void main() {
@@ -79,7 +79,7 @@ When you are in **client** mode, add this directly to the `index.html` file:
 
 ### Dynamically Adding Stylesheets
 
-You can use the [Document.head](/components/document#document-head) component to dynamically set a value in the `<head>`
+You can use the [Document.head()](/components/document#documenthead) component to dynamically set a value in the `<head>`
 from any component.
 
 ```dart
@@ -140,7 +140,7 @@ After setting up the package, simply create a `.scss` file:
 }
 ```
 
-and include the generated output `.css` file as an [external stylesheet](#external-stylesheets):
+and include the generated output `.css` file as an [external stylesheet](/concepts/styling#external-stylesheets):
 
 ```dart
 link(rel:"stylesheet", href: "/styles.css")
