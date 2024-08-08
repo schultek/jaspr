@@ -98,7 +98,7 @@ It allows you to define the document markup in a separate html file instead of u
 The `Document.head()` constructor renders metadata and other elements inside the `<head>` of the document.
 
 Any children are pulled out of the normal rendering tree of the application and rendered instead
-inside a special section of the <head> element of the document. This is supported both on the
+inside a special section of the `<head>` element of the document. This is supported both on the
 server during pre-rendering and on the client.
 
 The `.head()` component can be used multiple times in an application where deeper or latter mounted
@@ -134,8 +134,8 @@ deeper but prior will override latter but shallower components.
 
 Elements inside `.head()` are overridden using the following system:
 - elements with an `id` override other elements with the same `id`
-- <title> and <base> elements override other <title> or <base> elements respectively
-- <meta> elements override other <meta> elements with the same `name`
+- `<title>` and `<base>` elements override other `<title>` or `<base>` elements respectively
+- `<meta>` elements override other `<meta>` elements with the same `name`
 
 ---
 
