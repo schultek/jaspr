@@ -48,10 +48,6 @@ class BrowserTester {
     return binding.attachRootComponent(component, attachTo: attachTo);
   }
 
-  void stubFetchState(Map<String, dynamic> Function(String url) onFetchState) {
-    binding._onFetchState = onFetchState;
-  }
-
   Future<void> click(Finder finder, {bool pump = true}) async {
     dispatchEvent(finder, 'click', null);
     if (pump) {
@@ -106,15 +102,9 @@ class BrowserTester {
 
 class TestBrowserComponentsBinding extends BrowserAppBinding {
   Map<String, dynamic>? _initialSyncState;
-  Map<String, dynamic> Function(String url)? _onFetchState;
 
   @override
   Map<String, dynamic>? loadSyncState() {
     return _initialSyncState;
-  }
-
-  @override
-  Future<Map<String, dynamic>> fetchState(String url) async {
-    return _onFetchState?.call(url) ?? {};
   }
 }
