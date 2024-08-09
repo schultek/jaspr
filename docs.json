@@ -35,7 +35,6 @@
     ]],
     ["Ecosystem", [
       ["\uD83C\uDF0A Riverpod", "/eco/riverpod"],
-      ["\uD83D\uDE80 Serverpod", "/eco/serverpod"],
       ["\uD83C\uDF2C️ Tailwind", "/eco/tailwind"],
       ["\uD83D\uDCDA Third-Party Packages", "/eco/packages"]
     ]],
