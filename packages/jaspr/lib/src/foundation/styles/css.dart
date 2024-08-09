@@ -48,18 +48,27 @@ const css = CssUtility._();
 class CssUtility {
   const CssUtility._();
 
+  /// Renders a css rule with the given selector.
+  ///
+  /// Use chained calls to [Styles] groups to define the styles for the rule.
+  ///
+  /// Rules can be nested using the optional second list parameter. Nested rules
+  /// can use the `&` symbol in their selector to refer to the parent selector.
   NestedStyleRule call(String selector, [List<StyleRule> children = const []]) {
     return NestedStyleRule._(Selector(selector), Styles(), children);
   }
 
+  /// Renders a `@import url(...)` css rule.
   ImportStyleRule import(String url) {
     return ImportStyleRule(url);
   }
 
-  FontFaceStyleRule fontFace({required String fontFamily, FontStyle? fontStyle, required String url}) {
-    return FontFaceStyleRule(fontFamily: fontFamily, fontStyle: fontStyle, url: url);
+  /// Renders a `@font-face` css rule.
+  FontFaceStyleRule fontFace({required String family, FontStyle? style, required String url}) {
+    return FontFaceStyleRule(family: family, style: style, url: url);
   }
 
+  /// Renders a `@media` css rule.
   MediaStyleRule media(MediaQuery query, List<StyleRule> styles) {
     return MediaStyleRule(query: query, styles: styles);
   }

@@ -1,3 +1,4 @@
+import '../../foundation/options.dart';
 import '../../framework/framework.dart';
 import '../child_nodes.dart';
 import '../markup_render_object.dart';
@@ -31,17 +32,18 @@ class ClientComponentRegistryElement extends ObserverElement {
 
   bool _didAddClientScript = false;
   final List<Element> _clientElements = [];
+  final List<ClientTarget> _clientTargets = [];
 
   @override
   void willRebuildElement(Element element) {
     var binding = this.binding as ServerAppBinding;
 
     if (!_didAddClientScript) {
-      (binding).addRenderAdapter(ClientScriptAdapter(binding, _clientElements));
+      (binding).addRenderAdapter(ClientScriptAdapter(binding, _clientTargets));
       _didAddClientScript = true;
     }
 
-    var entry = binding.options.clients[element.component.runtimeType];
+    var entry = binding.options.clients?[element.component.runtimeType];
 
     if (entry == null) {
       return;
@@ -57,6 +59,7 @@ class ClientComponentRegistryElement extends ObserverElement {
     }
 
     _clientElements.add(element);
+    _clientTargets.add(entry);
     binding.addRenderAdapter(ClientComponentAdapter(entry.name, entry.dataFor(element.component), element));
   }
 

@@ -82,7 +82,7 @@ class CreateCommand extends BaseCommand {
   }
 
   @override
-  String get description => 'Creates a new jaspr project.';
+  String get description => 'Create a new jaspr project.';
 
   @override
   String get name => 'create';

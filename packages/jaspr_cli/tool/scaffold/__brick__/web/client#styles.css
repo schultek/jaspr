@@ -6,6 +6,8 @@ html, body {
   min-height: 100vh;
   padding: 0;
   margin: 0;
+
+  --primary-color: #01589B;
 }
 
 h1 {
@@ -35,7 +37,7 @@ header {
 }
 
 header nav {
-  background-color: #01589B;
+  background-color: var(--primary-color);
   height: 3em;
   border-radius: 10px;
   overflow: clip;
@@ -81,8 +83,8 @@ header nav div.active::before {
   padding-bottom: 10px;
   border-top-style: solid;
   border-bottom-style: solid;
-  border-top-color: #01589B;
-  border-bottom-color: #01589B;
+  border-top-color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
   border-top-width: 1px;
   border-bottom-width: 1px;
 }
@@ -109,7 +111,7 @@ header nav div.active::before {
   padding-right: 2rem;
   box-sizing: border-box;
   min-width: 2.5em;
-  color: #01589B;
+  color: var(--primary-color);
   font-size: 4rem;
   text-align: center;
 }

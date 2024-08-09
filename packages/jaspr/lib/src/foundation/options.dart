@@ -23,10 +23,10 @@ class Jaspr {
 /// Global options for configuring jaspr. DO NOT USE DIRECTLY.
 /// Use the generated [defaultJasprOptions] instead.
 class JasprOptions {
-  const JasprOptions({this.clients = const {}, this.styles = const []});
+  const JasprOptions({this.clients, this.styles});
 
-  final Map<Type, ClientTarget> clients;
-  final List<StyleRule> styles;
+  final Map<Type, ClientTarget>? clients;
+  final List<StyleRule> Function()? styles;
 }
 
 /// The target configuration for a @client component. DO NOT USE DIRECTLY.

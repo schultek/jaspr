@@ -10,7 +10,7 @@ class DoctorCommand extends BaseCommand {
   DoctorCommand({super.logger});
 
   @override
-  String get description => 'Shows information about the environment and project.';
+  String get description => 'Show information about the environment and project.';
 
   @override
   String get name => 'doctor';

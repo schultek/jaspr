@@ -26,7 +26,6 @@ final defaultJasprOptions = JasprOptions(
     prefix0.Counter: ClientTarget<prefix0.Counter>('components/counter'),
     prefix1.Hello: ClientTarget<prefix1.Hello>('components/hello', params: _prefix1Hello),
   },
-  styles: [],
 );
 
 Map<String, dynamic> _prefix1Hello(prefix1.Hello c) => {'name': c.name};

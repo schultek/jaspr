@@ -55,6 +55,16 @@ class SyncMixinsBuilder implements Builder {
                       '@sync cannot be used on static fields. Failing element: ${clazz.name}.${element.name} in library ${library.source.fullName}.');
                   return false;
                 }
+                if (element.isFinal) {
+                  log.severe(
+                      '@sync cannot be used on final fields. Failing element: ${clazz.name}.${element.name} in library ${library.source.fullName}.');
+                  return false;
+                }
+                if (element.isPrivate) {
+                  log.severe(
+                      '@sync cannot be used on private fields. Failing element: ${clazz.name}.${element.name} in library ${library.source.fullName}.');
+                  return false;
+                }
 
                 return true;
               })

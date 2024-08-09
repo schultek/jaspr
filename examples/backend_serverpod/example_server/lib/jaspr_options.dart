@@ -20,6 +20,8 @@ import 'components/counter.dart' as prefix0;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(clients: {
-  prefix0.Counter: ClientTarget<prefix0.Counter>('components/counter'),
-}, styles: []);
+final defaultJasprOptions = JasprOptions(
+  clients: {
+    prefix0.Counter: ClientTarget<prefix0.Counter>('components/counter'),
+  },
+);

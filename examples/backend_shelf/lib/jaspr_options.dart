@@ -26,5 +26,4 @@ final defaultJasprOptions = JasprOptions(
     prefix0.App: ClientTarget<prefix0.App>('components/app'),
     prefix1.Hello: ClientTarget<prefix1.Hello>('components/hello'),
   },
-  styles: [],
 );

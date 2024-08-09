@@ -1,23 +1,26 @@
 ---
 title: Flutter Embedding
-description: Embedding a Flutter web app in a jaspr website.
-previous: /eco/riverpod
-next: /eco/tailwind
+description: Embedding a Flutter web app in a Jaspr website.
 ---
 
-# 🖼️ Flutter Embedding
+# Flutter Embedding
+*Embedding a Flutter web app in a Jaspr website.*
 
-To embed a flutter app into your jaspr website you need the following setup:
+---
 
-1. Add `jaspr_flutter_embed` as a dependency:
-    `dart pub add jaspr_flutter_embed`
+To embed a Flutter app into your Jaspr website you need the following setup:
+
+1. Add `flutter` and `jaspr_flutter_embed` as a dependency:
+
+  ```shell
+  dart pub add flutter jaspr_flutter_embed
+  ```
+
 2. Replace `build_web_compilers` with `jaspr_web_compilers` as a dev dependency:
-    `dart pub remove build_web_compilers`
-    `dart pub add jaspr_web_compilers --dev`
-3. Add `uses-flutter: true` to your jaspr config inside `pubspec.yaml`:
-  ```yaml
-  jaspr:
-    uses-flutter: true
+
+  ```shell
+  dart pub remove build_web_compilers
+  dart pub add jaspr_web_compilers --dev
   ```
 
 Next add the `FlutterEmbedView` component to your jaspr app like this:
@@ -58,6 +61,5 @@ Any code and components that use the flutter sdk can only be imported on the cli
 when you use server-side rendering, you cannot directly import the above component into your app, or you will get a
 compilation error.
 
-Instead you need to use Darts conditional imports to only import the affected code on the client.
-
-**TODO**: Elaborate and add example snippet.
+Instead, you need to use Darts conditional imports to only import the affected code on the client.
+See [@Import](/utils/at_import).

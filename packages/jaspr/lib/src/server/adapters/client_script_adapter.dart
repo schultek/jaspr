@@ -1,23 +1,23 @@
-import '../../framework/framework.dart';
+import '../../foundation/options.dart';
 import '../markup_render_object.dart';
 import '../server_binding.dart';
 import 'head_scope_adapter.dart';
 
 class ClientScriptAdapter extends HeadScopeAdapter {
-  ClientScriptAdapter(this.binding, this.clientElements);
+  ClientScriptAdapter(this.binding, this.clientTargets);
 
   final ServerAppBinding binding;
-  final List<Element> clientElements;
+  final List<ClientTarget> clientTargets;
 
   @override
   void applyHead(MarkupRenderObject head) {
-    if (clientElements.isEmpty) {
+    if (clientTargets.isEmpty) {
       return;
     }
 
     String source;
-    if (clientElements.length == 1) {
-      var entry = binding.options.clients[clientElements.first.component.runtimeType]!;
+    if (clientTargets.length == 1) {
+      var entry = clientTargets.first;
       source = '${entry.name}.client';
     } else {
       source = 'main.clients';
