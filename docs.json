@@ -58,6 +58,7 @@
       ["@sync", "/utils/at_sync"],
       ["SyncStateMixin", "/utils/sync_state_mixin"],
       ["PreloadStateMixin", "/utils/preload_state_mixin"],
+      ["@encoder/@decoder", "/utils/at_encoder_decoder"],
       ["@Import", "/utils/at_import"]
     ]]
   ],
