@@ -47,7 +47,7 @@ class MyAsyncComponent extends AsyncStatelessComponent {
 or using the `AsyncBuilder` component:
 
 ```dart
-return AsyncBuilder(builder: (context) async* {
+yield AsyncBuilder(builder: (context) async* {
   // Simply use "await" inside the build method.
   var data = await loadDataFromDatabase();
 
@@ -62,7 +62,7 @@ While this is less of a concern in static mode, be aware that in server mode thi
 <Warning>
 As a Flutter developer, it may feel very strange or dangerous to use `async/await` as part of the build method for a component.
 Be assured that this is perfectly safe, mainly for the reason that this component is **only executed on the server** and
-**only built once** during pre-rendering. Therefore you don't need to worry about potentially expensive rebuilds or floating async
+**only built once** during pre-rendering. Therefore, you don't need to worry about potentially expensive rebuilds or floating async
 operations with these components.
 </Warning>
 

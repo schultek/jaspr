@@ -10,9 +10,9 @@
 
 - Made `Jaspr.initializeApp()` required (static and server mode).
 
-- Add `Document.head` and related constructors replacing `Head` component.
+- Added `Document.head` and related constructors replacing `Head` component.
 
-- Changed `SyncStateMixin`, removed codex and id parameters.
+- Improved `SyncStateMixin`, removed codex and id parameters.
 - Added `@sync` annotation.
 
 ## 0.13.3
