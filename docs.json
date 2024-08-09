@@ -23,8 +23,8 @@
       ["\uD83D\uDD8D Writing HTML", "/concepts/html"],
       ["\uD83C\uDFA8 Styling", "/concepts/styling"],
       ["\uD83E\uDDED Routing", "/concepts/routing"],
-      ["\uD83D\uDD0E SEO & Meta", "/concepts/seo"],
       ["\uD83D\uDCE1 Data Fetching", "/concepts/data_fetching"],
+      ["\uD83D\uDD0E SEO & Meta", "/concepts/seo"],
       ["\uD83E\uDDEA Testing", "/concepts/testing"],
       ["\uD83C\uDF10 Deploying", "/concepts/deploying"]
     ]],

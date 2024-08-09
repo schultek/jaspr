@@ -17,8 +17,10 @@ example from a database or external api in oder to render out the content of you
 asynchronously and using server-side only apis like `dart:io`. Therefore:
 
 1. You need to **delay the pre-rendering** of your site until all needed data is loaded.
-2. Correctly handle server-side logic without breaking client-side compilation.
-3. Make sure the loaded data is also available on the client for further client-side rendering.
+2. Correctly **handle server-side logic** without breaking client-side compilation.
+3. Make sure the loaded data is also **available on the client** for further client-side rendering.
+
+---
 
 Say you are developing a blog and want to show a list of articles on the website. Your articles are stored in some database
 or CMS, and you also want the user to be able to filter the list on the client. This requires the following
@@ -30,6 +32,7 @@ data-loading strategy:
 4. Hydrate the website on the client to enable interactivity.
 5. When the user wants to filter the articles use the received article data to update the website content on the client.
 
+---
 
 With Jaspr loading data like this on the server and also syncing it with the client is build into the core framework,
 and you have a couple of options to choose from.
