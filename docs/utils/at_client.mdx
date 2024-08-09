@@ -138,44 +138,36 @@ with parameters are a **great way to pass data from the server to the client**. 
 
 #### 1. All parameters must be **initializing field** parameters (`this.<fieldname>`):
 
-  ```dart
-  @client
-  class App extends StatelessComponent {
-    const App({required this.title, super.key});
+```dart
+@client
+class App extends StatelessComponent {
+  const App({required this.title, super.key});
 
-    final String title;
+  final String title;
 
-    ...
-  }
-  ```
+  ...
+}
+```
 
 #### 2. All parameters must be **serializable**:
 
-  Parameters must either have a primitive serializable type: `bool`, `int`, `double`, `String` or `List` / `Map`s of these.
+Parameters must either have a primitive serializable type: `bool`, `int`, `double`, `String` or `List` / `Map`s of these.
 
-  Or for your own classes you can tell jaspr how to serialize/deserialize them using the `@encoder` and `@decoder`
-  annotations with the class:
+Or you can use custom data types by using the `@encoder` and `@decoder` annotations with the class:
 
-  ```dart title="model.dart"
-  class Model {
-      @decoder
-      static Model fromJson(String json) => ...;
+```dart title="model.dart"
+class Model {
+  @decoder
+  static Model fromJson(Map<String, dynamic> json) => ...;
 
-      @encoder
-      String toJson() => ...;
-  }
-  ```
+  @encoder
+  Map<String, dynamic> toJson() => ...;
+}
+```
 
-  The `@decoder` annotation must be used on a **static method** that
-  - returns an instance of the class
-  - takes a value of any primitive serializable type (see above).
+Learn more about how to set up serialization for custom data types using the [`@encoder`/ `@decoder`](/utils/at_encoder_decoder) annotations.
 
-  The `@encoder` annotation must be used on an **instance method** that
-  - returns the same type that the `@decoder` method takes in.
-
-  <Info> Both methods can have any name.</Info>
-
-  With this setup you can use this class as the parameter type of a `@client` component.
+With this setup you can use any class as the parameter of a `@client` component.
 
 ## How it works
 

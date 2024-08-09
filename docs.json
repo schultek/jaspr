@@ -56,8 +56,8 @@
       ["Styles", "/utils/styles"],
       ["events()", "/utils/events"],
       ["@sync", "/utils/at_sync"],
-      ["PreloadStateMixin", "/utils/preload_state_mixin"],
       ["SyncStateMixin", "/utils/sync_state_mixin"],
+      ["PreloadStateMixin", "/utils/preload_state_mixin"],
       ["@Import", "/utils/at_import"]
     ]]
   ],
