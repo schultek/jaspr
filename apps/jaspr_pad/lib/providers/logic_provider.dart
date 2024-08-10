@@ -1,4 +1,5 @@
-import 'package:jaspr/jaspr.dart';
+import 'dart:convert';
+
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../adapters/html.dart';
@@ -148,10 +149,11 @@ class Logic {
     var currentProject = ref.read(editProjectProvider);
     if (currentProject == null) return;
 
+    var projectBase64 = base64UrlEncode(utf8.encode(jsonEncode(currentProject.toMap())));
+
     var doc = window.document as HtmlDocumentOrStubbed;
     var element = doc.createElement('a');
-    element.setAttribute(
-        'href', '${window.location.origin}/api/download?project=${stateCodec.encode(currentProject.toMap())}');
+    element.setAttribute('href', '${window.location.origin}/api/download?project=$projectBase64');
     element.setAttribute('download', 'jaspr_${currentProject.id}.zip');
 
     element.style.display = 'none';

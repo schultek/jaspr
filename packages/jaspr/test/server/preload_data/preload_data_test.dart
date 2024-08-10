@@ -17,17 +17,8 @@ void main() {
       var body = response.document?.body;
       expect(body, isNotNull);
 
-      var appHtml = '<div>App<button>Click Me</button>Count: 202</div>';
+      var appHtml = '<div>App<!--\$ =202--><button>Click Me</button>Count: 202</div>';
       expect(body!.innerHtml.trim(), equals(appHtml));
-    });
-
-    testServer('should fetch data', (tester) async {
-      tester.pumpComponent(Document(body: App()));
-
-      var response = await tester.fetchData('/');
-
-      expect(response.statusCode, equals(200));
-      expect(response.data, equals({'counter': 202}));
     });
   });
 }

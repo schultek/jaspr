@@ -5,7 +5,6 @@ import 'package:html/parser.dart';
 
 import '../../../server.dart';
 import '../../server/adapters/document_adapter.dart';
-import '../../server/child_nodes.dart';
 
 export '../style.dart' hide Style;
 

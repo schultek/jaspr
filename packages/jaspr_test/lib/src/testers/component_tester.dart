@@ -115,20 +115,6 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   bool get isClient => _isClient;
 
   @override
-  Future<Map<String, String>> fetchState(String url) {
-    throw UnimplementedError();
-  }
-
-  @override
-  String? getRawState(String id) {
-    if (!isClient) throw UnimplementedError();
-    return null;
-  }
-
-  @override
-  void updateRawState(String id, dynamic state) {}
-
-  @override
   void scheduleFrame(VoidCallback frameCallback) {
     Future.microtask(frameCallback);
   }

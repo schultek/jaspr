@@ -29,9 +29,6 @@ class PreloadImagesState extends State<PreloadImages> with SyncStateMixin<Preloa
   }
 
   @override
-  String get syncId => 'preload-images';
-
-  @override
   void updateState(List? value) {
     setState(() {
       preloadImages.addAll(value?.cast() ?? []);
