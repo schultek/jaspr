@@ -12,8 +12,9 @@ This component is part of the `jaspr_router` package. Make sure to add this to y
 the component.
 </Info>
 
+Use can use the `Router` component to add routing to your website. It takes a list of `Route`s to render based on the
+current URL.
 
-Use can use the `Router` component for some basic routing. It takes a list of `Route`s.
 A simple use looks like this:
 
 ```dart title="lib/app.dart"
@@ -36,8 +37,93 @@ class App extends StatelessComponent {
 If you know `go_router` a lot of the core concepts should feel familiar.
 </Info>
 
+## Defining Routes
 
-To push a new route call `Router.of(context).push('/path');` inside your child components. Similarly, you can call `.replace()` or `.back()`.
+To configure a `Route`, a `path` template and `builder` function must be provided:
+
+```dart
+Route(
+  path: '/users/:userId',
+  builder: (BuildContext context, RouteState state) {
+    return const UserScreen();
+  },
+),
+```
+
+To navigate to this route, use `context.push()`. To learn more about how navigation works, see the [Routing](/concepts/routing) guide.
+
+### Path Parameters
+
+To specify a path parameter, prefix a path segment with a `:` character, followed by a unique name, for example, `:userId`.
+You can access the value of the parameter by accessing it through the `RouteState` object provided to the `builder` function:
+
+```dart
+Route(
+  path: '/users/:userId',
+  builder: (context, state) => const UserScreen(id: state.pathParameters['userId']),
+),
+```
+
+Similarly, to access a query string parameter (the part of URL after the `?`), use `RouteState`. For example,
+a URL path such as `/users?filter=admins` can read the filter parameter:
+
+```dart
+Route(
+  path: '/users',
+  builder: (context, state) => const UsersScreen(filter: state.uri.queryParameters['filter']),
+),
+```
+
+### Child routes
+
+`Route`s can also have nested child `Route`s which will resolve their `path` relative to the parents `path`.
+
+<Info>
+Different to GoRouter in Flutter, nested `Route`s do **not** create a stack of pages.
+Instead, only the most nested matched route is rendered.
+</Info>
+
+To define a nested child route, add it to the parent's `routes` list:
+
+```dart
+Route(
+  path: '/users',
+  builder: (context, state) => const UsersScreen(),
+  routes: [
+    Route(
+      path: ':userId',
+      builder: (context, state) => const UserScreen(id: state.pathParameters['userId']),
+    ),
+  ],
+),
+```
+
+Navigating to `/users` will render the `UsersScreen()` and navigating to `/users/abc` will render the `UserScreen()`.
+
+### Nested rendering
+
+Some websites display content of pages in a subsection of the screen, for example, an app using a `<nav>` bar that
+stays on-screen when navigating between pages.
+
+By using `ShellRoute` and providing a `builder` you can render any layout around your `Route`s content:
+
+```dart
+ShellRoute(
+  builder: (context, state, child) {
+    return div([
+      child,
+    ]);
+  },
+  routes: <RouteBase>[
+    GoRoute(
+      path: 'details',
+      builder: (context, state) => const DetailsScreen(),
+    ),
+  ],
+),
+```
+
+## Lazy Routes
 
 ## Lazy Routes & Code Splitting
 
@@ -65,4 +151,7 @@ class App extends StatelessComponent {
 
 This will lazy load the appropriate javascript files for the '/about' route when navigating to it.
 
+## Navigating
 
+
+To push a new route call `Router.of(context).push('/path');` inside your child components. Similarly, you can call `.replace()` or `.back()`.

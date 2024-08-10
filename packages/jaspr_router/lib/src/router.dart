@@ -95,7 +95,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
   }
 
   Future<void> initRoutes() {
-    var location = context.binding.currentUri.toString();
+    final location = context.binding.currentUri.toString();
     return _matchRoute(location).then(_preload).then((match) {
       _matchList = match;
       if (context.binding.isClient && match.uri.toString() != location) {
@@ -109,15 +109,14 @@ class RouterState extends State<Router> with PreloadStateMixin {
   }
 
   Future<RouteMatchList> _preload(RouteMatchList match) {
-    var loaders = <RouteLoader>[];
+    final loaders = <RouteLoader>[];
     for (var i = 0; i < match.matches.length; i++) {
-      var m = match.matches[i];
-      var r = m.route;
-      var hasNext = i < match.matches.length - 1;
+      final m = match.matches[i];
+      final hasNext = i < match.matches.length - 1;
 
-      if (r is LazyRouteMixin && (!hasNext || r is ShellRoute)) {
-        var key = m.subloc;
-        var l = (routeLoaders[key] ??= RouteLoader.from((r as LazyRouteMixin).load()));
+      if (m.route case LazyRouteBase r when (!hasNext || r is ShellRoute)) {
+        final key = m.subloc;
+        final l = (routeLoaders[key] ??= RouteLoader.from(r.load()));
         loaders.add(l);
       }
     }
