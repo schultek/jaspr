@@ -35,7 +35,7 @@ class DomComponent extends ProxyComponent {
   final Map<String, EventCallback>? events;
 
   @override
-  Element createElement() => DomElement(this);
+  ProxyElement createElement() => DomElement(this);
 }
 
 class DomElement extends ProxyRenderObjectElement {

@@ -9,10 +9,13 @@ abstract class ProxyComponent extends Component {
 
   final Component? child;
   final List<Component>? children;
+
+  @override
+  ProxyElement createElement() => ProxyElement(this);
 }
 
 /// An [Element] that has multiple children based on a proxy list.
-abstract class ProxyElement extends Element {
+class ProxyElement extends Element {
   /// Creates an element that uses the given component as its configuration.
   ProxyElement(ProxyComponent super.component);
 

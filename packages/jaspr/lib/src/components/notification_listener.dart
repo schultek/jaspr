@@ -35,7 +35,7 @@ class NotificationListener<T extends Notification> extends ProxyComponent {
   final NotificationListenerCallback<T>? onNotification;
 
   @override
-  Element createElement() {
+  ProxyElement createElement() {
     return _NotificationElement<T>(this);
   }
 }
