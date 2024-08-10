@@ -15,6 +15,8 @@
 - Improved `SyncStateMixin`, removed codex and id parameters.
 - Added `@sync` annotation.
 
+- Added `Fragment` component.
+
 ## 0.13.3
 
 - Added support for custom models as parameters to `@client` components.

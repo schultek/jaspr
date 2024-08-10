@@ -3,7 +3,9 @@ import 'dart:convert';
 import '../../../server.dart';
 
 void initSyncState(SyncStateMixin element) {
-  (element.context.binding as ServerAppBinding).addRenderAdapter(SyncAdapter(element, element.context as Element));
+  if (element.context.binding case ServerAppBinding b) {
+    b.addRenderAdapter(SyncAdapter(element, element.context as Element));
+  }
 }
 
 class SyncAdapter extends ElementBoundaryAdapter {

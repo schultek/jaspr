@@ -4,6 +4,14 @@
 
 import '../framework/framework.dart';
 
+/// A utility component that renders its [children] without any wrapper element.
+///
+/// This is meant to be used in places where you want to render multiple components,
+/// but only a single component is allowed by the API.
+class Fragment extends ProxyComponent {
+  Fragment({required super.children, super.key});
+}
+
 /// A stateless utility component whose [build] method uses its
 /// [builder] callback to create the component's child.
 ///

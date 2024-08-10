@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
@@ -9,9 +10,9 @@ import '../models/project.dart';
 import 'project.dart';
 
 Future<Response> downloadProject(Request request) async {
-  var project = ProjectDataMapper.fromMap(
-    stateCodec.decode(request.url.queryParameters['project']!).cast<String, dynamic>(),
-  );
+  var param = request.url.queryParameters['project']!;
+  var data = jsonDecode(utf8.decode(base64Decode(param)));
+  var project = ProjectDataMapper.fromMap(data);
 
   var encoder = ZipProjectEncoder();
   await encoder.zipProject(project);

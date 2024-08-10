@@ -31,9 +31,6 @@ class CounterState extends State<Counter> with PreloadStateMixin, SyncStateMixin
   int getState() => counter;
 
   @override
-  String get syncId => 'counter';
-
-  @override
   void updateState(int? value) => throw UnimplementedError();
 
   @override
