@@ -62,7 +62,7 @@ class AttachDocument extends ProxyComponent implements Document {
   final Map<String, String>? attributes;
 
   @override
-  Element createElement() => _AttachElement(this);
+  ProxyElement createElement() => _AttachElement(this);
 }
 
 class _AttachElement extends ProxyRenderObjectElement {
