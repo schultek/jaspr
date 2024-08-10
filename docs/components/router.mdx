@@ -5,6 +5,7 @@ description: Handles routing between different pages both server- and client-sid
 
 # Router
 *Handles routing between different pages both server- and client-side.*
+
 ---
 
 <Info>
@@ -125,33 +126,25 @@ ShellRoute(
 
 ## Lazy Routes
 
-## Lazy Routes & Code Splitting
+For larger websites, we don't want to load everything together, but rather split our pages into smaller chunks of code.
+`LazyRoute`s can be combined with Darts [deferred imports](https://dart.dev/language/libraries#lazily-loading-a-library)
+to split the resulting javascript bundle into separate files for each `LazyRoute`:
 
-For larger web apps, we don't want to load everything together, but rather split our pages into smaller chunks.
-`jaspr` can do this automatically using `LazyRoutes` and deferred imports.
+```dart
+import 'users_screen.dart' as users;
 
-To use lazy routes, change the above code to the following:
+...
 
-```dart title="lib/app.dart"
-import 'pages/home.dart';
-import 'pages/about.dart' deferred as about;
-
-class App extends StatelessComponent {
-  @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Router(
-      routes: [
-        Route(path: '/', builder: (context, state) => Home()),
-        Route.lazy(path: '/about', builder: (context, state) => about.About(), load: about.loadLibrary),
-      ],
-    );
-  }
-}
+Route.lazy(
+  path: '/users',
+  load: users.loadLibrary,
+  builder: (context, state) => users.UsersScreen(),
+),
 ```
 
-This will lazy load the appropriate javascript files for the '/about' route when navigating to it.
+This will lazy load the needed `.js` file for the `/users` route only when navigating to it.
 
 ## Navigating
 
-
-To push a new route call `Router.of(context).push('/path');` inside your child components. Similarly, you can call `.replace()` or `.back()`.
+To push a new route call `Router.of(context).push('/path');` inside your child components.
+Similarly, you can call `.replace()` or `.back()`.

@@ -46,7 +46,8 @@
       ["Router", "/components/router"],
       ["Link", "/components/link"],
       ["Style", "/components/style"],
-      ["FlutterEmbedView", "/components/flutter_embed_view"]
+      ["FlutterEmbedView", "/components/flutter_embed_view"],
+      ["Fragment", "/components/fragment"]
     ]],
     ["Utilities", [
       ["runApp", "/utils/run_app"],
