@@ -30,6 +30,7 @@ class Route extends RouteBase {
   factory Route.lazy({
     required String path,
     String? name,
+    String? title,
     RouterComponentBuilder? builder,
     RouterRedirect? redirect,
     required AsyncCallback load,

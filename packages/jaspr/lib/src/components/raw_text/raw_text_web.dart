@@ -1,0 +1,71 @@
+import 'dart:js_interop';
+
+import 'package:web/web.dart' as web;
+
+import '../../../browser.dart';
+
+class RawText extends StatelessComponent {
+  const RawText(this.text, {super.key});
+
+  final String text;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    var fragment = web.document.createElement('template');
+    fragment.innerHTML = text;
+    for (var node in fragment.childNodes.toIterable()) {
+      yield RawNode.withKey(node);
+    }
+  }
+}
+
+class RawNode extends Component {
+  RawNode(this.node, {super.key});
+
+  factory RawNode.withKey(web.Node node) {
+    return RawNode(
+      node,
+      key: switch (node) {
+        web.Text() when node.instanceOfString("Text") => ValueKey('text'),
+        web.Element() when node.instanceOfString("Element") => ValueKey('element:${node.tagName}'),
+        _ => null,
+      },
+    );
+  }
+
+  final web.Node node;
+
+  @override
+  Element createElement() => RawNodeElement(this);
+}
+
+class RawNodeElement extends BuildableRenderObjectElement {
+  RawNodeElement(RawNode super.component);
+
+  @override
+  RawNode get component => super.component as RawNode;
+
+  @override
+  Iterable<Component> build() sync* {
+    for (var node in component.node.childNodes.toIterable()) {
+      yield RawNode.withKey(node);
+    }
+  }
+
+  @override
+  void updateRenderObject() {
+    var next = component.node;
+    if (next.instanceOfString("Text") && next is web.Text) {
+      renderObject.updateText(next.textContent ?? '');
+    } else if (next.instanceOfString("Element") && next is web.Element) {
+      renderObject.updateElement(
+          next.tagName.toLowerCase(), next.id, next.className, null, next.attributes.toMap(), null);
+    } else {
+      var curr = (renderObject as DomRenderObject).node;
+      if (curr != null) {
+        curr.parentNode?.replaceChild(next, curr);
+      }
+      (renderObject as DomRenderObject).node = next;
+    }
+  }
+}

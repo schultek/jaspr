@@ -1,5 +1,4 @@
 import '../../framework/framework.dart';
-import '../child_nodes.dart';
 import '../markup_render_object.dart';
 import '../server_binding.dart';
 import 'client_script_adapter.dart';
@@ -9,12 +8,13 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
   ClientComponentAdapter(this.name, this.data, super.element);
 
   final String name;
-  final String data;
+  final String? data;
 
   @override
-  void processBoundary(ChildListRange range) {
-    range.start.insertNext(ChildNodeData(MarkupRenderObject()..updateText('<!-- \$$name $data  -->', true)));
-    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!-- /\$$name -->', true)));
+  void applyBoundary(ChildListRange range) {
+    range.start.insertNext(
+        ChildNodeData(MarkupRenderObject()..updateText('<!--\$$name${data != null ? ' data=$data' : ''}-->', true)));
+    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!--/\$$name-->', true)));
   }
 }
 
@@ -40,7 +40,7 @@ class ClientComponentRegistryElement extends ObserverElement {
       _didAddClientScript = true;
     }
 
-    var entry = binding.options.targets[element.component.runtimeType];
+    var entry = binding.options.clients[element.component.runtimeType];
 
     if (entry == null) {
       return;

@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
+// ignore: implementation_imports
+import 'package:jaspr/src/server/async_build_owner.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
@@ -12,7 +14,7 @@ void testComponents(
   String description,
   FutureOr<void> Function(ComponentTester tester) callback, {
   Uri? uri,
-  bool isClient = false,
+  bool isClient = true,
   bool? skip,
   Timeout? timeout,
   dynamic tags,
@@ -113,19 +115,6 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   bool get isClient => _isClient;
 
   @override
-  Future<Map<String, String>> fetchState(String url) {
-    throw UnimplementedError();
-  }
-
-  @override
-  String? getRawState(String id) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void updateRawState(String id, dynamic state) {}
-
-  @override
   void scheduleFrame(VoidCallback frameCallback) {
     Future.microtask(frameCallback);
   }
@@ -134,11 +123,17 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   RenderObject createRootRenderObject() {
     return TestRenderObject();
   }
+
+  @override
+  BuildOwner createRootBuildOwner() {
+    if (!isClient) {
+      return AsyncBuildOwner();
+    }
+    return super.createRootBuildOwner();
+  }
 }
 
 class TestRenderObject extends RenderObject {
-  TestRenderObject? parent;
-
   String? tag;
   String? id;
   String? classes;
@@ -150,8 +145,11 @@ class TestRenderObject extends RenderObject {
   List<TestRenderObject> children = [];
 
   @override
+  TestRenderObject? parent;
+
+  @override
   RenderObject createChildRenderObject() {
-    return TestRenderObject();
+    return TestRenderObject()..parent = this;
   }
 
   @override
@@ -179,24 +177,21 @@ class TestRenderObject extends RenderObject {
   }
 
   @override
-  void attach(TestRenderObject? parent, TestRenderObject? after) {
-    this.parent = parent;
-    if (parent == null) {
-      return;
-    }
-    var children = parent.children;
-    children.remove(this);
+  void attach(TestRenderObject child, {TestRenderObject? after}) {
+    child.parent = this;
+
+    children.remove(child);
     if (after == null) {
-      children.insert(0, this);
+      children.insert(0, child);
     } else {
       var index = children.indexOf(after);
-      children.insert(index + 1, this);
+      children.insert(index + 1, child);
     }
   }
 
   @override
-  void remove() {
-    parent?.children.remove(this);
-    parent = null;
+  void remove(TestRenderObject child) {
+    children.remove(child);
+    child.parent = null;
   }
 }

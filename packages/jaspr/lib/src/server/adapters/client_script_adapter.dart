@@ -17,7 +17,7 @@ class ClientScriptAdapter extends HeadScopeAdapter {
 
     String source;
     if (clientElements.length == 1) {
-      var entry = binding.options.targets[clientElements.first.component.runtimeType]!;
+      var entry = binding.options.clients[clientElements.first.component.runtimeType]!;
       source = '${entry.name}.client';
     } else {
       source = 'main.clients';

@@ -10,63 +10,8 @@ next: /advanced/imports
 In the standard configuration, `jaspr` creates its own http server to handle incoming requests and
 render your components. For this it uses the popular `shelf` package.
 
-If you want, you can customize the server implementation or completely replace it with your own.
+If you want, you can replace the server handling with your own backend setup.
 This allows also the use of your favorite dart backend framework.
-
-## Custom Shelf Middleware
-
-You can add custom shelf middleware to `jaspr`s http server, for example to log requests or add
-additional api endpoints.
-
-First replace your `runApp` method with the `runServer` method. This will return an instance of
-the `ServerApp` class that allows you to customize certain aspects of the http server.
-
-```dart
-void main() {
-  // Similar to [runApp], but returns an instance of [ServerApp]
-  var serverApp = runServer(App());
-  
-  // Attach a listener that is called when the server was started successfully
-  serverApp.setListener((server) {
-    // [server] is the [HttpServer] used to serve your app
-    print('Serving at http://${server.address.host}:${server.port}');
-  });
-  
-  // Adds the [logRequests] middleware to log all incoming requests
-  serverApp.addMiddleware(logRequests);
-  
-  // Adds another shelf middleware. It takes a shelf handler and can modify,
-  // redirect or intercept incoming requests.
-  serverApp.addMiddleware((handler) {
-    return (request) {
-      // inspect or modify [request]
-      
-      // e.g. reroute to a custom handler
-      if (request.url.path.startsWith('api')) {
-        return handleApi(request.change(path: 'api'));
-      }
-      
-      // this will continue with normal server side rendering
-      return handler(request);
-    };
-  });
-}
-
-FutureOr<Response> handleApi(Request request) {
-  return Response.ok('FROM API');
-}
-```
-
-This code will respond `FROM API` to all requests under the `/api` endpoint, and render
-the `App()` component for all other requests.
-
-<Info>
-For a complete app check out the [custom_middleware example](https://github.com/schultek/jaspr/tree/main/examples/custom_server_middleware)
-</Info>
-
-## Custom Backend
-
-If this is not enough, you can go one step further and spin up your own server or use a custom backend framework.
 
 <Info>
 Since `jaspr` is built with `shelf`, this works best when the backend framework is also compatible with shelf.
@@ -84,7 +29,7 @@ When using your own backend setup, you can still do `jaspr serve`, however auto-
 on the server automatically.
 </Warning>
 
-## Example: Shelf
+## Shelf
 
 [`shelf`](https://pub.dev/packages/shelf) is a widely-used package for building server apps with dart that is 
 maintained by the Dart team.
@@ -108,7 +53,7 @@ void main() async {
 }
 ```
 
-Check out our [shelf_backend example](https://github.com/schultek/jaspr/tree/main/examples/shelf_backend)
+Check out our [backend_shelf example](https://github.com/schultek/jaspr/tree/main/examples/backend_shelf)
 to see this in action.
 
 **Make sure** that you set the base path of your app when mounting the `serveApp` handler to
@@ -116,13 +61,22 @@ any other route prefix than `/`, otherwise your static resources like `styles.cs
 can't be loaded correctly. Add the `<base href="/<route_prefix>/">` tag to the `head` of your
 `index.html`, as demonstrated in the example.
 
-## Example: Dart Frog
+## Serverpod
+
+[Serverpod](https://serverpod.dev/) is an open-source, scalable app server, written in Dart for the Flutter community.
+You can use Serverpod and Jaspr together using our official [**Serverpod Integration**](https://pub.dev/packages/jaspr_serverpod)
+to build robust and scalable fullstack websites leveraging Serverpods builtin webserver and additional components.
+
+To get started with combining Jaspr and Serverpod head over to the [documentation of the integration package](https://pub.dev/packages/jaspr_serverpod)
+or checkout the [example](https://github.com/schultek/jaspr/tree/main/examples/backend_serverpod).
+
+## Dart Frog
 
 [`dart_frog`](https://dartfrog.vgv.dev/) is a new backend framework built by Very Good Ventures. You
 can combine it with jaspr to build powerful fullstack web applications that use dart_frog for managing
 the backend api and jaspr for rendering the frontend app.
 
-Check out our [dart_frog_backend example](https://github.com/schultek/jaspr/tree/main/examples/server_dart_frog)
+Check out our [backend_dart_frog example](https://github.com/schultek/jaspr/tree/main/examples/backend_dart_frog)
 to see this in action.
 
 With this, a `dart_frog` route that renders a jaspr component can be as simple as:

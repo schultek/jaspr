@@ -49,7 +49,7 @@ class ImportsOutputBuilder implements Builder {
         
         ${vmShow.isNotEmpty ? """
           export '$relativeDir/_vm.dart' 
-            if (dart.library.html) '$relativeDir/_stubs.dart' 
+            if (dart.library.js_interop) '$relativeDir/_stubs.dart' 
             show ${vmShow.join(', ')};
         """ : ''}
       """));

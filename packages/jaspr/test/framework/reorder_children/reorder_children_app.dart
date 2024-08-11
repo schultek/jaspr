@@ -69,7 +69,7 @@ class ChildComponent extends Component {
   Element createElement() => ChildElement(this);
 }
 
-class ChildElement extends SingleChildElement {
+class ChildElement extends BuildableElement {
   ChildElement(ChildComponent super.component);
 
   @override
@@ -84,5 +84,5 @@ class ChildElement extends SingleChildElement {
   }
 
   @override
-  Component? build() => Text('Child ${component.num}');
+  Iterable<Component> build() => [Text('Child ${component.num}')];
 }

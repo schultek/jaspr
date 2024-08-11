@@ -2,12 +2,12 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import 'effects_controls.dart';
-import 'flutter_app_container.dart' if (dart.library.html) 'flutter_app_container_web.dart';
+import 'flutter_app_container.dart' if (dart.library.js_interop) 'flutter_app_container_web.dart';
 import 'interop_controls.dart';
 
 @client
 class App extends StatelessComponent {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

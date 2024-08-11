@@ -1,4 +1,12 @@
-## Unreleased minor
+## 0.3.2
+
+- `jaspr` upgraded to `0.13.0`
+
+## 0.3.1
+
+- `jaspr` upgraded to `0.12.0`
+
+## 0.3.0
 
 - Changed internal bootstrapping of flutter engine.
 - Requires a peer dependency of `jaspr_web_compilers >= 4.0.9`.

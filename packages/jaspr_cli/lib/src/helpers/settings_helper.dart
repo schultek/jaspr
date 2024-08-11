@@ -59,7 +59,7 @@ final File? settingsFile = () {
     }
   }
 
-  final settingsFile = File('${settingsDir.absolute.path}${path.separator}$_settingsFileName');
+  final settingsFile = File('${settingsDir.path}${path.separator}$_settingsFileName').absolute;
   if (!settingsFile.existsSync()) {
     settingsFile.createSync();
     settingsFile.writeAsStringSync('{"analytics": true}');
@@ -79,7 +79,7 @@ Directory? getSettingsDirectory() {
   if (dir == null) {
     return null;
   }
-  return Directory(path.join(dir.path, _settingsDirectoryName));
+  return Directory(path.join(dir.path, _settingsDirectoryName)).absolute;
 }
 
 /// Return the user's home directory for the current platform.
@@ -87,6 +87,6 @@ Directory? get homeDir {
   var envKey = Platform.operatingSystem == 'windows' ? 'APPDATA' : 'HOME';
   var home = Platform.environment[envKey] ?? '.';
 
-  var dir = Directory(home);
+  var dir = Directory(home).absolute;
   return dir.existsSync() ? dir : null;
 }

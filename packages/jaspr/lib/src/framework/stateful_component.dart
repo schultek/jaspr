@@ -350,6 +350,17 @@ abstract class State<T extends StatefulComponent> {
     assert(_debugLifecycleState == _StateLifecycle.created);
   }
 
+  /// Implement this method to determine whether a rebuild can be skipped.
+  ///
+  /// This method will be called whenever the component is about to update. If returned false, the subsequent rebuild will be skipped.
+  ///
+  /// This method exists only as a performance optimization and gives no guarantees about when the component is rebuilt.
+  /// Keep the implementation as efficient as possible and avoid deep (recursive) comparisons or performance heavy checks, as this might
+  /// have an opposite effect on performance.
+  bool shouldRebuild(covariant T newComponent) {
+    return true;
+  }
+
   /// Called whenever the component configuration changes.
   ///
   /// If the parent component rebuilds and request that this location in the tree
@@ -583,7 +594,7 @@ mixin PreloadStateMixin<T extends StatefulComponent> on State<T> {
 }
 
 /// An [Element] that uses a [StatefulComponent] as its configuration.
-class StatefulElement extends MultiChildElement {
+class StatefulElement extends BuildableElement {
   /// Creates an element that uses the given component as its configuration.
   StatefulElement(StatefulComponent component)
       : _state = component.createState(),
@@ -620,29 +631,22 @@ class StatefulElement extends MultiChildElement {
   State? _state;
   State get state => _state!;
 
+  Future? _asyncInitState;
+
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
+  void didMount() {
     assert(state._debugLifecycleState == _StateLifecycle.created);
 
     // We check if state uses on of the mixins that support async initialization,
-    // which will be handled by [BuildOwner.preformRebuildOn].
-    // In this case we don't call [_initState()] directly here, but rather let it
-    // be called by the mixins implementation.
-
-    Future? asyncFirstBuild;
+    // which will delay the call to [_initState()] until resolved during the first build.
 
     if (owner.isFirstBuild && state is PreloadStateMixin && !binding.isClient) {
-      asyncFirstBuild = (state as PreloadStateMixin).preloadState();
-    }
-
-    if (asyncFirstBuild != null) {
-      _asyncFirstBuild = asyncFirstBuild.then((_) => _initState());
-      asyncFirstBuild.whenComplete(() => _asyncFirstBuild = null);
+      _asyncInitState = (state as PreloadStateMixin).preloadState().then((_) => _initState());
     } else {
       _initState();
     }
 
-    super._firstBuild(onBuilt);
+    super.didMount();
   }
 
   void _initState() {
@@ -655,7 +659,7 @@ class StatefulElement extends MultiChildElement {
         '${state.runtimeType}.initState() returned a Future.\n\n'
         'Rather than awaiting on asynchronous work directly inside of initState, '
         'call a separate method to do this work without awaiting it.\n\n'
-        'If you need to do some async work before the first render, use PreloadStateMixin or DeferRenderMixin on State.',
+        'If you need to do some async work before the first render, use PreloadStateMixin on State.',
       );
     } finally {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
@@ -672,7 +676,16 @@ class StatefulElement extends MultiChildElement {
   }
 
   @override
-  void performRebuild() {
+  FutureOr<void> performRebuild() {
+    if (owner.isFirstBuild && _asyncInitState != null) {
+      return _asyncInitState!.then((_) {
+        if (_didChangeDependencies) {
+          state.didChangeDependencies();
+          _didChangeDependencies = false;
+        }
+        super.performRebuild();
+      });
+    }
     if (_didChangeDependencies) {
       state.didChangeDependencies();
       _didChangeDependencies = false;
@@ -681,16 +694,19 @@ class StatefulElement extends MultiChildElement {
   }
 
   @override
+  bool shouldRebuild(covariant StatefulComponent newComponent) {
+    return state.shouldRebuild(newComponent);
+  }
+
+  @override
   void update(StatefulComponent newComponent) {
     super.update(newComponent);
     assert(component == newComponent);
-    final StatefulComponent oldComponent = state.component;
-
-    // We mark ourselves as dirty before calling didUpdateWidget to
-    // let authors call setState from within didUpdateWidget without triggering
-    // asserts.
-    _dirty = true;
     state._component = newComponent;
+  }
+
+  @override
+  void didUpdate(StatefulComponent oldComponent) {
     try {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
       // TODO: check for returned future
@@ -698,7 +714,7 @@ class StatefulElement extends MultiChildElement {
     } finally {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
     }
-    rebuild();
+    super.didUpdate(oldComponent);
   }
 
   @override

@@ -9,7 +9,9 @@ import 'package:path/path.dart' as p;
 Builder buildStylesheet(BuilderOptions options) => TailwindBuilder(options);
 
 class TailwindBuilder implements Builder {
-  TailwindBuilder(BuilderOptions options);
+  final BuilderOptions options;
+
+  TailwindBuilder(this.options);
 
   @override
   Future<void> build(BuildStep buildStep) async {
@@ -38,18 +40,18 @@ class TailwindBuilder implements Builder {
     var hasCustomConfig = await configFile.exists();
 
     await Process.run(
-      'npx',
+      'tailwindcss',
       [
-        'tailwindcss',
         '--input',
         scratchSpace.fileFor(buildStep.inputId).path,
         '--output',
-        scratchSpace.fileFor(outputId).path,
+        scratchSpace.fileFor(outputId).path.toPosix(),
         '--content',
-        p.join(Directory.current.path, '{lib,web}', '**', '*.dart'),
+        p.join(Directory.current.path, '{lib,web}', '**', '*.dart').toPosix(true),
+        if (options.config.containsKey('tailwindcss')) options.config['tailwindcss'],
         if (hasCustomConfig) ...[
           '--config',
-          p.join(Directory.current.path, 'tailwind.config.js'),
+          p.join(Directory.current.path, 'tailwind.config.js').toPosix(),
         ],
       ],
       workingDirectory: root,
@@ -62,4 +64,14 @@ class TailwindBuilder implements Builder {
   Map<String, List<String>> get buildExtensions => {
         'web/{{file}}.tw.css': ['web/{{file}}.css']
       };
+}
+
+extension POSIXPath on String {
+  String toPosix([bool quoted = false]) {
+    if (Platform.isWindows) {
+      final result = replaceAll('\\', '/');
+      return quoted ? "'$result'" : result;
+    }
+    return this;
+  }
 }

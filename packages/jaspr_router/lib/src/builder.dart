@@ -29,7 +29,6 @@ class RouteBuilder {
 
   /// Builds the top-level Navigator for the given [RouteMatchList].
   Iterable<Component> build(
-    BuildContext context,
     RouterState router,
   ) sync* {
     if (router.matchList.isEmpty) {
@@ -40,22 +39,19 @@ class RouteBuilder {
 
     yield InheritedRouter(
       router: router,
-      child: Builder.single(builder: (context) {
-        return _buildRoute(context, router.matchList, router.routeLoaders);
-      }),
+      child: _buildRoute(router.matchList, router.routeLoaders),
     );
   }
 
-  Component _buildRoute(BuildContext context, RouteMatchList matchList, Map<Object, RouteLoader> loaders) {
+  Component _buildRoute(RouteMatchList matchList, Map<Object, RouteLoader> loaders) {
     try {
-      return _buildRecursive(context, matchList, 0, loaders);
+      return _buildRecursive(matchList, 0, loaders);
     } on _RouteBuilderError catch (e) {
-      return _buildErrorPage(context, e, matchList.uri);
+      return _buildErrorPage(e, matchList.uri);
     }
   }
 
   Component _buildRecursive(
-    BuildContext context,
     RouteMatchList matchList,
     int startIndex,
     Map<Object, RouteLoader> loaders,
@@ -70,14 +66,14 @@ class RouteBuilder {
     final RouteState state = buildState(matchList, match);
     if (route is Route) {
       if (matchList.matches.length > startIndex + 1) {
-        return _buildRecursive(context, matchList, startIndex + 1, loaders);
+        return _buildRecursive(matchList, startIndex + 1, loaders);
       }
 
-      return _callRouteBuilder(context, state, route, loaders);
+      return _callRouteBuilder(state, route, loaders);
     } else if (route is ShellRoute) {
-      var child = _buildRecursive(context, matchList, startIndex + 1, loaders);
+      var child = _buildRecursive(matchList, startIndex + 1, loaders);
 
-      return _callShellRouteBuilder(context, state, route, loaders, child: child);
+      return _callShellRouteBuilder(state, route, loaders, child: child);
     }
 
     throw _RouteBuilderException('Unsupported route type $route');
@@ -109,7 +105,7 @@ class RouteBuilder {
   }
 
   /// Calls the user-provided route builder from the [RouteMatch]'s [RouteBase].
-  Component _callRouteBuilder(BuildContext context, RouteState state, Route route, Map<Object, RouteLoader> loaders) {
+  Component _callRouteBuilder(RouteState state, Route route, Map<Object, RouteLoader> loaders) {
     final RouterComponentBuilder? builder = route.builder;
 
     if (builder == null) {
@@ -129,7 +125,6 @@ class RouteBuilder {
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError) {
                 yield _buildErrorPage(
-                  context,
                   _RouteBuilderError('Failed to load lazy route'),
                   Uri.parse(state.location),
                 );
@@ -149,8 +144,7 @@ class RouteBuilder {
   }
 
   /// Calls the user-provided route builder from the [RouteMatch]'s [RouteBase].
-  Component _callShellRouteBuilder(
-      BuildContext context, RouteState state, ShellRoute route, Map<Object, RouteLoader> loaders,
+  Component _callShellRouteBuilder(RouteState state, ShellRoute route, Map<Object, RouteLoader> loaders,
       {required Component child}) {
     final ShellRouteBuilder builder = route.builder;
 
@@ -166,7 +160,6 @@ class RouteBuilder {
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError) {
                 yield _buildErrorPage(
-                  context,
                   _RouteBuilderError('Failed to load lazy shell route'),
                   Uri.parse(state.location),
                 );
@@ -187,7 +180,6 @@ class RouteBuilder {
 
   /// Builds a an error page.
   Component _buildErrorPage(
-    BuildContext context,
     _RouteBuilderError error,
     Uri uri,
   ) {
@@ -201,7 +193,7 @@ class RouteBuilder {
     );
 
     if (errorBuilder != null) {
-      return errorBuilder!(context, state);
+      return Builder.single(builder: (context) => errorBuilder!(context, state));
     } else {
       return ErrorScreen(state.error);
     }

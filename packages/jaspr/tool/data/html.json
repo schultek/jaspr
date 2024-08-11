@@ -39,6 +39,10 @@
     "h6": {
       "doc": "The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest."
     },
+    "main_": {
+      "tag": "main",
+      "doc": "The &lt;main&gt; HTML element represents the primary content of a document, distinct from content that is repeated across multiple pages such as site headers, footers, and navigation bars."
+    },    
     "nav": {
       "doc": "The &lt;nav&gt; HTML element represents a section of a page whose purpose is to provide navigation links, either within the current document or to other documents. Common examples of navigation sections are menus, tables of contents, and indexes."
     },
@@ -1057,23 +1061,19 @@
       "attributes": {
         "x": {
           "doc": "The x coordinate of the rect.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "y": {
           "doc": "The y coordinate of the rect.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "width": {
           "doc": "The width of the rect.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "height": {
           "doc": "The height of the rect.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
@@ -1083,18 +1083,15 @@
       "attributes": {
         "cx": {
           "doc": "The x-axis coordinate of the center of the circle.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "cy": {
           "doc": "The y-axis coordinate of the center of the circle.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "r": {
           "doc": "The radius of the circle.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
@@ -1104,23 +1101,19 @@
       "attributes": {
         "cx": {
           "doc": "The x-axis coordinate of the center of the ellipse.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "cy": {
           "doc": "The y-axis coordinate of the center of the ellipse.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "rx": {
           "doc": "The radius of the ellipse on the x axis.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "ry": {
           "doc": "The radius of the ellipse on the y axis.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
@@ -1130,23 +1123,19 @@
       "attributes": {
         "x1": {
           "doc": "Defines the x-axis coordinate of the line starting point.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "y1": {
           "doc": "Defines the y-axis coordinate of the line starting point.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "x2": {
           "doc": "Defines the x-axis coordinate of the line ending point.",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "y2": {
           "doc": "Defines the y-axis coordinate of the line ending point.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
@@ -1156,8 +1145,7 @@
       "attributes": {
         "d": {
           "doc": "This attribute defines the shape of the path.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
@@ -1167,8 +1155,7 @@
       "attributes": {
         "points": {
           "doc": "This attribute defines the list of points (pairs of x,y absolute coordinates) required to draw the polygon.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"
@@ -1178,8 +1165,7 @@
       "attributes": {
         "points": {
           "doc": "This attribute defines the list of points (pairs of x,y absolute coordinates) required to draw the polyline.",
-          "type": "string",
-          "required": true
+          "type": "string"
         }
       },
       "inherit": "shapes"

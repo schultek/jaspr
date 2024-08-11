@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../framework/framework.dart';
+import '../../jaspr.dart';
 
 /// Main class for initializing the jaspr framework.
 ///
@@ -23,9 +23,10 @@ class Jaspr {
 /// Global options for configuring jaspr. DO NOT USE DIRECTLY.
 /// Use the generated [defaultJasprOptions] instead.
 class JasprOptions {
-  const JasprOptions({this.targets = const {}});
+  const JasprOptions({this.clients = const {}, this.styles = const []});
 
-  final Map<Type, ClientTarget> targets;
+  final Map<Type, ClientTarget> clients;
+  final List<StyleRule> styles;
 }
 
 /// The target configuration for a @client component. DO NOT USE DIRECTLY.
@@ -36,9 +37,8 @@ class ClientTarget<T extends Component> {
 
   const ClientTarget(this.name, {this.params});
 
-  String dataFor(T component) {
-    if (params == null) return '';
-
-    return 'data=${HtmlEscape(HtmlEscapeMode(escapeLtGt: true)).convert(jsonEncode(params!(component)))}';
+  String? dataFor(T component) {
+    if (params == null) return null;
+    return HtmlEscape(HtmlEscapeMode(escapeLtGt: true)).convert(jsonEncode(params!(component)));
   }
 }

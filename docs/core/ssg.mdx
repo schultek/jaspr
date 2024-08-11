@@ -8,16 +8,16 @@ next: /advanced/islands
 # 📑 Static Site Generation
 
 SSG describes the process of generating all your website routes at build time. Different to SSR, this doesn't require
-a running server that generates your website on each request. Instead, you can run the `jaspr generate` command that generates
-and builds all the routes for your website and outputs only static files that can be deployed to any static hosting provider.
+a running server that generates your website on each request. Instead, `jaspr build` will generate all the routes for
+your website and outputs only static files that can be deployed to any static hosting provider.
 
 ---
 
-To use SSG with Jaspr, you need to setup your app the same way as for server-side rendering. Then instead of building the
-server as an executable, `jaspr generate` will run your app locally and request each route to be rendered into a separate `.html` file.
+To use SSG with Jaspr, choose the `static` mode when creating a new project or set `jaspr.mode = static` in your `build.yaml` file.
+When executing then `jaspr build`, it will run your app locally and request each route to be rendered into a separate `.html` file.
 
-Say you have a server-rendered app with the routes `/`, `/about` and `/contact`. Then running `jaspr generate` will
-output a `index.html`, `about.html` and `contact.html` file.
+Say you have a server-rendered app with the routes `/`, `/about` and `/contact`. Then running `jaspr build` will
+output a `index.html`, `about/index.html` and `contact/index.html` file.
 
 To make sure all pages are generated for your site, you need to tell Jaspr about the routes of your website.
 
@@ -42,7 +42,7 @@ Router(
 You may want to generate dynamic routes based on some data for your application.
 
 Take for example a typical blog site, where each blog post has its own route, e.g. `/posts/{postId}`, and you want
-to render these as separate pages when running `jaspr generate`. Normally you could use routes with path parameters for this,
+to render these as separate pages when running `jaspr build`. Normally you could use routes with path parameters for this,
 however for static-site generation, path parameters are not supported, since all routes need to be resolvable when initializing the router.
 
 Instead, you need to add a route for each page you want generated:

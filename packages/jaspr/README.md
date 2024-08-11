@@ -61,39 +61,39 @@ JasprPad is also built with **Jaspr** itself, so you can [**check out its source
 
 ## Outline
 
-- [Get Started](#get-started)
-- [CLI Tool](#cli-tool)
+- [Get Started](#-get-started)
+- [CLI Tool](#-jaspr-cli)
 - [Framework](#framework)
 - [Differences to Flutter(-Web)](#differences-to-flutter-web)
 - [Building](#building)
 - [Testing](#testing)
 
-## Get Started
+## 🛫 Get Started
 
 To get started simply activate the `jasper_cli` command line tool and run `jaspr create`:
 
 ```shell
 dart pub global activate jaspr_cli
-jaspr create my_web_app
+jaspr create my_website
 ```
 
 Next, run the development server using the following command:
 
 ```shell
-cd my_web_app
+cd my_website
 jaspr serve
 ```
 
 This will spin up a server at `localhost:8080`. You can now start developing your web app. 
 Also observe that the browser automatically refreshes the page when you change something in your code, like the `Hello World` text.
 
-## CLI Tool
+## 🕹 Jaspr CLI
 
-Jaspr comes with a cli tool to create, serve and build your web app.
+Jaspr comes with a cli tool to create, serve and build your website.
 
-- `jaspr create my_web_app` will create a new jaspr project inside the `my_web_app` directory
-- `jaspr serve` will serve the web-app in the current directory, including hot-reloading
-- `jaspr build` will build the web-app containing the static web assets (compiled js, html, ...) and the server executable
+- `jaspr create` will create a new jaspr project. The cli will prompt you for a project name and setup options.
+- `jaspr serve` will serve the website in the current directory, including hot-reloading.
+- `jaspr build` will build the website containing the static assets (compiled js, html, images, etc.) and the optional server executable.
 
 ## Framework
 
@@ -107,26 +107,16 @@ as **Widgets** from Flutter. jaspr comes with all three base types of Components
 - **StatefulComponent**: A component that holds state and can trigger rebuilds using `setState()`.
 - **InheritedComponent**: A component that can notify its dependents when its state changes.
 
-In addition to these base components, there are two more components that don't exist in Flutter:
+In addition to these base components, there are also all **html** elements available as components:
 
-- **DomComponent**: A component that renders any HTML element given a tag, attributes and events.
-  ```dart
-  var component = DomComponent(
-    tag: 'div',
-    id: 'my-id',
-    classes: ['class-a', 'class-b'],
-    attributes: {'my-attribute': 'my-value'},
-    events: {'click': (e) => print('clicked')},
-    children: [
-      ...
-    ],
-  );
-  ```
-  
-- **Text**: A simple component that renders a text node.
-  `var text = Text('Hello World!');`
-  
-[Check the Wiki for more](https://docs.page/schultek/jaspr)
+```dart
+div([
+  h1([text('Welcome to Jaspr')]),
+  p([text('This is some basic html!')])]),
+]);
+```
+
+[Check the Docs for more](https://docs.page/schultek/jaspr)
 
 ## Differences to Flutter(-Web)
 
@@ -178,15 +168,7 @@ You can build your application using the following command:
 jaspr build
 ```
 
-This will build the app inside the `build` directory. 
-You can choose whether to build a standalone executable or an aot or jit snapshot with the `--target` option.
-
-To run your built application do:
-
-```shell
-cd build
-./app
-```
+This will build the app inside the `build/jaspr` directory.
 
 ## Testing
 
@@ -196,25 +178,26 @@ It is built as a layer on top of `package:test` and has a similar api to `flutte
 A simple component test looks like this:
 
 ```dart
+// This also exports 'package:test' so no need for an additional import.
 import 'package:jaspr_test/jaspr_test.dart';
 
-import 'app.dart';
+// Import the components that you want to test.
+import 'my_component.dart';
 
 void main() {
   group('simple component test', () {
-    late ComponentTester tester;
+    testComponents('renders my component', (tester) async {
+      // We want to test the MyComponent component.
+      // Assume this shows a count and a button to increase it.
+      await tester.pumpComponent(MyComponent());
 
-    setUp(() {
-      tester = ComponentTester.setUp();
-    });
-
-    test('should render component', () async {
-      await tester.pumpComponent(App());
-
+      // Should render a [Text] component with content 'Count: 0'.
       expect(find.text('Count: 0'), findsOneComponent);
 
+      // Searches for the <button> element and simulates a click event.
       await tester.click(find.tag('button'));
 
+      // Should render a [Text] component with content 'Count: 1'.
       expect(find.text('Count: 1'), findsOneComponent);
     });
   });

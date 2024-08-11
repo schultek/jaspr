@@ -4,7 +4,7 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import '../providers/app_state_provider.dart';
 
 class InteropControls extends StatefulComponent {
-  const InteropControls({Key? key}) : super(key: key);
+  const InteropControls({super.key});
 
   @override
   State<InteropControls> createState() => _InteropControlsState();

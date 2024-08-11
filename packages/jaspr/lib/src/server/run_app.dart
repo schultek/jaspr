@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:shelf/shelf.dart';
 
@@ -13,12 +14,6 @@ import 'server_handler.dart';
 void runApp(Component app) {
   _checkInitialized('runApp');
   ServerApp.run(_createSetup(app));
-}
-
-/// Same as [runApp] but returns an instance of [ServerApp] to control aspects of the http server
-ServerApp runServer(Component app) {
-  _checkInitialized('runServer');
-  return ServerApp.run(_createSetup(app));
 }
 
 /// Returns a shelf handler that serves the provided component and related assets
@@ -37,20 +32,18 @@ typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render)
 /// Directly renders the provided component into a html string
 Future<String> renderComponent(Component app) async {
   _checkInitialized('renderComponent');
-  return renderHtml(_createSetup(app), Uri.parse('https://0.0.0.0/'), (name) async {
-    var response = await staticFileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
-    return response.readAsString();
+  var fileHandler = staticFileHandler();
+  return render(_createSetup(app), Uri.parse('https://0.0.0.0/'), (name) async {
+    var response = await fileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
+    return response.statusCode == 200 ? response.readAsString() : null;
   });
 }
 
 void _checkInitialized(String method) {
-  assert(() {
-    if (!Jaspr.isInitialized) {
-      print("[WARNING] Jaspr was not initialized. Call Jaspr.initializeApp() before calling $method(). "
-          "This will be required in a future version of jaspr and result in an error.");
-    }
-    return true;
-  }());
+  if (!Jaspr.isInitialized) {
+    stderr.write("Error: Jaspr was not initialized. Call Jaspr.initializeApp() before calling $method()");
+    exit(-1);
+  }
 }
 
 SetupFunction _createSetup(Component app) {

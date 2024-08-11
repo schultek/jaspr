@@ -12,6 +12,32 @@ to write a lot of css.
 
 Jaspr has a first-class tailwind integration called `jaspr_tailwind`.
 
+## Prerequisites
+
+This package expects tailwind to be installed through the `tailwindcss` command. The recommended way is to use
+the [standalone tailwind cli](https://tailwindcss.com/blog/standalone-cli).
+
+To install it, download the executable for your platform from the [latest release](https://github.com/tailwindlabs/tailwindcss/releases/latest)
+on GitHub and give it executable permissions:
+
+```shell
+curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-<your-platform>
+chmod +x tailwindcss-<your-platform>
+```
+
+Next move it to a common executable location or add its location to your **PATH**:
+
+```shell
+# e.g. /usr/local/bin on unix based systems (linux, macos)
+mv tailwindcss-<your-platform> /usr/local/bin/tailwindcss
+```
+
+Test your installation by typing in your terminal:
+
+```shell
+tailwindcss -h
+```
+
 ## Setup
 
 Simply add `jaspr_tailwind` as a dev dependency to your project:
@@ -67,13 +93,13 @@ class SimpleCard extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4'.split(' '), [
-      div(classes: ['shrink-0'], [
-        img(classes: 'h-12 w-12'.split(' '), src: '/img/logo.svg', alt: '$title Logo'),
+    yield div(classes: 'p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4', [
+      div(classes: 'shrink-0', [
+        img(classes: 'h-12 w-12', src: '/img/logo.svg', alt: '$title Logo'),
       ]),
       div([
-        div(classes: 'text-xl font-medium text-black'.split(' '), [text(title)]),
-        p(classes: ['text-slate-500'], [text(message)]),
+        div(classes: 'text-xl font-medium text-black', [text(title)]),
+        p(classes: 'text-slate-500', [text(message)]),
       ])
     ]);
   }

@@ -118,6 +118,17 @@ abstract class StatelessComponent extends Component {
   ///  * [StatelessComponent], which contains the discussion on performance considerations.
   @protected
   Iterable<Component> build(BuildContext context);
+
+  /// Implement this method to determine whether a rebuild can be skipped.
+  ///
+  /// This method will be called whenever the component is about to update. If returned false, the subsequent rebuild will be skipped.
+  ///
+  /// This method exists only as a performance optimization and gives no guarantees about when the component is rebuilt.
+  /// Keep the implementation as efficient as possible and avoid deep (recursive) comparisons or performance heavy checks, as this might
+  /// have an opposite effect on performance.
+  bool shouldRebuild(covariant Component newComponent) {
+    return true;
+  }
 }
 
 /// Mixin on [StatelessComponent] that performs some async task on the first build
@@ -126,32 +137,45 @@ mixin OnFirstBuild on StatelessComponent {
 }
 
 /// An [Element] that uses a [StatelessComponent] as its configuration.
-class StatelessElement extends MultiChildElement {
+class StatelessElement extends BuildableElement {
   /// Creates an element that uses the given component as its configuration.
   StatelessElement(StatelessComponent super.component);
 
   @override
   StatelessComponent get component => super.component as StatelessComponent;
 
-  @override
-  Iterable<Component> build() => component.build(this);
+  Future? _asyncFirstBuild;
 
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
+  void didMount() {
+    // We check if the component uses on of the mixins that support async initialization,
+    // which will delay the call to [build()] until resolved during the first build.
+
     if (owner.isFirstBuild && !binding.isClient && component is OnFirstBuild) {
       var result = (component as OnFirstBuild).onFirstBuild(this);
       if (result is Future) {
         _asyncFirstBuild = result;
-        result.whenComplete(() => _asyncFirstBuild = null);
       }
     }
-    super._firstBuild(onBuilt);
+
+    super.didMount();
   }
 
   @override
-  void update(StatelessComponent newComponent) {
-    super.update(newComponent);
-    _dirty = true;
-    rebuild();
+  bool shouldRebuild(covariant Component newComponent) {
+    return component.shouldRebuild(newComponent);
+  }
+
+  @override
+  Iterable<Component> build() => component.build(this);
+
+  @override
+  FutureOr<void> performRebuild() {
+    if (owner.isFirstBuild && _asyncFirstBuild != null) {
+      return _asyncFirstBuild!.then((_) {
+        super.performRebuild();
+      });
+    }
+    super.performRebuild();
   }
 }

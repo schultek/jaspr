@@ -1,0 +1,65 @@
+{
+  "moduleName": "dart_quotes",
+  "tables": [
+    {
+      "name": "quotes",
+      "dartName": "Quote",
+      "module": "dart_quotes",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "columnType": 2,
+          "isNullable": false,
+          "columnDefault": "nextval('quotes_id_seq'::regclass)",
+          "dartType": "int?"
+        },
+        {
+          "name": "quote",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "author",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "likes",
+          "columnType": 8,
+          "isNullable": false,
+          "dartType": "List<int>"
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "indexName": "quotes_pkey",
+          "elements": [
+            {
+              "type": 0,
+              "definition": "id"
+            }
+          ],
+          "type": "btree",
+          "isUnique": true,
+          "isPrimary": true
+        }
+      ],
+      "managed": true
+    }
+  ],
+  "installedModules": [
+    {
+      "module": "serverpod",
+      "version": "20240115074235544"
+    },
+    {
+      "module": "dart_quotes",
+      "version": "20240523111535153"
+    }
+  ],
+  "migrationApiVersion": 1
+}
