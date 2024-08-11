@@ -6,6 +6,7 @@ import 'package:web/web.dart' as web;
 import '../foundation/constants.dart';
 import '../foundation/events/events.dart';
 import '../framework/framework.dart';
+import 'utils.dart';
 
 const htmlns = 'http://www.w3.org/1999/xhtml';
 const xmlns = {
@@ -48,8 +49,8 @@ class DomRenderObject extends RenderObject {
     late web.Element elem;
 
     var namespace = xmlns[tag];
-    if ((namespace, parent?.node) case (== null, web.Element pnode)) {
-      namespace = pnode.namespaceURI;
+    if (namespace == null && (parent?.node?.instanceOfString("Element") ?? false)) {
+      namespace = (parent?.node as web.Element).namespaceURI;
     }
 
     diff:
@@ -84,8 +85,7 @@ class DomRenderObject extends RenderObject {
         node!.parentNode!.replaceChild(elem, old);
         node = elem;
         if (old.childNodes.length > 0) {
-          var oldChildren = old.childNodes.toIterable();
-          for (var child in oldChildren) {
+          for (var child in old.childNodes.toIterable()) {
             elem.append(child as dynamic);
           }
         }
@@ -304,26 +304,18 @@ class EventBinding {
 
 extension AttributeOperation on web.Element {
   void clearOrSetAttribute(String name, String? value) {
-    final current = getAttribute(name);
-    if (current == value) return;
     if (value == null) {
+      if (!hasAttribute(name)) return;
       if (kVerboseMode) {
         print("Remove attribute: $name");
       }
       removeAttribute(name);
     } else {
+      if (getAttribute(name) == value) return;
       if (kVerboseMode) {
         print("Update attribute: $name - $value");
       }
       setAttribute(name, value);
-    }
-  }
-}
-
-extension on web.NodeList {
-  Iterable<web.Node> toIterable() sync* {
-    for (var i = 0; i < length; i++) {
-      yield item(i)!;
     }
   }
 }

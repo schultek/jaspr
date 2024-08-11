@@ -3,6 +3,7 @@ import 'dart:js_interop';
 import 'package:web/web.dart' as web;
 
 import '../../../browser.dart';
+import '../../browser/utils.dart';
 
 class RawText extends StatelessComponent {
   const RawText(this.text, {super.key});

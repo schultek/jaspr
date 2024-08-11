@@ -3,6 +3,7 @@ import 'dart:js_interop';
 import 'package:web/web.dart' as web;
 
 import '../../../browser.dart';
+import '../../browser/utils.dart';
 
 abstract class Document implements Component {
   const factory Document.html({
@@ -175,7 +176,7 @@ class AttachAdapter {
 
   late final web.Element element = web.document.querySelector(target.name)!;
 
-  late final Map<String, String> initialAttributes = {...element.attributes.toMap()};
+  late final Map<String, String> initialAttributes = element.attributes.toMap();
 
   late final (web.Node, web.Node) attachWindow = () {
     var iterator = web.document.createNodeIterator(element, 128);
@@ -246,7 +247,10 @@ class AttachAdapter {
         }
       }
 
-      var attributesToRemove = element.attributes.keys.toSet();
+      var attributesToRemove = <String>{};
+      for (var i = 0; i < element.attributes.length; i++) {
+        attributesToRemove.add(element.attributes.item(i)!.name);
+      }
       if (attributes.isNotEmpty) {
         for (var attr in attributes.entries) {
           element.clearOrSetAttribute(attr.key, attr.value);
