@@ -19,7 +19,7 @@ For a general guide about data-fetching on the server see [Data Fetching](/conce
 Start by annotating a field of your `StatefulComponent` with `@sync`:
 
 ```dart title="lib/my_component.dart"
-class MyComponent extends StatefulComponent { ... }
+class MyComponent extends StatefulComponent { /* ... */ }
 
 class MyComponentState extends State<MyComponent> {
 
@@ -36,7 +36,7 @@ a `<ComponentStateName>SyncMixin` that you have to apply to your state class:
 ```dart title="lib/my_component.dart"
 import 'my_component.sync.dart';
 
-class MyComponent extends StatefulComponent { ... }
+class MyComponent extends StatefulComponent { /* ... */ }
 
 class MyComponentState extends State<MyComponent> with MyComponentStateSyncMixin {
 
@@ -64,10 +64,10 @@ Or you can use custom data types by using the `@encoder` and `@decoder` annotati
 ```dart title="model.dart"
 class Model {
   @decoder
-  static Model fromJson(Map<String, dynamic> json) => ...;
+  static Model fromJson(Map<String, dynamic> json) => /* ... */;
 
   @encoder
-  Map<String, dynamic> toJson() => ...;
+  Map<String, dynamic> toJson() => /* ... */;
 }
 ```
 
@@ -85,7 +85,7 @@ When the data is **synchronous** you can simply assign the value of a `@sync` fi
 ```dart title="lib/my_component.dart"
 import 'my_component.sync.dart';
 
-class MyComponent extends StatefulComponent { ... }
+class MyComponent extends StatefulComponent { /* ... */ }
 
 class MyComponentState extends State<MyComponent> with MyComponentStateSyncMixin {
 
@@ -121,7 +121,7 @@ to perform any asynchronous work before `initState()` is called on the server:
 ```dart title="lib/my_component.dart"
 import 'my_component.sync.dart';
 
-class MyComponent extends StatefulComponent { ... }
+class MyComponent extends StatefulComponent { /* ... */ }
 
 class MyComponentState extends State<MyComponent> with MyComponentStateSyncMixin, PreloadStateMixin {
 

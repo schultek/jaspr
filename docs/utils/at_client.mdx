@@ -38,7 +38,7 @@ class App extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield ...;
+    yield /* ... */;
   }
 }
 ```
@@ -103,7 +103,7 @@ class MyClientComponent extends StatelessComponent {
     // Inject the shared container at the root of each client component tree.
     yield InheritedStateContainer(
       container: _container,
-      child: ...,
+      child: /* ... */,
     );
   }
 }
@@ -124,7 +124,7 @@ class MyClientComponent extends StatelessComponent {
     // Use the shared container for the provider scope.
     yield ProviderScope(
       container: _container,
-      child: ...,
+      child: /* ... */,
     );
   }
 }
@@ -145,7 +145,7 @@ class App extends StatelessComponent {
 
   final String title;
 
-  ...
+  /* ... */
 }
 ```
 
@@ -158,10 +158,10 @@ Or you can use custom data types by using the `@encoder` and `@decoder` annotati
 ```dart title="model.dart"
 class Model {
   @decoder
-  static Model fromJson(Map<String, dynamic> json) => ...;
+  static Model fromJson(Map<String, dynamic> json) => /* ... */;
 
   @encoder
-  Map<String, dynamic> toJson() => ...;
+  Map<String, dynamic> toJson() => /* ... */;
 }
 ```
 

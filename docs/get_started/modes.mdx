@@ -81,7 +81,7 @@ Instead, you need to add a route for each page you want generated:
 Router(
   routes: [
     for (var post in posts)
-      Route(path: '/posts/${post.id}', ...),
+      Route(path: '/posts/${post.id}', /* ... */),
   ],
 );
 ```

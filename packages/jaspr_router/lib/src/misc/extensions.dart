@@ -9,15 +9,13 @@ import '../router.dart';
 /// Dart extension to add navigation function to a BuildContext object, e.g.
 /// context.push('/');
 extension GoRouterHelper on BuildContext {
-  /// Push a location onto the page stack.
+  /// Pushes a new route onto the history stack.
   ///
   /// See also:
-  /// * [replace] which replaces the top-most page of the page stack but treats
-  ///   it as the same page. The page key will be reused. This will preserve the
-  ///   state and not run any page animation.
+  /// * [replace] which replaces the history entry with the new route.
   Future<void> push(String location, {Object? extra}) => Router.of(this).push(location, extra: extra);
 
-  /// Navigate to a named route onto the page stack.
+  /// Pushes a named route onto the history stack.
   Future<void> pushNamed(
     String name, {
     Map<String, String> params = const <String, String>{},
@@ -26,29 +24,18 @@ extension GoRouterHelper on BuildContext {
   }) =>
       Router.of(this).pushNamed(name, params: params, queryParams: queryParams, extra: extra);
 
-  void back() => Router.of(this).back();
-
-  /// Replaces the top-most page of the page stack with the given one but treats
-  /// it as the same page.
-  ///
-  /// The page key will be reused. This will preserve the state and not run any
-  /// page animation.
+  /// Replaces the current history entry with a new route.
   ///
   /// See also:
-  /// * [push] which pushes the given location onto the page stack.
-  ///   always uses a new page key.
+  /// * [push] which pushes the route to the history stack.
   void replace(String location, {Object? extra}) => Router.of(this).replace(location, extra: extra);
 
-  /// Replaces the top-most page with the named route and optional parameters,
-  /// preserving the page key.
+  /// Replaces the current history entry with a named route.
   ///
-  /// This will preserve the state and not run any page animation. Optional
-  /// parameters can be provided to the named route, e.g. `name='person',
-  /// params={'fid': 'f2', 'pid': 'p1'}`.
+  /// Optional parameters can be provided to the named route, e.g. `params: {'userId': '123'}`.
   ///
   /// See also:
-  /// * [pushNamed] which pushes the given location onto the page stack.
-  ///   stack but always uses a new page key.
+  /// * [pushNamed] which pushes a named route onto the history stack.
   void replaceNamed(
     String name, {
     Map<String, String> params = const <String, String>{},
@@ -56,4 +43,17 @@ extension GoRouterHelper on BuildContext {
     Object? extra,
   }) =>
       Router.of(this).replaceNamed(name, params: params, queryParams: queryParams, extra: extra);
+
+  /// Triggers the browsers back navigation.
+  void back() => Router.of(this).back();
+
+  /// Get a location from route name and parameters.
+  /// This is useful for redirecting to a named location.
+  String namedLocation(
+    String name, {
+    Map<String, String> params = const <String, String>{},
+    Map<String, dynamic> queryParams = const <String, dynamic>{},
+  }) {
+    return Router.of(this).namedLocation(name, params: params, queryParams: queryParams);
+  }
 }

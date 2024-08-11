@@ -20,13 +20,13 @@ For a general guide about data-fetching on the server see [Data Fetching](/conce
 Start by adding the `PreloadStateMixin` on a `StatefulComponent`s `State` class and implement the `Future<T> preloadState()` method.
 
 ```dart
-class MyStatefulComponent extends StatefulComponent { ... }
+class MyStatefulComponent extends StatefulComponent { /* ... */ }
 
 class MyState extends State<MyStatefulComponent> with PreloadStateMixin {
 
   @override
   Future<void> preloadState() async {
-    ...
+    /* ... */
   }
 }
 ```

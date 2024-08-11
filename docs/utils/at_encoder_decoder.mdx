@@ -31,13 +31,13 @@ In practice this can look like this:
 ```dart title="model.dart"
 class Model {
   // Constructors, fields, etc.
-  ...
+  /* ... */
 
   @decoder
-  static Model decode(Map<String, dynamic> data) => ...;
+  static Model decode(Map<String, dynamic> data) => /* ... */;
 
   @encoder
-  Map<String, dynamic> encode() => ...;
+  Map<String, dynamic> encode() => /* ... */;
 }
 ```
 
@@ -75,7 +75,7 @@ extension type ModelOverride(Model model) implements Model {
     return ModelOverride(
       Model(
         // decode the values of [data]
-        ...
+        /* ... */
       ),
     );
   }
@@ -83,7 +83,7 @@ extension type ModelOverride(Model model) implements Model {
   @encoder
   Map<String, dynamic> encode() => {
       // encode the values of [model]
-      ...
+      /* ... */
     };
 }
 ```

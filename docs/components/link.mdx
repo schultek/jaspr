@@ -34,7 +34,7 @@ renders to
 ## Client-Side Navigation
 
 When using client-side routing, the `Link` component will override the default behavior of the `<a>`
-tag and use the `Router`s `push()` or `replace()` method to navigate to the target route when clicked.
+tag and use the [`Router`s](/components/router) `push()` or `replace()` method to navigate to the target route when clicked.
 
 ## Parameters
 
@@ -42,7 +42,7 @@ tag and use the `Router`s `push()` or `replace()` method to navigate to the targ
 - `replace`: Whether to replace the route instead of pushing. *Only affects client-side routing.*
 - `extra`: The extra data to attach to the new route. *Only affects client-side routing.*
 - `preload`: Whether to preload the target route when the link is hovered. *Only affects client-side routing when using lazy routes.*
-- `target`: The `target` attribute value to apply to the anchor element.
-- `referrer`: The `referrerpolicy` attribute value to apply to the anchor element.
-- `classes`, `styles`, `attributes`: Other standard properties to apply to the anchor element.
+- `target`: The `target` attribute value applied to the anchor element.
+- `referrer`: The `referrerpolicy` attribute value applied to the anchor element.
+- `classes`, `styles`, `attributes`: Other standard properties applied to the anchor element.
 - `child` and `children`: Components to render inside the anchor element.

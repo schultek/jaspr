@@ -92,13 +92,13 @@ Learn more about how to use the [AsyncBuilder](/components/async_components) and
 If you have a `StatefulComponent` you can also load asynchronous data using the `PreloadStateMixin`:
 
 ```dart
-class MyStatefulComponent extends StatefulComponent { ... }
+class MyStatefulComponent extends StatefulComponent { /* ... */ }
 
 class MyState extends State<MyStatefulComponent> with PreloadStateMixin {
 
   @override
   Future<void> preloadState() async {
-    ...
+    /* ... */
   }
 }
 ```
@@ -144,7 +144,7 @@ class App extends StatelessComponent {
 
   final String title;
 
-  ...
+  /* ... */
 }
 ```
 
@@ -157,7 +157,7 @@ Alternatively, you can use the `@sync` annotation on any field of a `StatefulCom
 cause that field to be synced to the client and have the same value on the client as during pre-rendering on the server.
 
 ```dart
-class MyComponent extends StatefulComponent { ... }
+class MyComponent extends StatefulComponent { /* ... */ }
 
 class MyComponentState extends State<MyComponent> {
 
