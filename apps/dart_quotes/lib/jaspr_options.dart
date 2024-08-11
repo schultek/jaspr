@@ -28,7 +28,7 @@ final defaultJasprOptions = JasprOptions(
     prefix0.QuoteLikeButton:
         ClientTarget<prefix0.QuoteLikeButton>('components/quote_like_button', params: _prefix0QuoteLikeButton),
   },
-  styles: [
+  styles: () => [
     ...prefix0.QuoteLikeButton.styles,
     ...prefix1.HomePage.styles,
     ...prefix2.QuotePage.styles,

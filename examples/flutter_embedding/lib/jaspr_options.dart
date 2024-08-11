@@ -22,4 +22,4 @@ import 'components/app.dart' as prefix0;
 /// ```
 final defaultJasprOptions = JasprOptions(clients: {
   prefix0.App: ClientTarget<prefix0.App>('components/app'),
-}, styles: []);
+}, styles: () => []);
