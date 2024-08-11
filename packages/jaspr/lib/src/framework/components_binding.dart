@@ -18,6 +18,7 @@ mixin ComponentsBinding on AppBinding {
       element._renderObject = createRootRenderObject();
 
       await buildOwner.performInitialBuild(element);
+      completeInitialFrame();
 
       _rootElement = element;
 
