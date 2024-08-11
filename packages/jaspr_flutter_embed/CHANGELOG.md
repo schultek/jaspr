@@ -1,3 +1,8 @@
+## Unreleased minor
+
+- Change to new js interop system.
+- Enable flutter multi-view embedding.
+
 ## 0.3.2
 
 - `jaspr` upgraded to `0.13.0`
