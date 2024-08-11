@@ -148,7 +148,7 @@ class CodecModuleBuilder implements Builder {
 
           return (element, decoder, encoder);
         })
-        .whereNotNull()
+        .nonNulls
         .toList();
 
     if (annotated.isEmpty) {
