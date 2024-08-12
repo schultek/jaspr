@@ -8,4 +8,138 @@ description: Improve your sites SEO and add meta tags.
 
 ---
 
-TODO
+Jaspr gives you all the tools you need to build websites with great SEO performance. Below is a collection
+of features and techniques related to improving SEO for your site.
+
+<Info>
+This page is about what features Jaspr has that relate to SEO, not an in-depth guide on how to generally do SEO for websites.
+There are lots of other resources on that topic, most of which are applicable for any kind of website and translate well to Jaspr.
+</Info>
+
+## Pre-rendering
+
+Pre-rendering can improve SEO performance in a meaningful way, since the browser immediately receives the full html
+of your website and doesn't need to wait until the javascript is loaded to display your content.
+
+This is a core feature of Jaspr and supported by both **static** and **server** mode. See [Rendering Modes](/get_started/modes)
+for more details on this topic.
+
+---
+
+## Meta Information
+
+The meta information of your website is usually supposed to be consumed by search engines, crawlers or social previews.
+It consists of non-ui elements like title and meta tags like description, keywords or social preview image.
+
+Common meta tags include:
+
+- **description**: A short description of your site. This is typically what is shown in search results of your site.
+- **keywords**: Some keywords for your site.
+- **og:title**: The title to show in a social preview card.
+- **og:image**: The image to show in a social preview card.
+
+### Static meta information
+
+Out-of-the-box, Jaspr sets sensible defaults for this information, which you can override if needed.
+
+In **static** or **server** mode, the [Document](/components/document) component has a couple of parameters that can be
+used to set the following information:
+
+- **title**: Sets the overall `<title>` of the site.
+- **lang**: Sets the `<html lang="...">` attribute that defines the language of the site.
+- **viewport**: Sets the viewport of the site, defaults to `'width=device-width, initial-scale=1.0'`.
+- **meta**: Sets any additional `<meta>` tags.
+
+In **client** mode the `web/index.html` file contains some default tags inside `<head>`, which can be customized as needed.
+
+### Dynamic meta information
+
+In the above section you learn how to set meta information for the whole website. However in many cases, you want to set
+page specific information, e.g. the `/users` page should have a different description than the home page, or a `/article/:articleId`
+should have a summary of the article as its description together with a social preview image.
+
+In these cases you can use the [`Document.head()`](/components/document#documenthead) component to set meta information
+from **anywhere in the component tree**. This will override the global meta information e.g. for a specific route.
+
+```dart
+Document.head(
+  title: "My Page Title",
+  meta: {"description": "My Page Description"}
+),
+```
+
+---
+
+## Reducing the amount of loaded javascript
+
+The best way to improve the load time of your website on the client, is to simply remove the amount of javascript
+that needs to be loaded by the browser.
+
+An important consideration for this is to think about what part of your website actually needs to be interactive, and
+then only shipping javascript for this part.
+
+For example if you are building a blog site with mostly static content, but with one small "Like" button on the page,
+its rather inefficient to ship the whole component tree to the client just to make that button interactive. Rather
+you should use targeted [hydration](/get_started/hydration) to only ship the button component.
+
+If you are using [@client](/utils/at_client) component, this translates to "move the `@client` annotation as much down the
+component tree as possible".
+
+Once you have optimized the overall hydration of your site, you can use code splitting to further reduce the initial js
+bundle size.
+
+### Code Splitting
+
+Code splitting can improve the load time of your client-side javascript bundle that is compiled from your Dart source.
+It allows you to split up the compiled javascript into smaller chunks and load them only when needed.
+
+This functionality is built into Dart using a concept called [deferred imports](https://dart.dev/language/libraries#lazily-loading-a-library).
+You can use a deferred import for lazily importing any Dart library, whether it is in your own codebase or from a package.
+
+For example lazy-loading a component could look like this:
+
+```dart
+// Use the "deferred as" syntax to specify a deferred import.
+import 'components/hello.dart' deferred as hello;
+
+class MyPage extends StatelessComponent {
+
+  Iterable<Component> build(BuildContext context) sync* {
+    yield FutureBuilder(
+      // This loads in the library when first built.
+      future: hello.loadLibrary(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          // Show the component only once loaded.
+          return hello.Hello();
+        } else {
+          // Else show a fallback component.
+          return Fallback();
+        }
+      }
+    );
+  }
+}
+```
+
+Loading a library like this mostly makes sense if the library is rather complex and would add a significant amount of
+code to the javascript bundle. Some potential use-cases can be:
+
+- Dialog components that are only loaded when needed.
+- A screen that is only shown to a certain group of users and shouln't slow down the page load for others.
+- Business logic for extended user flows that is loaded in as needed.
+
+Checkout the [official documentation](https://dart.dev/language/libraries#lazily-loading-a-library) on deferred imports for more information.
+
+---
+
+## Other Techniques
+
+There are of course a lot more techniques to improve SEO but are either too specific or too general to cover here.
+Some honorable mentions are:
+
+- Adding `alt` attributes to all images.
+- Optimizing images in size and format (e.g. `.webp`)
+- Optimizing fonts.
+- Preloading assets using `<link rel="preload">`
+-
