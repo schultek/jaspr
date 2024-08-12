@@ -31,9 +31,9 @@ Future<FlutterApp> _flutterApp = Future(() {
   return completer.future;
 });
 
-Future<int> addView(Element target, flt.Widget widget) async {
+Future<int> addView(Element target, ViewConstraints? constraints, flt.Widget widget) async {
   var app = await _flutterApp;
-  var id = app.addView(ViewOptions(hostElement: target));
+  var id = app.addView(ViewOptions(hostElement: target, viewConstraints: constraints));
   _viewWidgets[id] = widget;
   return id;
 }
@@ -91,11 +91,20 @@ extension type AppRunner._(JSObject _) implements JSObject {
 }
 
 extension type ViewOptions._(JSObject _) {
-  external ViewOptions({Element? hostElement, JSAny? initialData});
+  external ViewOptions({Element? hostElement, JSAny? initialData, ViewConstraints? viewConstraints});
 }
 
 extension type FlutterApp._(JSObject _) implements JSObject {
   external int addView(ViewOptions options);
 
   external void removeView(int viewId);
+}
+
+extension type ViewConstraints._(JSObject _) {
+  external ViewConstraints({double? minWidth, double? maxWidth, double? minHeight, double? maxHeight});
+
+  external double? minWidth;
+  external double? maxWidth;
+  external double? minHeight;
+  external double? maxHeight;
 }

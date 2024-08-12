@@ -5,11 +5,22 @@ import 'package:jaspr/browser.dart';
 
 import 'run_flutter_app.dart';
 
-class FlutterEmbedView extends StatefulComponent {
-  const FlutterEmbedView({required this.app, this.loader, this.id, this.classes, this.styles, super.key});
+export 'run_flutter_app.dart' show ViewConstraints;
 
-  final flt.Widget app;
+class FlutterEmbedView extends StatefulComponent {
+  const FlutterEmbedView({
+    this.app,
+    this.loader,
+    this.constraints,
+    this.id,
+    this.classes,
+    this.styles,
+    super.key,
+  });
+
+  final flt.Widget? app;
   final Component? loader;
+  final ViewConstraints? constraints;
   final String? id;
   final String? classes;
   final Styles? styles;
@@ -30,9 +41,9 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
     if (kIsWeb) {
       context.binding.addPostFrameCallback(() async {
         var element = findChildDomElement(context as Element)!;
-        viewId = await addView(element, flt.StatefulBuilder(builder: (context, setState) {
+        viewId = await addView(element, component.constraints, flt.StatefulBuilder(builder: (context, setState) {
           rebuildFlutterApp = () => setState(() {});
-          return component.app;
+          return component.app ?? flt.SizedBox.shrink();
         }));
       });
     }
@@ -68,8 +79,22 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(id: component.id, classes: component.classes, styles: component.styles, [
-      if (component.loader != null) component.loader!,
-    ]);
+    yield div(
+      id: component.id,
+      classes: component.classes,
+      styles: Styles.combine([
+        if (component.constraints case final c?)
+          Styles.box(
+            minWidth: c.minWidth != double.infinity ? c.minWidth?.px : null,
+            maxWidth: c.maxWidth != double.infinity ? c.maxWidth?.px : null,
+            minHeight: c.minHeight != double.infinity ? c.minHeight?.px : null,
+            maxHeight: c.maxHeight != double.infinity ? c.maxHeight?.px : null,
+          ),
+        if (component.styles != null) component.styles!
+      ]),
+      [
+        if (component.loader != null && viewId == null) component.loader!,
+      ],
+    );
   }
 }
