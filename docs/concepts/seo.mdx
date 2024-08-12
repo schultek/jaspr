@@ -58,7 +58,7 @@ In the above section you learn how to set meta information for the whole website
 page specific information, e.g. the `/users` page should have a different description than the home page, or a `/article/:articleId`
 should have a summary of the article as its description together with a social preview image.
 
-In these cases you can use the [`Document.head()`](/components/document#documenthead) component to set meta information
+In these cases you can use the `Document.head()` component to set meta information
 from **anywhere in the component tree**. This will override the global meta information e.g. for a specific route.
 
 ```dart
@@ -68,22 +68,24 @@ Document.head(
 ),
 ```
 
+See the [Document.head()](/components/document#documenthead) docs for more details on how to use it.
+
 ---
 
 ## Reducing the amount of loaded javascript
 
-The best way to improve the load time of your website on the client, is to simply remove the amount of javascript
+The best way to improve the load time of your website on the client is to simply reduce the amount of javascript
 that needs to be loaded by the browser.
 
 An important consideration for this is to think about what part of your website actually needs to be interactive, and
-then only shipping javascript for this part.
+then only shipping javascript for that part.
 
-For example if you are building a blog site with mostly static content, but with one small "Like" button on the page,
+For example if you are building a blog site with mostly static content but with one small "Like" button on the page,
 its rather inefficient to ship the whole component tree to the client just to make that button interactive. Rather
 you should use targeted [hydration](/get_started/hydration) to only ship the button component.
 
 If you are using [@client](/utils/at_client) component, this translates to "move the `@client` annotation as much down the
-component tree as possible".
+component tree as possible". See the [Hydration](/get_started/hydration) docs for more details.
 
 Once you have optimized the overall hydration of your site, you can use code splitting to further reduce the initial js
 bundle size.
@@ -142,4 +144,3 @@ Some honorable mentions are:
 - Optimizing images in size and format (e.g. `.webp`)
 - Optimizing fonts.
 - Preloading assets using `<link rel="preload">`
--
