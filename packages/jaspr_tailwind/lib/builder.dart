@@ -34,8 +34,6 @@ class TailwindBuilder implements Builder {
     var assets = await buildStep.findAssets(Glob('{lib,web}/**.dart')).toList();
     await Future.wait(assets.map((a) => buildStep.canRead(a)));
 
-    var root = p.normalize(p.join(Directory.current.path, '.dart_tool', Uri.parse(packageConfig['rootUri']!).path));
-
     var configFile = File('tailwind.config.js');
     var hasCustomConfig = await configFile.exists();
 
@@ -46,15 +44,15 @@ class TailwindBuilder implements Builder {
         scratchSpace.fileFor(buildStep.inputId).path,
         '--output',
         scratchSpace.fileFor(outputId).path.toPosix(),
-        '--content',
-        p.join(Directory.current.path, '{lib,web}', '**', '*.dart').toPosix(true),
         if (options.config.containsKey('tailwindcss')) options.config['tailwindcss'],
         if (hasCustomConfig) ...[
           '--config',
           p.join(Directory.current.path, 'tailwind.config.js').toPosix(),
+        ] else ...[
+          '--content',
+          p.join(Directory.current.path, '{lib,web}', '**', '*.dart').toPosix(true),
         ],
       ],
-      workingDirectory: root,
     );
 
     await scratchSpace.copyOutput(outputId, buildStep);
