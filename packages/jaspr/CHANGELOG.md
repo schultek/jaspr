@@ -1,21 +1,36 @@
 ## Unreleased breaking
 
-- Fixed missing html unescape in hydrated data.
+- **BREAKING** Calling `Jaspr.initializeApp()` is now required in static and server mode.
 
-- Added `@css` annotation.
+- **BREAKING** Removed `Head` component in favor of new `Document.head()` component.
+  `Document.head()` has the same parameters as the old `Head` component and renders its children inside
+  the `<head>` element.
+- Added `Document.html()` and `Document.body()` to modify the attributes of `<html>` and `<body>`.
 
+- **BREAKING** Removed `syncId` and `syncCodec` parameters from `SyncStateMixin`.
+  `SyncStateMixin` now embeds its data locally in the pre-rendered html using standard json encoding.
+- Added `@sync` annotation. Can be used on any field of a `StatefulComponent` to automatically sync its value. 
+ 
+  ```dart
+  class MyComponentState extends State<MyComponent> with MyComponentStateSyncMixin {
+    @sync
+    String myValue;
+  }
+  ```
+
+- **BREAKING** Removed `MediaRuleQuery` in favor of `MediaQuery`.
 - Added `css.import()`, `css.fontFace()` and `css.media()` shorthands.
+- Added `@css` annotation. Can be used on a list of style rules to automatically include them in the global styles.
 
-- Removed `MediaRuleQuery` in favor of `MediaQuery`
-
-- Made `Jaspr.initializeApp()` required (static and server mode).
-
-- Added `Document.head` and related constructors replacing `Head` component.
-
-- Improved `SyncStateMixin`, removed codex and id parameters.
-- Added `@sync` annotation.
+  ```dart
+  @css
+  final styles = [
+    css('.main').box(width: 100.px),
+  ];
+  ```
 
 - Added `Fragment` component.
+- Fixed missing html unescape in hydrated data.
 
 ## 0.13.3
 
