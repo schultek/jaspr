@@ -85,6 +85,11 @@ or in **client** mode:
 </html>
 ```
 
+You can also have more than one input css file. Any file inside the web directory ending in `.tw.css` will be used and compiled
+to its `.css` counterpart.
+
+---
+
 ## Usage
 
 If you are unfamiliar with tailwind, head over to their [official documentation](https://tailwindcss.com/docs/utility-first)
@@ -118,6 +123,8 @@ class SimpleCard extends StatelessComponent {
 }
 ```
 
+---
+
 ## Config
 
 By default, you don't need a tailwind config file for your project. The package automatically scans the project's Dart files and builds the CSS.
@@ -136,7 +143,7 @@ module.exports = {
 }
 ```
 
----
-
-You can also have more than one input css file. Any file inside the web directory ending in `.tw.css` will be used and compiled
-to its `.css` counterpart.
+<Warning>
+Setting a custom content configuration is possible, but the tailwind integration won't recompile the css when those
+files change. Automatic recompiling is only enabled for `.dart` files.
+</Warning>
