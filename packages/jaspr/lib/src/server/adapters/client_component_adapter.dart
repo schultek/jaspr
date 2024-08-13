@@ -1,5 +1,4 @@
 import '../../framework/framework.dart';
-import '../child_nodes.dart';
 import '../markup_render_object.dart';
 import '../server_binding.dart';
 import 'client_script_adapter.dart';

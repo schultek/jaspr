@@ -10,7 +10,12 @@
 
 - Made `Jaspr.initializeApp()` required (static and server mode).
 
-- Add `Attach` component
+- Add `Document.head` and related constructors replacing `Head` component.
+
+- Changed `SyncStateMixin`, removed codex and id parameters.
+- Added `@sync` annotation.
+
+- Added `Fragment` component.
 
 ## 0.13.3
 

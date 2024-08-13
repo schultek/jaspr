@@ -2,9 +2,8 @@ export 'package:meta/meta.dart'
     show factory, immutable, mustCallSuper, nonVirtual, optionalTypeArgs, protected, required, visibleForTesting;
 
 export 'src/components/async.dart';
-export 'src/components/attach.dart';
 export 'src/components/basic.dart';
-export 'src/components/head.dart';
+export 'src/components/document.dart';
 export 'src/components/html/html.dart';
 export 'src/components/listenable_builder.dart';
 export 'src/components/raw_text/raw_text.dart';

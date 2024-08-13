@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:html/dom.dart';
@@ -97,30 +96,6 @@ class ServerTester {
       statusCode: statusCode,
       body: body,
       document: doc?.body != null ? doc : null,
-    );
-  }
-
-  /// Perform a virtual data request to your app that collects all the sync-data from
-  /// the rendered components.
-  Future<DataResponse> fetchData(String location) async {
-    var uri = Uri.parse('http://test.server$location');
-
-    var headers = {'jaspr-mode': 'data-only'};
-
-    var response = await _handler(Request('GET', uri, headers: headers));
-    var statusCode = response.statusCode;
-    var body = await response.readAsString();
-
-    Map<String, dynamic>? data;
-    if (statusCode == 200) {
-      try {
-        data = jsonDecode(body) as Map<String, dynamic>;
-      } catch (_) {}
-    }
-
-    return DataResponse(
-      statusCode: statusCode,
-      data: data,
     );
   }
 }

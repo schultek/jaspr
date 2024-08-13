@@ -24,9 +24,6 @@ class HomeState extends State<Home> with PreloadStateMixin, SyncStateMixin<Home,
   }
 
   @override
-  String get syncId => 'images';
-
-  @override
   void updateState(List? value) {
     setState(() {
       images = value ?? [];

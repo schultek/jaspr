@@ -197,7 +197,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     if (_matchList?.title case var title?) {
-      yield Head(title: title);
+      yield Document.head(title: title);
     }
     yield* component._builder.build(this);
   }

@@ -20,7 +20,7 @@ class QuotePage extends AsyncStatelessComponent {
       return;
     }
 
-    yield Head(
+    yield Document.head(
       title: quote.quote,
       meta: {"description": '"${quote.quote}" - ${quote.author}'},
       children: [

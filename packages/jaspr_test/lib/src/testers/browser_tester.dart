@@ -24,7 +24,7 @@ void testBrowser(
         html.window.history.replaceState(null, 'Test', location);
       }
 
-      var binding = TestBrowserComponentsBinding();
+      var binding = BrowserAppBinding();
       var tester = BrowserTester._(binding);
 
       return binding.runTest(() async {
@@ -41,15 +41,10 @@ void testBrowser(
 class BrowserTester {
   BrowserTester._(this.binding);
 
-  final TestBrowserComponentsBinding binding;
+  final BrowserAppBinding binding;
 
-  Future<void> pumpComponent(Component component, {Map<String, dynamic>? initialSyncState, String attachTo = 'body'}) {
-    binding._initialSyncState = initialSyncState;
+  Future<void> pumpComponent(Component component, {String attachTo = 'body'}) {
     return binding.attachRootComponent(component, attachTo: attachTo);
-  }
-
-  void stubFetchState(Map<String, dynamic> Function(String url) onFetchState) {
-    binding._onFetchState = onFetchState;
   }
 
   Future<void> click(Finder finder, {bool pump = true}) async {
@@ -101,20 +96,5 @@ class BrowserTester {
     }
 
     return foundElement!;
-  }
-}
-
-class TestBrowserComponentsBinding extends BrowserAppBinding {
-  Map<String, dynamic>? _initialSyncState;
-  Map<String, dynamic> Function(String url)? _onFetchState;
-
-  @override
-  Map<String, dynamic>? loadSyncState() {
-    return _initialSyncState;
-  }
-
-  @override
-  Future<Map<String, dynamic>> fetchState(String url) async {
-    return _onFetchState?.call(url) ?? {};
   }
 }

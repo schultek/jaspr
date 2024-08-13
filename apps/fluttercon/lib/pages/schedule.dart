@@ -12,7 +12,7 @@ class SchedulePage extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield Head(meta: {
+    yield Document.head(meta: {
       'description': "Schedule of all sessions on day $day.",
       'keywords': "Fluttercon, Sessions, Jaspr, Dart, Flutter",
       'og:title': "Fluttercon Berlin 2024 - Schedule for Day $day",

@@ -1,10 +1,9 @@
 import '../framework/framework.dart';
 import 'scheduler.dart';
-import 'sync.dart';
 
 /// Main class that provide services (also known as
 /// "bindings").
-abstract class AppBinding with SchedulerBinding, SyncBinding {
+abstract class AppBinding with SchedulerBinding {
   AppBinding();
 
   /// The currently active uri.

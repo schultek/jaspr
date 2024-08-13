@@ -1,6 +1,6 @@
 import 'dart:convert' as convert;
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/jaspr.dart' hide Document;
 import 'package:markdown/markdown.dart' as md show Text, Element;
 import 'package:markdown/markdown.dart' hide Text, Element;
 
