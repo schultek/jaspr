@@ -32,7 +32,7 @@ final defaultJasprOptions = JasprOptions(
     prefix0.LikeButton: ClientTarget<prefix0.LikeButton>('components/like_button', params: _prefix0LikeButton),
     prefix5.FavoritesPage: ClientTarget<prefix5.FavoritesPage>('pages/favorites'),
   },
-  styles: [
+  styles: () => [
     ...prefix0.LikeButton.styles,
     ...prefix1.PagesNav.styles,
     ...prefix2.SessionCard.styles,

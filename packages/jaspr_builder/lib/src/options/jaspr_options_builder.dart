@@ -85,12 +85,8 @@ class JasprOptionsBuilder implements Builder {
       /// }
       /// ```
       final defaultJasprOptions = JasprOptions(
-        clients: {
-          ${buildClientEntries(imports, clients)}
-        },
-        styles: [
-          ${buildStylesEntries(imports, styles)}
-        ],
+        ${buildClientEntries(imports, clients)}
+        ${buildStylesEntries(imports, styles)}
       );
       
       ${buildClientParamGetters(imports, clients)}
@@ -117,7 +113,8 @@ class JasprOptionsBuilder implements Builder {
   }
 
   String buildClientEntries(ImportsWriter imports, List<ClientModule> clients) {
-    return clients.map((c) {
+    if (clients.isEmpty) return '';
+    return 'clients: {${clients.map((c) {
       final prefix = imports.prefixOf(c.id);
       return '''
         $prefix.${c.name}: ClientTarget<$prefix.${c.name}>(
@@ -125,7 +122,7 @@ class JasprOptionsBuilder implements Builder {
           ${c.params.isNotEmpty ? ', params: _$prefix${c.name}' : ''}
         ),
       ''';
-    }).join('\n');
+    }).join('\n')}},';
   }
 
   String buildClientParamGetters(ImportsWriter imports, List<ClientModule> clients) {
@@ -136,10 +133,12 @@ class JasprOptionsBuilder implements Builder {
   }
 
   String buildStylesEntries(ImportsWriter imports, List<StylesModule> styles) {
-    return styles.map((s) {
+    if (styles.isEmpty) return '';
+
+    return 'styles: () => [${styles.map((s) {
       final prefix = imports.prefixOf(s.id);
       return s.elements.map((e) => '...$prefix.$e,').join('\n');
-    }).join('\n');
+    }).join('\n')}],';
   }
 }
 

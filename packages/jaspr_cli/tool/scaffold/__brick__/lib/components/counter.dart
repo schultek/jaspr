@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 {{#server}}
-import '../styles.dart';{{/server}}{{#flutter}}
+import '../constants/theme.dart';{{/server}}{{#flutter}}
 import 'flutter_counter.dart' if (dart.library.io) 'flutter_counter_fallback.dart';{{/flutter}}
 
 class Counter extends StatefulComponent {

@@ -1,0 +1,200 @@
+---
+title: Deploying
+description: Learn how to deploy your Jaspr site to any hosting provider.
+---
+
+# Deploying
+*Learn how to deploy your Jaspr site to any hosting provider.*
+
+---
+
+A website built with Jaspr can be deployed to nearly any standard web hosting provider. The form of deployment
+depends on your chosen [Rendering Mode](/get_started/modes):
+
+- **static**: Deploy your pre-rendered site to any static hosting provider.
+- **server**: Deploy your server application to any Dart hosting provider or containerized hosting service using Docker.
+- **client**: Deploy your site to any static hosting provider.
+
+---
+
+## Static Hosting
+
+With **static** or **client** mode you will have a purely static site after running `jaspr build`. This means that you
+can just take the `/build/jaspr` folder and deploy it to any static hosting provider.
+
+### Firebase Hosting
+
+To deploy your site to [Firebase Hosting](https://firebase.google.com/docs/hosting) follow these steps:
+
+1. Run `jaspr build`
+
+2. Run `firebase init` inside your project directory.
+    1. Select the "Hosting" feature
+    2. Set the public directory to `build/jaspr`
+    3. For **static** mode select "No" when asked to configure as a single-page app, for **client** mode select "Yes"
+    4. Select "No" when asked to override `index.html`.
+
+3. Run `firebase deploy`
+
+### Github Pages
+
+With [Github Pages](https://pages.github.com/) you can automatically deploy your when you push to a configured repository
+and branch. Since you need to run `jaspr build` before deploying, it's recommended to set up a custom
+[Github Actions](https://github.com/features/actions) workflow to build and deploy your site automatically when pushed.
+
+First we set up the repository to deploy from your repository:
+
+<Info>
+This will roughly follow the steps from [this guide](https://docs.github.com/de/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#ver%C3%B6ffentlichen-mit-einem-benutzerdefinierten-github-actions-workflow)
+of the official documentation.
+</Info>
+
+1. Go to your repository and open "Settings" -> "Pages"
+2. Set the "Source" to "GitHub Actions"
+3. Find the suggested "Static HTML" workflow and click "Configure"
+4. Edit the default workflow script to the following:
+    1. After the "Setup Pages" step add the following two step:
+       ```yaml
+       - name: "Setup Dart"
+         uses: dart-lang/setup-dart@v1.3
+       - name: "Build Jaspr"
+         run: |
+           dart pub global activate jaspr_cli
+           jaspr build --verbose
+       ```
+    2. In the "Upload artifact" step change the "path" variable to `build/jaspr`
+       ```yaml
+       with:
+          # Upload only jaspr build output
+          path: 'build/jaspr'
+       ```
+5. Click "Commit changes" and commit the new workflow file.
+
+#### Modifying the code
+
+If you are deploying from the special `<username>.github.io` repository you are all set and you can view your deployed
+site at `https://<username>.github.io.`.
+
+If you are deploying from any other repository, the site url will be `http://<username>.github.io/<repository>`. For this
+to correctly load all files you need to set the `<base>` url of your site to the repository name.
+
+In static mode, provide the `base` parameter to the `Document` constructor:
+
+```dart
+Document(
+  base: '<repository>',
+  body: /* ... */
+),
+```
+
+In client mode, add the `<base>` element to `index.html` inside `<head>`:
+
+```html
+<head>
+    <base href="/<repository>/"/>
+</head>
+```
+
+Finally, make sure all links and asset paths are **relative urls** (they don't start with '/').
+
+#### Flutter support
+
+If your project is depending on either `flutter` for element embedding or `jaspr_web_compilers` you need to modify the
+created workflow file to also pull in flutter, otherwise the build will result in an error.
+
+- After the "Setup Dart" step add the following step:
+  ```yaml
+  - name: "Setup Flutter"
+    uses: subosito/flutter-action@v2
+  ```
+- Commit and push the file.
+
+---
+
+## Server Hosting
+
+With **server** mode `jaspr build` will generate a server executable `app.exe` and an additional assets folder `web/`
+to `/build/jaspr`. When deploying this executable, make sure to deploy the asset folder with it.
+
+### Docker
+
+[Docker](https://www.docker.com/) is a very common tool for containerizing any application to run it virtually anywhere.
+Lots of cloud hosting services support deploying docker containers, like:
+
+- [Google Cloud Run](https://cloud.google.com/run)
+- [AWS Amplify](https://docs.amplify.aws/gen1/flutter/tools/cli/usage/containers)
+- [fly.io](https://fly.io/docs/languages-and-frameworks/dockerfile/)
+- [Digital Ocean](https://docs.digitalocean.com/products/app-platform/how-to/deploy-from-container-images/)
+- any many more...
+
+The main thing to set up when using docker is the `Dockerfile`, a build script that creates the container image.
+
+Create a new file called `Dockerfile` (no extension) at the root directory of your project with the following content:
+
+```dockerfile
+# Use the official dart docker image as our build image.
+FROM dart:stable as build
+
+# Activate the jaspr cli.
+RUN dart pub global activate jaspr_cli
+
+WORKDIR /app
+# Copy all files into the current image.
+COPY . .
+
+# Resolve app dependencies.
+RUN rm -f pubspec_overrides.yaml
+RUN dart pub get
+
+# Build project
+RUN dart pub global run jaspr_cli:jaspr build --verbose
+
+# Use a new empty docker image, this will be the final container image.
+FROM scratch
+
+# Copy all the needed runtime libraries for dart.
+COPY --from=build /runtime/ /
+# Copy the build outputs for your site.
+COPY --from=build /app/build/jaspr/ /app/
+
+WORKDIR /app
+
+# Start the server.
+EXPOSE 8080
+CMD ["./app"]
+```
+
+Running `docker build` from your project directory will then build a container image that you can deploy.
+
+#### Flutter support
+
+If your project is depending on either `flutter` for element embedding or `jaspr_web_compilers` you need to modify the
+`Dockerfile` to also have flutter installed in the build image, otherwise the build will result in an error.
+
+First change the first lines to the following:
+
+```dockerfile
+# We need a docker image that has flutter installed.
+FROM ghcr.io/cirruslabs/flutter:stable as build
+```
+
+Next replace the script starting from "FROM scratch" with the following:
+
+```dockerfile
+# This image is additionally needed for the dart runtime libs.
+FROM dart:stable as dart
+
+# Use a new empty docker image, this will be the final container image.
+FROM scratch
+
+# Copy all the needed runtime libraries for dart.
+COPY --from=dart /runtime/ /
+# Copy the build outputs for your site.
+COPY --from=build /app/build/jaspr/ /app/
+
+WORKDIR /app
+
+# Start the server.
+EXPOSE 8080
+CMD ["./app"]
+```

@@ -3,11 +3,57 @@ import 'dart:html' as html;
 import '../../../browser.dart';
 
 abstract class Document implements Component {
+  /// Attaches a set of attributes to the `<html>` element.
+  ///
+  /// This can be used at any point in the component tree and is supported both on the
+  /// server during pre-rendering and on the client.
+  ///
+  /// Can be used multiple times in an application where deeper or latter mounted
+  /// components will override duplicate attributes from other `.html()` components.
   const factory Document.html({
     Map<String, String>? attributes,
     Key? key,
   }) = AttachDocument.html;
 
+  /// Renders metadata and other elements inside the `<head>` of the document.
+  ///
+  /// Any children are pulled out of the normal rendering tree of the application and rendered instead
+  /// inside a special section of the `<head>` element of the document. This is supported both on the
+  /// server during pre-rendering and on the client.
+  ///
+  /// Can be used multiple times in an application where deeper or latter mounted
+  /// components will override duplicate elements from other `.head()` components.
+  ///
+  /// ```dart
+  /// Parent(children: [
+  ///   Document.head(
+  ///     title: "My Title",
+  ///     meta: {"description": "My Page Description"}
+  ///   ),
+  ///   Child(children: [
+  ///     Document.head(
+  ///       title: "Nested Title"
+  ///     ),
+  ///   ]),
+  /// ]),
+  /// ```
+  ///
+  /// The above configuration of components will result in these elements inside `<head>`:
+  ///
+  /// ```html
+  /// <head>
+  ///   <title>Nested Title</title>
+  ///   <meta name="description" content="My Page Description">
+  /// </head>
+  /// ```
+  ///
+  /// Note that 'deeper or latter' here does not result in a true DFS ordering. Components that are mounted
+  /// deeper but prior will override latter but shallower components.
+  ///
+  /// Elements rendered by nested `.head()` are overridden using the following system:
+  /// - elements with an `id` override other elements with the same `id`
+  /// - `<title>` and `<base>` elements override other `<title>` or `<base>` elements respectively
+  /// - `<meta>` elements override other `<meta>` elements with the same `name`
   const factory Document.head({
     String? title,
     Map<String, String>? meta,
@@ -15,6 +61,13 @@ abstract class Document implements Component {
     Key? key,
   }) = HeadDocument;
 
+  /// Attaches a set of attributes to the `<body>` element.
+  ///
+  /// This can be used at any point in the component tree and is supported both on the
+  /// server during pre-rendering and on the client.
+  ///
+  /// Can be used multiple times in an application where deeper or latter mounted
+  /// components will override duplicate attributes from other `.body()` components.
   const factory Document.body({
     Map<String, String>? attributes,
     Key? key,

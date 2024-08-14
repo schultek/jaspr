@@ -1,0 +1,65 @@
+---
+title: Flutter Embedding
+description: Embedding a Flutter web app in a Jaspr website.
+---
+
+# Flutter Embedding
+*Embedding a Flutter web app in a Jaspr website.*
+
+---
+
+To embed a Flutter app into your Jaspr website you need the following setup:
+
+1. Add `flutter` and `jaspr_flutter_embed` as a dependency:
+
+  ```shell
+  dart pub add flutter jaspr_flutter_embed
+  ```
+
+2. Replace `build_web_compilers` with `jaspr_web_compilers` as a dev dependency:
+
+  ```shell
+  dart pub remove build_web_compilers
+  dart pub add jaspr_web_compilers --dev
+  ```
+
+Next add the `FlutterEmbedView` component to your jaspr app like this:
+
+```dart
+
+import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
+
+// import your flutter app widget
+import 'my_flutter_app.dart';
+
+// this can be any jaspr component
+class JasprApp extends StatelessComponent {
+  JasprApp({super.key});
+
+  Iterable<Component> build(BuildContext context) sync* {
+    // this is a normal jaspr component
+    yield FlutterEmbedView(
+      // provide your flutter app widget
+      app: MyFlutterApp(
+        // provide any widget properties or callbacks
+        // this way you can pass and share state between jaspr and flutter
+        // without needing js interop
+        title: 'My Embedded Flutter App',
+      ),
+      // provide an optional loader component that will be displayed while the flutter app loads
+      loader: MyCustomLoader(),
+    );
+  }
+}
+```
+
+Finally, run your jaspr app as normal using `jaspr serve` or `jaspr build`.
+
+## Import handling
+
+Any code and components that use the flutter sdk can only be imported on the client, not the server. That means that
+when you use server-side rendering, you cannot directly import the above component into your app, or you will get a
+compilation error.
+
+Instead, you need to use Darts conditional imports to only import the affected code on the client.
+See [@Import](/utils/at_import).
