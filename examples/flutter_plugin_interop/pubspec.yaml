@@ -1,13 +1,13 @@
 name: flutter_plugin_interop
 description: A pure client-side app without ssr.
-version: 0.1.0
+version: 0.1.1
 publish_to: none
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  jaspr: ^0.13.0
+  jaspr: ^0.14.0
   firebase_auth: ^4.7.1
   firebase_core: ^2.15.0
   cloud_firestore: ^4.8.3

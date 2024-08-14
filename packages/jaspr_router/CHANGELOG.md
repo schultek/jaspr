@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.5.0
 
 - Changed the signature of the `Link` component, `children` is now a named parameter.
 

@@ -1,4 +1,4 @@
-## Unreleased breaking
+## 0.14.0
 
 - **BREAKING** Calling `Jaspr.initializeApp()` is now required in static and server mode.
 
