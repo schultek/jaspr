@@ -1,0 +1,65 @@
+import '../../codec/sources/model_class.dart';
+import 'sync_model.dart';
+
+final syncModelClassSources = {
+  ...syncModelSources,
+  ...modelClassSources,
+  ...modelClassOutputs,
+};
+
+final syncModelClassOutputs = {
+  'site|lib/component.sync.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+      '// Generated with jaspr_builder\n'
+      '\n'
+      'import \'package:jaspr/jaspr.dart\';\n'
+      'import \'package:site/component.dart\';\n'
+      'import \'package:site/model.dart\';\n'
+      '\n'
+      'mixin ComponentStateSyncMixin on State<Component> implements SyncStateMixin<Component, Map<String, dynamic>> {\n'
+      '  Model? get m;\n'
+      '  set m(Model? m);\n'
+      '\n'
+      '  Model get m2;\n'
+      '  set m2(Model m2);\n'
+      '\n'
+      '  List<Model> get m3;\n'
+      '  set m3(List<Model> m3);\n'
+      '\n'
+      '  List<Model?> get m4;\n'
+      '  set m4(List<Model?> m4);\n'
+      '\n'
+      '  Map<String, Model> get m5;\n'
+      '  set m5(Map<String, Model> m5);\n'
+      '\n'
+      '  Map<String, Model?> get m6;\n'
+      '  set m6(Map<String, Model?> m6);\n'
+      '\n'
+      '  @override\n'
+      '  void updateState(Map<String, dynamic> value) {\n'
+      '    m = value[\'m\'] != null ? Model.fromRaw(value[\'m\']!) : null;\n'
+      '    m2 = Model.fromRaw(value[\'m2\']);\n'
+      '    m3 = (value[\'m3\'] as List<dynamic>).map((i) => Model.fromRaw(i)).toList();\n'
+      '    m4 = (value[\'m4\'] as List<dynamic>).map((i) => i != null ? Model.fromRaw(i!) : null).toList();\n'
+      '    m5 = (value[\'m5\'] as Map<String, dynamic>).map((k, v) => MapEntry(k, Model.fromRaw(v)));\n'
+      '    m6 = (value[\'m6\'] as Map<String, dynamic>).map((k, v) => MapEntry(k, v != null ? Model.fromRaw(v!) : null));\n'
+      '  }\n'
+      '\n'
+      '  @override\n'
+      '  Map<String, dynamic> getState() {\n'
+      '    return {\n'
+      '      \'m\': m?.toRaw(),\n'
+      '      \'m2\': m2.toRaw(),\n'
+      '      \'m3\': m3.map((i) => i.toRaw()).toList(),\n'
+      '      \'m4\': m4.map((i) => i?.toRaw()).toList(),\n'
+      '      \'m5\': m5.map((k, v) => MapEntry(k, v.toRaw())),\n'
+      '      \'m6\': m6.map((k, v) => MapEntry(k, v?.toRaw())),\n'
+      '    };\n'
+      '  }\n'
+      '\n'
+      '  @override\n'
+      '  void initState() {\n'
+      '    super.initState();\n'
+      '    SyncStateMixin.initSyncState(this);\n'
+      '  }\n'
+      '}\n',
+};
