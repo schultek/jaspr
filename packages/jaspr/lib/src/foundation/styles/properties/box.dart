@@ -406,7 +406,7 @@ class _OnlyOverflow implements Overflow {
   @override
   Map<String, String> get styles => {
         if (x != null && y != null)
-          'overflow': '$x $y'
+          'overflow': '${x!._value} ${y!._value}'
         else ...{
           if (x != null) 'overflow-x': x!._value,
           if (y != null) 'overflow-y': y!._value,

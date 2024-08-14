@@ -24,8 +24,7 @@ void main() {
 
         test('only', () {
           var border = Border.only(
-            left: BorderSide(
-              style: BorderStyle.solid,
+            left: BorderSide.groove(
               color: Colors.black,
               width: 2.pt,
             ),
@@ -34,7 +33,7 @@ void main() {
           expect(
             border.styles,
             equals({
-              'border-left-style': 'solid',
+              'border-left-style': 'groove',
               'border-left-color': 'black',
               'border-left-width': '2pt',
             }),
@@ -43,12 +42,10 @@ void main() {
 
         test('symmetric', () {
           var border = Border.symmetric(
-            vertical: BorderSide(
-              style: BorderStyle.solid,
+            vertical: BorderSide.solid(
               color: Colors.blue,
             ),
-            horizontal: BorderSide(
-              style: BorderStyle.dashed,
+            horizontal: BorderSide.dashed(
               width: 2.pt,
             ),
           );
@@ -62,6 +59,33 @@ void main() {
               'border-left-width': '2pt',
               'border-right-width': '2pt',
             }),
+          );
+        });
+
+        test('symmetric only', () {
+          var border = Border.symmetric(
+            vertical: BorderSide.dotted(
+              color: Colors.blue,
+            ),
+          );
+
+          expect(
+            border.styles,
+            equals({
+              'border-top-style': 'dotted',
+              'border-bottom-style': 'dotted',
+              'border-top-color': 'blue',
+              'border-bottom-color': 'blue',
+            }),
+          );
+        });
+
+        test('none', () {
+          var border = Border.all(BorderSide.none());
+
+          expect(
+            border.styles,
+            equals({'border': 'none'}),
           );
         });
       });
@@ -113,6 +137,26 @@ void main() {
             radius.styles,
             equals({'border-radius': '20px 10px 2em 0 / 20px 5pt 2em 25px'}),
           );
+        });
+      });
+
+      group('overflow', () {
+        test('value', () {
+          expect(Overflow.initial.styles, equals({'overflow': 'initial'}));
+          expect(Overflow.unset.styles, equals({'overflow': 'unset'}));
+          expect(Overflow.auto.styles, equals({'overflow': 'auto'}));
+          expect(Overflow.clip.styles, equals({'overflow': 'clip'}));
+          expect(Overflow.scroll.styles, equals({'overflow': 'scroll'}));
+          expect(Overflow.visible.styles, equals({'overflow': 'visible'}));
+          expect(Overflow.hidden.styles, equals({'overflow': 'hidden'}));
+          expect(Overflow.inherit.styles, equals({'overflow': 'inherit'}));
+          expect(Overflow.revert.styles, equals({'overflow': 'revert'}));
+          expect(Overflow.revertLayer.styles, equals({'overflow': 'revert-layer'}));
+        });
+
+        test('only', () {
+          expect(Overflow.only(x: Overflow.visible, y: Overflow.hidden).styles, equals({'overflow': 'visible hidden'}));
+          expect(Overflow.only(x: Overflow.clip).styles, equals({'overflow-x': 'clip'}));
         });
       });
     });
