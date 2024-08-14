@@ -198,6 +198,23 @@ To navigate to a route using its name, call `pushNamed()` or `replaceNamed()`:
 context.pushNamed('users', params: {'userId': '123'});
 ```
 
+### Using extra
+
+You can provide additional data along with navigation.
+
+```dart
+context.push('/123', extra: 'abc');
+```
+
+and retrieve the data from `RouteState`
+
+```dart
+final String extraString = RouteState.of(context).extra! as String;
+```
+
+The extra data will go through serialization when it is stored in the browser. You can only use primitive serializable
+values like String, bool, int, double or Lists and Maps for the extra data.
+
 ## Redirection
 
 Redirection changes the location to a new one based on application state. For example, redirection can be used to

@@ -11,11 +11,21 @@ import '../router.dart';
 extension GoRouterHelper on BuildContext {
   /// Pushes a new route onto the history stack.
   ///
+  /// The [extra] parameter can be used to provide additional data with navigation. It will go through serialization
+  /// when it is stored in the browser and must be a primitive serializable value.
+  ///
   /// See also:
   /// * [replace] which replaces the history entry with the new route.
   Future<void> push(String location, {Object? extra}) => Router.of(this).push(location, extra: extra);
 
   /// Pushes a named route onto the history stack.
+  ///
+  /// Optional parameters can be provided to the named route, like `params: {'userId': '123'}` as well as [queryParams].
+  /// The [extra] parameter can be used to provide additional data with navigation. It will go through serialization
+  /// when it is stored in the browser and must be a primitive serializable value.
+  ///
+  /// See also:
+  /// * [replaceNamed] which replaces the history entry with the named route.
   Future<void> pushNamed(
     String name, {
     Map<String, String> params = const <String, String>{},
@@ -26,13 +36,18 @@ extension GoRouterHelper on BuildContext {
 
   /// Replaces the current history entry with a new route.
   ///
+  /// The [extra] parameter can be used to provide additional data with navigation. It will go through serialization
+  /// when it is stored in the browser and must be a primitive serializable value.
+  ///
   /// See also:
   /// * [push] which pushes the route to the history stack.
   void replace(String location, {Object? extra}) => Router.of(this).replace(location, extra: extra);
 
   /// Replaces the current history entry with a named route.
   ///
-  /// Optional parameters can be provided to the named route, e.g. `params: {'userId': '123'}`.
+  /// Optional parameters can be provided to the named route, like `params: {'userId': '123'}` as well as [queryParams].
+  /// The [extra] parameter can be used to provide additional data with navigation. It will go through serialization
+  /// when it is stored in the browser and must be a primitive serializable value.
   ///
   /// See also:
   /// * [pushNamed] which pushes a named route onto the history stack.
@@ -49,6 +64,8 @@ extension GoRouterHelper on BuildContext {
 
   /// Get a location from route name and parameters.
   /// This is useful for redirecting to a named location.
+  ///
+  /// Optional parameters can be provided to the named route, like `params: {'userId': '123'}` as well as [queryParams].
   String namedLocation(
     String name, {
     Map<String, String> params = const <String, String>{},
