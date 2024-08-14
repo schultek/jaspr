@@ -14,11 +14,11 @@ final clientModelClassJsonOutputs = {
     "name": "Component",
     "id": ["site", "lib/component_model.dart"],
     "params": [
-      {"name": "a", "isNamed": false, "decoder": "p.get(\'a\')", "encoder": "c.a", "imports": []},
+      {"name": "a", "isNamed": false, "decoder": "p.get('a')", "encoder": "c.a", "imports": []},
       {
         "name": "b",
         "isNamed": true,
-        "decoder": "Model.fromRaw(p.get(\'b\'))",
+        "decoder": "Model.fromRaw(p.get('b'))",
         "encoder": "c.b.toRaw()",
         "imports": ["package:site/model.dart"]
       },

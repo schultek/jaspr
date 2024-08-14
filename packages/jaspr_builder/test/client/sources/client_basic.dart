@@ -24,10 +24,10 @@ final clientBasicJsonOutputs = {
     "name": "Component",
     "id": ["site", "lib/component_basic.dart"],
     "params": [
-      {"name": "a", "isNamed": false, "decoder": "p.get(\'a\')", "encoder": "c.a", "imports": []},
-      {"name": "b", "isNamed": true, "decoder": "p.get(\'b\')", "encoder": "c.b", "imports": []},
-      {"name": "c", "isNamed": true, "decoder": "p.get(\'c\')", "encoder": "c.c", "imports": []},
-      {"name": "d", "isNamed": true, "decoder": "p.get(\'d\')", "encoder": "c.d", "imports": []}
+      {"name": "a", "isNamed": false, "decoder": "p.get('a')", "encoder": "c.a", "imports": []},
+      {"name": "b", "isNamed": true, "decoder": "p.get('b')", "encoder": "c.b", "imports": []},
+      {"name": "c", "isNamed": true, "decoder": "p.get('c')", "encoder": "c.c", "imports": []},
+      {"name": "d", "isNamed": true, "decoder": "p.get('d')", "encoder": "c.d", "imports": []}
     ]
   }),
 };
