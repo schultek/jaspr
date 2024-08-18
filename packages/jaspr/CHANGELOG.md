@@ -1,6 +1,6 @@
 ## Unreleased patch
 
-- **BREAKING** Fixed spelling mistake from `spaceRvenly` to `spaceEvenly`
+- Fixed spelling mistake from `spaceRvenly` to `spaceEvenly`
 
 ## 0.14.0
 
