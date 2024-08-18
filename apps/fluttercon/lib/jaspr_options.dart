@@ -43,4 +43,4 @@ final defaultJasprOptions = JasprOptions(
   ],
 );
 
-Map<String, dynamic> _prefix0LikeButton(prefix0.LikeButton c) => {'session': c.session.toJson()};
+Map<String, dynamic> _prefix0LikeButton(prefix0.LikeButton c) => {'session': SessionCodex(c.session).encode()};

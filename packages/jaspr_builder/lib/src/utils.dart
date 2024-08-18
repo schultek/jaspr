@@ -3,6 +3,8 @@
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:build/build.dart';
+import 'package:collection/collection.dart';
 import 'package:jaspr/jaspr.dart'
     show ClientAnnotation, CssUtility, Import, Component, Key, StyleRule, SyncAnnotation, State;
 import 'package:source_gen/source_gen.dart';
@@ -46,5 +48,94 @@ extension ElementNode on Element {
     } else {
       return null;
     }
+  }
+}
+
+class ImportsWriter {
+  ImportsWriter();
+
+  final List<String> imports = [];
+  bool _sorted = false;
+
+  void addAsset(AssetId id) {
+    add(id.toImportUrl());
+  }
+
+  void add(String url) {
+    assert(!_sorted);
+    var index = imports.indexOf(url);
+    if (index == -1) {
+      imports.add(url);
+    }
+  }
+
+  String prefixOfAsset(AssetId id) {
+    return prefixOf(id.toImportUrl());
+  }
+
+  String prefixOf(String url) {
+    assert(_sorted);
+    return 'prefix${imports.indexOf(url)}';
+  }
+
+  void sort() {
+    imports.sort(compareImports);
+    _sorted = true;
+  }
+
+  static int comparePaths(List<String> a, List<String> b) {
+    if (a.length > 1 && b.length > 1) {
+      var comp = a.first.compareTo(b.first);
+      if (comp == 0) {
+        return comparePaths(a.skip(1).toList(), b.skip(1).toList());
+      } else {
+        return comp;
+      }
+    } else if (a.length > 1) {
+      return -1;
+    } else if (b.length > 1) {
+      return 1;
+    } else {
+      return a.first.compareTo(b.first);
+    }
+  }
+
+  static int compareImports(String a, String b) {
+    return comparePaths(a.split('/'), b.split('/'));
+  }
+
+  String resolve(String source) {
+    source.writeImports(this);
+    sort();
+    return source.resolveImports(this).replaceFirst('[[/]]', toString());
+  }
+
+  @override
+  String toString() {
+    assert(_sorted);
+    return imports.mapIndexed((index, url) => "import '$url' as prefix$index;").join('\n');
+  }
+}
+
+final _importsRegex = RegExp(r'\[\[(?!/)(.+?)\]\]');
+
+extension ImportUrl on AssetId {
+  String toImportUrl() {
+    return 'package:$package/${path.replaceFirst('lib/', '')}';
+  }
+}
+
+extension ResolveImports on String {
+  void writeImports(ImportsWriter imports) {
+    for (var match in _importsRegex.allMatches(this)) {
+      imports.add(match.group(1)!);
+    }
+  }
+
+  String resolveImports(ImportsWriter imports) {
+    return replaceAllMapped(_importsRegex, (match) {
+      var url = match.group(1)!;
+      return imports.prefixOf(url);
+    });
   }
 }

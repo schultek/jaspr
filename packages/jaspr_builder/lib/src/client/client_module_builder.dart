@@ -86,29 +86,26 @@ class ClientModuleBuilder implements Builder {
   }
 
   Future<void> generateWebEntrypoint(ClientModule module, BuildStep buildStep) async {
-    var webId =
-        AssetId(module.id.package, module.id.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.client.dart'));
-
-    var moduleImport = 'package:${module.id.package}/${module.id.path.replaceFirst('lib/', '')}';
-    var paramImports = module.params.expand((p) => p.imports).toSet();
-
-    var webSource = DartFormatter(pageWidth: 120).format('''
+    var source = '''
       $generationHeader
       
       import 'package:jaspr/browser.dart';
-      import '$moduleImport' as a;
-      ${paramImports.map((p) => "import '$p';").join('\n  ')}
+      [[/]]
             
       void main() {
         runAppWithParams(getComponentForParams);
       }
       
       Component getComponentForParams(ConfigParams p) {
-        return a.${module.name}(${module.params.where((p) => !p.isNamed).map((p) => p.decoder).followedBy(module.params.where((p) => p.isNamed).map((p) => '${p.name}: ${p.decoder}')).join(', ')});
+        return [[${module.id.toImportUrl()}]].${module.name}(${module.params.where((p) => !p.isNamed).map((p) => p.decoder).followedBy(module.params.where((p) => p.isNamed).map((p) => '${p.name}: ${p.decoder}')).join(', ')});
       }
-    ''');
+    ''';
+    source = ImportsWriter().resolve(source);
+    source = DartFormatter(pageWidth: 120).format(source);
 
-    await buildStep.writeAsString(webId, webSource);
+    var webId =
+        AssetId(module.id.package, module.id.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.client.dart'));
+    await buildStep.writeAsString(webId, source);
   }
 }
 
@@ -153,29 +150,25 @@ class ClientParam {
   final bool isNamed;
   final String decoder;
   final String encoder;
-  final Set<String> imports;
 
   ClientParam({
     required this.name,
     this.isNamed = false,
     required this.decoder,
     required this.encoder,
-    required this.imports,
   });
 
   ClientParam.deserialize(Map<String, dynamic> map)
       : name = map['name'],
         isNamed = map['isNamed'],
         decoder = map['decoder'],
-        encoder = map['encoder'],
-        imports = (map['imports'] as List).toSet().cast();
+        encoder = map['encoder'];
 
   Map<String, dynamic> serialize() => {
         'name': name,
         'isNamed': isNamed,
         'decoder': decoder,
         'encoder': encoder,
-        'imports': imports.toList(),
       };
 }
 
@@ -193,13 +186,6 @@ List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
   return params.map((p) {
     var decoder = codecs.getDecoderFor(p.type, 'p.get(\'${p.name}\')');
     var encoder = codecs.getEncoderFor(p.type, 'c.${p.name}');
-
-    return ClientParam(
-      name: p.name,
-      isNamed: p.isNamed,
-      decoder: decoder.$1,
-      encoder: encoder.$1,
-      imports: {...decoder.$2, ...encoder.$2},
-    );
+    return ClientParam(name: p.name, isNamed: p.isNamed, decoder: decoder, encoder: encoder);
   }).toList();
 }

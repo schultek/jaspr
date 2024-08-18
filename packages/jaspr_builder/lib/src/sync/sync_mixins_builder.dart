@@ -86,35 +86,28 @@ class SyncMixinsBuilder implements Builder {
     var resource = await buildStep.fetchResource(codecResource);
     var codecs = await resource.readCodecs(buildStep);
 
-    var outputId = buildStep.inputId.changeExtension('.sync.dart');
-
-    var moduleImport = 'package:${buildStep.inputId.package}/${buildStep.inputId.path.replaceFirst('lib/', '')}';
-    var mixinImports = <String>{};
-
     var mixins = annotated.map((e) {
-      var (mixin, imports) = generateMixinFromEntry(e, codecs);
-      mixinImports.addAll(imports);
-      return mixin;
+      return generateMixinFromEntry(e, codecs, buildStep.inputId.toImportUrl());
     }).join('\n\n');
 
-    var syncPart = DartFormatter(pageWidth: 120).format('''
+    var source = '''
       $generationHeader
       
       import 'package:jaspr/jaspr.dart';
-      import '$moduleImport';
-      ${mixinImports.map((p) => "import '$p';").join('\n  ')}
+      [[/]]
             
       $mixins
-    ''');
+    ''';
+    source = ImportsWriter().resolve(source);
+    source = DartFormatter(pageWidth: 120).format(source);
 
-    await buildStep.writeAsString(outputId, syncPart);
+    var outputId = buildStep.inputId.changeExtension('.sync.dart');
+    await buildStep.writeAsString(outputId, source);
   }
 
-  (String, Set<String>) generateMixinFromEntry((ClassElement, Iterable<FieldElement>) element, Codecs codecs) {
+  String generateMixinFromEntry((ClassElement, Iterable<FieldElement>) element, Codecs codecs, String baseImport) {
     final (clazz, fields) = element;
     final comp = clazz.supertype!.typeArguments.first.element!;
-
-    final imports = <String>{};
 
     final members = fields.map((f) => """
       ${f.type.getDisplayString()} get ${f.name};
@@ -123,19 +116,16 @@ class SyncMixinsBuilder implements Builder {
 
     final decoders = fields.map((f) {
       var decoder = codecs.getDecoderFor(f.type, "value['${f.name}']");
-      imports.addAll(decoder.$2);
-      return "${f.name} = ${decoder.$1};";
+      return "${f.name} = $decoder;";
     }).join('\n');
 
     final encoders = fields.map((f) {
       var encoder = codecs.getEncoderFor(f.type, f.name);
-      imports.addAll(encoder.$2);
-      return "'${f.name}': ${encoder.$1},";
+      return "'${f.name}': $encoder,";
     }).join('\n');
 
-    return (
-      """
-      mixin ${clazz.name.startsWith('_') ? clazz.name.substring(1) : clazz.name}SyncMixin on State<${comp.name}> implements SyncStateMixin<${comp.name}, Map<String, dynamic>> {
+    return """
+      mixin ${clazz.name.startsWith('_') ? clazz.name.substring(1) : clazz.name}SyncMixin on State<[[$baseImport]].${comp.name}> implements SyncStateMixin<[[$baseImport]].${comp.name}, Map<String, dynamic>> {
         $members
       
         @override
@@ -156,8 +146,6 @@ class SyncMixinsBuilder implements Builder {
           SyncStateMixin.initSyncState(this);
         }
       }
-    """,
-      imports
-    );
+    """;
   }
 }

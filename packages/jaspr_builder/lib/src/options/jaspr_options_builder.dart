@@ -10,6 +10,7 @@ import 'package:yaml/yaml.dart' as yaml;
 
 import '../client/client_module_builder.dart';
 import '../styles/styles_module_builder.dart';
+import '../utils.dart';
 
 /// Builds part files and web entrypoints for components annotated with @app
 class JasprOptionsBuilder implements Builder {
@@ -45,28 +46,17 @@ class JasprOptionsBuilder implements Builder {
       return;
     }
 
-    final imports = ImportsWriter();
-
     final clients = await loadClientModules(buildStep);
     final styles = await loadStylesModules(buildStep);
 
-    for (var c in clients) {
-      imports.add(c.id);
-    }
-    for (var s in styles) {
-      imports.add(s.id);
-    }
+    clients.sortByCompare((c) => '${c.id.toImportUrl()}/${c.name}', ImportsWriter.compareImports);
+    clients.sortByCompare((s) => s.id.toImportUrl(), ImportsWriter.compareImports);
 
-    imports.sort();
-    clients.sortBy((c) => '${imports.prefixOf(c.id)}.${c.name}');
-    styles.sortBy((s) => imports.prefixOf(s.id));
-
-    final optionsId = AssetId(buildStep.inputId.package, 'lib/jaspr_options.dart');
-    final optionsSource = DartFormatter(pageWidth: 120).format('''
+    var source = '''
       $generationHeader
       
       import 'package:jaspr/jaspr.dart';
-      $imports
+      [[/]]
       
       /// Default [JasprOptions] for use with your jaspr project.
       ///
@@ -85,15 +75,17 @@ class JasprOptionsBuilder implements Builder {
       /// }
       /// ```
       final defaultJasprOptions = JasprOptions(
-        ${buildClientEntries(imports, clients)}
-        ${buildStylesEntries(imports, styles)}
+        ${buildClientEntries(clients)}
+        ${buildStylesEntries(styles)}
       );
       
-      ${buildClientParamGetters(imports, clients)}
-      
-    ''');
+      ${buildClientParamGetters(clients)}  
+    ''';
+    source = ImportsWriter().resolve(source);
+    source = DartFormatter(pageWidth: 120).format(source);
 
-    await buildStep.writeAsString(optionsId, optionsSource);
+    final optionsId = AssetId(buildStep.inputId.package, 'lib/jaspr_options.dart');
+    await buildStep.writeAsString(optionsId, source);
   }
 
   Future<List<ClientModule>> loadClientModules(BuildStep buildStep) {
@@ -112,88 +104,29 @@ class JasprOptionsBuilder implements Builder {
         .toList();
   }
 
-  String buildClientEntries(ImportsWriter imports, List<ClientModule> clients) {
+  String buildClientEntries(List<ClientModule> clients) {
     if (clients.isEmpty) return '';
     return 'clients: {${clients.map((c) {
-      final prefix = imports.prefixOf(c.id);
       return '''
-        $prefix.${c.name}: ClientTarget<$prefix.${c.name}>(
+        [[${c.id.toImportUrl()}]].${c.name}: ClientTarget<[[${c.id.toImportUrl()}]].${c.name}>(
           '${path.url.relative(path.url.withoutExtension(c.id.path), from: 'lib')}'
-          ${c.params.isNotEmpty ? ', params: _$prefix${c.name}' : ''}
+          ${c.params.isNotEmpty ? ', params: _[[${c.id.toImportUrl()}]]${c.name}' : ''}
         ),
       ''';
     }).join('\n')}},';
   }
 
-  String buildClientParamGetters(ImportsWriter imports, List<ClientModule> clients) {
+  String buildClientParamGetters(List<ClientModule> clients) {
     return clients.where((c) => c.params.isNotEmpty).map((c) {
-      final prefix = imports.prefixOf(c.id);
-      return 'Map<String, dynamic> _$prefix${c.name}($prefix.${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};';
+      return 'Map<String, dynamic> _[[${c.id.toImportUrl()}]]${c.name}([[${c.id.toImportUrl()}]].${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};';
     }).join('\n');
   }
 
-  String buildStylesEntries(ImportsWriter imports, List<StylesModule> styles) {
+  String buildStylesEntries(List<StylesModule> styles) {
     if (styles.isEmpty) return '';
 
     return 'styles: () => [${styles.map((s) {
-      final prefix = imports.prefixOf(s.id);
-      return s.elements.map((e) => '...$prefix.$e,').join('\n');
+      return s.elements.map((e) => '...[[${s.id.toImportUrl()}]].$e,').join('\n');
     }).join('\n')}],';
-  }
-}
-
-class ImportsWriter {
-  ImportsWriter();
-
-  final List<String> imports = [];
-  bool _sorted = false;
-
-  void add(AssetId id) {
-    assert(!_sorted);
-
-    var url = path.url.relative(id.path, from: 'lib');
-    var index = imports.indexOf(url);
-    if (index == -1) {
-      imports.add(url);
-    }
-  }
-
-  String prefixOf(AssetId id) {
-    assert(_sorted);
-
-    var url = path.url.relative(id.path, from: 'lib');
-    return 'prefix${imports.indexOf(url)}';
-  }
-
-  void sort() {
-    imports.sort((a, b) {
-      var ap = a.split('/');
-      var bp = b.split('/');
-      return comparePaths(ap, bp);
-    });
-    _sorted = true;
-  }
-
-  int comparePaths(List<String> a, List<String> b) {
-    if (a.length > 1 && b.length > 1) {
-      var comp = a.first.compareTo(b.first);
-      if (comp == 0) {
-        return comparePaths(a.skip(1).toList(), b.skip(1).toList());
-      } else {
-        return comp;
-      }
-    } else if (a.length > 1) {
-      return -1;
-    } else if (b.length > 1) {
-      return 1;
-    } else {
-      return a.first.compareTo(b.first);
-    }
-  }
-
-  @override
-  String toString() {
-    assert(_sorted);
-    return imports.mapIndexed((index, url) => "import '$url' as prefix$index;").join('\n');
   }
 }
