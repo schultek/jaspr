@@ -19,8 +19,7 @@ Refer to our official [Setup Guide](https://pub.dev/documentation/jaspr_serverpo
 
 After you have [setup](https://pub.dev/documentation/jaspr_serverpod/latest/topics/Setup-topic.html) the integration, simply run `jaspr serve` in your terminal to start **both** the Jaspr development server and run Serverpod in debug mode. 
 
-*This fully replaces the need to run `dart bin/main.dart` during development. However on a fresh project or when you update
-your models, you might need to run `dart bin/main.dart --apply-migrations` from time to time.*
+*This fully replaces the need to run `dart bin/main.dart` during development.*
 
 ## Building and deploying
 
