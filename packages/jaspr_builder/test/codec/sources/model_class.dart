@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 const modelClassSources = {
-  'site|lib/model.dart': '''
+  'site|lib/model_class.dart': '''
     import 'package:jaspr/jaspr.dart';
         
     class Model {
@@ -26,16 +26,10 @@ const modelClassSources = {
 };
 
 final modelClassOutputs = {
-  'site|lib/model.codec.json': jsonEncode({
-    "id": ["site", "lib/model.dart"],
+  'site|lib/model_class.codec.json': jsonEncode({
+    "id": ["site", "lib/model_class.dart"],
     "elements": [
-      {
-        "name": "Model",
-        "extension": null,
-        "decoder": "fromRaw",
-        "encoder": "toRaw",
-        "import": "package:site/model.dart"
-      }
+      {"name": "Model", "decoder": "fromRaw", "encoder": "toRaw", "import": "package:site/model_class.dart"}
     ]
   }),
 };

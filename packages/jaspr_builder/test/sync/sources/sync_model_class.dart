@@ -1,8 +1,32 @@
 import '../../codec/sources/model_class.dart';
-import 'sync_model.dart';
 
 final syncModelClassSources = {
-  ...syncModelSources,
+  'site|lib/component.dart': '''
+    import 'package:jaspr/jaspr.dart';
+    import 'model_class.dart';
+    import 'component.sync.dart';
+    
+    class Component extends StatefulComponent {
+      State createState() => ComponentState();
+    }
+    
+    class ComponentState extends State<Component> with ComponentStateSyncMixin {
+      @sync
+      Model? m;
+      @sync
+      late Model m2;
+      @sync
+      List<Model> m3 = [];
+      @sync
+      List<Model?> m4 = [];
+      @sync
+      Map<String, Model> m5 = {};
+      @sync
+      Map<String, Model?> m6 = {};
+      
+      Iterable<Component> build(BuildContext context) => [];
+    }
+  ''',
   ...modelClassSources,
   ...modelClassOutputs,
 };
@@ -13,7 +37,7 @@ final syncModelClassOutputs = {
       '\n'
       'import \'package:jaspr/jaspr.dart\';\n'
       'import \'package:site/component.dart\' as prefix0;\n'
-      'import \'package:site/model.dart\' as prefix1;\n'
+      'import \'package:site/model_class.dart\' as prefix1;\n'
       '\n'
       'mixin ComponentStateSyncMixin on State<prefix0.Component>\n'
       '    implements SyncStateMixin<prefix0.Component, Map<String, dynamic>> {\n'

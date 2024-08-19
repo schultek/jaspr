@@ -42,7 +42,7 @@ void main() {
           clientModelClassSources,
           outputs: {
             ...clientModelClassJsonOutputs,
-            'site|web/component_model.client.dart': isNotEmpty,
+            'site|web/component_model_class.client.dart': isNotEmpty,
           },
           reader: await PackageAssetReader.currentIsolate(),
         );
@@ -53,7 +53,7 @@ void main() {
           ClientModuleBuilder(BuilderOptions({})),
           clientModelClassSources,
           outputs: {
-            'site|lib/component_model.client.json': isNotEmpty,
+            'site|lib/component_model_class.client.json': isNotEmpty,
             ...clientModelClassDartOutputs,
           },
           reader: await PackageAssetReader.currentIsolate(),
@@ -68,7 +68,7 @@ void main() {
           clientModelExtensionSources,
           outputs: {
             ...clientModelExtensionJsonOutputs,
-            'site|web/component_model.client.dart': isNotEmpty,
+            'site|web/component_model_extension.client.dart': isNotEmpty,
           },
           reader: await PackageAssetReader.currentIsolate(),
         );
@@ -79,7 +79,7 @@ void main() {
           ClientModuleBuilder(BuilderOptions({})),
           clientModelExtensionSources,
           outputs: {
-            'site|lib/component_model.client.json': isNotEmpty,
+            'site|lib/component_model_extension.client.json': isNotEmpty,
             ...clientModelExtensionDartOutputs,
           },
           reader: await PackageAssetReader.currentIsolate(),

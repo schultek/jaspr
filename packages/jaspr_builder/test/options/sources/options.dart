@@ -1,11 +1,13 @@
 import '../../client/sources/client_basic.dart';
 import '../../client/sources/client_model_class.dart';
+import '../../client/sources/client_model_extension.dart';
 import '../../styles/sources/styles_class.dart';
 import '../../styles/sources/styles_global.dart';
 
 final optionsSources = {
   ...clientBasicJsonOutputs,
   ...clientModelClassJsonOutputs,
+  ...clientModelExtensionJsonOutputs,
   ...stylesGlobalOutputs,
   ...stylesClassOutputs,
   'site|pubspec.yaml': '''
@@ -20,8 +22,10 @@ final optionsOutputs = {
       '\n'
       'import \'package:jaspr/jaspr.dart\';\n'
       'import \'package:site/component_basic.dart\' as prefix0;\n'
-      'import \'package:site/component_model.dart\' as prefix1;\n'
-      'import \'package:site/styles.dart\' as prefix2;\n'
+      'import \'package:site/component_model_class.dart\' as prefix1;\n'
+      'import \'package:site/component_model_extension.dart\' as prefix2;\n'
+      'import \'package:site/model_extension.dart\' as prefix3;\n'
+      'import \'package:site/styles.dart\' as prefix4;\n'
       '\n'
       '/// Default [JasprOptions] for use with your jaspr project.\n'
       '///\n'
@@ -42,15 +46,17 @@ final optionsOutputs = {
       'final defaultJasprOptions = JasprOptions(\n'
       '  clients: {\n'
       '    prefix0.Component: ClientTarget<prefix0.Component>(\'component_basic\', params: _prefix0Component),\n'
-      '    prefix1.Component: ClientTarget<prefix1.Component>(\'component_model\', params: _prefix1Component),\n'
+      '    prefix1.Component: ClientTarget<prefix1.Component>(\'component_model_class\', params: _prefix1Component),\n'
+      '    prefix2.Component: ClientTarget<prefix2.Component>(\'component_model_extension\', params: _prefix2Component),\n'
       '  },\n'
       '  styles: () => [\n'
-      '    ...prefix2.Component.styles,\n'
-      '    ...prefix2.Component.styles2,\n'
+      '    ...prefix4.Component.styles,\n'
+      '    ...prefix4.Component.styles2,\n'
       '  ],\n'
       ');\n'
       '\n'
       'Map<String, dynamic> _prefix0Component(prefix0.Component c) => {\'a\': c.a, \'b\': c.b, \'c\': c.c, \'d\': c.d};\n'
       'Map<String, dynamic> _prefix1Component(prefix1.Component c) => {\'a\': c.a, \'b\': c.b.toRaw()};\n'
+      'Map<String, dynamic> _prefix2Component(prefix2.Component c) => {\'a\': c.a, \'b\': prefix3.ModelCodec(c.b).toRaw()};\n'
       '',
 };

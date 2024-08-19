@@ -50,7 +50,7 @@ class JasprOptionsBuilder implements Builder {
     final styles = await loadStylesModules(buildStep);
 
     clients.sortByCompare((c) => '${c.id.toImportUrl()}/${c.name}', ImportsWriter.compareImports);
-    clients.sortByCompare((s) => s.id.toImportUrl(), ImportsWriter.compareImports);
+    styles.sortByCompare((s) => s.id.toImportUrl(), ImportsWriter.compareImports);
 
     var source = '''
       $generationHeader

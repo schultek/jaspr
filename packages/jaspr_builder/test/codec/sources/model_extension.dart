@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 const modelExtensionSources = {
-  'site|lib/model.dart': '''
+  'site|lib/model_type.dart': '''
     import 'package:jaspr/jaspr.dart';
         
     class Model {
@@ -12,7 +12,11 @@ const modelExtensionSources = {
       final double? c;
       final bool d;
     }
-    
+  ''',
+  'site|lib/model_extension.dart': '''
+    import 'package:jaspr/jaspr.dart';
+    import 'model_type.dart';
+        
     extension type ModelCodec._(Model model) implements Model {  
       @decoder
       factory ModelCodec.fromRaw(Map<String, dynamic> raw) {
@@ -28,15 +32,16 @@ const modelExtensionSources = {
 };
 
 final modelExtensionOutputs = {
-  'site|lib/model.codec.json': jsonEncode({
-    "id": ["site", "lib/model.dart"],
+  'site|lib/model_extension.codec.json': jsonEncode({
+    "id": ["site", "lib/model_extension.dart"],
     "elements": [
       {
         "name": "Model",
         "extension": "ModelCodec",
         "decoder": "fromRaw",
         "encoder": "toRaw",
-        "import": "package:site/model.dart"
+        "import": "package:site/model_extension.dart",
+        "typeImport": "package:site/model_type.dart",
       }
     ]
   }),

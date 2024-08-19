@@ -49,6 +49,10 @@ extension CodecReader on Codecs {
     var encoder = type.acceptWithArgument(EncoderVisitor(this), getter);
     return encoder ?? getter;
   }
+
+  String getPrefixedType(DartType type) {
+    return type.accept(PrefixVisitor(this));
+  }
 }
 
 class EncoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
@@ -121,5 +125,26 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
       }
     }
     return super.visitInterfaceType(type, argument);
+  }
+}
+
+class PrefixVisitor extends UnifyingTypeVisitor<String> {
+  PrefixVisitor(this.codecs);
+  final Codecs codecs;
+
+  @override
+  String visitDartType(DartType type) {
+    return type.getDisplayString();
+  }
+
+  @override
+  String visitInterfaceType(InterfaceType type) {
+    var name = type.element.name;
+    if (codecs[type.element.name] case final codec?) {
+      name = '[[${codec.typeImport ?? codec.import}]].$name';
+    }
+    var nullable = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+    var args = type.typeArguments.map((t) => t.accept(this));
+    return '$name${args.isEmpty ? '' : '<${args.join(', ')}>'}$nullable';
   }
 }

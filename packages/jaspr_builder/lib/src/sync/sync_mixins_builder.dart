@@ -109,10 +109,13 @@ class SyncMixinsBuilder implements Builder {
     final (clazz, fields) = element;
     final comp = clazz.supertype!.typeArguments.first.element!;
 
-    final members = fields.map((f) => """
-      ${f.type.getDisplayString()} get ${f.name};
-      set ${f.name}(${f.type.getDisplayString()} ${f.name});
-    """).join('\n');
+    final members = fields.map((f) {
+      var type = codecs.getPrefixedType(f.type);
+      return """
+        $type get ${f.name};
+        set ${f.name}($type ${f.name});
+      """;
+    }).join('\n');
 
     final decoders = fields.map((f) {
       var decoder = codecs.getDecoderFor(f.type, "value['${f.name}']");
