@@ -37,22 +37,23 @@ class ImportsOutputBuilder implements Builder {
       var relativeDir = path.relative(outputDir, from: path.dirname(buildStep.inputId.path));
 
       await buildStep.writeAsString(
-          outputId,
-          DartFormatter().format("""
-        $generationHeader
-        
-        ${webShow.isNotEmpty ? """
-          export '$relativeDir/_web.dart' 
-            if (dart.library.io) '$relativeDir/_stubs.dart' 
-            show ${webShow.join(', ')};
-        """ : ''}
-        
-        ${vmShow.isNotEmpty ? """
-          export '$relativeDir/_vm.dart' 
-            if (dart.library.html) '$relativeDir/_stubs.dart' 
-            show ${vmShow.join(', ')};
-        """ : ''}
-      """));
+        outputId,
+        DartFormatter(pageWidth: 120).format("""
+          $generationHeader
+          
+          ${webShow.isNotEmpty ? """
+            export '$relativeDir/_web.dart' 
+              if (dart.library.io) '$relativeDir/_stubs.dart' 
+              show ${webShow.join(', ')};
+          """ : ''}
+          
+          ${vmShow.isNotEmpty ? """
+            export '$relativeDir/_vm.dart' 
+              if (dart.library.html) '$relativeDir/_stubs.dart' 
+              show ${vmShow.join(', ')};
+          """ : ''}
+        """),
+      );
     } catch (e, st) {
       print(e);
       print(st);

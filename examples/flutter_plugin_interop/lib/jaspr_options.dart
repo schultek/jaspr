@@ -2,7 +2,7 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/jaspr.dart';
-import 'components/app.dart' as prefix0;
+import 'package:flutter_plugin_interop/components/app.dart' as prefix0;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
