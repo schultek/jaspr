@@ -4,7 +4,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
 
-import '../codec/codec_resource.dart';
+import '../codec/codecs.dart';
 import '../utils.dart';
 
 /// Builds mixins for components annotated with @sync
@@ -83,12 +83,8 @@ class SyncMixinsBuilder implements Builder {
       return;
     }
 
-    var resource = await buildStep.fetchResource(codecResource);
-    var codecs = await resource.readCodecs(buildStep);
-
-    var mixins = annotated.map((e) {
-      return generateMixinFromEntry(e, codecs, buildStep.inputId.toImportUrl());
-    }).join('\n\n');
+    var codecs = await buildStep.loadCodecs();
+    var mixins = annotated.map((e) => generateMixinFromEntry(e, codecs, buildStep.inputId.toImportUrl())).join('\n\n');
 
     var source = '''
       $generationHeader

@@ -1,5 +1,7 @@
 // ignore_for_file: implementation_imports
 
+import 'dart:convert';
+
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
@@ -52,7 +54,9 @@ extension ElementNode on Element {
 }
 
 class ImportsWriter {
-  ImportsWriter();
+  ImportsWriter({this.deferred = false});
+
+  final bool deferred;
 
   final List<String> imports = [];
   bool _sorted = false;
@@ -113,7 +117,9 @@ class ImportsWriter {
   @override
   String toString() {
     assert(_sorted);
-    return imports.mapIndexed((index, url) => "import '$url' as prefix$index;").join('\n');
+    return imports
+        .mapIndexed((index, url) => "import '$url' ${deferred ? 'deferred ' : ''}as prefix$index;")
+        .join('\n');
   }
 }
 
@@ -137,5 +143,20 @@ extension ResolveImports on String {
       var url = match.group(1)!;
       return imports.prefixOf(url);
     });
+  }
+}
+
+extension LoadBundle on BuildStep {
+  Stream<T> loadBundle<T>(String name, T Function(Map<String, dynamic>) decoder) async* {
+    var config = await packageConfig;
+    for (var package in config.packages) {
+      var bundleId = AssetId(package.name, 'lib/$name.bundle.json');
+      if (await canRead(bundleId)) {
+        var bundle = jsonDecode(await readAsString(bundleId)) as List;
+        for (var element in bundle) {
+          yield decoder(element);
+        }
+      }
+    }
   }
 }

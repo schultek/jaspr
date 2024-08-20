@@ -13,7 +13,7 @@ const modelClassSources = {
       final bool d;
       
       @decoder
-      factory Model.fromRaw(Map<String, dynamic> raw) {
+      factory Model.fromRaw(Map<String, dynamic> model) {
         return Model(model['a'], b: model['b'], c: model['c'], d: model['d']);
       }
       

@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed issue with wrongly generated imports of `@encoder`/`@decoder` methods.
+
 ## 0.14.0
 
 - **BREAKING** Calling `Jaspr.initializeApp()` is now required in static and server mode.

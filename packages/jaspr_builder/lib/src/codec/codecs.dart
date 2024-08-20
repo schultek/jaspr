@@ -1,41 +1,22 @@
-import 'dart:convert';
-
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/type_visitor.dart';
 import 'package:build/build.dart';
-import 'package:glob/glob.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:source_gen/source_gen.dart';
 
+import '../utils.dart';
 import 'codec_module_builder.dart';
-
-final codecResource = Resource<CodecResource>(() => CodecResource._());
 
 final encoderChecker = TypeChecker.fromRuntime(EncoderAnnotation);
 final decoderChecker = TypeChecker.fromRuntime(DecoderAnnotation);
 
 typedef Codecs = Map<String, CodecElement>;
 
-class CodecResource {
-  CodecResource._();
-
-  Future<Codecs>? _codecs;
-
-  Future<Codecs> readCodecs(AssetReader reader) async {
-    return _codecs ??= Future(() async {
-      var modules = reader
-          .findAssets(Glob('lib/**.codec.json'))
-          .asyncMap((id) => reader.readAsString(id))
-          .map((c) => CodecModule.deserialize(jsonDecode(c)));
-      var codecs = <String, CodecElement>{};
-      await for (final module in modules) {
-        for (var element in module.elements) {
-          codecs[element.name] = element;
-        }
-      }
-      return codecs;
-    });
+extension CodecLoader on BuildStep {
+  Future<Codecs> loadCodecs() async {
+    var bundle = await loadBundle<CodecElement>('codec', CodecElement.deserialize).toList();
+    return {for (final c in bundle) c.name: c};
   }
 }
 

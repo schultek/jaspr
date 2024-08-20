@@ -5,7 +5,6 @@ import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:glob/glob.dart';
-import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart' as yaml;
 
 import '../client/client_module_builder.dart';
@@ -49,7 +48,7 @@ class JasprOptionsBuilder implements Builder {
     final clients = await loadClientModules(buildStep);
     final styles = await loadStylesModules(buildStep);
 
-    clients.sortByCompare((c) => '${c.id.toImportUrl()}/${c.name}', ImportsWriter.compareImports);
+    clients.sortByCompare((c) => '${c.import}/${c.name}', ImportsWriter.compareImports);
     styles.sortByCompare((s) => s.id.toImportUrl(), ImportsWriter.compareImports);
 
     var source = '''
@@ -88,7 +87,7 @@ class JasprOptionsBuilder implements Builder {
     await buildStep.writeAsString(optionsId, source);
   }
 
-  Future<List<ClientModule>> loadClientModules(BuildStep buildStep) {
+  Future<List<ClientModule>> loadClientModules(BuildStep buildStep) async {
     return buildStep
         .findAssets(Glob('lib/**.client.json'))
         .asyncMap((id) => buildStep.readAsString(id))
@@ -108,9 +107,9 @@ class JasprOptionsBuilder implements Builder {
     if (clients.isEmpty) return '';
     return 'clients: {${clients.map((c) {
       return '''
-        [[${c.id.toImportUrl()}]].${c.name}: ClientTarget<[[${c.id.toImportUrl()}]].${c.name}>(
-          '${path.url.relative(path.url.withoutExtension(c.id.path), from: 'lib')}'
-          ${c.params.isNotEmpty ? ', params: _[[${c.id.toImportUrl()}]]${c.name}' : ''}
+        [[${c.import}]].${c.name}: ClientTarget<[[${c.import}]].${c.name}>(
+          '${c.id}'
+          ${c.params.isNotEmpty ? ', params: _[[${c.import}]]${c.name}' : ''}
         ),
       ''';
     }).join('\n')}},';
@@ -118,7 +117,7 @@ class JasprOptionsBuilder implements Builder {
 
   String buildClientParamGetters(List<ClientModule> clients) {
     return clients.where((c) => c.params.isNotEmpty).map((c) {
-      return 'Map<String, dynamic> _[[${c.id.toImportUrl()}]]${c.name}([[${c.id.toImportUrl()}]].${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};';
+      return 'Map<String, dynamic> _[[${c.import}]]${c.name}([[${c.import}]].${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};';
     }).join('\n');
   }
 

@@ -8,7 +8,7 @@ builders:
     build_extensions:
       "lib/$lib$":
         - "lib/jaspr_options.dart"
-    auto_apply: dependents
+    auto_apply: root_package
     build_to: source
     required_inputs:
       - '.client.json'
@@ -25,10 +25,10 @@ builders:
       "lib/{{file}}.dart":
         - "lib/{{file}}.client.json"
         - "web/{{file}}.client.dart"
-    auto_apply: dependents
+    auto_apply: root_package
     build_to: cache
     required_inputs:
-      - '.codec.json'
+      - 'codec.bundle.json'
   client_registry:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "buildClientRegistry" ]
@@ -37,7 +37,7 @@ builders:
         - "web/main.clients.dart"
     required_inputs:
       - '.client.json'
-    auto_apply: dependents
+    auto_apply: root_package
     build_to: cache
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap
@@ -64,7 +64,7 @@ builders:
     auto_apply: dependents
     build_to: source
     required_inputs:
-      - '.codec.json'
+      - 'codec.bundle.json'
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap
 # ========================
@@ -76,8 +76,18 @@ builders:
     build_extensions:
       ".dart":
         - ".codec.json"
-    auto_apply: dependents
+    auto_apply: all_packages
     build_to: cache
+  codec_bundle:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildCodecBundle" ]
+    build_extensions:
+      "lib/$lib$":
+        - "lib/codec.bundle.json"
+    auto_apply: all_packages
+    build_to: cache
+    required_inputs:
+      - '.codec.json'
 # ========================
 # === Platform Imports ===
 # ========================

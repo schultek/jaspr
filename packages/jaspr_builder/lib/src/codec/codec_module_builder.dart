@@ -5,7 +5,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 
-import 'codec_resource.dart';
+import 'codecs.dart';
 
 /// Builds modules for types annotated with @encoder / @decoder
 class CodecModuleBuilder implements Builder {
@@ -148,6 +148,10 @@ class CodecModuleBuilder implements Builder {
             } else if (element.representation.type.element?.name == null) {
               log.severe(
                   'Extension types using @decoder and @encoder must have a valid representation type. Failing element: ${element.name} in library ${library.source.fullName}.');
+              return null;
+            } else if (element.primaryConstructor.isPrivate || element.primaryConstructor.name.isNotEmpty) {
+              log.severe(
+                  'Extension types using @decoder and @encoder must have a public unnamed primary constructor. Failing element: ${element.name} in library ${library.source.fullName}.');
               return null;
             }
           }

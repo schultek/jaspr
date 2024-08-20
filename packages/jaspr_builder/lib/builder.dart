@@ -2,6 +2,7 @@ import 'package:build/build.dart';
 
 import 'src/client/client_module_builder.dart';
 import 'src/client/client_registry_builder.dart';
+import 'src/codec/codec_bundle_builder.dart';
 import 'src/codec/codec_module_builder.dart';
 import 'src/imports/analyzing_builder.dart';
 import 'src/imports/imports_builder.dart';
@@ -23,3 +24,4 @@ Builder buildStylesModule(BuilderOptions options) => StylesModuleBuilder(options
 Builder buildSyncMixins(BuilderOptions options) => SyncMixinsBuilder(options);
 
 Builder buildCodecModule(BuilderOptions options) => CodecModuleBuilder(options);
+Builder buildCodecBundle(BuilderOptions options) => CodecBundleBuilder(options);

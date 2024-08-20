@@ -4,9 +4,10 @@ import 'dart:convert';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
+import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
 
-import '../codec/codec_resource.dart';
+import '../codec/codecs.dart';
 import '../utils.dart';
 
 /// Builds modules for components annotated with @client
@@ -75,8 +76,7 @@ class ClientModuleBuilder implements Builder {
       return;
     }
 
-    var resource = await buildStep.fetchResource(codecResource);
-    var codecs = await resource.readCodecs(buildStep);
+    var codecs = await buildStep.loadCodecs();
     var module = ClientModule.fromElement(element, codecs, buildStep);
 
     var outputId = buildStep.inputId.changeExtension('.client.json');
@@ -97,31 +97,34 @@ class ClientModuleBuilder implements Builder {
       }
       
       Component getComponentForParams(ConfigParams p) {
-        return [[${module.id.toImportUrl()}]].${module.name}(${module.params.where((p) => !p.isNamed).map((p) => p.decoder).followedBy(module.params.where((p) => p.isNamed).map((p) => '${p.name}: ${p.decoder}')).join(', ')});
+        return ${module.componentFactory()};
       }
     ''';
     source = ImportsWriter().resolve(source);
     source = DartFormatter(pageWidth: 120).format(source);
 
+    var moduleId = AssetId.resolve(Uri.parse(module.import));
     var webId =
-        AssetId(module.id.package, module.id.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.client.dart'));
+        AssetId(moduleId.package, moduleId.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.client.dart'));
     await buildStep.writeAsString(webId, source);
   }
 }
 
 class ClientModule {
   final String name;
-  final AssetId id;
+  final String id;
+  final String import;
   final List<ClientParam> params;
 
-  ClientModule({required this.name, required this.id, required this.params});
+  ClientModule({required this.name, required this.id, required this.import, required this.params});
 
   static ClientModule fromElement(ClassElement element, Codecs codecs, BuildStep buildStep) {
     var params = getParamsFor(element, codecs);
 
     return ClientModule(
       name: element.name,
-      id: buildStep.inputId,
+      id: path.url.withoutExtension(buildStep.inputId.path).replaceFirst('lib/', ''),
+      import: buildStep.inputId.toImportUrl(),
       params: params,
     );
   }
@@ -129,7 +132,8 @@ class ClientModule {
   factory ClientModule.deserialize(Map<String, dynamic> map) {
     return ClientModule(
       name: map['name'],
-      id: AssetId.deserialize(map['id']),
+      id: map['id'],
+      import: map['import'],
       params: [
         for (var p in map['params']) ClientParam.deserialize(p),
       ],
@@ -138,11 +142,16 @@ class ClientModule {
 
   Map<String, dynamic> serialize() => {
         'name': name,
-        'id': id.serialize(),
+        'id': id,
+        'import': import,
         'params': [
           for (var p in params) p.serialize(),
         ],
       };
+
+  String componentFactory() {
+    return '[[$import]].$name(${params.where((p) => !p.isNamed).map((p) => p.decoder).followedBy(params.where((p) => p.isNamed).map((p) => '${p.name}: ${p.decoder}')).join(', ')})';
+  }
 }
 
 class ClientParam {
