@@ -8,6 +8,7 @@ import 'src/imports/analyzing_builder.dart';
 import 'src/imports/imports_builder.dart';
 import 'src/imports/stubs_builder.dart';
 import 'src/options/jaspr_options_builder.dart';
+import 'src/styles/styles_bundle_builder.dart';
 import 'src/styles/styles_module_builder.dart';
 import 'src/sync/sync_mixins_builder.dart';
 
@@ -21,6 +22,8 @@ Builder writePlatformImports(BuilderOptions options) => ImportsOutputBuilder(opt
 Builder buildPlatformStubs(BuilderOptions options) => ImportsStubsBuilder(options);
 
 Builder buildStylesModule(BuilderOptions options) => StylesModuleBuilder(options);
+Builder buildStylesBundle(BuilderOptions options) => StylesBundleBuilder(options);
+
 Builder buildSyncMixins(BuilderOptions options) => SyncMixinsBuilder(options);
 
 Builder buildCodecModule(BuilderOptions options) => CodecModuleBuilder(options);

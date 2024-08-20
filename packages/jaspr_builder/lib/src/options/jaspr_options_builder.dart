@@ -8,6 +8,7 @@ import 'package:glob/glob.dart';
 import 'package:yaml/yaml.dart' as yaml;
 
 import '../client/client_module_builder.dart';
+import '../styles/styles_bundle_builder.dart';
 import '../styles/styles_module_builder.dart';
 import '../utils.dart';
 
@@ -45,11 +46,19 @@ class JasprOptionsBuilder implements Builder {
       return;
     }
 
-    final clients = await loadClientModules(buildStep);
-    final styles = await loadStylesModules(buildStep);
+    var (clients, styles, sources) = await (
+      loadClientModules(buildStep),
+      loadStylesModules(buildStep),
+      loadTransitiveSources(buildStep),
+    ).wait;
 
     clients.sortByCompare((c) => '${c.import}/${c.name}', ImportsWriter.compareImports);
-    styles.sortByCompare((s) => s.id.toImportUrl(), ImportsWriter.compareImports);
+    styles = [
+      for (var s in styles)
+        sources.contains(s.id)
+            ? s
+            : StylesModule(id: s.id, elements: s.elements.where((e) => !e.contains('.')).toList())
+    ]..sortByCompare((s) => s.id.toImportUrl(), ImportsWriter.compareImports);
 
     var source = '''
       $generationHeader
@@ -95,12 +104,23 @@ class JasprOptionsBuilder implements Builder {
         .toList();
   }
 
-  Future<List<StylesModule>> loadStylesModules(BuildStep buildStep) {
-    return buildStep
-        .findAssets(Glob('lib/**.styles.json'))
-        .asyncMap((id) => buildStep.readAsString(id))
-        .map((c) => StylesModule.deserialize(jsonDecode(c)))
-        .toList();
+  Future<List<StylesModule>> loadStylesModules(BuildStep buildStep) async {
+    return await buildStep.loadStyles();
+  }
+
+  Future<Set<AssetId>> loadTransitiveSources(BuildStep buildStep) async {
+    final main = AssetId(buildStep.inputId.package, 'lib/main.dart');
+    if (!await buildStep.canRead(main)) {
+      return {};
+    }
+    await buildStep.resolver.libraryFor(main);
+    return buildStep.resolver.libraries.expand<AssetId>((lib) {
+      try {
+        return [AssetId.resolve(lib.source.uri)];
+      } catch (_) {
+        return [];
+      }
+    }).toSet();
   }
 
   String buildClientEntries(List<ClientModule> clients) {
