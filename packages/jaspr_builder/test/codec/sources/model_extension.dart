@@ -4,8 +4,8 @@ const modelExtensionSources = {
   'site|lib/model_type.dart': '''
     import 'package:jaspr/jaspr.dart';
         
-    class Model {
-      Model(this.a, {this.b = 18, this.c, required this.d});
+    class ModelB {
+      ModelB(this.a, {this.b = 18, this.c, required this.d});
       
       final String a;
       final int b;
@@ -17,10 +17,10 @@ const modelExtensionSources = {
     import 'package:jaspr/jaspr.dart';
     import 'model_type.dart';
         
-    extension type ModelCodec._(Model model) implements Model {  
+    extension type ModelBCodec(ModelB model) implements ModelB {  
       @decoder
-      factory ModelCodec.fromRaw(Map<String, dynamic> raw) {
-        return ModelCodec._(Model(model['a'], b: model['b'], c: model['c'], d: model['d']));
+      factory ModelBCodec.fromRaw(Map<String, dynamic> raw) {
+        return ModelBCodec._(ModelB(model['a'], b: model['b'], c: model['c'], d: model['d']));
       }
       
       @encoder
@@ -33,11 +33,10 @@ const modelExtensionSources = {
 
 final modelExtensionOutputs = {
   'site|lib/model_extension.codec.json': jsonEncode({
-    "id": ["site", "lib/model_extension.dart"],
     "elements": [
       {
-        "name": "Model",
-        "extension": "ModelCodec",
+        "name": "ModelB",
+        "extension": "ModelBCodec",
         "decoder": "fromRaw",
         "encoder": "toRaw",
         "import": "package:site/model_extension.dart",

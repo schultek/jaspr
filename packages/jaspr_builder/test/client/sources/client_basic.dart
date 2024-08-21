@@ -22,7 +22,8 @@ const clientBasicSources = {
 final clientBasicJsonOutputs = {
   'site|lib/component_basic.client.json': jsonEncode({
     "name": "Component",
-    "id": ["site", "lib/component_basic.dart"],
+    "id": "component_basic",
+    "import": "package:site/component_basic.dart",
     "params": [
       {"name": "a", "isNamed": false, "decoder": "p.get('a')", "encoder": "c.a"},
       {"name": "b", "isNamed": true, "decoder": "p.get('b')", "encoder": "c.b"},

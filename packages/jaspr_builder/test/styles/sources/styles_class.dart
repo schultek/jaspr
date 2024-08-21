@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 const stylesClassSources = {
-  'site|lib/styles.dart': '''
+  'site|lib/styles_class.dart': '''
     import 'package:jaspr/jaspr.dart';
         
     class Component {
@@ -21,8 +21,8 @@ const stylesClassSources = {
 };
 
 final stylesClassOutputs = {
-  'site|lib/styles.styles.json': jsonEncode({
+  'site|lib/styles_class.styles.json': jsonEncode({
     "elements": ["Component.styles", "Component.styles2"],
-    "id": ["site", "lib/styles.dart"],
+    "id": ["site", "lib/styles_class.dart"],
   }),
 };

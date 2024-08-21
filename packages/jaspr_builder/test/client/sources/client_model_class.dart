@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../../codec/sources/bundle.dart';
 import '../../codec/sources/model_class.dart';
 
 final clientModelClassSources = {
@@ -12,26 +13,27 @@ final clientModelClassSources = {
       Component(this.a, {required this.b, super.key});
       
       final String a;
-      final Model b;
+      final ModelA b;
     
       @override
       Iterable<Component> build(BuildContext context) => [];
     }
   ''',
   ...modelClassSources,
-  ...modelClassOutputs,
+  ...codecBundleOutputs,
 };
 
 final clientModelClassJsonOutputs = {
   'site|lib/component_model_class.client.json': jsonEncode({
     "name": "Component",
-    "id": ["site", "lib/component_model_class.dart"],
+    "id": "component_model_class",
+    "import": "package:site/component_model_class.dart",
     "params": [
       {"name": "a", "isNamed": false, "decoder": "p.get('a')", "encoder": "c.a"},
       {
         "name": "b",
         "isNamed": true,
-        "decoder": "[[package:site/model_class.dart]].Model.fromRaw(p.get('b'))",
+        "decoder": "[[package:site/model_class.dart]].ModelA.fromRaw(p.get('b'))",
         "encoder": "c.b.toRaw()",
       },
     ]
@@ -51,6 +53,6 @@ final clientModelClassDartOutputs = {
       '}\n'
       '\n'
       'Component getComponentForParams(ConfigParams p) {\n'
-      '  return prefix0.Component(p.get(\'a\'), b: prefix1.Model.fromRaw(p.get(\'b\')));\n'
+      '  return prefix0.Component(p.get(\'a\'), b: prefix1.ModelA.fromRaw(p.get(\'b\')));\n'
       '}\n',
 };

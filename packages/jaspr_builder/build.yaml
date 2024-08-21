@@ -101,17 +101,17 @@ builders:
 # ========================
 # === Platform Imports ===
 # ========================
-  imports:
+  imports_module:
     import: "package:jaspr_builder/builder.dart"
-    builder_factories: [ "findPlatformImports" ]
+    builder_factories: [ "buildImportsModule" ]
     build_extensions:
       ".dart":
         - ".imports.json"
     auto_apply: dependents
     build_to: cache
-  import_parts:
+  import_output:
     import: "package:jaspr_builder/builder.dart"
-    builder_factories: [ "writePlatformImports" ]
+    builder_factories: [ "buildImportsOutput" ]
     build_extensions:
       ".imports.json":
         - ".imports.dart"
@@ -132,6 +132,6 @@ builders:
     auto_apply: dependents
     build_to: source
     required_inputs:
-      - .imports.json
+      - '.imports.json'
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap

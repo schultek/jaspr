@@ -17,8 +17,8 @@ Builder buildJasprOptions(BuilderOptions options) => JasprOptionsBuilder(options
 Builder buildClientModule(BuilderOptions options) => ClientModuleBuilder(options);
 Builder buildClientRegistry(BuilderOptions options) => ClientRegistryBuilder(options);
 
-Builder findPlatformImports(BuilderOptions options) => ImportsAnalyzingBuilder(options);
-Builder writePlatformImports(BuilderOptions options) => ImportsOutputBuilder(options);
+Builder buildImportsModule(BuilderOptions options) => ImportsModuleBuilder(options);
+Builder buildImportsOutput(BuilderOptions options) => ImportsOutputBuilder(options);
 Builder buildPlatformStubs(BuilderOptions options) => ImportsStubsBuilder(options);
 
 Builder buildStylesModule(BuilderOptions options) => StylesModuleBuilder(options);

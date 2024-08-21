@@ -1,15 +1,13 @@
 import '../../client/sources/client_basic.dart';
 import '../../client/sources/client_model_class.dart';
 import '../../client/sources/client_model_extension.dart';
-import '../../styles/sources/styles_class.dart';
-import '../../styles/sources/styles_global.dart';
+import '../../styles/sources/bundle.dart';
 
 final optionsSources = {
   ...clientBasicJsonOutputs,
   ...clientModelClassJsonOutputs,
   ...clientModelExtensionJsonOutputs,
-  ...stylesGlobalOutputs,
-  ...stylesClassOutputs,
+  ...stylesBundleOutputs,
   'site|pubspec.yaml': '''
     jaspr:
       mode: static
@@ -25,7 +23,7 @@ final optionsOutputs = {
       'import \'package:site/component_model_class.dart\' as prefix1;\n'
       'import \'package:site/component_model_extension.dart\' as prefix2;\n'
       'import \'package:site/model_extension.dart\' as prefix3;\n'
-      'import \'package:site/styles.dart\' as prefix4;\n'
+      'import \'package:site/styles_global.dart\' as prefix4;\n'
       '\n'
       '/// Default [JasprOptions] for use with your jaspr project.\n'
       '///\n'
@@ -50,13 +48,13 @@ final optionsOutputs = {
       '    prefix2.Component: ClientTarget<prefix2.Component>(\'component_model_extension\', params: _prefix2Component),\n'
       '  },\n'
       '  styles: () => [\n'
-      '    ...prefix4.Component.styles,\n'
-      '    ...prefix4.Component.styles2,\n'
+      '    ...prefix4.styles,\n'
+      '    ...prefix4.styles2,\n'
       '  ],\n'
       ');\n'
       '\n'
       'Map<String, dynamic> _prefix0Component(prefix0.Component c) => {\'a\': c.a, \'b\': c.b, \'c\': c.c, \'d\': c.d};\n'
       'Map<String, dynamic> _prefix1Component(prefix1.Component c) => {\'a\': c.a, \'b\': c.b.toRaw()};\n'
-      'Map<String, dynamic> _prefix2Component(prefix2.Component c) => {\'a\': c.a, \'b\': prefix3.ModelCodec(c.b).toRaw()};\n'
+      'Map<String, dynamic> _prefix2Component(prefix2.Component c) => {\'a\': c.a, \'b\': prefix3.ModelBCodec(c.b).toRaw()};\n'
       '',
 };

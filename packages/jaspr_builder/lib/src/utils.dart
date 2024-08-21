@@ -148,9 +148,9 @@ extension ResolveImports on String {
 
 extension LoadBundle on BuildStep {
   Stream<T> loadBundle<T>(String name, T Function(Map<String, dynamic>) decoder) async* {
-    var config = await packageConfig;
-    for (var package in config.packages) {
-      var bundleId = AssetId(package.name, 'lib/$name.bundle.json');
+    var packages = {inputId.package, ...(await packageConfig).packages.map((p) => p.name)};
+    for (var package in packages) {
+      var bundleId = AssetId(package, 'lib/$name.bundle.json');
       if (await canRead(bundleId)) {
         var bundle = jsonDecode(await readAsString(bundleId)) as List;
         for (var element in bundle) {

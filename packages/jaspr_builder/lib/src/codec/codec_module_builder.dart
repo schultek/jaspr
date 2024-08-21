@@ -173,15 +173,13 @@ class CodecModuleBuilder implements Builder {
 }
 
 class CodecModule {
-  final AssetId id;
   final List<CodecElement> elements;
 
-  CodecModule({required this.id, required this.elements});
+  CodecModule({required this.elements});
 
   factory CodecModule.fromElements(
       List<(InterfaceElement, ExecutableElement, MethodElement)> elements, BuildStep buildStep) {
     return CodecModule(
-      id: buildStep.inputId,
       elements: [
         for (var (element, decoder, encoder) in elements) CodecElement.fromElement(element, decoder, encoder),
       ],
@@ -190,7 +188,6 @@ class CodecModule {
 
   factory CodecModule.deserialize(Map<String, dynamic> map) {
     return CodecModule(
-      id: AssetId.deserialize(map['id']),
       elements: [
         for (var e in map['elements']) CodecElement.deserialize(e),
       ],
@@ -198,7 +195,6 @@ class CodecModule {
   }
 
   Map<String, dynamic> serialize() => {
-        'id': id.serialize(),
         'elements': [
           for (var e in elements) e.serialize(),
         ],

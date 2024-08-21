@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../../codec/sources/bundle.dart';
 import '../../codec/sources/model_extension.dart';
 
 final clientModelExtensionSources = {
@@ -12,27 +13,28 @@ final clientModelExtensionSources = {
       Component(this.a, {required this.b, super.key});
       
       final String a;
-      final Model b;
+      final ModelB b;
     
       @override
       Iterable<Component> build(BuildContext context) => [];
     }
   ''',
   ...modelExtensionSources,
-  ...modelExtensionOutputs,
+  ...codecBundleOutputs,
 };
 
 final clientModelExtensionJsonOutputs = {
   'site|lib/component_model_extension.client.json': jsonEncode({
     "name": "Component",
-    "id": ["site", "lib/component_model_extension.dart"],
+    "id": "component_model_extension",
+    "import": "package:site/component_model_extension.dart",
     "params": [
       {"name": "a", "isNamed": false, "decoder": "p.get('a')", "encoder": "c.a"},
       {
         "name": "b",
         "isNamed": true,
-        "decoder": "[[package:site/model_extension.dart]].ModelCodec.fromRaw(p.get('b'))",
-        "encoder": "[[package:site/model_extension.dart]].ModelCodec(c.b).toRaw()",
+        "decoder": "[[package:site/model_extension.dart]].ModelBCodec.fromRaw(p.get('b'))",
+        "encoder": "[[package:site/model_extension.dart]].ModelBCodec(c.b).toRaw()",
       },
     ]
   }),
@@ -51,6 +53,6 @@ final clientModelExtensionDartOutputs = {
       '}\n'
       '\n'
       'Component getComponentForParams(ConfigParams p) {\n'
-      '  return prefix0.Component(p.get(\'a\'), b: prefix1.ModelCodec.fromRaw(p.get(\'b\')));\n'
+      '  return prefix0.Component(p.get(\'a\'), b: prefix1.ModelBCodec.fromRaw(p.get(\'b\')));\n'
       '}\n',
 };

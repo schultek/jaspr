@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 const stylesGlobalSources = {
-  'site|lib/styles.dart': '''
+  'site|lib/styles_global.dart': '''
     import 'package:jaspr/jaspr.dart';
         
     @css
@@ -19,8 +19,8 @@ const stylesGlobalSources = {
 };
 
 final stylesGlobalOutputs = {
-  'site|lib/styles.styles.json': jsonEncode({
+  'site|lib/styles_global.styles.json': jsonEncode({
     "elements": ["styles", "styles2"],
-    "id": ["site", "lib/styles.dart"]
+    "id": ["site", "lib/styles_global.dart"]
   }),
 };
