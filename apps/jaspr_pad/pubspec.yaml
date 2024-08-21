@@ -1,6 +1,6 @@
 name: jaspr_pad
 description: Dartpad inspired online-editor for jaspr built with jaspr.
-version: 0.1.1
+version: 0.1.2
 publish_to: none
 homepage: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
@@ -17,8 +17,8 @@ dependencies:
   googleapis: ^12.0.0
   googleapis_auth: ^1.4.1
   http: ^1.1.2
-  jaspr: ^0.14.0
-  jaspr_riverpod: ^0.3.13
+  jaspr: ^0.15.0
+  jaspr_riverpod: ^0.3.14
   js: ^0.6.5
   markdown: ^7.1.1
   mdc_web: ^0.6.0

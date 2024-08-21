@@ -1,6 +1,6 @@
 name: jaspr_serverpod
 description: Serverpod integration for jaspr.
-version: 0.3.2
+version: 0.3.3
 homepage: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
 documentation: https://docs.page/schultek/jaspr
@@ -16,7 +16,7 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  jaspr: ^0.14.0
+  jaspr: ^0.15.0
   serverpod: 2.0.2
   serverpod_client: 2.0.2
   shelf: ^1.4.0

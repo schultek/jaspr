@@ -1,3 +1,7 @@
+## 0.5.1
+
+- `jaspr` upgraded to `0.15.0`
+
 ## 0.5.0
 
 - Changed the signature of the `Link` component, `children` is now a named parameter.
