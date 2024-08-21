@@ -12,6 +12,7 @@
   Top-level styles continue to be always included.
 
 - Fixed issue with wrongly generated imports of `@encoder`/`@decoder` methods.
+- Fixed spelling mistake from `spaceRvenly` to `spaceEvenly`
 
 ## 0.14.0
 
