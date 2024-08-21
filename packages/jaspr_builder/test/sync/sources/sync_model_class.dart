@@ -1,3 +1,4 @@
+import '../../codec/sources/bundle.dart';
 import '../../codec/sources/model_class.dart';
 
 final syncModelClassSources = {
@@ -12,23 +13,23 @@ final syncModelClassSources = {
     
     class ComponentState extends State<Component> with ComponentStateSyncMixin {
       @sync
-      Model? m;
+      ModelA? m;
       @sync
-      late Model m2;
+      late ModelA m2;
       @sync
-      List<Model> m3 = [];
+      List<ModelA> m3 = [];
       @sync
-      List<Model?> m4 = [];
+      List<ModelA?> m4 = [];
       @sync
-      Map<String, Model> m5 = {};
+      Map<String, ModelA> m5 = {};
       @sync
-      Map<String, Model?> m6 = {};
+      Map<String, ModelA?> m6 = {};
       
       Iterable<Component> build(BuildContext context) => [];
     }
   ''',
   ...modelClassSources,
-  ...modelClassOutputs,
+  ...codecBundleOutputs,
 };
 
 final syncModelClassOutputs = {
@@ -41,32 +42,33 @@ final syncModelClassOutputs = {
       '\n'
       'mixin ComponentStateSyncMixin on State<prefix0.Component>\n'
       '    implements SyncStateMixin<prefix0.Component, Map<String, dynamic>> {\n'
-      '  prefix1.Model? get m;\n'
-      '  set m(prefix1.Model? m);\n'
+      '  prefix1.ModelA? get m;\n'
+      '  set m(prefix1.ModelA? m);\n'
       '\n'
-      '  prefix1.Model get m2;\n'
-      '  set m2(prefix1.Model m2);\n'
+      '  prefix1.ModelA get m2;\n'
+      '  set m2(prefix1.ModelA m2);\n'
       '\n'
-      '  List<prefix1.Model> get m3;\n'
-      '  set m3(List<prefix1.Model> m3);\n'
+      '  List<prefix1.ModelA> get m3;\n'
+      '  set m3(List<prefix1.ModelA> m3);\n'
       '\n'
-      '  List<prefix1.Model?> get m4;\n'
-      '  set m4(List<prefix1.Model?> m4);\n'
+      '  List<prefix1.ModelA?> get m4;\n'
+      '  set m4(List<prefix1.ModelA?> m4);\n'
       '\n'
-      '  Map<String, prefix1.Model> get m5;\n'
-      '  set m5(Map<String, prefix1.Model> m5);\n'
+      '  Map<String, prefix1.ModelA> get m5;\n'
+      '  set m5(Map<String, prefix1.ModelA> m5);\n'
       '\n'
-      '  Map<String, prefix1.Model?> get m6;\n'
-      '  set m6(Map<String, prefix1.Model?> m6);\n'
+      '  Map<String, prefix1.ModelA?> get m6;\n'
+      '  set m6(Map<String, prefix1.ModelA?> m6);\n'
       '\n'
       '  @override\n'
       '  void updateState(Map<String, dynamic> value) {\n'
-      '    m = value[\'m\'] != null ? prefix1.Model.fromRaw(value[\'m\']!) : null;\n'
-      '    m2 = prefix1.Model.fromRaw(value[\'m2\']);\n'
-      '    m3 = (value[\'m3\'] as List<dynamic>).map((i) => prefix1.Model.fromRaw(i)).toList();\n'
-      '    m4 = (value[\'m4\'] as List<dynamic>).map((i) => i != null ? prefix1.Model.fromRaw(i!) : null).toList();\n'
-      '    m5 = (value[\'m5\'] as Map<String, dynamic>).map((k, v) => MapEntry(k, prefix1.Model.fromRaw(v)));\n'
-      '    m6 = (value[\'m6\'] as Map<String, dynamic>).map((k, v) => MapEntry(k, v != null ? prefix1.Model.fromRaw(v!) : null));\n'
+      '    m = value[\'m\'] != null ? prefix1.ModelA.fromRaw(value[\'m\']!) : null;\n'
+      '    m2 = prefix1.ModelA.fromRaw(value[\'m2\']);\n'
+      '    m3 = (value[\'m3\'] as List<dynamic>).map((i) => prefix1.ModelA.fromRaw(i)).toList();\n'
+      '    m4 = (value[\'m4\'] as List<dynamic>).map((i) => i != null ? prefix1.ModelA.fromRaw(i!) : null).toList();\n'
+      '    m5 = (value[\'m5\'] as Map<String, dynamic>).map((k, v) => MapEntry(k, prefix1.ModelA.fromRaw(v)));\n'
+      '    m6 =\n'
+      '        (value[\'m6\'] as Map<String, dynamic>).map((k, v) => MapEntry(k, v != null ? prefix1.ModelA.fromRaw(v!) : null));\n'
       '  }\n'
       '\n'
       '  @override\n'
