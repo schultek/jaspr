@@ -23,7 +23,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
-  jaspr_builder: ^0.14.0
+  jaspr_builder: ^0.15.0
   jaspr_web_compilers: ^4.0.10
 
 flutter:
