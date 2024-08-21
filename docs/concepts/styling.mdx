@@ -48,6 +48,29 @@ renders to:
 Try to prefer `const` styles whenever possible, which will benefit the performance and size of your site.
 </Info>
 
+### Responsive styles
+
+To make your styles responsive and e.g. change based on the screen width or height, use the `css.media()` utility.
+This will render [css `@media` queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Using_media_queries).
+
+> Media queries allow you to apply CSS styles depending on a device's media type (such as print vs. screen) or other
+> features or characteristics such as screen resolution or orientation, aspect ratio, browser viewport width or height,
+> user preferences such as preferring reduced motion, data usage, or transparency.
+
+Provide a `MediaQuery` as well as child styles to the function:
+
+```dart
+@css
+final styles = [
+    css('.main').flexbox(direction: FlexDirection.row),
+    css.media(MediaQuery.screen(maxWidth: 600.px), [
+      css('.main').flexbox(direction: FlexDirection.column)
+    ]),
+];
+```
+
+The above rules define a row layout for larger screens and a column layout for smaller (<600px) screens.
+
 ---
 
 ## External Stylesheets
