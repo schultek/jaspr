@@ -2,7 +2,7 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/jaspr.dart';
-import 'components/counter.dart' as prefix0;
+import 'package:example_server/components/counter.dart' as prefix0;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///

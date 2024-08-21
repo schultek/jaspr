@@ -1,5 +1,17 @@
 ## Unreleased patch
 
+- Added support for using `@css` and `@encoder`/`@decoder` across other packages.
+  
+  1. Styles annotated with `@css` from other dependent packages are now also included in the pre-rendered css.
+  2. Models (or extension types) that define `@encoder` and `@decoder` annotations from other dependent packages can
+     now also be used together with `@client` components and `@sync` fields.
+
+- **BREAKING** Component (or any class member) styles annotated with `@css` are now only included in the pre-rendered css if 
+  the file they are defined in is actually imported somewhere in the project.
+
+  Top-level styles continue to be always included.
+
+- Fixed issue with wrongly generated imports of `@encoder`/`@decoder` methods.
 - Fixed spelling mistake from `spaceRvenly` to `spaceEvenly`
 - Added default `BorderStyle.solid` to `BorderSide` constructor.
 

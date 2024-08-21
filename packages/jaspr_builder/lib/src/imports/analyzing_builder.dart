@@ -8,8 +8,8 @@ import 'package:path/path.dart' as path;
 
 import '../utils.dart';
 
-class ImportsAnalyzingBuilder implements Builder {
-  ImportsAnalyzingBuilder(BuilderOptions options);
+class ImportsModuleBuilder implements Builder {
+  ImportsModuleBuilder(BuilderOptions options);
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
@@ -20,56 +20,54 @@ class ImportsAnalyzingBuilder implements Builder {
         return;
       }
 
-      if (await buildStep.resolver.isLibrary(buildStep.inputId)) {
-        var lib = await buildStep.resolver.libraryFor(buildStep.inputId, allowSyntaxErrors: true);
-
-        var outputId = buildStep.inputId.changeExtension('.imports.json');
-        var partId = buildStep.inputId.changeExtension('.imports.dart');
-
-        bool hasAnnotation(Element e) => importChecker.hasAnnotationOf(e);
-        bool hasImportsUri(Element e) {
-          var uri = e is LibraryImportElement
-              ? e.uri
-              : e is LibraryExportElement
-                  ? e.uri
-                  : null;
-          if (uri is DirectiveUriWithRelativeUriString) {
-            return uri.relativeUriString == path.basename(partId.path);
-          }
-          return false;
-        }
-
-        var import = lib.libraryImports
-            .cast<Element>()
-            .followedBy(lib.libraryExports)
-            .where(hasAnnotation)
-            .where(hasImportsUri)
-            .firstOrNull;
-
-        if (import == null) {
-          return;
-        }
-
-        var annotations = importChecker.annotationsOf(import);
-        if (annotations.isEmpty) {
-          return;
-        }
-
-        var entries = [];
-
-        for (var annotation in annotations) {
-          var url = annotation.getField('import')!.toStringValue()!;
-          var show = annotation.getField('show')!.toListValue()!.map((s) {
-            return s.toSymbolValue() ?? s.toStringValue() ?? s.toString();
-          }).toList();
-          var platform = annotation.getField('platform')!.getField('index')!.toIntValue()!;
-          entries.add(ImportEntry(url, show, platform));
-        }
-
-        if (entries.isNotEmpty) {
-          await buildStep.writeAsString(outputId, JsonEncoder.withIndent('  ').convert(entries));
-        }
+      if (!await buildStep.resolver.isLibrary(buildStep.inputId)) {
+        return;
       }
+
+      var lib = await buildStep.resolver.libraryFor(buildStep.inputId, allowSyntaxErrors: true);
+
+      var outputId = buildStep.inputId.changeExtension('.imports.json');
+      var partId = buildStep.inputId.changeExtension('.imports.dart');
+
+      var import = lib.libraryImports
+          .cast<Element>()
+          .followedBy(lib.libraryExports)
+          .where((Element e) => importChecker.hasAnnotationOf(e))
+          .where((Element e) {
+        var uri = switch (e) {
+          LibraryImportElement() => e.uri,
+          LibraryExportElement() => e.uri,
+          _ => null,
+        };
+        if (uri is DirectiveUriWithRelativeUriString && uri.relativeUriString == path.basename(partId.path)) {
+          return true;
+        }
+        log.severe('@Import must only be applied to the respective "<filename>.imports.dart" import of a library. '
+            'Instead found it on "${uri.toString()}" in library ${lib.source.uri.toString()}.');
+        return false;
+      }).firstOrNull;
+
+      if (import == null) {
+        return;
+      }
+
+      var annotations = importChecker.annotationsOf(import);
+      if (annotations.isEmpty) {
+        return;
+      }
+
+      var entries = [];
+
+      for (var annotation in annotations) {
+        var url = annotation.getField('import')!.toStringValue()!;
+        var show = annotation.getField('show')!.toListValue()!.map((s) {
+          return s.toSymbolValue() ?? s.toStringValue() ?? s.toString();
+        }).toList();
+        var platform = annotation.getField('platform')!.getField('index')!.toIntValue()!;
+        entries.add(ImportEntry(url, show, platform));
+      }
+
+      await buildStep.writeAsString(outputId, jsonEncode(entries));
     } catch (e, st) {
       print(e);
       print(st);

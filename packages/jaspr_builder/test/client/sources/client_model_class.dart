@@ -1,44 +1,58 @@
 import 'dart:convert';
 
+import '../../codec/sources/bundle.dart';
 import '../../codec/sources/model_class.dart';
-import 'client_model.dart';
 
 final clientModelClassSources = {
-  ...clientModelSources,
+  'site|lib/component_model_class.dart': '''
+    import 'package:jaspr/jaspr.dart';
+    import 'model_class.dart';
+    
+    @client
+    class Component extends StatelessComponent {
+      Component(this.a, {required this.b, super.key});
+      
+      final String a;
+      final ModelA b;
+    
+      @override
+      Iterable<Component> build(BuildContext context) => [];
+    }
+  ''',
   ...modelClassSources,
-  ...modelClassOutputs,
+  ...codecBundleOutputs,
 };
 
 final clientModelClassJsonOutputs = {
-  'site|lib/component_model.client.json': jsonEncode({
+  'site|lib/component_model_class.client.json': jsonEncode({
     "name": "Component",
-    "id": ["site", "lib/component_model.dart"],
+    "id": "component_model_class",
+    "import": "package:site/component_model_class.dart",
     "params": [
-      {"name": "a", "isNamed": false, "decoder": "p.get('a')", "encoder": "c.a", "imports": []},
+      {"name": "a", "isNamed": false, "decoder": "p.get('a')", "encoder": "c.a"},
       {
         "name": "b",
         "isNamed": true,
-        "decoder": "Model.fromRaw(p.get('b'))",
+        "decoder": "[[package:site/model_class.dart]].ModelA.fromRaw(p.get('b'))",
         "encoder": "c.b.toRaw()",
-        "imports": ["package:site/model.dart"]
       },
     ]
   }),
 };
 
 final clientModelClassDartOutputs = {
-  'site|web/component_model.client.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+  'site|web/component_model_class.client.dart': '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
       'import \'package:jaspr/browser.dart\';\n'
-      'import \'package:site/component_model.dart\' as a;\n'
-      'import \'package:site/model.dart\';\n'
+      'import \'package:site/component_model_class.dart\' as prefix0;\n'
+      'import \'package:site/model_class.dart\' as prefix1;\n'
       '\n'
       'void main() {\n'
       '  runAppWithParams(getComponentForParams);\n'
       '}\n'
       '\n'
       'Component getComponentForParams(ConfigParams p) {\n'
-      '  return a.Component(p.get(\'a\'), b: Model.fromRaw(p.get(\'b\')));\n'
+      '  return prefix0.Component(p.get(\'a\'), b: prefix1.ModelA.fromRaw(p.get(\'b\')));\n'
       '}\n',
 };

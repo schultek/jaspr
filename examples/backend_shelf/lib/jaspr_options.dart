@@ -2,8 +2,8 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/jaspr.dart';
-import 'components/app.dart' as prefix0;
-import 'components/hello.dart' as prefix1;
+import 'package:backend_shelf/components/app.dart' as prefix0;
+import 'package:backend_shelf/components/hello.dart' as prefix1;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///

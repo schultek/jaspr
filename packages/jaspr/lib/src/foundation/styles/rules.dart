@@ -185,7 +185,7 @@ class _AnyMediaRuleQuery implements MediaQuery {
   final List<MediaQuery> queries;
 
   @override
-  String get _value => queries.join(', ');
+  String get _value => queries.map((q) => q._value).join(', ');
 }
 
 class ImportStyleRule implements StyleRule {

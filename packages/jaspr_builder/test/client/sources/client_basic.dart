@@ -22,12 +22,13 @@ const clientBasicSources = {
 final clientBasicJsonOutputs = {
   'site|lib/component_basic.client.json': jsonEncode({
     "name": "Component",
-    "id": ["site", "lib/component_basic.dart"],
+    "id": "component_basic",
+    "import": "package:site/component_basic.dart",
     "params": [
-      {"name": "a", "isNamed": false, "decoder": "p.get('a')", "encoder": "c.a", "imports": []},
-      {"name": "b", "isNamed": true, "decoder": "p.get('b')", "encoder": "c.b", "imports": []},
-      {"name": "c", "isNamed": true, "decoder": "p.get('c')", "encoder": "c.c", "imports": []},
-      {"name": "d", "isNamed": true, "decoder": "p.get('d')", "encoder": "c.d", "imports": []}
+      {"name": "a", "isNamed": false, "decoder": "p.get('a')", "encoder": "c.a"},
+      {"name": "b", "isNamed": true, "decoder": "p.get('b')", "encoder": "c.b"},
+      {"name": "c", "isNamed": true, "decoder": "p.get('c')", "encoder": "c.c"},
+      {"name": "d", "isNamed": true, "decoder": "p.get('d')", "encoder": "c.d"}
     ]
   }),
 };
@@ -37,13 +38,13 @@ final clientBasicDartOutputs = {
       '// Generated with jaspr_builder\n'
       '\n'
       'import \'package:jaspr/browser.dart\';\n'
-      'import \'package:site/component_basic.dart\' as a;\n'
+      'import \'package:site/component_basic.dart\' as prefix0;\n'
       '\n'
       'void main() {\n'
       '  runAppWithParams(getComponentForParams);\n'
       '}\n'
       '\n'
       'Component getComponentForParams(ConfigParams p) {\n'
-      '  return a.Component(p.get(\'a\'), b: p.get(\'b\'), c: p.get(\'c\'), d: p.get(\'d\'));\n'
+      '  return prefix0.Component(p.get(\'a\'), b: p.get(\'b\'), c: p.get(\'c\'), d: p.get(\'d\'));\n'
       '}\n',
 };

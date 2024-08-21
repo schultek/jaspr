@@ -2,8 +2,8 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/jaspr.dart';
-import 'components/app.dart' as prefix0;
-import 'main.dart' as prefix1;
+import 'package:package_riverpod/components/app.dart' as prefix0;
+import 'package:package_riverpod/main.dart' as prefix1;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///

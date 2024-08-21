@@ -1,8 +1,10 @@
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
+import 'package:jaspr_builder/src/codec/codec_bundle_builder.dart';
 import 'package:jaspr_builder/src/codec/codec_module_builder.dart';
 import 'package:test/test.dart';
 
+import 'sources/bundle.dart';
 import 'sources/model_class.dart';
 import 'sources/model_extension.dart';
 
@@ -28,6 +30,15 @@ void main() {
           reader: await PackageAssetReader.currentIsolate(),
         );
       });
+    });
+
+    test('generates bundle', () async {
+      await testBuilder(
+        CodecBundleBuilder(BuilderOptions({})),
+        {...modelClassOutputs, ...modelExtensionOutputs},
+        outputs: codecBundleOutputs,
+        reader: await PackageAssetReader.currentIsolate(),
+      );
     });
   });
 }
