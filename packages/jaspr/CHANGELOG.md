@@ -1,6 +1,7 @@
 ## Unreleased patch
 
 - Fixed spelling mistake from `spaceRvenly` to `spaceEvenly`
+- Added default `BorderStyle.solid` to `BorderSide` constructor.
 
 ## 0.14.0
 

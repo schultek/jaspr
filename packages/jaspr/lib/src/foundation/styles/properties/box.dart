@@ -132,7 +132,7 @@ class BorderSide {
   final Color? color;
   final Unit? width;
 
-  const BorderSide({this.style, this.color, this.width});
+  const BorderSide({this.style = BorderStyle.solid, this.color, this.width});
 
   const BorderSide.none()
       : color = null,
