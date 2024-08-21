@@ -1,4 +1,4 @@
-## Unreleased patch
+## Unreleased minor
 
 - Added support for using `@css` and `@encoder`/`@decoder` across other packages.
   
