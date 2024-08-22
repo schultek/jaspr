@@ -345,7 +345,7 @@
 ## 0.6.2
 
 - Added integrated support for seamless **flutter element embedding**.
-  Refer to [Flutter Embedding Docs](https://docs.page/schultek/jaspr/eco/flutter_embedding) on how to setup and use this.
+  Refer to [Flutter Embedding Docs](https://docs.page/schultek/jaspr/going_further/flutter_embedding) on how to setup and use this.
 
 ## 0.6.1
 
