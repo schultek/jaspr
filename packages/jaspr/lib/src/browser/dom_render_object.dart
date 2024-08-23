@@ -79,7 +79,7 @@ class DomRenderObject extends RenderObject {
         web.console.log("Create html node: $elem".toJS);
       }
     } else {
-      if (node.instanceOfString('Element') || (node as web.Element).tagName.toLowerCase() != tag) {
+      if (!node.instanceOfString('Element') || (node as web.Element).tagName.toLowerCase() != tag) {
         elem = _createElement(tag, namespace);
         var old = node!;
         node!.parentNode!.replaceChild(elem, old);
@@ -140,9 +140,9 @@ class DomRenderObject extends RenderObject {
         prevEventTypes?.remove(type);
         final currentBinding = dataEvents[type];
         if (currentBinding != null) {
-          currentBinding.fn = fn as dynamic;
+          currentBinding.fn = fn;
         } else {
-          dataEvents[type] = EventBinding(elem, type, fn as dynamic);
+          dataEvents[type] = EventBinding(elem, type, fn);
         }
       });
       prevEventTypes?.forEach((type) {
