@@ -40,12 +40,26 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
     if (kIsWeb) {
       context.binding.addPostFrameCallback(() async {
         var element = findChildDomElement(context as Element)!;
+        element = element.children.item(element.children.length - 1)!;
         viewId = await addView(element, component.constraints, flt.StatefulBuilder(builder: (context, setState) {
           rebuildFlutterApp = () => setState(() {});
+          waitOnWarmupFrames();
           return component.app ?? flt.SizedBox.shrink();
         }));
       });
     }
+  }
+
+  int frame = 0;
+  void waitOnWarmupFrames() {
+    if (frame > 2) {
+      setState(() {});
+      return;
+    }
+    flt.WidgetsBinding.instance.addPostFrameCallback((_) {
+      frame++;
+      waitOnWarmupFrames();
+    });
   }
 
   @override
@@ -76,6 +90,8 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
     rebuildFlutterApp?.call();
   }
 
+  final flutterDivKey = UniqueKey();
+
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield div(
@@ -92,7 +108,8 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
         if (component.styles != null) component.styles!
       ]),
       [
-        if (component.loader != null && viewId == null) component.loader!,
+        if (component.loader != null && frame <= 2) component.loader!,
+        div(key: flutterDivKey, []),
       ],
     );
   }

@@ -1,8 +1,8 @@
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
-import 'package:flutter_embedding_demo/components/app.dart' as prefix0;
 import 'package:jaspr/jaspr.dart';
+import 'package:flutter_embedding_demo/components/app.dart' as prefix0;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///

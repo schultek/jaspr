@@ -29,7 +29,6 @@ class _MultiViewAppState extends State<MultiViewApp> with WidgetsBindingObserver
 
   @override
   void didChangeMetrics() {
-    print("CHANGED METRICS");
     _updateViews();
   }
 
@@ -47,7 +46,6 @@ class _MultiViewAppState extends State<MultiViewApp> with WidgetsBindingObserver
   }
 
   Widget _createViewWidget(FlutterView view) {
-    print("BUILDING VIEW ${view.viewId}");
     return View(view: view, child: widget.viewBuilder(view.viewId)!);
   }
 

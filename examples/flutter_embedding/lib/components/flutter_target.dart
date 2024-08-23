@@ -1,14 +1,15 @@
-import 'package:flutter/widgets.dart' show Widget;
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../providers/effects_provider.dart';
+@Import.onWeb('package:flutter/widgets.dart', show: [#Widget])
+import 'flutter_target.imports.dart';
 
 class FlutterTarget extends StatelessComponent {
   const FlutterTarget({required this.app, this.loader, super.key});
 
-  final Widget app;
+  final WidgetOrStubbed? app;
   final Component? loader;
 
   @override

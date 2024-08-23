@@ -13,7 +13,7 @@ class FlutterCounter extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield FlutterEmbedView(
-      //styles: Styles.box(width: 18.rem, height: 5.rem, margin: EdgeInsets.only(top: 2.rem)),
+      styles: Styles.box(margin: EdgeInsets.only(top: 2.rem), position: const Position.relative()),
       constraints: ViewConstraints(
         minWidth: 300,
         minHeight: 100,
@@ -21,10 +21,9 @@ class FlutterCounter extends StatelessComponent {
         maxHeight: double.infinity,
       ),
       loader: div(
-        styles: Styles.box(width: 18.rem, height: 5.rem, margin: EdgeInsets.only(top: 2.rem))
-            .background(color: Colors.black),
-        [],
-      ),
+          styles: Styles.box(width: 100.percent, height: 100.percent, position: const Position.absolute())
+              .background(color: Colors.black),
+          []),
       app: kIsWeb ? CounterWidget(count: count, onChange: onChange) : null,
     );
   }
