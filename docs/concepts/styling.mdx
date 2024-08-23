@@ -1,0 +1,173 @@
+---
+title: Styling
+description: How to style your Jaspr website.
+---
+
+# Styling
+*How to style your Jaspr website.*
+
+---
+
+Jaspr is highly flexible when it comes to styling. Write your own styles, or reference local and external stylesheets.
+You can use Jasprs own type-safe CSS-in-Dart styling system or integrate CSS frameworks to style your website.
+
+## CSS-in-Dart
+
+Jaspr gives you a strongly-typed styles system that wraps the most common css properties. You can
+access these various properties through the [`Styles`](/utils/styles) class that is exported by the core package.
+
+When defining styles like this, you can use them to either write global stylesheets, or set inline styles for html elements.
+
+### Global Stylesheet
+
+You can define a global stylesheet from your Dart code using one of the following options:
+
+1. Passing [Style Rules](/utils/at_css#defining-style-rules) to [Document(styles: ...)](/components/document#parameters).
+   This will render the provided styles into a global stylesheet inside the `<head>` element.
+
+2. Using the [@css](/utils/at_css#registering-style-rules) annotation to automatically render the annotated styles into
+   a global stylesheet inside the `<head>` element.
+
+3. Using the [Style](/components/style) component to manually define a `<style>` element anywhere in the tree.
+
+### Inline Styles
+
+You can also pass a `Styles` instance to any html component, which will then render as inline css styles:
+
+```dart
+div(styles: const Styles.background(color: Colors.red), []);
+```
+
+renders to:
+
+```html
+<div style="background: red"></div>
+```
+
+<Info>
+Try to prefer `const` styles whenever possible, which will benefit the performance and size of your site.
+</Info>
+
+### Responsive styles
+
+To make your styles responsive and e.g. change based on the screen width or height, use the `css.media()` utility.
+This will render [css `@media` queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Using_media_queries).
+
+> Media queries allow you to apply CSS styles depending on a device's media type (such as print vs. screen) or other
+> features or characteristics such as screen resolution or orientation, aspect ratio, browser viewport width or height,
+> user preferences such as preferring reduced motion, data usage, or transparency.
+
+Provide a `MediaQuery` as well as child styles to the function:
+
+```dart
+@css
+final styles = [
+    css('.main').flexbox(direction: FlexDirection.row),
+    css.media(MediaQuery.screen(maxWidth: 600.px), [
+      css('.main').flexbox(direction: FlexDirection.column)
+    ]),
+];
+```
+
+The above rules define a row layout for larger screens and a column layout for smaller (`< 600px`) screens.
+
+---
+
+## External Stylesheets
+
+If you are writing `.css` stylesheets manually or have external stylesheets you want to use, you can add
+them as a `<link rel="stylesheet">` inside the `<head>` element.
+
+When you are in **static** or **server** mode, add this to [Document(head: ...)](/components/document#parameters):
+
+```dart title="lib/main.dart"
+void main() {
+  runApp(Document(
+    /* ... */ // other properties
+    head: [
+      link(rel: "stylesheet", href: "/path/to/your/stylesheet.css"),
+    ],
+    body: App(),
+  ));
+}
+```
+
+When you are in **client** mode, add this directly to the `index.html` file:
+
+```html title="web/index.html"
+<head>
+  <link rel="stylesheet" href="/path/to/your/stylesheet.css"/>
+</head>
+```
+
+### Dynamically Adding Stylesheets
+
+You can use the [Document.head()](/components/document#documenthead) component to dynamically set a value in the `<head>`
+from any component.
+
+```dart
+class MyCustomComponent extends StatelessComponent {
+
+  Iterable<Component> build(BuildContext context) sync* {
+    yield Document.head(children: [
+      <link rel="stylesheet" href="/some/extra/stylesheet.css"/>
+    ]);
+  }
+}
+```
+
+---
+
+## Using Third-Party CSS Frameworks
+
+There are lots of other options from the CSS landscape that you can integrate with Jaspr.
+
+<Info>
+Remember, Jaspr sites are just normal websites. You can do (almost) all the same things.
+</Info>
+
+Some common css solutions include:
+
+- CSS Utility Frameworks, like [Tailwind](https://tailwindcss.com/)
+- CSS Component Frameworks, like [Bulma](https://bulma.io/)
+- CSS Preprocessors, like [Dart Sass](https://sass-lang.com/dart-sass/)
+
+### Tailwind
+
+Jaspr has a first-party Tailwind integration. Check it out [here](/eco/tailwind).
+
+### Bulma
+
+> Bulma is a free, open source framework that provides ready-to-use frontend components that you can easily combine to build responsive web interfaces.
+
+With Bulma (and other similar css component frameworks) you basically only need to add specific classes to your
+html elements to style them as read-made components.
+
+See the [Bulma Example](https://jasprpad.schultek.de/?sample=bulma) on JasprPad for some basic example components.
+
+### Dart Sass
+
+The easiest way to integrate the Sass preprocessor into your dart project is by using the
+[sass_builder](https://pub.dev/packages/sass_builder) package.
+
+After setting up the package, simply create a `.scss` file:
+
+```scss title="web/styles.scss"
+@use "package:bootstrap_sass/scss/variables" as bootstrap;
+
+.a {
+  color: blue;
+}
+.c {
+  color: bootstrap.$body-color;
+}
+```
+
+and include the generated output `.css` file as an [external stylesheet](/concepts/styling#external-stylesheets):
+
+```dart
+link(rel:"stylesheet", href: "/styles.css")
+```
+
+
+

@@ -7,7 +7,7 @@ class GlobalStylesAdapter extends HeadScopeAdapter {
 
   @override
   void applyHead(MarkupRenderObject head) {
-    var styles = binding.options.styles;
+    var styles = binding.options.styles?.call() ?? [];
     if (styles.isEmpty) {
       return;
     }

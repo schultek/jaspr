@@ -16,7 +16,7 @@ class CleanCommand extends BaseCommand {
   }
 
   @override
-  String get description => 'Cleans the project directory.';
+  String get description => 'Delete the `build/` and `.dart_tool/` directories.';
 
   @override
   String get name => 'clean';

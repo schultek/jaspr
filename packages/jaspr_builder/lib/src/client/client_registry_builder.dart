@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:build/build.dart';
-import 'package:collection/collection.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:glob/glob.dart';
-import 'package:path/path.dart' as path;
+
+import '../utils.dart';
+import 'client_module_builder.dart';
 
 /// Builds the registry for client components.
 class ClientRegistryBuilder implements Builder {
@@ -13,13 +15,10 @@ class ClientRegistryBuilder implements Builder {
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     try {
-      var appsSource = await generateApps(buildStep);
-      if (appsSource != null) {
+      var source = await generateClients(buildStep);
+      if (source != null) {
         var outputId = AssetId(buildStep.inputId.package, 'web/main.clients.dart');
-        await buildStep.writeAsString(
-          outputId,
-          appsSource,
-        );
+        await buildStep.writeAsString(outputId, source);
       }
     } catch (e, st) {
       print('An unexpected error occurred.\n'
@@ -39,32 +38,37 @@ class ClientRegistryBuilder implements Builder {
   String get generationHeader => "// GENERATED FILE, DO NOT MODIFY\n"
       "// Generated with jaspr_builder\n";
 
-  Future<String?> generateApps(BuildStep buildStep) async {
-    var moduleFiles = await buildStep.findAssets(Glob('lib/**.client.json')).toList();
+  Future<String?> generateClients(BuildStep buildStep) async {
+    var modules = buildStep
+        .findAssets(Glob('lib/**.client.json'))
+        .asyncMap((id) => buildStep.readAsString(id))
+        .map((c) => ClientModule.deserialize(jsonDecode(c)));
 
-    if (moduleFiles.isEmpty) {
+    var entrypoints = [
+      await for (var module in modules) (id: module.id, import: '${module.id}.client.dart'),
+    ];
+
+    if (entrypoints.isEmpty) {
       return null;
     }
 
-    var modules = moduleFiles.map((id) => id.changeExtension('.dart'));
-
-    return DartFormatter(pageWidth: 120).format('''
+    var source = '''
       $generationHeader
       
       import 'package:jaspr/browser.dart';
-      ${modules.mapIndexed((index, c) => "import '${path.url.relative(c.path, from: 'lib')}' deferred as i$index;").join('\n')}
+      [[/]]
       
       void main() {
         registerClients({
-          ${modules.mapIndexed((index, c) {
-      return '''
-              '${path.url.relative(path.url.withoutExtension(path.url.withoutExtension(c.path)), from: 'lib')}': loadClient(i$index.loadLibrary, 
-              (p) => i$index.getComponentForParams(p),
-              ),
-            ''';
-    }).join('\n')}
+          ${entrypoints.map((e) => '''
+            '${e.id}': loadClient([[${e.import}]].loadLibrary, (p) => [[${e.import}]].getComponentForParams(p)),
+          ''').join('\n')}
         });
       }
-    ''');
+    ''';
+
+    source = ImportsWriter(deferred: true).resolve(source);
+    source = DartFormatter(pageWidth: 120).format(source);
+    return source;
   }
 }

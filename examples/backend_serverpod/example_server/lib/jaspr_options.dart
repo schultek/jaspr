@@ -2,7 +2,7 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/jaspr.dart';
-import 'components/counter.dart' as prefix0;
+import 'package:example_server/components/counter.dart' as prefix0;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
@@ -20,6 +20,8 @@ import 'components/counter.dart' as prefix0;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(clients: {
-  prefix0.Counter: ClientTarget<prefix0.Counter>('components/counter'),
-}, styles: []);
+final defaultJasprOptions = JasprOptions(
+  clients: {
+    prefix0.Counter: ClientTarget<prefix0.Counter>('components/counter'),
+  },
+);

@@ -3,13 +3,19 @@ import 'selector.dart';
 import 'styles.dart';
 
 abstract class StyleRule {
+  /// Renders a css rule with the given selector and styles.
   const factory StyleRule({required Selector selector, required Styles styles}) = BlockStyleRule;
 
+  /// Renders a `@import url(...)` css rule.
   const factory StyleRule.import(String url) = ImportStyleRule;
-  const factory StyleRule.fontFace({required String fontFamily, FontStyle? fontStyle, required String url}) =
-      FontFaceStyleRule;
+
+  /// Renders a `@font-face` css rule.
+  const factory StyleRule.fontFace({required String family, FontStyle? style, required String url}) = FontFaceStyleRule;
+
+  /// Renders a `@media` css rule.
   const factory StyleRule.media({required MediaQuery query, required List<StyleRule> styles}) = MediaStyleRule;
 
+  /// Returns the rendered css for this rule.
   String toCss([String indent]);
 }
 
@@ -17,8 +23,23 @@ const cssBlockInset = kDebugMode || kGenerateMode ? '  ' : '';
 const cssPropSpace = kDebugMode || kGenerateMode ? '\n' : ' ';
 
 extension StyleRulesRender on Iterable<StyleRule> {
+  /// Renders a list of style rules into raw css.
+  ///
+  /// @import rules are hoisted to the beginning of the rendered css rules
+  /// as only there they are used by the css engine.
   String render() {
-    return map((s) => s.toCss()).join(cssPropSpace);
+    final imports = StringBuffer();
+    final rules = StringBuffer();
+    for (final rule in this) {
+      final output = rule.toCss() + cssPropSpace;
+      if (rule is ImportStyleRule) {
+        imports.write(output);
+      } else {
+        rules.write(output);
+      }
+    }
+
+    return (imports.toString() + rules.toString()).trimRight();
   }
 }
 
@@ -164,7 +185,7 @@ class _AnyMediaRuleQuery implements MediaQuery {
   final List<MediaQuery> queries;
 
   @override
-  String get _value => queries.join(', ');
+  String get _value => queries.map((q) => q._value).join(', ');
 }
 
 class ImportStyleRule implements StyleRule {
@@ -178,17 +199,17 @@ class ImportStyleRule implements StyleRule {
 }
 
 class FontFaceStyleRule implements StyleRule {
-  const FontFaceStyleRule({required this.fontFamily, this.fontStyle, required this.url});
+  const FontFaceStyleRule({required this.family, this.style, required this.url});
 
-  final String fontFamily;
-  final FontStyle? fontStyle;
+  final String family;
+  final FontStyle? style;
   final String url;
 
   @override
   String toCss([String indent = '']) {
     return '$indent@font-face {$cssPropSpace'
-        '$indent${cssBlockInset}font-family: "$fontFamily";$cssPropSpace'
-        '${fontStyle != null ? '$indent${cssBlockInset}font-style: ${fontStyle!.value};$cssPropSpace' : ''}'
+        '$indent${cssBlockInset}font-family: "$family";$cssPropSpace'
+        '${style != null ? '$indent${cssBlockInset}font-style: ${style!.value};$cssPropSpace' : ''}'
         '$indent${cssBlockInset}src: url($url);$cssPropSpace'
         '$indent}';
   }

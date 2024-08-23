@@ -1,3 +1,11 @@
+## 0.3.3
+
+- `jaspr` upgraded to `0.15.0`
+
+## 0.3.2
+
+- `jaspr` upgraded to `0.14.0`
+
 ## 0.3.1
 
 - Update readme, move setup guide to topics.

@@ -1,3 +1,11 @@
+## 0.5.1
+
+- `jaspr` upgraded to `0.15.0`
+
+## 0.5.0
+
+- Changed the signature of the `Link` component, `children` is now a named parameter.
+
 ## 0.4.2
 
 - The title of the browser tab will no be properly set to the `title` of the current route.

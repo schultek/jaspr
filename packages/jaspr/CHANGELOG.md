@@ -1,21 +1,53 @@
-## Unreleased breaking
+## 0.15.0
 
-- Fixed missing html unescape in hydrated data.
+- Added support for using `@css` and `@encoder`/`@decoder` across other packages.
+  
+  1. Styles annotated with `@css` from other dependent packages are now also included in the pre-rendered css.
+  2. Models (or extension types) that define `@encoder` and `@decoder` annotations from other dependent packages can
+     now also be used together with `@client` components and `@sync` fields.
 
-- Added `@css` annotation.
+- **BREAKING** Component (or any class member) styles annotated with `@css` are now only included in the pre-rendered css if 
+  the file they are defined in is actually imported somewhere in the project.
 
+  Top-level styles continue to be always included.
+
+- Fixed issue with wrongly generated imports of `@encoder`/`@decoder` methods.
+- Fixed spelling mistake from `spaceRvenly` to `spaceEvenly`
+- Added default `BorderStyle.solid` to `BorderSide` constructor.
+
+## 0.14.0
+
+- **BREAKING** Calling `Jaspr.initializeApp()` is now required in static and server mode.
+
+- **BREAKING** Removed `Head` component in favor of new `Document.head()` component.
+  `Document.head()` has the same parameters as the old `Head` component and renders its children inside
+  the `<head>` element.
+- Added `Document.html()` and `Document.body()` to modify the attributes of `<html>` and `<body>`.
+
+- **BREAKING** Removed `syncId` and `syncCodec` parameters from `SyncStateMixin`.
+  `SyncStateMixin` now embeds its data locally in the pre-rendered html using standard json encoding.
+- Added `@sync` annotation. Can be used on any field of a `StatefulComponent` to automatically sync its value. 
+ 
+  ```dart
+  class MyComponentState extends State<MyComponent> with MyComponentStateSyncMixin {
+    @sync
+    String myValue;
+  }
+  ```
+
+- **BREAKING** Removed `MediaRuleQuery` in favor of `MediaQuery`.
 - Added `css.import()`, `css.fontFace()` and `css.media()` shorthands.
+- Added `@css` annotation. Can be used on a list of style rules to automatically include them in the global styles.
 
-- Removed `MediaRuleQuery` in favor of `MediaQuery`
-
-- Made `Jaspr.initializeApp()` required (static and server mode).
-
-- Add `Document.head` and related constructors replacing `Head` component.
-
-- Changed `SyncStateMixin`, removed codex and id parameters.
-- Added `@sync` annotation.
+  ```dart
+  @css
+  final styles = [
+    css('.main').box(width: 100.px),
+  ];
+  ```
 
 - Added `Fragment` component.
+- Fixed missing html unescape in hydrated data.
 
 ## 0.13.3
 
@@ -313,7 +345,7 @@
 ## 0.6.2
 
 - Added integrated support for seamless **flutter element embedding**.
-  Refer to [Flutter Embedding Docs](https://docs.page/schultek/jaspr/eco/flutter_embedding) on how to setup and use this.
+  Refer to [Flutter Embedding Docs](https://docs.page/schultek/jaspr/going_further/flutter_embedding) on how to setup and use this.
 
 ## 0.6.1
 

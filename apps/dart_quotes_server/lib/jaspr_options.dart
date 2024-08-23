@@ -2,10 +2,10 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/jaspr.dart';
-import 'web/components/quote_like_button.dart' as prefix0;
-import 'web/pages/home_page.dart' as prefix1;
-import 'web/pages/quote_page.dart' as prefix2;
-import 'web/app.dart' as prefix3;
+import 'package:dart_quotes_server/web/components/quote_like_button.dart' as prefix0;
+import 'package:dart_quotes_server/web/pages/home_page.dart' as prefix1;
+import 'package:dart_quotes_server/web/pages/quote_page.dart' as prefix2;
+import 'package:dart_quotes_server/web/app.dart' as prefix3;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
@@ -28,7 +28,7 @@ final defaultJasprOptions = JasprOptions(
     prefix0.QuoteLikeButton:
         ClientTarget<prefix0.QuoteLikeButton>('web/components/quote_like_button', params: _prefix0QuoteLikeButton),
   },
-  styles: [
+  styles: () => [
     ...prefix0.QuoteLikeButtonState.styles,
     ...prefix1.HomePage.styles,
     ...prefix2.QuotePage.styles,

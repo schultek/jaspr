@@ -5,11 +5,12 @@ import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:glob/glob.dart';
-import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart' as yaml;
 
 import '../client/client_module_builder.dart';
+import '../styles/styles_bundle_builder.dart';
 import '../styles/styles_module_builder.dart';
+import '../utils.dart';
 
 /// Builds part files and web entrypoints for components annotated with @app
 class JasprOptionsBuilder implements Builder {
@@ -45,28 +46,25 @@ class JasprOptionsBuilder implements Builder {
       return;
     }
 
-    final imports = ImportsWriter();
+    var (clients, styles, sources) = await (
+      loadClientModules(buildStep),
+      loadStylesModules(buildStep),
+      loadTransitiveSources(buildStep),
+    ).wait;
 
-    final clients = await loadClientModules(buildStep);
-    final styles = await loadStylesModules(buildStep);
+    clients.sortByCompare((c) => '${c.import}/${c.name}', ImportsWriter.compareImports);
+    styles = [
+      for (var s in styles)
+        sources.contains(s.id)
+            ? s
+            : StylesModule(id: s.id, elements: s.elements.where((e) => !e.contains('.')).toList())
+    ]..sortByCompare((s) => s.id.toImportUrl(), ImportsWriter.compareImports);
 
-    for (var c in clients) {
-      imports.add(c.id);
-    }
-    for (var s in styles) {
-      imports.add(s.id);
-    }
-
-    imports.sort();
-    clients.sortBy((c) => '${imports.prefixOf(c.id)}.${c.name}');
-    styles.sortBy((s) => imports.prefixOf(s.id));
-
-    final optionsId = AssetId(buildStep.inputId.package, 'lib/jaspr_options.dart');
-    final optionsSource = DartFormatter(pageWidth: 120).format('''
+    var source = '''
       $generationHeader
       
       import 'package:jaspr/jaspr.dart';
-      $imports
+      [[/]]
       
       /// Default [JasprOptions] for use with your jaspr project.
       ///
@@ -85,22 +83,20 @@ class JasprOptionsBuilder implements Builder {
       /// }
       /// ```
       final defaultJasprOptions = JasprOptions(
-        clients: {
-          ${buildClientEntries(imports, clients)}
-        },
-        styles: [
-          ${buildStylesEntries(imports, styles)}
-        ],
+        ${buildClientEntries(clients)}
+        ${buildStylesEntries(styles)}
       );
       
-      ${buildClientParamGetters(imports, clients)}
-      
-    ''');
+      ${buildClientParamGetters(clients)}  
+    ''';
+    source = ImportsWriter().resolve(source);
+    source = DartFormatter(pageWidth: 120).format(source);
 
-    await buildStep.writeAsString(optionsId, optionsSource);
+    final optionsId = AssetId(buildStep.inputId.package, 'lib/jaspr_options.dart');
+    await buildStep.writeAsString(optionsId, source);
   }
 
-  Future<List<ClientModule>> loadClientModules(BuildStep buildStep) {
+  Future<List<ClientModule>> loadClientModules(BuildStep buildStep) async {
     return buildStep
         .findAssets(Glob('lib/**.client.json'))
         .asyncMap((id) => buildStep.readAsString(id))
@@ -108,93 +104,48 @@ class JasprOptionsBuilder implements Builder {
         .toList();
   }
 
-  Future<List<StylesModule>> loadStylesModules(BuildStep buildStep) {
-    return buildStep
-        .findAssets(Glob('lib/**.styles.json'))
-        .asyncMap((id) => buildStep.readAsString(id))
-        .map((c) => StylesModule.deserialize(jsonDecode(c)))
-        .toList();
+  Future<List<StylesModule>> loadStylesModules(BuildStep buildStep) async {
+    return await buildStep.loadStyles();
   }
 
-  String buildClientEntries(ImportsWriter imports, List<ClientModule> clients) {
-    return clients.map((c) {
-      final prefix = imports.prefixOf(c.id);
+  Future<Set<AssetId>> loadTransitiveSources(BuildStep buildStep) async {
+    final main = AssetId(buildStep.inputId.package, 'lib/main.dart');
+    if (!await buildStep.canRead(main)) {
+      return {};
+    }
+    await buildStep.resolver.libraryFor(main);
+    return buildStep.resolver.libraries.expand<AssetId>((lib) {
+      try {
+        return [AssetId.resolve(lib.source.uri)];
+      } catch (_) {
+        return [];
+      }
+    }).toSet();
+  }
+
+  String buildClientEntries(List<ClientModule> clients) {
+    if (clients.isEmpty) return '';
+    return 'clients: {${clients.map((c) {
       return '''
-        $prefix.${c.name}: ClientTarget<$prefix.${c.name}>(
-          '${path.url.relative(path.url.withoutExtension(c.id.path), from: 'lib')}'
-          ${c.params.isNotEmpty ? ', params: _$prefix${c.name}' : ''}
+        [[${c.import}]].${c.name}: ClientTarget<[[${c.import}]].${c.name}>(
+          '${c.id}'
+          ${c.params.isNotEmpty ? ', params: _[[${c.import}]]${c.name}' : ''}
         ),
       ''';
-    }).join('\n');
+    }).join('\n')}},';
   }
 
-  String buildClientParamGetters(ImportsWriter imports, List<ClientModule> clients) {
+  String buildClientParamGetters(List<ClientModule> clients) {
     return clients.where((c) => c.params.isNotEmpty).map((c) {
-      final prefix = imports.prefixOf(c.id);
-      return 'Map<String, dynamic> _$prefix${c.name}($prefix.${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};';
+      return 'Map<String, dynamic> _[[${c.import}]]${c.name}([[${c.import}]].${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};';
     }).join('\n');
   }
 
-  String buildStylesEntries(ImportsWriter imports, List<StylesModule> styles) {
-    return styles.map((s) {
-      final prefix = imports.prefixOf(s.id);
-      return s.elements.map((e) => '...$prefix.$e,').join('\n');
-    }).join('\n');
-  }
-}
+  String buildStylesEntries(List<StylesModule> styles) {
+    if (styles.isEmpty) return '';
 
-class ImportsWriter {
-  ImportsWriter();
-
-  final List<String> imports = [];
-  bool _sorted = false;
-
-  void add(AssetId id) {
-    assert(!_sorted);
-
-    var url = path.url.relative(id.path, from: 'lib');
-    var index = imports.indexOf(url);
-    if (index == -1) {
-      imports.add(url);
-    }
-  }
-
-  String prefixOf(AssetId id) {
-    assert(_sorted);
-
-    var url = path.url.relative(id.path, from: 'lib');
-    return 'prefix${imports.indexOf(url)}';
-  }
-
-  void sort() {
-    imports.sort((a, b) {
-      var ap = a.split('/');
-      var bp = b.split('/');
-      return comparePaths(ap, bp);
-    });
-    _sorted = true;
-  }
-
-  int comparePaths(List<String> a, List<String> b) {
-    if (a.length > 1 && b.length > 1) {
-      var comp = a.first.compareTo(b.first);
-      if (comp == 0) {
-        return comparePaths(a.skip(1).toList(), b.skip(1).toList());
-      } else {
-        return comp;
-      }
-    } else if (a.length > 1) {
-      return -1;
-    } else if (b.length > 1) {
-      return 1;
-    } else {
-      return a.first.compareTo(b.first);
-    }
-  }
-
-  @override
-  String toString() {
-    assert(_sorted);
-    return imports.mapIndexed((index, url) => "import '$url' as prefix$index;").join('\n');
+    return 'styles: () => [${styles.map((s) {
+      return s.elements.map((e) => '...[[${s.id.toImportUrl()}]].$e,').join('\n');
+    }).join('\n')}],';
   }
 }
