@@ -34,3 +34,7 @@ abstract class HTMLCollection {
 }
 
 abstract class Node {}
+
+extension JSAnyUtilityExtension on dynamic {
+  bool instanceOfString(String constructorName) => true;
+}
