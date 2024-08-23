@@ -5,7 +5,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 
-import 'codec_resource.dart';
+import 'codecs.dart';
 
 /// Builds modules for types annotated with @encoder / @decoder
 class CodecModuleBuilder implements Builder {
@@ -140,15 +140,25 @@ class CodecModuleBuilder implements Builder {
             return null;
           }
 
-          if (element is ExtensionTypeElement && element.interfaces.firstOrNull != element.representation.type) {
-            log.severe(
-                'Extension types using @decoder and @encoder must implement the representation type. Failing element: ${element.name} in library ${library.source.fullName}.');
-            return null;
+          if (element is ExtensionTypeElement) {
+            if (element.interfaces.firstOrNull != element.representation.type) {
+              log.severe(
+                  'Extension types using @decoder and @encoder must implement the representation type. Failing element: ${element.name} in library ${library.source.fullName}.');
+              return null;
+            } else if (element.representation.type.element?.name == null) {
+              log.severe(
+                  'Extension types using @decoder and @encoder must have a valid representation type. Failing element: ${element.name} in library ${library.source.fullName}.');
+              return null;
+            } else if (element.primaryConstructor.isPrivate || element.primaryConstructor.name.isNotEmpty) {
+              log.severe(
+                  'Extension types using @decoder and @encoder must have a public unnamed primary constructor. Failing element: ${element.name} in library ${library.source.fullName}.');
+              return null;
+            }
           }
 
           return (element, decoder, encoder);
         })
-        .whereNotNull()
+        .nonNulls
         .toList();
 
     if (annotated.isEmpty) {
@@ -163,15 +173,13 @@ class CodecModuleBuilder implements Builder {
 }
 
 class CodecModule {
-  final AssetId id;
   final List<CodecElement> elements;
 
-  CodecModule({required this.id, required this.elements});
+  CodecModule({required this.elements});
 
   factory CodecModule.fromElements(
       List<(InterfaceElement, ExecutableElement, MethodElement)> elements, BuildStep buildStep) {
     return CodecModule(
-      id: buildStep.inputId,
       elements: [
         for (var (element, decoder, encoder) in elements) CodecElement.fromElement(element, decoder, encoder),
       ],
@@ -180,7 +188,6 @@ class CodecModule {
 
   factory CodecModule.deserialize(Map<String, dynamic> map) {
     return CodecModule(
-      id: AssetId.deserialize(map['id']),
       elements: [
         for (var e in map['elements']) CodecElement.deserialize(e),
       ],
@@ -188,7 +195,6 @@ class CodecModule {
   }
 
   Map<String, dynamic> serialize() => {
-        'id': id.serialize(),
         'elements': [
           for (var e in elements) e.serialize(),
         ],
@@ -201,6 +207,7 @@ class CodecElement {
   final String decoder;
   final String encoder;
   final String import;
+  final String? typeImport;
 
   CodecElement({
     required this.name,
@@ -208,16 +215,42 @@ class CodecElement {
     required this.decoder,
     required this.encoder,
     required this.import,
+    this.typeImport,
   });
 
   factory CodecElement.fromElement(InterfaceElement element, ExecutableElement decoder, MethodElement encoder) {
-    return CodecElement(
-      name: element is ExtensionTypeElement ? element.representation.type.getDisplayString() : element.name,
-      extension: element is ExtensionTypeElement ? element.name : null,
-      decoder: decoder.name,
-      encoder: encoder.name,
-      import: element.librarySource.uri.toString(),
-    );
+    if (element is ExtensionTypeElement) {
+      var typeElement = element.representation.type.element!;
+      if (element.library.exportNamespace.get(typeElement.name!) == typeElement) {
+        return CodecElement(
+          name: element.representation.type.getDisplayString(),
+          extension: element.name,
+          decoder: decoder.name,
+          encoder: encoder.name,
+          import: element.librarySource.uri.toString(),
+        );
+      } else {
+        var import = element.library.importedLibraries
+            .where((l) => l.exportNamespace.get(typeElement.name!) == typeElement)
+            .firstOrNull;
+
+        return CodecElement(
+          name: element.representation.type.getDisplayString(),
+          extension: element.name,
+          decoder: decoder.name,
+          encoder: encoder.name,
+          import: element.librarySource.uri.toString(),
+          typeImport: import?.source.uri.toString(),
+        );
+      }
+    } else {
+      return CodecElement(
+        name: element.name,
+        decoder: decoder.name,
+        encoder: encoder.name,
+        import: element.librarySource.uri.toString(),
+      );
+    }
   }
 
   CodecElement.deserialize(Map<String, dynamic> map)
@@ -225,13 +258,15 @@ class CodecElement {
         extension = map['extension'],
         decoder = map['decoder'],
         encoder = map['encoder'],
-        import = map['import'];
+        import = map['import'],
+        typeImport = map['typeImport'];
 
   Map<String, dynamic> serialize() => {
         'name': name,
-        'extension': extension,
+        if (extension != null) 'extension': extension,
         'decoder': decoder,
         'encoder': encoder,
         'import': import,
+        if (typeImport != null) 'typeImport': typeImport,
       };
 }

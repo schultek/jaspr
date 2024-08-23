@@ -1,7 +1,10 @@
-// Any .dart file inside the /web directory is compiled to javascript
-// and executed in the browser.
+// The entrypoint for the **client** environment.
+//
+// This file is compiled to javascript and executed in the browser.
 
-import 'package:jaspr/jaspr.dart';
+// Client-specific jaspr import.
+import 'package:jaspr/browser.dart';
+// Imports the [App] component.
 import 'package:{{name}}/app.dart';
 
 void main() {

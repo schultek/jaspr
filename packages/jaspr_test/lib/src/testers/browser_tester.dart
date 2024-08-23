@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:html' as html;
 
 import 'package:jaspr/browser.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
+import 'package:web/web.dart' as web;
 
 import '../binding.dart';
 import '../finders.dart';
@@ -20,8 +20,8 @@ void testBrowser(
   test(
     description,
     () async {
-      if (html.window.location.pathname != location) {
-        html.window.history.replaceState(null, 'Test', location);
+      if (web.window.location.pathname != location) {
+        web.window.history.replaceState(null, 'Test', location);
       }
 
       var binding = BrowserAppBinding();
@@ -58,8 +58,8 @@ class BrowserTester {
     var element = _findDomElement(finder);
 
     var source = (element.renderObject as DomRenderObject).node;
-    if (source is html.Element) {
-      source.dispatchEvent(html.MouseEvent('click'));
+    if (source is web.Element) {
+      source.dispatchEvent(web.MouseEvent('click'));
     }
   }
 

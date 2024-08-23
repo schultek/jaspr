@@ -1,10 +1,10 @@
 import '../../components/html/html.dart';
 import '../basic_types.dart';
-import 'events_web.dart' if (dart.library.ffi) 'events_vm.dart';
+import 'web.dart' if (dart.library.io) 'web_stub.dart' as web;
 
-export 'events_web.dart' if (dart.library.ffi) 'events_vm.dart' hide InputElement, TextAreaElement, SelectElement;
+export 'web.dart' if (dart.library.io) 'web_stub.dart' show Event;
 
-typedef EventCallback = void Function(Event event);
+typedef EventCallback = void Function(web.Event event);
 typedef EventCallbacks = Map<String, EventCallback>;
 
 /// Helper function to provide typed event handlers to the `events` property of html components.
@@ -38,11 +38,11 @@ EventCallbacks events<V1, V2>({
       if (onChange != null) 'change': _callWithValue('onChange', onChange),
     };
 
-void Function(Event) _callWithValue<V>(String event, void Function(V) fn) {
+void Function(web.Event) _callWithValue<V>(String event, void Function(V) fn) {
   return (e) {
     var target = e.target;
     var value = switch (target) {
-      InputElement() => () {
+      web.HTMLInputElement() when target.instanceOfString("HTMLInputElement") => () {
           var type = InputType.values.where((v) => v.name == target.type).firstOrNull;
           return switch (type) {
             InputType.checkbox || InputType.radio => target.checked,
@@ -52,8 +52,11 @@ void Function(Event) _callWithValue<V>(String event, void Function(V) fn) {
             _ => target.value,
           };
         }(),
-      TextAreaElement() => target.value ?? '',
-      SelectElement() => target.selectedOptions.map((o) => o.value).toList(),
+      web.HTMLTextAreaElement() when target.instanceOfString("HTMLTextAreaElement") => target.value,
+      web.HTMLSelectElement() when target.instanceOfString("HTMLSelectElement") => [
+          for (final o in target.selectedOptions.toIterable())
+            if (o is web.HTMLOptionElement && o.instanceOfString("HTMLOptionElement")) o.value,
+        ],
       _ => null,
     };
     assert(() {
@@ -65,4 +68,12 @@ void Function(Event) _callWithValue<V>(String event, void Function(V) fn) {
     }());
     fn(value as V);
   };
+}
+
+extension on web.HTMLCollection {
+  Iterable<web.Node> toIterable() sync* {
+    for (var i = 0; i < length; i++) {
+      yield item(i)!;
+    }
+  }
 }

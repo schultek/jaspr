@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:html';
+
+import 'package:web/web.dart';
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
@@ -12,7 +13,7 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
   bool get isClient => true;
 
   late final String _baseOrigin = () {
-    var base = document.querySelector('head>base') as BaseElement?;
+    var base = document.querySelector('head>base') as HTMLBaseElement?;
     return base?.href ?? window.location.origin;
   }();
 

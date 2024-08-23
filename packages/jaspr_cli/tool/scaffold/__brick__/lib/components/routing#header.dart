@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 {{#server}}
-import '../styles.dart';{{/server}}
+import '../constants/theme.dart';{{/server}}
 
 class Header extends StatelessComponent {
   const Header({super.key});
@@ -17,7 +17,7 @@ class Header extends StatelessComponent {
           (label: 'About', path: '/about'),
         ])
           div(classes: activePath == route.path ? 'active' : null, [
-            Link(to: route.path, [text(route.label)])
+            Link(to: route.path, child: text(route.label)),
           ]),
       ]),
     ]);

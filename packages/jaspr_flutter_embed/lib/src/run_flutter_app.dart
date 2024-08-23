@@ -3,11 +3,11 @@
 library flutter_interop;
 
 import 'dart:async';
-import 'dart:html';
 import 'dart:js_interop';
 import 'dart:ui_web' as ui_web;
 
 import 'package:flutter/widgets.dart' as flt;
+import 'package:web/web.dart';
 
 import 'multi_view_app.dart';
 

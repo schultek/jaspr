@@ -1,7 +1,6 @@
-import 'dart:html' as html;
-
 import 'package:flutter/widgets.dart' as flt;
 import 'package:jaspr/browser.dart';
+import 'package:web/web.dart' as web;
 
 import 'run_flutter_app.dart';
 
@@ -57,18 +56,18 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
     super.dispose();
   }
 
-  html.Element? findChildDomElement(Element element) {
-    html.Node? node;
+  web.Element? findChildDomElement(Element element) {
+    web.Node? node;
     element.visitChildren((child) {
       if (node != null) return;
       if (child is RenderObjectElement) {
-        node = (child.renderObject as DomRenderObject).node as html.Element;
+        node = (child.renderObject as DomRenderObject).node as web.Element;
         return;
       } else {
         node = findChildDomElement(child);
       }
     });
-    return node as html.Element?;
+    return node as web.Element?;
   }
 
   @override

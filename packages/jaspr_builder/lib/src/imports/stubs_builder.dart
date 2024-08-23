@@ -51,7 +51,7 @@ class ImportsStubsBuilder implements Builder {
     if (vmImports.isNotEmpty) {
       await buildStep.writeAsString(
         AssetId(buildStep.inputId.package, 'lib/generated/imports/_vm.dart'),
-        DartFormatter().format("""
+        DartFormatter(pageWidth: 120).format("""
           $generationHeader
           // ignore_for_file: directives_ordering
           

@@ -12,7 +12,6 @@ migrate_working_dir/
 
 # Keeping the repo
 .metadata
-pubspec.lock
 
 # IntelliJ related
 *.iml

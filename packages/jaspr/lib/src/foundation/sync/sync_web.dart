@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:html' as html;
+import 'dart:js_interop';
 
 import '../../../browser.dart';
 
@@ -11,17 +11,17 @@ void initSyncState(SyncStateMixin sync) {
   var r = (sync.context as Element).parentRenderObjectElement?.renderObject as DomRenderObject?;
   if (r == null) return;
   for (var node in r.toHydrate) {
-    if (node is html.Text) {
+    if (node.instanceOfString("Text")) {
       continue;
     }
-    if (node is html.Comment) {
+    if (node.instanceOfString("Comment")) {
       var value = node.nodeValue ?? '';
       var match = _syncRegex.firstMatch(value);
 
       if (match == null) continue;
 
       r.toHydrate.remove(node);
-      node.remove();
+      node.parentNode?.removeChild(node);
 
       var data = match.group(1)!.replaceAllMapped(_escapeRegex,
           (match) => switch (match.group(1)) { 'amp' => '&', 'lt' => '<', 'gt' => '>', _ => match.group(0)! });

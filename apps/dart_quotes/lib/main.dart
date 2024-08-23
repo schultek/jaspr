@@ -16,11 +16,11 @@ void main() {
     },
     styles: [
       // Include text font
-      css.fontFace(fontFamily: "Roboto", url: "/fonts/Roboto-Regular.ttf"),
-      css.fontFace(fontFamily: "Roboto", fontStyle: FontStyle.italic, url: "/fonts/Roboto-Italic.ttf"),
+      css.fontFace(family: "Roboto", url: "/fonts/Roboto-Regular.ttf"),
+      css.fontFace(family: "Roboto", style: FontStyle.italic, url: "/fonts/Roboto-Italic.ttf"),
 
       // Include icon font
-      css.fontFace(fontFamily: "icomoon", url: "/fonts/icomoon.ttf"),
+      css.fontFace(family: "icomoon", url: "/fonts/icomoon.ttf"),
       css('[class^="icon-"], [class*=" icon-"]').text(fontFamily: FontFamily('icomoon')),
       css('.icon-heart-o:before').raw({'content': r'"\e900"'}),
       css('.icon-heart:before').raw({'content': r'"\e901"'}),

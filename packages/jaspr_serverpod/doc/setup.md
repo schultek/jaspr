@@ -19,7 +19,7 @@ Add the following to the bottom of `pubspec.yaml`:
 ```yaml
 jaspr:
   mode: server
-  dev-command: dart bin/main.dart
+  dev-command: dart bin/main.dart --apply-migrations
 ```
 
 Move everything from `web/static/` up to `web/`:
@@ -170,7 +170,7 @@ class _CounterState extends State<Counter> {
 }
 ```
 
-> All Jaspr components must be kept outside of the `src/` directory to function properly!
+> All Jaspr components must be kept outside the `src/` directory to function properly!
 
 ---
 
