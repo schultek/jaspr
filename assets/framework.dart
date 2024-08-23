@@ -31,14 +31,14 @@ class UniqueKey extends LocalKey {
 }
 
 @optionalTypeArgs
-class GlobalKey<T extends State<StatefulWidget>> extends Key {
+class GlobalKey<T extends State<StatefulComponent>> extends Key {
   const GlobalKey() : super.empty();
 
-  Element? get _currentElement => WidgetsBinding._globalKeyRegistry[this];
+  Element? get _currentElement => ComponentsBinding._globalKeyRegistry[this];
 
   BuildContext? get currentContext => _currentElement;
 
-  Widget? get currentWidget => _currentElement?.widget;
+  Component? get currentComponent => _currentElement?.component;
 
   T? get currentState {
     final Element? element = _currentElement;
@@ -52,7 +52,7 @@ class GlobalKey<T extends State<StatefulWidget>> extends Key {
 }
 
 @optionalTypeArgs
-class GlobalObjectKey<T extends State<StatefulWidget>> extends GlobalKey<T> {
+class GlobalObjectKey<T extends State<StatefulComponent>> extends GlobalKey<T> {
   const GlobalObjectKey(this.value) : super();
 
   final Object value;
@@ -67,34 +67,34 @@ class GlobalObjectKey<T extends State<StatefulWidget>> extends GlobalKey<T> {
 }
 
 @immutable
-abstract class Widget {
-  const Widget({this.key});
+abstract class Component {
+  const Component({this.key});
 
   final Key? key;
 
   Element createElement();
 
-  static bool canUpdate(Widget oldWidget, Widget newWidget) {
-    return oldWidget.runtimeType == newWidget.runtimeType && oldWidget.key == newWidget.key;
+  static bool canUpdate(Component oldComponent, Component newComponent) {
+    return oldComponent.runtimeType == newComponent.runtimeType && oldComponent.key == newComponent.key;
   }
 }
 
-abstract class StatelessWidget extends Widget {
-  const StatelessWidget({super.key});
+abstract class StatelessComponent extends Component {
+  const StatelessComponent({super.key});
 
   @override
   Element createElement() => StatelessElement(this);
 
   @protected
-  Iterable<Widget> build(BuildContext context);
+  Iterable<Component> build(BuildContext context);
 
-  bool shouldRebuild(covariant Widget newWidget) {
+  bool shouldRebuild(covariant Component newComponent) {
     return true;
   }
 }
 
-abstract class StatefulWidget extends Widget {
-  const StatefulWidget({super.key});
+abstract class StatefulComponent extends Component {
+  const StatefulComponent({super.key});
 
   @override
   Element createElement() => StatefulElement(this);
@@ -115,13 +115,13 @@ enum _StateLifecycle {
 typedef StateSetter = void Function(VoidCallback fn);
 
 @optionalTypeArgs
-abstract class State<T extends StatefulWidget> {
-  T get widget => _widget!;
-  T? _widget;
+abstract class State<T extends StatefulComponent> {
+  T get component => _component!;
+  T? _component;
 
   _StateLifecycle _debugLifecycleState = _StateLifecycle.created;
 
-  bool _debugTypesAreRight(Widget widget) => widget is T;
+  bool _debugTypesAreRight(Component component) => component is T;
 
   BuildContext get context => _element!;
 
@@ -135,13 +135,13 @@ abstract class State<T extends StatefulWidget> {
     assert(_debugLifecycleState == _StateLifecycle.created);
   }
 
-  bool shouldRebuild(covariant T newWidget) {
+  bool shouldRebuild(covariant T newComponent) {
     return true;
   }
 
   @mustCallSuper
   @protected
-  void didUpdateWidget(covariant T oldWidget) {}
+  void didUpdateComponent(covariant T oldComponent) {}
 
   @protected
   void setState(VoidCallback fn) {
@@ -151,7 +151,7 @@ abstract class State<T extends StatefulWidget> {
       result is! Future,
       'setState() callback argument returned a Future.\n\n'
       'Instead of performing asynchronous work inside a call to setState(), first '
-      'execute the work (without updating the widget state), and then synchronously '
+      'execute the work (without updating the component state), and then synchronously '
       'update the state inside a call to setState().',
     );
     _element!.markNeedsBuild();
@@ -176,35 +176,35 @@ abstract class State<T extends StatefulWidget> {
   }
 
   @protected
-  Iterable<Widget> build(BuildContext context);
+  Iterable<Component> build(BuildContext context);
 
   @protected
   @mustCallSuper
   void didChangeDependencies() {}
 }
 
-abstract class ProxyWidget extends Widget {
-  const ProxyWidget({
+abstract class ProxyComponent extends Component {
+  const ProxyComponent({
     this.child,
     this.children,
     super.key,
   }) : assert(child == null || children == null);
 
-  final Widget? child;
-  final List<Widget>? children;
+  final Component? child;
+  final List<Component>? children;
 
   @override
   ProxyElement createElement() => ProxyElement(this);
 }
 
-abstract class InheritedWidget extends ProxyWidget {
-  const InheritedWidget({super.child, super.children, super.key});
+abstract class InheritedComponent extends ProxyComponent {
+  const InheritedComponent({super.child, super.children, super.key});
 
   @override
   InheritedElement createElement() => InheritedElement(this);
 
   @protected
-  bool updateShouldNotify(covariant InheritedWidget oldWidget);
+  bool updateShouldNotify(covariant InheritedComponent oldComponent);
 }
 
 enum _ElementLifecycle {
@@ -265,17 +265,17 @@ class _InactiveElements {
 typedef ElementVisitor = void Function(Element element);
 
 sealed class BuildContext {
-  Widget get widget;
+  Component get component;
 
   AppBinding get binding;
 
   bool get debugDoingBuild;
 
-  InheritedWidget dependOnInheritedElement(InheritedElement ancestor, {Object? aspect});
+  InheritedComponent dependOnInheritedElement(InheritedElement ancestor, {Object? aspect});
 
-  T? dependOnInheritedWidgetOfExactType<T extends InheritedWidget>({Object? aspect});
+  T? dependOnInheritedComponentOfExactType<T extends InheritedComponent>({Object? aspect});
 
-  InheritedElement? getElementForInheritedWidgetOfExactType<T extends InheritedWidget>();
+  InheritedElement? getElementForInheritedComponentOfExactType<T extends InheritedComponent>();
 
   T? findAncestorStateOfType<T extends State>();
 
@@ -306,7 +306,7 @@ class BuildOwner {
 
   void scheduleBuildFor(Element element) {
     assert(!isFirstBuild);
-    assert(element.dirty, 'scheduleBuildFor() called for a widget that is not marked as dirty.');
+    assert(element.dirty, 'scheduleBuildFor() called for a component that is not marked as dirty.');
 
     if (element._inDirtyList) {
       _dirtyElementsNeedsResorting = true;
@@ -389,7 +389,7 @@ class BuildOwner {
           }
         } catch (e) {
           // TODO: properly report error
-          print("Error on rebuilding widget: $e");
+          print("Error on rebuilding component: $e");
           rethrow;
         }
 
@@ -459,7 +459,7 @@ class _NotificationNode {
 }
 
 abstract class Element implements BuildContext {
-  Element(Widget widget) : _widget = widget;
+  Element(Component component) : _component = component;
 
   Element? _parent;
   Element? get parent => _parent;
@@ -472,9 +472,9 @@ abstract class Element implements BuildContext {
   bool operator ==(Object other) => identical(this, other);
 
   // Custom implementation of hash code optimized for the ".of" pattern used
-  // with `InheritedWidgets`.
+  // with `InheritedComponents`.
   //
-  // `Element.dependOnInheritedWidgetOfExactType` relies heavily on hash-based
+  // `Element.dependOnInheritedComponentOfExactType` relies heavily on hash-based
   // `Set` look-ups, putting this getter on the performance critical path.
   //
   // The value is designed to fit within the SMI representation. This makes
@@ -504,8 +504,8 @@ abstract class Element implements BuildContext {
   }
 
   @override
-  Widget get widget => _widget!;
-  Widget? _widget;
+  Component get component => _component!;
+  Component? _component;
 
   @override
   AppBinding get binding => _binding!;
@@ -526,8 +526,8 @@ abstract class Element implements BuildContext {
   }
 
   @protected
-  Element? updateChild(Element? child, Widget? newWidget, Element? prevSibling) {
-    if (newWidget == null) {
+  Element? updateChild(Element? child, Component? newComponent, Element? prevSibling) {
+    if (newComponent == null) {
       if (child != null) {
         if (_lastChild == child) {
           updateLastChild(prevSibling);
@@ -538,27 +538,27 @@ abstract class Element implements BuildContext {
     }
     final Element newChild;
     if (child != null) {
-      if (child._widget == newWidget) {
+      if (child._component == newComponent) {
         if (child._parentChanged || child._prevSibling != prevSibling) {
           child.updatePrevSibling(prevSibling);
         }
         newChild = child;
-      } else if (child._parentChanged || Widget.canUpdate(child.widget, newWidget)) {
+      } else if (child._parentChanged || Component.canUpdate(child.component, newComponent)) {
         if (child._parentChanged || child._prevSibling != prevSibling) {
           child.updatePrevSibling(prevSibling);
         }
-        var oldWidget = child.widget;
-        child.update(newWidget);
-        assert(child.widget == newWidget);
-        child.didUpdate(oldWidget);
+        var oldComponent = child.component;
+        child.update(newComponent);
+        assert(child.component == newComponent);
+        child.didUpdate(oldComponent);
         newChild = child;
       } else {
         deactivateChild(child);
         assert(child._parent == null);
-        newChild = inflateWidget(newWidget, prevSibling);
+        newChild = inflateComponent(newComponent, prevSibling);
       }
     } else {
-      newChild = inflateWidget(newWidget, prevSibling);
+      newChild = inflateComponent(newComponent, prevSibling);
     }
 
     if (_lastChild == prevSibling) {
@@ -569,12 +569,12 @@ abstract class Element implements BuildContext {
   }
 
   @protected
-  List<Element> updateChildren(List<Element> oldChildren, List<Widget> newWidgets, {Set<Element>? forgottenChildren}) {
+  List<Element> updateChildren(List<Element> oldChildren, List<Component> newComponents, {Set<Element>? forgottenChildren}) {
     Element? replaceWithNullIfForgotten(Element? child) {
       return child != null && forgottenChildren != null && forgottenChildren.contains(child) ? null : child;
     }
 
-    // This attempts to diff the new child list (newWidgets) with
+    // This attempts to diff the new child list (newComponents) with
     // the old child list (oldChildren), and produce a new list of elements to
     // be the new list of child elements of this element. The called of this
     // method is expected to update this render object accordingly.
@@ -582,10 +582,10 @@ abstract class Element implements BuildContext {
     // The cases it tries to optimize for are:
     //  - the old list is empty
     //  - the lists are identical
-    //  - there is an insertion or removal of one or more widgets in
+    //  - there is an insertion or removal of one or more components in
     //    only one place in the list
-    // If a widget with a key is in both lists, it will be synced.
-    // Widgets without keys might be synced but there is no guarantee.
+    // If a component with a key is in both lists, it will be synced.
+    // Components without keys might be synced but there is no guarantee.
 
     // The general approach is to sync the entire new list backwards, as follows:
     // 1. Walk the lists from the top, syncing nodes, until you no longer have
@@ -605,29 +605,29 @@ abstract class Element implements BuildContext {
     // 6. Sync null with any items in the list of keys that are still
     //    mounted.
 
-    if (oldChildren.length <= 1 && newWidgets.length <= 1) {
+    if (oldChildren.length <= 1 && newComponents.length <= 1) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren.firstOrNull);
-      var newChild = updateChild(oldChild, newWidgets.firstOrNull, null);
+      var newChild = updateChild(oldChild, newComponents.firstOrNull, null);
       return [if (newChild != null) newChild];
     }
 
     int newChildrenTop = 0;
     int oldChildrenTop = 0;
-    int newChildrenBottom = newWidgets.length - 1;
+    int newChildrenBottom = newComponents.length - 1;
     int oldChildrenBottom = oldChildren.length - 1;
 
-    final List<Element?> newChildren = oldChildren.length == newWidgets.length
+    final List<Element?> newChildren = oldChildren.length == newComponents.length
         ? oldChildren
-        : List<Element?>.filled(newWidgets.length, null, growable: true);
+        : List<Element?>.filled(newComponents.length, null, growable: true);
 
     Element? prevChild;
 
     // Update the top of the list.
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
-      final Widget newWidget = newWidgets[newChildrenTop];
-      if (oldChild == null || !Widget.canUpdate(oldChild.widget, newWidget)) break;
-      final Element newChild = updateChild(oldChild, newWidget, prevChild)!;
+      final Component newComponent = newComponents[newChildrenTop];
+      if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
+      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
@@ -637,21 +637,21 @@ abstract class Element implements BuildContext {
     // Scan the bottom of the list.
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenBottom]);
-      final Widget newWidget = newWidgets[newChildrenBottom];
-      if (oldChild == null || !Widget.canUpdate(oldChild.widget, newWidget)) break;
+      final Component newComponent = newComponents[newChildrenBottom];
+      if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
       oldChildrenBottom -= 1;
       newChildrenBottom -= 1;
     }
 
     Map<Key, Element>? retakeOldKeyedChildren;
     if (newChildrenTop <= newChildrenBottom && oldChildrenTop <= oldChildrenBottom) {
-      final Map<Key, Widget> newKeyedChildren = {};
+      final Map<Key, Component> newKeyedChildren = {};
       var newChildrenTopPeek = newChildrenTop;
       while (newChildrenTopPeek <= newChildrenBottom) {
-        final Widget newWidget = newWidgets[newChildrenTopPeek];
-        final Key? key = newWidget.key;
+        final Component newComponent = newComponents[newChildrenTopPeek];
+        final Key? key = newComponent.key;
         if (key != null) {
-          newKeyedChildren[key] = newWidget;
+          newKeyedChildren[key] = newComponent;
         }
         newChildrenTopPeek += 1;
       }
@@ -662,10 +662,10 @@ abstract class Element implements BuildContext {
         while (oldChildrenTopPeek <= oldChildrenBottom) {
           final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTopPeek]);
           if (oldChild != null) {
-            final Key? key = oldChild.widget.key;
+            final Key? key = oldChild.component.key;
             if (key != null) {
-              final Widget? newWidget = newKeyedChildren[key];
-              if (newWidget != null && Widget.canUpdate(oldChild.widget, newWidget)) {
+              final Component? newComponent = newKeyedChildren[key];
+              if (newComponent != null && Component.canUpdate(oldChild.component, newComponent)) {
                 retakeOldKeyedChildren[key] = oldChild;
               }
             }
@@ -679,7 +679,7 @@ abstract class Element implements BuildContext {
       if (oldChildrenTop <= oldChildrenBottom) {
         final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
         if (oldChild != null) {
-          final Key? key = oldChild.widget.key;
+          final Key? key = oldChild.component.key;
           if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
             deactivateChild(oldChild);
           }
@@ -688,13 +688,13 @@ abstract class Element implements BuildContext {
       }
 
       Element? oldChild;
-      final Widget newWidget = newWidgets[newChildrenTop];
-      final Key? key = newWidget.key;
+      final Component newComponent = newComponents[newChildrenTop];
+      final Key? key = newComponent.key;
       if (key != null) {
         oldChild = retakeOldKeyedChildren?[key];
       }
 
-      final Element newChild = updateChild(oldChild, newWidget, prevChild)!;
+      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
@@ -703,7 +703,7 @@ abstract class Element implements BuildContext {
     while (oldChildrenTop <= oldChildrenBottom) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
       if (oldChild != null) {
-        final Key? key = oldChild.widget.key;
+        final Key? key = oldChild.component.key;
         if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
           deactivateChild(oldChild);
         }
@@ -712,14 +712,14 @@ abstract class Element implements BuildContext {
     }
 
     // We've scanned the whole list.
-    newChildrenBottom = newWidgets.length - 1;
+    newChildrenBottom = newComponents.length - 1;
     oldChildrenBottom = oldChildren.length - 1;
 
     // Update the bottom of the list.
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element oldChild = oldChildren[oldChildrenTop];
-      final Widget newWidget = newWidgets[newChildrenTop];
-      final Element newChild = updateChild(oldChild, newWidget, prevChild)!;
+      final Component newComponent = newComponents[newChildrenTop];
+      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
@@ -734,7 +734,7 @@ abstract class Element implements BuildContext {
   @mustCallSuper
   void mount(Element? parent, Element? prevSibling) {
     assert(_lifecycleState == _ElementLifecycle.initial);
-    assert(_widget != null);
+    assert(_component != null);
     assert(_parent == null);
     assert(parent == null || parent._lifecycleState == _ElementLifecycle.active);
 
@@ -754,9 +754,9 @@ abstract class Element implements BuildContext {
     assert(_owner != null);
     assert(_binding != null);
 
-    final Key? key = widget.key;
+    final Key? key = component.key;
     if (key is GlobalKey && binding.isClient) {
-      WidgetsBinding._registerGlobalKey(key, this);
+      ComponentsBinding._registerGlobalKey(key, this);
     }
     _updateInheritance();
     _updateObservers();
@@ -768,25 +768,25 @@ abstract class Element implements BuildContext {
   void didMount() {}
 
   @mustCallSuper
-  void update(covariant Widget newWidget) {
+  void update(covariant Component newComponent) {
     assert(_lifecycleState == _ElementLifecycle.active);
-    assert(_widget != null);
-    assert(newWidget != widget);
+    assert(_component != null);
+    assert(newComponent != component);
     assert(_depth != null);
-    assert(Widget.canUpdate(widget, newWidget));
-    if (shouldRebuild(newWidget)) {
+    assert(Component.canUpdate(component, newComponent));
+    if (shouldRebuild(newComponent)) {
       _dirty = true;
     }
-    _widget = newWidget;
+    _component = newComponent;
   }
 
-  void didUpdate(covariant Widget oldWidget) {
+  void didUpdate(covariant Component oldComponent) {
     if (_dirty) {
       rebuild();
     }
   }
 
-  bool shouldRebuild(covariant Widget newWidget);
+  bool shouldRebuild(covariant Component newComponent);
 
   void _updateDepth(int parentDepth) {
     final int expectedDepth = parentDepth + 1;
@@ -798,12 +798,12 @@ abstract class Element implements BuildContext {
     }
   }
 
-  Element? _retakeInactiveElement(GlobalKey key, Widget newWidget) {
+  Element? _retakeInactiveElement(GlobalKey key, Component newComponent) {
     final Element? element = key._currentElement;
     if (element == null) {
       return null;
     }
-    if (!Widget.canUpdate(element.widget, newWidget)) {
+    if (!Component.canUpdate(element.component, newComponent)) {
       return null;
     }
     final Element? parent = element._parent;
@@ -817,20 +817,20 @@ abstract class Element implements BuildContext {
   }
 
   @protected
-  Element inflateWidget(Widget newWidget, Element? prevSibling) {
-    final Key? key = newWidget.key;
+  Element inflateComponent(Component newComponent, Element? prevSibling) {
+    final Key? key = newComponent.key;
     if (key is GlobalKey) {
-      final Element? newChild = _retakeInactiveElement(key, newWidget);
+      final Element? newChild = _retakeInactiveElement(key, newComponent);
       if (newChild != null) {
         assert(newChild._parent == null);
         newChild._activateWithParent(this);
         newChild._parentChanged = true;
-        final Element? updatedChild = updateChild(newChild, newWidget, prevSibling);
+        final Element? updatedChild = updateChild(newChild, newComponent, prevSibling);
         assert(newChild == updatedChild);
         return updatedChild!;
       }
     }
-    final Element newChild = newWidget.createElement();
+    final Element newChild = newComponent.createElement();
     newChild.mount(this, prevSibling);
     newChild.didMount();
     assert(newChild._lifecycleState == _ElementLifecycle.active);
@@ -869,7 +869,7 @@ abstract class Element implements BuildContext {
   @mustCallSuper
   void activate() {
     assert(_lifecycleState == _ElementLifecycle.inactive);
-    assert(_widget != null);
+    assert(_component != null);
     assert(_owner != null);
     assert(_binding != null);
     assert(_parent != null);
@@ -894,7 +894,7 @@ abstract class Element implements BuildContext {
   @mustCallSuper
   void deactivate() {
     assert(_lifecycleState == _ElementLifecycle.active);
-    assert(_widget != null);
+    assert(_component != null);
     assert(_depth != null);
     if (_dependencies != null && _dependencies!.isNotEmpty) {
       for (var dependency in _dependencies!) {
@@ -908,7 +908,7 @@ abstract class Element implements BuildContext {
   @mustCallSuper
   void unmount() {
     assert(_lifecycleState == _ElementLifecycle.inactive);
-    assert(_widget != null);
+    assert(_component != null);
     assert(_depth != null);
     assert(_owner != null);
 
@@ -919,13 +919,13 @@ abstract class Element implements BuildContext {
       _observerElements = null;
     }
 
-    final Key? key = widget.key;
+    final Key? key = component.key;
     if (key is GlobalKey) {
-      WidgetsBinding._unregisterGlobalKey(key, this);
+      ComponentsBinding._unregisterGlobalKey(key, this);
     }
 
     _parentRenderObjectElement = null;
-    _widget = null;
+    _component = null;
     _dependencies = null;
     _lifecycleState = _ElementLifecycle.defunct;
   }
@@ -937,15 +937,15 @@ abstract class Element implements BuildContext {
   bool _hadUnsatisfiedDependencies = false;
 
   @override
-  InheritedWidget dependOnInheritedElement(InheritedElement ancestor, {Object? aspect}) {
+  InheritedComponent dependOnInheritedElement(InheritedElement ancestor, {Object? aspect}) {
     _dependencies ??= HashSet<InheritedElement>();
     _dependencies!.add(ancestor);
     ancestor.updateDependencies(this, aspect);
-    return ancestor.widget;
+    return ancestor.component;
   }
 
   @override
-  T? dependOnInheritedWidgetOfExactType<T extends InheritedWidget>({Object? aspect}) {
+  T? dependOnInheritedComponentOfExactType<T extends InheritedComponent>({Object? aspect}) {
     final InheritedElement? ancestor = _inheritedElements == null ? null : _inheritedElements![T];
     if (ancestor != null) {
       return dependOnInheritedElement(ancestor, aspect: aspect) as T;
@@ -955,7 +955,7 @@ abstract class Element implements BuildContext {
   }
 
   @override
-  InheritedElement? getElementForInheritedWidgetOfExactType<T extends InheritedWidget>() {
+  InheritedElement? getElementForInheritedComponentOfExactType<T extends InheritedComponent>() {
     final InheritedElement? ancestor = _inheritedElements == null ? null : _inheritedElements![T];
     return ancestor;
   }
@@ -976,7 +976,7 @@ abstract class Element implements BuildContext {
   }
 
   @override
-  T? findAncestorStateOfType<T extends State<StatefulWidget>>() {
+  T? findAncestorStateOfType<T extends State<StatefulComponent>>() {
     Element? ancestor = _parent;
     while (ancestor != null) {
       if (ancestor is StatefulElement && ancestor.state is T) {
@@ -1005,7 +1005,7 @@ abstract class Element implements BuildContext {
   bool _debugCheckOwnerBuildTargetExists(String methodName) {
     assert(() {
       if (owner._debugCurrentBuildTarget == null) {
-        throw '$methodName for ${widget.runtimeType} was called at an '
+        throw '$methodName for ${component.runtimeType} was called at an '
             'inappropriate time.';
       }
       return true;
@@ -1021,10 +1021,10 @@ abstract class Element implements BuildContext {
   // ignore: prefer_final_fields
   bool _inDirtyList = false;
 
-  // We let widget authors call setState from initState, didUpdateWidget, and
+  // We let component authors call setState from initState, didUpdateComponent, and
   // build even when state is locked because its convenient and a no-op anyway.
   // This flag ensures that this convenience is only allowed on the element
-  // currently undergoing initState, didUpdateWidget, or build.
+  // currently undergoing initState, didUpdateComponent, or build.
   bool _debugAllowIgnoredCallsToMarkNeedsBuild = false;
   bool _debugSetAllowIgnoredCallsToMarkNeedsBuild(bool value) {
     assert(_debugAllowIgnoredCallsToMarkNeedsBuild == !value);
@@ -1051,7 +1051,7 @@ abstract class Element implements BuildContext {
         assert(dirty);
       } else if (owner._debugStateLocked) {
         assert(!_debugAllowIgnoredCallsToMarkNeedsBuild);
-        throw 'setState() or markNeedsBuild() called when widget tree was locked.';
+        throw 'setState() or markNeedsBuild() called when component tree was locked.';
       }
       return true;
     }());
@@ -1154,7 +1154,7 @@ abstract class Element implements BuildContext {
 
   void updatePrevSibling(Element? prevSibling) {
     assert(_lifecycleState == _ElementLifecycle.active);
-    assert(_widget != null);
+    assert(_component != null);
     assert(_parent != null);
     assert(_parent!._lifecycleState == _ElementLifecycle.active);
     assert(_depth != null);
@@ -1181,7 +1181,7 @@ abstract class Element implements BuildContext {
 }
 
 abstract class BuildableElement extends Element {
-  BuildableElement(super.widget);
+  BuildableElement(super.component);
 
   @protected
   Iterable<Element> get children => _children!.where((Element child) => !_forgottenChildren.contains(child));
@@ -1208,14 +1208,14 @@ abstract class BuildableElement extends Element {
   }
 
   @override
-  bool shouldRebuild(Widget newWidget) {
+  bool shouldRebuild(Component newComponent) {
     return true;
   }
 
   @override
   void performRebuild() {
     assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(true));
-    List<Widget>? built;
+    List<Component>? built;
     try {
       assert(() {
         _debugDoingBuild = true;
@@ -1228,11 +1228,11 @@ abstract class BuildableElement extends Element {
       }());
     } catch (e, st) {
       _debugDoingBuild = false;
-      // TODO: implement actual error widget
+      // TODO: implement actual error component
       built = [
-        DomWidget(
+        DomComponent(
           tag: 'div',
-          child: Text("Error on building widget: $e"),
+          child: Text("Error on building component: $e"),
         ),
       ];
       print('Error: $e $st');
@@ -1246,7 +1246,7 @@ abstract class BuildableElement extends Element {
   }
 
   @protected
-  Iterable<Widget> build();
+  Iterable<Component> build();
 
   @override
   void visitChildren(ElementVisitor visitor) {
@@ -1268,20 +1268,20 @@ abstract class BuildableElement extends Element {
 }
 
 class StatelessElement extends BuildableElement {
-  StatelessElement(StatelessWidget super.widget);
+  StatelessElement(StatelessComponent super.component);
 
   @override
-  StatelessWidget get widget => super.widget as StatelessWidget;
+  StatelessComponent get component => super.component as StatelessComponent;
 
   Future? _asyncFirstBuild;
 
   @override
   void didMount() {
-    // We check if the widget uses on of the mixins that support async initialization,
+    // We check if the component uses on of the mixins that support async initialization,
     // which will delay the call to [build()] until resolved during the first build.
 
-    if (owner.isFirstBuild && !binding.isClient && widget is OnFirstBuild) {
-      var result = (widget as OnFirstBuild).onFirstBuild(this);
+    if (owner.isFirstBuild && !binding.isClient && component is OnFirstBuild) {
+      var result = (component as OnFirstBuild).onFirstBuild(this);
       if (result is Future) {
         _asyncFirstBuild = result;
       }
@@ -1291,12 +1291,12 @@ class StatelessElement extends BuildableElement {
   }
 
   @override
-  bool shouldRebuild(covariant Widget newWidget) {
-    return widget.shouldRebuild(newWidget);
+  bool shouldRebuild(covariant Component newComponent) {
+    return component.shouldRebuild(newComponent);
   }
 
   @override
-  Iterable<Widget> build() => widget.build(this);
+  Iterable<Component> build() => component.build(this);
 
   @override
   FutureOr<void> performRebuild() {
@@ -1310,32 +1310,32 @@ class StatelessElement extends BuildableElement {
 }
 
 class StatefulElement extends BuildableElement {
-  StatefulElement(StatefulWidget widget)
-      : _state = widget.createState(),
-        super(widget) {
+  StatefulElement(StatefulComponent component)
+      : _state = component.createState(),
+        super(component) {
     assert(() {
-      if (!state._debugTypesAreRight(widget)) {
-        throw 'StatefulWidget.createState must return a subtype of State<${widget.runtimeType}>\n\n'
-            'The createState function for ${widget.runtimeType} returned a state '
+      if (!state._debugTypesAreRight(component)) {
+        throw 'StatefulComponent.createState must return a subtype of State<${component.runtimeType}>\n\n'
+            'The createState function for ${component.runtimeType} returned a state '
             'of type ${state.runtimeType}, which is not a subtype of '
-            'State<${widget.runtimeType}>, violating the contract for createState.';
+            'State<${component.runtimeType}>, violating the contract for createState.';
       }
       return true;
     }());
     assert(state._element == null);
     state._element = this;
     assert(
-      state._widget == null,
-      'The createState function for $widget returned an old or invalid state '
-      'instance: ${state._widget}, which is not null, violating the contract '
+      state._component == null,
+      'The createState function for $component returned an old or invalid state '
+      'instance: ${state._component}, which is not null, violating the contract '
       'for createState.',
     );
-    state._widget = widget;
+    state._component = component;
     assert(state._debugLifecycleState == _StateLifecycle.created);
   }
 
   @override
-  Iterable<Widget> build() => state.build(this);
+  Iterable<Component> build() => state.build(this);
 
   State? _state;
   State get state => _state!;
@@ -1403,27 +1403,27 @@ class StatefulElement extends BuildableElement {
   }
 
   @override
-  bool shouldRebuild(covariant StatefulWidget newWidget) {
-    return state.shouldRebuild(newWidget);
+  bool shouldRebuild(covariant StatefulComponent newComponent) {
+    return state.shouldRebuild(newComponent);
   }
 
   @override
-  void update(StatefulWidget newWidget) {
-    super.update(newWidget);
-    assert(widget == newWidget);
-    state._widget = newWidget;
+  void update(StatefulComponent newComponent) {
+    super.update(newComponent);
+    assert(component == newComponent);
+    state._component = newComponent;
   }
 
   @override
-  void didUpdate(StatefulWidget oldWidget) {
+  void didUpdate(StatefulComponent oldComponent) {
     try {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
       // TODO: check for returned future
-      state.didUpdateWidget(oldWidget);
+      state.didUpdateComponent(oldComponent);
     } finally {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
     }
-    super.didUpdate(oldWidget);
+    super.didUpdate(oldComponent);
   }
 
   @override
@@ -1459,7 +1459,7 @@ class StatefulElement extends BuildableElement {
 }
 
 class ProxyElement extends Element {
-  ProxyElement(ProxyWidget super.widget);
+  ProxyElement(ProxyComponent super.component);
 
   @protected
   Iterable<Element> get children => _children!.where((Element child) => !_forgottenChildren.contains(child));
@@ -1485,7 +1485,7 @@ class ProxyElement extends Element {
   }
 
   @override
-  bool shouldRebuild(ProxyWidget newWidget) {
+  bool shouldRebuild(ProxyComponent newComponent) {
     return true;
   }
 
@@ -1493,10 +1493,10 @@ class ProxyElement extends Element {
   void performRebuild() {
     _dirty = false;
 
-    var comp = (widget as ProxyWidget);
-    var newWidgets = comp.children ?? [if (comp.child != null) comp.child!];
+    var comp = (component as ProxyComponent);
+    var newComponents = comp.children ?? [if (comp.child != null) comp.child!];
 
-    _children = updateChildren(_children ?? [], newWidgets, forgottenChildren: _forgottenChildren);
+    _children = updateChildren(_children ?? [], newComponents, forgottenChildren: _forgottenChildren);
     _forgottenChildren.clear();
   }
 
@@ -1520,10 +1520,10 @@ class ProxyElement extends Element {
 }
 
 class InheritedElement extends ProxyElement {
-  InheritedElement(InheritedWidget super.widget);
+  InheritedElement(InheritedComponent super.component);
 
   @override
-  InheritedWidget get widget => super.widget as InheritedWidget;
+  InheritedComponent get component => super.component as InheritedComponent;
 
   final Map<Element, Object?> _dependents = HashMap<Element, Object?>();
 
@@ -1536,7 +1536,7 @@ class InheritedElement extends ProxyElement {
     } else {
       _inheritedElements = HashMap<Type, InheritedElement>();
     }
-    _inheritedElements![widget.runtimeType] = this;
+    _inheritedElements![component.runtimeType] = this;
   }
 
   @protected
@@ -1555,23 +1555,23 @@ class InheritedElement extends ProxyElement {
   }
 
   @override
-  void didUpdate(covariant InheritedWidget oldWidget) {
-    if (widget.updateShouldNotify(oldWidget)) {
-      notifyClients(oldWidget);
+  void didUpdate(covariant InheritedComponent oldComponent) {
+    if (component.updateShouldNotify(oldComponent)) {
+      notifyClients(oldComponent);
     }
-    super.didUpdate(oldWidget);
+    super.didUpdate(oldComponent);
   }
 
   @protected
-  void notifyClients(covariant InheritedWidget oldWidget) {
+  void notifyClients(covariant InheritedComponent oldComponent) {
     assert(_debugCheckOwnerBuildTargetExists('notifyClients'));
     for (final Element dependent in _dependents.keys) {
-      notifyDependent(oldWidget, dependent);
+      notifyDependent(oldComponent, dependent);
     }
   }
 
   @protected
-  void notifyDependent(covariant InheritedWidget oldWidget, Element dependent) {
+  void notifyDependent(covariant InheritedComponent oldComponent, Element dependent) {
     dependent.didChangeDependencies();
   }
 
