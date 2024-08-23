@@ -18,7 +18,7 @@ class RawText extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     var fragment = web.document.createElement('template');
-    fragment.innerHTML = text;
+    fragment.innerHTML = text.toJS;
     for (var node in fragment.childNodes.toIterable()) {
       yield RawNode.withKey(node);
     }

@@ -291,7 +291,7 @@ class EventBinding {
   StreamSubscription? subscription;
 
   EventBinding(web.Element element, this.type, this.fn) {
-    web.EventStreamProvider<web.Event>(type).forElement(element).listen((event) {
+    subscription = web.EventStreamProvider<web.Event>(type).forElement(element).listen((event) {
       fn(event);
     });
   }
