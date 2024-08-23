@@ -1,7 +1,7 @@
-/// A [Key] is an identifier for [Component]s, [Element]s and [SemanticsNode]s.
+/// A [Key] is an identifier for [Widget]s, [Element]s and [SemanticsNode]s.
 ///
-/// A new component will only be used to update an existing element if its key is
-/// the same as the key of the current component associated with the element.
+/// A new widget will only be used to update an existing element if its key is
+/// the same as the key of the current widget associated with the element.
 ///
 /// Keys must be unique amongst the [Element]s with the same parent.
 ///
@@ -9,7 +9,7 @@
 ///
 /// See also:
 ///
-///  * [Component.key], which discusses how components use keys.
+///  * [Widget.key], which discusses how widgets use keys.
 @immutable
 abstract class Key {
   /// Construct a [ValueKey<String>] with the given [String].
@@ -32,7 +32,7 @@ abstract class Key {
 ///
 /// See also:
 ///
-///  * [Component.key], which discusses how components use keys.
+///  * [Widget.key], which discusses how widgets use keys.
 abstract class LocalKey extends Key {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
@@ -48,11 +48,11 @@ abstract class LocalKey extends Key {
 /// other value keys that happen to use the same value. If the subclass is
 /// private, this results in a value key type that cannot collide with keys from
 /// other sources, which could be useful, for example, if the keys are being
-/// used as fallbacks in the same scope as keys supplied from another component.
+/// used as fallbacks in the same scope as keys supplied from another widget.
 ///
 /// See also:
 ///
-///  * [Component.key], which discusses how components use keys.
+///  * [Widget.key], which discusses how widgets use keys.
 class ValueKey<T> extends LocalKey {
   /// Creates a key that delegates its [operator==] to the given value.
   const ValueKey(this.value);
@@ -100,23 +100,23 @@ class UniqueKey extends LocalKey {
 ///
 /// Global keys uniquely identify elements. Global keys provide access to other
 /// objects that are associated with those elements, such as [BuildContext].
-/// For [StatefulComponent]s, global keys also provide access to [State].
+/// For [StatefulWidget]s, global keys also provide access to [State].
 ///
-/// Components that have global keys reparent their subtrees when they are moved
+/// Widgets that have global keys reparent their subtrees when they are moved
 /// from one location in the tree to another location in the tree. In order to
-/// reparent its subtree, a component must arrive at its new location in the tree
+/// reparent its subtree, a widget must arrive at its new location in the tree
 /// in the same animation frame in which it was removed from its old location in
 /// the tree.
 ///
 /// Reparenting an [Element] using a global key is relatively expensive, as
 /// this operation will trigger a call to [State.deactivate] on the associated
-/// [State] and all of its descendants; then force all components that depends
-/// on an [InheritedComponent] to rebuild.
+/// [State] and all of its descendants; then force all widgets that depends
+/// on an [InheritedWidget] to rebuild.
 ///
 /// If you don't need any of the features listed above, consider using a [Key],
 /// [ValueKey], or [UniqueKey] instead.
 ///
-/// You cannot simultaneously include two components in the tree with the same
+/// You cannot simultaneously include two widgets in the tree with the same
 /// global key. Attempting to do so will assert at runtime.
 ///
 /// ## Pitfalls
@@ -127,38 +127,38 @@ class UniqueKey extends LocalKey {
 /// Creating a new GlobalKey on every build will throw away the state of the
 /// subtree associated with the old key and create a new fresh subtree for the
 /// new key. Besides harming performance, this can also cause unexpected
-/// behavior in components in the subtree.
+/// behavior in widgets in the subtree.
 ///
 /// Instead, a good practice is to let a State object own the GlobalKey, and
 /// instantiate it outside the build method, such as in [State.initState].
 ///
 /// See also:
 ///
-///  * The discussion at [Component.key] for more information about how components use
+///  * The discussion at [Widget.key] for more information about how widgets use
 ///    keys.
 @optionalTypeArgs
-class GlobalKey<T extends State<StatefulComponent>> extends Key {
+class GlobalKey<T extends State<StatefulWidget>> extends Key {
   /// Creates a global key.
   const GlobalKey() : super.empty();
 
-  Element? get _currentElement => ComponentsBinding._globalKeyRegistry[this];
+  Element? get _currentElement => WidgetsBinding._globalKeyRegistry[this];
 
-  /// The build context in which the component with this key builds.
+  /// The build context in which the widget with this key builds.
   ///
-  /// The current context is null if there is no component in the tree that matches
+  /// The current context is null if there is no widget in the tree that matches
   /// this global key.
   BuildContext? get currentContext => _currentElement;
 
-  /// The component in the tree that currently has this global key.
+  /// The widget in the tree that currently has this global key.
   ///
-  /// The current component is null if there is no component in the tree that matches
+  /// The current widget is null if there is no widget in the tree that matches
   /// this global key.
-  Component? get currentComponent => _currentElement?.component;
+  Widget? get currentWidget => _currentElement?.widget;
 
-  /// The [State] for the component in the tree that currently has this global key.
+  /// The [State] for the widget in the tree that currently has this global key.
   ///
-  /// The current state is null if (1) there is no component in the tree that
-  /// matches this global key, (2) that component is not a [StatefulComponent], or the
+  /// The current state is null if (1) there is no widget in the tree that
+  /// matches this global key, (2) that widget is not a [StatefulWidget], or the
   /// associated [State] object is not a subtype of `T`.
   T? get currentState {
     final Element? element = _currentElement;
@@ -173,11 +173,11 @@ class GlobalKey<T extends State<StatefulComponent>> extends Key {
 
 /// A global key that takes its identity from the object used as its value.
 ///
-/// Used to tie the identity of a component to the identity of an object used to
-/// generate that component.
+/// Used to tie the identity of a widget to the identity of an object used to
+/// generate that widget.
 ///
 /// If the object is not private, then it is possible that collisions will occur
-/// where independent components will reuse the same object as their
+/// where independent widgets will reuse the same object as their
 /// [GlobalObjectKey] value in a different part of the tree, leading to a global
 /// key conflict. To avoid this problem, create a private [GlobalObjectKey]
 /// subclass, as in:
@@ -194,7 +194,7 @@ class GlobalKey<T extends State<StatefulComponent>> extends Key {
 ///
 /// Any [GlobalObjectKey] created for the same value will match.
 @optionalTypeArgs
-class GlobalObjectKey<T extends State<StatefulComponent>> extends GlobalKey<T> {
+class GlobalObjectKey<T extends State<StatefulWidget>> extends GlobalKey<T> {
   /// Creates a global key that uses [identical] on [value] for its [operator==].
   const GlobalObjectKey(this.value) : super();
 
@@ -212,61 +212,61 @@ class GlobalObjectKey<T extends State<StatefulComponent>> extends GlobalKey<T> {
 
 /// Describes the configuration for an [Element].
 ///
-/// Components are the central class hierarchy in the jaspr framework and have the
-/// same structure and purpose as components do in Flutter. A component
-/// is an immutable description of part of a user interface. Components can be
+/// Widgets are the central class hierarchy in the jaspr framework and have the
+/// same structure and purpose as widgets do in Flutter. A widget
+/// is an immutable description of part of a user interface. Widgets can be
 /// inflated into elements, which manage the underlying DOM.
 ///
-/// Components themselves have no mutable state (all their fields must be final).
-/// If you wish to associate mutable state with a component, consider using a
-/// [StatefulComponent], which creates a [State] object (via
-/// [StatefulComponent.createState]) whenever it is inflated into an element and
+/// Widgets themselves have no mutable state (all their fields must be final).
+/// If you wish to associate mutable state with a widget, consider using a
+/// [StatefulWidget], which creates a [State] object (via
+/// [StatefulWidget.createState]) whenever it is inflated into an element and
 /// incorporated into the tree.
 ///
-/// A given component can be included in the tree zero or more times. In particular
-/// a given component can be placed in the tree multiple times. Each time a component
+/// A given widget can be included in the tree zero or more times. In particular
+/// a given widget can be placed in the tree multiple times. Each time a widget
 /// is placed in the tree, it is inflated into an [Element], which means a
-/// component that is incorporated into the tree multiple times will be inflated
+/// widget that is incorporated into the tree multiple times will be inflated
 /// multiple times.
 ///
-/// The [key] property controls how one component replaces another component in the
-/// tree. If the [runtimeType] and [key] properties of the two components are
-/// [operator==], respectively, then the new component replaces the old component by
+/// The [key] property controls how one widget replaces another widget in the
+/// tree. If the [runtimeType] and [key] properties of the two widgets are
+/// [operator==], respectively, then the new widget replaces the old widget by
 /// updating the underlying element (i.e., by calling [Element.update] with the
-/// new component). Otherwise, the old element is removed from the tree, the new
-/// component is inflated into an element, and the new element is inserted into the
+/// new widget). Otherwise, the old element is removed from the tree, the new
+/// widget is inflated into an element, and the new element is inserted into the
 /// tree.
 ///
 /// See also:
 ///
-///  * [StatefulComponent] and [State], for components that can build differently
+///  * [StatefulWidget] and [State], for widgets that can build differently
 ///    several times over their lifetime.
-///  * [InheritedComponent], for components that introduce ambient state that can
-///    be read by descendant components.
-///  * [StatelessComponent], for components that always build the same way given a
+///  * [InheritedWidget], for widgets that introduce ambient state that can
+///    be read by descendant widgets.
+///  * [StatelessWidget], for widgets that always build the same way given a
 ///    particular configuration and ambient state.
 @immutable
-abstract class Component {
+abstract class Widget {
   /// Initializes [key] for subclasses.
-  const Component({this.key});
+  const Widget({this.key});
 
-  /// Controls how one component replaces another component in the tree.
+  /// Controls how one widget replaces another widget in the tree.
   ///
-  /// If the [runtimeType] and [key] properties of the two components are
-  /// [operator==], respectively, then the new component replaces the old component by
+  /// If the [runtimeType] and [key] properties of the two widgets are
+  /// [operator==], respectively, then the new widget replaces the old widget by
   /// updating the underlying element (i.e., by calling [Element.update] with the
-  /// new component). Otherwise, the old element is removed from the tree, the new
-  /// component is inflated into an element, and the new element is inserted into the
+  /// new widget). Otherwise, the old element is removed from the tree, the new
+  /// widget is inflated into an element, and the new element is inserted into the
   /// tree.
   ///
-  /// In addition, using a [GlobalKey] as the component's [key] allows the element
+  /// In addition, using a [GlobalKey] as the widget's [key] allows the element
   /// to be moved around the tree (changing parent) without losing state. When a
-  /// new component is found (its key and type do not match a previous component in
-  /// the same location), but there was a component with that same global key
-  /// elsewhere in the tree in the previous frame, then that component's element is
+  /// new widget is found (its key and type do not match a previous widget in
+  /// the same location), but there was a widget with that same global key
+  /// elsewhere in the tree in the previous frame, then that widget's element is
   /// moved to the new location.
   ///
-  /// Generally, a component that is the only child of another component does not need
+  /// Generally, a widget that is the only child of another widget does not need
   /// an explicit key.
   ///
   /// See also:
@@ -276,264 +276,264 @@ abstract class Component {
 
   /// Inflates this configuration to a concrete instance.
   ///
-  /// A given component can be included in the tree zero or more times. In particular
-  /// a given component can be placed in the tree multiple times. Each time a component
+  /// A given widget can be included in the tree zero or more times. In particular
+  /// a given widget can be placed in the tree multiple times. Each time a widget
   /// is placed in the tree, it is inflated into an [Element], which means a
-  /// component that is incorporated into the tree multiple times will be inflated
+  /// widget that is incorporated into the tree multiple times will be inflated
   /// multiple times.
   Element createElement();
 
-  /// Whether the `newComponent` can be used to update an [Element] that currently
-  /// has the `oldComponent` as its configuration.
+  /// Whether the `newWidget` can be used to update an [Element] that currently
+  /// has the `oldWidget` as its configuration.
   ///
-  /// An element that uses a given component as its configuration can be updated to
-  /// use another component as its configuration if, and only if, the two components
+  /// An element that uses a given widget as its configuration can be updated to
+  /// use another widget as its configuration if, and only if, the two widgets
   /// have [runtimeType] and [key] properties that are [operator==].
   ///
-  /// If the components have no key (their key is null), then they are considered a
+  /// If the widgets have no key (their key is null), then they are considered a
   /// match if they have the same type, even if their children are completely
   /// different.
-  static bool canUpdate(Component oldComponent, Component newComponent) {
-    return oldComponent.runtimeType == newComponent.runtimeType && oldComponent.key == newComponent.key;
+  static bool canUpdate(Widget oldWidget, Widget newWidget) {
+    return oldWidget.runtimeType == newWidget.runtimeType && oldWidget.key == newWidget.key;
   }
 }
 
-/// A component that does not require mutable state.
+/// A widget that does not require mutable state.
 ///
-/// A stateless component is a component that describes part of the user interface by
-/// building a constellation of other components that describe the user interface
+/// A stateless widget is a widget that describes part of the user interface by
+/// building a constellation of other widgets that describe the user interface
 /// more concretely. The building process continues recursively until the
 /// description of the user interface is fully concrete (e.g., consists
-/// entirely of [DOMComponent]s, which describe concrete DOM elements).
+/// entirely of [DOMWidget]s, which describe concrete DOM elements).
 ///
-/// Stateless component are useful when the part of the user interface you are
+/// Stateless widget are useful when the part of the user interface you are
 /// describing does not depend on anything other than the configuration
-/// information in the object itself and the [BuildContext] in which the component
+/// information in the object itself and the [BuildContext] in which the widget
 /// is inflated. For compositions that can change dynamically, e.g. due to
 /// having an internal clock-driven state, or depending on some system state,
-/// consider using [StatefulComponent].
+/// consider using [StatefulWidget].
 ///
 /// ## Performance considerations
 ///
-/// The [build] method of a stateless component is typically only called in three
-/// situations: the first time the component is inserted in the tree, when the
-/// component's parent changes its configuration, and when an [InheritedComponent] it
+/// The [build] method of a stateless widget is typically only called in three
+/// situations: the first time the widget is inserted in the tree, when the
+/// widget's parent changes its configuration, and when an [InheritedWidget] it
 /// depends on changes.
 ///
-/// If a component's parent will regularly change the component's configuration, or if
-/// it depends on inherited components that frequently change, then it is important
+/// If a widget's parent will regularly change the widget's configuration, or if
+/// it depends on inherited widgets that frequently change, then it is important
 /// to optimize the performance of the [build] method to maintain a fluid
 /// rendering performance.
 ///
 /// There are several techniques one can use to minimize the impact of
-/// rebuilding a stateless component:
+/// rebuilding a stateless widget:
 ///
 ///  * Minimize the number of nodes transitively created by the build method and
-///    any components it creates.
+///    any widgets it creates.
 ///
-///  * Use `const` components where possible, and provide a `const` constructor for
-///    the component so that users of the component can also do so.
+///  * Use `const` widgets where possible, and provide a `const` constructor for
+///    the widget so that users of the widget can also do so.
 ///
-///  * When trying to create a reusable piece of UI, prefer using a component
+///  * When trying to create a reusable piece of UI, prefer using a widget
 ///    rather than a helper method. For example, if there was a function used to
-///    build a component, a [State.setState] call would require Flutter to entirely
-///    rebuild the returned wrapping component. If a [Component] was used instead,
+///    build a widget, a [State.setState] call would require Flutter to entirely
+///    rebuild the returned wrapping widget. If a [Widget] was used instead,
 ///    we would be able to efficiently re-render only those parts that
-///    really need to be updated. Even better, if the created component is `const`,
+///    really need to be updated. Even better, if the created widget is `const`,
 ///    we would short-circuit most of the rebuild work.
 ///
-///  * Consider refactoring the stateless component into a stateful component so that
-///    it can use some of the techniques described at [StatefulComponent], such as
+///  * Consider refactoring the stateless widget into a stateful widget so that
+///    it can use some of the techniques described at [StatefulWidget], such as
 ///    caching common parts of subtrees and using [GlobalKey]s when changing the
 ///    tree structure.
 ///
-///  * If the component is likely to get rebuilt frequently due to the use of
-///    [InheritedComponent]s, consider refactoring the stateless component into
-///    multiple components, with the parts of the tree that change being pushed to
-///    the leaves. For example instead of building a tree with four components, the
-///    inner-most component depending on some [InheritedComponent], consider factoring out the
-///    part of the build function that builds the inner-most component into its own
-///    component, so that only the inner-most component needs to be rebuilt when the
-///    inherited component changes.
+///  * If the widget is likely to get rebuilt frequently due to the use of
+///    [InheritedWidget]s, consider refactoring the stateless widget into
+///    multiple widgets, with the parts of the tree that change being pushed to
+///    the leaves. For example instead of building a tree with four widgets, the
+///    inner-most widget depending on some [InheritedWidget], consider factoring out the
+///    part of the build function that builds the inner-most widget into its own
+///    widget, so that only the inner-most widget needs to be rebuilt when the
+///    inherited widget changes.
 ///
-/// By convention, component constructors only use named arguments. Also by
+/// By convention, widget constructors only use named arguments. Also by
 /// convention, the first argument is [key], and the last argument is `child`,
 /// `children`, or the equivalent.
 ///
 /// See also:
 ///
-///  * [StatefulComponent] and [State], for components that can build differently
+///  * [StatefulWidget] and [State], for widgets that can build differently
 ///    several times over their lifetime.
-///  * [InheritedComponent], for components that introduce ambient state that can
-///    be read by descendant components.
-abstract class StatelessComponent extends Component {
+///  * [InheritedWidget], for widgets that introduce ambient state that can
+///    be read by descendant widgets.
+abstract class StatelessWidget extends Widget {
   /// Initializes [key] for subclasses.
-  const StatelessComponent({super.key});
+  const StatelessWidget({super.key});
 
-  /// Creates a [StatelessElement] to manage this component's location in the tree.
+  /// Creates a [StatelessElement] to manage this widget's location in the tree.
   ///
   /// It is uncommon for subclasses to override this method.
   @override
   Element createElement() => StatelessElement(this);
 
-  /// Describes the part of the user interface represented by this component.
+  /// Describes the part of the user interface represented by this widget.
   ///
-  /// The framework calls this method when this component is inserted into the tree
-  /// in a given [BuildContext] and when the dependencies of this component change
-  /// (e.g., an [InheritedComponent] referenced by this component changes). This
+  /// The framework calls this method when this widget is inserted into the tree
+  /// in a given [BuildContext] and when the dependencies of this widget change
+  /// (e.g., an [InheritedWidget] referenced by this widget changes). This
   /// method can potentially be called in every frame and should not have any side
-  /// effects beyond building a component.
+  /// effects beyond building a widget.
   ///
-  /// The framework replaces the subtree below this component with the component
+  /// The framework replaces the subtree below this widget with the widget
   /// returned by this method, either by updating the existing subtree or by
   /// removing the subtree and inflating a new subtree, depending on whether the
-  /// component returned by this method can update the root of the existing
-  /// subtree, as determined by calling [Component.canUpdate].
+  /// widget returned by this method can update the root of the existing
+  /// subtree, as determined by calling [Widget.canUpdate].
   ///
-  /// Typically implementations return a newly created constellation of components
-  /// that are configured with information from this component's constructor and
+  /// Typically implementations return a newly created constellation of widgets
+  /// that are configured with information from this widget's constructor and
   /// from the given [BuildContext].
   ///
   /// The given [BuildContext] contains information about the location in the
-  /// tree at which this component is being built. For example, the context
-  /// provides the set of inherited components for this location in the tree. A
-  /// given component might be built with multiple different [BuildContext]
-  /// arguments over time if the component is moved around the tree or if the
-  /// component is inserted into the tree in multiple places at once.
+  /// tree at which this widget is being built. For example, the context
+  /// provides the set of inherited widgets for this location in the tree. A
+  /// given widget might be built with multiple different [BuildContext]
+  /// arguments over time if the widget is moved around the tree or if the
+  /// widget is inserted into the tree in multiple places at once.
   ///
   /// The implementation of this method must only depend on:
   ///
-  /// * the fields of the component, which themselves must not change over time,
+  /// * the fields of the widget, which themselves must not change over time,
   ///   and
   /// * any ambient state obtained from the `context` using
-  ///   [BuildContext.dependOnInheritedComponentOfExactType].
+  ///   [BuildContext.dependOnInheritedWidgetOfExactType].
   ///
-  /// If a component's [build] method is to depend on anything else, use a
-  /// [StatefulComponent] instead.
+  /// If a widget's [build] method is to depend on anything else, use a
+  /// [StatefulWidget] instead.
   ///
   /// See also:
   ///
-  ///  * [StatelessComponent], which contains the discussion on performance considerations.
+  ///  * [StatelessWidget], which contains the discussion on performance considerations.
   @protected
-  Iterable<Component> build(BuildContext context);
+  Iterable<Widget> build(BuildContext context);
 
   /// Implement this method to determine whether a rebuild can be skipped.
   ///
-  /// This method will be called whenever the component is about to update. If returned false, the subsequent rebuild will be skipped.
+  /// This method will be called whenever the widget is about to update. If returned false, the subsequent rebuild will be skipped.
   ///
-  /// This method exists only as a performance optimization and gives no guarantees about when the component is rebuilt.
+  /// This method exists only as a performance optimization and gives no guarantees about when the widget is rebuilt.
   /// Keep the implementation as efficient as possible and avoid deep (recursive) comparisons or performance heavy checks, as this might
   /// have an opposite effect on performance.
-  bool shouldRebuild(covariant Component newComponent) {
+  bool shouldRebuild(covariant Widget newWidget) {
     return true;
   }
 }
 
-/// A component that has mutable state.
+/// A widget that has mutable state.
 ///
-/// State is information that (1) can be read synchronously when the component is
-/// built and (2) might change during the lifetime of the component. It is the
-/// responsibility of the component implementer to ensure that the [State] is
+/// State is information that (1) can be read synchronously when the widget is
+/// built and (2) might change during the lifetime of the widget. It is the
+/// responsibility of the widget implementer to ensure that the [State] is
 /// promptly notified when such state changes, using [State.setState].
 ///
-/// A stateful component is a component that describes part of the user interface by
-/// building a constellation of other components that describe the user interface
+/// A stateful widget is a widget that describes part of the user interface by
+/// building a constellation of other widgets that describe the user interface
 /// more concretely. The building process continues recursively until the
 /// description of the user interface is fully concrete (e.g., consists
-/// entirely of [DOMComponent]s, which describe concrete DOM elements).
+/// entirely of [DOMWidget]s, which describe concrete DOM elements).
 ///
-/// Stateful components are useful when the part of the user interface you are
+/// Stateful widgets are useful when the part of the user interface you are
 /// describing can change dynamically, e.g. due to having an internal
 /// clock-driven state, or depending on some system state. For compositions that
 /// depend only on the configuration information in the object itself and the
-/// [BuildContext] in which the component is inflated, consider using
-/// [StatelessComponent].
+/// [BuildContext] in which the widget is inflated, consider using
+/// [StatelessWidget].
 ///
-/// [StatefulComponent] instances themselves are immutable and store their mutable
+/// [StatefulWidget] instances themselves are immutable and store their mutable
 /// state either in separate [State] objects that are created by the
 /// [createState] method, or in objects to which that [State] subscribes, for
 /// example [Stream] or [ChangeNotifier] objects, to which references are stored
-/// in final fields on the [StatefulComponent] itself.
+/// in final fields on the [StatefulWidget] itself.
 ///
 /// The framework calls [createState] whenever it inflates a
-/// [StatefulComponent], which means that multiple [State] objects might be
-/// associated with the same [StatefulComponent] if that component has been inserted
-/// into the tree in multiple places. Similarly, if a [StatefulComponent] is
+/// [StatefulWidget], which means that multiple [State] objects might be
+/// associated with the same [StatefulWidget] if that widget has been inserted
+/// into the tree in multiple places. Similarly, if a [StatefulWidget] is
 /// removed from the tree and later inserted in to the tree again, the framework
 /// will call [createState] again to create a fresh [State] object, simplifying
 /// the lifecycle of [State] objects.
 ///
-/// A [StatefulComponent] keeps the same [State] object when moving from one
+/// A [StatefulWidget] keeps the same [State] object when moving from one
 /// location in the tree to another if its creator used a [GlobalKey] for its
-/// [key]. Because a component with a [GlobalKey] can be used in at most one
-/// location in the tree, a component that uses a [GlobalKey] has at most one
+/// [key]. Because a widget with a [GlobalKey] can be used in at most one
+/// location in the tree, a widget that uses a [GlobalKey] has at most one
 /// associated element. The framework takes advantage of this property when
-/// moving a component with a global key from one location in the tree to another
-/// by grafting the (unique) subtree associated with that component from the old
+/// moving a widget with a global key from one location in the tree to another
+/// by grafting the (unique) subtree associated with that widget from the old
 /// location to the new location (instead of recreating the subtree at the new
-/// location). The [State] objects associated with [StatefulComponent] are grafted
+/// location). The [State] objects associated with [StatefulWidget] are grafted
 /// along with the rest of the subtree, which means the [State] object is reused
 /// (instead of being recreated) in the new location. However, in order to be
-/// eligible for grafting, the component must be inserted into the new location in
+/// eligible for grafting, the widget must be inserted into the new location in
 /// the same build phase in which it was removed from the old location.
 ///
 /// ## Performance considerations
 ///
-/// There are two primary categories of [StatefulComponent]s.
+/// There are two primary categories of [StatefulWidget]s.
 ///
 /// The first is one which allocates resources in [State.initState] and disposes
-/// of them in [State.dispose], but which does not depend on [InheritedComponent]s
-/// or call [State.setState]. Such components are commonly used at the root of an
-/// application or page, and communicate with subcomponents via [ChangeNotifier]s,
-/// [Stream]s, or other such objects. Stateful components following such a pattern
+/// of them in [State.dispose], but which does not depend on [InheritedWidget]s
+/// or call [State.setState]. Such widgets are commonly used at the root of an
+/// application or page, and communicate with subwidgets via [ChangeNotifier]s,
+/// [Stream]s, or other such objects. Stateful widgets following such a pattern
 /// are relatively cheap (in terms of CPU and GPU cycles), because they are
 /// built once then never update. They can, therefore, have somewhat complicated
 /// and deep build methods.
 ///
-/// The second category is components that use [State.setState] or depend on
-/// [InheritedComponent]s. These will typically rebuild many times during the
+/// The second category is widgets that use [State.setState] or depend on
+/// [InheritedWidget]s. These will typically rebuild many times during the
 /// application's lifetime, and it is therefore important to minimize the impact
-/// of rebuilding such a component. (They may also use [State.initState] or
+/// of rebuilding such a widget. (They may also use [State.initState] or
 /// [State.didChangeDependencies] and allocate resources, but the important part
 /// is that they rebuild.)
 ///
 /// There are several techniques one can use to minimize the impact of
-/// rebuilding a stateful component:
+/// rebuilding a stateful widget:
 ///
 ///  * Push the state to the leaves. For example, if your page has a ticking
 ///    clock, rather than putting the state at the top of the page and
 ///    rebuilding the entire page each time the clock ticks, create a dedicated
-///    clock component that only updates itself.
+///    clock widget that only updates itself.
 ///
 ///  * Minimize the number of nodes transitively created by the build method and
-///    any components it creates. Ideally, a stateful component would only create a
-///    single component, and that component would be a [RenderObjectComponent].
-///    (Obviously this isn't always practical, but the closer a component gets to
+///    any widgets it creates. Ideally, a stateful widget would only create a
+///    single widget, and that widget would be a [RenderObjectWidget].
+///    (Obviously this isn't always practical, but the closer a widget gets to
 ///    this ideal, the more efficient it will be.)
 ///
-///  * If a subtree does not change, cache the component that represents that
+///  * If a subtree does not change, cache the widget that represents that
 ///    subtree and re-use it each time it can be used. It is massively more
-///    efficient for a component to be re-used than for a new (but
-///    identically-configured) component to be created. Factoring out the stateful
-///    part into a component that takes a child argument is a common way of doing
-///    this. Another caching strategy consists of assigning a component to a
+///    efficient for a widget to be re-used than for a new (but
+///    identically-configured) widget to be created. Factoring out the stateful
+///    part into a widget that takes a child argument is a common way of doing
+///    this. Another caching strategy consists of assigning a widget to a
 ///    `final` state variable which can be used in the build method.
 ///
-///  * Use `const` components where possible. (This is equivalent to caching a
-///    component and re-using it.)
+///  * Use `const` widgets where possible. (This is equivalent to caching a
+///    widget and re-using it.)
 ///
-///  * When trying to create a reusable piece of UI, prefer using a component
+///  * When trying to create a reusable piece of UI, prefer using a widget
 ///    rather than a helper method. For example, if there was a function used to
-///    build a component, a [State.setState] call would require Flutter to entirely
-///    rebuild the returned wrapping component. If a [Component] was used instead,
+///    build a widget, a [State.setState] call would require Flutter to entirely
+///    rebuild the returned wrapping widget. If a [Widget] was used instead,
 ///    Flutter would be able to efficiently re-render only those parts that
-///    really need to be updated. Even better, if the created component is `const`,
+///    really need to be updated. Even better, if the created widget is `const`,
 ///    Flutter would short-circuit most of the rebuild work.
 ///
 ///  * Avoid changing the depth of any created subtrees or changing the type of
-///    any components in the subtree. For example, rather than returning either the
+///    any widgets in the subtree. For example, rather than returning either the
 ///    child or the child wrapped in an [IgnorePointer], always wrap the child
-///    component in an [IgnorePointer] and control the [IgnorePointer.ignoring]
+///    widget in an [IgnorePointer] and control the [IgnorePointer.ignoring]
 ///    property. This is because changing the depth of the subtree requires
 ///    rebuilding, laying out, and painting the entire subtree, whereas just
 ///    changing the property will require the least possible change to the
@@ -541,46 +541,46 @@ abstract class StatelessComponent extends Component {
 ///    repaint is necessary at all).
 ///
 ///  * If the depth must be changed for some reason, consider wrapping the
-///    common parts of the subtrees in components that have a [GlobalKey] that
-///    remains consistent for the life of the stateful component. (The
-///    [KeyedSubtree] component may be useful for this purpose if no other component
+///    common parts of the subtrees in widgets that have a [GlobalKey] that
+///    remains consistent for the life of the stateful widget. (The
+///    [KeyedSubtree] widget may be useful for this purpose if no other widget
 ///    can conveniently be assigned the key.)
 ///
-/// By convention, component constructors only use named arguments. Also by
+/// By convention, widget constructors only use named arguments. Also by
 /// convention, the first argument is [key], and the last argument is `child`,
 /// `children`, or the equivalent.
 ///
 /// See also:
 ///
-///  * [State], where the logic behind a [StatefulComponent] is hosted.
-///  * [StatelessComponent], for components that always build the same way given a
+///  * [State], where the logic behind a [StatefulWidget] is hosted.
+///  * [StatelessWidget], for widgets that always build the same way given a
 ///    particular configuration and ambient state.
-///  * [InheritedComponent], for components that introduce ambient state that can
-///    be read by descendant components.
-abstract class StatefulComponent extends Component {
+///  * [InheritedWidget], for widgets that introduce ambient state that can
+///    be read by descendant widgets.
+abstract class StatefulWidget extends Widget {
   /// Initializes [key] for subclasses.
-  const StatefulComponent({super.key});
+  const StatefulWidget({super.key});
 
-  /// Creates a [StatefulElement] to manage this component's location in the tree.
+  /// Creates a [StatefulElement] to manage this widget's location in the tree.
   ///
   /// It is uncommon for subclasses to override this method.
   @override
   Element createElement() => StatefulElement(this);
 
-  /// Creates the mutable state for this component at a given location in the tree.
+  /// Creates the mutable state for this widget at a given location in the tree.
   ///
   /// Subclasses should override this method to return a newly created
   /// instance of their associated [State] subclass:
   ///
   /// ```dart
   /// @override
-  /// State<MyComponent> createState() => _MyComponentState();
+  /// State<MyWidget> createState() => _MyWidgetState();
   /// ```
   ///
   /// The framework can call this method multiple times over the lifetime of
-  /// a [StatefulComponent]. For example, if the component is inserted into the tree
+  /// a [StatefulWidget]. For example, if the widget is inserted into the tree
   /// in multiple locations, the framework will create a separate [State] object
-  /// for each location. Similarly, if the component is removed from the tree and
+  /// for each location. Similarly, if the widget is removed from the tree and
   /// later inserted into the tree again, the framework will call [createState]
   /// again to create a fresh [State] object, simplifying the lifecycle of
   /// [State] objects.
@@ -609,27 +609,27 @@ enum _StateLifecycle {
 /// The signature of [State.setState] functions.
 typedef StateSetter = void Function(VoidCallback fn);
 
-/// The logic and internal state for a [StatefulComponent].
+/// The logic and internal state for a [StatefulWidget].
 ///
-/// State is information that (1) can be read synchronously when the component is
-/// built and (2) might change during the lifetime of the component. It is the
-/// responsibility of the component implementer to ensure that the [State] is
+/// State is information that (1) can be read synchronously when the widget is
+/// built and (2) might change during the lifetime of the widget. It is the
+/// responsibility of the widget implementer to ensure that the [State] is
 /// promptly notified when such state changes, using [State.setState].
 ///
 /// [State] objects are created by the framework by calling the
-/// [StatefulComponent.createState] method when inflating a [StatefulComponent] to
-/// insert it into the tree. Because a given [StatefulComponent] instance can be
-/// inflated multiple times (e.g., the component is incorporated into the tree in
+/// [StatefulWidget.createState] method when inflating a [StatefulWidget] to
+/// insert it into the tree. Because a given [StatefulWidget] instance can be
+/// inflated multiple times (e.g., the widget is incorporated into the tree in
 /// multiple places at once), there might be more than one [State] object
-/// associated with a given [StatefulComponent] instance. Similarly, if a
-/// [StatefulComponent] is removed from the tree and later inserted in to the tree
-/// again, the framework will call [StatefulComponent.createState] again to create
+/// associated with a given [StatefulWidget] instance. Similarly, if a
+/// [StatefulWidget] is removed from the tree and later inserted in to the tree
+/// again, the framework will call [StatefulWidget.createState] again to create
 /// a fresh [State] object, simplifying the lifecycle of [State] objects.
 ///
 /// [State] objects have the following lifecycle:
 ///
 ///  * The framework creates a [State] object by calling
-///    [StatefulComponent.createState].
+///    [StatefulWidget.createState].
 ///  * The newly created [State] object is associated with a [BuildContext].
 ///    This association is permanent: the [State] object will never change its
 ///    [BuildContext]. However, the [BuildContext] itself can be moved around
@@ -637,14 +637,14 @@ typedef StateSetter = void Function(VoidCallback fn);
 ///    considered [mounted].
 ///  * The framework calls [initState]. Subclasses of [State] should override
 ///    [initState] to perform one-time initialization that depends on the
-///    [BuildContext] or the component, which are available as the [context] and
-///    [component] properties, respectively, when the [initState] method is
+///    [BuildContext] or the widget, which are available as the [context] and
+///    [widget] properties, respectively, when the [initState] method is
 ///    called.
 ///  * The framework calls [didChangeDependencies]. Subclasses of [State] should
 ///    override [didChangeDependencies] to perform initialization involving
-///    [InheritedComponent]s. If [BuildContext.dependOnInheritedComponentOfExactType] is
+///    [InheritedWidget]s. If [BuildContext.dependOnInheritedWidgetOfExactType] is
 ///    called, the [didChangeDependencies] method will be called again if the
-///    inherited components subsequently change or if the component moves in the tree.
+///    inherited widgets subsequently change or if the widget moves in the tree.
 ///  * At this point, the [State] object is fully initialized and the framework
 ///    might call its [build] method any number of times to obtain a
 ///    description of the user interface for this subtree. [State] objects can
@@ -652,22 +652,22 @@ typedef StateSetter = void Function(VoidCallback fn);
 ///    [setState] method, which indicates that some of their internal state
 ///    has changed in a way that might impact the user interface in this
 ///    subtree.
-///  * During this time, a parent component might rebuild and request that this
-///    location in the tree update to display a new component with the same
-///    [runtimeType] and [Component.key]. When this happens, the framework will
-///    update the [component] property to refer to the new component and then call the
-///    [didUpdateComponent] method with the previous component as an argument. [State]
-///    objects should override [didUpdateComponent] to respond to changes in their
-///    associated component (e.g., to start implicit animations). The framework
-///    always calls [build] after calling [didUpdateComponent], which means any
-///    calls to [setState] in [didUpdateComponent] are redundant.
+///  * During this time, a parent widget might rebuild and request that this
+///    location in the tree update to display a new widget with the same
+///    [runtimeType] and [Widget.key]. When this happens, the framework will
+///    update the [widget] property to refer to the new widget and then call the
+///    [didUpdateWidget] method with the previous widget as an argument. [State]
+///    objects should override [didUpdateWidget] to respond to changes in their
+///    associated widget (e.g., to start implicit animations). The framework
+///    always calls [build] after calling [didUpdateWidget], which means any
+///    calls to [setState] in [didUpdateWidget] are redundant.
 ///  * During development, if a hot reload occurs (whether initiated from the
 ///    command line `flutter` tool by pressing `r`, or from an IDE), the
 ///    [reassemble] method is called. This provides an opportunity to
 ///    reinitialize any data that was prepared in the [initState] method.
 ///  * If the subtree containing the [State] object is removed from the tree
-///    (e.g., because the parent built a component with a different [runtimeType]
-///    or [Component.key]), the framework calls the [deactivate] method. Subclasses
+///    (e.g., because the parent built a widget with a different [runtimeType]
+///    or [Widget.key]), the framework calls the [deactivate] method. Subclasses
 ///    should override this method to clean up any links between this object
 ///    and other elements in the tree.
 ///  * At this point, the framework might reinsert this subtree into another
@@ -689,26 +689,26 @@ typedef StateSetter = void Function(VoidCallback fn);
 ///
 /// See also:
 ///
-///  * [StatefulComponent], where the current configuration of a [State] is hosted,
+///  * [StatefulWidget], where the current configuration of a [State] is hosted,
 ///    and whose documentation has sample code for [State].
-///  * [StatelessComponent], for components that always build the same way given a
+///  * [StatelessWidget], for widgets that always build the same way given a
 ///    particular configuration and ambient state.
-///  * [InheritedComponent], for components that introduce ambient state that can
-///    be read by descendant components.
-///  * [Component], for an overview of components in general.
+///  * [InheritedWidget], for widgets that introduce ambient state that can
+///    be read by descendant widgets.
+///  * [Widget], for an overview of widgets in general.
 @optionalTypeArgs
-abstract class State<T extends StatefulComponent> {
+abstract class State<T extends StatefulWidget> {
   /// The current configuration.
   ///
-  /// A [State] object's configuration is the corresponding [StatefulComponent]
+  /// A [State] object's configuration is the corresponding [StatefulWidget]
   /// instance. This property is initialized by the framework before calling
   /// [initState]. If the parent updates this location in the tree to a new
-  /// component with the same [runtimeType] and [Component.key] as the current
+  /// widget with the same [runtimeType] and [Widget.key] as the current
   /// configuration, the framework will update this property to refer to the new
-  /// component and then call [didUpdateComponent], passing the old configuration as
+  /// widget and then call [didUpdateWidget], passing the old configuration as
   /// an argument.
-  T get component => _component!;
-  T? _component;
+  T get widget => _widget!;
+  T? _widget;
 
   /// The current stage in the lifecycle for this state object.
   ///
@@ -717,13 +717,13 @@ abstract class State<T extends StatefulComponent> {
   _StateLifecycle _debugLifecycleState = _StateLifecycle.created;
 
   /// Verifies that the [State] that was created is one that expects to be
-  /// created for that particular [Component].
-  bool _debugTypesAreRight(Component component) => component is T;
+  /// created for that particular [Widget].
+  bool _debugTypesAreRight(Widget widget) => widget is T;
 
-  /// The location in the tree where this component builds.
+  /// The location in the tree where this widget builds.
   ///
   /// The framework associates [State] objects with a [BuildContext] after
-  /// creating them with [StatefulComponent.createState] and before calling
+  /// creating them with [StatefulWidget.createState] and before calling
   /// [initState]. The association is permanent: the [State] object will never
   /// change its [BuildContext]. However, the [BuildContext] itself can be moved
   /// around the tree.
@@ -752,23 +752,23 @@ abstract class State<T extends StatefulComponent> {
   ///
   /// Override this method to perform initialization that depends on the
   /// location at which this object was inserted into the tree (i.e., [context])
-  /// or on the component used to configure this object (i.e., [component]).
+  /// or on the widget used to configure this object (i.e., [widget]).
   ///
   /// If a [State]'s [build] method depends on an object that can itself
   /// change state, for example a [ChangeNotifier] or [Stream], or some
   /// other object to which one can subscribe to receive notifications, then
   /// be sure to subscribe and unsubscribe properly in [initState],
-  /// [didUpdateComponent], and [dispose]:
+  /// [didUpdateWidget], and [dispose]:
   ///
   ///  * In [initState], subscribe to the object.
-  ///  * In [didUpdateComponent] unsubscribe from the old object and subscribe
-  ///    to the new one if the updated component configuration requires
+  ///  * In [didUpdateWidget] unsubscribe from the old object and subscribe
+  ///    to the new one if the updated widget configuration requires
   ///    replacing the object.
   ///  * In [dispose], unsubscribe from the object.
   ///
-  /// You cannot use [BuildContext.dependOnInheritedComponentOfExactType] from this
+  /// You cannot use [BuildContext.dependOnInheritedWidgetOfExactType] from this
   /// method. However, [didChangeDependencies] will be called immediately
-  /// following this method, and [BuildContext.dependOnInheritedComponentOfExactType] can
+  /// following this method, and [BuildContext.dependOnInheritedWidgetOfExactType] can
   /// be used there.
   ///
   /// Implementations of this method should start with a call to the inherited
@@ -781,34 +781,34 @@ abstract class State<T extends StatefulComponent> {
 
   /// Implement this method to determine whether a rebuild can be skipped.
   ///
-  /// This method will be called whenever the component is about to update. If returned false, the subsequent rebuild will be skipped.
+  /// This method will be called whenever the widget is about to update. If returned false, the subsequent rebuild will be skipped.
   ///
-  /// This method exists only as a performance optimization and gives no guarantees about when the component is rebuilt.
+  /// This method exists only as a performance optimization and gives no guarantees about when the widget is rebuilt.
   /// Keep the implementation as efficient as possible and avoid deep (recursive) comparisons or performance heavy checks, as this might
   /// have an opposite effect on performance.
-  bool shouldRebuild(covariant T newComponent) {
+  bool shouldRebuild(covariant T newWidget) {
     return true;
   }
 
-  /// Called whenever the component configuration changes.
+  /// Called whenever the widget configuration changes.
   ///
-  /// If the parent component rebuilds and request that this location in the tree
-  /// update to display a new component with the same [runtimeType] and
-  /// [Component.key], the framework will update the [component] property of this
-  /// [State] object to refer to the new component and then call this method
-  /// with the previous component as an argument.
+  /// If the parent widget rebuilds and request that this location in the tree
+  /// update to display a new widget with the same [runtimeType] and
+  /// [Widget.key], the framework will update the [widget] property of this
+  /// [State] object to refer to the new widget and then call this method
+  /// with the previous widget as an argument.
   ///
-  /// Override this method to respond when the [component] changes (e.g., to start
+  /// Override this method to respond when the [widget] changes (e.g., to start
   /// implicit animations).
   ///
-  /// The framework always calls [build] after calling [didUpdateComponent], which
-  /// means any calls to [setState] in [didUpdateComponent] are redundant.
+  /// The framework always calls [build] after calling [didUpdateWidget], which
+  /// means any calls to [setState] in [didUpdateWidget] are redundant.
   ///
   /// Implementations of this method should start with a call to the inherited
-  /// method, as in `super.didUpdateComponent(oldComponent)`
+  /// method, as in `super.didUpdateWidget(oldWidget)`
   @mustCallSuper
   @protected
-  void didUpdateComponent(covariant T oldComponent) {}
+  void didUpdateWidget(covariant T oldWidget) {}
 
   /// Notify the framework that the internal state of this object has changed.
   ///
@@ -860,7 +860,7 @@ abstract class State<T extends StatefulComponent> {
       result is! Future,
       'setState() callback argument returned a Future.\n\n'
       'Instead of performing asynchronous work inside a call to setState(), first '
-      'execute the work (without updating the component state), and then synchronously '
+      'execute the work (without updating the widget state), and then synchronously '
       'update the state inside a call to setState().',
     );
     _element!.markNeedsBuild();
@@ -889,7 +889,7 @@ abstract class State<T extends StatefulComponent> {
   ///
   /// See also:
   ///
-  ///  * [dispose], which is called after [deactivate] if the component is removed
+  ///  * [dispose], which is called after [deactivate] if the widget is removed
   ///    from the tree permanently.
   @protected
   @mustCallSuper
@@ -956,54 +956,54 @@ abstract class State<T extends StatefulComponent> {
     }());
   }
 
-  /// Describes the part of the user interface represented by this component.
+  /// Describes the part of the user interface represented by this widget.
   ///
   /// The framework calls this method in a number of different situations. For
   /// example:
   ///
   ///  * After calling [initState].
-  ///  * After calling [didUpdateComponent].
+  ///  * After calling [didUpdateWidget].
   ///  * After receiving a call to [setState].
   ///  * After a dependency of this [State] object changes (e.g., an
-  ///    [InheritedComponent] referenced by the previous [build] changes).
+  ///    [InheritedWidget] referenced by the previous [build] changes).
   ///  * After calling [deactivate] and then reinserting the [State] object into
   ///    the tree at another location.
   ///
   /// This method can potentially be called in every frame and should not have
-  /// any side effects beyond building a component.
+  /// any side effects beyond building a widget.
   ///
-  /// The framework replaces the subtree below this component with the component
+  /// The framework replaces the subtree below this widget with the widget
   /// returned by this method, either by updating the existing subtree or by
   /// removing the subtree and inflating a new subtree, depending on whether the
-  /// component returned by this method can update the root of the existing
-  /// subtree, as determined by calling [Component.canUpdate].
+  /// widget returned by this method can update the root of the existing
+  /// subtree, as determined by calling [Widget.canUpdate].
   ///
-  /// Typically implementations return a newly created constellation of components
-  /// that are configured with information from this component's constructor, the
+  /// Typically implementations return a newly created constellation of widgets
+  /// that are configured with information from this widget's constructor, the
   /// given [BuildContext], and the internal state of this [State] object.
   ///
   /// The given [BuildContext] contains information about the location in the
-  /// tree at which this component is being built. For example, the context
-  /// provides the set of inherited components for this location in the tree. The
+  /// tree at which this widget is being built. For example, the context
+  /// provides the set of inherited widgets for this location in the tree. The
   /// [BuildContext] argument is always the same as the [context] property of
   /// this [State] object and will remain the same for the lifetime of this
   /// object. The [BuildContext] argument is provided redundantly here so that
-  /// this method matches the signature for a [ComponentBuilder].
+  /// this method matches the signature for a [WidgetBuilder].
   ///
   /// See also:
   ///
-  ///  * [StatefulComponent], which contains the discussion on performance considerations.
+  ///  * [StatefulWidget], which contains the discussion on performance considerations.
   @protected
-  Iterable<Component> build(BuildContext context);
+  Iterable<Widget> build(BuildContext context);
 
   /// Called when a dependency of this [State] object changes.
   ///
   /// For example, if the previous call to [build] referenced an
-  /// [InheritedComponent] that later changed, the framework would call this
+  /// [InheritedWidget] that later changed, the framework would call this
   /// method to notify this object about the change.
   ///
   /// This method is also called immediately after [initState]. It is safe to
-  /// call [BuildContext.dependOnInheritedComponentOfExactType] from this method.
+  /// call [BuildContext.dependOnInheritedWidgetOfExactType] from this method.
   ///
   /// Subclasses rarely override this method because the framework always
   /// calls [build] after a dependency changes. Some subclasses do override
@@ -1015,75 +1015,75 @@ abstract class State<T extends StatefulComponent> {
   void didChangeDependencies() {}
 }
 
-abstract class ProxyComponent extends Component {
-  const ProxyComponent({
+abstract class ProxyWidget extends Widget {
+  const ProxyWidget({
     this.child,
     this.children,
     super.key,
   }) : assert(child == null || children == null);
 
-  final Component? child;
-  final List<Component>? children;
+  final Widget? child;
+  final List<Widget>? children;
 
   @override
   ProxyElement createElement() => ProxyElement(this);
 }
 
-/// Base class for components that efficiently propagate information down the tree.
+/// Base class for widgets that efficiently propagate information down the tree.
 ///
-/// To obtain the nearest instance of a particular type of inherited component from
-/// a build context, use [BuildContext.dependOnInheritedComponentOfExactType].
+/// To obtain the nearest instance of a particular type of inherited widget from
+/// a build context, use [BuildContext.dependOnInheritedWidgetOfExactType].
 ///
-/// Inherited components, when referenced in this way, will cause the consumer to
-/// rebuild when the inherited component itself changes state.
+/// Inherited widgets, when referenced in this way, will cause the consumer to
+/// rebuild when the inherited widget itself changes state.
 ///
 /// ## Implementing the `of` method
 ///
-/// The convention is to provide a static method `of` on the [InheritedComponent]
-/// which does the call to [BuildContext.dependOnInheritedComponentOfExactType]. This
+/// The convention is to provide a static method `of` on the [InheritedWidget]
+/// which does the call to [BuildContext.dependOnInheritedWidgetOfExactType]. This
 /// allows the class to define its own fallback logic in case there isn't
-/// a component in scope. In the example above, the value returned will be
+/// a widget in scope. In the example above, the value returned will be
 /// null in that case, but it could also have defaulted to a value.
 ///
-/// Occasionally, the inherited component is an implementation detail of another
+/// Occasionally, the inherited widget is an implementation detail of another
 /// class, and is therefore private. The `of` method in that case is typically
 /// put on the public class instead.
 ///
 /// ## Calling the `of` method
 ///
 /// When using the `of` method, the `context` must be a descendant of the
-/// [InheritedComponent], meaning it must be "below" the [InheritedComponent] in the
+/// [InheritedWidget], meaning it must be "below" the [InheritedWidget] in the
 /// tree.
 ///
 /// See also:
 ///
-///  * [StatefulComponent] and [State], for components that can build differently
+///  * [StatefulWidget] and [State], for widgets that can build differently
 ///    several times over their lifetime.
-///  * [StatelessComponent], for components that always build the same way given a
+///  * [StatelessWidget], for widgets that always build the same way given a
 ///    particular configuration and ambient state.
-///  * [Component], for an overview of components in general.
-abstract class InheritedComponent extends ProxyComponent {
+///  * [Widget], for an overview of widgets in general.
+abstract class InheritedWidget extends ProxyWidget {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
-  const InheritedComponent({super.child, super.children, super.key});
+  const InheritedWidget({super.child, super.children, super.key});
 
   @override
   InheritedElement createElement() => InheritedElement(this);
 
-  /// Whether the framework should notify components that inherit from this component.
+  /// Whether the framework should notify widgets that inherit from this widget.
   ///
-  /// When this component is rebuilt, sometimes we need to rebuild the components that
-  /// inherit from this component but sometimes we do not. For example, if the data
-  /// held by this component is the same as the data held by `oldComponent`, then we
-  /// do not need to rebuild the components that inherited the data held by
-  /// `oldComponent`.
+  /// When this widget is rebuilt, sometimes we need to rebuild the widgets that
+  /// inherit from this widget but sometimes we do not. For example, if the data
+  /// held by this widget is the same as the data held by `oldWidget`, then we
+  /// do not need to rebuild the widgets that inherited the data held by
+  /// `oldWidget`.
   ///
   /// The framework distinguishes these cases by calling this function with the
-  /// component that previously occupied this location in the tree as an argument.
-  /// The given component is guaranteed to have the same [runtimeType] as this
+  /// widget that previously occupied this location in the tree as an argument.
+  /// The given widget is guaranteed to have the same [runtimeType] as this
   /// object.
   @protected
-  bool updateShouldNotify(covariant InheritedComponent oldComponent);
+  bool updateShouldNotify(covariant InheritedWidget oldWidget);
 }
 
 enum _ElementLifecycle {
@@ -1149,87 +1149,87 @@ class _InactiveElements {
 /// this callback.
 typedef ElementVisitor = void Function(Element element);
 
-/// The BuildContext supplied to a Components build() method.
+/// The BuildContext supplied to a Widgets build() method.
 sealed class BuildContext {
   /// The current configuration of the [Element] that is this [BuildContext].
-  Component get component;
+  Widget get widget;
 
-  /// The root component binding that manages the component tree.
+  /// The root widget binding that manages the widget tree.
   AppBinding get binding;
 
-  /// Whether the [component] is currently updating the component or render tree.
+  /// Whether the [widget] is currently updating the widget or render tree.
   ///
-  /// For [StatefulComponent]s and [StatelessComponent]s this flag is true while
+  /// For [StatefulWidget]s and [StatelessWidget]s this flag is true while
   /// their respective build methods are executing.
-  /// Other [Component] types may set this to true for conceptually similar phases
+  /// Other [Widget] types may set this to true for conceptually similar phases
   /// of their lifecycle.
   ///
-  /// When this is true, it is safe for [component] to establish a dependency to an
-  /// [InheritedComponent] by calling [dependOnInheritedElement] or
-  /// [dependOnInheritedComponentOfExactType].
+  /// When this is true, it is safe for [widget] to establish a dependency to an
+  /// [InheritedWidget] by calling [dependOnInheritedElement] or
+  /// [dependOnInheritedWidgetOfExactType].
   ///
   /// Accessing this flag in release mode is not valid.
   bool get debugDoingBuild;
 
   /// Registers this build context with [ancestor] such that when
-  /// [ancestor]'s component changes this build context is rebuilt.
+  /// [ancestor]'s widget changes this build context is rebuilt.
   ///
-  /// Returns `ancestor.component`.
+  /// Returns `ancestor.widget`.
   ///
   /// This method is rarely called directly. Most applications should use
-  /// [dependOnInheritedComponentOfExactType], which calls this method after finding
+  /// [dependOnInheritedWidgetOfExactType], which calls this method after finding
   /// the appropriate [InheritedElement] ancestor.
   ///
-  /// All of the qualifications about when [dependOnInheritedComponentOfExactType] can
+  /// All of the qualifications about when [dependOnInheritedWidgetOfExactType] can
   /// be called apply to this method as well.
-  InheritedComponent dependOnInheritedElement(InheritedElement ancestor, {Object? aspect});
+  InheritedWidget dependOnInheritedElement(InheritedElement ancestor, {Object? aspect});
 
-  /// Obtains the nearest component of the given type `T`, which must be the type of a
-  /// concrete [InheritedComponent] subclass, and registers this build context with
-  /// that component such that when that component changes (or a new component of that
-  /// type is introduced, or the component goes away), this build context is
-  /// rebuilt so that it can obtain new values from that component.
+  /// Obtains the nearest widget of the given type `T`, which must be the type of a
+  /// concrete [InheritedWidget] subclass, and registers this build context with
+  /// that widget such that when that widget changes (or a new widget of that
+  /// type is introduced, or the widget goes away), this build context is
+  /// rebuilt so that it can obtain new values from that widget.
   ///
   /// This is typically called implicitly from `of()` static methods, e.g.
   /// [Router.of].
   ///
   /// The [aspect] parameter is only used when `T` is an
-  /// [InheritedComponent] subclasses that supports partial updates.
+  /// [InheritedWidget] subclasses that supports partial updates.
   /// It specifies what "aspect" of the inherited
-  /// component this context depends on.
-  T? dependOnInheritedComponentOfExactType<T extends InheritedComponent>({Object? aspect});
+  /// widget this context depends on.
+  T? dependOnInheritedWidgetOfExactType<T extends InheritedWidget>({Object? aspect});
 
-  /// Obtains the element corresponding to the nearest component of the given type `T`,
-  /// which must be the type of a concrete [InheritedComponent] subclass.
+  /// Obtains the element corresponding to the nearest widget of the given type `T`,
+  /// which must be the type of a concrete [InheritedWidget] subclass.
   ///
   /// Returns null if no such element is found.
   ///
   /// Calling this method is O(1) with a small constant factor.
   ///
   /// This method does not establish a relationship with the target in the way
-  /// that [dependOnInheritedComponentOfExactType] does.
-  InheritedElement? getElementForInheritedComponentOfExactType<T extends InheritedComponent>();
+  /// that [dependOnInheritedWidgetOfExactType] does.
+  InheritedElement? getElementForInheritedWidgetOfExactType<T extends InheritedWidget>();
 
-  /// Returns the [State] object of the nearest ancestor [StatefulComponent] component
+  /// Returns the [State] object of the nearest ancestor [StatefulWidget] widget
   /// that is an instance of the given type `T`.
   ///
   /// Calling this method is relatively expensive (O(N) in the depth of the
-  /// tree). Only call this method if the distance from this component to the
+  /// tree). Only call this method if the distance from this widget to the
   /// desired ancestor is known to be small and bounded.
   T? findAncestorStateOfType<T extends State>();
 
   /// Walks the ancestor chain, starting with the parent of this build context's
-  /// component, invoking the argument for each ancestor. The callback is given a
-  /// reference to the ancestor component's corresponding [Element] object. The
-  /// walk stops when it reaches the root component or when the callback returns
+  /// widget, invoking the argument for each ancestor. The callback is given a
+  /// reference to the ancestor widget's corresponding [Element] object. The
+  /// walk stops when it reaches the root widget or when the callback returns
   /// false. The callback must not return null.
   ///
-  /// This is useful for inspecting the component tree.
+  /// This is useful for inspecting the widget tree.
   ///
   /// Calling this method is relatively expensive (O(N) in the depth of the tree).
   void visitAncestorElements(bool Function(Element element) visitor);
 
-  /// Walks the children of this component.
+  /// Walks the children of this widget.
   ///
   /// This is useful for applying changes to children after they are built
   /// without waiting for the next frame, especially if the children are known.
@@ -1239,14 +1239,14 @@ sealed class BuildContext {
   ///
   /// Calling this method recursively is extremely expensive (O(N) in the number
   /// of descendants), and should be avoided if possible. Generally it is
-  /// significantly cheaper to use an [InheritedComponent] and have the descendants
+  /// significantly cheaper to use an [InheritedWidget] and have the descendants
   /// pull data down, than it is to use [visitChildElements] recursively to push
   /// data down to them.
   void visitChildElements(ElementVisitor visitor);
 
   /// Start bubbling this notification at the given build context.
   ///
-  /// The notification will be delivered to any [NotificationListener] components
+  /// The notification will be delivered to any [NotificationListener] widgets
   /// with the appropriate type parameters that are ancestors of the given
   /// [BuildContext].
   void dispatchNotification(Notification notification);
@@ -1331,7 +1331,7 @@ class BuildOwner {
 
   /// Rebuilds [child] and correctly accounts for any asynchronous operations that can
   /// occur during the initial build of the app.
-  /// We want the component and element apis to stay synchronous, so this delays
+  /// We want the widget and element apis to stay synchronous, so this delays
   /// the execution of [child.performRebuild()] instead of calling it directly.
   void performRebuildOn(Element child, void Function() whenComplete) {
     Object? result = child.performRebuild() as dynamic;
@@ -1374,7 +1374,7 @@ class BuildOwner {
           }
         } catch (e) {
           // TODO: properly report error
-          print("Error on rebuilding component: $e");
+          print("Error on rebuilding widget: $e");
           rethrow;
         }
 
@@ -1453,42 +1453,42 @@ class _NotificationNode {
   }
 }
 
-/// An instantiation of a [Component] at a particular location in the tree.
+/// An instantiation of a [Widget] at a particular location in the tree.
 ///
-/// Components describe how to configure a subtree but the same component can be used
-/// to configure multiple subtrees simultaneously because components are immutable.
-/// An [Element] represents the use of a component to configure a specific location
-/// in the tree. Over time, the component associated with a given element can
-/// change, for example, if the parent component rebuilds and creates a new component
+/// Widgets describe how to configure a subtree but the same widget can be used
+/// to configure multiple subtrees simultaneously because widgets are immutable.
+/// An [Element] represents the use of a widget to configure a specific location
+/// in the tree. Over time, the widget associated with a given element can
+/// change, for example, if the parent widget rebuilds and creates a new widget
 /// for this location..
 abstract class Element implements BuildContext {
-  /// Creates an element that uses the given component as its configuration.
+  /// Creates an element that uses the given widget as its configuration.
   ///
-  /// Typically called by an override of [Component.createElement].
-  Element(Component component) : _component = component;
+  /// Typically called by an override of [Widget.createElement].
+  Element(Widget widget) : _widget = widget;
 
   Element? _parent;
   Element? get parent => _parent;
 
   _NotificationNode? _notificationTree;
 
-  /// Compare two components for equality.
+  /// Compare two widgets for equality.
   ///
-  /// When a component is rebuilt with another that compares equal according
+  /// When a widget is rebuilt with another that compares equal according
   /// to `operator ==`, it is assumed that the update is redundant and the
   /// work to update that branch of the tree is skipped.
   ///
-  /// It is generally discouraged to override `operator ==` on any component that
+  /// It is generally discouraged to override `operator ==` on any widget that
   /// has children, since a correct implementation would have to defer to the
   /// children's equality operator also, and that is an O(N²) operation: each
   /// child would need to itself walk all its children, each step of the tree.
   ///
-  /// It is sometimes reasonable for a leaf component (one with no children) to
-  /// implement this method, if rebuilding the component is known to be much more
-  /// expensive than checking the components' parameters for equality and if the
-  /// component is expected to often be rebuilt with identical parameters.
+  /// It is sometimes reasonable for a leaf widget (one with no children) to
+  /// implement this method, if rebuilding the widget is known to be much more
+  /// expensive than checking the widgets' parameters for equality and if the
+  /// widget is expected to often be rebuilt with identical parameters.
   ///
-  /// In general, however, it is more efficient to cache the components used
+  /// In general, however, it is more efficient to cache the widgets used
   /// in a build method if it is known that they will not change.
   @nonVirtual
   @override
@@ -1496,9 +1496,9 @@ abstract class Element implements BuildContext {
   bool operator ==(Object other) => identical(this, other);
 
   // Custom implementation of hash code optimized for the ".of" pattern used
-  // with `InheritedComponents`.
+  // with `InheritedWidgets`.
   //
-  // `Element.dependOnInheritedComponentOfExactType` relies heavily on hash-based
+  // `Element.dependOnInheritedWidgetOfExactType` relies heavily on hash-based
   // `Set` look-ups, putting this getter on the performance critical path.
   //
   // The value is designed to fit within the SMI representation. This makes
@@ -1531,10 +1531,10 @@ abstract class Element implements BuildContext {
 
   /// The configuration for this element.
   @override
-  Component get component => _component!;
-  Component? _component;
+  Widget get widget => _widget!;
+  Widget? _widget;
 
-  /// The root component binding that manages the component tree.
+  /// The root widget binding that manages the widget tree.
   @override
   AppBinding get binding => _binding!;
   AppBinding? _binding;
@@ -1566,18 +1566,18 @@ abstract class Element implements BuildContext {
 
   /// Update the given child with the given new configuration.
   ///
-  /// This method is the core of the components system. It is called each time we
+  /// This method is the core of the widgets system. It is called each time we
   /// are to add, update, or remove a child based on an updated configuration.
   ///
-  /// If the `child` is null, and the `newComponent` is not null, then we have a new
-  /// child for which we need to create an [Element], configured with `newComponent`.
+  /// If the `child` is null, and the `newWidget` is not null, then we have a new
+  /// child for which we need to create an [Element], configured with `newWidget`.
   ///
-  /// If the `newComponent` is null, and the `child` is not null, then we need to
+  /// If the `newWidget` is null, and the `child` is not null, then we need to
   /// remove it because it no longer has a configuration.
   ///
   /// If neither are null, then we need to update the `child`'s configuration to
-  /// be the new configuration given by `newComponent`. If `newComponent` can be given
-  /// to the existing child (as determined by [Component.canUpdate]), then it is so
+  /// be the new configuration given by `newWidget`. If `newWidget` can be given
+  /// to the existing child (as determined by [Widget.canUpdate]), then it is so
   /// given. Otherwise, the old child needs to be disposed and a new child
   /// created for the new configuration.
   ///
@@ -1590,13 +1590,13 @@ abstract class Element implements BuildContext {
   ///
   /// The following table summarizes the above:
   ///
-  /// |                     | **newComponent == null**  | **newComponent != null**   |
+  /// |                     | **newWidget == null**  | **newWidget != null**   |
   /// | :-----------------: | :--------------------- | :---------------------- |
   /// |  **child == null**  |  Returns null.         |  Returns new [Element]. |
   /// |  **child != null**  |  Old child is removed, returns null. | Old child updated if possible, returns child or new [Element]. |
   @protected
-  Element? updateChild(Element? child, Component? newComponent, Element? prevSibling) {
-    if (newComponent == null) {
+  Element? updateChild(Element? child, Widget? newWidget, Element? prevSibling) {
+    if (newWidget == null) {
       if (child != null) {
         if (_lastChild == child) {
           updateLastChild(prevSibling);
@@ -1607,27 +1607,27 @@ abstract class Element implements BuildContext {
     }
     final Element newChild;
     if (child != null) {
-      if (child._component == newComponent) {
+      if (child._widget == newWidget) {
         if (child._parentChanged || child._prevSibling != prevSibling) {
           child.updatePrevSibling(prevSibling);
         }
         newChild = child;
-      } else if (child._parentChanged || Component.canUpdate(child.component, newComponent)) {
+      } else if (child._parentChanged || Widget.canUpdate(child.widget, newWidget)) {
         if (child._parentChanged || child._prevSibling != prevSibling) {
           child.updatePrevSibling(prevSibling);
         }
-        var oldComponent = child.component;
-        child.update(newComponent);
-        assert(child.component == newComponent);
-        child.didUpdate(oldComponent);
+        var oldWidget = child.widget;
+        child.update(newWidget);
+        assert(child.widget == newWidget);
+        child.didUpdate(oldWidget);
         newChild = child;
       } else {
         deactivateChild(child);
         assert(child._parent == null);
-        newChild = inflateComponent(newComponent, prevSibling);
+        newChild = inflateWidget(newWidget, prevSibling);
       }
     } else {
-      newChild = inflateComponent(newComponent, prevSibling);
+      newChild = inflateWidget(newWidget, prevSibling);
     }
 
     if (_lastChild == prevSibling) {
@@ -1637,10 +1637,10 @@ abstract class Element implements BuildContext {
     return newChild;
   }
 
-  /// Updates the children of this element to use new components.
+  /// Updates the children of this element to use new widgets.
   ///
   /// Attempts to update the given old children list using the given new
-  /// components, removing obsolete elements and introducing new ones as necessary,
+  /// widgets, removing obsolete elements and introducing new ones as necessary,
   /// and then returns the new child list.
   ///
   /// During this function the `oldChildren` list must not be modified. If the
@@ -1654,13 +1654,12 @@ abstract class Element implements BuildContext {
   /// This function is a convenience wrapper around [updateChild], which updates
   /// each individual child.
   @protected
-  List<Element> updateChildren(List<Element> oldChildren, List<Component> newComponents,
-      {Set<Element>? forgottenChildren}) {
+  List<Element> updateChildren(List<Element> oldChildren, List<Widget> newWidgets, {Set<Element>? forgottenChildren}) {
     Element? replaceWithNullIfForgotten(Element? child) {
       return child != null && forgottenChildren != null && forgottenChildren.contains(child) ? null : child;
     }
 
-    // This attempts to diff the new child list (newComponents) with
+    // This attempts to diff the new child list (newWidgets) with
     // the old child list (oldChildren), and produce a new list of elements to
     // be the new list of child elements of this element. The called of this
     // method is expected to update this render object accordingly.
@@ -1668,10 +1667,10 @@ abstract class Element implements BuildContext {
     // The cases it tries to optimize for are:
     //  - the old list is empty
     //  - the lists are identical
-    //  - there is an insertion or removal of one or more components in
+    //  - there is an insertion or removal of one or more widgets in
     //    only one place in the list
-    // If a component with a key is in both lists, it will be synced.
-    // Components without keys might be synced but there is no guarantee.
+    // If a widget with a key is in both lists, it will be synced.
+    // Widgets without keys might be synced but there is no guarantee.
 
     // The general approach is to sync the entire new list backwards, as follows:
     // 1. Walk the lists from the top, syncing nodes, until you no longer have
@@ -1691,29 +1690,29 @@ abstract class Element implements BuildContext {
     // 6. Sync null with any items in the list of keys that are still
     //    mounted.
 
-    if (oldChildren.length <= 1 && newComponents.length <= 1) {
+    if (oldChildren.length <= 1 && newWidgets.length <= 1) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren.firstOrNull);
-      var newChild = updateChild(oldChild, newComponents.firstOrNull, null);
+      var newChild = updateChild(oldChild, newWidgets.firstOrNull, null);
       return [if (newChild != null) newChild];
     }
 
     int newChildrenTop = 0;
     int oldChildrenTop = 0;
-    int newChildrenBottom = newComponents.length - 1;
+    int newChildrenBottom = newWidgets.length - 1;
     int oldChildrenBottom = oldChildren.length - 1;
 
-    final List<Element?> newChildren = oldChildren.length == newComponents.length
+    final List<Element?> newChildren = oldChildren.length == newWidgets.length
         ? oldChildren
-        : List<Element?>.filled(newComponents.length, null, growable: true);
+        : List<Element?>.filled(newWidgets.length, null, growable: true);
 
     Element? prevChild;
 
     // Update the top of the list.
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
-      final Component newComponent = newComponents[newChildrenTop];
-      if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
-      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      final Widget newWidget = newWidgets[newChildrenTop];
+      if (oldChild == null || !Widget.canUpdate(oldChild.widget, newWidget)) break;
+      final Element newChild = updateChild(oldChild, newWidget, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
@@ -1723,21 +1722,21 @@ abstract class Element implements BuildContext {
     // Scan the bottom of the list.
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenBottom]);
-      final Component newComponent = newComponents[newChildrenBottom];
-      if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
+      final Widget newWidget = newWidgets[newChildrenBottom];
+      if (oldChild == null || !Widget.canUpdate(oldChild.widget, newWidget)) break;
       oldChildrenBottom -= 1;
       newChildrenBottom -= 1;
     }
 
     Map<Key, Element>? retakeOldKeyedChildren;
     if (newChildrenTop <= newChildrenBottom && oldChildrenTop <= oldChildrenBottom) {
-      final Map<Key, Component> newKeyedChildren = {};
+      final Map<Key, Widget> newKeyedChildren = {};
       var newChildrenTopPeek = newChildrenTop;
       while (newChildrenTopPeek <= newChildrenBottom) {
-        final Component newComponent = newComponents[newChildrenTopPeek];
-        final Key? key = newComponent.key;
+        final Widget newWidget = newWidgets[newChildrenTopPeek];
+        final Key? key = newWidget.key;
         if (key != null) {
-          newKeyedChildren[key] = newComponent;
+          newKeyedChildren[key] = newWidget;
         }
         newChildrenTopPeek += 1;
       }
@@ -1748,10 +1747,10 @@ abstract class Element implements BuildContext {
         while (oldChildrenTopPeek <= oldChildrenBottom) {
           final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTopPeek]);
           if (oldChild != null) {
-            final Key? key = oldChild.component.key;
+            final Key? key = oldChild.widget.key;
             if (key != null) {
-              final Component? newComponent = newKeyedChildren[key];
-              if (newComponent != null && Component.canUpdate(oldChild.component, newComponent)) {
+              final Widget? newWidget = newKeyedChildren[key];
+              if (newWidget != null && Widget.canUpdate(oldChild.widget, newWidget)) {
                 retakeOldKeyedChildren[key] = oldChild;
               }
             }
@@ -1765,7 +1764,7 @@ abstract class Element implements BuildContext {
       if (oldChildrenTop <= oldChildrenBottom) {
         final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
         if (oldChild != null) {
-          final Key? key = oldChild.component.key;
+          final Key? key = oldChild.widget.key;
           if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
             deactivateChild(oldChild);
           }
@@ -1774,13 +1773,13 @@ abstract class Element implements BuildContext {
       }
 
       Element? oldChild;
-      final Component newComponent = newComponents[newChildrenTop];
-      final Key? key = newComponent.key;
+      final Widget newWidget = newWidgets[newChildrenTop];
+      final Key? key = newWidget.key;
       if (key != null) {
         oldChild = retakeOldKeyedChildren?[key];
       }
 
-      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      final Element newChild = updateChild(oldChild, newWidget, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
@@ -1789,7 +1788,7 @@ abstract class Element implements BuildContext {
     while (oldChildrenTop <= oldChildrenBottom) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
       if (oldChild != null) {
-        final Key? key = oldChild.component.key;
+        final Key? key = oldChild.widget.key;
         if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
           deactivateChild(oldChild);
         }
@@ -1798,14 +1797,14 @@ abstract class Element implements BuildContext {
     }
 
     // We've scanned the whole list.
-    newChildrenBottom = newComponents.length - 1;
+    newChildrenBottom = newWidgets.length - 1;
     oldChildrenBottom = oldChildren.length - 1;
 
     // Update the bottom of the list.
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element oldChild = oldChildren[oldChildrenTop];
-      final Component newComponent = newComponents[newChildrenTop];
-      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      final Widget newWidget = newWidgets[newChildrenTop];
+      final Element newChild = updateChild(oldChild, newWidget, prevChild)!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
@@ -1835,7 +1834,7 @@ abstract class Element implements BuildContext {
   @mustCallSuper
   void mount(Element? parent, Element? prevSibling) {
     assert(_lifecycleState == _ElementLifecycle.initial);
-    assert(_component != null);
+    assert(_widget != null);
     assert(_parent == null);
     assert(parent == null || parent._lifecycleState == _ElementLifecycle.active);
 
@@ -1855,9 +1854,9 @@ abstract class Element implements BuildContext {
     assert(_owner != null);
     assert(_binding != null);
 
-    final Key? key = component.key;
+    final Key? key = widget.key;
     if (key is GlobalKey && binding.isClient) {
-      ComponentsBinding._registerGlobalKey(key, this);
+      WidgetsBinding._registerGlobalKey(key, this);
     }
     _updateInheritance();
     _updateObservers();
@@ -1868,27 +1867,27 @@ abstract class Element implements BuildContext {
   @mustCallSuper
   void didMount() {}
 
-  /// Change the component used to configure this element.
+  /// Change the widget used to configure this element.
   ///
   /// The framework calls this function when the parent wishes to use a
-  /// different component to configure this element. The new component is guaranteed
-  /// to have the same [runtimeType] as the old component.
+  /// different widget to configure this element. The new widget is guaranteed
+  /// to have the same [runtimeType] as the old widget.
   ///
   /// This function is called only during the "active" lifecycle state.
   @mustCallSuper
-  void update(covariant Component newComponent) {
+  void update(covariant Widget newWidget) {
     assert(_lifecycleState == _ElementLifecycle.active);
-    assert(_component != null);
-    assert(newComponent != component);
+    assert(_widget != null);
+    assert(newWidget != widget);
     assert(_depth != null);
-    assert(Component.canUpdate(component, newComponent));
-    if (shouldRebuild(newComponent)) {
+    assert(Widget.canUpdate(widget, newWidget));
+    if (shouldRebuild(newWidget)) {
       _dirty = true;
     }
-    _component = newComponent;
+    _widget = newWidget;
   }
 
-  void didUpdate(covariant Component oldComponent) {
+  void didUpdate(covariant Widget oldWidget) {
     if (_dirty) {
       rebuild();
     }
@@ -1896,12 +1895,12 @@ abstract class Element implements BuildContext {
 
   /// Implement this method to determine whether a rebuild can be skipped.
   ///
-  /// This method will be called whenever the component is about to update. If returned false, the subsequent rebuild will be skipped.
+  /// This method will be called whenever the widget is about to update. If returned false, the subsequent rebuild will be skipped.
   ///
-  /// This method exists only as a performance optimization and gives no guarantees about when the component is rebuilt.
+  /// This method exists only as a performance optimization and gives no guarantees about when the widget is rebuilt.
   /// Keep the implementation as efficient as possible and avoid deep (recursive) comparisons or performance heavy checks, as this might
   /// have an opposite effect on performance.
-  bool shouldRebuild(covariant Component newComponent);
+  bool shouldRebuild(covariant Widget newWidget);
 
   void _updateDepth(int parentDepth) {
     final int expectedDepth = parentDepth + 1;
@@ -1913,12 +1912,12 @@ abstract class Element implements BuildContext {
     }
   }
 
-  Element? _retakeInactiveElement(GlobalKey key, Component newComponent) {
+  Element? _retakeInactiveElement(GlobalKey key, Widget newWidget) {
     final Element? element = key._currentElement;
     if (element == null) {
       return null;
     }
-    if (!Component.canUpdate(element.component, newComponent)) {
+    if (!Widget.canUpdate(element.widget, newWidget)) {
       return null;
     }
     final Element? parent = element._parent;
@@ -1931,35 +1930,35 @@ abstract class Element implements BuildContext {
     return element;
   }
 
-  /// Create an element for the given component and add it as a child of this
+  /// Create an element for the given widget and add it as a child of this
   /// element.
   ///
   /// This method is typically called by [updateChild] but can be called
   /// directly by subclasses that need finer-grained control over creating
   /// elements.
   ///
-  /// If the given component has a global key and an element already exists that
-  /// has a component with that global key, this function will reuse that element
+  /// If the given widget has a global key and an element already exists that
+  /// has a widget with that global key, this function will reuse that element
   /// (potentially grafting it from another location in the tree or reactivating
   /// it from the list of inactive elements) rather than creating a new element.
   ///
   /// The element returned by this function will already have been mounted and
   /// will be in the "active" lifecycle state.
   @protected
-  Element inflateComponent(Component newComponent, Element? prevSibling) {
-    final Key? key = newComponent.key;
+  Element inflateWidget(Widget newWidget, Element? prevSibling) {
+    final Key? key = newWidget.key;
     if (key is GlobalKey) {
-      final Element? newChild = _retakeInactiveElement(key, newComponent);
+      final Element? newChild = _retakeInactiveElement(key, newWidget);
       if (newChild != null) {
         assert(newChild._parent == null);
         newChild._activateWithParent(this);
         newChild._parentChanged = true;
-        final Element? updatedChild = updateChild(newChild, newComponent, prevSibling);
+        final Element? updatedChild = updateChild(newChild, newWidget, prevSibling);
         assert(newChild == updatedChild);
         return updatedChild!;
       }
     }
-    final Element newChild = newComponent.createElement();
+    final Element newChild = newWidget.createElement();
     newChild.mount(this, prevSibling);
     newChild.didMount();
     assert(newChild._lifecycleState == _ElementLifecycle.active);
@@ -2033,7 +2032,7 @@ abstract class Element implements BuildContext {
   @mustCallSuper
   void activate() {
     assert(_lifecycleState == _ElementLifecycle.inactive);
-    assert(_component != null);
+    assert(_widget != null);
     assert(_owner != null);
     assert(_binding != null);
     assert(_parent != null);
@@ -2071,7 +2070,7 @@ abstract class Element implements BuildContext {
   @mustCallSuper
   void deactivate() {
     assert(_lifecycleState == _ElementLifecycle.active);
-    assert(_component != null);
+    assert(_widget != null);
     assert(_depth != null);
     if (_dependencies != null && _dependencies!.isNotEmpty) {
       for (var dependency in _dependencies!) {
@@ -2099,7 +2098,7 @@ abstract class Element implements BuildContext {
   @mustCallSuper
   void unmount() {
     assert(_lifecycleState == _ElementLifecycle.inactive);
-    assert(_component != null);
+    assert(_widget != null);
     assert(_depth != null);
     assert(_owner != null);
 
@@ -2110,13 +2109,13 @@ abstract class Element implements BuildContext {
       _observerElements = null;
     }
 
-    final Key? key = component.key;
+    final Key? key = widget.key;
     if (key is GlobalKey) {
-      ComponentsBinding._unregisterGlobalKey(key, this);
+      WidgetsBinding._unregisterGlobalKey(key, this);
     }
 
     _parentRenderObjectElement = null;
-    _component = null;
+    _widget = null;
     _dependencies = null;
     _lifecycleState = _ElementLifecycle.defunct;
   }
@@ -2128,15 +2127,15 @@ abstract class Element implements BuildContext {
   bool _hadUnsatisfiedDependencies = false;
 
   @override
-  InheritedComponent dependOnInheritedElement(InheritedElement ancestor, {Object? aspect}) {
+  InheritedWidget dependOnInheritedElement(InheritedElement ancestor, {Object? aspect}) {
     _dependencies ??= HashSet<InheritedElement>();
     _dependencies!.add(ancestor);
     ancestor.updateDependencies(this, aspect);
-    return ancestor.component;
+    return ancestor.widget;
   }
 
   @override
-  T? dependOnInheritedComponentOfExactType<T extends InheritedComponent>({Object? aspect}) {
+  T? dependOnInheritedWidgetOfExactType<T extends InheritedWidget>({Object? aspect}) {
     final InheritedElement? ancestor = _inheritedElements == null ? null : _inheritedElements![T];
     if (ancestor != null) {
       return dependOnInheritedElement(ancestor, aspect: aspect) as T;
@@ -2146,7 +2145,7 @@ abstract class Element implements BuildContext {
   }
 
   @override
-  InheritedElement? getElementForInheritedComponentOfExactType<T extends InheritedComponent>() {
+  InheritedElement? getElementForInheritedWidgetOfExactType<T extends InheritedWidget>() {
     final InheritedElement? ancestor = _inheritedElements == null ? null : _inheritedElements![T];
     return ancestor;
   }
@@ -2171,14 +2170,14 @@ abstract class Element implements BuildContext {
   /// in instead.
   ///
   /// See also:
-  ///   * [NotificationListener], a component that allows listening to notifications.
+  ///   * [NotificationListener], a widget that allows listening to notifications.
   @protected
   void attachNotificationTree() {
     _notificationTree = _parent?._notificationTree;
   }
 
   @override
-  T? findAncestorStateOfType<T extends State<StatefulComponent>>() {
+  T? findAncestorStateOfType<T extends State<StatefulWidget>>() {
     Element? ancestor = _parent;
     while (ancestor != null) {
       if (ancestor is StatefulElement && ancestor.state is T) {
@@ -2200,11 +2199,11 @@ abstract class Element implements BuildContext {
 
   /// Called when a dependency of this element changes.
   ///
-  /// The [dependOnInheritedComponentOfExactType] registers this element as depending on
+  /// The [dependOnInheritedWidgetOfExactType] registers this element as depending on
   /// inherited information of the given type. When the information of that type
   /// changes at this location in the tree (e.g., because the [InheritedElement]
-  /// updated to a new [InheritedComponent] and
-  /// [InheritedComponent.updateShouldNotify] returned true), the framework calls
+  /// updated to a new [InheritedWidget] and
+  /// [InheritedWidget.updateShouldNotify] returned true), the framework calls
   /// this function to notify this element of the change.
   void didChangeDependencies() {
     assert(_lifecycleState == _ElementLifecycle.active);
@@ -2215,7 +2214,7 @@ abstract class Element implements BuildContext {
   bool _debugCheckOwnerBuildTargetExists(String methodName) {
     assert(() {
       if (owner._debugCurrentBuildTarget == null) {
-        throw '$methodName for ${component.runtimeType} was called at an '
+        throw '$methodName for ${widget.runtimeType} was called at an '
             'inappropriate time.';
       }
       return true;
@@ -2232,10 +2231,10 @@ abstract class Element implements BuildContext {
   // ignore: prefer_final_fields
   bool _inDirtyList = false;
 
-  // We let component authors call setState from initState, didUpdateComponent, and
+  // We let widget authors call setState from initState, didUpdateWidget, and
   // build even when state is locked because its convenient and a no-op anyway.
   // This flag ensures that this convenience is only allowed on the element
-  // currently undergoing initState, didUpdateComponent, or build.
+  // currently undergoing initState, didUpdateWidget, or build.
   bool _debugAllowIgnoredCallsToMarkNeedsBuild = false;
   bool _debugSetAllowIgnoredCallsToMarkNeedsBuild(bool value) {
     assert(_debugAllowIgnoredCallsToMarkNeedsBuild == !value);
@@ -2284,10 +2283,10 @@ abstract class Element implements BuildContext {
     return false;
   }
 
-  /// Cause the component to update itself.
+  /// Cause the widget to update itself.
   ///
   /// Called by the [BuildOwner] when rebuilding, by [mount] when the element is first
-  /// built, and by [update] when the component has changed.
+  /// built, and by [update] when the widget has changed.
   void rebuild() {
     assert(_lifecycleState != _ElementLifecycle.initial);
     if (_lifecycleState != _ElementLifecycle.active || !_dirty) {
@@ -2328,7 +2327,7 @@ abstract class Element implements BuildContext {
     });
   }
 
-  /// Cause the component to update itself.
+  /// Cause the widget to update itself.
   ///
   /// Called by [BuildOwner] after the appropriate checks have been made.
   void performRebuild();
@@ -2383,7 +2382,7 @@ abstract class Element implements BuildContext {
 
   void updatePrevSibling(Element? prevSibling) {
     assert(_lifecycleState == _ElementLifecycle.active);
-    assert(_component != null);
+    assert(_widget != null);
     assert(_parent != null);
     assert(_parent!._lifecycleState == _ElementLifecycle.active);
     assert(_depth != null);
@@ -2411,10 +2410,10 @@ abstract class Element implements BuildContext {
 
 /// An [Element] that has multiple children and a [build] method.
 ///
-/// Used by [DomComponent], [StatelessComponent] and [StatefulComponent].
+/// Used by [DomWidget], [StatelessWidget] and [StatefulWidget].
 abstract class BuildableElement extends Element {
-  /// Creates an element that uses the given component as its configuration.
-  BuildableElement(super.component);
+  /// Creates an element that uses the given widget as its configuration.
+  BuildableElement(super.widget);
 
   /// The current list of children of this element.
   ///
@@ -2445,14 +2444,14 @@ abstract class BuildableElement extends Element {
   }
 
   @override
-  bool shouldRebuild(Component newComponent) {
+  bool shouldRebuild(Widget newWidget) {
     return true;
   }
 
   @override
   void performRebuild() {
     assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(true));
-    List<Component>? built;
+    List<Widget>? built;
     try {
       assert(() {
         _debugDoingBuild = true;
@@ -2465,11 +2464,11 @@ abstract class BuildableElement extends Element {
       }());
     } catch (e, st) {
       _debugDoingBuild = false;
-      // TODO: implement actual error component
+      // TODO: implement actual error widget
       built = [
-        DomComponent(
+        DomWidget(
           tag: 'div',
-          child: Text("Error on building component: $e"),
+          child: Text("Error on building widget: $e"),
         ),
       ];
       print('Error: $e $st');
@@ -2483,10 +2482,10 @@ abstract class BuildableElement extends Element {
   }
 
   /// Subclasses should override this function to actually call the appropriate
-  /// `build` function (e.g., [StatelessComponent.build] or [State.build]) for
-  /// their component.
+  /// `build` function (e.g., [StatelessWidget.build] or [State.build]) for
+  /// their widget.
   @protected
-  Iterable<Component> build();
+  Iterable<Widget> build();
 
   @override
   void visitChildren(ElementVisitor visitor) {
@@ -2507,23 +2506,23 @@ abstract class BuildableElement extends Element {
   }
 }
 
-/// An [Element] that uses a [StatelessComponent] as its configuration.
+/// An [Element] that uses a [StatelessWidget] as its configuration.
 class StatelessElement extends BuildableElement {
-  /// Creates an element that uses the given component as its configuration.
-  StatelessElement(StatelessComponent super.component);
+  /// Creates an element that uses the given widget as its configuration.
+  StatelessElement(StatelessWidget super.widget);
 
   @override
-  StatelessComponent get component => super.component as StatelessComponent;
+  StatelessWidget get widget => super.widget as StatelessWidget;
 
   Future? _asyncFirstBuild;
 
   @override
   void didMount() {
-    // We check if the component uses on of the mixins that support async initialization,
+    // We check if the widget uses on of the mixins that support async initialization,
     // which will delay the call to [build()] until resolved during the first build.
 
-    if (owner.isFirstBuild && !binding.isClient && component is OnFirstBuild) {
-      var result = (component as OnFirstBuild).onFirstBuild(this);
+    if (owner.isFirstBuild && !binding.isClient && widget is OnFirstBuild) {
+      var result = (widget as OnFirstBuild).onFirstBuild(this);
       if (result is Future) {
         _asyncFirstBuild = result;
       }
@@ -2533,12 +2532,12 @@ class StatelessElement extends BuildableElement {
   }
 
   @override
-  bool shouldRebuild(covariant Component newComponent) {
-    return component.shouldRebuild(newComponent);
+  bool shouldRebuild(covariant Widget newWidget) {
+    return widget.shouldRebuild(newWidget);
   }
 
   @override
-  Iterable<Component> build() => component.build(this);
+  Iterable<Widget> build() => widget.build(this);
 
   @override
   FutureOr<void> performRebuild() {
@@ -2551,35 +2550,35 @@ class StatelessElement extends BuildableElement {
   }
 }
 
-/// An [Element] that uses a [StatefulComponent] as its configuration.
+/// An [Element] that uses a [StatefulWidget] as its configuration.
 class StatefulElement extends BuildableElement {
-  /// Creates an element that uses the given component as its configuration.
-  StatefulElement(StatefulComponent component)
-      : _state = component.createState(),
-        super(component) {
+  /// Creates an element that uses the given widget as its configuration.
+  StatefulElement(StatefulWidget widget)
+      : _state = widget.createState(),
+        super(widget) {
     assert(() {
-      if (!state._debugTypesAreRight(component)) {
-        throw 'StatefulComponent.createState must return a subtype of State<${component.runtimeType}>\n\n'
-            'The createState function for ${component.runtimeType} returned a state '
+      if (!state._debugTypesAreRight(widget)) {
+        throw 'StatefulWidget.createState must return a subtype of State<${widget.runtimeType}>\n\n'
+            'The createState function for ${widget.runtimeType} returned a state '
             'of type ${state.runtimeType}, which is not a subtype of '
-            'State<${component.runtimeType}>, violating the contract for createState.';
+            'State<${widget.runtimeType}>, violating the contract for createState.';
       }
       return true;
     }());
     assert(state._element == null);
     state._element = this;
     assert(
-      state._component == null,
-      'The createState function for $component returned an old or invalid state '
-      'instance: ${state._component}, which is not null, violating the contract '
+      state._widget == null,
+      'The createState function for $widget returned an old or invalid state '
+      'instance: ${state._widget}, which is not null, violating the contract '
       'for createState.',
     );
-    state._component = component;
+    state._widget = widget;
     assert(state._debugLifecycleState == _StateLifecycle.created);
   }
 
   @override
-  Iterable<Component> build() => state.build(this);
+  Iterable<Widget> build() => state.build(this);
 
   /// The [State] instance associated with this location in the tree.
   ///
@@ -2652,27 +2651,27 @@ class StatefulElement extends BuildableElement {
   }
 
   @override
-  bool shouldRebuild(covariant StatefulComponent newComponent) {
-    return state.shouldRebuild(newComponent);
+  bool shouldRebuild(covariant StatefulWidget newWidget) {
+    return state.shouldRebuild(newWidget);
   }
 
   @override
-  void update(StatefulComponent newComponent) {
-    super.update(newComponent);
-    assert(component == newComponent);
-    state._component = newComponent;
+  void update(StatefulWidget newWidget) {
+    super.update(newWidget);
+    assert(widget == newWidget);
+    state._widget = newWidget;
   }
 
   @override
-  void didUpdate(StatefulComponent oldComponent) {
+  void didUpdate(StatefulWidget oldWidget) {
     try {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
       // TODO: check for returned future
-      state.didUpdateComponent(oldComponent);
+      state.didUpdateWidget(oldWidget);
     } finally {
       _debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
     }
-    super.didUpdate(oldComponent);
+    super.didUpdate(oldWidget);
   }
 
   @override
@@ -2700,8 +2699,8 @@ class StatefulElement extends BuildableElement {
 
   /// This controls whether we should call [State.didChangeDependencies] from
   /// the start of [build], to avoid calls when the [State] will not get built.
-  /// This can happen when the component has dropped out of the tree, but depends
-  /// on an [InheritedComponent] that is still in the tree.
+  /// This can happen when the widget has dropped out of the tree, but depends
+  /// on an [InheritedWidget] that is still in the tree.
   ///
   /// It is set initially to false, since [_firstBuild] makes the initial call
   /// on the [state]. When it is true, [build] will call
@@ -2718,8 +2717,8 @@ class StatefulElement extends BuildableElement {
 
 /// An [Element] that has multiple children based on a proxy list.
 class ProxyElement extends Element {
-  /// Creates an element that uses the given component as its configuration.
-  ProxyElement(ProxyComponent super.component);
+  /// Creates an element that uses the given widget as its configuration.
+  ProxyElement(ProxyWidget super.widget);
 
   /// The current list of children of this element.
   ///
@@ -2749,7 +2748,7 @@ class ProxyElement extends Element {
   }
 
   @override
-  bool shouldRebuild(ProxyComponent newComponent) {
+  bool shouldRebuild(ProxyWidget newWidget) {
     return true;
   }
 
@@ -2757,10 +2756,10 @@ class ProxyElement extends Element {
   void performRebuild() {
     _dirty = false;
 
-    var comp = (component as ProxyComponent);
-    var newComponents = comp.children ?? [if (comp.child != null) comp.child!];
+    var comp = (widget as ProxyWidget);
+    var newWidgets = comp.children ?? [if (comp.child != null) comp.child!];
 
-    _children = updateChildren(_children ?? [], newComponents, forgottenChildren: _forgottenChildren);
+    _children = updateChildren(_children ?? [], newWidgets, forgottenChildren: _forgottenChildren);
     _forgottenChildren.clear();
   }
 
@@ -2783,13 +2782,13 @@ class ProxyElement extends Element {
   }
 }
 
-/// An [Element] that uses an [InheritedComponent] as its configuration.
+/// An [Element] that uses an [InheritedWidget] as its configuration.
 class InheritedElement extends ProxyElement {
-  /// Creates an element that uses the given component as its configuration.
-  InheritedElement(InheritedComponent super.component);
+  /// Creates an element that uses the given widget as its configuration.
+  InheritedElement(InheritedWidget super.widget);
 
   @override
-  InheritedComponent get component => super.component as InheritedComponent;
+  InheritedWidget get widget => super.widget as InheritedWidget;
 
   final Map<Element, Object?> _dependents = HashMap<Element, Object?>();
 
@@ -2802,7 +2801,7 @@ class InheritedElement extends ProxyElement {
     } else {
       _inheritedElements = HashMap<Type, InheritedElement>();
     }
-    _inheritedElements![component.runtimeType] = this;
+    _inheritedElements![widget.runtimeType] = this;
   }
 
   /// Returns the dependencies value recorded for [dependent]
@@ -2822,7 +2821,7 @@ class InheritedElement extends ProxyElement {
   /// See also:
   ///
   ///  * [updateDependencies], which is called each time a dependency is
-  ///    created with [dependOnInheritedComponentOfExactType].
+  ///    created with [dependOnInheritedWidgetOfExactType].
   ///  * [setDependencies], which sets dependencies value for a dependent
   ///    element.
   ///  * [notifyDependent], which can be overridden to use a dependent's
@@ -2847,7 +2846,7 @@ class InheritedElement extends ProxyElement {
   /// See also:
   ///
   ///  * [updateDependencies], which is called each time a dependency is
-  ///    created with [dependOnInheritedComponentOfExactType].
+  ///    created with [dependOnInheritedWidgetOfExactType].
   ///  * [getDependencies], which returns the current value for a dependent
   ///    element.
   ///  * [notifyDependent], which can be overridden to use a dependent's
@@ -2857,7 +2856,7 @@ class InheritedElement extends ProxyElement {
     _dependents[dependent] = value;
   }
 
-  /// Called by [dependOnInheritedComponentOfExactType] when a new [dependent] is added.
+  /// Called by [dependOnInheritedWidgetOfExactType] when a new [dependent] is added.
   ///
   /// Each dependent element can be mapped to a single object value with
   /// [setDependencies]. This method can lookup the existing dependencies with
@@ -2883,30 +2882,30 @@ class InheritedElement extends ProxyElement {
   }
 
   @override
-  void didUpdate(covariant InheritedComponent oldComponent) {
-    if (component.updateShouldNotify(oldComponent)) {
-      notifyClients(oldComponent);
+  void didUpdate(covariant InheritedWidget oldWidget) {
+    if (widget.updateShouldNotify(oldWidget)) {
+      notifyClients(oldWidget);
     }
-    super.didUpdate(oldComponent);
+    super.didUpdate(oldWidget);
   }
 
-  /// Notifies all dependent elements that this inherited component has changed, by
+  /// Notifies all dependent elements that this inherited widget has changed, by
   /// calling [Element.didChangeDependencies].
   ///
   /// This method must only be called during the build phase. Usually this
-  /// method is called automatically when an inherited component is rebuilt, e.g.
-  /// as a result of calling [State.setState] above the inherited component.
+  /// method is called automatically when an inherited widget is rebuilt, e.g.
+  /// as a result of calling [State.setState] above the inherited widget.
   ///
-  /// Notify other objects that the component associated with this element has
+  /// Notify other objects that the widget associated with this element has
   /// changed.
   ///
-  /// Called during [didUpdate] after changing the component
+  /// Called during [didUpdate] after changing the widget
   /// associated with this element but before rebuilding this element.
   @protected
-  void notifyClients(covariant InheritedComponent oldComponent) {
+  void notifyClients(covariant InheritedWidget oldWidget) {
     assert(_debugCheckOwnerBuildTargetExists('notifyClients'));
     for (final Element dependent in _dependents.keys) {
-      notifyDependent(oldComponent, dependent);
+      notifyDependent(oldWidget, dependent);
     }
   }
 
@@ -2920,12 +2919,12 @@ class InheritedElement extends ProxyElement {
   /// See also:
   ///
   ///  * [updateDependencies], which is called each time a dependency is
-  ///    created with [dependOnInheritedComponentOfExactType].
+  ///    created with [dependOnInheritedWidgetOfExactType].
   ///  * [getDependencies], which returns the current value for a dependent
   ///    element.
   ///  * [setDependencies], which sets the value for a dependent element.
   @protected
-  void notifyDependent(covariant InheritedComponent oldComponent, Element dependent) {
+  void notifyDependent(covariant InheritedWidget oldWidget, Element dependent) {
     dependent.didChangeDependencies();
   }
 
@@ -2945,7 +2944,6 @@ class InheritedElement extends ProxyElement {
     _dependents.remove(dependent);
   }
 }
-
 
 mixin RenderObjectElement on Element {
   RenderObject createRenderObject() {
@@ -2970,25 +2968,25 @@ mixin RenderObjectElement on Element {
 
   bool _dirtyRender = false;
 
-  bool shouldRerender(covariant Component newComponent) {
+  bool shouldRerender(covariant Widget newWidget) {
     return true;
   }
 
   @override
-  void update(Component newComponent) {
-    if (shouldRerender(newComponent)) {
+  void update(Widget newWidget) {
+    if (shouldRerender(newWidget)) {
       _dirtyRender = true;
     }
-    super.update(newComponent);
+    super.update(newWidget);
   }
 
   @override
-  void didUpdate(Component oldComponent) {
+  void didUpdate(Widget oldWidget) {
     if (_dirtyRender) {
       _dirtyRender = false;
       updateRenderObject();
     }
-    super.didUpdate(oldComponent);
+    super.didUpdate(oldWidget);
   }
 
   @override
