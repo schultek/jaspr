@@ -76,7 +76,7 @@ class DomRenderObject extends RenderObject {
       elem = node = _createElement(tag, namespace);
       attributesToRemove = {};
       if (kVerboseMode) {
-        print("Create html node: $elem");
+        web.console.log(["Create html node:", elem].toJSBox);
       }
     } else {
       if (node.instanceOfString('Element') || (node as web.Element).tagName.toLowerCase() != tag) {
