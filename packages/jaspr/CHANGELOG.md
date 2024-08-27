@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed an issue where webDir would never resolve during tests.
+
 ## 0.15.1
 
 - Include and setup `jaspr_lints` in newly created projects.
