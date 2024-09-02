@@ -3,7 +3,10 @@ export 'package:meta/meta.dart'
 
 export 'src/components/async.dart';
 export 'src/components/basic.dart';
+export 'src/components/document.dart';
 export 'src/components/html/html.dart';
+export 'src/components/listenable_builder.dart';
+export 'src/components/raw_text/raw_text.dart';
 export 'src/components/style.dart';
 export 'src/foundation/annotations.dart';
 export 'src/foundation/basic_types.dart';
@@ -14,7 +17,7 @@ export 'src/foundation/events/events.dart';
 export 'src/foundation/object.dart';
 export 'src/foundation/options.dart';
 export 'src/foundation/scheduler.dart';
-export 'src/foundation/styles/styles.dart';
+export 'src/foundation/style.dart';
 export 'src/foundation/sync.dart';
 export 'src/foundation/synchronous_future.dart';
 export 'src/framework/framework.dart';

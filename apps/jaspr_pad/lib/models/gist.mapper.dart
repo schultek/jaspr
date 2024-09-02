@@ -69,8 +69,7 @@ mixin GistDataMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType && GistDataMapper.ensureInitialized().isValueEqual(this as GistData, other));
+    return GistDataMapper.ensureInitialized().equalsValue(this as GistData, other);
   }
 
   @override
@@ -175,8 +174,7 @@ mixin GistFileMappable {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        (runtimeType == other.runtimeType && GistFileMapper.ensureInitialized().isValueEqual(this as GistFile, other));
+    return GistFileMapper.ensureInitialized().equalsValue(this as GistFile, other);
   }
 
   @override

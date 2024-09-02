@@ -1,0 +1,29 @@
+---
+title: RawText
+description: Renders raw HTML from a String.
+---
+
+# RawText
+*Renders raw HTML from a String.*
+
+---
+
+The `RawText` component renders its input text as raw and unescaped HTML.
+
+```dart
+yield RawText('<div>Hello HTML</div>');
+```
+
+renders to:
+
+```html
+<div>Hello HTML</div>
+```
+
+<Warning>
+This component does not do any escaping of user inputs and is
+vulnerable to [cross-site scripting (XSS) attacks](https://owasp.org/www-community/attacks/xss/).
+Make sure to sanitize any user input when using this component.
+</Warning>
+
+The component can be used both on the server and the client and supports deep updates of the provided html.

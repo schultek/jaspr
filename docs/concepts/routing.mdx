@@ -1,0 +1,119 @@
+---
+title: Routing
+description: How to do routing in Jaspr.
+---
+
+# Routing
+*How to do routing in Jaspr.*
+
+---
+
+A core feature of almost every website is routing between separate pages. With Jaspr you can use the core `jaspr_router`
+package for a powerful routing system that adapts to your needs.
+
+## Setup
+
+To start, add `jaspr_router` to your project, use the [Router](/components/router) component and provide a list
+of `Route`s:
+
+```dart title="lib/app.dart"
+import 'package:jaspr_router/jaspr_router.dart';
+
+import 'pages/home.dart';
+import 'pages/about.dart' ;
+
+class App extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield Router(routes: [
+      Route(path: '/', builder: (context, state) => Home()),
+      Route(path: '/about', builder: (context, state) => About()),
+    ]);
+  }
+}
+```
+
+See the [Router](/components/router) docs for a full description of its API.
+
+As with many Jaspr components, `Router` can be used both on the server and on the client. However, there is an important
+difference in routing behavior based on where it is rendered. Read the section below for more details.
+
+## Single-page vs multi-page routing
+
+When creating a new Jaspr project, you can choose between two routing setups:
+
+- **multi-page** (server-side) routing or
+- **single-page** (client-side) routing.
+
+This defined how navigating between routes will behave. With **multi-page routing** a "real" page load is performed when
+navigating to a new route (aka. the browser requests the new page using its url from the server). With **single-page routing**
+the routing happens purely on the client without any request to the server.
+
+Usually you would choose multi-page routing for more "traditional" websites with multiple pages and
+single-page routing for more self-contained app-like websites.
+
+<Info>
+    There are different advantages and disadvantages for both types. To help you decide you can find many [articles](https://www.google.com/search?q=multi+page+vs+single+page+site) about this topic.
+</Info>
+
+<Info>
+    Flutter for example only does single-page routing.
+</Info>
+
+To set up routing for either strategy is really straight forward:
+
+- For multi-page routing place the `Router` component in the section of the component tree where it is **only** pre-rendered on the server.
+  For example if you are using [@client](/utils/at_client) components place the `Router` above these components in the tree.
+
+  <Info>
+    Since this requires pre-rendering, multi-page routing is only available with **static** or **server** mode.
+  </Info>
+
+  <Info>
+    If you are unsure about how the separation between server and client works, check out the [Hydration](/get_started/hydration)
+    docs, specifically the [Separation of Environments](/get_started/hydration#separation-of-environments) section.
+  </Info>
+
+  To navigate to a different page, use the [Link](/components/link) component, which wraps the `<a>` html element.
+
+  When using multi-page routing and the `Router` component is only rendered on the server, you cannot use `Router.of(context).push('/path)'`
+  for navigating on the client as it would fail to locate the `Router` in the client-side component tree.
+
+- For single-page routing place the `Router` in the client-rendered section of the component tree, i.e. below any [@client](/utils/at_client) components.
+
+  To navigate to a different page, either use the [Link](/components/link) component or call `Router.of(context).push('/path');`.
+
+  When using client-side routing we recommend code-splitting your client bundle based on your routes to improve load times.
+  See the section below for more details.
+
+## Route based code splitting
+
+<Info>
+  This is only relevant when using single-page routing.
+</Info>
+
+For larger web apps, we don't want to load everything together, but rather split our pages into smaller chunks.
+`jaspr` can do this automatically using `LazyRoutes` and deferred imports.
+
+To use lazy routes, change the above code to the following:
+
+```dart title="lib/app.dart"
+import 'pages/home.dart';
+import 'pages/about.dart' deferred as about;
+
+class App extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield Router(
+      routes: [
+        Route(path: '/', builder: (context, state) => Home()),
+        Route.lazy(path: '/about', builder: (context, state) => about.About(), load: about.loadLibrary),
+      ],
+    );
+  }
+}
+```
+
+This will lazy load the appropriate javascript files for the '/about' route when navigating to it.
+
+Read more in the docs about [Lazy Routes](/components/router#lazy-routes).

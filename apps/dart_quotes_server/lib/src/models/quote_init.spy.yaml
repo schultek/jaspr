@@ -1,0 +1,4 @@
+class: QuoteInit
+
+fields:
+  id: int

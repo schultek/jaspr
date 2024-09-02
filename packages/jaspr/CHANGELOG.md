@@ -1,8 +1,208 @@
-## Unreleased minor
+## 0.15.0
 
-- Fixed bug with `DomValidator`.
-- `Document` is no longer required when using server-side rendering.
+- Added support for using `@css` and `@encoder`/`@decoder` across other packages.
+  
+  1. Styles annotated with `@css` from other dependent packages are now also included in the pre-rendered css.
+  2. Models (or extension types) that define `@encoder` and `@decoder` annotations from other dependent packages can
+     now also be used together with `@client` components and `@sync` fields.
+
+- **BREAKING** Component (or any class member) styles annotated with `@css` are now only included in the pre-rendered css if 
+  the file they are defined in is actually imported somewhere in the project.
+
+  Top-level styles continue to be always included.
+
+- Fixed issue with wrongly generated imports of `@encoder`/`@decoder` methods.
+- Fixed spelling mistake from `spaceRvenly` to `spaceEvenly`
+- Added default `BorderStyle.solid` to `BorderSide` constructor.
+
+## 0.14.0
+
+- **BREAKING** Calling `Jaspr.initializeApp()` is now required in static and server mode.
+
+- **BREAKING** Removed `Head` component in favor of new `Document.head()` component.
+  `Document.head()` has the same parameters as the old `Head` component and renders its children inside
+  the `<head>` element.
+- Added `Document.html()` and `Document.body()` to modify the attributes of `<html>` and `<body>`.
+
+- **BREAKING** Removed `syncId` and `syncCodec` parameters from `SyncStateMixin`.
+  `SyncStateMixin` now embeds its data locally in the pre-rendered html using standard json encoding.
+- Added `@sync` annotation. Can be used on any field of a `StatefulComponent` to automatically sync its value. 
+ 
+  ```dart
+  class MyComponentState extends State<MyComponent> with MyComponentStateSyncMixin {
+    @sync
+    String myValue;
+  }
+  ```
+
+- **BREAKING** Removed `MediaRuleQuery` in favor of `MediaQuery`.
+- Added `css.import()`, `css.fontFace()` and `css.media()` shorthands.
+- Added `@css` annotation. Can be used on a list of style rules to automatically include them in the global styles.
+
+  ```dart
+  @css
+  final styles = [
+    css('.main').box(width: 100.px),
+  ];
+  ```
+
+- Added `Fragment` component.
+- Fixed missing html unescape in hydrated data.
+
+## 0.13.3
+
+- Added support for custom models as parameters to `@client` components.
+
+  To enable this a custom model class must have two methods: 
+  - An instance method that encodes the model to a primitive value and is annotated with `@encoder`:
+    ```dart
+    @encoder
+    String toJson() { ... }
+    ```
+  - A static method that decodes the model from a primitive value and is annotated with `@decoder`:
+    ```dart
+    @decoder
+    static MyModel fromJson(String json) { ... }
+    ```
+    
+  The method names can be freely chosen. 
+  The encoding type must be any primitive type (`String`, `int`, `List`, `Map`, etc.).
+
+- Added `ListenableBuilder` and `ValueListenableBuilder` components.
+
+- Added `Styles.list` for styling `ul` and `ol` elements.
+- Added `TextDecoration.none` shorthand.
+
+## 0.13.2
+
+- Improved the performance of the building and diffing algorithm, and other performance improvements.
+- Added `StatelessComponent.shouldRebuild` and `State.shouldRebuild` for possible skipping rebuilds as a performance improvement.
+
+## 0.13.1
+
+- Fixed namespace handling for nested svg elements.
+- Fixed global key conflicts during server-side rendering by disabling them on the server.
+- Change `testComponents(isClient: _)` default to true.
+
+## 0.13.0
+
+- Added `Head` component to render metadata inside the documents `<head>`.
+
+  You can specify a title, metadata or custom children: 
+  ```dart
+  Head(
+    title: 'My Title',
+    meta: {
+      'description': 'My Page Description',
+      'custom': 'my-custom-metadata',
+    },
+    children: [
+      link(rel: "canonical" href: "https://mysite.com/example"),
+    ],
+  )
+  ```
+  
+  Deeper or latter `Head` components will override duplicate elements:
+
+  ```dart
+  Parent(children: [
+    Head(
+      title: "My Title",
+      meta: {"description": "My Page Description"}
+    ),
+    Child(children: [
+      Head(
+        title: "Nested Title"
+      ),
+    ]),
+  ]),
+  ```
+  
+  will render:
+
+  ```html
+  <head>
+    <title>Nested Title</title>
+    <meta name="description" content="My Page Description">
+  </head>
+  ```
+
+- Added `AsyncStatelessComponent` and `AsyncBuilder`.
+  These are special components that are only available on the server (using `package:jaspr/server.dart`) and have an 
+  asynchronous build function.
+
+- Improved internal framework implementation of different element types.
+  - Added `BuildableElement` and `ProxyElement` as replacement for `MultiChildElement` and `SingleChildElement`.
+  - Added `Element.didMount()` and `Element.didUpdate()` lifecycle methods.
+
+- Fixed race condition where routes were skipped during static rendering.
+- Fixed infinite loading bug for async server builds.
+- Fixed hydration bug with empty or nested client components.
+- Added documentation comments.
+
+## 0.12.0
+
+- **BREAKING** Removed `Document.file()`, instead use new `Document.template()`.
+
+- Added `Document.template()` for loading template html files.
+
+  Files that should be used with `Document.template()` must have the `.template.html` extension to differentiate
+  between normal `.html` files that are served as-is. The `name` parameter provided to `Document.template()` must be the
+  simple name of the file without extension, e.g. `Document.template(name: 'index')` loads the `web/index.template.html` file.
+
+- Added the `lang` attribute to `Document()` constructor.
+- Added `<main>` as `main_()` to the standard html components.
+
+- Fixed bug with `PreloadStateMixin` and improved async server builds.
+- Fixed crash with server hot-reload.
+- Improved the shelf backend template for proper handling of server hot-reload.
+- Fixed `DomValidator` to allow attributes with `.`.
+
+## 0.11.1
+
+- Fixed bug with base paths.
+
+## 0.11.0
+
+- **BREAKING** Changed jaspr configuration to require `jaspr.mode` in `pubspec.yaml`:
+  
+  The `jaspr.mode` option now sets the rendering mode and must be one of:
+
+  - **static**: For building a statically pre-rendered site (SSG) with optional client-side hydration.
+  - **server**: For building a server-rendered site (SSR) with optional client-side hydration.
+  - **client**: For building a purely client-rendered site (SPA).
+
+  This replaces the old `jaspr.uses-ssr` option.
+
+- **BREAKING** Removed `jaspr generate` command in favor using the `jaspr build` command in combination with
+  the new `jaspr.mode = static` option in `pubspec.yaml`.
+
+- **BREAKING** Removed the `runServer()` method along with its support for adding middleware and listeners. Users should instead 
+  migrate to the custom backend setup using `package:shelf`.
+
+- **BREAKING** Removed `rawHtml` flag from `Text` component and `text()` method, in favor of
+  new `RawText` component and `raw()` method respectively, which fixes multiple bugs with the old implementation.
+
+- Improved the `jaspr create` command by changing to a scaffolding system as replacement for templates.
+  You will now be walked through a configuration wizard that creates a starting project based on the selected options.
+
+- Removed `jaspr.uses-flutter` option. This is now auto-detected based on the dependencies.
+
+- Styles can now be written more concise using the ability to chain style groups as well as the new `css()` method.
+
+- Changes made to `main.dart` are now also hot-reloaded on the server.
+
+- `Document` is no longer required when using server-side rendering. A basic document structure (`<html><head>...<body>...`) 
+  is automatically filled in.
+
 - Improved how `@client` components are hydrated.
+
+- The `jaspr build` command now accepts an optimization option. Minification (`-O 2`) enabled by default.
+
+- Fixed `DomValidator` to allow special attributes with uppercase letters and colons.
+
+- Exceptions thrown during `renderHtml` are now correctly passed through to the spawning isolate.
+
 
 ## 0.10.0
 
@@ -145,7 +345,7 @@
 ## 0.6.2
 
 - Added integrated support for seamless **flutter element embedding**.
-  Refer to [Flutter Embedding Docs](https://docs.page/schultek/jaspr/eco/flutter_embedding) on how to setup and use this.
+  Refer to [Flutter Embedding Docs](https://docs.page/schultek/jaspr/going_further/flutter_embedding) on how to setup and use this.
 
 ## 0.6.1
 

@@ -2,7 +2,7 @@ include: package:lints/recommended.yaml
 
 analyzer:
   exclude:
-    - tool/templates/**
+    - tool/scaffold/**
 
 linter:
   rules:

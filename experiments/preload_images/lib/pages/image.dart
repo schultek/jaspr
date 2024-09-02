@@ -25,9 +25,6 @@ class ImageState extends State<Image> with PreloadStateMixin, SyncStateMixin<Ima
   }
 
   @override
-  String get syncId => 'image-${component.id}';
-
-  @override
   void updateState(Map<String, dynamic>? value) {
     setState(() {
       image = value ?? {};

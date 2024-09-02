@@ -24,24 +24,24 @@
 
 # Jaspr
 
-> A modern web framework for building websites in Dart with support for both **client-side** and **server-side rendering**.
+> A modern web framework for building websites in Dart with support for both **client-side** and **server-side rendering**, as well as **static site generation**.
 
 - 🔮 **Why?**: Jaspr was made with the premise to make a web-framework that looks and feels just like Flutter, but
-  renders normal html/css like Vue or React.
+  renders normal html/css like React.
 - 👥 **Who?**: Jaspr is targeted mainly at Flutter developers that want to build any type of websites
   (especially ones that are not suitable for Flutter Web).
 - 🚀 **What?**: Jaspr wants to push the boundaries of Dart on the web and server, by giving you a thought-through fullstack
   web framework written completely in Dart.
 
 > Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of
-> developers around Jaspr and check out the [Contributing Guide](https://docs.page/schultek/jaspr/eco/contributing).
+> developers around Jaspr and check out the [Contributing Guide](https://docs.page/schultek/jaspr/going_further/contributing).
 
 ### Core Features
 
 - 💙 **Familiar**: Works with a similar component model to flutter widgets.
 - 🚀 **Powerful**: Comes with server side rendering out of the box.
 - ♻️ **Easy**: Syncs component state between server and client automatically.
-- ⚡️ **Fast**: Performs incremental DOM updates only where needed.
+- ⚡️ **Fast**: Performs direct DOM updates only where needed.
 - 🎛 **Flexible**: Runs on the server, client or both with manual or automatic setup. You decide.
 
 > If you want to say thank you, star the project on GitHub and like the package on pub.dev 🙌💙

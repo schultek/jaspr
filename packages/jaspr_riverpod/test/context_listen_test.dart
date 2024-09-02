@@ -9,110 +9,101 @@ final counterB = StateProvider.autoDispose((ref) => 0);
 
 void main() {
   group('context.listen', () {
-    testComponents(
-      'listens to provider state',
-      (tester) async {
-        int? wasCalledWith;
+    testComponents('listens to provider state', (tester) async {
+      int? wasCalledWith;
 
-        await tester.pumpComponent(providerApp((context) sync* {
-          context.listen<int>(counter, (prev, next) {
-            wasCalledWith = next;
-          });
+      await tester.pumpComponent(providerApp((context) sync* {
+        context.listen<int>(counter, (prev, next) {
+          wasCalledWith = next;
+        });
 
-          yield Button(
-            label: 'tap',
-            onPressed: () {
-              context.read(counter.notifier).state++;
-            },
-          );
-        }));
+        yield Button(
+          label: 'tap',
+          onPressed: () {
+            context.read(counter.notifier).state++;
+          },
+        );
+      }));
 
-        expect(wasCalledWith, isNull);
+      expect(wasCalledWith, isNull);
 
-        // increase counter
-        await tester.click(find.tag('button'));
+      // increase counter
+      await tester.click(find.tag('button'));
 
-        expect(wasCalledWith, equals(1));
-      },
-    );
+      expect(wasCalledWith, equals(1));
+    });
 
-    testComponents(
-      'context.listen re-listens on rebuild',
-      (tester) async {
-        List<int> wasCalledWith = [];
+    testComponents('re-listens on rebuild', (tester) async {
+      List<int> wasCalledWith = [];
 
-        await tester.pumpComponent(providerApp((context) sync* {
-          context.listen<int>(counter, (prev, next) {
-            wasCalledWith.add(next);
-          }, fireImmediately: true);
+      await tester.pumpComponent(providerApp((context) sync* {
+        context.listen<int>(counter, (prev, next) {
+          wasCalledWith.add(next);
+        }, fireImmediately: true);
 
-          yield Button(
-            label: '${context.watch(counter)}',
-            onPressed: () {
-              context.read(counter.notifier).state++;
-            },
-          );
-        }));
+        yield Button(
+          label: '${context.watch(counter)}',
+          onPressed: () {
+            context.read(counter.notifier).state++;
+          },
+        );
+      }));
 
-        expect(wasCalledWith, equals([0]));
+      expect(wasCalledWith, equals([0]));
 
-        // increase counter
-        await tester.click(find.tag('button'));
+      // increase counter
+      await tester.click(find.tag('button'));
 
-        expect(wasCalledWith, equals([0, 1]));
-      },
-    );
+      expect(wasCalledWith, equals([0, 1]));
+    });
 
-    testComponents(
-      'context.listen un-listens on dispose',
-      (tester) async {
-        List<int> wasCalledWith = [];
+    testComponents('un-listens on dispose', (tester) async {
+      List<int> wasCalledWith = [];
 
-        await tester.pumpComponent(providerApp((context) sync* {
-          if (context.watch(counter.select((cnt) => cnt < 2))) {
-            yield Builder(
-              builder: (context) sync* {
-                context.listen<int>(counter, (prev, next) {
-                  wasCalledWith.add(next);
-                }, fireImmediately: true);
+      await tester.pumpComponent(providerApp((context) sync* {
+        if (context.watch(counter.select((cnt) => cnt < 2))) {
+          yield Builder(
+            builder: (context) sync* {
+              context.listen<int>(counter, (prev, next) {
+                wasCalledWith.add(next);
+              }, fireImmediately: true);
 
-                yield button(onClick: () {
-                  context.read(counter.notifier).state++;
-                }, [text('a ${context.watch(counter)}')]);
-              },
-            );
-          } else {
-            yield Button(
-              label: 'b ${context.watch(counter)}',
-              onPressed: () {
+              yield button(onClick: () {
                 context.read(counter.notifier).state++;
-              },
-            );
-          }
-        }));
+              }, [text('a ${context.watch(counter)}')]);
+            },
+          );
+        } else {
+          yield Button(
+            label: 'b ${context.watch(counter)}',
+            onPressed: () {
+              context.read(counter.notifier).state++;
+            },
+          );
+        }
+      }));
 
-        expect(wasCalledWith, equals([0]));
-        expect(find.text('a 0'), findsOneComponent);
+      expect(wasCalledWith, equals([0]));
+      expect(find.text('a 0'), findsOneComponent);
 
-        // increase counter
-        await tester.click(find.tag('button'));
+      // increase counter
+      await tester.click(find.tag('button'));
 
-        expect(wasCalledWith, equals([0, 1]));
-        expect(find.text('a 1'), findsOneComponent);
+      expect(wasCalledWith, equals([0, 1]));
+      expect(find.text('a 1'), findsOneComponent);
 
-        // increase counter
-        await tester.click(find.tag('button'));
+      // increase counter
+      await tester.click(find.tag('button'));
 
-        expect(wasCalledWith, equals([0, 1, 2]));
-        expect(find.text('b 2'), findsOneComponent);
+      expect(wasCalledWith, equals([0, 1, 2]));
+      expect(find.text('b 2'), findsOneComponent);
 
-        // increase counter
-        await tester.click(find.tag('button'));
+      // increase counter
+      await tester.click(find.tag('button'));
 
-        expect(wasCalledWith, equals([0, 1, 2]));
-        expect(find.text('b 3'), findsOneComponent);
-      },
-    );
+      expect(wasCalledWith, equals([0, 1, 2]));
+      expect(find.text('b 3'), findsOneComponent);
+    });
 
     testComponents(
       'omitting closes an active listener',

@@ -1,0 +1,121 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+
+html, body {
+  font-family: 'Roboto', sans-serif;
+  width: 100%;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+
+  --primary-color: #01589B;
+}
+
+h1 {
+  font-size: 4rem;
+  margin: unset;
+}
+
+.main {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.main section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  padding: 1em;
+}
+
+header nav {
+  background-color: var(--primary-color);
+  height: 3em;
+  border-radius: 10px;
+  overflow: clip;
+  display: flex;
+  justify-content: space-between;
+}
+
+header nav a {
+  color: white;
+  font-weight: 700;
+  text-decoration: none;
+  padding-left: 2em;
+  padding-right: 2em;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+header nav a:hover {
+  background-color: #0005;
+}
+
+header nav div.active {
+  position: relative;
+}
+
+header nav div.active::before {
+  content: "";
+  display: block;
+  height: 2px;
+  border-radius: 1px;
+  position: absolute;
+  left: 20px;
+  bottom: 0.5em;
+  right: 20px;
+  background-color: white;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-top-style: solid;
+  border-bottom-style: solid;
+  border-top-color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+}
+
+.counter button {
+  font-size: 2rem;
+  width: 2em;
+  height: 2em;
+  border: unset;
+  cursor: pointer;
+  border-radius: 2em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+}
+
+.counter button:hover {
+  background-color: #0001;
+}
+
+.counter span {
+  padding-left: 2rem;
+  padding-right: 2rem;
+  box-sizing: border-box;
+  min-width: 2.5em;
+  color: var(--primary-color);
+  font-size: 4rem;
+  text-align: center;
+}
+
+ol {
+  max-width: 500px;
+}

@@ -41,12 +41,10 @@ ClientLoader loadClient(Future<void> Function() loader, ClientBuilder builder) {
   return () => loader().then((_) => builder);
 }
 
-void _runClient(ClientBuilder builder, ConfigParams params, (Node, Node) between) {
-  BrowserAppBinding().attachRootComponent(builder(params), attachBetween: between);
-}
+final _compStartRegex = RegExp(r'^\$(\S+)(?:\s+data=(.*))?$');
+final _compEndRegex = RegExp(r'^/\$(\S+)$');
 
-final _compStartRegex = RegExp(r'^\s*\$(\S+)(?:\s+data=(.*))?\s*$');
-final _compEndRegex = RegExp(r'^\s*/\$(\S+)\s*$');
+final _escapeRegex = RegExp(r'&(amp|lt|gt);');
 
 void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
   var iterator = NodeIterator(document, NodeFilter.SHOW_COMMENT);
@@ -74,13 +72,19 @@ void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
         assert(start.parentNode == currNode.parentNode);
 
         var between = (start, currNode);
-        var params = ConfigParams(jsonDecode(comp.$2 ?? '{}'));
+
+        // Remove the data string.
+        start.text = '\$${comp.$1}';
+
+        final data = (comp.$2 ?? '{}').replaceAllMapped(_escapeRegex,
+            (match) => switch (match.group(1)) { 'amp' => '&', 'lt' => '<', 'gt' => '>', _ => match.group(0)! });
+        var params = ConfigParams(jsonDecode(data));
 
         var builder = fn(name);
         if (builder is ClientBuilder) {
-          _runClient(builder, params, between);
+          BrowserAppBinding().attachRootComponent(builder(params), attachBetween: between);
         } else {
-          builder.then((b) => _runClient(b, params, between));
+          builder.then((b) => BrowserAppBinding().attachRootComponent(b(params), attachBetween: between));
         }
       }
     }

@@ -1,5 +1,7 @@
 import 'dart:html';
 
+import 'package:jaspr/jaspr.dart';
+
 import '../route.dart';
 import 'platform.dart';
 
@@ -15,10 +17,12 @@ class PlatformRouterImpl implements PlatformRouter {
 /// Accesses the window.history api
 class HistoryManagerImpl implements HistoryManager {
   @override
-  void init(String locationn, void Function(String url) onChange) {
-    window.onPopState.listen((event) {
-      onChange(window.location.href.substring(window.location.origin.length));
-    });
+  void init(AppBinding binding, {void Function(Object? state, {String? url})? onChangeState}) {
+    if (onChangeState != null) {
+      window.onPopState.listen((event) {
+        onChangeState(window.history.state);
+      });
+    }
   }
 
   @override
@@ -39,5 +43,5 @@ class HistoryManagerImpl implements HistoryManager {
 
 class RouteRegistryImpl implements RouteRegistry {
   @override
-  void registerRoutes(List<RouteBase> routes) {}
+  Future<void> registerRoutes(List<RouteBase> routes) async {}
 }

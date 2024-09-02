@@ -74,7 +74,7 @@ class SyncProvider<T> extends _SyncProviderBase<T>
           return Completer<T>().future;
         }
         var value = s[id];
-        return value != null ? (codec ?? CastCodec()).decode(value) : value;
+        return value != null && codec != null ? codec!.decode(value) : value;
       }));
     }
     return _createFn(ref);

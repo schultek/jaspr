@@ -2,8 +2,7 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/jaspr.dart';
-
-import 'components/app.dart' as c0;
+import 'package:flutter_embedding_demo/components/app.dart' as prefix0;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
@@ -21,8 +20,8 @@ import 'components/app.dart' as c0;
 ///   runApp(...);
 /// }
 /// ```
-const defaultJasprOptions = JasprOptions(
-  targets: {
-    c0.App: ClientTarget<c0.App>('components/app'),
+final defaultJasprOptions = JasprOptions(
+  clients: {
+    prefix0.App: ClientTarget<prefix0.App>('components/app'),
   },
 );

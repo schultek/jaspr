@@ -1,0 +1,57 @@
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/cli.yml'
+      - 'packages/jaspr_cli/**'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/cli.yml'
+      - 'packages/jaspr_cli/**'
+
+name: CLI Pipeline
+
+jobs:
+  cli:
+    name: Test CLI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        Variant:
+          - sampn
+          - vnsnn
+          - cnsnn
+          - vanen
+          - cnnen
+          - vanns
+          - sanpn
+          - cnspn
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+
+      - uses: dart-lang/setup-dart@v1.3
+      - uses: subosito/flutter-action@v2
+
+      - name: Bootstrap
+        run: |
+          dart pub global activate melos
+          dart pub global activate coverage
+          melos bootstrap --no-private
+          jaspr --disable-analytics
+
+      - name: Run cli test
+        run: melos coverage:cli
+        env:
+          VARIANT: ${{matrix.VARIANT}}
+
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage/*_lcov.info

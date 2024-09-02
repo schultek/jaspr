@@ -6,16 +6,19 @@ import '../foundation/constants.dart';
 import '../foundation/events/events.dart';
 import '../framework/framework.dart';
 
+const htmlns = 'http://www.w3.org/1999/xhtml';
 const xmlns = {
   'svg': 'http://www.w3.org/2000/svg',
+  'math': 'http://www.w3.org/1998/Math/MathML',
 };
 
 class DomRenderObject extends RenderObject {
-  DomRenderObject? parent;
-  String? namespace;
   Node? node;
   List<Node> toHydrate = [];
   Map<String, EventBinding>? events;
+
+  @override
+  DomRenderObject? parent;
 
   void clearEvents() {
     events?.forEach((type, binding) {
@@ -26,15 +29,12 @@ class DomRenderObject extends RenderObject {
 
   @override
   DomRenderObject createChildRenderObject() {
-    return DomRenderObject()
-      ..parent = this
-      ..namespace = namespace;
+    return DomRenderObject()..parent = this;
   }
 
-  html.Element _createElement(String tag) {
-    namespace = xmlns[tag] ?? namespace;
-    if (namespace != null) {
-      return document.createElementNS(namespace!, tag);
+  html.Element _createElement(String tag, String? namespace) {
+    if (namespace != null && namespace != htmlns) {
+      return document.createElementNS(namespace, tag);
     }
     return document.createElement(tag);
   }
@@ -44,6 +44,11 @@ class DomRenderObject extends RenderObject {
       Map<String, String>? attributes, Map<String, EventCallback>? events) {
     late Set<String> attributesToRemove;
     late html.Element elem;
+
+    var namespace = xmlns[tag];
+    if ((namespace, parent?.node) case (== null, html.Element pnode)) {
+      namespace = pnode.namespaceUri;
+    }
 
     diff:
     if (node == null) {
@@ -67,14 +72,14 @@ class DomRenderObject extends RenderObject {
         }
       }
 
-      elem = node = _createElement(tag);
+      elem = node = _createElement(tag, namespace);
       attributesToRemove = {};
       if (kVerboseMode) {
         print("Create html node: $elem");
       }
     } else {
       if (node is! html.Element || (node as html.Element).tagName.toLowerCase() != tag) {
-        elem = _createElement(tag);
+        elem = _createElement(tag, namespace);
         var old = node;
         node!.replaceWith(elem);
         node = elem;
@@ -144,22 +149,7 @@ class DomRenderObject extends RenderObject {
   }
 
   @override
-  void updateText(String text, [bool rawHtml = false]) {
-    if (rawHtml) {
-      var parent = this.parent!.node;
-      if (parent is html.Element) {
-        if (parent.innerHtml != text) {
-          parent.innerHtml = text;
-          node = parent.childNodes.first;
-          if (kVerboseMode) {
-            print("Update inner html: $text");
-          }
-        }
-        this.parent!.toHydrate.clear();
-      }
-      return;
-    }
-
+  void updateText(String text) {
     diff:
     if (node == null) {
       var toHydrate = parent!.toHydrate;
@@ -212,22 +202,17 @@ class DomRenderObject extends RenderObject {
   }
 
   @override
-  void attach(DomRenderObject? parent, DomRenderObject? after) {
+  void attach(DomRenderObject child, {DomRenderObject? after}) {
     try {
-      this.parent = parent;
-      namespace = parent?.namespace;
-      if (parent == null) return;
+      child.parent = this;
 
-      var parentNode = parent.node;
-      var childNode = node;
+      var parentNode = node;
+      var childNode = child.node;
 
       assert(parentNode is html.Element);
       if (childNode == null) return;
 
       var afterNode = after?.node;
-      if (afterNode == null && parent is RootDomRenderObject) {
-        afterNode = parent.beforeStart;
-      }
 
       if (childNode.previousNode == afterNode && childNode.parentNode == parentNode) {
         return;
@@ -238,30 +223,25 @@ class DomRenderObject extends RenderObject {
       }
 
       if (afterNode == null) {
-        if (parentNode!.childNodes.isEmpty) {
-          parentNode.append(childNode);
-        } else {
-          parentNode.insertBefore(childNode, parentNode.childNodes.first);
-        }
+        parentNode!.insertBefore(childNode, parentNode.childNodes.firstOrNull);
       } else {
         parentNode!.insertBefore(childNode, afterNode.nextNode);
       }
     } finally {
-      _finalize();
+      child.finalize();
     }
   }
 
   @override
-  void remove() {
+  void remove(DomRenderObject child) {
     if (kVerboseMode) {
-      print("Remove child $node of ${parent?.node}");
+      print("Remove child $child of $this");
     }
-    node?.remove();
-    parent = null;
-    namespace = null;
+    child.node?.remove();
+    child.parent = null;
   }
 
-  void _finalize() {
+  void finalize() {
     if (kVerboseMode && toHydrate.isNotEmpty) {
       print("Clear ${toHydrate.length} nodes not hydrated ($toHydrate)");
     }
@@ -291,6 +271,11 @@ class RootDomRenderObject extends DomRenderObject {
     }
     return RootDomRenderObject(start.parentNode!, nodes);
   }
+
+  @override
+  void attach(covariant DomRenderObject child, {covariant DomRenderObject? after}) {
+    super.attach(child, after: after?.node != null ? after : (DomRenderObject()..node = beforeStart));
+  }
 }
 
 typedef DomEventCallback = void Function(Event event);
@@ -312,7 +297,7 @@ class EventBinding {
   }
 }
 
-extension on html.Element {
+extension AttributeOperation on html.Element {
   void clearOrSetAttribute(String name, String? value) {
     final current = getAttribute(name);
     if (current == value) return;

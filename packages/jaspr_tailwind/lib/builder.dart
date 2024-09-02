@@ -9,7 +9,9 @@ import 'package:path/path.dart' as p;
 Builder buildStylesheet(BuilderOptions options) => TailwindBuilder(options);
 
 class TailwindBuilder implements Builder {
-  TailwindBuilder(BuilderOptions options);
+  final BuilderOptions options;
+
+  TailwindBuilder(this.options);
 
   @override
   Future<void> build(BuildStep buildStep) async {
@@ -32,27 +34,25 @@ class TailwindBuilder implements Builder {
     var assets = await buildStep.findAssets(Glob('{lib,web}/**.dart')).toList();
     await Future.wait(assets.map((a) => buildStep.canRead(a)));
 
-    var root = p.normalize(p.join(Directory.current.path, '.dart_tool', Uri.parse(packageConfig['rootUri']!).path));
-
     var configFile = File('tailwind.config.js');
     var hasCustomConfig = await configFile.exists();
 
     await Process.run(
-      'npx',
+      'tailwindcss',
       [
-        'tailwindcss',
         '--input',
         scratchSpace.fileFor(buildStep.inputId).path,
         '--output',
-        scratchSpace.fileFor(outputId).path,
-        '--content',
-        p.join(Directory.current.path, '{lib,web}', '**', '*.dart'),
+        scratchSpace.fileFor(outputId).path.toPosix(),
+        if (options.config.containsKey('tailwindcss')) options.config['tailwindcss'],
         if (hasCustomConfig) ...[
           '--config',
-          p.join(Directory.current.path, 'tailwind.config.js'),
+          p.join(Directory.current.path, 'tailwind.config.js').toPosix(),
+        ] else ...[
+          '--content',
+          p.join(Directory.current.path, '{lib,web}', '**', '*.dart').toPosix(true),
         ],
       ],
-      workingDirectory: root,
     );
 
     await scratchSpace.copyOutput(outputId, buildStep);
@@ -62,4 +62,14 @@ class TailwindBuilder implements Builder {
   Map<String, List<String>> get buildExtensions => {
         'web/{{file}}.tw.css': ['web/{{file}}.css']
       };
+}
+
+extension POSIXPath on String {
+  String toPosix([bool quoted = false]) {
+    if (Platform.isWindows) {
+      final result = replaceAll('\\', '/');
+      return quoted ? "'$result'" : result;
+    }
+    return this;
+  }
 }

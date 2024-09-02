@@ -1,32 +1,78 @@
 import 'dart:io';
 
+import 'package:mason/mason.dart' as m show Logger;
 import 'package:mason/mason.dart';
-import 'package:path/path.dart' as path;
+import 'package:path/path.dart' as p;
+import 'package:pub_updater/pub_updater.dart';
 
 import '../logging.dart';
-import '../templates.dart';
+import '../scaffold/scaffold_bundle.dart';
 import '../version.dart';
 import 'base_command.dart';
 
 final RegExp _packageRegExp = RegExp(r'^[a-z_][a-z0-9_]*$');
 
-final templatesByName = {for (var t in templates) t.name: t};
-final templateDescriptionByName = {for (var t in templates) t.name: t.description};
+enum RenderingMode {
+  static('Build a statically pre-rendered site'),
+  server('Build a server-rendered site'),
+  client('Build a purely client-rendered site');
+
+  const RenderingMode(this.help);
+
+  final String help;
+
+  bool get useServer => this == server || this == static;
+  String get recommend => this == static ? '(Recommended) ' : '';
+}
 
 class CreateCommand extends BaseCommand {
   CreateCommand({super.logger}) {
+    argParser.addSeparator('Project Presets:');
     argParser.addOption(
-      'template',
-      abbr: 't',
-      help: 'The template used to generate this new project.',
-      allowed: templatesByName.keys,
-      allowedHelp: templateDescriptionByName,
+      'mode',
+      abbr: 'm',
+      help: 'Choose a rendering mode for the project.',
+      allowed: [
+        for (var m in RenderingMode.values) ...[m.name, if (m.useServer) '${m.name}:auto']
+      ],
+      allowedHelp: {
+        for (var v in RenderingMode.values) ...{
+          v.name: '${v.help}.',
+          if (v.useServer) '${v.name}:auto': '${v.recommend}${v.help} with automatic client-side hydration.',
+        }
+      },
     );
-    argParser.addFlag(
-      'jaspr-web-compilers',
-      abbr: 'c',
-      help: 'Uses jaspr_web_compilers. This enables the use of flutter web plugins and direct flutter embedding.',
-      defaultsTo: null,
+    argParser.addOption(
+      'routing',
+      abbr: 'r',
+      help: 'Choose a routing strategy for the project.',
+      allowed: ['none', 'multi-page', 'single-page'],
+      allowedHelp: {
+        'none': 'No preconfigured routing.',
+        'multi-page': '(Recommended) Sets up multi-page (server-side) routing.',
+        'single-page': 'Sets up single-page (client-side) routing.',
+      },
+    );
+    argParser.addOption(
+      'flutter',
+      abbr: 'f',
+      help: 'Choose the Flutter support for the project.',
+      allowed: ['none', 'embedded', 'plugins-only'],
+      allowedHelp: {
+        'none': 'No preconfigured Flutter support.',
+        'embedded': 'Sets up an embedded Flutter app inside your site.',
+        'plugins-only': '(Recommended) Enables support for using Flutter web plugins.'
+      },
+    );
+    argParser.addOption(
+      'backend',
+      abbr: 'b',
+      help: 'Choose the backend setup for the project (only valid in "server" mode).',
+      allowed: ['none', 'shelf'],
+      allowedHelp: {
+        'none': 'No custom backend setup.',
+        'shelf': 'Sets up a custom backend using the shelf package.',
+      },
     );
   }
 
@@ -36,7 +82,7 @@ class CreateCommand extends BaseCommand {
   }
 
   @override
-  String get description => 'Creates a new jaspr project.';
+  String get description => 'Create a new jaspr project.';
 
   @override
   String get name => 'create';
@@ -48,17 +94,89 @@ class CreateCommand extends BaseCommand {
   bool get requiresPubspec => false;
 
   @override
-  Future<int> run() async {
+  Future<CommandResult?> run() async {
     await super.run();
 
-    var targetPath = argResults!.rest.firstOrNull;
-    targetPath ??= logger.logger.prompt('Specify a target directory:');
+    var (dir, name) = getTargetDirectory();
 
-    var directory = Directory(targetPath);
-    var dir = path.basenameWithoutExtension(directory.path);
+    var (useMode, useHydration) = getRenderingMode();
+    var (useRouting, useMultiPageRouting) = getRouting(useMode.useServer, useHydration);
+    var (useFlutter, usePlugins) = getFlutter();
+    var useBackend = useMode == RenderingMode.server ? getBackend() : null;
+
+    var description = 'A new jaspr project.';
+
+    var usedPrefixes = {
+      if (useMode.useServer) 'server',
+      if (useMode == RenderingMode.client) 'client',
+      if (useRouting) 'routing',
+      if (useHydration) 'hydration',
+      if (useFlutter) 'flutter',
+      if (useMode == RenderingMode.client || !useHydration) 'manual',
+      if (useMode.useServer) useBackend ?? 'base',
+    };
+
+    var updater = PubUpdater();
+
+    var webCompilersPackage = usePlugins ? 'jaspr_web_compilers' : 'build_web_compilers';
+
+    var [
+      jasprFlutterEmbedVersion,
+      jasprRouterVersion,
+      webCompilersVersion,
+    ] = await Future.wait([
+      updater.getLatestVersion('jaspr_flutter_embed'),
+      updater.getLatestVersion('jaspr_router'),
+      updater.getLatestVersion(webCompilersPackage),
+    ]);
+
+    var progress = logger.logger.progress('Generating project...');
+    var generator = await MasonGenerator.fromBundle(scaffoldBundle);
+    final files = await generator.generate(
+      ScaffoldGeneratorTarget(dir, usedPrefixes),
+      vars: {
+        'name': name,
+        'description': description,
+        'mode': useMode.name,
+        'routing': useRouting,
+        'multipage': useMultiPageRouting,
+        'flutter': useFlutter,
+        'plugins': usePlugins,
+        'hydration': useHydration,
+        'server': useMode.useServer,
+        'shelf': useBackend == 'shelf',
+        'jasprCoreVersion': jasprCoreVersion,
+        'jasprBuilderVersion': jasprBuilderVersion,
+        'jasprFlutterEmbedVersion': jasprFlutterEmbedVersion,
+        'jasprRouterVersion': jasprRouterVersion,
+        'webCompilersPackage': webCompilersPackage,
+        'webCompilersVersion': webCompilersVersion,
+      },
+      logger: logger.logger,
+    );
+    progress.complete('Generated ${files.length} file(s)');
+
+    var process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
+
+    await watchProcess('pub', process,
+        tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s == '...' || s.contains('+'));
+
+    logger.write('\n'
+        'Created project $name! In order to get started, run the following commands:\n\n'
+        '  cd ${p.relative(dir.path, from: Directory.current.absolute.path)}\n'
+        '  jaspr serve\n');
+
+    return null;
+  }
+
+  (Directory, String) getTargetDirectory() {
+    var targetPath = argResults!.rest.firstOrNull ?? logger.logger.prompt('Specify a target directory:');
+
+    var directory = Directory(targetPath).absolute;
+    var dir = p.basenameWithoutExtension(directory.path);
     var name = dir.replaceAll('-', '_');
 
-    if (await directory.exists()) {
+    if (directory.existsSync()) {
       usageException('Directory $targetPath already exists.');
     }
 
@@ -69,43 +187,128 @@ class CreateCommand extends BaseCommand {
           'You should use snake_case for the package name e.g. my_jaspr_project');
     }
 
-    var templateName = argResults!['template'] as String?;
-    templateName ??= logger.logger.chooseOne('Choose a template:',
-        choices: templatesByName.keys.toList(), display: (name) => '$name: ${templateDescriptionByName[name]}');
+    return (directory, name);
+  }
 
-    var template = templatesByName[templateName]!;
+  (RenderingMode, bool) getRenderingMode() {
+    var opt = argResults!['mode'] as String?;
+    return switch (opt?.split(':')) {
+      ['client'] => (RenderingMode.client, false),
+      [var m, 'auto'] => (RenderingMode.values.byName(m), true),
+      [var m] => (RenderingMode.values.byName(m), false),
+      _ => () {
+          var mode = logger.logger.chooseOne(
+            'Select a rendering mode:',
+            choices: RenderingMode.values,
+            display: (o) => '${o.name}: ${o.help}.',
+          );
+          var hydration = mode.useServer &&
+              logger.logger.confirm('(Recommended) Enable automatic hydration on the client?', defaultValue: true);
+          return (mode, hydration);
+        }(),
+    };
+  }
 
-    var useJasprCompilers = argResults!['jaspr-web-compilers'] as bool?;
-    useJasprCompilers ??= logger.logger.confirm(
-      'Use jaspr_web_compilers? This enables the use of flutter web plugins and direct flutter embedding.',
-      defaultValue: false,
-    );
+  (bool, bool) getRouting(bool useServer, bool useHydration) {
+    var opt = argResults!['routing'] as String?;
 
-    var progress = logger.logger.progress('Bootstrapping');
-    var generator = await MasonGenerator.fromBundle(template);
-    final files = await generator.generate(
-      DirectoryGeneratorTarget(directory),
-      vars: {
-        'name': name,
-        'jasprCoreVersion': jasprCoreVersion,
-        'jasprBuilderVersion': jasprBuilderVersion,
-        'webCompilersPackage': useJasprCompilers ? 'jaspr_web_compilers' : 'build_web_compilers',
-        'webCompilersVersion': useJasprCompilers ? '4.0.4' : '4.0.4', // TODO get latest version from pub
-      },
-      logger: logger.logger,
-    );
-    progress.complete('Generated ${files.length} file(s)');
+    return switch (opt) {
+      'none' => (false, false),
+      'single-page' => (true, false),
+      'multi-page' => !useServer
+          ? usageException("Cannot use multi-page routing in client mode.")
+          : !useHydration
+              ? usageException("Cannot use multi-page routing with manual hydration.")
+              : (true, true),
+      _ => () {
+          var routing = logger.logger.confirm('Setup routing for different pages of your site?', defaultValue: true);
+          var multiPage = routing && useServer && useHydration
+              ? logger.logger.confirm(
+                  '(Recommended) Use multi-page (server-side) routing? '
+                  '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',
+                  defaultValue: true,
+                )
+              : false;
+          return (routing, multiPage);
+        }(),
+    };
+  }
 
-    var process = await Process.start('dart', ['pub', 'get'], workingDirectory: directory.absolute.path);
+  (bool, bool) getFlutter() {
+    var opt = argResults!['flutter'] as String?;
 
-    await watchProcess('pub', process,
-        tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s.contains('+'));
+    return switch (opt) {
+      'none' => (false, false),
+      'embedded' => (true, true),
+      'plugins-only' => (false, true),
+      _ => () {
+          var flutter = logger.logger.confirm('Setup Flutter web embedding?', defaultValue: false);
+          var plugins = flutter ||
+              logger.logger.confirm(
+                'Enable support for using Flutter web plugins in your project?',
+                defaultValue: true,
+              );
+          return (flutter, plugins);
+        }(),
+    };
+  }
 
-    logger.write('\n'
-        'Created project $name in $dir! In order to get started, run the following commands:\n\n'
-        '  cd $dir\n'
-        '  jaspr serve\n');
+  String? getBackend() {
+    var opt = argResults!['backend'] as String?;
 
-    return ExitCode.success.code;
+    return switch (opt) {
+      'none' => null,
+      String b => b,
+      null => () {
+          var backend = logger.logger.confirm(
+            'Use a custom backend package or framework for the server part of your project?',
+            defaultValue: false,
+          );
+          if (!backend) return null;
+
+          var b = logger.logger
+              .chooseOne(
+                'Select a backend framework:',
+                choices: [
+                  ('shelf', 'Shelf: An official and well-supported minimal server package by the Dart Team.'),
+                  (
+                    'dart_frog',
+                    'Dart Frog: (Coming Soon) A fast, minimalistic backend framework for Dart built by Very Good Ventures.'
+                  ),
+                ],
+                display: (o) => o.$2,
+              )
+              .$1;
+
+          if (b == 'dart_frog') {
+            usageException('Support for Dart Frog is coming soon.');
+          }
+
+          return b;
+        }(),
+    };
+  }
+}
+
+class ScaffoldGeneratorTarget extends DirectoryGeneratorTarget {
+  ScaffoldGeneratorTarget(super.dir, this.prefixes);
+
+  final Set<String> prefixes;
+
+  @override
+  Future<GeneratedFile> createFile(String path, List<int> contents,
+      {m.Logger? logger, OverwriteRule? overwriteRule}) async {
+    var filename = p.basename(path);
+    if (filename.contains('#')) {
+      var [prefix, ...] = filename.split('#');
+
+      if (!prefixes.contains(prefix)) {
+        return GeneratedFile.skipped(path: path);
+      }
+
+      path = path.replaceFirst('$prefix#', '');
+    }
+
+    return await super.createFile(path, contents, logger: logger, overwriteRule: overwriteRule);
   }
 }

@@ -17,16 +17,16 @@ import '../foundation/styles/styles.dart';
 
 part 'build_context.dart';
 part 'build_owner.dart';
+part 'buildable_element.dart';
 part 'components_binding.dart';
 part 'dom_component.dart';
 part 'inactive_elements.dart';
 part 'inherited_component.dart';
 part 'keys.dart';
-part 'multi_child_element.dart';
 part 'notification.dart';
 part 'observer_component.dart';
+part 'proxy_element.dart';
 part 'render_object.dart';
-part 'single_child_element.dart';
 part 'stateful_component.dart';
 part 'stateless_component.dart';
 
@@ -156,6 +156,8 @@ abstract class Element implements BuildContext {
   Element(Component component) : _component = component;
 
   Element? _parent;
+  Element? get parent => _parent;
+
   _NotificationNode? _notificationTree;
 
   /// Compare two components for equality.
@@ -302,8 +304,10 @@ abstract class Element implements BuildContext {
         if (child._parentChanged || child._prevSibling != prevSibling) {
           child.updatePrevSibling(prevSibling);
         }
+        var oldComponent = child.component;
         child.update(newComponent);
         assert(child.component == newComponent);
+        child.didUpdate(oldComponent);
         newChild = child;
       } else {
         deactivateChild(child);
@@ -319,6 +323,186 @@ abstract class Element implements BuildContext {
     }
 
     return newChild;
+  }
+
+  /// Updates the children of this element to use new components.
+  ///
+  /// Attempts to update the given old children list using the given new
+  /// components, removing obsolete elements and introducing new ones as necessary,
+  /// and then returns the new child list.
+  ///
+  /// During this function the `oldChildren` list must not be modified. If the
+  /// caller wishes to remove elements from `oldChildren` re-entrantly while
+  /// this function is on the stack, the caller can supply a `forgottenChildren`
+  /// argument, which can be modified while this function is on the stack.
+  /// Whenever this function reads from `oldChildren`, this function first
+  /// checks whether the child is in `forgottenChildren`. If it is, the function
+  /// acts as if the child was not in `oldChildren`.
+  ///
+  /// This function is a convenience wrapper around [updateChild], which updates
+  /// each individual child.
+  @protected
+  List<Element> updateChildren(List<Element> oldChildren, List<Component> newComponents,
+      {Set<Element>? forgottenChildren}) {
+    Element? replaceWithNullIfForgotten(Element? child) {
+      return child != null && forgottenChildren != null && forgottenChildren.contains(child) ? null : child;
+    }
+
+    // This attempts to diff the new child list (newComponents) with
+    // the old child list (oldChildren), and produce a new list of elements to
+    // be the new list of child elements of this element. The called of this
+    // method is expected to update this render object accordingly.
+
+    // The cases it tries to optimize for are:
+    //  - the old list is empty
+    //  - the lists are identical
+    //  - there is an insertion or removal of one or more components in
+    //    only one place in the list
+    // If a component with a key is in both lists, it will be synced.
+    // Components without keys might be synced but there is no guarantee.
+
+    // The general approach is to sync the entire new list backwards, as follows:
+    // 1. Walk the lists from the top, syncing nodes, until you no longer have
+    //    matching nodes.
+    // 2. Walk the lists from the bottom, without syncing nodes, until you no
+    //    longer have matching nodes. We'll sync these nodes at the end. We
+    //    don't sync them now because we want to sync all the nodes in order
+    //    from beginning to end.
+    // At this point we narrowed the old and new lists to the point
+    // where the nodes no longer match.
+    // 3. Walk the narrowed part of the old list to get the list of
+    //    keys and sync null with non-keyed items.
+    // 4. Walk the narrowed part of the new list forwards:
+    //     * Sync non-keyed items with null
+    //     * Sync keyed items with the source if it exists, else with null.
+    // 5. Walk the bottom of the list again, syncing the nodes.
+    // 6. Sync null with any items in the list of keys that are still
+    //    mounted.
+
+    if (oldChildren.length <= 1 && newComponents.length <= 1) {
+      final Element? oldChild = replaceWithNullIfForgotten(oldChildren.firstOrNull);
+      var newChild = updateChild(oldChild, newComponents.firstOrNull, null);
+      return [if (newChild != null) newChild];
+    }
+
+    int newChildrenTop = 0;
+    int oldChildrenTop = 0;
+    int newChildrenBottom = newComponents.length - 1;
+    int oldChildrenBottom = oldChildren.length - 1;
+
+    final List<Element?> newChildren = oldChildren.length == newComponents.length
+        ? oldChildren
+        : List<Element?>.filled(newComponents.length, null, growable: true);
+
+    Element? prevChild;
+
+    // Update the top of the list.
+    while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
+      final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
+      final Component newComponent = newComponents[newChildrenTop];
+      if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
+      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      newChildren[newChildrenTop] = newChild;
+      prevChild = newChild;
+      newChildrenTop += 1;
+      oldChildrenTop += 1;
+    }
+
+    // Scan the bottom of the list.
+    while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
+      final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenBottom]);
+      final Component newComponent = newComponents[newChildrenBottom];
+      if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
+      oldChildrenBottom -= 1;
+      newChildrenBottom -= 1;
+    }
+
+    Map<Key, Element>? retakeOldKeyedChildren;
+    if (newChildrenTop <= newChildrenBottom && oldChildrenTop <= oldChildrenBottom) {
+      final Map<Key, Component> newKeyedChildren = {};
+      var newChildrenTopPeek = newChildrenTop;
+      while (newChildrenTopPeek <= newChildrenBottom) {
+        final Component newComponent = newComponents[newChildrenTopPeek];
+        final Key? key = newComponent.key;
+        if (key != null) {
+          newKeyedChildren[key] = newComponent;
+        }
+        newChildrenTopPeek += 1;
+      }
+
+      if (newKeyedChildren.isNotEmpty) {
+        retakeOldKeyedChildren = {};
+        var oldChildrenTopPeek = oldChildrenTop;
+        while (oldChildrenTopPeek <= oldChildrenBottom) {
+          final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTopPeek]);
+          if (oldChild != null) {
+            final Key? key = oldChild.component.key;
+            if (key != null) {
+              final Component? newComponent = newKeyedChildren[key];
+              if (newComponent != null && Component.canUpdate(oldChild.component, newComponent)) {
+                retakeOldKeyedChildren[key] = oldChild;
+              }
+            }
+          }
+          oldChildrenTopPeek += 1;
+        }
+      }
+    }
+
+    while (newChildrenTop <= newChildrenBottom) {
+      if (oldChildrenTop <= oldChildrenBottom) {
+        final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
+        if (oldChild != null) {
+          final Key? key = oldChild.component.key;
+          if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
+            deactivateChild(oldChild);
+          }
+        }
+        oldChildrenTop += 1;
+      }
+
+      Element? oldChild;
+      final Component newComponent = newComponents[newChildrenTop];
+      final Key? key = newComponent.key;
+      if (key != null) {
+        oldChild = retakeOldKeyedChildren?[key];
+      }
+
+      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      newChildren[newChildrenTop] = newChild;
+      prevChild = newChild;
+      newChildrenTop += 1;
+    }
+
+    while (oldChildrenTop <= oldChildrenBottom) {
+      final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
+      if (oldChild != null) {
+        final Key? key = oldChild.component.key;
+        if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
+          deactivateChild(oldChild);
+        }
+      }
+      oldChildrenTop += 1;
+    }
+
+    // We've scanned the whole list.
+    newChildrenBottom = newComponents.length - 1;
+    oldChildrenBottom = oldChildren.length - 1;
+
+    // Update the bottom of the list.
+    while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
+      final Element oldChild = oldChildren[oldChildrenTop];
+      final Component newComponent = newComponents[newChildrenTop];
+      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      newChildren[newChildrenTop] = newChild;
+      prevChild = newChild;
+      newChildrenTop += 1;
+      oldChildrenTop += 1;
+    }
+
+    assert(newChildren.every((element) => element != null));
+
+    return newChildren.cast<Element>();
   }
 
   /// Add this element to the tree as a child of the given parent.
@@ -360,7 +544,7 @@ abstract class Element implements BuildContext {
     assert(_binding != null);
 
     final Key? key = component.key;
-    if (key is GlobalKey) {
+    if (key is GlobalKey && binding.isClient) {
       ComponentsBinding._registerGlobalKey(key, this);
     }
     _updateInheritance();
@@ -368,8 +552,9 @@ abstract class Element implements BuildContext {
     attachNotificationTree();
   }
 
+  @protected
   @mustCallSuper
-  void _firstBuild([VoidCallback? onBuilt]) {}
+  void didMount() {}
 
   /// Change the component used to configure this element.
   ///
@@ -385,8 +570,26 @@ abstract class Element implements BuildContext {
     assert(newComponent != component);
     assert(_depth != null);
     assert(Component.canUpdate(component, newComponent));
+    if (shouldRebuild(newComponent)) {
+      _dirty = true;
+    }
     _component = newComponent;
   }
+
+  void didUpdate(covariant Component oldComponent) {
+    if (_dirty) {
+      rebuild();
+    }
+  }
+
+  /// Implement this method to determine whether a rebuild can be skipped.
+  ///
+  /// This method will be called whenever the component is about to update. If returned false, the subsequent rebuild will be skipped.
+  ///
+  /// This method exists only as a performance optimization and gives no guarantees about when the component is rebuilt.
+  /// Keep the implementation as efficient as possible and avoid deep (recursive) comparisons or performance heavy checks, as this might
+  /// have an opposite effect on performance.
+  bool shouldRebuild(covariant Component newComponent);
 
   void _updateDepth(int parentDepth) {
     final int expectedDepth = parentDepth + 1;
@@ -446,6 +649,7 @@ abstract class Element implements BuildContext {
     }
     final Element newChild = newComponent.createElement();
     newChild.mount(this, prevSibling);
+    newChild.didMount();
     assert(newChild._lifecycleState == _ElementLifecycle.active);
     return newChild;
   }
@@ -772,7 +976,7 @@ abstract class Element implements BuildContext {
   ///
   /// Called by the [BuildOwner] when rebuilding, by [mount] when the element is first
   /// built, and by [update] when the component has changed.
-  void rebuild([VoidCallback? onRebuilt]) {
+  void rebuild() {
     assert(_lifecycleState != _ElementLifecycle.initial);
     if (_lifecycleState != _ElementLifecycle.active || !_dirty) {
       return;
@@ -781,6 +985,7 @@ abstract class Element implements BuildContext {
     assert(owner._debugStateLocked);
     Element? debugPreviousBuildTarget;
     assert(() {
+      if (!binding.isClient && owner.isFirstBuild) return true;
       debugPreviousBuildTarget = owner._debugCurrentBuildTarget;
       owner._debugCurrentBuildTarget = this;
       return true;
@@ -792,6 +997,7 @@ abstract class Element implements BuildContext {
     }
     owner.performRebuildOn(this, () {
       assert(() {
+        if (!binding.isClient && owner.isFirstBuild) return true;
         assert(owner._debugCurrentBuildTarget == this);
         owner._debugCurrentBuildTarget = debugPreviousBuildTarget;
         return true;
@@ -807,21 +1013,22 @@ abstract class Element implements BuildContext {
           observer.didRebuildElement(this);
         }
       }
-      onRebuilt?.call();
     });
   }
 
   /// Cause the component to update itself.
   ///
-  /// Called by [rebuild] after the appropriate checks have been made.
-  @protected
+  /// Called by [BuildOwner] after the appropriate checks have been made.
   void performRebuild();
 
-  /// Can be set by the element to signal that the first build should be performed asynchronous.
-  Future? _asyncFirstBuild;
+  void attachRenderObject() {}
 
-  // ignore: prefer_final_fields
-  List<Future> _asyncFirstBuildChildren = [];
+  void detachRenderObject() {
+    visitChildren((Element child) {
+      assert(child._parent == this);
+      child.detachRenderObject();
+    });
+  }
 
   @override
   void dispatchNotification(Notification notification) {
@@ -834,6 +1041,7 @@ abstract class Element implements BuildContext {
 
   /// The direct previous sibling element.
   Element? _prevSibling;
+  Element? get prevSibling => _prevSibling;
 
   /// The direct or indirect previous sibling element.
   ///

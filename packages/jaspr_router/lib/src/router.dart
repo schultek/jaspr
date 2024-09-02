@@ -48,10 +48,14 @@ class Router extends StatefulComponent {
   State<StatefulComponent> createState() => RouterState();
 
   static RouterState of(BuildContext context) {
+    return maybeOf(context)!;
+  }
+
+  static RouterState? maybeOf(BuildContext context) {
     if (context is StatefulElement && context.state is RouterState) {
       return context.state as RouterState;
     }
-    return context.dependOnInheritedComponentOfExactType<InheritedRouter>()!.router;
+    return context.dependOnInheritedComponentOfExactType<InheritedRouter>()?.router;
   }
 }
 
@@ -62,62 +66,68 @@ class RouterState extends State<Router> with PreloadStateMixin {
   Map<Object, RouteLoader> routeLoaders = {};
 
   @override
-  Future<void> preloadState() {
-    var location = context.binding.currentUri.toString();
-    return _matchRoute(location).then(_preload).then((match) => _matchList = match);
+  Future<void> preloadState() async {
+    if (kGenerateMode) {
+      await PlatformRouter.instance.registry.registerRoutes(component.routes);
+    }
+    return initRoutes();
   }
 
   @override
   void initState() {
     super.initState();
-    if (kGenerateMode) {
-      PlatformRouter.instance.registry.registerRoutes(component.routes);
-    }
-    PlatformRouter.instance.history.init(context.binding.currentUri.toString(), (uri) {
-      _update(uri, updateHistory: false);
+    PlatformRouter.instance.history.init(context.binding, onChangeState: (state, {url}) {
+      _update(url ?? context.binding.currentUri.toString(), extra: state, updateHistory: false, replace: true);
     });
     if (_matchList == null) {
       assert(context.binding.isClient);
-      preloadState().then((_) {
+      initRoutes().then((_) {
         setState(() {});
       });
     }
   }
 
+  @override
+  void didUpdateComponent(Router oldComponent) {
+    super.didUpdateComponent(oldComponent);
+    if (component == oldComponent) return;
+    initRoutes();
+  }
+
+  Future<void> initRoutes() {
+    final location = context.binding.currentUri.toString();
+    return _matchRoute(location).then(_preload).then((match) {
+      _matchList = match;
+      if (context.binding.isClient && match.uri.toString() != location) {
+        PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title);
+      }
+    });
+  }
+
+  /// Preloads the route for faster navigation. Works with [LazyRoute]s.
   Future<void> preload(String location) {
     return _matchRoute(location).then(_preload);
   }
 
-  Future<RouteMatchList> _preload(RouteMatchList match) {
-    var loaders = <RouteLoader>[];
-    for (var i = 0; i < match.matches.length; i++) {
-      var m = match.matches[i];
-      var r = m.route;
-      var hasNext = i < match.matches.length - 1;
-
-      if (r is LazyRouteMixin && (!hasNext || r is ShellRoute)) {
-        var key = m.subloc;
-        var l = (routeLoaders[key] ??= RouteLoader.from((r as LazyRouteMixin).load()));
-        loaders.add(l);
-      }
-    }
-    return RouteLoader.wait(loaders).then((_) => match);
-  }
-
-  /// Get a location from route name and parameters.
-  /// This is useful for redirecting to a named location.
-  String namedLocation(
-    String name, {
-    Map<String, String> params = const <String, String>{},
-    Map<String, dynamic> queryParams = const <String, dynamic>{},
-  }) {
-    return component._configuration.namedLocation(name, params: params, queryParams: queryParams);
-  }
-
+  /// Pushes a new route onto the history stack.
+  ///
+  /// The [extra] parameter can be used to provide additional data with navigation. It will go through serialization
+  /// when it is stored in the browser and must be a primitive serializable value.
+  ///
+  /// See also:
+  /// * [replace] which replaces the history entry with the new route.
   Future<void> push(String location, {Object? extra}) {
     return _update(location, extra: extra);
   }
 
+  /// Pushes a named route onto the history stack.
+  ///
+  /// Optional parameters can be provided to the named route, like `params: {'userId': '123'}` as well as [queryParams].
+  /// The [extra] parameter can be used to provide additional data with navigation. It will go through serialization
+  /// when it is stored in the browser and must be a primitive serializable value.
+  ///
+  /// See also:
+  /// * [replaceNamed] which replaces the history entry with the named route.
   Future<void> pushNamed(
     String name, {
     Map<String, String> params = const <String, String>{},
@@ -130,10 +140,25 @@ class RouterState extends State<Router> with PreloadStateMixin {
     );
   }
 
+  /// Replaces the current history entry with a new route.
+  ///
+  /// The [extra] parameter can be used to provide additional data with navigation. It will go through serialization
+  /// when it is stored in the browser and must be a primitive serializable value.
+  ///
+  /// See also:
+  /// * [push] which pushes the route to the history stack.
   Future<void> replace(String location, {Object? extra}) {
     return _update(location, extra: extra, replace: true);
   }
 
+  /// Replaces the current history entry with a named route.
+  ///
+  /// Optional parameters can be provided to the named route, like `params: {'userId': '123'}` as well as [queryParams].
+  /// The [extra] parameter can be used to provide additional data with navigation. It will go through serialization
+  /// when it is stored in the browser and must be a primitive serializable value.
+  ///
+  /// See also:
+  /// * [pushNamed] which pushes a named route onto the history stack.
   Future<void> replaceNamed(
     String name, {
     Map<String, String> params = const <String, String>{},
@@ -146,8 +171,21 @@ class RouterState extends State<Router> with PreloadStateMixin {
     );
   }
 
+  /// Triggers the browsers back navigation.
   void back() {
     PlatformRouter.instance.history.back();
+  }
+
+  /// Get a location from route name and parameters.
+  /// This is useful for redirecting to a named location.
+  ///
+  /// Optional parameters can be provided to the named route, like `params: {'userId': '123'}` as well as [queryParams].
+  String namedLocation(
+    String name, {
+    Map<String, String> params = const <String, String>{},
+    Map<String, dynamic> queryParams = const <String, dynamic>{},
+  }) {
+    return component._configuration.namedLocation(name, params: params, queryParams: queryParams);
   }
 
   Future<void> _update(
@@ -159,15 +197,30 @@ class RouterState extends State<Router> with PreloadStateMixin {
     return _matchRoute(location, extra: extra).then((match) {
       setState(() {
         _matchList = match;
-        if (updateHistory) {
+        if (updateHistory || location != match.uri.toString()) {
           if (!replace) {
-            PlatformRouter.instance.history.push(match.uri.toString(), title: match.title);
+            PlatformRouter.instance.history.push(match.uri.toString(), title: match.title, data: match.extra);
           } else {
-            PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title);
+            PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title, data: match.extra);
           }
         }
       });
     });
+  }
+
+  Future<RouteMatchList> _preload(RouteMatchList match) {
+    final loaders = <RouteLoader>[];
+    for (var i = 0; i < match.matches.length; i++) {
+      final m = match.matches[i];
+      final hasNext = i < match.matches.length - 1;
+
+      if (m.route case LazyRouteBase r when (!hasNext || r is ShellRoute)) {
+        final key = m.subloc;
+        final l = (routeLoaders[key] ??= RouteLoader.from(r.load()));
+        loaders.add(l);
+      }
+    }
+    return RouteLoader.wait(loaders).then((_) => match);
   }
 
   Future<RouteMatchList> _matchRoute(String location, {Object? extra}) {
@@ -176,7 +229,10 @@ class RouterState extends State<Router> with PreloadStateMixin {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield* component._builder.build(context, this);
+    if (_matchList?.title case var title?) {
+      yield Document.head(title: title);
+    }
+    yield* component._builder.build(this);
   }
 }
 

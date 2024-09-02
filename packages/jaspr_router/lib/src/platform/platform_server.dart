@@ -30,14 +30,14 @@ class HistoryManagerImpl implements HistoryManager {
   }
 
   @override
-  void init(String location, void Function(String) onChange) {
+  void init(AppBinding binding, {void Function(Object? state, {String? url})? onChangeState}) {
     // No-op
   }
 }
 
 class RouteRegistryImpl implements RouteRegistry {
   @override
-  void registerRoutes(List<RouteBase> routes) {
+  Future<void> registerRoutes(List<RouteBase> routes) async {
     Set<String> paths = {};
 
     void registerRoute(RouteBase route, String path) {
@@ -61,7 +61,7 @@ class RouteRegistryImpl implements RouteRegistry {
     }
 
     for (var path in paths) {
-      ServerApp.requestRouteGeneration(path);
+      await ServerApp.requestRouteGeneration(path);
     }
   }
 }

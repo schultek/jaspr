@@ -14,22 +14,7 @@ void main() {
 class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield NavBar(
-      brand: NavbarBrand(children: [
-        NavbarItem(child: BulmaLogo(), href: 'https://bulma.io'),
-      ]),
-      menu: NavbarMenu(items: [
-        NavbarItem(child: Text('Home')),
-        NavbarItem(child: Text('Documentation')),
-        NavbarItem.dropdown(child: Text('More'), items: [
-          NavbarItem(child: Text('About')),
-          NavbarItem(child: Text('Jobs')),
-          NavbarItem(child: Text('Contact')),
-          NavbarDivider(),
-          NavbarItem(child: Text('Report an issue')),
-        ]),
-      ]),
-    );
+    yield ExampleNavbar();
 
     yield ButtonGroup(children: [
       Button(child: Text('Normal'), onPressed: () {}),
@@ -65,11 +50,48 @@ class App extends StatelessComponent {
   }
 }
 
+class ExampleNavbar extends StatefulComponent {
+  const ExampleNavbar({super.key});
+
+  @override
+  State<ExampleNavbar> createState() => _ExampleNavbarState();
+}
+
+class _ExampleNavbarState extends State<ExampleNavbar> {
+  bool isActive = false;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield NavBar(
+      brand: NavbarBrand(children: [
+        NavbarItem(child: BulmaLogo(), href: 'https://bulma.io'),
+        NavbarBurger(
+          isActive: isActive,
+          onToggle: () {
+            setState(() => isActive = !isActive);
+          },
+        ),
+      ]),
+      menu: NavbarMenu(isActive: isActive, items: [
+        NavbarItem(child: Text('Home')),
+        NavbarItem(child: Text('Documentation')),
+        NavbarItem.dropdown(child: Text('More'), items: [
+          NavbarItem(child: Text('About')),
+          NavbarItem(child: Text('Jobs')),
+          NavbarItem(child: Text('Contact')),
+          NavbarDivider(),
+          NavbarItem(child: Text('Report an issue')),
+        ]),
+      ]),
+    );
+  }
+}
+
 class BulmaLogo extends StatelessComponent {
   const BulmaLogo({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield img(src: 'https://bulma.io/images/bulma-logo.png', attributes: {'width': '112', 'height': '20'});
+    yield img(src: 'https://bulma.io/assets/brand/Bulma%20Logo.svg', attributes: {'width': '112', 'height': '20'});
   }
 }

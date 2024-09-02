@@ -1,6 +1,6 @@
 part of '../styles.dart';
 
-class _TextStyles implements Styles {
+class _TextStyles extends Styles {
   final Color? color;
   final TextAlign? align;
   final FontFamily? fontFamily;
@@ -33,7 +33,7 @@ class _TextStyles implements Styles {
     this.shadow,
     this.overflow,
     this.whiteSpace,
-  });
+  }) : super._();
 
   @override
   Map<String, String> get styles => {

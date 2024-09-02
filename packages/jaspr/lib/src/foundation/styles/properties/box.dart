@@ -25,24 +25,6 @@ enum Display {
   const Display(this.value);
 }
 
-class BoxConstraints {
-  final Unit? maxWidth;
-  final Unit? maxHeight;
-  final Unit? minWidth;
-  final Unit? minHeight;
-
-  const BoxConstraints({this.minWidth, this.maxWidth, this.minHeight, this.maxHeight});
-
-  Map<String, String> get styles {
-    return {
-      if (minWidth != null) 'min-width': minWidth!.value,
-      if (maxWidth != null) 'max-width': maxWidth!.value,
-      if (minHeight != null) 'min-height': minHeight!.value,
-      if (maxHeight != null) 'max-height': maxHeight!.value,
-    };
-  }
-}
-
 abstract class Border {
   const factory Border.all(BorderSide side) = _AllBorder;
   const factory Border.only({BorderSide? left, BorderSide? top, BorderSide? right, BorderSide? bottom}) = _OnlyBorder;
@@ -150,7 +132,18 @@ class BorderSide {
   final Color? color;
   final Unit? width;
 
-  const BorderSide({this.style, this.color, this.width});
+  const BorderSide({this.style = BorderStyle.solid, this.color, this.width});
+
+  const BorderSide.none()
+      : color = null,
+        width = null,
+        style = BorderStyle.none;
+  const BorderSide.solid({this.color, this.width}) : style = BorderStyle.solid;
+  const BorderSide.dotted({this.color, this.width}) : style = BorderStyle.dotted;
+  const BorderSide.dashed({this.color, this.width}) : style = BorderStyle.dashed;
+  const BorderSide.double({this.color, this.width}) : style = BorderStyle.double;
+  const BorderSide.groove({this.color, this.width}) : style = BorderStyle.groove;
+  const BorderSide.ridge({this.color, this.width}) : style = BorderStyle.ridge;
 }
 
 enum BorderStyle {
@@ -413,7 +406,7 @@ class _OnlyOverflow implements Overflow {
   @override
   Map<String, String> get styles => {
         if (x != null && y != null)
-          'overflow': '$x $y'
+          'overflow': '${x!._value} ${y!._value}'
         else ...{
           if (x != null) 'overflow-x': x!._value,
           if (y != null) 'overflow-y': y!._value,

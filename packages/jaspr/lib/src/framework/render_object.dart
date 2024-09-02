@@ -8,55 +8,91 @@ part of 'framework.dart';
 typedef RenderObjectVisitor = void Function(RenderObject child);
 
 abstract class RenderObject {
+  RenderObject? get parent;
+
   RenderObject createChildRenderObject();
 
   void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
       Map<String, String>? attributes, Map<String, EventCallback>? events);
 
-  void updateText(String text, [bool rawHtml = false]);
+  void updateText(String text);
 
   void skipChildren();
 
-  void attach(covariant RenderObject? parent, covariant RenderObject? after);
+  void attach(covariant RenderObject child, {covariant RenderObject? after});
 
-  void remove();
+  void remove(covariant RenderObject child);
 }
 
+abstract class BuildableRenderObjectElement = BuildableElement with RenderObjectElement;
+abstract class ProxyRenderObjectElement = ProxyElement with RenderObjectElement;
+abstract class LeafRenderObjectElement = LeafElement with RenderObjectElement;
+
 mixin RenderObjectElement on Element {
+  RenderObject createRenderObject() {
+    var renderObject = _parentRenderObjectElement!.renderObject.createChildRenderObject();
+    assert(renderObject.parent == _parentRenderObjectElement!.renderObject);
+    return renderObject;
+  }
+
   void updateRenderObject();
 
   RenderObject get renderObject => _renderObject!;
   RenderObject? _renderObject;
 
   @override
-  void _firstBuild([VoidCallback? onBuilt]) {
+  void didMount() {
     if (_renderObject == null) {
-      _renderObject = _parentRenderObjectElement!.renderObject.createChildRenderObject();
+      _renderObject = createRenderObject();
       updateRenderObject();
     }
-    super._firstBuild(() {
-      attachRenderObject();
-      onBuilt?.call();
-    });
+    super.didMount();
+  }
+
+  bool _dirtyRender = false;
+
+  bool shouldRerender(covariant Component newComponent) {
+    return true;
   }
 
   @override
   void update(Component newComponent) {
-    super.update(newComponent);
-    updateRenderObject();
-  }
-
-  void attachRenderObject() {
-    Element? prevElem = _prevAncestorSibling;
-    while (prevElem != null && prevElem._lastRenderObjectElement == null) {
-      prevElem = prevElem._prevAncestorSibling;
+    if (shouldRerender(newComponent)) {
+      _dirtyRender = true;
     }
-    var after = prevElem?._lastRenderObjectElement;
-    renderObject.attach(_parentRenderObjectElement?.renderObject, after?.renderObject);
+    super.update(newComponent);
   }
 
+  @override
+  void didUpdate(Component oldComponent) {
+    if (_dirtyRender) {
+      _dirtyRender = false;
+      updateRenderObject();
+    }
+    super.didUpdate(oldComponent);
+  }
+
+  @override
+  void attachRenderObject() {
+    var parent = _parentRenderObjectElement?.renderObject;
+    if (parent != null) {
+      Element? prevElem = _prevAncestorSibling;
+      while (prevElem != null && prevElem._lastRenderObjectElement == null) {
+        prevElem = prevElem._prevAncestorSibling;
+      }
+      var after = prevElem?._lastRenderObjectElement;
+      parent.attach(renderObject, after: after?.renderObject);
+      assert(renderObject.parent == parent);
+    }
+  }
+
+  @override
   void detachRenderObject() {
-    renderObject.remove();
+    var parent = _parentRenderObjectElement?.renderObject;
+    if (parent != null) {
+      parent.remove(renderObject);
+      assert(renderObject.parent == null);
+    }
   }
 
   @override
