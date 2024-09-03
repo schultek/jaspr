@@ -223,6 +223,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--release',
         '--verbose',
         '--delete-conflicting-outputs',
+        '--use-polling-watcher',
         '--define=${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true","-O${argResults!['optimize']}"]'
       ],
       logger.writeServerLog,
