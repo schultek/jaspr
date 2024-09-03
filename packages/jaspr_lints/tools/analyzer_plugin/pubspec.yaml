@@ -1,0 +1,10 @@
+name: jaspr_lints_analyzer_plugin_loader
+description: This pubspec determines the version of the analyzer plugin to load.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  custom_lint: 0.6.5
