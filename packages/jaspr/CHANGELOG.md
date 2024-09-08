@@ -1,3 +1,6 @@
+## 0.16.0
+- Added css variable for Unit, Color and Angle.
+
 ## 0.15.0
 
 - Added support for using `@css` and `@encoder`/`@decoder` across other packages.
