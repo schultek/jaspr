@@ -18,12 +18,16 @@ class CssAssistProvider extends DartAssist {
       if (!target.coveredBy(node.function.sourceRange)) {
         return;
       }
-      if (!isComponentType(node.staticType)) {
-        return;
-      }
-      if (node.staticInvokeType case FunctionType t when hasClassesParameter(t.parameters)) {
-        final indent = getLineIndent(resolver.lineInfo, node);
-        addStyles(resolver, reporter, node, indent, node.argumentList);
+      if (isComponentType(node.staticType)) {
+        if (node.staticInvokeType case FunctionType t when hasClassesParameter(t.parameters)) {
+          final indent = getLineIndent(resolver.lineInfo, node);
+          addStyles(resolver, reporter, node, indent, node.argumentList);
+        }
+      } else if (node is FunctionExpressionInvocation) {
+        if (node.function case SimpleIdentifier(name: 'css')) {
+          final indent = getLineIndent(resolver.lineInfo, node);
+          convertToNested(resolver, reporter, node, indent);
+        }
       }
     });
     context.registry.addInstanceCreationExpression((node) {
@@ -69,13 +73,12 @@ class CssAssistProvider extends DartAssist {
         .whereType<ListLiteral>()
         .firstOrNull;
 
-    if (styles == null) {
-      final cb = reporter.createChangeBuilder(
-        priority: 1,
-        message: 'Add styles',
-      );
-
-      cb.addDartFileEdit((builder) {
+    final cb = reporter.createChangeBuilder(
+      priority: 1,
+      message: 'Add styles',
+    );
+    cb.addDartFileEdit((builder) {
+      if (styles == null) {
         builder.addInsertion(comp.$2.end, (edit) {
           edit.write('\n\n  @css\n  static final List<StyleRule> styles = [\n    css(\'');
           if (idVal != null) {
@@ -92,26 +95,75 @@ class CssAssistProvider extends DartAssist {
               suggestions: ['box', 'text', 'background', 'flexbox', 'flexItem', 'grid', 'gridItem', 'list']);
           edit.write('(),\n  ];');
         });
-
-        if (idVal == null && classesVal == null) {
-          if (classesArg != null) {
-            builder.addInsertion(classesArg.expression.offset, (edit) {
-              edit.write("'");
-              edit.addSimpleLinkedEdit('className', 'classname');
-              edit.write(" \${");
-            });
-            builder.addInsertion(classesArg.expression.end, (edit) {
-              edit.write("}'");
-            });
+      } else {
+        builder.addInsertion(styles.leftBracket.end, (edit) {
+          edit.write('\n    css(\'');
+          if (idVal != null) {
+            edit.write('#$idVal\').');
+          } else if (classesVal != null) {
+            edit.write('.$classesVal\').');
           } else {
-            builder.addInsertion(idArg?.end ?? argumentList.leftParenthesis.end, (edit) {
-              edit.write("classes: '");
-              edit.addSimpleLinkedEdit('className', 'classname');
-              edit.write("', ");
-            });
+            edit.write('.');
+            edit.addSimpleLinkedEdit('className', 'classname');
+            edit.write('\').');
           }
+          edit.addSimpleLinkedEdit('styles', 'box',
+              kind: LinkedEditSuggestionKind.METHOD,
+              suggestions: ['box', 'text', 'background', 'flexbox', 'flexItem', 'grid', 'gridItem', 'list']);
+          edit.write('(),');
+        });
+      }
+
+      if (idVal == null && classesVal == null) {
+        if (classesArg != null) {
+          builder.addInsertion(classesArg.expression.offset, (edit) {
+            edit.write("'");
+            edit.addSimpleLinkedEdit('className', 'classname');
+            edit.write(" \${");
+          });
+          builder.addInsertion(classesArg.expression.end, (edit) {
+            edit.write("}'");
+          });
+        } else {
+          builder.addInsertion(idArg?.end ?? argumentList.leftParenthesis.end, (edit) {
+            edit.write("classes: '");
+            edit.addSimpleLinkedEdit('className', 'classname');
+            edit.write("', ");
+          });
         }
+      }
+    });
+  }
+
+  void convertToNested(
+      CustomLintResolver resolver, ChangeReporter reporter, FunctionExpressionInvocation node, int lineIndent) {
+    if (node.argumentList.arguments.length != 1) {
+      return;
+    }
+
+    var selector = node.argumentList.arguments.first;
+    var chain = getFullChain(node.parent);
+
+    final cb = reporter.createChangeBuilder(
+      priority: 1,
+      message: 'Convert to nested styles',
+    );
+
+    cb.addDartFileEdit((builder) {
+      builder.addInsertion(selector.end, (edit) {
+        edit.write(', [\n${''.padLeft(lineIndent)}  css(\'&\'');
       });
-    } else {}
+      builder.addInsertion(chain?.end ?? node.end, (edit) {
+        edit.write(',\n${''.padLeft(lineIndent)}])');
+      });
+    });
+  }
+
+  MethodInvocation? getFullChain(AstNode? node) {
+    if (node is MethodInvocation) {
+      return getFullChain(node.parent) ?? node;
+    } else {
+      return null;
+    }
   }
 }
