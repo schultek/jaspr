@@ -33,6 +33,9 @@ class FontFamily {
   /// Constructs a [FontFamily] value from a list of families
   const factory FontFamily.list(List<FontFamily> families) = _ListFontFamily;
 
+  /// Constructs a css variable with FontFamily
+  const factory FontFamily.variable(String value) = _VariableFontFamily;
+
   static const FontFamily inherit = FontFamily._generic('inherit');
   static const FontFamily initial = FontFamily._generic('initial');
   static const FontFamily revert = FontFamily._generic('revert');
@@ -46,6 +49,14 @@ class _ListFontFamily implements FontFamily {
 
   @override
   String get value => families.map((f) => f.value).join(', ');
+}
+
+class _VariableFontFamily implements FontFamily {
+  final String _value;
+  const _VariableFontFamily(this._value);
+
+  @override
+  String get value => 'var($_value)';
 }
 
 class FontFamilies {

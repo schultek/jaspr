@@ -1,5 +1,5 @@
 ## 0.16.0
-- Added css variable for Unit, Color and Angle.
+- Added css variable for Unit, Color, Angle and FontFamily.
 
 ## 0.15.0
 
