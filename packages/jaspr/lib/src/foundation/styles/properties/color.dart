@@ -20,6 +20,9 @@ abstract class Color {
   /// Constructs a [Color] from hue, saturation, lightness and alpha values
   const factory Color.hsla(int hue, int saturation, int lightness, double alpha) = _HSLAColor;
 
+  /// Constructs a variable containing color.
+  const factory Color.variable(String value) = _VariableColor;
+
   static const Color inherit = Color.named('inherit');
   static const Color initial = Color.named('initial');
   static const Color revert = Color.named('revert');
@@ -93,6 +96,15 @@ class _HSLAColor extends _HSLColor {
 
   @override
   String get value => 'hsla($hue, $saturation%, $lightness%, $alpha)';
+}
+
+class _VariableColor implements Color {
+  final String _variable;
+
+  const _VariableColor(this._variable);
+
+  @override
+  String get value => 'var($_variable)';
 }
 
 class Colors {
