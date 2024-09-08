@@ -99,12 +99,12 @@ class _HSLAColor extends _HSLColor {
 }
 
 class _VariableColor implements Color {
-  final String _variable;
+  final String _value;
 
-  const _VariableColor(this._variable);
+  const _VariableColor(this._value);
 
   @override
-  String get value => 'var($_variable)';
+  String get value => 'var($_value)';
 }
 
 class Colors {

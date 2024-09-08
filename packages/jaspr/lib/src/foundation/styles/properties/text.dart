@@ -53,6 +53,7 @@ class _ListFontFamily implements FontFamily {
 
 class _VariableFontFamily implements FontFamily {
   final String _value;
+
   const _VariableFontFamily(this._value);
 
   @override
