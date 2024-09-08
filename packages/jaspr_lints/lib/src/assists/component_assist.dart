@@ -1,5 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/source/source_range.dart';
+import 'package:analyzer_plugin/utilities/change_builder/change_builder_dart.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 class ComponentAssistProvider extends DartAssist {
@@ -34,6 +36,9 @@ class ComponentAssistProvider extends DartAssist {
       nameSuggestion = nameSuggestion.split('_').map((s) => s.substring(0, 1).toUpperCase() + s.substring(1)).join();
 
       reporter.createChangeBuilder(priority: 1, message: 'Create StatelessComponent').addDartFileEdit((builder) {
+        if (!hasJasprImport) {
+          builder.importLibrary(Uri.parse('package:jaspr/jaspr.dart'));
+        }
         builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
           edit.write('class ');
           edit.addSimpleLinkedEdit('name', nameSuggestion);
@@ -46,15 +51,12 @@ class ComponentAssistProvider extends DartAssist {
           edit.addSimpleLinkedEdit('child', "div([])");
           edit.write(';\n  }\n}\n');
         });
-
-        if (!hasJasprImport) {
-          builder.addInsertion(node.directives.lastOrNull?.end ?? 0, (edit) {
-            edit.write("\nimport 'package:jaspr/jaspr.dart';");
-          });
-        }
       });
 
       reporter.createChangeBuilder(priority: 2, message: 'Create StatefulComponent').addDartFileEdit((builder) {
+        if (!hasJasprImport) {
+          builder.importLibrary(Uri.parse('package:jaspr/jaspr.dart'));
+        }
         builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
           edit.write('class ');
           edit.addSimpleLinkedEdit('name', nameSuggestion);
@@ -73,15 +75,13 @@ class ComponentAssistProvider extends DartAssist {
           edit.addSimpleLinkedEdit('child', "div([])");
           edit.write(';\n  }\n}\n');
         });
-
-        if (!hasJasprImport) {
-          builder.addInsertion(node.directives.lastOrNull?.end ?? 0, (edit) {
-            edit.write("\nimport 'package:jaspr/jaspr.dart';");
-          });
-        }
       });
 
       reporter.createChangeBuilder(priority: 3, message: 'Create InheritedComponent').addDartFileEdit((builder) {
+        if (!hasJasprImport) {
+          builder.importLibrary(Uri.parse('package:jaspr/jaspr.dart'));
+        }
+
         builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
           edit.write('class ');
           edit.addSimpleLinkedEdit('name', nameSuggestion);
@@ -103,13 +103,85 @@ class ComponentAssistProvider extends DartAssist {
           edit.addSimpleLinkedEdit('name', nameSuggestion);
           edit.write(' oldComponent) {\n    return false;\n  }\n}\n');
         });
-
-        if (!hasJasprImport) {
-          builder.addInsertion(node.directives.lastOrNull?.end ?? 0, (edit) {
-            edit.write("\nimport 'package:jaspr/jaspr.dart';");
-          });
-        }
       });
     });
+
+    context.registry.addClassDeclaration((node) {
+      if (target.offset < node.offset || target.end > node.leftBracket.end) {
+        return;
+      }
+      if (node.extendsClause?.superclass.name2.lexeme != 'StatelessComponent') {
+        return;
+      }
+
+      MethodDeclaration? buildMethod;
+      List<String> members = [];
+      for (var m in node.members) {
+        if (m is MethodDeclaration && m.name.lexeme == "build") {
+          buildMethod = m;
+        } else if (m is FieldDeclaration) {
+          members.addAll(m.fields.variables.map((v) => v.name.lexeme));
+        }
+      }
+
+      reporter.createChangeBuilder(priority: 1, message: 'Convert to StatefulComponent').addDartFileEdit((builder) {
+        builder.addReplacement(node.extendsClause!.superclass.sourceRange, (edit) {
+          edit.write('StatefulComponent');
+        });
+
+        var splitToken = buildMethod?.beginToken ?? node.rightBracket;
+        var indent = buildMethod != null ? '' : '  ';
+        var endIndent = buildMethod != null ? '  ' : '';
+        var name = node.name.lexeme;
+
+        builder.addInsertion(splitToken.offset, (edit) {
+          edit.write("${indent}@override\n  State createState() => ${name}State();\n"
+              "}\n\nclass ${name}State extends State<$name> {\n$endIndent");
+        });
+
+        buildMethod?.body.visitChildren(StateBuildVisitor(builder, node));
+      });
+
+      if (buildMethod != null && buildMethod.body.keyword != null) {
+        reporter
+            .createChangeBuilder(priority: 1, message: 'Convert to AsyncStatelessComponent')
+            .addDartFileEdit((builder) {
+          if (node.parent case CompilationUnit unit) {
+            for (var dir in unit.directives) {
+              if (dir is ImportDirective && dir.uri.stringValue == 'package:jaspr/jaspr.dart') {
+                builder.addDeletion(dir.sourceRange);
+              }
+            }
+          }
+
+          builder.importLibrary(Uri.parse('package:jaspr/server.dart'));
+
+          builder.addSimpleReplacement(node.extendsClause!.superclass.sourceRange, 'AsyncStatelessComponent');
+          builder.addSimpleReplacement(buildMethod!.body.keyword!.sourceRange, 'async');
+          if (buildMethod.returnType != null) {
+            builder.addSimpleReplacement(buildMethod.returnType!.sourceRange, 'Stream<Component>');
+          } else {
+            builder.addSimpleInsertion(buildMethod.name.offset, 'Stream<Component> ');
+          }
+        });
+      }
+    });
+  }
+}
+
+class StateBuildVisitor extends UnifyingAstVisitor {
+  StateBuildVisitor(this.builder, this.clazz);
+
+  final DartFileEditBuilder builder;
+  final ClassDeclaration clazz;
+
+  @override
+  visitSimpleIdentifier(SimpleIdentifier node) {
+    var elem = node.staticElement;
+    if (elem == null) return;
+
+    if (elem.enclosingElement == clazz.declaredElement) {
+      builder.addSimpleInsertion(node.offset, 'component.');
+    }
   }
 }
