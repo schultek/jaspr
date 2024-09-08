@@ -96,8 +96,8 @@ class CssAssistProvider extends DartAssist {
           edit.write('(),\n  ];');
         });
       } else {
-        builder.addInsertion(styles.leftBracket.end, (edit) {
-          edit.write('\n    css(\'');
+        builder.addInsertion(styles.rightBracket.offset, (edit) {
+          edit.write('  css(\'');
           if (idVal != null) {
             edit.write('#$idVal\').');
           } else if (classesVal != null) {
@@ -110,7 +110,7 @@ class CssAssistProvider extends DartAssist {
           edit.addSimpleLinkedEdit('styles', 'box',
               kind: LinkedEditSuggestionKind.METHOD,
               suggestions: ['box', 'text', 'background', 'flexbox', 'flexItem', 'grid', 'gridItem', 'list']);
-          edit.write('(),');
+          edit.write('(),\n  ');
         });
       }
 

@@ -36,9 +36,6 @@ class ComponentAssistProvider extends DartAssist {
       nameSuggestion = nameSuggestion.split('_').map((s) => s.substring(0, 1).toUpperCase() + s.substring(1)).join();
 
       reporter.createChangeBuilder(priority: 1, message: 'Create StatelessComponent').addDartFileEdit((builder) {
-        if (!hasJasprImport) {
-          builder.importLibrary(Uri.parse('package:jaspr/jaspr.dart'));
-        }
         builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
           edit.write('class ');
           edit.addSimpleLinkedEdit('name', nameSuggestion);
@@ -51,12 +48,12 @@ class ComponentAssistProvider extends DartAssist {
           edit.addSimpleLinkedEdit('child', "div([])");
           edit.write(';\n  }\n}\n');
         });
+        if (!hasJasprImport) {
+          builder.addSimpleInsertion(0, "import 'package:jaspr/jaspr.dart';\n");
+        }
       });
 
       reporter.createChangeBuilder(priority: 2, message: 'Create StatefulComponent').addDartFileEdit((builder) {
-        if (!hasJasprImport) {
-          builder.importLibrary(Uri.parse('package:jaspr/jaspr.dart'));
-        }
         builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
           edit.write('class ');
           edit.addSimpleLinkedEdit('name', nameSuggestion);
@@ -75,6 +72,9 @@ class ComponentAssistProvider extends DartAssist {
           edit.addSimpleLinkedEdit('child', "div([])");
           edit.write(';\n  }\n}\n');
         });
+        if (!hasJasprImport) {
+          builder.importLibrary(Uri.parse('package:jaspr/jaspr.dart'));
+        }
       });
 
       reporter.createChangeBuilder(priority: 3, message: 'Create InheritedComponent').addDartFileEdit((builder) {

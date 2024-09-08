@@ -22,6 +22,7 @@ class TreeAssistProvider extends DartAssist {
       final indent = getLineIndent(resolver.lineInfo, node);
       wrapComponent(resolver, reporter, node, indent);
       removeComponent(resolver, reporter, node, indent, node.argumentList);
+      extractComponent(resolver, reporter, node, indent);
     });
     context.registry.addInstanceCreationExpression((node) {
       if (!target.coveredBy(node.constructorName.sourceRange)) {
@@ -33,6 +34,7 @@ class TreeAssistProvider extends DartAssist {
       final indent = getLineIndent(resolver.lineInfo, node);
       wrapComponent(resolver, reporter, node, indent);
       removeComponent(resolver, reporter, node, indent, node.argumentList);
+      extractComponent(resolver, reporter, node, indent);
     });
   }
 
@@ -50,14 +52,14 @@ class TreeAssistProvider extends DartAssist {
       );
 
       cb.addDartFileEdit((builder) {
-        builder.addReplacement(node.sourceRange, (editBuilder) {
+        builder.addReplacement(node.sourceRange, (edit) {
           if (suggestions != null) {
-            editBuilder.addSimpleLinkedEdit(name, suggestions.first,
+            edit.addSimpleLinkedEdit(name, suggestions.first,
                 kind: LinkedEditSuggestionKind.METHOD, suggestions: suggestions);
           } else {
-            editBuilder.write(name);
+            edit.write(name);
           }
-          editBuilder.write(htmlSource);
+          edit.write(htmlSource);
         });
       });
     }
@@ -68,20 +70,20 @@ class TreeAssistProvider extends DartAssist {
     wrapWith('ul');
     wrapWith('li');
 
-    final cb2 = reporter.createChangeBuilder(
+    final cb = reporter.createChangeBuilder(
       priority: 2,
       message: 'Wrap with component...',
     );
 
-    cb2.addDartFileEdit((builder) {
-      builder.addReplacement(node.sourceRange, (editBuilder) {
-        editBuilder.addSimpleLinkedEdit('comp', 'component');
-        editBuilder.write('(\n');
-        editBuilder.write(''.padLeft(lineIndent, ' '));
-        editBuilder.write('  child: ');
-        editBuilder.writeln(lines[0]);
-        editBuilder.write(lines.skip(1).map((s) => '  ' + s).join('\n'));
-        editBuilder.write(',\n${''.padLeft(lineIndent, ' ')})');
+    cb.addDartFileEdit((builder) {
+      builder.addReplacement(node.sourceRange, (edit) {
+        edit.addSimpleLinkedEdit('comp', 'component');
+        edit.write('(\n');
+        edit.write(''.padLeft(lineIndent, ' '));
+        edit.write('  child: ');
+        edit.writeln(lines[0]);
+        edit.write(lines.skip(1).map((s) => '  ' + s).join('\n'));
+        edit.write(',\n${''.padLeft(lineIndent, ' ')})');
       });
     });
   }
@@ -114,11 +116,10 @@ class TreeAssistProvider extends DartAssist {
       );
 
       cb.addDartFileEdit((builder) {
-        builder.addReplacement(node.sourceRange, (editBuilder) {
+        builder.addReplacement(node.sourceRange, (edit) {
           var child = children.first;
           var childIndent = getLineIndent(resolver.lineInfo, child);
-          editBuilder
-              .write(content.substring(child.offset, child.end).reIndent(lineIndent - childIndent, skipFirst: true));
+          edit.write(content.substring(child.offset, child.end).reIndent(lineIndent - childIndent, skipFirst: true));
         });
       });
     } else if (node.parent is ListLiteral) {
@@ -128,17 +129,17 @@ class TreeAssistProvider extends DartAssist {
       );
 
       cb.addDartFileEdit((builder) {
-        builder.addReplacement(node.sourceRange, (editBuilder) {
+        builder.addReplacement(node.sourceRange, (edit) {
           for (var child in children) {
             var childIndent = getLineIndent(resolver.lineInfo, child);
             var source = content.substring(child.offset, child.end).reIndent(lineIndent - childIndent, skipFirst: true);
 
             if (child != children.first) {
-              editBuilder.write(''.padLeft(lineIndent));
+              edit.write(''.padLeft(lineIndent));
             }
-            editBuilder.write(source);
+            edit.write(source);
             if (child != children.last) {
-              editBuilder.write(',\n');
+              edit.write(',\n');
             }
           }
         });
@@ -150,21 +151,54 @@ class TreeAssistProvider extends DartAssist {
       );
 
       cb.addDartFileEdit((builder) {
-        builder.addReplacement(node.parent!.sourceRange, (editBuilder) {
+        builder.addReplacement(node.parent!.sourceRange, (edit) {
           for (var child in children) {
             var childIndent = getLineIndent(resolver.lineInfo, child);
             var source = content.substring(child.offset, child.end).reIndent(lineIndent - childIndent, skipFirst: true);
 
             if (child != children.first) {
-              editBuilder.write(''.padLeft(lineIndent));
+              edit.write(''.padLeft(lineIndent));
             }
-            editBuilder.write('yield $source;');
+            edit.write('yield $source;');
             if (child != children.last) {
-              editBuilder.write('\n');
+              edit.write('\n');
             }
           }
         });
       });
     }
+  }
+
+  void extractComponent(CustomLintResolver resolver, ChangeReporter reporter, Expression node, int lineIndent) {
+    var content = resolver.source.contents.data;
+    var source = content.substring(node.offset, node.end).reIndent(4 - lineIndent, skipFirst: true);
+
+    final cb = reporter.createChangeBuilder(
+      priority: 4,
+      message: 'Extract component',
+    );
+
+    cb.addDartFileEdit((builder) {
+      builder.addInsertion(resolver.source.contents.data.length, (edit) {
+        edit.write('\nclass ');
+        edit.addSimpleLinkedEdit('name', 'MyComponent');
+        edit.write(' extends StatelessComponent {\n'
+            '  const ');
+        edit.addSimpleLinkedEdit('name', 'MyComponent');
+        edit.write('();\n'
+            '\n'
+            '  @override\n'
+            '  Iterable<Component> build(BuildContext context) sync* {\n'
+            '    yield ');
+        edit.write(source);
+        edit.write(';\n'
+            '  }\n}\n');
+      });
+
+      builder.addReplacement(node.sourceRange, (edit) {
+        edit.addSimpleLinkedEdit('name', 'MyComponent');
+        edit.write('()');
+      });
+    });
   }
 }
