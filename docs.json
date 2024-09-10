@@ -16,9 +16,7 @@
     "github": "schultek"
   },
   "theme": {
-    "primary": "#01589B",
-    "primaryDark": "#41C3FE",
-    "primaryLight": "#01589B"
+    "primary": "#01589B"
   },
   "sidebar": [
     {
