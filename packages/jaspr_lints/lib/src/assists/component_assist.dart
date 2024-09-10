@@ -16,7 +16,7 @@ class ComponentAssistProvider extends DartAssist {
       var hasJasprImport = false;
 
       for (var dir in node.directives) {
-        if (dir.offset > target.end) {
+        if (dir.end > target.offset) {
           return;
         }
         if (dir is ImportDirective && (dir.uri.stringValue?.startsWith('package:jaspr/') ?? false)) {

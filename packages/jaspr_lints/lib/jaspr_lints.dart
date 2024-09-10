@@ -1,5 +1,6 @@
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:jaspr_lints/src/assists/css_assist.dart';
+import 'package:jaspr_lints/src/assists/import_assist.dart';
 
 import 'src/assists/component_assist.dart';
 import 'src/assists/tailwind_assist.dart';
@@ -17,5 +18,6 @@ class JasprLinter extends PluginBase {
         TreeAssistProvider(),
         TailwindAssistProvider(),
         CssAssistProvider(),
+        ImportAssistProvider(),
       ];
 }
