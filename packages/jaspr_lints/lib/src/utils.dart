@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/type_visitor.dart';
 import 'package:analyzer/source/line_info.dart';
+import 'package:path/path.dart' as path;
+import 'package:yaml/yaml.dart';
 
 bool isComponentType(DartType? type) {
   return type != null && type.accept(IsComponentVisitor());
@@ -74,5 +78,17 @@ extension Indent on String {
       }
     }
     return lines.join('\n');
+  }
+}
+
+dynamic readJasprConfig(String filePath) {
+  var segments = path.split(filePath);
+  while (segments.length > 1) {
+    var pubspecFile = File(path.joinAll([...segments, 'pubspec.yaml']));
+    if (pubspecFile.existsSync()) {
+      var pubspecData = loadYaml(pubspecFile.readAsStringSync());
+      return pubspecData['jaspr'];
+    }
+    segments.removeLast();
   }
 }

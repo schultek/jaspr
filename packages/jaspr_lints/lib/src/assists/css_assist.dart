@@ -14,6 +14,11 @@ class CssAssistProvider extends DartAssist {
     CustomLintContext context,
     SourceRange target,
   ) {
+    var config = readJasprConfig(resolver.path);
+    if (config['mode'] != 'server' && config['mode'] != 'static') {
+      return;
+    }
+
     context.registry.addInvocationExpression((node) {
       if (!target.coveredBy(node.function.sourceRange)) {
         return;
