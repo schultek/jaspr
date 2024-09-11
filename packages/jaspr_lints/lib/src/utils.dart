@@ -13,6 +13,12 @@ bool isComponentType(DartType? type) {
   return type != null && type.accept(IsComponentVisitor());
 }
 
+bool isComponentListType(DartType? type) {
+  return type != null &&
+      type.isDartCoreList &&
+      (type as InterfaceType).typeArguments.first.accept(IsComponentVisitor());
+}
+
 int getLineIndent(LineInfo lineInfo, AstNode node) {
   var lineNumber = lineInfo.getLocation(node.offset).lineNumber - 1;
   var lineOffset = lineInfo.getOffsetOfLine(lineNumber);
