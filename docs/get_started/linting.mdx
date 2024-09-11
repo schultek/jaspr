@@ -26,6 +26,7 @@ with every new project and enables the following set of lint rules and code assi
         ```
 
         **GOOD:**
+        ```dart
         yield div([
           p([text('Hello World')]),
         ]);
@@ -47,6 +48,7 @@ with every new project and enables the following set of lint rules and code assi
         ```
 
         **GOOD:**
+        ```dart
         yield div(id: 'main', [
           p(classes: 'text-red', [text('Hello World')]),
         ]);
@@ -57,14 +59,75 @@ with every new project and enables the following set of lint rules and code assi
 ## Code Assists
 
 <Card>
-    **Create `StatelessComponent` / `StatefulComponent` / `InheritedComponent`**
+    <Property name="Create StatelessComponent">
+        ```dart
+        class [...] extends StatelessComponent {
+          [...]({super.key});
+
+          Iterable<Component> build(BuildContext context) sync* {
+            yield [...];
+          }
+        }
+        ```
+    </Property>
 </Card>
 
 <Card>
-    **Convert `StatelessComponent` to `StatefulComponent`**
+    <Property name="Create StatefulComponent">
+    </Property>
 </Card>
 
 <Card>
-    **Convert `StatelessComponent` to `AsyncStatelessComponent`**
+    <Property name="Create InheritedComponent">
+    </Property>
 </Card>
 
+<Card>
+    <Property name="Convert to StaetfulComponent">
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Convert to AsyncStatelessComponent">
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Remove this component">
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Wrap with html...">
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Wrap with component...">
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Wrap with Builder">
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Extract component">
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Add styles">
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Convert to web-only import">
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Convert to server-only import">
+    </Property>
+</Card>
