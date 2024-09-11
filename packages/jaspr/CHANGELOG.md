@@ -1,3 +1,8 @@
+## Unreleased minor
+
+- Include and setup `jaspr_lints` in newly created projects.
+- Added `jaspr analyze` command to check all custom lints.
+
 ## 0.15.0
 
 - Added support for using `@css` and `@encoder`/`@decoder` across other packages.
