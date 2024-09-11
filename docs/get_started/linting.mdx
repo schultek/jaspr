@@ -1,0 +1,70 @@
+---
+title: Linting
+description: Jaspr comes with its own set of lint rules and code assists.
+---
+
+Jaspr has its own linting and analyzer package called `jaspr_lints`. This comes pre-configured
+with every new project and enables the following set of lint rules and code assists:
+
+## Lint Rules
+
+<Card>
+    <Property name="prefer_html_methods" type="Fix available">
+        Prefer html methods like `div(...)` over `DomComponent(tag: 'div', ...)`.
+
+        **BAD:**
+        ```dart
+        yield DomComponent(
+          tag: 'div',
+          children: [
+            DomComponent(
+              tag: 'p',
+              child: Text('Hello World'),
+            ),
+          ],
+        );
+        ```
+
+        **GOOD:**
+        yield div([
+          p([text('Hello World')]),
+        ]);
+        ```
+    </Property>
+</Card>
+
+<Card>
+    <Property name="sort_children_properties_last" type="Fix available">
+        Sort children properties last in html component methods.
+
+        This improves readability and best represents actual html.
+
+        **BAD:**
+        ```dart
+        yield div([
+          p([text('Hello World')], classes: 'text-red'),
+        ], id: 'main');
+        ```
+
+        **GOOD:**
+        yield div(id: 'main', [
+          p(classes: 'text-red', [text('Hello World')]),
+        ]);
+        ```
+    </Property>
+</Card>
+
+## Code Assists
+
+<Card>
+    **Create `StatelessComponent` / `StatefulComponent` / `InheritedComponent`**
+</Card>
+
+<Card>
+    **Convert `StatelessComponent` to `StatefulComponent`**
+</Card>
+
+<Card>
+    **Convert `StatelessComponent` to `AsyncStatelessComponent`**
+</Card>
+

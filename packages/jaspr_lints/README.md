@@ -17,7 +17,7 @@ This package provides lints and code assists for Jaspr projects.
 
 ## Lints
 
-- Prefer html methods `div(...)` over `DomComponent(tag: 'div', ...)`. **(Fix available)**
+- Prefer html methods like `div(...)` over `DomComponent(tag: 'div', ...)`. **(Fix available)**
 - Sort children properties last in html component methods. **(Fix available)**
 
 ## Setup:

@@ -16,7 +16,8 @@
       ["\uD83D\uDD79 Jaspr CLI", "/get_started/cli"],
       ["\uD83D\uDCDF Rendering Modes", "/get_started/modes"],
       ["\uD83D\uDCA7 Hydration", "/get_started/hydration"],
-      ["\uD83D\uDCE6 Project Structure", "/get_started/project_structure"]
+      ["\uD83D\uDCE6 Project Structure", "/get_started/project_structure"],
+      ["\uD83E\uDDF9 Linting", "/get_started/linting"]
     ]],
     ["Key Concepts", [
       ["\uD83E\uDDF1 Component System", "/concepts/components"],
