@@ -1,14 +1,26 @@
 # Jaspr Lints
 
-This package provides lints and code assists for jaspr projects.
+This package provides lints and code assists for Jaspr projects.
 
-### Features:
-* Create a new StatelessComponent / StatefulComponent / InheritedComponent
-* Remove components from the component tree
-* Add components tp the component tree
-* More to come
+## Code Assists:
 
-### Setup:
+- Create `StatelessComponent` / `StatefulComponent` / `InheritedComponent`
+- Convert `StatelessComponent` to `StatefulComponent`
+- Convert `StatelessComponent` to `AsyncStatelessComponent`
+- Remove component from the tree
+- Wrap component with `div()` / `section()` / `ul()` or any html component
+- Wrap component with other component
+- Wrap component with `Builder`
+- Extract subtree into `StatelessComponent`
+- Add styles to html component
+- Convert import to web-only / server-only import
+
+## Lints
+
+- Prefer html methods `div(...)` over `DomComponent(tag: 'div', ...)`. **(Fix available)**
+- Sort children properties last in html component methods. **(Fix available)**
+
+## Setup:
 
 * Add `jaspr_lints` as dev dependency:
 ```shell
@@ -19,9 +31,23 @@ dart pub add jaspr_lints --dev
 ```yaml
 analyzer:
   plugins:
-    - jaspr_lints
+    - custom_lints
 ```
 
-After running `pub get` you now see additional Jaspr lints when invoking code assist on a component function like `div()` or `p()` files:
+After running `pub get` you now see additional Jaspr lints 
+when invoking code assist on a component function like `div()` or `p()` files.
 
-![Example screenshot of what Jaspr code assists look like](screenshots/1.png "Jaspr Code Assists")
+## Usage
+
+Unfortunately, running `dart analyze` does not pick up the custom lints. 
+Instead, you need to run a separate command for this: `jaspr analyze`
+
+Also enabling / disabling specific lint rules works slightly different.
+In `analysis_options.yaml` add the following section:
+
+```yaml
+custom_lint:
+  rules:
+    prefer_html_methods: true
+    sort_children_properties_last: true
+```

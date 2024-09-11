@@ -135,7 +135,7 @@ class ComponentAssistProvider extends DartAssist {
         var name = node.name.lexeme;
 
         builder.addInsertion(splitToken.offset, (edit) {
-          edit.write("${indent}@override\n  State createState() => ${name}State();\n"
+          edit.write("$indent@override\n  State createState() => ${name}State();\n"
               "}\n\nclass ${name}State extends State<$name> {\n$endIndent");
         });
 
@@ -180,7 +180,7 @@ class StateBuildVisitor extends UnifyingAstVisitor {
     var elem = node.staticElement;
     if (elem == null) return;
 
-    if (elem.enclosingElement == clazz.declaredElement) {
+    if (elem.enclosingElement3 == clazz.declaredElement) {
       builder.addSimpleInsertion(node.offset, 'component.');
     }
   }

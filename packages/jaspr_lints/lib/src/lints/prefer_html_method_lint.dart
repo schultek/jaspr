@@ -11,9 +11,8 @@ class PreferHtmlMethodLint extends DartLintRule {
   PreferHtmlMethodLint()
       : super(
           code: LintCode(
-            name: 'prefer_html_method',
-            problemMessage: 'Prefer a html component method over DomComponent',
-            correctionMessage: "Replace 'DomComponent(tag: \"{0}\", ...)' with '{0}(...)'",
+            name: 'prefer_html_methods',
+            problemMessage: "Prefer using '{0}(...)' over 'DomComponent(tag: \"{0}\", ...)'",
           ),
         );
 

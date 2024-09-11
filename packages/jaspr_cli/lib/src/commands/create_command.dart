@@ -82,7 +82,7 @@ class CreateCommand extends BaseCommand {
   }
 
   @override
-  String get description => 'Create a new jaspr project.';
+  String get description => 'Create a new Jaspr project.';
 
   @override
   String get name => 'create';
@@ -123,10 +123,12 @@ class CreateCommand extends BaseCommand {
     var [
       jasprFlutterEmbedVersion,
       jasprRouterVersion,
+      jasprLintsVersion,
       webCompilersVersion,
     ] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
+      updater.getLatestVersion('jaspr_lints'),
       updater.getLatestVersion(webCompilersPackage),
     ]);
 
@@ -149,6 +151,7 @@ class CreateCommand extends BaseCommand {
         'jasprBuilderVersion': jasprBuilderVersion,
         'jasprFlutterEmbedVersion': jasprFlutterEmbedVersion,
         'jasprRouterVersion': jasprRouterVersion,
+        'jasprLintsVersion': jasprLintsVersion,
         'webCompilersPackage': webCompilersPackage,
         'webCompilersVersion': webCompilersVersion,
       },

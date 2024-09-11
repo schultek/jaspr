@@ -2,7 +2,8 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:jaspr_lints/src/utils.dart';
+
+import '../utils.dart';
 
 class TreeAssistProvider extends DartAssist {
   @override

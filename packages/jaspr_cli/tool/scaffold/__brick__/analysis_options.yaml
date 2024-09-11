@@ -14,15 +14,27 @@
 include: package:flutter_lints/flutter.yaml{{/flutter}}{{^flutter}}
 include: package:lints/recommended.yaml{{/flutter}}
 
-# Uncomment the following section to specify additional rules.
+analyzer:
+  # Jaspr has a custom lint package 'jaspr_lints', which needs the 'custom_lint' analyzer plugin.
+  #
+  # Unfortunately, running 'dart analyze' does not pick up the custom lints. Instead, you need to
+  # run a separate command for this: `jaspr analyze`
+  plugins:
+    - custom_lint
+#   exclude:
+#     - path/to/excluded/files/**
+
+# Uncomment the following section to enable or disable additional rules.
 
 # linter:
 #   rules:
-#     - camel_case_types
+#     camel_case_types: true
 
-# analyzer:
-#   exclude:
-#     - path/to/excluded/files/**
+# For controlling Jaspr specific lint rules, we need a slightly different config.
+
+# custom_lint:
+#   rules:
+#     prefer_html_methods: false
 
 # For more information about the core and recommended set of lints, see
 # https://dart.dev/go/core-lints
