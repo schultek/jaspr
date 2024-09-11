@@ -42,8 +42,10 @@ void Function(web.Event) _callWithValue<V>(String event, void Function(V) fn) {
   return (e) {
     var target = e.target;
     var value = switch (target) {
-      web.HTMLInputElement() when target.instanceOfString("HTMLInputElement") => () {
-          var type = InputType.values.where((v) => v.name == target.type).firstOrNull;
+      web.HTMLInputElement() when target.instanceOfString("HTMLInputElement") =>
+        () {
+          var type =
+              InputType.values.where((v) => v.name == target.type).firstOrNull;
           return switch (type) {
             InputType.checkbox || InputType.radio => target.checked,
             InputType.number => target.valueAsNumber,
@@ -52,10 +54,16 @@ void Function(web.Event) _callWithValue<V>(String event, void Function(V) fn) {
             _ => target.value,
           };
         }(),
-      web.HTMLTextAreaElement() when target.instanceOfString("HTMLTextAreaElement") => target.value,
-      web.HTMLSelectElement() when target.instanceOfString("HTMLSelectElement") => [
+      web.HTMLTextAreaElement()
+          when target.instanceOfString("HTMLTextAreaElement") =>
+        target.value,
+      web.HTMLSelectElement()
+          when target.instanceOfString("HTMLSelectElement") =>
+        [
           for (final o in target.selectedOptions.toIterable())
-            if (o is web.HTMLOptionElement && o.instanceOfString("HTMLOptionElement")) o.value,
+            if (o is web.HTMLOptionElement &&
+                o.instanceOfString("HTMLOptionElement"))
+              o.value,
         ],
       _ => null,
     };

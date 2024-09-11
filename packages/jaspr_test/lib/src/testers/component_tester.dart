@@ -8,6 +8,7 @@ import 'package:test/test.dart';
 
 import '../binding.dart';
 import '../finders.dart';
+import 'fake_event_web.dart' if (dart.library.io) 'fake_event_vm.dart';
 
 @isTest
 void testComponents(
@@ -51,7 +52,7 @@ class ComponentTester {
   /// Simulates a 'click' event on the given element
   /// and pumps the next frame.
   Future<void> click(Finder finder, {bool pump = true}) async {
-    dispatchEvent(finder, 'click', null);
+    dispatchEvent(finder, 'click', fakeEvent());
     if (pump) {
       await pumpEventQueue();
     }
@@ -108,7 +109,8 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
 
   final Uri? _currentUri;
   @override
-  Uri get currentUri => _currentUri ?? (throw 'Did not call setUp() with currentUri provided.');
+  Uri get currentUri =>
+      _currentUri ?? (throw 'Did not call setUp() with currentUri provided.');
 
   final bool _isClient;
   @override
@@ -153,8 +155,13 @@ class TestRenderObject extends RenderObject {
   }
 
   @override
-  void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
-      Map<String, String>? attributes, Map<String, EventCallback>? events) {
+  void updateElement(
+      String tag,
+      String? id,
+      String? classes,
+      Map<String, String>? styles,
+      Map<String, String>? attributes,
+      Map<String, EventCallback>? events) {
     this
       ..tag = tag
       ..id = id
