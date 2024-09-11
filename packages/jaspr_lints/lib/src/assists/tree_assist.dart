@@ -43,7 +43,7 @@ class TreeAssistProvider extends DartAssist {
     var lines = content.substring(node.offset, node.end).split('\n');
 
     var htmlSource =
-        '([\n${''.padLeft(lineIndent)}${lines.map((s) => '  ' + s).join('\n')},\n${''.padLeft(lineIndent)}])';
+        '([\n${''.padLeft(lineIndent)}${lines.map((s) => '  $s').join('\n')},\n${''.padLeft(lineIndent)}])';
 
     void wrapWith(String name, [List<String>? suggestions]) {
       final cb = reporter.createChangeBuilder(
@@ -82,8 +82,24 @@ class TreeAssistProvider extends DartAssist {
         edit.write(''.padLeft(lineIndent, ' '));
         edit.write('  child: ');
         edit.writeln(lines[0]);
-        edit.write(lines.skip(1).map((s) => '  ' + s).join('\n'));
+        edit.write(lines.skip(1).map((s) => '  $s').join('\n'));
         edit.write(',\n${''.padLeft(lineIndent, ' ')})');
+      });
+    });
+
+    final cb2 = reporter.createChangeBuilder(
+      priority: 2,
+      message: 'Wrap with Builder',
+    );
+
+    cb2.addDartFileEdit((builder) {
+      builder.addReplacement(node.sourceRange, (edit) {
+        edit.write('Builder(builder: (context) sync* {\n');
+        edit.write(''.padLeft(lineIndent, ' '));
+        edit.write('  yield ');
+        edit.write(lines[0]);
+        edit.write(lines.skip(1).map((s) => '\n  $s').join());
+        edit.write(';\n${''.padLeft(lineIndent, ' ')}})');
       });
     });
   }

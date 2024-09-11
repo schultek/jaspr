@@ -1,6 +1,7 @@
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:jaspr_lints/src/assists/css_assist.dart';
 import 'package:jaspr_lints/src/assists/import_assist.dart';
+import 'package:jaspr_lints/src/lints/prefer_html_method_lint.dart';
 import 'package:jaspr_lints/src/lints/sort_children_properties_last_lint.dart';
 
 import 'src/assists/component_assist.dart';
@@ -13,6 +14,7 @@ class JasprLinter extends PluginBase {
   @override
   List<LintRule> getLintRules(CustomLintConfigs configs) => [
         SortChildrenPropertiesLastLint(),
+        PreferHtmlMethodLint(),
       ];
 
   @override
