@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.15.1
 
 - Include and setup `jaspr_lints` in newly created projects.
 - Added `jaspr analyze` command to check all custom lints.
