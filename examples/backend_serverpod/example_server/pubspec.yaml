@@ -8,8 +8,7 @@ environment:
 
 dependencies:
   jaspr: ^0.15.0
-  jaspr_serverpod:
-    path: ../../../packages/jaspr_serverpod
+  jaspr_serverpod: ^0.3.2
   serverpod: 2.1.1
 
 dev_dependencies:
