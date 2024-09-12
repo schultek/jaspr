@@ -1,11 +1,8 @@
-## Unreleased minor
-<<<<<<< feat/analyzer_plugin
+## Unreleased patch
 
 - Include and setup `jaspr_lints` in newly created projects.
 - Added `jaspr analyze` command to check all custom lints.
-=======
-- Added css variable for Unit, Color, Angle and FontFamily.
->>>>>>> main
+- Added css variable support with `Unit.variable()`, `Color.variable()`, `Angle.variable()` and `FontFamily.variable()`.
 
 ## 0.15.0
 
