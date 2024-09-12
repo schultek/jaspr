@@ -86,10 +86,11 @@ Rather it embraces these differences to give the best of both worlds.
 - **/examples**: Well-maintained and documented examples
 - **/experiments**: Experimental apps or features, that are not part of the core framework (yet?) (may be broken).
 - **/packages**:
-  - [**/jaspr**](https://github.com/schultek/jaspr/tree/main/packages/jaspr): The core framework package.
+  - **/jaspr**: The core framework package.
   - **/jaspr_builder**: Code-generation builders for jaspr.
   - **/jaspr_cli**: The command line interface of jaspr.
   - **/jaspr_flutter_embed**: Flutter element embedding bindings for jaspr.
+  - **/jaspr_lints**: A collection of lints and assists for jaspr projects.
   - **/jaspr_riverpod**: Riverpod implementation for jaspr.
   - **/jaspr_router**: A router implementation for jaspr.
   - **/jaspr_test**: A testing package for jaspr.
