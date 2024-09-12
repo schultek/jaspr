@@ -109,8 +109,7 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
 
   final Uri? _currentUri;
   @override
-  Uri get currentUri =>
-      _currentUri ?? (throw 'Did not call setUp() with currentUri provided.');
+  Uri get currentUri => _currentUri ?? (throw 'Did not call setUp() with currentUri provided.');
 
   final bool _isClient;
   @override
@@ -155,13 +154,8 @@ class TestRenderObject extends RenderObject {
   }
 
   @override
-  void updateElement(
-      String tag,
-      String? id,
-      String? classes,
-      Map<String, String>? styles,
-      Map<String, String>? attributes,
-      Map<String, EventCallback>? events) {
+  void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
+      Map<String, String>? attributes, Map<String, EventCallback>? events) {
     this
       ..tag = tag
       ..id = id

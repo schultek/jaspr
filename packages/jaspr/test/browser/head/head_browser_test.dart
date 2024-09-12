@@ -11,13 +11,9 @@ void main() {
     testBrowser('should serve component', (tester) async {
       await tester.pumpComponent(App());
 
-      var nodes =
-          AttachAdapter.instanceFor(AttachTarget.head).liveNodes.toList();
+      var nodes = AttachAdapter.instanceFor(AttachTarget.head).liveNodes.toList();
 
-      expect(nodes, [
-        _hasOuterHtml('<title>c</title>'),
-        _hasOuterHtml('<meta name="c" content="e">')
-      ]);
+      expect(nodes, [_hasOuterHtml('<title>c</title>'), _hasOuterHtml('<meta name="c" content="e">')]);
 
       await tester.click(find.tag('button'));
 

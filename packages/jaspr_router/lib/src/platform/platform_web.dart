@@ -18,8 +18,7 @@ class PlatformRouterImpl implements PlatformRouter {
 /// Accesses the window.history api
 class HistoryManagerImpl implements HistoryManager {
   @override
-  void init(AppBinding binding,
-      {void Function(Object? state, {String? url})? onChangeState}) {
+  void init(AppBinding binding, {void Function(Object? state, {String? url})? onChangeState}) {
     if (onChangeState != null) {
       window.onPopState.listen((event) {
         onChangeState(window.history.state);
