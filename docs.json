@@ -38,7 +38,8 @@
         {"title":  "\uD83D\uDD79 Jaspr CLI", "href": "/get_started/cli"},
         {"title":  "\uD83D\uDCDF Rendering Modes", "href": "/get_started/modes"},
         {"title":  "\uD83D\uDCA7 Hydration", "href": "/get_started/hydration"},
-        {"title":  "\uD83D\uDCE6 Project Structure", "href": "/get_started/project_structure"}
+        {"title":  "\uD83D\uDCE6 Project Structure", "href": "/get_started/project_structure"},
+        {"title":  "\uD83E\uDDF9 Linting", "href": "/get_started/linting"}
       ]
     },
     {
