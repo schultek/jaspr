@@ -3,7 +3,7 @@ description: A collection of lints and assists for jaspr projects.
 version: 0.1.0
 homepage: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
-documentation: https://docs.page/schultek/jaspr
+documentation: https://docs.page/schultek/jaspr/get_started/linting
 funding:
   - https://github.com/sponsors/schultek
 
@@ -23,4 +23,4 @@ dependencies:
   yaml: ^3.1.2
 
 dev_dependencies:
-  lints: ^3.0.0
+  lints: ^4.0.0

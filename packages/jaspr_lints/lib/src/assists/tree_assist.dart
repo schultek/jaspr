@@ -71,12 +71,7 @@ class TreeAssistProvider extends DartAssist {
     wrapWith('ul');
     wrapWith('li');
 
-    final cb = reporter.createChangeBuilder(
-      priority: 2,
-      message: 'Wrap with component...',
-    );
-
-    cb.addDartFileEdit((builder) {
+    reporter.createChangeBuilder(priority: 2, message: 'Wrap with component...').addDartFileEdit((builder) {
       builder.addReplacement(node.sourceRange, (edit) {
         edit.addSimpleLinkedEdit('comp', 'component');
         edit.write('(\n');
@@ -88,12 +83,7 @@ class TreeAssistProvider extends DartAssist {
       });
     });
 
-    final cb2 = reporter.createChangeBuilder(
-      priority: 2,
-      message: 'Wrap with Builder',
-    );
-
-    cb2.addDartFileEdit((builder) {
+    reporter.createChangeBuilder(priority: 2, message: 'Wrap with Builder').addDartFileEdit((builder) {
       builder.addReplacement(node.sourceRange, (edit) {
         edit.write('Builder(builder: (context) sync* {\n');
         edit.write(''.padLeft(lineIndent, ' '));
@@ -127,12 +117,7 @@ class TreeAssistProvider extends DartAssist {
     var content = resolver.source.contents.data;
 
     if (children.length == 1) {
-      final cb = reporter.createChangeBuilder(
-        priority: 3,
-        message: 'Remove this component',
-      );
-
-      cb.addDartFileEdit((builder) {
+      reporter.createChangeBuilder(priority: 3, message: 'Remove this component').addDartFileEdit((builder) {
         builder.addReplacement(node.sourceRange, (edit) {
           var child = children.first;
           var childIndent = getLineIndent(resolver.lineInfo, child);
@@ -140,12 +125,7 @@ class TreeAssistProvider extends DartAssist {
         });
       });
     } else if (node.parent is ListLiteral) {
-      final cb = reporter.createChangeBuilder(
-        priority: 3,
-        message: 'Remove this component',
-      );
-
-      cb.addDartFileEdit((builder) {
+      reporter.createChangeBuilder(priority: 3, message: 'Remove this component').addDartFileEdit((builder) {
         builder.addReplacement(node.sourceRange, (edit) {
           for (var child in children) {
             var childIndent = getLineIndent(resolver.lineInfo, child);
@@ -162,12 +142,7 @@ class TreeAssistProvider extends DartAssist {
         });
       });
     } else if (node.parent is YieldStatement) {
-      final cb = reporter.createChangeBuilder(
-        priority: 3,
-        message: 'Remove this component',
-      );
-
-      cb.addDartFileEdit((builder) {
+      reporter.createChangeBuilder(priority: 3, message: 'Remove this component').addDartFileEdit((builder) {
         builder.addReplacement(node.parent!.sourceRange, (edit) {
           for (var child in children) {
             var childIndent = getLineIndent(resolver.lineInfo, child);
