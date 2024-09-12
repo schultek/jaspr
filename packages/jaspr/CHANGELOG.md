@@ -1,3 +1,6 @@
+## Unreleased minor
+- Added css variable for Unit, Color, Angle and FontFamily.
+
 ## 0.15.0
 
 - Added support for using `@css` and `@encoder`/`@decoder` across other packages.
