@@ -2,6 +2,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
+import 'package:analyzer_plugin/utilities/change_builder/change_builder_dart.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../utils.dart';
@@ -78,44 +79,36 @@ class CssAssistProvider extends DartAssist {
         .whereType<ListLiteral>()
         .firstOrNull;
 
-    final cb = reporter.createChangeBuilder(
-      priority: 1,
-      message: 'Add styles',
-    );
-    cb.addDartFileEdit((builder) {
+    reporter.createChangeBuilder(priority: 1, message: 'Add styles').addDartFileEdit((builder) {
+      void writeCssRule(DartEditBuilder edit) {
+        edit.write('  css(\'');
+        if (idVal != null) {
+          edit.write('#$idVal\').');
+        } else if (classesVal != null) {
+          edit.write('.$classesVal\').');
+        } else {
+          edit.write('.');
+          edit.addSimpleLinkedEdit('className', 'classname');
+          edit.write('\').');
+        }
+        edit.addSimpleLinkedEdit(
+          'styles',
+          'box',
+          kind: LinkedEditSuggestionKind.METHOD,
+          suggestions: ['box', 'text', 'background', 'flexbox', 'flexItem', 'grid', 'gridItem', 'list'],
+        );
+        edit.write('(),\n  ');
+      }
+
       if (styles == null) {
         builder.addInsertion(comp.$2.end, (edit) {
-          edit.write('\n\n  @css\n  static final List<StyleRule> styles = [\n    css(\'');
-          if (idVal != null) {
-            edit.write('#$idVal\').');
-          } else if (classesVal != null) {
-            edit.write('.$classesVal\').');
-          } else {
-            edit.write('.');
-            edit.addSimpleLinkedEdit('className', 'classname');
-            edit.write('\').');
-          }
-          edit.addSimpleLinkedEdit('styles', 'box',
-              kind: LinkedEditSuggestionKind.METHOD,
-              suggestions: ['box', 'text', 'background', 'flexbox', 'flexItem', 'grid', 'gridItem', 'list']);
-          edit.write('(),\n  ];');
+          edit.write('\n\n  @css\n  static final List<StyleRule> styles = [\n  ');
+          writeCssRule(edit);
+          edit.write('];');
         });
       } else {
         builder.addInsertion(styles.rightBracket.offset, (edit) {
-          edit.write('  css(\'');
-          if (idVal != null) {
-            edit.write('#$idVal\').');
-          } else if (classesVal != null) {
-            edit.write('.$classesVal\').');
-          } else {
-            edit.write('.');
-            edit.addSimpleLinkedEdit('className', 'classname');
-            edit.write('\').');
-          }
-          edit.addSimpleLinkedEdit('styles', 'box',
-              kind: LinkedEditSuggestionKind.METHOD,
-              suggestions: ['box', 'text', 'background', 'flexbox', 'flexItem', 'grid', 'gridItem', 'list']);
-          edit.write('(),\n  ');
+          writeCssRule(edit);
         });
       }
 
@@ -141,7 +134,11 @@ class CssAssistProvider extends DartAssist {
   }
 
   void convertToNested(
-      CustomLintResolver resolver, ChangeReporter reporter, FunctionExpressionInvocation node, int lineIndent) {
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    FunctionExpressionInvocation node,
+    int lineIndent,
+  ) {
     if (node.argumentList.arguments.length != 1) {
       return;
     }
@@ -149,12 +146,7 @@ class CssAssistProvider extends DartAssist {
     var selector = node.argumentList.arguments.first;
     var chain = getFullChain(node.parent);
 
-    final cb = reporter.createChangeBuilder(
-      priority: 1,
-      message: 'Convert to nested styles',
-    );
-
-    cb.addDartFileEdit((builder) {
+    reporter.createChangeBuilder(priority: 1, message: 'Convert to nested styles').addDartFileEdit((builder) {
       builder.addInsertion(selector.end, (edit) {
         edit.write(', [\n${''.padLeft(lineIndent)}  css(\'&\'');
       });

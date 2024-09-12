@@ -66,7 +66,11 @@ class ComponentAssistProvider extends DartAssist {
   }
 
   void createStatelessComponent(
-      ChangeReporter reporter, SourceRange target, String nameSuggestion, bool hasJasprImport) {
+    ChangeReporter reporter,
+    SourceRange target,
+    String nameSuggestion,
+    bool hasJasprImport,
+  ) {
     reporter.createChangeBuilder(priority: 1, message: 'Create StatelessComponent').addDartFileEdit((builder) {
       builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
         edit.write('class ');
@@ -87,7 +91,11 @@ class ComponentAssistProvider extends DartAssist {
   }
 
   void createStatefulComponent(
-      ChangeReporter reporter, SourceRange target, String nameSuggestion, bool hasJasprImport) {
+    ChangeReporter reporter,
+    SourceRange target,
+    String nameSuggestion,
+    bool hasJasprImport,
+  ) {
     reporter.createChangeBuilder(priority: 1, message: 'Create StatefulComponent').addDartFileEdit((builder) {
       builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
         edit.write('class ');
@@ -114,7 +122,11 @@ class ComponentAssistProvider extends DartAssist {
   }
 
   void createInheritedComponent(
-      ChangeReporter reporter, SourceRange target, String nameSuggestion, bool hasJasprImport) {
+    ChangeReporter reporter,
+    SourceRange target,
+    String nameSuggestion,
+    bool hasJasprImport,
+  ) {
     reporter.createChangeBuilder(priority: 1, message: 'Create InheritedComponent').addDartFileEdit((builder) {
       if (!hasJasprImport) {
         builder.importLibrary(Uri.parse('package:jaspr/jaspr.dart'));

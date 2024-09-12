@@ -13,8 +13,8 @@ class TreeAssistProvider extends DartAssist {
     CustomLintContext context,
     SourceRange target,
   ) {
-    context.registry.addInvocationExpression((node) {
-      if (!target.coveredBy(node.function.sourceRange)) {
+    void treeAssistsFor(Expression node, AstNode anchor, ArgumentList argumentList) {
+      if (!target.coveredBy(anchor.sourceRange)) {
         return;
       }
       if (!isComponentType(node.staticType)) {
@@ -22,20 +22,15 @@ class TreeAssistProvider extends DartAssist {
       }
       final indent = getLineIndent(resolver.lineInfo, node);
       wrapComponent(resolver, reporter, node, indent);
-      removeComponent(resolver, reporter, node, indent, node.argumentList);
+      removeComponent(resolver, reporter, node, indent, argumentList);
       extractComponent(resolver, reporter, node, indent);
+    }
+
+    context.registry.addInvocationExpression((node) {
+      treeAssistsFor(node, node.function, node.argumentList);
     });
     context.registry.addInstanceCreationExpression((node) {
-      if (!target.coveredBy(node.constructorName.sourceRange)) {
-        return;
-      }
-      if (!isComponentType(node.staticType)) {
-        return;
-      }
-      final indent = getLineIndent(resolver.lineInfo, node);
-      wrapComponent(resolver, reporter, node, indent);
-      removeComponent(resolver, reporter, node, indent, node.argumentList);
-      extractComponent(resolver, reporter, node, indent);
+      treeAssistsFor(node, node.constructorName, node.argumentList);
     });
   }
 
@@ -47,16 +42,15 @@ class TreeAssistProvider extends DartAssist {
         '([\n${''.padLeft(lineIndent)}${lines.map((s) => '  $s').join('\n')},\n${''.padLeft(lineIndent)}])';
 
     void wrapWith(String name, [List<String>? suggestions]) {
-      final cb = reporter.createChangeBuilder(
-        priority: 2,
-        message: 'Wrap with $name',
-      );
-
-      cb.addDartFileEdit((builder) {
+      reporter.createChangeBuilder(priority: 2, message: 'Wrap with $name').addDartFileEdit((builder) {
         builder.addReplacement(node.sourceRange, (edit) {
           if (suggestions != null) {
-            edit.addSimpleLinkedEdit(name, suggestions.first,
-                kind: LinkedEditSuggestionKind.METHOD, suggestions: suggestions);
+            edit.addSimpleLinkedEdit(
+              name,
+              suggestions.first,
+              kind: LinkedEditSuggestionKind.METHOD,
+              suggestions: suggestions,
+            );
           } else {
             edit.write(name);
           }
@@ -95,8 +89,13 @@ class TreeAssistProvider extends DartAssist {
     });
   }
 
-  void removeComponent(CustomLintResolver resolver, ChangeReporter reporter, Expression node, int lineIndent,
-      ArgumentList argumentList) {
+  void removeComponent(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    Expression node,
+    int lineIndent,
+    ArgumentList argumentList,
+  ) {
     var children = <AstNode>[
       for (var arg in argumentList.arguments)
         if (arg is NamedExpression)
@@ -165,12 +164,7 @@ class TreeAssistProvider extends DartAssist {
     var content = resolver.source.contents.data;
     var source = content.substring(node.offset, node.end).reIndent(4 - lineIndent, skipFirst: true);
 
-    final cb = reporter.createChangeBuilder(
-      priority: 4,
-      message: 'Extract component',
-    );
-
-    cb.addDartFileEdit((builder) {
+    reporter.createChangeBuilder(priority: 4, message: 'Extract component').addDartFileEdit((builder) {
       builder.addInsertion(resolver.source.contents.data.length, (edit) {
         edit.write('\nclass ');
         edit.addSimpleLinkedEdit('name', 'MyComponent');
