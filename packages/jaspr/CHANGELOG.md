@@ -1,5 +1,8 @@
-## Unreleased minor
-- Added css variable for Unit, Color, Angle and FontFamily.
+## 0.15.1
+
+- Include and setup `jaspr_lints` in newly created projects.
+- Added `jaspr analyze` command to check all custom lints.
+- Added css variable support with `Unit.variable()`, `Color.variable()`, `Angle.variable()` and `FontFamily.variable()`.
 
 ## 0.15.0
 

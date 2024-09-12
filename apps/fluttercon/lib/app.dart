@@ -21,27 +21,28 @@ class App extends AsyncStatelessComponent {
     final sessions = (sessionsJson as List).map((s) => SessionMapper.fromMap(s)).toList();
 
     yield Router(
-        redirect: (context, state) {
-          if (state.location == '/') return '/day-1';
-          return null;
-        },
-        routes: [
-          for (var i = 1; i < 4; i++)
-            Route(
-              path: '/day-$i',
-              title: 'Fluttercon Berlin 2024',
-              builder: (context, state) => SchedulePage(
-                day: i,
-                sessions: sessions.where((s) => s.startsAt.day == i + 2).toList(),
-              ),
+      redirect: (context, state) {
+        if (state.location == '/') return '/day-1';
+        return null;
+      },
+      routes: [
+        for (var i = 1; i < 4; i++)
+          Route(
+            path: '/day-$i',
+            title: 'Fluttercon Berlin 2024',
+            builder: (context, state) => SchedulePage(
+              day: i,
+              sessions: sessions.where((s) => s.startsAt.day == i + 2).toList(),
             ),
-          Route(path: '/favorites', title: 'Favorites', builder: (context, state) => FavoritesPage()),
-          for (var session in sessions)
-            Route(
-              path: '/${session.slug}',
-              title: session.title,
-              builder: (context, state) => SessionPage(session: session),
-            ),
-        ]);
+          ),
+        Route(path: '/favorites', title: 'Favorites', builder: (context, state) => FavoritesPage()),
+        for (var session in sessions)
+          Route(
+            path: '/${session.slug}',
+            title: session.title,
+            builder: (context, state) => SessionPage(session: session),
+          ),
+      ],
+    );
   }
 }

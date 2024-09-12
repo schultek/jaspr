@@ -7,6 +7,7 @@ import 'package:cli_completion/cli_completion.dart';
 import 'package:mason/mason.dart';
 import 'package:pub_updater/pub_updater.dart';
 
+import 'commands/analyze_command.dart';
 import 'commands/base_command.dart';
 import 'commands/build_command.dart';
 import 'commands/clean_command.dart';
@@ -37,6 +38,7 @@ class JasprCommandRunner extends CompletionCommandRunner<CommandResult?> {
     addCommand(CreateCommand());
     addCommand(ServeCommand());
     addCommand(BuildCommand());
+    addCommand(AnalyzeCommand());
     addCommand(CleanCommand());
     addCommand(UpdateCommand());
     addCommand(DoctorCommand());
