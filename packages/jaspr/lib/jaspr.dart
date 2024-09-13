@@ -8,6 +8,7 @@ export 'src/components/html/html.dart';
 export 'src/components/listenable_builder.dart';
 export 'src/components/raw_text/raw_text.dart';
 export 'src/components/style.dart';
+export 'src/components/theme.dart';
 export 'src/foundation/annotations.dart';
 export 'src/foundation/basic_types.dart';
 export 'src/foundation/binding.dart';

@@ -1,6 +1,6 @@
 import 'package:recase/recase.dart';
 
-import '../../browser.dart';
+import '../../ui.dart';
 
 mixin BaseTheme {
   String getName();
