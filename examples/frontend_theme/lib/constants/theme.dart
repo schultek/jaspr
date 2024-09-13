@@ -13,11 +13,11 @@ enum AppTheme with AppThemeMixin {
     light: Var(Colors.black),
     dark: Var(Colors.white),
   ),
-  counterTextFontFamily(
-    light: Var(Unit.points(16)),
-    dark: Var(Unit.points(12)),
-  ),
   counterTextFontSize(
+    light: Var(Unit.points(32)),
+    dark: Var(Unit.points(24)),
+  ),
+  counterTextFontFamily(
     light: Var(FontFamilies.arial),
     dark: Var(FontFamilies.timesNewRoman),
   );
