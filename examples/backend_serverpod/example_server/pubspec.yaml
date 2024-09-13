@@ -8,7 +8,7 @@ environment:
 
 dependencies:
   jaspr: ^0.15.0
-  jaspr_serverpod: ^0.3.2
+  jaspr_serverpod: ^0.3.3
   serverpod: 2.1.1
 
 dev_dependencies:
