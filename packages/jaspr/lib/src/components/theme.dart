@@ -12,7 +12,7 @@ class Var<T> {
   final T value;
 }
 
-mixin AppThemeMixin on Enum {
+mixin ThemeMixin on Enum {
   get color => Color.variable('--${name.paramCase}');
 
   get unit => Unit.variable('--${name.paramCase}');
@@ -22,7 +22,7 @@ mixin AppThemeMixin on Enum {
 
 class ThemeUtils {
   static StyleRule getStyles(
-    List<AppThemeMixin> themeValues,
+    List<ThemeMixin> themeValues,
     List<BaseTheme> themeModes,
     Var? Function(BaseTheme, dynamic) getStyleByMode,
   ) {

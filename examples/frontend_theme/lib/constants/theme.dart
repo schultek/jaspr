@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
-enum AppTheme with AppThemeMixin {
+enum AppTheme with ThemeMixin {
   counterButtonColor(
     light: Var(Colors.red),
     dark: Var(Colors.darkRed),
