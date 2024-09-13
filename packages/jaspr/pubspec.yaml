@@ -24,6 +24,7 @@ dependencies:
   js: ^0.6.5
   meta: ^1.7.0
   path: ^1.8.0
+  recase: ^4.1.0
   shelf: ^1.2.0
   shelf_gzip: ^4.0.0
   shelf_proxy: ^1.0.1
