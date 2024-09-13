@@ -2,21 +2,36 @@ import 'package:recase/recase.dart';
 
 import '../../browser.dart';
 
-class ThemeData<T extends Enum> {
-  const ThemeData({
-    required this.name,
-    required this.data,
-  });
+mixin BaseTheme {
+  String getName();
+}
 
-  final String name;
-  final Map<T, Color> data;
+class Var<T> {
+  const Var(this.value);
 
-  static Color getColorValue(String name) => Color.variable('--${name.paramCase}');
+  final T value;
+}
 
-  StyleRule get cssStyles {
-    return css('&[data-theme=\'$name\']').raw({
-      for (var style in data.entries) '--${style.key.name.paramCase}': style.value.value,
-    });
+mixin AppThemeMixin on Enum {
+  get color => Color.variable('--${name.paramCase}');
+
+  get unit => Unit.variable('--${name.paramCase}');
+
+  get fontFamily => FontFamily.variable('--${name.paramCase}');
+}
+
+class ThemeUtils {
+  static StyleRule getStyles(
+    List<AppThemeMixin> themeValues,
+    List<BaseTheme> themeModes,
+    Var? Function(BaseTheme, dynamic) getStyleByMode,
+  ) {
+    return css('body', [
+      for (BaseTheme mode in themeModes)
+        css('&[data-theme=\'${mode.getName()}\']').raw({
+          for (var style in themeValues) '--${style.name.paramCase}': getStyleByMode(mode, style)!.value.value,
+        }),
+    ]);
   }
 }
 
@@ -29,14 +44,14 @@ class ThemeProvider extends StatefulComponent {
   });
 
   final Component child;
-  final ThemeData theme;
+  final BaseTheme theme;
 
   @override
   State createState() => ThemeProviderState();
 }
 
 class ThemeProviderState extends State<ThemeProvider> {
-  late ThemeData current;
+  late BaseTheme current;
 
   @override
   void initState() {
@@ -44,14 +59,14 @@ class ThemeProviderState extends State<ThemeProvider> {
     current = component.theme;
   }
 
-  update(ThemeData theme) {
+  update(BaseTheme theme) {
     setState(() => current = theme);
   }
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield Document.body(attributes: {
-      'data-theme': current.name,
+      'data-theme': current.getName(),
     });
     yield Theme(
       theme: current,
@@ -65,14 +80,14 @@ class Theme extends InheritedComponent {
   const Theme({
     super.key,
     required super.child,
-    required ThemeData theme,
+    required BaseTheme theme,
     required this.update,
   }) : _theme = theme;
 
-  final ThemeData _theme;
-  final void Function(ThemeData) update;
+  final BaseTheme _theme;
+  final void Function(BaseTheme) update;
 
-  ThemeData get current => _theme;
+  BaseTheme get current => _theme;
 
   static Theme of(BuildContext context) {
     final Theme? result = context.dependOnInheritedComponentOfExactType<Theme>();
