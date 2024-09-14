@@ -1,4 +1,4 @@
-## Unreleased minor
+## Unreleased patch
 
 - Add `InheritedModel<T>` similar to [flutter](https://api.flutter.dev/flutter/widgets/InheritedModel-class.html)
 
