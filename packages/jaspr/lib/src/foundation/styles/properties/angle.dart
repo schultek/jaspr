@@ -18,6 +18,9 @@ abstract class Angle {
   /// Constructs an [Angle] in the form '1turn'
   const factory Angle.turn(double value) = _TurnAngle;
 
+  /// Represents a css variable
+  const factory Angle.variable(String value) = _VariableAngle;
+
   /// The css value
   String get value;
 }
@@ -33,6 +36,21 @@ class _ZeroAngle implements Angle {
 
   @override
   int get hashCode => 0;
+}
+
+class _VariableAngle implements Angle {
+  final String _value;
+
+  const _VariableAngle(this._value);
+
+  @override
+  String get value => 'var($_value)';
+
+  @override
+  bool operator ==(Object other) => identical(this, other) || other is _VariableAngle && other._value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 class _Angle implements Angle {

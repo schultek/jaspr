@@ -1,70 +1,111 @@
 {
+  "$schema": "https://docs.page/schema.json",
   "name": "Jaspr",
-  "logo": "https://jasprpad.schultek.de/jaspr-192.png",
-  "logoDark": "https://jasprpad.schultek.de/jaspr-192.png",
+  "logo": {
+    "light": "https://jasprpad.schultek.de/jaspr-192.png",
+    "dark": "https://jasprpad.schultek.de/jaspr-192.png"
+  },
   "favicon": "https://jasprpad.schultek.de/jaspr-32.png",
-  "twitter": "schultek_dev",
   "anchors": [
-    { "title": "Discord", "icon": "discord", "link": "https://discord.gg/XGXrGEk4c6" },
-    { "title": "Playground", "icon": "code", "link": "https://jasprpad.schultek.de" }
+    { "title": "Discord", "icon": "discord", "href": "https://discord.gg/XGXrGEk4c6" },
+    { "title": "Playground", "icon": "code", "href": "https://jasprpad.schultek.de" },
+    { "title": "Twitter/X", "icon": "twitter", "href": "https://x.com/schultek_dev" }
   ],
+  "social": {
+    "x": "@schultek_dev",
+    "github": "schultek"
+  },
+  "theme": {
+    "primary": "#01589B"
+  },
   "sidebar": [
-    ["\uD83D\uDCD6 Overview", "/"],
-    ["\uD83E\uDD4A Jaspr vs Flutter Web", "/jaspr-vs-flutter-web"],
-    ["Get Started", [
-      ["\uD83D\uDEEB Installation", "/get_started/installation"],
-      ["\uD83D\uDD79 Jaspr CLI", "/get_started/cli"],
-      ["\uD83D\uDCDF Rendering Modes", "/get_started/modes"],
-      ["\uD83D\uDCA7 Hydration", "/get_started/hydration"],
-      ["\uD83D\uDCE6 Project Structure", "/get_started/project_structure"]
-    ]],
-    ["Key Concepts", [
-      ["\uD83E\uDDF1 Component System", "/concepts/components"],
-      ["\uD83D\uDD8D Writing HTML", "/concepts/html"],
-      ["\uD83C\uDFA8 Styling", "/concepts/styling"],
-      ["\uD83E\uDDED Routing", "/concepts/routing"],
-      ["\uD83D\uDCE1 Data Fetching", "/concepts/data_fetching"],
-      ["\uD83D\uDD0E SEO & Meta", "/concepts/seo"],
-      ["\uD83E\uDDEA Testing", "/concepts/testing"],
-      ["\uD83C\uDF10 Deploying", "/concepts/deploying"]
-    ]],
-    ["Going Further", [
-      ["\uD83D\uDC99 Flutter Embedding", "/going_further/flutter_embedding"],
-      ["\uD83E\uDE90 Custom Backend", "/going_further/backend"],
-      ["\uD83C\uDF1F Contributing", "/going_further/contributing"]
-    ]],
-    ["Ecosystem", [
-      ["\uD83C\uDF0A Riverpod", "/eco/riverpod"],
-      ["\uD83C\uDF2C️ Tailwind", "/eco/tailwind"],
-      ["\uD83D\uDCDA Third-Party Packages", "/eco/packages"]
-    ]],
-    ["Components", [
-      ["Document", "/components/document"],
-      ["RawText", "/components/raw_text"],
-      ["AsyncBuilder", "/components/async_components"],
-      ["AsyncStatelessComponent", "/components/async_components"],
-      ["Router", "/components/router"],
-      ["Link", "/components/link"],
-      ["Style", "/components/style"],
-      ["FlutterEmbedView", "/components/flutter_embed_view"],
-      ["Fragment", "/components/fragment"]
-    ]],
-    ["Utilities", [
-      ["runApp", "/utils/run_app"],
-      ["@client", "/utils/at_client"],
-      ["@css / css()", "/utils/at_css"],
-      ["Styles", "/utils/styles"],
-      ["events()", "/utils/events"],
-      ["@sync", "/utils/at_sync"],
-      ["SyncStateMixin", "/utils/sync_state_mixin"],
-      ["PreloadStateMixin", "/utils/preload_state_mixin"],
-      ["@encoder/@decoder", "/utils/at_encoder_decoder"],
-      ["@Import", "/utils/at_import"]
-    ]]
+    {
+      "pages": [
+        {
+          "title": "\uD83D\uDCD6 Overview",
+          "href": "/"
+        },
+        {
+          "title": "\uD83E\uDD4A Jaspr vs Flutter Web",
+          "href": "/jaspr-vs-flutter-web"
+        }
+      ]
+    },
+    {
+      "group": "Get Started",
+      "pages": [
+        {"title":  "\uD83D\uDEEB Installation", "href": "/get_started/installation"},
+        {"title":  "\uD83D\uDD79 Jaspr CLI", "href": "/get_started/cli"},
+        {"title":  "\uD83D\uDCDF Rendering Modes", "href": "/get_started/modes"},
+        {"title":  "\uD83D\uDCA7 Hydration", "href": "/get_started/hydration"},
+        {"title":  "\uD83D\uDCE6 Project Structure", "href": "/get_started/project_structure"},
+        {"title":  "\uD83E\uDDF9 Linting", "href": "/get_started/linting"}
+      ]
+    },
+    {
+      "group": "Key Concepts",
+      "pages": [
+        {"title": "\uD83E\uDDF1 Component System", "href": "/concepts/components"},
+        {"title": "\uD83D\uDD8D Writing HTML", "href": "/concepts/html"},
+        {"title": "\uD83C\uDFA8 Styling", "href": "/concepts/styling"},
+        {"title": "\uD83E\uDDED Routing", "href": "/concepts/routing"},
+        {"title": "\uD83D\uDCE1 Data Fetching", "href": "/concepts/data_fetching"},
+        {"title": "\uD83D\uDD0E SEO & Meta", "href": "/concepts/seo"},
+        {"title": "\uD83E\uDDEA Testing", "href": "/concepts/testing"},
+        {"title": "\uD83C\uDF10 Deploying", "href" :"/concepts/deploying"}
+      ]
+    },
+    {
+      "group": "Going Further",
+      "pages": [
+        {"title": "\uD83D\uDC99 Flutter Embedding", "href": "/going_further/flutter_embedding"},
+        {"title": "\uD83E\uDE90 Custom Backend", "href": "/going_further/backend"},
+        {"title": "\uD83C\uDF1F Contributing", "href" :"/going_further/contributing"}
+      ]
+    },
+    {
+      "group": "Ecosystem",
+      "pages": [
+        {"title": "\uD83C\uDF0A Riverpod", "href": "/eco/riverpod"},
+        {"title": "\uD83C\uDF2C️ Tailwind", "href": "/eco/tailwind"},
+        {"title": "\uD83D\uDCDA Third-Party Packages", "href" :"/eco/packages"}
+      ]
+    },
+    {
+      "group": "Components",
+      "pages": [
+        {"title": "Document", "href": "/components/document"},
+        {"title": "RawText", "href": "/components/raw_text"},
+        {"title": "AsyncBuilder", "href": "/components/async_components"},
+        {"title": "AsyncStatelessComponent", "href": "/components/async_components"},
+        {"title": "Router", "href": "/components/router"},
+        {"title": "Link", "href": "/components/link"},
+        {"title": "Style", "href": "/components/style"},
+        {"title": "FlutterEmbedView", "href": "/components/flutter_embed_view"},
+        {"title": "Fragment", "href" :"/components/fragment"}
+      ]
+    },
+    {
+      "group": "Utilities",
+      "pages": [
+        {"title": "runApp", "href": "/utils/run_app"},
+        {"title": "@client", "href": "/utils/at_client"},
+        {"title": "@css / css()", "href": "/utils/at_css"},
+        {"title": "Styles", "href": "/utils/styles"},
+        {"title": "events()", "href": "/utils/events"},
+        {"title": "@sync", "href": "/utils/at_sync"},
+        {"title": "SyncStateMixin", "href": "/utils/sync_state_mixin"},
+        {"title": "PreloadStateMixin", "href": "/utils/preload_state_mixin"},
+        {"title": "@encoder/@decoder", "href": "/utils/at_encoder_decoder"},
+        {"title": "@Import", "href": "/utils/at_import"}
+      ]
+    }
   ],
-  "docsearch": {
-    "appId": "0JMHSW1KVQ",
-    "apiKey": "8468af6f1ca29778add97e829aa8f69a",
-    "indexName": "schultek"
+  "search": {
+    "docsearch": {
+      "appId": "0JMHSW1KVQ",
+      "apiKey": "8468af6f1ca29778add97e829aa8f69a",
+      "indexName": "schultek"
+    }
   }
 }

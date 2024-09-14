@@ -117,10 +117,10 @@ packages:
     dependency: "direct dev"
     description:
       name: build_web_compilers
-      sha256: ebd3db74f0d53ae9b91a214016e35733add484a1a3014e188754954e8d69843c
+      sha256: e8d818410cc8b4dc96c4960ce0ab84fe3f2b0ca6576cc130fd7277b56eba9d68
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.8"
+    version: "4.0.11"
   built_collection:
     dependency: transitive
     description:
@@ -295,7 +295,7 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.13.3"
+    version: "0.15.1"
   js:
     dependency: transitive
     description:
@@ -569,4 +569,4 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=3.1.0 <3.5.0"
+  dart: ">=3.5.0-259.0.dev <3.6.0"

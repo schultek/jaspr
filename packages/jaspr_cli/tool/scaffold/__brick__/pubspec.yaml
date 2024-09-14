@@ -20,7 +20,8 @@ dev_dependencies:
   jaspr_builder: ^{{jasprBuilderVersion}}{{#flutter}}
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0{{/flutter}}{{^flutter}}
+  flutter_lints: ^3.0.0{{/flutter}}
+  jaspr_lints: ^{{jasprLintsVersion}}{{^flutter}}
   lints: ^3.0.0{{/flutter}}
 
 jaspr:

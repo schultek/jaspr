@@ -42,7 +42,5 @@ class SessionCard extends StatelessComponent {
       css('div').flexbox(),
       css('button').box(position: Position.absolute(right: 10.px, top: 10.px)),
     ]),
-    ...LikeButton.styles,
-    ...Tag.styles,
   ];
 }

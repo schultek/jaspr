@@ -13,14 +13,16 @@ enum Tag {
   cli('CLI', cyan),
   builder('BUILDER', magenta),
   server('SERVER', yellow),
-  flutter('FLUTTER', blue);
+  flutter('FLUTTER', blue),
+  none('', black);
 
   const Tag(this.name, this.color);
   final String name;
   final AnsiCode color;
 
   String format() {
-    return color.wrap('[$name]')!;
+    if (this == none) return '';
+    return color.wrap('[$name] ')!;
   }
 }
 
@@ -68,7 +70,7 @@ class Logger {
     }
   }
 
-  void write(String message, {Tag tag = Tag.cli, Level level = Level.info, ProgressState? progress}) {
+  void write(String message, {Tag tag = Tag.none, Level level = Level.info, ProgressState? progress}) {
     if (level == Level.verbose && !verbose) {
       return;
     }
@@ -84,7 +86,7 @@ class Logger {
 
     var showAsProgress = !verbose && progress != null && (progress == ProgressState.running || _progress != null);
 
-    String log = '${tag.format()} ${level.format(message.trim())}';
+    String log = '${tag.format()}${level.format(message.trim())}';
 
     if (showAsProgress) {
       _progress ??= logger.progress(log);

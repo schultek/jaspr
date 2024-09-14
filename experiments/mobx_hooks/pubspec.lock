@@ -303,14 +303,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.13.3"
+    version: "0.15.1"
   jaspr_test:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_test"
       relative: true
     source: path
-    version: "0.13.3"
+    version: "0.15.1"
   js:
     dependency: transitive
     description:
@@ -499,10 +499,10 @@ packages:
     dependency: transitive
     description:
       name: source_map_stack_trace
-      sha256: "84cf769ad83aa6bb61e0aa5a18e53aea683395f196a6f39c4c881fb90ed4f7ae"
+      sha256: c0713a43e323c3302c2abe2a1cc89aa057a387101ebd280371d6a6c9fa68516b
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
   source_maps:
     dependency: transitive
     description:

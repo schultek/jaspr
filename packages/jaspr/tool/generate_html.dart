@@ -5,6 +5,8 @@ void main() {
   var specFile = File('tool/data/html.json');
   var specJson = jsonDecode(specFile.readAsStringSync()) as Map<String, dynamic>;
 
+  var allTags = <String>{};
+
   for (var key in specJson.keys) {
     var group = specJson[key] as Map<String, dynamic>;
     var file = File('lib/src/components/html/$key.dart');
@@ -19,6 +21,7 @@ void main() {
         continue;
       }
 
+      allTags.add(tag);
       content.write('\n${data['doc'].split('\n').map((t) => '/// $t\n').join()}');
 
       var attrs = data['attributes'] as Map<String, dynamic>?;
@@ -206,4 +209,7 @@ void main() {
 
     file.writeAsStringSync(content.toString());
   }
+
+  var lintFile = File('../jaspr_lints/lib/src/all_html_tags.dart');
+  lintFile.writeAsStringSync('const allHtmlTags = {${allTags.map((t) => "'$t'").join(', ')}};\n');
 }
