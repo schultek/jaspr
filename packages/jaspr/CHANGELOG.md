@@ -1,3 +1,7 @@
+## Unreleased breaking
+
+- **BREAKING** Migrate all packages to `package:web`, replacing `dart:html`.
+
 ## 0.15.1
 
 - Include and setup `jaspr_lints` in newly created projects.
