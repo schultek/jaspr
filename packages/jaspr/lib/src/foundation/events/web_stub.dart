@@ -1,5 +1,7 @@
 abstract class Event {
   Node get target;
+
+  void preventDefault();
 }
 
 abstract class HTMLInputElement implements Node {
