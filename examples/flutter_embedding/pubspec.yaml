@@ -7,11 +7,11 @@ environment:
   sdk: '>=3.0.0-0 <4.0.0'
 
 dependencies:
-  firebase_core: ^2.15.1
+  firebase_core: ^3.4.1
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.4.0
-  jaspr: ^0.15.0
+  jaspr: ^0.15.1
   jaspr_flutter_embed: ^0.3.4
   jaspr_riverpod: ^0.3.14
   riverpod: ^2.4.0
@@ -21,7 +21,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
-  jaspr_builder: ^0.15.0
+  jaspr_builder: ^0.15.1
   jaspr_web_compilers: ^4.0.10
 
 flutter:
