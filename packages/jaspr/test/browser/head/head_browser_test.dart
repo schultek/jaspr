@@ -2,7 +2,6 @@
 
 import 'package:jaspr/src/components/document/document_client.dart';
 import 'package:jaspr_test/browser_test.dart';
-import 'package:web/web.dart';
 
 import 'head_app.dart';
 
@@ -14,9 +13,9 @@ void main() {
       var nodes = AttachAdapter.instanceFor(AttachTarget.head).liveNodes.toList();
 
       expect(nodes, [
-        _hasOuterHtml('<title>c</title>'),
-        _hasOuterHtml('<meta name="test" content="b">'),
-        _hasOuterHtml('<meta name="c" content="e">'),
+        hasOuterHtml('<title>c</title>'),
+        hasOuterHtml('<meta name="test" content="b">'),
+        hasOuterHtml('<meta name="c" content="e">'),
       ]);
 
       await tester.click(find.tag('button'));
@@ -24,14 +23,10 @@ void main() {
       nodes = AttachAdapter.instanceFor(AttachTarget.head).liveNodes.toList();
 
       expect(nodes, [
-        _hasOuterHtml('<title>d</title>'),
-        _hasOuterHtml('<meta name="test" content="b">'),
-        _hasOuterHtml('<meta name="c" content="d">'),
+        hasOuterHtml('<title>d</title>'),
+        hasOuterHtml('<meta name="test" content="b">'),
+        hasOuterHtml('<meta name="c" content="d">'),
       ]);
     });
   });
-}
-
-Matcher _hasOuterHtml(outer) {
-  return isA<HTMLElement>().having((e) => e.outerHTML, 'outerHTML', outer);
 }
