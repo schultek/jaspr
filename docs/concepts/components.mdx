@@ -3,9 +3,6 @@ title: Component System
 description: An overview of Jasprs component system.
 ---
 
-# Component System
-* An overview of Jasprs component system.*
-
 ---
 
 **Jaspr** comes with a component system that is very similar to Flutters widgets. This is a core design decision of jaspr, in order to look and feel very familiar to developers coming from Flutter. You might think of it as just replacing the word 'Widget' with 'Component' *(which actually was a small part of jasprs development process 😉)*, while keeping the same structure and behavior.
@@ -133,6 +130,12 @@ class MyInheritedComponent extends InheritedComponent {
 
   const MyInheritedComponent({required Component child, Key? key}) 
     : super(child: child, key: key);
+
+  static MyInheritedComponent of(BuildContext context) {
+    final MyInheritedComponent? result = context.dependOnInheritedComponentOfExactType<MyInheritedComponent>();
+    assert(result != null, 'No MyInheritedComponent found in context');
+    return result!;
+  }
 
   @override
   bool updateShouldNotify(covariant MyInheritedComponent oldComponent) {

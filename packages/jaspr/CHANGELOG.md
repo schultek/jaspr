@@ -1,3 +1,13 @@
+## Unreleased breaking
+
+- **BREAKING** Migrate all packages to `package:web`, replacing `dart:html`.
+
+## 0.15.1
+
+- Include and setup `jaspr_lints` in newly created projects.
+- Added `jaspr analyze` command to check all custom lints.
+- Added css variable support with `Unit.variable()`, `Color.variable()`, `Angle.variable()` and `FontFamily.variable()`.
+
 ## 0.15.0
 
 - Added support for using `@css` and `@encoder`/`@decoder` across other packages.

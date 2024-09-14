@@ -51,6 +51,9 @@ abstract class Unit {
   ///auto represents the style attribute unit 'auto'
   static const Unit auto = _AutoUnit();
 
+  /// Represents a css variable
+  const factory Unit.variable(String value) = _VariableUnit;
+
   /// Constructs a [Unit] in the form '100%'
   const factory Unit.percent(double value) = _PercentUnit;
 
@@ -101,6 +104,21 @@ class _AutoUnit implements Unit {
 
   @override
   int get hashCode => 0;
+}
+
+class _VariableUnit implements Unit {
+  final String _value;
+
+  const _VariableUnit(this._value);
+
+  @override
+  String get value => 'var($_value)';
+
+  @override
+  bool operator ==(Object other) => identical(this, other) || other is _VariableUnit && other._value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 class _Unit implements Unit {

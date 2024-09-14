@@ -1,5 +1,6 @@
-## Unreleased minor
+## Unreleased breaking
 
+- **BREAKING** Migrate to `package:web`.
 - Change to new js interop system.
 - Enable flutter multi-view embedding.
 

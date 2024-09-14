@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Bump `serverpod` to `2.1.1`
+
 ## 0.3.3
 
 - `jaspr` upgraded to `0.15.0`

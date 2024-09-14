@@ -33,7 +33,7 @@ Then you are welcome to open a PR with a fix.
 
 ### 1. Cloning and setup
 
-Make sure that you are at least on **Dart SDK version 2.17.0**.
+Make sure that you are at least on **Dart SDK version 3.5.0**.
 
 Clone the project with the following command:
 ```shell
