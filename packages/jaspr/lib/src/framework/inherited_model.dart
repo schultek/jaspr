@@ -1,8 +1,4 @@
-import 'dart:collection';
-
-import 'package:meta/meta.dart';
-
-import 'framework.dart';
+part of 'framework.dart';
 
 abstract class InheritedModel<T> extends InheritedComponent {
   /// Creates an inherited component that supports dependencies qualified by
