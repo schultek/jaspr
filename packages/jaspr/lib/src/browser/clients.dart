@@ -6,20 +6,7 @@ import '../framework/framework.dart';
 import 'browser_binding.dart';
 
 typedef ClientLoader = FutureOr<ClientBuilder> Function();
-typedef ClientBuilder = Component Function(ConfigParams);
-
-class ConfigParams {
-  final Map<String, dynamic> _params;
-
-  ConfigParams(this._params);
-
-  T get<T>(String key) {
-    if (_params[key] is! T) {
-      print("$key is not $T: ${_params[key]}");
-    }
-    return _params[key];
-  }
-}
+typedef ClientBuilder = Component Function(Map<String, dynamic> params);
 
 void registerClientsSync(Map<String, ClientBuilder> clients) {
   _applyClients((name) => clients[name]!);
@@ -41,10 +28,18 @@ ClientLoader loadClient(Future<void> Function() loader, ClientBuilder builder) {
   return () => loader().then((_) => builder);
 }
 
+void runAppWithParams(ClientBuilder appBuilder) {
+  _applyClients((_) => appBuilder);
+}
+
 final _compStartRegex = RegExp(r'^\$(\S+)(?:\s+data=(.*))?$');
 final _compEndRegex = RegExp(r'^/\$(\S+)$');
 
 final _escapeRegex = RegExp(r'&(amp|lt|gt);');
+String unescapeData(String data) => data.replaceAllMapped(
+      _escapeRegex,
+      (match) => switch (match.group(1)) { 'amp' => '&', 'lt' => '<', 'gt' => '>', _ => match.group(0)! },
+    );
 
 void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
   var iterator = NodeIterator(document, NodeFilter.SHOW_COMMENT);
@@ -76,21 +71,29 @@ void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
         // Remove the data string.
         start.text = '\$${comp.$1}';
 
-        final data = (comp.$2 ?? '{}').replaceAllMapped(_escapeRegex,
-            (match) => switch (match.group(1)) { 'amp' => '&', 'lt' => '<', 'gt' => '>', _ => match.group(0)! });
-        var params = ConfigParams(jsonDecode(data));
-
-        var builder = fn(name);
-        if (builder is ClientBuilder) {
-          BrowserAppBinding().attachRootComponent(builder(params), attachBetween: between);
-        } else {
-          builder.then((b) => BrowserAppBinding().attachRootComponent(b(params), attachBetween: between));
-        }
+        var params = comp.$2 != null ? jsonDecode(unescapeData(comp.$2!)) : {};
+        unawaited(_runBuilder(name, fn(name), params, between));
       }
     }
   }
 }
 
-void runAppWithParams(ClientBuilder appBuilder) {
-  _applyClients((_) => appBuilder);
+Future<void> _runBuilder(
+  String name,
+  FutureOr<ClientBuilder> builder,
+  Map<String, dynamic> params,
+  (Node, Node) between,
+) async {
+  if (builder is Future<ClientBuilder>) {
+    builder = await builder;
+  }
+  try {
+    BrowserAppBinding().attachRootComponent((builder as ClientBuilder)(params), attachBetween: between);
+  } catch (e, st) {
+    throw Error.throwWithStackTrace(
+      "Failed to attach client component '$name'. "
+      "The following error occurred: $e",
+      st,
+    );
+  }
 }

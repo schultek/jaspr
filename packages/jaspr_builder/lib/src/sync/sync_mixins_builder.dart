@@ -84,7 +84,14 @@ class SyncMixinsBuilder implements Builder {
     }
 
     var codecs = await buildStep.loadCodecs();
-    var mixins = annotated.map((e) => generateMixinFromEntry(e, codecs, buildStep.inputId.toImportUrl())).join('\n\n');
+    String mixins;
+
+    try {
+      mixins = annotated.map((e) => generateMixinFromEntry(e, codecs, buildStep.inputId.toImportUrl())).join('\n\n');
+    } on UnsupportedError catch (e) {
+      log.severe(e.message);
+      return;
+    }
 
     var source = '''
       $generationHeader

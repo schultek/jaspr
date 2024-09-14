@@ -29,11 +29,11 @@ final clientModelClassJsonOutputs = {
     "id": "component_model_class",
     "import": "package:site/component_model_class.dart",
     "params": [
-      {"name": "a", "isNamed": false, "decoder": "p.get('a')", "encoder": "c.a"},
+      {"name": "a", "isNamed": false, "decoder": "p['a']", "encoder": "c.a"},
       {
         "name": "b",
         "isNamed": true,
-        "decoder": "[[package:site/model_class.dart]].ModelA.fromRaw(p.get('b'))",
+        "decoder": "[[package:site/model_class.dart]].ModelA.fromRaw(p['b'])",
         "encoder": "c.b.toRaw()",
       },
     ]
@@ -52,7 +52,7 @@ final clientModelClassDartOutputs = {
       '  runAppWithParams(getComponentForParams);\n'
       '}\n'
       '\n'
-      'Component getComponentForParams(ConfigParams p) {\n'
-      '  return prefix0.Component(p.get(\'a\'), b: prefix1.ModelA.fromRaw(p.get(\'b\')));\n'
+      'Component getComponentForParams(Map<String, dynamic> p) {\n'
+      '  return prefix0.Component(p[\'a\'], b: prefix1.ModelA.fromRaw(p[\'b\']));\n'
       '}\n',
 };

@@ -81,22 +81,42 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
 
   @override
   String? visitDartType(DartType type, String argument) {
-    return null;
+    if (!type.isDartPrimitive) {
+      throw UnsupportedError('Unsupported parameter type: Expected primitive type, found ${type.getDisplayString()}');
+    }
+    return argument;
   }
 
   @override
   String? visitInterfaceType(InterfaceType type, String argument) {
     if (type.isDartCoreList) {
+      var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+      var base = '($argument as List<dynamic>$nullCheck)';
+      if (type.typeArguments.first is DynamicType) {
+        return base;
+      }
       var nested = type.typeArguments.first.acceptWithArgument(this, 'i');
-      if (nested != null) {
-        var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
-        return '($argument as List<dynamic>$nullCheck)$nullCheck.map((i) => $nested).toList()';
+      if (nested == 'i') {
+        return '$base$nullCheck.cast<${type.typeArguments.first.getDisplayString()}>()';
+      } else {
+        return '$base$nullCheck.map((i) => $nested).toList()';
       }
     } else if (type.isDartCoreMap) {
+      if (!type.typeArguments.first.isDartCoreString) {
+        throw UnsupportedError(
+            'Unsupported Map key type: Expected String, found ${type.typeArguments.first.getDisplayString()}');
+      }
+
+      var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+      var base = '($argument as Map<String, dynamic>$nullCheck)';
+      if (type.typeArguments[1] is DynamicType) {
+        return base;
+      }
       var nested = type.typeArguments[1].acceptWithArgument(this, 'v');
-      if (nested != null) {
-        var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
-        return '($argument as Map<String, dynamic>$nullCheck)$nullCheck.map((k, v) => MapEntry(k, $nested))';
+      if (nested == 'v') {
+        return '$base$nullCheck.cast<String, ${type.typeArguments[1].getDisplayString()}>()';
+      } else {
+        return '$base$nullCheck.map((k, v) => MapEntry(k, $nested))';
       }
     } else if (codecs[type.element.name] case final codec?) {
       if (type.nullabilitySuffix == NullabilitySuffix.question) {
@@ -127,5 +147,21 @@ class PrefixVisitor extends UnifyingTypeVisitor<String> {
     var nullable = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
     var args = type.typeArguments.map((t) => t.accept(this));
     return '$name${args.isEmpty ? '' : '<${args.join(', ')}>'}$nullable';
+  }
+}
+
+extension on DartType {
+  bool get isDartPrimitive {
+    return isDartCoreString ||
+        isDartCoreBool ||
+        isDartCoreDouble ||
+        isDartCoreInt ||
+        isDartCoreNum ||
+        isDartCoreNull ||
+        isDartCoreObject ||
+        (isDartCoreList && (this as InterfaceType).typeArguments.first is DynamicType) ||
+        (isDartCoreMap &&
+            (this as InterfaceType).typeArguments.first.isDartCoreString &&
+            (this as InterfaceType).typeArguments.last is DynamicType);
   }
 }
