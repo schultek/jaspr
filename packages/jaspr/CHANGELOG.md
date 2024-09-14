@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Add `InheritedModel<T>` similar to [flutter](https://api.flutter.dev/flutter/widgets/InheritedModel-class.html)
+
 ## 0.15.1
 
 - Include and setup `jaspr_lints` in newly created projects.
