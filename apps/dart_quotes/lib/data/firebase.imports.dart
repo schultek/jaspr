@@ -18,5 +18,5 @@ export '../generated/imports/_web.dart' if (dart.library.io) '../generated/impor
         DefaultFirebaseOptions,
         DefaultFirebaseOptionsOrStubbed;
 
-export '../generated/imports/_vm.dart' if (dart.library.html) '../generated/imports/_stubs.dart'
+export '../generated/imports/_vm.dart' if (dart.library.js_interop) '../generated/imports/_stubs.dart'
     show FirebaseAdminApp, Credential, FirebaseAdminAppOrStubbed, CredentialOrStubbed, Firestore, FirestoreOrStubbed;

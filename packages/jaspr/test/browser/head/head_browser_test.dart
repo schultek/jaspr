@@ -13,13 +13,21 @@ void main() {
 
       var nodes = AttachAdapter.instanceFor(AttachTarget.head).liveNodes.toList();
 
-      expect(nodes, [_hasOuterHtml('<title>c</title>'), _hasOuterHtml('<meta name="c" content="e">')]);
+      expect(nodes, [
+        _hasOuterHtml('<title>c</title>'),
+        _hasOuterHtml('<meta name="test" content="b">'),
+        _hasOuterHtml('<meta name="c" content="e">'),
+      ]);
 
       await tester.click(find.tag('button'));
 
       nodes = AttachAdapter.instanceFor(AttachTarget.head).liveNodes.toList();
 
-      expect(nodes, [_hasOuterHtml('<title>d</title>')]);
+      expect(nodes, [
+        _hasOuterHtml('<title>d</title>'),
+        _hasOuterHtml('<meta name="test" content="b">'),
+        _hasOuterHtml('<meta name="c" content="d">'),
+      ]);
     });
   });
 }
