@@ -78,8 +78,7 @@ void main() {
       await controller.rebuildWith(MyDto(a: 2, b: 3.5));
       expect(find.text('A: 2'), findsOneComponent);
       expect(find.text('B: 3.5'), findsOneComponent);
-
-      // since only A has changed, only AComponent should be rebuilt.
+      
       expect(buildCalledFor, <Key>{
         App.componentKey,
         // ExampleComponent should NOT be rebuilt
