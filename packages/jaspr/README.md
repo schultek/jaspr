@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://docs.page/schultek/jaspr/quick-start">Quickstart</a> •
+  <a href="https://docs.page/schultek/jaspr/get_started/installation">Quickstart</a> •
   <a href="https://docs.page/schultek/jaspr">Documentation</a> •
   <a href="https://jasprpad.schultek.de">Playground</a> •
   <a href="https://github.com/schultek/jaspr/tree/main/examples/">Examples</a> •
@@ -205,5 +205,5 @@ void main() {
 ```
 
 For more examples on how to use the testing package, check out the 
-[documentation](https://docs.page/schultek/jaspr/testing) and the 
+[documentation](https://docs.page/schultek/jaspr/concepts/testing) and the 
 [tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/packages/jaspr/test).
