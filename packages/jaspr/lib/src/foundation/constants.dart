@@ -71,7 +71,7 @@ const double precisionErrorTolerance = 1e-10;
 /// backed by the same kind of object. Thus a double `0.0` is identical
 /// to an integer `0`. This is not true for Dart code running in AOT or on the
 /// VM.
-const bool kIsWeb = identical(0, 0.0);
+const bool kIsWeb = bool.fromEnvironment('dart.library.js_util');
 
 /// A constant that is true if the application is running in static-site-generation mode.
 const bool kGenerateMode = bool.fromEnvironment('jaspr.flags.generate');
