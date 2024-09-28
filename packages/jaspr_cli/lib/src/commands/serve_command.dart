@@ -232,6 +232,9 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       } else if (event.status == BuildStatus.failed) {
         logger.write('Failed building web assets. There is probably more output above.',
             level: Level.error, progress: ProgressState.completed);
+        if (!buildCompleter.isCompleted) {
+          buildCompleter.completeError(event);
+        }
       } else if (event.status == BuildStatus.started) {
         if (buildCompleter.isCompleted) {
           logger.write('Rebuilding web assets...', progress: ProgressState.running);
@@ -241,10 +244,15 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
     });
 
-    await buildCompleter.future;
+    try {
+      await buildCompleter.future;
+      logger.write('Done building web assets.', progress: ProgressState.completed);
+    } on BuildResult catch (_) {
+      logger.write('Could not start dev server due to build errors.',
+          level: Level.error, progress: ProgressState.completed);
+      await shutdown();
+    }
     timer.cancel();
-
-    logger.write('Done building web assets.', progress: ProgressState.completed);
 
     return workflow;
   }
