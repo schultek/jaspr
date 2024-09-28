@@ -11,20 +11,11 @@ class QuotesEndpoint extends Endpoint {
     }
   }
 
-  @override
-  Future<void> handleStreamMessage(
-    StreamingSession session,
-    SerializableModel message,
-  ) async {
-    if (message is QuoteInit) {
-      var quote = await QuotesService.getQuoteById(session, message.id);
-      if (quote == null) return;
+  Stream<Quote> subscribeToQuote(Session session, int id) async* {
+    var quote = await QuotesService.getQuoteById(session, id);
+    if (quote == null) return;
 
-      sendStreamMessage(session, quote);
-
-      session.messages.addListener('quote-update-${message.id}', (update) {
-        sendStreamMessage(session, update);
-      });
-    }
+    yield quote;
+    yield* session.messages.createStream('quote-update-${id}');
   }
 }
