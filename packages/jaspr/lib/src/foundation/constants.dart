@@ -57,21 +57,11 @@ const bool kVerboseMode = bool.fromEnvironment('jaspr.flags.verbose');
 ///  * [kReleaseMode], which is true in release builds.
 const bool kDebugMode = !kReleaseMode;
 
-/// The epsilon of tolerable double precision error.
-///
-/// This is used in various places in the framework to allow for floating point
-/// precision loss in calculations. Differences below this threshold are safe to
-/// disregard.
-const double precisionErrorTolerance = 1e-10;
-
 /// A constant that is true if the application was compiled to run on the web.
-///
-/// This implementation takes advantage of the fact that JavaScript does not
-/// support integers. In this environment, Dart's doubles and ints are
-/// backed by the same kind of object. Thus a double `0.0` is identical
-/// to an integer `0`. This is not true for Dart code running in AOT or on the
-/// VM.
-const bool kIsWeb = bool.fromEnvironment('dart.library.js_util');
+const bool kIsWeb = bool.fromEnvironment('dart.library.js_interop');
+
+/// A constant that is true if the application was compiled to WebAssembly.
+const bool kIsWasm = bool.fromEnvironment('dart.tool.dart2wasm');
 
 /// A constant that is true if the application is running in static-site-generation mode.
 const bool kGenerateMode = bool.fromEnvironment('jaspr.flags.generate');
