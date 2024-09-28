@@ -1,5 +1,6 @@
 ## Unreleased patch
 
+- Add `InheritedModel<T>` similar to Flutters [InheritedModel](https://api.flutter.dev/flutter/widgets/InheritedModel-class.html)
 - Fixed an issue where webDir would never resolve during tests.
 
 ## 0.15.1
