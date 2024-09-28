@@ -11,8 +11,9 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i3;
-import 'protocol.dart' as _i4;
+import 'package:dart_quotes_client/src/protocol/quote.dart' as _i3;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i4;
+import 'protocol.dart' as _i5;
 
 /// {@category Endpoint}
 class EndpointQuotes extends _i1.EndpointRef {
@@ -33,14 +34,22 @@ class EndpointQuotes extends _i1.EndpointRef {
           'liked': liked,
         },
       );
+
+  _i2.Stream<_i3.Quote> subscribeToQuote(int id) =>
+      caller.callStreamingServerEndpoint<_i2.Stream<_i3.Quote>, _i3.Quote>(
+        'quotes',
+        'subscribeToQuote',
+        {'id': id},
+        {},
+      );
 }
 
 class _Modules {
   _Modules(Client client) {
-    auth = _i3.Caller(client);
+    auth = _i4.Caller(client);
   }
 
-  late final _i3.Caller auth;
+  late final _i4.Caller auth;
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -59,7 +68,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i4.Protocol(),
+          _i5.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
