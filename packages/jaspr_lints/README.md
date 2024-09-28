@@ -31,10 +31,10 @@ dart pub add jaspr_lints --dev
 ```yaml
 analyzer:
   plugins:
-    - custom_lints
+    - custom_lint
 ```
 
-After running `pub get` you now see additional Jaspr lints 
+After running `dart pub get` you now see additional Jaspr lints 
 when invoking code assist on a component function like `div()` or `p()` files.
 
 ## Usage
