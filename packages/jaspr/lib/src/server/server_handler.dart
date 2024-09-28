@@ -19,12 +19,33 @@ const String kDevWeb = String.fromEnvironment('jaspr.dev.web');
 final webDir = kDevWeb.isNotEmpty ? kDevWeb : join(_findRootProjectDir(), 'web');
 
 String _findRootProjectDir() {
-  var dir = dirname(Platform.script.toFilePath());
-  if (Platform.resolvedExecutable == Platform.script.toFilePath()) return dir;
-  while (dir.isNotEmpty && !File(join(dir, 'pubspec.yaml')).existsSync()) {
-    dir = dirname(dir);
+  final executableDir = dirname(Platform.script.toFilePath());
+  final workingDir = Directory.current.path;
+
+  if (Platform.resolvedExecutable == Platform.script.toFilePath()) {
+    return executableDir;
   }
-  return dir;
+
+  final foundDir = _tryFindRootProjectDir(executableDir) ?? _tryFindRootProjectDir(workingDir);
+
+  if (foundDir == null) {
+    throw Exception('Could not resolve project directory containing pubspec.yaml');
+  }
+
+  return foundDir;
+}
+
+String? _tryFindRootProjectDir(String startingDir) {
+  if (File(join(startingDir, 'pubspec.yaml')).existsSync()) {
+    return startingDir;
+  }
+
+  final parentDir = dirname(startingDir);
+  if (startingDir == parentDir) {
+    return null;
+  }
+
+  return _tryFindRootProjectDir(parentDir);
 }
 
 Handler staticFileHandler([http.Client? client]) => jasprProxyPort != null
