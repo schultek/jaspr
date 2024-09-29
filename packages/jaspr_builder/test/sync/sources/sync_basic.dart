@@ -13,6 +13,12 @@ final syncBasicSources = {
       
       @sync
       String? b;
+      
+      @sync
+      List<double> c = [];
+      
+      @sync
+      Map<String, Object> d = {};
     
       Iterable<Component> build(BuildContext context) => [];
     }
@@ -34,10 +40,18 @@ final syncBasicOutputs = {
       '  String? get b;\n'
       '  set b(String? b);\n'
       '\n'
+      '  List<double> get c;\n'
+      '  set c(List<double> c);\n'
+      '\n'
+      '  Map<String, Object> get d;\n'
+      '  set d(Map<String, Object> d);\n'
+      '\n'
       '  @override\n'
       '  void updateState(Map<String, dynamic> value) {\n'
       '    a = value[\'a\'];\n'
       '    b = value[\'b\'];\n'
+      '    c = (value[\'c\'] as List<dynamic>).cast<double>();\n'
+      '    d = (value[\'d\'] as Map<String, dynamic>).cast<String, Object>();\n'
       '  }\n'
       '\n'
       '  @override\n'
@@ -45,6 +59,8 @@ final syncBasicOutputs = {
       '    return {\n'
       '      \'a\': a,\n'
       '      \'b\': b,\n'
+      '      \'c\': c,\n'
+      '      \'d\': d,\n'
       '    };\n'
       '  }\n'
       '\n'
