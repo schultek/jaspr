@@ -17,7 +17,7 @@ void main() {
       var body = response.document?.body;
       expect(body, isNotNull);
 
-      var appHtml = '<div>App<!--\$ =202--><button>Click Me</button>Count: 202</div>';
+      var appHtml = '<div>App<!--\$202--><button>Click Me</button>Count: 202</div>';
       expect(body!.innerHtml.trim(), equals(appHtml));
     });
   });

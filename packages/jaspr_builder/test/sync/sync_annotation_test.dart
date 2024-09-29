@@ -4,6 +4,7 @@ import 'package:jaspr_builder/src/sync/sync_mixins_builder.dart';
 import 'package:test/test.dart';
 
 import 'sources/sync_basic.dart';
+import 'sources/sync_invalid.dart';
 import 'sources/sync_model_class.dart';
 import 'sources/sync_model_extension.dart';
 import 'sources/sync_multi.dart';
@@ -50,6 +51,29 @@ void main() {
           syncModelExtensionSources,
           outputs: syncModelExtensionOutputs,
           reader: await PackageAssetReader.currentIsolate(),
+        );
+      });
+    });
+
+    group('on invalid component', () {
+      test('parameter throws error', () async {
+        String? errorLog;
+
+        await testBuilder(
+          SyncMixinsBuilder(BuilderOptions({})),
+          syncInvalidSources,
+          outputs: {},
+          reader: await PackageAssetReader.currentIsolate(),
+          onLog: (log) {
+            if (log.level.name == 'SEVERE') {
+              errorLog = log.message;
+            }
+          },
+        );
+
+        expect(
+          errorLog,
+          equals('Unsupported Map key type: Expected String, found int'),
         );
       });
     });

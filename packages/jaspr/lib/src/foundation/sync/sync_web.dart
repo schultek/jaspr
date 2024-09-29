@@ -2,10 +2,9 @@ import 'dart:convert';
 import 'dart:html' as html;
 
 import '../../../browser.dart';
+import '../marker_utils.dart';
 
-final _syncRegex = RegExp(r'^\$\s=(.*)$');
-
-final _escapeRegex = RegExp(r'&(amp|lt|gt);');
+final _syncRegex = RegExp('^$syncMarkerPrefixRegex(.*)\$');
 
 void initSyncState(SyncStateMixin sync) {
   var r = (sync.context as Element).parentRenderObjectElement?.renderObject as DomRenderObject?;
@@ -23,8 +22,7 @@ void initSyncState(SyncStateMixin sync) {
       r.toHydrate.remove(node);
       node.remove();
 
-      var data = match.group(1)!.replaceAllMapped(_escapeRegex,
-          (match) => switch (match.group(1)) { 'amp' => '&', 'lt' => '<', 'gt' => '>', _ => match.group(0)! });
+      var data = unescapeMarkerText(match.group(1)!);
       sync.updateState(jsonDecode(data));
       break;
     }

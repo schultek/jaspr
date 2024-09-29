@@ -1,7 +1,8 @@
 ## Unreleased patch
 
 - Add `InheritedModel<T>` similar to Flutters [InheritedModel](https://api.flutter.dev/flutter/widgets/InheritedModel-class.html)
-- Fixed an issue where webDir would never resolve during tests.
+- Fixed server issue during tests where the web directory would never resolve.
+- Fixed issue with unhandled parameter types of client components.
 
 ## 0.15.1
 

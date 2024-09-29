@@ -77,7 +77,14 @@ class ClientModuleBuilder implements Builder {
     }
 
     var codecs = await buildStep.loadCodecs();
-    var module = ClientModule.fromElement(element, codecs, buildStep);
+    ClientModule module;
+
+    try {
+      module = ClientModule.fromElement(element, codecs, buildStep);
+    } on UnsupportedError catch (e) {
+      log.severe(e.message);
+      return;
+    }
 
     var outputId = buildStep.inputId.changeExtension('.client.json');
     await buildStep.writeAsString(outputId, jsonEncode(module.serialize()));
@@ -96,7 +103,7 @@ class ClientModuleBuilder implements Builder {
         runAppWithParams(getComponentForParams);
       }
       
-      Component getComponentForParams(ConfigParams p) {
+      Component getComponentForParams(Map<String, dynamic> p) {
         return ${module.componentFactory()};
       }
     ''';
@@ -193,7 +200,7 @@ List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
   }
 
   return params.map((p) {
-    var decoder = codecs.getDecoderFor(p.type, 'p.get(\'${p.name}\')');
+    var decoder = codecs.getDecoderFor(p.type, "p['${p.name}']");
     var encoder = codecs.getEncoderFor(p.type, 'c.${p.name}');
     return ClientParam(name: p.name, isNamed: p.isNamed, decoder: decoder, encoder: encoder);
   }).toList();

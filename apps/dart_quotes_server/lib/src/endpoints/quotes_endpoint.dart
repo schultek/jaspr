@@ -16,6 +16,6 @@ class QuotesEndpoint extends Endpoint {
     if (quote == null) return;
 
     yield quote;
-    yield* session.messages.createStream('quote-update-${id}');
+    yield* session.messages.createStream('quote-update-$id');
   }
 }
