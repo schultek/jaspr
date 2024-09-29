@@ -64,9 +64,9 @@ void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
         var between = (start, currNode);
 
         // Remove the data string.
-        start.text = '\$${comp.$1}';
+        start.text = '$clientMarkerPrefix${comp.$1}';
 
-        var params = comp.$2 != null ? jsonDecode(unescapeMarkerText(comp.$2!)) : {};
+        Map<String, dynamic> params = comp.$2 != null ? jsonDecode(unescapeMarkerText(comp.$2!)) : {};
         unawaited(_runBuilder(name, fn(name), params, between));
       }
     }
