@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../jaspr.dart';
+import 'marker_utils.dart';
 
 /// Main class for initializing the jaspr framework.
 ///
@@ -39,6 +40,6 @@ class ClientTarget<T extends Component> {
 
   String? dataFor(T component) {
     if (params == null) return null;
-    return HtmlEscape(HtmlEscapeMode(escapeLtGt: true)).convert(jsonEncode(params!(component)));
+    return escapeMarkerText(jsonEncode(params!(component)));
   }
 }

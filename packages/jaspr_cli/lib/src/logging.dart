@@ -70,7 +70,7 @@ class Logger {
     }
   }
 
-  void write(String message, {Tag tag = Tag.none, Level level = Level.info, ProgressState? progress}) {
+  void write(String message, {Tag tag = Tag.cli, Level level = Level.info, ProgressState? progress}) {
     if (level == Level.verbose && !verbose) {
       return;
     }
