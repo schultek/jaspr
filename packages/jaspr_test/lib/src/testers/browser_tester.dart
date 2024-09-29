@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:js_interop';
 
 import 'package:jaspr/browser.dart';
 import 'package:meta/meta.dart';
@@ -27,9 +28,12 @@ void testBrowser(
       var binding = BrowserAppBinding();
       var tester = BrowserTester._(binding);
 
-      return binding.runTest(() async {
+      await binding.runTest(() async {
         await callback(tester);
       });
+
+      // Clear all nodes
+      web.document.body?.replaceChildren([].jsify()!);
     },
     skip: skip,
     timeout: timeout,
@@ -48,19 +52,52 @@ class BrowserTester {
   }
 
   Future<void> click(Finder finder, {bool pump = true}) async {
-    dispatchEvent(finder, 'click', null);
+    await dispatchEvent(finder, web.MouseEvent('click'), pump: pump);
+  }
+
+  Future<void> input(Finder finder, {bool? checked, double? valueAsNumber, String? value, bool pump = true}) async {
+    await _dispatchInputEvent(finder, 'input',
+        checked: checked, valueAsNumber: valueAsNumber, value: value, pump: pump);
+  }
+
+  Future<void> change(Finder finder, {bool? checked, double? valueAsNumber, String? value, bool pump = true}) async {
+    await _dispatchInputEvent(finder, 'change',
+        checked: checked, valueAsNumber: valueAsNumber, value: value, pump: pump);
+  }
+
+  Future<void> _dispatchInputEvent(
+    Finder finder,
+    String type, {
+    bool? checked,
+    double? valueAsNumber,
+    String? value,
+    bool pump = true,
+  }) async {
+    dispatchEvent(finder, web.InputEvent(type), before: (e) {
+      if (checked != null) (e as web.HTMLInputElement).checked = checked;
+      if (valueAsNumber != null) (e as web.HTMLInputElement).valueAsNumber = valueAsNumber;
+      if (value != null) (e as web.HTMLInputElement).value = value;
+    }, pump: pump);
+  }
+
+  Future<void> dispatchEvent(Finder finder, web.Event event,
+      {void Function(web.Element)? before, bool pump = true}) async {
+    var element = _findDomElement(finder);
+
+    var source = (element.renderObject as DomRenderObject).node;
+    if (source is web.Element) {
+      before?.call(source);
+      source.dispatchEvent(event);
+    }
+
     if (pump) {
       await pumpEventQueue();
     }
   }
 
-  void dispatchEvent(Finder finder, String event, dynamic data) {
+  web.Node? findNode(Finder finder) {
     var element = _findDomElement(finder);
-
-    var source = (element.renderObject as DomRenderObject).node;
-    if (source is web.Element) {
-      source.dispatchEvent(web.MouseEvent('click'));
-    }
+    return (element.renderObject as DomRenderObject).node;
   }
 
   DomElement _findDomElement(Finder finder) {
