@@ -1,5 +1,5 @@
-import 'package:dart_quotes_client/dart_quotes_client.dart' if (dart.library.io) '../../src/generated/protocol.dart'
-    show Quote;
+import 'dart:async';
+
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_serverpod/jaspr_serverpod.dart';
 
@@ -23,13 +23,13 @@ class QuoteLikeButton extends StatefulComponent {
 }
 
 class QuoteLikeButtonState extends State<QuoteLikeButton> {
-  late final StreamingConnectionHandlerOrStubbed connectionHandler;
-
   late final ClientOrStubbed client = Client(
     'http://localhost:8080/',
     authenticationKeyManager: FlutterAuthenticationKeyManager(),
   );
   late SessionManagerOrStubbed sessionManager;
+
+  StreamSubscription? subscription;
 
   int count = 0;
   bool? hasLiked;
@@ -56,33 +56,18 @@ class QuoteLikeButtonState extends State<QuoteLikeButton> {
     );
     await sessionManager.initialize();
 
-    // Start listening to updates from the quotes endpoint.
-    _listenToUpdates();
-
-    // Setup our connection handler and open a streaming connection to the
-    // server. The [StreamingConnectionHandler] will attempt to reconnect until
-    // the `close` method is called.
-    connectionHandler = StreamingConnectionHandler(
-      client: client,
-      listener: (connectionState) {
-        if (connectionState.status.index == 0) {
-          client.quotes.sendStreamMessage(QuoteInit(id: component.id));
-        }
-        setState(() {});
-      },
-    );
-    connectionHandler.connect();
+    subscription = client.quotes.subscribeToQuote(component.id).listen((quote) {
+      setState(() {
+        count = quote.likes.length;
+        hasLiked = sessionManager.isSignedIn && quote.likes.contains(sessionManager.signedInUser?.id);
+      });
+    });
   }
 
-  Future<void> _listenToUpdates() async {
-    await for (var update in client.quotes.stream) {
-      if (update is Quote) {
-        setState(() {
-          count = update.likes.length;
-          hasLiked = sessionManager.isSignedIn && update.likes.contains(sessionManager.signedInUser?.id);
-        });
-      }
-    }
+  @override
+  void dispose() {
+    subscription?.cancel();
+    super.dispose();
   }
 
   @override

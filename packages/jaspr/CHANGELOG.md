@@ -2,6 +2,10 @@
 
 - **BREAKING** Migrate all packages to `package:web`, replacing `dart:html`.
 
+- Add `InheritedModel<T>` similar to Flutters [InheritedModel](https://api.flutter.dev/flutter/widgets/InheritedModel-class.html)
+- Fixed server issue during tests where the web directory would never resolve.
+- Fixed issue with unhandled parameter types of client components.
+
 ## 0.15.1
 
 - Include and setup `jaspr_lints` in newly created projects.

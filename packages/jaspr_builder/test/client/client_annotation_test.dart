@@ -4,6 +4,7 @@ import 'package:jaspr_builder/src/client/client_module_builder.dart';
 import 'package:test/test.dart';
 
 import 'sources/client_basic.dart';
+import 'sources/client_invalid.dart';
 import 'sources/client_model_class.dart';
 import 'sources/client_model_extension.dart';
 
@@ -83,6 +84,51 @@ void main() {
             ...clientModelExtensionDartOutputs,
           },
           reader: await PackageAssetReader.currentIsolate(),
+        );
+      });
+    });
+
+    group('on invalid component', () {
+      test('constructor throws error', () async {
+        String? errorLog;
+
+        await testBuilder(
+          ClientModuleBuilder(BuilderOptions({})),
+          clientInvalidConstructorSources,
+          outputs: {},
+          reader: await PackageAssetReader.currentIsolate(),
+          onLog: (log) {
+            if (log.level.name == 'SEVERE') {
+              errorLog = log.message;
+            }
+          },
+        );
+
+        expect(
+          errorLog,
+          equals('Client components only support initializing formal constructor parameters. '
+              'Failing element: Component.(String a)'),
+        );
+      });
+
+      test('param throws error', () async {
+        String? errorLog;
+
+        await testBuilder(
+          ClientModuleBuilder(BuilderOptions({})),
+          clientInvalidParamSources,
+          outputs: {},
+          reader: await PackageAssetReader.currentIsolate(),
+          onLog: (log) {
+            if (log.level.name == 'SEVERE') {
+              errorLog = log.message;
+            }
+          },
+        );
+
+        expect(
+          errorLog,
+          equals('Unsupported parameter type: Expected primitive type, found DateTime'),
         );
       });
     });

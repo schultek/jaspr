@@ -22,6 +22,7 @@ part 'components_binding.dart';
 part 'dom_component.dart';
 part 'inactive_elements.dart';
 part 'inherited_component.dart';
+part 'inherited_model.dart';
 part 'keys.dart';
 part 'notification.dart';
 part 'observer_component.dart';

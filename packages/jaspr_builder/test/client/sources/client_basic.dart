@@ -25,10 +25,10 @@ final clientBasicJsonOutputs = {
     "id": "component_basic",
     "import": "package:site/component_basic.dart",
     "params": [
-      {"name": "a", "isNamed": false, "decoder": "p.get('a')", "encoder": "c.a"},
-      {"name": "b", "isNamed": true, "decoder": "p.get('b')", "encoder": "c.b"},
-      {"name": "c", "isNamed": true, "decoder": "p.get('c')", "encoder": "c.c"},
-      {"name": "d", "isNamed": true, "decoder": "p.get('d')", "encoder": "c.d"}
+      {"name": "a", "isNamed": false, "decoder": "p['a']", "encoder": "c.a"},
+      {"name": "b", "isNamed": true, "decoder": "p['b']", "encoder": "c.b"},
+      {"name": "c", "isNamed": true, "decoder": "p['c']", "encoder": "c.c"},
+      {"name": "d", "isNamed": true, "decoder": "p['d']", "encoder": "c.d"}
     ]
   }),
 };
@@ -44,7 +44,7 @@ final clientBasicDartOutputs = {
       '  runAppWithParams(getComponentForParams);\n'
       '}\n'
       '\n'
-      'Component getComponentForParams(ConfigParams p) {\n'
-      '  return prefix0.Component(p.get(\'a\'), b: p.get(\'b\'), c: p.get(\'c\'), d: p.get(\'d\'));\n'
+      'Component getComponentForParams(Map<String, dynamic> p) {\n'
+      '  return prefix0.Component(p[\'a\'], b: p[\'b\'], c: p[\'c\'], d: p[\'d\']);\n'
       '}\n',
 };

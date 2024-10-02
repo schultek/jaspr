@@ -29,13 +29,13 @@ class DecoderAnnotation {
 ///
 /// ```
 /// @Import.onWeb('dart:html', show: [#window])
-/// import 'file.import.dart';
+/// import 'file.imports.dart';
 /// ```
 ///
 /// 1. Put the actual import in the annotation.
 /// 3. Define what elements or types to 'show' as symbols (prefixed by #).
 ///   - This is required to reduce the amount of stubbing needed.
-/// 2. Import the file '<current filename>.import.dart'.
+/// 2. Import the file '<current filename>.imports.dart'.
 ///
 /// The associated file will be generated the next time you run `jaspr serve`.
 ///
