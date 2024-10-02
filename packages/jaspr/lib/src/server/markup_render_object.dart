@@ -3,8 +3,6 @@ import 'dart:convert';
 import '../../server.dart';
 import 'child_nodes.dart';
 
-const formatOutput = kDebugMode || kGenerateMode;
-
 class MarkupRenderObject extends RenderObject {
   String? tag;
   String? id;
@@ -58,13 +56,14 @@ class MarkupRenderObject extends RenderObject {
     child.parent = null;
   }
 
-  String renderToHtml() {
+  String renderToHtml([bool strictFormatting = false, bool strictWhitespace = false, String indent = '']) {
     var output = StringBuffer();
     if (text case var text?) {
-      if (rawHtml == true) {
-        output.write(text);
+      var html = rawHtml == true ? text : htmlEscape.convert(text);
+      if (strictFormatting) {
+        output.write(html);
       } else {
-        output.write(htmlEscape.convert(text));
+        output.write(html.replaceAll('\n', '\n$indent'));
       }
     } else if (tag case var tag?) {
       tag = tag.toLowerCase();
@@ -90,30 +89,47 @@ class MarkupRenderObject extends RenderObject {
           }
         }
       }
-      var selfClosing = _domValidator.isSelfClosing(tag);
+      final selfClosing = _domValidator.isSelfClosing(tag);
       if (selfClosing) {
         output.write('/>');
       } else {
         output.write('>');
-        var childOutput = <String>[];
+
+        final childStrictFormatting = strictFormatting || _domValidator.hasStrictFormatting(tag);
+        final childStrictWhitespace = strictWhitespace || _domValidator.hasStrictWhitespace(tag);
+
+        final childOutput = <String>[];
+        var childOutputLength = 0;
+
         for (var child in children) {
-          childOutput.add(child.renderToHtml());
+          final childHtml = child.renderToHtml(childStrictFormatting, childStrictWhitespace, '$indent  ');
+          childOutput.add(childHtml);
+          childOutputLength += childHtml.length;
         }
-        var fullChildOutput = childOutput.fold<String>('', (s, o) => s + o);
-        if (formatOutput && (fullChildOutput.length > 80 || fullChildOutput.contains('\n'))) {
-          output.write('\n');
+
+        if (childStrictFormatting || childOutputLength < 100) {
           for (var child in childOutput) {
-            output.writeln('  ${child.replaceAll('\n', '\n  ')}');
+            output.write(child);
           }
         } else {
-          output.write(fullChildOutput);
+          var allowNewline = true;
+          for (var child in childOutput) {
+            if (allowNewline || child.startsWith(DomValidator._whitespace)) {
+              output.write('\n$indent  ');
+            }
+            output.write(child);
+            allowNewline = childStrictWhitespace //
+                ? child.substring(child.length - 1).startsWith(DomValidator._whitespace)
+                : true;
+          }
+          output.write('\n$indent');
         }
         output.write('</$tag>');
       }
     } else {
       assert(parent == null);
       for (var child in children) {
-        output.writeln(child.renderToHtml());
+        output.writeln(child.renderToHtml(strictFormatting, strictWhitespace, indent));
       }
     }
     return output.toString();
@@ -144,7 +160,23 @@ class DomValidator {
     'track',
     'wbr',
   };
-  final _tags = <String>{};
+  static const _strictWhitespace = <String>{
+    'a',
+    'p',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+  };
+  static const _strictFormatting = <String>{
+    'span',
+    'pre',
+    'code',
+  };
+  static final _whitespace = RegExp(r'\s');
+  static final _tags = <String>{};
   final _attrs = <String>{};
 
   void validateElementName(String tag) {
@@ -167,5 +199,13 @@ class DomValidator {
 
   bool isSelfClosing(String tag) {
     return _selfClosing.contains(tag);
+  }
+
+  bool hasStrictWhitespace(String tag) {
+    return _strictWhitespace.contains(tag);
+  }
+
+  bool hasStrictFormatting(String tag) {
+    return _strictFormatting.contains(tag);
   }
 }
