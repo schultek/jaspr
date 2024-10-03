@@ -56,7 +56,7 @@ class DomRenderObject extends RenderObject {
     diff:
     if (node == null) {
       if (parent!.toHydrate.isNotEmpty) {
-        for (var e in parent!.toHydrate) {
+        for (final e in parent!.toHydrate) {
           if (e.instanceOfString('Element') && (e as web.Element).tagName.toLowerCase() == tag) {
             if (kVerboseMode) {
               print("Hydrate html node: $e");
@@ -81,11 +81,11 @@ class DomRenderObject extends RenderObject {
     } else {
       if (!node.instanceOfString('Element') || (node as web.Element).tagName.toLowerCase() != tag) {
         elem = _createElement(tag, namespace);
-        var old = node!;
+        final old = node!;
         node!.parentNode!.replaceChild(elem, old);
         node = elem;
         if (old.childNodes.length > 0) {
-          for (var child in old.childNodes.toIterable()) {
+          for (final child in old.childNodes.toIterable()) {
             elem.append(child as dynamic);
           }
         }
@@ -108,7 +108,7 @@ class DomRenderObject extends RenderObject {
         styles == null || styles.isEmpty ? null : styles.entries.map((e) => '${e.key}: ${e.value}').join('; '));
 
     if (attributes != null && attributes.isNotEmpty) {
-      for (var attr in attributes.entries) {
+      for (final attr in attributes.entries) {
         if (attr.key == 'value' &&
             elem.instanceOfString('HTMLInputElement') &&
             (elem as web.HTMLInputElement).value != attr.value) {
@@ -157,9 +157,9 @@ class DomRenderObject extends RenderObject {
   void updateText(String text) {
     diff:
     if (node == null) {
-      var toHydrate = parent!.toHydrate;
+      final toHydrate = parent!.toHydrate;
       if (toHydrate.isNotEmpty) {
-        for (var e in toHydrate) {
+        for (final e in toHydrate) {
           if (e.instanceOfString('Text')) {
             if (kVerboseMode) {
               print("Hydrate text node: $e");
@@ -183,14 +183,14 @@ class DomRenderObject extends RenderObject {
       }
     } else {
       if (!node.instanceOfString('Text')) {
-        var elem = web.Text(text);
+        final elem = web.Text(text);
         (node as web.Element).replaceWith(elem as dynamic);
         node = elem;
         if (kVerboseMode) {
           print("Replace text node: $text");
         }
       } else {
-        var node = this.node as web.Text;
+        final node = this.node as web.Text;
         if (node.textContent != text) {
           node.textContent = text;
           if (kVerboseMode) {
@@ -211,13 +211,13 @@ class DomRenderObject extends RenderObject {
     try {
       child.parent = this;
 
-      var parentNode = node;
-      var childNode = child.node;
+      final parentNode = node;
+      final childNode = child.node;
 
       assert(parentNode.instanceOfString('Element'));
       if (childNode == null) return;
 
-      var afterNode = after?.node;
+      final afterNode = after?.node;
 
       if (childNode.previousSibling == afterNode && childNode.parentNode == parentNode) {
         return;
@@ -250,7 +250,7 @@ class DomRenderObject extends RenderObject {
     if (kVerboseMode && toHydrate.isNotEmpty) {
       print("Clear ${toHydrate.length} nodes not hydrated ($toHydrate)");
     }
-    for (var node in toHydrate) {
+    for (final node in toHydrate) {
       node.parentNode!.removeChild(node);
     }
     toHydrate.clear();
@@ -268,7 +268,7 @@ class RootDomRenderObject extends DomRenderObject {
   }
 
   factory RootDomRenderObject.between(web.Node start, web.Node end) {
-    var nodes = <web.Node>[];
+    final nodes = <web.Node>[];
     web.Node? curr = start.nextSibling;
     while (curr != null && curr != end) {
       nodes.add(curr);
