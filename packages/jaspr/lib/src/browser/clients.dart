@@ -65,7 +65,7 @@ void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
         final between = (start, currNode);
 
         // Remove the data string.
-        start.text = '\$${comp.$1}';
+        start.text = '$clientMarkerPrefix${comp.$1}';
 
         final params = comp.$2 != null //
             ? jsonDecode(unescapeMarkerText(comp.$2!)) as Map<String, dynamic>
