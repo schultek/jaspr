@@ -45,8 +45,8 @@ class ComponentTester {
 
   final TestComponentsBinding binding;
 
-  Future<void> pumpComponent(Component component) {
-    return binding.attachRootComponent(component);
+  void pumpComponent(Component component) {
+    binding.attachRootComponent(component);
   }
 
   /// Simulates a 'click' event on the given element

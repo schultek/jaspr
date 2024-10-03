@@ -33,10 +33,10 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
   late (Node, Node)? attachBetween;
 
   @override
-  Future<void> attachRootComponent(Component app, {String attachTo = 'body', (Node, Node)? attachBetween}) {
+  void attachRootComponent(Component app, {String attachTo = 'body', (Node, Node)? attachBetween}) {
     attachTarget = attachTo;
     this.attachBetween = attachBetween;
-    return super.attachRootComponent(app);
+    super.attachRootComponent(app);
   }
 
   @override

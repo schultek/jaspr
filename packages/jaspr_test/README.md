@@ -25,7 +25,7 @@ void main() {
     testComponents('renders my component', (tester) async {
       // We want to test the MyComponent component.
       // Assume this shows a count and a button to increase it.
-      await tester.pumpComponent(MyComponent());
+      tester.pumpComponent(MyComponent());
 
       // Should render a [Text] component with content 'Count: 0'.
       expect(find.text('Count: 0'), findsOneComponent);

@@ -1,6 +1,7 @@
 ## Unreleased breaking
 
 - **BREAKING** Migrate all packages to `package:web`, replacing `dart:html`.
+- **BREAKING** Make `ComponentsBinding.attachRootComponent()` and `ComponentTester.pumpComponent()` synchronous.
 
 - Add `InheritedModel<T>` similar to Flutters [InheritedModel](https://api.flutter.dev/flutter/widgets/InheritedModel-class.html)
 - Improved html formatting on the server to not introduce unwanted whitespaces.

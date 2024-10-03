@@ -12,11 +12,9 @@ extension AsyncElement on Element {
 
 class AsyncBuildOwner extends BuildOwner {
   @override
-  Future<void> performInitialBuild(Element element, Future<void> Function() completeBuild) {
-    return super.performInitialBuild(element, () async {
-      await element._asyncBuildLock?.asFuture;
-      return completeBuild();
-    });
+  void completeInitialBuild(Element element, void Function() buildCallback) async {
+    await element._asyncBuildLock?.asFuture;
+    super.completeInitialBuild(element, buildCallback);
   }
 
   @override

@@ -20,7 +20,7 @@ void main() {
       expect(pElement.parentNode, equals(divElement));
       expect(bElement.parentNode, equals(pElement));
 
-      await tester.pumpComponent(div([
+      tester.pumpComponent(div([
         p([
           text('Hello '),
           b([text('World2')]),

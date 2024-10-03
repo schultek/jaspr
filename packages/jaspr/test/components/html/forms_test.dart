@@ -6,7 +6,7 @@ import 'package:jaspr_test/jaspr_test.dart';
 void main() {
   group('html components', () {
     testComponents('renders button', (tester) async {
-      await tester.pumpComponent(button(
+      tester.pumpComponent(button(
         autofocus: false,
         disabled: false,
         type: ButtonType.button,
@@ -18,7 +18,7 @@ void main() {
     });
 
     testComponents('renders form', (tester) async {
-      await tester.pumpComponent(form(
+      tester.pumpComponent(form(
           action: "",
           method: FormMethod.post,
           encType: FormEncType.text,

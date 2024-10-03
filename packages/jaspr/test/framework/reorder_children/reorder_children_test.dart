@@ -10,7 +10,7 @@ import 'reorder_children_app.dart';
 void main() {
   group('reorder children test', () {
     testComponents('should keep child state on reordering', (tester) async {
-      var controller = await tester.pumpTestComponent(App());
+      var controller = tester.pumpTestComponent(App());
       var app = controller.element;
 
       expect((app.component as App).child2Key.toString(), equals('[<2>]'));

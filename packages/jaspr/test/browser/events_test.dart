@@ -8,7 +8,7 @@ void main() {
     testBrowser('handle click events', (tester) async {
       int clicked = 0;
 
-      await tester.pumpComponent(button(onClick: () {
+      tester.pumpComponent(button(onClick: () {
         clicked++;
       }, []));
 
@@ -20,7 +20,7 @@ void main() {
       bool checkedInput = false;
       bool checkedChange = false;
 
-      await tester.pumpComponent(input(
+      tester.pumpComponent(input(
         type: InputType.checkbox,
         onInput: (value) => checkedInput = value,
         onChange: (value) => checkedChange = value,
@@ -38,7 +38,7 @@ void main() {
       double numberInput = 0;
       double numberChange = 0;
 
-      await tester.pumpComponent(input(
+      tester.pumpComponent(input(
         type: InputType.number,
         onInput: (value) => numberInput = value,
         onChange: (value) => numberChange = value,
@@ -56,7 +56,7 @@ void main() {
       String textInput = "";
       String textChange = "";
 
-      await tester.pumpComponent(input(
+      tester.pumpComponent(input(
         type: InputType.text,
         onInput: (value) => textInput = value,
         onChange: (value) => textChange = value,
@@ -74,7 +74,7 @@ void main() {
       String textInput = "";
       String textChange = "";
 
-      await tester.pumpComponent(textarea(
+      tester.pumpComponent(textarea(
         onInput: (value) => textInput = value,
         onChange: (value) => textChange = value,
         [],

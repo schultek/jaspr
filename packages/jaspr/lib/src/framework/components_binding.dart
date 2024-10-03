@@ -3,7 +3,7 @@ part of 'framework.dart';
 /// Main app binding, controls the root component and global state
 mixin ComponentsBinding on AppBinding {
   /// Sets [app] as the new root of the component tree and performs an initial build
-  Future<void> attachRootComponent(Component app) async {
+  void attachRootComponent(Component app) async {
     var buildOwner = _rootElement?._owner ?? createRootBuildOwner();
 
     var element = _Root(child: app).createElement();
@@ -13,9 +13,7 @@ mixin ComponentsBinding on AppBinding {
 
     _rootElement = element;
 
-    return buildOwner.performInitialBuild(element, () async {
-      completeInitialFrame();
-    });
+    buildOwner.performInitialBuild(element, completeInitialFrame);
   }
 
   RenderObject createRootRenderObject();

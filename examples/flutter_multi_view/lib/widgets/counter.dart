@@ -9,7 +9,6 @@ class CounterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var theme = ThemeData.light();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Card(

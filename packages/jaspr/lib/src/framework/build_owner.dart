@@ -72,7 +72,7 @@ class BuildOwner {
     assert(_debugStateLockLevel >= 0);
   }
 
-  Future<void> performInitialBuild(Element element, Future<void> Function() completeBuild) async {
+  Future<void> performInitialBuild(Element element, void Function() completeBuild) async {
     assert(_debugStateLockLevel >= 0);
     assert(!_debugBuilding);
 
@@ -87,16 +87,22 @@ class BuildOwner {
     element.mount(null, null);
     element.didMount();
 
-    _isFirstBuild = false;
+    completeInitialBuild(element, () {
+      _isFirstBuild = false;
 
-    assert(_debugBuilding);
-    assert(() {
-      _debugBuilding = false;
-      _debugStateLockLevel -= 1;
-      return true;
-    }());
+      assert(_debugBuilding);
+      assert(() {
+        _debugBuilding = false;
+        _debugStateLockLevel -= 1;
+        return true;
+      }());
 
-    return completeBuild();
+      completeBuild();
+    });
+  }
+
+  void completeInitialBuild(Element element, void Function() buildCallback) {
+    buildCallback();
   }
 
   /// Rebuilds [child] and correctly accounts for any asynchronous operations that can

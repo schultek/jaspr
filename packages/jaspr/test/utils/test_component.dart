@@ -2,8 +2,8 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
 extension PumpTestComponent on ComponentTester {
-  Future<TestComponentController<T>> pumpTestComponent<T>(TestComponent<T> component) async {
-    await pumpComponent(component);
+  TestComponentController<T> pumpTestComponent<T>(TestComponent<T> component) {
+    pumpComponent(component);
     late Element testElem;
     binding.rootElement!.visitChildren((element) {
       testElem = element;
