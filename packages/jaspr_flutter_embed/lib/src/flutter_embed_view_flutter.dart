@@ -3,26 +3,27 @@ import 'package:jaspr/browser.dart';
 import 'package:web/web.dart' as web;
 
 import 'run_flutter_app.dart';
-
-export 'run_flutter_app.dart' show ViewConstraints;
+import 'view_constraints.dart';
 
 class FlutterEmbedView extends StatefulComponent {
   const FlutterEmbedView({
-    this.app,
-    this.loader,
-    this.constraints,
     this.id,
     this.classes,
     this.styles,
+    this.constraints,
+    this.loader,
+    this.widget,
     super.key,
   });
 
-  final flt.Widget? app;
+  final flt.Widget? widget;
   final Component? loader;
   final ViewConstraints? constraints;
   final String? id;
   final String? classes;
   final Styles? styles;
+
+  static Future<void> preload() => preloadEngine();
 
   @override
   State<FlutterEmbedView> createState() => _FlutterEmbedViewState();
@@ -42,22 +43,30 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
         var element = findChildDomElement(context as Element)!;
         element = element.children.item(element.children.length - 1)!;
         viewId = await addView(element, component.constraints, flt.StatefulBuilder(builder: (context, setState) {
-          rebuildFlutterApp = () => setState(() {});
+          rebuildFlutterApp = () {
+            if (!context.mounted) return;
+            setState(() {});
+          };
           waitOnWarmupFrames();
-          return component.app ?? flt.SizedBox.shrink();
+          return component.widget ?? flt.SizedBox.shrink();
         }));
       });
     }
   }
 
-  int frame = 0;
+  // The flutter view does only actually appear after the second frame.
+  // We delay the removal of the loader component until then.
+  bool get didRenderView => _frame > 1;
+  int _frame = 0;
+
   void waitOnWarmupFrames() {
-    if (frame > 2) {
+    if (!mounted) return;
+    if (_frame > 1) {
       setState(() {});
       return;
     }
     flt.WidgetsBinding.instance.addPostFrameCallback((_) {
-      frame++;
+      _frame++;
       waitOnWarmupFrames();
     });
   }
@@ -108,7 +117,7 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
         if (component.styles != null) component.styles!
       ]),
       [
-        if (component.loader != null && frame <= 2) component.loader!,
+        if (component.loader != null && !didRenderView) component.loader!,
         div(key: flutterDivKey, []),
       ],
     );

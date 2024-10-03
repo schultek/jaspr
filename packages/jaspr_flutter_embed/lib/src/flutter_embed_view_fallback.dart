@@ -1,33 +1,43 @@
 import 'package:jaspr/jaspr.dart';
 
+import 'view_constraints.dart';
+
 typedef Widget = Never;
-
-class ViewConstraints {
-  ViewConstraints({this.minWidth, this.maxWidth, this.minHeight, this.maxHeight});
-
-  final double? minWidth;
-  final double? maxWidth;
-  final double? minHeight;
-  final double? maxHeight;
-}
 
 class FlutterEmbedView extends StatelessComponent {
   const FlutterEmbedView({
-    this.app,
-    this.loader,
-    this.constraints,
     this.id,
     this.classes,
     this.styles,
+    this.constraints,
+    this.loader,
+    this.widget,
     super.key,
-  });
+  })  : loadLibrary = null,
+        builder = null;
 
-  final Widget? app;
-  final Component? loader;
-  final ViewConstraints? constraints;
+  const FlutterEmbedView.deferred({
+    this.id,
+    this.classes,
+    this.styles,
+    this.constraints,
+    this.loader,
+    this.loadLibrary,
+    this.builder,
+    super.key,
+  }) : widget = null;
+
   final String? id;
   final String? classes;
   final Styles? styles;
+  final ViewConstraints? constraints;
+  final Component? loader;
+  final Future? loadLibrary;
+  final Widget? widget;
+
+  final Object Function()? builder;
+
+  static Future<void> preload() => Future.value();
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

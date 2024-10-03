@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart' as flt;
 import 'package:web/web.dart';
 
 import 'multi_view_app.dart';
+import 'view_constraints.dart';
 
 Map<int, flt.Widget> _viewWidgets = {};
 
@@ -30,6 +31,8 @@ Future<FlutterApp> _flutterApp = Future(() {
 
   return completer.future;
 });
+
+Future<void> preloadEngine() => _flutterApp;
 
 Future<int> addView(Element target, ViewConstraints? constraints, flt.Widget widget) async {
   var app = await _flutterApp;
@@ -98,13 +101,4 @@ extension type FlutterApp._(JSObject _) implements JSObject {
   external int addView(ViewOptions options);
 
   external void removeView(int viewId);
-}
-
-extension type ViewConstraints._(JSObject _) {
-  external ViewConstraints({double? minWidth, double? maxWidth, double? minHeight, double? maxHeight});
-
-  external double? minWidth;
-  external double? maxWidth;
-  external double? minHeight;
-  external double? maxHeight;
 }
