@@ -1,8 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
 import 'view_constraints.dart';
-
-typedef Widget = Never;
+import 'widget.dart';
 
 class FlutterEmbedView extends StatelessComponent {
   const FlutterEmbedView({

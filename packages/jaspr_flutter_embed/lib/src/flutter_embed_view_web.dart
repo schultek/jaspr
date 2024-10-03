@@ -3,6 +3,7 @@ import 'package:jaspr/jaspr.dart';
 import 'flutter_embed_view_fallback.dart' as fallback;
 import 'flutter_embed_view_flutter.dart' deferred as flutter;
 import 'view_constraints.dart';
+import 'widget.dart';
 
 class FlutterEmbedView extends StatefulComponent {
   const FlutterEmbedView({
@@ -33,8 +34,8 @@ class FlutterEmbedView extends StatefulComponent {
   final ViewConstraints? constraints;
   final Component? loader;
   final Future? loadLibrary;
-  final Object? widget;
-  final Object Function()? builder;
+  final Widget? widget;
+  final Widget Function()? builder;
 
   static final Future<void> _libraryFuture = flutter.loadLibrary().then((_) => flutter.FlutterEmbedView.preload());
 
@@ -50,11 +51,7 @@ class FlutterEmbedView extends StatefulComponent {
       styles: styles,
       constraints: constraints,
       loader: loader,
-      widget: widget != null
-          ? widget as dynamic
-          : builder != null
-              ? builder!()
-              : null,
+      widget: (widget ?? builder?.call()) as dynamic,
     );
   }
 
