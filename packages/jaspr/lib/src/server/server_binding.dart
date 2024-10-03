@@ -23,7 +23,8 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   final rootCompleter = Completer.sync();
 
   @override
-  void didAttachRootElement(Element element) {
+  Future<void> attachRootComponent(Component app) async {
+    await super.attachRootComponent(ClientComponentRegistry(child: app));
     rootCompleter.complete();
   }
 
@@ -85,11 +86,6 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   void initializeOptions(JasprOptions options) {
     _options = options;
-  }
-
-  @override
-  Future<void> attachRootComponent(Component app) {
-    return super.attachRootComponent(ClientComponentRegistry(child: app));
   }
 }
 

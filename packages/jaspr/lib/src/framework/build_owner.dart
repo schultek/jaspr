@@ -9,11 +9,6 @@ class BuildOwner {
   bool _isFirstBuild = false;
   bool get isFirstBuild => _isFirstBuild;
 
-  Future<void> performInitialBuild(Element element) async {
-    element.mount(null, null);
-    element.didMount();
-  }
-
   final _InactiveElements _inactiveElements = _InactiveElements();
 
   /// Whether [_dirtyElements] need to be sorted again as a result of more
@@ -75,6 +70,33 @@ class BuildOwner {
       }());
     }
     assert(_debugStateLockLevel >= 0);
+  }
+
+  Future<void> performInitialBuild(Element element, Future<void> Function() completeBuild) async {
+    assert(_debugStateLockLevel >= 0);
+    assert(!_debugBuilding);
+
+    assert(() {
+      _debugStateLockLevel += 1;
+      _debugBuilding = true;
+      return true;
+    }());
+
+    _isFirstBuild = true;
+
+    element.mount(null, null);
+    element.didMount();
+
+    _isFirstBuild = false;
+
+    assert(_debugBuilding);
+    assert(() {
+      _debugBuilding = false;
+      _debugStateLockLevel -= 1;
+      return true;
+    }());
+
+    return completeBuild();
   }
 
   /// Rebuilds [child] and correctly accounts for any asynchronous operations that can
