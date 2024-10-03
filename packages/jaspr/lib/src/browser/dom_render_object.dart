@@ -63,7 +63,7 @@ class DomRenderObject extends RenderObject {
             }
             elem = node = e;
             attributesToRemove = {};
-            for (final i = 0; i < elem.attributes.length; i++) {
+            for (var i = 0; i < elem.attributes.length; i++) {
               attributesToRemove.add(elem.attributes.item(i)!.name);
             }
             parent!.toHydrate.remove(e);
@@ -96,7 +96,7 @@ class DomRenderObject extends RenderObject {
       } else {
         elem = node as web.Element;
         attributesToRemove = {};
-        for (final i = 0; i < elem.attributes.length; i++) {
+        for (var i = 0; i < elem.attributes.length; i++) {
           attributesToRemove.add(elem.attributes.item(i)!.name);
         }
       }
