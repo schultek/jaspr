@@ -12,13 +12,13 @@ topics:
   - web
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
   jaspr: ^0.15.0
-  js: ^0.6.5
+  web: ^1.0.0
 
 dev_dependencies:
-  lints: ^3.0.0
+  lints: ^4.0.0

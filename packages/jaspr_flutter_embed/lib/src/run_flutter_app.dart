@@ -2,32 +2,28 @@
 @JS()
 library flutter_interop;
 
-import 'dart:html';
+import 'dart:js_interop';
 import 'dart:ui_web' as ui_web;
 
-import 'package:js/js.dart';
+import 'package:web/web.dart';
 
 /// Starts a flutter app and attaches it to the [attachTo] dom element.
 void runFlutterApp({required String attachTo, required void Function() runApp}) {
-  var target = querySelector(attachTo);
+  var target = document.querySelector(attachTo);
 
   flutter ??= FlutterInterop();
   flutter!.loader ??= FlutterLoader();
 
-  flutter!.loader!.didCreateEngineInitializer = allowInterop((engineInitializer) {
+  flutter!.loader!.didCreateEngineInitializer = ((engineInitializer) {
     return engineInitializer
         .initializeEngine(InitializeEngineOptions(hostElement: target!))
-        .then(allowInterop((runner) {
-      runner.runApp();
-    }));
+        .toDart
+        .then((runner) => runner.runApp())
+        .toJS;
   });
 
   ui_web.bootstrapEngine(runApp: runApp);
 }
-
-/// Handle to the [require()] function from RequireJS
-@JS()
-external void Function(List<String>) require;
 
 /// Handle to the [_flutter] object defined by the 'flutter.js' script.
 @JS('_flutter')
@@ -36,59 +32,34 @@ external FlutterInterop? flutter;
 // Below are some js bindings to interact with the flutter loader script
 // from dart in a type-safe way.
 
-@JS()
-@anonymous
-class FlutterInterop {
-  external factory FlutterInterop();
+extension type FlutterInterop._(JSObject _) {
+  external FlutterInterop({FlutterLoader? loader});
 
-  external FlutterLoader? loader;
+  external FlutterLoader? get loader;
+  external set loader(FlutterLoader? loader);
 }
 
-@JS()
-@anonymous
-class FlutterLoader {
-  external factory FlutterLoader();
+extension type FlutterLoader._(JSObject _) {
+  external FlutterLoader({JSFunction? didCreateEngineInitializer});
 
-  external Promise<dynamic> loadEntrypoint(LoadEntrypointOptions options);
+  @JS("didCreateEngineInitializer")
+  external set _didCreateEngineInitializer(JSFunction? fn);
 
-  external OnEntrypointLoaded? didCreateEngineInitializer;
+  set didCreateEngineInitializer(OnEntrypointLoaded? callback) {
+    _didCreateEngineInitializer = callback?.toJS;
+  }
 }
 
-typedef OnEntrypointLoaded = Promise<void> Function(EngineInitializer engineInitializer);
+typedef OnEntrypointLoaded = JSPromise Function(EngineInitializer engineInitializer);
 
-@JS()
-@anonymous
-class LoadEntrypointOptions {
-  external factory LoadEntrypointOptions({
-    String? entrypointUrl,
-    OnEntrypointLoaded? onEntrypointLoaded,
-  });
+extension type EngineInitializer._(JSObject _) {
+  external JSPromise<AppRunner> initializeEngine(InitializeEngineOptions options);
 }
 
-@JS()
-class EngineInitializer {
-  external factory EngineInitializer();
-
-  external Promise<AppRunner> initializeEngine(InitializeEngineOptions options);
+extension type InitializeEngineOptions._(JSObject _) {
+  external InitializeEngineOptions({Element? hostElement});
 }
 
-@JS()
-@anonymous
-class InitializeEngineOptions {
-  external factory InitializeEngineOptions({
-    Element? hostElement,
-  });
-}
-
-@JS()
-class AppRunner {
-  external factory AppRunner();
-
-  external Promise<void> runApp();
-}
-
-@JS()
-class Promise<T> {
-  external Promise(void Function(void Function(T result) resolve, Function reject) executor);
-  external Promise then(void Function(T result) onFulfilled, [Function onRejected]);
+extension type AppRunner._(JSObject _) implements JSObject {
+  external JSPromise<JSAny> runApp();
 }

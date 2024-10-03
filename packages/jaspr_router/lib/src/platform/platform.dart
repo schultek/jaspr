@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
 import '../route.dart';
-import 'platform_server.dart' if (dart.library.html) 'platform_web.dart';
+import 'platform_server.dart' if (dart.library.js_interop) 'platform_web.dart';
 
 /// Interface for platform router.
 abstract class PlatformRouter {

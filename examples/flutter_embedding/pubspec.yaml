@@ -14,7 +14,6 @@ dependencies:
   jaspr: ^0.15.1
   jaspr_flutter_embed: ^0.3.4
   jaspr_riverpod: ^0.3.14
-  js: ^0.6.7
   riverpod: ^2.4.0
 
 dev_dependencies:

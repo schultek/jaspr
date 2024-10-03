@@ -32,7 +32,7 @@ final importsOutput = {
       'export \'generated/imports/_web.dart\' if (dart.library.io) \'generated/imports/_stubs.dart\'\n'
       '    show window, Window, WindowOrStubbed;\n'
       '\n'
-      'export \'generated/imports/_vm.dart\' if (dart.library.html) \'generated/imports/_stubs.dart\'\n'
+      'export \'generated/imports/_vm.dart\' if (dart.library.js_interop) \'generated/imports/_stubs.dart\'\n'
       '    show HttpServer, HttpServerOrStubbed;\n'
       ''
 };
