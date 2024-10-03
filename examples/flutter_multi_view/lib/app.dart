@@ -1,14 +1,40 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
-import 'pages/home.dart';
+import 'components/counter.dart';
 
-// A simple [StatelessComponent] with a [build] method.
 @client
-class App extends StatelessComponent {
+class App extends StatefulComponent {
+  const App({super.key});
+
+  @override
+  State<App> createState() => AppState();
+}
+
+class AppState extends State<App> {
+  int counters = 2;
+
+  @override
+  void initState() {
+    super.initState();
+    FlutterEmbedView.preload();
+  }
+
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield div(classes: 'main', [
-      const Home(),
+      section([
+        img(src: 'images/logo.png', width: 80),
+        button(onClick: () {
+          setState(() => counters++);
+        }, [text("More Counters")]),
+        button(onClick: () {
+          setState(() => counters--);
+        }, [text("Less Counters")]),
+        div(classes: 'counters', [
+          for (var i = 0; i < counters; i++) div([const Counter()]),
+        ]),
+      ])
     ]);
   }
 
@@ -22,5 +48,15 @@ class App extends StatelessComponent {
             alignItems: AlignItems.center,
           ),
     ]),
+    css('.counters').grid(
+      template: GridTemplate(
+        columns: GridTracks([
+          GridTrack(TrackSize.fr(1)),
+          GridTrack(TrackSize.fr(1)),
+          GridTrack(TrackSize.fr(1)),
+        ]),
+      ),
+    ),
+    css('.counters > div').box(padding: EdgeInsets.all(20.px)),
   ];
 }

@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
 import '../styles.dart';
-import 'flutter_counter.dart';
+import 'embedded_counter.dart';
 
 class Counter extends StatefulComponent {
   const Counter({super.key});
@@ -31,7 +31,7 @@ class CounterState extends State<Counter> {
       ),
     ]);
 
-    yield FlutterCounter(
+    yield EmbeddedCounter(
       count: count,
       onChange: (value) {
         setState(() => count = value);
