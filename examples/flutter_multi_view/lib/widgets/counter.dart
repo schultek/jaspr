@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_multi_view/constants/theme.dart';
 
 class CounterWidget extends StatelessWidget {
   const CounterWidget({this.count = 0, required this.onChange, super.key});
@@ -8,12 +9,15 @@ class CounterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var theme = ThemeData.light();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Material(
+      home: Card(
+        margin: EdgeInsets.zero,
+        color: Color(0xFF000000 | surfaceColorValue),
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: Color(0xFF01589B)),
-          borderRadius: BorderRadius.circular(10),
+          side: const BorderSide(color: Color(0xFF000000 | primaryColorValue)),
+          borderRadius: BorderRadius.circular(cardBorderRadius),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -29,7 +33,7 @@ class CounterWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text('Flutter Counter'),
-                Text('$count', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('$count', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               ],
             ),
             const SizedBox(width: 5),

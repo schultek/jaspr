@@ -105,7 +105,7 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
   Iterable<Component> build(BuildContext context) sync* {
     yield div(
       id: component.id,
-      classes: component.classes,
+      classes: [if (component.classes != null) component.classes, if (didRenderView) 'active'].join(' '),
       styles: Styles.combine([
         if (component.constraints case final c?)
           Styles.box(

@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
-import '../styles.dart';
+import '../constants/theme.dart';
 import 'embedded_counter.dart';
 
 class Counter extends StatefulComponent {
@@ -20,9 +20,13 @@ class CounterState extends State<Counter> {
         onClick: () {
           setState(() => count--);
         },
-        [text('-')],
+        [text('–')],
       ),
-      span([text('$count')]),
+      span([
+        text('Jaspr Counter'),
+        br(),
+        b([text('$count')]),
+      ]),
       button(
         onClick: () {
           setState(() => count++);
@@ -42,22 +46,29 @@ class CounterState extends State<Counter> {
   @css
   static final styles = [
     css('.counter', [
-      css('&').flexbox(alignItems: AlignItems.center).box(
+      css('&')
+          .box(
             padding: EdgeInsets.symmetric(vertical: 10.px),
-            border: Border.symmetric(vertical: BorderSide.solid(color: primaryColor, width: 1.px)),
-          ),
+            border: Border.all(BorderSide.solid(color: primaryColor, width: 1.px)),
+            radius: BorderRadius.circular(cardBorderRadius.px),
+            maxWidth: cardWidth.px,
+            minHeight: cardHeight.px,
+            boxSizing: BoxSizing.borderBox,
+          )
+          .background(color: surfaceColor)
+          .flexbox(alignItems: AlignItems.center, justifyContent: JustifyContent.spaceAround)
+          .text(color: Colors.black),
       css('button', [
         css('&')
-            .text(fontSize: 2.rem)
+            .text(fontSize: 1.5.rem)
             .box(width: 2.em, height: 2.em, border: Border.unset, cursor: Cursor.pointer)
             .box(radius: BorderRadius.all(Radius.circular(2.em)))
             .flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center)
             .background(color: Colors.transparent),
         css('&:hover').background(color: const Color.hex('#0001')),
       ]),
-      css('span') //
-          .box(padding: EdgeInsets.symmetric(horizontal: 2.rem), boxSizing: BoxSizing.borderBox, minWidth: 2.5.em)
-          .text(color: primaryColor, fontSize: 4.rem, align: TextAlign.center),
+      css('span').text(fontSize: 14.px, align: TextAlign.center),
+      css('b').text(fontSize: 18.px),
     ]),
   ];
 }

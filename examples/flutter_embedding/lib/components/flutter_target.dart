@@ -32,7 +32,7 @@ class FlutterTarget extends StatelessComponent {
             )
           : null,
       loader: loader,
-      app: app,
+      widget: app,
     );
 
     if (isHandheld) {

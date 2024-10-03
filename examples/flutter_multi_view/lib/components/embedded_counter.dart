@@ -1,3 +1,4 @@
+import 'package:flutter_multi_view/constants/theme.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
@@ -13,24 +14,25 @@ class EmbeddedCounter extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield FlutterEmbedView.deferred(
-      styles: Styles.box(margin: EdgeInsets.only(top: 2.rem), position: const Position.relative()),
+      classes: 'flutter-counter',
+      styles: Styles.box(margin: EdgeInsets.only(top: 20.px)),
       constraints: ViewConstraints(
-        minWidth: 300,
-        minHeight: 100,
+        minWidth: cardWidth,
+        minHeight: cardHeight,
         maxWidth: double.infinity,
         maxHeight: double.infinity,
-      ),
-      loader: div(
-        styles: Styles.box(
-                width: 100.percent,
-                height: 100.percent,
-                position: const Position.absolute(),
-                radius: BorderRadius.circular(10.px))
-            .background(color: Colors.lightGrey),
-        [],
       ),
       loadLibrary: widget.loadLibrary(),
       builder: () => widget.CounterWidget(count: count, onChange: onChange),
     );
   }
+
+  @css
+  static final styles = [
+    css('.flutter-counter', [
+      css('&').box(radius: BorderRadius.circular(cardBorderRadius.px)).background(color: surfaceColor),
+      css('& > div[flt-embedding]').box(opacity: 0, transition: Transition('opacity', duration: 400)),
+      css('&.active > div[flt-embedding]').box(opacity: 1),
+    ])
+  ];
 }
