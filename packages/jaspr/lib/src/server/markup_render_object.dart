@@ -3,8 +3,6 @@ import 'dart:convert';
 import '../../server.dart';
 import 'child_nodes.dart';
 
-const formatOutput = kDebugMode || kGenerateMode;
-
 class MarkupRenderObject extends RenderObject {
   String? tag;
   String? id;
@@ -59,13 +57,23 @@ class MarkupRenderObject extends RenderObject {
   }
 
   String renderToHtml() {
+    return _renderAndFormat().$1;
+  }
+
+  (String, bool, bool) _renderAndFormat(
+      [bool strictFormatting = false, bool strictWhitespace = false, String indent = '']) {
     var output = StringBuffer();
+    var leadingWhitespace = false;
+    var trailingWhitespace = false;
     if (text case var text?) {
-      if (rawHtml == true) {
-        output.write(text);
+      var html = rawHtml == true ? text : htmlEscape.convert(text);
+      if (strictFormatting) {
+        output.write(html);
       } else {
-        output.write(htmlEscape.convert(text));
+        output.write(html.replaceAll('\n', '\n$indent'));
       }
+      leadingWhitespace = html.startsWith(DomValidator._whitespace);
+      trailingWhitespace = html.substring(html.length - 1).startsWith(DomValidator._whitespace);
     } else if (tag case var tag?) {
       tag = tag.toLowerCase();
       _domValidator.validateElementName(tag);
@@ -90,33 +98,63 @@ class MarkupRenderObject extends RenderObject {
           }
         }
       }
-      var selfClosing = _domValidator.isSelfClosing(tag);
+      final selfClosing = _domValidator.isSelfClosing(tag);
       if (selfClosing) {
         output.write('/>');
       } else {
         output.write('>');
-        var childOutput = <String>[];
-        for (var child in children) {
-          childOutput.add(child.renderToHtml());
-        }
-        var fullChildOutput = childOutput.fold<String>('', (s, o) => s + o);
-        if (formatOutput && (fullChildOutput.length > 80 || fullChildOutput.contains('\n'))) {
-          output.write('\n');
-          for (var child in childOutput) {
-            output.writeln('  ${child.replaceAll('\n', '\n  ')}');
+        if (children.isNotEmpty) {
+          final childStrictFormatting = strictFormatting || _domValidator.hasStrictFormatting(tag);
+          final childStrictWhitespace = strictWhitespace || _domValidator.hasStrictWhitespace(tag);
+
+          final childOutput = <(String, bool, bool)>[];
+          var childOutputLength = 0;
+          var childOutputLinebreak = false;
+
+          for (var child in children) {
+            final (html, leading, trailing) =
+                child._renderAndFormat(childStrictFormatting, childStrictWhitespace, '$indent  ');
+            childOutput.add((html, leading, trailing));
+            childOutputLength += html.length;
+            childOutputLinebreak |= html.contains('\n');
           }
-        } else {
-          output.write(fullChildOutput);
+
+          if (childStrictFormatting || (childOutputLength < 100 && !childOutputLinebreak)) {
+            for (var child in childOutput) {
+              output.write(child.$1);
+              if (child == childOutput.first) leadingWhitespace = child.$2;
+              trailingWhitespace = child.$3;
+            }
+          } else {
+            var allowNewline = strictWhitespace ? false : true;
+            for (var child in childOutput) {
+              if (allowNewline || child.$2) {
+                output.write('\n$indent  ');
+                if (child == childOutput.first) leadingWhitespace = true;
+              }
+              output.write(child.$1);
+              allowNewline = childStrictWhitespace //
+                  ? child.$3
+                  : true;
+            }
+            if (allowNewline || !strictWhitespace) {
+              output.write('\n$indent');
+              trailingWhitespace = true;
+            }
+          }
         }
         output.write('</$tag>');
       }
     } else {
       assert(parent == null);
       for (var child in children) {
-        output.writeln(child.renderToHtml());
+        final (html, leading, trailing) = child._renderAndFormat(strictFormatting, strictWhitespace, indent);
+        output.writeln(html);
+        if (child == children.first) leadingWhitespace = leading;
+        trailingWhitespace = trailing;
       }
     }
-    return output.toString();
+    return (output.toString(), leadingWhitespace, trailingWhitespace);
   }
 
   final _attributeEscape = HtmlEscape(HtmlEscapeMode.attribute);
@@ -144,7 +182,22 @@ class DomValidator {
     'track',
     'wbr',
   };
-  final _tags = <String>{};
+  static const _strictWhitespace = <String>{
+    'p',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'label',
+  };
+  static const _strictFormatting = <String>{
+    'span',
+    'pre',
+  };
+  static final _whitespace = RegExp(r'\s');
+  static final _tags = <String>{};
   final _attrs = <String>{};
 
   void validateElementName(String tag) {
@@ -167,5 +220,13 @@ class DomValidator {
 
   bool isSelfClosing(String tag) {
     return _selfClosing.contains(tag);
+  }
+
+  bool hasStrictWhitespace(String tag) {
+    return _strictWhitespace.contains(tag);
+  }
+
+  bool hasStrictFormatting(String tag) {
+    return _strictFormatting.contains(tag);
   }
 }

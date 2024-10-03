@@ -162,3 +162,51 @@ component also only receives a single string to render to the page.
 
 As usual for web, styling is done through a combination of CSS attributes, either in a **Stylesheet** or inline though
 the **`styles` attribute** of the parent elements.
+
+## Formatting Whitespace
+
+When pre-rendering your components in **server** and **static** mode, Jaspr will output cleanly formatted html on a best-effort
+basis. This means it will add newlines and indentations to your html element, while trying to not affect the way the html
+is rendered.
+
+For example lets look at this simple Jaspr code:
+
+```dart
+div([
+  b([text('A')]),
+  em([text('B')]),
+  span([text('C')]),
+])
+```
+
+Which will generate the following html:
+
+```html
+<div>
+  <b>A</b>
+  <em>B</em>
+  <span>C</span>
+</div>
+```
+
+Here Jaspr adds newlines and indentation for each child element. However in some cases, you might not want Jaspr
+to introduce extra whitespace because it would affect the way the html is rendered.
+
+If you don't want Jaspr to format the output html for a part of your code, wrap it in a `<span>` element. This works
+since Jaspr will not apply and additional formatting to `<span>` elements.
+
+So for example this code:
+
+```dart
+span([
+  b([text('A')]),
+  em([text('B')]),
+  span([text('C')]),
+]),
+```
+
+will generate to following html:
+
+```html
+<span><b>A</b><em>B</em><span>C</span></span>
+```
