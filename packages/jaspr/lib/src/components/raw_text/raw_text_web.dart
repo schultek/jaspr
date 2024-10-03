@@ -1,6 +1,9 @@
-import 'dart:html' as html;
+import 'dart:js_interop';
+
+import 'package:web/web.dart' as web;
 
 import '../../../browser.dart';
+import '../../browser/utils.dart';
 
 /// Renders its input as raw HTML.
 ///
@@ -14,8 +17,9 @@ class RawText extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    var fragment = html.document.createDocumentFragment()..setInnerHtml(text, validator: AllowAll());
-    for (var node in fragment.childNodes) {
+    var fragment = web.document.createElement('template');
+    fragment.innerHTML = text.toJS;
+    for (var node in fragment.childNodes.toIterable()) {
       yield RawNode.withKey(node);
     }
   }
@@ -24,18 +28,18 @@ class RawText extends StatelessComponent {
 class RawNode extends Component {
   RawNode(this.node, {super.key});
 
-  factory RawNode.withKey(html.Node node) {
+  factory RawNode.withKey(web.Node node) {
     return RawNode(
       node,
       key: switch (node) {
-        html.Text() => ValueKey('text'),
-        html.Element(:var tagName) => ValueKey('element:$tagName'),
+        web.Text() when node.instanceOfString("Text") => ValueKey('text'),
+        web.Element() when node.instanceOfString("Element") => ValueKey('element:${node.tagName}'),
         _ => null,
       },
     );
   }
 
-  final html.Node node;
+  final web.Node node;
 
   @override
   Element createElement() => RawNodeElement(this);
@@ -49,7 +53,7 @@ class RawNodeElement extends BuildableRenderObjectElement {
 
   @override
   Iterable<Component> build() sync* {
-    for (var node in component.node.childNodes) {
+    for (var node in component.node.childNodes.toIterable()) {
       yield RawNode.withKey(node);
     }
   }
@@ -57,28 +61,17 @@ class RawNodeElement extends BuildableRenderObjectElement {
   @override
   void updateRenderObject() {
     var next = component.node;
-    if (next is html.Text) {
-      renderObject.updateText(next.text ?? '');
-    } else if (next is html.Element) {
-      renderObject.updateElement(next.tagName.toLowerCase(), next.id, next.className, null, next.attributes, null);
+    if (next.instanceOfString("Text") && next is web.Text) {
+      renderObject.updateText(next.textContent ?? '');
+    } else if (next.instanceOfString("Element") && next is web.Element) {
+      renderObject.updateElement(
+          next.tagName.toLowerCase(), next.id, next.className, null, next.attributes.toMap(), null);
     } else {
       var curr = (renderObject as DomRenderObject).node;
       if (curr != null) {
-        curr.replaceWith(next);
+        curr.parentNode?.replaceChild(next, curr);
       }
       (renderObject as DomRenderObject).node = next;
     }
-  }
-}
-
-class AllowAll implements html.NodeValidator {
-  @override
-  bool allowsAttribute(html.Element element, String attributeName, String value) {
-    return true;
-  }
-
-  @override
-  bool allowsElement(html.Element element) {
-    return true;
   }
 }

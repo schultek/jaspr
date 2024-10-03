@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
-import 'counter.server.dart' if (dart.library.html) 'counter.web.dart';
+import 'counter.server.dart' if (dart.library.js_interop) 'counter.web.dart';
 
 // A simple [StatelessComponent] with a [build] method
 @client

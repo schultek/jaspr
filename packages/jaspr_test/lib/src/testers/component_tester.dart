@@ -8,6 +8,7 @@ import 'package:test/test.dart';
 
 import '../binding.dart';
 import '../finders.dart';
+import 'fake_event_web.dart' if (dart.library.io) 'fake_event_vm.dart';
 
 @isTest
 void testComponents(
@@ -51,7 +52,7 @@ class ComponentTester {
   /// Simulates a 'click' event on the given element
   /// and pumps the next frame.
   Future<void> click(Finder finder, {bool pump = true}) async {
-    dispatchEvent(finder, 'click', null);
+    dispatchEvent(finder, 'click', fakeEvent());
     if (pump) {
       await pumpEventQueue();
     }

@@ -1,6 +1,9 @@
-import 'dart:html' as html;
+import 'dart:js_interop';
+
+import 'package:web/web.dart' as web;
 
 import '../../../browser.dart';
+import '../../browser/utils.dart';
 
 abstract class Document implements Component {
   /// Attaches a set of attributes to the `<html>` element.
@@ -151,11 +154,11 @@ class _AttachElement extends ProxyRenderObjectElement {
 
 class AttachRenderObject extends DomRenderObject {
   AttachRenderObject(this._target, this._depth) {
-    node = html.Text('');
+    node = web.Text('');
     AttachAdapter.instanceFor(_target).register(this);
   }
 
-  final List<html.Node> children = [];
+  final List<web.Node> children = [];
 
   AttachTarget _target;
   set target(AttachTarget target) {
@@ -224,17 +227,17 @@ class AttachAdapter {
 
   final AttachTarget target;
 
-  late final html.Element element = html.querySelector(target.name)!;
+  late final web.Element element = web.document.querySelector(target.name)!;
 
-  late final Map<String, String> initialAttributes = {...element.attributes};
+  late final Map<String, String> initialAttributes = element.attributes.toMap();
 
-  late final (html.Node, html.Node) attachWindow = () {
-    var iterator = html.NodeIterator(element, html.NodeFilter.SHOW_COMMENT);
+  late final (web.Node, web.Node) attachWindow = () {
+    var iterator = web.document.createNodeIterator(element, 128);
 
-    html.Node? start, end;
+    web.Node? start, end;
 
-    html.Comment? currNode;
-    while ((currNode = iterator.nextNode() as html.Comment?) != null) {
+    web.Comment? currNode;
+    while ((currNode = iterator.nextNode() as web.Comment?) != null) {
       var value = currNode!.nodeValue ?? '';
       if (value == r'$') {
         start = currNode;
@@ -244,34 +247,38 @@ class AttachAdapter {
     }
 
     if (start == null) {
-      start = html.Comment(r'$');
+      start = web.Comment(r'$');
       element.insertBefore(start, end);
     }
     if (end == null) {
-      end = html.Comment('/');
-      element.insertBefore(end, start.nextNode);
+      end = web.Comment('/');
+      element.insertBefore(end, start.nextSibling);
     }
     return (start, end);
   }();
 
-  Iterable<html.Node> get liveNodes sync* {
-    html.Node? curr = attachWindow.$1.nextNode;
+  Iterable<web.Node> get liveNodes sync* {
+    web.Node? curr = attachWindow.$1.nextSibling;
     while (curr != null && curr != attachWindow.$2) {
       yield curr;
-      curr = curr.nextNode;
+      curr = curr.nextSibling;
     }
   }
 
-  late final Map<String, html.Node> initialKeyedNodes = {
+  late final Map<String, web.Node> initialKeyedNodes = {
     for (var node in liveNodes)
       if (keyFor(node) case String key) key: node,
   };
 
-  String? keyFor(html.Node node) {
-    return switch (node) {
-      html.Element(id: String id) when id.isNotEmpty => id,
-      html.Element(tagName: "TITLE" || "BASE") => '__${node.tagName}',
-      html.Element(tagName: "META", attributes: {'name': String name}) => '__meta:$name',
+  String? keyFor(web.Node node) {
+    if (!node.instanceOfString('Element')) return null;
+    return switch (node as web.Element) {
+      web.Element(id: String id) when id.isNotEmpty => id,
+      web.Element(tagName: "TITLE" || "BASE") => '__${node.tagName}',
+      web.Element(tagName: "META") => switch (node.attributes.getNamedItem("name")) {
+          web.Attr name => '__meta:${name.value}',
+          _ => null
+        },
       _ => null,
     };
   }
@@ -296,7 +303,10 @@ class AttachAdapter {
         }
       }
 
-      var attributesToRemove = element.attributes.keys.toSet();
+      var attributesToRemove = <String>{};
+      for (var i = 0; i < element.attributes.length; i++) {
+        attributesToRemove.add(element.attributes.item(i)!.name);
+      }
       if (attributes.isNotEmpty) {
         for (var attr in attributes.entries) {
           element.clearOrSetAttribute(attr.key, attr.value);
@@ -312,8 +322,8 @@ class AttachAdapter {
     }
 
     if (target.attachChildren) {
-      Map<String, html.Node> keyedNodes = Map.of(initialKeyedNodes);
-      List<html.Node> children = List.of(initialKeyedNodes.values);
+      Map<String, web.Node> keyedNodes = Map.of(initialKeyedNodes);
+      List<web.Node> children = List.of(initialKeyedNodes.values);
 
       for (var renderObject in renderObjects) {
         for (var node in renderObject.children) {
@@ -330,24 +340,24 @@ class AttachAdapter {
         }
       }
 
-      html.Node? current = attachWindow.$1.nextNode;
+      web.Node? current = attachWindow.$1.nextSibling;
 
       for (var node in children) {
         if (current == null || current == attachWindow.$2) {
           element.insertBefore(node, current);
         } else if (current == node) {
-          current = current.nextNode;
+          current = current.nextSibling;
         } else if (keyFor(node) != null && keyFor(node) == keyFor(current)) {
-          current.replaceWith(node);
-          current = node.nextNode;
+          current.parentNode?.replaceChild(node, current);
+          current = node.nextSibling;
         } else {
           element.insertBefore(node, current);
         }
       }
 
       while (current != null && current != attachWindow.$2) {
-        var next = current.nextNode;
-        current.remove();
+        var next = current.nextSibling;
+        current.parentNode?.removeChild(current);
         current = next;
       }
     }

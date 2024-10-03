@@ -22,5 +22,5 @@ export 'src/foundation/sync.dart';
 export 'src/foundation/synchronous_future.dart';
 export 'src/framework/framework.dart';
 export 'src/stub/run_app_stub.dart'
-    if (dart.library.html) 'src/browser/run_app.dart'
+    if (dart.library.js_interop) 'src/browser/run_app.dart'
     if (dart.library.io) 'src/server/run_app.dart' show runApp;
