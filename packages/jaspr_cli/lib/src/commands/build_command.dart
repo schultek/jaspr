@@ -80,20 +80,26 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       entryPoint = await getEntryPoint(argResults!['input']);
     }
 
-    if (await dir.exists()) {
-      await dir.delete(recursive: true);
+    if (dir.existsSync()) {
+      dir.deleteSync(recursive: true);
     }
-    await webDir.create(recursive: true);
+    webDir.createSync(recursive: true);
 
     var indexHtml = File('web/index.html').absolute;
     var targetIndexHtml = File('${webDir.path}/index.html').absolute;
 
     var dummyIndex = false;
     var dummyTargetIndex = false;
-    if (config!.usesFlutter && !await indexHtml.exists()) {
+    if (config!.usesFlutter && !indexHtml.existsSync()) {
       dummyIndex = true;
       dummyTargetIndex = true;
-      await indexHtml.create();
+      indexHtml
+        ..createSync()
+        ..writeAsStringSync(
+            'This file (web/index.html) should not exist. If you see this message something went wrong during "jaspr build". Simply delete the file.');
+      guardResource(() {
+        if (indexHtml.existsSync()) indexHtml.deleteSync();
+      });
     }
 
     var webResult = _buildWeb();
@@ -210,9 +216,9 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     await flutterResult;
 
     if (dummyIndex) {
-      await indexHtml.delete();
-      if (dummyTargetIndex && await targetIndexHtml.exists()) {
-        await targetIndexHtml.delete();
+      if (indexHtml.existsSync()) indexHtml.deleteSync();
+      if (dummyTargetIndex && targetIndexHtml.existsSync()) {
+        targetIndexHtml.deleteSync();
       }
     }
 
