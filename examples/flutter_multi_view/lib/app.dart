@@ -59,12 +59,22 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
         for (var name in counters) Counter(name: name),
       ]),
     ]);
+
+    yield footer([
+      text('💙 Built with '),
+      a(href: "https://github.com/schultek/jaspr", [text('Jaspr')]),
+      text(' by '),
+      a(href: "https://x.com/schultek_dev", [text('@schultek')]),
+      text(' 💙'),
+      br(),
+      a(href: "https://github.com/schultek/jaspr/tree/main/examples/flutter_multi_view", [text('See the code')]),
+    ]);
   }
 
   @css
   static final styles = [
     css('.main', [
-      css('&').flexbox(direction: FlexDirection.column, alignItems: AlignItems.center),
+      css('&').box(minHeight: 80.vh).flexbox(direction: FlexDirection.column, alignItems: AlignItems.center),
       css('.buttons', [
         css('&').flexbox(direction: FlexDirection.row),
         css('button')
@@ -82,5 +92,8 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
         ),
       ]),
     ]),
+    css('footer')
+        .box(margin: EdgeInsets.all(40.px))
+        .text(fontSize: 12.px, align: TextAlign.center, fontStyle: FontStyle.italic),
   ];
 }

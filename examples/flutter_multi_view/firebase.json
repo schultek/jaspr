@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "site": "jaspr-flutter-multiview-demo",
+    "public": "build/jaspr",
+    "ignore": [
+      "firebase.json",
+      "**/.*"
+    ]
+  }
+}
