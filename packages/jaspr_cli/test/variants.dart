@@ -9,7 +9,15 @@ final allVariants = [
       for (var routing in RoutingOption.values)
         for (var flutter in FlutterOption.values)
           for (var backend in BackendOption.valuesFor(mode))
-            TestVariant(mode: mode, hydration: hydration, routing: routing, flutter: flutter, backend: backend),
+            for (var compiler in CompilerOption.values)
+              TestVariant(
+                mode: mode,
+                hydration: hydration,
+                routing: routing,
+                flutter: flutter,
+                backend: backend,
+                compiler: compiler,
+              ),
 ];
 
 class TestVariant {
@@ -18,6 +26,7 @@ class TestVariant {
   final RoutingOption routing;
   final FlutterOption flutter;
   final BackendOption backend;
+  final CompilerOption compiler;
 
   const TestVariant({
     required this.mode,
@@ -25,15 +34,18 @@ class TestVariant {
     required this.routing,
     required this.flutter,
     required this.backend,
+    required this.compiler,
   });
 
   String get name =>
-      '${mode.name}${hydration.option} routing:${routing.option} flutter:${flutter.option} backend:${backend.option}';
+      '${mode.name}${hydration.option} routing:${routing.option} flutter:${flutter.option} backend:${backend.option} compiler:${compiler.option}';
 
-  String get options =>
+  String get tag => '${mode.tag}${hydration.tag}${routing.tag}${flutter.tag}${backend.tag}${compiler.tag}';
+
+  String get createOptions =>
       '-m ${mode.name}${hydration.option} -r ${routing.option} -f ${flutter.option} -b ${backend.option}';
 
-  String get tag => '${mode.tag}${hydration.tag}${routing.tag}${flutter.tag}${backend.tag}';
+  List<String> get runOptions => ['-v', if (compiler == CompilerOption.wasm) '--experimental-wasm'];
 
   Set<String> get packages => {
         if (routing != RoutingOption.none) 'packages/jaspr_router',
@@ -45,6 +57,7 @@ class TestVariant {
         ('pubspec.yaml', fileExists),
         ('README.md', fileExists),
         ...mode.files,
+        ...hydration.files,
         ...routing.files,
         ...flutter.files,
         ...backend.files,
@@ -53,6 +66,7 @@ class TestVariant {
   Set<String> get resources => {
         '/',
         ...mode.resources,
+        ...hydration.resources,
         ...routing.resources,
         ...flutter.resources,
         ...backend.resources,
@@ -60,6 +74,7 @@ class TestVariant {
 
   Set<(String, Matcher)> get outputs => {
         ...mode.outputs,
+        ...hydration.outputsFor(compiler),
         ...routing.outputs,
         ...flutter.outputs,
         ...backend.outputs,
@@ -107,11 +122,20 @@ enum HydrationMode {
         auto => {}
       };
   Set<String> get resources => {};
-  Set<(String, Matcher)> get outputs => switch (this) {
-        none => {('main.dart.js', fileExists)},
+  Set<(String, Matcher)> outputsFor(CompilerOption compiler) => switch (this) {
+        none => {
+            ('main.dart.js', fileExists),
+            if (compiler == CompilerOption.wasm) ...{('main.mjs', fileExists), ('main.wasm', fileExists)}
+          },
         auto => {
             ('main.clients.dart.js', fileExists),
             ('components/app.client.dart.js', fileExists),
+            if (compiler == CompilerOption.wasm) ...{
+              ('main.clients.mjs', fileExists),
+              ('main.clients.wasm', fileExists),
+              ('components/app.client.mjs', fileExists),
+              ('components/app.client.wasm', fileExists),
+            }
           },
       };
 }
@@ -164,6 +188,7 @@ enum FlutterOption {
         embedded => {
             ('manifest.json', fileExists),
             ('version.json', fileExists),
+            ('flutter_bootstrap.js', fileExists),
             ('flutter_service_worker.js', fileExists),
             ('canvaskit/canvaskit.js', fileExists),
             ('assets/AssetManifest.json', fileExists),
@@ -183,6 +208,20 @@ enum BackendOption {
       switch (mode) { RenderingMode.server => values, _ => [none] };
 
   String get tag => switch (this) { none => 'n', shelf => 's' };
+
+  Set<(String, Matcher)> get files => {};
+  Set<String> get resources => {};
+  Set<(String, Matcher)> get outputs => {};
+}
+
+enum CompilerOption {
+  js('js'),
+  wasm('wasm');
+
+  const CompilerOption(this.option);
+  final String option;
+
+  String get tag => switch (this) { js => 'j', wasm => 'w' };
 
   Set<(String, Matcher)> get files => {};
   Set<String> get resources => {};
