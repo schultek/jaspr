@@ -5,6 +5,5 @@
 
 import '../../../widgets/counter.dart' show CounterWidget;
 export '../../../widgets/counter.dart' show CounterWidget;
-export '../../../view_transition.dart' show startViewTransition;
 
 typedef CounterWidgetOrStubbed = CounterWidget;

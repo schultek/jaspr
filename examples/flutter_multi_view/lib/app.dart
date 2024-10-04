@@ -1,8 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
-@Import.onWeb('view_transition.dart', show: [#startViewTransition])
-import 'app.imports.dart';
 import 'components/counter.dart';
 import 'constants/theme.dart';
 
@@ -14,7 +12,7 @@ class App extends StatefulComponent {
   State<App> createState() => AppState();
 }
 
-class AppState extends State<App> {
+class AppState extends State<App> with ViewTransitionMixin<App> {
   List<String> counters = ['counter-1', 'counter-2'];
 
   @override
@@ -24,42 +22,18 @@ class AppState extends State<App> {
   }
 
   void addCounter() async {
-    // if (!document.has('startViewTransition')) {
-    //   setState(() {
-    //     counters.add('counter-${counters.length + 1}');
-    //   });
-    //   return;
-    // }
-
-    await startViewTransition(() {
-      setState(() {
-        counters.add('targeted-counter');
-      });
-    });
-
-    setState(() {
+    setStateWithViewTransition(() {
+      counters.add('targeted-counter');
+    }, postTransition: () {
       counters[counters.length - 1] = 'counter-${counters.length}';
     });
   }
 
   void removeCounter() {
-    // if (document.startViewTransition as dynamic == null) {
-    //   setState(() {
-    //     counters.removeLast();
-    //   });
-    //   return;
-    // }
-
-    setState(() {
+    setStateWithViewTransition(preTransition: () {
       counters[counters.length - 1] = 'targeted-counter';
-    });
-
-    context.binding.addPostFrameCallback(() {
-      startViewTransition(() {
-        setState(() {
-          counters.removeLast();
-        });
-      });
+    }, () {
+      counters.removeLast();
     });
   }
 

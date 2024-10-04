@@ -5,4 +5,3 @@
 
 dynamic CounterWidget;
 typedef CounterWidgetOrStubbed = dynamic;
-dynamic startViewTransition;
