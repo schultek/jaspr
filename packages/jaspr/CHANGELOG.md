@@ -1,10 +1,14 @@
 ## Unreleased breaking
 
-- **BREAKING** Migrate all packages to `package:web`, replacing `dart:html`.
-- **BREAKING** Make `ComponentsBinding.attachRootComponent()` and `ComponentTester.pumpComponent()` synchronous.
+- **BREAKING** Migrated all packages to `package:web`, replacing `dart:html`.
+- **BREAKING** Made `ComponentsBinding.attachRootComponent()` and `ComponentTester.pumpComponent()` synchronous.
 
-- Add `InheritedModel<T>` similar to Flutters [InheritedModel](https://api.flutter.dev/flutter/widgets/InheritedModel-class.html)
+- Added `InheritedModel<T>` similar to Flutters [InheritedModel](https://api.flutter.dev/flutter/widgets/InheritedModel-class.html)
+- Added `css.layer()`, `css.supports()` and `css.keyframes()` rules.
+- Added `ViewTransitionMixin` to use [view transitions](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API) in a `StatefulComponent`.
+
 - Improved html formatting on the server to not introduce unwanted whitespaces.
+
 - Fixed server issue during tests where the web directory would never resolve.
 - Fixed issue with unhandled parameter types of client components.
 

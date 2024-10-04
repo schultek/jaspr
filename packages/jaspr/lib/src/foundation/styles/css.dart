@@ -72,6 +72,21 @@ class CssUtility {
   MediaStyleRule media(MediaQuery query, List<StyleRule> styles) {
     return MediaStyleRule(query: query, styles: styles);
   }
+
+  /// Renders a `@layer` css rule.
+  LayerStyleRule layer(List<StyleRule> styles, {String? name}) {
+    return LayerStyleRule(name: name, styles: styles);
+  }
+
+  /// Renders a `@supports` css rule.
+  SupportsStyleRule supports(String condition, List<StyleRule> styles) {
+    return SupportsStyleRule(condition: condition, styles: styles);
+  }
+
+  /// Renders a `@keyframes` css rule.
+  KeyframesStyleRule keyframes(String name, Map<String, Styles> styles) {
+    return KeyframesStyleRule(name: name, styles: styles);
+  }
 }
 
 class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {

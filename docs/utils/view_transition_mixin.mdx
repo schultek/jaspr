@@ -1,0 +1,35 @@
+---
+title: ViewTransitionMixin
+description: Easily transition between ui states with View Transitions.
+---
+
+---
+
+The `ViewTransitionMixin` lets you use [View Transitions](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API)
+when updating a `StatefulComponent`s `State`.
+
+## Usage
+
+Start by adding the `ViewTransitionMixin` on a `StatefulComponent`s `State` class.
+
+```dart
+class MyStatefulComponent extends StatefulComponent { /* ... */ }
+
+class MyState extends State<MyStatefulComponent> with ViewTransitionMixin {
+
+  /* ... */
+}
+```
+
+This will give you access to the `setStateWithViewTransition()` method, which is a drop-in replacement for
+`setState()` and will start an animated view transition for your state change.
+
+<Warning>
+    You must also define your view transitions in css using the [View Transitions API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API).
+</Warning>
+
+---
+
+In addition to the main `callback` function, `setStateWithViewTransition()` also takes a named `preTransition` and `postTransition`
+callback. You can use these to change your state **before** or **after** the transition, e.g. to apply custom view transition names
+on elements.

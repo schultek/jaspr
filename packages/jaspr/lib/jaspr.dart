@@ -20,6 +20,7 @@ export 'src/foundation/scheduler.dart';
 export 'src/foundation/style.dart';
 export 'src/foundation/sync.dart';
 export 'src/foundation/synchronous_future.dart';
+export 'src/foundation/view_transition.dart';
 export 'src/framework/framework.dart';
 export 'src/stub/run_app_stub.dart'
     if (dart.library.js_interop) 'src/browser/run_app.dart'
