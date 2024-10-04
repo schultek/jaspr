@@ -14,28 +14,55 @@ With the `FlutterEmbedView` component you can embed any Flutter widget as part o
 Jaspr component tree. The component takes care of initializing the Flutter engine and attaching the provided widget
 to the root of Flutters widget tree. It internally calls Flutters `runApp` method with the provided widget.
 
-It renders a `<div id="flutter_target"></div>` element and mounts the flutter app inside.
+It renders a `<div></div>` element and mounts the flutter app inside.
+
+## Usage
 
 You can provide the following parameters:
 
-- `app`: The widget that will be run as your embedded Flutter app.
-- `loader`: An optional component that is displayed while the flutter app is initializing.
+- `id`: Optional id for the created `<div>` element.
 - `classes`: Optional class name for the created `<div>` element.
 - `styles`: Optional styles for the created `<div>` element.
+- `constraints`: Optional view constraints for the flutter view.
+- `loader`: An optional component that is displayed while the flutter app is initializing.
+- `widget`: The widget that will be run as your embedded Flutter app.
 
 ```dart
 yield FlutterEmbedView(
+  // provide an optional loader component that will be displayed while the flutter app loads
+  loader: MyCustomLoader(),
   // provide your flutter app widget
-  app: MyFlutterApp(
+  widget: MyFlutterApp(
     // provide any widget properties or callbacks
     // this way you can pass and share state between jaspr and flutter
     // without needing js interop
     title: 'My Embedded Flutter App',
   ),
-  // provide an optional loader component that will be displayed while the flutter app loads
-  loader: MyCustomLoader(),
 );
 ```
+
+## Deferred variant
+
+The `FlutterEmbedView` is designed to be used with **deferred imports**. This will help making your bundle size smaller
+and the loading of your site faster.
+
+To make full use of the optimal bundle splitting, place your app widget in a separate library and deferred import it.
+Then you can use the `FlutterEmbedView.deferred()` constructor like this:
+
+```dart
+import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
+import 'widgets/my_app.dart' deferred as app;
+
+/* ... */
+
+yield FlutterEmbedView.deferred(
+  /* ... */
+  loadLibrary: app.loadLibrary(),
+  builder: () => app.MyFlutterApp(),
+);
+```
+
+---
 
 <Info>
 Read more about Jasprs support for [Flutter Embedding](/going_further/flutter_embedding).
