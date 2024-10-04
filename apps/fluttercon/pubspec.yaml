@@ -1,6 +1,6 @@
 name: fluttercon
 description: A new jaspr project.
-version: 0.0.3
+version: 0.0.4
 publish_to: none
 homepage: https://fluttercon.schultek.de
 issue_tracker: https://github.com/schultek/jaspr/issues
@@ -13,8 +13,8 @@ dependencies:
   dart_mappable: ^4.2.2
   http: ^1.2.1
   intl: ^0.19.0
-  jaspr: ^0.15.1
-  jaspr_router: ^0.5.1
+  jaspr: ^0.16.0
+  jaspr_router: ^0.6.0
   shared_preferences: ^2.2.3
 
 dev_dependencies:

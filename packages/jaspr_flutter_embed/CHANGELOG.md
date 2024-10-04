@@ -1,4 +1,4 @@
-## Unreleased breaking
+## 0.4.0
 
 - **BREAKING** Migrated to `package:web`.
 - **BREAKING** Added support for multi-view embedding. This allows you to use `FlutterEmbedView` multiple times across 

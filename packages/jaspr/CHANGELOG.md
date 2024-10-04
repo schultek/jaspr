@@ -1,4 +1,4 @@
-## Unreleased breaking
+## 0.16.0
 
 - **BREAKING** Migrated all packages to `package:web`, replacing `dart:html`.
 - **BREAKING** Made `ComponentsBinding.attachRootComponent()` and `ComponentTester.pumpComponent()` synchronous.

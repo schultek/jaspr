@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.1.2
 
 - Updated sdk constraint to `>=3.5.0 <4.0.0`.
 - Fixed setup instructions in README.

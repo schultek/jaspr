@@ -1,4 +1,4 @@
-## Unreleased breaking
+## 0.6.0
 
 - **BREAKING** Migrate to `package:web`.
 

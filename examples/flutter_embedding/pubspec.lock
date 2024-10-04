@@ -371,35 +371,36 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.15.1"
+    version: "0.16.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.15.1"
+    version: "0.16.0"
   jaspr_flutter_embed:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_flutter_embed"
       relative: true
     source: path
-    version: "0.3.4"
+    version: "0.4.0"
   jaspr_riverpod:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_riverpod"
       relative: true
     source: path
-    version: "0.3.14"
+    version: "0.3.15"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
-      path: "../../modules/build/jaspr_web_compilers"
-      relative: true
-    source: path
-    version: "4.0.9"
+      name: jaspr_web_compilers
+      sha256: "068e42fbb89e5a7b7d47849886669b80a0d9e011f76bbfd85f6444d0b80cc4f4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.10"
   js:
     dependency: transitive
     description:
@@ -766,5 +767,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.5.0-259.0.dev <3.7.0"
+  dart: ">=3.5.0-259.0.dev <3.6.0"
   flutter: ">=3.22.0"

@@ -1,3 +1,9 @@
+## 0.1.3
+
+- `jaspr` upgraded to `0.16.0`
+- `jaspr_router` upgraded to `0.6.0`
+- `jaspr_serverpod` upgraded to `0.4.0`
+
 ## 0.1.2
 
 - `jaspr` upgraded to `0.15.0`

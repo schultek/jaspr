@@ -390,29 +390,28 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.15.1"
+    version: "0.16.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.15.1"
+    version: "0.16.0"
   jaspr_flutter_embed:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_flutter_embed"
       relative: true
     source: path
-    version: "0.3.4"
+    version: "0.4.0"
   jaspr_lints:
     dependency: "direct dev"
     description:
-      name: jaspr_lints
-      sha256: ad0c61d9a6faeab35d542e1243fe0dac3433b6d297f06e39b7e3bdda364aae43
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.1"
+      path: "../../packages/jaspr_lints"
+      relative: true
+    source: path
+    version: "0.1.2"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:

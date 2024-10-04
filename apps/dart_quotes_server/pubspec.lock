@@ -629,28 +629,28 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.15.1"
+    version: "0.16.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.15.1"
+    version: "0.16.0"
   jaspr_router:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_router"
       relative: true
     source: path
-    version: "0.5.1"
+    version: "0.6.0"
   jaspr_serverpod:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_serverpod"
       relative: true
     source: path
-    version: "0.3.3"
+    version: "0.4.0"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
