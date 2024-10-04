@@ -9,6 +9,8 @@
   a Flutter view.
 - Added `FlutterEmbedView.deferred()` constructor as an easy way to work with deferred imports of widgets.
 
+- Updated sdk constraints of flutter to `>=3.24.0 <4.0.0` and dart to `>=3.5.0 <4.0.0`.
+
 ## 0.3.4
 
 - `jaspr` upgraded to `0.15.0`
