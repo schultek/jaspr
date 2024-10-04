@@ -12,8 +12,7 @@ abstract class InheritedModel<T> extends InheritedComponent {
   /// Return true if the changes between this model and [oldComponent] match any
   /// of the [dependencies].
   @protected
-  bool updateShouldNotifyDependent(
-      covariant InheritedModel<T> oldComponent, Set<T> dependencies);
+  bool updateShouldNotifyDependent(covariant InheritedModel<T> oldComponent, Set<T> dependencies);
 
   /// Returns true if this model supports the given [aspect].
   ///
@@ -29,8 +28,7 @@ abstract class InheritedModel<T> extends InheritedComponent {
   // with the one that supports the specified model [aspect].
   static void _findModels<T extends InheritedModel<Object>>(
       BuildContext context, Object aspect, List<InheritedElement> results) {
-    final InheritedElement? model =
-        context.getElementForInheritedComponentOfExactType<T>();
+    final InheritedElement? model = context.getElementForInheritedComponentOfExactType<T>();
     if (model == null) {
       return;
     }
@@ -70,8 +68,7 @@ abstract class InheritedModel<T> extends InheritedComponent {
   /// `context.dependOnInheritedComponentOfExactType<T>()`.
   ///
   /// If no ancestor of type T exists, null is returned.
-  static T? inheritFrom<T extends InheritedModel<Object>>(BuildContext context,
-      {Object? aspect}) {
+  static T? inheritFrom<T extends InheritedModel<Object>>(BuildContext context, {Object? aspect}) {
     if (aspect == null) {
       return context.dependOnInheritedComponentOfExactType<T>();
     }
@@ -86,8 +83,7 @@ abstract class InheritedModel<T> extends InheritedComponent {
 
     final InheritedElement lastModel = models.last;
     for (final InheritedElement model in models) {
-      final T value =
-          context.dependOnInheritedElement(model, aspect: aspect) as T;
+      final T value = context.dependOnInheritedElement(model, aspect: aspect) as T;
       if (model == lastModel) {
         return value;
       }
@@ -113,8 +109,7 @@ class InheritedModelElement<T> extends InheritedElement {
       setDependencies(dependent, HashSet<T>());
     } else {
       assert(aspect is T);
-      setDependencies(
-          dependent, (dependencies ?? HashSet<T>())..add(aspect as T));
+      setDependencies(dependent, (dependencies ?? HashSet<T>())..add(aspect as T));
     }
   }
 
@@ -125,8 +120,7 @@ class InheritedModelElement<T> extends InheritedElement {
       return;
     }
     if (dependencies.isEmpty ||
-        (component as InheritedModel<T>)
-            .updateShouldNotifyDependent(oldComponent, dependencies)) {
+        (component as InheritedModel<T>).updateShouldNotifyDependent(oldComponent, dependencies)) {
       dependent.didChangeDependencies();
     }
   }

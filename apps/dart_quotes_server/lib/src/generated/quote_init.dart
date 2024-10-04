@@ -11,8 +11,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
-abstract class QuoteInit
-    implements _i1.SerializableModel, _i1.ProtocolSerialization {
+abstract class QuoteInit implements _i1.SerializableModel, _i1.ProtocolSerialization {
   QuoteInit._({required this.id});
 
   factory QuoteInit({required int id}) = _QuoteInitImpl;
