@@ -167,6 +167,14 @@ abstract class BaseCommand extends Command<CommandResult?> {
 
     return exitCode;
   }
+
+  void checkWasmSupport() {
+    var package = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    var version = config!.pubspecYaml['dev_dependencies']?[package];
+    if (version is! String || !version.startsWith(RegExp(r'\^?4.1.'))) {
+      usageException('Using "--experimental-wasm" requires $package 4.1.0 or newer.');
+    }
+  }
 }
 
 extension on Stream<String> {

@@ -191,6 +191,11 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   }
 
   Future<DevWorkflow> _runWebCompiler(String webPort) async {
+    bool useWasm = argResults!['experimental-wasm'] as bool;
+    if (useWasm) {
+      checkWasmSupport();
+    }
+
     logger.write('Starting web compiler...', progress: ProgressState.running);
 
     var configuration = Configuration(
@@ -199,8 +204,6 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     );
 
     var package = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
-    bool useWasm = argResults!['experimental-wasm'] as bool;
-
     var compiler = useWasm
         ? 'dart2wasm'
         : release
