@@ -4,7 +4,9 @@ import '../constants/theme.dart';
 import 'embedded_counter.dart';
 
 class Counter extends StatefulComponent {
-  const Counter({super.key});
+  const Counter({required this.name, super.key});
+
+  final String name;
 
   @override
   State<Counter> createState() => CounterState();
@@ -15,36 +17,43 @@ class CounterState extends State<Counter> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'counter', [
-      button(
-        onClick: () {
-          setState(() => count--);
-        },
-        [text('–')],
-      ),
-      span([
-        text('Jaspr Counter'),
-        br(),
-        b([text('$count')]),
+    yield div(classes: 'counter-group', styles: Styles.raw({'view-transition-name': component.name}), [
+      div(classes: 'counter', [
+        button(
+          onClick: () {
+            setState(() => count--);
+          },
+          [text('–')],
+        ),
+        span([
+          text('Jaspr Counter'),
+          br(),
+          b([text('$count')]),
+        ]),
+        button(
+          onClick: () {
+            setState(() => count++);
+          },
+          [text('+')],
+        ),
       ]),
-      button(
-        onClick: () {
-          setState(() => count++);
+      EmbeddedCounter(
+        count: count,
+        onChange: (value) {
+          setState(() => count = value);
         },
-        [text('+')],
       ),
     ]);
-
-    yield EmbeddedCounter(
-      count: count,
-      onChange: (value) {
-        setState(() => count = value);
-      },
-    );
   }
 
   @css
   static final styles = [
+    css('.counter-group').box(
+      margin: EdgeInsets.all(10.px),
+      padding: EdgeInsets.all(10.px),
+      border: Border.all(BorderSide.dashed(width: 1.px, color: Colors.lightGrey)),
+      radius: BorderRadius.circular((cardBorderRadius + 10).px),
+    ),
     css('.counter', [
       css('&')
           .box(

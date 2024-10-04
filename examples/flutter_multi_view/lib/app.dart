@@ -56,10 +56,7 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
         ),
       ]),
       div(classes: 'counters', [
-        for (var name in counters)
-          div(classes: 'counter-group', styles: Styles.raw({'view-transition-name': name}), [
-            const Counter(),
-          ]),
+        for (var name in counters) Counter(name: name),
       ]),
     ]);
   }
@@ -83,11 +80,6 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
           wrap: FlexWrap.wrap,
           justifyContent: JustifyContent.center,
         ),
-        css('.counter-group').box(
-            margin: EdgeInsets.all(10.px),
-            padding: EdgeInsets.all(10.px),
-            border: Border.all(BorderSide.dashed(width: 1.px, color: Colors.lightGrey)),
-            radius: BorderRadius.circular((cardBorderRadius + 10).px)),
       ]),
     ]),
   ];
