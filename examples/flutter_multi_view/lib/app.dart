@@ -1,6 +1,8 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
+@Import.onWeb('view_transition.dart', show: [#startViewTransition])
+import 'app.imports.dart';
 import 'components/counter.dart';
 import 'constants/theme.dart';
 
@@ -13,12 +15,52 @@ class App extends StatefulComponent {
 }
 
 class AppState extends State<App> {
-  int counters = 2;
+  List<String> counters = ['counter-1', 'counter-2'];
 
   @override
   void initState() {
     super.initState();
     FlutterEmbedView.preload();
+  }
+
+  void addCounter() async {
+    // if (!document.has('startViewTransition')) {
+    //   setState(() {
+    //     counters.add('counter-${counters.length + 1}');
+    //   });
+    //   return;
+    // }
+
+    await startViewTransition(() {
+      setState(() {
+        counters.add('targeted-counter');
+      });
+    });
+
+    setState(() {
+      counters[counters.length - 1] = 'counter-${counters.length}';
+    });
+  }
+
+  void removeCounter() {
+    // if (document.startViewTransition as dynamic == null) {
+    //   setState(() {
+    //     counters.removeLast();
+    //   });
+    //   return;
+    // }
+
+    setState(() {
+      counters[counters.length - 1] = 'targeted-counter';
+    });
+
+    context.binding.addPostFrameCallback(() {
+      startViewTransition(() {
+        setState(() {
+          counters.removeLast();
+        });
+      });
+    });
   }
 
   @override
@@ -28,20 +70,20 @@ class AppState extends State<App> {
       div(classes: 'buttons', [
         button(
           onClick: () {
-            setState(() => counters--);
+            removeCounter();
           },
           [text('Less Counters')],
         ),
         button(
           onClick: () {
-            setState(() => counters++);
+            addCounter();
           },
           [text('More Counters')],
         ),
       ]),
       div(classes: 'counters', [
-        for (var i = 0; i < counters; i++)
-          div(classes: 'counter-group', [
+        for (var name in counters)
+          div(classes: 'counter-group', styles: Styles.raw({'view-transition-name': name}), [
             const Counter(),
           ]),
       ]),

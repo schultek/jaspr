@@ -13,6 +13,14 @@
 
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  # Jaspr has a custom lint package 'jaspr_lints', which needs the 'custom_lint' analyzer plugin.
+  #
+  # Unfortunately, running 'dart analyze' does not pick up the custom lints. Instead, you need to
+  # run a separate command for this: `jaspr analyze`
+  plugins:
+    - custom_lint
+
 # Uncomment the following section to specify additional rules.
 
 # linter:
