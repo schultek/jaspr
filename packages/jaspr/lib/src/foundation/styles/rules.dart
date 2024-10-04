@@ -15,6 +15,15 @@ abstract class StyleRule {
   /// Renders a `@media` css rule.
   const factory StyleRule.media({required MediaQuery query, required List<StyleRule> styles}) = MediaStyleRule;
 
+  /// Renders a `@layer` css rule.
+  const factory StyleRule.layer({String? name, required List<StyleRule> styles}) = LayerStyleRule;
+
+  /// Renders a `@supports` css rule.
+  const factory StyleRule.supports({required String condition, required List<StyleRule> styles}) = SupportsStyleRule;
+
+  /// Renders a `@keyframes` css rule.
+  const factory StyleRule.keyframes({required String name, required Map<String, Styles> styles}) = KeyframesStyleRule;
+
   /// Returns the rendered css for this rule.
   String toCss([String indent]);
 }
@@ -66,7 +75,7 @@ class MediaStyleRule implements StyleRule {
   @override
   String toCss([String indent = '']) {
     return '$indent@media ${query._value} {$cssPropSpace'
-        '${styles.map((r) => r.toCss(kDebugMode ? '$indent  ' : '') + cssPropSpace).join()}'
+        '${styles.map((r) => r.toCss('$indent$cssBlockInset') + cssPropSpace).join()}'
         '$indent}';
   }
 }
@@ -211,6 +220,50 @@ class FontFaceStyleRule implements StyleRule {
         '$indent${cssBlockInset}font-family: "$family";$cssPropSpace'
         '${style != null ? '$indent${cssBlockInset}font-style: ${style!.value};$cssPropSpace' : ''}'
         '$indent${cssBlockInset}src: url($url);$cssPropSpace'
+        '$indent}';
+  }
+}
+
+class LayerStyleRule implements StyleRule {
+  const LayerStyleRule({this.name, required this.styles});
+
+  final String? name;
+  final List<StyleRule> styles;
+
+  @override
+  String toCss([String indent = '']) {
+    return '$indent@layer${name != null ? ' $name' : ''} {$cssPropSpace'
+        '${styles.map((r) => r.toCss('$indent$cssBlockInset') + cssPropSpace).join()}'
+        '$indent}';
+  }
+}
+
+class SupportsStyleRule implements StyleRule {
+  const SupportsStyleRule({required this.condition, required this.styles});
+
+  final String condition;
+  final List<StyleRule> styles;
+
+  @override
+  String toCss([String indent = '']) {
+    return '$indent@supports $condition {$cssPropSpace'
+        '${styles.map((r) => r.toCss('$indent$cssBlockInset') + cssPropSpace).join()}'
+        '$indent}';
+  }
+}
+
+class KeyframesStyleRule implements StyleRule {
+  const KeyframesStyleRule({required this.name, required this.styles});
+
+  final String name;
+  final Map<String, Styles> styles;
+
+  @override
+  String toCss([String indent = '']) {
+    return '$indent@keyframes $name {$cssPropSpace'
+        '${styles.entries.map((e) => '$indent$cssBlockInset${e.key} {$cssPropSpace'
+            '${e.value.styles.entries.map((e) => '$indent$cssBlockInset$cssBlockInset${e.key}: ${e.value};$cssPropSpace').join()}'
+            '$indent$cssBlockInset}$cssPropSpace').join()}'
         '$indent}';
   }
 }
