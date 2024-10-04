@@ -21,7 +21,7 @@ void main() {
 
     for (var variant in allVariants) {
       test(variant.name, tags: variant.tag, () async {
-        await runner.run('create -v ${variant.createOptions} myapp', dir: dirs.root);
+        await runner.run('create -v ${variant.options} myapp', dir: dirs.root);
 
         for (var f in variant.files) {
           expect(File(p.join(dirs.app().path, f.$1)), f.$2, reason: f.$1);
@@ -30,7 +30,7 @@ void main() {
         // Override jaspr dependencies from path.
         await bootstrap(variant, dirs.root());
 
-        var serve = await runner.run('serve ${variant.runOptions.join(' ')}', dir: dirs.app) as RunningCommandResult;
+        var serve = await runner.run('serve -v', dir: dirs.app) as RunningCommandResult;
         await Future.delayed(Duration(seconds: 10));
 
         // Wait until server is started.
@@ -58,7 +58,7 @@ void main() {
 
         await Future.delayed(Duration(seconds: 10));
 
-        await runner.run('build ${variant.runOptions.join(' ')}', dir: dirs.app);
+        await runner.run('build -v', dir: dirs.app);
 
         var outputPath = p.join(dirs.app().path, 'build', 'jaspr');
         if (variant.mode == RenderingMode.server) {
