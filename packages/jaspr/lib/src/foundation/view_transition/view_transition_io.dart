@@ -1,3 +1,5 @@
-Future<void> startViewTransition(void Function() callback) async {
+import 'dart:async';
+
+FutureOr<void> startViewTransition(void Function() callback) {
   callback();
 }

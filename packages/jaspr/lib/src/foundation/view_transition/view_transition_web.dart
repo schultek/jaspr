@@ -4,12 +4,12 @@ import 'dart:js_interop_unsafe';
 
 import 'package:web/web.dart';
 
-Future<void> startViewTransition(void Function() callback) async {
+FutureOr<void> startViewTransition(void Function() callback) {
   if (!document.has('startViewTransition')) {
     callback();
-    return;
+    return null;
   }
 
   final transition = document.startViewTransition(callback.toJS);
-  await transition.finished.toDart;
+  return transition.finished.toDart as Future<void>;
 }
