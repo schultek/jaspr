@@ -39,6 +39,8 @@ jobs:
           submodules: 'true'
 
       - uses: dart-lang/setup-dart@v1.3
+        with:
+          sdk: beta
       - uses: subosito/flutter-action@v2
         with:
           channel: master
