@@ -158,11 +158,11 @@ void main() {
 
     group('jaspr context', () {
       //   test('App', () async {
-      //     await tester.pumpComponent(MobXHooksObserverComponent(child: App()));
+      //     tester.pumpComponent(MobXHooksObserverComponent(child: App()));
       //   });
 
       testComponents('custom flow', (tester) async {
-        await tester.pumpComponent(
+        tester.pumpComponent(
           MobXHooksObserverComponent(
             child: Builder(
               builder: (context) sync* {

@@ -1,6 +1,13 @@
 ## Unreleased breaking
 
-- **BREAKING** Migrate to `package:web`.
+- **BREAKING** Migrated to `package:web`.
+- **BREAKING** Added support for multi-view embedding. This allows you to use `FlutterEmbedView` multiple times across 
+  the website and add or remove views at any time.
+
+- Improved internals to use deferred imports for all imported flutter libraries.
+- Added `FlutterEmbedView.preload()` function to manually trigger the preload of all deferred libraries before rendering
+  a Flutter view.
+- Added `FlutterEmbedView.deferred()` constructor as an easy way to work with deferred imports of widgets.
 
 ## 0.3.4
 

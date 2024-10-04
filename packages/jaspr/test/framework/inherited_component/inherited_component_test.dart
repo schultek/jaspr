@@ -9,7 +9,7 @@ import 'inherited_component_app.dart';
 void main() {
   group('inherited component test', () {
     testComponents('should inherit component', (tester) async {
-      var controller = await tester.pumpTestComponent(App());
+      var controller = tester.pumpTestComponent(App());
 
       // phase 1: inherited component should be mounted
       expect(find.text('Inherited value: 0'), findsOneComponent);

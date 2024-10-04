@@ -12,7 +12,7 @@ void main() {
     });
 
     testComponents('should redirect toplevel', (tester) async {
-      await tester.pumpComponent(Router(
+      tester.pumpComponent(Router(
         routes: [
           homeRoute(),
           route('/b'),
@@ -37,7 +37,7 @@ void main() {
     testComponents('should redirect on route', (tester) async {
       var blocked = true;
 
-      await tester.pumpComponent(Router(routes: [
+      tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a'),
         route('/b', [], null, (_, s) {

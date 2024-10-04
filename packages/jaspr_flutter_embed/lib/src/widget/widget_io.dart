@@ -1,0 +1,1 @@
+typedef Widget = Never;

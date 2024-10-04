@@ -12,7 +12,7 @@ void main() {
     });
 
     testComponents('should push route', (tester) async {
-      await tester.pumpComponent(Router(routes: [
+      tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a'),
       ]));
@@ -36,7 +36,7 @@ void main() {
     });
 
     testComponents('should replace route', (tester) async {
-      await tester.pumpComponent(Router(routes: [
+      tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a'),
         route('/b'),
@@ -61,7 +61,7 @@ void main() {
     });
 
     testComponents('should build shell route', (tester) async {
-      await tester.pumpComponent(Router(routes: [
+      tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a', [
           shellRoute('b', [

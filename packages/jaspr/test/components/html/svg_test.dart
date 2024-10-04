@@ -6,7 +6,7 @@ import 'package:jaspr_test/jaspr_test.dart';
 void main() {
   group('html components', () {
     testComponents('renders svg', (tester) async {
-      await tester.pumpComponent(svg(viewBox: "0 0 100 100", width: 100.px, height: 100.px, [
+      tester.pumpComponent(svg(viewBox: "0 0 100 100", width: 100.px, height: 100.px, [
         rect(
             x: "0",
             y: "0",

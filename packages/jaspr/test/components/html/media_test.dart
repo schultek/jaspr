@@ -6,7 +6,7 @@ import 'package:jaspr_test/jaspr_test.dart';
 void main() {
   group('html components', () {
     testComponents('renders media', (tester) async {
-      await tester.pumpComponent(div([
+      tester.pumpComponent(div([
         audio(
           autoplay: false,
           controls: false,

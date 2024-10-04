@@ -47,8 +47,8 @@ class BrowserTester {
 
   final BrowserAppBinding binding;
 
-  Future<void> pumpComponent(Component component, {String attachTo = 'body'}) {
-    return binding.attachRootComponent(component, attachTo: attachTo);
+  void pumpComponent(Component component, {String attachTo = 'body'}) {
+    binding.attachRootComponent(component, attachTo: attachTo);
   }
 
   Future<void> click(Finder finder, {bool pump = true}) async {
