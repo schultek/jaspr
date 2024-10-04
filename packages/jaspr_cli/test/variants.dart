@@ -38,7 +38,8 @@ class TestVariant {
   Set<String> get packages => {
         if (routing != RoutingOption.none) 'packages/jaspr_router',
         if (flutter == FlutterOption.embedded) 'packages/jaspr_flutter_embed',
-        if (flutter != FlutterOption.none) 'modules/build/jaspr_web_compilers',
+        // Ignore until next stable version (4.1.0)
+        // if (flutter != FlutterOption.none) 'modules/build/jaspr_web_compilers',
       };
 
   Set<(String, Matcher)> get files => {
