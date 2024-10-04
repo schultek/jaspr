@@ -36,21 +36,32 @@ class JasprApp extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     // this is a normal jaspr component
     yield FlutterEmbedView(
+      // provide an optional loader component that will be displayed while the flutter app loads
+      loader: MyCustomLoader(),
       // provide your flutter app widget
-      app: MyFlutterApp(
+      widget: MyFlutterApp(
         // provide any widget properties or callbacks
         // this way you can pass and share state between jaspr and flutter
         // without needing js interop
         title: 'My Embedded Flutter App',
       ),
-      // provide an optional loader component that will be displayed while the flutter app loads
-      loader: MyCustomLoader(),
     );
   }
 }
 ```
 
 Finally, run your jaspr app as normal using `jaspr serve` or `jaspr build`.
+
+See the documentation of [FlutterEmbedView](/components/flutter_embed_view) for a description of all available properties.
+
+## Deferred loading
+
+The `jaspr_flutter_embed` package itself uses deferred imports internally to optimize the loading of the flutter framework.
+To make optimal use of lazy loading the flutter framework, you should use the [FlutterEmbedView.deferred()](/components/flutter_embed_view#deferred-variant) constructor.
+
+With this the flutter framework will automatically be lazy-loaded when rendering a `FlutterEmbedView` for the first time.
+
+As a further optimization, it is also possible to **preload** the flutter framework by calling `FlutterEmbedView.preload()`.
 
 ## Import handling
 
