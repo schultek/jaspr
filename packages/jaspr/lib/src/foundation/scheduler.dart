@@ -14,6 +14,10 @@ mixin SchedulerBinding {
     scheduleFrame(() => _handleFrame(buildCallback));
   }
 
+  void completeInitialFrame() {
+    _flushPostFrameCallbacks();
+  }
+
   void _handleFrame(VoidCallback buildCallback) {
     _schedulerPhase = SchedulerPhase.midFrameCallback;
     buildCallback();

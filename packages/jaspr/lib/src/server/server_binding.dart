@@ -20,15 +20,19 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   @override
   bool get isClient => false;
 
-  final rootCompleter = Completer.sync();
-
   @override
-  void didAttachRootElement(Element element) {
-    rootCompleter.complete();
+  void attachRootComponent(Component app) async {
+    super.attachRootComponent(ClientComponentRegistry(child: app));
   }
 
   Future<String> render() async {
-    await rootCompleter.future;
+    if (rootElement == null) return '';
+
+    if (rootElement!.owner.isFirstBuild) {
+      final completer = Completer.sync();
+      rootElement!.binding.addPostFrameCallback(completer.complete);
+      await completer.future;
+    }
 
     var root = rootElement!.renderObject as MarkupRenderObject;
     var adapters = [
@@ -85,11 +89,6 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   void initializeOptions(JasprOptions options) {
     _options = options;
-  }
-
-  @override
-  Future<void> attachRootComponent(Component app) {
-    return super.attachRootComponent(ClientComponentRegistry(child: app));
   }
 }
 

@@ -16,7 +16,7 @@ void main() {
     testComponents('should push lazy route', (tester) async {
       var bCompleter = Completer.sync();
 
-      await tester.pumpComponent(Router(routes: [
+      tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a'),
         lazyRoute('/b', bCompleter.future),
@@ -43,7 +43,7 @@ void main() {
     testComponents('should push lazy shell route', (tester) async {
       var bCompleter = Completer.sync();
 
-      await tester.pumpComponent(Router(routes: [
+      tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a'),
         lazyShellRoute('b', bCompleter.future, [

@@ -1,6 +1,7 @@
 ## Unreleased breaking
 
 - **BREAKING** Migrated all packages to `package:web`, replacing `dart:html`.
+- **BREAKING** Made `ComponentsBinding.attachRootComponent()` and `ComponentTester.pumpComponent()` synchronous.
 
 - Added `InheritedModel<T>` similar to Flutters [InheritedModel](https://api.flutter.dev/flutter/widgets/InheritedModel-class.html)
 - Added `css.layer()`, `css.supports()` and `css.keyframes()` rules.

@@ -9,7 +9,7 @@ final counter = StateProvider((ref) => 0);
 void main() {
   group('context.refresh', () {
     testComponents('refreshes provider state', (tester) async {
-      await tester.pumpComponent(providerApp((context) sync* {
+      tester.pumpComponent(providerApp((context) sync* {
         yield Button(
           label: '${context.watch(counter)}',
           onPressed: () {
@@ -41,7 +41,7 @@ void main() {
     });
 
     testComponents('refreshes overridden provider state', (tester) async {
-      await tester.pumpComponent(providerApp((context) sync* {
+      tester.pumpComponent(providerApp((context) sync* {
         yield Builder(builder: (context) sync* {
           yield Button(
             key: const ValueKey('a'),

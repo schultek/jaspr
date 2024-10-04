@@ -8,7 +8,7 @@ import 'head_app.dart';
 void main() {
   group('head browser test', () {
     testBrowser('should serve component', (tester) async {
-      await tester.pumpComponent(App());
+      tester.pumpComponent(App());
 
       var nodes = AttachAdapter.instanceFor(AttachTarget.head).liveNodes.toList();
 

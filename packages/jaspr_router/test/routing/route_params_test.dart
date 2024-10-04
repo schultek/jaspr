@@ -12,7 +12,7 @@ void main() {
     });
 
     testComponents('should resolve route params', (tester) async {
-      await tester.pumpComponent(Router(routes: [
+      tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a/:aId'),
       ]));

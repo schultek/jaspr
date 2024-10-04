@@ -11,7 +11,7 @@ void main() {
     testComponents('should track elements', (tester) async {
       ObserverParam params = ObserverParam(renderBoth: true, events: []);
       final events = params.events;
-      final controller = await tester.pumpTestComponent(App(params));
+      final controller = tester.pumpTestComponent(App(params));
 
       // phase 1: observer component should be mounted
       expect(find.text('Leaf true false'), findsOneComponent);

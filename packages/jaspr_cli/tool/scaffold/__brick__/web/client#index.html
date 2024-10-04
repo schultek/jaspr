@@ -7,6 +7,10 @@
 
         <title>{{name}}</title>
         <link rel="stylesheet" href="styles.css">
+        {{#flutter}}
+        <!-- The generated flutter manifest and bootstrap script -->
+        <link rel="manifest" href="manifest.json">
+        <script src="flutter_bootstrap.js" async></script>{{/flutter}}
 
         <!--
             Loads and runs the compiled 'main.dart' file,

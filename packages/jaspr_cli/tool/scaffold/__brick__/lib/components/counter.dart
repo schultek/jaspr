@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 {{#server}}
 import '../constants/theme.dart';{{/server}}{{#flutter}}
-import 'flutter_counter.dart' if (dart.library.io) 'flutter_counter_fallback.dart';{{/flutter}}
+import 'embedded_counter.dart';{{/flutter}}
 
 class Counter extends StatefulComponent {
   const Counter({super.key});
@@ -31,7 +31,7 @@ class CounterState extends State<Counter> {
       ),
     ]);{{#flutter}}
 
-    yield FlutterCounter(
+    yield EmbeddedCounter(
       count: count,
       onChange: (value) {
         setState(() => count = value);

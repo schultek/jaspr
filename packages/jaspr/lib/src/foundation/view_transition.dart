@@ -13,6 +13,7 @@ mixin ViewTransitionMixin<T extends StatefulComponent> on State<T> {
       context.binding.addPostFrameCallback(() {
         setStateWithViewTransition(callback, postTransition: postTransition);
       });
+      return;
     }
 
     var transition = startViewTransition(() {

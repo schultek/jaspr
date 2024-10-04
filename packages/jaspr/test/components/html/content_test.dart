@@ -6,7 +6,7 @@ import 'package:jaspr_test/jaspr_test.dart';
 void main() {
   group('html components', () {
     testComponents('renders content', (tester) async {
-      await tester.pumpComponent(html([
+      tester.pumpComponent(html([
         head([]),
         body([
           header([

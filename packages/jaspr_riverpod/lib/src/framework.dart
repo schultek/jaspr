@@ -35,7 +35,7 @@ part 'provider_dependencies.dart';
 ///
 /// ```dart
 /// testComponents('Test example', (tester) async {
-///   await tester.pumpComponent(
+///   tester.pumpComponent(
 ///     ProviderScope(
 ///       overrides: [
 ///         // override the behavior of repositoryProvider to provide a fake

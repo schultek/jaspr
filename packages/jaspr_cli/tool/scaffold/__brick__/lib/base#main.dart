@@ -38,12 +38,14 @@ void main() {
     head: [
       // Links to the compiled client entrypoint.
       script(defer: true, src: 'main.dart.js', []),{{#flutter}}
-      // The generated flutter manifest.
-      link(rel: 'manifest', href: 'manifest.json'),{{/flutter}}
+      // The generated flutter manifest and bootstrap script.
+      link(rel: 'manifest', href: 'manifest.json'),
+      script(src: "flutter_bootstrap.js", async: true, []),{{/flutter}}
     ],{{/hydration}}{{#hydration}}{{#flutter}}
     head: [
-      // The generated flutter manifest.
+      // The generated flutter manifest and bootstrap script.
       link(rel: 'manifest', href: 'manifest.json'),
+      script(src: "flutter_bootstrap.js", async: true, []),
     ],{{/flutter}}{{/hydration}}
     body: App(),
   ));

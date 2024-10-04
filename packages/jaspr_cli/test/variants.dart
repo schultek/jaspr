@@ -152,9 +152,11 @@ enum FlutterOption {
   Set<(String, Matcher)> get files => switch (this) {
         none => {},
         embedded => {
-            ('lib/components/flutter_counter.dart', fileExists),
-            ('lib/components/flutter_counter_fallback.dart', fileExists),
+            ('lib/components/embedded_counter.dart', fileExists),
+            ('lib/components/embedded_counter.imports.dart', fileExists),
+            ('lib/widgets/counter.dart', fileExists),
             ('web/manifest.json', fileExists),
+            ('web/flutter_bootstrap.js', fileExists),
           },
         pluginsOnly => {},
       };

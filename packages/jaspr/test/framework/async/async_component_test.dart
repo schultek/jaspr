@@ -11,7 +11,7 @@ void main() {
     testComponents('should render future with data', (tester) async {
       var completer = Completer<String>();
 
-      await tester.pumpComponent(FutureTester(completer.future));
+      tester.pumpComponent(FutureTester(completer.future));
 
       expect(find.text('LOADING'), findsOneComponent);
 
@@ -24,7 +24,7 @@ void main() {
     testComponents('should render future with error', (tester) async {
       var completer = Completer<String>();
 
-      await tester.pumpComponent(FutureTester(completer.future));
+      tester.pumpComponent(FutureTester(completer.future));
 
       expect(find.text('LOADING'), findsOneComponent);
 
@@ -37,7 +37,7 @@ void main() {
     testComponents('should render stream', (tester) async {
       var controller = StreamController<String>();
 
-      await tester.pumpComponent(StreamTester(controller.stream));
+      tester.pumpComponent(StreamTester(controller.stream));
 
       expect(find.text('LOADING'), findsOneComponent);
 

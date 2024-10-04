@@ -9,7 +9,7 @@ import 'global_key_schenanigans_app.dart';
 void main() {
   group('global key schenanigans test', () {
     testComponents('should keep state on reparenting', (tester) async {
-      var controller = await tester.pumpTestComponent(App());
+      var controller = tester.pumpTestComponent(App());
 
       // phase 1: component should be mounted directly
       expect(find.byType(Child), findsOneComponent);
