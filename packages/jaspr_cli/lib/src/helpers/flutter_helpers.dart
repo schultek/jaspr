@@ -38,6 +38,7 @@ mixin FlutterHelper on BaseCommand {
     var moveTargets = [
       'version.json',
       'flutter_service_worker.js',
+      'flutter_bootstrap.js',
       'assets/',
       'canvaskit/',
     ];

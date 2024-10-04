@@ -50,6 +50,11 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       help: 'Serves the app in release mode.',
       negatable: false,
     );
+    argParser.addFlag(
+      'experimental-wasm',
+      help: 'Compile to wasm',
+      negatable: false,
+    );
   }
 
   @override
@@ -193,17 +198,24 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       release: release,
     );
 
-    var compilers = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    var package = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    bool useWasm = argResults!['experimental-wasm'] as bool;
+
+    var compiler = useWasm
+        ? 'dart2wasm'
+        : release
+            ? 'dart2js'
+            : 'dartdevc';
 
     var workflow = await DevWorkflow.start(configuration, [
       if (release) '--release',
       '--define',
-      '$compilers:ddc=generate-full-dill=true',
+      '$package:ddc=generate-full-dill=true',
       '--delete-conflicting-outputs',
-      if (!release)
-        '--define=$compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
-      else
-        '--define=$compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
+      '--define=$package:entrypoint=compiler=$compiler',
+      if (compiler == 'dartdevc') '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug}',
+      if (compiler != 'dartdevc')
+        '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"${!release ? ',"--enable-asserts"' : ''}]',
     ], {
       'web': int.parse(webPort)
     });

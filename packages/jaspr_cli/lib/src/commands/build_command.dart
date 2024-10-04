@@ -36,10 +36,15 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: 'exe',
     );
+    argParser.addFlag(
+      'experimental-wasm',
+      help: 'Compile to wasm',
+      negatable: false,
+    );
     argParser.addOption(
       'optimize',
       abbr: 'O',
-      help: 'Set the dart2js compiler optimization level',
+      help: 'Set the dart2js / dart2wasm compiler optimization level',
       allowed: ['0', '1', '2', '3', '4'],
       allowedHelp: {
         '0': 'No optimizations (only meant for debugging the compiler).',
@@ -217,13 +222,20 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
   Future<int> _buildWeb() async {
     logger.write('Building web assets...', progress: ProgressState.running);
-    var client = await d.connectClient(
+
+    final useWasm = argResults!['experimental-wasm'] as bool;
+    final compiler = useWasm ? 'dart2wasm' : 'dart2js';
+
+    final entrypointBuilder = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint';
+
+    final client = await d.connectClient(
       Directory.current.path,
       [
         '--release',
         '--verbose',
         '--delete-conflicting-outputs',
-        '--define=${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true","-O${argResults!['optimize']}"]'
+        '--define=$entrypointBuilder=compiler=$compiler',
+        '--define=$entrypointBuilder=${compiler}_args=["-Djaspr.flags.release=true","-O${argResults!['optimize']}"]',
       ],
       logger.writeServerLog,
     );
