@@ -4,6 +4,7 @@ import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
 @Import.onWeb('../widgets/counter.dart', show: [#CounterWidget])
 import 'embedded_counter.imports.dart' deferred as widget;
+import 'pulsing_loader.dart';
 
 class EmbeddedCounter extends StatelessComponent {
   const EmbeddedCounter({this.count = 0, required this.onChange, super.key});
@@ -22,6 +23,7 @@ class EmbeddedCounter extends StatelessComponent {
         maxWidth: double.infinity,
         maxHeight: double.infinity,
       ),
+      loader: PulsingLoader(),
       loadLibrary: widget.loadLibrary(),
       builder: () => widget.CounterWidget(count: count, onChange: onChange),
     );
@@ -30,7 +32,9 @@ class EmbeddedCounter extends StatelessComponent {
   @css
   static final styles = [
     css('.flutter-counter', [
-      css('&').box(radius: BorderRadius.circular(cardBorderRadius.px)).background(color: surfaceColor),
+      css('&')
+          .box(display: Display.flex, radius: BorderRadius.circular(cardBorderRadius.px))
+          .background(color: surfaceColor),
       css('& > div[flt-embedding]').box(opacity: 0, transition: Transition('opacity', duration: 400)),
       css('&.active > div[flt-embedding]').box(opacity: 1),
     ])

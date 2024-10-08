@@ -4,8 +4,9 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:flutter_multi_view/components/counter.dart' as prefix0;
 import 'package:flutter_multi_view/components/embedded_counter.dart' as prefix1;
-import 'package:flutter_multi_view/constants/view_transition.dart' as prefix2;
-import 'package:flutter_multi_view/app.dart' as prefix3;
+import 'package:flutter_multi_view/components/pulsing_loader.dart' as prefix2;
+import 'package:flutter_multi_view/constants/view_transition.dart' as prefix3;
+import 'package:flutter_multi_view/app.dart' as prefix4;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
@@ -25,12 +26,13 @@ import 'package:flutter_multi_view/app.dart' as prefix3;
 /// ```
 final defaultJasprOptions = JasprOptions(
   clients: {
-    prefix3.App: ClientTarget<prefix3.App>('app'),
+    prefix4.App: ClientTarget<prefix4.App>('app'),
   },
   styles: () => [
     ...prefix0.CounterState.styles,
     ...prefix1.EmbeddedCounter.styles,
-    ...prefix2.viewTransitionStyles,
-    ...prefix3.AppState.styles,
+    ...prefix2.PulsingLoader.styles,
+    ...prefix3.viewTransitionStyles,
+    ...prefix4.AppState.styles,
   ],
 );
