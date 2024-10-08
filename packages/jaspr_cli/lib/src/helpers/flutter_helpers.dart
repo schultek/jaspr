@@ -13,7 +13,15 @@ mixin FlutterHelper on BaseCommand {
 
     var flutterProcess = await Process.start(
       'flutter',
-      ['run', '--device-id=web-server', '-t', '.dart_tool/jaspr/flutter_target.dart', '--web-port=$flutterPort'],
+      [
+        'run',
+        '--device-id=web-server',
+        '-t',
+        '.dart_tool/jaspr/flutter_target.dart',
+        '--web-port=$flutterPort',
+        '--web-renderer=canvaskit',
+        if (argResults!['release']) '--release'
+      ],
       runInShell: true,
       workingDirectory: Directory.current.path,
     );

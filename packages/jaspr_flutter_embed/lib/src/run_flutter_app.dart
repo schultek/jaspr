@@ -19,7 +19,12 @@ Future<FlutterApp> _flutterApp = Future(() {
 
   flutter!.loader!.didCreateEngineInitializer = (EngineInitializer engineInitializer) {
     return Future(() async {
-      var engine = await engineInitializer.initializeEngine(InitializeEngineOptions(multiViewEnabled: true)).toDart;
+      var engine = await engineInitializer
+          .initializeEngine(InitializeEngineOptions(
+            multiViewEnabled: true,
+            renderer: 'canvaskit',
+          ))
+          .toDart;
       var app = await engine.runApp().toDart;
       completer.complete(app);
     }).toJS;
@@ -84,6 +89,7 @@ extension type InitializeEngineOptions._(JSObject _) {
   external InitializeEngineOptions({
     Element? hostElement,
     bool? multiViewEnabled,
+    String? renderer,
   });
 }
 

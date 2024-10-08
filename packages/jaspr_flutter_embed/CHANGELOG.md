@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed flutter embedding on mobile to always use canvaskit renderer.
+
 ## 0.4.0
 
 - **BREAKING** Migrated to `package:web`.

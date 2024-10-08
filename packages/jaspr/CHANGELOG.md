@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed flutter embedding on mobile to always use canvaskit renderer.
+
 ## 0.16.0
 
 - **BREAKING** Migrated all packages to `package:web`, replacing `dart:html`.
