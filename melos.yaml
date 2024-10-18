@@ -65,6 +65,12 @@ scripts:
     run: |
       rm -r packages/jaspr_cli/.dart_tool
       dart pub global activate packages/jaspr_cli --source=path
+  activate:cli:windows:
+    run: |
+      cd packages\jaspr_cli\
+      del .dart_tool
+      dart pub get
+      dart pub global activate . --source=path
   deploy:jasprpad:
     run: |
       dart run apps/jaspr_pad/tool/deploy.dart
