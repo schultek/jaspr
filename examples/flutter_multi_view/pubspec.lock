@@ -390,21 +390,21 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.16.1"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.16.1"
   jaspr_flutter_embed:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_flutter_embed"
       relative: true
     source: path
-    version: "0.4.0"
+    version: "0.4.1"
   jaspr_lints:
     dependency: "direct dev"
     description:

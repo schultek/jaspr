@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.4.1
 
 - Fixed flutter embedding on mobile to always use canvaskit renderer.
 
