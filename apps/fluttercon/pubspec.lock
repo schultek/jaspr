@@ -377,10 +377,10 @@ packages:
     dependency: "direct dev"
     description:
       name: jaspr_web_compilers
-      sha256: "068e42fbb89e5a7b7d47849886669b80a0d9e011f76bbfd85f6444d0b80cc4f4"
+      sha256: adb5265c119a505b1268d62a3f291e08664d904111b9044ff0e769ba96cdf90f
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.10"
+    version: "4.0.10+1"
   js:
     dependency: transitive
     description:
