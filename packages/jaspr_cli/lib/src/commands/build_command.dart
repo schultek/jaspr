@@ -132,7 +132,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           './build/jaspr/app$extension',
           '-Djaspr.flags.release=true',
         ],
-        runInShell: true,
         workingDirectory: Directory.current.path,
       );
 
@@ -174,7 +173,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           '-Djaspr.dev.web=build/jaspr',
           entryPoint!,
         ],
-        runInShell: true,
         environment: {'PORT': '8080', 'JASPR_PROXY_PORT': '5567'},
         workingDirectory: Directory.current.path,
       );

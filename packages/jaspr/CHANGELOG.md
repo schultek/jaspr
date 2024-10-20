@@ -1,6 +1,8 @@
 ## Unreleased patch
 
+- Fixed flutter embedding in new project scaffold.
 - Fixed flutter embedding on mobile to always use canvaskit renderer.
+- Fixed build command on windows to correctly end child process.
 
 ## 0.16.0
 
