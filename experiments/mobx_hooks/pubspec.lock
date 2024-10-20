@@ -308,14 +308,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.16.1"
   jaspr_test:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_test"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.16.1"
   js:
     dependency: transitive
     description:
