@@ -121,7 +121,7 @@ final scaffoldBundle = MasonBundle.fromJson(<String, dynamic>{
     },
     {
       "path": "web/flutter#flutter_bootstrap.js",
-      "data": "e3tmbHV0dGVyX2pzfX0Ke3tmbHV0dGVyX2J1aWxkX2NvbmZpZ319Cg==",
+      "data": "e3s9PCUgJT49fX17e2ZsdXR0ZXJfanN9fQp7e2ZsdXR0ZXJfYnVpbGRfY29uZmlnfX08JT17eyB9fT0lPgo=",
       "type": "text"
     },
     {
