@@ -65,8 +65,8 @@ class MarkupRenderObject extends RenderObject {
     var output = StringBuffer();
     var leadingWhitespace = false;
     var trailingWhitespace = false;
-    if (text case var text?) {
-      var html = rawHtml == true ? text : htmlEscape.convert(text);
+    if (text case var text? when text.isNotEmpty) {
+      var html = rawHtml == true ? text : _elementEscape.convert(text);
       if (strictFormatting) {
         output.write(html);
       } else {
@@ -145,7 +145,7 @@ class MarkupRenderObject extends RenderObject {
         }
         output.write('</$tag>');
       }
-    } else {
+    } else if (children.isNotEmpty) {
       assert(parent == null);
       for (var child in children) {
         final (html, leading, trailing) = child._renderAndFormat(strictFormatting, strictWhitespace, indent);
@@ -157,6 +157,7 @@ class MarkupRenderObject extends RenderObject {
     return (output.toString(), leadingWhitespace, trailingWhitespace);
   }
 
+  final _elementEscape = HtmlEscape(HtmlEscapeMode.element);
   final _attributeEscape = HtmlEscape(HtmlEscapeMode.attribute);
   final _domValidator = DomValidator();
 }
