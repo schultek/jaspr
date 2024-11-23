@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed layout bug of embedded flutter view.
+
 ## 0.4.1
 
 - Fixed flutter embedding on mobile to always use canvaskit renderer.
@@ -5,7 +9,7 @@
 ## 0.4.0
 
 - **BREAKING** Migrated to `package:web`.
-- **BREAKING** Added support for multi-view embedding. This allows you to use `FlutterEmbedView` multiple times across 
+- **BREAKING** Added support for multi-view embedding. This allows you to use `FlutterEmbedView` multiple times across
   the website and add or remove views at any time.
 
 - Improved internals to use deferred imports for all imported flutter libraries.

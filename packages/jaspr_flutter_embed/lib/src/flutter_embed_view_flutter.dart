@@ -118,7 +118,7 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
       ]),
       [
         if (component.loader != null && !didRenderView) component.loader!,
-        div(key: flutterDivKey, []),
+        div(key: flutterDivKey, styles: Styles.box(height: 100.percent), []),
       ],
     );
   }
