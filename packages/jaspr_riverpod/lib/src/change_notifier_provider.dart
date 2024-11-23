@@ -29,7 +29,7 @@ ProviderElementProxy<NotifierT, NotifierT> _notifier<NotifierT extends ChangeNot
 /// dispatching notifications, but instead O(N)
 /// {@endtemplate}
 abstract class _ChangeNotifierProviderBase<NotifierT extends ChangeNotifier?> extends ProviderBase<NotifierT> {
-  _ChangeNotifierProviderBase({
+  const _ChangeNotifierProviderBase({
     required super.name,
     required super.from,
     required super.argument,
@@ -45,7 +45,7 @@ abstract class _ChangeNotifierProviderBase<NotifierT extends ChangeNotifier?> ex
   ///
   /// ```dart
   /// Button(
-  ///   onTap: () => ref.read(changeNotifierProvider.notifer).increment(),
+  ///   onTap: () => ref.read(changeNotifierProvider.notifier).increment(),
   /// )
   /// ```
   ///

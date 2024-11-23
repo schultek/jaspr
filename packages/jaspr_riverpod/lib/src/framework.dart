@@ -13,7 +13,7 @@ import 'sync_provider.dart';
 part 'provider_context.dart';
 part 'provider_dependencies.dart';
 
-/// {@template riverpod.providerscope}
+/// {@template riverpod.provider_scope}
 /// A component that stores the state of providers.
 ///
 /// All Jaspr applications using Riverpod must contain a [ProviderScope] at
@@ -83,7 +83,7 @@ part 'provider_dependencies.dart';
 /// {@endtemplate}
 @sealed
 class ProviderScope extends StatefulComponent {
-  /// {@macro riverpod.providerscope}
+  /// {@macro riverpod.provider_scope}
   const ProviderScope({
     super.key,
     this.overrides = const [],

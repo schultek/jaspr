@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Upgrade `riverpod` to `^2.6.0`
+
 ## 0.3.15
 
 - `jaspr` upgraded to `0.16.0`
