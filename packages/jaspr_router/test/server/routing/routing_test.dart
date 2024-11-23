@@ -22,7 +22,7 @@ void main() {
       response = await tester.request('/unknown');
 
       expect(response.statusCode, equals(200));
-      expect(response.body, contains('Unknown (&#47;unknown)'));
+      expect(response.body, contains('Unknown (/unknown)'));
     });
   });
 }

@@ -18,6 +18,8 @@ final editProjectProvider = StateProvider<ProjectDataBase?>((ref) {
         ref.read(storageProvider)['project'] = project.toJson();
       }
     }, Duration(seconds: 1));
+
+    // ignore: deprecated_member_use
     ref.listenSelf((_, data) => update(data));
   }
 
