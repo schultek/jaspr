@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.4.2
 
 - Fixed layout bug of embedded flutter view.
 

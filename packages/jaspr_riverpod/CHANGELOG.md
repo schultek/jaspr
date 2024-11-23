@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.3.16
 
 - Upgrade `riverpod` to `^2.6.0`
 

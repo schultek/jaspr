@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.16.2
 
 - Fixed bug with empty `text('')` components.
 - Fixed bug in `raw()` component.
