@@ -2,7 +2,7 @@
 
 part of '../sync_provider.dart';
 
-/// {@macro riverpod.providerrefbase}
+/// {@macro riverpod.provider_ref_base}
 /// - [state], the value currently exposed by this provider.
 abstract class SyncProviderRef<State> implements Ref<AsyncValue<State>> {
   /// Obtains the state currently exposed by this provider.
@@ -22,10 +22,13 @@ abstract class SyncProviderRef<State> implements Ref<AsyncValue<State>> {
   Future<State> get future;
 }
 
-/// {@macro riverpod.syncprovider}
+/// {@macro riverpod.sync_provider}
 class SyncProvider<T> extends _SyncProviderBase<T>
-    with AlwaysAliveProviderBase<AsyncValue<T>>, AlwaysAliveAsyncSelector<T> {
-  /// {@macro riverpod.syncprovider}
+    with
+        // ignore: deprecated_member_use
+        AlwaysAliveProviderBase<AsyncValue<T>>,
+        AlwaysAliveAsyncSelector<T> {
+  /// {@macro riverpod.sync_provider}
   SyncProvider(
     this._createFn, {
     required this.id,
@@ -64,6 +67,7 @@ class SyncProvider<T> extends _SyncProviderBase<T>
   final Codec<T, dynamic>? codec;
 
   @override
+  // ignore: deprecated_member_use
   late final AlwaysAliveRefreshable<Future<T>> future = _future(this);
 
   @override
@@ -83,7 +87,7 @@ class SyncProvider<T> extends _SyncProviderBase<T>
   @override
   SyncProviderElement<T> createElement() => SyncProviderElement._(this);
 
-  /// {@macro riverpod.overridewith}
+  /// {@macro riverpod.override_with}
   Override overrideWith(Create<FutureOr<T>, SyncProviderRef<T>> create) {
     return ProviderOverride(
       origin: this,
@@ -170,7 +174,7 @@ class SyncProviderFamily<R, Arg>
 
   final Codec<R, dynamic>? codec;
 
-  /// {@macro riverpod.overridewith}
+  /// {@macro riverpod.override_with}
   Override overrideWith(
     FutureOr<R> Function(SyncProviderRef<R> ref, Arg arg) create,
   ) {
