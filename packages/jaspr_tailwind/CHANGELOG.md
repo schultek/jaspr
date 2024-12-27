@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.3.1
 
 - Fixed execution of tailwind cli by adding `runInShell: true`.
 
