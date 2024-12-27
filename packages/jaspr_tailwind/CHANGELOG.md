@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed execution of tailwind cli by adding `runInShell: true`.
+
 ## 0.3.0
 
 - Added minify option to tailwind in release mode.
