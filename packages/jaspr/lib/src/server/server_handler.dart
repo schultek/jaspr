@@ -86,7 +86,7 @@ Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHa
       }
 
       return Response.ok(
-        await render(setup, requestUri, fileLoader),
+        await render(setup, requestUri, fileLoader, false),
         headers: {'Content-Type': 'text/html'},
       );
     });

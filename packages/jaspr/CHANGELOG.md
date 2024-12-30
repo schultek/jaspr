@@ -1,3 +1,9 @@
+## Unreleased patch
+
+- Added `table` and related html methods.
+- Added `value` parameter to `select()` method.
+- Add 'standalone' option to `renderComponent` method.
+
 ## 0.16.2
 
 - Fixed bug with empty `text('')` components.

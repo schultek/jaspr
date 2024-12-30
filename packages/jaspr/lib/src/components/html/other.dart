@@ -72,6 +72,41 @@ Component summary(List<Component> children,
   );
 }
 
+/// The  &lt;meta&gt; HTML element represents metadata that cannot be represented by other HTML meta-related elements, like  &lt;base &gt;,  &lt;link &gt;,  &lt;script &gt;,  &lt;style &gt; or  &lt;title &gt;.
+///
+/// - [name]: The name and content attributes can be used together to provide document metadata in terms of name-value pairs, with the name attribute giving the metadata name, and the content attribute giving the value.
+///   See standard metadata names for details about the set of standard metadata names defined in the HTML specification.
+/// - [content]: This attribute contains the value for the 'http-equiv' or 'name' attribute, depending on which is used.
+/// - [charset]: This attribute declares the document's character encoding. If the attribute is present, its value must be an ASCII case-insensitive match for the string "utf-8", because UTF-8 is the only valid encoding for HTML5 documents. &lt;meta&gt; elements which declare a character encoding must be located entirely within the first 1024 bytes of the document.
+/// - [httpEquiv]: Defines a pragma directive. The attribute's name, short for http-equivalent, is because all the allowed values are names of particular HTTP headers.
+Component meta(
+    {String? name,
+    String? content,
+    String? charset,
+    String? httpEquiv,
+    Key? key,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
+  return DomComponent(
+    tag: 'meta',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: {
+      ...attributes ?? {},
+      if (name != null) 'name': name,
+      if (content != null) 'content': content,
+      if (charset != null) 'charset': charset,
+      if (httpEquiv != null) 'http-equiv': httpEquiv,
+    },
+    events: events,
+  );
+}
+
 /// The &lt;link&gt; HTML element specifies relationships between the current document and an external resource. This element is most commonly used to link to stylesheets, but is also used to establish site icons (both "favicon" style icons and icons for the home screen and apps on mobile devices) among other things.
 ///
 /// - [href]: This attribute specifies the URL of the linked resource. A URL can be absolute or relative.

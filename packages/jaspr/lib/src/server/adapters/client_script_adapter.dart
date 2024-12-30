@@ -10,9 +10,9 @@ class ClientScriptAdapter extends HeadScopeAdapter {
   final List<ClientTarget> clientTargets;
 
   @override
-  void applyHead(MarkupRenderObject head) {
+  bool applyHead(MarkupRenderObject head) {
     if (clientTargets.isEmpty) {
-      return;
+      return false;
     }
 
     String source;
@@ -27,5 +27,7 @@ class ClientScriptAdapter extends HeadScopeAdapter {
       head.createChildRenderObject()
         ..updateElement('script', null, null, null, {'src': '$source.dart.js', 'defer': ''}, null),
     );
+
+    return true;
   }
 }

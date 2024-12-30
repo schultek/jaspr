@@ -25,7 +25,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     super.attachRootComponent(ClientComponentRegistry(child: app));
   }
 
-  Future<String> render() async {
+  Future<String> render({bool standalone = false}) async {
     if (rootElement == null) return '';
 
     if (rootElement!.owner.isFirstBuild) {
@@ -38,7 +38,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     var adapters = [
       ..._adapters.reversed,
       GlobalStylesAdapter(this),
-      DocumentAdapter(),
+      if (!standalone) DocumentAdapter(),
     ];
 
     for (var adapter in adapters.reversed) {

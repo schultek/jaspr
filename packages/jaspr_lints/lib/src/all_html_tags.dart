@@ -57,6 +57,7 @@ const allHtmlTags = {
   'details',
   'dialog',
   'summary',
+  'meta',
   'link',
   'script',
   'svg',
@@ -66,5 +67,15 @@ const allHtmlTags = {
   'line',
   'path',
   'polygon',
-  'polyline'
+  'polyline',
+  'table',
+  'caption',
+  'thead',
+  'tbody',
+  'tfoot',
+  'th',
+  'tr',
+  'td',
+  'col',
+  'colgroup'
 };
