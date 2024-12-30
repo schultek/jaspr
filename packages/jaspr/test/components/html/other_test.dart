@@ -10,6 +10,8 @@ void main() {
         details(open: false, []),
         dialog(open: false, []),
         summary([]),
+        meta(httpEquiv: "x-ua-compatible", content: "ie=edge"),
+        meta(name: "description", content: "Hello world"),
         link(href: "a", rel: "", type: "", as: ""),
         script(async: false, defer: false, src: "a.js", []),
       ]));
@@ -17,6 +19,7 @@ void main() {
       expect(find.tag('details'), findsOneComponent);
       expect(find.tag('dialog'), findsOneComponent);
       expect(find.tag('summary'), findsOneComponent);
+      expect(find.tag('meta'), findsNComponents(2));
       expect(find.tag('link'), findsOneComponent);
       expect(find.tag('script'), findsOneComponent);
     });
