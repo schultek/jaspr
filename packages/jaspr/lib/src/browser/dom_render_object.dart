@@ -118,6 +118,17 @@ class DomRenderObject extends RenderObject {
           elem.value = attr.value;
           continue;
         }
+
+        if (attr.key == 'value' &&
+            elem.instanceOfString('HTMLSelectElement') &&
+            (elem as web.HTMLSelectElement).value != attr.value) {
+          if (kVerboseMode) {
+            print("Set select value: ${attr.value}");
+          }
+          elem.value = attr.value;
+          continue;
+        }
+
         elem.clearOrSetAttribute(attr.key, attr.value);
       }
     }
