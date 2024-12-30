@@ -29,14 +29,16 @@ Handler serveApp(AppHandler handler) {
 typedef RenderFunction = FutureOr<Response> Function(Component);
 typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render);
 
-/// Directly renders the provided component into a html string
-Future<String> renderComponent(Component app) async {
+/// Directly renders the provided component into a html string.
+///
+/// When [standalone] is false (default), the html output will have a full document structure (html, head, body).
+Future<String> renderComponent(Component app, {bool standalone = false}) async {
   _checkInitialized('renderComponent');
   var fileHandler = staticFileHandler();
   return render(_createSetup(app), Uri.parse('https://0.0.0.0/'), (name) async {
     var response = await fileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
     return response.statusCode == 200 ? response.readAsString() : null;
-  });
+  }, standalone);
 }
 
 void _checkInitialized(String method) {
