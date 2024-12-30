@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.16.3
 
 - Added `table` and related html methods.
 - Added `value` parameter to `select()` method.
