@@ -1,3 +1,7 @@
+## 0.1.3
+
+ - Resolve analyzer warnings and errors.
+
 ## 0.1.2
 
 - Updated sdk constraint to `>=3.5.0 <4.0.0`.
