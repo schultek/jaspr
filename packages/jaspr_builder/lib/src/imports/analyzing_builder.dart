@@ -29,9 +29,11 @@ class ImportsModuleBuilder implements Builder {
       var outputId = buildStep.inputId.changeExtension('.imports.json');
       var partId = buildStep.inputId.changeExtension('.imports.dart');
 
-      var import = lib.libraryImports
+      // Get the library's compilation unit and use its imports instead
+      var compilationUnit = lib.definingCompilationUnit;
+      var import = compilationUnit.libraryImports
           .cast<Element>()
-          .followedBy(lib.libraryExports)
+          .followedBy(compilationUnit.libraryExports)
           .where((Element e) => importChecker.hasAnnotationOf(e))
           .where((Element e) {
         var uri = switch (e) {
