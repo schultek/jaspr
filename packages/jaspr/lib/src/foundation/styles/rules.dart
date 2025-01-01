@@ -4,25 +4,44 @@ import 'styles.dart';
 
 abstract class StyleRule {
   /// Renders a css rule with the given selector and styles.
-  const factory StyleRule({required Selector selector, required Styles styles}) = BlockStyleRule;
+  const factory StyleRule({
+    required Selector selector,
+    required Styles styles,
+  }) = BlockStyleRule;
 
   /// Renders a `@import url(...)` css rule.
   const factory StyleRule.import(String url) = ImportStyleRule;
 
   /// Renders a `@font-face` css rule.
-  const factory StyleRule.fontFace({required String family, FontStyle? style, required String url}) = FontFaceStyleRule;
+  const factory StyleRule.fontFace({
+    required String family,
+    FontStyle? style,
+    required String url,
+  }) = FontFaceStyleRule;
 
   /// Renders a `@media` css rule.
-  const factory StyleRule.media({required MediaQuery query, required List<StyleRule> styles}) = MediaStyleRule;
+  const factory StyleRule.media({
+    required MediaQuery query,
+    required List<StyleRule> styles,
+  }) = MediaStyleRule;
 
   /// Renders a `@layer` css rule.
-  const factory StyleRule.layer({String? name, required List<StyleRule> styles}) = LayerStyleRule;
+  const factory StyleRule.layer({
+    String? name,
+    required List<StyleRule> styles,
+  }) = LayerStyleRule;
 
   /// Renders a `@supports` css rule.
-  const factory StyleRule.supports({required String condition, required List<StyleRule> styles}) = SupportsStyleRule;
+  const factory StyleRule.supports({
+    required String condition,
+    required List<StyleRule> styles,
+  }) = SupportsStyleRule;
 
   /// Renders a `@keyframes` css rule.
-  const factory StyleRule.keyframes({required String name, required Map<String, Styles> styles}) = KeyframesStyleRule;
+  const factory StyleRule.keyframes({
+    required String name,
+    required Map<String, Styles> styles,
+  }) = KeyframesStyleRule;
 
   /// Returns the rendered css for this rule.
   String toCss([String indent]);
@@ -128,7 +147,9 @@ class _MediaRuleQuery implements MediaQuery {
     this.orientation,
     this.canHover,
     this.aspectRatio,
+    this.isDark,
   }) : target = 'all';
+
   const _MediaRuleQuery.screen({
     this.minWidth,
     this.maxWidth,
@@ -137,7 +158,9 @@ class _MediaRuleQuery implements MediaQuery {
     this.orientation,
     this.canHover,
     this.aspectRatio,
+    this.isDark,
   }) : target = 'screen';
+
   const _MediaRuleQuery.print({
     this.minWidth,
     this.maxWidth,
@@ -146,6 +169,7 @@ class _MediaRuleQuery implements MediaQuery {
     this.orientation,
     this.canHover,
     this.aspectRatio,
+    this.isDark,
   }) : target = 'print';
 
   final String target;
@@ -156,6 +180,7 @@ class _MediaRuleQuery implements MediaQuery {
   final Orientation? orientation;
   final bool? canHover;
   final String? aspectRatio;
+  final bool? isDark;
 
   @override
   String get _value => '$target'
@@ -165,6 +190,7 @@ class _MediaRuleQuery implements MediaQuery {
       '${maxHeight != null ? ' and (max-height: ${maxHeight!.value})' : ''}'
       '${orientation != null ? ' and (orientation: ${orientation!.name})' : ''}'
       '${canHover != null ? ' and (hover: ${canHover! ? 'hover' : 'none'})' : ''}'
+      '${isDark != null ? ' and (prefers-color-scheme: ${isDark! ? 'dark' : 'light'})' : ''}'
       '${aspectRatio != null ? ' and (aspect-ratio: ${aspectRatio!})' : ''}';
 }
 
@@ -208,7 +234,11 @@ class ImportStyleRule implements StyleRule {
 }
 
 class FontFaceStyleRule implements StyleRule {
-  const FontFaceStyleRule({required this.family, this.style, required this.url});
+  const FontFaceStyleRule({
+    required this.family,
+    this.style,
+    required this.url,
+  });
 
   final String family;
   final FontStyle? style;
