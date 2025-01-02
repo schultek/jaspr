@@ -1,4 +1,4 @@
-## Unreleased 0.1.3
+## Unreleased patch
 
  - Resolve analyzer warnings and errors.
 
