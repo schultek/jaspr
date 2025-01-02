@@ -44,8 +44,8 @@ class EndpointQuotes extends _i1.EndpointRef {
       );
 }
 
-class _Modules {
-  _Modules(Client client) {
+class Modules {
+  Modules(Client client) {
     auth = _i4.Caller(client);
   }
 
@@ -75,19 +75,21 @@ class Client extends _i1.ServerpodClientShared {
           connectionTimeout: connectionTimeout,
           onFailedCall: onFailedCall,
           onSucceededCall: onSucceededCall,
-          disconnectStreamsOnLostInternetConnection: disconnectStreamsOnLostInternetConnection,
+          disconnectStreamsOnLostInternetConnection:
+              disconnectStreamsOnLostInternetConnection,
         ) {
     quotes = EndpointQuotes(this);
-    modules = _Modules(this);
+    modules = Modules(this);
   }
 
   late final EndpointQuotes quotes;
 
-  late final _Modules modules;
+  late final Modules modules;
 
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {'quotes': quotes};
 
   @override
-  Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {'auth': modules.auth};
+  Map<String, _i1.ModuleEndpointCaller> get moduleLookup =>
+      {'auth': modules.auth};
 }
