@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Updated `custom_lint` to `^0.7.0`
+
 ## 0.1.2
 
 - Updated sdk constraint to `>=3.5.0 <4.0.0`.
