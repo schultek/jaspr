@@ -59,10 +59,12 @@ class StylesModuleBuilder implements Builder {
         })
         .where((element) => stylesChecker.firstAnnotationOfExact(element) != null)
         .where((element) {
+          // ignore: deprecated_member_use
           if (element.enclosingElement case ClassElement clazz when clazz.isPrivate || element.isPrivate) {
             log.severe(
                 '@css cannot be used on private classes or members. Failing element: ${clazz.name}.${element.name} in library ${library.source.fullName}.');
             return false;
+          // ignore: deprecated_member_use
           } else if (element.enclosingElement case ClassElement clazz
               when (element is FieldElement && !element.isStatic) ||
                   (element is PropertyAccessorElement && !element.isStatic)) {
@@ -84,6 +86,7 @@ class StylesModuleBuilder implements Builder {
           if (type == null ||
               !type.isDartCoreList ||
               !styleRuleChecker.isAssignableFromType((type as InterfaceType).typeArguments.first)) {
+            // ignore: deprecated_member_use
             final prefix = switch (element.enclosingElement) { ClassElement(:var name) => '$name.', _ => '' };
             log.severe(
                 '@css can only be applied on variables or getters of type List<StyleRule>. Failing element: $prefix${element.name} with type $type in library ${element.source?.fullName}.');
@@ -93,6 +96,7 @@ class StylesModuleBuilder implements Builder {
           return true;
         })
         .map((e) {
+          // ignore: deprecated_member_use
           if (e.enclosingElement case ClassElement clazz) {
             return '${clazz.name}.${e.name}';
           } else {
