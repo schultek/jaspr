@@ -1,20 +1,25 @@
-
 import '../commands/base_command.dart';
 
 extension AddDartDefine on BaseCommand {
   void addDartDefineArgs() {
-    argParser.addMultiOption('dart-define',
-      help: 'Additional key-value pairs that will be available both on the server and client as constants from the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors. Multiple defines can be passed by repeating "--dart-define" multiple times.',
+    argParser.addMultiOption(
+      'dart-define',
+      help:
+          'Additional key-value pairs that will be available both on the server and client as constants from the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors. Multiple defines can be passed by repeating "--dart-define" multiple times.',
       valueHelp: 'key=value',
       splitCommas: false,
     );
-    argParser.addMultiOption('dart-define-client',
-      help: 'Additional key-value pairs that will be available on the client as constants from the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors. Multiple defines can be passed by repeating "--dart-define-client" multiple times.',
+    argParser.addMultiOption(
+      'dart-define-client',
+      help:
+          'Additional key-value pairs that will be available on the client as constants from the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors. Multiple defines can be passed by repeating "--dart-define-client" multiple times.',
       valueHelp: 'key=value',
       splitCommas: false,
     );
-    argParser.addMultiOption('dart-define-server',
-      help: 'Additional key-value pairs that will be available on the server as constants from the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors. Multiple defines can be passed by repeating "--dart-define-client" multiple times.',
+    argParser.addMultiOption(
+      'dart-define-server',
+      help:
+          'Additional key-value pairs that will be available on the server as constants from the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors. Multiple defines can be passed by repeating "--dart-define-client" multiple times.',
       valueHelp: 'key=value',
       splitCommas: false,
     );

@@ -113,8 +113,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       flutterResult = buildFlutter();
     }
 
-
-      var serverDefines = getServerDartDefines();
+    var serverDefines = getServerDartDefines();
 
     if (config!.mode == JasprMode.server) {
       logger.write('Building server app...', progress: ProgressState.running);
@@ -168,7 +167,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         serverPid.createSync(recursive: true);
       }
       serverPid.writeAsStringSync('');
-
 
       var process = await Process.start(
         Platform.executable,

@@ -64,7 +64,7 @@ class StylesModuleBuilder implements Builder {
             log.severe(
                 '@css cannot be used on private classes or members. Failing element: ${clazz.name}.${element.name} in library ${library.source.fullName}.');
             return false;
-          // ignore: deprecated_member_use
+            // ignore: deprecated_member_use
           } else if (element.enclosingElement case ClassElement clazz
               when (element is FieldElement && !element.isStatic) ||
                   (element is PropertyAccessorElement && !element.isStatic)) {

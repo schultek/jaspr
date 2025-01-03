@@ -140,8 +140,7 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       ] else
         '-Djaspr.flags.release=true',
       '-Djaspr.flags.verbose=$debug',
-      for (var define in userDefines.entries)
-        '-D${define.key}=${define.value}',
+      for (var define in userDefines.entries) '-D${define.key}=${define.value}',
     ];
 
     if (debug) {
@@ -230,8 +229,7 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       '$package:ddc=generate-full-dill=true',
       '--delete-conflicting-outputs',
       '--define=$package:entrypoint=compiler=$compiler',
-      if (compiler == 'dartdevc') 
-        '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug$dartdevcDefines}',
+      if (compiler == 'dartdevc') '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug$dartdevcDefines}',
       if (compiler != 'dartdevc')
         '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"$dart2jsDefines${!release ? ',"--enable-asserts"' : ''}]',
     ], {

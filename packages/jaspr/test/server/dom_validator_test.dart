@@ -12,41 +12,30 @@ void main() {
     group('validateElementName', () {
       test('accepts valid element names', () {
         expect(() => validator.validateElementName('div'), returnsNormally);
-        expect(() => validator.validateElementName('custom-element'),
-            returnsNormally);
+        expect(() => validator.validateElementName('custom-element'), returnsNormally);
         expect(() => validator.validateElementName('h1'), returnsNormally);
       });
 
       test('throws on invalid element names', () {
-        expect(
-            () => validator.validateElementName('1div'), throwsArgumentError);
-        expect(() => validator.validateElementName('-element'),
-            throwsArgumentError);
-        expect(
-            () => validator.validateElementName('div!'), throwsArgumentError);
+        expect(() => validator.validateElementName('1div'), throwsArgumentError);
+        expect(() => validator.validateElementName('-element'), throwsArgumentError);
+        expect(() => validator.validateElementName('div!'), throwsArgumentError);
       });
     });
 
     group('validateAttributeName', () {
       test('accepts valid attribute names', () {
         expect(() => validator.validateAttributeName('id'), returnsNormally);
-        expect(() => validator.validateAttributeName('data-test'),
-            returnsNormally);
-        expect(() => validator.validateAttributeName('aria-label'),
-            returnsNormally);
-        expect(
-            () => validator.validateAttributeName(':class'), returnsNormally);
-        expect(() => validator.validateAttributeName('@scroll.window'),
-            returnsNormally);
+        expect(() => validator.validateAttributeName('data-test'), returnsNormally);
+        expect(() => validator.validateAttributeName('aria-label'), returnsNormally);
+        expect(() => validator.validateAttributeName(':class'), returnsNormally);
+        expect(() => validator.validateAttributeName('@scroll.window'), returnsNormally);
       });
 
       test('throws on invalid attribute names', () {
-        expect(
-            () => validator.validateAttributeName('1id'), throwsArgumentError);
-        expect(() => validator.validateAttributeName('-test'),
-            throwsArgumentError);
-        expect(() => validator.validateAttributeName('data!'),
-            throwsArgumentError);
+        expect(() => validator.validateAttributeName('1id'), throwsArgumentError);
+        expect(() => validator.validateAttributeName('-test'), throwsArgumentError);
+        expect(() => validator.validateAttributeName('data!'), throwsArgumentError);
       });
     });
 

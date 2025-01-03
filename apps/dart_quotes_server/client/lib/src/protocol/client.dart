@@ -75,8 +75,7 @@ class Client extends _i1.ServerpodClientShared {
           connectionTimeout: connectionTimeout,
           onFailedCall: onFailedCall,
           onSucceededCall: onSucceededCall,
-          disconnectStreamsOnLostInternetConnection:
-              disconnectStreamsOnLostInternetConnection,
+          disconnectStreamsOnLostInternetConnection: disconnectStreamsOnLostInternetConnection,
         ) {
     quotes = EndpointQuotes(this);
     modules = Modules(this);
@@ -90,6 +89,5 @@ class Client extends _i1.ServerpodClientShared {
   Map<String, _i1.EndpointRef> get endpointRefLookup => {'quotes': quotes};
 
   @override
-  Map<String, _i1.ModuleEndpointCaller> get moduleLookup =>
-      {'auth': modules.auth};
+  Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {'auth': modules.auth};
 }
