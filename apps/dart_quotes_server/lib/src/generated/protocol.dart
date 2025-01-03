@@ -175,8 +175,7 @@ class Protocol extends _i1.SerializationManagerServer {
   }
 
   @override
-  List<_i2.TableDefinition> getTargetTableDefinitions() =>
-      targetTableDefinitions;
+  List<_i2.TableDefinition> getTargetTableDefinitions() => targetTableDefinitions;
 
   @override
   String getModuleName() => 'dart_quotes';

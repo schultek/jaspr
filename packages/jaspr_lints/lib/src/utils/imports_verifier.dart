@@ -146,8 +146,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
       if (target is SimpleIdentifier) {
         var targetElement = target.staticElement;
         if (targetElement is PrefixElement) {
-          List<Element> prefixedElements = usedElements.prefixMap
-              .putIfAbsent(targetElement, () => <Element>[]);
+          List<Element> prefixedElements = usedElements.prefixMap.putIfAbsent(targetElement, () => <Element>[]);
           prefixedElements.add(element);
           return true;
         }
@@ -224,7 +223,6 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
     }
   }
 }
-
 
 /// A container with information about used imports prefixes and used imported
 /// elements.

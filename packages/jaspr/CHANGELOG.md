@@ -1,5 +1,7 @@
 ## Unreleased patch
-- Fixed improved validation regular expressions to support specific attribute names
+
+- Added `--dart-define`, `--dart-define-client` and `--dart-define-server` to `serve` and `build` commands.
+- Fixed attribute validation to support attribute names including `@` and `:`.
 
 ## 0.16.3
 
