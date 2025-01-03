@@ -1,6 +1,6 @@
-## Unreleased patch
+## Unreleased minor
 
- - Resolve analyzer warnings and errors.
+- Updated `custom_lint` to `^0.7.0`
 
 ## 0.1.2
 
