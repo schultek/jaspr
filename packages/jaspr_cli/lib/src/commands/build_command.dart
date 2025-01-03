@@ -11,6 +11,7 @@ import 'package:path/path.dart' as p;
 import 'package:webdev/src/daemon_client.dart' as d;
 
 import '../config.dart';
+import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
@@ -55,6 +56,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: '2',
     );
+    addDartDefineArgs();
   }
 
   @override
@@ -111,6 +113,9 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       flutterResult = buildFlutter();
     }
 
+
+      var serverDefines = getServerDartDefines();
+
     if (config!.mode == JasprMode.server) {
       logger.write('Building server app...', progress: ProgressState.running);
 
@@ -131,6 +136,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           '-o',
           './build/jaspr/app$extension',
           '-Djaspr.flags.release=true',
+          for (var define in serverDefines.entries) '-D${define.key}=${define.value}',
         ],
         workingDirectory: Directory.current.path,
       );
@@ -163,6 +169,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
       serverPid.writeAsStringSync('');
 
+
       var process = await Process.start(
         Platform.executable,
         [
@@ -171,6 +178,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           '-Djaspr.flags.release=true',
           '-Djaspr.flags.generate=true',
           '-Djaspr.dev.web=build/jaspr',
+          for (var define in serverDefines.entries) '-D${define.key}=${define.value}',
           entryPoint!,
         ],
         environment: {'PORT': '8080', 'JASPR_PROXY_PORT': '5567'},
@@ -233,8 +241,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     logger.write('Building web assets...', progress: ProgressState.running);
 
     final compiler = useWasm ? 'dart2wasm' : 'dart2js';
-
     final entrypointBuilder = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint';
+    final userDefines = getClientDartDefines().entries.map((e) => ',"-D${e.key}=${e.value}"').join();
 
     final client = await d.connectClient(
       Directory.current.path,
@@ -243,7 +251,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--verbose',
         '--delete-conflicting-outputs',
         '--define=$entrypointBuilder=compiler=$compiler',
-        '--define=$entrypointBuilder=${compiler}_args=["-Djaspr.flags.release=true","-O${argResults!['optimize']}"]',
+        '--define=$entrypointBuilder=${compiler}_args=["-Djaspr.flags.release=true","-O${argResults!['optimize']}"$userDefines]',
       ],
       logger.writeServerLog,
     );
