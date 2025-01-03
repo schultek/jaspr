@@ -1,4 +1,4 @@
-![Banner](https://github.com/schultek/jaspr/raw/main/assets/jaspr_banner.png)
+![Banner](https://github.com/schultek/jaspr/raw/main/assets/banner.png)
 
 <p align="center">
   <a href="https://pub.dev/packages/jaspr"><img src="https://img.shields.io/pub/v/jaspr?label=pub.dev&labelColor=333940&logo=dart&color=00589B" alt="pub"></a>
