@@ -358,14 +358,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.16.3"
+    version: "0.16.4"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.16.3"
+    version: "0.16.4"
   jaspr_router:
     dependency: "direct main"
     description:

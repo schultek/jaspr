@@ -1,4 +1,4 @@
-## Unreleased minor 
+## 0.5.0
 
 - Bump `serverpod` to `2.3.0`
 

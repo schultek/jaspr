@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.2.0
 
 - Updated `custom_lint` to `^0.7.0`
 
