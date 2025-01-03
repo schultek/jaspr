@@ -110,6 +110,7 @@ abstract class MediaQuery {
     Orientation? orientation,
     bool? canHover,
     String? aspectRatio,
+    ColorScheme? prefersColorScheme,
   }) = _MediaRuleQuery.all;
 
   const factory MediaQuery.screen({
@@ -120,6 +121,7 @@ abstract class MediaQuery {
     Orientation? orientation,
     bool? canHover,
     String? aspectRatio,
+    ColorScheme? prefersColorScheme,
   }) = _MediaRuleQuery.screen;
 
   const factory MediaQuery.print({
@@ -130,6 +132,7 @@ abstract class MediaQuery {
     Orientation? orientation,
     bool? canHover,
     String? aspectRatio,
+    ColorScheme? prefersColorScheme,
   }) = _MediaRuleQuery.print;
 
   const factory MediaQuery.not(MediaQuery query) = _NotMediaRuleQuery;
@@ -137,6 +140,8 @@ abstract class MediaQuery {
 }
 
 enum Orientation { portrait, landscape }
+
+enum ColorScheme { light, dark }
 
 class _MediaRuleQuery implements MediaQuery {
   const _MediaRuleQuery.all({
@@ -147,7 +152,7 @@ class _MediaRuleQuery implements MediaQuery {
     this.orientation,
     this.canHover,
     this.aspectRatio,
-    this.isDark,
+    this.prefersColorScheme,
   }) : target = 'all';
 
   const _MediaRuleQuery.screen({
@@ -158,7 +163,7 @@ class _MediaRuleQuery implements MediaQuery {
     this.orientation,
     this.canHover,
     this.aspectRatio,
-    this.isDark,
+    this.prefersColorScheme,
   }) : target = 'screen';
 
   const _MediaRuleQuery.print({
@@ -169,7 +174,7 @@ class _MediaRuleQuery implements MediaQuery {
     this.orientation,
     this.canHover,
     this.aspectRatio,
-    this.isDark,
+    this.prefersColorScheme,
   }) : target = 'print';
 
   final String target;
@@ -180,7 +185,7 @@ class _MediaRuleQuery implements MediaQuery {
   final Orientation? orientation;
   final bool? canHover;
   final String? aspectRatio;
-  final bool? isDark;
+  final ColorScheme? prefersColorScheme;
 
   @override
   String get _value => '$target'
@@ -190,7 +195,7 @@ class _MediaRuleQuery implements MediaQuery {
       '${maxHeight != null ? ' and (max-height: ${maxHeight!.value})' : ''}'
       '${orientation != null ? ' and (orientation: ${orientation!.name})' : ''}'
       '${canHover != null ? ' and (hover: ${canHover! ? 'hover' : 'none'})' : ''}'
-      '${isDark != null ? ' and (prefers-color-scheme: ${isDark! ? 'dark' : 'light'})' : ''}'
+      '${prefersColorScheme != null ? ' and (prefers-color-scheme: ${prefersColorScheme!.name})' : ''}'
       '${aspectRatio != null ? ' and (aspect-ratio: ${aspectRatio!})' : ''}';
 }
 
