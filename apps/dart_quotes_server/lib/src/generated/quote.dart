@@ -11,13 +11,13 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
-abstract class Quote extends _i1.TableRow implements _i1.ProtocolSerialization {
+abstract class Quote implements _i1.TableRow, _i1.ProtocolSerialization {
   Quote._({
-    int? id,
+    this.id,
     required this.quote,
     required this.author,
     required this.likes,
-  }) : super(id);
+  });
 
   factory Quote({
     int? id,
@@ -38,6 +38,9 @@ abstract class Quote extends _i1.TableRow implements _i1.ProtocolSerialization {
   static final t = QuoteTable();
 
   static const db = QuoteRepository._();
+
+  @override
+  int? id;
 
   String quote;
 

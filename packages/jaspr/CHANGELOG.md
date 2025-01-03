@@ -1,3 +1,6 @@
+## Unreleased patch
+- Fixed improved validation regular expressions to support specific attribute names
+
 ## 0.16.3
 
 - Added `table` and related html methods.
