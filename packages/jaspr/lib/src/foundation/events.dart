@@ -1,8 +1,8 @@
-import '../../components/html/html.dart';
-import '../basic_types.dart';
-import 'web.dart' if (dart.library.io) 'web_stub.dart' as web;
+import 'package:universal_web/js_interop.dart';
+import 'package:universal_web/web.dart' as web;
 
-export 'web.dart' if (dart.library.io) 'web_stub.dart' show Event;
+import '../components/html/html.dart';
+import 'basic_types.dart';
 
 typedef EventCallback = void Function(web.Event event);
 typedef EventCallbacks = Map<String, EventCallback>;

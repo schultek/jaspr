@@ -8,10 +8,11 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:meta/meta.dart';
+import 'package:universal_web/web.dart' as web;
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
-import '../foundation/events/events.dart';
+import '../foundation/events.dart';
 import '../foundation/object.dart';
 import '../foundation/styles/styles.dart';
 

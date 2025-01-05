@@ -1,5 +1,5 @@
 import '../../foundation/basic_types.dart';
-import '../../foundation/events/events.dart';
+import '../../foundation/events.dart';
 import '../../foundation/styles/styles.dart';
 import '../../framework/framework.dart';
 import '../raw_text/raw_text.dart';

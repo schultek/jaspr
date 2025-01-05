@@ -111,8 +111,12 @@ abstract class Document implements Component {
   }) = AttachDocument.body;
 }
 
-// only allow a single document
-const _documentKey = GlobalKey();
+// Only allow a single Document.
+const _documentKey = _DocumentKey();
+
+class _DocumentKey extends GlobalKey {
+  const _DocumentKey() : super.constructor();
+}
 
 class BaseDocument extends StatelessComponent implements Document {
   const BaseDocument({
