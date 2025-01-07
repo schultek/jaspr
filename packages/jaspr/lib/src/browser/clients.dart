@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:web/web.dart' as web;
+import 'package:universal_web/web.dart' as web;
 
 import '../foundation/marker_utils.dart';
 import '../framework/framework.dart';

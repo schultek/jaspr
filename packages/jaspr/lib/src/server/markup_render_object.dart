@@ -6,7 +6,6 @@ import '../../server.dart';
 import 'child_nodes.dart';
 
 class MarkupRenderObject extends RenderObject {
-
   String? tag;
   String? id;
   String? classes;

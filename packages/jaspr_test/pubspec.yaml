@@ -18,7 +18,7 @@ dependencies:
   jaspr: ^0.16.4
   meta: ^1.7.0
   test: ^1.22.0
-  universal_web: ^1.1.0
+  universal_web: ^1.1.0+1
 
 dev_dependencies:
   lints: ^4.0.0

@@ -8,7 +8,6 @@ import 'package:test/test.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../binding.dart';
-import '../fakes/fake_event.dart';
 import '../finders.dart';
 
 @isTest
@@ -64,9 +63,9 @@ class ComponentTester {
   }
 
   /// Simulates [event] on the given element.
-  void dispatchEvent(Finder finder, String event,[ web.Event? data]) {
+  void dispatchEvent(Finder finder, String event, [web.Event? data]) {
     var renderObject = _findDomElement(finder).renderObject as TestRenderObject;
-    renderObject.events?[event]?.call(data ?? fakeEvent(event));
+    renderObject.events?[event]?.call(data ?? web.Event(event));
   }
 
   DomElement _findDomElement(Finder finder) {

@@ -145,7 +145,7 @@ abstract class GlobalKey extends Key {
   ///
   /// The label is purely for debugging and not used for comparing the identity
   /// of the key.
-  factory GlobalKey({ String? debugLabel }) => LabeledGlobalKey(debugLabel);
+  factory GlobalKey({String? debugLabel}) => LabeledGlobalKey(debugLabel);
 
   /// Creates a global key without a label.
   ///
@@ -166,7 +166,6 @@ abstract class GlobalKey extends Key {
   /// The current component is null if there is no component in the tree that matches
   /// this global key.
   Component? get currentComponent => _currentElement?.component;
-
 }
 
 /// A global key with a debugging label.
@@ -247,7 +246,7 @@ class GlobalObjectKey extends GlobalKey {
 ///  * The discussion at [Component.key] for more information about how components use
 ///    keys.
 class GlobalStateKey<T extends State<StatefulComponent>> extends GlobalKey {
-  factory GlobalStateKey({ String? debugLabel }) => LabeledGlobalStateKey(debugLabel);
+  factory GlobalStateKey({String? debugLabel}) => LabeledGlobalStateKey(debugLabel);
 
   /// Creates a global state key without a label.
   ///
@@ -261,9 +260,9 @@ class GlobalStateKey<T extends State<StatefulComponent>> extends GlobalKey {
   /// matches this global key, (2) that component is not a [StatefulComponent], or the
   /// associated [State] object is not a subtype of `T`.
   T? get currentState => switch (_currentElement) {
-    StatefulElement(:final T state) => state,
-    _ => null,
-  };
+        StatefulElement(:final T state) => state,
+        _ => null,
+      };
 }
 
 /// A global state key with a debugging label.
@@ -342,7 +341,6 @@ class GlobalObjectStateKey<T extends State<StatefulComponent>> extends GlobalSta
   }
 }
 
-
 /// A global key that provides access to the dom [web.Node] that is associated with its element.
 ///
 /// See also:
@@ -352,7 +350,7 @@ class GlobalObjectStateKey<T extends State<StatefulComponent>> extends GlobalSta
 ///  * The discussion at [Component.key] for more information about how components use
 ///    keys.
 class GlobalNodeKey<T extends web.Node> extends GlobalKey {
-  factory GlobalNodeKey({ String? debugLabel }) => LabeledGlobalNodeKey(debugLabel);
+  factory GlobalNodeKey({String? debugLabel}) => LabeledGlobalNodeKey(debugLabel);
 
   /// Creates a global node key without a label.
   ///
@@ -362,12 +360,12 @@ class GlobalNodeKey<T extends web.Node> extends GlobalKey {
 
   /// The [web.Node] for the component in the tree that currently has this global key.
   ///
-  /// The current node is null if (1) the current environment is not web, (2) there is no component 
+  /// The current node is null if (1) the current environment is not web, (2) there is no component
   /// in the tree that matches this global key, or (3) its element is not a [RenderObjectElement].
   T? get currentNode => switch (_currentElement) {
-    RenderObjectElement(renderObject: RenderObject(: final T node)) => node,
-    _ => null,
-  };
+        RenderObjectElement(renderObject: RenderObject(:final T node)) => node,
+        _ => null,
+      };
 }
 
 /// A global node key with a debugging label.
