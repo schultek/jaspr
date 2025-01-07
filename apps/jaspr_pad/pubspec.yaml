@@ -5,6 +5,7 @@ publish_to: none
 homepage: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
 
+# resolution: workspace
 environment:
   sdk: '>=3.0.0 <4.0.0'
 

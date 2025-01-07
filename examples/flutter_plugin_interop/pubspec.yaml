@@ -3,8 +3,9 @@ description: A pure client-side app without ssr.
 version: 0.1.3
 publish_to: none
 
+resolution: workspace
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
 
 dependencies:
   jaspr: ^0.16.0

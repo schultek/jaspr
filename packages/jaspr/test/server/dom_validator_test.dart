@@ -1,3 +1,5 @@
+@TestOn('vm')
+
 import 'package:jaspr/src/server/markup_render_object.dart';
 import 'package:test/test.dart';
 

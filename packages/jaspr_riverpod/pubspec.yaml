@@ -8,8 +8,9 @@ topics:
   - jaspr
   - web
 
+resolution: workspace
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
 
 dependencies:
   jaspr: ^0.16.2

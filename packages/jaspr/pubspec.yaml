@@ -13,8 +13,9 @@ topics:
   - html
   - server
 
+resolution: workspace
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
 
 dependencies:
   binary_codec: ^2.0.3
@@ -33,5 +34,5 @@ dev_dependencies:
   build_runner: ^2.4.0
   build_web_compilers: ^4.0.0
   jaspr_test: '>=0.1.0 <1.0.0'
-  lints: ^3.0.0
+  lints: ^4.0.0
   test: ^1.25.8

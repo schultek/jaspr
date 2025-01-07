@@ -1,8 +1,31 @@
 name: jaspr_workspace
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
+
+workspace:
+  - packages/jaspr
+  - packages/jaspr_builder
+  - packages/jaspr_cli
+  - packages/jaspr_flutter_embed
+  - packages/jaspr_lints
+  - packages/jaspr_riverpod
+  - packages/jaspr_router
+  - packages/jaspr_serverpod
+  - packages/jaspr_tailwind
+  - packages/jaspr_test
+  - apps/dart_quotes
+  - apps/dart_quotes_server
+  - apps/fluttercon
+  # - apps/jaspr_pad
+  - examples/backend_dart_frog
+  - examples/backend_serverpod/example_server
+  - examples/backend_shelf
+  - examples/flutter_embedding
+  - examples/flutter_multi_view
+  - examples/flutter_plugin_interop
+  - examples/package_riverpod
 
 dev_dependencies:
-  melos: ^3.4.0
+  melos: ^7.0.0-dev.1
 

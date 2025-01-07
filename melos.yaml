@@ -1,18 +1,21 @@
 name: jaspr_workspace
 repository: https://github.com/schultek/jaspr
 
-command:
-  bootstrap:
-    hooks:
-      post: |
-        dart pub global activate packages/jaspr_cli --source=path
-
 packages:
   - packages/*
   - apps/*
   - examples/*
   - experiments/*
-  - thirdparty/*
+
+ide:
+  intellij:
+    enabled: false
+    
+command:
+  bootstrap:
+    hooks:
+      post: |
+        dart pub global activate packages/jaspr_cli --source=path
 
 scripts:
   format:

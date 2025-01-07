@@ -2,8 +2,9 @@ name: flutter_multi_view
 description: A new jaspr project.
 version: 0.0.2
 
+resolution: workspace
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -17,8 +18,8 @@ dev_dependencies:
   jaspr_builder: ^0.16.3
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
-  jaspr_lints: ^0.1.2
+  flutter_lints: ^4.0.0
+  jaspr_lints: ^0.2.0
 
 jaspr:
   mode: static

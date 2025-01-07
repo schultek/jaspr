@@ -2,6 +2,7 @@ name: preload_images_experiment
 version: 0.1.0
 publish_to: none
 
+resolution: workspace
 environment:
   sdk: '>=3.0.0 <4.0.0'
 

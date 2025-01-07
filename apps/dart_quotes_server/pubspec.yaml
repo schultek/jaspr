@@ -3,8 +3,9 @@ description: Collection of Dart quotes.
 version: 0.1.3
 publish_to: none
 
+resolution: workspace
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
 
 dependencies:
   dart_quotes_client:

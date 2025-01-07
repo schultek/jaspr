@@ -3,6 +3,7 @@ publish_to: none
 description: A MobX and Hooks enabled jaspr web app.
 version: 0.1.0
 
+resolution: workspace
 environment:
   sdk: ">=3.0.0 <4.0.0"
 

@@ -1,6 +1,7 @@
 name: dart_quotes_client
 description: Generated client for dart_quotes serverpod app.
 
+resolution: workspace
 environment:
   sdk: '>=3.1.0 <4.0.0'
 
