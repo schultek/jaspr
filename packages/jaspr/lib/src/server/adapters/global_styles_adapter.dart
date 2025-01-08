@@ -6,10 +6,10 @@ class GlobalStylesAdapter extends HeadScopeAdapter {
   final ServerAppBinding binding;
 
   @override
-  void applyHead(MarkupRenderObject head) {
+  bool applyHead(MarkupRenderObject head) {
     var styles = binding.options.styles?.call() ?? [];
     if (styles.isEmpty) {
-      return;
+      return false;
     }
 
     head.children.insertBefore(
@@ -17,5 +17,7 @@ class GlobalStylesAdapter extends HeadScopeAdapter {
         ..updateElement('style', null, null, null, null, null)
         ..children.insertBefore(head.createChildRenderObject()..updateText(styles.render(), true)),
     );
+
+    return true;
   }
 }

@@ -1,3 +1,7 @@
+## 0.15.2
+
+- Add 'standalone' option to `renderComponent` method.
+
 ## 0.15.1
 
 - Include and setup `jaspr_lints` in newly created projects.

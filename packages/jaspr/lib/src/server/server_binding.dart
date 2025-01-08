@@ -27,14 +27,14 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     rootCompleter.complete();
   }
 
-  Future<String> render() async {
+  Future<String> render({bool standalone = false}) async {
     await rootCompleter.future;
 
     var root = rootElement!.renderObject as MarkupRenderObject;
     var adapters = [
       ..._adapters.reversed,
       GlobalStylesAdapter(this),
-      DocumentAdapter(),
+      if (!standalone) DocumentAdapter(),
     ];
 
     for (var adapter in adapters.reversed) {
