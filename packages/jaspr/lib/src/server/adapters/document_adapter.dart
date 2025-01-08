@@ -20,10 +20,7 @@ mixin DocumentStructureMixin on RenderAdapter {
 
     if (head == null) {
       head = html.createChildRenderObject()..tag = 'head';
-      head.children.insertAfter(head.createChildRenderObject()
-        ..tag = 'base'
-        ..attributes = {'href': '/'});
-
+      
       if (body == null) {
         var range = html.children.range();
         html.children.insertAfter(head);
@@ -43,13 +40,6 @@ mixin DocumentStructureMixin on RenderAdapter {
           ..insertNodeAfter(rangeAfter)
           ..insertNodeAfter(rangeBefore);
         html.children.insertAfter(body, after: head);
-      }
-
-      var base = head.children.findWhere((c) => c.tag == 'base');
-      if (base == null) {
-        head.children.insertAfter(head.createChildRenderObject()
-          ..tag = 'base'
-          ..attributes = {'href': '/'});
       }
     }
 
