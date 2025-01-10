@@ -234,26 +234,34 @@ packages:
     dependency: transitive
     description:
       name: custom_lint
-      sha256: "4939d89e580c36215e48a7de8fd92f22c79dcc3eb11fda84f3402b3b45aec663"
+      sha256: "3486c470bb93313a9417f926c7dd694a2e349220992d7b9d14534dc49c15bba9"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.5"
+    version: "0.7.0"
   custom_lint_builder:
     dependency: transitive
     description:
       name: custom_lint_builder
-      sha256: d9e5bb63ed52c1d006f5a1828992ba6de124c27a531e8fba0a31afffa81621b3
+      sha256: "42cdc41994eeeddab0d7a722c7093ec52bd0761921eeb2cbdbf33d192a234759"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.5"
+    version: "0.7.0"
   custom_lint_core:
     dependency: transitive
     description:
       name: custom_lint_core
-      sha256: "4ddbbdaa774265de44c97054dcec058a83d9081d071785ece601e348c18c267d"
+      sha256: "02450c3e45e2a6e8b26c4d16687596ab3c4644dd5792e3313aa9ceba5a49b7f5"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.5"
+    version: "0.7.0"
+  custom_lint_visitor:
+    dependency: transitive
+    description:
+      name: custom_lint_visitor
+      sha256: bfe9b7a09c4775a587b58d10ebb871d4fe618237639b1e84d5ec62d7dfef25f9
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0+6.11.0"
   dart_style:
     dependency: transitive
     description:
@@ -390,14 +398,14 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.16.3"
+    version: "0.16.4"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.16.3"
+    version: "0.16.4"
   jaspr_flutter_embed:
     dependency: "direct main"
     description:
@@ -411,7 +419,7 @@ packages:
       path: "../../packages/jaspr_lints"
       relative: true
     source: path
-    version: "0.1.2"
+    version: "0.2.0"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:

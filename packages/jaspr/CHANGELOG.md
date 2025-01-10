@@ -1,3 +1,8 @@
+## 0.16.4
+
+- Added `--dart-define`, `--dart-define-client` and `--dart-define-server` to `serve` and `build` commands.
+- Fixed attribute validation to support attribute names including `@` and `:`.
+
 ## 0.16.3
 
 - Added `table` and related html methods.
