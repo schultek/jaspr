@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Added `prefersColorScheme` parameter to `MediaQuery`.
+
 ## 0.16.4
 
 - Added `--dart-define`, `--dart-define-client` and `--dart-define-server` to `serve` and `build` commands.
