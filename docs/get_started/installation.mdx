@@ -9,46 +9,53 @@ Follow the steps below to set up a new Jaspr project on your computer.
 
 ## New Project
 
-To get started simply activate the `jaspr` command line tool:
+<Steps>
+  <Step title="Install CLI">
+    Install the Jaspr CLI via:
 
-```shell
-dart pub global activate jaspr_cli
-```
+    ```js
+    dart pub global activate jaspr_cli
+    ```
 
-Then create a new project like this:
+    The `jaspr` command will be available in your terminal.
+  </Step>
+  <Step title="Create a Project">
+    To create a new project run:
 
-```
-jaspr create my_website
-```
+    ```
+    jaspr create my_website
+    ```
 
-This will walk you through the setup wizard and create a new Jaspr project inside the `my_website` folder.
+    This will walk you through the setup wizard and create a new Jaspr project inside the `my_website` folder.
 
-The cli will prompt you with a set of options to configure your project. You can read about what each option
-does [below](/get_started/installation#project-options) or just start with the recommended ones (simply press **Enter** each time).
+    The cli will prompt you with a set of options to configure your project. You can read about what each option does [below](/get_started/installation#project-options) or just start with the recommended ones (simply press **Enter** each time).
 
-<Info>
-    If you are just starting out and are not sure what options to pick, just select the default one for each question
-    (simply press **Enter** each time).
-</Info>
+    <Info>
+        If you are just starting out and are not sure what options to pick, just select the default one for each question
+        (simply press **Enter** each time).
+    </Info>
 
-<Info>
-    Choosing a set of options do not lock you into a specific configuration. Starting from one setup you can easily
-    modify your code to behave as any other setup along the way.
-</Info>
+    <Info>
+        Choosing a set of options do not lock you into a specific configuration. Starting from one setup you can easily
+        modify your code to behave as any other setup along the way.
+    </Info>
+  </Step>
+  <Step title="Run the Development Server">
+    Start the development server via:
 
-After creation, run the development server using the following commands:
+    ```shell
+    cd my_website
+    jaspr serve
+    ```
 
-```shell
-cd my_website
-jaspr serve
-```
+    This will spin up a development server at `localhost:8080`.
+  </Step>
+</Steps>
 
-This will spin up a development server at `localhost:8080`.
 You can now start developing your website. 🎉
 
 <Success>
-    Observe that the browser automatically refreshes the page when you change something in your
-    code, like the `Welcome` text.
+  Observe that the browser automatically refreshes the page when you change something in your code, like the `Welcome` text.
 </Success>
 
 ## Project Options
@@ -58,36 +65,57 @@ The options set your rendering mode, hydration strategy, routing, flutter intero
 
 You can choose from the following options:
 
-1. **Rendering Mode**:
+<Property name="Rendering Mode">
+  Select one of the three rendering modes Jaspr supports. Read about the different modes [here](/get_started/modes).
+</Property>
 
-Select one of the three rendering modes Jaspr supports. Read about the different modes [here](/get_started/modes).
+---
 
-2. **Hydration** (Conditional Option):
+<Property name="Hydration" type="conditional">
+  Select the hydration strategy (automatic or manual). Read about hydration [here](/get_started/hydration).
+</Property>
 
-Select the hydration strategy (automatic or manual). Read about hydration [here](/get_started/hydration).
+---
 
-3. **Routing**:
+<Property name="Routing">
+  Whether to set up routing. Selecting **Yes** will setup a basic `Routing` with two routes ('/home' and '/about'). This gives you a convenient
+  starting point when you plan to develop a website with multiple pages.
+</Property>
 
-Whether to set up routing. Selecting **Yes** will setup a basic `Routing` with two routes ('/home' and '/about'). This gives you a convenient
-starting point when you plan to develop a website with multiple pages.
+---
 
-4. **Multi-Page Routing** (Conditional Option):
+<Property name="Multi-Page Routing" type="conditional">
+  Whether to set up multi-page or single-page routing, also called server-side or client-side routing respectively. This defined how navigating
+  between routes will behave. Either a "real" page load is performed when navigating to a new route (aka. the browser requests the new page using its url from the server).
+  Or the routing happens purely on the client without any request to the server.
 
-Whether to set up multi-page or single-page routing, also called server-side or client-side routing respectively. This defined how navigating
-between routes will behave. Either a "real" page load is performed when navigating to a new route (aka. the browser requests the new page using its url from the server).
-Or the routing happens purely on the client without any request to the server.
+  <Info>
+      There are different advantages and disadvantages for both types. To help you decide you can find many [articles](https://www.google.com/search?q=multi+page+vs+single+page+site) about this topic.
+  </Info>
 
-<Info>
-    There are different advantages and disadvantages for both types. To help you decide you can find many [articles](https://www.google.com/search?q=multi+page+vs+single+page+site) about this topic.
-</Info>
+  Read more about routing [here](/concepts/routing).
+</Property>
 
-Read more about routing [here](/concepts/routing).
+---
 
-5. **Flutter Embedding**:
+<Property name="Flutter Embedding">
+  Whether to setup an embedded Flutter application with your site. This will use Jasprs first-party integration for [Flutter element embedding](https://docs.flutter.dev/deployment/web#embedding-a-flutter-app-into-an-html-page) and create a simple Flutter counter app that synchronizes its state with your Jaspr site.
+</Property>
 
-Whether to setup an embedded Flutter application with your site. This will use Jasprs first-party integration for [Flutter element embedding](https://docs.flutter.dev/deployment/web#embedding-a-flutter-app-into-an-html-page) and create a simple Flutter counter app that synchronizes its state with your Jaspr site.
+---
 
-6. **Plugin Support**:
+<Property name="Plugin Support">
+  Whether to enable support for Flutter web plugins. This will switch to Jasprs custom compiler pipeline (replacing `build_web_compilers`) which allows the use of most Flutter web plugins in your Jaspr site without any additional setup.
+  *Flutter web plugins* refers to any Flutter plugin from pub.dev that supports web and is not concerned with widgets or rendering. This includes packages like `shared_preferences` or `firebase`.
+</Property>
 
-Whether to enable support for Flutter web plugins. This will switch to Jasprs custom compiler pipeline (replacing `build_web_compilers`) which allows the use of most Flutter web plugins in your Jaspr site without any additional setup.
-*Flutter web plugins* refers to any Flutter plugin from pub.dev that supports web and is not concerned with widgets or rendering. This includes packages like `shared_preferences` or `firebase`.
+---
+
+<Property name="Custom Backend" type="conditional">
+  Whether to use a custom backend package or framework for the server part of your project. You can choose between:
+  - **None**: No backend setup. This is the default option and is recommended if you are just starting out.
+  - **Shelf**: A simple and lightweight web server for Dart. This is a good choice if you want to build a custom backend for your project.
+  - *More options coming soon*
+
+  Read more about backends [here](/going_further/backend).
+</Property>

@@ -4,6 +4,8 @@
 - **BREAKING** Removed `currentState` from `GlobalKey`, use `GlobalStateKey` instead.
 - Migrated all web imports from `package:web` to `package:universal_web`.
 
+- Added `prefersColorScheme` parameter to `MediaQuery`.
+
 ## 0.16.4
 
 - Added `--dart-define`, `--dart-define-client` and `--dart-define-server` to `serve` and `build` commands.

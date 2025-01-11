@@ -35,11 +35,74 @@ tag and use the [`Router`s](/components/router) `push()` or `replace()` method t
 
 ## Parameters
 
-- `to`: The url to navigate to.
-- `replace`: Whether to replace the route instead of pushing. *Only affects client-side routing.*
-- `extra`: The extra data to attach to the new route. *Only affects client-side routing.*
-- `preload`: Whether to preload the target route when the link is hovered. *Only affects client-side routing when using lazy routes.*
-- `target`: The `target` attribute value applied to the anchor element.
-- `referrer`: The `referrerpolicy` attribute value applied to the anchor element.
-- `classes`, `styles`, `attributes`: Other standard properties applied to the anchor element.
-- `child` and `children`: Components to render inside the anchor element.
+<Property name="to" type="String" required>
+  The url to navigate to.
+</Property>
+
+---
+
+<Property name="replace" type="bool" optional>
+  Whether to replace the route instead of pushing, defaults to 'false'. 
+  
+  *Only affects client-side routing.*
+</Property>
+
+---
+
+<Property name="extra" type="Object" optional>
+  The extra data to attach to the new route. 
+  
+  *Only affects client-side routing.*
+</Property>
+
+---
+
+<Property name="preload" type="bool" optional>
+  Whether to preload the target route when the link is hovered, defaults to 'true'. 
+  
+  *Only affects client-side routing when using lazy routes.*
+</Property>
+
+---
+
+<Property name="target" type="Target?" optional>
+  The `target` attribute value applied to the anchor element.
+</Property>
+
+---
+
+<Property name="referrer" type="ReferrerPolicy?" optional>
+  The `referrerpolicy` attribute value applied to the anchor element.
+</Property>
+
+---
+
+<Property name="classes" type="String?" optional>
+  The `class` attribute value applied to the anchor element.
+</Property>
+
+---
+
+<Property name="styles" type="Styles?" optional>
+  The `style` attribute value applied to the anchor element.
+</Property>
+
+---
+
+<Property name="attributes" type="Map<String, String>?" optional>
+  Other attribute values applied to the anchor element.
+</Property>
+
+---
+
+<Property name="child" type="Component?" optional>
+  Child component to render inside the anchor element.
+</Property>
+
+---
+
+<Property name="children" type="List<Component>?" optional>
+  Child components to render inside the anchor element.
+</Property>
+
+---
