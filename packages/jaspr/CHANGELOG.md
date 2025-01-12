@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.17.0
 
 
 - **BREAKING** Removed `currentState` from `GlobalKey`, use `GlobalStateKey` instead.

@@ -371,28 +371,28 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.16.4"
+    version: "0.17.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.16.4"
+    version: "0.17.0"
   jaspr_flutter_embed:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_flutter_embed"
       relative: true
     source: path
-    version: "0.4.2"
+    version: "0.4.3"
   jaspr_riverpod:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_riverpod"
       relative: true
     source: path
-    version: "0.3.16"
+    version: "0.3.17"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
@@ -710,6 +710,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  universal_web:
+    dependency: transitive
+    description:
+      name: universal_web
+      sha256: fd161c6424fd78625097429b0050c2ea967304fb2b8b5ea0c0f51cd41b915053
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0+2"
   vector_math:
     dependency: transitive
     description:
