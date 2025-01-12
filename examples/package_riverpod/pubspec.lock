@@ -300,21 +300,21 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.16.4"
+    version: "0.17.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.16.4"
+    version: "0.17.0"
   jaspr_riverpod:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_riverpod"
       relative: true
     source: path
-    version: "0.3.16"
+    version: "0.3.17"
   js:
     dependency: transitive
     description:
@@ -579,6 +579,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.2"
+  universal_web:
+    dependency: transitive
+    description:
+      name: universal_web
+      sha256: fd161c6424fd78625097429b0050c2ea967304fb2b8b5ea0c0f51cd41b915053
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0+2"
   vm_service:
     dependency: transitive
     description:
@@ -599,10 +607,10 @@ packages:
     dependency: transitive
     description:
       name: web
-      sha256: d43c1d6b787bf0afad444700ae7f4db8827f701bc61c255ac8d328c6f4d52062
+      sha256: cd3543bd5798f6ad290ea73d210f423502e71900302dde696f8bff84bf89a1cb
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.1.0"
   web_socket:
     dependency: transitive
     description:

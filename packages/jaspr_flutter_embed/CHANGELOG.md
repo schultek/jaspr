@@ -1,3 +1,7 @@
+## 0.4.3
+
+- `jaspr` upgraded to `0.17.0`
+
 ## 0.4.2
 
 - Fixed layout bug of embedded flutter view.

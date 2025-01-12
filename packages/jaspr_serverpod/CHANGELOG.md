@@ -1,3 +1,7 @@
+## 0.5.1
+
+- `jaspr` upgraded to `0.17.0`
+
 ## 0.5.0
 
 - Bump `serverpod` to `2.3.0`
