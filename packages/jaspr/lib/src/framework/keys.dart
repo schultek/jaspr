@@ -95,7 +95,7 @@ class UniqueKey extends LocalKey {
   UniqueKey();
 
   @override
-  String toString() => '[#$hashCode]';
+  String toString() => '[#${shortHash(this)}]';
 }
 
 /// A key that is unique across the entire app.
@@ -139,9 +139,19 @@ class UniqueKey extends LocalKey {
 ///  * The discussion at [Component.key] for more information about how components use
 ///    keys.
 @optionalTypeArgs
-class GlobalKey<T extends State<StatefulComponent>> extends Key {
-  /// Creates a global key.
-  const GlobalKey() : super.empty();
+abstract class GlobalKey extends Key {
+  /// Creates a [LabeledGlobalKey], which is a [GlobalKey] with a label used for
+  /// debugging.
+  ///
+  /// The label is purely for debugging and not used for comparing the identity
+  /// of the key.
+  factory GlobalKey({String? debugLabel}) => LabeledGlobalKey(debugLabel);
+
+  /// Creates a global key without a label.
+  ///
+  /// Used by subclasses because the factory constructor shadows the implicit
+  /// constructor.
+  const GlobalKey.constructor() : super.empty();
 
   Element? get _currentElement => ComponentsBinding._globalKeyRegistry[this];
 
@@ -156,20 +166,29 @@ class GlobalKey<T extends State<StatefulComponent>> extends Key {
   /// The current component is null if there is no component in the tree that matches
   /// this global key.
   Component? get currentComponent => _currentElement?.component;
+}
 
-  /// The [State] for the component in the tree that currently has this global key.
+/// A global key with a debugging label.
+///
+/// The debug label is useful for documentation and for debugging. The label
+/// does not affect the key's identity.
+@optionalTypeArgs
+class LabeledGlobalKey extends GlobalKey {
+  /// Creates a global key with a debugging label.
   ///
-  /// The current state is null if (1) there is no component in the tree that
-  /// matches this global key, (2) that component is not a [StatefulComponent], or the
-  /// associated [State] object is not a subtype of `T`.
-  T? get currentState {
-    final Element? element = _currentElement;
-    if (element is StatefulElement) {
-      final StatefulElement statefulElement = element;
-      final State state = statefulElement.state;
-      if (state is T) return state;
+  /// The label does not affect the key's identity.
+  // ignore: prefer_const_constructors_in_immutables , never use const for this class
+  LabeledGlobalKey(this._debugLabel) : super.constructor();
+
+  final String? _debugLabel;
+
+  @override
+  String toString() {
+    final String label = _debugLabel != null ? ' $_debugLabel' : '';
+    if (runtimeType == LabeledGlobalKey) {
+      return '[GlobalKey#${shortHash(this)}$label]';
     }
-    return null;
+    return '[${describeIdentity(this)}$label]';
   }
 }
 
@@ -196,18 +215,231 @@ class GlobalKey<T extends State<StatefulComponent>> extends Key {
 ///
 /// Any [GlobalObjectKey] created for the same value will match.
 @optionalTypeArgs
-class GlobalObjectKey<T extends State<StatefulComponent>> extends GlobalKey<T> {
+class GlobalObjectKey extends GlobalKey {
   /// Creates a global key that uses [identical] on [value] for its [operator==].
-  const GlobalObjectKey(this.value) : super();
+  const GlobalObjectKey(this.value) : super.constructor();
 
   /// The object whose identity is used by this key's [operator==].
   final Object value;
 
   @override
   bool operator ==(Object other) {
-    return other.runtimeType == runtimeType && other is GlobalObjectKey<T> && identical(other.value, value);
+    return other.runtimeType == runtimeType && other is GlobalObjectKey && identical(other.value, value);
   }
 
   @override
   int get hashCode => identityHashCode(value);
+
+  @override
+  String toString() {
+    String selfType = objectRuntimeType(this, 'GlobalObjectKey');
+    return '[$selfType ${describeIdentity(value)}]';
+  }
+}
+
+/// A global key that provides access to the [State] that is associated with its element.
+///
+/// See also:
+///
+///  * [GlobalKey], which is a key that is unique across the entire app.
+///  * [GlobalNodeKey], which is a key that provides access to the dom [web.Node] that is associated with its element.
+///  * The discussion at [Component.key] for more information about how components use
+///    keys.
+class GlobalStateKey<T extends State<StatefulComponent>> extends GlobalKey {
+  factory GlobalStateKey({String? debugLabel}) => LabeledGlobalStateKey(debugLabel);
+
+  /// Creates a global state key without a label.
+  ///
+  /// Used by subclasses because the factory constructor shadows the implicit
+  /// constructor.
+  const GlobalStateKey.constructor() : super.constructor();
+
+  /// The [State] for the component in the tree that currently has this global key.
+  ///
+  /// The current state is null if (1) there is no component in the tree that
+  /// matches this global key, (2) that component is not a [StatefulComponent], or the
+  /// associated [State] object is not a subtype of `T`.
+  T? get currentState => switch (_currentElement) {
+        StatefulElement(:final T state) => state,
+        _ => null,
+      };
+}
+
+/// A global state key with a debugging label.
+///
+/// The debug label is useful for documentation and for debugging. The label
+/// does not affect the key's identity.
+@optionalTypeArgs
+class LabeledGlobalStateKey<T extends State<StatefulComponent>> extends GlobalStateKey<T> {
+  /// Creates a global key with a debugging label.
+  ///
+  /// The label does not affect the key's identity.
+  // ignore: prefer_const_constructors_in_immutables , never use const for this class
+  LabeledGlobalStateKey(this._debugLabel) : super.constructor();
+
+  final String? _debugLabel;
+
+  @override
+  String toString() {
+    final String label = _debugLabel != null ? ' $_debugLabel' : '';
+    if (runtimeType == LabeledGlobalStateKey) {
+      return '[GlobalKey#${shortHash(this)}$label]';
+    }
+    return '[${describeIdentity(this)}$label]';
+  }
+}
+
+/// A global state key that takes its identity from the object used as its value.
+///
+/// Used to tie the identity of a component to the identity of an object used to
+/// generate that component.
+///
+/// If the object is not private, then it is possible that collisions will occur
+/// where independent components will reuse the same object as their
+/// [GlobalObjectStateKey] value in a different part of the tree, leading to a global
+/// key conflict. To avoid this problem, create a private [GlobalObjectStateKey]
+/// subclass, as in:
+///
+/// ```dart
+/// class _MyKey extends GlobalObjectStateKey {
+///   const _MyKey(Object value) : super(value);
+/// }
+/// ```
+///
+/// Since the [runtimeType] of the key is part of its identity, this will
+/// prevent clashes with other [GlobalObjectStateKey]s even if they have the same
+/// value.
+///
+/// Any [GlobalObjectStateKey] created for the same value will match.
+@optionalTypeArgs
+class GlobalObjectStateKey<T extends State<StatefulComponent>> extends GlobalStateKey<T> {
+  /// Creates a global key that uses [identical] on [value] for its [operator==].
+  const GlobalObjectStateKey(this.value) : super.constructor();
+
+  /// The object whose identity is used by this key's [operator==].
+  final Object value;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == runtimeType && other is GlobalObjectKey && identical(other.value, value);
+  }
+
+  @override
+  int get hashCode => identityHashCode(value);
+
+  @override
+  String toString() {
+    String selfType = objectRuntimeType(this, 'GlobalObjectStateKey');
+    // The runtimeType string of a GlobalObjectStateKey() returns 'GlobalObjectStateKey<State<StatefulComponent>>'
+    // because GlobalObjectStateKey is instantiated to its bounds. To avoid cluttering the output
+    // we remove the suffix.
+    const String suffix = '<State<StatefulComponent>>';
+    if (selfType.endsWith(suffix)) {
+      selfType = selfType.substring(0, selfType.length - suffix.length);
+    }
+    return '[$selfType ${describeIdentity(value)}]';
+  }
+}
+
+/// A global key that provides access to the dom [web.Node] that is associated with its element.
+///
+/// See also:
+///
+///  * [GlobalKey], which is a key that is unique across the entire app.
+///  * [GlobalStateKey], which is a key that provides access to the [State] that is associated with its element.
+///  * The discussion at [Component.key] for more information about how components use
+///    keys.
+class GlobalNodeKey<T extends web.Node> extends GlobalKey {
+  factory GlobalNodeKey({String? debugLabel}) => LabeledGlobalNodeKey(debugLabel);
+
+  /// Creates a global node key without a label.
+  ///
+  /// Used by subclasses because the factory constructor shadows the implicit
+  /// constructor.
+  const GlobalNodeKey.constructor() : super.constructor();
+
+  /// The [web.Node] for the component in the tree that currently has this global key.
+  ///
+  /// The current node is null if (1) the current environment is not web, (2) there is no component
+  /// in the tree that matches this global key, or (3) its element is not a [RenderObjectElement].
+  T? get currentNode => switch (_currentElement) {
+        RenderObjectElement(renderObject: RenderObject(:final T node)) => node,
+        _ => null,
+      };
+}
+
+/// A global node key with a debugging label.
+///
+/// The debug label is useful for documentation and for debugging. The label
+/// does not affect the key's identity.
+@optionalTypeArgs
+class LabeledGlobalNodeKey<T extends web.Node> extends GlobalNodeKey<T> {
+  /// Creates a global key with a debugging label.
+  ///
+  /// The label does not affect the key's identity.
+  // ignore: prefer_const_constructors_in_immutables , never use const for this class
+  LabeledGlobalNodeKey(this._debugLabel) : super.constructor();
+
+  final String? _debugLabel;
+
+  @override
+  String toString() {
+    final String label = _debugLabel != null ? ' $_debugLabel' : '';
+    if (runtimeType == LabeledGlobalNodeKey) {
+      return '[GlobalKey#${shortHash(this)}$label]';
+    }
+    return '[${describeIdentity(this)}$label]';
+  }
+}
+
+/// A global node key that takes its identity from the object used as its value.
+///
+/// Used to tie the identity of a component to the identity of an object used to
+/// generate that component.
+///
+/// If the object is not private, then it is possible that collisions will occur
+/// where independent components will reuse the same object as their
+/// [GlobalObjectNodeKey] value in a different part of the tree, leading to a global
+/// key conflict. To avoid this problem, create a private [GlobalObjectNodeKey]
+/// subclass, as in:
+///
+/// ```dart
+/// class _MyKey extends GlobalObjectNodeKey {
+///   const _MyKey(Object value) : super(value);
+/// }
+/// ```
+///
+/// Since the [runtimeType] of the key is part of its identity, this will
+/// prevent clashes with other [GlobalObjectNodeKey]s even if they have the same
+/// value.
+///
+/// Any [GlobalObjectNodeKey] created for the same value will match.
+@optionalTypeArgs
+class GlobalObjectNodeKey<T extends web.Node> extends GlobalNodeKey<T> {
+  /// Creates a global key that uses [identical] on [value] for its [operator==].
+  const GlobalObjectNodeKey(this.value) : super.constructor();
+
+  /// The object whose identity is used by this key's [operator==].
+  final Object value;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == runtimeType && other is GlobalObjectKey && identical(other.value, value);
+  }
+
+  @override
+  int get hashCode => identityHashCode(value);
+
+  @override
+  String toString() {
+    String selfType = objectRuntimeType(this, 'GlobalObjectNodeKey');
+    // The runtimeType string of a GlobalObjectNodeKey() returns 'GlobalObjectNodeKey<Node>'
+    // because GlobalObjectNodeKey is instantiated to its bounds. To avoid cluttering the output
+    // we remove the suffix.
+    const String suffix = '<Node>';
+    if (selfType.endsWith(suffix)) {
+      selfType = selfType.substring(0, selfType.length - suffix.length);
+    }
+    return '[$selfType ${describeIdentity(value)}]';
+  }
 }

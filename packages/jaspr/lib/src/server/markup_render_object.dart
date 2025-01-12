@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:universal_web/web.dart' as web;
+
 import '../../server.dart';
 import 'child_nodes.dart';
 
@@ -15,6 +17,8 @@ class MarkupRenderObject extends RenderObject {
 
   @override
   MarkupRenderObject? parent;
+  @override
+  web.Node? get node => null;
 
   late final ChildList children = ChildList(this);
 

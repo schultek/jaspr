@@ -1,4 +1,4 @@
-import 'package:web/web.dart' as web;
+import 'package:universal_web/web.dart' as web;
 
 extension NodeListIterable on web.NodeList {
   Iterable<web.Node> toIterable() sync* {

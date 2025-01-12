@@ -1,8 +1,8 @@
 @TestOn('browser')
 
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/src/foundation/events/web.dart';
 import 'package:jaspr_test/browser_test.dart';
+import 'package:universal_web/web.dart';
 
 void main() {
   group('forms', () {

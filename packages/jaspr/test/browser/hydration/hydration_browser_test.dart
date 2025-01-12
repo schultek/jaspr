@@ -5,7 +5,7 @@ import 'dart:js_interop';
 import 'package:jaspr/browser.dart';
 import 'package:jaspr/src/foundation/marker_utils.dart';
 import 'package:jaspr_test/browser_test.dart';
-import 'package:web/web.dart';
+import 'package:universal_web/web.dart';
 
 void main() {
   group('hydration browser test', () {

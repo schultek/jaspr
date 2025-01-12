@@ -4,7 +4,7 @@ import 'dart:js_interop';
 import 'package:jaspr/browser.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
-import 'package:web/web.dart' as web;
+import 'package:universal_web/web.dart' as web;
 
 import '../binding.dart';
 import '../finders.dart';
@@ -95,9 +95,10 @@ class BrowserTester {
     }
   }
 
-  web.Node? findNode(Finder finder) {
+  @optionalTypeArgs
+  T? findNode<T extends web.Node>(Finder finder) {
     var element = _findDomElement(finder);
-    return (element.renderObject as DomRenderObject).node;
+    return (element.renderObject as DomRenderObject).node as T?;
   }
 
   DomElement _findDomElement(Finder finder) {

@@ -1,6 +1,6 @@
 import 'dart:js_interop';
 
-import 'package:web/web.dart' as web;
+import 'package:universal_web/web.dart' as web;
 
 import '../jaspr_test.dart';
 

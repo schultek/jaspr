@@ -98,6 +98,7 @@
         {"title": "SyncStateMixin", "href": "/utils/sync_state_mixin"},
         {"title": "PreloadStateMixin", "href": "/utils/preload_state_mixin"},
         {"title": "@encoder/@decoder", "href": "/utils/at_encoder_decoder"},
+        {"title": "GlobalNodeKey", "href": "/utils/global_node_key"},
         {"title": "@Import", "href": "/utils/at_import"},
         {"title": "ViewTransitionMixin", "href": "/utils/view_transition_mixin"}
       ]
