@@ -4,6 +4,7 @@ import 'package:jaspr/jaspr.dart';
 
 import '../../../components/install_command.dart';
 import '../../../components/link_button.dart';
+import '../../../constants/theme.dart';
 
 class Hero extends StatelessComponent {
   @override
@@ -20,7 +21,7 @@ class Hero extends StatelessComponent {
         ]),
         div(classes: 'cta', [
           InstallCommand(),
-          div(classes: 'row', [
+          div(classes: 'actions', [
             LinkButton.filled(label: 'Get Started', icon: 'arrow-right', to: 'https://docs.page/schultek/jaspr/get_started/installation'),
             LinkButton.outlined(label: 'Meet Jaspr', icon: 'jaspr', to: '#meet'),
           ]),
@@ -44,6 +45,7 @@ class Hero extends StatelessComponent {
       css('h1')
           .box(margin: EdgeInsets.only(top: Unit.zero, bottom: 0.1.rem))
           .text(fontSize: 4.rem, fontWeight: FontWeight.w800),
+      css('p').combine(bodySmall),
       css('.cta')
           .box(margin: EdgeInsets.only(top: 2.rem))
           .flexbox(direction: FlexDirection.column, alignItems: AlignItems.center),

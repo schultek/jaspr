@@ -12,7 +12,7 @@ class Header extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield header([
       div(classes: "logo", [
-        img(src: 'images/logo.svg', height: 42),
+        img(src: 'images/logo.svg', height: 36),
         span([text('Jaspr')]),
       ]),
       nav([
@@ -36,7 +36,7 @@ class Header extends StatelessComponent {
       css('&')
           .box(
             position: Position.absolute(left: Unit.zero, right: Unit.zero),
-            padding: EdgeInsets.symmetric(horizontal: 1.rem, vertical: 0.5.rem),
+            padding: EdgeInsets.symmetric(horizontal: 2.rem, vertical: 2.rem),
           )
           .flexbox(gap: Gap(column: 2.rem)),
       css('& > *').flexbox(alignItems: AlignItems.center),
