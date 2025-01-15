@@ -226,7 +226,7 @@ void main() {
             'side content',
             'side content',
           ])),
-          gap: GridGap(row: Unit.pixels(20)),
+          gap: Gap(row: Unit.pixels(20)),
           autoRows: [TrackSize(Unit.percent(20)), TrackSize.auto],
           autoColumns: [TrackSize(Unit.pixels(100)), TrackSize.auto, TrackSize.auto],
         );

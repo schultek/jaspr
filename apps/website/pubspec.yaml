@@ -1,0 +1,23 @@
+name: website
+description: A new jaspr project.
+version: 0.0.1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  highlight: ^0.7.0
+  jaspr: ^0.17.0
+  jaspr_router: ^0.6.1
+  universal_web: ^1.1.0+2
+
+dev_dependencies:
+  build_runner: ^2.4.0
+  build_web_compilers: ^4.1.0
+  jaspr_builder: ^0.17.0
+  jaspr_lints: ^0.2.0
+  lints: ^3.0.0
+
+jaspr:
+  mode: static
+
