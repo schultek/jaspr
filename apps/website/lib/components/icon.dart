@@ -11,6 +11,9 @@ class Icon extends StatelessComponent {
     if (name == 'jaspr') {
       yield img(src: 'images/logo_icon.svg', styles: Styles.box(height: size ?? 1.2.em));
       return;
+    } else if (name == 'jasper') {
+      yield img(src: 'images/jasper_icon.png', styles: Styles.box(height: size ?? 1.2.em));
+      return;
     }
     yield i(classes: 'icon-$name', styles: Styles.text(fontSize: size ?? 1.2.em), []);
   }

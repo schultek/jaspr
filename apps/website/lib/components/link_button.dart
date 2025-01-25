@@ -52,8 +52,11 @@ class LinkButton extends StatelessComponent {
             .box(shadow: BoxShadow(offsetX: 1.px, offsetY: 1.px, blur: 5.px, color: Color.hex('#0004'))),
       ]),
       css('&.link-button-outlined', [
-        css('&').background(color: Colors.white).box(opacity: 0.9).text(color: Colors.black),
-        css('&:hover').background(color: Colors.whiteSmoke).box(opacity: 1),
+        css('&')
+            .background(color: Colors.white)
+            .box(opacity: 0.9, border: Border.all(BorderSide(color: Color.hex('#EEE'), width: 2.px)))
+            .text(color: Colors.black),
+        css('&:hover').background(color: Color.hex('#EEE')).box(opacity: 1),
       ]),
       css('&.link-button-icon', [
         css('&')

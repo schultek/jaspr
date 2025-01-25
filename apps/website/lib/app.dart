@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
-import 'components/header.dart';
+import 'pages/home/sections/0_header.dart';
 import 'pages/home/home.dart';
 
 class App extends StatelessComponent {
