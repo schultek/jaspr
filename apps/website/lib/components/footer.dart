@@ -64,7 +64,8 @@ class Footer extends StatelessComponent {
       ]),
       div(classes: 'footer-banner', [
         text('Copyright © 2025 Jaspr | '),
-        a(href: '', classes: 'animated-underline', [text('MIT License')])
+        a(href: '', classes: 'animated-underline', [text('MIT License')]),
+        text(' | Built with Jaspr (obviously)'),
       ]),
     ]);
   }

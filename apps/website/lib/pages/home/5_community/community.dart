@@ -67,7 +67,12 @@ class Community extends StatelessComponent {
     css('#community', [
       css('&')
           .box(
-            padding: EdgeInsets.only(top: 10.rem, left: 2.rem, right: 2.rem, bottom: 10.rem),
+            padding: EdgeInsets.only(
+              top: sectionPadding,
+              left: contentPadding,
+              right: contentPadding,
+              bottom: sectionPadding,
+            ),
           )
           .flexbox(direction: FlexDirection.column, alignItems: AlignItems.center)
           .text(align: TextAlign.center),

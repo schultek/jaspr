@@ -68,7 +68,7 @@ class Features extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('#features', [
       css('&')
-          .box(padding: EdgeInsets.only(top: 10.rem))
+          .box(padding: EdgeInsets.only(top: sectionPadding))
           .flexbox(direction: FlexDirection.column, alignItems: AlignItems.center)
           .text(align: TextAlign.center),
       css('.feature-grid', [
@@ -76,7 +76,7 @@ class Features extends StatelessComponent {
             .box(
               maxWidth: maxContentWidth,
               margin: EdgeInsets.only(top: 3.rem, bottom: 4.rem),
-              padding: EdgeInsets.symmetric(horizontal: 2.rem),
+              padding: EdgeInsets.symmetric(horizontal: contentPadding),
             )
             .flexbox(direction: FlexDirection.row, wrap: FlexWrap.wrap, gap: Gap.all(1.5.rem)),
         css('& > *')

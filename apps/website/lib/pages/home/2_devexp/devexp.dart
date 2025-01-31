@@ -88,10 +88,11 @@ class DevExp extends StatelessComponent {
                 'Jaspr comes with its own lints and code completions to boost your productivity during development.'),
             preview: div(classes: 'analyze-preview', [
               div([
-                CodeWindow(
-                  name: 'app.dart',
-                  framed: false,
-                  source: '''
+                div([
+                  CodeWindow(
+                    name: 'app.dart',
+                    framed: false,
+                    source: '''
                 class App extends StatelessComponent {
                   const App({super.key});
 
@@ -99,17 +100,18 @@ class DevExp extends StatelessComponent {
                     yield div([
                       ...
                 ''',
-                  lineClasses: {0: 'quick-select'},
-                ),
-                div(classes: 'quick-actions', [
-                  span([text('Quick Actions:')]),
-                  span([
-                    Icon('lightbulb'),
-                    span([text('Convert to StatefulComponent')])
-                  ]),
-                  span([
-                    Icon('lightbulb'),
-                    span([text('Convert to AsyncStatelessComponent')])
+                    lineClasses: {0: 'quick-select'},
+                  ),
+                  div(classes: 'quick-actions', [
+                    span([text('Quick Actions:')]),
+                    span([
+                      Icon('lightbulb'),
+                      span([text('Convert to StatefulComponent')])
+                    ]),
+                    span([
+                      Icon('lightbulb'),
+                      span([text('Convert to AsyncStatelessComponent')])
+                    ]),
                   ]),
                 ]),
               ]),
@@ -124,7 +126,7 @@ class DevExp extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('#devexp', [
       css('&')
-          .box(padding: EdgeInsets.only(top: 10.rem))
+          .box(padding: EdgeInsets.only(top: sectionPadding))
           .flexbox(direction: FlexDirection.column, alignItems: AlignItems.center)
           .text(align: TextAlign.center),
       css('.feature-grid', [
@@ -132,12 +134,12 @@ class DevExp extends StatelessComponent {
             .box(
               maxWidth: maxContentWidth,
               margin: EdgeInsets.only(top: 3.rem),
-              padding: EdgeInsets.symmetric(horizontal: 2.rem),
+              padding: EdgeInsets.symmetric(horizontal: contentPadding),
             )
             .flexbox(direction: FlexDirection.column, gap: Gap(row: 3.rem)),
         css('& > div', [
           css('&').flexbox(direction: FlexDirection.row, wrap: FlexWrap.wrap, gap: Gap.all(3.rem)),
-          css('& > *').flexItem(flex: Flex(grow: 1, shrink: 0, basis: FlexBasis(16.rem))),
+          css('& > *').flexItem(flex: Flex(grow: 1, shrink: 1, basis: FlexBasis(16.rem))),
           css('&:first-child > *:first-child').raw({'flex-basis': '30rem'}),
           css('&:last-child > *:last-child').raw({'flex-basis': '30rem'}),
         ]),
@@ -151,15 +153,23 @@ class DevExp extends StatelessComponent {
           css('&').box(padding: EdgeInsets.all(.5.rem)),
         ]),
         css('.analyze-preview', [
-          css('&')
-              .box(padding: EdgeInsets.all(1.rem), height: 100.percent, boxSizing: BoxSizing.borderBox)
-              .flexbox(alignItems: AlignItems.center, justifyContent: JustifyContent.center),
-          css('& > *').flexItem(flex: Flex(grow: 1)),
+          css('&').box(
+            padding: EdgeInsets.all(1.rem),
+            height: 100.percent,
+            boxSizing: BoxSizing.borderBox,
+            position: Position.relative(),
+          ),
+          css('& > div').box(
+            position: Position.absolute(top: 50.percent, left: 40.percent),
+            width: 25.rem,
+            maxWidth: 100.percent,
+            transform: Transform.translate(x: (-50).percent, y: (-50).percent),
+          ),
           css('.quick-select  span.hljs-title:last-child', [
             css('&').background(color: primaryFaded),
           ]),
-          css('& > div', [
-            css('&').box(position: Position.relative(), maxWidth: 25.rem).raw({'pointer-events': 'none'}),
+          css('& > div > div', [
+            css('&').box(position: Position.relative()).raw({'pointer-events': 'none'}),
           ]),
           css('.quick-actions', [
             css('&')

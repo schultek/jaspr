@@ -1,30 +1,81 @@
-import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
+import 'dart:async';
 
+import 'package:jaspr/jaspr.dart';
+import 'package:universal_web/web.dart' as web;
+
+import 'menu_button.dart';
+import '../constants/theme.dart';
 import 'github_button.dart';
 import 'link_button.dart';
 import 'logo.dart';
 import 'theme_toggle.dart';
 
-class Header extends StatelessComponent {
+@client
+class Header extends StatefulComponent {
   const Header({super.key});
 
   @override
+  State createState() => HeaderState();
+}
+
+class HeaderState extends State<Header> {
+
+  static const mobileBreakpoint = 750;
+
+  final contentKey = GlobalKey();
+  bool menuOpen = false;
+
+  StreamSubscription? sub;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (kIsWeb) {
+      sub = web.EventStreamProviders.resizeEvent.forTarget(web.window).listen((e) {
+        if (menuOpen && web.window.innerWidth > mobileBreakpoint) {
+          setState(() {
+            menuOpen = false;
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    sub?.cancel();
+    super.dispose();
+  }
+
+  @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield header([
-      Logo(),
+    var content = Fragment(key: contentKey, children: [
       nav([
         a(href: "https://docs.page/schultek/jaspr", classes: 'animated-underline', [text("Docs")]),
         a(href: "https://jasprpad.schultek.de", classes: 'animated-underline', [text("Playground")]),
         a(href: "https://github.com/sponsors/schultek/", classes: 'animated-underline', [text("Sponsor")]),
       ]),
-      div([
+      div(classes: 'header-actions', [
         ThemeToggle(),
         div(classes: 'discord-button', [
           LinkButton.icon(icon: 'custom-discord', to: 'https://discord.gg/XGXrGEk4c6'),
         ]),
         GithubButton(),
-      ])
+      ]),
+    ]);
+
+    yield header([
+      Logo(),
+      if (!menuOpen) content,
+      MenuButton(
+        onClick: () {
+          setState(() {
+            menuOpen = !menuOpen;
+          });
+        },
+        child: menuOpen ? content : null,
+      ),
     ]);
   }
 
@@ -39,14 +90,24 @@ class Header extends StatelessComponent {
           .flexbox(gap: Gap(column: 2.rem)),
       css('& > *').flexbox(alignItems: AlignItems.center),
       css('nav', [
-        css('&').flexItem(flex: Flex(grow: 1)).flexbox(justifyContent: JustifyContent.end, gap: Gap(column: 2.rem)),
+        css('&')
+            .flexItem(flex: Flex(grow: 1))
+            .flexbox(justifyContent: JustifyContent.end, gap: Gap(column: 2.rem))
+            .text(color: textBlack),
         css('& a').text(
           fontSize: 1.rem,
           fontWeight: FontWeight.w500,
           decoration: TextDecoration.none,
-          color: Colors.black,
+          color: textBlack,
         ),
         css('& a:hover').text(color: primaryMid),
+      ]),
+    ]),
+    css.media(MediaQuery.screen(maxWidth: mobileBreakpoint.px), [
+      css('header', [
+        css('&').flexbox(justifyContent: JustifyContent.spaceBetween),
+        css('& > nav').box(display: Display.none),
+        css('& > .header-actions').box(display: Display.none),
       ]),
     ]),
   ];

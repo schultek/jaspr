@@ -124,8 +124,8 @@ class Meet extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('#meet', [
       css('&')
-          .box(minHeight: 100.vh, padding: EdgeInsets.only(top: 2.rem, left: 4.rem, right: 4.rem))
-          .flexbox(direction: FlexDirection.column, gap: Gap(row: 10.rem), alignItems: AlignItems.center),
+          .box(minHeight: 100.vh, padding: EdgeInsets.only(top: 2.rem, left: contentPadding, right: contentPadding))
+          .flexbox(direction: FlexDirection.column, gap: Gap(row: sectionPadding), alignItems: AlignItems.center),
       css('.meet-section', [
         css('&').box(maxWidth: maxContentWidth).flexbox(
               direction: FlexDirection.row,
@@ -133,7 +133,7 @@ class Meet extends StatelessComponent {
               wrap: FlexWrap.wrap,
               gap: Gap(column: 4.rem, row: 4.rem),
             ),
-        css('& > *').flexItem(flex: Flex(grow: 1, shrink: 0, basis: FlexBasis(24.rem))).box(minWidth: Unit.zero),
+        css('& > *').flexItem(flex: Flex(grow: 1, shrink: 1, basis: FlexBasis(24.rem))).box(minWidth: Unit.zero),
         css('p').combine(bodyLarge),
         css('.actions').box(margin: EdgeInsets.only(top: 2.rem)),
       ]),

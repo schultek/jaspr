@@ -43,7 +43,7 @@ final lightTheme = {
   shadowColor2: Color.hex('#0004'),
   shadowColor3: Color.hex('#0002'),
   background: Color.hex('#FFF'),
-  backgroundFaded: Color.hex('#FFF4'),
+  backgroundFaded: Color.hex('#FFF9'),
   borderColor: Color.hex('#EEE'),
   borderColor2: Color.hex('#CCC'),
   surface: Color.hex('#F5F5F5'),
@@ -64,7 +64,7 @@ final darkTheme = {
   shadowColor2: Color.hex('#0004'),
   shadowColor3: Color.hex('#0002'),
   background: Color.hex('#0d1117'),
-  backgroundFaded: Color.hex('#15151544'),
+  backgroundFaded: Color.hex('#0d111799'),
   borderColor: Color.hex('#1d1f25'),
   borderColor2: Color.hex('#292c35'),
   surface: Color.hex('#070c14'),
@@ -99,6 +99,10 @@ final heading4 = Styles.text(fontSize: 1.5.rem, fontWeight: FontWeight.w700, col
 final heading5 = Styles.text(fontSize: 1.rem, fontWeight: FontWeight.w600, color: textBlack);
 
 const maxContentWidth = Unit.rem(70);
+const mobileBreakpoint = Unit.rem(40);
+
+const contentPadding = Unit.variable('--contentPadding');
+const sectionPadding = Unit.variable('--sectionPadding');
 
 @css
 final root = [
@@ -117,11 +121,20 @@ final root = [
 
   css(':root').raw({
     for (final color in lightTheme.keys) color.value.substring(4, color.value.length - 1): lightTheme[color]!.value,
+    '--contentPadding': '4rem',
+    '--sectionPadding': '10rem',
   }),
 
   css(':root.dark').raw({
     for (final color in darkTheme.keys) color.value.substring(4, color.value.length - 1): darkTheme[color]!.value,
   }),
+
+  css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
+    css(':root').raw({
+      '--contentPadding': '2rem',
+      '--sectionPadding': '5rem',
+    }),
+  ]),
 
   // Typography
   css('.caption').combine(caption),
@@ -133,15 +146,26 @@ final root = [
   css('h4').combine(heading4).box(margin: EdgeInsets.only(top: Unit.zero, bottom: 0.1.em)),
   css('h5').combine(heading5).box(margin: EdgeInsets.only(top: Unit.zero, bottom: 0.1.em)),
 
+  css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
+    css('h1').text(fontSize: 2.6.rem),
+    css('h2').text(fontSize: 1.8.rem),
+    css('h3').text(fontSize: 1.8.rem),
+    css('h4').text(fontSize: 1.2.rem),
+  ]),
+
   // Common
-  css('.actions').flexbox(direction: FlexDirection.row, alignItems: AlignItems.center, gap: Gap(column: .8.em)),
+  css('.actions').flexbox(
+    direction: FlexDirection.row,
+    alignItems: AlignItems.center,
+    gap: Gap.all(.8.em),
+    wrap: FlexWrap.wrap,
+  ),
   css('.text-gradient').raw({
     'background': primaryGradient,
     '-webkit-background-clip': 'text',
     '-webkit-text-fill-color': 'transparent',
   }),
   css('a').text(decoration: TextDecoration.none, color: textDark),
-  css('a:visited').text(color: textDark),
   css('b').text(fontWeight: FontWeight.w500),
 
   css('code, pre, .mono').text(

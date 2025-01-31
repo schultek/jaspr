@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "jaspr-website",
+    "public": "build/jaspr",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

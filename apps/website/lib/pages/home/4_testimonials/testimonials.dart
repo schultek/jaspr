@@ -52,7 +52,7 @@ class Testimonials extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('#testimonials', [
       css('&')
-          .box(padding: EdgeInsets.only(top: 10.rem))
+          .box(padding: EdgeInsets.only(top: sectionPadding))
           .flexbox(direction: FlexDirection.column, alignItems: AlignItems.center)
           .text(align: TextAlign.center),
       css('.testimonials-grid', [
@@ -60,7 +60,7 @@ class Testimonials extends StatelessComponent {
             .box(
           maxWidth: maxContentWidth,
           margin: EdgeInsets.only(top: 3.rem, bottom: 4.rem),
-          padding: EdgeInsets.symmetric(horizontal: 2.rem),
+          padding: EdgeInsets.symmetric(horizontal: contentPadding),
         )
             .raw({'column-count': '3', 'gap': '1.5rem'}),
         css('& > *').raw({'break-inside': 'avoid'}),

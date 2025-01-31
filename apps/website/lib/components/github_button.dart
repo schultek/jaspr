@@ -7,7 +7,6 @@ import 'package:website/constants/theme.dart';
 
 import 'icon.dart';
 
-@client
 class GithubButton extends StatefulComponent {
   const GithubButton({super.key});
 

@@ -4,7 +4,6 @@ import 'package:website/constants/theme.dart';
 
 import 'icon.dart';
 
-@client
 class ThemeToggle extends StatefulComponent {
   const ThemeToggle({super.key});
 
@@ -29,7 +28,7 @@ class ThemeToggleState extends State<ThemeToggle> {
     if (!kIsWeb) {
       yield Document.head(children: [
         // ignore: prefer_html_methods
-        DomComponent(tag: 'script', children: [
+        DomComponent(id: 'theme-script', tag: 'script', children: [
           raw('''
           let userTheme = window.localStorage.getItem('active-theme');
           if (userTheme != null) {
@@ -53,8 +52,8 @@ class ThemeToggleState extends State<ThemeToggle> {
       onClick: () {
         setState(() {
           isDark = !isDark;
-          web.window.localStorage.setItem('active-theme', isDark ? 'dark' : 'light');
         });
+        web.window.localStorage.setItem('active-theme', isDark ? 'dark' : 'light');
       },
       styles: !kIsWeb ? Styles.box(visibility: Visibility.hidden) : null,
       [Icon(isDark ? 'moon' : 'sun')],
