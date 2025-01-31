@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:jaspr/jaspr.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:website/constants/theme.dart';
 
 import 'icon.dart';
 
@@ -66,9 +67,9 @@ class GithubButtonState extends State<GithubButton> {
             padding: EdgeInsets.symmetric(horizontal: 0.7.rem, vertical: 0.4.rem),
             radius: BorderRadius.circular(8.px),
           )
-          .text(decoration: TextDecoration.none, color: Colors.black, fontSize: 0.7.rem)
+          .text(decoration: TextDecoration.none, color: textBlack, fontSize: 0.7.rem)
           .flexbox(alignItems: AlignItems.center, gap: Gap(column: .5.rem)),
-      css('&:hover').background(color: Colors.whiteSmoke),
+      css('&:hover').background(color: hoverOverlayColor),
       css('& *').box(transition: Transition('opacity', duration: 200, curve: Curve.easeInOut)),
       css('&:hover *').raw({'opacity': '1 !important'}),
       css('& > i').box(opacity: 0.9),

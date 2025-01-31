@@ -1,4 +1,5 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:website/constants/theme.dart';
 
 class FeatureBox extends StatelessComponent {
   const FeatureBox({
@@ -32,10 +33,10 @@ class FeatureBox extends StatelessComponent {
       css('&')
           .box(
             radius: BorderRadius.circular(12.px),
-            border: Border.all(BorderSide.solid(width: 2.px, color: Color.hex('#EEE'))),
+            border: Border.all(BorderSide.solid(width: 2.px, color: borderColor)),
           )
           .flexbox(direction: FlexDirection.column, alignItems: AlignItems.stretch)
-          .raw({'background': 'linear-gradient(180deg, #FFFFFF 0%, #F5F5F5 100%)'}),
+          .raw({'background': 'linear-gradient(180deg, ${background.value} 0%, ${surface.value} 100%)'}),
       css('.feature-preview').box(minHeight: 15.rem),
       css('.feature-info', [
         css('&').box(padding: EdgeInsets.only(left: 1.rem, right: 1.rem, bottom: .5.rem)).text(align: TextAlign.start),

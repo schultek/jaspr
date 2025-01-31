@@ -1,12 +1,10 @@
-// ignore_for_file: file_names
-
 import 'package:jaspr/jaspr.dart';
 import 'package:website/constants/theme.dart';
 
-import '../../../components/github_button.dart';
-import '../../../components/link_button.dart';
-import '../../../components/logo.dart';
-import '../../../components/theme_toggle.dart';
+import 'github_button.dart';
+import 'link_button.dart';
+import 'logo.dart';
+import 'theme_toggle.dart';
 
 class Header extends StatelessComponent {
   const Header({super.key});
@@ -35,7 +33,7 @@ class Header extends StatelessComponent {
     css('header', [
       css('&')
           .box(
-            position: Position.absolute(left: Unit.zero, right: Unit.zero),
+            position: Position.absolute(left: Unit.zero, right: Unit.zero, zIndex: ZIndex(1)),
             padding: EdgeInsets.symmetric(horizontal: 2.rem, vertical: 2.rem),
           )
           .flexbox(gap: Gap(column: 2.rem)),

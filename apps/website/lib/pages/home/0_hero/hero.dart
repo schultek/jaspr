@@ -1,10 +1,8 @@
-// ignore_for_file: file_names
-
 import 'package:jaspr/jaspr.dart';
 
-import '../../../components/install_command.dart';
+import 'components/install_command.dart';
 import '../../../components/link_button.dart';
-import '../../../components/meet_jaspr_button.dart';
+import 'components/meet_jaspr_button.dart';
 import '../../../constants/theme.dart';
 
 class Hero extends StatelessComponent {
@@ -18,12 +16,17 @@ class Hero extends StatelessComponent {
           text(' for Dart Developers')
         ]),
         p([
-          text('Jaspr is an open source framework for building websites in Dart.'),
+          text('Jaspr is a free and open source framework for building websites in Dart.'),
+          br(),
+          text('Create fast and dynamic web experiences with ease in a familiar language and ecosystem.'),
         ]),
         div(classes: 'cta', [
           InstallCommand(),
           div(classes: 'actions', [
-            LinkButton.filled(label: 'Get Started', icon: 'arrow-right', to: 'https://docs.page/schultek/jaspr/get_started/installation'),
+            LinkButton.filled(
+                label: 'Get Started',
+                icon: 'arrow-right',
+                to: 'https://docs.page/schultek/jaspr/get_started/installation'),
             MeetJasprButton(),
           ]),
         ]),
@@ -35,7 +38,7 @@ class Hero extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('#hero', [
       css('&')
-          .box(minHeight: 100.vh)
+          .box(minHeight: 100.vh, padding: EdgeInsets.symmetric(horizontal: 2.rem))
           .flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center)
           .text(align: TextAlign.center),
       css('& > div').box(maxWidth: 45.rem).flexbox(
@@ -43,9 +46,6 @@ class Hero extends StatelessComponent {
             justifyContent: JustifyContent.center,
             alignItems: AlignItems.center,
           ),
-      css('h1')
-          .box(margin: EdgeInsets.only(top: Unit.zero, bottom: 0.1.rem))
-          .text(fontSize: 4.rem, fontWeight: FontWeight.w800),
       css('p').combine(bodyMedium),
       css('.cta')
           .box(margin: EdgeInsets.only(top: 2.rem))

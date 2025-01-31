@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart';
+import 'package:website/constants/theme.dart';
 
-import 'icon.dart';
+import '../../../../components/icon.dart';
 
 @client
 class InstallCommand extends StatefulComponent {
@@ -45,13 +46,13 @@ class InstallCommandState extends State<InstallCommand> {
       css('&')
           .box(
             margin: EdgeInsets.only(bottom: .8.rem),
-            border: Border.all(BorderSide.solid(color: Colors.gainsboro)),
+            border: Border.all(BorderSide.solid(color: borderColor2)),
             radius: BorderRadius.circular(3.em),
             padding: EdgeInsets.symmetric(horizontal: .8.rem, vertical: .6.rem),
             cursor: Cursor.copy,
           )
-          .background(color: Colors.whiteSmoke)
-          .text(color: Color.hex('#555'), fontSize: .8.rem),
+          .background(color: surfaceLow)
+          .text(color: textDark, fontSize: .8.rem),
       css('& span').flexbox(alignItems: AlignItems.center, gap: Gap(column: .6.rem)),
       css('& button', [
         css('&')
@@ -59,7 +60,7 @@ class InstallCommandState extends State<InstallCommand> {
             .box(display: Display.inlineFlex, border: Border.unset, cursor: Cursor.pointer, padding: EdgeInsets.zero)
             .background(color: Colors.transparent)
             .text(color: Color.unset),
-        css('&:hover').text(color: Colors.black),
+        css('&:hover').text(color: textBlack),
       ]),
     ]),
   ];

@@ -1,12 +1,9 @@
-// ignore_for_file: file_names
-
 import 'package:jaspr/jaspr.dart';
-import 'package:universal_web/web.dart';
 import 'package:website/constants/theme.dart';
 
-import '../../../components/code_window.dart';
+import '../../../components/code_window/code_window.dart';
 import '../../../components/link_button.dart';
-import '../../../components/modes_animation.dart';
+import 'components/modes_animation.dart';
 
 class Meet extends StatelessComponent {
   const Meet({super.key});
@@ -18,7 +15,7 @@ class Meet extends StatelessComponent {
         div([
           h3(classes: 'select-target-1', [text('Everything is a Component')]),
           p(classes: 'select-target-2', [
-            text('Jaspr Components are the fundamental building blocks of any Jaspr website and work very similar '
+            text('Jaspr Components are the fundamental building blocks of any Jaspr website and look very similar '
                 'to Flutter widgets. However, Jaspr renders actual HTML and CSS from your components, resulting in '
                 'great SEO and fast loading times.')
           ]),
@@ -36,9 +33,12 @@ class Meet extends StatelessComponent {
           ])
         ]),
         div([
-          CodeWindow(name: 'info_section.dart', source: '''
-          class InfoSection extends StatelessComponent {
-            const InfoSection({super.key});
+          CodeWindow(name: 'app.dart', inactiveName: 'button.dart', selectable: true, source: '''
+          import 'package:jaspr/jaspr.dart';
+          import 'button.dart';
+          
+          class App extends StatelessComponent {
+            const App({super.key});
 
             @override
             Iterable<Component> build(BuildContext context) sync* {
@@ -59,19 +59,19 @@ class Meet extends StatelessComponent {
             }
           }
           ''', lineClasses: {
-            5: 'select-trigger-1',
-            6: 'select-trigger-2',
-            8: 'select-trigger-3',
-            9: 'select-trigger-4',
-            10: 'select-trigger-4',
-            11: 'select-trigger-4',
+            8: 'select-trigger-1',
+            9: 'select-trigger-2',
+            11: 'select-trigger-3',
             12: 'select-trigger-4',
             13: 'select-trigger-4',
-            14: 'select-trigger-5',
-            15: 'select-trigger-5',
-            16: 'select-trigger-5',
+            14: 'select-trigger-4',
+            15: 'select-trigger-4',
+            16: 'select-trigger-4',
             17: 'select-trigger-5',
-            18: 'select-trigger-3'
+            18: 'select-trigger-5',
+            19: 'select-trigger-5',
+            20: 'select-trigger-5',
+            21: 'select-trigger-3'
           }),
         ])
       ]),
@@ -79,11 +79,13 @@ class Meet extends StatelessComponent {
         div([
           CodeWindow(
               name: 'pubspec.yaml',
+              inactiveName: 'main.dart',
               source: '''
           name: my_awesome_website
           description: A new Jaspr site.
 
-          environment:  sdk: ">=3.0.0 <4.0.0"
+          environment:  
+            sdk: ">=3.0.0 <4.0.0"
 
           dependencies:  
             jaspr: ^0.16.0
@@ -98,7 +100,7 @@ class Meet extends StatelessComponent {
             mode: static
           ''',
               language: 'yaml',
-              lineClasses: {14: 'put-top', 15: 'put-top jaspr-mode'}),
+              lineClasses: {15: 'put-top', 16: 'put-top jaspr-mode'}),
           div(classes: 'mode-highlight', []),
         ]),
         div([
@@ -125,7 +127,7 @@ class Meet extends StatelessComponent {
           .box(minHeight: 100.vh, padding: EdgeInsets.only(top: 2.rem, left: 4.rem, right: 4.rem))
           .flexbox(direction: FlexDirection.column, gap: Gap(row: 10.rem), alignItems: AlignItems.center),
       css('.meet-section', [
-        css('&').box(maxWidth: 60.rem).flexbox(
+        css('&').box(maxWidth: maxContentWidth).flexbox(
               direction: FlexDirection.row,
               alignItems: AlignItems.center,
               wrap: FlexWrap.wrap,
@@ -146,22 +148,22 @@ class Meet extends StatelessComponent {
                 border: Border.all(BorderSide(color: primaryLight, width: 1.px)),
                 radius: BorderRadius.circular(8.px),
               )
-              .background(color: Colors.aliceBlue),
+              .background(color: primaryFaded),
         ]
       ]),
       css('.meet-modes', [
         css('&').flexbox(wrap: FlexWrap.wrapReverse),
         css('& > div:first-child').box(position: Position.relative()),
-        css('.put-top').box(position: Position.absolute(zIndex: ZIndex(1))),
+        css('.put-top span:last-child').box(position: Position.absolute(zIndex: ZIndex(1))),
         css('.mode-highlight')
             .box(
                 position: Position.absolute(bottom: 0.8.em, left: (-16).px, right: (-16).px),
-                height: 3.2.em,
+                height: 2.8.em,
                 radius: BorderRadius.circular(8.px),
                 border: Border.all(
                   BorderSide(color: primaryLight, width: 2.px),
                 ))
-            .background(color: Color.hex('#6AD1FF44')),
+            .background(color: primaryFaded).raw({'pointer-events': 'none'}),
       ]),
     ]),
   ];

@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
 import 'package:website/components/link_button.dart';
+import 'package:website/pages/home/0_hero/components/overlay.dart';
 import 'package:website/constants/theme.dart';
 
 @client
@@ -17,7 +18,7 @@ class MeetJasprButton extends StatefulComponent {
 class MeetJasprButtonState extends State<MeetJasprButton> {
   final notifier = ProgressNotifier();
 
-  var imageIndex = 0;
+  var showOverlay = false;
 
   @override
   void initState() {
@@ -26,30 +27,6 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
       setState(() {});
       if (notifier.done) {
         changeJasprText();
-      }
-    });
-  }
-
-  void showRandomImage() {
-    if (imageIndex == 0) {
-      setupKeyListener();
-    }
-    var current = imageIndex;
-    setState(() {
-      while (imageIndex == current) {
-        imageIndex = Random().nextInt(18) + 1;
-      }
-    });
-  }
-
-  void setupKeyListener() {
-    late final StreamSubscription sub;
-    sub = web.window.onKeyDown.listen((event) {
-      if (event.key == 'Escape') {
-        setState(() {
-          imageIndex = 0;
-        });
-        sub.cancel();
       }
     });
   }
@@ -66,26 +43,21 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     if (notifier.done) {
-      if (imageIndex > 0) {
-        yield Document.body(attributes: {'style': 'overflow: hidden;'});
+      if (showOverlay) {
         yield LinkButton.outlined(label: 'Meet Jasper', icon: 'jasper', to: '#meet');
-
-        yield div(classes: 'blur-backdrop', events: events(onClick: () {
-          showRandomImage();
-        }), [
-          img(
-              classes: "jasper-image",
-              src: 'images/jasper_resized/${imageIndex.toString().padLeft(2, '0')}.webp',
-              alt: 'Jasper'),
-          span([text('Click anywhere to see another image. Press ESC to close.')]),
-        ]);
+        yield Overlay(onClose: () {
+          setState(() {
+            showOverlay = false;
+          });
+        });
       } else {
-        yield Document.body(attributes: {'style': 'overflow: initial;'});
         yield DomComponent.wrap(
           events: {
             'click': (event) {
               event.preventDefault();
-              showRandomImage();
+              setState(() {
+                showOverlay = true;
+              });
             },
           },
           child: LinkButton.outlined(label: 'Meet Jasper', icon: 'jasper', to: '#meet'),
@@ -111,12 +83,12 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
         styles: notifier.progressAfterCliff > 0
             ? Styles.raw({
                 'background':
-                    'linear-gradient(to right, ${primaryMid.value}44 ${notifier.progressAfterCliff - 1}%, whitesmoke ${notifier.progressAfterCliff}%)'
+                    'linear-gradient(to right, ${primaryFaded.value} ${notifier.progressAfterCliff - 1}%, ${surface.value} ${notifier.progressAfterCliff}%)'
               })
             : null,
-        child: LinkButton.outlined(label: 'Meet Jaspr', icon: 'jaspr', to: '#meet'),
+        child: LinkButton.outlined(label: 'Meet Jaspr', icon: 'custom-jaspr', to: '#meet'),
       ),
-      svg([
+      svg(classes: 'particles', [
         for (final particle in notifier.particles)
           DomComponent(
             key: ValueKey(particle.id),
@@ -139,7 +111,7 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
   static final List<StyleRule> styles = [
     css('#meet-jaspr-button', [
       css('&').box(position: Position.relative()),
-      css('svg', [
+      css('svg.particles', [
         css('&')
             .box(
                 overflow: Overflow.visible,
@@ -148,27 +120,6 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
                 height: 100.percent)
             .raw({'pointer-events': 'none'}),
         css('circle').raw({'animation': 'particle 1s linear forwards'}),
-      ]),
-    ]),
-    css('.blur-backdrop', [
-      css('&')
-          .box(
-            position:
-                Position.fixed(top: Unit.zero, left: Unit.zero, right: Unit.zero, bottom: Unit.zero, zIndex: ZIndex(1)),
-          )
-          .background(color: Color.hex('#FFF4'))
-          .flexbox(
-              direction: FlexDirection.column, alignItems: AlignItems.center, justifyContent: JustifyContent.center)
-          .raw({'backdrop-filter': 'blur(5px)', 'user-select': 'none'}),
-      css('span').box(display: Display.inlineBlock, margin: EdgeInsets.only(top: 1.rem)).combine(bodySmall),
-      css('.jasper-image', [
-        css('&')
-            .box(
-          maxWidth: 80.percent,
-          maxHeight: 80.percent,
-          radius: BorderRadius.circular(20.px),
-        )
-            .raw({'object-fit': 'cover', 'pointer-events': 'none'}),
       ]),
     ]),
     css.keyframes('particle', {
@@ -184,7 +135,7 @@ class ProgressNotifier extends ValueNotifier<double> {
 
   bool get done => value >= 100;
 
-  int get progressAfterCliff => done ? 100 : max((value - 10) / 0.9, 0).round();
+  int get progressAfterCliff => done ? 100 : max((value - 2) / 0.98, 0).round();
 
   Timer? timer;
 
@@ -206,7 +157,7 @@ class ProgressNotifier extends ValueNotifier<double> {
       return;
     }
 
-    value += v * min(0.9, (1.3 - value / 100));
+    value += v * min(0.9, (1.4 - value / 100));
 
     if (progressAfterCliff > 0) {
       if (particleCooldown > 1) {

@@ -1,8 +1,6 @@
-import 'package:highlight/languages/tex.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:website/constants/theme.dart';
 
-import 'icon.dart';
 
 class TestimonialCard extends StatelessComponent {
   const TestimonialCard({
@@ -25,9 +23,10 @@ class TestimonialCard extends StatelessComponent {
     yield div(classes: 'testimonial-card', [
       p([text('"'), text(quote), text('"')]),
       a(href: link, [
-        img(src: picture, alt: name),
+        img(src: picture, height: 40, width: 40, alt: name),
         p([
           span([text(name)]),
+          br(),
           span([text(position)]),
         ]),
       ]),
@@ -40,13 +39,24 @@ class TestimonialCard extends StatelessComponent {
       css('&')
           .box(
             radius: BorderRadius.circular(12.px),
-            border: Border.all(BorderSide.solid(width: 2.px, color: Color.hex('#EEE'))),
+            border: Border.all(BorderSide.solid(width: 2.px, color: borderColor)),
             padding: EdgeInsets.all(1.rem),
-            shadow: BoxShadow(offsetX: 1.px, offsetY: 1.px, blur: 3.px, spread: (-1).px, color: Color.hex('#0001')),
+            margin: EdgeInsets.only(bottom: 1.5.rem),
+            shadow: BoxShadow(offsetX: 1.px, offsetY: 1.px, blur: 3.px, spread: (-1).px, color: shadowColor1),
           )
           .flexbox(direction: FlexDirection.column, alignItems: AlignItems.stretch)
           .text(align: TextAlign.start, decoration: TextDecoration.none),
-      css('p').box(margin: EdgeInsets.only(top: 0.4.em, bottom: Unit.zero)).combine(bodySmall),
+      css('p').box(margin: EdgeInsets.only(top: 0.4.em, bottom: Unit.zero)).combine(bodyMedium),
+      css('a', [
+        css('&')
+            .box(display: Display.block, margin: EdgeInsets.only(top: 1.2.rem))
+            .flexbox(direction: FlexDirection.row, alignItems: AlignItems.center),
+        css('img')
+            .box(radius: BorderRadius.circular(100.percent), margin: EdgeInsets.only(right: 0.8.rem))
+            .raw({'object-fit': 'cover'}),
+            css('p').box(margin: EdgeInsets.zero).combine(bodySmall),
+            css('p span:first-child').text(fontWeight: FontWeight.w600, color: textBlack),
+      ]),
     ]),
   ];
 }

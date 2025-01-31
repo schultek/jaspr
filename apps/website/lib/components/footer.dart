@@ -3,7 +3,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:website/components/logo.dart';
 
-import '../../../constants/theme.dart';
+import '../constants/theme.dart';
 
 class Footer extends StatelessComponent {
   const Footer({super.key});
@@ -73,8 +73,7 @@ class Footer extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('footer', [
       css('&').box(
-        margin: EdgeInsets.only(top: 10.rem),
-        border: Border.only(top: BorderSide(color: Colors.whiteSmoke, width: 2.px)),
+        border: Border.only(top: BorderSide(color: borderColor, width: 2.px)),
       ),
       css('.created-by', [
         css('&')
@@ -85,13 +84,14 @@ class Footer extends StatelessComponent {
       css('.footer-navigation', [
         css('&')
             .box(
-              padding: EdgeInsets.only(top: 4.rem, left: 2.rem, right: 2.rem, bottom: 2.5.rem),
-              maxWidth: 60.rem,
+              padding: EdgeInsets.only(top: 4.rem, left: 2.rem, right: 4.rem, bottom: 2.5.rem),
+              maxWidth: maxContentWidth,
             )
             .flexbox(
               direction: FlexDirection.row,
               justifyContent: JustifyContent.spaceBetween,
               alignItems: AlignItems.start,
+              gap: Gap.all(2.rem),
             ),
         css('h5').box(margin: EdgeInsets.only(bottom: 1.rem)),
         css('ul').list(style: ListStyle.none).box(padding: EdgeInsets.zero).text(fontSize: 0.9.rem, lineHeight: 2.rem),
@@ -100,9 +100,14 @@ class Footer extends StatelessComponent {
       css('.footer-banner')
           .box(
             padding: EdgeInsets.symmetric(vertical: 1.rem, horizontal: 2.rem),
-            border: Border.only(top: BorderSide(color: Colors.whiteSmoke, width: 2.px)),
+            border: Border.only(top: BorderSide(color: borderColor, width: 2.px)),
           )
           .text(fontSize: 0.8.rem, color: textDim),
     ]),
+    css.media(MediaQuery.all(maxWidth: 600.px), [
+      css('footer', [
+        css('.footer-navigation').flexbox(direction: FlexDirection.column),
+      ])
+    ])
   ];
 }

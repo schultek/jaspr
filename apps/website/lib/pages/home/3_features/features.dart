@@ -1,8 +1,7 @@
-// ignore_for_file: file_names
-
 import 'package:jaspr/jaspr.dart';
+import 'package:website/constants/theme.dart';
 
-import '../../../components/link_card.dart';
+import 'components/link_card.dart';
 
 class Features extends StatelessComponent {
   const Features({super.key});
@@ -75,7 +74,7 @@ class Features extends StatelessComponent {
       css('.feature-grid', [
         css('&')
             .box(
-              maxWidth: 60.5.rem,
+              maxWidth: maxContentWidth,
               margin: EdgeInsets.only(top: 3.rem, bottom: 4.rem),
               padding: EdgeInsets.symmetric(horizontal: 2.rem),
             )

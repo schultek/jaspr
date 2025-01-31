@@ -1,12 +1,11 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/pages/home/sections/7_footer.dart';
 
-import 'sections/1_hero.dart';
-import 'sections/2_meet.dart';
-import 'sections/3_devexp.dart';
-import 'sections/4_features.dart';
-import 'sections/5_testimonials.dart';
-import 'sections/6_community.dart';
+import '0_hero/hero.dart';
+import '1_meet/meet.dart';
+import '2_devexp/devexp.dart';
+import '3_features/features.dart';
+import '4_testimonials/testimonials.dart';
+import '5_community/community.dart';
 
 class Home extends StatelessComponent {
   @override
@@ -17,6 +16,5 @@ class Home extends StatelessComponent {
     yield Features();
     yield Testimonials();
     yield Community();
-    yield Footer();
   }
 }

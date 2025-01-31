@@ -1,8 +1,7 @@
-// ignore_for_file: file_names
-
 import 'package:jaspr/jaspr.dart';
 import 'package:website/components/link_button.dart';
-import '../../../components/sponsors_list.dart';
+import 'package:website/constants/theme.dart';
+import 'components/sponsors_list.dart';
 
 class Community extends StatelessComponent {
   const Community({super.key});
@@ -67,25 +66,27 @@ class Community extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('#community', [
       css('&')
-          .box(padding: EdgeInsets.only(top: 10.rem, left: 2.rem, right: 2.rem))
+          .box(
+            padding: EdgeInsets.only(top: 10.rem, left: 2.rem, right: 2.rem, bottom: 10.rem),
+          )
           .flexbox(direction: FlexDirection.column, alignItems: AlignItems.center)
           .text(align: TextAlign.center),
       css('.community-card', [
         css('&')
             .box(
-              maxWidth: 60.5.rem,
-              margin: EdgeInsets.only(top: 3.rem),
-              border: Border.all(BorderSide(color: Color.hex('#EEE'), width: 2.px)),
-              radius: BorderRadius.circular(12.px),
-            )
-            .raw({'background': 'linear-gradient(180deg, #FFFFFF 0%, #F5F5F5 100%)'})
+                maxWidth: maxContentWidth,
+                margin: EdgeInsets.only(top: 3.rem),
+                border: Border.all(BorderSide(color: borderColor, width: 2.px)),
+                radius: BorderRadius.circular(12.px),
+                shadow: BoxShadow(offsetX: 4.px, offsetY: 4.px, blur: 20.px, color: shadowColor1))
+            .raw({'background': 'linear-gradient(180deg, ${background.value} 0%, ${surface.value} 100%)'})
             .flexbox(direction: FlexDirection.row, wrap: FlexWrap.wrap)
             .text(align: TextAlign.start),
         css('& > div').box(padding: EdgeInsets.all(2.rem)).flexItem(flex: Flex(grow: 1, basis: FlexBasis(20.rem))),
         css('& > div > h4:not(:first-child)').box(margin: EdgeInsets.only(top: 3.rem)),
         css('.sponsor', [
           css('&').box(
-            border: Border.only(left: BorderSide(color: Color.hex('#EEE'), width: 2.px)),
+            border: Border.only(left: BorderSide(color: borderColor, width: 2.px)),
           ),
           css('h5').box(margin: EdgeInsets.only(bottom: 0.5.rem)),
           css('.actions').box(margin: EdgeInsets.only(top: 1.rem)),
