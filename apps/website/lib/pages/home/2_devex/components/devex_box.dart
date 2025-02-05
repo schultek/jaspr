@@ -1,8 +1,8 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:website/constants/theme.dart';
 
-class FeatureBox extends StatelessComponent {
-  const FeatureBox({
+class DevexBox extends StatelessComponent {
+  const DevexBox({
     required this.caption,
     required this.title,
     required this.description,

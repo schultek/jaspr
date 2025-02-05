@@ -3,9 +3,12 @@ import 'dart:math';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
+import 'package:website/utils/events.dart';
 import 'package:website/components/link_button.dart';
 import 'package:website/pages/home/0_hero/components/overlay.dart';
 import 'package:website/constants/theme.dart';
+
+import '../../../../components/particles.dart';
 
 @client
 class MeetJasprButton extends StatefulComponent {
@@ -17,6 +20,7 @@ class MeetJasprButton extends StatefulComponent {
 
 class MeetJasprButtonState extends State<MeetJasprButton> {
   final notifier = ProgressNotifier();
+  Timer? touchTimer;
 
   var showOverlay = false;
 
@@ -38,6 +42,11 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
       var node = walker.currentNode as web.Text;
       node.textContent = node.textContent?.replaceAll('Jaspr', 'Jasper').replaceAll('jaspr', 'jasper');
     }
+  }
+
+  void scrollToMeet() {
+    var el = web.document.querySelector('#meet') as web.HTMLElement;
+    web.window.scrollTo(web.ScrollToOptions(top: el.offsetTop, behavior: 'smooth'));
   }
 
   @override
@@ -69,15 +78,34 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
 
     yield div(id: 'meet-jaspr-button', [
       DomComponent.wrap(
+        classes: touchTimer != null ? 'active' : null,
         events: {
           'mousemove': (event) {
             var e = event as web.MouseEvent;
             var movement = (e.movementX.abs() + e.movementY.abs()) / 10;
             notifier.add(movement);
           },
+          'touchstart': (event) {
+            event.preventDefault();
+            touchTimer = Timer(Duration(seconds: 1), () {
+              touchTimer = Timer.periodic(Duration(milliseconds: 50), (_) {
+                notifier.add(2, linear: true);
+              });
+            });
+            setState(() {});
+          },
+          'touchend': (event) {
+            touchTimer?.cancel();
+            setState(() {
+              touchTimer = null;
+            });
+            if (notifier.progressAfterCliff == 0) {
+              scrollToMeet();
+            }
+          },
           'click': (event) {
             event.preventDefault();
-            web.document.querySelector('#meet')?.scrollIntoView(web.ScrollOptions(behavior: 'smooth'));
+            scrollToMeet();
           },
         },
         styles: notifier.progressAfterCliff > 0
@@ -88,22 +116,7 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
             : null,
         child: LinkButton.outlined(label: 'Meet Jaspr', icon: 'custom-jaspr', to: '#meet'),
       ),
-      svg(classes: 'particles', [
-        for (final particle in notifier.particles)
-          DomComponent(
-            key: ValueKey(particle.id),
-            tag: 'g',
-            styles: Styles.box(
-              transform: Transform.combine([
-                Transform.translate(x: particle.dx.percent, y: particle.dy.percent),
-                Transform.rotate(((particle.dy / 100 - 0.5) * 120).deg),
-              ]),
-            ).raw({'--particle-offset': '${particle.offset}px'}),
-            children: [
-              circle(cx: "0", cy: "0", r: "${particle.size}", fill: primaryMid, []),
-            ],
-          ),
-      ]),
+      Particles(particles: notifier.particles),
     ]);
   }
 
@@ -111,22 +124,7 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
   static final List<StyleRule> styles = [
     css('#meet-jaspr-button', [
       css('&').box(position: Position.relative()),
-      css('svg.particles', [
-        css('&')
-            .box(
-                overflow: Overflow.visible,
-                position: Position.absolute(top: Unit.zero, left: Unit.zero),
-                width: 100.percent,
-                height: 100.percent)
-            .raw({'pointer-events': 'none'}),
-        css('circle').raw({'animation': 'particle 1s linear forwards'}),
-      ]),
     ]),
-    css.keyframes('particle', {
-      '0%': Styles.box(transform: Transform.translate(y: 0.px)),
-      '90%': Styles.box(opacity: 1),
-      '100%': Styles.box(transform: Transform.translate(x: Unit.variable('--particle-offset')), opacity: 0),
-    })
   ];
 }
 
@@ -140,16 +138,11 @@ class ProgressNotifier extends ValueNotifier<double> {
   Timer? timer;
 
   var particleCooldown = 0.0;
-  final List<({String id, int dx, int dy, int offset, double size})> particles = [];
+  final List<Particle> particles = [];
 
-  final random = Random();
-
-  String randomId() {
-    return random.nextInt(0xFFFF).toRadixString(16);
-  }
-
-  void add(double v) {
+  void add(double v, {bool linear = false}) {
     if (done) return;
+
     if (value >= 100) {
       value = 100;
       timer?.cancel();
@@ -157,19 +150,29 @@ class ProgressNotifier extends ValueNotifier<double> {
       return;
     }
 
-    value += v * min(0.9, (1.4 - value / 100));
+    if (linear) {
+      value += v;
+    } else {
+      value += v * min(0.9, (1.4 - value / 100));
+    }
+
+    if (done) {
+      captureEasterEgg();
+    }
 
     if (progressAfterCliff > 0) {
       if (particleCooldown > 1) {
         particleCooldown = 0;
       }
       if (particleCooldown == 0) {
+        var dy = Particles.randomInt(0, 100);
         var particle = (
-          id: randomId(),
+          id: Particles.randomId(),
           dx: progressAfterCliff,
-          dy: random.nextInt(100),
-          offset: 10 + random.nextInt(40),
-          size: 0.5 + random.nextInt(3) / 2,
+          dy: dy,
+          angle: (dy / 100 - 0.5) * 120,
+          offset: Particles.randomInt(10, 50),
+          size: Particles.randomInt(1, 4) / 2,
         );
         particles.add(particle);
 

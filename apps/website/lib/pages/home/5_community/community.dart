@@ -34,7 +34,7 @@ class Community extends StatelessComponent {
             LinkButton.outlined(
               icon: 'send',
               label: 'Get Support',
-              to: 'mailto://kilian@schultek.dev',
+              to: 'mailto:kilian@schultek.dev',
             ),
           ]),
         ]),
@@ -46,7 +46,8 @@ class Community extends StatelessComponent {
           ]),
           p([
             text(
-                'Are you interested in a larger sponsoring including a prominent logo placement on this website? Contact me at kilian@schultek.dev')
+                'Are you interested in a larger sponsoring including a prominent logo placement on this website? Contact me at '),
+            a(href: 'mailto:kilian@schultek.dev', classes: 'animated-underline', [text('kilian@schultek.dev')]), text('.'),
           ]),
           h5([text('Current Sponsors')]),
           SponsorsList(),

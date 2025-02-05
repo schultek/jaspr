@@ -23,6 +23,9 @@ class Footer extends StatelessComponent {
           h5([text('Navigation')]),
           ul([
             li([
+              a(href: '/', classes: 'animated-underline', [text('Home')])
+            ]),
+            li([
               a(href: 'https://github.com/schultek/jaspr', classes: 'animated-underline', [text('Github')])
             ]),
             li([
@@ -30,9 +33,6 @@ class Footer extends StatelessComponent {
             ]),
             li([
               a(href: 'https://jasprpad.schultek.de', classes: 'animated-underline', [text('Playground')])
-            ]),
-            li([
-              a(href: 'https://github.com/sponsors/schultek/', classes: 'animated-underline', [text('Sponsor')])
             ]),
           ]),
         ]),
@@ -48,24 +48,27 @@ class Footer extends StatelessComponent {
                   classes: 'animated-underline',
                   [text('Contribute')])
             ]),
+            li([
+              a(href: 'https://github.com/sponsors/schultek/', classes: 'animated-underline', [text('Sponsor')])
+            ]),
           ]),
         ]),
         div([
           h5([text('Legal')]),
           ul([
             li([
-              a(href: '/terms', classes: 'animated-underline', [text('Terms')])
+              a(href: '/terms#imprint', classes: 'animated-underline', [text('Imprint')])
             ]),
             li([
-              a(href: '/privacy', classes: 'animated-underline', [text('Privacy Policy')])
+              a(href: '/terms#privacy', classes: 'animated-underline', [text('Privacy Policy')])
             ]),
           ]),
         ]),
       ]),
       div(classes: 'footer-banner', [
         text('Copyright © 2025 Jaspr | '),
-        a(href: '', classes: 'animated-underline', [text('MIT License')]),
-        text(' | Built with Jaspr (obviously)'),
+        a(href: '', classes: 'animated-underline', [raw('MIT&nbsp;License')]),
+        raw(' | Built&nbsp;with&nbsp;Jaspr&nbsp;(obviously)'),
       ]),
     ]);
   }

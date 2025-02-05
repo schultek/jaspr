@@ -18,6 +18,13 @@ class Testimonials extends StatelessComponent {
           picture: 'https://avatars.githubusercontent.com/u/1454449?v=4',
           link: 'https://www.linkedin.com/in/dinko-marinac/',
         ),
+        TestimonialCard(
+          quote: 'I\'ve been using Jaspr with Tailwind CSS to build sites like course.temiajiboye.com, temiajiboye.com, and flutteryeg.com, and I\'ve been really impressed. The SSR support and component-based approach make it feel like Flutter for the web, but with the flexibility of Dart. It’s smooth, efficient, and just makes sense. If you\'re into Dart and want to build modern web apps, definitely give Jaspr a try!',
+          name: 'Temi Ajiboye',
+          position: 'Flutter Developer',
+          picture: 'https://pbs.twimg.com/profile_images/1638555966105894916/jhdtN6oQ_400x400.jpg',
+          link: 'http://temiajiboye.com',
+        ),
         // Three more dummy testimonials from imaginary people with dummy quotes
         TestimonialCard(
           quote: 'Jaspr is great for building websites with Dart. I love the simplicity of the framework and how it allows me to use my existing Flutter knowledge to build websites. The built-in Tailwind CSS support is a game-changer, and the hydration and server-side rendering features are a huge plus. I\'ve been using Jaspr for a few months now and can\'t wait to see where it goes in the future.',

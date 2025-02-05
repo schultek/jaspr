@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
 import '../constants/theme.dart';
-import 'header.dart';
+import '../layout/header.dart';
 import 'icon.dart';
 
 class MenuButton extends StatelessComponent {
@@ -43,12 +43,12 @@ class MenuButton extends StatelessComponent {
             direction: FlexDirection.columnReverse,
             justifyContent: JustifyContent.start,
             alignItems: AlignItems.center,
-            gap: Gap(row: 2.rem),
+            gap: Gap(row: 4.rem),
           )
           .raw({'backdrop-filter': 'blur(5px)'}),
       css('nav', [
         css('&')
-            .flexbox(direction: FlexDirection.column, gap: Gap(row: 1.rem), alignItems: AlignItems.center)
+            .flexbox(direction: FlexDirection.column, gap: Gap(row: 2.rem), alignItems: AlignItems.center)
             .flexItem(flex: Flex(grow: 0)),
         css('a').text(fontSize: 2.rem),
       ]),

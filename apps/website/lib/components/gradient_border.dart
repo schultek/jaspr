@@ -58,5 +58,6 @@ class GradientBorder extends StatelessComponent {
       ),
       css('&:hover rect').raw({'stroke-dasharray': '50 0 52'}),
     ]),
+    css('.active .gradient-border rect').raw({'stroke-dasharray': '50 0 52'}),
   ];
 }

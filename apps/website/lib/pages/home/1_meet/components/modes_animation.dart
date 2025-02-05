@@ -41,7 +41,7 @@ class ModesAnimationState extends State<ModesAnimation> {
       index = (index + 1) % texts.length;
       await Future.delayed(const Duration(milliseconds: 300));
       await animateIn();
-      await Future.delayed(const Duration(milliseconds: 3000));
+      await Future.delayed(const Duration(milliseconds: 2000));
     }
   }
 

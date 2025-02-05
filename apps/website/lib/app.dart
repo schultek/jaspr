@@ -1,8 +1,10 @@
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_router/jaspr_router.dart';
 import 'package:website/constants/theme.dart';
 
-import 'components/footer.dart';
-import 'components/header.dart';
+import 'layout/footer.dart';
+import 'layout/header.dart';
+import 'layout/markdown_page.dart';
 import 'pages/home/home.dart';
 
 class App extends StatelessComponent {
@@ -10,11 +12,19 @@ class App extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield Header();
-    yield main_([
-      Home(),
+    yield Router(routes: [
+      Route(
+        path: '/',
+        builder: (_, __) => Fragment(children: [
+          Header(),
+          main_([
+            Home(),
+          ]),
+          Footer(),
+        ]),
+      ),
+      Route(path: '/terms', builder: (_, __) => MarkdownPage('lib/content/terms.md')),
     ]);
-    yield Footer();
   }
 
   @css
@@ -29,13 +39,12 @@ class App extends StatelessComponent {
     css('#community:before').combine(backgroundShade(60.vh, 10.vw, w: 80.vw, b: (-20).vh)),
   ];
 
-  static Styles backgroundShade(Unit top, Unit left,{ Unit? w, Unit? h, Unit? b, Unit? r}) {
+  static Styles backgroundShade(Unit top, Unit left, {Unit? w, Unit? h, Unit? b, Unit? r}) {
     return Styles.raw({'content': '""', 'filter': 'blur(64px)', 'background': primaryGradient}).box(
-      position:
-          Position.absolute(top: top, left: left, right: r, bottom: b, zIndex: ZIndex(-1)),
-          radius: BorderRadius.circular(100.percent),
-          width: w,
-          height: h,
+      position: Position.absolute(top: top, left: left, right: r, bottom: b, zIndex: ZIndex(-1)),
+      radius: BorderRadius.circular(100.percent),
+      width: w,
+      height: h,
       opacity: 0.05,
     );
   }

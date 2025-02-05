@@ -56,7 +56,20 @@ class OverlayState extends State<Overlay> {
       showRandomImage();
     }), [
       img(src: 'images/jasper_resized/$currentImage.webp', alt: 'Jasper'),
-      span([text('Click anywhere to see another image. Press ESC to close.')]),
+      span([
+        text('Click anywhere to see another image.'),
+        br(),
+        text('Press ESC or click '),
+        a(href: '', events: {
+          'click': (e) {
+            e.preventDefault();
+            component.onClose();
+          }
+        }, [
+          text('here')
+        ]),
+        text(' to close.'),
+      ]),
     ]);
   }
 

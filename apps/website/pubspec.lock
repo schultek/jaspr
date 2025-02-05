@@ -134,14 +134,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "8.0.0"
-  build_web_compilers:
-    dependency: "direct dev"
-    description:
-      name: build_web_compilers
-      sha256: "75a3ce1cd97d2bb13bc0d7321570c390ef795304ca3c6a635716fd9902587a68"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.0"
   built_collection:
     dependency: transitive
     description:
@@ -402,6 +394,14 @@ packages:
       relative: true
     source: path
     version: "0.6.1"
+  jaspr_web_compilers:
+    dependency: "direct dev"
+    description:
+      name: jaspr_web_compilers
+      sha256: "291b75c7da5b928edc0bafe4b362a6f506b79ff7625db38817d2b2756d31c525"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
   js:
     dependency: transitive
     description:
@@ -434,6 +434,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.0"
+  lukehog_client:
+    dependency: "direct main"
+    description:
+      name: lukehog_client
+      sha256: "7906ee5df7d9a6f9e012af2594c874cbfda8962104c754deabcfd067c32348dd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.6"
   macros:
     dependency: transitive
     description:
@@ -442,6 +450,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.3-main.0"
+  markdown:
+    dependency: "direct main"
+    description:
+      name: markdown
+      sha256: "935e23e1ff3bc02d390bad4d4be001208ee92cc217cb5b5a6c19bc14aaa318c1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.3.0"
   matcher:
     dependency: transitive
     description:
@@ -466,6 +482,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  nanoid2:
+    dependency: transitive
+    description:
+      name: nanoid2
+      sha256: "35b5048f836652a1d711db0d716bdee59fcaaa4c37792db8b3568da4f7feb2f9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   package_config:
     dependency: transitive
     description:
@@ -522,6 +546,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
+  retry:
+    dependency: transitive
+    description:
+      name: retry
+      sha256: "822e118d5b3aafed083109c72d5f484c6dc66707885e07c0fbcb8b986bba7efc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.2"
   rxdart:
     dependency: transitive
     description:

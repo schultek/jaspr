@@ -2,24 +2,26 @@ import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
+import 'package:website/utils/events.dart';
 
-import 'menu_button.dart';
+import '../components/menu_button.dart';
 import '../constants/theme.dart';
-import 'github_button.dart';
-import 'link_button.dart';
-import 'logo.dart';
-import 'theme_toggle.dart';
+import '../components/github_button.dart';
+import '../components/link_button.dart';
+import '../components/logo.dart';
+import '../components/theme_toggle.dart';
 
 @client
 class Header extends StatefulComponent {
-  const Header({super.key});
+  const Header({this.showHome = false, super.key});
+
+  final bool showHome;
 
   @override
   State createState() => HeaderState();
 }
 
 class HeaderState extends State<Header> {
-
   static const mobileBreakpoint = 750;
 
   final contentKey = GlobalKey();
@@ -32,6 +34,7 @@ class HeaderState extends State<Header> {
     super.initState();
 
     if (kIsWeb) {
+      captureVisit();
       sub = web.EventStreamProviders.resizeEvent.forTarget(web.window).listen((e) {
         if (menuOpen && web.window.innerWidth > mobileBreakpoint) {
           setState(() {
@@ -52,6 +55,7 @@ class HeaderState extends State<Header> {
   Iterable<Component> build(BuildContext context) sync* {
     var content = Fragment(key: contentKey, children: [
       nav([
+        if (component.showHome) a(href: '/', classes: 'animated-underline', [text("Home")]),
         a(href: "https://docs.page/schultek/jaspr", classes: 'animated-underline', [text("Docs")]),
         a(href: "https://jasprpad.schultek.de", classes: 'animated-underline', [text("Playground")]),
         a(href: "https://github.com/sponsors/schultek/", classes: 'animated-underline', [text("Sponsor")]),

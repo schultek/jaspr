@@ -2,10 +2,10 @@ import 'package:jaspr/jaspr.dart';
 
 // Colors
 
-const primaryDark = Color.variable('--primaryDark');
-const primaryMid = Color.variable('--primaryMid');
+const primaryDark = Color.hex('#09387e');
+const primaryMid = Color.hex('#0066B4');
 const primaryMidLow = Color.variable('--primaryMidLow');
-const primaryLight = Color.variable('--primaryLight');
+const primaryLight = Color.hex('#40C4FF');
 
 const primaryFaded = Color.variable('--primaryFaded');
 
@@ -27,14 +27,12 @@ final borderColor2 = Color.variable('--borderColor2');
 
 final surface = Color.variable('--surface');
 final surfaceLow = Color.variable('--surfaceLow');
+final surfaceLowest = Color.variable('--surfaceLowest');
 
 final hoverOverlayColor = Color.variable('--hoverOverlayColor');
 
 final lightTheme = {
-  primaryDark: Color.hex('#072F69'),
-  primaryMid: Color.hex('#0066B4'),
   primaryMidLow: Color.hex('#004377'),
-  primaryLight: Color.hex('#40C4FF'),
   primaryFaded: Color.hex('#0066b41e'),
   textDim: Color.hex('#777'),
   textDark: Color.hex('#555'),
@@ -48,14 +46,12 @@ final lightTheme = {
   borderColor2: Color.hex('#CCC'),
   surface: Color.hex('#F5F5F5'),
   surfaceLow: Color.hex('#F8F8F8'),
+  surfaceLowest: Color.hex('#FCFCFC'),
   hoverOverlayColor: Color.hex('#0001'),
 };
 
 final darkTheme = {
-  primaryDark: Color.hex('#09387e'),
-  primaryMid: Color.hex('#0066B4'),
   primaryMidLow: Color.hex('#007ad7'),
-  primaryLight: Color.hex('#40C4FF'),
   primaryFaded: Color.hex('#6ad0ff1c'),
   textDim: Color.hex('#CCC'),
   textDark: Color.hex('#EEE'),
@@ -68,7 +64,8 @@ final darkTheme = {
   borderColor: Color.hex('#1d1f25'),
   borderColor2: Color.hex('#292c35'),
   surface: Color.hex('#070c14'),
-  surfaceLow: Color.hex('#15181c'),
+  surfaceLow: Color.hex('#161b1f'),
+  surfaceLowest: Color.hex('#11141a'),
   hoverOverlayColor: Color.hex('#FFF1'),
 };
 
@@ -100,6 +97,7 @@ final heading5 = Styles.text(fontSize: 1.rem, fontWeight: FontWeight.w600, color
 
 const maxContentWidth = Unit.rem(70);
 const mobileBreakpoint = Unit.rem(40);
+const smallMobileBreakpoint = Unit.rem(25);
 
 const contentPadding = Unit.variable('--contentPadding');
 const sectionPadding = Unit.variable('--sectionPadding');
@@ -122,7 +120,7 @@ final root = [
   css(':root').raw({
     for (final color in lightTheme.keys) color.value.substring(4, color.value.length - 1): lightTheme[color]!.value,
     '--contentPadding': '4rem',
-    '--sectionPadding': '10rem',
+    '--sectionPadding': '16rem',
   }),
 
   css(':root.dark').raw({
@@ -132,7 +130,14 @@ final root = [
   css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
     css(':root').raw({
       '--contentPadding': '2rem',
-      '--sectionPadding': '5rem',
+      '--sectionPadding': '8rem',
+    }),
+  ]),
+
+  css.media(MediaQuery.all(maxWidth: smallMobileBreakpoint), [
+    css(':root').raw({
+      '--contentPadding': '1rem',
+      '--sectionPadding': '4rem',
     }),
   ]),
 

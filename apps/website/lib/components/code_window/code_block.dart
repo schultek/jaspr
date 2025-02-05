@@ -79,9 +79,9 @@ class CodeBlock extends StatelessComponent {
               padding: EdgeInsets.only(top: 0.5.em, bottom: 0.5.em, right: 0.5.em),
               boxSizing: BoxSizing.borderBox,
             )
-            .background(color: background)
+            .background(color: surfaceLowest)
             .text(align: TextAlign.start)
-            .combine(jasprLightTheme['root']!),
+            .combine(jasprTheme['root']!),
         css('.lines', [
           css('&').box(display: Display.inlineBlock, minWidth: 100.percent),
           css('.line', [
@@ -106,7 +106,7 @@ class CodeBlock extends StatelessComponent {
             css('.line-number').background(color: hoverOverlayColor).box(opacity: 1),
           ]),
         ]),
-        for (final e in jasprLightTheme.entries) css('code span.hljs-${e.key}').combine(e.value),
+        for (final e in jasprTheme.entries) css('code span.hljs-${e.key}').combine(e.value),
       ]),
     ]),
   ];

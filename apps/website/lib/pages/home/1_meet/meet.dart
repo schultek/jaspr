@@ -42,6 +42,7 @@ class Meet extends StatelessComponent {
 
             @override
             Iterable<Component> build(BuildContext context) sync* {
+              // Hover me!
               yield h2([text('Everything is a Component')]);
               yield p([text('Jaspr Components are the fundamental building blocks ...')]);
 
@@ -60,18 +61,19 @@ class Meet extends StatelessComponent {
           }
           ''', lineClasses: {
             8: 'select-trigger-1',
-            9: 'select-trigger-2',
-            11: 'select-trigger-3',
-            12: 'select-trigger-4',
+            9: 'select-trigger-1',
+            10: 'select-trigger-2',
+            12: 'select-trigger-3',
             13: 'select-trigger-4',
             14: 'select-trigger-4',
             15: 'select-trigger-4',
             16: 'select-trigger-4',
-            17: 'select-trigger-5',
+            17: 'select-trigger-4',
             18: 'select-trigger-5',
             19: 'select-trigger-5',
             20: 'select-trigger-5',
-            21: 'select-trigger-3'
+            21: 'select-trigger-5',
+            22: 'select-trigger-3'
           }),
         ])
       ]),
@@ -106,8 +108,8 @@ class Meet extends StatelessComponent {
         div([
           h3([text('Build '), br(), ModesAnimation(), br(), text(' using pure Dart')]),
           p([
-            text(
-                'Choose the rendering strategy you need. Generate static html at build time, pre-render pages dynamically on the server or build a single page application.')
+            text('Choose the rendering strategy you need. Generate static html at build time, '
+                'pre-render pages dynamically on the server or build a single page application. Jaspr has you covered.')
           ]),
           div(classes: 'actions', [
             LinkButton.filled(
@@ -157,13 +159,14 @@ class Meet extends StatelessComponent {
         css('.put-top span:last-child').box(position: Position.absolute(zIndex: ZIndex(1))),
         css('.mode-highlight')
             .box(
-                position: Position.absolute(bottom: 0.8.em, left: (-16).px, right: (-16).px),
-                height: 2.8.em,
+                position: Position.absolute(bottom: 0.6.em, left: (-16).px, right: (-16).px),
+                height: 3.2.em,
                 radius: BorderRadius.circular(8.px),
                 border: Border.all(
                   BorderSide(color: primaryLight, width: 2.px),
                 ))
-            .background(color: primaryFaded).raw({'pointer-events': 'none'}),
+            .background(color: primaryFaded)
+            .raw({'pointer-events': 'none'}),
       ]),
     ]),
   ];

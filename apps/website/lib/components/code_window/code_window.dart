@@ -85,10 +85,14 @@ class CodeWindow extends StatelessComponent {
                 radius: BorderRadius.only(topLeft: Radius.circular(6.px), topRight: Radius.circular(6.px)),
               )
               .flexbox(alignItems: AlignItems.center, gap: Gap(column: 0.4.rem))
-              .background(color: background),
-          css('&.inactive').box(opacity: 0.5),
+              .background(color: surfaceLowest)
+              .text(color: textBlack),
+          css('&.inactive')
+              .box(opacity: 0.5, width: 0.px)
+              .flexItem(flex: Flex(grow: 1))
+              .raw({'max-width': 'fit-content'}),
         ]),
-        css('.code-window-title').text(fontFamily: monoFont, fontWeight: FontWeight.w400, fontSize: 0.9.rem, color: textBlack),
+        css('.code-window-title').text(fontFamily: monoFont, fontWeight: FontWeight.w400, fontSize: 0.9.rem),
       ]),
       css('.code-window-body', [
         css('&')
