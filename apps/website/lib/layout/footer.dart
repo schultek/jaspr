@@ -40,16 +40,17 @@ class Footer extends StatelessComponent {
           h5([text('Community')]),
           ul([
             li([
-              a(href: 'https://discord.gg/XGXrGEk4c6', classes: 'animated-underline', [text('Discord')])
+              a(href: 'https://discord.gg/XGXrGEk4c6', target: Target.blank, classes: 'animated-underline', [text('Discord')])
             ]),
             li([
               a(
                   href: 'https://docs.page/schultek/jaspr/going_further/contributing',
+                  target: Target.blank, 
                   classes: 'animated-underline',
                   [text('Contribute')])
             ]),
             li([
-              a(href: 'https://github.com/sponsors/schultek/', classes: 'animated-underline', [text('Sponsor')])
+              a(href: 'https://github.com/sponsors/schultek/', target: Target.blank, classes: 'animated-underline', [text('Sponsor')])
             ]),
           ]),
         ]),
@@ -67,7 +68,7 @@ class Footer extends StatelessComponent {
       ]),
       div(classes: 'footer-banner', [
         text('Copyright © 2025 Jaspr | '),
-        a(href: '', classes: 'animated-underline', [raw('MIT&nbsp;License')]),
+        a(href: 'https://github.com/schultek/jaspr/blob/main/LICENSE', classes: 'animated-underline', [raw('MIT&nbsp;License')]),
         raw(' | Built&nbsp;with&nbsp;Jaspr&nbsp;(obviously)'),
       ]),
     ]);
@@ -99,7 +100,7 @@ class Footer extends StatelessComponent {
             ),
         css('h5').box(margin: EdgeInsets.only(bottom: 1.rem)),
         css('ul').list(style: ListStyle.none).box(padding: EdgeInsets.zero).text(fontSize: 0.9.rem, lineHeight: 2.rem),
-        css('a').text(color: textDim),
+        css('ul a').text(color: textDim),
       ]),
       css('.footer-banner')
           .box(

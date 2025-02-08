@@ -33,7 +33,9 @@ class InstallCommandState extends State<InstallCommand> {
       span([
         Icon('terminal'),
         code([text('dart pub global activate jaspr_cli')]),
-        button(styles: copied ? Styles.text(color: Colors.forestGreen) : null, [
+        button(styles: copied ? Styles.text(color: Colors.forestGreen) : null, attributes: {
+          'aria-label': 'Copy'
+        }, [
           Icon(copied ? 'check' : 'copy'),
         ]),
       ]),

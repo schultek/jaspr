@@ -6,8 +6,8 @@ class Logo extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: "logo", [
-      img(src: 'images/logo.svg', height: 40),
+    yield a(href: '/', classes: "logo", [
+      img(src: 'images/logo.svg', alt: 'logo', height: 40),
       span([text('Jaspr')]),
     ]);
   }
@@ -16,6 +16,7 @@ class Logo extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('.logo')
         .flexbox(alignItems: AlignItems.center, gap: Gap(column: 0.5.rem))
-        .text(fontSize: 1.8.rem, fontWeight: FontWeight.w600, color: textBlack),
+        .text(fontSize: 1.8.rem, fontWeight: FontWeight.w600, color: textBlack)
+        .raw({'user-select': 'none'}),
   ];
 }

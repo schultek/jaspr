@@ -5,12 +5,14 @@ import 'package:website/constants/theme.dart';
 import 'icon.dart';
 
 class LinkButton extends StatelessComponent {
-  const LinkButton._({this.label, required this.icon, required this.to, required this.style});
+  const LinkButton._({this.label, required this.icon, required this.to, required this.style, this.target, this.ariaLabel});
 
   final String? label;
   final String? icon;
   final String to;
   final String style;
+  final Target? target;
+  final String? ariaLabel;
 
   factory LinkButton.filled({required String label, String? icon, required String to}) {
     return LinkButton._(label: label, icon: icon, to: to, style: 'filled');
@@ -20,8 +22,8 @@ class LinkButton extends StatelessComponent {
     return LinkButton._(label: label, icon: icon, to: to, style: 'outlined');
   }
 
-  factory LinkButton.icon({required String icon, required String to}) {
-    return LinkButton._(icon: icon, to: to, style: 'icon');
+  factory LinkButton.icon({required String icon, required String to, Target? target, String? ariaLabel}) {
+    return LinkButton._(icon: icon, to: to, style: 'icon', target: target, ariaLabel: ariaLabel);
   }
 
   @override
@@ -34,7 +36,9 @@ class LinkButton extends StatelessComponent {
     if (style == 'outlined') {
       child = GradientBorder(child: child, radius: 7);
     }
-    yield a(classes: 'link-button link-button-$style', href: to, [
+    yield a(classes: 'link-button link-button-$style', href: to, target: target, attributes: {
+      if (ariaLabel != null) 'aria-label': ariaLabel!
+    }, [
       child,
     ]);
   }
@@ -44,13 +48,13 @@ class LinkButton extends StatelessComponent {
     css('.link-button', [
       css('&')
           .box(
-            display: Display.block,
-            radius: BorderRadius.circular(8.px),
-            cursor: Cursor.pointer,
-            transition: Transition('background', duration: 300),
-          )
-          .raw({'user-select': 'none', '-webkit-tap-highlight-color': 'transparent'})
-          .text(decoration: TextDecoration.none, fontSize: .9.rem),
+        display: Display.block,
+        radius: BorderRadius.circular(8.px),
+        cursor: Cursor.pointer,
+        transition: Transition('background', duration: 300),
+      )
+          .raw({'user-select': 'none', '-webkit-tap-highlight-color': 'transparent'}).text(
+              decoration: TextDecoration.none, fontSize: .9.rem),
       css('.link-button-content')
           .box(padding: EdgeInsets.symmetric(horizontal: .9.rem, vertical: .7.rem))
           .flexbox(alignItems: AlignItems.center, justifyContent: JustifyContent.center, gap: Gap(column: .4.rem)),

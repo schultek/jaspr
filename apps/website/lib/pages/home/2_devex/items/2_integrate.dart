@@ -26,6 +26,7 @@ class Integrate extends StatelessComponent {
       ]),
       preview: div([
         CodeBlock(
+          scroll: false,
           source: '''
                 name: my_awesome_website
 

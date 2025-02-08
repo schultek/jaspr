@@ -49,6 +49,7 @@ class ThemeToggleState extends State<ThemeToggle> {
 
     yield button(
       classes: 'theme-toggle',
+      attributes: {'aria-label': 'Theme Toggle'},
       onClick: () {
         setState(() {
           isDark = !isDark;

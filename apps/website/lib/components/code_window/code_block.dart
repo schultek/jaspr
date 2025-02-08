@@ -7,15 +7,17 @@ import 'package:website/constants/theme.dart';
 class CodeBlock extends StatelessComponent {
   const CodeBlock({
     required this.source,
-    this.lineClasses = const {},
     this.selectable = false,
     this.language = 'dart',
+    this.scroll = true,
+    this.lineClasses = const {},
     super.key,
   });
 
   final String source;
   final bool selectable;
   final String language;
+  final bool scroll;
   final Map<int, String> lineClasses;
 
   @override
@@ -35,7 +37,7 @@ class CodeBlock extends StatelessComponent {
 
     yield div(classes: 'code-block', [
       pre([
-        code(classes: 'language-$language', [
+        code(classes: 'language-$language ${scroll ? 'scroll' : ''}', [
           span(classes: 'lines ${selectable ? 'selectable' : ''}', [
             for (var i = 0; i < lines.length; i++) ...[
               span(classes: 'line ${lineClasses[i] ?? ''}', [
@@ -71,17 +73,20 @@ class CodeBlock extends StatelessComponent {
               position: Position.absolute(left: Unit.zero),
             )
             .background(color: surfaceLow),
-        css('code')
+        css('code', [
+          css('&')
             .box(
               display: Display.inlineBlock,
               width: 100.percent,
-              overflow: Overflow.only(x: Overflow.scroll),
+              overflow: Overflow.only(x: Overflow.hidden),
               padding: EdgeInsets.only(top: 0.5.em, bottom: 0.5.em, right: 0.5.em),
               boxSizing: BoxSizing.borderBox,
             )
             .background(color: surfaceLowest)
             .text(align: TextAlign.start)
             .combine(jasprTheme['root']!),
+            css('&.scroll').box(overflow: Overflow.only(x: Overflow.scroll)),
+        ]),
         css('.lines', [
           css('&').box(display: Display.inlineBlock, minWidth: 100.percent),
           css('.line', [

@@ -71,8 +71,6 @@ final darkTheme = {
 
 // Typography
 
-final baseFont = Styles.text(
-    fontFamily: FontFamily.list([FontFamily('Inter'), FontFamilies.sansSerif]), fontWeight: FontWeight.w400);
 final monoFont = FontFamily.list([
   FontFamilies.uiMonospace,
   FontFamily('SFMono-Regular'),
@@ -104,14 +102,10 @@ const sectionPadding = Unit.variable('--sectionPadding');
 
 @css
 final root = [
-  css.import('font/inter.css'),
-  css.import('https://unpkg.com/lucide-static@latest/font/lucide.css'),
+  css.import('font/inter/inter.css'),
+  css.import('font/lucide/lucide.css'),
 
   // Global
-  css(':root').combine(baseFont),
-  css.supports('(font-variation-settings: normal)', [
-    css(':root').combine(baseFont).raw({'font-optical-sizing': 'auto'}),
-  ]),
   css('html, body').box(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
   css('html').background(color: background),
 

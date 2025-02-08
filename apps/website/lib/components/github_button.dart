@@ -43,7 +43,7 @@ class GithubButtonState extends State<GithubButton> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield a(href: 'https://github.com/schultek/jaspr', classes: 'github-button', [
+    yield a(href: 'https://github.com/schultek/jaspr', target: Target.blank, classes: 'github-button', [
       Icon('custom-github', size: 1.2.rem),
       div([
         span([text('schultek/jaspr')]),

@@ -2,9 +2,9 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:website/constants/theme.dart';
 
+import 'components/markdown_page.dart';
 import 'layout/footer.dart';
 import 'layout/header.dart';
-import 'layout/markdown_page.dart';
 import 'pages/home/home.dart';
 
 class App extends StatelessComponent {
@@ -23,7 +23,11 @@ class App extends StatelessComponent {
           Footer(),
         ]),
       ),
-      Route(path: '/terms', builder: (_, __) => MarkdownPage('lib/content/terms.md')),
+      Route(
+        path: '/terms',
+        title: 'Terms',
+        builder: (_, __) => MarkdownPage('lib/content/terms.md'),
+      ),
     ]);
   }
 
@@ -34,7 +38,7 @@ class App extends StatelessComponent {
     ),
     css('section').box(position: Position.relative()),
     css('#hero:before').combine(backgroundShade(40.vh, (-20).vw, w: 80.vw, h: 160.vh)),
-    css('#devexp:before').combine(backgroundShade(10.vh, 20.vw, w: 80.vw, h: 60.vh)),
+    css('#devex:before').combine(backgroundShade(10.vh, 20.vw, w: 80.vw, h: 60.vh)),
     css('#testimonials:before').combine(backgroundShade((-10).vh, (-10).vw, w: 60.vw, h: 60.vh)),
     css('#community:before').combine(backgroundShade(60.vh, 10.vw, w: 80.vw, b: (-20).vh)),
   ];

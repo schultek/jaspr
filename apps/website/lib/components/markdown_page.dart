@@ -4,8 +4,8 @@ import 'package:jaspr/jaspr.dart';
 import 'package:markdown/markdown.dart';
 
 import '../constants/theme.dart';
-import 'footer.dart';
-import 'header.dart';
+import '../layout/footer.dart';
+import '../layout/header.dart';
 
 class MarkdownPage extends StatelessComponent {
   const MarkdownPage(this.filename, {super.key});

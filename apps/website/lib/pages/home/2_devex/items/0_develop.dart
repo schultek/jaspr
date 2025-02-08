@@ -22,6 +22,7 @@ class Develop extends StatelessComponent {
             CodeWindow(
               name: 'counter.dart',
               framed: false,
+              scroll: false,
               source: '''
                 Iterable<Component> build(BuildContext context) sync* {
                   yield button(

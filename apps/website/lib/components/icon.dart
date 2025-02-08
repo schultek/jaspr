@@ -9,10 +9,10 @@ class Icon extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     if (name == 'jasper') {
-      yield img(src: 'images/jasper_icon.png', styles: Styles.box(height: size ?? 1.2.em));
+      yield img(src: 'images/jasper_icon.png', alt: 'jasper-icon', styles: Styles.box(height: size ?? 1.2.em));
       return;
     } else if (name == 'dart') {
-      yield img(src: 'images/dart_icon.png', styles: Styles.box(height: size ?? 1.2.em));
+      yield img(src: 'images/dart_icon.png', alt: 'dart-icon', styles: Styles.box(height: size ?? 1.2.em));
       return;
     }
     yield i(classes: 'icon-$name', styles: Styles.text(fontSize: size ?? 1.2.em), []);

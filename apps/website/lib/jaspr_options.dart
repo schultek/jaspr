@@ -9,13 +9,13 @@ import 'package:website/components/gradient_border.dart' as prefix3;
 import 'package:website/components/icon.dart' as prefix4;
 import 'package:website/components/link_button.dart' as prefix5;
 import 'package:website/components/logo.dart' as prefix6;
-import 'package:website/components/menu_button.dart' as prefix7;
-import 'package:website/components/particles.dart' as prefix8;
-import 'package:website/components/theme_toggle.dart' as prefix9;
-import 'package:website/constants/theme.dart' as prefix10;
-import 'package:website/layout/footer.dart' as prefix11;
-import 'package:website/layout/header.dart' as prefix12;
-import 'package:website/layout/markdown_page.dart' as prefix13;
+import 'package:website/components/markdown_page.dart' as prefix7;
+import 'package:website/components/menu_button.dart' as prefix8;
+import 'package:website/components/particles.dart' as prefix9;
+import 'package:website/components/theme_toggle.dart' as prefix10;
+import 'package:website/constants/theme.dart' as prefix11;
+import 'package:website/layout/footer.dart' as prefix12;
+import 'package:website/layout/header.dart' as prefix13;
 import 'package:website/pages/home/0_hero/components/install_command.dart' as prefix14;
 import 'package:website/pages/home/0_hero/components/meet_jaspr_button.dart' as prefix15;
 import 'package:website/pages/home/0_hero/components/overlay.dart' as prefix16;
@@ -54,7 +54,7 @@ import 'package:website/app.dart' as prefix32;
 /// ```
 final defaultJasprOptions = JasprOptions(
   clients: {
-    prefix12.Header: ClientTarget<prefix12.Header>('layout/header', params: _prefix12Header),
+    prefix13.Header: ClientTarget<prefix13.Header>('layout/header', params: _prefix13Header),
     prefix14.InstallCommand: ClientTarget<prefix14.InstallCommand>('pages/home/0_hero/components/install_command'),
     prefix15.MeetJasprButton: ClientTarget<prefix15.MeetJasprButton>('pages/home/0_hero/components/meet_jaspr_button'),
     prefix18.ModesAnimation: ClientTarget<prefix18.ModesAnimation>('pages/home/1_meet/components/modes_animation'),
@@ -69,13 +69,13 @@ final defaultJasprOptions = JasprOptions(
     ...prefix4.Icon.styles,
     ...prefix5.LinkButton.styles,
     ...prefix6.Logo.styles,
-    ...prefix7.MenuButton.styles,
-    ...prefix8.Particles.styles,
-    ...prefix9.ThemeToggleState.styles,
-    ...prefix10.root,
-    ...prefix11.Footer.styles,
-    ...prefix12.HeaderState.styles,
-    ...prefix13.MarkdownPage.styles,
+    ...prefix7.MarkdownPage.styles,
+    ...prefix8.MenuButton.styles,
+    ...prefix9.Particles.styles,
+    ...prefix10.ThemeToggleState.styles,
+    ...prefix11.root,
+    ...prefix12.Footer.styles,
+    ...prefix13.HeaderState.styles,
     ...prefix14.InstallCommandState.styles,
     ...prefix15.MeetJasprButtonState.styles,
     ...prefix16.OverlayState.styles,
@@ -97,4 +97,4 @@ final defaultJasprOptions = JasprOptions(
   ],
 );
 
-Map<String, dynamic> _prefix12Header(prefix12.Header c) => {'showHome': c.showHome};
+Map<String, dynamic> _prefix13Header(prefix13.Header c) => {'showHome': c.showHome};

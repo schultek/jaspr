@@ -10,7 +10,8 @@ void main() {
   );
 
   runApp(Document(
-    title: 'Jaspr Web Framework',
+    title: 'Jaspr | Dart Web Framework',
+    lang: 'en',
     body: App(),
   ));
 }

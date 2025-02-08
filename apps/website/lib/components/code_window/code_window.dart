@@ -13,6 +13,7 @@ class CodeWindow extends StatelessComponent {
     this.framed = true,
     this.lineClasses = const {},
     this.language = 'dart',
+    this.scroll = true,
     super.key,
   });
 
@@ -22,6 +23,7 @@ class CodeWindow extends StatelessComponent {
   final bool selectable;
   final bool framed;
   final String language;
+  final bool scroll;
   final Map<int, String> lineClasses;
 
   @override
@@ -46,6 +48,7 @@ class CodeWindow extends StatelessComponent {
           selectable: selectable,
           lineClasses: lineClasses,
           language: language,
+          scroll: scroll
         ),
       ]),
     ]);

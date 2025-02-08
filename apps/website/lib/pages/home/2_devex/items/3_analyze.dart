@@ -23,6 +23,7 @@ class Analyze extends StatelessComponent {
             CodeWindow(
               name: 'app.dart',
               framed: false,
+              scroll: false,
               source: '''
                 class App extends StatelessComponent {
                   const App({super.key});
@@ -69,7 +70,7 @@ class Analyze extends StatelessComponent {
         css('&').background(color: primaryFaded),
       ]),
       css('& > div > div', [
-        css('&').box(position: Position.relative()).raw({'pointer-events': 'none'}),
+        css('&').box(position: Position.relative()),
       ]),
       css('.quick-actions', [
         css('&')

@@ -38,7 +38,11 @@ class Hero extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('#hero', [
       css('&')
-          .box(minHeight: 100.vh, padding: EdgeInsets.symmetric(horizontal: contentPadding, vertical: 4.rem))
+          .box(
+            minHeight: 100.vh,
+            padding: EdgeInsets.only(left: contentPadding, right: contentPadding, top: 8.rem, bottom: 4.rem),
+            boxSizing: BoxSizing.borderBox,
+          )
           .flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center)
           .text(align: TextAlign.center),
       css('& > div').box(maxWidth: 45.rem).flexbox(
@@ -51,5 +55,8 @@ class Hero extends StatelessComponent {
           .box(margin: EdgeInsets.only(top: 2.rem))
           .flexbox(direction: FlexDirection.column, alignItems: AlignItems.center),
     ]),
+    css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
+      css('#hero').box(minHeight: 95.vh),
+    ])
   ];
 }
