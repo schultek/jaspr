@@ -39,7 +39,7 @@ class CodeWindow extends StatelessComponent {
           div(classes: 'code-window-tab inactive', [
             if (inactiveName!.endsWith('.dart')) Icon('dart'),
             if (inactiveName!.endsWith('.yaml')) Icon('file-json-2', size: 1.em),
-            span(classes: 'code-window-title', [text(inactiveName!)]),
+            span(classes: 'code-window-title mono', [text(inactiveName!)]),
           ]),
       ]),
       div(classes: 'code-window-body', [
@@ -95,7 +95,7 @@ class CodeWindow extends StatelessComponent {
               .flexItem(flex: Flex(grow: 1))
               .raw({'max-width': 'fit-content'}),
         ]),
-        css('.code-window-title').text(fontFamily: monoFont, fontWeight: FontWeight.w400, fontSize: 0.9.rem),
+        css('.code-window-title').text(fontWeight: FontWeight.w400, fontSize: 0.9.rem),
       ]),
       css('.code-window-body', [
         css('&')

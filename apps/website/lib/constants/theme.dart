@@ -71,17 +71,6 @@ final darkTheme = {
 
 // Typography
 
-final monoFont = FontFamily.list([
-  FontFamilies.uiMonospace,
-  FontFamily('SFMono-Regular'),
-  FontFamily('Menlo'),
-  FontFamily('Monaco'),
-  FontFamily('Consolas'),
-  FontFamily('Liberation Mono'),
-  FontFamily('Courier New'),
-  FontFamilies.monospace
-]);
-
 final bodySmall = Styles.text(fontSize: 0.875.rem, fontWeight: FontWeight.w400, lineHeight: 1.3.em, color: textDim);
 final bodyMedium = Styles.text(fontSize: 1.rem, fontWeight: FontWeight.w400, lineHeight: 1.6.em, color: textDark);
 final bodyLarge = Styles.text(fontSize: 1.1.rem, fontWeight: FontWeight.w400, lineHeight: 1.7.em, color: textDark);
@@ -102,15 +91,15 @@ const sectionPadding = Unit.variable('--sectionPadding');
 
 @css
 final root = [
-  css.import('font/inter/inter.css'),
   css.import('font/lucide/lucide.css'),
 
   // Global
   css('html, body').box(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
-  css('html').background(color: background),
+  css('html')
+      .text(fontFamily: FontFamily.list([FontFamilies.uiSansSerif, FontFamilies.systemUi, FontFamilies.sansSerif]))
+      .background(color: background),
 
   // Theme
-
   css(':root').raw({
     for (final color in lightTheme.keys) color.value.substring(4, color.value.length - 1): lightTheme[color]!.value,
     '--contentPadding': '4rem',
@@ -168,7 +157,16 @@ final root = [
   css('b').text(fontWeight: FontWeight.w500),
 
   css('code, pre, .mono').text(
-    fontFamily: monoFont,
+    fontFamily: FontFamily.list([
+      FontFamilies.uiMonospace,
+      FontFamily('SFMono-Regular'),
+      FontFamily('Menlo'),
+      FontFamily('Monaco'),
+      FontFamily('Consolas'),
+      FontFamily('Liberation Mono'),
+      FontFamily('Courier New'),
+      FontFamilies.monospace
+    ]),
     fontSize: 0.875.rem,
     lineHeight: 1.4.em,
   ),
