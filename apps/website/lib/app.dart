@@ -44,7 +44,12 @@ class App extends StatelessComponent {
   ];
 
   static Styles backgroundShade(Unit top, Unit left, {Unit? w, Unit? h, Unit? b, Unit? r}) {
-    return Styles.raw({'content': '""', 'filter': 'blur(64px)', 'background': primaryGradient}).box(
+    return Styles.raw({
+      'content': '""',
+      'filter': 'blur(64px)',
+      '-webkit-filter': 'blur(64px)',
+      'background': primaryGradient,
+    }).box(
       position: Position.absolute(top: top, left: left, right: r, bottom: b, zIndex: ZIndex(-1)),
       radius: BorderRadius.circular(100.percent),
       width: w,

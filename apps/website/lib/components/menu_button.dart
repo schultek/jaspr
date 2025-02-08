@@ -12,7 +12,11 @@ class MenuButton extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield button(classes: 'menu-toggle', attributes: {'aria-label': 'Menu Toggle'}, onClick: onClick, [Icon(child != null ? 'x' : 'menu')]);
+    yield button(
+        classes: 'menu-toggle',
+        attributes: {'aria-label': 'Menu Toggle'},
+        onClick: onClick,
+        [Icon(child != null ? 'x' : 'menu')]);
     if (child != null) {
       yield div(classes: 'menu-overlay', [child!]);
     }
@@ -45,7 +49,10 @@ class MenuButton extends StatelessComponent {
             alignItems: AlignItems.center,
             gap: Gap(row: 4.rem),
           )
-          .raw({'backdrop-filter': 'blur(5px)'}),
+          .raw({
+        'backdrop-filter': 'blur(5px)',
+        '-webkit-backdrop-filter': 'blur(5px)',
+      }),
       css('nav', [
         css('&')
             .flexbox(direction: FlexDirection.column, gap: Gap(row: 2.rem), alignItems: AlignItems.center)

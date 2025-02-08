@@ -26,13 +26,13 @@ class Footer extends StatelessComponent {
               a(href: '/', classes: 'animated-underline', [text('Home')])
             ]),
             li([
-              a(href: 'https://github.com/schultek/jaspr', classes: 'animated-underline', [text('Github')])
-            ]),
-            li([
               a(href: 'https://docs.page/schultek/jaspr', classes: 'animated-underline', [text('Docs')])
             ]),
             li([
-              a(href: 'https://jasprpad.schultek.de', classes: 'animated-underline', [text('Playground')])
+              a(href: 'https://playground.jaspr.site', classes: 'animated-underline', [text('Playground')])
+            ]),
+            li([
+              a(href: 'https://github.com/schultek/jaspr', classes: 'animated-underline', [text('Github')])
             ]),
           ]),
         ]),
@@ -40,17 +40,25 @@ class Footer extends StatelessComponent {
           h5([text('Community')]),
           ul([
             li([
-              a(href: 'https://discord.gg/XGXrGEk4c6', target: Target.blank, classes: 'animated-underline', [text('Discord')])
+              a(
+                  href: 'https://discord.gg/XGXrGEk4c6',
+                  target: Target.blank,
+                  classes: 'animated-underline',
+                  [text('Discord')])
             ]),
             li([
               a(
                   href: 'https://docs.page/schultek/jaspr/going_further/contributing',
-                  target: Target.blank, 
+                  target: Target.blank,
                   classes: 'animated-underline',
                   [text('Contribute')])
             ]),
             li([
-              a(href: 'https://github.com/sponsors/schultek/', target: Target.blank, classes: 'animated-underline', [text('Sponsor')])
+              a(
+                  href: 'https://github.com/sponsors/schultek/',
+                  target: Target.blank,
+                  classes: 'animated-underline',
+                  [text('Sponsor')])
             ]),
           ]),
         ]),
@@ -68,7 +76,10 @@ class Footer extends StatelessComponent {
       ]),
       div(classes: 'footer-banner', [
         text('Copyright © 2025 Jaspr | '),
-        a(href: 'https://github.com/schultek/jaspr/blob/main/LICENSE', classes: 'animated-underline', [raw('MIT&nbsp;License')]),
+        a(
+            href: 'https://github.com/schultek/jaspr/blob/main/LICENSE',
+            classes: 'animated-underline',
+            [raw('MIT&nbsp;License')]),
         raw(' | Built&nbsp;with&nbsp;Jaspr&nbsp;(obviously)'),
       ]),
     ]);

@@ -12,45 +12,29 @@ class Testimonials extends StatelessComponent {
       h2([text('Trusted by '), br(), text('Dart Experts')]),
       div(classes: 'testimonials-grid', [
         TestimonialCard(
-          quote: 'I chose Jaspr to build a landing page for my business because Flutter has poor SEO performance. What impressed me the most is the ability to do everything in Dart instead of JavaScript. The support for hydration, server-side rendering, and built-in Tailwind integration blew me away. I\'ve been using Jaspr since version 0.10.0, and it keeps getting better with every release. The community Kilian built around it is super passionate, and I can\'t wait for it to become the de-facto standard for building web experiences with Dart.',
+          quote:
+              'Jaspr is an amazing usage of Dart\'s web stack and a compliment to Flutter web. It\'s a great place to start if you want to use HTML and CSS with Dart.',
+          name: 'Kevin Moore',
+          position: 'Product Manager for Dart and Flutter at Google',
+          picture: 'https://avatars.githubusercontent.com/u/17034?v=4',
+          link: 'https://kevmoo.com/',
+        ),
+        TestimonialCard(
+          quote:
+              'I chose Jaspr to build a landing page for my business because Flutter has poor SEO performance. What impressed me the most is the ability to do everything in Dart instead of JavaScript. The support for hydration, server-side rendering, and built-in Tailwind integration blew me away. I\'ve been using Jaspr since version 0.10.0, and it keeps getting better with every release. The community Kilian built around it is super passionate, and I can\'t wait for it to become the de-facto standard for building web experiences with Dart.',
           name: 'Dinko Marinac',
           position: 'Flutter Freelancer and Consultant',
           picture: 'https://avatars.githubusercontent.com/u/1454449?v=4',
           link: 'https://www.linkedin.com/in/dinko-marinac/',
         ),
         TestimonialCard(
-          quote: 'I\'ve been using Jaspr with Tailwind CSS to build sites like course.temiajiboye.com, temiajiboye.com, and flutteryeg.com, and I\'ve been really impressed. The SSR support and component-based approach make it feel like Flutter for the web, but with the flexibility of Dart. It’s smooth, efficient, and just makes sense. If you\'re into Dart and want to build modern web apps, definitely give Jaspr a try!',
+          quote:
+              'I\'ve been using Jaspr with Tailwind CSS to build sites like course.temiajiboye.com, temiajiboye.com, and flutteryeg.com, and I\'ve been really impressed. The SSR support and component-based approach make it feel like Flutter for the web, but with the flexibility of Dart. It\'s smooth, efficient, and just makes sense. If you\'re into Dart and want to build modern web apps, definitely give Jaspr a try!',
           name: 'Temi Ajiboye',
           position: 'Flutter Developer',
           picture: 'https://pbs.twimg.com/profile_images/1638555966105894916/jhdtN6oQ_400x400.jpg',
           link: 'http://temiajiboye.com',
         ),
-        // Three more dummy testimonials from imaginary people with dummy quotes
-        TestimonialCard(
-          quote: 'Jaspr is great for building websites with Dart. I love the simplicity of the framework and how it allows me to use my existing Flutter knowledge to build websites. The built-in Tailwind CSS support is a game-changer, and the hydration and server-side rendering features are a huge plus. I\'ve been using Jaspr for a few months now and can\'t wait to see where it goes in the future.',
-          name: 'John Doe',
-          position: 'Flutter Developer',
-          picture: 'https://placehold.co/400',
-          link: 'https://example.com',
-        ),
-        TestimonialCard(
-          quote: 'I\'ve been using Jaspr for a few weeks now and I\'m loving it. I can\'t wait to see what the future holds for Jaspr and the Dart ecosystem.',
-          name: 'Jane Doe',
-          position: 'Web Developer',
-          picture: 'https://placehold.co/400',
-          link: 'https://example.com',
-        ),
-        TestimonialCard(
-          quote: 'Jaspr is the best web framework for Dart developers. I love how easy it is to build websites with Dart and how it allows me to use my existing Flutter knowledge. The built-in Tailwind CSS support is fantastic, and the hydration and server-side rendering features are a huge plus. ',
-          name: 'John Smith',
-          position: 'Flutter Developer',
-          picture: 'https://placehold.co/400',
-          link: 'https://example.com',
-        ),
-        
-
-
-
       ]),
     ]);
   }

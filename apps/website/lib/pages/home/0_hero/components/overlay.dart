@@ -92,7 +92,12 @@ class OverlayState extends State<Overlay> {
             alignItems: AlignItems.center,
             justifyContent: JustifyContent.center,
           )
-          .raw({'backdrop-filter': 'blur(5px)', 'user-select': 'none'}),
+          .raw({
+        'backdrop-filter': 'blur(5px)',
+        '-webkit-backdrop-filter': 'blur(5px)',
+        'user-select': 'none',
+        '-webkit-user-select': 'none',
+      }),
       css('img', [
         css('&')
             .box(maxWidth: 80.percent, maxHeight: 80.percent, radius: BorderRadius.circular(20.px))

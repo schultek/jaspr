@@ -131,6 +131,10 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
 class ProgressNotifier extends ValueNotifier<double> {
   ProgressNotifier() : super(0);
 
+  final isSafari = kIsWeb && RegExp(r'^((?!chrome|android).)*safari', caseSensitive: false) //
+      .hasMatch(web.window.navigator.userAgent);
+  late final scaleFactor = isSafari ? 2 : 1;
+
   bool get done => value >= 100;
 
   int get progressAfterCliff => done ? 100 : max((value - 2) / 0.98, 0).round();
@@ -153,7 +157,7 @@ class ProgressNotifier extends ValueNotifier<double> {
     if (linear) {
       value += v;
     } else {
-      value += v * min(0.9, (1.4 - value / 100));
+      value += v * min(1, (1.7 - value / 100)) * scaleFactor;
     }
 
     if (done) {
@@ -161,7 +165,7 @@ class ProgressNotifier extends ValueNotifier<double> {
     }
 
     if (progressAfterCliff > 0) {
-      if (particleCooldown > 1) {
+      if (particleCooldown > 2) {
         particleCooldown = 0;
       }
       if (particleCooldown == 0) {

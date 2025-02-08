@@ -17,6 +17,6 @@ class Logo extends StatelessComponent {
     css('.logo')
         .flexbox(alignItems: AlignItems.center, gap: Gap(column: 0.5.rem))
         .text(fontSize: 1.8.rem, fontWeight: FontWeight.w600, color: textBlack)
-        .raw({'user-select': 'none'}),
+        .raw({'user-select': 'none', '-webkit-user-select': 'none'}),
   ];
 }

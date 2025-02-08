@@ -57,7 +57,7 @@ class HeaderState extends State<Header> {
       nav([
         if (component.showHome) a(href: '/', classes: 'animated-underline', [text("Home")]),
         a(href: "https://docs.page/schultek/jaspr", classes: 'animated-underline', [text("Docs")]),
-        a(href: "https://jasprpad.schultek.de", classes: 'animated-underline', [text("Playground")]),
+        a(href: "https://playground.jaspr.site", classes: 'animated-underline', [text("Playground")]),
         a(href: "https://github.com/sponsors/schultek/", classes: 'animated-underline', [text("Sponsor")]),
       ]),
       div(classes: 'header-actions', [

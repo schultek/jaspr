@@ -156,7 +156,8 @@ final root = [
   css('a').text(decoration: TextDecoration.none, color: textDark),
   css('b').text(fontWeight: FontWeight.w500),
 
-  css('code, pre, .mono').text(
+  css('code, pre, .mono')
+      .text(
     fontFamily: FontFamily.list([
       FontFamilies.uiMonospace,
       FontFamily('SFMono-Regular'),
@@ -169,7 +170,8 @@ final root = [
     ]),
     fontSize: 0.875.rem,
     lineHeight: 1.4.em,
-  ),
+  )
+      .raw({'-webkit-text-size-adjust': '100%'}),
 
   // Animated underline
   css('.animated-underline', [

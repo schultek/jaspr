@@ -5,7 +5,8 @@ import 'package:website/constants/theme.dart';
 import 'icon.dart';
 
 class LinkButton extends StatelessComponent {
-  const LinkButton._({this.label, required this.icon, required this.to, required this.style, this.target, this.ariaLabel});
+  const LinkButton._(
+      {this.label, required this.icon, required this.to, required this.style, this.target, this.ariaLabel});
 
   final String? label;
   final String? icon;
@@ -53,8 +54,11 @@ class LinkButton extends StatelessComponent {
         cursor: Cursor.pointer,
         transition: Transition('background', duration: 300),
       )
-          .raw({'user-select': 'none', '-webkit-tap-highlight-color': 'transparent'}).text(
-              decoration: TextDecoration.none, fontSize: .9.rem),
+          .raw({
+        'user-select': 'none',
+        '-webkit-user-select': 'none',
+        '-webkit-tap-highlight-color': 'transparent',
+      }).text(decoration: TextDecoration.none, fontSize: .9.rem),
       css('.link-button-content')
           .box(padding: EdgeInsets.symmetric(horizontal: .9.rem, vertical: .7.rem))
           .flexbox(alignItems: AlignItems.center, justifyContent: JustifyContent.center, gap: Gap(column: .4.rem)),
@@ -66,7 +70,12 @@ class LinkButton extends StatelessComponent {
               shadow: BoxShadow(offsetX: 1.px, offsetY: 1.px, blur: 5.px, color: shadowColor2),
             ),
         css('&:after')
-            .raw({'content': '""', 'filter': 'blur(5px)'})
+            .raw({
+              'content': '""',
+              'filter': 'blur(5px)',
+              '-webkit-filter': 'blur(5px)',
+              'background': primaryGradient,
+            })
             .box(
               display: Display.block,
               position: Position.absolute(left: 1.rem, right: (-2).px, bottom: (-2).px, zIndex: ZIndex(-1)),
