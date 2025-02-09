@@ -1,0 +1,50 @@
+{
+  "name": "Jaspr",
+  "description": "A web project template for Jaspr",
+  "icon": "https://github.com/schultek/jaspr/blob/main/assets/jaspr_icon.png",
+  "categories": [
+    "Jaspr",
+    "Web app"
+  ],
+  "publisher": "Kilian Schulte",
+  "params": [
+    {
+      "id": "mode",
+      "name": "Rendering Mode",
+      "type": "enum",
+      "default": "static",
+      "options": {
+        "static": "Static Site (Recommended)",
+        "server": "Server Rendered Site",
+        "client": "Single Page Application"
+      },
+      "required": true
+    },
+    {
+      "id": "routing",
+      "name": "Routing Strategy",
+      "type": "enum",
+      "default": "multi-page",
+      "options": {
+        "multi-page": "Multi-page routing.",
+        "single-page": "Single-page routing.",
+        "none": "No routing."
+      },
+      "required": false
+    },
+    {
+      "id": "flutter",
+      "name": "Setup Flutter Embedding",
+      "type": "boolean",
+      "default": "false",
+      "required": false
+    },
+    {
+      "id": "plugins",
+      "name": "Enable support for Flutter web plugins",
+      "type": "boolean",
+      "default": "false",
+      "required": false
+    }
+  ]
+}
