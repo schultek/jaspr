@@ -1,4 +1,4 @@
-![Banner](/assets/banner.png)
+[![Banner](/assets/banner.png)](https://jaspr.site)
 
 <p align="center">
   <a href="https://github.com/sponsors/schultek"><img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white" alt="sponsor"></a>
@@ -14,10 +14,10 @@
 </p>
 
 <p align="center">
+  <a href="https://jaspr.site">Website</a> •
   <a href="https://docs.jaspr.site/get_started/installation">Quickstart</a> •
   <a href="https://docs.jaspr.site">Documentation</a> •
   <a href="https://playground.jaspr.site">Playground</a> •
-  <a href="https://github.com/schultek/jaspr/tree/main/examples/">Examples</a> •
   <a href="https://discord.gg/XGXrGEk4c6">Community & Support</a> •
   <a href="https://jaspr-benchmarks.web.app">Benchmarks</a>
 </p>
