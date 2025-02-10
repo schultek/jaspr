@@ -4,7 +4,7 @@ class _GridStyles extends Styles {
   const _GridStyles({this.template, this.gap, this.autoRows, this.autoColumns}) : super._();
 
   final GridTemplate? template;
-  final GridGap? gap;
+  final Gap? gap;
   final List<TrackSize>? autoRows;
   final List<TrackSize>? autoColumns;
 
@@ -14,5 +14,6 @@ class _GridStyles extends Styles {
         ...?template?.styles,
         if (autoRows != null) 'grid-auto-rows': autoRows!.map((s) => s.value).join(' '),
         if (autoColumns != null) 'grid-auto-columns': autoColumns!.map((s) => s.value).join(' '),
+        ...?gap?.styles,
       };
 }

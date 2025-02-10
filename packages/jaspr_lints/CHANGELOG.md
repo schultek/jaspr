@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Update logo and website links.
+
 ## 0.2.0
 
 - Updated `custom_lint` to `^0.7.0`

@@ -1,4 +1,4 @@
-![Banner](https://github.com/schultek/jaspr/raw/main/assets/jaspr_banner.png)
+![Banner](https://raw.githubusercontent.com/schultek/jaspr/main/assets/banner.png)
 
 <p align="center">
   <a href="https://pub.dev/packages/jaspr"><img src="https://img.shields.io/pub/v/jaspr?label=pub.dev&labelColor=333940&logo=dart&color=00589B" alt="pub"></a>
@@ -10,11 +10,11 @@
 </p>
 
 <p align="center">
-  <a href="https://docs.page/schultek/jaspr/get_started/installation">Quickstart</a> •
-  <a href="https://docs.page/schultek/jaspr">Documentation</a> •
-  <a href="https://jasprpad.schultek.de">Playground</a> •
+  <a href="https://jaspr.site">Website</a> •
+  <a href="https://docs.jaspr.site/get_started/installation">Quickstart</a> •
+  <a href="https://docs.jaspr.site">Documentation</a> •
+  <a href="https://playground.jaspr.site">Playground</a> •
   <a href="https://github.com/schultek/jaspr/tree/main/examples/">Examples</a> •
-  <a href="https://discord.gg/XGXrGEk4c6">Community & Support</a> •
   <a href="https://jaspr-benchmarks.web.app">Benchmarks</a>
 </p>
 
@@ -34,7 +34,7 @@
   web framework written completely in Dart.
 
 > Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of
-> developers around Jaspr and check out the [Contributing Guide](https://docs.page/schultek/jaspr/eco/contributing).
+> developers around Jaspr and check out the [Contributing Guide](https://docs.jaspr.site/going_further/contributing).
 
 ### Core Features
 
@@ -50,7 +50,7 @@
 
 Inspired by DartPad, **Jaspr** has it's own online editor and playground, called **JasprPad**.
 
-[Check it out here!](https://jasprpad.schultek.de)
+[Check it out here!](https://playground.jaspr.site)
 
 You can check out the samples, take the tutorial or try out jaspr for yourself, all live in the browser.
 When you want to continue coding offline, you can quickly download the current files bundled in a complete dart project, ready to start coding locally.
@@ -116,7 +116,7 @@ div([
 ]);
 ```
 
-[Check the Docs for more](https://docs.page/schultek/jaspr)
+[Check the Docs for more](https://docs.jaspr.site)
 
 ## Differences to Flutter(-Web)
 
@@ -152,7 +152,7 @@ Rather it embraces these differences to give the best of both worlds.
    
    *Trade-Off: Providing styled components would be a lot of extra work and is currently not feasible.
     Also there exist a lot of different, well established CSS frameworks for web that you can already
-    integrate and use with jaspr (e.g. [Bulma](https://jasprpad.schultek.de/?sample=bulma).*
+    integrate and use with jaspr (e.g. [Bulma](https://playground.jaspr.site/?sample=bulma).*
    
 3. `Text` receives only a `String` and nothing else. As usual for web, styling is done through a combination
    of CSS attributes, either in a **Stylesheet** or though the **`style` attribute** of the parent elements. 
@@ -205,5 +205,5 @@ void main() {
 ```
 
 For more examples on how to use the testing package, check out the 
-[documentation](https://docs.page/schultek/jaspr/concepts/testing) and the 
+[documentation](https://docs.jaspr.site/concepts/testing) and the 
 [tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/packages/jaspr/test).

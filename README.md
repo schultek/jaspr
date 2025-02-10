@@ -1,4 +1,4 @@
-![Banner](/assets/jaspr_banner.png)
+[![Banner](/assets/banner.png)](https://jaspr.site)
 
 <p align="center">
   <a href="https://github.com/sponsors/schultek"><img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white" alt="sponsor"></a>
@@ -14,10 +14,10 @@
 </p>
 
 <p align="center">
-  <a href="https://docs.page/schultek/jaspr/get_started/installation">Quickstart</a> •
-  <a href="https://docs.page/schultek/jaspr">Documentation</a> •
-  <a href="https://jasprpad.schultek.de">Playground</a> •
-  <a href="https://github.com/schultek/jaspr/tree/main/examples/">Examples</a> •
+  <a href="https://jaspr.site">Website</a> •
+  <a href="https://docs.jaspr.site/get_started/installation">Quickstart</a> •
+  <a href="https://docs.jaspr.site">Documentation</a> •
+  <a href="https://playground.jaspr.site">Playground</a> •
   <a href="https://discord.gg/XGXrGEk4c6">Community & Support</a> •
   <a href="https://jaspr-benchmarks.web.app">Benchmarks</a>
 </p>
@@ -34,7 +34,7 @@
   web framework written completely in Dart.
 
 > Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of
-> developers around Jaspr and check out the [Contributing Guide](https://docs.page/schultek/jaspr/going_further/contributing).
+> developers around Jaspr and check out the [Contributing Guide](https://docs.jaspr.site/going_further/contributing).
 
 ### Core Features
 
@@ -50,7 +50,7 @@
 
 Inspired by DartPad, **Jaspr** has it's own online editor and playground, called **JasprPad**.
 
-[Check it out here!](https://jasprpad.schultek.de)
+[Check it out here!](https://playground.jaspr.site)
 
 You can check out the samples, take the tutorial or try out jaspr for yourself, all live in the browser.
 When you want to continue coding offline, you can quickly download the current files bundled in a complete dart project, ready to start coding locally.
@@ -76,13 +76,13 @@ Instead of trying to mirror every little thing from Flutter, `jaspr` tries to gi
 by matching features where it makes sense without compromising on the unique properties of the web platform.
 Rather it embraces these differences to give the best of both worlds.
 
-[More](https://docs.page/schultek/jaspr/jaspr-vs-flutter-web)
+[More](https://docs.jaspr.site/jaspr-vs-flutter-web)
 
 ## Directories
 
 - **/apps**: Production apps built with jaspr
   - **/jaspr_pad**: Online Editor and Playground inspired by DartPad, built with jaspr.
-- **/docs**: Documentation hosted at [docs.page/schultek/jaspr](https://docs.page/schultek/jaspr)
+- **/docs**: Documentation hosted at [docs.jaspr.site](https://docs.jaspr.site)
 - **/examples**: Well-maintained and documented examples
 - **/experiments**: Experimental apps or features, that are not part of the core framework (yet?) (may be broken).
 - **/packages**:

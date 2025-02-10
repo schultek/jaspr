@@ -1,9 +1,9 @@
 name: jaspr_lints
 description: A collection of lints and assists for jaspr projects.
 version: 0.2.0
-homepage: https://github.com/schultek/jaspr
+homepage: https://jaspr.site
 issue_tracker: https://github.com/schultek/jaspr/issues
-documentation: https://docs.page/schultek/jaspr/get_started/linting
+documentation: https://docs.jaspr.site/get_started/linting
 funding:
   - https://github.com/sponsors/schultek
 

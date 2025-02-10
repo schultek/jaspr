@@ -32,9 +32,9 @@ class Home extends StatelessComponent {
         a(href: "https://github.com/serverpod/serverpod", [text("Github")]),
       ]),
       div(classes: "link-box", [
-        a(href: "https://docs.page/schultek/jaspr", [text("Jaspr")]),
+        a(href: "https://docs.jaspr.site", [text("Jaspr")]),
         text('•'),
-        a(href: "https://docs.page/schultek/jaspr/quick-start", [text("Get Started")]),
+        a(href: "https://docs.jaspr.site/quick-start", [text("Get Started")]),
         text('•'),
         a(href: "https://github.com/schultek/jaspr", [text("Github")]),
       ])
