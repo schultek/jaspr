@@ -1,6 +1,6 @@
 name: jaspr_router
 description: A routing component for jaspr.
-version: 0.6.1
+version: 0.6.2
 homepage: https://jaspr.site
 issue_tracker: https://github.com/schultek/jaspr/issues
 documentation: https://docs.jaspr.site/concepts/routing
@@ -15,7 +15,7 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  jaspr: ^0.17.0
+  jaspr: ^0.17.1
   web: ^1.0.0
 
 dev_dependencies:

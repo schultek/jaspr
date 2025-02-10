@@ -1,6 +1,6 @@
 name: jaspr_pad
 description: Dartpad inspired online-editor for jaspr built with jaspr.
-version: 0.1.4
+version: 0.1.5
 publish_to: none
 
 environment:
@@ -15,8 +15,8 @@ dependencies:
   googleapis: ^12.0.0
   googleapis_auth: ^1.4.1
   http: ^1.1.2
-  jaspr: ^0.15.1
-  jaspr_riverpod: ^0.3.14
+  jaspr: ^0.17.1
+  jaspr_riverpod: ^0.3.18
   js: ^0.6.5
   markdown: ^7.1.1
   mdc_web: ^0.6.0
