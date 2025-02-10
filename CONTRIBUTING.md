@@ -3,14 +3,14 @@
 ## New contributor guide
 
 To get an overview of the project, read the [README](README.md) 
-and [Documentation](https://docs.page/schultek/jaspr).
+and [Documentation](https://docs.jaspr.site).
 
 ## What to contribute
 
 We welcome all contributions to the project, however some contributions are better suited 
 for new contributors or easier to get accepted.
 
-Read [Contributing Docs](https://docs.page/schultek/jaspr) for some guidance on the types
+Read [Contributing Docs](https://docs.jaspr.site/going_further/contributing) for some guidance on the types
 of possible contributions.
 
 ## Issues

@@ -56,7 +56,7 @@ For readability, it is recommended to put the list of child components last in t
 `div(id: "main", [text('Hello World')])` is more readable than `div([text('Hello World')], id: "main")`.
 In case of no children specify an empty list (`[]`). Some tags also omit this parameter, like `img`.
 
-[Try it out on JasprPad](https://jasprpad.schultek.de/?sample=html)
+[Try it out on JasprPad](https://playground.jaspr.site/?sample=html)
 
 ---
 
@@ -83,12 +83,12 @@ Finally, here are some more examples of this syntax. You can switch between the 
 <CodeGroup title="Anchor with an image">
   ```dart
     a(href: "https://github.com/schultek/jaspr", target: Target.blank, [
-      img(src: "https://jasprpad.schultek.de/jaspr-192.png"),
+      img(src: "https://playground.jaspr.site/jaspr-192.png"),
     ])
   ```
   ```html
     <a href="https://github.com/schultek/jaspr" target="_blank">
-      <img src="https://jasprpad.schultek.de/jaspr-192.png" />
+      <img src="https://playground.jaspr.site/jaspr-192.png" />
     </a>
   ```
 </CodeGroup>

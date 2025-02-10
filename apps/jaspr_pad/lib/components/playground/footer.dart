@@ -13,7 +13,7 @@ class PlaygroundFooter extends StatelessComponent {
       //     [text('keyboard')],
       //   ),
       div(classes: 'footer-item', [
-        a(href: 'https://docs.page/schultek/jaspr', target: Target.blank, classes: 'footer-item', [
+        a(href: 'https://docs.jaspr.site', target: Target.blank, classes: 'footer-item', [
           text('Jaspr Docs'),
         ]),
         a(href: 'https://discord.gg/XGXrGEk4c6', target: Target.blank, classes: 'footer-item', [

@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Update logo and website links.
+
 ## 0.3.1
 
 - Fixed execution of tailwind cli by adding `runInShell: true`.

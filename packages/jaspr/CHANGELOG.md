@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Update logo and website links.
+
 ## 0.17.0
 
 
@@ -400,7 +404,7 @@
 
 - Added support for Tailwind using the `jaspr_tailwind` integration.  
   Simply run `dart pub add jaspr_tailwind --dev` and start using tailwind classes in your Jaspr components.  
-  For a full setup and usage guide see [Tailwind Integration Docs](https://docs.page/schultek/jaspr/eco/tailwind).
+  For a full setup and usage guide see [Tailwind Integration Docs](https://docs.jaspr.site/eco/tailwind)
 
 ## 0.7.0
 
@@ -421,7 +425,7 @@
 ## 0.6.2
 
 - Added integrated support for seamless **flutter element embedding**.
-  Refer to [Flutter Embedding Docs](https://docs.page/schultek/jaspr/going_further/flutter_embedding) on how to setup and use this.
+  Refer to [Flutter Embedding Docs](https://docs.jaspr.site/going_further/flutter_embedding) on how to setup and use this.
 
 ## 0.6.1
 

@@ -23,7 +23,7 @@ class App extends StatelessComponent {
       ]),
       // some elements have typed attributes for easy access
       a(href: "https://github.com/schultek/jaspr", target: Target.blank, [
-        img(src: "https://jasprpad.schultek.de/jaspr-192.png"),
+        img(src: "https://playground.jaspr.site/jaspr-192.png"),
       ]),
       // some elements don't have children
       hr(),

@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Update logo and website links.
+
 ## 0.4.3
 
 - `jaspr` upgraded to `0.17.0`

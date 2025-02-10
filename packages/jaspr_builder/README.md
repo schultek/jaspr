@@ -14,7 +14,7 @@ dart pub add jaspr_builder --dev
 
 Builder for automatic setup of client components.
 
-View [client components](https://docs.page/schultek/jaspr/core/app#client-components) for documentation.
+View [client components](https://docs.jaspr.site/core/app#client-components) for documentation.
 
 ## @Import
 
