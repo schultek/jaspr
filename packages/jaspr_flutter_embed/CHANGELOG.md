@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.4.4
 
 - Update logo and website links.
 
