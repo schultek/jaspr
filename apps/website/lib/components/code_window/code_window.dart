@@ -33,7 +33,7 @@ class CodeWindow extends StatelessComponent {
         div(classes: 'code-window-tab', [
           if (name.endsWith('.dart')) Icon('dart'),
           if (name.endsWith('.yaml')) Icon('file-json-2', size: 1.em),
-          span(classes: 'code-window-title', [text(name)]),
+          span(classes: 'code-window-title mono', [text(name)]),
         ]),
         if (inactiveName != null)
           div(classes: 'code-window-tab inactive', [
