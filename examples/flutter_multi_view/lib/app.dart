@@ -40,7 +40,7 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield div(classes: 'main', [
-      img(src: 'images/logo.png', width: 80),
+      img(src: 'images/logo.svg', width: 80),
       div(classes: 'buttons', [
         button(
           onClick: () {
