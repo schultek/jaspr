@@ -39,49 +39,55 @@ to fall back to using a normal `Map` of event names to callbacks.
 
 It has bindings to the following events:
 
-### onClick
+<Property name="onClick" type="void Function()" optional>
+  The `onClick` handler binds to the `click` event and receives no parameters.
+</Property>
 
-The `onClick` handler binds to the `click` event and is a callback with no parameters.
+---
 
-### onInput
+<Property name="onInput" type="void Function(T value)" optional>
+  The `onInput` handler binds to the `input` event and receives a single parameter `value`.
 
-The `onInput` handler binds to the `input` event and is a callback with a single parameter `value`.
+  The type of the `value` parameter must be a generic type according to the target element:
 
-The type of the `value` parameter must be a generic type according to the target element:
+  - `bool?` for checkbox or radio input elements
+  - `num?` for number input elements
+  - `DateTime` for date input elements
+  - `List<File>?` for file input elements
+  - `List<String>` for select elements
+  - `String` for text input and textarea elements
+  - `Null` for all other elements
 
-- `bool?` for checkbox or radio input elements
-- `num?` for number input elements
-- `DateTime` for date input elements
-- `List<File>?` for file input elements
-- `List<String>` for select elements
-- `String` for text input and textarea elements
-- `Null` for all other elements
+  ```dart
+  yield input(type: InputType.checkbox, events: events(onInput: (bool? value) {
+    print('Checked: $value');
+  }, []);
+  ```
+</Property>
 
-```dart
-yield input(type: InputType.checkbox, events: events(onInput: (bool? value) {
-  print('Checked: $value');
-}, []);
-```
+---
 
-### onChange
+<Property name="onChange" type="void Function(T value)" optional>
+  The `onChange` handler binds to the `change` event and receives a single parameter `value`.
 
-The `onChange` handler binds to the `change` event and is a callback with a single parameter `value`.
+  The type of the `value` parameter must be a generic type according to the target element:
 
-The type of the `value` parameter must be a generic type according to the target element:
+  - `bool?` for checkbox or radio input elements
+  - `num?` for number input elements
+  - `DateTime` for date input elements
+  - `List<File>?` for file input elements
+  - `List<String>` for select elements
+  - `String` for text input and textarea elements
+  - `Null` for all other elements
 
-- `bool?` for checkbox or radio input elements
-- `num?` for number input elements
-- `DateTime` for date input elements
-- `List<File>?` for file input elements
-- `List<String>` for select elements
-- `String` for text input and textarea elements
-- `Null` for all other elements
+  ```dart
+  yield textarea(events: events(onChange: (String value) {
+    print('Content: $value');
+  }, []);
+  ```
+</Property>
 
-```dart
-yield textarea(events: events(onChange: (String value) {
-  print('Content: $value');
-}, []);
-```
+---
 
 ## Component Shortcuts
 

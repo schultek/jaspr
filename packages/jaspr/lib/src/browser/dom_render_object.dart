@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:js_interop';
 
-import 'package:web/web.dart' as web;
+import 'package:universal_web/web.dart' as web;
 
 import '../foundation/constants.dart';
-import '../foundation/events/events.dart';
+import '../foundation/events.dart';
 import '../framework/framework.dart';
 import 'utils.dart';
 
@@ -15,7 +15,9 @@ const xmlns = {
 };
 
 class DomRenderObject extends RenderObject {
+  @override
   web.Node? node;
+
   List<web.Node> toHydrate = [];
 
   Map<String, EventBinding>? events;
@@ -118,6 +120,17 @@ class DomRenderObject extends RenderObject {
           elem.value = attr.value;
           continue;
         }
+
+        if (attr.key == 'value' &&
+            elem.instanceOfString('HTMLSelectElement') &&
+            (elem as web.HTMLSelectElement).value != attr.value) {
+          if (kVerboseMode) {
+            print("Set select value: ${attr.value}");
+          }
+          elem.value = attr.value;
+          continue;
+        }
+
         elem.clearOrSetAttribute(attr.key, attr.value);
       }
     }

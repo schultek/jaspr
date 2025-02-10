@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:web/web.dart';
+import 'package:universal_web/web.dart';
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';

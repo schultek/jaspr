@@ -143,8 +143,8 @@ enum AutoComplete {
 /// The &lt;input&gt; HTML element is used to create interactive controls for web-based forms in order to accept data from the user; a wide variety of types of input data and control widgets are available, depending on the device and user agent. The &lt;input&gt; element is one of the most powerful and complex in all of HTML due to the sheer number of combinations of input types and attributes.
 ///
 /// - [type]: Defines how an &lt;input&gt; works. If this attribute is not specified, the default type adopted is text.
-/// - [name]: Name of the form control. Submitted with the form as part of a name/value pair
-/// - [value]: The initial value of the control
+/// - [name]: Name of the form control. Submitted with the form as part of a name/value pair.
+/// - [value]: The value of the control.
 /// - [disabled]: Indicates that the user should not be able to interact with the input. Disabled inputs are typically rendered with a dimmer color or using some other form of indication that the field is not available for use.
 /// - [onInput]: Callback for the 'input' event. The type of [value] depends on [type].
 /// - [onChange]: Callback for the 'change' event. The type of [value] depends on [type].
@@ -457,6 +457,7 @@ Component option(List<Component> children,
 /// The &lt;select&gt; HTML element represents a control that provides a menu of options.
 ///
 /// - [name]: This attribute is used to specify the name of the control.
+/// - [value]: The value of the control.
 /// - [multiple]: Indicates that multiple options can be selected in the list. If it is not specified, then only one option can be selected at a time. When multiple is specified, most browsers will show a scrolling list box instead of a single line dropdown.
 /// - [required]: Indicating that an option with a non-empty string value must be selected.
 /// - [disabled]: Indicates that the user cannot interact with the control. If this attribute is not specified, the control inherits its setting from the containing element, for example &lt;fieldset&gt;; if there is no containing element with the disabled attribute set, then the control is enabled.
@@ -467,6 +468,7 @@ Component option(List<Component> children,
 /// - [onChange]: Callback for the 'change' event.
 Component select(List<Component> children,
     {String? name,
+    String? value,
     bool? multiple,
     bool? required,
     bool? disabled,
@@ -490,6 +492,7 @@ Component select(List<Component> children,
     attributes: {
       ...attributes ?? {},
       if (name != null) 'name': name,
+      if (value != null) 'value': value,
       if (multiple == true) 'multiple': '',
       if (required == true) 'required': '',
       if (disabled == true) 'disabled': '',

@@ -29,16 +29,16 @@ void main() {
       });
 
       test('gap', () {
-        var gap = GridGap(row: 10.px);
+        var gap = Gap(row: 10.px);
         expect(gap.styles, equals({'row-gap': '10px'}));
 
-        gap = GridGap(row: 10.px, column: 10.px);
+        gap = Gap(row: 10.px, column: 10.px);
         expect(gap.styles, equals({'gap': '10px'}));
 
-        gap = GridGap(row: 10.px, column: 20.px);
+        gap = Gap(row: 10.px, column: 20.px);
         expect(gap.styles, equals({'gap': '10px 20px'}));
 
-        gap = GridGap.all(10.px);
+        gap = Gap.all(10.px);
         expect(gap.styles, equals({'gap': '10px'}));
       });
 

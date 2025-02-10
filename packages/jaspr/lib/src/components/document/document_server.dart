@@ -23,8 +23,8 @@ abstract class Document implements Component {
     String? base,
     String? charset,
     String? viewport,
-    Map<String, String>? meta,
-    List<StyleRule>? styles,
+    Map<String, String> meta,
+    List<StyleRule> styles,
     List<Component> head,
     required Component body,
   }) = BaseDocument;
@@ -111,8 +111,12 @@ abstract class Document implements Component {
   }) = AttachDocument.body;
 }
 
-// only allow a single document
-const _documentKey = GlobalKey();
+// Only allow a single Document.
+const _documentKey = _DocumentKey();
+
+class _DocumentKey extends GlobalKey {
+  const _DocumentKey() : super.constructor();
+}
 
 class BaseDocument extends StatelessComponent implements Document {
   const BaseDocument({
@@ -121,8 +125,8 @@ class BaseDocument extends StatelessComponent implements Document {
     this.base,
     this.charset = 'utf-8',
     this.viewport = 'width=device-width, initial-scale=1.0',
-    this.meta,
-    this.styles,
+    this.meta = const {},
+    this.styles = const [],
     this.head = const [],
     required this.body,
   }) : super(key: _documentKey);
@@ -132,8 +136,8 @@ class BaseDocument extends StatelessComponent implements Document {
   final String? base;
   final String? charset;
   final String? viewport;
-  final Map<String, String>? meta;
-  final List<StyleRule>? styles;
+  final Map<String, String> meta;
+  final List<StyleRule> styles;
   final List<Component> head;
   final Component body;
 
@@ -162,11 +166,11 @@ class BaseDocument extends StatelessComponent implements Document {
               title: title,
               meta: {
                 if (viewport != null) 'viewport': viewport!,
-                ...?meta,
+                ...meta,
               },
             ),
-            if (styles != null) //
-              Style(styles: styles!),
+            if (styles.isNotEmpty) //
+              Style(styles: styles),
             ...head,
           ],
         ),

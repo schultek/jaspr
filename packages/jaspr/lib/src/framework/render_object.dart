@@ -9,6 +9,7 @@ typedef RenderObjectVisitor = void Function(RenderObject child);
 
 abstract class RenderObject {
   RenderObject? get parent;
+  web.Node? get node;
 
   RenderObject createChildRenderObject();
 

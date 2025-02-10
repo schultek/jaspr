@@ -9,6 +9,7 @@ import 'package:webdev/src/command/configuration.dart';
 import 'package:webdev/src/serve/dev_workflow.dart';
 
 import '../config.dart';
+import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
@@ -55,6 +56,7 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       help: 'Compile to wasm',
       negatable: false,
     );
+    addDartDefineArgs();
   }
 
   @override
@@ -128,6 +130,8 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
     serverPid.writeAsStringSync('');
 
+    var userDefines = getServerDartDefines();
+
     var args = [
       'run',
       if (!release) ...[
@@ -136,6 +140,7 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       ] else
         '-Djaspr.flags.release=true',
       '-Djaspr.flags.verbose=$debug',
+      for (var define in userDefines.entries) '-D${define.key}=${define.value}',
     ];
 
     if (debug) {
@@ -175,6 +180,10 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (debug) {
       logger.write("Ignoring --debug flag since custom dev command is used.", level: Level.warning);
     }
+    var userDefines = getServerDartDefines();
+    if (userDefines.isNotEmpty) {
+      logger.write("Ignoring all --dart-define options since custom dev command is used.", level: Level.warning);
+    }
 
     var [exec, ...args] = command.split(" ");
 
@@ -210,15 +219,19 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
             ? 'dart2js'
             : 'dartdevc';
 
+    var dartDefines = getClientDartDefines();
+    var dartdevcDefines = dartDefines.entries.map((e) => ',"${e.key}":"${e.value}"').join();
+    var dart2jsDefines = dartDefines.entries.map((e) => ',"-D${e.key}=${e.value}"').join();
+
     var workflow = await DevWorkflow.start(configuration, [
       if (release) '--release',
       '--define',
       '$package:ddc=generate-full-dill=true',
       '--delete-conflicting-outputs',
       '--define=$package:entrypoint=compiler=$compiler',
-      if (compiler == 'dartdevc') '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug}',
+      if (compiler == 'dartdevc') '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug$dartdevcDefines}',
       if (compiler != 'dartdevc')
-        '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"${!release ? ',"--enable-asserts"' : ''}]',
+        '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"$dart2jsDefines${!release ? ',"--enable-asserts"' : ''}]',
     ], {
       'web': int.parse(webPort)
     });

@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:universal_web/web.dart' as web;
+
 import '../../server.dart';
 import 'child_nodes.dart';
 
@@ -15,6 +17,8 @@ class MarkupRenderObject extends RenderObject {
 
   @override
   MarkupRenderObject? parent;
+  @override
+  web.Node? get node => null;
 
   late final ChildList children = ChildList(this);
 
@@ -164,7 +168,7 @@ class MarkupRenderObject extends RenderObject {
 
 /// DOM validator with sane defaults.
 class DomValidator {
-  static final _attributeRegExp = RegExp(r'^[a-z](?:[a-zA-Z0-9\-_:.]*[a-z0-9]+)?$');
+  static final _attributeRegExp = RegExp(r'^[@a-z:](?:[a-zA-Z0-9\-_:.]*[a-z0-9]+)?$');
   static final _elementRegExp = _attributeRegExp;
   static const _selfClosing = <String>{
     'area',

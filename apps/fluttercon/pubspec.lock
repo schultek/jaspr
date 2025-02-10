@@ -5,23 +5,23 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: f256b0c0ba6c7577c15e2e4e114755640a875e885099367bf6e012b19314c834
+      sha256: "16e298750b6d0af7ce8a3ba7c18c69c3785d11b15ec83f6dcd0ad2a0009b3cab"
       url: "https://pub.dev"
     source: hosted
-    version: "72.0.0"
+    version: "76.0.0"
   _macros:
     dependency: transitive
     description: dart
     source: sdk
-    version: "0.3.2"
+    version: "0.3.3"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
-      sha256: b652861553cd3990d8ed361f7979dc6d7053a9ac8843fa73820ab68ce5410139
+      sha256: "1f14db053a8c23e260789e9b0980fa27f2680dd640932cae5e1137cce0e46e1e"
       url: "https://pub.dev"
     source: hosted
-    version: "6.7.0"
+    version: "6.11.0"
   ansicolor:
     dependency: transitive
     description:
@@ -186,10 +186,10 @@ packages:
     dependency: "direct main"
     description:
       name: collection
-      sha256: ee67cb0715911d28db6bf4af1026078bd6f0128b07a5f66fb2ed94ec6783c09a
+      sha256: a1ace0a119f20aabc852d165077c036cd864315bd99b7eaa10a60100341941bf
       url: "https://pub.dev"
     source: hosted
-    version: "1.18.0"
+    version: "1.19.0"
   convert:
     dependency: transitive
     description:
@@ -358,29 +358,29 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.16.2"
+    version: "0.17.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.16.2"
+    version: "0.17.0"
   jaspr_router:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_router"
       relative: true
     source: path
-    version: "0.6.0"
+    version: "0.6.1"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
       name: jaspr_web_compilers
-      sha256: adb5265c119a505b1268d62a3f291e08664d904111b9044ff0e769ba96cdf90f
+      sha256: a2138ff664ca7ba79a70109128a29dd0d838c06c8e51e4f08d8a675c214f2a5d
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.10+1"
+    version: "4.1.0-beta.1"
   js:
     dependency: transitive
     description:
@@ -417,10 +417,10 @@ packages:
     dependency: transitive
     description:
       name: macros
-      sha256: "0acaed5d6b7eab89f63350bccd82119e6c602df0f391260d0e32b5e23db79536"
+      sha256: "1d9e801cd66f7ea3663c45fc708450db1fa57f988142c64289142c9b7ee80656"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.2-main.4"
+    version: "0.1.3-main.0"
   matcher:
     dependency: transitive
     description:
@@ -649,7 +649,7 @@ packages:
     dependency: transitive
     description: flutter
     source: sdk
-    version: "0.0.99"
+    version: "0.0.0"
   source_gen:
     dependency: transitive
     description:
@@ -746,6 +746,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.2"
+  universal_web:
+    dependency: transitive
+    description:
+      name: universal_web
+      sha256: fd161c6424fd78625097429b0050c2ea967304fb2b8b5ea0c0f51cd41b915053
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0+2"
   vector_math:
     dependency: transitive
     description:
@@ -774,10 +782,10 @@ packages:
     dependency: transitive
     description:
       name: web
-      sha256: d43c1d6b787bf0afad444700ae7f4db8827f701bc61c255ac8d328c6f4d52062
+      sha256: cd3543bd5798f6ad290ea73d210f423502e71900302dde696f8bff84bf89a1cb
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.1.0"
   web_socket:
     dependency: transitive
     description:
@@ -811,5 +819,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.5.0-259.0.dev <3.6.0"
+  dart: ">=3.6.0-165.0.dev <3.7.0"
   flutter: ">=3.22.0"

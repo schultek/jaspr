@@ -42,7 +42,7 @@
     "main_": {
       "tag": "main",
       "doc": "The &lt;main&gt; HTML element represents the primary content of a document, distinct from content that is repeated across multiple pages such as site headers, footers, and navigation bars."
-    },    
+    },
     "nav": {
       "doc": "The &lt;nav&gt; HTML element represents a section of a page whose purpose is to provide navigation links, either within the current document or to other documents. Common examples of navigation sections are menus, tables of contents, and indexes."
     },
@@ -129,7 +129,7 @@
   "text": {
     "a": {
       "doc": "The &lt;a&gt; HTML element (or anchor element), with its href attribute, creates a hyperlink to web pages, files, email addresses, locations in the same page, or anything else a URL can address.\n\nContent within each &lt;a&gt; should indicate the link's destination. If the href attribute is present, pressing the enter key while focused on the &lt;a&gt; element will activate it.",
-      "attributes":{
+      "attributes": {
         "download": {
           "doc": "Causes the browser to treat the linked URL as a download. Can be used with or without a value:\n\nWithout a value, the browser will suggest a filename/extension, generated from various sources:\nThe Content-Disposition HTTP header\nThe final segment in the URL path\nThe media type (from the Content-Type header, the start of a data: URL, or Blob.type for a blob: URL)\nDefining a value suggests it as the filename. / and \\ characters are converted to underscores (_). Filesystems may forbid other characters in filenames, so browsers will adjust the suggested name if necessary.",
           "type": "string"
@@ -698,11 +698,11 @@
           }
         },
         "name": {
-          "doc": "Name of the form control. Submitted with the form as part of a name/value pair",
+          "doc": "Name of the form control. Submitted with the form as part of a name/value pair.",
           "type": "string"
         },
         "value": {
-          "doc": "The initial value of the control",
+          "doc": "The value of the control.",
           "type": "string"
         },
         "disabled": {
@@ -817,6 +817,10 @@
       "attributes": {
         "name": {
           "doc": "This attribute is used to specify the name of the control.",
+          "type": "string"
+        },
+        "value": {
+          "doc": "The value of the control.",
           "type": "string"
         },
         "multiple": {
@@ -980,6 +984,29 @@
     },
     "summary": {
       "doc": "The &lt;summary&gt; HTML element specifies a summary, caption, or legend for a &lt;details&gt; element's disclosure box. Clicking the &lt;summary&gt; element toggles the state of the parent &lt;details&gt; element open and closed."
+    },
+    "meta": {
+      "doc": "The  &lt;meta&gt; HTML element represents metadata that cannot be represented by other HTML meta-related elements, like  &lt;base &gt;,  &lt;link &gt;,  &lt;script &gt;,  &lt;style &gt; or  &lt;title &gt;.",
+      "self_closing": true,
+      "attributes": {
+        "name": {
+          "doc": "The name and content attributes can be used together to provide document metadata in terms of name-value pairs, with the name attribute giving the metadata name, and the content attribute giving the value.\nSee standard metadata names for details about the set of standard metadata names defined in the HTML specification.",
+          "type": "string"
+        },
+        "content": {
+          "doc": "This attribute contains the value for the 'http-equiv' or 'name' attribute, depending on which is used.",
+          "type": "string"
+        },
+        "charset": {
+          "doc": "This attribute declares the document's character encoding. If the attribute is present, its value must be an ASCII case-insensitive match for the string \"utf-8\", because UTF-8 is the only valid encoding for HTML5 documents. &lt;meta&gt; elements which declare a character encoding must be located entirely within the first 1024 bytes of the document.",
+          "type": "string"
+        },
+        "http-equiv": {
+          "name": "httpEquiv",
+          "doc": "Defines a pragma directive. The attribute's name, short for http-equivalent, is because all the allowed values are names of particular HTTP headers.",
+          "type": "string"
+        }
+      }
     },
     "link": {
       "doc": "The &lt;link&gt; HTML element specifies relationships between the current document and an external resource. This element is most commonly used to link to stylesheets, but is also used to establish site icons (both \"favicon\" style icons and icons for the home screen and apps on mobile devices) among other things.",
@@ -1169,6 +1196,86 @@
         }
       },
       "inherit": "shapes"
+    }
+  },
+  "table": {
+    "table": {
+      "doc": "The &lt;table&gt; HTML element represents tabular data—that is, information presented in a two-dimensional table comprised of rows and columns of cells containing data."
+    },
+    "caption": {
+      "doc": "The &lt;caption&gt; HTML element specifies the caption (or title) of a table, providing the table an accessible description."
+    },
+    "thead": {
+      "doc": "The &lt;thead&gt; HTML element encapsulates a set of table rows (&lt;tr&gt; elements), indicating that they comprise the head of a table with information about the table's columns. This is usually in the form of column headers (&lt;th&gt; elements)."
+    },
+    "tbody": {
+      "doc": "The &lt;tbody&gt; HTML element encapsulates a set of table rows (&lt;tr&gt; elements), indicating that they comprise the body of a table's (main) data."
+    },
+    "tfoot": {
+      "doc": "The &lt;tfoot&gt; HTML element encapsulates a set of table rows (&lt;tr&gt; elements), indicating that they comprise the foot of a table with information about the table's columns. This is usually a summary of the columns, e.g., a sum of the given numbers in a column."
+    },
+    "th": {
+      "doc": "The &lt;th&gt; HTML element defines a cell as the header of a group of table cells and may be used as a child of the &lt;tr&gt; element. The exact nature of this group is defined by the scope and headers attributes.",
+      "attributes": {
+        "abbr": {
+          "doc": "A short, abbreviated description of the header cell's content provided as an alternative label to use for the header cell when referencing the cell in other contexts. Some user-agents, such as speech readers, may present this description before the content itself.",
+          "type": "string"
+        },
+        "colspan": {
+          "doc": "A non-negative integer value indicating how many columns the header cell spans or extends. The default value is 1. User agents dismiss values higher than 1000 as incorrect, defaulting such values to 1.",
+          "type": "int"
+        },
+        "headers": {
+          "doc": "A list of space-separated strings corresponding to the id attributes of the &lt;th&gt; elements that provide the headers for this header cell.",
+          "type": "string"
+        },
+        "rowspan": {
+          "doc": "A non-negative integer value indicating how many rows the header cell spans or extends. The default value is 1; if its value is set to 0, the header cell will extends to the end of the table grouping section (&lt;thead&gt;, &lt;tbody&gt;, &lt;tfoot&gt;, even if implicitly defined), that the &lt;th&gt; belongs to. Values higher than 65534 are clipped at 65534.",
+          "type": "int"
+        },
+        "scope": {
+          "doc": "Defines the cells that the header (defined in the &lt;th&gt;) element relates to. Possible enumerated values are:\n- row: the header relates to all cells of the row it belongs to;\n- col: the header relates to all cells of the column it belongs to;\n- rowgroup: the header belongs to a rowgroup and relates to all of its cells;\n- colgroup: the header belongs to a colgroup and relates to all of its cells.\nIf the scope attribute is not specified, or its value is not row, col, rowgroup, or colgroup, then browsers automatically select the set of cells to which the header cell applies.",
+          "type": "string"
+        }
+      }
+    },
+    "tr": {
+      "doc": "The &lt;tr&gt; HTML element defines a row of cells in a table. The row's cells can then be established using a mix of &lt;td&gt; (data cell) and &lt;th&gt; (header cell) elements."
+    },
+    "td": {
+      "doc": "The &lt;td&gt; HTML element defines a cell of a table that contains data and may be used as a child of the &lt;tr&gt; element.",
+      "attributes": {
+        "colspan": {
+          "doc": "Contains a non-negative integer value that indicates how many columns the data cell spans or extends. The default value is 1. User agents dismiss values higher than 1000 as incorrect, setting to the default value (1).",
+          "type": "int"
+        },
+        "headers": {
+          "doc": "Contains a list of space-separated strings, each corresponding to the id attribute of the &lt;th&gt; elements that provide headings for this table cell.",
+          "type": "string"
+        },
+        "rowspan": {
+          "doc": "Contains a non-negative integer value that indicates for how many rows the data cell spans or extends. The default value is 1; if its value is set to 0, it extends until the end of the table grouping section (&lt;thead&gt;, &lt;tbody&gt;, &lt;tfoot&gt;, even if implicitly defined), that the cell belongs to. Values higher than 65534 are clipped to 65534.",
+          "type": "int"
+        }
+      }
+    },
+    "col": {
+      "doc": "The &lt;col&gt; HTML element defines one or more columns in a column group represented by its parent &lt;colgroup&gt; element. The &lt;col&gt; element is only valid as a child of a &lt;colgroup&gt; element that has no span attribute defined.",
+      "attributes": {
+        "span": {
+          "doc": "Specifies the number of consecutive columns the &lt;col&gt; element spans. The value must be a positive integer greater than zero. If not present, its default value is 1.",
+          "type": "int"
+        }
+      }
+    },
+    "colgroup": {
+      "doc": "The &lt;colgroup&gt; HTML element defines a group of columns within a table.",
+      "attributes": {
+        "span": {
+          "doc": "Specifies the number of consecutive columns the &lt;colgroup&gt; element spans. The value must be a positive integer greater than zero. If not present, its default value is 1.",
+          "type": "int"
+        }
+      }
     }
   }
 }

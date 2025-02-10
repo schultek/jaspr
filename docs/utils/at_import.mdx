@@ -12,6 +12,10 @@ is only supported on one side, e.g.:
 - `dart:html` is only supported on the client,
 - `dart:io` is only supported on the server.
 
+<Info>
+When using `package:web` you should instead use `package:universal_web` which already works across web **and server** environments. No need to use conditional imports or the `@Import` annotation shown on this page.
+</Info>
+
 When you want to use such a library in your project, you would have to resort to *conditional imports*, 
 which are quite cumbersome to use since you have to create multiple files and stub everything you want to use.
 

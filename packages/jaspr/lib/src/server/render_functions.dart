@@ -10,13 +10,13 @@ typedef FileLoader = Future<String?> Function(String);
 /// Performs the rendering process and provides the created [AppBinding] to [setup].
 ///
 /// If [Jaspr.useIsolates] is true, this spawns an isolate for each render.
-Future<String> render(SetupFunction setup, Uri requestUri, FileLoader loadFile) async {
+Future<String> render(SetupFunction setup, Uri requestUri, FileLoader loadFile, bool standalone) async {
   if (!Jaspr.useIsolates) {
     var binding = ServerAppBinding()
       ..setCurrentUri(requestUri)
       ..setFileHandler(loadFile);
     setup(binding);
-    return binding.render();
+    return binding.render(standalone: standalone);
   }
 
   var resultCompleter = Completer<String>.sync();
@@ -38,7 +38,7 @@ Future<String> render(SetupFunction setup, Uri requestUri, FileLoader loadFile) 
   });
 
   try {
-    var message = _RenderMessage(setup, requestUri, port.sendPort);
+    var message = _RenderMessage(setup, requestUri, standalone, port.sendPort);
     await Isolate.spawn(_render, message, onError: errorPort.sendPort);
 
     return await resultCompleter.future;
@@ -62,16 +62,17 @@ void _render(_RenderMessage message) async {
     });
   message.setup(binding);
 
-  var result = await binding.render();
+  var result = await binding.render(standalone: message.standalone);
   message.sendPort.send(result);
 }
 
 class _RenderMessage {
   final SetupFunction setup;
   final Uri requestUri;
+  final bool standalone;
   final SendPort sendPort;
 
-  _RenderMessage(this.setup, this.requestUri, this.sendPort);
+  _RenderMessage(this.setup, this.requestUri, this.standalone, this.sendPort);
 }
 
 class _LoadFileRequest {

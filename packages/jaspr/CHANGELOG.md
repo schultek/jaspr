@@ -1,3 +1,47 @@
+## 0.17.0
+
+
+- **BREAKING** Removed `currentState` from `GlobalKey`, use `GlobalStateKey` instead.
+- Added `GlobalStateKey<T extends State>` to access the state of a component using `currentState`.
+
+  ```dart
+  // Use any State type as the type parameter.
+  final GlobalStateKey<MyComponentState> myComponentKey = GlobalStateKey();
+
+  /* ... */
+
+  // Access the state from the key.
+  MyComponentState? state = myComponentKey.currentState;
+  ```
+
+- Added `GlobalNodeKey<T extends Node>` to access native dom nodes using `currentNode`.
+
+  ```dart
+  import 'package:universal_web/web.dart';
+
+  // Use any Node type (from package:universal_web) as the type parameter.
+  final GlobalNodeKey<HTMLFormElement> myFormKey = GlobalNodeKey();
+
+  /* ... */
+
+  // Access the dom node from the key.
+  HTMLFormElement? node = myFormKey.currentNode;
+  ```
+
+- Migrated all web imports from `package:web` to `package:universal_web`.
+- Added `prefersColorScheme` parameter to `MediaQuery`.
+
+## 0.16.4
+
+- Added `--dart-define`, `--dart-define-client` and `--dart-define-server` to `serve` and `build` commands.
+- Fixed attribute validation to support attribute names including `@` and `:`.
+
+## 0.16.3
+
+- Added `table` and related html methods.
+- Added `value` parameter to `select()` method.
+- Add 'standalone' option to `renderComponent` method.
+
 ## 0.16.2
 
 - Fixed bug with empty `text('')` components.

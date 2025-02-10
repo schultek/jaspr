@@ -53,6 +53,7 @@ class TailwindBuilder implements Builder {
           p.join(Directory.current.path, '{lib,web}', '**', '*.dart').toPosix(true),
         ],
       ],
+      runInShell: true,
     );
 
     await scratchSpace.copyOutput(outputId, buildStep);

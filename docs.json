@@ -8,6 +8,11 @@
   "favicon": "https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/favicon.png",
   "anchors": [
     {
+      "title": "Website",
+      "icon": "globe",
+      "href": "https://jaspr.site"
+    },
+    {
       "title": "Discord",
       "icon": "discord",
       "href": "https://discord.gg/XGXrGEk4c6"
@@ -15,7 +20,7 @@
     {
       "title": "Playground",
       "icon": "code",
-      "href": "https://jasprpad.schultek.de"
+      "href": "https://playground.jaspr.site"
     },
     {
       "title": "Bluesky",
@@ -33,7 +38,8 @@
     "github": "schultek"
   },
   "theme": {
-    "primary": "#01589B"
+    "primary": "#01589B",
+    "primaryDark": "#41C3FE"
   },
   "sidebar": [
     {
@@ -227,6 +233,10 @@
         {
           "title": "@encoder/@decoder",
           "href": "/utils/at_encoder_decoder"
+        },
+        {
+          "title": "GlobalNodeKey",
+          "href": "/utils/global_node_key"
         },
         {
           "title": "@Import",

@@ -93,6 +93,7 @@ abstract class Styles with StylesMixin<Styles> {
     FlexWrap? wrap,
     JustifyContent? justifyContent,
     AlignItems? alignItems,
+    Gap? gap,
   }) = _FlexBoxStyles;
 
   /// Constructs a [Styles] instance for children of a flex-box parent.
@@ -105,7 +106,7 @@ abstract class Styles with StylesMixin<Styles> {
   /// Constructs a [Styles] instance for common grid style properties.
   const factory Styles.grid({
     GridTemplate? template,
-    GridGap? gap,
+    Gap? gap,
     List<TrackSize>? autoRows,
     List<TrackSize>? autoColumns,
   }) = _GridStyles;
@@ -254,12 +255,14 @@ abstract mixin class StylesMixin<T> {
     FlexWrap? wrap,
     JustifyContent? justifyContent,
     AlignItems? alignItems,
+    Gap? gap,
   }) =>
       combine(Styles.flexbox(
         direction: direction,
         wrap: wrap,
         justifyContent: justifyContent,
         alignItems: alignItems,
+        gap: gap,
       ));
 
   /// Combines the current styles with common flex child properties.
@@ -277,7 +280,7 @@ abstract mixin class StylesMixin<T> {
   /// Combines the current styles with common grid style properties.
   T grid({
     GridTemplate? template,
-    GridGap? gap,
+    Gap? gap,
     List<TrackSize>? autoRows,
     List<TrackSize>? autoColumns,
   }) =>

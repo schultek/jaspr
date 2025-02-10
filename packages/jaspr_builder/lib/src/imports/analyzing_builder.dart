@@ -29,8 +29,10 @@ class ImportsModuleBuilder implements Builder {
       var outputId = buildStep.inputId.changeExtension('.imports.json');
       var partId = buildStep.inputId.changeExtension('.imports.dart');
 
+      // ignore: deprecated_member_use
       var import = lib.libraryImports
           .cast<Element>()
+          // ignore: deprecated_member_use
           .followedBy(lib.libraryExports)
           .where((Element e) => importChecker.hasAnnotationOf(e))
           .where((Element e) {

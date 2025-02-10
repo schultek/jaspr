@@ -1,5 +1,5 @@
 import '../../foundation/basic_types.dart';
-import '../../foundation/events/events.dart';
+import '../../foundation/events.dart';
 import '../../foundation/styles/styles.dart';
 import '../../framework/framework.dart';
 import '../raw_text/raw_text.dart';
@@ -9,6 +9,7 @@ part 'forms.dart';
 part 'media.dart';
 part 'other.dart';
 part 'svg.dart';
+part 'table.dart';
 part 'text.dart';
 
 final _events = events;

@@ -1,3 +1,7 @@
+## 0.6.1
+
+- `jaspr` upgraded to `0.17.0`
+
 ## 0.6.0
 
 - **BREAKING** Migrate to `package:web`.

@@ -5,10 +5,10 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/src/server/async_build_owner.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
+import 'package:universal_web/web.dart' as web;
 
 import '../binding.dart';
 import '../finders.dart';
-import 'fake_event_web.dart' if (dart.library.io) 'fake_event_vm.dart';
 
 @isTest
 void testComponents(
@@ -52,7 +52,7 @@ class ComponentTester {
   /// Simulates a 'click' event on the given element
   /// and pumps the next frame.
   Future<void> click(Finder finder, {bool pump = true}) async {
-    dispatchEvent(finder, 'click', fakeEvent());
+    dispatchEvent(finder, 'click');
     if (pump) {
       await pumpEventQueue();
     }
@@ -63,9 +63,9 @@ class ComponentTester {
   }
 
   /// Simulates [event] on the given element.
-  void dispatchEvent(Finder finder, String event, dynamic data) {
+  void dispatchEvent(Finder finder, String event, [web.Event? data]) {
     var renderObject = _findDomElement(finder).renderObject as TestRenderObject;
-    renderObject.events?[event]?.call(data);
+    renderObject.events?[event]?.call(data ?? web.Event(event));
   }
 
   DomElement _findDomElement(Finder finder) {
@@ -147,6 +147,8 @@ class TestRenderObject extends RenderObject {
 
   @override
   TestRenderObject? parent;
+  @override
+  web.Node? get node => null;
 
   @override
   RenderObject createChildRenderObject() {
