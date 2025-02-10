@@ -75,17 +75,17 @@ class CodeBlock extends StatelessComponent {
             .background(color: surfaceLow),
         css('code', [
           css('&')
-            .box(
-              display: Display.inlineBlock,
-              width: 100.percent,
-              overflow: Overflow.only(x: Overflow.hidden),
-              padding: EdgeInsets.only(top: 0.5.em, bottom: 0.5.em, right: 0.5.em),
-              boxSizing: BoxSizing.borderBox,
-            )
-            .background(color: surfaceLowest)
-            .text(align: TextAlign.start)
-            .combine(jasprTheme['root']!),
-            css('&.scroll').box(overflow: Overflow.only(x: Overflow.scroll)),
+              .box(
+                display: Display.inlineBlock,
+                width: 100.percent,
+                overflow: Overflow.only(x: Overflow.hidden),
+                padding: EdgeInsets.only(top: 0.5.em, bottom: 0.5.em, right: 0.5.em),
+                boxSizing: BoxSizing.borderBox,
+              )
+              .background(color: surfaceLowest)
+              .text(align: TextAlign.start)
+              .combine(jasprTheme['root']!),
+          css('&.scroll').box(overflow: Overflow.only(x: Overflow.scroll)),
         ]),
         css('.lines', [
           css('&').box(display: Display.inlineBlock, minWidth: 100.percent),

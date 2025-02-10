@@ -45,7 +45,6 @@ void main() async {
 
   try {
     process.stdin.writeln(icons.join(' '));
-
   } finally {
     await process.stdin.flush();
     await process.stdin.close();

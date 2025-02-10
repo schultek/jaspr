@@ -98,7 +98,10 @@ class Community extends StatelessComponent {
             border: Border.only(right: BorderSide(color: borderColor, width: 2.px)),
           ),
           css('h5').box(margin: EdgeInsets.only(bottom: 0.5.rem)),
-          css('.actions').box(margin: EdgeInsets.only(top: 2.rem, )),
+          css('.actions').box(
+              margin: EdgeInsets.only(
+            top: 2.rem,
+          )),
           css('p:last-child').box(margin: EdgeInsets.only(top: 2.rem)).combine(bodySmall),
         ]),
       ])

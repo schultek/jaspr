@@ -239,7 +239,8 @@ void main() {
                 '"side content"\n'
                 '"side content"',
             'grid-auto-rows': '20% auto',
-            'grid-auto-columns': '100px auto auto'
+            'grid-auto-columns': '100px auto auto',
+            'row-gap': '20px',
           }),
         );
       });

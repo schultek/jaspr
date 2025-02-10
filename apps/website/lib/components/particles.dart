@@ -18,8 +18,8 @@ class Particles extends StatelessComponent {
   }
 
   static int randomInt(int min, int max) {
-    return min + random.nextInt(max-min);
-  } 
+    return min + random.nextInt(max - min);
+  }
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

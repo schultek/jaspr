@@ -63,7 +63,11 @@ class HeaderState extends State<Header> {
       div(classes: 'header-actions', [
         ThemeToggle(),
         div(classes: 'discord-button', [
-          LinkButton.icon(icon: 'custom-discord', to: 'https://discord.gg/XGXrGEk4c6', target: Target.blank, ariaLabel: 'Join Discord'),
+          LinkButton.icon(
+              icon: 'custom-discord',
+              to: 'https://discord.gg/XGXrGEk4c6',
+              target: Target.blank,
+              ariaLabel: 'Join Discord'),
         ]),
         GithubButton(),
       ]),

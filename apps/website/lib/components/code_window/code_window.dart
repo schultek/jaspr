@@ -43,13 +43,7 @@ class CodeWindow extends StatelessComponent {
           ]),
       ]),
       div(classes: 'code-window-body', [
-        CodeBlock(
-          source: source,
-          selectable: selectable,
-          lineClasses: lineClasses,
-          language: language,
-          scroll: scroll
-        ),
+        CodeBlock(source: source, selectable: selectable, lineClasses: lineClasses, language: language, scroll: scroll),
       ]),
     ]);
   }

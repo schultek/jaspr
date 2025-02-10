@@ -12,7 +12,6 @@ class ModesAnimation extends StatefulComponent {
 }
 
 class ModesAnimationState extends State<ModesAnimation> {
-
   final List<(String, String)> texts = [
     ('Static Sites', 'static'),
     ('Server Rendered Sites', 'server'),

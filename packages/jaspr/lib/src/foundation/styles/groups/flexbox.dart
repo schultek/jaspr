@@ -7,7 +7,13 @@ class _FlexBoxStyles extends Styles {
   final AlignItems? alignItems;
   final Gap? gap;
 
-  const _FlexBoxStyles({this.direction, this.wrap, this.justifyContent, this.alignItems, this.gap,}) : super._();
+  const _FlexBoxStyles({
+    this.direction,
+    this.wrap,
+    this.justifyContent,
+    this.alignItems,
+    this.gap,
+  }) : super._();
 
   @override
   Map<String, String> get styles => {

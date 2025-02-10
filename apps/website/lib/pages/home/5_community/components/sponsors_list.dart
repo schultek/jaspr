@@ -58,12 +58,14 @@ class SponsorsListState extends State<SponsorsList> {
         gap: Gap.all(0.4.rem),
       ),
       css('& > *', [
-        css('&').box(
-          width: 2.rem,
-          height: 2.rem,
-          radius: BorderRadius.circular(1.rem),
-          overflow: Overflow.hidden,
-        ).background(color: Colors.gray),
+        css('&')
+            .box(
+              width: 2.rem,
+              height: 2.rem,
+              radius: BorderRadius.circular(1.rem),
+              overflow: Overflow.hidden,
+            )
+            .background(color: Colors.gray),
         css('img').box(width: 100.percent),
       ]),
     ]),

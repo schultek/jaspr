@@ -26,9 +26,7 @@ class Meet extends StatelessComponent {
             ]),
             div(classes: 'select-target-5', [
               LinkButton.outlined(
-                  label: 'Read the Docs',
-                  icon: 'book-text',
-                  to: 'https://docs.jaspr.site/concepts/components'),
+                  label: 'Read the Docs', icon: 'book-text', to: 'https://docs.jaspr.site/concepts/components'),
             ]),
           ])
         ]),

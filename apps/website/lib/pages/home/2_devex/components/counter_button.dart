@@ -22,7 +22,6 @@ class CounterButtonState extends State<CounterButton> {
       count++;
     });
 
-
     for (var i = 0; i < 20; i++) {
       final dx = Particles.randomInt(0, 100);
       final dy = Particles.randomInt(0, 100);
@@ -45,7 +44,6 @@ class CounterButtonState extends State<CounterButton> {
 
       await Future.delayed(Duration(milliseconds: 20));
     }
-
   }
 
   @override

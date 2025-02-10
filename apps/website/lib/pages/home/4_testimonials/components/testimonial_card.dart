@@ -1,7 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:website/constants/theme.dart';
 
-
 class TestimonialCard extends StatelessComponent {
   const TestimonialCard({
     required this.quote,
@@ -54,8 +53,8 @@ class TestimonialCard extends StatelessComponent {
         css('img')
             .box(radius: BorderRadius.circular(100.percent), margin: EdgeInsets.only(right: 0.8.rem))
             .raw({'object-fit': 'cover'}),
-            css('p').box(margin: EdgeInsets.zero).combine(bodySmall),
-            css('p span:first-child').text(fontWeight: FontWeight.w600, color: textBlack),
+        css('p').box(margin: EdgeInsets.zero).combine(bodySmall),
+        css('p span:first-child').text(fontWeight: FontWeight.w600, color: textBlack),
       ]),
     ]),
   ];

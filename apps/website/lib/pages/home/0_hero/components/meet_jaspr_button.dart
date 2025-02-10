@@ -131,8 +131,9 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
 class ProgressNotifier extends ValueNotifier<double> {
   ProgressNotifier() : super(0);
 
-  final isSafari = kIsWeb && RegExp(r'^((?!chrome|android).)*safari', caseSensitive: false) //
-      .hasMatch(web.window.navigator.userAgent);
+  final isSafari = kIsWeb &&
+      RegExp(r'^((?!chrome|android).)*safari', caseSensitive: false) //
+          .hasMatch(web.window.navigator.userAgent);
   late final scaleFactor = isSafari ? 2 : 1;
 
   bool get done => value >= 100;
