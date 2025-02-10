@@ -26,7 +26,7 @@ class Hero extends StatelessComponent {
             LinkButton.filled(
                 label: 'Get Started',
                 icon: 'arrow-right',
-                to: 'https://docs.page/schultek/jaspr/get_started/installation'),
+                to: 'https://docs.jaspr.site/get_started/installation'),
             MeetJasprButton(),
           ]),
         ]),

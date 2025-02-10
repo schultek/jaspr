@@ -21,6 +21,14 @@ class Testimonials extends StatelessComponent {
         ),
         TestimonialCard(
           quote:
+              'Jaspr is a great way to build websites with Dart, and with its Serverpod integration you also get access to a full ORM to talk with your database.',
+          name: 'Viktor Lidholt',
+          position: 'Founder of Serverpod',
+          picture: 'https://avatars.githubusercontent.com/u/1539812?v=4',
+          link: 'https://serverpod.dev/',
+        ),
+        TestimonialCard(
+          quote:
               'I chose Jaspr to build a landing page for my business because Flutter has poor SEO performance. What impressed me the most is the ability to do everything in Dart instead of JavaScript. The support for hydration, server-side rendering, and built-in Tailwind integration blew me away. I\'ve been using Jaspr since version 0.10.0, and it keeps getting better with every release. The community Kilian built around it is super passionate, and I can\'t wait for it to become the de-facto standard for building web experiences with Dart.',
           name: 'Dinko Marinac',
           position: 'Flutter Freelancer and Consultant',
@@ -29,9 +37,9 @@ class Testimonials extends StatelessComponent {
         ),
         TestimonialCard(
           quote:
-              'I\'ve been using Jaspr with Tailwind CSS to build sites like course.temiajiboye.com, temiajiboye.com, and flutteryeg.com, and I\'ve been really impressed. The SSR support and component-based approach make it feel like Flutter for the web, but with the flexibility of Dart. It\'s smooth, efficient, and just makes sense. If you\'re into Dart and want to build modern web apps, definitely give Jaspr a try!',
+              'I\'ve been using Jaspr with Tailwind CSS to build sites like course.temiajiboye.com, temiajiboye.com, and flutteryeg.com, and I\'ve been really impressed. The SSR support and component-based approach makes it feel like Flutter for the web, but with the flexibility of Dart. It\'s smooth, efficient, and just makes sense. If you\'re into Dart and want to build modern web apps, definitely give Jaspr a try!',
           name: 'Temi Ajiboye',
-          position: 'Flutter Developer',
+          position: 'Mobile Developer',
           picture: 'https://pbs.twimg.com/profile_images/1638555966105894916/jhdtN6oQ_400x400.jpg',
           link: 'http://temiajiboye.com',
         ),

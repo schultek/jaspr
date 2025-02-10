@@ -22,13 +22,13 @@ class Meet extends StatelessComponent {
           div(classes: 'actions select-target-3', [
             div(classes: 'select-target-4', [
               LinkButton.filled(
-                  label: 'Try out in Playground', icon: 'rocket', to: 'https://jasprpad.schultek.de/?sample=counter'),
+                  label: 'Try out in Playground', icon: 'rocket', to: 'https://playground.jaspr.site?sample=counter'),
             ]),
             div(classes: 'select-target-5', [
               LinkButton.outlined(
                   label: 'Read the Docs',
                   icon: 'book-text',
-                  to: 'https://docs.page/schultek/jaspr/concepts/components'),
+                  to: 'https://docs.jaspr.site/concepts/components'),
             ]),
           ])
         ]),
@@ -113,7 +113,7 @@ class Meet extends StatelessComponent {
           ]),
           div(classes: 'actions', [
             LinkButton.filled(
-                label: 'Explore Modes', icon: 'book-open', to: 'https://docs.page/schultek/jaspr/get_started/modes'),
+                label: 'Explore Modes', icon: 'book-open', to: 'https://docs.jaspr.site/get_started/modes'),
             LinkButton.outlined(
                 label: 'See what others have built', icon: 'newspaper', to: 'https://discord.gg/Ej3Fkt5SGx'),
           ])

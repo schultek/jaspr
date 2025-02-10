@@ -56,7 +56,7 @@ class HeaderState extends State<Header> {
     var content = Fragment(key: contentKey, children: [
       nav([
         if (component.showHome) a(href: '/', classes: 'animated-underline', [text("Home")]),
-        a(href: "https://docs.page/schultek/jaspr", classes: 'animated-underline', [text("Docs")]),
+        a(href: "https://docs.jaspr.site", classes: 'animated-underline', [text("Docs")]),
         a(href: "https://playground.jaspr.site", classes: 'animated-underline', [text("Playground")]),
         a(href: "https://github.com/sponsors/schultek/", classes: 'animated-underline', [text("Sponsor")]),
       ]),

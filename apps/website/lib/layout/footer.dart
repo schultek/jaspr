@@ -26,7 +26,7 @@ class Footer extends StatelessComponent {
               a(href: '/', classes: 'animated-underline', [text('Home')])
             ]),
             li([
-              a(href: 'https://docs.page/schultek/jaspr', classes: 'animated-underline', [text('Docs')])
+              a(href: 'https://docs.jaspr.site', classes: 'animated-underline', [text('Docs')])
             ]),
             li([
               a(href: 'https://playground.jaspr.site', classes: 'animated-underline', [text('Playground')])
@@ -48,7 +48,7 @@ class Footer extends StatelessComponent {
             ]),
             li([
               a(
-                  href: 'https://docs.page/schultek/jaspr/going_further/contributing',
+                  href: 'https://docs.jaspr.site/going_further/contributing',
                   target: Target.blank,
                   classes: 'animated-underline',
                   [text('Contribute')])
