@@ -32,13 +32,11 @@ typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render)
 /// Directly renders the provided component into a html string.
 ///
 /// When [standalone] is false (default), the html output will have a full document structure (html, head, body).
-Future<String> renderComponent(Component app, {bool standalone = false}) async {
+Future<ResponseLike> renderComponent(Component app, {Request? request, bool standalone = false}) async {
   _checkInitialized('renderComponent');
-  var fileHandler = staticFileHandler();
-  return render(_createSetup(app), Uri.parse('https://0.0.0.0/'), (name) async {
-    var response = await fileHandler(Request('get', Uri.parse('https://0.0.0.0/$name')));
-    return response.statusCode == 200 ? response.readAsString() : null;
-  }, standalone);
+  request ??= Request('GET', Uri.parse('https://0.0.0.0/'));
+  var fileLoader = proxyFileLoader(request, staticFileHandler());
+  return render(_createSetup(app), request, fileLoader, standalone);
 }
 
 void _checkInitialized(String method) {

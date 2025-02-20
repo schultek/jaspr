@@ -6,11 +6,6 @@ import 'scheduler.dart';
 abstract class AppBinding with SchedulerBinding {
   AppBinding();
 
-  /// The currently active uri.
-  /// On the server, this is the requested uri. On the client, this is the
-  /// currently visited uri in the browser.
-  Uri get currentUri;
-
   /// Whether the current app is run on the client (in the browser)
   bool get isClient;
 
