@@ -8,6 +8,7 @@ extension AppContext on BuildContext {
     return base?.href ?? window.location.origin;
   }();
 
+  /// The currently visited url.
   String get url {
     if (_baseOrigin.length > window.location.href.length) {
       return '/';

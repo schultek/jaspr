@@ -1,3 +1,13 @@
+## Unreleased minor
+
+- **BREAKING** Changed return type of `renderComponent`.
+
+- Added `context.url`, `context.headers`, `context.cookies`.
+
+- Added `context.setHeader()` and `context.setCookie()`.
+
+- Added `context.setStatusCode()`.
+
 ## 0.17.1
 
 - Update logo and website links.
