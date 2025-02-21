@@ -10,8 +10,8 @@ abstract class AppBinding with SchedulerBinding {
   bool get isClient;
 
   /// The currently active url.
-  /// 
-  /// On the server, this is the request url. 
+  ///
+  /// On the server, this is the request url.
   /// On the client, this is the currently visited url in the browser.
   String get currentUrl;
 

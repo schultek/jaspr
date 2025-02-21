@@ -12,7 +12,6 @@ import 'render_functions.dart';
 
 typedef FileLoader = Future<String?> Function(String);
 
-
 /// Global component binding for the server
 class ServerAppBinding extends AppBinding with ComponentsBinding {
   ServerAppBinding(this.request, {required FileLoader loadFile}) : _fileLoader = loadFile;
@@ -42,7 +41,6 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   int responseStatusCode = 200;
   String? responseErrorBody;
-
 
   @override
   void attachRootComponent(Component app) async {
@@ -108,7 +106,6 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   JasprOptions get options => _options!;
   JasprOptions? _options;
-
 
   void initializeOptions(JasprOptions options) {
     _options = options;

@@ -35,28 +35,35 @@ extension AppContext on BuildContext {
   }
 
   /// Sets the cookie with the given name and value in the response.
-  /// 
+  ///
   /// [name] and [value] must be composed of valid characters according to RFC
   /// 6265.
   void setCookie(
     /// The name of the cookie.
     String name,
+
     /// The value of the cookie.
     String value, {
     /// The time at which the cookie expires.
     DateTime? expires,
+
     /// The number of seconds until the cookie expires. A zero or negative value
     /// means the cookie has expired.
     int? maxAge,
+
     /// The domain that the cookie applies to.
     String? domain,
+
     /// The path within the [domain] that the cookie applies to.
     String? path,
+
     /// Whether to only send this cookie on secure connections.
     bool secure = false,
+
     /// Whether the cookie is only sent in the HTTP request and is not made
     /// available to client side scripts.
     bool httpOnly = true,
+
     /// Whether the cookie is available from other sites.
     SameSite? sameSite,
   }) {
@@ -73,7 +80,7 @@ extension AppContext on BuildContext {
   }
 
   /// Sets the response status code.
-  /// 
+  ///
   /// When [responseBody] is provided, it will be used as the response body instead of the rendered html.
   void setStatusCode(int statusCode, {String? responseBody}) {
     _binding

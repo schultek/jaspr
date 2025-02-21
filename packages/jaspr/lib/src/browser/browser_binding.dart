@@ -9,10 +9,9 @@ import 'dom_render_object.dart';
 
 /// Global component binding for the browser
 class BrowserAppBinding extends AppBinding with ComponentsBinding {
-
   @override
   bool get isClient => true;
-    
+
   static final String _baseOrigin = () {
     var base = document.querySelector('head>base') as HTMLBaseElement?;
     return base?.href ?? window.location.origin;
