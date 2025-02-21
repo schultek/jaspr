@@ -7,7 +7,7 @@ extension AppContext on BuildContext {
   ServerAppBinding get _binding => binding as ServerAppBinding;
 
   /// The url of the current request.
-  String get url => _binding.request.url.toString();
+  String get url => binding.currentUrl;
 
   /// The HTTP headers of the current request with case-insensitive keys.
   ///

@@ -20,6 +20,12 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   final RequestLike request;
   final FileLoader _fileLoader;
 
+  @override
+  bool get isClient => false;
+
+  @override
+  String get currentUrl => request.url;
+
   late final Map<String, String> cookies = () {
     final Map<String, String> map = {};
     final cookies = request.headers[HttpHeaders.cookieHeader]?.expand((h) => h.split(';')) ?? [];
@@ -37,8 +43,6 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   int responseStatusCode = 200;
   String? responseErrorBody;
 
-  @override
-  bool get isClient => false;
 
   @override
   void attachRootComponent(Component app) async {

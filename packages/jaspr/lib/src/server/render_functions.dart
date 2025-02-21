@@ -10,15 +10,15 @@ import 'run_app.dart';
 import 'server_app.dart';
 import 'server_binding.dart';
 
-typedef RequestLike = ({Uri url, Headers headers});
+typedef RequestLike = ({String url, Headers headers});
 
 /// Performs the rendering process and provides the created [AppBinding] to [setup].
 ///
 /// If [Jaspr.useIsolates] is true, this spawns an isolate for each render.
 Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loadFile, bool standalone) async {
-  var url = request.url.normalizePath();
-  if (!url.path.startsWith('/')) {
-    url = url.replace(path: '/${url.path}');
+  var url = request.url.normalizePath().toString();
+  if (!url.startsWith('/')) {
+    url = '/$url';
   }
 
   final RequestLike r = (url: url, headers: Headers.from(request.headersAll));

@@ -74,7 +74,7 @@ final loadedProjectProvider = Provider<AsyncValue<ProjectDataBase>>((ref) {
   }
 
   var storedProject = ref.read(storedProjectProvider);
-  var uri = Uri.parse(ref.binding.rootElement?.url ?? '/');
+  var uri = Uri.parse(ref.binding.currentUrl);
   var queryId = uri.queryParameters['gist'] != null
       ? 'gist-${uri.queryParameters['gist']}'
       : uri.queryParameters['sample'] != null
