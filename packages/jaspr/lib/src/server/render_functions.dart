@@ -6,11 +6,11 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/src/headers.dart';
 
 import '../../jaspr.dart';
+import 'run_app.dart';
 import 'server_app.dart';
 import 'server_binding.dart';
 
 typedef RequestLike = ({Uri url, Headers headers});
-typedef ResponseLike = ({int statusCode, String body, Map<String, List<String>> headers});
 
 /// Performs the rendering process and provides the created [AppBinding] to [setup].
 ///
@@ -20,9 +20,6 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
   if (!url.path.startsWith('/')) {
     url = url.replace(path: '/${url.path}');
   }
-  
-  print(("REQUEST", request.url, request.handlerPath, request.requestedUri, url));
-
 
   final RequestLike r = (url: url, headers: Headers.from(request.headersAll));
 

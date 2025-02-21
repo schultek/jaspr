@@ -16,7 +16,10 @@ void runApp(Component app) {
   ServerApp.run(_createSetup(app));
 }
 
-/// Returns a shelf handler that serves the provided component and related assets
+typedef RenderFunction = FutureOr<Response> Function(Component);
+typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render);
+
+/// Returns a shelf handler that serves the provided component and related assets.
 Handler serveApp(AppHandler handler) {
   _checkInitialized('serveApp');
   return createHandler((request, render) {
@@ -26,12 +29,13 @@ Handler serveApp(AppHandler handler) {
   });
 }
 
-typedef RenderFunction = FutureOr<Response> Function(Component);
-typedef AppHandler = FutureOr<Response> Function(Request, RenderFunction render);
+/// A record containing the status code, body, and headers for a response.
+typedef ResponseLike = ({int statusCode, String body, Map<String, List<String>> headers});
 
-/// Directly renders the provided component into a html string.
+/// Directly renders the provided component to HTML. Returns a [ResponseLike] object.
 ///
-/// When [standalone] is false (default), the html output will have a full document structure (html, head, body).
+/// - Accepts a [request] object for getting the current url and headers.
+/// - When [standalone] is false (default), the html output will have a full document structure (html, head, body).
 Future<ResponseLike> renderComponent(Component app, {Request? request, bool standalone = false}) async {
   _checkInitialized('renderComponent');
   request ??= Request('GET', Uri.parse('https://0.0.0.0/'));

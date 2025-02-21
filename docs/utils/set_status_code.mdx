@@ -1,0 +1,32 @@
+---
+title: "context.setStatusCode()"
+description: Set the response status code and body.
+---
+
+---
+
+<Warning>
+This API can only be used on the server and is only available using the `package:jaspr/server.dart` import.
+</Warning>
+
+## context.setStatusCode()
+
+The `context.setStatusCode()` method lets you set the status code for the response.
+
+You can also provide an optional `responseBody` that will be sent as the response body instead of the rendered html.
+
+```dart
+class App extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    if (!isAllowedAccess) {
+      // Redirect to the signup page.
+      context.setHeader('Location', '/signup');
+      context.setStatusCode(307, responseBody: 'Need to sign up.');
+      return;
+    }
+
+    yield p([text('Hello, World!')]);
+  }
+}
+```
