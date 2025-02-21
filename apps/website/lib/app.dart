@@ -24,9 +24,14 @@ class App extends StatelessComponent {
         ]),
       ),
       Route(
-        path: '/terms',
-        title: 'Terms',
-        builder: (_, __) => MarkdownPage('lib/content/terms.md'),
+        path: '/imprint',
+        title: 'Imprint',
+        builder: (_, __) => MarkdownPage('lib/content/imprint.md'),
+      ),
+      Route(
+        path: '/privacy',
+        title: 'Privacy Policy',
+        builder: (_, __) => MarkdownPage('lib/content/privacy.md'),
       ),
     ]);
   }
