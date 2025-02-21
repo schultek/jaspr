@@ -66,10 +66,10 @@ class Footer extends StatelessComponent {
           h5([text('Legal')]),
           ul([
             li([
-              a(href: '/terms#imprint', classes: 'animated-underline', [text('Imprint')])
+              a(href: '/imprint', classes: 'animated-underline', [text('Imprint')])
             ]),
             li([
-              a(href: '/terms#privacy', classes: 'animated-underline', [text('Privacy Policy')])
+              a(href: '/privacy', classes: 'animated-underline', [text('Privacy Policy')])
             ]),
           ]),
         ]),
