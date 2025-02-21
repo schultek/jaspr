@@ -13,7 +13,7 @@ void main() {
       var result = await renderComponent(div(id: 'test', []));
 
       expect(
-          result,
+          result.body,
           equals('<!DOCTYPE html>\n'
               '<html><head><base href="/"/></head><body><div id="test"></div></body></html>\n'
               ''));
@@ -22,7 +22,7 @@ void main() {
     test('renders standalone component', () async {
       var result = await renderComponent(div(id: 'test', []), standalone: true);
 
-      expect(result, equals('<div id="test"></div>\n'));
+      expect(result.body, equals('<div id="test"></div>\n'));
     });
   });
 }
