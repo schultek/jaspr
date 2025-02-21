@@ -23,7 +23,7 @@ void testComponents(
   test(
     description,
     () async {
-      var binding = TestComponentsBinding(uri ?? Uri.parse('/'), isClient);
+      var binding = TestComponentsBinding(isClient);
       var tester = ComponentTester._(binding);
 
       return binding.runTest(() async {
@@ -105,11 +105,7 @@ class ComponentTester {
 }
 
 class TestComponentsBinding extends AppBinding with ComponentsBinding {
-  TestComponentsBinding(this._currentUri, this._isClient);
-
-  final Uri? _currentUri;
-  @override
-  Uri get currentUri => _currentUri ?? (throw 'Did not call setUp() with currentUri provided.');
+  TestComponentsBinding(this._isClient);
 
   final bool _isClient;
   @override
