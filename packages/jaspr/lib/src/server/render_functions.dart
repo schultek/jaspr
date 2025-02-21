@@ -20,6 +20,9 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
   if (!url.path.startsWith('/')) {
     url = url.replace(path: '/${url.path}');
   }
+  
+  print(("REQUEST", request.url, request.handlerPath, request.requestedUri, url));
+
 
   final RequestLike r = (url: url, headers: Headers.from(request.headersAll));
 
