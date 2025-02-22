@@ -76,34 +76,29 @@ class OverlayState extends State<Overlay> {
   @css
   static final List<StyleRule> styles = [
     css('.blur-backdrop', [
-      css('&')
-          .box(
-            position: Position.fixed(
-              top: Unit.zero,
-              left: Unit.zero,
-              right: Unit.zero,
-              bottom: Unit.zero,
-              zIndex: ZIndex(1),
-            ),
-          )
-          .background(color: backgroundFaded)
-          .flexbox(
-            direction: FlexDirection.column,
-            alignItems: AlignItems.center,
-            justifyContent: JustifyContent.center,
-          )
-          .raw({
-        'backdrop-filter': 'blur(5px)',
-        '-webkit-backdrop-filter': 'blur(5px)',
-        'user-select': 'none',
-        '-webkit-user-select': 'none',
-      }),
+      css('&').styles(
+        position: Position.fixed(top: Unit.zero, left: Unit.zero, right: Unit.zero, bottom: Unit.zero),
+        zIndex: ZIndex(1),
+        backgroundColor: backgroundFaded,
+        flexDirection: FlexDirection.column,
+        alignItems: AlignItems.center,
+        justifyContent: JustifyContent.center,
+        userSelect: UserSelect.none,
+        raw: {
+          'backdrop-filter': 'blur(5px)',
+          '-webkit-backdrop-filter': 'blur(5px)',
+        },
+      ),
       css('img', [
-        css('&')
-            .box(maxWidth: 80.percent, maxHeight: 80.percent, radius: BorderRadius.circular(20.px))
-            .raw({'object-fit': 'cover', 'pointer-events': 'none'}),
+        css('&').styles(
+          maxWidth: 80.percent,
+          maxHeight: 80.percent,
+          radius: BorderRadius.circular(20.px),
+          pointerEvents: PointerEvents.none,
+          raw: {'object-fit': 'cover'},
+        ),
       ]),
-      css('span').box(display: Display.inlineBlock, margin: EdgeInsets.only(top: 1.rem)).combine(bodySmall),
+      css('span').styles(display: Display.inlineBlock, margin: Margin.only(top: 1.rem)).combine(bodySmall),
     ]),
   ];
 }

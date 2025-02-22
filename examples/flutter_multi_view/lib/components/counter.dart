@@ -17,7 +17,7 @@ class CounterState extends State<Counter> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'counter-group', styles: Styles.raw({'view-transition-name': component.name}), [
+    yield div(classes: 'counter-group', styles: Styles(raw: {'view-transition-name': component.name}), [
       div(classes: 'counter', [
         button(
           onClick: () {
@@ -48,36 +48,48 @@ class CounterState extends State<Counter> {
 
   @css
   static final styles = [
-    css('.counter-group').box(
-      margin: EdgeInsets.all(10.px),
-      padding: EdgeInsets.all(10.px),
-      border: Border.all(BorderSide.dashed(width: 1.px, color: Colors.lightGrey)),
+    css('.counter-group').styles(
+      margin: Margin.all(10.px),
+      padding: Padding.all(10.px),
+      border: Border(style: BorderStyle.dashed, width: 1.px, color: Colors.lightGrey),
       radius: BorderRadius.circular((cardBorderRadius + 10).px),
     ),
     css('.counter', [
-      css('&')
-          .box(
-            padding: EdgeInsets.symmetric(vertical: 10.px),
-            border: Border.all(BorderSide.solid(color: primaryColor, width: 1.px)),
-            radius: BorderRadius.circular(cardBorderRadius.px),
-            maxWidth: cardWidth.px,
-            minHeight: cardHeight.px,
-            boxSizing: BoxSizing.borderBox,
-          )
-          .background(color: surfaceColor)
-          .flexbox(alignItems: AlignItems.center, justifyContent: JustifyContent.spaceAround)
-          .text(color: Colors.black),
+      css('&').styles(
+        padding: Padding.symmetric(vertical: 10.px),
+        border: Border(color: primaryColor, width: 1.px),
+        radius: BorderRadius.circular(cardBorderRadius.px),
+        maxWidth: cardWidth.px,
+        minHeight: cardHeight.px,
+        boxSizing: BoxSizing.borderBox,
+        backgroundColor: surfaceColor,
+        display: Display.flex,
+        alignItems: AlignItems.center,
+        justifyContent: JustifyContent.spaceAround,
+        color: Colors.black,
+      ),
       css('button', [
-        css('&')
-            .text(fontSize: 1.5.rem)
-            .box(width: 2.em, height: 2.em, border: Border.unset, cursor: Cursor.pointer)
-            .box(radius: BorderRadius.all(Radius.circular(2.em)))
-            .flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center)
-            .background(color: Colors.transparent),
-        css('&:hover').background(color: const Color.hex('#0001')),
+        css('&').styles(
+          fontSize: 1.5.rem,
+          width: 2.em,
+          height: 2.em,
+          border: Border.unset,
+          cursor: Cursor.pointer,
+          radius: BorderRadius.all(Radius.circular(2.em)),
+          display: Display.flex,
+          justifyContent: JustifyContent.center,
+          alignItems: AlignItems.center,
+          backgroundColor: Colors.transparent,
+        ),
+        css('&:hover').styles(
+          backgroundColor: const Color.hex('#0001'),
+        ),
       ]),
-      css('span').text(fontSize: 14.px, align: TextAlign.center),
-      css('b').text(fontSize: 18.px),
+      css('span').styles(
+        fontSize: 14.px,
+        textAlign: TextAlign.center,
+      ),
+      css('b').styles(fontSize: 18.px),
     ]),
   ];
 }

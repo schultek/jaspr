@@ -30,16 +30,20 @@ class DevexBox extends StatelessComponent {
   @css
   static final List<StyleRule> styles = [
     css('.feature-box', [
-      css('&')
-          .box(
-            radius: BorderRadius.circular(12.px),
-            border: Border.all(BorderSide.solid(width: 2.px, color: borderColor)),
-          )
-          .flexbox(direction: FlexDirection.column, alignItems: AlignItems.stretch)
-          .raw({'background': 'linear-gradient(180deg, ${background.value} 0%, ${surface.value} 100%)'}),
-      css('.feature-preview').box(minHeight: 15.rem),
+      css('&').styles(
+        radius: BorderRadius.circular(12.px),
+        border: Border(width: 2.px, color: borderColor),
+        display: Display.flex,
+        flexDirection: FlexDirection.column,
+        alignItems: AlignItems.stretch,
+        raw: {'background': 'linear-gradient(180deg, ${background.value} 0%, ${surface.value} 100%)'},
+      ),
+      css('.feature-preview').styles(minHeight: 15.rem),
       css('.feature-info', [
-        css('&').box(padding: EdgeInsets.only(left: 1.rem, right: 1.rem, bottom: .5.rem)).text(align: TextAlign.start),
+        css('&').styles(
+          padding: Padding.only(left: 1.rem, right: 1.rem, bottom: .5.rem),
+          textAlign: TextAlign.start,
+        ),
       ]),
     ]),
   ];

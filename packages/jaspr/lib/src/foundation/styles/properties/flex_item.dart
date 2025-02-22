@@ -33,19 +33,6 @@ class _Flex implements Flex {
 
   @override
   Map<String, String> get styles {
-    if (grow != null) {
-      if (shrink == null && basis == null) {
-        return {'flex': grow!.numstr};
-      } else if (basis == null) {
-        return {'flex': '${grow!.numstr} ${shrink!.numstr}'};
-      } else if (shrink == null) {
-        return {'flex': '${grow!.numstr} ${basis!.value}'};
-      } else {
-        return {'flex': '${grow!.numstr} ${shrink!.numstr} ${basis!.value}'};
-      }
-    } else if (basis != null && shrink == null) {
-      return {'flex': basis!.value};
-    }
     return {
       if (grow != null) 'flex-grow': grow!.numstr,
       if (shrink != null) 'flex-shrink': shrink!.numstr,

@@ -71,16 +71,16 @@ final darkTheme = {
 
 // Typography
 
-final bodySmall = Styles.text(fontSize: 0.875.rem, fontWeight: FontWeight.w400, lineHeight: 1.3.em, color: textDim);
-final bodyMedium = Styles.text(fontSize: 1.rem, fontWeight: FontWeight.w400, lineHeight: 1.6.em, color: textDark);
-final bodyLarge = Styles.text(fontSize: 1.1.rem, fontWeight: FontWeight.w400, lineHeight: 1.7.em, color: textDark);
-final caption = Styles.text(fontSize: 1.2.rem, fontWeight: FontWeight.w800, color: primaryMid);
-final caption2 = Styles.text(fontSize: 0.8.rem, fontWeight: FontWeight.w800, color: primaryMid, letterSpacing: 0.08.em);
-final heading1 = Styles.text(fontSize: 4.rem, fontWeight: FontWeight.w800, color: textBlack);
-final heading2 = Styles.text(fontSize: 3.rem, fontWeight: FontWeight.w700, color: textBlack);
-final heading3 = Styles.text(fontSize: 2.5.rem, fontWeight: FontWeight.w700, color: textBlack);
-final heading4 = Styles.text(fontSize: 1.5.rem, fontWeight: FontWeight.w700, color: textBlack);
-final heading5 = Styles.text(fontSize: 1.rem, fontWeight: FontWeight.w600, color: textBlack);
+final bodySmall = Styles(fontSize: 0.875.rem, fontWeight: FontWeight.w400, lineHeight: 1.3.em, color: textDim);
+final bodyMedium = Styles(fontSize: 1.rem, fontWeight: FontWeight.w400, lineHeight: 1.6.em, color: textDark);
+final bodyLarge = Styles(fontSize: 1.1.rem, fontWeight: FontWeight.w400, lineHeight: 1.7.em, color: textDark);
+final caption = Styles(fontSize: 1.2.rem, fontWeight: FontWeight.w800, color: primaryMid);
+final caption2 = Styles(fontSize: 0.8.rem, fontWeight: FontWeight.w800, color: primaryMid, letterSpacing: 0.08.em);
+final heading1 = Styles(fontSize: 4.rem, fontWeight: FontWeight.w800, color: textBlack);
+final heading2 = Styles(fontSize: 3.rem, fontWeight: FontWeight.w700, color: textBlack);
+final heading3 = Styles(fontSize: 2.5.rem, fontWeight: FontWeight.w700, color: textBlack);
+final heading4 = Styles(fontSize: 1.5.rem, fontWeight: FontWeight.w700, color: textBlack);
+final heading5 = Styles(fontSize: 1.rem, fontWeight: FontWeight.w600, color: textBlack);
 
 const maxContentWidth = Unit.rem(70);
 const mobileBreakpoint = Unit.rem(40);
@@ -94,31 +94,32 @@ final root = [
   css.import('font/lucide/lucide.css'),
 
   // Global
-  css('html, body').box(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
-  css('html')
-      .text(fontFamily: FontFamily.list([FontFamilies.uiSansSerif, FontFamilies.systemUi, FontFamilies.sansSerif]))
-      .background(color: background),
+  css('html, body').styles(margin: Margin.zero, padding: Padding.zero),
+  css('html').styles(
+    fontFamily: FontFamily.list([FontFamilies.uiSansSerif, FontFamilies.systemUi, FontFamilies.sansSerif]),
+    backgroundColor: background,
+  ),
 
   // Theme
-  css(':root').raw({
+  css(':root').styles(raw: {
     for (final color in lightTheme.keys) color.value.substring(4, color.value.length - 1): lightTheme[color]!.value,
     '--contentPadding': '4rem',
     '--sectionPadding': '16rem',
   }),
 
-  css(':root.dark').raw({
+  css(':root.dark').styles(raw: {
     for (final color in darkTheme.keys) color.value.substring(4, color.value.length - 1): darkTheme[color]!.value,
   }),
 
   css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
-    css(':root').raw({
+    css(':root').styles(raw: {
       '--contentPadding': '2rem',
       '--sectionPadding': '8rem',
     }),
   ]),
 
   css.media(MediaQuery.all(maxWidth: smallMobileBreakpoint), [
-    css(':root').raw({
+    css(':root').styles(raw: {
       '--contentPadding': '1rem',
       '--sectionPadding': '4rem',
     }),
@@ -128,36 +129,36 @@ final root = [
   css('.caption').combine(caption),
   css('.caption2').combine(caption2),
   css('p').combine(bodyMedium),
-  css('h1').combine(heading1).box(margin: EdgeInsets.only(top: Unit.zero, bottom: 0.1.rem)),
-  css('h2').combine(heading2).box(margin: EdgeInsets.only(top: Unit.zero, bottom: 0.1.em)),
-  css('h3').combine(heading3).box(margin: EdgeInsets.only(top: Unit.zero, bottom: 0.1.em)),
-  css('h4').combine(heading4).box(margin: EdgeInsets.only(top: Unit.zero, bottom: 0.1.em)),
-  css('h5').combine(heading5).box(margin: EdgeInsets.only(top: Unit.zero, bottom: 0.1.em)),
+  css('h1').combine(heading1).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.rem)),
+  css('h2').combine(heading2).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
+  css('h3').combine(heading3).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
+  css('h4').combine(heading4).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
+  css('h5').combine(heading5).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
 
   css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
-    css('h1').text(fontSize: 2.6.rem),
-    css('h2').text(fontSize: 1.8.rem),
-    css('h3').text(fontSize: 1.8.rem),
-    css('h4').text(fontSize: 1.2.rem),
+    css('h1').styles(fontSize: 2.6.rem),
+    css('h2').styles(fontSize: 1.8.rem),
+    css('h3').styles(fontSize: 1.8.rem),
+    css('h4').styles(fontSize: 1.2.rem),
   ]),
 
   // Common
-  css('.actions').flexbox(
-    direction: FlexDirection.row,
+  css('.actions').styles(
+    display: Display.flex,
+    flexDirection: FlexDirection.row,
     alignItems: AlignItems.center,
     gap: Gap.all(.8.em),
-    wrap: FlexWrap.wrap,
+    flexWrap: FlexWrap.wrap,
   ),
-  css('.text-gradient').raw({
+  css('.text-gradient').styles(raw: {
     'background': primaryGradient,
     '-webkit-background-clip': 'text',
     '-webkit-text-fill-color': 'transparent',
   }),
-  css('a').text(decoration: TextDecoration.none, color: textDark),
-  css('b').text(fontWeight: FontWeight.w500),
+  css('a').styles(textDecoration: TextDecoration.none, color: textDark),
+  css('b').styles(fontWeight: FontWeight.w500),
 
-  css('code, pre, .mono')
-      .text(
+  css('code, pre, .mono').styles(
     fontFamily: FontFamily.list([
       FontFamilies.uiMonospace,
       FontFamily('SFMono-Regular'),
@@ -170,19 +171,20 @@ final root = [
     ]),
     fontSize: 0.875.rem,
     lineHeight: 1.4.em,
-  )
-      .raw({'-webkit-text-size-adjust': '100%'}),
+    raw: {'-webkit-text-size-adjust': '100%'},
+  ),
 
   // Animated underline
   css('.animated-underline', [
-    css('&')
-        .raw({'background-image': 'linear-gradient(to right, currentColor, currentColor)'})
-        .background(
-          position: BackgroundPosition(offsetX: Unit.zero, offsetY: 100.percent),
-          repeat: BackgroundRepeat.noRepeat,
-          size: BackgroundSize.sides(Unit.zero, 1.5.px),
-        )
-        .box(transition: Transition('background-size', duration: 300, curve: Curve.easeInOut)),
-    css('&:hover').background(size: BackgroundSize.sides(100.percent, 1.5.px)),
+    css('&').styles(
+      raw: {'background-image': 'linear-gradient(to right, currentColor, currentColor)'},
+      backgroundPosition: BackgroundPosition(offsetX: Unit.zero, offsetY: 100.percent),
+      backgroundRepeat: BackgroundRepeat.noRepeat,
+      backgroundSize: BackgroundSize.sides(Unit.zero, 1.5.px),
+      transition: Transition('background-size', duration: 300, curve: Curve.easeInOut),
+    ),
+    css('&:hover').styles(
+      backgroundSize: BackgroundSize.sides(100.percent, 1.5.px),
+    ),
   ]),
 ];

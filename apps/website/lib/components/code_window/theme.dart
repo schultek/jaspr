@@ -2,10 +2,10 @@ import 'package:jaspr/jaspr.dart';
 import 'package:website/constants/theme.dart';
 
 final jasprTheme = {
-  'root': Styles.text(color: textDark),
-  'keyword': Styles.text(color: Color.hex('#5d48d5')),
-  'string': Styles.text(color: Color.hex('#60a15f')),
-  'attr': Styles.text(color: Color.hex('#c36077')),
+  'root': Styles(color: textDark),
+  'keyword': Styles(color: Color.hex('#5d48d5')),
+  'string': Styles(color: Color.hex('#60a15f')),
+  'attr': Styles(color: Color.hex('#c36077')),
   // 'comment': Styles.text(color: Color.hex('#6a737d')),
   // 'quote': Styles.text(color: Color.hex('#6a737d')),
   // 'selector-tag': Styles.text(color: Color.hex('#005cc5')),

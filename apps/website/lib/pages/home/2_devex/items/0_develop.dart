@@ -46,22 +46,22 @@ class Develop extends StatelessComponent {
   @css
   static final List<StyleRule> styles = [
     css('.develop-preview', [
-      css('&').box(
-        padding: EdgeInsets.all(1.rem),
+      css('&').styles(
+        padding: Padding.all(1.rem),
         height: 100.percent,
         boxSizing: BoxSizing.borderBox,
         position: Position.relative(),
       ),
-      css('& > div').box(
+      css('& > div').styles(
         position: Position.absolute(top: 50.percent, left: 47.percent),
         width: 33.rem,
         maxWidth: 100.percent,
         transform: Transform.translate(x: (-50).percent, y: (-50).percent),
       ),
-      css('& > div > div', [
-        css('&').box(position: Position.relative()),
-      ]),
-      css('.counter-button').box(
+      css('& > div > div').styles(
+        position: Position.relative(),
+      ),
+      css('.counter-button').styles(
         position: Position.absolute(right: (-1.5).rem, bottom: (-0.5).rem),
       ),
     ]),

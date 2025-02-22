@@ -30,23 +30,34 @@ class DevExp extends StatelessComponent {
   @css
   static final List<StyleRule> styles = [
     css('#devex', [
-      css('&')
-          .box(padding: EdgeInsets.only(top: sectionPadding))
-          .flexbox(direction: FlexDirection.column, alignItems: AlignItems.center)
-          .text(align: TextAlign.center),
+      css('&').styles(
+        padding: Padding.only(top: sectionPadding),
+        display: Display.flex,
+        flexDirection: FlexDirection.column,
+        alignItems: AlignItems.center,
+        textAlign: TextAlign.center,
+      ),
       css('.devex-grid', [
-        css('&')
-            .box(
-              maxWidth: maxContentWidth,
-              margin: EdgeInsets.only(top: 3.rem),
-              padding: EdgeInsets.symmetric(horizontal: contentPadding),
-            )
-            .flexbox(direction: FlexDirection.column, gap: Gap(row: 3.rem)),
+        css('&').styles(
+          maxWidth: maxContentWidth,
+          margin: Margin.only(top: 3.rem),
+          padding: Padding.symmetric(horizontal: contentPadding),
+          display: Display.flex,
+          flexDirection: FlexDirection.column,
+          gap: Gap(row: 3.rem),
+        ),
         css('& > div', [
-          css('&').flexbox(direction: FlexDirection.row, wrap: FlexWrap.wrap, gap: Gap.all(3.rem)),
-          css('& > *').flexItem(flex: Flex(grow: 1, shrink: 1, basis: FlexBasis(16.rem))),
-          css('&:first-child > *:first-child').raw({'flex-basis': '30rem'}),
-          css('&:last-child > *:last-child').raw({'flex-basis': '30rem'}),
+          css('&').styles(
+            display: Display.flex,
+            flexDirection: FlexDirection.row,
+            flexWrap: FlexWrap.wrap,
+            gap: Gap.all(3.rem),
+          ),
+          css('& > *').styles(
+            flex: Flex(grow: 1, shrink: 1, basis: FlexBasis(16.rem)),
+          ),
+          css('&:first-child > *:first-child').styles(flex: Flex(basis: FlexBasis(30.rem))),
+          css('&:last-child > *:last-child').styles(flex: Flex(basis: FlexBasis(30.rem))),
         ]),
       ])
     ]),

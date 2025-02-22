@@ -8,6 +8,7 @@ part 'groups/background.dart';
 part 'groups/box.dart';
 part 'groups/flexbox.dart';
 part 'groups/flexitem.dart';
+part 'groups/general.dart';
 part 'groups/grid.dart';
 part 'groups/grid_item.dart';
 part 'groups/list.dart';
@@ -17,12 +18,86 @@ part 'groups/text.dart';
 abstract class Styles with StylesMixin<Styles> {
   const Styles._();
 
-  Map<String, String> get styles;
+  Map<String, String> get properties;
 
   /// Constructs an empty [Styles] instance.
-  const factory Styles() = _EmptyStyles;
+  const factory Styles({
+    // Box Styles
+    Padding? padding,
+    Margin? margin,
+    Display? display,
+    BoxSizing? boxSizing,
+    Unit? width,
+    Unit? height,
+    Unit? minWidth,
+    Unit? maxWidth,
+    Unit? minHeight,
+    Unit? maxHeight,
+    Border? border,
+    BorderRadius? radius,
+    Outline? outline,
+    Overflow? overflow,
+    Visibility? visibility,
+    Position? position,
+    ZIndex? zIndex,
+    double? opacity,
+    Transform? transform,
+    BoxShadow? shadow,
+    Cursor? cursor,
+    Transition? transition,
+    UserSelect? userSelect,
+    PointerEvents? pointerEvents,
+    // Text Styles
+    Color? color,
+    TextAlign? textAlign,
+    FontFamily? fontFamily,
+    FontStyle? fontStyle,
+    Unit? fontSize,
+    FontWeight? fontWeight,
+    TextDecoration? textDecoration,
+    TextTransform? textTransform,
+    Unit? textIndent,
+    Unit? letterSpacing,
+    Unit? wordSpacing,
+    Unit? lineHeight,
+    TextShadow? textShadow,
+    TextOverflow? textOverflow,
+    WhiteSpace? whiteSpace,
+    // Background Styles
+    Color? backgroundColor,
+    BackgroundAttachment? backgroundAttachment,
+    BackgroundClip? backgroundClip,
+    ImageStyle? backgroundImage,
+    BackgroundOrigin? backgroundOrigin,
+    BackgroundPosition? backgroundPosition,
+    BackgroundRepeat? backgroundRepeat,
+    BackgroundSize? backgroundSize,
+    // Flexbox Styles
+    FlexDirection? flexDirection,
+    FlexWrap? flexWrap,
+    JustifyContent? justifyContent,
+    AlignItems? alignItems,
+    Gap? gap,
+    Flex? flex,
+    int? order,
+    AlignSelf? alignSelf,
+    // Grid Styles
+    GridTemplate? gridTemplate,
+    List<TrackSize>? autoRows,
+    List<TrackSize>? autoColumns,
+    GridPlacement? gridPlacement,
+    // List Styles
+    ListStyle? listStyle,
+    ImageStyle? listImage,
+    ListStylePosition? listPosition,
+    // Other Styles
+    String? content,
+    // Raw Styles
+    Map<String, String>? raw,
+  }) = _Styles;
 
   /// Constructs a [Styles] instance from a [Map] of raw css style properties and values.
+  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
   const factory Styles.raw(Map<String, String> styles) = _RawStyles;
 
   /// Constructs a [Styles] instance by combining multiple other [Styles] instances.
@@ -32,6 +107,7 @@ abstract class Styles with StylesMixin<Styles> {
   Styles combine(Styles styles) => Styles.combine([this, styles]);
 
   /// Constructs a [Styles] instance for common text-related style properties.
+  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
   const factory Styles.text({
     Color? color,
     TextAlign? align,
@@ -51,6 +127,7 @@ abstract class Styles with StylesMixin<Styles> {
   }) = _TextStyles;
 
   /// Constructs a [Styles] instance for common background style properties.
+  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
   const factory Styles.background({
     Color? color,
     BackgroundAttachment? attachment,
@@ -63,6 +140,7 @@ abstract class Styles with StylesMixin<Styles> {
   }) = _BackgroundStyles;
 
   /// Constructs a [Styles] instance for common box style properties.
+  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
   const factory Styles.box({
     EdgeInsets? padding,
     EdgeInsets? margin,
@@ -80,6 +158,7 @@ abstract class Styles with StylesMixin<Styles> {
     Overflow? overflow,
     Visibility? visibility,
     Position? position,
+    ZIndex? zIndex,
     double? opacity,
     Transform? transform,
     BoxShadow? shadow,
@@ -88,6 +167,7 @@ abstract class Styles with StylesMixin<Styles> {
   }) = _BoxStyles;
 
   /// Constructs a [Styles] instance for common flexbox style properties.
+  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
   const factory Styles.flexbox({
     FlexDirection? direction,
     FlexWrap? wrap,
@@ -97,6 +177,7 @@ abstract class Styles with StylesMixin<Styles> {
   }) = _FlexBoxStyles;
 
   /// Constructs a [Styles] instance for children of a flex-box parent.
+  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
   const factory Styles.flexItem({
     Flex? flex,
     int? order,
@@ -104,6 +185,7 @@ abstract class Styles with StylesMixin<Styles> {
   }) = _FlexItemStyles;
 
   /// Constructs a [Styles] instance for common grid style properties.
+  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
   const factory Styles.grid({
     GridTemplate? template,
     Gap? gap,
@@ -112,11 +194,13 @@ abstract class Styles with StylesMixin<Styles> {
   }) = _GridStyles;
 
   /// Constructs a [Styles] instance for children of a grid parent.
+  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
   const factory Styles.gridItem({
     GridPlacement? placement,
   }) = _GridItemStyles;
 
   /// Constructs a [Styles] instance for a list.
+  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
   const factory Styles.list({
     ListStyle? style,
     ImageStyle? image,
@@ -124,26 +208,157 @@ abstract class Styles with StylesMixin<Styles> {
   }) = _ListStyles;
 }
 
-class _EmptyStyles extends Styles {
-  const _EmptyStyles() : super._();
-
-  @override
-  Map<String, String> get styles => {};
-
-  @override
-  Styles combine(Styles styles) {
-    return styles;
-  }
-}
-
 abstract mixin class StylesMixin<T> {
+  T styles({
+    // Box Styles
+    Padding? padding,
+    Margin? margin,
+    Display? display,
+    BoxSizing? boxSizing,
+    Unit? width,
+    Unit? height,
+    Unit? minWidth,
+    Unit? maxWidth,
+    Unit? minHeight,
+    Unit? maxHeight,
+    Border? border,
+    BorderRadius? radius,
+    Outline? outline,
+    Overflow? overflow,
+    Visibility? visibility,
+    Position? position,
+    ZIndex? zIndex,
+    double? opacity,
+    Transform? transform,
+    BoxShadow? shadow,
+    Cursor? cursor,
+    Transition? transition,
+    UserSelect? userSelect,
+    PointerEvents? pointerEvents,
+    // Text Styles
+    Color? color,
+    TextAlign? textAlign,
+    FontFamily? fontFamily,
+    FontStyle? fontStyle,
+    Unit? fontSize,
+    FontWeight? fontWeight,
+    TextDecoration? textDecoration,
+    TextTransform? textTransform,
+    Unit? textIndent,
+    Unit? letterSpacing,
+    Unit? wordSpacing,
+    Unit? lineHeight,
+    TextShadow? textShadow,
+    TextOverflow? textOverflow,
+    WhiteSpace? whiteSpace,
+    // Background Styles
+    Color? backgroundColor,
+    BackgroundAttachment? backgroundAttachment,
+    BackgroundClip? backgroundClip,
+    ImageStyle? backgroundImage,
+    BackgroundOrigin? backgroundOrigin,
+    BackgroundPosition? backgroundPosition,
+    BackgroundRepeat? backgroundRepeat,
+    BackgroundSize? backgroundSize,
+    // Flexbox Styles
+    FlexDirection? flexDirection,
+    FlexWrap? flexWrap,
+    JustifyContent? justifyContent,
+    AlignItems? alignItems,
+    Gap? gap,
+    Flex? flex,
+    int? order,
+    AlignSelf? alignSelf,
+    // Grid Styles
+    GridTemplate? gridTemplate,
+    List<TrackSize>? autoRows,
+    List<TrackSize>? autoColumns,
+    GridPlacement? gridPlacement,
+    // List Styles
+    ListStyle? listStyle,
+    ImageStyle? listImage,
+    ListStylePosition? listPosition,
+    // Other Styles
+    String? content,
+    // Raw Styles
+    Map<String, String>? raw,
+  }) =>
+      combine(Styles(
+        padding: padding,
+        margin: margin,
+        display: display,
+        boxSizing: boxSizing,
+        width: width,
+        height: height,
+        minWidth: minWidth,
+        maxWidth: maxWidth,
+        minHeight: minHeight,
+        maxHeight: maxHeight,
+        border: border,
+        radius: radius,
+        outline: outline,
+        overflow: overflow,
+        visibility: visibility,
+        position: position,
+        zIndex: zIndex,
+        opacity: opacity,
+        transform: transform,
+        shadow: shadow,
+        cursor: cursor,
+        transition: transition,
+        userSelect: userSelect,
+        pointerEvents: pointerEvents,
+        color: color,
+        textAlign: textAlign,
+        fontFamily: fontFamily,
+        fontStyle: fontStyle,
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        textDecoration: textDecoration,
+        textTransform: textTransform,
+        textIndent: textIndent,
+        letterSpacing: letterSpacing,
+        wordSpacing: wordSpacing,
+        lineHeight: lineHeight,
+        textShadow: textShadow,
+        textOverflow: textOverflow,
+        whiteSpace: whiteSpace,
+        backgroundColor: backgroundColor,
+        backgroundAttachment: backgroundAttachment,
+        backgroundClip: backgroundClip,
+        backgroundImage: backgroundImage,
+        backgroundOrigin: backgroundOrigin,
+        backgroundPosition: backgroundPosition,
+        backgroundRepeat: backgroundRepeat,
+        backgroundSize: backgroundSize,
+        flexDirection: flexDirection,
+        flexWrap: flexWrap,
+        justifyContent: justifyContent,
+        alignItems: alignItems,
+        gap: gap,
+        flex: flex,
+        order: order,
+        alignSelf: alignSelf,
+        gridTemplate: gridTemplate,
+        autoRows: autoRows,
+        autoColumns: autoColumns,
+        gridPlacement: gridPlacement,
+        listStyle: listStyle,
+        listImage: listImage,
+        listPosition: listPosition,
+        content: content,
+        raw: raw,
+      ));
+
   /// Combines the current styles with a [Map] of raw css style properties and values.
+  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
   T raw(Map<String, String> styles) => combine(Styles.raw(styles));
 
   /// Combines the current styles with another [Styles] instances.
   T combine(Styles styles);
 
   /// Combines the current styles with common text-related style properties.
+  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
   T text({
     Color? color,
     TextAlign? align,
@@ -180,6 +395,7 @@ abstract mixin class StylesMixin<T> {
       ));
 
   /// Combines the current styles with common background style properties.
+  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
   T background({
     Color? color,
     BackgroundAttachment? attachment,
@@ -202,6 +418,7 @@ abstract mixin class StylesMixin<T> {
       ));
 
   /// Combines the current styles with common box style properties.
+  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
   T box({
     EdgeInsets? padding,
     EdgeInsets? margin,
@@ -250,6 +467,7 @@ abstract mixin class StylesMixin<T> {
       ));
 
   /// Combines the current styles with common flexbox style properties.
+  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
   T flexbox({
     FlexDirection? direction,
     FlexWrap? wrap,
@@ -266,6 +484,7 @@ abstract mixin class StylesMixin<T> {
       ));
 
   /// Combines the current styles with common flex child properties.
+  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
   T flexItem({
     Flex? flex,
     int? order,
@@ -278,6 +497,7 @@ abstract mixin class StylesMixin<T> {
       ));
 
   /// Combines the current styles with common grid style properties.
+  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
   T grid({
     GridTemplate? template,
     Gap? gap,
@@ -292,6 +512,7 @@ abstract mixin class StylesMixin<T> {
       ));
 
   /// Combines the current styles with common grid child properties.
+  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
   T gridItem({
     GridPlacement? placement,
   }) =>
@@ -300,6 +521,7 @@ abstract mixin class StylesMixin<T> {
       ));
 
   /// Combines the current styles with common list style properties.
+  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
   T list({
     ListStyle? style,
     ImageStyle? image,
@@ -314,13 +536,13 @@ abstract mixin class StylesMixin<T> {
 
 class _RawStyles extends Styles {
   @override
-  final Map<String, String> styles;
+  final Map<String, String> properties;
 
-  const _RawStyles(this.styles) : super._();
+  const _RawStyles(this.properties) : super._();
 
   @override
   Styles raw(Map<String, String> styles) {
-    return Styles.raw({...this.styles, ...styles});
+    return Styles(raw: {...properties, ...styles});
   }
 }
 
@@ -330,7 +552,7 @@ class _CombinedStyles extends Styles {
   const _CombinedStyles(this._styles) : super._();
 
   @override
-  Map<String, String> get styles => _styles.fold({}, (v, s) => v..addAll(s.styles));
+  Map<String, String> get properties => _styles.fold({}, (v, s) => v..addAll(s.properties));
 
   @override
   Styles combine(Styles styles) {

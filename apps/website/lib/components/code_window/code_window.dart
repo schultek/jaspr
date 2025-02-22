@@ -51,54 +51,57 @@ class CodeWindow extends StatelessComponent {
   @css
   static final List<StyleRule> styles = [
     css('.code-window', [
-      css('&').box(
+      css('&').styles(
         radius: BorderRadius.circular(13.px),
       ),
       css('&.framed', [
-        css('&')
-            .box(
-              overflow: Overflow.hidden,
-              border: Border.all(BorderSide(color: borderColor, width: 6.px)),
-              shadow: BoxShadow(offsetX: 2.px, offsetY: 2.px, blur: 18.px, color: shadowColor1),
-            )
-            .background(color: borderColor),
+        css('&').styles(
+          overflow: Overflow.hidden,
+          border: Border(color: borderColor, width: 6.px),
+          shadow: BoxShadow(offsetX: 2.px, offsetY: 2.px, blur: 18.px, color: shadowColor1),
+          backgroundColor: borderColor,
+        ),
       ]),
       css('&:not(.framed)', [
-        css('.code-window-body').box(
+        css('.code-window-body').styles(
           shadow: BoxShadow(offsetX: 2.px, offsetY: 2.px, blur: 10.px, color: shadowColor3),
         ),
       ]),
       css('.code-window-header', [
-        css('&')
-            .box(
-              padding: EdgeInsets.only(left: 2.6.em, top: 2.px),
-            )
-            .flexbox(gap: Gap(column: 0.2.rem)),
+        css('&').styles(
+          padding: Padding.only(left: 2.6.em, top: 2.px),
+          display: Display.flex,
+          gap: Gap(column: 0.2.rem),
+        ),
         css('.code-window-tab', [
-          css('&')
-              .box(
-                padding: EdgeInsets.only(left: .8.em, right: 1.2.em, top: .5.em, bottom: .5.em),
-                shadow: BoxShadow(offsetX: 0.px, offsetY: (-2).px, blur: 3.px, color: shadowColor1),
-                radius: BorderRadius.only(topLeft: Radius.circular(6.px), topRight: Radius.circular(6.px)),
-              )
-              .flexbox(alignItems: AlignItems.center, gap: Gap(column: 0.4.rem))
-              .background(color: surfaceLowest)
-              .text(color: textBlack),
-          css('&.inactive')
-              .box(opacity: 0.5, width: 0.px)
-              .flexItem(flex: Flex(grow: 1))
-              .raw({'max-width': 'fit-content'}),
+          css('&').styles(
+              padding: Padding.only(left: .8.em, right: 1.2.em, top: .5.em, bottom: .5.em),
+              shadow: BoxShadow(offsetX: 0.px, offsetY: (-2).px, blur: 3.px, color: shadowColor1),
+              radius: BorderRadius.only(topLeft: Radius.circular(6.px), topRight: Radius.circular(6.px)),
+              display: Display.flex,
+              alignItems: AlignItems.center,
+              gap: Gap(column: 0.4.rem),
+              backgroundColor: surfaceLowest,
+              color: textBlack),
+          css('&.inactive').styles(
+            opacity: 0.5,
+            width: 0.px,
+            flex: Flex(grow: 1),
+            raw: {'max-width': 'fit-content'},
+          ),
         ]),
-        css('.code-window-title').text(fontWeight: FontWeight.w400, fontSize: 0.9.rem),
+        css('.code-window-title').styles(
+          fontWeight: FontWeight.w400,
+          fontSize: 0.9.rem,
+        ),
       ]),
       css('.code-window-body', [
-        css('&')
-            .box(
-              radius: BorderRadius.circular(8.px),
-              overflow: Overflow.hidden,
-              shadow: BoxShadow(offsetX: Unit.zero, offsetY: Unit.zero, blur: 4.px, color: shadowColor1),
-            )
-            .background(color: background),
+        css('&').styles(
+          radius: BorderRadius.circular(8.px),
+          overflow: Overflow.hidden,
+          shadow: BoxShadow(offsetX: Unit.zero, offsetY: Unit.zero, blur: 4.px, color: shadowColor1),
+          backgroundColor: background,
+        ),
       ]),
     ]),
   ];

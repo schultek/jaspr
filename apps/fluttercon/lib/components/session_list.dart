@@ -27,13 +27,18 @@ class SessionList extends StatelessComponent {
   @css
   static final styles = [
     css('.sessions', [
-      css('&').list(style: ListStyle.none).box(padding: EdgeInsets.symmetric(horizontal: 40.px)),
-      css('li').box(margin: EdgeInsets.only(bottom: 8.px)),
-      css('.group').box(
+      css('&').styles(
+        listStyle: ListStyle.none,
+        padding: Padding.symmetric(horizontal: 40.px),
+      ),
+      css('li').styles(
+        margin: Margin.only(bottom: 8.px),
+      ),
+      css('.group').styles(
           radius: BorderRadius.circular(8.px),
-          border: Border.all(BorderSide.dashed(color: Colors.gray)),
-          padding: EdgeInsets.only(left: 8.px, right: 8.px, top: 8.px),
-          margin: EdgeInsets.symmetric(vertical: 20.px)),
+          border: Border(style: BorderStyle.dashed, color: Colors.gray),
+          padding: Padding.only(left: 8.px, right: 8.px, top: 8.px),
+          margin: Margin.symmetric(vertical: 20.px)),
     ]),
   ];
 }

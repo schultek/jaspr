@@ -16,7 +16,7 @@ class _FlexBoxStyles extends Styles {
   }) : super._();
 
   @override
-  Map<String, String> get styles => {
+  Map<String, String> get properties => {
         'display': 'flex',
         if (direction != null) 'flex-direction': direction!.value,
         if (wrap != null) 'flex-wrap': wrap!.value,

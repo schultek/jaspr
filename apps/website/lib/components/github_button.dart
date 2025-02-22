@@ -49,10 +49,10 @@ class GithubButtonState extends State<GithubButton> {
         span([text('schultek/jaspr')]),
         span([
           Icon('star'),
-          span(styles: !loaded ? Styles.box(opacity: 0) : null, [text('$stars')]),
+          span(styles: !loaded ? Styles(opacity: 0) : null, [text('$stars')]),
           span([]),
           Icon('git-fork'),
-          span(styles: !loaded ? Styles.box(opacity: 0) : null, [text('$forks')])
+          span(styles: !loaded ? Styles(opacity: 0) : null, [text('$forks')])
         ])
       ])
     ]);
@@ -61,26 +61,45 @@ class GithubButtonState extends State<GithubButton> {
   @css
   static final List<StyleRule> styles = [
     css('.github-button', [
-      css('&')
-          .box(
-            padding: EdgeInsets.symmetric(horizontal: 0.7.rem, vertical: 0.4.rem),
-            radius: BorderRadius.circular(8.px),
-          )
-          .text(decoration: TextDecoration.none, color: textBlack, fontSize: 0.7.rem)
-          .flexbox(alignItems: AlignItems.center, gap: Gap(column: .5.rem)),
-      css('&:hover').background(color: hoverOverlayColor),
-      css('& *').box(transition: Transition('opacity', duration: 200, curve: Curve.easeInOut)),
-      css('&:hover *').raw({'opacity': '1 !important'}),
-      css('& > i').box(opacity: 0.9),
+      css('&').styles(
+        padding: Padding.symmetric(horizontal: 0.7.rem, vertical: 0.4.rem),
+        radius: BorderRadius.circular(8.px),
+        textDecoration: TextDecoration.none,
+        color: textBlack,
+        fontSize: 0.7.rem,
+        display: Display.flex,
+        alignItems: AlignItems.center,
+        gap: Gap(column: .5.rem),
+      ),
+      css('&:hover').styles(
+        backgroundColor: hoverOverlayColor,
+      ),
+      css('& *').styles(
+        transition: Transition('opacity', duration: 200, curve: Curve.easeInOut),
+      ),
+      css('&:hover *').styles(
+        raw: {'opacity': '1 !important'},
+      ),
+      css('& > i').styles(
+        opacity: 0.9,
+      ),
       css('div', [
-        css('&').flexbox(direction: FlexDirection.column),
-        css('& > span:first-child')
-            .text(fontFamily: FontFamily.list([FontFamilies.monospace]))
-            .box(opacity: 0.8, margin: EdgeInsets.only(bottom: 2.px)),
-        css('& > span:last-child')
-            .text(fontSize: 0.9.em)
-            .box(opacity: 0.6)
-            .flexbox(alignItems: AlignItems.center, gap: Gap(column: .3.em)),
+        css('&').styles(
+          display: Display.flex,
+          flexDirection: FlexDirection.column,
+        ),
+        css('& > span:first-child').styles(
+          fontFamily: FontFamily.list([FontFamilies.monospace]),
+          opacity: 0.8,
+          margin: Margin.only(bottom: 2.px),
+        ),
+        css('& > span:last-child').styles(
+          fontSize: 0.9.em,
+          opacity: 0.6,
+          display: Display.flex,
+          alignItems: AlignItems.center,
+          gap: Gap(column: .3.em),
+        ),
       ]),
     ]),
   ];

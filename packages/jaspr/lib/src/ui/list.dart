@@ -57,13 +57,12 @@ class ListView extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    final styles = Styles.list(
-      style: marker?.style,
-      image: marker?.image,
-      position: marker?.position,
-    ).box(
-      margin: marker?.style == ListStyle.none ? EdgeInsets.zero : null,
-      padding: marker?.style == ListStyle.none ? EdgeInsets.zero : null,
+    final styles = Styles(
+      listStyle: marker?.style,
+      listImage: marker?.image,
+      listPosition: marker?.position,
+      margin: marker?.style == ListStyle.none ? Margin.zero : null,
+      padding: marker?.style == ListStyle.none ? Padding.zero : null,
     );
 
     if (type == ListType.unordered) {

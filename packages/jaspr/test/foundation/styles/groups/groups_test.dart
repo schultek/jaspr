@@ -7,21 +7,21 @@ void main() {
   group('style group', () {
     group('raw', () {
       test('outputs raw styles', () {
-        var styles = const Styles.raw({'a': 'b', 'c': 'd'});
+        var styles = const Styles(raw: {'a': 'b', 'c': 'd'});
 
-        expect(styles.styles, equals({'a': 'b', 'c': 'd'}));
+        expect(styles.properties, equals({'a': 'b', 'c': 'd'}));
       });
     });
 
     group('combine', () {
       test('combines raw styles', () {
         var styles = const Styles.combine([
-          Styles.raw({'a': 'b', 'c': 'd'}),
-          Styles.raw({'c': 'e', 'f': 'g'}),
+          Styles(raw: {'a': 'b', 'c': 'd'}),
+          Styles(raw: {'c': 'e', 'f': 'g'}),
         ]);
 
         expect(
-          styles.styles,
+          styles.properties,
           equals({
             'a': 'b',
             'c': 'e',
@@ -32,17 +32,17 @@ void main() {
 
       test('combines typed styles', () {
         var styles = const Styles.combine([
-          Styles.text(
+          Styles(
             fontSize: Unit.pixels(12),
             fontFamily: FontFamily('Roboto'),
           ),
-          Styles.text(
+          Styles(
             fontSize: Unit.pixels(14),
           ),
         ]);
 
         expect(
-          styles.styles,
+          styles.properties,
           equals({
             'font-size': '14px',
             'font-family': "'Roboto'",
@@ -53,25 +53,25 @@ void main() {
 
     group('text', () {
       test('outputs all properties', () {
-        var styles = const Styles.text(
+        var styles = const Styles(
           color: Colors.blue,
-          align: TextAlign.center,
+          textAlign: TextAlign.center,
           fontFamily: FontFamily('Roboto'),
           fontStyle: FontStyle.italic,
           fontSize: Unit.pixels(12),
           fontWeight: FontWeight.bold,
-          decoration: TextDecoration(line: TextDecorationLine.underline),
-          transform: TextTransform.lowerCase,
-          indent: Unit.pixels(8),
+          textDecoration: TextDecoration(line: TextDecorationLine.underline),
+          textTransform: TextTransform.lowerCase,
+          textIndent: Unit.pixels(8),
           letterSpacing: Unit.em(0.5),
           wordSpacing: Unit.points(10),
           lineHeight: Unit.rem(1.5),
-          shadow: TextShadow(offsetX: Unit.zero, offsetY: Unit.zero, blur: Unit.pixels(10)),
-          overflow: TextOverflow.ellipsis,
+          textShadow: TextShadow(offsetX: Unit.zero, offsetY: Unit.zero, blur: Unit.pixels(10)),
+          textOverflow: TextOverflow.ellipsis,
         );
 
         expect(
-          styles.styles,
+          styles.properties,
           equals({
             'color': 'blue',
             'text-align': 'center',
@@ -94,23 +94,23 @@ void main() {
 
     group('background', () {
       test('outputs all properties', () {
-        var styles = const Styles.background(
-          color: Colors.red,
-          attachment: BackgroundAttachment.fixed,
-          clip: BackgroundClip.borderBox,
-          image: ImageStyle.url('abc.png'),
-          origin: BackgroundOrigin.contentBox,
-          position: BackgroundPosition(
+        var styles = const Styles(
+          backgroundColor: Colors.red,
+          backgroundAttachment: BackgroundAttachment.fixed,
+          backgroundClip: BackgroundClip.borderBox,
+          backgroundImage: ImageStyle.url('abc.png'),
+          backgroundOrigin: BackgroundOrigin.contentBox,
+          backgroundPosition: BackgroundPosition(
             alignX: BackgroundAlignX.left,
             alignY: BackgroundAlignY.center,
             offsetX: Unit.percent(20),
           ),
-          repeat: BackgroundRepeat.noRepeat,
-          size: BackgroundSize.cover,
+          backgroundRepeat: BackgroundRepeat.noRepeat,
+          backgroundSize: BackgroundSize.cover,
         );
 
         expect(
-          styles.styles,
+          styles.properties,
           equals({
             'background-color': 'red',
             'background-attachment': 'fixed',
@@ -127,9 +127,9 @@ void main() {
 
     group('box', () {
       test('outputs all properties', () {
-        var styles = const Styles.box(
-          padding: EdgeInsets.all(Unit.pixels(20)),
-          margin: EdgeInsets.zero,
+        var styles = const Styles(
+          padding: Padding.all(Unit.pixels(20)),
+          margin: Margin.zero,
           display: Display.inlineBlock,
           boxSizing: BoxSizing.borderBox,
           width: Unit.percent(80),
@@ -141,6 +141,7 @@ void main() {
           overflow: Overflow.visible,
           visibility: Visibility.visible,
           position: Position.absolute(top: Unit.pixels(100)),
+          zIndex: ZIndex(100),
           opacity: 0.5,
           transform: Transform.scale(2),
           shadow: BoxShadow(offsetX: Unit.zero, offsetY: Unit.zero, blur: Unit.pixels(10)),
@@ -149,7 +150,7 @@ void main() {
         );
 
         expect(
-          styles.styles,
+          styles.properties,
           equals({
             'padding': '20px',
             'margin': '0',
@@ -166,6 +167,7 @@ void main() {
             'visibility': 'visible',
             'position': 'absolute',
             'top': '100px',
+            'z-index': '100',
             'opacity': '0.5',
             'transform': 'scale(2)',
             'box-shadow': '0 0 10px',
@@ -178,17 +180,16 @@ void main() {
 
     group('flexbox', () {
       test('outputs all properties', () {
-        var styles = const Styles.flexbox(
-          direction: FlexDirection.column,
-          wrap: FlexWrap.nowrap,
+        var styles = const Styles(
+          flexDirection: FlexDirection.column,
+          flexWrap: FlexWrap.nowrap,
           justifyContent: JustifyContent.center,
           alignItems: AlignItems.start,
         );
 
         expect(
-          styles.styles,
+          styles.properties,
           equals({
-            'display': 'flex',
             'flex-direction': 'column',
             'flex-wrap': 'nowrap',
             'justify-content': 'center',
@@ -200,14 +201,14 @@ void main() {
 
     group('flexitem', () {
       test('outputs all properties', () {
-        var styles = const Styles.flexItem(
+        var styles = const Styles(
           flex: Flex(grow: 2, shrink: 1, basis: FlexBasis.auto),
           order: 2,
           alignSelf: AlignSelf.start,
         );
 
         expect(
-          styles.styles,
+          styles.properties,
           equals({
             'flex': '2 1 auto',
             'order': '2',
@@ -219,8 +220,8 @@ void main() {
 
     group('grid', () {
       test('outputs all properties', () {
-        var styles = const Styles.grid(
-          template: GridTemplate(
+        var styles = const Styles(
+          gridTemplate: GridTemplate(
               areas: GridAreas([
             'header header',
             'side content',
@@ -232,9 +233,8 @@ void main() {
         );
 
         expect(
-          styles.styles,
+          styles.properties,
           equals({
-            'display': 'grid',
             'grid-template-areas': '"header header"\n'
                 '"side content"\n'
                 '"side content"',
@@ -248,12 +248,12 @@ void main() {
 
     group('griditem', () {
       test('outputs all properties', () {
-        var styles = const Styles.gridItem(
-          placement: GridPlacement.area('content'),
+        var styles = const Styles(
+          gridPlacement: GridPlacement.area('content'),
         );
 
         expect(
-          styles.styles,
+          styles.properties,
           equals({
             'grid-area': 'content',
           }),

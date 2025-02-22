@@ -90,32 +90,40 @@ class HeaderState extends State<Header> {
   @css
   static final styles = [
     css('header', [
-      css('&')
-          .box(
-            position: Position.absolute(left: Unit.zero, right: Unit.zero, zIndex: ZIndex(1)),
-            padding: EdgeInsets.symmetric(horizontal: 2.rem, vertical: 2.rem),
-          )
-          .flexbox(gap: Gap(column: 2.rem)),
-      css('& > *').flexbox(alignItems: AlignItems.center),
+      css('&').styles(
+        position: Position.absolute(left: Unit.zero, right: Unit.zero),
+        zIndex: ZIndex(1),
+        padding: Padding.symmetric(horizontal: 2.rem, vertical: 2.rem),
+        gap: Gap(column: 2.rem),
+      ),
+      css('& > *').styles(alignItems: AlignItems.center),
       css('nav', [
-        css('&')
-            .flexItem(flex: Flex(grow: 1))
-            .flexbox(justifyContent: JustifyContent.end, gap: Gap(column: 2.rem))
-            .text(color: textBlack),
-        css('& a').text(
-          fontSize: 1.rem,
-          fontWeight: FontWeight.w500,
-          decoration: TextDecoration.none,
+        css('&').styles(
+          flex: Flex(grow: 1),
+          display: Display.flex,
+          justifyContent: JustifyContent.end,
+          gap: Gap(column: 2.rem),
           color: textBlack,
         ),
-        css('& a:hover').text(color: primaryMid),
+        css('& a').styles(
+          fontSize: 1.rem,
+          fontWeight: FontWeight.w500,
+          textDecoration: TextDecoration.none,
+          color: textBlack,
+        ),
+        css('& a:hover').styles(
+          color: primaryMid,
+        ),
       ]),
     ]),
     css.media(MediaQuery.screen(maxWidth: mobileBreakpoint.px), [
       css('header', [
-        css('&').flexbox(justifyContent: JustifyContent.spaceBetween),
-        css('& > nav').box(display: Display.none),
-        css('& > .header-actions').box(display: Display.none),
+        css('&').styles(
+          display: Display.flex,
+          justifyContent: JustifyContent.spaceBetween,
+        ),
+        css('& > nav').styles(display: Display.none),
+        css('& > .header-actions').styles(display: Display.none),
       ]),
     ]),
   ];

@@ -1,34 +1,40 @@
 import 'unit.dart';
 
-class EdgeInsets {
+@Deprecated('Will be removed in 0.20.0. Use Padding or Margin instead.')
+typedef EdgeInsets = Spacing;
+
+typedef Padding = Spacing;
+typedef Margin = Spacing;
+
+class Spacing {
   /// The css styles
   final Map<String, String> styles;
 
-  const EdgeInsets._(this.styles);
+  const Spacing._(this.styles);
 
-  const factory EdgeInsets.fromLTRB(Unit left, Unit top, Unit right, Unit bottom) = _QuadEdgeInsets;
+  const factory Spacing.fromLTRB(Unit left, Unit top, Unit right, Unit bottom) = _QuadEdgeInsets;
 
-  const factory EdgeInsets.only({Unit? left, Unit? top, Unit? right, Unit? bottom}) = _QuadEdgeInsets.only;
+  const factory Spacing.only({Unit? left, Unit? top, Unit? right, Unit? bottom}) = _QuadEdgeInsets.only;
 
-  const factory EdgeInsets.all(Unit value) = _AllEdgeInsets;
+  const factory Spacing.all(Unit value) = _AllEdgeInsets;
 
-  const factory EdgeInsets.symmetric({Unit? vertical, Unit? horizontal}) = _SymmetricEdgeInsets;
+  const factory Spacing.symmetric({Unit? vertical, Unit? horizontal}) = _SymmetricEdgeInsets;
 
-  static const EdgeInsets zero = EdgeInsets.all(Unit.zero);
+  static const Spacing zero = Spacing.all(Unit.zero);
 
   Unit get left => Unit.zero;
   Unit get right => Unit.zero;
   Unit get top => Unit.zero;
   Unit get bottom => Unit.zero;
 
-  static const EdgeInsets inherit = EdgeInsets._({'': 'inherit'});
-  static const EdgeInsets initial = EdgeInsets._({'': 'initial'});
-  static const EdgeInsets revert = EdgeInsets._({'': 'revert'});
-  static const EdgeInsets revertLayer = EdgeInsets._({'': 'revert-layer'});
-  static const EdgeInsets unset = EdgeInsets._({'': 'unset'});
+  static const Spacing inherit = Spacing._({'': 'inherit'});
+  static const Spacing initial = Spacing._({'': 'initial'});
+  static const Spacing revert = Spacing._({'': 'revert'});
+  static const Spacing revertLayer = Spacing._({'': 'revert-layer'});
+  static const Spacing unset = Spacing._({'': 'unset'});
 }
 
-class _QuadEdgeInsets implements EdgeInsets {
+class _QuadEdgeInsets implements Spacing {
   final Unit? _left;
   final Unit? _top;
   final Unit? _right;
@@ -65,7 +71,7 @@ class _QuadEdgeInsets implements EdgeInsets {
   }
 }
 
-class _AllEdgeInsets implements EdgeInsets {
+class _AllEdgeInsets implements Spacing {
   final Unit _value;
 
   const _AllEdgeInsets(this._value);
@@ -83,7 +89,7 @@ class _AllEdgeInsets implements EdgeInsets {
   Map<String, String> get styles => {'': _value.value};
 }
 
-class _SymmetricEdgeInsets implements EdgeInsets {
+class _SymmetricEdgeInsets implements Spacing {
   final Unit? vertical;
   final Unit? horizontal;
 

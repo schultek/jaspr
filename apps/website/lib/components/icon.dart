@@ -9,28 +9,32 @@ class Icon extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     if (name == 'jasper') {
-      yield img(src: 'images/jasper_icon.png', alt: 'jasper-icon', styles: Styles.box(height: size ?? 1.2.em));
+      yield img(src: 'images/jasper_icon.png', alt: 'jasper-icon', styles: Styles(height: size ?? 1.2.em));
       return;
     } else if (name == 'dart') {
-      yield img(src: 'images/dart_icon.png', alt: 'dart-icon', styles: Styles.box(height: size ?? 1.2.em));
+      yield img(src: 'images/dart_icon.png', alt: 'dart-icon', styles: Styles(height: size ?? 1.2.em));
       return;
     }
-    yield i(classes: 'icon-$name', styles: Styles.text(fontSize: size ?? 1.2.em), []);
+    yield i(classes: 'icon-$name', styles: Styles(fontSize: size ?? 1.2.em), []);
   }
 
   @css
   static final List<StyleRule> styles = [
-    css('[class^=icon-custom-]').box(width: 1.em, height: 1.em).raw({
-      '-webkit-mask': 'var(--icon) no-repeat',
-      'mask': 'var(--icon) no-repeat',
-      '-webkit-mask-size': '100% 100%',
-      'mask-size': '100% 100%',
-      'background-color': 'currentColor',
-      'color': 'inherit',
-    }),
-    css('.icon-custom-discord').raw({'--icon': 'url("$discordIcon")'}),
-    css('.icon-custom-github').raw({'--icon': 'url("$githubIcon")'}),
-    css('.icon-custom-jaspr').raw({'--icon': 'url("$jasprIcon")'}),
+    css('[class^=icon-custom-]').styles(
+      width: 1.em,
+      height: 1.em,
+      color: Color.inherit,
+      raw: {
+        '-webkit-mask': 'var(--icon) no-repeat',
+        'mask': 'var(--icon) no-repeat',
+        '-webkit-mask-size': '100% 100%',
+        'mask-size': '100% 100%',
+        'background-color': 'currentColor',
+      },
+    ),
+    css('.icon-custom-discord').styles(raw: {'--icon': 'url("$discordIcon")'}),
+    css('.icon-custom-github').styles(raw: {'--icon': 'url("$githubIcon")'}),
+    css('.icon-custom-jaspr').styles(raw: {'--icon': 'url("$jasprIcon")'}),
   ];
 }
 

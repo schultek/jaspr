@@ -1,3 +1,13 @@
+## Unreleased minor
+
+- **BREAKING** Moved `zIndex` property out of `Position` and directly into `Styles`.
+
+- Deprecated having seperate style groups (`Styles.box()`, `Styles.text()`, `Styles.background()`, etc. as well as `.box()`, `.text()`, etc.). All styling properties are now available under the single `Styles()` constructur and `.styles()` method.
+
+- Deprecated `EdgeInsets` in favor of `Padding` and `Margin` types.
+
+- Added `userSelect`, `pointerEvents` and `content` properties to `Styles`.
+
 ## 0.17.1
 
 - Update logo and website links.

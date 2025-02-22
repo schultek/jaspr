@@ -1,6 +1,6 @@
 library components;
 
-export 'jaspr.dart' hide runApp;
+export 'jaspr.dart' hide runApp, Padding;
 export 'src/ui/layout.dart';
 export 'src/ui/list.dart';
 export 'src/ui/media.dart';

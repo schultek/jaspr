@@ -54,9 +54,9 @@ void main() {
       });
     });
 
-    group('edge_insets', () {
+    group('spacing', () {
       test('base', () {
-        var insets = EdgeInsets.inherit;
+        var insets = Spacing.inherit;
 
         expect(insets.styles, equals({'': 'inherit'}));
 
@@ -67,7 +67,7 @@ void main() {
       });
 
       test('from ltrm', () {
-        var insets = EdgeInsets.fromLTRB(10.px, 20.px, 30.px, 40.px);
+        var insets = Spacing.fromLTRB(10.px, 20.px, 30.px, 40.px);
 
         expect(insets.left, equals(10.px));
         expect(insets.top, equals(20.px));
@@ -78,7 +78,7 @@ void main() {
       });
 
       test('only', () {
-        var insets = EdgeInsets.only(left: 10.px, bottom: 40.px);
+        var insets = Spacing.only(left: 10.px, bottom: 40.px);
 
         expect(insets.left, equals(10.px));
         expect(insets.top, equals(0.px));
@@ -89,7 +89,7 @@ void main() {
       });
 
       test('all', () {
-        var insets = EdgeInsets.all(10.px);
+        var insets = Spacing.all(10.px);
 
         expect(insets.left, equals(10.px));
         expect(insets.top, equals(10.px));
@@ -100,7 +100,7 @@ void main() {
       });
 
       test('symmetric', () {
-        var insets = EdgeInsets.symmetric(vertical: 10.px, horizontal: 20.px);
+        var insets = Spacing.symmetric(vertical: 10.px, horizontal: 20.px);
 
         expect(insets.left, equals(20.px));
         expect(insets.top, equals(10.px));
@@ -109,7 +109,7 @@ void main() {
 
         expect(insets.styles, equals({'': '10px 20px'}));
 
-        insets = EdgeInsets.symmetric(vertical: 10.px);
+        insets = Spacing.symmetric(vertical: 10.px);
 
         expect(insets.left, equals(0.px));
         expect(insets.top, equals(10.px));

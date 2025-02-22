@@ -57,7 +57,7 @@ class CounterButtonState extends State<CounterButton> {
             increment();
           }
         },
-        styles: Styles.box(width: 10.em).text(align: TextAlign.center, whiteSpace: WhiteSpace.noWrap),
+        styles: Styles(width: 10.em, textAlign: TextAlign.center, whiteSpace: WhiteSpace.noWrap),
         child: LinkButton.filled(label: 'Clicked $count times', to: ''),
       ),
     ]);
@@ -65,6 +65,6 @@ class CounterButtonState extends State<CounterButton> {
 
   @css
   static final List<StyleRule> styles = [
-    css('.counter-container').box(position: Position.relative()),
+    css('.counter-container').styles(position: Position.relative()),
   ];
 }

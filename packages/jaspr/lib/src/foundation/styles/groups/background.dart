@@ -22,7 +22,7 @@ class _BackgroundStyles extends Styles {
   }) : super._();
 
   @override
-  Map<String, String> get styles => {
+  Map<String, String> get properties => {
         if (color != null) 'background-color': color!.value,
         if (attachment != null) 'background-attachment': attachment!.value,
         if (clip != null) 'background-clip': clip!.value,

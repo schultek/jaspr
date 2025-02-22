@@ -6,5 +6,5 @@ class _GridItemStyles extends Styles {
   final GridPlacement? placement;
 
   @override
-  Map<String, String> get styles => placement?.styles ?? {};
+  Map<String, String> get properties => placement?.styles ?? {};
 }

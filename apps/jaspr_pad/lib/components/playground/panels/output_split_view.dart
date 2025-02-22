@@ -91,7 +91,7 @@ class EditorTabs extends StatelessComponent {
               yield button(
                 id: 'left-console-clear-button',
                 classes: 'console-clear-icon mdc-icon-button',
-                styles: !isConsole ? Styles.box(visibility: Visibility.hidden) : null,
+                styles: !isConsole ? Styles(visibility: Visibility.hidden) : null,
                 attributes: {'title': 'Clear console'},
                 events: events(onClick: () {
                   context.read(consoleMessagesProvider.notifier).state = [];
@@ -110,7 +110,7 @@ class EditorTabs extends StatelessComponent {
             ),
           ]),
         ]),
-        div(id: 'editor-panel-tab-host', styles: Styles.box(overflow: Overflow.scroll), [
+        div(id: 'editor-panel-tab-host', styles: Styles(overflow: Overflow.scroll), [
           EditorTabWindow(),
         ]),
       ],
