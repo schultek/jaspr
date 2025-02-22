@@ -51,17 +51,13 @@ class App extends StatelessComponent {
   static Styles backgroundShade(Unit top, Unit left, {Unit? w, Unit? h, Unit? b, Unit? r}) {
     return Styles(
       content: '',
-      raw: {
-        'filter': 'blur(64px)',
-        '-webkit-filter': 'blur(64px)',
-        'background': primaryGradient,
-      },
       position: Position.absolute(top: top, left: left, right: r, bottom: b),
       zIndex: ZIndex(-1),
-      radius: BorderRadius.circular(100.percent),
       width: w,
       height: h,
+      radius: BorderRadius.circular(100.percent),
       opacity: 0.05,
+      raw: {'filter' : 'blur(64px)', '-webkit-filter' : 'blur(64px)', 'background' : primaryGradient},
     );
   }
 }

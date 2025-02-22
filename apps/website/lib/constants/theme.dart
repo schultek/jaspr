@@ -71,16 +71,16 @@ final darkTheme = {
 
 // Typography
 
-final bodySmall = Styles(fontSize: 0.875.rem, fontWeight: FontWeight.w400, lineHeight: 1.3.em, color: textDim);
-final bodyMedium = Styles(fontSize: 1.rem, fontWeight: FontWeight.w400, lineHeight: 1.6.em, color: textDark);
-final bodyLarge = Styles(fontSize: 1.1.rem, fontWeight: FontWeight.w400, lineHeight: 1.7.em, color: textDark);
-final caption = Styles(fontSize: 1.2.rem, fontWeight: FontWeight.w800, color: primaryMid);
-final caption2 = Styles(fontSize: 0.8.rem, fontWeight: FontWeight.w800, color: primaryMid, letterSpacing: 0.08.em);
-final heading1 = Styles(fontSize: 4.rem, fontWeight: FontWeight.w800, color: textBlack);
-final heading2 = Styles(fontSize: 3.rem, fontWeight: FontWeight.w700, color: textBlack);
-final heading3 = Styles(fontSize: 2.5.rem, fontWeight: FontWeight.w700, color: textBlack);
-final heading4 = Styles(fontSize: 1.5.rem, fontWeight: FontWeight.w700, color: textBlack);
-final heading5 = Styles(fontSize: 1.rem, fontWeight: FontWeight.w600, color: textBlack);
+final bodySmall = Styles(color: textDim, fontSize: 0.875.rem, fontWeight: FontWeight.w400, lineHeight: 1.3.em);
+final bodyMedium = Styles(color: textDark, fontSize: 1.rem, fontWeight: FontWeight.w400, lineHeight: 1.6.em);
+final bodyLarge = Styles(color: textDark, fontSize: 1.1.rem, fontWeight: FontWeight.w400, lineHeight: 1.7.em);
+final caption = Styles(color: primaryMid, fontSize: 1.2.rem, fontWeight: FontWeight.w800);
+final caption2 = Styles(color: primaryMid, fontSize: 0.8.rem, fontWeight: FontWeight.w800, letterSpacing: 0.08.em);
+final heading1 = Styles(color: textBlack, fontSize: 4.rem, fontWeight: FontWeight.w800);
+final heading2 = Styles(color: textBlack, fontSize: 3.rem, fontWeight: FontWeight.w700);
+final heading3 = Styles(color: textBlack, fontSize: 2.5.rem, fontWeight: FontWeight.w700);
+final heading4 = Styles(color: textBlack, fontSize: 1.5.rem, fontWeight: FontWeight.w700);
+final heading5 = Styles(color: textBlack, fontSize: 1.rem, fontWeight: FontWeight.w600);
 
 const maxContentWidth = Unit.rem(70);
 const mobileBreakpoint = Unit.rem(40);

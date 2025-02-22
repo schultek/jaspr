@@ -64,8 +64,8 @@ class Particles extends StatelessComponent {
         opacity: 1,
       ),
       '100%': Styles(
-        transform: Transform.translate(x: Unit.variable('--particle-offset')),
         opacity: 0,
+        transform: Transform.translate(x: Unit.variable('--particle-offset')),
       ),
     })
   ];

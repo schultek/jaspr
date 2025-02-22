@@ -6,6 +6,8 @@ import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../utils.dart';
+
 class StylesOrderingLint extends DartLintRule {
   StylesOrderingLint()
       : super(
@@ -32,14 +34,41 @@ class StylesOrderingLint extends DartLintRule {
       }
 
       final params = method.parameters.map((p) => p.name).toList();
+      final arguments = node.argumentList.arguments;
 
-      var violatesOrder = !isOrdered(node.argumentList.arguments, params);
+      var violatesOrder = !isOrdered(arguments, params);
       if (violatesOrder) {
         reporter.atOffset(
-          offset: node.argumentList.arguments.beginToken!.offset,
-          length: node.argumentList.arguments.endToken!.end - node.argumentList.arguments.beginToken!.offset,
+          offset: arguments.beginToken!.offset,
+          length: arguments.endToken!.end - arguments.beginToken!.offset,
           errorCode: code,
-          data: (node, params),
+          data: (arguments, params),
+        );
+      }
+    });
+    
+    context.registry.addInstanceCreationExpression((node) {
+      if (node.constructorName.type.name2.lexeme != 'Styles' || node.constructorName.name != null) {
+        return;
+      }
+      if (!isStylesType(node.staticType)) {
+        return;
+      }
+      var constructor = node.constructorName.staticElement;
+      if (constructor == null) {
+        return;
+      }
+
+      final params = constructor.parameters.map((p) => p.name).toList();
+      final arguments = node.argumentList.arguments;
+
+      var violatesOrder = !isOrdered(arguments, params);
+      if (violatesOrder) {
+        reporter.atOffset(
+          offset: arguments.beginToken!.offset,
+          length: arguments.endToken!.end - arguments.beginToken!.offset,
+          errorCode: code,
+          data: (arguments, params),
         );
       }
     });
@@ -84,14 +113,13 @@ class OrderStylesFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    if (analysisError.data case (InvocationExpression node, List<String> params)) {
-      var violatesOrder = !StylesOrderingLint.isOrdered(node.argumentList.arguments, params);
+    if (analysisError.data case (NodeList<Expression> arguments, List<String> params)) {
+      var violatesOrder = !StylesOrderingLint.isOrdered(arguments, params);
       if (!violatesOrder) {
         return;
       }
 
       reporter.createChangeBuilder(message: 'Sort styles', priority: 2).addDartFileEdit((builder) {
-        var arguments = node.argumentList.arguments;
         var content = resolver.source.contents.data;
 
         var start = arguments.beginToken!.offset;
@@ -103,8 +131,13 @@ class OrderStylesFix extends DartFix {
           breaks.add(content.substring(arguments[i].end, arguments[i + 1].offset));
         }
 
-        var args = <NamedExpression>[...arguments.cast<NamedExpression>()]
-          ..sort((a, b) => params.indexOf(a.name.label.name).compareTo(params.indexOf(b.name.label.name)));
+        var args = [...arguments]
+          ..sort((a, b) {
+            if (a is NamedExpression && b is NamedExpression) {
+              return params.indexOf(a.name.label.name).compareTo(params.indexOf(b.name.label.name));
+            }
+            return 0;
+          });
 
         var argSources = args.map((a) => a.toSource()).toList();
 

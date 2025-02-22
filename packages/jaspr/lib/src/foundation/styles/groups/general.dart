@@ -2,37 +2,57 @@ part of '../styles.dart';
 
 class _Styles extends Styles {
   // Box Styles
-  final Padding? padding;
-  final Margin? margin;
+  final String? content;
   final Display? display;
-  final BoxSizing? boxSizing;
+  final Position? position;
+  final ZIndex? zIndex;
   final Unit? width;
   final Unit? height;
   final Unit? minWidth;
-  final Unit? maxWidth;
   final Unit? minHeight;
+  final Unit? maxWidth;
   final Unit? maxHeight;
+  final Padding? padding;
+  final Margin? margin;
+  final BoxSizing? boxSizing;
   final Border? border;
   final BorderRadius? radius;
   final Outline? outline;
-  final Overflow? overflow;
-  final Visibility? visibility;
-  final Position? position;
-  final ZIndex? zIndex;
   final double? opacity;
-  final Transform? transform;
+  final Visibility? visibility;
+  final Overflow? overflow;
   final BoxShadow? shadow;
   final Cursor? cursor;
-  final Transition? transition;
   final UserSelect? userSelect;
   final PointerEvents? pointerEvents;
-  // Text Styles
+  final Transition? transition;
+  final Transform? transform;
+  // Flexbox Style
+  final FlexDirection? flexDirection;
+  final FlexWrap? flexWrap;
+  final JustifyContent? justifyContent;
+  final AlignItems? alignItems;
+  // Grid Style
+  final GridTemplate? gridTemplate;
+  final List<TrackSize>? autoRows;
+  final List<TrackSize>? autoColumns;
+  final Gap? gap;
+  // Item Style
+  final Flex? flex;
+  final int? order;
+  final AlignSelf? alignSelf;
+  final GridPlacement? gridPlacement;
+  // List Style
+  final ListStyle? listStyle;
+  final ImageStyle? listImage;
+  final ListStylePosition? listPosition;
+  // Text Style
   final Color? color;
   final TextAlign? textAlign;
   final FontFamily? fontFamily;
-  final FontStyle? fontStyle;
   final Unit? fontSize;
   final FontWeight? fontWeight;
+  final FontStyle? fontStyle;
   final TextDecoration? textDecoration;
   final TextTransform? textTransform;
   final Unit? textIndent;
@@ -42,71 +62,71 @@ class _Styles extends Styles {
   final TextShadow? textShadow;
   final TextOverflow? textOverflow;
   final WhiteSpace? whiteSpace;
-  // Background Styles
+  // Background Style
   final Color? backgroundColor;
-  final BackgroundAttachment? backgroundAttachment;
-  final BackgroundClip? backgroundClip;
   final ImageStyle? backgroundImage;
   final BackgroundOrigin? backgroundOrigin;
   final BackgroundPosition? backgroundPosition;
+  final BackgroundAttachment? backgroundAttachment;
   final BackgroundRepeat? backgroundRepeat;
   final BackgroundSize? backgroundSize;
-  // Flexbox Styles
-  final FlexDirection? flexDirection;
-  final FlexWrap? flexWrap;
-  final JustifyContent? justifyContent;
-  final AlignItems? alignItems;
-  final Gap? gap;
-  final Flex? flex;
-  final int? order;
-  final AlignSelf? alignSelf;
-  // Grid Styles
-  final GridTemplate? gridTemplate;
-  final List<TrackSize>? autoRows;
-  final List<TrackSize>? autoColumns;
-  final GridPlacement? gridPlacement;
-  // List Styles
-  final ListStyle? listStyle;
-  final ImageStyle? listImage;
-  final ListStylePosition? listPosition;
-  // Other Styles
-  final String? content;
+  final BackgroundClip? backgroundClip;
   // Raw Styles
   final Map<String, String>? _raw;
 
   const _Styles({
     // Box Styles
-    this.margin,
-    this.padding,
+    this.content,
     this.display,
-    this.boxSizing,
+    this.position,
+    this.zIndex,
     this.width,
     this.height,
     this.minWidth,
-    this.maxWidth,
     this.minHeight,
+    this.maxWidth,
     this.maxHeight,
+    this.padding,
+    this.margin,
+    this.boxSizing,
     this.border,
     this.radius,
     this.outline,
-    this.overflow,
-    this.visibility,
-    this.position,
-    this.zIndex,
     this.opacity,
-    this.transform,
+    this.visibility,
+    this.overflow,
     this.shadow,
     this.cursor,
-    this.transition,
     this.userSelect,
     this.pointerEvents,
+    this.transition,
+    this.transform,
+    // Flexbox Styles
+    this.flexDirection,
+    this.flexWrap,
+    this.justifyContent,
+    this.alignItems,
+    // Grid Styles
+    this.gridTemplate,
+    this.autoRows,
+    this.autoColumns,
+    this.gap,
+    // Item Styles
+    this.flex,
+    this.order,
+    this.alignSelf,
+    this.gridPlacement,
+    // List Styles
+    this.listStyle,
+    this.listImage,
+    this.listPosition,
     // Text Styles
     this.color,
     this.textAlign,
     this.fontFamily,
-    this.fontStyle,
     this.fontSize,
     this.fontWeight,
+    this.fontStyle,
     this.textDecoration,
     this.textTransform,
     this.textIndent,
@@ -118,33 +138,13 @@ class _Styles extends Styles {
     this.whiteSpace,
     // Background Styles
     this.backgroundColor,
-    this.backgroundAttachment,
-    this.backgroundClip,
     this.backgroundImage,
     this.backgroundOrigin,
     this.backgroundPosition,
+    this.backgroundAttachment,
     this.backgroundRepeat,
     this.backgroundSize,
-    // Flexbox Styles
-    this.flexDirection,
-    this.flexWrap,
-    this.justifyContent,
-    this.alignItems,
-    this.gap,
-    this.flex,
-    this.order,
-    this.alignSelf,
-    // Grid Styles
-    this.gridTemplate,
-    this.autoRows,
-    this.autoColumns,
-    this.gridPlacement,
-    // List Styles
-    this.listStyle,
-    this.listImage,
-    this.listPosition,
-    // Other Styles
-    this.content,
+    this.backgroundClip,
     // Raw Styles
     Map<String, String>? raw,
   })  : _raw = raw,
