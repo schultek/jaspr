@@ -3,13 +3,10 @@ import 'unit.dart';
 abstract class Position {
   static const Position static = _Position('static');
 
-  const factory Position.absolute({Unit? top, Unit? left, Unit? bottom, Unit? right}) =
-      _Positioned.absolute;
-  const factory Position.relative({Unit? top, Unit? left, Unit? bottom, Unit? right}) =
-      _Positioned.relative;
+  const factory Position.absolute({Unit? top, Unit? left, Unit? bottom, Unit? right}) = _Positioned.absolute;
+  const factory Position.relative({Unit? top, Unit? left, Unit? bottom, Unit? right}) = _Positioned.relative;
   const factory Position.fixed({Unit? top, Unit? left, Unit? bottom, Unit? right}) = _Positioned.fixed;
-  const factory Position.sticky({Unit? top, Unit? left, Unit? bottom, Unit? right}) =
-      _Positioned.sticky;
+  const factory Position.sticky({Unit? top, Unit? left, Unit? bottom, Unit? right}) = _Positioned.sticky;
 
   static const Position inherit = _Position('inherit');
   static const Position initial = _Position('initial');

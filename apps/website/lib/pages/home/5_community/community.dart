@@ -70,29 +70,24 @@ class Community extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('#community', [
       css('&').styles(
-        padding: Padding.only(
-          top: sectionPadding,
-          left: contentPadding,
-          right: contentPadding,
-          bottom: sectionPadding,
-        ),
         display: Display.flex,
+        padding: Padding.only(top: sectionPadding, left: contentPadding, right: contentPadding, bottom: sectionPadding),
         flexDirection: FlexDirection.column,
         alignItems: AlignItems.center,
         textAlign: TextAlign.center,
       ),
       css('.community-card', [
         css('&').styles(
+          display: Display.flex,
           maxWidth: maxContentWidth,
           margin: Margin.only(top: 3.rem),
           border: Border(color: borderColor, width: 2.px),
           radius: BorderRadius.circular(12.px),
           shadow: BoxShadow(offsetX: 4.px, offsetY: 4.px, blur: 20.px, color: shadowColor1),
-          raw: {'background': 'linear-gradient(180deg, ${background.value} 0%, ${surface.value} 100%)'},
-          display: Display.flex,
           flexDirection: FlexDirection.row,
           flexWrap: FlexWrap.wrap,
           textAlign: TextAlign.start,
+          raw: {'background': 'linear-gradient(180deg, ${background.value} 0%, ${surface.value} 100%)'},
         ),
         css('& > div').styles(
           padding: Padding.all(2.rem),

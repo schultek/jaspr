@@ -99,17 +99,17 @@ class HeaderState extends State<Header> {
       css('& > *').styles(alignItems: AlignItems.center),
       css('nav', [
         css('&').styles(
-          flex: Flex(grow: 1),
           display: Display.flex,
           justifyContent: JustifyContent.end,
           gap: Gap(column: 2.rem),
+          flex: Flex(grow: 1),
           color: textBlack,
         ),
         css('& a').styles(
+          color: textBlack,
           fontSize: 1.rem,
           fontWeight: FontWeight.w500,
           textDecoration: TextDecoration.none,
-          color: textBlack,
         ),
         css('& a:hover').styles(
           color: primaryMid,

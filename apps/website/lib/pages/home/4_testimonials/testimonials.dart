@@ -51,8 +51,8 @@ class Testimonials extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('#testimonials', [
       css('&').styles(
-        padding: Padding.only(top: sectionPadding),
         display: Display.flex,
+        padding: Padding.only(top: sectionPadding),
         flexDirection: FlexDirection.column,
         alignItems: AlignItems.center,
         textAlign: TextAlign.center,
@@ -60,8 +60,8 @@ class Testimonials extends StatelessComponent {
       css('.testimonials-grid', [
         css('&').styles(
           maxWidth: maxContentWidth,
-          margin: Margin.only(top: 3.rem, bottom: 4.rem),
           padding: Padding.symmetric(horizontal: contentPadding),
+          margin: Margin.only(top: 3.rem, bottom: 4.rem),
           gap: Gap.all(1.5.rem),
           raw: {'column-count': '3'},
         ),

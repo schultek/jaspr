@@ -62,14 +62,14 @@ class GithubButtonState extends State<GithubButton> {
   static final List<StyleRule> styles = [
     css('.github-button', [
       css('&').styles(
+        display: Display.flex,
         padding: Padding.symmetric(horizontal: 0.7.rem, vertical: 0.4.rem),
         radius: BorderRadius.circular(8.px),
-        textDecoration: TextDecoration.none,
-        color: textBlack,
-        fontSize: 0.7.rem,
-        display: Display.flex,
         alignItems: AlignItems.center,
         gap: Gap(column: .5.rem),
+        color: textBlack,
+        fontSize: 0.7.rem,
+        textDecoration: TextDecoration.none,
       ),
       css('&:hover').styles(
         backgroundColor: hoverOverlayColor,
@@ -89,16 +89,16 @@ class GithubButtonState extends State<GithubButton> {
           flexDirection: FlexDirection.column,
         ),
         css('& > span:first-child').styles(
-          fontFamily: FontFamily.list([FontFamilies.monospace]),
-          opacity: 0.8,
           margin: Margin.only(bottom: 2.px),
+          opacity: 0.8,
+          fontFamily: FontFamily.list([FontFamilies.monospace]),
         ),
         css('& > span:last-child').styles(
-          fontSize: 0.9.em,
-          opacity: 0.6,
           display: Display.flex,
+          opacity: 0.6,
           alignItems: AlignItems.center,
           gap: Gap(column: .3.em),
+          fontSize: 0.9.em,
         ),
       ]),
     ]),

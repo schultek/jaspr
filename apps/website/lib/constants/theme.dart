@@ -94,7 +94,7 @@ final root = [
   css.import('font/lucide/lucide.css'),
 
   // Global
-  css('html, body').styles(margin: Margin.zero, padding: Padding.zero),
+  css('html, body').styles(padding: Padding.zero, margin: Margin.zero),
   css('html').styles(
     fontFamily: FontFamily.list([FontFamilies.uiSansSerif, FontFamilies.systemUi, FontFamilies.sansSerif]),
     backgroundColor: background,
@@ -146,16 +146,16 @@ final root = [
   css('.actions').styles(
     display: Display.flex,
     flexDirection: FlexDirection.row,
+    flexWrap: FlexWrap.wrap,
     alignItems: AlignItems.center,
     gap: Gap.all(.8.em),
-    flexWrap: FlexWrap.wrap,
   ),
   css('.text-gradient').styles(raw: {
     'background': primaryGradient,
     '-webkit-background-clip': 'text',
     '-webkit-text-fill-color': 'transparent',
   }),
-  css('a').styles(textDecoration: TextDecoration.none, color: textDark),
+  css('a').styles(color: textDark, textDecoration: TextDecoration.none),
   css('b').styles(fontWeight: FontWeight.w500),
 
   css('code, pre, .mono').styles(
@@ -177,11 +177,11 @@ final root = [
   // Animated underline
   css('.animated-underline', [
     css('&').styles(
-      raw: {'background-image': 'linear-gradient(to right, currentColor, currentColor)'},
+      transition: Transition('background-size', duration: 300, curve: Curve.easeInOut),
       backgroundPosition: BackgroundPosition(offsetX: Unit.zero, offsetY: 100.percent),
       backgroundRepeat: BackgroundRepeat.noRepeat,
       backgroundSize: BackgroundSize.sides(Unit.zero, 1.5.px),
-      transition: Transition('background-size', duration: 300, curve: Curve.easeInOut),
+      raw: {'background-image': 'linear-gradient(to right, currentColor, currentColor)'},
     ),
     css('&:hover').styles(
       backgroundSize: BackgroundSize.sides(100.percent, 1.5.px),

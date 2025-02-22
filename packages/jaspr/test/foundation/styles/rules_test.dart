@@ -111,8 +111,7 @@ void main() {
 
     test('keyframes', () {
       expect(
-        StyleRule.keyframes(name: 'fade', styles: {'from': Styles(opacity: 0), 'to': Styles(opacity: 1)})
-            .toCss(),
+        StyleRule.keyframes(name: 'fade', styles: {'from': Styles(opacity: 0), 'to': Styles(opacity: 1)}).toCss(),
         equals('@keyframes fade {\n'
             '  from {\n'
             '    opacity: 0.0;\n'

@@ -55,10 +55,10 @@ class Analyze extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('.analyze-preview', [
       css('&').styles(
-        padding: Padding.all(1.rem),
-        height: 100.percent,
-        boxSizing: BoxSizing.borderBox,
         position: Position.relative(),
+        height: 100.percent,
+        padding: Padding.all(1.rem),
+        boxSizing: BoxSizing.borderBox,
       ),
       css('& > div').styles(
         position: Position.absolute(top: 50.percent, left: 47.percent),
@@ -74,30 +74,30 @@ class Analyze extends StatelessComponent {
       ),
       css('.quick-actions', [
         css('&').styles(
-          position: Position.absolute(right: (-1.5).rem, top: 4.rem),
-          radius: BorderRadius.circular(8.px),
-          border: Border(color: borderColor2, width: 1.px),
-          padding: Padding.symmetric(horizontal: .2.rem, vertical: .5.rem),
-          raw: {'width': 'max-content'},
           display: Display.flex,
+          position: Position.absolute(right: (-1.5).rem, top: 4.rem),
+          padding: Padding.symmetric(horizontal: .2.rem, vertical: .5.rem),
+          border: Border(color: borderColor2, width: 1.px),
+          radius: BorderRadius.circular(8.px),
           flexDirection: FlexDirection.column,
           alignItems: AlignItems.stretch,
           gap: Gap(row: .2.rem),
-          backgroundColor: surfaceLow,
-          fontSize: .8.rem,
           color: textBlack,
+          fontSize: .8.rem,
+          backgroundColor: surfaceLow,
+          raw: {'width': 'max-content'},
         ),
         css('& > span:first-child').styles(
-          fontWeight: FontWeight.w600,
           color: textDim,
+          fontWeight: FontWeight.w600,
         ),
         css('& > span').styles(
           display: Display.flex,
+          padding: Padding.symmetric(horizontal: 0.5.rem, vertical: 0.2.rem),
+          radius: BorderRadius.circular(4.px),
           flexDirection: FlexDirection.row,
           alignItems: AlignItems.center,
           gap: Gap(column: 0.2.rem),
-          padding: Padding.symmetric(horizontal: 0.5.rem, vertical: 0.2.rem),
-          radius: BorderRadius.circular(4.px),
           textAlign: TextAlign.left,
         ),
         css('& > span:nth-child(2)').styles(

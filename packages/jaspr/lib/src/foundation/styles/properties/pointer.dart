@@ -37,20 +37,23 @@ enum UserSelect {
 
   /// The text of the element and its sub-elements is not selectable. Note that the Selection object can contain these elements.
   none("none"),
+
   /// The used value of auto is determined as follows:
-  /// 
+  ///
   /// On the ::before and ::after pseudo elements, the used value is none
   /// If the used value of user-select on the parent of this element is none, the used value is none
   /// Otherwise, if the used value of user-select on the parent of this element is all, the used value is all
   /// Otherwise, the used value is text
   auto("auto"),
+
   /// The text can be selected by the user.
   text("text"),
+
   /// The content of the element shall be selected atomically: If a selection would contain part of the element, then the selection must contain the entire element including all its descendants. If a double-click or context-click occurred in sub-elements, the highest ancestor with this value will be selected.
   all("all"),
 
   // Global values
-  
+
   inherit("inherit"),
   initial("initial"),
   revert("revert"),

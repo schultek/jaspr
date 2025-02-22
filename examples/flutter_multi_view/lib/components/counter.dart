@@ -49,36 +49,36 @@ class CounterState extends State<Counter> {
   @css
   static final styles = [
     css('.counter-group').styles(
-      margin: Margin.all(10.px),
       padding: Padding.all(10.px),
+      margin: Margin.all(10.px),
       border: Border(style: BorderStyle.dashed, width: 1.px, color: Colors.lightGrey),
       radius: BorderRadius.circular((cardBorderRadius + 10).px),
     ),
     css('.counter', [
       css('&').styles(
+        display: Display.flex,
+        minHeight: cardHeight.px,
+        maxWidth: cardWidth.px,
         padding: Padding.symmetric(vertical: 10.px),
+        boxSizing: BoxSizing.borderBox,
         border: Border(color: primaryColor, width: 1.px),
         radius: BorderRadius.circular(cardBorderRadius.px),
-        maxWidth: cardWidth.px,
-        minHeight: cardHeight.px,
-        boxSizing: BoxSizing.borderBox,
-        backgroundColor: surfaceColor,
-        display: Display.flex,
-        alignItems: AlignItems.center,
         justifyContent: JustifyContent.spaceAround,
+        alignItems: AlignItems.center,
         color: Colors.black,
+        backgroundColor: surfaceColor,
       ),
       css('button', [
         css('&').styles(
-          fontSize: 1.5.rem,
+          display: Display.flex,
           width: 2.em,
           height: 2.em,
           border: Border.unset,
-          cursor: Cursor.pointer,
           radius: BorderRadius.all(Radius.circular(2.em)),
-          display: Display.flex,
+          cursor: Cursor.pointer,
           justifyContent: JustifyContent.center,
           alignItems: AlignItems.center,
+          fontSize: 1.5.rem,
           backgroundColor: Colors.transparent,
         ),
         css('&:hover').styles(
@@ -86,8 +86,8 @@ class CounterState extends State<Counter> {
         ),
       ]),
       css('span').styles(
-        fontSize: 14.px,
         textAlign: TextAlign.center,
+        fontSize: 14.px,
       ),
       css('b').styles(fontSize: 18.px),
     ]),

@@ -46,10 +46,10 @@ class Particles extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('svg.particles', [
       css('&').styles(
-        overflow: Overflow.visible,
         position: Position.absolute(top: Unit.zero, left: Unit.zero),
         width: 100.percent,
         height: 100.percent,
+        overflow: Overflow.visible,
         pointerEvents: PointerEvents.none,
       ),
       css('circle').styles(

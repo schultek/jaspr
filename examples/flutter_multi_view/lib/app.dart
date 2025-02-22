@@ -75,8 +75,8 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
   static final styles = [
     css('.main', [
       css('&').styles(
-        minHeight: 80.vh,
         display: Display.flex,
+        minHeight: 80.vh,
         flexDirection: FlexDirection.column,
         alignItems: AlignItems.center,
       ),
@@ -90,12 +90,12 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
           border: Border(color: primaryColor, width: 1.px),
         ),
         css('button:first-child').styles(
-          radius: BorderRadius.horizontal(left: Radius.circular(6.px)),
           margin: Margin.only(right: (-1).px),
+          radius: BorderRadius.horizontal(left: Radius.circular(6.px)),
         ),
         css('button:last-child').styles(
-          radius: BorderRadius.horizontal(right: Radius.circular(6.px)),
           margin: Margin.only(left: (-1).px),
+          radius: BorderRadius.horizontal(right: Radius.circular(6.px)),
         ),
       ]),
       css('.counters', [
@@ -109,8 +109,8 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
     ]),
     css('footer').styles(
       margin: Margin.all(40.px),
-      fontSize: 12.px,
       textAlign: TextAlign.center,
+      fontSize: 12.px,
       fontStyle: FontStyle.italic,
     ),
   ];

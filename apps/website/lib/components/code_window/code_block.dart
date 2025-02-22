@@ -59,18 +59,18 @@ class CodeBlock extends StatelessComponent {
       css('&').styles(display: Display.flex),
       css('pre', [
         css('&').styles(
-          flex: Flex(grow: 1),
-          width: Unit.zero,
           position: Position.relative(),
-          margin: Margin.zero,
+          width: Unit.zero,
           padding: Padding.only(left: 3.em),
+          margin: Margin.zero,
+          flex: Flex(grow: 1),
         ),
         css('&::before').styles(
           content: '',
           display: Display.block,
-          height: 100.percent,
-          width: 3.em,
           position: Position.absolute(left: Unit.zero),
+          width: 3.em,
+          height: 100.percent,
           backgroundColor: surfaceLow,
         ),
         css('code', [
@@ -78,11 +78,11 @@ class CodeBlock extends StatelessComponent {
               .styles(
                 display: Display.inlineBlock,
                 width: 100.percent,
-                overflow: Overflow.only(x: Overflow.hidden),
                 padding: Padding.only(top: 0.5.em, bottom: 0.5.em, right: 0.5.em),
                 boxSizing: BoxSizing.borderBox,
-                backgroundColor: surfaceLowest,
+                overflow: Overflow.only(x: Overflow.hidden),
                 textAlign: TextAlign.start,
+                backgroundColor: surfaceLowest,
               )
               .combine(jasprTheme['root']!),
           css('&.scroll').styles(
@@ -101,14 +101,14 @@ class CodeBlock extends StatelessComponent {
               padding: Padding.only(left: .5.em),
             ),
             css('.line-number').styles(
-              position: Position.absolute(left: Unit.zero),
               display: Display.inlineBlock,
-              boxSizing: BoxSizing.borderBox,
+              position: Position.absolute(left: Unit.zero),
               width: 3.em,
               padding: Padding.only(right: 0.6.em),
+              boxSizing: BoxSizing.borderBox,
               opacity: 0.5,
-              textAlign: TextAlign.right,
               color: textBlack,
+              textAlign: TextAlign.right,
             ),
           ]),
           css('&.selectable .line:hover', [
@@ -116,8 +116,8 @@ class CodeBlock extends StatelessComponent {
               backgroundColor: hoverOverlayColor,
             ),
             css('.line-number').styles(
-              backgroundColor: hoverOverlayColor,
               opacity: 1,
+              backgroundColor: hoverOverlayColor,
             ),
           ]),
         ]),

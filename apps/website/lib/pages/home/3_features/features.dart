@@ -68,25 +68,25 @@ class Features extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('#features', [
       css('&').styles(
-        padding: Padding.only(top: sectionPadding),
         display: Display.flex,
+        padding: Padding.only(top: sectionPadding),
         flexDirection: FlexDirection.column,
         alignItems: AlignItems.center,
         textAlign: TextAlign.center,
       ),
       css('.feature-grid', [
         css('&').styles(
-          maxWidth: maxContentWidth,
-          margin: Margin.only(top: 3.rem, bottom: 4.rem),
-          padding: Padding.symmetric(horizontal: contentPadding),
           display: Display.flex,
+          maxWidth: maxContentWidth,
+          padding: Padding.symmetric(horizontal: contentPadding),
+          margin: Margin.only(top: 3.rem, bottom: 4.rem),
           flexDirection: FlexDirection.row,
           flexWrap: FlexWrap.wrap,
           gap: Gap.all(1.5.rem),
         ),
         css('& > *').styles(
-          flex: Flex(grow: 1, shrink: 0, basis: FlexBasis(13.rem)),
           boxSizing: BoxSizing.borderBox,
+          flex: Flex(grow: 1, shrink: 0, basis: FlexBasis(13.rem)),
         ),
       ]),
     ]),

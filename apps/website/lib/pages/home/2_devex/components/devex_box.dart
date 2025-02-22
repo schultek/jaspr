@@ -31,9 +31,9 @@ class DevexBox extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('.feature-box', [
       css('&').styles(
-        radius: BorderRadius.circular(12.px),
-        border: Border(width: 2.px, color: borderColor),
         display: Display.flex,
+        border: Border(width: 2.px, color: borderColor),
+        radius: BorderRadius.circular(12.px),
         flexDirection: FlexDirection.column,
         alignItems: AlignItems.stretch,
         raw: {'background': 'linear-gradient(180deg, ${background.value} 0%, ${surface.value} 100%)'},

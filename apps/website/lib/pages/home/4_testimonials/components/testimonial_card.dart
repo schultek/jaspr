@@ -36,12 +36,12 @@ class TestimonialCard extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('.testimonial-card', [
       css('&').styles(
-        radius: BorderRadius.circular(12.px),
-        border: Border(width: 2.px, color: borderColor),
+        display: Display.flex,
         padding: Padding.all(1.rem),
         margin: Margin.only(bottom: 1.5.rem),
+        border: Border(width: 2.px, color: borderColor),
+        radius: BorderRadius.circular(12.px),
         shadow: BoxShadow(offsetX: 1.px, offsetY: 1.px, blur: 3.px, spread: (-1).px, color: shadowColor1),
-        display: Display.flex,
         flexDirection: FlexDirection.column,
         alignItems: AlignItems.stretch,
         textAlign: TextAlign.start,
@@ -56,14 +56,14 @@ class TestimonialCard extends StatelessComponent {
           alignItems: AlignItems.center,
         ),
         css('img').styles(
-          radius: BorderRadius.circular(100.percent),
           margin: Margin.only(right: 0.8.rem),
+          radius: BorderRadius.circular(100.percent),
           raw: {'object-fit': 'cover'},
         ),
         css('p').styles(margin: Margin.zero).combine(bodySmall),
         css('p span:first-child').styles(
-          fontWeight: FontWeight.w600,
           color: textBlack,
+          fontWeight: FontWeight.w600,
         ),
       ]),
     ]),

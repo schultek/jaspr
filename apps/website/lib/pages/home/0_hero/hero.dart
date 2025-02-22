@@ -36,17 +36,17 @@ class Hero extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('#hero', [
       css('&').styles(
+        display: Display.flex,
         minHeight: 100.vh,
         padding: Padding.only(left: contentPadding, right: contentPadding, top: 8.rem, bottom: 4.rem),
         boxSizing: BoxSizing.borderBox,
-        display: Display.flex,
         justifyContent: JustifyContent.center,
         alignItems: AlignItems.center,
         textAlign: TextAlign.center,
       ),
       css('& > div').styles(
-        maxWidth: 45.rem,
         display: Display.flex,
+        maxWidth: 45.rem,
         flexDirection: FlexDirection.column,
         justifyContent: JustifyContent.center,
         alignItems: AlignItems.center,

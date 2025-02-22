@@ -31,18 +31,18 @@ class DevExp extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('#devex', [
       css('&').styles(
-        padding: Padding.only(top: sectionPadding),
         display: Display.flex,
+        padding: Padding.only(top: sectionPadding),
         flexDirection: FlexDirection.column,
         alignItems: AlignItems.center,
         textAlign: TextAlign.center,
       ),
       css('.devex-grid', [
         css('&').styles(
-          maxWidth: maxContentWidth,
-          margin: Margin.only(top: 3.rem),
-          padding: Padding.symmetric(horizontal: contentPadding),
           display: Display.flex,
+          maxWidth: maxContentWidth,
+          padding: Padding.symmetric(horizontal: contentPadding),
+          margin: Margin.only(top: 3.rem),
           flexDirection: FlexDirection.column,
           gap: Gap(row: 3.rem),
         ),

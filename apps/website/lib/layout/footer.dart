@@ -95,20 +95,20 @@ class Footer extends StatelessComponent {
         css('&').styles(
           display: Display.inlineBlock,
           margin: Margin.only(top: 0.4.rem),
-          fontSize: 0.7.rem,
           color: textDim,
+          fontSize: 0.7.rem,
         ),
         css('a').styles(
-          textDecoration: TextDecoration.none,
-          fontWeight: FontWeight.w500,
           color: textDark,
+          fontWeight: FontWeight.w500,
+          textDecoration: TextDecoration.none,
         ),
       ]),
       css('.footer-navigation', [
         css('&').styles(
-          padding: Padding.only(top: 4.rem, left: 2.rem, right: 4.rem, bottom: 2.5.rem),
-          maxWidth: maxContentWidth,
           display: Display.flex,
+          maxWidth: maxContentWidth,
+          padding: Padding.only(top: 4.rem, left: 2.rem, right: 4.rem, bottom: 2.5.rem),
           flexDirection: FlexDirection.row,
           justifyContent: JustifyContent.spaceBetween,
           alignItems: AlignItems.start,
@@ -116,8 +116,8 @@ class Footer extends StatelessComponent {
         ),
         css('h5').styles(margin: Margin.only(bottom: 1.rem)),
         css('ul').styles(
-          listStyle: ListStyle.none,
           padding: Padding.zero,
+          listStyle: ListStyle.none,
           fontSize: 0.9.rem,
           lineHeight: 2.rem,
         ),
@@ -126,8 +126,8 @@ class Footer extends StatelessComponent {
       css('.footer-banner').styles(
         padding: Padding.symmetric(vertical: 1.rem, horizontal: 2.rem),
         border: Border.only(top: BorderSide(color: borderColor, width: 2.px)),
-        fontSize: 0.8.rem,
         color: textDim,
+        fontSize: 0.8.rem,
       ),
     ]),
     css.media(MediaQuery.all(maxWidth: 600.px), [

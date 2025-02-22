@@ -46,14 +46,14 @@ class InstallCommandState extends State<InstallCommand> {
   static final List<StyleRule> styles = [
     css('.install-jaspr', [
       css('&').styles(
-        border: Border(color: borderColor2),
-        margin: Margin.only(bottom: .8.rem),
-        radius: BorderRadius.circular(3.em),
         padding: Padding.symmetric(horizontal: .8.rem, vertical: .6.rem),
+        margin: Margin.only(bottom: .8.rem),
+        border: Border(color: borderColor2),
+        radius: BorderRadius.circular(3.em),
         cursor: Cursor.copy,
-        backgroundColor: surfaceLow,
         color: textDark,
         fontSize: .8.rem,
+        backgroundColor: surfaceLow,
       ),
       css('& span').styles(
         display: Display.flex,
@@ -62,13 +62,13 @@ class InstallCommandState extends State<InstallCommand> {
       ),
       css('& button', [
         css('&').styles(
-          alignItems: AlignItems.center,
           display: Display.inlineFlex,
+          padding: Padding.zero,
           border: Border.unset,
           cursor: Cursor.pointer,
-          padding: Padding.zero,
-          backgroundColor: Colors.transparent,
+          alignItems: AlignItems.center,
           color: Color.unset,
+          backgroundColor: Colors.transparent,
         ),
         css('&:hover').styles(color: textBlack),
       ]),

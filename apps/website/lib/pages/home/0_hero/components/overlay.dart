@@ -79,15 +79,12 @@ class OverlayState extends State<Overlay> {
       css('&').styles(
         position: Position.fixed(top: Unit.zero, left: Unit.zero, right: Unit.zero, bottom: Unit.zero),
         zIndex: ZIndex(1),
-        backgroundColor: backgroundFaded,
-        flexDirection: FlexDirection.column,
-        alignItems: AlignItems.center,
-        justifyContent: JustifyContent.center,
         userSelect: UserSelect.none,
-        raw: {
-          'backdrop-filter': 'blur(5px)',
-          '-webkit-backdrop-filter': 'blur(5px)',
-        },
+        flexDirection: FlexDirection.column,
+        justifyContent: JustifyContent.center,
+        alignItems: AlignItems.center,
+        backgroundColor: backgroundFaded,
+        raw: {'backdrop-filter': 'blur(5px)', '-webkit-backdrop-filter': 'blur(5px)'},
       ),
       css('img', [
         css('&').styles(

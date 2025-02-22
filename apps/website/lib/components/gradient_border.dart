@@ -44,8 +44,8 @@ class GradientBorder extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('.gradient-border-container', [
       css('&').styles(
-        height: 100.percent,
         position: Position.relative(),
+        height: 100.percent,
       ),
       css('.gradient-border', [
         css('&').styles(
@@ -54,8 +54,8 @@ class GradientBorder extends StatelessComponent {
         css('svg').styles(overflow: Overflow.visible),
       ]),
       css('rect').styles(
-        raw: {'stroke-dasharray': '0 101'},
         transition: Transition('stroke-dasharray', duration: 300, curve: Curve.easeOut),
+        raw: {'stroke-dasharray': '0 101'},
       ),
       css('&:hover rect').styles(raw: {'stroke-dasharray': '50 0 52'}),
     ]),

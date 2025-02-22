@@ -53,9 +53,9 @@ class Run extends StatelessComponent {
       css('.console').styles(
         display: Display.block,
         opacity: .8,
-        fontSize: .7.rem,
-        textAlign: TextAlign.start,
         color: textBlack,
+        textAlign: TextAlign.start,
+        fontSize: .7.rem,
       ),
     ]),
   ];

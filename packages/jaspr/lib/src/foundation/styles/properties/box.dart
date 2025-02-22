@@ -27,7 +27,7 @@ enum Display {
 
 abstract class Border {
   const factory Border({BorderStyle? style, Color? color, Unit? width}) = __Border;
-  
+
   @Deprecated('Use Border() instead.')
   const factory Border.all(BorderSide side) = _AllBorder;
   const factory Border.only({BorderSide? left, BorderSide? top, BorderSide? right, BorderSide? bottom}) = _OnlyBorder;

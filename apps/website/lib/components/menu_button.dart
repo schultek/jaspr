@@ -25,12 +25,12 @@ class MenuButton extends StatelessComponent {
   @css
   static final List<StyleRule> styles = [
     css('.menu-toggle').styles(
-      alignItems: AlignItems.center,
       display: Display.none,
-      radius: BorderRadius.circular(8.px),
-      border: Border.unset,
-      outline: Outline.unset,
       padding: Padding.all(.7.rem),
+      border: Border.unset,
+      radius: BorderRadius.circular(8.px),
+      outline: Outline.unset,
+      alignItems: AlignItems.center,
       color: textBlack,
       fontSize: 1.5.rem,
       backgroundColor: Colors.transparent,
@@ -40,26 +40,23 @@ class MenuButton extends StatelessComponent {
     ),
     css('.menu-overlay', [
       css('&').styles(
+        display: Display.flex,
         position: Position.fixed(top: Unit.zero, left: Unit.zero, right: Unit.zero, bottom: Unit.zero),
         zIndex: ZIndex(100),
         padding: Padding.only(top: 7.rem),
-        backgroundColor: backgroundFaded,
-        display: Display.flex,
         flexDirection: FlexDirection.columnReverse,
         justifyContent: JustifyContent.start,
         alignItems: AlignItems.center,
         gap: Gap(row: 4.rem),
-        raw: {
-          'backdrop-filter': 'blur(5px)',
-          '-webkit-backdrop-filter': 'blur(5px)',
-        },
+        backgroundColor: backgroundFaded,
+        raw: {'backdrop-filter': 'blur(5px)', '-webkit-backdrop-filter': 'blur(5px)'},
       ),
       css('nav', [
         css('&').styles(
           display: Display.flex,
           flexDirection: FlexDirection.column,
-          gap: Gap(row: 2.rem),
           alignItems: AlignItems.center,
+          gap: Gap(row: 2.rem),
           flex: Flex(grow: 0),
         ),
         css('a').styles(fontSize: 2.rem),

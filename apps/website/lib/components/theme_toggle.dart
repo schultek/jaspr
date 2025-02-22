@@ -65,11 +65,11 @@ class ThemeToggleState extends State<ThemeToggle> {
   static final List<StyleRule> styles = [
     css('.theme-toggle', [
       css('&').styles(
-        radius: BorderRadius.circular(8.px),
-        border: Border.unset,
-        outline: Outline.unset,
-        padding: Padding.all(.7.rem),
         display: Display.flex,
+        padding: Padding.all(.7.rem),
+        border: Border.unset,
+        radius: BorderRadius.circular(8.px),
+        outline: Outline.unset,
         alignItems: AlignItems.center,
         color: textBlack,
         backgroundColor: Colors.transparent,

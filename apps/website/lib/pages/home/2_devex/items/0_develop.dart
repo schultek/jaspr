@@ -47,10 +47,10 @@ class Develop extends StatelessComponent {
   static final List<StyleRule> styles = [
     css('.develop-preview', [
       css('&').styles(
-        padding: Padding.all(1.rem),
-        height: 100.percent,
-        boxSizing: BoxSizing.borderBox,
         position: Position.relative(),
+        height: 100.percent,
+        padding: Padding.all(1.rem),
+        boxSizing: BoxSizing.borderBox,
       ),
       css('& > div').styles(
         position: Position.absolute(top: 50.percent, left: 47.percent),
