@@ -210,7 +210,9 @@ void main() {
         expect(
           styles.properties,
           equals({
-            'flex': '2 1 auto',
+            'flex-grow': '2',
+            'flex-shrink': '1',
+            'flex-basis': 'auto',
             'order': '2',
             'align-self': 'start',
           }),
