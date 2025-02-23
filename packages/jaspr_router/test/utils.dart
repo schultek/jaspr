@@ -44,8 +44,8 @@ class MockHistoryManager implements HistoryManager {
   late void Function(Object? state, {String? url})? onChangeState;
 
   @override
-  void init(AppBinding binding, {void Function(Object? state, {String? url})? onChangeState}) {
-    history = [binding.currentUri.toString()];
+  void init(BuildContext context, {void Function(Object? state, {String? url})? onChangeState}) {
+    history = [context.url];
     this.onChangeState = onChangeState;
   }
 

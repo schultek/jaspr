@@ -1,6 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:jaspr/server.dart' hide Response;
 import 'package:backend_dart_frog/jaspr_options.dart';
+import 'package:shelf/shelf.dart' as shelf;
 
 /// Wraps jasprs [serveApp] as a dart_frog middleware.
 ///
@@ -25,14 +26,19 @@ Middleware serveJasprApp() {
 Future<Response> renderJasprComponent(RequestContext context, Component child) async {
   var base = context.read<BasePath>();
 
-  return Response(
-    body: await renderComponent(
-      Document(
-        base: base.path,
-        body: child,
-      ),
+  var response = await renderComponent(
+    Document(base: base.path, body: child),
+    request: shelf.Request(
+      context.request.method.name,
+      context.request.url,
+      headers: context.request.headers,
     ),
-    headers: {'Content-Type': 'text/html'},
+  );
+
+  return Response(
+    statusCode: response.statusCode,
+    body: response.body,
+    headers: response.headers,
   );
 }
 

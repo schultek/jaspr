@@ -22,6 +22,9 @@ export 'src/foundation/sync.dart';
 export 'src/foundation/synchronous_future.dart';
 export 'src/foundation/view_transition.dart';
 export 'src/framework/framework.dart';
+export 'src/stub/app_context_stub.dart'
+    if (dart.library.js_interop) 'src/browser/app_context.dart'
+    if (dart.library.io) 'src/server/app_context.dart' show AppContext;
 export 'src/stub/run_app_stub.dart'
     if (dart.library.js_interop) 'src/browser/run_app.dart'
     if (dart.library.io) 'src/server/run_app.dart' show runApp;

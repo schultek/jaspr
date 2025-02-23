@@ -14,7 +14,7 @@ import '../finders.dart';
 void testComponents(
   String description,
   FutureOr<void> Function(ComponentTester tester) callback, {
-  Uri? uri,
+  String? url,
   bool isClient = true,
   bool? skip,
   Timeout? timeout,
@@ -23,7 +23,7 @@ void testComponents(
   test(
     description,
     () async {
-      var binding = TestComponentsBinding(uri ?? Uri.parse('/'), isClient);
+      var binding = TestComponentsBinding(url ?? '/', isClient);
       var tester = ComponentTester._(binding);
 
       return binding.runTest(() async {
@@ -105,15 +105,12 @@ class ComponentTester {
 }
 
 class TestComponentsBinding extends AppBinding with ComponentsBinding {
-  TestComponentsBinding(this._currentUri, this._isClient);
+  TestComponentsBinding(this.currentUrl, this.isClient);
 
-  final Uri? _currentUri;
   @override
-  Uri get currentUri => _currentUri ?? (throw 'Did not call setUp() with currentUri provided.');
-
-  final bool _isClient;
+  final bool isClient;
   @override
-  bool get isClient => _isClient;
+  final String currentUrl;
 
   @override
   void scheduleFrame(VoidCallback frameCallback) {

@@ -239,6 +239,18 @@
           "href": "/utils/global_node_key"
         },
         {
+          "title": "headers / setHeader()",
+          "href": "/utils/headers"
+        },
+        {
+          "title": "cookies / setCookie()",
+          "href": "/utils/cookies"
+        },
+        {
+          "title": "setStatusCode()",
+          "href": "/utils/set_status_code"
+        },
+        {
           "title": "@Import",
           "href": "/utils/at_import"
         },

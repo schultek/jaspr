@@ -11,7 +11,7 @@ void main() {
     test('should resolve the project root and render', () async {
       Jaspr.initializeApp();
       final rendered = await renderComponent(App());
-      expect(rendered.contains('Hello'), isTrue);
+      expect(rendered.body.contains('Hello'), isTrue);
     });
   });
 }

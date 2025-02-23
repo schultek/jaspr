@@ -1,3 +1,17 @@
+## Unreleased minor
+
+- **BREAKING** Changed `AppBinding`s `Uri get currentUri` to `String get currentUrl`.
+
+- **BREAKING** Changed return type of `renderComponent()` from `Future<String>` to `Future<({int statusCode, String body, Map<String, List<String>> headers})>`. 
+
+  The rendered html is accessible through the `body` property. `statusCode` and `headers` can be used to create a response object when part of a custom http handler.
+
+- Added `context.url` extension getter on both client and server.
+
+- Added `context.headers`, `context.headersAll` and `context.cookies` extension getters on the server. These can be used to access the headers and cookies of the currently handled request.
+
+- Added `context.setHeader()` and `context.setCookie()` and `context.setStatusCode()` extension on the server. These can be used to set headers, cookies and the status code of the response.
+
 ## 0.17.1
 
 - Update logo and website links.
