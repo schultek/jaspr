@@ -5,11 +5,9 @@ description: Styling utility to write nested style rules.
 
 ---
 
-To style your website in Jaspr you need to write css styles alongside your html markup. See the [Styling](/concepts/styling)
-docs for a general overview of the different ways to add styling to your website.
+To style your website in Jaspr you need to write css styles alongside your html markup. See the [Styling](/concepts/styling) docs for a general overview of the different ways to add styling to your website.
 
-The `css` utility gives you a convenient way of writing CSS style rules in Dart alongside your Jaspr components. It
-uses a combination of nested css selectors and Jasprs fully typed [CSS bindings](/utils/styles) in Dart.
+The `css` utility gives you a convenient way of writing CSS style rules in Dart alongside your Jaspr components. It uses a combination of nested css selectors and Jasprs fully typed [CSS bindings](/utils/styles) in Dart.
 
 ---
 
@@ -33,8 +31,7 @@ The `@css` annotation can be applied to the following elements:
 - global variables or static fields of type `List<StyleRule>`
 - global or static getters returning `List<StyleRule>`
 
-The recommended approach is to define your styles alongside your components `build()` method
-for better locality of your code:
+The recommended approach is to define your styles inside your components for better locality of your code:
 
 ```dart lib/app.dart
 class App extends StatelessComponent {
@@ -50,8 +47,13 @@ class App extends StatelessComponent {
   @css
   static final styles = [
     css('.main', [
-      css('&').box(width: 100.px),
-      css('p').text(color: Colors.blue),
+      css('&').styles(
+        width: 100.px,
+        padding: Padding.all(10.rem),
+      ),
+      css('p').styles(
+        color: Colors.blue,
+      ),
     ]),
   ];
 }
@@ -62,19 +64,25 @@ Styles defined in a component and registered using `@css` are **not** scoped to 
 You should try to use ids or unique class names as selectors to prevent unwanted effects on other components or conflicting style definitions.
 </Warning>
 
+<Success>
+**Tip:** The `jaspr_lints` package provides a convenient lint rule to keep your styles properties organized. Learn more about it [here](/get_started/linting#lint-rules).
+</Success>
+
 ---
 
 ## Defining style rules
 
-The default `css()` method takes a selector and a chain of [Styles](/utils/styles).
+The default `css()` method takes a selector and calls [styles()](/utils/styles).
 
 ```dart
-css('.main')
-  .box(width: 100.px, minHeight: 100.vh)
-  .text(color: Colors.black)
+css('.main').styles(
+  width: 100.px, 
+  minHeight: 100.vh,
+  color: Colors.black,
+)
 ```
 
-renders to:
+Which renders to:
 
 ```css
 .main {
@@ -90,13 +98,13 @@ Alternatively, calls of `css()` can take an additional list of nested rules like
 
 ```dart
 css('.main', [
-  css('&').box(width: 100.px),
-  css('&:hover').background(color: Colors.blue),
-  css('p').text(fontSize: 1.5em),
+  css('&').styles(width: 100.px),
+  css('&:hover').styles(backgroundColor: Colors.blue),
+  css('p').styles(fontSize: 1.5em),
 ])
 ```
 
-renders to:
+This renders to:
 
 ```css
 .main {
@@ -127,7 +135,7 @@ The `css.import()` function takes an url and renders a `@import` css rule:
 css.import('https://fonts.googleapis.com/css?family=Roboto')
 ```
 
-renders to:
+Renders to:
 
 ```css
 @import url(https://fonts.googleapis.com/css?family=Roboto);
@@ -145,7 +153,7 @@ css.fontFace(
 )
 ```
 
-renders to:
+Renders to:
 
 ```css
 @font-face {
@@ -161,11 +169,11 @@ The `css.media()` function renders a `@media` css rule.
 
 ```dart
 css.media(MediaQuery.screen(minWidth: 1000.px), [
-  css('.main').box(width: 200.px),
+  css('.main').styles(width: 200.px),
 ])
 ```
 
-renders to:
+Renders to:
 
 ```css
 @media screen and (min-width: 1000px) {

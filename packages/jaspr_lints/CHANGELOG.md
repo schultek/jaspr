@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Added 'styles_ordering' lint and fix.
+
 ## 0.2.1
 
 - Update logo and website links.

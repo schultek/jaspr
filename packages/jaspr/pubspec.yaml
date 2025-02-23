@@ -14,7 +14,7 @@ topics:
   - server
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
 
 dependencies:
   binary_codec: ^2.0.3

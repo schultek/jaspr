@@ -56,6 +56,44 @@ with every new project and enables the following set of lint rules and code assi
     </Property>
 </Card>
 
+<Card>
+    <Property name="styles_ordering" type="Fix available">
+        Sort styles properties.
+
+        This improves readability and consistency across style rules.
+
+        **BAD:**
+        ```dart
+        @css
+        static List<StyleRule> styles = [
+          css('button').styles(
+            color: Colors.black, // [!code --]
+            padding: Padding.all(8.px), // [!code --]
+          ),
+          css('input').styles(
+            padding: Padding.all(16.px),
+            color: Colors.black,
+          ),
+        ];
+        ```
+
+        **GOOD:**
+        ```dart
+        @css
+        static List<StyleRule> styles = [
+          css('button').styles(
+            padding: Padding.all(8.px), // [!code ++]
+            color: Colors.black, // [!code ++]
+          ),
+          css('input').styles(
+            padding: Padding.all(16.px),
+            color: Colors.black,
+          ),
+        ];
+        ```
+    </Property>
+</Card>
+
 ## Code Assists
 
 <Card>

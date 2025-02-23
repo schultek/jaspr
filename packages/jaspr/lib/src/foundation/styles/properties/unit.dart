@@ -46,10 +46,19 @@ extension UnitExt on num {
 }
 
 abstract class Unit {
-  static const Unit zero = _ZeroUnit();
+  static const Unit zero = _ExpUnit('0');
 
-  ///auto represents the style attribute unit 'auto'
-  static const Unit auto = _AutoUnit();
+  /// The style attribute unit 'auto'
+  static const Unit auto = _ExpUnit('auto');
+
+  /// The max-content sizing keyword represents the maximum intrinsic size of the content. For text content this means that the content will not wrap at all even if it causes overflows.
+  static const Unit maxContent = _ExpUnit('max-content');
+
+  /// The min-content sizing keyword represents the minimum intrinsic size of the content. For text content this means that the content will take all soft-wrapping opportunities, becoming as small as the longest word.
+  static const Unit minContent = _ExpUnit('min-content');
+
+  /// The fit-content keyword means that the box will use the available space, but never more than max-content.
+  static const Unit fitContent = _ExpUnit('fit-content');
 
   /// Represents a css variable
   const factory Unit.variable(String value) = _VariableUnit;
@@ -75,35 +84,27 @@ abstract class Unit {
   /// Constructs a [Unit] in the form '100vh'
   const factory Unit.vh(double value) = _VhUnit;
 
+  /// Constructs a [Unit] from a custom css expression.
+  /// 
+  /// This allows to use css functions like `calc()`, `min()`, etc.
+  const factory Unit.expression(String expression) = _ExpUnit;
+
   /// The css value
   String get value;
 }
 
-class _ZeroUnit implements Unit {
-  const _ZeroUnit();
+class _ExpUnit implements Unit {
+  const _ExpUnit(this.value);
 
   @override
-  String get value => '0';
+  final String value;
+
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is _Unit && other._value == 0;
+  bool operator ==(Object other) => identical(this, other) || other is _ExpUnit && other.value == value;
 
   @override
-  int get hashCode => 0;
-}
-
-///_AutoUnit represents the style attribute unit 'auto'
-class _AutoUnit implements Unit {
-  const _AutoUnit();
-
-  @override
-  String get value => 'auto';
-
-  @override
-  bool operator ==(Object other) => identical(this, other) || other is _AutoUnit;
-
-  @override
-  int get hashCode => 0;
+  int get hashCode => value == '0' ? 0 : Object.hash(_ExpUnit, value);
 }
 
 class _VariableUnit implements Unit {
@@ -118,7 +119,7 @@ class _VariableUnit implements Unit {
   bool operator ==(Object other) => identical(this, other) || other is _VariableUnit && other._value == _value;
 
   @override
-  int get hashCode => _value.hashCode;
+  int get hashCode => Object.hash(_VariableUnit, _value);
 }
 
 class _Unit implements Unit {
@@ -133,11 +134,11 @@ class _Unit implements Unit {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      _value == 0 && (other is _ZeroUnit || (other is _Unit && other._value == 0)) ||
+      _value == 0 && ((other is _ExpUnit && other.value == '0') || (other is _Unit && other._value == 0)) ||
       other is _Unit && runtimeType == other.runtimeType && _unit == other._unit && _value == other._value;
 
   @override
-  int get hashCode => _value == 0 ? 0 : _unit.hashCode ^ _value.hashCode;
+  int get hashCode => _value == 0 ? 0 : Object.hash(_unit, _value);
 }
 
 class _PercentUnit extends _Unit {
