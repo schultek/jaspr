@@ -1,8 +1,102 @@
 name: jaspr_workspace
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.6.0 <4.0.0'
+
+workspace:
+  - packages/jaspr
+  - packages/jaspr_builder
+  - packages/jaspr_cli
+  - packages/jaspr_flutter_embed
+  - packages/jaspr_lints
+  - packages/jaspr_riverpod
+  - packages/jaspr_router
+  - packages/jaspr_serverpod
+  - packages/jaspr_tailwind
+  - packages/jaspr_test
+  - apps/dart_quotes
+  - apps/dart_quotes_server
+  - apps/fluttercon
+  - apps/jaspr_pad
+  - examples/backend_dart_frog
+  - examples/backend_serverpod/example_server
+  - examples/backend_shelf
+  - examples/flutter_embedding
+  - examples/flutter_multi_view
+  - examples/flutter_plugin_interop
+  - examples/package_riverpod
 
 dev_dependencies:
-  melos: ^3.4.0
+  melos: ^7.0.0-dev.7
 
+melos:
+  command:
+    bootstrap:
+      hooks:
+        post: |
+          dart pub global activate packages/jaspr_cli --source=path
+
+  ide:
+    intellij:
+      enabled: false
+
+  scripts:
+    format:
+      run: |
+        melos exec --ignore=jaspr_cli -- "dart format . --line-length=120 --set-exit-if-changed"
+        melos exec --scope=jaspr_cli -- "dart format lib  --line-length=120 --set-exit-if-changed"
+    analyze: melos exec -- "dart analyze . --fatal-infos"
+    test:
+      run: dart test
+      exec:
+        concurrency: 1
+      packageFilters:
+        scope: [ jaspr, jaspr_builder, jaspr_riverpod, jaspr_router ]
+    coverage:
+      run: |
+        dart test --coverage=coverage &&
+        dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/\$MELOS_PACKAGE_NAME_lcov.info" -i ./coverage
+      exec:
+        concurrency: 1
+      packageFilters:
+        scope: [jaspr, jaspr_builder, jaspr_riverpod, jaspr_router]
+    coverage:cli:
+      run: |
+        cd packages/jaspr_cli &&
+        dart test --coverage=coverage --tags="$VARIANT" &&
+        dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "../../coverage/jaspr_cli_$(echo $VARIANT)_lcov.info" -i ./coverage
+    coverage:all:
+      run: |
+        melos run coverage --no-select
+        genhtml --ignore-errors unmapped -p $MELOS_ROOT_PATH/packages -o $MELOS_ROOT_PATH/coverage/report $MELOS_ROOT_PATH/coverage/*_lcov.info
+        open $MELOS_ROOT_PATH/coverage/report/index.html
+    generate:build:
+      packageFilters:
+        dependsOn: build_runner
+      run: |
+        melos exec --depends-on=build_runner -- "dart run build_runner build --delete-conflicting-outputs"
+    generate:html:
+      run: |
+        cd packages/jaspr
+        dart run tool/generate_html.dart
+    generate:scaffold:
+      run: |
+        cd packages/jaspr_cli
+        dart run tool/generate_scaffold.dart
+    generate:versions:
+      run: |
+        cd packages/jaspr_cli
+        dart run tool/generate_versions.dart
+    activate:cli:
+      run: |
+        rm -r packages/jaspr_cli/.dart_tool
+        dart pub global activate packages/jaspr_cli --source=path
+    activate:cli:windows:
+      run: |
+        cd packages\jaspr_cli\
+        del .dart_tool
+        dart pub get
+        dart pub global activate . --source=path
+    deploy:jasprpad:
+      run: |
+        dart run apps/jaspr_pad/tool/deploy.dart

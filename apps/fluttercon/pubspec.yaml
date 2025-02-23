@@ -6,7 +6,9 @@ homepage: https://fluttercon.schultek.de
 issue_tracker: https://github.com/schultek/jaspr/issues
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.6.0 <4.0.0'
+
+resolution: workspace
 
 dependencies:
   collection: ^1.18.0
@@ -21,8 +23,8 @@ dev_dependencies:
   build_runner: ^2.4.0
   dart_mappable_builder: ^4.2.3
   jaspr_web_compilers: ^4.0.10
-  jaspr_builder: ^0.16.3
-  lints: ^4.0.0
+  jaspr_builder: ^0.17.0
+  lints: ^5.0.0
 
 jaspr:
   mode: static
