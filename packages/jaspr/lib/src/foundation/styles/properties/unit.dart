@@ -100,7 +100,10 @@ class _ExpUnit implements Unit {
   final String value;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is _ExpUnit && other.value == value;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _ExpUnit && other.value == value ||
+      value == '0' && other is _Unit && other._value == 0;
 
   @override
   int get hashCode => value == '0' ? 0 : Object.hash(_ExpUnit, value);
