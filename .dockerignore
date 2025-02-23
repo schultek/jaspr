@@ -8,5 +8,4 @@ Dockerfile
 .packages
 
 build/
-experiments/
 example/
