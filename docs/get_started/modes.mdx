@@ -33,18 +33,14 @@ You can write server-side code to pre-render components and pages at built time,
 Additionally, you can set up hydration on the client in order to make your site interactive.
 
 <Info>
-Even if you want to build a Single Page Application this can be a good choice over 'client' mode since you don't need
-a `index.html` or `styles.css` and instead can write everything in Dart and let Jaspr do the rendering to actual html/css files during build.
+Even if you want to build a Single Page Application this can be a good choice over 'client' mode since you don't need a `index.html` or `styles.css` and instead can write everything in Dart and let Jaspr do the rendering to actual html/css files during build.
 </Info>
 
 ### Generating Pages
 
-Static-Site Generation (SSG) describes the process of generating all your website routes at build time. Different to SSR, this doesn't require
-a running server that generates your website on each request. Instead, `jaspr build` will generate all the routes for
-your website and outputs only static files (`.html`, etc.) that can be deployed to any static hosting provider.
+Static-Site Generation (SSG) describes the process of generating all your website routes at build time. Different to SSR, this doesn't require a running server that generates your website on each request. Instead, `jaspr build` will generate all the routes for your website and outputs only static files (`.html`, etc.) that can be deployed to any static hosting provider.
 
-Say you have a project in `static` mode with the routes `/`, `/about` and `/contact`. Then running `jaspr build` will
-output a `index.html`, `about/index.html` and `contact/index.html` file.
+Say you have a project in `static` mode with the routes `/`, `/about` and `/contact`. Then running `jaspr build` will output a `index.html`, `about/index.html` and `contact/index.html` file.
 
 To make sure all pages are generated for your site, you need to tell Jaspr about the routes of your website.
 
@@ -107,8 +103,9 @@ In this mode Jaspr runs and builds a server application that pre-renders your co
 You can use either Jasprs inbuilt webserver or choose to integrate it into your favorite Dart backend framework.
 Additionally, you can set up hydration on the client in order to make your site interactive.
 
-To deploy your site, you either need a service that supports Dart deployments or otherwise bundle your application with
-e.g. Docker. See the [Deploying](/concepts/deploying) guide for more information.
+To deploy your site, you either need a service that supports Dart deployments or otherwise bundle your application with e.g. Docker. See the [Deploying](/concepts/deploying) guide for more information.
+
+During server-side rendering, you can access the request url, [headers](/utils/headers) and [cookies](/utils/cookies) through context extensions (e.g. `context.url`). You can also modify the response [headers](/utils/headers#contextsetheader), [cookies](/utils/cookies#contextsetcookie) and [status code](/utils/set_status_code).
 
 ---
 
