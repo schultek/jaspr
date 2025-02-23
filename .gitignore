@@ -87,6 +87,12 @@ node_modules/
 .packages
 pubspec_overrides.yaml
 
+# Flutter related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.flutter-plugins
+.flutter-plugins-dependencies
+
 # Conventional directory for build outputs
 build/
 

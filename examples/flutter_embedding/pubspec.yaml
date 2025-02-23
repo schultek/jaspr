@@ -4,7 +4,9 @@ version: 0.1.4
 publish_to: none
 
 environment:
-  sdk: '>=3.0.0-0 <4.0.0'
+  sdk: ">=3.6.0 <4.0.0"
+
+resolution: workspace
 
 dependencies:
   firebase_core: ^3.4.1
@@ -20,8 +22,8 @@ dev_dependencies:
   build_runner: ^2.4.6
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
-  jaspr_builder: ^0.16.3
+  flutter_lints: ^5.0.0
+  jaspr_builder: ^0.17.0
   jaspr_web_compilers: ^4.0.10
 
 flutter:

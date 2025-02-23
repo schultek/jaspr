@@ -4,7 +4,9 @@ version: 0.1.4
 publish_to: none
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.6.0 <4.0.0'
+
+resolution: workspace
 
 dependencies:
   firebase_core: ^3.4.1
@@ -18,7 +20,7 @@ dev_dependencies:
   build_runner: ^2.4.0
   jaspr_web_compilers: ^4.0.10
   jaspr_builder: ^0.17.0
-  lints: ^4.0.0
+  lints: ^5.0.0
 
 jaspr:
   mode: server

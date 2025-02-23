@@ -13,7 +13,9 @@ topics:
   - testing
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.6.0 <4.0.0"
+
+resolution: workspace
 
 dependencies:
   html: ^0.15.0
@@ -24,4 +26,4 @@ dependencies:
   universal_web: ^1.1.0+1
 
 dev_dependencies:
-  lints: ^4.0.0
+  lints: ^5.0.0
