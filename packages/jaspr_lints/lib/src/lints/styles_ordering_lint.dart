@@ -46,7 +46,7 @@ class StylesOrderingLint extends DartLintRule {
         );
       }
     });
-    
+
     context.registry.addInstanceCreationExpression((node) {
       if (node.constructorName.type.name2.lexeme != 'Styles' || node.constructorName.name != null) {
         return;
@@ -131,8 +131,7 @@ class OrderStylesFix extends DartFix {
           breaks.add(content.substring(arguments[i].end, arguments[i + 1].offset));
         }
 
-        var args = [...arguments]
-          ..sort((a, b) {
+        var args = [...arguments]..sort((a, b) {
             if (a is NamedExpression && b is NamedExpression) {
               return params.indexOf(a.name.label.name).compareTo(params.indexOf(b.name.label.name));
             }

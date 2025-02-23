@@ -57,7 +57,7 @@ class App extends StatelessComponent {
       height: h,
       radius: BorderRadius.circular(100.percent),
       opacity: 0.05,
-      raw: {'filter' : 'blur(64px)', '-webkit-filter' : 'blur(64px)', 'background' : primaryGradient},
+      raw: {'filter': 'blur(64px)', '-webkit-filter': 'blur(64px)', 'background': primaryGradient},
     );
   }
 }

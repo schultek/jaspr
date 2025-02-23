@@ -85,7 +85,7 @@ abstract class Unit {
   const factory Unit.vh(double value) = _VhUnit;
 
   /// Constructs a [Unit] from a custom css expression.
-  /// 
+  ///
   /// This allows to use css functions like `calc()`, `min()`, etc.
   const factory Unit.expression(String expression) = _ExpUnit;
 
@@ -98,7 +98,6 @@ class _ExpUnit implements Unit {
 
   @override
   final String value;
-
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is _ExpUnit && other.value == value;

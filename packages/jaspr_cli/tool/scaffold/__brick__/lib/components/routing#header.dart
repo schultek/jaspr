@@ -8,7 +8,7 @@ class Header extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    var activePath = {{^multipage}}RouteState.of(context).location{{/multipage}}{{#multipage}}context.binding.currentUri.path{{/multipage}};
+    var activePath = {{^multipage}}RouteState.of(context).location{{/multipage}}{{#multipage}}context.url{{/multipage}};
 
     yield header([
       nav([
