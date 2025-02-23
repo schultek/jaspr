@@ -1,1 +1,1 @@
-library jaspr_cli;
+library;
