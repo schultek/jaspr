@@ -80,7 +80,7 @@ class BlockStyleRule implements StyleRule {
   @override
   String toCss([String indent = '']) {
     return '$indent${selector.selector} {$cssPropSpace'
-        '${styles.styles.entries.map((e) => '$indent$cssBlockInset${e.key}: ${e.value};$cssPropSpace').join()}'
+        '${styles.properties.entries.map((e) => '$indent$cssBlockInset${e.key}: ${e.value};$cssPropSpace').join()}'
         '$indent}';
   }
 }
@@ -297,7 +297,7 @@ class KeyframesStyleRule implements StyleRule {
   String toCss([String indent = '']) {
     return '$indent@keyframes $name {$cssPropSpace'
         '${styles.entries.map((e) => '$indent$cssBlockInset${e.key} {$cssPropSpace'
-            '${e.value.styles.entries.map((e) => '$indent$cssBlockInset$cssBlockInset${e.key}: ${e.value};$cssPropSpace').join()}'
+            '${e.value.properties.entries.map((e) => '$indent$cssBlockInset$cssBlockInset${e.key}: ${e.value};$cssPropSpace').join()}'
             '$indent$cssBlockInset}$cssPropSpace').join()}'
         '$indent}';
   }

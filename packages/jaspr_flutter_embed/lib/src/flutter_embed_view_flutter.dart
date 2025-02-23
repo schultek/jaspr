@@ -108,7 +108,7 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
       classes: [if (component.classes != null) component.classes, if (didRenderView) 'active'].join(' '),
       styles: Styles.combine([
         if (component.constraints case final c?)
-          Styles.box(
+          Styles(
             minWidth: c.minWidth != double.infinity ? c.minWidth?.px : null,
             maxWidth: c.maxWidth != double.infinity ? c.maxWidth?.px : null,
             minHeight: c.minHeight != double.infinity ? c.minHeight?.px : null,
@@ -118,7 +118,7 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
       ]),
       [
         if (component.loader != null && !didRenderView) component.loader!,
-        div(key: flutterDivKey, styles: Styles.box(height: 100.percent), []),
+        div(key: flutterDivKey, styles: Styles(height: 100.percent), []),
       ],
     );
   }

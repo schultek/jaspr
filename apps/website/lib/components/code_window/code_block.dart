@@ -56,59 +56,69 @@ class CodeBlock extends StatelessComponent {
   @css
   static final styles = [
     css('.code-block', [
-      css('&').flexbox(),
+      css('&').styles(display: Display.flex),
       css('pre', [
-        css('&').flexItem(flex: Flex(grow: 1)).box(
-              width: Unit.zero,
-              position: Position.relative(),
-              margin: EdgeInsets.zero,
-              padding: EdgeInsets.only(left: 3.em),
-            ),
-        css('&::before')
-            .raw({'content': '""'})
-            .box(
-              display: Display.block,
-              height: 100.percent,
-              width: 3.em,
-              position: Position.absolute(left: Unit.zero),
-            )
-            .background(color: surfaceLow),
+        css('&').styles(
+          position: Position.relative(),
+          width: Unit.zero,
+          padding: Padding.only(left: 3.em),
+          margin: Margin.zero,
+          flex: Flex(grow: 1),
+        ),
+        css('&::before').styles(
+          content: '',
+          display: Display.block,
+          position: Position.absolute(left: Unit.zero),
+          width: 3.em,
+          height: 100.percent,
+          backgroundColor: surfaceLow,
+        ),
         css('code', [
           css('&')
-              .box(
+              .styles(
                 display: Display.inlineBlock,
                 width: 100.percent,
-                overflow: Overflow.only(x: Overflow.hidden),
-                padding: EdgeInsets.only(top: 0.5.em, bottom: 0.5.em, right: 0.5.em),
+                padding: Padding.only(top: 0.5.em, bottom: 0.5.em, right: 0.5.em),
                 boxSizing: BoxSizing.borderBox,
+                overflow: Overflow.only(x: Overflow.hidden),
+                textAlign: TextAlign.start,
+                backgroundColor: surfaceLowest,
               )
-              .background(color: surfaceLowest)
-              .text(align: TextAlign.start)
               .combine(jasprTheme['root']!),
-          css('&.scroll').box(overflow: Overflow.only(x: Overflow.scroll)),
+          css('&.scroll').styles(
+            overflow: Overflow.only(x: Overflow.scroll),
+          ),
         ]),
         css('.lines', [
-          css('&').box(display: Display.inlineBlock, minWidth: 100.percent),
+          css('&').styles(
+            display: Display.inlineBlock,
+            minWidth: 100.percent,
+          ),
           css('.line', [
-            css('&').box(
+            css('&').styles(
               display: Display.inlineBlock,
               width: 100.percent,
-              padding: EdgeInsets.only(left: .5.em),
+              padding: Padding.only(left: .5.em),
             ),
-            css('.line-number')
-                .box(
-                  position: Position.absolute(left: Unit.zero),
-                  display: Display.inlineBlock,
-                  boxSizing: BoxSizing.borderBox,
-                  width: 3.em,
-                  padding: EdgeInsets.only(right: 0.6.em),
-                  opacity: 0.5,
-                )
-                .text(align: TextAlign.right, color: textBlack),
+            css('.line-number').styles(
+              display: Display.inlineBlock,
+              position: Position.absolute(left: Unit.zero),
+              width: 3.em,
+              padding: Padding.only(right: 0.6.em),
+              boxSizing: BoxSizing.borderBox,
+              opacity: 0.5,
+              color: textBlack,
+              textAlign: TextAlign.right,
+            ),
           ]),
           css('&.selectable .line:hover', [
-            css('&').background(color: hoverOverlayColor),
-            css('.line-number').background(color: hoverOverlayColor).box(opacity: 1),
+            css('&').styles(
+              backgroundColor: hoverOverlayColor,
+            ),
+            css('.line-number').styles(
+              opacity: 1,
+              backgroundColor: hoverOverlayColor,
+            ),
           ]),
         ]),
         for (final e in jasprTheme.entries) css('code span.hljs-${e.key}').combine(e.value),

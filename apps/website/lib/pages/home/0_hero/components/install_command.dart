@@ -33,7 +33,7 @@ class InstallCommandState extends State<InstallCommand> {
       span([
         Icon('terminal'),
         code([text('dart pub global activate jaspr_cli')]),
-        button(styles: copied ? Styles.text(color: Colors.forestGreen) : null, attributes: {
+        button(styles: copied ? Styles(color: Colors.forestGreen) : null, attributes: {
           'aria-label': 'Copy'
         }, [
           Icon(copied ? 'check' : 'copy'),
@@ -45,24 +45,32 @@ class InstallCommandState extends State<InstallCommand> {
   @css
   static final List<StyleRule> styles = [
     css('.install-jaspr', [
-      css('&')
-          .box(
-            margin: EdgeInsets.only(bottom: .8.rem),
-            border: Border.all(BorderSide.solid(color: borderColor2)),
-            radius: BorderRadius.circular(3.em),
-            padding: EdgeInsets.symmetric(horizontal: .8.rem, vertical: .6.rem),
-            cursor: Cursor.copy,
-          )
-          .background(color: surfaceLow)
-          .text(color: textDark, fontSize: .8.rem),
-      css('& span').flexbox(alignItems: AlignItems.center, gap: Gap(column: .6.rem)),
+      css('&').styles(
+        padding: Padding.symmetric(horizontal: .8.rem, vertical: .6.rem),
+        margin: Margin.only(bottom: .8.rem),
+        border: Border(color: borderColor2),
+        radius: BorderRadius.circular(3.em),
+        cursor: Cursor.copy,
+        color: textDark,
+        fontSize: .8.rem,
+        backgroundColor: surfaceLow,
+      ),
+      css('& span').styles(
+        display: Display.flex,
+        alignItems: AlignItems.center,
+        gap: Gap(column: .6.rem),
+      ),
       css('& button', [
-        css('&')
-            .flexbox(alignItems: AlignItems.center)
-            .box(display: Display.inlineFlex, border: Border.unset, cursor: Cursor.pointer, padding: EdgeInsets.zero)
-            .background(color: Colors.transparent)
-            .text(color: Color.unset),
-        css('&:hover').text(color: textBlack),
+        css('&').styles(
+          display: Display.inlineFlex,
+          padding: Padding.zero,
+          border: Border.unset,
+          cursor: Cursor.pointer,
+          alignItems: AlignItems.center,
+          color: Color.unset,
+          backgroundColor: Colors.transparent,
+        ),
+        css('&:hover').styles(color: textBlack),
       ]),
     ]),
   ];

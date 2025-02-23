@@ -52,21 +52,21 @@ class SponsorsListState extends State<SponsorsList> {
   @css
   static final List<StyleRule> styles = [
     css('.sponsors-list', [
-      css('&').flexbox(
-        direction: FlexDirection.row,
-        wrap: FlexWrap.wrap,
+      css('&').styles(
+        display: Display.flex,
+        flexDirection: FlexDirection.row,
+        flexWrap: FlexWrap.wrap,
         gap: Gap.all(0.4.rem),
       ),
       css('& > *', [
-        css('&')
-            .box(
-              width: 2.rem,
-              height: 2.rem,
-              radius: BorderRadius.circular(1.rem),
-              overflow: Overflow.hidden,
-            )
-            .background(color: Colors.gray),
-        css('img').box(width: 100.percent),
+        css('&').styles(
+          width: 2.rem,
+          height: 2.rem,
+          radius: BorderRadius.circular(1.rem),
+          overflow: Overflow.hidden,
+          backgroundColor: Colors.gray,
+        ),
+        css('img').styles(width: 100.percent),
       ]),
     ]),
   ];

@@ -69,7 +69,7 @@ class MenuElement extends StatelessElement {
   @override
   Iterable<Component> build() sync* {
     yield div(
-      styles: Styles.box(position: Position.relative()),
+      styles: Styles(position: Position.relative()),
       [
         DomNodeReader(
           onNode: (node) {

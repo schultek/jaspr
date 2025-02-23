@@ -28,12 +28,13 @@ class Particles extends StatelessComponent {
         DomComponent(
           key: ValueKey(particle.id),
           tag: 'g',
-          styles: Styles.box(
+          styles: Styles(
             transform: Transform.combine([
               Transform.translate(x: particle.dx.percent, y: particle.dy.percent),
               Transform.rotate(particle.angle.deg),
             ]),
-          ).raw({'--particle-offset': '${particle.offset}px'}),
+            raw: {'--particle-offset': '${particle.offset}px'},
+          ),
           children: [
             circle(cx: "0", cy: "0", r: "${particle.size}", fill: primaryMid, []),
           ],
@@ -44,19 +45,28 @@ class Particles extends StatelessComponent {
   @css
   static final List<StyleRule> styles = [
     css('svg.particles', [
-      css('&')
-          .box(
-              overflow: Overflow.visible,
-              position: Position.absolute(top: Unit.zero, left: Unit.zero),
-              width: 100.percent,
-              height: 100.percent)
-          .raw({'pointer-events': 'none'}),
-      css('circle').raw({'animation': 'particle 1s linear forwards'}),
+      css('&').styles(
+        position: Position.absolute(top: Unit.zero, left: Unit.zero),
+        width: 100.percent,
+        height: 100.percent,
+        overflow: Overflow.visible,
+        pointerEvents: PointerEvents.none,
+      ),
+      css('circle').styles(
+        raw: {'animation': 'particle 1s linear forwards'},
+      ),
     ]),
     css.keyframes('particle', {
-      '0%': Styles.box(transform: Transform.translate(y: 0.px)),
-      '90%': Styles.box(opacity: 1),
-      '100%': Styles.box(transform: Transform.translate(x: Unit.variable('--particle-offset')), opacity: 0),
+      '0%': Styles(
+        transform: Transform.translate(y: 0.px),
+      ),
+      '90%': Styles(
+        opacity: 1,
+      ),
+      '100%': Styles(
+        opacity: 0,
+        transform: Transform.translate(x: Unit.variable('--particle-offset')),
+      ),
     })
   ];
 }

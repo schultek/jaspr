@@ -13,11 +13,11 @@ void main() {
         });
 
         test('all', () {
-          var border = Border.all(BorderSide(
+          var border = Border(
             style: BorderStyle.dashed,
             color: Colors.blue,
             width: 2.px,
-          ));
+          );
 
           expect(border.styles, equals({'border': 'dashed blue 2px'}));
         });
@@ -81,7 +81,7 @@ void main() {
         });
 
         test('none', () {
-          var border = Border.all(BorderSide.none());
+          var border = Border.none;
 
           expect(
             border.styles,

@@ -74,26 +74,44 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
   @css
   static final styles = [
     css('.main', [
-      css('&').box(minHeight: 80.vh).flexbox(direction: FlexDirection.column, alignItems: AlignItems.center),
+      css('&').styles(
+        display: Display.flex,
+        minHeight: 80.vh,
+        flexDirection: FlexDirection.column,
+        alignItems: AlignItems.center,
+      ),
       css('.buttons', [
-        css('&').flexbox(direction: FlexDirection.row),
-        css('button')
-            .box(padding: EdgeInsets.all(8.px), border: Border.all(BorderSide.solid(color: primaryColor, width: 1.px))),
-        css('button:first-child')
-            .box(radius: BorderRadius.horizontal(left: Radius.circular(6.px)), margin: EdgeInsets.only(right: (-1).px)),
-        css('button:last-child')
-            .box(radius: BorderRadius.horizontal(right: Radius.circular(6.px)), margin: EdgeInsets.only(left: (-1).px)),
+        css('&').styles(
+          display: Display.flex,
+          flexDirection: FlexDirection.row,
+        ),
+        css('button').styles(
+          padding: Padding.all(8.px),
+          border: Border(color: primaryColor, width: 1.px),
+        ),
+        css('button:first-child').styles(
+          margin: Margin.only(right: (-1).px),
+          radius: BorderRadius.horizontal(left: Radius.circular(6.px)),
+        ),
+        css('button:last-child').styles(
+          margin: Margin.only(left: (-1).px),
+          radius: BorderRadius.horizontal(right: Radius.circular(6.px)),
+        ),
       ]),
       css('.counters', [
-        css('&').flexbox(
-          direction: FlexDirection.row,
-          wrap: FlexWrap.wrap,
+        css('&').styles(
+          display: Display.flex,
+          flexDirection: FlexDirection.row,
+          flexWrap: FlexWrap.wrap,
           justifyContent: JustifyContent.center,
         ),
       ]),
     ]),
-    css('footer')
-        .box(margin: EdgeInsets.all(40.px))
-        .text(fontSize: 12.px, align: TextAlign.center, fontStyle: FontStyle.italic),
+    css('footer').styles(
+      margin: Margin.all(40.px),
+      textAlign: TextAlign.center,
+      fontSize: 12.px,
+      fontStyle: FontStyle.italic,
+    ),
   ];
 }

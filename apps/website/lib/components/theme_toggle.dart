@@ -56,7 +56,7 @@ class ThemeToggleState extends State<ThemeToggle> {
         });
         web.window.localStorage.setItem('active-theme', isDark ? 'dark' : 'light');
       },
-      styles: !kIsWeb ? Styles.box(visibility: Visibility.hidden) : null,
+      styles: !kIsWeb ? Styles(visibility: Visibility.hidden) : null,
       [Icon(isDark ? 'moon' : 'sun')],
     );
   }
@@ -64,16 +64,19 @@ class ThemeToggleState extends State<ThemeToggle> {
   @css
   static final List<StyleRule> styles = [
     css('.theme-toggle', [
-      css('&')
-          .box(
-              radius: BorderRadius.circular(8.px),
-              border: Border.unset,
-              outline: Outline.unset,
-              padding: EdgeInsets.all(.7.rem))
-          .flexbox(alignItems: AlignItems.center)
-          .text(color: textBlack)
-          .background(color: Colors.transparent),
-      css('&:hover').background(color: hoverOverlayColor),
+      css('&').styles(
+        display: Display.flex,
+        padding: Padding.all(.7.rem),
+        border: Border.unset,
+        radius: BorderRadius.circular(8.px),
+        outline: Outline.unset,
+        alignItems: AlignItems.center,
+        color: textBlack,
+        backgroundColor: Colors.transparent,
+      ),
+      css('&:hover').styles(
+        backgroundColor: hoverOverlayColor,
+      ),
     ]),
   ];
 }

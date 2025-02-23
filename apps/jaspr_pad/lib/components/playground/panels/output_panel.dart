@@ -13,7 +13,7 @@ class OutputPanel extends StatelessComponent {
 
     yield div(
       id: 'output-panel',
-      styles: isTutorial ? Styles.raw({'width': 'auto'}) : null,
+      styles: isTutorial ? Styles(width: Unit.auto) : null,
       [ExecutionIFrame()],
     );
   }

@@ -19,7 +19,7 @@ class PlaygroundHeader extends StatelessComponent {
         img(classes: 'logo', src: "jaspr-192.png", alt: "JasprPad Logo"),
         span([text('JasprPad')]),
       ]),
-      div(styles: Styles.text(whiteSpace: WhiteSpace.noWrap), [
+      div(styles: Styles(whiteSpace: WhiteSpace.noWrap), [
         Button(
           id: 'jnew-button',
           label: 'New Pad',
@@ -71,21 +71,20 @@ class PlaygroundHeader extends StatelessComponent {
           context.read(logicProvider).selectTutorial();
         },
       ),
-      div(styles: Styles.box(width: 10.px), []),
+      div(styles: Styles(width: 10.px), []),
       SamplesMenuButton(),
       div(
-        styles: Styles.combine([
-          Styles.box(padding: EdgeInsets.symmetric(vertical: Unit.zero, horizontal: 10.px)),
-          Styles.flexbox(
-            justifyContent: JustifyContent.center,
-            alignItems: AlignItems.center,
-          ),
-        ]),
+        styles: Styles(
+          padding: Padding.symmetric(vertical: Unit.zero, horizontal: 10.px),
+          display: Display.flex,
+          justifyContent: JustifyContent.center,
+          alignItems: AlignItems.center,
+        ),
         [
           a(href: 'https://github.com/schultek/jaspr', target: Target.blank, [
             img(
               src: 'https://findicons.com/files/icons/2779/simple_icons/128/github.png',
-              styles: Styles.raw({'width': '40px', '-webkit-backface-visibility': 'hidden'}),
+              styles: Styles(width: 40.px, raw: {'-webkit-backface-visibility': 'hidden'}),
             ),
           ]),
         ],

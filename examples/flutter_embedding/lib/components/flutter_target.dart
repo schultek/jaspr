@@ -24,7 +24,7 @@ class FlutterTarget extends StatelessComponent {
       id: "flutter_target",
       classes: isHandheld ? 'handheld' : effects.join(' '),
       styles: !isHandheld && rotation != 0
-          ? Styles.box(
+          ? Styles(
               transform: Transform.combine([
                 Transform.perspective(1000.px),
                 Transform.rotateAxis(y: rotation.deg),

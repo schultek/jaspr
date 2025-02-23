@@ -45,7 +45,7 @@ class FlutterEmbedView extends StatelessComponent {
       classes: classes,
       styles: Styles.combine([
         if (constraints case final c?)
-          Styles.box(
+          Styles(
             minWidth: c.minWidth != double.infinity ? c.minWidth?.px : null,
             maxWidth: c.maxWidth != double.infinity ? c.maxWidth?.px : null,
             minHeight: c.minHeight != double.infinity ? c.minHeight?.px : null,

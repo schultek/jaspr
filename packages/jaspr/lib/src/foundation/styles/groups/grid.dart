@@ -9,7 +9,7 @@ class _GridStyles extends Styles {
   final List<TrackSize>? autoColumns;
 
   @override
-  Map<String, String> get styles => {
+  Map<String, String> get properties => {
         'display': 'grid',
         ...?template?.styles,
         if (autoRows != null) 'grid-auto-rows': autoRows!.map((s) => s.value).join(' '),

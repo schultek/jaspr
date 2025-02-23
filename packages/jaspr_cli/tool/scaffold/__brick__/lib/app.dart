@@ -86,11 +86,18 @@ class App extends StatelessComponent {
   static final styles = [
     css('.main', [
       // The '&' refers to the parent selector of a nested style rules.
-      css('&').box(height: 100.vh).flexbox(direction: FlexDirection.{{#routing}}column{{/routing}}{{^routing}}row{{/routing}}, wrap: FlexWrap.wrap),
-      css('section').flexItem(flex: Flex(grow: 1{{^routing}}, shrink: 0, basis: FlexBasis(400.px){{/routing}})).flexbox(
-        direction: FlexDirection.column,
+      css('&').styles(
+        display: Display.flex,
+        height: 100.vh,
+        flexDirection: FlexDirection.{{#routing}}column{{/routing}}{{^routing}}row{{/routing}},
+        flexWrap: FlexWrap.wrap,
+      ),
+      css('section').styles(
+        display: Display.flex,
+        flexDirection: FlexDirection.column,
         justifyContent: JustifyContent.center,
         alignItems: AlignItems.center,
+        flex: Flex(grow: 1{{^routing}}, shrink: 0, basis: FlexBasis(400.px){{/routing}}),
       ),
     ]),
   ];{{/server}}

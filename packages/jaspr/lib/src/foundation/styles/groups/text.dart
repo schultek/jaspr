@@ -36,7 +36,7 @@ class _TextStyles extends Styles {
   }) : super._();
 
   @override
-  Map<String, String> get styles => {
+  Map<String, String> get properties => {
         if (color != null) 'color': color!.value,
         if (fontFamily != null) 'font-family': fontFamily!.value,
         if (fontStyle != null) 'font-style': fontStyle!.value,

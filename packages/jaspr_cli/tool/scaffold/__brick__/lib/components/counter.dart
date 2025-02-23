@@ -42,22 +42,36 @@ class CounterState extends State<Counter> {
   @css
   static final styles = [
     css('.counter', [
-      css('&').flexbox(alignItems: AlignItems.center).box(
-            padding: EdgeInsets.symmetric(vertical: 10.px),
-            border: Border.symmetric(vertical: BorderSide.solid(color: primaryColor, width: 1.px)),
-          ),
+      css('&').styles(
+        display: Display.flex,
+        padding: Padding.symmetric(vertical: 10.px),
+        border: Border.symmetric(vertical: BorderSide.solid(color: primaryColor, width: 1.px)),
+        alignItems: AlignItems.center,
+      ),
       css('button', [
-        css('&')
-            .text(fontSize: 2.rem)
-            .box(width: 2.em, height: 2.em, border: Border.unset, cursor: Cursor.pointer)
-            .box(radius: BorderRadius.all(Radius.circular(2.em)))
-            .flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center)
-            .background(color: Colors.transparent),
-        css('&:hover').background(color: const Color.hex('#0001')),
+        css('&').styles(
+          display: Display.flex,
+          width: 2.em,
+          height: 2.em, 
+          border: Border.unset, 
+          radius: BorderRadius.all(Radius.circular(2.em)),
+          cursor: Cursor.pointer,
+          justifyContent: JustifyContent.center, 
+          alignItems: AlignItems.center,
+          backgroundColor: Colors.transparent,
+        ),
+        css('&:hover').styles(
+          backgroundColor: const Color.hex('#0001'),
+        ),
       ]),
-      css('span') //
-          .box(padding: EdgeInsets.symmetric(horizontal: 2.rem), boxSizing: BoxSizing.borderBox, minWidth: 2.5.em)
-          .text(color: primaryColor, fontSize: 4.rem, align: TextAlign.center),
+      css('span').styles(
+        minWidth: 2.5.em,
+        padding: Padding.symmetric(horizontal: 2.rem),
+        boxSizing: BoxSizing.borderBox, 
+        color: primaryColor, 
+        textAlign: TextAlign.center,
+        fontSize: 4.rem,
+      ),
     ]),
   ];{{/server}}
 }

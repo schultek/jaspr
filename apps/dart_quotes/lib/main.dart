@@ -21,17 +21,23 @@ void main() {
 
       // Include icon font
       css.fontFace(family: "icomoon", url: "/fonts/icomoon.ttf"),
-      css('[class^="icon-"], [class*=" icon-"]').text(fontFamily: FontFamily('icomoon')),
-      css('.icon-heart-o:before').raw({'content': r'"\e900"'}),
-      css('.icon-heart:before').raw({'content': r'"\e901"'}),
+      css('[class^="icon-"], [class*=" icon-"]').styles(fontFamily: FontFamily('icomoon')),
+      css('.icon-heart-o:before').styles(content: r'\e900'),
+      css('.icon-heart:before').styles(content: r'\e901'),
 
       // Root styles
-      css('html, body')
-          .text(fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]))
-          .box(width: 100.percent, minHeight: 100.vh)
-          .box(margin: EdgeInsets.zero, padding: EdgeInsets.zero)
-          .background(color: Color.hex('#F7F7F7')),
-      css('h1').text(fontSize: 4.rem).box(margin: EdgeInsets.unset),
+      css('html, body').styles(
+        fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]),
+        width: 100.percent,
+        minHeight: 100.vh,
+        margin: Margin.zero,
+        padding: Padding.zero,
+        backgroundColor: Color.hex('#F7F7F7'),
+      ),
+      css('h1').styles(
+        fontSize: 4.rem,
+        margin: Margin.unset,
+      ),
     ],
     body: App(),
   ));

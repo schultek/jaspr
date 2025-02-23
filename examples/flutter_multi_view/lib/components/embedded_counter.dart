@@ -16,7 +16,7 @@ class EmbeddedCounter extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield FlutterEmbedView.deferred(
       classes: 'flutter-counter',
-      styles: Styles.box(margin: EdgeInsets.only(top: 20.px)),
+      styles: Styles(margin: Margin.only(top: 20.px)),
       constraints: ViewConstraints(
         minWidth: cardWidth,
         minHeight: cardHeight,
@@ -32,11 +32,16 @@ class EmbeddedCounter extends StatelessComponent {
   @css
   static final styles = [
     css('.flutter-counter', [
-      css('&')
-          .box(display: Display.flex, radius: BorderRadius.circular(cardBorderRadius.px))
-          .background(color: surfaceColor),
-      css('& > div[flt-embedding]').box(opacity: 0, transition: Transition('opacity', duration: 400)),
-      css('&.active > div[flt-embedding]').box(opacity: 1),
+      css('&').styles(
+        display: Display.flex,
+        radius: BorderRadius.circular(cardBorderRadius.px),
+        backgroundColor: surfaceColor,
+      ),
+      css('& > div[flt-embedding]').styles(
+        opacity: 0,
+        transition: Transition('opacity', duration: 400),
+      ),
+      css('&.active > div[flt-embedding]').styles(opacity: 1),
     ])
   ];
 }

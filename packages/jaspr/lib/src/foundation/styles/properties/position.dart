@@ -3,13 +3,10 @@ import 'unit.dart';
 abstract class Position {
   static const Position static = _Position('static');
 
-  const factory Position.absolute({Unit? top, Unit? left, Unit? bottom, Unit? right, ZIndex? zIndex}) =
-      _Positioned.absolute;
-  const factory Position.relative({Unit? top, Unit? left, Unit? bottom, Unit? right, ZIndex? zIndex}) =
-      _Positioned.relative;
-  const factory Position.fixed({Unit? top, Unit? left, Unit? bottom, Unit? right, ZIndex? zIndex}) = _Positioned.fixed;
-  const factory Position.sticky({Unit? top, Unit? left, Unit? bottom, Unit? right, ZIndex? zIndex}) =
-      _Positioned.sticky;
+  const factory Position.absolute({Unit? top, Unit? left, Unit? bottom, Unit? right}) = _Positioned.absolute;
+  const factory Position.relative({Unit? top, Unit? left, Unit? bottom, Unit? right}) = _Positioned.relative;
+  const factory Position.fixed({Unit? top, Unit? left, Unit? bottom, Unit? right}) = _Positioned.fixed;
+  const factory Position.sticky({Unit? top, Unit? left, Unit? bottom, Unit? right}) = _Positioned.sticky;
 
   static const Position inherit = _Position('inherit');
   static const Position initial = _Position('initial');
@@ -36,12 +33,11 @@ class _Positioned extends _Position {
   final Unit? left;
   final Unit? bottom;
   final Unit? right;
-  final ZIndex? zIndex;
 
-  const _Positioned.absolute({this.top, this.left, this.bottom, this.right, this.zIndex}) : super('absolute');
-  const _Positioned.relative({this.top, this.left, this.bottom, this.right, this.zIndex}) : super('relative');
-  const _Positioned.fixed({this.top, this.left, this.bottom, this.right, this.zIndex}) : super('fixed');
-  const _Positioned.sticky({this.top, this.left, this.bottom, this.right, this.zIndex}) : super('sticky');
+  const _Positioned.absolute({this.top, this.left, this.bottom, this.right}) : super('absolute');
+  const _Positioned.relative({this.top, this.left, this.bottom, this.right}) : super('relative');
+  const _Positioned.fixed({this.top, this.left, this.bottom, this.right}) : super('fixed');
+  const _Positioned.sticky({this.top, this.left, this.bottom, this.right}) : super('sticky');
 
   @override
   Map<String, String> get styles => {
@@ -50,7 +46,6 @@ class _Positioned extends _Position {
         if (left != null) 'left': left!.value,
         if (bottom != null) 'bottom': bottom!.value,
         if (right != null) 'right': right!.value,
-        if (zIndex != null) 'z-index': zIndex!.value,
       };
 }
 

@@ -109,7 +109,7 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
           },
         },
         styles: notifier.progressAfterCliff > 0
-            ? Styles.raw({
+            ? Styles(raw: {
                 'background':
                     'linear-gradient(to right, ${primaryFaded.value} ${notifier.progressAfterCliff - 1}%, ${surface.value} ${notifier.progressAfterCliff}%)'
               })
@@ -123,7 +123,7 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
   @css
   static final List<StyleRule> styles = [
     css('#meet-jaspr-button', [
-      css('&').box(position: Position.relative()),
+      css('&').styles(position: Position.relative()),
     ]),
   ];
 }

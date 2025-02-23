@@ -67,21 +67,27 @@ class Features extends StatelessComponent {
   @css
   static final List<StyleRule> styles = [
     css('#features', [
-      css('&')
-          .box(padding: EdgeInsets.only(top: sectionPadding))
-          .flexbox(direction: FlexDirection.column, alignItems: AlignItems.center)
-          .text(align: TextAlign.center),
+      css('&').styles(
+        display: Display.flex,
+        padding: Padding.only(top: sectionPadding),
+        flexDirection: FlexDirection.column,
+        alignItems: AlignItems.center,
+        textAlign: TextAlign.center,
+      ),
       css('.feature-grid', [
-        css('&')
-            .box(
-              maxWidth: maxContentWidth,
-              margin: EdgeInsets.only(top: 3.rem, bottom: 4.rem),
-              padding: EdgeInsets.symmetric(horizontal: contentPadding),
-            )
-            .flexbox(direction: FlexDirection.row, wrap: FlexWrap.wrap, gap: Gap.all(1.5.rem)),
-        css('& > *')
-            .flexItem(flex: Flex(grow: 1, shrink: 0, basis: FlexBasis(13.rem)))
-            .box(boxSizing: BoxSizing.borderBox),
+        css('&').styles(
+          display: Display.flex,
+          maxWidth: maxContentWidth,
+          padding: Padding.symmetric(horizontal: contentPadding),
+          margin: Margin.only(top: 3.rem, bottom: 4.rem),
+          flexDirection: FlexDirection.row,
+          flexWrap: FlexWrap.wrap,
+          gap: Gap.all(1.5.rem),
+        ),
+        css('& > *').styles(
+          boxSizing: BoxSizing.borderBox,
+          flex: Flex(grow: 1, shrink: 0, basis: FlexBasis(13.rem)),
+        ),
       ]),
     ]),
   ];

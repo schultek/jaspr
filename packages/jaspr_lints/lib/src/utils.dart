@@ -13,6 +13,14 @@ bool isComponentType(DartType? type) {
   return type != null && type.accept(IsComponentVisitor());
 }
 
+bool isStylesType(DartType? type) {
+  if (type == null || type is! InterfaceType) return false;
+  var name = type.element.name;
+  var lib = type.element.library;
+
+  return lib.identifier == 'package:jaspr/src/foundation/styles/styles.dart' && name == 'Styles';
+}
+
 bool isComponentListType(DartType? type) {
   return type != null &&
       type.isDartCoreList &&

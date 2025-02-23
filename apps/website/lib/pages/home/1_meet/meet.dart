@@ -123,48 +123,57 @@ class Meet extends StatelessComponent {
   @css
   static final List<StyleRule> styles = [
     css('#meet', [
-      css('&')
-          .box(minHeight: 100.vh, padding: EdgeInsets.only(top: 2.rem, left: contentPadding, right: contentPadding))
-          .flexbox(direction: FlexDirection.column, gap: Gap(row: sectionPadding), alignItems: AlignItems.center),
+      css('&').styles(
+        display: Display.flex,
+        minHeight: 100.vh,
+        padding: Padding.only(top: 2.rem, left: contentPadding, right: contentPadding),
+        flexDirection: FlexDirection.column,
+        alignItems: AlignItems.center,
+        gap: Gap(row: sectionPadding),
+      ),
       css('.meet-section', [
-        css('&').box(maxWidth: maxContentWidth).flexbox(
-              direction: FlexDirection.row,
-              alignItems: AlignItems.center,
-              wrap: FlexWrap.wrap,
-              gap: Gap(column: 4.rem, row: 4.rem),
-            ),
-        css('& > *').flexItem(flex: Flex(grow: 1, shrink: 1, basis: FlexBasis(24.rem))).box(minWidth: Unit.zero),
+        css('&').styles(
+          display: Display.flex,
+          maxWidth: maxContentWidth,
+          flexDirection: FlexDirection.row,
+          flexWrap: FlexWrap.wrap,
+          alignItems: AlignItems.center,
+          gap: Gap(column: 4.rem, row: 4.rem),
+        ),
+        css('& > *').styles(
+          minWidth: Unit.zero,
+          flex: Flex(grow: 1, shrink: 1, basis: FlexBasis(24.rem)),
+        ),
         css('p').combine(bodyLarge),
-        css('.actions').box(margin: EdgeInsets.only(top: 2.rem)),
+        css('.actions').styles(
+          margin: Margin.only(top: 2.rem),
+        ),
       ]),
       css('.meet-components', [
         for (var i = 1; i <= 5; i++) ...[
-          css('.select-target-$i').box(position: Position.relative()),
-          css('&:has(.select-trigger-$i:hover) .select-target-$i::before')
-              .raw({'content': '""'})
-              .box(
-                position: Position.absolute(
-                    left: (-10).px, top: (-10).px, right: (-10).px, bottom: (-10).px, zIndex: ZIndex(-1)),
-                border: Border.all(BorderSide(color: primaryLight, width: 1.px)),
-                radius: BorderRadius.circular(8.px),
-              )
-              .background(color: primaryFaded),
+          css('.select-target-$i').styles(position: Position.relative()),
+          css('&:has(.select-trigger-$i:hover) .select-target-$i::before').styles(
+            position: Position.absolute(left: (-10).px, top: (-10).px, right: (-10).px, bottom: (-10).px),
+            zIndex: ZIndex(-1),
+            border: Border(color: primaryLight, width: 1.px),
+            radius: BorderRadius.circular(8.px),
+            backgroundColor: primaryFaded,
+            raw: {'content': '""'},
+          ),
         ]
       ]),
       css('.meet-modes', [
-        css('&').flexbox(wrap: FlexWrap.wrapReverse),
-        css('& > div:first-child').box(position: Position.relative()),
-        css('.put-top span:last-child').box(position: Position.absolute(zIndex: ZIndex(1))),
-        css('.mode-highlight')
-            .box(
-                position: Position.absolute(bottom: 0.6.em, left: (-16).px, right: (-16).px),
-                height: 3.2.em,
-                radius: BorderRadius.circular(8.px),
-                border: Border.all(
-                  BorderSide(color: primaryLight, width: 2.px),
-                ))
-            .background(color: primaryFaded)
-            .raw({'pointer-events': 'none'}),
+        css('&').styles(flexWrap: FlexWrap.wrapReverse),
+        css('& > div:first-child').styles(position: Position.relative()),
+        css('.put-top span:last-child').styles(position: Position.absolute(), zIndex: ZIndex(1)),
+        css('.mode-highlight').styles(
+          position: Position.absolute(bottom: 0.6.em, left: (-16).px, right: (-16).px),
+          height: 3.2.em,
+          border: Border(color: primaryLight, width: 2.px),
+          radius: BorderRadius.circular(8.px),
+          pointerEvents: PointerEvents.none,
+          backgroundColor: primaryFaded,
+        ),
       ]),
     ]),
   ];

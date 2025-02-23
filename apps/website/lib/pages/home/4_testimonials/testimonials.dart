@@ -50,29 +50,32 @@ class Testimonials extends StatelessComponent {
   @css
   static final List<StyleRule> styles = [
     css('#testimonials', [
-      css('&')
-          .box(padding: EdgeInsets.only(top: sectionPadding))
-          .flexbox(direction: FlexDirection.column, alignItems: AlignItems.center)
-          .text(align: TextAlign.center),
+      css('&').styles(
+        display: Display.flex,
+        padding: Padding.only(top: sectionPadding),
+        flexDirection: FlexDirection.column,
+        alignItems: AlignItems.center,
+        textAlign: TextAlign.center,
+      ),
       css('.testimonials-grid', [
-        css('&')
-            .box(
+        css('&').styles(
           maxWidth: maxContentWidth,
-          margin: EdgeInsets.only(top: 3.rem, bottom: 4.rem),
-          padding: EdgeInsets.symmetric(horizontal: contentPadding),
-        )
-            .raw({'column-count': '3', 'gap': '1.5rem'}),
-        css('& > *').raw({'break-inside': 'avoid'}),
+          padding: Padding.symmetric(horizontal: contentPadding),
+          margin: Margin.only(top: 3.rem, bottom: 4.rem),
+          gap: Gap.all(1.5.rem),
+          raw: {'column-count': '3'},
+        ),
+        css('& > *').styles(raw: {'break-inside': 'avoid'}),
       ]),
     ]),
     css.media(MediaQuery.screen(maxWidth: 1200.px), [
       css('#testimonials .testimonials-grid', [
-        css('&').raw({'column-count': '2'}),
+        css('&').styles(raw: {'column-count': '2'}),
       ]),
     ]),
     css.media(MediaQuery.screen(maxWidth: 750.px), [
       css('#testimonials .testimonials-grid', [
-        css('&').raw({'column-count': '1'}),
+        css('&').styles(raw: {'column-count': '1'}),
       ]),
     ]),
   ];

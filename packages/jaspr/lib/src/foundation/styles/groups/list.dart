@@ -8,7 +8,7 @@ class _ListStyles extends Styles {
   const _ListStyles({this.style, this.image, this.position}) : super._();
 
   @override
-  Map<String, String> get styles => {
+  Map<String, String> get properties => {
         if (style != null) 'list-style-type': style!.value,
         if (position != null) 'list-style-position': position!.value,
         if (image != null) 'list-style-image': image!.value,

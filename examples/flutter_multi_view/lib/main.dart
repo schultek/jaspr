@@ -16,11 +16,17 @@ void main() {
     ],
     styles: [
       css.import('https://fonts.googleapis.com/css?family=Roboto'),
-      css('html, body')
-          .text(fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]))
-          .box(width: 100.percent, minHeight: 100.vh)
-          .box(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
-      css('h1').text(fontSize: 4.rem).box(margin: EdgeInsets.unset),
+      css('html, body').styles(
+        width: 100.percent,
+        minHeight: 100.vh,
+        padding: Padding.zero,
+        margin: Margin.zero,
+        fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]),
+      ),
+      css('h1').styles(
+        margin: Margin.unset,
+        fontSize: 4.rem,
+      ),
     ],
     body: App(),
   ));

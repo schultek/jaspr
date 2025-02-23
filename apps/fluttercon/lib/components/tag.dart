@@ -12,11 +12,11 @@ class Tag extends StatelessComponent {
 
   @css
   static final styles = [
-    css('.tag').box(
-      border: Border.all(BorderSide.solid(color: Colors.black, width: 1.px)),
+    css('.tag').styles(
+      border: Border(color: Colors.black, width: 1.px),
       radius: BorderRadius.circular(0.7.em),
-      margin: EdgeInsets.symmetric(horizontal: 2.px),
-      padding: EdgeInsets.symmetric(horizontal: 0.4.em, vertical: 0.2.em),
+      margin: Margin.symmetric(horizontal: 2.px),
+      padding: Padding.symmetric(horizontal: 0.4.em, vertical: 0.2.em),
     ),
   ];
 }

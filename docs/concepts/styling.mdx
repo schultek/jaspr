@@ -13,17 +13,51 @@ You can use Jasprs own type-safe CSS-in-Dart styling system or integrate CSS fra
 Jaspr gives you a strongly-typed styles system that wraps the most common css properties. You can
 access these various properties through the [`Styles`](/utils/styles) class that is exported by the core package.
 
-When defining styles like this, you can use them to either write global stylesheets, or set inline styles for html elements.
+When defining styles like this, you can use them to write component-level styles, global styles, or set inline styles for html elements.
+
+### Component Styles
+
+The recommended approach is to define your styles inside your components for better locality of your code:
+
+```dart lib/app.dart
+class App extends StatelessComponent {
+  const App({super.key});
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield div(classes: 'main', [
+      p([text('Hello World')]),
+    ]);
+  }
+
+  @css
+  static final styles = [
+    css('.main', [
+      css('&').styles(
+        width: 100.px,
+        padding: Padding.all(10.rem),
+      ),
+      css('p').styles(
+        color: Colors.blue,
+      ),
+    ]),
+  ];
+}
+```
+
+Read more about this approach in the documentation for [@çss](/utils/at_css).
+
+<Success>
+**Tip:** The `jaspr_lints` package provides a convenient lint rule to keep your styles properties organized. Learn more about it [here](/get_started/linting#lint-rules).
+</Success>
 
 ### Global Stylesheet
 
 You can define a global stylesheet from your Dart code using one of the following options:
 
-1. Passing [Style Rules](/utils/at_css#defining-style-rules) to [Document(styles: ...)](/components/document#parameters).
-   This will render the provided styles into a global stylesheet inside the `<head>` element.
+1. Passing [Style Rules](/utils/at_css#defining-style-rules) to [Document(styles: ...)](/components/document#parameters). This will render the provided styles into a global stylesheet inside the `<head>` element.
 
-2. Using the [@css](/utils/at_css#registering-style-rules) annotation to automatically render the annotated styles into
-   a global stylesheet inside the `<head>` element.
+2. Using the [@css](/utils/at_css#registering-style-rules) annotation on a global variable to automatically render the annotated styles into a global stylesheet inside the `<head>` element.
 
 3. Using the [Style](/components/style) component to manually define a `<style>` element anywhere in the tree.
 
@@ -32,13 +66,13 @@ You can define a global stylesheet from your Dart code using one of the followin
 You can also pass a `Styles` instance to any html component, which will then render as inline css styles:
 
 ```dart
-div(styles: const Styles.background(color: Colors.red), []);
+div(styles: const Styles(backgroundColor: Colors.red), []);
 ```
 
 renders to:
 
 ```html
-<div style="background: red"></div>
+<div style="background-color: red"></div>
 ```
 
 <Info>
@@ -47,21 +81,23 @@ Try to prefer `const` styles whenever possible, which will benefit the performan
 
 ### Responsive styles
 
-To make your styles responsive and e.g. change based on the screen width or height, use the `css.media()` utility.
-This will render [css `@media` queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Using_media_queries).
+To make your styles responsive and e.g. change based on the screen width or height, use the `css.media()` utility. This will render [css `@media` queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Using_media_queries).
 
-> Media queries allow you to apply CSS styles depending on a device's media type (such as print vs. screen) or other
-> features or characteristics such as screen resolution or orientation, aspect ratio, browser viewport width or height,
-> user preferences such as preferring reduced motion, data usage, or transparency.
+> Media queries allow you to apply CSS styles depending on a device's media type (such as print vs. screen) or other features or characteristics such as screen resolution or orientation, aspect ratio, browser viewport width or height, user preferences such as preferring reduced motion, data usage, or transparency.
 
 Provide a `MediaQuery` as well as child styles to the function:
 
 ```dart
 @css
 final styles = [
-    css('.main').flexbox(direction: FlexDirection.row),
+    css('.main').styles(
+      display: Display.flex, 
+      flexDirection: FlexDirection.row,
+    ),
     css.media(MediaQuery.screen(maxWidth: 600.px), [
-      css('.main').flexbox(direction: FlexDirection.column)
+      css('.main').styles(
+        flexDirection: FlexDirection.column,
+      ),
     ]),
 ];
 ```

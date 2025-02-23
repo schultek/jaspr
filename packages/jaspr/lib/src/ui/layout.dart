@@ -9,7 +9,7 @@ class Page extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield div(
-      styles: Styles.box(overflow: overflow),
+      styles: Styles(overflow: overflow),
       children,
     );
   }
@@ -23,7 +23,8 @@ class Center extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield div(
-      styles: Styles.flexbox(
+      styles: Styles(
+        display: Display.flex,
         justifyContent: JustifyContent.center,
         alignItems: AlignItems.center,
       ),
@@ -40,7 +41,7 @@ class Spacer extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(styles: Styles.box(width: width, height: height), []);
+    yield div(styles: Styles(width: width, height: height), []);
   }
 }
 
@@ -51,12 +52,12 @@ class Padding extends StatelessComponent {
     required this.children,
   });
 
-  final EdgeInsets padding;
+  final Spacing padding;
   final List<Component> children;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield div(styles: Styles.box(padding: padding), children);
+    yield div(styles: Styles(padding: padding), children);
   }
 }
 
@@ -76,8 +77,8 @@ class Container extends StatelessComponent {
 
   final Unit? width;
   final Unit? height;
-  final EdgeInsets? padding;
-  final EdgeInsets? margin;
+  final Spacing? padding;
+  final Spacing? margin;
   final Overflow? overflow;
   final Color? color;
   final Border? border;
@@ -88,17 +89,18 @@ class Container extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield div(
       styles: Styles.combine([
-        Styles.box(
+        Styles(
           width: width,
           height: height,
           padding: padding,
           margin: margin,
           overflow: overflow,
           border: border,
+          backgroundColor: color,
         ),
-        if (color != null) Styles.background(color: color),
         if (center)
-          Styles.flexbox(
+          Styles(
+            display: Display.flex,
             justifyContent: JustifyContent.center,
             alignItems: AlignItems.center,
           ),
@@ -123,9 +125,10 @@ class Column extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield div(
-      styles: Styles.flexbox(
-        direction: FlexDirection.column,
-        wrap: FlexWrap.nowrap,
+      styles: Styles(
+        display: Display.flex,
+        flexDirection: FlexDirection.column,
+        flexWrap: FlexWrap.nowrap,
         justifyContent: mainAxisAlignment,
         alignItems: crossAxisAlignment,
       ),
@@ -149,9 +152,10 @@ class Row extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield div(
-      styles: Styles.flexbox(
-        direction: FlexDirection.row,
-        wrap: FlexWrap.nowrap,
+      styles: Styles(
+        display: Display.flex,
+        flexDirection: FlexDirection.row,
+        flexWrap: FlexWrap.nowrap,
         justifyContent: mainAxisAlignment,
         alignItems: crossAxisAlignment,
       ),
@@ -176,7 +180,7 @@ class Grid extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield div(
-      styles: Styles.raw({
+      styles: Styles(raw: {
         "display": "grid",
         "grid-template-columns": "repeat($columns, ${spread ? "1fr" : "0fr"})",
         if (gap != null) "gap": gap!.value,

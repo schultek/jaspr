@@ -41,19 +41,33 @@ class SessionPage extends StatelessComponent {
   @css
   static final styles = [
     css('section.session', [
-      css('&')
-          .box(padding: EdgeInsets.all(40.px))
-          .flexbox(
-            direction: FlexDirection.column,
-            justifyContent: JustifyContent.center,
-            alignItems: AlignItems.center,
-          )
-          .text(align: TextAlign.center),
-      css('a').flexItem(alignSelf: AlignSelf.start).text(color: Color.initial),
-      css('h1').box(margin: EdgeInsets.only(top: 40.px, bottom: 20.px)).text(fontSize: 2.em),
-      css('div').box(margin: EdgeInsets.symmetric(vertical: 20.px)),
-      css('ul').list(style: ListStyle.none).box(padding: EdgeInsets.zero),
-      css('p').text(align: TextAlign.justify, whiteSpace: WhiteSpace.preLine),
+      css('&').styles(
+        padding: Padding.all(40.px),
+        display: Display.flex,
+        flexDirection: FlexDirection.column,
+        justifyContent: JustifyContent.center,
+        alignItems: AlignItems.center,
+        textAlign: TextAlign.center,
+      ),
+      css('a').styles(
+        alignSelf: AlignSelf.start,
+        color: Color.initial,
+      ),
+      css('h1').styles(
+        margin: Margin.only(top: 40.px, bottom: 20.px),
+        fontSize: 2.em,
+      ),
+      css('div').styles(
+        margin: Margin.symmetric(vertical: 20.px),
+      ),
+      css('ul').styles(
+        listStyle: ListStyle.none,
+        padding: Padding.zero,
+      ),
+      css('p').styles(
+        textAlign: TextAlign.justify,
+        whiteSpace: WhiteSpace.preLine,
+      ),
     ]),
   ];
 }

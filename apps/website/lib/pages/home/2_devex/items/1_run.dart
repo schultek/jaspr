@@ -36,7 +36,7 @@ class Run extends StatelessComponent {
           br(),
           for (final line in lines) ...[
             span([
-              span(styles: Styles.text(color: line.$2), [text(line.$1)]),
+              span(styles: Styles(color: line.$2), [text(line.$1)]),
               text(line.$3)
             ]),
             br(),
@@ -49,10 +49,14 @@ class Run extends StatelessComponent {
   @css
   static final List<StyleRule> styles = [
     css('.run-preview', [
-      css('&').box(padding: EdgeInsets.all(.5.rem)),
-      css('.console')
-          .box(display: Display.block, opacity: .8)
-          .text(fontSize: .7.rem, align: TextAlign.start, color: textBlack),
+      css('&').styles(padding: Padding.all(.5.rem)),
+      css('.console').styles(
+        display: Display.block,
+        opacity: .8,
+        color: textBlack,
+        textAlign: TextAlign.start,
+        fontSize: .7.rem,
+      ),
     ]),
   ];
 }

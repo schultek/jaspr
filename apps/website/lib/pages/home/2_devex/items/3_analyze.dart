@@ -54,44 +54,55 @@ class Analyze extends StatelessComponent {
   @css
   static final List<StyleRule> styles = [
     css('.analyze-preview', [
-      css('&').box(
-        padding: EdgeInsets.all(1.rem),
-        height: 100.percent,
-        boxSizing: BoxSizing.borderBox,
+      css('&').styles(
         position: Position.relative(),
+        height: 100.percent,
+        padding: Padding.all(1.rem),
+        boxSizing: BoxSizing.borderBox,
       ),
-      css('& > div').box(
+      css('& > div').styles(
         position: Position.absolute(top: 50.percent, left: 47.percent),
         width: 28.rem,
         maxWidth: 100.percent,
         transform: Transform.translate(x: (-50).percent, y: (-50).percent),
       ),
-      css('.quick-select  span.hljs-title:last-child', [
-        css('&').background(color: primaryFaded),
-      ]),
-      css('& > div > div', [
-        css('&').box(position: Position.relative()),
-      ]),
+      css('.quick-select  span.hljs-title:last-child').styles(
+        backgroundColor: primaryFaded,
+      ),
+      css('& > div > div').styles(
+        position: Position.relative(),
+      ),
       css('.quick-actions', [
-        css('&')
-            .box(
-              position: Position.absolute(right: (-1.5).rem, top: 4.rem),
-              radius: BorderRadius.circular(8.px),
-              border: Border.all(BorderSide(color: borderColor2, width: 1.px)),
-              padding: EdgeInsets.symmetric(horizontal: .2.rem, vertical: .5.rem),
-            )
-            .raw({'width': 'max-content'})
-            .flexbox(direction: FlexDirection.column, alignItems: AlignItems.stretch, gap: Gap(row: .2.rem))
-            .background(color: surfaceLow)
-            .text(fontSize: .8.rem, color: textBlack),
-        css('& > span:first-child').text(fontWeight: FontWeight.w600, color: textDim),
-        css('& > span')
-            .flexbox(direction: FlexDirection.row, alignItems: AlignItems.center, gap: Gap(column: 0.2.rem))
-            .box(
-                padding: EdgeInsets.symmetric(horizontal: 0.5.rem, vertical: 0.2.rem),
-                radius: BorderRadius.circular(4.px))
-            .text(align: TextAlign.left),
-        css('& > span:nth-child(2)').background(color: hoverOverlayColor),
+        css('&').styles(
+          display: Display.flex,
+          position: Position.absolute(right: (-1.5).rem, top: 4.rem),
+          padding: Padding.symmetric(horizontal: .2.rem, vertical: .5.rem),
+          border: Border(color: borderColor2, width: 1.px),
+          radius: BorderRadius.circular(8.px),
+          flexDirection: FlexDirection.column,
+          alignItems: AlignItems.stretch,
+          gap: Gap(row: .2.rem),
+          color: textBlack,
+          fontSize: .8.rem,
+          backgroundColor: surfaceLow,
+          raw: {'width': 'max-content'},
+        ),
+        css('& > span:first-child').styles(
+          color: textDim,
+          fontWeight: FontWeight.w600,
+        ),
+        css('& > span').styles(
+          display: Display.flex,
+          padding: Padding.symmetric(horizontal: 0.5.rem, vertical: 0.2.rem),
+          radius: BorderRadius.circular(4.px),
+          flexDirection: FlexDirection.row,
+          alignItems: AlignItems.center,
+          gap: Gap(column: 0.2.rem),
+          textAlign: TextAlign.left,
+        ),
+        css('& > span:nth-child(2)').styles(
+          backgroundColor: hoverOverlayColor,
+        ),
       ]),
     ]),
   ];

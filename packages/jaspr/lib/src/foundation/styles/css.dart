@@ -10,7 +10,7 @@ import 'styles.dart';
 /// ```dart
 /// @css
 /// final styles = [
-///   css('.someclass').box(width: 100.px)
+///   css('.someclass').styles(width: 100.px)
 /// ];
 /// ```
 ///
@@ -22,16 +22,17 @@ import 'styles.dart';
 ///
 /// - Provide any valid css selector and chain a set of styles:
 ///   ```dart
-///   css('.someclass')
-///     .box(width: 100.px)
-///     .text(color: Colors.black)
+///   css('.someclass').styles(
+///     width: 100.px,
+///     color: Colors.black,
+///   )
 ///   ```
 ///
 /// - Provide a second parameter to define nested rules. Use '&' to refer to the parent selector.
 ///   ```dart
 ///   css('.someclass', [
-///     css('&').box(width: 100.px),
-///     css('&:hover').background(color: Colors.blue),
+///     css('&').styles(width: 100.px),
+///     css('&:hover').styles(backgroundColor: Colors.blue),
 ///   ])
 ///   ```
 ///
@@ -40,7 +41,7 @@ import 'styles.dart';
 ///   css.import('/some/external/styles.css');
 ///   css.fontFace(fontFamily: 'SomeFont', url: '/some/font.ttf');
 ///   css.media(MediaQuery.screen(minWidth: 800.px), [
-///     css('.someclass').box(width: 200.px),
+///     css('.someclass').styles(width: 200.px),
 ///   ]);
 ///   ```
 const css = CssUtility._();
@@ -110,7 +111,7 @@ class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
         ? self.selector.selector.replaceAll('&', parent)
         : '$parent ${self.selector.selector}';
 
-    if (_self.styles.styles.isNotEmpty) {
+    if (_self.styles.properties.isNotEmpty) {
       rules.add(_self._toCssWithParent(indent, parent));
     }
 

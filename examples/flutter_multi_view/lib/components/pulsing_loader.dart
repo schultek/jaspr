@@ -11,23 +11,36 @@ class PulsingLoader extends StatelessComponent {
 
   @css
   static final styles = [
-    css('.loader')
-        .box(
-      margin: EdgeInsets.all(Unit.auto),
+    css('.loader').styles(
+      margin: Margin.all(Unit.auto),
       boxSizing: BoxSizing.borderBox,
-      border: Border.all(BorderSide.solid(width: 0.px, color: loaderColor)),
+      border: Border(width: 0.px, color: loaderColor),
       radius: BorderRadius.circular(50.percent),
-    )
-        .raw({'animation': 'loading 1s infinite ease-out'}),
+      raw: {'animation': 'loading 1s infinite ease-out'},
+    ),
     css.keyframes('loading', {
-      '0%': Styles.background(color: loaderColor).box(width: 0.px, height: 0.px),
-      '29%': Styles.background(color: loaderColor),
-      '30%': Styles.box(
-              width: 30.px, height: 30.px, border: Border.all(BorderSide(width: 15.px, color: loaderColor)), opacity: 1)
-          .background(color: Colors.transparent),
-      '100%': Styles.box(
-              width: 30.px, height: 30.px, border: Border.all(BorderSide(width: 0.px, color: loaderColor)), opacity: 0)
-          .background(color: Colors.transparent),
+      '0%': Styles(
+        backgroundColor: loaderColor,
+        width: 0.px,
+        height: 0.px,
+      ),
+      '29%': Styles(
+        backgroundColor: loaderColor,
+      ),
+      '30%': Styles(
+        width: 30.px,
+        height: 30.px,
+        border: Border(width: 15.px, color: loaderColor),
+        opacity: 1,
+        backgroundColor: Colors.transparent,
+      ),
+      '100%': Styles(
+        width: 30.px,
+        height: 30.px,
+        border: Border(width: 0.px, color: loaderColor),
+        opacity: 0,
+        backgroundColor: Colors.transparent,
+      ),
     })
   ];
 }

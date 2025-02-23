@@ -16,6 +16,6 @@ void main() async {
 
 @css
 final styles = [
-  css('.main').box(minWidth: 12.px),
+  css('.main').styles(minWidth: 12.px),
   css.media(MediaQuery.screen(minWidth: 200.px), []),
 ];
