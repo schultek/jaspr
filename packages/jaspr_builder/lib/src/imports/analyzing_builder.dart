@@ -25,7 +25,7 @@ class ImportsModuleBuilder implements Builder {
       }
 
       var lib = await buildStep.resolver.libraryFor(buildStep.inputId, allowSyntaxErrors: true);
-      
+
       var outputId = buildStep.inputId.changeExtension('.imports.json');
       var partId = buildStep.inputId.changeExtension('.imports.dart');
 

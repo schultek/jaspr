@@ -170,7 +170,7 @@ class CssAssistProvider extends DartAssist {
     reporter.createChangeBuilder(priority: 1, message: 'Convert to nested styles').addDartFileEdit((builder) {
       var content = resolver.source.contents.data.substring(start, end);
       content = content.split('\n').join('\n  ');
-      builder.addReplacement(SourceRange(start, end-start), (edit) {
+      builder.addReplacement(SourceRange(start, end - start), (edit) {
         edit.write(', [\n${''.padLeft(lineIndent)}  css(\'&\'');
         edit.write(content);
         edit.write(',\n${''.padLeft(lineIndent)}])');
