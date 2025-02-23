@@ -68,7 +68,10 @@ class ClientRegistryBuilder implements Builder {
     ''';
 
     source = ImportsWriter(deferred: true).resolve(source);
-    source = DartFormatter(pageWidth: 120).format(source);
+    source = DartFormatter(
+      languageVersion: DartFormatter.latestShortStyleLanguageVersion,
+      pageWidth: 120,
+    ).format(source);
     return source;
   }
 }

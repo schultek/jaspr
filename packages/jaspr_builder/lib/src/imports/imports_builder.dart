@@ -38,7 +38,10 @@ class ImportsOutputBuilder implements Builder {
 
       await buildStep.writeAsString(
         outputId,
-        DartFormatter(pageWidth: 120).format("""
+        DartFormatter(
+          languageVersion: DartFormatter.latestShortStyleLanguageVersion,
+          pageWidth: 120,
+        ).format("""
           $generationHeader
           
           ${webShow.isNotEmpty ? """

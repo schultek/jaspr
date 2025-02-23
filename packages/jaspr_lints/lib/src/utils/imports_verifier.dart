@@ -102,7 +102,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
   void _recordIfExtensionMember(Element? element) {
     if (element != null) {
       // ignore: deprecated_member_use
-      var enclosingElement = element.enclosingElement;
+      var enclosingElement = element.enclosingElement3;
       if (enclosingElement is ExtensionElement) {
         _recordUsedExtension(enclosingElement);
       }
@@ -203,7 +203,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
       return;
     }
     // ignore: deprecated_member_use
-    var enclosingElement = element.enclosingElement;
+    var enclosingElement = element.enclosingElement3;
     if (enclosingElement is CompilationUnitElement) {
       _recordUsedElement(element);
     } else if (enclosingElement is ExtensionElement) {

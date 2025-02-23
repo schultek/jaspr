@@ -211,7 +211,7 @@ class StateBuildVisitor extends UnifyingAstVisitor {
     if (elem == null) return;
 
     // ignore: deprecated_member_use
-    if (elem.enclosingElement == clazz.declaredElement) {
+    if (elem.enclosingElement3 == clazz.declaredElement) {
       builder.addSimpleInsertion(node.offset, 'component.');
     }
   }

@@ -16,11 +16,11 @@ environment:
   sdk: '>=3.5.0 <4.0.0'
 
 dependencies:
-  analyzer: ^6.6.0
-  analyzer_plugin: ^0.11.0
+  analyzer: ^7.0.0
+  analyzer_plugin: ^0.12.0
   custom_lint_builder: ^0.7.0
   path: ^1.9.0
   yaml: ^3.1.2
 
 dev_dependencies:
-  lints: ^4.0.0
+  lints: ^5.0.0
