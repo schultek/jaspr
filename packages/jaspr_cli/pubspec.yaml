@@ -34,7 +34,7 @@ dependencies:
   yaml: ^3.1.0
   # The following packages don't adhere to semantic versioning and might ship breaking changes in minor versions.
   # Therefore, we depend on fixed versions of these packages.
-  build_daemon: 4.0.1
+  build_daemon: 4.0.4
   dwds: 24.3.5
   webdev: 3.7.1
   shelf: ^1.4.1
