@@ -53,6 +53,7 @@ class Hero extends StatelessComponent {
       ),
       css('p').combine(bodyMedium),
       css('.cta').styles(
+        display: Display.flex,
         margin: Margin.only(top: 2.rem),
         flexDirection: FlexDirection.column,
         alignItems: AlignItems.center,

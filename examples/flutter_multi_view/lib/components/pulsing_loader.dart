@@ -20,9 +20,9 @@ class PulsingLoader extends StatelessComponent {
     ),
     css.keyframes('loading', {
       '0%': Styles(
-        backgroundColor: loaderColor,
         width: 0.px,
         height: 0.px,
+        backgroundColor: loaderColor,
       ),
       '29%': Styles(
         backgroundColor: loaderColor,

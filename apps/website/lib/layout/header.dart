@@ -91,12 +91,16 @@ class HeaderState extends State<Header> {
   static final styles = [
     css('header', [
       css('&').styles(
+        display: Display.flex,
         position: Position.absolute(left: Unit.zero, right: Unit.zero),
         zIndex: ZIndex(1),
         padding: Padding.symmetric(horizontal: 2.rem, vertical: 2.rem),
         gap: Gap(column: 2.rem),
       ),
-      css('& > *').styles(alignItems: AlignItems.center),
+      css('& > *').styles(
+        display: Display.flex,
+        alignItems: AlignItems.center,
+      ),
       css('nav', [
         css('&').styles(
           display: Display.flex,
