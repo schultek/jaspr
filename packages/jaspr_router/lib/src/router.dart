@@ -76,8 +76,8 @@ class RouterState extends State<Router> with PreloadStateMixin {
   @override
   void initState() {
     super.initState();
-    PlatformRouter.instance.history.init(context.binding, onChangeState: (state, {url}) {
-      _update(url ?? context.binding.currentUri.toString(), extra: state, updateHistory: false, replace: true);
+    PlatformRouter.instance.history.init(context, onChangeState: (state, {url}) {
+      _update(url ?? context.url, extra: state, updateHistory: false, replace: true);
     });
     if (_matchList == null) {
       assert(context.binding.isClient);
@@ -95,7 +95,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
   }
 
   Future<void> initRoutes() {
-    final location = context.binding.currentUri.toString();
+    final location = context.url;
     return _matchRoute(location).then(_preload).then((match) {
       _matchList = match;
       if (context.binding.isClient && match.uri.toString() != location) {

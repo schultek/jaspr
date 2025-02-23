@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:collection';
+import 'dart:io';
 
 import '../../jaspr.dart';
 import 'adapters/client_component_adapter.dart';
@@ -6,19 +8,39 @@ import 'adapters/document_adapter.dart';
 import 'adapters/global_styles_adapter.dart';
 import 'async_build_owner.dart';
 import 'markup_render_object.dart';
+import 'render_functions.dart';
+
+typedef FileLoader = Future<String?> Function(String);
 
 /// Global component binding for the server
 class ServerAppBinding extends AppBinding with ComponentsBinding {
-  @override
-  Uri get currentUri => _currentUri!;
-  Uri? _currentUri;
+  ServerAppBinding(this.request, {required FileLoader loadFile}) : _fileLoader = loadFile;
 
-  void setCurrentUri(Uri uri) {
-    _currentUri = uri;
-  }
+  final RequestLike request;
+  final FileLoader _fileLoader;
 
   @override
   bool get isClient => false;
+
+  @override
+  String get currentUrl => request.url;
+
+  late final Map<String, String> cookies = () {
+    final Map<String, String> map = {};
+    final cookies = request.headers[HttpHeaders.cookieHeader]?.expand((h) => h.split(';')) ?? [];
+    for (final cookie in cookies) {
+      final c = Cookie.fromSetCookieValue(cookie.trim());
+      map[c.name] = c.value;
+    }
+    return UnmodifiableMapView(map);
+  }();
+
+  final Map<String, List<String>> responseHeaders = {
+    'Content-Type': ['text/html'],
+  };
+
+  int responseStatusCode = 200;
+  String? responseErrorBody;
 
   @override
   void attachRootComponent(Component app) async {
@@ -52,6 +74,10 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       adapter.apply(root);
     }
 
+    if (responseErrorBody != null) {
+      return responseErrorBody!;
+    }
+
     return root.renderToHtml();
   }
 
@@ -70,13 +96,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     return AsyncBuildOwner();
   }
 
-  late Future<String?> Function(String) _fileHandler;
-
-  void setFileHandler(Future<String?> Function(String) handler) {
-    _fileHandler = handler;
-  }
-
-  Future<String?> loadFile(String name) => _fileHandler(name);
+  Future<String?> loadFile(String name) => _fileLoader(name);
 
   late final List<RenderAdapter> _adapters = [];
 

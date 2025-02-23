@@ -12,21 +12,21 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
   @override
   bool get isClient => true;
 
-  late final String _baseOrigin = () {
+  static final String _baseOrigin = () {
     var base = document.querySelector('head>base') as HTMLBaseElement?;
     return base?.href ?? window.location.origin;
   }();
 
   @override
-  Uri get currentUri {
+  String get currentUrl {
     if (_baseOrigin.length > window.location.href.length) {
-      return Uri(path: '/');
+      return '/';
     }
     var pathWithoutOrigin = window.location.href.substring(_baseOrigin.length);
     if (!pathWithoutOrigin.startsWith('/')) {
       pathWithoutOrigin = '/$pathWithoutOrigin';
     }
-    return Uri.parse(pathWithoutOrigin);
+    return pathWithoutOrigin;
   }
 
   late String attachTarget;

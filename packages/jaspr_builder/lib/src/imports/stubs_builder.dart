@@ -53,7 +53,7 @@ class ImportsStubsBuilder implements Builder {
         AssetId(buildStep.inputId.package, 'lib/generated/imports/_vm.dart'),
         DartFormatter(pageWidth: 120).format("""
           $generationHeader
-          // ignore_for_file: directives_ordering
+          // ignore_for_file: directives_ordering, deprecated_member_use
           
           ${vmImports.entries.where((e) => e.value.any((v) => v.isType)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
           ${vmImports.entries.map((e) => "export '${e.key}' show ${e.value.join(', ')};").join('\n')}
@@ -68,7 +68,7 @@ class ImportsStubsBuilder implements Builder {
         AssetId(buildStep.inputId.package, 'lib/generated/imports/_web.dart'),
         DartFormatter().format("""
           $generationHeader
-          // ignore_for_file: directives_ordering
+          // ignore_for_file: directives_ordering, deprecated_member_use
           
           ${webImports.entries.where((e) => e.value.any((v) => v.isType)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
           ${webImports.entries.map((e) => "export '${e.key}' show ${e.value.join(', ')};").join('\n')}

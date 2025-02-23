@@ -1,8 +1,38 @@
 ## Unreleased minor
 
-- **BREAKING** Moved `zIndex` property out of `Position` and directly into `Styles`.
+- **BREAKING** Changed `AppBinding`s `Uri get currentUri` to `String get currentUrl`.
+
+- **BREAKING** Changed return type of `renderComponent()` from `Future<String>` to `Future<({int statusCode, String body, Map<String, List<String>> headers})>`. 
+
+  The rendered html is accessible through the `body` property. `statusCode` and `headers` can be used to create a response object when part of a custom http handler.
+
+- Added `context.url` extension getter on both client and server.
+- Added `context.headers`, `context.headersAll` and `context.cookies` extension getters on the server. These can be used to access the headers and cookies of the currently handled request.
+- Added `context.setHeader()` and `context.setCookie()` and `context.setStatusCode()` extension on the server. These can be used to set headers, cookies and the status code of the response.
+
 - Deprecated having seperate style groups (`Styles.box()`, `Styles.text()`, `Styles.background()`, etc. as well as `.box()`, `.text()`, etc.). All styling properties are now available under the single `Styles()` constructur and `.styles()` method.
+
+  **Before:**
+  ```dart
+  css('.main')
+    .box(width: 100.px, height: 100.px)
+    .text(align: TextAlign.center)
+    .background(color: Colors.blue);
+  ````
+
+  **After:**
+  ```dart
+  css('.main').styles(
+    width: 100.px,
+    height: 100.px,
+    textAlign: TextAlign.center,
+    backgroundColor: Colors.blue,
+  );
+  ```
+
 - Deprecated `EdgeInsets` in favor of `Padding` and `Margin` types.
+- **BREAKING** Moved `zIndex` property out of `Position` and directly into `Styles`.
+
 - Added `userSelect`, `pointerEvents` and `content` properties to `Styles`.
 - Added `Unit.maxContent`, `Unit.minContent`, `Unit.fitContent` and `Unit.expression()`.
 

@@ -31,13 +31,11 @@ data-loading strategy:
 
 ---
 
-With Jaspr loading data like this on the server and also syncing it with the client is build into the core framework,
-and you have a couple of options to choose from.
+With Jaspr loading data like this on the server and also syncing it with the client is build into the core framework, and you have a couple of options to choose from.
 
 ## Loading data on the server
 
-The main challenge when loading data on the server is to delay the pre-rendering until all data is loaded. Otherwise,
-it wouldn't be part of the initial html of the website.
+The main challenge when loading data on the server is to delay the pre-rendering until all data is loaded. Otherwise, it wouldn't be part of the initial html of the website.
 
 Jaspr has two main concepts that solve this:
 
@@ -46,8 +44,7 @@ Jaspr has two main concepts that solve this:
 Jaspr provides two special components that effectively have an asynchronous build method. This allows you to do
 any asynchronous work during build, and also delay the build until the work is completed.
 
-These components can only be used on the server and are only available using the
-`package:jaspr/server.dart` import.
+These components can only be used on the server and are only available using the `package:jaspr/server.dart` import.
 
 One of these, the `AsyncBuilder` component, can be used like this:
 
@@ -61,10 +58,7 @@ yield AsyncBuilder(builder: (context) async* {
 });
 ```
 
-Here you directly use `await` inside the build method. This may feel very strange or dangerous as a Flutter developer.
-Be assured that this is perfectly safe, mainly for the reason that this component is **only executed on the server** and
-**only built once** during pre-rendering. Therefore, you don't need to worry about potentially expensive rebuilds or floating async
-operations with these components.
+Here you directly use `await` inside the build method. This may feel very strange or dangerous as a Flutter developer. Be assured that this is perfectly safe, mainly for the reason that this component is **only executed on the server** and **only built once** during pre-rendering. Therefore, you don't need to worry about potentially expensive rebuilds or floating async operations with these components.
 
 The other async component is the `AsyncStatelessComponent`, a variant of the `StatelessComponent` but with an async build method:
 
@@ -100,8 +94,7 @@ class MyState extends State<MyStatefulComponent> with PreloadStateMixin {
 }
 ```
 
-The `preloadState()` method will only be executed on the server and will be called before `initState()`. It will defer
-`initState()` as well as building the component until the future returned by the method is completed.
+The `preloadState()` method will only be executed on the server and will be called before `initState()`. It will defer `initState()` as well as building the component until the future returned by the method is completed.
 
 Learn more about how to use the [PreloadStateMixin](/utils/preload_state_mixin).
 
@@ -109,12 +102,9 @@ Learn more about how to use the [PreloadStateMixin](/utils/preload_state_mixin).
 
 ## Syncing data to the client
 
-If you want to have an interactive website it's often not enough to only pre-render the website with the loaded data.
-The used data also needs to be available on the client in order to update the data and re-render the website on user
-interactions.
+If you want to have an interactive website it's often not enough to only pre-render the website with the loaded data. The used data also needs to be available on the client in order to update the data and re-render the website on user interactions.
 
-Therefore, it's often needed to also synchronize the data that's loaded on the server with the client. Jaspr has this
-built into the framework in a couple of ways.
+Therefore, it's often needed to also synchronize the data that's loaded on the server with the client. Jaspr has this built into the framework in a couple of ways.
 
 <Info>
 The synchronization of data in Jaspr is only one-directional (from the server to the client) and is only performed
@@ -124,13 +114,9 @@ continuous loading of data, you should use a normal server-side api or realtime 
 
 ### Passing data through @client components
 
-`@client` components are special annotated components that are automatically hydrated on the client to make your website
-interactive. In addition to being a way to hydrate you website, they can also be used to pass data from the server to
-the client.
+`@client` components are special annotated components that are automatically hydrated on the client to make your website interactive. In addition to being a way to hydrate you website, they can also be used to pass data from the server to the client.
 
-When using such a component, all parameters of the component are serialized and sent to the client. When the component
-is first built during hydration, it receives all the same parameters on the client that have been previously used on
-the server during pre-rendering.
+When using such a component, all parameters of the component are serialized and sent to the client. When the component is first built during hydration, it receives all the same parameters on the client that have been previously used on the server during pre-rendering.
 
 ```dart
 @client
@@ -145,8 +131,7 @@ class App extends StatelessComponent {
 }
 ```
 
-Read more about [@client](/utils/at_client) components and how they can be used to [sync data](/utils/at_client#passing-data)
-from the server to the client.
+Read more about [@client](/utils/at_client) components and how they can be used to [sync data](/utils/at_client#passing-data) from the server to the client.
 
 ### Using @sync on fields on a StatefulComponents
 
@@ -167,5 +152,4 @@ class MyComponentState extends State<MyComponent> {
 
 Read more about the [@sync](/utils/at_sync) annotation and how it syncs any field from the server to the client.
 
-Additionally check out the [SyncStateMixin](/utils/sync_state_mixin) which is used internally by the `@sync` annotation
-and can also be used directly to sync state of a `StatefulComponent` in a more flexible and explicit way.
+Additionally check out the [SyncStateMixin](/utils/sync_state_mixin) which is used internally by the `@sync` annotation and can also be used directly to sync state of a `StatefulComponent` in a more flexible and explicit way.

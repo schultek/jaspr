@@ -78,24 +78,17 @@ Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHa
       return Response(404);
     }
 
-    var fileLoader = _proxyFileLoader(request, staticHandler);
+    var fileLoader = proxyFileLoader(request, staticHandler);
     return handle(request, (setup) async {
-      var requestUri = request.url.normalizePath();
-      if (!requestUri.path.startsWith('/')) {
-        requestUri = requestUri.replace(path: '/${requestUri.path}');
-      }
-
-      return Response.ok(
-        await render(setup, requestUri, fileLoader, false),
-        headers: {'Content-Type': 'text/html'},
-      );
+      final (:body, :headers, :statusCode) = await render(setup, request, fileLoader, false);
+      return Response(statusCode, body: body, headers: headers);
     });
   });
 
   return cascade.handler;
 }
 
-Future<String?> Function(String) _proxyFileLoader(Request req, Handler proxyHandler) {
+Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandler) {
   return (name) async {
     final indexRequest = Request('GET', req.requestedUri.replace(path: '/$name'),
         context: req.context, encoding: req.encoding, headers: req.headers, protocolVersion: req.protocolVersion);
