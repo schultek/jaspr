@@ -84,7 +84,6 @@ class StylesModuleBuilder implements Builder {
           if (type == null ||
               !type.isDartCoreList ||
               !styleRuleChecker.isAssignableFromType((type as InterfaceType).typeArguments.first)) {
-            
             final prefix = switch (element.enclosingElement3) { ClassElement(:var name) => '$name.', _ => '' };
             log.severe(
                 '@css can only be applied on variables or getters of type List<StyleRule>. Failing element: $prefix${element.name} with type $type in library ${element.source?.fullName}.');

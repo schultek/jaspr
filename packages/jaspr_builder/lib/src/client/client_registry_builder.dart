@@ -18,7 +18,7 @@ class ClientRegistryBuilder implements Builder {
       var source = await generateClients(buildStep);
       if (source != null) {
         var outputId = AssetId(buildStep.inputId.package, 'web/main.clients.dart');
-        await buildStep.writeAsString(outputId, source);
+        await buildStep.writeAsFormattedDart(outputId, source);
       }
     } catch (e, st) {
       print('An unexpected error occurred.\n'
@@ -35,9 +35,6 @@ class ClientRegistryBuilder implements Builder {
         'lib/\$lib\$': ['web/main.clients.dart']
       };
 
-  String get generationHeader => "// GENERATED FILE, DO NOT MODIFY\n"
-      "// Generated with jaspr_builder\n";
-
   Future<String?> generateClients(BuildStep buildStep) async {
     var modules = buildStep
         .findAssets(Glob('lib/**.client.json'))
@@ -53,8 +50,6 @@ class ClientRegistryBuilder implements Builder {
     }
 
     var source = '''
-      $generationHeader
-      
       import 'package:jaspr/browser.dart';
       [[/]]
       
@@ -68,10 +63,6 @@ class ClientRegistryBuilder implements Builder {
     ''';
 
     source = ImportsWriter(deferred: true).resolve(source);
-    source = DartFormatter(
-      languageVersion: DartFormatter.latestShortStyleLanguageVersion,
-      pageWidth: 120,
-    ).format(source);
     return source;
   }
 }

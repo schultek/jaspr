@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
-import 'package:dart_style/dart_style.dart';
 
 import '../codec/codecs.dart';
 import '../utils.dart';
@@ -94,21 +93,14 @@ class SyncMixinsBuilder implements Builder {
     }
 
     var source = '''
-      $generationHeader
-      
       import 'package:jaspr/jaspr.dart';
       [[/]]
             
       $mixins
     ''';
     source = ImportsWriter().resolve(source);
-    source = DartFormatter(
-      languageVersion: DartFormatter.latestShortStyleLanguageVersion,
-      pageWidth: 120,
-    ).format(source);
-
     var outputId = buildStep.inputId.changeExtension('.sync.dart');
-    await buildStep.writeAsString(outputId, source);
+    await buildStep.writeAsFormattedDart(outputId, source);
   }
 
   String generateMixinFromEntry((ClassElement, Iterable<FieldElement>) element, Codecs codecs, String baseImport) {
