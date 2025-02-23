@@ -19,7 +19,6 @@ mixin FlutterHelper on BaseCommand {
         '-t',
         '.dart_tool/jaspr/flutter_target.dart',
         '--web-port=$flutterPort',
-        '--web-renderer=canvaskit',
         if (argResults!['release']) '--release'
       ],
       runInShell: true,
