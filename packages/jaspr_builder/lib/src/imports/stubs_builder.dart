@@ -51,7 +51,10 @@ class ImportsStubsBuilder implements Builder {
     if (vmImports.isNotEmpty) {
       await buildStep.writeAsString(
         AssetId(buildStep.inputId.package, 'lib/generated/imports/_vm.dart'),
-        DartFormatter(pageWidth: 120).format("""
+        DartFormatter(
+          languageVersion: DartFormatter.latestShortStyleLanguageVersion,
+          pageWidth: 120,
+        ).format("""
           $generationHeader
           // ignore_for_file: directives_ordering, deprecated_member_use
           
@@ -66,7 +69,10 @@ class ImportsStubsBuilder implements Builder {
     if (webImports.isNotEmpty) {
       await buildStep.writeAsString(
         AssetId(buildStep.inputId.package, 'lib/generated/imports/_web.dart'),
-        DartFormatter().format("""
+        DartFormatter(
+          languageVersion: DartFormatter.latestShortStyleLanguageVersion,
+          pageWidth: 120,
+        ).format("""
           $generationHeader
           // ignore_for_file: directives_ordering, deprecated_member_use
           
@@ -81,7 +87,10 @@ class ImportsStubsBuilder implements Builder {
     if (stubs.isNotEmpty) {
       await buildStep.writeAsString(
         AssetId(buildStep.inputId.package, 'lib/generated/imports/_stubs.dart'),
-        DartFormatter().format("""
+        DartFormatter(
+          languageVersion: DartFormatter.latestShortStyleLanguageVersion,
+          pageWidth: 120,
+        ).format("""
          $generationHeader
          // ignore_for_file: directives_ordering, non_constant_identifier_names
          

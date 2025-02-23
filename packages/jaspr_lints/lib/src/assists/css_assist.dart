@@ -29,11 +29,12 @@ class CssAssistProvider extends DartAssist {
           final indent = getLineIndent(resolver.lineInfo, node);
           addStyles(resolver, reporter, node, indent, node.argumentList);
         }
-      } else if (node is FunctionExpressionInvocation) {
-        if (node.function case SimpleIdentifier(name: 'css')) {
-          final indent = getLineIndent(resolver.lineInfo, node);
-          convertToNested(resolver, reporter, node, indent);
-        }
+      }
+
+      final css = getCssInvocation(node);
+      if (css != null) {
+        final indent = getLineIndent(resolver.lineInfo, node);
+        convertToNested(resolver, reporter, css, indent);
       }
     });
     context.registry.addInstanceCreationExpression((node) {
@@ -49,6 +50,23 @@ class CssAssistProvider extends DartAssist {
       final indent = getLineIndent(resolver.lineInfo, node);
       addStyles(resolver, reporter, node, indent, node.argumentList);
     });
+  }
+
+  InvocationExpression? getCssInvocation(InvocationExpression node) {
+    var parent = node.function.parent;
+    if (parent is MethodInvocation) {
+      var target = parent.realTarget;
+      if (target is InvocationExpression) {
+        return getCssInvocation(target);
+      }
+    }
+    if (node.function case SimpleIdentifier(name: 'css', staticType: final InterfaceType type)) {
+      if (type.element.name == 'CssUtility' &&
+          type.element.library.identifier == 'package:jaspr/src/foundation/styles/css.dart') {
+        return node;
+      }
+    }
+    return null;
   }
 
   void addStyles(CustomLintResolver resolver, ChangeReporter reporter, Expression node, int lineIndent,
@@ -136,21 +154,25 @@ class CssAssistProvider extends DartAssist {
   void convertToNested(
     CustomLintResolver resolver,
     ChangeReporter reporter,
-    FunctionExpressionInvocation node,
+    InvocationExpression css,
     int lineIndent,
   ) {
-    if (node.argumentList.arguments.length != 1) {
+    if (css.argumentList.arguments.length != 1) {
       return;
     }
 
-    var selector = node.argumentList.arguments.first;
-    var chain = getFullChain(node.parent);
+    var selector = css.argumentList.arguments.first;
+    var chain = getFullChain(css.parent);
+
+    var start = selector.end;
+    var end = chain?.end ?? css.end;
 
     reporter.createChangeBuilder(priority: 1, message: 'Convert to nested styles').addDartFileEdit((builder) {
-      builder.addInsertion(selector.end, (edit) {
+      var content = resolver.source.contents.data.substring(start, end);
+      content = content.split('\n').join('\n  ');
+      builder.addReplacement(SourceRange(start, end-start), (edit) {
         edit.write(', [\n${''.padLeft(lineIndent)}  css(\'&\'');
-      });
-      builder.addInsertion(chain?.end ?? node.end, (edit) {
+        edit.write(content);
         edit.write(',\n${''.padLeft(lineIndent)}])');
       });
     });

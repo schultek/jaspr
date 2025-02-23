@@ -102,7 +102,10 @@ class SyncMixinsBuilder implements Builder {
       $mixins
     ''';
     source = ImportsWriter().resolve(source);
-    source = DartFormatter(pageWidth: 120).format(source);
+    source = DartFormatter(
+      languageVersion: DartFormatter.latestShortStyleLanguageVersion,
+      pageWidth: 120,
+    ).format(source);
 
     var outputId = buildStep.inputId.changeExtension('.sync.dart');
     await buildStep.writeAsString(outputId, source);

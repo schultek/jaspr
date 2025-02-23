@@ -108,7 +108,10 @@ class ClientModuleBuilder implements Builder {
       }
     ''';
     source = ImportsWriter().resolve(source);
-    source = DartFormatter(pageWidth: 120).format(source);
+    source = DartFormatter(
+      languageVersion: DartFormatter.latestShortStyleLanguageVersion,
+      pageWidth: 120,
+    ).format(source);
 
     var moduleId = AssetId.resolve(Uri.parse(module.import));
     var webId =

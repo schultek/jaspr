@@ -25,15 +25,13 @@ class ImportsModuleBuilder implements Builder {
       }
 
       var lib = await buildStep.resolver.libraryFor(buildStep.inputId, allowSyntaxErrors: true);
-
+      
       var outputId = buildStep.inputId.changeExtension('.imports.json');
       var partId = buildStep.inputId.changeExtension('.imports.dart');
 
-      // ignore: deprecated_member_use
-      var import = lib.libraryImports
+      var import = lib.definingCompilationUnit.libraryImports
           .cast<Element>()
-          // ignore: deprecated_member_use
-          .followedBy(lib.libraryExports)
+          .followedBy(lib.definingCompilationUnit.libraryExports)
           .where((Element e) => importChecker.hasAnnotationOf(e))
           .where((Element e) {
         var uri = switch (e) {
