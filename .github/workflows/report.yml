@@ -19,8 +19,6 @@ jobs:
           ref: "refs/pull/${{ github.event.number }}/merge"
 
       - uses: dart-lang/setup-dart@v1.3
-        with:
-          sdk: 3.6
       - uses: subosito/flutter-action@v2
 
       - name: Bootstrap
