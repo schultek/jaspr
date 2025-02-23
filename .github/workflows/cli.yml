@@ -37,8 +37,6 @@ jobs:
           submodules: 'true'
 
       - uses: dart-lang/setup-dart@v1.3
-        with:
-          sdk: 3.6.2
       - uses: subosito/flutter-action@v2
 
       - name: Bootstrap

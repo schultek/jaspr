@@ -54,7 +54,7 @@ class CounterState extends State<Counter> {
           width: 2.em,
           height: 2.em, 
           border: Border.unset, 
-          radius: BorderRadius.all(Radius.circular(2.em))
+          radius: BorderRadius.all(Radius.circular(2.em)),
           cursor: Cursor.pointer,
           justifyContent: JustifyContent.center, 
           alignItems: AlignItems.center,

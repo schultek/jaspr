@@ -59,13 +59,13 @@ class _QuadEdgeInsets implements Spacing {
   @override
   Map<String, String> get styles {
     if (_top != null && _right != null && _bottom != null && _left != null) {
-      return {'': '${_top!.value} ${_right!.value} ${_bottom!.value} ${_left!.value}'};
+      return {'': '${_top.value} ${_right.value} ${_bottom.value} ${_left.value}'};
     } else {
       return {
-        if (_top != null) 'top': _top!.value,
-        if (_left != null) 'left': _left!.value,
-        if (_right != null) 'right': _right!.value,
-        if (_bottom != null) 'bottom': _bottom!.value,
+        if (_top != null) 'top': _top.value,
+        if (_left != null) 'left': _left.value,
+        if (_right != null) 'right': _right.value,
+        if (_bottom != null) 'bottom': _bottom.value,
       };
     }
   }
