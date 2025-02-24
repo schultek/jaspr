@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.18.0
 
 - **BREAKING** Changed `AppBinding`s `Uri get currentUri` to `String get currentUrl`.
 

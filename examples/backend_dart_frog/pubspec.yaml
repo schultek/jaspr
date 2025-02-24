@@ -1,6 +1,6 @@
 name: backend_dart_frog
 description: An example application built with dart_frog & jaspr.
-version: 0.1.4
+version: 0.1.5
 publish_to: none
 
 environment:
@@ -8,7 +8,7 @@ environment:
 
 dependencies:
   dart_frog: ^1.0.0
-  jaspr: ^0.17.0
+  jaspr: ^0.18.0
   shelf: ^1.4.2
 
 dev_dependencies:

@@ -366,28 +366,28 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.17.1"
+    version: "0.18.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.17.1"
+    version: "0.18.0"
   jaspr_flutter_embed:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_flutter_embed"
       relative: true
     source: path
-    version: "0.4.4"
+    version: "0.4.5"
   jaspr_riverpod:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_riverpod"
       relative: true
     source: path
-    version: "0.3.18"
+    version: "0.3.19"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
