@@ -101,21 +101,14 @@ class CssAssistProvider extends DartAssist {
       void writeCssRule(DartEditBuilder edit) {
         edit.write('  css(\'');
         if (idVal != null) {
-          edit.write('#$idVal\').');
+          edit.write('#$idVal');
         } else if (classesVal != null) {
-          edit.write('.$classesVal\').');
+          edit.write('.$classesVal');
         } else {
           edit.write('.');
           edit.addSimpleLinkedEdit('className', 'classname');
-          edit.write('\').');
         }
-        edit.addSimpleLinkedEdit(
-          'styles',
-          'box',
-          kind: LinkedEditSuggestionKind.METHOD,
-          suggestions: ['box', 'text', 'background', 'flexbox', 'flexItem', 'grid', 'gridItem', 'list'],
-        );
-        edit.write('(),\n  ');
+        edit.write('\').styles(),\n  ');
       }
 
       if (styles == null) {
