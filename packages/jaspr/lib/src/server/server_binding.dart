@@ -65,16 +65,16 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     ];
 
     // Prepare from outer to inner.
-    for (var i = 0; i < adapters.length; i++) {
-      var r = adapters[i].prepare();
+    for (var adapter in adapters.reversed) {
+      var r = adapter.prepare();
       if (r is Future) {
         await r;
       }
     }
 
     // Apply from inner to outer;
-    for (var i = adapters.length - 1; i >= 0; i--) {
-      adapters[i].apply(root);
+    for (var adapter in adapters) {
+      adapter.apply(root);
     }
 
     if (responseErrorBody != null) {
@@ -101,9 +101,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   Future<String?> loadFile(String name) => _fileLoader(name);
 
-  late final List<RenderAdapter> _adapters = [
-
-  ];
+  late final List<RenderAdapter> _adapters = [];
 
   void addRenderAdapter(RenderAdapter adapter) {
     _adapters.add(adapter..binding = this);

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-const clientMarkerPrefix = '@';
-const clientMarkerPrefixRegex = '@';
+const componentMarkerPrefix = '@';
+const componentMarkerPrefixRegex = '@';
 
 const syncMarkerPrefix = r'$';
 const syncMarkerPrefixRegex = r'\$';

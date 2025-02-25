@@ -36,7 +36,7 @@ void main() {
     });
 
     testBrowser('should find and hydrate marker', (tester) async {
-      var marker = clientMarkerPrefix;
+      var marker = componentMarkerPrefix;
       window.document.body!.innerHTML = '<div>'
               '  <p>A</p>'
               '  <!--${marker}app-->'
@@ -68,7 +68,7 @@ void main() {
     });
 
     testBrowser('should find and hydrate multiple markers with params', (tester) async {
-      var marker = clientMarkerPrefix;
+      var marker = componentMarkerPrefix;
       window.document.body!.innerHTML = '<div>'
               '  <!--${marker}app data={"name": "A"}-->'
               '  <p>Hello</p>'

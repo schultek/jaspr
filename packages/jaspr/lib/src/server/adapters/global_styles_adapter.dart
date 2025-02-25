@@ -1,10 +1,6 @@
 import '../../../server.dart';
 
 class GlobalStylesAdapter extends HeadScopeAdapter {
-  GlobalStylesAdapter(this.binding);
-
-  final ServerAppBinding binding;
-
   @override
   bool applyHead(MarkupRenderObject head) {
     var styles = binding.options.styles?.call() ?? [];

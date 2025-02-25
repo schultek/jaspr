@@ -101,11 +101,11 @@ class ClientModuleBuilder implements Builder {
             
       void main() {
         registerClientsSync({
-          '${path.url.relative(path.url.withoutExtension(path.url.withoutExtension(module.id)), from: 'lib')}': getComponentForParams,
+          '${module.id}': getComponentForParams,
         });
       }
       
-      Component getComponentForParams(Map<String, dynamic> p) {
+      Component getComponentForParams(ConfigParams p) {
         return ${module.componentFactory()};
       }
     ''';
@@ -205,7 +205,7 @@ List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
   }
 
   return params.map((p) {
-    var decoder = codecs.getDecoderFor(p.type, "p['${p.name}']");
+    var decoder = codecs.getDecoderFor(p.type, "p.get('${p.name}')");
     var encoder = codecs.getEncoderFor(p.type, 'c.${p.name}');
     return ClientParam(name: p.name, isNamed: p.isNamed, decoder: decoder, encoder: encoder);
   }).toList();

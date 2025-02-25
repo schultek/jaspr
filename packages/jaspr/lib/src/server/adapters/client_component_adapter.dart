@@ -1,3 +1,4 @@
+import '../../foundation/marker_utils.dart';
 import '../../foundation/options.dart';
 import '../../framework/framework.dart';
 import '../markup_render_object.dart';
@@ -41,8 +42,8 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
     }
 
     range.start.insertNext(ChildNodeData(
-        MarkupRenderObject()..updateText('<!--\$${target.name}${data != null ? ' data=$data' : ''}-->', true)));
-    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!--/\$${target.name}-->', true)));
+        MarkupRenderObject()..updateText('<!--$componentMarkerPrefix${target.name}${data != null ? ' data=$data' : ''}-->', true)));
+    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!--/$componentMarkerPrefix${target.name}-->', true)));
   }
 
   String? getData() {

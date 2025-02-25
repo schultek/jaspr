@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:universal_web/web.dart' as web;
 
 import '../components/basic.dart';
-import '../components/raw_text/raw_text_web.dart';
+import '../components/raw_text/raw_text.dart';
 import '../foundation/marker_utils.dart';
 import '../framework/framework.dart';
 import 'browser_binding.dart';
@@ -62,11 +62,11 @@ class ConfigParams {
   }
 }
 
-final _clientStartRegex = RegExp('^$clientMarkerPrefixRegex(\\S+)(?:\\s+data=(.*))?\$');
-final _clientEndRegex = RegExp('^/$clientMarkerPrefixRegex(\\S+)\$');
+final _clientStartRegex = RegExp('^$componentMarkerPrefixRegex(\\S+)(?:\\s+data=(.*))?\$');
+final _clientEndRegex = RegExp('^/$componentMarkerPrefixRegex(\\S+)\$');
 
-final _serverStartRegex = RegExp(r'^s\$(\d+)$');
-final _serverEndRegex = RegExp(r'^/s\$(\d+)$');
+final _serverStartRegex = RegExp('^s$componentMarkerPrefixRegex(\\d+)\$');
+final _serverEndRegex = RegExp('^/s$componentMarkerPrefixRegex(\\d+)\$');
 
 sealed class ComponentAnchor {
   ComponentAnchor(this.name, this.startNode);
@@ -213,7 +213,7 @@ List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, we
       comp.builder = clientByName(name);
 
       // Remove the data string.
-      start.text = '$clientMarkerPrefix${comp.name}';
+      start.text = '$componentMarkerPrefix${comp.name}';
 
       if (runEagerly) {
         // Instantly run the client component.

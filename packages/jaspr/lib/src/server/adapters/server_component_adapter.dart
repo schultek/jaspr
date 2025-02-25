@@ -1,4 +1,4 @@
-import '../child_nodes.dart';
+import '../../foundation/marker_utils.dart';
 import '../markup_render_object.dart';
 import 'element_boundary_adapter.dart';
 
@@ -9,7 +9,7 @@ class ServerComponentAdapter extends ElementBoundaryAdapter {
 
   @override
   void applyBoundary(ChildListRange range) {
-    range.start.insertNext(ChildNodeData(MarkupRenderObject()..updateText('<!--s\$$id-->', true)));
-    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!--/s\$$id-->', true)));
+    range.start.insertNext(ChildNodeData(MarkupRenderObject()..updateText('<!--s$componentMarkerPrefix$id-->', true)));
+    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!--/s$componentMarkerPrefix$id-->', true)));
   }
 }
