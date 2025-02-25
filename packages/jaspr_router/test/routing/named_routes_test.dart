@@ -12,7 +12,7 @@ void main() {
     });
 
     testComponents('should push named route', (tester) async {
-      await tester.pumpComponent(Router(routes: [
+      tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a', [], 'alicia'),
         route('/b', [], 'bob'),
@@ -37,7 +37,7 @@ void main() {
     });
 
     testComponents('should replace named route', (tester) async {
-      await tester.pumpComponent(Router(routes: [
+      tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a', [], 'alicia'),
         route('/b', [], 'bob'),

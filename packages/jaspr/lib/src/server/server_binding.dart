@@ -1,69 +1,88 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:collection';
+import 'dart:io';
 
 import '../../jaspr.dart';
 import 'adapters/document_adapter.dart';
-import 'adapters/sync_script_adapter.dart';
+import 'adapters/global_styles_adapter.dart';
 import 'async_build_owner.dart';
 import 'components/client_component_registry.dart';
 import 'markup_render_object.dart';
+import 'render_functions.dart';
+
+typedef FileLoader = Future<String?> Function(String);
 
 /// Global component binding for the server
 class ServerAppBinding extends AppBinding with ComponentsBinding {
-  @override
-  Uri get currentUri => _currentUri!;
-  Uri? _currentUri;
+  ServerAppBinding(this.request, {required FileLoader loadFile}) : _fileLoader = loadFile;
 
-  void setCurrentUri(Uri uri) {
-    _currentUri = uri;
-  }
+  final RequestLike request;
+  final FileLoader _fileLoader;
 
   @override
   bool get isClient => false;
 
-  final rootCompleter = Completer.sync();
+  @override
+  String get currentUrl => request.url;
+
+  late final Map<String, String> cookies = () {
+    final Map<String, String> map = {};
+    final cookies = request.headers[HttpHeaders.cookieHeader]?.expand((h) => h.split(';')) ?? [];
+    for (final cookie in cookies) {
+      final c = Cookie.fromSetCookieValue(cookie.trim());
+      map[c.name] = c.value;
+    }
+    return UnmodifiableMapView(map);
+  }();
+
+  final Map<String, List<String>> responseHeaders = {
+    'Content-Type': ['text/html'],
+  };
+
+  int responseStatusCode = 200;
+  String? responseErrorBody;
 
   @override
-  void didAttachRootElement(Element element) {
-    rootCompleter.complete();
+  void attachRootComponent(Component app) async {
+    super.attachRootComponent(ClientComponentRegistry(child: app));
   }
 
-  Future<String> render() async {
-    await rootCompleter.future;
+  Future<String> render({bool standalone = false}) async {
+    if (rootElement == null) return '';
+
+    if (rootElement!.owner.isFirstBuild) {
+      final completer = Completer.sync();
+      rootElement!.binding.addPostFrameCallback(completer.complete);
+      await completer.future;
+    }
 
     var root = rootElement!.renderObject as MarkupRenderObject;
 
+    var adapters = [
+      ..._adapters.reversed,
+      GlobalStylesAdapter(this),
+      if (!standalone) DocumentAdapter(),
+    ];
+
     // Prepare from outer to inner.
-    for (var i = 0; i < _adapters.length; i++) {
-      var r = _adapters[i].prepare();
+    for (var i = 0; i < adapters.length; i++) {
+      var r = adapters[i].prepare();
       if (r is Future) {
         await r;
       }
     }
 
     // Apply from inner to outer;
-    for (var i = _adapters.length - 1; i >= 0; i--) {
-      _adapters[i].apply(root);
+    for (var i = adapters.length - 1; i >= 0; i--) {
+      adapters[i].apply(root);
+    }
+
+    if (responseErrorBody != null) {
+      return responseErrorBody!;
     }
 
     return root.renderToHtml();
   }
-
-  Future<String> data() async {
-    await rootCompleter.future;
-    return jsonEncode(getStateData());
-  }
-
-  @override
-  dynamic getRawState(String id) => null;
-
-  @override
-  Future<Map<String, String>> fetchState(String url) {
-    throw 'Cannot fetch state on the server';
-  }
-
-  @override
-  void updateRawState(String id, dynamic state) {}
 
   @override
   void scheduleFrame(VoidCallback frameCallback) {
@@ -80,17 +99,10 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     return AsyncBuildOwner();
   }
 
-  late Future<String?> Function(String) _fileHandler;
-
-  void setFileHandler(Future<String?> Function(String) handler) {
-    _fileHandler = handler;
-  }
-
-  Future<String?> loadFile(String name) => _fileHandler(name);
+  Future<String?> loadFile(String name) => _fileLoader(name);
 
   late final List<RenderAdapter> _adapters = [
-    DocumentAdapter(),
-    SyncScriptAdapter(getStateData),
+
   ];
 
   void addRenderAdapter(RenderAdapter adapter) {
@@ -102,11 +114,6 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   void initializeOptions(JasprOptions options) {
     _options = options;
-  }
-
-  @override
-  Future<void> attachRootComponent(Component app) {
-    return super.attachRootComponent(ClientComponentRegistry(child: app));
   }
 }
 

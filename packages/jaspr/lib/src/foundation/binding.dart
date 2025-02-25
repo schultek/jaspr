@@ -1,19 +1,19 @@
 import '../framework/framework.dart';
 import 'scheduler.dart';
-import 'sync.dart';
 
 /// Main class that provide services (also known as
 /// "bindings").
-abstract class AppBinding with SchedulerBinding, SyncBinding {
+abstract class AppBinding with SchedulerBinding {
   AppBinding();
-
-  /// The currently active uri.
-  /// On the server, this is the requested uri. On the client, this is the
-  /// currently visited uri in the browser.
-  Uri get currentUri;
 
   /// Whether the current app is run on the client (in the browser)
   bool get isClient;
+
+  /// The currently active url.
+  ///
+  /// On the server, this is the request url.
+  /// On the client, this is the currently visited url in the browser.
+  String get currentUrl;
 
   /// The [Element] that is at the root of the hierarchy.
   ///

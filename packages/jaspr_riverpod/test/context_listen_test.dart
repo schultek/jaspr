@@ -12,7 +12,7 @@ void main() {
     testComponents('listens to provider state', (tester) async {
       int? wasCalledWith;
 
-      await tester.pumpComponent(providerApp((context) sync* {
+      tester.pumpComponent(providerApp((context) sync* {
         context.listen<int>(counter, (prev, next) {
           wasCalledWith = next;
         });
@@ -36,7 +36,7 @@ void main() {
     testComponents('re-listens on rebuild', (tester) async {
       List<int> wasCalledWith = [];
 
-      await tester.pumpComponent(providerApp((context) sync* {
+      tester.pumpComponent(providerApp((context) sync* {
         context.listen<int>(counter, (prev, next) {
           wasCalledWith.add(next);
         }, fireImmediately: true);
@@ -60,7 +60,7 @@ void main() {
     testComponents('un-listens on dispose', (tester) async {
       List<int> wasCalledWith = [];
 
-      await tester.pumpComponent(providerApp((context) sync* {
+      tester.pumpComponent(providerApp((context) sync* {
         if (context.watch(counter.select((cnt) => cnt < 2))) {
           yield Builder(
             builder: (context) sync* {
@@ -113,7 +113,7 @@ void main() {
         late Element element;
         var shouldListen = true;
 
-        await tester.pumpComponent(providerApp((context) sync* {
+        tester.pumpComponent(providerApp((context) sync* {
           if (shouldListen) {
             context.listen(counterB, (_, int value) {
               wasCalledWith.add(value);

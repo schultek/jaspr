@@ -1,13 +1,26 @@
 ---
-title: Jaspr vs Flutter Web
+title: Jaspr vs Flutter (Web)
 description: Why you should use Jaspr over Flutter Web and their differences.
-previous: /quick-start
-next: /cli
 ---
 
-# 🥊 Jaspr vs Flutter Web
+---
 
-Jaspr is an **alternative to Flutter Web**, when you want to **build any kind of website with Dart**. 
+## Use-Cases
+
+### Jaspr
+
+Jaspr is an **alternative to Flutter Web**, when you want to **build any kind of website with Dart**.
+
+This includes (but is not limited to):
+
+- Static Sites
+- Server-Rendered Sites
+- Single-Page Applications
+
+Jaspr works by giving you the familiar look and feel of the Flutter framework, while using native web
+technologies, like HTML, the DOM and CSS to enable you building **all** kinds of websites using **Dart**.
+
+### Flutter
 
 The Flutter team itself has stated on multiple occasions that
 > Flutter Web is for building **Web-Apps**, not **Web-Sites**.
@@ -21,13 +34,12 @@ The [flutter docs](https://docs.flutter.dev/web) write in that regard:
 > static content such as blog articles benefit from the document-centric model that the web is built around, 
 > rather than the app-centric services that a UI framework like Flutter can deliver.
 
-Jaspr works by giving you the familiar look and feel of the Flutter framework, while using native web
-technologies, like HTML, the DOM and CSS to enable you building **all** kinds of websites using **Dart**.
+---
 
-## Differences between Jaspr and Flutter
+## Conceptual Differences
 
-As you might know Flutter renders Widgets by manually painting pixels to a canvas. However rendering web-pages
-with HTML & CSS works **fundamentally different** to Flutters painting approach. Also Flutter has a vast variety
+As you might know Flutter renders Widgets by manually painting pixels to a canvas. However, rendering web-pages
+with HTML & CSS works **fundamentally different** to Flutters painting approach. Also, Flutter has a vast variety
 of widgets with different purposes and styling, whereas in html you can uniquely style each html element however
 you like.
 
@@ -55,13 +67,13 @@ Rather it **embraces these differences** to give the best of both worlds.
    to how html works and thereby not a good practice.
    </Info>
 
-2. Jaspr does not care about the styling of components. There are (currently) no prestyled components
+2. Jaspr does not care about the styling of components. There are (currently) no pre-styled components
    like in Flutters material or cupertino libraries.
 
    <Info>
    Trade-Off: Providing styled components would be a lot of extra work and is currently not feasible.
    Also there exist a lot of different, well established CSS frameworks for web that you can already
-   integrate and use with jaspr (e.g. [Bulma](https://jasprpad.schultek.de/?sample=bulma)).
+   integrate and use with jaspr (e.g. [Bulma](https://playground.jaspr.site/?sample=bulma)).
    </Info>
 
 3. `Text` receives only a `String` and nothing else. As usual for web, styling is done through a combination
@@ -72,9 +84,11 @@ Rather it **embraces these differences** to give the best of both worlds.
    a good practice.
    </Info>
 
+---
+
 ## Flutter Web Embedding
 
 A Flutter web app can be embedded in a normal website using Flutters **element embedding** feature. Jaspr has first-class
 support for this feature and allows the embedding of a flutter web app as part of a jaspr website.
 
-For more details on this feature refer to the [Flutter Embedding](/eco/flutter_embedding) page.
+For more details on this feature refer to the [Flutter Embedding](/going_further/flutter_embedding) page.

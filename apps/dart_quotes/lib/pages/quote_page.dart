@@ -20,7 +20,7 @@ class QuotePage extends AsyncStatelessComponent {
       return;
     }
 
-    yield Head(
+    yield Document.head(
       title: quote.quote,
       meta: {"description": '"${quote.quote}" - ${quote.author}'},
       children: [
@@ -39,18 +39,37 @@ class QuotePage extends AsyncStatelessComponent {
     ]);
   }
 
-  static get styles => [
-        css('nav').text(align: TextAlign.center).box(padding: EdgeInsets.all(20.px)),
-        css('.center')
-            .box(height: 100.vh)
-            .flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center),
-        css('.quote-container', [
-          css('&').box(position: Position.relative()).text(align: TextAlign.center),
-          css('.quotes-start')
-              .box(position: Position.absolute(top: (-100).px, left: (-10).px), transform: Transform.rotate(180.deg)),
-          css('.quotes-end').box(position: Position.absolute(right: (-10).px, bottom: (-50).px)),
-          css('h1').text(fontSize: 40.px),
-          css('p').text(fontStyle: FontStyle.italic, fontWeight: FontWeight.normal),
-        ]),
-      ];
+  @css
+  static final styles = [
+    css('nav').styles(
+      textAlign: TextAlign.center,
+      padding: Padding.all(20.px),
+    ),
+    css('.center').styles(
+      height: 100.vh,
+      display: Display.flex,
+      justifyContent: JustifyContent.center,
+      alignItems: AlignItems.center,
+    ),
+    css('.quote-container', [
+      css('&').styles(
+        position: Position.relative(),
+        textAlign: TextAlign.center,
+      ),
+      css('.quotes-start').styles(
+        position: Position.absolute(top: (-100).px, left: (-10).px),
+        transform: Transform.rotate(180.deg),
+      ),
+      css('.quotes-end').styles(
+        position: Position.absolute(right: (-10).px, bottom: (-50).px),
+      ),
+      css('h1').styles(
+        fontSize: 40.px,
+      ),
+      css('p').styles(
+        fontStyle: FontStyle.italic,
+        fontWeight: FontWeight.normal,
+      ),
+    ]),
+  ];
 }

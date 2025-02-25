@@ -82,6 +82,7 @@ Future<void> bootstrap(TestVariant variant, Directory dir) async {
     'dependency_overrides': {
       'jaspr': {"path": p.join(jasprDir, 'packages', 'jaspr')},
       'jaspr_builder': {"path": p.join(jasprDir, 'packages', 'jaspr_builder')},
+      'jaspr_lints': {"path": p.join(jasprDir, 'packages', 'jaspr_lints')},
       for (var package in variant.packages) p.basename(package): {"path": p.join(jasprDir, package)},
     }
   }));

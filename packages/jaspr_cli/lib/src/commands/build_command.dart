@@ -11,6 +11,7 @@ import 'package:path/path.dart' as p;
 import 'package:webdev/src/daemon_client.dart' as d;
 
 import '../config.dart';
+import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
@@ -30,16 +31,21 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       help: 'Specify the compilation target for the executable (only in server mode)',
       allowed: ['aot-snapshot', 'exe', 'jit-snapshot'],
       allowedHelp: {
-        'aot-snapshot': 'Compile Dart to an AOT snapshot.',
-        'exe': 'Compile Dart to a self-contained executable.',
-        'jit-snapshot': 'Compile Dart to a JIT snapshot.',
+        'exe': 'Compile to a self-contained executable.',
+        'aot-snapshot': 'Compile to an AOT snapshot.',
+        'kernel': 'Compile to a portable kernel module.',
       },
       defaultsTo: 'exe',
+    );
+    argParser.addFlag(
+      'experimental-wasm',
+      help: 'Compile to wasm',
+      negatable: false,
     );
     argParser.addOption(
       'optimize',
       abbr: 'O',
-      help: 'Set the dart2js compiler optimization level',
+      help: 'Set the dart2js / dart2wasm compiler optimization level',
       allowed: ['0', '1', '2', '3', '4'],
       allowedHelp: {
         '0': 'No optimizations (only meant for debugging the compiler).',
@@ -50,10 +56,11 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: '2',
     );
+    addDartDefineArgs();
   }
 
   @override
-  String get description => 'Builds the full project.';
+  String get description => 'Build the full project.';
 
   @override
   String get name => 'build';
@@ -75,20 +82,26 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       entryPoint = await getEntryPoint(argResults!['input']);
     }
 
-    if (await dir.exists()) {
-      await dir.delete(recursive: true);
+    if (dir.existsSync()) {
+      dir.deleteSync(recursive: true);
     }
-    await webDir.create(recursive: true);
+    webDir.createSync(recursive: true);
 
     var indexHtml = File('web/index.html').absolute;
     var targetIndexHtml = File('${webDir.path}/index.html').absolute;
 
     var dummyIndex = false;
     var dummyTargetIndex = false;
-    if (config!.usesFlutter && !await indexHtml.exists()) {
+    if (config!.usesFlutter && !indexHtml.existsSync()) {
       dummyIndex = true;
       dummyTargetIndex = true;
-      await indexHtml.create();
+      indexHtml
+        ..createSync()
+        ..writeAsStringSync(
+            'This file (web/index.html) should not exist. If you see this message something went wrong during "jaspr build". Simply delete the file.');
+      guardResource(() {
+        if (indexHtml.existsSync()) indexHtml.deleteSync();
+      });
     }
 
     var webResult = _buildWeb();
@@ -100,14 +113,18 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       flutterResult = buildFlutter();
     }
 
+    var serverDefines = getServerDartDefines();
+
     if (config!.mode == JasprMode.server) {
       logger.write('Building server app...', progress: ProgressState.running);
 
-      String extension = '';
       final target = argResults!['target'];
-      if (Platform.isWindows && target == 'exe') {
-        extension = '.exe';
-      }
+      String extension = switch (target) {
+        'exe' when Platform.isWindows => '.exe',
+        'aot-snapshot' => '.aot',
+        'kernel' => '.dill',
+        _ => '',
+      };
 
       var process = await Process.start(
         'dart',
@@ -118,8 +135,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           '-o',
           './build/jaspr/app$extension',
           '-Djaspr.flags.release=true',
+          for (var define in serverDefines.entries) '-D${define.key}=${define.value}',
         ],
-        runInShell: true,
         workingDirectory: Directory.current.path,
       );
 
@@ -159,9 +176,9 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           '-Djaspr.flags.release=true',
           '-Djaspr.flags.generate=true',
           '-Djaspr.dev.web=build/jaspr',
+          for (var define in serverDefines.entries) '-D${define.key}=${define.value}',
           entryPoint!,
         ],
-        runInShell: true,
         environment: {'PORT': '8080', 'JASPR_PROXY_PORT': '5567'},
         workingDirectory: Directory.current.path,
       );
@@ -203,9 +220,9 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     await flutterResult;
 
     if (dummyIndex) {
-      await indexHtml.delete();
-      if (dummyTargetIndex && await targetIndexHtml.exists()) {
-        await targetIndexHtml.delete();
+      if (indexHtml.existsSync()) indexHtml.deleteSync();
+      if (dummyTargetIndex && targetIndexHtml.existsSync()) {
+        targetIndexHtml.deleteSync();
       }
     }
 
@@ -214,14 +231,25 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   }
 
   Future<int> _buildWeb() async {
+    final useWasm = argResults!['experimental-wasm'] as bool;
+    if (useWasm) {
+      checkWasmSupport();
+    }
+
     logger.write('Building web assets...', progress: ProgressState.running);
-    var client = await d.connectClient(
+
+    final compiler = useWasm ? 'dart2wasm' : 'dart2js';
+    final entrypointBuilder = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint';
+    final userDefines = getClientDartDefines().entries.map((e) => ',"-D${e.key}=${e.value}"').join();
+
+    final client = await d.connectClient(
       Directory.current.path,
       [
         '--release',
         '--verbose',
         '--delete-conflicting-outputs',
-        '--define=${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true","-O${argResults!['optimize']}"]'
+        '--define=$entrypointBuilder=compiler=$compiler',
+        '--define=$entrypointBuilder=${compiler}_args=["-Djaspr.flags.release=true","-O${argResults!['optimize']}"$userDefines]',
       ],
       logger.writeServerLog,
     );

@@ -82,7 +82,7 @@ class CreateCommand extends BaseCommand {
   }
 
   @override
-  String get description => 'Creates a new jaspr project.';
+  String get description => 'Create a new Jaspr project.';
 
   @override
   String get name => 'create';
@@ -100,7 +100,7 @@ class CreateCommand extends BaseCommand {
     var (dir, name) = getTargetDirectory();
 
     var (useMode, useHydration) = getRenderingMode();
-    var (useRouting, useMultiPageRouting) = getRouting(useMode.useServer);
+    var (useRouting, useMultiPageRouting) = getRouting(useMode.useServer, useHydration);
     var (useFlutter, usePlugins) = getFlutter();
     var useBackend = useMode == RenderingMode.server ? getBackend() : null;
 
@@ -123,10 +123,12 @@ class CreateCommand extends BaseCommand {
     var [
       jasprFlutterEmbedVersion,
       jasprRouterVersion,
+      jasprLintsVersion,
       webCompilersVersion,
     ] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
+      updater.getLatestVersion('jaspr_lints'),
       updater.getLatestVersion(webCompilersPackage),
     ]);
 
@@ -149,6 +151,7 @@ class CreateCommand extends BaseCommand {
         'jasprBuilderVersion': jasprBuilderVersion,
         'jasprFlutterEmbedVersion': jasprFlutterEmbedVersion,
         'jasprRouterVersion': jasprRouterVersion,
+        'jasprLintsVersion': jasprLintsVersion,
         'webCompilersPackage': webCompilersPackage,
         'webCompilersVersion': webCompilersVersion,
       },
@@ -209,16 +212,20 @@ class CreateCommand extends BaseCommand {
     };
   }
 
-  (bool, bool) getRouting(bool useServer) {
+  (bool, bool) getRouting(bool useServer, bool useHydration) {
     var opt = argResults!['routing'] as String?;
 
     return switch (opt) {
       'none' => (false, false),
       'single-page' => (true, false),
-      'multi-page' => (true, true),
+      'multi-page' => !useServer
+          ? usageException("Cannot use multi-page routing in client mode.")
+          : !useHydration
+              ? usageException("Cannot use multi-page routing with manual hydration.")
+              : (true, true),
       _ => () {
           var routing = logger.logger.confirm('Setup routing for different pages of your site?', defaultValue: true);
-          var multiPage = routing && useServer
+          var multiPage = routing && useServer && useHydration
               ? logger.logger.confirm(
                   '(Recommended) Use multi-page (server-side) routing? '
                   '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',

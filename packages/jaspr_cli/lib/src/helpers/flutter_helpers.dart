@@ -13,7 +13,14 @@ mixin FlutterHelper on BaseCommand {
 
     var flutterProcess = await Process.start(
       'flutter',
-      ['run', '--device-id=web-server', '-t', '.dart_tool/jaspr/flutter_target.dart', '--web-port=$flutterPort'],
+      [
+        'run',
+        '--device-id=web-server',
+        '-t',
+        '.dart_tool/jaspr/flutter_target.dart',
+        '--web-port=$flutterPort',
+        if (argResults!['release']) '--release'
+      ],
       runInShell: true,
       workingDirectory: Directory.current.path,
     );
@@ -38,6 +45,7 @@ mixin FlutterHelper on BaseCommand {
     var moveTargets = [
       'version.json',
       'flutter_service_worker.js',
+      'flutter_bootstrap.js',
       'assets/',
       'canvaskit/',
     ];

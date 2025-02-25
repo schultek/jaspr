@@ -1,13 +1,11 @@
 ---
 title: Jaspr Riverpod
-description: A port of the riverpod package for jaspr.
-previous: /eco/routing
-next: /eco/flutter_embedding
+description: A port of the riverpod package for Jaspr.
 ---
 
-# 🌊 Riverpod for Jaspr
+---
 
-Jaspr comes with a Riverpod package that ports over flutter_riverpod to Jaspr. It is based
+Jaspr comes with a Riverpod package that ports over `flutter_riverpod` to Jaspr. It is based
 on Riverpod 2 and supports all providers and modifiers.
 
 <Accordion title="TLDR: Differences to flutter_riverpod">
@@ -15,23 +13,22 @@ on Riverpod 2 and supports all providers and modifiers.
   - Additional `SyncProvider` to sync values between server and client.
 
   <Info>
-    Also check out [this example](https://github.com/schultek/jaspr/tree/main/examples/riverpod_app).
+    Also check out [this example](https://github.com/schultek/jaspr/tree/main/examples/package_riverpod).
   </Info>
 </Accordion>
 
-## 🪄 Accessing Providers
+## Accessing Providers
 
 While it has feature-parity for defining `Provider`s, it comes with some quality-of-life improvements
 on the `Consumer` side. Mainly: 
 
-**It does not have `Comsumer`, `ComsumerWidget` or `StatefulConsumerWidget`.** This is because it 
+**It does not have `Consumer`, `ConsumerWidget` or `StatefulConsumerWidget`.** This is because it 
 does not rely on `WidgetRef` to access providers but instead comes with **context extensions** on the
 `BuildContext` of **any** component.
 
 As an example, this (in Flutter):
 
-```dart
-// (Flutter)
+```dart title="Flutter"
 // need to extend custom ConsumerWidget
 class MyWidget extends ConsumerWidget {
   // need to accept custom WidgetRef
@@ -45,8 +42,7 @@ class MyWidget extends ConsumerWidget {
 
 is equivalent to this (in Jaspr)
 
-```dart 
-// (Jaspr)
+```dart title="Jaspr"
 // just extends the normal component
 class MyComponent extends StatelessComponent {
   // no extra parameter
@@ -75,11 +71,11 @@ give you a new context which you can call `context.watch` on:
 ```dart
 Builder(builder: (context) sync* {
   var value = context.watch(...);
-  yield ...;
+  yield /* ... */;
 });
 ```
 
-## ♻️ Preloading and Syncing Provider State
+## Preloading and Syncing Provider State
 
 Jaspr allows `StatefulComponent`s to preload state as well as sync state between server and client
 (when using server-side rendering).
@@ -102,7 +98,7 @@ never on the client. Instead the synced value is returned.
 It then can be used like any other provider. It functions like a `FutureProvider` and exposes a 
 value of type `AsyncValue<T>`.
 
-## 📜 Backstory: Why context extensions instead of Consumer?
+## Backstory: Why context extensions instead of Consumer?
 
 Put simply: Because they are easier and more flexible to use and require less boilerplate.
 

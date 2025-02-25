@@ -1,7 +1,7 @@
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
-// ignore_for_file: directives_ordering
+// ignore_for_file: directives_ordering, deprecated_member_use
 
 import 'package:mdc_web/mdc_web.dart'
     show MDCRipple, MDCDialog, MDCMenu, AnchorCorner, MDCSnackbar, MDCTabBar, MDCTextField;

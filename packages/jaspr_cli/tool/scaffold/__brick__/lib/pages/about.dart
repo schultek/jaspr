@@ -1,6 +1,11 @@
 import 'package:jaspr/jaspr.dart';
-{{#hydration}}{{#multipage}}
-@client{{/multipage}}{{/hydration}}
+{{#multipage}}
+// By using the @client annotation this component will be automatically compiled to javascript and mounted
+// on the client. Therefore:
+// - this file and any imported file must be compilable for both server and client environments.
+// - this component and any child components will be built once on the server during pre-rendering and then
+//   again on the client during normal rendering.
+@client{{/multipage}}
 class About extends StatelessComponent {
   const About({super.key});
 
@@ -11,13 +16,13 @@ class About extends StatelessComponent {
         li([
           h3([text('📖 Documentation')]),
           text('Jaspr\'s '),
-          a(href: 'https://docs.page/schultek/jaspr', [text('official documentation')]),
+          a(href: 'https://docs.jaspr.site', [text('official documentation')]),
           text(' provides you with all information you need to get started.'),
         ]),
         li([
           h3([text('💬 Community')]),
           text('Got stuck? Ask your question on the official '),
-          a(href: 'https://docs.page/schultek/jaspr', [text('Discord server')]),
+          a(href: 'https://discord.gg/XGXrGEk4c6', [text('Discord server')]),
           text(' for the Jaspr community.'),
         ]),
         li([
@@ -37,7 +42,8 @@ class About extends StatelessComponent {
     ]);
   }{{#server}}
 
-  static get styles => [
-        css('ol').box(maxWidth: 500.px),
-      ];{{/server}}
+  @css
+  static final styles = [
+    css('ol').styles(maxWidth: 500.px),
+  ];{{/server}}
 }

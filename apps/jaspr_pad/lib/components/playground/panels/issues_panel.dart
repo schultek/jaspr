@@ -12,7 +12,7 @@ class IssuesPanel extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     var issues = context.watch(issuesProvider);
 
-    yield div(styles: Styles.flexbox(direction: FlexDirection.column), [
+    yield div(styles: Styles(display: Display.flex, flexDirection: FlexDirection.column), [
       for (var issue in issues) IssueItem(issue),
     ]);
   }

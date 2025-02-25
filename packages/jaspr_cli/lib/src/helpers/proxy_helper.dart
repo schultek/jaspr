@@ -32,6 +32,10 @@ mixin ProxyHelper on BaseCommand {
       // This is also the reason why Cascade() won't work here.
       var body = req.read().asBroadcastStream();
 
+      if (flutterHandler != null && req.url.path == 'flutter_bootstrap.js') {
+        return await flutterHandler(req.change(body: body));
+      }
+
       // First try to load the resource from the webdev process.
       var res = await webdevHandler(req.change(body: body));
 

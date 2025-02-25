@@ -3,14 +3,14 @@
 ## New contributor guide
 
 To get an overview of the project, read the [README](README.md) 
-and [Documentation](https://docs.page/schultek/jaspr).
+and [Documentation](https://docs.jaspr.site).
 
 ## What to contribute
 
 We welcome all contributions to the project, however some contributions are better suited 
 for new contributors or easier to get accepted.
 
-Read [Contributing Docs](https://docs.page/schultek/jaspr) for some guidance on the types
+Read [Contributing Docs](https://docs.jaspr.site/going_further/contributing) for some guidance on the types
 of possible contributions.
 
 ## Issues
@@ -33,7 +33,7 @@ Then you are welcome to open a PR with a fix.
 
 ### 1. Cloning and setup
 
-Make sure that you are at least on **Dart SDK version 2.17.0**.
+Make sure that you are at least on **Dart SDK version 3.5.0**.
 
 Clone the project with the following command:
 ```shell

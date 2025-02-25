@@ -1,8 +1,177 @@
+## 0.18.0
+
+- **BREAKING** Changed `AppBinding`s `Uri get currentUri` to `String get currentUrl`.
+
+- **BREAKING** Changed return type of `renderComponent()` from `Future<String>` to `Future<({int statusCode, String body, Map<String, List<String>> headers})>`. 
+
+  The rendered html is accessible through the `body` property. `statusCode` and `headers` can be used to create a response object when part of a custom http handler.
+
+- Added `context.url` extension getter on both client and server.
+- Added `context.headers`, `context.headersAll` and `context.cookies` extension getters on the server. These can be used to access the headers and cookies of the currently handled request.
+- Added `context.setHeader()` and `context.setCookie()` and `context.setStatusCode()` extension on the server. These can be used to set headers, cookies and the status code of the response.
+
+- Deprecated having seperate style groups (`Styles.box()`, `Styles.text()`, `Styles.background()`, etc. as well as `.box()`, `.text()`, etc.). All styling properties are now available under the single `Styles()` constructur and `.styles()` method.
+
+  **Before:**
+  ```dart
+  css('.main')
+    .box(width: 100.px, height: 100.px)
+    .text(align: TextAlign.center)
+    .background(color: Colors.blue);
+  ````
+
+  **After:**
+  ```dart
+  css('.main').styles(
+    width: 100.px,
+    height: 100.px,
+    textAlign: TextAlign.center,
+    backgroundColor: Colors.blue,
+  );
+  ```
+
+- Deprecated `EdgeInsets` in favor of `Padding` and `Margin` types.
+- **BREAKING** Moved `zIndex` property out of `Position` and directly into `Styles`.
+
+- Added `userSelect`, `pointerEvents` and `content` properties to `Styles`.
+- Added `Unit.maxContent`, `Unit.minContent`, `Unit.fitContent` and `Unit.expression()`.
+
+## 0.17.1
+
+- Update logo and website links.
+
+## 0.17.0
+
+
+- **BREAKING** Removed `currentState` from `GlobalKey`, use `GlobalStateKey` instead.
+- Added `GlobalStateKey<T extends State>` to access the state of a component using `currentState`.
+
+  ```dart
+  // Use any State type as the type parameter.
+  final GlobalStateKey<MyComponentState> myComponentKey = GlobalStateKey();
+
+  /* ... */
+
+  // Access the state from the key.
+  MyComponentState? state = myComponentKey.currentState;
+  ```
+
+- Added `GlobalNodeKey<T extends Node>` to access native dom nodes using `currentNode`.
+
+  ```dart
+  import 'package:universal_web/web.dart';
+
+  // Use any Node type (from package:universal_web) as the type parameter.
+  final GlobalNodeKey<HTMLFormElement> myFormKey = GlobalNodeKey();
+
+  /* ... */
+
+  // Access the dom node from the key.
+  HTMLFormElement? node = myFormKey.currentNode;
+  ```
+
+- Migrated all web imports from `package:web` to `package:universal_web`.
+- Added `prefersColorScheme` parameter to `MediaQuery`.
+
+## 0.16.4
+
+- Added `--dart-define`, `--dart-define-client` and `--dart-define-server` to `serve` and `build` commands.
+- Fixed attribute validation to support attribute names including `@` and `:`.
+
+## 0.16.3
+
+- Added `table` and related html methods.
+- Added `value` parameter to `select()` method.
+- Add 'standalone' option to `renderComponent` method.
+
+## 0.16.2
+
+- Fixed bug with empty `text('')` components.
+- Fixed bug in `raw()` component.
+
+## 0.16.1
+
+- Fixed flutter embedding in new project scaffold.
+- Fixed flutter embedding on mobile to always use canvaskit renderer.
+- Fixed build command on windows to correctly end child process.
+
+## 0.16.0
+
+- **BREAKING** Migrated all packages to `package:web`, replacing `dart:html`.
+- **BREAKING** Made `ComponentsBinding.attachRootComponent()` and `ComponentTester.pumpComponent()` synchronous.
+
+- Added `InheritedModel<T>` similar to Flutters [InheritedModel](https://api.flutter.dev/flutter/widgets/InheritedModel-class.html)
+- Added `css.layer()`, `css.supports()` and `css.keyframes()` rules.
+- Added `ViewTransitionMixin` to use [view transitions](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API) in a `StatefulComponent`.
+
+- Improved html formatting on the server to not introduce unwanted whitespaces.
+
+- Fixed server issue during tests where the web directory would never resolve.
+- Fixed issue with unhandled parameter types of client components.
+
+## 0.15.1
+
+- Include and setup `jaspr_lints` in newly created projects.
+- Added `jaspr analyze` command to check all custom lints.
+- Added css variable support with `Unit.variable()`, `Color.variable()`, `Angle.variable()` and `FontFamily.variable()`.
+
+## 0.15.0
+
+- Added support for using `@css` and `@encoder`/`@decoder` across other packages.
+
+  1. Styles annotated with `@css` from other dependent packages are now also included in the pre-rendered css.
+  2. Models (or extension types) that define `@encoder` and `@decoder` annotations from other dependent packages can
+     now also be used together with `@client` components and `@sync` fields.
+
+- **BREAKING** Component (or any class member) styles annotated with `@css` are now only included in the pre-rendered css if
+  the file they are defined in is actually imported somewhere in the project.
+
+  Top-level styles continue to be always included.
+
+- Fixed issue with wrongly generated imports of `@encoder`/`@decoder` methods.
+- Fixed spelling mistake from `spaceRvenly` to `spaceEvenly`
+- Added default `BorderStyle.solid` to `BorderSide` constructor.
+
+## 0.14.0
+
+- **BREAKING** Calling `Jaspr.initializeApp()` is now required in static and server mode.
+
+- **BREAKING** Removed `Head` component in favor of new `Document.head()` component.
+  `Document.head()` has the same parameters as the old `Head` component and renders its children inside
+  the `<head>` element.
+- Added `Document.html()` and `Document.body()` to modify the attributes of `<html>` and `<body>`.
+
+- **BREAKING** Removed `syncId` and `syncCodec` parameters from `SyncStateMixin`.
+  `SyncStateMixin` now embeds its data locally in the pre-rendered html using standard json encoding.
+- Added `@sync` annotation. Can be used on any field of a `StatefulComponent` to automatically sync its value.
+
+  ```dart
+  class MyComponentState extends State<MyComponent> with MyComponentStateSyncMixin {
+    @sync
+    String myValue;
+  }
+  ```
+
+- **BREAKING** Removed `MediaRuleQuery` in favor of `MediaQuery`.
+- Added `css.import()`, `css.fontFace()` and `css.media()` shorthands.
+- Added `@css` annotation. Can be used on a list of style rules to automatically include them in the global styles.
+
+  ```dart
+  @css
+  final styles = [
+    css('.main').box(width: 100.px),
+  ];
+  ```
+
+- Added `Fragment` component.
+- Fixed missing html unescape in hydrated data.
+
 ## 0.13.3
 
 - Added support for custom models as parameters to `@client` components.
 
-  To enable this a custom model class must have two methods: 
+  To enable this a custom model class must have two methods:
+
   - An instance method that encodes the model to a primitive value and is annotated with `@encoder`:
     ```dart
     @encoder
@@ -13,8 +182,8 @@
     @decoder
     static MyModel fromJson(String json) { ... }
     ```
-    
-  The method names can be freely chosen. 
+
+  The method names can be freely chosen.
   The encoding type must be any primitive type (`String`, `int`, `List`, `Map`, etc.).
 
 - Added `ListenableBuilder` and `ValueListenableBuilder` components.
@@ -37,7 +206,8 @@
 
 - Added `Head` component to render metadata inside the documents `<head>`.
 
-  You can specify a title, metadata or custom children: 
+  You can specify a title, metadata or custom children:
+
   ```dart
   Head(
     title: 'My Title',
@@ -50,7 +220,7 @@
     ],
   )
   ```
-  
+
   Deeper or latter `Head` components will override duplicate elements:
 
   ```dart
@@ -66,21 +236,22 @@
     ]),
   ]),
   ```
-  
+
   will render:
 
   ```html
   <head>
     <title>Nested Title</title>
-    <meta name="description" content="My Page Description">
+    <meta name="description" content="My Page Description" />
   </head>
   ```
 
 - Added `AsyncStatelessComponent` and `AsyncBuilder`.
-  These are special components that are only available on the server (using `package:jaspr/server.dart`) and have an 
+  These are special components that are only available on the server (using `package:jaspr/server.dart`) and have an
   asynchronous build function.
 
 - Improved internal framework implementation of different element types.
+
   - Added `BuildableElement` and `ProxyElement` as replacement for `MultiChildElement` and `SingleChildElement`.
   - Added `Element.didMount()` and `Element.didUpdate()` lifecycle methods.
 
@@ -114,7 +285,7 @@
 ## 0.11.0
 
 - **BREAKING** Changed jaspr configuration to require `jaspr.mode` in `pubspec.yaml`:
-  
+
   The `jaspr.mode` option now sets the rendering mode and must be one of:
 
   - **static**: For building a statically pre-rendered site (SSG) with optional client-side hydration.
@@ -126,7 +297,7 @@
 - **BREAKING** Removed `jaspr generate` command in favor using the `jaspr build` command in combination with
   the new `jaspr.mode = static` option in `pubspec.yaml`.
 
-- **BREAKING** Removed the `runServer()` method along with its support for adding middleware and listeners. Users should instead 
+- **BREAKING** Removed the `runServer()` method along with its support for adding middleware and listeners. Users should instead
   migrate to the custom backend setup using `package:shelf`.
 
 - **BREAKING** Removed `rawHtml` flag from `Text` component and `text()` method, in favor of
@@ -141,7 +312,7 @@
 
 - Changes made to `main.dart` are now also hot-reloaded on the server.
 
-- `Document` is no longer required when using server-side rendering. A basic document structure (`<html><head>...<body>...`) 
+- `Document` is no longer required when using server-side rendering. A basic document structure (`<html><head>...<body>...`)
   is automatically filled in.
 
 - Improved how `@client` components are hydrated.
@@ -152,31 +323,30 @@
 
 - Exceptions thrown during `renderHtml` are now correctly passed through to the spawning isolate.
 
-
 ## 0.10.0
 
 - **BREAKING** Restructured core libraries:
+
   - Removed `package:jaspr/html.dart` -> Use `package:jaspr/jaspr.dart` instead.
   - Renamed `package:jaspr/components.dart` to `package:jaspr/ui.dart`.
 
 - **BREAKING** Updated `@client` components for a more streamlined usage.
-  
+
   Annotated components no longer generate a `.g.dart` file and don't need to implement any generated mixin anymore.
   Instead, a single `lib/jaspr_options.dart` file is generated when using `@client` components.
 
-  You must now call `Jaspr.initializeApp(options: defaultJasprOptions)` at the start of your app, where 
+  You must now call `Jaspr.initializeApp(options: defaultJasprOptions)` at the start of your app, where
   `defaultJasprOptions` is part of the newly generated `jaspr_options.dart` file.
 
-  *Note:* Calling `Jaspr.initializeApp()` will be required in a future version of Jaspr, and the cli will warn you
+  _Note:_ Calling `Jaspr.initializeApp()` will be required in a future version of Jaspr, and the cli will warn you
   when it's not called.
 
 - **BREAKING** Changed type of the `classes` property of html components from `List<String>` to `String`. Multiple class
   names can be set using a single space-delimited string, e.g. `classes: 'class1 class2'`.
-  
-- **BREAKING** Event callbacks are now typed. The `events` property of html components now expects a 
+- **BREAKING** Event callbacks are now typed. The `events` property of html components now expects a
   `Map<String, void Function(Event)>` instead of the old `Map<String, void Function(dynamic)>`.
 
-  In addition to this Jaspr comes with a new `events()` function to provide typed event handlers for common events, like 
+  In addition to this Jaspr comes with a new `events()` function to provide typed event handlers for common events, like
   `onClick`, `onInput` and `onChange`. Use it like this:
 
   ```dart
@@ -194,28 +364,28 @@
     [...]
   )
   ```
-  
-  Moreover, the html components `button`, `input`, `textarea` and `select` now also come with additional shorthand 
+
+  Moreover, the html components `button`, `input`, `textarea` and `select` now also come with additional shorthand
   properties for their supported event handlers:
 
   ```dart
   button(
     onClick: () {
-      print("Clicked");  
+      print("Clicked");
     },
     [...]
   )
   ```
 
-- **BREAKING** Refactored components inside the `package:jaspr/ui.dart` library. Some component properties have 
+- **BREAKING** Refactored components inside the `package:jaspr/ui.dart` library. Some component properties have
   changed or been discontinued. Check the separate components for details.
 
 - **BREAKING** Promoted `jaspr_web_compilers` to non-experimental status.
 
-  This also changes the respective cli option from `jaspr create --experimental-web-compilers` (old) to 
+  This also changes the respective cli option from `jaspr create --experimental-web-compilers` (old) to
   `jaspr create --jaspr-web-compilers` (new).
 
-- Added support for rendering `svg` elements. 
+- Added support for rendering `svg` elements.
   Also added `svg()`, `rect()`, `circle()`, `ellipse()`, `line()`, `path()` and `polygon()` components.
 
 - Refactored rendering implementation to use `RenderObject`s.
@@ -243,7 +413,6 @@
   - `clean` command to clean your project directory
   - `update` command to automatically update the cli to the latest version
   - `doctor` command to print information about the environment and project
-  
 - We added lightweight anonymous usage tracking to the cli. We use [mixpanel.com](https://mixpanel.com/home) and
   only process anonymized data. The usage statistics are made public and can be viewed here (TODO: Link will be added in next release).
 
@@ -251,12 +420,12 @@
 
 ## 0.9.0
 
-- Added *Static Site Generation* support.
+- Added _Static Site Generation_ support.
 
-  With the new `jaspr generate` command you can generate static pages from your Jaspr app. This requires a normal 
+  With the new `jaspr generate` command you can generate static pages from your Jaspr app. This requires a normal
   server-rendered Jaspr app and will output separate `.html` pages for each of your routes.
 
-  To specify which routes your application should handle, either use `jaspr_router` or call 
+  To specify which routes your application should handle, either use `jaspr_router` or call
   `ServerApp.requestRouteGeneration('/my/route');` for each target route.
 
 ## 0.8.2
@@ -273,7 +442,7 @@
 
 - Added support for Tailwind using the `jaspr_tailwind` integration.  
   Simply run `dart pub add jaspr_tailwind --dev` and start using tailwind classes in your Jaspr components.  
-  For a full setup and usage guide see [Tailwind Integration Docs](https://docs.page/schultek/jaspr/eco/tailwind).
+  For a full setup and usage guide see [Tailwind Integration Docs](https://docs.jaspr.site/eco/tailwind)
 
 ## 0.7.0
 
@@ -294,7 +463,7 @@
 ## 0.6.2
 
 - Added integrated support for seamless **flutter element embedding**.
-  Refer to [Flutter Embedding Docs](https://docs.page/schultek/jaspr/eco/flutter_embedding) on how to setup and use this.
+  Refer to [Flutter Embedding Docs](https://docs.jaspr.site/going_further/flutter_embedding) on how to setup and use this.
 
 ## 0.6.1
 
@@ -307,7 +476,7 @@
 
 - Added support for **flutter web plugins**.
 
-  Jaspr apps can now depend-on and import flutter plugins that work on web. This is achieved by 
+  Jaspr apps can now depend-on and import flutter plugins that work on web. This is achieved by
   using a modified compiler toolchain: `jaspr_web_compilers`.
 
   To enable support for flutter plugins simply exchange your `build_web_compilers` dependency for `jaspr_web_compilers`:
@@ -316,9 +485,9 @@
   dev_dependencies:
     jaspr_web_compilers: ^4.0.4
   ```
-  
+
   For an example see `examples/flutter_plugin_interop`](https://github.com/schultek/Jaspr/tree/main/examples/flutter_plugin_interop).
-  
+
 - Improved **flutter element embedding**.
 
   Flutter apps can now be directly embedded from your Jaspr codebase and integrated into
@@ -340,7 +509,7 @@
 
   This combines the behaviour of the now removed `@app` and `@island` annotations, as well as the
   removed `Document.app()` and `Document.islands()` constructors. Use the default `Document()` constructor instead.
- 
+
 - **BREAKING** Removed `DeferRenderMixin` as async first builds are no longer permitted on clients.
 
 - Added support for **Flutter element embedding**.
@@ -348,7 +517,7 @@
   Flutter apps can now easily be embedded within Jaspr sites. The cli supports the `--flutter` argument for both
   the `serve` and `build` commands to specify the entrypoint of the flutter application.
 
-  The complete setup is demonstrated in the [flutter_embedding](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding) 
+  The complete setup is demonstrated in the [flutter_embedding](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding)
   example.
 
 - Fixed handling of initial uri.
@@ -356,11 +525,13 @@
 
 ## 0.4.0
 
-- **BREAKING** Bindings are no longer singletons. 
+- **BREAKING** Bindings are no longer singletons.
+
   - `ComponentsBinding.instance`, `SchedulerBinding.instance` etc. were removed.
   - You can access the current binding through `BuildContext`s `context.binding` property.
 
 - **BREAKING** Removed `ComponentTester.setUp()`, `BrowserTester.setUp()` and `ServerTester.setUp()`.
+
   - Use `testComponents()`, `testBrowser()` and `testServer()` instead.
 
 - Requires Dart 3.0 or later.

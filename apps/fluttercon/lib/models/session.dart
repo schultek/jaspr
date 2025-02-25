@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:intl/intl.dart';
 import 'package:jaspr/jaspr.dart';
@@ -26,37 +24,20 @@ class Session with SessionMappable {
   final DateTime endsAt;
   final List<({String name})> speakers;
   final String room;
-  final List<Category> categories;
+  final List<({String name, List<({String name})> categoryItems})> categories;
 
   String get slug => '${title.toLowerCase().replaceAll(RegExp(r'[^a-zA-Z0-9]+'), '_')}_$id';
 
   String get format => categories.where((c) => c.name == "Session format").first.categoryItems.first.name;
 
-  Duration get duration => endsAt.difference(startsAt);
-
   String get timeFormatted => DateFormat("EEE, dd MMM 'at' h:mm a").format(startsAt.toLocal());
-  String get durationFormatted => '${duration.inMinutes}m';
+  String get durationFormatted => '${endsAt.difference(startsAt).inMinutes}m';
+}
 
+extension type SessionCodex(Session session) implements Session {
   @decoder
-  static Session fromJson(String json) => SessionMapper.fromJson(json);
+  SessionCodex.decode(String json) : session = SessionMapper.fromJson(json);
 
   @encoder
-  @override
-  String toJson() => super.toJson();
-}
-
-typedef Category = ({String name, List<({String name})> categoryItems});
-
-abstract class SimpleCodec<S, T> with Codec<S, T> {
-  const SimpleCodec();
-
-  @override
-  Converter<T, S> get decoder => SimpleConverter(decode);
-
-  @override
-  Converter<S, T> get encoder => SimpleConverter(encode);
-}
-
-class MappableCodec<T> extends SimpleCodec<T, String> {
-  const MappableCodec();
+  String encode() => session.toJson();
 }

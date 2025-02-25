@@ -26,9 +26,14 @@ enum Display {
 }
 
 abstract class Border {
+  const factory Border({BorderStyle? style, Color? color, Unit? width}) = __Border;
+
+  @Deprecated('Use Border() instead.')
   const factory Border.all(BorderSide side) = _AllBorder;
   const factory Border.only({BorderSide? left, BorderSide? top, BorderSide? right, BorderSide? bottom}) = _OnlyBorder;
   const factory Border.symmetric({BorderSide? vertical, BorderSide? horizontal}) = _SymmetricBorder;
+
+  static const Border none = _Border('none');
 
   static const Border inherit = _Border('inherit');
   static const Border initial = _Border('initial');
@@ -48,6 +53,23 @@ class _Border implements Border {
 
   @override
   Map<String, String> get styles => {'border': value};
+}
+
+class __Border implements Border {
+  final BorderStyle? style;
+  final Color? color;
+  final Unit? width;
+
+  const __Border({this.style = BorderStyle.solid, this.color, this.width});
+
+  @override
+  Map<String, String> get styles => {
+        'border': [
+          if (style != null) style!.value,
+          if (color != null) color!.value,
+          if (width != null) width!.value,
+        ].join(' ')
+      };
 }
 
 class _AllBorder implements Border {
@@ -132,7 +154,7 @@ class BorderSide {
   final Color? color;
   final Unit? width;
 
-  const BorderSide({this.style, this.color, this.width});
+  const BorderSide({this.style = BorderStyle.solid, this.color, this.width});
 
   const BorderSide.none()
       : color = null,
@@ -406,7 +428,7 @@ class _OnlyOverflow implements Overflow {
   @override
   Map<String, String> get styles => {
         if (x != null && y != null)
-          'overflow': '$x $y'
+          'overflow': '${x!._value} ${y!._value}'
         else ...{
           if (x != null) 'overflow-x': x!._value,
           if (y != null) 'overflow-y': y!._value,

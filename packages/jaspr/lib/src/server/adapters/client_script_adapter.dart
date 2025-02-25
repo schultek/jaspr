@@ -12,20 +12,24 @@ class ClientScriptAdapter extends HeadScopeAdapter {
   final Map<int, Element?> serverElements = {0: null};
 
   @override
-  void applyHead(MarkupRenderObject head) {
-    if (clientElements.isNotEmpty) {
-      String source;
-      if (clientElements.length == 1) {
-        var entry = binding.options.targets[clientElements.first.component.runtimeType]!;
-        source = '${entry.name}.client';
-      } else {
-        source = 'main.clients';
-      }
-
-      head.children.insertBefore(
-        head.createChildRenderObject()
-          ..updateElement('script', null, null, null, {'src': '$source.dart.js', 'defer': ''}, null),
-      );
+  bool applyHead(MarkupRenderObject head) {
+    if (clientElements.isEmpty) {
+      return false;
     }
+    
+    String source;
+    if (clientElements.length == 1) {
+      var entry = binding.options.clients![clientElements.first.component.runtimeType]!;
+      source = '${entry.name}.client';
+    } else {
+      source = 'main.clients';
+    }
+
+    head.children.insertBefore(
+      head.createChildRenderObject()
+        ..updateElement('script', null, null, null, {'src': '$source.dart.js', 'defer': ''}, null),
+    );
+
+    return true;
   }
 }

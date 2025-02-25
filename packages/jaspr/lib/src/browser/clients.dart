@@ -1,12 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html' as html show Element;
-import 'dart:html';
 
-import '../../browser.dart';
+import 'package:universal_web/web.dart' as web;
 
-typedef ClientBuilder = Component Function(ConfigParams);
+import '../components/basic.dart';
+import '../components/raw_text/raw_text_web.dart';
+import '../foundation/marker_utils.dart';
+import '../framework/framework.dart';
+import 'browser_binding.dart';
+import 'utils.dart';
+
 typedef ClientLoader = FutureOr<ClientBuilder> Function();
+typedef ClientBuilder = Component Function(ConfigParams params);
 
 typedef ClientByName = FutureOr<ClientBuilder> Function(String);
 
@@ -14,7 +19,7 @@ typedef ClientByName = FutureOr<ClientBuilder> Function(String);
 void registerClients(Map<String, ClientLoader> clients) {
   final Map<String, ClientBuilder> builders = {};
   _findAnchors(clientByName: (name) {
-    var client = (builders[name] ?? clients[name]!()) as FutureOr<ClientBuilder>;
+    final client = (builders[name] ?? clients[name]!()) as FutureOr<ClientBuilder>;
     if (client is ClientBuilder) {
       return builders[name] = client;
     } else {
@@ -57,8 +62,8 @@ class ConfigParams {
   }
 }
 
-final _clientStartRegex = RegExp(r'^\$(\S+)(?:\s+data=(.*))?$');
-final _clientEndRegex = RegExp(r'^/\$(\S+)$');
+final _clientStartRegex = RegExp('^$clientMarkerPrefixRegex(\\S+)(?:\\s+data=(.*))?\$');
+final _clientEndRegex = RegExp('^/$clientMarkerPrefixRegex(\\S+)\$');
 
 final _serverStartRegex = RegExp(r'^s\$(\d+)$');
 final _serverEndRegex = RegExp(r'^/s\$(\d+)$');
@@ -67,8 +72,8 @@ sealed class ComponentAnchor {
   ComponentAnchor(this.name, this.startNode);
 
   final String name;
-  final Node startNode;
-  late Node endNode;
+  final web.Node startNode;
+  late web.Node endNode;
 }
 
 class ClientComponentAnchor extends ComponentAnchor {
@@ -85,39 +90,47 @@ class ClientComponentAnchor extends ComponentAnchor {
 
   Component build() {
     assert(builder is ClientBuilder, "ClientComponentAnchor was not resolved before calling build()");
-    var params = ConfigParams(data != null ? jsonDecode(data!) : {}, serverAnchors);
+    var params = ConfigParams(data != null ? jsonDecode(unescapeMarkerText(data!)) : {}, serverAnchors);
     return (builder as ClientBuilder)(params);
   }
 
   Future<void> run() async {
     await resolve();
-    BrowserAppBinding().attachRootComponent(build(), attachBetween: (startNode, endNode));
+    try {
+      BrowserAppBinding().attachRootComponent(build(), attachBetween: (startNode, endNode));
+    } catch (e, st) {
+      throw Error.throwWithStackTrace(
+        "Failed to attach client component '$name'. "
+        "The following error occurred: $e",
+        st,
+      );
+    }
   }
 }
 
 class ServerComponentAnchor extends ComponentAnchor {
   ServerComponentAnchor(super.name, super.startNode);
 
-  late final DocumentFragment fragment;
+  late final web.DocumentFragment fragment;
   late final List<ClientComponentAnchor> clientAnchors;
-  final Map<String, Component Function(html.Element)> elementFactories = {};
+  final Map<String, Component Function(web.Element)> elementFactories = {};
 
   Future<void> resolve() async {
     await Future.wait(clientAnchors.map((a) => a.resolve()));
   }
 
   void recursivelyFindChildAnchors(ClientByName clientByName) {
-    fragment = document.createDocumentFragment();
+    fragment = web.document.createDocumentFragment();
 
-    Node? curr = startNode.nextNode;
+    web.Node? curr = startNode.nextSibling;
     while (curr != null && curr != endNode) {
-      fragment.append(curr.clone(true));
-      curr = curr.nextNode;
+      fragment.append(curr.cloneNode(true));
+      curr = curr.nextSibling;
     }
 
     clientAnchors = _findAnchors(clientByName: clientByName, root: fragment, runEagerly: false);
 
-    window.console.log(fragment);
+    web.console.log(fragment);
 
     for (var client in clientAnchors) {
       var name = client.name.toLowerCase().replaceAll('/', '_');
@@ -136,32 +149,34 @@ class ServerComponentAnchor extends ComponentAnchor {
         return child!;
       };
 
-      while (client.startNode.nextNode != null && client.startNode.nextNode != client.endNode) {
-        client.startNode.nextNode!.remove();
+      while (client.startNode.nextSibling != null && client.startNode.nextSibling != client.endNode) {
+        final next = client.startNode.nextSibling!;
+        next.parentNode?.removeChild(next);
       }
 
-      client.startNode.replaceWith(document.createElement('${name}_$n'));
-      client.endNode.remove();
+
+      client.startNode.parentNode?.replaceChild(web.document.createElement('${name}_$n'), client.startNode);
+      client.endNode.parentNode?.removeChild(client.endNode);
     }
 
-    window.console.log(fragment);
+    web.console.log(fragment);
   }
 
   Component build() {
     return Builder(builder: (context) {
-      return fragment.childNodes.map((n) => RawNode(n, elementFactories: elementFactories));
+      return fragment.childNodes.toIterable().map((n) => RawNode(n, elementFactories: elementFactories));
     });
   }
 }
 
-List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, Node? root, bool runEagerly = true}) {
-  var iterator = NodeIterator(root ?? document, NodeFilter.SHOW_COMMENT);
+List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, web.Node? root, bool runEagerly = true}) {
+  var iterator = web.document.createNodeIterator(web.document, 128 /* NodeFilter.SHOW_COMMENT */);
 
   List<ComponentAnchor> anchors = [];
   List<ClientComponentAnchor> clientAnchors = [];
 
-  Comment? currNode;
-  while ((currNode = iterator.nextNode() as Comment?) != null) {
+  web.Comment? currNode;
+  while ((currNode = iterator.nextNode() as web.Comment?) != null) {
     var value = currNode!.nodeValue ?? '';
 
     // Find client start anchor.
@@ -198,7 +213,7 @@ List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, No
       comp.builder = clientByName(name);
 
       // Remove the data string.
-      start.text = '\$${comp.name}';
+      start.text = '$clientMarkerPrefix${comp.name}';
 
       if (runEagerly) {
         // Instantly run the client component.

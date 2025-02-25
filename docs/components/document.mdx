@@ -1,0 +1,266 @@
+---
+title: Document
+description: The Document component sets up and controls the basic document structure.
+---
+
+---
+
+The `Document` component helps you with the basic document structure of your website, the `<html>`, `<head>` and `<body>`
+elements. It has **5 constructors** that setup or control separate aspects of the document.
+
+- The main `Document()` constructor and the `Document.template()` constructor setup the full document structure using either
+  a set of child parameters or a template file respectively. These are **only available on the server** using the `package:jaspr/server.dart` import.
+
+- The `Document.head()`, `Document.html()` and `Document.body()` constructors control the respective elements separately by
+  attaching child elements (for `.head()`) or setting attributes (for `.html()` and `.body()`). These can be used both on the
+  server and on the client.
+
+## Document()
+
+<Warning>
+    The `Document()` constructor can only be used on the server and is only available using the `package:jaspr/server.dart` import.
+</Warning>
+
+The `Document()` constructor helps you to set up a basic document structure at the root of your app.
+It renders the main `<html>`, `<head>` and `<body>` tags and takes a set of standard parameters, 
+e.g. to set the `title` or `meta` attributes inside the `<head>`.
+
+```dart title="lib/main.dart"
+void main() {
+  runApp(Document(
+    title: "My Site",
+    meta: {
+      "description": "My site description",
+    },
+    body: div(id: "main", []),
+  ));
+}
+```
+
+renders to:
+
+```html title="index.html"
+<!DOCTYPE html>
+<html>
+  <head>
+    <base href="/"/>
+    <meta charset="utf-8"/>
+    <title>My Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="My site description"/>
+  </head>
+  <body>
+    <div id="main"></div>
+  </body>
+</html>
+```
+
+### Parameters
+
+It takes the following parameters:
+
+<Property name="title" type="String?" optional>
+  Sets the title of your website.
+</Property>
+
+---
+
+<Property name="base" type="String?" optional>
+  Sets the `<base>` tag of your website.
+</Property>
+
+---
+
+<Property name="charset" type="String?" optional>
+  Sets the charset, defaults to 'utf-8'.
+</Property>
+
+---
+
+<Property name="viewport" type="String?" optional>
+  Sets the viewport for mobile devices, defaults to 'width=device-width, initial-scale=1.0'.
+</Property>
+
+---
+
+<Property name="meta" type="Map<String, String>" optional>
+  Sets additional `<meta>` properties.
+</Property>
+
+---
+
+<Property name="styles" type="List<StyleRule>" optional>
+  A global set of style-rules, rendered as a `<style>` section inside `<head>`.
+</Property>
+
+---
+
+<Property name="head" type="List<Component>" optional>
+  Additional components to render inside `<head>`.
+</Property>
+
+---
+
+<Property name="body" type="Component" required>
+  The component to render inside `<body>`.
+</Property>
+
+---
+
+## Document.template()
+
+<Warning>
+    The `Document.template()` constructor can only be used on the server and is only available using the
+    `package:jaspr/server.dart` import.
+</Warning>
+
+The `Document.template()` constructor loads an external `.template.html` file from the filesystem and attaches the provided
+child component to that template.
+
+It allows you to define the document markup in a separate html file instead of using the standard `Document()` constructor.
+
+---
+
+### Parameters
+
+<Property name="name" type="String" optional>
+  The name of the template file to load, defaults to 'index'. The file is loaded from the `web` directory as `web/<name>.template.html`.
+</Property>
+
+---
+
+<Property name="attachTo" type="String" optional>
+  The target element from the template to attach the `child` component to, defaults to 'body'.
+</Property>
+
+---
+
+<Property name="child" type="Component" required>
+  The component to attach to the template.
+</Property>
+
+---
+
+## Document.head()
+
+The `Document.head()` constructor renders metadata and other elements inside the `<head>` of the document.
+
+Any children are pulled out of the normal rendering tree of the application and rendered instead inside a special section of the `<head>` element of the document. This is supported both on the server during pre-rendering and on the client.
+
+The `.head()` component can be used multiple times in an application where deeper or latter mounted components will override duplicate elements from other `.head()` components.
+
+```dart
+Parent(children: [
+  Document.head(
+    title: "My Title",
+    meta: {"description": "My Page Description"}
+  ),
+  Child(children: [
+    Document.head(
+      title: "Nested Title"
+    ),
+  ]),
+]);
+```
+
+The above configuration of components will result in these elements inside `<head>`:
+
+```html
+<head>
+  <title>Nested Title</title>
+  <meta name="description" content="My Page Description">
+</head>
+```
+
+<Warning>
+Note that 'deeper or latter' here does not result in a true DFS ordering. Components that are mounted deeper but prior will override latter but shallower components.
+</Warning>
+
+Elements inside `.head()` are overridden using the following system:
+- elements with an `id` override other elements with the same `id`
+- `<title>` and `<base>` elements override other `<title>` or `<base>` elements respectively
+- `<meta>` elements override other `<meta>` elements with the same `name`
+
+---
+
+### Parameters
+
+<Property name="title" type="String?" optional>
+  Sets the `<title>` of your website.
+</Property>
+
+---
+
+<Property name="meta" type="Map<String, String>?" optional>
+  Sets additional `<meta>` properties.
+</Property>
+
+---
+
+<Property name="children" type="List<Component>?" optional>
+  Additional components to render inside `<head>`.
+</Property>
+
+---
+
+<Property name="key" type="Key?" optional>
+  A key for this component.
+</Property>
+
+---
+
+## Document.html()
+
+The `Document.html()` constructor attaches a set of attributes to the `<html>` element.
+
+This can be used at any point in the component tree and is supported both on the
+server during pre-rendering and on the client.
+
+The `.html()` component can be used multiple times in an application where deeper or latter mounted components will override duplicate attributes from other `.html()` components.
+
+<Warning>
+Note that 'deeper or latter' here does not result in a true DFS ordering. Components that are mounted deeper but prior will override latter but shallower components.
+</Warning>
+
+---
+
+### Parameters
+
+<Property name="attributes" type="Map<String, String>?" optional>
+  Sets additional attributes to the `<html>` element.
+</Property>
+
+---
+
+<Property name="key" type="Key?" optional>
+  A key for this component.
+</Property>
+
+---
+
+## Document.body()
+
+The `Document.body()` constructor attaches a set of attributes to the `<body>` element.
+
+This can be used at any point in the component tree and is supported both on the
+server during pre-rendering and on the client.
+
+The `.body()` component can be used multiple times in an application where deeper or latter mounted components will override duplicate attributes from other `.body()` components.
+
+<Warning>
+Note that 'deeper or latter' here does not result in a true DFS ordering. Components that are mounted deeper but prior will override latter but shallower components.
+</Warning>
+
+### Parameters
+
+<Property name="attributes" type="Map<String, String>?" optional>
+  Sets additional attributes to the `<html>` element.
+</Property>
+
+---
+
+<Property name="key" type="Key?" optional>
+  A key for this component.
+</Property>
+
+---

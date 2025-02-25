@@ -1,14 +1,15 @@
-import 'package:flutter/widgets.dart' show Widget;
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../providers/effects_provider.dart';
+@Import.onWeb('package:flutter/widgets.dart', show: [#Widget])
+import 'flutter_target.imports.dart';
 
 class FlutterTarget extends StatelessComponent {
   const FlutterTarget({required this.app, this.loader, super.key});
 
-  final Widget app;
+  final WidgetOrStubbed? app;
   final Component? loader;
 
   @override
@@ -20,9 +21,10 @@ class FlutterTarget extends StatelessComponent {
 
     Component child = FlutterEmbedView(
       key: GlobalObjectKey('flutter_target'),
+      id: "flutter_target",
       classes: isHandheld ? 'handheld' : effects.join(' '),
       styles: !isHandheld && rotation != 0
-          ? Styles.box(
+          ? Styles(
               transform: Transform.combine([
                 Transform.perspective(1000.px),
                 Transform.rotateAxis(y: rotation.deg),
@@ -30,7 +32,7 @@ class FlutterTarget extends StatelessComponent {
             )
           : null,
       loader: loader,
-      app: app,
+      widget: app,
     );
 
     if (isHandheld) {

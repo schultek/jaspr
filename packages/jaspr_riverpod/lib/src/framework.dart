@@ -13,7 +13,7 @@ import 'sync_provider.dart';
 part 'provider_context.dart';
 part 'provider_dependencies.dart';
 
-/// {@template riverpod.providerscope}
+/// {@template riverpod.provider_scope}
 /// A component that stores the state of providers.
 ///
 /// All Jaspr applications using Riverpod must contain a [ProviderScope] at
@@ -35,7 +35,7 @@ part 'provider_dependencies.dart';
 ///
 /// ```dart
 /// testComponents('Test example', (tester) async {
-///   await tester.pumpComponent(
+///   tester.pumpComponent(
 ///     ProviderScope(
 ///       overrides: [
 ///         // override the behavior of repositoryProvider to provide a fake
@@ -83,7 +83,7 @@ part 'provider_dependencies.dart';
 /// {@endtemplate}
 @sealed
 class ProviderScope extends StatefulComponent {
-  /// {@macro riverpod.providerscope}
+  /// {@macro riverpod.provider_scope}
   const ProviderScope({
     super.key,
     this.overrides = const [],
@@ -156,8 +156,7 @@ class ProviderScope extends StatefulComponent {
 /// Do not use: The [State] of [ProviderScope]
 @visibleForTesting
 @sealed
-class ProviderScopeState extends State<ProviderScope>
-    with SyncStateMixin<ProviderScope, Map<String, dynamic>>, SyncScopeMixin {
+class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin {
   /// The [ProviderContainer] exposed to [ProviderScope.child].
   @override
   @visibleForTesting

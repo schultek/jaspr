@@ -23,7 +23,7 @@ jobs:
       matrix:
         Variant:
           - sampn
-          - vnmnn
+          - vnsnn
           - cnsnn
           - vanen
           - cnnen
@@ -47,7 +47,7 @@ jobs:
           jaspr --disable-analytics
 
       - name: Run cli test
-        run: melos coverage:cli
+        run: melos run coverage:cli
         env:
           VARIANT: ${{matrix.VARIANT}}
 

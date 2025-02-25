@@ -1,7 +1,15 @@
-import 'dart:html' as html;
+import 'dart:js_interop';
+
+import 'package:universal_web/web.dart' as web;
 
 import '../../../browser.dart';
+import '../../browser/utils.dart';
 
+/// Renders its input as raw HTML.
+///
+/// **WARNING**: This component does not escape any
+/// user input and is vulnerable to [cross-site scripting (XSS) attacks](https://owasp.org/www-community/attacks/xss/).
+/// Make sure to sanitize any user input when using this component.
 class RawText extends StatelessComponent {
   const RawText(this.text, {this.elementFactories = const {}, super.key});
 
@@ -10,19 +18,20 @@ class RawText extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    var fragment = html.document.createDocumentFragment()..setInnerHtml(text, validator: AllowAll());
-    for (var node in fragment.childNodes) {
+    var fragment = web.document.createElement('template') as web.HTMLTemplateElement;
+    fragment.innerHTML = text.toJS;
+    for (var node in fragment.content.childNodes.toIterable()) {
       yield elementFactories.buildNode(node);
     }
   }
 }
 
 typedef ElementFactories = Map<String, ElementFactory>;
-typedef ElementFactory = Component Function(html.Element);
+typedef ElementFactory = Component Function(web.Element);
 
 extension on ElementFactories {
-  Component buildNode(html.Node node) {
-    if (node is html.Element && containsKey(node.tagName.toLowerCase())) {
+  Component buildNode(web.Node node) {
+    if (node is web.Element && containsKey(node.tagName.toLowerCase())) {
       return this[node.tagName.toLowerCase()]!(node);
     }
     return RawNode.withKey(node, this);
@@ -32,19 +41,19 @@ extension on ElementFactories {
 class RawNode extends Component {
   RawNode(this.node, {this.elementFactories = const {}, super.key});
 
-  factory RawNode.withKey(html.Node node, ElementFactories elementFactories) {
+  factory RawNode.withKey(web.Node node, ElementFactories elementFactories) {
     return RawNode(
       node,
       elementFactories: elementFactories,
       key: switch (node) {
-        html.Text() => ValueKey('text'),
-        html.Element(:var tagName) => ValueKey('element:$tagName'),
+        web.Text() when node.instanceOfString("Text") => ValueKey('text'),
+        web.Element() when node.instanceOfString("Element") => ValueKey('element:${node.tagName}'),
         _ => null,
       },
     );
   }
 
-  final html.Node node;
+  final web.Node node;
   final ElementFactories elementFactories;
 
   @override
@@ -59,37 +68,26 @@ class RawNodeElement extends BuildableRenderObjectElement {
 
   @override
   Iterable<Component> build() sync* {
-    for (var node in component.node.childNodes) {
+    for (var node in component.node.childNodes.toIterable()) {
       yield component.elementFactories.buildNode(node);
     }
   }
 
   @override
   void updateRenderObject() {
-    var node = component.node;
-    if (node is html.Text) {
-      renderObject.updateText(node.text ?? '');
-    } else if (node is html.Element) {
-      renderObject.updateElement(node.tagName.toLowerCase(), node.id, node.className, null, node.attributes, null);
+    var next = component.node;
+    if (next.instanceOfString("Text") && next is web.Text) {
+      renderObject.updateText(next.textContent ?? '');
+    } else if (next.instanceOfString("Element") && next is web.Element) {
+      renderObject.updateElement(
+          next.tagName.toLowerCase(), next.id, next.className, null, next.attributes.toMap(), null);
     } else {
       var curr = (renderObject as DomRenderObject).node;
-      var next = node.clone(true);
+      var clone = next.cloneNode(true);
       if (curr != null) {
-        curr.replaceWith(next);
+        curr.parentNode?.replaceChild(clone, curr);
       }
-      (renderObject as DomRenderObject).node = next;
+      (renderObject as DomRenderObject).node = clone;
     }
-  }
-}
-
-class AllowAll implements html.NodeValidator {
-  @override
-  bool allowsAttribute(html.Element element, String attributeName, String value) {
-    return true;
-  }
-
-  @override
-  bool allowsElement(html.Element element) {
-    return true;
   }
 }

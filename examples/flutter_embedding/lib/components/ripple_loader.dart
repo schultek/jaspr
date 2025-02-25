@@ -6,11 +6,13 @@ class RippleLoader extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield div(
-      styles: Styles.combine([
-        Styles.box(height: 100.percent),
-        Styles.flexbox(justifyContent: JustifyContent.center, alignItems: AlignItems.center),
-        Styles.background(color: Colors.black),
-      ]),
+      styles: Styles(
+        height: 100.percent,
+        display: Display.flex,
+        justifyContent: JustifyContent.center,
+        alignItems: AlignItems.center,
+        backgroundColor: Colors.black,
+      ),
       [
         div(classes: 'lds-ripple', [div([]), div([])])
       ],

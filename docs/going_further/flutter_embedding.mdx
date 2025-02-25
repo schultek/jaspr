@@ -1,0 +1,91 @@
+---
+title: Flutter Embedding
+description: Embedding a Flutter web app in a Jaspr website.
+---
+
+---
+
+<Warning>
+Requires Flutter 3.24.0 or newer.
+</Warning>
+
+To embed a Flutter app into your Jaspr website you need the following setup:
+
+<Steps>
+  <Step>
+    Add `flutter` and `jaspr_flutter_embed` as dependencies:
+    
+    ```shell
+    dart pub add flutter jaspr_flutter_embed
+    ```
+  </Step>
+  <Step>
+    Replace `build_web_compilers` with `jaspr_web_compilers` as a dev dependency:
+
+    ```shell
+    dart pub remove build_web_compilers
+    dart pub add jaspr_web_compilers --dev
+    ```
+  </Step>
+  <Step>
+    Create the file `web/flutter_bootstrap.js` with the following content:
+
+    ```js
+    {{flutter_js}}
+    {{flutter_build_config}}
+    ```
+  </Step>
+  <Step>
+    Add the `FlutterEmbedView` component to your jaspr app like this:
+
+    ```dart
+    import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
+
+    // import your flutter app widget
+    import 'my_flutter_app.dart';
+
+    // this can be any jaspr component
+    class JasprApp extends StatelessComponent {
+      JasprApp({super.key});
+
+      Iterable<Component> build(BuildContext context) sync* {
+        // this is a normal jaspr component
+        yield FlutterEmbedView(
+          // provide an optional loader component that will be displayed while the flutter app loads
+          loader: MyCustomLoader(),
+          // provide your flutter app widget
+          widget: MyFlutterApp(
+            // provide any widget properties or callbacks
+            // this way you can pass and share state between jaspr and flutter
+            // without needing js interop
+            title: 'My Embedded Flutter App',
+          ),
+        );
+      }
+    }
+    ```
+  </Step>
+  <Step>
+    Finally, run your jaspr app as normal using `jaspr serve` or `jaspr build`.
+  </Step>
+</Steps>
+
+See the documentation of [FlutterEmbedView](/components/flutter_embed_view) for a description of all available properties.
+
+## Deferred loading
+
+The `jaspr_flutter_embed` package itself uses deferred imports internally to optimize the loading of the flutter framework.
+To make optimal use of lazy loading the flutter framework, you should use the [FlutterEmbedView.deferred()](/components/flutter_embed_view#deferred-variant) constructor.
+
+With this the flutter framework will automatically be lazy-loaded when rendering a `FlutterEmbedView` for the first time.
+
+As a further optimization, it is also possible to **preload** the flutter framework by calling `FlutterEmbedView.preload()`.
+
+## Import handling
+
+Any code and components that use the flutter sdk can only be imported on the client, not the server. That means that
+when you use server-side rendering, you cannot directly import the above component into your app, or you will get a
+compilation error.
+
+Instead, you need to use Darts conditional imports to only import the affected code on the client.
+See [@Import](/utils/at_import).

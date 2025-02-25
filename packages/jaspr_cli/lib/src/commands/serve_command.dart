@@ -9,6 +9,7 @@ import 'package:webdev/src/command/configuration.dart';
 import 'package:webdev/src/serve/dev_workflow.dart';
 
 import '../config.dart';
+import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
@@ -50,11 +51,16 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       help: 'Serves the app in release mode.',
       negatable: false,
     );
+    argParser.addFlag(
+      'experimental-wasm',
+      help: 'Compile to wasm',
+      negatable: false,
+    );
+    addDartDefineArgs();
   }
 
   @override
-  String get description => 'Runs a development server that serves the jaspr app and '
-      'reloads based on file system updates.';
+  String get description => 'Runs a development server that reloads based on file system updates.';
 
   @override
   String get name => 'serve';
@@ -124,6 +130,8 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
     serverPid.writeAsStringSync('');
 
+    var userDefines = getServerDartDefines();
+
     var args = [
       'run',
       if (!release) ...[
@@ -132,13 +140,14 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       ] else
         '-Djaspr.flags.release=true',
       '-Djaspr.flags.verbose=$debug',
+      for (var define in userDefines.entries) '-D${define.key}=${define.value}',
     ];
 
     if (debug) {
       args.add('--pause-isolates-on-start');
     }
 
-    var entryPoint = await getEntryPoint(argResults!['input']);
+    var entryPoint = await getEntryPoint(argResults!['input'], true);
 
     if (!release) {
       var import = entryPoint.replaceFirst('lib', 'package:${config!.projectName}');
@@ -171,6 +180,10 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (debug) {
       logger.write("Ignoring --debug flag since custom dev command is used.", level: Level.warning);
     }
+    var userDefines = getServerDartDefines();
+    if (userDefines.isNotEmpty) {
+      logger.write("Ignoring all --dart-define options since custom dev command is used.", level: Level.warning);
+    }
 
     var [exec, ...args] = command.split(" ");
 
@@ -187,6 +200,11 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   }
 
   Future<DevWorkflow> _runWebCompiler(String webPort) async {
+    bool useWasm = argResults!['experimental-wasm'] as bool;
+    if (useWasm) {
+      checkWasmSupport();
+    }
+
     logger.write('Starting web compiler...', progress: ProgressState.running);
 
     var configuration = Configuration(
@@ -194,17 +212,26 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       release: release,
     );
 
-    var compilers = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    var package = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    var compiler = useWasm
+        ? 'dart2wasm'
+        : release
+            ? 'dart2js'
+            : 'dartdevc';
+
+    var dartDefines = getClientDartDefines();
+    var dartdevcDefines = dartDefines.entries.map((e) => ',"${e.key}":"${e.value}"').join();
+    var dart2jsDefines = dartDefines.entries.map((e) => ',"-D${e.key}=${e.value}"').join();
 
     var workflow = await DevWorkflow.start(configuration, [
       if (release) '--release',
       '--define',
-      '$compilers:ddc=generate-full-dill=true',
+      '$package:ddc=generate-full-dill=true',
       '--delete-conflicting-outputs',
-      if (!release)
-        '--define=$compilers:ddc=environment={"jaspr.flags.verbose":$debug}'
-      else
-        '--define=$compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true"]',
+      '--define=$package:entrypoint=compiler=$compiler',
+      if (compiler == 'dartdevc') '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug$dartdevcDefines}',
+      if (compiler != 'dartdevc')
+        '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"$dart2jsDefines${!release ? ',"--enable-asserts"' : ''}]',
     ], {
       'web': int.parse(webPort)
     });
@@ -233,6 +260,9 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       } else if (event.status == BuildStatus.failed) {
         logger.write('Failed building web assets. There is probably more output above.',
             level: Level.error, progress: ProgressState.completed);
+        if (!buildCompleter.isCompleted) {
+          buildCompleter.completeError(event);
+        }
       } else if (event.status == BuildStatus.started) {
         if (buildCompleter.isCompleted) {
           logger.write('Rebuilding web assets...', progress: ProgressState.running);
@@ -242,10 +272,15 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
     });
 
-    await buildCompleter.future;
+    try {
+      await buildCompleter.future;
+      logger.write('Done building web assets.', progress: ProgressState.completed);
+    } on BuildResult catch (_) {
+      logger.write('Could not start dev server due to build errors.',
+          level: Level.error, progress: ProgressState.completed);
+      await shutdown();
+    }
     timer.cancel();
-
-    logger.write('Done building web assets.', progress: ProgressState.completed);
 
     return workflow;
   }

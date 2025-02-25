@@ -1,9 +1,9 @@
 name: jaspr_cli
 description: A command line interface to create, serve and build jaspr applications.
-version: 0.13.3
-homepage: https://github.com/schultek/jaspr
+version: 0.18.0
+homepage: https://jaspr.site
 issue_tracker: https://github.com/schultek/jaspr/issues
-documentation: https://docs.page/schultek/jaspr
+documentation: https://docs.jaspr.site
 funding:
   - https://github.com/sponsors/schultek
 
@@ -13,7 +13,7 @@ topics:
   - cli
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
 
 executables:
   jaspr:
@@ -21,25 +21,25 @@ executables:
 dependencies:
   ansi_styles: ^0.3.2
   args: ^2.3.0
-  cli_completion: ^0.4.0
+  cli_completion: ^0.5.0
   cli_util: ^0.4.0
   collection: ^1.17.1
-  http: ^0.13.4
+  http: ^1.0.0
   io: ^1.0.4
   logging: ^1.1.1
-  mason: ^0.1.0-dev.31
+  mason: ^0.1.0
   meta: ^1.7.0
   path: ^1.8.0
-  pub_updater: ^0.3.0
+  pub_updater: ^0.5.0
   yaml: ^3.1.0
   # The following packages don't adhere to semantic versioning and might ship breaking changes in minor versions.
   # Therefore, we depend on fixed versions of these packages.
-  build_daemon: 4.0.1
-  dwds: 23.0.0
-  webdev: 3.3.0
+  build_daemon: 4.0.4
+  dwds: 24.3.5
+  webdev: 3.7.1
   shelf: ^1.4.1
   shelf_proxy: ^1.0.4
 
 dev_dependencies:
-  lints: ^3.0.0
+  lints: ^5.0.0
   test: ^1.22.0

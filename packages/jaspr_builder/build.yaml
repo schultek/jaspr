@@ -8,10 +8,11 @@ builders:
     build_extensions:
       "lib/$lib$":
         - "lib/jaspr_options.dart"
-    auto_apply: dependents
+    auto_apply: root_package
     build_to: source
     required_inputs:
       - '.client.json'
+      - 'styles.bundle.json'
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap
 # ========================
@@ -24,8 +25,10 @@ builders:
       "lib/{{file}}.dart":
         - "lib/{{file}}.client.json"
         - "web/{{file}}.client.dart"
-    auto_apply: dependents
+    auto_apply: root_package
     build_to: cache
+    required_inputs:
+      - 'codec.bundle.json'
   client_registry:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "buildClientRegistry" ]
@@ -34,24 +37,81 @@ builders:
         - "web/main.clients.dart"
     required_inputs:
       - '.client.json'
-    auto_apply: dependents
+    auto_apply: root_package
     build_to: cache
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap
 # ========================
+# === Styles ===
+# ========================
+  styles_module:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildStylesModule" ]
+    build_extensions:
+      ".dart":
+        - ".styles.json"
+    auto_apply: all_packages
+    build_to: cache
+  styles_bundle:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildStylesBundle" ]
+    build_extensions:
+      "lib/$lib$":
+        - "lib/styles.bundle.json"
+    auto_apply: all_packages
+    build_to: cache
+    required_inputs:
+      - '.styles.json'
+# ========================
+# === Sync Mixins ===
+# ========================
+  sync_mixins_module:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildSyncMixins" ]
+    build_extensions:
+      ".dart":
+        - ".sync.dart"
+    auto_apply: dependents
+    build_to: source
+    required_inputs:
+      - 'codec.bundle.json'
+    runs_before:
+      - jaspr_web_compilers:entrypoint_bootstrap
+# ========================
+# === Codec ===
+# ========================
+  codec_module:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildCodecModule" ]
+    build_extensions:
+      ".dart":
+        - ".codec.json"
+    auto_apply: all_packages
+    build_to: cache
+  codec_bundle:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildCodecBundle" ]
+    build_extensions:
+      "lib/$lib$":
+        - "lib/codec.bundle.json"
+    auto_apply: all_packages
+    build_to: cache
+    required_inputs:
+      - '.codec.json'
+# ========================
 # === Platform Imports ===
 # ========================
-  imports:
+  imports_module:
     import: "package:jaspr_builder/builder.dart"
-    builder_factories: [ "findPlatformImports" ]
+    builder_factories: [ "buildImportsModule" ]
     build_extensions:
       ".dart":
         - ".imports.json"
     auto_apply: dependents
     build_to: cache
-  import_parts:
+  import_output:
     import: "package:jaspr_builder/builder.dart"
-    builder_factories: [ "writePlatformImports" ]
+    builder_factories: [ "buildImportsOutput" ]
     build_extensions:
       ".imports.json":
         - ".imports.dart"
@@ -72,6 +132,6 @@ builders:
     auto_apply: dependents
     build_to: source
     required_inputs:
-      - .imports.json
+      - '.imports.json'
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap

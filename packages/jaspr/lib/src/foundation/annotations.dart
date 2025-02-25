@@ -1,25 +1,23 @@
-class ClientAnnotation {
-  const ClientAnnotation._();
-}
-
-/// Used to annotate a client component
+/// Used to annotate a client component.
 const client = ClientAnnotation._();
 
-class EncoderAnnotation {
-  const EncoderAnnotation._();
+class ClientAnnotation {
+  const ClientAnnotation._();
 }
 
 /// Used to annotate an encoder function for a custom model.
 const encoder = EncoderAnnotation._();
 
-class DecoderAnnotation {
-  const DecoderAnnotation._();
+class EncoderAnnotation {
+  const EncoderAnnotation._();
 }
 
 /// Used to annotate an decoder function for a custom model.
 const decoder = DecoderAnnotation._();
 
-enum ImportPlatform { web, server }
+class DecoderAnnotation {
+  const DecoderAnnotation._();
+}
 
 /// Define a platform specific import with auto-generated stubbing.
 ///
@@ -31,13 +29,13 @@ enum ImportPlatform { web, server }
 ///
 /// ```
 /// @Import.onWeb('dart:html', show: [#window])
-/// import 'file.import.dart';
+/// import 'file.imports.dart';
 /// ```
 ///
 /// 1. Put the actual import in the annotation.
 /// 3. Define what elements or types to 'show' as symbols (prefixed by #).
 ///   - This is required to reduce the amount of stubbing needed.
-/// 2. Import the file '<current filename>.import.dart'.
+/// 2. Import the file '<current filename>.imports.dart'.
 ///
 /// The associated file will be generated the next time you run `jaspr serve`.
 ///
@@ -58,3 +56,5 @@ class Import {
   final String import;
   final List<dynamic> show;
 }
+
+enum ImportPlatform { web, server }

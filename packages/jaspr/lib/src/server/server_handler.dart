@@ -19,12 +19,33 @@ const String kDevWeb = String.fromEnvironment('jaspr.dev.web');
 final webDir = kDevWeb.isNotEmpty ? kDevWeb : join(_findRootProjectDir(), 'web');
 
 String _findRootProjectDir() {
-  var dir = dirname(Platform.script.toFilePath());
-  if (Platform.resolvedExecutable == Platform.script.toFilePath()) return dir;
-  while (dir.isNotEmpty && !File(join(dir, 'pubspec.yaml')).existsSync()) {
-    dir = dirname(dir);
+  final executableDir = dirname(Platform.script.toFilePath());
+  final workingDir = Directory.current.path;
+
+  if (Platform.resolvedExecutable == Platform.script.toFilePath()) {
+    return executableDir;
   }
-  return dir;
+
+  final foundDir = _tryFindRootProjectDir(executableDir) ?? _tryFindRootProjectDir(workingDir);
+
+  if (foundDir == null) {
+    throw Exception('Could not resolve project directory containing pubspec.yaml');
+  }
+
+  return foundDir;
+}
+
+String? _tryFindRootProjectDir(String startingDir) {
+  if (File(join(startingDir, 'pubspec.yaml')).existsSync()) {
+    return startingDir;
+  }
+
+  final parentDir = dirname(startingDir);
+  if (startingDir == parentDir) {
+    return null;
+  }
+
+  return _tryFindRootProjectDir(parentDir);
 }
 
 Handler staticFileHandler([http.Client? client]) => jasprProxyPort != null
@@ -57,28 +78,17 @@ Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHa
       return Response(404);
     }
 
-    var fileLoader = _proxyFileLoader(request, staticHandler);
+    var fileLoader = proxyFileLoader(request, staticHandler);
     return handle(request, (setup) async {
-      // We support two modes here, rendered-html and data-only
-      // rendered-html does normal ssr, but data-only only returns the preloaded state data as json
-      var isDataMode = request.headers['jaspr-mode'] == 'data-only';
-
-      var requestUri = request.url.normalizePath();
-      if (!requestUri.path.startsWith('/')) {
-        requestUri = requestUri.replace(path: '/${requestUri.path}');
-      }
-
-      return Response.ok(
-        await render(isDataMode ? RenderMode.data : RenderMode.html, setup, requestUri, fileLoader),
-        headers: {'Content-Type': isDataMode ? 'application/json' : 'text/html'},
-      );
+      final (:body, :headers, :statusCode) = await render(setup, request, fileLoader, false);
+      return Response(statusCode, body: body, headers: headers);
     });
   });
 
   return cascade.handler;
 }
 
-Future<String?> Function(String) _proxyFileLoader(Request req, Handler proxyHandler) {
+Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandler) {
   return (name) async {
     final indexRequest = Request('GET', req.requestedUri.replace(path: '/$name'),
         context: req.context, encoding: req.encoding, headers: req.headers, protocolVersion: req.protocolVersion);

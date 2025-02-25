@@ -11,8 +11,6 @@ packages:
   - packages/*
   - apps/*
   - examples/*
-  - experiments/*
-  - thirdparty/*
 
 scripts:
   format:
@@ -25,7 +23,7 @@ scripts:
     exec:
       concurrency: 1
     packageFilters:
-      scope: [ jaspr, jaspr_riverpod, jaspr_router ]
+      scope: [ jaspr, jaspr_builder, jaspr_riverpod, jaspr_router ]
   coverage:
     run: |
       dart test --coverage=coverage &&
@@ -33,7 +31,7 @@ scripts:
     exec:
       concurrency: 1
     packageFilters:
-      scope: [jaspr, jaspr_riverpod, jaspr_router]
+      scope: [jaspr, jaspr_builder, jaspr_riverpod, jaspr_router]
   coverage:cli:
     run: |
       cd packages/jaspr_cli &&
@@ -63,7 +61,14 @@ scripts:
       dart run tool/generate_versions.dart
   activate:cli:
     run: |
+      rm -r packages/jaspr_cli/.dart_tool
       dart pub global activate packages/jaspr_cli --source=path
+  activate:cli:windows:
+    run: |
+      cd packages\jaspr_cli\
+      del .dart_tool
+      dart pub get
+      dart pub global activate . --source=path
   deploy:jasprpad:
     run: |
       dart run apps/jaspr_pad/tool/deploy.dart

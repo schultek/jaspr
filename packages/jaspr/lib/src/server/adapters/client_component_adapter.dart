@@ -1,7 +1,5 @@
-import 'dart:convert';
-
-import '../../../jaspr.dart';
-import '../child_nodes.dart';
+import '../../foundation/options.dart';
+import '../../framework/framework.dart';
 import '../markup_render_object.dart';
 import 'client_script_adapter.dart';
 import 'element_boundary_adapter.dart';
@@ -48,15 +46,13 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
   }
 
   String? getData() {
-    var params = target.getParamsFor(element.component);
-    if (params == null) return null;
-    var data = jsonEncode(params, toEncodable: (o) {
+    var data = target.dataFor(element.component, encode: (o) {
       if (o is Component) {
         return getDataForServerComponent(o, element);
       }
       return o;
     });
-    return HtmlEscape(HtmlEscapeMode(escapeLtGt: true)).convert(data);
+    return data;
   }
 
   String getDataForServerComponent(Component component, Element parent) {

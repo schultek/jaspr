@@ -5,6 +5,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/src/server/async_build_owner.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
+import 'package:universal_web/web.dart' as web;
 
 import '../binding.dart';
 import '../finders.dart';
@@ -13,7 +14,7 @@ import '../finders.dart';
 void testComponents(
   String description,
   FutureOr<void> Function(ComponentTester tester) callback, {
-  Uri? uri,
+  String? url,
   bool isClient = true,
   bool? skip,
   Timeout? timeout,
@@ -22,7 +23,7 @@ void testComponents(
   test(
     description,
     () async {
-      var binding = TestComponentsBinding(uri ?? Uri.parse('/'), isClient);
+      var binding = TestComponentsBinding(url ?? '/', isClient);
       var tester = ComponentTester._(binding);
 
       return binding.runTest(() async {
@@ -44,14 +45,14 @@ class ComponentTester {
 
   final TestComponentsBinding binding;
 
-  Future<void> pumpComponent(Component component) {
-    return binding.attachRootComponent(component);
+  void pumpComponent(Component component) {
+    binding.attachRootComponent(component);
   }
 
   /// Simulates a 'click' event on the given element
   /// and pumps the next frame.
   Future<void> click(Finder finder, {bool pump = true}) async {
-    dispatchEvent(finder, 'click', null);
+    dispatchEvent(finder, 'click');
     if (pump) {
       await pumpEventQueue();
     }
@@ -62,9 +63,9 @@ class ComponentTester {
   }
 
   /// Simulates [event] on the given element.
-  void dispatchEvent(Finder finder, String event, dynamic data) {
+  void dispatchEvent(Finder finder, String event, [web.Event? data]) {
     var renderObject = _findDomElement(finder).renderObject as TestRenderObject;
-    renderObject.events?[event]?.call(data);
+    renderObject.events?[event]?.call(data ?? web.Event(event));
   }
 
   DomElement _findDomElement(Finder finder) {
@@ -104,29 +105,12 @@ class ComponentTester {
 }
 
 class TestComponentsBinding extends AppBinding with ComponentsBinding {
-  TestComponentsBinding(this._currentUri, this._isClient);
-
-  final Uri? _currentUri;
-  @override
-  Uri get currentUri => _currentUri ?? (throw 'Did not call setUp() with currentUri provided.');
-
-  final bool _isClient;
-  @override
-  bool get isClient => _isClient;
+  TestComponentsBinding(this.currentUrl, this.isClient);
 
   @override
-  Future<Map<String, String>> fetchState(String url) {
-    throw UnimplementedError();
-  }
-
+  final bool isClient;
   @override
-  String? getRawState(String id) {
-    if (!isClient) throw UnimplementedError();
-    return null;
-  }
-
-  @override
-  void updateRawState(String id, dynamic state) {}
+  final String currentUrl;
 
   @override
   void scheduleFrame(VoidCallback frameCallback) {
@@ -160,6 +144,8 @@ class TestRenderObject extends RenderObject {
 
   @override
   TestRenderObject? parent;
+  @override
+  web.Node? get node => null;
 
   @override
   RenderObject createChildRenderObject() {

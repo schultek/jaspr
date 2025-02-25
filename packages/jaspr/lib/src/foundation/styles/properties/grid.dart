@@ -149,10 +149,10 @@ class TrackRepeat {
   static const TrackRepeat autoFit = TrackRepeat._('auto-fit');
 }
 
-class GridGap {
-  const GridGap({this.row, this.column});
+class Gap {
+  const Gap({this.row, this.column});
 
-  const GridGap.all(Unit value)
+  const Gap.all(Unit value)
       : row = value,
         column = value;
 

@@ -14,7 +14,7 @@ class UpdateCommand extends BaseCommand {
   final PubUpdater _updater = PubUpdater();
 
   @override
-  final String description = 'Updates the jaspr cli.';
+  final String description = 'Update the Jaspr cli.';
 
   @override
   final String name = 'update';

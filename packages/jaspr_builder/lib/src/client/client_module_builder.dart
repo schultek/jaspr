@@ -2,14 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/dart/element/type_visitor.dart';
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
-import 'package:jaspr/jaspr.dart' show DecoderAnnotation, EncoderAnnotation;
 import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
 
+import '../codec/codecs.dart';
 import '../utils.dart';
 
 /// Builds modules for components annotated with @client
@@ -60,22 +58,33 @@ class ClientModuleBuilder implements Builder {
     }
 
     if (annotated.length > 1) {
-      log.warning("Cannot have multiple components annotated with @client in a single library.");
+      log.severe(
+          "Cannot have multiple components annotated with @client in a single library. Failing library: ${library.source.fullName}.");
     }
 
     var element = annotated.first;
 
     if (element is! ClassElement) {
-      log.warning('@client can only be applied on classes. Failing element: ${element.name}');
+      log.severe(
+          '@client can only be applied on classes. Failing element: ${element.name} in library ${library.source.fullName}.');
       return;
     }
 
     if (!componentChecker.isAssignableFrom(element)) {
-      log.warning('@client can only be applied on classes extending Component. Failing element: ${element.name}');
+      log.severe(
+          '@client can only be applied on classes extending Component. Failing element: ${element.name} in library ${library.source.fullName}.');
       return;
     }
 
-    var module = await ClientModule.fromElement(element, buildStep);
+    var codecs = await buildStep.loadCodecs();
+    ClientModule module;
+
+    try {
+      module = ClientModule.fromElement(element, codecs, buildStep);
+    } on UnsupportedError catch (e) {
+      log.severe(e.message);
+      return;
+    }
 
     var outputId = buildStep.inputId.changeExtension('.client.json');
     await buildStep.writeAsString(outputId, jsonEncode(module.serialize()));
@@ -84,47 +93,50 @@ class ClientModuleBuilder implements Builder {
   }
 
   Future<void> generateWebEntrypoint(ClientModule module, BuildStep buildStep) async {
-    var webId =
-        AssetId(module.id.package, module.id.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.client.dart'));
-
-    var moduleImport = 'package:${module.id.package}/${module.id.path.replaceFirst('lib/', '')}';
-    var paramImports = module.params.expand((p) => p.imports).toSet();
-
-    var webSource = DartFormatter(pageWidth: 120).format('''
+    var source = '''
       $generationHeader
       
-      import 'package:jaspr/browser.dart' show registerClientsSync, ConfigParams, Component;
-      import '$moduleImport' as a;
-      ${paramImports.map((p) => "import '$p';").join('\n  ')}
+      import 'package:jaspr/browser.dart';
+      [[/]]
             
       void main() {
         registerClientsSync({
-          '${path.url.relative(path.url.withoutExtension(path.url.withoutExtension(module.id.path)), from: 'lib')}': getComponentForParams,
+          '${path.url.relative(path.url.withoutExtension(path.url.withoutExtension(module.id)), from: 'lib')}': getComponentForParams,
         });
       }
       
-      Component getComponentForParams(ConfigParams p) {
-        return a.${module.name}(${module.params.where((p) => !p.isNamed).map((p) => p.decoder).followedBy(module.params.where((p) => p.isNamed).map((p) => '${p.name}: ${p.decoder}')).join(', ')});
+      Component getComponentForParams(Map<String, dynamic> p) {
+        return ${module.componentFactory()};
       }
-    ''');
+    ''';
+    source = ImportsWriter().resolve(source);
+    source = DartFormatter(
+      languageVersion: DartFormatter.latestShortStyleLanguageVersion,
+      pageWidth: 120,
+    ).format(source);
 
-    await buildStep.writeAsString(webId, webSource);
+    var moduleId = AssetId.resolve(Uri.parse(module.import));
+    var webId =
+        AssetId(moduleId.package, moduleId.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.client.dart'));
+    await buildStep.writeAsString(webId, source);
   }
 }
 
 class ClientModule {
   final String name;
-  final AssetId id;
+  final String id;
+  final String import;
   final List<ClientParam> params;
 
-  ClientModule({required this.name, required this.id, required this.params});
+  ClientModule({required this.name, required this.id, required this.import, required this.params});
 
-  static Future<ClientModule> fromElement(ClassElement element, BuildStep buildStep) async {
-    var params = getParamsFor(element);
+  static ClientModule fromElement(ClassElement element, Codecs codecs, BuildStep buildStep) {
+    var params = getParamsFor(element, codecs);
 
     return ClientModule(
       name: element.name,
-      id: buildStep.inputId,
+      id: path.url.withoutExtension(buildStep.inputId.path).replaceFirst('lib/', ''),
+      import: buildStep.inputId.toImportUrl(),
       params: params,
     );
   }
@@ -132,7 +144,8 @@ class ClientModule {
   factory ClientModule.deserialize(Map<String, dynamic> map) {
     return ClientModule(
       name: map['name'],
-      id: AssetId.deserialize(map['id']),
+      id: map['id'],
+      import: map['import'],
       params: [
         for (var p in map['params']) ClientParam.deserialize(p),
       ],
@@ -141,11 +154,16 @@ class ClientModule {
 
   Map<String, dynamic> serialize() => {
         'name': name,
-        'id': id.serialize(),
+        'id': id,
+        'import': import,
         'params': [
           for (var p in params) p.serialize(),
         ],
       };
+
+  String componentFactory() {
+    return '[[$import]].$name(${params.where((p) => !p.isNamed).map((p) => p.decoder).followedBy(params.where((p) => p.isNamed).map((p) => '${p.name}: ${p.decoder}')).join(', ')})';
+  }
 }
 
 class ClientParam {
@@ -153,145 +171,42 @@ class ClientParam {
   final bool isNamed;
   final String decoder;
   final String encoder;
-  final Set<String> imports;
 
   ClientParam({
     required this.name,
     this.isNamed = false,
     required this.decoder,
     required this.encoder,
-    required this.imports,
   });
 
   ClientParam.deserialize(Map<String, dynamic> map)
       : name = map['name'],
         isNamed = map['isNamed'],
         decoder = map['decoder'],
-        encoder = map['encoder'],
-        imports = (map['imports'] as List).toSet().cast();
+        encoder = map['encoder'];
 
   Map<String, dynamic> serialize() => {
         'name': name,
         'isNamed': isNamed,
         'decoder': decoder,
         'encoder': encoder,
-        'imports': imports.toList(),
       };
 }
 
-List<ClientParam> getParamsFor(ClassElement e) {
-  var params = e.constructors.first.parameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
+List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
+  final constr = e.constructors.first;
+  var params = constr.parameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
 
   for (var param in params) {
     if (!param.isInitializingFormal) {
-      throw UnsupportedError('Client components only support initializing formal constructor parameters.');
+      throw UnsupportedError('Client components only support initializing formal constructor parameters. '
+          'Failing element: ${e.name}.${constr.name}($param)');
     }
   }
 
   return params.map((p) {
-    var decoder = getDecoderFor(p);
-    var encoder = getEncoderFor(p);
-
-    return ClientParam(
-      name: p.name,
-      isNamed: p.isNamed,
-      decoder: decoder.$1,
-      encoder: encoder.$1,
-      imports: [...decoder.$2, ...encoder.$2].map((l) => l.source.uri.toString()).toSet(),
-    );
+    var decoder = codecs.getDecoderFor(p.type, "p['${p.name}']");
+    var encoder = codecs.getEncoderFor(p.type, 'c.${p.name}');
+    return ClientParam(name: p.name, isNamed: p.isNamed, decoder: decoder, encoder: encoder);
   }).toList();
 }
-
-(String, Set<LibraryElement>) getDecoderFor(ParameterElement p) {
-  var type = p.type;
-
-  var value = 'p.get(\'${p.name}\')';
-  var decoder = type.acceptWithArgument(DecoderVisitor(), value);
-
-  if (decoder.$1 == null) {
-    return (value, {});
-  }
-
-  return (decoder.$1!, decoder.$2);
-}
-
-typedef DecoderResult = (String?, Set<LibraryElement>);
-
-class DecoderVisitor extends UnifyingTypeVisitorWithArgument<DecoderResult, String> {
-  @override
-  DecoderResult visitDartType(DartType type, String argument) {
-    return (null, {});
-  }
-
-  @override
-  DecoderResult visitInterfaceType(InterfaceType type, String argument) {
-    if (type.isDartCoreList) {
-      var nested = type.typeArguments.first.acceptWithArgument(this, 'i');
-      if (nested.$1 != null) {
-        return ('($argument as List).map((i) => ${nested.$1}).toList()', nested.$2);
-      }
-    } else if (type.isDartCoreMap) {
-      var nested = type.typeArguments[1].acceptWithArgument(this, 'v');
-      if (nested.$1 != null) {
-        return ('($argument as Map).map((k, v) => MapEntry(k, ${nested.$1}))', nested.$2);
-      }
-    } else if (findAnnotatedDecoder(type) case final decoder?) {
-      return ('${type.element.name}.$decoder($argument)', {type.element.library});
-    }
-    return super.visitInterfaceType(type, argument);
-  }
-}
-
-String? findAnnotatedDecoder(InterfaceType type) {
-  var decoder = type.methods.where((m) => m.isStatic && decoderChecker.firstAnnotationOfExact(m) != null).firstOrNull;
-  return decoder?.name;
-}
-
-final decoderChecker = TypeChecker.fromRuntime(DecoderAnnotation);
-
-(String, Set<LibraryElement>) getEncoderFor(ParameterElement p) {
-  var type = p.type;
-
-  var value = 'c.${p.name}';
-  var encoder = type.acceptWithArgument(EncoderVisitor(), value);
-
-  if (encoder.$1 == null) {
-    return (value, {});
-  }
-
-  return (encoder.$1!, encoder.$2);
-}
-
-typedef EncoderResult = (String?, Set<LibraryElement>);
-
-class EncoderVisitor extends UnifyingTypeVisitorWithArgument<EncoderResult, String> {
-  @override
-  EncoderResult visitDartType(DartType type, String argument) {
-    return (null, {});
-  }
-
-  @override
-  EncoderResult visitInterfaceType(InterfaceType type, String argument) {
-    if (type.isDartCoreList) {
-      var nested = type.typeArguments.first.acceptWithArgument(this, 'i');
-      if (nested.$1 != null) {
-        return ('$argument.map((i) => ${nested.$1}).toList()', nested.$2);
-      }
-    } else if (type.isDartCoreMap) {
-      var nested = type.typeArguments[1].acceptWithArgument(this, 'v');
-      if (nested.$1 != null) {
-        return ('$argument.map((k, v) => MapEntry(k, ${nested.$1}))', nested.$2);
-      }
-    } else if (findAnnotatedEncoder(type) case final encoder?) {
-      return ('$argument.$encoder()', {type.element.library});
-    }
-    return super.visitInterfaceType(type, argument);
-  }
-}
-
-String? findAnnotatedEncoder(InterfaceType type) {
-  var encoder = type.methods.where((m) => !m.isStatic && encoderChecker.firstAnnotationOfExact(m) != null).firstOrNull;
-  return encoder?.name;
-}
-
-final encoderChecker = TypeChecker.fromRuntime(EncoderAnnotation);

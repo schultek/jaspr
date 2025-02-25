@@ -2,32 +2,54 @@
 @JS()
 library flutter_interop;
 
-import 'dart:html';
+import 'dart:async';
+import 'dart:js_interop';
 import 'dart:ui_web' as ui_web;
 
-import 'package:js/js.dart';
+import 'package:flutter/widgets.dart' as flt;
+import 'package:web/web.dart';
 
-/// Starts a flutter app and attaches it to the [attachTo] dom element.
-void runFlutterApp({required String attachTo, required void Function() runApp}) {
-  var target = querySelector(attachTo);
+import 'multi_view_app.dart';
+import 'view_constraints.dart';
 
-  flutter ??= FlutterInterop();
-  flutter!.loader ??= FlutterLoader();
+Map<int, flt.Widget> _viewWidgets = {};
 
-  flutter!.loader!.didCreateEngineInitializer = allowInterop((engineInitializer) {
-    return engineInitializer
-        .initializeEngine(InitializeEngineOptions(hostElement: target!))
-        .then(allowInterop((runner) {
-      runner.runApp();
-    }));
+Future<FlutterApp> _flutterApp = Future(() {
+  final completer = Completer<FlutterApp>();
+
+  flutter!.loader!.didCreateEngineInitializer = (EngineInitializer engineInitializer) {
+    return Future(() async {
+      var engine = await engineInitializer
+          .initializeEngine(InitializeEngineOptions(
+            multiViewEnabled: true,
+            renderer: 'canvaskit',
+          ))
+          .toDart;
+      var app = await engine.runApp().toDart;
+      completer.complete(app);
+    }).toJS;
+  }.toJS;
+
+  ui_web.bootstrapEngine(runApp: () {
+    flt.runWidget(MultiViewApp(viewBuilder: (viewId) => _viewWidgets[viewId]));
   });
 
-  ui_web.bootstrapEngine(runApp: runApp);
+  return completer.future;
+});
+
+Future<void> preloadEngine() => _flutterApp;
+
+Future<int> addView(Element target, ViewConstraints? constraints, flt.Widget widget) async {
+  var app = await _flutterApp;
+  var id = app.addView(ViewOptions(hostElement: target, viewConstraints: constraints));
+  _viewWidgets[id] = widget;
+  return id;
 }
 
-/// Handle to the [require()] function from RequireJS
-@JS()
-external void Function(List<String>) require;
+Future<void> removeView(int viewId) async {
+  var app = await _flutterApp;
+  app.removeView(viewId);
+}
 
 /// Handle to the [_flutter] object defined by the 'flutter.js' script.
 @JS('_flutter')
@@ -36,59 +58,53 @@ external FlutterInterop? flutter;
 // Below are some js bindings to interact with the flutter loader script
 // from dart in a type-safe way.
 
-@JS()
-@anonymous
-class FlutterInterop {
-  external factory FlutterInterop();
+extension type FlutterInterop._(JSObject _) {
+  external FlutterInterop({FlutterLoader? loader});
 
   external FlutterLoader? loader;
 }
 
-@JS()
-@anonymous
-class FlutterLoader {
-  external factory FlutterLoader();
+extension type FlutterLoader._(JSObject _) {
+  external FlutterLoader({JSFunction? didCreateEngineInitializer});
 
-  external Promise<dynamic> loadEntrypoint(LoadEntrypointOptions options);
+  external JSPromise<JSAny?> load(LoadOptions options);
 
-  external OnEntrypointLoaded? didCreateEngineInitializer;
+  external JSFunction? didCreateEngineInitializer;
 }
 
-typedef OnEntrypointLoaded = Promise<void> Function(EngineInitializer engineInitializer);
-
-@JS()
-@anonymous
-class LoadEntrypointOptions {
-  external factory LoadEntrypointOptions({
+extension type LoadOptions._(JSObject _) {
+  external LoadOptions({
     String? entrypointUrl,
-    OnEntrypointLoaded? onEntrypointLoaded,
+    JSFunction? onEntrypointLoaded,
   });
 }
 
-@JS()
-class EngineInitializer {
-  external factory EngineInitializer();
+extension type EngineInitializer._(JSObject _) {
+  external EngineInitializer();
 
-  external Promise<AppRunner> initializeEngine(InitializeEngineOptions options);
+  external JSPromise<AppRunner> initializeEngine(InitializeEngineOptions options);
 }
 
-@JS()
-@anonymous
-class InitializeEngineOptions {
-  external factory InitializeEngineOptions({
+extension type InitializeEngineOptions._(JSObject _) {
+  external InitializeEngineOptions({
     Element? hostElement,
+    bool? multiViewEnabled,
+    String? renderer,
   });
 }
 
-@JS()
-class AppRunner {
-  external factory AppRunner();
+extension type AppRunner._(JSObject _) implements JSObject {
+  external AppRunner();
 
-  external Promise<void> runApp();
+  external JSPromise<FlutterApp> runApp();
 }
 
-@JS()
-class Promise<T> {
-  external Promise(void Function(void Function(T result) resolve, Function reject) executor);
-  external Promise then(void Function(T result) onFulfilled, [Function onRejected]);
+extension type ViewOptions._(JSObject _) {
+  external ViewOptions({Element? hostElement, JSAny? initialData, ViewConstraints? viewConstraints});
+}
+
+extension type FlutterApp._(JSObject _) implements JSObject {
+  external int addView(ViewOptions options);
+
+  external void removeView(int viewId);
 }

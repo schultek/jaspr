@@ -39,7 +39,7 @@ enum JustifyContent {
   normal('normal'),
   spaceBetween('space-between'),
   spaceAround('space-around'),
-  spaceRvenly('space-evenly'),
+  spaceEvenly('space-evenly'),
   stretch('stretch'),
   inherit('inherit'),
   initial('initial'),

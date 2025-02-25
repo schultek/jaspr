@@ -1,4 +1,7 @@
-import '../framework/framework.dart';
+import 'dart:convert';
+
+import '../../jaspr.dart';
+import 'marker_utils.dart';
 
 /// Main class for initializing the jaspr framework.
 ///
@@ -21,9 +24,10 @@ class Jaspr {
 /// Global options for configuring jaspr. DO NOT USE DIRECTLY.
 /// Use the generated [defaultJasprOptions] instead.
 class JasprOptions {
-  const JasprOptions({this.targets = const {}});
+  const JasprOptions({this.clients, this.styles});
 
-  final Map<Type, ClientTarget> targets;
+  final Map<Type, ClientTarget>? clients;
+  final List<StyleRule> Function()? styles;
 }
 
 /// The target configuration for a @client component. DO NOT USE DIRECTLY.
@@ -34,5 +38,8 @@ class ClientTarget<T extends Component> {
 
   const ClientTarget(this.name, {this.params});
 
-  Map<String, dynamic>? getParamsFor(T component) => params?.call(component);
+  String? dataFor(T component, {Object? Function(Object?)? encode}) {
+    if (params == null) return null;
+    return escapeMarkerText(jsonEncode(params!(component), toEncodable: encode));
+  }
 }

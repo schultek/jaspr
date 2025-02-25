@@ -3,36 +3,18 @@ part of 'framework.dart';
 /// Main app binding, controls the root component and global state
 mixin ComponentsBinding on AppBinding {
   /// Sets [app] as the new root of the component tree and performs an initial build
-  Future<void> attachRootComponent(Component app) async {
+  void attachRootComponent(Component app) async {
     var buildOwner = _rootElement?._owner ?? createRootBuildOwner();
-    await buildOwner.lockState(() async {
-      assert(() {
-        buildOwner._debugBuilding = true;
-        return true;
-      }());
-      buildOwner._isFirstBuild = true;
 
-      var element = _Root(child: app).createElement();
-      element._binding = this;
-      element._owner = buildOwner;
-      element._renderObject = createRootRenderObject();
+    var element = _Root(child: app).createElement();
+    element._binding = this;
+    element._owner = buildOwner;
+    element._renderObject = createRootRenderObject();
 
-      await buildOwner.performInitialBuild(element);
+    _rootElement = element;
 
-      _rootElement = element;
-
-      buildOwner._isFirstBuild = false;
-      assert(() {
-        buildOwner._debugBuilding = false;
-        return true;
-      }());
-
-      didAttachRootElement(element);
-    });
+    buildOwner.performInitialBuild(element, completeInitialFrame);
   }
-
-  @protected
-  void didAttachRootElement(Element element) {}
 
   RenderObject createRootRenderObject();
 

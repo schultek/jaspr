@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
 import '../route.dart';
-import 'platform_server.dart' if (dart.library.html) 'platform_web.dart';
+import 'platform_server.dart' if (dart.library.js_interop) 'platform_web.dart';
 
 /// Interface for platform router.
 abstract class PlatformRouter {
@@ -16,7 +16,7 @@ abstract class PlatformRouter {
 /// Will be implemented separately on browser and server
 abstract class HistoryManager {
   /// Initialize the history manager and setup any listeners to history changes
-  void init(AppBinding binding, {void Function(Object? state, {String? url})? onChangeState});
+  void init(BuildContext context, {void Function(Object? state, {String? url})? onChangeState});
 
   /// Push a new state to the history
   void push(String url, {String? title, Object? data});

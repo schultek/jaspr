@@ -35,7 +35,7 @@ class DomComponent extends ProxyComponent {
   final Map<String, EventCallback>? events;
 
   @override
-  Element createElement() => DomElement(this);
+  ProxyElement createElement() => DomElement(this);
 }
 
 class DomElement extends ProxyRenderObjectElement {
@@ -80,7 +80,7 @@ class DomElement extends ProxyRenderObjectElement {
         component.tag,
         component.id ?? wrappingComponent.id,
         _join(wrappingComponent.classes, component.classes, (a, b) => '$a $b'),
-        _join(wrappingComponent.styles?.styles, component.styles?.styles, (a, b) => {...a, ...b}),
+        _join(wrappingComponent.styles?.properties, component.styles?.properties, (a, b) => {...a, ...b}),
         _join(wrappingComponent.attributes, component.attributes, (a, b) => {...a, ...b}),
         _join(wrappingComponent.events, component.events, (a, b) => {...a, ...b}),
       );
@@ -92,7 +92,7 @@ class DomElement extends ProxyRenderObjectElement {
       component.tag,
       component.id,
       component.classes,
-      component.styles?.styles,
+      component.styles?.properties,
       component.attributes,
       component.events,
     );

@@ -9,7 +9,7 @@ import '../utils.dart';
 void main() {
   group('router', () {
     testBrowser('should push route', (tester) async {
-      await tester.pumpComponent(Router(routes: [
+      tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a'),
       ]));
@@ -33,7 +33,7 @@ void main() {
     });
 
     testBrowser('should replace route', (tester) async {
-      await tester.pumpComponent(Router(routes: [
+      tester.pumpComponent(Router(routes: [
         homeRoute(),
         route('/a'),
         route('/b'),

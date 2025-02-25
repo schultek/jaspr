@@ -77,7 +77,7 @@ extension on RenderingMode {
   Set<(String, Matcher)> get files => switch (this) {
         RenderingMode.static || RenderingMode.server => {
             ('lib/main.dart', fileExists),
-            ('lib/styles.dart', fileExists),
+            ('lib/jaspr_options.dart', fileExists),
           },
         RenderingMode.client => {
             ('web/index.html', fileExists),
@@ -104,9 +104,7 @@ enum HydrationMode {
         none => {
             ('web/main.dart', fileExists),
           },
-        auto => {
-            ('lib/jaspr_options.dart', fileExists),
-          }
+        auto => {}
       };
   Set<String> get resources => {};
   Set<(String, Matcher)> get outputs => switch (this) {
@@ -154,9 +152,11 @@ enum FlutterOption {
   Set<(String, Matcher)> get files => switch (this) {
         none => {},
         embedded => {
-            ('lib/components/flutter_counter.dart', fileExists),
-            ('lib/components/flutter_counter_fallback.dart', fileExists),
+            ('lib/components/embedded_counter.dart', fileExists),
+            ('lib/components/embedded_counter.imports.dart', fileExists),
+            ('lib/widgets/counter.dart', fileExists),
             ('web/manifest.json', fileExists),
+            ('web/flutter_bootstrap.js', fileExists),
           },
         pluginsOnly => {},
       };

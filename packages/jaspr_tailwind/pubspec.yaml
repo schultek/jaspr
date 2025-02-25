@@ -1,9 +1,9 @@
 name: jaspr_tailwind
 description: Tailwind integration for jaspr.
-version: 0.2.0
-homepage: https://github.com/schultek/jaspr
+version: 0.3.2
+homepage: https://jaspr.site
 issue_tracker: https://github.com/schultek/jaspr/issues
-documentation: https://docs.page/schultek/jaspr
+documentation: https://docs.jaspr.site/eco/tailwind
 funding:
   - https://github.com/sponsors/schultek
 

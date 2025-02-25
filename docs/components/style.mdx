@@ -1,0 +1,44 @@
+---
+title: Style
+description: Renders the provided StyleRules into css and wraps them with a <style> element.
+---
+
+---
+
+To define a global `<style>` element with a set of style rules use the `Style` (without *s*) component in combination with a set of `StyleRule`s (e.g. using the [`css()`](/utils/at_css) utility):
+
+```dart
+Style(styles: [
+  css('#content', [
+    css('&').styles(width: 100.percent, height: 100.percent),
+    css('a').styles(color: Colors.green),
+  ]),
+  css('.red-text').styles(color: Colors.red),
+]);
+```
+
+renders to:
+
+```html
+<style>
+  #content {
+    width: 100%;
+    height: 100%;
+  }
+
+  #content a {
+    color: green;
+  }
+
+  .red-text {
+    color: red;
+  }
+</style>
+```
+
+---
+
+Additionally read about:
+
+- The [`css()`](/utils/at_css) method and style rules.
+- The [`Styles`](/utils/styles) class and css properties.

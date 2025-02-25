@@ -86,7 +86,7 @@ abstract class BaseCommand extends Command<CommandResult?> {
     exit(exitCode);
   }
 
-  Future<String> getEntryPoint(String? input) async {
+  Future<String> getEntryPoint(String? input, [bool forceInsideLib = false]) async {
     var entryPoint = input ?? 'lib/main.dart';
 
     if (!File(entryPoint).absolute.existsSync()) {
@@ -96,7 +96,7 @@ abstract class BaseCommand extends Command<CommandResult?> {
       await shutdown();
     }
 
-    if (!entryPoint.startsWith('lib/')) {
+    if (forceInsideLib && !entryPoint.startsWith('lib/')) {
       logger.write("Entry point must be located inside lib/ folder, got '$entryPoint'.", level: Level.critical);
       await shutdown();
     }
@@ -166,6 +166,14 @@ abstract class BaseCommand extends Command<CommandResult?> {
     logger.complete(true);
 
     return exitCode;
+  }
+
+  void checkWasmSupport() {
+    var package = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    var version = config!.pubspecYaml['dev_dependencies']?[package];
+    if (version is! String || !version.startsWith(RegExp(r'\^?4.1.'))) {
+      usageException('Using "--experimental-wasm" requires $package 4.1.0 or newer.');
+    }
   }
 }
 

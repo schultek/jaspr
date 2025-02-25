@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'dart:html' as html;
+import 'dart:js_interop';
 
 import 'package:jaspr/browser.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
+import 'package:universal_web/web.dart' as web;
 
 import '../binding.dart';
 import '../finders.dart';
@@ -20,16 +21,19 @@ void testBrowser(
   test(
     description,
     () async {
-      if (html.window.location.pathname != location) {
-        html.window.history.replaceState(null, 'Test', location);
+      if (web.window.location.pathname != location) {
+        web.window.history.replaceState(null, 'Test', location);
       }
 
-      var binding = TestBrowserComponentsBinding();
+      var binding = BrowserAppBinding();
       var tester = BrowserTester._(binding);
 
-      return binding.runTest(() async {
+      await binding.runTest(() async {
         await callback(tester);
       });
+
+      // Clear all nodes
+      web.document.body?.replaceChildren([].jsify()!);
     },
     skip: skip,
     timeout: timeout,
@@ -41,31 +45,60 @@ void testBrowser(
 class BrowserTester {
   BrowserTester._(this.binding);
 
-  final TestBrowserComponentsBinding binding;
+  final BrowserAppBinding binding;
 
-  Future<void> pumpComponent(Component component, {Map<String, dynamic>? initialSyncState, String attachTo = 'body'}) {
-    binding._initialSyncState = initialSyncState;
-    return binding.attachRootComponent(component, attachTo: attachTo);
-  }
-
-  void stubFetchState(Map<String, dynamic> Function(String url) onFetchState) {
-    binding._onFetchState = onFetchState;
+  void pumpComponent(Component component, {String attachTo = 'body'}) {
+    binding.attachRootComponent(component, attachTo: attachTo);
   }
 
   Future<void> click(Finder finder, {bool pump = true}) async {
-    dispatchEvent(finder, 'click', null);
+    await dispatchEvent(finder, web.MouseEvent('click'), pump: pump);
+  }
+
+  Future<void> input(Finder finder, {bool? checked, double? valueAsNumber, String? value, bool pump = true}) async {
+    await _dispatchInputEvent(finder, 'input',
+        checked: checked, valueAsNumber: valueAsNumber, value: value, pump: pump);
+  }
+
+  Future<void> change(Finder finder, {bool? checked, double? valueAsNumber, String? value, bool pump = true}) async {
+    await _dispatchInputEvent(finder, 'change',
+        checked: checked, valueAsNumber: valueAsNumber, value: value, pump: pump);
+  }
+
+  Future<void> _dispatchInputEvent(
+    Finder finder,
+    String type, {
+    bool? checked,
+    double? valueAsNumber,
+    String? value,
+    bool pump = true,
+  }) async {
+    dispatchEvent(finder, web.InputEvent(type), before: (e) {
+      if (checked != null) (e as web.HTMLInputElement).checked = checked;
+      if (valueAsNumber != null) (e as web.HTMLInputElement).valueAsNumber = valueAsNumber;
+      if (value != null) (e as web.HTMLInputElement).value = value;
+    }, pump: pump);
+  }
+
+  Future<void> dispatchEvent(Finder finder, web.Event event,
+      {void Function(web.Element)? before, bool pump = true}) async {
+    var element = _findDomElement(finder);
+
+    var source = (element.renderObject as DomRenderObject).node;
+    if (source is web.Element) {
+      before?.call(source);
+      source.dispatchEvent(event);
+    }
+
     if (pump) {
       await pumpEventQueue();
     }
   }
 
-  void dispatchEvent(Finder finder, String event, dynamic data) {
+  @optionalTypeArgs
+  T? findNode<T extends web.Node>(Finder finder) {
     var element = _findDomElement(finder);
-
-    var source = (element.renderObject as DomRenderObject).node;
-    if (source is html.Element) {
-      source.dispatchEvent(html.MouseEvent('click'));
-    }
+    return (element.renderObject as DomRenderObject).node as T?;
   }
 
   DomElement _findDomElement(Finder finder) {
@@ -101,20 +134,5 @@ class BrowserTester {
     }
 
     return foundElement!;
-  }
-}
-
-class TestBrowserComponentsBinding extends BrowserAppBinding {
-  Map<String, dynamic>? _initialSyncState;
-  Map<String, dynamic> Function(String url)? _onFetchState;
-
-  @override
-  Map<String, dynamic>? loadSyncState() {
-    return _initialSyncState;
-  }
-
-  @override
-  Future<Map<String, dynamic>> fetchState(String url) async {
-    return _onFetchState?.call(url) ?? {};
   }
 }

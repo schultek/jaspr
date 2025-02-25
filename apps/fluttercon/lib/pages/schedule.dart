@@ -1,7 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
 import '../components/pages_nav.dart';
-import '../components/session_card.dart';
 import '../components/session_list.dart';
 import '../models/session.dart';
 
@@ -13,7 +12,7 @@ class SchedulePage extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield Head(meta: {
+    yield Document.head(meta: {
       'description': "Schedule of all sessions on day $day.",
       'keywords': "Fluttercon, Sessions, Jaspr, Dart, Flutter",
       'og:title': "Fluttercon Berlin 2024 - Schedule for Day $day",
@@ -35,10 +34,12 @@ class SchedulePage extends StatelessComponent {
     ]);
   }
 
-  static get styles => [
-        ...PagesNav.styles,
-        ...SessionList.styles,
-        ...SessionCard.styles,
-        css('footer').box(margin: EdgeInsets.all(40.px)).text(align: TextAlign.center, fontStyle: FontStyle.italic),
-      ];
+  @css
+  static final styles = [
+    css('footer').styles(
+      margin: Margin.all(40.px),
+      textAlign: TextAlign.center,
+      fontStyle: FontStyle.italic,
+    ),
+  ];
 }

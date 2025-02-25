@@ -1,0 +1,29 @@
+name: dart_quotes_server
+description: Collection of Dart quotes.
+version: 0.1.5
+publish_to: none
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  dart_quotes_client:
+    path: ./client
+  jaspr: ^0.18.0
+  jaspr_router: ^0.6.3
+  jaspr_serverpod: ^0.5.3
+  serverpod: 2.3.0
+  serverpod_auth_google_flutter: 2.3.0
+  serverpod_auth_server: 2.3.0
+  serverpod_auth_shared_flutter: 2.3.0
+  serverpod_serialization: 2.3.0
+
+dev_dependencies:
+  build_runner: ^2.4.0
+  jaspr_web_compilers: ^4.0.10
+  jaspr_builder: ^0.16.3
+  lints: ^4.0.0
+
+jaspr:
+  mode: server
+  dev-command: dart bin/main.dart --apply-migrations

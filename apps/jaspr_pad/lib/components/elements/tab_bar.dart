@@ -44,7 +44,7 @@ class TabBarState extends State<TabBar> {
       child: div(
         id: component.id,
         classes: 'mdc-tab-bar',
-        styles: Styles.raw({'min-width': '1px'}),
+        styles: Styles(minWidth: 1.px),
         attributes: {'role': 'tablist'},
         [
           div(classes: 'mdc-tab-scroller', [
@@ -83,16 +83,16 @@ class ButtonTab extends Tab {
         'role': 'tab',
         'tabindex': '0',
       },
-      styles: Styles.box(padding: EdgeInsets.symmetric(vertical: Unit.zero, horizontal: 16.px)),
+      styles: Styles(padding: Padding.symmetric(vertical: Unit.zero, horizontal: 16.px)),
       [
         span(classes: 'mdc-tab__content', [
           span(
             classes: 'mdc-tab__text-label',
-            styles: Styles.raw({'display': 'inline-flex', 'align-items': 'center'}),
+            styles: Styles(display: Display.inlineFlex, alignItems: AlignItems.center),
             [
               i(
                 classes: 'material-icons mdc-tab__icon',
-                styles: Styles.raw({'font-size': '20px', if (this.label.isNotEmpty) 'margin-right': '4px'}),
+                styles: Styles(fontSize: 20.px, margin: Margin.only(right: this.label.isNotEmpty ? 4.px : null)),
                 [text(icon)],
               ),
               text(this.label),

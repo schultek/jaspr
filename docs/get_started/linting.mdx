@@ -1,0 +1,245 @@
+---
+title: Linting
+description: Jaspr comes with its own set of lint rules and code assists.
+---
+
+Jaspr has its own linting and analyzer package called `jaspr_lints`. This comes pre-configured
+with every new project and enables the following set of lint rules and code assists:
+
+## Lint Rules
+
+<Card>
+    <Property name="prefer_html_methods" type="Fix available">
+        Prefer html methods like `div(...)` over `DomComponent(tag: 'div', ...)`.
+
+        **BAD:**
+        ```dart
+        yield DomComponent(
+          tag: 'div',
+          children: [
+            DomComponent(
+              tag: 'p',
+              child: Text('Hello World'),
+            ),
+          ],
+        );
+        ```
+
+        **GOOD:**
+        ```dart
+        yield div([
+          p([text('Hello World')]),
+        ]);
+        ```
+    </Property>
+</Card>
+
+<Card>
+    <Property name="sort_children_properties_last" type="Fix available">
+        Sort children properties last in html component methods.
+
+        This improves readability and best represents actual html.
+
+        **BAD:**
+        ```dart
+        yield div([
+          p([text('Hello World')], classes: 'text-red'),
+        ], id: 'main');
+        ```
+
+        **GOOD:**
+        ```dart
+        yield div(id: 'main', [
+          p(classes: 'text-red', [text('Hello World')]),
+        ]);
+        ```
+    </Property>
+</Card>
+
+<Card>
+    <Property name="styles_ordering" type="Fix available">
+        Sort styles properties.
+
+        This improves readability and consistency across style rules.
+
+        **BAD:**
+        ```dart
+        @css
+        static List<StyleRule> styles = [
+          css('button').styles(
+            color: Colors.black, // [!code --]
+            padding: Padding.all(8.px), // [!code --]
+          ),
+          css('input').styles(
+            padding: Padding.all(16.px),
+            color: Colors.black,
+          ),
+        ];
+        ```
+
+        **GOOD:**
+        ```dart
+        @css
+        static List<StyleRule> styles = [
+          css('button').styles(
+            padding: Padding.all(8.px), // [!code ++]
+            color: Colors.black, // [!code ++]
+          ),
+          css('input').styles(
+            padding: Padding.all(16.px),
+            color: Colors.black,
+          ),
+        ];
+        ```
+    </Property>
+</Card>
+
+## Code Assists
+
+<Card>
+    <Property name="Create StatelessComponent" type="Top level">
+        Creates a new `StatelessComponent` class.
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Create StatefulComponent" type="Top level">
+        Creates a new `StatefulComponent` and respective `State` class.
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Create InheritedComponent" type="Top level">
+        Creates a new `InheritedComponent` class.
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Convert to StatefulComponent" type="Class level">
+        Converts a custom `StatelessComponent` into a `StatefulComponent` and respective `State` class.
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Convert to AsyncStatelessComponent" type="Class level">
+        Converts a custom `StatelessComponent` into an `AsyncStatelessComponent`.
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Remove this component" type="Component tree level">
+        Surgically removes the selected component from the component tree, making its
+        children the new direct children of its parent.
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Wrap with html..." type="Component tree level">
+        Wraps the selected component with a new html component.
+
+        ```dart
+        yield div([
+          p([ // [!code ++]
+            span([text('Hello World')]),
+          ]), // [!code ++]
+        ]);
+        ```
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Wrap with component..." type="Component tree level">
+        Wraps the selected component with a new component.
+
+        ```dart
+        yield div([
+          MyComponent( // [!code ++]
+            child: span([text('Hello World')]),
+          ), // [!code ++]
+        ]);
+        ```
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Wrap with Builder" type="Component tree level">
+        Wraps the selected component with a `Builder`.
+
+        ```dart
+        yield div([
+          Builder(builder: (context) sync* { // [!code ++]
+            yield span([text('Hello World')]);
+          }), // [!code ++]
+        ]);
+        ```
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Extract component" type="Component tree level">
+        Extracts the selected component plus subtree into a new `StatelessComponent`.
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Add styles" type="Component tree level">
+        Adds new css styles to the selected component.
+
+        This will either add a new class name:
+        ```dart
+        yield div(
+          classes: '[...]' // [!code ++]
+          [],
+        );
+
+        /* ... */
+
+        @css // [!code ++]
+        static List<StyleRule> styles = [ // [!code ++]
+          css('.[...]').box(...), // [!code ++]
+        ]; // [!code ++]
+        ```
+
+        Or use an existing id or class name:
+        ```dart
+        yield div(id: 'content', []);
+
+        /* ... */
+
+        @css // [!code ++]
+        static List<StyleRule> styles = [ // [!code ++]
+          css('#content').box(...), // [!code ++]
+        ]; // [!code ++]
+        ```
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Convert to web-only import" type="Directive level">
+        Converts any import to a web-only import using the [@Import](/utils/at_import) annotation.
+
+        ```dart
+        import 'dart:html'; // [!code --]
+
+        @Import.onWeb('dart:html', show: [#window]) // [!code ++]
+        import 'filename.imports.dart'; // [!code ++]
+        ```
+
+        This will auto-detect all used members from the import and add them to the `show` parameter.
+    </Property>
+</Card>
+
+<Card>
+    <Property name="Convert to server-only import">
+        Converts any import to a server-only import using the [@Import](/utils/at_import) annotation.
+
+        ```dart
+        import 'dart:io'; // [!code --]
+
+        @Import.onServer('dart:io', show: [#HttpRequest]) // [!code ++]
+        import 'filename.imports.dart'; // [!code ++]
+        ```
+
+        This will auto-detect all used members from the import and add them to the `show` parameter.
+    </Property>
+</Card>

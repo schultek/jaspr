@@ -1,3 +1,31 @@
+## 0.3.19
+
+- `jaspr` upgraded to `0.18.0`
+
+## 0.3.18
+
+- Update logo and website links.
+
+## 0.3.17
+
+- `jaspr` upgraded to `0.17.0`
+
+## 0.3.16
+
+- Upgrade `riverpod` to `^2.6.0`
+
+## 0.3.15
+
+- `jaspr` upgraded to `0.16.0`
+
+## 0.3.14
+
+- `jaspr` upgraded to `0.15.0`
+
+## 0.3.13
+
+- `jaspr` upgraded to `0.14.0`
+
 ## 0.3.12
 
 - `jaspr` upgraded to `0.13.0`

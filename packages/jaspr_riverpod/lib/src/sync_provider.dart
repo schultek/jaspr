@@ -24,7 +24,7 @@ ProviderElementProxy<AsyncValue<T>, Future<T>> _future<T>(
   );
 }
 
-/// {@template jaspr_riverpod.syncprovider}
+/// {@template jaspr_riverpod.sync_provider}
 /// A provider that preloads a value on the server and syncs it to the client.
 ///
 /// This provider takes an additional [id] to uniquely identify this provider between the

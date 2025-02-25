@@ -36,8 +36,9 @@ class SessionMapper extends ClassMapperBase<Session> {
   static const Field<Session, List<_t$_R0<String>>> _f$speakers = Field('speakers', _$speakers);
   static String _$room(Session v) => v.room;
   static const Field<Session, String> _f$room = Field('room', _$room);
-  static List<Category> _$categories(Session v) => v.categories;
-  static const Field<Session, List<Category>> _f$categories = Field('categories', _$categories);
+  static List<_t$_R1<List<_t$_R0<String>>, String>> _$categories(Session v) => v.categories;
+  static const Field<Session, List<_t$_R1<List<_t$_R0<String>>, String>>> _f$categories =
+      Field('categories', _$categories);
 
   @override
   final MappableFields<Session> fields = const {
@@ -108,7 +109,8 @@ extension SessionValueCopy<$R, $Out> on ObjectCopyWith<$R, Session, $Out> {
 
 abstract class SessionCopyWith<$R, $In extends Session, $Out> implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, _t$_R0<String>, ObjectCopyWith<$R, _t$_R0<String>, _t$_R0<String>>> get speakers;
-  ListCopyWith<$R, Category, ObjectCopyWith<$R, Category, Category>> get categories;
+  ListCopyWith<$R, _t$_R1<List<_t$_R0<String>>, String>,
+      ObjectCopyWith<$R, _t$_R1<List<_t$_R0<String>>, String>, _t$_R1<List<_t$_R0<String>>, String>>> get categories;
   $R call(
       {String? title,
       String? id,
@@ -117,7 +119,7 @@ abstract class SessionCopyWith<$R, $In extends Session, $Out> implements ClassCo
       DateTime? endsAt,
       List<_t$_R0<String>>? speakers,
       String? room,
-      List<Category>? categories});
+      List<_t$_R1<List<_t$_R0<String>>, String>>? categories});
   SessionCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -131,8 +133,10 @@ class _SessionCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Session, $Out
   ListCopyWith<$R, _t$_R0<String>, ObjectCopyWith<$R, _t$_R0<String>, _t$_R0<String>>> get speakers =>
       ListCopyWith($value.speakers, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(speakers: v));
   @override
-  ListCopyWith<$R, Category, ObjectCopyWith<$R, Category, Category>> get categories =>
-      ListCopyWith($value.categories, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(categories: v));
+  ListCopyWith<$R, _t$_R1<List<_t$_R0<String>>, String>,
+          ObjectCopyWith<$R, _t$_R1<List<_t$_R0<String>>, String>, _t$_R1<List<_t$_R0<String>>, String>>>
+      get categories =>
+          ListCopyWith($value.categories, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(categories: v));
   @override
   $R call(
           {String? title,
@@ -142,7 +146,7 @@ class _SessionCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Session, $Out
           DateTime? endsAt,
           List<_t$_R0<String>>? speakers,
           String? room,
-          List<Category>? categories}) =>
+          List<_t$_R1<List<_t$_R0<String>>, String>>? categories}) =>
       $apply(FieldCopyWithData({
         if (title != null) #title: title,
         if (id != null) #id: id,
