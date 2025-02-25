@@ -31,7 +31,7 @@ typedef ElementFactory = Component Function(web.Element);
 
 extension on ElementFactories {
   Component buildNode(web.Node node) {
-    if (node is web.Element && containsKey(node.tagName.toLowerCase())) {
+    if (node is web.Element && node.instanceOfString("Element") && containsKey(node.tagName.toLowerCase())) {
       return this[node.tagName.toLowerCase()]!(node);
     }
     return RawNode.withKey(node, this);

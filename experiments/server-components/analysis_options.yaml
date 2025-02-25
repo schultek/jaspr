@@ -13,6 +13,10 @@
 
 include: package:lints/recommended.yaml
 
+analyzer: 
+  plugins: 
+    - custom_lint
+
 # Uncomment the following section to specify additional rules.
 
 # linter:

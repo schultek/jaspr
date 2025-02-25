@@ -47,7 +47,7 @@ class ConfigParams {
   T get<T>(String key) {
     if (T == Component) {
       var sId = _params[key];
-      assert(sId is String && sId.startsWith(r's$'));
+      assert(sId is String && sId.startsWith('s$componentMarkerPrefix'));
       var s = serverComponents[sId.substring(2)];
       if (s != null) {
         return s.build() as T;
@@ -130,8 +130,6 @@ class ServerComponentAnchor extends ComponentAnchor {
 
     clientAnchors = _findAnchors(clientByName: clientByName, root: fragment, runEagerly: false);
 
-    web.console.log(fragment);
-
     for (var client in clientAnchors) {
       var name = client.name.toLowerCase().replaceAll('/', '_');
       var n = 1;
@@ -149,17 +147,16 @@ class ServerComponentAnchor extends ComponentAnchor {
         return child!;
       };
 
+      final parent = client.startNode.parentNode;
+
       while (client.startNode.nextSibling != null && client.startNode.nextSibling != client.endNode) {
         final next = client.startNode.nextSibling!;
-        next.parentNode?.removeChild(next);
+        parent?.removeChild(next);
       }
 
-
-      client.startNode.parentNode?.replaceChild(web.document.createElement('${name}_$n'), client.startNode);
-      client.endNode.parentNode?.removeChild(client.endNode);
+      parent?.removeChild(client.endNode);
+      parent?.replaceChild(web.document.createElement('${name}_$n'), client.startNode);
     }
-
-    web.console.log(fragment);
   }
 
   Component build() {
@@ -170,7 +167,7 @@ class ServerComponentAnchor extends ComponentAnchor {
 }
 
 List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, web.Node? root, bool runEagerly = true}) {
-  var iterator = web.document.createNodeIterator(web.document, 128 /* NodeFilter.SHOW_COMMENT */);
+  var iterator = web.document.createNodeIterator(root ?? web.document, 128 /* NodeFilter.SHOW_COMMENT */);
 
   List<ComponentAnchor> anchors = [];
   List<ClientComponentAnchor> clientAnchors = [];

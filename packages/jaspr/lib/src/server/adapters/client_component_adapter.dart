@@ -41,9 +41,10 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
       return;
     }
 
-    range.start.insertNext(ChildNodeData(
-        MarkupRenderObject()..updateText('<!--$componentMarkerPrefix${target.name}${data != null ? ' data=$data' : ''}-->', true)));
-    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!--/$componentMarkerPrefix${target.name}-->', true)));
+    range.start.insertNext(ChildNodeData(MarkupRenderObject()
+      ..updateText('<!--$componentMarkerPrefix${target.name}${data != null ? ' data=$data' : ''}-->', true)));
+    range.end.insertPrev(
+        ChildNodeData(MarkupRenderObject()..updateText('<!--/$componentMarkerPrefix${target.name}-->', true)));
   }
 
   String? getData() {
@@ -58,7 +59,7 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 
   String getDataForServerComponent(Component component, Element parent) {
     if (adapter.serverComponents[component] case var s?) {
-      return 's\$$s';
+      return 's$componentMarkerPrefix$s';
     }
 
     Element? element;
@@ -77,8 +78,10 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
     findElementFromContext(parent);
 
     if (element == null) {
+      print("Warning: Component parameter not used in build method. This will result in empty html on the client.");
+      
       adapter.serverComponents[component] = 0;
-      return '';
+      return 's${componentMarkerPrefix}_';
     }
 
     var s = adapter.serverComponents[component] = adapter.serverElementNum++;
@@ -86,6 +89,6 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 
     binding.addRenderAdapter(ServerComponentAdapter(s, element!));
 
-    return 's\$$s';
+    return 's$componentMarkerPrefix$s';
   }
 }

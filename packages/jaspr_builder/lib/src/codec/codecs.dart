@@ -82,7 +82,7 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
   @override
   String? visitDartType(DartType type, String argument) {
     if (!type.isDartPrimitive) {
-      throw UnsupportedError('Unsupported parameter type: Expected primitive type, found ${type.getDisplayString()}');
+      throw UnsupportedError('Unsupported parameter type: Expected primitive type or Component, found ${type.getDisplayString()}');
     }
     return argument;
   }
@@ -124,6 +124,8 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
       } else {
         return '[[${codec.import}]].${codec.extension ?? codec.name}.${codec.decoder}($argument)';
       }
+    } else if (type.element.name == 'Component' && type.element.library.identifier == 'package:jaspr/src/framework/framework.dart') {
+      return argument;
     }
     return super.visitInterfaceType(type, argument);
   }
