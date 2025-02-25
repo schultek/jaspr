@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fix 'add_styles' assist.
+
 ## 0.3.0
 
 - Added 'styles_ordering' lint and fix.
