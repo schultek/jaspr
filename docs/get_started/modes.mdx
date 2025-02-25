@@ -29,18 +29,18 @@ Each mode is explained in detail below. The following table gives a quick overvi
 ## Static Mode
 
 With this mode, Jaspr will generate a fully static site when building your project that you can host at any common website hosting service.
-You can write server-side code to pre-render components and pages at built time, outputting clean html and css to deploy anywhere.
+You can write server-side code to pre-render components and pages at built time, outputting clean HTML and CSS to deploy anywhere.
 Additionally, you can set up hydration on the client in order to make your site interactive.
 
 <Info>
-Even if you want to build a Single Page Application this can be a good choice over 'client' mode since you don't need a `index.html` or `styles.css` and instead can write everything in Dart and let Jaspr do the rendering to actual html/css files during build.
+Even if you want to build a Single Page Application this can be a good choice over 'client' mode since you don't need a `index.html` or `styles.css` and instead can write everything in Dart and let Jaspr do the rendering to actual HTML/CSS files during build.
 </Info>
 
 ### Generating Pages
 
 Static-Site Generation (SSG) describes the process of generating all your website routes at build time. Different to SSR, this doesn't require a running server that generates your website on each request. Instead, `jaspr build` will generate all the routes for your website and outputs only static files (`.html`, etc.) that can be deployed to any static hosting provider.
 
-Say you have a project in `static` mode with the routes `/`, `/about` and `/contact`. Then running `jaspr build` will output a `index.html`, `about/index.html` and `contact/index.html` file.
+Say you have a project in `static` mode with the routes `/`, `/about` and `/contact`. Then running `jaspr build` will output the `index.html`, `about/index.html` and `contact/index.html` files.
 
 To make sure all pages are generated for your site, you need to tell Jaspr about the routes of your website.
 
@@ -65,7 +65,7 @@ Router(
 You may want to generate dynamic routes based on some data for your application.
 
 Take for example a typical blog site, where each blog post has its own route, e.g. `/posts/{postId}`, and you want
-to render these as separate pages when running `jaspr build`. Normally you could use routes with path parameters for this,
+to render these as separate pages when running `jaspr build`. Normally, you could use routes with path parameters for this,
 however for static-site generation, path parameters are not supported, since all routes need to be resolvable when initializing the router.
 
 Instead, you need to add a route for each page you want generated:
@@ -100,7 +100,7 @@ The method should be called during the initial build of your app, so putting it 
 ## Server Mode
 
 In this mode Jaspr runs and builds a server application that pre-renders your components for each incoming request.
-You can use either Jasprs inbuilt webserver or choose to integrate it into your favorite Dart backend framework.
+You can use either Jaspr's inbuilt webserver or choose to integrate it into your favorite Dart backend framework.
 Additionally, you can set up hydration on the client in order to make your site interactive.
 
 To deploy your site, you either need a service that supports Dart deployments or otherwise bundle your application with e.g. Docker. See the [Deploying](/concepts/deploying) guide for more information.
