@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.3.1
 
 - Fix 'add_styles' assist.
 
