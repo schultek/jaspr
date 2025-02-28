@@ -7,3 +7,14 @@ abstract class PageBuilder {
 
   Future<Component> buildPage(Page page);
 }
+
+extension PageBuilderExtension on Iterable<PageBuilder> {
+  Future<Component> buildPage(Page page) {
+    final builder = where((builder) => builder.suffix.any((s) => page.path.endsWith(s))).firstOrNull;
+    if (builder == null) {
+      throw Exception('No suffix builder found for path: $path');
+    }
+
+    return builder.buildPage(page);
+  }
+}

@@ -31,22 +31,21 @@ class MarkdownPageBuilder implements PageBuilder {
 
   @override
   Future<Component> buildPage(Page page) async {
-    
-      if (enableFrontmatter) {
-        page.parseFrontmatter();
-      }
-      if (enableTemplating) {
-        await page.renderTemplate();
-      }
+    if (enableFrontmatter) {
+      page.parseFrontmatter();
+    }
+    if (enableTemplating) {
+      await page.renderTemplate();
+    }
 
-      final markdownDocument = documentBuilder(page);
-      final nodes = markdownDocument.parse(page.content);
+    final markdownDocument = documentBuilder(page);
+    final nodes = markdownDocument.parse(page.content);
 
-      Component child = Fragment(
-        children: _buildMarkdown(nodes, page.config.components).toList(),
-      );
+    Component child = Fragment(
+      children: _buildMarkdown(nodes, page.config.components).toList(),
+    );
 
-      return page.buildLayout(child);
+    return page.buildLayout(child);
   }
 
   Iterable<Component> _buildMarkdown(Iterable<md.Node> nodes, ComponentsConfig? components) sync* {

@@ -5,16 +5,17 @@ import 'package:fbh_front_matter/fbh_front_matter.dart' as fm;
 import 'package:jaspr/jaspr.dart';
 
 import '../jaspr_content.dart';
+import 'pages_repository.dart';
 
 class Page {
-  Page(this.path, this.content, this.data, this.config, this._cache);
+  Page(this.path, this.content, this.data, this.config, this._repository);
 
   final String path;
   String content;
   Map<String, dynamic> data;
   final PageConfig config;
 
-  final PagesCache _cache;
+  final PagesRepository _repository;
 
   void apply({String? content, Map<String, dynamic>? data, bool mergeData = true}) {
     this.content = content ?? this.content;
@@ -30,13 +31,12 @@ class Page {
   }
 
   File access(Uri path) {
-    (_cache.dependentPages[path.toFilePath()] ??= {}).add(this.path);
-    return File.fromUri(path);
+    return _repository.access(path, this);
   }
 }
 
 class PageConfig {
-  PageConfig({this.templateEngine, this.components, this.layouts});
+  const PageConfig({this.templateEngine, this.components, this.layouts});
 
   final TemplateEngine? templateEngine;
   final ComponentsConfig? components;
