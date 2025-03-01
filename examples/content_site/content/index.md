@@ -4,6 +4,8 @@ Test home
 
 ---
 
+## Markdown Text
+
 1. Markdown is coolss
 
 <Counter/>
@@ -16,7 +18,11 @@ Test home
   > Test
 </Badge>
 
+### Subheading
+
 <Badge>Hello **TEST**</Badge>
+
+## Button
 
 [Click me](/about)
 

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:mustache_template/mustache_template.dart';
 import '../page.dart';
 import 'template_engine.dart';
@@ -21,7 +19,8 @@ class MustacheTemplateEngine implements TemplateEngine {
 
   @override
   Future<void> render(Page page) async {
-    page.apply(content: _buildTemplate(page, page.content).renderString(prepareValues(page)));
+    final template = _buildTemplate(page, page.content);
+    page.apply(content: template.renderString(prepareValues(page)));
   }
 
   Template _buildTemplate(Page page, String content) {

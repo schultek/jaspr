@@ -4,8 +4,11 @@ import 'dart:io';
 import 'package:fbh_front_matter/fbh_front_matter.dart' as fm;
 import 'package:jaspr/jaspr.dart';
 
-import '../jaspr_content.dart';
-import 'pages_repository.dart';
+import 'page_extension/page_extension.dart';
+import 'page_layout/page_layout.dart';
+import 'page_parser/page_parser.dart';
+import 'pages_loader/pages_loader.dart';
+import 'template_engine/template_engine.dart';
 
 class Page {
   Page(this.path, this.content, this.data, this.config, this._repository);
@@ -15,7 +18,7 @@ class Page {
   Map<String, dynamic> data;
   final PageConfig config;
 
-  final PagesRepository _repository;
+  final PagesLoader _repository;
 
   void apply({String? content, Map<String, dynamic>? data, bool mergeData = true}) {
     this.content = content ?? this.content;
@@ -36,17 +39,58 @@ class Page {
 }
 
 class PageConfig {
-  const PageConfig({this.templateEngine, this.components, this.layouts});
+  const PageConfig({
+    this.enableFrontmatter = true,
+    this.templateEngine,
+    this.parsers = const [],
+    this.extensions = const [],
+    this.layouts = const [],
+    this.pageBuilder = defaultPageBuilder,
+  });
 
+  final bool enableFrontmatter;
   final TemplateEngine? templateEngine;
-  final ComponentsConfig? components;
-  final LayoutsConfig? layouts;
+  final List<PageParser> parsers;
+  final List<PageExtension> extensions;
+  final List<PageLayout> layouts;
+  final PageBuilder pageBuilder;
+
+  static ConfigResolver resolve({
+    bool enableFrontmatter = true,
+    TemplateEngine? templateEngine,
+    List<PageParser> parsers = const [],
+    List<PageExtension> extensions = const [],
+    List<PageLayout> layouts = const [],
+    PageBuilder pageBuilder = defaultPageBuilder,
+  }) {
+    final config = PageConfig(
+      enableFrontmatter: enableFrontmatter,
+      templateEngine: templateEngine,
+      parsers: parsers,
+      extensions: extensions,
+      layouts: layouts,
+      pageBuilder: pageBuilder,
+    );
+    return (_) => config;
+  }
+
+  static Future<Component> defaultPageBuilder(Page page) async {
+    page.parseFrontmatter();
+    await page.renderTemplate();
+    var nodes = page.parseNodes();
+    var component = page.buildComponent(nodes);
+    return page.buildLayout(component);
+  }
 }
+
+typedef PageBuilder = Future<Component> Function(Page);
 
 extension PageHandlers on Page {
   void parseFrontmatter() {
-    final document = fm.parse(content);
-    apply(content: document.content, data: document.data.cast());
+    if (config.enableFrontmatter) {
+      final document = fm.parse(content);
+      apply(content: document.content, data: document.data.cast());
+    }
   }
 
   FutureOr<void> renderTemplate() {
@@ -55,11 +99,21 @@ extension PageHandlers on Page {
     }
   }
 
-  Component buildLayout(Component child) {
-    if (config.layouts != null) {
-      return config.layouts!.buildLayout(this, child);
+  List<Node> parseNodes() {
+    return config.parsers.parsePage(this);
+  }
+
+  Component buildComponent(List<Node> nodes) {
+    for (final extension in config.extensions) {
+      nodes = extension.processNodes(nodes, this);
     }
-    return child;
+    return nodes.build();
+  }
+
+  Component buildLayout(Component child) {
+    final layout = config.layouts.where((l) => l.name == data['layout']).firstOrNull ?? config.layouts.firstOrNull;
+    if (layout == null) return child;
+    return layout.buildLayout(this, child);
   }
 }
 

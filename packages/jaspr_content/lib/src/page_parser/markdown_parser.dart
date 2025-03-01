@@ -1,10 +1,9 @@
 import 'package:jaspr/server.dart' hide ComponentBuilder;
 import 'package:markdown/markdown.dart' as md;
 
-import '../components_config.dart';
 import '../page.dart';
 
-import 'page_builder.dart';
+import 'page_parser.dart';
 
 md.Document _defaultDocumentBuilder(Page _) {
   return md.Document(
@@ -15,65 +14,49 @@ md.Document _defaultDocumentBuilder(Page _) {
 
 typedef DocumentBuilder = md.Document Function(Page page);
 
-class MarkdownPageBuilder implements PageBuilder {
-  MarkdownPageBuilder({
-    this.enableFrontmatter = true,
-    this.enableTemplating = true,
+class MarkdownParser implements PageParser {
+  MarkdownParser({
     this.documentBuilder = _defaultDocumentBuilder,
   });
 
-  final bool enableFrontmatter;
-  final bool enableTemplating;
   final DocumentBuilder documentBuilder;
 
   @override
-  Set<String> get suffix => {'.md'};
+  Set<String> get suffix => {'.md', '.mdx'};
 
   @override
-  Future<Component> buildPage(Page page) async {
-    if (enableFrontmatter) {
-      page.parseFrontmatter();
-    }
-    if (enableTemplating) {
-      await page.renderTemplate();
-    }
-
+  List<Node> parsePage(Page page) {
     final markdownDocument = documentBuilder(page);
-    final nodes = markdownDocument.parse(page.content);
+    final markdownNodes = markdownDocument.parse(page.content);
 
-    Component child = Fragment(
-      children: _buildMarkdown(nodes, page.config.components).toList(),
-    );
-
-    return page.buildLayout(child);
+    return _buildNodes(markdownNodes);
   }
 
-  Iterable<Component> _buildMarkdown(Iterable<md.Node> nodes, ComponentsConfig? components) sync* {
-    for (final node in nodes) {
+  List<Node> _buildNodes(Iterable<md.Node> markdownNodes) {
+    final nodes = <Node>[];
+    for (final node in markdownNodes) {
       if (node is md.Text) {
-        yield raw(node.text);
+        nodes.add(TextNode(node.text));
       } else if (node is md.Element) {
-        final children = _buildMarkdown(node.children ?? [], components).toList();
-        var child = components?.buildComponent(node.tag, node.attributes, Fragment(children: children));
-        yield child ??
-            DomComponent(
-              tag: node.tag,
-              id: node.generatedId,
-              attributes: node.attributes,
-              children: children,
-            );
+        final children = _buildNodes(node.children ?? []);
+        nodes.add(ElementNode(
+          node.tag,
+          {if (node.generatedId != null) 'id': node.generatedId!, ...node.attributes},
+          children,
+        ));
       }
     }
+    return nodes;
   }
 }
 
 class ComponentBlockSyntax extends md.BlockSyntax {
-  ComponentBlockSyntax();
+  const ComponentBlockSyntax();
 
   @override
   RegExp get pattern => RegExp(r'^\s*<([A-Z][a-zA-Z]*)\s*([^>]*?)(/?)>(?:(.*)</([A-Z][a-zA-Z]*)>)?\s*$');
 
-  final RegExp endPattern = RegExp(r'^\s*</([A-Z][a-zA-Z]*)>\s*$');
+  RegExp get endPattern => RegExp(r'^\s*</([A-Z][a-zA-Z]*)>\s*$');
 
   @override
   List<md.Line> parseChildLines(md.BlockParser parser, [String endTag = '']) {
