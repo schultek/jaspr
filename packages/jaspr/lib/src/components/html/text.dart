@@ -21,12 +21,15 @@ part of 'html.dart';
 /// - [target]: Where to display the linked URL, as the name for a browsing context (a tab, window, or &lt;iframe&gt;).
 /// - [type]: Hints at the linked URL's format with a MIME type. No built-in functionality.
 /// - [referrerPolicy]: How much of the referrer to send when following the link.
+/// - [onClick]: When you want to override the link to call a local code function. By default when providing
+///              this parameter the link will only action the onClick callback and not visit [href]
 Component a(List<Component> children,
     {String? download,
     required String href,
     Target? target,
     String? type,
     ReferrerPolicy? referrerPolicy,
+    VoidCallback? onClick,
     Key? key,
     String? id,
     String? classes,
@@ -47,7 +50,14 @@ Component a(List<Component> children,
       if (type != null) 'type': type,
       if (referrerPolicy != null) 'referrerpolicy': referrerPolicy.value,
     },
-    events: events,
+    events: {
+      ...?events,
+      if (onClick != null) //
+        'click': (web.Event event) {
+          event.preventDefault();
+          onClick();
+        },
+    },
     children: children,
   );
 }
