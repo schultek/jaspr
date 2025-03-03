@@ -66,24 +66,28 @@ void main() {
       expect(tester.routeOf(find.text('b')).location, equals('/b'));
     });
 
-    testComponents('should redirect on update', (tester) async {
+    testComponents('should redirect on async update', (tester) async {
       var blocked = false;
       late void Function(VoidCallback) setState;
 
       tester.pumpComponent(StatefulBuilder(builder: (context, cb) sync* {
         setState = cb;
-        yield Router(routes: [
-          homeRoute(),
-          route('/a'),
-          
-        ], redirect: (_, s) {
-          if (s.location == '/a' && blocked) {
-            return '/';
-          }
-          return null;
-        });
+        yield Router(
+          routes: [
+            homeRoute(),
+            route('/a'),
+          ],
+          redirect: (_, s) async {
+            await Future(() async {});
+            if (s.location == '/a' && blocked) {
+              return '/';
+            }
+            return null;
+          },
+        );
       }));
 
+      await pumpEventQueue();
       expect(find.text('home'), findsOneComponent);
 
       await tester.router.push('/a');

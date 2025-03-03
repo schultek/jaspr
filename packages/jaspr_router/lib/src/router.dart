@@ -20,6 +20,7 @@ class Router extends StatefulComponent {
     this.errorBuilder,
     this.redirect,
     this.redirectLimit = 5,
+    super.key,
   }) {
     _configuration = RouteConfiguration(
       routes: routes,
