@@ -81,9 +81,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
     });
     if (_matchList == null) {
       assert(context.binding.isClient);
-      initRoutes().then((_) {
-        setState(() {});
-      });
+      initRoutes();
     }
   }
 
@@ -97,7 +95,10 @@ class RouterState extends State<Router> with PreloadStateMixin {
   Future<void> initRoutes() {
     final location = context.url;
     return _matchRoute(location).then(_preload).then((match) {
-      _matchList = match;
+      if (!mounted) return;
+      setState(() {
+        _matchList = match;
+      });
       if (context.binding.isClient && match.uri.toString() != location) {
         PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title);
       }
@@ -195,6 +196,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
     bool replace = false,
   }) {
     return _matchRoute(location, extra: extra).then((match) {
+      if (!mounted) return;
       setState(() {
         _matchList = match;
         if (updateHistory || location != match.uri.toString()) {
