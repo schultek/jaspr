@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed bug with router redirects.
+
 ## 0.6.3
 
 - `jaspr` upgraded to `0.18.0`
