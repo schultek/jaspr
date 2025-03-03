@@ -1,5 +1,3 @@
-import 'package:universal_web/web.dart' as web;
-
 import '../../foundation/basic_types.dart';
 import '../../foundation/events.dart';
 import '../../foundation/styles/styles.dart';

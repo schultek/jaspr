@@ -53,7 +53,11 @@ class Tab extends StatelessComponent {
     yield li(
       classes: selected ? 'is-active' : null,
       [
-        a(href: '#', onClick: onSelected, [child])
+        a(
+          href: '#',
+          events: events(onClick: onSelected),
+          [child],
+        )
       ],
     );
   }

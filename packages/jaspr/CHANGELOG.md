@@ -1,6 +1,6 @@
 ## Unreleased patch
 
-- Added `onClick` override to `a` html tag. Fixing issues with default action handling. @slightfoot
+- Added `onClick` override to `a` html tag. Fixing issues with default action handling.
 
 ## 0.18.0
 
