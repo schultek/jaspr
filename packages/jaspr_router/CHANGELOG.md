@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.6.4
 
 - Fixed bug with router redirects.
 

@@ -638,7 +638,7 @@ packages:
       path: "../../packages/jaspr_router"
       relative: true
     source: path
-    version: "0.6.3"
+    version: "0.6.4"
   jaspr_serverpod:
     dependency: "direct main"
     description:
