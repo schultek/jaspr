@@ -1,4 +1,4 @@
-## Unreleased
+## Unreleased patch
 
 - Added `onClick` override to `a` html tag. Fixing issues with default action handling. @slightfoot
 
