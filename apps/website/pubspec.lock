@@ -388,7 +388,7 @@ packages:
       path: "../../packages/jaspr_router"
       relative: true
     source: path
-    version: "0.6.3"
+    version: "0.6.4"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
