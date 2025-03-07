@@ -42,6 +42,18 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       help: 'Compile to wasm',
       negatable: false,
     );
+    argParser.addMultiOption(
+      'extra-js-compiler-option',
+      help: 'Extra flags to pass to `dart compile js`.',
+      defaultsTo: [],
+      hide: true,
+    );
+    argParser.addMultiOption(
+      'extra-wasm-compiler-option',
+      help: 'Extra flags to pass to `dart compile wasm`.',
+      defaultsTo: [],
+      hide: true,
+    );
     argParser.addOption(
       'optimize',
       abbr: 'O',
@@ -240,7 +252,17 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final compiler = useWasm ? 'dart2wasm' : 'dart2js';
     final entrypointBuilder = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint';
-    final userDefines = getClientDartDefines().entries.map((e) => ',"-D${e.key}=${e.value}"').join();
+
+    final args = [
+      '-Djaspr.flags.release=true',
+      '-O${argResults!['optimize']}',
+      if (useWasm)
+        ...argResults!['extra-wasm-compiler-option']
+      else
+        ...argResults!['extra-js-compiler-option'],
+      for (final entry in getClientDartDefines().entries)
+        '-D${entry.key}=${entry.value}',
+    ];
 
     final client = await d.connectClient(
       Directory.current.path,
@@ -249,7 +271,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--verbose',
         '--delete-conflicting-outputs',
         '--define=$entrypointBuilder=compiler=$compiler',
-        '--define=$entrypointBuilder=${compiler}_args=["-Djaspr.flags.release=true","-O${argResults!['optimize']}"$userDefines]',
+        '--define=$entrypointBuilder=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',
       ],
       logger.writeServerLog,
     );
