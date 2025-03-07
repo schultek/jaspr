@@ -60,7 +60,7 @@ You can access the value of the parameter by accessing it through the `RouteStat
 ```dart
 Route(
   path: '/users/:userId',
-  builder: (context, state) => const UserScreen(id: state.pathParameters['userId']),
+  builder: (context, state) => const UserScreen(id: state.params['userId']),
 ),
 ```
 
@@ -70,7 +70,7 @@ a URL path such as `/users?filter=admins` can read the filter parameter:
 ```dart
 Route(
   path: '/users',
-  builder: (context, state) => const UsersScreen(filter: state.uri.queryParameters['filter']),
+  builder: (context, state) => const UsersScreen(filter: state.queryParams['filter']),
 ),
 ```
 
@@ -92,7 +92,7 @@ Route(
   routes: [
     Route(
       path: ':userId',
-      builder: (context, state) => const UserScreen(id: state.pathParameters['userId']),
+      builder: (context, state) => const UserScreen(id: state.params['userId']),
     ),
   ],
 ),
