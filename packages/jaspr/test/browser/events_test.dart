@@ -1,7 +1,10 @@
 @TestOn('browser')
 
+import 'dart:js_interop';
+
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/browser_test.dart';
+import 'package:universal_web/web.dart';
 
 void main() {
   group('events', () {
@@ -85,6 +88,21 @@ void main() {
 
       await tester.change(find.tag('textarea'), value: "World");
       expect(textChange, equals("World"));
+    });
+
+    testBrowser('handle anchor click events', (tester) async {
+      int clicked = 0;
+
+      tester.pumpComponent(a(href: '/abc', onClick: () {
+        clicked++;
+      }, []));
+
+      expect(window.location.pathname, equals('/'));
+
+      await tester.click(find.tag('a'));
+
+      expect(window.location.pathname, equals('/'));
+      expect(clicked, equals(1));
     });
   });
 }
