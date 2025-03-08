@@ -3,6 +3,7 @@ import 'package:universal_web/web.dart' as web;
 
 import '../components/html/html.dart';
 import 'basic_types.dart';
+import 'constants.dart';
 
 typedef EventCallback = void Function(web.Event event);
 typedef EventCallbacks = Map<String, EventCallback>;
@@ -10,8 +11,8 @@ typedef EventCallbacks = Map<String, EventCallback>;
 /// Helper function to provide typed event handlers to the `events` property of html components.
 EventCallbacks events<V1, V2>({
   /// Listens to the 'click' event.
-  /// 
-  /// If the target element is an anchor (<a>) element, this will override the default behavior of the link and not 
+  ///
+  /// If the target element is an anchor (<a>) element, this will override the default behavior of the link and not
   /// visit [href] when clicked.
   VoidCallback? onClick,
 
@@ -36,12 +37,13 @@ EventCallbacks events<V1, V2>({
   ValueChanged<V2>? onChange,
 }) =>
     {
-      if (onClick != null) 'click': (event) {
-        if (event.target is web.HTMLAnchorElement && event.target.instanceOfString("HTMLAnchorElement")) {
-          event.preventDefault();
-        }
-        onClick();
-      },
+      if (onClick != null)
+        'click': (event) {
+          if (kIsWeb && event.target is web.HTMLAnchorElement && event.target.instanceOfString("HTMLAnchorElement")) {
+            event.preventDefault();
+          }
+          onClick();
+        },
       if (onInput != null) 'input': _callWithValue('onInput', onInput),
       if (onChange != null) 'change': _callWithValue('onChange', onChange),
     };
