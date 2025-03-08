@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Added `onClick` override to `a` html tag. Fixing issues with default action handling.
+
 ## 0.18.0
 
 - **BREAKING** Changed `AppBinding`s `Uri get currentUri` to `String get currentUrl`.

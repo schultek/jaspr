@@ -172,6 +172,10 @@
           "name": "referrerPolicy",
           "doc": "How much of the referrer to send when following the link.",
           "type": "enum:ReferrerPolicy"
+        },
+        "onClick": {
+          "doc": "Callback for the 'click' event. This will override the default behavior of the link and not visit [href] when clicked.",
+          "type": "event:onClick:VoidCallback"
         }
       }
     },
