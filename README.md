@@ -95,5 +95,4 @@ Rather it embraces these differences to give the best of both worlds.
   - **/jaspr_riverpod**: An unofficial Riverpod implementation for Jaspr.
   - **/jaspr_router**: A router implementation for Jaspr.
   - **/jaspr_serverpod**: An official Jaspr integration for [Serverpod](serverpod.dev).
-  - **/jaspr_tailwind**: A tailwind integration for Jaspr.
   - **/jaspr_test**: A testing package for Jaspr.
