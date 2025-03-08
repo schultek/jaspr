@@ -1,6 +1,7 @@
 ## Unreleased patch
 
 - Added `onClick` override to `a` html tag. Fixing issues with default action handling.
+- Added `--extra-js-compiler-option` and `--extra-wasm-compiler-option` to `jaspr build` command.
 
 ## 0.18.0
 

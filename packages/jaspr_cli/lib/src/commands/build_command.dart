@@ -256,11 +256,11 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final args = [
       '-Djaspr.flags.release=true',
       '-O${argResults!['optimize']}',
-      if (useWasm)
+      if (useWasm) //
         ...argResults!['extra-wasm-compiler-option']
       else
         ...argResults!['extra-js-compiler-option'],
-      for (final entry in getClientDartDefines().entries)
+      for (final entry in getClientDartDefines().entries) //
         '-D${entry.key}=${entry.value}',
     ];
 
