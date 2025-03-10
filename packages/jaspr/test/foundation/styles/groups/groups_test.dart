@@ -202,7 +202,7 @@ void main() {
     group('flexitem', () {
       test('outputs all properties', () {
         var styles = const Styles(
-          flex: Flex(grow: 2, shrink: 1, basis: FlexBasis.auto),
+          flex: Flex(grow: 2, shrink: 1, basis: Unit.auto),
           order: 2,
           alignSelf: AlignSelf.start,
         );

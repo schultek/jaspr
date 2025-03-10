@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
-import 'package:glob/glob.dart';
+import 'package:yaml/yaml.dart' as yaml;
 
 import '../utils.dart';
-import 'client_module_builder.dart';
+import 'client_bundle_builder.dart';
 
 /// Builds the registry for client components.
 class ClientRegistryBuilder implements Builder {
@@ -39,18 +38,25 @@ class ClientRegistryBuilder implements Builder {
       "// Generated with jaspr_builder\n";
 
   Future<String?> generateClients(BuildStep buildStep) async {
-    var modules = buildStep
-        .findAssets(Glob('lib/**.client.json'))
-        .asyncMap((id) => buildStep.readAsString(id))
-        .map((c) => ClientModule.deserialize(jsonDecode(c)));
+    final pubspecYaml = await buildStep.readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
+    final mode = yaml.loadYaml(pubspecYaml)?['jaspr']?['mode'];
 
-    var entrypoints = [
-      await for (var module in modules) (id: module.id, import: '${module.id}.client.dart'),
-    ];
-
-    if (entrypoints.isEmpty) {
+    if (mode != 'static' && mode != 'server') {
       return null;
     }
+
+    var (clients, sources) = await (
+      buildStep.loadClients(),
+      buildStep.loadTransitiveSources(),
+    ).wait;
+
+    clients = clients.where((c) => sources.contains(c.id)).toList();
+
+    if (clients.isEmpty) {
+      return null;
+    }
+
+    final package = buildStep.inputId.package;
 
     var source = '''
       $generationHeader
@@ -60,9 +66,14 @@ class ClientRegistryBuilder implements Builder {
       
       void main() {
         registerClients({
-          ${entrypoints.map((e) => '''
-            '${e.id}': loadClient([[${e.import}]].loadLibrary, (p) => [[${e.import}]].getComponentForParams(p)),
-          ''').join('\n')}
+          ${clients.map((c) {
+      final id = c.resolveId(package);
+      final import = c.import.replaceFirst('.dart', '.client.dart');
+
+      return '''
+        '$id': loadClient([[$import]].loadLibrary, (p) => [[$import]].getComponentForParams(p)),
+      ''';
+    }).join('\n')}
         });
       }
     ''';

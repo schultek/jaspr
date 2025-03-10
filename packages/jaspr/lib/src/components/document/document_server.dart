@@ -336,13 +336,9 @@ class AttachDocument extends StatelessComponent implements Document {
 class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
   static AttachAdapter instance = AttachAdapter();
 
-  static bool _registered = false;
   static void register(BuildContext context, AttachDocument item) {
     var binding = (context.binding as ServerAppBinding);
-    if (!_registered) {
-      binding.addRenderAdapter(instance);
-      _registered = true;
-    }
+    binding.addRenderAdapter(instance);
 
     var entry = instance.entries[item.target] ??= (attributes: {}, children: []);
     if (item.attributes != null) {

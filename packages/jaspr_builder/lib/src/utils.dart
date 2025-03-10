@@ -159,4 +159,19 @@ extension LoadBundle on BuildStep {
       }
     }
   }
+
+  Future<Set<AssetId>> loadTransitiveSources() async {
+    final main = AssetId(inputId.package, 'lib/main.dart');
+    if (!await canRead(main)) {
+      return {};
+    }
+    await resolver.libraryFor(main);
+    return resolver.libraries.expand<AssetId>((lib) {
+      try {
+        return [AssetId.resolve(lib.source.uri)];
+      } catch (_) {
+        return [];
+      }
+    }).toSet();
+  }
 }

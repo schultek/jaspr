@@ -1,3 +1,11 @@
+## Unreleased minor
+
+- **BREAKING** The `Flex(basis: ...)` style now accepts a `Unit` value directly instead of a `FlexBasis`.
+
+- Allow nesting `css.media` and `css.supports` rules.
+
+- Support `@client` components from other packages.
+
 ## 0.18.0
 
 - **BREAKING** Changed `AppBinding`s `Uri get currentUri` to `String get currentUrl`.

@@ -101,6 +101,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   late final List<RenderAdapter> _adapters = [];
 
   void addRenderAdapter(RenderAdapter adapter) {
+    if (_adapters.contains(adapter)) return;
     _adapters.add(adapter);
   }
 
