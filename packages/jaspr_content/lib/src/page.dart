@@ -29,8 +29,8 @@ class Page {
     }
   }
 
-  static Component wrap(Page page, Component child) {
-    return _InheritedPage(page: page, child: child);
+  static Component wrap(Page page, List<Page> pages, Component child) {
+    return _InheritedPage(page: page, pages: pages, child: child);
   }
 
   File access(Uri path) {
@@ -120,16 +120,14 @@ extension PageHandlers on Page {
 extension PageContext on BuildContext {
   Page get page => dependOnInheritedComponentOfExactType<_InheritedPage>()!.page;
 
-  List<Page> get pages {
-    var pages = page.data['pages'];
-    return pages is List<Page> ? pages : [];
-  }
+  List<Page> get pages => dependOnInheritedComponentOfExactType<_InheritedPage>()!.pages;
 }
 
 class _InheritedPage extends InheritedComponent {
-  _InheritedPage({required this.page, super.child});
+  _InheritedPage({required this.page, required this.pages, super.child});
 
   final Page page;
+  final List<Page> pages;
 
   @override
   bool updateShouldNotify(covariant _InheritedPage oldComponent) {

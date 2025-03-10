@@ -17,11 +17,11 @@ class ContentApp extends AsyncStatelessComponent {
     PageBuilder pageBuilder = PageConfig.defaultPageBuilder,
     this.routerBuilder = _defaultRouterBuilder,
     bool debugPrint = false,
-  })  : loader = FilesystemLoader(
+  })  : loaders = [FilesystemLoader(
           directory,
           eager: eagerlyLoadAllPages,
           debugPrint: debugPrint,
-        ),
+        )],
         configResolver = PageConfig.resolve(
           enableFrontmatter: enableFrontmatter,
           templateEngine: templateEngine,
@@ -34,7 +34,7 @@ class ContentApp extends AsyncStatelessComponent {
   }
 
   ContentApp.custom({
-    required this.loader,
+    required this.loaders,
     this.configResolver = _defaultConfigResolver,
     this.routerBuilder = _defaultRouterBuilder,
   }) {
@@ -45,28 +45,21 @@ class ContentApp extends AsyncStatelessComponent {
     Jaspr.initializeApp(options: Jaspr.options, useIsolates: false);
   }
 
-  final PagesLoader loader;
+  final List<PagesLoader> loaders;
   final ConfigResolver configResolver;
-  final Component Function(List<RouteBase> routes) routerBuilder;
+  final Component Function(List<List<RouteBase>> routes) routerBuilder;
 
   @override
   Stream<Component> build(BuildContext context) async* {
-    final routes = await loader.loadRoutes(configResolver);
+    final routes = await Future.wait(loaders.map((l) => l.loadRoutes(configResolver)));
     yield routerBuilder(routes);
   }
-
-  @css
-  static List<StyleRule> styles = [
-    css('body').styles(
-      backgroundColor: Colors.black,
-    ),
-  ];
 }
 
 PageConfig _defaultConfigResolver(String path) {
   return const PageConfig();
 }
 
-Component _defaultRouterBuilder(List<RouteBase> routes) {
-  return Router(routes: routes);
+Component _defaultRouterBuilder(List<List<RouteBase>> routes) {
+  return Router(routes: [for (final r in routes) ...r]);
 }

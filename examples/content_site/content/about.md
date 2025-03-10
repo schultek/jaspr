@@ -6,4 +6,6 @@ title: "About"
 
 This is the about pages
 
+<Github/>
+
 [Home](/)

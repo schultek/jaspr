@@ -6,6 +6,7 @@ export 'src/page.dart';
 export 'src/page_extension/components_extension.dart';
 export 'src/page_extension/page_extension.dart';
 export 'src/page_extension/table_of_contents_extension.dart';
+export 'src/page_layout/empty_layout.dart';
 export 'src/page_layout/page_layout.dart';
 export 'src/page_parser/html_parser.dart';
 export 'src/page_parser/markdown_parser.dart';

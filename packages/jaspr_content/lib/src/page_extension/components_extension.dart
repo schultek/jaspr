@@ -28,14 +28,19 @@ class ComponentsExtension implements PageExtension {
   }
 
   Node _processNode(ElementNode node) {
-    var builder = components[node.tag];
+    final builder = components[node.tag];
+    final children = node.children != null ? _processNodes(node.children!) : null;
     if (builder != null) {
-      return ComponentNode(builder(node.attributes, node.children?.build()));
+      return ComponentNode(builder(node.attributes, children?.build()));
+    }
+    // Ignore unspecified components.
+    if (node.tag.startsWith(RegExp(r'[A-Z]'))) {
+      return ComponentNode(children != null ? children.build() : Fragment(children: []));
     }
     return ElementNode(
       node.tag,
       node.attributes,
-      node.children != null ? _processNodes(node.children!) : null,
+      children,
     );
   }
 }

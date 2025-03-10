@@ -127,10 +127,9 @@ class FilesystemLoader implements PagesLoader {
     final content = await file.readAsString();
     final data = {
       'page': {'path': path},
-      if (eager) 'pages': UnmodifiableListView(_pages),
     };
     final page = Page(path, content, data, config, this);
-    var child = Page.wrap(page, await config.pageBuilder(page));
+    var child = Page.wrap(page, UnmodifiableListView(_pages), await config.pageBuilder(page));
 
     add(path, page, child);
     return child;

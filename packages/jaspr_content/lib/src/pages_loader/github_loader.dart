@@ -96,11 +96,10 @@ class GithubLoader implements PagesLoader {
     final content = response.body;
     final data = {
       'page': {'path': file.path},
-      if (eager) 'pages': UnmodifiableListView(_pages),
     };
 
     final page = Page(file.path, content, data, config, this);
-    var child = Page.wrap(page, await config.pageBuilder(page));
+    var child = Page.wrap(page, UnmodifiableListView(_pages), await config.pageBuilder(page));
 
     add(file.path, page, child);
     return child;

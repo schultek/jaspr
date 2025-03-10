@@ -25,6 +25,7 @@ dependencies:
   liquid_engine: ^0.2.2
   markdown: ^7.3.0
   mustache_template: ^2.0.0
+  universal_web: ^1.1.0+2
   watcher: ^1.1.1
   yaml: ^3.1.3
 

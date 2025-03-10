@@ -18,7 +18,7 @@ void main() {
     ],
     // Enables using 'layout: ___' in frontmatter to choose the page layout.
     layouts: [
-      DefaultLayout(),
+      EmptyLayout(),
     ],
   ));
 }
@@ -44,22 +44,4 @@ class Badge extends StatelessComponent {
       radius: BorderRadius.circular(0.25.em),
     ),
   ];
-}
-
-class DefaultLayout implements PageLayout {
-  const DefaultLayout();
-
-  @override
-  String get name => 'default';
-
-  @override
-  Component buildLayout(Page page, Component child) {
-    return Document(
-      title: page.data['title'] != null ? '${page.data['title']} | My Site' : 'My Site',
-      lang: 'en',
-      body: main_([
-        child,
-      ]),
-    );
-  }
 }
