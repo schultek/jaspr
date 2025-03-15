@@ -1,6 +1,7 @@
 /// Jaspr plugin for content driven sites.
 library;
 
+export 'src/content/content.dart';
 export 'src/content_app.dart';
 export 'src/page.dart';
 export 'src/page_extension/components_extension.dart';

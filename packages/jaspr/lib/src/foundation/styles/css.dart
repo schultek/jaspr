@@ -117,11 +117,12 @@ class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
 extension on Selector {
   Selector resolve(String parent) {
     return Selector(
-        selector.startsWith('&') || parent.isEmpty ? selector.replaceAll('&', parent) : '$parent $selector');
+      selector.startsWith('&') || parent.isEmpty ? selector.replaceAll('&', parent) : '$parent $selector',
+    );
   }
 }
 
-extension on StyleRule {
+extension StyleRuleResolve on StyleRule {
   List<StyleRule> resolve(String parent) {
     var self = this;
     return switch (self) {

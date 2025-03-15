@@ -18,6 +18,8 @@ List<StyleRule> get globalStyles => [
       css('.justify-center').styles(justifyContent: JustifyContent.center),
     ];
 
+const secondary = ColorToken('secondary', Colors.blue, dark: Colors.skyBlue);
+
 void runLocal() {
   runApp(ContentApp(
     eagerlyLoadAllPages: false,
@@ -29,13 +31,20 @@ void runLocal() {
     extensions: [
       TableOfContentsExtension(),
       ComponentsExtension({
-        'Badge': (attrs, child) => Badge(color: Color.named(attrs['color'] ?? 'blue'), child: child),
+        'Badges': (attrs, child) => Badge(color: Color(attrs['color'] ?? 'blue'), child: child),
         'Counter': (_, __) => Counter(),
       }),
     ],
     layouts: [
       DefaultLayout(),
     ],
+    theme: ContentTheme(
+      primary: Colors.violet,
+      background: Color('#0b0d0e'),
+      tokens: [
+        secondary,
+      ],
+    ),
   ));
 }
 
@@ -62,7 +71,7 @@ void runGithub() {
       ],
       layouts: [
         DocsLayout(
-          title: 'Jaspr',
+          title: 'Jaspr TEST',
           logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',
           favicon: 'favicon.ico',
           sidebar: Sidebar(groups: [
@@ -70,6 +79,7 @@ void runGithub() {
               items: [
                 SidebarItem(text: "\uD83D\uDCD6 Overview", href: '/'),
                 SidebarItem(text: "\uD83E\uDD4A Jaspr vs Flutter Web", href: '/jaspr-vs-flutter-web'),
+                SidebarItem(text: "\uD83E\uDD4A About", href: '/about'),
               ],
             ),
             SidebarGroup(title: 'Get Started', items: [
@@ -83,6 +93,13 @@ void runGithub() {
           ]),
         ),
       ],
+      theme: ContentTheme(
+        primary: Colors.blue,
+        background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
+        tokens: [
+          secondary,
+        ],
+      ),
     ),
   ));
 }

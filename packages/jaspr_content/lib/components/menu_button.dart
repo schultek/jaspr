@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart';
 
@@ -8,7 +10,19 @@ class MenuButton extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield button(classes: 'menu-button', onClick: () {
-      window.document.querySelector('.sidebar-container')?.classList.toggle('open');
+      StreamSubscription? closeSub, barrierSub;
+      void close() {
+        closeSub?.cancel();
+        barrierSub?.cancel();
+        window.document.querySelector('.sidebar-container')?.classList.remove('open');
+      }
+      closeSub = window.document.querySelector('.sidebar-close')?.onClick.listen((_) {
+        close();
+      });
+      barrierSub = window.document.querySelector('.sidebar-barrier')?.onClick.listen((_) {
+        close();
+      });
+      window.document.querySelector('.sidebar-container')?.classList.add('open');
     }, [
       raw(menuIcon),
     ]);

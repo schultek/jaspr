@@ -1,8 +1,8 @@
 ## Unreleased minor
 
 - **BREAKING** The `Flex(basis: ...)` style now accepts a `Unit` value directly instead of a `FlexBasis`.
-
 - Allow nesting `css.media` and `css.supports` rules.
+- Deprecated `Color.hex()` and `Color.named()` in favor of default `Color()` constructor.
 
 - Support `@client` components from other packages.
 

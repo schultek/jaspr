@@ -16,6 +16,7 @@ class ContentApp extends AsyncStatelessComponent {
     List<PageLayout> layouts = const [],
     PageBuilder pageBuilder = PageConfig.defaultPageBuilder,
     this.routerBuilder = _defaultRouterBuilder,
+    ContentTheme? theme,
     bool debugPrint = false,
   })  : loaders = [FilesystemLoader(
           directory,
@@ -29,6 +30,7 @@ class ContentApp extends AsyncStatelessComponent {
           extensions: extensions,
           layouts: layouts,
           pageBuilder: pageBuilder,
+          theme: theme,
         ) {
     _disableIsolates();
   }

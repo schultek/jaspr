@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:fbh_front_matter/fbh_front_matter.dart' as fm;
 import 'package:jaspr/jaspr.dart';
 
+import 'content/content.dart';
 import 'page_extension/page_extension.dart';
 import 'page_layout/page_layout.dart';
 import 'page_parser/page_parser.dart';
@@ -46,6 +47,7 @@ class PageConfig {
     this.extensions = const [],
     this.layouts = const [],
     this.pageBuilder = defaultPageBuilder,
+    this.theme,
   });
 
   final bool enableFrontmatter;
@@ -54,6 +56,7 @@ class PageConfig {
   final List<PageExtension> extensions;
   final List<PageLayout> layouts;
   final PageBuilder pageBuilder;
+  final ContentTheme? theme;
 
   static ConfigResolver resolve({
     bool enableFrontmatter = true,
@@ -62,6 +65,7 @@ class PageConfig {
     List<PageExtension> extensions = const [],
     List<PageLayout> layouts = const [],
     PageBuilder pageBuilder = defaultPageBuilder,
+    ContentTheme? theme,
   }) {
     final config = PageConfig(
       enableFrontmatter: enableFrontmatter,
@@ -70,6 +74,7 @@ class PageConfig {
       extensions: extensions,
       layouts: layouts,
       pageBuilder: pageBuilder,
+      theme: theme,
     );
     return (_) => config;
   }
@@ -79,7 +84,11 @@ class PageConfig {
     await page.renderTemplate();
     var nodes = page.parseNodes();
     var component = page.buildComponent(nodes);
-    return page.buildLayout(component);
+    var layout = page.buildLayout(component);
+    if (page.config.theme case final theme?) {
+      return InheritedContentTheme(theme: theme, child: layout);
+    }
+    return layout;
   }
 }
 

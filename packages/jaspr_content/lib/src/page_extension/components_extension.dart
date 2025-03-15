@@ -35,6 +35,7 @@ class ComponentsExtension implements PageExtension {
     }
     // Ignore unspecified components.
     if (node.tag.startsWith(RegExp(r'[A-Z]'))) {
+      print("[Warning] Ignoring unspecified component: ${node.tag}");
       return ComponentNode(children != null ? children.build() : Fragment(children: []));
     }
     return ElementNode(
