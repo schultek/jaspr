@@ -1,21 +1,29 @@
 import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
-import 'package:universal_web/web.dart';
+import 'package:universal_web/web.dart' hide Document;
 
+/// A sidebar toggle button.
 @client
-class MenuButton extends StatelessComponent {
-  MenuButton({super.key});
+class SidebarToggleButton extends StatelessComponent {
+  SidebarToggleButton({super.key});
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield button(classes: 'menu-button', onClick: () {
+    if (!kIsWeb) {
+      yield Document.head(children: [
+        Style(styles: styles),
+      ]);
+    }
+
+    yield button(classes: 'sidebar-toggle-button', onClick: () {
       StreamSubscription? closeSub, barrierSub;
       void close() {
         closeSub?.cancel();
         barrierSub?.cancel();
         window.document.querySelector('.sidebar-container')?.classList.remove('open');
       }
+
       closeSub = window.document.querySelector('.sidebar-close')?.onClick.listen((_) {
         close();
       });
@@ -28,19 +36,18 @@ class MenuButton extends StatelessComponent {
     ]);
   }
 
-  @css
-  static final styles = [
-    css('.menu-button').styles(
-      display: Display.flex,
-      justifyContent: JustifyContent.center,
-      alignItems: AlignItems.center,
-      width: 2.rem,
-      height: 2.rem,
-    ),
-    css.media(MediaQuery.all(minWidth: 1024.px), [
-      css('.menu-button').styles(display: Display.none),
-    ]),
-  ];
+  List<StyleRule> get styles => [
+        css('.sidebar-toggle-button').styles(
+          display: Display.none,
+          justifyContent: JustifyContent.center,
+          alignItems: AlignItems.center,
+          width: 2.rem,
+          height: 2.rem,
+        ),
+        css.media(MediaQuery.all(maxWidth: 1024.px), [
+          css('[data-has-sidebar] .sidebar-toggle-button').styles(display: Display.flex),
+        ]),
+      ];
 }
 
 const menuIcon = '''

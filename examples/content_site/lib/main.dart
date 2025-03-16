@@ -1,10 +1,9 @@
 import 'package:content_site/jaspr_options.dart';
 import 'package:jaspr/server.dart';
-import 'package:jaspr_content/components/github_button.dart';
 import 'package:jaspr_content/jaspr_content.dart';
-import 'package:jaspr_content/layouts/docs_layout.dart';
-
-import 'components/counter.dart';
+import 'package:jaspr_content/components/theme_toggle.dart';
+import 'package:jaspr_content/components/github_button.dart';
+import 'package:jaspr_content/components/callout.dart';
 
 void main() {
   Jaspr.initializeApp(options: defaultJasprOptions);
@@ -28,15 +27,8 @@ void runLocal() {
       HtmlParser(),
       MarkdownParser(),
     ],
-    extensions: [
-      TableOfContentsExtension(),
-      ComponentsExtension({
-        'Badges': (attrs, child) => Badge(color: Color(attrs['color'] ?? 'blue'), child: child),
-        'Counter': (_, __) => Counter(),
-      }),
-    ],
     layouts: [
-      DefaultLayout(),
+      EmptyLayout(),
     ],
     theme: ContentTheme(
       primary: Colors.violet,
@@ -60,41 +52,47 @@ void runGithub() {
     configResolver: PageConfig.resolve(
       templateEngine: MustacheTemplateEngine(),
       parsers: [
-        HtmlParser(),
         MarkdownParser(),
       ],
       extensions: [
         TableOfContentsExtension(),
-        ComponentsExtension({
-          'Github': (_, __) => GithubButton(repo: 'schultek/jaspr'),
-        }),
+        HeadingAnchorExtension(),
+        ComponentsExtension([
+          Callout.factory,
+        ]),
       ],
       layouts: [
         DocsLayout(
-          title: 'Jaspr TEST',
-          logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',
           favicon: 'favicon.ico',
+          header: Header(
+            title: 'Jaspr',
+            logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',
+            items: [
+              ThemeToggle(),
+              GithubButton(repo: 'schultek/jaspr'),
+            ]
+          ),
           sidebar: Sidebar(groups: [
             SidebarGroup(
-              items: [
-                SidebarItem(text: "\uD83D\uDCD6 Overview", href: '/'),
-                SidebarItem(text: "\uD83E\uDD4A Jaspr vs Flutter Web", href: '/jaspr-vs-flutter-web'),
-                SidebarItem(text: "\uD83E\uDD4A About", href: '/about'),
+              links: [
+                SidebarLink(text: "\uD83D\uDCD6 Overview", href: '/'),
+                SidebarLink(text: "\uD83E\uDD4A Jaspr vs Flutter Web", href: '/jaspr-vs-flutter-web'),
+                SidebarLink(text: "\uD83E\uDD4A About", href: '/about'),
               ],
             ),
-            SidebarGroup(title: 'Get Started', items: [
-              SidebarItem(text: "\uD83D\uDEEB Installation", href: '/get_started/installation'),
-              SidebarItem(text: "\uD83D\uDD79 Jaspr CLI", href: '/get_started/cli'),
-              SidebarItem(text: "\uD83D\uDCDF Rendering Modes", href: '/get_started/modes'),
-              SidebarItem(text: "\uD83D\uDCA7 Hydration", href: '/get_started/hydration'),
-              SidebarItem(text: "\uD83D\uDCE6 Project Structure", href: '/get_started/project_structure'),
-              SidebarItem(text: "\uD83E\uDDF9 Linting", href: '/get_started/linting'),
+            SidebarGroup(title: 'Get Started', links: [
+              SidebarLink(text: "\uD83D\uDEEB Installation", href: '/get_started/installation'),
+              SidebarLink(text: "\uD83D\uDD79 Jaspr CLI", href: '/get_started/cli'),
+              SidebarLink(text: "\uD83D\uDCDF Rendering Modes", href: '/get_started/modes'),
+              SidebarLink(text: "\uD83D\uDCA7 Hydration", href: '/get_started/hydration'),
+              SidebarLink(text: "\uD83D\uDCE6 Project Structure", href: '/get_started/project_structure'),
+              SidebarLink(text: "\uD83E\uDDF9 Linting", href: '/get_started/linting'),
             ]),
           ]),
         ),
       ],
       theme: ContentTheme(
-        primary: Colors.blue,
+        primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
         background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
         tokens: [
           secondary,
@@ -102,65 +100,4 @@ void runGithub() {
       ),
     ),
   ));
-}
-
-class Badge extends StatelessComponent {
-  Badge({required this.color, this.child});
-
-  final Color color;
-  final Component? child;
-
-  @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield span(classes: 'badge', styles: Styles(color: color), [
-      if (child != null) child!,
-    ]);
-  }
-
-  @css
-  static final styles = [
-    css('.badge').styles(
-      display: Display.inlineBlock,
-      padding: Padding.symmetric(vertical: 0.25.em, horizontal: 0.5.em),
-      radius: BorderRadius.circular(0.25.em),
-    ),
-  ];
-}
-
-class DefaultLayout implements PageLayout {
-  const DefaultLayout();
-
-  @override
-  String get name => 'default';
-
-  @override
-  Component buildLayout(Page page, Component child) {
-    final title = page.data['title'];
-    final toc = page.data['toc'];
-
-    return Document(
-      title: title != null ? '$title | My Site' : 'My Site',
-      lang: 'en',
-      body: Fragment(children: [
-        main_([
-          child,
-        ]),
-        if (toc case List<TocEntry> toc)
-          aside(classes: 'toc', [
-            ul([..._buildToc(toc)]),
-          ]),
-      ]),
-    );
-  }
-
-  Iterable<Component> _buildToc(List<TocEntry> toc, [int indent = 0]) sync* {
-    for (final entry in toc) {
-      yield li(styles: Styles(padding: Padding.only(left: (0.75 * indent).em)), [
-        a(href: '#${entry.id}', [text(entry.text)]),
-      ]);
-      if (entry.children.isNotEmpty) {
-        yield* _buildToc(entry.children, indent + 1);
-      }
-    }
-  }
 }

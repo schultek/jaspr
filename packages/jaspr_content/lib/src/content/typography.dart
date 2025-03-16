@@ -1,18 +1,19 @@
 part of 'content.dart';
 
-class ContentLayout {
-  const ContentLayout({
+/// A collection of typography styles for content-driven sites.
+class ContentTypography {
+  const ContentTypography({
     required this.styles,
     required this.rules,
   });
 
-  static final ContentLayout base = _baseContentLayout;
+  static final ContentTypography base = _baseContentTypography;
 
   final Styles styles;
   final List<StyleRule> rules;
 }
 
-extension on ContentLayout {
+extension on ContentTypography {
   StyleRule build() {
     return css('.content', [
       css('&').styles(

@@ -1,6 +1,6 @@
 part of 'content.dart';
 
-final ContentLayout _baseContentLayout = ContentLayout(
+final ContentTypography _baseContentTypography = ContentTypography(
   styles: Styles(
     fontSize: 1.rem,
     lineHeight: 1.75.em,

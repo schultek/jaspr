@@ -6,6 +6,9 @@ dynamic _defaultPrepareValues(Page page) {
   return page.data;
 }
 
+/// A template engine that uses the Mustache templating language.
+/// 
+/// This engine uses the `mustache_template` package to render Mustache templates.
 class MustacheTemplateEngine implements TemplateEngine {
   const MustacheTemplateEngine({
     this.delimiters = '{{ }}',
@@ -28,7 +31,7 @@ class MustacheTemplateEngine implements TemplateEngine {
       content,
       partialResolver: (String name) {
         final path = Uri.parse(partialsRoot).resolve(name);
-        return _buildTemplate(page, page.access(path).readAsStringSync());
+        return _buildTemplate(page, page.readPartialSync(path));
       },
       delimiters: delimiters,
     );

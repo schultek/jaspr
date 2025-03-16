@@ -14,15 +14,23 @@ md.Document _defaultDocumentBuilder(Page _) {
 
 typedef DocumentBuilder = md.Document Function(Page page);
 
+/// A parser for Markdown content.
+/// 
+/// This parser uses the `markdown` package to parse Markdown content.
 class MarkdownParser implements PageParser {
-  MarkdownParser({
+  /// Creates a Markdown parser.
+  const MarkdownParser({
+    /// The function used to build the Markdown document.
+    /// 
+    /// This can be used to customize the Markdown parser's behavior, e.g. by adding custom syntaxes.
+    /// The default builder adds support for component blocks and uses the [md.ExtensionSet.gitHubWeb] extension set.
     this.documentBuilder = _defaultDocumentBuilder,
   });
 
   final DocumentBuilder documentBuilder;
 
   @override
-  Set<String> get suffix => {'.md', '.mdx'};
+  Pattern get pattern => RegExp(r'.*\.mdx?$');
 
   @override
   List<Node> parsePage(Page page) {

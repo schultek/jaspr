@@ -11,6 +11,9 @@ void _defaultPrepareContext(Context context, Page page) {
   });
 }
 
+/// A template engine that uses the Liquid templating language.
+/// 
+/// This engine uses the `liquid_engine` package to render Liquid templates.
 class LiquidTemplateEngine implements TemplateEngine {
   const LiquidTemplateEngine({
     this.includesPath = 'content/_includes/',
@@ -44,7 +47,7 @@ class _IncludeResolver implements Root {
   @override
   Future<Source> resolve(String relPath) async {
     final file = _includesPath.resolve(relPath);
-    final content = await page.access(file).readAsString();
+    final content = await page.readPartial(file);
     return Source(file, content, this);
   }
 }

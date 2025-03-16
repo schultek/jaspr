@@ -1,26 +1,25 @@
+import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_router/jaspr_router.dart';
+
 import '../page.dart';
 import '../page_parser/page_parser.dart';
 import 'page_extension.dart';
 
-class TocEntry {
-  TocEntry(this.text, this.id, this.children);
-
-  final String text;
-  final String id;
-  final List<TocEntry> children;
-}
-
-final _headerRegex = RegExp(r'^h(\d)$', caseSensitive: false);
-
+/// An extension that generates a table of contents from the headers in the page.
+/// 
+/// The resulting [TableOfContents] object is stored in the page's data under the 'toc' key.
+/// It may be consumed by a layout to display the table of contents.
 class TableOfContentsExtension implements PageExtension {
-  TableOfContentsExtension({
+  const TableOfContentsExtension({
     this.maxHeaderDepth = 3,
   });
 
   final int maxHeaderDepth;
 
+  static final _headerRegex = RegExp(r'^h(\d)$', caseSensitive: false);
+
   @override
-  List<Node> processNodes(List<Node> nodes, Page page) {
+  List<Node> apply(Page page, List<Node> nodes) {
     final toc = <TocEntry>[];
     final stack = <TocEntry>[];
 
@@ -58,9 +57,40 @@ class TableOfContentsExtension implements PageExtension {
       }
     }
 
-    page.data['toc'] = toc;
+    page.data['toc'] = TableOfContents(toc);
 
     return nodes;
   }
+}
 
+class TableOfContents {
+  const TableOfContents(this.entries);
+
+  final List<TocEntry> entries;
+
+  Component build() {
+    return ul([..._buildToc(entries)]);
+  }
+
+  Iterable<Component> _buildToc(List<TocEntry> toc, [int indent = 0]) sync* {
+    for (final entry in toc) {
+      yield li(styles: Styles(padding: Padding.only(left: (0.75 * indent).em)), [
+        Builder(builder: (context) sync* {
+          var route = RouteState.of(context);
+          yield a(href: '${route.path}#${entry.id}', [text(entry.text)]);
+        }),
+      ]);
+      if (entry.children.isNotEmpty) {
+        yield* _buildToc(entry.children, indent + 1);
+      }
+    }
+  }
+}
+
+class TocEntry {
+  TocEntry(this.text, this.id, this.children);
+
+  final String text;
+  final String id;
+  final List<TocEntry> children;
 }

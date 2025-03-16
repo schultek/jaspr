@@ -1,36 +1,11 @@
 part of 'content.dart';
 
-class ThemeColor implements Color {
-  const ThemeColor(this.light, {this.dark});
-
-  final Color light;
-  final Color? dark;
-
-  @override
-  String get value => light.value;
-}
-
-class ColorToken extends ThemeColor {
-  const ColorToken(this.name, super.light, {super.dark});
-
-  final String name;
-
-  @override
-  String get value => 'var(--theme-token-$name)';
-
-  @override
-  operator ==(Object other) {
-    return other is ColorToken && other.name == name;
-  }
-
-  @override
-  int get hashCode => name.hashCode;
-
-  @override
-  String toString() => 'ColorToken($name)';
-}
-
+/// A theme for content-driven sites.
+/// 
+/// The theme provides colors and typography styles for a page.
+/// When no theme is provided, the default [ContentColors.gray] and [ContentTypography.base] are used.
 class ContentTheme {
+  /// Creates a new theme with the provided colors.
   factory ContentTheme({
     Color? primary,
     Color? background,
@@ -46,36 +21,40 @@ class ContentTheme {
     );
   }
 
-  const ContentTheme.custom({this.colors, this.layout});
+  /// Creates a new theme with the provided colors and typography.
+  const ContentTheme.custom({this.colors, this.typography});
 
   static const Color primary = Color.variable('--theme-primary');
   static const Color background = Color.variable('--theme-background');
   static const Color text = Color.variable('--theme-text');
 
   final ContentColors? colors;
-  final ContentLayout? layout;
+  final ContentTypography? typography;
 
   ContentTheme copyWith({
     ContentColors? colors,
-    ContentLayout? layout,
+    ContentTypography? typography,
   }) {
     return ContentTheme.custom(
       colors: colors ?? this.colors,
-      layout: layout ?? this.layout,
+      typography: typography ?? this.typography,
     );
   }
 
   List<StyleRule> get styles {
     final colors = this.colors ?? ContentColors.gray;
-    final layout = this.layout ?? ContentLayout.base;
+    final typography = this.typography ?? ContentTypography.base;
 
     return [
       ...colors.build(),
-      layout.build(),
+      typography.build(),
     ];
   }
 }
 
+/// A set of colors for the page content.
+/// 
+/// You can override individual colors, or add new color tokens to the theme.
 class ContentColors {
   const ContentColors({
     required this.primary,
@@ -102,26 +81,26 @@ class ContentColors {
   });
 
   static final ContentColors gray = ContentColors(
-    primary: ThemeColor(colors.gray.$900, dark: Colors.white),
-    background: ThemeColor(colors.gray.$100, dark: colors.gray.$900),
-    text: ThemeColor(colors.gray.$700, dark: colors.gray.$200),
-    headings: ThemeColor(colors.gray.$900, dark: Colors.white),
-    lead: ThemeColor(colors.gray.$600, dark: colors.gray.$400),
-    links: ThemeColor(colors.gray.$900, dark: Colors.white),
-    bold: ThemeColor(colors.gray.$900, dark: Colors.white),
-    counters: ThemeColor(colors.gray.$500, dark: colors.gray.$400),
-    bullets: ThemeColor(colors.gray.$300, dark: colors.gray.$600),
-    hr: ThemeColor(colors.gray.$200, dark: colors.gray.$700),
-    quotes: ThemeColor(colors.gray.$900, dark: colors.gray.$100),
-    quoteBorders: ThemeColor(colors.gray.$200, dark: colors.gray.$700),
-    captions: ThemeColor(colors.gray.$500, dark: colors.gray.$400),
-    kbd: ThemeColor(colors.gray.$900, dark: Colors.white),
-    kbdShadows: ThemeColor(colors.gray.$900, dark: Colors.white),
-    code: ThemeColor(colors.gray.$900, dark: Colors.white),
-    preCode: ThemeColor(colors.gray.$200, dark: colors.gray.$300),
-    preBg: ThemeColor(colors.gray.$800, dark: Color('rgb(0 0 0 / 50%)')),
-    thBorders: ThemeColor(colors.gray.$300, dark: colors.gray.$600),
-    tdBorders: ThemeColor(colors.gray.$200, dark: colors.gray.$700),
+    primary: ThemeColor(ColorTheme.gray.$900, dark: Colors.white),
+    background: ThemeColor(ColorTheme.gray.$100, dark: ColorTheme.gray.$900),
+    text: ThemeColor(ColorTheme.gray.$700, dark: ColorTheme.gray.$200),
+    headings: ThemeColor(ColorTheme.gray.$900, dark: Colors.white),
+    lead: ThemeColor(ColorTheme.gray.$600, dark: ColorTheme.gray.$400),
+    links: ThemeColor(ColorTheme.gray.$900, dark: Colors.white),
+    bold: ThemeColor(ColorTheme.gray.$900, dark: Colors.white),
+    counters: ThemeColor(ColorTheme.gray.$500, dark: ColorTheme.gray.$400),
+    bullets: ThemeColor(ColorTheme.gray.$300, dark: ColorTheme.gray.$600),
+    hr: ThemeColor(ColorTheme.gray.$200, dark: ColorTheme.gray.$700),
+    quotes: ThemeColor(ColorTheme.gray.$900, dark: ColorTheme.gray.$100),
+    quoteBorders: ThemeColor(ColorTheme.gray.$200, dark: ColorTheme.gray.$700),
+    captions: ThemeColor(ColorTheme.gray.$500, dark: ColorTheme.gray.$400),
+    kbd: ThemeColor(ColorTheme.gray.$900, dark: Colors.white),
+    kbdShadows: ThemeColor(ColorTheme.gray.$900, dark: Colors.white),
+    code: ThemeColor(ColorTheme.gray.$900, dark: Colors.white),
+    preCode: ThemeColor(ColorTheme.gray.$200, dark: ColorTheme.gray.$300),
+    preBg: ThemeColor(ColorTheme.gray.$800, dark: Color('rgb(0 0 0 / 50%)')),
+    thBorders: ThemeColor(ColorTheme.gray.$300, dark: ColorTheme.gray.$600),
+    tdBorders: ThemeColor(ColorTheme.gray.$200, dark: ColorTheme.gray.$700),
   );
 
   final Color primary;

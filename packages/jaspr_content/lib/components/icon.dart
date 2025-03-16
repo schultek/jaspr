@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
+/// A close icon.
 class CloseIcon extends StatelessComponent {
   CloseIcon({this.size});
 
@@ -14,6 +15,7 @@ class CloseIcon extends StatelessComponent {
   }
 }
 
+/// A moon icon.
 class MoonIcon extends StatelessComponent {
   MoonIcon({this.size});
 
@@ -27,6 +29,7 @@ class MoonIcon extends StatelessComponent {
   }
 }
 
+/// A sun icon.
 class SunIcon extends StatelessComponent {
   SunIcon({this.size});
 
@@ -44,6 +47,67 @@ class SunIcon extends StatelessComponent {
       path(d: 'M17.657 17.657h.01', []),
       path(d: 'M6.343 17.657h.01', []),
       path(d: 'M6.343 6.343h.01', []),
+    ]);
+  }
+}
+
+/// An info icon.
+class InfoIcon extends StatelessComponent {
+  InfoIcon({this.size});
+
+  final int? size;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield _Icon(size: size, children: [
+      circle(cx: '12', cy: '12', r: '10', []),
+      path(d: 'M12 16v-4', []),
+      path(d: 'M12 8h.01', []),
+    ]);
+  }
+}
+
+/// An alert icon.
+class AlertIcon extends StatelessComponent {
+  AlertIcon({this.size});
+
+  final int? size;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield _Icon(size: size, children: [
+      path(d: 'm21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3', []),
+      path(d: 'M12 9v4', []),
+      path(d: 'M12 17h.01', []),
+    ]);
+  }
+}
+
+class CircleXIcon extends StatelessComponent {
+  CircleXIcon({this.size});
+
+  final int? size;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield _Icon(size: size, children: [
+      circle(cx: '12', cy: '12', r: '10', []),
+      path(d: 'm15 9-6 6', []),
+      path(d: 'm9 9 6 6', []),
+    ]);
+  }
+}
+
+class CircleCheckIcon extends StatelessComponent {
+  CircleCheckIcon({this.size});
+
+  final int? size;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield _Icon(size: size, children: [
+      circle(cx: '12', cy: '12', r: '10', []),
+      path(d: 'm9 12 2 2 4-4', []),
     ]);
   }
 }

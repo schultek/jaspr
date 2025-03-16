@@ -6,6 +6,14 @@ title: "About"
 
 This is the about pages TEST HALLO
 
-<Github/>
+<Info> Hello World </Info>
+
+## Test
+
+<Warning> Hello World </Warning>
+
+<Error> Hello World </Error>
+
+<Success> Hello World </Success>
 
 [Home](/)

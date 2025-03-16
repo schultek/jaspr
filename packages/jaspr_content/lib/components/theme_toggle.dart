@@ -3,6 +3,7 @@ import 'package:universal_web/web.dart' as web;
 
 import 'icon.dart';
 
+/// A theme toggle button.
 @client
 class ThemeToggle extends StatefulComponent {
   const ThemeToggle({super.key});

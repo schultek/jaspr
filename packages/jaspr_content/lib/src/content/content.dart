@@ -2,14 +2,41 @@ import 'package:jaspr/jaspr.dart';
 // ignore: implementation_imports
 import 'package:jaspr/src/foundation/styles/css.dart';
 
-import '../themes/colors.dart';
-
+part '_base.dart';
+part '_reset.dart';
+part 'colors.dart';
+part 'typography.dart';
 part 'theme.dart';
-part 'base.dart';
-part 'layout.dart';
 
-class InheritedContentTheme extends InheritedComponent {
-  InheritedContentTheme({
+/// A component that wraps the content of a page and applies default typographic styles.
+/// 
+/// The applies styles are based on the [ContentTheme] provided by the nearest [Content.wrapTheme] ancestor 
+/// (usually the root [ContentApp]).
+class Content extends StatelessComponent {
+  const Content(this.child, {super.key});
+
+  final Component child;
+
+  static Component wrapTheme(ContentTheme theme, {required Component child}) {
+    return _InheritedContentTheme(theme: theme, child: child);
+  }
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    if (!kIsWeb) {
+      final theme =
+          context.dependOnInheritedComponentOfExactType<_InheritedContentTheme>()?.theme ?? const ContentTheme.custom();
+      yield Document.head(children: [
+        Style(styles: theme.styles),
+      ]);
+    }
+
+    yield section(classes: 'content', [child]);
+  }
+}
+
+class _InheritedContentTheme extends InheritedComponent {
+  _InheritedContentTheme({
     required this.theme,
     required super.child,
   });
@@ -17,28 +44,7 @@ class InheritedContentTheme extends InheritedComponent {
   final ContentTheme theme;
 
   @override
-  bool updateShouldNotify(covariant InheritedContentTheme oldComponent) {
+  bool updateShouldNotify(covariant _InheritedContentTheme oldComponent) {
     return theme != oldComponent.theme;
-  }
-}
-
-class Content extends StatelessComponent {
-  const Content({
-    required this.children,
-  });
-
-  final List<Component> children;
-
-  @override
-  Iterable<Component> build(BuildContext context) sync* {
-    if (!kIsWeb) {
-      final theme =
-          context.dependOnInheritedComponentOfExactType<InheritedContentTheme>()?.theme ?? const ContentTheme.custom();
-      yield Document.head(children: [
-        Style(styles: theme.styles),
-      ]);
-    }
-
-    yield section(classes: 'content', children);
   }
 }

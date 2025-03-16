@@ -1,9 +1,9 @@
-import 'package:jaspr/jaspr.dart';
-
+part of 'content.dart';
+/// A default set of CSS reset styles.
 final List<StyleRule> resetStyles = [
   css('*, :after, :before').styles(
     boxSizing: BoxSizing.borderBox,
-    border: Border(width: Unit.zero, style: BorderStyle.solid, color: Color.hex('#e5e7eb')),
+    border: Border(width: Unit.zero, style: BorderStyle.solid, color: Color('#e5e7eb')),
   ),
   css(':host,html').styles(
     lineHeight: 1.5.em,
@@ -173,7 +173,7 @@ final List<StyleRule> resetStyles = [
   ),
   css('input::placeholder, textarea::placeholder').styles(
     opacity: 1,
-    color: Color.hex('#9ca3af'),
+    color: Color('#9ca3af'),
   ),
   css('[role=button], button').styles(
     cursor: Cursor.pointer,

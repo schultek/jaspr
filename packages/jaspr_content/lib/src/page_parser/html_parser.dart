@@ -4,11 +4,12 @@ import 'package:html/parser.dart' as html;
 import '../page.dart';
 import 'page_parser.dart';
 
+/// A parser for HTML pages.
 class HtmlParser implements PageParser {
-  HtmlParser();
+  const HtmlParser();
 
   @override
-  Set<String> get suffix => {'.html', '.htm'};
+  Pattern get pattern => RegExp(r'.*\.html');
 
   @override
   List<Node> parsePage(Page page) {
