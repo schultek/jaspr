@@ -168,7 +168,7 @@ Component input(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (type != null) 'type': type.value,
       if (name != null) 'name': name,
       if (value != null) 'value': value,
