@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:content_site/jaspr_options.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_content/jaspr_content.dart';
@@ -17,40 +19,20 @@ List<StyleRule> get globalStyles => [
       css('.justify-center').styles(justifyContent: JustifyContent.center),
     ];
 
-const secondary = ColorToken('secondary', Colors.blue, dark: Colors.skyBlue);
-
-void runLocal() {
-  runApp(ContentApp(
-    eagerlyLoadAllPages: false,
-    templateEngine: MustacheTemplateEngine(),
-    parsers: [
-      HtmlParser(),
-      MarkdownParser(),
-    ],
-    layouts: [
-      EmptyLayout(),
-    ],
-    theme: ContentTheme(
-      primary: Colors.violet,
-      background: Color('#0b0d0e'),
-      tokens: [
-        secondary,
-      ],
-    ),
-  ));
-}
-
 void runGithub() {
   runApp(ContentApp.custom(
     loaders: [
       FilesystemLoader('content'),
       GithubLoader(
         'schultek/jaspr',
-        accessToken: '...',
+        accessToken: Platform.environment['GITHUB_ACCESS_TOKEN'],
       ),
     ],
     configResolver: PageConfig.resolve(
       templateEngine: MustacheTemplateEngine(),
+      dataLoaders: [
+        FilesystemDataLoader('content/_data'),
+      ],
       parsers: [
         MarkdownParser(),
       ],
@@ -65,13 +47,12 @@ void runGithub() {
         DocsLayout(
           favicon: 'favicon.ico',
           header: Header(
-            title: 'Jaspr',
-            logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',
-            items: [
-              ThemeToggle(),
-              GithubButton(repo: 'schultek/jaspr'),
-            ]
-          ),
+              title: 'Jasprs',
+              logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',
+              items: [
+                ThemeToggle(),
+                GithubButton(repo: 'schultek/jaspr'),
+              ]),
           sidebar: Sidebar(groups: [
             SidebarGroup(
               links: [
@@ -94,9 +75,6 @@ void runGithub() {
       theme: ContentTheme(
         primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
         background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
-        tokens: [
-          secondary,
-        ],
       ),
     ),
   ));

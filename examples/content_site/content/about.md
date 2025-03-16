@@ -6,6 +6,12 @@ title: "About"
 
 This is the about pages TEST HALLO
 
+Framework: {{details.framework}}
+
+## Info
+
+{{ info.what }}
+
 <Info> Hello World </Info>
 
 ## Test

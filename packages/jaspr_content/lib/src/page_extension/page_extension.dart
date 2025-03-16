@@ -1,7 +1,17 @@
+/// @docImport 'components_extension.dart';
+/// @docImport 'heading_anchor_extension.dart';
+/// @docImport 'table_of_contents_extension.dart';
+library;
+
 import '../page.dart';
 import '../page_parser/page_parser.dart';
 
 /// An extension that can post-process a page and its parsed nodes.
+/// 
+/// See also:
+/// - [ComponentsExtension]
+/// - [HeadingAnchorExtension]
+/// - [TableOfContentsExtension]
 abstract class PageExtension {
   /// Applies the extension to the given [Page] and parsed [Node]s.
   /// 

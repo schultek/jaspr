@@ -1,3 +1,7 @@
+/// @docImport 'filesystem_loader.dart';
+/// @docImport 'github_loader.dart';
+library;
+
 import 'dart:async';
 import 'dart:collection';
 
@@ -7,14 +11,30 @@ import 'package:jaspr_router/jaspr_router.dart';
 import '../page.dart';
 
 /// A loader that loads pages and creates routes.
+/// 
+/// See also:
+/// - [FilesystemLoader]
+/// - [GithubLoader]
 abstract class PageLoader {
   /// Loads the routes with the given [ConfigResolver].
   Future<List<RouteBase>> loadRoutes(ConfigResolver resolver);
 
-  /// Reads a partial from the given [uri].
-  Future<String> readPartial(Uri uri, Page page);
-  /// Reads a partial from the given [uri] synchronously.
-  String readPartialSync(Uri uri, Page page);
+  /// Reads a partial from the given [path].
+  /// 
+  /// Partials are commonly used by templating engines to include other files during rendering.
+  Future<String> readPartial(String path, Page page);
+
+  /// Reads a partial from the given [path] synchronously.
+  /// 
+  /// Partials are commonly used by templating engines to include other files during rendering.
+  String readPartialSync(String path, Page page);
+
+  /// Invalidates the given [page].
+  /// 
+  /// This will cause the page to be rebuilt 
+  /// - when next accessed in lazy mode, or
+  /// - immediately in eager mode.
+  void invalidatePage(Page page);
 }
 
 /// A base class for [PageLoader] implementations.
@@ -27,7 +47,7 @@ abstract class PageLoaderBase implements PageLoader {
   final bool eager;
   final bool debugPrint;
 
-  Future<List<RouteBase>> _routes = Future.value([]);
+  Future<List<RouteBase>>? _routes;
 
   final Map<String, PageFactory> _factories = {};
 
@@ -39,6 +59,8 @@ abstract class PageLoaderBase implements PageLoader {
     return _resolver!;
   }
 
+  StreamSubscription? _reassembleSub;
+
   String getKeyForRoute(PageRoute route) {
     return route.route;
   }
@@ -49,23 +71,24 @@ abstract class PageLoaderBase implements PageLoader {
 
   @override
   Future<List<RouteBase>> loadRoutes(ConfigResolver resolver) async {
+    _reassembleSub ??= ServerApp.onReassemble.listen((_) {
+      invalidateAll();
+      onReassemble();
+      _reassembleSub?.cancel();
+      _reassembleSub = null;
+    });
+
     if (_resolver != resolver) {
       _resolver = resolver;
-      invalidateAll();
-      reload();
-      didInit();
     }
+    _routes ??= _buildRoutes();
     if (eager) {
       await Future.wait(_factories.values.map((v) => v.future).whereType<Future>());
     }
-    return _routes;
+    return _routes ?? [];
   }
 
-  void didInit() {}
-
-  void reload() {
-    _routes = _buildRoutes();
-  }
+  void onReassemble() {}
 
   Future<List<RouteBase>> _buildRoutes() async {
     final entities = await loadPageEntities();
@@ -73,15 +96,15 @@ abstract class PageLoaderBase implements PageLoader {
       entities: entities,
       buildPage: (page) {
         final config = resolver(page.route);
-        final factory = _factories[getKeyForRoute(page)] ??= createFactory(page);
+        final factory = _factories[getKeyForRoute(page)] ??= createFactory(page, config);
         if (eager) {
-          factory.future = factory.loadPage(config);
+          factory.future = factory.loadPage();
           return AsyncBuilder(builder: (context) async* {
             yield await factory.future!;
           });
         } else {
           return AsyncBuilder(builder: (context) async* {
-            yield await factory.loadPage(config);
+            yield await factory.loadPage();
           });
         }
       },
@@ -89,42 +112,51 @@ abstract class PageLoaderBase implements PageLoader {
     );
   }
 
-  PageFactory createFactory(PageRoute page);
+  PageFactory createFactory(PageRoute page, PageConfig config);
 
   Future<List<PageEntity>> loadPageEntities();
 
-  void invalidate(String key, {bool rebuild = true}) {
+  @override
+  void invalidatePage(Page page) {
+    final key = getKeyForPage(page);
+    if (key != null) {
+      invalidateKey(key);
+    }
+  }
+
+  void invalidateKey(String key, {bool rebuild = true}) {
     final factory = _factories[key];
-    if (factory?.page case final page?) {
-      pages.remove(page);
-    }
-    if (factory != null && rebuild && eager) {
-      factory.future = factory.loadPage(_resolver?.call(factory.route.route) ?? PageConfig());
-    }
+    factory?.invalidate(rebuild: rebuild);
+  }
+
+  void invalidateRoutes() {
+    _routes = null;
   }
 
   void invalidateAll() {
     _factories.clear();
+    _routes = null;
     pages.clear();
   }
 }
 
 abstract class PageFactory<T extends PageLoaderBase> {
-  PageFactory(this.route, this.loader);
+  PageFactory(this.route, this.config, this.loader);
 
   final PageRoute route;
+  final PageConfig config;
   final T loader;
 
   Page? page;
   Component? component;
   Future<Component>? future;
 
-  Future<Component> loadPage(PageConfig config) async {
+  Future<Component> loadPage() async {
     if (component != null) {
       return component!;
     }
 
-    final newPage = await buildPage(config);
+    final newPage = await buildPage();
 
     if (page != null) {
       loader.pages.remove(page);
@@ -139,7 +171,20 @@ abstract class PageFactory<T extends PageLoaderBase> {
     return child;
   }
 
-  Future<Page> buildPage(PageConfig config);
+  Future<Page> buildPage();
+
+  void invalidate({bool rebuild = true}) {
+    if (page != null) {
+      loader.pages.remove(page);
+      page = null;
+    }
+    component = null;
+    if (rebuild && loader.eager) {
+      future = loadPage();
+    } else {
+      future = null;
+    }
+  }
 }
 
 sealed class PageEntity {

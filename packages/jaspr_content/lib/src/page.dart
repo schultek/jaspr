@@ -4,6 +4,7 @@ import 'package:fbh_front_matter/fbh_front_matter.dart' as fm;
 import 'package:jaspr/jaspr.dart';
 
 import 'content/content.dart';
+import 'data_loader/data_loader.dart';
 import 'layouts/page_layout.dart';
 import 'page_extension/page_extension.dart';
 import 'page_loader/page_loader.dart';
@@ -53,16 +54,20 @@ class Page {
     }
   }
 
+  void markNeedsRebuild() {
+    _loader.invalidatePage(this);
+  }
+
   static Component wrap(Page page, List<Page> pages, Component child) {
     return _InheritedPage(page: page, pages: pages, child: child);
   }
 
-  Future<String> readPartial(Uri uri) {
-    return _loader.readPartial(uri, this);
+  Future<String> readPartial(String path) {
+    return _loader.readPartial(path, this);
   }
 
-  String readPartialSync(Uri uri) {
-    return _loader.readPartialSync(uri, this);
+  String readPartialSync(String path) {
+    return _loader.readPartialSync(path, this);
   }
 }
 
@@ -72,6 +77,7 @@ class Page {
 class PageConfig {
   const PageConfig({
     this.enableFrontmatter = true,
+    this.dataLoaders = const [],
     this.templateEngine,
     this.parsers = const [],
     this.extensions = const [],
@@ -82,6 +88,9 @@ class PageConfig {
 
   /// Whether to enable frontmatter parsing.
   final bool enableFrontmatter;
+
+  /// The data loaders to use for loading additional data for the page.
+  final List<DataLoader> dataLoaders;
 
   /// The template engine to use for preprocessing the page content before parsing.
   final TemplateEngine? templateEngine;
@@ -116,6 +125,7 @@ class PageConfig {
   /// Resolves the given configuration for all pages.
   static ConfigResolver resolve({
     bool enableFrontmatter = true,
+    List<DataLoader> dataLoaders = const [],
     TemplateEngine? templateEngine,
     List<PageParser> parsers = const [],
     List<PageExtension> extensions = const [],
@@ -125,6 +135,7 @@ class PageConfig {
   }) {
     final config = PageConfig(
       enableFrontmatter: enableFrontmatter,
+      dataLoaders: dataLoaders,
       templateEngine: templateEngine,
       parsers: parsers,
       extensions: extensions,
@@ -149,6 +160,7 @@ class PageConfig {
   /// Custom page builder functions may copy and modify this function as needed.
   static Future<Component> defaultPageBuilder(Page page) async {
     page.parseFrontmatter();
+    await page.loadData();
     await page.renderTemplate();
     var nodes = page.parseNodes();
     nodes = page.applyExtensions(nodes);
@@ -174,6 +186,13 @@ extension PageHandlers on Page {
     if (config.enableFrontmatter) {
       final document = fm.parse(content);
       apply(content: document.content, data: document.data.cast());
+    }
+  }
+
+  /// Loads additional data for the page using the configured data loaders.
+  Future<void> loadData() async {
+    for (final loader in config.dataLoaders) {
+      await loader.loadData(this);
     }
   }
 
@@ -209,8 +228,11 @@ extension PageHandlers on Page {
   /// When no key is set or matching, the first provided layout is used.
   /// Returns [child] if no layout is provided.
   Component buildLayout(Component child) {
-    final layout = config.layouts.where((l) => l.name.matchAsPrefix(data['layout']) != null).firstOrNull ??
-        config.layouts.firstOrNull;
+    PageLayout? layout;
+    if (data['layout'] case final key?) {
+      layout = config.layouts.where((l) => l.name.matchAsPrefix(key) != null).firstOrNull;
+    }
+    layout ??= config.layouts.firstOrNull;
     if (layout == null) return child;
     return layout.buildLayout(this, child);
   }

@@ -22,16 +22,17 @@ class MustacheTemplateEngine implements TemplateEngine {
 
   @override
   Future<void> render(Page page) async {
-    final template = _buildTemplate(page, page.content);
+    final root = Uri.parse(partialsRoot);
+    final template = _buildTemplate(page, page.content, root);
     page.apply(content: template.renderString(prepareValues(page)));
   }
 
-  Template _buildTemplate(Page page, String content) {
+  Template _buildTemplate(Page page, String content, Uri root) {
     return Template(
       content,
       partialResolver: (String name) {
-        final path = Uri.parse(partialsRoot).resolve(name);
-        return _buildTemplate(page, page.readPartialSync(path));
+        final path = root.resolve(name).path;
+        return _buildTemplate(page, page.readPartialSync(path), root);
       },
       delimiters: delimiters,
     );

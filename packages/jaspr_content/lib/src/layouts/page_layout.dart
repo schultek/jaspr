@@ -1,3 +1,7 @@
+/// @docImport 'docs/layout.dart';
+/// @docImport 'empty_layout.dart';
+library;
+
 import 'package:jaspr/server.dart';
 
 import '../content/content.dart';
@@ -10,6 +14,10 @@ import '../page.dart';
 /// 
 /// When more than one layout is provided to the page's [PageConfig], the layout's [name] pattern is used to determined 
 /// which layout to choose for a page.
+/// 
+/// See also:
+/// - [EmptyLayout]
+/// - [DocsLayout]
 abstract class PageLayout {
   /// The name pattern that the layout matches.
   /// 

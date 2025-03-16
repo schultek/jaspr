@@ -47,7 +47,7 @@ class _IncludeResolver implements Root {
   @override
   Future<Source> resolve(String relPath) async {
     final file = _includesPath.resolve(relPath);
-    final content = await page.readPartial(file);
+    final content = await page.readPartial(file.path);
     return Source(file, content, this);
   }
 }

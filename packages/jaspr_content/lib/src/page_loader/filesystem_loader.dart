@@ -2,11 +2,17 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:jaspr/server.dart';
+import 'package:jaspr_router/jaspr_router.dart';
 import 'package:watcher/watcher.dart';
 
 import '../page.dart';
 import 'page_loader.dart';
 
+/// A loader that loads pages from the filesystem.
+/// 
+/// Routes are constructed based on the recursive folder structure under the root [directory].
+/// Index files (index.*) are treated as the page for the containing folder.
+/// Files and folders starting with an underscore (_) are ignored.
 class FilesystemLoader extends PageLoaderBase {
   FilesystemLoader(
     this.directory, {
@@ -14,11 +20,12 @@ class FilesystemLoader extends PageLoaderBase {
     super.debugPrint,
   });
 
+  /// The directory to load pages from.
   final String directory;
 
   final Map<String, Set<String>> dependentPages = {};
 
-  static StreamSubscription<WatchEvent>? _watchEvents;
+  StreamSubscription<WatchEvent>? _watcherSub;
 
   @override
   String getKeyForRoute(PageRoute route) {
@@ -26,53 +33,59 @@ class FilesystemLoader extends PageLoaderBase {
   }
 
   @override
-  void didInit() {
+  Future<List<RouteBase>> loadRoutes(ConfigResolver resolver) async {
     if (kDebugMode) {
-      _watchEvents?.cancel();
-      _watchEvents = DirectoryWatcher(directory).events.listen((event) {
+      _watcherSub ??= DirectoryWatcher(directory).events.listen((event) {
         var path = event.path;
         if (event.type == ChangeType.MODIFY) {
-          invalidate(path);
+          invalidateKey(path);
         } else if (event.type == ChangeType.REMOVE) {
-          invalidate(path, rebuild: false);
-          reload();
+          invalidateKey(path, rebuild: false);
+          invalidateRoutes();
         } else if (event.type == ChangeType.ADD) {
-          reload();
+          invalidateRoutes();
         }
       });
     }
+    return super.loadRoutes(resolver);
   }
 
   @override
-  Future<String> readPartial(Uri uri, Page page) {
-    return _getPartial(uri, page).readAsString();
+  void onReassemble() {
+    _watcherSub?.cancel();
+    _watcherSub = null;
   }
 
   @override
-  String readPartialSync(Uri uri, Page page) {
-    return _getPartial(uri, page).readAsStringSync();
+  Future<String> readPartial(String path, Page page) {
+    return _getPartial(path, page).readAsString();
   }
 
-  File _getPartial(Uri uri, Page page) {
-    final path = getKeyForPage(page);
-    if (path != null) {
-      (dependentPages[uri.toFilePath()] ??= {}).add(path);
+  @override
+  String readPartialSync(String path, Page page) {
+    return _getPartial(path, page).readAsStringSync();
+  }
+
+  File _getPartial(String path, Page page) {
+    final pagePath = getKeyForPage(page);
+    if (pagePath != null) {
+      (dependentPages[path] ??= {}).add(pagePath);
     }
-    return File.fromUri(uri);
+    return File(path);
   }
 
   @override
-  PageFactory createFactory(PageRoute page) {
-    return FilePageFactory(page, this);
+  PageFactory createFactory(PageRoute page, PageConfig config) {
+    return FilePageFactory(page, config, this);
   }
 
   @override
-  void invalidate(String key, {bool rebuild = true}) {
-    super.invalidate(key, rebuild: rebuild);
+  void invalidateKey(String key, {bool rebuild = true}) {
+    super.invalidateKey(key, rebuild: rebuild);
     final dependencies = {...?dependentPages[key]};
     dependentPages[key]?.clear();
     for (var dpath in dependencies) {
-      invalidate(dpath, rebuild: rebuild);
+      invalidateKey(dpath, rebuild: rebuild);
     }
   }
 
@@ -104,10 +117,10 @@ class FilesystemLoader extends PageLoaderBase {
 }
 
 class FilePageFactory extends PageFactory<FilesystemLoader> {
-  FilePageFactory(super.route, super.loader);
+  FilePageFactory(super.route, super.config, super.loader);
 
   @override
-  Future<Page> buildPage(PageConfig config) async {
+  Future<Page> buildPage() async {
     final file = File(route.source);
     final content = await file.readAsString();
     final data = {

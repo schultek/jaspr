@@ -7,7 +7,7 @@ import 'marker_utils.dart';
 ///
 /// Call [Jaspr.initializeApp()] at the start of your app, before any calls to [runApp].
 class Jaspr {
-  static void initializeApp({JasprOptions options = const JasprOptions(), bool useIsolates = true}) {
+  static void initializeApp({JasprOptions options = const JasprOptions(), bool useIsolates = false}) {
     _options = options;
     _useIsolates = useIsolates;
   }

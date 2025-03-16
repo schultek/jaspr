@@ -6,6 +6,11 @@ import 'package:http/http.dart' as http;
 import '../page.dart';
 import 'page_loader.dart';
 
+/// A loader that loads pages from a github repository.
+/// 
+/// Routes are constructed based on the recursive folder structure starting at the root [path].
+/// Index files (index.*) are treated as the page for the containing folder.
+/// Files and folders starting with an underscore (_) are ignored.
 class GithubLoader extends PageLoaderBase {
   GithubLoader(
     this.repo, {
@@ -16,24 +21,32 @@ class GithubLoader extends PageLoaderBase {
     super.debugPrint,
   });
 
+  /// The repository to load pages from. Must be in the form '<owner>/<repo>'.
   final String repo;
+  /// The branch, tag or commit to checkout the repository at.
   final String ref;
+  /// The root path to load pages from.
   final String path;
+
+  /// The access token to use for authentication.
+  /// 
+  /// This is required for private repositories. 
+  /// For public repositories you may quickly hit rate limits without an access token.
   final String? accessToken;
 
   @override
-  Future<String> readPartial(Uri uri, Page page) {
+  Future<String> readPartial(String path, Page page) {
     throw UnsupportedError('Reading partial files is not supported for GithubLoader');
   }
   
   @override
-  String readPartialSync(Uri uri, Page page) {
+  String readPartialSync(String path, Page page) {
    throw UnsupportedError('Reading partial files is not supported for GithubLoader');
   }
 
   @override
-  PageFactory createFactory(PageRoute page) {
-    return GithubPageFactory(page, this);
+  PageFactory createFactory(PageRoute page, PageConfig config) {
+    return GithubPageFactory(page,config, this);
   }
 
   Future<List<dynamic>> _loadTree() async {
@@ -94,10 +107,10 @@ class GithubLoader extends PageLoaderBase {
 }
 
 class GithubPageFactory extends PageFactory<GithubLoader> {
-  GithubPageFactory(super.route, super.loader);
+  GithubPageFactory(super.route,super.config, super.loader);
 
   @override
-  Future<Page> buildPage(PageConfig config) async {
+  Future<Page> buildPage() async {
     final response = await http.get(Uri.parse(route.source), headers: {
       'Accept': 'application/vnd.github.raw+json',
       if (loader.accessToken != null) 'Authorization': 'Bearer ${loader.accessToken}',

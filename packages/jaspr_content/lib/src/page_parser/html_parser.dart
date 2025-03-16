@@ -4,7 +4,7 @@ import 'package:html/parser.dart' as html;
 import '../page.dart';
 import 'page_parser.dart';
 
-/// A parser for HTML pages.
+/// A parser for HTML content.
 class HtmlParser implements PageParser {
   const HtmlParser();
 

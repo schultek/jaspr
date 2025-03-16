@@ -41,6 +41,9 @@ class ContentApp extends AsyncStatelessComponent {
     /// Whether to enable frontmatter parsing for pages.
     bool enableFrontmatter = true,
 
+    /// The directory to load data files from.
+    String dataDirectory = 'content/_data',
+
     /// An optional [TemplateEngine] to preprocess a page's content.
     TemplateEngine? templateEngine,
 
@@ -74,6 +77,9 @@ class ContentApp extends AsyncStatelessComponent {
         ],
         configResolver = PageConfig.resolve(
           enableFrontmatter: enableFrontmatter,
+          dataLoaders: [
+            FilesystemDataLoader(dataDirectory),
+          ],
           templateEngine: templateEngine,
           parsers: parsers,
           extensions: extensions,
@@ -103,8 +109,11 @@ class ContentApp extends AsyncStatelessComponent {
   }
 
   void _disableIsolates() {
-    // For caching to work correctly we need to disable isolate rendering.
-    Jaspr.initializeApp(options: Jaspr.options, useIsolates: false);
+    if (Jaspr.useIsolates) {
+      print("[Warning] ContentApp only supports non-isolate rendering. Disabling isolate rendering.");
+      // For caching to work correctly we need to disable isolate rendering.
+      Jaspr.initializeApp(options: Jaspr.options, useIsolates: false);
+    }
   }
 
   final List<PageLoader> loaders;

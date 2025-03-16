@@ -1,8 +1,17 @@
+
+/// @docImport 'html_parser.dart';
+/// @docImport 'markdown_parser.dart';
+library;
+
 import 'package:jaspr/server.dart';
 
 import '../page.dart';
 
 /// Parses a page into a list of nodes.
+/// 
+/// See also:
+/// - [HtmlParser]
+/// - [MarkdownParser]
 abstract class PageParser {
 
   /// The pattern that is used to match the page name (usually the file name).

@@ -50,6 +50,9 @@ void main() {
       ),
     ],
     configResolver: PageConfig.resolve(
+      dataLoaders: [
+        FilesystemDataLoader('content/_data'),
+      ],
       parsers: [
         MarkdownParser(),
       ],

@@ -3,6 +3,8 @@ library;
 
 export 'src/content/content.dart';
 export 'src/content_app.dart';
+export 'src/data_loader/data_loader.dart';
+export 'src/data_loader/filesystem_data_loader.dart';
 export 'src/layouts/docs/layout.dart';
 export 'src/layouts/empty_layout.dart';
 export 'src/layouts/page_layout.dart';
