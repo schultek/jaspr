@@ -1,30 +1,28 @@
 import 'dart:async';
 
 import 'package:fbh_front_matter/fbh_front_matter.dart' as fm;
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/server.dart';
 
 import 'content/content.dart';
 import 'data_loader/data_loader.dart';
 import 'layouts/page_layout.dart';
 import 'page_extension/page_extension.dart';
-import 'page_loader/page_loader.dart';
 import 'page_parser/page_parser.dart';
+import 'route_loader/route_loader.dart';
 import 'template_engine/template_engine.dart';
 
 /// A single page of the site.
 ///
-/// It contains the page's name, url, content, and additional data.
+/// It contains the page's path, url, content, and additional data.
 /// The page object is passed to the different modules of the content package and may be modified by them.
 /// How the page is built is determined by the [PageConfig] object.
 class Page {
-  Page(this.name, this.url, this.content, this.data, this.config, this._loader);
+  Page(this.path, this.url, this.content, this.data, this.config, this._loader);
 
-  /// The name of the page including its suffix.
-  ///
-  /// E.g. index.html, about.md
-  final String name;
+  /// The path of the page including its suffix, e.g. 'index.html', 'some/path.md'.
+  final String path;
 
-  /// The url path of the page.
+  /// The url of the page, e.g. '/', '/some/path'.
   final String url;
 
   /// The content of the page.
@@ -42,7 +40,7 @@ class Page {
   /// This determines how the page is built.
   final PageConfig config;
 
-  final PageLoader _loader;
+  final RouteLoader _loader;
 
   /// Applies changes to the page content or data.
   void apply({String? content, Map<String, dynamic>? data, bool mergeData = true}) {
@@ -69,6 +67,37 @@ class Page {
   String readPartialSync(String path) {
     return _loader.readPartialSync(path, this);
   }
+
+  /// Builds the page.
+  ///
+  /// This performs the following steps in order:
+  /// 1. Parses the frontmatter if [enableFrontmatter] is true.
+  /// 2. Preprocesses the content if a [templateEngine] is provided.
+  /// 3. Parses the nodes of the page using one of the [parsers].
+  /// 4. Processes the nodes by applying the provided [extensions].
+  /// 5. Builds the [Content] component from the processed nodes.
+  /// 6. Builds the layout for the page using one of the [layouts].
+  /// 7. Wraps the layout in the provided [theme].
+  Future<Component> build() async {
+    parseFrontmatter();
+    await loadData();
+    return AsyncBuilder(builder: (context) async* {
+      await renderTemplate();
+
+      if (config.enableRawOutput) {
+        context.setHeader('Content-Type', getContentType());
+        context.setStatusCode(200, responseBody: content);
+
+        return;
+      }
+
+      var nodes = parseNodes();
+      nodes = applyExtensions(nodes);
+      final component = Content(nodes.build());
+      final layout = buildLayout(component);
+      yield wrapTheme(layout);
+    });
+  }
 }
 
 /// The configuration for building a page.
@@ -79,10 +108,10 @@ class PageConfig {
     this.enableFrontmatter = true,
     this.dataLoaders = const [],
     this.templateEngine,
+    this.enableRawOutput = false,
     this.parsers = const [],
     this.extensions = const [],
     this.layouts = const [],
-    this.pageBuilder = defaultPageBuilder,
     this.theme,
   });
 
@@ -94,6 +123,11 @@ class PageConfig {
 
   /// The template engine to use for preprocessing the page content before parsing.
   final TemplateEngine? templateEngine;
+
+  /// Whether to output the raw content of the page.
+  /// 
+  /// When true, this will skip parsing and rendering the page and return the content as is.
+  final bool enableRawOutput;
 
   /// The parsers to use for parsing the page content.
   ///
@@ -113,24 +147,17 @@ class PageConfig {
   /// When no key is set or matching, the first provided layout is used.
   final List<PageLayout> layouts;
 
-  /// A custom builder function to use for building the page.
-  ///
-  /// This function controls the page building process and should only be overridden for advanced use-cases.
-  /// It defaults to [PageConfig.defaultPageBuilder].
-  final PageBuilder pageBuilder;
-
   /// The theme to use for the page.
   final ContentTheme? theme;
 
   /// Resolves the given configuration for all pages.
-  static ConfigResolver resolve({
+  static ConfigResolver all({
     bool enableFrontmatter = true,
     List<DataLoader> dataLoaders = const [],
     TemplateEngine? templateEngine,
     List<PageParser> parsers = const [],
     List<PageExtension> extensions = const [],
     List<PageLayout> layouts = const [],
-    PageBuilder pageBuilder = defaultPageBuilder,
     ContentTheme? theme,
   }) {
     final config = PageConfig(
@@ -140,44 +167,20 @@ class PageConfig {
       parsers: parsers,
       extensions: extensions,
       layouts: layouts,
-      pageBuilder: pageBuilder,
       theme: theme,
     );
     return (_) => config;
   }
-
-  /// The default page builder function.
-  ///
-  /// This performs the following steps in order:
-  /// 1. Parses the frontmatter if [enableFrontmatter] is true.
-  /// 2. Preprocesses the content if a [templateEngine] is provided.
-  /// 3. Parses the nodes of the page using one of the [parsers].
-  /// 4. Processes the nodes by applying the provided [extensions].
-  /// 5. Builds the [Content] component from the processed nodes.
-  /// 6. Builds the layout for the page using one of the [layouts].
-  /// 7. Wraps the layout in the provided [theme].
-  ///
-  /// Custom page builder functions may copy and modify this function as needed.
-  static Future<Component> defaultPageBuilder(Page page) async {
-    page.parseFrontmatter();
-    await page.loadData();
-    await page.renderTemplate();
-    var nodes = page.parseNodes();
-    nodes = page.applyExtensions(nodes);
-    final component = Content(nodes.build());
-    final layout = page.buildLayout(component);
-    return page.wrapTheme(layout);
-  }
 }
 
 /// A function that resolves the configuration for a page based on its url.
-typedef ConfigResolver = PageConfig Function(String);
+typedef ConfigResolver = PageConfig Function(PageRoute);
 
 /// A function that builds a page based on its configuration.
 typedef PageBuilder = Future<Component> Function(Page);
 
 /// Common build steps that may be used in a page builder function.
-extension PageHandlers on Page {
+extension PageHandlersExtension on Page {
   /// Parses the frontmatter of the page content and adds it to the page data.
   ///
   /// This is only done if [PageConfig.enableFrontmatter] is true.
@@ -202,6 +205,25 @@ extension PageHandlers on Page {
   FutureOr<void> renderTemplate() {
     if (config.templateEngine != null) {
       return config.templateEngine!.render(this);
+    }
+  }
+
+  String getContentType() {
+    if (data['content-type'] case final type?) {
+      return type;
+    }
+    if (this.path.endsWith('.html')) {
+      return 'text/html';
+    } else if (this.path.endsWith('.xml')) {
+      return 'text/xml';
+    } else if (this.path.endsWith('.md')) {
+      return 'text/markdown';
+    } else if (this.path.endsWith('.json')) {
+      return 'application/json';
+    } else if (this.path.endsWith('.yaml')) {
+      return 'application/yaml';
+    } else {
+      return 'text/plain';
     }
   }
 
@@ -255,7 +277,7 @@ extension PageContext on BuildContext {
 
   /// Returns the list of all pages that are being built.
   ///
-  /// This list will only be fully available if the [PageLoader] is eagerly loading all pages before building them.
+  /// This list will only be fully available if the [RouteLoader] is eagerly loading all pages before building them.
   /// Otherwise, it will only contain the pages that have been built so far.
   ///
   /// The list should not be modified, otherwise it could lead to unexpected behavior.
@@ -274,7 +296,7 @@ class _InheritedPage extends InheritedComponent {
   }
 }
 
-extension on Map<String, dynamic> {
+extension DataMergeExtension on Map<String, dynamic> {
   Map<String, dynamic> merge(Map<String, dynamic> other) {
     var merged = <String, dynamic>{};
     var otherKeys = other.keys.toSet();

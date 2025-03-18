@@ -14,8 +14,8 @@ import '../page.dart';
 /// - [MarkdownParser]
 abstract class PageParser {
 
-  /// The pattern that is used to match the page name (usually the file name).
-  /// It must match the entire name, not just the file suffix. Regexes are allowed.
+  /// The pattern that is used to match the page path.
+  /// It must match the entire path, not just the file suffix. Regexes are allowed.
   Pattern get pattern;
 
   /// Parses the given [page] into a list of nodes.
@@ -27,9 +27,9 @@ abstract class PageParser {
 extension PageBuilderExtension on Iterable<PageParser> {
   /// Parses the given [page] by selecting the matching parser and calling [PageParser.parsePage].
   List<Node> parsePage(Page page) {
-    final parser = where((parser) => parser.pattern.matchAsPrefix(page.name) != null).firstOrNull;
+    final parser = where((parser) => parser.pattern.matchAsPrefix(page.path) != null).firstOrNull;
     if (parser == null) {
-      throw Exception('No parser found for page: ${page.name}');
+      throw Exception('No parser found for page: ${page.path}');
     }
     return parser.parsePage(page);
   }

@@ -4,18 +4,18 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../page.dart';
-import 'page_loader.dart';
+import 'route_loader.dart';
 
-/// A loader that loads pages from a github repository.
+/// A loader that loads routes from a github repository.
 /// 
 /// Routes are constructed based on the recursive folder structure starting at the root [path].
 /// Index files (index.*) are treated as the page for the containing folder.
 /// Files and folders starting with an underscore (_) are ignored.
-class GithubLoader extends PageLoaderBase {
+class GithubLoader extends RouteLoaderBase {
   GithubLoader(
     this.repo, {
     this.ref = 'main',
-    this.path = 'docs',
+    this.path = 'docs/',
     this.accessToken,
     super.eager,
     super.debugPrint,
@@ -45,8 +45,8 @@ class GithubLoader extends PageLoaderBase {
   }
 
   @override
-  PageFactory createFactory(PageRoute page, PageConfig config) {
-    return GithubPageFactory(page,config, this);
+  PageFactory createFactory(PageRoute route, PageConfig config) {
+    return GithubPageFactory(route,config, this);
   }
 
   Future<List<dynamic>> _loadTree() async {
@@ -66,8 +66,11 @@ class GithubLoader extends PageLoaderBase {
   }
 
   @override
-  Future<List<PageEntity>> loadPageEntities() async {
-    final root = path;
+  Future<List<RouteEntity>> loadPageEntities() async {
+    var root = path;
+    if (root.isNotEmpty && !root.endsWith('/')) {
+      root += '/';
+    }
     var files = await _loadTree();
 
     Map<String, dynamic> tree = {};
@@ -88,26 +91,26 @@ class GithubLoader extends PageLoaderBase {
         var segment = segments[i];
         current = (current[segment] ??= <String, dynamic>{});
       }
-      current[segments.last] = PageSource(segments.last, file['url']);
+      current[segments.last] = SourceRoute(segments.last, file['url']);
     }
 
-    PageEntity? getEntity(MapEntry<String, dynamic> entry) {
-      if (entry.value case PageSource file) {
+    RouteEntity? getEntity(MapEntry<String, dynamic> entry) {
+      if (entry.value case SourceRoute file) {
         return file;
       } else if (entry.value case Map<String, dynamic> map) {
-        return PageCollection(entry.key, map.entries.map(getEntity).whereType<PageEntity>().toList());
+        return CollectionRoute(entry.key, map.entries.map(getEntity).whereType<RouteEntity>().toList());
       } else {
         return null;
       }
     }
 
-    return tree.entries.map(getEntity).whereType<PageEntity>().toList();
+    return tree.entries.map(getEntity).whereType<RouteEntity>().toList();
   }
   
 }
 
 class GithubPageFactory extends PageFactory<GithubLoader> {
-  GithubPageFactory(super.route,super.config, super.loader);
+  GithubPageFactory(super.route, super.config, super.loader);
 
   @override
   Future<Page> buildPage() async {
@@ -118,9 +121,9 @@ class GithubPageFactory extends PageFactory<GithubLoader> {
     });
     final content = response.body;
     final data = {
-      'page': {'url': route.route},
+      'page': {'path': route.path, 'url': route.route},
     };
 
-    return Page(route.name, route.route, content, data, config, loader);
+    return Page(route.path, route.route, content, data, config, loader);
   }
 }

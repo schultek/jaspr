@@ -393,17 +393,19 @@ packages:
   jaspr_lints:
     dependency: "direct dev"
     description:
-      path: "../../packages/jaspr_lints"
-      relative: true
-    source: path
+      name: jaspr_lints
+      sha256: "17e73c818c409454ea150e0641928bf1d340c2704016aba5efd223302bee72f7"
+      url: "https://pub.dev"
+    source: hosted
     version: "0.3.1"
   jaspr_router:
     dependency: "direct main"
     description:
-      path: "../../packages/jaspr_router"
-      relative: true
-    source: path
-    version: "0.6.3"
+      name: jaspr_router
+      sha256: "79402a33791e58969ea85ce3c90739e4bdbd4a0ce07c0a9daffd7cb383cb9041"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.4"
   js:
     dependency: transitive
     description:

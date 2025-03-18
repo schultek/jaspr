@@ -1,17 +1,25 @@
 import 'dart:async';
 
 import 'package:jaspr/server.dart';
-import 'package:jaspr_router/jaspr_router.dart';
+import 'package:jaspr_router/jaspr_router.dart' hide RouteLoader;
 
-import '../jaspr_content.dart';
+import 'content/content.dart';
+import 'data_loader/filesystem_data_loader.dart';
+import 'layouts/page_layout.dart';
+import 'page.dart';
+import 'page_extension/page_extension.dart';
+import 'page_parser/page_parser.dart';
+import 'route_loader/filesystem_loader.dart';
+import 'route_loader/route_loader.dart';
+import 'template_engine/template_engine.dart';
 
 /// The root component for building a content-driven site.
 ///
-/// [ContentApp] builds the top-level [Router] for the site. The provided [PageLoader]s are used to load the full set
-/// of routes for the site. A [PageLoader] then builds a [Page] for each route based on the resolved [PageConfig].
+/// [ContentApp] builds the top-level [Router] for the site. The provided [RouteLoader]s are used to load the full set
+/// of routes for the site. A [RouteLoader] then builds a [Page] for each route based on the resolved [PageConfig].
 ///
 /// For a single page, the following steps are taken:
-/// 1. The page is loaded by the [PageLoader].
+/// 1. The page is loaded by the [RouteLoader].
 /// 2. The page's configuration is resolved by the [ConfigResolver] based on its url.
 /// 3. The page's content is parsed and processed based on the configuration.
 /// 4. The page's content is wrapped in a [Component] and layout.
@@ -75,7 +83,7 @@ class ContentApp extends AsyncStatelessComponent {
             debugPrint: debugPrint,
           )
         ],
-        configResolver = PageConfig.resolve(
+        configResolver = PageConfig.all(
           enableFrontmatter: enableFrontmatter,
           dataLoaders: [
             FilesystemDataLoader(dataDirectory),
@@ -87,7 +95,7 @@ class ContentApp extends AsyncStatelessComponent {
           theme: theme,
         ),
         routerBuilder = _defaultRouterBuilder {
-    _disableIsolates();
+    _overrideGlobalOptions();
   }
 
   /// Creates a [ContentApp].
@@ -97,7 +105,7 @@ class ContentApp extends AsyncStatelessComponent {
 
     /// A function to resolve the configuration for a page based on its url.
     ///
-    /// Use [PageConfig.resolve] to resolve the same config for all pages.
+    /// Use [PageConfig.all] to resolve the same config for all pages.
     this.configResolver = _defaultConfigResolver,
 
     /// A custom builder function to use for building the main [Router] component.
@@ -105,10 +113,10 @@ class ContentApp extends AsyncStatelessComponent {
     /// This can be used to customize the router component, add additional routes or inserting components above the router.
     this.routerBuilder = _defaultRouterBuilder,
   }) {
-    _disableIsolates();
+    _overrideGlobalOptions();
   }
 
-  void _disableIsolates() {
+  void _overrideGlobalOptions() {
     if (Jaspr.useIsolates) {
       print("[Warning] ContentApp only supports non-isolate rendering. Disabling isolate rendering.");
       // For caching to work correctly we need to disable isolate rendering.
@@ -116,18 +124,44 @@ class ContentApp extends AsyncStatelessComponent {
     }
   }
 
-  final List<PageLoader> loaders;
+  final List<RouteLoader> loaders;
   final ConfigResolver configResolver;
   final Component Function(List<List<RouteBase>> routes) routerBuilder;
 
   @override
   Stream<Component> build(BuildContext context) async* {
     final routes = await Future.wait(loaders.map((l) => l.loadRoutes(configResolver)));
+    _ensureAllowedSuffixes(routes);
     yield routerBuilder(routes);
+  }
+
+  void _ensureAllowedSuffixes(List<List<RouteBase>> routes) {
+    List<String> getSuffixes(RouteBase route) {
+      if (route is Route) {
+        return [
+          if (route.path.split('/').last.split('.') case [_, ..., final suffix]) suffix,
+          ...route.routes.expand((r) => getSuffixes(r)),
+        ];
+      } else if (route is ShellRoute) {
+        return route.routes.expand((r) => getSuffixes(r)).toList();
+      } else {
+        return [];
+      }
+    }
+
+    final suffixes = routes.expand((r) => r).expand((r) => getSuffixes(r)).toSet();
+    final missing = suffixes.difference(Jaspr.allowedPathSuffixes.toSet());
+    if (missing.isNotEmpty) {
+      Jaspr.initializeApp(
+        options: Jaspr.options,
+        useIsolates: Jaspr.useIsolates,
+        allowedPathSuffixes: [...Jaspr.allowedPathSuffixes, ...missing],
+      );
+    }
   }
 }
 
-PageConfig _defaultConfigResolver(String path) {
+PageConfig _defaultConfigResolver(PageRoute route) {
   return const PageConfig();
 }
 

@@ -6,14 +6,14 @@ import 'package:jaspr_router/jaspr_router.dart';
 import 'package:watcher/watcher.dart';
 
 import '../page.dart';
-import 'page_loader.dart';
+import 'route_loader.dart';
 
-/// A loader that loads pages from the filesystem.
+/// A loader that loads routes from the filesystem.
 /// 
 /// Routes are constructed based on the recursive folder structure under the root [directory].
 /// Index files (index.*) are treated as the page for the containing folder.
 /// Files and folders starting with an underscore (_) are ignored.
-class FilesystemLoader extends PageLoaderBase {
+class FilesystemLoader extends RouteLoaderBase {
   FilesystemLoader(
     this.directory, {
     super.eager,
@@ -96,17 +96,17 @@ class FilesystemLoader extends PageLoaderBase {
   }
 
   @override
-  Future<List<PageEntity>> loadPageEntities() async {
+  Future<List<RouteEntity>> loadPageEntities() async {
     final dir = Directory(directory);
 
-    List<PageEntity> loadEntities(Directory dir) {
-      List<PageEntity> entities = [];
+    List<RouteEntity> loadEntities(Directory dir) {
+      List<RouteEntity> entities = [];
       for (final entry in dir.listSync()) {
         final name = entry.path.substring(dir.path.length + 1);
         if (entry is File) {
-          entities.add(PageSource(name, entry.path));
+          entities.add(SourceRoute(name, entry.path));
         } else if (entry is Directory) {
-          entities.add(PageCollection(name, loadEntities(entry)));
+          entities.add(CollectionRoute(name, loadEntities(entry)));
         }
       }
       return entities;
@@ -124,8 +124,8 @@ class FilePageFactory extends PageFactory<FilesystemLoader> {
     final file = File(route.source);
     final content = await file.readAsString();
     final data = {
-      'page': {'url': route.route},
+      'page': {'path': route.path, 'url': route.route},
     };
-    return Page(route.name, route.route, content, data, config, loader);
+    return Page(route.path, route.route, content, data, config, loader);
   }
 }

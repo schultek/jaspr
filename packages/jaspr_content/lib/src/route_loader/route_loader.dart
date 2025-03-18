@@ -10,36 +10,36 @@ import 'package:jaspr_router/jaspr_router.dart';
 
 import '../page.dart';
 
-/// A loader that loads pages and creates routes.
-/// 
+/// A loader that loads routes and creates pages.
+///
 /// See also:
 /// - [FilesystemLoader]
 /// - [GithubLoader]
-abstract class PageLoader {
+abstract class RouteLoader {
   /// Loads the routes with the given [ConfigResolver].
   Future<List<RouteBase>> loadRoutes(ConfigResolver resolver);
 
   /// Reads a partial from the given [path].
-  /// 
+  ///
   /// Partials are commonly used by templating engines to include other files during rendering.
   Future<String> readPartial(String path, Page page);
 
   /// Reads a partial from the given [path] synchronously.
-  /// 
+  ///
   /// Partials are commonly used by templating engines to include other files during rendering.
   String readPartialSync(String path, Page page);
 
   /// Invalidates the given [page].
-  /// 
-  /// This will cause the page to be rebuilt 
+  ///
+  /// This will cause the page to be rebuilt
   /// - when next accessed in lazy mode, or
   /// - immediately in eager mode.
   void invalidatePage(Page page);
 }
 
-/// A base class for [PageLoader] implementations.
-abstract class PageLoaderBase implements PageLoader {
-  PageLoaderBase({
+/// A base class for [RouteLoader] implementations.
+abstract class RouteLoaderBase implements RouteLoader {
+  RouteLoaderBase({
     this.eager = false,
     this.debugPrint = false,
   });
@@ -94,9 +94,9 @@ abstract class PageLoaderBase implements PageLoader {
     final entities = await loadPageEntities();
     return buildRoutesFromEntities(
       entities: entities,
-      buildPage: (page) {
-        final config = resolver(page.route);
-        final factory = _factories[getKeyForRoute(page)] ??= createFactory(page, config);
+      buildPage: (route) {
+        final config = resolver(route);
+        final factory = _factories[getKeyForRoute(route)] ??= createFactory(route, config);
         if (eager) {
           factory.future = factory.loadPage();
           return AsyncBuilder(builder: (context) async* {
@@ -112,9 +112,9 @@ abstract class PageLoaderBase implements PageLoader {
     );
   }
 
-  PageFactory createFactory(PageRoute page, PageConfig config);
+  PageFactory createFactory(PageRoute route, PageConfig config);
 
-  Future<List<PageEntity>> loadPageEntities();
+  Future<List<RouteEntity>> loadPageEntities();
 
   @override
   void invalidatePage(Page page) {
@@ -140,7 +140,7 @@ abstract class PageLoaderBase implements PageLoader {
   }
 }
 
-abstract class PageFactory<T extends PageLoaderBase> {
+abstract class PageFactory<T extends RouteLoaderBase> {
   PageFactory(this.route, this.config, this.loader);
 
   final PageRoute route;
@@ -165,7 +165,7 @@ abstract class PageFactory<T extends PageLoaderBase> {
     page = newPage;
     loader.pages.add(newPage);
 
-    var child = Page.wrap(newPage, UnmodifiableListView(loader.pages), await config.pageBuilder(newPage));
+    var child = Page.wrap(newPage, UnmodifiableListView(loader.pages), await newPage.build());
 
     component = child;
     return child;
@@ -187,36 +187,37 @@ abstract class PageFactory<T extends PageLoaderBase> {
   }
 }
 
-sealed class PageEntity {
-  PageEntity(this.name);
+sealed class RouteEntity {
+  RouteEntity(this.path);
 
-  final String name;
+  final String path;
 }
 
-class PageSource extends PageEntity {
-  PageSource(super.name, this.source);
+class SourceRoute extends RouteEntity {
+  SourceRoute(super.path, this.source, {this.keepSuffix = false});
 
   final String source;
+  final bool keepSuffix;
 }
 
-class PageCollection extends PageEntity {
-  PageCollection(super.name, this.entities);
+class CollectionRoute extends RouteEntity {
+  CollectionRoute(super.path, this.entities);
 
-  final List<PageEntity> entities;
+  final List<RouteEntity> entities;
 }
 
-class PageRoute extends PageSource {
-  PageRoute(super.name, super.source, this.route);
+class PageRoute extends SourceRoute {
+  PageRoute(super.path, super.source, this.route);
 
   final String route;
 }
 
 final indexRegex = RegExp(r'index\.[^/]*$');
 
-extension PagesRepositoryExtension on PageLoader {
+extension RouteLoaderExtension on RouteLoader {
   List<RouteBase> buildRoutesFromEntities({
-    required List<PageEntity> entities,
-    required Component Function(PageRoute page) buildPage,
+    required List<RouteEntity> entities,
+    required Component Function(PageRoute route) buildPage,
     bool debugPrint = false,
   }) {
     final routes = _buildRoutes(entities: entities, buildPage: buildPage);
@@ -227,26 +228,27 @@ extension PagesRepositoryExtension on PageLoader {
   }
 
   List<RouteBase> _buildRoutes({
-    required List<PageEntity> entities,
-    required Component Function(PageRoute page) buildPage,
+    required List<RouteEntity> entities,
+    required Component Function(PageRoute route) buildPage,
     String path = '',
     bool isTopLevel = true,
   }) {
-    PageSource? indexFile;
-    List<PageSource> files = [];
-    List<PageCollection> subdirs = [];
+    SourceRoute? indexFile;
+    List<SourceRoute> files = [];
+    List<CollectionRoute> subdirs = [];
 
     for (final entry in entities) {
-      if (entry.name.startsWith('_')) continue;
+      final name = entry.path.split('/').last;
+      if (name.startsWith('_')) continue;
 
-      if (entry is PageSource) {
-        final isIndex = indexRegex.hasMatch(entry.name);
+      if (entry is SourceRoute) {
+        final isIndex = indexRegex.hasMatch(name);
         if (isIndex) {
           indexFile = entry;
         } else {
           files.add(entry);
         }
-      } else if (entry is PageCollection) {
+      } else if (entry is CollectionRoute) {
         subdirs.add(entry);
       }
     }
@@ -254,10 +256,12 @@ extension PagesRepositoryExtension on PageLoader {
     List<RouteBase> routes = [];
 
     for (final file in files) {
-      final routePath = (isTopLevel ? '/' : '') +
-          (indexFile != null || path.isEmpty ? '' : '$path/') +
-          file.name.replaceFirst(RegExp(r'\..*'), '');
-      final child = buildPage(PageRoute(file.name, file.source, routePath));
+      var name = file.path.split('/').last;
+      if (!file.keepSuffix) {
+        name = name.replaceFirst(RegExp(r'\..*'), '');
+      }
+      final routePath = (isTopLevel ? '/' : '') + (indexFile != null || path.isEmpty ? '' : '$path/') + name;
+      final child = buildPage(PageRoute(file.path, file.source, routePath));
 
       final route = Route(
         path: routePath,
@@ -267,10 +271,11 @@ extension PagesRepositoryExtension on PageLoader {
     }
 
     for (final subdir in subdirs) {
+      final name = subdir.path.split('/').last;
       final subRoutes = _buildRoutes(
         entities: subdir.entities,
         buildPage: buildPage,
-        path: (isTopLevel ? '/' : '') + (indexFile == null && path.isNotEmpty ? '$path/' : '') + subdir.name,
+        path: (isTopLevel ? '/' : '') + (indexFile == null && path.isNotEmpty ? '$path/' : '') + name,
         isTopLevel: false,
       );
       routes.addAll(subRoutes);
@@ -278,7 +283,7 @@ extension PagesRepositoryExtension on PageLoader {
 
     if (indexFile != null) {
       final routePath = (isTopLevel ? '/' : '') + path;
-      final child = buildPage(PageRoute(indexFile.name, indexFile.source, routePath));
+      final child = buildPage(PageRoute(indexFile.path, indexFile.source, routePath));
 
       final route = Route(
         path: routePath,

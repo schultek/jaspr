@@ -202,7 +202,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         var file = File(p.url.join(
           'build/jaspr',
           route.startsWith('/') ? route.substring(1) : route,
-          'index.html',
+          p.url.extension(route).isEmpty ? 'index.html' : null,
         )).absolute;
 
         file.createSync(recursive: true);

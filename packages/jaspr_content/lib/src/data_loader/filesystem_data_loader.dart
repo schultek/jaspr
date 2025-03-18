@@ -9,7 +9,13 @@ import 'data_loader.dart';
 
 /// A data loader that loads data from the filesystem.
 class FilesystemDataLoader implements DataLoader {
-  FilesystemDataLoader(this.directory);
+  factory FilesystemDataLoader(String directory) {
+    return _instance[directory] ??= FilesystemDataLoader._(directory);
+  }
+
+  static final Map<String, FilesystemDataLoader> _instance = {};
+
+  FilesystemDataLoader._(this.directory);
 
   final String directory;
 
@@ -17,17 +23,27 @@ class FilesystemDataLoader implements DataLoader {
   StreamSubscription? _reassembleSub;
   Future<Map<String, dynamic>>? _data;
 
+  final Set<Page> _pages = {};
+
   @override
   Future<void> loadData(Page page) async {
+    if (!await Directory(directory).exists()) {
+      return;
+    }
+
     _watcherSub ??= DirectoryWatcher(directory).events.listen((event) {
       _data = null;
-      page.markNeedsRebuild();
+      for (var page in _pages) {
+        page.markNeedsRebuild();
+      }
+      _pages.clear();
       _watcherSub?.cancel();
       _watcherSub = null;
     });
 
     _reassembleSub ??= ServerApp.onReassemble.listen((_) {
       _data = null;
+      _pages.clear();
       _watcherSub?.cancel();
       _watcherSub = null;
       _reassembleSub?.cancel();
@@ -35,6 +51,7 @@ class FilesystemDataLoader implements DataLoader {
     });
 
     _data ??= _loadData(Directory(directory));
+    _pages.add(page);
     page.apply(data: await _data);
   }
 

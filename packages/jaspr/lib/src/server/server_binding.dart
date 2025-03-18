@@ -40,7 +40,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   };
 
   int responseStatusCode = 200;
-  String? responseErrorBody;
+  String? responseBodyOverride;
 
   @override
   void attachRootComponent(Component app) async {
@@ -74,8 +74,8 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       adapter.apply(root);
     }
 
-    if (responseErrorBody != null) {
-      return responseErrorBody!;
+    if (responseBodyOverride != null) {
+      return responseBodyOverride!;
     }
 
     return root.renderToHtml();

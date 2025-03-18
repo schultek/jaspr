@@ -9,7 +9,7 @@ class HtmlParser implements PageParser {
   const HtmlParser();
 
   @override
-  Pattern get pattern => RegExp(r'.*\.html');
+  Pattern get pattern => RegExp(r'.*\.html$');
 
   @override
   List<Node> parsePage(Page page) {
