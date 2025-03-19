@@ -1,9 +1,8 @@
-import 'dart:js_interop';
-
 import 'package:universal_web/web.dart' as web;
 
 import '../../../browser.dart';
 import '../../browser/utils.dart';
+import '../../foundation/type_checks.dart';
 
 abstract class Document implements Component {
   /// Attaches a set of attributes to the `<html>` element.
@@ -271,7 +270,7 @@ class AttachAdapter {
   };
 
   String? keyFor(web.Node node) {
-    if (!node.instanceOfString('Element')) return null;
+    if (!node.isElement) return null;
     return switch (node as web.Element) {
       web.Element(id: String id) when id.isNotEmpty => id,
       web.Element(tagName: "TITLE" || "BASE") => '__${node.tagName}',
