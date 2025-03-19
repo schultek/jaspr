@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:js_interop';
 
 import '../../../browser.dart';
+import '../../foundation/type_checks.dart';
 import '../marker_utils.dart';
 
 final _syncRegex = RegExp('^$syncMarkerPrefixRegex(.*)\$');
@@ -10,7 +11,7 @@ void initSyncState(SyncStateMixin sync) {
   var r = (sync.context as Element).parentRenderObjectElement?.renderObject as DomRenderObject?;
   if (r == null) return;
   for (var node in r.toHydrate) {
-    if (node.instanceOfString("Text")) {
+    if (node.isText) {
       continue;
     }
     if (node.instanceOfString("Comment")) {
