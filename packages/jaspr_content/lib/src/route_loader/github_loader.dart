@@ -17,7 +17,6 @@ class GithubLoader extends RouteLoaderBase {
     this.ref = 'main',
     this.path = 'docs/',
     this.accessToken,
-    super.eager,
     super.debugPrint,
   });
 
@@ -120,10 +119,7 @@ class GithubPageFactory extends PageFactory<GithubLoader> {
       'X-GitHub-Api-Version': '2022-11-28',
     });
     final content = response.body;
-    final data = {
-      'page': {'path': route.path, 'url': route.route},
-    };
-
-    return Page(route.path, route.route, content, data, config, loader);
+   
+    return Page(route.path, route.route, content, {}, config, loader);
   }
 }

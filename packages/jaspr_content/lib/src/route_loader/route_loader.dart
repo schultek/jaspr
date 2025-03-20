@@ -19,7 +19,7 @@ import '../page.dart';
 /// - [MemoryLoader]
 abstract class RouteLoader {
   /// Loads the routes with the given [ConfigResolver].
-  Future<List<RouteBase>> loadRoutes(ConfigResolver resolver);
+  Future<List<RouteBase>> loadRoutes(ConfigResolver resolver, bool eager);
 
   /// Reads a partial from the given [path].
   ///
@@ -37,29 +37,29 @@ abstract class RouteLoader {
   /// - when next accessed in lazy mode, or
   /// - immediately in eager mode.
   void invalidatePage(Page page);
+
+  static final List<Page> _pages = [];
 }
 
 /// A base class for [RouteLoader] implementations.
 abstract class RouteLoaderBase implements RouteLoader {
   RouteLoaderBase({
-    this.eager = false,
     this.debugPrint = false,
   });
 
-  final bool eager;
   final bool debugPrint;
 
   Future<List<RouteBase>>? _routes;
 
   final Map<String, PageFactory> _factories = {};
 
-  final List<Page> pages = [];
-
   ConfigResolver? _resolver;
   ConfigResolver get resolver {
     assert(_resolver != null, 'Resolver not available, call loadRoutes first.');
     return _resolver!;
   }
+
+  bool _eager = false;
 
   StreamSubscription? _reassembleSub;
 
@@ -72,7 +72,7 @@ abstract class RouteLoaderBase implements RouteLoader {
   }
 
   @override
-  Future<List<RouteBase>> loadRoutes(ConfigResolver resolver) async {
+  Future<List<RouteBase>> loadRoutes(ConfigResolver resolver, bool eager) async {
     _reassembleSub ??= ServerApp.onReassemble.listen((_) {
       invalidateAll();
       onReassemble();
@@ -80,9 +80,9 @@ abstract class RouteLoaderBase implements RouteLoader {
       _reassembleSub = null;
     });
 
-    if (_resolver != resolver) {
-      _resolver = resolver;
-    }
+    _resolver = resolver;
+    _eager = eager;
+
     _routes ??= _buildRoutes();
     if (eager) {
       await Future.wait(_factories.values.map((v) => v.future).whereType<Future>());
@@ -99,7 +99,7 @@ abstract class RouteLoaderBase implements RouteLoader {
       buildPage: (route) {
         final config = resolver(route);
         final factory = _factories[getKeyForRoute(route)] ??= createFactory(route, config);
-        if (eager) {
+        if (_eager) {
           factory.future = factory.loadPage();
           return AsyncBuilder(builder: (context) async* {
             yield await factory.future!;
@@ -138,7 +138,7 @@ abstract class RouteLoaderBase implements RouteLoader {
   void invalidateAll() {
     _factories.clear();
     _routes = null;
-    pages.clear();
+    RouteLoader._pages.clear();
   }
 }
 
@@ -161,13 +161,24 @@ abstract class PageFactory<T extends RouteLoaderBase> {
     final newPage = await buildPage();
 
     if (page != null) {
-      loader.pages.remove(page);
+      RouteLoader._pages.remove(page);
     }
 
     page = newPage;
-    loader.pages.add(newPage);
+    RouteLoader._pages.add(newPage);
 
-    var child = Page.wrap(newPage, UnmodifiableListView(loader.pages), await newPage.build());
+    newPage.apply(
+      data: <String, dynamic>{
+        'page': {'path': route.path, 'url': route.route},
+      }.merge(newPage.data),
+      mergeData: false,
+    );
+
+    var child = Page.wrap(
+      newPage,
+      loader._eager ? UnmodifiableListView(RouteLoader._pages) : [],
+      await newPage.build(),
+    );
 
     component = child;
     return child;
@@ -177,11 +188,11 @@ abstract class PageFactory<T extends RouteLoaderBase> {
 
   void invalidate({bool rebuild = true}) {
     if (page != null) {
-      loader.pages.remove(page);
+      RouteLoader._pages.remove(page);
       page = null;
     }
     component = null;
-    if (rebuild && loader.eager) {
+    if (rebuild && loader._eager) {
       future = loadPage();
     } else {
       future = null;

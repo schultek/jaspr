@@ -5,14 +5,16 @@ import 'package:liquid_engine/src/buildin_tags/include.dart';
 import '../page.dart';
 import 'template_engine.dart';
 
-void _defaultPrepareContext(Context context, Page page) {
+void _defaultPrepareContext(Context context, Page page, List<Page> pages) {
+  context.variables.addAll(page.data);
+  context.variables.putIfAbsent('pages', () => pages.map((p) => p.data['page']).toList());
   context.tags.addAll({
     'render': Include.factory,
   });
 }
 
 /// A template engine that uses the Liquid templating language.
-/// 
+///
 /// This engine uses the `liquid_engine` package to render Liquid templates.
 class LiquidTemplateEngine implements TemplateEngine {
   const LiquidTemplateEngine({
@@ -20,14 +22,13 @@ class LiquidTemplateEngine implements TemplateEngine {
     this.prepareContext = _defaultPrepareContext,
   });
 
-  final void Function(Context, Page) prepareContext;
+  final void Function(Context, Page, List<Page> pages) prepareContext;
   final String includesPath;
 
   @override
-  Future<void> render(Page page) async {
+  Future<void> render(Page page, List<Page> pages) async {
     var context = Context.create();
-    context.variables.addAll(page.data);
-    prepareContext(context, page);
+    prepareContext(context, page, pages);
 
     final template = Template.parse(
       context,

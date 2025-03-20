@@ -85,7 +85,7 @@ class Page {
     parseFrontmatter();
     await loadData();
     return AsyncBuilder(builder: (context) async* {
-      await renderTemplate();
+      await renderTemplate(context.pages);
 
       if (config.rawOutputPattern?.matchAsPrefix(path) != null) {
         context.setHeader('Content-Type', getContentType());
@@ -194,7 +194,7 @@ extension PageHandlersExtension on Page {
   void parseFrontmatter() {
     if (config.enableFrontmatter) {
       final document = fm.parse(content);
-      apply(content: document.content, data: document.data.cast());
+      apply(content: document.content, data: {'page': document.data.cast<String, dynamic>()});
     }
   }
 
@@ -208,9 +208,9 @@ extension PageHandlersExtension on Page {
   /// Renders the page content using the configured template engine.
   ///
   /// Modifies the page content.
-  FutureOr<void> renderTemplate() {
+  FutureOr<void> renderTemplate(List<Page> pages) {
     if (config.templateEngine != null) {
-      return config.templateEngine!.render(this);
+      return config.templateEngine!.render(this, pages);
     }
   }
 

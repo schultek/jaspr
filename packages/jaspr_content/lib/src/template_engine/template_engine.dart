@@ -12,5 +12,5 @@ import '../page.dart';
 /// - [MustacheTemplateEngine]
 abstract class TemplateEngine {
   /// Renders the given [page]'s content. The content is modified in place.
-  Future<void> render(Page page);
+  Future<void> render(Page page, List<Page> pages);
 }

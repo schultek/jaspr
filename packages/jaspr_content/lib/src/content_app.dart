@@ -44,7 +44,7 @@ class ContentApp extends AsyncStatelessComponent {
     String directory = 'content',
 
     /// Whether to eagerly load all pages at startup. See the discussion on [ContentApp] for more information.
-    bool eagerlyLoadAllPages = false,
+    this.eagerlyLoadAllPages = false,
 
     /// Whether to enable frontmatter parsing for pages.
     bool enableFrontmatter = true,
@@ -76,13 +76,7 @@ class ContentApp extends AsyncStatelessComponent {
     /// The [ContentTheme] to use for the pages.
     ContentTheme? theme,
     bool debugPrint = false,
-  })  : loaders = [
-          FilesystemLoader(
-            directory,
-            eager: eagerlyLoadAllPages,
-            debugPrint: debugPrint,
-          )
-        ],
+  })  : loaders = [FilesystemLoader(directory, debugPrint: debugPrint)],
         configResolver = PageConfig.all(
           enableFrontmatter: enableFrontmatter,
           dataLoaders: [
@@ -102,6 +96,9 @@ class ContentApp extends AsyncStatelessComponent {
   ContentApp.custom({
     /// A list of [RouteLoader]s to load pages from.
     required this.loaders,
+
+    /// Whether to eagerly load all pages at startup. See the discussion on [ContentApp] for more information.
+    this.eagerlyLoadAllPages = false,
 
     /// A function to resolve the configuration for a page based on its url.
     ///
@@ -125,12 +122,13 @@ class ContentApp extends AsyncStatelessComponent {
   }
 
   final List<RouteLoader> loaders;
+  final bool eagerlyLoadAllPages;
   final ConfigResolver configResolver;
   final Component Function(List<List<RouteBase>> routes) routerBuilder;
 
   @override
   Stream<Component> build(BuildContext context) async* {
-    final routes = await Future.wait(loaders.map((l) => l.loadRoutes(configResolver)));
+    final routes = await Future.wait(loaders.map((l) => l.loadRoutes(configResolver, eagerlyLoadAllPages)));
     _ensureAllowedSuffixes(routes);
     yield routerBuilder(routes);
   }

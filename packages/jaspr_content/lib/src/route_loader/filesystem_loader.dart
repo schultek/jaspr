@@ -9,14 +9,13 @@ import '../page.dart';
 import 'route_loader.dart';
 
 /// A loader that loads routes from the filesystem.
-/// 
+///
 /// Routes are constructed based on the recursive folder structure under the root [directory].
 /// Index files (index.*) are treated as the page for the containing folder.
 /// Files and folders starting with an underscore (_) are ignored.
 class FilesystemLoader extends RouteLoaderBase {
   FilesystemLoader(
     this.directory, {
-    super.eager,
     super.debugPrint,
   });
 
@@ -33,7 +32,7 @@ class FilesystemLoader extends RouteLoaderBase {
   }
 
   @override
-  Future<List<RouteBase>> loadRoutes(ConfigResolver resolver) async {
+  Future<List<RouteBase>> loadRoutes(ConfigResolver resolver, bool eager) async {
     if (kDebugMode) {
       _watcherSub ??= DirectoryWatcher(directory).events.listen((event) {
         var path = event.path;
@@ -47,7 +46,7 @@ class FilesystemLoader extends RouteLoaderBase {
         }
       });
     }
-    return super.loadRoutes(resolver);
+    return super.loadRoutes(resolver, eager);
   }
 
   @override
@@ -123,9 +122,7 @@ class FilePageFactory extends PageFactory<FilesystemLoader> {
   Future<Page> buildPage() async {
     final file = File(route.source);
     final content = await file.readAsString();
-    final data = {
-      'page': {'path': route.path, 'url': route.route},
-    };
-    return Page(route.path, route.route, content, data, config, loader);
+
+    return Page(route.path, route.route, content, {}, config, loader);
   }
 }

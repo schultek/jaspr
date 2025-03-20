@@ -47,7 +47,8 @@ abstract class PageLayoutBase implements PageLayout {
 
   @override
   Component buildLayout(Page page, Component child) {
-    final title = switch ((page.data['title'], page.data['titleBase'])) {
+    final p = page.data['page'] ?? {};
+    final title = switch ((p['title'], p['titleBase'])) {
       (String title, String base) => '$title | $base',
       (String title, _) => title,
       (_, String base) => base,
@@ -55,18 +56,18 @@ abstract class PageLayoutBase implements PageLayout {
     };
     return Document(
       title: title,
-      lang: page.data['lang'] ?? lang,
+      lang: p['lang'] ?? lang,
       meta: {
-        if (page.data['description'] case final desc?) 'description': desc.toString(),
-        if (page.data['keywords'] case final keys?) 'keywords': keys is List ? keys.join(', ') : keys.toString(),
+        if (p['description'] case final desc?) 'description': desc.toString(),
+        if (p['keywords'] case final keys?) 'keywords': keys is List ? keys.join(', ') : keys.toString(),
       },
       styles: resetStyles,
       head: [
         if (favicon != null) link(rel: 'icon', type: 'image/png', href: favicon!),
         meta(attributes: {'property': 'og:title'}, content: title),
-        if (page.data['description'] case final desc?)
+        if (p['description'] case final desc?)
           meta(attributes: {'property': 'og:description'}, content: desc.toString()),
-        if (page.data['image'] case final img?) meta(attributes: {'property': 'og:image'}, content: img.toString()),
+        if (p['image'] case final img?) meta(attributes: {'property': 'og:image'}, content: img.toString()),
         buildHead(page),
       ],
       body: buildBody(page, child),

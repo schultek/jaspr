@@ -35,6 +35,7 @@ void runGithub() {
         )
       ])
     ],
+    eagerlyLoadAllPages: true,
     configResolver: PageConfig.all(
       dataLoaders: [
         FilesystemDataLoader('content/_data'),
