@@ -72,19 +72,22 @@ class Page {
   ///
   /// This performs the following steps in order:
   /// 1. Parses the frontmatter if [enableFrontmatter] is true.
-  /// 2. Preprocesses the content if a [templateEngine] is provided.
-  /// 3. Parses the nodes of the page using one of the [parsers].
-  /// 4. Processes the nodes by applying the provided [extensions].
-  /// 5. Builds the [Content] component from the processed nodes.
-  /// 6. Builds the layout for the page using one of the [layouts].
-  /// 7. Wraps the layout in the provided [theme].
+  /// 2. Loads additional data using the provided [dataLoaders].
+  /// 3. Preprocesses the content if a [templateEngine] is provided.
+  /// 4. If [enableRawOutput] is true, outputs the content as raw text and skips further processing. 
+  ///    Else continues with 5.
+  /// 5. Parses the nodes of the page using one of the [parsers].
+  /// 6. Processes the nodes by applying the provided [extensions].
+  /// 7. Builds the [Content] component from the processed nodes.
+  /// 8. Builds the layout for the page using one of the [layouts].
+  /// 9. Wraps the layout in the provided [theme].
   Future<Component> build() async {
     parseFrontmatter();
     await loadData();
     return AsyncBuilder(builder: (context) async* {
       await renderTemplate();
 
-      if (config.enableRawOutput) {
+      if (config.rawOutputPattern?.matchAsPrefix(path) != null) {
         context.setHeader('Content-Type', getContentType());
         context.setStatusCode(200, responseBody: content);
 
@@ -108,7 +111,7 @@ class PageConfig {
     this.enableFrontmatter = true,
     this.dataLoaders = const [],
     this.templateEngine,
-    this.enableRawOutput = false,
+    this.rawOutputPattern,
     this.parsers = const [],
     this.extensions = const [],
     this.layouts = const [],
@@ -124,10 +127,11 @@ class PageConfig {
   /// The template engine to use for preprocessing the page content before parsing.
   final TemplateEngine? templateEngine;
 
-  /// Whether to output the raw content of the page.
+  /// A pattern to match pages that should output their raw content.
   /// 
-  /// When true, this will skip parsing and rendering the page and return the content as is.
-  final bool enableRawOutput;
+  /// When this matches a page's path, this will skip parsing and rendering the page and return the content as is.
+  /// This may be used for matching non-html pages like robots.txt, sitemap.xml, etc.
+  final Pattern? rawOutputPattern;
 
   /// The parsers to use for parsing the page content.
   ///
@@ -155,6 +159,7 @@ class PageConfig {
     bool enableFrontmatter = true,
     List<DataLoader> dataLoaders = const [],
     TemplateEngine? templateEngine,
+    Pattern? rawOutputPattern,
     List<PageParser> parsers = const [],
     List<PageExtension> extensions = const [],
     List<PageLayout> layouts = const [],
@@ -164,6 +169,7 @@ class PageConfig {
       enableFrontmatter: enableFrontmatter,
       dataLoaders: dataLoaders,
       templateEngine: templateEngine,
+      rawOutputPattern: rawOutputPattern,
       parsers: parsers,
       extensions: extensions,
       layouts: layouts,

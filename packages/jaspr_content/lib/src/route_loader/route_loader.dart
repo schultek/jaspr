@@ -1,5 +1,6 @@
 /// @docImport 'filesystem_loader.dart';
 /// @docImport 'github_loader.dart';
+/// @docImport 'memory_loader.dart';
 library;
 
 import 'dart:async';
@@ -15,6 +16,7 @@ import '../page.dart';
 /// See also:
 /// - [FilesystemLoader]
 /// - [GithubLoader]
+/// - [MemoryLoader]
 abstract class RouteLoader {
   /// Loads the routes with the given [ConfigResolver].
   Future<List<RouteBase>> loadRoutes(ConfigResolver resolver);

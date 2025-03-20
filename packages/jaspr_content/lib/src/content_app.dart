@@ -19,22 +19,22 @@ import 'template_engine/template_engine.dart';
 /// of routes for the site. A [RouteLoader] then builds a [Page] for each route based on the resolved [PageConfig].
 ///
 /// For a single page, the following steps are taken:
-/// 1. The page is loaded by the [RouteLoader].
+/// 1. The page is created by the [RouteLoader].
 /// 2. The page's configuration is resolved by the [ConfigResolver] based on its url.
-/// 3. The page's content is parsed and processed based on the configuration.
-/// 4. The page's content is wrapped in a [Component] and layout.
-/// 5. The page's [Component] is built and rendered to HTML.
+/// 3. The page's frontmatter is parsed and additional data is loaded.
+/// 4. The page's content is parsed and processed based on the configuration.
+/// 5. The page is wrapped in a layout and rendered to HTML.
 ///
-/// Page loading (steps 1 and 2) is always done eagerly at startup for all pages.
+/// Page creation (steps 1 and 2) is always done eagerly at startup for all pages.
 ///
-/// Page building (steps 3 and 4) happens either lazily or eagerly.
-/// - In lazy mode (default), pages are built on-demand when they are requested. This is useful for large sites when
-///   serving locally or when running in server mode, as it avoids the overhead of building all pages at startup.
-/// - In eager mode, all pages are built at startup. This is needed when a page may depend on other pages, such as when
+/// Page loading (step 3) happens either lazily or eagerly.
+/// - In lazy mode (default), pages are loaded on-demand when they are requested. This is useful for large sites when
+///   serving locally or when running in server mode, as it avoids the overhead of loading all pages at startup.
+/// - In eager mode, all pages are loaded at startup. This is needed when a page may depend on other pages, such as when
 ///   rendering a collection of sub-pages. Read [PageContext.pages] for more information.
 ///
-/// Page rendering (step 5) is always done on-demand when a page is requested. In eager mode, it is only done after all
-/// pages are built.
+/// Page rendering (steps 4 and 5) is always done on-demand when a page is requested. In eager mode, this waits for all
+/// pages to be loaded before rendering the requested page.
 class ContentApp extends AsyncStatelessComponent {
   /// Creates a basic [ContentApp] that loads pages from the filesystem and applies the same configuration to all pages.
   ///
@@ -100,7 +100,7 @@ class ContentApp extends AsyncStatelessComponent {
 
   /// Creates a [ContentApp].
   ContentApp.custom({
-    /// A list of [PageLoader]s to load pages from.
+    /// A list of [RouteLoader]s to load pages from.
     required this.loaders,
 
     /// A function to resolve the configuration for a page based on its url.

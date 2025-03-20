@@ -1,6 +1,9 @@
 import '../page.dart';
 import 'route_loader.dart';
 
+/// A loader that loads routes from memory.
+///
+/// Takes a list of [MemoryPage]s and creates routes from them.
 class MemoryLoader extends RouteLoaderBase {
   MemoryLoader({required List<MemoryPage> pages, super.eager, super.debugPrint}) : _pages = pages;
 
@@ -33,7 +36,11 @@ class MemoryLoader extends RouteLoaderBase {
 }
 
 class MemoryPage {
-  const MemoryPage({required this.path, required this.content, this.data = const {}});
+  const MemoryPage({
+    required this.path,
+    required this.content,
+    this.data = const {},
+  });
 
   final String path;
   final String content;

@@ -1,4 +1,5 @@
 /// @docImport 'filesystem_data_loader.dart';
+/// @docImport 'memory_data_loader.dart';
 library;
 
 
@@ -11,6 +12,7 @@ import '../page.dart';
 /// 
 /// See also:
 /// - [FilesystemDataLoader]
+/// - [MemoryDataLoader]
 abstract class DataLoader {
   /// Loads the data for the given [page].
   /// 
