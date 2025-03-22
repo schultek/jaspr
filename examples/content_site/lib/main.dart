@@ -3,7 +3,10 @@ import 'package:jaspr/server.dart';
 import 'package:jaspr_content/jaspr_content.dart';
 import 'package:jaspr_content/components/theme_toggle.dart';
 import 'package:jaspr_content/components/github_button.dart';
+import 'package:jaspr_content/components/post_break.dart';
 import 'package:jaspr_content/components/callout.dart';
+import 'package:jaspr_content/components/drop_cap.dart';
+import 'package:jaspr_content/components/image.dart';
 
 void main() {
   Jaspr.initializeApp(options: defaultJasprOptions);
@@ -48,13 +51,24 @@ void runGithub() {
       extensions: [
         TableOfContentsExtension(),
         HeadingAnchorExtension(),
+        ImageExtension(zoom: true),
         ComponentsExtension([
           Callout.factory,
+          DropCap.factory,
+          PostBreak.factory,
         ]),
       ],
       layouts: [
+        BlogLayout(
+          header: Header(
+            title: 'Jasprs',
+            logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',
+            items: [
+              GithubButton(repo: 'schultek/jaspr'),
+            ],
+          ),
+        ),
         DocsLayout(
-          favicon: 'favicon.ico',
           header: Header(
             title: 'Jasprs',
             logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',

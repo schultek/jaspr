@@ -8,7 +8,7 @@ import 'page_layout.dart';
 /// 
 /// The page content is rendered as is directly in the body.
 class EmptyLayout extends PageLayoutBase {
-  const EmptyLayout({super.favicon});
+  const EmptyLayout();
 
   @override
   String get name => 'empty';
@@ -16,7 +16,7 @@ class EmptyLayout extends PageLayoutBase {
   @override
   Component buildBody(Page page, Component child) {
     return main_([
-      Content(child),
+      child,
     ]);
   }
 }

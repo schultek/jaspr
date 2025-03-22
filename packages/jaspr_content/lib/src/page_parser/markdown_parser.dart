@@ -15,13 +15,13 @@ md.Document _defaultDocumentBuilder(Page _) {
 typedef DocumentBuilder = md.Document Function(Page page);
 
 /// A parser for Markdown content.
-/// 
+///
 /// This parser uses the `markdown` package to parse Markdown content.
 class MarkdownParser implements PageParser {
   /// Creates a Markdown parser.
   const MarkdownParser({
     /// The function used to build the Markdown document.
-    /// 
+    ///
     /// This can be used to customize the Markdown parser's behavior, e.g. by adding custom syntaxes.
     /// The default builder adds support for component blocks and uses the [md.ExtensionSet.gitHubWeb] extension set.
     this.documentBuilder = _defaultDocumentBuilder,
@@ -36,7 +36,7 @@ class MarkdownParser implements PageParser {
   List<Node> parsePage(Page page) {
     final markdownDocument = documentBuilder(page);
     final markdownNodes = markdownDocument.parse(page.content);
-    
+
     return _buildNodes(markdownNodes);
   }
 
@@ -62,8 +62,9 @@ class ComponentBlockSyntax extends md.BlockSyntax {
   const ComponentBlockSyntax();
 
   @override
-  RegExp get pattern => RegExp(r'^\s*<([A-Z][a-zA-Z]*)\s*([^>]*?)(/?)>(?:(.*)</([A-Z][a-zA-Z]*)>)?\s*$');
+  RegExp get pattern => RegExp(r'^\s*<([A-Z][a-zA-Z]*)\s*([^>]*?)((/?)>(?:(.*)</([A-Z][a-zA-Z]*)>)?)?\s*$');
 
+  RegExp get closingPattern => RegExp(r'^([^>]*?)(/?)>(?:(.*)</([A-Z][a-zA-Z]*)>)?$');
   RegExp get endPattern => RegExp(r'^\s*</([A-Z][a-zA-Z]*)>\s*$');
 
   @override
@@ -106,19 +107,53 @@ class ComponentBlockSyntax extends md.BlockSyntax {
 
     if (match == null) throw AssertionError('Block syntax should match pattern.');
 
-    final tag = match.group(1)!;
-    final value = match.group(2)!.trim();
-    final attributes = value.isNotEmpty
-        ? value.split(RegExp(r'\s+')).map((e) {
-            final parts = e.split('=');
-            return MapEntry(parts[0], parts.length > 1 ? parts[1].substring(1, parts[1].length - 1) : '');
-          })
-        : <MapEntry<String, String>>[];
-    final isSelfClosing = match.group(3) == '/';
-    final content = match.group(4);
-    final endTag = match.group(5);
-
     parser.advance();
+
+    final tag = match.group(1)!;
+
+    var value = match.group(2)!.trim();
+
+    final isClosing = match.group(3) != null;
+
+    late bool isSelfClosing;
+    late String? content;
+    late String? endTag;
+
+    if (isClosing) {
+      isSelfClosing = match.group(4) == '/';
+      content = match.group(5);
+      endTag = match.group(6);
+    } else {
+      while (!parser.isDone) {
+        final line = parser.current.content;
+        final lineMatch = closingPattern.firstMatch(line);
+
+        parser.advance();
+
+        if (lineMatch != null) {
+          value += lineMatch.group(1) ?? '';
+          isSelfClosing = lineMatch.group(2) == '/';
+          content = lineMatch.group(3);
+          endTag = lineMatch.group(4);
+          break;
+        } else {
+          value += line;
+        }
+      }
+    }
+
+    var attributes = <MapEntry<String, String>>[];
+
+    if (value.trim().isNotEmpty) {
+      final attributeRegex = RegExp(r'\s*([a-zA-Z][a-zA-Z0-9_-]*)(="((?:[^"]|\\")*)")?');
+      final matches = attributeRegex.allMatches(value.trim());
+
+      attributes = matches.map((m) {
+        final key = m.group(1)!;
+        final value = m.group(3);
+        return MapEntry(key, value ?? '');
+      }).toList();
+    }
 
     if (endTag != null) {
       assert(endTag == tag, 'Invalid component block.');

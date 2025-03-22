@@ -1,4 +1,5 @@
-/// @docImport 'docs/layout.dart';
+/// @docImport 'blog_layout.dart';
+/// @docImport 'docs_layout.dart';
 /// @docImport 'empty_layout.dart';
 library;
 
@@ -18,6 +19,7 @@ import '../page.dart';
 /// See also:
 /// - [EmptyLayout]
 /// - [DocsLayout]
+/// - [BlogLayout]
 abstract class PageLayout {
   /// The name pattern that the layout matches.
   ///
@@ -31,13 +33,7 @@ abstract class PageLayout {
 
 /// A base implementation of a page layout.
 abstract class PageLayoutBase implements PageLayout {
-  const PageLayoutBase({
-    this.favicon,
-    this.lang = 'en',
-  });
-
-  final String? favicon;
-  final String lang;
+  const PageLayoutBase();
 
   Component buildHead(Page page) {
     return Fragment(children: []);
@@ -47,27 +43,41 @@ abstract class PageLayoutBase implements PageLayout {
 
   @override
   Component buildLayout(Page page, Component child) {
-    final p = page.data['page'] ?? {};
-    final title = switch ((p['title'], p['titleBase'])) {
+    final pageData = page.data['page'] ?? {};
+    final siteData = page.data['site'] ?? {};
+
+    final pageTitle = pageData['title'] ?? siteData['title'];
+    final pageTitleBase = pageData['titleBase'] ?? siteData['titleBase'];
+
+    final title = switch ((pageTitle, pageTitleBase)) {
       (String title, String base) => '$title | $base',
       (String title, _) => title,
       (_, String base) => base,
       _ => '',
     };
+
+    final lang = pageData['lang'] ?? siteData['lang'];
+    final favicon = siteData['favicon'];
+
+    final description = pageData['description'];
+    final keywords = pageData['keywords'];
+    final image = pageData['image'];
+
+
     return Document(
       title: title,
-      lang: p['lang'] ?? lang,
+      lang: lang,
       meta: {
-        if (p['description'] case final desc?) 'description': desc.toString(),
-        if (p['keywords'] case final keys?) 'keywords': keys is List ? keys.join(', ') : keys.toString(),
+        if (description case final desc?) 'description': desc.toString(),
+        if (keywords case final keys?) 'keywords': keys is List ? keys.join(', ') : keys.toString(),
       },
       styles: resetStyles,
       head: [
         if (favicon != null) link(rel: 'icon', type: 'image/png', href: favicon!),
         meta(attributes: {'property': 'og:title'}, content: title),
-        if (p['description'] case final desc?)
+        if (description case final desc?)
           meta(attributes: {'property': 'og:description'}, content: desc.toString()),
-        if (p['image'] case final img?) meta(attributes: {'property': 'og:image'}, content: img.toString()),
+        if (image case final img?) meta(attributes: {'property': 'og:image'}, content: img.toString()),
         buildHead(page),
       ],
       body: buildBody(page, child),

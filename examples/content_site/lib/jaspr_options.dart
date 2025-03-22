@@ -3,10 +3,14 @@
 
 import 'package:jaspr/jaspr.dart';
 import 'package:content_site/main.dart' as prefix0;
-import 'package:jaspr_content/components/callout.dart' as prefix1;
-import 'package:jaspr_content/components/github_button.dart' as prefix2;
-import 'package:jaspr_content/components/sidebar_toggle_button.dart' as prefix3;
-import 'package:jaspr_content/components/theme_toggle.dart' as prefix4;
+import 'package:jaspr_content/components/_internal/zoomable_image.dart' as prefix1;
+import 'package:jaspr_content/components/callout.dart' as prefix2;
+import 'package:jaspr_content/components/drop_cap.dart' as prefix3;
+import 'package:jaspr_content/components/github_button.dart' as prefix4;
+import 'package:jaspr_content/components/image.dart' as prefix5;
+import 'package:jaspr_content/components/post_break.dart' as prefix6;
+import 'package:jaspr_content/components/sidebar_toggle_button.dart' as prefix7;
+import 'package:jaspr_content/components/theme_toggle.dart' as prefix8;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
@@ -26,18 +30,26 @@ import 'package:jaspr_content/components/theme_toggle.dart' as prefix4;
 /// ```
 JasprOptions get defaultJasprOptions => JasprOptions(
       clients: {
-        prefix2.GithubButton:
-            ClientTarget<prefix2.GithubButton>('jaspr_content:components/github_button', params: _prefix2GithubButton),
-        prefix3.SidebarToggleButton:
-            ClientTarget<prefix3.SidebarToggleButton>('jaspr_content:components/sidebar_toggle_button'),
-        prefix4.ThemeToggle: ClientTarget<prefix4.ThemeToggle>('jaspr_content:components/theme_toggle'),
+        prefix1.ZoomableImage: ClientTarget<prefix1.ZoomableImage>('jaspr_content:components/_internal/zoomable_image',
+            params: _prefix1ZoomableImage),
+        prefix4.GithubButton:
+            ClientTarget<prefix4.GithubButton>('jaspr_content:components/github_button', params: _prefix4GithubButton),
+        prefix7.SidebarToggleButton:
+            ClientTarget<prefix7.SidebarToggleButton>('jaspr_content:components/sidebar_toggle_button'),
+        prefix8.ThemeToggle: ClientTarget<prefix8.ThemeToggle>('jaspr_content:components/theme_toggle'),
       },
       styles: () => [
         ...prefix0.globalStyles,
-        ...prefix1.Callout.styles,
-        ...prefix2.GithubButtonState.styles,
-        ...prefix4.ThemeToggleState.styles,
+        ...prefix1.ZoomableImage.styles,
+        ...prefix2.Callout.styles,
+        ...prefix3.DropCap.styles,
+        ...prefix4.GithubButtonState.styles,
+        ...prefix5.Image.styles,
+        ...prefix6.PostBreak.styles,
+        ...prefix8.ThemeToggleState.styles,
       ],
     );
 
-Map<String, dynamic> _prefix2GithubButton(prefix2.GithubButton c) => {'repo': c.repo};
+Map<String, dynamic> _prefix1ZoomableImage(prefix1.ZoomableImage c) =>
+    {'src': c.src, 'alt': c.alt, 'caption': c.caption};
+Map<String, dynamic> _prefix4GithubButton(prefix4.GithubButton c) => {'repo': c.repo};

@@ -1,4 +1,5 @@
 part of 'content.dart';
+
 /// A default set of CSS reset styles.
 final List<StyleRule> resetStyles = [
   css('*, :after, :before').styles(

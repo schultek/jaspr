@@ -1,7 +1,7 @@
 part of 'content.dart';
 
 /// A theme for content-driven sites.
-/// 
+///
 /// The theme provides colors and typography styles for a page.
 /// When no theme is provided, the default [ContentColors.gray] and [ContentTypography.base] are used.
 class ContentTheme {
@@ -47,13 +47,17 @@ class ContentTheme {
 
     return [
       ...colors.build(),
+      css('body').styles(
+        color: ContentTheme.text,
+        backgroundColor: ContentTheme.background,
+      ),
       typography.build(),
     ];
   }
 }
 
 /// A set of colors for the page content.
-/// 
+///
 /// You can override individual colors, or add new color tokens to the theme.
 class ContentColors {
   const ContentColors({

@@ -1,15 +1,14 @@
+/// @docImport 'components/header.dart';
+/// @docImport 'components/sidebar.dart';
+library;
+
 import 'package:jaspr/server.dart' as jaspr;
 import 'package:jaspr/server.dart';
 
-import '../../../components/icon.dart';
-import '../../../components/sidebar_toggle_button.dart';
-import '../../content/content.dart';
-import '../../page.dart';
-import '../../page_extension/table_of_contents_extension.dart';
-import '../page_layout.dart';
-
-part 'sidebar.dart';
-part 'header.dart';
+import '../content/content.dart';
+import '../page.dart';
+import '../page_extension/table_of_contents_extension.dart';
+import 'page_layout.dart';
 
 /// A layout for documentation pages.
 ///
@@ -22,8 +21,6 @@ part 'header.dart';
 /// The header is usually a [Header] component but may be any custom component.
 class DocsLayout extends PageLayoutBase {
   const DocsLayout({
-    /// The favicon to use for the page.
-    super.favicon,
     this.sidebar,
     this.header,
   });
@@ -67,7 +64,7 @@ class DocsLayout extends PageLayoutBase {
                 if (page.data['description'] case String description) p([text(description)]),
                 if (page.data['image'] case String image) img(src: image, alt: page.data['imageAlt']),
               ]),
-              Content(child),
+              child,
             ]),
             if (page.data['toc'] case TableOfContents toc)
               aside(classes: 'toc', [
@@ -83,10 +80,7 @@ class DocsLayout extends PageLayoutBase {
   }
 
   static List<StyleRule> get _styles => [
-        css('body').styles(
-          color: ContentTheme.text,
-          backgroundColor: ContentTheme.background,
-        ),
+        
         css('.docs', [
           css('.header-container', [
             css('&').styles(

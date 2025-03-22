@@ -16,11 +16,7 @@ class ContentTypography {
 extension on ContentTypography {
   StyleRule build() {
     return css('.content', [
-      css('&').styles(
-          color: ContentTheme.text,
-          maxWidth: Unit.expression('65ch'),
-        )
-        .combine(styles),
+      css('&').styles(color: ContentTheme.text).combine(styles),
       ..._scopeContent([
         ..._contentStyles,
         ...rules,
@@ -29,13 +25,12 @@ extension on ContentTypography {
   }
 }
 
-
 List<StyleRule> _scopeContent(List<StyleRule> rules) {
   return rules.expand((rule) => rule.resolve('')).map((rule) {
     if (rule is BlockStyleRule) {
       return BlockStyleRule(
-        selector: Selector(
-            ':where(${rule.selector.selector}):not(:where([class~=not-content],[class~=not-content] *))'),
+        selector:
+            Selector(':where(${rule.selector.selector}):not(:where([class~=not-content],[class~=not-content] *))'),
         styles: rule.styles,
       );
     }

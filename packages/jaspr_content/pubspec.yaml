@@ -38,3 +38,4 @@ dependency_overrides:
   mustache_template:
     git:
       url: https://github.com/Rodsevich/mustache
+      ref: 119cd0799e9c7b55397521ace7ca73787a32ef8d

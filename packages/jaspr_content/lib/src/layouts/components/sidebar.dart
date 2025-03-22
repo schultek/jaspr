@@ -1,4 +1,8 @@
-part of 'layout.dart';
+import 'package:jaspr/server.dart';
+
+import '../../../components/icon.dart';
+import '../../content/content.dart';
+import '../../page.dart';
 
 class SidebarGroup {
   SidebarGroup({
