@@ -41,8 +41,26 @@
     "primary": "#01589B",
     "primaryDark": "#41C3FE"
   },
+  "tabs": [
+    {
+      "id": "root",
+      "title": "Guides",
+      "href": "/"
+    },
+    {
+      "id": "ref",
+      "title": "Reference",
+      "href": "/reference"
+    },
+    {
+      "id": "content",
+      "title": "Content",
+      "href": "/content"
+    }
+  ],
   "sidebar": [
     {
+      "tab": "root",
       "pages": [
         {
           "title": "\uD83D\uDCD6 Overview",
@@ -55,6 +73,7 @@
       ]
     },
     {
+      "tab": "root",
       "group": "Get Started",
       "pages": [
         {
@@ -84,6 +103,7 @@
       ]
     },
     {
+      "tab": "root",
       "group": "Key Concepts",
       "pages": [
         {
@@ -121,6 +141,7 @@
       ]
     },
     {
+      "tab": "root",
       "group": "Going Further",
       "pages": [
         {
@@ -138,6 +159,7 @@
       ]
     },
     {
+      "tab": "root",
       "group": "Ecosystem",
       "pages": [
         {
@@ -155,6 +177,16 @@
       ]
     },
     {
+      "tab": "ref",
+      "pages": [
+        {
+          "title": "Overview",
+          "href": "/reference"
+        }
+      ]
+    },
+    {
+      "tab": "ref",
       "group": "Components",
       "pages": [
         {
@@ -196,6 +228,7 @@
       ]
     },
     {
+      "tab": "ref",
       "group": "Utilities",
       "pages": [
         {
@@ -257,6 +290,15 @@
         {
           "title": "ViewTransitionMixin",
           "href": "/utils/view_transition_mixin"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "pages": [
+        {
+          "title": "Overview",
+          "href": "/content"
         }
       ]
     }
