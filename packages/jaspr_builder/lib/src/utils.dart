@@ -12,11 +12,12 @@ import 'package:jaspr/jaspr.dart'
     show ClientAnnotation, CssUtility, Import, Component, Key, StyleRule, SyncAnnotation, State;
 import 'package:source_gen/source_gen.dart';
 
-const String generationHeader = "// dart format width=80\n"
+const String generationHeader = "// dart format off\n"
+    "// ignore_for_file: type=lint\n\n"
     "// GENERATED FILE, DO NOT MODIFY\n"
     "// Generated with jaspr_builder\n\n";
 
-final formatter = DartFormatter(languageVersion: DartFormatter.latestShortStyleLanguageVersion);
+final formatter = DartFormatter(languageVersion: DartFormatter.latestLanguageVersion);
 
 extension DartOutput on BuildStep {
   Future<void> writeAsFormattedDart(AssetId outputId, String source) async {
