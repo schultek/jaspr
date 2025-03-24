@@ -3,6 +3,7 @@
 - Fixed flutter embedding issue with version 3.29.0.
 - Added `onClick` override to `a` html tag. Fixing issues with default action handling.
 - Added `--extra-js-compiler-option` and `--extra-wasm-compiler-option` to `jaspr build` command.
+- Added `// dart format off` and `// ignore_for_file: type=lint` headers to all generated files.
 
 ## 0.18.0
 

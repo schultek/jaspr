@@ -41,7 +41,10 @@ final clientModelExtensionJsonOutputs = {
 };
 
 final clientModelExtensionDartOutputs = {
-  'site|web/component_model_extension.client.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+  'site|web/component_model_extension.client.dart': '// dart format off\n'
+      '// ignore_for_file: type=lint\n'
+      '\n'
+      '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
       'import \'package:jaspr/browser.dart\';\n'
@@ -54,5 +57,6 @@ final clientModelExtensionDartOutputs = {
       '\n'
       'Component getComponentForParams(Map<String, dynamic> p) {\n'
       '  return prefix0.Component(p[\'a\'], b: prefix1.ModelBCodec.fromRaw(p[\'b\']));\n'
-      '}\n',
+      '}\n'
+      '',
 };
