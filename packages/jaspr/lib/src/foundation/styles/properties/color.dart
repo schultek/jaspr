@@ -1,12 +1,20 @@
 abstract class Color {
+
+  /// Constructs a [Color] from a css color value.
+  /// 
+  /// [value] must be a valid css color value, e.g. a color name, a hex value etc.
+  const factory Color(String value) = _Color;
+
   /// Constructs a [Color] from a hex string. Must start with a '#' and contain up to 6 hex characters.
-  const factory Color.hex(String hex) = _HexColor;
+  @Deprecated('Use unnamed Color() constructor instead.')
+  const factory Color.hex(String hex) = _Color;
 
   /// Constructs a [Color] from an integer value.
   const factory Color.value(int value) = _ValueColor;
 
   /// Constructs a [Color] from a web color name. Consider using [Colors.<name>] instead.
-  const factory Color.named(String name) = _NamedColor;
+  @Deprecated('Use Colors.<name> or Color() instead.')
+  const factory Color.named(String name) = _Color;
 
   /// Constructs a [Color] from red, green and blue values
   const factory Color.rgb(int red, int green, int blue) = _RGBColor;
@@ -23,23 +31,23 @@ abstract class Color {
   /// Constructs a variable containing color.
   const factory Color.variable(String value) = _VariableColor;
 
-  static const Color inherit = Color.named('inherit');
-  static const Color initial = Color.named('initial');
-  static const Color revert = Color.named('revert');
-  static const Color revertLayer = Color.named('revert-layer');
-  static const Color unset = Color.named('unset');
+  static const Color inherit = Color('inherit');
+  static const Color initial = Color('initial');
+  static const Color revert = Color('revert');
+  static const Color revertLayer = Color('revert-layer');
+  static const Color unset = Color('unset');
 
   /// The color css value
   String get value;
 }
 
-class _HexColor implements Color {
-  final String hex;
+class _Color implements Color {
+  final String _value;
 
-  const _HexColor(this.hex);
+  const _Color(this._value);
 
   @override
-  String get value => hex;
+  String get value => _value;
 }
 
 class _ValueColor implements Color {
@@ -48,14 +56,6 @@ class _ValueColor implements Color {
 
   @override
   String get value => '#${_value.toRadixString(16).padLeft(6, '0')}';
-}
-
-class _NamedColor implements Color {
-  final String name;
-  const _NamedColor(this.name);
-
-  @override
-  String get value => name;
 }
 
 class _RGBColor implements Color {
@@ -108,145 +108,145 @@ class _VariableColor implements Color {
 }
 
 class Colors {
-  static const Color aliceBlue = Color.named('aliceBlue');
-  static const Color antiqueWhite = Color.named('antiqueWhite');
-  static const Color aqua = Color.named('aqua');
-  static const Color aquamarine = Color.named('aquamarine');
-  static const Color azure = Color.named('azure');
-  static const Color beige = Color.named('beige');
-  static const Color bisque = Color.named('bisque');
-  static const Color black = Color.named('black');
-  static const Color blanchedAlmond = Color.named('blanchedAlmond');
-  static const Color blue = Color.named('blue');
-  static const Color blueViolet = Color.named('blueViolet');
-  static const Color brown = Color.named('brown');
-  static const Color burlyWood = Color.named('burlyWood');
-  static const Color cadetBlue = Color.named('cadetBlue');
-  static const Color chartreuse = Color.named('chartreuse');
-  static const Color chocolate = Color.named('chocolate');
-  static const Color coral = Color.named('coral');
-  static const Color cornflowerBlue = Color.named('cornflowerBlue');
-  static const Color cornsilk = Color.named('cornsilk');
-  static const Color crimson = Color.named('crimson');
-  static const Color cyan = Color.named('cyan');
-  static const Color darkBlue = Color.named('darkBlue');
-  static const Color darkCyan = Color.named('darkCyan');
-  static const Color darkGoldenRod = Color.named('darkGoldenRod');
-  static const Color darkGray = Color.named('darkGray');
-  static const Color darkGreen = Color.named('darkGreen');
-  static const Color darkKhaki = Color.named('darkKhaki');
-  static const Color darkMagenta = Color.named('darkMagenta');
-  static const Color darkOliveGreen = Color.named('darkOliveGreen');
-  static const Color darkorange = Color.named('darkorange');
-  static const Color darkOrchid = Color.named('darkOrchid');
-  static const Color darkRed = Color.named('darkRed');
-  static const Color darkSalmon = Color.named('darkSalmon');
-  static const Color darkSeaGreen = Color.named('darkSeaGreen');
-  static const Color darkSlateBlue = Color.named('darkSlateBlue');
-  static const Color darkSlateGray = Color.named('darkSlateGray');
-  static const Color darkTurquoise = Color.named('darkTurquoise');
-  static const Color darkViolet = Color.named('darkViolet');
-  static const Color deepPink = Color.named('deepPink');
-  static const Color deepSkyBlue = Color.named('deepSkyBlue');
-  static const Color dimGray = Color.named('dimGray');
-  static const Color dodgerBlue = Color.named('dodgerBlue');
-  static const Color fireBrick = Color.named('fireBrick');
-  static const Color floralWhite = Color.named('floralWhite');
-  static const Color forestGreen = Color.named('forestGreen');
-  static const Color fuchsia = Color.named('fuchsia');
-  static const Color gainsboro = Color.named('gainsboro');
-  static const Color ghostWhite = Color.named('ghostWhite');
-  static const Color gold = Color.named('gold');
-  static const Color goldenRod = Color.named('goldenRod');
-  static const Color gray = Color.named('gray');
-  static const Color green = Color.named('green');
-  static const Color greenYellow = Color.named('greenYellow');
-  static const Color honeyDew = Color.named('honeyDew');
-  static const Color hotPink = Color.named('hotPink');
-  static const Color indianRed = Color.named('indianRed');
-  static const Color indigo = Color.named('indigo');
-  static const Color ivory = Color.named('ivory');
-  static const Color khaki = Color.named('khaki');
-  static const Color lavender = Color.named('lavender');
-  static const Color lavenderBlush = Color.named('lavenderBlush');
-  static const Color lawnGreen = Color.named('lawnGreen');
-  static const Color lemonChiffon = Color.named('lemonChiffon');
-  static const Color lightBlue = Color.named('lightBlue');
-  static const Color lightCoral = Color.named('lightCoral');
-  static const Color lightCyan = Color.named('lightCyan');
-  static const Color lightGoldenRodYellow = Color.named('lightGoldenRodYellow');
-  static const Color lightGrey = Color.named('lightGrey');
-  static const Color lightGreen = Color.named('lightGreen');
-  static const Color lightPink = Color.named('lightPink');
-  static const Color lightSalmon = Color.named('lightSalmon');
-  static const Color lightSeaGreen = Color.named('lightSeaGreen');
-  static const Color lightSkyBlue = Color.named('lightSkyBlue');
-  static const Color lightSlateGray = Color.named('lightSlateGray');
-  static const Color lightSteelBlue = Color.named('lightSteelBlue');
-  static const Color lightYellow = Color.named('lightYellow');
-  static const Color lime = Color.named('lime');
-  static const Color limeGreen = Color.named('limeGreen');
-  static const Color linen = Color.named('linen');
-  static const Color magenta = Color.named('magenta');
-  static const Color maroon = Color.named('maroon');
-  static const Color mediumAquaMarine = Color.named('mediumAquaMarine');
-  static const Color mediumBlue = Color.named('mediumBlue');
-  static const Color mediumOrchid = Color.named('mediumOrchid');
-  static const Color mediumPurple = Color.named('mediumPurple');
-  static const Color mediumSeaGreen = Color.named('mediumSeaGreen');
-  static const Color mediumSlateBlue = Color.named('mediumSlateBlue');
-  static const Color mediumSpringGreen = Color.named('mediumSpringGreen');
-  static const Color mediumTurquoise = Color.named('mediumTurquoise');
-  static const Color mediumVioletRed = Color.named('mediumVioletRed');
-  static const Color midnightBlue = Color.named('midnightBlue');
-  static const Color mintCream = Color.named('mintCream');
-  static const Color mistyRose = Color.named('mistyRose');
-  static const Color moccasin = Color.named('moccasin');
-  static const Color navajoWhite = Color.named('navajoWhite');
-  static const Color navy = Color.named('navy');
-  static const Color oldLace = Color.named('oldLace');
-  static const Color olive = Color.named('olive');
-  static const Color oliveDrab = Color.named('oliveDrab');
-  static const Color orange = Color.named('orange');
-  static const Color orangeRed = Color.named('orangeRed');
-  static const Color orchid = Color.named('orchid');
-  static const Color paleGoldenRod = Color.named('paleGoldenRod');
-  static const Color paleGreen = Color.named('paleGreen');
-  static const Color paleTurquoise = Color.named('paleTurquoise');
-  static const Color paleVioletRed = Color.named('paleVioletRed');
-  static const Color papayaWhip = Color.named('papayaWhip');
-  static const Color peachPuff = Color.named('peachPuff');
-  static const Color peru = Color.named('peru');
-  static const Color pink = Color.named('pink');
-  static const Color plum = Color.named('plum');
-  static const Color powderBlue = Color.named('powderBlue');
-  static const Color purple = Color.named('purple');
-  static const Color red = Color.named('red');
-  static const Color rosyBrown = Color.named('rosyBrown');
-  static const Color royalBlue = Color.named('royalBlue');
-  static const Color saddleBrown = Color.named('saddleBrown');
-  static const Color salmon = Color.named('salmon');
-  static const Color sandyBrown = Color.named('sandyBrown');
-  static const Color seaGreen = Color.named('seaGreen');
-  static const Color seaShell = Color.named('seaShell');
-  static const Color sienna = Color.named('sienna');
-  static const Color silver = Color.named('silver');
-  static const Color skyBlue = Color.named('skyBlue');
-  static const Color slateBlue = Color.named('slateBlue');
-  static const Color slateGray = Color.named('slateGray');
-  static const Color snow = Color.named('snow');
-  static const Color springGreen = Color.named('springGreen');
-  static const Color steelBlue = Color.named('steelBlue');
-  static const Color tan = Color.named('tan');
-  static const Color teal = Color.named('teal');
-  static const Color thistle = Color.named('thistle');
-  static const Color tomato = Color.named('tomato');
-  static const Color turquoise = Color.named('turquoise');
-  static const Color violet = Color.named('violet');
-  static const Color wheat = Color.named('wheat');
-  static const Color white = Color.named('white');
-  static const Color whiteSmoke = Color.named('whiteSmoke');
-  static const Color yellow = Color.named('yellow');
-  static const Color yellowGreen = Color.named('yellowGreen');
-  static const Color transparent = Color.named('transparent');
+  static const Color aliceBlue = Color('aliceBlue');
+  static const Color antiqueWhite = Color('antiqueWhite');
+  static const Color aqua = Color('aqua');
+  static const Color aquamarine = Color('aquamarine');
+  static const Color azure = Color('azure');
+  static const Color beige = Color('beige');
+  static const Color bisque = Color('bisque');
+  static const Color black = Color('black');
+  static const Color blanchedAlmond = Color('blanchedAlmond');
+  static const Color blue = Color('blue');
+  static const Color blueViolet = Color('blueViolet');
+  static const Color brown = Color('brown');
+  static const Color burlyWood = Color('burlyWood');
+  static const Color cadetBlue = Color('cadetBlue');
+  static const Color chartreuse = Color('chartreuse');
+  static const Color chocolate = Color('chocolate');
+  static const Color coral = Color('coral');
+  static const Color cornflowerBlue = Color('cornflowerBlue');
+  static const Color cornsilk = Color('cornsilk');
+  static const Color crimson = Color('crimson');
+  static const Color cyan = Color('cyan');
+  static const Color darkBlue = Color('darkBlue');
+  static const Color darkCyan = Color('darkCyan');
+  static const Color darkGoldenRod = Color('darkGoldenRod');
+  static const Color darkGray = Color('darkGray');
+  static const Color darkGreen = Color('darkGreen');
+  static const Color darkKhaki = Color('darkKhaki');
+  static const Color darkMagenta = Color('darkMagenta');
+  static const Color darkOliveGreen = Color('darkOliveGreen');
+  static const Color darkorange = Color('darkorange');
+  static const Color darkOrchid = Color('darkOrchid');
+  static const Color darkRed = Color('darkRed');
+  static const Color darkSalmon = Color('darkSalmon');
+  static const Color darkSeaGreen = Color('darkSeaGreen');
+  static const Color darkSlateBlue = Color('darkSlateBlue');
+  static const Color darkSlateGray = Color('darkSlateGray');
+  static const Color darkTurquoise = Color('darkTurquoise');
+  static const Color darkViolet = Color('darkViolet');
+  static const Color deepPink = Color('deepPink');
+  static const Color deepSkyBlue = Color('deepSkyBlue');
+  static const Color dimGray = Color('dimGray');
+  static const Color dodgerBlue = Color('dodgerBlue');
+  static const Color fireBrick = Color('fireBrick');
+  static const Color floralWhite = Color('floralWhite');
+  static const Color forestGreen = Color('forestGreen');
+  static const Color fuchsia = Color('fuchsia');
+  static const Color gainsboro = Color('gainsboro');
+  static const Color ghostWhite = Color('ghostWhite');
+  static const Color gold = Color('gold');
+  static const Color goldenRod = Color('goldenRod');
+  static const Color gray = Color('gray');
+  static const Color green = Color('green');
+  static const Color greenYellow = Color('greenYellow');
+  static const Color honeyDew = Color('honeyDew');
+  static const Color hotPink = Color('hotPink');
+  static const Color indianRed = Color('indianRed');
+  static const Color indigo = Color('indigo');
+  static const Color ivory = Color('ivory');
+  static const Color khaki = Color('khaki');
+  static const Color lavender = Color('lavender');
+  static const Color lavenderBlush = Color('lavenderBlush');
+  static const Color lawnGreen = Color('lawnGreen');
+  static const Color lemonChiffon = Color('lemonChiffon');
+  static const Color lightBlue = Color('lightBlue');
+  static const Color lightCoral = Color('lightCoral');
+  static const Color lightCyan = Color('lightCyan');
+  static const Color lightGoldenRodYellow = Color('lightGoldenRodYellow');
+  static const Color lightGrey = Color('lightGrey');
+  static const Color lightGreen = Color('lightGreen');
+  static const Color lightPink = Color('lightPink');
+  static const Color lightSalmon = Color('lightSalmon');
+  static const Color lightSeaGreen = Color('lightSeaGreen');
+  static const Color lightSkyBlue = Color('lightSkyBlue');
+  static const Color lightSlateGray = Color('lightSlateGray');
+  static const Color lightSteelBlue = Color('lightSteelBlue');
+  static const Color lightYellow = Color('lightYellow');
+  static const Color lime = Color('lime');
+  static const Color limeGreen = Color('limeGreen');
+  static const Color linen = Color('linen');
+  static const Color magenta = Color('magenta');
+  static const Color maroon = Color('maroon');
+  static const Color mediumAquaMarine = Color('mediumAquaMarine');
+  static const Color mediumBlue = Color('mediumBlue');
+  static const Color mediumOrchid = Color('mediumOrchid');
+  static const Color mediumPurple = Color('mediumPurple');
+  static const Color mediumSeaGreen = Color('mediumSeaGreen');
+  static const Color mediumSlateBlue = Color('mediumSlateBlue');
+  static const Color mediumSpringGreen = Color('mediumSpringGreen');
+  static const Color mediumTurquoise = Color('mediumTurquoise');
+  static const Color mediumVioletRed = Color('mediumVioletRed');
+  static const Color midnightBlue = Color('midnightBlue');
+  static const Color mintCream = Color('mintCream');
+  static const Color mistyRose = Color('mistyRose');
+  static const Color moccasin = Color('moccasin');
+  static const Color navajoWhite = Color('navajoWhite');
+  static const Color navy = Color('navy');
+  static const Color oldLace = Color('oldLace');
+  static const Color olive = Color('olive');
+  static const Color oliveDrab = Color('oliveDrab');
+  static const Color orange = Color('orange');
+  static const Color orangeRed = Color('orangeRed');
+  static const Color orchid = Color('orchid');
+  static const Color paleGoldenRod = Color('paleGoldenRod');
+  static const Color paleGreen = Color('paleGreen');
+  static const Color paleTurquoise = Color('paleTurquoise');
+  static const Color paleVioletRed = Color('paleVioletRed');
+  static const Color papayaWhip = Color('papayaWhip');
+  static const Color peachPuff = Color('peachPuff');
+  static const Color peru = Color('peru');
+  static const Color pink = Color('pink');
+  static const Color plum = Color('plum');
+  static const Color powderBlue = Color('powderBlue');
+  static const Color purple = Color('purple');
+  static const Color red = Color('red');
+  static const Color rosyBrown = Color('rosyBrown');
+  static const Color royalBlue = Color('royalBlue');
+  static const Color saddleBrown = Color('saddleBrown');
+  static const Color salmon = Color('salmon');
+  static const Color sandyBrown = Color('sandyBrown');
+  static const Color seaGreen = Color('seaGreen');
+  static const Color seaShell = Color('seaShell');
+  static const Color sienna = Color('sienna');
+  static const Color silver = Color('silver');
+  static const Color skyBlue = Color('skyBlue');
+  static const Color slateBlue = Color('slateBlue');
+  static const Color slateGray = Color('slateGray');
+  static const Color snow = Color('snow');
+  static const Color springGreen = Color('springGreen');
+  static const Color steelBlue = Color('steelBlue');
+  static const Color tan = Color('tan');
+  static const Color teal = Color('teal');
+  static const Color thistle = Color('thistle');
+  static const Color tomato = Color('tomato');
+  static const Color turquoise = Color('turquoise');
+  static const Color violet = Color('violet');
+  static const Color wheat = Color('wheat');
+  static const Color white = Color('white');
+  static const Color whiteSmoke = Color('whiteSmoke');
+  static const Color yellow = Color('yellow');
+  static const Color yellowGreen = Color('yellowGreen');
+  static const Color transparent = Color('transparent');
 }

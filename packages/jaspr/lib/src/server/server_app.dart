@@ -20,6 +20,9 @@ class ServerApp {
 
   static final createTestHandler = createHandler;
 
+  static final StreamController<Object> _reassembleController = StreamController.broadcast();
+  static Stream<Object> get onReassemble => _reassembleController.stream;
+
   final SetupFunction _setup;
 
   static Object? _runLock;
@@ -43,6 +46,8 @@ class ServerApp {
 
     _client?.close();
     _client = client;
+
+    _reassembleController.add(Object());
 
     if (isFirstStartup) {
       print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');

@@ -1,5 +1,6 @@
 import 'package:build/build.dart';
 
+import 'src/client/client_bundle_builder.dart';
 import 'src/client/client_module_builder.dart';
 import 'src/client/client_registry_builder.dart';
 import 'src/codec/codec_bundle_builder.dart';
@@ -15,6 +16,7 @@ import 'src/sync/sync_mixins_builder.dart';
 Builder buildJasprOptions(BuilderOptions options) => JasprOptionsBuilder(options);
 
 Builder buildClientModule(BuilderOptions options) => ClientModuleBuilder(options);
+Builder buildClientsBundle(BuilderOptions options) => ClientsBundleBuilder(options);
 Builder buildClientRegistry(BuilderOptions options) => ClientRegistryBuilder(options);
 
 Builder buildImportsModule(BuilderOptions options) => ImportsModuleBuilder(options);

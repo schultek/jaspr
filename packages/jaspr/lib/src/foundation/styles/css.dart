@@ -91,52 +91,95 @@ class CssUtility {
 }
 
 class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
-  NestedStyleRule._(Selector selector, Styles styles, this._children)
-      : _self = BlockStyleRule(selector: selector, styles: styles);
+  NestedStyleRule._(this._selector, this._styles, this._children);
 
-  final BlockStyleRule _self;
+  final Selector _selector;
+  final Styles _styles;
   final List<StyleRule> _children;
 
   @override
   NestedStyleRule combine(Styles styles) {
-    return NestedStyleRule._(_self.selector, _self.styles.combine(styles), _children);
+    return NestedStyleRule._(_selector, _styles.combine(styles), _children);
   }
 
   @override
-  String toCss([String indent = '', String parent = '']) {
+  String toCss([String indent = '']) {
     var rules = <String>[];
 
-    var self = _self;
-    var curr = self.selector.selector.startsWith('&') || parent.isEmpty
-        ? self.selector.selector.replaceAll('&', parent)
-        : '$parent ${self.selector.selector}';
-
-    if (_self.styles.properties.isNotEmpty) {
-      rules.add(_self._toCssWithParent(indent, parent));
-    }
-
-    for (var child in _children) {
-      if (child is NestedStyleRule) {
-        rules.add(child.toCss(indent, curr));
-      } else if (child is BlockStyleRule) {
-        rules.add(child._toCssWithParent(indent, curr));
-      } else {
-        throw UnsupportedError('Cannot nest ${child.runtimeType} inside other StyleRule.');
-      }
+    for (var rule in resolve('')) {
+      rules.add(rule.toCss(indent));
     }
 
     return rules.join(cssPropSpace);
   }
 }
 
-extension on BlockStyleRule {
-  String _toCssWithParent(String indent, String parent) {
-    var child = BlockStyleRule(
-      selector: Selector(selector.selector.startsWith('&') || parent.isEmpty
-          ? selector.selector.replaceAll('&', parent)
-          : '$parent ${selector.selector}'),
-      styles: styles,
+extension on Selector {
+  Selector resolve(String parent) {
+    return Selector(
+      selector.startsWith('&') || parent.isEmpty ? selector.replaceAll('&', parent) : '$parent $selector',
     );
-    return child.toCss(indent);
+  }
+}
+
+extension StyleRuleResolve on StyleRule {
+  List<StyleRule> resolve(String parent) {
+    var self = this;
+    return switch (self) {
+      NestedStyleRule() => self._resolve(parent),
+      BlockStyleRule() => [self._resolve(parent)],
+      MediaStyleRule() => [self._resolve(parent)],
+      LayerStyleRule() => [self._resolve(parent)],
+      SupportsStyleRule() => [self._resolve(parent)],
+      _ => throw UnsupportedError('Cannot nest ${self.runtimeType} inside other StyleRule.'),
+    };
+  }
+}
+
+extension on NestedStyleRule {
+  List<StyleRule> _resolve(String parent) {
+    var rules = <StyleRule>[];
+
+    var selector = _selector.resolve(parent);
+
+    if (_styles.properties.isNotEmpty) {
+      rules.add(StyleRule(selector: selector, styles: _styles));
+    }
+
+    for (var child in _children) {
+      rules.addAll(child.resolve(selector.selector));
+    }
+
+    return rules;
+  }
+}
+
+extension on BlockStyleRule {
+  StyleRule _resolve(String parent) {
+    return BlockStyleRule(selector: selector.resolve(parent), styles: styles);
+  }
+}
+
+extension on MediaStyleRule {
+  StyleRule _resolve(String parent) {
+    return MediaStyleRule(query: query, styles: [
+      for (var style in styles) ...style.resolve(parent),
+    ]);
+  }
+}
+
+extension on LayerStyleRule {
+  StyleRule _resolve(String parent) {
+    return LayerStyleRule(name: name, styles: [
+      for (var style in styles) ...style.resolve(parent),
+    ]);
+  }
+}
+
+extension on SupportsStyleRule {
+  StyleRule _resolve(String parent) {
+    return SupportsStyleRule(condition: condition, styles: [
+      for (var style in styles) ...style.resolve(parent),
+    ]);
   }
 }

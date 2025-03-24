@@ -11,7 +11,7 @@ builders:
     auto_apply: root_package
     build_to: source
     required_inputs:
-      - '.client.json'
+      - 'clients.bundle.json'
       - 'styles.bundle.json'
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap
@@ -24,11 +24,21 @@ builders:
     build_extensions:
       "lib/{{file}}.dart":
         - "lib/{{file}}.client.json"
-        - "web/{{file}}.client.dart"
-    auto_apply: root_package
+        - "lib/{{file}}.client.dart"
+    auto_apply: all_packages
     build_to: cache
     required_inputs:
       - 'codec.bundle.json'
+  clients_bundle:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildClientsBundle" ]
+    build_extensions:
+      "lib/$lib$":
+        - "lib/clients.bundle.json"
+    auto_apply: all_packages
+    build_to: cache
+    required_inputs:
+      - '.client.json'
   client_registry:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "buildClientRegistry" ]
@@ -36,7 +46,7 @@ builders:
       "lib/$lib$":
         - "web/main.clients.dart"
     required_inputs:
-      - '.client.json'
+      - 'clients.bundle.json'
     auto_apply: root_package
     build_to: cache
     runs_before:

@@ -1,7 +1,23 @@
-## Unreleased patch
+## Unreleased minor
 
-- Fixed flutter embedding issue with version 3.29.0.
-- Added `onClick` override to `a` html tag. Fixing issues with default action handling.
+- **BREAKING** `JasprOptions.useIsolates` is now `false` by default (was `true`).
+  
+  If you want to keep the old behaviour of rendering each request in a separate isolate, 
+  use `Jaspr.initializeApp(..., useIsolates: true)`.
+
+- Added support `@client` components from other packages.
+
+  Components annotated with `@client` from other dependent packages are now also part of the js bundle when
+  used during pre-rendering.
+
+- Added `onClick` override to the `a` html tag. When used, this will override the default behaviour of the link and not visit its url when clicked.
+
+- **BREAKING** The `Flex(basis: ...)` style now accepts a `Unit` value directly instead of a `FlexBasis`.
+
+- Allow nesting `css.media` and `css.supports` rules.
+- Deprecated `Color.hex()` and `Color.named()` in favor of the default `Color()` constructor.
+
+- Fixed flutter embedding issue for version 3.29.0.
 - Added `--extra-js-compiler-option` and `--extra-wasm-compiler-option` to `jaspr build` command.
 
 ## 0.18.0

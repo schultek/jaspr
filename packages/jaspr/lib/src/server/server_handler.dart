@@ -10,6 +10,7 @@ import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
 import '../foundation/constants.dart';
+import '../foundation/options.dart';
 import 'render_functions.dart';
 import 'server_app.dart';
 
@@ -56,9 +57,12 @@ Handler staticFileHandler([http.Client? client]) => jasprProxyPort != null
 
 typedef SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
 
-final _allowedRenderPaths = RegExp(r'\.html?$|^[^.]*$');
-
-Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHandler}) {
+Handler createHandler(
+  SetupHandler handle, {
+  http.Client? client,
+  Handler? fileHandler,
+  List<Pattern>? allowedRenderPaths,
+}) {
   client ??= http.Client();
   var staticHandler = fileHandler ?? staticFileHandler(client);
 
@@ -74,11 +78,21 @@ Handler createHandler(SetupHandler handle, {http.Client? client, Handler? fileHa
   }
 
   cascade = cascade.add((request) async {
-    if (!_allowedRenderPaths.hasMatch(request.url.pathSegments.lastOrNull ?? '')) {
+    var isAllowedPath = false;
+    final segment = request.url.pathSegments.lastOrNull ?? '';
+    if (!segment.contains('.')) {
+      isAllowedPath = true;
+    } else {
+      final suffix = segment.split('.').last;
+      if (Jaspr.allowedPathSuffixes.contains(suffix)) {
+        isAllowedPath = true;
+      }
+    }
+    if (!isAllowedPath) {
       return Response(404);
     }
 
-    var fileLoader = proxyFileLoader(request, staticHandler);
+    final fileLoader = proxyFileLoader(request, staticHandler);
     return handle(request, (setup) async {
       final (:body, :headers, :statusCode) = await render(setup, request, fileLoader, false);
       return Response(statusCode, body: body, headers: headers);
