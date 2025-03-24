@@ -54,8 +54,7 @@ void Function(web.Event) _callWithValue<V>(String event, void Function(V) fn) {
     var value = switch (target) {
       web.HTMLInputElement() when target.isHtmlInputElement => () {
           final targetType = target.type;
-          final type =
-              InputType.values.where((v) => v.name == targetType).firstOrNull;
+          final type = InputType.values.where((v) => v.name == targetType).firstOrNull;
           return switch (type) {
             InputType.checkbox || InputType.radio => target.checked,
             InputType.number => target.valueAsNumber,
