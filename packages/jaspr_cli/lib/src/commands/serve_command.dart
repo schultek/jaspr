@@ -72,6 +72,7 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final release = argResults!['release'] as bool;
   late final mode = argResults!['mode'] as String;
   late final port = argResults!['port'] as String;
+  late final useWasm = argResults!['experimental-wasm'] as bool;
 
   @override
   Future<CommandResult?> run() async {
@@ -86,7 +87,7 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     var workflow = await _runWebCompiler(webPort);
 
     if (config!.usesFlutter) {
-      var flutterProcess = await serveFlutter(flutterPort);
+      var flutterProcess = await serveFlutter(flutterPort, useWasm);
 
       workflow.serverManager.servers.first.buildResults
           .where((event) => event.status == BuildStatus.succeeded)
@@ -200,7 +201,6 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   }
 
   Future<DevWorkflow> _runWebCompiler(String webPort) async {
-    bool useWasm = argResults!['experimental-wasm'] as bool;
     if (useWasm) {
       checkWasmSupport();
     }
@@ -220,6 +220,10 @@ class ServeCommand extends BaseCommand with ProxyHelper, FlutterHelper {
             : 'dartdevc';
 
     var dartDefines = getClientDartDefines();
+    if (config!.usesFlutter) {
+      dartDefines.addAll(getFlutterDartDefines(useWasm, release));
+    }
+
     var dartdevcDefines = dartDefines.entries.map((e) => ',"${e.key}":"${e.value}"').join();
     var dart2jsDefines = dartDefines.entries.map((e) => ',"-D${e.key}=${e.value}"').join();
 
