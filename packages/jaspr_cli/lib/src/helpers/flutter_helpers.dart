@@ -8,7 +8,17 @@ import '../config.dart';
 import '../logging.dart';
 
 mixin FlutterHelper on BaseCommand {
-  Future<Process> serveFlutter(String flutterPort) async {
+  Map<String, String> getFlutterDartDefines(bool useWasm, bool release) {
+    var flutterDefines = <String, String>{};
+
+    flutterDefines['dart.vm.product'] = '$release';
+    flutterDefines['FLUTTER_WEB_USE_SKWASM'] = '$useWasm';
+    flutterDefines['FLUTTER_WEB_USE_SKIA'] = '${!useWasm}';
+
+    return flutterDefines;
+  }
+
+  Future<Process> serveFlutter(String flutterPort, bool wasm) async {
     await _ensureTarget();
 
     var flutterProcess = await Process.start(
@@ -19,6 +29,7 @@ mixin FlutterHelper on BaseCommand {
         '-t',
         '.dart_tool/jaspr/flutter_target.dart',
         '--web-port=$flutterPort',
+        if (wasm) '--wasm',
         if (argResults!['release']) '--release'
       ],
       runInShell: true,
@@ -30,12 +41,19 @@ mixin FlutterHelper on BaseCommand {
     return flutterProcess;
   }
 
-  Future<void> buildFlutter() async {
+  Future<void> buildFlutter(bool wasm) async {
     await _ensureTarget();
 
     var flutterProcess = await Process.start(
       'flutter',
-      ['build', 'web', '-t', '.dart_tool/jaspr/flutter_target.dart', '--output=build/flutter'],
+      [
+        'build',
+        'web',
+        '-t',
+        '.dart_tool/jaspr/flutter_target.dart',
+        if (wasm) '--wasm',
+        '--output=build/flutter',
+      ],
       runInShell: true,
       workingDirectory: Directory.current.path,
     );

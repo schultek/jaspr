@@ -80,6 +80,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   @override
   String get category => 'Project';
 
+  late final useWasm = argResults!['experimental-wasm'] as bool;
+
   @override
   Future<CommandResult?> run() async {
     await super.run();
@@ -122,7 +124,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     await webResult;
 
     if (config!.usesFlutter) {
-      flutterResult = buildFlutter();
+      flutterResult = buildFlutter(useWasm);
     }
 
     var serverDefines = getServerDartDefines();
@@ -243,7 +245,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   }
 
   Future<int> _buildWeb() async {
-    final useWasm = argResults!['experimental-wasm'] as bool;
     if (useWasm) {
       checkWasmSupport();
     }
@@ -253,6 +254,11 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final compiler = useWasm ? 'dart2wasm' : 'dart2js';
     final entrypointBuilder = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint';
 
+    var dartDefines = getClientDartDefines();
+    if (config!.usesFlutter) {
+      dartDefines.addAll(getFlutterDartDefines(useWasm, true));
+    }
+
     final args = [
       '-Djaspr.flags.release=true',
       '-O${argResults!['optimize']}',
@@ -260,7 +266,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         ...argResults!['extra-wasm-compiler-option']
       else
         ...argResults!['extra-js-compiler-option'],
-      for (final entry in getClientDartDefines().entries) //
+      for (final entry in dartDefines.entries) //
         '-D${entry.key}=${entry.value}',
     ];
 
