@@ -1,4 +1,8 @@
-## Unreleased minor
+## 0.3.1
+
+- Fix 'add_styles' assist.
+
+## 0.3.0
 
 - Added 'styles_ordering' lint and fix.
 

@@ -1,3 +1,7 @@
+## 0.4.5
+
+- `jaspr` upgraded to `0.18.0`
+
 ## 0.4.4
 
 - Update logo and website links.

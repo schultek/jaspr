@@ -97,9 +97,9 @@ import 'package:jaspr/browser.dart';
 import 'lib/app.dart';
 
 void main() {
-// Attaches the app component to the <body> tag
-// and hydrates the component / makes it interactive.
-runApp(App(), attachTo: 'body');
+  // Attaches the app component to the <body> tag
+  // and hydrates the component / makes it interactive.
+  runApp(App(), attachTo: 'body');
 }
 ```
 
@@ -119,12 +119,12 @@ void main() {
     Jaspr.initializeApp(options: defaultJasprOptions);
 
     runApp(Document(
-    head: [
-    // Links to the compiled `web/main.dart` file.
-    script(src: 'main.dart.js', []),
-    ],
-    // Pre-renders the [App] component inside the <body> tag
-    body: App(),
+      head: [
+        // Links to the compiled `web/main.dart` file.
+        script(src: 'main.dart.js', []),
+      ],
+      // Pre-renders the [App] component inside the <body> tag
+      body: App(),
     ));
 }
 ```
@@ -154,9 +154,9 @@ Your client entrypoint could be:
 
 ```dart title="web/main.dart"
 void main() {
-    runApp(Header(), attachTo: 'header');
-    runApp(Sidebar(), attachTo: '#sidebar');
-    runApp(Content(), attachTo: '#content');
+  runApp(Header(), attachTo: 'header');
+  runApp(Sidebar(), attachTo: '#sidebar');
+  runApp(Content(), attachTo: '#content');
 }
 ```
 

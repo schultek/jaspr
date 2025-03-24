@@ -1,3 +1,7 @@
+## 0.5.3
+
+- Loosen `serverpod` dependency constraint to `>=2.3.0 <2.4.0`.
+
 ## 0.5.2
 
 - Update logo and website links.

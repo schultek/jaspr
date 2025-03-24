@@ -45,7 +45,7 @@ class CounterState extends State<Counter> {
       css('&').styles(
         display: Display.flex,
         padding: Padding.symmetric(vertical: 10.px),
-        border: Border.symmetric(vertical: BorderSide.solid(color: primaryColor, width: 1.px)),
+        border: Border.symmetric(vertical: BorderSide.solid(color: primaryColor, width: 2.px)),
         alignItems: AlignItems.center,
       ),
       css('button', [
@@ -58,6 +58,7 @@ class CounterState extends State<Counter> {
           cursor: Cursor.pointer,
           justifyContent: JustifyContent.center, 
           alignItems: AlignItems.center,
+          fontSize: 2.rem,
           backgroundColor: Colors.transparent,
         ),
         css('&:hover').styles(

@@ -1,4 +1,10 @@
-## Unreleased minor
+## Unreleased patch
+
+- Fixed flutter embedding issue with version 3.29.0.
+- Added `onClick` override to `a` html tag. Fixing issues with default action handling.
+- Added `--extra-js-compiler-option` and `--extra-wasm-compiler-option` to `jaspr build` command.
+
+## 0.18.0
 
 - **BREAKING** Changed `AppBinding`s `Uri get currentUri` to `String get currentUrl`.
 

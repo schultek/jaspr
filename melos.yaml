@@ -11,8 +11,6 @@ packages:
   - packages/*
   - apps/*
   - examples/*
-  - experiments/*
-  - thirdparty/*
 
 scripts:
   format:

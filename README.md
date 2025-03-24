@@ -52,10 +52,10 @@ Inspired by DartPad, **Jaspr** has it's own online editor and playground, called
 
 [Check it out here!](https://playground.jaspr.site)
 
-You can check out the samples, take the tutorial or try out jaspr for yourself, all live in the browser.
+You can check out the samples, take the tutorial or try out Jaspr for yourself, all live in the browser.
 When you want to continue coding offline, you can quickly download the current files bundled in a complete dart project, ready to start coding locally.
 
-JasprPad is also built with **Jaspr** itself, so you can [**check out its source code**](https://github.com/schultek/jaspr/tree/main/apps/jaspr_pad) to get a feel for how jaspr would be used in a larger app.
+JasprPad is also built with **Jaspr** itself, so you can [**check out its source code**](https://github.com/schultek/jaspr/tree/main/apps/jaspr_pad) to get a feel for how Jaspr would be used in a larger app.
 
 ![JasprPad Screenshot](https://user-images.githubusercontent.com/13920539/170837732-9e09d5f3-e79e-4ddd-b118-72e49456a7cd.png)
 
@@ -72,7 +72,7 @@ platforms including the web, it may not be suited for all types of websites that
 Jaspr works by giving you the familiar look and feel of the Flutter framework, while using native web
 technologies, like HTML, the DOM and CSS to enable you building **all** kinds of websites using **Dart**.
 
-Instead of trying to mirror every little thing from Flutter, `jaspr` tries to give a general Fluttery feeling
+Instead of trying to mirror every little thing from Flutter, Jaspr tries to give a general Fluttery feeling
 by matching features where it makes sense without compromising on the unique properties of the web platform.
 Rather it embraces these differences to give the best of both worlds.
 
@@ -80,18 +80,19 @@ Rather it embraces these differences to give the best of both worlds.
 
 ## Directories
 
-- **/apps**: Production apps built with jaspr
-  - **/jaspr_pad**: Online Editor and Playground inspired by DartPad, built with jaspr.
+- **/apps**: Production apps built with Jaspr
+  - **/jaspr_pad**: Online Editor and Playground inspired by DartPad, built with Jaspr. Hosted at [playground.jaspr.site](https://playground.jaspr.site)
+  - **/website**: The Jaspr website, built with Jaspr itself. Hosted at [jaspr.site](https://jaspr.site)
+- **/assets**: Branding images and other assets for Jaspr.
 - **/docs**: Documentation hosted at [docs.jaspr.site](https://docs.jaspr.site)
-- **/examples**: Well-maintained and documented examples
-- **/experiments**: Experimental apps or features, that are not part of the core framework (yet?) (may be broken).
+- **/examples**: Examples for showcasing different Jaspr features.
 - **/packages**:
   - **/jaspr**: The core framework package.
-  - **/jaspr_builder**: Code-generation builders for jaspr.
-  - **/jaspr_cli**: The command line interface of jaspr.
-  - **/jaspr_flutter_embed**: Flutter element embedding bindings for jaspr.
-  - **/jaspr_lints**: A collection of lints and assists for jaspr projects.
-  - **/jaspr_riverpod**: Riverpod implementation for jaspr.
-  - **/jaspr_router**: A router implementation for jaspr.
-  - **/jaspr_test**: A testing package for jaspr.
-  - **/jaspr_tailwind**: A tailwind integration for jaspr.
+  - **/jaspr_builder**: Code-generation builders for Jaspr.
+  - **/jaspr_cli**: The command line interface of Jaspr.
+  - **/jaspr_flutter_embed**: Flutter element embedding bindings for Jaspr.
+  - **/jaspr_lints**: A collection of lints and assists for Jaspr projects.
+  - **/jaspr_riverpod**: An unofficial Riverpod implementation for Jaspr.
+  - **/jaspr_router**: A router implementation for Jaspr.
+  - **/jaspr_serverpod**: An official Jaspr integration for [Serverpod](serverpod.dev).
+  - **/jaspr_test**: A testing package for Jaspr.

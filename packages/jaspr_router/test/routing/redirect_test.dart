@@ -1,5 +1,6 @@
 @TestOn('vm')
 
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
@@ -63,6 +64,45 @@ void main() {
 
       expect(find.text('b'), findsOneComponent);
       expect(tester.routeOf(find.text('b')).location, equals('/b'));
+    });
+
+    testComponents('should redirect on async update', (tester) async {
+      var blocked = false;
+      late void Function(VoidCallback) setState;
+
+      tester.pumpComponent(StatefulBuilder(builder: (context, cb) sync* {
+        setState = cb;
+        yield Router(
+          routes: [
+            homeRoute(),
+            route('/a'),
+          ],
+          redirect: (_, s) async {
+            await Future(() async {});
+            if (s.location == '/a' && blocked) {
+              return '/';
+            }
+            return null;
+          },
+        );
+      }));
+
+      await pumpEventQueue();
+      expect(find.text('home'), findsOneComponent);
+
+      await tester.router.push('/a');
+      await pumpEventQueue();
+
+      expect(find.text('a'), findsOneComponent);
+      expect(tester.routeOf(find.text('a')).location, equals('/a'));
+
+      setState(() {
+        blocked = true;
+      });
+      await pumpEventQueue();
+
+      expect(find.text('home'), findsOneComponent);
+      expect(tester.routeOf(find.text('home')).location, equals('/'));
     });
   });
 }
