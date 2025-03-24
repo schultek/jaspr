@@ -3,7 +3,7 @@ description: A new jaspr project.
 version: 0.0.2
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.6.0 <4.0.0'
 
 dependencies:
   highlight: ^0.7.0
