@@ -26,19 +26,26 @@ final importsModuleOutput = {
 };
 
 final importsOutput = {
-  'site|lib/target.imports.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+  'site|lib/target.imports.dart': '// dart format off\n'
+      '// ignore_for_file: type=lint\n'
+      '\n'
+      '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
-      'export \'generated/imports/_web.dart\' if (dart.library.io) \'generated/imports/_stubs.dart\'\n'
+      'export \'generated/imports/_web.dart\'\n'
+      '    if (dart.library.io) \'generated/imports/_stubs.dart\'\n'
       '    show window, Window, WindowOrStubbed;\n'
       '\n'
-      'export \'generated/imports/_vm.dart\' if (dart.library.js_interop) \'generated/imports/_stubs.dart\'\n'
+      'export \'generated/imports/_vm.dart\'\n'
+      '    if (dart.library.js_interop) \'generated/imports/_stubs.dart\'\n'
       '    show HttpServer, HttpServerOrStubbed;\n'
-      ''
+      '',
 };
 
 final importsStubsOutput = {
-  'site|lib/generated/imports/_web.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+  'site|lib/generated/imports/_web.dart': '// dart format off\n'
+      '// ignore_for_file: type=lint\n\n'
+      '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
       '// ignore_for_file: directives_ordering, deprecated_member_use\n'
@@ -48,7 +55,9 @@ final importsStubsOutput = {
       '\n'
       'typedef WindowOrStubbed = Window;\n'
       '',
-  'site|lib/generated/imports/_vm.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+  'site|lib/generated/imports/_vm.dart': '// dart format off\n'
+      '// ignore_for_file: type=lint\n\n'
+      '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
       '// ignore_for_file: directives_ordering, deprecated_member_use\n'
@@ -58,7 +67,9 @@ final importsStubsOutput = {
       '\n'
       'typedef HttpServerOrStubbed = HttpServer;\n'
       '',
-  'site|lib/generated/imports/_stubs.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+  'site|lib/generated/imports/_stubs.dart': '// dart format off\n'
+      '// ignore_for_file: type=lint\n\n'
+      '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
       '// ignore_for_file: directives_ordering, non_constant_identifier_names\n'

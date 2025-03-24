@@ -21,7 +21,7 @@ final formatter = DartFormatter(languageVersion: DartFormatter.latestLanguageVer
 
 extension DartOutput on BuildStep {
   Future<void> writeAsFormattedDart(AssetId outputId, String source) async {
-    await writeAsString(outputId, formatter.format('$generationHeader$source'));
+    await writeAsString(outputId, '$generationHeader${formatter.format(source)}');
   }
 }
 

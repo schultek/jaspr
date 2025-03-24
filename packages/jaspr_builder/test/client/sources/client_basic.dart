@@ -34,7 +34,10 @@ final clientBasicJsonOutputs = {
 };
 
 final clientBasicDartOutputs = {
-  'site|web/component_basic.client.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+  'site|web/component_basic.client.dart': '// dart format off\n'
+      '// ignore_for_file: type=lint\n'
+      '\n'
+      '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
       'import \'package:jaspr/browser.dart\';\n'
@@ -46,5 +49,6 @@ final clientBasicDartOutputs = {
       '\n'
       'Component getComponentForParams(Map<String, dynamic> p) {\n'
       '  return prefix0.Component(p[\'a\'], b: p[\'b\'], c: p[\'c\'], d: p[\'d\']);\n'
-      '}\n',
+      '}\n'
+      '',
 };
