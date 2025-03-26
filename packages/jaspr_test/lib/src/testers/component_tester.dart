@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:jaspr/jaspr.dart';
 // ignore: implementation_imports
@@ -128,6 +129,11 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
       return AsyncBuildOwner();
     }
     return super.createRootBuildOwner();
+  }
+
+  @override
+  void reportBuildError(Element element, Object error, StackTrace stackTrace) {
+    stderr.writeln('Error while building ${element.component.runtimeType}:\n$error\n\n$stackTrace');
   }
 }
 
