@@ -15,7 +15,7 @@ on Riverpod 2 and supports all providers and modifiers.
 While it has feature-parity for defining `Provider`s, it comes with some quality-of-life improvements
 on the `Consumer` side. Mainly:
 
-**It does not have `Comsumer`, `ComsumerWidget` or `StatefulConsumerWidget`.** This is because it
+**It does not have `Consumer`, `ConsumerWidget` or `StatefulConsumerWidget`.** This is because it
 does not rely on `WidgetRef` to access providers but instead comes with **context extensions** on the
 `BuildContext` of **any** component.
 
