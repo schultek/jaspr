@@ -94,9 +94,7 @@ class CreateCommand extends BaseCommand {
   bool get requiresPubspec => false;
 
   @override
-  Future<CommandResult?> run() async {
-    await super.run();
-
+  Future<int> runCommand() async {
     var (dir, name) = getTargetDirectory();
 
     var (useMode, useHydration) = getRenderingMode();
@@ -132,7 +130,7 @@ class CreateCommand extends BaseCommand {
       updater.getLatestVersion(webCompilersPackage),
     ]);
 
-    var progress = logger.logger.progress('Generating project...');
+    var progress = logger.logger!.progress('Generating project...');
     var generator = await MasonGenerator.fromBundle(scaffoldBundle);
     final files = await generator.generate(
       ScaffoldGeneratorTarget(dir, usedPrefixes),
@@ -169,11 +167,11 @@ class CreateCommand extends BaseCommand {
         '  cd ${p.relative(dir.path, from: Directory.current.absolute.path)}\n'
         '  jaspr serve\n');
 
-    return null;
+    return 0;
   }
 
   (Directory, String) getTargetDirectory() {
-    var targetPath = argResults!.rest.firstOrNull ?? logger.logger.prompt('Specify a target directory:');
+    var targetPath = argResults!.rest.firstOrNull ?? logger.logger!.prompt('Specify a target directory:');
 
     var directory = Directory(targetPath).absolute;
     var dir = p.basenameWithoutExtension(directory.path);
@@ -200,13 +198,13 @@ class CreateCommand extends BaseCommand {
       [var m, 'auto'] => (RenderingMode.values.byName(m), true),
       [var m] => (RenderingMode.values.byName(m), false),
       _ => () {
-          var mode = logger.logger.chooseOne(
+          var mode = logger.logger!.chooseOne(
             'Select a rendering mode:',
             choices: RenderingMode.values,
             display: (o) => '${o.name}: ${o.help}.',
           );
           var hydration = mode.useServer &&
-              logger.logger.confirm('(Recommended) Enable automatic hydration on the client?', defaultValue: true);
+              logger.logger!.confirm('(Recommended) Enable automatic hydration on the client?', defaultValue: true);
           return (mode, hydration);
         }(),
     };
@@ -224,9 +222,9 @@ class CreateCommand extends BaseCommand {
               ? usageException("Cannot use multi-page routing with manual hydration.")
               : (true, true),
       _ => () {
-          var routing = logger.logger.confirm('Setup routing for different pages of your site?', defaultValue: true);
+          var routing = logger.logger!.confirm('Setup routing for different pages of your site?', defaultValue: true);
           var multiPage = routing && useServer && useHydration
-              ? logger.logger.confirm(
+              ? logger.logger!.confirm(
                   '(Recommended) Use multi-page (server-side) routing? '
                   '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',
                   defaultValue: true,
@@ -245,9 +243,9 @@ class CreateCommand extends BaseCommand {
       'embedded' => (true, true),
       'plugins-only' => (false, true),
       _ => () {
-          var flutter = logger.logger.confirm('Setup Flutter web embedding?', defaultValue: false);
+          var flutter = logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
           var plugins = flutter ||
-              logger.logger.confirm(
+              logger.logger!.confirm(
                 'Enable support for using Flutter web plugins in your project?',
                 defaultValue: true,
               );
@@ -263,13 +261,13 @@ class CreateCommand extends BaseCommand {
       'none' => null,
       String b => b,
       null => () {
-          var backend = logger.logger.confirm(
+          var backend = logger.logger!.confirm(
             'Use a custom backend package or framework for the server part of your project?',
             defaultValue: false,
           );
           if (!backend) return null;
 
-          var b = logger.logger
+          var b = logger.logger!
               .chooseOne(
                 'Select a backend framework:',
                 choices: [

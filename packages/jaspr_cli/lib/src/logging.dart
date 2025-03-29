@@ -4,16 +4,16 @@ import 'package:build_daemon/data/server_log.dart' as s;
 import 'package:io/ansi.dart';
 import 'package:logging/logging.dart' as l;
 import 'package:mason/mason.dart' as m;
-// ignore: implementation_imports
-import 'package:webdev/src/logging.dart';
 
 typedef Level = m.Level;
+typedef MasonLogger = m.Logger;
 
 enum Tag {
   cli('CLI', cyan),
   builder('BUILDER', magenta),
   server('SERVER', yellow),
   flutter('FLUTTER', blue),
+  client('CLIENT', lightGreen),
   none('', black);
 
   const Tag(this.name, this.color);
@@ -28,37 +28,28 @@ enum Tag {
 
 enum ProgressState { running, completed }
 
-class Logger {
-  Logger(this.verbose) {
-    configureLogWriter(false, customLogWriter: (level, message, {loggerName, error, stackTrace}) {
-      if (level.value < l.Level.INFO.value) return;
+abstract class Logger {
+  factory Logger(bool verbose) = _Logger;
+  
+  MasonLogger? get logger;
+  bool get verbose;
 
-      if (!verbose && level.value < l.Level.SEVERE.value) return;
+  void complete(bool success);
+  void write(String message, {Tag tag = Tag.cli, Level level = Level.info, ProgressState? progress});
+}
 
-      // We log our own server and don't want to confuse the user.
-      if (message.startsWith('Serving `web` on')) {
-        return;
-      }
+class _Logger implements Logger {
+  _Logger(this.verbose);
 
-      var buffer = StringBuffer(message);
-      if (error != null) {
-        buffer.writeln(error);
-      }
-
-      var log = buffer.toString().trim();
-      if (log.isEmpty) {
-        return;
-      }
-      write(log, tag: Tag.builder, level: level.toLevel());
-    });
-  }
-
+  @override
   final bool verbose;
 
-  final m.Logger logger = m.Logger();
+  @override
+  final MasonLogger logger = MasonLogger();
 
   m.Progress? _progress;
 
+  @override
   void complete(bool success) {
     if (_progress != null) {
       if (success) {
@@ -70,12 +61,16 @@ class Logger {
     }
   }
 
-  void write(String message, {Tag tag = Tag.cli, Level level = Level.info, ProgressState? progress}) {
+  @override
+  void write(String message, {Tag? tag = Tag.cli, Level level = Level.info, ProgressState? progress}) {
     if (level == Level.verbose && !verbose) {
       return;
     }
 
     message = message.trim();
+    if (message.isEmpty) {
+      return;
+    }
     if (message.contains('\n')) {
       var lines = message.split('\n');
       for (var l in lines) {
@@ -86,7 +81,7 @@ class Logger {
 
     var showAsProgress = !verbose && progress != null && (progress == ProgressState.running || _progress != null);
 
-    String log = '${tag.format()}${level.format(message.trim())}';
+    String log = '${tag?.format() ?? ''}${level.format(message.trim())}';
 
     if (showAsProgress) {
       _progress ??= logger.progress(log);
@@ -114,6 +109,10 @@ class Logger {
     }
   }
 
+}
+
+
+extension ServerLogger on Logger {
   void writeServerLog(s.ServerLog serverLog) {
     if (!verbose) return;
     //if (serverLog.level < Level.INFO) return;
@@ -147,7 +146,7 @@ extension on Level {
   }
 }
 
-extension on l.Level {
+extension LevelTransform on l.Level {
   Level toLevel() {
     if (value < l.Level.INFO.value) {
       return Level.debug;

@@ -39,6 +39,7 @@ dependencies:
   webdev: 3.7.1
   shelf: ^1.4.1
   shelf_proxy: ^1.0.4
+  async: ^2.13.0
 
 dev_dependencies:
   lints: ^5.0.0
