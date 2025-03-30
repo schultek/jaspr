@@ -2,14 +2,29 @@
   "name": "jaspr-code",
   "displayName": "Jaspr",
   "description": "Jaspr framework support for Visual Studio Code",
-  "version": "0.0.1",
-  "engines": {
-    "vscode": "^1.98.0"
+  "version": "0.1.0",
+  "preview": true,
+  "publisher": "schultek",
+  "author": {
+    "name": "Kilian Schulte"
   },
-  "categories": [
-    "Other"
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "extensionKind": [
+    "workspace"
   ],
+  "categories": [
+    "Debuggers"
+  ],
+  "keywords": [
+    "jaspr",
+    "dart",
+    "flutter"
+  ],
+  "icon": "media/jaspr.png",
   "activationEvents": [
+    "workspaceContains:pubspec.yaml",
     "onDebug"
   ],
   "main": "./out/extension.js",
@@ -37,10 +52,10 @@
         },
         "configurationSnippets": [
           {
-            "label": "Jaspr Serve",
-            "description": "A new configuration for serving a jaspr app.",
+            "label": "Jaspr",
+            "description": "A new configuration for launching a Jaspr app.",
             "body": {
-              "name": "Jaspr Serve",
+              "name": "Jaspr",
               "request": "launch",
               "type": "jaspr"
             }
@@ -61,14 +76,17 @@
     "Dart-Code.dart-code"
   ],
   "devDependencies": {
-    "@types/vscode": "^1.98.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/vscode": "^1.98.0",
     "@typescript-eslint/eslint-plugin": "^8.25.0",
     "@typescript-eslint/parser": "^8.25.0",
-    "eslint": "^9.21.0",
-    "typescript": "^5.7.3",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.21.0",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1"
   }
 }

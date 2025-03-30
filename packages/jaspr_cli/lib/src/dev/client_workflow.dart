@@ -10,7 +10,7 @@ import 'dart:io';
 import 'package:build_daemon/client.dart';
 import 'package:build_daemon/data/build_target.dart';
 import 'package:build_daemon/data/server_log.dart' show toLoggingLevel;
-import 'package:logging/logging.dart' as logging;
+import 'package:logging/logging.dart' as l;
 
 import 'package:webdev/src/command/configuration.dart';
 import 'package:webdev/src/daemon_client.dart';
@@ -85,15 +85,8 @@ Future<BuildDaemonClient?> _startBuildDaemon(String workingDirectory, List<Strin
       workingDirectory,
       buildOptions,
       (serverLog) {
-        var level = toLoggingLevel(serverLog.level);
-        if (level.value < logging.Level.INFO.value) return;
-
-        if (!logger.verbose && level.value < logging.Level.WARNING.value) return;
-
-        // We log our own server and don't want to confuse the user.
-        if (serverLog.message.startsWith('Serving `web` on')) {
-          return;
-        }
+        var level = mapBuilderLevel(toLoggingLevel(serverLog.level));
+        if (!logger.verbose && level.index < Level.info.index) return;
 
         var buffer = StringBuffer(serverLog.message);
         if (serverLog.error != null) {
@@ -104,7 +97,8 @@ Future<BuildDaemonClient?> _startBuildDaemon(String workingDirectory, List<Strin
         if (log.isEmpty) {
           return;
         }
-        logger.write(log, tag: Tag.builder, level: level.toLevel());
+
+        logger.write(log, tag: Tag.builder, level: level);
       },
     );
   } on OptionsSkew {
@@ -120,6 +114,17 @@ Future<BuildDaemonClient?> _startBuildDaemon(String workingDirectory, List<Strin
   }
 }
 
+Level mapBuilderLevel(l.Level builderLevel) {
+  if (builderLevel.value < l.Level.INFO.value) {
+    return Level.verbose;
+  } else if (builderLevel.value == l.Level.INFO.value) {
+    return Level.debug;
+  } else if (builderLevel.value < l.Level.SEVERE.value) {
+    return Level.warning;
+  } else {
+    return Level.error;
+  }
+}
 
 Future<ServerManager> _startServerManager(
   Configuration configuration,
@@ -138,19 +143,8 @@ Future<ServerManager> _startServerManager(
       assetPort,
     ));
   }
-  logger.write('Starting resource servers...', tag: Tag.builder, level: Level.verbose, progress: ProgressState.running);
+  
   final serverManager = await ServerManager.start(serverOptions, client.buildResults);
-
-  for (final server in serverManager.servers) {
-    logger.write(
-      'Serving `${server.target}` on '
-      '${Uri(scheme: server.protocol, host: server.host, port: server.port)}\n',
-      tag: Tag.builder,
-      level: Level.verbose,
-      progress: ProgressState.running,
-    );
-  }
-
   return serverManager;
 }
 

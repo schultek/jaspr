@@ -5,21 +5,50 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:browser_launcher/browser_launcher.dart' as browser_launcher;
+import 'package:path/path.dart' as path;
 // ignore: implementation_imports
 import 'package:webdev/src/serve/chrome.dart' as webdev;
+import '../helpers/settings_helper.dart';
 import '../logging.dart';
 
 Future<Chrome?> startChrome(int port, Logger logger) async {
   final uri = Uri(scheme: 'http', host: 'localhost', port: port).toString();
   try {
-    return await Chrome.start([uri], port: 0);
+    return await Chrome.start([uri], port: 0, chromeUserDir: chromeUserDir);
   } on ChromeError catch (e) {
     logger.write('Error starting Chrome: ${e.details}', level: Level.error);
     return null; 
   }
 }
+
+
+final Directory? chromeUserDir = () {
+  final settingsDir = getSettingsDirectory();
+  if (settingsDir == null) {
+    // Some systems don't support user home directories.
+    return null;
+  }
+
+  if (!settingsDir.existsSync()) {
+    try {
+      settingsDir.createSync();
+    } catch (e) {
+      // If we can't create the directory for the analytics settings, fail
+      // gracefully by returning null.
+      return null;
+    }
+  }
+
+  final chromeUserDir = Directory('${settingsDir.path}${path.separator}chrome_user_data').absolute;
+  if (!chromeUserDir.existsSync()) {
+    chromeUserDir.createSync();
+  }
+
+  return chromeUserDir;
+}();
 
 /// A class for managing an instance of Chrome.
 class Chrome {
@@ -36,8 +65,8 @@ class Chrome {
     bChrome.close();
   }
 
-  static Future<Chrome> start(List<String> urls, {required int port}) async {
-    final browser = await browser_launcher.Chrome.startWithDebugPort(urls, debugPort: port);
+  static Future<Chrome> start(List<String> urls, {required int port, required Directory? chromeUserDir}) async {
+    final browser = await browser_launcher.Chrome.startWithDebugPort(urls, debugPort: port, userDataDir: chromeUserDir?.path);
 
     return Chrome._(await webdev.Chrome.fromExisting(browser.debugPort), browser);
   }

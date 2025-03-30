@@ -78,8 +78,6 @@ class DaemonLogger implements Logger {
   @override
   bool get verbose => true;
 
-  bool _hasProgress = false;
-
   @override
   void write(String message, {Tag? tag = Tag.cli, Level level = Level.info, ProgressState? progress}) {
     message = message.trim();
@@ -111,44 +109,15 @@ class DaemonLogger implements Logger {
       }
     }
 
-    var showAsProgress = progress != null && (progress == ProgressState.running || _hasProgress);
-
-    if (showAsProgress) {
-      final status = progress == ProgressState.completed
-          ? level.index <= Level.info.index
-              ? 'success'
-              : 'failed'
-          : 'running';
-
-      log({
-        'progress': status,
-        'message': message,
-        'level': level.name,
-        'tag': tag?.name,
-      });
-
-      _hasProgress = progress != ProgressState.completed;
-    } else {
-      if (_hasProgress) {
-        log({'progress': 'cancelled'});
-        _hasProgress = false;
-      }
-
-      log({
-        'message': message,
-        'level': level.name,
-        'tag': tag?.name,
-      });
-    }
+    log({
+      'message': message,
+      'level': level.name,
+      'tag': tag?.name,
+    });
   }
 
   @override
-  void complete(bool success) {
-    if (!_hasProgress) return;
-    log({
-      'progress': success ? 'success' : 'failed',
-    });
-  }
+  void complete(bool success) {}
 
   void log(Map<String, dynamic> data) {
     event('daemon.log', data);

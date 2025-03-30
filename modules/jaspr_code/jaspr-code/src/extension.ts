@@ -1,6 +1,4 @@
 import * as vscode from "vscode";
-import { dartVMPath } from "./constants";
-import * as path from "path";
 import { JasprDebugConfigurationProvider } from "./debug";
 import { DartExtensionApi } from "./interfaces";
 
@@ -16,10 +14,9 @@ export function activate(context: vscode.ExtensionContext) {
     );
   }
 
-  console.log(dartCode.exports._privateApi);
   const dartExtensionApi = dartCode.exports._privateApi as DartExtensionApi;
 
-  const provider = new JasprDebugConfigurationProvider(dartExtensionApi);
+  const provider = new JasprDebugConfigurationProvider(context, dartExtensionApi);
 	vscode.debug.registerDebugConfigurationProvider(
 		"jaspr",
 		provider,

@@ -43,9 +43,8 @@ function activate(context) {
         // but just in case, we'd like to give a useful error message.
         throw new Error("The Dart extension is not installed, Jaspr extension is unable to activate.");
     }
-    console.log(dartCode.exports._privateApi);
     const dartExtensionApi = dartCode.exports._privateApi;
-    const provider = new debug_1.JasprDebugConfigurationProvider(dartExtensionApi);
+    const provider = new debug_1.JasprDebugConfigurationProvider(context, dartExtensionApi);
     vscode.debug.registerDebugConfigurationProvider("jaspr", provider, vscode.DebugConfigurationProviderTriggerKind.Dynamic);
     context.subscriptions.push(provider);
 }

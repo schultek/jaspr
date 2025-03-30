@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import * as child_process from "child_process";
 import * as stream from "stream";
 

@@ -3,8 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JasprDebugConfigurationProvider = void 0;
 const process_1 = require("./process");
 class JasprDebugConfigurationProvider {
+    context;
     dartExtensionApi;
-    constructor(dartExtensionApi) {
+    constructor(context, dartExtensionApi) {
+        this.context = context;
         this.dartExtensionApi = dartExtensionApi;
     }
     _disposables = [];
@@ -17,7 +19,7 @@ class JasprDebugConfigurationProvider {
         }
         return [
             {
-                name: "Jaspr Serve",
+                name: "Jaspr",
                 request: "launch",
                 type: "jaspr",
                 args: [],
@@ -27,7 +29,7 @@ class JasprDebugConfigurationProvider {
     async resolveDebugConfiguration(folder, debugConfiguration, token) {
         const process = new process_1.JasprServeProcess(this.dartExtensionApi);
         this._disposables.push(process);
-        process.start(folder, debugConfiguration);
+        process.start(this.context, folder, debugConfiguration);
         return undefined;
     }
 }

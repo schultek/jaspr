@@ -37,6 +37,10 @@ exports.JasprServeProcess = void 0;
 const vscode = __importStar(require("vscode"));
 const path = __importStar(require("path"));
 const constants_1 = require("./constants");
+let chalk;
+(async () => {
+    chalk = new (await import("chalk")).Chalk({ level: 1 });
+})();
 class JasprServeProcess {
     dartExtensionApi;
     constructor(dartExtensionApi) {
@@ -51,17 +55,18 @@ class JasprServeProcess {
     folder;
     randomId = 0;
     runName = "";
-    async start(folder, debugConfiguration) {
+    async start(context, folder, debugConfiguration) {
         const isInstalled = await this.install();
         if (!isInstalled) {
             return;
         }
         this.folder = folder;
         this.randomId = Math.floor(Math.random() * 1000000);
-        this.runName = debugConfiguration.name ?? "Jaspr Serve";
+        this.runName = debugConfiguration.name ?? "Jaspr";
         const terminalReady = new Promise((resolve) => {
             const terminal = vscode.window.createTerminal({
                 name: "Jaspr",
+                iconPath: vscode.Uri.file(context.asAbsolutePath("media/icons/jaspr.svg")),
                 pty: {
                     onDidWrite: this.emitter.event,
                     handleInput: (data) => {
@@ -133,23 +138,24 @@ class JasprServeProcess {
         return v !== undefined;
     }
     async stop() {
-        this.status = "stopped";
         this.process?.stdin.write('[{"method":"daemon.shutdown", "id": "0"}]\n');
-        for (const session of this.sessions) {
-            await vscode.debug.stopDebugging(session);
-        }
+        const sess = this.sessions;
         this.sessions = [];
+        this.status = "stopped";
+        for (const session of sess) {
+            vscode.debug.stopDebugging(session);
+        }
     }
     async dispose() {
         this.stop();
-        this.status = "disposed";
         this.process?.kill();
-        this.process?.disconnect();
         this.process = undefined;
         this.terminal?.dispose();
         this.terminal = undefined;
         this.emitter.dispose();
         this._disposables.forEach((d) => d.dispose());
+        this._disposables = [];
+        this.status = "disposed";
     }
     handleData(data, isError) {
         let str = data.toString();
@@ -160,37 +166,41 @@ class JasprServeProcess {
                 continue;
             }
             if (line.startsWith("[{") && line.endsWith("}]")) {
+                let event;
                 try {
                     const json = JSON.parse(line);
-                    const event = json[0];
+                    event = json[0];
+                }
+                catch (_) { }
+                if (event) {
                     this.handleEvent(event);
                     continue;
                 }
-                catch (_) { }
             }
             this.handleEvent({ event: "daemon.log", params: { message: line } });
         }
     }
+    _progress = undefined;
     handleEvent(event) {
         var eventName = event.event;
         var params = event.params;
         if (eventName === "daemon.log") {
             const tag = params.tag;
             const level = params.level;
-            if (tag === "SERVER" &&
-                params.message.startsWith("The Dart VM service is listening on ")) {
-                var url = params.message.substring("The Dart VM service is listening on ".length);
-                this.attachDebugger("Server", url);
-                return;
-            }
-            let message = params.message + "\r\n";
+            const progress = params.progress;
+            let log = params.message || "";
             if (level !== undefined) {
-                message = `(${level}) ${message}`;
+                log = formatLevel(level, log);
             }
             if (tag !== undefined) {
-                message = `[${tag}] ${message}`;
+                log = `${formatTag(tag)} ${log}`;
             }
-            this.emitter.fire(message);
+            // if (progress !== undefined) {
+            //   this._progress ??= new Progress();
+            //   this._progress.update(message, );
+            //   return;
+            // }
+            this.emitter.fire(log + "\r\n");
             return;
         }
         if (eventName === "client.debugPort") {
@@ -203,8 +213,13 @@ class JasprServeProcess {
             if (session !== undefined) {
                 vscode.debug.stopDebugging(session);
             }
+            return;
         }
-        this.emitter.fire(JSON.stringify(event) + "\r\n");
+        if (eventName === "server.started") {
+            this.attachDebugger("Server", params.vmServiceUri);
+            return;
+        }
+        //this.emitter.fire(JSON.stringify(event) + "\r\n");
     }
     attachDebugger(name, vmServiceUri) {
         if (this.sessions.find((s) => s.configuration.vmServiceUri === vmServiceUri)) {
@@ -221,4 +236,39 @@ class JasprServeProcess {
     }
 }
 exports.JasprServeProcess = JasprServeProcess;
+function formatTag(tag) {
+    switch (tag) {
+        case "CLI":
+            return chalk.cyan(`[${tag}]`);
+        case "BUILDER":
+            return chalk.magenta(`[${tag}]`);
+        case "SERVER":
+            return chalk.yellow(`[${tag}]`);
+        case "FLUTTER":
+            return chalk.blue(`[${tag}]`);
+        case "CLIENT":
+            return chalk.greenBright(`[${tag}]`);
+        default:
+            return `[${tag}]`;
+    }
+}
+function formatLevel(level, message) {
+    switch (level) {
+        case "verbose":
+        case "debug":
+            return chalk.gray(message);
+        case "info":
+            return message;
+        case "warning":
+            return chalk.yellow.bold(`[WARNING] ${message}`);
+        case "error":
+            return chalk.redBright(`[ERROR] ${message}`);
+        case "critical":
+            return chalk.bgRed.bold.white(`[CRITICAL] ${message}`);
+        default:
+            return message;
+    }
+}
+class Progress {
+}
 //# sourceMappingURL=process.js.map

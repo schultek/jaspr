@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:build_daemon/data/server_log.dart' as s;
 import 'package:io/ansi.dart';
-import 'package:logging/logging.dart' as l;
 import 'package:mason/mason.dart' as m;
 
 typedef Level = m.Level;
@@ -138,25 +137,11 @@ extension on Level {
     return switch (this) {
       Level.verbose || Level.debug => theme.detail(s),
       Level.info => theme.info(s),
-      Level.warning => theme.warn('[WARNing] $s'),
+      Level.warning => theme.warn('[WARNING] $s'),
       Level.error => theme.err('[ERROR] $s'),
       Level.critical => theme.alert('[CRITICAL] $s'),
       Level.quiet => s,
     }!;
-  }
-}
-
-extension LevelTransform on l.Level {
-  Level toLevel() {
-    if (value < l.Level.INFO.value) {
-      return Level.debug;
-    } else if (value < l.Level.WARNING.value) {
-      return Level.info;
-    } else if (value < l.Level.SEVERE.value) {
-      return Level.warning;
-    } else {
-      return Level.error;
-    }
   }
 }
 

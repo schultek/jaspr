@@ -4,7 +4,7 @@ import { JasprServeProcess } from "./process";
 export class JasprDebugConfigurationProvider
   implements vscode.DebugConfigurationProvider, vscode.Disposable
 {
-  constructor(private dartExtensionApi: any) {}
+  constructor(private context: vscode.ExtensionContext, private dartExtensionApi: any) {}
 
   private _disposables: vscode.Disposable[] = [];
 
@@ -21,7 +21,7 @@ export class JasprDebugConfigurationProvider
     }
     return [
       {
-        name: "Jaspr Serve",
+        name: "Jaspr",
         request: "launch",
         type: "jaspr",
         args: [],
@@ -39,7 +39,7 @@ export class JasprDebugConfigurationProvider
     const process = new JasprServeProcess(this.dartExtensionApi);
     this._disposables.push(process);
 
-    process.start(folder, debugConfiguration);
+    process.start(this.context, folder, debugConfiguration);
 
     return undefined;
   }

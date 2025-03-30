@@ -3,6 +3,11 @@ import { DartExtensionApi, SpawnedProcess } from "./interfaces";
 import * as path from "path";
 import { dartVMPath } from "./constants";
 
+let chalk: any;
+(async () => {
+  chalk = new (await import("chalk")).Chalk({ level: 1 });
+})();
+
 export class JasprServeProcess implements vscode.Disposable {
   constructor(private dartExtensionApi: DartExtensionApi) {}
 
@@ -20,6 +25,7 @@ export class JasprServeProcess implements vscode.Disposable {
   private runName: string = "";
 
   async start(
+    context: vscode.ExtensionContext,
     folder: vscode.WorkspaceFolder | undefined,
     debugConfiguration: vscode.DebugConfiguration
   ): Promise<void> {
@@ -30,11 +36,14 @@ export class JasprServeProcess implements vscode.Disposable {
 
     this.folder = folder;
     this.randomId = Math.floor(Math.random() * 1000000);
-    this.runName = debugConfiguration.name ?? "Jaspr Serve";
+    this.runName = debugConfiguration.name ?? "Jaspr";
 
     const terminalReady = new Promise<vscode.Terminal>((resolve) => {
       const terminal = vscode.window.createTerminal({
         name: "Jaspr",
+        iconPath: vscode.Uri.file(
+          context.asAbsolutePath("media/icons/jaspr.svg")
+        ),
         pty: {
           onDidWrite: this.emitter.event,
           handleInput: (data: string) => {
@@ -121,26 +130,26 @@ export class JasprServeProcess implements vscode.Disposable {
   }
 
   async stop(): Promise<void> {
-    this.status = "stopped";
-
     this.process?.stdin.write('[{"method":"daemon.shutdown", "id": "0"}]\n');
-    for (const session of this.sessions) {
-      await vscode.debug.stopDebugging(session);
-    }
+    const sess = this.sessions;
     this.sessions = [];
+    this.status = "stopped";
+    for (const session of sess) {
+      vscode.debug.stopDebugging(session);
+    }
   }
 
   async dispose() {
     this.stop();
 
-    this.status = "disposed";
     this.process?.kill();
-    this.process?.disconnect();
     this.process = undefined;
     this.terminal?.dispose();
     this.terminal = undefined;
     this.emitter.dispose();
     this._disposables.forEach((d) => d.dispose());
+    this._disposables = [];
+    this.status = "disposed";
   }
 
   handleData(data: Buffer | string, isError: boolean) {
@@ -153,17 +162,22 @@ export class JasprServeProcess implements vscode.Disposable {
       }
 
       if (line.startsWith("[{") && line.endsWith("}]")) {
+        let event: any;
         try {
           const json = JSON.parse(line);
-          const event = json[0];
+          event = json[0];
+        } catch (_) {}
+        if (event) {
           this.handleEvent(event);
           continue;
-        } catch (_) {}
+        }
       }
 
       this.handleEvent({ event: "daemon.log", params: { message: line } });
     }
   }
+
+  private _progress: Progress | undefined = undefined;
 
   handleEvent(event: any) {
     var eventName = event.event;
@@ -172,26 +186,23 @@ export class JasprServeProcess implements vscode.Disposable {
     if (eventName === "daemon.log") {
       const tag = params.tag;
       const level = params.level;
+      const progress = params.progress;
 
-      if (
-        tag === "SERVER" &&
-        params.message.startsWith("The Dart VM service is listening on ")
-      ) {
-        var url = params.message.substring(
-          "The Dart VM service is listening on ".length
-        );
-        this.attachDebugger("Server", url);
-        return;
-      }
-
-      let message = params.message + "\r\n";
+      let log = params.message || "";
       if (level !== undefined) {
-        message = `(${level}) ${message}`;
+        log = formatLevel(level, log);
       }
       if (tag !== undefined) {
-        message = `[${tag}] ${message}`;
+        log = `${formatTag(tag)} ${log}`;
       }
-      this.emitter.fire(message);
+
+      // if (progress !== undefined) {
+      //   this._progress ??= new Progress();
+      //   this._progress.update(message, );
+      //   return;
+      // }
+
+      this.emitter.fire(log + "\r\n");
       return;
     }
 
@@ -208,9 +219,15 @@ export class JasprServeProcess implements vscode.Disposable {
       if (session !== undefined) {
         vscode.debug.stopDebugging(session);
       }
+      return;
     }
 
-    this.emitter.fire(JSON.stringify(event) + "\r\n");
+    if (eventName === "server.started") {
+      this.attachDebugger("Server", params.vmServiceUri);
+      return;
+    }
+
+    //this.emitter.fire(JSON.stringify(event) + "\r\n");
   }
 
   attachDebugger(name: string, vmServiceUri: string) {
@@ -231,3 +248,40 @@ export class JasprServeProcess implements vscode.Disposable {
     vscode.debug.startDebugging(this.folder, debugConfig);
   }
 }
+
+function formatTag(tag: string): string {
+  switch (tag) {
+    case "CLI":
+      return chalk.cyan(`[${tag}]`);
+    case "BUILDER":
+      return chalk.magenta(`[${tag}]`);
+    case "SERVER":
+      return chalk.yellow(`[${tag}]`);
+    case "FLUTTER":
+      return chalk.blue(`[${tag}]`);
+    case "CLIENT":
+      return chalk.greenBright(`[${tag}]`);
+    default:
+      return `[${tag}]`;
+  }
+}
+
+function formatLevel(level: string, message: string): string {
+  switch (level) {
+    case "verbose":
+    case "debug":
+      return chalk.gray(message);
+    case "info":
+      return message;
+    case "warning":
+      return chalk.yellow.bold(`[WARNING] ${message}`);
+    case "error":
+      return chalk.redBright(`[ERROR] ${message}`);
+    case "critical":
+      return chalk.bgRed.bold.white(`[CRITICAL] ${message}`);
+    default:
+      return message;
+  }
+}
+
+class Progress {}
