@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.18.1
 
 - Better report errors during static build.
 - Fixed flutter embedding issue with version 3.29.0.
