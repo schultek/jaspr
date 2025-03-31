@@ -173,34 +173,17 @@ export class JasprServeProcess implements vscode.Disposable {
         }
       }
 
-      this.handleEvent({ event: "daemon.log", params: { message: line } });
+      this.handleEvent({ event: "daemon.log", params: { message: chalk.gray(line) } });
     }
   }
-
-  private _progress: Progress | undefined = undefined;
 
   handleEvent(event: any) {
     var eventName = event.event;
     var params = event.params;
 
     if (eventName === "daemon.log") {
-      const tag = params.tag;
-      const level = params.level;
-      const progress = params.progress;
-
-      let log = params.message || "";
-      if (level !== undefined) {
-        log = formatLevel(level, log);
-      }
-      if (tag !== undefined) {
-        log = `${formatTag(tag)} ${log}`;
-      }
-
-      // if (progress !== undefined) {
-      //   this._progress ??= new Progress();
-      //   this._progress.update(message, );
-      //   return;
-      // }
+      let log: string = params.message || "";
+      log = log.replaceAll("\\033", "\x1b");
 
       this.emitter.fire(log + "\r\n");
       return;
@@ -248,40 +231,3 @@ export class JasprServeProcess implements vscode.Disposable {
     vscode.debug.startDebugging(this.folder, debugConfig);
   }
 }
-
-function formatTag(tag: string): string {
-  switch (tag) {
-    case "CLI":
-      return chalk.cyan(`[${tag}]`);
-    case "BUILDER":
-      return chalk.magenta(`[${tag}]`);
-    case "SERVER":
-      return chalk.yellow(`[${tag}]`);
-    case "FLUTTER":
-      return chalk.blue(`[${tag}]`);
-    case "CLIENT":
-      return chalk.greenBright(`[${tag}]`);
-    default:
-      return `[${tag}]`;
-  }
-}
-
-function formatLevel(level: string, message: string): string {
-  switch (level) {
-    case "verbose":
-    case "debug":
-      return chalk.gray(message);
-    case "info":
-      return message;
-    case "warning":
-      return chalk.yellow.bold(`[WARNING] ${message}`);
-    case "error":
-      return chalk.redBright(`[ERROR] ${message}`);
-    case "critical":
-      return chalk.bgRed.bold.white(`[CRITICAL] ${message}`);
-    default:
-      return message;
-  }
-}
-
-class Progress {}

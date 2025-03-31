@@ -19,9 +19,9 @@ enum Tag {
   final String name;
   final AnsiCode color;
 
-  String format() {
+  String format([bool daemon = false]) {
     if (this == none) return '';
-    return color.wrap('[$name] ')!;
+    return color.wrap('[$name] ', forScript: daemon)!;
   }
 }
 
@@ -29,7 +29,7 @@ enum ProgressState { running, completed }
 
 abstract class Logger {
   factory Logger(bool verbose) = _Logger;
-  
+
   MasonLogger? get logger;
   bool get verbose;
 
@@ -107,9 +107,7 @@ class _Logger implements Logger {
       }
     }
   }
-
 }
-
 
 extension ServerLogger on Logger {
   void writeServerLog(s.ServerLog serverLog) {
@@ -130,16 +128,15 @@ extension ServerLogger on Logger {
   }
 }
 
-const theme = m.LogTheme();
-
-extension on Level {
-  String format(String s) {
+extension LevelFormat on Level {
+  String format(String s, [bool daemon = false]) {
     return switch (this) {
-      Level.verbose || Level.debug => theme.detail(s),
-      Level.info => theme.info(s),
-      Level.warning => theme.warn('[WARNING] $s'),
-      Level.error => theme.err('[ERROR] $s'),
-      Level.critical => theme.alert('[CRITICAL] $s'),
+      Level.verbose || Level.debug => darkGray.wrap(s, forScript: daemon),
+      Level.info => s,
+      Level.warning => yellow.wrap(styleBold.wrap('[WARNING] $s', forScript: daemon), forScript: daemon),
+      Level.error => lightRed.wrap('[ERROR] $s', forScript: daemon),
+      Level.critical => backgroundRed
+          .wrap(styleBold.wrap(white.wrap('[CRITICAL] $s', forScript: daemon), forScript: daemon), forScript: daemon),
       Level.quiet => s,
     }!;
   }

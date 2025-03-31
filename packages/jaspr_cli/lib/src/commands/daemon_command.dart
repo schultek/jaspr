@@ -109,11 +109,9 @@ class DaemonLogger implements Logger {
       }
     }
 
-    log({
-      'message': message,
-      'level': level.name,
-      'tag': tag?.name,
-    });
+    String logmessage = '${tag?.format(true) ?? ''}${level.format(message.trim(), true)}';
+
+    log({'message': logmessage});
   }
 
   @override
