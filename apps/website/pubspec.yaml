@@ -1,6 +1,7 @@
 name: website
-description: A new jaspr project.
-version: 0.0.2
+description: The Jaspr website hosted at https://jaspr.site
+version: 0.1.0
+publish_to: none
 
 environment:
   sdk: '>=3.6.0 <4.0.0'

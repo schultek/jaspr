@@ -55,7 +55,7 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
     // Microtasks are run before other tasks or events.
     scheduleMicrotask(frameCallback);
   }
-  
+
   @override
   void reportBuildError(Element element, Object error, StackTrace stackTrace) {
     web.console.error('Error while building ${element.component.runtimeType}:\n$error\n\n$stackTrace'.toJS);
