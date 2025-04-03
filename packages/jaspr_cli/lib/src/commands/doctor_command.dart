@@ -19,9 +19,7 @@ class DoctorCommand extends BaseCommand {
   String get category => 'Tooling';
 
   @override
-  Future<CommandResult?> run() async {
-    await super.run();
-
+  Future<int> runCommand() async {
     var sections = <DoctorSection>[];
 
     sections.add((
@@ -83,10 +81,10 @@ class DoctorCommand extends BaseCommand {
         out.write('\n  • $i');
       }
       out.writeln();
-      logger.logger.info(out.toString());
+      logger.write(out.toString());
     }
 
-    return null;
+    return 0;
   }
 }
 

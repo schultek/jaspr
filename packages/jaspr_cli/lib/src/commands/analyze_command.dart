@@ -32,11 +32,9 @@ class AnalyzeCommand extends BaseCommand {
   String get category => 'Tooling';
 
   @override
-  Future<CommandResult?> run() async {
-    await super.run();
-
+  Future<int> runCommand() async {
     var process = await Process.start('dart', ['run', 'custom_lint', ...?argResults?.arguments]);
 
-    return CommandResult.running(watchProcess('custom_lint', process, tag: Tag.none), stop);
+    return watchProcess('custom_lint', process, tag: Tag.none);
   }
 }

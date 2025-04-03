@@ -83,9 +83,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final useWasm = argResults!['experimental-wasm'] as bool;
 
   @override
-  Future<CommandResult?> run() async {
-    await super.run();
-
+  Future<int> runCommand() async {
     logger.write("Building jaspr for ${config!.mode.name} rendering mode.");
 
     var dir = Directory('build/jaspr').absolute;
@@ -254,11 +252,11 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         progress: ProgressState.completed,
         level: Level.error,
       );
-      return CommandResult.done(1);
+      return 1;
     }
 
     logger.write('Completed building project to /build/jaspr.', progress: ProgressState.completed);
-    return null;
+    return 0;
   }
 
   Future<int> _buildWeb() async {

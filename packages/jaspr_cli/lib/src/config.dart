@@ -43,17 +43,23 @@ Future<JasprConfig> getConfig(Logger logger) async {
   if (pubspecYaml case {'dev_dependencies': {'jaspr_builder': _}}) {
     // ok
   } else {
-    var result = logger.logger.confirm(
-        'Missing dependency on jaspr_builder package. Do you want to add jaspr_builder to your dev_dependencies now?',
-        defaultValue: true);
-    if (result) {
-      var result = Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
-      if (result.exitCode != 0) {
-        logger.logger.err(result.stderr);
-        throw 'Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.';
-      }
+    var log = logger.logger;
+    if (log == null) {
+      logger.write(
+          'Missing dependency on jaspr_builder in pubspec.yaml file. Make sure to add jaspr_builder to your dev_dependencies.');
+    } else {
+      var result = log.confirm(
+          'Missing dependency on jaspr_builder package. Do you want to add jaspr_builder to your dev_dependencies now?',
+          defaultValue: true);
+      if (result) {
+        var result = Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
+        if (result.exitCode != 0) {
+          log.err(result.stderr);
+          throw 'Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.';
+        }
 
-      logger.logger.success('Successfully added jaspr_builder to your dev_dependencies.');
+        log.success('Successfully added jaspr_builder to your dev_dependencies.');
+      }
     }
   }
 
