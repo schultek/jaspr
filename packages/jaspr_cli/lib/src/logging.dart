@@ -34,7 +34,7 @@ abstract class Logger {
   bool get verbose;
 
   void complete(bool success);
-  void write(String message, {Tag tag = Tag.cli, Level level = Level.info, ProgressState? progress});
+  void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress});
 }
 
 class _Logger implements Logger {
@@ -61,7 +61,7 @@ class _Logger implements Logger {
   }
 
   @override
-  void write(String message, {Tag? tag = Tag.cli, Level level = Level.info, ProgressState? progress}) {
+  void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
     if (level == Level.verbose && !verbose) {
       return;
     }

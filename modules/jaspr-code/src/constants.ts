@@ -19,3 +19,4 @@ export const executableNames = {
 };
 export const getExecutableName = (cmd: string) => (executableNames as { [key: string]: string | undefined })[cmd] ?? cmd;
 export const dartVMPath = "bin/" + executableNames.dart;
+export const JASPR_CREATE_PROJECT_TRIGGER_FILE = 'jaspr.create';

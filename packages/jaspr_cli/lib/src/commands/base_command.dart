@@ -87,6 +87,7 @@ abstract class BaseCommand extends Command<int> {
     if (!File(entryPoint).absolute.existsSync()) {
       logger.complete(false);
       logger.write("Cannot find entry point. Create a lib/main.dart file, or specify a file using --input.",
+      
           level: Level.critical);
       await shutdown();
       exit(1);

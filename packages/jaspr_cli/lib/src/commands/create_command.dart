@@ -163,9 +163,13 @@ class CreateCommand extends BaseCommand {
         tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s == '...' || s.contains('+'));
 
     logger.write('\n'
-        'Created project $name! In order to get started, run the following commands:\n\n'
-        '  cd ${p.relative(dir.path, from: Directory.current.absolute.path)}\n'
-        '  jaspr serve\n');
+        'Created project $name! In order to get started, run the following commands:\n\n');
+
+    var relativePath = p.relative(dir.path, from: Directory.current.absolute.path);
+    if (relativePath != '.') {
+      logger.write('  cd $relativePath\n');
+    }
+    logger.write('  jaspr serve\n');
 
     return 0;
   }
@@ -174,18 +178,19 @@ class CreateCommand extends BaseCommand {
     var targetPath = argResults!.rest.firstOrNull ?? logger.logger!.prompt('Specify a target directory:');
 
     var directory = Directory(targetPath).absolute;
-    var dir = p.basenameWithoutExtension(directory.path);
+    var dir = p.basenameWithoutExtension(p.normalize(directory.path));
     var name = dir.replaceAll('-', '_');
 
     if (directory.existsSync()) {
-      usageException('Directory $targetPath already exists.');
+      if (targetPath != '.') {
+        usageException('Directory $targetPath already exists.');
+      } else if (directory.listSync().isNotEmpty) {
+        usageException('Directory must be empty.');
+      }
     }
 
-    if (name.isEmpty) {
-      usageException('You must specify a snake_case package name.');
-    } else if (!_packageRegExp.hasMatch(name)) {
-      usageException('"$name" is not a valid package name.\n\n'
-          'You should use snake_case for the package name e.g. my_jaspr_project');
+    if (name.isEmpty || !_packageRegExp.hasMatch(name)) {
+      usageException('"$name" is not a valid package name.');
     }
 
     return (directory, name);

@@ -109,7 +109,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     );
 
     if (config!.mode == JasprMode.client) {
-      logger.write('Serving at http://localhost:$proxyPort');
+      logger.write('Serving at http://localhost:$proxyPort', tag: Tag.cli);
+
+      var result = await _runChrome();
+      if (result != null) {
+        return result;
+      }
 
       await workflow.done;
       return 0;
@@ -123,7 +128,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   }
 
   Future<int> _runServer(String proxyPort, ClientWorkflow workflow) async {
-    logger.write("Starting server...", progress: ProgressState.running);
+    logger.write("Starting server...", tag: Tag.cli, progress: ProgressState.running);
 
     var serverTarget = File('.dart_tool/jaspr/server_target.dart').absolute;
     if (!serverTarget.existsSync()) {
@@ -172,10 +177,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       workingDirectory: Directory.current.path,
     );
 
-    logger.write('Server started.', progress: ProgressState.completed);
+    logger.write('Server started.', tag: Tag.cli, progress: ProgressState.completed);
 
     var serverFuture = watchProcess('server', process, tag: Tag.server, onFail: () {
       logger.write('Server stopped unexpectedly. There is probably more output above.',
+      tag: Tag.cli, 
           level: Level.error, progress: ProgressState.completed);
       return true;
     });
@@ -200,40 +206,32 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       if (n > 10) {
         logger.write(
             'Server at http://localhost:$port not reachable after ${n * 2} seconds. Please check the server logs for errors.',
+            tag: Tag.cli, 
             level: Level.error);
         return 1;
       }
     }
 
-    if (launchInChrome) {
-      var chrome = await startChrome(int.parse(port), logger);
-      if (chrome == null) {
-        return 1;
-      }
-      guardResource(() async {
-        if (chrome != null) {
-          logger.write('Closing Chrome...');
-          chrome?.close();
-          chrome = null;
-        }
-      });
+    var result = await _runChrome();
+    if (result != null) {
+      return result;
     }
 
     return serverFuture;
   }
 
   Future<int> _runDevCommand(String command, String proxyPort) async {
-    logger.write("Starting server...", progress: ProgressState.running);
+    logger.write("Starting server...", tag: Tag.cli, progress: ProgressState.running);
 
     if (release) {
-      logger.write("Ignoring --release flag since custom dev command is used.", level: Level.warning);
+      logger.write("Ignoring --release flag since custom dev command is used.", tag: Tag.cli, level: Level.warning);
     }
     if (debug) {
-      logger.write("Ignoring --debug flag since custom dev command is used.", level: Level.warning);
+      logger.write("Ignoring --debug flag since custom dev command is used.", tag: Tag.cli, level: Level.warning);
     }
     var userDefines = getServerDartDefines();
     if (userDefines.isNotEmpty) {
-      logger.write("Ignoring all --dart-define options since custom dev command is used.", level: Level.warning);
+      logger.write("Ignoring all --dart-define options since custom dev command is used.", tag: Tag.cli, level: Level.warning);
     }
 
     var [exec, ...args] = command.split(" ");
@@ -245,9 +243,30 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       workingDirectory: Directory.current.path,
     );
 
-    logger.write('Server started.', progress: ProgressState.completed);
+    logger.write('Server started.', tag: Tag.cli, progress: ProgressState.completed);
 
     return await watchProcess('server', process, tag: Tag.server);
+  }
+
+  Future<int?> _runChrome() async {
+    if (!launchInChrome) return null;
+
+    var chrome = await startChrome(int.parse(port), logger);
+    if (chrome == null) {
+      return 1;
+    }
+
+    logger.write('Chrome started.', tag: Tag.cli, progress: ProgressState.completed);
+
+    guardResource(() async {
+      if (chrome != null) {
+        logger.write('Closing Chrome...');
+        chrome?.close();
+        chrome = null;
+      }
+    });
+
+    return null;
   }
 
   Future<ClientWorkflow?> _runClient(String webPort) async {
@@ -255,7 +274,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       checkWasmSupport();
     }
 
-    logger.write('Starting web compiler...', progress: ProgressState.running);
+    logger.write('Starting web compiler...', tag: Tag.cli, progress: ProgressState.running);
 
     var configuration = Configuration(
       reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
@@ -305,7 +324,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     var timer = Timer(Duration(seconds: 20), () {
       if (!buildCompleter.isCompleted) {
-        logger.write('Building web assets... (This takes longer for the initial build)',
+        logger.write('Building web assets... (This takes longer for the initial build)',tag: Tag.cli, 
             progress: ProgressState.running);
       }
     });
@@ -315,19 +334,19 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         if (!buildCompleter.isCompleted) {
           buildCompleter.complete();
         } else {
-          logger.write('Rebuilt web assets.', progress: ProgressState.completed);
+          logger.write('Rebuilt web assets.', tag: Tag.cli, progress: ProgressState.completed);
         }
       } else if (event.status == BuildStatus.failed) {
-        logger.write('Failed building web assets. There is probably more output above.',
+        logger.write('Failed building web assets. There is probably more output above.',tag: Tag.cli, 
             level: Level.error, progress: ProgressState.completed);
         if (!buildCompleter.isCompleted) {
           buildCompleter.completeError(event);
         }
       } else if (event.status == BuildStatus.started) {
         if (buildCompleter.isCompleted) {
-          logger.write('Rebuilding web assets...', progress: ProgressState.running);
+          logger.write('Rebuilding web assets...', tag: Tag.cli, progress: ProgressState.running);
         } else {
-          logger.write('Building web assets...', progress: ProgressState.running);
+          logger.write('Building web assets...', tag: Tag.cli, progress: ProgressState.running);
         }
       }
     });
@@ -343,9 +362,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     try {
       await buildCompleter.future;
-      logger.write('Done building web assets.', progress: ProgressState.completed);
+      logger.write('Done building web assets.', tag: Tag.cli, progress: ProgressState.completed);
     } on BuildResult catch (_) {
-      logger.write('Could not start dev server due to build errors.',
+      logger.write('Could not start dev server due to build errors.',tag: Tag.cli, 
           level: Level.error, progress: ProgressState.completed);
 
       return null;

@@ -24,6 +24,10 @@ class DaemonCommand extends DevCommand {
   bool get hidden => true;
 
   @override
+  // ignore: overridden_fields
+  final bool verbose = true;
+
+  @override
   final bool launchInChrome = true;
   @override
   final bool autoRun = false;
@@ -79,7 +83,7 @@ class DaemonLogger implements Logger {
   bool get verbose => true;
 
   @override
-  void write(String message, {Tag? tag = Tag.cli, Level level = Level.info, ProgressState? progress}) {
+  void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
     message = message.trim();
     if (message.contains('\n')) {
       var lines = message.split('\n');

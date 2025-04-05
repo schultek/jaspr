@@ -2,6 +2,10 @@
   "name": "jaspr-code",
   "displayName": "Jaspr",
   "description": "Jaspr framework support for Visual Studio Code",
+  "repository": {
+    "url": "https://github.com/schultek/jaspr-code",
+    "directory": "modules/jaspr-code"
+  },
   "version": "0.1.0",
   "preview": true,
   "publisher": "schultek",
@@ -21,15 +25,58 @@
   "keywords": [
     "jaspr",
     "dart",
-    "flutter"
+    "flutter",
+    "web"
   ],
   "icon": "media/jaspr.png",
   "activationEvents": [
     "workspaceContains:pubspec.yaml",
-    "onDebug"
+    "workspaceContains:jaspr.create",
+    "onDebug",
+    "onDebugDynamicConfigurations"
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "jaspr.create",
+        "title": "New Project",
+        "category": "Jaspr"
+      },
+      {
+        "command": "jaspr.serve",
+        "title": "Serve",
+        "category": "Jaspr"
+      },
+      {
+        "command": "jaspr.clean",
+        "title": "Clean",
+        "category": "Jaspr"
+      },
+      {
+        "command": "jaspr.doctor",
+        "title": "Doctor",
+        "category": "Jaspr"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "jaspr.create"
+        },
+        {
+          "command": "jaspr.serve",
+          "when": "jaspr-code:anyJasprProjectLoaded"
+        },
+        {
+          "command": "jaspr.clean",
+          "when": "jaspr-code:anyJasprProjectLoaded"
+        },
+        {
+          "command": "jaspr.doctor"
+        }
+      ]
+    },
     "debuggers": [
       {
         "type": "jaspr",
@@ -47,6 +94,10 @@
                   "type": "string"
                 },
                 "default": []
+              },
+              "cwd": {
+                "type": "string",
+                "description": "Project root."
               }
             }
           }
@@ -85,7 +136,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
-    "@types/vscode": "^1.98.0",
+    "@types/vscode": "^1.96.0",
     "@typescript-eslint/eslint-plugin": "^8.25.0",
     "@typescript-eslint/parser": "^8.25.0",
     "@vscode/test-cli": "^0.0.10",
@@ -94,6 +145,8 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "chalk": "^5.4.1"
+    "chalk": "^5.4.1",
+    "vscode-uri": "^3.1.0",
+    "yaml": "^2.7.0"
   }
 }

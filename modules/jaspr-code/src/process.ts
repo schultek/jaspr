@@ -1,7 +1,9 @@
 import * as vscode from "vscode";
-import { DartExtensionApi, SpawnedProcess } from "./interfaces";
+
 import * as path from "path";
 import { dartVMPath } from "./constants";
+import * as fs from "fs";
+import { dartExtensionApi, SpawnedProcess } from "./api";
 
 let chalk: any;
 (async () => {
@@ -9,7 +11,7 @@ let chalk: any;
 })();
 
 export class JasprServeProcess implements vscode.Disposable {
-  constructor(private dartExtensionApi: DartExtensionApi) {}
+  
 
   private _disposables: vscode.Disposable[] = [];
 
@@ -35,8 +37,8 @@ export class JasprServeProcess implements vscode.Disposable {
 
   async start(
     context: vscode.ExtensionContext,
-    folder: vscode.WorkspaceFolder | undefined,
-    debugConfiguration: vscode.DebugConfiguration
+    folder?: vscode.WorkspaceFolder,
+    debugConfiguration?: vscode.DebugConfiguration
   ): Promise<void> {
     const isInstalled = await this.install();
     if (!isInstalled) {
@@ -45,7 +47,7 @@ export class JasprServeProcess implements vscode.Disposable {
 
     this.folder = folder;
     this.randomId = Math.floor(Math.random() * 1000000);
-    this.runName = debugConfiguration.name ?? "Jaspr";
+    this.runName = debugConfiguration?.name ?? "Jaspr";
 
     this.statusBarItem = await vscode.window.createStatusBarItem(
       vscode.StatusBarAlignment.Left,
@@ -84,7 +86,7 @@ export class JasprServeProcess implements vscode.Disposable {
     this.statusBarItem.tooltip = "Click to show the Jaspr terminal";
 
     this.statusBarCloseItem.name = "Close Jaspr";
-    this.statusBarCloseItem.text = "$(debug-stop)";
+    this.statusBarCloseItem.text = "$(debug-stop) Stop Jaspr";
     this.statusBarCloseItem.command = `jaspr.closeClicked.${this.randomId}`;
     this.statusBarCloseItem.tooltip = "Stop Jaspr";
 
@@ -96,7 +98,7 @@ export class JasprServeProcess implements vscode.Disposable {
 
   async _startJaspr(
     context: vscode.ExtensionContext,
-    debugConfiguration: vscode.DebugConfiguration
+    debugConfiguration?: vscode.DebugConfiguration
   ) {
     await this._startTerminal(context);
 
@@ -149,7 +151,7 @@ export class JasprServeProcess implements vscode.Disposable {
     this.terminal = await terminalReady;
   }
 
-  async _startProcess(debugConfiguration: vscode.DebugConfiguration) {
+  async _startProcess(debugConfiguration?: vscode.DebugConfiguration) {
     const pubExecution = {
       args: [
         "pub",
@@ -157,16 +159,29 @@ export class JasprServeProcess implements vscode.Disposable {
         "run",
         "jaspr_cli:jaspr",
         "daemon",
-        ...(debugConfiguration.args ?? []),
+        ...(debugConfiguration?.args ?? []),
       ],
       executable: path.join(
-        this.dartExtensionApi.workspaceContext.sdks.dart,
+        dartExtensionApi.workspaceContext.sdks.flutter ??
+          dartExtensionApi.workspaceContext.sdks.dart,
         dartVMPath
       ),
     };
 
-    this.process = this.dartExtensionApi.safeToolSpawn(
-      this.folder?.uri.fsPath,
+    if (!fs.existsSync(pubExecution.executable)) {
+      pubExecution.executable = path.join(
+        dartExtensionApi.workspaceContext.sdks.dart,
+        dartVMPath
+      );
+    }
+
+    let folder = this.folder?.uri.fsPath;
+    if (debugConfiguration?.cwd) {
+      folder = path.resolve(folder ?? "", debugConfiguration.cwd);
+    }
+
+    this.process = dartExtensionApi.safeToolSpawn(
+      folder,
       pubExecution.executable,
       pubExecution.args
     );
@@ -204,7 +219,7 @@ export class JasprServeProcess implements vscode.Disposable {
   }
 
   async install(): Promise<boolean> {
-    const v = await this.dartExtensionApi.pubGlobal.installIfRequired({
+    const v = await dartExtensionApi.pubGlobal.installIfRequired({
       packageName: "jaspr",
       packageID: "jaspr_cli",
     });

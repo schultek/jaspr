@@ -19,7 +19,7 @@ Future<Chrome?> startChrome(int port, Logger logger) async {
   try {
     return await Chrome.start([uri], port: 0, chromeUserDir: chromeUserDir);
   } on ChromeError catch (e) {
-    logger.write('Error starting Chrome: ${e.details}', level: Level.error);
+    logger.write('Error starting Chrome: ${e.details}', tag: Tag.cli, level: Level.error);
     return null; 
   }
 }
