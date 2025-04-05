@@ -181,8 +181,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     var serverFuture = watchProcess('server', process, tag: Tag.server, onFail: () {
       logger.write('Server stopped unexpectedly. There is probably more output above.',
-      tag: Tag.cli, 
-          level: Level.error, progress: ProgressState.completed);
+          tag: Tag.cli, level: Level.error, progress: ProgressState.completed);
       return true;
     });
 
@@ -206,7 +205,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       if (n > 10) {
         logger.write(
             'Server at http://localhost:$port not reachable after ${n * 2} seconds. Please check the server logs for errors.',
-            tag: Tag.cli, 
+            tag: Tag.cli,
             level: Level.error);
         return 1;
       }
@@ -231,7 +230,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
     var userDefines = getServerDartDefines();
     if (userDefines.isNotEmpty) {
-      logger.write("Ignoring all --dart-define options since custom dev command is used.", tag: Tag.cli, level: Level.warning);
+      logger.write("Ignoring all --dart-define options since custom dev command is used.",
+          tag: Tag.cli, level: Level.warning);
     }
 
     var [exec, ...args] = command.split(" ");
@@ -324,8 +324,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     var timer = Timer(Duration(seconds: 20), () {
       if (!buildCompleter.isCompleted) {
-        logger.write('Building web assets... (This takes longer for the initial build)',tag: Tag.cli, 
-            progress: ProgressState.running);
+        logger.write('Building web assets... (This takes longer for the initial build)',
+            tag: Tag.cli, progress: ProgressState.running);
       }
     });
 
@@ -337,8 +337,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           logger.write('Rebuilt web assets.', tag: Tag.cli, progress: ProgressState.completed);
         }
       } else if (event.status == BuildStatus.failed) {
-        logger.write('Failed building web assets. There is probably more output above.',tag: Tag.cli, 
-            level: Level.error, progress: ProgressState.completed);
+        logger.write('Failed building web assets. There is probably more output above.',
+            tag: Tag.cli, level: Level.error, progress: ProgressState.completed);
         if (!buildCompleter.isCompleted) {
           buildCompleter.completeError(event);
         }
@@ -364,8 +364,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       await buildCompleter.future;
       logger.write('Done building web assets.', tag: Tag.cli, progress: ProgressState.completed);
     } on BuildResult catch (_) {
-      logger.write('Could not start dev server due to build errors.',tag: Tag.cli, 
-          level: Level.error, progress: ProgressState.completed);
+      logger.write('Could not start dev server due to build errors.',
+          tag: Tag.cli, level: Level.error, progress: ProgressState.completed);
 
       return null;
     } catch (_) {

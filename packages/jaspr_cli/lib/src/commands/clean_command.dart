@@ -60,7 +60,7 @@ class CleanCommand extends BaseCommand {
           if (kill) {
             logger.write("Killing ${pids.length} runaway processes.");
           }
-        } else if (stdout.hasTerminal){
+        } else if (stdout.hasTerminal) {
           kill = logger.logger!.confirm('Kill ${pids.length} runaway processes?');
         }
 

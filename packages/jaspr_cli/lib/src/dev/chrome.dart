@@ -20,10 +20,9 @@ Future<Chrome?> startChrome(int port, Logger logger) async {
     return await Chrome.start([uri], port: 0, chromeUserDir: chromeUserDir);
   } on ChromeError catch (e) {
     logger.write('Error starting Chrome: ${e.details}', tag: Tag.cli, level: Level.error);
-    return null; 
+    return null;
   }
 }
-
 
 final Directory? chromeUserDir = () {
   final settingsDir = getSettingsDirectory();
@@ -66,7 +65,8 @@ class Chrome {
   }
 
   static Future<Chrome> start(List<String> urls, {required int port, required Directory? chromeUserDir}) async {
-    final browser = await browser_launcher.Chrome.startWithDebugPort(urls, debugPort: port, userDataDir: chromeUserDir?.path);
+    final browser =
+        await browser_launcher.Chrome.startWithDebugPort(urls, debugPort: port, userDataDir: chromeUserDir?.path);
 
     return Chrome._(await webdev.Chrome.fromExisting(browser.debugPort), browser);
   }

@@ -249,7 +249,7 @@ class _ClientState {
     domain.sendEvent('app.started', {
       'appId': appId,
     });
-    
+
     _appConnection.runMain();
   }
 
