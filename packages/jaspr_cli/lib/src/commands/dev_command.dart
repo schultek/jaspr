@@ -216,7 +216,17 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       return result;
     }
 
-    return serverFuture;
+    var wasKilled = false;
+    guardResource(() {
+      wasKilled = true;
+    });
+
+    result = await serverFuture;
+    if (wasKilled) {
+      return 0;
+    }
+
+    return result;
   }
 
   Future<int> _runDevCommand(String command, String proxyPort) async {
