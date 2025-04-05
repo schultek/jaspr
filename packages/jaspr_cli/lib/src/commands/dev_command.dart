@@ -291,7 +291,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"$dart2jsDefines${!release ? ',"--enable-asserts"' : ''}]',
     ];
 
-    var workflow = await ClientWorkflow.start(configuration, buildArgs, webPort, logger);
+    var workflow = await ClientWorkflow.start(configuration, buildArgs, webPort, logger, guardResource);
     if (workflow == null) {
       return null;
     }
@@ -332,16 +332,31 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
     });
 
+    var aborted = false;
+    guardResource(() {
+      if (!buildCompleter.isCompleted) {
+        logger.write('Aborting build...');
+        aborted = true;
+        buildCompleter.completeError(Object());
+      }
+    });
+
     try {
       await buildCompleter.future;
       logger.write('Done building web assets.', progress: ProgressState.completed);
     } on BuildResult catch (_) {
       logger.write('Could not start dev server due to build errors.',
           level: Level.error, progress: ProgressState.completed);
-      return null;
-    }
 
-    timer.cancel();
+      return null;
+    } catch (_) {
+      if (aborted) {
+        return null;
+      }
+      rethrow;
+    } finally {
+      timer.cancel();
+    }
 
     return workflow;
   }

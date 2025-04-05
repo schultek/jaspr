@@ -47,6 +47,9 @@ class JasprServeProcess {
         this.dartExtensionApi = dartExtensionApi;
     }
     _disposables = [];
+    statusBarItem;
+    statusBarCloseItem;
+    displayStatus;
     emitter = new vscode.EventEmitter();
     terminal;
     sessions = [];
@@ -63,6 +66,47 @@ class JasprServeProcess {
         this.folder = folder;
         this.randomId = Math.floor(Math.random() * 1000000);
         this.runName = debugConfiguration.name ?? "Jaspr";
+        this.statusBarItem = await vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2);
+        this.statusBarCloseItem = await vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
+        this._disposables.push(vscode.commands.registerCommand(`jaspr.statusClicked.${this.randomId}`, () => {
+            if (this.displayStatus === "stopped") {
+                this.dispose();
+            }
+            else {
+                this.terminal?.show();
+            }
+        }));
+        this._disposables.push(vscode.commands.registerCommand(`jaspr.closeClicked.${this.randomId}`, () => {
+            this.dispose();
+        }));
+        this.statusBarItem.name = "Jaspr Status";
+        this.statusBarItem.text = "$(loading~spin) Starting Jaspr...";
+        this.statusBarItem.command = `jaspr.statusClicked.${this.randomId}`;
+        this.statusBarItem.tooltip = "Click to show the Jaspr terminal";
+        this.statusBarCloseItem.name = "Close Jaspr";
+        this.statusBarCloseItem.text = "$(debug-stop)";
+        this.statusBarCloseItem.command = `jaspr.closeClicked.${this.randomId}`;
+        this.statusBarCloseItem.tooltip = "Stop Jaspr";
+        this.statusBarItem.show();
+        this.displayStatus = "starting";
+        await this._startJaspr(context, debugConfiguration);
+    }
+    async _startJaspr(context, debugConfiguration) {
+        await this._startTerminal(context);
+        await this._startProcess(debugConfiguration);
+        this._disposables.push(vscode.debug.onDidStartDebugSession((session) => {
+            if (session.configuration._processId !== this.randomId) {
+                return;
+            }
+            this.sessions.push(session);
+            if (this.displayStatus === "starting") {
+                this.statusBarItem.text = "$(zap) Jaspr is running";
+                this.statusBarCloseItem?.show();
+                this.displayStatus = "running";
+            }
+        }));
+    }
+    async _startTerminal(context) {
         const terminalReady = new Promise((resolve) => {
             const terminal = vscode.window.createTerminal({
                 name: "Jaspr",
@@ -88,7 +132,8 @@ class JasprServeProcess {
             });
         });
         this.terminal = await terminalReady;
-        this.terminal.show();
+    }
+    async _startProcess(debugConfiguration) {
         const pubExecution = {
             args: [
                 "pub",
@@ -100,7 +145,7 @@ class JasprServeProcess {
             ],
             executable: path.join(this.dartExtensionApi.workspaceContext.sdks.dart, constants_1.dartVMPath),
         };
-        this.process = this.dartExtensionApi.safeToolSpawn(folder?.uri.fsPath, pubExecution.executable, pubExecution.args);
+        this.process = this.dartExtensionApi.safeToolSpawn(this.folder?.uri.fsPath, pubExecution.executable, pubExecution.args);
         this.process.stdout.setEncoding("utf8");
         this.process.stdout.on("data", (data) => {
             this.handleData(data, false);
@@ -117,18 +162,22 @@ class JasprServeProcess {
             else {
                 this.emitter.fire(`Jaspr Serve exited with code ${code}.\r\n`);
                 this.emitter.fire("Press any key to close the terminal.\r\n");
+                if (this.displayStatus === "starting" && this.status !== "stopped") {
+                    this.statusBarItem.text = "$(warning) Jaspr failed to start";
+                    this.displayStatus = "failed";
+                    this.terminal?.show();
+                }
+            }
+            if (this.displayStatus !== "stopped") {
+                this.statusBarItem.text = "$(check) Jaspr stopped (click to close)";
+                this.statusBarItem.tooltip = "Click to close Jaspr";
+                this.displayStatus = "stopped";
             }
             this.stop();
         });
         this.process.on("exit", (code) => {
             console.log("exit", code);
         });
-        this._disposables.push(vscode.debug.onDidStartDebugSession((session) => {
-            if (session.configuration._processId !== this.randomId) {
-                return;
-            }
-            this.sessions.push(session);
-        }));
     }
     async install() {
         const v = await this.dartExtensionApi.pubGlobal.installIfRequired({
@@ -139,6 +188,7 @@ class JasprServeProcess {
     }
     async stop() {
         this.process?.stdin.write('[{"method":"daemon.shutdown", "id": "0"}]\n');
+        this.statusBarCloseItem?.hide();
         const sess = this.sessions;
         this.sessions = [];
         this.status = "stopped";
@@ -148,6 +198,8 @@ class JasprServeProcess {
     }
     async dispose() {
         this.stop();
+        this.statusBarItem?.dispose();
+        this.statusBarItem = undefined;
         this.process?.kill();
         this.process = undefined;
         this.terminal?.dispose();
@@ -177,7 +229,10 @@ class JasprServeProcess {
                     continue;
                 }
             }
-            this.handleEvent({ event: "daemon.log", params: { message: chalk.gray(line) } });
+            this.handleEvent({
+                event: "daemon.log",
+                params: { message: chalk.gray(line) },
+            });
         }
     }
     handleEvent(event) {

@@ -15,7 +15,8 @@
     "workspace"
   ],
   "categories": [
-    "Debuggers"
+    "Debuggers",
+    "Snippets"
   ],
   "keywords": [
     "jaspr",
@@ -61,6 +62,12 @@
             }
           }
         ]
+      }
+    ],
+    "snippets": [
+      {
+        "language": "dart",
+        "path": "./snippets.json"
       }
     ]
   },

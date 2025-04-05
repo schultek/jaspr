@@ -7,6 +7,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:async/async.dart';
 import 'package:build_daemon/client.dart';
 import 'package:build_daemon/data/build_target.dart';
 import 'package:build_daemon/data/server_log.dart' show toLoggingLevel;
@@ -31,20 +32,41 @@ class ClientWorkflow {
     List<String> buildOptions,
     String targetPort,
     Logger logger,
+    void Function(FutureOr<void> Function()) guard,
   ) async {
-    final workingDirectory = Directory.current.path;
-    final targetPorts = {'web': int.parse(targetPort)};
+    var cancelled = false;
 
-    final client = await _startBuildDaemon(workingDirectory, buildOptions, logger);
-    if (client == null) return null;
-    _registerBuildTargets(client, configuration, targetPorts);
+    var op = CancelableOperation<ClientWorkflow?>.fromFuture(Future(() async {
+      final workingDirectory = Directory.current.path;
+      final targetPorts = {'web': int.parse(targetPort)};
 
-    logger.write('Starting initial build...', tag: Tag.builder, progress: ProgressState.running);
-    client.startBuild();
+      final client = await _startBuildDaemon(workingDirectory, buildOptions, logger);
+      if (client == null) return null;
+      if (cancelled) {
+        client.close();
+        return null;
+      }
+      _registerBuildTargets(client, configuration, targetPorts);
 
-    final serverManager = await _startServerManager(configuration, targetPorts, workingDirectory, client, logger);
+      logger.write('Starting initial build...', tag: Tag.builder, progress: ProgressState.running);
+      client.startBuild();
 
-    return ClientWorkflow._(client, serverManager, logger);
+      final serverManager = await _startServerManager(configuration, targetPorts, workingDirectory, client, logger);
+      if (cancelled) {
+        await client.close();
+        await serverManager.stop();
+        return null;
+      }
+
+      return ClientWorkflow._(client, serverManager, logger);
+    }));
+
+    guard(() {
+      op.cancel();
+      cancelled = true;
+    });
+
+    return op.valueOrCancellation(null);
   }
 
   ClientWorkflow._(
@@ -66,12 +88,10 @@ class ClientWorkflow {
   final Logger logger;
 
   final ServerManager serverManager;
-  StreamSubscription? _resultsSub;
 
   Future<void> get done => _doneCompleter.future;
 
   Future<void> shutDown() async {
-    await _resultsSub?.cancel();
     await client.close();
     await serverManager.stop();
     if (!_doneCompleter.isCompleted) _doneCompleter.complete();
@@ -143,7 +163,7 @@ Future<ServerManager> _startServerManager(
       assetPort,
     ));
   }
-  
+
   final serverManager = await ServerManager.start(serverOptions, client.buildResults);
   return serverManager;
 }
