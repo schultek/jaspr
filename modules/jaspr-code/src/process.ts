@@ -4,6 +4,7 @@ import * as path from "path";
 import { dartVMPath } from "./constants";
 import * as fs from "fs";
 import { dartExtensionApi, SpawnedProcess } from "./api";
+import { checkJasprInstalled } from "./commands";
 
 let chalk: any;
 (async () => {
@@ -40,7 +41,7 @@ export class JasprServeProcess implements vscode.Disposable {
     folder?: vscode.WorkspaceFolder,
     debugConfiguration?: vscode.DebugConfiguration
   ): Promise<void> {
-    const isInstalled = await this.install();
+    const isInstalled = await checkJasprInstalled();
     if (!isInstalled) {
       return;
     }
@@ -218,13 +219,6 @@ export class JasprServeProcess implements vscode.Disposable {
     });
   }
 
-  async install(): Promise<boolean> {
-    const v = await dartExtensionApi.pubGlobal.installIfRequired({
-      packageName: "jaspr",
-      packageID: "jaspr_cli",
-    });
-    return v !== undefined;
-  }
 
   async stop(): Promise<void> {
     this.process?.stdin.write('[{"method":"daemon.shutdown", "id": "0"}]\n');

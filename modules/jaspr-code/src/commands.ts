@@ -20,6 +20,11 @@ export async function jasprCreate(
   projectPath: string,
   options: JasprCreateOptions | undefined
 ): Promise<boolean> {
+  const isInstalled = await checkJasprInstalled();
+  if (!isInstalled) {
+    return false;
+  }
+
   const args = ["create"];
 
   args.push("--mode");
@@ -48,7 +53,9 @@ export async function jasprCreate(
   return exitCode === 0;
 }
 
-export async function jasprClean(selection: vs.Uri | undefined): Promise<number | undefined> {
+export async function jasprClean(
+  selection: vs.Uri | undefined
+): Promise<number | undefined> {
   return runJaspr(["clean"], selection);
 }
 
@@ -56,11 +63,16 @@ export function jasprDoctor() {
   return runJaspr(["doctor"], undefined, true);
 }
 
-export function runJaspr(
+export async function runJaspr(
   args: string[],
   selection: vs.Uri | undefined,
   alwaysShowOutput = false
-): Thenable<number | undefined> {
+): Promise<number | undefined> {
+  const isInstalled = await checkJasprInstalled();
+  if (!isInstalled) {
+    return;
+  }
+
   return dartExtensionApi.addDependencyCommand.runCommandForWorkspace(
     runJasprInFolder,
     `Select the folder to run "jaspr ${args.join(" ")}" in`,
@@ -90,4 +102,22 @@ export function runJasprInFolder(
     allArgs,
     alwaysShowOutput
   );
+}
+
+export async function checkJasprInstalled(): Promise<boolean> {
+  const v = await dartExtensionApi.pubGlobal.installIfRequired({
+    packageName: "jaspr",
+    packageID: "jaspr_cli",
+    requiredVersion: "0.18.2",
+  });
+  if (v === undefined) {
+    return false;
+  }
+  if (v < "0.18.2") {
+    await vs.window.showErrorMessage(
+      "Jaspr CLI version is too old. Please update to 0.18.2 or later."
+    );
+    return false;
+  }
+  return true;
 }
