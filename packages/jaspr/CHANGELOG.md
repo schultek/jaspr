@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.18.2
 
 - Added `jaspr daemon` command to run a daemon server (used by the new [VSCode extension]()).
 - Added `--launch-in-chrome` option to `jaspr serve` command to open the browser automatically.
