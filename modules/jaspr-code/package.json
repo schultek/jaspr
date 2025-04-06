@@ -2,11 +2,14 @@
   "name": "jaspr-code",
   "displayName": "Jaspr",
   "description": "Jaspr framework support for Visual Studio Code",
+  "version": "0.1.1",
   "repository": {
-    "url": "https://github.com/schultek/jaspr-code",
+    "url": "https://github.com/schultek/jaspr",
     "directory": "modules/jaspr-code"
   },
-  "version": "0.1.0",
+  "homepage": "https://jaspr.site",
+  "funding": "https://github.com/sponsors/schultek",
+  "license": "MIT",
   "preview": true,
   "publisher": "schultek",
   "author": {
