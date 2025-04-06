@@ -12,7 +12,7 @@ This extension also requires the [Dart VSCode Extension](https://marketplace.vis
 
 To create a new Jaspr project, open the command palette (`Ctrl+Shift+P`) and select **Jaspr: New Project**. You are ask to choose from several templates and set a project folder.
 
-![New Project](media/screenshots/new_project.png)
+![New Project](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/new_project.png?raw=true)
 
 ## Debugging a Jaspr application
 
@@ -24,13 +24,13 @@ When developing a Jaspr project in `static` or `server` mode, this will open **t
 
 | Sidebar | Dropdown. |
 |---|---|
-| ![Sidebar](media/screenshots/sidebar.png) | ![Dropdown](media/screenshots/dropdown.png)
+| ![Sidebar](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/sidebar.png?raw=true) | ![Dropdown](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/dropdown.png?raw=true)
 
 Both processes will be managed by the main Jaspr terminal.
 
-![Terminal](media/screenshots/terminal.png)
+![Terminal](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/terminal.png?raw=true)
 
-To stop the server, focus the terminal and press `Ctrl+C`. This will stop both debugging sessions and the main process.
+To stop the server, click "Stop Jaspr" in the status bar, or focus the terminal and press `Ctrl+C`. This will stop both debugging sessions and the main process.
 You can also detach the debugging sessions individually using the detach button in the debug bar, but this will keep the app running.
 
 ## Jaspr Commands
