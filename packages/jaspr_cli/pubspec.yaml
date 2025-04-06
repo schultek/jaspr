@@ -37,6 +37,8 @@ dependencies:
   build_daemon: 4.0.4
   dwds: 24.3.5
   webdev: 3.7.1
+  browser_launcher: 1.1.3
+  vm_service: 14.3.1
   shelf: ^1.4.1
   shelf_proxy: ^1.0.4
   async: ^2.13.0
