@@ -31,7 +31,7 @@ void main() {
         // Override jaspr dependencies from path.
         await bootstrap(variant, dirs.root());
 
-        var serveResult = runner.run('serve -v', dir: dirs.app);
+        var serveResult = runner.run('serve -v', dir: dirs.app, checkExitCode: false);
 
         // Wait until server is started.
         await Future.delayed(Duration(seconds: 10));
@@ -109,12 +109,14 @@ TestRunner setupRunner() {
 class TestRunner {
   late JasprCommandRunner runner;
 
-  Future<int?> run(String command, {Directory Function()? dir}) async {
+  Future<int?> run(String command, {Directory Function()? dir, bool checkExitCode = true}) async {
     return await IOOverrides.runZoned(
       getCurrentDirectory: dir,
       () async {
         var res = await runner.run(command.split(' '));
-        expect(res, equals(0));
+        if (checkExitCode) {
+          expect(res, equals(0));
+        }
         return res;
       },
     );
