@@ -31,7 +31,7 @@ const bool kReleaseMode = bool.fromEnvironment('jaspr.flags.release');
 ///
 /// See also:
 ///
-///  * [kReleaseMode], which is true in debug builds.
+///  * [kDebugMode], which is true in debug builds.
 const bool kVerboseMode = bool.fromEnvironment('jaspr.flags.verbose');
 
 /// A constant that is true if the application was compiled in debug mode.

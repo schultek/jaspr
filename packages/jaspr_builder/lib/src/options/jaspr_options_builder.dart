@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
-import 'package:dart_style/dart_style.dart';
 
 import 'package:yaml/yaml.dart' as yaml;
 
@@ -67,8 +66,6 @@ class JasprOptionsBuilder implements Builder {
       ..sortByCompare((s) => s.id.toImportUrl(), ImportsWriter.compareImports);
 
     var source = '''
-      $generationHeader
-      
       import 'package:jaspr/jaspr.dart';
       [[/]]
       
@@ -96,13 +93,8 @@ class JasprOptionsBuilder implements Builder {
       ${buildClientParamGetters(clients)}  
     ''';
     source = ImportsWriter().resolve(source);
-    source = DartFormatter(
-      languageVersion: DartFormatter.latestShortStyleLanguageVersion,
-      pageWidth: 120,
-    ).format(source);
-
     final optionsId = AssetId(buildStep.inputId.package, 'lib/jaspr_options.dart');
-    await buildStep.writeAsString(optionsId, source);
+    await buildStep.writeAsFormattedDart(optionsId, source);
   }
 
   String buildClientEntries(List<ClientModule> clients, String package) {

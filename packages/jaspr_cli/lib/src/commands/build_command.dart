@@ -83,9 +83,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final useWasm = argResults!['experimental-wasm'] as bool;
 
   @override
-  Future<CommandResult?> run() async {
-    await super.run();
-
+  Future<int> runCommand() async {
     logger.write("Building jaspr for ${config!.mode.name} rendering mode.");
 
     var dir = Directory('build/jaspr').absolute;
@@ -127,6 +125,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       flutterResult = buildFlutter(useWasm);
     }
 
+    bool hasBuildError = false;
+
     var serverDefines = getServerDartDefines();
 
     if (config!.mode == JasprMode.server) {
@@ -156,7 +156,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       await watchProcess('server build', process, tag: Tag.cli, progress: 'Building server app...');
     } else if (config!.mode == JasprMode.static) {
-      logger.write('Building server app...', progress: ProgressState.running);
+      logger.write('Generating static site...', progress: ProgressState.running);
 
       Set<String> generatedRoutes = {};
       List<String> queuedRoutes = [];
@@ -213,6 +213,12 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
         var response = await http.get(Uri.parse('http://localhost:8080$route'));
 
+        if (response.statusCode != 200) {
+          logger.write('Failed to generate route "$route".', level: Level.error);
+          hasBuildError = true;
+          continue;
+        }
+
         var file = File(p.url.join(
           'build/jaspr',
           route.startsWith('/') ? route.substring(1) : route,
@@ -226,7 +232,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       done = true;
       process.kill();
 
-      logger.complete(true);
+      logger.complete(hasBuildError);
 
       dummyTargetIndex &= !(generatedRoutes.contains('/') || generatedRoutes.contains('/index'));
     }
@@ -240,8 +246,17 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
     }
 
+    if (hasBuildError) {
+      logger.write(
+        'Failed to build project.',
+        progress: ProgressState.completed,
+        level: Level.error,
+      );
+      return 1;
+    }
+
     logger.write('Completed building project to /build/jaspr.', progress: ProgressState.completed);
-    return null;
+    return 0;
   }
 
   Future<int> _buildWeb() async {

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:build/build.dart';
-import 'package:dart_style/dart_style.dart';
 import 'package:yaml/yaml.dart' as yaml;
 
 import '../utils.dart';
@@ -17,7 +16,7 @@ class ClientRegistryBuilder implements Builder {
       var source = await generateClients(buildStep);
       if (source != null) {
         var outputId = AssetId(buildStep.inputId.package, 'web/main.clients.dart');
-        await buildStep.writeAsString(outputId, source);
+        await buildStep.writeAsFormattedDart(outputId, source);
       }
     } catch (e, st) {
       print('An unexpected error occurred.\n'
@@ -33,9 +32,6 @@ class ClientRegistryBuilder implements Builder {
   Map<String, List<String>> get buildExtensions => const {
         'lib/\$lib\$': ['web/main.clients.dart']
       };
-
-  String get generationHeader => "// GENERATED FILE, DO NOT MODIFY\n"
-      "// Generated with jaspr_builder\n";
 
   Future<String?> generateClients(BuildStep buildStep) async {
     final pubspecYaml = await buildStep.readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
@@ -59,8 +55,6 @@ class ClientRegistryBuilder implements Builder {
     final package = buildStep.inputId.package;
 
     var source = '''
-      $generationHeader
-      
       import 'package:jaspr/browser.dart';
       [[/]]
       
@@ -79,10 +73,6 @@ class ClientRegistryBuilder implements Builder {
     ''';
 
     source = ImportsWriter(deferred: true).resolve(source);
-    source = DartFormatter(
-      languageVersion: DartFormatter.latestShortStyleLanguageVersion,
-      pageWidth: 120,
-    ).format(source);
     return source;
   }
 }

@@ -7,12 +7,23 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
+import 'package:dart_style/dart_style.dart';
 import 'package:jaspr/jaspr.dart'
     show ClientAnnotation, CssUtility, Import, Component, Key, StyleRule, SyncAnnotation, State;
 import 'package:source_gen/source_gen.dart';
 
-const String generationHeader = "// GENERATED FILE, DO NOT MODIFY\n"
-    "// Generated with jaspr_builder\n";
+const String generationHeader = "// dart format off\n"
+    "// ignore_for_file: type=lint\n\n"
+    "// GENERATED FILE, DO NOT MODIFY\n"
+    "// Generated with jaspr_builder\n\n";
+
+final formatter = DartFormatter(languageVersion: DartFormatter.latestLanguageVersion);
+
+extension DartOutput on BuildStep {
+  Future<void> writeAsFormattedDart(AssetId outputId, String source) async {
+    await writeAsString(outputId, '$generationHeader${formatter.format(source)}');
+  }
+}
 
 var clientChecker = TypeChecker.fromRuntime(ClientAnnotation);
 var componentChecker = TypeChecker.fromRuntime(Component);

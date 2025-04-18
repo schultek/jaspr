@@ -56,14 +56,20 @@ abstract class BuildableElement extends Element {
       }());
     } catch (e, st) {
       _debugDoingBuild = false;
-      // TODO: implement actual error component
+      // TODO: implement actual error handling
       built = [
         DomComponent(
           tag: 'div',
+          styles: Styles(
+            padding: Padding.all(2.em),
+            backgroundColor: Colors.red,
+            color: Colors.yellow,
+            fontSize: 1.rem,
+          ),
           child: Text("Error on building component: $e"),
         ),
       ];
-      print('Error: $e $st');
+      binding.reportBuildError(this, e, st);
     } finally {
       _dirty = false;
       assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(false));

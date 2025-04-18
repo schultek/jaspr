@@ -10,15 +10,24 @@
   Components annotated with `@client` from other dependent packages are now also part of the js bundle when
   used during pre-rendering.
 
-- Added `onClick` override to the `a` html tag. When used, this will override the default behaviour of the link and not visit its url when clicked.
-
 - **BREAKING** The `Flex(basis: ...)` style now accepts a `Unit` value directly instead of a `FlexBasis`.
 
 - Allow nesting `css.media` and `css.supports` rules.
 - Deprecated `Color.hex()` and `Color.named()` in favor of the default `Color()` constructor.
 
-- Fixed flutter embedding issue for version 3.29.0.
+## 0.18.2
+
+- Added `jaspr daemon` command to run a daemon server (used by the new [VSCode extension]()).
+- Added `--launch-in-chrome` option to `jaspr serve` command to open the browser automatically.
+- Added support for running `jaspr create .` in an empty directory.
+
+## 0.18.1
+
+- Better report errors during static build.
+- Fixed flutter embedding issue with version 3.29.0.
+- Added `onClick` override to the `a` html tag. When used, this will override the default behaviour of the link and not visit its url when clicked.
 - Added `--extra-js-compiler-option` and `--extra-wasm-compiler-option` to `jaspr build` command.
+- Added `// dart format off` and `// ignore_for_file: type=lint` headers to all generated files.
 
 ## 0.18.0
 

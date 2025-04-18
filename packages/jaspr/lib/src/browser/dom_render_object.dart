@@ -112,9 +112,7 @@ class DomRenderObject extends RenderObject {
 
     if (attributes != null && attributes.isNotEmpty) {
       for (final attr in attributes.entries) {
-        if (attr.key == 'value' &&
-            elem.isHtmlInputElement  &&
-            (elem as web.HTMLInputElement).value != attr.value) {
+        if (attr.key == 'value' && elem.isHtmlInputElement && (elem as web.HTMLInputElement).value != attr.value) {
           if (kVerboseMode) {
             print("Set input value: ${attr.value}");
           }
@@ -122,9 +120,7 @@ class DomRenderObject extends RenderObject {
           continue;
         }
 
-        if (attr.key == 'value' &&
-            elem.isHtmlSelectElement &&
-            (elem as web.HTMLSelectElement).value != attr.value) {
+        if (attr.key == 'value' && elem.isHtmlSelectElement && (elem as web.HTMLSelectElement).value != attr.value) {
           if (kVerboseMode) {
             print("Set select value: ${attr.value}");
           }

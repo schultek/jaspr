@@ -111,6 +111,12 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   void initializeOptions(JasprOptions options) {
     _options = options;
   }
+
+  @override
+  void reportBuildError(Element element, Object error, StackTrace stackTrace) {
+    responseStatusCode = 500;
+    stderr.writeln('Error while building ${element.component.runtimeType}:\n$error\n\n$stackTrace');
+  }
 }
 
 abstract class RenderAdapter {
