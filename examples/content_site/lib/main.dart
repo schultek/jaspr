@@ -45,6 +45,7 @@ void runGithub() {
       ],
       templateEngine: MustacheTemplateEngine(),
       rawOutputPattern: RegExp(r'.*\.txt'),
+      secondaryOutputs: {RegExp(r'.*\.mdx?'): SecondaryMarkdownOutput()},
       parsers: [
         MarkdownParser(),
       ],

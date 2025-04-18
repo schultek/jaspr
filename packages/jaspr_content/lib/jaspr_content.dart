@@ -23,6 +23,8 @@ export 'src/route_loader/filesystem_loader.dart' hide FilePageFactory;
 export 'src/route_loader/github_loader.dart' hide GithubPageFactory;
 export 'src/route_loader/memory_loader.dart' hide MemoryPageFactory;
 export 'src/route_loader/route_loader.dart';
+export 'src/secondary_output/secondary_markdown_output.dart';
+export 'src/secondary_output/secondary_output.dart';
 export 'src/template_engine/liquid_template_engine.dart';
 export 'src/template_engine/mustache_template_engine.dart';
 export 'src/template_engine/template_engine.dart';

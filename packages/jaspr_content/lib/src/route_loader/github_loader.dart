@@ -7,7 +7,7 @@ import '../page.dart';
 import 'route_loader.dart';
 
 /// A loader that loads routes from a github repository.
-/// 
+///
 /// Routes are constructed based on the recursive folder structure starting at the root [path].
 /// Index files (index.*) are treated as the page for the containing folder.
 /// Files and folders starting with an underscore (_) are ignored.
@@ -22,14 +22,16 @@ class GithubLoader extends RouteLoaderBase {
 
   /// The repository to load pages from. Must be in the form '<owner>/<repo>'.
   final String repo;
+
   /// The branch, tag or commit to checkout the repository at.
   final String ref;
+
   /// The root path to load pages from.
   final String path;
 
   /// The access token to use for authentication.
-  /// 
-  /// This is required for private repositories. 
+  ///
+  /// This is required for private repositories.
   /// For public repositories you may quickly hit rate limits without an access token.
   final String? accessToken;
 
@@ -37,15 +39,15 @@ class GithubLoader extends RouteLoaderBase {
   Future<String> readPartial(String path, Page page) {
     throw UnsupportedError('Reading partial files is not supported for GithubLoader');
   }
-  
+
   @override
   String readPartialSync(String path, Page page) {
-   throw UnsupportedError('Reading partial files is not supported for GithubLoader');
+    throw UnsupportedError('Reading partial files is not supported for GithubLoader');
   }
 
   @override
   PageFactory createFactory(PageRoute route, PageConfig config) {
-    return GithubPageFactory(route,config, this);
+    return GithubPageFactory(route, config, this);
   }
 
   Future<List<dynamic>> _loadTree() async {
@@ -105,7 +107,6 @@ class GithubLoader extends RouteLoaderBase {
 
     return tree.entries.map(getEntity).whereType<RouteEntity>().toList();
   }
-  
 }
 
 class GithubPageFactory extends PageFactory<GithubLoader> {
@@ -119,7 +120,14 @@ class GithubPageFactory extends PageFactory<GithubLoader> {
       'X-GitHub-Api-Version': '2022-11-28',
     });
     final content = response.body;
-   
-    return Page(route.path, route.route, content, {}, config, loader);
+
+    return Page(
+      path: route.path,
+      url: route.url,
+      content: content,
+      data: {},
+      config: config,
+      loader: loader,
+    );
   }
 }

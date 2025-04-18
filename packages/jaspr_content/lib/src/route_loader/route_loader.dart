@@ -10,6 +10,7 @@ import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
 import '../page.dart';
+import '../secondary_output/secondary_output.dart';
 
 /// A loader that loads routes and creates pages.
 ///
@@ -64,7 +65,7 @@ abstract class RouteLoaderBase implements RouteLoader {
   StreamSubscription? _reassembleSub;
 
   String getKeyForRoute(PageRoute route) {
-    return route.route;
+    return route.url;
   }
 
   String? getKeyForPage(Page page) {
@@ -96,19 +97,42 @@ abstract class RouteLoaderBase implements RouteLoader {
     final entities = await loadPageEntities();
     return buildRoutesFromEntities(
       entities: entities,
-      buildPage: (route) {
+      buildRoute: (route) {
         final config = resolver(route);
         final factory = _factories[getKeyForRoute(route)] ??= createFactory(route, config);
+
         if (_eager) {
           factory.future = factory.loadPage();
-          return AsyncBuilder(builder: (context) async* {
-            yield await factory.future!;
-          });
-        } else {
-          return AsyncBuilder(builder: (context) async* {
-            yield await factory.loadPage();
-          });
         }
+        final pageBuilder = AsyncBuilder(builder: (context) async* {
+          if (_eager) {
+            yield await factory.future!;
+          } else {
+            yield await factory.loadPage();
+          }
+        });
+
+        final routes = <RouteBase>[];
+
+        routes.add(Route(
+          path: route.url,
+          builder: (_, __) => pageBuilder,
+          routes: route.routes,
+        ));
+
+        for (final MapEntry(key: pattern, value: output) in config.secondaryOutputs.entries) {
+          if (pattern.matchAsPrefix(route.path) != null) {
+            routes.add(Route(
+              path: output.createRoute(route.url),
+              builder: (_, __) => InheritedSecondaryOutput(
+                builder: output.build,
+                child: pageBuilder,
+              ),
+            ));
+          }
+        }
+
+        return routes;
       },
       debugPrint: debugPrint,
     );
@@ -169,7 +193,7 @@ abstract class PageFactory<T extends RouteLoaderBase> {
 
     newPage.apply(
       data: <String, dynamic>{
-        'page': {'path': route.path, 'url': route.route},
+        'page': {'path': route.path, 'url': route.url},
       }.merge(newPage.data),
       mergeData: false,
     );
@@ -220,9 +244,10 @@ class CollectionRoute extends RouteEntity {
 }
 
 class PageRoute extends SourceRoute {
-  PageRoute(super.path, super.source, this.route);
+  PageRoute(super.path, super.source, this.url, this.routes);
 
-  final String route;
+  final String url;
+  final List<RouteBase> routes;
 }
 
 final indexRegex = RegExp(r'index\.[^/]*$');
@@ -230,10 +255,10 @@ final indexRegex = RegExp(r'index\.[^/]*$');
 extension RouteLoaderExtension on RouteLoader {
   List<RouteBase> buildRoutesFromEntities({
     required List<RouteEntity> entities,
-    required Component Function(PageRoute route) buildPage,
+    required List<RouteBase> Function(PageRoute route) buildRoute,
     bool debugPrint = false,
   }) {
-    final routes = _buildRoutes(entities: entities, buildPage: buildPage);
+    final routes = _buildRoutes(entities: entities, buildRoute: buildRoute);
     if (debugPrint) {
       _printRoutes(routes);
     }
@@ -242,7 +267,7 @@ extension RouteLoaderExtension on RouteLoader {
 
   List<RouteBase> _buildRoutes({
     required List<RouteEntity> entities,
-    required Component Function(PageRoute route) buildPage,
+    required List<RouteBase> Function(PageRoute route) buildRoute,
     String path = '',
     bool isTopLevel = true,
   }) {
@@ -274,20 +299,16 @@ extension RouteLoaderExtension on RouteLoader {
         name = name.replaceFirst(RegExp(r'\..*'), '');
       }
       final routePath = (isTopLevel ? '/' : '') + (indexFile != null || path.isEmpty ? '' : '$path/') + name;
-      final child = buildPage(PageRoute(file.path, file.source, routePath));
+      final result = buildRoute(PageRoute(file.path, file.source, routePath, []));
 
-      final route = Route(
-        path: routePath,
-        builder: (context, state) => child,
-      );
-      routes.add(route);
+      routes.addAll(result);
     }
 
     for (final subdir in subdirs) {
       final name = subdir.path.split('/').last;
       final subRoutes = _buildRoutes(
         entities: subdir.entities,
-        buildPage: buildPage,
+        buildRoute: buildRoute,
         path: (isTopLevel ? '/' : '') + (indexFile == null && path.isNotEmpty ? '$path/' : '') + name,
         isTopLevel: false,
       );
@@ -296,18 +317,17 @@ extension RouteLoaderExtension on RouteLoader {
 
     if (indexFile != null) {
       final routePath = (isTopLevel ? '/' : '') + path;
-      final child = buildPage(PageRoute(indexFile.path, indexFile.source, routePath));
-
-      final route = Route(
-        path: routePath,
-        builder: (context, state) => child,
-        routes: isTopLevel ? [] : routes,
-      );
+      final result = buildRoute(PageRoute(
+        indexFile.path,
+        indexFile.source,
+        routePath,
+        isTopLevel ? [] : routes,
+      ));
 
       if (isTopLevel) {
-        routes.insert(0, route);
+        routes.insertAll(0, result);
       } else {
-        routes = [route];
+        routes = [...result];
       }
     }
 

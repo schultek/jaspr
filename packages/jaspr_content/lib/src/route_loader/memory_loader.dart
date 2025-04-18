@@ -5,7 +5,7 @@ import 'route_loader.dart';
 ///
 /// Takes a list of [MemoryPage]s and creates routes from them.
 class MemoryLoader extends RouteLoaderBase {
-  MemoryLoader({required List<MemoryPage> pages,  super.debugPrint}) : _pages = pages;
+  MemoryLoader({required List<MemoryPage> pages, super.debugPrint}) : _pages = pages;
 
   final List<MemoryPage> _pages;
 
@@ -54,6 +54,13 @@ class MemoryPageFactory extends PageFactory {
 
   @override
   Future<Page> buildPage() async {
-    return Page(route.path, route.route, _page.content, _page.data, config, loader);
+    return Page(
+      path: route.path,
+      url: route.url,
+      content: _page.content,
+      data: _page.data,
+      config: config,
+      loader: loader,
+    );
   }
 }

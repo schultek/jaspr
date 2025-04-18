@@ -9,6 +9,7 @@ import 'layouts/page_layout.dart';
 import 'page_extension/page_extension.dart';
 import 'page_parser/page_parser.dart';
 import 'route_loader/route_loader.dart';
+import 'secondary_output/secondary_output.dart';
 import 'template_engine/template_engine.dart';
 
 /// A single page of the site.
@@ -17,7 +18,14 @@ import 'template_engine/template_engine.dart';
 /// The page object is passed to the different modules of the content package and may be modified by them.
 /// How the page is built is determined by the [PageConfig] object.
 class Page {
-  Page(this.path, this.url, this.content, this.data, this.config, this._loader);
+  Page({
+    required this.path,
+    required this.url,
+    required this.content,
+    required this.data,
+    required this.config,
+    required RouteLoader loader,
+  }) : _loader = loader;
 
   /// The path of the page including its suffix, e.g. 'index.html', 'some/path.md'.
   final String path;
@@ -74,7 +82,7 @@ class Page {
   /// 1. Parses the frontmatter if [enableFrontmatter] is true.
   /// 2. Loads additional data using the provided [dataLoaders].
   /// 3. Preprocesses the content if a [templateEngine] is provided.
-  /// 4. If [enableRawOutput] is true, outputs the content as raw text and skips further processing. 
+  /// 4. If [enableRawOutput] is true, outputs the content as raw text and skips further processing.
   ///    Else continues with 5.
   /// 5. Parses the nodes of the page using one of the [parsers].
   /// 6. Processes the nodes by applying the provided [extensions].
@@ -86,6 +94,11 @@ class Page {
     await loadData();
     return AsyncBuilder(builder: (context) async* {
       await renderTemplate(context.pages);
+
+      if (InheritedSecondaryOutput.of(context) case final secondaryOutput?) {
+        yield secondaryOutput.builder(this);
+        return;
+      }
 
       if (config.rawOutputPattern?.matchAsPrefix(path) != null) {
         context.setHeader('Content-Type', getContentType());
@@ -112,6 +125,7 @@ class PageConfig {
     this.dataLoaders = const [],
     this.templateEngine,
     this.rawOutputPattern,
+    this.secondaryOutputs = const {},
     this.parsers = const [],
     this.extensions = const [],
     this.layouts = const [],
@@ -128,10 +142,16 @@ class PageConfig {
   final TemplateEngine? templateEngine;
 
   /// A pattern to match pages that should output their raw content.
-  /// 
+  ///
   /// When this matches a page's path, this will skip parsing and rendering the page and return the content as is.
   /// This may be used for matching non-html pages like robots.txt, sitemap.xml, etc.
   final Pattern? rawOutputPattern;
+
+  /// A collection of secondary outputs to create for matching pages.
+  ///
+  /// When an output matches a page's path, it is used to generate additional files for the page.
+  /// This may be used for outputting supplementary files like the raw markdown of a page, an llms.txt file
+  final Map<Pattern, SecondaryOutput> secondaryOutputs;
 
   /// The parsers to use for parsing the page content.
   ///
@@ -160,6 +180,7 @@ class PageConfig {
     List<DataLoader> dataLoaders = const [],
     TemplateEngine? templateEngine,
     Pattern? rawOutputPattern,
+    Map<Pattern, SecondaryOutput> secondaryOutputs = const {},
     List<PageParser> parsers = const [],
     List<PageExtension> extensions = const [],
     List<PageLayout> layouts = const [],
@@ -170,12 +191,27 @@ class PageConfig {
       dataLoaders: dataLoaders,
       templateEngine: templateEngine,
       rawOutputPattern: rawOutputPattern,
+      secondaryOutputs: secondaryOutputs,
       parsers: parsers,
       extensions: extensions,
       layouts: layouts,
       theme: theme,
     );
     return (_) => config;
+  }
+
+  /// Resolves the first config for that the pattern matches the page path.
+  /// 
+  /// If no pattern matches, the default config is returned.
+  static ConfigResolver match(Map<Pattern, PageConfig> configs) {
+    return (PageRoute route) {
+      for (final entry in configs.entries) {
+        if (entry.key.matchAsPrefix(route.path) != null) {
+          return entry.value;
+        }
+      }
+      return PageConfig();
+    };
   }
 }
 

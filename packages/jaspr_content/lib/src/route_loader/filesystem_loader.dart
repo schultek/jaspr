@@ -123,6 +123,13 @@ class FilePageFactory extends PageFactory<FilesystemLoader> {
     final file = File(route.source);
     final content = await file.readAsString();
 
-    return Page(route.path, route.route, content, {}, config, loader);
+    return Page(
+      path: route.path,
+      url: route.url,
+      content: content,
+      data: {},
+      config: config,
+      loader: loader,
+    );
   }
 }
