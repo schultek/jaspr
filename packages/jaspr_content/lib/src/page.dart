@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:fbh_front_matter/fbh_front_matter.dart' as fm;
 import 'package:jaspr/server.dart';
 
 import 'content/content.dart';
+import 'content/theme.dart';
 import 'data_loader/data_loader.dart';
 import 'layouts/page_layout.dart';
 import 'page_extension/page_extension.dart';
@@ -95,6 +97,10 @@ class Page {
     return AsyncBuilder(builder: (context) async* {
       await renderTemplate(context.pages);
 
+      if (kGenerateMode && data['page']['sitemap'] != null) {
+        context.setHeader('jaspr-sitemap-data', jsonEncode(data['page']['sitemap']));
+      }
+
       if (InheritedSecondaryOutput.of(context) case final secondaryOutput?) {
         yield secondaryOutput.builder(this);
         return;
@@ -109,7 +115,7 @@ class Page {
 
       var nodes = parseNodes();
       nodes = applyExtensions(nodes);
-      final component = Content(nodes.build());
+      final component = Content(NodesBuilder(config.components).build(nodes));
       final layout = buildLayout(component);
       yield wrapTheme(layout);
     });
@@ -125,9 +131,10 @@ class PageConfig {
     this.dataLoaders = const [],
     this.templateEngine,
     this.rawOutputPattern,
-    this.secondaryOutputs = const {},
+    this.secondaryOutputs = const [],
     this.parsers = const [],
     this.extensions = const [],
+    this.components = const [],
     this.layouts = const [],
     this.theme,
   });
@@ -151,7 +158,7 @@ class PageConfig {
   ///
   /// When an output matches a page's path, it is used to generate additional files for the page.
   /// This may be used for outputting supplementary files like the raw markdown of a page, an llms.txt file
-  final Map<Pattern, SecondaryOutput> secondaryOutputs;
+  final List<SecondaryOutput> secondaryOutputs;
 
   /// The parsers to use for parsing the page content.
   ///
@@ -163,6 +170,9 @@ class PageConfig {
   /// Each extension may add or modify the nodes of the page.
   /// Extensions are applied in the order they are listed.
   final List<PageExtension> extensions;
+
+  /// A collection of custom components to render in the page.
+  final List<CustomComponent> components;
 
   /// The layouts to use for building the page.
   ///
@@ -180,9 +190,10 @@ class PageConfig {
     List<DataLoader> dataLoaders = const [],
     TemplateEngine? templateEngine,
     Pattern? rawOutputPattern,
-    Map<Pattern, SecondaryOutput> secondaryOutputs = const {},
+    List<SecondaryOutput> secondaryOutputs = const [],
     List<PageParser> parsers = const [],
     List<PageExtension> extensions = const [],
+    List<CustomComponent> components = const [],
     List<PageLayout> layouts = const [],
     ContentTheme? theme,
   }) {
@@ -194,6 +205,7 @@ class PageConfig {
       secondaryOutputs: secondaryOutputs,
       parsers: parsers,
       extensions: extensions,
+      components: components,
       layouts: layouts,
       theme: theme,
     );
@@ -201,7 +213,7 @@ class PageConfig {
   }
 
   /// Resolves the first config for that the pattern matches the page path.
-  /// 
+  ///
   /// If no pattern matches, the default config is returned.
   static ConfigResolver match(Map<Pattern, PageConfig> configs) {
     return (PageRoute route) {

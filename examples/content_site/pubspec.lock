@@ -169,6 +169,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "8.9.4"
+  characters:
+    dependency: transitive
+    description:
+      name: characters
+      sha256: f71061c654a3380576a52b451dd5532377954cf9dbd272a78fc8479606670803
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.0"
   checked_yaml:
     dependency: transitive
     description:
@@ -471,21 +479,21 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.18.0"
+    version: "0.18.2"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.18.0"
+    version: "0.18.2"
   jaspr_cli:
     dependency: "direct overridden"
     description:
       path: "../../packages/jaspr_cli"
       relative: true
     source: path
-    version: "0.18.0"
+    version: "0.18.2"
   jaspr_content:
     dependency: "direct main"
     description:
@@ -496,18 +504,16 @@ packages:
   jaspr_lints:
     dependency: "direct dev"
     description:
-      name: jaspr_lints
-      sha256: "17e73c818c409454ea150e0641928bf1d340c2704016aba5efd223302bee72f7"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../packages/jaspr_lints"
+      relative: true
+    source: path
     version: "0.3.1"
   jaspr_router:
     dependency: "direct main"
     description:
-      name: jaspr_router
-      sha256: "79402a33791e58969ea85ce3c90739e4bdbd4a0ce07c0a9daffd7cb383cb9041"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../packages/jaspr_router"
+      relative: true
+    source: path
     version: "0.6.4"
   js:
     dependency: transitive
@@ -829,6 +835,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  syntax_highlight_lite:
+    dependency: transitive
+    description:
+      name: syntax_highlight_lite
+      sha256: ff54f69159263e26b843c64a2dc556ac7bbbc66690eb6d500aefb341cf4957a0
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   term_glyph:
     dependency: transitive
     description:

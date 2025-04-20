@@ -68,9 +68,19 @@ class ServerApp {
     return (client, await shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true));
   }
 
-  static Future<void> requestRouteGeneration(String route) async {
+  static Future<void> requestRouteGeneration(
+    String route, {
+    String? lastMod,
+    String? changefreq,
+    double? priority,
+  }) async {
     if (kGenerateMode) {
-      await _sendDebugMessage({'route': route});
+      await _sendDebugMessage({
+        'route': route,
+        'lastmod': lastMod,
+        'changefreq': changefreq,
+        'priority': priority,
+      });
     }
   }
 

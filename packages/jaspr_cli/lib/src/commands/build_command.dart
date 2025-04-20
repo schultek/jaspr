@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, implementation_imports
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:build_daemon/data/build_status.dart';
@@ -68,6 +69,13 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: '2',
     );
+    argParser.addOption(
+      'sitemap-domain',
+      help: 'If set, generates a sitemap.xml file for the static site. '
+          'The domain will be used as the base URL for the sitemap entries.',
+    );
+    argParser.addOption('sitemap-exclude',
+        help: 'A regex pattern of routes that should be excluded from the sitemap. ');
     addDartDefineArgs();
   }
 
@@ -81,6 +89,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   String get category => 'Project';
 
   late final useWasm = argResults!['experimental-wasm'] as bool;
+  late final sitemapDomain = argResults!['sitemap-domain'] as String?;
+  late final sitemapExclude = argResults!['sitemap-exclude'] as String?;
 
   @override
   Future<int> runCommand() async {
@@ -158,7 +168,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     } else if (config!.mode == JasprMode.static) {
       logger.write('Generating static site...', progress: ProgressState.running);
 
-      Set<String> generatedRoutes = {};
+      Map<String, ({String? lastmod, String? changefreq, double? priority})> generatedRoutes = {};
       List<String> queuedRoutes = [];
 
       var serverStartedCompleter = Completer();
@@ -168,11 +178,16 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           if (!serverStartedCompleter.isCompleted) {
             serverStartedCompleter.complete();
           }
-          if (generatedRoutes.contains(route)) {
+          if (generatedRoutes.containsKey(route)) {
             return;
           }
           queuedRoutes.insert(0, route);
-          generatedRoutes.add(route);
+
+          final lastmod = message['lastmod'] is String ? message['lastmod'] : null;
+          final changefreq = message['changefreq'] is String ? message['changefreq'] : null;
+          final priority = message['priority'] is num ? (message['priority'] as num).toDouble() : null;
+
+          generatedRoutes[route] = (lastmod: lastmod, changefreq: changefreq, priority: priority);
         }
       });
 
@@ -209,12 +224,15 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       while (queuedRoutes.isNotEmpty) {
         var route = queuedRoutes.removeLast();
 
-        logger.write('Generating route "$route"...', progress: ProgressState.running);
+        logger.write(
+          'Generating route "$route" (${generatedRoutes.length - queuedRoutes.length}/${generatedRoutes.length})...',
+          progress: ProgressState.running,
+        );
 
         var response = await http.get(Uri.parse('http://localhost:8080$route'));
 
         if (response.statusCode != 200) {
-          logger.write('Failed to generate route "$route".', level: Level.error);
+          logger.write('Failed to generate route "$route".', level: Level.error, progress: ProgressState.completed);
           hasBuildError = true;
           continue;
         }
@@ -227,14 +245,70 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
         file.createSync(recursive: true);
         file.writeAsBytesSync(response.bodyBytes);
+
+        if (response.headers['jaspr-sitemap-data'] case String data) {
+          final sitemap = jsonDecode(data);
+          if (sitemap is! Map<String, dynamic>) {
+            logger.write(
+              'Invalid sitemap data for route "$route". Expected a map, but got ${sitemap.runtimeType}.',
+              level: Level.error,
+              progress: ProgressState.completed,
+            );
+            hasBuildError = true;
+            continue;
+          }
+
+          generatedRoutes[route] = (
+            lastmod: sitemap['lastmod'] is String ? sitemap['lastmod'] : generatedRoutes[route]?.lastmod,
+            changefreq: sitemap['changefreq'] is String ? sitemap['changefreq'] : generatedRoutes[route]?.changefreq,
+            priority:
+                sitemap['priority'] is num ? (sitemap['priority'] as num).toDouble() : generatedRoutes[route]?.priority,
+          );
+        }
       }
 
       done = true;
       process.kill();
 
-      logger.complete(hasBuildError);
+      logger.complete(!hasBuildError);
 
-      dummyTargetIndex &= !(generatedRoutes.contains('/') || generatedRoutes.contains('/index'));
+      if (sitemapDomain != null) {
+        logger.write('Generating sitemap.xml...');
+
+        var content = StringBuffer();
+        content.writeln('<?xml version="1.0" encoding="UTF-8"?>');
+        content.writeln('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
+
+        var domain = sitemapDomain!;
+        if (!domain.startsWith(RegExp('https?://'))) {
+          domain = 'https://$domain';
+        }
+
+        var excludePattern = sitemapExclude != null ? RegExp(sitemapExclude!) : null;
+        var now = DateTime.now().copyWith(millisecond: 0, microsecond: 0).toIso8601String();
+
+        for (var route in generatedRoutes.entries) {
+          if (excludePattern != null && excludePattern.hasMatch(route.key)) {
+            continue;
+          }
+
+          content.writeln('  <url>');
+          content.writeln('    <loc>$domain${route.key}</loc>');
+          content.writeln('    <lastmod>${route.value.lastmod ?? now}</lastmod>');
+          if (route.value.changefreq != null) {
+            content.writeln('    <changefreq>${route.value.changefreq}</changefreq>');
+          }
+          content.writeln('    <priority>${route.value.priority ?? 0.5}</priority>');
+          content.writeln('  </url>');
+        }
+        content.writeln('</urlset>');
+
+        var sitemap = File(p.url.join('build/jaspr', 'sitemap.xml')).absolute;
+        sitemap.createSync(recursive: true);
+        sitemap.writeAsStringSync(content.toString());
+      }
+
+      dummyTargetIndex &= !(generatedRoutes.containsKey('/') || generatedRoutes.containsKey('/index'));
     }
 
     await flutterResult;

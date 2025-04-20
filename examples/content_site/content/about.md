@@ -1,5 +1,8 @@
 ---
 title: "About"
+sitemap:
+  priority: 1
+  changefreq: "weekly"
 ---
 
 # About
