@@ -2,18 +2,17 @@ import 'package:jaspr/jaspr.dart';
 
 import '../jaspr_content.dart';
 
-/// A drop cap component.
-class DropCap extends StatelessComponent {
-  const DropCap({
-    super.key,
-  });
+/// A drop cap component that renders the first letter of a paragraph in a larger font size.
+class DropCap extends StatelessComponent with CustomComponentBase {
+  const DropCap();
 
-  static ComponentFactory factory = ComponentFactory(
-    pattern: 'DropCap',
-    build: (_, __, ___) {
-      return DropCap();
-    },
-  );
+  @override
+  final Pattern pattern = 'DropCap';
+
+  @override
+  Component apply(String name, Map<String, String> attributes, Component? child) {
+    return this;
+  }
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

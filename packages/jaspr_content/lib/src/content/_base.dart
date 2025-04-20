@@ -1,4 +1,4 @@
-part of 'content.dart';
+part of 'theme.dart';
 
 final ContentTypography _baseContentTypography = ContentTypography(
   styles: Styles(

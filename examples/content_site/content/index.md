@@ -14,7 +14,6 @@ Author: Albert Wolszon from LeanCode
 
 Unfortunately, the Dart team has taken up the very difficult decision of abandoning their work on the macros language feature.
 
-<link to Dart team announcement post>
 
 <DropCap/>
 We were wholeheartedly cheering for this feature to come up eventually, but now that we know it won’t come, at least in the foreseeable future, we’re not caught off guard.
@@ -36,6 +35,20 @@ Let’s take a look at the features that were most important to us in freezed:
   zoom
 />
 
+
+
+<Tabs>
+  <TabItem label="Freezed" value="freezed">
+    Freezed is a code generation library for Dart that helps you create immutable data classes.
+  </TabItem>
+  <TabItem label="Sealed Classes" value="sealed-classes">
+    Sealed classes are a new feature in Dart that allows you to create a closed set of subclasses.
+  </TabItem>
+  <TabItem label="Value Equality" value="value-equality">
+    Value equality is a way to compare objects based on their values rather than their references.
+  </TabItem>
+</Tabs>
+
 Union classes — to have a closed set of data structures with different fields that we can map over.
 Value equality — instead of reference equality.
 `copyWith` — to conveniently create a new instance of the immutable data class with only some fields changed.
@@ -47,32 +60,40 @@ One of the most valuable features in freezed was the union class “simulation�
 As Dart 3.0 was released, along with Flutter 3.10, sealed classes and pattern matching were introduced directly into the language. The class `SomethingState extends _$SomethingState` could be replaced with `sealed class SomethingState`. The freezed’s subclasses are now replaced with an ordinary subclass, marked final to close the hierarchy.
 
 Before
+
+```dart
 @freezed
 class SomethingState with _$SomethingState {
- const factory SomethingState.initial() = SomethingInitial;
- const factory SomethingState.loadInProgress() = SomethingLoadInProgress;
- const factory SomethingState.loadSuccess() = SomethingLoadSuccess;
- const factory SomethingState.loadFailure() = SomethingError
+  const factory SomethingState.initial() = SomethingInitial;
+  const factory SomethingState.loadInProgress() = SomethingLoadInProgress;
+  const factory SomethingState.loadSuccess() = SomethingLoadSuccess;
+  const factory SomethingState.loadFailure() = SomethingError;
+}
+```
+
 After
+```dart title="sealed class"
 sealed class SomethingState {
- const SomethingState();
+  const SomethingState();
 }
 
 final class SomethingInitial extends SomethingState {
- const SomethingInitial();
+  const SomethingInitial();
 }
 
 final class SomethingLoadInProgress extends SomethingState {
- const SomethingLoadInProgress();
+  const SomethingLoadInProgress();
 }
 
 final class SomethingLoadSuccess extends SomethingState {
- const SomethingLoadSuccess();
+  const SomethingLoadSuccess();
 }
 
 final class SomethingError extends SomethingState {
- const SomethingError();
+  const SomethingError();
 }
+```
+
 There are a few more lines to write (or to wait for Copilot to suggest), but in exchange, we don’t need to follow a specific pattern, otherwise making the code invalid for freezed generator, but rather we can write as many constructors, factories, subclasses, etc. as we need.
 
 One of the things that freezed gave us, and we don’t have with sealed classes are automatic shared properties. Instead, we need to put the field in the base class.

@@ -4,7 +4,7 @@ library;
 import 'package:jaspr/server.dart' as jaspr;
 import 'package:jaspr/server.dart';
 
-import '../content/content.dart';
+import '../content/theme.dart';
 import '../page.dart';
 import 'page_layout.dart';
 

@@ -1,4 +1,4 @@
-part of 'content.dart';
+part of 'theme.dart';
 
 /// A default set of CSS reset styles.
 final List<StyleRule> resetStyles = [

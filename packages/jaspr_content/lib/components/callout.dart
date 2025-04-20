@@ -1,45 +1,35 @@
 import 'package:jaspr/jaspr.dart';
 
-import '../jaspr_content.dart';
-import 'icon.dart';
+import '../src/page_parser/page_parser.dart';
+import '_internal/icon.dart';
 
-/// A callout component.
-/// 
+/// A custom callout component.
+///
 /// Can be one of 'Info', 'Warning', 'Error', or 'Success'.
-class Callout extends StatelessComponent {
-  const Callout({
-    required this.type,
-    required this.child,
-    super.key,
-  });
+class Callout extends CustomComponentBase {
+  Callout();
 
-  static ComponentFactory factory = ComponentFactory(
-    pattern: RegExp(r'Info|Warning|Error|Success'),
-    build: (name, _, child) {
-      return Callout(
-        type: name.toLowerCase(),
-        child: child!,
-      );
-    },
-  );
-
-  final String type;
-  final Component child;
+  static Component from({
+    required String type,
+    required Component child,
+    Key? key,
+  }) {
+    return _Callout(
+      type: type.toLowerCase(),
+      child: child,
+      key: key,
+    );
+  }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'callout callout-$type', [
-      span([
-        switch (type) {
-          'info' => InfoIcon(size: 20),
-          'warning' => AlertIcon(size: 20),
-          'error' => CircleXIcon(size: 20),
-          'success' => CircleCheckIcon(size: 20),
-          _ => InfoIcon(size: 20),
-        }
-      ]),
-      span([child])
-    ]);
+  final Pattern pattern = RegExp(r'Info|Warning|Error|Success');
+
+  @override
+  Component apply(String name, Map<String, String> attributes, Component? child) {
+    return _Callout(
+      type: name.toLowerCase(),
+      child: child!,
+    );
   }
 
   @css
@@ -104,4 +94,34 @@ class Callout extends StatelessComponent {
           ),
         ])
       ];
+}
+
+/// A callout component.
+///
+/// Can be one of 'Info', 'Warning', 'Error', or 'Success'.
+class _Callout extends StatelessComponent {
+  const _Callout({
+    required this.type,
+    required this.child,
+    super.key,
+  });
+
+  final String type;
+  final Component child;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield div(classes: 'callout callout-$type', [
+      span([
+        switch (type) {
+          'info' => InfoIcon(size: 20),
+          'warning' => AlertIcon(size: 20),
+          'error' => CircleXIcon(size: 20),
+          'success' => CircleCheckIcon(size: 20),
+          _ => InfoIcon(size: 20),
+        }
+      ]),
+      span([child])
+    ]);
+  }
 }

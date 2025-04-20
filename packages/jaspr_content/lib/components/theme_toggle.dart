@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
 
-import 'icon.dart';
+import '_internal/icon.dart';
 
 /// A theme toggle button.
 @client

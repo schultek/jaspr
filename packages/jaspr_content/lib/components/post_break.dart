@@ -3,17 +3,16 @@ import 'package:jaspr/jaspr.dart';
 import '../jaspr_content.dart';
 
 /// A post break component.
-class PostBreak extends StatelessComponent {
-  const PostBreak({
-    super.key,
-  });
+class PostBreak extends StatelessComponent with CustomComponentBase {
+  const PostBreak();
 
-  static ComponentFactory factory = ComponentFactory(
-    pattern: 'PostBreak',
-    build: (_, __, ___) {
-      return PostBreak();
-    },
-  );
+  @override
+  final Pattern pattern = 'PostBreak';
+
+  @override
+  Component apply(String name, Map<String, String> attributes, Component? child) {
+    return this;
+  }
 
   @override
   Iterable<Component> build(BuildContext context) sync* {

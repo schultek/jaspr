@@ -1,4 +1,11 @@
-part of 'content.dart';
+import 'package:jaspr/jaspr.dart';
+// ignore: implementation_imports
+import 'package:jaspr/src/foundation/styles/css.dart';
+
+part '_base.dart';
+part '_reset.dart';
+part 'colors.dart';
+part 'typography.dart';
 
 /// A theme for content-driven sites.
 ///

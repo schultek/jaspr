@@ -1,7 +1,7 @@
 import 'package:jaspr/server.dart';
 
-import '../../../components/icon.dart';
-import '../../content/content.dart';
+import '../../../components/_internal/icon.dart';
+import '../../content/theme.dart';
 import '../../page.dart';
 
 class SidebarGroup {

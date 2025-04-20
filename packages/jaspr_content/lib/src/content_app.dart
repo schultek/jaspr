@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart' hide RouteLoader;
 
-import 'content/content.dart';
+import 'content/theme.dart';
 import 'data_loader/filesystem_data_loader.dart';
 import 'layouts/page_layout.dart';
 import 'page.dart';

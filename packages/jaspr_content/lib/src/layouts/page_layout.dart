@@ -5,7 +5,7 @@ library;
 
 import 'package:jaspr/server.dart';
 
-import '../content/content.dart';
+import '../content/theme.dart';
 import '../page.dart';
 
 /// A layout for a page.

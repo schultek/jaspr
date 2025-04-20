@@ -2,6 +2,7 @@
 library;
 
 export 'src/content/content.dart';
+export 'src/content/theme.dart';
 export 'src/content_app.dart';
 export 'src/data_loader/data_loader.dart';
 export 'src/data_loader/filesystem_data_loader.dart';
@@ -12,7 +13,6 @@ export 'src/layouts/docs_layout.dart';
 export 'src/layouts/empty_layout.dart';
 export 'src/layouts/page_layout.dart';
 export 'src/page.dart' hide DataMergeExtension, PageHandlersExtension;
-export 'src/page_extension/components_extension.dart';
 export 'src/page_extension/heading_anchor_extension.dart';
 export 'src/page_extension/page_extension.dart';
 export 'src/page_extension/table_of_contents_extension.dart';

@@ -163,18 +163,6 @@ If you want to make sure to understand all concepts, here is a full list of all 
 
 ## Future Ideas
 
-- Add a code block component
-
-  - syntax highlighting
-  - copy button
-  - line numbers, diffing, etc.
-
-- Add a blog / articles layout
-
-- Add a tabs component
-
-- Add a GithubDataLoader
-
 - Add a search bar component
 
 - Support generating a sitemap

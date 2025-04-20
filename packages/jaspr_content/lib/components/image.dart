@@ -3,35 +3,63 @@ import 'package:jaspr/jaspr.dart';
 import '../jaspr_content.dart';
 import '_internal/zoomable_image.dart';
 
-class ImageExtension implements PageExtension {
-  const ImageExtension({
+/// An image component with optional zooming and caption support.
+class Image implements CustomComponent {
+  const Image({
     this.zoom = false,
+    this.replaceImg = true,
   });
 
+  static Component from({
+    required String src,
+    String? alt,
+    String? caption,
+    bool zoom = false,
+    Key? key,
+  }) {
+    if (zoom) {
+      return ZoomableImage(src: src, alt: alt, caption: caption, key: key);
+    }
+    return _Image(src: src, alt: alt, caption: caption, key: key);
+  }
+
+  /// Whether to enable zooming on the image.
   final bool zoom;
 
-  @override
-  List<Node> apply(Page page, List<Node> nodes) {
-    final processed = <Node>[];
-    for (final node in nodes) {
-      if (node case ElementNode(tag: 'img' || 'Image', :final attributes)) {
-        processed.add(ComponentNode(Image._fromAttributes(attributes, zoom)));
-        continue;
-      }
-      if (node case ElementNode(tag: 'p', children: [ElementNode(tag: 'img' || 'Image', :final attributes)])) {
-        processed.add(ComponentNode(Image._fromAttributes(attributes, zoom)));
-        continue;
-      }
+  /// Whether to replace the default <img> tag with this component.
+  final bool replaceImg;
 
-      processed.add(node);
+  @override
+  Component? create(Node node, NodesBuilder builder) {
+    if (node
+        case ElementNode(tag: 'img' || 'Image', :final attributes) ||
+            ElementNode(tag: 'p', children: [ElementNode(tag: 'img' || 'Image', :final attributes)])) {
+      assert(attributes.containsKey('src'), 'Image must have a "src" argument. Found $attributes');
+      return from(
+        src: attributes['src']!,
+        alt: attributes['alt'],
+        caption: attributes['caption'],
+        zoom: zoom || attributes['zoom'] != null,
+      );
     }
-    return processed;
+    return null;
   }
+
+  @css
+  static List<StyleRule> get styles => [
+        css('figure.image', [
+          css('&').styles(
+            display: Display.flex,
+            flexDirection: FlexDirection.column,
+            alignItems: AlignItems.center,
+          ),
+        ]),
+      ];
 }
 
 /// An image component with an optional caption.
-class Image extends StatelessComponent {
-  const Image({
+class _Image extends StatelessComponent {
+  const _Image({
     required this.src,
     this.alt,
     this.caption,
@@ -47,29 +75,6 @@ class Image extends StatelessComponent {
   /// The image caption.
   final String? caption;
 
-  static ComponentFactory factory = ComponentFactory(
-    pattern: 'Image',
-    build: (_, attrs, ___) => _fromAttributes(attrs, false),
-  );
-
-  static Component _fromAttributes(Map<String, String> attributes, bool globalZoom) {
-    assert(attributes.containsKey('src'), 'Image must have a "src" argument. Found $attributes');
-    final zoomable = globalZoom || attributes['zoom'] != null;
-    if (zoomable) {
-      return ZoomableImage(
-        src: attributes['src']!,
-        alt: attributes['alt'],
-        caption: attributes['caption'],
-      );
-    }
-
-    return Image(
-      src: attributes['src']!,
-      alt: attributes['alt'],
-      caption: attributes['caption'],
-    );
-  }
-
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(tag: 'figure', classes: 'image', children: [
@@ -77,15 +82,4 @@ class Image extends StatelessComponent {
       if (caption != null) DomComponent(tag: 'figcaption', children: [text(caption!)]),
     ]);
   }
-
-  @css
-  static List<StyleRule> get styles => [
-        css('figure.image', [
-          css('&').styles(
-            display: Display.flex,
-            flexDirection: FlexDirection.column,
-            alignItems: AlignItems.center,
-          ),
-        ]),
-      ];
 }

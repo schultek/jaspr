@@ -1,4 +1,4 @@
-part of 'content.dart';
+part of 'theme.dart';
 
 /// A collection of typography styles for content-driven sites.
 class ContentTypography {
@@ -212,7 +212,6 @@ final List<StyleRule> _contentStyles = [
     fontWeight: FontWeight.inherit,
     color: Color.inherit,
     fontSize: Unit.inherit,
-    fontFamily: FontFamily.inherit,
     lineHeight: Unit.inherit,
   ),
   css('pre code::before').styles(

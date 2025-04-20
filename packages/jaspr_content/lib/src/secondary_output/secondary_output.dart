@@ -5,6 +5,9 @@ import '../page.dart';
 
 /// A secondary output for a page.
 abstract class SecondaryOutput {
+  /// A pattern to match the pages path that this output should be created for.
+  Pattern get pattern;
+
   /// Creates the route for this output based on the given base route.
   String createRoute(String route);
 

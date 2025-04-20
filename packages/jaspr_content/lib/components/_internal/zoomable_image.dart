@@ -9,6 +9,7 @@ class ZoomableImage extends StatefulComponent {
     required this.src,
     this.alt,
     this.caption,
+    super.key,
   });
 
   final String src;

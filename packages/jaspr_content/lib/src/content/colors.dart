@@ -1,5 +1,5 @@
 
-part of 'content.dart';
+part of 'theme.dart';
 
 /// A color that holds a variant for light and dark themes.
 class ThemeColor implements Color {

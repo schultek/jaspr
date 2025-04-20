@@ -120,8 +120,8 @@ abstract class RouteLoaderBase implements RouteLoader {
           routes: route.routes,
         ));
 
-        for (final MapEntry(key: pattern, value: output) in config.secondaryOutputs.entries) {
-          if (pattern.matchAsPrefix(route.path) != null) {
+        for (final output in config.secondaryOutputs) {
+          if (output.pattern.matchAsPrefix(route.path) != null) {
             routes.add(Route(
               path: output.createRoute(route.url),
               builder: (_, __) => InheritedSecondaryOutput(

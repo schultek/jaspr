@@ -1,5 +1,6 @@
 import 'package:content_site/jaspr_options.dart';
 import 'package:jaspr/server.dart';
+import 'package:jaspr_content/components/code_block.dart';
 import 'package:jaspr_content/jaspr_content.dart';
 import 'package:jaspr_content/components/theme_toggle.dart';
 import 'package:jaspr_content/components/github_button.dart';
@@ -7,6 +8,7 @@ import 'package:jaspr_content/components/post_break.dart';
 import 'package:jaspr_content/components/callout.dart';
 import 'package:jaspr_content/components/drop_cap.dart';
 import 'package:jaspr_content/components/image.dart';
+import 'package:jaspr_content/components/tabs.dart';
 
 void main() {
   Jaspr.initializeApp(options: defaultJasprOptions);
@@ -45,19 +47,21 @@ void runGithub() {
       ],
       templateEngine: MustacheTemplateEngine(),
       rawOutputPattern: RegExp(r'.*\.txt'),
-      secondaryOutputs: {RegExp(r'.*\.mdx?'): SecondaryMarkdownOutput()},
+      secondaryOutputs: [SecondaryMarkdownOutput()],
       parsers: [
         MarkdownParser(),
       ],
       extensions: [
         TableOfContentsExtension(),
         HeadingAnchorExtension(),
-        ImageExtension(zoom: true),
-        ComponentsExtension([
-          Callout.factory,
-          DropCap.factory,
-          PostBreak.factory,
-        ]),
+      ],
+      components: [
+        Callout(),
+        DropCap(),
+        PostBreak(),
+        Image(zoom: true),
+        CodeBlock(),
+        Tabs(),
       ],
       layouts: [
         BlogLayout(

@@ -1,0 +1,43 @@
+import 'dart:async';
+
+import 'package:universal_web/web.dart' as web;
+import 'package:jaspr/jaspr.dart';
+
+import 'icon.dart';
+
+@client
+class CodeBlockCopyButton extends StatefulComponent {
+  const CodeBlockCopyButton({
+    super.key,
+  });
+
+  State<CodeBlockCopyButton> createState() => _CodeBlockCopyButtonState();
+}
+
+class _CodeBlockCopyButtonState extends State<CodeBlockCopyButton> {
+  bool copied = false;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield button(events: {
+      'click': (event) {
+        final target = event.currentTarget as web.Element;
+        final content = target.parentElement?.querySelector('pre code')?.textContent;
+        if (content == null) {
+          return;
+        }
+        web.window.navigator.clipboard.writeText(content);
+        setState(() {
+          copied = true;
+        });
+        Timer(const Duration(seconds: 2), () {
+          setState(() {
+            copied = false;
+          });
+        });
+      }
+    }, [
+      copied ? CheckIcon(size: 18) : CopyIcon(size: 18),
+    ]);
+  }
+}

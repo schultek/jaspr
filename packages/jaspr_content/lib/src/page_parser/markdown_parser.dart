@@ -72,12 +72,19 @@ class ComponentBlockSyntax extends md.BlockSyntax {
     final childLines = <md.Line>[];
 
     var nesting = 1;
+    var indent = -1;
 
     while (!parser.isDone) {
       if (nesting == 0) break;
 
       final line = parser.current;
-      childLines.add(line);
+
+      if (indent == -1) {
+        final match = RegExp(r'^\s*').firstMatch(line.content);
+        indent = match?.group(0)!.length ?? 0;
+      }
+
+      childLines.add(md.Line(_removeIndentation(line.content, indent)));
       parser.advance();
 
       var match = endPattern.firstMatch(line.content);
@@ -99,6 +106,11 @@ class ComponentBlockSyntax extends md.BlockSyntax {
 
     childLines.removeLast();
     return childLines;
+  }
+
+  String _removeIndentation(String content, int length) {
+    final text = content.replaceFirst(RegExp('^\\s{0,$length}'), '');
+    return content.substring(content.length - text.length);
   }
 
   @override

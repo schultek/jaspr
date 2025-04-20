@@ -1,3 +1,8 @@
+/// A collection of icons used in the application.
+/// 
+/// The icon paths are sourced from lucide icons (https://lucide.dev/icons).
+library;
+
 import 'package:jaspr/jaspr.dart';
 
 /// A close icon.
@@ -108,6 +113,33 @@ class CircleCheckIcon extends StatelessComponent {
     yield _Icon(size: size, children: [
       circle(cx: '12', cy: '12', r: '10', []),
       path(d: 'm9 12 2 2 4-4', []),
+    ]);
+  }
+}
+
+class CopyIcon extends StatelessComponent {
+  CopyIcon({this.size});
+
+  final int? size;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield _Icon(size: size, children: [
+      rect(width: "14", height: "14", x: "8", y: "8", attributes: {'rx': "2", 'ry': "2"}, []),
+      path(d: "M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2", []),
+    ]);
+  }
+}
+
+class CheckIcon extends StatelessComponent {
+  CheckIcon({this.size});
+
+  final int? size;
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield _Icon(size: size, children: [
+      path(d: 'M20 6 9 17l-5-5', []),
     ]);
   }
 }

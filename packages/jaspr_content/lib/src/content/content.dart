@@ -1,12 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-// ignore: implementation_imports
-import 'package:jaspr/src/foundation/styles/css.dart';
 
-part '_base.dart';
-part '_reset.dart';
-part 'colors.dart';
-part 'typography.dart';
-part 'theme.dart';
+import 'theme.dart';
 
 /// A component that wraps the content of a page and applies default typographic styles.
 /// 
