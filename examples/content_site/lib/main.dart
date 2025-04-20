@@ -94,7 +94,7 @@ void runGithub() {
               SidebarLink(text: "\uD83D\uDEEB Installation", href: '/get_started/installation'),
               SidebarLink(text: "\uD83D\uDD79 Jaspr CLI", href: '/get_started/cli'),
               SidebarLink(text: "\uD83D\uDCDF Rendering Modes", href: '/get_started/modes'),
-              SidebarLink(text: "\uD83D\uDCA7 Hydration", href: '/get_started/hydration'),
+              SidebarLink(text: "\uD83D\uDCA7 Server vs Client", href: '/get_started/server_client'),
               SidebarLink(text: "\uD83D\uDCE6 Project Structure", href: '/get_started/project_structure'),
               SidebarLink(text: "\uD83E\uDDF9 Linting", href: '/get_started/linting'),
             ]),

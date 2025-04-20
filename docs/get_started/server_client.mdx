@@ -1,6 +1,6 @@
 ---
-title: Client vs Server
-description: Understand the difference between client vs server rendering.
+title: Server vs Client
+description: Understand the difference between server and client rendering.
 ---
 
 <Info>
@@ -12,6 +12,7 @@ This page is only relevant when using **static** or **server** mode.
 When using Jaspr in **static** or **server** mode, your app will be executed both on the server (as native code or running in the Dart VM) and on the client (compiled to either JS or WASM), with some parts being run in both environments and some in only one.
 
 As a result, some or your components will be:
+
 - **only rendered on the server**
 - **rendered both on the server and client** 
 - **only rendered on the client** (almost never happens though).
@@ -33,8 +34,8 @@ Therefore, accessing a web-specific library like `dart:js_interop` in a server-r
 
 If you must access one of these libraries in a component that is rendered in both environments, you have several options:
 
-1. When using `package:web` you should instead use `package:universal_web` which already works across web **and server** environments. No need to use conditional imports or the `@Import` annotation shown below.
-2. You can use the `@Import` annotation to import the correct library depending on the environment. This is a shorthand for using [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files) and is the recommended way to do this in Jaspr.
+1. When using [`package:web`](https://pub.dev/packages/web) you should instead use [`package:universal_web`](https://pub.dev/packages/universal_web) which already works across web **and server** environments. No need to use conditional imports or the `@Import` annotation shown below.
+2. You can use the [`@Import`](/utils/at_import) annotation to import the correct library depending on the environment. This is a shorthand for using [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files) and is the recommended way to do this in Jaspr.
 3. You can use Dart's [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files) to import the correct library depending on the environment. This is a more verbose way of doing the same thing as the `@Import` annotation, but is still valid.
 
 ---
@@ -66,7 +67,7 @@ To find out if a particular component is rendered on the server or client, you c
 
 <Info>
   Therefore `@client` components act as a sort of boundary. Everything below in the tree is rendered in both environments, while everything above is only rendered on the server.
-<Info>
+</Info>
 
 ---
 
@@ -74,7 +75,7 @@ To reiterate:
 
 1. Components rendered **only on the server** can safely:
   - use server-side Jaspr features like `Document()`  and `AsyncStatelessComponent`.
-  - import and use server-specific libraries like `dart:io`
+  - import and use server-specific libraries like `dart:io`.
   - access the filesystem, connect to a database etc.
 
 2. Components rendered **both on the server and client** can:

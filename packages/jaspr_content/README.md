@@ -128,7 +128,7 @@ void main() {
             ),
             SidebarGroup(title: 'Get Started', links: [
               SidebarLink(text: "\uD83D\uDCDF Rendering Modes", href: '/get_started/modes'),
-              SidebarLink(text: "\uD83D\uDCA7 Hydration", href: '/get_started/hydration'),
+              SidebarLink(text: "\uD83D\uDCA7 Server vs Client", href: '/get_started/server_client'),
             ]),
           ]),
         ),

@@ -40,64 +40,7 @@ Additionally, you can set up hydration on the client in order to make your site 
   HTML/CSS files during build.
 </Info>
 
-### Generating Pages
-
-Static-Site Generation (SSG) describes the process of generating all your website routes at build time. Different to SSR, this doesn't require a running server that generates your website on each request. Instead, `jaspr build` will generate all the routes for your website and outputs only static files (`.html`, etc.) that can be deployed to any static hosting provider.
-
-Say you have a project in `static` mode with the routes `/`, `/about` and `/contact`. Then running `jaspr build` will output the `index.html`, `about/index.html` and `contact/index.html` files.
-
-To make sure all pages are generated for your site, you need to tell Jaspr about the routes of your website.
-
-### Using `jaspr_router`
-
-It is recommended you use `jaspr_router` together with `static` mode, since it automatically renders all routes that you define.
-
-The following shows a router that would render the above three routes:
-
-```dart
-Router(
-  routes: [
-    Route(path: '/', builder: (_, __) => HomePage()),
-    Route(path: '/about', builder: (_, __) => AboutPage()),
-    Route(path: '/contact', builder: (_, __) => ContactPage()),
-  ]
-);
-```
-
-#### Generating dynamic routes
-
-You may want to generate dynamic routes based on some data for your application.
-
-Take for example a typical blog site, where each blog post has its own route, e.g. `/posts/{postId}`, and you want
-to render these as separate pages when running `jaspr build`. Normally, you could use routes with path parameters for this,
-however for static-site generation, path parameters are not supported, since all routes need to be resolvable when initializing the router.
-
-Instead, you need to add a route for each page you want generated:
-
-```dart
-Router(
-  routes: [
-    for (var post in posts)
-      Route(path: '/posts/${post.id}', /* ... */),
-  ],
-);
-```
-
-Here, the `posts` list may be loaded from a database before the component builds.
-
-<Info>
-  Check the [Data Fetching](/concepts/data_fetching) guide on how to do this.
-</Info>
-
-### Manual usage
-
-If you want to set this up manually, you need to call `ServerApp.requestRouteGeneration('/my_route');` for any of your
-routes you want to generate.
-
-Since `ServerApp` is only available through the `package:jaspr/server.dart` import, you need to make sure this is only part of your
-server code and not the client.
-
-The method should be called during the initial build of your app, so putting it into `initState()` of your root component is a good choice.
+To lean more about generating static sites with Jaspr, check out the [Static Sites](/concepts/static_sites) guide.
 
 ---
 

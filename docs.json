@@ -89,8 +89,8 @@
           "href": "/get_started/modes"
         },
         {
-          "title": "\uD83C\uDD9A Client vs Server",
-          "href": "/get_started/client_server"
+          "title": "\uD83C\uDD9A Server vs Client",
+          "href": "/get_started/server_client"
         },
         {
           "title": "\uD83D\uDCE6 Project Structure",
@@ -129,6 +129,10 @@
         {
           "title": "\uD83D\uDD0E SEO & Meta",
           "href": "/concepts/seo"
+        },
+        {
+          "title": "\ud83c\udfd7\ufe0f Static Sites",
+          "href": "/concepts/static_sites"
         },
         {          
           "title": "\uD83D\uDCA7 Hydration",
