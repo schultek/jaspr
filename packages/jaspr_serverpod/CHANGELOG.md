@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Loosen `serverpod` dependency constraint to `>=2.3.0 <2.6.0`.
+
 ## 0.5.4
 
 - Loosen `serverpod` dependency constraint to `>=2.3.0 <2.5.0`.
