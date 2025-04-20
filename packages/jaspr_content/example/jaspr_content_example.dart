@@ -8,14 +8,11 @@ void main() {
   runApp(ContentApp(
     templateEngine: MustacheTemplateEngine(),
     parsers: [
-      HtmlParser(),
       MarkdownParser(),
     ],
-    extensions: [
+    components: [
       // Enables using custom components like '<Info>Hello</Info>'.
-      ComponentsExtension([
-        Callout.factory,
-      ]),
+      Callout(),
     ],
     layouts: [
       EmptyLayout(),

@@ -21,42 +21,6 @@ them to html. Then when the browser has loaded your site along with additional f
 > computer performs the initial rendering away from the user's browser. This may be an actual webserver running in some datacenter, but
 > when using "static" mode this can also be just your computer or e.g. the machine running your ci pipeline.
 
-## Separation of Environments
-
-One main aspect of developing a site in `static` or `server` mode that is important to think about and keep track of is **which
-component is rendered in which environment**. Starting at the root of your tree, components are by default **only rendered on the server**.
-When adding hydration to the mix, now certain components are **both rendered on the server and client**.
-
-This has the following implications:
-
-1. To keep the complexity of dealing with two separate rendering environments as low as possible, it is recommended to
-  define (conceptual or structural) boundaries of where components start to also being rendered on the client. With that anything above such
-  a boundary in the tree can be assumed to only be rendered on the server, and anything below on both server and client.
-
-  <Info>
-  Going forward we will call "server components" those that are only rendered on the server, and "client components"
-  those that are *also* rendered on the client (note the 'also' - there are no 'only rendered on the client' components in this model).
-  </Info>
-
-  <Info>
-  Notice how any child of a client component is automatically also a client component.
-  </Info>
-
-2. Once defined, components can make use of environment-specific concepts.
-
-  - Server components can safely import and use server-specific libraries like `dart:io`, or e.g. access the filesystem, connect to a database etc.
-
-  - Client components must function and compile in **both environments** and therefore can neither directly import client- nor server-specific libraries.
-    Instead, they either use shared implementations or have to use Darts [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files).
-
-    Because using conditional imports manually is pretty cumbersome, Jaspr provides the [`@Import` utility](/utils/at_import) to make working with
-    platform-specific libraries in client components a lot easier.
-
-3. The import restrictions from (2) apply (obviously) also to all transitive imports of a component. One additional rule that
-   follows that is that **client components can/should never import server components**.
-
----
-
 ## Hydration Setup
 
 For hydration to happen seamlessly the initial client-side render has to match the previously pre-rendered html from the server exactly.

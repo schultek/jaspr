@@ -6,7 +6,7 @@ description: Jaspr comes with three different rendering modes - static, server a
 ---
 
 **Jaspr** is a full-stack web framework, meaning it can run both on the server and the client. Depending on what you
-want to build you can choose how your app should be built and executed using Jaspr.
+want to build, you can choose how your app should be built and executed using Jaspr.
 
 Therefore, Jaspr supports the following three rendering modes:
 
@@ -16,13 +16,14 @@ Therefore, Jaspr supports the following three rendering modes:
 
 Each mode is explained in detail below. The following table gives a quick overview:
 
-|                                               | **static**                                    | **server**                                    | **client** |
-|:----------------------------------------------|-----------------------------------------------|-----------------------------------------------|------------|
-| **Pre-Rendering**                             | Yes (at build time)                           | Yes (at request time)                         | No         |
-| **Client-side rendering** / **Interactivity** | Yes (with [Hydration](/get_started/hydration)) | Yes (with [Hydration](/get_started/hydration)) | Yes        |
-| **Needs Server**                              | No                                            | Yes                                           | No         |
-| **Deploy to any Webhoster**                   | Yes                                           | No                                            | Yes        |
-| **Custom backend**                            | No                                            | [Yes](/going_further/backend)                      | No         |
+|                               | **static**                                 | **server**                                 | **client** |
+| :---------------------------- | ------------------------------------------ | ------------------------------------------ | ---------- |
+| **No HTML/CSS**               | ✅                                         | ✅                                         | ❌         |
+| **Pre-Rendering**             | ✅ (at build time)                         | ✅ (at request time)                       | ❌         |
+| **Client-Side Interactivity** | ✅ (with [Hydration](/concepts/hydration)) | ✅ (with [Hydration](/concepts/hydration)) | ✅         |
+| **Needs Server**              | ❌                                         | ✅                                         | ❌         |
+| **Static Deployment**         | ✅                                         | ❌                                         | ✅         |
+| **Custom Backend**            | ❌                                         | ✅ (See [here](/going_further/backend))    | ❌         |
 
 ---
 
@@ -33,7 +34,10 @@ You can write server-side code to pre-render components and pages at built time,
 Additionally, you can set up hydration on the client in order to make your site interactive.
 
 <Info>
-Even if you want to build a Single Page Application this can be a good choice over 'client' mode since you don't need a `index.html` or `styles.css` and instead can write everything in Dart and let Jaspr do the rendering to actual HTML/CSS files during build.
+  Even if you want to build a Single Page Application this can be a good choice
+  over 'client' mode since you don't need a `index.html` or `styles.css` and
+  instead can write everything in Dart and let Jaspr do the rendering to actual
+  HTML/CSS files during build.
 </Info>
 
 ### Generating Pages
@@ -82,7 +86,7 @@ Router(
 Here, the `posts` list may be loaded from a database before the component builds.
 
 <Info>
-Check the [Data Fetching](/concepts/data_fetching) guide on how to do this.
+  Check the [Data Fetching](/concepts/data_fetching) guide on how to do this.
 </Info>
 
 ### Manual usage

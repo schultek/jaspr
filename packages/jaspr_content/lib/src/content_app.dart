@@ -66,6 +66,9 @@ class ContentApp extends AsyncStatelessComponent {
     /// Extensions are applied in the order they are listed.
     List<PageExtension> extensions = const [],
 
+    /// A list of [CustomComponent]s to use for rendering the page.
+    List<CustomComponent> components = const [],
+
     /// A list of [PageLayout]s to use for building the page.
     ///
     /// When more than one layout is provided, the layout to use is determined by the 'layout' key in the page data.
@@ -85,6 +88,7 @@ class ContentApp extends AsyncStatelessComponent {
           templateEngine: templateEngine,
           parsers: parsers,
           extensions: extensions,
+          components: components,
           layouts: layouts,
           theme: theme,
         ),
