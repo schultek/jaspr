@@ -1,0 +1,121 @@
+---
+title: Quick Start
+description: Get started with jaspr_content to build content-driven sites.
+---
+
+---
+
+To get started, create a new Jaspr project in either `static` or `server` mode. You can do this using the Jaspr VSCode extension or by using the `jaspr create` command.
+
+Then perform the following steps:
+
+<Steps>
+  <Step title="Add jaspr_content">
+
+    Add the `jaspr_content` package to your project by adding it to your `pubspec.yaml` file:
+
+    ```bash
+    dart pub add jaspr_content
+    ```
+  </Step>
+  <Step title="Add a Content Directory">
+
+    Create a top-level `content/` directory in your project. This is where you will store your content files. Inside the `content/` directory, create a new file called `index.md` and add some sample content.
+
+    <Accordion title="Markdown Sample">
+      ```markdown title="content/index.md"
+      # Welcome to Jaspr Content
+
+      This is a sample content file. You can add more files here as needed.
+
+      All standard **markdown syntax** is supported, including:
+
+      - Lists:
+        - Unordered list item 1
+        - Unordered list item 2
+          - Nested item
+        - Unordered list item 3
+
+      - Ordered lists:
+        1. Ordered list item 1
+        2. Ordered list item 2
+          1. Nested ordered item
+        3. Ordered list item 3
+
+      - **Blockquotes**:
+        > This is a blockquote.  
+        > It can span multiple lines.
+
+      - **Code blocks**:
+        ```dart
+        void main() {
+          print('Hello, world!');
+        }
+        ```
+
+      - **Inline code**: Use `print('Hello, world!')` to display a message.
+
+      - **Links**: [Visit Jaspr](https://jaspr.dev)
+
+      - **Images**:
+        ![Sample Image](https://via.placeholder.com/150)
+
+      - **Tables**:
+
+        | Syntax    | Description |
+        |-----------|-------------|
+        | Header 1  | Content 1   |
+        | Header 2  | Content 2   |
+
+      - **Emphasis**:
+        - *Italic text*
+        - **Bold text**
+        - ***Bold and italic text***
+
+      - **Horizontal Rule**:
+
+      ---
+
+      - **Task Lists**:
+        - [x] Task 1
+        - [ ] Task 2
+        - [ ] Task 3
+      ```
+    </Accordion>
+  </Step>
+  <Step title="Update main.dart">
+
+    Remove all files in `lib/` except for `main.dart` and `jaspr_options.dart`.
+
+    Open the `lib/main.dart` file in your project. This is where you will set up the `jaspr_content` package to load and render your content.
+
+    Replace the contents of `lib/main.dart` with the following code:
+
+    ```dart title="lib/main.dart"
+    import 'package:jaspr/jaspr.dart';
+    import 'package:jaspr_content/jaspr_content.dart';
+
+    import 'jaspr_options.dart';
+
+    void main() {
+      Jaspr.initializeApp(options: defaultJasprOptions);
+
+      runApp(ContentApp(
+        parsers: [
+          MarkdownParser(),
+        ],
+      ));
+    }
+    ```
+  </Step>
+  <Step title="Launch Jaspr">
+    Launch your Jaspr application using either the VSCode extension or the `jaspr serve` command in your terminal.
+  </Step>
+</Steps>
+
+<Success>
+  This minimal setup already gives you a functional markdown rendering system in your Jaspr application. You can try around with editing your markdown and adding more content files.
+</Success>
+
+So far we have only seen a very minimal setup for `ContentApp`. You are welcome to play around with the different options and explore the API.
+

@@ -1,3 +1,7 @@
+/// @docImport 'data_loader/data_loader.dart';
+/// @docImport 'content/content.dart';
+library;
+
 import 'dart:async';
 
 import 'package:jaspr/server.dart';
@@ -19,11 +23,15 @@ import 'template_engine/template_engine.dart';
 /// of routes for the site. A [RouteLoader] then builds a [Page] for each route based on the resolved [PageConfig].
 ///
 /// For a single page, the following steps are taken:
-/// 1. The page is created by the [RouteLoader].
-/// 2. The page's configuration is resolved by the [ConfigResolver] based on its url.
-/// 3. The page's frontmatter is parsed and additional data is loaded.
-/// 4. The page's content is parsed and processed based on the configuration.
-/// 5. The page is wrapped in a layout and rendered to HTML.
+/// 1. The page is created by one of the provided [RouteLoader]s.
+/// 2. The page's configuration is resolved by the provided [ConfigResolver] based on its route.
+/// 3. The page's frontmatter is parsed and additional data is loaded by the configured [DataLoader]s.
+/// 4. The page's content is pre-processed by the configured [TemplateEngine].
+/// 5. The page's content is parsed by one of the configured [PageParser]s.
+/// 6. The parsed content is further processed by the configured [PageExtension]s.
+/// 7. The processed content is rendered using the configured [CustomComponent]s ans wrapped in a [Content] component.
+/// 8. The content is wrapped in a [PageLayout] and gets applied the configured [ContentTheme].
+/// 9. The result is rendered to HTML.
 ///
 /// Page creation (steps 1 and 2) is always done eagerly at startup for all pages.
 ///
@@ -33,7 +41,7 @@ import 'template_engine/template_engine.dart';
 /// - In eager mode, all pages are loaded at startup. This is needed when a page may depend on other pages, such as when
 ///   rendering a collection of sub-pages. Read [PageContext.pages] for more information.
 ///
-/// Page rendering (steps 4 and 5) is always done on-demand when a page is requested. In eager mode, this waits for all
+/// Page rendering (steps 4 to 9) is always done on-demand when a page is requested. In eager mode, this waits for all
 /// pages to be loaded before rendering the requested page.
 class ContentApp extends AsyncStatelessComponent {
   /// Creates a basic [ContentApp] that loads pages from the filesystem and applies the same configuration to all pages.
@@ -132,6 +140,8 @@ class ContentApp extends AsyncStatelessComponent {
 
   @override
   Stream<Component> build(BuildContext context) async* {
+    yield Document.head(children: [Style(styles: resetStyles)]);
+    
     final routes = await Future.wait(loaders.map((l) => l.loadRoutes(configResolver, eagerlyLoadAllPages)));
     _ensureAllowedSuffixes(routes);
     yield routerBuilder(routes);

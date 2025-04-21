@@ -1,0 +1,26 @@
+---
+title: Pages
+description: Understand how pages are built in jaspr_content.
+---
+
+---
+
+Pages are the core of any content-driven site. They represent a single piece of content that can be requested through its url.
+
+For example, you might have a `about.md` file that is rendered as a page at the `/about` url. 
+
+In `jaspr_content` pages are built based on the configuration provided to the `ContentApp` component. This configuration defines how the content is loaded, parsed, and rendered.
+
+For a single page, the following steps are taken:
+
+1. The page is created by one of the provided `RouteLoader`s.
+2. The page's configuration is resolved by the provided `ConfigResolver` based on its route.
+3. The page's frontmatter is parsed and additional data is loaded by the configured `DataLoader`s.
+4. The page's content is pre-processed by the configured `TemplateEngine`.
+5. The page's content is parsed by one of the configured `PageParser`s.
+6. The parsed content is further processed by the configured `PageExtension`s.
+7. The processed content is rendered using the configured `CustomComponent`s and wrapped in a `Content` component.
+8. The content component is wrapped in a `PageLayout` and gets applied the configured `ContentTheme`.
+9. The result is rendered to HTML.
+
+All of the different parts used to build a page are configurable. They can be switched out, extended, or replaced with custom implementations. This allows you to create a content-driven site that fits your needs perfectly.

@@ -5,7 +5,6 @@ library;
 
 import 'package:jaspr/server.dart';
 
-import '../content/theme.dart';
 import '../page.dart';
 
 /// A layout for a page.
@@ -71,7 +70,6 @@ abstract class PageLayoutBase implements PageLayout {
         if (description case final desc?) 'description': desc.toString(),
         if (keywords case final keys?) 'keywords': keys is List ? keys.join(', ') : keys.toString(),
       },
-      styles: resetStyles,
       head: [
         if (favicon != null) link(rel: 'icon', type: 'image/png', href: favicon!),
         meta(attributes: {'property': 'og:title'}, content: title),

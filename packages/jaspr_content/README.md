@@ -151,18 +151,10 @@ If you want to make sure to understand all concepts, here is a full list of all 
 - **ContentApp**: The main entry point for setting up a content-driven site.
 - **Page**: A data object that holds all information and configuration about a single page. A page is what will be rendered to a `.html` file.
 - **PageConfig**: A configuration object that holds all settings for parsing and rendering content. This may either be applied to a single page (where different pages have different PageConfigs) or to the whole app.
-- **PageLoader**: Loads pages from a sources like the filesystem or a github repository.
+- **RouteLoader**: Loads pages from a sources like the filesystem or a github repository.
 - **DataLoader**: Loads additional data from sources like `.json` or `.yaml` files.
 - **TemplateEngine**: Pre-processes the content using a templating language like mustache. This is useful for injecting data (from frontmatter and data loaders) into the content before parsing.
 - **PageParser**: Parses the content from a file format like markdown or html.
 - **PageExtension**: Post-processes a page after parsing. This may analyze and modify the page in many different ways and is useful for adding features like custom components or a table of contents.
 - **PageLayout**: Renders a page's content into a final html layout. This may include any additional ui elements like a header, sidebar, or footer. Multiple layouts are supported, and a page may choose a different layout than the default one.
 - **ContentTheme**: Defines the theme colors and typographic styles for the site. This includes primary and background colors, light and dark variants as well as font sizes and styles for headers, paragraphs and more.
-
----
-
-## Future Ideas
-
-- Add a search bar component
-
-- Support generating a sitemap
