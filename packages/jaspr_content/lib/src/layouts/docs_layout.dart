@@ -1,5 +1,5 @@
-/// @docImport 'components/header.dart';
-/// @docImport 'components/sidebar.dart';
+/// @docImport '../components/header.dart';
+/// @docImport '../components/sidebar.dart';
 library;
 
 import 'package:jaspr/server.dart' as jaspr;

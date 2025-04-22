@@ -29,3 +29,12 @@ Framework: {{details.framework}}
 <Success> Hello World </Success>
 
 [Home](/)
+
+
+# Frequently Asked Questions
+
+{{#faq}}
+## {{question}}
+
+> {{answer}}
+{{/faq}}

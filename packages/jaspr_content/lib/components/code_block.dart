@@ -8,8 +8,8 @@ import '_internal/code_block_copy_button.dart';
 class CodeBlock implements CustomComponent {
   CodeBlock({
     this.defaultLanguage = 'dart',
-    this.defaultTheme,
-    this.themes = const {},
+    this.grammars = const {},
+    this.theme,
   });
 
   static Component from({
@@ -27,13 +27,17 @@ class CodeBlock implements CustomComponent {
   /// The default language for the code block.
   final String defaultLanguage;
 
-  /// The default theme for the code block.
-  final HighlighterTheme? defaultTheme;
+  /// The available grammars for the code block.
+  /// 
+  /// The key is the name of the language.
+  /// The value is a json encoded string of the grammar.
+  final Map<String, String> grammars;
 
-  /// The available themes for the code block.
-  final Map<String, HighlighterTheme> themes;
+  /// The default theme for the code block.
+  final HighlighterTheme? theme;
 
   bool _initialized = false;
+  HighlighterTheme? _defaultTheme;
 
   @override
   Component? create(Node node, NodesBuilder builder) {
@@ -47,13 +51,16 @@ class CodeBlock implements CustomComponent {
 
       if (!_initialized) {
         Highlighter.initialize(['dart']);
+        for (final entry in grammars.entries) {
+          Highlighter.addLanguage(entry.key, entry.value);
+        }
         _initialized = true;
       }
 
       return AsyncBuilder(builder: (context) async* {
         final highlighter = Highlighter(
           language: language ?? defaultLanguage,
-          theme: await HighlighterTheme.loadDarkTheme(),
+          theme: theme ?? (_defaultTheme ??= await HighlighterTheme.loadDarkTheme()),
         );
 
         yield _CodeBlock(

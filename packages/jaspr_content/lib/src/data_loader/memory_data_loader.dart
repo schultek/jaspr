@@ -11,6 +11,8 @@ class MemoryDataLoader implements DataLoader {
 
   @override
   Future<void> loadData(Page page) async {
+    var pageData = page.data['page'] ?? {};
     page.apply(data: data);
+    page.apply(data: {'page': pageData});
   }
 }

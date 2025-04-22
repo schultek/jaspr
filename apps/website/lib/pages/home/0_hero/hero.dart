@@ -24,7 +24,7 @@ class Hero extends StatelessComponent {
           InstallCommand(),
           div(classes: 'actions', [
             LinkButton.filled(
-                label: 'Get Started', icon: 'arrow-right', to: 'https://docs.jaspr.site/get_started/installation'),
+                label: 'Get Started', icon: 'arrow-right', to: 'https://docs.jaspr.site/get_started/quick_start'),
             MeetJasprButton(),
           ]),
         ]),

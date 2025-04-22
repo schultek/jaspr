@@ -49,6 +49,8 @@ class ContentApp extends AsyncStatelessComponent {
   /// For a more customized setup, use [ContentApp.custom].
   ContentApp({
     /// The directory to load pages from.
+    /// 
+    /// This is relative to the root of the project.
     String directory = 'content',
 
     /// Whether to eagerly load all pages at startup. See the discussion on [ContentApp] for more information.
@@ -86,6 +88,7 @@ class ContentApp extends AsyncStatelessComponent {
 
     /// The [ContentTheme] to use for the pages.
     ContentTheme? theme,
+
     bool debugPrint = false,
   })  : loaders = [FilesystemLoader(directory, debugPrint: debugPrint)],
         configResolver = PageConfig.all(
@@ -119,7 +122,7 @@ class ContentApp extends AsyncStatelessComponent {
 
     /// A custom builder function to use for building the main [Router] component.
     ///
-    /// This can be used to customize the router component, add additional routes or inserting components above the router.
+    /// This can be used to customize the [Router] component like add additional routes or inserting components above the router.
     this.routerBuilder = _defaultRouterBuilder,
   }) {
     _overrideGlobalOptions();
@@ -141,7 +144,7 @@ class ContentApp extends AsyncStatelessComponent {
   @override
   Stream<Component> build(BuildContext context) async* {
     yield Document.head(children: [Style(styles: resetStyles)]);
-    
+
     final routes = await Future.wait(loaders.map((l) => l.loadRoutes(configResolver, eagerlyLoadAllPages)));
     _ensureAllowedSuffixes(routes);
     yield routerBuilder(routes);

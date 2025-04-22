@@ -276,11 +276,10 @@ extension RouteLoaderExtension on RouteLoader {
     List<CollectionRoute> subdirs = [];
 
     for (final entry in entities) {
-      final name = entry.path.split('/').last;
-      if (name.startsWith('_')) continue;
+      if (entry.path.startsWith('_')) continue;
 
       if (entry is SourceRoute) {
-        final isIndex = indexRegex.hasMatch(name);
+        final isIndex = indexRegex.hasMatch(entry.path);
         if (isIndex) {
           indexFile = entry;
         } else {
@@ -294,22 +293,21 @@ extension RouteLoaderExtension on RouteLoader {
     List<RouteBase> routes = [];
 
     for (final file in files) {
-      var name = file.path.split('/').last;
+      var filePath = file.path;
       if (!file.keepSuffix) {
-        name = name.replaceFirst(RegExp(r'\..*'), '');
+        filePath = filePath.replaceFirst(RegExp(r'\.[^/]*$'), '');
       }
-      final routePath = (isTopLevel ? '/' : '') + (indexFile != null || path.isEmpty ? '' : '$path/') + name;
+      final routePath = (isTopLevel ? '/' : '') + (indexFile != null || path.isEmpty ? '' : '$path/') + filePath;
       final result = buildRoute(PageRoute(file.path, file.source, routePath, []));
 
       routes.addAll(result);
     }
 
     for (final subdir in subdirs) {
-      final name = subdir.path.split('/').last;
       final subRoutes = _buildRoutes(
         entities: subdir.entities,
         buildRoute: buildRoute,
-        path: (isTopLevel ? '/' : '') + (indexFile == null && path.isNotEmpty ? '$path/' : '') + name,
+        path: (isTopLevel ? '/' : '') + (indexFile == null && path.isNotEmpty ? '$path/' : '') + subdir.path,
         isTopLevel: false,
       );
       routes.addAll(subRoutes);

@@ -1,0 +1,96 @@
+
+
+- extensions
+- components
+- layouts
+- theming
+
+
+
+---
+
+
+---
+
+Instead of more talking, lets look at some code:
+
+```dart
+// lib/main.dart
+import 'package:jaspr/server.dart';
+import 'package:jaspr_content/jaspr_content.dart';
+
+void main() {
+  Jaspr.initializeApp();
+
+  runApp(ContentApp.custom(
+    loaders: [
+      FilesystemLoader('content'),
+      GithubLoader(
+        'schultek/jaspr',
+        accessToken: '...',
+      ),
+    ],
+    configResolver: PageConfig.resolve(
+      dataLoaders: [
+        FilesystemDataLoader('content/_data'),
+      ],
+      templateEngine: MustacheTemplateEngine(),
+      parsers: [
+        HtmlParser(),
+        MarkdownParser(),
+      ],
+      extensions: [
+        TableOfContentsExtension(),
+        HeadingAnchorExtension(),
+        ComponentsExtension([
+          Callout.factory,
+        ]),
+      ],
+      layouts: [
+        DocsLayout(
+          favicon: 'favicon.ico',
+          header: Header(
+            title: 'Jaspr',
+            logo: 'assets/logo.png',
+            items: [
+              ThemeToggle(),
+              GithubButton(repo: 'schultek/jaspr'),
+            ]
+          ),
+          sidebar: Sidebar(groups: [
+            SidebarGroup(
+              links: [
+                SidebarLink(text: "\uD83D\uDCD6 Overview", href: '/'),
+                SidebarLink(text: "\uD83E\uDD4A About", href: '/about'),
+              ],
+            ),
+            SidebarGroup(title: 'Get Started', links: [
+              SidebarLink(text: "\uD83D\uDCDF Rendering Modes", href: '/get_started/modes'),
+              SidebarLink(text: "\uD83D\uDCA7 Server vs Client", href: '/get_started/server_client'),
+            ]),
+          ]),
+        ),
+      ],
+      theme: ContentTheme(
+        primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
+        background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
+      ),
+    ),
+  ));
+}
+```
+
+This is a setup for a documentation site loaded both from the local filesystem as well as a github repository. It uses features such as:
+
+- Support for frontmatter data in all files.
+- Additional data is loaded from `.json` and `.yaml` files in the local `content/_data` directory.
+- Each file is pre-processed using the mustache templating language.
+- The content is parsed from `.md` and `.html` files.
+- A table of contents is auto-generated from the headings in the content.
+- Each heading gets an anchor link for easy linking.
+- Rendering of custom components from content such as `<Info>...</Info>` or `<Success>...</Success>`.
+- The page is rendered in a documentation layout including:
+  - a header with a title and logo
+  - a toggle to switch between light and dark mode
+  - a sidebar with links to different pages
+- Custom primary and background colors with both light and dark variants.

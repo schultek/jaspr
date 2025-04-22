@@ -1,6 +1,6 @@
 import 'package:jaspr/server.dart';
 
-import '../../../components/sidebar_toggle_button.dart';
+import '../../components/sidebar_toggle_button.dart';
 
 /// A header component with a logo, title, and additional items.
 class Header extends StatelessComponent {

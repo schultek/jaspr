@@ -77,12 +77,8 @@
       "group": "Get Started",
       "pages": [
         {
-          "title": "\uD83D\uDEEB Installation",
-          "href": "/get_started/installation"
-        },
-        {
-          "title": "\uD83D\uDD79 Jaspr CLI",
-          "href": "/get_started/cli"
+          "title": "\uD83D\uDEEB Quickstart",
+          "href": "/get_started/quick_start"
         },
         {
           "title": "\uD83D\uDCDF Rendering Modes",
@@ -91,6 +87,10 @@
         {
           "title": "\uD83C\uDD9A Server vs Client",
           "href": "/get_started/server_client"
+        },
+        {
+          "title": "\uD83D\uDD79 Jaspr CLI",
+          "href": "/get_started/cli"
         },
         {
           "title": "\uD83D\uDCE6 Project Structure",
@@ -305,8 +305,146 @@
       "tab": "content",
       "pages": [
         {
-          "title": "Overview",
+          "title": "\uD83D\uDCD6 Overview",
           "href": "/content"
+        },
+        {
+          "title": "\uD83D\uDEEB Quick Start",
+          "href": "/content/quick_start"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Guides",
+      "pages": [
+        {
+          "title": "📄 Adding Pages",
+          "href": "/content/guides/adding_pages"
+        },
+        {
+          "title": "✒️ Writing Content",
+          "href": "/content/guides/writing_content"
+        },
+        {
+          "title": "🎨 Customizing Rendering",
+          "href": "/content/guides/customizing_rendering"
+        },
+        {
+          "title": "🌐 Building and Deploying",
+          "href": "/content/guides/building_and_deploying"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Concepts",
+      "pages": [
+        {
+          "title": "Pages",
+          "href": "/content/concepts/pages"
+        },
+        {
+          "title": "ContentApp",
+          "href": "/content/concepts/content_app"
+        },
+        {
+          "title": "Route Loading",
+          "href": "/content/concepts/route_loading"
+        },
+        {
+          "title": "Data Loading",
+          "href": "/content/concepts/data_loading"
+        },
+        {
+          "title": "Templating",
+          "href": "/content/concepts/templating"
+        },
+        {
+          "title": "Page Parsing",
+          "href": "/content/concepts/page_parsing"
+        },
+        {
+          "title": "Page Extensions",
+          "href": "/content/concepts/page_extensions"
+        },
+        {
+          "title": "Custom Components",
+          "href": "/content/concepts/custom_components"
+        },
+        {
+          "title": "Page Layouts",
+          "href": "/content/concepts/page_layouts"
+        },
+        {
+          "title": "Theming",
+          "href": "/content/concepts/theming"
+        },
+        {
+          "title": "Secondary Outputs",
+          "href": "/content/concepts/secondary_outputs"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Components",
+      "pages": [
+        {
+          "title": "Callout",
+          "href": "/content/components/callout"
+        },
+        {
+          "title": "CodeBlock",
+          "href": "/content/components/code_block"
+        },
+        {
+          "title": "Image",
+          "href": "/content/components/image"
+        },
+        {
+          "title": "Tabs",
+          "href": "/content/components/tabs"
+        },
+        {
+          "title": "DropCap",
+          "href": "/content/components/drop_cap"
+        },
+        {
+          "title": "PostBreak",
+          "href": "/content/components/post_break"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Extensions",
+      "pages": [
+        {
+          "title": "Heading Anchors",
+          "href": "/content/extensions/heading_anchors"
+        },
+        {
+          "title": "Table of Contents",
+          "href": "/content/extensions/table_of_contents"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Layouts",
+      "pages": [
+        {
+          "title": "DocsLayout",
+          "href": "/content/layouts/docs_layout"
+        },
+        {
+          "title": "BlogLayout",
+          "href": "/content/layouts/blog_layout"
+        },
+        {
+          "title": "EmptyLayout",
+          "href": "/content/layouts/empty_layout"
         }
       ]
     }

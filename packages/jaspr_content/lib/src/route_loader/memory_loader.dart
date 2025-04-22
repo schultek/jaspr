@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/server.dart';
+
 import '../page.dart';
 import 'route_loader.dart';
 
@@ -38,12 +43,19 @@ class MemoryLoader extends RouteLoaderBase {
 class MemoryPage {
   const MemoryPage({
     required this.path,
-    required this.content,
+    this.content,
     this.data = const {},
-  });
+  }) : builder = null;
+  
+  const MemoryPage.builder({
+    required this.path,
+    this.builder,
+    this.data = const {},
+  }) : content = null;
 
   final String path;
-  final String content;
+  final String? content;
+  final Component Function(Page page)? builder;
   final Map<String, dynamic> data;
 }
 
@@ -54,13 +66,48 @@ class MemoryPageFactory extends PageFactory {
 
   @override
   Future<Page> buildPage() async {
+    if (_page.builder != null) {
+      return _BuilderPage(
+        path: route.path,
+        url: route.url,
+        builder: _page.builder!,
+        data: _page.data,
+        config: config,
+        loader: loader,
+      );
+    }
     return Page(
       path: route.path,
       url: route.url,
-      content: _page.content,
+      content: _page.content ?? '',
       data: _page.data,
       config: config,
       loader: loader,
     );
+  }
+}
+
+class _BuilderPage extends Page {
+  _BuilderPage({
+    required super.path,
+    required super.url,
+    required this.builder,
+    required super.data,
+    required super.config,
+    required super.loader,
+  }) : super(content: '');
+
+  final Component Function(Page page) builder;
+
+  @override
+  Future<Component> build() async {
+    await loadData();
+    return AsyncBuilder(builder: (context) async* {
+      if (kGenerateMode && data['page']['sitemap'] != null) {
+        context.setHeader('jaspr-sitemap-data', jsonEncode(data['page']['sitemap']));
+      }
+
+      yield builder(this);
+    });
   }
 }
