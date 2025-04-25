@@ -2,13 +2,11 @@
 
 - **BREAKING** `JasprOptions.useIsolates` is now `false` by default (was `true`).
   
-  If you want to keep the old behaviour of rendering each request in a separate isolate, 
-  use `Jaspr.initializeApp(..., useIsolates: true)`.
+  If you want to keep the old behaviour of rendering each request in a separate isolate, use `Jaspr.initializeApp(..., useIsolates: true)`.
 
 - Added support `@client` components from other packages.
 
-  Components annotated with `@client` from other dependent packages are now also part of the js bundle when
-  used during pre-rendering.
+  Components annotated with `@client` from other dependent packages are now also part of the js bundle when used during pre-rendering.
 
 - **BREAKING** The `Flex(basis: ...)` style now accepts a `Unit` value directly instead of a `FlexBasis`.
 

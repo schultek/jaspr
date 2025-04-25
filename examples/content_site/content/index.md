@@ -9,6 +9,23 @@ tags: ["Dart", "Freezed", "Macros", "Freezed", "Macros", "Freezed", "Macros", "F
 ---
 
 
+This is a paragraph.
+
+<PostBreak/>
+
+This is another, longer paragraph. It contains more text and will be span the whole width of the screen.
+
+
+<DropCap/>
+The first letter of this paragraph (T) will be a drop cap. This looks best for longer paragraphs that have enough text to span multiple lines. The drop cap will be the first letter of the paragraph, and it will be larger than the rest of the text. This is a common design pattern in print media, and it can add a nice touch to your website.
+
+
+
+
+
+
+
+
 This is the about pages TEST HALLO
 Author: Albert Wolszon from LeanCode
 

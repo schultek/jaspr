@@ -48,9 +48,9 @@
       "href": "/"
     },
     {
-      "id": "ref",
-      "title": "Reference",
-      "href": "/reference"
+      "id": "api",
+      "title": "API",
+      "href": "/api"
     },
     {
       "id": "content",
@@ -134,7 +134,7 @@
           "title": "\ud83c\udfd7\ufe0f Static Sites",
           "href": "/concepts/static_sites"
         },
-        {          
+        {
           "title": "\uD83D\uDCA7 Hydration",
           "href": "/concepts/hydration"
         },
@@ -185,16 +185,16 @@
       ]
     },
     {
-      "tab": "ref",
+      "tab": "api",
       "pages": [
         {
           "title": "Overview",
-          "href": "/reference"
+          "href": "/api"
         }
       ]
     },
     {
-      "tab": "ref",
+      "tab": "api",
       "group": "Components",
       "pages": [
         {
@@ -236,28 +236,50 @@
       ]
     },
     {
-      "tab": "ref",
-      "group": "Utilities",
+      "tab": "api",
+      "group": "General",
       "pages": [
         {
           "title": "runApp",
           "href": "/utils/run_app"
         },
         {
-          "title": "@client",
-          "href": "/utils/at_client"
+          "title": "Styles",
+          "href": "/utils/styles"
         },
         {
           "title": "@css / css()",
           "href": "/utils/at_css"
         },
         {
-          "title": "Styles",
-          "href": "/utils/styles"
-        },
-        {
           "title": "events()",
           "href": "/utils/events"
+        },
+        {
+          "title": "GlobalNodeKey",
+          "href": "/utils/global_node_key"
+        },
+        {
+          "title": "ViewTransitionMixin",
+          "href": "/utils/view_transition_mixin"
+        }
+      ]
+    },
+    {
+      "tab": "api",
+      "group": "Server / Client",
+      "pages": [
+        {
+          "title": "@client",
+          "href": "/utils/at_client"
+        },
+        {
+          "title": "@encoder/@decoder",
+          "href": "/utils/at_encoder_decoder"
+        },
+        {
+          "title": "@Import",
+          "href": "/utils/at_import"
         },
         {
           "title": "@sync",
@@ -272,14 +294,6 @@
           "href": "/utils/preload_state_mixin"
         },
         {
-          "title": "@encoder/@decoder",
-          "href": "/utils/at_encoder_decoder"
-        },
-        {
-          "title": "GlobalNodeKey",
-          "href": "/utils/global_node_key"
-        },
-        {
           "title": "headers / setHeader()",
           "href": "/utils/headers"
         },
@@ -290,14 +304,6 @@
         {
           "title": "setStatusCode()",
           "href": "/utils/set_status_code"
-        },
-        {
-          "title": "@Import",
-          "href": "/utils/at_import"
-        },
-        {
-          "title": "ViewTransitionMixin",
-          "href": "/utils/view_transition_mixin"
         }
       ]
     },

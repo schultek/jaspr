@@ -4,3 +4,49 @@ description: A custom code block component with syntax highlighting and a copy b
 ---
 
 ---
+
+Code Blocks are a great way to display code snippets in your site. Use the standard markdown syntax of three backticks (\`\`\`) to create a code block, or use the `<CodeBlock>` component.
+
+## Usage
+
+Add the `CodeBlock()` component to your `components` list in your `main.dart` file:
+
+```dart
+ContentApp(
+  components: [
+    CodeBlock(),
+  ],
+)
+```
+
+Then use the code block syntax in your content files to display the code blocks.
+
+```markdown
+\```dart
+void main() {
+  print('Hello, world!');
+}
+\```
+```
+
+---
+
+### Properties
+
+The `CodeBlock()` constructor takes the following properties:
+
+<Property name="defaultLanguage" type="String" required>
+  The default language to use for syntax highlighting. This is used when no language is specified for a code block. Defaults to "dart".
+</Property>
+
+---
+
+<Property name="grammars" type="Map<String, String>">
+  By default, the code block component only supports the `dart` language for syntax highlighting. You can add support for other languages by adding additional `grammars`. The key is the language name and the value is a json encoded string of the TextMate grammar rules.
+</Property>
+
+---
+
+<Property name="theme" type="HighlighterTheme">
+  A custom theme to use for syntax highlighting. This overrides the default theme if provided.
+</Property>

@@ -16,6 +16,7 @@ class GithubLoader extends RouteLoaderBase {
     this.repo, {
     this.ref = 'main',
     this.path = 'docs/',
+    this.keeySuffixPattern,
     this.accessToken,
     super.debugPrint,
   });
@@ -28,6 +29,9 @@ class GithubLoader extends RouteLoaderBase {
 
   /// The root path to load pages from.
   final String path;
+
+  /// A pattern to keep the file suffix for all matching pages.
+  final Pattern? keeySuffixPattern;
 
   /// The access token to use for authentication.
   ///
@@ -92,7 +96,7 @@ class GithubLoader extends RouteLoaderBase {
         var segment = segments[i];
         current = (current[segment] ??= <String, dynamic>{});
       }
-      current[segments.last] = SourceRoute(segments.last, file['url']);
+      current[segments.last] = SourceRoute(segments.last, file['url'], keepSuffix: keeySuffixPattern?.matchAsPrefix(path) != null);
     }
 
     RouteEntity? getEntity(MapEntry<String, dynamic> entry) {

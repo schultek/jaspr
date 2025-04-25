@@ -25,7 +25,7 @@ List<StyleRule> get globalStyles => [
 void runGithub() {
   runApp(ContentApp.custom(
     loaders: [
-      FilesystemLoader('content'),
+      FilesystemLoader('content', keeySuffixPattern: RegExp(r'.*\.txt$')),
       // GithubLoader(
       //   'schultek/jaspr',
       //   accessToken: Platform.environment['GITHUB_ACCESS_TOKEN'],
@@ -33,6 +33,7 @@ void runGithub() {
       MemoryLoader(pages: [
         MemoryPage(
           path: 'robots.txt',
+          keepSuffix: true,
           content: '''
             This is a robots file
             Data is: {{info.what}}
@@ -71,7 +72,7 @@ void runGithub() {
         Tabs(),
       ],
       layouts: [
-        EmptyLayout(),
+        //EmptyLayout(),
         BlogLayout(
           header: Header(
             title: 'Jasprs',

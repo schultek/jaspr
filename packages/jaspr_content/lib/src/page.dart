@@ -35,7 +35,7 @@ class Page {
   /// The url of the page, e.g. '/', '/some/path'.
   final String url;
 
-  /// The content of the page.
+  /// The (unparsed) content of the page.
   ///
   /// This may be modified by the different modules during the page building process.
   String content;

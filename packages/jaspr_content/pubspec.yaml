@@ -40,3 +40,7 @@ dependency_overrides:
     git:
       url: https://github.com/Rodsevich/mustache
       ref: 119cd0799e9c7b55397521ace7ca73787a32ef8d
+
+screenshots:
+  - description: The jaspr_content logo
+    path: screenshots/logo.png

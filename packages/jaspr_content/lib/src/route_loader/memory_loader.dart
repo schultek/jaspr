@@ -24,7 +24,7 @@ class MemoryLoader extends RouteLoaderBase {
   Future<List<RouteEntity>> loadPageEntities() async {
     final entities = <RouteEntity>[];
     for (final page in _pages) {
-      entities.add(SourceRoute(page.path, page.path, keepSuffix: true));
+      entities.add(SourceRoute(page.path, page.path, keepSuffix: page.keepSuffix));
     }
     return entities;
   }
@@ -43,19 +43,31 @@ class MemoryLoader extends RouteLoaderBase {
 class MemoryPage {
   const MemoryPage({
     required this.path,
+    this.keepSuffix = false,
     this.content,
     this.data = const {},
   }) : builder = null;
   
   const MemoryPage.builder({
     required this.path,
+    this.keepSuffix = false,
     this.builder,
     this.data = const {},
   }) : content = null;
 
+  /// The path to the page.
   final String path;
+
+  /// Whether to keep the suffix of the page.
+  final bool keepSuffix;
+
+  /// The content of the page.
   final String? content;
+
+  /// A builder function to create the page.
   final Component Function(Page page)? builder;
+
+  /// The initial data to pass to the page.
   final Map<String, dynamic> data;
 }
 

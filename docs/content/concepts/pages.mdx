@@ -27,6 +27,78 @@ For a single page, the following steps are taken:
 
 All of the different parts used to build a page are configurable. They can be switched out, extended, or replaced with custom implementations. This allows you to create a content-driven site that fits your needs perfectly.
 
+---
+
+## Page
+
+The `Page` class is the main data object that holds all information about a single page.
+
+<Card title="Fields" icon="file">
+  <Property name="path" type="String">
+    The path of the page including its suffix, e.g. 'index.html', 'some/path.md'.
+  </Property>
+
+  ---
+
+  <Property name="url" type="String">
+    The url of the page, e.g. '/', '/some/path'.
+  </Property>
+
+  ---
+
+  <Property name="content" type="String">
+    The (unparsed) content of the page.
+
+    This may be modified by the different modules during the page building process.
+  </Property>
+
+  ---
+
+  <Property name="data" type="Map<String, dynamic>">
+    Additional data for the page.
+
+    This contains data from the frontmatter, data loaders, and any other data that is added to the page during the building process.
+
+    This may be modified by the different modules during the page building process.
+  </Property>
+
+  ---
+
+  <Property name="config" type="PageConfig">
+    The configuration for the page. 
+
+    This determines how the page is built.
+  </Property>
+</Card>
+
+Each part in the pipeline can modify the page's content or data by using the `apply()` method like this:
+
+```dart
+page.apply(
+  content: 'updated content',
+  data: {'key': 'value'},
+);
+```
+
+With this the content is overridden and the data is deeply merged with the existing data, unless `mergeData` is set to `false`.
+
+### Accessing a Page
+
+For most parts of the pipeline, you will have access to the page object directly. E.g. a `DataLoader` will receive the current page as an argument in its `loadData(Page page)` method.
+
+You can also access the current page from within any Jaspr component by using the `context.page` extension getter:
+
+```dart
+class MyComponent extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync {
+    yield text('Page URL: ${context.page.url}');
+  }
+}
+```
+
+---
+
 ## PageConfig
 
 The `PageConfig` class is the main configuration object for a page. It holds all the settings for loading, parsing, and rendering the page.
