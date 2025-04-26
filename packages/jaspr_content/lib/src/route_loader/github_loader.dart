@@ -21,7 +21,7 @@ class GithubLoader extends RouteLoaderBase {
     super.debugPrint,
   });
 
-  /// The repository to load pages from. Must be in the form '<owner>/<repo>'.
+  /// The repository to load pages from. Must be in the form `'<owner>/<repo>'`.
   final String repo;
 
   /// The branch, tag or commit to checkout the repository at.

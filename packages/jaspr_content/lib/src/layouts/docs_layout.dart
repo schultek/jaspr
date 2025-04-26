@@ -5,9 +5,9 @@ library;
 import 'package:jaspr/server.dart' as jaspr;
 import 'package:jaspr/server.dart';
 
-import '../theme/theme.dart';
 import '../page.dart';
 import '../page_extension/table_of_contents_extension.dart';
+import '../theme/theme.dart';
 import 'page_layout.dart';
 
 /// A layout for documentation pages.

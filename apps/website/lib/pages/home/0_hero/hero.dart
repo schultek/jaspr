@@ -71,10 +71,10 @@ class Hero extends StatelessComponent {
             css('.pill-content').styles(
               display: Display.flex,
               padding: Padding.symmetric(vertical: 0.5.rem, horizontal: 0.8.rem),
-              fontWeight: FontWeight.w700,
-              fontSize: 0.8.rem,
               gap: Gap(column: 0.5.rem),
               color: textBlack,
+              fontSize: 0.8.rem,
+              fontWeight: FontWeight.w700,
             ),
           ]),
           css('& > div').styles(

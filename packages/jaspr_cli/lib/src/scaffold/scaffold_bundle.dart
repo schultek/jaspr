@@ -56,7 +56,7 @@ final scaffoldBundle = MasonBundle.fromJson(<String, dynamic>{
     {
       "path": "lib/constants/server#theme.dart",
       "data":
-          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2phc3ByLmRhcnQnOwoKLy8gQXMgeW91ciBjc3Mgc3R5bGVzIGFyZSBkZWZpbmVkIHVzaW5nIGp1c3QgRGFydCwgeW91IGNhbiBzaW1wbHkKLy8gdXNlIGdsb2JhbCB2YXJpYWJsZXMgb3IgbWV0aG9kcyBmb3IgY29tbW9uIHRoaW5ncyBsaWtlIGNvbG9ycy4KY29uc3QgcHJpbWFyeUNvbG9yID0gQ29sb3IuaGV4KCcjMDE1ODlCJyk7Cg==",
+          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2phc3ByLmRhcnQnOwoKLy8gQXMgeW91ciBjc3Mgc3R5bGVzIGFyZSBkZWZpbmVkIHVzaW5nIGp1c3QgRGFydCwgeW91IGNhbiBzaW1wbHkKLy8gdXNlIGdsb2JhbCB2YXJpYWJsZXMgb3IgbWV0aG9kcyBmb3IgY29tbW9uIHRoaW5ncyBsaWtlIGNvbG9ycy4KY29uc3QgcHJpbWFyeUNvbG9yID0gQ29sb3IoJyMwMTU4OUInKTsK",
       "type": "text"
     },
     {

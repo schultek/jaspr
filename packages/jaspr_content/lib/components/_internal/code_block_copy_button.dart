@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:universal_web/web.dart' as web;
 import 'package:jaspr/jaspr.dart';
+import 'package:universal_web/web.dart' as web;
 
 import 'icon.dart';
 
@@ -11,6 +11,7 @@ class CodeBlockCopyButton extends StatefulComponent {
     super.key,
   });
 
+  @override
   State<CodeBlockCopyButton> createState() => _CodeBlockCopyButtonState();
 }
 

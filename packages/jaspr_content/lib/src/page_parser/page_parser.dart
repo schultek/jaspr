@@ -137,7 +137,6 @@ class NodesBuilder {
     if (nodes == null || nodes.isEmpty) {
       return null;
     }
-    ;
     return Fragment(children: _buildNodes(nodes));
   }
 
