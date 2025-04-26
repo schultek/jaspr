@@ -4,3 +4,165 @@ description: Create custom components to use in your content.
 ---
 
 ---
+
+With custom components you can use any normal Jaspr component in your content files. 
+
+This enables you to enhance your content with more visual or interactive experiences for your visitors over what is possible with only Markdown.
+
+## Using Components
+
+To use components in your content, you can use the html-like `<Component>` syntax. For example, the `<Info>` component can be used to display an informational message more visible to users:
+
+```markdown
+<Info>This draws attention to useful page information.</Info>
+```
+
+The inner content of a component can contain normal markdown or even other components, which will be rendered as its children. Additionally, components can also take attributes to further customize their behavior: 
+
+```markdown
+<Tabs>
+  <TabItem name="Tab 1" value="1">
+    **First Item**
+  </TabItem>
+  <TabItem name="Tab 2" value="2">
+    *Second Item*
+  </TabItem>
+</Tabs>
+```
+
+## Adding Components
+
+To make a custom component available for use in your content, add it to the `components` list of `ContentApp` or `PageConfig`:
+
+```dart
+ContentApp(
+  ...
+  components: [
+    Callout(),
+    Tabs(),
+  ],
+);
+```
+
+The `Callout` and `Tabs` components are provided by `jaspr_content` itself. But you can also easily add your own Jaspr component by wrapping it in a `CustomComponent` object.
+
+## Creating Custom Components
+
+Say you have a normal Jaspr component like this:
+
+```dart
+class Card extends StatelessComponent {
+  const Card({this.title, this.child, super.key});
+
+  final String? title;
+  final Component? child;
+
+  ...
+}
+```
+
+To make this available as a custom `<Card>` component in your content, add the following to your app:
+
+```dart
+ContentApp(
+  ...
+  components: [
+    CustomComponent(
+      pattern: 'Card',
+      builder: (name, attributes, child) {
+        return Card(title: attributes['title'], child: child);
+      }
+    ),
+  ],
+);
+```
+
+Then you can write markdown like this to render your card component:
+
+```markdown
+<Card>Simple card with no title.</Card>
+
+<Card title="My Single Card">Simple card with title.</Card>
+
+<Card title="My Markdown Card">
+  Card that contains **markdown content**.
+
+  > You can even nest components like this:
+
+  <Card>Nested card</Card>
+</Card>
+```
+
+---
+
+The `CustomComponent` constructor takes the following parameters:
+
+<Property name="pattern" type="Pattern" required>
+  A `String` or `RegExp` that matches the component name in your content.
+</Property>
+
+---
+
+<Property name="builder" type="Component Function(...)" required>
+  A builder function that builds the Jaspr component.
+  
+  It receives the following parameters:
+  
+  <Card>
+    <Property name="name" type="String">
+      The component name matched by `pattern`. 
+    </Property>
+    
+    ---
+
+    <Property name="attributes" type="Map<String, String>">
+      The parsed attributes.
+    </Property>
+
+    ---
+
+    <Property name="child" type="Component?">
+      The inner content of the component. 
+      This is `null` when using the self-closing `<Component />` syntax.
+    </Property>
+    
+   </Card>
+</Property>
+
+### Syntax Overrides
+
+Some of `jaspr_content`s provided components like [`CodeBlock`](/content/components/code_block) and [`Image`](/content/components/image) override their respective standard markdown syntax in addition to the `<Component>` syntax. For example when using the `CodeBlock` component, any standard markdown codeblock will be rendered as this component.
+
+To add similar functionality to your own custom components, instead of using the `CustomComponent()` constructor, create a class implementing `CustomComponent` like this:
+
+```dart
+class CustomCard implements CustomComponent {
+
+  @override
+  Component? create(Node node, NodesBuilder builder) {
+    ...
+  }
+}
+```
+
+Here instead of using a `pattern`, you must implement the `create` method to detect and build your component. It will be called for each parsed `Node` from the content and should return either a `Component` to override this node or `null` otherwise.
+
+<Info>
+For more information on what a `Node` is and how to use it, check out the [Page Parsing](/content/concepts/page_parsing) docs.
+</Info>
+
+For example, to override the standard `blockquote` markdown syntax, write the following:
+
+```dart
+@override
+Component? create(Node node, NodesBuilder builder) {
+  if (node case ElementNode(tag: 'blockquote', :List<Node>? children)) {
+    return Card(child: builder.build(children));
+  }
+  return null;
+}
+```
+
+<Info>
+You can also use this in combination with custom markdown syntaxes. Checkout the [Markdown Parsing](/content/concepts/page_parsing#markdown) docs for more info.
+</Info>

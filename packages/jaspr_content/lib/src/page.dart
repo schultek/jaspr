@@ -115,7 +115,7 @@ class Page {
 
       var nodes = parseNodes();
       nodes = applyExtensions(nodes);
-      final component = Content(NodesBuilder(config.components).build(nodes));
+      final component = Content(NodesBuilder(config.components).build(nodes) ?? const Text(''));
       final layout = buildLayout(component);
       yield wrapTheme(layout);
     });

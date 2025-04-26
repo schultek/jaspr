@@ -73,7 +73,7 @@ void runGithub() {
         Tabs(),
         CustomComponent(
           pattern: 'Clicker',
-          build: (_, __, ___) => Clicker(),
+          builder: (_, __, ___) => Clicker(),
         ),
       ],
       layouts: [

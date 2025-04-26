@@ -80,7 +80,7 @@ abstract class CustomComponent {
   /// Creates a custom component with the given pattern and builder.
   factory CustomComponent({
     required Pattern pattern,
-    required CustomComponentBuilder build,
+    required CustomComponentBuilder builder,
   }) = _CustomComponent;
 }
 
@@ -109,16 +109,16 @@ abstract mixin class CustomComponentBase implements CustomComponent {
 class _CustomComponent extends CustomComponentBase {
   const _CustomComponent({
     required this.pattern,
-    required CustomComponentBuilder build,
-  }) : _build = build;
+    required CustomComponentBuilder builder,
+  }) : _builder = builder;
 
   @override
   final Pattern pattern;
-  final CustomComponentBuilder _build;
+  final CustomComponentBuilder _builder;
 
   @override
   Component apply(String name, Map<String, String> attributes, Component? child) {
-    return _build(name, attributes, child);
+    return _builder(name, attributes, child);
   }
 }
 
@@ -133,7 +133,10 @@ class NodesBuilder {
   final List<CustomComponent> components;
 
   /// Builds a component from the given nodes.
-  Component build(List<Node> nodes) {
+  Component? build(List<Node>? nodes) {
+    if (nodes == null || nodes.isEmpty) {
+      return null;
+    };
     return Fragment(children: _buildNodes(nodes));
   }
 

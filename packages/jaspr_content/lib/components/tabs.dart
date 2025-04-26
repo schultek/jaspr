@@ -30,7 +30,7 @@ class Tabs implements CustomComponent {
             TabItem(
               label: tab.attributes['label'] ?? '',
               value: tab.attributes['value'] ?? '',
-              child: tab.children != null ? builder.build(tab.children!) : const Text(''),
+              child: builder.build(tab.children) ?? const Text(''),
             ),
         ],
       );
