@@ -1,3 +1,4 @@
+import 'package:content_site/clicker.dart';
 import 'package:content_site/jaspr_options.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_content/components/code_block.dart';
@@ -70,6 +71,10 @@ void runGithub() {
         Image(zoom: true),
         CodeBlock(),
         Tabs(),
+        CustomComponent(
+          pattern: 'Clicker',
+          build: (_, __, ___) => Clicker(),
+        ),
       ],
       layouts: [
         //EmptyLayout(),

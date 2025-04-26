@@ -47,6 +47,9 @@ class _Color implements Color {
 
   @override
   String get value => _value;
+
+  @override
+  String toString() => 'Color($_value)';
 }
 
 class _ValueColor implements Color {

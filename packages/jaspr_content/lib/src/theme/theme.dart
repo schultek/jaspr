@@ -20,30 +20,36 @@ class ContentTheme {
     List<ColorToken> colors = const [],
   }) {
     return ContentTheme.custom(
-      colors: ContentColors._base.apply(colors: {
+      colors: ContentColors._base.apply(colors: [
         ...colors,
         if (primary != null) ContentColors.primary.apply(primary),
         if (background != null) ContentColors.background.apply(background),
         if (text != null) ContentColors.text.apply(text),
-      }),
+      ]),
     );
   }
 
   /// Creates a new theme with the provided colors and typography.
   const ContentTheme.custom({this.colors, this.typography});
 
-  final Set<ColorToken>? colors;
+  final List<ColorToken>? colors;
   final ContentTypography? typography;
 
   ContentTheme apply({
-    Set<ColorToken>? colors,
+    List<ColorToken>? colors,
     ContentTypography? typography,
+    bool mergeColors = true,
   }) {
-    return copyWith(colors: colors, typography: typography);
+    return copyWith(
+      colors: mergeColors && this.colors != null && colors != null
+          ? this.colors?.apply(colors: colors)
+          : colors ?? this.colors,
+      typography: typography,
+    );
   }
 
   ContentTheme copyWith({
-    Set<ColorToken>? colors,
+    List<ColorToken>? colors,
     ContentTypography? typography,
   }) {
     return ContentTheme.custom(
@@ -73,7 +79,7 @@ class ContentTheme {
 class ContentColors {
   const ContentColors._();
 
-  static final Set<ColorToken> _base = {
+  static final List<ColorToken> _base = [
     primary,
     background,
     text,
@@ -94,10 +100,10 @@ class ContentColors {
     preBg,
     thBorders,
     tdBorders,
-  };
+  ];
 
   static final ColorToken primary = ColorToken('primary', ColorTheme.gray.$900, dark: Colors.white);
-  static final ColorToken background = ColorToken('background', ColorTheme.gray.$100, dark: ColorTheme.gray.$900);
+  static final ColorToken background = ColorToken('background', ColorTheme.gray.$100, dark: ColorTheme.gray.$950);
   static final ColorToken text = ColorToken('text', ColorTheme.gray.$700, dark: ColorTheme.gray.$200);
   static final ColorToken headings = ColorToken('content-headings', ColorTheme.gray.$900, dark: Colors.white);
   static final ColorToken lead = ColorToken('content-lead', ColorTheme.gray.$600, dark: ColorTheme.gray.$400);
@@ -121,12 +127,17 @@ class ContentColors {
       ColorToken('content-td-borders', ColorTheme.gray.$200, dark: ColorTheme.gray.$700);
 }
 
-extension on Set<ColorToken> {
-  Set<ColorToken> apply({
-    Set<ColorToken>? colors,
+extension on List<ColorToken> {
+  List<ColorToken> apply({
+    List<ColorToken>? colors,
     bool mergeColors = true,
   }) {
-    return mergeColors && colors != null ? {...this, ...colors} : colors ?? this;
+    if (mergeColors && colors != null) {
+      final map = {for (final color in this) color.name: color, for (final color in colors) color.name: color};
+      return map.values.toList();
+    } else {
+      return colors ?? this;
+    }
   }
 
   List<StyleRule> build() {

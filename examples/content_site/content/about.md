@@ -7,6 +7,8 @@ sitemap:
 
 # Documentation
 
+<Clicker />
+
 ## Introduction
 
 ## Features

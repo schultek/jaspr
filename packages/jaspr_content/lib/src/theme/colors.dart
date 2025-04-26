@@ -9,6 +9,17 @@ class ThemeColor implements Color {
 
   @override
   String get value => light.value;
+
+  @override
+  operator ==(Object other) {
+    return other is ThemeColor && other.light == light && other.dark == dark;
+  }
+
+  @override
+  int get hashCode => Object.hash(light, dark);
+
+  @override
+  String toString() => 'ThemeColor($light, dark: $dark)';
 }
 
 /// A color token that can be used in a theme.
@@ -30,14 +41,14 @@ class ColorToken extends ThemeColor {
 
   @override
   operator ==(Object other) {
-    return other is ColorToken && other.name == name;
+    return other is ColorToken && other.name == name && other.light == light && other.dark == dark;
   }
 
   @override
-  int get hashCode => name.hashCode;
+  int get hashCode => Object.hash(name, light, dark);
 
   @override
-  String toString() => 'ColorToken($name)';
+  String toString() => 'ColorToken($name, light: $light, dark: $dark)';
 }
 
 /// A vast and beautiful color theme.
