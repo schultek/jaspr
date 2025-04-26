@@ -45,6 +45,8 @@ class DocsLayout extends PageLayoutBase {
 
   @override
   Component buildBody(Page page, Component child) {
+    final pageData = page.data['page'] ?? {};
+
     return div(classes: 'docs', [
       if (header case final header?)
         div(classes: 'header-container', attributes: {
@@ -62,11 +64,9 @@ class DocsLayout extends PageLayoutBase {
           div([
             div(classes: 'content-container', [
               div(classes: 'content-header', [
-                h1([
-                  text(page.data['title'] ?? 'Documentation'),
-                ]),
-                if (page.data['description'] case String description) p([text(description)]),
-                if (page.data['image'] case String image) img(src: image, alt: page.data['imageAlt']),
+                if (pageData['title'] case String title) h1([text(title)]),
+                if (pageData['description'] case String description) p([text(description)]),
+                if (pageData['image'] case String image) img(src: image, alt: pageData['imageAlt']),
               ]),
               child,
               if (footer case final footer?)
@@ -180,15 +180,16 @@ class DocsLayout extends PageLayoutBase {
                   css('.content-header', [
                     css('&').styles(
                       margin: Margin.only(bottom: 2.rem),
+                      color: ContentColors.headings,
                     ),
                     css('h1').styles(
-                      fontSize: 1.875.rem,
+                      fontSize: 2.rem,
                       lineHeight: 2.25.rem,
                     ),
                     css('p').styles(
-                      fontSize: 1.125.rem,
-                      lineHeight: 1.75.rem,
-                      margin: Margin.only(top: 1.rem),
+                      fontSize: 1.25.rem,
+                      lineHeight: 1.25.rem,
+                      margin: Margin.only(top: .75.rem),
                     ),
                     css('img').styles(
                       margin: Margin.only(top: 1.rem),

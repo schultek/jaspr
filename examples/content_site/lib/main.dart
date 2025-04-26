@@ -61,8 +61,8 @@ void runGithub() {
         MarkdownParser(),
       ],
       extensions: [
-        //TableOfContentsExtension(),
-        HeadingAnchorExtension(),
+        TableOfContentsExtension(),
+        //HeadingAnchorExtension(),
       ],
       components: [
         Callout(),
@@ -80,16 +80,17 @@ void runGithub() {
         //EmptyLayout(),
         // BlogLayout(
         //   header: Header(
-        //     title: 'Jasprs',
+        //     title: 'Jaspr Blog',
         //     logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',
         //     items: [
+        //       ThemeToggle(),
         //       GithubButton(repo: 'schultek/jaspr'),
         //     ],
         //   ),
         // ),
         DocsLayout(
           header: Header(
-            title: 'Jasprs',
+            title: 'Jaspr',
             logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',
             items: [
               ThemeToggle(),
@@ -99,26 +100,20 @@ void runGithub() {
           sidebar: Sidebar(groups: [
             SidebarGroup(
               links: [
-                SidebarLink(text: "\uD83D\uDCD6 Overview", href: '/'),
-                SidebarLink(text: "\uD83E\uDD4A Jaspr vs Flutter Web", href: '/jaspr-vs-flutter-web'),
-                SidebarLink(text: "\uD83E\uDD4A About", href: '/about'),
+                SidebarLink(text: "Overview", href: '/docs'),
               ],
             ),
             SidebarGroup(title: 'Get Started', links: [
-              SidebarLink(text: "\uD83D\uDEEB Quickstart", href: '/get_started/quick_start'),
-              SidebarLink(text: "\uD83D\uDCDF Rendering Modes", href: '/get_started/modes'),
-              SidebarLink(text: "\uD83D\uDCA7 Server vs Client", href: '/get_started/server_client'),
-              SidebarLink(text: "\uD83D\uDD79 Jaspr CLI", href: '/get_started/cli'),
-              SidebarLink(text: "\uD83D\uDCE6 Project Structure", href: '/get_started/project_structure'),
-              SidebarLink(text: "\uD83E\uDDF9 Linting", href: '/get_started/linting'),
+              SidebarLink(text: "Quickstart", href: '/get_started/quick_start'),
+              SidebarLink(text: "Installation", href: '/get_started/installation'),
             ]),
           ]),
         ),
       ],
-      theme: ContentTheme(
-        primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
-        background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
-      ),
+      // theme: ContentTheme(
+      //   primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
+      //   background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
+      // ),
     ),
   ));
 }

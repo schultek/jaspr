@@ -150,7 +150,7 @@ class BlogLayout extends PageLayoutBase {
                   css('span').styles(
                     padding: Padding.symmetric(horizontal: 0.75.rem, vertical: 0.25.rem),
                     radius: BorderRadius.circular(10.rem),
-                    backgroundColor: ContentColors.preCode,
+                    backgroundColor: ContentColors.hr,
                     fontSize: 0.875.rem,
                   )
                 ])
