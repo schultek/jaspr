@@ -5,36 +5,16 @@ sitemap:
   changefreq: "weekly"
 ---
 
-# About
+# Documentation
 
-This is the about pages TEST HALLO
+## Introduction
 
-Framework: {{details.framework}}
+## Features
 
-## Info
+### Key Highlights
 
-{{ info.what }}
+## Getting Started
 
-<Info> Hello World </Info>
+### Installation
 
-## Test
-
-<Warning> 
-  * Hello World 
-  
-</Warning>
-
-<Error> Hello World </Error>
-
-<Success> Hello World </Success>
-
-[Home](/)
-
-
-# Frequently Asked Questions
-
-{{#faq}}
-## {{question}}
-
-> {{answer}}
-{{/faq}}
+### Configuration

@@ -73,15 +73,15 @@ void runGithub() {
       ],
       layouts: [
         //EmptyLayout(),
-        BlogLayout(
-          header: Header(
-            title: 'Jasprs',
-            logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',
-            items: [
-              GithubButton(repo: 'schultek/jaspr'),
-            ],
-          ),
-        ),
+        // BlogLayout(
+        //   header: Header(
+        //     title: 'Jasprs',
+        //     logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',
+        //     items: [
+        //       GithubButton(repo: 'schultek/jaspr'),
+        //     ],
+        //   ),
+        // ),
         DocsLayout(
           header: Header(
             title: 'Jasprs',

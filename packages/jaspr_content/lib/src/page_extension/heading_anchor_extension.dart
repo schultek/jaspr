@@ -13,6 +13,7 @@ class HeadingAnchorExtension implements PageExtension {
     this.maxHeaderDepth = 3,
   });
 
+  /// The maximum header depth to generate anchors for.
   final int maxHeaderDepth;
 
   static final _headerRegex = RegExp(r'^h(\d)$', caseSensitive: false);
