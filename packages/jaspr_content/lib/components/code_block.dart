@@ -28,7 +28,7 @@ class CodeBlock implements CustomComponent {
   final String defaultLanguage;
 
   /// The available grammars for the code block.
-  /// 
+  ///
   /// The key is the name of the language.
   /// The value is a json encoded string of the grammar.
   final Map<String, String> grammars;
@@ -71,7 +71,6 @@ class CodeBlock implements CustomComponent {
     }
     return null;
   }
-
 
   @css
   static List<StyleRule> get styles => [
@@ -139,5 +138,4 @@ class _CodeBlock extends StatelessComponent {
       for (final t in textSpan.children) buildSpan(t),
     ]);
   }
-
 }

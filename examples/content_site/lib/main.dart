@@ -60,7 +60,7 @@ void runGithub() {
         MarkdownParser(),
       ],
       extensions: [
-        TableOfContentsExtension(),
+        //TableOfContentsExtension(),
         HeadingAnchorExtension(),
       ],
       components: [

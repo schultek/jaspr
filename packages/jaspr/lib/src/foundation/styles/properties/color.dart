@@ -1,7 +1,6 @@
 abstract class Color {
-
   /// Constructs a [Color] from a css color value.
-  /// 
+  ///
   /// [value] must be a valid css color value, e.g. a color name, a hex value etc.
   const factory Color(String value) = _Color;
 

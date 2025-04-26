@@ -1,5 +1,5 @@
+/// @docImport 'content.dart';
 /// @docImport 'data_loader/data_loader.dart';
-/// @docImport 'content/content.dart';
 library;
 
 import 'dart:async';
@@ -7,7 +7,6 @@ import 'dart:async';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart' hide RouteLoader;
 
-import 'content/theme.dart';
 import 'data_loader/filesystem_data_loader.dart';
 import 'layouts/page_layout.dart';
 import 'page.dart';
@@ -16,6 +15,7 @@ import 'page_parser/page_parser.dart';
 import 'route_loader/filesystem_loader.dart';
 import 'route_loader/route_loader.dart';
 import 'template_engine/template_engine.dart';
+import 'theme/theme.dart';
 
 /// The root component for building a content-driven site.
 ///
@@ -49,7 +49,7 @@ class ContentApp extends AsyncStatelessComponent {
   /// For a more customized setup, use [ContentApp.custom].
   ContentApp({
     /// The directory to load pages from.
-    /// 
+    ///
     /// This is relative to the root of the project.
     String directory = 'content',
 
@@ -88,7 +88,6 @@ class ContentApp extends AsyncStatelessComponent {
 
     /// The [ContentTheme] to use for the pages.
     ContentTheme? theme,
-
     bool debugPrint = false,
   })  : loaders = [FilesystemLoader(directory, debugPrint: debugPrint)],
         configResolver = PageConfig.all(

@@ -192,5 +192,4 @@ final List<StyleRule> resetStyles = [
     maxWidth: 100.percent,
     height: Unit.auto,
   ),
-
 ];

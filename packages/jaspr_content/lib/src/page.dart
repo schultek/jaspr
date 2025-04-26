@@ -4,8 +4,7 @@ import 'dart:convert';
 import 'package:fbh_front_matter/fbh_front_matter.dart' as fm;
 import 'package:jaspr/server.dart';
 
-import 'content/content.dart';
-import 'content/theme.dart';
+import 'content.dart';
 import 'data_loader/data_loader.dart';
 import 'layouts/page_layout.dart';
 import 'page_extension/page_extension.dart';
@@ -13,6 +12,7 @@ import 'page_parser/page_parser.dart';
 import 'route_loader/route_loader.dart';
 import 'secondary_output/secondary_output.dart';
 import 'template_engine/template_engine.dart';
+import 'theme/theme.dart';
 
 /// A single page of the site.
 ///

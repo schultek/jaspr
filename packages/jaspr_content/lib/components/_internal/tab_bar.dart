@@ -1,6 +1,8 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
 
+import '../../src/theme/theme.dart';
+
 @client
 class TabBar extends StatefulComponent {
   const TabBar({required this.initialValue, required this.items, super.key});
@@ -21,25 +23,19 @@ class TabBar extends StatefulComponent {
             display: Display.flex,
             alignItems: AlignItems.center,
             gap: Gap(column: 1.25.rem),
-            border: Border.only(bottom: BorderSide(width: 1.px, color: Color.variable('--content-hr'))),
+            border: Border.only(bottom: BorderSide(width: 1.px, color: ContentColors.hr)),
           ),
           css('button').styles(
             padding: Padding.symmetric(vertical: 0.75.rem),
             fontWeight: FontWeight.w700,
             border: Border.only(bottom: BorderSide(width: 2.px, color: Colors.transparent)),
           ),
-          css('button:hover').styles(
-            
-            raw: {
-              'border-bottom-color': 'var(--content-hr)',
-            }
-          ),
-          css('button[active]').styles(
-            color: Color.variable('--theme-primary'),
-            raw: {
-              'border-bottom-color': 'var(--theme-primary)',
-            }
-          ),
+          css('button:hover').styles(raw: {
+            'border-bottom-color': ContentColors.hr.value,
+          }),
+          css('button[active]').styles(color: Color.variable('--theme-primary'), raw: {
+            'border-bottom-color': 'var(--theme-primary)',
+          }),
         ]),
       ];
 }

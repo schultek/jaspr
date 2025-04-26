@@ -6,7 +6,7 @@ import '../page_parser/page_parser.dart';
 import 'page_extension.dart';
 
 /// An extension that generates anchor links for headers in the page.
-/// 
+///
 /// The resulting anchor links are appended to the headers as a clickable '#' symbol.
 class HeadingAnchorExtension implements PageExtension {
   HeadingAnchorExtension({

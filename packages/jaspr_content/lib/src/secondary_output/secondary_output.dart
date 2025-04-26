@@ -1,4 +1,3 @@
-
 import 'package:jaspr/jaspr.dart';
 
 import '../page.dart';
@@ -12,7 +11,7 @@ abstract class SecondaryOutput {
   String createRoute(String route);
 
   /// Builds the secondary output component for a page.
-  /// 
+  ///
   /// This is called after the template rendering, but before the page parsing.
   Component build(Page page);
 }

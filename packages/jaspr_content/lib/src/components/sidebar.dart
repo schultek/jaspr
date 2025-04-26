@@ -1,7 +1,7 @@
 import 'package:jaspr/server.dart';
 
 import '../../components/_internal/icon.dart';
-import '../content/theme.dart';
+import '../theme/theme.dart';
 import '../page.dart';
 
 class SidebarGroup {
@@ -115,7 +115,7 @@ class Sidebar extends StatelessComponent {
                 ),
                 css('&.active').styles(
                   opacity: 1,
-                  color: ContentTheme.primary,
+                  color: ContentColors.primary,
                   fontWeight: FontWeight.w700,
                   backgroundColor: Color('color-mix(in srgb, currentColor 15%, transparent)'),
                 ),

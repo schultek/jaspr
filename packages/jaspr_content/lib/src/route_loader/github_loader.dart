@@ -96,7 +96,8 @@ class GithubLoader extends RouteLoaderBase {
         var segment = segments[i];
         current = (current[segment] ??= <String, dynamic>{});
       }
-      current[segments.last] = SourceRoute(segments.last, file['url'], keepSuffix: keeySuffixPattern?.matchAsPrefix(path) != null);
+      current[segments.last] =
+          SourceRoute(segments.last, file['url'], keepSuffix: keeySuffixPattern?.matchAsPrefix(path) != null);
     }
 
     RouteEntity? getEntity(MapEntry<String, dynamic> entry) {

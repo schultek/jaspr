@@ -26,7 +26,7 @@ class Jaspr {
   static bool _useIsolates = true;
 
   static List<String> get allowedPathSuffixes => _allowedPathSuffixes;
-  static  List<String> _allowedPathSuffixes = [];
+  static List<String> _allowedPathSuffixes = [];
 }
 
 /// Global options for configuring jaspr. DO NOT USE DIRECTLY.

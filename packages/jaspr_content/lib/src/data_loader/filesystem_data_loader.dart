@@ -52,7 +52,7 @@ class FilesystemDataLoader implements DataLoader {
 
     _data ??= _loadData(Directory(directory));
     _pages.add(page);
-    
+
     var pageData = page.data['page'] ?? {};
     page.apply(data: await _data);
     page.apply(data: {'page': pageData});

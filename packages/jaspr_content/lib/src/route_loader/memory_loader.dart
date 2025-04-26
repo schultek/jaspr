@@ -47,7 +47,7 @@ class MemoryPage {
     this.content,
     this.data = const {},
   }) : builder = null;
-  
+
   const MemoryPage.builder({
     required this.path,
     this.keepSuffix = false,

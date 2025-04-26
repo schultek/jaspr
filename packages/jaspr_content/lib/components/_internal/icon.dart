@@ -1,5 +1,5 @@
 /// A collection of icons used in the application.
-/// 
+///
 /// The icon paths are sourced from lucide icons (https://lucide.dev/icons).
 library;
 

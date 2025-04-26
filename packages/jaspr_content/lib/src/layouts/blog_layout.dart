@@ -4,7 +4,7 @@ library;
 import 'package:jaspr/server.dart' as jaspr;
 import 'package:jaspr/server.dart';
 
-import '../content/theme.dart';
+import '../theme/theme.dart';
 import '../page.dart';
 import 'page_layout.dart';
 
@@ -74,7 +74,7 @@ class BlogLayout extends PageLayoutBase {
             css('&').styles(
               position: Position.sticky(top: Unit.zero, left: Unit.zero, right: Unit.zero),
               zIndex: ZIndex(10),
-              backgroundColor: ContentTheme.background,
+              backgroundColor: ContentColors.background,
             ),
           ]),
           css('.main-container', [
@@ -98,7 +98,7 @@ class BlogLayout extends PageLayoutBase {
                   css('h1').styles(
                     fontSize: 2.75.rem,
                     lineHeight: 3.25.rem,
-                    color: Color.variable('--content-headings'),
+                    color: ContentColors.headings,
                   ),
                   css('.post-info', [
                     css('&').styles(
@@ -112,7 +112,7 @@ class BlogLayout extends PageLayoutBase {
                       css('&').styles(
                         display: Display.flex,
                         flexDirection: FlexDirection.column,
-                        color: Color.variable('--content-text'),
+                        color: ContentColors.text,
                       ),
                       css(':first-child').styles(
                         fontSize: 1.125.rem,
@@ -138,7 +138,6 @@ class BlogLayout extends PageLayoutBase {
                     FontFamilies.times,
                     FontFamilies.serif,
                   ])),
-                  
                 ]),
                 css('.post-tags', [
                   css('&').styles(
@@ -151,7 +150,7 @@ class BlogLayout extends PageLayoutBase {
                   css('span').styles(
                     padding: Padding.symmetric(horizontal: 0.75.rem, vertical: 0.25.rem),
                     radius: BorderRadius.circular(10.rem),
-                    backgroundColor: Color.variable('--content-pre-code'),
+                    backgroundColor: ContentColors.preCode,
                     fontSize: 0.875.rem,
                   )
                 ])

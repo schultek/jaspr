@@ -11,12 +11,24 @@ class ContentTypography {
 
   final Styles styles;
   final List<StyleRule> rules;
+
+  ContentTypography apply({
+    Styles? styles,
+    List<StyleRule>? rules,
+    bool mergeStyles = true,
+    bool mergeRules = true,
+  }) {
+    return ContentTypography(
+      styles: mergeStyles && styles != null ? this.styles.combine(styles) : styles ?? this.styles,
+      rules: mergeRules && rules != null ? [...this.rules, ...rules] : rules ?? this.rules,
+    );
+  }
 }
 
 extension on ContentTypography {
   StyleRule build() {
     return css('.content', [
-      css('&').styles(color: ContentTheme.text).combine(styles),
+      css('&').styles(color: ContentColors.text).combine(styles),
       ..._scopeContent([
         ..._contentStyles,
         ...rules,
@@ -40,12 +52,12 @@ List<StyleRule> _scopeContent(List<StyleRule> rules) {
 
 final List<StyleRule> _contentStyles = [
   css('a').styles(
-    color: Color.variable('--content-links'),
+    color: ContentColors.links,
     textDecoration: TextDecoration(line: TextDecorationLine.underline),
     fontWeight: FontWeight.w500,
   ),
   css('strong').styles(
-    color: Color.variable('--content-bold'),
+    color: ContentColors.bold,
     fontWeight: FontWeight.w600,
   ),
   css('a strong').styles(
@@ -92,17 +104,17 @@ final List<StyleRule> _contentStyles = [
   ),
   css('ol > li::marker').styles(
     fontWeight: FontWeight.w400,
-    color: Color.variable('--content-counters'),
+    color: ContentColors.counters,
   ),
   css('ul > li::marker').styles(
-    color: Color.variable('--content-bullets'),
+    color: ContentColors.bullets,
   ),
   css('dt').styles(
-    color: Color.variable('--content-headings'),
+    color: ContentColors.headings,
     fontWeight: FontWeight.w600,
   ),
   css('hr').styles(
-    border: Border(color: Color.variable('--content-hr')),
+    border: Border(color: ContentColors.hr),
     raw: {
       'border-top-width': '1px',
     },
@@ -110,10 +122,10 @@ final List<StyleRule> _contentStyles = [
   css('blockquote').styles(
     fontWeight: FontWeight.w500,
     fontStyle: FontStyle.italic,
-    color: Color.variable('--content-quotes'),
+    color: ContentColors.quotes,
     raw: {
       'border-inline-start-width': '0.25rem',
-      'border-inline-start-color': 'var(--content-quote-borders)',
+      'border-inline-start-color': ContentColors.quoteBorders.value,
       'quotes': '"\\201C""\\201D""\\2018""\\2019"',
     },
   ),
@@ -128,7 +140,7 @@ final List<StyleRule> _contentStyles = [
     },
   ),
   css('h1').styles(
-    color: Color.variable('--content-headings'),
+    color: ContentColors.headings,
     fontWeight: FontWeight.w800,
   ),
   css('h1 strong').styles(
@@ -136,7 +148,7 @@ final List<StyleRule> _contentStyles = [
     color: Color.inherit,
   ),
   css('h2').styles(
-    color: Color.variable('--content-headings'),
+    color: ContentColors.headings,
     fontWeight: FontWeight.w700,
   ),
   css('h2 strong').styles(
@@ -144,7 +156,7 @@ final List<StyleRule> _contentStyles = [
     color: Color.inherit,
   ),
   css('h3').styles(
-    color: Color.variable('--content-headings'),
+    color: ContentColors.headings,
     fontWeight: FontWeight.w600,
   ),
   css('h3 strong').styles(
@@ -152,7 +164,7 @@ final List<StyleRule> _contentStyles = [
     color: Color.inherit,
   ),
   css('h4').styles(
-    color: Color.variable('--content-headings'),
+    color: ContentColors.headings,
     fontWeight: FontWeight.w600,
   ),
   css('h4 strong').styles(
@@ -165,10 +177,10 @@ final List<StyleRule> _contentStyles = [
   css('kbd').styles(
     fontWeight: FontWeight.w500,
     fontFamily: FontFamily.inherit,
-    color: Color.variable('--content-kbd'),
+    color: ContentColors.kbd,
   ),
   css('code').styles(
-    color: Color.variable('--content-code'),
+    color: ContentColors.code,
     fontWeight: FontWeight.w600,
   ),
   css('code::before').styles(
@@ -199,8 +211,8 @@ final List<StyleRule> _contentStyles = [
     color: Color.inherit,
   ),
   css('pre').styles(
-    color: Color.variable('--content-pre-code'),
-    backgroundColor: Color.variable('--content-pre-bg'),
+    color: ContentColors.preCode,
+    backgroundColor: ContentColors.preBg,
     overflow: Overflow.only(x: Overflow.auto),
     fontWeight: FontWeight.w400,
   ),
@@ -235,12 +247,12 @@ final List<StyleRule> _contentStyles = [
     border: Border.only(
       bottom: BorderSide(
         width: 1.px,
-        color: Color.variable('--content-th-borders'),
+        color: ContentColors.thBorders,
       ),
     ),
   ),
   css('thead th').styles(
-    color: Color.variable('--content-headings'),
+    color: ContentColors.headings,
     fontWeight: FontWeight.w600,
     raw: {
       'vertical-align': 'bottom',
@@ -250,7 +262,7 @@ final List<StyleRule> _contentStyles = [
     border: Border.only(
       bottom: BorderSide(
         width: 1.px,
-        color: Color.variable('--content-td-borders'),
+        color: ContentColors.tdBorders,
       ),
     ),
   ),
@@ -266,7 +278,7 @@ final List<StyleRule> _contentStyles = [
     border: Border.only(
       top: BorderSide(
         width: 1.px,
-        color: Color.variable('--content-th-borders'),
+        color: ContentColors.thBorders,
       ),
     ),
   ),
@@ -281,6 +293,6 @@ final List<StyleRule> _contentStyles = [
     },
   ),
   css('figcaption').styles(
-    color: Color.variable('--content-captions'),
+    color: ContentColors.captions,
   ),
 ];

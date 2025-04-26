@@ -35,7 +35,7 @@ class PostBreak extends StatelessComponent with CustomComponentBase {
           css('span').styles(
             width: 4.px,
             height: 4.px,
-            backgroundColor: Color.variable('--content-headings'),
+            backgroundColor: ContentColors.headings,
             radius: BorderRadius.circular(4.px),
           ),
         ])

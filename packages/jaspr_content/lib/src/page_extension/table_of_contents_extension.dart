@@ -6,7 +6,7 @@ import '../page_parser/page_parser.dart';
 import 'page_extension.dart';
 
 /// An extension that generates a table of contents from the headers in the page.
-/// 
+///
 /// The resulting [TableOfContents] object is stored in the page's data under the 'toc' key.
 /// It may be consumed by a layout to display the table of contents.
 class TableOfContentsExtension implements PageExtension {

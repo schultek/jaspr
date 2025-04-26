@@ -5,7 +5,7 @@ library;
 import 'package:jaspr/server.dart' as jaspr;
 import 'package:jaspr/server.dart';
 
-import '../content/theme.dart';
+import '../theme/theme.dart';
 import '../page.dart';
 import '../page_extension/table_of_contents_extension.dart';
 import 'page_layout.dart';
@@ -14,22 +14,26 @@ import 'page_layout.dart';
 ///
 /// This layout includes a sidebar and a header.
 /// It also renders a table of contents when the [TableOfContentsExtension] is applied to the page.
-/// 
+///
 /// It supports light and dark mode and custom theme colors.
-/// 
+///
 /// The sidebar is usually a [Sidebar] component but may be any custom component.
 /// The header is usually a [Header] component but may be any custom component.
 class DocsLayout extends PageLayoutBase {
   const DocsLayout({
     this.sidebar,
     this.header,
+    this.footer,
   });
 
-    /// The sidebar component to render, usually a [Sidebar].
+  /// The sidebar component to render, usually a [Sidebar].
   final Component? sidebar;
-  
-    /// The header component to render, usually a [Header].
+
+  /// The header component to render, usually a [Header].
   final Component? header;
+
+  /// The footer component to render below the content.
+  final Component? footer;
 
   @override
   String get name => 'docs';
@@ -65,14 +69,18 @@ class DocsLayout extends PageLayoutBase {
                 if (page.data['image'] case String image) img(src: image, alt: page.data['imageAlt']),
               ]),
               child,
+              if (footer case final footer?)
+                div(classes: 'content-footer', [
+                  footer,
+                ]),
             ]),
-            if (page.data['toc'] case TableOfContents toc)
-              aside(classes: 'toc', [
+            aside(classes: 'toc', [
+              if (page.data['toc'] case TableOfContents toc)
                 div([
                   h3([text('On this page')]),
                   toc.build(),
                 ]),
-              ]),
+            ]),
           ]),
         ]),
       ]),
@@ -80,7 +88,6 @@ class DocsLayout extends PageLayoutBase {
   }
 
   static List<StyleRule> get _styles => [
-        
         css('.docs', [
           css('.header-container', [
             css('&').styles(
@@ -104,7 +111,7 @@ class DocsLayout extends PageLayoutBase {
               css('&').styles(
                 position: Position.absolute(),
                 zIndex: ZIndex(9),
-                backgroundColor: ContentTheme.background,
+                backgroundColor: ContentColors.background,
                 opacity: 0,
                 pointerEvents: PointerEvents.none,
                 raw: {'inset': '0'},
@@ -136,7 +143,7 @@ class DocsLayout extends PageLayoutBase {
               ]),
               css.media(MediaQuery.all(maxWidth: 1023.px), [
                 css('&').styles(
-                  backgroundColor: ContentTheme.background,
+                  backgroundColor: ContentColors.background,
                   position: Position.fixed(top: Unit.zero),
                   border: Border.only(right: BorderSide(width: 1.px, color: Color('#0000000d'))),
                 ),
@@ -187,6 +194,11 @@ class DocsLayout extends PageLayoutBase {
                       margin: Margin.only(top: 1.rem),
                       radius: BorderRadius.circular(0.375.rem),
                     )
+                  ]),
+                  css('.content-footer', [
+                    css('&').styles(
+                      margin: Margin.only(top: 2.rem),
+                    ),
                   ]),
                 ]),
                 css('aside.toc', [

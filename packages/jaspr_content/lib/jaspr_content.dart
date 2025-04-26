@@ -3,8 +3,7 @@ library;
 
 export 'src/components/header.dart';
 export 'src/components/sidebar.dart';
-export 'src/content/content.dart';
-export 'src/content/theme.dart';
+export 'src/content.dart';
 export 'src/content_app.dart';
 export 'src/data_loader/data_loader.dart';
 export 'src/data_loader/filesystem_data_loader.dart';
@@ -28,3 +27,4 @@ export 'src/secondary_output/secondary_output.dart';
 export 'src/template_engine/liquid_template_engine.dart';
 export 'src/template_engine/mustache_template_engine.dart';
 export 'src/template_engine/template_engine.dart';
+export 'src/theme/theme.dart';

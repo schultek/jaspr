@@ -336,7 +336,6 @@ class AttachDocument extends StatelessComponent implements Document {
 final Expando<AttachAdapter> _attach = Expando();
 
 class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
- 
   static void register(BuildContext context, AttachDocument item) {
     var binding = (context.binding as ServerAppBinding);
     var adapter = _attach[binding] ??= AttachAdapter();

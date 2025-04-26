@@ -1,4 +1,3 @@
-
 part of 'theme.dart';
 
 /// A color that holds a variant for light and dark themes.
@@ -19,7 +18,15 @@ class ColorToken extends ThemeColor {
   final String name;
 
   @override
-  String get value => 'var(--theme-token-$name)';
+  String get value => 'var(--$name)';
+
+  /// Recreates this color token with the new color.
+  ///
+  /// If [color] is a [ThemeColor], it will apply both the light and dark colors.
+  /// Else only the light color will be applied.
+  ColorToken apply(Color color) {
+    return ColorToken(name, color, dark: color is ThemeColor ? color.dark : null);
+  }
 
   @override
   operator ==(Object other) {

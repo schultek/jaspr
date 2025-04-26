@@ -29,5 +29,4 @@ class HtmlParser implements PageParser {
     }
     return nodes;
   }
-  
 }

@@ -73,7 +73,7 @@ extension NodeExtension on Node {
   }
 }
 
-abstract  class CustomComponent {
+abstract class CustomComponent {
   /// Creates a component for the given node, or returns null.
   Component? create(Node node, NodesBuilder builder);
 
@@ -139,7 +139,8 @@ class NodesBuilder {
 
   List<Component> _buildNodes(List<Node> nodes) {
     final result = <Component>[];
-    outer: for (final node in nodes) {
+    outer:
+    for (final node in nodes) {
       for (final component in components) {
         if (component.create(node, this) case final comp?) {
           result.add(comp);

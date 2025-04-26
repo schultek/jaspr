@@ -1,10 +1,10 @@
 import 'package:jaspr/jaspr.dart';
 
-import 'theme.dart';
+import 'theme/theme.dart';
 
 /// A component that wraps the content of a page and applies default typographic styles.
-/// 
-/// The applies styles are based on the [ContentTheme] provided by the nearest [Content.wrapTheme] ancestor 
+///
+/// The applies styles are based on the [ContentTheme] provided by the nearest [Content.wrapTheme] ancestor
 /// (usually the root [ContentApp]).
 class Content extends StatelessComponent {
   const Content(this.child, {super.key});

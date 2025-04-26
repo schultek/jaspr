@@ -62,7 +62,6 @@ abstract class PageLayoutBase implements PageLayout {
     final keywords = pageData['keywords'];
     final image = pageData['image'];
 
-
     return Document(
       title: title,
       lang: lang,
@@ -73,8 +72,7 @@ abstract class PageLayoutBase implements PageLayout {
       head: [
         if (favicon != null) link(rel: 'icon', type: 'image/png', href: favicon!),
         meta(attributes: {'property': 'og:title'}, content: title),
-        if (description case final desc?)
-          meta(attributes: {'property': 'og:description'}, content: desc.toString()),
+        if (description case final desc?) meta(attributes: {'property': 'og:description'}, content: desc.toString()),
         if (image case final img?) meta(attributes: {'property': 'og:image'}, content: img.toString()),
         buildHead(page),
       ],
