@@ -136,7 +136,8 @@ class NodesBuilder {
   Component? build(List<Node>? nodes) {
     if (nodes == null || nodes.isEmpty) {
       return null;
-    };
+    }
+    ;
     return Fragment(children: _buildNodes(nodes));
   }
 
