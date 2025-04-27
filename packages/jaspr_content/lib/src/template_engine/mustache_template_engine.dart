@@ -24,12 +24,14 @@ class MustacheTemplateEngine implements TemplateEngine {
   Future<void> render(Page page, List<Page> pages) async {
     final root = Uri.parse(partialsRoot);
     final template = _buildTemplate(page, page.content, root);
+
     page.apply(content: template.renderString(prepareValues(page, pages)));
   }
 
   Template _buildTemplate(Page page, String content, Uri root) {
     return Template(
       content,
+      lenient: true,
       partialResolver: (String name) {
         final path = root.resolve(name).path;
         return _buildTemplate(page, page.readPartialSync(path), root);

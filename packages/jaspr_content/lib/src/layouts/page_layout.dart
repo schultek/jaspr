@@ -61,6 +61,7 @@ abstract class PageLayoutBase implements PageLayout {
     final description = pageData['description'];
     final keywords = pageData['keywords'];
     final image = pageData['image'];
+    final metaData = pageData['meta'];
 
     return Document(
       title: title,
@@ -68,12 +69,16 @@ abstract class PageLayoutBase implements PageLayout {
       meta: {
         if (description case final desc?) 'description': desc.toString(),
         if (keywords case final keys?) 'keywords': keys is List ? keys.join(', ') : keys.toString(),
+        if (metaData case Map metaData?) ...metaData,
       },
       head: [
         if (favicon != null) link(rel: 'icon', type: 'image/png', href: favicon!),
         meta(attributes: {'property': 'og:title'}, content: title),
         if (description case final desc?) meta(attributes: {'property': 'og:description'}, content: desc.toString()),
         if (image case final img?) meta(attributes: {'property': 'og:image'}, content: img.toString()),
+        if (metaData case List metaData?)
+          for (final item in metaData)
+            if (item is Map) meta(attributes: item.cast()),
         buildHead(page),
       ],
       body: buildBody(page, child),

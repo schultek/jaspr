@@ -6,6 +6,8 @@ date: "26 April 2025"
 readTime: "5 min"
 authorImage: https://avatars.githubusercontent.com/u/13920539?s=96&v=4
 tags: ["Dart", "Jaspr", "Blog"]
+meta:
+  robots: noindex, nofollow
 ---
 
 <DropCap />
@@ -15,3 +17,8 @@ Building blogs with `jaspr_content` offers a modern and efficient approach to cr
 
 Getting started with `jaspr_content` is straightforward. You can write your blog posts in Markdown and render them using Dart components. This approach allows you to focus on creating high-quality content while the framework handles the complexities of rendering and interactivity. Whether you are a seasoned developer or new to web development, `jaspr_content` provides a robust foundation for building feature-rich blogs that stand out in today’s digital landscape.
 
+## Pages:
+
+{{#pages}}
+  - [{{title}}]({{url}})
+{{/pages}}

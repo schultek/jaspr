@@ -5,6 +5,8 @@ description: How to add pages to your Jaspr content site.
 
 ---
 
+This guide explains how to add pages to your Jaspr content site. You'll learn how to use the content directory structure that maps to URL routes and work with different file formats or remote content sources. We'll also cover advanced features like private files, in-memory pages and  raw content output options.
+
 ## Content Folder
 
 A page is a single file that contains the content for a specific route in your site. By default, `ContentApp` loads pages from the `content/` directory in your project. For example you might have the following directory structure:
@@ -30,7 +32,9 @@ This would create the following routes:
 - `/posts/post1` for `content/posts/post1.md`
 - `/posts/post2` for `content/posts/post2.md`
 
-As you can see the url paths are based on the directory structure, with the file name as the last part of the path. The `index.md` files are used to create a route for the directory they are in.
+<Info>
+The url paths are based on the directory structure relative to the root content directory. The file name is used as the last part of the path, except for files named `index.*`, which are used to create a route for the directory they are in.
+</Info>
 
 ### Private Files
 

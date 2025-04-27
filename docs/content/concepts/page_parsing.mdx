@@ -4,3 +4,23 @@ description: Parse different types of content.
 ---
 
 ---
+
+It takes an optional `documentBuilder` function, which you can use to customize the markdown parsing by defining a custom markdown `Document`:
+
+```dart
+import 'package:markdown/markdown.dart' as md;
+
+[...]
+
+ContentApp(
+  parsers: [
+    MarkdownParser(
+      documentBuilder: (Page page) {
+        return md.Document(
+          // specify any custom syntaxes, extension sets etc. here
+        );
+      }
+    )
+  ]
+)
+```

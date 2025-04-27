@@ -1,6 +1,9 @@
 ---
 title: "Jaspr Docs"
 description: "Documentation for Jaspr"
+meta:
+  - property: twitter:creator
+    content: schultek_dev
 ---
 
 Welcome to the Jaspr documentation! This guide is designed to help you understand and effectively use Jaspr, a powerful framework for building modern web applications. Whether you're a beginner or an experienced developer, you'll find valuable information to enhance your development workflow.
