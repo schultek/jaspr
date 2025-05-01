@@ -12,6 +12,7 @@ import 'package:shelf_static/shelf_static.dart';
 import '../foundation/constants.dart';
 import '../foundation/options.dart';
 import 'render_functions.dart';
+import 'run_app.dart';
 import 'server_app.dart';
 
 final String? jasprProxyPort = Platform.environment['JASPR_PROXY_PORT'];
@@ -95,7 +96,14 @@ Handler createHandler(
     final fileLoader = proxyFileLoader(request, staticHandler);
     return handle(request, (setup) async {
       final (:body, :headers, :statusCode) = await render(setup, request, fileLoader, false);
-      return Response(statusCode, body: body, headers: headers);
+      return Response(
+        statusCode,
+        body: switch (body) {
+          ResponseBodyString() => body.content,
+          ResponseBodyBytes() => body.bytes,
+        },
+        headers: headers,
+      );
     });
   });
 

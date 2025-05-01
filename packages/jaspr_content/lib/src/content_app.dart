@@ -131,8 +131,12 @@ class ContentApp extends AsyncStatelessComponent {
     if (Jaspr.useIsolates) {
       print("[Warning] ContentApp only supports non-isolate rendering. Disabling isolate rendering.");
       // For caching to work correctly we need to disable isolate rendering.
-      Jaspr.initializeApp(options: Jaspr.options, useIsolates: false);
+      Jaspr.initializeApp(options: Jaspr.options, useIsolates: false, allowedPathSuffixes: Jaspr.allowedPathSuffixes);
     }
+
+    Future.wait(loaders.map((l) => l.loadRoutes(configResolver, eagerlyLoadAllPages))).then((routes) {
+      _ensureAllowedSuffixes(routes);
+    });
   }
 
   final List<RouteLoader> loaders;
@@ -143,9 +147,7 @@ class ContentApp extends AsyncStatelessComponent {
   @override
   Stream<Component> build(BuildContext context) async* {
     yield Document.head(children: [Style(styles: resetStyles)]);
-
     final routes = await Future.wait(loaders.map((l) => l.loadRoutes(configResolver, eagerlyLoadAllPages)));
-    _ensureAllowedSuffixes(routes);
     yield routerBuilder(routes);
   }
 

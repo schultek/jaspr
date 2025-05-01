@@ -30,7 +30,7 @@ Handler serveApp(AppHandler handler) {
 }
 
 /// A record containing the status code, body, and headers for a response.
-typedef ResponseLike = ({int statusCode, String body, Map<String, List<String>> headers});
+typedef ResponseLike = ({int statusCode, ResponseBody body, Map<String, List<String>> headers});
 
 /// Directly renders the provided component to HTML. Returns a [ResponseLike] object.
 ///
@@ -56,4 +56,22 @@ SetupFunction _createSetup(Component app) {
     binding.initializeOptions(options);
     binding.attachRootComponent(app);
   };
+}
+
+
+
+sealed class ResponseBody {
+  const factory ResponseBody(String content) = ResponseBodyString;
+}
+
+class ResponseBodyString implements ResponseBody {
+  const ResponseBodyString(this.content);
+
+  final String content;
+}
+
+class ResponseBodyBytes implements ResponseBody {
+  const ResponseBodyBytes(this.bytes);
+
+  final List<int> bytes;
 }

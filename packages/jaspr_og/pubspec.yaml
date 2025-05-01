@@ -1,0 +1,44 @@
+name: jaspr_og
+description: A open graph image generator for Jaspr.
+version: 1.0.0
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  native_toolchain_rust: ^0.1.0-dev.7
+  native_assets_cli: ^0.7.3
+  ffi: ^2.1.4
+  image: ^4.5.4
+  jaspr: ^0.18.2
+  xml: ^6.5.0
+  nanoid: ^1.0.0
+
+dev_dependencies:
+  ffigen: ^18.1.0
+  lints: ^5.0.0
+  test: ^1.24.0
+
+ffigen:
+  output: 'lib/src/resvg.dart'
+  name: 'ReSVG'
+  description: 'Bindings for ReSVG'
+  headers:
+    entry-points:
+      - 'resvg/crates/c-api/resvg.h'
+  ffi-native:
+    asset-id: 'package:jaspr_og/resvgc'
+  functions:
+    rename:
+      'resvg_(.*)': '$1'
+  structs:
+    rename:
+      'resvg_(.*)': '$1'
+
+  type-map:
+    'native-types':
+      'char':
+        'lib': 'ffi'
+        'c-type': 'Uint8'
+        'dart-type': 'int'
+  silence-enum-warning: true

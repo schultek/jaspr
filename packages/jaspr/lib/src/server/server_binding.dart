@@ -9,6 +9,7 @@ import 'adapters/global_styles_adapter.dart';
 import 'async_build_owner.dart';
 import 'markup_render_object.dart';
 import 'render_functions.dart';
+import 'run_app.dart';
 
 typedef FileLoader = Future<String?> Function(String);
 
@@ -40,15 +41,15 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   };
 
   int responseStatusCode = 200;
-  String? responseBodyOverride;
+  ResponseBody? responseBodyOverride;
 
   @override
   void attachRootComponent(Component app) async {
     super.attachRootComponent(ClientComponentRegistry(child: app));
   }
 
-  Future<String> render({bool standalone = false}) async {
-    if (rootElement == null) return '';
+  Future<ResponseBody> render({bool standalone = false}) async {
+    if (rootElement == null) return ResponseBody('');
 
     if (rootElement!.owner.isFirstBuild) {
       final completer = Completer.sync();
@@ -78,7 +79,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       return responseBodyOverride!;
     }
 
-    return root.renderToHtml();
+    return ResponseBody(root.renderToHtml());
   }
 
   @override

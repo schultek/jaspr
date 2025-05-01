@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import '../framework/framework.dart';
+import 'run_app.dart';
 import 'server_binding.dart';
 
 extension AppContext on BuildContext {
@@ -82,9 +83,13 @@ extension AppContext on BuildContext {
   /// Sets the response status code.
   ///
   /// When [responseBody] is provided, it will be used as the response body instead of the rendered html.
-  void setStatusCode(int statusCode, {String? responseBody}) {
+  void setStatusCode(int statusCode, {String? responseBody, List<int>? responseBytes}) {
     _binding
       ..responseStatusCode = statusCode
-      ..responseBodyOverride = responseBody;
+      ..responseBodyOverride = responseBody != null
+          ? ResponseBody(responseBody)
+          : responseBytes != null
+              ? ResponseBodyBytes(responseBytes)
+              : null;
   }
 }

@@ -19,6 +19,7 @@ abstract class BaseCommand extends Command<int> {
       abbr: 'v',
       help: 'Enable verbose logging.',
       negatable: false,
+      aliases: ['vb']
     );
   }
 

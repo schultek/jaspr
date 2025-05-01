@@ -57,6 +57,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       help: 'Compile to wasm',
       negatable: false,
     );
+    argParser.addMultiOption(
+      'dart-vm-arg',
+      help: 'Passes additional arguments to the Dart VM.',
+      defaultsTo: [],
+    );
     addDartDefineArgs();
   }
 
@@ -141,9 +146,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
     serverPid.writeAsStringSync('');
 
+    final vmArgs = argResults!['dart-vm-arg'] as List<String>?;
     var userDefines = getServerDartDefines();
 
     var args = [
+      ...?vmArgs,
+      '--enable-experiment=native-assets'
       'run',
       if (!release) ...[
         '--enable-vm-service',
