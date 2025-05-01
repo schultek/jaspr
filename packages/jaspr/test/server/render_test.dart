@@ -13,7 +13,7 @@ void main() {
       var result = await renderComponent(div(id: 'test', []));
 
       expect(
-          result.body,
+          result,
           equals('<!DOCTYPE html>\n'
               '<html><head><base href="/"/></head><body><div id="test"></div></body></html>\n'
               ''));
@@ -22,11 +22,11 @@ void main() {
     test('renders standalone component', () async {
       var result = await renderComponent(div(id: 'test', []), standalone: true);
 
-      expect(result.body, equals('<div id="test"></div>\n'));
+      expect(result, equals('<div id="test"></div>\n'));
     });
 
-    test('renders component with headers', () async {
-      var result = await renderComponent(
+    test('renders app with headers', () async {
+      var result = await renderApp(
         Builder(builder: (context) sync* {
           var value = context.headers['x-test'];
           context.setHeader('x-test2', 'xyz');
@@ -37,7 +37,7 @@ void main() {
       );
 
       expect(result.statusCode, equals(200));
-      expect(result.body, equals('<div id="test">abc</div>\n'));
+      expect(result.body.content, equals('<div id="test">abc</div>\n'));
       expect(
         result.headers,
         equals({
@@ -47,8 +47,8 @@ void main() {
       );
     });
 
-    test('renders component with cookies', () async {
-      var result = await renderComponent(
+    test('renders app with cookies', () async {
+      var result = await renderApp(
         Builder(builder: (context) sync* {
           var value = context.cookies['test'];
           context.setCookie('test2', 'xyz');

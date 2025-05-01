@@ -1,0 +1,18 @@
+{
+  "hosting": {
+    "site": "pubsocial",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*"
+    ],
+    "rewrites": [ {
+      "source": "/packages/**",
+      "run": {
+        "serviceId": "pubsocial",
+        "region": "europe-west1",
+        "pinTag": true      
+      }
+    } ]
+  }
+}

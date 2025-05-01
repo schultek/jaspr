@@ -4,6 +4,10 @@
   
   If you want to keep the old behaviour of rendering each request in a separate isolate, use `Jaspr.initializeApp(..., useIsolates: true)`.
 
+- **BREAKING** Changed return type of `renderComponent()` back to `Future<String>`.
+
+- Added `renderApp()` that returns a `Future<ResponseLike>`.
+
 - Added support `@client` components from other packages.
 
   Components annotated with `@client` from other dependent packages are now also part of the js bundle when used during pre-rendering.

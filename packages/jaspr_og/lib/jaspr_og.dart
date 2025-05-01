@@ -1,12 +1,9 @@
-import 'dart:convert';
 import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
 import 'package:jaspr/server.dart';
 import 'package:nanoid/non_secure.dart';
-// ignore: implementation_imports, depend_on_referenced_packages
-import 'package:shelf/src/headers.dart';
 import 'package:xml/xml.dart';
 
 import 'src/render.dart';
@@ -16,15 +13,10 @@ export 'src/render.dart' show RenderError;
 Future<Uint8List> renderSvg(Component child, {required int width, required int height}) async {
   final stopwatch = Stopwatch()..start();
 
-  var binding =
-      ServerAppBinding((url: '/', headers: Headers.empty()), loadFile: (_) => Future.value(null))
-        ..initializeOptions(JasprOptions())
-        ..attachRootComponent(child);
-  final body = await binding.render(standalone: true);
-  final content = switch (body) {
-    ResponseBodyString() => body.content,
-    ResponseBodyBytes() => utf8.decode(body.bytes),
-  };
+  if (!Jaspr.isInitialized) {
+    Jaspr.initializeApp();
+  }
+  final content = await renderComponent(child);
 
   print("Jaspr render took: ${stopwatch.elapsedMilliseconds}ms");
   stopwatch.reset();
@@ -159,7 +151,9 @@ class Alignment {
   final double? y;
 
   static Alignment fromString(String value) {
-    final match = RegExp(r'^(center|top|bottom|left|right)$|^(top|center|bottom|none)\s+(left|center|right|none)$').firstMatch(value);
+    final match = RegExp(
+      r'^(center|top|bottom|left|right)$|^(top|center|bottom|none)\s+(left|center|right|none)$',
+    ).firstMatch(value);
     if (match == null) {
       throw ArgumentError('Invalid alignment value: $value');
     }
