@@ -16,16 +16,17 @@ Future<Uint8List> renderSvg(Component child, {required int width, required int h
   if (!Jaspr.isInitialized) {
     Jaspr.initializeApp();
   }
-  final content = await renderComponent(child);
+  final content = await renderComponent(child, standalone: true);
 
   print("Jaspr render took: ${stopwatch.elapsedMilliseconds}ms");
   stopwatch.reset();
 
-  final processor = TreeProcessor(content);
-  processor.processAlignElements();
-  final svg = processor.document.toXmlString(pretty: true, indent: '  ');
+  // final processor = TreeProcessor(content);
+  // processor.processAlignElements();
+  // print("Processing took: ${stopwatch.elapsedMilliseconds}ms");
+  final svg = content; // processor.document.toXmlString();
 
-  print("Processing took: ${stopwatch.elapsedMilliseconds}ms");
+  print("Processing2 took: ${stopwatch.elapsedMilliseconds}ms");
   stopwatch.reset();
 
   try {

@@ -27,14 +27,19 @@ Future<Response> _packageHandler(Request request) async {
           meta(attributes: {'http-equiv': 'refresh', 'content': '1; url=https://pub.dev/packages/$name'}),
           meta(name: 'description', content: package.description),
           meta(attributes: {'property': 'og:type', 'content': 'website'}),
-          meta(name: 'twitter:card', content: 'summary_large_image'),
-          meta(name: 'twitter:site', content: '@dart_lang'),
           meta(attributes: {'property': 'og:title', 'content': package.name}),
           meta(attributes: {'property': 'og:description', 'content': package.description}),
           meta(attributes: {'property': 'og:url', 'content': 'https://pub.dev/packages/$name'}),
           meta(attributes: {'property': 'og:image', 'content': 'https://pub.schultek.dev/packages/$name.png'}),
+          meta(name: 'twitter:card', content: 'summary_large_image'),
+          meta(name: 'twitter:site', content: '@dart_lang'),
+          meta(name: 'twitter:description', content: package.description),
+          meta(name: 'twitter:title', content: package.name),
+          meta(name: 'twitter:image', content: 'https://pub.schultek.dev/packages/$name.png'),
         ],
-        body: Fragment(children: []),
+        body: text(
+          'Redirecting to https://pub.dev/packages/$name...',
+        ),
       ),
     );
     return Response(
@@ -105,6 +110,8 @@ Component metric(num? value, String label, {int x = 0, int y = 0}) {
 Future<Response> _packageImageHandler(Request request) async {
   final name = request.params['package']!;
 
+  print("Generating image for package: $name");
+
   final client = PubClient();
   try {
     final package = await client.packageInfo(name);
@@ -153,7 +160,7 @@ Future<Response> _packageImageHandler(Request request) async {
         g([
           rect(x: "0", y: "0", width: "100%", height: "100%", fill: Colors.white, []),
           txt(
-            package.name,
+            '${package.name} ',
             {'x': '100', 'y': '160', 'class': 'title'},
             [
               DomComponent(tag: 'tspan', classes: 'version', children: [text(package.version)]),
@@ -166,7 +173,6 @@ Future<Response> _packageImageHandler(Request request) async {
             attributes: {'x': '900', 'y': '80', 'width': '200', 'height': 'auto', 'href': 'assets/dart.png'},
             children: [],
           ),
-
           metric(score.likeCount, 'Likes', x: 100, y: 510),
           metric(score.grantedPoints, 'Points', x: 270, y: 510),
           metric(score.downloadCount30Days, 'Downloads', x: 440, y: 510),
@@ -181,7 +187,7 @@ Future<Response> _packageImageHandler(Request request) async {
     );
   } catch (e) {
     print(e);
-    return Response.notFound('Package not found');
+    return Response.notFound('Package not found. Could not generate image.');
   } finally {
     client.close();
   }
