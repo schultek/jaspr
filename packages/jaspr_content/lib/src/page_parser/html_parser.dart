@@ -1,5 +1,7 @@
 import 'package:html/dom.dart' as html;
 import 'package:html/parser.dart' as html;
+// ignore: implementation_imports
+import 'package:html/src/tokenizer.dart' as html;
 
 import '../page.dart';
 import 'page_parser.dart';
@@ -13,7 +15,11 @@ class HtmlParser implements PageParser {
 
   @override
   List<Node> parsePage(Page page) {
-    final document = html.parse(page.content);
+    final tokenizer = html.HtmlTokenizer(
+      page.content,
+      lowercaseElementName: false,
+    );
+    final document = html.parse(tokenizer);
     return buildNodes(document.nodes);
   }
 

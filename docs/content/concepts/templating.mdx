@@ -4,3 +4,263 @@ description: Use templating languages to create dynamic content.
 ---
 
 ---
+
+Templating allows you to render **dynamic content** like variables, conditionals, and loops within your Markdown or HTML content. `jaspr_content` provides built-in support for **popular templating languages**, enabling you to create rich, data-driven pages without much effort.
+
+Templating is particularly useful for:
+
+- Displaying data from frontmatter or external sources.
+- Creating dynamic lists or tables.
+- Showing content conditionally.
+- Referencing other pages (with eager loading)
+
+---
+
+`jaspr_content` currently supports two templating languages out of the box:
+
+- **[Mustache](https://mustache.github.io/mustache.5.html)**: A simple, logic-less template engine that focuses on variable substitution and basic conditions.
+- **[Liquid](https://shopify.github.io/liquid/basics/introduction/)**: A more powerful template engine originally created by Shopify with support for complex logic, filters, and control flow.
+
+## Context and Data Sources
+
+Template engines can access data from various sources:
+
+### Frontmatter
+
+All frontmatter data from the current page is available under the `page` key:
+
+```markdown
+---
+title: My Page Title
+author: Kilian Schulte
+date: 2025-08-01
+---
+
+# {{page.title}}
+Written by {{page.author}} on {{page.date}}
+```
+
+### Built-in Variables
+
+Jaspr Content provides some built-in variables for each page:
+
+- `page.path` - The file path of the current page
+- `page.url` - The URL of the current page
+- `pages` - An array of all pages (when using eager loading)
+
+### Data Files
+
+Data loaded from `.yaml` or `.json` files in your `/content/_data` directory is available by the filename:
+
+```yaml
+# content/_data/site.yaml
+title: My Awesome Website
+description: A website built with Jaspr Content
+author: Kilian Schulte
+```
+
+```markdown
+# Welcome to {{site.title}}
+
+{{site.description}} by {{site.author}}
+```
+
+For nested data paths like `content/_data/company/info.json`, access it with dot notation: `{{company.info.property}}`.
+
+<Info>
+For more information on data loading read the [Data Loading](/content/concepts/data_loading) documentation.
+</Info>
+
+## Built-in TemplateEngines
+
+### Mustache Templates
+
+Mustache is a "logic-less" templating language - it focuses on simple variable substitutions and iterations rather than complex logic. 
+
+To enable Mustache templating, add the `MustacheTemplateEngine` to your page configuration:
+
+```dart
+ContentApp(
+  // ...
+  templateEngine: MustacheTemplateEngine(),
+);
+```
+
+This uses the [`mustache_template`](https://pub.dev/packages/mustache_template) package.
+
+#### Syntax Examples
+
+##### Variable Substitution
+
+```markdown
+Hello {{page.name}}!
+```
+
+##### Sections (Loops and Conditionals)
+
+```markdown
+<!-- If projects exists and is not empty -->
+{{#projects}}
+  <h3>{{name}}</h3>
+  <p>{{description}}</p>
+{{/projects}}
+
+<!-- Inverted sections (if not) -->
+{{^projects}}
+  No projects found.
+{{/projects}}
+```
+
+#### Customizing Mustache
+
+You can customize the `MustacheTemplateEngine` by providing options when creating it:
+
+```dart
+ContentApp(
+  // ...
+  templateEngine: MustacheTemplateEngine(
+    // Customize delimiters (default is "{{ }}")
+    delimiters: '{% %}',
+    
+    // Change where partials are loaded from (default is "content/_partials/")
+    partialsRoot: 'content/_includes/',
+    
+    // Customize the values available in templates
+    prepareValues: (page, pages) => {
+      ...page.data,
+      'custom': 'value',
+      'currentYear': DateTime.now().year,
+      // Only include published pages
+      'pages': pages
+        .where((p) => p.data['page']['published'] == true)
+        .map((p) => p.data['page'])
+        .toList(),
+    },
+  ),
+);
+```
+
+### Liquid Templates
+
+Liquid is a more powerful templating language with additional features like filters, control flow statements, and assignments.
+
+To enable Liquid templating, add the `LiquidTemplateEngine` to your page configuration:
+
+```dart
+ContentApp(
+  // ...
+  templateEngine: LiquidTemplateEngine(),
+);
+```
+
+This uses the [`liquify`](https://pub.dev/packages/liquify) package.
+
+#### Syntax Examples
+
+##### Variable Substitution with Filters
+
+```markdown
+Hello {{ page.name | upcase }}!
+```
+
+##### Control Flow
+
+```markdown
+{% if page.show_banner %}
+  <div class="banner">Special Announcement</div>
+{% endif %}
+
+{% for member in team %}
+  <h3>{{ member.name }}</h3>
+  <p>{{ member.bio }}</p>
+{% endfor %}
+```
+
+##### Assignments
+
+```markdown
+{% assign greeting = "Hello" %}
+{{ greeting }}, {{ page.name }}!
+```
+
+#### Customizing Liquid
+
+You can customize the Liquid template engine by providing options:
+
+```dart
+ContentApp(
+  // ...
+  templateEngine: LiquidTemplateEngine(
+    // Change where includes are loaded from
+    includesPath: 'content/_includes/',
+    
+    // Customize the template context or add custom tags/filters
+    prepareTemplate: (template, page, pages) {
+      // Add custom filters
+      template.registerFilter('greet', (input) => 'Hello, $input!');
+      
+      // Add custom tags
+      template.registerTag('current_time', (_) async => 
+        DateTime.now().toIso8601String()
+      );
+    },
+  ),
+);
+```
+
+## Including Template Files
+
+Both template engines support including partial template files, which helps with reusability.
+
+### Mustache Partials
+
+```markdown
+{{> header.md }}
+
+# Page Content
+
+{{> footer.md }}
+```
+
+By default, these partials are loaded from `content/_partials/`.
+
+### Liquid Includes
+
+```markdown
+{% include 'header.liquid' %}
+
+# Page Content
+
+{% include 'footer.liquid' %}
+```
+
+By default, these includes are loaded from `content/_includes/`.
+
+## Creating a Custom TemplateEngine
+
+You can create your own templating implementation by implementing the `TemplateEngine` interface. This allows you to support other templating languages or even do custom preprocessing of content.
+
+```dart
+class CustomTemplateEngine implements TemplateEngine {
+  @override
+  Future<void> render(Page page, List<Page> pages) async {
+    // 1. Access page content with page.content
+    final content = page.content;
+    
+    // 2. Process the content with your templating logic
+    final processedContent = myTemplateProcessingFunction(content, page.data, pages);
+    
+    // 3. Update the page content
+    page.apply(content: processedContent);
+  }
+}
+```
+
+Then use it in your ContentApp:
+
+```dart
+ContentApp(
+  // ...
+  templateEngine: CustomTemplateEngine(),
+);
+```

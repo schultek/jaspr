@@ -5,7 +5,7 @@ description: Add anchor links to headings in the content.
 
 ---
 
-The `HeadingAnchorExtension` generates anchor links for all headings in the content and adds them as clickable '#' symbols to the headings.
+The **Heading Anchors** extension generates anchor links for all headings in the content and adds them as clickable '#' symbols to the headings.
 
 Content like this:
 
@@ -21,13 +21,13 @@ Clicking on the '#' symbol will navigate to `/example#example-subheading`, which
 
 ## Usage
 
-To use the `HeadingAnchorExtension`, add it to the `extensions` list of the `ContentApp` component:
+To use the `HeadingAnchorsExtension`, add it to the `extensions` list of the `ContentApp` component:
 
 ```dart
 ContentApp(
   ...
   extensions: [
-    HeadingAnchorExtension(),
+    HeadingAnchorsExtension(),
   ],
 );
 ```

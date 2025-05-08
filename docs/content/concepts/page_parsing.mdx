@@ -5,22 +5,180 @@ description: Parse different types of content.
 
 ---
 
-It takes an optional `documentBuilder` function, which you can use to customize the markdown parsing by defining a custom markdown `Document`:
+`jaspr_content` allows you to **parse content** from different files using a system of `PageParser` objects. Each parser is responsible for handling specific file types (like markdown or HTML) and converting them into a tree of nodes that Jaspr can render.
+
+To use parsers, add them to your `ContentApp`:
+
+```dart
+ContentApp(
+  parsers: [
+    MarkdownParser(),
+    HtmlParser(),
+  ],
+)
+```
+
+With this configuration, you can mix markdown and HTML files in your content directory. For example:
+
+```
+content/
+ ├── index.html
+ ├── about.md
+ └── posts/
+    ├── index.md
+    ├── post1.html
+    └── post2.md
+```
+
+When a page is requested, `jaspr_content` will select the appropriate parser based on the file extension and use it to parse the content.
+
+## Built-in PageParsers
+
+### MarkdownParser
+
+The `MarkdownParser` handles files with `.md` or `.mdx` extensions. It uses the [`markdown`](https://pub.dev/packages/markdown) package to parse Markdown content into nodes.
+
+#### Customizing Markdown Parsing
+
+The parser takes an optional `documentBuilder` function, which you can use to customize the markdown parsing by defining a custom markdown `Document`:
 
 ```dart
 import 'package:markdown/markdown.dart' as md;
 
 [...]
 
-ContentApp(
-  parsers: [
-    MarkdownParser(
-      documentBuilder: (Page page) {
-        return md.Document(
-          // specify any custom syntaxes, extension sets etc. here
-        );
-      }
-    )
-  ]
+MarkdownParser(
+  documentBuilder: (Page page) {
+    return md.Document(
+      // specify any custom syntaxes, extension sets etc. here
+      blockSyntaxes: [
+        // Add your custom block syntaxes
+      ],
+      inlineSyntaxes: [
+        // Add your custom inline syntaxes
+      ],
+      extensionSet: md.ExtensionSet.gitHubFlavored,
+    );
+  }
 )
 ```
+
+By default, the `MarkdownParser` uses the GitHub Web extension set and adds support for the component block syntax, which allows you to use Jaspr components in your markdown.
+
+<Info>
+If you want to keep supporting [Custom Components](/content/concepts/custom_components) in your markdown files, make sure to use the `ComponentBlockSyntax()` as part of your custom configuration.
+</Info>
+
+### HtmlParser
+
+The `HtmlParser` handles files with `.html` extensions. It uses the [`html`](https://pub.dev/packages/html) package to parse HTML content into nodes.
+
+```dart
+ContentApp(
+  parsers: [
+    HtmlParser(),
+  ],
+)
+```
+
+This allows you to write direct HTML content:
+
+```html
+<!-- content/page.html -->
+<div class="container">
+  <h1>Welcome to my site</h1>
+  <p>This is a paragraph with <strong>bold text</strong>.</p>
+</div>
+```
+
+Like with markdown, you can also use custom components in HTML files:
+
+```html
+<div class="container">
+  <Info>
+    This is an info box component.
+  </Info>
+</div>
+```
+
+## Creating a Custom PageParser
+
+You can create your own parser by implementing the `PageParser` interface. This lets you add support for other file types or custom formats.
+
+```dart
+class CustomParser implements PageParser {
+  @override
+  Pattern get pattern => RegExp(r'.*\.custom$'); // Match files with .custom extension.
+
+  @override
+  List<Node> parsePage(Page page) {
+    // Parse the content into nodes.
+    // This is where you convert your custom format into Jaspr's Node structure.
+    
+    final nodes = <Node>[];
+    
+    // Example: Converting a simple custom format.
+    final lines = page.content.split('\n');
+    for (final line in lines) {
+      if (line.startsWith('# ')) {
+        // Create a heading element.
+        nodes.add(ElementNode('h1', {}, [TextNode(line.substring(2))]));
+      } else if (line.isNotEmpty) {
+        // Create a paragraph element.
+        nodes.add(ElementNode('p', {}, [TextNode(line)]));
+      }
+    }
+    
+    return nodes;
+  }
+}
+```
+
+Then add your custom parser to your `ContentApp`:
+
+```dart
+ContentApp(
+  parsers: [
+    CustomParser(),
+    MarkdownParser(),
+    HtmlParser(),
+  ],
+)
+```
+
+### Understanding Nodes
+
+When implementing a custom parser, you'll need to create a tree of nodes that represent the content. Jaspr provides three types of nodes:
+
+- `TextNode`: Represents text content.
+- `ElementNode`: Represents an element with a tag, attributes, and children.
+- `ComponentNode`: Represents a Jaspr component.
+
+<Info>
+A parser should usually only create `TextNode`s and `ElementNode`s. The `ComponentNode` type is meant for extensions or custom components.
+</Info>
+
+For example, the following nodes represent a simple paragraph element:
+
+```dart
+ElementNode('p', {'class': 'intro'}, [
+  TextNode('This is a '),
+  ElementNode('strong', {}, [TextNode('paragraph')]),
+  TextNode(' with styling.'),
+])
+```
+
+This would be rendered as:
+```html
+<p class="intro">This is a <strong>paragraph</strong> with styling.</p>
+```
+
+## Parser Selection
+
+When a content file is loaded, Jaspr selects the appropriate parser based on the file path and the parser's `pattern`. The first parser with a pattern that matches the file path is used to parse the content.
+
+Patterns are checked in the order the parsers are added to the `ContentApp`, so put more specific parsers before more general ones.
+
+<Info>
+When implementing a custom parser, make sure your pattern is specific enough to only match the files you want to parse. The pattern is checked against the full file path, not just the extension.
+</Info>

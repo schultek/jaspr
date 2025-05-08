@@ -19,7 +19,7 @@ class TableOfContentsExtension implements PageExtension {
   static final _headerRegex = RegExp(r'^h(\d)$', caseSensitive: false);
 
   @override
-  List<Node> apply(Page page, List<Node> nodes) {
+  Future<List<Node>> apply(Page page, List<Node> nodes) async {
     final toc = <TocEntry>[];
     final stack = <TocEntry>[];
 
@@ -57,7 +57,7 @@ class TableOfContentsExtension implements PageExtension {
       }
     }
 
-    page.data['toc'] = TableOfContents(toc);
+    page.apply(data: {'toc': TableOfContents(toc)});
 
     return nodes;
   }

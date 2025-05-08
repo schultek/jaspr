@@ -8,8 +8,8 @@ import 'page_extension.dart';
 /// An extension that generates anchor links for headers in the page.
 ///
 /// The resulting anchor links are appended to the headers as a clickable '#' symbol.
-class HeadingAnchorExtension implements PageExtension {
-  HeadingAnchorExtension({
+class HeadingAnchorsExtension implements PageExtension {
+  HeadingAnchorsExtension({
     this.maxHeaderDepth = 3,
   });
 
@@ -19,7 +19,7 @@ class HeadingAnchorExtension implements PageExtension {
   static final _headerRegex = RegExp(r'^h(\d)$', caseSensitive: false);
 
   @override
-  List<Node> apply(Page page, List<Node> nodes) {
+  Future<List<Node>> apply(Page page, List<Node> nodes) async {
     return [
       ComponentNode(Document.head(children: [
         Style(styles: _styles),

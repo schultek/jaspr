@@ -59,10 +59,11 @@ void runGithub() {
       secondaryOutputs: [SecondaryMarkdownOutput()],
       parsers: [
         MarkdownParser(),
+        HtmlParser(),
       ],
       extensions: [
         TableOfContentsExtension(),
-        //HeadingAnchorExtension(),
+        //HeadingAnchorsExtension(),
       ],
       components: [
         Callout(),

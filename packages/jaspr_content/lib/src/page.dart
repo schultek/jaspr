@@ -114,7 +114,7 @@ class Page {
       }
 
       var nodes = parseNodes();
-      nodes = applyExtensions(nodes);
+      nodes = await applyExtensions(nodes);
       final component = Content(NodesBuilder(config.components).build(nodes) ?? const Text(''));
       final layout = buildLayout(component);
       yield wrapTheme(layout);
@@ -291,9 +291,9 @@ extension PageHandlersExtension on Page {
   /// Applies the configured extensions to the parsed nodes.
   ///
   /// Returns the new list of nodes.
-  List<Node> applyExtensions(List<Node> nodes) {
+  Future<List<Node>> applyExtensions(List<Node> nodes) async {
     for (final extension in config.extensions) {
-      nodes = extension.apply(this, nodes);
+      nodes = await extension.apply(this, nodes);
     }
     return nodes;
   }

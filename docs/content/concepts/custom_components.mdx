@@ -5,9 +5,7 @@ description: Create custom components to use in your content.
 
 ---
 
-With custom components you can use any normal Jaspr component in your content files. 
-
-This enables you to enhance your content with more visual or interactive experiences for your visitors over what is possible with only Markdown.
+With custom components you can use any normal **Jaspr Component** in your content files. This enables you to enhance your content with more visual or interactive experiences for your visitors over what is possible with only Markdown.
 
 ## Using Components
 
@@ -52,10 +50,10 @@ Say you have a normal Jaspr component like this:
 
 ```dart
 class Card extends StatelessComponent {
-  const Card({this.title, this.child, super.key});
+  const Card({this.title, required this.child, super.key});
 
   final String? title;
-  final Component? child;
+  final Component child;
 
   ...
 }
@@ -70,7 +68,7 @@ ContentApp(
     CustomComponent(
       pattern: 'Card',
       builder: (name, attributes, child) {
-        return Card(title: attributes['title'], child: child);
+        return Card(title: attributes['title'], child: child!);
       }
     ),
   ],
@@ -129,9 +127,9 @@ The `CustomComponent` constructor takes the following parameters:
    </Card>
 </Property>
 
-### Syntax Overrides
+### Standard Element Overrides
 
-Some of `jaspr_content`s provided components like [`CodeBlock`](/content/components/code_block) and [`Image`](/content/components/image) override their respective standard markdown syntax in addition to the `<Component>` syntax. For example when using the `CodeBlock` component, any standard markdown codeblock will be rendered as this component.
+Some of `jaspr_content`s provided components like [`CodeBlock`](/content/components/code_block) and [`Image`](/content/components/image) override their respective standard markdown elements in addition to the `<Component>` syntax. For example when using the `CodeBlock` component, any standard markdown codeblock will be rendered as this component.
 
 To add similar functionality to your own custom components, instead of using the `CustomComponent()` constructor, create a class implementing `CustomComponent` like this:
 
