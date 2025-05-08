@@ -31,14 +31,21 @@ class GithubButtonState extends State<GithubButton> {
 
   Future<void> loadRepositoryData() async {
     final response = await http.get(Uri.parse('https://api.github.com/repos/schultek/jaspr'));
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    final {"stargazers_count": int stars, "forks_count": int forks} = data;
+    try {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final {"stargazers_count": int stars, "forks_count": int forks} = data;
 
-    setState(() {
-      this.stars = stars;
-      this.forks = forks;
-      loaded = true;
-    });
+      setState(() {
+        this.stars = stars;
+        this.forks = forks;
+        loaded = true;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error parsing GitHub data: $e\n${response.body}');
+      }
+      // noop
+    }
   }
 
   @override

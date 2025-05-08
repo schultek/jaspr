@@ -142,7 +142,7 @@ class Meet extends StatelessComponent {
         ),
         css('& > *').styles(
           minWidth: Unit.zero,
-          flex: Flex(grow: 1, shrink: 1, basis: FlexBasis(24.rem)),
+          flex: Flex(grow: 1, shrink: 1, basis: 24.rem),
         ),
         css('p').combine(bodyLarge),
         css('.actions').styles(

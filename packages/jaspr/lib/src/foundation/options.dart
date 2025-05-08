@@ -7,9 +7,14 @@ import 'marker_utils.dart';
 ///
 /// Call [Jaspr.initializeApp()] at the start of your app, before any calls to [runApp].
 class Jaspr {
-  static void initializeApp({JasprOptions options = const JasprOptions(), bool useIsolates = true}) {
+  static void initializeApp({
+    JasprOptions options = const JasprOptions(),
+    bool useIsolates = false,
+    List<String> allowedPathSuffixes = const ['html', 'htm', 'xml'],
+  }) {
     _options = options;
     _useIsolates = useIsolates;
+    _allowedPathSuffixes = allowedPathSuffixes;
   }
 
   static bool get isInitialized => _options != null;
@@ -19,6 +24,9 @@ class Jaspr {
 
   static bool get useIsolates => _useIsolates;
   static bool _useIsolates = true;
+
+  static List<String> get allowedPathSuffixes => _allowedPathSuffixes;
+  static List<String> _allowedPathSuffixes = [];
 }
 
 /// Global options for configuring jaspr. DO NOT USE DIRECTLY.

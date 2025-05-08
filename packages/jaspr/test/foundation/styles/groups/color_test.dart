@@ -6,19 +6,14 @@ import 'package:jaspr_test/jaspr_test.dart';
 void main() {
   group('style', () {
     group('color', () {
-      test('hex', () {
-        var color = Color.hex('#ffddee');
+      test('default', () {
+        var color = Color('#ffddee');
         expect(color.value, equals('#ffddee'));
       });
 
       test('value', () {
         var color = Color.value(0xffddee);
         expect(color.value, equals('#ffddee'));
-      });
-
-      test('named', () {
-        var color = Color.named('red');
-        expect(color.value, equals('red'));
       });
 
       test('rgb', () {

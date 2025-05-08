@@ -91,7 +91,7 @@ class Community extends StatelessComponent {
         ),
         css('& > div').styles(
           padding: Padding.all(2.rem),
-          flex: Flex(grow: 1, basis: FlexBasis(20.rem)),
+          flex: Flex(grow: 1, basis: 20.rem),
         ),
         css('& > div > h4:not(:first-child)').styles(
           margin: Margin.only(top: 3.rem),

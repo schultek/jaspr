@@ -59,7 +59,7 @@ class SplitterState extends State<Splitter> {
         var pair = splitPairs[i - 1];
         yield div(
           classes: 'gutter gutter-${component.horizontal ? 'horizontal' : 'vertical'}',
-          styles: Styles(flex: Flex(basis: FlexBasis(6.px))),
+          styles: Styles(flex: Flex(basis: 6.px)),
           events: {'mousedown': (e) => pair.startDragging(e as html.MouseEventOrStubbed)},
           [],
         );

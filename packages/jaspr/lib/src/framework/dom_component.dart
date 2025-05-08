@@ -75,7 +75,6 @@ class DomElement extends ProxyRenderObjectElement {
   void updateRenderObject() {
     if (_wrappingElement != null) {
       var wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
-
       renderObject.updateElement(
         component.tag,
         component.id ?? wrappingComponent.id,
@@ -100,15 +99,13 @@ class DomElement extends ProxyRenderObjectElement {
 
   static String? _joinString(String? a, String? b) {
     if (a == null) return b;
-    if (b == null) return null;
+    if (b == null) return a;
     return '$a $b';
   }
 
   static Map<K, V>? _joinMap<K, V>(Map<K, V>? a, Map<K, V>? b) {
-    if (a == null) return b;
-    if (b == null) return null;
-    if (a.isEmpty) return b;
-    if (b.isEmpty) return a;
+    if (a == null || a.isEmpty) return b;
+    if (b == null || b.isEmpty) return a;
     return {...a, ...b};
   }
 }

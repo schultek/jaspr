@@ -37,7 +37,7 @@ class SessionCard extends StatelessComponent {
         color: Color.initial,
       ),
       css('&:hover').styles(
-        backgroundColor: Color.hex('#0001'),
+        backgroundColor: Color('#0001'),
       ),
       css('span').styles(
         fontSize: 0.7.em,

@@ -41,8 +41,26 @@
     "primary": "#01589B",
     "primaryDark": "#41C3FE"
   },
+  "tabs": [
+    {
+      "id": "root",
+      "title": "Guides",
+      "href": "/"
+    },
+    {
+      "id": "api",
+      "title": "API",
+      "href": "/api"
+    },
+    {
+      "id": "content",
+      "title": "Content",
+      "href": "/content"
+    }
+  ],
   "sidebar": [
     {
+      "tab": "root",
       "pages": [
         {
           "title": "\uD83D\uDCD6 Overview",
@@ -55,23 +73,24 @@
       ]
     },
     {
+      "tab": "root",
       "group": "Get Started",
       "pages": [
         {
-          "title": "\uD83D\uDEEB Installation",
-          "href": "/get_started/installation"
-        },
-        {
-          "title": "\uD83D\uDD79 Jaspr CLI",
-          "href": "/get_started/cli"
+          "title": "\uD83D\uDEEB Quickstart",
+          "href": "/get_started/quick_start"
         },
         {
           "title": "\uD83D\uDCDF Rendering Modes",
           "href": "/get_started/modes"
         },
         {
-          "title": "\uD83D\uDCA7 Hydration",
-          "href": "/get_started/hydration"
+          "title": "\uD83C\uDD9A Server vs Client",
+          "href": "/get_started/server_client"
+        },
+        {
+          "title": "\uD83D\uDD79 Jaspr CLI",
+          "href": "/get_started/cli"
         },
         {
           "title": "\uD83D\uDCE6 Project Structure",
@@ -84,6 +103,7 @@
       ]
     },
     {
+      "tab": "root",
       "group": "Key Concepts",
       "pages": [
         {
@@ -111,6 +131,14 @@
           "href": "/concepts/seo"
         },
         {
+          "title": "\ud83c\udfd7\ufe0f Static Sites",
+          "href": "/concepts/static_sites"
+        },
+        {
+          "title": "\uD83D\uDCA7 Hydration",
+          "href": "/concepts/hydration"
+        },
+        {
           "title": "\uD83E\uDDEA Testing",
           "href": "/concepts/testing"
         },
@@ -121,6 +149,7 @@
       ]
     },
     {
+      "tab": "root",
       "group": "Going Further",
       "pages": [
         {
@@ -138,6 +167,7 @@
       ]
     },
     {
+      "tab": "root",
       "group": "Ecosystem",
       "pages": [
         {
@@ -155,6 +185,16 @@
       ]
     },
     {
+      "tab": "api",
+      "pages": [
+        {
+          "title": "Overview",
+          "href": "/api"
+        }
+      ]
+    },
+    {
+      "tab": "api",
       "group": "Components",
       "pages": [
         {
@@ -196,27 +236,50 @@
       ]
     },
     {
-      "group": "Utilities",
+      "tab": "api",
+      "group": "General",
       "pages": [
         {
           "title": "runApp",
           "href": "/utils/run_app"
         },
         {
-          "title": "@client",
-          "href": "/utils/at_client"
+          "title": "Styles",
+          "href": "/utils/styles"
         },
         {
           "title": "@css / css()",
           "href": "/utils/at_css"
         },
         {
-          "title": "Styles",
-          "href": "/utils/styles"
-        },
-        {
           "title": "events()",
           "href": "/utils/events"
+        },
+        {
+          "title": "GlobalNodeKey",
+          "href": "/utils/global_node_key"
+        },
+        {
+          "title": "ViewTransitionMixin",
+          "href": "/utils/view_transition_mixin"
+        }
+      ]
+    },
+    {
+      "tab": "api",
+      "group": "Server / Client",
+      "pages": [
+        {
+          "title": "@client",
+          "href": "/utils/at_client"
+        },
+        {
+          "title": "@encoder/@decoder",
+          "href": "/utils/at_encoder_decoder"
+        },
+        {
+          "title": "@Import",
+          "href": "/utils/at_import"
         },
         {
           "title": "@sync",
@@ -231,14 +294,6 @@
           "href": "/utils/preload_state_mixin"
         },
         {
-          "title": "@encoder/@decoder",
-          "href": "/utils/at_encoder_decoder"
-        },
-        {
-          "title": "GlobalNodeKey",
-          "href": "/utils/global_node_key"
-        },
-        {
           "title": "headers / setHeader()",
           "href": "/utils/headers"
         },
@@ -249,14 +304,153 @@
         {
           "title": "setStatusCode()",
           "href": "/utils/set_status_code"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "pages": [
+        {
+          "title": "\uD83D\uDCD6 Overview",
+          "href": "/content"
         },
         {
-          "title": "@Import",
-          "href": "/utils/at_import"
+          "title": "\uD83D\uDEEB Quick Start",
+          "href": "/content/quick_start"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Guides",
+      "pages": [
+        {
+          "title": "📄 Adding Pages",
+          "href": "/content/guides/adding_pages"
         },
         {
-          "title": "ViewTransitionMixin",
-          "href": "/utils/view_transition_mixin"
+          "title": "✒️ Writing Content",
+          "href": "/content/guides/writing_content"
+        },
+        {
+          "title": "🎨 Customizing Rendering",
+          "href": "/content/guides/customizing_rendering"
+        },
+        {
+          "title": "🌐 Building and Deploying",
+          "href": "/content/guides/building_and_deploying"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Concepts",
+      "pages": [
+        {
+          "title": "Pages",
+          "href": "/content/concepts/pages"
+        },
+        {
+          "title": "ContentApp",
+          "href": "/content/concepts/content_app"
+        },
+        {
+          "title": "Route Loading",
+          "href": "/content/concepts/route_loading"
+        },
+        {
+          "title": "Data Loading",
+          "href": "/content/concepts/data_loading"
+        },
+        {
+          "title": "Templating",
+          "href": "/content/concepts/templating"
+        },
+        {
+          "title": "Page Parsing",
+          "href": "/content/concepts/page_parsing"
+        },
+        {
+          "title": "Page Extensions",
+          "href": "/content/concepts/page_extensions"
+        },
+        {
+          "title": "Custom Components",
+          "href": "/content/concepts/custom_components"
+        },
+        {
+          "title": "Page Layouts",
+          "href": "/content/concepts/page_layouts"
+        },
+        {
+          "title": "Theming",
+          "href": "/content/concepts/theming"
+        },
+        {
+          "title": "Secondary Outputs",
+          "href": "/content/concepts/secondary_outputs"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Components",
+      "pages": [
+        {
+          "title": "Callout",
+          "href": "/content/components/callout"
+        },
+        {
+          "title": "CodeBlock",
+          "href": "/content/components/code_block"
+        },
+        {
+          "title": "Image",
+          "href": "/content/components/image"
+        },
+        {
+          "title": "Tabs",
+          "href": "/content/components/tabs"
+        },
+        {
+          "title": "DropCap",
+          "href": "/content/components/drop_cap"
+        },
+        {
+          "title": "PostBreak",
+          "href": "/content/components/post_break"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Extensions",
+      "pages": [
+        {
+          "title": "Heading Anchors",
+          "href": "/content/extensions/heading_anchors"
+        },
+        {
+          "title": "Table of Contents",
+          "href": "/content/extensions/table_of_contents"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Layouts",
+      "pages": [
+        {
+          "title": "DocsLayout",
+          "href": "/content/layouts/docs_layout"
+        },
+        {
+          "title": "BlogLayout",
+          "href": "/content/layouts/blog_layout"
+        },
+        {
+          "title": "EmptyLayout",
+          "href": "/content/layouts/empty_layout"
         }
       ]
     }

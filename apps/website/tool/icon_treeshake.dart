@@ -30,6 +30,7 @@ final icons = [
   0xe156, // server
   0xe1dc, // palette
   0xe409, // test-tube
+  0xe205, // code-xml
 ];
 
 void main() async {

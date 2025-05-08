@@ -26,7 +26,7 @@ final clientModelExtensionSources = {
 final clientModelExtensionJsonOutputs = {
   'site|lib/component_model_extension.client.json': jsonEncode({
     "name": "Component",
-    "id": "component_model_extension",
+    "id": ["site", "lib/component_model_extension.dart"],
     "import": "package:site/component_model_extension.dart",
     "params": [
       {"name": "a", "isNamed": false, "decoder": "p['a']", "encoder": "c.a"},
@@ -41,7 +41,7 @@ final clientModelExtensionJsonOutputs = {
 };
 
 final clientModelExtensionDartOutputs = {
-  'site|web/component_model_extension.client.dart': '// dart format off\n'
+  'site|lib/component_model_extension.client.dart': '// dart format off\n'
       '// ignore_for_file: type=lint\n'
       '\n'
       '// GENERATED FILE, DO NOT MODIFY\n'
@@ -50,10 +50,6 @@ final clientModelExtensionDartOutputs = {
       'import \'package:jaspr/browser.dart\';\n'
       'import \'package:site/component_model_extension.dart\' as prefix0;\n'
       'import \'package:site/model_extension.dart\' as prefix1;\n'
-      '\n'
-      'void main() {\n'
-      '  runAppWithParams(getComponentForParams);\n'
-      '}\n'
       '\n'
       'Component getComponentForParams(Map<String, dynamic> p) {\n'
       '  return prefix0.Component(p[\'a\'], b: prefix1.ModelBCodec.fromRaw(p[\'b\']));\n'

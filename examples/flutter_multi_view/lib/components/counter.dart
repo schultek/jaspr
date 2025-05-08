@@ -82,7 +82,7 @@ class CounterState extends State<Counter> {
           backgroundColor: Colors.transparent,
         ),
         css('&:hover').styles(
-          backgroundColor: const Color.hex('#0001'),
+          backgroundColor: const Color('#0001'),
         ),
       ]),
       css('span').styles(

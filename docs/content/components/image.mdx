@@ -1,0 +1,62 @@
+---
+title: Image
+description: Renders an image from a given source URL.
+---
+
+---
+
+Images can be displayed using either standard Markdown syntax, or the `<Image>` component.
+
+## Usage
+
+To use the `<Image>` component, add it to your `components` list in your `main.dart` file:
+
+```dart
+ContentApp(
+  components: [
+    Image(),
+  ],
+)
+```
+
+Then use the `<Image>` component in your content files to display images:
+
+```jsx
+<Image src="https://placehold.co/600x400" alt="Sample Image" />
+```
+
+## Captions
+
+To add a caption below the image, use the caption prop:
+
+```jsx
+<Image src="https://placehold.co/600x400" caption="This is a sample image." alt="Sample Image" />
+```
+
+<Image src="https://placehold.co/600x400" caption="This is a sample image." alt="Sample Image" />
+
+## Zooming
+
+The `<Image>` component also supports zooming of images. To enable zooming, pass the zoom prop to the image:
+
+```jsx
+<Image src="https://placehold.co/600x400" zoom alt="Sample Image" />
+```
+
+*Click on the image to zoom in, and click again or scroll to zoom out.*
+
+<Image src="https://placehold.co/600x400" zoom alt="Sample Image" />
+
+Alternatively, you can enable zooming globally in your app like this:
+
+```dart
+ContentApp(
+  components: [
+    Image(zoom: true),
+  ],
+)
+```
+
+<Info>
+  This will enable zooming for all images, both using the `<Image>` component and standard Markdown syntax `![Alt text](image url)`.
+</Info>

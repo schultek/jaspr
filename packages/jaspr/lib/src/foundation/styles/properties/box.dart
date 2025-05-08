@@ -13,6 +13,7 @@ enum Display {
   inlineGrid('inline-grid'),
   flowRoot('flow-root'),
   contents('contents'),
+  listItem('list-item'),
 
   inherit('inherit'),
   initial('initial'),

@@ -85,6 +85,6 @@ extension AppContext on BuildContext {
   void setStatusCode(int statusCode, {String? responseBody}) {
     _binding
       ..responseStatusCode = statusCode
-      ..responseErrorBody = responseBody;
+      ..responseBodyOverride = responseBody;
   }
 }

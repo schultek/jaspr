@@ -2,10 +2,10 @@ import 'package:jaspr/jaspr.dart';
 
 // Colors
 
-const primaryDark = Color.hex('#09387e');
-const primaryMid = Color.hex('#0066B4');
+const primaryDark = Color('#09387e');
+const primaryMid = Color('#0066B4');
 const primaryMidLow = Color.variable('--primaryMidLow');
-const primaryLight = Color.hex('#40C4FF');
+const primaryLight = Color('#40C4FF');
 
 const primaryFaded = Color.variable('--primaryFaded');
 
@@ -32,41 +32,41 @@ final surfaceLowest = Color.variable('--surfaceLowest');
 final hoverOverlayColor = Color.variable('--hoverOverlayColor');
 
 final lightTheme = {
-  primaryMidLow: Color.hex('#004377'),
-  primaryFaded: Color.hex('#0066b41e'),
-  textDim: Color.hex('#777'),
-  textDark: Color.hex('#555'),
-  textBlack: Color.hex('#222'),
-  shadowColor1: Color.hex('#0001'),
-  shadowColor2: Color.hex('#0004'),
-  shadowColor3: Color.hex('#0002'),
-  background: Color.hex('#FFF'),
-  backgroundFaded: Color.hex('#FFF9'),
-  borderColor: Color.hex('#EEE'),
-  borderColor2: Color.hex('#CCC'),
-  surface: Color.hex('#F5F5F5'),
-  surfaceLow: Color.hex('#F8F8F8'),
-  surfaceLowest: Color.hex('#FCFCFC'),
-  hoverOverlayColor: Color.hex('#0001'),
+  primaryMidLow: Color('#004377'),
+  primaryFaded: Color('#0066b41e'),
+  textDim: Color('#777'),
+  textDark: Color('#555'),
+  textBlack: Color('#222'),
+  shadowColor1: Color('#0001'),
+  shadowColor2: Color('#0004'),
+  shadowColor3: Color('#0002'),
+  background: Color('#FFF'),
+  backgroundFaded: Color('#FFF9'),
+  borderColor: Color('#EEE'),
+  borderColor2: Color('#CCC'),
+  surface: Color('#F5F5F5'),
+  surfaceLow: Color('#F8F8F8'),
+  surfaceLowest: Color('#FCFCFC'),
+  hoverOverlayColor: Color('#0001'),
 };
 
 final darkTheme = {
-  primaryMidLow: Color.hex('#007ad7'),
-  primaryFaded: Color.hex('#6ad0ff1c'),
-  textDim: Color.hex('#CCC'),
-  textDark: Color.hex('#EEE'),
-  textBlack: Color.hex('#F5F5F5'),
-  shadowColor1: Color.hex('#0001'),
-  shadowColor2: Color.hex('#0004'),
-  shadowColor3: Color.hex('#0002'),
-  background: Color.hex('#0d1117'),
-  backgroundFaded: Color.hex('#0d111799'),
-  borderColor: Color.hex('#1d1f25'),
-  borderColor2: Color.hex('#292c35'),
-  surface: Color.hex('#070c14'),
-  surfaceLow: Color.hex('#161b1f'),
-  surfaceLowest: Color.hex('#11141a'),
-  hoverOverlayColor: Color.hex('#FFF1'),
+  primaryMidLow: Color('#007ad7'),
+  primaryFaded: Color('#6ad0ff1c'),
+  textDim: Color('#CCC'),
+  textDark: Color('#EEE'),
+  textBlack: Color('#F5F5F5'),
+  shadowColor1: Color('#0001'),
+  shadowColor2: Color('#0004'),
+  shadowColor3: Color('#0002'),
+  background: Color('#0d1117'),
+  backgroundFaded: Color('#0d111799'),
+  borderColor: Color('#1d1f25'),
+  borderColor2: Color('#292c35'),
+  surface: Color('#070c14'),
+  surfaceLow: Color('#161b1f'),
+  surfaceLowest: Color('#11141a'),
+  hoverOverlayColor: Color('#FFF1'),
 };
 
 // Typography

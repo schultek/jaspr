@@ -1,14 +1,61 @@
 ---
-title: Installation
+title: Quickstart
 description: Get started with Jaspr and build your first website in Dart.
 ---
 
 ---
 
-Follow the steps below to set up a new Jaspr project on your computer.
+To get started with Jaspr, you can either use the **Jaspr CLI** or our official **VSCode Extension**. The cli lets you manage the project from the command line, while the extension provides a more integrated experience within your IDE.
 
-## New Project
+## VSCode Extension
 
+<Steps>
+  <Step title="Install Extension">
+    Install the Jaspr VSCode extension by searching for `Jaspr` in the extensions menu.
+  </Step>
+  <Step title="Create a Project">
+    To create a new Jaspr project, open the command palette (`Ctrl+Shift+P`) and select **Jaspr: New Project**. You are ask to choose from several templates and set a project folder.
+
+    ![New Project](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/new_project.png?raw=true)
+
+    <Info>
+      Choosing a template will not lock you into a specific configuration. Starting from one template you can easily modify your code to behave as any other template along the way.
+    </Info>
+
+    When running for the first time, the extension will ask you to install the Jaspr CLI. This is required to run the Jaspr development server and build your project.
+    
+  </Step>
+  <Step title="Debug your Jaspr Project">
+    To run and debug a Jaspr applications, launch it using F5 or the Debug menu. The extension will start the debug process and attach the Dart debugger to it. 
+
+    ---
+
+    When developing a Jaspr project in `static` or `server` mode, this will open **two** separate debugging sessions, one for the server and one for the client. Switch between the two using the debugging sidebar or process dropdown.
+
+    | Sidebar | Dropdown. |
+    |---|---|
+    | ![Sidebar](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/sidebar.png?raw=true) | ![Dropdown](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/dropdown.png?raw=true)
+
+    Both processes will be managed by the main Jaspr terminal.
+
+    ![Terminal](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/terminal.png?raw=true)
+
+    To stop the server, click "Stop Jaspr" in the status bar, or focus the terminal and press `Ctrl+C`. This will stop both debugging sessions and the main process.
+    You can also detach the debugging sessions individually using the detach button in the debug bar, but this will keep the app running.
+
+  </Step>
+</Steps>
+
+You can now start developing your website. 🎉
+
+<Success>
+  Observe that the browser automatically refreshes the page when you change something in your code, like the `Welcome` text.
+</Success>
+
+---
+
+## Jaspr CLI
+    
 <Steps>
   <Step title="Install CLI">
     Install the Jaspr CLI via:
@@ -28,7 +75,7 @@ Follow the steps below to set up a new Jaspr project on your computer.
 
     This will walk you through the setup wizard and create a new Jaspr project inside the `my_website` folder.
 
-    The cli will prompt you with a set of options to configure your project. You can read about what each option does [below](/get_started/installation#project-options) or just start with the recommended ones (simply press **Enter** each time).
+    The cli will prompt you with a set of options to configure your project. You can read about what each option does [below](/get_started/quick_start#project-options) or just start with the recommended ones (simply press **Enter** each time).
 
     <Info>
         If you are just starting out and are not sure what options to pick, just select the default one for each question
@@ -58,10 +105,9 @@ You can now start developing your website. 🎉
   Observe that the browser automatically refreshes the page when you change something in your code, like the `Welcome` text.
 </Success>
 
-## Project Options
+### Project Options
 
-When creating a new project, you will go through a set of questions to configure the project to your liking.
-The options set your rendering mode, hydration strategy, routing, flutter interoperability strategy and more.
+When creating a new project through the **Jaspr CLI**, you will go through a set of questions to configure the project to your liking. The options set your rendering mode, hydration strategy, routing, flutter interoperability strategy and more.
 
 You can choose from the following options:
 
@@ -72,7 +118,7 @@ You can choose from the following options:
 ---
 
 <Property name="Hydration" type="conditional">
-  Select the hydration strategy (automatic or manual). Read about hydration [here](/get_started/hydration).
+  Select the hydration strategy (automatic or manual). Read about hydration [here](/concepts/hydration).
 </Property>
 
 ---

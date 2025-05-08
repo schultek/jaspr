@@ -97,7 +97,7 @@ class App extends StatelessComponent {
         flexDirection: FlexDirection.column,
         justifyContent: JustifyContent.center,
         alignItems: AlignItems.center,
-        flex: Flex(grow: 1{{^routing}}, shrink: 0, basis: FlexBasis(400.px){{/routing}}),
+        flex: Flex(grow: 1{{^routing}}, shrink: 0, basis: 400.px{{/routing}}),
       ),
     ]),
   ];{{/server}}

@@ -86,7 +86,7 @@ class Features extends StatelessComponent {
         ),
         css('& > *').styles(
           boxSizing: BoxSizing.borderBox,
-          flex: Flex(grow: 1, shrink: 0, basis: FlexBasis(13.rem)),
+          flex: Flex(grow: 1, shrink: 0, basis: 13.rem),
         ),
       ]),
     ]),

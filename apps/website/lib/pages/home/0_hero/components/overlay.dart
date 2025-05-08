@@ -77,6 +77,7 @@ class OverlayState extends State<Overlay> {
   static final List<StyleRule> styles = [
     css('.blur-backdrop', [
       css('&').styles(
+        display: Display.flex,
         position: Position.fixed(top: Unit.zero, left: Unit.zero, right: Unit.zero, bottom: Unit.zero),
         zIndex: ZIndex(1),
         userSelect: UserSelect.none,

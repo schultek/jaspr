@@ -51,7 +51,7 @@ class Header extends StatelessComponent {
             textDecoration: const TextDecoration(line: TextDecorationLine.none),
           ),
           css('&:hover').styles(
-            backgroundColor: const Color.hex('#0005'),
+            backgroundColor: const Color('#0005'),
           ),
         ]),
         css('div.active', [

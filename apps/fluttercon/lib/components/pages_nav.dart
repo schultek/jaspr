@@ -39,10 +39,10 @@ class PagesNav extends StatelessComponent {
           radius: BorderRadius.horizontal(right: Radius.circular(0.6.em)),
         ),
         css('&.active').styles(
-          backgroundColor: Color.hex('#0002'),
+          backgroundColor: Color('#0002'),
         ),
         css('&:hover').styles(
-          backgroundColor: Color.hex('#0001'),
+          backgroundColor: Color('#0001'),
         ),
       ]),
     ]),

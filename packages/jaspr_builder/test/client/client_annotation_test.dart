@@ -1,8 +1,10 @@
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
+import 'package:jaspr_builder/src/client/client_bundle_builder.dart';
 import 'package:jaspr_builder/src/client/client_module_builder.dart';
 import 'package:test/test.dart';
 
+import 'sources/bundle.dart';
 import 'sources/client_basic.dart';
 import 'sources/client_invalid.dart';
 import 'sources/client_model_class.dart';
@@ -17,13 +19,13 @@ void main() {
           clientBasicSources,
           outputs: {
             ...clientBasicJsonOutputs,
-            'site|web/component_basic.client.dart': isNotEmpty,
+            'site|lib/component_basic.client.dart': isNotEmpty,
           },
           reader: await PackageAssetReader.currentIsolate(),
         );
       });
 
-      test('generates web entrypoint', () async {
+      test('generates entrypoint', () async {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientBasicSources,
@@ -43,13 +45,13 @@ void main() {
           clientModelClassSources,
           outputs: {
             ...clientModelClassJsonOutputs,
-            'site|web/component_model_class.client.dart': isNotEmpty,
+            'site|lib/component_model_class.client.dart': isNotEmpty,
           },
           reader: await PackageAssetReader.currentIsolate(),
         );
       });
 
-      test('generates web entrypoint', () async {
+      test('generates entrypoint', () async {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientModelClassSources,
@@ -69,13 +71,13 @@ void main() {
           clientModelExtensionSources,
           outputs: {
             ...clientModelExtensionJsonOutputs,
-            'site|web/component_model_extension.client.dart': isNotEmpty,
+            'site|lib/component_model_extension.client.dart': isNotEmpty,
           },
           reader: await PackageAssetReader.currentIsolate(),
         );
       });
 
-      test('generates web entrypoint', () async {
+      test('generates entrypoint', () async {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientModelExtensionSources,
@@ -131,6 +133,19 @@ void main() {
           equals('Unsupported parameter type: Expected primitive type, found DateTime'),
         );
       });
+    });
+
+    test('generates bundle', () async {
+      await testBuilder(
+        ClientsBundleBuilder(BuilderOptions({})),
+        {
+          ...clientBasicJsonOutputs,
+          ...clientModelClassJsonOutputs,
+          ...clientModelExtensionJsonOutputs,
+        },
+        outputs: clientBundleOutputs,
+        reader: await PackageAssetReader.currentIsolate(),
+      );
     });
   });
 }
