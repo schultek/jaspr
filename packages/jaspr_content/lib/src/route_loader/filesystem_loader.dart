@@ -99,23 +99,23 @@ class FilesystemLoader extends RouteLoaderBase {
   }
 
   @override
-  Future<List<RouteEntity>> loadPageEntities() async {
-    final dir = Directory(directory);
+  Future<List<SourceRoute>> loadPageEntities() async {
+    final root = Directory(directory);
 
-    List<RouteEntity> loadEntities(Directory dir) {
-      List<RouteEntity> entities = [];
+    List<SourceRoute> loadEntities(Directory dir) {
+      List<SourceRoute> entities = [];
       for (final entry in dir.listSync()) {
-        final name = entry.path.substring(dir.path.length + 1);
+        final path = entry.path.substring(root.path.length + 1);
         if (entry is File) {
-          entities.add(SourceRoute(name, entry.path, keepSuffix: keeySuffixPattern?.matchAsPrefix(entry.path) != null));
+          entities.add(SourceRoute(path, entry.path, keepSuffix: keeySuffixPattern?.matchAsPrefix(entry.path) != null));
         } else if (entry is Directory) {
-          entities.add(CollectionRoute(name, loadEntities(entry)));
+          entities.addAll(loadEntities(entry));
         }
       }
       return entities;
     }
 
-    return loadEntities(dir);
+    return loadEntities(root);
   }
 }
 

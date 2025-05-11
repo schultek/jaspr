@@ -142,8 +142,6 @@ class ContentApp extends AsyncStatelessComponent {
 
   @override
   Stream<Component> build(BuildContext context) async* {
-    yield Document.head(children: [Style(styles: resetStyles)]);
-
     final routes = await Future.wait(loaders.map((l) => l.loadRoutes(configResolver, eagerlyLoadAllPages)));
     _ensureAllowedSuffixes(routes);
     yield routerBuilder(routes);

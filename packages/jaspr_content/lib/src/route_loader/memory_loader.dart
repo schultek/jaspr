@@ -20,8 +20,8 @@ class MemoryLoader extends RouteLoaderBase {
   }
 
   @override
-  Future<List<RouteEntity>> loadPageEntities() async {
-    final entities = <RouteEntity>[];
+  Future<List<SourceRoute>> loadPageEntities() async {
+    final entities = <SourceRoute>[];
     for (final page in _pages) {
       entities.add(SourceRoute(page.path, page.path, keepSuffix: page.keepSuffix));
     }
@@ -111,7 +111,12 @@ class _BuilderPage extends Page {
   final Component Function(Page page) builder;
 
   @override
-  Future<Component> build() async {
+  Page copy() {
+    return _BuilderPage(path: this.path, url: url, builder: builder, data: data, config: config, loader: loader);
+  }
+
+  @override
+  Future<Component> render() async {
     await loadData();
     return AsyncBuilder(builder: (context) async* {
       if (kGenerateMode && data['page']['sitemap'] != null) {

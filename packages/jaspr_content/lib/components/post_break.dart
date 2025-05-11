@@ -1,6 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
-import '../jaspr_content.dart';
+import '../src/page_parser/page_parser.dart';
+import '../src/theme/theme.dart';
 
 /// A post break component.
 class PostBreak extends StatelessComponent with CustomComponentBase {

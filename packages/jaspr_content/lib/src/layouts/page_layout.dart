@@ -34,14 +34,8 @@ abstract class PageLayout {
 abstract class PageLayoutBase implements PageLayout {
   const PageLayoutBase();
 
-  Component buildHead(Page page) {
-    return Fragment(children: []);
-  }
-
-  Component buildBody(Page page, Component child);
-
-  @override
-  Component buildLayout(Page page, Component child) {
+  @mustCallSuper
+  Iterable<Component> buildHead(Page page) sync* {
     final pageData = page.data['page'] ?? {};
     final siteData = page.data['site'] ?? {};
 
@@ -55,7 +49,6 @@ abstract class PageLayoutBase implements PageLayout {
       _ => '',
     };
 
-    final lang = pageData['lang'] ?? siteData['lang'];
     final favicon = siteData['favicon'];
 
     final description = pageData['description'];
@@ -63,24 +56,53 @@ abstract class PageLayoutBase implements PageLayout {
     final image = pageData['image'];
     final metaData = pageData['meta'];
 
+    if (favicon != null) {
+      yield link(rel: 'icon', type: 'image/png', href: favicon!);
+    }
+
+    yield DomComponent(tag: 'title', child: text(title));
+    yield meta(attributes: {'property': 'og:title'}, content: title);
+
+    if (description case final desc?) {
+      yield meta(name: 'description', content: desc.toString());
+    }
+    if (keywords case final keys?) {
+      yield meta(name: 'keywords', content: keys is List ? keys.join(', ') : keys.toString());
+    }
+    if (metaData case Map metaData?) {
+      for (final key in metaData.keys) {
+        yield meta(name: key, content: metaData[key]);
+      }
+    }
+
+    if (description case final desc?) {
+      yield meta(attributes: {'property': 'og:description'}, content: desc.toString());
+    }
+    if (image case final img?) {
+      yield meta(attributes: {'property': 'og:image'}, content: img.toString());
+    }
+    if (metaData case List metaData?) {
+      for (final item in metaData) {
+        if (item is Map) {
+          yield meta(attributes: item.cast());
+        }
+      }
+    }
+  }
+
+  Component buildBody(Page page, Component child);
+
+  @override
+  Component buildLayout(Page page, Component child) {
+    final pageData = page.data['page'] ?? {};
+    final siteData = page.data['site'] ?? {};
+
+    final lang = pageData['lang'] ?? siteData['lang'];
+
     return Document(
-      title: title,
       lang: lang,
-      meta: {
-        if (description case final desc?) 'description': desc.toString(),
-        if (keywords case final keys?) 'keywords': keys is List ? keys.join(', ') : keys.toString(),
-        if (metaData case Map metaData?) ...metaData,
-      },
-      head: [
-        if (favicon != null) link(rel: 'icon', type: 'image/png', href: favicon!),
-        meta(attributes: {'property': 'og:title'}, content: title),
-        if (description case final desc?) meta(attributes: {'property': 'og:description'}, content: desc.toString()),
-        if (image case final img?) meta(attributes: {'property': 'og:image'}, content: img.toString()),
-        if (metaData case List metaData?)
-          for (final item in metaData)
-            if (item is Map) meta(attributes: item.cast()),
-        buildHead(page),
-      ],
+      meta: {},
+      head: buildHead(page).toList(),
       body: buildBody(page, child),
     );
   }

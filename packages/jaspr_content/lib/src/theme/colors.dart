@@ -1,5 +1,59 @@
 part of 'theme.dart';
 
+/// A set of colors for the page content.
+///
+/// You can override individual colors, or add new color tokens to the theme.
+class ContentColors {
+  const ContentColors._();
+
+  static final List<ColorToken> _base = [
+    primary,
+    background,
+    text,
+    headings,
+    lead,
+    links,
+    bold,
+    counters,
+    bullets,
+    hr,
+    quotes,
+    quoteBorders,
+    captions,
+    kbd,
+    kbdShadows,
+    code,
+    preCode,
+    preBg,
+    thBorders,
+    tdBorders,
+  ];
+
+  static final ColorToken primary = ColorToken('primary', ThemeColors.gray.$900, dark: Colors.white);
+  static final ColorToken background = ColorToken('background', ThemeColors.gray.$100, dark: ThemeColors.gray.$950);
+  static final ColorToken text = ColorToken('text', ThemeColors.gray.$700, dark: ThemeColors.gray.$200);
+  static final ColorToken headings = ColorToken('content-headings', ThemeColors.gray.$900, dark: Colors.white);
+  static final ColorToken lead = ColorToken('content-lead', ThemeColors.gray.$600, dark: ThemeColors.gray.$400);
+  static final ColorToken links = ColorToken('content-links', ThemeColors.gray.$900, dark: Colors.white);
+  static final ColorToken bold = ColorToken('content-bold', ThemeColors.gray.$900, dark: Colors.white);
+  static final ColorToken counters = ColorToken('content-counters', ThemeColors.gray.$500, dark: ThemeColors.gray.$400);
+  static final ColorToken bullets = ColorToken('content-bullets', ThemeColors.gray.$300, dark: ThemeColors.gray.$600);
+  static final ColorToken hr = ColorToken('content-hr', ThemeColors.gray.$200, dark: ThemeColors.gray.$700);
+  static final ColorToken quotes = ColorToken('content-quotes', ThemeColors.gray.$900, dark: ThemeColors.gray.$100);
+  static final ColorToken quoteBorders =
+      ColorToken('content-quote-borders', ThemeColors.gray.$200, dark: ThemeColors.gray.$700);
+  static final ColorToken captions = ColorToken('content-captions', ThemeColors.gray.$500, dark: ThemeColors.gray.$400);
+  static final ColorToken kbd = ColorToken('content-kbd', ThemeColors.gray.$900, dark: Colors.white);
+  static final ColorToken kbdShadows = ColorToken('content-kbd-shadows', ThemeColors.gray.$900, dark: Colors.white);
+  static final ColorToken code = ColorToken('content-code', ThemeColors.gray.$900, dark: Colors.white);
+  static final ColorToken preCode = ColorToken('content-pre-code', ThemeColors.gray.$200, dark: ThemeColors.gray.$300);
+  static final ColorToken preBg = ColorToken('content-pre-bg', ThemeColors.gray.$800, dark: Color('rgb(0 0 0 / 50%)'));
+  static final ColorToken thBorders =
+      ColorToken('content-th-borders', ThemeColors.gray.$300, dark: ThemeColors.gray.$600);
+  static final ColorToken tdBorders =
+      ColorToken('content-td-borders', ThemeColors.gray.$200, dark: ThemeColors.gray.$700);
+}
+
 /// A color that holds a variant for light and dark themes.
 class ThemeColor implements Color {
   const ThemeColor(this.light, {this.dark});
@@ -51,10 +105,42 @@ class ColorToken extends ThemeColor {
   String toString() => 'ColorToken($name, light: $light, dark: $dark)';
 }
 
+extension on List<ColorToken> {
+  List<ColorToken> apply({
+    List<ColorToken>? colors,
+    bool mergeColors = true,
+  }) {
+    if (mergeColors && colors != null) {
+      final map = {for (final color in this) color.name: color, for (final color in colors) color.name: color};
+      return map.values.toList();
+    } else {
+      return colors ?? this;
+    }
+  }
+
+  List<StyleRule> build() {
+    final colors = {
+      for (final color in this) '--${color.name}': color,
+    };
+
+    final light = {for (final entry in colors.entries) entry.key: entry.value.light.value};
+
+    final dark = {
+      for (final entry in colors.entries)
+        if (entry.value case ThemeColor(:final dark?)) entry.key: dark.value,
+    };
+
+    return [
+      css(':root').styles(raw: light),
+      if (dark.isNotEmpty) css(':root[data-theme="dark"]').styles(raw: dark),
+    ];
+  }
+}
+
 /// A vast and beautiful color theme.
 ///
 /// This color palette is based on the [Tailwind Colors](https://tailwindcss.com/docs/colors).
-class ColorTheme {
+class ThemeColors {
   static const ColorSwatch slate = ColorSwatch(
     $50: Color('oklch(0.984 0.003 247.858)'),
     $100: Color('oklch(0.968 0.007 247.896)'),

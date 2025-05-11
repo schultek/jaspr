@@ -140,7 +140,7 @@ abstract class RouteLoaderBase implements RouteLoader {
 
   PageFactory createFactory(PageRoute route, PageConfig config);
 
-  Future<List<RouteEntity>> loadPageEntities();
+  Future<List<SourceRoute>> loadPageEntities();
 
   @override
   void invalidatePage(Page page) {
@@ -201,7 +201,7 @@ abstract class PageFactory<T extends RouteLoaderBase> {
     var child = Page.wrap(
       newPage,
       loader._eager ? UnmodifiableListView(RouteLoader._pages) : [],
-      await newPage.build(),
+      await newPage.render(),
     );
 
     component = child;
@@ -224,23 +224,12 @@ abstract class PageFactory<T extends RouteLoaderBase> {
   }
 }
 
-sealed class RouteEntity {
-  RouteEntity(this.path);
+class SourceRoute {
+  SourceRoute(this.path, this.source, {this.keepSuffix = false});
 
   final String path;
-}
-
-class SourceRoute extends RouteEntity {
-  SourceRoute(super.path, this.source, {this.keepSuffix = false});
-
   final String source;
   final bool keepSuffix;
-}
-
-class CollectionRoute extends RouteEntity {
-  CollectionRoute(super.path, this.entities);
-
-  final List<RouteEntity> entities;
 }
 
 class PageRoute extends SourceRoute {
@@ -254,7 +243,7 @@ final indexRegex = RegExp(r'index\.[^/]*$');
 
 extension RouteLoaderExtension on RouteLoader {
   List<RouteBase> buildRoutesFromEntities({
-    required List<RouteEntity> entities,
+    required List<SourceRoute> entities,
     required List<RouteBase> Function(PageRoute route) buildRoute,
     bool debugPrint = false,
   }) {
@@ -266,67 +255,41 @@ extension RouteLoaderExtension on RouteLoader {
   }
 
   List<RouteBase> _buildRoutes({
-    required List<RouteEntity> entities,
+    required List<SourceRoute> entities,
     required List<RouteBase> Function(PageRoute route) buildRoute,
-    String path = '',
-    bool isTopLevel = true,
   }) {
-    SourceRoute? indexFile;
-    List<SourceRoute> files = [];
-    List<CollectionRoute> subdirs = [];
-
-    for (final entry in entities) {
-      if (entry.path.startsWith('_')) continue;
-
-      if (entry is SourceRoute) {
-        final isIndex = indexRegex.hasMatch(entry.path);
-        if (isIndex) {
-          indexFile = entry;
-        } else {
-          files.add(entry);
-        }
-      } else if (entry is CollectionRoute) {
-        subdirs.add(entry);
-      }
-    }
-
     List<RouteBase> routes = [];
 
-    for (final file in files) {
-      var filePath = file.path;
-      if (!file.keepSuffix) {
-        filePath = filePath.replaceFirst(RegExp(r'\.[^/]*$'), '');
+    for (final entry in entities) {
+      final segments = entry.path.split('/');
+
+      if (segments.isEmpty) continue;
+      if (segments.any((s) => s.startsWith('_'))) continue;
+
+      if (segments.first.isEmpty) {
+        segments.removeAt(0);
       }
-      final routePath = (isTopLevel ? '/' : '') + (indexFile != null || path.isEmpty ? '' : '$path/') + filePath;
-      final result = buildRoute(PageRoute(file.path, file.source, routePath, []));
+      if (segments.last.isEmpty) {
+        segments.removeLast();
+      }
 
-      routes.addAll(result);
-    }
+      if (!entry.keepSuffix) {
+        final isIndex = indexRegex.hasMatch(segments.last);
+        if (isIndex) {
+          segments.removeLast();
+        } else {
+          segments.last = segments.last.replaceFirst(RegExp(r'\.[^/]*$'), '');
+        }
+      }
 
-    for (final subdir in subdirs) {
-      final subRoutes = _buildRoutes(
-        entities: subdir.entities,
-        buildRoute: buildRoute,
-        path: (isTopLevel ? '/' : '') + (indexFile == null && path.isNotEmpty ? '$path/' : '') + subdir.path,
-        isTopLevel: false,
-      );
-      routes.addAll(subRoutes);
-    }
-
-    if (indexFile != null) {
-      final routePath = (isTopLevel ? '/' : '') + path;
       final result = buildRoute(PageRoute(
-        indexFile.path,
-        indexFile.source,
-        routePath,
-        isTopLevel ? [] : routes,
+        entry.path,
+        entry.source,
+        '/${segments.join('/')}',
+        [],
       ));
 
-      if (isTopLevel) {
-        routes.insertAll(0, result);
-      } else {
-        routes = [...result];
-      }
+      routes.addAll(result);
     }
 
     return routes;

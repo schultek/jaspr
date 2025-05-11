@@ -39,8 +39,9 @@ class DocsLayout extends PageLayoutBase {
   String get name => 'docs';
 
   @override
-  Component buildHead(Page page) {
-    return Style(styles: _styles);
+  Iterable<Component> buildHead(Page page) sync* {
+    yield* super.buildHead(page);
+    yield Style(styles: _styles);
   }
 
   @override

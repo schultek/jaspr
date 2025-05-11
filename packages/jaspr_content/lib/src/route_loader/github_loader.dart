@@ -71,14 +71,14 @@ class GithubLoader extends RouteLoaderBase {
   }
 
   @override
-  Future<List<RouteEntity>> loadPageEntities() async {
+  Future<List<SourceRoute>> loadPageEntities() async {
     var root = path;
     if (root.isNotEmpty && !root.endsWith('/')) {
       root += '/';
     }
     var files = await _loadTree();
 
-    Map<String, dynamic> tree = {};
+    List<SourceRoute> routes = [];
 
     for (final file in files) {
       if (file['type'] != 'blob') continue;
@@ -89,28 +89,10 @@ class GithubLoader extends RouteLoaderBase {
       if (path.startsWith('/')) path = path.substring(1);
       if (path.isEmpty) continue;
 
-      var segments = path.split('/');
-
-      var current = tree;
-      for (var i = 0; i < segments.length - 1; i++) {
-        var segment = segments[i];
-        current = (current[segment] ??= <String, dynamic>{});
-      }
-      current[segments.last] =
-          SourceRoute(segments.last, file['url'], keepSuffix: keeySuffixPattern?.matchAsPrefix(path) != null);
+      routes.add(SourceRoute(path, file['url'], keepSuffix: keeySuffixPattern?.matchAsPrefix(path) != null));
     }
 
-    RouteEntity? getEntity(MapEntry<String, dynamic> entry) {
-      if (entry.value case SourceRoute file) {
-        return file;
-      } else if (entry.value case Map<String, dynamic> map) {
-        return CollectionRoute(entry.key, map.entries.map(getEntity).whereType<RouteEntity>().toList());
-      } else {
-        return null;
-      }
-    }
-
-    return tree.entries.map(getEntity).whereType<RouteEntity>().toList();
+    return routes;
   }
 }
 

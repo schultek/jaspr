@@ -15,11 +15,14 @@ class Content extends StatelessComponent {
     return _InheritedContentTheme(theme: theme, child: child);
   }
 
+  static ContentTheme themeOf(BuildContext context) {
+    return context.dependOnInheritedComponentOfExactType<_InheritedContentTheme>()?.theme ?? ContentTheme();
+  }
+
   @override
   Iterable<Component> build(BuildContext context) sync* {
     if (!kIsWeb) {
-      final theme =
-          context.dependOnInheritedComponentOfExactType<_InheritedContentTheme>()?.theme ?? const ContentTheme.custom();
+      final theme = themeOf(context);
       yield Document.head(children: [
         Style(styles: theme.styles),
       ]);

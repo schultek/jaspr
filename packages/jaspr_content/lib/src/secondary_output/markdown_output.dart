@@ -4,7 +4,7 @@ import '../page.dart';
 import 'secondary_output.dart';
 
 /// Outputs a secondary 'index.html.md' file for a markdown page containing its unparsed content.
-class SecondaryMarkdownOutput extends SecondaryOutput {
+class MarkdownOutput extends SecondaryOutput {
   @override
   final Pattern pattern = RegExp(r'.*\.mdx?');
 

@@ -26,8 +26,8 @@ class Page {
     required this.content,
     required this.data,
     required this.config,
-    required RouteLoader loader,
-  }) : _loader = loader;
+    required this.loader,
+  });
 
   /// The path of the page including its suffix, e.g. 'index.html', 'some/path.md'.
   final String path;
@@ -50,7 +50,8 @@ class Page {
   /// This determines how the page is built.
   final PageConfig config;
 
-  final RouteLoader _loader;
+  /// The route loader that created this page.
+  final RouteLoader loader;
 
   /// Applies changes to the page content or data.
   void apply({String? content, Map<String, dynamic>? data, bool mergeData = true}) {
@@ -62,8 +63,12 @@ class Page {
     }
   }
 
+  Page copy() {
+    return Page(path: path, url: url, content: content, data: data, config: config, loader: loader);
+  }
+
   void markNeedsRebuild() {
-    _loader.invalidatePage(this);
+    loader.invalidatePage(this);
   }
 
   static Component wrap(Page page, List<Page> pages, Component child) {
@@ -71,14 +76,14 @@ class Page {
   }
 
   Future<String> readPartial(String path) {
-    return _loader.readPartial(path, this);
+    return loader.readPartial(path, this);
   }
 
   String readPartialSync(String path) {
-    return _loader.readPartialSync(path, this);
+    return loader.readPartialSync(path, this);
   }
 
-  /// Builds the page.
+  /// Renders the page.
   ///
   /// This performs the following steps in order:
   /// 1. Parses the frontmatter if [enableFrontmatter] is true.
@@ -91,7 +96,7 @@ class Page {
   /// 7. Builds the [Content] component from the processed nodes.
   /// 8. Builds the layout for the page using one of the [layouts].
   /// 9. Wraps the layout in the provided [theme].
-  Future<Component> build() async {
+  Future<Component> render() async {
     parseFrontmatter();
     await loadData();
     return AsyncBuilder(builder: (context) async* {
@@ -109,16 +114,19 @@ class Page {
       if (config.rawOutputPattern?.matchAsPrefix(path) != null) {
         context.setHeader('Content-Type', getContentType());
         context.setStatusCode(200, responseBody: content);
-
         return;
       }
 
-      var nodes = parseNodes();
-      nodes = await applyExtensions(nodes);
-      final component = Content(NodesBuilder(config.components).build(nodes) ?? const Text(''));
-      final layout = buildLayout(component);
-      yield wrapTheme(layout);
+      yield await build();
     });
+  }
+
+  Future<Component> build() async {
+    var nodes = parseNodes();
+    nodes = await applyExtensions(nodes);
+    final component = Content(NodesBuilder(config.components).build(nodes) ?? const Text(''));
+    final layout = buildLayout(component);
+    return wrapTheme(layout);
   }
 }
 
@@ -315,10 +323,7 @@ extension PageHandlersExtension on Page {
 
   /// Wraps [child] in the provided theme.
   Component wrapTheme(Component child) {
-    if (config.theme case final theme?) {
-      return Content.wrapTheme(theme, child: child);
-    }
-    return child;
+    return Content.wrapTheme(config.theme ?? ContentTheme(), child: child);
   }
 }
 

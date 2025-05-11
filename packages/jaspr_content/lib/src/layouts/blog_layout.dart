@@ -4,8 +4,8 @@ library;
 import 'package:jaspr/server.dart' as jaspr;
 import 'package:jaspr/server.dart';
 
+import '../../theme.dart';
 import '../page.dart';
-import '../theme/theme.dart';
 import 'page_layout.dart';
 
 /// A layout for blog articles.
@@ -16,17 +16,42 @@ import 'page_layout.dart';
 class BlogLayout extends PageLayoutBase {
   const BlogLayout({
     this.header,
+    this.textFont = _defaultTextFont,
   });
 
   /// The header component to render, usually a [Header].
   final Component? header;
 
+  /// The font to use for the text content, excluding heading.
+  final FontFamily textFont;
+
+  static const _defaultTextFont = FontFamily.list([
+    FontFamily('source-serif-pro'),
+    FontFamily('Georgia'),
+    FontFamily('Cambria'),
+    FontFamilies.timesNewRoman,
+    FontFamilies.times,
+    FontFamilies.serif,
+  ]);
+
   @override
   String get name => 'blog';
 
   @override
-  Component buildHead(Page page) {
-    return Style(styles: _styles);
+  Iterable<Component> buildHead(Page page) sync* {
+    yield* super.buildHead(page);
+    yield Style(styles: [
+      ..._styles,
+      css('.blog .content', [
+        css('&').styles(
+          fontSize: 1.125.rem,
+          lineHeight: 2.rem,
+        ),
+        css('> :not(:is(h1,h2,h3,h4,h5,h6))').styles(
+          fontFamily: textFont,
+        ),
+      ])
+    ]);
   }
 
   @override
@@ -123,21 +148,6 @@ class BlogLayout extends PageLayoutBase {
                       ),
                     ])
                   ]),
-                ]),
-                css('.content', [
-                  css('&').styles(
-                    fontSize: 1.125.rem,
-                    lineHeight: 2.rem,
-                  ),
-                  css('> :not(:is(h1,h2,h3,h4,h5,h6))').styles(
-                      fontFamily: FontFamily.list([
-                    FontFamily('source-serif-pro'),
-                    FontFamily('Georgia'),
-                    FontFamily('Cambria'),
-                    FontFamilies.timesNewRoman,
-                    FontFamilies.times,
-                    FontFamilies.serif,
-                  ])),
                 ]),
                 css('.post-tags', [
                   css('&').styles(

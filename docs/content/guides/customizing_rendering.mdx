@@ -152,73 +152,57 @@ ContentApp(
 
 Both layouts have additional properties to configure their appearance.
 
-### Switching Layouts
+## Create Custom Layouts
 
+You can create your own layouts by implementing the `PageLayout` interface or by extending the `PageLayoutBase` class. This allows for full control over the structure and appearance of your pages.
 
-### Custom Layouts
+A custom layout typically involves:
+1.  Defining a unique `name` (pattern) to be used in frontmatter.
+2.  Optionally overriding `buildHead` to add custom meta tags, styles, or scripts.
+3.  Implementing `buildBody` to structure the page, incorporating the main `child` content alongside custom elements like headers, footers, or sidebars.
 
-You can create your own layout by implementing the `PageLayout` interface:
+```dart title="lib/my_custom_layout.dart"
+import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_content/jaspr_content.dart';
 
-```dart
-class BlogLayout implements PageLayout {
+class MyCustomLayout extends PageLayoutBase {
+  const MyCustomLayout();
+
   @override
-  Component build(PageContext context, Component content) {
-    return DomComponent(
-      tag: 'div',
-      classes: ['blog-layout'],
-      children: [
-        Header(title: context.page.data['title'] ?? 'Blog'),
-        DomComponent(
-          tag: 'main',
-          children: [content],
-        ),
-        Footer(
-          copyright: '© 2025 My Blog',
-          links: [
-            Link(text: 'Home', href: '/'),
-            Link(text: 'Archive', href: '/archive'),
-            Link(text: 'Contact', href: '/contact'),
-          ],
-        ),
-      ],
-    );
+  Pattern get name => 'my_custom_layout_name'; // To be used in frontmatter.
+
+  @override
+  Iterable<Component> buildHead(Page page) sync* {
+    yield* super.buildHead(page); // Add common meta tags.
+    // Add custom styles or scripts here
+  }
+
+  @override
+  Component buildBody(Page page, Component child) {
+    return div(classes: 'custom_layout', [
+      // Add a custom header, nav, etc.
+      main_([child]), // Main content
+      // Add a custom footer
+    ]);
   }
 }
 ```
 
-Register your custom layout:
+Then, register your custom layout in your `ContentApp` configuration:
 
 ```dart
 ContentApp(
+  // ...
   layouts: [
-    BlogLayout(),
+    MyCustomLayout(),
+    // other layouts
   ],
 )
 ```
 
-### Page-Specific Layouts
-
-You can specify which layout to use for a specific page in its frontmatter:
-
-```markdown
----
-title: My Blog Post
-layout: blog
----
-
-This will use the blog layout instead of the default one.
-```
-
-For this to work, you need to register your layout with a name:
-
-```dart
-ContentApp(
-  layouts: [
-    NamedLayout('blog', BlogLayout()),
-    NamedLayout('docs', DocsLayout()),
-  ],
-)
-```
+<Info>
+For a more detailed guide on creating custom layouts, including how to add a table of contents and use layout components, refer to the [Page Layouts](/content/concepts/page_layouts) documentation.
+</Info>
 
 ## Theming
 

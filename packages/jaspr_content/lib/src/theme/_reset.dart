@@ -1,23 +1,36 @@
 part of 'theme.dart';
 
+final _defaultFont = FontFamily.list([
+  FontFamily('Open Sans'),
+  FontFamilies.uiSansSerif,
+  FontFamilies.systemUi,
+  FontFamilies.sansSerif,
+  FontFamily('Apple Color Emoji'),
+  FontFamily('Segoe UI Emoji'),
+  FontFamily('Segoe UI Symbol'),
+  FontFamily('Noto Color Emoji'),
+]);
+
+final _defaultCodeFont = FontFamily.list([
+  FontFamily('JetBrains Mono'),
+  FontFamilies.uiMonospace,
+  FontFamily('SFMono-Regular'),
+  FontFamily('Menlo'),
+  FontFamily('Monaco'),
+  FontFamily('Consolas'),
+  FontFamily('Liberation Mono'),
+  FontFamilies.courierNew,
+  FontFamilies.monospace,
+]);
+
 /// A default set of CSS reset styles.
-final List<StyleRule> resetStyles = [
+final List<StyleRule> _resetStyles = [
   css('*, :after, :before').styles(
     boxSizing: BoxSizing.borderBox,
     border: Border(width: Unit.zero, style: BorderStyle.solid, color: Color('#e5e7eb')),
   ),
   css(':host,html').styles(
     lineHeight: 1.5.em,
-    fontFamily: FontFamily.list([
-      FontFamily('Open Sans'),
-      FontFamilies.uiSansSerif,
-      FontFamilies.systemUi,
-      FontFamilies.sansSerif,
-      FontFamily('Apple Color Emoji'),
-      FontFamily('Segoe UI Emoji'),
-      FontFamily('Segoe UI Symbol'),
-      FontFamily('Noto Color Emoji'),
-    ]),
     raw: {
       '-webkit-text-size-adjust': '100%',
       '-moz-tab-size': '4',
@@ -47,17 +60,6 @@ final List<StyleRule> resetStyles = [
     fontWeight: FontWeight.bolder,
   ),
   css('code, kbd, pre, samp').styles(
-    fontFamily: FontFamily.list([
-      FontFamily('JetBrains Mono'),
-      FontFamilies.uiMonospace,
-      FontFamily('SFMono-Regular'),
-      FontFamily('Menlo'),
-      FontFamily('Monaco'),
-      FontFamily('Consolas'),
-      FontFamily('Liberation Mono'),
-      FontFamilies.courierNew,
-      FontFamilies.monospace,
-    ]),
     fontSize: 1.em,
     raw: {
       'font-feature-settings': 'normal',
