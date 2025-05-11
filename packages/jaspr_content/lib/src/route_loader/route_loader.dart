@@ -51,8 +51,8 @@ abstract class RouteLoaderBase implements RouteLoader {
   final bool debugPrint;
 
   Future<List<RouteBase>>? _routes;
-
-  final Map<String, PageFactory> _factories = {};
+  List<PageSource>? _sources;
+  List<PageSource> get sources => UnmodifiableListView(_sources ?? []);
 
   ConfigResolver? _resolver;
   ConfigResolver get resolver {
@@ -64,12 +64,18 @@ abstract class RouteLoaderBase implements RouteLoader {
 
   StreamSubscription? _reassembleSub;
 
-  String getKeyForRoute(PageRoute route) {
-    return route.url;
+  @override
+  Future<String> readPartial(String path, Page page) {
+    throw UnsupportedError('Reading partial files is not supported for $runtimeType');
   }
 
-  String? getKeyForPage(Page page) {
-    return _factories.keys.where((k) => _factories[k]!.page == page).firstOrNull;
+  @override
+  String readPartialSync(String path, Page page) {
+    throw UnsupportedError('Reading partial files is not supported for $runtimeType');
+  }
+
+  PageSource? getSourceForPage(Page page) {
+    return _sources?.where((s) => s.page == page).firstOrNull;
   }
 
   @override
@@ -85,8 +91,10 @@ abstract class RouteLoaderBase implements RouteLoader {
     _eager = eager;
 
     _routes ??= _buildRoutes();
-    if (eager) {
-      await Future.wait(_factories.values.map((v) => v.future).whereType<Future>());
+    if (eager && _sources != null) {
+      await Future.wait([
+        for (final s in _sources!) s.onLoad,
+      ]);
     }
     return _routes ?? [];
   }
@@ -94,65 +102,61 @@ abstract class RouteLoaderBase implements RouteLoader {
   void onReassemble() {}
 
   Future<List<RouteBase>> _buildRoutes() async {
-    final entities = await loadPageEntities();
-    return buildRoutesFromEntities(
-      entities: entities,
-      buildRoute: (route) {
-        final config = resolver(route);
-        final factory = _factories[getKeyForRoute(route)] ??= createFactory(route, config);
+    final sources = _sources ??= await loadPageSources();
 
-        if (_eager) {
-          factory.future = factory.loadPage();
+    List<RouteBase> routes = [];
+    for (final source in sources) {
+      if (source.path.isEmpty || source.private) {
+        continue;
+      }
+
+      final config = resolver(source);
+      source.config = config;
+
+      if (_eager) {
+        source.load();
+      }
+      final pageBuilder = AsyncBuilder(
+        builder: (context) => Stream.fromFuture(source.load()),
+      );
+
+      routes.add(Route(
+        path: source.url,
+        builder: (_, __) => pageBuilder,
+      ));
+
+      for (final output in config.secondaryOutputs) {
+        if (output.pattern.matchAsPrefix(source.path) != null) {
+          routes.add(Route(
+            path: output.createRoute(source.url),
+            builder: (_, __) => InheritedSecondaryOutput(
+              builder: output.build,
+              child: pageBuilder,
+            ),
+          ));
         }
-        final pageBuilder = AsyncBuilder(builder: (context) async* {
-          if (_eager) {
-            yield await factory.future!;
-          } else {
-            yield await factory.loadPage();
-          }
-        });
+      }
+    }
 
-        final routes = <RouteBase>[];
+    if (debugPrint) {
+      _printRoutes(routes);
+    }
 
-        routes.add(Route(
-          path: route.url,
-          builder: (_, __) => pageBuilder,
-          routes: route.routes,
-        ));
-
-        for (final output in config.secondaryOutputs) {
-          if (output.pattern.matchAsPrefix(route.path) != null) {
-            routes.add(Route(
-              path: output.createRoute(route.url),
-              builder: (_, __) => InheritedSecondaryOutput(
-                builder: output.build,
-                child: pageBuilder,
-              ),
-            ));
-          }
-        }
-
-        return routes;
-      },
-      debugPrint: debugPrint,
-    );
+    return routes;
   }
 
-  PageFactory createFactory(PageRoute route, PageConfig config);
-
-  Future<List<SourceRoute>> loadPageEntities();
+  Future<List<PageSource>> loadPageSources();
 
   @override
   void invalidatePage(Page page) {
-    final key = getKeyForPage(page);
-    if (key != null) {
-      invalidateKey(key);
+    final source = getSourceForPage(page);
+    if (source != null) {
+      invalidateSource(source);
     }
   }
 
-  void invalidateKey(String key, {bool rebuild = true}) {
-    final factory = _factories[key];
-    factory?.invalidate(rebuild: rebuild);
+  void invalidateSource(PageSource source, {bool rebuild = true}) {
+    source.invalidate(rebuild: rebuild);
   }
 
   void invalidateRoutes() {
@@ -160,40 +164,75 @@ abstract class RouteLoaderBase implements RouteLoader {
   }
 
   void invalidateAll() {
-    _factories.clear();
+    _sources = null;
     _routes = null;
     RouteLoader._pages.clear();
   }
 }
 
-abstract class PageFactory<T extends RouteLoaderBase> {
-  PageFactory(this.route, this.config, this.loader);
+final indexRegex = RegExp(r'index\.[^/]*$');
 
-  final PageRoute route;
-  final PageConfig config;
-  final T loader;
+abstract class PageSource {
+  PageSource(this.path, this.loader, {bool keepSuffix = false}) {
+    final segments = path.split('/');
 
-  Page? page;
-  Component? component;
-  Future<Component>? future;
+    private = segments.any((s) => s.startsWith('_'));
+
+    if (segments.isEmpty) {
+      url = '/';
+      return;
+    }
+
+    if (segments.first.isEmpty) {
+      segments.removeAt(0);
+    }
+    if (segments.last.isEmpty) {
+      segments.removeLast();
+    }
+
+    if (!keepSuffix) {
+      final isIndex = indexRegex.hasMatch(segments.last);
+      if (isIndex) {
+        segments.removeLast();
+      } else {
+        segments.last = segments.last.replaceFirst(RegExp(r'\.[^/]*$'), '');
+      }
+    }
+
+    url = '/${segments.join('/')}';
+  }
+
+  final String path;
+  late final String url;
+  late final bool private;
+  final RouteLoaderBase loader;
+
+  PageConfig config = PageConfig();
+
+  Page? _page;
+  Future<Component>? _future;
+
+  Page? get page => _page;
+  Future<void> get onLoad => _future ?? Future.value();
+
+  Future<Component> load() async {
+    _future ??= loadPage();
+    return _future!;
+  }
 
   Future<Component> loadPage() async {
-    if (component != null) {
-      return component!;
-    }
-
     final newPage = await buildPage();
 
-    if (page != null) {
-      RouteLoader._pages.remove(page);
+    if (_page != null) {
+      RouteLoader._pages.remove(_page);
     }
 
-    page = newPage;
+    _page = newPage;
     RouteLoader._pages.add(newPage);
 
     newPage.apply(
       data: <String, dynamic>{
-        'page': {'path': route.path, 'url': route.url},
+        'page': {'path': path, 'url': url},
       }.merge(newPage.data),
       mergeData: false,
     );
@@ -204,97 +243,24 @@ abstract class PageFactory<T extends RouteLoaderBase> {
       await newPage.render(),
     );
 
-    component = child;
     return child;
   }
 
   Future<Page> buildPage();
 
   void invalidate({bool rebuild = true}) {
-    if (page != null) {
-      RouteLoader._pages.remove(page);
-      page = null;
+    if (_page != null) {
+      RouteLoader._pages.remove(_page);
+      _page = null;
     }
-    component = null;
+    _future = null;
     if (rebuild && loader._eager) {
-      future = loadPage();
-    } else {
-      future = null;
+      load();
     }
   }
 }
-
-class SourceRoute {
-  SourceRoute(this.path, this.source, {this.keepSuffix = false});
-
-  final String path;
-  final String source;
-  final bool keepSuffix;
-}
-
-class PageRoute extends SourceRoute {
-  PageRoute(super.path, super.source, this.url, this.routes);
-
-  final String url;
-  final List<RouteBase> routes;
-}
-
-final indexRegex = RegExp(r'index\.[^/]*$');
 
 extension RouteLoaderExtension on RouteLoader {
-  List<RouteBase> buildRoutesFromEntities({
-    required List<SourceRoute> entities,
-    required List<RouteBase> Function(PageRoute route) buildRoute,
-    bool debugPrint = false,
-  }) {
-    final routes = _buildRoutes(entities: entities, buildRoute: buildRoute);
-    if (debugPrint) {
-      _printRoutes(routes);
-    }
-    return routes;
-  }
-
-  List<RouteBase> _buildRoutes({
-    required List<SourceRoute> entities,
-    required List<RouteBase> Function(PageRoute route) buildRoute,
-  }) {
-    List<RouteBase> routes = [];
-
-    for (final entry in entities) {
-      final segments = entry.path.split('/');
-
-      if (segments.isEmpty) continue;
-      if (segments.any((s) => s.startsWith('_'))) continue;
-
-      if (segments.first.isEmpty) {
-        segments.removeAt(0);
-      }
-      if (segments.last.isEmpty) {
-        segments.removeLast();
-      }
-
-      if (!entry.keepSuffix) {
-        final isIndex = indexRegex.hasMatch(segments.last);
-        if (isIndex) {
-          segments.removeLast();
-        } else {
-          segments.last = segments.last.replaceFirst(RegExp(r'\.[^/]*$'), '');
-        }
-      }
-
-      final result = buildRoute(PageRoute(
-        entry.path,
-        entry.source,
-        '/${segments.join('/')}',
-        [],
-      ));
-
-      routes.addAll(result);
-    }
-
-    return routes;
-  }
-
   void _printRoutes(List<RouteBase> routes, [String padding = '']) {
     for (final route in routes) {
       if (route is Route) {

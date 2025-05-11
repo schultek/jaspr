@@ -3,3 +3,40 @@ title: Secondary Outputs
 description: Create secondary outputs for your pages.
 ---
 
+
+
+
+You need to define a `pattern` to match the routes this output should apply to, a `createRoute` method to define the output's path, and a `build` method to render the content.
+
+Here's an example of a custom secondary output that generates a simple text file for each page:
+
+```dart
+import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_content/jaspr_content.dart';
+
+class SimpleTextOutput extends SecondaryOutput {
+  @override
+  Pattern get pattern => RegExp(r'.*'); // Apply to all routes
+
+  @override
+  String createRoute(String route) {
+    if (route.endsWith('/')) {
+      route += 'index';
+    } else if (route.split('/').last.contains('.')) {
+      route = route.substring(0, route.lastIndexOf('.'));
+    }
+    return route += '.txt';
+  }
+
+  @override
+  Component build(Page page) {
+    return Builder(builder: (context) sync* {
+      context.setHeader('Content-Type', 'text/plain');
+      context.setStatusCode(200, responseBody: 'Content for ${page.url}:
+${page.rawContent}');
+    });
+  }
+}
+```
+
+Then, add it to your `PageConfig`'s `secondaryOutputs` list.

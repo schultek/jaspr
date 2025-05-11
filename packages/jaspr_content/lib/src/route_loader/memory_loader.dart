@@ -14,43 +14,45 @@ class MemoryLoader extends RouteLoaderBase {
   final List<MemoryPage> _pages;
 
   @override
-  PageFactory createFactory(PageRoute route, PageConfig config) {
-    final page = _pages.where((p) => p.path == route.path).first;
-    return MemoryPageFactory(page, route, config, this);
-  }
-
-  @override
-  Future<List<SourceRoute>> loadPageEntities() async {
-    final entities = <SourceRoute>[];
+  Future<List<PageSource>> loadPageSources() async {
+    final entities = <PageSource>[];
     for (final page in _pages) {
-      entities.add(SourceRoute(page.path, page.path, keepSuffix: page.keepSuffix));
+      entities.add(MemoryPageSource(page, page.path, this, keepSuffix: page.keepSuffix));
     }
     return entities;
   }
-
-  @override
-  Future<String> readPartial(String path, Page page) {
-    throw UnsupportedError('Reading partial files is not supported for MemoryLoader');
-  }
-
-  @override
-  String readPartialSync(String path, Page page) {
-    throw UnsupportedError('Reading partial files is not supported for MemoryLoader');
-  }
 }
 
+/// A page that is loaded from memory.
+///
+/// This can be used to programmatically create pages.
+///
+/// - Use `MemoryPage()` to create a normal page from a content String.
+/// - Use `MemoryPage.builder()` to create a page from a component builder function.
 class MemoryPage {
+  /// Creates a new [MemoryPage] with the given [path] and [content].
+  ///
+  /// Optionally takes initial [data] to pass to the page.
   const MemoryPage({
     required this.path,
     this.keepSuffix = false,
     this.content,
     this.data = const {},
-  }) : builder = null;
+  })  : builder = null,
+        applyLayout = true;
 
+  /// Creates a new [MemoryPage] with the given [path] and builds it using the [builder].
+  ///
+  /// This is a special case where the page has no content, but is built using the [builder] function.
+  /// Therefore, the any template engine, parsers or extensions will not be used. The layout and theme
+  /// will only be applied if [applyLayout] is set to true (default).
+  ///
+  /// Optionally takes initial [data] to pass to the page.
   const MemoryPage.builder({
     required this.path,
     this.keepSuffix = false,
     this.builder,
+    this.applyLayout = true,
     this.data = const {},
   }) : content = null;
 
@@ -66,12 +68,15 @@ class MemoryPage {
   /// A builder function to create the page.
   final Component Function(Page page)? builder;
 
+  /// Whether to apply a layout to the page.
+  final bool applyLayout;
+
   /// The initial data to pass to the page.
   final Map<String, dynamic> data;
 }
 
-class MemoryPageFactory extends PageFactory {
-  MemoryPageFactory(this._page, super.route, super.config, super.loader);
+class MemoryPageSource extends PageSource {
+  MemoryPageSource(this._page, super.path, super.loader, {super.keepSuffix = false});
 
   final MemoryPage _page;
 
@@ -79,17 +84,18 @@ class MemoryPageFactory extends PageFactory {
   Future<Page> buildPage() async {
     if (_page.builder != null) {
       return _BuilderPage(
-        path: route.path,
-        url: route.url,
+        path: this.path,
+        url: url,
         builder: _page.builder!,
+        applyLayout: _page.applyLayout,
         data: _page.data,
         config: config,
         loader: loader,
       );
     }
     return Page(
-      path: route.path,
-      url: route.url,
+      path: this.path,
+      url: url,
       content: _page.content ?? '',
       data: _page.data,
       config: config,
@@ -103,27 +109,44 @@ class _BuilderPage extends Page {
     required super.path,
     required super.url,
     required this.builder,
+    required this.applyLayout,
     required super.data,
     required super.config,
     required super.loader,
   }) : super(content: '');
 
   final Component Function(Page page) builder;
+  final bool applyLayout;
 
   @override
   Page copy() {
-    return _BuilderPage(path: this.path, url: url, builder: builder, data: data, config: config, loader: loader);
+    return _BuilderPage(
+      path: this.path,
+      url: url,
+      builder: builder,
+      applyLayout: applyLayout,
+      data: data,
+      config: config,
+      loader: loader,
+    );
   }
 
   @override
   Future<Component> render() async {
     await loadData();
-    return AsyncBuilder(builder: (context) async* {
+    return Builder.single(builder: (context) {
       if (kGenerateMode && data['page']['sitemap'] != null) {
         context.setHeader('jaspr-sitemap-data', jsonEncode(data['page']['sitemap']));
       }
 
-      yield builder(this);
+      final child = builder(this);
+
+      if (applyLayout) {
+        final layout = buildLayout(child);
+        return wrapTheme(layout);
+      }
+
+      return child;
     });
   }
 }

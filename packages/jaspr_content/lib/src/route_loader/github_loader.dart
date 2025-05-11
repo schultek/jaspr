@@ -39,21 +39,6 @@ class GithubLoader extends RouteLoaderBase {
   /// For public repositories you may quickly hit rate limits without an access token.
   final String? accessToken;
 
-  @override
-  Future<String> readPartial(String path, Page page) {
-    throw UnsupportedError('Reading partial files is not supported for GithubLoader');
-  }
-
-  @override
-  String readPartialSync(String path, Page page) {
-    throw UnsupportedError('Reading partial files is not supported for GithubLoader');
-  }
-
-  @override
-  PageFactory createFactory(PageRoute route, PageConfig config) {
-    return GithubPageFactory(route, config, this);
-  }
-
   Future<List<dynamic>> _loadTree() async {
     var response = await http.get(
       Uri.parse('https://api.github.com/repos/$repo/git/trees/$ref?recursive=true'),
@@ -71,14 +56,14 @@ class GithubLoader extends RouteLoaderBase {
   }
 
   @override
-  Future<List<SourceRoute>> loadPageEntities() async {
+  Future<List<PageSource>> loadPageSources() async {
     var root = path;
     if (root.isNotEmpty && !root.endsWith('/')) {
       root += '/';
     }
     var files = await _loadTree();
 
-    List<SourceRoute> routes = [];
+    List<PageSource> routes = [];
 
     for (final file in files) {
       if (file['type'] != 'blob') continue;
@@ -89,28 +74,37 @@ class GithubLoader extends RouteLoaderBase {
       if (path.startsWith('/')) path = path.substring(1);
       if (path.isEmpty) continue;
 
-      routes.add(SourceRoute(path, file['url'], keepSuffix: keeySuffixPattern?.matchAsPrefix(path) != null));
+      routes.add(GithubPageSource(
+        path,
+        file['url'],
+        this,
+        accessToken: accessToken,
+        keepSuffix: keeySuffixPattern?.matchAsPrefix(path) != null,
+      ));
     }
 
     return routes;
   }
 }
 
-class GithubPageFactory extends PageFactory<GithubLoader> {
-  GithubPageFactory(super.route, super.config, super.loader);
+class GithubPageSource extends PageSource {
+  GithubPageSource(super.path, this.blobUrl, super.loader, {this.accessToken, super.keepSuffix = false});
+
+  final String blobUrl;
+  final String? accessToken;
 
   @override
   Future<Page> buildPage() async {
-    final response = await http.get(Uri.parse(route.source), headers: {
+    final response = await http.get(Uri.parse(blobUrl), headers: {
       'Accept': 'application/vnd.github.raw+json',
-      if (loader.accessToken != null) 'Authorization': 'Bearer ${loader.accessToken}',
+      if (accessToken != null) 'Authorization': 'Bearer $accessToken',
       'X-GitHub-Api-Version': '2022-11-28',
     });
     final content = response.body;
 
     return Page(
-      path: route.path,
-      url: route.url,
+      path: path,
+      url: url,
       content: content,
       data: {},
       config: config,

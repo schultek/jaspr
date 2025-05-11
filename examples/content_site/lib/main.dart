@@ -1,5 +1,4 @@
 import 'package:content_site/clicker.dart';
-import 'package:content_site/jaspr_options.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_content/components/code_block.dart';
 import 'package:jaspr_content/jaspr_content.dart';
@@ -10,6 +9,9 @@ import 'package:jaspr_content/components/callout.dart';
 import 'package:jaspr_content/components/drop_cap.dart';
 import 'package:jaspr_content/components/image.dart';
 import 'package:jaspr_content/components/tabs.dart';
+import 'package:jaspr_content/theme.dart';
+
+import 'jaspr_options.dart';
 
 void main() {
   Jaspr.initializeApp(options: defaultJasprOptions);
@@ -114,10 +116,13 @@ void runGithub() {
           ]),
         ),
       ],
-      // theme: ContentTheme(
-      //   primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
-      //   background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
-      // ),
+      theme: ContentTheme(
+        //primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
+       // background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
+       colors: [
+        ContentColors.quoteBorders.apply(ThemeColors.indigo),
+       ]
+      ),
     ),
   ));
 }

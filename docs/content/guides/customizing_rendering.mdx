@@ -207,12 +207,14 @@ For a more detailed guide on creating custom layouts, including how to add a tab
 ## Theming
 
 Theming allows you to customize the colors, typography, and overall look of your site.
-
-### Content Theme
-
 The `ContentTheme` class provides a way to define colors and other visual properties:
 
 ```dart
+// Theming needs a separate import.
+import 'package:jaspr_content/theme.dart';
+
+// ...
+
 ContentApp(
   theme: ContentTheme(
     // Primary color for buttons, links, etc.
@@ -220,106 +222,129 @@ ContentApp(
     
     // Background color for the site
     background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
-    
-    // Text colors
-    text: ThemeColor(Colors.black, dark: Colors.white),
-    textMuted: ThemeColor(Colors.grey[700], dark: Colors.grey[300]),
-    
-    // Font settings
-    fontFamily: 'Inter, system-ui, sans-serif',
-    codeFont: 'JetBrains Mono, monospace',
   ),
 )
 ```
 
-The `ThemeColor` class allows you to specify different colors for light and dark modes, which work with the built-in theme toggle.
+The `ThemeColor` class allows you to specify different colors for light and dark modes, which work with the built-in [Theme Toggle](/content/concepts/page_layouts#themetoggle) component.
 
-### Custom CSS
+You can also:
 
-You can also add custom CSS to your site by including a stylesheet:
-
-```dart
-ContentApp(
-  extraStylesheets: [
-    'assets/custom-styles.css',
-  ],
-)
-```
-
-### Responsive Design
-
-All built-in layouts are responsive by default, but you can customize how they behave at different screen sizes:
+- change content specific colors from `ContentColors`
+- add your own theme-aware `ColorToken`
+- pick any color from `ThemeColors`
 
 ```dart
-DocsLayout(
-  // ...
-  responsiveBreakpoint: 768, // px
-  sidebarPosition: SidebarPosition.left,
-  sidebarWidth: 250, // px
+// Define your token with light and dark colors.
+final myColorToken = ColorToken('myToken', ThemeColors.indigo.$500, dark: ThemeColors.indigo.$400);
+
+// ...
+
+// Provide it to ContentTheme
+theme: ContentTheme(
+  colors: [
+    // Add your own color token.
+    myColorToken,
+    // Change the color of an existing token.
+    ContentColors.quoteBorders.apply(ThemeColors.indigo),
+  ]
 )
+
+// ...
+
+// Use it in your components
+css('.my-component').styles(
+  // A [ColorToken] can be used anywhere a [Color] is expected and automatically respects light and dark mode.
+  backgroundColor: myColorToken, 
+  border: Border(color: ContentColors.quoteBorders)
+),
 ```
 
 ## Putting It All Together
 
 Here's a complete example that brings together all the customization options:
 
-```dart
-// lib/main.dart
+```dart title="lib/main.dart"
 import 'package:jaspr/server.dart';
 import 'package:jaspr_content/jaspr_content.dart';
+import 'package:jaspr_content/theme.dart';
+
+import 'jaspr_options.dart';
 
 void main() {
-  Jaspr.initializeApp();
+  Jaspr.initializeApp(options: defaultJasprOptions);
 
   runApp(ContentApp.custom(
     loaders: [
+      // Load pages from both the 'content/' directory and github repository.
       FilesystemLoader('content'),
       GithubLoader(
-        'username/repo',
+        '<username>/<repo>',
         accessToken: '...',
       ),
     ],
-    configResolver: PageConfig.resolve(
+    // Resolve the same config for all pages.
+    configResolver: PageConfig.all(
       dataLoaders: [
+        // Load data from the 'content/_data' directory.
         FilesystemDataLoader('content/_data'),
       ],
+      // Preprocess files with mustache.
       templateEngine: MustacheTemplateEngine(),
       parsers: [
+        // Parse both .html and .md files.
         HtmlParser(),
         MarkdownParser(),
       ],
       extensions: [
+        // Create a table of contents.
         TableOfContentsExtension(),
+        // Add heading anchors.
         HeadingAnchorsExtension(),
-        ComponentsExtension([
-          Callout.factory,
-        ]),
       ],
+      components: {
+        // Support <Info>, <Warning>, <Error> and <Success> components.
+        Callout(),
+        // Support zoomable images with captions.
+        Image(zoom: true),
+        // Add syntax highlighting and copy button to code blocks.
+        CodeBlock(),
+        // Add a custom <Card> component.
+        CustomComponent(
+          pattern: 'Card',
+          builder: (_, __, child) => Card(child: child),
+        ),
+      }
       layouts: [
+        // Render content in a docs layout with header and sidebar.
         DocsLayout(
           favicon: 'favicon.ico',
           header: Header(
-            title: 'Jaspr',
+            title: 'My Docs',
             logo: 'assets/logo.png',
             items: [
+              // Support toggling between light and dark mode.
               ThemeToggle(),
-              GithubButton(repo: 'username/repo'),
+              // Show a github button with live stars and forks count.
+              GithubButton(repo: '<username>/<repo>'),
             ]
           ),
           sidebar: Sidebar(groups: [
+            // Render sidebar links.
             SidebarGroup(
               links: [
-                SidebarLink(text: "📖 Overview", href: '/'),
-                SidebarLink(text: "🥊 About", href: '/about'),
+                SidebarLink(text: "Overview", href: '/'),
+                SidebarLink(text: "About", href: '/about'),
               ],
             ),
             SidebarGroup(title: 'Get Started', links: [
-              SidebarLink(text: "🖟 Rendering Modes", href: '/get_started/modes'),
-              SidebarLink(text: "💧 Server vs Client", href: '/get_started/server_client'),
+              SidebarLink(text: "Installation", href: '/get_started/installation'),
+              SidebarLink(text: "Quick Start", href: '/get_started/quick_start'),
             ]),
           ]),
         ),
       ],
+      // Set custom theme colors.
       theme: ContentTheme(
         primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
         background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
@@ -336,8 +361,12 @@ This configuration creates a comprehensive content site with:
 - Content parsed from markdown and HTML files
 - A table of contents automatically generated from headings
 - Anchor links for each heading for easy linking
-- Custom components like callout boxes
-- A documentation layout with header, theme toggle, GitHub button, and sidebar navigation
-- Custom primary and background colors with light and dark variants
+- Custom components like callout boxes, zoomable images and syntax highlighting in code blocks.
+- A documentation layout with header, theme toggle, GitHub button, and sidebar navigation.
+- Custom primary and background colors with light and dark variants.
 
 By combining these customization options, you can create a unique and feature-rich content site that matches your brand and meets your specific requirements.
+
+---
+
+Proceed to the [Assembling the Site](/content/guides/assembling_the_site) guide to learn how to finalize your site and deploy it to various hosting platforms.

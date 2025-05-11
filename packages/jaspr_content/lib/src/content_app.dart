@@ -173,7 +173,7 @@ class ContentApp extends AsyncStatelessComponent {
   }
 }
 
-PageConfig _defaultConfigResolver(PageRoute route) {
+PageConfig _defaultConfigResolver(PageSource source) {
   return const PageConfig();
 }
 

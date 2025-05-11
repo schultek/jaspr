@@ -224,9 +224,9 @@ class PageConfig {
   ///
   /// If no pattern matches, the default config is returned.
   static ConfigResolver match(Map<Pattern, PageConfig> configs) {
-    return (PageRoute route) {
+    return (PageSource source) {
       for (final entry in configs.entries) {
-        if (entry.key.matchAsPrefix(route.path) != null) {
+        if (entry.key.matchAsPrefix(source.path) != null) {
           return entry.value;
         }
       }
@@ -235,8 +235,8 @@ class PageConfig {
   }
 }
 
-/// A function that resolves the configuration for a page based on its url.
-typedef ConfigResolver = PageConfig Function(PageRoute);
+/// A function that resolves the configuration for a page based on its source.
+typedef ConfigResolver = PageConfig Function(PageSource);
 
 /// A function that builds a page based on its configuration.
 typedef PageBuilder = Future<Component> Function(Page);

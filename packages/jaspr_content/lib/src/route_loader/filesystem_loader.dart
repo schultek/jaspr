@@ -26,14 +26,9 @@ class FilesystemLoader extends RouteLoaderBase {
   /// A pattern to keep the file suffix for all matching pages.
   final Pattern? keeySuffixPattern;
 
-  final Map<String, Set<String>> dependentPages = {};
+  final Map<String, Set<PageSource>> dependentSources = {};
 
   StreamSubscription<WatchEvent>? _watcherSub;
-
-  @override
-  String getKeyForRoute(PageRoute route) {
-    return route.source;
-  }
 
   @override
   Future<List<RouteBase>> loadRoutes(ConfigResolver resolver, bool eager) async {
@@ -41,9 +36,9 @@ class FilesystemLoader extends RouteLoaderBase {
       _watcherSub ??= DirectoryWatcher(directory).events.listen((event) {
         var path = event.path;
         if (event.type == ChangeType.MODIFY) {
-          invalidateKey(path);
+          invalidateFile(path);
         } else if (event.type == ChangeType.REMOVE) {
-          invalidateKey(path, rebuild: false);
+          invalidateFile(path, rebuild: false);
           invalidateRoutes();
         } else if (event.type == ChangeType.ADD) {
           invalidateRoutes();
@@ -70,66 +65,79 @@ class FilesystemLoader extends RouteLoaderBase {
   }
 
   File _getPartial(String path, Page page) {
-    final pagePath = getKeyForPage(page);
-    if (pagePath != null) {
-      (dependentPages[path] ??= {}).add(pagePath);
+    final pageSource = getSourceForPage(page);
+    if (pageSource != null) {
+      (dependentSources[path] ??= {}).add(pageSource);
     }
     return File(path);
   }
 
   @override
-  PageFactory createFactory(PageRoute page, PageConfig config) {
-    return FilePageFactory(page, config, this);
+  Future<List<PageSource>> loadPageSources() async {
+    final root = Directory(directory);
+
+    List<PageSource> loadFiles(Directory dir) {
+      List<PageSource> entities = [];
+      for (final entry in dir.listSync()) {
+        final path = entry.path.substring(root.path.length + 1);
+        if (entry is File) {
+          entities.add(FilePageSource(
+            path,
+            entry,
+            this,
+            keepSuffix: keeySuffixPattern?.matchAsPrefix(entry.path) != null,
+          ));
+        } else if (entry is Directory) {
+          entities.addAll(loadFiles(entry));
+        }
+      }
+      return entities;
+    }
+
+    return loadFiles(root);
+  }
+
+  void invalidateFile(String path, {bool rebuild = true}) {
+    final source = sources.where((s) => (s as FilePageSource).file.path == path).firstOrNull;
+    if (source != null) {
+      invalidateSource(source, rebuild: rebuild);
+    }
   }
 
   @override
-  void invalidateKey(String key, {bool rebuild = true}) {
-    super.invalidateKey(key, rebuild: rebuild);
-    final dependencies = {...?dependentPages[key]};
-    dependentPages[key]?.clear();
-    for (var dpath in dependencies) {
-      invalidateKey(dpath, rebuild: rebuild);
+  void invalidateSource(PageSource source, {bool rebuild = true}) {
+    super.invalidateSource(source, rebuild: rebuild);
+    final dependencies = {...?dependentSources[source.path]};
+    dependentSources[source.path]?.clear();
+    for (var dependent in dependencies) {
+      invalidateSource(dependent, rebuild: rebuild);
     }
   }
 
   @override
   void invalidateAll() {
     super.invalidateAll();
-    dependentPages.clear();
-  }
-
-  @override
-  Future<List<SourceRoute>> loadPageEntities() async {
-    final root = Directory(directory);
-
-    List<SourceRoute> loadEntities(Directory dir) {
-      List<SourceRoute> entities = [];
-      for (final entry in dir.listSync()) {
-        final path = entry.path.substring(root.path.length + 1);
-        if (entry is File) {
-          entities.add(SourceRoute(path, entry.path, keepSuffix: keeySuffixPattern?.matchAsPrefix(entry.path) != null));
-        } else if (entry is Directory) {
-          entities.addAll(loadEntities(entry));
-        }
-      }
-      return entities;
-    }
-
-    return loadEntities(root);
+    dependentSources.clear();
   }
 }
 
-class FilePageFactory extends PageFactory<FilesystemLoader> {
-  FilePageFactory(super.route, super.config, super.loader);
+class FilePageSource extends PageSource {
+  FilePageSource(
+    super.path,
+    this.file,
+    super.loader, {
+    super.keepSuffix,
+  });
+
+  final File file;
 
   @override
   Future<Page> buildPage() async {
-    final file = File(route.source);
     final content = await file.readAsString();
 
     return Page(
-      path: route.path,
-      url: route.url,
+      path: this.path,
+      url: url,
       content: content,
       data: {},
       config: config,
