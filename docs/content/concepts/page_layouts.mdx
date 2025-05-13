@@ -1,0 +1,258 @@
+---
+title: Page Layouts
+description: Use layouts to create a consistent look and feel for your pages.
+---
+
+---
+
+Page layouts define the overall structure and appearance of your pages. They allow you to wrap your page content with common elements like headers, footers, sidebars, and navigation menus, ensuring a consistent user experience across your site.`jaspr_content` allows you to use **pre-built layouts**, create your own **custom layouts**, and easily switch between them.
+
+## How Layouts Work
+
+When `jaspr_content` renders a page, it takes the page's main content (often generated from Markdown or HTML) and passes it to a `PageLayout` object. The layout is then responsible for embedding this content within a larger component tree.
+
+You can specify a default layout for all pages in your `ContentApp` configuration, or choose a specific layout for individual pages using frontmatter.
+
+```dart
+ContentApp(
+  // ...
+  layouts: [
+    // Default layout (first item)
+    DocsLayout(), 
+    // Additional layouts
+    BlogLayout(),
+    MyCustomLayout(),
+  ],
+)
+```
+
+To use a specific layout for a page, you can specify it in the page's frontmatter:
+
+```markdown title="content/my-page.md"
+---
+title: My Awesome Page
+layout: blog
+---
+
+This page will use `BlogLayout`.
+```
+
+The name is defined by the specific `PageLayout`, like `docs` for `DocsLayout` or `blog` for `BlogLayout`. If no `layout` is specified in the frontmatter, or if the specified layout is not found, the first registered layout in the `ContentApp`'s `layouts` list is used as the default.
+
+## Built-in Layouts
+
+`jaspr_content` comes with a few pre-built layouts to get you started quickly:
+
+### DocsLayout
+
+The [`DocsLayout`](/content/layouts/docs_layout) is designed for documentation websites. It comes with:
+
+- A header with a title, logo, and other actions.
+- A sidebar for navigation between documentation sections.
+- A table of contents for the current page.
+
+[Learn more about DocsLayout](/content/layouts/docs_layout).
+
+### BlogLayout
+
+The [`BlogLayout`](/content/layouts/blog_layout) is tailored for blog posts and articles. It features:
+- A header with a title, logo, and other actions.
+- A prominent title block displaying the post's title, author, date, etc.
+- Optional display of tags or categories.
+
+[Learn more about BlogLayout](/content/layouts/blog_layout).
+
+### EmptyLayout
+
+The `EmptyLayout` is a minimal layout that renders only the page's content without any additional surrounding elements like headers or footers. It's useful for pages where you want full control over the output or for content that will be embedded elsewhere.
+
+[Learn more about EmptyLayout](/content/layouts/empty_layout).
+
+## Creating Custom Layouts
+
+You can create your own layouts by implementing the `PageLayout` interface or by extending the `PageLayoutBase` class. 
+
+<Info>
+`PageLayoutBase` provides a helpful starting point by handling common tasks like setting up the document's `<head>` with meta tags.
+</Info>
+
+### Using `PageLayoutBase`
+
+Here's an example of a simple custom layout:
+
+```dart title="lib/my_custom_layout.dart"
+import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_content/jaspr_content.dart';
+
+class MyCustomLayout extends PageLayoutBase {
+  const MyCustomLayout();
+
+  @override
+  Pattern get name => 'my_custom_layout_name'; // To be used in frontmatter.
+
+  @override
+  Iterable<Component> buildHead(Page page) sync* {
+    // Add common meta tags.
+    yield* super.buildHead(page);
+
+    yield Style(styles: [
+      css('.custom_layout', [
+        // Add custom css rules for this layout.
+      ]),
+    ]);
+  }
+
+  @override
+  Component buildBody(Page page, Component child) {
+    // `page` contains all page data, including frontmatter.
+    // `child` is the rendered content of the page.
+    
+    return div(classes: 'custom_layout', [
+      header([
+        // Add a custom header.
+      ]),
+      main_([
+        child,
+      ]),
+      footer([
+        // Add a custom footer.
+      ]),
+    ]);
+  }
+}
+```
+
+Then, register your custom layout in `ContentApp`:
+
+```dart
+ContentApp(
+  // ...
+  layouts: [
+     MyCustomLayout(),
+    // other layouts
+  ],
+)
+```
+
+### Adding a Table of Contents
+
+The `TableOfContentsExtension` generates a table of contents based on the headings in your page. You can then display this in your layout.
+
+First, ensure the extension is added to your `ContentApp`:
+
+```dart title="lib/main.dart"
+ContentApp(
+  // ...
+  extensions: [
+    TableOfContentsExtension(),
+    // other extensions
+  ],
+  // ...
+)
+```
+
+The extension stores the `TableOfContents` object in `page.data['toc']`. Your custom layout can then access and render it:
+
+```dart title="lib/my_custom_layout.dart"
+// ...
+@override
+Component buildBody(Page page, Component child) {
+  // ...
+
+  return div([
+    // ...
+    main_([
+      child,
+      aside(classes: 'toc', [
+        if (page.data['toc'] case TableOfContents toc)
+          div([
+            h3([text('On this page')]),
+            toc.build(), // Renders the ToC as an unstyled <ul> list
+          ]),
+      ]),
+    ]),
+    // ...
+  ]);
+}
+// ...
+```
+
+## Using Layout Components
+
+`jaspr_content` provides several additional components that are commonly used within layouts to add functionality and structure. You can use these components both with existing layouts or your own custom implementations.
+
+### Header
+
+A `Header` component is often used at the top of the page. It can contain the site title, logo, navigation links, and other elements like a theme toggle. Both `DocsLayout` and `BlogLayout` accept a `header` parameter.
+
+Example usage with `BlogLayout`:
+
+```dart
+BlogLayout(
+  header: Header(
+    title: 'My Site',
+    logo: '/assets/logo.png',
+    items: [
+      Link(text: 'Home', href: '/'),
+      Link(text: 'Articles', href: '/articles'),
+      ThemeToggle(), // Described below
+      GithubButton(repo: '<user>/<repo>'), // Described below
+    ],
+  )
+)
+```
+
+### Sidebar
+
+A `Sidebar` is common in documentation sites for navigating through different pages or sections. `DocsLayout` accepts a `sidebar` parameter. The `Sidebar` typically contains `SidebarGroup`s and `SidebarLink`s.
+
+Example usage with `DocsLayout`:
+
+```dart
+DocsLayout(
+  sidebar: Sidebar(groups: [
+    SidebarGroup(
+      links: [
+        SidebarLink(text: "📖 Overview", href: '/'),
+        SidebarLink(text: "🧭 About", href: '/about'),
+      ],
+    ),
+    SidebarGroup(title: 'Get Started', links: [
+      SidebarLink(text: "🚀 Quick Start", href: '/get_started/quick_start'),
+    ]),
+  ]),
+),
+```
+
+The `DocsLayout` also adds a menu button in the `Header` to show/hide the sidebar on smaller screens. When you are not using the `Header` component you can add this menu button manually like this:
+
+```dart
+div(attributes: {'data-has-sidebar': ''}, [
+  // ...,
+  header([
+    SidebarToggleButton(),
+    // Other header elements ...
+  ]),
+  // ...
+])
+```
+
+### GithubButton
+
+The `GithubButton` component can be used to display a link to a GitHub repository including its number of stars and forks.
+
+```dart
+GithubButton(repo: '<user>/<repo>')
+```
+
+![GithubButton Screenshot](/content/assets/github_button.png)
+
+### ThemeToggle
+
+The `ThemeToggle` component allows users to switch between light and dark mode for the site. This component works in conjunction with the `ContentTheme` defined in your `ContentApp`. [Learn more about Theming](/content/concepts/theming)
+
+```dart
+ThemeToggle()
+```
+
+![ThemeToggle Screenshot](/content/assets/theme_toggle.png)

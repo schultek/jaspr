@@ -1,0 +1,200 @@
+---
+title: Theming
+description: Customize the look and feel of your site using custom colors, fonts and typography.
+---
+
+Theming in `jaspr_content` allows you to tailor the visual appearance of your site, including its **colors, fonts, and overall styling**, to match your brand or personal preference. This is primarily managed through the `ContentTheme` class.
+
+## ContentTheme
+
+The `ContentTheme` class is the central piece for customizing the look and feel of your content-driven site. You provide an instance of `ContentTheme` to the `theme` parameter of your `ContentApp`.
+
+First, ensure you have the necessary import:
+
+```dart
+import 'package:jaspr_content/theme.dart';
+```
+
+<Info>
+The theme has a separate import because it may also be used in client-side code and components, which is different to everything else from `jaspr_content`.
+</Info>
+
+Then, configure it in your `ContentApp`:
+
+```dart
+ContentApp(
+  // ... other configurations
+  theme: ContentTheme(
+    // Theme customizations go here
+  ),
+)
+```
+
+### Changing Colors
+
+`ContentTheme` allows you to easily set the main colors for your site:
+
+- `primary`: The primary accent color, used for links, buttons, and other highlighted elements.
+- `background`: The main background color for your pages.
+- `text`: The default text color.
+
+These properties accept a `Color` object. For light and dark mode support, use `ThemeColor`:
+
+```dart
+ContentTheme(
+  primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
+  background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
+  text: ThemeColor(ThemeColors.gray.$700, dark: ThemeColors.gray.$200),
+)
+```
+
+### Changing Fonts
+
+You can specify default and code-specific font families:
+
+-   `font`: The default `FontFamily` for the entire page.
+-   `codeFont`: The `FontFamily` used for `<code>`, `<kbd>`, `<pre>`, and `<samp>` elements.
+
+```dart
+ContentTheme(
+  font: FontFamilies.arial,
+  codeFont: FontFamily('SomeMonoFont')
+)
+```
+
+If not specified, `ContentTheme.defaultFont` and `ContentTheme.defaultCodeFont` are used.
+
+### Overriding Content Colors
+
+`jaspr_content` comes with a set of predefined `ColorToken`s for various content elements (like blockquotes, table borders, etc.), available via `ContentColors`. You can override these default colors.
+
+To override a specific content color, provide it in the `colors` list within `ContentTheme`, using the `.apply()` method on the desired `ContentColor` token. You can use colors from `ThemeColors` (a Tailwind-inspired palette) or any other `Color` object.
+
+```dart
+// Define your theme
+ContentTheme(
+  colors: [
+    // Change the border color of quotes to blue
+    ContentColors.quoteBorders.apply(ThemeColors.blue.$500),
+    // Change the background of code blocks, with dark mode variant
+    ContentColors.preBg.apply(ThemeColor(ThemeColors.slate.$100, dark: ThemeColors.slate.$800)),
+  ],
+)
+```
+
+### Adding Custom Color Tokens
+
+You can define your own `ColorToken`s to use throughout your site. A `ColorToken` can have different values for light and dark themes.
+
+1.  **Define your token**:
+    ```dart
+    final myCustomToken = ColorToken(
+      'my-brand-accent', // CSS variable name will be --my-brand-accent
+      ThemeColors.amber.$500,    // Light mode color
+      dark: ThemeColors.amber.$400 // Dark mode color
+    );
+
+    final anotherToken = ColorToken('footer-bg', Color('#eeeeee')); // Same for light and dark
+    ```
+
+2.  **Add it to `ContentTheme`**:
+    ```dart
+    ContentTheme(
+      colors: [
+        myCustomToken,
+        anotherToken,
+        // ... other color overrides or custom tokens
+      ],
+    )
+    ```
+
+3.  **Use it in Styles**: (Continue to next section)
+
+## Theme Colors and Tokens
+
+### Use in Components
+
+Once a `ColorToken` (either predefined or custom) is part of your theme, it generates a CSS variable (e.g., `--my-brand-accent`). You can use these tokens directly in your Jaspr component styles. They automatically respect the current light/dark mode.
+
+```dart
+// In your component's style
+css('.my-custom-component').styles(
+  backgroundColor: myCustomToken, // Uses the token defined above
+  border: Border(color: ContentColors.quoteBorders), // Uses an overridden or default content color
+),
+```
+
+### Light & Dark Mode
+
+`jaspr_content` has built-in support for light and dark color schemes. You can define theme-aware colors using the `ThemeColor` or `ColorToken` classes, both of which implement `Color` and can be used anywhere a normal color is expected.
+
+<Info>
+You can use the built-in [`ThemeToggle`](/content/concepts/page_layouts#themetoggle) component anywhere on your page to enable switching between light and dark mode.
+</Info> 
+
+## Content Styles
+
+### The `not-content` class
+
+Sometimes, you might have parts of your page (like custom html snippets in markdown files) that should not inherit the default content typography and styles (e.g., paragraph margins, heading sizes). You can add the class `not-content` to any element in your content. Elements with this class will be excluded from the global content styling.
+
+```markdown
+## Markdown Content
+
+<div class="not-content">Custom HTML with no styling</div>
+```
+
+### Modify Typography
+
+`ContentTypography` allows for detailed customization of text styles across your site, including headings, paragraphs, links, lists, and more. The `typography` parameter in `ContentTheme` accepts a `ContentTypography` object. By default, `ContentTypography.base` is used.
+
+To customize typography:
+
+1.  Create an instance of `ContentTypography`.
+2.  Use the `styles` parameter to define base styles that apply to the main content container.
+3.  Use the `rules` parameter to provide a list of `StyleRule` objects for specific HTML elements (e.g., `h1`, `p`, `a`). These rules will be automatically scoped to the content container and respect the `not-content` class.
+
+```dart
+ContentTheme(
+  // ... other theme settings
+  typography: ContentTypography(
+    styles: Styles(
+      // Base styles for all content within the main content area
+      lineHeight: 1.7.em,
+      fontSize: 1.05.rem,
+    ),
+    rules: [
+      css('h1').styles(
+        fontSize: 2.8.rem,
+        fontWeight: FontWeight.w700,
+        marginTop: 2.rem,
+        marginBottom: 1.rem,
+        color: ContentColors.headings, // Using a theme color token
+      ),
+      // Add more rules for other elements like ul, li, blockquote, etc.
+    ],
+  ),
+)
+```
+
+You can also extend the base typography rules by using:
+
+```dart
+typography: ContentTypography.base.apply(
+  styles: ...,
+  rules: ...,
+)
+```
+
+By combining these theming options, you can create a visually consistent and appealing site that aligns perfectly with your design requirements.
+
+
+## Disable Theming
+
+By default (even without any configuration) `jaspr_content` will apply a set of global reset styles and the default content styles to the page. You can opt-out of that (e.g. to use your own custom theming solution) by using `ContentTheme.none()`.
+
+```dart
+ContentApp(
+  theme: const ContentTheme.none(),
+)
+```

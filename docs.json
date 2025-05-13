@@ -21,28 +21,33 @@
       "title": "Playground",
       "icon": "code",
       "href": "https://playground.jaspr.site"
-    },
-    {
-      "title": "Bluesky",
-      "icon": "bluesky",
-      "href": "https://bsky.app/profile/schultek.dev"
-    },
-    {
-      "title": "X",
-      "icon": "x-twitter",
-      "href": "https://x.com/schultek_dev"
     }
   ],
   "social": {
     "x": "@schultek_dev",
-    "github": "schultek"
+    "github": "schultek",
+    "website": "https://jaspr.site",
+    "discord": "XGXrGEk4c6"
   },
   "theme": {
     "primary": "#01589B",
     "primaryDark": "#41C3FE"
   },
+  "tabs": [
+    {
+      "id": "root",
+      "title": "Guides",
+      "href": "/"
+    },
+    {
+      "id": "api",
+      "title": "API",
+      "href": "/api"
+    }
+  ],
   "sidebar": [
     {
+      "tab": "root",
       "pages": [
         {
           "title": "\uD83D\uDCD6 Overview",
@@ -55,23 +60,24 @@
       ]
     },
     {
+      "tab": "root",
       "group": "Get Started",
       "pages": [
         {
-          "title": "\uD83D\uDEEB Installation",
-          "href": "/get_started/installation"
-        },
-        {
-          "title": "\uD83D\uDD79 Jaspr CLI",
-          "href": "/get_started/cli"
+          "title": "\uD83D\uDEEB Quickstart",
+          "href": "/get_started/quick_start"
         },
         {
           "title": "\uD83D\uDCDF Rendering Modes",
           "href": "/get_started/modes"
         },
         {
-          "title": "\uD83D\uDCA7 Hydration",
-          "href": "/get_started/hydration"
+          "title": "\uD83C\uDD9A Server vs Client",
+          "href": "/get_started/server_client"
+        },
+        {
+          "title": "\uD83D\uDD79 Jaspr CLI",
+          "href": "/get_started/cli"
         },
         {
           "title": "\uD83D\uDCE6 Project Structure",
@@ -84,6 +90,7 @@
       ]
     },
     {
+      "tab": "root",
       "group": "Key Concepts",
       "pages": [
         {
@@ -111,6 +118,14 @@
           "href": "/concepts/seo"
         },
         {
+          "title": "\ud83c\udfd7\ufe0f Static Sites",
+          "href": "/concepts/static_sites"
+        },
+        {
+          "title": "\uD83D\uDCA7 Hydration",
+          "href": "/concepts/hydration"
+        },
+        {
           "title": "\uD83E\uDDEA Testing",
           "href": "/concepts/testing"
         },
@@ -121,6 +136,7 @@
       ]
     },
     {
+      "tab": "root",
       "group": "Going Further",
       "pages": [
         {
@@ -138,6 +154,7 @@
       ]
     },
     {
+      "tab": "root",
       "group": "Ecosystem",
       "pages": [
         {
@@ -155,112 +172,281 @@
       ]
     },
     {
-      "group": "Components",
+      "tab": "api",
       "pages": [
         {
-          "title": "Document",
-          "href": "/components/document"
-        },
-        {
-          "title": "RawText",
-          "href": "/components/raw_text"
-        },
-        {
-          "title": "AsyncBuilder",
-          "href": "/components/async_components"
-        },
-        {
-          "title": "AsyncStatelessComponent",
-          "href": "/components/async_components"
-        },
-        {
-          "title": "Router",
-          "href": "/components/router"
-        },
-        {
-          "title": "Link",
-          "href": "/components/link"
-        },
-        {
-          "title": "Style",
-          "href": "/components/style"
-        },
-        {
-          "title": "FlutterEmbedView",
-          "href": "/components/flutter_embed_view"
-        },
-        {
-          "title": "Fragment",
-          "href": "/components/fragment"
+          "title": "Overview",
+          "href": "/api"
         }
       ]
     },
     {
-      "group": "Utilities",
+      "tab": "api",
+      "group": "Components",
+      "pages": [
+        {
+          "title": "Document",
+          "href": "/api/components/document"
+        },
+        {
+          "title": "RawText",
+          "href": "/api/components/raw_text"
+        },
+        {
+          "title": "AsyncBuilder",
+          "href": "/api/components/async_components"
+        },
+        {
+          "title": "AsyncStatelessComponent",
+          "href": "/api/components/async_components"
+        },
+        {
+          "title": "Router",
+          "href": "/api/components/router"
+        },
+        {
+          "title": "Link",
+          "href": "/api/components/link"
+        },
+        {
+          "title": "Style",
+          "href": "/api/components/style"
+        },
+        {
+          "title": "FlutterEmbedView",
+          "href": "/api/components/flutter_embed_view"
+        },
+        {
+          "title": "Fragment",
+          "href": "/api/components/fragment"
+        }
+      ]
+    },
+    {
+      "tab": "api",
+      "group": "General",
       "pages": [
         {
           "title": "runApp",
-          "href": "/utils/run_app"
-        },
-        {
-          "title": "@client",
-          "href": "/utils/at_client"
-        },
-        {
-          "title": "@css / css()",
-          "href": "/utils/at_css"
+          "href": "/api/utils/run_app"
         },
         {
           "title": "Styles",
-          "href": "/utils/styles"
+          "href": "/api/utils/styles"
+        },
+        {
+          "title": "@css / css()",
+          "href": "/api/utils/at_css"
         },
         {
           "title": "events()",
-          "href": "/utils/events"
-        },
-        {
-          "title": "@sync",
-          "href": "/utils/at_sync"
-        },
-        {
-          "title": "SyncStateMixin",
-          "href": "/utils/sync_state_mixin"
-        },
-        {
-          "title": "PreloadStateMixin",
-          "href": "/utils/preload_state_mixin"
-        },
-        {
-          "title": "@encoder/@decoder",
-          "href": "/utils/at_encoder_decoder"
+          "href": "/api/utils/events"
         },
         {
           "title": "GlobalNodeKey",
-          "href": "/utils/global_node_key"
-        },
-        {
-          "title": "headers / setHeader()",
-          "href": "/utils/headers"
-        },
-        {
-          "title": "cookies / setCookie()",
-          "href": "/utils/cookies"
-        },
-        {
-          "title": "setStatusCode()",
-          "href": "/utils/set_status_code"
-        },
-        {
-          "title": "@Import",
-          "href": "/utils/at_import"
+          "href": "/api/utils/global_node_key"
         },
         {
           "title": "ViewTransitionMixin",
-          "href": "/utils/view_transition_mixin"
+          "href": "/api/utils/view_transition_mixin"
+        }
+      ]
+    },
+    {
+      "tab": "api",
+      "group": "Server / Client",
+      "pages": [
+        {
+          "title": "@client",
+          "href": "/api/utils/at_client"
+        },
+        {
+          "title": "@encoder/@decoder",
+          "href": "/api/utils/at_encoder_decoder"
+        },
+        {
+          "title": "@Import",
+          "href": "/api/utils/at_import"
+        },
+        {
+          "title": "@sync",
+          "href": "/api/utils/at_sync"
+        },
+        {
+          "title": "SyncStateMixin",
+          "href": "/api/utils/sync_state_mixin"
+        },
+        {
+          "title": "PreloadStateMixin",
+          "href": "/api/utils/preload_state_mixin"
+        },
+        {
+          "title": "headers / setHeader()",
+          "href": "/api/utils/headers"
+        },
+        {
+          "title": "cookies / setCookie()",
+          "href": "/api/utils/cookies"
+        },
+        {
+          "title": "setStatusCode()",
+          "href": "/api/utils/set_status_code"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "pages": [
+        {
+          "title": "\uD83D\uDCD6 Overview",
+          "href": "/content"
+        },
+        {
+          "title": "\uD83D\uDEEB Quick Start",
+          "href": "/content/quick_start"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Guides",
+      "pages": [
+        {
+          "title": "📄 Adding Pages",
+          "href": "/content/guides/adding_pages"
+        },
+        {
+          "title": "✒️ Writing Content",
+          "href": "/content/guides/writing_content"
+        },
+        {
+          "title": "🎨 Customizing Rendering",
+          "href": "/content/guides/customizing_rendering"
+        },
+        {
+          "title": "🌐 Assembling the Site",
+          "href": "/content/guides/assembling_the_site"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Concepts",
+      "pages": [
+        {
+          "title": "Pages",
+          "href": "/content/concepts/pages"
+        },
+        {
+          "title": "ContentApp",
+          "href": "/content/concepts/content_app"
+        },
+        {
+          "title": "Route Loading",
+          "href": "/content/concepts/route_loading"
+        },
+        {
+          "title": "Data Loading",
+          "href": "/content/concepts/data_loading"
+        },
+        {
+          "title": "Templating",
+          "href": "/content/concepts/templating"
+        },
+        {
+          "title": "Page Parsing",
+          "href": "/content/concepts/page_parsing"
+        },
+        {
+          "title": "Page Extensions",
+          "href": "/content/concepts/page_extensions"
+        },
+        {
+          "group": "Page Extensions",
+          "pages": [
+            {
+              "title": "Overview",
+              "href": "/content/concepts/page_extensions"
+            },
+            {
+              "title": "Heading Anchors",
+              "href": "/content/extensions/heading_anchors"
+            },
+            {
+              "title": "Table of Contents",
+              "href": "/content/extensions/table_of_contents"
+            }
+          ]
+        },
+        {
+          "title": "Custom Components",
+          "href": "/content/concepts/custom_components"
+        },
+        {
+          "group": "Page Layouts",
+          "pages": [
+            {
+              "title": "Overview",
+              "href": "/content/concepts/page_layouts"
+            },
+            {
+              "title": "DocsLayout",
+              "href": "/content/layouts/docs_layout"
+            },
+            {
+              "title": "BlogLayout",
+              "href": "/content/layouts/blog_layout"
+            },
+            {
+              "title": "EmptyLayout",
+              "href": "/content/layouts/empty_layout"
+            }
+          ]
+        },
+        {
+          "title": "Theming",
+          "href": "/content/concepts/theming"
+        },
+        {
+          "title": "Secondary Outputs",
+          "href": "/content/concepts/secondary_outputs"
+        }
+      ]
+    },
+    {
+      "tab": "content",
+      "group": "Components",
+      "pages": [
+        {
+          "title": "Callout",
+          "href": "/content/components/callout"
+        },
+        {
+          "title": "CodeBlock",
+          "href": "/content/components/code_block"
+        },
+        {
+          "title": "Image",
+          "href": "/content/components/image"
+        },
+        {
+          "title": "Tabs",
+          "href": "/content/components/tabs"
+        },
+        {
+          "title": "DropCap",
+          "href": "/content/components/drop_cap"
+        },
+        {
+          "title": "PostBreak",
+          "href": "/content/components/post_break"
         }
       ]
     }
   ],
+  "content": {
+    "showPageImage": false
+  },
   "search": {
     "docsearch": {
       "appId": "0JMHSW1KVQ",

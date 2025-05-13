@@ -1,3 +1,6 @@
+// dart format off
+// ignore_for_file: type=lint
+
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
@@ -52,49 +55,64 @@ import 'package:website/app.dart' as prefix32;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(
-  clients: {
-    prefix13.Header: ClientTarget<prefix13.Header>('layout/header', params: _prefix13Header),
-    prefix14.InstallCommand: ClientTarget<prefix14.InstallCommand>('pages/home/0_hero/components/install_command'),
-    prefix15.MeetJasprButton: ClientTarget<prefix15.MeetJasprButton>('pages/home/0_hero/components/meet_jaspr_button'),
-    prefix18.ModesAnimation: ClientTarget<prefix18.ModesAnimation>('pages/home/1_meet/components/modes_animation'),
-    prefix20.CounterButton: ClientTarget<prefix20.CounterButton>('pages/home/2_devex/components/counter_button'),
-    prefix30.SponsorsList: ClientTarget<prefix30.SponsorsList>('pages/home/5_community/components/sponsors_list'),
-  },
-  styles: () => [
-    ...prefix0.CodeBlock.styles,
-    ...prefix1.CodeWindow.styles,
-    ...prefix2.GithubButtonState.styles,
-    ...prefix3.GradientBorder.styles,
-    ...prefix4.Icon.styles,
-    ...prefix5.LinkButton.styles,
-    ...prefix6.Logo.styles,
-    ...prefix7.MarkdownPage.styles,
-    ...prefix8.MenuButton.styles,
-    ...prefix9.Particles.styles,
-    ...prefix10.ThemeToggleState.styles,
-    ...prefix11.root,
-    ...prefix12.Footer.styles,
-    ...prefix13.HeaderState.styles,
-    ...prefix14.InstallCommandState.styles,
-    ...prefix15.MeetJasprButtonState.styles,
-    ...prefix16.OverlayState.styles,
-    ...prefix17.Hero.styles,
-    ...prefix19.Meet.styles,
-    ...prefix20.CounterButtonState.styles,
-    ...prefix21.DevexBox.styles,
-    ...prefix22.Develop.styles,
-    ...prefix23.Run.styles,
-    ...prefix24.Analyze.styles,
-    ...prefix25.DevExp.styles,
-    ...prefix26.LinkCard.styles,
-    ...prefix27.Features.styles,
-    ...prefix28.TestimonialCard.styles,
-    ...prefix29.Testimonials.styles,
-    ...prefix30.SponsorsListState.styles,
-    ...prefix31.Community.styles,
-    ...prefix32.App.styles,
-  ],
-);
+JasprOptions get defaultJasprOptions => JasprOptions(
+      clients: {
+        prefix13.Header: ClientTarget<prefix13.Header>(
+          'layout/header',
+          params: _prefix13Header,
+        ),
+        prefix14.InstallCommand: ClientTarget<prefix14.InstallCommand>(
+          'pages/home/0_hero/components/install_command',
+        ),
+        prefix15.MeetJasprButton: ClientTarget<prefix15.MeetJasprButton>(
+          'pages/home/0_hero/components/meet_jaspr_button',
+        ),
+        prefix18.ModesAnimation: ClientTarget<prefix18.ModesAnimation>(
+          'pages/home/1_meet/components/modes_animation',
+        ),
+        prefix20.CounterButton: ClientTarget<prefix20.CounterButton>(
+          'pages/home/2_devex/components/counter_button',
+        ),
+        prefix30.SponsorsList: ClientTarget<prefix30.SponsorsList>(
+          'pages/home/5_community/components/sponsors_list',
+        ),
+      },
+      styles: () => [
+        ...prefix0.CodeBlock.styles,
+        ...prefix1.CodeWindow.styles,
+        ...prefix2.GithubButtonState.styles,
+        ...prefix3.GradientBorder.styles,
+        ...prefix4.Icon.styles,
+        ...prefix5.LinkButton.styles,
+        ...prefix6.Logo.styles,
+        ...prefix7.MarkdownPage.styles,
+        ...prefix8.MenuButton.styles,
+        ...prefix9.Particles.styles,
+        ...prefix10.ThemeToggleState.styles,
+        ...prefix11.root,
+        ...prefix12.Footer.styles,
+        ...prefix13.HeaderState.styles,
+        ...prefix14.InstallCommandState.styles,
+        ...prefix15.MeetJasprButtonState.styles,
+        ...prefix16.OverlayState.styles,
+        ...prefix17.Hero.styles,
+        ...prefix19.Meet.styles,
+        ...prefix20.CounterButtonState.styles,
+        ...prefix21.DevexBox.styles,
+        ...prefix22.Develop.styles,
+        ...prefix23.Run.styles,
+        ...prefix24.Analyze.styles,
+        ...prefix25.DevExp.styles,
+        ...prefix26.LinkCard.styles,
+        ...prefix27.Features.styles,
+        ...prefix28.TestimonialCard.styles,
+        ...prefix29.Testimonials.styles,
+        ...prefix30.SponsorsListState.styles,
+        ...prefix31.Community.styles,
+        ...prefix32.App.styles,
+      ],
+    );
 
-Map<String, dynamic> _prefix13Header(prefix13.Header c) => {'showHome': c.showHome};
+Map<String, dynamic> _prefix13Header(prefix13.Header c) => {
+      'showHome': c.showHome,
+    };

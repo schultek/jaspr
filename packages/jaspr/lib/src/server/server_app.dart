@@ -20,6 +20,9 @@ class ServerApp {
 
   static final createTestHandler = createHandler;
 
+  static final StreamController<Object> _reassembleController = StreamController.broadcast();
+  static Stream<Object> get onReassemble => _reassembleController.stream;
+
   final SetupFunction _setup;
 
   static Object? _runLock;
@@ -44,6 +47,8 @@ class ServerApp {
     _client?.close();
     _client = client;
 
+    _reassembleController.add(Object());
+
     if (isFirstStartup) {
       print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');
       print('Serving at http://${kDebugMode ? 'localhost' : _server!.address.host}:${_server!.port}');
@@ -63,9 +68,19 @@ class ServerApp {
     return (client, await shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true));
   }
 
-  static Future<void> requestRouteGeneration(String route) async {
+  static Future<void> requestRouteGeneration(
+    String route, {
+    String? lastMod,
+    String? changefreq,
+    double? priority,
+  }) async {
     if (kGenerateMode) {
-      await _sendDebugMessage({'route': route});
+      await _sendDebugMessage({
+        'route': route,
+        'lastmod': lastMod,
+        'changefreq': changefreq,
+        'priority': priority,
+      });
     }
   }
 

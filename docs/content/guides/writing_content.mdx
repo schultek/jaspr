@@ -1,0 +1,211 @@
+---
+title: Writing Content
+description: A guide to writing content for your site.
+---
+
+---
+
+In this guide we will go over the different features you can leverage to write rich and engaging content. It covers **markdown syntax**, **frontmatter**, **templating**, **data loading**, as well as using **custom components**.
+
+## Markdown Syntax
+
+Jaspr supports standard Markdown syntax for writing content. You can use headings, lists, links, images, and more. For a detailed reference on Markdown, see the [Markdown Guide](https://www.markdownguide.org/).
+
+Example:
+
+```markdown
+# Heading 1
+## Heading 2
+
+- List item 1
+- List item 2
+
+[Link text](https://example.com)
+```
+
+### Customizing Markdown
+
+Markdown support is enabled through the `MarkdownParser` object, which you need to provide to the `parsers` list of `ContentApp`:
+
+```dart
+ContentApp(
+  parsers: [
+    MarkdownParser(),
+  ]
+)
+```
+
+The `MarkdownParser` can also be customized to support custom syntaxes or resolvers. You can also add additional parsers like the `HtmlParser()` or create your own implementation. To read more about customizing content parsing read the [Page Parsing](/content/concepts/page_parsing) docs.
+
+## Frontmatter
+
+Each content file may start with a frontmatter block, written in YAML. This block defines metadata for the page, such as the title, description, and other custom fields. This metadata can then be used by any other part of the content rendering pipeline, like the template engine, extensions or layouts.
+
+A frontmatter blog is wrapped in '---' and looks like this:
+
+```markdown
+---
+title: My Page Title
+description: A short description of the page.
+custom_field: Custom value
+---
+
+*Normal content*
+```
+
+### Meta Tags & Sitemap
+
+All provided layouts use parts of the frontmatter data (specifically `title`, `description`, `keywords` and `image`) to set the SEO meta tags for a page.
+
+You can also specify additional meta tags using the `meta` key:
+
+```
+---
+title: My Page Title
+meta:
+  - name: author
+    content: Kilian Schulte
+  - property: og:site_name
+    content: Jaspr Docs
+---
+```
+
+You can also specify sitemap properties for a page using the `sitemap` key:
+
+```markdown
+---
+title: My Page Title
+sitemap:
+  lastmod: 2025-04-01
+  changefreq: monthly
+  priority: 0.8
+---
+```
+
+Find out more about generating a sitemap with Jaspr [here](/concepts/static_sites#generating-a-sitemap).
+
+## Templating
+
+Templating allows you to render dynamic content like variables or conditional blocks. `jaspr_content` has inbuilt support for these templating languages:
+
+- [mustache](https://mustache.github.io/mustache.5.html), a simple and logic-less template engine.
+- [liquid](https://shopify.github.io/liquid/basics/introduction/), a powerful template engine made by Shopify.
+
+For example with mustache, you can use data variables in your content like this:
+
+```markdown
+---
+name: Kilian
+---
+
+Hello {{page.name}}!
+```
+
+<Info>
+All frontmatter data of a page is available under the `page` key. Additionally, you can use the `page.path` and `page.url` to get the page's file path and url respectively.
+</Info>
+
+### Usage
+
+You can choose a template engine by providing its respective `TemplateEngine` instance to `ContentApp`, for example:
+
+```dart
+ContentApp(
+  ...
+  templateEngine: MustacheTemplateEngine(),
+);
+```
+
+- `MustacheTemplateEngine` uses the [`mustache_template`](https://pub.dev/packages/mustache_template) package, and
+- `LiquidTemplateEngine` uses the [`liquify`](https://pub.dev/packages/liquify)
+
+Both can be further customized in what context or features are available during the template rendering process. To find out more, check the [Templating](/content/concepts/templating) docs or read the respective package documentation.
+
+### Data Files
+
+In addition to frontmatter data, you can use data loaded from `.yaml` or `.json` files in your `/content/_data` directory. For example, you can have a `content/_data/faq.yaml` file with the following content:
+
+```yaml title="content/_data/faq.yaml"
+- question: What is Jaspr?
+  answer: Jaspr is a framework for building web applications in Dart.
+- question: How do I get started?
+  answer: You can get started by following the [quick start guide](/quick_start).
+```
+
+You can access this data in your markdown files using the `faq` variable:
+
+```markdown title="content/index.md"
+# Frequently Asked Questions
+
+{{#faq}}
+## {{question}}
+> {{answer}}
+{{/faq}}
+```
+
+<Info>
+Data from files in the `content/_data/` are accessible by their path segments separated by `.`. So e.g. `content/_data/faq.yaml` is available simply as `faq`, while `content/_data/some/other/data.json` is available as `some.other.data`.
+</Info>
+
+You can also load data from other sources than the filesystem, or customize the root path of the data directory. To learn more, read the [Data Loading](/content/concepts/data_loading) docs.
+
+### Eager Loading
+
+By default, pages are loaded and rendered on-demand when they are requested. This is useful for large sites when serving locally or when running in server mode, as it avoids the overhead of loading all pages at startup. However sometimes you want to access also information about other pages, for example when building a blog you may want to create a list of recent posts and render them on an overview page.
+
+With **eager loading**, all pages are loaded at startup and their data is made accessible under the `pages` key during templating. It can be enabled like this:
+
+```dart
+ContentApp(
+  ...
+  eagerlyLoadAllPages: true,
+);
+````
+
+You can then use this to e.g. display a list of links to other pages:
+
+```markdown
+## Other Pages
+
+{{#pages}}
+  - [{{title}}]({{url}})
+{{/pages}}
+```
+
+This uses the `title` of a page from its frontmatter data, and the `url` provided by `jaspr_content`.
+
+## Custom Components
+
+If you want to customize your content even further, you can integrate and use **Custom Components** in your content. With this you can embed any normal Jaspr component in your content, including support for attributes and inner content as children.
+
+Jaspr provides a set of components out of the box to enhance your content. These components include callouts, tabs, code blocks, and more. You can also create custom components to suit your needs.
+
+<Info>
+For a full list of available components, checkout the **Components** section in the sidebar menu.
+</Info>
+
+### Usage
+
+To include components in your content, you can use the html-like `<Component>` syntax. For example, the `<Info>` component can be used to display an informational message more visible to users:
+
+```markdown
+<Info>This draws attention to useful page information.</Info>
+```
+
+To enable this, simply add the choosen components to the `components` list of `ContentApp`:
+
+```dart
+ContentApp(
+  ...
+  components: [
+    Callout(), // Enables callout boxes like <Info>, <Warning>, <Error> and more.
+  ],
+);
+```
+
+Read more about how to use custom components or create your own in the [Custom Components](/content/concepts/custom_components) docs.
+
+---
+
+Ready to take your site's appearance and behavior to the next level? Dive into the [Customizing Rendering](/content/guides/customizing_rendering) guide to learn how to tailor the look and feel of your content site.
+

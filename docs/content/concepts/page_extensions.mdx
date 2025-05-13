@@ -1,0 +1,180 @@
+---
+title: Page Extensions
+description: Extend your pages with additional functionality.
+---
+
+---
+
+Page extensions allow you to hook into the page processing pipeline to **add, modify, or analyze** the content of your pages. They provide a powerful way to customize how your content is transformed into the final rendered output.
+
+---
+
+When `jaspr_content` processes your source files (e.g., Markdown files), it parses them into a **tree of nodes**. Each node represents an element in the document, like a paragraph, a heading, or a code block. `PageExtension`s can traverse and manipulate this node tree before the final output is rendered.
+
+This enables a variety of use cases, such as:
+
+- Automatically adding anchor links to headings.
+- Generating a table of contents.
+- Injecting custom elements or components.
+- Performing content analysis or validation.
+
+---
+
+To use extensions, add them to your `ContentApp`:
+
+```dart
+ContentApp(
+  parsers: [
+    HeadingAnchorsExtension(),
+    TableOfContentsExtension(),
+  ],
+)
+```
+
+## Built-in Extensions
+
+Jaspr Content comes with a few pre-built extensions to showcase their capabilities and provide common functionalities.
+
+### HeadingAnchorsExtension
+
+The `HeadingAnchorsExtension` automatically adds anchor links (e.g., `#my-heading`) to all headings in your pages. This makes it easy to link directly to specific sections of your content.
+
+[Learn more about HeadingAnchorsExtension](/content/extensions/heading_anchors).
+
+### TableOfContentsExtension
+
+The `TableOfContentsExtension` generates a table of contents based on the headings in your page. You can then display this table of contents in your page layout or a sidebar.
+
+[Learn more about TableOfContentsExtension](/content/extensions/table_of_contents).
+
+## Creating Custom Extensions
+
+You can create your own extension by implementing the `PageExtension` interface.
+
+```dart
+import 'package:jaspr_content/jaspr_content.dart';
+import 'package:html/dom.dart' as dom;
+
+class MyCustomExtension extends PageExtension {
+
+  @override
+  Future<List<Node>> apply(Page page, List<Node> nodes) async {
+    // Implement your extension logic here
+  }
+}
+```
+
+Inside the `apply` method, you have access to the `nodes` tree which represents the content of the page. You can iterate over them and analyze or modify the list. You can return a new or the same list which is then further processed and rendered.
+
+Read [Understanding Nodes](/content/concepts/page_parsing#understanding-nodes) to find out more about how nodes are created.
+
+### Analyzing Nodes
+
+Page extensions can be used to analyze nodes without modifying them. This is useful for extracting information or generating metadata from your page content.
+
+When analyzing, your extension traverses the node tree and collects information, but returns the original nodes unchanged. The extracted data can be stored in the page's metadata or used in other ways.
+
+As an example, the following example extimates the reading time for the page content and saves it to the `page.readingTime` data property:
+
+```dart
+class ReadingTimeExtension extends PageExtension {
+  const ReadingTimeExtension();
+
+  @override
+  Future<List<Node>> apply(Page page, List<Node> nodes) async {
+    // Count words in text nodes.
+    int wordCount = 0;
+
+    void countWords(List<Node> nodes) {
+      for (final node in nodes) {
+        if (node is TextNode) {
+          wordCount += node.text.split(' ').where((word) => word.isNotEmpty).length;
+        } else if (node is ElementNode) {
+          countWords(node.children);
+        }
+      }
+    }
+
+    countWords(nodes);
+
+    // Calculate reading time (average 200 words per minute).
+    final readingTimeMinutes = (wordCount / 200).ceil();
+
+    // Store reading time in page data.
+    page.apply(data: {
+      'page': {'readingTime': '$readingTimeMinutes min read'},
+    });
+
+    return nodes;
+  }
+}
+```
+
+### Modifying Nodes
+
+Extensions can also modify nodes to transform your content. They can traverse the node tree, find specific nodes, and apply changes to them.
+
+Here's an example that generate alt text for images that don't have any:
+
+```dart
+class ImageAltTextExtension extends PageExtension {
+  const ImageAltTextExtension();
+
+  @override
+  Future<List<Node>> apply(Page page, List<Node> nodes) async {
+    return [
+      for (final node in nodes) await _processNode(node),
+    ];
+  }
+
+  Future<Node> _processNode(Node node) async {
+    // Find images with no alt text.
+    if (node is ElementNode && node.tag == 'img' && node.attributes['alt'] == null) {       
+      
+      final imgSrc = node.attributes['src'] ?? '';
+      try {
+        // Generate alt text, e.g. using an AI model.
+        final altText = await generateImageDescription(imgSrc);
+
+        return ElementNode(
+          tag: node.tag,
+          attributes: {...node.attributes, 'alt': altText},
+          children: node.children,
+        ));
+      } catch (e) {
+        print('Failed to generate alt text for $imgSrc: $e');
+
+        result.add(node);
+      }
+    }
+    
+    if (node is ElementNode && node.children != null) {
+      // Process children recursively.
+      return ElementNode(
+        tag: node.tag,
+        attributes: node.attributes,
+        children: [
+          for (final node in node.children!) await _processNode(node),
+        ],
+      );
+    }
+
+    // Return other nodes unchanged.
+    return node;
+  }
+}
+```
+
+This extension finds images without alt text, then uses some service to analyze the image and generate descriptive alt text. This improves accessibility and SEO without manual effort.
+
+## Futher Ideas
+
+Page extensions open up a wide range of possibilities. Some ideas include:
+
+- **Reading Time Estimation**: Calculate and display the estimated reading time for each page based on word count.
+- **Image Optimization**: Find all `<img>` tags and replace them with responsive image components, add alt texts or add lazy loading.
+- **SEO Enhancements**: Automatically add or modify meta tags, or generate structured data based on page content.
+- **Link Validation**: Check for broken links within your content during the build process.
+- **Data Extraction**: Collect specific data points from pages, like all external links or image sources, for analysis or references generation.
+
+By leveraging page extensions, you can significantly enhance the functionality and presentation of your Jaspr Content sites with tailored processing logic.

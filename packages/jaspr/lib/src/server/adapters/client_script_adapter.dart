@@ -15,17 +15,9 @@ class ClientScriptAdapter extends HeadScopeAdapter {
       return false;
     }
 
-    String source;
-    if (clientTargets.length == 1) {
-      var entry = clientTargets.first;
-      source = '${entry.name}.client';
-    } else {
-      source = 'main.clients';
-    }
-
     head.children.insertBefore(
       head.createChildRenderObject()
-        ..updateElement('script', null, null, null, {'src': '$source.dart.js', 'defer': ''}, null),
+        ..updateElement('script', null, null, null, {'src': 'main.clients.dart.js', 'defer': ''}, null),
     );
 
     return true;

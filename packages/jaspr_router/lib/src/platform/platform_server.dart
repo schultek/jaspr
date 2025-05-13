@@ -38,7 +38,7 @@ class HistoryManagerImpl implements HistoryManager {
 class RouteRegistryImpl implements RouteRegistry {
   @override
   Future<void> registerRoutes(List<RouteBase> routes) async {
-    Set<String> paths = {};
+    Map<String, RouteSettings?> paths = {};
 
     void registerRoute(RouteBase route, String path) {
       if (route is ShellRoute) {
@@ -49,7 +49,7 @@ class RouteRegistryImpl implements RouteRegistry {
         var p = path + (path.endsWith('/') || route.path.startsWith('/') ? '' : '/') + route.path;
         assert(route.pathParams.isEmpty,
             'Routes with path parameters are not supported when using static-site generation.');
-        paths.add(p);
+        paths[p] = route.settings;
         for (var route in route.routes) {
           registerRoute(route, p);
         }
@@ -60,8 +60,13 @@ class RouteRegistryImpl implements RouteRegistry {
       registerRoute(route, '');
     }
 
-    for (var path in paths) {
-      await ServerApp.requestRouteGeneration(path);
+    for (var path in paths.entries) {
+      await ServerApp.requestRouteGeneration(
+        path.key,
+        lastMod: path.value?.lastMod?.toIso8601String(),
+        changefreq: path.value?.changeFreq?.name,
+        priority: path.value?.priority,
+      );
     }
   }
 }

@@ -91,6 +91,12 @@ abstract class Unit {
 
   /// The css value
   String get value;
+
+  static const Unit inherit = _ExpUnit('inherit');
+  static const Unit initial = _ExpUnit('initial');
+  static const Unit revert = _ExpUnit('revert');
+  static const Unit revertLayer = _ExpUnit('revert-layer');
+  static const Unit unset = _ExpUnit('unset');
 }
 
 class _ExpUnit implements Unit {

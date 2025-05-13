@@ -19,7 +19,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  jaspr_lints: ^0.2.0
+  jaspr_lints: ^0.3.1
 
 jaspr:
   mode: static

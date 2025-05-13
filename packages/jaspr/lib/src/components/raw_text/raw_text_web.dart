@@ -67,7 +67,7 @@ class RawNodeElement extends BuildableRenderObjectElement {
     } else if (next.isElement) {
       next as web.Element;
       renderObject.updateElement(
-          next.tagName.toLowerCase(), next.id, next.className, null, next.attributes.toMap(), null);
+          next.tagName.toLowerCase(), next.id, next.getAttribute('class'), null, next.attributes.toMap(), null);
     } else {
       var curr = (renderObject as DomRenderObject).node;
       if (curr != null) {

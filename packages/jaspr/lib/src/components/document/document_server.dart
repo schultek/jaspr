@@ -333,23 +333,20 @@ class AttachDocument extends StatelessComponent implements Document {
   }
 }
 
-class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
-  static AttachAdapter instance = AttachAdapter();
+final Expando<AttachAdapter> _attach = Expando();
 
-  static bool _registered = false;
+class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
   static void register(BuildContext context, AttachDocument item) {
     var binding = (context.binding as ServerAppBinding);
-    if (!_registered) {
-      binding.addRenderAdapter(instance);
-      _registered = true;
-    }
+    var adapter = _attach[binding] ??= AttachAdapter();
+    binding.addRenderAdapter(adapter);
 
-    var entry = instance.entries[item.target] ??= (attributes: {}, children: []);
+    var entry = adapter.entries[item.target] ??= (attributes: {}, children: []);
     if (item.attributes != null) {
       entry.attributes.addAll(item.attributes!);
     }
     if (item.children != null) {
-      binding.addRenderAdapter(_AttachChildrenAdapter(item.target, context as Element));
+      binding.addRenderAdapter(_AttachChildrenAdapter(adapter, item.target, context as Element));
     }
   }
 
@@ -416,12 +413,13 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
 }
 
 class _AttachChildrenAdapter extends ElementBoundaryAdapter {
-  _AttachChildrenAdapter(this.target, super.element);
+  _AttachChildrenAdapter(this.adapter, this.target, super.element);
 
+  final AttachAdapter adapter;
   final String target;
 
   @override
   void prepareBoundary(ChildListRange range) {
-    AttachAdapter.instance.entries[target]!.children.add((range, element.depth));
+    adapter.entries[target]!.children.add((range, element.depth));
   }
 }

@@ -1,0 +1,147 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:jaspr/server.dart';
+import 'package:jaspr_router/jaspr_router.dart';
+import 'package:watcher/watcher.dart';
+
+import '../page.dart';
+import 'route_loader.dart';
+
+/// A loader that loads routes from the filesystem.
+///
+/// Routes are constructed based on the recursive folder structure under the root [directory].
+/// Index files (index.*) are treated as the page for the containing folder.
+/// Files and folders starting with an underscore (_) are ignored.
+class FilesystemLoader extends RouteLoaderBase {
+  FilesystemLoader(
+    this.directory, {
+    this.keeySuffixPattern,
+    super.debugPrint,
+  });
+
+  /// The directory to load pages from.
+  final String directory;
+
+  /// A pattern to keep the file suffix for all matching pages.
+  final Pattern? keeySuffixPattern;
+
+  final Map<String, Set<PageSource>> dependentSources = {};
+
+  StreamSubscription<WatchEvent>? _watcherSub;
+
+  @override
+  Future<List<RouteBase>> loadRoutes(ConfigResolver resolver, bool eager) async {
+    if (kDebugMode) {
+      _watcherSub ??= DirectoryWatcher(directory).events.listen((event) {
+        var path = event.path;
+        if (event.type == ChangeType.MODIFY) {
+          invalidateFile(path);
+        } else if (event.type == ChangeType.REMOVE) {
+          invalidateFile(path, rebuild: false);
+          invalidateRoutes();
+        } else if (event.type == ChangeType.ADD) {
+          invalidateRoutes();
+        }
+      });
+    }
+    return super.loadRoutes(resolver, eager);
+  }
+
+  @override
+  void onReassemble() {
+    _watcherSub?.cancel();
+    _watcherSub = null;
+  }
+
+  @override
+  Future<String> readPartial(String path, Page page) {
+    return _getPartial(path, page).readAsString();
+  }
+
+  @override
+  String readPartialSync(String path, Page page) {
+    return _getPartial(path, page).readAsStringSync();
+  }
+
+  File _getPartial(String path, Page page) {
+    final pageSource = getSourceForPage(page);
+    if (pageSource != null) {
+      (dependentSources[path] ??= {}).add(pageSource);
+    }
+    return File(path);
+  }
+
+  @override
+  Future<List<PageSource>> loadPageSources() async {
+    final root = Directory(directory);
+
+    List<PageSource> loadFiles(Directory dir) {
+      List<PageSource> entities = [];
+      for (final entry in dir.listSync()) {
+        final path = entry.path.substring(root.path.length + 1);
+        if (entry is File) {
+          entities.add(FilePageSource(
+            path,
+            entry,
+            this,
+            keepSuffix: keeySuffixPattern?.matchAsPrefix(entry.path) != null,
+          ));
+        } else if (entry is Directory) {
+          entities.addAll(loadFiles(entry));
+        }
+      }
+      return entities;
+    }
+
+    return loadFiles(root);
+  }
+
+  void invalidateFile(String path, {bool rebuild = true}) {
+    final source = sources.where((s) => (s as FilePageSource).file.path == path).firstOrNull;
+    if (source != null) {
+      invalidateSource(source, rebuild: rebuild);
+    }
+  }
+
+  @override
+  void invalidateSource(PageSource source, {bool rebuild = true}) {
+    super.invalidateSource(source, rebuild: rebuild);
+    final dependencies = {...?dependentSources[source.path]};
+    dependentSources[source.path]?.clear();
+    for (var dependent in dependencies) {
+      invalidateSource(dependent, rebuild: rebuild);
+    }
+  }
+
+  @override
+  void invalidateAll() {
+    super.invalidateAll();
+    dependentSources.clear();
+  }
+}
+
+class FilePageSource extends PageSource {
+  FilePageSource(
+    super.path,
+    this.file,
+    super.loader, {
+    super.keepSuffix,
+  });
+
+  final File file;
+
+  @override
+  Future<Page> buildPage() async {
+    final content = await file.readAsString();
+
+    return Page(
+      path: this.path,
+      url: url,
+      content: content,
+      data: {},
+      config: config,
+      loader: loader,
+    );
+  }
+}

@@ -32,7 +32,7 @@ void main() {
         minHeight: 100.vh,
         margin: Margin.zero,
         padding: Padding.zero,
-        backgroundColor: Color.hex('#F7F7F7'),
+        backgroundColor: Color('#F7F7F7'),
       ),
       css('h1').styles(
         fontSize: 4.rem,

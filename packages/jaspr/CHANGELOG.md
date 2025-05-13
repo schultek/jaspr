@@ -1,3 +1,18 @@
+## Unreleased minor
+
+- **BREAKING** `JasprOptions.useIsolates` is now `false` by default (was `true`).
+  
+  If you want to keep the old behaviour of rendering each request in a separate isolate, use `Jaspr.initializeApp(..., useIsolates: true)`.
+
+- Added support `@client` components from other packages.
+
+  Components annotated with `@client` from other dependent packages are now also part of the js bundle when used during pre-rendering.
+
+- **BREAKING** The `Flex(basis: ...)` style now accepts a `Unit` value directly instead of a `FlexBasis`.
+
+- Allow nesting `css.media` and `css.supports` rules.
+- Deprecated `Color.hex()` and `Color.named()` in favor of the default `Color()` constructor.
+
 ## 0.18.2
 
 - Added `jaspr daemon` command to run a daemon server (used by the new [VSCode extension]()).
@@ -8,7 +23,7 @@
 
 - Better report errors during static build.
 - Fixed flutter embedding issue with version 3.29.0.
-- Added `onClick` override to `a` html tag. Fixing issues with default action handling.
+- Added `onClick` override to the `a` html tag. When used, this will override the default behaviour of the link and not visit its url when clicked.
 - Added `--extra-js-compiler-option` and `--extra-wasm-compiler-option` to `jaspr build` command.
 - Added `// dart format off` and `// ignore_for_file: type=lint` headers to all generated files.
 
