@@ -153,7 +153,7 @@ You can also load data from other sources than the filesystem, or customize the 
 
 By default, pages are loaded and rendered on-demand when they are requested. This is useful for large sites when serving locally or when running in server mode, as it avoids the overhead of loading all pages at startup. However sometimes you want to access also information about other pages, for example when building a blog you may want to create a list of recent posts and render them on an overview page.
 
-With **eager loading**, all pages are loaded at startup and their data is made accessible under the `pages` key during templating. 
+With **eager loading**, all pages are loaded at startup and their data is made accessible under the `pages` key during templating. It can be enabled like this:
 
 ```dart
 ContentApp(

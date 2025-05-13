@@ -21,21 +21,13 @@
       "title": "Playground",
       "icon": "code",
       "href": "https://playground.jaspr.site"
-    },
-    {
-      "title": "Bluesky",
-      "icon": "bluesky",
-      "href": "https://bsky.app/profile/schultek.dev"
-    },
-    {
-      "title": "X",
-      "icon": "x-twitter",
-      "href": "https://x.com/schultek_dev"
     }
   ],
   "social": {
     "x": "@schultek_dev",
-    "github": "schultek"
+    "github": "schultek",
+    "website": "https://jaspr.site",
+    "discord": "XGXrGEk4c6"
   },
   "theme": {
     "primary": "#01589B",
@@ -375,12 +367,46 @@
           "href": "/content/concepts/page_extensions"
         },
         {
+          "group": "Page Extensions",
+          "pages": [
+            {
+              "title": "Overview",
+              "href": "/content/concepts/page_extensions"
+            },
+            {
+              "title": "Heading Anchors",
+              "href": "/content/extensions/heading_anchors"
+            },
+            {
+              "title": "Table of Contents",
+              "href": "/content/extensions/table_of_contents"
+            }
+          ]
+        },
+        {
           "title": "Custom Components",
           "href": "/content/concepts/custom_components"
         },
         {
-          "title": "Page Layouts",
-          "href": "/content/concepts/page_layouts"
+          "group": "Page Layouts",
+          "pages": [
+            {
+              "title": "Overview",
+              "href": "/content/concepts/page_layouts"
+            },
+            {
+              "title": "DocsLayout",
+              "href": "/content/layouts/docs_layout"
+            },
+            {
+              "title": "BlogLayout",
+              "href": "/content/layouts/blog_layout"
+            },
+            {
+              "title": "EmptyLayout",
+              "href": "/content/layouts/empty_layout"
+            }
+          ]
         },
         {
           "title": "Theming",
@@ -419,38 +445,6 @@
         {
           "title": "PostBreak",
           "href": "/content/components/post_break"
-        }
-      ]
-    },
-    {
-      "tab": "content",
-      "group": "Extensions",
-      "pages": [
-        {
-          "title": "Heading Anchors",
-          "href": "/content/extensions/heading_anchors"
-        },
-        {
-          "title": "Table of Contents",
-          "href": "/content/extensions/table_of_contents"
-        }
-      ]
-    },
-    {
-      "tab": "content",
-      "group": "Layouts",
-      "pages": [
-        {
-          "title": "DocsLayout",
-          "href": "/content/layouts/docs_layout"
-        },
-        {
-          "title": "BlogLayout",
-          "href": "/content/layouts/blog_layout"
-        },
-        {
-          "title": "EmptyLayout",
-          "href": "/content/layouts/empty_layout"
         }
       ]
     }
