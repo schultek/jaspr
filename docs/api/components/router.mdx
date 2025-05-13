@@ -155,7 +155,7 @@ built on the client. If its only built on the server you have to use normal link
 
 ### Navigating using Link component
 
-The simplest way to add a navigation link to your site is by using the [`Link`](/components/link) component.
+The simplest way to add a navigation link to your site is by using the [`Link`](/api/components/link) component.
 This is a drop-in replacement for the `<a>` tag and intelligently performs the correct navigation when clicked.
 
 ### Navigating to a URL
@@ -261,7 +261,7 @@ By default, this value is set to `5`. The `Router` will display the error screen
 
 ## Preloading Routes
 
-When using [Lazy Routes](/components/router#lazy-routes) you can use `Router.of(context).preload()` to preload this
+When using [Lazy Routes](/api/components/router#lazy-routes) you can use `Router.of(context).preload()` to preload this
 route before actually navigating to it.
 
 This is usually done as a performance improvement to estimate when the user is about to navigate to that route
@@ -284,4 +284,4 @@ yield button(
 The above snippet will render a `<button>` that already preloads the target route when it is hovered,
 resulting in a potentially faster navigation when the user eventually clicks it.
 
-The [`Link`](/components/link) component has this behavior built in based on its `preload` parameter.
+The [`Link`](/api/components/link) component has this behavior built in based on its `preload` parameter.

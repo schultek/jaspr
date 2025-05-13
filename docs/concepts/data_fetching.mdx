@@ -76,7 +76,7 @@ class MyAsyncComponent extends AsyncStatelessComponent {
 }
 ```
 
-Learn more about how to use the [AsyncBuilder](/components/async_components) and [AsyncStatelessComponent](/components/async_components).
+Learn more about how to use the [AsyncBuilder](/api/components/async_components) and [AsyncStatelessComponent](/api/components/async_components).
 
 ### Preloading state of a StatefulComponent
 
@@ -96,7 +96,7 @@ class MyState extends State<MyStatefulComponent> with PreloadStateMixin {
 
 The `preloadState()` method will only be executed on the server and will be called before `initState()`. It will defer `initState()` as well as building the component until the future returned by the method is completed.
 
-Learn more about how to use the [PreloadStateMixin](/utils/preload_state_mixin).
+Learn more about how to use the [PreloadStateMixin](/api/utils/preload_state_mixin).
 
 ---
 
@@ -131,7 +131,7 @@ class App extends StatelessComponent {
 }
 ```
 
-Read more about [@client](/utils/at_client) components and how they can be used to [sync data](/utils/at_client#passing-data) from the server to the client.
+Read more about [@client](/api/utils/at_client) components and how they can be used to [sync data](/api/utils/at_client#passing-data) from the server to the client.
 
 ### Using @sync on fields on a StatefulComponents
 
@@ -150,6 +150,6 @@ class MyComponentState extends State<MyComponent> {
 }
 ```
 
-Read more about the [@sync](/utils/at_sync) annotation and how it syncs any field from the server to the client.
+Read more about the [@sync](/api/utils/at_sync) annotation and how it syncs any field from the server to the client.
 
-Additionally check out the [SyncStateMixin](/utils/sync_state_mixin) which is used internally by the `@sync` annotation and can also be used directly to sync state of a `StatefulComponent` in a more flexible and explicit way.
+Additionally check out the [SyncStateMixin](/api/utils/sync_state_mixin) which is used internally by the `@sync` annotation and can also be used directly to sync state of a `StatefulComponent` in a more flexible and explicit way.

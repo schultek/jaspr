@@ -11,7 +11,7 @@ You can use Jasprs own type-safe CSS-in-Dart styling system or integrate CSS fra
 ## CSS-in-Dart
 
 Jaspr gives you a strongly-typed styles system that wraps the most common css properties. You can
-access these various properties through the [`Styles`](/utils/styles) class that is exported by the core package.
+access these various properties through the [`Styles`](/api/utils/styles) class that is exported by the core package.
 
 When defining styles like this, you can use them to write component-level styles, global styles, or set inline styles for html elements.
 
@@ -45,7 +45,7 @@ class App extends StatelessComponent {
 }
 ```
 
-Read more about this approach in the documentation for [@çss](/utils/at_css).
+Read more about this approach in the documentation for [@çss](/api/utils/at_css).
 
 <Success>
 **Tip:** The `jaspr_lints` package provides a convenient lint rule to keep your styles properties organized. Learn more about it [here](/get_started/linting#lint-rules).
@@ -55,11 +55,11 @@ Read more about this approach in the documentation for [@çss](/utils/at_css).
 
 You can define a global stylesheet from your Dart code using one of the following options:
 
-1. Passing [Style Rules](/utils/at_css#defining-style-rules) to [Document(styles: ...)](/components/document#parameters). This will render the provided styles into a global stylesheet inside the `<head>` element.
+1. Passing [Style Rules](/api/utils/at_css#defining-style-rules) to [Document(styles: ...)](/api/components/document#parameters). This will render the provided styles into a global stylesheet inside the `<head>` element.
 
-2. Using the [@css](/utils/at_css#registering-style-rules) annotation on a global variable to automatically render the annotated styles into a global stylesheet inside the `<head>` element.
+2. Using the [@css](/api/utils/at_css#registering-style-rules) annotation on a global variable to automatically render the annotated styles into a global stylesheet inside the `<head>` element.
 
-3. Using the [Style](/components/style) component to manually define a `<style>` element anywhere in the tree.
+3. Using the [Style](/api/components/style) component to manually define a `<style>` element anywhere in the tree.
 
 ### Inline Styles
 
@@ -111,7 +111,7 @@ The above rules define a row layout for larger screens and a column layout for s
 If you are writing `.css` stylesheets manually or have external stylesheets you want to use, you can add
 them as a `<link rel="stylesheet">` inside the `<head>` element.
 
-When you are in **static** or **server** mode, add this to [Document(head: ...)](/components/document#parameters):
+When you are in **static** or **server** mode, add this to [Document(head: ...)](/api/components/document#parameters):
 
 ```dart title="lib/main.dart"
 void main() {
@@ -135,7 +135,7 @@ When you are in **client** mode, add this directly to the `index.html` file:
 
 ### Dynamically Adding Stylesheets
 
-You can use the [Document.head()](/components/document#documenthead) component to dynamically set a value in the `<head>`
+You can use the [Document.head()](/api/components/document#documenthead) component to dynamically set a value in the `<head>`
 from any component.
 
 ```dart

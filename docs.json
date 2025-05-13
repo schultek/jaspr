@@ -43,11 +43,6 @@
       "id": "api",
       "title": "API",
       "href": "/api"
-    },
-    {
-      "id": "content",
-      "title": "Content",
-      "href": "/content"
     }
   ],
   "sidebar": [
@@ -191,39 +186,39 @@
       "pages": [
         {
           "title": "Document",
-          "href": "/components/document"
+          "href": "/api/components/document"
         },
         {
           "title": "RawText",
-          "href": "/components/raw_text"
+          "href": "/api/components/raw_text"
         },
         {
           "title": "AsyncBuilder",
-          "href": "/components/async_components"
+          "href": "/api/components/async_components"
         },
         {
           "title": "AsyncStatelessComponent",
-          "href": "/components/async_components"
+          "href": "/api/components/async_components"
         },
         {
           "title": "Router",
-          "href": "/components/router"
+          "href": "/api/components/router"
         },
         {
           "title": "Link",
-          "href": "/components/link"
+          "href": "/api/components/link"
         },
         {
           "title": "Style",
-          "href": "/components/style"
+          "href": "/api/components/style"
         },
         {
           "title": "FlutterEmbedView",
-          "href": "/components/flutter_embed_view"
+          "href": "/api/components/flutter_embed_view"
         },
         {
           "title": "Fragment",
-          "href": "/components/fragment"
+          "href": "/api/components/fragment"
         }
       ]
     },
@@ -233,27 +228,27 @@
       "pages": [
         {
           "title": "runApp",
-          "href": "/utils/run_app"
+          "href": "/api/utils/run_app"
         },
         {
           "title": "Styles",
-          "href": "/utils/styles"
+          "href": "/api/utils/styles"
         },
         {
           "title": "@css / css()",
-          "href": "/utils/at_css"
+          "href": "/api/utils/at_css"
         },
         {
           "title": "events()",
-          "href": "/utils/events"
+          "href": "/api/utils/events"
         },
         {
           "title": "GlobalNodeKey",
-          "href": "/utils/global_node_key"
+          "href": "/api/utils/global_node_key"
         },
         {
           "title": "ViewTransitionMixin",
-          "href": "/utils/view_transition_mixin"
+          "href": "/api/utils/view_transition_mixin"
         }
       ]
     },
@@ -263,39 +258,39 @@
       "pages": [
         {
           "title": "@client",
-          "href": "/utils/at_client"
+          "href": "/api/utils/at_client"
         },
         {
           "title": "@encoder/@decoder",
-          "href": "/utils/at_encoder_decoder"
+          "href": "/api/utils/at_encoder_decoder"
         },
         {
           "title": "@Import",
-          "href": "/utils/at_import"
+          "href": "/api/utils/at_import"
         },
         {
           "title": "@sync",
-          "href": "/utils/at_sync"
+          "href": "/api/utils/at_sync"
         },
         {
           "title": "SyncStateMixin",
-          "href": "/utils/sync_state_mixin"
+          "href": "/api/utils/sync_state_mixin"
         },
         {
           "title": "PreloadStateMixin",
-          "href": "/utils/preload_state_mixin"
+          "href": "/api/utils/preload_state_mixin"
         },
         {
           "title": "headers / setHeader()",
-          "href": "/utils/headers"
+          "href": "/api/utils/headers"
         },
         {
           "title": "cookies / setCookie()",
-          "href": "/utils/cookies"
+          "href": "/api/utils/cookies"
         },
         {
           "title": "setStatusCode()",
-          "href": "/utils/set_status_code"
+          "href": "/api/utils/set_status_code"
         }
       ]
     },

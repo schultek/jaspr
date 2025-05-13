@@ -68,7 +68,7 @@ class Model {
 }
 ```
 
-Read the docs on the [@encoder / @decoder](/utils/at_encoder_decoder) annotations to learn more about how to set up
+Read the docs on the [@encoder / @decoder](/api/utils/at_encoder_decoder) annotations to learn more about how to set up
 serialization for custom data types.
 
 With this setup you can use fields of any type with the `@sync` annotation.
@@ -112,7 +112,7 @@ class MyComponentState extends State<MyComponent> with MyComponentStateSyncMixin
 }
 ```
 
-When the data you want to load is **asynchronous**, you can additionally use the [`PreloadStateMixin`](/utils/preload_state_mixin)
+When the data you want to load is **asynchronous**, you can additionally use the [`PreloadStateMixin`](/api/utils/preload_state_mixin)
 to perform any asynchronous work before `initState()` is called on the server:
 
 ```dart title="lib/my_component.dart"
@@ -134,15 +134,15 @@ class MyComponentState extends State<MyComponent> with MyComponentStateSyncMixin
 }
 ```
 
-Read the docs on [PreloadStateMixin](/utils/preload_state_mixin) for more details.
+Read the docs on [PreloadStateMixin](/api/utils/preload_state_mixin) for more details.
 
 ---
 
 ## Alternatives
 
-- Check out the [SyncStateMixin](/utils/sync_state_mixin) for a more explicit way to sync state of a `StatefulComponent`
+- Check out the [SyncStateMixin](/api/utils/sync_state_mixin) for a more explicit way to sync state of a `StatefulComponent`
   between server and client (this is used by `@sync` under the hood).
 
-- Check out [@client](/utils/at_client) components, that support passing data from the server to the client as part
+- Check out [@client](/api/utils/at_client) components, that support passing data from the server to the client as part
   of the component parameters, including support for custom data types.
 

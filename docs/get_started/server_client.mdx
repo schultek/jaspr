@@ -35,7 +35,7 @@ Therefore, accessing a web-specific library like `dart:js_interop` in a server-r
 If you must access one of these libraries in a component that is rendered in both environments, you have several options:
 
 1. When using [`package:web`](https://pub.dev/packages/web) you should instead use [`package:universal_web`](https://pub.dev/packages/universal_web) which already works across web **and server** environments. No need to use conditional imports or the `@Import` annotation shown below.
-2. You can use the [`@Import`](/utils/at_import) annotation to import the correct library depending on the environment. This is a shorthand for using [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files) and is the recommended way to do this in Jaspr.
+2. You can use the [`@Import`](/api/utils/at_import) annotation to import the correct library depending on the environment. This is a shorthand for using [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files) and is the recommended way to do this in Jaspr.
 3. You can use Dart's [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files) to import the correct library depending on the environment. This is a more verbose way of doing the same thing as the `@Import` annotation, but is still valid.
 
 ---
@@ -89,5 +89,5 @@ To reiterate:
 For more info regarding this topic, check out the following pages:
 
 - [Hydration](/concepts/hydration)
-- [`@client`](/utils/at_client)
-- [`@Import`](/utils/at_import)
+- [`@client`](/api/utils/at_client)
+- [`@Import`](/api/utils/at_import)
