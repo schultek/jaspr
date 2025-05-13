@@ -17,8 +17,8 @@ environment:
 
 dependencies:
   jaspr: ^0.18.0
-  serverpod: '>=2.3.0 <2.6.0'
-  serverpod_client: '>=2.3.0 <2.6.0'
+  serverpod: '>=2.3.0 <3.0.0'
+  serverpod_client: '>=2.3.0 <3.0.0'
   shelf: ^1.4.0
   web: ^1.0.0
 
