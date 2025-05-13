@@ -69,8 +69,7 @@ class RSSOutput extends SecondaryOutput {
       context.setStatusCode(200, responseBody: renderRssFeed(page, context.pages));
     });
   }
-  
-  
+
   /// The standard date format for dates within an RSS feed.
   static final rssDateFormat = DateFormat("dd MMM yyyy");
 
@@ -85,7 +84,6 @@ class RSSOutput extends SecondaryOutput {
   }
 
   String renderRssFeed(Page page, List<Page> pages) {
-
     final title = this.title ?? page.data['site']?['title'] ?? '/';
     final siteUrl = this.siteUrl ?? page.data['site']?['url'] ?? '';
     final description = this.description ?? page.data['site']?['description'] ?? '/';
@@ -157,4 +155,3 @@ class RSSItem {
   final String? pubDate;
   final String? author;
 }
-

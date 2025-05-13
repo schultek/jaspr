@@ -117,12 +117,11 @@ void runGithub() {
         ),
       ],
       theme: ContentTheme(
-        //primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
-       // background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
-       colors: [
-        ContentColors.quoteBorders.apply(ThemeColors.indigo),
-       ]
-      ),
+          //primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
+          // background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
+          colors: [
+            ContentColors.quoteBorders.apply(ThemeColors.indigo),
+          ]),
     ),
   ));
 }

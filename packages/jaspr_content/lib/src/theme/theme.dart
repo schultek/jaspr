@@ -104,7 +104,6 @@ class ContentTheme {
         css(':host,html').styles(
           fontFamily: font,
         ),
-      
       if (codeFont != null)
         css('code, kbd, pre, samp').styles(
           fontFamily: codeFont,

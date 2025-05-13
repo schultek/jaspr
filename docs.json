@@ -449,6 +449,9 @@
       ]
     }
   ],
+  "content": {
+    "showPageImage": false
+  },
   "search": {
     "docsearch": {
       "appId": "0JMHSW1KVQ",

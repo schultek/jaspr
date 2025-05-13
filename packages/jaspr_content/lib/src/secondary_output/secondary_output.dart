@@ -3,7 +3,7 @@ import 'package:jaspr/jaspr.dart';
 import '../page.dart';
 
 /// A secondary output for a page.
-/// 
+///
 /// See also:
 /// - [SecondaryMarkdownOutput] for a secondary output containing the unparsed markdown of a page.
 abstract class SecondaryOutput {
