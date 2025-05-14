@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Added `settings` parameter to `Route` for specifying sitemap settings like `priority` and `changefreq`.
+
 ## 0.6.4
 
 - Fixed bug with router redirects.

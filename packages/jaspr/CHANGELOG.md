@@ -4,6 +4,16 @@
   
   If you want to keep the old behaviour of rendering each request in a separate isolate, use `Jaspr.initializeApp(..., useIsolates: true)`.
 
+- Added `allowedPathSuffixes` option to `Jaspr.initializeApp()` to enable handling route paths with extensions other than `html`.
+
+- Added support for generating a **sitemap.xml** in static mode. To enable this, pass `--sitemap-domain=my.domain.com` to `jaspr build`. 
+
+  Add sitemap params like `changefreq` and `priority` to your routes by using `Route(settings: RouteSettings(priority: 0.5))` or set them through `ServerApp.requestRouteGeneration()`.
+
+  Exclude routes from the sitemap through the `--sitemap-exclude` option to `jaspr build`.
+
+  Read more about [Generating a Sitemap](https://docs.jaspr.site/concepts/static_sites#generating-a-sitemap).
+
 - Added support `@client` components from other packages.
 
   Components annotated with `@client` from other dependent packages are now also part of the js bundle when used during pre-rendering.
@@ -12,6 +22,10 @@
 
 - Allow nesting `css.media` and `css.supports` rules.
 - Deprecated `Color.hex()` and `Color.named()` in favor of the default `Color()` constructor.
+
+- Added `onReassemble` stream to `ServerApp`.
+
+- Various bug fixes.
 
 ## 0.18.2
 
