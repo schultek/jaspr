@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.7.0
 
 - Added `settings` parameter to `Route` for specifying sitemap settings like `priority` and `changefreq`.
 

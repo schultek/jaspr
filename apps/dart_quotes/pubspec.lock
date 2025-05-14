@@ -486,21 +486,21 @@ packages:
       path: "../../packages/jaspr"
       relative: true
     source: path
-    version: "0.18.2"
+    version: "0.19.0"
   jaspr_builder:
     dependency: "direct dev"
     description:
       path: "../../packages/jaspr_builder"
       relative: true
     source: path
-    version: "0.18.2"
+    version: "0.19.0"
   jaspr_router:
     dependency: "direct main"
     description:
       path: "../../packages/jaspr_router"
       relative: true
     source: path
-    version: "0.6.4"
+    version: "0.7.0"
   jaspr_web_compilers:
     dependency: "direct dev"
     description:

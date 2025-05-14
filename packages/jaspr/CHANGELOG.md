@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.19.0
 
 - **BREAKING** `JasprOptions.useIsolates` is now `false` by default (was `true`).
   
