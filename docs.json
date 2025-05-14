@@ -43,6 +43,11 @@
       "id": "api",
       "title": "API",
       "href": "/api"
+    },
+    {
+      "id": "content",
+      "title": "Content",
+      "href": "/content"
     }
   ],
   "sidebar": [
