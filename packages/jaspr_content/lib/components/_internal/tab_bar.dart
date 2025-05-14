@@ -33,8 +33,8 @@ class TabBar extends StatefulComponent {
           css('button:hover').styles(raw: {
             'border-bottom-color': ContentColors.hr.value,
           }),
-          css('button[active]').styles(color: Color.variable('--theme-primary'), raw: {
-            'border-bottom-color': 'var(--theme-primary)',
+          css('button[active]').styles(color: ContentColors.primary, raw: {
+            'border-bottom-color': ContentColors.primary.value,
           }),
         ]),
       ];

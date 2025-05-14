@@ -44,6 +44,4 @@ Checkout the official documentation at [docs.jaspr.site/content](https://docs.ja
 - [**Concepts**](https://docs.jaspr.site/content/concepts/pages): In-depth explanations of the core concepts and features of `jaspr_content`.
 - [**Components**](https://docs.jaspr.site/content/components/callout): 
   A list of all built-in components and their usage.
-- [**Extensions**](https://docs.jaspr.site/content/extensions/heading_anchors): A list of all built-in extensions and their usage.
-- [**Layouts**](https://docs.jaspr.site/content/layouts/docs_layout): A list of all built-in layouts and their usage.
 

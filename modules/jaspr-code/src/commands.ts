@@ -16,9 +16,11 @@ export interface JasprCreateOptions {
   readonly backend?: JasprBackendOption;
 }
 
+export type JasprTemplate = "docs";
+
 export async function jasprCreate(
   projectPath: string,
-  options: JasprCreateOptions | undefined
+  options: JasprCreateOptions | JasprTemplate | undefined
 ): Promise<boolean> {
   const isInstalled = await checkJasprInstalled();
   if (!isInstalled) {
@@ -27,18 +29,23 @@ export async function jasprCreate(
 
   const args = ["create"];
 
-  args.push("--mode");
-  args.push(options?.mode ?? "static:auto");
+  if (typeof options === "string") {
+    args.push("--template");
+    args.push(options);
+  } else {
+    args.push("--mode");
+    args.push(options?.mode ?? "static:auto");
 
-  args.push("--routing");
-  args.push(options?.routing ?? "none");
+    args.push("--routing");
+    args.push(options?.routing ?? "none");
 
-  args.push("--flutter");
-  args.push(options?.flutter ?? "none");
+    args.push("--flutter");
+    args.push(options?.flutter ?? "none");
 
-  if (options?.mode === "server" || options?.mode === "server:auto") {
-    args.push("--backend");
-    args.push(options?.backend ?? "none");
+    if (options?.mode === "server" || options?.mode === "server:auto") {
+      args.push("--backend");
+      args.push(options?.backend ?? "none");
+    }
   }
 
   args.push(".");

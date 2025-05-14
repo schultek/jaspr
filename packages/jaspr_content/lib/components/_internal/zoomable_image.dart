@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' hide Document;
 
+import '../../theme.dart';
+
 @client
 class ZoomableImage extends StatefulComponent {
   ZoomableImage({
@@ -37,12 +39,13 @@ class ZoomableImage extends StatefulComponent {
             border: Border.none,
             backgroundColor: Colors.transparent,
             overflow: Overflow.hidden,
+            outline: Outline(style: OutlineStyle.none),
           ),
           css('.image-wrapper').styles(
             position: Position.relative(),
             width: 100.percent,
             height: 100.percent,
-            backgroundColor: Color.variable('--theme-background'),
+            backgroundColor: ContentColors.background,
           ),
           css('img').styles(
             position: Position.absolute(),

@@ -74,7 +74,7 @@ final scaffoldBundle = MasonBundle.fromJson(<String, dynamic>{
     {
       "path": "lib/server#jaspr_options.dart",
       "data":
-          "Ly8gR0VORVJBVEVEIEZJTEUsIERPIE5PVCBNT0RJRlkKLy8gR2VuZXJhdGVkIHdpdGggamFzcHJfYnVpbGRlcgoKaW1wb3J0ICdwYWNrYWdlOmphc3ByL2phc3ByLmRhcnQnOwoKLy8vIERlZmF1bHQgW0phc3ByT3B0aW9uc10gZm9yIHVzZSB3aXRoIHlvdXIgamFzcHIgcHJvamVjdC4KLy8vCi8vLyBVc2UgdGhpcyB0byBpbml0aWFsaXplIGphc3ByICoqYmVmb3JlKiogY2FsbGluZyBbcnVuQXBwXS4KLy8vCi8vLyBFeGFtcGxlOgovLy8gYGBgZGFydAovLy8gaW1wb3J0ICdqYXNwcl9vcHRpb25zLmRhcnQnOwovLy8KLy8vIHZvaWQgbWFpbigpIHsKLy8vICAgSmFzcHIuaW5pdGlhbGl6ZUFwcCgKLy8vICAgICBvcHRpb25zOiBkZWZhdWx0SmFzcHJPcHRpb25zLAovLy8gICApOwovLy8KLy8vICAgcnVuQXBwKC4uLik7Ci8vLyB9Ci8vLyBgYGAKZmluYWwgZGVmYXVsdEphc3ByT3B0aW9ucyA9IEphc3ByT3B0aW9ucygpOwo=",
+          "Ly8gZGFydCBmb3JtYXQgb2ZmCi8vIGlnbm9yZV9mb3JfZmlsZTogdHlwZT1saW50CgovLyBHRU5FUkFURUQgRklMRSwgRE8gTk9UIE1PRElGWQovLyBHZW5lcmF0ZWQgd2l0aCBqYXNwcl9idWlsZGVyCgppbXBvcnQgJ3BhY2thZ2U6amFzcHIvamFzcHIuZGFydCc7CgovLy8gRGVmYXVsdCBbSmFzcHJPcHRpb25zXSBmb3IgdXNlIHdpdGggeW91ciBqYXNwciBwcm9qZWN0LgovLy8KLy8vIFVzZSB0aGlzIHRvIGluaXRpYWxpemUgamFzcHIgKipiZWZvcmUqKiBjYWxsaW5nIFtydW5BcHBdLgovLy8KLy8vIEV4YW1wbGU6Ci8vLyBgYGBkYXJ0Ci8vLyBpbXBvcnQgJ2phc3ByX29wdGlvbnMuZGFydCc7Ci8vLwovLy8gdm9pZCBtYWluKCkgewovLy8gICBKYXNwci5pbml0aWFsaXplQXBwKAovLy8gICAgIG9wdGlvbnM6IGRlZmF1bHRKYXNwck9wdGlvbnMsCi8vLyAgICk7Ci8vLwovLy8gICBydW5BcHAoLi4uKTsKLy8vIH0KLy8vIGBgYApmaW5hbCBkZWZhdWx0SmFzcHJPcHRpb25zID0gSmFzcHJPcHRpb25zKCk7Cg==",
       "type": "text"
     },
     {
@@ -175,7 +175,7 @@ final scaffoldBundle = MasonBundle.fromJson(<String, dynamic>{
   ],
   "hooks": [],
   "name": "scaffold",
-  "description": "A new brick created with the Mason CLI.",
+  "description": "A new Jaspr project",
   "version": "0.1.0",
   "environment": {"mason": ">=0.1.0-dev.52 <0.1.0"},
   "vars": {}

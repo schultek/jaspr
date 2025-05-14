@@ -3,14 +3,37 @@ import { fsPath } from "./utils";
 import * as fs from "fs";
 import * as path from "path";
 import { JASPR_CREATE_PROJECT_TRIGGER_FILE } from "./constants";
-import { jasprCreate, JasprCreateOptions, runJasprInFolder } from "./commands";
+import { jasprCreate, JasprCreateOptions, JasprTemplate } from "./commands";
+import { dartExtensionApi } from "./api";
 
-function getJasprVariants(): Array<
-  vs.QuickPickItem & { data?: JasprCreateOptions | "more" }
-> {
-  const items: Array<
-    vs.QuickPickItem & { data?: JasprCreateOptions | "more" }
-  > = [
+type JasprVariant = vs.QuickPickItem & {
+  data?: JasprCreateOptions | JasprTemplate | "more";
+};
+
+function getJasprVariants(version: string): Array<JasprVariant> {
+  let items: Array<JasprVariant> = [];
+
+  if (version >= "0.19.0") {
+    items.push(
+      {
+        kind: vs.QuickPickItemKind.Separator,
+        label: "New",
+      },
+      {
+        detail:
+          "A beautiful documentation site rendered from Markdown files with prebuilt layout, theming and more.",
+        label: "$(book) Documentation Site",
+        description: "using jaspr_content",
+        data: "docs",
+      }
+    );
+  }
+
+  items.push(
+    {
+      kind: vs.QuickPickItemKind.Separator,
+      label: "Templates",
+    },
     {
       detail:
         "A static site that is pre-rendered at build time, includes routing and client-side interactivity. Recommended for most sites, landing pages, marketing, portfolios, blogs etc.",
@@ -68,13 +91,13 @@ function getJasprVariants(): Array<
     },
     {
       kind: vs.QuickPickItemKind.Separator,
-      label: "More options...",
+      label: "More",
     },
     {
       label: "More ...",
       data: "more",
-    },
-  ];
+    }
+  );
 
   return items;
 }
@@ -204,12 +227,18 @@ function getJasprVariantsAll(): Array<
 }
 
 export async function createJasprProject(): Promise<vs.Uri | undefined> {
-  const jasprVariants = getJasprVariants();
+  const v = await dartExtensionApi.pubGlobal.installIfRequired({
+    packageName: "jaspr",
+    packageID: "jaspr_cli",
+    requiredVersion: "0.18.2",
+  });
+
+  const jasprVariants = getJasprVariants(v);
 
   let selectedModeItem = await vs.window.showQuickPick(jasprVariants, {
     ignoreFocusOut: true,
     matchOnDescription: true,
-    placeHolder: "Select a starting option",
+    placeHolder: "Select a starter template",
   });
 
   if (selectedModeItem?.data === "more") {
@@ -218,7 +247,7 @@ export async function createJasprProject(): Promise<vs.Uri | undefined> {
     selectedModeItem = await vs.window.showQuickPick(jasprVariantsAll, {
       ignoreFocusOut: true,
       matchOnDescription: true,
-      placeHolder: "Select a starting option",
+      placeHolder: "Select a configuration",
     });
   }
 

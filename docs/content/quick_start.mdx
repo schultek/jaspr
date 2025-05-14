@@ -7,16 +7,32 @@ description: Get started with jaspr_content to build content-driven sites.
 
 ## Setup
 
-To get started, create a new Jaspr project in either `static` or `server` mode. You can do this using the Jaspr VSCode extension or by using the `jaspr create` command.
+### Documentation Template
 
-Then perform the following steps:
+To get you started quickly, Jaspr comes with a new **Documentation Template** you can choose when creating a new project. This will give you an already functional documentation site out-of-the-box with no manual setup.
+
+To use this template, either select it when creating a new project using the **Jaspr VSCode Extension**, or run:
+
+```shell
+jaspr create --template=docs my_documentation_site
+```
+
+### Custom Setup
+
+If the template isn't the right fit for you, its also very easy to get started with a custom setup. To do this perform the following steps:
 
 <Steps>
+  <Step title="Create a new Project">
+
+    Create a new Jaspr project in either `static` or `server` mode. 
+    
+    You can do this using the **Jaspr VSCode extension** or by using the `jaspr create` command.
+  </Step>
   <Step title="Add jaspr_content">
 
     Add the `jaspr_content` package to your project by adding it to your `pubspec.yaml` file:
 
-    ```bash
+    ```shell
     dart pub add jaspr_content
     ```
   </Step>

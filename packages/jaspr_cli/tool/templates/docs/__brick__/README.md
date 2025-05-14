@@ -1,6 +1,6 @@
-# content_site
+# {{name}}
 
-A new jaspr project.
+{{description}}
 
 ## Running the project
 

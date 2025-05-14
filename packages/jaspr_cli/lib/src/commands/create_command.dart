@@ -5,8 +5,9 @@ import 'package:mason/mason.dart';
 import 'package:path/path.dart' as p;
 import 'package:pub_updater/pub_updater.dart';
 
+import '../bundles/bundles.dart';
+import '../bundles/scaffold/scaffold_bundle.dart';
 import '../logging.dart';
-import '../scaffold/scaffold_bundle.dart';
 import '../version.dart';
 import 'base_command.dart';
 
@@ -27,6 +28,15 @@ enum RenderingMode {
 
 class CreateCommand extends BaseCommand {
   CreateCommand({super.logger}) {
+    argParser.addOption(
+      'template',
+      abbr: 't',
+      help: 'The template to use for the project.',
+      allowed: ['docs'],
+      allowedHelp: {
+        'docs': 'A template for creating a documentation site with jaspr_content.',
+      },
+    );
     argParser.addSeparator('Project Presets:');
     argParser.addOption(
       'mode',
@@ -97,12 +107,15 @@ class CreateCommand extends BaseCommand {
   Future<int> runCommand() async {
     var (dir, name) = getTargetDirectory();
 
+    var template = argResults!['template'] as String?;
+    if (template != null) {
+      return await createFromTemplate(template, dir, name);
+    }
+
     var (useMode, useHydration) = getRenderingMode();
     var (useRouting, useMultiPageRouting) = getRouting(useMode.useServer, useHydration);
     var (useFlutter, usePlugins) = getFlutter();
     var useBackend = useMode == RenderingMode.server ? getBackend() : null;
-
-    var description = 'A new jaspr project.';
 
     var usedPrefixes = {
       if (useMode.useServer) 'server',
@@ -136,7 +149,7 @@ class CreateCommand extends BaseCommand {
       ScaffoldGeneratorTarget(dir, usedPrefixes),
       vars: {
         'name': name,
-        'description': description,
+        'description': scaffoldBundle.description,
         'mode': useMode.name,
         'routing': useRouting,
         'multipage': useMultiPageRouting,
@@ -152,6 +165,71 @@ class CreateCommand extends BaseCommand {
         'jasprLintsVersion': jasprLintsVersion,
         'webCompilersPackage': webCompilersPackage,
         'webCompilersVersion': webCompilersVersion,
+      },
+      logger: logger.logger,
+    );
+    progress.complete('Generated ${files.length} file(s)');
+
+    var process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
+
+    await watchProcess('pub', process,
+        tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s == '...' || s.contains('+'));
+
+    logger.write('\n'
+        'Created project $name! In order to get started, run the following commands:\n\n');
+
+    var relativePath = p.relative(dir.path, from: Directory.current.absolute.path);
+    if (relativePath != '.') {
+      logger.write('  cd $relativePath\n');
+    }
+    logger.write('  jaspr serve\n');
+
+    return 0;
+  }
+
+  Future<int> createFromTemplate(
+    String template,
+    Directory dir,
+    String name,
+  ) async {
+    final bundle = templates[template];
+    if (bundle == null) {
+      usageException('Template "$template" not found.');
+    }
+
+    var updater = PubUpdater();
+
+    var [
+      jasprFlutterEmbedVersion,
+      jasprRouterVersion,
+      jasprContentVersion,
+      jasprLintsVersion,
+      jasprWebCompilersVersion,
+      buildWebCompilersVersion,
+    ] = await Future.wait([
+      updater.getLatestVersion('jaspr_flutter_embed'),
+      updater.getLatestVersion('jaspr_router'),
+      updater.getLatestVersion('jaspr_content'),
+      updater.getLatestVersion('jaspr_lints'),
+      updater.getLatestVersion('jaspr_web_compilers'),
+      updater.getLatestVersion('build_web_compilers'),
+    ]);
+
+    var progress = logger.logger!.progress('Generating project from template "$template"...');
+    var generator = await MasonGenerator.fromBundle(bundle);
+    final files = await generator.generate(
+      DirectoryGeneratorTarget(dir),
+      vars: {
+        'name': name,
+        'description': bundle.description,
+        'jasprCoreVersion': jasprCoreVersion,
+        'jasprBuilderVersion': jasprBuilderVersion,
+        'jasprFlutterEmbedVersion': jasprFlutterEmbedVersion,
+        'jasprRouterVersion': jasprRouterVersion,
+        'jasprContentVersion': jasprContentVersion,
+        'jasprLintsVersion': jasprLintsVersion,
+        'jasprWebCompilersVersion': jasprWebCompilersVersion,
+        'buildWebCompilersVersion': buildWebCompilersVersion,
       },
       logger: logger.logger,
     );
