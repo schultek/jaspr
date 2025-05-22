@@ -1098,6 +1098,14 @@
           "doc": "The y coordinate of the rect.",
           "type": "string"
         },
+        "rx": {
+          "doc": "The rx coordinate of the rect.",
+          "type": "string"
+        },
+        "ry": {
+          "doc": "The ry coordinate of the rect.",
+          "type": "string"
+        },
         "width": {
           "doc": "The width of the rect.",
           "type": "string"

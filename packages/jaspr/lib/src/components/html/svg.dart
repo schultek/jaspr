@@ -36,6 +36,8 @@ Component svg(List<Component> children,
 ///
 /// - [x]: The x coordinate of the rect.
 /// - [y]: The y coordinate of the rect.
+/// - [rx]: The rx coordinate of the rect.
+/// - [ry]: The ry coordinate of the rect.
 /// - [width]: The width of the rect.
 /// - [height]: The height of the rect.
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
@@ -44,6 +46,8 @@ Component svg(List<Component> children,
 Component rect(List<Component> children,
     {String? x,
     String? y,
+    String? rx,
+    String? ry,
     String? width,
     String? height,
     Color? fill,
@@ -65,6 +69,8 @@ Component rect(List<Component> children,
       ...attributes ?? {},
       if (x != null) 'x': x,
       if (y != null) 'y': y,
+      if (rx != null) 'rx': rx,
+      if (ry != null) 'ry': ry,
       if (width != null) 'width': width,
       if (height != null) 'height': height,
       if (fill != null) 'fill': fill.value,

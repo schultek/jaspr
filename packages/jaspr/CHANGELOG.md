@@ -1,3 +1,7 @@
+## 0.19.1
+  
+- Added `rx:`, `ry:` attributes for svg rect().
+
 ## 0.19.0
 
 - **BREAKING** `JasprOptions.useIsolates` is now `false` by default (was `true`).
