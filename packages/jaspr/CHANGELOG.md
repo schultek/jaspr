@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Added `Color.currentColor` constant.
+
 ## 0.19.0
 
 - **BREAKING** `JasprOptions.useIsolates` is now `false` by default (was `true`).
