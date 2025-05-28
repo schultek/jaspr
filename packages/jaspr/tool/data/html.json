@@ -1099,7 +1099,7 @@
           "type": "string"
         },
         "rx": {
-          "doc": "The rx coordinate of the rect.",
+          "doc": "The horizontal corner radius of the rect.",
           "type": "string"
         },
         "ry": {
