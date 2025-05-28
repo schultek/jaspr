@@ -1103,7 +1103,7 @@
           "type": "string"
         },
         "ry": {
-          "doc": "The ry coordinate of the rect.",
+          "doc": "The vertical corner radius of the rect.",
           "type": "string"
         },
         "width": {
