@@ -1,6 +1,7 @@
 ## Unreleased patch
 
 - Added `Color.currentColor` constant.
+- Added `rx` and `ry` properties for svg `rect()`.
 
 ## 0.19.0
 

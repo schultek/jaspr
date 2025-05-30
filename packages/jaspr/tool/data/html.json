@@ -1098,6 +1098,14 @@
           "doc": "The y coordinate of the rect.",
           "type": "string"
         },
+        "rx": {
+          "doc": "The horizontal corner radius of the rect.",
+          "type": "string"
+        },
+        "ry": {
+          "doc": "The vertical corner radius of the rect.",
+          "type": "string"
+        },
         "width": {
           "doc": "The width of the rect.",
           "type": "string"
