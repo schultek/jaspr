@@ -40,7 +40,7 @@ class Community extends StatelessComponent {
           h4([text('Discord')]),
           p([
             text(
-                'Join our Discord community with over 400 developers. Chat with other developers, ask questions, and share your projects.')
+                'Join our Discord community with over 500 developers. Chat with other developers, ask questions, and share your projects.')
           ]),
           div(classes: 'actions', [
             LinkButton.outlined(
