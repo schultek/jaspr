@@ -30,7 +30,7 @@ abstract class Color {
   /// Constructs a variable containing color.
   const factory Color.variable(String value) = _VariableColor;
 
-  /// The `currentcolor` keyword represents the value of an element's color property. 
+  /// The `currentcolor` keyword represents the value of an element's color property.
   /// This lets you use the color value on properties that do not receive it by default.
   static const Color currentColor = Color('currentcolor');
 

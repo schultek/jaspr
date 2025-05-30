@@ -42,7 +42,7 @@ Component a(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (download != null) 'download': download,
       'href': href,
       if (target != null) 'target': target.value,

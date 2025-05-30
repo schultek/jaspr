@@ -111,7 +111,7 @@ void main() {
 
       if (attrs != null) {
         content.write('{\n'
-            '      ...attributes ?? {},\n');
+            '      ...?attributes,\n');
 
         for (var attr in attrs.keys) {
           var name = attrs[attr]['name'] ?? attr;

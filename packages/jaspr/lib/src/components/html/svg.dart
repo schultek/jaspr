@@ -22,7 +22,7 @@ Component svg(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (viewBox != null) 'viewBox': viewBox,
       if (width != null) 'width': width.value,
       if (height != null) 'height': height.value,
@@ -36,8 +36,8 @@ Component svg(List<Component> children,
 ///
 /// - [x]: The x coordinate of the rect.
 /// - [y]: The y coordinate of the rect.
-/// - [rx]: The rx coordinate of the rect.
-/// - [ry]: The ry coordinate of the rect.
+/// - [rx]: The horizontal corner radius of the rect.
+/// - [ry]: The vertical corner radius of the rect.
 /// - [width]: The width of the rect.
 /// - [height]: The height of the rect.
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
@@ -66,7 +66,7 @@ Component rect(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (x != null) 'x': x,
       if (y != null) 'y': y,
       if (rx != null) 'rx': rx,
@@ -110,7 +110,7 @@ Component circle(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (cx != null) 'cx': cx,
       if (cy != null) 'cy': cy,
       if (r != null) 'r': r,
@@ -153,7 +153,7 @@ Component ellipse(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (cx != null) 'cx': cx,
       if (cy != null) 'cy': cy,
       if (rx != null) 'rx': rx,
@@ -197,7 +197,7 @@ Component line(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (x1 != null) 'x1': x1,
       if (y1 != null) 'y1': y1,
       if (x2 != null) 'x2': x2,
@@ -235,7 +235,7 @@ Component path(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (d != null) 'd': d,
       if (fill != null) 'fill': fill.value,
       if (stroke != null) 'stroke': stroke.value,
@@ -270,7 +270,7 @@ Component polygon(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (points != null) 'points': points,
       if (fill != null) 'fill': fill.value,
       if (stroke != null) 'stroke': stroke.value,
@@ -305,7 +305,7 @@ Component polyline(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (points != null) 'points': points,
       if (fill != null) 'fill': fill.value,
       if (stroke != null) 'stroke': stroke.value,
