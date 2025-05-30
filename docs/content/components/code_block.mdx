@@ -12,6 +12,10 @@ Code Blocks are a great way to display code snippets in your site. Use the stand
 Add the `CodeBlock()` component to your `components` list in your `main.dart` file:
 
 ```dart
+import 'package:jaspr_content/components/code_block.dart';
+
+// ...
+
 ContentApp(
   components: [
     CodeBlock(),
@@ -21,13 +25,13 @@ ContentApp(
 
 Then use the code block syntax in your content files to display the code blocks.
 
-```markdown
-\```dart
+````markdown
+```dart
 void main() {
   print('Hello, world!');
 }
-\```
 ```
+````
 
 ---
 
