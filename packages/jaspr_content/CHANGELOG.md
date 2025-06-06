@@ -1,3 +1,7 @@
+## 0.1.2-wip
+
+- Require Dart 3.6 or later.
+
 ## 0.1.1
 
 - `jaspr` upgraded to `0.19.0`

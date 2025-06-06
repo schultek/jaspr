@@ -24,7 +24,7 @@ extension UnitExt on num {
   /// Refers to the CSS rem (root em) unit.
   ///
   /// This is used to specify a length relative to the font size of the
-  /// root element (usually the <html> element). For example, '2.rem' is equal
+  /// root element (usually the `<html>` element). For example, '2.rem' is equal
   /// to twice the font size of the root element. If all child elements use
   /// rem units, then simply changing the value of the root element will
   /// proportionally adjust the values of the children.

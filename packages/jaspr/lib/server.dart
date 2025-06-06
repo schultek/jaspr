@@ -1,5 +1,3 @@
-library server;
-
 export 'package:shelf/shelf.dart' show Handler, Request, Response;
 
 export 'jaspr.dart' hide runApp, AppContext, Document;

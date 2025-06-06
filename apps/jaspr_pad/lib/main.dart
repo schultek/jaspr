@@ -1,5 +1,5 @@
 @MappableLib(generateInitializerForScope: InitializerScope.package)
-library main;
+library;
 
 import 'dart:async';
 import 'dart:io';

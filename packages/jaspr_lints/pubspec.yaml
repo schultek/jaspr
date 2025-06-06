@@ -23,4 +23,4 @@ dependencies:
   yaml: ^3.1.2
 
 dev_dependencies:
-  lints: ^5.0.0
+  lints: ^5.1.1
