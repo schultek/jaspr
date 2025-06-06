@@ -19,12 +19,12 @@ jaspr create --template=docs my_documentation_site
 
 ### Custom Setup
 
-If the template isn't the right fit for you, its also very easy to get started with a custom setup. To do this perform the following steps:
+If the template isn't the right fit for you, it's also very easy to get started with a custom setup. To do this, perform the following steps:
 
 <Steps>
   <Step title="Create a new Project">
 
-    Create a new Jaspr project in either `static` or `server` mode. 
+    Create a new Jaspr project in either `static` or `server` mode.
     
     You can do this using the **Jaspr VSCode extension** or by using the `jaspr create` command.
   </Step>
@@ -41,7 +41,7 @@ If the template isn't the right fit for you, its also very easy to get started w
     Create a top-level `content/` directory in your project. This is where you will store your content files. Inside the `content/` directory, create a new file called `index.md` and add some sample content.
 
     
-    ```markdown title="content/index.md"
+    ````markdown title="content/index.md"
     # Welcome to Jaspr Content
 
     This is a sample content file. You can add more files here as needed.
@@ -58,17 +58,17 @@ If the template isn't the right fit for you, its also very easy to get started w
       2. Nested item 2
 
     **Blockquotes**:
-      
+
     > This is a blockquote.  
     > It can span multiple lines.
 
     **Code blocks**:
-      
-    \```dart
+
+    ```dart
     void main() {
       print('Hello, world!');
     }
-    \```
+    ```
 
     **Inline code**: Use `print('Hello, world!')` to display a message.
 
@@ -82,7 +82,7 @@ If the template isn't the right fit for you, its also very easy to get started w
     |-----------|-------------|
     | Header 1  | Content 1   |
     | Header 2  | Content 2   |
-    ```
+    ````
     
   </Step>
   <Step title="Update main.dart">
@@ -132,7 +132,7 @@ So far we have only seen a very minimal setup for `ContentApp` and there is lots
   ---
 
   ...
-  ````
+  ```
 
 - Add one of the provided [layouts](/content/concepts/page_layouts) or create your own. For example, [DocsLayout](/content/layouts/docs_layout) provides a beautiful documentation layout with a header, sidebar and table of contents *(Similar to the docs you are reading right now)*.
 
@@ -151,7 +151,7 @@ So far we have only seen a very minimal setup for `ContentApp` and there is lots
   ],
   ```
 
-  ```markdown title="content/index.md"
+  ````markdown title="content/index.md"
   You can use Jaspr components in your content files using their "html" syntax:
 
   <Info>
@@ -161,12 +161,12 @@ So far we have only seen a very minimal setup for `ContentApp` and there is lots
   Or components can override existing markdown blocks, like how the `CodeBlock` 
   component adds **syntax highlighting** and a **copy button** to standard code blocks:
 
-  \```dart
+  ```dart
   void main() {
     print('Hello, world!');
   }
-  \```
   ```
+  ````
 
   You can also add [**your own Jaspr components**](/content/concepts/custom_components) and use them in your content files. 
   
@@ -230,7 +230,7 @@ If you want to make sure to understand all concepts, here is a full list of all 
 - [**ContentApp**](/content/concepts/content_app): The main entry point for setting up a content-driven site.
 - [**Page**](/content/concepts/pages): A data object that holds all information and configuration about a single page. A page is what will be rendered to a `.html` file.
 - [**PageConfig**](/content/concepts/pages#pageconfig): A configuration object that holds all settings for parsing and rendering content. This may either be applied to a single page (where different pages have different PageConfigs) or to the whole app.
-- [**RouteLoader**](/content/concepts/route_loading): Loads pages from a sources like the filesystem or a github repository.
+- [**RouteLoader**](/content/concepts/route_loading): Loads pages from a sources like the filesystem or a GitHub repository.
 - [**DataLoader**](/content/concepts/data_loading): Loads additional data from sources like `.json` or `.yaml` files.
 - [**TemplateEngine**](/content/concepts/templating): Pre-processes the content using a templating language like mustache. This is useful for injecting data (from frontmatter and data loaders) into the content before parsing.
 - [**PageParser**](/content/concepts/page_parsing): Parses the content from a file format like markdown or html.
