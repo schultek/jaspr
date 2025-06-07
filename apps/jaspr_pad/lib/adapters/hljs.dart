@@ -1,5 +1,5 @@
 @JS()
-library hljs;
+library;
 
 import 'package:js/js.dart';
 

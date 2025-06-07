@@ -117,10 +117,10 @@ packages:
     dependency: transitive
     description:
       name: build_modules
-      sha256: "0327cb2a9eefba197b63f71872c38bafe4c63b331797a43618d6c270516a6447"
+      sha256: b1fc29a603669b25a5d95cc9610ed649e9f00e6075e5b6b721aa1a095cff13de
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.11"
+    version: "5.0.13"
   build_resolvers:
     dependency: transitive
     description:
@@ -650,10 +650,10 @@ packages:
     dependency: "direct dev"
     description:
       name: jaspr_web_compilers
-      sha256: "127f4079886add9d5ff3a2a04d2819437855f4330e10f2090d03d7ad4211b347"
+      sha256: "977cefb4e34d2c5b4814dc83b57225eb6313f083e0b12df9473ab294e6cddd93"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.1"
+    version: "4.1.5"
   jose:
     dependency: transitive
     description:
@@ -682,10 +682,10 @@ packages:
     dependency: "direct dev"
     description:
       name: lints
-      sha256: "976c774dd944a42e83e2467f4cc670daef7eed6295b10b36ae8c85bcbf828235"
+      sha256: c35bb79562d980e9a453fc715854e1ed39e24e7d0297a880ef54e17f9874a9d7
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.0"
+    version: "5.1.1"
   logging:
     dependency: transitive
     description:
@@ -1271,10 +1271,10 @@ packages:
     dependency: transitive
     description:
       name: vector_math
-      sha256: "80b3257d1492ce4d091729e3a67a60407d227c27241d6927be0130c98e741803"
+      sha256: d530bd74fea330e6e364cda7a85019c434070188383e1cd8d9777ee586914c5b
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.2.0"
   vm_service:
     dependency: transitive
     description:
@@ -1356,5 +1356,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.7.0-0 <3.8.0-z"
+  dart: ">=3.7.0 <3.9.0-z"
   flutter: ">=3.24.0"
