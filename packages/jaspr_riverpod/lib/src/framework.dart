@@ -1,7 +1,5 @@
 // ignore_for_file: invalid_use_of_internal_member
 
-library framework;
-
 import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';

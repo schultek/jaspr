@@ -55,14 +55,28 @@ class BrowserTester {
     await dispatchEvent(finder, web.MouseEvent('click'), pump: pump);
   }
 
-  Future<void> input(Finder finder, {bool? checked, double? valueAsNumber, String? value, bool pump = true}) async {
+  Future<void> input(Finder finder,
+      {bool? checked,
+      double? valueAsNumber,
+      String? value,
+      bool pump = true}) async {
     await _dispatchInputEvent(finder, 'input',
-        checked: checked, valueAsNumber: valueAsNumber, value: value, pump: pump);
+        checked: checked,
+        valueAsNumber: valueAsNumber,
+        value: value,
+        pump: pump);
   }
 
-  Future<void> change(Finder finder, {bool? checked, double? valueAsNumber, String? value, bool pump = true}) async {
+  Future<void> change(Finder finder,
+      {bool? checked,
+      double? valueAsNumber,
+      String? value,
+      bool pump = true}) async {
     await _dispatchInputEvent(finder, 'change',
-        checked: checked, valueAsNumber: valueAsNumber, value: value, pump: pump);
+        checked: checked,
+        valueAsNumber: valueAsNumber,
+        value: value,
+        pump: pump);
   }
 
   Future<void> _dispatchInputEvent(
@@ -74,9 +88,12 @@ class BrowserTester {
     bool pump = true,
   }) async {
     dispatchEvent(finder, web.InputEvent(type), before: (e) {
-      if (checked != null) (e as web.HTMLInputElement).checked = checked;
-      if (valueAsNumber != null) (e as web.HTMLInputElement).valueAsNumber = valueAsNumber;
-      if (value != null) (e as web.HTMLInputElement).value = value;
+      var inputElement = e as web.HTMLInputElement;
+      if (checked != null) inputElement.checked = checked;
+      if (valueAsNumber != null) {
+        inputElement.valueAsNumber = valueAsNumber;
+      }
+      if (value != null) inputElement.value = value;
     }, pump: pump);
   }
 
@@ -85,8 +102,8 @@ class BrowserTester {
     var element = _findDomElement(finder);
 
     var source = (element.renderObject as DomRenderObject).node;
-    if (source is web.Element) {
-      before?.call(source);
+    if (source != null && source.isA<web.Element>()) {
+      before?.call(source as web.Element);
       source.dispatchEvent(event);
     }
 

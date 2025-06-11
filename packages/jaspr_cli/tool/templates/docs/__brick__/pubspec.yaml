@@ -15,7 +15,7 @@ dev_dependencies:
   jaspr_web_compilers: ^{{jasprWebCompilersVersion}}
   jaspr_builder: ^{{jasprBuilderVersion}}
   jaspr_lints: ^{{jasprLintsVersion}}
-  lints: ^5.0.0
+  lints: ^5.1.1
 
 jaspr:
   mode: static

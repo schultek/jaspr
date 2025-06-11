@@ -1,5 +1,3 @@
-library router;
-
 import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';

@@ -2,6 +2,7 @@ include: package:lints/recommended.yaml
 
 linter:
   rules:
+    avoid_types_as_parameter_names: false
     sort_pub_dependencies: true
     prefer_relative_imports: true
     directives_ordering: true
