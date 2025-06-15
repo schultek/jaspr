@@ -33,12 +33,7 @@ class ContentTheme {
         reset = true;
 
   /// Disables any theming and styles for the page.
-  const ContentTheme.none()
-      : colors = const [],
-        font = null,
-        codeFont = null,
-        typography = const ContentTypography(styles: Styles(), rules: []),
-        reset = false;
+  const factory ContentTheme.none() = _NoContentTheme;
 
   /// A set of color tokens for the site.
   final List<ColorToken> colors;
@@ -69,7 +64,9 @@ class ContentTheme {
     bool mergeColors = true,
   }) {
     return copyWith(
-      colors: mergeColors && colors != null ? this.colors.apply(colors: colors) : colors ?? this.colors,
+      colors: mergeColors && colors != null
+          ? this.colors.apply(colors: colors)
+          : colors ?? this.colors,
       font: font ?? this.font,
       codeFont: codeFont ?? this.codeFont,
       typography: typography,
@@ -94,8 +91,10 @@ class ContentTheme {
     final colors = this.colors;
     final typography = this.typography;
 
-    final hasTextToken = colors.any((color) => color.name == ContentColors.text.name);
-    final hasBackgroundToken = colors.any((color) => color.name == ContentColors.background.name);
+    final hasTextToken =
+        colors.any((color) => color.name == ContentColors.text.name);
+    final hasBackgroundToken =
+        colors.any((color) => color.name == ContentColors.background.name);
 
     return [
       ...colors.build(),
@@ -116,4 +115,46 @@ class ContentTheme {
       typography.build(),
     ];
   }
+}
+
+class _NoContentTheme implements ContentTheme {
+  const _NoContentTheme();
+
+  @override
+  FontFamily? get codeFont => null;
+
+  @override
+  List<ColorToken> get colors => [];
+
+  @override
+  FontFamily? get font => null;
+
+  @override
+  bool get reset => false;
+
+  @override
+  List<StyleRule> get styles => [];
+
+  @override
+  ContentTypography get typography =>
+      ContentTypography(styles: Styles(), rules: []);
+
+  @override
+  ContentTheme apply({
+    List<ColorToken>? colors,
+    FontFamily? font,
+    FontFamily? codeFont,
+    ContentTypography? typography,
+    bool mergeColors = true,
+  }) =>
+      this;
+
+  @override
+  ContentTheme copyWith({
+    List<ColorToken>? colors,
+    FontFamily? font,
+    FontFamily? codeFont,
+    ContentTypography? typography,
+  }) =>
+      this;
 }
