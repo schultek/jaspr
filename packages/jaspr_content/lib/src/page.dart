@@ -313,8 +313,10 @@ extension PageHandlersExtension on Page {
   /// Returns [child] if no layout is provided.
   Component buildLayout(Component child) {
     PageLayout? layout;
-    if (data['layout'] case final key?) {
-      layout = config.layouts.where((l) => l.name.matchAsPrefix(key) != null).firstOrNull;
+    if (data['page']['layout'] case final layoutName?) {
+      layout = config.layouts
+          .where((l) => l.name.matchAsPrefix(layoutName) != null)
+          .firstOrNull;
     }
     layout ??= config.layouts.firstOrNull;
     if (layout == null) return child;
