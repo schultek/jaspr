@@ -282,7 +282,7 @@ extension PageHandlersExtension on Page {
       return 'text/markdown';
     } else if (this.path.endsWith('.json')) {
       return 'application/json';
-    } else if (this.path.endsWith('.yaml')) {
+    } else if (this.path.endsWith('.yaml') || this.path.endsWith('.yml')) {
       return 'application/yaml';
     } else {
       return 'text/plain';
