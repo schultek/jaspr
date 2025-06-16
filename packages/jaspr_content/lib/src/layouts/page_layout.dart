@@ -94,10 +94,11 @@ abstract class PageLayoutBase implements PageLayout {
 
   @override
   Component buildLayout(Page page, Component child) {
-    final pageData = page.data['page'] ?? {};
-    final siteData = page.data['site'] ?? {};
-
-    final lang = pageData['lang'] ?? siteData['lang'];
+    final lang = switch (page.data) {
+      {'page': {'lang': String lang}} => lang,
+      {'site': {'lang': String lang}} => lang,
+      _ => null,
+    };
 
     return Document(
       lang: lang,
