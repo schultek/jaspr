@@ -312,15 +312,15 @@ extension PageHandlersExtension on Page {
   /// When no key is set or matching, the first provided layout is used.
   /// Returns [child] if no layout is provided.
   Component buildLayout(Component child) {
-    PageLayout? layout;
-    if (data['page']['layout'] case final layoutName?) {
-      layout = config.layouts
+    final pageLayout = switch (data['page']?['layout']) {
+      final String layoutName => config.layouts
           .where((l) => l.name.matchAsPrefix(layoutName) != null)
-          .firstOrNull;
-    }
-    layout ??= config.layouts.firstOrNull;
-    if (layout == null) return child;
-    return layout.buildLayout(this, child);
+          .firstOrNull,
+      _ => config.layouts.firstOrNull,
+    };
+
+    if (pageLayout == null) return child;
+    return pageLayout.buildLayout(this, child);
   }
 
   /// Wraps [child] in the provided theme.
