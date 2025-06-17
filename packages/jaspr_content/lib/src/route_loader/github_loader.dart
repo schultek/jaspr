@@ -16,7 +16,7 @@ class GithubLoader extends RouteLoaderBase {
     this.repo, {
     this.ref = 'main',
     this.path = 'docs/',
-    this.keeySuffixPattern,
+    this.keySuffixPattern,
     this.accessToken,
     super.debugPrint,
   });
@@ -31,7 +31,7 @@ class GithubLoader extends RouteLoaderBase {
   final String path;
 
   /// A pattern to keep the file suffix for all matching pages.
-  final Pattern? keeySuffixPattern;
+  final Pattern? keySuffixPattern;
 
   /// The access token to use for authentication.
   ///
@@ -79,7 +79,7 @@ class GithubLoader extends RouteLoaderBase {
         file['url'],
         this,
         accessToken: accessToken,
-        keepSuffix: keeySuffixPattern?.matchAsPrefix(path) != null,
+        keepSuffix: keySuffixPattern?.matchAsPrefix(path) != null,
       ));
     }
 

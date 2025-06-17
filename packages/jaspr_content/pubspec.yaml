@@ -1,6 +1,6 @@
 name: jaspr_content
 description: Jaspr plugin for content driven sites.
-version: 0.1.1
+version: 0.2.0-wip
 homepage: https://jaspr.site
 issue_tracker: https://github.com/schultek/jaspr/issues
 documentation: https://docs.jaspr.site
