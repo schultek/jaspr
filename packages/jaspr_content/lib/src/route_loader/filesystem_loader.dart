@@ -16,7 +16,7 @@ import 'route_loader.dart';
 class FilesystemLoader extends RouteLoaderBase {
   FilesystemLoader(
     this.directory, {
-    this.keeySuffixPattern,
+    this.keepSuffixPattern,
     super.debugPrint,
   });
 
@@ -24,7 +24,7 @@ class FilesystemLoader extends RouteLoaderBase {
   final String directory;
 
   /// A pattern to keep the file suffix for all matching pages.
-  final Pattern? keeySuffixPattern;
+  final Pattern? keepSuffixPattern;
 
   final Map<String, Set<PageSource>> dependentSources = {};
 
@@ -38,10 +38,9 @@ class FilesystemLoader extends RouteLoaderBase {
         if (event.type == ChangeType.MODIFY) {
           invalidateFile(path);
         } else if (event.type == ChangeType.REMOVE) {
-          invalidateFile(path, rebuild: false);
-          invalidateRoutes();
+          removeFile(path);
         } else if (event.type == ChangeType.ADD) {
-          invalidateRoutes();
+          addFile(path);
         }
       });
     }
@@ -85,7 +84,7 @@ class FilesystemLoader extends RouteLoaderBase {
             path,
             entry,
             this,
-            keepSuffix: keeySuffixPattern?.matchAsPrefix(entry.path) != null,
+            keepSuffix: keepSuffixPattern?.matchAsPrefix(entry.path) != null,
           ));
         } else if (entry is Directory) {
           entities.addAll(loadFiles(entry));
@@ -95,6 +94,22 @@ class FilesystemLoader extends RouteLoaderBase {
     }
 
     return loadFiles(root);
+  }
+
+  void addFile(String path) {
+    addSource(FilePageSource(
+      path.substring(directory.length + 1),
+      File(path),
+      this,
+      keepSuffix: keepSuffixPattern?.matchAsPrefix(path) != null,
+    ));
+  }
+
+  void removeFile(String path) {
+    final source = sources.where((s) => (s as FilePageSource).file.path == path).firstOrNull;
+    if (source != null) {
+      removeSource(source);
+    }
   }
 
   void invalidateFile(String path, {bool rebuild = true}) {
