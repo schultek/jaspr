@@ -1,4 +1,4 @@
-## Unreleased breaking
+## 0.2.0
 
 - **Breaking**: Changed `MemoryPage.builder` to accept a `BuildContext` instead of a `Page` parameter.
 

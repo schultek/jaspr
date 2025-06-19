@@ -64,9 +64,7 @@ class ContentTheme {
     bool mergeColors = true,
   }) {
     return copyWith(
-      colors: mergeColors && colors != null
-          ? this.colors.apply(colors: colors)
-          : colors ?? this.colors,
+      colors: mergeColors && colors != null ? this.colors.apply(colors: colors) : colors ?? this.colors,
       font: font ?? this.font,
       codeFont: codeFont ?? this.codeFont,
       typography: typography,
@@ -91,10 +89,8 @@ class ContentTheme {
     final colors = this.colors;
     final typography = this.typography;
 
-    final hasTextToken =
-        colors.any((color) => color.name == ContentColors.text.name);
-    final hasBackgroundToken =
-        colors.any((color) => color.name == ContentColors.background.name);
+    final hasTextToken = colors.any((color) => color.name == ContentColors.text.name);
+    final hasBackgroundToken = colors.any((color) => color.name == ContentColors.background.name);
 
     return [
       ...colors.build(),
@@ -136,8 +132,7 @@ class _NoContentTheme implements ContentTheme {
   List<StyleRule> get styles => [];
 
   @override
-  ContentTypography get typography =>
-      ContentTypography(styles: Styles(), rules: []);
+  ContentTypography get typography => ContentTypography(styles: Styles(), rules: []);
 
   @override
   ContentTheme apply({

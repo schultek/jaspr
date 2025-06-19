@@ -10,13 +10,13 @@ abstract class StyleRule {
   }) = BlockStyleRule;
 
   /// Renders a `@import url(...)` css rule.
-  /// 
+  ///
   /// The `@import` CSS at-rule is used to import style rules from other valid stylesheets.
   const factory StyleRule.import(String url) = ImportStyleRule;
 
   /// Renders a `@font-face` css rule.
-  /// 
-  /// The `@font-face` CSS at-rule specifies a custom font with which to display text; the font can be loaded from 
+  ///
+  /// The `@font-face` CSS at-rule specifies a custom font with which to display text; the font can be loaded from
   /// either a remote server or a locally-installed font on the user's own computer.
   const factory StyleRule.fontFace({
     required String family,
@@ -35,8 +35,8 @@ abstract class StyleRule {
   }) = MediaStyleRule;
 
   /// Renders a `@layer` css rule.
-  /// 
-  /// The `@layer` CSS at-rule is used to declare a cascade layer and can also be used to define the order of 
+  ///
+  /// The `@layer` CSS at-rule is used to declare a cascade layer and can also be used to define the order of
   /// precedence in case of multiple cascade layers.
   const factory StyleRule.layer({
     String? name,
@@ -44,9 +44,9 @@ abstract class StyleRule {
   }) = LayerStyleRule;
 
   /// Renders a `@supports` css rule.
-  /// 
-  /// The `@supports` CSS at-rule lets you specify CSS declarations that depend on a browser's support for CSS 
-  /// features. Using this at-rule is commonly called a feature query. The rule must be placed at the top level of 
+  ///
+  /// The `@supports` CSS at-rule lets you specify CSS declarations that depend on a browser's support for CSS
+  /// features. Using this at-rule is commonly called a feature query. The rule must be placed at the top level of
   /// your code or nested inside any other conditional group at-rule.
   const factory StyleRule.supports({
     required String condition,
@@ -54,9 +54,9 @@ abstract class StyleRule {
   }) = SupportsStyleRule;
 
   /// Renders a `@keyframes` css rule.
-  /// 
-  /// The `@keyframes` CSS at-rule controls the intermediate steps in a CSS animation sequence by defining styles for 
-  /// keyframes (or waypoints) along the animation sequence. This gives more control over the intermediate steps of 
+  ///
+  /// The `@keyframes` CSS at-rule controls the intermediate steps in a CSS animation sequence by defining styles for
+  /// keyframes (or waypoints) along the animation sequence. This gives more control over the intermediate steps of
   /// the animation sequence than transitions.
   const factory StyleRule.keyframes({
     required String name,

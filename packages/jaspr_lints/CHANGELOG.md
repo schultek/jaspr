@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.4.0
 
 - Added 'prefer_styles_getter' lint and fix.
 - Update `analyzer_plugin` to `^0.13.0`.
