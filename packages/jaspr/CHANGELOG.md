@@ -2,6 +2,9 @@
 
 - Added `Color.currentColor` constant.
 - Added `rx` and `ry` properties for svg `rect()`.
+- Added `prefersContrast: Contrast.<more|less|noPreference>` to `MediaQuery`.
+- Added `MediaQuery.raw()` for creating a custom media query from a `String`.
+
 - Fixed rendering bug when nesting components with empty children.
 
 ## 0.19.0
