@@ -16,7 +16,7 @@ import 'route_loader.dart';
 class FilesystemLoader extends RouteLoaderBase {
   FilesystemLoader(
     this.directory, {
-    this.keeySuffixPattern,
+    this.keepSuffixPattern,
     super.debugPrint,
   });
 
@@ -24,7 +24,7 @@ class FilesystemLoader extends RouteLoaderBase {
   final String directory;
 
   /// A pattern to keep the file suffix for all matching pages.
-  final Pattern? keeySuffixPattern;
+  final Pattern? keepSuffixPattern;
 
   final Map<String, Set<PageSource>> dependentSources = {};
 
@@ -85,7 +85,7 @@ class FilesystemLoader extends RouteLoaderBase {
             path,
             entry,
             this,
-            keepSuffix: keeySuffixPattern?.matchAsPrefix(entry.path) != null,
+            keepSuffix: keepSuffixPattern?.matchAsPrefix(entry.path) != null,
           ));
         } else if (entry is Directory) {
           entities.addAll(loadFiles(entry));
