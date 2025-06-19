@@ -25,7 +25,8 @@ class InheritedSecondaryOutput extends InheritedComponent {
   final Component Function(Page) builder;
 
   static InheritedSecondaryOutput? of(BuildContext context) {
-    return context.dependOnInheritedComponentOfExactType<InheritedSecondaryOutput>();
+    return context
+        .dependOnInheritedComponentOfExactType<InheritedSecondaryOutput>();
   }
 
   @override

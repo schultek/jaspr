@@ -30,7 +30,9 @@ class HtmlParser implements PageParser {
         nodes.add(TextNode(node.text));
       } else if (node is html.Element) {
         final children = buildNodes(node.nodes);
-        nodes.add(ElementNode(node.localName ?? '', node.attributes.cast(), children));
+        nodes.add(
+          ElementNode(node.localName ?? '', node.attributes.cast(), children),
+        );
       }
     }
     return nodes;

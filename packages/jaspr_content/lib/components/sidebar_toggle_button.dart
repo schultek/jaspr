@@ -11,43 +11,63 @@ class SidebarToggleButton extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     if (!kIsWeb) {
-      yield Document.head(children: [
-        Style(styles: styles),
-      ]);
+      yield Document.head(
+        children: [
+          Style(styles: styles),
+        ],
+      );
     }
 
-    yield button(classes: 'sidebar-toggle-button', onClick: () {
-      StreamSubscription? closeSub, barrierSub;
-      void close() {
-        closeSub?.cancel();
-        barrierSub?.cancel();
-        window.document.querySelector('.sidebar-container')?.classList.remove('open');
-      }
+    yield button(
+      classes: 'sidebar-toggle-button',
+      onClick: () {
+        StreamSubscription? closeSub, barrierSub;
+        void close() {
+          closeSub?.cancel();
+          barrierSub?.cancel();
+          window.document
+              .querySelector('.sidebar-container')
+              ?.classList
+              .remove('open');
+        }
 
-      closeSub = window.document.querySelector('.sidebar-close')?.onClick.listen((_) {
-        close();
-      });
-      barrierSub = window.document.querySelector('.sidebar-barrier')?.onClick.listen((_) {
-        close();
-      });
-      window.document.querySelector('.sidebar-container')?.classList.add('open');
-    }, [
-      raw(menuIcon),
-    ]);
+        closeSub = window.document
+            .querySelector('.sidebar-close')
+            ?.onClick
+            .listen((_) {
+              close();
+            });
+        barrierSub = window.document
+            .querySelector('.sidebar-barrier')
+            ?.onClick
+            .listen((_) {
+              close();
+            });
+        window.document
+            .querySelector('.sidebar-container')
+            ?.classList
+            .add('open');
+      },
+      [
+        raw(menuIcon),
+      ],
+    );
   }
 
   List<StyleRule> get styles => [
-        css('.sidebar-toggle-button').styles(
-          display: Display.none,
-          justifyContent: JustifyContent.center,
-          alignItems: AlignItems.center,
-          width: 2.rem,
-          height: 2.rem,
-        ),
-        css.media(MediaQuery.all(maxWidth: 1024.px), [
-          css('[data-has-sidebar] .sidebar-toggle-button').styles(display: Display.flex),
-        ]),
-      ];
+    css('.sidebar-toggle-button').styles(
+      display: Display.none,
+      justifyContent: JustifyContent.center,
+      alignItems: AlignItems.center,
+      width: 2.rem,
+      height: 2.rem,
+    ),
+    css.media(MediaQuery.all(maxWidth: 1024.px), [
+      css(
+        '[data-has-sidebar] .sidebar-toggle-button',
+      ).styles(display: Display.flex),
+    ]),
+  ];
 }
 
 const menuIcon = '''

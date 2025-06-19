@@ -8,7 +8,8 @@ abstract class RSSFilter {
   static const optOut = _OptOutRSSFilter();
   static const optIn = _OptInRSSFilter();
 
-  const factory RSSFilter.custom(bool Function(Page page) include) = _CustomRSSFilter;
+  const factory RSSFilter.custom(bool Function(Page page) include) =
+      _CustomRSSFilter;
 
   bool include(Page page);
 }
@@ -64,10 +65,15 @@ class RSSOutput extends SecondaryOutput {
 
   @override
   Component build(Page page) {
-    return Builder(builder: (context) sync* {
-      context.setHeader('Content-Type', 'text/xml');
-      context.setStatusCode(200, responseBody: renderRssFeed(page, context.pages));
-    });
+    return Builder(
+      builder: (context) sync* {
+        context.setHeader('Content-Type', 'text/xml');
+        context.setStatusCode(
+          200,
+          responseBody: renderRssFeed(page, context.pages),
+        );
+      },
+    );
   }
 
   /// The standard date format for dates within an RSS feed.
@@ -86,10 +92,13 @@ class RSSOutput extends SecondaryOutput {
   String renderRssFeed(Page page, List<Page> pages) {
     final title = this.title ?? page.data['site']?['title'] ?? '/';
     final siteUrl = this.siteUrl ?? page.data['site']?['url'] ?? '';
-    final description = this.description ?? page.data['site']?['description'] ?? '/';
+    final description =
+        this.description ?? page.data['site']?['description'] ?? '/';
     final language = this.language ?? page.data['site']?['language'] ?? 'en-US';
 
-    final pubDate = page.data['site']?['publishDate'] ?? rssDateFormat.format(DateTime.now());
+    final pubDate =
+        page.data['site']?['publishDate'] ??
+        rssDateFormat.format(DateTime.now());
     final lastBuildDate = rssDateFormat.format(DateTime.now());
 
     final items = <String>[];
@@ -101,7 +110,8 @@ class RSSOutput extends SecondaryOutput {
 
       final item = itemBuilder(page);
 
-      var itemSource = '''
+      var itemSource =
+          '''
     <item>
       <title>${item.title}</title>
       <link>$siteUrl${page.url}</link>''';
@@ -126,7 +136,8 @@ class RSSOutput extends SecondaryOutput {
       items.add(itemSource);
     }
 
-    final feed = '''
+    final feed =
+        '''
 <rss version="2.0">
   <channel>
     <title>$title</title>

@@ -31,7 +31,10 @@ class FilesystemLoader extends RouteLoaderBase {
   StreamSubscription<WatchEvent>? _watcherSub;
 
   @override
-  Future<List<RouteBase>> loadRoutes(ConfigResolver resolver, bool eager) async {
+  Future<List<RouteBase>> loadRoutes(
+    ConfigResolver resolver,
+    bool eager,
+  ) async {
     if (kDebugMode) {
       _watcherSub ??= DirectoryWatcher(directory).events.listen((event) {
         var path = event.path;
@@ -77,16 +80,18 @@ class FilesystemLoader extends RouteLoaderBase {
     final root = Directory(directory);
 
     List<PageSource> loadFiles(Directory dir) {
-      List<PageSource> entities = [];
+      final entities = <PageSource>[];
       for (final entry in dir.listSync()) {
         final path = entry.path.substring(root.path.length + 1);
         if (entry is File) {
-          entities.add(FilePageSource(
-            path,
-            entry,
-            this,
-            keepSuffix: keeySuffixPattern?.matchAsPrefix(entry.path) != null,
-          ));
+          entities.add(
+            FilePageSource(
+              path,
+              entry,
+              this,
+              keepSuffix: keeySuffixPattern?.matchAsPrefix(entry.path) != null,
+            ),
+          );
         } else if (entry is Directory) {
           entities.addAll(loadFiles(entry));
         }
@@ -98,7 +103,9 @@ class FilesystemLoader extends RouteLoaderBase {
   }
 
   void invalidateFile(String path, {bool rebuild = true}) {
-    final source = sources.where((s) => (s as FilePageSource).file.path == path).firstOrNull;
+    final source = sources
+        .where((s) => (s as FilePageSource).file.path == path)
+        .firstOrNull;
     if (source != null) {
       invalidateSource(source, rebuild: rebuild);
     }

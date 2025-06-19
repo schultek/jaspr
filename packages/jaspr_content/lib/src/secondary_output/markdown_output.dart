@@ -20,9 +20,11 @@ class MarkdownOutput extends SecondaryOutput {
 
   @override
   Component build(Page page) {
-    return Builder(builder: (context) sync* {
-      context.setHeader('Content-Type', 'text/markdown');
-      context.setStatusCode(200, responseBody: page.content);
-    });
+    return Builder(
+      builder: (context) sync* {
+        context.setHeader('Content-Type', 'text/markdown');
+        context.setStatusCode(200, responseBody: page.content);
+      },
+    );
   }
 }

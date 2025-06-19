@@ -20,25 +20,30 @@ class _CodeBlockCopyButtonState extends State<CodeBlockCopyButton> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield button(events: {
-      'click': (event) {
-        final target = event.currentTarget as web.Element;
-        final content = target.parentElement?.querySelector('pre code')?.textContent;
-        if (content == null) {
-          return;
-        }
-        web.window.navigator.clipboard.writeText(content);
-        setState(() {
-          copied = true;
-        });
-        Timer(const Duration(seconds: 2), () {
+    yield button(
+      events: {
+        'click': (event) {
+          final target = event.currentTarget as web.Element;
+          final content = target.parentElement
+              ?.querySelector('pre code')
+              ?.textContent;
+          if (content == null) {
+            return;
+          }
+          web.window.navigator.clipboard.writeText(content);
           setState(() {
-            copied = false;
+            copied = true;
           });
-        });
-      }
-    }, [
-      copied ? CheckIcon(size: 18) : CopyIcon(size: 18),
-    ]);
+          Timer(const Duration(seconds: 2), () {
+            setState(() {
+              copied = false;
+            });
+          });
+        },
+      },
+      [
+        copied ? CheckIcon(size: 18) : CopyIcon(size: 18),
+      ],
+    );
   }
 }

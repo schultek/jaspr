@@ -18,7 +18,11 @@ class Tabs implements CustomComponent {
   @override
   Component? create(Node node, NodesBuilder builder) {
     if (node is ElementNode && node.tag == 'Tabs') {
-      var tabs = node.children?.whereType<ElementNode>().where((n) => n.tag == 'TabItem') ?? [];
+      var tabs =
+          node.children?.whereType<ElementNode>().where(
+            (n) => n.tag == 'TabItem',
+          ) ??
+          [];
       if (tabs.isEmpty) {
         print("[WARNING] Tabs component requires at least one TabItem child.");
       }
@@ -40,13 +44,13 @@ class Tabs implements CustomComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('.tabs', [
-          css('.tab-content', [
-            css('&').styles(display: Display.none),
-            css('&[active]').styles(display: Display.initial),
-          ])
-        ]),
-      ];
+    css('.tabs', [
+      css('.tab-content', [
+        css('&').styles(display: Display.none),
+        css('&[active]').styles(display: Display.initial),
+      ]),
+    ]),
+  ];
 }
 
 class _Tabs extends StatelessComponent {
@@ -62,12 +66,19 @@ class _Tabs extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     final initialValue = defaultValue ?? items.first.value;
     yield div(classes: 'tabs', [
-      TabBar(initialValue: initialValue, items: {for (var item in items) item.value: item.label}),
+      TabBar(
+        initialValue: initialValue,
+        items: {for (var item in items) item.value: item.label},
+      ),
       div([
         for (var item in items)
           div(
             classes: 'tab-content',
-            attributes: {'data-tab': item.value, 'label': item.label, if (item.value == initialValue) 'active': ''},
+            attributes: {
+              'data-tab': item.value,
+              'label': item.label,
+              if (item.value == initialValue) 'active': '',
+            },
             [item.child],
           ),
       ]),

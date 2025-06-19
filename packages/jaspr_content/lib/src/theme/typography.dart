@@ -19,8 +19,12 @@ class ContentTypography {
     bool mergeRules = true,
   }) {
     return ContentTypography(
-      styles: mergeStyles && styles != null ? this.styles.combine(styles) : styles ?? this.styles,
-      rules: mergeRules && rules != null ? [...this.rules, ...rules] : rules ?? this.rules,
+      styles: mergeStyles && styles != null
+          ? this.styles.combine(styles)
+          : styles ?? this.styles,
+      rules: mergeRules && rules != null
+          ? [...this.rules, ...rules]
+          : rules ?? this.rules,
     );
   }
 }
@@ -41,8 +45,9 @@ List<StyleRule> _scopeContent(List<StyleRule> rules) {
   return rules.expand((rule) => rule.resolve('')).map((rule) {
     if (rule is BlockStyleRule) {
       return BlockStyleRule(
-        selector:
-            Selector(':where(${rule.selector.selector}):not(:where([class~=not-content],[class~=not-content] *))'),
+        selector: Selector(
+          ':where(${rule.selector.selector}):not(:where([class~=not-content],[class~=not-content] *))',
+        ),
         styles: rule.styles,
       );
     }

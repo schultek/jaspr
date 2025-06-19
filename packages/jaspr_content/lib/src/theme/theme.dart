@@ -21,24 +21,26 @@ class ContentTheme {
     FontFamily? font,
     FontFamily? codeFont,
     ContentTypography? typography,
-  })  : colors = ContentColors._base.apply(colors: [
-          ...colors,
-          if (primary != null) ContentColors.primary.apply(primary),
-          if (background != null) ContentColors.background.apply(background),
-          if (text != null) ContentColors.text.apply(text),
-        ]),
-        font = font ?? defaultFont,
-        codeFont = codeFont ?? defaultCodeFont,
-        typography = typography ?? ContentTypography.base,
-        reset = true;
+  }) : colors = ContentColors._base.apply(
+         colors: [
+           ...colors,
+           if (primary != null) ContentColors.primary.apply(primary),
+           if (background != null) ContentColors.background.apply(background),
+           if (text != null) ContentColors.text.apply(text),
+         ],
+       ),
+       font = font ?? defaultFont,
+       codeFont = codeFont ?? defaultCodeFont,
+       typography = typography ?? ContentTypography.base,
+       reset = true;
 
   /// Disables any theming and styles for the page.
   const ContentTheme.none()
-      : colors = const [],
-        font = null,
-        codeFont = null,
-        typography = const ContentTypography(styles: Styles(), rules: []),
-        reset = false;
+    : colors = const [],
+      font = null,
+      codeFont = null,
+      typography = const ContentTypography(styles: Styles(), rules: []),
+      reset = false;
 
   /// A set of color tokens for the site.
   final List<ColorToken> colors;
@@ -69,7 +71,9 @@ class ContentTheme {
     bool mergeColors = true,
   }) {
     return copyWith(
-      colors: mergeColors && colors != null ? this.colors.apply(colors: colors) : colors ?? this.colors,
+      colors: mergeColors && colors != null
+          ? this.colors.apply(colors: colors)
+          : colors ?? this.colors,
       font: font ?? this.font,
       codeFont: codeFont ?? this.codeFont,
       typography: typography,
@@ -94,8 +98,12 @@ class ContentTheme {
     final colors = this.colors;
     final typography = this.typography;
 
-    final hasTextToken = colors.any((color) => color.name == ContentColors.text.name);
-    final hasBackgroundToken = colors.any((color) => color.name == ContentColors.background.name);
+    final hasTextToken = colors.any(
+      (color) => color.name == ContentColors.text.name,
+    );
+    final hasBackgroundToken = colors.any(
+      (color) => color.name == ContentColors.background.name,
+    );
 
     return [
       ...colors.build(),

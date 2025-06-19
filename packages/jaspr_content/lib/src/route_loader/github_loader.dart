@@ -41,7 +41,9 @@ class GithubLoader extends RouteLoaderBase {
 
   Future<List<dynamic>> _loadTree() async {
     var response = await http.get(
-      Uri.parse('https://api.github.com/repos/$repo/git/trees/$ref?recursive=true'),
+      Uri.parse(
+        'https://api.github.com/repos/$repo/git/trees/$ref?recursive=true',
+      ),
       headers: {
         'Accept': 'application/vnd.github+json',
         if (accessToken != null) 'Authorization': 'Bearer $accessToken',
@@ -49,7 +51,9 @@ class GithubLoader extends RouteLoaderBase {
       },
     );
     if (response.statusCode != 200) {
-      throw Exception('Failed to load tree: ${response.statusCode} - ${response.body}');
+      throw Exception(
+        'Failed to load tree: ${response.statusCode} - ${response.body}',
+      );
     }
     var files = jsonDecode(response.body)['tree'] as List;
     return files;
@@ -63,7 +67,7 @@ class GithubLoader extends RouteLoaderBase {
     }
     var files = await _loadTree();
 
-    List<PageSource> routes = [];
+    final routes = <PageSource>[];
 
     for (final file in files) {
       if (file['type'] != 'blob') continue;
@@ -74,13 +78,15 @@ class GithubLoader extends RouteLoaderBase {
       if (path.startsWith('/')) path = path.substring(1);
       if (path.isEmpty) continue;
 
-      routes.add(GithubPageSource(
-        path,
-        file['url'],
-        this,
-        accessToken: accessToken,
-        keepSuffix: keeySuffixPattern?.matchAsPrefix(path) != null,
-      ));
+      routes.add(
+        GithubPageSource(
+          path,
+          file['url'],
+          this,
+          accessToken: accessToken,
+          keepSuffix: keeySuffixPattern?.matchAsPrefix(path) != null,
+        ),
+      );
     }
 
     return routes;
@@ -88,18 +94,27 @@ class GithubLoader extends RouteLoaderBase {
 }
 
 class GithubPageSource extends PageSource {
-  GithubPageSource(super.path, this.blobUrl, super.loader, {this.accessToken, super.keepSuffix = false});
+  GithubPageSource(
+    super.path,
+    this.blobUrl,
+    super.loader, {
+    this.accessToken,
+    super.keepSuffix = false,
+  });
 
   final String blobUrl;
   final String? accessToken;
 
   @override
   Future<Page> buildPage() async {
-    final response = await http.get(Uri.parse(blobUrl), headers: {
-      'Accept': 'application/vnd.github.raw+json',
-      if (accessToken != null) 'Authorization': 'Bearer $accessToken',
-      'X-GitHub-Api-Version': '2022-11-28',
-    });
+    final response = await http.get(
+      Uri.parse(blobUrl),
+      headers: {
+        'Accept': 'application/vnd.github.raw+json',
+        if (accessToken != null) 'Authorization': 'Bearer $accessToken',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    );
     final content = response.body;
 
     return Page(

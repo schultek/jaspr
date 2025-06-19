@@ -74,12 +74,17 @@ class TableOfContents {
 
   Iterable<Component> _buildToc(List<TocEntry> toc, [int indent = 0]) sync* {
     for (final entry in toc) {
-      yield li(styles: Styles(padding: Padding.only(left: (0.75 * indent).em)), [
-        Builder(builder: (context) sync* {
-          var route = RouteState.of(context);
-          yield a(href: '${route.path}#${entry.id}', [text(entry.text)]);
-        }),
-      ]);
+      yield li(
+        styles: Styles(padding: Padding.only(left: (0.75 * indent).em)),
+        [
+          Builder(
+            builder: (context) sync* {
+              var route = RouteState.of(context);
+              yield a(href: '${route.path}#${entry.id}', [text(entry.text)]);
+            },
+          ),
+        ],
+      );
       if (entry.children.isNotEmpty) {
         yield* _buildToc(entry.children, indent + 1);
       }

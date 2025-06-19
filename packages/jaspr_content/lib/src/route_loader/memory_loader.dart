@@ -9,7 +9,8 @@ import 'route_loader.dart';
 ///
 /// Takes a list of [MemoryPage]s and creates routes from them.
 class MemoryLoader extends RouteLoaderBase {
-  MemoryLoader({required List<MemoryPage> pages, super.debugPrint}) : _pages = pages;
+  MemoryLoader({required List<MemoryPage> pages, super.debugPrint})
+    : _pages = pages;
 
   final List<MemoryPage> _pages;
 
@@ -17,7 +18,9 @@ class MemoryLoader extends RouteLoaderBase {
   Future<List<PageSource>> loadPageSources() async {
     final entities = <PageSource>[];
     for (final page in _pages) {
-      entities.add(MemoryPageSource(page, page.path, this, keepSuffix: page.keepSuffix));
+      entities.add(
+        MemoryPageSource(page, page.path, this, keepSuffix: page.keepSuffix),
+      );
     }
     return entities;
   }
@@ -38,8 +41,8 @@ class MemoryPage {
     this.keepSuffix = false,
     this.content,
     this.data = const {},
-  })  : builder = null,
-        applyLayout = true;
+  }) : builder = null,
+       applyLayout = true;
 
   /// Creates a new [MemoryPage] with the given [path] and builds it using the [builder].
   ///
@@ -76,7 +79,12 @@ class MemoryPage {
 }
 
 class MemoryPageSource extends PageSource {
-  MemoryPageSource(this._page, super.path, super.loader, {super.keepSuffix = false});
+  MemoryPageSource(
+    this._page,
+    super.path,
+    super.loader, {
+    super.keepSuffix = false,
+  });
 
   final MemoryPage _page;
 
@@ -134,19 +142,24 @@ class _BuilderPage extends Page {
   @override
   Future<Component> render() async {
     await loadData();
-    return Builder.single(builder: (context) {
-      if (kGenerateMode && data['page']['sitemap'] != null) {
-        context.setHeader('jaspr-sitemap-data', jsonEncode(data['page']['sitemap']));
-      }
+    return Builder.single(
+      builder: (context) {
+        if (kGenerateMode && data['page']['sitemap'] != null) {
+          context.setHeader(
+            'jaspr-sitemap-data',
+            jsonEncode(data['page']['sitemap']),
+          );
+        }
 
-      final child = builder(this);
+        final child = builder(this);
 
-      if (applyLayout) {
-        final layout = buildLayout(child);
-        return wrapTheme(layout);
-      }
+        if (applyLayout) {
+          final layout = buildLayout(child);
+          return wrapTheme(layout);
+        }
 
-      return child;
-    });
+        return child;
+      },
+    );
   }
 }
