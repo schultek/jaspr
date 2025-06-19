@@ -24,7 +24,7 @@ abstract class DataLoader {
   static Object? parseData(String name, String data) {
     if (name.endsWith('.json')) {
       return jsonDecode(data);
-    } else if (name.endsWith('.yaml')) {
+    } else if (name.endsWith('.yaml') || name.endsWith('.yml')) {
       return yaml.loadYamlNode(data).normalize();
     } else {
       return data;

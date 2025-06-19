@@ -2,6 +2,7 @@
 
 - Added `Color.currentColor` constant.
 - Added `rx` and `ry` properties for svg `rect()`.
+- Fixed rendering bug when nesting components with empty children.
 
 ## 0.19.0
 

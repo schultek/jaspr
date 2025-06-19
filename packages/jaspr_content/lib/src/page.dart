@@ -282,7 +282,7 @@ extension PageHandlersExtension on Page {
       return 'text/markdown';
     } else if (this.path.endsWith('.json')) {
       return 'application/json';
-    } else if (this.path.endsWith('.yaml')) {
+    } else if (this.path.endsWith('.yaml') || this.path.endsWith('.yml')) {
       return 'application/yaml';
     } else {
       return 'text/plain';
@@ -312,13 +312,15 @@ extension PageHandlersExtension on Page {
   /// When no key is set or matching, the first provided layout is used.
   /// Returns [child] if no layout is provided.
   Component buildLayout(Component child) {
-    PageLayout? layout;
-    if (data['layout'] case final key?) {
-      layout = config.layouts.where((l) => l.name.matchAsPrefix(key) != null).firstOrNull;
-    }
-    layout ??= config.layouts.firstOrNull;
-    if (layout == null) return child;
-    return layout.buildLayout(this, child);
+    final pageLayout = switch (data['page']?['layout']) {
+      final String layoutName => config.layouts
+          .where((l) => l.name.matchAsPrefix(layoutName) != null)
+          .firstOrNull,
+      _ => config.layouts.firstOrNull,
+    };
+
+    if (pageLayout == null) return child;
+    return pageLayout.buildLayout(this, child);
   }
 
   /// Wraps [child] in the provided theme.
