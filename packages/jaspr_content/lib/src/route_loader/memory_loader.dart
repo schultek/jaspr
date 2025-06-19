@@ -66,7 +66,7 @@ class MemoryPage {
   final String? content;
 
   /// A builder function to create the page.
-  final Component Function(Page page)? builder;
+  final Component Function(BuildContext context)? builder;
 
   /// Whether to apply a layout to the page.
   final bool applyLayout;
@@ -115,7 +115,7 @@ class _BuilderPage extends Page {
     required super.loader,
   }) : super(content: '');
 
-  final Component Function(Page page) builder;
+  final Component Function(BuildContext context) builder;
   final bool applyLayout;
 
   @override
@@ -139,7 +139,7 @@ class _BuilderPage extends Page {
         context.setHeader('jaspr-sitemap-data', jsonEncode(data['page']['sitemap']));
       }
 
-      final child = builder(this);
+      final child = Builder.single(builder: builder);
 
       if (applyLayout) {
         final layout = buildLayout(child);

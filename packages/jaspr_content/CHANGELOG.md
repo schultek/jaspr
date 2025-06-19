@@ -1,7 +1,9 @@
-## Unreleased minor
+## Unreleased breaking
+
+- **Breaking**: Changed `MemoryPage.builder` to accept a `BuildContext` instead of a `Page` parameter.
 
 - Fixed typo with `keepSuffixPattern` parameter in `FilesystemLoader` and `GithubLoader`.
-- Adding or removing content files will now properly update the routes. 
+- Adding or removing content files will now properly update the routes.
 
 ## 0.1.1
 
