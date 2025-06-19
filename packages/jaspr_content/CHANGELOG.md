@@ -1,6 +1,7 @@
 ## Unreleased minor
 
 - Fixed typo with `keepSuffixPattern` parameter in `FilesystemLoader` and `GithubLoader`.
+- Adding or removing content files will now properly update the routes. 
 
 ## 0.1.1
 

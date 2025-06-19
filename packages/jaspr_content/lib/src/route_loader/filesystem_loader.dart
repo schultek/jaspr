@@ -38,10 +38,9 @@ class FilesystemLoader extends RouteLoaderBase {
         if (event.type == ChangeType.MODIFY) {
           invalidateFile(path);
         } else if (event.type == ChangeType.REMOVE) {
-          invalidateFile(path, rebuild: false);
-          invalidateRoutes();
+          removeFile(path);
         } else if (event.type == ChangeType.ADD) {
-          invalidateRoutes();
+          addFile(path);
         }
       });
     }
@@ -95,6 +94,22 @@ class FilesystemLoader extends RouteLoaderBase {
     }
 
     return loadFiles(root);
+  }
+
+  void addFile(String path) {
+    addSource(FilePageSource(
+      path.substring(directory.length + 1),
+      File(path),
+      this,
+      keepSuffix: keepSuffixPattern?.matchAsPrefix(path) != null,
+    ));
+  }
+
+  void removeFile(String path) {
+    final source = sources.where((s) => (s as FilePageSource).file.path == path).firstOrNull;
+    if (source != null) {
+      removeSource(source);
+    }
   }
 
   void invalidateFile(String path, {bool rebuild = true}) {

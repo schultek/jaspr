@@ -155,6 +155,17 @@ abstract class RouteLoaderBase implements RouteLoader {
     }
   }
 
+  void addSource(PageSource source) {
+    _sources ??= [];
+    _sources!.add(source);
+    invalidateRoutes();
+  }
+
+  void removeSource(PageSource source) {
+    _sources?.remove(source);
+    invalidateRoutes();
+  }
+
   void invalidateSource(PageSource source, {bool rebuild = true}) {
     source.invalidate(rebuild: rebuild);
   }
