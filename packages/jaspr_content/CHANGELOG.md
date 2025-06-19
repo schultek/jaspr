@@ -1,4 +1,4 @@
-## 0.2.0-wip
+## Unreleased minor
 
 - Changed the `keeySuffixPattern` field and constructor parameter of
   `FilesystemLoader` and `GithubLoader` to `keySuffixPattern`.
