@@ -20,6 +20,7 @@ This package provides lints and code assists for Jaspr projects.
 - Prefer html methods like `div(...)` over `DomComponent(tag: 'div', ...)`. **(Fix available)**
 - Sort children properties last in html component methods. **(Fix available)**
 - Sort styles properties. **(Fix available)**
+- Prefer styles getter over (final) variable. **(Fix available)**
 
 ## Setup:
 
@@ -52,4 +53,5 @@ custom_lint:
     prefer_html_methods: true
     sort_children_properties_last: true
     styles_ordering: true
+    prefer_styles_getter: true
 ```
