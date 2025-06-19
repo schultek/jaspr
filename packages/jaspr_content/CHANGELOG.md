@@ -2,8 +2,11 @@
 
 - **Breaking**: Changed `MemoryPage.builder` to accept a `BuildContext` instead of a `Page` parameter.
 
-- Fixed typo with `keepSuffixPattern` parameter in `FilesystemLoader` and `GithubLoader`.
 - Adding or removing content files will now properly update the routes.
+- Support `.yml` in addition to `.yaml` for data files.
+- Fixed specifying the `layout` name in frontmatter.
+- Fixed `ContentTheme.none` to not apply any styles.
+- Fixed typo with `keepSuffixPattern` parameter in `FilesystemLoader` and `GithubLoader`.
 
 ## 0.1.1
 
