@@ -26,10 +26,14 @@ class ThemeToggleState extends State<ThemeToggle> {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     if (!kIsWeb) {
-      yield Document.head(children: [
-        // ignore: prefer_html_methods
-        DomComponent(id: 'theme-script', tag: 'script', children: [
-          raw('''
+      yield Document.head(
+        children: [
+          // ignore: prefer_html_methods
+          DomComponent(
+            id: 'theme-script',
+            tag: 'script',
+            children: [
+              raw('''
           let userTheme = window.localStorage.getItem('jaspr:theme');
           if (userTheme != null) {
             document.documentElement.setAttribute('data-theme', userTheme);
@@ -38,13 +42,17 @@ class ThemeToggleState extends State<ThemeToggle> {
           } else {
             document.documentElement.setAttribute('data-theme', 'light');
           }
-        ''')
-        ]),
-      ]);
+        '''),
+            ],
+          ),
+        ],
+      );
     }
 
     if (kIsWeb) {
-      yield Document.html(attributes: {'data-theme': isDark ? 'dark' : 'light'});
+      yield Document.html(
+        attributes: {'data-theme': isDark ? 'dark' : 'light'},
+      );
     }
 
     yield button(
@@ -54,12 +62,19 @@ class ThemeToggleState extends State<ThemeToggle> {
         setState(() {
           isDark = !isDark;
         });
-        web.window.localStorage.setItem('jaspr:theme', isDark ? 'dark' : 'light');
+        web.window.localStorage.setItem(
+          'jaspr:theme',
+          isDark ? 'dark' : 'light',
+        );
       },
       styles: !kIsWeb ? Styles(visibility: Visibility.hidden) : null,
       [
-        span(styles: Styles(display: isDark ? Display.none : null), [MoonIcon(size: 20)]),
-        span(styles: Styles(display: isDark ? null : Display.none), [SunIcon(size: 20)]),
+        span(styles: Styles(display: isDark ? Display.none : null), [
+          MoonIcon(size: 20),
+        ]),
+        span(styles: Styles(display: isDark ? null : Display.none), [
+          SunIcon(size: 20),
+        ]),
       ],
     );
   }
@@ -77,7 +92,9 @@ class ThemeToggleState extends State<ThemeToggle> {
         backgroundColor: Colors.transparent,
       ),
       css('&:hover').styles(
-        backgroundColor: Color('color-mix(in srgb, currentColor 5%, transparent)'),
+        backgroundColor: Color(
+          'color-mix(in srgb, currentColor 5%, transparent)',
+        ),
       ),
     ]),
   ];

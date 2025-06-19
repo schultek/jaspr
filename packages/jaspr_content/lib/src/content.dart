@@ -16,16 +16,21 @@ class Content extends StatelessComponent {
   }
 
   static ContentTheme themeOf(BuildContext context) {
-    return context.dependOnInheritedComponentOfExactType<_InheritedContentTheme>()?.theme ?? ContentTheme();
+    return context
+            .dependOnInheritedComponentOfExactType<_InheritedContentTheme>()
+            ?.theme ??
+        ContentTheme();
   }
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
     if (!kIsWeb) {
       final theme = themeOf(context);
-      yield Document.head(children: [
-        Style(styles: theme.styles),
-      ]);
+      yield Document.head(
+        children: [
+          Style(styles: theme.styles),
+        ],
+      );
     }
 
     yield section(classes: 'content', [child]);

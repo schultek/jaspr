@@ -25,7 +25,9 @@ abstract class PageParser {
 extension PageBuilderExtension on Iterable<PageParser> {
   /// Parses the given [page] by selecting the matching parser and calling [PageParser.parsePage].
   List<Node> parsePage(Page page) {
-    final parser = where((parser) => parser.pattern.matchAsPrefix(page.path) != null).firstOrNull;
+    final parser = where(
+      (parser) => parser.pattern.matchAsPrefix(page.path) != null,
+    ).firstOrNull;
     if (parser == null) {
       throw Exception('No parser found for page: ${page.path}');
     }
@@ -85,7 +87,12 @@ abstract class CustomComponent {
 }
 
 /// A builder for creating components from a name, attributes, and child.
-typedef CustomComponentBuilder = Component Function(String name, Map<String, String> attributes, Component? child);
+typedef CustomComponentBuilder =
+    Component Function(
+      String name,
+      Map<String, String> attributes,
+      Component? child,
+    );
 
 /// Base class for creating components based on a name pattern.
 abstract mixin class CustomComponentBase implements CustomComponent {
@@ -95,12 +102,20 @@ abstract mixin class CustomComponentBase implements CustomComponent {
   Pattern get pattern;
 
   /// Builds a component with the given name, attributes, and child.
-  Component apply(String name, Map<String, String> attributes, Component? child);
+  Component apply(
+    String name,
+    Map<String, String> attributes,
+    Component? child,
+  );
 
   @override
   Component? create(Node node, NodesBuilder builder) {
     if (node is ElementNode && pattern.matchAsPrefix(node.tag) != null) {
-      return apply(node.tag, node.attributes, node.children != null ? builder.build(node.children!) : null);
+      return apply(
+        node.tag,
+        node.attributes,
+        node.children != null ? builder.build(node.children!) : null,
+      );
     }
     return null;
   }
@@ -117,7 +132,11 @@ class _CustomComponent extends CustomComponentBase {
   final CustomComponentBuilder _builder;
 
   @override
-  Component apply(String name, Map<String, String> attributes, Component? child) {
+  Component apply(
+    String name,
+    Map<String, String> attributes,
+    Component? child,
+  ) {
     return _builder(name, attributes, child);
   }
 }
@@ -157,11 +176,13 @@ class NodesBuilder {
           result.add(text(node.text));
         }
       } else if (node is ElementNode) {
-        result.add(DomComponent(
-          tag: node.tag,
-          attributes: node.attributes,
-          child: node.children != null ? build(node.children!) : null,
-        ));
+        result.add(
+          DomComponent(
+            tag: node.tag,
+            attributes: node.attributes,
+            child: node.children != null ? build(node.children!) : null,
+          ),
+        );
       } else if (node is ComponentNode) {
         result.add(node.component);
       }

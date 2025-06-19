@@ -3,7 +3,8 @@ import '../page.dart';
 import 'template_engine.dart';
 
 dynamic _defaultPrepareValues(Page page, List<Page> pages) {
-  return {...page.data}..putIfAbsent('pages', () => pages.map((p) => p.data['page']).toList());
+  return {...page.data}
+    ..putIfAbsent('pages', () => pages.map((p) => p.data['page']).toList());
 }
 
 /// A template engine that uses the Mustache templating language.

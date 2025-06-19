@@ -42,10 +42,20 @@ class CodeBlock implements CustomComponent {
   @override
   Component? create(Node node, NodesBuilder builder) {
     if (node
-        case ElementNode(tag: 'Code' || 'CodeBlock', :final children, :final attributes) ||
-            ElementNode(tag: 'pre', children: [ElementNode(tag: 'code', :final children, :final attributes)])) {
+        case ElementNode(
+              tag: 'Code' || 'CodeBlock',
+              :final children,
+              :final attributes,
+            ) ||
+            ElementNode(
+              tag: 'pre',
+              children: [
+                ElementNode(tag: 'code', :final children, :final attributes),
+              ],
+            )) {
       var language = attributes['language'];
-      if (language == null && (attributes['class']?.startsWith('language-') ?? false)) {
+      if (language == null &&
+          (attributes['class']?.startsWith('language-') ?? false)) {
         language = attributes['class']!.substring('language-'.length);
       }
 
@@ -57,36 +67,40 @@ class CodeBlock implements CustomComponent {
         _initialized = true;
       }
 
-      return AsyncBuilder(builder: (context) async* {
-        final highlighter = Highlighter(
-          language: language ?? defaultLanguage,
-          theme: theme ?? (_defaultTheme ??= await HighlighterTheme.loadDarkTheme()),
-        );
+      return AsyncBuilder(
+        builder: (context) async* {
+          final highlighter = Highlighter(
+            language: language ?? defaultLanguage,
+            theme:
+                theme ??
+                (_defaultTheme ??= await HighlighterTheme.loadDarkTheme()),
+          );
 
-        yield _CodeBlock(
-          source: children?.map((c) => c.innerText).join(' ') ?? '',
-          highlighter: highlighter,
-        );
-      });
+          yield _CodeBlock(
+            source: children?.map((c) => c.innerText).join(' ') ?? '',
+            highlighter: highlighter,
+          );
+        },
+      );
     }
     return null;
   }
 
   @css
   static List<StyleRule> get styles => [
-        css('.code-block', [
-          css('&').styles(position: Position.relative()),
-          css('button').styles(
-            position: Position.absolute(top: 1.rem, right: 1.rem),
-            opacity: 0,
-            color: Colors.white,
-            width: 1.25.rem,
-            height: 1.25.rem,
-            zIndex: ZIndex(10),
-          ),
-          css('&:hover button').styles(opacity: 0.75),
-        ]),
-      ];
+    css('.code-block', [
+      css('&').styles(position: Position.relative()),
+      css('button').styles(
+        position: Position.absolute(top: 1.rem, right: 1.rem),
+        opacity: 0,
+        color: Colors.white,
+        width: 1.25.rem,
+        height: 1.25.rem,
+        zIndex: ZIndex(10),
+      ),
+      css('&:hover button').styles(opacity: 0.75),
+    ]),
+  ];
 }
 
 /// A code block component with syntax highlighting.
@@ -107,8 +121,11 @@ class _CodeBlock extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     final codeblock = pre([
       code([
-        if (highlighter != null) buildSpan(highlighter!.highlight(source)) else text(source),
-      ])
+        if (highlighter != null)
+          buildSpan(highlighter!.highlight(source))
+        else
+          text(source),
+      ]),
     ]);
 
     yield div(classes: 'code-block', [
@@ -125,7 +142,9 @@ class _CodeBlock extends StatelessComponent {
         color: Color.value(style.foreground.argb & 0x00FFFFFF),
         fontWeight: style.bold ? FontWeight.bold : null,
         fontStyle: style.italic ? FontStyle.italic : null,
-        textDecoration: style.underline ? TextDecoration(line: TextDecorationLine.underline) : null,
+        textDecoration: style.underline
+            ? TextDecoration(line: TextDecorationLine.underline)
+            : null,
       );
     }
 

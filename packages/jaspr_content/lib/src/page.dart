@@ -54,7 +54,11 @@ class Page {
   final RouteLoader loader;
 
   /// Applies changes to the page content or data.
-  void apply({String? content, Map<String, dynamic>? data, bool mergeData = true}) {
+  void apply({
+    String? content,
+    Map<String, dynamic>? data,
+    bool mergeData = true,
+  }) {
     this.content = content ?? this.content;
     if (mergeData && data != null) {
       this.data = this.data.merge(data);
@@ -64,7 +68,14 @@ class Page {
   }
 
   Page copy() {
-    return Page(path: path, url: url, content: content, data: data, config: config, loader: loader);
+    return Page(
+      path: path,
+      url: url,
+      content: content,
+      data: data,
+      config: config,
+      loader: loader,
+    );
   }
 
   void markNeedsRebuild() {
@@ -99,32 +110,39 @@ class Page {
   Future<Component> render() async {
     parseFrontmatter();
     await loadData();
-    return AsyncBuilder(builder: (context) async* {
-      await renderTemplate(context.pages);
+    return AsyncBuilder(
+      builder: (context) async* {
+        await renderTemplate(context.pages);
 
-      if (kGenerateMode && data['page']['sitemap'] != null) {
-        context.setHeader('jaspr-sitemap-data', jsonEncode(data['page']['sitemap']));
-      }
+        if (kGenerateMode && data['page']['sitemap'] != null) {
+          context.setHeader(
+            'jaspr-sitemap-data',
+            jsonEncode(data['page']['sitemap']),
+          );
+        }
 
-      if (InheritedSecondaryOutput.of(context) case final secondaryOutput?) {
-        yield secondaryOutput.builder(this);
-        return;
-      }
+        if (InheritedSecondaryOutput.of(context) case final secondaryOutput?) {
+          yield secondaryOutput.builder(this);
+          return;
+        }
 
-      if (config.rawOutputPattern?.matchAsPrefix(path) != null) {
-        context.setHeader('Content-Type', getContentType());
-        context.setStatusCode(200, responseBody: content);
-        return;
-      }
+        if (config.rawOutputPattern?.matchAsPrefix(path) != null) {
+          context.setHeader('Content-Type', getContentType());
+          context.setStatusCode(200, responseBody: content);
+          return;
+        }
 
-      yield await build();
-    });
+        yield await build();
+      },
+    );
   }
 
   Future<Component> build() async {
     var nodes = parseNodes();
     nodes = await applyExtensions(nodes);
-    final component = Content(NodesBuilder(config.components).build(nodes) ?? const Text(''));
+    final component = Content(
+      NodesBuilder(config.components).build(nodes) ?? const Text(''),
+    );
     final layout = buildLayout(component);
     return wrapTheme(layout);
   }
@@ -250,7 +268,10 @@ extension PageHandlersExtension on Page {
   void parseFrontmatter() {
     if (config.enableFrontmatter) {
       final document = fm.parse(content);
-      apply(content: document.content, data: {'page': document.data.cast<String, dynamic>()});
+      apply(
+        content: document.content,
+        data: {'page': document.data.cast<String, dynamic>()},
+      );
     }
   }
 
@@ -313,9 +334,10 @@ extension PageHandlersExtension on Page {
   /// Returns [child] if no layout is provided.
   Component buildLayout(Component child) {
     final pageLayout = switch (data['page']?['layout']) {
-      final String layoutName => config.layouts
-          .where((l) => l.name.matchAsPrefix(layoutName) != null)
-          .firstOrNull,
+      final String layoutName =>
+        config.layouts
+            .where((l) => l.name.matchAsPrefix(layoutName) != null)
+            .firstOrNull,
       _ => config.layouts.firstOrNull,
     };
 
@@ -334,7 +356,8 @@ extension PageContext on BuildContext {
   /// Returns the current [Page] that this component is being built for.
   ///
   /// The page should not be modified, otherwise it could lead to unexpected behavior.
-  Page get page => dependOnInheritedComponentOfExactType<_InheritedPage>()!.page;
+  Page get page =>
+      dependOnInheritedComponentOfExactType<_InheritedPage>()!.page;
 
   /// Returns the list of all pages that are being built.
   ///
@@ -342,7 +365,8 @@ extension PageContext on BuildContext {
   /// Otherwise, it will only contain the pages that have been built so far.
   ///
   /// The list should not be modified, otherwise it could lead to unexpected behavior.
-  List<Page> get pages => dependOnInheritedComponentOfExactType<_InheritedPage>()!.pages;
+  List<Page> get pages =>
+      dependOnInheritedComponentOfExactType<_InheritedPage>()!.pages;
 }
 
 class _InheritedPage extends InheritedComponent {
@@ -363,8 +387,11 @@ extension DataMergeExtension on Map<String, dynamic> {
     var otherKeys = other.keys.toSet();
     for (var key in keys) {
       if (otherKeys.remove(key)) {
-        if (this[key] is Map<String, dynamic> && other[key] is Map<String, dynamic>) {
-          merged[key] = (this[key] as Map<String, dynamic>).merge(other[key] as Map<String, dynamic>);
+        if (this[key] is Map<String, dynamic> &&
+            other[key] is Map<String, dynamic>) {
+          merged[key] = (this[key] as Map<String, dynamic>).merge(
+            other[key] as Map<String, dynamic>,
+          );
         } else {
           merged[key] = other[key];
         }

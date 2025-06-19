@@ -66,12 +66,16 @@ abstract class RouteLoaderBase implements RouteLoader {
 
   @override
   Future<String> readPartial(String path, Page page) {
-    throw UnsupportedError('Reading partial files is not supported for $runtimeType');
+    throw UnsupportedError(
+      'Reading partial files is not supported for $runtimeType',
+    );
   }
 
   @override
   String readPartialSync(String path, Page page) {
-    throw UnsupportedError('Reading partial files is not supported for $runtimeType');
+    throw UnsupportedError(
+      'Reading partial files is not supported for $runtimeType',
+    );
   }
 
   PageSource? getSourceForPage(Page page) {
@@ -79,7 +83,10 @@ abstract class RouteLoaderBase implements RouteLoader {
   }
 
   @override
-  Future<List<RouteBase>> loadRoutes(ConfigResolver resolver, bool eager) async {
+  Future<List<RouteBase>> loadRoutes(
+    ConfigResolver resolver,
+    bool eager,
+  ) async {
     _reassembleSub ??= ServerApp.onReassemble.listen((_) {
       invalidateAll();
       onReassemble();
@@ -104,7 +111,7 @@ abstract class RouteLoaderBase implements RouteLoader {
   Future<List<RouteBase>> _buildRoutes() async {
     final sources = _sources ??= await loadPageSources();
 
-    List<RouteBase> routes = [];
+    final routes = <RouteBase>[];
     for (final source in sources) {
       if (source.path.isEmpty || source.private) {
         continue;
@@ -120,20 +127,24 @@ abstract class RouteLoaderBase implements RouteLoader {
         builder: (context) => Stream.fromFuture(source.load()),
       );
 
-      routes.add(Route(
-        path: source.url,
-        builder: (_, __) => pageBuilder,
-      ));
+      routes.add(
+        Route(
+          path: source.url,
+          builder: (_, _) => pageBuilder,
+        ),
+      );
 
       for (final output in config.secondaryOutputs) {
         if (output.pattern.matchAsPrefix(source.path) != null) {
-          routes.add(Route(
-            path: output.createRoute(source.url),
-            builder: (_, __) => InheritedSecondaryOutput(
-              builder: output.build,
-              child: pageBuilder,
+          routes.add(
+            Route(
+              path: output.createRoute(source.url),
+              builder: (_, _) => InheritedSecondaryOutput(
+                builder: output.build,
+                child: pageBuilder,
+              ),
             ),
-          ));
+          );
         }
       }
     }

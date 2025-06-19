@@ -17,9 +17,11 @@ class Header extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield Document.head(children: [
-      Style(styles: _styles),
-    ]);
+    yield Document.head(
+      children: [
+        Style(styles: _styles),
+      ],
+    );
 
     yield header(classes: 'header', [
       SidebarToggleButton(),
@@ -32,41 +34,43 @@ class Header extends StatelessComponent {
   }
 
   static List<StyleRule> get _styles => [
-        css('.header', [
-          css('&').styles(
-            height: 4.rem,
-            display: Display.flex,
-            alignItems: AlignItems.center,
-            gap: Gap(column: 1.rem),
-            maxWidth: 90.rem,
-            padding: Padding.symmetric(horizontal: 1.rem, vertical: .25.rem),
-            margin: Margin.symmetric(horizontal: Unit.auto),
-            border: Border.only(bottom: BorderSide(color: Color('#0000000d'), width: 1.px)),
-          ),
-          css.media(MediaQuery.all(minWidth: 768.px), [
-            css('&').styles(padding: Padding.symmetric(horizontal: 2.5.rem)),
-          ]),
-          css('.header-title', [
-            css('&').styles(
-              flex: Flex(grow: 1),
-              display: Display.inlineFlex,
-              alignItems: AlignItems.center,
-              gap: Gap(column: .75.rem),
-            ),
-            css('img').styles(
-              height: 1.5.rem,
-              width: Unit.auto,
-            ),
-            css('span').styles(
-              fontWeight: FontWeight.w700,
-            ),
-          ]),
-          css('.header-items', [
-            css('&').styles(
-              display: Display.flex,
-              gap: Gap(column: 0.25.rem),
-            ),
-          ]),
-        ]),
-      ];
+    css('.header', [
+      css('&').styles(
+        height: 4.rem,
+        display: Display.flex,
+        alignItems: AlignItems.center,
+        gap: Gap(column: 1.rem),
+        maxWidth: 90.rem,
+        padding: Padding.symmetric(horizontal: 1.rem, vertical: .25.rem),
+        margin: Margin.symmetric(horizontal: Unit.auto),
+        border: Border.only(
+          bottom: BorderSide(color: Color('#0000000d'), width: 1.px),
+        ),
+      ),
+      css.media(MediaQuery.all(minWidth: 768.px), [
+        css('&').styles(padding: Padding.symmetric(horizontal: 2.5.rem)),
+      ]),
+      css('.header-title', [
+        css('&').styles(
+          flex: Flex(grow: 1),
+          display: Display.inlineFlex,
+          alignItems: AlignItems.center,
+          gap: Gap(column: .75.rem),
+        ),
+        css('img').styles(
+          height: 1.5.rem,
+          width: Unit.auto,
+        ),
+        css('span').styles(
+          fontWeight: FontWeight.w700,
+        ),
+      ]),
+      css('.header-items', [
+        css('&').styles(
+          display: Display.flex,
+          gap: Gap(column: 0.25.rem),
+        ),
+      ]),
+    ]),
+  ];
 }

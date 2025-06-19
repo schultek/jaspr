@@ -67,7 +67,10 @@ abstract class PageLayoutBase implements PageLayout {
       yield meta(name: 'description', content: desc.toString());
     }
     if (keywords case final keys?) {
-      yield meta(name: 'keywords', content: keys is List ? keys.join(', ') : keys.toString());
+      yield meta(
+        name: 'keywords',
+        content: keys is List ? keys.join(', ') : keys.toString(),
+      );
     }
     if (metaData case Map metaData?) {
       for (final key in metaData.keys) {
@@ -76,7 +79,10 @@ abstract class PageLayoutBase implements PageLayout {
     }
 
     if (description case final desc?) {
-      yield meta(attributes: {'property': 'og:description'}, content: desc.toString());
+      yield meta(
+        attributes: {'property': 'og:description'},
+        content: desc.toString(),
+      );
     }
     if (image case final img?) {
       yield meta(attributes: {'property': 'og:image'}, content: img.toString());

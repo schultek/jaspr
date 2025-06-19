@@ -29,29 +29,106 @@ class ContentColors {
     tdBorders,
   ];
 
-  static final ColorToken primary = ColorToken('primary', ThemeColors.gray.$900, dark: Colors.white);
-  static final ColorToken background = ColorToken('background', ThemeColors.gray.$100, dark: ThemeColors.gray.$950);
-  static final ColorToken text = ColorToken('text', ThemeColors.gray.$700, dark: ThemeColors.gray.$200);
-  static final ColorToken headings = ColorToken('content-headings', ThemeColors.gray.$900, dark: Colors.white);
-  static final ColorToken lead = ColorToken('content-lead', ThemeColors.gray.$600, dark: ThemeColors.gray.$400);
-  static final ColorToken links = ColorToken('content-links', ThemeColors.gray.$900, dark: Colors.white);
-  static final ColorToken bold = ColorToken('content-bold', ThemeColors.gray.$900, dark: Colors.white);
-  static final ColorToken counters = ColorToken('content-counters', ThemeColors.gray.$500, dark: ThemeColors.gray.$400);
-  static final ColorToken bullets = ColorToken('content-bullets', ThemeColors.gray.$300, dark: ThemeColors.gray.$600);
-  static final ColorToken hr = ColorToken('content-hr', ThemeColors.gray.$200, dark: ThemeColors.gray.$700);
-  static final ColorToken quotes = ColorToken('content-quotes', ThemeColors.gray.$900, dark: ThemeColors.gray.$100);
-  static final ColorToken quoteBorders =
-      ColorToken('content-quote-borders', ThemeColors.gray.$200, dark: ThemeColors.gray.$700);
-  static final ColorToken captions = ColorToken('content-captions', ThemeColors.gray.$500, dark: ThemeColors.gray.$400);
-  static final ColorToken kbd = ColorToken('content-kbd', ThemeColors.gray.$900, dark: Colors.white);
-  static final ColorToken kbdShadows = ColorToken('content-kbd-shadows', ThemeColors.gray.$900, dark: Colors.white);
-  static final ColorToken code = ColorToken('content-code', ThemeColors.gray.$900, dark: Colors.white);
-  static final ColorToken preCode = ColorToken('content-pre-code', ThemeColors.gray.$200, dark: ThemeColors.gray.$300);
-  static final ColorToken preBg = ColorToken('content-pre-bg', ThemeColors.gray.$800, dark: Color('rgb(0 0 0 / 50%)'));
-  static final ColorToken thBorders =
-      ColorToken('content-th-borders', ThemeColors.gray.$300, dark: ThemeColors.gray.$600);
-  static final ColorToken tdBorders =
-      ColorToken('content-td-borders', ThemeColors.gray.$200, dark: ThemeColors.gray.$700);
+  static final ColorToken primary = ColorToken(
+    'primary',
+    ThemeColors.gray.$900,
+    dark: Colors.white,
+  );
+  static final ColorToken background = ColorToken(
+    'background',
+    ThemeColors.gray.$100,
+    dark: ThemeColors.gray.$950,
+  );
+  static final ColorToken text = ColorToken(
+    'text',
+    ThemeColors.gray.$700,
+    dark: ThemeColors.gray.$200,
+  );
+  static final ColorToken headings = ColorToken(
+    'content-headings',
+    ThemeColors.gray.$900,
+    dark: Colors.white,
+  );
+  static final ColorToken lead = ColorToken(
+    'content-lead',
+    ThemeColors.gray.$600,
+    dark: ThemeColors.gray.$400,
+  );
+  static final ColorToken links = ColorToken(
+    'content-links',
+    ThemeColors.gray.$900,
+    dark: Colors.white,
+  );
+  static final ColorToken bold = ColorToken(
+    'content-bold',
+    ThemeColors.gray.$900,
+    dark: Colors.white,
+  );
+  static final ColorToken counters = ColorToken(
+    'content-counters',
+    ThemeColors.gray.$500,
+    dark: ThemeColors.gray.$400,
+  );
+  static final ColorToken bullets = ColorToken(
+    'content-bullets',
+    ThemeColors.gray.$300,
+    dark: ThemeColors.gray.$600,
+  );
+  static final ColorToken hr = ColorToken(
+    'content-hr',
+    ThemeColors.gray.$200,
+    dark: ThemeColors.gray.$700,
+  );
+  static final ColorToken quotes = ColorToken(
+    'content-quotes',
+    ThemeColors.gray.$900,
+    dark: ThemeColors.gray.$100,
+  );
+  static final ColorToken quoteBorders = ColorToken(
+    'content-quote-borders',
+    ThemeColors.gray.$200,
+    dark: ThemeColors.gray.$700,
+  );
+  static final ColorToken captions = ColorToken(
+    'content-captions',
+    ThemeColors.gray.$500,
+    dark: ThemeColors.gray.$400,
+  );
+  static final ColorToken kbd = ColorToken(
+    'content-kbd',
+    ThemeColors.gray.$900,
+    dark: Colors.white,
+  );
+  static final ColorToken kbdShadows = ColorToken(
+    'content-kbd-shadows',
+    ThemeColors.gray.$900,
+    dark: Colors.white,
+  );
+  static final ColorToken code = ColorToken(
+    'content-code',
+    ThemeColors.gray.$900,
+    dark: Colors.white,
+  );
+  static final ColorToken preCode = ColorToken(
+    'content-pre-code',
+    ThemeColors.gray.$200,
+    dark: ThemeColors.gray.$300,
+  );
+  static final ColorToken preBg = ColorToken(
+    'content-pre-bg',
+    ThemeColors.gray.$800,
+    dark: Color('rgb(0 0 0 / 50%)'),
+  );
+  static final ColorToken thBorders = ColorToken(
+    'content-th-borders',
+    ThemeColors.gray.$300,
+    dark: ThemeColors.gray.$600,
+  );
+  static final ColorToken tdBorders = ColorToken(
+    'content-td-borders',
+    ThemeColors.gray.$200,
+    dark: ThemeColors.gray.$700,
+  );
 }
 
 /// A color that holds a variant for light and dark themes.
@@ -65,7 +142,7 @@ class ThemeColor implements Color {
   String get value => light.value;
 
   @override
-  operator ==(Object other) {
+  bool operator ==(Object other) {
     return other is ThemeColor && other.light == light && other.dark == dark;
   }
 
@@ -90,12 +167,19 @@ class ColorToken extends ThemeColor {
   /// If [color] is a [ThemeColor], it will apply both the light and dark colors.
   /// Else only the light color will be applied.
   ColorToken apply(Color color) {
-    return ColorToken(name, color, dark: color is ThemeColor ? color.dark : null);
+    return ColorToken(
+      name,
+      color,
+      dark: color is ThemeColor ? color.dark : null,
+    );
   }
 
   @override
-  operator ==(Object other) {
-    return other is ColorToken && other.name == name && other.light == light && other.dark == dark;
+  bool operator ==(Object other) {
+    return other is ColorToken &&
+        other.name == name &&
+        other.light == light &&
+        other.dark == dark;
   }
 
   @override
@@ -111,7 +195,10 @@ extension on List<ColorToken> {
     bool mergeColors = true,
   }) {
     if (mergeColors && colors != null) {
-      final map = {for (final color in this) color.name: color, for (final color in colors) color.name: color};
+      final map = {
+        for (final color in this) color.name: color,
+        for (final color in colors) color.name: color,
+      };
       return map.values.toList();
     } else {
       return colors ?? this;
@@ -123,7 +210,9 @@ extension on List<ColorToken> {
       for (final color in this) '--${color.name}': color,
     };
 
-    final light = {for (final entry in colors.entries) entry.key: entry.value.light.value};
+    final light = {
+      for (final entry in colors.entries) entry.key: entry.value.light.value,
+    };
 
     final dark = {
       for (final entry in colors.entries)

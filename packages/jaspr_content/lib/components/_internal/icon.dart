@@ -13,10 +13,13 @@ class CloseIcon extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield _Icon(size: size, children: [
-      path(d: "M18 6 6 18", []),
-      path(d: "m6 6 12 12", []),
-    ]);
+    yield _Icon(
+      size: size,
+      children: [
+        path(d: "M18 6 6 18", []),
+        path(d: "m6 6 12 12", []),
+      ],
+    );
   }
 }
 
@@ -28,9 +31,12 @@ class MoonIcon extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield _Icon(size: size, children: [
-      path(d: 'M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z', []),
-    ]);
+    yield _Icon(
+      size: size,
+      children: [
+        path(d: 'M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z', []),
+      ],
+    );
   }
 }
 
@@ -42,17 +48,20 @@ class SunIcon extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield _Icon(size: size, children: [
-      circle(cx: '12', cy: '12', r: '4', []),
-      path(d: 'M12 4h.01', []),
-      path(d: 'M20 12h.01', []),
-      path(d: 'M12 20h.01', []),
-      path(d: 'M4 12h.01', []),
-      path(d: 'M17.657 6.343h.01', []),
-      path(d: 'M17.657 17.657h.01', []),
-      path(d: 'M6.343 17.657h.01', []),
-      path(d: 'M6.343 6.343h.01', []),
-    ]);
+    yield _Icon(
+      size: size,
+      children: [
+        circle(cx: '12', cy: '12', r: '4', []),
+        path(d: 'M12 4h.01', []),
+        path(d: 'M20 12h.01', []),
+        path(d: 'M12 20h.01', []),
+        path(d: 'M4 12h.01', []),
+        path(d: 'M17.657 6.343h.01', []),
+        path(d: 'M17.657 17.657h.01', []),
+        path(d: 'M6.343 17.657h.01', []),
+        path(d: 'M6.343 6.343h.01', []),
+      ],
+    );
   }
 }
 
@@ -64,11 +73,14 @@ class InfoIcon extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield _Icon(size: size, children: [
-      circle(cx: '12', cy: '12', r: '10', []),
-      path(d: 'M12 16v-4', []),
-      path(d: 'M12 8h.01', []),
-    ]);
+    yield _Icon(
+      size: size,
+      children: [
+        circle(cx: '12', cy: '12', r: '10', []),
+        path(d: 'M12 16v-4', []),
+        path(d: 'M12 8h.01', []),
+      ],
+    );
   }
 }
 
@@ -80,11 +92,17 @@ class AlertIcon extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield _Icon(size: size, children: [
-      path(d: 'm21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3', []),
-      path(d: 'M12 9v4', []),
-      path(d: 'M12 17h.01', []),
-    ]);
+    yield _Icon(
+      size: size,
+      children: [
+        path(
+          d: 'm21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3',
+          [],
+        ),
+        path(d: 'M12 9v4', []),
+        path(d: 'M12 17h.01', []),
+      ],
+    );
   }
 }
 
@@ -95,11 +113,14 @@ class CircleXIcon extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield _Icon(size: size, children: [
-      circle(cx: '12', cy: '12', r: '10', []),
-      path(d: 'm15 9-6 6', []),
-      path(d: 'm9 9 6 6', []),
-    ]);
+    yield _Icon(
+      size: size,
+      children: [
+        circle(cx: '12', cy: '12', r: '10', []),
+        path(d: 'm15 9-6 6', []),
+        path(d: 'm9 9 6 6', []),
+      ],
+    );
   }
 }
 
@@ -110,10 +131,13 @@ class CircleCheckIcon extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield _Icon(size: size, children: [
-      circle(cx: '12', cy: '12', r: '10', []),
-      path(d: 'm9 12 2 2 4-4', []),
-    ]);
+    yield _Icon(
+      size: size,
+      children: [
+        circle(cx: '12', cy: '12', r: '10', []),
+        path(d: 'm9 12 2 2 4-4', []),
+      ],
+    );
   }
 }
 
@@ -124,10 +148,20 @@ class CopyIcon extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield _Icon(size: size, children: [
-      rect(width: "14", height: "14", x: "8", y: "8", attributes: {'rx': "2", 'ry': "2"}, []),
-      path(d: "M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2", []),
-    ]);
+    yield _Icon(
+      size: size,
+      children: [
+        rect(
+          width: "14",
+          height: "14",
+          x: "8",
+          y: "8",
+          attributes: {'rx': "2", 'ry': "2"},
+          [],
+        ),
+        path(d: "M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2", []),
+      ],
+    );
   }
 }
 
@@ -138,9 +172,12 @@ class CheckIcon extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield _Icon(size: size, children: [
-      path(d: 'M20 6 9 17l-5-5', []),
-    ]);
+    yield _Icon(
+      size: size,
+      children: [
+        path(d: 'M20 6 9 17l-5-5', []),
+      ],
+    );
   }
 }
 
@@ -156,16 +193,17 @@ class _Icon extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield svg(
-        width: size?.px,
-        height: size?.px,
-        viewBox: "0 0 24 24",
-        attributes: {
-          'fill': 'none',
-          'stroke': 'currentColor',
-          'stroke-width': '2',
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-        },
-        children);
+      width: size?.px,
+      height: size?.px,
+      viewBox: "0 0 24 24",
+      attributes: {
+        'fill': 'none',
+        'stroke': 'currentColor',
+        'stroke-width': '2',
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+      },
+      children,
+    );
   }
 }

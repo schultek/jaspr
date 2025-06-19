@@ -33,8 +33,14 @@ class Image implements CustomComponent {
   Component? create(Node node, NodesBuilder builder) {
     if (node
         case ElementNode(tag: 'img' || 'Image', :final attributes) ||
-            ElementNode(tag: 'p', children: [ElementNode(tag: 'img' || 'Image', :final attributes)])) {
-      assert(attributes.containsKey('src'), 'Image must have a "src" argument. Found $attributes');
+            ElementNode(
+              tag: 'p',
+              children: [ElementNode(tag: 'img' || 'Image', :final attributes)],
+            )) {
+      assert(
+        attributes.containsKey('src'),
+        'Image must have a "src" argument. Found $attributes',
+      );
       return from(
         src: attributes['src']!,
         alt: attributes['alt'],
@@ -47,14 +53,14 @@ class Image implements CustomComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('figure.image', [
-          css('&').styles(
-            display: Display.flex,
-            flexDirection: FlexDirection.column,
-            alignItems: AlignItems.center,
-          ),
-        ]),
-      ];
+    css('figure.image', [
+      css('&').styles(
+        display: Display.flex,
+        flexDirection: FlexDirection.column,
+        alignItems: AlignItems.center,
+      ),
+    ]),
+  ];
 }
 
 /// An image component with an optional caption.
@@ -77,9 +83,14 @@ class _Image extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'figure', classes: 'image', children: [
-      img(src: src, alt: alt ?? caption),
-      if (caption != null) DomComponent(tag: 'figcaption', children: [text(caption!)]),
-    ]);
+    yield DomComponent(
+      tag: 'figure',
+      classes: 'image',
+      children: [
+        img(src: src, alt: alt ?? caption),
+        if (caption != null)
+          DomComponent(tag: 'figcaption', children: [text(caption!)]),
+      ],
+    );
   }
 }

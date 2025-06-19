@@ -89,20 +89,20 @@ class ContentApp extends AsyncStatelessComponent {
     /// The [ContentTheme] to use for the pages.
     ContentTheme? theme,
     bool debugPrint = false,
-  })  : loaders = [FilesystemLoader(directory, debugPrint: debugPrint)],
-        configResolver = PageConfig.all(
-          enableFrontmatter: enableFrontmatter,
-          dataLoaders: [
-            FilesystemDataLoader(dataDirectory),
-          ],
-          templateEngine: templateEngine,
-          parsers: parsers,
-          extensions: extensions,
-          components: components,
-          layouts: layouts,
-          theme: theme,
-        ),
-        routerBuilder = _defaultRouterBuilder {
+  }) : loaders = [FilesystemLoader(directory, debugPrint: debugPrint)],
+       configResolver = PageConfig.all(
+         enableFrontmatter: enableFrontmatter,
+         dataLoaders: [
+           FilesystemDataLoader(dataDirectory),
+         ],
+         templateEngine: templateEngine,
+         parsers: parsers,
+         extensions: extensions,
+         components: components,
+         layouts: layouts,
+         theme: theme,
+       ),
+       routerBuilder = _defaultRouterBuilder {
     _overrideGlobalOptions();
   }
 
@@ -129,7 +129,9 @@ class ContentApp extends AsyncStatelessComponent {
 
   void _overrideGlobalOptions() {
     if (Jaspr.useIsolates) {
-      print("[Warning] ContentApp only supports non-isolate rendering. Disabling isolate rendering.");
+      print(
+        "[Warning] ContentApp only supports non-isolate rendering. Disabling isolate rendering.",
+      );
       // For caching to work correctly we need to disable isolate rendering.
       Jaspr.initializeApp(options: Jaspr.options, useIsolates: false);
     }
@@ -142,7 +144,9 @@ class ContentApp extends AsyncStatelessComponent {
 
   @override
   Stream<Component> build(BuildContext context) async* {
-    final routes = await Future.wait(loaders.map((l) => l.loadRoutes(configResolver, eagerlyLoadAllPages)));
+    final routes = await Future.wait(
+      loaders.map((l) => l.loadRoutes(configResolver, eagerlyLoadAllPages)),
+    );
     _ensureAllowedSuffixes(routes);
     yield routerBuilder(routes);
   }
@@ -151,7 +155,8 @@ class ContentApp extends AsyncStatelessComponent {
     List<String> getSuffixes(RouteBase route) {
       if (route is Route) {
         return [
-          if (route.path.split('/').last.split('.') case [_, ..., final suffix]) suffix,
+          if (route.path.split('/').last.split('.') case [_, ..., final suffix])
+            suffix,
           ...route.routes.expand((r) => getSuffixes(r)),
         ];
       } else if (route is ShellRoute) {
@@ -161,7 +166,10 @@ class ContentApp extends AsyncStatelessComponent {
       }
     }
 
-    final suffixes = routes.expand((r) => r).expand((r) => getSuffixes(r)).toSet();
+    final suffixes = routes
+        .expand((r) => r)
+        .expand((r) => getSuffixes(r))
+        .toSet();
     final missing = suffixes.difference(Jaspr.allowedPathSuffixes.toSet());
     if (missing.isNotEmpty) {
       Jaspr.initializeApp(

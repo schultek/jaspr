@@ -40,18 +40,20 @@ class BlogLayout extends PageLayoutBase {
   @override
   Iterable<Component> buildHead(Page page) sync* {
     yield* super.buildHead(page);
-    yield Style(styles: [
-      ..._styles,
-      css('.blog .content', [
-        css('&').styles(
-          fontSize: 1.125.rem,
-          lineHeight: 2.rem,
-        ),
-        css('> :not(:is(h1,h2,h3,h4,h5,h6))').styles(
-          fontFamily: textFont,
-        ),
-      ])
-    ]);
+    yield Style(
+      styles: [
+        ..._styles,
+        css('.blog .content', [
+          css('&').styles(
+            fontSize: 1.125.rem,
+            lineHeight: 2.rem,
+          ),
+          css('> :not(:is(h1,h2,h3,h4,h5,h6))').styles(
+            fontFamily: textFont,
+          ),
+        ]),
+      ],
+    );
   }
 
   @override
@@ -69,14 +71,18 @@ class BlogLayout extends PageLayoutBase {
             div(classes: 'post-header', [
               if (pageData['title'] case String title) h1([text(title)]),
               div(classes: 'post-info', [
-                if (pageData['authorImage'] case String authorImage) img(src: authorImage, alt: 'Author image'),
+                if (pageData['authorImage'] case String authorImage)
+                  img(src: authorImage, alt: 'Author image'),
                 div([
                   span([text(pageData['author'] ?? 'Unknown')]),
                   span([
-                    text([
-                      if (pageData['readTime'] case String readTime) '$readTime read',
-                      if (pageData['date'] case String date) date,
-                    ].join(' • ')),
+                    text(
+                      [
+                        if (pageData['readTime'] case String readTime)
+                          '$readTime read',
+                        if (pageData['date'] case String date) date,
+                      ].join(' • '),
+                    ),
                   ]),
                 ]),
               ]),
@@ -94,79 +100,95 @@ class BlogLayout extends PageLayoutBase {
   }
 
   static List<StyleRule> get _styles => [
-        css('.blog', [
-          css('.header-container', [
-            css('&').styles(
-              position: Position.sticky(top: Unit.zero, left: Unit.zero, right: Unit.zero),
-              zIndex: ZIndex(10),
-              backgroundColor: ContentColors.background,
+    css('.blog', [
+      css('.header-container', [
+        css('&').styles(
+          position: Position.sticky(
+            top: Unit.zero,
+            left: Unit.zero,
+            right: Unit.zero,
+          ),
+          zIndex: ZIndex(10),
+          backgroundColor: ContentColors.background,
+        ),
+      ]),
+      css('.main-container', [
+        css('&').styles(
+          padding: Padding.zero,
+        ),
+        css.media(MediaQuery.all(minWidth: 768.px), [
+          css('&').styles(padding: Padding.symmetric(horizontal: 1.25.rem)),
+        ]),
+        css('main', [
+          css('&').styles(
+            padding: Padding.only(
+              top: 2.rem,
+              left: 1.rem,
+              right: 1.rem,
+              bottom: 4.rem,
             ),
-          ]),
-          css('.main-container', [
-            css('&').styles(
-              padding: Padding.zero,
-            ),
-            css.media(MediaQuery.all(minWidth: 768.px), [
-              css('&').styles(padding: Padding.symmetric(horizontal: 1.25.rem)),
-            ]),
-            css('main', [
+            margin: Margin.symmetric(horizontal: Unit.auto),
+            maxWidth: Unit.expression('75ch'),
+          ),
+          css('.content-container', [
+            css('.post-header', [
               css('&').styles(
-                padding: Padding.only(top: 2.rem, left: 1.rem, right: 1.rem, bottom: 4.rem),
-                margin: Margin.symmetric(horizontal: Unit.auto),
-                maxWidth: Unit.expression('75ch'),
+                margin: Margin.only(bottom: 2.rem),
               ),
-              css('.content-container', [
-                css('.post-header', [
-                  css('&').styles(
-                    margin: Margin.only(bottom: 2.rem),
-                  ),
-                  css('h1').styles(
-                    fontSize: 2.75.rem,
-                    lineHeight: 3.25.rem,
-                    color: ContentColors.headings,
-                  ),
-                  css('.post-info', [
-                    css('&').styles(
-                      margin: Margin.only(top: 2.rem),
-                      display: Display.flex,
-                      alignItems: AlignItems.center,
-                      gap: Gap(column: 1.rem),
-                    ),
-                    css('> img').styles(width: 42.px, height: 42.px, radius: BorderRadius.circular(10.rem)),
-                    css('> div', [
-                      css('&').styles(
-                        display: Display.flex,
-                        flexDirection: FlexDirection.column,
-                        color: ContentColors.text,
-                      ),
-                      css(':first-child').styles(
-                        fontSize: 1.125.rem,
-                      ),
-                      css(':last-child').styles(
-                        fontSize: 1.rem,
-                        opacity: 0.85,
-                      ),
-                    ])
-                  ]),
-                ]),
-                css('.post-tags', [
+              css('h1').styles(
+                fontSize: 2.75.rem,
+                lineHeight: 3.25.rem,
+                color: ContentColors.headings,
+              ),
+              css('.post-info', [
+                css('&').styles(
+                  margin: Margin.only(top: 2.rem),
+                  display: Display.flex,
+                  alignItems: AlignItems.center,
+                  gap: Gap(column: 1.rem),
+                ),
+                css('> img').styles(
+                  width: 42.px,
+                  height: 42.px,
+                  radius: BorderRadius.circular(10.rem),
+                ),
+                css('> div', [
                   css('&').styles(
                     display: Display.flex,
-                    flexDirection: FlexDirection.row,
-                    flexWrap: FlexWrap.wrap,
-                    gap: Gap.all(0.5.rem),
-                    margin: Margin.only(top: 2.rem, bottom: 0.5.rem),
+                    flexDirection: FlexDirection.column,
+                    color: ContentColors.text,
                   ),
-                  css('span').styles(
-                    padding: Padding.symmetric(horizontal: 0.75.rem, vertical: 0.25.rem),
-                    radius: BorderRadius.circular(10.rem),
-                    backgroundColor: ContentColors.hr,
-                    fontSize: 0.875.rem,
-                  )
-                ])
+                  css(':first-child').styles(
+                    fontSize: 1.125.rem,
+                  ),
+                  css(':last-child').styles(
+                    fontSize: 1.rem,
+                    opacity: 0.85,
+                  ),
+                ]),
               ]),
+            ]),
+            css('.post-tags', [
+              css('&').styles(
+                display: Display.flex,
+                flexDirection: FlexDirection.row,
+                flexWrap: FlexWrap.wrap,
+                gap: Gap.all(0.5.rem),
+                margin: Margin.only(top: 2.rem, bottom: 0.5.rem),
+              ),
+              css('span').styles(
+                padding: Padding.symmetric(
+                  horizontal: 0.75.rem,
+                  vertical: 0.25.rem,
+                ),
+                radius: BorderRadius.circular(10.rem),
+                backgroundColor: ContentColors.hr,
+                fontSize: 0.875.rem,
+              ),
             ]),
           ]),
         ]),
-      ];
+      ]),
+    ]),
+  ];
 }

@@ -18,26 +18,35 @@ class TabBar extends StatefulComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('.tab-bar', [
-          css('&').styles(
-            display: Display.flex,
-            alignItems: AlignItems.center,
-            gap: Gap(column: 1.25.rem),
-            border: Border.only(bottom: BorderSide(width: 1.px, color: ContentColors.hr)),
-          ),
-          css('button').styles(
-            padding: Padding.symmetric(vertical: 0.75.rem),
-            fontWeight: FontWeight.w700,
-            border: Border.only(bottom: BorderSide(width: 2.px, color: Colors.transparent)),
-          ),
-          css('button:hover').styles(raw: {
-            'border-bottom-color': ContentColors.hr.value,
-          }),
-          css('button[active]').styles(color: ContentColors.primary, raw: {
-            'border-bottom-color': ContentColors.primary.value,
-          }),
-        ]),
-      ];
+    css('.tab-bar', [
+      css('&').styles(
+        display: Display.flex,
+        alignItems: AlignItems.center,
+        gap: Gap(column: 1.25.rem),
+        border: Border.only(
+          bottom: BorderSide(width: 1.px, color: ContentColors.hr),
+        ),
+      ),
+      css('button').styles(
+        padding: Padding.symmetric(vertical: 0.75.rem),
+        fontWeight: FontWeight.w700,
+        border: Border.only(
+          bottom: BorderSide(width: 2.px, color: Colors.transparent),
+        ),
+      ),
+      css('button:hover').styles(
+        raw: {
+          'border-bottom-color': ContentColors.hr.value,
+        },
+      ),
+      css('button[active]').styles(
+        color: ContentColors.primary,
+        raw: {
+          'border-bottom-color': ContentColors.primary.value,
+        },
+      ),
+    ]),
+  ];
 }
 
 class _TabBarState extends State<TabBar> {
@@ -53,25 +62,27 @@ class _TabBarState extends State<TabBar> {
   Iterable<Component> build(BuildContext context) sync* {
     yield div(classes: 'tab-bar', [
       for (var item in component.items.entries)
-        button(attributes: {
-          if (item.key == value) 'active': ''
-        }, events: {
-          'click': (e) {
-            setState(() {
-              value = item.key;
-            });
+        button(
+          attributes: {if (item.key == value) 'active': ''},
+          events: {
+            'click': (e) {
+              setState(() {
+                value = item.key;
+              });
 
-            final target = e.currentTarget as web.Element;
+              final target = e.currentTarget as web.Element;
 
-            final currentTabView = target.parentElement?.nextElementSibling?.querySelector('div[active]');
-            final nexttabView = target.parentElement?.nextElementSibling?.querySelector('div[data-tab="${item.key}"]');
+              final currentTabView = target.parentElement?.nextElementSibling
+                  ?.querySelector('div[active]');
+              final nexttabView = target.parentElement?.nextElementSibling
+                  ?.querySelector('div[data-tab="${item.key}"]');
 
-            currentTabView?.removeAttribute('active');
-            nexttabView?.setAttribute('active', '');
-          }
-        }, [
-          text(item.value)
-        ]),
+              currentTabView?.removeAttribute('active');
+              nexttabView?.setAttribute('active', '');
+            },
+          },
+          [text(item.value)],
+        ),
     ]);
   }
 }

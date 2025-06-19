@@ -5,3 +5,6 @@ linter:
     sort_pub_dependencies: true
     prefer_relative_imports: true
     directives_ordering: true
+
+formatter:
+  trailing_commas: preserve

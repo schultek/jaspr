@@ -27,7 +27,11 @@ final _defaultCodeFont = FontFamily.list([
 final List<StyleRule> _resetStyles = [
   css('*, :after, :before').styles(
     boxSizing: BoxSizing.borderBox,
-    border: Border(width: Unit.zero, style: BorderStyle.solid, color: Color('#e5e7eb')),
+    border: Border(
+      width: Unit.zero,
+      style: BorderStyle.solid,
+      color: Color('#e5e7eb'),
+    ),
   ),
   css(':host,html').styles(
     lineHeight: 1.5.em,
@@ -107,7 +111,9 @@ final List<StyleRule> _resetStyles = [
   css('button, select').styles(
     textTransform: TextTransform.none,
   ),
-  css('button, input[type=button], input[type=reset], input[type=submit]').styles(
+  css(
+    'button, input[type=button], input[type=reset], input[type=submit]',
+  ).styles(
     raw: {
       '-webkit-appearance': 'button',
       'background-color': 'transparent',
