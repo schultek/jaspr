@@ -83,7 +83,7 @@ class App extends StatelessComponent {
   // By using the @css annotation, these will be rendered automatically to css inside the <head> of your page.
   // Must be a variable or getter of type [List<StyleRule>].
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.main', [
       // The '&' refers to the parent selector of a nested style rules.
       css('&').styles(
