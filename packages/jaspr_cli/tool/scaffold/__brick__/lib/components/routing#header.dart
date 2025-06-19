@@ -24,7 +24,7 @@ class Header extends StatelessComponent {
   }{{#server}}
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('header', [
       css('&').styles(
         display: Display.flex,

@@ -13,8 +13,7 @@ The `css` utility gives you a convenient way of writing CSS style rules in Dart 
 
 ## Registering style rules
 
-When used as the `@css` annotation, you can register any amount of style definitions to be automatically included
-in your server-rendered html output (in **static** or **server** mode).
+When used as the `@css` annotation, you can register any amount of style definitions to be automatically included in your server-rendered html output.
 
 ```dart
 @css
@@ -25,6 +24,10 @@ final List<StyleRule> styles = [
 ```
 
 This is then automatically rendered to css and included in your html output after pre-rendering.
+
+<Warning>
+Because `@css` requires pre-rendering, it is only supported in *+server** and **static** mode.
+</Warning>
 
 The `@css` annotation can be applied to the following elements:
 
