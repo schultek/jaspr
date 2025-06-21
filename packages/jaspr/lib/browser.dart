@@ -1,4 +1,4 @@
-library browser;
+library;
 
 export 'jaspr.dart' hide runApp, AppContext;
 export 'src/browser/app_context.dart';

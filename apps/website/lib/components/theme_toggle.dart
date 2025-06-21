@@ -62,21 +62,21 @@ class ThemeToggleState extends State<ThemeToggle> {
   }
 
   @css
-  static final List<StyleRule> styles = [
-    css('.theme-toggle', [
-      css('&').styles(
-        display: Display.flex,
-        padding: Padding.all(.7.rem),
-        border: Border.unset,
-        radius: BorderRadius.circular(8.px),
-        outline: Outline.unset,
-        alignItems: AlignItems.center,
-        color: textBlack,
-        backgroundColor: Colors.transparent,
-      ),
-      css('&:hover').styles(
-        backgroundColor: hoverOverlayColor,
-      ),
-    ]),
-  ];
+  static List<StyleRule> get styles => [
+        css('.theme-toggle', [
+          css('&').styles(
+            display: Display.flex,
+            padding: Padding.all(.7.rem),
+            border: Border.unset,
+            radius: BorderRadius.circular(8.px),
+            outline: Outline.unset,
+            alignItems: AlignItems.center,
+            color: textBlack,
+            backgroundColor: Colors.transparent,
+          ),
+          css('&:hover').styles(
+            backgroundColor: hoverOverlayColor,
+          ),
+        ]),
+      ];
 }

@@ -19,23 +19,23 @@ class Icon extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
-    css('[class^=icon-custom-]').styles(
-      width: 1.em,
-      height: 1.em,
-      color: Color.inherit,
-      raw: {
-        '-webkit-mask': 'var(--icon) no-repeat',
-        'mask': 'var(--icon) no-repeat',
-        '-webkit-mask-size': '100% 100%',
-        'mask-size': '100% 100%',
-        'background-color': 'currentColor',
-      },
-    ),
-    css('.icon-custom-discord').styles(raw: {'--icon': 'url("$discordIcon")'}),
-    css('.icon-custom-github').styles(raw: {'--icon': 'url("$githubIcon")'}),
-    css('.icon-custom-jaspr').styles(raw: {'--icon': 'url("$jasprIcon")'}),
-  ];
+  static List<StyleRule> get styles => [
+        css('[class^=icon-custom-]').styles(
+          width: 1.em,
+          height: 1.em,
+          color: Color.inherit,
+          raw: {
+            '-webkit-mask': 'var(--icon) no-repeat',
+            'mask': 'var(--icon) no-repeat',
+            '-webkit-mask-size': '100% 100%',
+            'mask-size': '100% 100%',
+            'background-color': 'currentColor',
+          },
+        ),
+        css('.icon-custom-discord').styles(raw: {'--icon': 'url("$discordIcon")'}),
+        css('.icon-custom-github').styles(raw: {'--icon': 'url("$githubIcon")'}),
+        css('.icon-custom-jaspr').styles(raw: {'--icon': 'url("$jasprIcon")'}),
+      ];
 }
 
 const githubIcon =

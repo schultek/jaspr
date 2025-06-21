@@ -13,11 +13,11 @@ void main() {
     styles: [
       css.import('fonts/fonts.css'),
       css('html, body').styles(
-        fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]),
         width: 100.percent,
         minHeight: 100.vh,
-        margin: Margin.zero,
         padding: Padding.zero,
+        margin: Margin.zero,
+        fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]),
       ),
     ],
     body: App(),

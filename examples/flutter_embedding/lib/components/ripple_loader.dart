@@ -7,8 +7,8 @@ class RippleLoader extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield div(
       styles: Styles(
-        height: 100.percent,
         display: Display.flex,
+        height: 100.percent,
         justifyContent: JustifyContent.center,
         alignItems: AlignItems.center,
         backgroundColor: Colors.black,

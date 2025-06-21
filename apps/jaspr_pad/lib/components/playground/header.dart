@@ -75,8 +75,8 @@ class PlaygroundHeader extends StatelessComponent {
       SamplesMenuButton(),
       div(
         styles: Styles(
-          padding: Padding.symmetric(vertical: Unit.zero, horizontal: 10.px),
           display: Display.flex,
+          padding: Padding.symmetric(vertical: Unit.zero, horizontal: 10.px),
           justifyContent: JustifyContent.center,
           alignItems: AlignItems.center,
         ),

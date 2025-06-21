@@ -15,7 +15,7 @@ void main() async {
 }
 
 @css
-final styles = [
-  css('.main').styles(minWidth: 12.px),
-  css.media(MediaQuery.screen(minWidth: 200.px), []),
-];
+List<StyleRule> get styles => [
+      css('.main').styles(minWidth: 12.px),
+      css.media(MediaQuery.screen(minWidth: 200.px), []),
+    ];

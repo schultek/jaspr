@@ -88,13 +88,13 @@ class Meet extends StatelessComponent {
             sdk: ">=3.0.0 <4.0.0"
 
           dependencies:  
-            jaspr: ^0.16.0
-            jaspr_router: ^0.2.3
+            jaspr: ^0.19.0
+            jaspr_router: ^0.7.0
             
           dev_dependencies:
-            jaspr_builders: ^0.16.0
+            jaspr_builders: ^0.19.0
             jaspr_web_compilers: ^4.1.0
-            jaspr_lints: ^0.2.1
+            jaspr_lints: ^0.4.0
 
           jaspr:
             mode: static
@@ -121,60 +121,60 @@ class Meet extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
-    css('#meet', [
-      css('&').styles(
-        display: Display.flex,
-        minHeight: 100.vh,
-        padding: Padding.only(top: 2.rem, left: contentPadding, right: contentPadding),
-        flexDirection: FlexDirection.column,
-        alignItems: AlignItems.center,
-        gap: Gap(row: sectionPadding),
-      ),
-      css('.meet-section', [
-        css('&').styles(
-          display: Display.flex,
-          maxWidth: maxContentWidth,
-          flexDirection: FlexDirection.row,
-          flexWrap: FlexWrap.wrap,
-          alignItems: AlignItems.center,
-          gap: Gap(column: 4.rem, row: 4.rem),
-        ),
-        css('& > *').styles(
-          minWidth: Unit.zero,
-          flex: Flex(grow: 1, shrink: 1, basis: 24.rem),
-        ),
-        css('p').combine(bodyLarge),
-        css('.actions').styles(
-          margin: Margin.only(top: 2.rem),
-        ),
-      ]),
-      css('.meet-components', [
-        for (var i = 1; i <= 5; i++) ...[
-          css('.select-target-$i').styles(position: Position.relative()),
-          css('&:has(.select-trigger-$i:hover) .select-target-$i::before').styles(
-            position: Position.absolute(left: (-10).px, top: (-10).px, right: (-10).px, bottom: (-10).px),
-            zIndex: ZIndex(-1),
-            border: Border(color: primaryLight, width: 1.px),
-            radius: BorderRadius.circular(8.px),
-            backgroundColor: primaryFaded,
-            raw: {'content': '""'},
+  static List<StyleRule> get styles => [
+        css('#meet', [
+          css('&').styles(
+            display: Display.flex,
+            minHeight: 100.vh,
+            padding: Padding.only(top: 2.rem, left: contentPadding, right: contentPadding),
+            flexDirection: FlexDirection.column,
+            alignItems: AlignItems.center,
+            gap: Gap(row: sectionPadding),
           ),
-        ]
-      ]),
-      css('.meet-modes', [
-        css('&').styles(flexWrap: FlexWrap.wrapReverse),
-        css('& > div:first-child').styles(position: Position.relative()),
-        css('.put-top span:last-child').styles(position: Position.absolute(), zIndex: ZIndex(1)),
-        css('.mode-highlight').styles(
-          position: Position.absolute(bottom: 0.6.em, left: (-16).px, right: (-16).px),
-          height: 3.2.em,
-          border: Border(color: primaryLight, width: 2.px),
-          radius: BorderRadius.circular(8.px),
-          pointerEvents: PointerEvents.none,
-          backgroundColor: primaryFaded,
-        ),
-      ]),
-    ]),
-  ];
+          css('.meet-section', [
+            css('&').styles(
+              display: Display.flex,
+              maxWidth: maxContentWidth,
+              flexDirection: FlexDirection.row,
+              flexWrap: FlexWrap.wrap,
+              alignItems: AlignItems.center,
+              gap: Gap(column: 4.rem, row: 4.rem),
+            ),
+            css('& > *').styles(
+              minWidth: Unit.zero,
+              flex: Flex(grow: 1, shrink: 1, basis: 24.rem),
+            ),
+            css('p').combine(bodyLarge),
+            css('.actions').styles(
+              margin: Margin.only(top: 2.rem),
+            ),
+          ]),
+          css('.meet-components', [
+            for (var i = 1; i <= 5; i++) ...[
+              css('.select-target-$i').styles(position: Position.relative()),
+              css('&:has(.select-trigger-$i:hover) .select-target-$i::before').styles(
+                position: Position.absolute(left: (-10).px, top: (-10).px, right: (-10).px, bottom: (-10).px),
+                zIndex: ZIndex(-1),
+                border: Border(color: primaryLight, width: 1.px),
+                radius: BorderRadius.circular(8.px),
+                backgroundColor: primaryFaded,
+                raw: {'content': '""'},
+              ),
+            ]
+          ]),
+          css('.meet-modes', [
+            css('&').styles(flexWrap: FlexWrap.wrapReverse),
+            css('& > div:first-child').styles(position: Position.relative()),
+            css('.put-top span:last-child').styles(position: Position.absolute(), zIndex: ZIndex(1)),
+            css('.mode-highlight').styles(
+              position: Position.absolute(bottom: 0.6.em, left: (-16).px, right: (-16).px),
+              height: 3.2.em,
+              border: Border(color: primaryLight, width: 2.px),
+              radius: BorderRadius.circular(8.px),
+              pointerEvents: PointerEvents.none,
+              backgroundColor: primaryFaded,
+            ),
+          ]),
+        ]),
+      ];
 }

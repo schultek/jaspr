@@ -90,101 +90,101 @@ const contentPadding = Unit.variable('--contentPadding');
 const sectionPadding = Unit.variable('--sectionPadding');
 
 @css
-final root = [
-  css.import('font/lucide/lucide.css'),
+List<StyleRule> get root => [
+      css.import('font/lucide/lucide.css'),
 
-  // Global
-  css('html, body').styles(padding: Padding.zero, margin: Margin.zero),
-  css('html').styles(
-    fontFamily: FontFamily.list([FontFamilies.uiSansSerif, FontFamilies.systemUi, FontFamilies.sansSerif]),
-    backgroundColor: background,
-  ),
+      // Global
+      css('html, body').styles(padding: Padding.zero, margin: Margin.zero),
+      css('html').styles(
+        fontFamily: FontFamily.list([FontFamilies.uiSansSerif, FontFamilies.systemUi, FontFamilies.sansSerif]),
+        backgroundColor: background,
+      ),
 
-  // Theme
-  css(':root').styles(raw: {
-    for (final color in lightTheme.keys) color.value.substring(4, color.value.length - 1): lightTheme[color]!.value,
-    '--contentPadding': '4rem',
-    '--sectionPadding': '16rem',
-  }),
+      // Theme
+      css(':root').styles(raw: {
+        for (final color in lightTheme.keys) color.value.substring(4, color.value.length - 1): lightTheme[color]!.value,
+        '--contentPadding': '4rem',
+        '--sectionPadding': '16rem',
+      }),
 
-  css(':root.dark').styles(raw: {
-    for (final color in darkTheme.keys) color.value.substring(4, color.value.length - 1): darkTheme[color]!.value,
-  }),
+      css(':root.dark').styles(raw: {
+        for (final color in darkTheme.keys) color.value.substring(4, color.value.length - 1): darkTheme[color]!.value,
+      }),
 
-  css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
-    css(':root').styles(raw: {
-      '--contentPadding': '2rem',
-      '--sectionPadding': '8rem',
-    }),
-  ]),
+      css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
+        css(':root').styles(raw: {
+          '--contentPadding': '2rem',
+          '--sectionPadding': '8rem',
+        }),
+      ]),
 
-  css.media(MediaQuery.all(maxWidth: smallMobileBreakpoint), [
-    css(':root').styles(raw: {
-      '--contentPadding': '1rem',
-      '--sectionPadding': '4rem',
-    }),
-  ]),
+      css.media(MediaQuery.all(maxWidth: smallMobileBreakpoint), [
+        css(':root').styles(raw: {
+          '--contentPadding': '1rem',
+          '--sectionPadding': '4rem',
+        }),
+      ]),
 
-  // Typography
-  css('.caption').combine(caption),
-  css('.caption2').combine(caption2),
-  css('p').combine(bodyMedium),
-  css('h1').combine(heading1).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.rem)),
-  css('h2').combine(heading2).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
-  css('h3').combine(heading3).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
-  css('h4').combine(heading4).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
-  css('h5').combine(heading5).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
+      // Typography
+      css('.caption').combine(caption),
+      css('.caption2').combine(caption2),
+      css('p').combine(bodyMedium),
+      css('h1').combine(heading1).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.rem)),
+      css('h2').combine(heading2).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
+      css('h3').combine(heading3).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
+      css('h4').combine(heading4).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
+      css('h5').combine(heading5).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
 
-  css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
-    css('h1').styles(fontSize: 2.6.rem),
-    css('h2').styles(fontSize: 1.8.rem),
-    css('h3').styles(fontSize: 1.8.rem),
-    css('h4').styles(fontSize: 1.2.rem),
-  ]),
+      css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
+        css('h1').styles(fontSize: 2.6.rem),
+        css('h2').styles(fontSize: 1.8.rem),
+        css('h3').styles(fontSize: 1.8.rem),
+        css('h4').styles(fontSize: 1.2.rem),
+      ]),
 
-  // Common
-  css('.actions').styles(
-    display: Display.flex,
-    flexDirection: FlexDirection.row,
-    flexWrap: FlexWrap.wrap,
-    alignItems: AlignItems.center,
-    gap: Gap.all(.8.em),
-  ),
-  css('.text-gradient').styles(raw: {
-    'background': primaryGradient,
-    '-webkit-background-clip': 'text',
-    '-webkit-text-fill-color': 'transparent',
-  }),
-  css('a').styles(color: textDark, textDecoration: TextDecoration.none),
-  css('b').styles(fontWeight: FontWeight.w500),
+      // Common
+      css('.actions').styles(
+        display: Display.flex,
+        flexDirection: FlexDirection.row,
+        flexWrap: FlexWrap.wrap,
+        alignItems: AlignItems.center,
+        gap: Gap.all(.8.em),
+      ),
+      css('.text-gradient').styles(raw: {
+        'background': primaryGradient,
+        '-webkit-background-clip': 'text',
+        '-webkit-text-fill-color': 'transparent',
+      }),
+      css('a').styles(color: textDark, textDecoration: TextDecoration.none),
+      css('b').styles(fontWeight: FontWeight.w500),
 
-  css('code, pre, .mono').styles(
-    fontFamily: FontFamily.list([
-      FontFamilies.uiMonospace,
-      FontFamily('SFMono-Regular'),
-      FontFamily('Menlo'),
-      FontFamily('Monaco'),
-      FontFamily('Consolas'),
-      FontFamily('Liberation Mono'),
-      FontFamily('Courier New'),
-      FontFamilies.monospace
-    ]),
-    fontSize: 0.875.rem,
-    lineHeight: 1.4.em,
-    raw: {'-webkit-text-size-adjust': '100%'},
-  ),
+      css('code, pre, .mono').styles(
+        fontFamily: FontFamily.list([
+          FontFamilies.uiMonospace,
+          FontFamily('SFMono-Regular'),
+          FontFamily('Menlo'),
+          FontFamily('Monaco'),
+          FontFamily('Consolas'),
+          FontFamily('Liberation Mono'),
+          FontFamily('Courier New'),
+          FontFamilies.monospace
+        ]),
+        fontSize: 0.875.rem,
+        lineHeight: 1.4.em,
+        raw: {'-webkit-text-size-adjust': '100%'},
+      ),
 
-  // Animated underline
-  css('.animated-underline', [
-    css('&').styles(
-      transition: Transition('background-size', duration: 300, curve: Curve.easeInOut),
-      backgroundPosition: BackgroundPosition(offsetX: Unit.zero, offsetY: 100.percent),
-      backgroundRepeat: BackgroundRepeat.noRepeat,
-      backgroundSize: BackgroundSize.sides(Unit.zero, 1.5.px),
-      raw: {'background-image': 'linear-gradient(to right, currentColor, currentColor)'},
-    ),
-    css('&:hover').styles(
-      backgroundSize: BackgroundSize.sides(100.percent, 1.5.px),
-    ),
-  ]),
-];
+      // Animated underline
+      css('.animated-underline', [
+        css('&').styles(
+          transition: Transition('background-size', duration: 300, curve: Curve.easeInOut),
+          backgroundPosition: BackgroundPosition(offsetX: Unit.zero, offsetY: 100.percent),
+          backgroundRepeat: BackgroundRepeat.noRepeat,
+          backgroundSize: BackgroundSize.sides(Unit.zero, 1.5.px),
+          raw: {'background-image': 'linear-gradient(to right, currentColor, currentColor)'},
+        ),
+        css('&:hover').styles(
+          backgroundSize: BackgroundSize.sides(100.percent, 1.5.px),
+        ),
+      ]),
+    ];

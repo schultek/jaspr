@@ -28,16 +28,16 @@ class RootRoute extends JasprRoute {
 
         // Root styles
         css('html, body').styles(
-          fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]),
           width: 100.percent,
           minHeight: 100.vh,
-          margin: Margin.zero,
           padding: Padding.zero,
+          margin: Margin.zero,
+          fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]),
           backgroundColor: Color('#F7F7F7'),
         ),
         css('h1').styles(
-          fontSize: 4.rem,
           margin: Margin.unset,
+          fontSize: 4.rem,
         ),
       ],
       body: App(),

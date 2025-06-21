@@ -12,7 +12,7 @@ class Home extends StatelessComponent {
         img(
           src: "/images/serverpod-logo.svg",
           width: 160,
-          styles: Styles.box(margin: EdgeInsets.only(top: 8.px, bottom: 12.px)),
+          styles: Styles(margin: Margin.only(top: 8.px, bottom: 12.px)),
         ),
         p([
           a(href: "https://serverpod.dev/", [text("Serverpod + Jaspr")])

@@ -88,47 +88,47 @@ class HeaderState extends State<Header> {
   }
 
   @css
-  static final styles = [
-    css('header', [
-      css('&').styles(
-        display: Display.flex,
-        position: Position.absolute(left: Unit.zero, right: Unit.zero),
-        zIndex: ZIndex(1),
-        padding: Padding.symmetric(horizontal: 2.rem, vertical: 2.rem),
-        gap: Gap(column: 2.rem),
-      ),
-      css('& > *').styles(
-        display: Display.flex,
-        alignItems: AlignItems.center,
-      ),
-      css('nav', [
-        css('&').styles(
-          display: Display.flex,
-          justifyContent: JustifyContent.end,
-          gap: Gap(column: 2.rem),
-          flex: Flex(grow: 1),
-          color: textBlack,
-        ),
-        css('& a').styles(
-          color: textBlack,
-          fontSize: 1.rem,
-          fontWeight: FontWeight.w500,
-          textDecoration: TextDecoration.none,
-        ),
-        css('& a:hover').styles(
-          color: primaryMid,
-        ),
-      ]),
-    ]),
-    css.media(MediaQuery.screen(maxWidth: mobileBreakpoint.px), [
-      css('header', [
-        css('&').styles(
-          display: Display.flex,
-          justifyContent: JustifyContent.spaceBetween,
-        ),
-        css('& > nav').styles(display: Display.none),
-        css('& > .header-actions').styles(display: Display.none),
-      ]),
-    ]),
-  ];
+  static List<StyleRule> get styles => [
+        css('header', [
+          css('&').styles(
+            display: Display.flex,
+            position: Position.absolute(left: Unit.zero, right: Unit.zero),
+            zIndex: ZIndex(1),
+            padding: Padding.symmetric(horizontal: 2.rem, vertical: 2.rem),
+            gap: Gap(column: 2.rem),
+          ),
+          css('& > *').styles(
+            display: Display.flex,
+            alignItems: AlignItems.center,
+          ),
+          css('nav', [
+            css('&').styles(
+              display: Display.flex,
+              justifyContent: JustifyContent.end,
+              gap: Gap(column: 2.rem),
+              flex: Flex(grow: 1),
+              color: textBlack,
+            ),
+            css('& a').styles(
+              color: textBlack,
+              fontSize: 1.rem,
+              fontWeight: FontWeight.w500,
+              textDecoration: TextDecoration.none,
+            ),
+            css('& a:hover').styles(
+              color: primaryMid,
+            ),
+          ]),
+        ]),
+        css.media(MediaQuery.screen(maxWidth: mobileBreakpoint.px), [
+          css('header', [
+            css('&').styles(
+              display: Display.flex,
+              justifyContent: JustifyContent.spaceBetween,
+            ),
+            css('& > nav').styles(display: Display.none),
+            css('& > .header-actions').styles(display: Display.none),
+          ]),
+        ]),
+      ];
 }

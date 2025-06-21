@@ -64,7 +64,7 @@ class CounterButtonState extends State<CounterButton> {
   }
 
   @css
-  static final List<StyleRule> styles = [
-    css('.counter-container').styles(position: Position.relative()),
-  ];
+  static List<StyleRule> get styles => [
+        css('.counter-container').styles(position: Position.relative()),
+      ];
 }

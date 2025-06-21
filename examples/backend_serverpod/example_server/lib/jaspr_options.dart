@@ -1,3 +1,6 @@
+// dart format off
+// ignore_for_file: type=lint
+
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
@@ -20,8 +23,8 @@ import 'package:example_server/components/counter.dart' as prefix0;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(
-  clients: {
-    prefix0.Counter: ClientTarget<prefix0.Counter>('components/counter'),
-  },
-);
+JasprOptions get defaultJasprOptions => JasprOptions(
+      clients: {
+        prefix0.Counter: ClientTarget<prefix0.Counter>('components/counter'),
+      },
+    );

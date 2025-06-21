@@ -53,17 +53,20 @@ class JasprOptionsBuilder implements Builder {
 
     final package = buildStep.inputId.package;
 
-    clients = clients.where((c) => sources.contains(c.id)).toList()
-      ..sortByCompare((c) => '${c.import}/${c.name}', ImportsWriter.compareImports);
-    styles = styles
-        .map((s) => sources.contains(s.id)
-            ? s
-            : StylesModule(
-                id: s.id,
-                elements: s.elements.where((e) => !e.contains('.')).toList(),
-              ))
-        .toList()
-      ..sortByCompare((s) => s.id.toImportUrl(), ImportsWriter.compareImports);
+    if (sources.isNotEmpty) {
+      clients = clients.where((c) => sources.contains(c.id)).toList();
+      styles = styles
+          .map((s) => sources.contains(s.id)
+              ? s
+              : StylesModule(
+                  id: s.id,
+                  elements: s.elements.where((e) => !e.contains('.')).toList(),
+                ))
+          .toList();
+    }
+
+    clients.sortByCompare((c) => '${c.import}/${c.name}', ImportsWriter.compareImports);
+    styles.sortByCompare((s) => s.id.toImportUrl(), ImportsWriter.compareImports);
 
     var source = '''
       import 'package:jaspr/jaspr.dart';

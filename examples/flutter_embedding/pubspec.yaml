@@ -20,9 +20,10 @@ dev_dependencies:
   build_runner: ^2.4.6
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
-  jaspr_builder: ^0.16.3
-  jaspr_web_compilers: ^4.0.10
+  flutter_lints: ^5.0.0
+  jaspr_builder: ^0.19.1
+  jaspr_web_compilers: ^4.1.0
+  jaspr_lints: ^0.4.0
 
 flutter:
   uses-material-design: true

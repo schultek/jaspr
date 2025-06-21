@@ -1,4 +1,4 @@
-library router;
+library;
 
 import 'dart:async';
 

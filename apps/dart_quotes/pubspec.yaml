@@ -11,14 +11,15 @@ dependencies:
   jaspr: ^0.19.0
   jaspr_router: ^0.7.0
   cloud_firestore: ^5.4.1
-  dart_firebase_admin: ^0.3.1
+  dart_firebase_admin: ^0.4.1
   firebase_auth: ^5.2.1
 
 dev_dependencies:
   build_runner: ^2.4.0
-  jaspr_web_compilers: ^4.0.10
-  jaspr_builder: ^0.17.0
-  lints: ^4.0.0
+  jaspr_web_compilers: ^4.1.0
+  jaspr_builder: ^0.19.1
+  jaspr_lints: ^0.4.0
+  lints: ^5.0.0
 
 jaspr:
   mode: server

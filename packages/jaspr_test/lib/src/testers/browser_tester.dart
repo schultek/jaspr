@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:js_interop';
 
 import 'package:jaspr/browser.dart';
+// ignore: implementation_imports
+import 'package:jaspr/src/foundation/type_checks.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 import 'package:universal_web/web.dart' as web;
@@ -85,9 +87,9 @@ class BrowserTester {
     var element = _findDomElement(finder);
 
     var source = (element.renderObject as DomRenderObject).node;
-    if (source is web.Element) {
-      before?.call(source);
-      source.dispatchEvent(event);
+    if (source.isElement) {
+      before?.call(source as web.Element);
+      (source as web.Element).dispatchEvent(event);
     }
 
     if (pump) {

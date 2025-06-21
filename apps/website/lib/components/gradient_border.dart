@@ -42,24 +42,24 @@ class GradientBorder extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
-    css('.gradient-border-container', [
-      css('&').styles(
-        position: Position.relative(),
-        height: 100.percent,
-      ),
-      css('.gradient-border', [
-        css('&').styles(
-          position: Position.absolute(top: (-1).px, left: (-1).px, right: (-1).px, bottom: (-1).px),
-        ),
-        css('svg').styles(overflow: Overflow.visible),
-      ]),
-      css('rect').styles(
-        transition: Transition('stroke-dasharray', duration: 300, curve: Curve.easeOut),
-        raw: {'stroke-dasharray': '0 101'},
-      ),
-      css('&:hover rect, &.fixed rect').styles(raw: {'stroke-dasharray': '50 0 52'}),
-    ]),
-    css('.active .gradient-border rect').styles(raw: {'stroke-dasharray': '50 0 52'}),
-  ];
+  static List<StyleRule> get styles => [
+        css('.gradient-border-container', [
+          css('&').styles(
+            position: Position.relative(),
+            height: 100.percent,
+          ),
+          css('.gradient-border', [
+            css('&').styles(
+              position: Position.absolute(top: (-1).px, left: (-1).px, right: (-1).px, bottom: (-1).px),
+            ),
+            css('svg').styles(overflow: Overflow.visible),
+          ]),
+          css('rect').styles(
+            transition: Transition('stroke-dasharray', duration: 300, curve: Curve.easeOut),
+            raw: {'stroke-dasharray': '0 101'},
+          ),
+          css('&:hover rect, &.fixed rect').styles(raw: {'stroke-dasharray': '50 0 52'}),
+        ]),
+        css('.active .gradient-border rect').styles(raw: {'stroke-dasharray': '50 0 52'}),
+      ];
 }

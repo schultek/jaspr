@@ -39,35 +39,35 @@ class SessionPage extends StatelessComponent {
   }
 
   @css
-  static final styles = [
-    css('section.session', [
-      css('&').styles(
-        padding: Padding.all(40.px),
-        display: Display.flex,
-        flexDirection: FlexDirection.column,
-        justifyContent: JustifyContent.center,
-        alignItems: AlignItems.center,
-        textAlign: TextAlign.center,
-      ),
-      css('a').styles(
-        alignSelf: AlignSelf.start,
-        color: Color.initial,
-      ),
-      css('h1').styles(
-        margin: Margin.only(top: 40.px, bottom: 20.px),
-        fontSize: 2.em,
-      ),
-      css('div').styles(
-        margin: Margin.symmetric(vertical: 20.px),
-      ),
-      css('ul').styles(
-        listStyle: ListStyle.none,
-        padding: Padding.zero,
-      ),
-      css('p').styles(
-        textAlign: TextAlign.justify,
-        whiteSpace: WhiteSpace.preLine,
-      ),
-    ]),
-  ];
+  static List<StyleRule> get styles => [
+        css('section.session', [
+          css('&').styles(
+            display: Display.flex,
+            padding: Padding.all(40.px),
+            flexDirection: FlexDirection.column,
+            justifyContent: JustifyContent.center,
+            alignItems: AlignItems.center,
+            textAlign: TextAlign.center,
+          ),
+          css('a').styles(
+            alignSelf: AlignSelf.start,
+            color: Color.initial,
+          ),
+          css('h1').styles(
+            margin: Margin.only(top: 40.px, bottom: 20.px),
+            fontSize: 2.em,
+          ),
+          css('div').styles(
+            margin: Margin.symmetric(vertical: 20.px),
+          ),
+          css('ul').styles(
+            padding: Padding.zero,
+            listStyle: ListStyle.none,
+          ),
+          css('p').styles(
+            textAlign: TextAlign.justify,
+            whiteSpace: WhiteSpace.preLine,
+          ),
+        ]),
+      ];
 }

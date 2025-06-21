@@ -30,9 +30,10 @@ dev_dependencies:
   build_runner: ^2.4.0
   build_web_compilers: ^4.0.0
   dart_mappable_builder: ^4.2.0
-  jaspr_builder: ^0.15.1
-  jaspr_test: ^0.15.1
-  lints: ^4.0.0
+  jaspr_builder: ^0.19.1
+  jaspr_lints: ^0.4.0
+  jaspr_test: ^0.19.1
+  lints: ^5.0.0
   test: ^1.25.0
   yaml_writer: ^1.0.1
 

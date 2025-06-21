@@ -21,9 +21,8 @@ class Counter extends StatelessComponent with SyncProviderDependencies {
       },
     );
 
-    yield DomComponent(
-      tag: 'span',
-      child: Text('Counter: ${context.watch(countProvider)}'),
-    );
+    yield span([
+      text('Counter: ${context.watch(countProvider)}'),
+    ]);
   }
 }

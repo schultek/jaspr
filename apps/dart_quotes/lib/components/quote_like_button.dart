@@ -38,23 +38,23 @@ class QuoteLikeButton extends StatelessComponent {
   }
 
   @css
-  static final styles = [
-    css('.quote-like-btn', [
-      css('&').styles(
-        border: Border.none,
-        outline: Outline(style: OutlineStyle.none),
-        backgroundColor: Colors.transparent,
-        fontSize: 18.px,
-      ),
-      css('&:hover span').styles(
-        transform: Transform.scale(1.2),
-      ),
-      css('&.active span').styles(
-        color: Colors.blue,
-      ),
-      css('span').styles(
-        transition: Transition('transform', duration: 300, curve: Curve.ease),
-      ),
-    ])
-  ];
+  static List<StyleRule> get styles => [
+        css('.quote-like-btn', [
+          css('&').styles(
+            border: Border.none,
+            outline: Outline(style: OutlineStyle.none),
+            fontSize: 18.px,
+            backgroundColor: Colors.transparent,
+          ),
+          css('&:hover span').styles(
+            transform: Transform.scale(1.2),
+          ),
+          css('&.active span').styles(
+            color: Colors.blue,
+          ),
+          css('span').styles(
+            transition: Transition('transform', duration: 300, curve: Curve.ease),
+          ),
+        ])
+      ];
 }

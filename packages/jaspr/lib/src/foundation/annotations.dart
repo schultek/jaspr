@@ -35,7 +35,7 @@ class DecoderAnnotation {
 /// 1. Put the actual import in the annotation.
 /// 3. Define what elements or types to 'show' as symbols (prefixed by #).
 ///   - This is required to reduce the amount of stubbing needed.
-/// 2. Import the file '<current filename>.imports.dart'.
+/// 2. Import the file '&lt;current filename&gt;.imports.dart'.
 ///
 /// The associated file will be generated the next time you run `jaspr serve`.
 ///

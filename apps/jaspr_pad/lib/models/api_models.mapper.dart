@@ -25,11 +25,11 @@ class IssueKindMapper extends EnumMapper<IssueKind> {
   @override
   IssueKind decode(dynamic value) {
     switch (value) {
-      case 'error':
+      case r'error':
         return IssueKind.error;
-      case 'warning':
+      case r'warning':
         return IssueKind.warning;
-      case 'info':
+      case r'info':
         return IssueKind.info;
       default:
         throw MapperException.unknownEnumValue(value);
@@ -40,11 +40,11 @@ class IssueKindMapper extends EnumMapper<IssueKind> {
   dynamic encode(IssueKind self) {
     switch (self) {
       case IssueKind.error:
-        return 'error';
+        return r'error';
       case IssueKind.warning:
-        return 'warning';
+        return r'warning';
       case IssueKind.info:
-        return 'info';
+        return r'info';
     }
   }
 }
@@ -104,7 +104,7 @@ mixin CompileRequestMappable {
   }
 
   CompileRequestCopyWith<CompileRequest, CompileRequest, CompileRequest> get copyWith =>
-      _CompileRequestCopyWithImpl(this as CompileRequest, $identity, $identity);
+      _CompileRequestCopyWithImpl<CompileRequest, CompileRequest>(this as CompileRequest, $identity, $identity);
   @override
   String toString() {
     return CompileRequestMapper.ensureInitialized().stringifyValue(this as CompileRequest);
@@ -123,7 +123,7 @@ mixin CompileRequestMappable {
 
 extension CompileRequestValueCopy<$R, $Out> on ObjectCopyWith<$R, CompileRequest, $Out> {
   CompileRequestCopyWith<$R, CompileRequest, $Out> get $asCompileRequest =>
-      $base.as((v, t, t2) => _CompileRequestCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _CompileRequestCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class CompileRequestCopyWith<$R, $In extends CompileRequest, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -148,7 +148,7 @@ class _CompileRequestCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Compil
 
   @override
   CompileRequestCopyWith<$R2, CompileRequest, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _CompileRequestCopyWithImpl($value, $cast, t);
+      _CompileRequestCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class CompileResponseMapper extends ClassMapperBase<CompileResponse> {
@@ -202,7 +202,7 @@ mixin CompileResponseMappable {
   }
 
   CompileResponseCopyWith<CompileResponse, CompileResponse, CompileResponse> get copyWith =>
-      _CompileResponseCopyWithImpl(this as CompileResponse, $identity, $identity);
+      _CompileResponseCopyWithImpl<CompileResponse, CompileResponse>(this as CompileResponse, $identity, $identity);
   @override
   String toString() {
     return CompileResponseMapper.ensureInitialized().stringifyValue(this as CompileResponse);
@@ -221,7 +221,7 @@ mixin CompileResponseMappable {
 
 extension CompileResponseValueCopy<$R, $Out> on ObjectCopyWith<$R, CompileResponse, $Out> {
   CompileResponseCopyWith<$R, CompileResponse, $Out> get $asCompileResponse =>
-      $base.as((v, t, t2) => _CompileResponseCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _CompileResponseCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class CompileResponseCopyWith<$R, $In extends CompileResponse, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -244,7 +244,7 @@ class _CompileResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Compi
 
   @override
   CompileResponseCopyWith<$R2, CompileResponse, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _CompileResponseCopyWithImpl($value, $cast, t);
+      _CompileResponseCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class AnalyzeRequestMapper extends ClassMapperBase<AnalyzeRequest> {
@@ -295,7 +295,7 @@ mixin AnalyzeRequestMappable {
   }
 
   AnalyzeRequestCopyWith<AnalyzeRequest, AnalyzeRequest, AnalyzeRequest> get copyWith =>
-      _AnalyzeRequestCopyWithImpl(this as AnalyzeRequest, $identity, $identity);
+      _AnalyzeRequestCopyWithImpl<AnalyzeRequest, AnalyzeRequest>(this as AnalyzeRequest, $identity, $identity);
   @override
   String toString() {
     return AnalyzeRequestMapper.ensureInitialized().stringifyValue(this as AnalyzeRequest);
@@ -314,7 +314,7 @@ mixin AnalyzeRequestMappable {
 
 extension AnalyzeRequestValueCopy<$R, $Out> on ObjectCopyWith<$R, AnalyzeRequest, $Out> {
   AnalyzeRequestCopyWith<$R, AnalyzeRequest, $Out> get $asAnalyzeRequest =>
-      $base.as((v, t, t2) => _AnalyzeRequestCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _AnalyzeRequestCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class AnalyzeRequestCopyWith<$R, $In extends AnalyzeRequest, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -339,7 +339,7 @@ class _AnalyzeRequestCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Analyz
 
   @override
   AnalyzeRequestCopyWith<$R2, AnalyzeRequest, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _AnalyzeRequestCopyWithImpl($value, $cast, t);
+      _AnalyzeRequestCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class FormatResponseMapper extends ClassMapperBase<FormatResponse> {
@@ -393,7 +393,7 @@ mixin FormatResponseMappable {
   }
 
   FormatResponseCopyWith<FormatResponse, FormatResponse, FormatResponse> get copyWith =>
-      _FormatResponseCopyWithImpl(this as FormatResponse, $identity, $identity);
+      _FormatResponseCopyWithImpl<FormatResponse, FormatResponse>(this as FormatResponse, $identity, $identity);
   @override
   String toString() {
     return FormatResponseMapper.ensureInitialized().stringifyValue(this as FormatResponse);
@@ -412,7 +412,7 @@ mixin FormatResponseMappable {
 
 extension FormatResponseValueCopy<$R, $Out> on ObjectCopyWith<$R, FormatResponse, $Out> {
   FormatResponseCopyWith<$R, FormatResponse, $Out> get $asFormatResponse =>
-      $base.as((v, t, t2) => _FormatResponseCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _FormatResponseCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class FormatResponseCopyWith<$R, $In extends FormatResponse, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -435,7 +435,7 @@ class _FormatResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Format
 
   @override
   FormatResponseCopyWith<$R2, FormatResponse, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _FormatResponseCopyWithImpl($value, $cast, t);
+      _FormatResponseCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class FormatRequestMapper extends ClassMapperBase<FormatRequest> {
@@ -489,7 +489,7 @@ mixin FormatRequestMappable {
   }
 
   FormatRequestCopyWith<FormatRequest, FormatRequest, FormatRequest> get copyWith =>
-      _FormatRequestCopyWithImpl(this as FormatRequest, $identity, $identity);
+      _FormatRequestCopyWithImpl<FormatRequest, FormatRequest>(this as FormatRequest, $identity, $identity);
   @override
   String toString() {
     return FormatRequestMapper.ensureInitialized().stringifyValue(this as FormatRequest);
@@ -508,7 +508,7 @@ mixin FormatRequestMappable {
 
 extension FormatRequestValueCopy<$R, $Out> on ObjectCopyWith<$R, FormatRequest, $Out> {
   FormatRequestCopyWith<$R, FormatRequest, $Out> get $asFormatRequest =>
-      $base.as((v, t, t2) => _FormatRequestCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _FormatRequestCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class FormatRequestCopyWith<$R, $In extends FormatRequest, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -531,7 +531,7 @@ class _FormatRequestCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, FormatR
 
   @override
   FormatRequestCopyWith<$R2, FormatRequest, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _FormatRequestCopyWithImpl($value, $cast, t);
+      _FormatRequestCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class AnalyzeResponseMapper extends ClassMapperBase<AnalyzeResponse> {
@@ -583,7 +583,7 @@ mixin AnalyzeResponseMappable {
   }
 
   AnalyzeResponseCopyWith<AnalyzeResponse, AnalyzeResponse, AnalyzeResponse> get copyWith =>
-      _AnalyzeResponseCopyWithImpl(this as AnalyzeResponse, $identity, $identity);
+      _AnalyzeResponseCopyWithImpl<AnalyzeResponse, AnalyzeResponse>(this as AnalyzeResponse, $identity, $identity);
   @override
   String toString() {
     return AnalyzeResponseMapper.ensureInitialized().stringifyValue(this as AnalyzeResponse);
@@ -602,7 +602,7 @@ mixin AnalyzeResponseMappable {
 
 extension AnalyzeResponseValueCopy<$R, $Out> on ObjectCopyWith<$R, AnalyzeResponse, $Out> {
   AnalyzeResponseCopyWith<$R, AnalyzeResponse, $Out> get $asAnalyzeResponse =>
-      $base.as((v, t, t2) => _AnalyzeResponseCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _AnalyzeResponseCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class AnalyzeResponseCopyWith<$R, $In extends AnalyzeResponse, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -627,7 +627,7 @@ class _AnalyzeResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Analy
 
   @override
   AnalyzeResponseCopyWith<$R2, AnalyzeResponse, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _AnalyzeResponseCopyWithImpl($value, $cast, t);
+      _AnalyzeResponseCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class IssueMapper extends ClassMapperBase<Issue> {
@@ -704,7 +704,8 @@ mixin IssueMappable {
     return IssueMapper.ensureInitialized().encodeMap<Issue>(this as Issue);
   }
 
-  IssueCopyWith<Issue, Issue, Issue> get copyWith => _IssueCopyWithImpl(this as Issue, $identity, $identity);
+  IssueCopyWith<Issue, Issue, Issue> get copyWith =>
+      _IssueCopyWithImpl<Issue, Issue>(this as Issue, $identity, $identity);
   @override
   String toString() {
     return IssueMapper.ensureInitialized().stringifyValue(this as Issue);
@@ -722,7 +723,7 @@ mixin IssueMappable {
 }
 
 extension IssueValueCopy<$R, $Out> on ObjectCopyWith<$R, Issue, $Out> {
-  IssueCopyWith<$R, Issue, $Out> get $asIssue => $base.as((v, t, t2) => _IssueCopyWithImpl(v, t, t2));
+  IssueCopyWith<$R, Issue, $Out> get $asIssue => $base.as((v, t, t2) => _IssueCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class IssueCopyWith<$R, $In extends Issue, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -776,7 +777,8 @@ class _IssueCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Issue, $Out>
       url: data.get(#url, or: $value.url));
 
   @override
-  IssueCopyWith<$R2, Issue, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) => _IssueCopyWithImpl($value, $cast, t);
+  IssueCopyWith<$R2, Issue, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _IssueCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class IssueLocationMapper extends ClassMapperBase<IssueLocation> {
@@ -840,7 +842,7 @@ mixin IssueLocationMappable {
   }
 
   IssueLocationCopyWith<IssueLocation, IssueLocation, IssueLocation> get copyWith =>
-      _IssueLocationCopyWithImpl(this as IssueLocation, $identity, $identity);
+      _IssueLocationCopyWithImpl<IssueLocation, IssueLocation>(this as IssueLocation, $identity, $identity);
   @override
   String toString() {
     return IssueLocationMapper.ensureInitialized().stringifyValue(this as IssueLocation);
@@ -859,7 +861,7 @@ mixin IssueLocationMappable {
 
 extension IssueLocationValueCopy<$R, $Out> on ObjectCopyWith<$R, IssueLocation, $Out> {
   IssueLocationCopyWith<$R, IssueLocation, $Out> get $asIssueLocation =>
-      $base.as((v, t, t2) => _IssueLocationCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _IssueLocationCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class IssueLocationCopyWith<$R, $In extends IssueLocation, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -889,7 +891,7 @@ class _IssueLocationCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, IssueLo
 
   @override
   IssueLocationCopyWith<$R2, IssueLocation, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _IssueLocationCopyWithImpl($value, $cast, t);
+      _IssueLocationCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class DocumentResponseMapper extends ClassMapperBase<DocumentResponse> {
@@ -944,7 +946,7 @@ mixin DocumentResponseMappable {
   }
 
   DocumentResponseCopyWith<DocumentResponse, DocumentResponse, DocumentResponse> get copyWith =>
-      _DocumentResponseCopyWithImpl(this as DocumentResponse, $identity, $identity);
+      _DocumentResponseCopyWithImpl<DocumentResponse, DocumentResponse>(this as DocumentResponse, $identity, $identity);
   @override
   String toString() {
     return DocumentResponseMapper.ensureInitialized().stringifyValue(this as DocumentResponse);
@@ -963,7 +965,7 @@ mixin DocumentResponseMappable {
 
 extension DocumentResponseValueCopy<$R, $Out> on ObjectCopyWith<$R, DocumentResponse, $Out> {
   DocumentResponseCopyWith<$R, DocumentResponse, $Out> get $asDocumentResponse =>
-      $base.as((v, t, t2) => _DocumentResponseCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _DocumentResponseCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class DocumentResponseCopyWith<$R, $In extends DocumentResponse, $Out>
@@ -990,7 +992,7 @@ class _DocumentResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Docu
 
   @override
   DocumentResponseCopyWith<$R2, DocumentResponse, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _DocumentResponseCopyWithImpl($value, $cast, t);
+      _DocumentResponseCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class HoverInfoMapper extends ClassMapperBase<HoverInfo> {
@@ -1075,7 +1077,7 @@ mixin HoverInfoMappable {
   }
 
   HoverInfoCopyWith<HoverInfo, HoverInfo, HoverInfo> get copyWith =>
-      _HoverInfoCopyWithImpl(this as HoverInfo, $identity, $identity);
+      _HoverInfoCopyWithImpl<HoverInfo, HoverInfo>(this as HoverInfo, $identity, $identity);
   @override
   String toString() {
     return HoverInfoMapper.ensureInitialized().stringifyValue(this as HoverInfo);
@@ -1093,7 +1095,8 @@ mixin HoverInfoMappable {
 }
 
 extension HoverInfoValueCopy<$R, $Out> on ObjectCopyWith<$R, HoverInfo, $Out> {
-  HoverInfoCopyWith<$R, HoverInfo, $Out> get $asHoverInfo => $base.as((v, t, t2) => _HoverInfoCopyWithImpl(v, t, t2));
+  HoverInfoCopyWith<$R, HoverInfo, $Out> get $asHoverInfo =>
+      $base.as((v, t, t2) => _HoverInfoCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class HoverInfoCopyWith<$R, $In extends HoverInfo, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -1152,7 +1155,7 @@ class _HoverInfoCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, HoverInfo, 
 
   @override
   HoverInfoCopyWith<$R2, HoverInfo, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _HoverInfoCopyWithImpl($value, $cast, t);
+      _HoverInfoCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class DocumentRequestMapper extends ClassMapperBase<DocumentRequest> {
@@ -1209,7 +1212,7 @@ mixin DocumentRequestMappable {
   }
 
   DocumentRequestCopyWith<DocumentRequest, DocumentRequest, DocumentRequest> get copyWith =>
-      _DocumentRequestCopyWithImpl(this as DocumentRequest, $identity, $identity);
+      _DocumentRequestCopyWithImpl<DocumentRequest, DocumentRequest>(this as DocumentRequest, $identity, $identity);
   @override
   String toString() {
     return DocumentRequestMapper.ensureInitialized().stringifyValue(this as DocumentRequest);
@@ -1228,7 +1231,7 @@ mixin DocumentRequestMappable {
 
 extension DocumentRequestValueCopy<$R, $Out> on ObjectCopyWith<$R, DocumentRequest, $Out> {
   DocumentRequestCopyWith<$R, DocumentRequest, $Out> get $asDocumentRequest =>
-      $base.as((v, t, t2) => _DocumentRequestCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _DocumentRequestCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class DocumentRequestCopyWith<$R, $In extends DocumentRequest, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -1255,5 +1258,5 @@ class _DocumentRequestCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Docum
 
   @override
   DocumentRequestCopyWith<$R2, DocumentRequest, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _DocumentRequestCopyWithImpl($value, $cast, t);
+      _DocumentRequestCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

@@ -1,5 +1,3 @@
-library style;
-
 import 'properties/all.dart';
 
 export 'properties/all.dart' hide NumberString;

@@ -5,7 +5,6 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/jaspr.dart';
-import 'package:flutter_plugin_interop/components/app.dart' as prefix0;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
@@ -23,6 +22,4 @@ import 'package:flutter_plugin_interop/components/app.dart' as prefix0;
 ///   runApp(...);
 /// }
 /// ```
-JasprOptions get defaultJasprOptions => JasprOptions(
-      clients: {prefix0.App: ClientTarget<prefix0.App>('components/app')},
-    );
+JasprOptions get defaultJasprOptions => JasprOptions();

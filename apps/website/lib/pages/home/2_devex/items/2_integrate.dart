@@ -35,7 +35,7 @@ class Integrate extends StatelessComponent {
                   dart_mappable: ^4.3.0
                   http: ^1.3.0
                   intl: ^0.19.0
-                  jaspr: ^0.17.0
+                  jaspr: ^0.19.0
                   logging: ^1.3.0
                   riverpod: ^2.6.1
                   shared_preferences: ^2.4.0

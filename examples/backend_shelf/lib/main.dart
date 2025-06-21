@@ -45,7 +45,7 @@ void main() async {
 
   var handler = const Pipeline() //
       .addMiddleware(logRequests())
-      .addHandler(router);
+      .addHandler(router.call);
 
   server = await shelf_io.serve(handler, InternetAddress.anyIPv4, 8080);
 
