@@ -7,11 +7,16 @@ command:
       post: |
         dart pub global activate packages/jaspr_cli --source=path
 
+ide:
+  intellij:
+    enabled: false
+
 packages:
   - packages/*
   - apps/*
   - examples/*
   - examples/*/*
+  - modules/build/jaspr_web_compilers
 
 scripts:
   format:

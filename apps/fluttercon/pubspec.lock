@@ -442,10 +442,9 @@ packages:
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
-      name: jaspr_web_compilers
-      sha256: "6aa61cead1400684dd25530576db7a86983795d2f12e933b90b7ff9e88f17298"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../modules/build/jaspr_web_compilers"
+      relative: true
+    source: path
     version: "4.1.5+1"
   js:
     dependency: transitive
