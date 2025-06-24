@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Added support for disabling the sitemap generation for specific pages of `jaspr_content` sites.
+
 ## 0.19.1
 
 - Added `Color.currentColor` constant.

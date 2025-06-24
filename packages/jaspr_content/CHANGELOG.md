@@ -1,3 +1,8 @@
+## Unreleased patch
+
+- Added support for `sitemap: false` in the page data to exclude pages from the sitemap.
+- Ignores files and folders in the content directory starting with `.` (in addition to `_`).
+
 ## 0.2.0
 
 - **Breaking**: Changed `MemoryPage.builder` to accept a `BuildContext` instead of a `Page` parameter.

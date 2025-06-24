@@ -27,7 +27,7 @@ The `FilesystemLoader` loads pages from a specified directory on your local file
 
 - **Source**: A local directory.
 - **Behavior**: Recursively scans the directory for files.
-  - Files and folders starting with an underscore (`_`) are ignored.
+  - Files and folders starting with an underscore (`_`) or dot (`.`) are ignored.
   - Index files (e.g., `index.md`, `index.html`) are treated as the page for the containing folder (e.g., `/about/index.md` becomes `/about`).
   - Other files have their names (without extension) used as the path segment (e.g., `/posts/my-article.md` becomes `/posts/my-article`).
 - **Features**:
@@ -60,7 +60,7 @@ The `GithubLoader` fetches pages from a GitHub repository.
 - **Source**: A GitHub repository.
 - **Behavior**:
   - Uses the GitHub API to list files in the specified repository, path, and ref (branch, tag, or commit).
-  - Similar to `FilesystemLoader`, it ignores files/folders starting with `_` and handles index files.
+  - Similar to `FilesystemLoader`, it ignores files/folders starting with `_` or `.` and handles index files.
 - **Features**:
   - Allows loading content directly from remote sources.
   - Can use an optional access token for private repositories or to avoid rate limits on public ones.

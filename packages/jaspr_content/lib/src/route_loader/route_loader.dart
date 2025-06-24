@@ -187,7 +187,7 @@ abstract class PageSource {
   PageSource(this.path, this.loader, {bool keepSuffix = false}) {
     final segments = path.split('/');
 
-    private = segments.any((s) => s.startsWith('_'));
+    private = segments.any((s) => s.startsWith('_') || s.startsWith('.'));
 
     if (segments.isEmpty) {
       url = '/';
