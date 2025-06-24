@@ -247,8 +247,15 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         file.writeAsBytesSync(response.bodyBytes);
 
         if (response.headers['jaspr-sitemap-data'] case String data) {
-          final sitemap = jsonDecode(data);
-          if (sitemap is! Map<String, dynamic>) {
+          final sitemap = jsonDecode(data) as Object?;
+
+          if (sitemap == false) {
+            // If `sitemap: false`, don't include this route in the sitemap.
+            generatedRoutes.remove(route);
+            continue;
+          }
+
+          if (sitemap is! Map<String, Object?>) {
             logger.write(
               'Invalid sitemap data for route "$route". Expected a map, but got ${sitemap.runtimeType}.',
               level: Level.error,
@@ -258,11 +265,15 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
             continue;
           }
 
+          final originalRouteConfig = generatedRoutes[route];
+          final lastModConfig = sitemap['lastmod'];
+          final changeFrequencyConfig = sitemap['changefreq'];
+          final priorityConfig = sitemap['priority'];
+
           generatedRoutes[route] = (
-            lastmod: sitemap['lastmod'] is String ? sitemap['lastmod'] : generatedRoutes[route]?.lastmod,
-            changefreq: sitemap['changefreq'] is String ? sitemap['changefreq'] : generatedRoutes[route]?.changefreq,
-            priority:
-                sitemap['priority'] is num ? (sitemap['priority'] as num).toDouble() : generatedRoutes[route]?.priority,
+            lastmod: lastModConfig is String ? lastModConfig : originalRouteConfig?.lastmod,
+            changefreq: changeFrequencyConfig is String ? changeFrequencyConfig : originalRouteConfig?.changefreq,
+            priority: priorityConfig is num ? priorityConfig.toDouble() : originalRouteConfig?.priority,
           );
         }
       }
