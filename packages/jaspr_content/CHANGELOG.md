@@ -2,6 +2,7 @@
 
 - Added support for `sitemap: false` in the page data to exclude pages from the sitemap.
 - Ignores files and folders in the content directory starting with `.` (in addition to `_`).
+- Require Dart 3.6 or later to match the other Jaspr packages.
 
 ## 0.2.0
 
