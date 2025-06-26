@@ -21,6 +21,7 @@ dependencies:
   hotreloader: ^4.1.0
   html: ^0.15.0
   http: '>=0.13.0 <2.0.0'
+  listen: 1.0.0-beta.0
   meta: ^1.7.0
   path: ^1.8.0
   shelf: ^1.2.0
