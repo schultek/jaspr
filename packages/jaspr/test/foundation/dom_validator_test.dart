@@ -1,4 +1,4 @@
-import 'package:jaspr/src/server/markup_render_object.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:test/test.dart';
 
 void main() {

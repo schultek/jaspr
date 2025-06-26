@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import '../../../server.dart';
-import '../marker_utils.dart';
 
 void initSyncState(SyncStateMixin element) {
   if (element.context.binding case ServerAppBinding b) {
@@ -18,7 +17,7 @@ class SyncAdapter extends ElementBoundaryAdapter {
   void applyBoundary(ChildListRange range) {
     var value = sync.getState();
     if (value == null) return;
-    var data = escapeMarkerText(jsonEncode(value));
-    range.start.insertNext(ChildNodeData(MarkupRenderObject()..updateText('<!--$syncMarkerPrefix$data-->', true)));
+    var data = const DomValidator().escapeMarkerText(jsonEncode(value));
+    range.start.insertNext(ChildNodeData(MarkupRenderObject()..updateText('<!--${DomValidator.syncMarkerPrefix}$data-->', true)));
   }
 }

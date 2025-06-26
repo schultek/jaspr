@@ -20,6 +20,7 @@ export 'src/foundation/scheduler.dart';
 export 'src/foundation/style.dart';
 export 'src/foundation/sync.dart';
 export 'src/foundation/synchronous_future.dart';
+export 'src/foundation/validator.dart';
 export 'src/foundation/view_transition.dart';
 export 'src/framework/framework.dart';
 export 'src/stub/app_context_stub.dart'
