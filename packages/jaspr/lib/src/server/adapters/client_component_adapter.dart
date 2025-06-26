@@ -1,5 +1,5 @@
-import '../../foundation/marker_utils.dart';
 import '../../foundation/options.dart';
+import '../../foundation/validator.dart';
 import '../../framework/framework.dart';
 import '../markup_render_object.dart';
 import '../server_binding.dart';
@@ -15,8 +15,8 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
   @override
   void applyBoundary(ChildListRange range) {
     range.start.insertNext(ChildNodeData(
-        MarkupRenderObject()..updateText('<!--$clientMarkerPrefix$name${data != null ? ' data=$data' : ''}-->', true)));
-    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!--/$clientMarkerPrefix$name-->', true)));
+        MarkupRenderObject()..updateText('<!--${DomValidator.clientMarkerPrefix}$name${data != null ? ' data=$data' : ''}-->', true)));
+    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!--/${DomValidator.clientMarkerPrefix}$name-->', true)));
   }
 }
 

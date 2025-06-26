@@ -3,6 +3,7 @@ import 'package:html/parser.dart' as html;
 import 'package:html/src/token.dart' as html;
 // ignore: implementation_imports
 import 'package:html/src/tokenizer.dart' as html;
+import 'package:jaspr/jaspr.dart';
 import 'package:markdown/markdown.dart' as md;
 
 import '../page.dart';
@@ -66,6 +67,7 @@ class CustomHtmlSyntax extends md.BlockSyntax {
   const CustomHtmlSyntax() : super();
 
   static final _htmlPattern = md.HtmlBlockSyntax().pattern;
+  static const _validator = DomValidator();
 
   // Extend html pattern to also match incomplete opening tags.
   @override
@@ -99,8 +101,11 @@ class CustomHtmlSyntax extends md.BlockSyntax {
             }
           }
           tokens.add(token);
-          if (token.kind == html.TokenKind.startTag && !(token as html.StartTagToken).selfClosing) {
-            nesting++;
+          if (token.kind == html.TokenKind.startTag) {
+            final selfClosing = (token as html.StartTagToken).selfClosing || _validator.isSelfClosing(token.name ?? '');
+            if (!selfClosing) {
+              nesting++;
+            }
           } else if (token.kind == html.TokenKind.endTag) {
             nesting--;
           }

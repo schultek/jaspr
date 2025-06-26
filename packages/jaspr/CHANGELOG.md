@@ -1,6 +1,7 @@
 ## Unreleased patch
 
 - Added support for disabling the sitemap generation for specific pages of `jaspr_content` sites.
+- Moved `DomValidator` class to foundation library.
 
 ## 0.19.1
 
