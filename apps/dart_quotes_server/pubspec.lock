@@ -720,9 +720,10 @@ packages:
   jaspr_web_compilers:
     dependency: "direct dev"
     description:
-      path: "../../modules/build/jaspr_web_compilers"
-      relative: true
-    source: path
+      name: jaspr_web_compilers
+      sha256: "6aa61cead1400684dd25530576db7a86983795d2f12e933b90b7ff9e88f17298"
+      url: "https://pub.dev"
+    source: hosted
     version: "4.1.5+1"
   jose:
     dependency: transitive
@@ -756,6 +757,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.1"
+  listen:
+    dependency: transitive
+    description:
+      name: listen
+      sha256: c5a4c892a23afe6be09a981482241e90e7ebe561c6148b33653aa13ee8974667
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-beta.0"
   logging:
     dependency: transitive
     description:
@@ -1341,10 +1350,10 @@ packages:
     dependency: transitive
     description:
       name: vector_math
-      sha256: "80b3257d1492ce4d091729e3a67a60407d227c27241d6927be0130c98e741803"
+      sha256: d530bd74fea330e6e364cda7a85019c434070188383e1cd8d9777ee586914c5b
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.2.0"
   vm_service:
     dependency: transitive
     description:
