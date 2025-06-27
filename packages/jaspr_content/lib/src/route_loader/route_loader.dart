@@ -62,7 +62,7 @@ abstract class RouteLoaderBase implements RouteLoader {
 
   bool _eager = false;
 
-  StreamSubscription? _reassembleSub;
+  StreamSubscription<void>? _reassembleSub;
 
   @override
   Future<String> readPartial(String path, Page page) {
@@ -242,7 +242,7 @@ abstract class PageSource {
     RouteLoader._pages.add(newPage);
 
     newPage.apply(
-      data: <String, dynamic>{
+      data: <String, Object?>{
         'page': {'path': path, 'url': url},
       }.merge(newPage.data),
       mergeData: false,

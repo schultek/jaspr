@@ -7,12 +7,11 @@ import 'data_loader.dart';
 class MemoryDataLoader implements DataLoader {
   const MemoryDataLoader(this.data);
 
-  final Map<String, dynamic> data;
+  final Map<String, Object?> data;
 
   @override
   Future<void> loadData(Page page) async {
-    var pageData = page.data['page'] ?? {};
     page.apply(data: data);
-    page.apply(data: {'page': pageData});
+    page.apply(data: {'page': page.namespacedPageData});
   }
 }

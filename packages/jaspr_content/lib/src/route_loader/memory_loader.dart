@@ -72,7 +72,7 @@ class MemoryPage {
   final bool applyLayout;
 
   /// The initial data to pass to the page.
-  final Map<String, dynamic> data;
+  final Map<String, Object?> data;
 }
 
 class MemoryPageSource extends PageSource {
@@ -135,8 +135,10 @@ class _BuilderPage extends Page {
   Future<Component> render() async {
     await loadData();
     return Builder.single(builder: (context) {
-      if (kGenerateMode && data['page']['sitemap'] != null) {
-        context.setHeader('jaspr-sitemap-data', jsonEncode(data['page']['sitemap']));
+      if (kGenerateMode) {
+        if (namespacedPageData['sitemap'] case final sitemap?) {
+          context.setHeader('jaspr-sitemap-data', jsonEncode(sitemap));
+        }
       }
 
       final child = Builder.single(builder: builder);
