@@ -43,7 +43,7 @@ class Page {
   /// Additional data for the page.
   ///
   /// This may be modified by the different modules during the page building process.
-  Map<String, dynamic> data;
+  Map<String, Object?> data;
 
   /// The configuration for the page.
   ///
@@ -54,7 +54,7 @@ class Page {
   final RouteLoader loader;
 
   /// Applies changes to the page content or data.
-  void apply({String? content, Map<String, dynamic>? data, bool mergeData = true}) {
+  void apply({String? content, Map<String, Object?>? data, bool mergeData = true}) {
     this.content = content ?? this.content;
     if (mergeData && data != null) {
       this.data = this.data.merge(data);
@@ -102,8 +102,10 @@ class Page {
     return AsyncBuilder(builder: (context) async* {
       await renderTemplate(context.pages);
 
-      if (kGenerateMode && data['page']['sitemap'] != null) {
-        context.setHeader('jaspr-sitemap-data', jsonEncode(data['page']['sitemap']));
+      if (kGenerateMode) {
+        if (namespacedPageData['sitemap'] case final sitemap?) {
+          context.setHeader('jaspr-sitemap-data', jsonEncode(sitemap));
+        }
       }
 
       if (InheritedSecondaryOutput.of(context) case final secondaryOutput?) {
@@ -128,6 +130,14 @@ class Page {
     final layout = buildLayout(component);
     return wrapTheme(layout);
   }
+}
+
+extension PageNamespacedData on Page {
+  /// The data specific to this page, namespaced under 'page' in [data].
+  Map<String, Object?> get namespacedPageData => switch (data['page']) {
+        final Map<String, Object?> nestedPageData => nestedPageData,
+        _ => const {},
+      };
 }
 
 /// The configuration for building a page.
@@ -250,7 +260,7 @@ extension PageHandlersExtension on Page {
   void parseFrontmatter() {
     if (config.enableFrontmatter) {
       final document = fm.parse(content);
-      apply(content: document.content, data: {'page': document.data.cast<String, dynamic>()});
+      apply(content: document.content, data: {'page': document.data.cast<String, Object?>()});
     }
   }
 
@@ -271,7 +281,7 @@ extension PageHandlersExtension on Page {
   }
 
   String getContentType() {
-    if (data['content-type'] case final type?) {
+    if (data['content-type'] case final String type) {
       return type;
     }
     if (this.path.endsWith('.html')) {
@@ -312,7 +322,7 @@ extension PageHandlersExtension on Page {
   /// When no key is set or matching, the first provided layout is used.
   /// Returns [child] if no layout is provided.
   Component buildLayout(Component child) {
-    final pageLayout = switch (data['page']?['layout']) {
+    final pageLayout = switch (namespacedPageData['layout']) {
       final String layoutName => config.layouts.where((l) => l.name.matchAsPrefix(layoutName) != null).firstOrNull,
       _ => config.layouts.firstOrNull,
     };
@@ -355,14 +365,14 @@ class _InheritedPage extends InheritedComponent {
   }
 }
 
-extension DataMergeExtension on Map<String, dynamic> {
-  Map<String, dynamic> merge(Map<String, dynamic> other) {
-    var merged = <String, dynamic>{};
+extension DataMergeExtension on Map<String, Object?> {
+  Map<String, Object?> merge(Map<String, Object?> other) {
+    var merged = <String, Object?>{};
     var otherKeys = other.keys.toSet();
     for (var key in keys) {
       if (otherKeys.remove(key)) {
-        if (this[key] is Map<String, dynamic> && other[key] is Map<String, dynamic>) {
-          merged[key] = (this[key] as Map<String, dynamic>).merge(other[key] as Map<String, dynamic>);
+        if (this[key] is Map<String, Object?> && other[key] is Map<String, Object?>) {
+          merged[key] = (this[key] as Map<String, Object?>).merge(other[key] as Map<String, Object?>);
         } else {
           merged[key] = other[key];
         }

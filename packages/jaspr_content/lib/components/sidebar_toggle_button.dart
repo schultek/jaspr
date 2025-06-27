@@ -17,7 +17,7 @@ class SidebarToggleButton extends StatelessComponent {
     }
 
     yield button(classes: 'sidebar-toggle-button', onClick: () {
-      StreamSubscription? closeSub, barrierSub;
+      StreamSubscription<void>? closeSub, barrierSub;
       void close() {
         closeSub?.cancel();
         barrierSub?.cancel();

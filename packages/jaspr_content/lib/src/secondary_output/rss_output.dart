@@ -17,14 +17,18 @@ class _OptOutRSSFilter implements RSSFilter {
   const _OptOutRSSFilter();
 
   @override
-  bool include(Page page) => page.data['page']?['rss'] != false;
+  bool include(Page page) {
+    return page.namespacedPageData['rss'] != false;
+  }
 }
 
 class _OptInRSSFilter implements RSSFilter {
   const _OptInRSSFilter();
 
   @override
-  bool include(Page page) => page.data['page']?['rss'] == true;
+  bool include(Page page) {
+    return page.namespacedPageData['rss'] == true;
+  }
 }
 
 class _CustomRSSFilter implements RSSFilter {
@@ -74,22 +78,23 @@ class RSSOutput extends SecondaryOutput {
   static final rssDateFormat = DateFormat("dd MMM yyyy");
 
   static RSSItem _defaultItemBuilder(Page page) {
-    final pageData = page.data['page'] ?? {};
+    final pageData = page.namespacedPageData;
     return RSSItem(
-      title: pageData['title'] ?? '',
-      description: pageData['description'],
-      pubDate: pageData['publishDate'],
-      author: pageData['author'],
+      title: pageData['title'] as String? ?? '',
+      description: pageData['description'] as String?,
+      pubDate: pageData['publishDate'] as String?,
+      author: pageData['author'] as String?,
     );
   }
 
   String renderRssFeed(Page page, List<Page> pages) {
-    final title = this.title ?? page.data['site']?['title'] ?? '/';
-    final siteUrl = this.siteUrl ?? page.data['site']?['url'] ?? '';
-    final description = this.description ?? page.data['site']?['description'] ?? '/';
-    final language = this.language ?? page.data['site']?['language'] ?? 'en-US';
+    var siteConfig = page.data['site'] as Map<String, Object?>? ?? {};
+    final title = this.title ?? siteConfig['title'] ?? '/';
+    final siteUrl = this.siteUrl ?? siteConfig['url'] ?? '';
+    final description = this.description ?? siteConfig['description'] ?? '/';
+    final language = this.language ?? siteConfig['language'] ?? 'en-US';
 
-    final pubDate = page.data['site']?['publishDate'] ?? rssDateFormat.format(DateTime.now());
+    final pubDate = siteConfig['publishDate'] ?? rssDateFormat.format(DateTime.now());
     final lastBuildDate = rssDateFormat.format(DateTime.now());
 
     final items = <String>[];
