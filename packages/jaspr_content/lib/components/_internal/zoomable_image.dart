@@ -62,18 +62,18 @@ class ZoomableImage extends StatefulComponent {
 class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin {
   static int _dialogCount = 0;
 
-  late final HTMLDialogElement dialog;
-  final GlobalNodeKey<HTMLImageElement> imageKey = GlobalNodeKey();
+  late final HTMLDialogElement _dialog;
+  final GlobalNodeKey<HTMLImageElement> _imageKey = GlobalNodeKey();
 
   StreamSubscription<Event>? _cancelSub;
   StreamSubscription<Event>? _resizeSub;
-  void Function(void Function())? dialogSetState;
+  void Function(void Function())? _dialogSetState;
 
-  bool zoomed = false;
-  bool isResize = false;
+  bool _zoomed = false;
+  bool _isResize = false;
 
-  var sourceOffset = (x: 0.0, y: 0.0, scale: 1.0);
-  var targetOffset = (x: 0.0, y: 0.0, width: 0.0, height: 0.0);
+  var _sourceOffset = (x: 0.0, y: 0.0, scale: 1.0);
+  var _targetOffset = (x: 0.0, y: 0.0, width: 0.0, height: 0.0);
 
   @override
   void initState() {
@@ -81,32 +81,32 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
 
     if (kIsWeb) {
       context.binding.addPostFrameCallback(() {
-        dialog = HTMLDialogElement()
+        _dialog = HTMLDialogElement()
           ..id = 'dzm${_dialogCount++}'
           ..className = 'zoom-modal';
-        window.document.body!.appendChild(dialog);
+        window.document.body!.appendChild(_dialog);
 
-        _cancelSub = EventStreamProviders.cancelEvent.forTarget(dialog).listen((e) {
+        _cancelSub = EventStreamProviders.cancelEvent.forTarget(_dialog).listen((e) {
           e.preventDefault();
           zoomOut();
         });
 
-        updateImageOffset(false);
+        _updateImageOffset(false);
 
         (runApp as dynamic)(StatefulBuilder(builder: (context, setState) {
-          dialogSetState = setState;
+          _dialogSetState = setState;
           return _buildDialog(context);
-        }), attachTo: '#${dialog.id}');
+        }), attachTo: '#${_dialog.id}');
       });
 
       _resizeSub = EventStreamProviders.resizeEvent.forTarget(window).listen((_) {
-        updateImageOffset(true);
+        _updateImageOffset(true);
       });
     }
   }
 
-  void updateImageOffset(bool isResize) {
-    var sourceRect = imageKey.currentNode?.getBoundingClientRect();
+  void _updateImageOffset(bool isResize) {
+    var sourceRect = _imageKey.currentNode?.getBoundingClientRect();
     if (sourceRect == null) return;
 
     var sourceAspect = sourceRect.width / sourceRect.height;
@@ -121,37 +121,37 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
         windowAspect > sourceAspect ? 0.0 : (window.innerHeight - sourceRect.height / sourceScale) / 2;
 
     setState(() {
-      sourceOffset = (x: sourceRect.left, y: sourceRect.top, scale: sourceScale);
-      targetOffset = (
+      _sourceOffset = (x: sourceRect.left, y: sourceRect.top, scale: sourceScale);
+      _targetOffset = (
         x: targetOffsetX,
         y: targetOffsetY,
         width: sourceRect.width / sourceScale,
         height: sourceRect.height / sourceScale
       );
-      this.isResize = isResize;
+      _isResize = isResize;
     });
-    dialogSetState?.call(() {});
+    _dialogSetState?.call(() {});
   }
 
   void zoomIn() {
-    updateImageOffset(false);
+    _updateImageOffset(false);
 
     setState(() {
-      zoomed = true;
+      _zoomed = true;
     });
-    dialogSetState?.call(() {});
+    _dialogSetState?.call(() {});
     document.body!.style.overflow = 'hidden';
-    dialog.showModal();
+    _dialog.showModal();
   }
 
   void zoomOut() async {
     setState(() {
-      zoomed = false;
+      _zoomed = false;
     });
-    dialogSetState?.call(() {});
+    _dialogSetState?.call(() {});
     await Future.delayed(Duration(milliseconds: 300));
-    if (zoomed) return;
-    dialog.close();
+    if (_zoomed) return;
+    _dialog.close();
     document.body!.style.overflow = 'auto';
   }
 
@@ -159,7 +159,7 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
   void dispose() {
     _cancelSub?.cancel();
     _resizeSub?.cancel();
-    dialog.remove();
+    _dialog.remove();
     super.dispose();
   }
 
@@ -167,15 +167,15 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
   Iterable<Component> build(BuildContext context) sync* {
     yield DomComponent(tag: 'figure', classes: 'image zoomable', children: [
       img(
-        key: imageKey,
+        key: _imageKey,
         src: component.src,
         alt: component.alt ?? component.caption,
-        styles: zoomed ? Styles(visibility: Visibility.hidden) : null,
+        styles: _zoomed ? Styles(visibility: Visibility.hidden) : null,
         events: events(onClick: () {
           zoomIn();
         }),
       ),
-      if (component.caption != null) DomComponent(tag: 'figcaption', children: [text(component.caption!)]),
+      if (component.caption case final caption?) DomComponent(tag: 'figcaption', children: [text(caption)]),
     ]);
   }
 
@@ -192,22 +192,22 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
         src: component.src,
         alt: component.alt ?? component.caption,
         styles: Styles(
-          position: Position.absolute(top: sourceOffset.y.px, left: sourceOffset.x.px),
-          width: targetOffset.width.px,
-          height: targetOffset.height.px,
-          transform: Transform.combine(zoomed
+          position: Position.absolute(top: _sourceOffset.y.px, left: _sourceOffset.x.px),
+          width: _targetOffset.width.px,
+          height: _targetOffset.height.px,
+          transform: Transform.combine(_zoomed
               ? [
                   Transform.translate(
-                    x: (-sourceOffset.x + targetOffset.x).px,
-                    y: (-sourceOffset.y + targetOffset.y).px,
+                    x: (-_sourceOffset.x + _targetOffset.x).px,
+                    y: (-_sourceOffset.y + _targetOffset.y).px,
                   ),
                   Transform.scale(1),
                 ]
               : [
                   Transform.translate(x: 0.px, y: 0.px),
-                  Transform.scale(sourceOffset.scale),
+                  Transform.scale(_sourceOffset.scale),
                 ]),
-          raw: {if (isResize) 'transition': 'none'},
+          raw: {if (_isResize) 'transition': 'none'},
         ),
       ),
     ]);

@@ -32,7 +32,7 @@ class Sidebar extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    var currentRoute = context.page.url;
+    final currentRoute = context.page.url;
 
     yield Document.head(children: [
       Style(styles: _styles),

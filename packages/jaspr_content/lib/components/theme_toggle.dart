@@ -9,18 +9,36 @@ class ThemeToggle extends StatefulComponent {
   const ThemeToggle({super.key});
 
   @override
-  State createState() => ThemeToggleState();
+  State<ThemeToggle> createState() => _ThemeToggleState();
+
+  @css
+  static final List<StyleRule> styles = [
+    css('.theme-toggle', [
+      css('&').styles(
+        display: Display.flex,
+        padding: Padding.all(.7.rem),
+        border: Border.unset,
+        radius: BorderRadius.circular(8.px),
+        outline: Outline.unset,
+        alignItems: AlignItems.center,
+        backgroundColor: Colors.transparent,
+      ),
+      css('&:hover').styles(
+        backgroundColor: Color('color-mix(in srgb, currentColor 5%, transparent)'),
+      ),
+    ]),
+  ];
 }
 
-class ThemeToggleState extends State<ThemeToggle> {
-  bool isDark = false;
+class _ThemeToggleState extends State<ThemeToggle> {
+  bool _isDark = false;
 
   @override
   void initState() {
     super.initState();
 
     if (!kIsWeb) return;
-    isDark = web.document.documentElement!.getAttribute('data-theme') == 'dark';
+    _isDark = web.document.documentElement!.getAttribute('data-theme') == 'dark';
   }
 
   @override
@@ -44,7 +62,7 @@ class ThemeToggleState extends State<ThemeToggle> {
     }
 
     if (kIsWeb) {
-      yield Document.html(attributes: {'data-theme': isDark ? 'dark' : 'light'});
+      yield Document.html(attributes: {'data-theme': _isDark ? 'dark' : 'light'});
     }
 
     yield button(
@@ -52,33 +70,15 @@ class ThemeToggleState extends State<ThemeToggle> {
       attributes: {'aria-label': 'Theme Toggle'},
       onClick: () {
         setState(() {
-          isDark = !isDark;
+          _isDark = !_isDark;
         });
-        web.window.localStorage.setItem('jaspr:theme', isDark ? 'dark' : 'light');
+        web.window.localStorage.setItem('jaspr:theme', _isDark ? 'dark' : 'light');
       },
       styles: !kIsWeb ? Styles(visibility: Visibility.hidden) : null,
       [
-        span(styles: Styles(display: isDark ? Display.none : null), [MoonIcon(size: 20)]),
-        span(styles: Styles(display: isDark ? null : Display.none), [SunIcon(size: 20)]),
+        span(styles: Styles(display: _isDark ? Display.none : null), [MoonIcon(size: 20)]),
+        span(styles: Styles(display: _isDark ? null : Display.none), [SunIcon(size: 20)]),
       ],
     );
   }
-
-  @css
-  static final List<StyleRule> styles = [
-    css('.theme-toggle', [
-      css('&').styles(
-        display: Display.flex,
-        padding: Padding.all(.7.rem),
-        border: Border.unset,
-        radius: BorderRadius.circular(8.px),
-        outline: Outline.unset,
-        alignItems: AlignItems.center,
-        backgroundColor: Colors.transparent,
-      ),
-      css('&:hover').styles(
-        backgroundColor: Color('color-mix(in srgb, currentColor 5%, transparent)'),
-      ),
-    ]),
-  ];
 }

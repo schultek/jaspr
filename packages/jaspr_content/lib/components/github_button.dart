@@ -14,63 +14,7 @@ class GithubButton extends StatefulComponent {
   final String repo;
 
   @override
-  State createState() => GithubButtonState();
-}
-
-class GithubButtonState extends State<GithubButton> with PreloadStateMixin<GithubButton> {
-  int? stars;
-  int? forks;
-
-  bool get loaded => stars != null;
-
-  @override
-  Future<void> preloadState() async {
-    if (!kGenerateMode && kReleaseMode) {
-      await loadRepositoryData();
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (kIsWeb) {
-      loadRepositoryData().then((_) {
-        setState(() {});
-      });
-    }
-  }
-
-  Future<void> loadRepositoryData() async {
-    final response = await http.get(Uri.parse('https://api.github.com/repos/${component.repo}'));
-    if (response.statusCode != 200) {
-      return;
-    }
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    final {"stargazers_count": int stars, "forks_count": int forks} = data;
-
-    this.stars = stars;
-    this.forks = forks;
-  }
-
-  @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield a(href: 'https://github.com/${component.repo}', target: Target.blank, classes: 'github-button not-content', [
-      div(classes: 'github-icon', [
-        GithubIcon(),
-      ]),
-      div(classes: 'github-info', [
-        span([text('schultek/jaspr')]),
-        span([
-          text('★'),
-          span(styles: !loaded ? Styles(opacity: 0) : null, [text('${stars ?? 9999}')]),
-          span([]),
-          text('⑂'),
-          span(styles: !loaded ? Styles(opacity: 0) : null, [text('${forks ?? 99}')])
-        ])
-      ])
-    ]);
-  }
+  State<GithubButton> createState() => _GithubButtonState();
 
   @css
   static List<StyleRule> get styles => [
@@ -123,7 +67,65 @@ class GithubButtonState extends State<GithubButton> with PreloadStateMixin<Githu
       ];
 }
 
+class _GithubButtonState extends State<GithubButton> with PreloadStateMixin<GithubButton> {
+  int? _stars;
+  int? _forks;
+
+  bool get _loaded => _stars != null;
+
+  @override
+  Future<void> preloadState() async {
+    if (!kGenerateMode && kReleaseMode) {
+      await _loadRepositoryData();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (kIsWeb) {
+      _loadRepositoryData().then((_) {
+        setState(() {});
+      });
+    }
+  }
+
+  Future<void> _loadRepositoryData() async {
+    final response = await http.get(Uri.parse('https://api.github.com/repos/${component.repo}'));
+    if (response.statusCode != 200) {
+      return;
+    }
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    final {"stargazers_count": int stars, "forks_count": int forks} = data;
+
+    _stars = stars;
+    _forks = forks;
+  }
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield a(href: 'https://github.com/${component.repo}', target: Target.blank, classes: 'github-button not-content', [
+      div(classes: 'github-icon', [
+        const GithubIcon(),
+      ]),
+      div(classes: 'github-info', [
+        span([text(component.repo)]),
+        span([
+          text('★'),
+          span(styles: !_loaded ? Styles(opacity: 0) : null, [text('${_stars ?? 9999}')]),
+          span([]),
+          text('⑂'),
+          span(styles: !_loaded ? Styles(opacity: 0) : null, [text('${_forks ?? 99}')])
+        ])
+      ])
+    ]);
+  }
+}
+
 class GithubIcon extends StatelessComponent {
+  const GithubIcon();
+
   @override
   Iterable<Component> build(BuildContext context) sync* {
     yield svg(viewBox: '0 0 24 24', attributes: {

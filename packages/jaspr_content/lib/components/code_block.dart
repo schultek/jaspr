@@ -45,8 +45,9 @@ class CodeBlock implements CustomComponent {
         case ElementNode(tag: 'Code' || 'CodeBlock', :final children, :final attributes) ||
             ElementNode(tag: 'pre', children: [ElementNode(tag: 'code', :final children, :final attributes)])) {
       var language = attributes['language'];
-      if (language == null && (attributes['class']?.startsWith('language-') ?? false)) {
-        language = attributes['class']!.substring('language-'.length);
+      var existingClasses = attributes['class'];
+      if (language == null && (existingClasses != null && existingClasses.startsWith('language-'))) {
+        language = existingClasses.substring('language-'.length);
       }
 
       if (!_initialized) {
@@ -90,7 +91,7 @@ class CodeBlock implements CustomComponent {
 }
 
 /// A code block component with syntax highlighting.
-class _CodeBlock extends StatelessComponent {
+final class _CodeBlock extends StatelessComponent {
   const _CodeBlock({
     required this.source,
     this.highlighter,
@@ -105,15 +106,15 @@ class _CodeBlock extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    final codeblock = pre([
+    final codeBlock = pre([
       code([
-        if (highlighter != null) buildSpan(highlighter!.highlight(source)) else text(source),
+        if (highlighter case final highlighter?) buildSpan(highlighter.highlight(source)) else text(source),
       ])
     ]);
 
     yield div(classes: 'code-block', [
-      CodeBlockCopyButton(),
-      codeblock,
+      const CodeBlockCopyButton(),
+      codeBlock,
     ]);
   }
 
@@ -134,7 +135,7 @@ class _CodeBlock extends StatelessComponent {
     }
 
     return span(styles: styles, [
-      if (textSpan.text != null) text(textSpan.text!),
+      if (textSpan.text case final textSpanText?) text(textSpanText),
       for (final t in textSpan.children) buildSpan(t),
     ]);
   }

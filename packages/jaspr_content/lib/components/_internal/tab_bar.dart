@@ -41,12 +41,12 @@ class TabBar extends StatefulComponent {
 }
 
 class _TabBarState extends State<TabBar> {
-  late String value;
+  String? _value;
 
   @override
   void initState() {
     super.initState();
-    value = component.initialValue;
+    _value = component.initialValue;
   }
 
   @override
@@ -54,20 +54,20 @@ class _TabBarState extends State<TabBar> {
     yield div(classes: 'tab-bar', [
       for (var item in component.items.entries)
         button(attributes: {
-          if (item.key == value) 'active': ''
+          if (item.key == _value) 'active': ''
         }, events: {
           'click': (e) {
             setState(() {
-              value = item.key;
+              _value = item.key;
             });
 
             final target = e.currentTarget as web.Element;
 
             final currentTabView = target.parentElement?.nextElementSibling?.querySelector('div[active]');
-            final nexttabView = target.parentElement?.nextElementSibling?.querySelector('div[data-tab="${item.key}"]');
+            final nextTabView = target.parentElement?.nextElementSibling?.querySelector('div[data-tab="${item.key}"]');
 
             currentTabView?.removeAttribute('active');
-            nexttabView?.setAttribute('active', '');
+            nextTabView?.setAttribute('active', '');
           }
         }, [
           text(item.value)

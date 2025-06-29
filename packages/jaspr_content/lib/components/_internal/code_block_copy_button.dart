@@ -16,7 +16,7 @@ class CodeBlockCopyButton extends StatefulComponent {
 }
 
 class _CodeBlockCopyButtonState extends State<CodeBlockCopyButton> {
-  bool copied = false;
+  bool _copied = false;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -29,16 +29,16 @@ class _CodeBlockCopyButtonState extends State<CodeBlockCopyButton> {
         }
         web.window.navigator.clipboard.writeText(content);
         setState(() {
-          copied = true;
+          _copied = true;
         });
         Timer(const Duration(seconds: 2), () {
           setState(() {
-            copied = false;
+            _copied = false;
           });
         });
       }
     }, [
-      copied ? CheckIcon(size: 18) : CopyIcon(size: 18),
+      _copied ? CheckIcon(size: 18) : CopyIcon(size: 18),
     ]);
   }
 }
