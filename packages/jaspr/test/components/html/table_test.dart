@@ -24,7 +24,7 @@ void main() {
             td([text("30")]),
           ]),
           tr([
-            col(span: 2, []),
+            col(span: 2),
             colgroup(span: 2, []),
           ])
         ]),

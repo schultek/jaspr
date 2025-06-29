@@ -25,7 +25,6 @@ void main() {
         type: InputType.checkbox,
         onInput: (value) => checkedInput = value,
         onChange: (value) => checkedChange = value,
-        [],
       ));
 
       await tester.input(find.tag('input'), checked: true);
@@ -43,7 +42,6 @@ void main() {
         type: InputType.number,
         onInput: (value) => numberInput = value,
         onChange: (value) => numberChange = value,
-        [],
       ));
 
       await tester.input(find.tag('input'), valueAsNumber: 2.0);
@@ -61,7 +59,6 @@ void main() {
         type: InputType.text,
         onInput: (value) => textInput = value,
         onChange: (value) => textChange = value,
-        [],
       ));
 
       await tester.input(find.tag('input'), value: "Hello");

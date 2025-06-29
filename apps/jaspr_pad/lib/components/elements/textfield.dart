@@ -34,7 +34,6 @@ class TextFieldState extends State<TextField> {
           attributes: {if (component.placeholder != null) 'placeholder': component.placeholder!},
           events: {'input': (e) => component.onChange?.call((e.target as html.InputElementOrStubbed).value!)},
           classes: 'mdc-text-field__input',
-          [],
         ),
       ]),
     );

@@ -624,6 +624,7 @@
     },
     "input": {
       "doc": "The &lt;input&gt; HTML element is used to create interactive controls for web-based forms in order to accept data from the user; a wide variety of types of input data and control widgets are available, depending on the device and user agent. The &lt;input&gt; element is one of the most powerful and complex in all of HTML due to the sheer number of combinations of input types and attributes.",
+      "self_closing": true,
       "attributes": {
         "type": {
           "doc": "Defines how an &lt;input&gt; works. If this attribute is not specified, the default type adopted is text.",
@@ -1273,6 +1274,7 @@
     },
     "col": {
       "doc": "The &lt;col&gt; HTML element defines one or more columns in a column group represented by its parent &lt;colgroup&gt; element. The &lt;col&gt; element is only valid as a child of a &lt;colgroup&gt; element that has no span attribute defined.",
+      "self_closing": true,
       "attributes": {
         "span": {
           "doc": "Specifies the number of consecutive columns the &lt;col&gt; element spans. The value must be a positive integer greater than zero. If not present, its default value is 1.",

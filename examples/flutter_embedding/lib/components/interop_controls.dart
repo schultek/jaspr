@@ -29,7 +29,12 @@ class _InteropControlsState extends State<InteropControls> {
       ]),
       label(htmlFor: 'value', classes: state.currentScreen != DemoScreen.counter ? 'disabled' : null, [
         text('Value'),
-        input(id: 'value', value: state.count.toString(), type: InputType.text, attributes: {'readonly': ''}, []),
+        input(
+          id: 'value',
+          value: state.count.toString(),
+          type: InputType.text,
+          attributes: {'readonly': ''},
+        ),
       ]),
       input(
         id: 'increment',
@@ -39,7 +44,6 @@ class _InteropControlsState extends State<InteropControls> {
         events: events(onClick: () {
           context.read(appStateProvider.notifier).increment();
         }),
-        [],
       ),
     ]);
   }
