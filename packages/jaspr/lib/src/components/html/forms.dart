@@ -148,7 +148,7 @@ enum AutoComplete {
 /// - [disabled]: Indicates that the user should not be able to interact with the input. Disabled inputs are typically rendered with a dimmer color or using some other form of indication that the field is not available for use.
 /// - [onInput]: Callback for the 'input' event. The type of [value] depends on [type].
 /// - [onChange]: Callback for the 'change' event. The type of [value] depends on [type].
-Component input(List<Component> children,
+Component input(
     {InputType? type,
     String? name,
     String? value,
@@ -178,7 +178,6 @@ Component input(List<Component> children,
       ...?events,
       ..._events(onInput: onInput, onChange: onChange),
     },
-    children: children,
   );
 }
 
