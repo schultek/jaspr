@@ -1,4 +1,3 @@
-import 'package:html/parser.dart' as html;
 // ignore: implementation_imports
 import 'package:html/src/token.dart' as html;
 // ignore: implementation_imports
@@ -7,7 +6,6 @@ import 'package:jaspr/jaspr.dart';
 import 'package:markdown/markdown.dart' as md;
 
 import '../page.dart';
-import 'html_parser.dart';
 import 'page_parser.dart';
 
 md.Document _defaultDocumentBuilder(Page _) {
@@ -49,7 +47,7 @@ class MarkdownParser implements PageParser {
     final nodes = <Node>[];
     for (final node in markdownNodes) {
       if (node is md.Text) {
-        nodes.addAll(HtmlParser.buildNodes(html.parseFragment(node.text).nodes));
+        nodes.add(TextNode(node.text));
       } else if (node is md.Element) {
         final children = _buildNodes(node.children ?? []);
         nodes.add(ElementNode(
@@ -57,6 +55,8 @@ class MarkdownParser implements PageParser {
           {if (node.generatedId != null) 'id': node.generatedId!, ...node.attributes},
           children,
         ));
+      } else if (node is Comment) {
+        nodes.add(TextNode('<!--${node.text.text}-->', raw: true));
       }
     }
     return nodes;
@@ -92,10 +92,14 @@ class CustomHtmlSyntax extends md.BlockSyntax {
         while (tokenizer.moveNext()) {
           final token = tokenizer.current;
           if (token.kind == html.TokenKind.parseError) {
-            if (["unexpected-EOF-after-attribute-value", "expected-attribute-name-but-got-eof"]
-                .contains((token as html.ParseErrorToken).data)) {
+            final error = (token as html.ParseErrorToken).data;
+            if (error case 'unexpected-EOF-after-attribute-value' || 'expected-attribute-name-but-got-eof') {
               incompleteTag = content;
               continue outer; // Incomplete tag, continue to next line
+            } else if (error == 'expected-tag-name-but-got-question-mark') {
+              // This error happens with processing instructions like <?some-instruction ... ?>
+              // We can safely ignore it, since the next token will be a comment containing the instruction.
+              continue;
             } else {
               throw AssertionError('Unexpected parse error: ${token.data}');
             }
@@ -157,7 +161,8 @@ class CustomHtmlSyntax extends md.BlockSyntax {
         final attributes = token.data.map((k, v) => MapEntry(k.toString(), v));
         final element = md.Element(tag, [])..attributes.addAll(attributes);
         currentChildren.add(element);
-        if (!token.selfClosing) {
+        final selfClosing = token.selfClosing || _validator.isSelfClosing(token.name ?? '');
+        if (!selfClosing) {
           stack.add(element);
           currentChildren = element.children!;
         }
@@ -168,8 +173,14 @@ class CustomHtmlSyntax extends md.BlockSyntax {
         }
         stack.removeLast();
         currentChildren = stack.last.children!;
-      } else if (token.kind == html.TokenKind.comment || token.kind == html.TokenKind.doctype) {
-        // Ignore comments and doctype tokens.
+      } else if (token.kind == html.TokenKind.comment) {
+        var data = (token as html.CommentToken).data;
+        if (data.startsWith('?') && data.endsWith('?')) {
+          data = data.substring(1, data.length - 1);
+        }
+        currentChildren.add(Comment(md.Text(data)));
+      } else if (token.kind == html.TokenKind.doctype) {
+        // Ignore doctype tokens.
         continue;
       }
     }
@@ -180,4 +191,19 @@ class CustomHtmlSyntax extends md.BlockSyntax {
 
     return root;
   }
+}
+
+class Comment extends md.Node {
+  Comment(this.text);
+
+  /// The comment text.
+  final md.Text text;
+
+  @override
+  void accept(md.NodeVisitor visitor) {
+    text.accept(visitor);
+  }
+
+  @override
+  String get textContent => text.textContent;
 }

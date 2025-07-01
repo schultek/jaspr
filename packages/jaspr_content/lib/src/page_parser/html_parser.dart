@@ -31,6 +31,8 @@ class HtmlParser implements PageParser {
       } else if (node is html.Element) {
         final children = buildNodes(node.nodes);
         nodes.add(ElementNode(node.localName ?? '', node.attributes.cast(), children));
+      } else if (node is html.Comment) {
+        nodes.add(TextNode('<!--${node.data}-->', raw: true));
       }
     }
     return nodes;
