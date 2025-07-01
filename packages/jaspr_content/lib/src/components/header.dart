@@ -22,7 +22,7 @@ class Header extends StatelessComponent {
     ]);
 
     yield header(classes: 'header', [
-      SidebarToggleButton(),
+      const SidebarToggleButton(),
       a(classes: 'header-title', href: '/', [
         img(src: logo, alt: 'Logo'),
         span([text(title)]),
