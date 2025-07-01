@@ -33,7 +33,7 @@ abstract class DataLoader {
 }
 
 extension on yaml.YamlNode {
-  Object normalize() {
+  Object? normalize() {
     if (this case yaml.YamlMap(:final nodes)) {
       return {
         for (final entry in nodes.entries) entry.key.toString(): entry.value.normalize(),
@@ -43,7 +43,7 @@ extension on yaml.YamlNode {
         for (final node in nodes) node.normalize(),
       ];
     } else {
-      return value;
+      return value as Object?;
     }
   }
 }

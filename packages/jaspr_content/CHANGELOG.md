@@ -5,6 +5,8 @@
 - Require Dart 3.6 or later to match the other Jaspr packages.
 - Renamed the `GithubButton` component to `GitHubButton`.
 - Fixed `GitHubButton` not linking to the correct repository.
+- Add a `namespacedPageData` extension to `Page` to access `page.data['page']`.
+- Switch the type of data in `Page` from `Map<String, dynamic` to `Map<String, Object?>`.
 
 ## 0.2.0
 

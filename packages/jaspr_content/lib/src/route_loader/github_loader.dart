@@ -39,7 +39,7 @@ class GithubLoader extends RouteLoaderBase {
   /// For public repositories you may quickly hit rate limits without an access token.
   final String? accessToken;
 
-  Future<List<dynamic>> _loadTree() async {
+  Future<List<Object?>> _loadTree() async {
     var response = await http.get(
       Uri.parse('https://api.github.com/repos/$repo/git/trees/$ref?recursive=true'),
       headers: {
@@ -51,7 +51,8 @@ class GithubLoader extends RouteLoaderBase {
     if (response.statusCode != 200) {
       throw Exception('Failed to load tree: ${response.statusCode} - ${response.body}');
     }
-    var files = jsonDecode(response.body)['tree'] as List;
+    var decodedJson = jsonDecode(response.body) as Map<String, Object?>;
+    var files = decodedJson['tree'] as List<Object?>;
     return files;
   }
 
@@ -65,18 +66,18 @@ class GithubLoader extends RouteLoaderBase {
 
     List<PageSource> routes = [];
 
-    for (final file in files) {
+    for (final file in files.cast<Map<String, Object?>>()) {
       if (file['type'] != 'blob') continue;
-      var path = file['path'];
+      var path = file['path'] as String;
 
-      if (!file['path'].startsWith(root)) continue;
+      if (!path.startsWith(root)) continue;
       path = path.substring(root.length);
       if (path.startsWith('/')) path = path.substring(1);
       if (path.isEmpty) continue;
 
       routes.add(GithubPageSource(
         path,
-        file['url'],
+        file['url'] as String,
         this,
         accessToken: accessToken,
         keepSuffix: keepSuffixPattern?.matchAsPrefix(path) != null,

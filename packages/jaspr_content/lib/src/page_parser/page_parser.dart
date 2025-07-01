@@ -100,7 +100,7 @@ abstract mixin class CustomComponentBase implements CustomComponent {
   @override
   Component? create(Node node, NodesBuilder builder) {
     if (node is ElementNode && pattern.matchAsPrefix(node.tag) != null) {
-      return apply(node.tag, node.attributes, node.children != null ? builder.build(node.children!) : null);
+      return apply(node.tag, node.attributes, node.children != null ? builder.build(node.children) : null);
     }
     return null;
   }
@@ -160,7 +160,7 @@ class NodesBuilder {
         result.add(DomComponent(
           tag: node.tag,
           attributes: node.attributes,
-          child: node.children != null ? build(node.children!) : null,
+          child: node.children != null ? build(node.children) : null,
         ));
       } else if (node is ComponentNode) {
         result.add(node.component);

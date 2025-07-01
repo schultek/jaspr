@@ -36,8 +36,8 @@ abstract class PageLayoutBase implements PageLayout {
 
   @mustCallSuper
   Iterable<Component> buildHead(Page page) sync* {
-    final pageData = page.data['page'] ?? {};
-    final siteData = page.data['site'] ?? {};
+    final pageData = page.namespacedPageData;
+    final siteData = page.data['site'] as Map<String, Object?>? ?? {};
 
     final pageTitle = pageData['title'] ?? siteData['title'];
     final pageTitleBase = pageData['titleBase'] ?? siteData['titleBase'];
@@ -56,8 +56,8 @@ abstract class PageLayoutBase implements PageLayout {
     final image = pageData['image'];
     final metaData = pageData['meta'];
 
-    if (favicon != null) {
-      yield link(rel: 'icon', type: 'image/png', href: favicon!);
+    if (favicon case final String faviconHref) {
+      yield link(rel: 'icon', type: 'image/png', href: faviconHref);
     }
 
     yield DomComponent(tag: 'title', child: text(title));
@@ -69,9 +69,9 @@ abstract class PageLayoutBase implements PageLayout {
     if (keywords case final keys?) {
       yield meta(name: 'keywords', content: keys is List ? keys.join(', ') : keys.toString());
     }
-    if (metaData case Map metaData?) {
-      for (final key in metaData.keys) {
-        yield meta(name: key, content: metaData[key]);
+    if (metaData case Map<String, Object?> metaData?) {
+      for (final MapEntry(key: name, value: content) in metaData.entries) {
+        yield meta(name: name, content: content as String?);
       }
     }
 
@@ -81,9 +81,9 @@ abstract class PageLayoutBase implements PageLayout {
     if (image case final img?) {
       yield meta(attributes: {'property': 'og:image'}, content: img.toString());
     }
-    if (metaData case List metaData?) {
+    if (metaData case List<Object?> metaData?) {
       for (final item in metaData) {
-        if (item is Map) {
+        if (item is Map<Object?, Object?>) {
           yield meta(attributes: item.cast());
         }
       }
