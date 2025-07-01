@@ -7,14 +7,14 @@ import 'package:website/constants/theme.dart';
 
 import 'icon.dart';
 
-class GithubButton extends StatefulComponent {
-  const GithubButton({super.key});
+class GitHubButton extends StatefulComponent {
+  const GitHubButton({super.key});
 
   @override
-  State createState() => GithubButtonState();
+  State createState() => GitHubButtonState();
 }
 
-class GithubButtonState extends State<GithubButton> {
+class GitHubButtonState extends State<GitHubButton> {
   bool loaded = false;
 
   int stars = 9999;

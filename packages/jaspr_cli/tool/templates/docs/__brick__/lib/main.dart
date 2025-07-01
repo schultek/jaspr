@@ -64,7 +64,7 @@ void main() {
             // Enables switching between light and dark mode.
             ThemeToggle(),
             // Shows github stats.
-            GithubButton(repo: 'schultek/jaspr'),
+            GitHubButton(repo: 'schultek/jaspr'),
           ],
         ),
         sidebar: Sidebar(groups: [

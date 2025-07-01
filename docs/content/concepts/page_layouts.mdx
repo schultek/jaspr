@@ -196,7 +196,7 @@ BlogLayout(
       Link(text: 'Home', href: '/'),
       Link(text: 'Articles', href: '/articles'),
       ThemeToggle(), // Described below
-      GithubButton(repo: '<user>/<repo>'), // Described below
+      GitHubButton(repo: '<user>/<repo>'), // Described below
     ],
   )
 )
@@ -237,15 +237,15 @@ div(attributes: {'data-has-sidebar': ''}, [
 ])
 ```
 
-### GithubButton
+### GitHubButton
 
-The `GithubButton` component can be used to display a link to a GitHub repository including its number of stars and forks.
+The `GitHubButton` component can be used to display a link to a GitHub repository including its number of stars and forks.
 
 ```dart
-GithubButton(repo: '<user>/<repo>')
+GitHubButton(repo: '<user>/<repo>')
 ```
 
-![GithubButton Screenshot](/content/assets/github_button.png)
+![GitHubButton Screenshot](/content/assets/github_button.png)
 
 ### ThemeToggle
 

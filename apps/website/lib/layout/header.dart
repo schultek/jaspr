@@ -69,7 +69,7 @@ class HeaderState extends State<Header> {
               target: Target.blank,
               ariaLabel: 'Join Discord'),
         ]),
-        GithubButton(),
+        GitHubButton(),
       ]),
     ]);
 
