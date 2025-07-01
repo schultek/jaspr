@@ -34,6 +34,7 @@ const allHtmlTags = {
   'span',
   'strong',
   'u',
+  'wbr',
   'audio',
   'img',
   'video',
@@ -77,5 +78,5 @@ const allHtmlTags = {
   'tr',
   'td',
   'col',
-  'colgroup'
+  'colgroup',
 };

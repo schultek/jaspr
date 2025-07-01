@@ -2,6 +2,7 @@
 
 - Added support for disabling the sitemap generation for specific pages of `jaspr_content` sites.
 - Moved `DomValidator` class to foundation library.
+- Added the `wbr` function for creating a line-break opportunity element.
 
 ## 0.19.1
 
