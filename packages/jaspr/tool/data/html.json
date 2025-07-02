@@ -209,6 +209,10 @@
     },
     "u": {
       "doc": "The &lt;u&gt; HTML element represents a span of inline text which should be rendered in a way that indicates that it has a non-textual annotation. This is rendered by default as a simple solid underline, but may be altered using CSS."
+    },
+    "wbr": {
+      "doc": "The &lt;wbr&gt; HTML element represents a word break opportunity—a position within text where the browser may optionally break a line, though its line-breaking rules would not otherwise create a break at that location.",
+      "self_closing": true
     }
   },
   "media": {

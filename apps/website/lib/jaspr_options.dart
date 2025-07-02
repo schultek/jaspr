@@ -80,7 +80,7 @@ JasprOptions get defaultJasprOptions => JasprOptions(
       styles: () => [
         ...prefix0.CodeBlock.styles,
         ...prefix1.CodeWindow.styles,
-        ...prefix2.GithubButtonState.styles,
+        ...prefix2.GitHubButtonState.styles,
         ...prefix3.GradientBorder.styles,
         ...prefix4.Icon.styles,
         ...prefix5.LinkButton.styles,

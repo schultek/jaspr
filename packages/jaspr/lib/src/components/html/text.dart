@@ -273,3 +273,22 @@ Component u(List<Component> children,
     children: children,
   );
 }
+
+/// The &lt;wbr&gt; HTML element represents a word break opportunity—a position within text where the browser may optionally break a line, though its line-breaking rules would not otherwise create a break at that location.
+Component wbr(
+    {Key? key,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
+  return DomComponent(
+    tag: 'wbr',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: attributes,
+    events: events,
+  );
+}
