@@ -59,7 +59,7 @@ class ElementNode extends Node {
 
   @override
   String toString() {
-    return 'ElementNode(tag: $tag, attributes: $attributes, children: ${children})';
+    return 'ElementNode(tag: $tag, attributes: $attributes, children: $children)';
   }
 }
 
