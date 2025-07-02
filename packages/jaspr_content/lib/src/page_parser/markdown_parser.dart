@@ -1,3 +1,4 @@
+import 'package:html/parser.dart' as html;
 // ignore: implementation_imports
 import 'package:html/src/token.dart' as html;
 // ignore: implementation_imports
@@ -6,6 +7,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:markdown/markdown.dart' as md;
 
 import '../page.dart';
+import 'html_parser.dart';
 import 'page_parser.dart';
 
 md.Document _defaultDocumentBuilder(Page _) {
@@ -47,7 +49,7 @@ class MarkdownParser implements PageParser {
     final nodes = <Node>[];
     for (final node in markdownNodes) {
       if (node is md.Text) {
-        nodes.add(TextNode(node.text));
+        nodes.addAll(HtmlParser.buildNodes(html.parseFragment(node.text).nodes));
       } else if (node is md.Element) {
         final children = _buildNodes(node.children ?? []);
         nodes.add(ElementNode(

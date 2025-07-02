@@ -44,6 +44,9 @@ class TextNode extends Node {
 
   final String text;
   final bool raw;
+
+  @override
+  String toString() => 'TextNode(text: $text, raw: $raw)';
 }
 
 /// A node that represents an element with a tag, attributes and children.
@@ -53,6 +56,11 @@ class ElementNode extends Node {
   final String tag;
   final Map<String, String> attributes;
   final List<Node>? children;
+
+  @override
+  String toString() {
+    return 'ElementNode(tag: $tag, attributes: $attributes, children: ${children})';
+  }
 }
 
 /// A node that represents a component.
