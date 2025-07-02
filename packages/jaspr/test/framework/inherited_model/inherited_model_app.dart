@@ -22,10 +22,7 @@ class App extends TestComponent<MyDto> {
           initialValue: MyDto(a: 0, b: 0),
         );
 
-  final child = DomComponent(
-    tag: 'div',
-    child: ExampleComponent(),
-  );
+  final child = div([ExampleComponent()]);
 
   static final componentKey = Key('App');
 

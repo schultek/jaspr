@@ -16,10 +16,7 @@ class ObserverParam {
 class App extends TestComponent<ObserverParam> {
   App(ObserverParam param) : super(initialValue: param);
 
-  final child = DomComponent(
-    tag: 'div',
-    child: MyChildComponent(value: false),
-  );
+  final child = div([MyChildComponent(value: false)]);
 
   @override
   Iterable<Component> build(BuildContext context, ObserverParam value) sync* {
@@ -28,10 +25,7 @@ class App extends TestComponent<ObserverParam> {
       child: value.renderBoth
           ? MyObserverComponent(
               value: value,
-              child: DomComponent(
-                tag: 'div',
-                child: MyChildComponent(value: true),
-              ),
+              child: div([MyChildComponent(value: true)]),
             )
           : child,
     );

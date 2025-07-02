@@ -27,9 +27,7 @@ class ThemeToggleState extends State<ThemeToggle> {
   Iterable<Component> build(BuildContext context) sync* {
     if (!kIsWeb) {
       yield Document.head(children: [
-        // ignore: prefer_html_methods
-        DomComponent(id: 'theme-script', tag: 'script', children: [
-          raw('''
+        script(id: 'theme-script', content: '''
           let userTheme = window.localStorage.getItem('jaspr:theme');
           if (userTheme != null) {
             document.documentElement.setAttribute('data-theme', userTheme);
@@ -38,8 +36,7 @@ class ThemeToggleState extends State<ThemeToggle> {
           } else {
             document.documentElement.setAttribute('data-theme', 'light');
           }
-        ''')
-        ]),
+        '''),
       ]);
     }
 
