@@ -91,7 +91,6 @@ class SearchBarState extends State<SearchBar> {
         onInput: (value) {
           setState(() => search = value);
         },
-        [],
       ),
       button(
         onClick: () {

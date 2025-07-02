@@ -1,7 +1,10 @@
 ## Unreleased patch
 
-- Added support for disabling the sitemap generation for specific pages of `jaspr_content` sites.
+- **Breaking**: Removed the positional children parameter from `input` and `col` as
+  they are void elements and shouldn't be passed children.
+  
 - Added the `wbr` function for creating a line-break opportunity element.
+- Added support for disabling the sitemap generation for specific pages of `jaspr_content` sites.
 
 ## 0.19.1
 
