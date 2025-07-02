@@ -156,10 +156,12 @@ Component link(
 ///
 ///   This attribute allows the elimination of parser-blocking JavaScript where the browser would have to load and evaluate scripts before continuing to parse. async has a similar effect in this case.
 /// - [src]: This attribute specifies the URI of an external script; this can be used as an alternative to embedding a script directly within a document.
-Component script(List<Component> children,
+/// - [content]: The content of the script element, if it is not an external script.
+Component script(
     {bool? async,
     bool? defer,
-    required String src,
+    String? src,
+    String? content,
     Key? key,
     String? id,
     String? classes,
@@ -176,9 +178,9 @@ Component script(List<Component> children,
       ...?attributes,
       if (async == true) 'async': '',
       if (defer == true) 'defer': '',
-      'src': src,
+      if (src != null) 'src': src,
     },
     events: events,
-    children: children,
+    children: [if (content != null) raw(content)],
   );
 }

@@ -361,3 +361,43 @@ Component source(
     events: events,
   );
 }
+
+/// The &lt;figure&gt; HTML element represents self-contained content, potentially with an optional caption, which is specified using the &lt;figcaption&gt; element. The figure, its caption, and its contents are referenced as a single unit.
+Component figure(List<Component> children,
+    {Key? key,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
+  return DomComponent(
+    tag: 'figure',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: attributes,
+    events: events,
+    children: children,
+  );
+}
+
+/// The &lt;figcaption&gt; HTML element represents a caption or legend describing the rest of the contents of its parent &lt;figure&gt; element, providing the &lt;figure&gt;> an accessible description.
+Component figcaption(List<Component> children,
+    {Key? key,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
+  return DomComponent(
+    tag: 'figcaption',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: attributes,
+    events: events,
+    children: children,
+  );
+}

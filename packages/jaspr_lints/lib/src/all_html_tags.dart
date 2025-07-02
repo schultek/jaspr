@@ -42,6 +42,8 @@ const allHtmlTags = {
   'iframe',
   'object',
   'source',
+  'figure',
+  'figcaption',
   'button',
   'form',
   'input',
@@ -78,5 +80,5 @@ const allHtmlTags = {
   'tr',
   'td',
   'col',
-  'colgroup',
+  'colgroup'
 };

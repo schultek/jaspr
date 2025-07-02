@@ -510,6 +510,12 @@
           "type": "string"
         }
       }
+    },
+    "figure": {
+      "doc": "The &lt;figure&gt; HTML element represents self-contained content, potentially with an optional caption, which is specified using the &lt;figcaption&gt; element. The figure, its caption, and its contents are referenced as a single unit."
+    },
+    "figcaption": {
+      "doc": "The &lt;figcaption&gt; HTML element represents a caption or legend describing the rest of the contents of its parent &lt;figure&gt; element, providing the &lt;figure&gt;> an accessible description."
     }
   },
   "forms": {
@@ -1042,6 +1048,7 @@
     },
     "script": {
       "doc": "The &lt;script&gt; HTML element is used to embed executable code or data; this is typically used to embed or refer to JavaScript code. The &lt;script&gt; element can also be used with other languages, such as WebGL's GLSL shader programming language and JSON.",
+      "self_closing": true,
       "attributes": {
         "async": {
           "doc": "For classic scripts, if the async attribute is present, then the classic script will be fetched in parallel to parsing and evaluated as soon as it is available.\n\nFor module scripts, if the async attribute is present then the scripts and all their dependencies will be executed in the defer queue, therefore they will get fetched in parallel to parsing and evaluated as soon as they are available.\n\nThis attribute allows the elimination of parser-blocking JavaScript where the browser would have to load and evaluate scripts before continuing to parse. defer has a similar effect in this case.",
@@ -1053,8 +1060,11 @@
         },
         "src": {
           "doc": "This attribute specifies the URI of an external script; this can be used as an alternative to embedding a script directly within a document.",
-          "required": true,
           "type": "string"
+        },
+        "content": {
+          "doc": "The content of the script element, if it is not an external script.",
+          "type": "content"
         }
       }
     }

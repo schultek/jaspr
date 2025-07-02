@@ -1,9 +1,11 @@
 ## Unreleased patch
 
-- **Breaking**: Removed the positional children parameter from `input` and `col` as
+- **Breaking**: Removed the children parameter from `input` and `col` methods as
   they are void elements and shouldn't be passed children.
+- **Breaking**: Replaced the children parameter from `script` method with a `String? content` parameter, as it can only contain text content. Also made `src` parameter optional.
   
-- Added the `wbr` function for creating a line-break opportunity element.
+- Added `figure` and `figcaption` html methods.  
+- Added the `wbr` html method for creating a line-break opportunity element.
 - Added support for disabling the sitemap generation for specific pages of `jaspr_content` sites.
 
 ## 0.19.1
