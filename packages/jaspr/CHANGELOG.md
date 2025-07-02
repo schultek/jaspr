@@ -3,6 +3,11 @@
 - **Breaking**: Removed the children parameter from `input` and `col` methods as
   they are void elements and shouldn't be passed children.
 - **Breaking**: Replaced the children parameter from `script` method with a `String? content` parameter, as it can only contain text content. Also made `src` parameter optional.
+
+- **Breaking**: Removed deprecated `Color.hex` and `Color.named` constructors.
+- **Breaking**: Removed deprecated style groups (`Styles.box()`, `Styles.text()`, `Styles.background()`, etc. as well as `.box()`, `.text()`, etc.).
+- **Breaking**: Removed deprecated `EdgeInsets` type.
+- **Breaking**: Removed deprecated `Border.all` constructor.
   
 - Added `figure` and `figcaption` html methods.  
 - Added the `wbr` html method for creating a line-break opportunity element.

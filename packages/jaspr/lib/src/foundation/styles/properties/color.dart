@@ -4,16 +4,8 @@ abstract class Color {
   /// [value] must be a valid css color value, e.g. a color name, a hex value etc.
   const factory Color(String value) = _Color;
 
-  /// Constructs a [Color] from a hex string. Must start with a '#' and contain up to 6 hex characters.
-  @Deprecated('Use unnamed Color() constructor instead.')
-  const factory Color.hex(String hex) = _Color;
-
   /// Constructs a [Color] from an integer value.
   const factory Color.value(int value) = _ValueColor;
-
-  /// Constructs a [Color] from a web color name. Consider using [Colors.<name>] instead.
-  @Deprecated('Use Colors.<name> or Color() instead.')
-  const factory Color.named(String name) = _Color;
 
   /// Constructs a [Color] from red, green and blue values
   const factory Color.rgb(int red, int green, int blue) = _RGBColor;
