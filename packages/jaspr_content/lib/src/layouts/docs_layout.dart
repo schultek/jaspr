@@ -46,7 +46,7 @@ class DocsLayout extends PageLayoutBase {
 
   @override
   Component buildBody(Page page, Component child) {
-    final pageData = page.data['page'] ?? {};
+    final pageData = page.data.page;
 
     return div(classes: 'docs', [
       if (header case final header?)
@@ -67,7 +67,7 @@ class DocsLayout extends PageLayoutBase {
               div(classes: 'content-header', [
                 if (pageData['title'] case String title) h1([text(title)]),
                 if (pageData['description'] case String description) p([text(description)]),
-                if (pageData['image'] case String image) img(src: image, alt: pageData['imageAlt']),
+                if (pageData['image'] case String image) img(src: image, alt: pageData['imageAlt'] as String?),
               ]),
               child,
               if (footer case final footer?)

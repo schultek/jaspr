@@ -106,7 +106,6 @@ class GithubPageSource extends PageSource {
       path: path,
       url: url,
       content: content,
-      data: {},
       config: config,
       loader: loader,
     );

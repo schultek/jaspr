@@ -154,7 +154,6 @@ class FilePageSource extends PageSource {
       path: this.path,
       url: url,
       content: content,
-      data: {},
       config: config,
       loader: loader,
     );

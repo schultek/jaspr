@@ -17,14 +17,14 @@ class _OptOutRSSFilter implements RSSFilter {
   const _OptOutRSSFilter();
 
   @override
-  bool include(Page page) => page.data['page']?['rss'] != false;
+  bool include(Page page) => page.data.page['rss'] != false;
 }
 
 class _OptInRSSFilter implements RSSFilter {
   const _OptInRSSFilter();
 
   @override
-  bool include(Page page) => page.data['page']?['rss'] == true;
+  bool include(Page page) => page.data.page['rss'] == true;
 }
 
 class _CustomRSSFilter implements RSSFilter {
@@ -74,22 +74,23 @@ class RSSOutput extends SecondaryOutput {
   static final rssDateFormat = DateFormat("dd MMM yyyy");
 
   static RSSItem _defaultItemBuilder(Page page) {
-    final pageData = page.data['page'] ?? {};
+    final pageData = page.data.page;
     return RSSItem(
-      title: pageData['title'] ?? '',
-      description: pageData['description'],
-      pubDate: pageData['publishDate'],
-      author: pageData['author'],
+      title: pageData['title'] as String? ?? '',
+      description: pageData['description'] as String?,
+      pubDate: pageData['publishDate'] as String?,
+      author: pageData['author'] as String?,
     );
   }
 
   String renderRssFeed(Page page, List<Page> pages) {
-    final title = this.title ?? page.data['site']?['title'] ?? '/';
-    final siteUrl = this.siteUrl ?? page.data['site']?['url'] ?? '';
-    final description = this.description ?? page.data['site']?['description'] ?? '/';
-    final language = this.language ?? page.data['site']?['language'] ?? 'en-US';
+    final siteData = page.data.site;
+    final title = this.title ?? siteData['title'] ?? '/';
+    final siteUrl = this.siteUrl ?? siteData['url'] ?? '';
+    final description = this.description ?? siteData['description'] ?? '/';
+    final language = this.language ?? siteData['language'] ?? 'en-US';
 
-    final pubDate = page.data['site']?['publishDate'] ?? rssDateFormat.format(DateTime.now());
+    final pubDate = siteData['publishDate'] ?? rssDateFormat.format(DateTime.now());
     final lastBuildDate = rssDateFormat.format(DateTime.now());
 
     final items = <String>[];

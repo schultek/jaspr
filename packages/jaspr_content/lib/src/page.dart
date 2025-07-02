@@ -24,10 +24,10 @@ class Page {
     required this.path,
     required this.url,
     required this.content,
-    required this.data,
+    Map<String, Object?> initialData = const {},
     required this.config,
     required this.loader,
-  });
+  }) : _data = PageDataMap._({...initialData});
 
   /// The path of the page including its suffix, e.g. 'index.html', 'some/path.md'.
   final String path;
@@ -40,10 +40,16 @@ class Page {
   /// This may be modified by the different modules during the page building process.
   String content;
 
-  /// Additional data for the page.
+  /// Data available to the page.
+  PageDataMap _data;
+
+  /// Data available to the page.
   ///
-  /// This may be modified by the different modules during the page building process.
-  Map<String, dynamic> data;
+  /// The data data might be modified by
+  /// different modules during the page building process.
+  ///
+  /// Prefer modifying or replacing data with [apply].
+  PageDataMap get data => _data;
 
   /// The configuration for the page.
   ///
@@ -54,17 +60,25 @@ class Page {
   final RouteLoader loader;
 
   /// Applies changes to the page content or data.
-  void apply({String? content, Map<String, dynamic>? data, bool mergeData = true}) {
-    this.content = content ?? this.content;
-    if (mergeData && data != null) {
-      this.data = this.data.merge(data);
-    } else {
-      this.data = data ?? this.data;
+  void apply({String? content, Map<String, Object?>? data, bool mergeData = true}) {
+    if (content != null) {
+      this.content = content;
+    }
+
+    if (data != null) {
+      _data = mergeData ? PageDataMap._(data.merge(data)) : PageDataMap._({...data});
     }
   }
 
   Page copy() {
-    return Page(path: path, url: url, content: content, data: data, config: config, loader: loader);
+    return Page(
+      path: path,
+      url: url,
+      content: content,
+      initialData: data,
+      config: config,
+      loader: loader,
+    );
   }
 
   void markNeedsRebuild() {
@@ -102,8 +116,10 @@ class Page {
     return AsyncBuilder(builder: (context) async* {
       await renderTemplate(context.pages);
 
-      if (kGenerateMode && data['page']['sitemap'] != null) {
-        context.setHeader('jaspr-sitemap-data', jsonEncode(data['page']['sitemap']));
+      if (kGenerateMode) {
+        if (data.page['sitemap'] case final sitemap?) {
+          context.setHeader('jaspr-sitemap-data', jsonEncode(sitemap));
+        }
       }
 
       if (InheritedSecondaryOutput.of(context) case final secondaryOutput?) {
@@ -250,7 +266,7 @@ extension PageHandlersExtension on Page {
   void parseFrontmatter() {
     if (config.enableFrontmatter) {
       final document = fm.parse(content);
-      apply(content: document.content, data: {'page': document.data.cast<String, dynamic>()});
+      apply(content: document.content, data: {'page': document.data});
     }
   }
 
@@ -271,7 +287,7 @@ extension PageHandlersExtension on Page {
   }
 
   String getContentType() {
-    if (data['content-type'] case final type?) {
+    if (data['content-type'] case final String type) {
       return type;
     }
     if (this.path.endsWith('.html')) {
@@ -312,7 +328,7 @@ extension PageHandlersExtension on Page {
   /// When no key is set or matching, the first provided layout is used.
   /// Returns [child] if no layout is provided.
   Component buildLayout(Component child) {
-    final pageLayout = switch (data['page']?['layout']) {
+    final pageLayout = switch (data.page['layout']) {
       final String layoutName => config.layouts.where((l) => l.name.matchAsPrefix(layoutName) != null).firstOrNull,
       _ => config.layouts.firstOrNull,
     };
@@ -355,14 +371,33 @@ class _InheritedPage extends InheritedComponent {
   }
 }
 
-extension DataMergeExtension on Map<String, dynamic> {
-  Map<String, dynamic> merge(Map<String, dynamic> other) {
-    var merged = <String, dynamic>{};
+/// The data exposed to and used by the page, accessed with [Page.data].
+///
+/// Rather than directly modifying or replacing the underlying data,
+/// use [Page.apply] to apply changes.
+extension type PageDataMap._(Map<String, Object?> _data) implements Map<String, Object?> {
+  /// Data specific to this page, namespaced under 'page' in [data].
+  Map<String, Object?> get page => switch (_data['page']) {
+        final Map<String, Object?> nestedPageData => nestedPageData,
+        _ => const {},
+      };
+
+  /// Data declared under the 'site' key in [data],
+  /// often loaded from a `_data/site.yml` file and shared across the site.
+  Map<String, Object?> get site => switch (_data['site']) {
+        final Map<String, Object?> siteData => siteData,
+        _ => const {},
+      };
+}
+
+extension DataMergeExtension on Map<String, Object?> {
+  Map<String, Object?> merge(Map<String, Object?> other) {
+    var merged = <String, Object?>{};
     var otherKeys = other.keys.toSet();
     for (var key in keys) {
       if (otherKeys.remove(key)) {
-        if (this[key] is Map<String, dynamic> && other[key] is Map<String, dynamic>) {
-          merged[key] = (this[key] as Map<String, dynamic>).merge(other[key] as Map<String, dynamic>);
+        if (this[key] is Map<String, Object?> && other[key] is Map<String, Object?>) {
+          merged[key] = (this[key] as Map<String, Object?>).merge(other[key] as Map<String, Object?>);
         } else {
           merged[key] = other[key];
         }
