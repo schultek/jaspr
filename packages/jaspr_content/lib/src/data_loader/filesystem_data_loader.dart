@@ -21,7 +21,7 @@ class FilesystemDataLoader implements DataLoader {
 
   StreamSubscription<WatchEvent>? _watcherSub;
   StreamSubscription? _reassembleSub;
-  Future<Map<String, dynamic>>? _data;
+  Future<Map<String, Object?>>? _data;
 
   final Set<Page> _pages = {};
 
@@ -53,13 +53,13 @@ class FilesystemDataLoader implements DataLoader {
     _data ??= _loadData(Directory(directory));
     _pages.add(page);
 
-    var pageData = page.data['page'] ?? {};
+    var pageData = page.data.page;
     page.apply(data: await _data);
     page.apply(data: {'page': pageData});
   }
 
-  Future<Map<String, dynamic>> _loadData(Directory dir) async {
-    final data = <String, dynamic>{};
+  Future<Map<String, Object?>> _loadData(Directory dir) async {
+    final data = <String, Object?>{};
     if (await dir.exists()) {
       await for (var entity in dir.list()) {
         if (entity is File) {

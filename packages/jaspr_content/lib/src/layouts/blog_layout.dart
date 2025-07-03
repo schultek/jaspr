@@ -56,7 +56,7 @@ class BlogLayout extends PageLayoutBase {
 
   @override
   Component buildBody(Page page, Component child) {
-    final pageData = page.data['page'] ?? {};
+    final pageData = page.data.page;
 
     return div(classes: 'blog', [
       if (header case final header?)
@@ -71,7 +71,7 @@ class BlogLayout extends PageLayoutBase {
               div(classes: 'post-info', [
                 if (pageData['authorImage'] case String authorImage) img(src: authorImage, alt: 'Author image'),
                 div([
-                  span([text(pageData['author'] ?? 'Unknown')]),
+                  span([text(pageData['author'] as String? ?? 'Unknown')]),
                   span([
                     text([
                       if (pageData['readTime'] case String readTime) '$readTime read',

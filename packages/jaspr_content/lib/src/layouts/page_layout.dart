@@ -36,8 +36,8 @@ abstract class PageLayoutBase implements PageLayout {
 
   @mustCallSuper
   Iterable<Component> buildHead(Page page) sync* {
-    final pageData = page.data['page'] ?? {};
-    final siteData = page.data['site'] ?? {};
+    final pageData = page.data.page;
+    final siteData = page.data.site;
 
     final pageTitle = pageData['title'] ?? siteData['title'];
     final pageTitleBase = pageData['titleBase'] ?? siteData['titleBase'];
@@ -49,19 +49,17 @@ abstract class PageLayoutBase implements PageLayout {
       _ => '',
     };
 
-    final favicon = siteData['favicon'];
+    yield DomComponent(tag: 'title', child: text(title));
+    yield meta(attributes: {'property': 'og:title'}, content: title);
+
+    if (siteData['favicon'] case final String favicon) {
+      yield link(rel: 'icon', type: 'image/png', href: favicon);
+    }
 
     final description = pageData['description'];
     final keywords = pageData['keywords'];
     final image = pageData['image'];
     final metaData = pageData['meta'];
-
-    if (favicon != null) {
-      yield link(rel: 'icon', type: 'image/png', href: favicon!);
-    }
-
-    yield DomComponent(tag: 'title', child: text(title));
-    yield meta(attributes: {'property': 'og:title'}, content: title);
 
     if (description case final desc?) {
       yield meta(name: 'description', content: desc.toString());
