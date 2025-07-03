@@ -16,7 +16,7 @@ import '../secondary_output/secondary_output.dart';
 ///
 /// See also:
 /// - [FilesystemLoader]
-/// - [GithubLoader]
+/// - [GitHubLoader]
 /// - [MemoryLoader]
 abstract class RouteLoader {
   /// Loads the routes with the given [ConfigResolver].
