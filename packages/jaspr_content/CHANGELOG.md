@@ -5,6 +5,8 @@
 - Require Dart 3.6 or later to match the other Jaspr packages.
 - Renamed the `GithubButton` component to `GitHubButton`.
 - Fixed `GitHubButton` not linking to the correct repository.
+- Renamed the `GithubLoader` route loader to `GitHubLoader`.
+- **Breaking:** Made `GitHubPageSource` private.
 
 ## 0.2.0
 

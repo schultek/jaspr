@@ -53,9 +53,9 @@ ContentApp.custom(
 );
 ```
 
-### GithubLoader
+### GitHubLoader
 
-The `GithubLoader` fetches pages from a GitHub repository.
+The `GitHubLoader` fetches pages from a GitHub repository.
 
 - **Source**: A GitHub repository.
 - **Behavior**:
@@ -71,7 +71,7 @@ The `GithubLoader` fetches pages from a GitHub repository.
 ```dart
 ContentApp.custom(
   loaders: [
-    GithubLoader(
+    GitHubLoader(
       'owner/repo',     // Replace with your repository
       ref: 'main',      // Branch or ref (defaults to 'main')
       path: 'docs/',    // Path within the repository (defaults to 'docs/')
