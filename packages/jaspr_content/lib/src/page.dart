@@ -59,14 +59,22 @@ class Page {
   /// The route loader that created this page.
   final RouteLoader loader;
 
-  /// Applies changes to the page content or data.
+  /// Applies changes to the page [content] or [data].
+  ///
+  /// If [data] isn't `null` and [mergeData] is `true`,
+  /// values from [data] override those from [Page.data].
+  /// Maps with string keys are deeply merged,
+  /// also favoring values from [data].
+  ///
+  /// If [data] isn't `null` and [mergeData] is `false`,
+  /// [data] replaces the page's entire [Page.data].
   void apply({String? content, Map<String, Object?>? data, bool mergeData = true}) {
     if (content != null) {
       this.content = content;
     }
 
     if (data != null) {
-      _data = mergeData ? PageDataMap._(data.merge(data)) : PageDataMap._({...data});
+      _data = mergeData ? PageDataMap._(_data.merge(data)) : PageDataMap._({...data});
     }
   }
 
@@ -390,24 +398,42 @@ extension type PageDataMap._(Map<String, Object?> _data) implements Map<String, 
       };
 }
 
-extension DataMergeExtension on Map<String, Object?> {
+extension on Map<String, Object?> {
+  /// Merge this map with the [other] specified map.
+  ///
+  /// When both maps share the same key,
+  /// values from [other] are favored.
+  ///
+  /// Maps with string keys are deeply merged,
+  /// also favoring values from [other].
   Map<String, Object?> merge(Map<String, Object?> other) {
-    var merged = <String, Object?>{};
-    var otherKeys = other.keys.toSet();
-    for (var key in keys) {
-      if (otherKeys.remove(key)) {
-        if (this[key] is Map<String, Object?> && other[key] is Map<String, Object?>) {
-          merged[key] = (this[key] as Map<String, Object?>).merge(other[key] as Map<String, Object?>);
+    final merged = <String, Object?>{};
+    final otherKeys = other.keys.toSet();
+
+    for (final MapEntry(key: thisKey, value: thisValue) in entries) {
+      if (otherKeys.remove(thisKey)) {
+        // If both maps have an entry with this key,
+        // prefer the value from other.
+        final otherValue = other[thisKey];
+        // If the value of this entry for both maps is a map with string keys,
+        // recursively merge those maps as well.
+        if (thisValue is Map<String, Object?> && otherValue is Map<String, Object?>) {
+          merged[thisKey] = thisValue.merge(otherValue);
         } else {
-          merged[key] = other[key];
+          merged[thisKey] = otherValue;
         }
       } else {
-        merged[key] = this[key];
+        // Other doesn't have an entry with this key,
+        // so use the value from this map.
+        merged[thisKey] = thisValue;
       }
     }
-    for (var key in otherKeys) {
-      merged[key] = other[key];
+
+    // Add entries from other that have a unique key.
+    for (final uniqueKey in otherKeys) {
+      merged[uniqueKey] = other[uniqueKey];
     }
+
     return merged;
   }
 }
