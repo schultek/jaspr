@@ -241,7 +241,7 @@ abstract class PageSource {
     _page = newPage;
     RouteLoader._pages.add(newPage);
 
-    // Preserve originally data to reapply
+    // Preserve original data to reapply
     // after first specifying our provided data.
     final builtData = newPage.data;
 
