@@ -11,7 +11,7 @@ export 'src/layouts/blog_layout.dart';
 export 'src/layouts/docs_layout.dart';
 export 'src/layouts/empty_layout.dart';
 export 'src/layouts/page_layout.dart';
-export 'src/page.dart' hide DataMergeExtension;
+export 'src/page.dart';
 export 'src/page_extension/heading_anchors_extension.dart';
 export 'src/page_extension/page_extension.dart';
 export 'src/page_extension/table_of_contents_extension.dart';

@@ -96,14 +96,14 @@ content/
 
 ## Remote Files
 
-You can also load content from remote sources like Github or a CMS, instead of the filesystem. `jaspr_content` already comes with a `GithubLoader` that can be used to load content from a Github repository. Or you can implement your own `RouteLoader` to load content from any source you want.
+You can also load content from remote sources like GitHub or a CMS, instead of the filesystem. `jaspr_content` already comes with a `GitHubLoader` that can be used to load content from a GitHub repository. Or you can implement your own `RouteLoader` to load content from any source you want.
 
-For example, to load content from a Github repository, you can do this:
+For example, to load content from a GitHub repository, you can do this:
 
 ```dart
 ContentApp.custom(
   loaders: [
-    GithubLoader(
+    GitHubLoader(
       '<username>/<repo>'
       path: 'docs/',
       accessToken: '...'

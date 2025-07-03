@@ -1,10 +1,17 @@
 ## Unreleased patch
 
+- **Breaking**: `Page.data` now returns a `PageDataMap` with typed getters for
+  the maps stored under `page` and `site`.
+  It's also `final` now and should be modified using the `Page.apply` method.
+- **Breaking**: The `data` parameters in `Page.new` and `MemoryPage.new` have been
+  renamed to `initialData` to reflect they don't necessarily specify the final data.
 - Added support for `sitemap: false` in the page data to exclude pages from the sitemap.
 - Ignores files and folders in the content directory starting with `.` (in addition to `_`).
 - Require Dart 3.6 or later to match the other Jaspr packages.
 - Renamed the `GithubButton` component to `GitHubButton`.
 - Fixed `GitHubButton` not linking to the correct repository.
+- Renamed the `GithubLoader` route loader to `GitHubLoader`.
+- **Breaking:** Made `GitHubPageSource` private.
 
 ## 0.2.0
 

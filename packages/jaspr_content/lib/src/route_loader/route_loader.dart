@@ -16,7 +16,7 @@ import '../secondary_output/secondary_output.dart';
 ///
 /// See also:
 /// - [FilesystemLoader]
-/// - [GithubLoader]
+/// - [GitHubLoader]
 /// - [MemoryLoader]
 abstract class RouteLoader {
   /// Loads the routes with the given [ConfigResolver].
@@ -241,12 +241,17 @@ abstract class PageSource {
     _page = newPage;
     RouteLoader._pages.add(newPage);
 
+    // Preserve originally data to reapply
+    // after first specifying our provided data.
+    final builtData = newPage.data;
+
     newPage.apply(
-      data: <String, dynamic>{
+      data: <String, Object?>{
         'page': {'path': path, 'url': url},
-      }.merge(newPage.data),
+      },
       mergeData: false,
     );
+    newPage.apply(data: builtData);
 
     var child = Page.wrap(
       newPage,
