@@ -167,10 +167,12 @@ Some <sub>inline</sub> HTML.<br>Span with <strong>bold</strong> text.
 <div class="inline-html">This is **not** markdown.</div>
 
 <div class="block-html">
+
   This **is** markdown.
 </div>
 
 <div class="quote">
+
   > Some quoted text.
 </div>
 ''');
@@ -179,14 +181,18 @@ Some <sub>inline</sub> HTML.<br>Span with <strong>bold</strong> text.
           matchNodes([
             ElementNode('h1', {'id': 'markdown-with-html'}, [TextNode('Markdown with HTML')]),
             ElementNode('div', {'class': 'inline-html'}, [TextNode('This is **not** markdown.')]),
-            ElementNode('div', {'class': 'block-html'}, [
+            ElementNode('div', {
+              'class': 'block-html'
+            }, [
               ElementNode('p', {}, [
-                TextNode('This '),
+                TextNode('  This '),
                 ElementNode('strong', {}, [TextNode('is')]),
                 TextNode(' markdown.'),
               ]),
             ]),
-            ElementNode('div', {'class': 'quote'}, [
+            ElementNode('div', {
+              'class': 'quote'
+            }, [
               ElementNode('blockquote', {}, [
                 ElementNode('p', {}, [TextNode('Some quoted text.')]),
               ]),
@@ -220,11 +226,11 @@ Some text after the image.
               'href': '/world',
               'class': 'link'
             }, [
-              TextNode(' '),
+              TextNode('\n  '),
               ElementNode('img', {'src': '/assets/the-world.png', 'alt': 'The World'}, []),
-              TextNode(' '),
+              TextNode('\n  '),
               ElementNode('span', {}, [TextNode('Hello world!')]),
-              TextNode(' '),
+              TextNode('\n'),
             ]),
           ]),
         );
@@ -240,10 +246,65 @@ Content after comment and processing instruction.
         expect(
           nodes,
           matchNodes([
-            ElementNode('h1', {'id': 'html-comments-and-processing-instructions'}, [TextNode('HTML Comments and Processing Instructions')]),
+            ElementNode('h1', {'id': 'html-comments-and-processing-instructions'},
+                [TextNode('HTML Comments and Processing Instructions')]),
             TextNode('<!-- This is a comment -->', raw: true),
+            TextNode('\n'),
             TextNode('<!--php echo "Hello, World!"; -->', raw: true),
             ElementNode('p', {}, [TextNode('Content after comment and processing instruction.')]),
+          ]),
+        );
+      });
+
+      test('should parse tags with line-breaks', () {
+        final nodes = parseMarkdown('''
+# HTML with Line-Breaks
+
+<div id="foo"
+  class="bar">
+
+  Some content here.
+</div>
+''');
+        expect(
+          nodes,
+          matchNodes([
+            ElementNode('h1', {'id': 'html-with-line-breaks'}, [TextNode('HTML with Line-Breaks')]),
+            ElementNode('div', {
+              'id': 'foo',
+              'class': 'bar'
+            }, [
+              ElementNode('p', {}, [TextNode('  Some content here.')]),
+            ]),
+          ]),
+        );
+      });
+
+      test('should handle code blocks within html tags', () {
+        final nodes = parseMarkdown('''
+# Code Blocks in HTML
+
+<div>
+
+```dart
+void method<T>(T t) {
+  print(t);
+}
+```
+</div>''');
+        expect(
+          nodes,
+          matchNodes([
+            ElementNode('h1', {'id': 'code-blocks-in-html'}, [TextNode('Code Blocks in HTML')]),
+            ElementNode('div', {}, [
+              ElementNode('pre', {}, [
+                ElementNode('code', {
+                  'class': 'language-dart'
+                }, [
+                  TextNode('void method<T>(T t) {\n  print(t);\n}\n'),
+                ]),
+              ]),
+            ]),
           ]),
         );
       });
