@@ -8,7 +8,7 @@ void main() {
         url: '/test',
         path: 'test.md',
         content: content,
-        data: {},
+        initialData: {},
         config: PageConfig(),
         loader: FilesystemLoader('_'),
       ));

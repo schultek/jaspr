@@ -13,6 +13,7 @@ import 'route_loader/route_loader.dart';
 import 'secondary_output/secondary_output.dart';
 import 'template_engine/template_engine.dart';
 import 'theme/theme.dart';
+import 'utils.dart';
 
 /// A single page of the site.
 ///
@@ -41,7 +42,7 @@ class Page {
   String content;
 
   /// Data available to the page.
-  PageDataMap _data;
+  Map<String, Object?> _data;
 
   /// Data available to the page.
   ///
@@ -49,7 +50,7 @@ class Page {
   /// different modules during the page building process.
   ///
   /// Prefer modifying or replacing data with [apply].
-  PageDataMap get data => _data;
+  PageDataMap get data => PageDataMap._(_data);
 
   /// The configuration for the page.
   ///
@@ -74,7 +75,7 @@ class Page {
     }
 
     if (data != null) {
-      _data = mergeData ? PageDataMap._(_data.merge(data)) : PageDataMap._({...data});
+      _data = mergeData ? _data.merge(data) : {...data};
     }
   }
 
@@ -274,7 +275,7 @@ extension PageHandlersExtension on Page {
   void parseFrontmatter() {
     if (config.enableFrontmatter) {
       final document = fm.parse(content);
-      apply(content: document.content, data: {'page': document.data});
+      apply(content: document.content, data: {'page': document.data.normalize});
     }
   }
 
