@@ -1,3 +1,4 @@
+import 'package:watcher/watcher.dart';
 import 'package:yaml/yaml.dart' as yaml;
 
 extension YamlMapNormalize on yaml.YamlMap {
@@ -20,3 +21,6 @@ extension YamlNodeNormalize on yaml.YamlNode {
         final value => value,
       };
 }
+
+
+typedef DirectoryWatcherFactory = DirectoryWatcher Function(String path);
