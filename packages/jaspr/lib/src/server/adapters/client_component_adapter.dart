@@ -14,9 +14,10 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 
   @override
   void applyBoundary(ChildListRange range) {
-    range.start.insertNext(ChildNodeData(
-        MarkupRenderObject()..updateText('<!--${DomValidator.clientMarkerPrefix}$name${data != null ? ' data=$data' : ''}-->', true)));
-    range.end.insertPrev(ChildNodeData(MarkupRenderObject()..updateText('<!--/${DomValidator.clientMarkerPrefix}$name-->', true)));
+    range.start.insertNext(ChildNodeData(MarkupRenderObject()
+      ..updateText('<!--${DomValidator.clientMarkerPrefix}$name${data != null ? ' data=$data' : ''}-->', true)));
+    range.end.insertPrev(
+        ChildNodeData(MarkupRenderObject()..updateText('<!--/${DomValidator.clientMarkerPrefix}$name-->', true)));
   }
 }
 

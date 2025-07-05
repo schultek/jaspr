@@ -7,6 +7,7 @@ export 'src/content.dart';
 export 'src/content_app.dart';
 export 'src/data_loader/data_loader.dart';
 export 'src/data_loader/filesystem_data_loader.dart';
+export 'src/data_loader/memory_data_loader.dart';
 export 'src/layouts/blog_layout.dart';
 export 'src/layouts/docs_layout.dart';
 export 'src/layouts/empty_layout.dart';

@@ -1,11 +1,13 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:file/file.dart';
+import 'package:file/local.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:watcher/watcher.dart';
 
 import '../page.dart';
+import '../utils.dart';
 import 'route_loader.dart';
 
 /// A loader that loads routes from the filesystem.
@@ -18,13 +20,22 @@ class FilesystemLoader extends RouteLoaderBase {
     this.directory, {
     this.keepSuffixPattern,
     super.debugPrint,
-  });
+    @visibleForTesting this.fileSystem = const LocalFileSystem(),
+    @visibleForTesting DirectoryWatcherFactory? watcherFactory,
+  }) : watcherFactory = watcherFactory ?? _defaultWatcherFactory;
 
   /// The directory to load pages from.
   final String directory;
 
   /// A pattern to keep the file suffix for all matching pages.
   final Pattern? keepSuffixPattern;
+
+  @visibleForTesting
+  final FileSystem fileSystem;
+  @visibleForTesting
+  final DirectoryWatcherFactory watcherFactory;
+
+  static DirectoryWatcher _defaultWatcherFactory(String path) => DirectoryWatcher(path);
 
   final Map<String, Set<PageSource>> dependentSources = {};
 
@@ -33,7 +44,7 @@ class FilesystemLoader extends RouteLoaderBase {
   @override
   Future<List<RouteBase>> loadRoutes(ConfigResolver resolver, bool eager) async {
     if (kDebugMode) {
-      _watcherSub ??= DirectoryWatcher(directory).events.listen((event) {
+      _watcherSub ??= watcherFactory(directory).events.listen((event) {
         var path = event.path;
         if (event.type == ChangeType.MODIFY) {
           invalidateFile(path);
@@ -68,12 +79,15 @@ class FilesystemLoader extends RouteLoaderBase {
     if (pageSource != null) {
       (dependentSources[path] ??= {}).add(pageSource);
     }
-    return File(path);
+    return fileSystem.file(path);
   }
 
   @override
   Future<List<PageSource>> loadPageSources() async {
-    final root = Directory(directory);
+    final root = fileSystem.directory(directory);
+    if (!await root.exists()) {
+      return [];
+    }
 
     List<PageSource> loadFiles(Directory dir) {
       List<PageSource> entities = [];
@@ -99,21 +113,21 @@ class FilesystemLoader extends RouteLoaderBase {
   void addFile(String path) {
     addSource(FilePageSource(
       path.substring(directory.length + 1),
-      File(path),
+      fileSystem.file(path),
       this,
       keepSuffix: keepSuffixPattern?.matchAsPrefix(path) != null,
     ));
   }
 
   void removeFile(String path) {
-    final source = sources.where((s) => (s as FilePageSource).file.path == path).firstOrNull;
+    final source = sources.whereType<FilePageSource>().where((s) => s.file.path == path).firstOrNull;
     if (source != null) {
       removeSource(source);
     }
   }
 
   void invalidateFile(String path, {bool rebuild = true}) {
-    final source = sources.where((s) => (s as FilePageSource).file.path == path).firstOrNull;
+    final source = sources.whereType<FilePageSource>().where((s) => s.file.path == path).firstOrNull;
     if (source != null) {
       invalidateSource(source, rebuild: rebuild);
     }
@@ -122,8 +136,9 @@ class FilesystemLoader extends RouteLoaderBase {
   @override
   void invalidateSource(PageSource source, {bool rebuild = true}) {
     super.invalidateSource(source, rebuild: rebuild);
-    final dependencies = {...?dependentSources[source.path]};
-    dependentSources[source.path]?.clear();
+    final fullPath = fileSystem.path.join(directory, source.path);
+    final dependencies = {...?dependentSources[fullPath]};
+    dependentSources[fullPath]?.clear();
     for (var dependent in dependencies) {
       invalidateSource(dependent, rebuild: rebuild);
     }
