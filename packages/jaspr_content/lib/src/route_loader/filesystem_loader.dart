@@ -92,7 +92,7 @@ class FilesystemLoader extends RouteLoaderBase {
     List<PageSource> loadFiles(Directory dir) {
       List<PageSource> entities = [];
       for (final entry in dir.listSync()) {
-                final path = entry.path.substring(root.path.length + 1);
+        final path = entry.path.substring(root.path.length + 1);
         if (entry is File) {
           entities.add(FilePageSource(
             path,

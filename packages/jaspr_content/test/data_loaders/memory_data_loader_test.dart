@@ -82,13 +82,15 @@ void main() {
       await page.loadData();
 
       // Assert
-      expect(page.data, equals({
-        'title': 'Global Title',
-        'page': {
-          'title': 'Initial Title', // Preserved from initialData
-          'author': 'Loader Author', // Merged from loader
-        }
-      }));
+      expect(
+          page.data,
+          equals({
+            'title': 'Global Title',
+            'page': {
+              'title': 'Initial Title', // Preserved from initialData
+              'author': 'Loader Author', // Merged from loader
+            }
+          }));
     });
 
     test('frontmatter data takes precedence over loader data', () async {
@@ -99,14 +101,14 @@ void main() {
           'author': 'Loader Author',
         }
       });
-      
+
       final page = Page(
         path: 'test.md',
         url: '/test',
         content: '---\n'
-                 'title: Frontmatter Title\n'
-                 '---\n'
-                 '# Hello World',
+            'title: Frontmatter Title\n'
+            '---\n'
+            '# Hello World',
         config: PageConfig(
           dataLoaders: [loader],
         ),
@@ -118,12 +120,14 @@ void main() {
       await page.loadData();
 
       // Assert
-      expect(page.data, equals({
-        'page': {
-          'title': 'Frontmatter Title',
-          'author': 'Loader Author',
-        }
-      }));
+      expect(
+          page.data,
+          equals({
+            'page': {
+              'title': 'Frontmatter Title',
+              'author': 'Loader Author',
+            }
+          }));
     });
 
     test('does not change data if loader data is empty', () async {

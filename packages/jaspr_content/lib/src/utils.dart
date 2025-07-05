@@ -22,5 +22,4 @@ extension YamlNodeNormalize on yaml.YamlNode {
       };
 }
 
-
 typedef DirectoryWatcherFactory = DirectoryWatcher Function(String path);
