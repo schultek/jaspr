@@ -275,7 +275,8 @@ extension PageHandlersExtension on Page {
   void parseFrontmatter() {
     if (config.enableFrontmatter) {
       final document = fm.parse(content);
-      apply(content: document.content, data: {'page': document.data.normalize});
+      final normalizedData = document.data.normalize();
+      apply(content: document.content, data: {'page': normalizedData});
     }
   }
 

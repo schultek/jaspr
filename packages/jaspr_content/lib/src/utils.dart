@@ -1,17 +1,22 @@
 import 'package:yaml/yaml.dart' as yaml;
 
-extension YamlNormalize on yaml.YamlNode {
-  Object normalize() {
-    if (this case yaml.YamlMap(:final nodes)) {
-      return {
+extension YamlMapNormalize on yaml.YamlMap {
+  Map<String, Object?> normalize() => {
         for (final entry in nodes.entries) entry.key.toString(): entry.value.normalize(),
       };
-    } else if (this case yaml.YamlList(:final nodes)) {
-      return [
+}
+
+extension YamlListNormalize on yaml.YamlList {
+  List<Object?> normalize() => [
         for (final node in nodes) node.normalize(),
       ];
-    } else {
-      return value;
-    }
-  }
+}
+
+extension YamlNodeNormalize on yaml.YamlNode {
+  Object normalize() => switch (this) {
+        final yaml.YamlMap map => map.normalize(),
+        final yaml.YamlList list => list.normalize(),
+        final yaml.YamlScalar scalar => scalar.value,
+        final value => value,
+      };
 }
