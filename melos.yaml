@@ -29,7 +29,7 @@ scripts:
     exec:
       concurrency: 1
     packageFilters:
-      scope: [ jaspr, jaspr_builder, jaspr_riverpod, jaspr_router ]
+      scope: [ jaspr, jaspr_builder, jaspr_content, jaspr_riverpod, jaspr_router ]
   coverage:
     run: |
       dart test --coverage=coverage &&
@@ -37,7 +37,7 @@ scripts:
     exec:
       concurrency: 1
     packageFilters:
-      scope: [jaspr, jaspr_builder, jaspr_riverpod, jaspr_router]
+      scope: [jaspr, jaspr_builder, jaspr_content, jaspr_riverpod, jaspr_router]
   coverage:cli:
     run: |
       cd packages/jaspr_cli &&

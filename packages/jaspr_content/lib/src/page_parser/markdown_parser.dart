@@ -1,4 +1,9 @@
 import 'package:html/parser.dart' as html;
+// ignore: implementation_imports
+import 'package:html/src/token.dart' as html;
+// ignore: implementation_imports
+import 'package:html/src/tokenizer.dart' as html;
+import 'package:jaspr/jaspr.dart';
 import 'package:markdown/markdown.dart' as md;
 
 import '../page.dart';
@@ -7,7 +12,7 @@ import 'page_parser.dart';
 
 md.Document _defaultDocumentBuilder(Page _) {
   return md.Document(
-    blockSyntaxes: [ComponentBlockSyntax()],
+    blockSyntaxes: MarkdownParser.defaultBlockSyntaxes,
     extensionSet: md.ExtensionSet.gitHubWeb,
   );
 }
@@ -29,6 +34,10 @@ class MarkdownParser implements PageParser {
 
   final DocumentBuilder documentBuilder;
 
+  static const List<md.BlockSyntax> defaultBlockSyntaxes = [
+    JasprHtmlBlockSyntax(),
+  ];
+
   @override
   Pattern get pattern => RegExp(r'.*\.mdx?$');
 
@@ -41,148 +50,89 @@ class MarkdownParser implements PageParser {
   }
 
   List<Node> _buildNodes(Iterable<md.Node> markdownNodes) {
-    final nodes = <Node>[];
+    final root = ElementNode('_', {}, []);
+    List<ElementNode> stack = [root];
+    List<Node> currentNodes = root.children!;
+
     for (final node in markdownNodes) {
-      if (node is md.Text) {
-        nodes.addAll(HtmlParser.buildNodes(html.parseFragment(node.text).nodes));
+      if (node is HtmlText) {
+        final tokenizer = html.HtmlTokenizer(
+          node.text,
+          lowercaseElementName: false,
+        );
+
+        while (tokenizer.moveNext()) {
+          final token = tokenizer.current;
+
+          if (token.kind == html.TokenKind.parseError) {
+            final error = (token as html.ParseErrorToken).data;
+            if (error == 'expected-tag-name-but-got-question-mark') {
+              // This error happens with processing instructions like <?some-instruction ... ?>
+              // We can safely ignore it, since the next token will be a comment containing the instruction.
+              continue;
+            } else {
+              throw AssertionError('Unexpected parse error: ${token.data}');
+            }
+          }
+
+          if (token.kind == html.TokenKind.startTag) {
+            final tag = (token as html.StartTagToken).name ?? '';
+            final attributes = token.data.map((k, v) => MapEntry(k.toString(), v));
+            final element = ElementNode(tag, attributes, []);
+            currentNodes.add(element);
+            final selfClosing = token.selfClosing || const DomValidator().isSelfClosing(token.name ?? '');
+            if (!selfClosing) {
+              stack.add(element);
+              currentNodes = element.children!;
+            }
+          } else if (token.kind == html.TokenKind.endTag) {
+            if (stack.last.tag != (token as html.EndTagToken).name) {
+              // If the end tag does not match the last opened tag, we ignore it.
+              continue;
+            }
+            stack.removeLast();
+            currentNodes = stack.last.children!;
+          } else if (token.kind == html.TokenKind.characters || token.kind == html.TokenKind.spaceCharacters) {
+            currentNodes.add(TextNode((token as html.StringToken).data));
+          } else if (token.kind == html.TokenKind.comment) {
+            var data = (token as html.CommentToken).data;
+            if (data.startsWith('?') && data.endsWith('?')) {
+              data = data.substring(1, data.length - 1);
+            }
+            currentNodes.add(TextNode('<!--$data-->', raw: true));
+          } else if (token.kind == html.TokenKind.doctype) {
+            // Ignore doctype tokens.
+            continue;
+          }
+        }
+      } else if (node is md.Text) {
+        currentNodes.addAll(HtmlParser.buildNodes(html.parseFragment(node.text).nodes));
       } else if (node is md.Element) {
         final children = _buildNodes(node.children ?? []);
-        nodes.add(ElementNode(
+        currentNodes.add(ElementNode(
           node.tag,
           {if (node.generatedId != null) 'id': node.generatedId!, ...node.attributes},
           children,
         ));
       }
     }
-    return nodes;
+
+    return root.children!;
   }
 }
 
-class ComponentBlockSyntax extends md.BlockSyntax {
-  const ComponentBlockSyntax();
-
-  @override
-  RegExp get pattern => RegExp(r'^\s*<([A-Z][a-zA-Z]*)\s*([^>]*?)((/?)>(?:(.*)</([A-Z][a-zA-Z]*)>)?)?\s*$');
-
-  RegExp get closingPattern => RegExp(r'^([^>]*?)(/?)>(?:(.*)</([A-Z][a-zA-Z]*)>)?$');
-  RegExp get endPattern => RegExp(r'^\s*</([A-Z][a-zA-Z]*)>\s*$');
-
-  @override
-  List<md.Line> parseChildLines(md.BlockParser parser, [String endTag = '']) {
-    final childLines = <md.Line>[];
-
-    var nesting = 1;
-    var indent = -1;
-
-    while (!parser.isDone) {
-      if (nesting == 0) break;
-
-      final line = parser.current;
-
-      if (indent == -1) {
-        final match = RegExp(r'^\s*').firstMatch(line.content);
-        indent = match?.group(0)!.length ?? 0;
-      }
-
-      childLines.add(md.Line(_removeIndentation(line.content, indent)));
-      parser.advance();
-
-      var match = endPattern.firstMatch(line.content);
-      if (match != null && match.group(1) == endTag) {
-        nesting--;
-        continue;
-      }
-
-      match = pattern.firstMatch(line.content);
-      if (match != null && match.group(1) == endTag) {
-        nesting++;
-        continue;
-      }
-    }
-
-    if (nesting != 0) {
-      throw AssertionError('Component block did not end: $endTag.');
-    }
-
-    childLines.removeLast();
-    return childLines;
-  }
-
-  String _removeIndentation(String content, int length) {
-    final text = content.replaceFirst(RegExp('^\\s{0,$length}'), '');
-    return content.substring(content.length - text.length);
-  }
+class JasprHtmlBlockSyntax extends md.HtmlBlockSyntax {
+  const JasprHtmlBlockSyntax() : super();
 
   @override
   md.Node parse(md.BlockParser parser) {
-    var match = pattern.firstMatch(parser.current.content);
+    final childLines = parseChildLines(parser);
 
-    if (match == null) throw AssertionError('Block syntax should match pattern.');
-
-    parser.advance();
-
-    final tag = match.group(1)!;
-
-    var value = match.group(2)!.trim();
-
-    final isClosing = match.group(3) != null;
-
-    late bool isSelfClosing;
-    late String? content;
-    late String? endTag;
-
-    if (isClosing) {
-      isSelfClosing = match.group(4) == '/';
-      content = match.group(5);
-      endTag = match.group(6);
-    } else {
-      while (!parser.isDone) {
-        final line = parser.current.content;
-        final lineMatch = closingPattern.firstMatch(line);
-
-        parser.advance();
-
-        if (lineMatch != null) {
-          value += lineMatch.group(1) ?? '';
-          isSelfClosing = lineMatch.group(2) == '/';
-          content = lineMatch.group(3);
-          endTag = lineMatch.group(4);
-          break;
-        } else {
-          value += line;
-        }
-      }
-    }
-
-    var attributes = <MapEntry<String, String>>[];
-
-    if (value.trim().isNotEmpty) {
-      final attributeRegex = RegExp(r'\s*([a-zA-Z][a-zA-Z0-9_-]*)(="((?:[^"]|\\")*)")?');
-      final matches = attributeRegex.allMatches(value.trim());
-
-      attributes = matches.map((m) {
-        final key = m.group(1)!;
-        final value = m.group(3);
-        return MapEntry(key, value ?? '');
-      }).toList();
-    }
-
-    if (endTag != null) {
-      assert(endTag == tag, 'Invalid component block.');
-      var children = md.InlineParser(content ?? '', parser.document).parse();
-      return md.Element(tag, children)..attributes.addEntries(attributes);
-    }
-
-    if (isSelfClosing) {
-      assert(endTag == null, 'Invalid self-closing component block.');
-      return md.Element(tag, null)..attributes.addEntries(attributes);
-    }
-
-    final childLines = parseChildLines(parser, tag);
-
-    // Recursively parse the contents of the component.
-    final children = md.BlockParser(childLines, parser.document).parseLines(parentSyntax: this);
-
-    return md.Element(tag, children)..attributes.addEntries(attributes);
+    var text = childLines.map((e) => e.content).join('\n').trimRight();
+    return HtmlText(text);
   }
+}
+
+class HtmlText extends md.Text {
+  HtmlText(super.text);
 }

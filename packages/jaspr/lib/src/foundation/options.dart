@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import '../../jaspr.dart';
-import 'marker_utils.dart';
 
 /// Main class for initializing the jaspr framework.
 ///
@@ -48,6 +47,6 @@ class ClientTarget<T extends Component> {
 
   String? dataFor(T component) {
     if (params == null) return null;
-    return escapeMarkerText(jsonEncode(params!(component)));
+    return const DomValidator().escapeMarkerText(jsonEncode(params!(component)));
   }
 }
