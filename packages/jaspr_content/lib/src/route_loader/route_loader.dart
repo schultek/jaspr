@@ -8,6 +8,7 @@ import 'dart:collection';
 
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
+import 'package:path/path.dart' as pkg_path;
 
 import '../page.dart';
 import '../secondary_output/secondary_output.dart';
@@ -185,7 +186,7 @@ final indexRegex = RegExp(r'index\.[^/]*$');
 
 abstract class PageSource {
   PageSource(this.path, this.loader, {bool keepSuffix = false}) {
-    final segments = path.split('/');
+    final segments = pkg_path.split(path);
 
     private = segments.any((s) => s.startsWith('_') || s.startsWith('.'));
 
