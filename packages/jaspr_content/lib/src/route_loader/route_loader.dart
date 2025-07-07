@@ -63,7 +63,7 @@ abstract class RouteLoaderBase implements RouteLoader {
 
   bool _eager = false;
 
-  StreamSubscription? _reassembleSub;
+  StreamSubscription<void>? _reassembleSub;
 
   @override
   Future<String> readPartial(String path, Page page) {

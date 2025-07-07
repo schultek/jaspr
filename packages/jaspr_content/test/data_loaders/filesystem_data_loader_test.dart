@@ -54,7 +54,7 @@ void main() {
           equals({
             'site': {'name': 'My Site'},
             'user': {'name': 'Test User'},
-            'page': {},
+            'page': <String, Object?>{},
           }));
     });
 
@@ -84,9 +84,9 @@ void main() {
           page.data,
           equals({
             'nav': {
-              'main': {'items': []}
+              'main': {'items': <Object?>[]}
             },
-            'page': {},
+            'page': <String, Object?>{},
           }));
     });
 
@@ -120,12 +120,12 @@ void main() {
         );
 
         final page1 = MockPage();
-        when(() => page1.data).thenReturn({'page': {}} as PageDataMap);
+        when(() => page1.data).thenReturn({'page': <String, Object?>{}} as PageDataMap);
         when(() => page1.config).thenReturn(PageConfig(dataLoaders: [loader]));
         when(() => page1.markNeedsRebuild()).thenReturn(null);
 
         final page2 = MockPage();
-        when(() => page2.data).thenReturn({'page': {}} as PageDataMap);
+        when(() => page2.data).thenReturn({'page': <String, Object?>{}} as PageDataMap);
         when(() => page2.config).thenReturn(PageConfig(dataLoaders: [loader]));
         when(() => page2.markNeedsRebuild()).thenReturn(null);
 
@@ -134,7 +134,7 @@ void main() {
         await loader.loadData(page2);
 
         eventController.add(WatchEvent(ChangeType.MODIFY, '_data/site.json'));
-        await Future.delayed(Duration.zero); // Allow stream to propagate
+        await Future<void>.delayed(Duration.zero); // Allow stream to propagate
 
         // Assert
         verify(() => page1.markNeedsRebuild()).called(1);
@@ -164,7 +164,7 @@ void main() {
 
         // Act
         eventController.add(WatchEvent(ChangeType.MODIFY, '_data/site.json'));
-        await Future.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
 
         siteFile.writeAsStringSync('{"version": 2}');
         final page2 = Page(

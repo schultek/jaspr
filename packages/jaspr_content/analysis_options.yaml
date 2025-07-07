@@ -1,7 +1,14 @@
 include: package:lints/recommended.yaml
 
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
 linter:
   rules:
+    avoid_dynamic_calls: true
     sort_pub_dependencies: true
     prefer_relative_imports: true
     directives_ordering: true
