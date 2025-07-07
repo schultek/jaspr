@@ -45,7 +45,7 @@ class FilesystemDataLoader implements DataLoader {
   final DirectoryWatcherFactory watcherFactory;
 
   StreamSubscription<WatchEvent>? _watcherSub;
-  StreamSubscription? _reassembleSub;
+  StreamSubscription<void>? _reassembleSub;
   Future<Map<String, Object?>>? _data;
 
   final Set<Page> _pages = {};
