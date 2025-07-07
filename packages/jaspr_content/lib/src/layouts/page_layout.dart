@@ -52,8 +52,8 @@ abstract class PageLayoutBase implements PageLayout {
     yield DomComponent(tag: 'title', children: [text(title)]);
     yield meta(attributes: {'property': 'og:title'}, content: title);
 
-    if (siteData['favicon'] case final String favicon) {
-      yield link(rel: 'icon', type: 'image/png', href: favicon);
+    if (siteData['favicon'] case final String faviconHref) {
+      yield link(rel: 'icon', type: 'image/png', href: faviconHref);
     }
 
     final description = pageData['description'];
@@ -67,9 +67,9 @@ abstract class PageLayoutBase implements PageLayout {
     if (keywords case final keys?) {
       yield meta(name: 'keywords', content: keys is List ? keys.join(', ') : keys.toString());
     }
-    if (metaData case Map metaData?) {
-      for (final key in metaData.keys) {
-        yield meta(name: key, content: metaData[key]);
+    if (metaData case Map<String, Object?> metaData?) {
+      for (final MapEntry(key: name, value: content) in metaData.entries) {
+        yield meta(name: name, content: content as String?);
       }
     }
 
@@ -79,9 +79,9 @@ abstract class PageLayoutBase implements PageLayout {
     if (image case final img?) {
       yield meta(attributes: {'property': 'og:image'}, content: img.toString());
     }
-    if (metaData case List metaData?) {
+    if (metaData case List<Object?> metaData?) {
       for (final item in metaData) {
-        if (item is Map) {
+        if (item is Map<Object?, Object?>) {
           yield meta(attributes: item.cast());
         }
       }
