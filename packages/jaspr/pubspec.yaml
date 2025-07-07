@@ -17,7 +17,6 @@ environment:
   sdk: '>=3.6.0 <4.0.0'
 
 dependencies:
-  binary_codec: ^2.0.3
   hotreloader: ^4.1.0
   html: ^0.15.0
   http: '>=0.13.0 <2.0.0'
