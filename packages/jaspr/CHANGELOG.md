@@ -3,6 +3,8 @@
 - Added support for disabling the sitemap generation for specific pages of `jaspr_content` sites.
 - Moved `DomValidator` class to foundation library.
 - Added the `wbr` function for creating a line-break opportunity element.
+- Fixed an error where building too many routes in succession
+  caused ports to be exhausted on macOS.
 
 ## 0.19.1
 
