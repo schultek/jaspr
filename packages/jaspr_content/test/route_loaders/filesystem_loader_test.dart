@@ -64,6 +64,30 @@ void main() {
             ]));
       });
 
+      test('loads nested file structure on windows', () async {
+        final MemoryFileSystem fs =
+            MemoryFileSystem(style: FileSystemStyle.windows);
+        // Arrange
+        final pagesDir = fs.directory('pages')..createSync();
+        pagesDir.childFile('index.md').createSync();
+        fs.directory(r'pages\blog').createSync();
+        fs.file(r'pages\blog\post-1.md').createSync();
+
+        final loader = FilesystemLoader('pages', fileSystem: fs);
+
+        // Act
+        final sources = await loader.loadPageSources();
+
+        // Assert
+        expect(sources, hasLength(2));
+        expect(
+            sources,
+            equals([
+              pageSource('index.md', '/', private: false),
+              pageSource(r'blog\post-1.md', '/blog/post-1', private: false),
+            ]));
+      });
+
       test('marks files and directories starting with an underscore as private', () async {
         // Arrange
         final pagesDir = fileSystem.directory('pages')..createSync();
