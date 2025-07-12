@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:build_daemon/data/build_status.dart';
 import 'package:build_daemon/data/build_target.dart';
 import 'package:collection/collection.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as http show Client;
 import 'package:path/path.dart' as p;
 import 'package:webdev/src/daemon_client.dart' as d;
 
@@ -221,6 +221,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       logger.write('Generating routes...', progress: ProgressState.running);
 
+      final httpClient = http.Client();
+
       while (queuedRoutes.isNotEmpty) {
         var route = queuedRoutes.removeLast();
 
@@ -229,7 +231,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           progress: ProgressState.running,
         );
 
-        var response = await http.get(Uri.parse('http://localhost:8080$route'));
+        var response = await httpClient.get(Uri.parse('http://localhost:8080$route'));
 
         if (response.statusCode != 200) {
           logger.write('Failed to generate route "$route".', level: Level.error, progress: ProgressState.completed);
@@ -277,6 +279,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
 
       done = true;
+      httpClient.close();
       process.kill();
 
       logger.complete(!hasBuildError);
