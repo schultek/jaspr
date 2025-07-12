@@ -142,7 +142,7 @@ void main() {
         fileSystem.file(filePath).createSync();
 
         eventController.add(WatchEvent(ChangeType.ADD, filePath));
-        await Future.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
 
         // Assert
         expect(loader.sources, hasLength(1));
@@ -159,7 +159,7 @@ void main() {
 
         // Act
         eventController.add(WatchEvent(ChangeType.REMOVE, filePath));
-        await Future.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
 
         // Assert
         expect(loader.sources, isEmpty);
@@ -201,7 +201,7 @@ void main() {
 
         // Act: Simulate a modify event on the partial
         eventController.add(WatchEvent(ChangeType.MODIFY, partialPath));
-        await Future.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
 
         // Assert: The page was invalidated
         expect(pageSource.page, isNull);

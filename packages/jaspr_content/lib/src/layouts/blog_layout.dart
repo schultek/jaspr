@@ -83,7 +83,7 @@ class BlogLayout extends PageLayoutBase {
             ]),
             hr(),
             child,
-            if (pageData['tags'] case List tags)
+            if (pageData['tags'] case List<Object?> tags)
               div(classes: 'post-tags', [
                 for (final tag in tags) span([text(tag.toString())]),
               ]),
