@@ -8,6 +8,7 @@ import 'dart:collection';
 
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
+import 'package:path/path.dart' as pkg_path;
 
 import '../page.dart';
 import '../secondary_output/secondary_output.dart';
@@ -184,8 +185,8 @@ abstract class RouteLoaderBase implements RouteLoader {
 final indexRegex = RegExp(r'index\.[^/]*$');
 
 abstract class PageSource {
-  PageSource(this.path, this.loader, {bool keepSuffix = false}) {
-    final segments = path.split('/');
+  PageSource(this.path, this.loader, {bool keepSuffix = false, pkg_path.Context? context}) {
+    final segments = (context ?? pkg_path.context).split(path);
 
     private = segments.any((s) => s.startsWith('_') || s.startsWith('.'));
 

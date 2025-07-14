@@ -12,6 +12,7 @@
 - Fixed `GitHubButton` not linking to the correct repository.
 - Renamed the `GithubLoader` route loader to `GitHubLoader`.
 - **Breaking:** Made `GitHubPageSource` private.
+- Fixed subfolders in `Content` are not recognized on Windows.
 
 ## 0.2.0
 

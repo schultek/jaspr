@@ -99,6 +99,7 @@ class FilesystemLoader extends RouteLoaderBase {
             entry,
             this,
             keepSuffix: keepSuffixPattern?.matchAsPrefix(entry.path) != null,
+            context: fileSystem.path,
           ));
         } else if (entry is Directory) {
           entities.addAll(loadFiles(entry));
@@ -116,6 +117,7 @@ class FilesystemLoader extends RouteLoaderBase {
       fileSystem.file(path),
       this,
       keepSuffix: keepSuffixPattern?.matchAsPrefix(path) != null,
+      context: fileSystem.path,
     ));
   }
 
@@ -157,6 +159,7 @@ class FilePageSource extends PageSource {
     this.file,
     super.loader, {
     super.keepSuffix,
+    super.context,
   });
 
   final File file;

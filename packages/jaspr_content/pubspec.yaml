@@ -28,6 +28,7 @@ dependencies:
   liquify: ^1.0.0
   markdown: ^7.3.0
   mustache_template: ^2.0.0
+  path: ^1.9.1
   syntax_highlight_lite: ^0.0.1
   universal_web: ^1.1.0
   watcher: ^1.1.1
