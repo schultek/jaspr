@@ -153,12 +153,12 @@ class Meet extends StatelessComponent {
             for (var i = 1; i <= 5; i++) ...[
               css('.select-target-$i').styles(position: Position.relative()),
               css('&:has(.select-trigger-$i:hover) .select-target-$i::before').styles(
+                content: '',
                 position: Position.absolute(left: (-10).px, top: (-10).px, right: (-10).px, bottom: (-10).px),
                 zIndex: ZIndex(-1),
                 border: Border(color: primaryLight, width: 1.px),
                 radius: BorderRadius.circular(8.px),
                 backgroundColor: primaryFaded,
-                raw: {'content': '""'},
               ),
             ]
           ]),

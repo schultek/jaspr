@@ -278,7 +278,7 @@ void main() {
     loaders: [
       // Load pages from both the 'content/' directory and github repository.
       FilesystemLoader('content'),
-      GithubLoader(
+      GitHubLoader(
         '<username>/<repo>',
         accessToken: '...',
       ),

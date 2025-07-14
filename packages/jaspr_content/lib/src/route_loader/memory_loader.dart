@@ -32,12 +32,12 @@ class MemoryLoader extends RouteLoaderBase {
 class MemoryPage {
   /// Creates a new [MemoryPage] with the given [path] and [content].
   ///
-  /// Optionally takes initial [data] to pass to the page.
+  /// Optionally takes [initialData] to pass to the page.
   const MemoryPage({
     required this.path,
     this.keepSuffix = false,
     this.content,
-    this.data = const {},
+    this.initialData = const {},
   })  : builder = null,
         applyLayout = true;
 
@@ -47,13 +47,13 @@ class MemoryPage {
   /// Therefore, the any template engine, parsers or extensions will not be used. The layout and theme
   /// will only be applied if [applyLayout] is set to true (default).
   ///
-  /// Optionally takes initial [data] to pass to the page.
+  /// Optionally takes [initialData] to pass to the page.
   const MemoryPage.builder({
     required this.path,
     this.keepSuffix = false,
     this.builder,
     this.applyLayout = true,
-    this.data = const {},
+    this.initialData = const {},
   }) : content = null;
 
   /// The path to the page.
@@ -72,7 +72,7 @@ class MemoryPage {
   final bool applyLayout;
 
   /// The initial data to pass to the page.
-  final Map<String, dynamic> data;
+  final Map<String, Object?> initialData;
 }
 
 class MemoryPageSource extends PageSource {
@@ -82,13 +82,13 @@ class MemoryPageSource extends PageSource {
 
   @override
   Future<Page> buildPage() async {
-    if (_page.builder != null) {
+    if (_page.builder case final pageBuilder?) {
       return _BuilderPage(
         path: this.path,
         url: url,
-        builder: _page.builder!,
+        builder: pageBuilder,
         applyLayout: _page.applyLayout,
-        data: _page.data,
+        initialData: _page.initialData,
         config: config,
         loader: loader,
       );
@@ -97,7 +97,7 @@ class MemoryPageSource extends PageSource {
       path: this.path,
       url: url,
       content: _page.content ?? '',
-      data: _page.data,
+      initialData: _page.initialData,
       config: config,
       loader: loader,
     );
@@ -110,7 +110,7 @@ class _BuilderPage extends Page {
     required super.url,
     required this.builder,
     required this.applyLayout,
-    required super.data,
+    required super.initialData,
     required super.config,
     required super.loader,
   }) : super(content: '');
@@ -125,7 +125,7 @@ class _BuilderPage extends Page {
       url: url,
       builder: builder,
       applyLayout: applyLayout,
-      data: data,
+      initialData: data,
       config: config,
       loader: loader,
     );
@@ -135,8 +135,10 @@ class _BuilderPage extends Page {
   Future<Component> render() async {
     await loadData();
     return Builder.single(builder: (context) {
-      if (kGenerateMode && data['page']['sitemap'] != null) {
-        context.setHeader('jaspr-sitemap-data', jsonEncode(data['page']['sitemap']));
+      if (kGenerateMode) {
+        if (data.page['sitemap'] case final sitemap?) {
+          context.setHeader('jaspr-sitemap-data', jsonEncode(sitemap));
+        }
       }
 
       final child = Builder.single(builder: builder);

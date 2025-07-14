@@ -41,3 +41,15 @@ Through the command palette, you can access the following Jaspr commands:
 - **Jaspr: Server**: Start the Jaspr dev server.
 - **Jaspr: Clean**: Clean the Jaspr project folder.
 - **Jaspr: Doctor**: Run the Jaspr doctor command.
+
+## Snippets
+
+The extension comes with the following snippets:
+
+- `jstless`: Create a new StatelessComponent
+- `jstful`: Create a new StatefulComponent
+- `jhtml`: Insert a html component
+- `jtext`: Insert a text component
+- `jstyls`: Create a new styles definition
+- `jevt`: Insert an event handler
+- `jclick`: Insert a click event handler

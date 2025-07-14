@@ -8,6 +8,7 @@ import 'dart:collection';
 
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
+import 'package:path/path.dart' as pkg_path;
 
 import '../page.dart';
 import '../secondary_output/secondary_output.dart';
@@ -16,7 +17,7 @@ import '../secondary_output/secondary_output.dart';
 ///
 /// See also:
 /// - [FilesystemLoader]
-/// - [GithubLoader]
+/// - [GitHubLoader]
 /// - [MemoryLoader]
 abstract class RouteLoader {
   /// Loads the routes with the given [ConfigResolver].
@@ -184,8 +185,8 @@ abstract class RouteLoaderBase implements RouteLoader {
 final indexRegex = RegExp(r'index\.[^/]*$');
 
 abstract class PageSource {
-  PageSource(this.path, this.loader, {bool keepSuffix = false}) {
-    final segments = path.split('/');
+  PageSource(this.path, this.loader, {bool keepSuffix = false, pkg_path.Context? context}) {
+    final segments = (context ?? pkg_path.context).split(path);
 
     private = segments.any((s) => s.startsWith('_') || s.startsWith('.'));
 
@@ -241,12 +242,17 @@ abstract class PageSource {
     _page = newPage;
     RouteLoader._pages.add(newPage);
 
+    // Preserve original data to reapply
+    // after first specifying our provided data.
+    final builtData = newPage.data;
+
     newPage.apply(
-      data: <String, dynamic>{
+      data: <String, Object?>{
         'page': {'path': path, 'url': url},
-      }.merge(newPage.data),
+      },
       mergeData: false,
     );
+    newPage.apply(data: builtData);
 
     var child = Page.wrap(
       newPage,

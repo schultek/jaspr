@@ -85,8 +85,9 @@ class ServerApp {
   }
 
   static Future<void> _sendDebugMessage(Object message) async {
-    await http.post(
-      Uri.parse('http://localhost:$jasprProxyPort/\$jasprMessageHandler'),
+    final postWithClient = _client?.post ?? http.post;
+    await postWithClient(
+      Uri.http('localhost:$jasprProxyPort', r'$jasprMessageHandler'),
       body: jsonEncode(message),
     );
   }

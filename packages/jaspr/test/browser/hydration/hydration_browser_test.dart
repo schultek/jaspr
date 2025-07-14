@@ -4,7 +4,6 @@ library;
 import 'dart:js_interop';
 
 import 'package:jaspr/browser.dart';
-import 'package:jaspr/src/foundation/marker_utils.dart';
 import 'package:jaspr_test/browser_test.dart';
 import 'package:universal_web/web.dart';
 
@@ -37,7 +36,7 @@ void main() {
     });
 
     testBrowser('should find and hydrate marker', (tester) async {
-      var marker = clientMarkerPrefix;
+      var marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML = '<div>'
               '  <p>A</p>'
               '  <!--${marker}app-->'
@@ -69,7 +68,7 @@ void main() {
     });
 
     testBrowser('should find and hydrate multiple markers with params', (tester) async {
-      var marker = clientMarkerPrefix;
+      var marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML = '<div>'
               '  <!--${marker}app data={"name": "A"}-->'
               '  <p>Hello</p>'
