@@ -10,7 +10,7 @@ void main() {
     testBrowser('should access node from GlobalNodeKey', (tester) async {
       final key = GlobalNodeKey<HTMLInputElement>();
 
-      tester.pumpComponent(input(key: key, type: InputType.checkbox, []));
+      tester.pumpComponent(input(key: key, type: InputType.checkbox));
 
       expect(key.currentNode, isNotNull);
 

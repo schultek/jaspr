@@ -10,7 +10,7 @@ class App extends StatelessComponent {
         Route(path: '/about', builder: (_, __) => About()),
       ],
       errorBuilder: (_, state) {
-        return DomComponent(tag: 'span', child: Text('Unknown (${state.location})'));
+        return span([text('Unknown (${state.location})')]);
       },
     );
   }
@@ -23,7 +23,7 @@ class Home extends StatelessComponent {
     shouldThrow(() => Router.of(context).replace('/'));
     shouldThrow(() => Router.of(context).back());
 
-    yield DomComponent(tag: 'span', child: Text('Home'));
+    yield span([text('Home')]);
   }
 
   void shouldThrow(Function fn) async {
@@ -40,13 +40,13 @@ class Home extends StatelessComponent {
 class About extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'span', child: Text('About'));
+    yield span([text('About')]);
   }
 }
 
 class Contact extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'span', child: Text('Contact'));
+    yield span([text('Contact')]);
   }
 }

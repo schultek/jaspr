@@ -29,8 +29,6 @@ enum Display {
 abstract class Border {
   const factory Border({BorderStyle? style, Color? color, Unit? width}) = __Border;
 
-  @Deprecated('Use Border() instead.')
-  const factory Border.all(BorderSide side) = _AllBorder;
   const factory Border.only({BorderSide? left, BorderSide? top, BorderSide? right, BorderSide? bottom}) = _OnlyBorder;
   const factory Border.symmetric({BorderSide? vertical, BorderSide? horizontal}) = _SymmetricBorder;
 
@@ -69,21 +67,6 @@ class __Border implements Border {
           if (style != null) style!.value,
           if (color != null) color!.value,
           if (width != null) width!.value,
-        ].join(' ')
-      };
-}
-
-class _AllBorder implements Border {
-  final BorderSide side;
-
-  const _AllBorder(this.side);
-
-  @override
-  Map<String, String> get styles => {
-        'border': [
-          if (side.style != null) side.style!.value,
-          if (side.color != null) side.color!.value,
-          if (side.width != null) side.width!.value,
         ].join(' ')
       };
 }

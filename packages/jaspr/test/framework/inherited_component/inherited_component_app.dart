@@ -8,10 +8,7 @@ final myKey = GlobalKey();
 class App extends TestComponent<int> {
   App() : super(initialValue: 0);
 
-  final child = DomComponent(
-    tag: 'div',
-    child: MyChildComponent(),
-  );
+  final child = div([MyChildComponent()]);
 
   @override
   Iterable<Component> build(BuildContext context, int counter) sync* {

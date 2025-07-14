@@ -26,10 +26,9 @@ class Home extends StatelessComponent {
     if (phase == 1) {
       yield MyStatefulComponent(key: myKey);
     } else if (phase == 2) {
-      yield DomComponent(
-        tag: 'div',
-        child: MyStatefulComponent(key: myKey),
-      );
+      yield div([
+        MyStatefulComponent(key: myKey),
+      ]);
     }
   }
 }

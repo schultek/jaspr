@@ -77,9 +77,9 @@ class _Image extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'figure', classes: 'image', children: [
+    yield figure(classes: 'image', [
       img(src: src, alt: alt ?? caption),
-      if (caption != null) DomComponent(tag: 'figcaption', children: [text(caption!)]),
+      if (caption != null) figcaption([text(caption!)]),
     ]);
   }
 }

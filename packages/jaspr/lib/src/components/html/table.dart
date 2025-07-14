@@ -198,7 +198,7 @@ Component td(List<Component> children,
 /// The &lt;col&gt; HTML element defines one or more columns in a column group represented by its parent &lt;colgroup&gt; element. The &lt;col&gt; element is only valid as a child of a &lt;colgroup&gt; element that has no span attribute defined.
 ///
 /// - [span]: Specifies the number of consecutive columns the &lt;col&gt; element spans. The value must be a positive integer greater than zero. If not present, its default value is 1.
-Component col(List<Component> children,
+Component col(
     {int? span,
     Key? key,
     String? id,
@@ -217,7 +217,6 @@ Component col(List<Component> children,
       if (span != null) 'span': '$span',
     },
     events: events,
-    children: children,
   );
 }
 

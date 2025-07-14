@@ -165,7 +165,7 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'figure', classes: 'image zoomable', children: [
+    yield figure(classes: 'image zoomable', [
       img(
         key: imageKey,
         src: component.src,
@@ -175,7 +175,7 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
           zoomIn();
         }),
       ),
-      if (component.caption != null) DomComponent(tag: 'figcaption', children: [text(component.caption!)]),
+      if (component.caption != null) figcaption([text(component.caption!)]),
     ]);
   }
 

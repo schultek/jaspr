@@ -1,8 +1,5 @@
 import 'unit.dart';
 
-@Deprecated('Will be removed in 0.20.0. Use Padding or Margin instead.')
-typedef EdgeInsets = Spacing;
-
 typedef Padding = Spacing;
 typedef Margin = Spacing;
 

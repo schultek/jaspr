@@ -18,7 +18,6 @@ class EffectsControls extends StatelessComponent {
             '${alignTop ? ' align-top' : ''}'
             '${fx != 'handheld' && effects.contains('handheld') ? ' disabled' : ''}',
         attributes: {'data-fx': fx},
-        [],
       );
     }
 
@@ -50,7 +49,6 @@ class EffectsControls extends StatelessComponent {
           id: 'rotation',
           classes: 'tight${effects.contains('handheld') ? ' disabled' : ''}',
           attributes: {'min': '-180', 'max': '180', 'list': 'markers'},
-          [],
         ),
         datalist(id: 'markers', [
           option(value: '-180', []),

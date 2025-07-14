@@ -13,7 +13,7 @@ void main() {
 
       tester.pumpComponent(StatefulBuilder(builder: (context, s) sync* {
         setState = s;
-        yield input(value: text, []);
+        yield input(value: text);
       }));
 
       final node = tester.findNode(find.tag('input')) as HTMLInputElement;

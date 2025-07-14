@@ -49,6 +49,7 @@ void main() {
       content.write('{');
 
       var events = <String>{};
+      String? contentParam;
 
       if (attrs != null) {
         for (var attr in attrs.keys) {
@@ -85,6 +86,9 @@ void main() {
           } else if (type is Map<String, dynamic>) {
             var name = type['name'];
             content.write(name);
+          } else if (type == 'content') {
+            content.write('String');
+            contentParam = name;
           } else {
             throw ArgumentError('Attribute type is unknown ($type) for attribute $key.$tag.$attr');
           }
@@ -117,7 +121,7 @@ void main() {
           var name = attrs[attr]['name'] ?? attr;
           var type = attrs[attr]['type'];
 
-          if (type is String && type.startsWith('event:')) continue;
+          if (type is String && (type.startsWith('event:') || type == 'content')) continue;
 
           content.write('      ');
 
@@ -168,6 +172,8 @@ void main() {
 
       if (!selfClosing) {
         content.write('    children: children,\n');
+      } else if (contentParam != null) {
+        content.write('    children: [if ($contentParam != null) raw($contentParam)],\n');
       }
 
       content.writeln('  );\n'

@@ -34,7 +34,6 @@ void main() {
               disabled: false,
               onInput: (_) {},
               onChange: (_) {},
-              [],
             ),
             label(htmlFor: 'a', []),
             datalist([]),
