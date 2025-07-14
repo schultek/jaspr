@@ -13,6 +13,10 @@
 - Added the `wbr` html method for creating a line-break opportunity element.
 - Added support for disabling the sitemap generation for specific pages of `jaspr_content` sites.
 
+- Moved `DomValidator` class to foundation library.
+- Fixed an error where building too many routes in succession
+  caused ports to be exhausted on macOS.
+
 ## 0.19.1
 
 - Added `Color.currentColor` constant.

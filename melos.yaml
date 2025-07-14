@@ -21,7 +21,7 @@ packages:
 scripts:
   format:
     run: |
-      melos exec --ignore=jaspr_cli -- "dart format . --line-length=120 --set-exit-if-changed"
+      melos exec --ignore=jaspr_cli,jaspr_web_compilers -- "dart format . --line-length=120 --set-exit-if-changed"
       melos exec --scope=jaspr_cli -- "dart format lib  --line-length=120 --set-exit-if-changed"
   analyze: melos exec -- "dart analyze . --fatal-infos"
   test:
@@ -29,7 +29,7 @@ scripts:
     exec:
       concurrency: 1
     packageFilters:
-      scope: [ jaspr, jaspr_builder, jaspr_riverpod, jaspr_router ]
+      scope: [ jaspr, jaspr_builder, jaspr_content, jaspr_riverpod, jaspr_router ]
   coverage:
     run: |
       dart test --coverage=coverage &&
@@ -37,7 +37,7 @@ scripts:
     exec:
       concurrency: 1
     packageFilters:
-      scope: [jaspr, jaspr_builder, jaspr_riverpod, jaspr_router]
+      scope: [jaspr, jaspr_builder, jaspr_content, jaspr_riverpod, jaspr_router]
   coverage:cli:
     run: |
       cd packages/jaspr_cli &&

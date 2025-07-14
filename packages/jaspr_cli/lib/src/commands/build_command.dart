@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:build_daemon/data/build_status.dart';
 import 'package:build_daemon/data/build_target.dart';
 import 'package:collection/collection.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as http show Client;
 import 'package:path/path.dart' as p;
 import 'package:webdev/src/daemon_client.dart' as d;
 
@@ -168,7 +168,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     } else if (config!.mode == JasprMode.static) {
       logger.write('Generating static site...', progress: ProgressState.running);
 
-      Map<String, ({String? lastmod, String? changefreq, double? priority})> generatedRoutes = {};
+      Map<String, ({String? lastmod, String? changefreq, double? priority})?> generatedRoutes = {};
       List<String> queuedRoutes = [];
 
       var serverStartedCompleter = Completer();
@@ -221,6 +221,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       logger.write('Generating routes...', progress: ProgressState.running);
 
+      final httpClient = http.Client();
+
       while (queuedRoutes.isNotEmpty) {
         var route = queuedRoutes.removeLast();
 
@@ -229,7 +231,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           progress: ProgressState.running,
         );
 
-        var response = await http.get(Uri.parse('http://localhost:8080$route'));
+        var response = await httpClient.get(Uri.parse('http://localhost:8080$route'));
 
         if (response.statusCode != 200) {
           logger.write('Failed to generate route "$route".', level: Level.error, progress: ProgressState.completed);
@@ -247,38 +249,37 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         file.writeAsBytesSync(response.bodyBytes);
 
         if (response.headers['jaspr-sitemap-data'] case String data) {
-          final sitemap = jsonDecode(data) as Object?;
+          if (data == 'false') {
+            generatedRoutes[route] = null;
+          } else {
+            final sitemap = jsonDecode(data) as Object?;
 
-          if (sitemap == false) {
-            // If `sitemap: false`, don't include this route in the sitemap.
-            generatedRoutes.remove(route);
-            continue;
-          }
+            if (sitemap is! Map<String, Object?>) {
+              logger.write(
+                'Invalid sitemap data for route "$route". Expected a map, but got ${sitemap.runtimeType}.',
+                level: Level.error,
+                progress: ProgressState.completed,
+              );
+              hasBuildError = true;
+              continue;
+            }
 
-          if (sitemap is! Map<String, Object?>) {
-            logger.write(
-              'Invalid sitemap data for route "$route". Expected a map, but got ${sitemap.runtimeType}.',
-              level: Level.error,
-              progress: ProgressState.completed,
+            final originalRouteConfig = generatedRoutes[route];
+            final lastModConfig = sitemap['lastmod'];
+            final changeFrequencyConfig = sitemap['changefreq'];
+            final priorityConfig = sitemap['priority'];
+
+            generatedRoutes[route] = (
+              lastmod: lastModConfig is String ? lastModConfig : originalRouteConfig?.lastmod,
+              changefreq: changeFrequencyConfig is String ? changeFrequencyConfig : originalRouteConfig?.changefreq,
+              priority: priorityConfig is num ? priorityConfig.toDouble() : originalRouteConfig?.priority,
             );
-            hasBuildError = true;
-            continue;
           }
-
-          final originalRouteConfig = generatedRoutes[route];
-          final lastModConfig = sitemap['lastmod'];
-          final changeFrequencyConfig = sitemap['changefreq'];
-          final priorityConfig = sitemap['priority'];
-
-          generatedRoutes[route] = (
-            lastmod: lastModConfig is String ? lastModConfig : originalRouteConfig?.lastmod,
-            changefreq: changeFrequencyConfig is String ? changeFrequencyConfig : originalRouteConfig?.changefreq,
-            priority: priorityConfig is num ? priorityConfig.toDouble() : originalRouteConfig?.priority,
-          );
         }
       }
 
       done = true;
+      httpClient.close();
       process.kill();
 
       logger.complete(!hasBuildError);
@@ -303,13 +304,18 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
             continue;
           }
 
+          final sitemapData = route.value;
+          if (sitemapData == null) {
+            continue;
+          }
+
           content.writeln('  <url>');
           content.writeln('    <loc>$domain${route.key}</loc>');
-          content.writeln('    <lastmod>${route.value.lastmod ?? now}</lastmod>');
-          if (route.value.changefreq != null) {
-            content.writeln('    <changefreq>${route.value.changefreq}</changefreq>');
+          content.writeln('    <lastmod>${sitemapData.lastmod ?? now}</lastmod>');
+          if (sitemapData.changefreq != null) {
+            content.writeln('    <changefreq>${sitemapData.changefreq}</changefreq>');
           }
-          content.writeln('    <priority>${route.value.priority ?? 0.5}</priority>');
+          content.writeln('    <priority>${sitemapData.priority ?? 0.5}</priority>');
           content.writeln('  </url>');
         }
         content.writeln('</urlset>');
