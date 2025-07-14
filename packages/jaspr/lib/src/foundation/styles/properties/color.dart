@@ -1,3 +1,4 @@
+/// An immutable css color value.
 abstract class Color {
   /// Constructs a [Color] from a css color value.
   ///
@@ -34,75 +35,32 @@ abstract class Color {
 
   /// The color css value
   String get value;
-}
 
-class _Color implements Color {
-  final String _value;
+  /// Returns a new color that matches this color, but with its opacity modified.
+  ///
+  /// By default, the current opacity is replaced with the given opacity value (which ranges from 0.0 to 1.0).
+  /// When [replace] is false, the current opacity will be increased or decreased by the specified
+  /// amount (ranging from -1.0 to 1.0).
+  Color withOpacity(double opacity, {bool replace = true});
 
-  const _Color(this._value);
+  /// Returns a new color that matches this color, but with its lightness modified.
+  ///
+  /// By default, the current lightness is replaced with the given lightness value (which ranges from 0.0 to 1.0).
+  /// When [replace] is false, the current lightness will be increased or decreased by the specified
+  /// amount (ranging from -1.0 to 1.0).
+  Color withLightness(double lightness, {bool replace = true});
 
-  @override
-  String get value => _value;
+  /// Returns a new color that matches this color, but with its hue modified.
+  ///
+  /// By default, the current hue is replaced with the given hue angle (from 0 to 360).
+  /// When [replace] is false, the current hue will be rotated by the specified angle instead.
+  ///
+  /// Note: The new color is specified in the OKLCH color space, which gives a more uniform perception of color than
+  /// HSL, but uses different hue angles than the sRGB color space.
+  Color withHue(double hue, {bool replace = true});
 
-  @override
-  String toString() => 'Color($_value)';
-}
-
-class _ValueColor implements Color {
-  final int _value;
-  const _ValueColor(this._value);
-
-  @override
-  String get value => '#${_value.toRadixString(16).padLeft(6, '0')}';
-}
-
-class _RGBColor implements Color {
-  final int red;
-  final int green;
-  final int blue;
-
-  const _RGBColor(this.red, this.green, this.blue);
-
-  @override
-  String get value => 'rgb($red, $green, $blue)';
-}
-
-class _RGBAColor extends _RGBColor {
-  final double alpha;
-
-  const _RGBAColor(super.red, super.green, super.blue, this.alpha);
-
-  @override
-  String get value => 'rgba($red, $green, $blue, $alpha)';
-}
-
-class _HSLColor implements Color {
-  final int hue;
-  final int saturation;
-  final int lightness;
-
-  const _HSLColor(this.hue, this.saturation, this.lightness);
-
-  @override
-  String get value => 'hsl($hue, $saturation%, $lightness%)';
-}
-
-class _HSLAColor extends _HSLColor {
-  final double alpha;
-
-  const _HSLAColor(super.hue, super.saturation, super.lightness, this.alpha);
-
-  @override
-  String get value => 'hsla($hue, $saturation%, $lightness%, $alpha)';
-}
-
-class _VariableColor implements Color {
-  final String _value;
-
-  const _VariableColor(this._value);
-
-  @override
-  String get value => 'var($_value)';
+  /// Returns a new color with the provided values replaced.
+  Color withValues({double? red, double? green, double? blue, double? alpha});
 }
 
 class Colors {
@@ -247,4 +205,261 @@ class Colors {
   static const Color yellow = Color('yellow');
   static const Color yellowGreen = Color('yellowGreen');
   static const Color transparent = Color('transparent');
+}
+
+abstract mixin class _ColorMixin implements Color {
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    return _RelativeRGBColor(from: this, alpha: opacity, replace: replace);
+  }
+
+  @override
+  Color withLightness(double lightness, {bool replace = true}) {
+    return _RelativeHSLColor(from: this, lightness: lightness, replace: replace);
+  }
+
+  @override
+  Color withHue(double hue, {bool replace = true}) {
+    return _RelativeOKLCHColor(from: this, hue: hue, replace: replace);
+  }
+
+  @override
+  Color withValues({double? red, double? green, double? blue, double? alpha}) {
+    return _RelativeRGBColor(from: this, red: red, green: green, blue: blue, alpha: alpha);
+  }
+}
+
+class _Color with _ColorMixin {
+  final String _value;
+
+  const _Color(this._value);
+
+  @override
+  String get value => _value;
+
+  @override
+  String toString() => 'Color($_value)';
+}
+
+class _ValueColor with _ColorMixin {
+  final int _value;
+  const _ValueColor(this._value);
+
+  @override
+  String get value => '#${_value.toRadixString(16).padLeft(6, '0')}';
+}
+
+class _RGBColor with _ColorMixin {
+  final int red;
+  final int green;
+  final int blue;
+
+  const _RGBColor(this.red, this.green, this.blue);
+
+  @override
+  String get value => 'rgb($red, $green, $blue)';
+}
+
+class _RGBAColor extends _RGBColor {
+  final double alpha;
+
+  const _RGBAColor(super.red, super.green, super.blue, this.alpha);
+
+  @override
+  String get value => 'rgba($red, $green, $blue, $alpha)';
+}
+
+class _HSLColor with _ColorMixin {
+  final int hue;
+  final int saturation;
+  final int lightness;
+
+  const _HSLColor(this.hue, this.saturation, this.lightness);
+
+  @override
+  String get value => 'hsl($hue, $saturation%, $lightness%)';
+}
+
+class _HSLAColor extends _HSLColor {
+  final double alpha;
+
+  const _HSLAColor(super.hue, super.saturation, super.lightness, this.alpha);
+
+  @override
+  String get value => 'hsla($hue, $saturation%, $lightness%, $alpha)';
+}
+
+class _VariableColor with _ColorMixin {
+  final String _value;
+
+  const _VariableColor(this._value);
+
+  @override
+  String get value => 'var($_value)';
+}
+
+abstract class _RelativeColor with _ColorMixin {
+  final Color from;
+  final double? alpha;
+  final bool replace;
+
+  const _RelativeColor({
+    required this.from,
+    this.alpha,
+    this.replace = true,
+  });
+
+  String _channel(double? v, String origin) {
+    if (v == null) return origin;
+    final vStr = (v.toInt() == v) ? v.abs().toInt().toString() : v.abs().toString();
+    if (replace) {
+      return vStr;
+    } else if (v < 0) {
+      return 'calc($origin - $vStr)';
+    } else {
+      return 'calc($origin + $vStr)';
+    }
+  }
+
+  String _relative(String method, String channels) {
+    final a = alpha != null ? ' / ${_channel(alpha, 'alpha')}' : '';
+    return '$method(from ${from.value} $channels$a)';
+  }
+}
+
+class _RelativeRGBColor extends _RelativeColor {
+  final double? red;
+  final double? green;
+  final double? blue;
+
+  const _RelativeRGBColor({
+    required super.from,
+    this.red,
+    this.green,
+    this.blue,
+    super.alpha,
+    super.replace = true,
+  });
+
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    if (replace && this.replace) {
+      return _RelativeRGBColor(
+        from: from,
+        red: red,
+        green: green,
+        blue: blue,
+        alpha: opacity,
+      );
+    } else if (!replace && !this.replace) {
+      return _RelativeRGBColor(
+        from: from,
+        red: red,
+        green: green,
+        blue: blue,
+        alpha: alpha != null ? alpha! + opacity : opacity,
+        replace: false,
+      );
+    } else {
+      return super.withOpacity(opacity, replace: replace);
+    }
+  }
+
+  @override
+  Color withValues({
+    double? red,
+    double? green,
+    double? blue,
+    double? alpha,
+  }) {
+    if (replace) {
+      return _RelativeRGBColor(
+        from: from,
+        red: red ?? this.red,
+        green: green ?? this.green,
+        blue: blue ?? this.blue,
+        alpha: alpha ?? this.alpha,
+      );
+    } else {
+      return super.withValues(red: red, green: green, blue: blue, alpha: alpha);
+    }
+  }
+
+  @override
+  String get value {
+    final r = _channel(red, 'r');
+    final g = _channel(green, 'g');
+    final b = _channel(blue, 'b');
+    return _relative('rgb', '$r $g $b');
+  }
+}
+
+class _RelativeHSLColor extends _RelativeColor {
+  final double lightness;
+
+  const _RelativeHSLColor({required super.from, required this.lightness, super.alpha, super.replace = true});
+
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    if (replace && this.replace) {
+      return _RelativeHSLColor(from: from, lightness: lightness, alpha: opacity);
+    } else if (!replace && !this.replace) {
+      return _RelativeHSLColor(
+          from: from, lightness: lightness, alpha: alpha != null ? alpha! + opacity : opacity, replace: false);
+    } else {
+      return super.withOpacity(opacity, replace: replace);
+    }
+  }
+
+  @override
+  Color withLightness(double lightness, {bool replace = true}) {
+    if (replace && this.replace) {
+      return _RelativeHSLColor(from: from, lightness: lightness, alpha: alpha);
+    } else if (!replace && !this.replace) {
+      return _RelativeHSLColor(from: from, lightness: this.lightness + lightness, alpha: alpha, replace: false);
+    } else {
+      return super.withLightness(lightness, replace: replace);
+    }
+  }
+
+  @override
+  String get value {
+    final l = _channel(lightness * 100, 'l');
+    return  _relative('hsl', 'h s $l');
+  }
+}
+
+class _RelativeOKLCHColor extends _RelativeColor {
+  final double hue;
+
+  const _RelativeOKLCHColor({required super.from, required this.hue, super.alpha, super.replace = true});
+
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    if (replace && this.replace) {
+      return _RelativeOKLCHColor(from: from, hue: hue, alpha: opacity);
+    } else if (!replace && !this.replace) {
+      return _RelativeOKLCHColor(
+          from: from, hue: hue, alpha: alpha != null ? alpha! + opacity : opacity, replace: false);
+    } else {
+      return super.withOpacity(opacity, replace: replace);
+    }
+  }
+
+  @override
+  Color withHue(double hue, {bool replace = true}) {
+    if (replace && this.replace) {
+      return _RelativeOKLCHColor(from: from, hue: hue, alpha: alpha);
+    } else if (!replace && !this.replace) {
+      return _RelativeOKLCHColor(from: from, hue: this.hue + hue, alpha: alpha, replace: false);
+    } else {
+      return super.withHue(hue, replace: replace);
+    }
+  }
+
+  @override
+  String get value {
+    final h = _channel(hue, 'h');
+    return _relative('oklch', 'l c $h');
+  }
 }

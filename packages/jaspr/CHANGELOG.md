@@ -8,12 +8,14 @@
 - **Breaking**: Removed deprecated style groups (`Styles.box()`, `Styles.text()`, `Styles.background()`, etc. as well as `.box()`, `.text()`, etc.).
 - **Breaking**: Removed deprecated `EdgeInsets` type.
 - **Breaking**: Removed deprecated `Border.all` constructor.
+
+- Added `withOpacity()`, `withLightness()`, `withHue()` and `withValues()` methods to `Color`.
   
 - Added `figure` and `figcaption` html methods.  
 - Added the `wbr` html method for creating a line-break opportunity element.
-- Added support for disabling the sitemap generation for specific pages of `jaspr_content` sites.
 
 - Moved `DomValidator` class to foundation library.
+- Added support for disabling the sitemap generation for specific pages of `jaspr_content` sites.
 - Fixed an error where building too many routes in succession
   caused ports to be exhausted on macOS.
 

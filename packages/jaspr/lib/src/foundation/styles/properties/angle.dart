@@ -21,6 +21,8 @@ abstract class Angle {
   /// Represents a css variable
   const factory Angle.variable(String value) = _VariableAngle;
 
+  operator +(Angle other);
+
   /// The css value
   String get value;
 }
@@ -30,6 +32,9 @@ class _ZeroAngle implements Angle {
 
   @override
   String get value => '0';
+
+  @override
+  Angle operator +(Angle other) => other;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is _Angle && other._value == 0;
@@ -47,6 +52,12 @@ class _VariableAngle implements Angle {
   String get value => 'var($_value)';
 
   @override
+  Angle operator +(Angle other) {
+    if (other is _ZeroAngle) return this;
+    return _AddAngle(this, other);
+  }
+
+  @override
   bool operator ==(Object other) => identical(this, other) || other is _VariableAngle && other._value == _value;
 
   @override
@@ -61,6 +72,15 @@ class _Angle implements Angle {
 
   @override
   String get value => '${_value.numstr}$_unit';
+
+  @override
+  Angle operator +(Angle other) {
+    if (other is _ZeroAngle) return this;
+    if (other is _Angle && other._unit == _unit) {
+      return _Angle(_value + other._value, _unit);
+    }
+    return _AddAngle(this, other);
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -82,4 +102,19 @@ class _RadianAngle extends _Angle {
 
 class _TurnAngle extends _Angle {
   const _TurnAngle(double value) : super(value, 'turn');
+}
+
+class _AddAngle implements Angle {
+  final Angle _first;
+  final Angle _second;
+
+  const _AddAngle(this._first, this._second);
+
+  @override
+  String get value => 'calc(${_first.value} + ${_second.value})';
+
+  @override
+  Angle operator +(Angle other) {
+    return _AddAngle(_first, _second + other);
+  }
 }
