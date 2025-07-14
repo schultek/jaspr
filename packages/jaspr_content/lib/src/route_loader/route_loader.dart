@@ -185,8 +185,8 @@ abstract class RouteLoaderBase implements RouteLoader {
 final indexRegex = RegExp(r'index\.[^/]*$');
 
 abstract class PageSource {
-  PageSource(this.path, this.loader, {bool keepSuffix = false}) {
-    final segments = pkg_path.split(path);
+  PageSource(this.path, this.loader, {bool keepSuffix = false, pkg_path.Context? context}) {
+    final segments = (context ?? pkg_path.context).split(path);
 
     private = segments.any((s) => s.startsWith('_') || s.startsWith('.'));
 
