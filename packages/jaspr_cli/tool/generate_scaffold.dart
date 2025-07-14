@@ -17,7 +17,6 @@ Future<void> generate(String name) async {
   if (result.exitCode != 0) {
     exit(result.exitCode);
   }
-
 }
 
 String toCamelCase(String s) {
