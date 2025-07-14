@@ -71,21 +71,6 @@ class __Border implements Border {
       };
 }
 
-class _AllBorder implements Border {
-  final BorderSide side;
-
-  const _AllBorder(this.side);
-
-  @override
-  Map<String, String> get styles => {
-        'border': [
-          if (side.style != null) side.style!.value,
-          if (side.color != null) side.color!.value,
-          if (side.width != null) side.width!.value,
-        ].join(' ')
-      };
-}
-
 class _OnlyBorder implements Border {
   final BorderSide? left;
   final BorderSide? top;
