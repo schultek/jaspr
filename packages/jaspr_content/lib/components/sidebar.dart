@@ -1,38 +1,56 @@
 import 'package:jaspr/jaspr.dart';
 
-import '../../components/_internal/icon.dart';
-import '../page.dart';
-import '../theme/theme.dart';
+import '../../theme.dart';
+import '../jaspr_content.dart';
+import '_internal/icon.dart';
+import 'sidebar_toggle_button.dart';
 
-class SidebarGroup {
-  SidebarGroup({
+/// A group of link entries in a [Sidebar] with an optional [title].
+final class SidebarGroup {
+  const SidebarGroup({
     this.title,
     required this.links,
   });
 
+  /// The title of this group.
   final String? title;
+
+  /// The link entries in this group.
   final List<SidebarLink> links;
 }
 
-class SidebarLink {
-  SidebarLink({
+/// An entry in a [Sidebar] with link [text] and a destination [href] url.
+final class SidebarLink {
+  const SidebarLink({
     required this.text,
     required this.href,
   });
 
+  /// The link text for this sidebar entry.
   final String text;
+
+  /// The link destination for this sidebar entry.
   final String href;
 }
 
 /// A sidebar component that renders groups of links.
+///
+/// Include a [SidebarToggleButton] in your app's [Header] or elsewhere
+/// to enable toggling the sidebar in narrow layouts.
 class Sidebar extends StatelessComponent {
-  const Sidebar({required this.groups});
+  const Sidebar({this.currentRoute, required this.groups});
 
+  /// The url of the route to highlight as active.
+  ///
+  /// If not specified, uses the url of the current [Page].
+  final String? currentRoute;
+
+  /// The sidebar groups of links to render.
   final List<SidebarGroup> groups;
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    var currentRoute = context.page.url;
+    final currentRoute = this.currentRoute ?? context.page.url;
 
     yield Document.head(children: [
       Style(styles: _styles),
@@ -40,19 +58,17 @@ class Sidebar extends StatelessComponent {
 
     yield nav(classes: 'sidebar', [
       button(classes: 'sidebar-close', [
-        CloseIcon(size: 20),
+        const CloseIcon(size: 20),
       ]),
       div([
         for (final group in groups)
           div(classes: 'sidebar-group', [
-            if (group.title != null) h3([text(group.title!)]),
+            if (group.title case final groupTitle?) h3([text(groupTitle)]),
             ul([
               for (final item in group.links)
                 li([
                   div(classes: currentRoute == item.href ? 'active' : null, [
-                    a(href: item.href, [
-                      text(item.text),
-                    ]),
+                    a(href: item.href, [text(item.text)]),
                   ]),
                 ]),
             ]),

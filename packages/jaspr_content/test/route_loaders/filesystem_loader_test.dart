@@ -65,8 +65,7 @@ void main() {
       });
 
       test('loads nested file structure on windows', () async {
-        final MemoryFileSystem fs =
-            MemoryFileSystem(style: FileSystemStyle.windows);
+        final MemoryFileSystem fs = MemoryFileSystem(style: FileSystemStyle.windows);
         // Arrange
         final pagesDir = fs.directory('pages')..createSync();
         pagesDir.childFile('index.md').createSync();

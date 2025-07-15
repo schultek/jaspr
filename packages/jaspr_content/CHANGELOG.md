@@ -5,6 +5,8 @@
   It's also `final` now and should be modified using the `Page.apply` method.
 - **Breaking**: The `data` parameters in `Page.new` and `MemoryPage.new` have been
   renamed to `initialData` to reflect they don't necessarily specify the final data.
+- **Breaking**: `Header` has been moved to `package:jaspr_content/components/header.dart`.
+- **Breaking**: `Sidebar` has been moved to `package:jaspr_content/components/sidebar.dart`.
 - Added support for `sitemap: false` in the page data to exclude pages from the sitemap.
 - Ignores files and folders in the content directory starting with `.` (in addition to `_`).
 - Require Dart 3.6 or later to match the other Jaspr packages.
