@@ -1,8 +1,6 @@
 /// A package for building content-driven sites with Jaspr.
 library;
 
-export 'src/components/header.dart';
-export 'src/components/sidebar.dart';
 export 'src/content.dart';
 export 'src/content_app.dart';
 export 'src/data_loader/data_loader.dart';
