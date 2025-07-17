@@ -6,12 +6,14 @@
 // Server-specific jaspr import.
 import 'package:jaspr/server.dart';
 
-import 'package:jaspr_content/jaspr_content.dart';
-import 'package:jaspr_content/components/code_block.dart';
-import 'package:jaspr_content/components/theme_toggle.dart';
-import 'package:jaspr_content/components/github_button.dart';
 import 'package:jaspr_content/components/callout.dart';
+import 'package:jaspr_content/components/code_block.dart';
+import 'package:jaspr_content/components/github_button.dart';
+import 'package:jaspr_content/components/header.dart';
 import 'package:jaspr_content/components/image.dart';
+import 'package:jaspr_content/components/sidebar.dart';
+import 'package:jaspr_content/components/theme_toggle.dart';
+import 'package:jaspr_content/jaspr_content.dart';
 import 'package:jaspr_content/theme.dart';
 
 import 'components/clicker.dart';

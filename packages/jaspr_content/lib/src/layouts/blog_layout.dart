@@ -1,4 +1,4 @@
-/// @docImport '../components/header.dart';
+/// @docImport 'package:jaspr_content/components/header.dart';
 library;
 
 import 'package:jaspr/server.dart' as jaspr;
