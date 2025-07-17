@@ -7,9 +7,12 @@
   renamed to `initialData` to reflect they don't necessarily specify the final data.
 - **Breaking**: `Header` has been moved to `package:jaspr_content/components/header.dart`.
 - **Breaking**: `Sidebar` has been moved to `package:jaspr_content/components/sidebar.dart`.
+
+- Added a new `Markdown` component for directly rendering markdown content from a `String`.
 - Added support for `sitemap: false` in the page data to exclude pages from the sitemap.
 - Ignores files and folders in the content directory starting with `.` (in addition to `_`).
 - Require Dart 3.6 or later to match the other Jaspr packages.
+
 - Renamed the `GithubButton` component to `GitHubButton`.
 - Fixed `GitHubButton` not linking to the correct repository.
 - Renamed the `GithubLoader` route loader to `GitHubLoader`.
