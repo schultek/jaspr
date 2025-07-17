@@ -7,7 +7,7 @@ import 'package:jaspr/jaspr.dart';
 
 /// A close icon.
 class CloseIcon extends StatelessComponent {
-  CloseIcon({this.size});
+  const CloseIcon({this.size});
 
   final int? size;
 
