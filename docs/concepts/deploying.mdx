@@ -26,14 +26,19 @@ To deploy your site to [Firebase Hosting](https://firebase.google.com/docs/hosti
 1. Run `jaspr build`
 
 2. Run `firebase init` inside your project directory.
-    1. Select the "Hosting" feature
-    2. Set the public directory to `build/jaspr`
-    3. For **static** mode select "No" when asked to configure as a single-page app, for **client** mode select "Yes"
-    4. Select "No" when asked to override `index.html`.
+
+   1. Select the "Hosting" feature
+   2. Set the public directory to `build/jaspr`
+   3. For **static** mode select "No" when asked to configure as a single-page app, for **client** mode select "Yes"
+   4. Select "No" when asked to override `index.html`.
 
 3. Run `firebase deploy`
 
-<Info>There is no additional step to add Flutter support. After it's been deployed a Page Not Found page from Firebase may be shown initially but afterwards your website will be shown.</Info>
+<Info>
+  There is no additional step to add Flutter support. After it's been deployed a
+  Page Not Found page from Firebase may be shown initially but afterwards your
+  website will be shown.
+</Info>
 
 ### Github Pages
 
@@ -44,29 +49,30 @@ and branch. Since you need to run `jaspr build` before deploying, it's recommend
 First we set up the repository to deploy from your repository:
 
 <Info>
-This will roughly follow the steps from [this guide](https://docs.github.com/de/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#ver%C3%B6ffentlichen-mit-einem-benutzerdefinierten-github-actions-workflow)
-of the official documentation.
+  This will roughly follow the steps from [this
+  guide](https://docs.github.com/de/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#ver%C3%B6ffentlichen-mit-einem-benutzerdefinierten-github-actions-workflow)
+  of the official documentation.
 </Info>
 
 1. Go to your repository and open "Settings" -> "Pages"
 2. Set the "Source" to "GitHub Actions"
 3. Find the suggested "Static HTML" workflow and click "Configure"
 4. Edit the default workflow script to the following:
-    1. After the "Setup Pages" step add the following two step:
-       ```yaml
-       - name: "Setup Dart"
-         uses: dart-lang/setup-dart@v1.3
-       - name: "Build Jaspr"
-         run: |
-           dart pub global activate jaspr_cli
-           jaspr build --verbose
-       ```
-    2. In the "Upload artifact" step change the "path" variable to `build/jaspr`
-       ```yaml
-       with:
-          # Upload only jaspr build output
-          path: 'build/jaspr'
-       ```
+   1. After the "Setup Pages" step add the following two step:
+      ```yaml
+      - name: 'Setup Dart'
+        uses: dart-lang/setup-dart@v1.3
+      - name: 'Build Jaspr'
+        run: |
+          dart pub global activate jaspr_cli
+          jaspr build --verbose
+      ```
+   2. In the "Upload artifact" step change the "path" variable to `build/jaspr`
+      ```yaml
+      with:
+        # Upload only jaspr build output
+        path: 'build/jaspr'
+      ```
 5. Click "Commit changes" and commit the new workflow file.
 
 #### Modifying the code
@@ -90,7 +96,7 @@ In client mode, add the `<base>` element to `index.html` inside `<head>`:
 
 ```html
 <head>
-    <base href="/<repository>/"/>
+  <base href="/<repository>/" />
 </head>
 ```
 
@@ -103,7 +109,7 @@ created workflow file to also pull in flutter, otherwise the build will result i
 
 - After the "Setup Dart" step add the following step:
   ```yaml
-  - name: "Setup Flutter"
+  - name: 'Setup Flutter'
     uses: subosito/flutter-action@v2
   ```
 - Commit and push the file.
@@ -197,3 +203,29 @@ WORKDIR /app
 EXPOSE 8080
 CMD ["./app"]
 ```
+
+---
+
+## Globe
+
+[Globe](https://globe.dev/) is a hosting platform for Dart & Flutter applications from Invertase. It offers a streamlined deployment experience, automatically detecting your Jaspr project's configuration and rendering mode.
+
+1. Install the Globe CLI:
+
+   ```bash
+   dart pub global activate globe_cli
+   ```
+
+2. Run the deployment command from your project's root directory:
+
+   ```bash
+   globe deploy --prod
+   ```
+
+3. For your first deployment, the CLI will guide you through creating and linking a new Globe project.
+
+Globe will then build and deploy your application, providing you with a unique URL (e.g., `https://your-project-name.globeapp.dev`).
+
+### Flutter Support
+
+No additional configuration is needed. Globe's build pipeline automatically detects and sets up projects that use Flutter for element embedding or `jaspr_web_compilers`.
