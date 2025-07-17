@@ -56,24 +56,26 @@ class FilesystemDataLoader implements DataLoader {
       return;
     }
 
-    _watcherSub ??= watcherFactory(directory).events.listen((event) {
-      _data = null;
-      for (var page in _pages) {
-        page.markNeedsRebuild();
-      }
-      _pages.clear();
-      _watcherSub?.cancel();
-      _watcherSub = null;
-    });
+    if (kDebugMode) {
+      _watcherSub ??= watcherFactory(directory).events.listen((event) {
+        _data = null;
+        for (var page in _pages) {
+          page.markNeedsRebuild();
+        }
+        _pages.clear();
+        _watcherSub?.cancel();
+        _watcherSub = null;
+      });
 
-    _reassembleSub ??= ServerApp.onReassemble.listen((_) {
-      _data = null;
-      _pages.clear();
-      _watcherSub?.cancel();
-      _watcherSub = null;
-      _reassembleSub?.cancel();
-      _reassembleSub = null;
-    });
+      _reassembleSub ??= ServerApp.onReassemble.listen((_) {
+        _data = null;
+        _pages.clear();
+        _watcherSub?.cancel();
+        _watcherSub = null;
+        _reassembleSub?.cancel();
+        _reassembleSub = null;
+      });
+    }
 
     _data ??= _loadData(fileSystem.directory(directory));
     _pages.add(page);
