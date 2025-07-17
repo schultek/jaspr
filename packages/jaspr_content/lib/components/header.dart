@@ -1,18 +1,29 @@
 import 'package:jaspr/jaspr.dart';
 
-import '../../components/sidebar_toggle_button.dart';
+import 'sidebar_toggle_button.dart';
 
 /// A header component with a logo, title, and additional items.
 class Header extends StatelessComponent {
   const Header({
     required this.logo,
     required this.title,
+    this.leading = const [SidebarToggleButton()],
     this.items = const [],
     super.key,
   });
 
+  /// The src href to render as the site logo.
   final String logo;
+
+  /// The name of the site to render alongside the [logo].
   final String title;
+
+  /// Components to render before the site logo and title.
+  ///
+  /// If not specified, defaults to a [SidebarToggleButton].
+  final List<Component> leading;
+
+  /// Other components to render in the header, such as site section links.
   final List<Component> items;
 
   @override
@@ -22,7 +33,7 @@ class Header extends StatelessComponent {
     ]);
 
     yield header(classes: 'header', [
-      const SidebarToggleButton(),
+      ...leading,
       a(classes: 'header-title', href: '/', [
         img(src: logo, alt: 'Logo'),
         span([text(title)]),
