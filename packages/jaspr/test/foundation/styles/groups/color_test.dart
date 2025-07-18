@@ -40,72 +40,101 @@ void main() {
       group('relative', () {
         test('withOpacity', () {
           var color = Color('#ff0000');
-          var relativeColor = color.withOpacity(0.5);
-          expect(relativeColor.value, equals('rgb(from #ff0000 r g b / 0.5)'));
-        });
+          var color1 = color.withOpacity(0.5);
+          expect(color1.value, equals('rgb(from #ff0000 r g b / 0.5)'));
 
-        test('withOpacity relative', () {
-          var color = Color('#ff0000');
-          var relativeColor = color.withOpacity(-0.2, replace: false);
-          expect(relativeColor.value, equals('rgb(from #ff0000 r g b / calc(alpha - 0.2))'));
-        });
+          var color2 = color.withOpacity(0.5, replace: false);
+          expect(color2.value, equals('rgb(from #ff0000 r g b / calc(alpha + 0.5))'));
 
-        test('withOpacity relative chain', () {
-          var color = Color('#ff0000');
-          var relativeColor = color.withOpacity(-0.2, replace: false).withOpacity(0.4, replace: false);
-          expect(relativeColor.value, equals('rgb(from #ff0000 r g b / calc(alpha + 0.2))'));
+          var color3 = color.withOpacity(0.2).withOpacity(0.8);
+          expect(color3.value, equals('rgb(from #ff0000 r g b / 0.8)'));
+
+          var color4 = color.withOpacity(0.2, replace: false).withOpacity(0.2, replace: false);
+          expect(color4.value, equals('rgb(from #ff0000 r g b / calc(alpha + 0.4))'));
+
+          var color5 = color.withOpacity(0.2, replace: false).withOpacity(0.4);
+          expect(color5.value, equals('rgb(from #ff0000 r g b / 0.4)'));
+
+          var color6 = color.withOpacity(0.2).withOpacity(0.2, replace: false);
+          expect(color6.value, equals('rgb(from #ff0000 r g b / 0.4)'));
         });
 
         test('withLightness', () {
           var color = Color('#ff0000');
-          var relativeColor = color.withLightness(0.5);
-          expect(relativeColor.value, equals('hsl(from #ff0000 h s 50)'));
-        });
+          var color1 = color.withLightness(0.5);
+          expect(color1.value, equals('hsl(from #ff0000 h s 50)'));
 
-        test('withLightness relative', () {
-          var color = Color('#ff0000');
-          var relativeColor = color.withLightness(0.5, replace: false);
-          expect(relativeColor.value, equals('hsl(from #ff0000 h s calc(l + 50))'));
-        });
+          var color2 = color.withLightness(0.5, replace: false);
+          expect(color2.value, equals('hsl(from #ff0000 h s calc(l + 50))'));
 
-        test('withLightness relative chained', () {
-          var color = Color('#ff0000');
-          var relativeColor = color
-              .withLightness(0.5, replace: false)
-              .withLightness(0.2, replace: false)
-              .withOpacity(-0.2, replace: false);
-          expect(relativeColor.value, equals('hsl(from #ff0000 h s calc(l + 70) / calc(alpha - 0.2))'));
+          var color3 = color.withLightness(0.2).withLightness(0.8);
+          expect(color3.value, equals('hsl(from #ff0000 h s 80)'));
+
+          var color4 = color.withLightness(0.2, replace: false).withLightness(0.2, replace: false);
+          expect(color4.value, equals('hsl(from #ff0000 h s calc(l + 40))'));
+
+          var color5 = color.withLightness(0.2, replace: false).withLightness(0.4);
+          expect(color5.value, equals('hsl(from #ff0000 h s 40)'));
+
+          var color6 = color.withLightness(0.2).withLightness(0.2, replace: false);
+          expect(color6.value, equals('hsl(from #ff0000 h s 40)'));
         });
 
         test('withHue', () {
           var color = Color('#ff0000');
-          var relativeColor = color.withHue(50);
-          expect(relativeColor.value, equals('oklch(from #ff0000 l c 50)'));
-        });
+          var color1 = color.withHue(50);
+          expect(color1.value, equals('oklch(from #ff0000 l c 50)'));
 
-        test('withHue relative', () {
-          var color = Color('#ff0000');
-          var relativeColor = color.withHue(50, replace: false);
-          expect(relativeColor.value, equals('oklch(from #ff0000 l c calc(h + 50))'));
-        });
+          var color2 = color.withHue(50, replace: false);
+          expect(color2.value, equals('oklch(from #ff0000 l c calc(h + 50))'));
 
-        test('withHue relative chained', () {
-          var color = Color('#ff0000');
-          var relativeColor =
-              color.withHue(50, replace: false).withHue(20, replace: false).withOpacity(-0.2, replace: false);
-          expect(relativeColor.value, equals('oklch(from #ff0000 l c calc(h + 70) / calc(alpha - 0.2))'));
+          var color3 = color.withHue(20).withHue(30);
+          expect(color3.value, equals('oklch(from #ff0000 l c 30)'));
+
+          var color4 = color.withHue(20, replace: false).withHue(20, replace: false);
+          expect(color4.value, equals('oklch(from #ff0000 l c calc(h + 40))'));
+
+          var color5 = color.withHue(20, replace: false).withHue(10);
+          expect(color5.value, equals('oklch(from #ff0000 l c 10)'));
+
+          var color6 = color.withHue(20).withHue(20, replace: false);
+          expect(color6.value, equals('oklch(from #ff0000 l c 40)'));
         });
 
         test('withValues', () {
           var color = Color('#ff00ff');
-          var relativeColor = color.withValues(red: 0, green: 255);
-          expect(relativeColor.value, equals('rgb(from #ff00ff 0 255 b)'));
+          var color1 = color.withValues(red: 0, green: 255);
+          expect(color1.value, equals('rgb(from #ff00ff 0 255 b)'));
+
+          var color2 = color.withValues(red: 0, blue: 255).withValues(red: 100).withOpacity(0.2);
+          expect(color2.value, equals('rgb(from #ff00ff 100 g 255 / 0.2)'));
         });
 
-        test('withValues chain', () {
-          var color = Color('#ff00ff');
-          var relativeColor = color.withValues(red: 0, green: 255).withValues(red: 100).withOpacity(0.2);
-          expect(relativeColor.value, equals('rgb(from #ff00ff 100 255 b / 0.2)'));
+        test('mixed', () {
+          var color = Color('#ff0000');
+          var color1 = color.withLightness(0.5).withOpacity(0.5, replace: false);
+          expect(color1.value, equals('hsl(from #ff0000 h s 50 / calc(alpha + 0.5))'));
+
+          var color2 = color.withOpacity(0.5).withLightness(0.5, replace: false);
+          expect(color2.value, equals('hsl(from #ff0000 h s calc(l + 50) / 0.5)'));
+
+          var color3 = color.withHue(50).withOpacity(0.5, replace: false);
+          expect(color3.value, equals('oklch(from #ff0000 l c 50 / calc(alpha + 0.5))'));
+
+          var color4 = color.withOpacity(0.5).withHue(50, replace: false);
+          expect(color4.value, equals('oklch(from #ff0000 l c calc(h + 50) / 0.5)'));
+
+          var color5 = color.withLightness(0.5).withHue(50, replace: false);
+          expect(color5.value, equals('oklch(from hsl(from #ff0000 h s 50) l c calc(h + 50))'));
+
+          var color6 = color.withHue(50).withLightness(0.5, replace: false);
+          expect(color6.value, equals('hsl(from oklch(from #ff0000 l c 50) h s calc(l + 50))'));
+
+          var color7 = color.withLightness(0.5).withHue(50).withOpacity(0.5, replace: false);
+          expect(color7.value, equals('oklch(from hsl(from #ff0000 h s 50) l c 50 / calc(alpha + 0.5))'));
+
+          var color8 = color.withOpacity(0.5).withLightness(0.5).withValues(red: 100);
+          expect(color8.value, equals('rgb(from hsl(from #ff0000 h s 50 / 0.5) 100 g b)'));
         });
       });
     });

@@ -65,7 +65,7 @@ class ThemeColor implements Color {
   String get value => light.value;
 
   @override
-  Color withHue(double hue, {bool replace = true}) {
+  ThemeColor withHue(double hue, {bool replace = true}) {
     return ThemeColor(
       light.withHue(hue, replace: replace),
       dark: dark?.withHue(hue, replace: replace),
@@ -73,7 +73,7 @@ class ThemeColor implements Color {
   }
 
   @override
-  Color withLightness(double lightness, {bool replace = true}) {
+  ThemeColor withLightness(double lightness, {bool replace = true}) {
     return ThemeColor(
       light.withLightness(lightness, replace: replace),
       dark: dark?.withLightness(lightness, replace: replace),
@@ -81,7 +81,7 @@ class ThemeColor implements Color {
   }
 
   @override
-  Color withOpacity(double opacity, {bool replace = true}) {
+  ThemeColor withOpacity(double opacity, {bool replace = true}) {
     return ThemeColor(
       light.withOpacity(opacity, replace: replace),
       dark: dark?.withOpacity(opacity, replace: replace),
@@ -89,7 +89,7 @@ class ThemeColor implements Color {
   }
 
   @override
-  Color withValues({double? red, double? green, double? blue, double? alpha}) {
+  ThemeColor withValues({double? red, double? green, double? blue, double? alpha}) {
     return ThemeColor(
       light.withValues(red: red, green: green, blue: blue, alpha: alpha),
       dark: dark?.withValues(red: red, green: green, blue: blue, alpha: alpha),
