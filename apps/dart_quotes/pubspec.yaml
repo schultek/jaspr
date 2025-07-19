@@ -1,6 +1,6 @@
 name: dart_quotes
 description: A collection of Dart quotes. Built for FullStackFlutter Conference.
-version: 0.1.6
+version: 0.1.7
 publish_to: none
 
 environment:
@@ -8,8 +8,8 @@ environment:
 
 dependencies:
   firebase_core: ^3.4.1
-  jaspr: ^0.19.0
-  jaspr_router: ^0.7.0
+  jaspr: ^0.20.0
+  jaspr_router: ^0.7.1
   cloud_firestore: ^5.4.1
   dart_firebase_admin: ^0.4.1
   firebase_auth: ^5.2.1

@@ -1,3 +1,7 @@
+## 0.7.1
+
+- `jaspr` upgraded to `0.20.0`
+
 ## 0.7.0
 
 - Added `settings` parameter to `Route` for specifying sitemap settings like `priority` and `changefreq`.

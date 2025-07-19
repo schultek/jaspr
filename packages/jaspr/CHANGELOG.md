@@ -1,4 +1,4 @@
-## Unreleased breaking
+## 0.20.0
 
 - **Breaking**: Removed the children parameter from `input` and `col` methods as
   they are void elements and shouldn't be passed children.

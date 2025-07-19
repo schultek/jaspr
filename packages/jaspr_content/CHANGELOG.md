@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.2.1
 
 - **Breaking**: `Page.data` now returns a `PageDataMap` with typed getters for
   the maps stored under `page` and `site`.
