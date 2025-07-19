@@ -4,12 +4,12 @@ import 'package:markdown/markdown.dart' as md;
 import '../jaspr_content.dart';
 
 /// A component that parses and renders markdown content as a Jaspr component.
-/// 
-/// Supports defining a custom [md.Document] to use for parsing, as well as a list 
+///
+/// Supports defining a custom [md.Document] to use for parsing, as well as a list
 /// of custom components that can be used in the markdown content.
-/// 
-/// The rendered markdown is wrapped in a [Content] section and has a default set of 
-/// typographic styles applied, which can be customized by providing a [ContentTheme] 
+///
+/// The rendered markdown is wrapped in a [Content] section and has a default set of
+/// typographic styles applied, which can be customized by providing a [ContentTheme]
 /// somewhere up the component tree using `Content.wrapTheme(ContentTheme(...), child)`.
 class Markdown extends StatelessComponent {
   Markdown({

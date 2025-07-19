@@ -490,7 +490,7 @@ class ColorSwatch implements Color {
 
   @override
   String get value => $500.value;
-  
+
   @override
   Color withHue(double hue, {bool replace = true}) {
     return ColorSwatch(
@@ -507,7 +507,7 @@ class ColorSwatch implements Color {
       $950: $950.withHue(hue, replace: replace),
     );
   }
-  
+
   @override
   Color withLightness(double lightness, {bool replace = true}) {
     return ColorSwatch(
@@ -524,7 +524,7 @@ class ColorSwatch implements Color {
       $950: $950.withLightness(lightness, replace: replace),
     );
   }
-  
+
   @override
   Color withOpacity(double opacity, {bool replace = true}) {
     return ColorSwatch(
@@ -541,7 +541,7 @@ class ColorSwatch implements Color {
       $950: $950.withOpacity(opacity, replace: replace),
     );
   }
-  
+
   @override
   Color withValues({double? red, double? green, double? blue, double? alpha}) {
     return ColorSwatch(
