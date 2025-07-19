@@ -65,6 +65,38 @@ class ThemeColor implements Color {
   String get value => light.value;
 
   @override
+  ThemeColor withHue(double hue, {bool replace = true}) {
+    return ThemeColor(
+      light.withHue(hue, replace: replace),
+      dark: dark?.withHue(hue, replace: replace),
+    );
+  }
+
+  @override
+  ThemeColor withLightness(double lightness, {bool replace = true}) {
+    return ThemeColor(
+      light.withLightness(lightness, replace: replace),
+      dark: dark?.withLightness(lightness, replace: replace),
+    );
+  }
+
+  @override
+  ThemeColor withOpacity(double opacity, {bool replace = true}) {
+    return ThemeColor(
+      light.withOpacity(opacity, replace: replace),
+      dark: dark?.withOpacity(opacity, replace: replace),
+    );
+  }
+
+  @override
+  ThemeColor withValues({double? red, double? green, double? blue, double? alpha}) {
+    return ThemeColor(
+      light.withValues(red: red, green: green, blue: blue, alpha: alpha),
+      dark: dark?.withValues(red: red, green: green, blue: blue, alpha: alpha),
+    );
+  }
+
+  @override
   operator ==(Object other) {
     return other is ThemeColor && other.light == light && other.dark == dark;
   }
@@ -458,4 +490,72 @@ class ColorSwatch implements Color {
 
   @override
   String get value => $500.value;
+  
+  @override
+  Color withHue(double hue, {bool replace = true}) {
+    return ColorSwatch(
+      $50: $50.withHue(hue, replace: replace),
+      $100: $100.withHue(hue, replace: replace),
+      $200: $200.withHue(hue, replace: replace),
+      $300: $300.withHue(hue, replace: replace),
+      $400: $400.withHue(hue, replace: replace),
+      $500: $500.withHue(hue, replace: replace),
+      $600: $600.withHue(hue, replace: replace),
+      $700: $700.withHue(hue, replace: replace),
+      $800: $800.withHue(hue, replace: replace),
+      $900: $900.withHue(hue, replace: replace),
+      $950: $950.withHue(hue, replace: replace),
+    );
+  }
+  
+  @override
+  Color withLightness(double lightness, {bool replace = true}) {
+    return ColorSwatch(
+      $50: $50.withLightness(lightness, replace: replace),
+      $100: $100.withLightness(lightness, replace: replace),
+      $200: $200.withLightness(lightness, replace: replace),
+      $300: $300.withLightness(lightness, replace: replace),
+      $400: $400.withLightness(lightness, replace: replace),
+      $500: $500.withLightness(lightness, replace: replace),
+      $600: $600.withLightness(lightness, replace: replace),
+      $700: $700.withLightness(lightness, replace: replace),
+      $800: $800.withLightness(lightness, replace: replace),
+      $900: $900.withLightness(lightness, replace: replace),
+      $950: $950.withLightness(lightness, replace: replace),
+    );
+  }
+  
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    return ColorSwatch(
+      $50: $50.withOpacity(opacity, replace: replace),
+      $100: $100.withOpacity(opacity, replace: replace),
+      $200: $200.withOpacity(opacity, replace: replace),
+      $300: $300.withOpacity(opacity, replace: replace),
+      $400: $400.withOpacity(opacity, replace: replace),
+      $500: $500.withOpacity(opacity, replace: replace),
+      $600: $600.withOpacity(opacity, replace: replace),
+      $700: $700.withOpacity(opacity, replace: replace),
+      $800: $800.withOpacity(opacity, replace: replace),
+      $900: $900.withOpacity(opacity, replace: replace),
+      $950: $950.withOpacity(opacity, replace: replace),
+    );
+  }
+  
+  @override
+  Color withValues({double? red, double? green, double? blue, double? alpha}) {
+    return ColorSwatch(
+      $50: $50.withValues(red: red, green: green, blue: blue, alpha: alpha),
+      $100: $100.withValues(red: red, green: green, blue: blue, alpha: alpha),
+      $200: $200.withValues(red: red, green: green, blue: blue, alpha: alpha),
+      $300: $300.withValues(red: red, green: green, blue: blue, alpha: alpha),
+      $400: $400.withValues(red: red, green: green, blue: blue, alpha: alpha),
+      $500: $500.withValues(red: red, green: green, blue: blue, alpha: alpha),
+      $600: $600.withValues(red: red, green: green, blue: blue, alpha: alpha),
+      $700: $700.withValues(red: red, green: green, blue: blue, alpha: alpha),
+      $800: $800.withValues(red: red, green: green, blue: blue, alpha: alpha),
+      $900: $900.withValues(red: red, green: green, blue: blue, alpha: alpha),
+      $950: $950.withValues(red: red, green: green, blue: blue, alpha: alpha),
+    );
+  }
 }

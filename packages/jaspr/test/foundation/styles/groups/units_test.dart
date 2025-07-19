@@ -53,6 +53,14 @@ void main() {
         expect(0.deg.hashCode, equals(0.rad.hashCode));
         expect(0.deg.hashCode, isNot(equals(1.rad.hashCode)));
       });
+
+      test('adds', () {
+        expect(Angle.deg(10) + Angle.deg(20), equals(Angle.deg(30)));
+        expect(Angle.rad(1) + Angle.rad(2), equals(Angle.rad(3)));
+        expect(Angle.turn(0.5) + Angle.turn(0.5), equals(Angle.turn(1)));
+        expect((Angle.deg(10) + Angle.rad(1)).value, equals('calc(10deg + 1rad)'));
+        expect((Angle.deg(10) + Angle.turn(0.5) + Angle.turn(1)).value, equals('calc(10deg + 1.5turn)'));
+      });
     });
 
     group('spacing', () {

@@ -1,3 +1,4 @@
+/// An immutable css color value.
 abstract class Color {
   /// Constructs a [Color] from a css color value.
   ///
@@ -34,75 +35,32 @@ abstract class Color {
 
   /// The color css value
   String get value;
-}
 
-class _Color implements Color {
-  final String _value;
+  /// Returns a new color that matches this color, but with its opacity modified.
+  ///
+  /// By default, the current opacity is replaced with the given opacity value (which ranges from 0.0 to 1.0).
+  /// When [replace] is false, the current opacity will be increased or decreased by the specified
+  /// amount (ranging from -1.0 to 1.0).
+  Color withOpacity(double opacity, {bool replace = true});
 
-  const _Color(this._value);
+  /// Returns a new color that matches this color, but with its lightness modified.
+  ///
+  /// By default, the current lightness is replaced with the given lightness value (which ranges from 0.0 to 1.0).
+  /// When [replace] is false, the current lightness will be increased or decreased by the specified
+  /// amount (ranging from -1.0 to 1.0).
+  Color withLightness(double lightness, {bool replace = true});
 
-  @override
-  String get value => _value;
+  /// Returns a new color that matches this color, but with its hue modified.
+  ///
+  /// By default, the current hue is replaced with the given hue angle (from 0 to 360).
+  /// When [replace] is false, the current hue will be rotated by the specified angle instead.
+  ///
+  /// Note: The new color is specified in the OKLCH color space, which gives a more uniform perception of color than
+  /// HSL, but uses different hue angles than the sRGB color space.
+  Color withHue(double hue, {bool replace = true});
 
-  @override
-  String toString() => 'Color($_value)';
-}
-
-class _ValueColor implements Color {
-  final int _value;
-  const _ValueColor(this._value);
-
-  @override
-  String get value => '#${_value.toRadixString(16).padLeft(6, '0')}';
-}
-
-class _RGBColor implements Color {
-  final int red;
-  final int green;
-  final int blue;
-
-  const _RGBColor(this.red, this.green, this.blue);
-
-  @override
-  String get value => 'rgb($red, $green, $blue)';
-}
-
-class _RGBAColor extends _RGBColor {
-  final double alpha;
-
-  const _RGBAColor(super.red, super.green, super.blue, this.alpha);
-
-  @override
-  String get value => 'rgba($red, $green, $blue, $alpha)';
-}
-
-class _HSLColor implements Color {
-  final int hue;
-  final int saturation;
-  final int lightness;
-
-  const _HSLColor(this.hue, this.saturation, this.lightness);
-
-  @override
-  String get value => 'hsl($hue, $saturation%, $lightness%)';
-}
-
-class _HSLAColor extends _HSLColor {
-  final double alpha;
-
-  const _HSLAColor(super.hue, super.saturation, super.lightness, this.alpha);
-
-  @override
-  String get value => 'hsla($hue, $saturation%, $lightness%, $alpha)';
-}
-
-class _VariableColor implements Color {
-  final String _value;
-
-  const _VariableColor(this._value);
-
-  @override
-  String get value => 'var($_value)';
+  /// Returns a new color with the provided values replaced.
+  Color withValues({double? red, double? green, double? blue, double? alpha});
 }
 
 class Colors {
@@ -247,4 +205,269 @@ class Colors {
   static const Color yellow = Color('yellow');
   static const Color yellowGreen = Color('yellowGreen');
   static const Color transparent = Color('transparent');
+}
+
+abstract mixin class _ColorMixin implements Color {
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    return _RelativeRGBColor(from: this, alpha: (opacity, replace));
+  }
+
+  @override
+  Color withLightness(double lightness, {bool replace = true}) {
+    return _RelativeHSLColor(from: this, lightness: (lightness, replace));
+  }
+
+  @override
+  Color withHue(double hue, {bool replace = true}) {
+    return _RelativeOKLCHColor(from: this, hue: (hue, replace));
+  }
+
+  @override
+  Color withValues({double? red, double? green, double? blue, double? alpha}) {
+    return _RelativeRGBColor(
+      from: this,
+      red: red != null ? (red, true) : null,
+      green: green != null ? (green, true) : null,
+      blue: blue != null ? (blue, true) : null,
+      alpha: alpha != null ? (alpha, true) : null,
+    );
+  }
+}
+
+class _Color with _ColorMixin {
+  final String _value;
+
+  const _Color(this._value);
+
+  @override
+  String get value => _value;
+
+  @override
+  String toString() => 'Color($_value)';
+}
+
+class _ValueColor with _ColorMixin {
+  final int _value;
+  const _ValueColor(this._value);
+
+  @override
+  String get value => '#${_value.toRadixString(16).padLeft(6, '0')}';
+}
+
+class _RGBColor with _ColorMixin {
+  final int red;
+  final int green;
+  final int blue;
+
+  const _RGBColor(this.red, this.green, this.blue);
+
+  @override
+  String get value => 'rgb($red, $green, $blue)';
+}
+
+class _RGBAColor extends _RGBColor {
+  final double alpha;
+
+  const _RGBAColor(super.red, super.green, super.blue, this.alpha);
+
+  @override
+  String get value => 'rgba($red, $green, $blue, $alpha)';
+}
+
+class _HSLColor with _ColorMixin {
+  final int hue;
+  final int saturation;
+  final int lightness;
+
+  const _HSLColor(this.hue, this.saturation, this.lightness);
+
+  @override
+  String get value => 'hsl($hue, $saturation%, $lightness%)';
+}
+
+class _HSLAColor extends _HSLColor {
+  final double alpha;
+
+  const _HSLAColor(super.hue, super.saturation, super.lightness, this.alpha);
+
+  @override
+  String get value => 'hsla($hue, $saturation%, $lightness%, $alpha)';
+}
+
+class _VariableColor with _ColorMixin {
+  final String _value;
+
+  const _VariableColor(this._value);
+
+  @override
+  String get value => 'var($_value)';
+}
+
+abstract class _RelativeColor with _ColorMixin {
+  final Color from;
+  final (double, bool)? alpha;
+
+  const _RelativeColor({
+    required this.from,
+    this.alpha,
+  });
+
+  String _channel((double, bool)? data, String origin) {
+    if (data == null) return origin;
+    final (value, replace) = data;
+    final vStr = (value.toInt() == value) ? value.abs().toInt().toString() : value.abs().toString();
+    if (replace) {
+      return vStr;
+    } else if (value < 0) {
+      return 'calc($origin - $vStr)';
+    } else {
+      return 'calc($origin + $vStr)';
+    }
+  }
+
+  String _relative(String method, String channels) {
+    final a = alpha != null ? ' / ${_channel(alpha, 'alpha')}' : '';
+    return '$method(from ${from.value} $channels$a)';
+  }
+}
+
+typedef _RelativeColorValue = (double, bool);
+
+extension on _RelativeColorValue? {
+  _RelativeColorValue? maybeApply(double? value, bool replace) {
+    if (value == null) return this;
+    return apply(value, replace);
+  }
+
+  _RelativeColorValue apply(double value, bool replace) {
+    if (this == null || replace) return (value, replace);
+    if (replace) return (value, true);
+    return (this!.$1 + value, this!.$2);
+  }
+}
+
+class _RelativeRGBColor extends _RelativeColor {
+  final (double, bool)? red;
+  final (double, bool)? green;
+  final (double, bool)? blue;
+
+  const _RelativeRGBColor({
+    required super.from,
+    this.red,
+    this.green,
+    this.blue,
+    super.alpha,
+  });
+
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    return _RelativeRGBColor(
+      from: from,
+      red: red,
+      green: green,
+      blue: blue,
+      alpha: alpha.apply(opacity, replace),
+    );
+  }
+
+  @override
+  Color withLightness(double lightness, {bool replace = true}) {
+    if (red == null && green == null && blue == null) {
+      return _RelativeHSLColor(from: from, lightness: (lightness, replace), alpha: alpha);
+    }
+    return super.withLightness(lightness, replace: replace);
+  }
+
+  @override
+  Color withHue(double hue, {bool replace = true}) {
+    if (red == null && green == null && blue == null) {
+      return _RelativeOKLCHColor(from: from, hue: (hue, replace), alpha: alpha);
+    }
+    return super.withHue(hue, replace: replace);
+  }
+
+  @override
+  Color withValues({
+    double? red,
+    double? green,
+    double? blue,
+    double? alpha,
+  }) {
+    return _RelativeRGBColor(
+      from: from,
+      red: this.red.maybeApply(red, true),
+      green: this.green.maybeApply(green, true),
+      blue: this.blue.maybeApply(blue, true),
+      alpha: this.alpha.maybeApply(alpha, true),
+    );
+  }
+
+  @override
+  String get value {
+    final r = _channel(red, 'r');
+    final g = _channel(green, 'g');
+    final b = _channel(blue, 'b');
+    return _relative('rgb', '$r $g $b');
+  }
+}
+
+class _RelativeHSLColor extends _RelativeColor {
+  final (double, bool) lightness;
+
+  const _RelativeHSLColor({required super.from, required this.lightness, super.alpha});
+
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    return _RelativeHSLColor(
+      from: from,
+      lightness: lightness,
+      alpha: alpha.apply(opacity, replace),
+    );
+  }
+
+  @override
+  Color withLightness(double lightness, {bool replace = true}) {
+    return _RelativeHSLColor(
+      from: from,
+      lightness: this.lightness.apply(lightness, replace),
+      alpha: alpha,
+    );
+  }
+
+  @override
+  String get value {
+    final l = _channel((lightness.$1 * 100, lightness.$2), 'l');
+    return _relative('hsl', 'h s $l');
+  }
+}
+
+class _RelativeOKLCHColor extends _RelativeColor {
+  final (double, bool) hue;
+
+  const _RelativeOKLCHColor({required super.from, required this.hue, super.alpha});
+
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    return _RelativeOKLCHColor(
+      from: from,
+      hue: hue,
+      alpha: alpha.apply(opacity, replace),
+    );
+  }
+
+  @override
+  Color withHue(double hue, {bool replace = true}) {
+    return _RelativeOKLCHColor(
+      from: from,
+      hue: this.hue.apply(hue, replace),
+      alpha: alpha,
+    );
+  }
+
+  @override
+  String get value {
+    final h = _channel(hue, 'h');
+    return _relative('oklch', 'l c $h');
+  }
 }
