@@ -50,7 +50,7 @@ class MarkdownParser implements PageParser {
   }
 
   /// Converts the given [markdownNodes] to a list of [Node]s.
-  /// 
+  ///
   /// This also handles html blocks inside the parsed markdown content.
   static List<Node> buildNodes(Iterable<md.Node> markdownNodes) {
     final root = ElementNode('_', {}, []);

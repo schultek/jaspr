@@ -2,7 +2,6 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_content/src/theme/theme.dart';
 import 'package:test/test.dart';
 
-
 void main() {
   group('ThemeColor', () {
     test('value returns light color value', () {

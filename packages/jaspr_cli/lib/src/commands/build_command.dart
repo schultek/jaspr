@@ -238,13 +238,15 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         try {
           response = await httpClient.get(Uri.parse('http://localhost:8080$route'));
         } catch (e) {
-          logger.write('Failed to generate route "$route". ($e)', level: Level.error, progress: ProgressState.completed);
+          logger.write('Failed to generate route "$route". ($e)',
+              level: Level.error, progress: ProgressState.completed);
           hasBuildError = true;
           continue;
         }
 
         if (response.statusCode != 200) {
-          logger.write('Failed to generate route "$route". (Received status code ${response.statusCode})', level: Level.error, progress: ProgressState.completed);
+          logger.write('Failed to generate route "$route". (Received status code ${response.statusCode})',
+              level: Level.error, progress: ProgressState.completed);
           hasBuildError = true;
           continue;
         }
