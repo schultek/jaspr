@@ -1,4 +1,4 @@
-## 0.2.1
+## Unreleased minor
 
 - **Breaking**: `Page.data` now returns a `PageDataMap` with typed getters for
   the maps stored under `page` and `site`.
