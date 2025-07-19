@@ -46,10 +46,13 @@ class MarkdownParser implements PageParser {
     final markdownDocument = documentBuilder(page);
     final markdownNodes = markdownDocument.parse(page.content);
 
-    return _buildNodes(markdownNodes);
+    return buildNodes(markdownNodes);
   }
 
-  List<Node> _buildNodes(Iterable<md.Node> markdownNodes) {
+  /// Converts the given [markdownNodes] to a list of [Node]s.
+  /// 
+  /// This also handles html blocks inside the parsed markdown content.
+  static List<Node> buildNodes(Iterable<md.Node> markdownNodes) {
     final root = ElementNode('_', {}, []);
     List<ElementNode> stack = [root];
     List<Node> currentNodes = root.children!;
@@ -108,7 +111,7 @@ class MarkdownParser implements PageParser {
       } else if (node is md.Text) {
         currentNodes.addAll(HtmlParser.buildNodes(html.parseFragment(node.text).nodes));
       } else if (node is md.Element) {
-        final children = _buildNodes(node.children ?? []);
+        final children = buildNodes(node.children ?? []);
         currentNodes.add(ElementNode(
           node.tag,
           {if (node.generatedId != null) 'id': node.generatedId!, ...node.attributes},
