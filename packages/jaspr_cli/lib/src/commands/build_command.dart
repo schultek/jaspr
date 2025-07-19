@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:build_daemon/data/build_status.dart';
 import 'package:build_daemon/data/build_target.dart';
 import 'package:collection/collection.dart';
-import 'package:http/http.dart' as http show Client;
+import 'package:http/http.dart' as http show Client, Response;
 import 'package:path/path.dart' as p;
 import 'package:webdev/src/daemon_client.dart' as d;
 
@@ -213,7 +213,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       );
 
       bool done = false;
-      watchProcess('server', process, tag: Tag.server, progress: 'Running server app...', onFail: () => !done);
+      watchProcess('server', process, tag: Tag.server, progress: 'Running server app...', onFail: () {
+        logger.write('Server process failed unexpectedly.', level: Level.error, progress: ProgressState.completed);
+        return !done;
+      });
 
       await serverStartedCompleter.future;
 
@@ -231,10 +234,17 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           progress: ProgressState.running,
         );
 
-        var response = await httpClient.get(Uri.parse('http://localhost:8080$route'));
+        http.Response response;
+        try {
+          response = await httpClient.get(Uri.parse('http://localhost:8080$route'));
+        } catch (e) {
+          logger.write('Failed to generate route "$route". ($e)', level: Level.error, progress: ProgressState.completed);
+          hasBuildError = true;
+          continue;
+        }
 
         if (response.statusCode != 200) {
-          logger.write('Failed to generate route "$route".', level: Level.error, progress: ProgressState.completed);
+          logger.write('Failed to generate route "$route". (Received status code ${response.statusCode})', level: Level.error, progress: ProgressState.completed);
           hasBuildError = true;
           continue;
         }

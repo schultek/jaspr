@@ -79,6 +79,15 @@ abstract class BuildableElement extends Element {
     _forgottenChildren.clear();
   }
 
+  @protected
+  void failRebuild(Object error, StackTrace stackTrace) {
+    binding.reportBuildError(this, error, stackTrace);
+
+    _dirty = false;
+    _children = [];
+    _forgottenChildren.clear();
+  }
+
   /// Subclasses should override this function to actually call the appropriate
   /// `build` function (e.g., [StatelessComponent.build] or [State.build]) for
   /// their component.
