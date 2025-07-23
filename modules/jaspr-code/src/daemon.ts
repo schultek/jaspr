@@ -3,17 +3,15 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { dartVMPath } from "./constants";
 import * as fs from "fs";
-import { dartExtensionApi, SpawnedProcess } from "./api";
-import { checkJasprInstalled } from "./commands";
+import { dartExtensionApi, DartProcess } from "./api";
+import { checkJasprInstalled } from "./helpers/install_helper";
 
 let chalk: any;
 (async () => {
   chalk = new (await import("chalk")).Chalk({ level: 1 });
 })();
 
-export class JasprServeProcess implements vscode.Disposable {
-  
-
+export class JasprDaemonProcess implements vscode.Disposable {
   private _disposables: vscode.Disposable[] = [];
 
   private statusBarItem: vscode.StatusBarItem | undefined;
@@ -29,7 +27,7 @@ export class JasprServeProcess implements vscode.Disposable {
     new vscode.EventEmitter<string>();
   private terminal: vscode.Terminal | undefined;
   private sessions: vscode.DebugSession[] = [];
-  private process: SpawnedProcess | undefined;
+  private process: DartProcess | undefined;
 
   private status: "running" | "stopped" | "disposed" = "running";
   private folder: vscode.WorkspaceFolder | undefined;
@@ -150,42 +148,29 @@ export class JasprServeProcess implements vscode.Disposable {
     });
 
     this.terminal = await terminalReady;
+    this.terminal.show();
   }
 
   async _startProcess(debugConfiguration?: vscode.DebugConfiguration) {
-    const pubExecution = {
-      args: [
-        "pub",
-        "global",
-        "run",
-        "jaspr_cli:jaspr",
-        "daemon",
-        ...(debugConfiguration?.args ?? []),
-      ],
-      executable: path.join(
-        dartExtensionApi.workspaceContext.sdks.flutter ??
-          dartExtensionApi.workspaceContext.sdks.dart,
-        dartVMPath
-      ),
-    };
-
-    if (!fs.existsSync(pubExecution.executable)) {
-      pubExecution.executable = path.join(
-        dartExtensionApi.workspaceContext.sdks.dart,
-        dartVMPath
-      );
-    }
+    const args = [
+      "pub",
+      "global",
+      "run",
+      "jaspr_cli:jaspr",
+      "daemon",
+      ...(debugConfiguration?.args ?? []),
+    ];
 
     let folder = this.folder?.uri.fsPath;
     if (debugConfiguration?.cwd) {
       folder = path.resolve(folder ?? "", debugConfiguration.cwd);
     }
 
-    this.process = dartExtensionApi.safeToolSpawn(
-      folder,
-      pubExecution.executable,
-      pubExecution.args
-    );
+    this.process = await dartExtensionApi.sdk.startDart(folder ?? "", args);
+    if (!this.process) {
+      this.emitter.fire("Failed to start Jaspr process.\r\n");
+      return;
+    }
     this.process.stdout.setEncoding("utf8");
     this.process.stdout.on("data", (data: Buffer | string) => {
       this.handleData(data, false);
@@ -218,7 +203,6 @@ export class JasprServeProcess implements vscode.Disposable {
       console.log("exit", code);
     });
   }
-
 
   async stop(): Promise<void> {
     this.process?.stdin.write('[{"method":"daemon.shutdown", "id": "0"}]\n');

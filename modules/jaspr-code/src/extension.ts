@@ -5,10 +5,10 @@ import {
   JasprDebugConfigurationProvider,
 } from "./debug";
 
-import { JasprServeProcess } from "./process";
-import { findJasprProjectFolders, projectReferencesJaspr } from "./utils";
 import { createJasprProject, handleNewProjects } from "./create";
 import { jasprClean, jasprDoctor } from "./commands";
+import { JasprDaemonProcess } from "./daemon";
+import { findJasprProjectFolders } from "./helpers/project_helper";
 
 export async function activate(context: vscode.ExtensionContext) {
   let projects = await findJasprProjectFolders();
@@ -58,7 +58,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("jaspr.serve", async () => {
-      const process = new JasprServeProcess();
+      const process = new JasprDaemonProcess();
       context.subscriptions.push(process);
 
       process.start(context);

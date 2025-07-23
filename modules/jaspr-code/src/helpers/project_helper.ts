@@ -2,23 +2,15 @@ import * as fs from "fs";
 import * as path from "path";
 import * as YAML from "yaml";
 import * as vscode from "vscode";
+import { Uri } from "vscode";
 
 import { URI } from "vscode-uri";
-import { dartVMPath, isWin } from "./constants";
-import { dartExtensionApi } from "./api";
+import { isWin } from "../constants";
+import { dartExtensionApi } from "../api";
 
 export async function findJasprProjectFolders(
-  workspaceFolders?: vscode.WorkspaceFolder[] | undefined
 ): Promise<string[]> {
-  let projects =
-    await dartExtensionApi.packagesTreeProvider.projectFinder.findAllProjectFolders(
-      undefined,
-      {
-        requirePubspec: true,
-        searchDepth: 5,
-        workspaceFolders,
-      }
-    );
+  let projects = await dartExtensionApi.workspace.findProjectFolders();
   projects = projects.filter(projectReferencesJaspr);
   return projects;
 }
@@ -98,4 +90,51 @@ export function forceWindowsDriveLetterToUppercase<
   }
 
   return p;
+}
+
+export async function getFolderToRunCommandIn(
+  placeHolder: string
+): Promise<string | undefined> {
+  // Otherwise look for what projects we have.
+  const selectableFolders =
+    await dartExtensionApi.workspace.findProjectFolders();
+  if (!selectableFolders?.length) {
+    void vscode.window.showWarningMessage(
+      `No Dart project roots were found. Do you have a pubspec.yaml file?`
+    );
+    return undefined;
+  }
+
+  return showFolderPicker(selectableFolders, placeHolder);
+}
+
+async function showFolderPicker(
+  folders: string[],
+  placeHolder: string
+): Promise<string | undefined> {
+  // No point asking the user if there's only one.
+  if (folders.length === 1) {
+    return folders[0];
+  }
+
+  const items = folders
+    .map((f) => {
+      const workspaceFolder = vscode.workspace.getWorkspaceFolder(Uri.file(f));
+      if (!workspaceFolder) {
+        return undefined;
+      }
+
+      const workspacePathParent = path.dirname(fsPath(workspaceFolder.uri));
+      return {
+        description: workspacePathParent,
+        label: path.relative(workspacePathParent, f),
+        path: f,
+      } as vscode.QuickPickItem & { path: string };
+    })
+    .filter((f) => f !== undefined);
+
+  const selectedFolder = await vscode.window.showQuickPick(items, {
+    placeHolder,
+  });
+  return selectedFolder && selectedFolder.path;
 }

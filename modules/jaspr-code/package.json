@@ -143,6 +143,7 @@
     "@typescript-eslint/parser": "^8.25.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
+    "dart-code": "github:Dart-Code/Dart-Code",
     "eslint": "^9.21.0",
     "typescript": "^5.7.3"
   },
