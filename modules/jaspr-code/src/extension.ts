@@ -9,6 +9,7 @@ import { JasprServeProcess } from "./process";
 import { findJasprProjectFolders, projectReferencesJaspr } from "./utils";
 import { createJasprProject, handleNewProjects } from "./create";
 import { jasprClean, jasprDoctor } from "./commands";
+import { ComponentCodeLensProvider } from "./code_lens";
 
 export async function activate(context: vscode.ExtensionContext) {
   let projects = await findJasprProjectFolders();
@@ -63,5 +64,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
       process.start(context);
     })
+  );
+  context.subscriptions.push(
+    vscode.languages.registerCodeLensProvider(
+      { language: "dart", scheme: "file" },
+      new ComponentCodeLensProvider()
+    )
   );
 }

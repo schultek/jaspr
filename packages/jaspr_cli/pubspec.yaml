@@ -20,6 +20,7 @@ executables:
   jaspr:
 
 dependencies:
+  analyzer: ^8.0.0
   ansi_styles: ^0.3.2
   args: ^2.3.0
   cli_completion: ^0.5.0
@@ -43,6 +44,7 @@ dependencies:
   shelf: ^1.4.1
   shelf_proxy: ^1.0.4
   async: ^2.13.0
+  watcher: ^1.1.2
 
 dev_dependencies:
   lints: ^5.0.0
