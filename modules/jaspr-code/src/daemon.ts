@@ -1,8 +1,6 @@
 import * as vscode from "vscode";
 
 import * as path from "path";
-import { dartVMPath } from "./constants";
-import * as fs from "fs";
 import { dartExtensionApi, DartProcess } from "./api";
 import { checkJasprInstalled } from "./helpers/install_helper";
 

@@ -18,8 +18,11 @@ Future<Chrome?> startChrome(int port, Logger logger) async {
   final uri = Uri(scheme: 'http', host: 'localhost', port: port).toString();
   try {
     return await Chrome.start([uri], port: 0, chromeUserDir: chromeUserDir);
-  } on ChromeError catch (e) {
-    logger.write('Error starting Chrome: ${e.details}', tag: Tag.cli, level: Level.error);
+  } on StateError catch (_) {
+    logger.write('Could not attach debugger to Chrome, since it is already running in a different session. Close Chrome and try again, or continue without debugging.', tag: Tag.cli, level: Level.error);
+    return null;
+  } catch (e) {
+    logger.write('Unexpected error starting Chrome: $e', tag: Tag.cli, level: Level.error);
     return null;
   }
 }
@@ -52,7 +55,7 @@ final Directory? chromeUserDir = () {
 /// A class for managing an instance of Chrome.
 class Chrome {
   final webdev.Chrome wChrome;
-  final browser_launcher.Chrome bChrome;
+  final browser_launcher.Chrome? bChrome;
 
   Chrome._(
     this.wChrome,
@@ -61,23 +64,17 @@ class Chrome {
 
   Future<void> close() async {
     wChrome.close();
-    bChrome.close();
+    bChrome?.close();
   }
 
   static Future<Chrome> start(List<String> urls, {required int port, required Directory? chromeUserDir}) async {
-    final browser =
-        await browser_launcher.Chrome.startWithDebugPort(urls, debugPort: port, userDataDir: chromeUserDir?.path);
-
+    final browser = await browser_launcher.Chrome.startWithDebugPort(urls,
+        debugPort: port, userDataDir: chromeUserDir?.path, signIn: true);
     return Chrome._(await webdev.Chrome.fromExisting(browser.debugPort), browser);
   }
-}
 
-class ChromeError extends Error {
-  final String details;
-  ChromeError(this.details);
-
-  @override
-  String toString() {
-    return 'ChromeError: $details';
+  static Future<Chrome> fromExisting(int port) async {
+    final browser = await browser_launcher.Chrome.fromExisting(port);
+    return Chrome._(await webdev.Chrome.fromExisting(browser.debugPort), browser);
   }
 }
