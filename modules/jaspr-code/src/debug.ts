@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
-import { JasprServeProcess } from "./process";
-import { findJasprProjectFolders, fsPath } from "./utils";
+
 import * as path from "path";
+import { JasprDaemonProcess } from "./daemon";
+import { findJasprProjectFolders, fsPath } from "./helpers/project_helper";
 
 export class JasprDebugConfigurationProvider
   implements vscode.DebugConfigurationProvider, vscode.Disposable
@@ -19,7 +20,7 @@ export class JasprDebugConfigurationProvider
     debugConfiguration: vscode.DebugConfiguration,
     token?: vscode.CancellationToken
   ): Promise<vscode.DebugConfiguration | undefined> {
-    const process = new JasprServeProcess();
+    const process = new JasprDaemonProcess();
     this._disposables.push(process);
 
     process.start(this.context, folder, debugConfiguration);
@@ -37,9 +38,7 @@ export class InitialLaunchJsonDebugConfigProvider
   ): Promise<vscode.DebugConfiguration[]> {
     const results: vscode.DebugConfiguration[] = [];
 
-    const projectFolders = folder
-      ? await findJasprProjectFolders([folder])
-      : [];
+    const projectFolders = await findJasprProjectFolders();
     const rootFolder = folder ? fsPath(folder.uri) : undefined;
 
     if (projectFolders.length) {
@@ -86,9 +85,7 @@ export class DynamicDebugConfigProvider
     const results: vscode.DebugConfiguration[] = [];
 
     const rootFolder = folder ? fsPath(folder.uri) : undefined;
-    const projectFolders = folder
-      ? await findJasprProjectFolders([folder])
-      : [];
+    const projectFolders = await findJasprProjectFolders();
     for (const projectFolder of projectFolders) {
       const name = path.basename(projectFolder);
       // Compute cwd, using undefined instead of empty if rootFolder === projectFolder

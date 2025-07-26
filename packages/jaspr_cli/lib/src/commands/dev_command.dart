@@ -111,10 +111,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (config!.mode == JasprMode.client) {
       logger.write('Serving at http://localhost:$proxyPort', tag: Tag.cli);
 
-      var result = await _runChrome();
-      if (result != null) {
-        return result;
-      }
+      await _runChrome();
 
       await workflow.done;
       return 0;
@@ -211,11 +208,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
     }
 
-    var result = await _runChrome();
-    if (result != null) {
-      return result;
-    }
-
+    await _runChrome();
     return serverFuture;
   }
 
@@ -248,12 +241,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     return await watchProcess('server', process, tag: Tag.server);
   }
 
-  Future<int?> _runChrome() async {
-    if (!launchInChrome) return null;
+  Future<void> _runChrome() async {
+    if (!launchInChrome) return;
 
     var chrome = await startChrome(int.parse(port), logger);
     if (chrome == null) {
-      return 1;
+      return;
     }
 
     logger.write('Chrome started.', tag: Tag.cli, progress: ProgressState.completed);
@@ -265,8 +258,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         chrome = null;
       }
     });
-
-    return null;
   }
 
   Future<ClientWorkflow?> _runClient(String webPort) async {

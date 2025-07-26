@@ -1,10 +1,10 @@
 import * as vs from "vscode";
-import { fsPath } from "./utils";
 import * as fs from "fs";
 import * as path from "path";
 import { JASPR_CREATE_PROJECT_TRIGGER_FILE } from "./constants";
 import { jasprCreate, JasprCreateOptions, JasprTemplate } from "./commands";
-import { dartExtensionApi } from "./api";
+import { checkJasprVersion } from "./helpers/install_helper";
+import { fsPath } from "./helpers/project_helper";
 
 type JasprVariant = vs.QuickPickItem & {
   data?: JasprCreateOptions | JasprTemplate | "more";
@@ -227,12 +227,10 @@ function getJasprVariantsAll(): Array<
 }
 
 export async function createJasprProject(): Promise<vs.Uri | undefined> {
-  const v = await dartExtensionApi.pubGlobal.installIfRequired({
-    packageName: "jaspr",
-    packageID: "jaspr_cli",
-    requiredVersion: "0.18.2",
-  });
-
+  const v = await checkJasprVersion();
+  if (!v) {
+    return;
+  }
   const jasprVariants = getJasprVariants(v);
 
   let selectedModeItem = await vs.window.showQuickPick(jasprVariants, {
