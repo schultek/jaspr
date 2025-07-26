@@ -19,7 +19,10 @@ Future<Chrome?> startChrome(int port, Logger logger) async {
   try {
     return await Chrome.start([uri], port: 0, chromeUserDir: chromeUserDir);
   } on StateError catch (_) {
-    logger.write('Could not attach debugger to Chrome, since it is already running in a different session. Close Chrome and try again, or continue without debugging.', tag: Tag.cli, level: Level.error);
+    logger.write(
+        'Could not attach debugger to Chrome, since it is already running in a different session. Close Chrome and try again, or continue without debugging.',
+        tag: Tag.cli,
+        level: Level.error);
     return null;
   } catch (e) {
     logger.write('Unexpected error starting Chrome: $e', tag: Tag.cli, level: Level.error);

@@ -29,7 +29,8 @@ Future<JasprConfig> getConfig(Logger logger) async {
   var pubspecPath = 'pubspec.yaml';
   var pubspecFile = File(pubspecPath).absolute;
   if (!(await pubspecFile.exists())) {
-    logger.write('Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.', tag: Tag.cli, level: Level.critical);
+    logger.write('Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.',
+        tag: Tag.cli, level: Level.critical);
     exit(1);
   }
 
@@ -38,7 +39,8 @@ Future<JasprConfig> getConfig(Logger logger) async {
   if (pubspecYaml case {'dependencies': {'jaspr': _}}) {
     // ok
   } else {
-    logger.write('Missing dependency on jaspr in pubspec.yaml file. Make sure to add jaspr to your dependencies.', tag: Tag.cli, level: Level.critical);
+    logger.write('Missing dependency on jaspr in pubspec.yaml file. Make sure to add jaspr to your dependencies.',
+        tag: Tag.cli, level: Level.critical);
     exit(1);
   }
 
@@ -48,7 +50,9 @@ Future<JasprConfig> getConfig(Logger logger) async {
     var log = logger.logger;
     if (log == null) {
       logger.write(
-          'Missing dependency on jaspr_builder in pubspec.yaml file. Make sure to add jaspr_builder to your dev_dependencies.', tag: Tag.cli, level: Level.warning);
+          'Missing dependency on jaspr_builder in pubspec.yaml file. Make sure to add jaspr_builder to your dev_dependencies.',
+          tag: Tag.cli,
+          level: Level.warning);
     } else {
       var result = log.confirm(
           'Missing dependency on jaspr_builder package. Do you want to add jaspr_builder to your dev_dependencies now?',
@@ -57,7 +61,8 @@ Future<JasprConfig> getConfig(Logger logger) async {
         var result = Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
         if (result.exitCode != 0) {
           log.err(result.stderr);
-          logger.write('Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.', tag: Tag.cli, level: Level.critical);
+          logger.write('Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.',
+              tag: Tag.cli, level: Level.critical);
           exit(1);
         }
 
