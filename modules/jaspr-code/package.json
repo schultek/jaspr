@@ -35,7 +35,8 @@
     "workspaceContains:pubspec.yaml",
     "workspaceContains:jaspr.create",
     "onDebug",
-    "onDebugDynamicConfigurations"
+    "onDebugDynamicConfigurations",
+    "onLanguage:dart"
   ],
   "main": "./out/extension.js",
   "contributes": {

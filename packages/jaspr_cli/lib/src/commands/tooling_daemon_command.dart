@@ -37,7 +37,7 @@ class ToolingDaemonCommand extends BaseCommand with DaemonHelper {
   @override
   Future<int> runCommand() async {
     return runWithDaemon((daemon) async {
-      daemon.registerDomain(ScopingDomain(daemon, logger));
+      daemon.registerDomain(ScopesDomain(daemon, logger));
       return 0;
     });
   }
@@ -45,66 +45,69 @@ class ToolingDaemonCommand extends BaseCommand with DaemonHelper {
 
 // [{"id":1,"method":"scoping.registerScopes","params":{"scopes":["/Users/kilian/Documents/Work/Packages/jaspr/apps/website/lib/main.dart"]}}]
 
-class ScopingDomain extends Domain {
-  ScopingDomain(Daemon daemon, this.logger) : super(daemon, 'scoping') {
-    registerHandler('registerScopes', _registerScopes);
+class ScopesDomain extends Domain {
+  ScopesDomain(Daemon daemon, this.logger) : super(daemon, 'scopes') {
+    registerHandler('register', _registerScopes);
   }
 
   final Logger logger;
-  final Map<String, Scope> _scopes = {};
+  AnalysisContextCollection? _collection;
+  final List<StreamSubscription<WatchEvent>> _watcherSubscriptions = [];
 
   Future<dynamic> _registerScopes(Map<String, dynamic> params) async {
-    final scopes = params['scopes'] as List<dynamic>;
-    AnalysisContextCollection collection = AnalysisContextCollection(
-      includedPaths: scopes.cast(),
+    await _collection?.dispose();
+    // ignore: avoid_function_literals_in_foreach_calls
+    _watcherSubscriptions.forEach((sub) => sub.cancel());
+    _watcherSubscriptions.clear();
+
+    final folders = params['folders'] as List<dynamic>;
+
+    _collection = AnalysisContextCollection(
+      includedPaths: folders.cast(),
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
-    for (final path in scopes) {
-      final context = collection.contextFor(path as String);
-      _scopes.putIfAbsent(path, () => Scope(this, context, logger));
+
+    for (final context in _collection!.contexts) {
+      _watcherSubscriptions.add(DirectoryWatcher(
+        context.contextRoot.root.path,
+      ).events.listen((event) {
+        final path = event.path;
+        logger.write('File changed: $path');
+
+        if (path.endsWith('.dart')) {
+          _reanalyze(path);
+        } else if (path.endsWith('pubspec.yaml') ||
+            path.endsWith('pubspec.lock') ||
+            path.endsWith('package_config.json')) {
+          // Recreate all scopes if pubspec or package config changes.
+          _registerScopes(params);
+        }
+      }));
+    }
+
+    for (final context in _collection!.contexts) {
+      await analyze(context);
     }
   }
 
-  @override
-  void dispose() {
-    for (final scope in _scopes.values) {
-      scope.dispose();
+  void _reanalyze(String path) {
+    for (final context in _collection!.contexts) {
+      context.changeFile(path);
+      analyze(context, true);
     }
-    _scopes.clear();
-    super.dispose();
-  }
-}
-
-class Scope {
-  Scope(this.domain, this.context, this.logger) {
-    watcher = DirectoryWatcher(
-      context.contextRoot.root.path,
-    );
-    watcherSub = watcher.events.listen((event) {
-      if (event.path.endsWith('.dart')) {
-        logger.write('File changed: ${event.path}');
-        context.changeFile(event.path);
-        analyze(true);
-      }
-    });
-    analyze();
   }
 
-  final ScopingDomain domain;
-  final AnalysisContext context;
-  final Logger logger;
-  late DirectoryWatcher watcher;
-  late StreamSubscription<WatchEvent> watcherSub;
-
-  Future<void> analyze([bool awaitPendingChanges = false]) async {
+  Future<void> analyze(AnalysisContext context, [bool awaitPendingChanges = false]) async {
+    final rootPath = context.contextRoot.root.path;
     final mainFile = context.contextRoot.root.getChildAssumingFolder('lib').getChildAssumingFile('main.dart');
+
     if (!mainFile.exists) {
-      logger.write('No main.dart found in ${context.contextRoot.root.path}');
+      logger.write('No main.dart found in $rootPath');
       return;
     }
 
     final sw = Stopwatch()..start();
-    logger.write('Analyzing ${context.contextRoot.root.path}...');
+    logger.write('Analyzing $rootPath...');
 
     if (awaitPendingChanges) {
       await context.applyPendingFileChanges();
@@ -116,26 +119,40 @@ class Scope {
     sw.stop();
 
     if (result is! ResolvedLibraryResult) {
-      logger.write('Failed to resolve main.dart in ${context.contextRoot.root.path}');
+      logger.write('Failed to resolve main.dart in $rootPath');
       return;
     }
     logger.write('Resolved main.dart in ${sw.elapsedMilliseconds}ms');
 
-    var inspectData = InspectData();
-
-    inspectData.inspectLibrary(result.element2);
-    domain.sendEvent('scoping.inspectResult', {
-      'path': context.contextRoot.root.path,
-      'data': inspectData.toJson(),
-    });
+    final inspectData = InspectData(result.element2);
+    sendEvent('scopes.result', inspectData.toJson());
   }
 
+  @override
   void dispose() {
-    watcherSub.cancel();
+    _collection?.dispose();
+    // ignore: avoid_function_literals_in_foreach_calls
+    _watcherSubscriptions.forEach((sub) => sub.cancel());
+    super.dispose();
   }
 }
 
 class InspectData {
+  InspectData(LibraryElement root) {
+    final mainFunction = root.topLevelFunctions.where((e) => e.name == 'main').firstOrNull?.firstFragment;
+    final mainLocation =
+        mainFunction?.libraryFragment.lineInfo.getLocation(mainFunction.nameOffset ?? mainFunction.offset);
+    mainTarget = InspectTarget(
+      root.firstFragment.source.fullName,
+      'main',
+      mainLocation?.lineNumber ?? 0,
+      mainLocation?.columnNumber ?? 0,
+    );
+
+    inspectLibrary(root);
+  }
+
+  late InspectTarget mainTarget;
   Map<String, InspectDataItem> libraries = {};
 
   void inspectLibrary(LibraryElement library, [Set<InspectTarget> clientScopeRoots = const {}]) {
@@ -163,7 +180,9 @@ class InspectData {
     libraries[path] = data;
 
     for (final clazz in library.classes) {
-      final target = InspectTarget(path, clazz.name ?? '');
+      final location = clazz.firstFragment.libraryFragment.lineInfo
+          .getLocation(clazz.firstFragment.nameOffset ?? clazz.firstFragment.offset);
+      final target = InspectTarget(path, clazz.name ?? '', location.lineNumber, location.columnNumber);
       if (clazz.allSupertypes.any((e) => e.element.name == 'Component')) {
         data.components.add(target);
         if (clazz.metadata.annotations.any((a) => a.element?.name == 'client')) {
@@ -183,7 +202,8 @@ class InspectData {
 
   Map<String, dynamic> toJson() {
     return {
-      'items': {
+      'root': mainTarget.toJson(),
+      'data': {
         for (var entry in libraries.entries)
           if (entry.value.components.isNotEmpty)
             entry.key: {
@@ -205,13 +225,17 @@ class InspectDataItem {
 class InspectTarget {
   final String path;
   final String name;
+  final int line;
+  final int character;
 
-  InspectTarget(this.path, this.name);
+  InspectTarget(this.path, this.name, this.line, this.character);
 
   Map<String, dynamic> toJson() {
     return {
       'path': path,
       'name': name,
+      'line': line,
+      'character': character,
     };
   }
 }

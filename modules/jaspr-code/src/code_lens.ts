@@ -1,74 +1,114 @@
-import {
-  CancellationToken,
-  CodeLens,
-  CodeLensProvider,
-  Disposable,
-  Location,
-  Position,
-  Range,
-  TextDocument,
-  Uri,
-} from "vscode";
+import * as vs from "vscode";
 import { dartExtensionApi } from "./api";
 import { findJasprProjectFolders } from "./helpers/project_helper";
-import { runJasprInFolder } from "./helpers/process_helper";
+import { JasprToolingDaemon } from "./jaspr/tooling_daemon";
+import { PublicOutline } from "dart-code/src/extension/api/interfaces";
 
-export class ComponentCodeLensProvider implements CodeLensProvider, Disposable {
-  private disposables: Disposable[] = [];
+type ScopeResults = {
+  root: ScopeTarget;
+  data: Record<string, ScopeFileResult>;
+};
 
-  private inspectResults: Record<string, Thenable<any> | undefined> = {};
+type ScopeFileResult = {
+  components: string[];
+  clientScopeRoots: ScopeTarget[];
+};
 
-  constructor() {}
+type ScopeTarget = {
+  path: string;
+  name: string;
+  line: number;
+  character: number;
+};
+
+export class ComponentCodeLensProvider
+  implements vs.CodeLensProvider, vs.Disposable
+{
+  private toolingDaemon: JasprToolingDaemon;
+
+  private _onDidChangeCodeLenses: vs.EventEmitter<void> =
+    new vs.EventEmitter<void>();
+  public readonly onDidChangeCodeLenses: vs.Event<void> =
+    this._onDidChangeCodeLenses.event;
+
+  private scopeResults: Record<string, ScopeResults> = {};
+
+  constructor(toolingDaemon: JasprToolingDaemon) {
+    this.toolingDaemon = toolingDaemon;
+    this.registerFolders();
+  }
+
+  private async registerFolders() {
+    var folders = await findJasprProjectFolders();
+    this.toolingDaemon.sendMessage("scopes.register", { folders: folders });
+    this.toolingDaemon.onEvent("scopes.result", (results: ScopeResults) => {
+      this.scopeResults[results.root.path] = results;
+      this._onDidChangeCodeLenses.fire();
+    });
+  }
 
   public async provideCodeLenses(
-    document: TextDocument,
-    token: CancellationToken
-  ): Promise<CodeLens[] | undefined> {
-    // Without version numbers, the best we have to tell if an outline is likely correct or stale is
-    // if its length matches the document exactly.
-    const expectedLength = document.getText().length;
-    const outline = await (
-      dartExtensionApi as any
-    ).analyzer.fileTracker.waitForOutlineWithLength(
+    document: vs.TextDocument,
+    token: vs.CancellationToken
+  ): Promise<vs.CodeLens[] | undefined> {
+    const outline = await dartExtensionApi.workspace.getOutline(
       document,
-      expectedLength,
       token
     );
     if (!outline?.children?.length) {
       return;
     }
 
-    var folders = await findJasprProjectFolders();
+    const results: vs.CodeLens[] = [];
 
-    var folder = folders.find((f) => document.uri.path.startsWith(f));
-    if (!folder) {
-      return;
-    }
+    const serverRoots: ScopeTarget[] = [];
+    const clientRoots: ScopeTarget[] = [];
+    const components: PublicOutline[] = [];
 
-    if (!this.inspectResults[folder]) {
-      this.inspectResults[folder] = runJasprInFolder(
-        folder,
-        ["inspect"],
-        undefined
-      );
-    }
+    for (let root in this.scopeResults) {
+      const scope = this.scopeResults[root];
+      const items = scope.data;
+      if (!items) {
+        continue;
+      }
+      const item = items[document.uri.fsPath];
+      if (!item) {
+        continue;
+      }
 
-    var mainFileLocation = folder + "/lib/main.dart";
-    var result = (await this.inspectResults[folder]).stdout as string;
-    var start = result.indexOf("<<__");
-    var end = result.indexOf("__>>");
-
-    var data = JSON.parse(result.substring(start + 4, end));
-    var item = data[document.uri.path];
-
-    const results: CodeLens[] = [];
-
-    for (let child of outline.children) {
-      if (item.components.includes(child.element.name)) {
-        results.push(this.createCodeLens(document, child, "Server Scope", mainFileLocation));
-        if (item.isClient || item.isClientDependent) {
-          results.push(this.createCodeLens(document, child, "Client Scope", mainFileLocation));
+      for (let child of outline.children) {
+        const component = item.components.find((c) => c === child.element.name);
+        if (!component) {
+          continue;
         }
+
+        serverRoots.push(scope.root);
+        clientRoots.push(...item.clientScopeRoots);
+        if (!components.includes(child)) {
+          components.push(child);
+        }
+      }
+    }
+
+    for (let component of components) {
+      results.push(
+        this.createCodeLens(
+          document,
+          component,
+          "Server Scope",
+          serverRoots.map(targetToLocation)
+        )
+      );
+
+      if (clientRoots.length > 0) {
+        results.push(
+          this.createCodeLens(
+            document,
+            component,
+            "Client Scope",
+            clientRoots.map(targetToLocation)
+          )
+        );
       }
     }
 
@@ -76,36 +116,35 @@ export class ComponentCodeLensProvider implements CodeLensProvider, Disposable {
   }
 
   private createCodeLens(
-    document: TextDocument,
+    document: vs.TextDocument,
     element: any,
     name: string,
-    location: string
-  ): CodeLens {
+    targets: vs.Location[]
+  ): vs.CodeLens {
     var range = lspToRange(element.codeRange);
-    return new CodeLens(range, {
-      arguments: [
-        document.uri,
-        range.start,
-        [
-          new Location(
-            Uri.parse(location),
-            new Position(0, 0),
-          ),
-        ],
-        "peek"
-      ],
+    return new vs.CodeLens(range, {
+      arguments: [document.uri, range.start, targets, "peek"],
       command: "editor.action.peekLocations",
       title: name,
     });
   }
 
-  public dispose(): any {}
+  public dispose(): any {
+    this._onDidChangeCodeLenses.dispose();
+  }
 }
 
-export function lspToRange(range: any): Range {
-  return new Range(lspToPosition(range.start), lspToPosition(range.end));
+function targetToLocation(target: ScopeTarget): vs.Location {
+  return new vs.Location(
+    vs.Uri.file(target.path),
+    new vs.Position(target.line - 1, target.character)
+  );
 }
 
-export function lspToPosition(position: any): Position {
-  return new Position(position.line, position.character);
+export function lspToRange(range: any): vs.Range {
+  return new vs.Range(lspToPosition(range.start), lspToPosition(range.end));
+}
+
+export function lspToPosition(position: any): vs.Position {
+  return new vs.Position(position.line, position.character);
 }
