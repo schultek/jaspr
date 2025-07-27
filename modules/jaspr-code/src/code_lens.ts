@@ -10,8 +10,8 @@ import {
   Uri,
 } from "vscode";
 import { dartExtensionApi } from "./api";
-import { findJasprProjectFolders, fsPath } from "./utils";
-import { runJasprInFolder } from "./commands";
+import { findJasprProjectFolders } from "./helpers/project_helper";
+import { runJasprInFolder } from "./helpers/process_helper";
 
 export class ComponentCodeLensProvider implements CodeLensProvider, Disposable {
   private disposables: Disposable[] = [];

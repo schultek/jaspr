@@ -5,11 +5,14 @@ import {
   JasprDebugConfigurationProvider,
 } from "./debug";
 
-import { JasprServeProcess } from "./process";
-import { findJasprProjectFolders, projectReferencesJaspr } from "./utils";
 import { createJasprProject, handleNewProjects } from "./create";
 import { jasprClean, jasprDoctor } from "./commands";
 import { ComponentCodeLensProvider } from "./code_lens";
+import { JasprDaemonProcess } from "./daemon";
+import {
+  findJasprProjectFolders,
+  getFolderToRunCommandIn,
+} from "./helpers/project_helper";
 
 export async function activate(context: vscode.ExtensionContext) {
   let projects = await findJasprProjectFolders();
@@ -59,12 +62,25 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("jaspr.serve", async () => {
-      const process = new JasprServeProcess();
+      const folderToRunCommandIn = await getFolderToRunCommandIn(
+        `Select the folder to run "jaspr serve" in`
+      );
+      if (!folderToRunCommandIn) {
+        return;
+      }
+
+      const process = new JasprDaemonProcess();
       context.subscriptions.push(process);
 
-      process.start(context);
+      process.start(context, undefined, {
+        name: "Jaspr",
+        request: "launch",
+        type: "jaspr",
+        cwd: folderToRunCommandIn,
+      });
     })
   );
+  
   context.subscriptions.push(
     vscode.languages.registerCodeLensProvider(
       { language: "dart", scheme: "file" },
