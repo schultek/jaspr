@@ -1,50 +1,50 @@
 import * as vs from "vscode";
 import { dartExtensionApi } from "./api";
-import { findJasprProjectFolders } from "./helpers/project_helper";
-import { JasprToolingDaemon } from "./jaspr/tooling_daemon";
 import { PublicOutline } from "dart-code/src/extension/api/interfaces";
-
-type ScopeResults = {
-  root: ScopeTarget;
-  data: Record<string, ScopeFileResult>;
-};
-
-type ScopeFileResult = {
-  components: string[];
-  clientScopeRoots: ScopeTarget[];
-};
-
-type ScopeTarget = {
-  path: string;
-  name: string;
-  line: number;
-  character: number;
-};
+import { ScopeResults, ScopesDomain, ScopeTarget } from "./jaspr/scopes_domain";
 
 export class ComponentCodeLensProvider
   implements vs.CodeLensProvider, vs.Disposable
 {
-  private toolingDaemon: JasprToolingDaemon;
+  private scopesDomain: ScopesDomain;
 
   private _onDidChangeCodeLenses: vs.EventEmitter<void> =
     new vs.EventEmitter<void>();
   public readonly onDidChangeCodeLenses: vs.Event<void> =
     this._onDidChangeCodeLenses.event;
 
-  private scopeResults: Record<string, ScopeResults> = {};
+  private hintCommand: vs.Disposable;
 
-  constructor(toolingDaemon: JasprToolingDaemon) {
-    this.toolingDaemon = toolingDaemon;
-    this.registerFolders();
-  }
+  private scopeResults: ScopeResults = {};
 
-  private async registerFolders() {
-    var folders = await findJasprProjectFolders();
-    this.toolingDaemon.sendMessage("scopes.register", { folders: folders });
-    this.toolingDaemon.onEvent("scopes.result", (results: ScopeResults) => {
-      this.scopeResults[results.root.path] = results;
+  constructor(scopesDomain: ScopesDomain) {
+    this.scopesDomain = scopesDomain;
+    this.scopesDomain.onDidChangeScopes((results: ScopeResults) => {
+      this.scopeResults = results;
       this._onDidChangeCodeLenses.fire();
     });
+
+    this.hintCommand = vs.commands.registerCommand(
+      "jaspr.action.showScopeHint",
+      async () => {
+        let result = await vs.window.showInformationMessage(
+          `Component Scopes define where a component is rendered: server, client or both. For example, any component that is a descendant of an '@client' component will be in that component's client scope. Scopes also limit which platform-specific imports are available for a component.`,
+          "Learn More",
+          "Close",
+          "Never Show Again"
+        );
+
+        if (result === "Learn More") {
+          await vs.env.openExternal(
+            vs.Uri.parse("https://docs.jaspr.site/get_started/server_client")
+          );
+        } else if (result === "Never Show Again") {
+          await vs.workspace
+            .getConfiguration("jaspr.scopes")
+            .update("showHint", false, vs.ConfigurationTarget.Global);
+        }
+      }
+    );
   }
 
   public async provideCodeLenses(
@@ -65,40 +65,33 @@ export class ComponentCodeLensProvider
     const clientRoots: ScopeTarget[] = [];
     const components: PublicOutline[] = [];
 
-    for (let root in this.scopeResults) {
-      const scope = this.scopeResults[root];
-      const items = scope.data;
-      if (!items) {
-        continue;
-      }
-      const item = items[document.uri.fsPath];
-      if (!item) {
+    const item = this.scopeResults[document.uri.fsPath];
+    if (!item) {
+      return;
+    }
+
+    for (let child of outline.children) {
+      const component = item.components?.find((c) => c === child.element.name);
+      if (!component) {
         continue;
       }
 
-      for (let child of outline.children) {
-        const component = item.components.find((c) => c === child.element.name);
-        if (!component) {
-          continue;
-        }
-
-        serverRoots.push(scope.root);
-        clientRoots.push(...item.clientScopeRoots);
-        if (!components.includes(child)) {
-          components.push(child);
-        }
-      }
+      serverRoots.push(...(item.serverScopeRoots ?? []));
+      clientRoots.push(...(item.clientScopeRoots ?? []));
+      components.push(child);
     }
 
     for (let component of components) {
-      results.push(
-        this.createCodeLens(
-          document,
-          component,
-          "Server Scope",
-          serverRoots.map(targetToLocation)
-        )
-      );
+      if (serverRoots.length > 0) {
+        results.push(
+          this.createCodeLens(
+            document,
+            component,
+            "Server Scope",
+            serverRoots.map(targetToLocation)
+          )
+        );
+      }
 
       if (clientRoots.length > 0) {
         results.push(
@@ -108,6 +101,21 @@ export class ComponentCodeLensProvider
             "Client Scope",
             clientRoots.map(targetToLocation)
           )
+        );
+      }
+
+      if (
+        (serverRoots.length > 0 || clientRoots.length > 0) &&
+        vs.workspace
+          .getConfiguration("jaspr.scopes", document)
+          .get("showHint", true)
+      ) {
+        var range = lspToRange(component.codeRange);
+        results.push(
+          new vs.CodeLens(range, {
+            command: "jaspr.action.showScopeHint",
+            title: "What is this?",
+          })
         );
       }
     }
@@ -131,6 +139,7 @@ export class ComponentCodeLensProvider
 
   public dispose(): any {
     this._onDidChangeCodeLenses.dispose();
+    this.hintCommand.dispose();
   }
 }
 

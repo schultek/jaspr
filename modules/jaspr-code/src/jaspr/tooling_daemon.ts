@@ -91,12 +91,12 @@ export class JasprToolingDaemon implements vscode.Disposable {
         continue;
       }
 
-      console.log("Tooling Daemon Log:", line);
-
       if (line.startsWith("[{")) {
         this._currentLine = line;
       } else if (this._currentLine.length > 0) {
         this._currentLine += line;
+      } else {
+        console.log("Tooling Daemon Log:", line);
       }
       if (this._currentLine.endsWith("}]")) {
         let event: any;
@@ -106,8 +106,10 @@ export class JasprToolingDaemon implements vscode.Disposable {
           const json = JSON.parse(currentLine);
           event = json[0];
         } catch (_) {}
-        if (event) {
+        if (event && event.event) {
           this.handleEvent(event);
+        } else {
+          console.log("Tooling Daemon Log:", currentLine);
         }
       }
     }
@@ -117,14 +119,16 @@ export class JasprToolingDaemon implements vscode.Disposable {
     var eventName = event.event;
     var params = event.params;
 
-    console.log("Tooling Daemon Event:", eventName, params);
-
     if (this._eventListeners[eventName]) {
       try {
         this._eventListeners[eventName](params);
       } catch (e) {
         console.error(`Error in event listener for ${eventName}:`, e);
       }
+    } else if (eventName === "daemon.log") {
+      console.log("Tooling Daemon Log:", params.message);
+    } else {
+      console.log("Tooling Daemon Event:", eventName, params);
     }
   }
 
