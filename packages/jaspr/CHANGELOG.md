@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed sitemap generation bug in top-level route ('/')
+
 ## 0.20.0
 
 - **Breaking**: Removed the children parameter from `input` and `col` methods as

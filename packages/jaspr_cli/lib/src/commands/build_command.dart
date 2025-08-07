@@ -178,10 +178,9 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           if (!serverStartedCompleter.isCompleted) {
             serverStartedCompleter.complete();
           }
-          if (generatedRoutes.containsKey(route)) {
-            return;
+          if (!generatedRoutes.containsKey(route)) {
+            queuedRoutes.insert(0, route);
           }
-          queuedRoutes.insert(0, route);
 
           final lastmod = message['lastmod'] is String ? message['lastmod'] : null;
           final changefreq = message['changefreq'] is String ? message['changefreq'] : null;
