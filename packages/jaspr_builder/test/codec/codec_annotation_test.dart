@@ -10,13 +10,20 @@ import 'sources/model_extension.dart';
 
 void main() {
   group('codec annotation', () {
+    late TestReaderWriter reader;
+
+    setUp(() async {
+      reader = TestReaderWriter(rootPackage: 'models');
+      await reader.testing.loadIsolateSources();
+    });
+
     group('on model class', () {
       test('generates json module', () async {
         await testBuilder(
           CodecModuleBuilder(BuilderOptions({})),
           modelClassSources,
           outputs: modelClassOutputs,
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
     });
@@ -27,7 +34,7 @@ void main() {
           CodecModuleBuilder(BuilderOptions({})),
           modelExtensionSources,
           outputs: modelExtensionOutputs,
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
     });
@@ -37,7 +44,7 @@ void main() {
         CodecBundleBuilder(BuilderOptions({})),
         {...modelClassOutputs, ...modelExtensionOutputs},
         outputs: codecBundleOutputs,
-        reader: await PackageAssetReader.currentIsolate(),
+        readerWriter: reader,
       );
     });
   });

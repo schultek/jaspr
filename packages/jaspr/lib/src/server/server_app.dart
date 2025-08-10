@@ -68,6 +68,8 @@ class ServerApp {
     return (client, await shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true));
   }
 
+  static final _requestedRoutes = <String, (String?, String?, double?)>{};
+
   static Future<void> requestRouteGeneration(
     String route, {
     String? lastMod,
@@ -75,6 +77,13 @@ class ServerApp {
     double? priority,
   }) async {
     if (kGenerateMode) {
+      final settings = (lastMod, changefreq, priority);
+      if (_requestedRoutes[route] == settings) {
+        // Skip if the route is already requested with the same settings.
+        return;
+      }
+
+      _requestedRoutes[route] = settings;
       await _sendDebugMessage({
         'route': route,
         'lastmod': lastMod,

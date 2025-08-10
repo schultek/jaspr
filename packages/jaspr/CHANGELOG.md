@@ -1,3 +1,8 @@
+## Unreleased minor
+
+- Fixed sitemap generation bug in top-level route ('/')
+- Update `build` dependency to 3.0.0 and migrate to new analyzer model.
+
 ## 0.20.0
 
 - **Breaking**: Removed the children parameter from `input` and `col` methods as
