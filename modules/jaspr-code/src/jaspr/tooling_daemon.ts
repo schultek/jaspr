@@ -33,6 +33,13 @@ export class JasprToolingDaemon implements vscode.Disposable {
     await this._startProcess();
   }
 
+  public setBusy(busy: boolean) {
+    if (!this.statusItem) {
+      return;
+    }
+    this.statusItem!.busy = busy;
+  }
+
   async _startProcess() {
     this.statusItem!.text = "$(loading~spin) Starting Jaspr Tooling Daemon...";
     this.statusItem!.severity = vscode.LanguageStatusSeverity.Information;

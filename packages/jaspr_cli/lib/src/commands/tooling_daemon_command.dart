@@ -9,6 +9,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:collection/collection.dart';
 import 'package:watcher/watcher.dart';
+import 'package:yaml/yaml.dart';
 
 import '../helpers/daemon_helper.dart';
 import '../logging.dart';
@@ -56,6 +57,7 @@ class ScopesDomain extends Domain {
   final Logger logger;
   AnalysisContextCollection? _collection;
   final List<StreamSubscription<WatchEvent>> _watcherSubscriptions = [];
+  final Map<AnalysisContext, bool> _analysisStatus = {};
   final Map<AnalysisContext, InspectData> _inspectedData = {};
 
   Future<dynamic> _registerScopes(Map<String, dynamic> params) async {
@@ -104,45 +106,75 @@ class ScopesDomain extends Domain {
 
   Future<void> analyze(AnalysisContext context, [bool awaitPendingChanges = false]) async {
     final rootPath = context.contextRoot.root.path;
-    final mainFile = context.contextRoot.root.getChildAssumingFolder('lib').getChildAssumingFile('main.dart');
 
-    if (!mainFile.exists) {
-      logger.write('No main.dart found in $rootPath');
-      return;
-    }
-
-    final sw = Stopwatch()..start();
-    logger.write('Analyzing $rootPath...');
-
-    if (awaitPendingChanges) {
-      await context.applyPendingFileChanges();
-      logger.write('Applied pending changes in ${sw.elapsedMilliseconds}ms');
-      sw.reset();
-    }
-
-    final result = await context.currentSession.getResolvedLibrary(mainFile.path);
-    sw.stop();
-
-    if (result is! ResolvedLibraryResult) {
-      logger.write('Failed to resolve main.dart in $rootPath');
-      return;
-    }
-    logger.write('Resolved main.dart in ${sw.elapsedMilliseconds}ms');
-
-    bool usesFlutter = false;
     try {
-      final packagesContent = context.contextRoot.packagesFile?.readAsStringSync();
-      final packagesJson = jsonDecode(packagesContent ?? '{}');
-      if (packagesJson case {'packages': List packages} when packages.any((p) => p['name'] == 'flutter')) {
-        usesFlutter = true;
+      final pubspecFile = context.contextRoot.root.getChildAssumingFile('pubspec.yaml');
+      if (!pubspecFile.exists) {
+        logger.write('No pubspec.yaml found in $rootPath');
+        return;
       }
-    } catch (_) {
-      // Ignore errors in reading packages file.
-    }
 
-    final inspectData = await InspectData.analyze(result.element2, usesFlutter);
-    _inspectedData[context] = inspectData;
-    emitScopes();
+      try {
+        final pubspecYaml = loadYaml(pubspecFile.readAsStringSync()) as YamlMap;
+
+        if (pubspecYaml case {'jaspr': {'mode': 'server' || 'static'}}) {
+          // ok
+        } else {
+          logger.write('Scopes not available in client mode.');
+          return;
+        }
+      } catch (e) {
+        logger.write('Failed to read pubspec.yaml in $rootPath: $e');
+        return;
+      }
+
+      final mainFile = context.contextRoot.root.getChildAssumingFolder('lib').getChildAssumingFile('main.dart');
+
+      if (!mainFile.exists) {
+        logger.write('No main.dart found in $rootPath');
+        return;
+      }
+
+      final sw = Stopwatch()..start();
+      logger.write('Analyzing $rootPath...');
+
+      _analysisStatus[context] = true;
+      emitStatus();
+
+      if (awaitPendingChanges) {
+        await context.applyPendingFileChanges();
+        logger.write('Applied pending changes in ${sw.elapsedMilliseconds}ms');
+        sw.reset();
+      }
+
+      final result = await context.currentSession.getResolvedLibrary(mainFile.path);
+      sw.stop();
+
+      if (result is! ResolvedLibraryResult) {
+        logger.write('Failed to resolve main.dart in $rootPath');
+        return;
+      }
+      logger.write('Resolved main.dart in ${sw.elapsedMilliseconds}ms');
+
+      bool usesJasprWebCompilers = false;
+      try {
+        final packagesContent = context.contextRoot.packagesFile?.readAsStringSync();
+        final packagesJson = jsonDecode(packagesContent ?? '{}');
+        if (packagesJson case {'packages': List packages}
+            when packages.any((p) => p['name'] == 'jaspr_web_compilers')) {
+          usesJasprWebCompilers = true;
+        }
+      } catch (_) {
+        // Ignore errors in reading packages file.
+      }
+
+      final inspectData = await InspectData.analyze(result.element2, usesJasprWebCompilers);
+      _inspectedData[context] = inspectData;
+      emitScopes();
+    } finally {
+      _analysisStatus[context] = false;
+      emitStatus();
+    }
   }
 
   void emitScopes() {
@@ -212,6 +244,17 @@ class ScopesDomain extends Domain {
     sendEvent('scopes.result', output);
   }
 
+  void emitStatus() {
+    final output = <String, dynamic>{};
+
+    for (final context in _collection!.contexts) {
+      final status = _analysisStatus[context] ?? false;
+      output[context.contextRoot.root.path] = status;
+    }
+
+    sendEvent('scopes.status', output);
+  }
+
   @override
   void dispose() {
     _collection?.dispose();
@@ -222,9 +265,9 @@ class ScopesDomain extends Domain {
 }
 
 class InspectData {
-  InspectData._(this.usesFlutter);
-  static Future<InspectData> analyze(LibraryElement root, bool usesFlutter) async {
-    final inspectData = InspectData._(usesFlutter);
+  InspectData._(this.usesJasprWebCompilers);
+  static Future<InspectData> analyze(LibraryElement root, bool usesJasprWebCompilers) async {
+    final inspectData = InspectData._(usesJasprWebCompilers);
 
     final mainFunction = root.topLevelFunctions.where((e) => e.name == 'main').firstOrNull?.firstFragment;
     final mainLocation =
@@ -241,7 +284,7 @@ class InspectData {
     return inspectData;
   }
 
-  final bool usesFlutter;
+  final bool usesJasprWebCompilers;
   Map<String, InspectDataItem> libraries = {};
 
   Future<InspectDataItem> inspectLibrary(LibraryElement library, InspectDataItem? parent,
@@ -315,7 +358,7 @@ class InspectData {
 
   bool isServerLib(LibraryElement lib) {
     return lib.identifier == 'package:jaspr/server.dart' ||
-        (!usesFlutter && lib.identifier == 'dart:io') ||
+        (!usesJasprWebCompilers && lib.identifier == 'dart:io') ||
         lib.identifier == 'dart:ffi' ||
         lib.identifier == 'dart:isolate' ||
         lib.identifier == 'dart:mirrors';
