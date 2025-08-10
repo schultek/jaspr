@@ -4,7 +4,7 @@ import 'dart:convert';
 
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_style/dart_style.dart';
@@ -53,11 +53,11 @@ extension TypeStub on String {
   }
 }
 
-extension ElementNode on Element {
+extension ElementNode on Element2 {
   AstNode? get node {
-    var result = session?.getParsedLibraryByElement(library!);
+    var result = session?.getParsedLibraryByElement2(library2!);
     if (result is ParsedLibraryResult) {
-      return result.getElementDeclaration(this)?.node;
+      return result.getFragmentDeclaration(firstFragment)?.node;
     } else {
       return null;
     }
@@ -179,7 +179,7 @@ extension LoadBundle on BuildStep {
     await resolver.libraryFor(main);
     return resolver.libraries.expand<AssetId>((lib) {
       try {
-        return [AssetId.resolve(lib.source.uri)];
+        return [AssetId.resolve(lib.firstFragment.source.uri)];
       } catch (_) {
         return [];
       }
