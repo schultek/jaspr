@@ -88,12 +88,12 @@ class Meet extends StatelessComponent {
             sdk: ">=3.0.0 <4.0.0"
 
           dependencies:  
-            jaspr: ^0.19.0
+            jaspr: ^0.20.0
             jaspr_router: ^0.7.0
             
           dev_dependencies:
-            jaspr_builders: ^0.19.0
-            jaspr_web_compilers: ^4.1.0
+            jaspr_builder: ^0.20.0
+            jaspr_web_compilers: ^4.2.0
             jaspr_lints: ^0.4.0
 
           jaspr:
