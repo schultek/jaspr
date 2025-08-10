@@ -168,7 +168,7 @@ class ScopesDomain extends Domain {
         // Ignore errors in reading packages file.
       }
 
-      final inspectData = await InspectData.analyze(result.element2, usesJasprWebCompilers);
+      final inspectData = await InspectData.analyze(result.element2, usesJasprWebCompilers, logger);
       _inspectedData[context] = inspectData;
       emitScopes();
     } finally {
@@ -265,9 +265,9 @@ class ScopesDomain extends Domain {
 }
 
 class InspectData {
-  InspectData._(this.usesJasprWebCompilers);
-  static Future<InspectData> analyze(LibraryElement root, bool usesJasprWebCompilers) async {
-    final inspectData = InspectData._(usesJasprWebCompilers);
+  InspectData._(this.usesJasprWebCompilers, this.logger);
+  static Future<InspectData> analyze(LibraryElement root, bool usesJasprWebCompilers, Logger logger) async {
+    final inspectData = InspectData._(usesJasprWebCompilers, logger);
 
     final mainFunction = root.topLevelFunctions.where((e) => e.name == 'main').firstOrNull?.firstFragment;
     final mainLocation =
@@ -285,6 +285,7 @@ class InspectData {
   }
 
   final bool usesJasprWebCompilers;
+  final Logger logger;
   Map<String, InspectDataItem> libraries = {};
 
   Future<InspectDataItem> inspectLibrary(LibraryElement library, InspectDataItem? parent,
@@ -431,7 +432,7 @@ class InspectDataItem {
 
     final result = library.session.getParsedLibraryByElement2(library);
     if (result is! ParsedLibraryResult) {
-      print('Failed to parse library: ${library.uri}');
+      data.logger.write('Tooling Daemon: Failed to parse library ${library.uri}', level: Level.warning);
       return [];
     }
 
@@ -484,7 +485,7 @@ class InspectDataItem {
 
           final baseLib = getBaseLibraryForDirective(directive);
           if (baseLib == null) {
-            print('Could not resolve base library for ${directive.uri.stringValue}');
+            data.logger.write('Tooling Daemon: Could not resolve base library for ${directive.uri.stringValue}', level: Level.warning);
           }
 
           final baseLoc = unit.lineInfo.getLocation(directive.offset);
@@ -517,7 +518,7 @@ class InspectDataItem {
               );
               dependencies.add((lib: clientLib, dir: clientDir, onClient: true, onServer: false));
             } else {
-              print('Could not resolve client library for ${directive.uri.stringValue}');
+              data.logger.write('Tooling Daemon: Could not resolve client library for ${directive.uri.stringValue}', level: Level.warning);
             }
           } else {
             // On the client, the base import is used.
@@ -539,7 +540,7 @@ class InspectDataItem {
               );
               dependencies.add((lib: serverLib, dir: serverDir, onClient: false, onServer: true));
             } else {
-              print('Could not resolve server library for ${directive.uri.stringValue}');
+              data.logger.write('Tooling Daemon: Could not resolve server library for ${directive.uri.stringValue}', level: Level.warning);
             }
           } else {
             // On the server, the base import is used.
