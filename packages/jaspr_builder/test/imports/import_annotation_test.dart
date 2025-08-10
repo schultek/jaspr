@@ -9,12 +9,20 @@ import 'sources/imports.dart';
 
 void main() {
   group('import annotation', () {
+    late TestReaderWriter reader;
+
+    setUp(() async {
+      reader = TestReaderWriter(rootPackage: 'models');
+      await reader.testing.loadIsolateSources();
+    });
+
+
     test('generates json module', () async {
       await testBuilder(
         ImportsModuleBuilder(BuilderOptions({})),
         importsSources,
         outputs: importsModuleOutput,
-        reader: await PackageAssetReader.currentIsolate(),
+        readerWriter: reader,
       );
     });
 
@@ -26,7 +34,7 @@ void main() {
           ...importsModuleOutput,
         },
         outputs: importsOutput,
-        reader: await PackageAssetReader.currentIsolate(),
+        readerWriter: reader,
       );
     });
 
@@ -38,7 +46,7 @@ void main() {
           ...importsModuleOutput,
         },
         outputs: importsStubsOutput,
-        reader: await PackageAssetReader.currentIsolate(),
+        readerWriter: reader,
       );
     });
   });
