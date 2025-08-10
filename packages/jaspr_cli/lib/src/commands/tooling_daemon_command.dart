@@ -168,7 +168,7 @@ class ScopesDomain extends Domain {
         // Ignore errors in reading packages file.
       }
 
-      final inspectData = await InspectData.analyze(result.element2, usesJasprWebCompilers, logger);
+      final inspectData = await InspectData.analyze(result.element, usesJasprWebCompilers, logger);
       _inspectedData[context] = inspectData;
       emitScopes();
     } finally {
@@ -430,7 +430,7 @@ class InspectDataItem {
       return [];
     }
 
-    final result = library.session.getParsedLibraryByElement2(library);
+    final result = library.session.getParsedLibraryByElement(library);
     if (result is! ParsedLibraryResult) {
       data.logger.write('Tooling Daemon: Failed to parse library ${library.uri}', level: Level.warning);
       return [];
@@ -458,7 +458,7 @@ class InspectDataItem {
       if (absolutePath == null) return null;
       var lib2 = await library.session.getResolvedLibrary(absolutePath);
       if (lib2 is ResolvedLibraryResult) {
-        return lib2.element2;
+        return lib2.element;
       }
       return null;
     }
