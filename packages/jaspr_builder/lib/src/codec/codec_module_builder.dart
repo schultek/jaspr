@@ -151,8 +151,7 @@ class CodecModuleBuilder implements Builder {
               log.severe(
                   'Extension types using @decoder and @encoder must have a valid representation type. Failing element: ${element.name3} in library $libName.');
               return null;
-            } else if (element.primaryConstructor2.isPrivate ||
-                (element.primaryConstructor2.name3 != 'new')) {
+            } else if (element.primaryConstructor2.isPrivate || (element.primaryConstructor2.name3 != 'new')) {
               log.severe(
                   'Extension types using @decoder and @encoder must have a public unnamed primary constructor. Failing element: ${element.name3} in library $libName.');
               return null;

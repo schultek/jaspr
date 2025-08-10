@@ -485,7 +485,8 @@ class InspectDataItem {
 
           final baseLib = getBaseLibraryForDirective(directive);
           if (baseLib == null) {
-            data.logger.write('Tooling Daemon: Could not resolve base library for ${directive.uri.stringValue}', level: Level.warning);
+            data.logger.write('Tooling Daemon: Could not resolve base library for ${directive.uri.stringValue}',
+                level: Level.warning);
           }
 
           final baseLoc = unit.lineInfo.getLocation(directive.offset);
@@ -518,7 +519,8 @@ class InspectDataItem {
               );
               dependencies.add((lib: clientLib, dir: clientDir, onClient: true, onServer: false));
             } else {
-              data.logger.write('Tooling Daemon: Could not resolve client library for ${directive.uri.stringValue}', level: Level.warning);
+              data.logger.write('Tooling Daemon: Could not resolve client library for ${directive.uri.stringValue}',
+                  level: Level.warning);
             }
           } else {
             // On the client, the base import is used.
@@ -540,7 +542,8 @@ class InspectDataItem {
               );
               dependencies.add((lib: serverLib, dir: serverDir, onClient: false, onServer: true));
             } else {
-              data.logger.write('Tooling Daemon: Could not resolve server library for ${directive.uri.stringValue}', level: Level.warning);
+              data.logger.write('Tooling Daemon: Could not resolve server library for ${directive.uri.stringValue}',
+                  level: Level.warning);
             }
           } else {
             // On the server, the base import is used.
