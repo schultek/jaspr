@@ -2,6 +2,7 @@ import { cwd } from "process";
 import { dartExtensionApi } from "../api";
 import { runCommand } from "./process_helper";
 import * as vs from "vscode";
+import { minimumJasprVersion } from "../constants";
 
 export async function checkJasprVersion(): Promise<string | undefined> {
   let installedVersion = await getInstalledVersion();
@@ -22,9 +23,9 @@ export async function checkJasprVersion(): Promise<string | undefined> {
       } else {
         return installedVersion;
       }
-    } else if (installedVersion < "0.18.2") {
+    } else if (installedVersion < minimumJasprVersion) {
       const action = await vs.window.showWarningMessage(
-        `Your installed version of jaspr_cli (${installedVersion}) is too old. Please update to 0.18.2 or later.`,
+        `Your installed version of jaspr_cli (${installedVersion}) is too old. Please update to ${minimumJasprVersion} or later.`,
         "Update Now"
       );
 
@@ -40,7 +41,7 @@ export async function checkJasprVersion(): Promise<string | undefined> {
     }
 
     installedVersion = await getInstalledVersion();
-    if (installedVersion === undefined || installedVersion < "0.18.2") {
+    if (installedVersion === undefined || installedVersion < minimumJasprVersion) {
       throw new Error(
         `Failed to install or update Jaspr CLI. Installed version: ${installedVersion}`
       );
@@ -76,9 +77,9 @@ export async function checkJasprInstalled(): Promise<boolean> {
   if (v === undefined) {
     return false;
   }
-  if (v < "0.18.2") {
+  if (v < minimumJasprVersion) {
     await vs.window.showErrorMessage(
-      "Jaspr CLI version is too old. Please update to 0.18.2 or later."
+      `Jaspr CLI version is too old. Please update to ${minimumJasprVersion} or later.`
     );
     return false;
   }

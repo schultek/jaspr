@@ -2,6 +2,7 @@
 
 - Fixed sitemap generation bug in top-level route ('/')
 - Update `build` dependency to 3.0.0 and migrate to new analyzer model.
+- Added `jaspr tooling-daemon` command and component scope analysis.
 
 ## 0.20.0
 
