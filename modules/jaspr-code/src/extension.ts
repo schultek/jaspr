@@ -7,11 +7,14 @@ import {
 
 import { createJasprProject, handleNewProjects } from "./create";
 import { jasprClean, jasprDoctor } from "./commands";
-import { JasprDaemonProcess } from "./daemon";
+import { ComponentCodeLensProvider } from "./code_lens";
+import { JasprServeDaemon } from "./jaspr/serve_daemon";
 import {
   findJasprProjectFolders,
   getFolderToRunCommandIn,
 } from "./helpers/project_helper";
+import { JasprToolingDaemon } from "./jaspr/tooling_daemon";
+import { ScopesDomain } from "./jaspr/scopes_domain";
 
 export async function activate(context: vscode.ExtensionContext) {
   let projects = await findJasprProjectFolders();
@@ -68,7 +71,7 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const process = new JasprDaemonProcess();
+      const process = new JasprServeDaemon();
       context.subscriptions.push(process);
 
       process.start(context, undefined, {
@@ -78,5 +81,20 @@ export async function activate(context: vscode.ExtensionContext) {
         cwd: folderToRunCommandIn,
       });
     })
+  );
+  
+
+  const toolingDaemon = new JasprToolingDaemon();
+  context.subscriptions.push(toolingDaemon);
+  await toolingDaemon.start(context);
+
+  const scopesDomain = new ScopesDomain(toolingDaemon);
+  context.subscriptions.push(scopesDomain);
+
+  context.subscriptions.push(
+    vscode.languages.registerCodeLensProvider(
+      { language: "dart", scheme: "file" },
+      new ComponentCodeLensProvider(scopesDomain)
+    )
   );
 }

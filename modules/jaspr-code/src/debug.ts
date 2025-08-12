@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 import * as path from "path";
-import { JasprDaemonProcess } from "./daemon";
+import { JasprServeDaemon } from "./jaspr/serve_daemon";
 import { findJasprProjectFolders, fsPath } from "./helpers/project_helper";
 
 export class JasprDebugConfigurationProvider
@@ -20,7 +20,7 @@ export class JasprDebugConfigurationProvider
     debugConfiguration: vscode.DebugConfiguration,
     token?: vscode.CancellationToken
   ): Promise<vscode.DebugConfiguration | undefined> {
-    const process = new JasprDaemonProcess();
+    const process = new JasprServeDaemon();
     this._disposables.push(process);
 
     process.start(this.context, folder, debugConfiguration);

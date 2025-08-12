@@ -35,7 +35,8 @@
     "workspaceContains:pubspec.yaml",
     "workspaceContains:jaspr.create",
     "onDebug",
-    "onDebugDynamicConfigurations"
+    "onDebugDynamicConfigurations",
+    "onLanguage:dart"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -122,7 +123,29 @@
         "language": "dart",
         "path": "./snippets.json"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Jaspr",
+      "type": "object",
+      "properties": {
+        "jaspr.scopes.showHint": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the 'What is this?' hint next to the identified component scopes in the editor."
+        },
+        "jaspr.scopes.showUnsafeImportDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show diagnostics for unsafe imports detected for a component file."
+        },
+        "jaspr.scopes.unsafeImportDiagnosticSeverity": {
+          "type": "number",
+          "enum": ["Error", "Warning", "Information"],
+          "default": "Error",
+          "markdownDescription": "The severity of diagnostics for unsafe imports detected for a component file. Only applies when `#jaspr.scopes.showUnsafeImportDiagnostics#` is set to `true`."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

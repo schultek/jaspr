@@ -1,15 +1,15 @@
 import * as vscode from "vscode";
 
 import * as path from "path";
-import { dartExtensionApi, DartProcess } from "./api";
-import { checkJasprInstalled } from "./helpers/install_helper";
+import { dartExtensionApi, DartProcess } from "../api";
+import { checkJasprInstalled } from "../helpers/install_helper";
 
 let chalk: any;
 (async () => {
   chalk = new (await import("chalk")).Chalk({ level: 1 });
 })();
 
-export class JasprDaemonProcess implements vscode.Disposable {
+export class JasprServeDaemon implements vscode.Disposable {
   private _disposables: vscode.Disposable[] = [];
 
   private statusBarItem: vscode.StatusBarItem | undefined;
@@ -173,7 +173,7 @@ export class JasprDaemonProcess implements vscode.Disposable {
     this.process.stdout.on("data", (data: Buffer | string) => {
       this.handleData(data, false);
     });
-    this.process.stdout.setEncoding("utf8");
+    this.process.stderr.setEncoding("utf8");
     this.process.stderr.on("data", (data: Buffer | string) => {
       this.handleData(data, true);
     });

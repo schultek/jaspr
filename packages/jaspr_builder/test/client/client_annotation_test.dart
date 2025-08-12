@@ -115,7 +115,8 @@ void main() {
 
         expect(
           errorLog,
-          equals('ClientModuleBuilder on lib/component_basic.dart:\nClient components only support initializing formal constructor parameters. '
+          equals(
+              'ClientModuleBuilder on lib/component_basic.dart:\nClient components only support initializing formal constructor parameters. '
               'Failing element: Component.new(String a)'),
         );
       });
@@ -137,7 +138,8 @@ void main() {
 
         expect(
           errorLog,
-          equals('ClientModuleBuilder on lib/component_basic.dart:\n@client components only support parameters of primitive serializable types or types that define @decoder and @encoder methods. Failing parameter: [DateTime time] in Component.new()'),
+          equals(
+              'ClientModuleBuilder on lib/component_basic.dart:\n@client components only support parameters of primitive serializable types or types that define @decoder and @encoder methods. Failing parameter: [DateTime time] in Component.new()'),
         );
       });
     });

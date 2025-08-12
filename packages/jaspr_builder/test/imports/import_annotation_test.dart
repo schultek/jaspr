@@ -16,7 +16,6 @@ void main() {
       await reader.testing.loadIsolateSources();
     });
 
-
     test('generates json module', () async {
       await testBuilder(
         ImportsModuleBuilder(BuilderOptions({})),
