@@ -1,3 +1,8 @@
+## Unreleased minor
+
+- Update `analyzer` to `^7.5.9`.
+- Update `custom_lint` to `^0.8.0`.
+
 ## 0.4.0
 
 - Added 'prefer_styles_getter' lint and fix.
