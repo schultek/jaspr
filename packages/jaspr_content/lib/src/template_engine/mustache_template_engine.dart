@@ -2,8 +2,8 @@ import 'package:mustache_template/mustache_template.dart';
 import '../page.dart';
 import 'template_engine.dart';
 
-dynamic _defaultPrepareValues(Page page, List<Page> pages) {
-  return {...page.data}..putIfAbsent('pages', () => pages.map((p) => p.data['page']).toList());
+Map<String, Object?> _defaultPrepareValues(Page page, List<Page> pages) {
+  return {...page.data}..putIfAbsent('pages', () => pages.map((p) => p.data.page).toList());
 }
 
 /// A template engine that uses the Mustache templating language.
@@ -18,7 +18,7 @@ class MustacheTemplateEngine implements TemplateEngine {
 
   final String delimiters;
   final String partialsRoot;
-  final dynamic Function(Page page, List<Page> pages) prepareValues;
+  final Object? Function(Page page, List<Page> pages) prepareValues;
 
   @override
   Future<void> render(Page page, List<Page> pages) async {
