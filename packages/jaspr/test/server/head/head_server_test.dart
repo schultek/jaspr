@@ -17,12 +17,11 @@ void main() {
       expect(response.document?.head, isNotNull);
       var head = response.document!.head!;
 
-      expect(head.children, hasLength(4));
+      expect(head.children, hasLength(3));
 
-      expect(head.children.first.localName, equals('base'));
-      expect(head.children[1].outerHtml, equals('<title>c</title>'));
-      expect(head.children[2].outerHtml, equals('<meta name="test" content="b">'));
-      expect(head.children[3].outerHtml, equals('<meta name="c" content="e">'));
+      expect(head.children[0].outerHtml, equals('<title>c</title>'));
+      expect(head.children[1].outerHtml, equals('<meta name="test" content="b">'));
+      expect(head.children[2].outerHtml, equals('<meta name="c" content="e">'));
     });
   });
 }

@@ -11,9 +11,11 @@ export '../style.dart' hide Style;
 abstract class Document implements Component {
   /// Sets up a basic document structure at the root of your app and renders the main `<html>`, `<head>` and `<body>` tags.
   ///
-  /// The `title` and `base` parameters are rendered as the `<title>` and `<base>` elements respectively.
+  /// The `title` parameter is rendered as the `<title>` element.
+  /// The `lang` parameter is set as the `lang` attribute on the `<html>` element.
+  /// The `base` parameter is rendered as the `<base href=...>` element and defaults to `'/'`.
   /// The `charset`, `viewport` and `meta` values are rendered as `<meta>` elements in `<head>`.
-  /// The `styles` parameter is rendered to css in a `<style` element inside `<head>`.
+  /// The `styles` parameter is rendered to css in a `<style>` element inside `<head>`.
   /// The `head` components are also rendered inside `<head>`.
   ///
   /// The `body` component is rendered inside the `<body>` element.
@@ -122,7 +124,7 @@ class BaseDocument extends StatelessComponent implements Document {
   const BaseDocument({
     this.title,
     this.lang,
-    this.base,
+    this.base = '/',
     this.charset = 'utf-8',
     this.viewport = 'width=device-width, initial-scale=1.0',
     this.meta = const {},
