@@ -84,8 +84,8 @@ class HeadDocument extends StatelessComponent implements Document {
   final List<Component>? children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield AttachDocument(
+  Component build(BuildContext context) {
+    return AttachDocument(
       target: AttachTarget.head,
       attributes: null,
       children: [

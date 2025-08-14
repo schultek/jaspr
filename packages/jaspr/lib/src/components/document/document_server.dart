@@ -150,8 +150,8 @@ class BaseDocument extends StatelessComponent implements Document {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
+  Component build(BuildContext context) {
+    return DomComponent(
       tag: 'html',
       attributes: {
         if (lang != null) 'lang': lang!,
@@ -192,8 +192,8 @@ class TemplateDocument extends StatelessComponent implements Document {
   final Component child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield child;
+  Component build(BuildContext context) {
+    return child;
   }
 
   @override
@@ -206,7 +206,7 @@ class _TemplateDocumentElement extends StatelessElement {
   Future<String?>? _templateFuture;
 
   @override
-  Iterable<Component> build() {
+  Component build() {
     (binding as ServerAppBinding).addRenderAdapter(TemplateDocumentAdapter(this));
     _templateFuture ??= (binding as ServerAppBinding).loadFile('${(component as TemplateDocument).name}.template.html');
     return super.build();
@@ -297,8 +297,8 @@ class HeadDocument extends StatelessComponent implements Document {
   final List<Component>? children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield AttachDocument(
+  Component build(BuildContext context) {
+    return AttachDocument(
       target: 'head',
       attributes: null,
       children: [
@@ -325,11 +325,9 @@ class AttachDocument extends StatelessComponent implements Document {
   final List<Component>? children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     AttachAdapter.register(context, this);
-    if (children != null) {
-      yield* children!;
-    }
+    return Fragment(children: children ?? []);
   }
 }
 

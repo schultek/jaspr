@@ -17,12 +17,12 @@ class RawText extends StatelessComponent {
   final String text;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var fragment = web.document.createElement('template') as web.HTMLTemplateElement;
     fragment.innerHTML = text.toJS;
-    for (var node in fragment.content.childNodes.toIterable()) {
-      yield RawNode.withKey(node);
-    }
+    return Fragment(children: [
+      for (var node in fragment.content.childNodes.toIterable()) RawNode.withKey(node),
+    ]);
   }
 }
 
@@ -53,10 +53,10 @@ class RawNodeElement extends BuildableRenderObjectElement {
   RawNode get component => super.component as RawNode;
 
   @override
-  Iterable<Component> build() sync* {
-    for (var node in component.node.childNodes.toIterable()) {
-      yield RawNode.withKey(node);
-    }
+  Component build() {
+    return Fragment(children: [
+      for (var node in component.node.childNodes.toIterable()) RawNode.withKey(node),
+    ]);
   }
 
   @override

@@ -124,10 +124,8 @@ abstract class Component {
 /// or [State.build].
 ///
 /// Used by [Builder.builder], etc.
-typedef ComponentBuilder = Iterable<Component> Function(BuildContext context);
-
-typedef SingleComponentBuilder = Component Function(BuildContext context);
-
+typedef ComponentBuilder = Component Function(BuildContext context);
+/// 
 /// Signature for the callback to [BuildContext.visitChildElements].
 ///
 /// The argument is the child being visited.

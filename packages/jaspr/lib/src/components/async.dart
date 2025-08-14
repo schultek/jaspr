@@ -92,7 +92,7 @@ abstract class StreamBuilderBase<T, S> extends StatefulComponent {
   S afterDisconnected(S current) => current;
 
   /// Returns a Component based on the [currentSummary].
-  Iterable<Component> build(BuildContext context, S currentSummary);
+  Component build(BuildContext context, S currentSummary);
 
   @override
   State<StreamBuilderBase<T, S>> createState() => _StreamBuilderBaseState<T, S>();
@@ -123,7 +123,7 @@ class _StreamBuilderBaseState<T, S> extends State<StreamBuilderBase<T, S>> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) => component.build(context, _summary);
+  Component build(BuildContext context) => component.build(context, _summary);
 
   @override
   void dispose() {
@@ -314,7 +314,7 @@ class AsyncSnapshot<T> {
 ///    itself based on a snapshot from interacting with a [Stream].
 ///  * [FutureBuilder], which delegates to an [AsyncComponentBuilder] to build
 ///    itself based on a snapshot from interacting with a [Future].
-typedef AsyncComponentBuilder<T> = Iterable<Component> Function(BuildContext context, AsyncSnapshot<T> snapshot);
+typedef AsyncComponentBuilder<T> = Component Function(BuildContext context, AsyncSnapshot<T> snapshot);
 
 /// Component that builds itself based on the latest snapshot of interaction with
 /// a [Stream].
@@ -436,7 +436,7 @@ class StreamBuilder<T> extends StreamBuilderBase<T, AsyncSnapshot<T>> {
   AsyncSnapshot<T> afterDisconnected(AsyncSnapshot<T> current) => current.inState(ConnectionState.none);
 
   @override
-  Iterable<Component> build(BuildContext context, AsyncSnapshot<T> currentSummary) => builder(context, currentSummary);
+  Component build(BuildContext context, AsyncSnapshot<T> currentSummary) => builder(context, currentSummary);
 }
 
 /// Component that builds itself based on the latest snapshot of interaction with
@@ -608,7 +608,7 @@ class _FutureBuilderState<T> extends State<FutureBuilder<T>> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) => component.builder(context, _snapshot);
+  Component build(BuildContext context) => component.builder(context, _snapshot);
 
   @override
   void dispose() {

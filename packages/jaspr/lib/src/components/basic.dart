@@ -102,15 +102,6 @@ class Builder extends StatelessComponent {
     required this.builder,
   });
 
-  /// Creates a component that delegates its build to a callback
-  /// that returns a single child component.
-  ///
-  /// The [builder] argument must not be null.
-  Builder.single({
-    super.key,
-    required SingleComponentBuilder builder,
-  }) : builder = _WrappedComponentBuilder(builder).call;
-
   /// Called to obtain the child component.
   ///
   /// This function is called whenever this component is included in its parent's
@@ -121,23 +112,13 @@ class Builder extends StatelessComponent {
   final ComponentBuilder builder;
 
   @override
-  Iterable<Component> build(BuildContext context) => builder(context);
-}
-
-class _WrappedComponentBuilder {
-  final SingleComponentBuilder _builder;
-
-  const _WrappedComponentBuilder(this._builder);
-
-  Iterable<Component> call(BuildContext context) sync* {
-    yield _builder(context);
-  }
+  Component build(BuildContext context) => builder(context);
 }
 
 /// Signature for the builder callback used by [StatefulBuilder].
 ///
 /// Call `setState` to schedule the [StatefulBuilder] to rebuild.
-typedef StatefulComponentBuilder = Iterable<Component> Function(BuildContext context, StateSetter setState);
+typedef StatefulComponentBuilder = Component Function(BuildContext context, StateSetter setState);
 
 /// A platonic component that both has state and calls a closure to obtain its child component.
 ///
@@ -174,5 +155,5 @@ class StatefulBuilder extends StatefulComponent {
 
 class _StatefulBuilderState extends State<StatefulBuilder> {
   @override
-  Iterable<Component> build(BuildContext context) => component.builder(context, setState);
+  Component build(BuildContext context) => component.builder(context, setState);
 }
