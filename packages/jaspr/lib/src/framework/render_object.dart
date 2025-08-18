@@ -27,6 +27,7 @@ abstract class RenderObject {
 
 abstract class BuildableRenderObjectElement = BuildableElement with RenderObjectElement;
 abstract class ProxyRenderObjectElement = ProxyElement with RenderObjectElement;
+abstract class MultiChildRenderObjectElement = MultiChildElement with RenderObjectElement;
 abstract class LeafRenderObjectElement = LeafElement with RenderObjectElement;
 
 mixin RenderObjectElement on Element {
@@ -75,13 +76,10 @@ mixin RenderObjectElement on Element {
 
   @override
   void attachRenderObject() {
-    var parent = _parentRenderObjectElement?.renderObject;
+    final parent = _parentRenderObjectElement?.renderObject;
     if (parent != null) {
-      Element? prevElem = _prevAncestorSibling;
-      while (prevElem != null && prevElem._lastRenderObjectElement == null) {
-        prevElem = prevElem._prevAncestorSibling;
-      }
-      var after = prevElem?._lastRenderObjectElement;
+      final after = _slot.;
+      
       parent.attach(renderObject, after: after?.renderObject);
       assert(renderObject.parent == parent);
     }
@@ -97,11 +95,8 @@ mixin RenderObjectElement on Element {
   }
 
   @override
-  void _didUpdateSlot() {
-    super._didUpdateSlot();
+  void updateSlot(ElementSlot? newSlot) {
+    super.updateSlot(newSlot);
     attachRenderObject();
   }
-
-  @override
-  RenderObjectElement get _lastRenderObjectElement => this;
 }

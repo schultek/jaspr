@@ -4,7 +4,7 @@ part of 'framework.dart';
 ///
 /// Must have a [tag] and any number of attributes.
 /// Can have a single [child] component or any amount of [children].
-class DomComponent extends ProxyComponent {
+class DomComponent extends Component {
   const DomComponent({
     super.key,
     required this.tag,
@@ -13,8 +13,7 @@ class DomComponent extends ProxyComponent {
     this.styles,
     this.attributes,
     this.events,
-    super.child,
-    super.children,
+    this.children,
   });
 
   const factory DomComponent.wrap({
@@ -33,18 +32,22 @@ class DomComponent extends ProxyComponent {
   final Styles? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
+  final List<Component>? children;
 
   @override
-  ProxyElement createElement() => DomElement(this);
+  Element createElement() => DomElement(this);
 }
 
-class DomElement extends ProxyRenderObjectElement {
+class DomElement extends MultiChildRenderObjectElement {
   DomElement(DomComponent super.component);
 
   @override
   DomComponent get component => super.component as DomComponent;
 
   InheritedElement? _wrappingElement;
+
+  @override
+  List<Component> buildChildren() => component.children ?? [];
 
   @override
   void _updateInheritance() {
@@ -133,6 +136,9 @@ class _WrappingDomComponent extends InheritedComponent implements DomComponent {
   final Map<String, String>? attributes;
   @override
   final Map<String, EventCallback>? events;
+
+  @override
+  List<Component>? get children => null;
 
   @override
   bool updateShouldNotify(_WrappingDomComponent oldComponent) {

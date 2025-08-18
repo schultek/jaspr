@@ -43,7 +43,7 @@ mixin ComponentsBinding on AppBinding {
 }
 
 class _Root extends ProxyComponent {
-  _Root({required Component super.child});
+  _Root({required super.child});
 
   @override
   _RootElement createElement() => _RootElement(this);

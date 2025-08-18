@@ -1,6 +1,6 @@
 part of 'framework.dart';
 
-/// An [Element] that has multiple children and a [build] method.
+/// An [Element] that has a [build] method.
 ///
 /// Used by [StatelessComponent] and [StatefulComponent].
 abstract class BuildableElement extends Element {
@@ -18,8 +18,8 @@ abstract class BuildableElement extends Element {
   bool get debugDoingBuild => _debugDoingBuild;
 
   @override
-  void mount(Element? parent, Element? prevSibling) {
-    super.mount(parent, prevSibling);
+  void mount(Element? parent, ElementSlot? newSlot) {
+    super.mount(parent, newSlot);
     assert(_child == null);
   }
 
@@ -59,7 +59,7 @@ abstract class BuildableElement extends Element {
           color: Colors.yellow,
           fontSize: 1.rem,
         ),
-        child: Text("Error on building component: $e"),
+        children: [Text("Error on building component: $e")],
       );
       binding.reportBuildError(this, e, st);
     } finally {
@@ -67,7 +67,7 @@ abstract class BuildableElement extends Element {
       assert(_debugSetAllowIgnoredCallsToMarkNeedsBuild(false));
     }
 
-    _child = updateChild(_child, built, null);
+    _child = updateChild(_child, built, slot);
   }
 
   @protected

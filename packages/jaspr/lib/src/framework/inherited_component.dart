@@ -36,7 +36,7 @@ part of 'framework.dart';
 abstract class InheritedComponent extends ProxyComponent {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
-  const InheritedComponent({super.child, super.children, super.key});
+  const InheritedComponent({required super.child, super.key});
 
   @override
   InheritedElement createElement() => InheritedElement(this);

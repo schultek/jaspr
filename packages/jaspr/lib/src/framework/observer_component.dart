@@ -15,7 +15,7 @@ part of 'framework.dart';
 abstract class ObserverComponent extends ProxyComponent {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
-  const ObserverComponent({super.child, super.children, super.key});
+  const ObserverComponent({required super.child, super.key});
 
   @override
   ObserverElement createElement();
