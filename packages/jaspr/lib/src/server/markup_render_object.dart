@@ -19,8 +19,8 @@ abstract class MarkupRenderObject extends RenderObject {
   }
 
   @override
-  MarkupRenderText createChildRenderText(String text) {
-    return MarkupRenderText(text)..parent = this;
+  MarkupRenderText createChildRenderText(String text, [bool rawHtml = false]) {
+    return MarkupRenderText(text, rawHtml)..parent = this;
   }
 
   @override
@@ -179,7 +179,7 @@ class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
 }
 
 class MarkupRenderText extends MarkupRenderObject implements RenderText {
-  MarkupRenderText(this.text) : rawHtml = false;
+  MarkupRenderText(this.text, this.rawHtml);
 
   String text;
   bool rawHtml;

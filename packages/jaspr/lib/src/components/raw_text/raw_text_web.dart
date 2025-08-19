@@ -4,7 +4,6 @@ import 'package:universal_web/web.dart' as web;
 
 import '../../../browser.dart';
 import '../../browser/utils.dart';
-import '../../foundation/type_checks.dart';
 
 /// Renders its input as raw HTML.
 ///
@@ -21,7 +20,7 @@ class RawText extends StatelessComponent {
     var fragment = web.document.createElement('template') as web.HTMLTemplateElement;
     fragment.innerHTML = text.toJS;
     return Fragment(children: [
-      for (var node in fragment.content.childNodes.toIterable()) RawNode.withKey(node),
+      for (var node in fragment.content.childNodes.toIterable()) RawNode(node, key: ValueKey(node)),
     ]);
   }
 }
@@ -29,51 +28,56 @@ class RawText extends StatelessComponent {
 class RawNode extends Component {
   RawNode(this.node, {super.key});
 
-  factory RawNode.withKey(web.Node node) {
-    return RawNode(
-      node,
-      key: switch (node) {
-        web.Text() when node.isText => ValueKey('text'),
-        web.Element() when node.isElement => ValueKey('element:${node.tagName}'),
-        _ => null,
-      },
-    );
-  }
-
   final web.Node node;
 
   @override
   Element createElement() => RawNodeElement(this);
 }
 
-class RawNodeElement extends MultiChildRenderObjectElement {
+class RawNodeElement extends LeafRenderObjectElement {
   RawNodeElement(RawNode super.component);
 
   @override
   RawNode get component => super.component as RawNode;
 
   @override
-  List<Component> buildChildren() {
-    return [
-      for (var node in component.node.childNodes.toIterable()) RawNode.withKey(node),
-    ];
+  void update(RawNode newComponent) {
+    assert(newComponent.node == component.node,
+        'RawNode cannot be updated with a different node. Use a new RawNode instance instead.');
+    super.update(newComponent);
   }
 
   @override
-  void updateRenderObject() {
-    var next = component.node;
-    if (next.isText) {
-      renderObject.updateText((next as web.Text).textContent ?? '');
-    } else if (next.isElement) {
-      next as web.Element;
-      renderObject.updateElement(
-          next.tagName.toLowerCase(), next.id, next.getAttribute('class'), null, next.attributes.toMap(), null);
-    } else {
-      var curr = (renderObject as DomRenderObject).node;
-      if (curr != null) {
-        curr.parentNode?.replaceChild(next, curr);
-      }
-      (renderObject as DomRenderObject).node = next;
-    }
+  RenderObject createRenderObject() {
+    final parent = parentRenderObjectElement!.renderObject;
+    return DomRenderNode(component.node)..parent = parent as DomRenderObject;
+  }
+
+  @override
+  void updateRenderObject(RenderObject renderObject) {}
+}
+
+class DomRenderNode extends DomRenderObject {
+  DomRenderNode(this.node);
+
+  @override
+  final web.Node node;
+
+  @override
+  void attach(covariant RenderObject child, {covariant RenderObject? after}) {
+    throw UnsupportedError('Raw nodes cannot have children attached to them.');
+  }
+
+  @override
+  void remove(covariant RenderObject child) {
+    throw UnsupportedError('Text nodes cannot have children removed from them.');
+  }
+
+  @override
+  void finalize() {}
+
+  @override
+  web.Node? retakeNode(bool Function(web.Node node) visitNode) {
+    return null; // Not applicable for raw nodes
   }
 }

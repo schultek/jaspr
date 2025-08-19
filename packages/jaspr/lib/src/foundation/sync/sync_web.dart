@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:js_interop';
 
 import '../../../browser.dart';
 import '../../foundation/type_checks.dart';
@@ -7,8 +6,7 @@ import '../../foundation/type_checks.dart';
 final _syncRegex = RegExp('^${DomValidator.syncMarkerPrefixRegex}(.*)\$');
 
 void initSyncState(SyncStateMixin sync) {
-  var r = (sync.context as Element).parentRenderObjectElement?.renderObject
-      as DomRenderObject?;
+  var r = (sync.context as Element).parentRenderObjectElement?.renderObject as DomRenderObject?;
   if (r == null) return;
 
   bool isNext = true;
@@ -27,8 +25,7 @@ void initSyncState(SyncStateMixin sync) {
   if (syncMarker != null) {
     syncMarker.parentNode?.removeChild(syncMarker);
 
-    var data = const DomValidator().unescapeMarkerText(
-        _syncRegex.firstMatch(syncMarker.nodeValue ?? '')!.group(1)!);
+    var data = const DomValidator().unescapeMarkerText(_syncRegex.firstMatch(syncMarker.nodeValue ?? '')!.group(1)!);
     sync.updateState(jsonDecode(data));
   }
 }

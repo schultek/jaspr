@@ -12,7 +12,7 @@ abstract class RenderObject {
   web.Node? get node;
 
   RenderElement createChildRenderElement(String tag);
-  RenderText createChildRenderText();
+  RenderText createChildRenderText(String text);
   RenderFragment createChildRenderFragment();
 
   void attach(covariant RenderObject child, {covariant RenderObject? after});

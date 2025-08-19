@@ -4,7 +4,6 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/source/line_info.dart';
-import 'package:vm_service/vm_service.dart';
 
 import '../logging.dart';
 import '../migrations/build_method_migration.dart';

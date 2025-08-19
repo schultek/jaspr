@@ -49,8 +49,7 @@ abstract class DomRenderObject implements RenderObject {
 
     try {
       final childNode = child.node;
-      if (childNode.previousSibling == afterNode &&
-          childNode.parentNode == node) {
+      if (childNode.previousSibling == afterNode && childNode.parentNode == node) {
         return;
       }
 
@@ -64,8 +63,7 @@ abstract class DomRenderObject implements RenderObject {
         node.insertBefore(childNode, afterNode.nextSibling);
       }
 
-      assert(childNode.previousSibling == afterNode,
-          'Child node should have been placed after the specified node.');
+      assert(childNode.previousSibling == afterNode, 'Child node should have been placed after the specified node.');
     } finally {
       child.finalize();
     }
@@ -76,8 +74,7 @@ abstract class DomRenderObject implements RenderObject {
       print("Remove child $child of $this");
     }
 
-    assert(node == child.node.parentNode,
-        'Child node must be a child of this element.');
+    assert(node == child.node.parentNode, 'Child node must be a child of this element.');
 
     node.removeChild(child.node);
     child.parent = null;
@@ -116,9 +113,7 @@ mixin HydratableDomRenderObject on DomRenderObject {
   }
 }
 
-class DomRenderElement extends DomRenderObject
-    with HydratableDomRenderObject
-    implements RenderElement {
+class DomRenderElement extends DomRenderObject with HydratableDomRenderObject implements RenderElement {
   DomRenderElement(String tag, DomRenderObject parent) {
     this.parent = parent;
     _createNode(tag);
@@ -162,8 +157,8 @@ class DomRenderElement extends DomRenderObject
   }
 
   @override
-  void update(String? id, String? classes, Map<String, String>? styles,
-      Map<String, String>? attributes, Map<String, EventCallback>? events) {
+  void update(String? id, String? classes, Map<String, String>? styles, Map<String, String>? attributes,
+      Map<String, EventCallback>? events) {
     late Set<String> attributesToRemove;
 
     attributesToRemove = {};
@@ -172,19 +167,13 @@ class DomRenderElement extends DomRenderObject
     }
 
     node.clearOrSetAttribute('id', id);
-    node.clearOrSetAttribute(
-        'class', classes == null || classes.isEmpty ? null : classes);
-    node.clearOrSetAttribute(
-        'style',
-        styles == null || styles.isEmpty
-            ? null
-            : styles.entries.map((e) => '${e.key}: ${e.value}').join('; '));
+    node.clearOrSetAttribute('class', classes == null || classes.isEmpty ? null : classes);
+    node.clearOrSetAttribute('style',
+        styles == null || styles.isEmpty ? null : styles.entries.map((e) => '${e.key}: ${e.value}').join('; '));
 
     if (attributes != null && attributes.isNotEmpty) {
       for (final attr in attributes.entries) {
-        if (attr.key == 'value' &&
-            node.isHtmlInputElement &&
-            (node as web.HTMLInputElement).value != attr.value) {
+        if (attr.key == 'value' && node.isHtmlInputElement && (node as web.HTMLInputElement).value != attr.value) {
           if (kVerboseMode) {
             print("Set input value: ${attr.value}");
           }
@@ -192,9 +181,7 @@ class DomRenderElement extends DomRenderObject
           continue;
         }
 
-        if (attr.key == 'value' &&
-            node.isHtmlSelectElement &&
-            (node as web.HTMLSelectElement).value != attr.value) {
+        if (attr.key == 'value' && node.isHtmlSelectElement && (node as web.HTMLSelectElement).value != attr.value) {
           if (kVerboseMode) {
             print("Set select value: ${attr.value}");
           }
@@ -206,8 +193,7 @@ class DomRenderElement extends DomRenderObject
       }
     }
 
-    attributesToRemove
-        .removeAll(['id', 'class', 'style', ...?attributes?.keys]);
+    attributesToRemove.removeAll(['id', 'class', 'style', ...?attributes?.keys]);
     if (attributesToRemove.isNotEmpty) {
       for (final name in attributesToRemove) {
         node.removeAttribute(name);
@@ -298,16 +284,12 @@ class DomRenderText extends DomRenderObject implements RenderText {
 
   @override
   void attach(covariant RenderObject child, {covariant RenderObject? after}) {
-    throw UnimplementedError(
-      'Text nodes cannot have children attached to them.',
-    );
+    throw UnsupportedError('Text nodes cannot have children attached to them.');
   }
 
   @override
   void remove(covariant RenderObject child) {
-    throw UnimplementedError(
-      'Text nodes cannot have children removed from them.',
-    );
+    throw UnsupportedError('Text nodes cannot have children removed from them.');
   }
 
   @override
@@ -321,13 +303,9 @@ class DomRenderText extends DomRenderObject implements RenderText {
   }
 }
 
-class DomRenderFragment extends DomRenderObject
-    with HydratableDomRenderObject
-    implements RenderFragment {
+class DomRenderFragment extends DomRenderObject with HydratableDomRenderObject implements RenderFragment {
   DomRenderFragment() : node = web.document.createDocumentFragment() {
-    toHydrate = parent is HydratableDomRenderObject
-        ? (parent as HydratableDomRenderObject).toHydrate
-        : [];
+    toHydrate = parent is HydratableDomRenderObject ? (parent as HydratableDomRenderObject).toHydrate : [];
   }
 
   @override
@@ -347,11 +325,9 @@ class DomRenderFragment extends DomRenderObject
 
       assert(parentNode.isElement);
 
-      final afterNode =
-          after?.node ?? (isAttached ? firstChildNode?.previousSibling : null);
+      final afterNode = after?.node ?? (isAttached ? firstChildNode?.previousSibling : null);
 
-      if (childNode.previousSibling == afterNode &&
-          childNode.parentNode == parentNode) {
+      if (childNode.previousSibling == afterNode && childNode.parentNode == parentNode) {
         return;
       }
 
@@ -377,10 +353,8 @@ class DomRenderFragment extends DomRenderObject
   }
 
   void move(DomRenderObject parent, web.Node? afterNode) {
-    assert(
-        parent == this.parent, 'Cannot move fragment to a different parent.');
-    assert(
-        isAttached, 'Cannot move fragment that is not attached to a parent.');
+    assert(parent == this.parent, 'Cannot move fragment to a different parent.');
+    assert(isAttached, 'Cannot move fragment that is not attached to a parent.');
 
     if (kVerboseMode) {
       print("Move fragment $this to $parent after $afterNode");
@@ -393,23 +367,18 @@ class DomRenderFragment extends DomRenderObject
       return;
     }
 
-    assert(lastChildNode != null,
-        'Non-empty attached fragments must have a valid last node reference.');
+    assert(lastChildNode != null, 'Non-empty attached fragments must have a valid last node reference.');
 
-    if (firstChildNode!.previousSibling == afterNode &&
-        firstChildNode!.parentNode == parentNode) {
+    if (firstChildNode!.previousSibling == afterNode && firstChildNode!.parentNode == parentNode) {
       return;
     }
 
     web.Node? currentNode = lastChildNode;
-    web.Node? beforeNode = afterNode == null
-        ? parentNode.childNodes.item(0)
-        : afterNode.nextSibling;
+    web.Node? beforeNode = afterNode == null ? parentNode.childNodes.item(0) : afterNode.nextSibling;
 
     // Move nodes in reverse order for efficient insertion.
     while (currentNode != null) {
-      final prevNode =
-          currentNode != firstChildNode ? currentNode.previousSibling : null;
+      final prevNode = currentNode != firstChildNode ? currentNode.previousSibling : null;
 
       // Attach to new parent
       parentNode.insertBefore(currentNode, beforeNode);
@@ -429,8 +398,7 @@ class DomRenderFragment extends DomRenderObject
     }
 
     final parentNode = isAttached ? parent!.node : node;
-    assert(parentNode == child.node.parentNode,
-        'Child node must be a child of this fragment.');
+    assert(parentNode == child.node.parentNode, 'Child node must be a child of this fragment.');
 
     parentNode.removeChild(child.node);
     child.parent = null;
@@ -438,14 +406,12 @@ class DomRenderFragment extends DomRenderObject
 
   @override
   void finalize() {
-    assert(node.childNodes.length == 0,
-        'Fragment should be empty after finalization.');
+    assert(node.childNodes.length == 0, 'Fragment should be empty after finalization.');
     isAttached = true;
   }
 }
 
-class RootDomRenderObject extends DomRenderObject
-    with HydratableDomRenderObject {
+class RootDomRenderObject extends DomRenderObject with HydratableDomRenderObject {
   RootDomRenderObject(this.node, [List<web.Node>? nodes]) {
     toHydrate = [...nodes ?? node.childNodes.toIterable()];
     beforeStart = toHydrate.firstOrNull?.previousSibling;
@@ -484,9 +450,7 @@ class EventBinding {
   StreamSubscription? subscription;
 
   EventBinding(web.Element element, this.type, this.fn) {
-    subscription = web.EventStreamProvider<web.Event>(type)
-        .forElement(element)
-        .listen((event) {
+    subscription = web.EventStreamProvider<web.Event>(type).forElement(element).listen((event) {
       fn(event);
     });
   }
