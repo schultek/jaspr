@@ -27,11 +27,12 @@ part 'inherited_model.dart';
 part 'keys.dart';
 part 'notification.dart';
 part 'observer_component.dart';
-part 'proxy_element.dart';
+part 'leaf_element.dart';
 part 'render_object.dart';
 part 'stateful_component.dart';
 part 'stateless_component.dart';
-part 'multi_child_render_object.dart';
+part 'multi_child_element.dart';
+part 'fragment.dart';
 
 /// Describes the configuration for an [Element].
 ///
@@ -190,7 +191,7 @@ abstract class Element implements BuildContext {
   ///
   /// A child component's slot is determined when the parent's [updateChild] method
   /// is called to inflate the child component.
-  ElementSlot? get slot => _slot;
+  ElementSlot get slot => _slot!;
   ElementSlot? _slot;
 
   // Custom implementation of hash code optimized for the ".of" pattern used
@@ -293,7 +294,7 @@ abstract class Element implements BuildContext {
   /// |  **child == null**  |  Returns null.         |  Returns new [Element]. |
   /// |  **child != null**  |  Old child is removed, returns null. | Old child updated if possible, returns child or new [Element]. |
   @protected
-  Element? updateChild(Element? child, Component? newComponent, ElementSlot? newSlot) {
+  Element? updateChild(Element? child, Component? newComponent, ElementSlot newSlot) {
     if (newComponent == null) {
       if (child != null) {
         deactivateChild(child);
@@ -351,6 +352,10 @@ abstract class Element implements BuildContext {
       return child != null && forgottenChildren != null && forgottenChildren.contains(child) ? null : child;
     }
 
+    ElementSlot slotFor(int newChildIndex, Element? previousChild) {
+      return ElementSlot(newChildIndex, previousChild);
+    }
+
     // This attempts to diff the new child list (newComponents) with
     // the old child list (oldChildren), and produce a new list of elements to
     // be the new list of child elements of this element. The called of this
@@ -384,7 +389,7 @@ abstract class Element implements BuildContext {
 
     if (oldChildren.length <= 1 && newComponents.length <= 1) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren.firstOrNull);
-      var newChild = updateChild(oldChild, newComponents.firstOrNull, null);
+      var newChild = updateChild(oldChild, newComponents.firstOrNull, ElementSlot(0, null));
       return [if (newChild != null) newChild];
     }
 
@@ -404,7 +409,7 @@ abstract class Element implements BuildContext {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
       final Component newComponent = newComponents[newChildrenTop];
       if (oldChild == null || !Component.canUpdate(oldChild.component, newComponent)) break;
-      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      final Element newChild = updateChild(oldChild, newComponent, slotFor(newChildrenTop, prevChild))!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
@@ -471,7 +476,7 @@ abstract class Element implements BuildContext {
         oldChild = retakeOldKeyedChildren?[key];
       }
 
-      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      final Element newChild = updateChild(oldChild, newComponent, slotFor(newChildrenTop, prevChild))!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
@@ -496,7 +501,7 @@ abstract class Element implements BuildContext {
     while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
       final Element oldChild = oldChildren[oldChildrenTop];
       final Component newComponent = newComponents[newChildrenTop];
-      final Element newChild = updateChild(oldChild, newComponent, prevChild)!;
+      final Element newChild = updateChild(oldChild, newComponent, slotFor(newChildrenTop, prevChild))!;
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
@@ -524,7 +529,7 @@ abstract class Element implements BuildContext {
   /// Implementations of this method should start with a call to the inherited
   /// method, as in `super.mount(parent)`.
   @mustCallSuper
-  void mount(Element? parent, ElementSlot? newSlot) {
+  void mount(Element? parent, ElementSlot newSlot) {
     assert(_lifecycleState == _ElementLifecycle.initial);
     assert(_component != null);
     assert(_parent == null);
@@ -534,6 +539,9 @@ abstract class Element implements BuildContext {
     _parentRenderObjectElement = parent is RenderObjectElement ? parent : parent?._parentRenderObjectElement;
 
     _slot = newSlot;
+    if (this is RenderObjectElement) {
+      newSlot.target = this as RenderObjectElement;
+    }
 
     _lifecycleState = _ElementLifecycle.active;
     _depth = parent != null ? parent.depth + 1 : 1;
@@ -599,7 +607,7 @@ abstract class Element implements BuildContext {
   /// subclasses that have multiple children, when child moves from one position
   /// to another in this element's child list.
   @protected
-  void updateSlotForChild(Element child, ElementSlot? newSlot) {
+  void updateSlotForChild(Element child, ElementSlot newSlot) {
     assert(_lifecycleState == _ElementLifecycle.active);
     assert(child._parent == this);
     void visit(Element element) {
@@ -621,11 +629,14 @@ abstract class Element implements BuildContext {
   /// that this [Element] occupies in its ancestor.
   @protected
   @mustCallSuper
-  void updateSlot(ElementSlot? newSlot) {
+  void updateSlot(ElementSlot newSlot) {
     assert(_lifecycleState == _ElementLifecycle.active);
     assert(_parent != null);
     assert(_parent!._lifecycleState == _ElementLifecycle.active);
     _slot = newSlot;
+    if (this is RenderObjectElement) {
+      newSlot.target = this as RenderObjectElement;
+    }
   }
 
   void _updateDepth(int parentDepth) {
@@ -671,7 +682,7 @@ abstract class Element implements BuildContext {
   /// The element returned by this function will already have been mounted and
   /// will be in the "active" lifecycle state.
   @protected
-  Element inflateComponent(Component newComponent, ElementSlot? newSlot) {
+  Element inflateComponent(Component newComponent, ElementSlot newSlot) {
     final Key? key = newComponent.key;
     if (key is GlobalKey) {
       final Element? newChild = _retakeInactiveElement(key, newComponent);
@@ -709,13 +720,7 @@ abstract class Element implements BuildContext {
   void deactivateChild(Element child) {
     assert(child._parent == this);
     child._parent = null;
-    void visit(Element element) {
-      element._slot = null;
-      if (element is! RenderObjectElement) {
-        element.visitChildren(visit);
-      }
-    }
-    visit(child);
+    child.slot.target = null;
     owner._inactiveElements.add(child);
   }
 
@@ -1084,4 +1089,25 @@ abstract class Element implements BuildContext {
   var _parentChanged = false;
 }
 
-class ElementSlot {}
+class ElementSlot {
+  ElementSlot(this.index, this.previousSibling);
+
+  RenderObjectElement? target;
+
+  /// The previous sibling of this slot in the parent's child list.
+  final Element? previousSibling;
+
+  /// The index of this slot in the parent's child list.
+  final int index;
+
+  @override
+  bool operator ==(Object other) {
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return other is ElementSlot && index == other.index && previousSibling == other.previousSibling;
+  }
+
+  @override
+  int get hashCode => Object.hash(index, previousSibling);
+}

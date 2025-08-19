@@ -84,7 +84,7 @@ class BuildOwner {
 
     _isFirstBuild = true;
 
-    element.mount(null, null);
+    element.mount(null, ElementSlot(0, null));
     element.didMount();
 
     completeInitialBuild(element, () {

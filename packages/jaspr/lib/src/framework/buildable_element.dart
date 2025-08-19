@@ -18,7 +18,7 @@ abstract class BuildableElement extends Element {
   bool get debugDoingBuild => _debugDoingBuild;
 
   @override
-  void mount(Element? parent, ElementSlot? newSlot) {
+  void mount(Element? parent, ElementSlot newSlot) {
     super.mount(parent, newSlot);
     assert(_child == null);
   }

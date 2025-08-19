@@ -13,7 +13,7 @@ void initSyncState(SyncStateMixin sync) {
     if (node.isText) {
       continue;
     }
-    if (node.instanceOfString("Comment")) {
+    if (node.isComment) {
       var value = node.nodeValue ?? '';
       var match = _syncRegex.firstMatch(value);
 

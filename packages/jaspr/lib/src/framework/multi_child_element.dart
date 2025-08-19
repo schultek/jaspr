@@ -21,7 +21,7 @@ abstract class MultiChildElement extends Element {
   bool get debugDoingBuild => false;
 
   @override
-  void mount(Element? parent, ElementSlot? newSlot) {
+  void mount(Element? parent, ElementSlot newSlot) {
     super.mount(parent, newSlot);
     assert(_children == null);
   }
@@ -33,7 +33,7 @@ abstract class MultiChildElement extends Element {
   }
 
   @override
-  bool shouldRebuild(ProxyComponent newComponent) {
+  bool shouldRebuild(Component newComponent) {
     return true;
   }
 

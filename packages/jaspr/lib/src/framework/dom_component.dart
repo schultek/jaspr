@@ -61,7 +61,7 @@ class DomElement extends MultiChildRenderObjectElement {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    updateRenderObject();
+    updateRenderObject(renderObject as RenderElement);
   }
 
   @override
@@ -75,10 +75,17 @@ class DomElement extends MultiChildRenderObjectElement {
   }
 
   @override
-  void updateRenderObject() {
+  RenderObject createRenderObject() {
+    final renderObject = _parentRenderObjectElement!.renderObject.createChildRenderElement();
+    assert(renderObject.parent == _parentRenderObjectElement!.renderObject);
+    return renderObject;
+  }
+
+  @override
+  void updateRenderObject(RenderElement renderObject) {
     if (_wrappingElement != null) {
       var wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
-      renderObject.updateElement(
+      renderObject.update(
         component.tag,
         component.id ?? wrappingComponent.id,
         _joinString(wrappingComponent.classes, component.classes),
@@ -90,7 +97,7 @@ class DomElement extends MultiChildRenderObjectElement {
       return;
     }
 
-    renderObject.updateElement(
+    renderObject.update(
       component.tag,
       component.id,
       component.classes,
@@ -171,23 +178,14 @@ class TextElement extends LeafRenderObjectElement {
   }
 
   @override
-  void updateRenderObject() {
-    renderObject.updateText((component as Text).text);
+  RenderObject createRenderObject() {
+    final renderObject = _parentRenderObjectElement!.renderObject.createChildRenderText();
+    assert(renderObject.parent == _parentRenderObjectElement!.renderObject);
+    return renderObject;
   }
-}
-
-class SkipContent extends Component {
-  const SkipContent();
 
   @override
-  Element createElement() => SkipContentElement(this);
-}
-
-class SkipContentElement extends LeafRenderObjectElement {
-  SkipContentElement(SkipContent super.component);
-
-  @override
-  void updateRenderObject() {
-    renderObject.skipChildren();
+  void updateRenderObject(RenderText text) {
+    text.update((component as Text).text);
   }
 }

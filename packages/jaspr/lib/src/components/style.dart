@@ -11,7 +11,7 @@ class Style extends StatelessComponent {
   Component build(BuildContext context) {
     return DomComponent(
       tag: 'style',
-      child: RawText(styles.render()),
+      children: [RawText(styles.render())],
     );
   }
 }

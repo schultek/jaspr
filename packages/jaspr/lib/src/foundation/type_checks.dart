@@ -17,6 +17,7 @@ extension DomTypeTests on JSAny? {
   bool get isHtmlOptionElement => this == null ? false : instanceof(_cachedHtmlOptionElementConstructor);
   bool get isText => this == null ? false : instanceof(_cachedTextConstructor);
   bool get isComment => this == null ? false : instanceof(_cachedCommentConstructor);
+  bool get isDocumentFragment => this == null ? false : instanceof(_cachedDocumentFragmentConstructor);
 }
 
 final _cachedElementConstructor = _elementConstructor;
@@ -27,6 +28,7 @@ final _cachedHtmlTextAreaElementConstructor = _htmlTextAreaElementConstructor;
 final _cachedHtmlOptionElementConstructor = _htmlOptionElementConstructor;
 final _cachedTextConstructor = _textConstructor;
 final _cachedCommentConstructor = _commentConstructor;
+final _cachedDocumentFragmentConstructor = _documentFragmentConstructor;
 
 @JS('Element')
 external JSFunction get _elementConstructor;
@@ -44,3 +46,5 @@ external JSFunction get _htmlOptionElementConstructor;
 external JSFunction get _textConstructor;
 @JS('Comment')
 external JSFunction get _commentConstructor;
+@JS('DocumentFragment')
+external JSFunction get _documentFragmentConstructor;

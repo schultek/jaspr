@@ -46,17 +46,17 @@ class RawNode extends Component {
   Element createElement() => RawNodeElement(this);
 }
 
-class RawNodeElement extends BuildableRenderObjectElement {
+class RawNodeElement extends MultiChildRenderObjectElement {
   RawNodeElement(RawNode super.component);
 
   @override
   RawNode get component => super.component as RawNode;
 
   @override
-  Component build() {
-    return Fragment(children: [
+  List<Component> buildChildren() {
+    return [
       for (var node in component.node.childNodes.toIterable()) RawNode.withKey(node),
-    ]);
+    ];
   }
 
   @override

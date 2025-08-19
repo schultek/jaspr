@@ -174,7 +174,7 @@ class BaseDocument extends StatelessComponent implements Document {
             ...head,
           ],
         ),
-        DomComponent(tag: 'body', child: body),
+        DomComponent(tag: 'body', children: [body]),
       ],
     );
   }
@@ -302,7 +302,7 @@ class HeadDocument extends StatelessComponent implements Document {
       target: 'head',
       attributes: null,
       children: [
-        if (title != null) DomComponent(tag: 'title', child: Text(title!)),
+        if (title != null) DomComponent(tag: 'title', children: [Text(title!)]),
         if (meta != null)
           for (var e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
         ...?children,

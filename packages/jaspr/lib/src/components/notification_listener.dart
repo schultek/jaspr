@@ -18,12 +18,11 @@ typedef NotificationListenerCallback<T extends Notification> = bool Function(T n
 /// [runtimeType] is a subtype of `T`.
 ///
 /// To dispatch notifications, use the [Notification.dispatch] method.
-class NotificationListener<T extends Notification> extends ProxyComponent {
+class NotificationListener<T extends Notification> extends Component {
   /// Creates a component that listens for notifications.
   const NotificationListener({
     this.onNotification,
-    super.child,
-    super.children,
+    required this.child,
     super.key,
   });
 
@@ -34,14 +33,16 @@ class NotificationListener<T extends Notification> extends ProxyComponent {
   /// allow the notification to continue to be dispatched to further ancestors.
   final NotificationListenerCallback<T>? onNotification;
 
+  final Component child;
+
   @override
-  ProxyElement createElement() {
+  Element createElement() {
     return _NotificationElement<T>(this);
   }
 }
 
 /// An element used to host [NotificationListener] elements.
-class _NotificationElement<T extends Notification> extends ProxyElement with NotifiableElementMixin {
+class _NotificationElement<T extends Notification> extends BuildableElement with NotifiableElementMixin {
   _NotificationElement(NotificationListener<T> super.component);
 
   @override
@@ -52,4 +53,7 @@ class _NotificationElement<T extends Notification> extends ProxyElement with Not
     }
     return false;
   }
+  
+  @override
+  Component build() => (component as NotificationListener<T>).child;
 }

@@ -89,7 +89,7 @@ class HeadDocument extends StatelessComponent implements Document {
       target: AttachTarget.head,
       attributes: null,
       children: [
-        if (title != null) DomComponent(tag: 'title', child: Text(title!)),
+        if (title != null) DomComponent(tag: 'title', children: [Text(title!)]),
         if (meta != null)
           for (var e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
         ...?children,
@@ -108,20 +108,24 @@ enum AttachTarget {
   final bool attachChildren;
 }
 
-class AttachDocument extends ProxyComponent implements Document {
-  const AttachDocument.html({this.attributes, super.key}) : target = AttachTarget.html;
-  const AttachDocument.body({this.attributes, super.key}) : target = AttachTarget.body;
-  const AttachDocument({required this.target, this.attributes, super.children});
+class AttachDocument extends Component implements Document {
+  const AttachDocument.html({this.attributes, super.key}) : target = AttachTarget.html, children = const [];
+  const AttachDocument.body({this.attributes, super.key}) : target = AttachTarget.body, children = const [];
+  const AttachDocument({required this.target, this.attributes, required this.children});
 
   final AttachTarget target;
   final Map<String, String>? attributes;
+  final List<Component> children;
 
   @override
-  ProxyElement createElement() => _AttachElement(this);
+  Element createElement() => _AttachElement(this);
 }
 
-class _AttachElement extends ProxyRenderObjectElement {
+class _AttachElement extends MultiChildRenderObjectElement {
   _AttachElement(AttachDocument super.component);
+
+  @override
+  List<Component> buildChildren() => (component as AttachDocument).children;
 
   @override
   RenderObject createRenderObject() {
@@ -130,9 +134,9 @@ class _AttachElement extends ProxyRenderObjectElement {
   }
 
   @override
-  void updateRenderObject() {
+  void updateRenderObject(AttachRenderObject renderObject) {
     var AttachDocument(:target, :attributes) = component as AttachDocument;
-    (renderObject as AttachRenderObject)
+    renderObject
       ..target = target
       ..attributes = attributes;
   }
@@ -149,9 +153,10 @@ class _AttachElement extends ProxyRenderObjectElement {
     final renderObject = this.renderObject as AttachRenderObject;
     AttachAdapter.instanceFor(renderObject._target).unregister(renderObject);
   }
+  
 }
 
-class AttachRenderObject extends DomRenderObject {
+class AttachRenderObject extends DomRenderText {
   AttachRenderObject(this._target, this._depth) {
     node = web.Text('');
     AttachAdapter.instanceFor(_target).register(this);
