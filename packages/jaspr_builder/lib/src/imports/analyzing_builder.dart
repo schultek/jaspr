@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 import 'package:path/path.dart' as path;
@@ -29,9 +29,9 @@ class ImportsModuleBuilder implements Builder {
       var outputId = buildStep.inputId.changeExtension('.imports.json');
       var partId = buildStep.inputId.changeExtension('.imports.dart');
 
-      var import = lib.firstFragment.libraryImports2
+      var import = lib.firstFragment.libraryImports
           .cast<ElementDirective>()
-          .followedBy(lib.firstFragment.libraryExports2)
+          .followedBy(lib.firstFragment.libraryExports)
           .where((ElementDirective e) => importChecker.firstAnnotationOf(e) != null)
           .where((ElementDirective e) {
         var uri = e.uri;

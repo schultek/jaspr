@@ -1,9 +1,7 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as path;
@@ -66,15 +64,15 @@ class ClientModuleBuilder implements Builder {
 
     var element = annotated.first;
 
-    if (element is! ClassElement2) {
+    if (element is! ClassElement) {
       log.severe(
-          '@client can only be applied on classes. Failing element: ${element.name3} in library ${library.firstFragment.source.fullName}.');
+          '@client can only be applied on classes. Failing element: ${element.name} in library ${library.firstFragment.source.fullName}.');
       return;
     }
 
     if (!componentChecker.isAssignableFrom(element)) {
       log.severe(
-          '@client can only be applied on classes extending Component. Failing element: ${element.name3} in library ${library.firstFragment.source.fullName}.');
+          '@client can only be applied on classes extending Component. Failing element: ${element.name} in library ${library.firstFragment.source.fullName}.');
       return;
     }
 
@@ -131,11 +129,11 @@ class ClientModule {
     required this.params,
   });
 
-  static ClientModule fromElement(ClassElement2 element, Codecs codecs, BuildStep buildStep) {
+  static ClientModule fromElement(ClassElement element, Codecs codecs, BuildStep buildStep) {
     var params = getParamsFor(element, codecs);
 
     return ClientModule(
-      name: element.name3 ?? '',
+      name: element.name ?? '',
       id: buildStep.inputId,
       import: buildStep.inputId.toImportUrl(),
       params: params,
@@ -200,26 +198,26 @@ class ClientParam {
       };
 }
 
-List<ClientParam> getParamsFor(ClassElement2 e, Codecs codecs) {
-  final constr = e.constructors2.first;
+List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
+  final constr = e.constructors.first;
   var params = constr.formalParameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
 
   for (var param in params) {
     if (!param.isInitializingFormal) {
       throw UnsupportedError('Client components only support initializing formal constructor parameters. '
-          'Failing element: ${e.name3}.${constr.name3}($param)');
+          'Failing element: ${e.name}.${constr.name}($param)');
     }
   }
 
   return params.map((p) {
     try {
-      var decoder = codecs.getDecoderFor(p.type, "p['${p.name3}']");
-      var encoder = codecs.getEncoderFor(p.type, 'c.${p.name3}');
-      return ClientParam(name: p.name3 ?? '', isNamed: p.isNamed, decoder: decoder, encoder: encoder);
+      var decoder = codecs.getDecoderFor(p.type, "p['${p.name}']");
+      var encoder = codecs.getEncoderFor(p.type, 'c.${p.name}');
+      return ClientParam(name: p.name ?? '', isNamed: p.isNamed, decoder: decoder, encoder: encoder);
     } on InvalidParameterException catch (_) {
       throw UnsupportedError(
           '@client components only support parameters of primitive serializable types or types that define @decoder and @encoder methods. '
-          'Failing parameter: [$p] in ${e.name3}.${constr.name3}()');
+          'Failing parameter: [$p] in ${e.name}.${constr.name}()');
     }
   }).toList();
 }

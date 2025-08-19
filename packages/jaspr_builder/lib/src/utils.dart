@@ -1,10 +1,10 @@
-// ignore_for_file: implementation_imports, deprecated_member_use
+// ignore_for_file: implementation_imports
 
 import 'dart:convert';
 
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_style/dart_style.dart';
@@ -25,14 +25,14 @@ extension DartOutput on BuildStep {
   }
 }
 
-var clientChecker = TypeChecker.fromRuntime(ClientAnnotation);
-var componentChecker = TypeChecker.fromRuntime(Component);
-final keyChecker = TypeChecker.fromRuntime(Key);
-var stylesChecker = TypeChecker.fromRuntime(CssUtility);
-var styleRuleChecker = TypeChecker.fromRuntime(StyleRule);
-var syncChecker = TypeChecker.fromRuntime(SyncAnnotation);
-var stateChecker = TypeChecker.fromRuntime(State);
-var importChecker = TypeChecker.fromRuntime(Import);
+final clientChecker = TypeChecker.typeNamed(ClientAnnotation, inPackage: 'jaspr');
+final componentChecker = TypeChecker.typeNamed(Component, inPackage: 'jaspr');
+final keyChecker = TypeChecker.typeNamed(Key, inPackage: 'jaspr');
+final stylesChecker = TypeChecker.typeNamed(CssUtility, inPackage: 'jaspr');
+final styleRuleChecker = TypeChecker.typeNamed(StyleRule, inPackage: 'jaspr');
+final syncChecker = TypeChecker.typeNamed(SyncAnnotation, inPackage: 'jaspr');
+final stateChecker = TypeChecker.typeNamed(State, inPackage: 'jaspr');
+final importChecker = TypeChecker.typeNamed(Import, inPackage: 'jaspr');
 
 class ImportEntry {
   String url;
@@ -53,9 +53,9 @@ extension TypeStub on String {
   }
 }
 
-extension ElementNode on Element2 {
+extension ElementNode on Element {
   AstNode? get node {
-    var result = session?.getParsedLibraryByElement2(library2!);
+    var result = session?.getParsedLibraryByElement(library!);
     if (result is ParsedLibraryResult) {
       return result.getFragmentDeclaration(firstFragment)?.node;
     } else {
