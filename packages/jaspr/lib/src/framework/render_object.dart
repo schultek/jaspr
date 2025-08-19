@@ -11,7 +11,7 @@ abstract class RenderObject {
   RenderObject? get parent;
   web.Node? get node;
 
-  RenderElement createChildRenderElement();
+  RenderElement createChildRenderElement(String tag);
   RenderText createChildRenderText();
   RenderFragment createChildRenderFragment();
 
@@ -21,7 +21,7 @@ abstract class RenderObject {
 }
 
 abstract class RenderElement implements RenderObject {
-  void update(String tag, String? id, String? classes, Map<String, String>? styles, Map<String, String>? attributes,
+  void update(String? id, String? classes, Map<String, String>? styles, Map<String, String>? attributes,
       Map<String, EventCallback>? events);
 }
 

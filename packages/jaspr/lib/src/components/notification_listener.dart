@@ -53,7 +53,7 @@ class _NotificationElement<T extends Notification> extends BuildableElement with
     }
     return false;
   }
-  
+
   @override
   Component build() => (component as NotificationListener<T>).child;
 }

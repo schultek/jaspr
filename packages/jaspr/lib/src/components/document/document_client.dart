@@ -91,7 +91,9 @@ class HeadDocument extends StatelessComponent implements Document {
       children: [
         if (title != null) DomComponent(tag: 'title', children: [Text(title!)]),
         if (meta != null)
-          for (var e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+          for (var e in meta!.entries)
+            DomComponent(
+                tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
         ...?children,
       ],
     );
@@ -109,9 +111,14 @@ enum AttachTarget {
 }
 
 class AttachDocument extends Component implements Document {
-  const AttachDocument.html({this.attributes, super.key}) : target = AttachTarget.html, children = const [];
-  const AttachDocument.body({this.attributes, super.key}) : target = AttachTarget.body, children = const [];
-  const AttachDocument({required this.target, this.attributes, required this.children});
+  const AttachDocument.html({this.attributes, super.key})
+      : target = AttachTarget.html,
+        children = const [];
+  const AttachDocument.body({this.attributes, super.key})
+      : target = AttachTarget.body,
+        children = const [];
+  const AttachDocument(
+      {required this.target, this.attributes, required this.children});
 
   final AttachTarget target;
   final Map<String, String>? attributes;
@@ -153,12 +160,10 @@ class _AttachElement extends MultiChildRenderObjectElement {
     final renderObject = this.renderObject as AttachRenderObject;
     AttachAdapter.instanceFor(renderObject._target).unregister(renderObject);
   }
-  
 }
 
 class AttachRenderObject extends DomRenderText {
-  AttachRenderObject(this._target, this._depth) {
-    node = web.Text('');
+  AttachRenderObject(this._target, this._depth) : super('', null) {
     AttachAdapter.instanceFor(_target).register(this);
   }
 
@@ -192,7 +197,6 @@ class AttachRenderObject extends DomRenderText {
   void attach(DomRenderObject child, {DomRenderObject? after}) {
     try {
       var childNode = child.node;
-      if (childNode == null) return;
 
       var afterNode = after?.node;
       if (afterNode == null && children.contains(childNode)) {
@@ -205,7 +209,8 @@ class AttachRenderObject extends DomRenderText {
       }
 
       children.remove(childNode);
-      children.insert(afterNode != null ? children.indexOf(afterNode) + 1 : 0, childNode);
+      children.insert(
+          afterNode != null ? children.indexOf(afterNode) + 1 : 0, childNode);
       AttachAdapter.instanceFor(_target).update();
     } finally {
       child.finalize();
@@ -214,7 +219,6 @@ class AttachRenderObject extends DomRenderText {
 
   @override
   void remove(DomRenderObject child) {
-    super.remove(child);
     children.remove(child.node);
     AttachAdapter.instanceFor(_target).update();
   }
@@ -279,7 +283,8 @@ class AttachAdapter {
     return switch (node as web.Element) {
       web.Element(id: String id) when id.isNotEmpty => id,
       web.Element(tagName: "TITLE" || "BASE") => '__${node.tagName}',
-      web.Element(tagName: "META") => switch (node.attributes.getNamedItem("name")) {
+      web.Element(tagName: "META") => switch (
+            node.attributes.getNamedItem("name")) {
           web.Attr name => '__meta:${name.value}',
           _ => null
         },

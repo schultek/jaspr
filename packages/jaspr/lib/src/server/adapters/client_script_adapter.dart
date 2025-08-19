@@ -16,8 +16,8 @@ class ClientScriptAdapter extends HeadScopeAdapter {
     }
 
     head.children.insertBefore(
-      head.createChildRenderObject()
-        ..updateElement('script', null, null, null, {'src': 'main.clients.dart.js', 'defer': ''}, null),
+      head.createChildRenderElement('script')
+        ..update(null, null, null, {'src': 'main.clients.dart.js', 'defer': ''}, null),
     );
 
     return true;

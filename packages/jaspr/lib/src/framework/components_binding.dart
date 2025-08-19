@@ -56,7 +56,7 @@ class _RootElement extends MultiChildRenderObjectElement {
 
   @override
   List<Component> buildChildren() => [(component as _Root).child];
-  
+
   @override
   RenderObject createRenderObject() {
     return (component as _Root).rootRenderObject;
@@ -64,5 +64,4 @@ class _RootElement extends MultiChildRenderObjectElement {
 
   @override
   void updateRenderObject(_) {}
-  
 }

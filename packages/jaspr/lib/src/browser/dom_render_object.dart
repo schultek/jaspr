@@ -17,16 +17,19 @@ const xmlns = {
 
 abstract class DomRenderObject implements RenderObject {
   @override
+  web.Node get node;
+
+  @override
   DomRenderObject? parent;
 
   @override
-  RenderElement createChildRenderElement() {
-    return DomRenderElement()..parent = this;
+  RenderElement createChildRenderElement(String tag) {
+    return DomRenderElement(tag, this);
   }
 
   @override
-  RenderText createChildRenderText() {
-    return DomRenderText()..parent = this;
+  RenderText createChildRenderText(String text) {
+    return DomRenderText(text, this);
   }
 
   @override
@@ -34,22 +37,121 @@ abstract class DomRenderObject implements RenderObject {
     return DomRenderFragment()..parent = this;
   }
 
+  web.Node? retakeNode(bool Function(web.Node node) visitNode);
+
+  void attachChild(DomRenderObject child, web.Node? afterNode) {
+    child.parent = this;
+
+    if (child is DomRenderFragment && child.isAttached) {
+      child.move(this, afterNode);
+      return;
+    }
+
+    try {
+      final childNode = child.node;
+      if (childNode.previousSibling == afterNode &&
+          childNode.parentNode == node) {
+        return;
+      }
+
+      if (kVerboseMode) {
+        print("Attach node $childNode of $node after $afterNode");
+      }
+
+      if (afterNode == null) {
+        node.insertBefore(childNode, node.childNodes.item(0));
+      } else {
+        node.insertBefore(childNode, afterNode.nextSibling);
+      }
+
+      assert(childNode.previousSibling == afterNode,
+          'Child node should have been placed after the specified node.');
+    } finally {
+      child.finalize();
+    }
+  }
+
+  void removeChild(DomRenderObject child) {
+    if (kVerboseMode) {
+      print("Remove child $child of $this");
+    }
+
+    assert(node == child.node.parentNode,
+        'Child node must be a child of this element.');
+
+    node.removeChild(child.node);
+    child.parent = null;
+  }
+
   void finalize();
 }
 
-class DomRenderElement extends DomRenderObject implements RenderElement {
-  @override
-  web.Element? node;
-
+mixin HydratableDomRenderObject on DomRenderObject {
+  /// List of nodes that are not hydrated yet.
+  /// These nodes will be removed when the render object is finalized.
   List<web.Node> toHydrate = [];
+
+  @override
+  web.Node? retakeNode(bool Function(web.Node node) visitNode) {
+    if (toHydrate.isNotEmpty) {
+      for (final e in toHydrate) {
+        if (visitNode(e)) {
+          toHydrate.remove(e);
+          return e;
+        }
+      }
+    }
+    return null;
+  }
+
+  @override
+  void finalize() {
+    if (kVerboseMode && toHydrate.isNotEmpty) {
+      print("Clear ${toHydrate.length} nodes not hydrated ($toHydrate)");
+    }
+    for (final node in toHydrate) {
+      node.parentNode!.removeChild(node);
+    }
+    toHydrate.clear();
+  }
+}
+
+class DomRenderElement extends DomRenderObject
+    with HydratableDomRenderObject
+    implements RenderElement {
+  DomRenderElement(String tag, DomRenderObject parent) {
+    this.parent = parent;
+    _createNode(tag);
+  }
+
+  @override
+  late final web.Element node;
 
   Map<String, EventBinding>? events;
 
-  void clearEvents() {
-    events?.forEach((type, binding) {
-      binding.clear();
+  void _createNode(String tag) {
+    var namespace = xmlns[tag];
+    if (namespace == null && (parent?.node.isElement ?? false)) {
+      namespace = (parent?.node as web.Element).namespaceURI;
+    }
+
+    final retakeNode = parent?.retakeNode((n) {
+      return n.isElement && (n as web.Element).tagName.toLowerCase() == tag;
     });
-    events = null;
+    if (retakeNode != null) {
+      if (kVerboseMode) {
+        print("Hydrate html node: $retakeNode");
+      }
+      node = retakeNode as web.Element;
+
+      toHydrate = retakeNode.childNodes.toIterable().toList();
+      return;
+    }
+
+    node = _createElement(tag, namespace);
+    if (kVerboseMode) {
+      web.console.log("Create html node: $node".toJS);
+    }
   }
 
   web.Element _createElement(String tag, String? namespace) {
@@ -60,86 +162,55 @@ class DomRenderElement extends DomRenderObject implements RenderElement {
   }
 
   @override
-  void update(String tag, String? id, String? classes, Map<String, String>? styles, Map<String, String>? attributes,
-      Map<String, EventCallback>? events) {
+  void update(String? id, String? classes, Map<String, String>? styles,
+      Map<String, String>? attributes, Map<String, EventCallback>? events) {
     late Set<String> attributesToRemove;
-    late web.Element elem;
 
-    var namespace = xmlns[tag];
-    if (namespace == null && (parent?.node?.isElement ?? false)) {
-      namespace = (parent?.node as web.Element).namespaceURI;
+    attributesToRemove = {};
+    for (var i = 0; i < node.attributes.length; i++) {
+      attributesToRemove.add(node.attributes.item(i)!.name);
     }
 
-    diff:
-    if (node == null) {
-      final parentToHydrate = parent is DomRenderElement ? (parent as DomRenderElement).toHydrate : [];
-      if (parentToHydrate.isNotEmpty) {
-        for (final e in parentToHydrate) {
-          if (e.isElement && (e as web.Element).tagName.toLowerCase() == tag) {
-            if (kVerboseMode) {
-              print("Hydrate html node: $e");
-            }
-            elem = node = e;
-            attributesToRemove = {};
-            for (var i = 0; i < elem.attributes.length; i++) {
-              attributesToRemove.add(elem.attributes.item(i)!.name);
-            }
-            parentToHydrate.remove(e);
-            toHydrate = e.childNodes.toIterable().toList();
-            break diff;
-          }
-        }
-      }
-
-      elem = node = _createElement(tag, namespace);
-      attributesToRemove = {};
-      if (kVerboseMode) {
-        web.console.log("Create html node: $elem".toJS);
-      }
-    } else {
-      if (node!.tagName.toLowerCase() != tag) {
-        throw ArgumentError(
-          'Cannot change element tag (tried from "${node!.tagName.toLowerCase()}" to "$tag").',
-        );
-      }
-      elem = node!;
-      attributesToRemove = {};
-      for (var i = 0; i < elem.attributes.length; i++) {
-        attributesToRemove.add(elem.attributes.item(i)!.name);
-      }
-    }
-
-    elem.clearOrSetAttribute('id', id);
-    elem.clearOrSetAttribute('class', classes == null || classes.isEmpty ? null : classes);
-    elem.clearOrSetAttribute('style',
-        styles == null || styles.isEmpty ? null : styles.entries.map((e) => '${e.key}: ${e.value}').join('; '));
+    node.clearOrSetAttribute('id', id);
+    node.clearOrSetAttribute(
+        'class', classes == null || classes.isEmpty ? null : classes);
+    node.clearOrSetAttribute(
+        'style',
+        styles == null || styles.isEmpty
+            ? null
+            : styles.entries.map((e) => '${e.key}: ${e.value}').join('; '));
 
     if (attributes != null && attributes.isNotEmpty) {
       for (final attr in attributes.entries) {
-        if (attr.key == 'value' && elem.isHtmlInputElement && (elem as web.HTMLInputElement).value != attr.value) {
+        if (attr.key == 'value' &&
+            node.isHtmlInputElement &&
+            (node as web.HTMLInputElement).value != attr.value) {
           if (kVerboseMode) {
             print("Set input value: ${attr.value}");
           }
-          elem.value = attr.value;
+          (node as web.HTMLInputElement).value = attr.value;
           continue;
         }
 
-        if (attr.key == 'value' && elem.isHtmlSelectElement && (elem as web.HTMLSelectElement).value != attr.value) {
+        if (attr.key == 'value' &&
+            node.isHtmlSelectElement &&
+            (node as web.HTMLSelectElement).value != attr.value) {
           if (kVerboseMode) {
             print("Set select value: ${attr.value}");
           }
-          elem.value = attr.value;
+          (node as web.HTMLSelectElement).value = attr.value;
           continue;
         }
 
-        elem.clearOrSetAttribute(attr.key, attr.value);
+        node.clearOrSetAttribute(attr.key, attr.value);
       }
     }
 
-    attributesToRemove.removeAll(['id', 'class', 'style', ...?attributes?.keys]);
+    attributesToRemove
+        .removeAll(['id', 'class', 'style', ...?attributes?.keys]);
     if (attributesToRemove.isNotEmpty) {
       for (final name in attributesToRemove) {
-        elem.removeAttribute(name);
+        node.removeAttribute(name);
         if (kVerboseMode) {
           print("Remove attribute: $name");
         }
@@ -156,108 +227,71 @@ class DomRenderElement extends DomRenderObject implements RenderElement {
         if (currentBinding != null) {
           currentBinding.fn = fn;
         } else {
-          dataEvents[type] = EventBinding(elem, type, fn);
+          dataEvents[type] = EventBinding(node, type, fn);
         }
       });
       prevEventTypes?.forEach((type) {
         dataEvents.remove(type)?.clear();
       });
     } else {
-      clearEvents();
+      this.events?.forEach((type, binding) {
+        binding.clear();
+      });
+      this.events = null;
     }
   }
 
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
-    try {
-      child.parent = this;
-
-      final parentNode = node;
-      final childNode = child.node;
-
-      assert(parentNode.isElement);
-      if (childNode == null) return;
-
-      final afterNode = after?.node;
-
-      if (childNode.previousSibling == afterNode && childNode.parentNode == parentNode) {
-        return;
-      }
-
-      if (kVerboseMode) {
-        print("Attach node $childNode of $parentNode after $afterNode");
-      }
-
-      if (afterNode == null) {
-        parentNode!.insertBefore(childNode, parentNode.childNodes.item(0));
-      } else {
-        parentNode!.insertBefore(childNode, afterNode.nextSibling);
-      }
-    } finally {
-      child.finalize();
-    }
+    attachChild(child, after?.node);
   }
 
   @override
   void remove(DomRenderObject child) {
-    if (kVerboseMode) {
-      print("Remove child $child of $this");
-    }
-    child.node?.parentNode!.removeChild(child.node!);
-    child.parent = null;
-  }
-
-  @override
-  void finalize() {
-    if (kVerboseMode && toHydrate.isNotEmpty) {
-      print("Clear ${toHydrate.length} nodes not hydrated ($toHydrate)");
-    }
-    for (final node in toHydrate) {
-      node.parentNode!.removeChild(node);
-    }
-    toHydrate.clear();
+    removeChild(child);
   }
 }
 
 class DomRenderText extends DomRenderObject implements RenderText {
-  @override
-  web.Text? node;
+  DomRenderText(String text, DomRenderObject? parent) {
+    this.parent = parent;
+    _createNode(text);
+  }
 
   @override
-  void update(String text) {
-    diff:
-    if (node == null) {
-      final toHydrate = parent is DomRenderElement ? (parent as DomRenderElement).toHydrate : [];
-      if (toHydrate.isNotEmpty) {
-        for (final e in toHydrate) {
-          if (e.isText) {
-            if (kVerboseMode) {
-              print("Hydrate text node: $e");
-            }
-            node = e;
-            if (e.textContent != text) {
-              e.textContent = text;
-              if (kVerboseMode) {
-                print("Update text node: $text");
-              }
-            }
-            toHydrate.remove(e);
-            break diff;
-          }
-        }
-      }
+  late final web.Text node;
 
-      node = web.Text(text);
+  void _createNode(String text) {
+    final retakeNode = parent?.retakeNode((n) {
+      return n.isText;
+    });
+
+    if (retakeNode != null) {
       if (kVerboseMode) {
-        print("Create text node: $text");
+        print("Hydrate text node: $retakeNode");
       }
-    } else {
-      final node = this.node!;
+      node = retakeNode as web.Text;
       if (node.textContent != text) {
         node.textContent = text;
         if (kVerboseMode) {
           print("Update text node: $text");
         }
+      }
+      return;
+    }
+
+    node = web.Text(text);
+    if (kVerboseMode) {
+      print("Create text node: $text");
+    }
+  }
+
+  @override
+  void update(String text) {
+    if (node.textContent != text) {
+      node.textContent = text;
+      if (kVerboseMode) {
+        print("Update text node: $text");
       }
     }
   }
@@ -277,37 +311,143 @@ class DomRenderText extends DomRenderObject implements RenderText {
   }
 
   @override
+  web.Node? retakeNode(bool Function(web.Node node) visitNode) {
+    return null;
+  }
+
+  @override
   void finalize() {
     // noop
   }
 }
 
-class DomRenderFragment extends DomRenderObject implements RenderFragment {
-  @override
-  web.DocumentFragment? node;
+class DomRenderFragment extends DomRenderObject
+    with HydratableDomRenderObject
+    implements RenderFragment {
+  DomRenderFragment() : node = web.document.createDocumentFragment() {
+    toHydrate = parent is HydratableDomRenderObject
+        ? (parent as HydratableDomRenderObject).toHydrate
+        : [];
+  }
 
-  void update() {
-    if (node == null) {
-      node = web.document.createDocumentFragment();
-      if (kVerboseMode) {
-        print("Create document fragment");
+  @override
+  final web.DocumentFragment node;
+  bool isAttached = false;
+
+  web.Node? firstChildNode;
+  web.Node? lastChildNode;
+
+  @override
+  void attach(DomRenderObject child, {DomRenderObject? after}) {
+    try {
+      child.parent = this;
+
+      final parentNode = isAttached ? parent!.node : node;
+      final childNode = child.node;
+
+      assert(parentNode.isElement);
+
+      final afterNode =
+          after?.node ?? (isAttached ? firstChildNode?.previousSibling : null);
+
+      if (childNode.previousSibling == afterNode &&
+          childNode.parentNode == parentNode) {
+        return;
       }
+
+      if (kVerboseMode) {
+        print("Attach node $childNode of $parentNode after $afterNode");
+      }
+
+      if (afterNode == null) {
+        parentNode.insertBefore(childNode, parentNode.childNodes.item(0));
+      } else {
+        parentNode.insertBefore(childNode, afterNode.nextSibling);
+      }
+
+      if (after?.node == null) {
+        firstChildNode = childNode;
+      }
+      if (after?.node == lastChildNode) {
+        lastChildNode = childNode;
+      }
+    } finally {
+      child.finalize();
     }
+  }
+
+  void move(DomRenderObject parent, web.Node? afterNode) {
+    assert(
+        parent == this.parent, 'Cannot move fragment to a different parent.');
+    assert(
+        isAttached, 'Cannot move fragment that is not attached to a parent.');
+
+    if (kVerboseMode) {
+      print("Move fragment $this to $parent after $afterNode");
+    }
+
+    final parentNode = parent.node;
+
+    if (firstChildNode == null) {
+      // If fragment is empty, nothing to move.
+      return;
+    }
+
+    assert(lastChildNode != null,
+        'Non-empty attached fragments must have a valid last node reference.');
+
+    if (firstChildNode!.previousSibling == afterNode &&
+        firstChildNode!.parentNode == parentNode) {
+      return;
+    }
+
+    web.Node? currentNode = lastChildNode;
+    web.Node? beforeNode = afterNode == null
+        ? parentNode.childNodes.item(0)
+        : afterNode.nextSibling;
+
+    // Move nodes in reverse order for efficient insertion.
+    while (currentNode != null) {
+      final prevNode =
+          currentNode != firstChildNode ? currentNode.previousSibling : null;
+
+      // Attach to new parent
+      parentNode.insertBefore(currentNode, beforeNode);
+
+      beforeNode = currentNode;
+      currentNode = prevNode;
+    }
+
+    assert(firstChildNode!.previousSibling == afterNode,
+        'First child node should have been placed after the specified node.');
+  }
+
+  @override
+  void remove(DomRenderObject child) {
+    if (kVerboseMode) {
+      print("Remove child $child of $this");
+    }
+
+    final parentNode = isAttached ? parent!.node : node;
+    assert(parentNode == child.node.parentNode,
+        'Child node must be a child of this fragment.');
+
+    parentNode.removeChild(child.node);
+    child.parent = null;
   }
 
   @override
   void finalize() {
-    // Fragments operate the hydration nodes of its parent, so we don't want to clear them.
+    assert(node.childNodes.length == 0,
+        'Fragment should be empty after finalization.');
+    isAttached = true;
   }
 }
 
-class RootDomRenderObject extends DomRenderElement {
-  final web.Element container;
-  late final web.Node? beforeStart;
-
-  RootDomRenderObject(this.container, [List<web.Node>? nodes]) {
-    node = container;
-    toHydrate = [...nodes ?? container.childNodes.toIterable()];
+class RootDomRenderObject extends DomRenderObject
+    with HydratableDomRenderObject {
+  RootDomRenderObject(this.node, [List<web.Node>? nodes]) {
+    toHydrate = [...nodes ?? node.childNodes.toIterable()];
     beforeStart = toHydrate.firstOrNull?.previousSibling;
   }
 
@@ -322,8 +462,17 @@ class RootDomRenderObject extends DomRenderElement {
   }
 
   @override
-  void attach(covariant DomRenderObject child, {covariant DomRenderObject? after}) {
-    super.attach(child, after: after?.node != null ? after : (DomRenderElement()..node = beforeStart));
+  final web.Element node;
+  late final web.Node? beforeStart;
+
+  @override
+  void attach(DomRenderObject child, {DomRenderObject? after}) {
+    attachChild(child, after?.node ?? beforeStart);
+  }
+
+  @override
+  void remove(DomRenderObject child) {
+    removeChild(child);
   }
 }
 
@@ -335,7 +484,9 @@ class EventBinding {
   StreamSubscription? subscription;
 
   EventBinding(web.Element element, this.type, this.fn) {
-    subscription = web.EventStreamProvider<web.Event>(type).forElement(element).listen((event) {
+    subscription = web.EventStreamProvider<web.Event>(type)
+        .forElement(element)
+        .listen((event) {
       fn(event);
     });
   }

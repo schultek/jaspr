@@ -18,7 +18,8 @@ class SyncAdapter extends ElementBoundaryAdapter {
     var value = sync.getState();
     if (value == null) return;
     var data = const DomValidator().escapeMarkerText(jsonEncode(value));
-    range.start.insertNext(
-        ChildNodeData(MarkupRenderObject()..updateText('<!--${DomValidator.syncMarkerPrefix}$data-->', true)));
+    range.start.insertNext(ChildNodeData(
+        MarkupRenderText('<!--${DomValidator.syncMarkerPrefix}$data-->')
+          ..rawHtml = true));
   }
 }

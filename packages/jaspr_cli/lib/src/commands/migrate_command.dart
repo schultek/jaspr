@@ -37,8 +37,6 @@ class MigrateCommand extends BaseCommand {
       BuildMethodMigration(),
     ];
 
-    
-
     for (final path in directories) {
       final dir = Directory(path);
       if (!dir.existsSync()) {
@@ -49,25 +47,25 @@ class MigrateCommand extends BaseCommand {
       for (final file in files) {
         final content = file.readAsStringSync();
         try {
-        final result = parseString(content: content);
+          final result = parseString(content: content);
 
-        final builder = MigrationBuilder(result.lineInfo);
+          final builder = MigrationBuilder(result.lineInfo);
 
-        for (final migration in migrations) {
-          migration.runForUnit(result.unit, builder);
-        }
+          for (final migration in migrations) {
+            migration.runForUnit(result.unit, builder);
+          }
 
-        if (builder._changes.isEmpty) {
-          continue;
-        }
+          if (builder._changes.isEmpty) {
+            continue;
+          }
 
-        if (dryRun) {
-          logger.write('${file.path}: ${builder._changes.length} changes');
-        } else {
-          final result = builder._apply(content);
-          file.writeAsStringSync(result);
-          logger.write('${file.path}: ${builder._changes.length} changes applied');
-        }
+          if (dryRun) {
+            logger.write('${file.path}: ${builder._changes.length} changes');
+          } else {
+            final result = builder._apply(content);
+            file.writeAsStringSync(result);
+            logger.write('${file.path}: ${builder._changes.length} changes applied');
+          }
         } catch (e, st) {
           logger.write('Error processing ${file.path}: $e\n$st', level: Level.error);
         }

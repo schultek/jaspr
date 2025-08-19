@@ -14,10 +14,15 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 
   @override
   void applyBoundary(ChildListRange range) {
-    range.start.insertNext(ChildNodeData(MarkupRenderObject()
-      ..updateText('<!--${DomValidator.clientMarkerPrefix}$name${data != null ? ' data=$data' : ''}-->', true)));
-    range.end.insertPrev(
-        ChildNodeData(MarkupRenderObject()..updateText('<!--/${DomValidator.clientMarkerPrefix}$name-->', true)));
+    final startMarker = MarkupRenderText(
+        '<!--${DomValidator.clientMarkerPrefix}$name${data != null ? ' data=$data' : ''}-->')
+      ..rawHtml = true;
+    final endMarker =
+        MarkupRenderText('<!--/${DomValidator.clientMarkerPrefix}$name-->')
+          ..rawHtml = true;
+
+    range.start.insertNext(ChildNodeData(startMarker));
+    range.end.insertPrev(ChildNodeData(endMarker));
   }
 }
 
@@ -61,7 +66,8 @@ class ClientComponentRegistryElement extends ObserverElement {
 
     _clientElements.add(element);
     _clientTargets.add(entry);
-    binding.addRenderAdapter(ClientComponentAdapter(entry.name, entry.dataFor(element.component), element));
+    binding.addRenderAdapter(ClientComponentAdapter(
+        entry.name, entry.dataFor(element.component), element));
   }
 
   @override

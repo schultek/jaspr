@@ -65,9 +65,14 @@ class DomElement extends MultiChildRenderObjectElement {
   }
 
   @override
+  void update(DomComponent newComponent) {
+    assert(component.tag == newComponent.tag, 'Cannot update a DomComponent with a different tag.');
+    super.update(newComponent);
+  }
+
+  @override
   bool shouldRerender(DomComponent newComponent) {
-    return component.tag != newComponent.tag ||
-        component.id != newComponent.id ||
+    return component.id != newComponent.id ||
         component.classes != newComponent.classes ||
         component.styles != newComponent.styles ||
         component.attributes != newComponent.attributes ||
@@ -76,7 +81,7 @@ class DomElement extends MultiChildRenderObjectElement {
 
   @override
   RenderObject createRenderObject() {
-    final renderObject = _parentRenderObjectElement!.renderObject.createChildRenderElement();
+    final renderObject = _parentRenderObjectElement!.renderObject.createChildRenderElement(component.tag);
     assert(renderObject.parent == _parentRenderObjectElement!.renderObject);
     return renderObject;
   }
@@ -86,7 +91,6 @@ class DomElement extends MultiChildRenderObjectElement {
     if (_wrappingElement != null) {
       var wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
       renderObject.update(
-        component.tag,
         component.id ?? wrappingComponent.id,
         _joinString(wrappingComponent.classes, component.classes),
         _joinMap(wrappingComponent.styles?.properties, component.styles?.properties),
@@ -98,7 +102,6 @@ class DomElement extends MultiChildRenderObjectElement {
     }
 
     renderObject.update(
-      component.tag,
       component.id,
       component.classes,
       component.styles?.properties,
@@ -173,19 +176,22 @@ class TextElement extends LeafRenderObjectElement {
   TextElement(Text super.component);
 
   @override
+  Text get component => super.component as Text;
+
+  @override
   bool shouldRerender(Text newComponent) {
-    return (component as Text).text != newComponent.text;
+    return component.text != newComponent.text;
   }
 
   @override
   RenderObject createRenderObject() {
-    final renderObject = _parentRenderObjectElement!.renderObject.createChildRenderText();
+    final renderObject = _parentRenderObjectElement!.renderObject.createChildRenderText(component.text);
     assert(renderObject.parent == _parentRenderObjectElement!.renderObject);
     return renderObject;
   }
 
   @override
   void updateRenderObject(RenderText text) {
-    text.update((component as Text).text);
+    text.update(component.text);
   }
 }

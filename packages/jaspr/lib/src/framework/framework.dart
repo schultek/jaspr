@@ -118,7 +118,14 @@ abstract class Component {
   /// match if they have the same type, even if their children are completely
   /// different.
   static bool canUpdate(Component oldComponent, Component newComponent) {
-    return oldComponent.runtimeType == newComponent.runtimeType && oldComponent.key == newComponent.key;
+    if (oldComponent.runtimeType != newComponent.runtimeType || oldComponent.key != newComponent.key) {
+      return false;
+    }
+    // If the tag is different, then the components are not compatible.
+    if (oldComponent is DomComponent && oldComponent.tag != (newComponent as DomComponent).tag) {
+      return false;
+    }
+    return true;
   }
 }
 

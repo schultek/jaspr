@@ -160,8 +160,10 @@ class BaseDocument extends StatelessComponent implements Document {
         DomComponent(
           tag: 'head',
           children: [
-            if (base != null) DomComponent(tag: 'base', attributes: {'href': _normalizedBase!}),
-            if (charset != null) DomComponent(tag: 'meta', attributes: {'charset': charset!}),
+            if (base != null)
+              DomComponent(tag: 'base', attributes: {'href': _normalizedBase!}),
+            if (charset != null)
+              DomComponent(tag: 'meta', attributes: {'charset': charset!}),
             HeadDocument(
               title: title,
               meta: {
@@ -207,8 +209,10 @@ class _TemplateDocumentElement extends StatelessElement {
 
   @override
   Component build() {
-    (binding as ServerAppBinding).addRenderAdapter(TemplateDocumentAdapter(this));
-    _templateFuture ??= (binding as ServerAppBinding).loadFile('${(component as TemplateDocument).name}.template.html');
+    (binding as ServerAppBinding)
+        .addRenderAdapter(TemplateDocumentAdapter(this));
+    _templateFuture ??= (binding as ServerAppBinding)
+        .loadFile('${(component as TemplateDocument).name}.template.html');
     return super.build();
   }
 }
@@ -233,10 +237,12 @@ class TemplateDocumentAdapter extends ElementBoundaryAdapter {
     var curr = range.start.prev!;
     range.remove();
     var document = parse(template);
-    var target = document.querySelector((element.component as TemplateDocument).attachTo)!;
+    var target = document
+        .querySelector((element.component as TemplateDocument).attachTo)!;
 
     MarkupRenderObject? createTree(dom.Node node) {
-      var n = element.parentRenderObjectElement!.renderObject.createChildRenderObject() as MarkupRenderObject;
+      var n = element.parentRenderObjectElement!.renderObject
+          .createChildRenderObject() as MarkupRenderObject;
 
       if (node is dom.Text) {
         if (node.text.trim().isEmpty) {
@@ -246,7 +252,8 @@ class TemplateDocumentAdapter extends ElementBoundaryAdapter {
       } else if (node is dom.Comment) {
         n.updateText('<!--${node.data}-->', true);
       } else if (node is dom.Element) {
-        n.updateElement(node.localName!, null, null, null, node.attributes.cast(), null);
+        n.updateElement(
+            node.localName!, null, null, null, node.attributes.cast(), null);
       } else if (node is dom.DocumentType) {
         n.updateText(node.toString(), true);
       } else {
@@ -304,7 +311,9 @@ class HeadDocument extends StatelessComponent implements Document {
       children: [
         if (title != null) DomComponent(tag: 'title', children: [Text(title!)]),
         if (meta != null)
-          for (var e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+          for (var e in meta!.entries)
+            DomComponent(
+                tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
         ...?children,
       ],
     );
@@ -344,11 +353,17 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
       entry.attributes.addAll(item.attributes!);
     }
     if (item.children != null) {
-      binding.addRenderAdapter(_AttachChildrenAdapter(adapter, item.target, context as Element));
+      binding.addRenderAdapter(
+          _AttachChildrenAdapter(adapter, item.target, context as Element));
     }
   }
 
-  Map<String, ({Map<String, String> attributes, List<(ChildListRange, int)> children})> entries = {};
+  Map<
+      String,
+      ({
+        Map<String, String> attributes,
+        List<(ChildListRange, int)> children
+      })> entries = {};
 
   @override
   void apply(MarkupRenderObject root) {
@@ -356,9 +371,10 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
 
     String? keyFor(MarkupRenderObject n) {
       return switch (n) {
-        MarkupRenderObject(id: String id) when id.isNotEmpty => id,
-        MarkupRenderObject(tag: "title" || "base") => '__${n.tag}',
-        MarkupRenderObject(tag: "meta", attributes: {'name': String name}) => '__meta:$name',
+        MarkupRenderElement(id: String id) when id.isNotEmpty => id,
+        MarkupRenderElement(tag: "title" || "base") => '__${n.tag}',
+        MarkupRenderElement(tag: "meta", attributes: {'name': String name}) =>
+          '__meta:$name',
         _ => null,
       };
     }
@@ -376,7 +392,8 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
       }
 
       if (value.children.isNotEmpty) {
-        target.children.insertBefore(target.createChildRenderObject()..updateText(r'<!--$-->', true));
+        target.children.insertBefore(
+            target.createChildRenderText(r'<!--$-->')..rawHtml = true);
 
         List<MarkupRenderObject> nodes = [];
         Map<String, (int, int)> indices = {};
@@ -404,7 +421,8 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
           target.children.insertBefore(n);
         }
 
-        target.children.insertBefore(target.createChildRenderObject()..updateText(r'<!--/-->', true));
+        target.children.insertBefore(
+            target.createChildRenderText(r'<!--/-->')..rawHtml = true);
       }
     }
   }
