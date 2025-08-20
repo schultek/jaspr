@@ -9,6 +9,7 @@ enum JasprMode { static, server, client }
 class JasprConfig {
   const JasprConfig({
     required this.pubspecYaml,
+    this.pubspecLock,
     required this.mode,
     this.usesFlutter = false,
     this.usesJasprWebCompilers = false,
@@ -16,6 +17,7 @@ class JasprConfig {
   });
 
   final YamlMap pubspecYaml;
+  final YamlMap? pubspecLock;
   final JasprMode mode;
 
   final bool usesFlutter;
@@ -29,8 +31,10 @@ Future<JasprConfig> getConfig(Logger logger) async {
   var pubspecPath = 'pubspec.yaml';
   var pubspecFile = File(pubspecPath).absolute;
   if (!(await pubspecFile.exists())) {
-    logger.write('Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.',
-        tag: Tag.cli, level: Level.critical);
+    logger.write(
+        'Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.',
+        tag: Tag.cli,
+        level: Level.critical);
     exit(1);
   }
 
@@ -39,8 +43,10 @@ Future<JasprConfig> getConfig(Logger logger) async {
   if (pubspecYaml case {'dependencies': {'jaspr': _}}) {
     // ok
   } else {
-    logger.write('Missing dependency on jaspr in pubspec.yaml file. Make sure to add jaspr to your dependencies.',
-        tag: Tag.cli, level: Level.critical);
+    logger.write(
+        'Missing dependency on jaspr in pubspec.yaml file. Make sure to add jaspr to your dependencies.',
+        tag: Tag.cli,
+        level: Level.critical);
     exit(1);
   }
 
@@ -58,15 +64,19 @@ Future<JasprConfig> getConfig(Logger logger) async {
           'Missing dependency on jaspr_builder package. Do you want to add jaspr_builder to your dev_dependencies now?',
           defaultValue: true);
       if (result) {
-        var result = Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
+        var result =
+            Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
         if (result.exitCode != 0) {
           log.err(result.stderr);
-          logger.write('Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.',
-              tag: Tag.cli, level: Level.critical);
+          logger.write(
+              'Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.',
+              tag: Tag.cli,
+              level: Level.critical);
           exit(1);
         }
 
-        log.success('Successfully added jaspr_builder to your dev_dependencies.');
+        log.success(
+            'Successfully added jaspr_builder to your dev_dependencies.');
       }
     }
   }
@@ -97,7 +107,8 @@ Future<JasprConfig> getConfig(Logger logger) async {
     if (modeYaml == null) {
       throw "'jaspr.mode' option is required but missing.";
     }
-    var modeOrNull = JasprMode.values.where((v) => v.name == modeYaml).firstOrNull;
+    var modeOrNull =
+        JasprMode.values.where((v) => v.name == modeYaml).firstOrNull;
     if (modeOrNull == null) {
       throw "'jaspr.mode' must be one of ${JasprMode.values.map((v) => v.name).join(', ')}.";
     }
@@ -105,7 +116,9 @@ Future<JasprConfig> getConfig(Logger logger) async {
 
     var devCommandYaml = configYaml['dev-command'];
     if (devCommandYaml != null) {
-      if (devCommandYaml is! String) throw "'jaspr.dev-command' must be a string.";
+      if (devCommandYaml is! String) {
+        throw "'jaspr.dev-command' must be a string.";
+      }
 
       devCommand = devCommandYaml;
     }
@@ -113,8 +126,17 @@ Future<JasprConfig> getConfig(Logger logger) async {
     throw 'Invalid jaspr configuration in pubspec.yaml: $e';
   }
 
+  YamlMap? pubspecLock;
+
+  var pubspecLockPath = 'pubspec.lock';
+  var pubspecLockFile = File(pubspecLockPath).absolute;
+  if (pubspecLockFile.existsSync()) {
+    pubspecLock = loadYaml(pubspecLockFile.readAsStringSync()) as YamlMap;
+  }
+
   return JasprConfig(
     pubspecYaml: pubspecYaml,
+    pubspecLock: pubspecLock,
     mode: mode,
     usesFlutter: usesFlutter,
     usesJasprWebCompilers: usesJasprWebCompilers,

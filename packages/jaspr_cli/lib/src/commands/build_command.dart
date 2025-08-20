@@ -94,13 +94,13 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
   @override
   Future<int> runCommand() async {
-    logger.write("Building jaspr for ${config!.mode.name} rendering mode.");
+    logger.write("Building jaspr for ${config.mode.name} rendering mode.");
 
     var dir = Directory('build/jaspr').absolute;
-    var webDir = config!.mode == JasprMode.server ? Directory('build/jaspr/web').absolute : dir;
+    var webDir = config.mode == JasprMode.server ? Directory('build/jaspr/web').absolute : dir;
 
     String? entryPoint;
-    if (config!.mode != JasprMode.client) {
+    if (config.mode != JasprMode.client) {
       entryPoint = await getEntryPoint(argResults!['input']);
     }
 
@@ -114,7 +114,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     var dummyIndex = false;
     var dummyTargetIndex = false;
-    if (config!.usesFlutter && !indexHtml.existsSync()) {
+    if (config.usesFlutter && !indexHtml.existsSync()) {
       dummyIndex = true;
       dummyTargetIndex = true;
       indexHtml
@@ -131,7 +131,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     await webResult;
 
-    if (config!.usesFlutter) {
+    if (config.usesFlutter) {
       flutterResult = buildFlutter(useWasm);
     }
 
@@ -139,7 +139,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     var serverDefines = getServerDartDefines();
 
-    if (config!.mode == JasprMode.server) {
+    if (config.mode == JasprMode.server) {
       logger.write('Building server app...', progress: ProgressState.running);
 
       final target = argResults!['target'];
@@ -165,7 +165,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       );
 
       await watchProcess('server build', process, tag: Tag.cli, progress: 'Building server app...');
-    } else if (config!.mode == JasprMode.static) {
+    } else if (config.mode == JasprMode.static) {
       logger.write('Generating static site...', progress: ProgressState.running);
 
       Map<String, ({String? lastmod, String? changefreq, double? priority})?> generatedRoutes = {};
@@ -369,10 +369,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     logger.write('Building web assets...', progress: ProgressState.running);
 
     final compiler = useWasm ? 'dart2wasm' : 'dart2js';
-    final entrypointBuilder = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint';
+    final entrypointBuilder = '${config.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint';
 
     var dartDefines = getClientDartDefines();
-    if (config!.usesFlutter) {
+    if (config.usesFlutter) {
       dartDefines.addAll(getFlutterDartDefines(useWasm, true));
     }
 
@@ -399,7 +399,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       logger.writeServerLog,
     );
     OutputLocation outputLocation = OutputLocation((b) => b
-      ..output = 'build/jaspr${config!.mode == JasprMode.server ? '/web' : ''}'
+      ..output = 'build/jaspr${config.mode == JasprMode.server ? '/web' : ''}'
       ..useSymlinks = false
       ..hoist = true);
 
