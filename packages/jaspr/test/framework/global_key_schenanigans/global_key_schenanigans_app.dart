@@ -7,15 +7,17 @@ class App extends TestComponent<int> {
   App() : super(initialValue: 1);
 
   @override
-  Iterable<Component> build(BuildContext context, int phase) sync* {
+  Component build(BuildContext context, int phase) {
     if (phase == 1) {
-      yield Child(key: GlobalObjectKey('test'));
+      return Child(key: GlobalObjectKey('test'));
     } else if (phase == 2) {
-      yield div([
+      return div([
         Child(
           key: GlobalObjectKey('test'),
         ),
       ]);
+    } else {
+      return text('');
     }
   }
 }
@@ -29,8 +31,10 @@ class Child extends StatefulComponent {
 
 class ChildState extends State<Child> with TrackStateLifecycle<Child> {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield* super.build(context);
-    yield Text('Child');
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      super.build(context),
+      Text('Child'),
+    ]);
   }
 }

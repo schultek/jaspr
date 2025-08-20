@@ -34,8 +34,8 @@ class App extends StatelessComponent {
   const App({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield /* ... */;
+  Component build(BuildContext context) {
+    return /* ... */;
   }
 }
 ```
@@ -96,9 +96,9 @@ class InheritedStateContainer extends InheritedComponent {
 class MyClientComponent extends StatelessComponent {
 
   @override
-  Iterable<Component> build(context) sync* {
+  Component build(context) {
     // Inject the shared container at the root of each client component tree.
-    yield InheritedStateContainer(
+    return InheritedStateContainer(
       container: _container,
       child: /* ... */,
     );
@@ -117,9 +117,9 @@ final _container = ProviderContainer();
 class MyClientComponent extends StatelessComponent {
 
   @override
-  Iterable<Component> build(context) sync* {
+  Component build(context) {
     // Use the shared container for the provider scope.
-    yield ProviderScope(
+    return ProviderScope(
       container: _container,
       child: /* ... */,
     );

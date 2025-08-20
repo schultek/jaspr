@@ -11,7 +11,7 @@ import 'counter.dart';
 @client
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield ProviderScope(child: Counter());
+  Component build(BuildContext context) {
+    return ProviderScope(child: Counter());
   }
 }

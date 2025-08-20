@@ -51,8 +51,8 @@ class OverlayState extends State<Overlay> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'blur-backdrop', events: events(onClick: () {
+  Component build(BuildContext context) {
+    return div(classes: 'blur-backdrop', events: events(onClick: () {
       showRandomImage();
     }), [
       img(src: 'images/jasper_resized/$currentImage.webp', alt: 'Jasper'),

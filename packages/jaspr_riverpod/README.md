@@ -25,7 +25,8 @@ As an example, this (in Flutter):
 // (Flutter)
 // need to extend custom ConsumerWidget
 class MyWidget extends ConsumerWidget {
-  // need to accept custom WidgetRef
+
+  @override    // need to accept custom WidgetRef
   Widget build(BuildContext context, WidgetRef ref) {
     // uses ref to access providers
     var value = ref.watch(myProvider);
@@ -40,11 +41,12 @@ is equivalent to this (in Jaspr)
 // (Jaspr)
 // just extends the normal component
 class MyComponent extends StatelessComponent {
-  // no extra parameter
-  Iterable<Component> build(BuildContext context) sync* {
+ 
+  @override       // no extra ref parameter
+  Component build(BuildContext context) {
     // uses context to access providers
     var value = context.watch(myProvider);
-    yield Text(value);
+    return Text(value);
   }
 }
 ```
@@ -65,9 +67,9 @@ give you a new context which you can call `context.watch` on:
 
 ```dart
 Builder(
-  builder: (context) sync* {
+  builder: (context) {
     var value = context.watch(...);
-    yield ...;
+    return ...;
   },
 );
 ```

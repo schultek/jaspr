@@ -10,8 +10,8 @@ class DevExp extends StatelessComponent {
   const DevExp({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section(id: 'devex', [
+  Component build(BuildContext context) {
+    return section(id: 'devex', [
       span(classes: 'caption text-gradient', [text('Developer Experience')]),
       h2([text('The productivity of Dart'), br(), text('brought to the Web')]),
       div(classes: 'devex-grid', [

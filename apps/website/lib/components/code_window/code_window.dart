@@ -27,8 +27,8 @@ class CodeWindow extends StatelessComponent {
   final Map<int, String> lineClasses;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'code-window ${framed ? 'framed' : ''}', [
+  Component build(BuildContext context) {
+    return div(classes: 'code-window ${framed ? 'framed' : ''}', [
       div(classes: 'code-window-header', [
         div(classes: 'code-window-tab', [
           if (name.endsWith('.dart')) Icon('dart'),

@@ -11,8 +11,8 @@ class App extends TestComponent<int> {
   final child = div([MyChildComponent()]);
 
   @override
-  Iterable<Component> build(BuildContext context, int counter) sync* {
-    yield MyInheritedComponent(
+  Component build(BuildContext context, int counter) {
+    return MyInheritedComponent(
       value: counter,
       child: child,
     );
@@ -45,8 +45,10 @@ class MyChildState extends State<MyChildComponent> with TrackStateLifecycle<MyCh
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield* super.build(context);
-    yield Text('Inherited value: $inheritedValue');
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      super.build(context),
+      Text('Inherited value: $inheritedValue'),
+    ]);
   }
 }

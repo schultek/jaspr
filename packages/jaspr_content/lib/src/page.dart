@@ -122,7 +122,7 @@ class Page {
   Future<Component> render() async {
     parseFrontmatter();
     await loadData();
-    return AsyncBuilder(builder: (context) async* {
+    return AsyncBuilder(builder: (context) async {
       await renderTemplate(context.pages);
 
       if (kGenerateMode) {
@@ -132,24 +132,23 @@ class Page {
       }
 
       if (InheritedSecondaryOutput.of(context) case final secondaryOutput?) {
-        yield secondaryOutput.builder(this);
-        return;
+        return secondaryOutput.builder(this);
       }
 
       if (config.rawOutputPattern?.matchAsPrefix(path) != null) {
         context.setHeader('Content-Type', getContentType());
         context.setStatusCode(200, responseBody: content);
-        return;
+        return Fragment(children: []);
       }
 
-      yield await build();
+      return await build();
     });
   }
 
   Future<Component> build() async {
     var nodes = parseNodes();
     nodes = await applyExtensions(nodes);
-    final component = Content(NodesBuilder(config.components).build(nodes) ?? const Text(''));
+    final component = Content(NodesBuilder(config.components).build(nodes));
     final layout = buildLayout(component);
     return wrapTheme(layout);
   }
@@ -370,7 +369,7 @@ extension PageContext on BuildContext {
 }
 
 class _InheritedPage extends InheritedComponent {
-  _InheritedPage({required this.page, required this.pages, super.child});
+  _InheritedPage({required this.page, required this.pages, required super.child});
 
   final Page page;
   final List<Page> pages;

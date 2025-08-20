@@ -7,8 +7,8 @@ class Page extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
+  Component build(BuildContext context) {
+    return div(
       styles: Styles(overflow: overflow),
       children,
     );
@@ -21,8 +21,8 @@ class Center extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
+  Component build(BuildContext context) {
+    return div(
       styles: Styles(
         display: Display.flex,
         justifyContent: JustifyContent.center,
@@ -40,8 +40,8 @@ class Spacer extends StatelessComponent {
   final Unit? height;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(styles: Styles(width: width, height: height), []);
+  Component build(BuildContext context) {
+    return div(styles: Styles(width: width, height: height), []);
   }
 }
 
@@ -56,8 +56,8 @@ class Padding extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(styles: Styles(padding: padding), children);
+  Component build(BuildContext context) {
+    return div(styles: Styles(padding: padding), children);
   }
 }
 
@@ -86,8 +86,8 @@ class Container extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
+  Component build(BuildContext context) {
+    return div(
       styles: Styles.combine([
         Styles(
           width: width,
@@ -123,8 +123,8 @@ class Column extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
+  Component build(BuildContext context) {
+    return div(
       styles: Styles(
         display: Display.flex,
         flexDirection: FlexDirection.column,
@@ -150,8 +150,8 @@ class Row extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
+  Component build(BuildContext context) {
+    return div(
       styles: Styles(
         display: Display.flex,
         flexDirection: FlexDirection.row,
@@ -178,8 +178,8 @@ class Grid extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
+  Component build(BuildContext context) {
+    return div(
       styles: Styles(raw: {
         "display": "grid",
         "grid-template-columns": "repeat($columns, ${spread ? "1fr" : "0fr"})",

@@ -28,10 +28,10 @@ void main() {
 
     test('renders component with headers', () async {
       var result = await renderComponent(
-        Builder(builder: (context) sync* {
+        Builder(builder: (context) {
           var value = context.headers['x-test'];
           context.setHeader('x-test2', 'xyz');
-          yield div(id: 'test', [text(value ?? '')]);
+          return div(id: 'test', [text(value ?? '')]);
         }),
         request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'x-test': 'abc'}),
         standalone: true,
@@ -50,10 +50,10 @@ void main() {
 
     test('renders component with cookies', () async {
       var result = await renderComponent(
-        Builder(builder: (context) sync* {
+        Builder(builder: (context) {
           var value = context.cookies['test'];
           context.setCookie('test2', 'xyz');
-          yield div(id: 'test', [text(value ?? '')]);
+          return div(id: 'test', [text(value ?? '')]);
         }),
         request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'cookie': 'test=abc'}),
         standalone: true,

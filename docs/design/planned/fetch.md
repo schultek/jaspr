@@ -38,10 +38,10 @@ Future<void> addNewUser(UserRequest request) async {
 
 class App extends StatelessComponent {
 
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Loader<List<User>>(
+  Component build(BuildContext context) {
+    return Loader<List<User>>(
       route: '/users',
-      builder: (BuildContext context, AsyncValue<List<User>> userState) sync* {
+      builder: (BuildContext context, AsyncValue<List<User>> userState) {
         // ...
         // Handler.trigger('/users/new', UserRequest.new(...))
       },

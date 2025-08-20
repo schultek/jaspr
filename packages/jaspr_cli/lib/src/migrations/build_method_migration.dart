@@ -1,9 +1,10 @@
 import 'dart:math';
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:io/ansi.dart';
 
-import '../commands/migrate_command.dart';
+import 'migration_models.dart';
 
 class BuildMethodMigration implements Migration {
   @override
@@ -12,8 +13,7 @@ class BuildMethodMigration implements Migration {
   @override
   String get name => 'build_method_migration';
   @override
-  String get description =>
-      'Migrates the build() to return a single child instead of using the sync* / yield syntax.';
+  String get description => 'Migrates the build() to return a single child instead of using the sync* / yield syntax.';
 
   @override
   String get hint {
@@ -23,13 +23,13 @@ class BuildMethodMigration implements Migration {
 
   bool _isBuildableClass(ClassDeclaration declaration) {
     final superName = declaration.extendsClause?.superclass.name.lexeme;
-    return superName == 'StatelessComponent' ||
-        superName == 'AsyncStatelessComponents' ||
-        superName == 'State';
+    return superName == 'StatelessComponent' || superName == 'AsyncStatelessComponent' || superName == 'State';
   }
 
   bool _isBuildMethod(MethodDeclaration method) {
-    return method.name.lexeme == 'build';
+    return method.name.lexeme == 'build' &&
+        (method.returnType?.toSource() == 'Iterable<Component>' ||
+            method.returnType?.toSource() == 'Stream<Component>');
   }
 
   @override
@@ -52,8 +52,7 @@ class BuildMethodMigration implements Migration {
     }
   }
 
-  void _migrateBuildMethod(
-      MethodDeclaration node, String className, MigrationReporter reporter) {
+  void _migrateBuildMethod(MethodDeclaration node, String className, MigrationReporter reporter) {
     if (node.body.keyword == null) {
       reporter.reportManualMigrationNeeded(node.offset, node.length,
           'Cannot migrate $className.build(): Only build methods using sync* or async* can be migrated automatically');
@@ -65,73 +64,53 @@ class BuildMethodMigration implements Migration {
       return;
     }
 
-    final keyword = node.body.keyword!;
-    final body = node.body as BlockFunctionBody;
-
-    bool isReturningStatement(Statement s) {
-      if (s is YieldStatement) return true;
-      if (s is ReturnStatement) return true;
-      if (s is Block) return s.statements.any(isReturningStatement);
-      if (s is ForStatement) return isReturningStatement(s.body);
-      if (s is IfStatement) {
-        if (isReturningStatement(s.thenStatement)) return true;
-        if (s.elseStatement != null && isReturningStatement(s.elseStatement!)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    final firstReturningStatement =
-        body.block.statements.indexWhere(isReturningStatement);
+    final firstReturningStatement = (node.body as BlockFunctionBody).block.statements.indexWhere(_isReturningStatement);
     if (firstReturningStatement == -1) {
       reporter.reportManualMigrationNeeded(node.offset, node.length,
           'Cannot migrate $className.build(): No "yield" statement found, please migrate manually');
       return;
     }
 
-    final toMigrate = body.block.statements.sublist(firstReturningStatement);
-
-    bool canMigrate(Statement s) {
-      return s is YieldStatement ||
-          (s is Block && s.statements.every(canMigrate)) ||
-          (s is ForStatement && canMigrate(s.body)) ||
-          (s is IfStatement &&
-              canMigrate(s.thenStatement) &&
-              (s.elseStatement == null || canMigrate(s.elseStatement!)));
-    }
-
-    if (!toMigrate.every(canMigrate)) {
-      reporter.reportManualMigrationNeeded(node.offset, node.length,
-          'Cannot migrate $className.build(): Too complex build method, please migrate manually');
-      return;
-    }
-
-    reporter.createMigration('Migrated build() method of $className class',
-        (builder) {
+    reporter.createMigration('Migrated build() method of $className class', (builder) {
       if (node.returnType case final returnType?) {
         if (returnType.toSource() == 'Iterable<Component>') {
           builder.replace(returnType.offset, returnType.length, 'Component');
         } else if (returnType.toSource() == 'Stream<Component>') {
-          builder.replace(
-              returnType.offset, returnType.length, 'Future<Component>');
+          builder.replace(returnType.offset, returnType.length, 'Future<Component>');
         }
       }
 
-      if (keyword.lexeme == 'sync') {
-        builder.delete(keyword.offset, keyword.length);
-      }
+      _migrateFunctionBody(node.body, builder);
+    });
+  }
 
-      if (body.star != null) {
-        final end = body.star!.next?.offset ?? body.star!.end;
-        builder.delete(body.star!.offset, end - body.star!.offset);
-      }
+  void _migrateFunctionBody(FunctionBody node, MigrationBuilder builder) {
+    final keyword = node.keyword;
+    if (keyword == null || node is! BlockFunctionBody) {
+      return;
+    }
 
+    final firstReturningStatement = node.block.statements.indexWhere(_isReturningStatement);
+    if (firstReturningStatement == -1) {
+      return;
+    }
+
+    final toMigrate = node.block.statements.sublist(firstReturningStatement);
+
+    if (keyword.lexeme == 'sync') {
+      builder.delete(keyword.offset, keyword.length);
+    }
+
+    if (node.star != null) {
+      final end = node.star!.next?.offset ?? node.star!.end;
+      builder.delete(node.star!.offset, end - node.star!.offset);
+    }
+
+    if (toMigrate.every(_canMigrateDeclaratively)) {
       int getChildCount(Statement s) {
         if (s is YieldStatement) return s.star == null ? 1 : 2;
         if (s is Block) {
-          return s.statements
-              .fold(0, (count, child) => count + getChildCount(child));
+          return s.statements.fold(0, (count, child) => count + getChildCount(child));
         }
         if (s is ForStatement) return 2;
         if (s is IfStatement) {
@@ -144,12 +123,10 @@ class BuildMethodMigration implements Migration {
         return 0;
       }
 
-      if (toMigrate.fold(0, (count, child) => count + getChildCount(child)) ==
-          1) {
+      if (toMigrate.fold(0, (count, child) => count + getChildCount(child)) == 1) {
         void replaceYieldWithReturn(Statement s) {
           if (s is YieldStatement) {
-            builder.replace(
-                s.yieldKeyword.offset, s.yieldKeyword.length, 'return');
+            builder.replace(s.yieldKeyword.offset, s.yieldKeyword.length, 'return');
           } else if (s is Block) {
             for (var child in s.statements) {
               replaceYieldWithReturn(child);
@@ -166,10 +143,8 @@ class BuildMethodMigration implements Migration {
 
         toMigrate.forEach(replaceYieldWithReturn);
       } else {
-        builder.insert(
-            toMigrate.first.offset, 'return Fragment(children: [\n      ');
-        builder.indent(toMigrate.first.offset,
-            toMigrate.last.end - toMigrate.first.offset, '  ');
+        builder.insert(toMigrate.first.offset, 'return Fragment(children: [\n      ');
+        builder.indent(toMigrate.first.offset, toMigrate.last.end - toMigrate.first.offset, '  ');
 
         void replaceStatementWithElement(Statement s, [bool addComma = true]) {
           if (s is YieldStatement) {
@@ -187,15 +162,13 @@ class BuildMethodMigration implements Migration {
           } else if (s is Block) {
             builder.delete(s.leftBracket.offset, s.leftBracket.length);
             for (var child in s.statements) {
-              replaceStatementWithElement(
-                  child, addComma ? true : child != s.statements.last);
+              replaceStatementWithElement(child, addComma ? true : child != s.statements.last);
             }
             builder.delete(s.rightBracket.offset, s.rightBracket.length);
           } else if (s is ForStatement) {
             replaceStatementWithElement(s.body, addComma);
           } else if (s is IfStatement) {
-            replaceStatementWithElement(
-                s.thenStatement, s.elseStatement == null);
+            replaceStatementWithElement(s.thenStatement, s.elseStatement == null);
             if (s.elseStatement != null) {
               replaceStatementWithElement(s.elseStatement!, addComma);
             }
@@ -205,6 +178,126 @@ class BuildMethodMigration implements Migration {
         toMigrate.forEach(replaceStatementWithElement);
         builder.insert(toMigrate.last.end, '\n    ]);');
       }
-    });
+    } else {
+      final inset = builder.getLineIndent(toMigrate.first);
+      builder.insert(toMigrate.first.offset, 'final children = <Component>[];\n${''.padLeft(inset)}');
+
+      void replaceYieldAndReturnWithChildren(Statement s) {
+        if (s is YieldStatement) {
+          final start = s.yieldKeyword.offset;
+          if (s.star != null) {
+            final end = s.star!.next?.offset ?? s.star!.end;
+            builder.replace(start, end - start, 'children.addAll(');
+          } else {
+            final end = s.yieldKeyword.next?.offset ?? s.yieldKeyword.end;
+            builder.replace(start, end - start, 'children.add(');
+          }
+          builder.insert(s.semicolon.offset, ')');
+        } else if (s is ReturnStatement) {
+          builder.insert(s.semicolon.offset, ' Fragment(children: children)');
+        } else if (s is Block) {
+          for (var child in s.statements) {
+            replaceYieldAndReturnWithChildren(child);
+          }
+        } else if (s is ForStatement) {
+          replaceYieldAndReturnWithChildren(s.body);
+        } else if (s is IfStatement) {
+          replaceYieldAndReturnWithChildren(s.thenStatement);
+          if (s.elseStatement != null) {
+            replaceYieldAndReturnWithChildren(s.elseStatement!);
+          }
+        }
+      }
+
+      toMigrate.forEach(replaceYieldAndReturnWithChildren);
+
+      if (toMigrate.last is! ReturnStatement) {
+        final inset = builder.getLineIndent(toMigrate.last);
+        builder.insert(toMigrate.last.end, '\n${''.padLeft(inset)}return Fragment(children: children);');
+      }
+    }
+
+    node.visitChildren(BuilderVisitor(onBuilderFunction: (node) {
+      _migrateFunctionBody(node, builder);
+    }, onSingleBuilder: (node) {
+      builder.delete(node.operator!.offset, node.operator!.length + node.methodName.length);
+    }));
+  }
+
+  bool _isReturningStatement(Statement s) {
+    if (s is YieldStatement) return true;
+    if (s is ReturnStatement) return true;
+    if (s is Block) return s.statements.any(_isReturningStatement);
+    if (s is ForStatement) return _isReturningStatement(s.body);
+    if (s is IfStatement) {
+      if (_isReturningStatement(s.thenStatement)) return true;
+      if (s.elseStatement != null && _isReturningStatement(s.elseStatement!)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool _canMigrateDeclaratively(Statement s) {
+    return s is YieldStatement ||
+        (s is Block && s.statements.every(_canMigrateDeclaratively)) ||
+        (s is ForStatement && _canMigrateDeclaratively(s.body)) ||
+        (s is IfStatement &&
+            _canMigrateDeclaratively(s.thenStatement) &&
+            (s.elseStatement == null || _canMigrateDeclaratively(s.elseStatement!)));
+  }
+}
+
+class BuilderVisitor extends RecursiveAstVisitor<void> {
+  BuilderVisitor({
+    required this.onBuilderFunction,
+    required this.onSingleBuilder,
+  });
+
+  final void Function(FunctionBody) onBuilderFunction;
+  final void Function(MethodInvocation) onSingleBuilder;
+
+  @override
+  void visitBlockFunctionBody(BlockFunctionBody node) {
+    if (node.parent
+        case FunctionExpression(
+          parent: NamedExpression(
+            name: Label(label: SimpleIdentifier(name: 'builder')),
+            parent: ArgumentList(
+              parent: MethodInvocation(
+                methodName: SimpleIdentifier(
+                  name: 'Builder' ||
+                      'StatefulBuilder' ||
+                      'AsyncBuilder' ||
+                      'ListenableBuilder' ||
+                      'StreamBuilder' ||
+                      'FutureBuilder'
+                )
+              )
+            )
+          )
+        )) {
+      onBuilderFunction(node);
+      return;
+    }
+
+    if (node.parent
+        case FunctionExpression(
+          parent: NamedExpression(
+            name: Label(label: SimpleIdentifier(name: 'builder')),
+            parent: ArgumentList(parent: MethodInvocation m)
+          )
+        )) {
+      if (m
+          case MethodInvocation(
+            methodName: SimpleIdentifier(name: 'single'),
+            target: SimpleIdentifier(name: 'Builder')
+          )) {
+        onSingleBuilder(m);
+        return;
+      }
+    }
+
+    super.visitBlockFunctionBody(node);
   }
 }

@@ -3,8 +3,8 @@ import 'package:jaspr_router/jaspr_router.dart';
 
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Router(
+  Component build(BuildContext context) {
+    return Router(
       routes: [
         Route(path: '/', builder: (_, __) => Home()),
         Route(path: '/about', builder: (_, __) => About()),
@@ -18,12 +18,12 @@ class App extends StatelessComponent {
 
 class Home extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     shouldThrow(() => Router.of(context).push('/'));
     shouldThrow(() => Router.of(context).replace('/'));
     shouldThrow(() => Router.of(context).back());
 
-    yield span([text('Home')]);
+    return span([text('Home')]);
   }
 
   void shouldThrow(Function fn) async {
@@ -39,14 +39,14 @@ class Home extends StatelessComponent {
 
 class About extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield span([text('About')]);
+  Component build(BuildContext context) {
+    return span([text('About')]);
   }
 }
 
 class Contact extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield span([text('Contact')]);
+  Component build(BuildContext context) {
+    return span([text('Contact')]);
   }
 }

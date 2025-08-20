@@ -19,8 +19,8 @@ class _CodeBlockCopyButtonState extends State<CodeBlockCopyButton> {
   bool copied = false;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield button(events: {
+  Component build(BuildContext context) {
+    return button(events: {
       'click': (event) {
         final target = event.currentTarget as web.Element;
         final content = target.parentElement?.querySelector('pre code')?.textContent;

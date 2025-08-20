@@ -11,7 +11,8 @@ final syncInvalidTypeSources = {
       @sync
       DateTime time;
     
-      Iterable<Component> build(BuildContext context) => [];
+      @override
+      Component build(BuildContext context) => text('');
     }
   ''',
 };
@@ -29,7 +30,8 @@ final syncInvalidMapSources = {
       @sync
       Map<int, int> a = {};
     
-      Iterable<Component> build(BuildContext context) => [];
+      @override
+      Component build(BuildContext context) => text('');
     }
   ''',
 };

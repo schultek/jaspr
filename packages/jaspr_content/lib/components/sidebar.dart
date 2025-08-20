@@ -49,30 +49,31 @@ class Sidebar extends StatelessComponent {
   final List<SidebarGroup> groups;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     final currentRoute = this.currentRoute ?? context.page.url;
 
-    yield Document.head(children: [
-      Style(styles: _styles),
-    ]);
-
-    yield nav(classes: 'sidebar', [
-      button(classes: 'sidebar-close', [
-        const CloseIcon(size: 20),
+    return Fragment(children: [
+      Document.head(children: [
+        Style(styles: _styles),
       ]),
-      div([
-        for (final group in groups)
-          div(classes: 'sidebar-group', [
-            if (group.title case final groupTitle?) h3([text(groupTitle)]),
-            ul([
-              for (final item in group.links)
-                li([
-                  div(classes: currentRoute == item.href ? 'active' : null, [
-                    a(href: item.href, [text(item.text)]),
+      nav(classes: 'sidebar', [
+        button(classes: 'sidebar-close', [
+          const CloseIcon(size: 20),
+        ]),
+        div([
+          for (final group in groups)
+            div(classes: 'sidebar-group', [
+              if (group.title case final groupTitle?) h3([text(groupTitle)]),
+              ul([
+                for (final item in group.links)
+                  li([
+                    div(classes: currentRoute == item.href ? 'active' : null, [
+                      a(href: item.href, [text(item.text)]),
+                    ]),
                   ]),
-                ]),
+              ]),
             ]),
-          ]),
+        ]),
       ]),
     ]);
   }

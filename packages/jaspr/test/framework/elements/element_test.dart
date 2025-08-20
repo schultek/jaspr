@@ -17,13 +17,12 @@ void main() {
       ]);
       tester.pumpComponent(component);
 
-      final render =
-          find.byComponent(component).evaluate().first.lastRenderObjectElement?.renderObject as TestRenderObject;
+      final render = find.byComponent(component).evaluate().first.slot.target?.renderObject as TestRenderElement;
       expect(render.tag, equals('div'));
       expect(render.children.length, equals(3));
-      expect(render.children[0].text, equals('A'));
-      expect(render.children[1].text, equals('B'));
-      expect(render.children[2].text, equals('C'));
+      expect(render.children[0], isA<TestRenderText>().having((e) => e.text, 'text', equals('A')));
+      expect(render.children[1], isA<TestRenderText>().having((e) => e.text, 'text', equals('B')));
+      expect(render.children[2], isA<TestRenderText>().having((e) => e.text, 'text', equals('C')));
     });
   });
 }

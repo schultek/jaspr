@@ -37,7 +37,7 @@ abstract class TestComponent<T> extends StatefulComponent {
   final T initialValue;
 
   @protected
-  Iterable<Component> build(BuildContext context, T value);
+  Component build(BuildContext context, T value);
 
   @override
   State<StatefulComponent> createState() => TestState();
@@ -53,7 +53,7 @@ class TestState<T> extends State<TestComponent> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield* component.build(context, value);
+  Component build(BuildContext context) {
+    return component.build(context, value);
   }
 }

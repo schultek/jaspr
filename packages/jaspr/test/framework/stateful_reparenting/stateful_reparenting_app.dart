@@ -9,8 +9,8 @@ class App extends TestComponent<int> {
   App() : super(initialValue: 1);
 
   @override
-  Iterable<Component> build(BuildContext context, int phase) sync* {
-    yield InheritedData(
+  Component build(BuildContext context, int phase) {
+    return InheritedData(
       child: Home(phase),
     );
   }
@@ -22,13 +22,15 @@ class Home extends StatelessComponent {
   final int phase;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     if (phase == 1) {
-      yield MyStatefulComponent(key: myKey);
+      return MyStatefulComponent(key: myKey);
     } else if (phase == 2) {
-      yield div([
+      return div([
         MyStatefulComponent(key: myKey),
       ]);
+    } else {
+      return text('');
     }
   }
 }
@@ -50,7 +52,7 @@ class MyStatefulComponent extends StatefulComponent {
 
 class MyState extends State<MyStatefulComponent> with TrackStateLifecycle<MyStatefulComponent> {
   @override
-  Iterable<Component> build(BuildContext context) {
+  Component build(BuildContext context) {
     context.dependOnInheritedComponentOfExactType<InheritedData>();
     return super.build(context);
   }

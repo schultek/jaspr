@@ -29,6 +29,7 @@ abstract class BaseCommand extends Command<int> {
   late final bool verbose = argResults?['verbose'] as bool? ?? false;
 
   final bool requiresPubspec = true;
+  final bool preferBuilderDependency = true;
   JasprConfig get config => _config!;
   JasprConfig? _config;
 

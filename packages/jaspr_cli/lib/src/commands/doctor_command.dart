@@ -19,6 +19,9 @@ class DoctorCommand extends BaseCommand {
   String get category => 'Tooling';
 
   @override
+  bool get preferBuilderDependency => false;
+
+  @override
   Future<int> runCommand() async {
     var sections = <DoctorSection>[];
 

@@ -10,52 +10,55 @@ class App extends TestComponent<int> {
   final child3Key = GlobalObjectKey(3);
 
   @override
-  Iterable<Component> build(BuildContext context, int phase) sync* {
+  Component build(BuildContext context, int phase) {
     if (phase == 1) {
-      yield ChildComponent(
-        key: child1Key,
-        num: 1,
-      );
-
-      yield ChildComponent(
-        key: child2Key,
-        num: 2,
-      );
-
-      yield ChildComponent(
-        key: child3Key,
-        num: 3,
-      );
+      return Fragment(children: [
+        ChildComponent(
+          key: child1Key,
+          num: 1,
+        ),
+        ChildComponent(
+          key: child2Key,
+          num: 2,
+        ),
+        ChildComponent(
+          key: child3Key,
+          num: 3,
+        ),
+      ]);
     } else if (phase == 2) {
-      yield ChildComponent(
-        key: child2Key,
-        num: 2,
-      );
+      return Fragment(children: [
+        ChildComponent(
+          key: child2Key,
+          num: 2,
+        )
+      ]);
     } else if (phase == 3) {
-      yield ChildComponent(
-        key: child3Key,
-        num: 3,
-      );
-
-      yield ChildComponent(
-        key: child2Key,
-        num: 2,
-      );
+      return Fragment(children: [
+        ChildComponent(
+          key: child3Key,
+          num: 3,
+        ),
+        ChildComponent(
+          key: child2Key,
+          num: 2,
+        ),
+      ]);
     } else {
-      yield ChildComponent(
-        key: child1Key,
-        num: 1,
-      );
-
-      yield ChildComponent(
-        key: child3Key,
-        num: 3,
-      );
-
-      yield ChildComponent(
-        key: child2Key,
-        num: 2,
-      );
+      return Fragment(children: [
+        ChildComponent(
+          key: child1Key,
+          num: 1,
+        ),
+        ChildComponent(
+          key: child3Key,
+          num: 3,
+        ),
+        ChildComponent(
+          key: child2Key,
+          num: 2,
+        ),
+      ]);
     }
   }
 }
@@ -84,5 +87,5 @@ class ChildElement extends BuildableElement {
   }
 
   @override
-  Iterable<Component> build() => [Text('Child ${component.num}')];
+  Component build() => Text('Child ${component.num}');
 }

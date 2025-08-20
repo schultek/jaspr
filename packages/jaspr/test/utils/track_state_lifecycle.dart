@@ -35,8 +35,9 @@ mixin TrackStateLifecycle<T extends StatefulComponent> on State<T> {
 
   @override
   @mustCallSuper
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     lifecycle.add('build');
+    return Text('');
   }
 
   @override

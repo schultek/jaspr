@@ -117,9 +117,7 @@ abstract class RouteLoaderBase implements RouteLoader {
       if (_eager) {
         source.load();
       }
-      final pageBuilder = AsyncBuilder(
-        builder: (context) => Stream.fromFuture(source.load()),
-      );
+      final pageBuilder = AsyncBuilder(builder: (_) => source.load());
 
       routes.add(Route(
         path: source.url,

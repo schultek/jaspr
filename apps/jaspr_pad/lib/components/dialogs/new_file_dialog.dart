@@ -42,8 +42,8 @@ class NewFileDialogState extends State<NewFileDialog> {
   );
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Dialog(
+  Component build(BuildContext context) {
+    return Dialog(
       title: 'New File',
       content: textField,
       actions: [

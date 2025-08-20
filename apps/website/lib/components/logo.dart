@@ -5,8 +5,8 @@ class Logo extends StatelessComponent {
   const Logo({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield a(href: '/', classes: "logo", [
+  Component build(BuildContext context) {
+    return a(href: '/', classes: "logo", [
       img(src: 'images/logo.svg', alt: 'logo', height: 40),
       span([text('Jaspr')]),
     ]);

@@ -27,9 +27,9 @@ class App extends TestComponent<MyDto> {
   static final componentKey = Key('App');
 
   @override
-  Iterable<Component> build(BuildContext context, MyDto dto) sync* {
+  Component build(BuildContext context, MyDto dto) {
     buildCalledFor.add(componentKey);
-    yield ABModel(
+    return ABModel(
       a: dto.a,
       b: dto.b,
       child: child,
@@ -75,10 +75,12 @@ class ExampleComponent extends StatelessComponent {
   const ExampleComponent({super.key});
   static final componentKey = Key('ExampleComponent');
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     buildCalledFor.add(componentKey);
-    yield AComponent();
-    yield BComponent();
+    return Fragment(children: [
+      AComponent(),
+      BComponent(),
+    ]);
   }
 }
 
@@ -87,10 +89,10 @@ class AComponent extends StatelessComponent {
   static final componentKey = Key('AComponent');
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     buildCalledFor.add(componentKey);
     final value = ABModel.aOf(context);
-    yield Text('A: $value');
+    return Text('A: $value');
   }
 }
 
@@ -99,10 +101,10 @@ class BComponent extends StatelessComponent {
   static final componentKey = Key('BComponent');
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     buildCalledFor.add(componentKey);
 
     final value = ABModel.bOf(context);
-    yield Text('B: $value');
+    return Text('B: $value');
   }
 }

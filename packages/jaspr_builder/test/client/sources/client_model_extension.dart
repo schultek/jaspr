@@ -16,7 +16,7 @@ final clientModelExtensionSources = {
       final ModelB b;
     
       @override
-      Iterable<Component> build(BuildContext context) => [];
+      Component build(BuildContext context) => text('');
     }
   ''',
   ...modelExtensionSources,

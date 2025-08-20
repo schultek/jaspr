@@ -10,8 +10,8 @@ class NavBar extends StatelessComponent {
   final NavbarMenu? menu;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield nav(
+  Component build(BuildContext context) {
+    return nav(
       classes: 'navbar block',
       [
         if (brand != null) brand!,
@@ -27,8 +27,8 @@ class NavbarBrand extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'navbar-brand', children);
+  Component build(BuildContext context) {
+    return div(classes: 'navbar-brand', children);
   }
 }
 
@@ -39,8 +39,8 @@ class NavbarBurger extends StatelessComponent {
   final void Function() onToggle;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield button(
+  Component build(BuildContext context) {
+    return button(
       classes: "navbar-burger${isActive ? ' is-active' : ''}",
       attributes: {"role": "button", "data-target": "navMenu"},
       events: events(onClick: () {
@@ -63,8 +63,8 @@ class NavbarMenu extends StatelessComponent {
   final List<Component> endItems;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'navbar-menu${isActive ? ' is-active' : ''}', [
+  Component build(BuildContext context) {
+    return div(classes: 'navbar-menu${isActive ? ' is-active' : ''}', [
       div(classes: 'navbar-start', items),
       div(classes: 'navbar-end', endItems),
     ]);
@@ -81,11 +81,11 @@ class NavbarItem extends StatelessComponent {
   final List<Component>? items;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     if (items == null) {
-      yield a(href: href ?? '', classes: 'navbar-item', [child]);
+      return a(href: href ?? '', classes: 'navbar-item', [child]);
     } else {
-      yield div(classes: 'navbar-item has-dropdown is-hoverable', [
+      return div(classes: 'navbar-item has-dropdown is-hoverable', [
         a(href: '', classes: 'navbar-link', [child]),
         div(classes: 'navbar-dropdown', items!),
       ]);
@@ -97,7 +97,7 @@ class NavbarDivider extends StatelessComponent {
   const NavbarDivider({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield hr(classes: 'navbar-divider');
+  Component build(BuildContext context) {
+    return hr(classes: 'navbar-divider');
   }
 }

@@ -52,7 +52,7 @@ class HeaderState extends State<Header> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var content = Fragment(key: contentKey, children: [
       nav([
         if (component.showHome) a(href: '/', classes: 'animated-underline', [text("Home")]),
@@ -73,7 +73,7 @@ class HeaderState extends State<Header> {
       ]),
     ]);
 
-    yield header([
+    return header([
       Logo(),
       if (!menuOpen) content,
       MenuButton(

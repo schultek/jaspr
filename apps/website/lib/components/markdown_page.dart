@@ -13,16 +13,18 @@ class MarkdownPage extends StatelessComponent {
   final String filename;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     final file = File(filename);
     final content = file.readAsStringSync();
     final html = markdownToHtml(content);
 
-    yield Header(showHome: true);
-    yield main_(classes: 'markdown-content', [
-      raw(html),
+    return Fragment(children: [
+      Header(showHome: true),
+      main_(classes: 'markdown-content', [
+        raw(html),
+      ]),
+      Footer(),
     ]);
-    yield Footer();
   }
 
   @css

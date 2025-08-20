@@ -24,41 +24,38 @@ class ThemeToggleState extends State<ThemeToggle> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    if (!kIsWeb) {
-      yield Document.head(children: [
-        script(id: 'theme-script', content: '''
-          let userTheme = window.localStorage.getItem('jaspr:theme');
-          if (userTheme != null) {
-            document.documentElement.setAttribute('data-theme', userTheme);
-          } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-          } else {
-            document.documentElement.setAttribute('data-theme', 'light');
-          }
-        '''),
-      ]);
-    }
-
-    if (kIsWeb) {
-      yield Document.html(attributes: {'data-theme': isDark ? 'dark' : 'light'});
-    }
-
-    yield button(
-      classes: 'theme-toggle',
-      attributes: {'aria-label': 'Theme Toggle'},
-      onClick: () {
-        setState(() {
-          isDark = !isDark;
-        });
-        web.window.localStorage.setItem('jaspr:theme', isDark ? 'dark' : 'light');
-      },
-      styles: !kIsWeb ? Styles(visibility: Visibility.hidden) : null,
-      [
-        span(styles: Styles(display: isDark ? Display.none : null), [MoonIcon(size: 20)]),
-        span(styles: Styles(display: isDark ? null : Display.none), [SunIcon(size: 20)]),
-      ],
-    );
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      if (!kIsWeb)
+        Document.head(children: [
+          script(id: 'theme-script', content: '''
+            let userTheme = window.localStorage.getItem('jaspr:theme');
+            if (userTheme != null) {
+              document.documentElement.setAttribute('data-theme', userTheme);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+              document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+              document.documentElement.setAttribute('data-theme', 'light');
+            }
+          '''),
+        ]),
+      if (kIsWeb) Document.html(attributes: {'data-theme': isDark ? 'dark' : 'light'}),
+      button(
+        classes: 'theme-toggle',
+        attributes: {'aria-label': 'Theme Toggle'},
+        onClick: () {
+          setState(() {
+            isDark = !isDark;
+          });
+          web.window.localStorage.setItem('jaspr:theme', isDark ? 'dark' : 'light');
+        },
+        styles: !kIsWeb ? Styles(visibility: Visibility.hidden) : null,
+        [
+          span(styles: Styles(display: isDark ? Display.none : null), [MoonIcon(size: 20)]),
+          span(styles: Styles(display: isDark ? null : Display.none), [SunIcon(size: 20)]),
+        ],
+      ),
+    ]);
   }
 
   @css

@@ -71,8 +71,8 @@ class QuoteLikeButtonState extends State<QuoteLikeButton> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield button(
+  Component build(BuildContext context) {
+    return button(
       classes: "quote-like-btn${hasLiked == true ? ' active' : ''}",
       onClick: () async {
         if (hasLiked == null) return;
