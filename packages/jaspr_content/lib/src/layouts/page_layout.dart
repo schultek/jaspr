@@ -98,8 +98,15 @@ abstract class PageLayoutBase implements PageLayout {
       _ => null,
     };
 
+    final base = switch (page.data) {
+      {'site': {'base': String base}} => base,
+      {'site': {'base': bool base}} => base ? '/' : null,
+      _ => '/',
+    };
+
     return Document(
       lang: lang,
+      base: base,
       meta: {},
       head: buildHead(page).toList(),
       body: buildBody(page, child),

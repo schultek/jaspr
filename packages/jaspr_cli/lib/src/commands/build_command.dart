@@ -69,6 +69,12 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: '2',
     );
+    argParser.addFlag(
+      'include-source-maps',
+      help: 'Include source maps (and dart source files) in the output.',
+      negatable: false,
+      defaultsTo: false,
+    );
     argParser.addOption(
       'sitemap-domain',
       help: 'If set, generates a sitemap.xml file for the static site. '
@@ -89,6 +95,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   String get category => 'Project';
 
   late final useWasm = argResults!['experimental-wasm'] as bool;
+  late final includeSourceMaps = argResults!['include-source-maps'] as bool;
   late final sitemapDomain = argResults!['sitemap-domain'] as String?;
   late final sitemapExclude = argResults!['sitemap-exclude'] as String?;
 
@@ -173,7 +180,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       var serverStartedCompleter = Completer();
 
-      await startProxy('5567', webPort: '0', onMessage: (message) {
+      await startProxy('5567', webPort: '0', serverPort: '8080', onMessage: (message) {
         if (message case {'route': String route}) {
           if (!serverStartedCompleter.isCompleted) {
             serverStartedCompleter.complete();
@@ -369,7 +376,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     logger.write('Building web assets...', progress: ProgressState.running);
 
     final compiler = useWasm ? 'dart2wasm' : 'dart2js';
-    final entrypointBuilder = '${config.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint';
+    final builders = '${config.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    final entrypointBuilder = '$builders:entrypoint';
 
     var dartDefines = getClientDartDefines();
     if (config.usesFlutter) {
@@ -395,6 +403,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--delete-conflicting-outputs',
         '--define=$entrypointBuilder=compiler=$compiler',
         '--define=$entrypointBuilder=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',
+        if (includeSourceMaps) ...[
+          '--define=$builders:dart2js_archive_extractor=filter_outputs=false',
+          '--define=$builders:dart_source_cleanup=enabled=false'
+        ],
       ],
       logger.writeServerLog,
     );
@@ -436,7 +448,21 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     await client.close();
     if (exitCode == 0) {
       logger.write('Completed building web assets.', progress: ProgressState.completed);
+
+      if (includeSourceMaps) {
+        _fixSourceMaps(outputLocation.output);
+      }
     }
     return exitCode;
+  }
+
+  void _fixSourceMaps(String root) {
+    final files = Directory(root).listSync(recursive: true);
+
+    for (final file in files) {
+      if (file is File && RegExp(r'\.dart\.js.*\.(map|deps)$').hasMatch(file.path)) {
+        file.writeAsStringSync(file.readAsStringSync().replaceAll('org-dartlang-app://', ''));
+      }
+    }
   }
 }

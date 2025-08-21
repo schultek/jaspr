@@ -13,6 +13,7 @@ import '../logging.dart';
 mixin ProxyHelper on BaseCommand {
   Future<HttpServer> startProxy(String port,
       {required String webPort,
+      required String serverPort,
       String? flutterPort,
       bool redirectNotFound = false,
       void Function(dynamic)? onMessage}) async {
@@ -44,7 +45,7 @@ mixin ProxyHelper on BaseCommand {
       if (res.statusCode == 200 && req.url.path.endsWith('.dart.bootstrap.js')) {
         var body = await res.readAsString();
         // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:<webPort>/$dwdsSseHandler";'
-        return res.change(body: body.replaceAll('http://localhost:$webPort/', './'));
+        return res.change(body: body.replaceAll('http://localhost:$webPort/', 'http://localhost:$serverPort/'));
       }
 
       // Second try to load the resource from the flutter process.

@@ -19,8 +19,7 @@ mixin DocumentStructureMixin on RenderAdapter {
 
     if (head == null) {
       head = html.createChildRenderElement('head');
-      head.children.insertAfter(head.createChildRenderElement('base')..attributes = {'href': '/'});
-
+     
       if (body == null) {
         var range = html.children.range();
         html.children.insertAfter(head);
@@ -40,10 +39,6 @@ mixin DocumentStructureMixin on RenderAdapter {
         html.children.insertAfter(body, after: head);
       }
 
-      var base = head.children.findWhere((c) => c is MarkupRenderElement && c.tag == 'base');
-      if (base == null) {
-        head.children.insertAfter(head.createChildRenderElement('base')..attributes = {'href': '/'});
-      }
     }
 
     return (html, head, body);
@@ -54,11 +49,6 @@ class DocumentAdapter extends RenderAdapter with DocumentStructureMixin {
   @override
   (MarkupRenderObject, MarkupRenderObject, MarkupRenderObject) apply(MarkupRenderObject root) {
     final (html, head, body) = createDocumentStructure(root);
-
-    var base = head.children.findWhere((c) => c is MarkupRenderElement && c.tag == 'base');
-    if (base == null) {
-      head.children.insertAfter(head.createChildRenderElement('base')..attributes = {'href': '/'});
-    }
 
     var doctype = root.children.findWhere((r) => r is MarkupRenderText && r.text.startsWith('<!DOCTYPE') && r.rawHtml);
     if (doctype == null) {

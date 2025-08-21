@@ -104,6 +104,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     await startProxy(
       proxyPort,
       webPort: webPort,
+      serverPort: port,
       flutterPort: config.usesFlutter ? flutterPort : null,
       redirectNotFound: config.mode == JasprMode.client,
     );
