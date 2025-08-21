@@ -109,15 +109,14 @@ class BuildOwner {
   /// occur during the initial build of the app.
   /// We want the component and element apis to stay synchronous, so this delays
   /// the execution of [child.performRebuild()] instead of calling it directly.
-  void performRebuildOn(Element child, void Function() whenComplete) {
+  void performRebuildOn(Element child) {
     Object? result = child.performRebuild() as dynamic;
     assert(
       result is! Future,
       '${child.runtimeType}.performBuild() returned a Future while rebuilding.\n\n'
       'Only server builds are allowed to be asynchronous.',
     );
-    whenComplete();
-    child.attachRenderObject();
+    child.didRebuild();
   }
 
   void performBuild() {

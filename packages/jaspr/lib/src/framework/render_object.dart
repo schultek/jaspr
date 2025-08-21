@@ -60,6 +60,15 @@ mixin RenderObjectElement on Element {
   }
 
   @override
+  void didRebuild() {
+    super.didRebuild();
+
+    if (!_attached) {
+      attachRenderObject();
+    }
+  }
+
+  @override
   void update(Component newComponent) {
     if (shouldRerender(newComponent)) {
       _dirtyRender = true;
@@ -76,14 +85,17 @@ mixin RenderObjectElement on Element {
     super.didUpdate(oldComponent);
   }
 
+  bool _attached = false;
+
   @override
   void attachRenderObject() {
     final parent = _parentRenderObjectElement?.renderObject;
     if (parent != null) {
-      final after = slot.target;
+      final after = slot.previousSibling?.slot.target;
       parent.attach(renderObject, after: after?.renderObject);
       assert(renderObject.parent == parent);
     }
+    _attached = true;
   }
 
   @override
@@ -93,6 +105,7 @@ mixin RenderObjectElement on Element {
       parent.remove(renderObject);
       assert(renderObject.parent == null);
     }
+    _attached = false;
   }
 
   @override

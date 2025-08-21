@@ -46,9 +46,7 @@ class MyChildState extends State<MyChildComponent> with TrackStateLifecycle<MyCh
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
-      super.build(context),
-      Text('Inherited value: $inheritedValue'),
-    ]);
+    trackBuild();
+    return Text('Inherited value: $inheritedValue');
   }
 }

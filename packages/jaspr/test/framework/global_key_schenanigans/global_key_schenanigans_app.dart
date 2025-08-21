@@ -32,9 +32,9 @@ class Child extends StatefulComponent {
 class ChildState extends State<Child> with TrackStateLifecycle<Child> {
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
-      super.build(context),
-      Text('Child'),
-    ]);
+    trackBuild();
+    return
+      Text('Child');
+    
   }
 }

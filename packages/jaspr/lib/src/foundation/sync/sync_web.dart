@@ -11,13 +11,14 @@ void initSyncState(SyncStateMixin sync) {
 
   bool isNext = true;
   final syncMarker = r.retakeNode((node) {
-    if (!isNext) {
+    if (!isNext || node.isText) {
       return false;
     }
-    isNext = false;
     if (node.isComment) {
       var value = node.nodeValue ?? '';
       return _syncRegex.hasMatch(value);
+    } else {
+      isNext = false;
     }
     return false;
   });

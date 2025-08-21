@@ -26,10 +26,10 @@ void main() {
       final child = root.children[0];
 
       verifyInOrder([
-        () => root.createChildRenderObject(),
+        () => root.createChildRenderElement('div'),
         () => child.parent,
-        () => child.updateElement(
-            'div', 'test', 'test-class', {'color': 'red'}, {'data-test': 'value'}, any(that: hasLength(1))),
+        () => (child as RenderElement).update(
+            'test', 'test-class', {'color': 'red'}, {'data-test': 'value'}, any(that: hasLength(1))),
         () => root.attach(child, after: null),
         () => child.parent,
       ]);
@@ -43,23 +43,30 @@ void main() {
 
       autoMockChildren(root);
 
-      binding.attachRootComponent(Fragment(children: [h1([]), h2([])]));
+      binding.attachRootComponent(div([h1([]), h2([])]));
 
-      expect(root.children, hasLength(2));
-      final child1 = root.children[0];
-      final child2 = root.children[1];
+      expect(root.children, hasLength(1));
+      final base = root.children[0];
+      expect(base.children, hasLength(2));
+      final child1 = base.children[0];
+      final child2 = base.children[1];
 
       verifyInOrder([
-        () => root.createChildRenderObject(),
+        () => root.createChildRenderElement('div'),
+        () => base.parent,
+        () => (base as RenderElement).update(null, null, null, null, null),
+        () => base.createChildRenderElement('h1'),
         () => child1.parent,
-        () => child1.updateElement('h1', null, null, null, null, null),
-        () => root.attach(child1, after: null),
+        () => (child1 as RenderElement).update(null, null, null, null, null),
+        () => base.attach(child1, after: null),
         () => child1.parent,
-        () => root.createChildRenderObject(),
+        () => base.createChildRenderElement('h2'),
         () => child2.parent,
-        () => child2.updateElement('h2', null, null, null, null, null),
-        () => root.attach(child2, after: child1),
+        () => (child2 as RenderElement).update(null, null, null, null, null),
+        () => base.attach(child2, after: child1),
         () => child2.parent,
+        () => root.attach(base, after: null),
+        () => base.parent,
       ]);
 
       verifyNoMoreRenderInteractions(root);
@@ -71,47 +78,49 @@ void main() {
 
       autoMockChildren(root);
 
-      final component = FakeComponent(children: [
+      final component = FakeComponent(child: div([
         h1(key: ValueKey(1), []),
         h2(key: ValueKey(2), []),
-      ]);
+      ]));
 
       binding.attachRootComponent(component);
 
-      expect(root.children, hasLength(2));
-      final child1 = root.children[0];
-      final child2 = root.children[1];
+      expect(root.children, hasLength(1));
+      final base = root.children[0];
+      expect(base.children, hasLength(2));
+      final child1 = base.children[0];
+      final child2 = base.children[1];
 
       verifyInOrder([
-        () => root.createChildRenderObject(),
+        () => root.createChildRenderElement('div'),
+        () => base.parent,
+        () => (base as RenderElement).update(null, null, null, null, null),
+        () => base.createChildRenderElement('h1'),
         () => child1.parent,
-        () => child1.updateElement('h1', null, null, null, null, null),
-        () => root.attach(child1, after: null),
+        () => (child1 as RenderElement).update(null, null, null, null, null),
+        () => base.attach(child1, after: null),
         () => child1.parent,
-        () => root.createChildRenderObject(),
+        () => base.createChildRenderElement('h2'),
         () => child2.parent,
-        () => child2.updateElement('h2', null, null, null, null, null),
-        () => root.attach(child2, after: child1),
+        () => (child2 as RenderElement).update(null, null, null, null, null),
+        () => base.attach(child2, after: child1),
         () => child2.parent,
+        () => root.attach(base, after: null),
+        () => base.parent,
       ]);
 
       verifyNoMoreRenderInteractions(root);
 
-      component.updateChildren([
+      component.updateChild(div([
         h2(key: ValueKey(2), []),
         h1(key: ValueKey(1), []),
-      ]);
+      ]));
       await pumpEventQueue();
 
-      // TODO: Fix duplicate attach calls
       verifyInOrder([
-        () => root.attach(child2, after: null),
+        () => base.attach(child2, after: null),
         () => child2.parent,
-        () => root.attach(child2, after: null),
-        () => child2.parent,
-        () => root.attach(child1, after: child2),
-        () => child1.parent,
-        () => root.attach(child1, after: child2),
+        () => base.attach(child1, after: child2),
         () => child1.parent,
       ]);
 
@@ -124,43 +133,48 @@ void main() {
 
       autoMockChildren(root);
 
-      final component = FakeComponent(children: [
+      final component = FakeComponent(child: div([
         h1([]),
         h2([]),
-      ]);
+      ]));
 
       binding.attachRootComponent(component);
 
-      expect(root.children, hasLength(2));
-      final child1 = root.children[0];
-      final child2 = root.children[1];
+      expect(root.children, hasLength(1));
+      final base = root.children[0];
+      expect(base.children, hasLength(2));
+      final child1 = base.children[0];
+      final child2 = base.children[1];
 
       verifyInOrder([
-        () => root.createChildRenderObject(),
+        () => root.createChildRenderElement('div'),
+        () => base.parent,
+        () => (base as RenderElement).update(null, null, null, null, null),
+        () => base.createChildRenderElement('h1'),
         () => child1.parent,
-        () => child1.updateElement('h1', null, null, null, null, null),
-        () => root.attach(child1, after: null),
+        () => (child1 as RenderElement).update(null, null, null, null, null),
+        () => base.attach(child1, after: null),
         () => child1.parent,
-        () => root.createChildRenderObject(),
+        () => base.createChildRenderElement('h2'),
         () => child2.parent,
-        () => child2.updateElement('h2', null, null, null, null, null),
-        () => root.attach(child2, after: child1),
+        () => (child2 as RenderElement).update(null, null, null, null, null),
+        () => base.attach(child2, after: child1),
         () => child2.parent,
+        () => root.attach(base, after: null),
+        () => base.parent,
       ]);
 
       verifyNoMoreRenderInteractions(root);
 
-      component.updateChildren([
+      component.updateChild(div([
         h2([]),
-      ]);
+      ]));
       await pumpEventQueue();
 
       verifyInOrder([
-        // TODO: Fix to remove child1 instead and don't update the element.
-        () => child1.updateElement('h2', null, null, null, null, null),
-        () => root.attach(child1, after: null),
+        () => base.remove(child1),
         () => child1.parent,
-        () => root.remove(child2),
+        () => base.attach(child2, after: null),
         () => child2.parent,
       ]);
 

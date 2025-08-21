@@ -21,7 +21,10 @@ void main() {
       expect(render.tag, equals('div'));
       expect(render.children.length, equals(3));
       expect(render.children[0], isA<TestRenderText>().having((e) => e.text, 'text', equals('A')));
-      expect(render.children[1], isA<TestRenderText>().having((e) => e.text, 'text', equals('B')));
+      expect(render.children[1], isA<TestRenderFragment>().having((e) => e.children, 'children', hasLength(2)));
+      final subChildren = (render.children[1] as TestRenderFragment).children;
+      expect(subChildren[0], isA<TestRenderText>().having((e) => e.text, 'text', equals('B')));
+      expect(subChildren[1], isA<TestRenderFragment>().having((e) => e.children, 'children', isEmpty));
       expect(render.children[2], isA<TestRenderText>().having((e) => e.text, 'text', equals('C')));
     });
   });

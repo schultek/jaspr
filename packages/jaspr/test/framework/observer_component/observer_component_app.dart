@@ -91,9 +91,7 @@ class MyChildState extends State<MyChildComponent> with TrackStateLifecycle<MyCh
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
-      super.build(context),
-      Text('Leaf ${component.value} ${notifier.value}'),
-    ]);
+    trackBuild();
+    return Text('Leaf ${component.value} ${notifier.value}');
   }
 }

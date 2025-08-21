@@ -385,22 +385,33 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
         List<MarkupRenderObject> nodes = [];
         Map<String, (int, int)> indices = {};
 
+        void visitRenderObject(MarkupRenderObject o, int depth) {
+          if (o is MarkupRenderFragment) {
+            for (final child in o.children) {
+              visitRenderObject(child, depth);
+            }
+            return;
+          }
+
+          var key = keyFor(o);
+          if (key == null) {
+            nodes.add(o);
+            return;
+          }
+          var index = indices[key];
+          if (index == null) {
+            nodes.add(o);
+            indices[key] = (nodes.length - 1, depth);
+          }
+          if (index != null && depth >= index.$2) {
+            nodes[index.$1] = o;
+          }
+        }
+
         for (var e in value.children) {
           e.$1.remove();
           for (var n in e.$1) {
-            var key = keyFor(n);
-            if (key == null) {
-              nodes.add(n);
-              continue;
-            }
-            var index = indices[key];
-            if (index == null) {
-              nodes.add(n);
-              indices[key] = (nodes.length - 1, e.$2);
-            }
-            if (index != null && e.$2 >= index.$2) {
-              nodes[index.$1] = n;
-            }
+            visitRenderObject(n, e.$2);
           }
         }
 

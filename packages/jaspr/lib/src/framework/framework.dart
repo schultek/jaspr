@@ -621,7 +621,7 @@ abstract class Element implements BuildContext {
       element.updateSlot(newSlot);
       if (element is! RenderObjectElement) {
         Element? next;
-        visitChildren((Element child) {
+        element.visitChildren((Element child) {
           assert(next == null); // This verifies that there's only one child.
           next = child;
           visit(child);
@@ -1026,6 +1026,8 @@ abstract class Element implements BuildContext {
     return false;
   }
 
+  Element? _debugPreviousBuildTarget;
+
   /// Cause the component to update itself.
   ///
   /// Called by the [BuildOwner] when rebuilding, by [mount] when the element is first
@@ -1037,10 +1039,9 @@ abstract class Element implements BuildContext {
     }
     assert(_lifecycleState == _ElementLifecycle.active);
     assert(owner._debugStateLocked);
-    Element? debugPreviousBuildTarget;
     assert(() {
       if (!binding.isClient && owner.isFirstBuild) return true;
-      debugPreviousBuildTarget = owner._debugCurrentBuildTarget;
+      _debugPreviousBuildTarget = owner._debugCurrentBuildTarget;
       owner._debugCurrentBuildTarget = this;
       return true;
     }());
@@ -1049,25 +1050,29 @@ abstract class Element implements BuildContext {
         observer.willRebuildElement(this);
       }
     }
-    owner.performRebuildOn(this, () {
-      assert(() {
-        if (!binding.isClient && owner.isFirstBuild) return true;
-        assert(owner._debugCurrentBuildTarget == this);
-        owner._debugCurrentBuildTarget = debugPreviousBuildTarget;
-        return true;
-      }());
-      assert(!_dirty);
-      if (_dependencies != null && _dependencies!.isNotEmpty) {
-        for (var dependency in _dependencies!) {
-          dependency.didRebuildDependent(this);
-        }
+    owner.performRebuildOn(this);
+  }
+
+  void didRebuild() {
+    assert(_lifecycleState == _ElementLifecycle.active);
+    assert(() {
+      if (!binding.isClient && owner.isFirstBuild) return true;
+      assert(owner._debugCurrentBuildTarget == this);
+      owner._debugCurrentBuildTarget = _debugPreviousBuildTarget;
+      return true;
+    }());
+    assert(!_dirty);
+
+    if (_dependencies != null && _dependencies!.isNotEmpty) {
+      for (var dependency in _dependencies!) {
+        dependency.didRebuildDependent(this);
       }
-      if (_observerElements != null && _observerElements!.isNotEmpty) {
-        for (var observer in _observerElements!) {
-          observer.didRebuildElement(this);
-        }
+    }
+    if (_observerElements != null && _observerElements!.isNotEmpty) {
+      for (var observer in _observerElements!) {
+        observer.didRebuildElement(this);
       }
-    });
+    }
   }
 
   /// Cause the component to update itself.

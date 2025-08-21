@@ -59,25 +59,23 @@ class TestState<T> extends State<TestComponent> {
 }
 
 // ignore: must_be_immutable
-class FakeComponent implements ProxyComponent {
-  FakeComponent({this.key, this.children = const []});
+class FakeComponent extends StatelessComponent {
+  FakeComponent({super.key, required this.child});
+
+  Component child;
 
   @override
-  Component? get child => null;
+  Component build(BuildContext context) {
+    return child;
+  }
 
   @override
-  List<Component> children;
+  StatelessElement createElement() => _element = StatelessElement(this);
 
-  late ProxyElement _element;
+  late StatelessElement _element;
 
-  @override
-  ProxyElement createElement() => _element = ProxyElement(this);
-
-  @override
-  final Key? key;
-
-  void updateChildren(List<Component> newChildren) {
-    children = newChildren;
+  void updateChild(Component newChild) {
+    child = newChild;
     _element.markNeedsBuild();
   }
 }

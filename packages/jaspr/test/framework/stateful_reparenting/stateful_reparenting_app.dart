@@ -54,6 +54,7 @@ class MyState extends State<MyStatefulComponent> with TrackStateLifecycle<MyStat
   @override
   Component build(BuildContext context) {
     context.dependOnInheritedComponentOfExactType<InheritedData>();
-    return super.build(context);
+    trackBuild();
+    return Text('');
   }
 }
