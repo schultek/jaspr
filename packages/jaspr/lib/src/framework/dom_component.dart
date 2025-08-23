@@ -83,6 +83,7 @@ class DomElement extends MultiChildRenderObjectElement {
   RenderObject createRenderObject() {
     final renderObject = _parentRenderObjectElement!.renderObject.createChildRenderElement(component.tag);
     assert(renderObject.parent == _parentRenderObjectElement!.renderObject);
+    updateRenderObject(renderObject);
     return renderObject;
   }
 

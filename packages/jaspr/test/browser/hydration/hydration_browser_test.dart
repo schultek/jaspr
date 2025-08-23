@@ -20,10 +20,13 @@ void main() {
       expect(pElement.parentNode, equals(divElement));
       expect(bElement.parentNode, equals(pElement));
 
+      final pKey = GlobalNodeKey();
+      final bKey = GlobalNodeKey();
+
       tester.pumpComponent(div([
-        p([
+        p(key: pKey, [
           text('Hello '),
-          b([text('World2')]),
+          b(key: bKey, [text('World2')]),
           text('!')
         ]),
       ]));
@@ -31,6 +34,9 @@ void main() {
       expect(divElement.parentNode, equals(window.document.body));
       expect(pElement.parentNode, equals(divElement));
       expect(bElement.parentNode, equals(pElement));
+
+      expect(pKey.currentNode, equals(pElement));
+      expect(bKey.currentNode, equals(bElement));
 
       expect(bElement.textContent, equals('World2'));
     });

@@ -133,8 +133,8 @@ class _AttachElement extends MultiChildRenderObjectElement {
 
   @override
   RenderObject createRenderObject() {
-    var AttachDocument(:target) = component as AttachDocument;
-    return AttachRenderObject(target, depth);
+    var AttachDocument(:target, :attributes) = component as AttachDocument;
+    return AttachRenderObject(target, depth)..attributes = attributes;
   }
 
   @override

@@ -46,10 +46,7 @@ mixin RenderObjectElement on Element {
 
   @override
   void didMount() {
-    if (_renderObject == null) {
-      _renderObject = createRenderObject();
-      updateRenderObject(renderObject);
-    }
+    _renderObject ??= createRenderObject();
     super.didMount();
   }
 

@@ -310,15 +310,11 @@ class DomRenderFragment extends DomRenderObject
 
   @override
   void remove(DomRenderObject child) {
-    if (kVerboseMode) {
-      print("Remove child $child of $this");
+    if (!isAttached) {
+      removeChild(child);
+    } else {
+      parent!.remove(child);
     }
-
-    final parentNode = isAttached ? parent!.node : node;
-    assert(parentNode == child.node.parentNode, 'Child node must be a child of this fragment.');
-
-    parentNode.removeChild(child.node);
-    child.parent = null;
   }
 
   @override
@@ -372,7 +368,7 @@ mixin MultiChildDomRenderObject on DomRenderObject {
       final node = getRealNodeOf(after.lastChild);
       return node ?? getRealNodeOf(after.previousSibling);
     }
-    if (this is DomRenderFragment) {
+    if (after == null && this is DomRenderFragment) {
       return (parent as MultiChildDomRenderObject).getRealNodeOf(previousSibling);
     }
     return after?.node;
@@ -396,7 +392,7 @@ mixin MultiChildDomRenderObject on DomRenderObject {
       }
 
       if (kVerboseMode) {
-        print("Attach node $childNode to $targetNode after $afterNode");
+        print("Attach node $childNode to $targetNode after $afterNode ($after)");
       }
 
       if (afterNode == null) {
@@ -407,11 +403,11 @@ mixin MultiChildDomRenderObject on DomRenderObject {
 
       if (child is! DomRenderFragment) {
         assert(childNode.previousSibling == afterNode, 'Child node should have been placed after the specified node.');
-      } else {
+      } else if (child.firstChildNode != null) {
         assert(child.firstChildNode?.previousSibling == afterNode,
-            'Fragment nodes should have been placed after the specified node.');
+            'Fragment first child should have been placed after the specified node.');
       }
-      
+
       final next = after?.nextSibling;
       child.previousSibling = after;
       after?.nextSibling = child;
