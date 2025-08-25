@@ -192,6 +192,8 @@ class AttachRenderObject extends DomRenderText {
 
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
+    child.parent = this;
+
     try {
       var childNode = child.node;
 
@@ -207,6 +209,7 @@ class AttachRenderObject extends DomRenderText {
 
       children.remove(childNode);
       children.insert(afterNode != null ? children.indexOf(afterNode) + 1 : 0, childNode);
+      
       AttachAdapter.instanceFor(_target).update();
     } finally {
       child.finalize();
@@ -216,6 +219,8 @@ class AttachRenderObject extends DomRenderText {
   @override
   void remove(DomRenderObject child) {
     children.remove(child.node);
+    child.parent = null;
+
     AttachAdapter.instanceFor(_target).update();
   }
 }

@@ -339,6 +339,11 @@ final Expando<AttachAdapter> _attach = Expando();
 
 class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
   static void register(BuildContext context, AttachDocument item) {
+    if (context.binding is! ServerAppBinding) {
+      // Return early in component tests.
+      return;
+    }
+
     var binding = (context.binding as ServerAppBinding);
     var adapter = _attach[binding] ??= AttachAdapter();
     binding.addRenderAdapter(adapter);
