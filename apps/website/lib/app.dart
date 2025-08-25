@@ -11,8 +11,8 @@ class App extends StatelessComponent {
   const App({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Router(routes: [
+  Component build(BuildContext context) {
+    return Router(routes: [
       Route(
         path: '/',
         builder: (_, __) => Fragment(children: [

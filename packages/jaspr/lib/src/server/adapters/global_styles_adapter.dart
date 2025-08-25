@@ -13,9 +13,7 @@ class GlobalStylesAdapter extends HeadScopeAdapter {
     }
 
     head.children.insertBefore(
-      head.createChildRenderObject()
-        ..updateElement('style', null, null, null, null, null)
-        ..children.insertBefore(head.createChildRenderObject()..updateText(styles.render(), true)),
+      head.createChildRenderElement('style')..children.insertBefore(head.createChildRenderText(styles.render(), true)),
     );
 
     return true;

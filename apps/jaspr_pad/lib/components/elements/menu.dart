@@ -11,8 +11,8 @@ class MenuItem extends StatelessComponent {
   final String label;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield li(
+  Component build(BuildContext context) {
+    return li(
       classes: 'mdc-list-item channel-menu-list',
       attributes: {'role': 'menuitem'},
       [
@@ -36,7 +36,9 @@ class Menu extends StatelessComponent {
   final void Function(int) onItemSelected;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {}
+  Component build(BuildContext context) {
+    return text('');
+  }
 
   @override
   Element createElement() => MenuElement(this);
@@ -67,8 +69,8 @@ class MenuElement extends StatelessElement {
   }
 
   @override
-  Iterable<Component> build() sync* {
-    yield div(
+  Component build() {
+    return div(
       styles: Styles(position: Position.relative()),
       [
         DomNodeReader(

@@ -2,10 +2,11 @@ import 'package:jaspr/jaspr.dart';
 
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Text('App');
-
-    yield Counter();
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      Text('App'),
+      Counter(),
+    ]);
   }
 }
 
@@ -18,15 +19,16 @@ class CounterState extends State<Counter> {
   int counter = 0;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Button(
-      label: 'Click Me',
-      onPressed: () {
-        setState(() => counter++);
-      },
-    );
-
-    yield Text('Count: $counter');
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      Button(
+        label: 'Click Me',
+        onPressed: () {
+          setState(() => counter++);
+        },
+      ),
+      Text('Count: $counter'),
+    ]);
   }
 }
 
@@ -37,7 +39,7 @@ class Button extends StatelessComponent {
   final void Function() onPressed;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield button(events: {'click': (e) => onPressed()}, [text(label)]);
+  Component build(BuildContext context) {
+    return button(events: {'click': (e) => onPressed()}, [text(label)]);
   }
 }

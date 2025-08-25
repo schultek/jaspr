@@ -7,8 +7,8 @@ class Features extends StatelessComponent {
   const Features({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section(id: 'features', [
+  Component build(BuildContext context) {
+    return section(id: 'features', [
       span(classes: 'caption text-gradient', [text('Features')]),
       h2([text('Comes with '), br(), text('Everything You Need')]),
       div(classes: 'feature-grid', [

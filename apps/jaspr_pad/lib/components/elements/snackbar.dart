@@ -32,8 +32,8 @@ class SnackBarState extends State<SnackBar> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomNodeReader(
+  Component build(BuildContext context) {
+    return DomNodeReader(
       onNode: (node) {
         if (kIsWeb && _snackbar == null) {
           _snackbar = MDCSnackbar(node);

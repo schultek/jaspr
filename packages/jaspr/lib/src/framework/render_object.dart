@@ -11,42 +11,42 @@ abstract class RenderObject {
   RenderObject? get parent;
   web.Node? get node;
 
-  RenderObject createChildRenderObject();
-
-  void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
-      Map<String, String>? attributes, Map<String, EventCallback>? events);
-
-  void updateText(String text);
-
-  void skipChildren();
+  RenderElement createChildRenderElement(String tag);
+  RenderText createChildRenderText(String text);
+  RenderFragment createChildRenderFragment();
 
   void attach(covariant RenderObject child, {covariant RenderObject? after});
 
   void remove(covariant RenderObject child);
 }
 
-abstract class BuildableRenderObjectElement = BuildableElement with RenderObjectElement;
-abstract class ProxyRenderObjectElement = ProxyElement with RenderObjectElement;
+abstract class RenderElement implements RenderObject {
+  void update(String? id, String? classes, Map<String, String>? styles, Map<String, String>? attributes,
+      Map<String, EventCallback>? events);
+}
+
+abstract class RenderText implements RenderObject {
+  void update(String text);
+}
+
+abstract class RenderFragment implements RenderObject {}
+
+abstract class MultiChildRenderObjectElement = MultiChildElement with RenderObjectElement;
 abstract class LeafRenderObjectElement = LeafElement with RenderObjectElement;
 
 mixin RenderObjectElement on Element {
-  RenderObject createRenderObject() {
-    var renderObject = _parentRenderObjectElement!.renderObject.createChildRenderObject();
-    assert(renderObject.parent == _parentRenderObjectElement!.renderObject);
-    return renderObject;
-  }
+  @protected
+  RenderObject createRenderObject();
 
-  void updateRenderObject();
+  @protected
+  void updateRenderObject(covariant RenderObject renderObject);
 
   RenderObject get renderObject => _renderObject!;
   RenderObject? _renderObject;
 
   @override
   void didMount() {
-    if (_renderObject == null) {
-      _renderObject = createRenderObject();
-      updateRenderObject();
-    }
+    _renderObject ??= createRenderObject();
     super.didMount();
   }
 
@@ -54,6 +54,15 @@ mixin RenderObjectElement on Element {
 
   bool shouldRerender(covariant Component newComponent) {
     return true;
+  }
+
+  @override
+  void didRebuild() {
+    super.didRebuild();
+
+    if (!_attached) {
+      attachRenderObject();
+    }
   }
 
   @override
@@ -68,23 +77,22 @@ mixin RenderObjectElement on Element {
   void didUpdate(Component oldComponent) {
     if (_dirtyRender) {
       _dirtyRender = false;
-      updateRenderObject();
+      updateRenderObject(renderObject);
     }
     super.didUpdate(oldComponent);
   }
 
+  bool _attached = false;
+
   @override
   void attachRenderObject() {
-    var parent = _parentRenderObjectElement?.renderObject;
+    final parent = _parentRenderObjectElement?.renderObject;
     if (parent != null) {
-      Element? prevElem = _prevAncestorSibling;
-      while (prevElem != null && prevElem._lastRenderObjectElement == null) {
-        prevElem = prevElem._prevAncestorSibling;
-      }
-      var after = prevElem?._lastRenderObjectElement;
+      final after = slot.previousSibling?.slot.target;
       parent.attach(renderObject, after: after?.renderObject);
       assert(renderObject.parent == parent);
     }
+    _attached = true;
   }
 
   @override
@@ -94,14 +102,12 @@ mixin RenderObjectElement on Element {
       parent.remove(renderObject);
       assert(renderObject.parent == null);
     }
+    _attached = false;
   }
 
   @override
-  void _didUpdateSlot() {
-    super._didUpdateSlot();
+  void updateSlot(ElementSlot newSlot) {
+    super.updateSlot(newSlot);
     attachRenderObject();
   }
-
-  @override
-  RenderObjectElement get _lastRenderObjectElement => this;
 }

@@ -6,8 +6,8 @@ class Tag extends StatelessComponent {
   final String label;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield span(classes: "tag", [text(label)]);
+  Component build(BuildContext context) {
+    return span(classes: "tag", [text(label)]);
   }
 
   @css

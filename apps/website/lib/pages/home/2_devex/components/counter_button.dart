@@ -47,8 +47,8 @@ class CounterButtonState extends State<CounterButton> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'counter-container', [
+  Component build(BuildContext context) {
+    return div(classes: 'counter-container', [
       Particles(particles: particles),
       DomComponent.wrap(
         events: {

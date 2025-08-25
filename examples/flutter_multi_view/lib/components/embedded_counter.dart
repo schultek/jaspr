@@ -13,8 +13,8 @@ class EmbeddedCounter extends StatelessComponent {
   final Function(int) onChange;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield FlutterEmbedView.deferred(
+  Component build(BuildContext context) {
+    return FlutterEmbedView.deferred(
       classes: 'flutter-counter',
       styles: Styles(margin: Margin.only(top: 20.px)),
       constraints: ViewConstraints(

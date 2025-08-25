@@ -24,8 +24,8 @@ class Run extends StatelessComponent {
   ];
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DevexBox(
+  Component build(BuildContext context) {
+    return DevexBox(
       caption: 'RUN',
       title: 'Jaspr CLI',
       description: text('Create, serve and build your site using simple cli commands.'),

@@ -5,12 +5,42 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
 import '../../utils/test_component.dart';
-import 'stateful_reparenting_app.dart';
+import '../../utils/track_state_lifecycle.dart';
+
+class InheritedData extends InheritedComponent {
+  InheritedData({required super.child});
+
+  @override
+  bool updateShouldNotify(covariant InheritedData oldComponent) {
+    return true;
+  }
+}
+
+class MyStatefulComponent extends StatefulComponent {
+  MyStatefulComponent({super.key});
+  @override
+  State<StatefulComponent> createState() => MyState();
+}
+
+class MyState extends State<MyStatefulComponent> with TrackStateLifecycle<MyStatefulComponent> {
+  @override
+  Component build(BuildContext context) {
+    context.dependOnInheritedComponentOfExactType<InheritedData>();
+    trackBuild();
+    return Text('');
+  }
+}
 
 void main() {
+  final myKey = GlobalKey();
+
   group('stateful reparenting test', () {
     testComponents('should keep state on reparenting', (tester) async {
-      var controller = tester.pumpTestComponent(App());
+      var component = FakeComponent(
+          child: InheritedData(
+        child: MyStatefulComponent(key: myKey),
+      ));
+      tester.pumpComponent(component);
 
       // phase 1: component should be mounted directly
       expect(find.byType(MyStatefulComponent), findsOneComponent);
@@ -23,16 +53,26 @@ void main() {
       state.lifecycle.clear();
 
       // phase 2: component should be mounted as child of a div element
-      await controller.rebuildWith(2);
+      component.updateChild(InheritedData(
+        child: div([
+          MyStatefulComponent(key: myKey),
+        ]),
+      ));
+      await tester.pump();
+
       expect(find.descendant(of: find.tag('div'), matching: find.byType(MyStatefulComponent)), findsOneComponent);
 
       // lifecycle: state should be reparented, updated and built again
       expect(
-          state.lifecycle, equals(['deactivate', 'activate', 'didUpdateComponent', 'didChangeDependencies', 'build']));
+        state.lifecycle,
+        equals(['deactivate', 'activate', 'didUpdateComponent', 'didChangeDependencies', 'build']),
+      );
       state.lifecycle.clear();
 
       // phase 3: component should be unmounted
-      await controller.rebuildWith(3);
+      component.updateChild(InheritedData(child: text('')));
+      await tester.pump();
+
       expect(find.byType(MyStatefulComponent), findsNothing);
 
       // lifecycle: state should be disposed

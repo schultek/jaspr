@@ -28,7 +28,7 @@ class LinkButton extends StatelessComponent {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var child = span(classes: 'link-button-content', [
       if (label != null) text(label!),
       if (icon != null) Icon(icon!),
@@ -37,7 +37,7 @@ class LinkButton extends StatelessComponent {
     if (style == 'outlined') {
       child = GradientBorder(child: child, radius: 7);
     }
-    yield a(classes: 'link-button link-button-$style', href: to, target: target, attributes: {
+    return a(classes: 'link-button link-button-$style', href: to, target: target, attributes: {
       if (ariaLabel != null) 'aria-label': ariaLabel!
     }, [
       child,

@@ -565,7 +565,7 @@ abstract class State<T extends StatefulComponent> {
   ///
   ///  * [StatefulComponent], which contains the discussion on performance considerations.
   @protected
-  Iterable<Component> build(BuildContext context);
+  Component build(BuildContext context);
 
   /// Called when a dependency of this [State] object changes.
   ///
@@ -621,7 +621,7 @@ class StatefulElement extends BuildableElement {
   }
 
   @override
-  Iterable<Component> build() => state.build(this);
+  Component build() => state.build(this);
 
   /// The [State] instance associated with this location in the tree.
   ///

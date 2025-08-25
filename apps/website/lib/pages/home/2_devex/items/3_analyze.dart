@@ -11,8 +11,8 @@ class Analyze extends StatelessComponent {
   const Analyze({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DevexBox(
+  Component build(BuildContext context) {
+    return DevexBox(
       caption: 'ANALYZE',
       title: 'Linter and Code Completions',
       description:
@@ -28,8 +28,8 @@ class Analyze extends StatelessComponent {
                 class App extends StatelessComponent {
                   const App({super.key});
 
-                  Iterable<Component> build(BuildContext context) sync* {
-                    yield div([
+                  Component build(BuildContext context) {
+                    return div([
                       ...
                 ''',
               lineClasses: {0: 'quick-select'},

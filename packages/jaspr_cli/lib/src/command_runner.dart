@@ -13,6 +13,7 @@ import 'commands/clean_command.dart';
 import 'commands/create_command.dart';
 import 'commands/daemon_command.dart';
 import 'commands/doctor_command.dart';
+import 'commands/migrate_command.dart';
 import 'commands/serve_command.dart';
 import 'commands/tooling_daemon_command.dart';
 import 'commands/update_command.dart';
@@ -43,6 +44,7 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
     addCommand(CleanCommand());
     addCommand(UpdateCommand());
     addCommand(DoctorCommand());
+    addCommand(MigrateCommand());
     addCommand(DaemonCommand());
     addCommand(ToolingDaemonCommand());
   }

@@ -18,7 +18,11 @@ class RawTextElement extends LeafRenderObjectElement {
   RawTextElement(super.component);
 
   @override
-  void updateRenderObject() {
-    (renderObject as MarkupRenderObject).updateText((component as RawText).text, true);
+  RenderObject createRenderObject() {
+    final parent = parentRenderObjectElement!.renderObject as MarkupRenderObject;
+    return parent.createChildRenderText((component as RawText).text, true);
   }
+
+  @override
+  void updateRenderObject(covariant RenderObject renderObject) {}
 }

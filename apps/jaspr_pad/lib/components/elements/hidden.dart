@@ -13,8 +13,8 @@ class Hidden extends StatelessComponent {
   final bool visibilityMode;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent.wrap(
+  Component build(BuildContext context) {
+    return DomComponent.wrap(
       styles: Styles(
         visibility: hidden && visibilityMode ? Visibility.hidden : null,
       ),

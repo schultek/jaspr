@@ -21,7 +21,7 @@ class CodeBlock extends StatelessComponent {
   final Map<int, String> lineClasses;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     final indent = this.source.indexOf(this.source.trimLeft());
     var source = this.source;
 
@@ -35,7 +35,7 @@ class CodeBlock extends StatelessComponent {
     final result = highlight.parse(source.trim(), language: language);
     final lines = result.toLines();
 
-    yield div(classes: 'code-block', [
+    return div(classes: 'code-block', [
       pre([
         code(classes: 'language-$language ${scroll ? 'scroll' : ''}', [
           span(classes: 'lines ${selectable ? 'selectable' : ''}', [

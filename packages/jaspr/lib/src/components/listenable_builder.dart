@@ -11,7 +11,7 @@ class ListenableBuilder extends StatefulComponent {
   /// Commonly a [ChangeNotifier].
   final Listenable listenable;
 
-  final Iterable<Component> Function(BuildContext) builder;
+  final Component Function(BuildContext) builder;
 
   /// Subclasses typically do not override this method.
   @override
@@ -50,13 +50,13 @@ class _ListenableBuilderState extends State<ListenableBuilder> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) => component.builder(context);
+  Component build(BuildContext context) => component.builder(context);
 }
 
 class ValueListenableBuilder<T> extends ListenableBuilder {
   ValueListenableBuilder({
     super.key,
     required ValueListenable<T> super.listenable,
-    required Iterable<Component> Function(BuildContext, T) builder,
+    required Component Function(BuildContext, T) builder,
   }) : super(builder: (context) => builder(context, listenable.value));
 }

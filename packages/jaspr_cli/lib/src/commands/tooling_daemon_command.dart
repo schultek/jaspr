@@ -31,12 +31,10 @@ class ToolingDaemonCommand extends BaseCommand with DaemonHelper {
   bool get hidden => true;
 
   @override
-  // ignore: overridden_fields
-  final bool requiresPubspec = false;
+  bool get requiresPubspec => false;
 
   @override
-  // ignore: overridden_fields
-  final bool verbose = true;
+  bool get verbose => true;
 
   @override
   Future<int> runCommand() async {

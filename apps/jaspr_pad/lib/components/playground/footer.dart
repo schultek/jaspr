@@ -4,8 +4,8 @@ class PlaygroundFooter extends StatelessComponent {
   const PlaygroundFooter({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield footer([
+  Component build(BuildContext context) {
+    return footer([
       //   i(
       //     id: 'keyboard-button',
       //     classes: ['material-icons', 'footer-item'],

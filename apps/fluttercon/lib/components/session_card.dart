@@ -10,8 +10,8 @@ class SessionCard extends StatelessComponent {
   final Session session;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield a(href: '/${session.slug}', classes: "session-card", [
+  Component build(BuildContext context) {
+    return a(href: '/${session.slug}', classes: "session-card", [
       LikeButton(session: session),
       span([text(session.timeFormatted)]),
       h2([text(session.title)]),

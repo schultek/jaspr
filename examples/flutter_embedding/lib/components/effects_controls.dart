@@ -7,7 +7,7 @@ class EffectsControls extends StatelessComponent {
   const EffectsControls({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var effects = context.watch(effectsProvider);
 
     Component effectButton(String label, String fx, [bool alignTop = false]) {
@@ -21,7 +21,7 @@ class EffectsControls extends StatelessComponent {
       );
     }
 
-    yield fieldset(id: 'fx', events: {
+    return fieldset(id: 'fx', events: {
       'click': (event) {
         var fx = (event.target as dynamic).dataset['fx'];
         if (fx != null) {

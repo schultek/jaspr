@@ -9,8 +9,8 @@ class ExecutionIFrame extends StatelessComponent {
   const ExecutionIFrame({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomNodeReader(
+  Component build(BuildContext context) {
+    return DomNodeReader(
       onNode: (node) {
         var iframe = context.read(iframeProvider);
         if (iframe == null || iframe != node) {

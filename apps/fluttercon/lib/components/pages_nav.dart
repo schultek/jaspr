@@ -6,8 +6,8 @@ class PagesNav extends StatelessComponent {
   final int? day;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield nav([
+  Component build(BuildContext context) {
+    return nav([
       a(href: '/day-1', classes: day == 1 ? 'active' : '', [text("Day 1")]),
       a(href: '/day-2', classes: day == 2 ? 'active' : '', [text("Day 2")]),
       a(href: '/day-3', classes: day == 3 ? 'active' : '', [text("Day 3")]),

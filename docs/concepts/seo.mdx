@@ -94,8 +94,9 @@ import 'components/hello.dart' deferred as hello;
 
 class MyPage extends StatelessComponent {
 
-  Iterable<Component> build(BuildContext context) sync* {
-    yield FutureBuilder(
+  @override
+  Component build(BuildContext context) {
+    return FutureBuilder(
       // This loads in the library when first built.
       future: hello.loadLibrary(),
       builder: (context, snapshot) {

@@ -33,10 +33,12 @@ part of 'framework.dart';
 ///  * [StatelessComponent], for components that always build the same way given a
 ///    particular configuration and ambient state.
 ///  * [Component], for an overview of components in general.
-abstract class InheritedComponent extends ProxyComponent {
+abstract class InheritedComponent extends Component {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
-  const InheritedComponent({super.child, super.children, super.key});
+  const InheritedComponent({required this.child, super.key});
+
+  final Component child;
 
   @override
   InheritedElement createElement() => InheritedElement(this);
@@ -58,12 +60,15 @@ abstract class InheritedComponent extends ProxyComponent {
 }
 
 /// An [Element] that uses an [InheritedComponent] as its configuration.
-class InheritedElement extends ProxyElement {
+class InheritedElement extends BuildableElement {
   /// Creates an element that uses the given component as its configuration.
   InheritedElement(InheritedComponent super.component);
 
   @override
   InheritedComponent get component => super.component as InheritedComponent;
+
+  @override
+  Component build() => component.child;
 
   final Map<Element, Object?> _dependents = HashMap<Element, Object?>();
 

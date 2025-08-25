@@ -114,8 +114,8 @@ class SimpleCard extends StatelessComponent {
   final String message;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4', [
+  Component build(BuildContext context) {
+    return div(classes: 'p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4', [
       div(classes: 'shrink-0', [
         img(classes: 'h-12 w-12', src: '/img/logo.svg', alt: '$title Logo'),
       ]),

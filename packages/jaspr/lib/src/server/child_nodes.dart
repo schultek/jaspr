@@ -168,13 +168,10 @@ class ChildList with Iterable<MarkupRenderObject> {
   }
 
   ChildListRange wrapElement(Element element) {
-    Element? prevElem = element.prevAncestorSibling;
-    while (prevElem != null && prevElem.lastRenderObjectElement == null) {
-      prevElem = prevElem.prevAncestorSibling;
-    }
+    Element? prevElem = element.slot.previousSibling;
 
-    var startAfter = findWhere((n) => n == prevElem?.lastRenderObjectElement?.renderObject) ?? _first;
-    var endBefore = findWhere((n) => n == element.lastRenderObjectElement?.renderObject)?.next ?? _last;
+    var startAfter = findWhere((n) => n == prevElem?.slot.target?.renderObject) ?? _first;
+    var endBefore = findWhere((n) => n == element.slot.target?.renderObject)?.next ?? _last;
 
     while (true) {
       if (startAfter.next case ChildNodeBoundary startNext) {
@@ -245,7 +242,7 @@ class ChildList with Iterable<MarkupRenderObject> {
 
     Element currA = a, currB = b;
     while (true) {
-      var prevA = currA.prevSibling, prevB = currB.prevSibling;
+      var prevA = currA.slot.previousSibling, prevB = currB.slot.previousSibling;
       if (prevB == a || prevA == null) {
         return 0;
       }

@@ -15,8 +15,8 @@ import 'pages/about.dart' ;
 
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Router(routes: [
+  Component build(BuildContext context) {
+    return Router(routes: [
       Route(path: '/', builder: (context, state) => Home()),
       Route(path: '/about', builder: (context, state) => About()),
     ]);
@@ -42,8 +42,8 @@ import 'pages/about.dart' deferred as about;
 
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Router(
+  Component build(BuildContext context) {
+    return Router(
       routes: [
         Route(path: '/', builder: (context, state) => Home()),
         Route.lazy(path: '/about', builder: (context, state) => about.About(), load: about.loadLibrary),

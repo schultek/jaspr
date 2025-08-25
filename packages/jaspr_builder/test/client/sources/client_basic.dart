@@ -14,7 +14,7 @@ const clientBasicSources = {
       final bool d;
     
       @override
-      Iterable<Component> build(BuildContext context) => [];
+      Component build(BuildContext context) => text('');
     }
   ''',
 };

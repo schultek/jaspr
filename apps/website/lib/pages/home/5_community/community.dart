@@ -7,8 +7,8 @@ class Community extends StatelessComponent {
   const Community({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section(id: 'community', [
+  Component build(BuildContext context) {
+    return section(id: 'community', [
       span(classes: 'caption text-gradient', [text('Community')]),
       h2([text('Join the Community')]),
       div(classes: 'community-card', [

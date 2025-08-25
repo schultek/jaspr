@@ -50,17 +50,18 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
+    final children = <Component>[];
     if (notifier.done) {
       if (showOverlay) {
-        yield LinkButton.outlined(label: 'Meet Jasper', icon: 'jasper', to: '#meet');
-        yield Overlay(onClose: () {
+        children.add(LinkButton.outlined(label: 'Meet Jasper', icon: 'jasper', to: '#meet'));
+        children.add(Overlay(onClose: () {
           setState(() {
             showOverlay = false;
           });
-        });
+        }));
       } else {
-        yield DomComponent.wrap(
+        children.add(DomComponent.wrap(
           events: {
             'click': (event) {
               event.preventDefault();
@@ -70,13 +71,13 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
             },
           },
           child: LinkButton.outlined(label: 'Meet Jasper', icon: 'jasper', to: '#meet'),
-        );
+        ));
       }
 
-      return;
+      return Fragment(children: children);
     }
 
-    yield div(id: 'meet-jaspr-button', [
+    children.add(div(id: 'meet-jaspr-button', [
       DomComponent.wrap(
         classes: touchTimer != null ? 'active' : null,
         events: {
@@ -117,7 +118,8 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
         child: LinkButton.outlined(label: 'Meet Jaspr', icon: 'custom-jaspr', to: '#meet'),
       ),
       Particles(particles: notifier.particles),
-    ]);
+    ]));
+    return Fragment(children: children);
   }
 
   @css

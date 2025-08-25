@@ -7,7 +7,7 @@ class Hello extends StatelessComponent {
   final String name;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield p([text('Hello $name')]);
+  Component build(BuildContext context) {
+    return p([text('Hello $name')]);
   }
 }

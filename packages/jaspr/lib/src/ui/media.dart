@@ -19,8 +19,8 @@ class Image extends StatelessComponent {
   final bool lazyLoading;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield img(src: source.toString(), width: width, height: height, alt: description, attributes: {
+  Component build(BuildContext context) {
+    return img(src: source.toString(), width: width, height: height, alt: description, attributes: {
       if (tooltip != null) 'title': tooltip!,
       if (lazyLoading) 'loading': 'lazy',
     });
@@ -52,8 +52,8 @@ class Video extends StatelessComponent {
   final Uri? poster;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield video(
+  Component build(BuildContext context) {
+    return video(
       src: source.toString(),
       width: width,
       height: height,
@@ -86,8 +86,8 @@ class Audio extends StatelessComponent {
   final bool muted;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield audio(
+  Component build(BuildContext context) {
+    return audio(
       src: source.toString(),
       autoplay: autoplay,
       loop: loop,

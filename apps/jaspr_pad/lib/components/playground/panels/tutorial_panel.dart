@@ -12,14 +12,14 @@ class TutorialPanel extends StatelessComponent {
   const TutorialPanel({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var tutorial = context.watch(editProjectProvider);
 
     if (tutorial is! TutorialData) {
-      return;
+      return text('');
     }
 
-    yield div(id: 'steps-panel', [
+    return div(id: 'steps-panel', [
       div(id: 'markdown-content', classes: 'custom-scrollbar', [
         Markdown(markdown: tutorial.step.text),
       ]),

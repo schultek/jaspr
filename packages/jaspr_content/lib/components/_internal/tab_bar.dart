@@ -50,8 +50,8 @@ class _TabBarState extends State<TabBar> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'tab-bar', [
+  Component build(BuildContext context) {
+    return div(classes: 'tab-bar', [
       for (var item in component.items.entries)
         button(attributes: {
           if (item.key == value) 'active': ''

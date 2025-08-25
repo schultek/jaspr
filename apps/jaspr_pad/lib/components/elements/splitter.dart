@@ -53,23 +53,24 @@ class SplitterState extends State<Splitter> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
+    final children = <Component>[];
     for (var j = 0; j < component.children.length; j++) {
       final i = j;
       if (i > 0) {
         var pair = splitPairs[i - 1];
-        yield div(
+        children.add(div(
           classes: 'gutter gutter-${component.horizontal ? 'horizontal' : 'vertical'}',
           styles: Styles(flex: Flex(basis: 6.px)),
           events: {'mousedown': (e) => pair.startDragging(e as html.MouseEventOrStubbed)},
           [],
-        );
+        ));
       }
 
       var dragging =
           (i > 0 ? splitPairs[i - 1].dragging : false) || (i < splitPairs.length ? splitPairs[i].dragging : false);
 
-      yield DomComponent.wrap(
+      children.add(DomComponent.wrap(
         styles: Styles(
           userSelect: dragging ? UserSelect.none : null,
           pointerEvents: dragging ? PointerEvents.none : null,
@@ -82,8 +83,9 @@ class SplitterState extends State<Splitter> {
           },
           child: component.children[i],
         ),
-      );
+      ));
     }
+    return Fragment(children: children);
   }
 }
 

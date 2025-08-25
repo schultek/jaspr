@@ -10,13 +10,13 @@ class LikeButton extends StatelessComponent {
   final Session session;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield ListenableBuilder(
+  Component build(BuildContext context) {
+    return ListenableBuilder(
       listenable: FavoritesService.instance,
-      builder: (context) sync* {
+      builder: (context) {
         final isFavorite = FavoritesService.instance.favorites.containsKey(session.id);
 
-        yield button(
+        return button(
           classes: 'like-button${isFavorite ? ' active' : ''}',
           events: {
             'click': (e) {

@@ -49,12 +49,12 @@ These components can only be used on the server and are only available using the
 One of these, the `AsyncBuilder` component, can be used like this:
 
 ```dart
-yield AsyncBuilder(builder: (context) async* {
+return AsyncBuilder(builder: (context) async {
   // Simply use "await" inside the build method.
   var data = await loadDataFromDatabase();
 
   // Renders the component after the data has loaded.
-  yield MyOtherComponent(data: data);
+  return MyOtherComponent(data: data);
 });
 ```
 
@@ -66,12 +66,12 @@ The other async component is the `AsyncStatelessComponent`, a variant of the `St
 class MyAsyncComponent extends AsyncStatelessComponent {
 
   @override
-  Stream<Component> build(BuildContext context) async* {
+  Future<Component> build(BuildContext context) async {
     // Simply use "await" inside the build method.
     var data = await loadDataFromDatabase();
 
     // Renders the component after the data has loaded.
-    yield MyOtherComponent(data: data);
+    return MyOtherComponent(data: data);
   }
 }
 ```

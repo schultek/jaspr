@@ -13,26 +13,26 @@ final class SidebarToggleButton extends StatelessComponent {
   const SidebarToggleButton({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    if (!kIsWeb) {
-      yield Document.head(children: [
-        Style(styles: _styles),
-      ]);
-    }
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      if (!kIsWeb)
+        Document.head(children: [
+          Style(styles: _styles),
+        ]),
+      button(classes: 'sidebar-toggle-button', onClick: () {
+        StreamSubscription<void>? closeSub, barrierSub;
+        void close(void _) {
+          closeSub?.cancel();
+          barrierSub?.cancel();
+          window.document.querySelector('.sidebar-container')?.classList.remove('open');
+        }
 
-    yield button(classes: 'sidebar-toggle-button', onClick: () {
-      StreamSubscription<void>? closeSub, barrierSub;
-      void close(void _) {
-        closeSub?.cancel();
-        barrierSub?.cancel();
-        window.document.querySelector('.sidebar-container')?.classList.remove('open');
-      }
-
-      closeSub = window.document.querySelector('.sidebar-close')?.onClick.listen(close);
-      barrierSub = window.document.querySelector('.sidebar-barrier')?.onClick.listen(close);
-      window.document.querySelector('.sidebar-container')?.classList.add('open');
-    }, [
-      raw(_menuIcon),
+        closeSub = window.document.querySelector('.sidebar-close')?.onClick.listen(close);
+        barrierSub = window.document.querySelector('.sidebar-barrier')?.onClick.listen(close);
+        window.document.querySelector('.sidebar-container')?.classList.add('open');
+      }, [
+        raw(_menuIcon),
+      ]),
     ]);
   }
 

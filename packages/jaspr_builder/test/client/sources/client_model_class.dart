@@ -16,7 +16,7 @@ final clientModelClassSources = {
       final ModelA b;
     
       @override
-      Iterable<Component> build(BuildContext context) => [];
+      Component build(BuildContext context) => text('');
     }
   ''',
   ...modelClassSources,

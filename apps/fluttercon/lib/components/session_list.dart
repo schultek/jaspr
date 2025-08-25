@@ -10,10 +10,10 @@ class SessionList extends StatelessComponent {
   final List<Session> sessions;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var groups = sessions.groupListsBy((s) => s.startsAt);
 
-    yield ul(classes: "sessions", [
+    return ul(classes: "sessions", [
       for (final MapEntry(value: sessions) in groups.entries)
         div(classes: "group", [
           for (final session in sessions)

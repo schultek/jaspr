@@ -9,8 +9,8 @@ class Meet extends StatelessComponent {
   const Meet({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section(id: 'meet', [
+  Component build(BuildContext context) {
+    return section(id: 'meet', [
       div(classes: 'meet-section meet-components', [
         div([
           h3(classes: 'select-target-1', [text('Everything is a Component')]),
@@ -39,21 +39,22 @@ class Meet extends StatelessComponent {
             const App({super.key});
 
             @override
-            Iterable<Component> build(BuildContext context) sync* {
-              // Hover me!
-              yield h2([text('Everything is a Component')]);
-              yield p([text('Jaspr Components are the fundamental building blocks ...')]);
-
-              yield div(classes: 'actions', [
-                Button(
-                  primary: true,
-                  label: 'Try out in Playground', 
-                  icon: 'rocket',
-                ),
-                Button(
-                  label: 'Read the Docs', 
-                  icon: 'book-text',
-                ),
+            Component build(BuildContext context) {
+              return div([
+                // Hover me!
+                h2([text('Everything is a Component')]),
+                p([text('Jaspr Components are the fundamental building blocks ...')]),
+                div(classes: 'actions', [
+                  Button(
+                    primary: true,
+                    label: 'Try out in Playground', 
+                    icon: 'rocket',
+                  ),
+                  Button(
+                    label: 'Read the Docs', 
+                    icon: 'book-text',
+                  ),
+                ]),
               ]);
             }
           }
@@ -85,14 +86,14 @@ class Meet extends StatelessComponent {
           description: A new Jaspr site.
 
           environment:  
-            sdk: ">=3.0.0 <4.0.0"
+            sdk: ^3.6.0
 
           dependencies:  
-            jaspr: ^0.20.0
-            jaspr_router: ^0.7.0
+            jaspr: ^0.21.0
+            jaspr_router: ^0.8.0
             
           dev_dependencies:
-            jaspr_builder: ^0.20.0
+            jaspr_builder: ^0.21.0
             jaspr_web_compilers: ^4.2.0
             jaspr_lints: ^0.4.0
 

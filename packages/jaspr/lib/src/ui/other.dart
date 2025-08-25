@@ -13,7 +13,7 @@ class Link extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield a(href: url.toString(), target: openInNewTab ? Target.blank : null, children);
+  Component build(BuildContext context) {
+    return a(href: url.toString(), target: openInNewTab ? Target.blank : null, children);
   }
 }

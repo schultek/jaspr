@@ -76,8 +76,8 @@ class _Image extends StatelessComponent {
   final String? caption;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield figure(classes: 'image', [
+  Component build(BuildContext context) {
+    return figure(classes: 'image', [
       img(src: src, alt: alt ?? caption),
       if (caption != null) figcaption([text(caption!)]),
     ]);

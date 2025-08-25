@@ -12,14 +12,14 @@ class QuoteLikeButton extends StatelessComponent {
   final int initialCount;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield StreamBuilder(
+  Component build(BuildContext context) {
+    return StreamBuilder(
       stream: FirebaseService.instance.getQuoteById(id),
-      builder: (context, snapshot) sync* {
+      builder: (context, snapshot) {
         int count = snapshot.data?.likes.length ?? initialCount;
         bool? hasLiked = snapshot.data?.likes.contains(FirebaseService.instance.getUserId());
 
-        yield button(
+        return button(
           classes: "quote-like-btn${hasLiked == true ? ' active' : ''}",
           onClick: () {
             if (hasLiked == null) return;

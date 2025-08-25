@@ -32,6 +32,9 @@ class AnalyzeCommand extends BaseCommand {
   String get category => 'Tooling';
 
   @override
+  bool get preferBuilderDependency => false;
+
+  @override
   Future<int> runCommand() async {
     var process = await Process.start('dart', ['run', 'custom_lint', ...?argResults?.arguments]);
 

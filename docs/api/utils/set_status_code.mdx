@@ -18,15 +18,15 @@ You can also provide an optional `responseBody` that will be sent as the respons
 ```dart
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     if (!isAllowedAccess) {
       // Redirect to the signup page.
       context.setHeader('Location', '/signup');
       context.setStatusCode(307, responseBody: 'Need to sign up.');
-      return;
+      return text('');
     }
 
-    yield p([text('Hello, World!')]);
+    return p([text('Hello, World!')]);
   }
 }
 ```

@@ -11,9 +11,9 @@ void main() {
       String text = "Hello";
       late void Function(void Function() cb) setState;
 
-      tester.pumpComponent(StatefulBuilder(builder: (context, s) sync* {
+      tester.pumpComponent(StatefulBuilder(builder: (context, s) {
         setState = s;
-        yield input(value: text);
+        return input(value: text);
       }));
 
       final node = tester.findNode(find.tag('input')) as HTMLInputElement;
@@ -33,9 +33,9 @@ void main() {
       String value = "a";
       late void Function(void Function() cb) setState;
 
-      tester.pumpComponent(StatefulBuilder(builder: (context, s) sync* {
+      tester.pumpComponent(StatefulBuilder(builder: (context, s) {
         setState = s;
-        yield select(value: value, [
+        return select(value: value, [
           option(value: "a", []),
           option(value: "b", []),
         ]);

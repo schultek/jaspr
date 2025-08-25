@@ -24,8 +24,9 @@ final syncModelExtensionSources = {
       Map<String, ModelB> m5 = {};
       @sync
       Map<String, ModelB?> m6 = {};
-      
-      Iterable<Component> build(BuildContext context) => [];
+
+      @override
+      Component build(BuildContext context) => text('');
     }
   ''',
   ...modelExtensionSources,

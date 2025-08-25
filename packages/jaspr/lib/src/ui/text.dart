@@ -9,8 +9,8 @@ class TextParagraph extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield p(children);
+  Component build(BuildContext context) {
+    return p(children);
   }
 }
 
@@ -27,16 +27,18 @@ class TextSpan extends StatelessComponent {
   final bool newLine;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    if (newLine) yield br();
+  Component build(BuildContext context) {
+    final children = <Component>[];
+    if (newLine) children.add(br());
 
     final lines = text.split('\n');
     for (var i = 0; i < lines.length; i++) {
-      yield Text(lines[i]);
+      children.add(Text(lines[i]));
       if (i < lines.length - 1 || breakLine) {
-        yield br();
+        children.add(br());
       }
     }
+    return Fragment(children: children);
   }
 }
 
@@ -51,8 +53,8 @@ class Heading extends StatelessComponent {
   final int size;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield switch (size) {
+  Component build(BuildContext context) {
+    return switch (size) {
       1 => h1([Text(text)]),
       2 => h2([Text(text)]),
       3 => h3([Text(text)]),
@@ -72,9 +74,9 @@ class BreakLine extends StatelessComponent {
   });
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    for (var i = 0; i < numberLines; i++) {
-      yield br();
-    }
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      for (var i = 0; i < numberLines; i++) br(),
+    ]);
   }
 }

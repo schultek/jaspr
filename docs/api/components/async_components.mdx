@@ -22,22 +22,22 @@ you need to **delay the build phase** until all data is loaded.
 
 The async components allow you to put your data-loading logic directly into the build method.
 
-- The `AsyncBuilder` component takes an async `builder: Stream<Component> Function(BuildContext context)` parameter.
-- The `AsyncStatelessComponent` has an abstract `Stream<Component> build(BuildContext context)` method.
+- The `AsyncBuilder` component takes an async `builder: Future<Component> Function(BuildContext context)` parameter.
+- The `AsyncStatelessComponent` has an abstract `Future<Component> build(BuildContext context)` method.
 
-Both methods are designed to resemble an async variant of the standard `Iterable<Component> Function(BuildContext context)`
-build method. Similarly, it is supposed to be used with the **async\* / yield** syntax:
+Both methods are designed to resemble an async variant of the standard `Component Function(BuildContext context)`
+build method.
 
 ```dart
 class MyAsyncComponent extends AsyncStatelessComponent {
 
   @override
-  Stream<Component> build(BuildContext context) async* {
+  Future<Component> build(BuildContext context) async {
     // Simply use "await" inside the build method.
     var data = await loadDataFromDatabase();
 
     // Renders the component after the data has loaded.
-    yield MyOtherComponent(data: data);
+    return MyOtherComponent(data: data);
   }
 }
 ```
@@ -45,12 +45,12 @@ class MyAsyncComponent extends AsyncStatelessComponent {
 or using the `AsyncBuilder` component:
 
 ```dart
-yield AsyncBuilder(builder: (context) async* {
+return AsyncBuilder(builder: (context) async {
   // Simply use "await" inside the build method.
   var data = await loadDataFromDatabase();
 
   // Renders the component after the data has loaded.
-  yield MyOtherComponent(data: data);
+  return MyOtherComponent(data: data);
 });
 ```
 

@@ -7,26 +7,27 @@ class HomePage extends StatelessComponent {
   const HomePage({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield header([
-      img(src: 'images/quote.jpg', alt: "Quote symbol", width: 100),
-      h1([text('Dart Quotes')]),
-    ]);
-
-    yield ul([
-      AsyncBuilder(builder: (context) async* {
-        var quotes = await QuotesService.loadQuotes(context.session);
-        quotes.sort((a, b) => b.likes.length.compareTo(a.likes.length));
-
-        for (var quote in quotes) {
-          yield li([
-            a(href: '/quote/${quote.id}', [
-              p([text(quote.quote)]),
-              span([text(quote.author)]),
-            ]),
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      header([
+        img(src: 'images/quote.jpg', alt: "Quote symbol", width: 100),
+        h1([text('Dart Quotes')]),
+      ]),
+      ul([
+        AsyncBuilder(builder: (context) async {
+          var quotes = await QuotesService.loadQuotes(context.session);
+          quotes.sort((a, b) => b.likes.length.compareTo(a.likes.length));
+          return Fragment(children: [
+            for (var quote in quotes)
+              li([
+                a(href: '/quote/${quote.id}', [
+                  p([text(quote.quote)]),
+                  span([text(quote.author)]),
+                ]),
+              ]),
           ]);
-        }
-      }),
+        }),
+      ]),
     ]);
   }
 

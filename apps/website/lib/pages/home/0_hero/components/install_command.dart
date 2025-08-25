@@ -18,8 +18,8 @@ class InstallCommandState extends State<InstallCommand> {
   bool copied = false;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'install-jaspr', events: events(onClick: () {
+  Component build(BuildContext context) {
+    return div(classes: 'install-jaspr', events: events(onClick: () {
       window.navigator.clipboard.writeText('dart pub global activate jaspr_cli');
       setState(() {
         copied = true;

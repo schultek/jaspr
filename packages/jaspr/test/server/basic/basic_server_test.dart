@@ -9,7 +9,7 @@ import 'basic_app.dart';
 void main() {
   group('basic server test', () {
     testServer('should serve component', (tester) async {
-      tester.pumpComponent(Builder.single(builder: (context) {
+      tester.pumpComponent(Builder(builder: (context) {
         Counter.initialValue = 101;
         return App();
       }));

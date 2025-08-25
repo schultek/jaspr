@@ -25,6 +25,9 @@ class CleanCommand extends BaseCommand {
   String get category => 'Tooling';
 
   @override
+  bool get preferBuilderDependency => false;
+
+  @override
   Future<int> runCommand() async {
     var genDir = Directory('.dart_tool/jaspr/').absolute;
     if (await genDir.exists()) {

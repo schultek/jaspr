@@ -9,10 +9,10 @@ class App extends StatelessComponent {
   const App({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     // you can then use the utility methods
     // to write concise html-like markup
-    yield div([
+    return div([
       // each element gets a list of child elements
       h1([text('jaspr/html')]),
       p([

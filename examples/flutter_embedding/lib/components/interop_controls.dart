@@ -12,10 +12,10 @@ class InteropControls extends StatefulComponent {
 
 class _InteropControlsState extends State<InteropControls> {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var state = context.watch(appStateProvider);
 
-    yield fieldset(id: 'interop', [
+    return fieldset(id: 'interop', [
       legend([text('JS Interop')]),
       label(htmlFor: 'screen-selector', [
         text('Screen'),

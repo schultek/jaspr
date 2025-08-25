@@ -12,17 +12,18 @@ class App extends StatelessComponent {
   const App({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Builder(builder: (context) sync* {
-      var count = context.watch(counterProvider);
-      yield Text('Count is $count');
-    });
-
-    yield button(
-      onClick: () {
-        context.read(counterProvider.notifier).state++;
-      },
-      [text('Press Me')],
-    );
+  Component build(BuildContext context) {
+    return div([
+      Builder(builder: (context) {
+        var count = context.watch(counterProvider);
+        return Text('Count is $count');
+      }),
+      button(
+        onClick: () {
+          context.read(counterProvider.notifier).state++;
+        },
+        [text('Press Me')],
+      ),
+    ]);
   }
 }

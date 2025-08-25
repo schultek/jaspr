@@ -38,36 +38,37 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'main', [
-      img(src: 'images/logo.svg', width: 80),
-      div(classes: 'buttons', [
-        button(
-          onClick: () {
-            removeCounter();
-          },
-          [text('Less Counters')],
-        ),
-        button(
-          onClick: () {
-            addCounter();
-          },
-          [text('More Counters')],
-        ),
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      div(classes: 'main', [
+        img(src: 'images/logo.svg', width: 80),
+        div(classes: 'buttons', [
+          button(
+            onClick: () {
+              removeCounter();
+            },
+            [text('Less Counters')],
+          ),
+          button(
+            onClick: () {
+              addCounter();
+            },
+            [text('More Counters')],
+          ),
+        ]),
+        div(classes: 'counters', [
+          for (var name in counters) Counter(name: name),
+        ]),
       ]),
-      div(classes: 'counters', [
-        for (var name in counters) Counter(name: name),
+      footer([
+        text('💙 Built with '),
+        a(href: "https://github.com/schultek/jaspr", [text('Jaspr')]),
+        text(' by '),
+        a(href: "https://x.com/schultek_dev", [text('@schultek')]),
+        text(' 💙'),
+        br(),
+        a(href: "https://github.com/schultek/jaspr/tree/main/examples/flutter_multi_view", [text('See the code')]),
       ]),
-    ]);
-
-    yield footer([
-      text('💙 Built with '),
-      a(href: "https://github.com/schultek/jaspr", [text('Jaspr')]),
-      text(' by '),
-      a(href: "https://x.com/schultek_dev", [text('@schultek')]),
-      text(' 💙'),
-      br(),
-      a(href: "https://github.com/schultek/jaspr/tree/main/examples/flutter_multi_view", [text('See the code')]),
     ]);
   }
 

@@ -9,8 +9,8 @@ class Integrate extends StatelessComponent {
   const Integrate({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DevexBox(
+  Component build(BuildContext context) {
+    return DevexBox(
       caption: 'INTEGRATE',
       title: 'Packages and Plugins',
       description: Fragment(children: [

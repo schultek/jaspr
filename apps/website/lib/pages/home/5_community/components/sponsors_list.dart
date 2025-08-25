@@ -37,8 +37,8 @@ class SponsorsListState extends State<SponsorsList> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'sponsors-list', [
+  Component build(BuildContext context) {
+    return div(classes: 'sponsors-list', [
       if (!loaded)
         for (var i = 0; i < 6; i++) div(classes: 'sponsor-avatar', [])
       else

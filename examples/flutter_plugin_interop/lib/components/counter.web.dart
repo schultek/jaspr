@@ -58,8 +58,8 @@ class _CounterState extends State<Counter> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'container', [
+  Component build(BuildContext context) {
+    return div(classes: 'container', [
       button(events: {'click': (_) => setState(() => count++)}, [text('Local count: $count')]),
       button(events: {'click': (_) => setState(() => remoteCount++)}, [text('Firestore count: $remoteCount')]),
     ]);

@@ -79,13 +79,15 @@ class _MarkdownState extends State<Markdown> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     if (kIsWeb) {
       context.binding.addPostFrameCallback(() {
         hljs.highlightAll();
       });
     }
-    yield* buildMarkdown(nodes);
+    return Fragment(children: [
+      ...buildMarkdown(nodes),
+    ]);
   }
 
   Iterable<Component> buildMarkdown(Iterable<Node> nodes) sync* {

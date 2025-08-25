@@ -29,14 +29,18 @@ abstract class BaseCommand extends Command<int> {
   late final bool verbose = argResults?['verbose'] as bool? ?? false;
 
   final bool requiresPubspec = true;
-  late JasprConfig? config;
+  final bool preferBuilderDependency = true;
+  JasprConfig get config => _config!;
+  JasprConfig? _config;
 
   @override
   @mustCallSuper
   Future<int> run() async {
-    config = requiresPubspec ? await getConfig(logger) : null;
+    if (requiresPubspec) {
+      _config = await getConfig(logger);
+    }
 
-    await trackEvent(name, projectName: config?.pubspecYaml['name'], projectMode: config?.mode.name);
+    await trackEvent(name, projectName: _config?.pubspecYaml['name'], projectMode: _config?.mode.name);
 
     var cancelCount = 0;
     final cancelSub = StreamGroup.merge([
@@ -167,13 +171,13 @@ abstract class BaseCommand extends Command<int> {
   }
 
   void checkWasmSupport() {
-    var package = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
-    var version = config!.pubspecYaml['dev_dependencies']?[package];
+    var package = '${config.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    var version = config.pubspecYaml['dev_dependencies']?[package];
     if (version is! String || !version.startsWith(RegExp(r'\^?4.1.'))) {
       usageException('Using "--experimental-wasm" requires $package 4.1.0 or newer.');
     }
 
-    if (config?.usesFlutter == true) {
+    if (config.usesFlutter) {
       usageException('Using "--experimental-wasm" is not supported together with flutter embedding.');
     }
   }

@@ -79,8 +79,8 @@ class ComponentAssistProvider extends DartAssist {
             '  const ');
 
         edit.addSimpleLinkedEdit('name', nameSuggestion);
-        edit.write('({super.key});\n\n  @override\n  Iterable<Component> build(BuildContext context) sync* {\n'
-            '    yield ');
+        edit.write('({super.key});\n\n  @override\n  Component build(BuildContext context) {\n'
+            '    return ');
         edit.addSimpleLinkedEdit('child', "div([])");
         edit.write(';\n  }\n}\n');
       });
@@ -110,8 +110,8 @@ class ComponentAssistProvider extends DartAssist {
         edit.addSimpleLinkedEdit('name', nameSuggestion);
         edit.write('State extends State<');
         edit.addSimpleLinkedEdit('name', nameSuggestion);
-        edit.write('> {\n\n  @override\n  Iterable<Component> build(BuildContext context) sync* {\n'
-            '    yield ');
+        edit.write('> {\n\n  @override\n  Component build(BuildContext context) {\n'
+            '    return ');
         edit.addSimpleLinkedEdit('child', "div([])");
         edit.write(';\n  }\n}\n');
       });

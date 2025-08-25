@@ -13,8 +13,8 @@ class DeleteFileDialog extends StatelessComponent {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Dialog(
+  Component build(BuildContext context) {
+    return Dialog(
       title: 'Delete File',
       content: Text('Delete file \'$file\'? This can\'t be undone.'),
       actions: [

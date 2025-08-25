@@ -94,12 +94,11 @@ class FlutterEmbedViewState extends State<FlutterEmbedView> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     if (flutterLoading || libraryLoading) {
-      yield component._buildFallback();
-      return;
+      return component._buildFallback();
     }
 
-    yield component._buildFlutter();
+    return component._buildFlutter();
   }
 }

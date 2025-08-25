@@ -102,8 +102,8 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
   final flutterDivKey = UniqueKey();
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
+  Component build(BuildContext context) {
+    return div(
       id: component.id,
       classes: [if (component.classes != null) component.classes, if (didRenderView) 'active'].join(' '),
       styles: Styles.combine([

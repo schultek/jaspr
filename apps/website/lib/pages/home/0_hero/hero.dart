@@ -9,8 +9,8 @@ import '../../../constants/theme.dart';
 
 class Hero extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section(id: "hero", [
+  Component build(BuildContext context) {
+    return section(id: "hero", [
       div([
         a(
             classes: 'hero-pill',

@@ -4,7 +4,7 @@ part of 'framework.dart';
 ///
 /// Must have a [tag] and any number of attributes.
 /// Can have a single [child] component or any amount of [children].
-class DomComponent extends ProxyComponent {
+class DomComponent extends Component {
   const DomComponent({
     super.key,
     required this.tag,
@@ -13,8 +13,7 @@ class DomComponent extends ProxyComponent {
     this.styles,
     this.attributes,
     this.events,
-    super.child,
-    super.children,
+    this.children,
   });
 
   const factory DomComponent.wrap({
@@ -33,18 +32,22 @@ class DomComponent extends ProxyComponent {
   final Styles? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
+  final List<Component>? children;
 
   @override
-  ProxyElement createElement() => DomElement(this);
+  Element createElement() => DomElement(this);
 }
 
-class DomElement extends ProxyRenderObjectElement {
+class DomElement extends MultiChildRenderObjectElement {
   DomElement(DomComponent super.component);
 
   @override
   DomComponent get component => super.component as DomComponent;
 
   InheritedElement? _wrappingElement;
+
+  @override
+  List<Component> buildChildren() => component.children ?? [];
 
   @override
   void _updateInheritance() {
@@ -58,13 +61,18 @@ class DomElement extends ProxyRenderObjectElement {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    updateRenderObject();
+    updateRenderObject(renderObject as RenderElement);
+  }
+
+  @override
+  void update(DomComponent newComponent) {
+    assert(component.tag == newComponent.tag, 'Cannot update a DomComponent with a different tag.');
+    super.update(newComponent);
   }
 
   @override
   bool shouldRerender(DomComponent newComponent) {
-    return component.tag != newComponent.tag ||
-        component.id != newComponent.id ||
+    return component.id != newComponent.id ||
         component.classes != newComponent.classes ||
         component.styles != newComponent.styles ||
         component.attributes != newComponent.attributes ||
@@ -72,11 +80,18 @@ class DomElement extends ProxyRenderObjectElement {
   }
 
   @override
-  void updateRenderObject() {
+  RenderObject createRenderObject() {
+    final renderObject = _parentRenderObjectElement!.renderObject.createChildRenderElement(component.tag);
+    assert(renderObject.parent == _parentRenderObjectElement!.renderObject);
+    updateRenderObject(renderObject);
+    return renderObject;
+  }
+
+  @override
+  void updateRenderObject(RenderElement renderObject) {
     if (_wrappingElement != null) {
       var wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
-      renderObject.updateElement(
-        component.tag,
+      renderObject.update(
         component.id ?? wrappingComponent.id,
         _joinString(wrappingComponent.classes, component.classes),
         _joinMap(wrappingComponent.styles?.properties, component.styles?.properties),
@@ -87,8 +102,7 @@ class DomElement extends ProxyRenderObjectElement {
       return;
     }
 
-    renderObject.updateElement(
-      component.tag,
+    renderObject.update(
       component.id,
       component.classes,
       component.styles?.properties,
@@ -135,6 +149,9 @@ class _WrappingDomComponent extends InheritedComponent implements DomComponent {
   final Map<String, EventCallback>? events;
 
   @override
+  List<Component>? get children => null;
+
+  @override
   bool updateShouldNotify(_WrappingDomComponent oldComponent) {
     return oldComponent.id != id ||
         oldComponent.classes != classes ||
@@ -160,28 +177,22 @@ class TextElement extends LeafRenderObjectElement {
   TextElement(Text super.component);
 
   @override
+  Text get component => super.component as Text;
+
+  @override
   bool shouldRerender(Text newComponent) {
-    return (component as Text).text != newComponent.text;
+    return component.text != newComponent.text;
   }
 
   @override
-  void updateRenderObject() {
-    renderObject.updateText((component as Text).text);
+  RenderObject createRenderObject() {
+    final renderObject = _parentRenderObjectElement!.renderObject.createChildRenderText(component.text);
+    assert(renderObject.parent == _parentRenderObjectElement!.renderObject);
+    return renderObject;
   }
-}
-
-class SkipContent extends Component {
-  const SkipContent();
 
   @override
-  Element createElement() => SkipContentElement(this);
-}
-
-class SkipContentElement extends LeafRenderObjectElement {
-  SkipContentElement(SkipContent super.component);
-
-  @override
-  void updateRenderObject() {
-    renderObject.skipChildren();
+  void updateRenderObject(RenderText text) {
+    text.update(component.text);
   }
 }

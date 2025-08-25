@@ -49,7 +49,7 @@ abstract class PageLayoutBase implements PageLayout {
       _ => '',
     };
 
-    yield DomComponent(tag: 'title', child: text(title));
+    yield DomComponent(tag: 'title', children: [text(title)]);
     yield meta(attributes: {'property': 'og:title'}, content: title);
 
     if (siteData['favicon'] case final String favicon) {

@@ -25,7 +25,8 @@ final syncModelClassSources = {
       @sync
       Map<String, ModelA?> m6 = {};
       
-      Iterable<Component> build(BuildContext context) => [];
+      @override
+      Component build(BuildContext context) => text('');
     }
   ''',
   ...modelClassSources,

@@ -11,15 +11,15 @@ class MenuButton extends StatelessComponent {
   final Component? child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield button(
-        classes: 'menu-toggle',
-        attributes: {'aria-label': 'Menu Toggle'},
-        onClick: onClick,
-        [Icon(child != null ? 'x' : 'menu')]);
-    if (child != null) {
-      yield div(classes: 'menu-overlay', [child!]);
-    }
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      button(
+          classes: 'menu-toggle',
+          attributes: {'aria-label': 'Menu Toggle'},
+          onClick: onClick,
+          [Icon(child != null ? 'x' : 'menu')]),
+      if (child != null) div(classes: 'menu-overlay', [child!]),
+    ]);
   }
 
   @css

@@ -16,13 +16,11 @@ class MyComponent extends StatefulComponent {
 
 class MyComponentState extends State<MyComponent> {
 
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div([...]);
+  Component build(BuildContext context) {
+    return div([...]);
   }
 }
 ```
-
-It again defines the `build()` method using the [**Sync Generator**](https://dart.dev/guides/language/language-tour#generators) pattern.
 
 # Task
 
@@ -32,5 +30,5 @@ It again defines the `build()` method using the [**Sync Generator**](https://dar
 3. Import the new file in your `main.dart` and use the [Counter] component beneath the `div` component.
    <details>
      <summary>Tip</summary>
-     Use `yield` a second time inside the `App`s build method.
+     Use the `Fragment` component to return multiple children.
    </details>

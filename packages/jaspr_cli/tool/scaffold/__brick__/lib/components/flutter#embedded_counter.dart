@@ -13,8 +13,8 @@ class EmbeddedCounter extends StatelessComponent {
   final void Function(int) onChange;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield FlutterEmbedView.deferred(
+  Component build(BuildContext context) {
+    return FlutterEmbedView.deferred(
       styles: Styles(margin: Margin.only(top: 2.rem)),
       // We need to set constraints as the flutter view cannot dynamically size itself.
       constraints: ViewConstraints(

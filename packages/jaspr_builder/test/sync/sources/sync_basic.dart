@@ -20,7 +20,8 @@ final syncBasicSources = {
       @sync
       Map<String, Object> d = {};
     
-      Iterable<Component> build(BuildContext context) => [];
+      @override
+      Component build(BuildContext context) => text('');
     }
   ''',
 };

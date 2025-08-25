@@ -28,7 +28,7 @@ class Markdown extends StatelessComponent {
   final List<CustomComponent> components;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     final markdownDocument = document ??
         md.Document(
           blockSyntaxes: MarkdownParser.defaultBlockSyntaxes,
@@ -39,8 +39,6 @@ class Markdown extends StatelessComponent {
     final nodes = MarkdownParser.buildNodes(markdownNodes);
 
     final child = NodesBuilder(components).build(nodes);
-    if (child != null) {
-      yield Content(child);
-    }
+    return Content(child);
   }
 }

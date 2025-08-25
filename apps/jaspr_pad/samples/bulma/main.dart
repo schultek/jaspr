@@ -13,40 +13,37 @@ void main() {
 
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield ExampleNavbar();
-
-    yield ButtonGroup(children: [
-      Button(child: Text('Normal'), onPressed: () {}),
-      Button(child: Text('Outlined'), isOutlined: true, onPressed: () {}),
-      Button(child: Text('Primary'), color: Color.primary, onPressed: () {}),
-      Button(child: Text('Loading'), isLoading: true, onPressed: () {}),
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      ExampleNavbar(),
+      ButtonGroup(children: [
+        Button(child: Text('Normal'), onPressed: () {}),
+        Button(child: Text('Outlined'), isOutlined: true, onPressed: () {}),
+        Button(child: Text('Primary'), color: Color.primary, onPressed: () {}),
+        Button(child: Text('Loading'), isLoading: true, onPressed: () {}),
+      ]),
+      ButtonGroup(isAttached: true, children: [
+        Button(child: IconLabel(icon: 'align-left', label: 'Left'), onPressed: () {}),
+        Button(child: IconLabel(icon: 'align-center', label: 'Center'), onPressed: () {}),
+        Button(child: IconLabel(icon: 'align-right', label: 'Right'), onPressed: () {}),
+      ]),
+      ProgressBar(value: 70, color: Color.success),
+      ProgressBar(color: Color.warning),
+      Tabs(
+        tabs: [Text('Pictures'), Text('Music'), Text('Videos'), Text('Documents')],
+        onSelected: (int value) {},
+      ),
+      Tabs(
+        tabs: [
+          IconLabel(icon: 'image', label: 'Pictures'),
+          IconLabel(icon: 'music', label: 'Music'),
+          IconLabel(icon: 'film', label: 'Videos'),
+          IconLabel(icon: 'file-alt', label: 'Documents'),
+        ],
+        isToggle: true,
+        onSelected: (int value) {},
+      ),
     ]);
-
-    yield ButtonGroup(isAttached: true, children: [
-      Button(child: IconLabel(icon: 'align-left', label: 'Left'), onPressed: () {}),
-      Button(child: IconLabel(icon: 'align-center', label: 'Center'), onPressed: () {}),
-      Button(child: IconLabel(icon: 'align-right', label: 'Right'), onPressed: () {}),
-    ]);
-
-    yield ProgressBar(value: 70, color: Color.success);
-    yield ProgressBar(color: Color.warning);
-
-    yield Tabs(
-      tabs: [Text('Pictures'), Text('Music'), Text('Videos'), Text('Documents')],
-      onSelected: (int value) {},
-    );
-
-    yield Tabs(
-      tabs: [
-        IconLabel(icon: 'image', label: 'Pictures'),
-        IconLabel(icon: 'music', label: 'Music'),
-        IconLabel(icon: 'film', label: 'Videos'),
-        IconLabel(icon: 'file-alt', label: 'Documents'),
-      ],
-      isToggle: true,
-      onSelected: (int value) {},
-    );
   }
 }
 
@@ -61,8 +58,8 @@ class _ExampleNavbarState extends State<ExampleNavbar> {
   bool isActive = false;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield NavBar(
+  Component build(BuildContext context) {
+    return NavBar(
       brand: NavbarBrand(children: [
         NavbarItem(child: BulmaLogo(), href: 'https://bulma.io'),
         NavbarBurger(
@@ -91,7 +88,7 @@ class BulmaLogo extends StatelessComponent {
   const BulmaLogo({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield img(src: 'https://bulma.io/assets/brand/Bulma%20Logo.svg', attributes: {'width': '112', 'height': '20'});
+  Component build(BuildContext context) {
+    return img(src: 'https://bulma.io/assets/brand/Bulma%20Logo.svg', attributes: {'width': '112', 'height': '20'});
   }
 }

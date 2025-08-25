@@ -8,10 +8,10 @@ class Style extends StatelessComponent {
   const Style({required this.styles, super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
+  Component build(BuildContext context) {
+    return DomComponent(
       tag: 'style',
-      child: RawText(styles.render()),
+      children: [RawText(styles.render())],
     );
   }
 }

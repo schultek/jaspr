@@ -46,10 +46,10 @@ is equivalent to this (in Jaspr)
 // just extends the normal component
 class MyComponent extends StatelessComponent {
   // no extra parameter
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     // uses context to access providers
     var value = context.watch(myProvider);
-    yield Text(value);
+    return Text(value);
   }
 }
 ```
@@ -69,9 +69,9 @@ component tree to rebuild when watching a provider, simply use the `Builder` com
 give you a new context which you can call `context.watch` on:
 
 ```dart
-Builder(builder: (context) sync* {
+Builder(builder: (context) {
   var value = context.watch(...);
-  yield /* ... */;
+  return /* ... */;
 });
 ```
 

@@ -157,7 +157,7 @@ class SimpleTextOutput extends SecondaryOutput {
   Component build(Page page) {
     // The 'page' object contains all data about the page,
     // including frontmatter (page.data) and raw content (page.content)
-    return Builder(builder: (context) sync* {
+    return Builder(builder: (context) {
       context.setHeader('Content-Type', 'text/plain; charset=utf-8');
       final textContent = '''
 Page URL: ${page.url}
@@ -167,6 +167,8 @@ Title: ${page.data['page']?['title'] ?? 'Untitled'}
 ${page.content}
 ''';
       context.setStatusCode(200, responseBody: textContent);
+
+      return text('');
     });
   }
 }

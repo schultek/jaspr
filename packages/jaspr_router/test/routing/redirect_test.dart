@@ -71,9 +71,9 @@ void main() {
       var blocked = false;
       late void Function(VoidCallback) setState;
 
-      tester.pumpComponent(StatefulBuilder(builder: (context, cb) sync* {
+      tester.pumpComponent(StatefulBuilder(builder: (context, cb) {
         setState = cb;
-        yield Router(
+        return Router(
           routes: [
             homeRoute(),
             route('/a'),

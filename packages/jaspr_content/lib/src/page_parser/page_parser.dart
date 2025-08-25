@@ -141,9 +141,9 @@ class NodesBuilder {
   final List<CustomComponent> components;
 
   /// Builds a component from the given nodes.
-  Component? build(List<Node>? nodes) {
+  Component build(List<Node>? nodes) {
     if (nodes == null || nodes.isEmpty) {
-      return null;
+      return Fragment(children: []);
     }
     return Fragment(children: _buildNodes(nodes));
   }
@@ -168,7 +168,7 @@ class NodesBuilder {
         result.add(DomComponent(
           tag: node.tag,
           attributes: node.attributes,
-          child: node.children != null ? build(node.children!) : null,
+          children: _buildNodes(node.children ?? []),
         ));
       } else if (node is ComponentNode) {
         result.add(node.component);

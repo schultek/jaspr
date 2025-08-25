@@ -152,8 +152,8 @@ class BaseDocument extends StatelessComponent implements Document {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
+  Component build(BuildContext context) {
+    return DomComponent(
       tag: 'html',
       attributes: {
         if (lang != null) 'lang': lang!,
@@ -176,7 +176,7 @@ class BaseDocument extends StatelessComponent implements Document {
             ...head,
           ],
         ),
-        DomComponent(tag: 'body', child: body),
+        DomComponent(tag: 'body', children: [body]),
       ],
     );
   }
@@ -194,8 +194,8 @@ class TemplateDocument extends StatelessComponent implements Document {
   final Component child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield child;
+  Component build(BuildContext context) {
+    return child;
   }
 
   @override
@@ -208,7 +208,7 @@ class _TemplateDocumentElement extends StatelessElement {
   Future<String?>? _templateFuture;
 
   @override
-  Iterable<Component> build() {
+  Component build() {
     (binding as ServerAppBinding).addRenderAdapter(TemplateDocumentAdapter(this));
     _templateFuture ??= (binding as ServerAppBinding).loadFile('${(component as TemplateDocument).name}.template.html');
     return super.build();
@@ -237,20 +237,22 @@ class TemplateDocumentAdapter extends ElementBoundaryAdapter {
     var document = parse(template);
     var target = document.querySelector((element.component as TemplateDocument).attachTo)!;
 
+    final MarkupRenderObject parent = element.parentRenderObjectElement!.renderObject as MarkupRenderObject;
+
     MarkupRenderObject? createTree(dom.Node node) {
-      var n = element.parentRenderObjectElement!.renderObject.createChildRenderObject() as MarkupRenderObject;
+      MarkupRenderObject n;
 
       if (node is dom.Text) {
         if (node.text.trim().isEmpty) {
           return null;
         }
-        n.updateText(node.text.trim(), true);
+        n = parent.createChildRenderText(node.text.trim(), true);
       } else if (node is dom.Comment) {
-        n.updateText('<!--${node.data}-->', true);
+        n = parent.createChildRenderText('<!--${node.data}-->', true);
       } else if (node is dom.Element) {
-        n.updateElement(node.localName!, null, null, null, node.attributes.cast(), null);
+        n = parent.createChildRenderElement(node.localName!)..update(null, null, null, node.attributes.cast(), null);
       } else if (node is dom.DocumentType) {
-        n.updateText(node.toString(), true);
+        n = parent.createChildRenderText(node.toString(), true);
       } else {
         throw UnsupportedError('Unsupported node type ${node.nodeType}');
       }
@@ -299,12 +301,12 @@ class HeadDocument extends StatelessComponent implements Document {
   final List<Component>? children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield AttachDocument(
+  Component build(BuildContext context) {
+    return AttachDocument(
       target: 'head',
       attributes: null,
       children: [
-        if (title != null) DomComponent(tag: 'title', child: Text(title!)),
+        if (title != null) DomComponent(tag: 'title', children: [Text(title!)]),
         if (meta != null)
           for (var e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
         ...?children,
@@ -327,11 +329,9 @@ class AttachDocument extends StatelessComponent implements Document {
   final List<Component>? children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     AttachAdapter.register(context, this);
-    if (children != null) {
-      yield* children!;
-    }
+    return Fragment(children: children ?? []);
   }
 }
 
@@ -339,6 +339,11 @@ final Expando<AttachAdapter> _attach = Expando();
 
 class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
   static void register(BuildContext context, AttachDocument item) {
+    if (context.binding is! ServerAppBinding) {
+      // Return early in component tests.
+      return;
+    }
+
     var binding = (context.binding as ServerAppBinding);
     var adapter = _attach[binding] ??= AttachAdapter();
     binding.addRenderAdapter(adapter);
@@ -360,9 +365,9 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
 
     String? keyFor(MarkupRenderObject n) {
       return switch (n) {
-        MarkupRenderObject(id: String id) when id.isNotEmpty => id,
-        MarkupRenderObject(tag: "title" || "base") => '__${n.tag}',
-        MarkupRenderObject(tag: "meta", attributes: {'name': String name}) => '__meta:$name',
+        MarkupRenderElement(id: String id) when id.isNotEmpty => id,
+        MarkupRenderElement(tag: "title" || "base") => '__${n.tag}',
+        MarkupRenderElement(tag: "meta", attributes: {'name': String name}) => '__meta:$name',
         _ => null,
       };
     }
@@ -380,27 +385,38 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
       }
 
       if (value.children.isNotEmpty) {
-        target.children.insertBefore(target.createChildRenderObject()..updateText(r'<!--$-->', true));
+        target.children.insertBefore(target.createChildRenderText(r'<!--$-->', true));
 
         List<MarkupRenderObject> nodes = [];
         Map<String, (int, int)> indices = {};
 
+        void visitRenderObject(MarkupRenderObject o, int depth) {
+          if (o is MarkupRenderFragment) {
+            for (final child in o.children) {
+              visitRenderObject(child, depth);
+            }
+            return;
+          }
+
+          var key = keyFor(o);
+          if (key == null) {
+            nodes.add(o);
+            return;
+          }
+          var index = indices[key];
+          if (index == null) {
+            nodes.add(o);
+            indices[key] = (nodes.length - 1, depth);
+          }
+          if (index != null && depth >= index.$2) {
+            nodes[index.$1] = o;
+          }
+        }
+
         for (var e in value.children) {
           e.$1.remove();
           for (var n in e.$1) {
-            var key = keyFor(n);
-            if (key == null) {
-              nodes.add(n);
-              continue;
-            }
-            var index = indices[key];
-            if (index == null) {
-              nodes.add(n);
-              indices[key] = (nodes.length - 1, e.$2);
-            }
-            if (index != null && e.$2 >= index.$2) {
-              nodes[index.$1] = n;
-            }
+            visitRenderObject(n, e.$2);
           }
         }
 
@@ -408,7 +424,7 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
           target.children.insertBefore(n);
         }
 
-        target.children.insertBefore(target.createChildRenderObject()..updateText(r'<!--/-->', true));
+        target.children.insertBefore(target.createChildRenderText(r'<!--/-->', true));
       }
     }
   }

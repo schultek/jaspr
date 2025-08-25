@@ -10,8 +10,8 @@ class App extends StatelessComponent {
   const App({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield ProviderScope(
+  Component build(BuildContext context) {
+    return ProviderScope(
       child: section(classes: 'contents', [
         FlutterAppContainer(),
         aside(id: 'demo_controls', [

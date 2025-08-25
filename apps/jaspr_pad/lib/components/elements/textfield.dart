@@ -20,8 +20,8 @@ class TextFieldState extends State<TextField> {
   MDCTextFieldOrStubbed? _textField;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomNodeReader(
+  Component build(BuildContext context) {
+    return DomNodeReader(
       onNode: (node) {
         _textField ??= MDCTextField(node);
       },

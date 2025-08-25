@@ -9,16 +9,17 @@ class FavoritesPage extends StatelessComponent {
   const FavoritesPage({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield PagesNav();
-
-    yield ListenableBuilder(
-      listenable: FavoritesService.instance,
-      builder: (context) sync* {
-        var favorites = FavoritesService.instance.favorites.values.toList();
-        favorites.sort((a, b) => a.startsAt.compareTo(b.startsAt));
-        yield SessionList(sessions: favorites);
-      },
-    );
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      PagesNav(),
+      ListenableBuilder(
+        listenable: FavoritesService.instance,
+        builder: (context) {
+          var favorites = FavoritesService.instance.favorites.values.toList();
+          favorites.sort((a, b) => a.startsAt.compareTo(b.startsAt));
+          return SessionList(sessions: favorites);
+        },
+      ),
+    ]);
   }
 }

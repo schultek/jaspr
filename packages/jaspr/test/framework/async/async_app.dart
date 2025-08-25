@@ -6,19 +6,20 @@ class FutureTester<T> extends StatelessComponent {
   final Future<T> future;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield FutureBuilder<T>(
+  Component build(BuildContext context) {
+    return FutureBuilder<T>(
       future: future,
-      builder: (context, snapshot) sync* {
+      builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          yield Text('LOADING');
+          return Text('LOADING');
         } else if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
-            yield Text('DATA: ${snapshot.data}');
+            return Text('DATA: ${snapshot.data}');
           } else if (snapshot.hasError) {
-            yield Text('ERROR: ${snapshot.error}');
+            return Text('ERROR: ${snapshot.error}');
           }
         }
+        return Text('UNKNOWN STATE: ${snapshot.connectionState}');
       },
     );
   }
@@ -30,21 +31,22 @@ class StreamTester<T> extends StatelessComponent {
   final Stream<T> stream;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield StreamBuilder<T>(
+  Component build(BuildContext context) {
+    return StreamBuilder<T>(
       stream: stream,
-      builder: (context, snapshot) sync* {
+      builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          yield Text('LOADING');
+          return Text('LOADING');
         } else if (snapshot.connectionState == ConnectionState.done) {
-          yield Text('DONE');
+          return Text('DONE');
         } else if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData) {
-            yield Text('DATA: ${snapshot.data}');
+            return Text('DATA: ${snapshot.data}');
           } else if (snapshot.hasError) {
-            yield Text('ERROR: ${snapshot.error}');
+            return Text('ERROR: ${snapshot.error}');
           }
         }
+        return Text('UNKNOWN STATE: ${snapshot.connectionState}');
       },
     );
   }

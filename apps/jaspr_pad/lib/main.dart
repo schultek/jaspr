@@ -30,7 +30,7 @@ void main() async {
   router.mount('/', serveApp((r, render) {
     return render(Document.template(
       name: 'main',
-      child: Builder.single(builder: (context) {
+      child: Builder(builder: (context) {
         return ProviderScope(
           overrides: [syncSamplesProvider.overrideWith(loadSamplesProviderOverride)],
           child: Playground(),

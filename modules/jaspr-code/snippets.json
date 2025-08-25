@@ -8,8 +8,8 @@
 				"  const $1({ Key? key }) : super(key: key);",
 				"",
 				"  @override",
-				"  Iterable<Component> build(BuildContext context) sync* {",
-				"    yield ${0:div([])};",
+				"  Component build(BuildContext context) {",
+				"    return ${0:div([])};",
 				"  }",
 				"}"
 			]
@@ -27,8 +27,8 @@
 				"",
 				"class _$1State extends State<$1> {",
 				"  @override",
-				"  Iterable<Component> build(BuildContext context) sync* {",
-				"    yield ${2:div([$3])};",
+				"  Component build(BuildContext context) {",
+				"    return ${2:div([$3])};",
 				"  }",
 				"}"
 			]

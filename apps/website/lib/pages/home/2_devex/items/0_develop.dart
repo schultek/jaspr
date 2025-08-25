@@ -10,8 +10,8 @@ class Develop extends StatelessComponent {
   const Develop({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DevexBox(
+  Component build(BuildContext context) {
+    return DevexBox(
       caption: 'DEVELOP',
       title: 'Familiar Concepts',
       description: text('Apply your Flutter skills to build websites. '
@@ -24,8 +24,8 @@ class Develop extends StatelessComponent {
               framed: false,
               scroll: false,
               source: '''
-                Iterable<Component> build(BuildContext context) sync* {
-                  yield button(
+                Component build(BuildContext context) {
+                  return button(
                     onClick: () {
                       setState(() => count++);
                     },

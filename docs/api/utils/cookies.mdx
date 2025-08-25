@@ -16,13 +16,13 @@ With the `context.cookies` getter you can access the cookies sent with the curre
 ```dart
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     final sessionCookie = context.cookies['session'];
 
     if (isValid(sessionCookie)) {
-      yield p([text('Welcome back!')]);
+      return p([text('Welcome back!')]);
     } else {
-      yield p([text('Please log in.')]);
+      return p([text('Please log in.')]);
     }
   }
 }
@@ -37,12 +37,12 @@ You can control cookie attributes like `expires`, `maxAge`, `domain`, `path`, `s
 ```dart
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     if (didLogIn) {
       context.setCookie('session', '1234');
     }
 
-    yield p([text('Hello, World!')]);
+    return p([text('Hello, World!')]);
   }
 }
 ```

@@ -18,8 +18,8 @@ class TestimonialCard extends StatelessComponent {
   final String link;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'testimonial-card', [
+  Component build(BuildContext context) {
+    return div(classes: 'testimonial-card', [
       p([raw('&ldquo;'), text(quote), raw('&rdquo;')]),
       a(href: link, [
         img(src: picture, height: 40, width: 40, alt: name),

@@ -13,8 +13,8 @@ class PlaygroundHeader extends StatelessComponent {
   const PlaygroundHeader({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield header(classes: 'mdc-elevation--z4', [
+  Component build(BuildContext context) {
+    return header(classes: 'mdc-elevation--z4', [
       div(classes: 'header-title', [
         img(classes: 'logo', src: "jaspr-192.png", alt: "JasprPad Logo"),
         span([text('JasprPad')]),
@@ -59,9 +59,9 @@ class PlaygroundHeader extends StatelessComponent {
           },
         ),
       ]),
-      Builder(builder: (context) sync* {
+      Builder(builder: (context) {
         var name = context.watch(projectNameProvider);
-        yield div(classes: 'header-gist-name', [text(name ?? '')]);
+        return div(classes: 'header-gist-name', [text(name ?? '')]);
       }),
       Button(
         dense: true,
@@ -100,10 +100,10 @@ class SamplesMenuButton extends StatelessComponent with SyncProviderDependencies
   Iterable<SyncProvider> get preloadDependencies => [syncSamplesProvider];
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var samples = context.watch(syncSamplesProvider).valueOrNull ?? [];
 
-    yield Menu(
+    return Menu(
       items: [
         for (var sample in samples) MenuItem(label: sample.description),
       ],

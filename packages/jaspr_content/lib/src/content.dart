@@ -20,15 +20,17 @@ class Content extends StatelessComponent {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
+    final children = <Component>[];
     if (!kIsWeb) {
       final theme = themeOf(context);
-      yield Document.head(children: [
+      children.add(Document.head(children: [
         Style(styles: theme.styles),
-      ]);
+      ]));
     }
 
-    yield section(classes: 'content', [child]);
+    children.add(section(classes: 'content', [child]));
+    return Fragment(children: children);
   }
 }
 

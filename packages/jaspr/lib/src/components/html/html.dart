@@ -15,11 +15,11 @@ part 'text.dart';
 final _events = events;
 
 /// Utility method to create a [Text] component.
-Component text(String text) {
-  return Text(text);
+Component text(String text, {Key? key}) {
+  return Text(text, key: key);
 }
 
 /// Utility method to create a [RawText] component.
-Component raw(String text) {
-  return RawText(text);
+Component raw(String text, {Key? key}) {
+  return RawText(text, key: key);
 }

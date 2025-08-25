@@ -13,14 +13,14 @@ import 'pages/session.dart';
 // A simple [StatelessComponent] with a [build] method.
 class App extends AsyncStatelessComponent {
   @override
-  Stream<Component> build(BuildContext context) async* {
+  Future<Component> build(BuildContext context) async {
     final response = await get(
         Uri.parse('https://sessionize.com/api/v2/${Platform.environment['FLUTTERCON_SESSIONIZE_ID']}/view/Sessions'));
 
     final [{"sessions": sessionsJson}] = jsonDecode(response.body) as List;
     final sessions = (sessionsJson as List).map((s) => SessionMapper.fromMap(s)).toList();
 
-    yield Router(
+    return Router(
       redirect: (context, state) {
         if (state.location == '/') return '/day-1';
         return null;

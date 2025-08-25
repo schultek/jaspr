@@ -29,26 +29,27 @@ class _AppState extends State<App> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield SearchBar(
-      placeholder: 'Enter Location',
-      onSearch: (value) {
-        setState(() => updateWeather(value));
-      },
-    );
-
-    yield FutureBuilder<CurrentWeather>(
-      future: weatherFuture,
-      builder: (context, snapshot) sync* {
-        if (snapshot.hasData) {
-          yield SimpleWeather(snapshot.data!);
-        } else if (snapshot.hasError) {
-          yield Text('Error: ${snapshot.error}');
-        } else {
-          yield Text('Loading');
-        }
-      },
-    );
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      SearchBar(
+        placeholder: 'Enter Location',
+        onSearch: (value) {
+          setState(() => updateWeather(value));
+        },
+      ),
+      FutureBuilder<CurrentWeather>(
+        future: weatherFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return SimpleWeather(snapshot.data!);
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            return Text('Loading');
+          }
+        },
+      ),
+    ]);
   }
 }
 
@@ -58,8 +59,8 @@ class SimpleWeather extends StatelessComponent {
   final CurrentWeather weather;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'weather', [
+  Component build(BuildContext context) {
+    return div(classes: 'weather', [
       img(src: weather.condition.icon),
       div(classes: 'info', [
         h1([text('${weather.temp}°')]),
@@ -83,8 +84,8 @@ class SearchBarState extends State<SearchBar> {
   String search = '';
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'searchbar', [
+  Component build(BuildContext context) {
+    return div(classes: 'searchbar', [
       input(
         type: InputType.text,
         attributes: {if (component.placeholder != null) 'placeholder': component.placeholder!},
