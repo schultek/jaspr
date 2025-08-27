@@ -7,10 +7,10 @@ class Header extends StatelessComponent {
   const Header({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var activePath = {{^multipage}}RouteState.of(context).location{{/multipage}}{{#multipage}}context.url{{/multipage}};
 
-    yield header([
+    return header([
       nav([
         for (var route in [
           (label: 'Home', path: '/'),

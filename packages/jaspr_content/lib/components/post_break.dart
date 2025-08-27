@@ -16,8 +16,8 @@ class PostBreak extends StatelessComponent with CustomComponentBase {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'postbreak', [
+  Component build(BuildContext context) {
+    return div(classes: 'postbreak', [
       span([]),
       span([]),
       span([]),

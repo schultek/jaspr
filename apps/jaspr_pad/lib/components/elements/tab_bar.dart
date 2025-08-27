@@ -34,8 +34,8 @@ class TabBarState extends State<TabBar> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomNodeReader(
+  Component build(BuildContext context) {
+    return DomNodeReader(
       onNode: (node) {
         if (kIsWeb && _tabBar == null) {
           _tabBar = MDCTabBar(node)..activateTab(component.selected + (component.leading != null ? 1 : 0));
@@ -75,8 +75,8 @@ class ButtonTab extends Tab {
   final VoidCallback onPressed;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield button(
+  Component build(BuildContext context) {
+    return button(
       classes: 'mdc-tab',
       events: {'click': (e) => onPressed()},
       attributes: {
@@ -114,10 +114,10 @@ class Tab extends StatelessComponent {
   final String label;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var (selected, index, onSelect) = context.watch(_tabProvider);
 
-    yield button(
+    return button(
       classes: 'mdc-tab ${selected ? ' mdc-tab--active' : ''}',
       events: {'click': (e) => onSelect()},
       attributes: {

@@ -11,8 +11,8 @@ class NewPadDialog extends StatelessComponent {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Dialog(
+  Component build(BuildContext context) {
+    return Dialog(
       title: 'Create New Pad',
       content: Text('This will discard the current pad.'),
       actions: [

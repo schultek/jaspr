@@ -70,7 +70,7 @@ class EditorState extends State<Editor> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     Component child = div(id: 'editor-host', []);
 
     if (kIsWeb) {
@@ -79,7 +79,7 @@ class EditorState extends State<Editor> {
         child: child,
       );
     }
-    yield child;
+    return child;
   }
 
   @override

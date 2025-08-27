@@ -9,7 +9,7 @@ class Counter extends StatefulComponent {
 
 class _CounterState extends State<Counter> {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Text('Counter');
+  Component build(BuildContext context) {
+    return Text('Counter');
   }
 }

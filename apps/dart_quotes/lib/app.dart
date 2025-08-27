@@ -6,19 +6,21 @@ import 'pages/quote_page.dart';
 
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'main', [
-      Router(
-        routes: [
-          Route(path: '/', builder: (context, state) => HomePage()),
-          Route(path: '/quote/:quoteId', builder: (context, state) => QuotePage(id: state.params['quoteId']!)),
-        ],
-      ),
-    ]);
-    yield a(classes: "github-badge", href: "https://github.com/schultek/jaspr", attributes: {
-      'aria-label': "Find the source on Github"
-    }, [
-      img(src: '/images/github-badge.svg', alt: "Github Badge"),
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      div(classes: 'main', [
+        Router(
+          routes: [
+            Route(path: '/', builder: (context, state) => HomePage()),
+            Route(path: '/quote/:quoteId', builder: (context, state) => QuotePage(id: state.params['quoteId']!)),
+          ],
+        ),
+      ]),
+      a(classes: "github-badge", href: "https://github.com/schultek/jaspr", attributes: {
+        'aria-label': "Find the source on Github"
+      }, [
+        img(src: '/images/github-badge.svg', alt: "Github Badge"),
+      ]),
     ]);
   }
 

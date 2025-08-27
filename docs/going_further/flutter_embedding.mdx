@@ -48,9 +48,9 @@ To embed a Flutter app into your Jaspr website you need the following setup:
     class JasprApp extends StatelessComponent {
       JasprApp({super.key});
 
-      Iterable<Component> build(BuildContext context) sync* {
+      Component build(BuildContext context) {
         // this is a normal jaspr component
-        yield FlutterEmbedView(
+        return FlutterEmbedView(
           // provide an optional loader component that will be displayed while the flutter app loads
           loader: MyCustomLoader(),
           // provide your flutter app widget

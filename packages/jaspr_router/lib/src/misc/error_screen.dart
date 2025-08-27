@@ -13,8 +13,8 @@ class ErrorScreen extends StatelessComponent {
   final Exception? error;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div([
+  Component build(BuildContext context) {
+    return div([
       text('Page Not Found'),
       br(),
       text(error?.toString() ?? 'page not found'),

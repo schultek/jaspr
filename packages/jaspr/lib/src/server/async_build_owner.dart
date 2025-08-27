@@ -18,7 +18,7 @@ class AsyncBuildOwner extends BuildOwner {
   }
 
   @override
-  void performRebuildOn(Element child, void Function() whenComplete) {
+  void performRebuildOn(Element child) {
     var parentAsyncBuildLock = child.parent?._asyncBuildLock;
     if (child is! RenderObjectElement) {
       child._asyncBuildLock = parentAsyncBuildLock;
@@ -30,8 +30,7 @@ class AsyncBuildOwner extends BuildOwner {
         .then(() => child._asyncBuildLock)
         // Wait on previous siblings
         .then(() => parentAsyncBuildLock)
-        .then(() => child.attachRenderObject())
-        .then(() => whenComplete());
+        .then(() => child.didRebuild());
 
     child.parent?._asyncBuildLock = chain;
   }

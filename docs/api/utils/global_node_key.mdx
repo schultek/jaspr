@@ -15,7 +15,7 @@ import 'package:universal_web/web.dart';
 final GlobalNodeKey<HTMLFormElement> myFormKey = GlobalNodeKey();
 
 // 3. Provide to a html component
-yield form(key: myFormKey, [ ... ]);
+return form(key: myFormKey, [ ... ]);
 
 // 4. Access dom node from key
 myFormKey.currentNode?.checkValidity();

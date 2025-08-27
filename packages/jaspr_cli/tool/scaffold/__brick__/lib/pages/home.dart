@@ -34,8 +34,8 @@ class Home extends StatelessComponent {
   const Home({super.key});{{/multipage}}
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section([
+  Component build(BuildContext context) {
+    return section([
       img(src: 'images/logo.svg', width: 80),
       h1([text('Welcome')]),
       p([text('You successfully create a new Jaspr site.')]),

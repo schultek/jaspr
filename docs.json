@@ -48,6 +48,11 @@
       "id": "content",
       "title": "Content",
       "href": "/content"
+    },
+    {
+      "id": "releases",
+      "title": "Releases",
+      "href": "/releases/v/0.21.0"
     }
   ],
   "sidebar": [
@@ -194,6 +199,10 @@
           "href": "/api/components/document"
         },
         {
+          "title": "Fragment",
+          "href": "/api/components/fragment"
+        },
+        {
           "title": "RawText",
           "href": "/api/components/raw_text"
         },
@@ -220,10 +229,6 @@
         {
           "title": "FlutterEmbedView",
           "href": "/api/components/flutter_embed_view"
-        },
-        {
-          "title": "Fragment",
-          "href": "/api/components/fragment"
         }
       ]
     },
@@ -441,6 +446,16 @@
         {
           "title": "PostBreak",
           "href": "/content/components/post_break"
+        }
+      ]
+    },
+    {
+      "tab": "releases",
+      "group": "Releases",
+      "pages": [
+        {
+          "title": "0.21.0",
+          "href": "/releases/v/0.21.0"
         }
       ]
     }

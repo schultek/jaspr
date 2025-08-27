@@ -12,17 +12,17 @@ import '../../framework/framework.dart';
 abstract class AsyncBuildableElement extends BuildableElement {
   AsyncBuildableElement(super.component);
 
-  Stream<Component> buildAsync();
+  Future<Component> buildAsync();
 
-  late Iterable<Component> _built;
+  late Component _built;
 
   @override
-  Iterable<Component> build() => _built;
+  Component build() => _built;
 
   @override
   Future<void> performRebuild() async {
     try {
-      _built = await buildAsync().toList();
+      _built = await buildAsync();
       super.performRebuild();
     } catch (e, st) {
       failRebuild(e, st);
@@ -48,7 +48,7 @@ abstract class AsyncStatelessComponent extends Component {
   Element createElement() => AsyncStatelessElement(this);
 
   @protected
-  Stream<Component> build(BuildContext context);
+  Future<Component> build(BuildContext context);
 }
 
 /// An [Element] that uses a [AsyncStatelessComponent] as its configuration.
@@ -57,7 +57,7 @@ class AsyncStatelessElement extends AsyncBuildableElement {
   AsyncStatelessElement(AsyncStatelessComponent super.component);
 
   @override
-  Stream<Component> buildAsync() => (component as AsyncStatelessComponent).build(this);
+  Future<Component> buildAsync() => (component as AsyncStatelessComponent).build(this);
 }
 
 /// The async variant of a [Builder] component.
@@ -72,10 +72,10 @@ class AsyncStatelessElement extends AsyncBuildableElement {
 class AsyncBuilder extends AsyncStatelessComponent {
   const AsyncBuilder({required this.builder, super.key});
 
-  final Stream<Component> Function(BuildContext context) builder;
+  final Future<Component> Function(BuildContext context) builder;
 
   @override
-  Stream<Component> build(BuildContext context) {
+  Future<Component> build(BuildContext context) {
     return builder(context);
   }
 }

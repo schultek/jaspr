@@ -32,7 +32,7 @@ You can provide the following parameters:
 - `widget`: The widget that will be run as your embedded Flutter app.
 
 ```dart
-yield FlutterEmbedView(
+return FlutterEmbedView(
   // provide an optional loader component that will be displayed while the flutter app loads
   loader: MyCustomLoader(),
   // provide your flutter app widget
@@ -59,7 +59,7 @@ import 'widgets/my_app.dart' deferred as app;
 
 /* ... */
 
-yield FlutterEmbedView.deferred(
+return FlutterEmbedView.deferred(
   /* ... */
   loadLibrary: app.loadLibrary(),
   builder: () => app.MyFlutterApp(),

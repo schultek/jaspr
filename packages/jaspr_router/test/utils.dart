@@ -104,17 +104,19 @@ class Page extends StatelessComponent {
   final Component? child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var label = path.startsWith('/') ? path.substring(1) : path;
-    yield span([text(label)]);
+    final children = <Component>[];
+    children.add(span([text(label)]));
 
     var state = RouteState.of(context);
     if (state.params.isNotEmpty) {
-      yield span([text(state.params.entries.map((e) => '${e.key}=${e.value}').join(','))]);
+      children.add(span([text(state.params.entries.map((e) => '${e.key}=${e.value}').join(','))]));
     }
 
     if (child != null) {
-      yield div([child!]);
+      children.add(div([child!]));
     }
+    return Fragment(children: children);
   }
 }

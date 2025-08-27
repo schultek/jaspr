@@ -164,8 +164,8 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield figure(classes: 'image zoomable', [
+  Component build(BuildContext context) {
+    return figure(classes: 'image zoomable', [
       img(
         key: imageKey,
         src: component.src,
@@ -179,8 +179,8 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
     ]);
   }
 
-  Iterable<Component> _buildDialog(BuildContext context) sync* {
-    yield div(classes: 'image-wrapper', events: {
+  Component _buildDialog(BuildContext context) {
+    return div(classes: 'image-wrapper', events: {
       'click': (_) {
         zoomOut();
       },

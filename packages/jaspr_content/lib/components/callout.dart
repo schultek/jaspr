@@ -110,8 +110,8 @@ class _Callout extends StatelessComponent {
   final Component child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'callout callout-$type', [
+  Component build(BuildContext context) {
+    return div(classes: 'callout callout-$type', [
       span([
         switch (type) {
           'info' => InfoIcon(size: 20),

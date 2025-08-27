@@ -9,7 +9,7 @@ import '../utils/node_reader.dart';
 final _dialogStateProvider = StateProvider.family<_DialogState?, String>((ref, String id) => null);
 
 class _DialogState<T> {
-  final SingleComponentBuilder builder;
+  final ComponentBuilder builder;
   final ValueChanged<T?> onResult;
 
   _DialogState(this.builder, this.onResult);
@@ -29,7 +29,7 @@ enum DialogResult {
   cancel,
 }
 
-Future<T?> showDialog<T>(BuildContext context, {required String slotId, required SingleComponentBuilder builder}) {
+Future<T?> showDialog<T>(BuildContext context, {required String slotId, required ComponentBuilder builder}) {
   var completer = Completer<T?>();
   context.read(_dialogStateProvider(slotId).notifier).state = _DialogState(builder, (result) {
     if (!completer.isCompleted) {
@@ -52,8 +52,8 @@ class Dialog extends StatelessComponent {
   final List<Component> actions;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'mdc-dialog__container', [
+  Component build(BuildContext context) {
+    return div(classes: 'mdc-dialog__container', [
       div(classes: 'mdc-dialog__surface', [
         h2(classes: 'mdc-dialog__title', [text(title)]),
         div(classes: 'mdc-dialog__content', [content]),
@@ -110,10 +110,10 @@ class DialogState extends State<DialogSlot> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var state = context.watch(_dialogStateProvider(component.slotId));
 
-    yield DomNodeReader(
+    return DomNodeReader(
       onNode: (node) {
         _dialog ??= MDCDialog(node);
         _dialog!.listen('MDCDialog:closed', (event) {

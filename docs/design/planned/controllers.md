@@ -31,25 +31,25 @@ as users;
 
 class UsersPage extends StatelessComponent {
 
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Controlled(
+  Component build(BuildContext context) {
+    return Controlled(
       controller: users.controller,
-      build: (BuildContext context, AsyncValue<List<User>> userState) sync* {
-        yield userState.when(
-          data: (List<User> users) sync* {
-            yield Text('Users: ${users.length}');
-            yield Button(
+      build: (BuildContext context, AsyncValue<List<User>> userState) {
+        return userState.when(
+          data: (List<User> users) {
+            return Text('Users: ${users.length}');
+            return Button(
               child: Text('Add new'),
               onPressed: () {
                 controller.dispatch(UserRequest.newUser('Tom'));
               },
             );
           },
-          loading: () sync* {
-            yield Text('Loading...');
+          loading: () {
+            return Text('Loading...');
           },
-          error: (e) sync* {
-            yield Text('Error: $e');
+          error: (e) {
+            return Text('Error: $e');
           },
         );
       },

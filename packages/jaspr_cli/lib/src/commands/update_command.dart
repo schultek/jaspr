@@ -5,8 +5,10 @@ import 'package:pub_updater/pub_updater.dart';
 
 import '../command_runner.dart';
 import '../logging.dart';
+import '../migrations/migration_models.dart';
 import '../version.dart';
 import 'base_command.dart';
+import 'migrate_command.dart';
 
 class UpdateCommand extends BaseCommand {
   UpdateCommand({super.logger});
@@ -40,7 +42,7 @@ class UpdateCommand extends BaseCommand {
 
     final isUpToDate = jasprCliVersion == latestVersion;
     if (isUpToDate) {
-      logger.write('jaspr is already at the latest version.');
+      logger.write('Jaspr is already at the latest version.');
       return 0;
     }
 
@@ -64,6 +66,27 @@ class UpdateCommand extends BaseCommand {
     }
 
     logger.write('Updated to $latestVersion', progress: ProgressState.completed);
+
+    var migrations = MigrateCommand.allMigrations.where((m) {
+      return latestVersion.compareTo(m.minimumJasprVersion) >= 0;
+    }).toList();
+
+    if (migrations.isNotEmpty) {
+      final results = migrations.computeResults(['lib'], false, (file, e, st) {
+        logger.write('Error processing ${file.path}: $e\n$st', level: Level.error);
+      });
+
+      if (results.isNotEmpty) {
+        stdout.write(
+            '\nYour project has automatic migrations available for updating the code to the newest Jaspr version:\n\n'
+            '${migrations.map((m) => '  ${m.name} · ${m.description}\n${m.hint}').join('\n')}\n\n');
+
+        stdout.write(
+            'Make sure to update the dependency constraint of jaspr in your pubspec.yaml file to include $latestVersion.\n');
+        stdout.write('Then run \'jaspr migrate --dry-run\' to preview all migration changes.');
+      }
+    }
+
     return 0;
   }
 }

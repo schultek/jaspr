@@ -13,7 +13,7 @@ class FlutterTarget extends StatelessComponent {
   final Component? loader;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var effects = context.watch(effectsProvider);
     var rotation = context.watch(rotationProvider);
 
@@ -51,6 +51,6 @@ class FlutterTarget extends StatelessComponent {
       ]);
     }
 
-    yield article([child]);
+    return article([child]);
   }
 }

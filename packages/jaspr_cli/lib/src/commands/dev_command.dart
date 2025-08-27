@@ -76,9 +76,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
   @override
   Future<int> runCommand() async {
-    logger.write("Running jaspr in ${config!.mode.name} rendering mode.");
+    logger.write("Running jaspr in ${config.mode.name} rendering mode.");
 
-    var proxyPort = config!.mode == JasprMode.client ? port : '5567';
+    var proxyPort = config.mode == JasprMode.client ? port : '5567';
     var flutterPort = '5678';
     var webPort = '5467';
 
@@ -90,7 +90,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     handleClientWorkflow(workflow);
 
-    if (config!.usesFlutter) {
+    if (config.usesFlutter) {
       var flutterProcess = await serveFlutter(flutterPort, useWasm);
 
       workflow.serverManager.servers.first.buildResults
@@ -105,11 +105,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       proxyPort,
       webPort: webPort,
       serverPort: port,
-      flutterPort: config!.usesFlutter ? flutterPort : null,
-      redirectNotFound: config!.mode == JasprMode.client,
+      flutterPort: config.usesFlutter ? flutterPort : null,
+      redirectNotFound: config.mode == JasprMode.client,
     );
 
-    if (config!.mode == JasprMode.client) {
+    if (config.mode == JasprMode.client) {
       logger.write('Serving at http://localhost:$proxyPort', tag: Tag.cli);
 
       await _runChrome();
@@ -118,8 +118,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       return 0;
     }
 
-    if (config!.devCommand != null) {
-      return await _runDevCommand(config!.devCommand!, proxyPort);
+    if (config.devCommand != null) {
+      return await _runDevCommand(config.devCommand!, proxyPort);
     } else {
       return await _runServer(proxyPort, workflow);
     }
@@ -159,7 +159,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     var entryPoint = await getEntryPoint(argResults!['input'], true);
 
     if (!release) {
-      var import = entryPoint.replaceFirst('lib', 'package:${config!.projectName}');
+      var import = entryPoint.replaceFirst('lib', 'package:${config.projectName}');
       serverTarget.writeAsStringSync(serverEntrypoint(import));
 
       args.add(serverTarget.path);
@@ -276,7 +276,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       autoRun: autoRun,
     );
 
-    var package = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    var package = '${config.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
     var compiler = useWasm
         ? 'dart2wasm'
         : release
@@ -284,7 +284,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
             : 'dartdevc';
 
     var dartDefines = getClientDartDefines();
-    if (config!.usesFlutter) {
+    if (config.usesFlutter) {
       dartDefines.addAll(getFlutterDartDefines(useWasm, release));
     }
 

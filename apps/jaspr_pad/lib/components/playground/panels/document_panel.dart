@@ -9,12 +9,12 @@ class DocumentPanel extends StatelessComponent {
   const DocumentPanel({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var info = context.watch(activeDocumentationProvider);
     if (info == null) {
-      return;
+      return text('');
     }
-    yield _DocumentHintMarkdown(info);
+    return _DocumentHintMarkdown(info);
   }
 }
 
@@ -43,8 +43,8 @@ class __DocumentHintMarkdownState extends State<_DocumentHintMarkdown> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield p(
+  Component build(BuildContext context) {
+    return p(
       classes: 'documentation custom-scrollbar',
       [Markdown(markdown: markdown)],
     );
