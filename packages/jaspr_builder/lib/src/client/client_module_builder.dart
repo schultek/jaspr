@@ -1,7 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as path;
@@ -32,7 +34,7 @@ class ClientModuleBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-        'lib/{{file}}.dart': ['lib/{{file}}.client.json', 'web/{{file}}.client.dart'],
+        'lib/{{file}}.dart': ['lib/{{file}}.client.json', 'lib/{{file}}.client.dart'],
       };
 
   Future<void> generateClientModule(BuildStep buildStep) async {
@@ -59,20 +61,20 @@ class ClientModuleBuilder implements Builder {
 
     if (annotated.length > 1) {
       log.severe(
-          "Cannot have multiple components annotated with @client in a single library. Failing library: ${library.source.fullName}.");
+          "Cannot have multiple components annotated with @client in a single library. Failing library: ${library.firstFragment.source.fullName}.");
     }
 
     var element = annotated.first;
 
-    if (element is! ClassElement) {
+    if (element is! ClassElement2) {
       log.severe(
-          '@client can only be applied on classes. Failing element: ${element.name} in library ${library.source.fullName}.');
+          '@client can only be applied on classes. Failing element: ${element.name3} in library ${library.firstFragment.source.fullName}.');
       return;
     }
 
     if (!componentChecker.isAssignableFrom(element)) {
       log.severe(
-          '@client can only be applied on classes extending Component. Failing element: ${element.name} in library ${library.source.fullName}.');
+          '@client can only be applied on classes extending Component. Failing element: ${element.name3} in library ${library.firstFragment.source.fullName}.');
       return;
     }
 
@@ -99,10 +101,6 @@ class ClientModuleBuilder implements Builder {
       import 'package:jaspr/browser.dart';
       [[/]]
             
-      void main() {
-        runAppWithParams(getComponentForParams);
-      }
-      
       Component getComponentForParams(Map<String, dynamic> p) {
         return ${module.componentFactory()};
       }
@@ -114,35 +112,46 @@ class ClientModuleBuilder implements Builder {
     ).format(source);
 
     var moduleId = AssetId.resolve(Uri.parse(module.import));
-    var webId =
-        AssetId(moduleId.package, moduleId.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.client.dart'));
-    await buildStep.writeAsString(webId, source);
+
+    var entryId = AssetId(moduleId.package, moduleId.path.replaceFirst('.dart', '.client.dart'));
+    await buildStep.writeAsString(entryId, source);
   }
 }
 
 class ClientModule {
   final String name;
-  final String id;
+  final AssetId id;
   final String import;
   final List<ClientParam> params;
 
-  ClientModule({required this.name, required this.id, required this.import, required this.params});
+  ClientModule({
+    required this.name,
+    required this.id,
+    required this.import,
+    required this.params,
+  });
 
-  static ClientModule fromElement(ClassElement element, Codecs codecs, BuildStep buildStep) {
+  static ClientModule fromElement(ClassElement2 element, Codecs codecs, BuildStep buildStep) {
     var params = getParamsFor(element, codecs);
 
     return ClientModule(
-      name: element.name,
-      id: path.url.withoutExtension(buildStep.inputId.path).replaceFirst('lib/', ''),
+      name: element.name3 ?? '',
+      id: buildStep.inputId,
       import: buildStep.inputId.toImportUrl(),
       params: params,
     );
   }
 
+  String resolveId(String package) {
+    final a = package != id.package ? '${id.package}:' : '';
+    final b = path.url.withoutExtension(id.path).replaceFirst('lib/', '');
+    return '$a$b';
+  }
+
   factory ClientModule.deserialize(Map<String, dynamic> map) {
     return ClientModule(
       name: map['name'],
-      id: map['id'],
+      id: AssetId.deserialize(map['id']),
       import: map['import'],
       params: [
         for (var p in map['params']) ClientParam.deserialize(p),
@@ -152,7 +161,7 @@ class ClientModule {
 
   Map<String, dynamic> serialize() => {
         'name': name,
-        'id': id,
+        'id': id.serialize(),
         'import': import,
         'params': [
           for (var p in params) p.serialize(),
@@ -191,20 +200,26 @@ class ClientParam {
       };
 }
 
-List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
-  final constr = e.constructors.first;
-  var params = constr.parameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
+List<ClientParam> getParamsFor(ClassElement2 e, Codecs codecs) {
+  final constr = e.constructors2.first;
+  var params = constr.formalParameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
 
   for (var param in params) {
     if (!param.isInitializingFormal) {
       throw UnsupportedError('Client components only support initializing formal constructor parameters. '
-          'Failing element: ${e.name}.${constr.name}($param)');
+          'Failing element: ${e.name3}.${constr.name3}($param)');
     }
   }
 
   return params.map((p) {
-    var decoder = codecs.getDecoderFor(p.type, "p['${p.name}']");
-    var encoder = codecs.getEncoderFor(p.type, 'c.${p.name}');
-    return ClientParam(name: p.name, isNamed: p.isNamed, decoder: decoder, encoder: encoder);
+    try {
+      var decoder = codecs.getDecoderFor(p.type, "p['${p.name3}']");
+      var encoder = codecs.getEncoderFor(p.type, 'c.${p.name3}');
+      return ClientParam(name: p.name3 ?? '', isNamed: p.isNamed, decoder: decoder, encoder: encoder);
+    } on InvalidParameterException catch (_) {
+      throw UnsupportedError(
+          '@client components only support parameters of primitive serializable types or types that define @decoder and @encoder methods. '
+          'Failing parameter: [$p] in ${e.name3}.${constr.name3}()');
+    }
   }).toList();
 }

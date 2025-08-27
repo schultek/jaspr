@@ -1,0 +1,32 @@
+---
+title: Post Break
+description: Renders a post break between paragraphs.
+---
+
+## Usage
+
+To use the `<PostBreak>` component, add it to your `components` list in your `main.dart` file:
+
+```dart
+import 'package:jaspr_content/components/post_break.dart';
+
+// ...
+
+ContentApp(
+  components: [
+    PostBreak(),
+  ],
+)
+```
+
+Then put the `<PostBreak/>` component somewhere in your markdown content:
+
+```markdown
+This is a paragraph.
+
+<PostBreak/>
+
+This is another, longer paragraph. ...
+```
+
+![Post Break Example](/content/components/post_break.png)

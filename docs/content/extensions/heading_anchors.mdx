@@ -1,0 +1,41 @@
+---
+title: Heading Anchors
+description: Add anchor links to headings in the content.
+---
+
+---
+
+The **Heading Anchors** extension generates anchor links for all headings in the content and adds them as clickable '#' symbols to the headings.
+
+Content like this:
+
+```markdown title="content/example.md"
+## Example Subheading
+```
+
+Will be rendered as:
+
+![Heading Anchor Example](/content/assets/heading_anchor.png)
+
+Clicking on the '#' symbol will navigate to `/example#example-subheading`, which is the anchor link for the heading.
+
+## Usage
+
+To use the `HeadingAnchorsExtension`, add it to the `extensions` list of the `ContentApp` component:
+
+```dart
+ContentApp(
+  ...
+  extensions: [
+    HeadingAnchorsExtension(),
+  ],
+);
+```
+
+The extension takes the following properties to customize the behavior:
+
+---
+
+<Property name="maxHeaderDepth" type="int">
+  The maximum header depth to generate anchors for. Defaults to 3.
+</Property>

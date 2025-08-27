@@ -22,7 +22,7 @@ const clientBasicSources = {
 final clientBasicJsonOutputs = {
   'site|lib/component_basic.client.json': jsonEncode({
     "name": "Component",
-    "id": "component_basic",
+    "id": ["site", "lib/component_basic.dart"],
     "import": "package:site/component_basic.dart",
     "params": [
       {"name": "a", "isNamed": false, "decoder": "p['a']", "encoder": "c.a"},
@@ -34,17 +34,17 @@ final clientBasicJsonOutputs = {
 };
 
 final clientBasicDartOutputs = {
-  'site|web/component_basic.client.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+  'site|lib/component_basic.client.dart': '// dart format off\n'
+      '// ignore_for_file: type=lint\n'
+      '\n'
+      '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
       'import \'package:jaspr/browser.dart\';\n'
       'import \'package:site/component_basic.dart\' as prefix0;\n'
       '\n'
-      'void main() {\n'
-      '  runAppWithParams(getComponentForParams);\n'
-      '}\n'
-      '\n'
       'Component getComponentForParams(Map<String, dynamic> p) {\n'
       '  return prefix0.Component(p[\'a\'], b: p[\'b\'], c: p[\'c\'], d: p[\'d\']);\n'
-      '}\n',
+      '}\n'
+      '',
 };

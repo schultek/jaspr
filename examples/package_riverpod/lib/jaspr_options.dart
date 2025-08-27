@@ -1,3 +1,6 @@
+// dart format off
+// ignore_for_file: type=lint
+
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
@@ -21,11 +24,7 @@ import 'package:package_riverpod/main.dart' as prefix1;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(
-  clients: {
-    prefix0.App: ClientTarget<prefix0.App>('components/app'),
-  },
-  styles: () => [
-    ...prefix1.styles,
-  ],
-);
+JasprOptions get defaultJasprOptions => JasprOptions(
+      clients: {prefix0.App: ClientTarget<prefix0.App>('components/app')},
+      styles: () => [...prefix1.styles],
+    );

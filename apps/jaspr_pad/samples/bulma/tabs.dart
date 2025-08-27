@@ -52,9 +52,8 @@ class Tab extends StatelessComponent {
   Iterable<Component> build(BuildContext context) sync* {
     yield li(
       classes: selected ? 'is-active' : null,
-      events: events(onClick: onSelected),
       [
-        a(href: '', [child])
+        a(href: '#', onClick: onSelected, [child])
       ],
     );
   }

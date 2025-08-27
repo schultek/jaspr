@@ -1,8 +1,7 @@
 import '../framework/framework.dart';
 import 'scheduler.dart';
 
-/// Main class that provide services (also known as
-/// "bindings").
+/// Main class that provide services (also known as "bindings").
 abstract class AppBinding with SchedulerBinding {
   AppBinding();
 
@@ -19,4 +18,7 @@ abstract class AppBinding with SchedulerBinding {
   ///
   /// This is initialized when [runApp] is called.
   Element? get rootElement;
+
+  /// Report an error that occurred during the build process of [element].
+  void reportBuildError(Element element, Object error, StackTrace stackTrace);
 }

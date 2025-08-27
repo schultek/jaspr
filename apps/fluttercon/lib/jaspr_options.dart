@@ -1,3 +1,6 @@
+// dart format off
+// ignore_for_file: type=lint
+
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
@@ -28,20 +31,27 @@ import 'package:fluttercon/pages/session.dart' as prefix8;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(
-  clients: {
-    prefix0.LikeButton: ClientTarget<prefix0.LikeButton>('components/like_button', params: _prefix0LikeButton),
-    prefix6.FavoritesPage: ClientTarget<prefix6.FavoritesPage>('pages/favorites'),
-  },
-  styles: () => [
-    ...prefix0.LikeButton.styles,
-    ...prefix1.PagesNav.styles,
-    ...prefix2.SessionCard.styles,
-    ...prefix3.SessionList.styles,
-    ...prefix4.Tag.styles,
-    ...prefix7.SchedulePage.styles,
-    ...prefix8.SessionPage.styles,
-  ],
-);
+JasprOptions get defaultJasprOptions => JasprOptions(
+      clients: {
+        prefix0.LikeButton: ClientTarget<prefix0.LikeButton>(
+          'components/like_button',
+          params: _prefix0LikeButton,
+        ),
+        prefix6.FavoritesPage: ClientTarget<prefix6.FavoritesPage>(
+          'pages/favorites',
+        ),
+      },
+      styles: () => [
+        ...prefix0.LikeButton.styles,
+        ...prefix1.PagesNav.styles,
+        ...prefix2.SessionCard.styles,
+        ...prefix3.SessionList.styles,
+        ...prefix4.Tag.styles,
+        ...prefix7.SchedulePage.styles,
+        ...prefix8.SessionPage.styles,
+      ],
+    );
 
-Map<String, dynamic> _prefix0LikeButton(prefix0.LikeButton c) => {'session': prefix5.SessionCodex(c.session).encode()};
+Map<String, dynamic> _prefix0LikeButton(prefix0.LikeButton c) => {
+      'session': prefix5.SessionCodex(c.session).encode(),
+    };

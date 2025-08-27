@@ -70,10 +70,10 @@ class EditorPanelState extends State<EditorPanel> {
           var activeFile = context.watch(activeDocKeyProvider);
           return div(
             styles: Styles(
-                position: Position.relative(),
                 display: Display.flex,
-                flex: Flex(grow: 1),
-                flexDirection: FlexDirection.column),
+                position: Position.relative(),
+                flexDirection: FlexDirection.column,
+                flex: Flex(grow: 1)),
             [
               Builder.single(
                 key: ValueKey('output-builder'),

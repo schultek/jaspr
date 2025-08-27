@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
@@ -9,14 +10,35 @@ void main() {
       Jaspr.initializeApp(useIsolates: false);
     });
 
-    test('renders component with document', () async {
+    test('renders component with document structure', () async {
       var result = await renderComponent(div(id: 'test', []));
 
       expect(
           result.body,
           equals('<!DOCTYPE html>\n'
-              '<html><head><base href="/"/></head><body><div id="test"></div></body></html>\n'
+              '<html><head></head><body><div id="test"></div></body></html>\n'
               ''));
+    });
+
+    test('renders document component', () async {
+      var result = await renderComponent(
+          Document(lang: 'en', base: '/app', meta: {'keywords': 'test'}, body: div(id: 'test', [])));
+
+      expect(
+          result.body,
+          equals('<!DOCTYPE html>\n'
+            '<html lang="en">\n'
+            '  <head>\n'
+            '    <base href="/app/"/>\n'
+            '    <meta charset="utf-8"/>\n'
+            '    <!--\$-->\n'
+            '    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>\n'
+            '    <meta name="keywords" content="test"/>\n'
+            '    <!--/-->\n'
+            '  </head>\n'
+            '  <body><div id="test"></div></body>\n'
+            '</html>\n'
+            ''));
     });
 
     test('renders standalone component', () async {

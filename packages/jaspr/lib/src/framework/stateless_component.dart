@@ -174,6 +174,8 @@ class StatelessElement extends BuildableElement {
     if (owner.isFirstBuild && _asyncFirstBuild != null) {
       return _asyncFirstBuild!.then((_) {
         super.performRebuild();
+      }).catchError((e, st) {
+        failRebuild(e, st);
       });
     }
     super.performRebuild();

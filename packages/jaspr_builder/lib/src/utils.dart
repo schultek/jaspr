@@ -1,18 +1,29 @@
-// ignore_for_file: implementation_imports
+// ignore_for_file: implementation_imports, deprecated_member_use
 
 import 'dart:convert';
 
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
+import 'package:dart_style/dart_style.dart';
 import 'package:jaspr/jaspr.dart'
     show ClientAnnotation, CssUtility, Import, Component, Key, StyleRule, SyncAnnotation, State;
 import 'package:source_gen/source_gen.dart';
 
-const String generationHeader = "// GENERATED FILE, DO NOT MODIFY\n"
-    "// Generated with jaspr_builder\n";
+const String generationHeader = "// dart format off\n"
+    "// ignore_for_file: type=lint\n\n"
+    "// GENERATED FILE, DO NOT MODIFY\n"
+    "// Generated with jaspr_builder\n\n";
+
+final formatter = DartFormatter(languageVersion: DartFormatter.latestLanguageVersion);
+
+extension DartOutput on BuildStep {
+  Future<void> writeAsFormattedDart(AssetId outputId, String source) async {
+    await writeAsString(outputId, '$generationHeader${formatter.format(source)}');
+  }
+}
 
 var clientChecker = TypeChecker.fromRuntime(ClientAnnotation);
 var componentChecker = TypeChecker.fromRuntime(Component);
@@ -42,11 +53,11 @@ extension TypeStub on String {
   }
 }
 
-extension ElementNode on Element {
+extension ElementNode on Element2 {
   AstNode? get node {
-    var result = session?.getParsedLibraryByElement(library!);
+    var result = session?.getParsedLibraryByElement2(library2!);
     if (result is ParsedLibraryResult) {
-      return result.getElementDeclaration(this)?.node;
+      return result.getFragmentDeclaration(firstFragment)?.node;
     } else {
       return null;
     }
@@ -158,5 +169,20 @@ extension LoadBundle on BuildStep {
         }
       }
     }
+  }
+
+  Future<Set<AssetId>> loadTransitiveSources() async {
+    final main = AssetId(inputId.package, 'lib/main.dart');
+    if (!await canRead(main)) {
+      return {};
+    }
+    await resolver.libraryFor(main);
+    return resolver.libraries.expand<AssetId>((lib) {
+      try {
+        return [AssetId.resolve(lib.firstFragment.source.uri)];
+      } catch (_) {
+        return [];
+      }
+    }).toSet();
   }
 }

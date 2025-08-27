@@ -1,17 +1,22 @@
 import 'dart:io';
 
 void main() async {
-  var scaffoldDir = Directory('tool/scaffold');
+  await generate('scaffold');
+  await generate('templates/docs');
 
-  var result = await Process.run('mason', 'bundle -t dart -o lib/src/scaffold ${scaffoldDir.path}'.split(' '));
+  Process.runSync('dart', 'format lib/src/bundles/ --line-length=120'.split(' '));
+}
+
+Future<void> generate(String name) async {
+  var scaffoldDir = Directory('tool/$name');
+
+  var result = await Process.run('mason', 'bundle -t dart -o lib/src/bundles/$name ${scaffoldDir.path}'.split(' '));
   stdout.write(result.stdout);
   stderr.write(result.stderr);
 
   if (result.exitCode != 0) {
     exit(result.exitCode);
   }
-
-  Process.runSync('dart', 'format lib/src/scaffold/ --line-length=120'.split(' '));
 }
 
 String toCamelCase(String s) {

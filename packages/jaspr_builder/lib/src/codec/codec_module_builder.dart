@@ -1,7 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 
@@ -44,75 +46,75 @@ class CodecModuleBuilder implements Builder {
     }
 
     var library = await buildStep.inputLibrary;
+    final libName = library.firstFragment.source.fullName;
 
-    MethodElement? findEncoderForElement(InterfaceElement element) {
-      var candidates = element.methods.where((m) => encoderChecker.firstAnnotationOfExact(m) != null);
+    MethodElement2? findEncoderForElement(InterfaceElement2 element) {
+      var candidates = element.methods2.where((m) => encoderChecker.firstAnnotationOfExact(m) != null);
       if (candidates.isEmpty) return null;
       if (candidates.length > 1) {
         log.severe(
-            'Cannot have multiple methods annotated with @encoder in a single class. Failing element: ${element.name} in ${library.source.fullName}.');
+            'Cannot have multiple methods annotated with @encoder in a single class. Failing element: ${element.name3} in $libName.');
       }
       var candidate = candidates.first;
       if (candidate.isPrivate) {
         log.severe(
-            '@encoder cannot be used on private methods. Failing element: ${element.name}.${candidate.name}() in library ${library.source.fullName}.');
+            '@encoder cannot be used on private methods. Failing element: ${element.name3}.${candidate.name3}() in library $libName.');
         return null;
       }
       if (candidate.isStatic) {
         log.severe(
-            '@encoder cannot be used on static methods. Failing element: ${element.name}.${candidate.name}() in library ${library.source.fullName}.');
+            '@encoder cannot be used on static methods. Failing element: ${element.name3}.${candidate.name3}() in library $libName.');
         return null;
       }
-      if (candidate.parameters.isNotEmpty) {
+      if (candidate.formalParameters.isNotEmpty) {
         log.severe(
-            'Methods annotated with @encoder must have no parameters. Failing element: ${element.name}.${candidate.name}() in library ${library.source.fullName}.');
+            'Methods annotated with @encoder must have no parameters. Failing element: ${element.name3}.${candidate.name3}() in library $libName.');
         return null;
       }
       return candidate;
     }
 
-    ExecutableElement? findDecoderForElement(InterfaceElement element) {
-      var candidates = element.methods
-          .cast<ExecutableElement>()
-          .followedBy(element.constructors)
+    ExecutableElement2? findDecoderForElement(InterfaceElement2 element) {
+      var candidates = element.methods2
+          .cast<ExecutableElement2>()
+          .followedBy(element.constructors2)
           .where((m) => decoderChecker.firstAnnotationOfExact(m) != null);
       if (candidates.isEmpty) return null;
       if (candidates.length > 1) {
         log.severe(
-            'Cannot have multiple members annotated with @decoder in a single class. Failing element: ${element.name} in ${library.source.fullName}.');
+            'Cannot have multiple members annotated with @decoder in a single class. Failing element: ${element.name3} in $libName.');
       }
       var candidate = candidates.first;
       if (candidate.isPrivate) {
         log.severe(
-            '@decoder cannot be used on private members. Failing element: ${element.name}.${candidate.name}() in library ${library.source.fullName}.');
+            '@decoder cannot be used on private members. Failing element: ${element.name3}.${candidate.name3}() in library $libName.');
         return null;
       }
-      if (candidate is! ConstructorElement && !candidate.isStatic) {
+      if (candidate is! ConstructorElement2 && !candidate.isStatic) {
         log.severe(
-            '@decoder cannot be used on instance members. Failing element: ${element.name}.${candidate.name}() in library ${library.source.fullName}.');
+            '@decoder cannot be used on instance members. Failing element: ${element.name3}.${candidate.name3}() in library $libName.');
         return null;
       }
-      if (candidate.parameters.length != 1) {
+      if (candidate.formalParameters.length != 1) {
         log.severe(
-            'Members annotated with @decoder must have exactly one parameter. Failing element: ${element.name}.${candidate.name}() in library ${library.source.fullName}.');
+            'Members annotated with @decoder must have exactly one parameter. Failing element: ${element.name3}.${candidate.name3}() in library $libName.');
         return null;
       }
-      if (candidate.parameters.length != 1) {
+      if (candidate.formalParameters.length != 1) {
         log.severe(
-            'Members annotated with @decoder must have exactly one parameter. Failing element: ${element.name}.${candidate.name}() in library ${library.source.fullName}.');
+            'Members annotated with @decoder must have exactly one parameter. Failing element: ${element.name3}.${candidate.name3}() in library $libName.');
         return null;
       }
       if (candidate.returnType != element.thisType) {
         log.severe(
-            'Members annotated with @decoder must return an instance of the target type. Failing element: ${element.name}.${candidate.name}() in library ${library.source.fullName}.');
+            'Members annotated with @decoder must return an instance of the target type. Failing element: ${element.name3}.${candidate.name3}() in library $libName.');
         return null;
       }
       return candidate;
     }
 
-    var annotated = library.topLevelElements
-        .whereType<InterfaceElement>()
-        .map<(InterfaceElement, ExecutableElement, MethodElement)?>((element) {
+    var annotated = [...library.classes, ...library.extensionTypes]
+        .map<(InterfaceElement2, ExecutableElement2, MethodElement2)?>((element) {
           var decoder = findDecoderForElement(element);
           var encoder = findEncoderForElement(element);
 
@@ -120,38 +122,38 @@ class CodecModuleBuilder implements Builder {
             return null;
           } else if (decoder == null) {
             log.severe(
-                'Elements defining an @encoder must also define a @decoder. Failing element: ${element.name} in library ${library.source.fullName}.');
+                'Elements defining an @encoder must also define a @decoder. Failing element: ${element.name3} in library $libName.');
             return null;
           } else if (encoder == null) {
             log.severe(
-                'Elements defining a @decoder must also define an @encoder. Failing element: ${element.name} in library ${library.source.fullName}.');
+                'Elements defining a @decoder must also define an @encoder. Failing element: ${element.name3} in library $libName.');
             return null;
           }
 
           if (element.isPrivate) {
             log.severe(
-                '@decoder and @encoder can only be used on public elements. Failing element: ${element.name} in library ${library.source.fullName}.');
+                '@decoder and @encoder can only be used on public elements. Failing element: ${element.name3} in library $libName.');
             return null;
           }
 
-          if (decoder.parameters.first.type != encoder.returnType) {
+          if (decoder.formalParameters.first.type != encoder.returnType) {
             log.severe(
-                'The @decoder parameter type must match the @encoder return type. Failing element: ${element.name} in library ${library.source.fullName}.');
+                'The @decoder parameter type must match the @encoder return type. Failing element: ${element.name3} in library $libName.');
             return null;
           }
 
-          if (element is ExtensionTypeElement) {
-            if (element.interfaces.firstOrNull != element.representation.type) {
+          if (element is ExtensionTypeElement2) {
+            if (element.interfaces.firstOrNull != element.representation2.type) {
               log.severe(
-                  'Extension types using @decoder and @encoder must implement the representation type. Failing element: ${element.name} in library ${library.source.fullName}.');
+                  'Extension types using @decoder and @encoder must implement the representation type. Failing element: ${element.name3} in library $libName.');
               return null;
-            } else if (element.representation.type.element?.name == null) {
+            } else if (element.representation2.type.element?.name == null) {
               log.severe(
-                  'Extension types using @decoder and @encoder must have a valid representation type. Failing element: ${element.name} in library ${library.source.fullName}.');
+                  'Extension types using @decoder and @encoder must have a valid representation type. Failing element: ${element.name3} in library $libName.');
               return null;
-            } else if (element.primaryConstructor.isPrivate || element.primaryConstructor.name.isNotEmpty) {
+            } else if (element.primaryConstructor2.isPrivate || (element.primaryConstructor2.name3 != 'new')) {
               log.severe(
-                  'Extension types using @decoder and @encoder must have a public unnamed primary constructor. Failing element: ${element.name} in library ${library.source.fullName}.');
+                  'Extension types using @decoder and @encoder must have a public unnamed primary constructor. Failing element: ${element.name3} in library $libName.');
               return null;
             }
           }
@@ -178,7 +180,7 @@ class CodecModule {
   CodecModule({required this.elements});
 
   factory CodecModule.fromElements(
-      List<(InterfaceElement, ExecutableElement, MethodElement)> elements, BuildStep buildStep) {
+      List<(InterfaceElement2, ExecutableElement2, MethodElement2)> elements, BuildStep buildStep) {
     return CodecModule(
       elements: [
         for (var (element, decoder, encoder) in elements) CodecElement.fromElement(element, decoder, encoder),
@@ -218,37 +220,37 @@ class CodecElement {
     this.typeImport,
   });
 
-  factory CodecElement.fromElement(InterfaceElement element, ExecutableElement decoder, MethodElement encoder) {
-    if (element is ExtensionTypeElement) {
-      var typeElement = element.representation.type.element!;
-      if (element.library.exportNamespace.get(typeElement.name!) == typeElement) {
+  factory CodecElement.fromElement(InterfaceElement2 element, ExecutableElement2 decoder, MethodElement2 encoder) {
+    if (element is ExtensionTypeElement2) {
+      var typeElement = element.representation2.type.element!;
+      if (element.library2.exportNamespace.get(typeElement.name!) == typeElement) {
         return CodecElement(
-          name: element.representation.type.getDisplayString(),
-          extension: element.name,
-          decoder: decoder.name,
-          encoder: encoder.name,
-          import: element.librarySource.uri.toString(),
+          name: element.representation2.type.getDisplayString(),
+          extension: element.name3,
+          decoder: decoder.name3 ?? '',
+          encoder: encoder.name3 ?? '',
+          import: element.library2.firstFragment.source.uri.toString(),
         );
       } else {
-        var import = element.library.importedLibraries
+        var import = element.library2.firstFragment.importedLibraries2
             .where((l) => l.exportNamespace.get(typeElement.name!) == typeElement)
             .firstOrNull;
 
         return CodecElement(
-          name: element.representation.type.getDisplayString(),
-          extension: element.name,
-          decoder: decoder.name,
-          encoder: encoder.name,
-          import: element.librarySource.uri.toString(),
-          typeImport: import?.source.uri.toString(),
+          name: element.representation2.type.getDisplayString(),
+          extension: element.name3,
+          decoder: decoder.name3 ?? '',
+          encoder: encoder.name3 ?? '',
+          import: element.library2.firstFragment.source.uri.toString(),
+          typeImport: import?.firstFragment.source.uri.toString(),
         );
       }
     } else {
       return CodecElement(
-        name: element.name,
-        decoder: decoder.name,
-        encoder: encoder.name,
-        import: element.librarySource.uri.toString(),
+        name: element.name3 ?? '',
+        decoder: decoder.name3 ?? '',
+        encoder: encoder.name3 ?? '',
+        import: element.library2.firstFragment.source.uri.toString(),
       );
     }
   }

@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -185,6 +186,7 @@ void main() {
           flexWrap: FlexWrap.nowrap,
           justifyContent: JustifyContent.center,
           alignItems: AlignItems.start,
+          alignContent: AlignContent.center,
         );
 
         expect(
@@ -194,6 +196,7 @@ void main() {
             'flex-wrap': 'nowrap',
             'justify-content': 'center',
             'align-items': 'start',
+            'align-content': 'center',
           }),
         );
       });
@@ -202,7 +205,7 @@ void main() {
     group('flexitem', () {
       test('outputs all properties', () {
         var styles = const Styles(
-          flex: Flex(grow: 2, shrink: 1, basis: FlexBasis.auto),
+          flex: Flex(grow: 2, shrink: 1, basis: Unit.auto),
           order: 2,
           alignSelf: AlignSelf.start,
         );
@@ -232,6 +235,7 @@ void main() {
           gap: Gap(row: Unit.pixels(20)),
           autoRows: [TrackSize(Unit.percent(20)), TrackSize.auto],
           autoColumns: [TrackSize(Unit.pixels(100)), TrackSize.auto, TrackSize.auto],
+          justifyItems: JustifyItems.center,
         );
 
         expect(
@@ -243,6 +247,7 @@ void main() {
             'grid-auto-rows': '20% auto',
             'grid-auto-columns': '100px auto auto',
             'row-gap': '20px',
+            'justify-items': 'center',
           }),
         );
       });
@@ -252,12 +257,14 @@ void main() {
       test('outputs all properties', () {
         var styles = const Styles(
           gridPlacement: GridPlacement.area('content'),
+          justifySelf: JustifySelf.start,
         );
 
         expect(
           styles.properties,
           equals({
             'grid-area': 'content',
+            'justify-self': 'start',
           }),
         );
       });

@@ -1,0 +1,86 @@
+---
+title: Blog Layout
+description: A clean and minimal blog layout with a header and title block.
+---
+
+---
+
+The `BlogLayout` provides a clean and minimal layout for blog posts.
+
+It looks like this:
+
+<Image src="/content/assets/blog_dark.png" zoom theme="light" width="600" caption="Blog Layout (Dark Theme)" />
+<Image src="/content/assets/blog_light.png" zoom theme="dark" width="600" caption="Blog Layout (Light Theme)" />
+
+<Info>
+Tip: Toggle the theme on this page to see the light / dark mode variant of this layout.
+</Info>
+
+The example above is achieved using the following content and code:
+
+```markdown title="content/index.md"
+---
+title: "Building blogs with Jaspr"
+keywords: ["jaspr", "blog"]
+author: "Kilian Schulte"
+date: "26 April 2025"
+readTime: "5 min"
+authorImage: https://avatars.githubusercontent.com/u/13920539?s=96&v=4
+tags: ["Dart", "Jaspr", "Blog"]
+---
+
+<DropCap />
+Building blogs with `jaspr_content` offers a modern and efficient approach to creating dynamic and interactive websites. [...]
+
+<PostBreak />
+
+Getting started with `jaspr_content` is straightforward. You can write your blog posts in Markdown and render them using Dart components. [...]
+````
+
+```dart title="lib/main.dart"
+ContentApp(
+  parsers: [
+    MarkdownParser(),
+  ],
+  components: [
+    DropCap(),
+    PostBreak(),
+  ],
+  layouts: [
+    BlogLayout(
+      header: Header(
+        title: 'Jaspr Blog',
+        logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',
+        items: [
+          ThemeToggle(),
+          GitHubButton(repo: 'schultek/jaspr'),
+        ],
+      ),
+    ),
+  ]
+)
+```
+
+## Usage
+
+The `BlogLayout` takes the following parameters:
+
+<Card>
+  <Property name="header" type="Component?">
+    The header component to render on the page, usually a `Header`.
+  </Property>
+</Card>
+
+### Title Block
+
+In addition to the header, it renders a title block based on the page data (i.e. frontmatter data).
+
+It uses the `title`, `author`, `date`, `readTime` and `authorImage` values as shown above.
+
+### Tags
+
+Below the content, the layout shows an optional tags list based on the `tags` value from the page data.
+
+## Meta
+
+The layout also adds appropriate meta tags to the `<head>` of the page, like `title`, `description`, `keywords` and more. For more info, read the [Page Layouts](/content/concepts/page_layouts) docs.

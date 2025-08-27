@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:universal_web/web.dart' as web;
 
-import '../foundation/marker_utils.dart';
+import '../foundation/validator.dart';
 import '../framework/framework.dart';
 import 'browser_binding.dart';
 
@@ -34,8 +34,8 @@ void runAppWithParams(ClientBuilder appBuilder) {
   _applyClients((_) => appBuilder);
 }
 
-final _compStartRegex = RegExp('^$clientMarkerPrefixRegex(\\S+)(?:\\s+data=(.*))?\$');
-final _compEndRegex = RegExp('^/$clientMarkerPrefixRegex(\\S+)\$');
+final _compStartRegex = RegExp('^${DomValidator.clientMarkerPrefixRegex}(\\S+)(?:\\s+data=(.*))?\$');
+final _compEndRegex = RegExp('^/${DomValidator.clientMarkerPrefixRegex}(\\S+)\$');
 
 void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
   var iterator = web.document.createNodeIterator(web.document, 128 /* NodeFilter.SHOW_COMMENT */);
@@ -65,10 +65,10 @@ void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
         final between = (start, currNode);
 
         // Remove the data string.
-        start.text = '$clientMarkerPrefix${comp.$1}';
+        start.textContent = '${DomValidator.clientMarkerPrefix}${comp.$1}';
 
         final params = comp.$2 != null //
-            ? jsonDecode(unescapeMarkerText(comp.$2!)) as Map<String, dynamic>
+            ? jsonDecode(const DomValidator().unescapeMarkerText(comp.$2!)) as Map<String, dynamic>
             : <String, dynamic>{};
         unawaited(_runBuilder(name, fn(name), params, between));
       }

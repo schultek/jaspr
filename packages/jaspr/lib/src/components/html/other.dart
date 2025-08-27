@@ -18,7 +18,7 @@ Component details(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (open == true) 'open': '',
     },
     events: events,
@@ -44,7 +44,7 @@ Component dialog(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (open == true) 'open': '',
     },
     events: events,
@@ -97,7 +97,7 @@ Component meta(
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (name != null) 'name': name,
       if (content != null) 'content': content,
       if (charset != null) 'charset': charset,
@@ -131,7 +131,7 @@ Component link(
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       'href': href,
       if (rel != null) 'rel': rel,
       if (type != null) 'type': type,
@@ -156,10 +156,12 @@ Component link(
 ///
 ///   This attribute allows the elimination of parser-blocking JavaScript where the browser would have to load and evaluate scripts before continuing to parse. async has a similar effect in this case.
 /// - [src]: This attribute specifies the URI of an external script; this can be used as an alternative to embedding a script directly within a document.
-Component script(List<Component> children,
+/// - [content]: The content of the script element, if it is not an external script.
+Component script(
     {bool? async,
     bool? defer,
-    required String src,
+    String? src,
+    String? content,
     Key? key,
     String? id,
     String? classes,
@@ -173,12 +175,12 @@ Component script(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (async == true) 'async': '',
       if (defer == true) 'defer': '',
-      'src': src,
+      if (src != null) 'src': src,
     },
     events: events,
-    children: children,
+    children: [if (content != null) raw(content)],
   );
 }

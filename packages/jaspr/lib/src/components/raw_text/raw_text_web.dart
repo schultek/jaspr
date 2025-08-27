@@ -4,6 +4,7 @@ import 'package:universal_web/web.dart' as web;
 
 import '../../../browser.dart';
 import '../../browser/utils.dart';
+import '../../foundation/type_checks.dart';
 
 /// Renders its input as raw HTML.
 ///
@@ -32,8 +33,8 @@ class RawNode extends Component {
     return RawNode(
       node,
       key: switch (node) {
-        web.Text() when node.instanceOfString("Text") => ValueKey('text'),
-        web.Element() when node.instanceOfString("Element") => ValueKey('element:${node.tagName}'),
+        web.Text() when node.isText => ValueKey('text'),
+        web.Element() when node.isElement => ValueKey('element:${node.tagName}'),
         _ => null,
       },
     );
@@ -61,11 +62,12 @@ class RawNodeElement extends BuildableRenderObjectElement {
   @override
   void updateRenderObject() {
     var next = component.node;
-    if (next.instanceOfString("Text") && next is web.Text) {
-      renderObject.updateText(next.textContent ?? '');
-    } else if (next.instanceOfString("Element") && next is web.Element) {
+    if (next.isText) {
+      renderObject.updateText((next as web.Text).textContent ?? '');
+    } else if (next.isElement) {
+      next as web.Element;
       renderObject.updateElement(
-          next.tagName.toLowerCase(), next.id, next.className, null, next.attributes.toMap(), null);
+          next.tagName.toLowerCase(), next.id, next.getAttribute('class'), null, next.attributes.toMap(), null);
     } else {
       var curr = (renderObject as DomRenderObject).node;
       if (curr != null) {

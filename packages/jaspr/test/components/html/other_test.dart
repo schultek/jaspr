@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -13,7 +14,7 @@ void main() {
         meta(httpEquiv: "x-ua-compatible", content: "ie=edge"),
         meta(name: "description", content: "Hello world"),
         link(href: "a", rel: "", type: "", as: ""),
-        script(async: false, defer: false, src: "a.js", []),
+        script(async: false, defer: false, src: "a.js"),
       ]));
 
       expect(find.tag('details'), findsOneComponent);

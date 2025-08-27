@@ -26,9 +26,7 @@ class UpdateCommand extends BaseCommand {
   bool get requiresPubspec => false;
 
   @override
-  Future<CommandResult?> run() async {
-    await super.run();
-
+  Future<int> runCommand() async {
     logger.write('Checking for updates', progress: ProgressState.running);
     late final String latestVersion;
     try {
@@ -36,14 +34,14 @@ class UpdateCommand extends BaseCommand {
     } catch (error) {
       logger.complete(false);
       logger.write('$error', level: Level.error);
-      return CommandResult.done(ExitCode.software.code);
+      return ExitCode.software.code;
     }
     logger.write('Checked for updates', progress: ProgressState.completed);
 
     final isUpToDate = jasprCliVersion == latestVersion;
     if (isUpToDate) {
       logger.write('jaspr is already at the latest version.');
-      return null;
+      return 0;
     }
 
     logger.write('Updating to $latestVersion', progress: ProgressState.running);
@@ -56,16 +54,16 @@ class UpdateCommand extends BaseCommand {
     } catch (error) {
       logger.complete(false);
       logger.write('$error', level: Level.error);
-      return CommandResult.done(ExitCode.software.code);
+      return ExitCode.software.code;
     }
 
     if (result.exitCode != ExitCode.success.code) {
       logger.write('Unable to update to $latestVersion', progress: ProgressState.completed);
       logger.write('${result.stderr}', level: Level.error);
-      return CommandResult.done(ExitCode.software.code);
+      return ExitCode.software.code;
     }
 
     logger.write('Updated to $latestVersion', progress: ProgressState.completed);
-    return null;
+    return 0;
   }
 }

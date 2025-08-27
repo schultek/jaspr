@@ -30,7 +30,7 @@ Component audio(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (autoplay == true) 'autoplay': '',
       if (controls == true) 'controls': '',
       if (crossOrigin != null) 'crossorigin': crossOrigin.value,
@@ -102,7 +102,7 @@ Component img(
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (alt != null) 'alt': alt,
       if (crossOrigin != null) 'crossorigin': crossOrigin.value,
       if (width != null) 'width': '$width',
@@ -163,7 +163,7 @@ Component video(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (autoplay == true) 'autoplay': '',
       if (controls == true) 'controls': '',
       if (crossOrigin != null) 'crossorigin': crossOrigin.value,
@@ -204,7 +204,7 @@ Component embed(
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       'src': src,
       if (type != null) 'type': type,
       if (width != null) 'width': '$width',
@@ -248,7 +248,7 @@ Component iframe(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       'src': src,
       if (allow != null) 'allow': allow,
       if (csp != null) 'csp': csp,
@@ -320,7 +320,7 @@ Component object(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (data != null) 'data': data,
       if (name != null) 'name': name,
       if (type != null) 'type': type,
@@ -354,10 +354,50 @@ Component source(
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (type != null) 'type': type,
       if (src != null) 'src': src,
     },
     events: events,
+  );
+}
+
+/// The &lt;figure&gt; HTML element represents self-contained content, potentially with an optional caption, which is specified using the &lt;figcaption&gt; element. The figure, its caption, and its contents are referenced as a single unit.
+Component figure(List<Component> children,
+    {Key? key,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
+  return DomComponent(
+    tag: 'figure',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: attributes,
+    events: events,
+    children: children,
+  );
+}
+
+/// The &lt;figcaption&gt; HTML element represents a caption or legend describing the rest of the contents of its parent &lt;figure&gt; element, providing the &lt;figure&gt;> an accessible description.
+Component figcaption(List<Component> children,
+    {Key? key,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
+  return DomComponent(
+    tag: 'figcaption',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: attributes,
+    events: events,
+    children: children,
   );
 }

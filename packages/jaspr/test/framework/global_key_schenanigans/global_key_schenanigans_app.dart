@@ -11,12 +11,11 @@ class App extends TestComponent<int> {
     if (phase == 1) {
       yield Child(key: GlobalObjectKey('test'));
     } else if (phase == 2) {
-      yield DomComponent(
-        tag: 'div',
-        child: Child(
+      yield div([
+        Child(
           key: GlobalObjectKey('test'),
         ),
-      );
+      ]);
     }
   }
 }

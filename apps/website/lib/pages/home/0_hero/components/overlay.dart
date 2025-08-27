@@ -74,28 +74,29 @@ class OverlayState extends State<Overlay> {
   }
 
   @css
-  static final List<StyleRule> styles = [
-    css('.blur-backdrop', [
-      css('&').styles(
-        position: Position.fixed(top: Unit.zero, left: Unit.zero, right: Unit.zero, bottom: Unit.zero),
-        zIndex: ZIndex(1),
-        userSelect: UserSelect.none,
-        flexDirection: FlexDirection.column,
-        justifyContent: JustifyContent.center,
-        alignItems: AlignItems.center,
-        backgroundColor: backgroundFaded,
-        raw: {'backdrop-filter': 'blur(5px)', '-webkit-backdrop-filter': 'blur(5px)'},
-      ),
-      css('img', [
-        css('&').styles(
-          maxWidth: 80.percent,
-          maxHeight: 80.percent,
-          radius: BorderRadius.circular(20.px),
-          pointerEvents: PointerEvents.none,
-          raw: {'object-fit': 'cover'},
-        ),
-      ]),
-      css('span').styles(display: Display.inlineBlock, margin: Margin.only(top: 1.rem)).combine(bodySmall),
-    ]),
-  ];
+  static List<StyleRule> get styles => [
+        css('.blur-backdrop', [
+          css('&').styles(
+            display: Display.flex,
+            position: Position.fixed(top: Unit.zero, left: Unit.zero, right: Unit.zero, bottom: Unit.zero),
+            zIndex: ZIndex(1),
+            userSelect: UserSelect.none,
+            flexDirection: FlexDirection.column,
+            justifyContent: JustifyContent.center,
+            alignItems: AlignItems.center,
+            backgroundColor: backgroundFaded,
+            raw: {'backdrop-filter': 'blur(5px)', '-webkit-backdrop-filter': 'blur(5px)'},
+          ),
+          css('img', [
+            css('&').styles(
+              maxWidth: 80.percent,
+              maxHeight: 80.percent,
+              radius: BorderRadius.circular(20.px),
+              pointerEvents: PointerEvents.none,
+              raw: {'object-fit': 'cover'},
+            ),
+          ]),
+          css('span').styles(display: Display.inlineBlock, margin: Margin.only(top: 1.rem)).combine(bodySmall),
+        ]),
+      ];
 }

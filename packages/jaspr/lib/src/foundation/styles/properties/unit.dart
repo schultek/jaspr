@@ -24,7 +24,7 @@ extension UnitExt on num {
   /// Refers to the CSS rem (root em) unit.
   ///
   /// This is used to specify a length relative to the font size of the
-  /// root element (usually the <html> element). For example, '2.rem' is equal
+  /// root element (usually the `<html>` element). For example, '2.rem' is equal
   /// to twice the font size of the root element. If all child elements use
   /// rem units, then simply changing the value of the root element will
   /// proportionally adjust the values of the children.
@@ -91,6 +91,12 @@ abstract class Unit {
 
   /// The css value
   String get value;
+
+  static const Unit inherit = _ExpUnit('inherit');
+  static const Unit initial = _ExpUnit('initial');
+  static const Unit revert = _ExpUnit('revert');
+  static const Unit revertLayer = _ExpUnit('revert-layer');
+  static const Unit unset = _ExpUnit('unset');
 }
 
 class _ExpUnit implements Unit {

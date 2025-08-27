@@ -30,18 +30,18 @@ class EmbeddedCounter extends StatelessComponent {
   }
 
   @css
-  static final styles = [
-    css('.flutter-counter', [
-      css('&').styles(
-        display: Display.flex,
-        radius: BorderRadius.circular(cardBorderRadius.px),
-        backgroundColor: surfaceColor,
-      ),
-      css('& > div[flt-embedding]').styles(
-        opacity: 0,
-        transition: Transition('opacity', duration: 400),
-      ),
-      css('&.active > div[flt-embedding]').styles(opacity: 1),
-    ])
-  ];
+  static List<StyleRule> get styles => [
+        css('.flutter-counter', [
+          css('&').styles(
+            display: Display.flex,
+            radius: BorderRadius.circular(cardBorderRadius.px),
+            backgroundColor: surfaceColor,
+          ),
+          css('& > div[flt-embedding]').styles(
+            opacity: 0,
+            transition: Transition('opacity', duration: 400),
+          ),
+          css('&.active > div[flt-embedding]').styles(opacity: 1),
+        ])
+      ];
 }

@@ -83,7 +83,7 @@ class App extends StatelessComponent {
   // By using the @css annotation, these will be rendered automatically to css inside the <head> of your page.
   // Must be a variable or getter of type [List<StyleRule>].
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.main', [
       // The '&' refers to the parent selector of a nested style rules.
       css('&').styles(
@@ -97,7 +97,7 @@ class App extends StatelessComponent {
         flexDirection: FlexDirection.column,
         justifyContent: JustifyContent.center,
         alignItems: AlignItems.center,
-        flex: Flex(grow: 1{{^routing}}, shrink: 0, basis: FlexBasis(400.px){{/routing}}),
+        flex: Flex(grow: 1{{^routing}}, shrink: 0, basis: 400.px{{/routing}}),
       ),
     ]),
   ];{{/server}}

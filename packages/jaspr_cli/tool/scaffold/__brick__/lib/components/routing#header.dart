@@ -24,7 +24,7 @@ class Header extends StatelessComponent {
   }{{#server}}
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('header', [
       css('&').styles(
         display: Display.flex,
@@ -51,7 +51,7 @@ class Header extends StatelessComponent {
             textDecoration: const TextDecoration(line: TextDecorationLine.none),
           ),
           css('&:hover').styles(
-            backgroundColor: const Color.hex('#0005'),
+            backgroundColor: const Color('#0005'),
           ),
         ]),
         css('div.active', [

@@ -11,8 +11,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
-abstract class Example
-    implements _i1.SerializableModel, _i1.ProtocolSerialization {
+abstract class Example implements _i1.SerializableModel, _i1.ProtocolSerialization {
   Example._({
     required this.name,
     required this.data,

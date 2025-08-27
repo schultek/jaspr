@@ -1,7 +1,8 @@
 name: jaspr_riverpod
 description: Riverpod for Jaspr
-version: 0.3.18
+version: 0.3.21
 homepage: https://github.com/schultek/jaspr
+repository: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
 documentation: https://docs.jaspr.site/eco/riverpod
 funding:
@@ -12,12 +13,12 @@ topics:
   - web
 
 environment:
-  sdk: ">=3.6.0 <4.0.0"
+  sdk: '>=3.6.0 <4.0.0'
 
 resolution: workspace
 
 dependencies:
-  jaspr: ^0.17.1
+  jaspr: ^0.20.0
   meta: ^1.9.1
   riverpod: ^2.6.0
 

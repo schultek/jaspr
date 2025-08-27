@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:build/build.dart';
-import 'package:dart_style/dart_style.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 
@@ -49,54 +48,39 @@ class ImportsStubsBuilder implements Builder {
     }
 
     if (vmImports.isNotEmpty) {
-      await buildStep.writeAsString(
+      await buildStep.writeAsFormattedDart(
         AssetId(buildStep.inputId.package, 'lib/generated/imports/_vm.dart'),
-        DartFormatter(
-          languageVersion: DartFormatter.latestShortStyleLanguageVersion,
-          pageWidth: 120,
-        ).format("""
-          $generationHeader
+        """
           // ignore_for_file: directives_ordering, deprecated_member_use
           
           ${vmImports.entries.where((e) => e.value.any((v) => v.isType)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
           ${vmImports.entries.map((e) => "export '${e.key}' show ${e.value.join(', ')};").join('\n')}
           
           ${vmImports.values.expand((v) => v.where((e) => e.isType)).map((e) => 'typedef ${e}OrStubbed = $e;').join('\n')}
-        """),
+        """,
       );
     }
 
     if (webImports.isNotEmpty) {
-      await buildStep.writeAsString(
+      await buildStep.writeAsFormattedDart(
         AssetId(buildStep.inputId.package, 'lib/generated/imports/_web.dart'),
-        DartFormatter(
-          languageVersion: DartFormatter.latestShortStyleLanguageVersion,
-          pageWidth: 120,
-        ).format("""
-          $generationHeader
+        """
           // ignore_for_file: directives_ordering, deprecated_member_use
           
           ${webImports.entries.where((e) => e.value.any((v) => v.isType)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
           ${webImports.entries.map((e) => "export '${e.key}' show ${e.value.join(', ')};").join('\n')}
           
           ${webImports.values.expand((v) => v.where((e) => e.isType)).map((e) => 'typedef ${e}OrStubbed = $e;').join('\n')}
-        """),
+        """,
       );
     }
 
     if (stubs.isNotEmpty) {
-      await buildStep.writeAsString(
-        AssetId(buildStep.inputId.package, 'lib/generated/imports/_stubs.dart'),
-        DartFormatter(
-          languageVersion: DartFormatter.latestShortStyleLanguageVersion,
-          pageWidth: 120,
-        ).format("""
-         $generationHeader
+      await buildStep.writeAsFormattedDart(AssetId(buildStep.inputId.package, 'lib/generated/imports/_stubs.dart'), """
          // ignore_for_file: directives_ordering, non_constant_identifier_names
          
          ${stubs.join('\n')}
-        """),
-      );
+        """);
     }
   }
 

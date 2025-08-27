@@ -2,10 +2,10 @@ import 'package:jaspr/jaspr.dart';
 
 // Colors
 
-const primaryDark = Color.hex('#09387e');
-const primaryMid = Color.hex('#0066B4');
+const primaryDark = Color('#09387e');
+const primaryMid = Color('#0066B4');
 const primaryMidLow = Color.variable('--primaryMidLow');
-const primaryLight = Color.hex('#40C4FF');
+const primaryLight = Color('#40C4FF');
 
 const primaryFaded = Color.variable('--primaryFaded');
 
@@ -32,41 +32,41 @@ final surfaceLowest = Color.variable('--surfaceLowest');
 final hoverOverlayColor = Color.variable('--hoverOverlayColor');
 
 final lightTheme = {
-  primaryMidLow: Color.hex('#004377'),
-  primaryFaded: Color.hex('#0066b41e'),
-  textDim: Color.hex('#777'),
-  textDark: Color.hex('#555'),
-  textBlack: Color.hex('#222'),
-  shadowColor1: Color.hex('#0001'),
-  shadowColor2: Color.hex('#0004'),
-  shadowColor3: Color.hex('#0002'),
-  background: Color.hex('#FFF'),
-  backgroundFaded: Color.hex('#FFF9'),
-  borderColor: Color.hex('#EEE'),
-  borderColor2: Color.hex('#CCC'),
-  surface: Color.hex('#F5F5F5'),
-  surfaceLow: Color.hex('#F8F8F8'),
-  surfaceLowest: Color.hex('#FCFCFC'),
-  hoverOverlayColor: Color.hex('#0001'),
+  primaryMidLow: Color('#004377'),
+  primaryFaded: Color('#0066b41e'),
+  textDim: Color('#777'),
+  textDark: Color('#555'),
+  textBlack: Color('#222'),
+  shadowColor1: Color('#0001'),
+  shadowColor2: Color('#0004'),
+  shadowColor3: Color('#0002'),
+  background: Color('#FFF'),
+  backgroundFaded: Color('#FFF9'),
+  borderColor: Color('#EEE'),
+  borderColor2: Color('#CCC'),
+  surface: Color('#F5F5F5'),
+  surfaceLow: Color('#F8F8F8'),
+  surfaceLowest: Color('#FCFCFC'),
+  hoverOverlayColor: Color('#0001'),
 };
 
 final darkTheme = {
-  primaryMidLow: Color.hex('#007ad7'),
-  primaryFaded: Color.hex('#6ad0ff1c'),
-  textDim: Color.hex('#CCC'),
-  textDark: Color.hex('#EEE'),
-  textBlack: Color.hex('#F5F5F5'),
-  shadowColor1: Color.hex('#0001'),
-  shadowColor2: Color.hex('#0004'),
-  shadowColor3: Color.hex('#0002'),
-  background: Color.hex('#0d1117'),
-  backgroundFaded: Color.hex('#0d111799'),
-  borderColor: Color.hex('#1d1f25'),
-  borderColor2: Color.hex('#292c35'),
-  surface: Color.hex('#070c14'),
-  surfaceLow: Color.hex('#161b1f'),
-  surfaceLowest: Color.hex('#11141a'),
-  hoverOverlayColor: Color.hex('#FFF1'),
+  primaryMidLow: Color('#007ad7'),
+  primaryFaded: Color('#6ad0ff1c'),
+  textDim: Color('#CCC'),
+  textDark: Color('#EEE'),
+  textBlack: Color('#F5F5F5'),
+  shadowColor1: Color('#0001'),
+  shadowColor2: Color('#0004'),
+  shadowColor3: Color('#0002'),
+  background: Color('#0d1117'),
+  backgroundFaded: Color('#0d111799'),
+  borderColor: Color('#1d1f25'),
+  borderColor2: Color('#292c35'),
+  surface: Color('#070c14'),
+  surfaceLow: Color('#161b1f'),
+  surfaceLowest: Color('#11141a'),
+  hoverOverlayColor: Color('#FFF1'),
 };
 
 // Typography
@@ -90,101 +90,101 @@ const contentPadding = Unit.variable('--contentPadding');
 const sectionPadding = Unit.variable('--sectionPadding');
 
 @css
-final root = [
-  css.import('font/lucide/lucide.css'),
+List<StyleRule> get root => [
+      css.import('font/lucide/lucide.css'),
 
-  // Global
-  css('html, body').styles(padding: Padding.zero, margin: Margin.zero),
-  css('html').styles(
-    fontFamily: FontFamily.list([FontFamilies.uiSansSerif, FontFamilies.systemUi, FontFamilies.sansSerif]),
-    backgroundColor: background,
-  ),
+      // Global
+      css('html, body').styles(padding: Padding.zero, margin: Margin.zero),
+      css('html').styles(
+        fontFamily: FontFamily.list([FontFamilies.uiSansSerif, FontFamilies.systemUi, FontFamilies.sansSerif]),
+        backgroundColor: background,
+      ),
 
-  // Theme
-  css(':root').styles(raw: {
-    for (final color in lightTheme.keys) color.value.substring(4, color.value.length - 1): lightTheme[color]!.value,
-    '--contentPadding': '4rem',
-    '--sectionPadding': '16rem',
-  }),
+      // Theme
+      css(':root').styles(raw: {
+        for (final color in lightTheme.keys) color.value.substring(4, color.value.length - 1): lightTheme[color]!.value,
+        '--contentPadding': '4rem',
+        '--sectionPadding': '16rem',
+      }),
 
-  css(':root.dark').styles(raw: {
-    for (final color in darkTheme.keys) color.value.substring(4, color.value.length - 1): darkTheme[color]!.value,
-  }),
+      css(':root.dark').styles(raw: {
+        for (final color in darkTheme.keys) color.value.substring(4, color.value.length - 1): darkTheme[color]!.value,
+      }),
 
-  css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
-    css(':root').styles(raw: {
-      '--contentPadding': '2rem',
-      '--sectionPadding': '8rem',
-    }),
-  ]),
+      css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
+        css(':root').styles(raw: {
+          '--contentPadding': '2rem',
+          '--sectionPadding': '8rem',
+        }),
+      ]),
 
-  css.media(MediaQuery.all(maxWidth: smallMobileBreakpoint), [
-    css(':root').styles(raw: {
-      '--contentPadding': '1rem',
-      '--sectionPadding': '4rem',
-    }),
-  ]),
+      css.media(MediaQuery.all(maxWidth: smallMobileBreakpoint), [
+        css(':root').styles(raw: {
+          '--contentPadding': '1rem',
+          '--sectionPadding': '4rem',
+        }),
+      ]),
 
-  // Typography
-  css('.caption').combine(caption),
-  css('.caption2').combine(caption2),
-  css('p').combine(bodyMedium),
-  css('h1').combine(heading1).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.rem)),
-  css('h2').combine(heading2).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
-  css('h3').combine(heading3).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
-  css('h4').combine(heading4).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
-  css('h5').combine(heading5).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
+      // Typography
+      css('.caption').combine(caption),
+      css('.caption2').combine(caption2),
+      css('p').combine(bodyMedium),
+      css('h1').combine(heading1).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.rem)),
+      css('h2').combine(heading2).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
+      css('h3').combine(heading3).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
+      css('h4').combine(heading4).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
+      css('h5').combine(heading5).styles(margin: Margin.only(top: Unit.zero, bottom: 0.1.em)),
 
-  css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
-    css('h1').styles(fontSize: 2.6.rem),
-    css('h2').styles(fontSize: 1.8.rem),
-    css('h3').styles(fontSize: 1.8.rem),
-    css('h4').styles(fontSize: 1.2.rem),
-  ]),
+      css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
+        css('h1').styles(fontSize: 2.6.rem),
+        css('h2').styles(fontSize: 1.8.rem),
+        css('h3').styles(fontSize: 1.8.rem),
+        css('h4').styles(fontSize: 1.2.rem),
+      ]),
 
-  // Common
-  css('.actions').styles(
-    display: Display.flex,
-    flexDirection: FlexDirection.row,
-    flexWrap: FlexWrap.wrap,
-    alignItems: AlignItems.center,
-    gap: Gap.all(.8.em),
-  ),
-  css('.text-gradient').styles(raw: {
-    'background': primaryGradient,
-    '-webkit-background-clip': 'text',
-    '-webkit-text-fill-color': 'transparent',
-  }),
-  css('a').styles(color: textDark, textDecoration: TextDecoration.none),
-  css('b').styles(fontWeight: FontWeight.w500),
+      // Common
+      css('.actions').styles(
+        display: Display.flex,
+        flexDirection: FlexDirection.row,
+        flexWrap: FlexWrap.wrap,
+        alignItems: AlignItems.center,
+        gap: Gap.all(.8.em),
+      ),
+      css('.text-gradient').styles(raw: {
+        'background': primaryGradient,
+        '-webkit-background-clip': 'text',
+        '-webkit-text-fill-color': 'transparent',
+      }),
+      css('a').styles(color: textDark, textDecoration: TextDecoration.none),
+      css('b').styles(fontWeight: FontWeight.w500),
 
-  css('code, pre, .mono').styles(
-    fontFamily: FontFamily.list([
-      FontFamilies.uiMonospace,
-      FontFamily('SFMono-Regular'),
-      FontFamily('Menlo'),
-      FontFamily('Monaco'),
-      FontFamily('Consolas'),
-      FontFamily('Liberation Mono'),
-      FontFamily('Courier New'),
-      FontFamilies.monospace
-    ]),
-    fontSize: 0.875.rem,
-    lineHeight: 1.4.em,
-    raw: {'-webkit-text-size-adjust': '100%'},
-  ),
+      css('code, pre, .mono').styles(
+        fontFamily: FontFamily.list([
+          FontFamilies.uiMonospace,
+          FontFamily('SFMono-Regular'),
+          FontFamily('Menlo'),
+          FontFamily('Monaco'),
+          FontFamily('Consolas'),
+          FontFamily('Liberation Mono'),
+          FontFamily('Courier New'),
+          FontFamilies.monospace
+        ]),
+        fontSize: 0.875.rem,
+        lineHeight: 1.4.em,
+        raw: {'-webkit-text-size-adjust': '100%'},
+      ),
 
-  // Animated underline
-  css('.animated-underline', [
-    css('&').styles(
-      transition: Transition('background-size', duration: 300, curve: Curve.easeInOut),
-      backgroundPosition: BackgroundPosition(offsetX: Unit.zero, offsetY: 100.percent),
-      backgroundRepeat: BackgroundRepeat.noRepeat,
-      backgroundSize: BackgroundSize.sides(Unit.zero, 1.5.px),
-      raw: {'background-image': 'linear-gradient(to right, currentColor, currentColor)'},
-    ),
-    css('&:hover').styles(
-      backgroundSize: BackgroundSize.sides(100.percent, 1.5.px),
-    ),
-  ]),
-];
+      // Animated underline
+      css('.animated-underline', [
+        css('&').styles(
+          transition: Transition('background-size', duration: 300, curve: Curve.easeInOut),
+          backgroundPosition: BackgroundPosition(offsetX: Unit.zero, offsetY: 100.percent),
+          backgroundRepeat: BackgroundRepeat.noRepeat,
+          backgroundSize: BackgroundSize.sides(Unit.zero, 1.5.px),
+          raw: {'background-image': 'linear-gradient(to right, currentColor, currentColor)'},
+        ),
+        css('&:hover').styles(
+          backgroundSize: BackgroundSize.sides(100.percent, 1.5.px),
+        ),
+      ]),
+    ];

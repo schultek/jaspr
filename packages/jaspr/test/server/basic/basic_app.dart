@@ -3,7 +3,7 @@ import 'package:jaspr/jaspr.dart';
 class App extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'div', children: [
+    yield div([
       Text('App'),
       Counter(),
     ]);
@@ -41,10 +41,9 @@ class Button extends StatelessComponent {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'button',
-      child: Text(label),
+    yield button(
       events: {'click': (e) => onPressed()},
+      [text(label)],
     );
   }
 }

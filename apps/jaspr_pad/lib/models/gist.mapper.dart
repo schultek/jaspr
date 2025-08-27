@@ -61,7 +61,7 @@ mixin GistDataMappable {
   }
 
   GistDataCopyWith<GistData, GistData, GistData> get copyWith =>
-      _GistDataCopyWithImpl(this as GistData, $identity, $identity);
+      _GistDataCopyWithImpl<GistData, GistData>(this as GistData, $identity, $identity);
   @override
   String toString() {
     return GistDataMapper.ensureInitialized().stringifyValue(this as GistData);
@@ -79,7 +79,8 @@ mixin GistDataMappable {
 }
 
 extension GistDataValueCopy<$R, $Out> on ObjectCopyWith<$R, GistData, $Out> {
-  GistDataCopyWith<$R, GistData, $Out> get $asGistData => $base.as((v, t, t2) => _GistDataCopyWithImpl(v, t, t2));
+  GistDataCopyWith<$R, GistData, $Out> get $asGistData =>
+      $base.as((v, t, t2) => _GistDataCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class GistDataCopyWith<$R, $In extends GistData, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -109,7 +110,7 @@ class _GistDataCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, GistData, $O
 
   @override
   GistDataCopyWith<$R2, GistData, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _GistDataCopyWithImpl($value, $cast, t);
+      _GistDataCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class GistFileMapper extends ClassMapperBase<GistFile> {
@@ -127,7 +128,7 @@ class GistFileMapper extends ClassMapperBase<GistFile> {
   final String id = 'GistFile';
 
   static String _$name(GistFile v) => v.name;
-  static const Field<GistFile, String> _f$name = Field('name', _$name, key: 'filename');
+  static const Field<GistFile, String> _f$name = Field('name', _$name, key: r'filename');
   static String _$content(GistFile v) => v.content;
   static const Field<GistFile, String> _f$content = Field('content', _$content);
   static String _$type(GistFile v) => v.type;
@@ -166,7 +167,7 @@ mixin GistFileMappable {
   }
 
   GistFileCopyWith<GistFile, GistFile, GistFile> get copyWith =>
-      _GistFileCopyWithImpl(this as GistFile, $identity, $identity);
+      _GistFileCopyWithImpl<GistFile, GistFile>(this as GistFile, $identity, $identity);
   @override
   String toString() {
     return GistFileMapper.ensureInitialized().stringifyValue(this as GistFile);
@@ -184,7 +185,8 @@ mixin GistFileMappable {
 }
 
 extension GistFileValueCopy<$R, $Out> on ObjectCopyWith<$R, GistFile, $Out> {
-  GistFileCopyWith<$R, GistFile, $Out> get $asGistFile => $base.as((v, t, t2) => _GistFileCopyWithImpl(v, t, t2));
+  GistFileCopyWith<$R, GistFile, $Out> get $asGistFile =>
+      $base.as((v, t, t2) => _GistFileCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class GistFileCopyWith<$R, $In extends GistFile, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -207,5 +209,5 @@ class _GistFileCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, GistFile, $O
 
   @override
   GistFileCopyWith<$R2, GistFile, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _GistFileCopyWithImpl($value, $cast, t);
+      _GistFileCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

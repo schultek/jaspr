@@ -8,12 +8,13 @@ import 'package:mason/mason.dart';
 import 'package:pub_updater/pub_updater.dart';
 
 import 'commands/analyze_command.dart';
-import 'commands/base_command.dart';
 import 'commands/build_command.dart';
 import 'commands/clean_command.dart';
 import 'commands/create_command.dart';
+import 'commands/daemon_command.dart';
 import 'commands/doctor_command.dart';
 import 'commands/serve_command.dart';
+import 'commands/tooling_daemon_command.dart';
 import 'commands/update_command.dart';
 import 'helpers/analytics.dart';
 import 'version.dart';
@@ -25,7 +26,7 @@ const packageName = 'jaspr_cli';
 const executableName = 'jaspr';
 
 /// A [CommandRunner] for the Jaspr CLI.
-class JasprCommandRunner extends CompletionCommandRunner<CommandResult?> {
+class JasprCommandRunner extends CompletionCommandRunner<int> {
   JasprCommandRunner() : super(executableName, 'jaspr - A modern web framework for building websites in Dart.') {
     argParser.addFlag(
       'version',
@@ -42,13 +43,15 @@ class JasprCommandRunner extends CompletionCommandRunner<CommandResult?> {
     addCommand(CleanCommand());
     addCommand(UpdateCommand());
     addCommand(DoctorCommand());
+    addCommand(DaemonCommand());
+    addCommand(ToolingDaemonCommand());
   }
 
   final Logger _logger = Logger();
   final PubUpdater _updater = PubUpdater();
 
   @override
-  Future<CommandResult?> run(Iterable<String> args) async {
+  Future<int?> run(Iterable<String> args) async {
     try {
       return await runCommand(parse(args));
     } on FormatException catch (e) {
@@ -56,24 +59,25 @@ class JasprCommandRunner extends CompletionCommandRunner<CommandResult?> {
         ..err(e.message)
         ..info('')
         ..info(usage);
-      return CommandResult.done(ExitCode.usage.code);
+      return ExitCode.usage.code;
     } on UsageException catch (e) {
       _logger
         ..err(e.message)
         ..info('')
         ..info(e.usage);
-      return CommandResult.done(ExitCode.usage.code);
+      return ExitCode.usage.code;
     } on ProcessException catch (error) {
       _logger.err(error.message);
-      return CommandResult.done(ExitCode.unavailable.code);
-    } catch (error) {
+      return ExitCode.unavailable.code;
+    } /*catch (error, stackTrace) {
       _logger.err('$error');
-      return CommandResult.done(ExitCode.software.code);
-    }
+      _logger.err('$stackTrace');
+      return ExitCode.software.code;
+    }*/
   }
 
   @override
-  Future<CommandResult?> runCommand(ArgResults topLevelResults) async {
+  Future<int?> runCommand(ArgResults topLevelResults) async {
     if (topLevelResults.command?.name == 'completion') {
       return await super.runCommand(topLevelResults);
     }
@@ -98,7 +102,7 @@ class JasprCommandRunner extends CompletionCommandRunner<CommandResult?> {
         return await super.runCommand(topLevelResults);
       }
     }
-    return CommandResult.done(exitCode);
+    return exitCode;
   }
 
   Future<void> _checkForUpdates() async {

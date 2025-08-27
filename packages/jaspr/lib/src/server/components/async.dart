@@ -21,8 +21,12 @@ abstract class AsyncBuildableElement extends BuildableElement {
 
   @override
   Future<void> performRebuild() async {
-    _built = await buildAsync().toList();
-    super.performRebuild();
+    try {
+      _built = await buildAsync().toList();
+      super.performRebuild();
+    } catch (e, st) {
+      failRebuild(e, st);
+    }
   }
 }
 

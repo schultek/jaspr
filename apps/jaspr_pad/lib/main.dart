@@ -1,5 +1,5 @@
 @MappableLib(generateInitializerForScope: InitializerScope.package)
-library main;
+library;
 
 import 'dart:async';
 import 'dart:io';
@@ -12,6 +12,7 @@ import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 import 'components/playground/playground.dart';
+import 'jaspr_options.dart';
 import 'main.init.dart';
 import 'providers/samples_provider.dart';
 import 'server/analyzer.dart';
@@ -21,7 +22,7 @@ import 'server/samples.dart';
 import 'server/tutorial.dart';
 
 void main() async {
-  Jaspr.initializeApp();
+  Jaspr.initializeApp(options: defaultJasprOptions);
 
   var router = Router();
 
@@ -38,7 +39,7 @@ void main() async {
     ));
   }));
 
-  var handler = Pipeline().addMiddleware(logRequests()).addHandler(router.call);
+  var handler = Pipeline().addHandler(router.call);
 
   var port = int.parse(Platform.environment['PORT'] ?? '8080');
   var server = await serve(handler, InternetAddress.anyIPv4, port, shared: true);

@@ -40,7 +40,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   };
 
   int responseStatusCode = 200;
-  String? responseErrorBody;
+  String? responseBodyOverride;
 
   @override
   void attachRootComponent(Component app) async {
@@ -74,8 +74,8 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       adapter.apply(root);
     }
 
-    if (responseErrorBody != null) {
-      return responseErrorBody!;
+    if (responseBodyOverride != null) {
+      return responseBodyOverride!;
     }
 
     return root.renderToHtml();
@@ -101,6 +101,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   late final List<RenderAdapter> _adapters = [];
 
   void addRenderAdapter(RenderAdapter adapter) {
+    if (_adapters.contains(adapter)) return;
     _adapters.add(adapter);
   }
 
@@ -109,6 +110,12 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   void initializeOptions(JasprOptions options) {
     _options = options;
+  }
+
+  @override
+  void reportBuildError(Element element, Object error, StackTrace stackTrace) {
+    responseStatusCode = 500;
+    stderr.writeln('Error while building ${element.component.runtimeType}:\n$error\n\n$stackTrace');
   }
 }
 

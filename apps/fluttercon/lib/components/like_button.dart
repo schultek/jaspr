@@ -33,20 +33,20 @@ class LikeButton extends StatelessComponent {
   }
 
   @css
-  static final styles = [
-    css('.like-button', [
-      css('&').styles(
-        border: Border.none,
-        outline: Outline(style: OutlineStyle.none),
-        backgroundColor: Colors.transparent,
-        fontSize: 1.5.em,
-      ),
-      css('&:hover span').styles(transform: Transform.scale(1.2)),
-      css('&.active span').styles(color: Colors.red),
-      css('span').styles(
-        display: Display.inlineBlock,
-        transition: Transition('transform', duration: 300, curve: Curve.ease),
-      ),
-    ]),
-  ];
+  static List<StyleRule> get styles => [
+        css('.like-button', [
+          css('&').styles(
+            border: Border.none,
+            outline: Outline(style: OutlineStyle.none),
+            fontSize: 1.5.em,
+            backgroundColor: Colors.transparent,
+          ),
+          css('&:hover span').styles(transform: Transform.scale(1.2)),
+          css('&.active span').styles(color: Colors.red),
+          css('span').styles(
+            display: Display.inlineBlock,
+            transition: Transition('transform', duration: 300, curve: Curve.ease),
+          ),
+        ]),
+      ];
 }

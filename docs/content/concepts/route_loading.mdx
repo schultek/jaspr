@@ -1,0 +1,279 @@
+---
+title: Route Loading
+description: Load routes and pages from the filesystem or other sources.
+---
+
+---
+
+Route loading is the process of discovering and preparing pages for your content site. `jaspr_content` provides a flexible system for loading routes from various sources, allowing you to structure your content in a way that best suits your project.
+
+---
+
+At its core, a `RouteLoader` is responsible for two main tasks:
+
+1. **Discovering Page Sources**: It scans a source (like a directory or a remote repository) to find all potential pages. Each discovered entity is represented as a `PageSource`.
+2. **Building Pages**: It loads the content for each of these `PageSource`s and creates actual `Page` objects.
+3. **Creating Routes**: It creates a route for each page.
+
+The `ContentApp` component orchestrates this process by taking a list of `RouteLoader`s and a `ConfigResolver`. The `ConfigResolver` determines which `PageConfig` applies to each page, influencing how it's loaded, parsed, and rendered.
+
+## Built-In Route Loaders
+
+`jaspr_content` comes with several built-in `RouteLoader` implementations to cover common use cases.
+
+### FilesystemLoader
+
+The `FilesystemLoader` loads pages from a specified directory on your local filesystem. It is configured by default when using the default `ContentApp()` constructor.
+
+- **Source**: A local directory.
+- **Behavior**: Recursively scans the directory for files.
+  - Files and folders starting with an underscore (`_`) or dot (`.`) are ignored.
+  - Index files (e.g., `index.md`, `index.html`) are treated as the page for the containing folder (e.g., `/about/index.md` becomes `/about`).
+  - Other files have their names (without extension) used as the path segment (e.g., `/posts/my-article.md` becomes `/posts/my-article`).
+- **Features**:
+  - Supports hot-reloading in debug mode: Changes to files trigger a rebuild of the affected pages.
+  - Can keep file suffixes for specific paths using the `keepSuffixPattern` argument.
+
+**Example:**
+
+```dart
+// The default ContentApp configures a FilesystemLoader by default.
+ContentApp(
+  directory: 'content' // Loads pages from the 'content' directory (default).
+  // ...
+);
+
+// OR
+
+ContentApp.custom(
+  loaders: [
+    FilesystemLoader('content'), // Loads pages from the 'content' directory.
+  ],
+  // ...
+);
+```
+
+### GitHubLoader
+
+The `GitHubLoader` fetches pages from a GitHub repository.
+
+- **Source**: A GitHub repository.
+- **Behavior**:
+  - Uses the GitHub API to list files in the specified repository, path, and ref (branch, tag, or commit).
+  - Similar to `FilesystemLoader`, it ignores files/folders starting with `_` or `.` and handles index files.
+- **Features**:
+  - Allows loading content directly from remote sources.
+  - Can use an optional access token for private repositories or to avoid rate limits on public ones.
+  - Can keep file suffixes for specific paths using the `keepSuffixPattern` argument.
+
+**Example:**
+
+```dart
+ContentApp.custom(
+  loaders: [
+    GitHubLoader(
+      'owner/repo',     // Replace with your repository
+      ref: 'main',      // Branch or ref (defaults to 'main')
+      path: 'docs/',    // Path within the repository (defaults to 'docs/')
+      accessToken: 'YOUR_GITHUB_TOKEN', // Optional
+    ),
+  ],
+  // ...
+)
+```
+
+### MemoryLoader
+
+The `MemoryLoader` loads pages directly from a list of `MemoryPage` objects defined in your Dart code.
+
+- **Source**: An in-memory list of `MemoryPage` objects.
+- **Behavior**: Each `MemoryPage` directly defines a page's path, content, and initial data.
+- **Use Cases**:
+  - Small sites with content that doesn't need to be in separate files.
+  - Programmatically generating pages.
+  - Testing or examples.
+- **Features**:
+  - Content can be a `String` or a `Component Function(Page page)` builder.
+
+**Example:**
+
+```dart
+ContentApp.custom(
+  loaders: [
+    MemoryLoader(pages: [
+      // Add a Page with content as a String.
+      MemoryPage(
+        path: 'index.md',
+        content: '# Hello from Memory!\n\nHello {{name}}!',
+        data: {'name': 'Jasper'}, // Optional initial data
+      ),
+      // Or directly build the component for a Page.
+      // This will skip templating, parsing and extensions, as there is no content.
+      // It may apply layout and theming based on the parameter.
+      MemoryPage.builder(
+        path: 'dynamic-page.html',
+        builder: (page) {
+          return p([
+            text('Dynamic Page: ${page.data['title']}'),
+          ]);
+        ),
+        applyLayout: true
+        data: {'title': 'My Dynamic Page'},
+      ),
+    ]),
+  ],
+  // ... other configurations
+);
+```
+
+## Creating Custom Route Loaders
+
+If the built-in loaders don't fit your needs, you can create a custom `RouteLoader` implementation. At minimum, you'll need to:
+
+1. Create a custom `PageSource` subclass (e.g. `MyPageSource extends PageSource`) and implement its `loadPage()` method.
+
+- This should load the page content from your source (filesystem, remote storage, database, etc.) and create a `Page` object.
+
+2. Create a custom `RouteLoaderBase` subclass (e.g. `MyRouteLoader extends RouteLoaderBase`) and implement its `Future<List<PageSource>> loadPageSources()` method.
+
+- This method should discover all your page sources and return a list of `PageSource` objects.
+
+You might also need to implement `readPartial()` and `readPartialSync()` in your custom loader if your content strategy involves including partial files (via a template engine) and these partials also need to be sourced from your custom location.
+
+**Example: Loading Pages from a CMS**
+
+Here's an example of a `RouteLoader` that fetches page information and content from an imaginary CMS API:
+
+```dart
+/// Custom PageSource for CMS Pages
+class CmsPageSource extends PageSource {
+  CmsPageSource(this.cmsPageId, super.path, super.loader);
+
+  final String cmsPageId; // Unique ID for fetching content from the CMS
+
+  @override
+  Future<Page> buildPage() async {
+    final content = await loadPageContentFromCMS(cmsPageId);
+    final metadata = await loadPageMetadataFromCMS(cmsPageId);
+
+    return Page(
+      path: this.path, // The path provided when CmsPageSource was created
+      url: this.url,   // Resolved URL (e.g., /blog/my-first-post)
+      content: content, // Content from CMS
+      data: {'page': metadata},  // Data from CMS
+      config: this.config, // Page-specific config resolved by ContentApp
+      loader: this.loader, // The CmsLoader instance
+    );
+  }
+}
+
+/// Custom RouteLoader for the CMS
+class CmsLoader extends RouteLoaderBase {
+  CmsLoader({super.debugPrint});
+
+  @override
+  Future<List<PageSource>> loadPageSources() async {
+    final sources = <PageSource>[];
+
+    final cmsPages = await loadCMSPages();
+
+    for (final page in cmsPages) {
+      final id = page.id;
+      final slug = page.slug;
+
+      // Determine the path. You might want to add a suffix like .md if your parsers expect it.
+      // This path is used for routing and matching against PageConfig patterns.
+      final pagePath = '$slug.md'; // e.g., "my-first-cms-post.md" or "about/company-info.md"
+
+      sources.add(CmsPageSource(id, pagePath, this));
+    }
+
+    return sources;
+  }
+}
+```
+
+You can then use your custom `RouteLoader` like this:
+
+```dart
+ContentApp.custom(
+  loaders: [
+    CMSLoader(),
+  ],
+  // ... other configurations
+);
+```
+
+## Eager Loading
+
+By default, pages are loaded and rendered on-demand when they are requested. This is useful for large sites when serving locally or when running in server mode, as it avoids the overhead of loading all pages at startup. However sometimes you want to access also information about other pages, for example when building a blog you may want to create a list of recent posts and render them on an overview page.
+
+With **eager loading**, all pages are loaded at startup and their data is made accessible under the `pages` key during templating and rendering. Page rendering (processing templates, parsing content, applying extensions and layouts) is still done on-demand when a page is requested, even in eager mode.
+
+You can enable eager loading by setting `eagerlyLoadAllPages = true` on the `ContentApp`:
+
+```dart
+ContentApp(
+  ...
+  eagerlyLoadAllPages: true,
+);
+```
+
+You can then use this to e.g. display a list of links to other pages:
+
+```markdown
+## Other Pages
+
+{{#pages}}
+  - [{{title}}]({{url}})
+{{/pages}}
+```
+
+This uses the `title` of a page from its frontmatter data, and the `url` provided by `jaspr_content`.
+
+## Adding Other Routes
+
+`jaspr_content` automatically creates a `Router` component with all the routes discovered by your `RouteLoader`s. If you want to add other routes alongside your content pages (e.g., a custom landing page) or want to wrap the router in other components, you can use the `routerBuilder` parameter in `ContentApp.custom`.
+
+The `routerBuilder` function receives a `List<List<RouteBase>>` (one list per loader) and should return a `Component` that includes a `Router`.
+
+**Example:** Adding a custom home page route:
+
+```dart
+import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_content/jaspr_content.dart';
+import 'package:jaspr_router/jaspr_router.dart';
+
+class HomePage extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    yield h1([text('Welcome to My Custom Site!')]);
+  }
+}
+
+void main() {
+  // ... Jaspr initialization
+
+  runApp(
+    ContentApp.custom(
+      loaders: [FilesystemLoader('content')],
+      configResolver: PageConfig.all(/* ... */),
+      routerBuilder: (List<List<RouteBase>> routes) {
+        return Router(
+          routes: [
+            // Your custom home route
+            Route(
+              path: '/',
+              builder: (context, state) => HomePage(),
+            ),
+            // Spread the routes generated by jaspr_content
+            ...routes.expand((r) => r).toList(),
+          ],
+        );
+      },
+    ),
+  );
+}
+```
+
+This allows you to seamlessly integrate a `jaspr_content` site within a larger Jaspr application, combining generated content with custom application logic and routing.

@@ -59,7 +59,8 @@ mixin SampleMappable {
     return SampleMapper.ensureInitialized().encodeMap<Sample>(this as Sample);
   }
 
-  SampleCopyWith<Sample, Sample, Sample> get copyWith => _SampleCopyWithImpl(this as Sample, $identity, $identity);
+  SampleCopyWith<Sample, Sample, Sample> get copyWith =>
+      _SampleCopyWithImpl<Sample, Sample>(this as Sample, $identity, $identity);
   @override
   String toString() {
     return SampleMapper.ensureInitialized().stringifyValue(this as Sample);
@@ -77,7 +78,7 @@ mixin SampleMappable {
 }
 
 extension SampleValueCopy<$R, $Out> on ObjectCopyWith<$R, Sample, $Out> {
-  SampleCopyWith<$R, Sample, $Out> get $asSample => $base.as((v, t, t2) => _SampleCopyWithImpl(v, t, t2));
+  SampleCopyWith<$R, Sample, $Out> get $asSample => $base.as((v, t, t2) => _SampleCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class SampleCopyWith<$R, $In extends Sample, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -102,7 +103,8 @@ class _SampleCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Sample, $Out>
       data.get(#id, or: $value.id), data.get(#description, or: $value.description), data.get(#index, or: $value.index));
 
   @override
-  SampleCopyWith<$R2, Sample, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) => _SampleCopyWithImpl($value, $cast, t);
+  SampleCopyWith<$R2, Sample, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _SampleCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class SampleResponseMapper extends ClassMapperBase<SampleResponse> {
@@ -157,7 +159,7 @@ mixin SampleResponseMappable {
   }
 
   SampleResponseCopyWith<SampleResponse, SampleResponse, SampleResponse> get copyWith =>
-      _SampleResponseCopyWithImpl(this as SampleResponse, $identity, $identity);
+      _SampleResponseCopyWithImpl<SampleResponse, SampleResponse>(this as SampleResponse, $identity, $identity);
   @override
   String toString() {
     return SampleResponseMapper.ensureInitialized().stringifyValue(this as SampleResponse);
@@ -176,7 +178,7 @@ mixin SampleResponseMappable {
 
 extension SampleResponseValueCopy<$R, $Out> on ObjectCopyWith<$R, SampleResponse, $Out> {
   SampleResponseCopyWith<$R, SampleResponse, $Out> get $asSampleResponse =>
-      $base.as((v, t, t2) => _SampleResponseCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _SampleResponseCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class SampleResponseCopyWith<$R, $In extends SampleResponse, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -203,5 +205,5 @@ class _SampleResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Sample
 
   @override
   SampleResponseCopyWith<$R2, SampleResponse, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _SampleResponseCopyWithImpl($value, $cast, t);
+      _SampleResponseCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

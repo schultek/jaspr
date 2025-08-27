@@ -2,15 +2,15 @@ import 'dart:convert';
 import 'dart:js_interop';
 
 import '../../../browser.dart';
-import '../marker_utils.dart';
+import '../../foundation/type_checks.dart';
 
-final _syncRegex = RegExp('^$syncMarkerPrefixRegex(.*)\$');
+final _syncRegex = RegExp('^${DomValidator.syncMarkerPrefixRegex}(.*)\$');
 
 void initSyncState(SyncStateMixin sync) {
   var r = (sync.context as Element).parentRenderObjectElement?.renderObject as DomRenderObject?;
   if (r == null) return;
   for (var node in r.toHydrate) {
-    if (node.instanceOfString("Text")) {
+    if (node.isText) {
       continue;
     }
     if (node.instanceOfString("Comment")) {
@@ -22,7 +22,7 @@ void initSyncState(SyncStateMixin sync) {
       r.toHydrate.remove(node);
       node.parentNode?.removeChild(node);
 
-      var data = unescapeMarkerText(match.group(1)!);
+      var data = const DomValidator().unescapeMarkerText(match.group(1)!);
       sync.updateState(jsonDecode(data));
       break;
     }

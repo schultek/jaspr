@@ -35,11 +35,11 @@ class SchedulePage extends StatelessComponent {
   }
 
   @css
-  static final styles = [
-    css('footer').styles(
-      margin: Margin.all(40.px),
-      textAlign: TextAlign.center,
-      fontStyle: FontStyle.italic,
-    ),
-  ];
+  static List<StyleRule> get styles => [
+        css('footer').styles(
+          margin: Margin.all(40.px),
+          textAlign: TextAlign.center,
+          fontStyle: FontStyle.italic,
+        ),
+      ];
 }

@@ -11,13 +11,20 @@ import 'sources/sync_multi.dart';
 
 void main() {
   group('sync annotation', () {
+    late TestReaderWriter reader;
+
+    setUp(() async {
+      reader = TestReaderWriter(rootPackage: 'models');
+      await reader.testing.loadIsolateSources();
+    });
+
     group('on basic component', () {
       test('generates mixin', () async {
         await testBuilder(
           SyncMixinsBuilder(BuilderOptions({})),
           syncBasicSources,
           outputs: syncBasicOutputs,
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
     });
@@ -28,7 +35,7 @@ void main() {
           SyncMixinsBuilder(BuilderOptions({})),
           syncMultiSources,
           outputs: syncMultiOutputs,
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
     });
@@ -39,7 +46,7 @@ void main() {
           SyncMixinsBuilder(BuilderOptions({})),
           syncModelClassSources,
           outputs: syncModelClassOutputs,
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
     });
@@ -50,20 +57,20 @@ void main() {
           SyncMixinsBuilder(BuilderOptions({})),
           syncModelExtensionSources,
           outputs: syncModelExtensionOutputs,
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
     });
 
-    group('on invalid component', () {
-      test('parameter throws error', () async {
+    group('on invalid', () {
+      test('map parameter throws error', () async {
         String? errorLog;
 
         await testBuilder(
           SyncMixinsBuilder(BuilderOptions({})),
-          syncInvalidSources,
+          syncInvalidMapSources,
           outputs: {},
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
           onLog: (log) {
             if (log.level.name == 'SEVERE') {
               errorLog = log.message;
@@ -73,7 +80,30 @@ void main() {
 
         expect(
           errorLog,
-          equals('Unsupported Map key type: Expected String, found int'),
+          equals(
+              'SyncMixinsBuilder on lib/component.dart:\nFields annotated with @sync must have a primitive serializable type or a type that defines @decoder and @encoder methods. Failing field: [Map<int, int> a] in ComponentState'),
+        );
+      });
+
+      test('type parameter throws error', () async {
+        String? errorLog;
+
+        await testBuilder(
+          SyncMixinsBuilder(BuilderOptions({})),
+          syncInvalidTypeSources,
+          outputs: {},
+          readerWriter: reader,
+          onLog: (log) {
+            if (log.level.name == 'SEVERE') {
+              errorLog = log.message;
+            }
+          },
+        );
+
+        expect(
+          errorLog,
+          equals(
+              'SyncMixinsBuilder on lib/component.dart:\nFields annotated with @sync must have a primitive serializable type or a type that defines @decoder and @encoder methods. Failing field: [DateTime time] in ComponentState'),
         );
       });
     });

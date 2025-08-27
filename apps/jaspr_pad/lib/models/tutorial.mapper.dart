@@ -77,7 +77,7 @@ mixin TutorialDataMappable {
   }
 
   TutorialDataCopyWith<TutorialData, TutorialData, TutorialData> get copyWith =>
-      _TutorialDataCopyWithImpl(this as TutorialData, $identity, $identity);
+      _TutorialDataCopyWithImpl<TutorialData, TutorialData>(this as TutorialData, $identity, $identity);
   @override
   String toString() {
     return TutorialDataMapper.ensureInitialized().stringifyValue(this as TutorialData);
@@ -96,7 +96,7 @@ mixin TutorialDataMappable {
 
 extension TutorialDataValueCopy<$R, $Out> on ObjectCopyWith<$R, TutorialData, $Out> {
   TutorialDataCopyWith<$R, TutorialData, $Out> get $asTutorialData =>
-      $base.as((v, t, t2) => _TutorialDataCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _TutorialDataCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class TutorialDataCopyWith<$R, $In extends TutorialData, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -148,7 +148,7 @@ class _TutorialDataCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Tutorial
 
   @override
   TutorialDataCopyWith<$R2, TutorialData, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _TutorialDataCopyWithImpl($value, $cast, t);
+      _TutorialDataCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class TutorialStepConfigMapper extends ClassMapperBase<TutorialStepConfig> {
@@ -202,7 +202,8 @@ mixin TutorialStepConfigMappable {
   }
 
   TutorialStepConfigCopyWith<TutorialStepConfig, TutorialStepConfig, TutorialStepConfig> get copyWith =>
-      _TutorialStepConfigCopyWithImpl(this as TutorialStepConfig, $identity, $identity);
+      _TutorialStepConfigCopyWithImpl<TutorialStepConfig, TutorialStepConfig>(
+          this as TutorialStepConfig, $identity, $identity);
   @override
   String toString() {
     return TutorialStepConfigMapper.ensureInitialized().stringifyValue(this as TutorialStepConfig);
@@ -221,7 +222,7 @@ mixin TutorialStepConfigMappable {
 
 extension TutorialStepConfigValueCopy<$R, $Out> on ObjectCopyWith<$R, TutorialStepConfig, $Out> {
   TutorialStepConfigCopyWith<$R, TutorialStepConfig, $Out> get $asTutorialStepConfig =>
-      $base.as((v, t, t2) => _TutorialStepConfigCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _TutorialStepConfigCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class TutorialStepConfigCopyWith<$R, $In extends TutorialStepConfig, $Out>
@@ -245,7 +246,7 @@ class _TutorialStepConfigCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Tu
 
   @override
   TutorialStepConfigCopyWith<$R2, TutorialStepConfig, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _TutorialStepConfigCopyWithImpl($value, $cast, t);
+      _TutorialStepConfigCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class TutorialStepMapper extends SubClassMapperBase<TutorialStep> {
@@ -321,7 +322,7 @@ mixin TutorialStepMappable {
   }
 
   TutorialStepCopyWith<TutorialStep, TutorialStep, TutorialStep> get copyWith =>
-      _TutorialStepCopyWithImpl(this as TutorialStep, $identity, $identity);
+      _TutorialStepCopyWithImpl<TutorialStep, TutorialStep>(this as TutorialStep, $identity, $identity);
   @override
   String toString() {
     return TutorialStepMapper.ensureInitialized().stringifyValue(this as TutorialStep);
@@ -340,7 +341,7 @@ mixin TutorialStepMappable {
 
 extension TutorialStepValueCopy<$R, $Out> on ObjectCopyWith<$R, TutorialStep, $Out> {
   TutorialStepCopyWith<$R, TutorialStep, $Out> get $asTutorialStep =>
-      $base.as((v, t, t2) => _TutorialStepCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _TutorialStepCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class TutorialStepCopyWith<$R, $In extends TutorialStep, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -382,7 +383,7 @@ class _TutorialStepCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Tutorial
 
   @override
   TutorialStepCopyWith<$R2, TutorialStep, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _TutorialStepCopyWithImpl($value, $cast, t);
+      _TutorialStepCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class TutorialResponseMapper extends ClassMapperBase<TutorialResponse> {
@@ -437,7 +438,7 @@ mixin TutorialResponseMappable {
   }
 
   TutorialResponseCopyWith<TutorialResponse, TutorialResponse, TutorialResponse> get copyWith =>
-      _TutorialResponseCopyWithImpl(this as TutorialResponse, $identity, $identity);
+      _TutorialResponseCopyWithImpl<TutorialResponse, TutorialResponse>(this as TutorialResponse, $identity, $identity);
   @override
   String toString() {
     return TutorialResponseMapper.ensureInitialized().stringifyValue(this as TutorialResponse);
@@ -456,7 +457,7 @@ mixin TutorialResponseMappable {
 
 extension TutorialResponseValueCopy<$R, $Out> on ObjectCopyWith<$R, TutorialResponse, $Out> {
   TutorialResponseCopyWith<$R, TutorialResponse, $Out> get $asTutorialResponse =>
-      $base.as((v, t, t2) => _TutorialResponseCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _TutorialResponseCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class TutorialResponseCopyWith<$R, $In extends TutorialResponse, $Out>
@@ -484,7 +485,7 @@ class _TutorialResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Tuto
 
   @override
   TutorialResponseCopyWith<$R2, TutorialResponse, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _TutorialResponseCopyWithImpl($value, $cast, t);
+      _TutorialResponseCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class TutorialConfigMapper extends ClassMapperBase<TutorialConfig> {
@@ -546,7 +547,7 @@ mixin TutorialConfigMappable {
   }
 
   TutorialConfigCopyWith<TutorialConfig, TutorialConfig, TutorialConfig> get copyWith =>
-      _TutorialConfigCopyWithImpl(this as TutorialConfig, $identity, $identity);
+      _TutorialConfigCopyWithImpl<TutorialConfig, TutorialConfig>(this as TutorialConfig, $identity, $identity);
   @override
   String toString() {
     return TutorialConfigMapper.ensureInitialized().stringifyValue(this as TutorialConfig);
@@ -565,7 +566,7 @@ mixin TutorialConfigMappable {
 
 extension TutorialConfigValueCopy<$R, $Out> on ObjectCopyWith<$R, TutorialConfig, $Out> {
   TutorialConfigCopyWith<$R, TutorialConfig, $Out> get $asTutorialConfig =>
-      $base.as((v, t, t2) => _TutorialConfigCopyWithImpl(v, t, t2));
+      $base.as((v, t, t2) => _TutorialConfigCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class TutorialConfigCopyWith<$R, $In extends TutorialConfig, $Out> implements ClassCopyWith<$R, $In, $Out> {
@@ -605,5 +606,5 @@ class _TutorialConfigCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Tutori
 
   @override
   TutorialConfigCopyWith<$R2, TutorialConfig, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _TutorialConfigCopyWithImpl($value, $cast, t);
+      _TutorialConfigCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }

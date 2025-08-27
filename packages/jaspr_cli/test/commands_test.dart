@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:jaspr_cli/src/command_runner.dart';
 import 'package:jaspr_cli/src/commands/base_command.dart';
 import 'package:jaspr_cli/src/commands/create_command.dart';
+import 'package:jaspr_cli/src/commands/serve_command.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
@@ -30,13 +31,13 @@ void main() {
         // Override jaspr dependencies from path.
         await bootstrap(variant, dirs.root());
 
-        var serve = await runner.run('serve -v', dir: dirs.app) as RunningCommandResult;
-        await Future.delayed(Duration(seconds: 10));
+        var serveResult = runner.run('serve -v', dir: dirs.app, checkExitCode: false);
 
         // Wait until server is started.
+        await Future.delayed(Duration(seconds: 10));
         while (true) {
           try {
-            await http.get(Uri.parse('http://localhost:8080'));
+            await http.head(Uri.parse('http://localhost:8080'));
             break;
           } on SocketException catch (_) {}
           await Future.delayed(Duration(seconds: 5));
@@ -54,9 +55,10 @@ void main() {
           );
         }
 
-        await serve.stop();
-
-        await Future.delayed(Duration(seconds: 10));
+        // Wait for the server to be stopped.
+        await runner.runner.commands.values.whereType<ServeCommand>().firstOrNull?.stop();
+        await serveResult;
+        await Future.delayed(Duration(seconds: 5));
 
         await runner.run('build -v', dir: dirs.app);
 
@@ -107,13 +109,13 @@ TestRunner setupRunner() {
 class TestRunner {
   late JasprCommandRunner runner;
 
-  Future<CommandResult?> run(String command, {Directory Function()? dir}) async {
+  Future<int?> run(String command, {Directory Function()? dir, bool checkExitCode = true}) async {
     return await IOOverrides.runZoned(
       getCurrentDirectory: dir,
       () async {
         var res = await runner.run(command.split(' '));
-        if (res is DoneCommandResult) {
-          expect(res.status, equals(0));
+        if (checkExitCode) {
+          expect(res, equals(0));
         }
         return res;
       },

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:build/build.dart';
-import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
 
 import '../utils.dart';
@@ -36,14 +35,9 @@ class ImportsOutputBuilder implements Builder {
       var outputDir = 'lib/generated/imports';
       var relativeDir = path.relative(outputDir, from: path.dirname(buildStep.inputId.path));
 
-      await buildStep.writeAsString(
+      await buildStep.writeAsFormattedDart(
         outputId,
-        DartFormatter(
-          languageVersion: DartFormatter.latestShortStyleLanguageVersion,
-          pageWidth: 120,
-        ).format("""
-          $generationHeader
-          
+        """
           ${webShow.isNotEmpty ? """
             export '$relativeDir/_web.dart' 
               if (dart.library.io) '$relativeDir/_stubs.dart' 
@@ -55,7 +49,7 @@ class ImportsOutputBuilder implements Builder {
               if (dart.library.js_interop) '$relativeDir/_stubs.dart' 
               show ${vmShow.join(', ')};
           """ : ''}
-        """),
+        """,
       );
     } catch (e, st) {
       print(e);

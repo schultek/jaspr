@@ -21,12 +21,14 @@ part of 'html.dart';
 /// - [target]: Where to display the linked URL, as the name for a browsing context (a tab, window, or &lt;iframe&gt;).
 /// - [type]: Hints at the linked URL's format with a MIME type. No built-in functionality.
 /// - [referrerPolicy]: How much of the referrer to send when following the link.
+/// - [onClick]: Callback for the 'click' event. This will override the default behavior of the link and not visit [href] when clicked.
 Component a(List<Component> children,
     {String? download,
     required String href,
     Target? target,
     String? type,
     ReferrerPolicy? referrerPolicy,
+    VoidCallback? onClick,
     Key? key,
     String? id,
     String? classes,
@@ -40,14 +42,17 @@ Component a(List<Component> children,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (download != null) 'download': download,
       'href': href,
       if (target != null) 'target': target.value,
       if (type != null) 'type': type,
       if (referrerPolicy != null) 'referrerpolicy': referrerPolicy.value,
     },
-    events: events,
+    events: {
+      ...?events,
+      ..._events(onClick: onClick),
+    },
     children: children,
   );
 }
@@ -266,5 +271,24 @@ Component u(List<Component> children,
     attributes: attributes,
     events: events,
     children: children,
+  );
+}
+
+/// The &lt;wbr&gt; HTML element represents a word break opportunity—a position within text where the browser may optionally break a line, though its line-breaking rules would not otherwise create a break at that location.
+Component wbr(
+    {Key? key,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events}) {
+  return DomComponent(
+    tag: 'wbr',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: attributes,
+    events: events,
   );
 }

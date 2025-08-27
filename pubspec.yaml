@@ -1,4 +1,5 @@
 name: jaspr_workspace
+repository: https://github.com/schultek/jaspr
 
 environment:
   sdk: '>=3.6.0 <4.0.0'
@@ -7,17 +8,18 @@ workspace:
   - packages/jaspr
   - packages/jaspr_builder
   - packages/jaspr_cli
+  - packages/jaspr_content
   - packages/jaspr_flutter_embed
   - packages/jaspr_lints
   - packages/jaspr_riverpod
   - packages/jaspr_router
   - packages/jaspr_serverpod
-  - packages/jaspr_tailwind
   - packages/jaspr_test
   - apps/dart_quotes
   - apps/dart_quotes_server
   - apps/fluttercon
   - apps/jaspr_pad
+  - apps/website
   - examples/backend_dart_frog
   - examples/backend_serverpod/example_server
   - examples/backend_shelf
@@ -27,7 +29,7 @@ workspace:
   - examples/package_riverpod
 
 dev_dependencies:
-  melos: ^7.0.0-dev.7
+  melos: ^7.1.0
 
 melos:
   command:
@@ -51,7 +53,7 @@ melos:
       exec:
         concurrency: 1
       packageFilters:
-        scope: [ jaspr, jaspr_builder, jaspr_riverpod, jaspr_router ]
+        scope: [ jaspr, jaspr_builder, jaspr_content, jaspr_riverpod, jaspr_router ]
     coverage:
       run: |
         dart test --coverage=coverage &&
@@ -59,7 +61,7 @@ melos:
       exec:
         concurrency: 1
       packageFilters:
-        scope: [jaspr, jaspr_builder, jaspr_riverpod, jaspr_router]
+        scope: [jaspr, jaspr_builder, jaspr_content, jaspr_riverpod, jaspr_router]
     coverage:cli:
       run: |
         cd packages/jaspr_cli &&

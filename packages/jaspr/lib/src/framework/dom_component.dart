@@ -75,14 +75,13 @@ class DomElement extends ProxyRenderObjectElement {
   void updateRenderObject() {
     if (_wrappingElement != null) {
       var wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
-
       renderObject.updateElement(
         component.tag,
         component.id ?? wrappingComponent.id,
-        _join(wrappingComponent.classes, component.classes, (a, b) => '$a $b'),
-        _join(wrappingComponent.styles?.properties, component.styles?.properties, (a, b) => {...a, ...b}),
-        _join(wrappingComponent.attributes, component.attributes, (a, b) => {...a, ...b}),
-        _join(wrappingComponent.events, component.events, (a, b) => {...a, ...b}),
+        _joinString(wrappingComponent.classes, component.classes),
+        _joinMap(wrappingComponent.styles?.properties, component.styles?.properties),
+        _joinMap(wrappingComponent.attributes, component.attributes),
+        _joinMap(wrappingComponent.events, component.events),
       );
 
       return;
@@ -98,8 +97,16 @@ class DomElement extends ProxyRenderObjectElement {
     );
   }
 
-  T? _join<T>(T? a, T? b, T Function(T a, T b) joiner) {
-    return a != null && b != null ? joiner(a, b) : a ?? b;
+  static String? _joinString(String? a, String? b) {
+    if (a == null) return b;
+    if (b == null) return a;
+    return '$a $b';
+  }
+
+  static Map<K, V>? _joinMap<K, V>(Map<K, V>? a, Map<K, V>? b) {
+    if (a == null || a.isEmpty) return b;
+    if (b == null || b.isEmpty) return a;
+    return {...a, ...b};
   }
 }
 

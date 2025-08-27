@@ -1,5 +1,5 @@
 export 'package:meta/meta.dart'
-    show factory, immutable, mustCallSuper, nonVirtual, optionalTypeArgs, protected, required, visibleForTesting;
+    show factory, immutable, mustCallSuper, nonVirtual, optionalTypeArgs, protected, visibleForTesting;
 
 export 'src/components/async.dart';
 export 'src/components/basic.dart';
@@ -20,6 +20,7 @@ export 'src/foundation/scheduler.dart';
 export 'src/foundation/style.dart';
 export 'src/foundation/sync.dart';
 export 'src/foundation/synchronous_future.dart';
+export 'src/foundation/validator.dart';
 export 'src/foundation/view_transition.dart';
 export 'src/framework/framework.dart';
 export 'src/stub/app_context_stub.dart'

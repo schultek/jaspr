@@ -1,8 +1,10 @@
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
+import 'package:jaspr_builder/src/client/client_bundle_builder.dart';
 import 'package:jaspr_builder/src/client/client_module_builder.dart';
 import 'package:test/test.dart';
 
+import 'sources/bundle.dart';
 import 'sources/client_basic.dart';
 import 'sources/client_invalid.dart';
 import 'sources/client_model_class.dart';
@@ -10,6 +12,13 @@ import 'sources/client_model_extension.dart';
 
 void main() {
   group('client annotation', () {
+    late TestReaderWriter reader;
+
+    setUp(() async {
+      reader = TestReaderWriter(rootPackage: 'models');
+      await reader.testing.loadIsolateSources();
+    });
+
     group('on basic component', () {
       test('generates json module', () async {
         await testBuilder(
@@ -17,13 +26,13 @@ void main() {
           clientBasicSources,
           outputs: {
             ...clientBasicJsonOutputs,
-            'site|web/component_basic.client.dart': isNotEmpty,
+            'site|lib/component_basic.client.dart': isNotEmpty,
           },
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
 
-      test('generates web entrypoint', () async {
+      test('generates entrypoint', () async {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientBasicSources,
@@ -31,7 +40,7 @@ void main() {
             'site|lib/component_basic.client.json': isNotEmpty,
             ...clientBasicDartOutputs,
           },
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
     });
@@ -43,13 +52,13 @@ void main() {
           clientModelClassSources,
           outputs: {
             ...clientModelClassJsonOutputs,
-            'site|web/component_model_class.client.dart': isNotEmpty,
+            'site|lib/component_model_class.client.dart': isNotEmpty,
           },
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
 
-      test('generates web entrypoint', () async {
+      test('generates entrypoint', () async {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientModelClassSources,
@@ -57,7 +66,7 @@ void main() {
             'site|lib/component_model_class.client.json': isNotEmpty,
             ...clientModelClassDartOutputs,
           },
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
     });
@@ -69,13 +78,13 @@ void main() {
           clientModelExtensionSources,
           outputs: {
             ...clientModelExtensionJsonOutputs,
-            'site|web/component_model_extension.client.dart': isNotEmpty,
+            'site|lib/component_model_extension.client.dart': isNotEmpty,
           },
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
 
-      test('generates web entrypoint', () async {
+      test('generates entrypoint', () async {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientModelExtensionSources,
@@ -83,7 +92,7 @@ void main() {
             'site|lib/component_model_extension.client.json': isNotEmpty,
             ...clientModelExtensionDartOutputs,
           },
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
     });
@@ -96,18 +105,19 @@ void main() {
           ClientModuleBuilder(BuilderOptions({})),
           clientInvalidConstructorSources,
           outputs: {},
-          reader: await PackageAssetReader.currentIsolate(),
           onLog: (log) {
             if (log.level.name == 'SEVERE') {
               errorLog = log.message;
             }
           },
+          readerWriter: reader,
         );
 
         expect(
           errorLog,
-          equals('Client components only support initializing formal constructor parameters. '
-              'Failing element: Component.(String a)'),
+          equals(
+              'ClientModuleBuilder on lib/component_basic.dart:\nClient components only support initializing formal constructor parameters. '
+              'Failing element: Component.new(String a)'),
         );
       });
 
@@ -118,19 +128,33 @@ void main() {
           ClientModuleBuilder(BuilderOptions({})),
           clientInvalidParamSources,
           outputs: {},
-          reader: await PackageAssetReader.currentIsolate(),
           onLog: (log) {
             if (log.level.name == 'SEVERE') {
               errorLog = log.message;
             }
           },
+          readerWriter: reader,
         );
 
         expect(
           errorLog,
-          equals('Unsupported parameter type: Expected primitive type, found DateTime'),
+          equals(
+              'ClientModuleBuilder on lib/component_basic.dart:\n@client components only support parameters of primitive serializable types or types that define @decoder and @encoder methods. Failing parameter: [DateTime time] in Component.new()'),
         );
       });
+    });
+
+    test('generates bundle', () async {
+      await testBuilder(
+        ClientsBundleBuilder(BuilderOptions({})),
+        {
+          ...clientBasicJsonOutputs,
+          ...clientModelClassJsonOutputs,
+          ...clientModelExtensionJsonOutputs,
+        },
+        outputs: clientBundleOutputs,
+        readerWriter: reader,
+      );
     });
   });
 }

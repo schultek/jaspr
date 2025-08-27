@@ -1,3 +1,6 @@
+// dart format off
+// ignore_for_file: type=lint
+
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
@@ -21,11 +24,14 @@ import 'package:backend_dart_frog/components/hello.dart' as prefix1;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(
-  clients: {
-    prefix0.Counter: ClientTarget<prefix0.Counter>('components/counter'),
-    prefix1.Hello: ClientTarget<prefix1.Hello>('components/hello', params: _prefix1Hello),
-  },
-);
+JasprOptions get defaultJasprOptions => JasprOptions(
+      clients: {
+        prefix0.Counter: ClientTarget<prefix0.Counter>('components/counter'),
+        prefix1.Hello: ClientTarget<prefix1.Hello>(
+          'components/hello',
+          params: _prefix1Hello,
+        ),
+      },
+    );
 
 Map<String, dynamic> _prefix1Hello(prefix1.Hello c) => {'name': c.name};

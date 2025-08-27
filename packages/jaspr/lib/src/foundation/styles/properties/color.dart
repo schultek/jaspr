@@ -1,12 +1,12 @@
+/// An immutable css color value.
 abstract class Color {
-  /// Constructs a [Color] from a hex string. Must start with a '#' and contain up to 6 hex characters.
-  const factory Color.hex(String hex) = _HexColor;
+  /// Constructs a [Color] from a css color value.
+  ///
+  /// [value] must be a valid css color value, e.g. a color name, a hex value etc.
+  const factory Color(String value) = _Color;
 
   /// Constructs a [Color] from an integer value.
   const factory Color.value(int value) = _ValueColor;
-
-  /// Constructs a [Color] from a web color name. Consider using [Colors.<name>] instead.
-  const factory Color.named(String name) = _NamedColor;
 
   /// Constructs a [Color] from red, green and blue values
   const factory Color.rgb(int red, int green, int blue) = _RGBColor;
@@ -23,26 +23,231 @@ abstract class Color {
   /// Constructs a variable containing color.
   const factory Color.variable(String value) = _VariableColor;
 
-  static const Color inherit = Color.named('inherit');
-  static const Color initial = Color.named('initial');
-  static const Color revert = Color.named('revert');
-  static const Color revertLayer = Color.named('revert-layer');
-  static const Color unset = Color.named('unset');
+  /// The `currentcolor` keyword represents the value of an element's color property.
+  /// This lets you use the color value on properties that do not receive it by default.
+  static const Color currentColor = Color('currentcolor');
+
+  static const Color inherit = Color('inherit');
+  static const Color initial = Color('initial');
+  static const Color revert = Color('revert');
+  static const Color revertLayer = Color('revert-layer');
+  static const Color unset = Color('unset');
 
   /// The color css value
   String get value;
+
+  /// Returns a new color that matches this color, but with its opacity modified.
+  ///
+  /// By default, the current opacity is replaced with the given opacity value (which ranges from 0.0 to 1.0).
+  /// When [replace] is false, the current opacity will be increased or decreased by the specified
+  /// amount (ranging from -1.0 to 1.0).
+  Color withOpacity(double opacity, {bool replace = true});
+
+  /// Returns a new color that matches this color, but with its lightness modified.
+  ///
+  /// By default, the current lightness is replaced with the given lightness value (which ranges from 0.0 to 1.0).
+  /// When [replace] is false, the current lightness will be increased or decreased by the specified
+  /// amount (ranging from -1.0 to 1.0).
+  Color withLightness(double lightness, {bool replace = true});
+
+  /// Returns a new color that matches this color, but with its hue modified.
+  ///
+  /// By default, the current hue is replaced with the given hue angle (from 0 to 360).
+  /// When [replace] is false, the current hue will be rotated by the specified angle instead.
+  ///
+  /// Note: The new color is specified in the OKLCH color space, which gives a more uniform perception of color than
+  /// HSL, but uses different hue angles than the sRGB color space.
+  Color withHue(double hue, {bool replace = true});
+
+  /// Returns a new color with the provided values replaced.
+  Color withValues({double? red, double? green, double? blue, double? alpha});
 }
 
-class _HexColor implements Color {
-  final String hex;
+class Colors {
+  static const Color aliceBlue = Color('aliceBlue');
+  static const Color antiqueWhite = Color('antiqueWhite');
+  static const Color aqua = Color('aqua');
+  static const Color aquamarine = Color('aquamarine');
+  static const Color azure = Color('azure');
+  static const Color beige = Color('beige');
+  static const Color bisque = Color('bisque');
+  static const Color black = Color('black');
+  static const Color blanchedAlmond = Color('blanchedAlmond');
+  static const Color blue = Color('blue');
+  static const Color blueViolet = Color('blueViolet');
+  static const Color brown = Color('brown');
+  static const Color burlyWood = Color('burlyWood');
+  static const Color cadetBlue = Color('cadetBlue');
+  static const Color chartreuse = Color('chartreuse');
+  static const Color chocolate = Color('chocolate');
+  static const Color coral = Color('coral');
+  static const Color cornflowerBlue = Color('cornflowerBlue');
+  static const Color cornsilk = Color('cornsilk');
+  static const Color crimson = Color('crimson');
+  static const Color cyan = Color('cyan');
+  static const Color darkBlue = Color('darkBlue');
+  static const Color darkCyan = Color('darkCyan');
+  static const Color darkGoldenRod = Color('darkGoldenRod');
+  static const Color darkGray = Color('darkGray');
+  static const Color darkGreen = Color('darkGreen');
+  static const Color darkKhaki = Color('darkKhaki');
+  static const Color darkMagenta = Color('darkMagenta');
+  static const Color darkOliveGreen = Color('darkOliveGreen');
+  static const Color darkorange = Color('darkorange');
+  static const Color darkOrchid = Color('darkOrchid');
+  static const Color darkRed = Color('darkRed');
+  static const Color darkSalmon = Color('darkSalmon');
+  static const Color darkSeaGreen = Color('darkSeaGreen');
+  static const Color darkSlateBlue = Color('darkSlateBlue');
+  static const Color darkSlateGray = Color('darkSlateGray');
+  static const Color darkTurquoise = Color('darkTurquoise');
+  static const Color darkViolet = Color('darkViolet');
+  static const Color deepPink = Color('deepPink');
+  static const Color deepSkyBlue = Color('deepSkyBlue');
+  static const Color dimGray = Color('dimGray');
+  static const Color dodgerBlue = Color('dodgerBlue');
+  static const Color fireBrick = Color('fireBrick');
+  static const Color floralWhite = Color('floralWhite');
+  static const Color forestGreen = Color('forestGreen');
+  static const Color fuchsia = Color('fuchsia');
+  static const Color gainsboro = Color('gainsboro');
+  static const Color ghostWhite = Color('ghostWhite');
+  static const Color gold = Color('gold');
+  static const Color goldenRod = Color('goldenRod');
+  static const Color gray = Color('gray');
+  static const Color green = Color('green');
+  static const Color greenYellow = Color('greenYellow');
+  static const Color honeyDew = Color('honeyDew');
+  static const Color hotPink = Color('hotPink');
+  static const Color indianRed = Color('indianRed');
+  static const Color indigo = Color('indigo');
+  static const Color ivory = Color('ivory');
+  static const Color khaki = Color('khaki');
+  static const Color lavender = Color('lavender');
+  static const Color lavenderBlush = Color('lavenderBlush');
+  static const Color lawnGreen = Color('lawnGreen');
+  static const Color lemonChiffon = Color('lemonChiffon');
+  static const Color lightBlue = Color('lightBlue');
+  static const Color lightCoral = Color('lightCoral');
+  static const Color lightCyan = Color('lightCyan');
+  static const Color lightGoldenRodYellow = Color('lightGoldenRodYellow');
+  static const Color lightGrey = Color('lightGrey');
+  static const Color lightGreen = Color('lightGreen');
+  static const Color lightPink = Color('lightPink');
+  static const Color lightSalmon = Color('lightSalmon');
+  static const Color lightSeaGreen = Color('lightSeaGreen');
+  static const Color lightSkyBlue = Color('lightSkyBlue');
+  static const Color lightSlateGray = Color('lightSlateGray');
+  static const Color lightSteelBlue = Color('lightSteelBlue');
+  static const Color lightYellow = Color('lightYellow');
+  static const Color lime = Color('lime');
+  static const Color limeGreen = Color('limeGreen');
+  static const Color linen = Color('linen');
+  static const Color magenta = Color('magenta');
+  static const Color maroon = Color('maroon');
+  static const Color mediumAquaMarine = Color('mediumAquaMarine');
+  static const Color mediumBlue = Color('mediumBlue');
+  static const Color mediumOrchid = Color('mediumOrchid');
+  static const Color mediumPurple = Color('mediumPurple');
+  static const Color mediumSeaGreen = Color('mediumSeaGreen');
+  static const Color mediumSlateBlue = Color('mediumSlateBlue');
+  static const Color mediumSpringGreen = Color('mediumSpringGreen');
+  static const Color mediumTurquoise = Color('mediumTurquoise');
+  static const Color mediumVioletRed = Color('mediumVioletRed');
+  static const Color midnightBlue = Color('midnightBlue');
+  static const Color mintCream = Color('mintCream');
+  static const Color mistyRose = Color('mistyRose');
+  static const Color moccasin = Color('moccasin');
+  static const Color navajoWhite = Color('navajoWhite');
+  static const Color navy = Color('navy');
+  static const Color oldLace = Color('oldLace');
+  static const Color olive = Color('olive');
+  static const Color oliveDrab = Color('oliveDrab');
+  static const Color orange = Color('orange');
+  static const Color orangeRed = Color('orangeRed');
+  static const Color orchid = Color('orchid');
+  static const Color paleGoldenRod = Color('paleGoldenRod');
+  static const Color paleGreen = Color('paleGreen');
+  static const Color paleTurquoise = Color('paleTurquoise');
+  static const Color paleVioletRed = Color('paleVioletRed');
+  static const Color papayaWhip = Color('papayaWhip');
+  static const Color peachPuff = Color('peachPuff');
+  static const Color peru = Color('peru');
+  static const Color pink = Color('pink');
+  static const Color plum = Color('plum');
+  static const Color powderBlue = Color('powderBlue');
+  static const Color purple = Color('purple');
+  static const Color red = Color('red');
+  static const Color rosyBrown = Color('rosyBrown');
+  static const Color royalBlue = Color('royalBlue');
+  static const Color saddleBrown = Color('saddleBrown');
+  static const Color salmon = Color('salmon');
+  static const Color sandyBrown = Color('sandyBrown');
+  static const Color seaGreen = Color('seaGreen');
+  static const Color seaShell = Color('seaShell');
+  static const Color sienna = Color('sienna');
+  static const Color silver = Color('silver');
+  static const Color skyBlue = Color('skyBlue');
+  static const Color slateBlue = Color('slateBlue');
+  static const Color slateGray = Color('slateGray');
+  static const Color snow = Color('snow');
+  static const Color springGreen = Color('springGreen');
+  static const Color steelBlue = Color('steelBlue');
+  static const Color tan = Color('tan');
+  static const Color teal = Color('teal');
+  static const Color thistle = Color('thistle');
+  static const Color tomato = Color('tomato');
+  static const Color turquoise = Color('turquoise');
+  static const Color violet = Color('violet');
+  static const Color wheat = Color('wheat');
+  static const Color white = Color('white');
+  static const Color whiteSmoke = Color('whiteSmoke');
+  static const Color yellow = Color('yellow');
+  static const Color yellowGreen = Color('yellowGreen');
+  static const Color transparent = Color('transparent');
+}
 
-  const _HexColor(this.hex);
+abstract mixin class _ColorMixin implements Color {
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    return _RelativeRGBColor(from: this, alpha: (opacity, replace));
+  }
 
   @override
-  String get value => hex;
+  Color withLightness(double lightness, {bool replace = true}) {
+    return _RelativeHSLColor(from: this, lightness: (lightness, replace));
+  }
+
+  @override
+  Color withHue(double hue, {bool replace = true}) {
+    return _RelativeOKLCHColor(from: this, hue: (hue, replace));
+  }
+
+  @override
+  Color withValues({double? red, double? green, double? blue, double? alpha}) {
+    return _RelativeRGBColor(
+      from: this,
+      red: red != null ? (red, true) : null,
+      green: green != null ? (green, true) : null,
+      blue: blue != null ? (blue, true) : null,
+      alpha: alpha != null ? (alpha, true) : null,
+    );
+  }
 }
 
-class _ValueColor implements Color {
+class _Color with _ColorMixin {
+  final String _value;
+
+  const _Color(this._value);
+
+  @override
+  String get value => _value;
+
+  @override
+  String toString() => 'Color($_value)';
+}
+
+class _ValueColor with _ColorMixin {
   final int _value;
   const _ValueColor(this._value);
 
@@ -50,15 +255,7 @@ class _ValueColor implements Color {
   String get value => '#${_value.toRadixString(16).padLeft(6, '0')}';
 }
 
-class _NamedColor implements Color {
-  final String name;
-  const _NamedColor(this.name);
-
-  @override
-  String get value => name;
-}
-
-class _RGBColor implements Color {
+class _RGBColor with _ColorMixin {
   final int red;
   final int green;
   final int blue;
@@ -78,7 +275,7 @@ class _RGBAColor extends _RGBColor {
   String get value => 'rgba($red, $green, $blue, $alpha)';
 }
 
-class _HSLColor implements Color {
+class _HSLColor with _ColorMixin {
   final int hue;
   final int saturation;
   final int lightness;
@@ -98,7 +295,7 @@ class _HSLAColor extends _HSLColor {
   String get value => 'hsla($hue, $saturation%, $lightness%, $alpha)';
 }
 
-class _VariableColor implements Color {
+class _VariableColor with _ColorMixin {
   final String _value;
 
   const _VariableColor(this._value);
@@ -107,146 +304,170 @@ class _VariableColor implements Color {
   String get value => 'var($_value)';
 }
 
-class Colors {
-  static const Color aliceBlue = Color.named('aliceBlue');
-  static const Color antiqueWhite = Color.named('antiqueWhite');
-  static const Color aqua = Color.named('aqua');
-  static const Color aquamarine = Color.named('aquamarine');
-  static const Color azure = Color.named('azure');
-  static const Color beige = Color.named('beige');
-  static const Color bisque = Color.named('bisque');
-  static const Color black = Color.named('black');
-  static const Color blanchedAlmond = Color.named('blanchedAlmond');
-  static const Color blue = Color.named('blue');
-  static const Color blueViolet = Color.named('blueViolet');
-  static const Color brown = Color.named('brown');
-  static const Color burlyWood = Color.named('burlyWood');
-  static const Color cadetBlue = Color.named('cadetBlue');
-  static const Color chartreuse = Color.named('chartreuse');
-  static const Color chocolate = Color.named('chocolate');
-  static const Color coral = Color.named('coral');
-  static const Color cornflowerBlue = Color.named('cornflowerBlue');
-  static const Color cornsilk = Color.named('cornsilk');
-  static const Color crimson = Color.named('crimson');
-  static const Color cyan = Color.named('cyan');
-  static const Color darkBlue = Color.named('darkBlue');
-  static const Color darkCyan = Color.named('darkCyan');
-  static const Color darkGoldenRod = Color.named('darkGoldenRod');
-  static const Color darkGray = Color.named('darkGray');
-  static const Color darkGreen = Color.named('darkGreen');
-  static const Color darkKhaki = Color.named('darkKhaki');
-  static const Color darkMagenta = Color.named('darkMagenta');
-  static const Color darkOliveGreen = Color.named('darkOliveGreen');
-  static const Color darkorange = Color.named('darkorange');
-  static const Color darkOrchid = Color.named('darkOrchid');
-  static const Color darkRed = Color.named('darkRed');
-  static const Color darkSalmon = Color.named('darkSalmon');
-  static const Color darkSeaGreen = Color.named('darkSeaGreen');
-  static const Color darkSlateBlue = Color.named('darkSlateBlue');
-  static const Color darkSlateGray = Color.named('darkSlateGray');
-  static const Color darkTurquoise = Color.named('darkTurquoise');
-  static const Color darkViolet = Color.named('darkViolet');
-  static const Color deepPink = Color.named('deepPink');
-  static const Color deepSkyBlue = Color.named('deepSkyBlue');
-  static const Color dimGray = Color.named('dimGray');
-  static const Color dodgerBlue = Color.named('dodgerBlue');
-  static const Color fireBrick = Color.named('fireBrick');
-  static const Color floralWhite = Color.named('floralWhite');
-  static const Color forestGreen = Color.named('forestGreen');
-  static const Color fuchsia = Color.named('fuchsia');
-  static const Color gainsboro = Color.named('gainsboro');
-  static const Color ghostWhite = Color.named('ghostWhite');
-  static const Color gold = Color.named('gold');
-  static const Color goldenRod = Color.named('goldenRod');
-  static const Color gray = Color.named('gray');
-  static const Color green = Color.named('green');
-  static const Color greenYellow = Color.named('greenYellow');
-  static const Color honeyDew = Color.named('honeyDew');
-  static const Color hotPink = Color.named('hotPink');
-  static const Color indianRed = Color.named('indianRed');
-  static const Color indigo = Color.named('indigo');
-  static const Color ivory = Color.named('ivory');
-  static const Color khaki = Color.named('khaki');
-  static const Color lavender = Color.named('lavender');
-  static const Color lavenderBlush = Color.named('lavenderBlush');
-  static const Color lawnGreen = Color.named('lawnGreen');
-  static const Color lemonChiffon = Color.named('lemonChiffon');
-  static const Color lightBlue = Color.named('lightBlue');
-  static const Color lightCoral = Color.named('lightCoral');
-  static const Color lightCyan = Color.named('lightCyan');
-  static const Color lightGoldenRodYellow = Color.named('lightGoldenRodYellow');
-  static const Color lightGrey = Color.named('lightGrey');
-  static const Color lightGreen = Color.named('lightGreen');
-  static const Color lightPink = Color.named('lightPink');
-  static const Color lightSalmon = Color.named('lightSalmon');
-  static const Color lightSeaGreen = Color.named('lightSeaGreen');
-  static const Color lightSkyBlue = Color.named('lightSkyBlue');
-  static const Color lightSlateGray = Color.named('lightSlateGray');
-  static const Color lightSteelBlue = Color.named('lightSteelBlue');
-  static const Color lightYellow = Color.named('lightYellow');
-  static const Color lime = Color.named('lime');
-  static const Color limeGreen = Color.named('limeGreen');
-  static const Color linen = Color.named('linen');
-  static const Color magenta = Color.named('magenta');
-  static const Color maroon = Color.named('maroon');
-  static const Color mediumAquaMarine = Color.named('mediumAquaMarine');
-  static const Color mediumBlue = Color.named('mediumBlue');
-  static const Color mediumOrchid = Color.named('mediumOrchid');
-  static const Color mediumPurple = Color.named('mediumPurple');
-  static const Color mediumSeaGreen = Color.named('mediumSeaGreen');
-  static const Color mediumSlateBlue = Color.named('mediumSlateBlue');
-  static const Color mediumSpringGreen = Color.named('mediumSpringGreen');
-  static const Color mediumTurquoise = Color.named('mediumTurquoise');
-  static const Color mediumVioletRed = Color.named('mediumVioletRed');
-  static const Color midnightBlue = Color.named('midnightBlue');
-  static const Color mintCream = Color.named('mintCream');
-  static const Color mistyRose = Color.named('mistyRose');
-  static const Color moccasin = Color.named('moccasin');
-  static const Color navajoWhite = Color.named('navajoWhite');
-  static const Color navy = Color.named('navy');
-  static const Color oldLace = Color.named('oldLace');
-  static const Color olive = Color.named('olive');
-  static const Color oliveDrab = Color.named('oliveDrab');
-  static const Color orange = Color.named('orange');
-  static const Color orangeRed = Color.named('orangeRed');
-  static const Color orchid = Color.named('orchid');
-  static const Color paleGoldenRod = Color.named('paleGoldenRod');
-  static const Color paleGreen = Color.named('paleGreen');
-  static const Color paleTurquoise = Color.named('paleTurquoise');
-  static const Color paleVioletRed = Color.named('paleVioletRed');
-  static const Color papayaWhip = Color.named('papayaWhip');
-  static const Color peachPuff = Color.named('peachPuff');
-  static const Color peru = Color.named('peru');
-  static const Color pink = Color.named('pink');
-  static const Color plum = Color.named('plum');
-  static const Color powderBlue = Color.named('powderBlue');
-  static const Color purple = Color.named('purple');
-  static const Color red = Color.named('red');
-  static const Color rosyBrown = Color.named('rosyBrown');
-  static const Color royalBlue = Color.named('royalBlue');
-  static const Color saddleBrown = Color.named('saddleBrown');
-  static const Color salmon = Color.named('salmon');
-  static const Color sandyBrown = Color.named('sandyBrown');
-  static const Color seaGreen = Color.named('seaGreen');
-  static const Color seaShell = Color.named('seaShell');
-  static const Color sienna = Color.named('sienna');
-  static const Color silver = Color.named('silver');
-  static const Color skyBlue = Color.named('skyBlue');
-  static const Color slateBlue = Color.named('slateBlue');
-  static const Color slateGray = Color.named('slateGray');
-  static const Color snow = Color.named('snow');
-  static const Color springGreen = Color.named('springGreen');
-  static const Color steelBlue = Color.named('steelBlue');
-  static const Color tan = Color.named('tan');
-  static const Color teal = Color.named('teal');
-  static const Color thistle = Color.named('thistle');
-  static const Color tomato = Color.named('tomato');
-  static const Color turquoise = Color.named('turquoise');
-  static const Color violet = Color.named('violet');
-  static const Color wheat = Color.named('wheat');
-  static const Color white = Color.named('white');
-  static const Color whiteSmoke = Color.named('whiteSmoke');
-  static const Color yellow = Color.named('yellow');
-  static const Color yellowGreen = Color.named('yellowGreen');
-  static const Color transparent = Color.named('transparent');
+abstract class _RelativeColor with _ColorMixin {
+  final Color from;
+  final (double, bool)? alpha;
+
+  const _RelativeColor({
+    required this.from,
+    this.alpha,
+  });
+
+  String _channel((double, bool)? data, String origin) {
+    if (data == null) return origin;
+    final (value, replace) = data;
+    final vStr = (value.toInt() == value) ? value.abs().toInt().toString() : value.abs().toString();
+    if (replace) {
+      return vStr;
+    } else if (value < 0) {
+      return 'calc($origin - $vStr)';
+    } else {
+      return 'calc($origin + $vStr)';
+    }
+  }
+
+  String _relative(String method, String channels) {
+    final a = alpha != null ? ' / ${_channel(alpha, 'alpha')}' : '';
+    return '$method(from ${from.value} $channels$a)';
+  }
+}
+
+typedef _RelativeColorValue = (double, bool);
+
+extension on _RelativeColorValue? {
+  _RelativeColorValue? maybeApply(double? value, bool replace) {
+    if (value == null) return this;
+    return apply(value, replace);
+  }
+
+  _RelativeColorValue apply(double value, bool replace) {
+    if (this == null || replace) return (value, replace);
+    if (replace) return (value, true);
+    return (this!.$1 + value, this!.$2);
+  }
+}
+
+class _RelativeRGBColor extends _RelativeColor {
+  final (double, bool)? red;
+  final (double, bool)? green;
+  final (double, bool)? blue;
+
+  const _RelativeRGBColor({
+    required super.from,
+    this.red,
+    this.green,
+    this.blue,
+    super.alpha,
+  });
+
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    return _RelativeRGBColor(
+      from: from,
+      red: red,
+      green: green,
+      blue: blue,
+      alpha: alpha.apply(opacity, replace),
+    );
+  }
+
+  @override
+  Color withLightness(double lightness, {bool replace = true}) {
+    if (red == null && green == null && blue == null) {
+      return _RelativeHSLColor(from: from, lightness: (lightness, replace), alpha: alpha);
+    }
+    return super.withLightness(lightness, replace: replace);
+  }
+
+  @override
+  Color withHue(double hue, {bool replace = true}) {
+    if (red == null && green == null && blue == null) {
+      return _RelativeOKLCHColor(from: from, hue: (hue, replace), alpha: alpha);
+    }
+    return super.withHue(hue, replace: replace);
+  }
+
+  @override
+  Color withValues({
+    double? red,
+    double? green,
+    double? blue,
+    double? alpha,
+  }) {
+    return _RelativeRGBColor(
+      from: from,
+      red: this.red.maybeApply(red, true),
+      green: this.green.maybeApply(green, true),
+      blue: this.blue.maybeApply(blue, true),
+      alpha: this.alpha.maybeApply(alpha, true),
+    );
+  }
+
+  @override
+  String get value {
+    final r = _channel(red, 'r');
+    final g = _channel(green, 'g');
+    final b = _channel(blue, 'b');
+    return _relative('rgb', '$r $g $b');
+  }
+}
+
+class _RelativeHSLColor extends _RelativeColor {
+  final (double, bool) lightness;
+
+  const _RelativeHSLColor({required super.from, required this.lightness, super.alpha});
+
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    return _RelativeHSLColor(
+      from: from,
+      lightness: lightness,
+      alpha: alpha.apply(opacity, replace),
+    );
+  }
+
+  @override
+  Color withLightness(double lightness, {bool replace = true}) {
+    return _RelativeHSLColor(
+      from: from,
+      lightness: this.lightness.apply(lightness, replace),
+      alpha: alpha,
+    );
+  }
+
+  @override
+  String get value {
+    final l = _channel((lightness.$1 * 100, lightness.$2), 'l');
+    return _relative('hsl', 'h s $l');
+  }
+}
+
+class _RelativeOKLCHColor extends _RelativeColor {
+  final (double, bool) hue;
+
+  const _RelativeOKLCHColor({required super.from, required this.hue, super.alpha});
+
+  @override
+  Color withOpacity(double opacity, {bool replace = true}) {
+    return _RelativeOKLCHColor(
+      from: from,
+      hue: hue,
+      alpha: alpha.apply(opacity, replace),
+    );
+  }
+
+  @override
+  Color withHue(double hue, {bool replace = true}) {
+    return _RelativeOKLCHColor(
+      from: from,
+      hue: this.hue.apply(hue, replace),
+      alpha: alpha,
+    );
+  }
+
+  @override
+  String get value {
+    final h = _channel(hue, 'h');
+    return _relative('oklch', 'l c $h');
+  }
 }

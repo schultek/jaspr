@@ -92,7 +92,7 @@ class ButtonTab extends Tab {
             [
               i(
                 classes: 'material-icons mdc-tab__icon',
-                styles: Styles(fontSize: 20.px, margin: Margin.only(right: this.label.isNotEmpty ? 4.px : null)),
+                styles: Styles(margin: Margin.only(right: this.label.isNotEmpty ? 4.px : null), fontSize: 20.px),
                 [text(icon)],
               ),
               text(this.label),

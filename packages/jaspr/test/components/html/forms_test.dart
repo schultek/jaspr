@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -33,7 +34,6 @@ void main() {
               disabled: false,
               onInput: (_) {},
               onChange: (_) {},
-              [],
             ),
             label(htmlFor: 'a', []),
             datalist([]),

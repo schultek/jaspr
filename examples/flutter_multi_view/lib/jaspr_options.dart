@@ -1,3 +1,6 @@
+// dart format off
+// ignore_for_file: type=lint
+
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
@@ -24,15 +27,13 @@ import 'package:flutter_multi_view/app.dart' as prefix4;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(
-  clients: {
-    prefix4.App: ClientTarget<prefix4.App>('app'),
-  },
-  styles: () => [
-    ...prefix0.CounterState.styles,
-    ...prefix1.EmbeddedCounter.styles,
-    ...prefix2.PulsingLoader.styles,
-    ...prefix3.viewTransitionStyles,
-    ...prefix4.AppState.styles,
-  ],
-);
+JasprOptions get defaultJasprOptions => JasprOptions(
+      clients: {prefix4.App: ClientTarget<prefix4.App>('app')},
+      styles: () => [
+        ...prefix0.CounterState.styles,
+        ...prefix1.EmbeddedCounter.styles,
+        ...prefix2.PulsingLoader.styles,
+        ...prefix3.viewTransitionStyles,
+        ...prefix4.AppState.styles,
+      ],
+    );

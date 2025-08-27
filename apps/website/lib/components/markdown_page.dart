@@ -26,13 +26,13 @@ class MarkdownPage extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
-    css('.markdown-content', [
-      css('&').styles(
-        minHeight: 50.vh,
-        padding: Padding.only(top: 8.rem, left: contentPadding, right: contentPadding, bottom: 4.rem),
-      ),
-      css('h3').styles(margin: Margin.only(top: 3.rem)),
-    ]),
-  ];
+  static List<StyleRule> get styles => [
+        css('.markdown-content', [
+          css('&').styles(
+            minHeight: 50.vh,
+            padding: Padding.only(top: 8.rem, left: contentPadding, right: contentPadding, bottom: 4.rem),
+          ),
+          css('h3').styles(margin: Margin.only(top: 3.rem)),
+        ]),
+      ];
 }

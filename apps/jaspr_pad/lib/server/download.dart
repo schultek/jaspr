@@ -40,6 +40,7 @@ class ZipProjectEncoder {
     };
 
     await addFromFile('pubspec.yaml', replacements);
+    await addFromFile('analysis_options.yaml', replacements);
     await addFromFile('web/main.dart', replacements);
     await addFromFile('web/index.html', replacements);
 

@@ -11,9 +11,11 @@ export '../style.dart' hide Style;
 abstract class Document implements Component {
   /// Sets up a basic document structure at the root of your app and renders the main `<html>`, `<head>` and `<body>` tags.
   ///
-  /// The `title` and `base` parameters are rendered as the `<title>` and `<base>` elements respectively.
+  /// The `title` parameter is rendered as the `<title>` element.
+  /// The `lang` parameter is set as the `lang` attribute on the `<html>` element.
+  /// The `base` parameter is rendered as the `<base href=...>` element and defaults to `'/'`.
   /// The `charset`, `viewport` and `meta` values are rendered as `<meta>` elements in `<head>`.
-  /// The `styles` parameter is rendered to css in a `<style` element inside `<head>`.
+  /// The `styles` parameter is rendered to css in a `<style>` element inside `<head>`.
   /// The `head` components are also rendered inside `<head>`.
   ///
   /// The `body` component is rendered inside the `<body>` element.
@@ -122,7 +124,7 @@ class BaseDocument extends StatelessComponent implements Document {
   const BaseDocument({
     this.title,
     this.lang,
-    this.base,
+    this.base = '/',
     this.charset = 'utf-8',
     this.viewport = 'width=device-width, initial-scale=1.0',
     this.meta = const {},
@@ -333,23 +335,20 @@ class AttachDocument extends StatelessComponent implements Document {
   }
 }
 
-class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
-  static AttachAdapter instance = AttachAdapter();
+final Expando<AttachAdapter> _attach = Expando();
 
-  static bool _registered = false;
+class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
   static void register(BuildContext context, AttachDocument item) {
     var binding = (context.binding as ServerAppBinding);
-    if (!_registered) {
-      binding.addRenderAdapter(instance);
-      _registered = true;
-    }
+    var adapter = _attach[binding] ??= AttachAdapter();
+    binding.addRenderAdapter(adapter);
 
-    var entry = instance.entries[item.target] ??= (attributes: {}, children: []);
+    var entry = adapter.entries[item.target] ??= (attributes: {}, children: []);
     if (item.attributes != null) {
       entry.attributes.addAll(item.attributes!);
     }
     if (item.children != null) {
-      binding.addRenderAdapter(_AttachChildrenAdapter(item.target, context as Element));
+      binding.addRenderAdapter(_AttachChildrenAdapter(adapter, item.target, context as Element));
     }
   }
 
@@ -416,12 +415,13 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
 }
 
 class _AttachChildrenAdapter extends ElementBoundaryAdapter {
-  _AttachChildrenAdapter(this.target, super.element);
+  _AttachChildrenAdapter(this.adapter, this.target, super.element);
 
+  final AttachAdapter adapter;
   final String target;
 
   @override
   void prepareBoundary(ChildListRange range) {
-    AttachAdapter.instance.entries[target]!.children.add((range, element.depth));
+    adapter.entries[target]!.children.add((range, element.depth));
   }
 }

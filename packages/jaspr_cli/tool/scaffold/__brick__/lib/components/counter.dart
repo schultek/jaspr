@@ -40,7 +40,7 @@ class CounterState extends State<Counter> {
   }{{#server}}
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.counter', [
       css('&').styles(
         display: Display.flex,
@@ -62,7 +62,7 @@ class CounterState extends State<Counter> {
           backgroundColor: Colors.transparent,
         ),
         css('&:hover').styles(
-          backgroundColor: const Color.hex('#0001'),
+          backgroundColor: const Color('#0001'),
         ),
       ]),
       css('span').styles(

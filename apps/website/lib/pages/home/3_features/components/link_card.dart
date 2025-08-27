@@ -33,31 +33,31 @@ class LinkCard extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
-    css('.link-card', [
-      css('&').styles(
-        display: Display.block,
-        border: Border(width: 2.px, color: borderColor),
-        radius: BorderRadius.circular(13.px),
-        shadow: BoxShadow(offsetX: 1.px, offsetY: 1.px, blur: 3.px, spread: (-1).px, color: shadowColor1),
-        transition: Transition('background', duration: 300),
-        textAlign: TextAlign.start,
-        textDecoration: TextDecoration.none,
-      ),
-      css('&:hover').styles(backgroundColor: surface),
-      css('.link-card-content').styles(
-        display: Display.flex,
-        padding: Padding.all(1.rem),
-        radius: BorderRadius.circular(10.px),
-        flexDirection: FlexDirection.column,
-        alignItems: AlignItems.stretch,
-      ),
-      css('.card-icon').styles(
-        margin: Margin.only(bottom: 1.rem),
-        color: primaryMid,
-        fontSize: 1.5.em,
-      ),
-      css('p').styles(margin: Margin.only(top: 0.4.em, bottom: Unit.zero)).combine(bodySmall),
-    ]),
-  ];
+  static List<StyleRule> get styles => [
+        css('.link-card', [
+          css('&').styles(
+            display: Display.block,
+            border: Border(width: 2.px, color: borderColor),
+            radius: BorderRadius.circular(13.px),
+            shadow: BoxShadow(offsetX: 1.px, offsetY: 1.px, blur: 3.px, spread: (-1).px, color: shadowColor1),
+            transition: Transition('background', duration: 300),
+            textAlign: TextAlign.start,
+            textDecoration: TextDecoration.none,
+          ),
+          css('&:hover').styles(backgroundColor: surface),
+          css('.link-card-content').styles(
+            display: Display.flex,
+            padding: Padding.all(1.rem),
+            radius: BorderRadius.circular(10.px),
+            flexDirection: FlexDirection.column,
+            alignItems: AlignItems.stretch,
+          ),
+          css('.card-icon').styles(
+            margin: Margin.only(bottom: 1.rem),
+            color: primaryMid,
+            fontSize: 1.5.em,
+          ),
+          css('p').styles(margin: Margin.only(top: 0.4.em, bottom: Unit.zero)).combine(bodySmall),
+        ]),
+      ];
 }

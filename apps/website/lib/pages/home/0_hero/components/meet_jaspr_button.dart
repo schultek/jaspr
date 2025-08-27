@@ -121,11 +121,11 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
   }
 
   @css
-  static final List<StyleRule> styles = [
-    css('#meet-jaspr-button', [
-      css('&').styles(position: Position.relative()),
-    ]),
-  ];
+  static List<StyleRule> get styles => [
+        css('#meet-jaspr-button', [
+          css('&').styles(position: Position.relative()),
+        ]),
+      ];
 }
 
 class ProgressNotifier extends ValueNotifier<double> {

@@ -1,0 +1,172 @@
+---
+title: Adding Pages
+description: How to add pages to your Jaspr content site.
+---
+
+---
+
+This guide explains how to add pages to your Jaspr content site. You'll learn how to use the **content directory** structure that maps to URL routes and work with different **file formats** or **remote content** sources. We'll also cover advanced features like private files, in-memory pages and raw content output options.
+
+## Content Folder
+
+A page is a single file that contains the content for a specific route in your site. By default, `ContentApp` loads pages from the `content/` directory in your project. For example you might have the following directory structure:
+
+```
+content/
+ ├── index.md
+ ├── about.md
+ └── posts/
+    ├── index.md
+    ├── post1.md
+    └── post2.md
+lib/
+ ├── ...
+ └── main.dart
+```
+
+This would create the following routes:
+
+- `/` for `content/index.md`
+- `/about` for `content/about.md`
+- `/posts` for `content/posts/index.md`
+- `/posts/post1` for `content/posts/post1.md`
+- `/posts/post2` for `content/posts/post2.md`
+
+<Info>
+The url paths are based on the directory structure relative to the root content directory. The file name is used as the last part of the path, except for files named `index.*`, which are used to create a route for the directory they are in.
+</Info>
+
+### Private Files
+
+Files and folders starting with `_` or `.` are considered private and will be ignored. This is useful for files that are not meant to be publicly accessible, such as configuration files or template partials.
+
+Many templating languages, including mustache and liquid, support partial files that can be included in other files. These files are usually stored in a `_partials` directory. For example, you might have the following directory structure:
+
+```
+content/
+ ├── index.md
+ └── _partials/
+    ├── header.md
+    └── footer.md
+```
+
+This would allow you to include the `header.md` and `footer.md` files in your other markdown files using the templating syntax of your choice. For example, in mustache you would use:
+
+```markdown
+{{> _partials/header }}
+
+# My Page Title
+This is the normal content of the page.
+
+{{> _partials/footer }}
+```
+
+Read more about how to configure templating like this in the [**Templating**](/content/concepts/templating) guide.
+
+## File Formats
+
+`jaspr_content` is not limited to only markdown files. Which formats are supported depends on the `PageParser`s you configured. 
+
+<Info>
+Jaspr comes out of the box with a `MarkdownParser` and a `HtmlParser`. You can also write your own by implementing the `PageParser` interface. Read more about this in the [**Page Parsing**](/content/concepts/page_parsing) section.
+</Info>
+
+Add additional parsers to the `ContentApp` like this:
+
+```dart
+ContentApp(
+  parsers: [
+    MarkdownParser(),
+    HtmlParser(),
+  ],
+);
+```
+
+With this configuration, you can then mix markdown and html files in your content directory. For example:
+
+```
+content/
+ ├── index.html
+ ├── about.md
+ └── posts/
+    ├── index.md
+    ├── post1.html
+    └── post2.md
+```
+
+## Remote Files
+
+You can also load content from remote sources like GitHub or a CMS, instead of the filesystem. `jaspr_content` already comes with a `GitHubLoader` that can be used to load content from a GitHub repository. Or you can implement your own `RouteLoader` to load content from any source you want.
+
+For example, to load content from a GitHub repository, you can do this:
+
+```dart
+ContentApp.custom(
+  loaders: [
+    GitHubLoader(
+      '<username>/<repo>'
+      path: 'docs/',
+      accessToken: '...'
+    ),
+  ],
+  ...
+);
+```
+
+## In-Memory Pages
+
+You can also create pages in memory without loading them from anywhere. This is useful for testing or for creating pages by code:
+
+```dart
+ContentApp.custom(
+  loaders: [
+    MemoryLoader(pages: [
+      MemoryPage(
+        path: 'special.md',
+        content: '''
+          This is a **special page** that is created in memory.
+          It is not loaded from anywhere.
+          It still follows the same rules as normal pages and is parsed and rendered like any other page.
+        ''',
+      ),
+    ]),
+  ],
+  ...
+)
+```
+
+This will create a page at the `/special` route with the content provided in the `MemoryPage`. The content is parsed and rendered like any other page, so you can use all the features of `jaspr_content` like frontmatter, templating, and components.
+
+## Raw Content
+
+Sometimes you might want to output content as is without rendering it to html. For example, you might want to add a `robots.txt` file or a `llms.txt` file to your site.
+
+You can of course do this by adding it as static assets to the `web/` directory. However, if you want to leverage the content pipeline for this, you can do so like this:
+
+```dart
+ContentApp.custom(
+  loaders: [
+    FilesystemLoader(
+      directory: 'content',
+      keepSuffixPattern: RegExp(r'.*\.txt$'),
+    ),
+  ],
+  configResolver: PageConfig.all(
+    ...
+    rawOutputPattern: RegExp(r'.*\.txt$'),
+  ),
+);
+```
+
+- The `keepSuffixPattern` will keep the `.txt` file suffix for matching pages. This is important since the file suffix is normally removed when creating the url for a page.
+- The `rawOutputPattern` will skip the html rendering for matching pages and output the raw content as is. The frontmatter parsing and templating will still be applied though.
+
+<Info>
+  Both patterns are a regex that is matched against the full path of the page. This means you can use it to match any part of the path, not just the file name.
+</Info>
+
+---
+
+Continue with the [Writing Content](/content/guides/writing_content) guide to learn about writing rich and engaging content for your pages. You will explore markdown syntax, frontmatter, templating, and how to use custom components to enhance your content.
+
+

@@ -72,46 +72,46 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
   }
 
   @css
-  static final styles = [
-    css('.main', [
-      css('&').styles(
-        display: Display.flex,
-        minHeight: 80.vh,
-        flexDirection: FlexDirection.column,
-        alignItems: AlignItems.center,
-      ),
-      css('.buttons', [
-        css('&').styles(
-          display: Display.flex,
-          flexDirection: FlexDirection.row,
+  static List<StyleRule> get styles => [
+        css('.main', [
+          css('&').styles(
+            display: Display.flex,
+            minHeight: 80.vh,
+            flexDirection: FlexDirection.column,
+            alignItems: AlignItems.center,
+          ),
+          css('.buttons', [
+            css('&').styles(
+              display: Display.flex,
+              flexDirection: FlexDirection.row,
+            ),
+            css('button').styles(
+              padding: Padding.all(8.px),
+              border: Border(color: primaryColor, width: 1.px),
+            ),
+            css('button:first-child').styles(
+              margin: Margin.only(right: (-1).px),
+              radius: BorderRadius.horizontal(left: Radius.circular(6.px)),
+            ),
+            css('button:last-child').styles(
+              margin: Margin.only(left: (-1).px),
+              radius: BorderRadius.horizontal(right: Radius.circular(6.px)),
+            ),
+          ]),
+          css('.counters', [
+            css('&').styles(
+              display: Display.flex,
+              flexDirection: FlexDirection.row,
+              flexWrap: FlexWrap.wrap,
+              justifyContent: JustifyContent.center,
+            ),
+          ]),
+        ]),
+        css('footer').styles(
+          margin: Margin.all(40.px),
+          textAlign: TextAlign.center,
+          fontSize: 12.px,
+          fontStyle: FontStyle.italic,
         ),
-        css('button').styles(
-          padding: Padding.all(8.px),
-          border: Border(color: primaryColor, width: 1.px),
-        ),
-        css('button:first-child').styles(
-          margin: Margin.only(right: (-1).px),
-          radius: BorderRadius.horizontal(left: Radius.circular(6.px)),
-        ),
-        css('button:last-child').styles(
-          margin: Margin.only(left: (-1).px),
-          radius: BorderRadius.horizontal(right: Radius.circular(6.px)),
-        ),
-      ]),
-      css('.counters', [
-        css('&').styles(
-          display: Display.flex,
-          flexDirection: FlexDirection.row,
-          flexWrap: FlexWrap.wrap,
-          justifyContent: JustifyContent.center,
-        ),
-      ]),
-    ]),
-    css('footer').styles(
-      margin: Margin.all(40.px),
-      textAlign: TextAlign.center,
-      fontSize: 12.px,
-      fontStyle: FontStyle.italic,
-    ),
-  ];
+      ];
 }

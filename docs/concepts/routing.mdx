@@ -10,7 +10,7 @@ package for a powerful routing system that adapts to your needs.
 
 ## Setup
 
-To start, add `jaspr_router` to your project, use the [Router](/components/router) component and provide a list
+To start, add `jaspr_router` to your project, use the [Router](/api/components/router) component and provide a list
 of `Route`s:
 
 ```dart title="lib/app.dart"
@@ -30,7 +30,7 @@ class App extends StatelessComponent {
 }
 ```
 
-See the [Router](/components/router) docs for a full description of its API.
+See the [Router](/api/components/router) docs for a full description of its API.
 
 As with many Jaspr components, `Router` can be used both on the server and on the client. However, there is an important
 difference in routing behavior based on where it is rendered. Read the section below for more details.
@@ -60,25 +60,24 @@ single-page routing for more self-contained app-like websites.
 To set up routing for either strategy is really straight forward:
 
 - For multi-page routing place the `Router` component in the section of the component tree where it is **only** pre-rendered on the server.
-  For example if you are using [@client](/utils/at_client) components place the `Router` above these components in the tree.
+  For example if you are using [@client](/api/utils/at_client) components place the `Router` above these components in the tree.
 
   <Info>
     Since this requires pre-rendering, multi-page routing is only available with **static** or **server** mode.
   </Info>
 
   <Info>
-    If you are unsure about how the separation between server and client works, check out the [Hydration](/get_started/hydration)
-    docs, specifically the [Separation of Environments](/get_started/hydration#separation-of-environments) section.
+    If you are unsure about how the separation between server and client works, check out the [Server vs Client](/get_started/server_client) docs.
   </Info>
 
-  To navigate to a different page, use the [Link](/components/link) component, which wraps the `<a>` html element.
+  To navigate to a different page, use the [Link](/api/components/link) component, which wraps the `<a>` html element.
 
   When using multi-page routing and the `Router` component is only rendered on the server, you cannot use `Router.of(context).push('/path)'`
   for navigating on the client as it would fail to locate the `Router` in the client-side component tree.
 
-- For single-page routing place the `Router` in the client-rendered section of the component tree, i.e. below any [@client](/utils/at_client) components.
+- For single-page routing place the `Router` in the client-rendered section of the component tree, i.e. below any [@client](/api/utils/at_client) components.
 
-  To navigate to a different page, either use the [Link](/components/link) component or call `Router.of(context).push('/path');`.
+  To navigate to a different page, either use the [Link](/api/components/link) component or call `Router.of(context).push('/path');`.
 
   When using client-side routing we recommend code-splitting your client bundle based on your routes to improve load times.
   See the section below for more details.
@@ -113,4 +112,4 @@ class App extends StatelessComponent {
 
 This will lazy load the appropriate javascript files for the '/about' route when navigating to it.
 
-Read more in the docs about [Lazy Routes](/components/router#lazy-routes).
+Read more in the docs about [Lazy Routes](/api/components/router#lazy-routes).

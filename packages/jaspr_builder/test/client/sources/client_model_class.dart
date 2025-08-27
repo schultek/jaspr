@@ -26,7 +26,7 @@ final clientModelClassSources = {
 final clientModelClassJsonOutputs = {
   'site|lib/component_model_class.client.json': jsonEncode({
     "name": "Component",
-    "id": "component_model_class",
+    "id": ["site", "lib/component_model_class.dart"],
     "import": "package:site/component_model_class.dart",
     "params": [
       {"name": "a", "isNamed": false, "decoder": "p['a']", "encoder": "c.a"},
@@ -41,18 +41,18 @@ final clientModelClassJsonOutputs = {
 };
 
 final clientModelClassDartOutputs = {
-  'site|web/component_model_class.client.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+  'site|lib/component_model_class.client.dart': '// dart format off\n'
+      '// ignore_for_file: type=lint\n'
+      '\n'
+      '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
       'import \'package:jaspr/browser.dart\';\n'
       'import \'package:site/component_model_class.dart\' as prefix0;\n'
       'import \'package:site/model_class.dart\' as prefix1;\n'
       '\n'
-      'void main() {\n'
-      '  runAppWithParams(getComponentForParams);\n'
-      '}\n'
-      '\n'
       'Component getComponentForParams(Map<String, dynamic> p) {\n'
       '  return prefix0.Component(p[\'a\'], b: prefix1.ModelA.fromRaw(p[\'b\']));\n'
-      '}\n',
+      '}\n'
+      '',
 };

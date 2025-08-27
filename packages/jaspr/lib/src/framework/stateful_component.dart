@@ -684,6 +684,8 @@ class StatefulElement extends BuildableElement {
           _didChangeDependencies = false;
         }
         super.performRebuild();
+      }).catchError((e, st) {
+        failRebuild(e, st);
       });
     }
     if (_didChangeDependencies) {

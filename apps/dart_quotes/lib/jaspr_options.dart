@@ -1,3 +1,6 @@
+// dart format off
+// ignore_for_file: type=lint
+
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
@@ -23,17 +26,22 @@ import 'package:dart_quotes/app.dart' as prefix3;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(
-  clients: {
-    prefix0.QuoteLikeButton:
-        ClientTarget<prefix0.QuoteLikeButton>('components/quote_like_button', params: _prefix0QuoteLikeButton),
-  },
-  styles: () => [
-    ...prefix0.QuoteLikeButton.styles,
-    ...prefix1.HomePage.styles,
-    ...prefix2.QuotePage.styles,
-    ...prefix3.App.styles,
-  ],
-);
+JasprOptions get defaultJasprOptions => JasprOptions(
+      clients: {
+        prefix0.QuoteLikeButton: ClientTarget<prefix0.QuoteLikeButton>(
+          'components/quote_like_button',
+          params: _prefix0QuoteLikeButton,
+        ),
+      },
+      styles: () => [
+        ...prefix0.QuoteLikeButton.styles,
+        ...prefix1.HomePage.styles,
+        ...prefix2.QuotePage.styles,
+        ...prefix3.App.styles,
+      ],
+    );
 
-Map<String, dynamic> _prefix0QuoteLikeButton(prefix0.QuoteLikeButton c) => {'id': c.id, 'initialCount': c.initialCount};
+Map<String, dynamic> _prefix0QuoteLikeButton(prefix0.QuoteLikeButton c) => {
+      'id': c.id,
+      'initialCount': c.initialCount,
+    };

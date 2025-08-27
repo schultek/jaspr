@@ -1,8 +1,9 @@
-import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../components/html/html.dart';
 import 'basic_types.dart';
+import 'constants.dart';
+import 'type_checks.dart';
 
 typedef EventCallback = void Function(web.Event event);
 typedef EventCallbacks = Map<String, EventCallback>;
@@ -10,6 +11,9 @@ typedef EventCallbacks = Map<String, EventCallback>;
 /// Helper function to provide typed event handlers to the `events` property of html components.
 EventCallbacks events<V1, V2>({
   /// Listens to the 'click' event.
+  ///
+  /// If the target element is an anchor (<a>) element, this will override the default behavior of the link and not
+  /// visit [href] when clicked.
   VoidCallback? onClick,
 
   /// Listens to the 'input' event. When providing a generic type for [value], it must be according to the target element:
@@ -33,7 +37,13 @@ EventCallbacks events<V1, V2>({
   ValueChanged<V2>? onChange,
 }) =>
     {
-      if (onClick != null) 'click': (_) => onClick(),
+      if (onClick != null)
+        'click': (event) {
+          if (kIsWeb && (event.target.isHtmlAnchorElement)) {
+            event.preventDefault();
+          }
+          onClick();
+        },
       if (onInput != null) 'input': _callWithValue('onInput', onInput),
       if (onChange != null) 'change': _callWithValue('onChange', onChange),
     };
@@ -42,8 +52,9 @@ void Function(web.Event) _callWithValue<V>(String event, void Function(V) fn) {
   return (e) {
     var target = e.target;
     var value = switch (target) {
-      web.HTMLInputElement() when target.instanceOfString("HTMLInputElement") => () {
-          var type = InputType.values.where((v) => v.name == target.type).firstOrNull;
+      web.HTMLInputElement() when target.isHtmlInputElement => () {
+          final targetType = target.type;
+          final type = InputType.values.where((v) => v.name == targetType).firstOrNull;
           return switch (type) {
             InputType.checkbox || InputType.radio => target.checked,
             InputType.number => target.valueAsNumber,
@@ -52,10 +63,10 @@ void Function(web.Event) _callWithValue<V>(String event, void Function(V) fn) {
             _ => target.value,
           };
         }(),
-      web.HTMLTextAreaElement() when target.instanceOfString("HTMLTextAreaElement") => target.value,
-      web.HTMLSelectElement() when target.instanceOfString("HTMLSelectElement") => [
+      web.HTMLTextAreaElement() when target.isTextAreaElement => target.value,
+      web.HTMLSelectElement() when target.isHtmlSelectElement => [
           for (final o in target.selectedOptions.toIterable())
-            if (o is web.HTMLOptionElement && o.instanceOfString("HTMLOptionElement")) o.value,
+            if (o.isHtmlOptionElement) (o as web.HTMLOptionElement).value,
         ],
       _ => null,
     };

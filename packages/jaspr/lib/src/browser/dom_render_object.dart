@@ -5,6 +5,7 @@ import 'package:universal_web/web.dart' as web;
 
 import '../foundation/constants.dart';
 import '../foundation/events.dart';
+import '../foundation/type_checks.dart';
 import '../framework/framework.dart';
 import 'utils.dart';
 
@@ -51,7 +52,7 @@ class DomRenderObject extends RenderObject {
     late web.Element elem;
 
     var namespace = xmlns[tag];
-    if (namespace == null && (parent?.node?.instanceOfString("Element") ?? false)) {
+    if (namespace == null && (parent?.node?.isElement ?? false)) {
       namespace = (parent?.node as web.Element).namespaceURI;
     }
 
@@ -59,7 +60,7 @@ class DomRenderObject extends RenderObject {
     if (node == null) {
       if (parent!.toHydrate.isNotEmpty) {
         for (final e in parent!.toHydrate) {
-          if (e.instanceOfString('Element') && (e as web.Element).tagName.toLowerCase() == tag) {
+          if (e.isElement && (e as web.Element).tagName.toLowerCase() == tag) {
             if (kVerboseMode) {
               print("Hydrate html node: $e");
             }
@@ -81,7 +82,7 @@ class DomRenderObject extends RenderObject {
         web.console.log("Create html node: $elem".toJS);
       }
     } else {
-      if (!node.instanceOfString('Element') || (node as web.Element).tagName.toLowerCase() != tag) {
+      if (!node.isElement || (node as web.Element).tagName.toLowerCase() != tag) {
         elem = _createElement(tag, namespace);
         final old = node!;
         node!.parentNode!.replaceChild(elem, old);
@@ -111,9 +112,7 @@ class DomRenderObject extends RenderObject {
 
     if (attributes != null && attributes.isNotEmpty) {
       for (final attr in attributes.entries) {
-        if (attr.key == 'value' &&
-            elem.instanceOfString('HTMLInputElement') &&
-            (elem as web.HTMLInputElement).value != attr.value) {
+        if (attr.key == 'value' && elem.isHtmlInputElement && (elem as web.HTMLInputElement).value != attr.value) {
           if (kVerboseMode) {
             print("Set input value: ${attr.value}");
           }
@@ -121,9 +120,7 @@ class DomRenderObject extends RenderObject {
           continue;
         }
 
-        if (attr.key == 'value' &&
-            elem.instanceOfString('HTMLSelectElement') &&
-            (elem as web.HTMLSelectElement).value != attr.value) {
+        if (attr.key == 'value' && elem.isHtmlSelectElement && (elem as web.HTMLSelectElement).value != attr.value) {
           if (kVerboseMode) {
             print("Set select value: ${attr.value}");
           }
@@ -173,7 +170,7 @@ class DomRenderObject extends RenderObject {
       final toHydrate = parent!.toHydrate;
       if (toHydrate.isNotEmpty) {
         for (final e in toHydrate) {
-          if (e.instanceOfString('Text')) {
+          if (e.isText) {
             if (kVerboseMode) {
               print("Hydrate text node: $e");
             }
@@ -195,7 +192,7 @@ class DomRenderObject extends RenderObject {
         print("Create text node: $text");
       }
     } else {
-      if (!node.instanceOfString('Text')) {
+      if (!node.isText) {
         final elem = web.Text(text);
         (node as web.Element).replaceWith(elem as dynamic);
         node = elem;
@@ -227,7 +224,7 @@ class DomRenderObject extends RenderObject {
       final parentNode = node;
       final childNode = child.node;
 
-      assert(parentNode.instanceOfString('Element'));
+      assert(parentNode.isElement);
       if (childNode == null) return;
 
       final afterNode = after?.node;

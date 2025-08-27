@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://jaspr.site">Website</a> •
-  <a href="https://docs.jaspr.site/get_started/installation">Quickstart</a> •
+  <a href="https://docs.jaspr.site/get_started/quick_start">Quickstart</a> •
   <a href="https://docs.jaspr.site">Documentation</a> •
   <a href="https://playground.jaspr.site">Playground</a> •
   <a href="https://github.com/schultek/jaspr/tree/main/examples/">Examples</a> •
@@ -26,22 +26,18 @@
 
 > A modern web framework for building websites in Dart with support for both **client-side** and **server-side rendering**.
 
-- 🔮 **Why?**: Jaspr was made with the premise to make a web-framework that looks and feels just like Flutter, but
-  renders normal html/css like Vue or React.
-- 👥 **Who?**: Jaspr is targeted mainly at Flutter developers that want to build any type of websites
-  (especially ones that are not suitable for Flutter Web).
-- 🚀 **What?**: Jaspr wants to push the boundaries of Dart on the web and server, by giving you a thought-through fullstack
-  web framework written completely in Dart.
+- 🔮 **Why?**: Jaspr was made with the premise to make a web-framework that looks and feels just like Flutter, but renders normal HTML and CSS like React or Vue.
+- 👥 **Who?**: Jaspr is targeted mainly at Flutter developers that want to build any type of websites (especially ones that are not suitable for Flutter Web).
+- 🚀 **What?**: Jaspr wants to push the boundaries of Dart on the web and server, by giving you a thought-through fullstack web framework written completely in Dart.
 
-> Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of
-> developers around Jaspr and check out the [Contributing Guide](https://docs.jaspr.site/going_further/contributing).
+> Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of developers around Jaspr and check out the [Contributing Guide](https://docs.jaspr.site/going_further/contributing).
 
 ### Core Features
 
 - 💙 **Familiar**: Works with a similar component model to flutter widgets.
 - 🏗 **Powerful**: Comes with server side rendering out of the box.
 - ♻️ **Easy**: Syncs component state between server and client automatically.
-- ⚡️ **Fast**: Performs incremental DOM updates only where needed.
+- ⚡️ **Fast**: Performs optimized DOM updates only where needed.
 - 🎛 **Flexible**: Runs on the server, client or both with manual or automatic setup. You decide.
 
 > If you want to say thank you, star the project on GitHub and like the package on pub.dev 🙌💙

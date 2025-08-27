@@ -1,0 +1,108 @@
+---
+title: Link
+description: Handles any kind of link.
+---
+
+---
+
+<Info>
+This component is part of the `jaspr_router` package. Make sure to add this to your dependencies
+before using the component.
+</Info>
+
+The `Link` component is a drop-in replacement for the `<a>` tag.
+
+When available, it uses client-side navigation (no page reload on click) and falls back to the default
+server-side navigation.
+
+```dart
+yield Link(
+  to: '/about',
+  child: Text('About'),
+);
+```
+
+renders to
+
+```html
+<a href="/about">About</a>
+```
+
+## Client-Side Navigation
+
+When using client-side routing, the `Link` component will override the default behavior of the `<a>`
+tag and use the [`Router`s](/api/components/router) `push()` or `replace()` method to navigate to the target route when clicked.
+
+## Parameters
+
+<Property name="to" type="String" required>
+  The url to navigate to.
+</Property>
+
+---
+
+<Property name="replace" type="bool" optional>
+  Whether to replace the route instead of pushing, defaults to 'false'. 
+  
+  *Only affects client-side routing.*
+</Property>
+
+---
+
+<Property name="extra" type="Object" optional>
+  The extra data to attach to the new route. 
+  
+  *Only affects client-side routing.*
+</Property>
+
+---
+
+<Property name="preload" type="bool" optional>
+  Whether to preload the target route when the link is hovered, defaults to 'true'. 
+  
+  *Only affects client-side routing when using lazy routes.*
+</Property>
+
+---
+
+<Property name="target" type="Target?" optional>
+  The `target` attribute value applied to the anchor element.
+</Property>
+
+---
+
+<Property name="referrer" type="ReferrerPolicy?" optional>
+  The `referrerpolicy` attribute value applied to the anchor element.
+</Property>
+
+---
+
+<Property name="classes" type="String?" optional>
+  The `class` attribute value applied to the anchor element.
+</Property>
+
+---
+
+<Property name="styles" type="Styles?" optional>
+  The `style` attribute value applied to the anchor element.
+</Property>
+
+---
+
+<Property name="attributes" type="Map<String, String>?" optional>
+  Other attribute values applied to the anchor element.
+</Property>
+
+---
+
+<Property name="child" type="Component?" optional>
+  Child component to render inside the anchor element.
+</Property>
+
+---
+
+<Property name="children" type="List<Component>?" optional>
+  Child components to render inside the anchor element.
+</Property>
+
+---

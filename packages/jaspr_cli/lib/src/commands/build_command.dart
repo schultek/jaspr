@@ -1,12 +1,13 @@
 // ignore_for_file: depend_on_referenced_packages, implementation_imports
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:build_daemon/data/build_status.dart';
 import 'package:build_daemon/data/build_target.dart';
 import 'package:collection/collection.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as http show Client, Response;
 import 'package:path/path.dart' as p;
 import 'package:webdev/src/daemon_client.dart' as d;
 
@@ -42,6 +43,18 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       help: 'Compile to wasm',
       negatable: false,
     );
+    argParser.addMultiOption(
+      'extra-js-compiler-option',
+      help: 'Extra flags to pass to `dart compile js`.',
+      defaultsTo: [],
+      hide: true,
+    );
+    argParser.addMultiOption(
+      'extra-wasm-compiler-option',
+      help: 'Extra flags to pass to `dart compile wasm`.',
+      defaultsTo: [],
+      hide: true,
+    );
     argParser.addOption(
       'optimize',
       abbr: 'O',
@@ -56,6 +69,19 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: '2',
     );
+    argParser.addFlag(
+      'include-source-maps',
+      help: 'Include source maps (and dart source files) in the output.',
+      negatable: false,
+      defaultsTo: false,
+    );
+    argParser.addOption(
+      'sitemap-domain',
+      help: 'If set, generates a sitemap.xml file for the static site. '
+          'The domain will be used as the base URL for the sitemap entries.',
+    );
+    argParser.addOption('sitemap-exclude',
+        help: 'A regex pattern of routes that should be excluded from the sitemap. ');
     addDartDefineArgs();
   }
 
@@ -68,10 +94,13 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   @override
   String get category => 'Project';
 
-  @override
-  Future<CommandResult?> run() async {
-    await super.run();
+  late final useWasm = argResults!['experimental-wasm'] as bool;
+  late final includeSourceMaps = argResults!['include-source-maps'] as bool;
+  late final sitemapDomain = argResults!['sitemap-domain'] as String?;
+  late final sitemapExclude = argResults!['sitemap-exclude'] as String?;
 
+  @override
+  Future<int> runCommand() async {
     logger.write("Building jaspr for ${config!.mode.name} rendering mode.");
 
     var dir = Directory('build/jaspr').absolute;
@@ -110,8 +139,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     await webResult;
 
     if (config!.usesFlutter) {
-      flutterResult = buildFlutter();
+      flutterResult = buildFlutter(useWasm);
     }
+
+    bool hasBuildError = false;
 
     var serverDefines = getServerDartDefines();
 
@@ -142,23 +173,27 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       await watchProcess('server build', process, tag: Tag.cli, progress: 'Building server app...');
     } else if (config!.mode == JasprMode.static) {
-      logger.write('Building server app...', progress: ProgressState.running);
+      logger.write('Generating static site...', progress: ProgressState.running);
 
-      Set<String> generatedRoutes = {};
+      Map<String, ({String? lastmod, String? changefreq, double? priority})?> generatedRoutes = {};
       List<String> queuedRoutes = [];
 
       var serverStartedCompleter = Completer();
 
-      await startProxy('5567', webPort: '0', onMessage: (message) {
+      await startProxy('5567', webPort: '0', serverPort: '8080', onMessage: (message) {
         if (message case {'route': String route}) {
           if (!serverStartedCompleter.isCompleted) {
             serverStartedCompleter.complete();
           }
-          if (generatedRoutes.contains(route)) {
-            return;
+          if (!generatedRoutes.containsKey(route)) {
+            queuedRoutes.insert(0, route);
           }
-          queuedRoutes.insert(0, route);
-          generatedRoutes.add(route);
+
+          final lastmod = message['lastmod'] is String ? message['lastmod'] : null;
+          final changefreq = message['changefreq'] is String ? message['changefreq'] : null;
+          final priority = message['priority'] is num ? (message['priority'] as num).toDouble() : null;
+
+          generatedRoutes[route] = (lastmod: lastmod, changefreq: changefreq, priority: priority);
         }
       });
 
@@ -184,7 +219,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       );
 
       bool done = false;
-      watchProcess('server', process, tag: Tag.server, progress: 'Running server app...', onFail: () => !done);
+      watchProcess('server', process, tag: Tag.server, progress: 'Running server app...', onFail: () {
+        logger.write('Server process failed unexpectedly.', level: Level.error, progress: ProgressState.completed);
+        return !done;
+      });
 
       await serverStartedCompleter.future;
 
@@ -192,29 +230,120 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       logger.write('Generating routes...', progress: ProgressState.running);
 
+      final httpClient = http.Client();
+
       while (queuedRoutes.isNotEmpty) {
         var route = queuedRoutes.removeLast();
 
-        logger.write('Generating route "$route"...', progress: ProgressState.running);
+        logger.write(
+          'Generating route "$route" (${generatedRoutes.length - queuedRoutes.length}/${generatedRoutes.length})...',
+          progress: ProgressState.running,
+        );
 
-        var response = await http.get(Uri.parse('http://localhost:8080$route'));
+        http.Response response;
+        try {
+          response = await httpClient.get(Uri.parse('http://localhost:8080$route'));
+        } catch (e) {
+          logger.write('Failed to generate route "$route". ($e)',
+              level: Level.error, progress: ProgressState.completed);
+          hasBuildError = true;
+          continue;
+        }
+
+        if (response.statusCode != 200) {
+          logger.write('Failed to generate route "$route". (Received status code ${response.statusCode})',
+              level: Level.error, progress: ProgressState.completed);
+          hasBuildError = true;
+          continue;
+        }
 
         var file = File(p.url.join(
           'build/jaspr',
           route.startsWith('/') ? route.substring(1) : route,
-          'index.html',
+          p.url.extension(route).isEmpty ? 'index.html' : null,
         )).absolute;
 
         file.createSync(recursive: true);
         file.writeAsBytesSync(response.bodyBytes);
+
+        if (response.headers['jaspr-sitemap-data'] case String data) {
+          if (data == 'false') {
+            generatedRoutes[route] = null;
+          } else {
+            final sitemap = jsonDecode(data) as Object?;
+
+            if (sitemap is! Map<String, Object?>) {
+              logger.write(
+                'Invalid sitemap data for route "$route". Expected a map, but got ${sitemap.runtimeType}.',
+                level: Level.error,
+                progress: ProgressState.completed,
+              );
+              hasBuildError = true;
+              continue;
+            }
+
+            final originalRouteConfig = generatedRoutes[route];
+            final lastModConfig = sitemap['lastmod'];
+            final changeFrequencyConfig = sitemap['changefreq'];
+            final priorityConfig = sitemap['priority'];
+
+            generatedRoutes[route] = (
+              lastmod: lastModConfig is String ? lastModConfig : originalRouteConfig?.lastmod,
+              changefreq: changeFrequencyConfig is String ? changeFrequencyConfig : originalRouteConfig?.changefreq,
+              priority: priorityConfig is num ? priorityConfig.toDouble() : originalRouteConfig?.priority,
+            );
+          }
+        }
       }
 
       done = true;
+      httpClient.close();
       process.kill();
 
-      logger.complete(true);
+      logger.complete(!hasBuildError);
 
-      dummyTargetIndex &= !(generatedRoutes.contains('/') || generatedRoutes.contains('/index'));
+      if (sitemapDomain != null) {
+        logger.write('Generating sitemap.xml...');
+
+        var content = StringBuffer();
+        content.writeln('<?xml version="1.0" encoding="UTF-8"?>');
+        content.writeln('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
+
+        var domain = sitemapDomain!;
+        if (!domain.startsWith(RegExp('https?://'))) {
+          domain = 'https://$domain';
+        }
+
+        var excludePattern = sitemapExclude != null ? RegExp(sitemapExclude!) : null;
+        var now = DateTime.now().copyWith(millisecond: 0, microsecond: 0).toIso8601String();
+
+        for (var route in generatedRoutes.entries) {
+          if (excludePattern != null && excludePattern.hasMatch(route.key)) {
+            continue;
+          }
+
+          final sitemapData = route.value;
+          if (sitemapData == null) {
+            continue;
+          }
+
+          content.writeln('  <url>');
+          content.writeln('    <loc>$domain${route.key}</loc>');
+          content.writeln('    <lastmod>${sitemapData.lastmod ?? now}</lastmod>');
+          if (sitemapData.changefreq != null) {
+            content.writeln('    <changefreq>${sitemapData.changefreq}</changefreq>');
+          }
+          content.writeln('    <priority>${sitemapData.priority ?? 0.5}</priority>');
+          content.writeln('  </url>');
+        }
+        content.writeln('</urlset>');
+
+        var sitemap = File(p.url.join('build/jaspr', 'sitemap.xml')).absolute;
+        sitemap.createSync(recursive: true);
+        sitemap.writeAsStringSync(content.toString());
+      }
+
+      dummyTargetIndex &= !(generatedRoutes.containsKey('/') || generatedRoutes.containsKey('/index'));
     }
 
     await flutterResult;
@@ -226,12 +355,20 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
     }
 
+    if (hasBuildError) {
+      logger.write(
+        'Failed to build project.',
+        progress: ProgressState.completed,
+        level: Level.error,
+      );
+      return 1;
+    }
+
     logger.write('Completed building project to /build/jaspr.', progress: ProgressState.completed);
-    return null;
+    return 0;
   }
 
   Future<int> _buildWeb() async {
-    final useWasm = argResults!['experimental-wasm'] as bool;
     if (useWasm) {
       checkWasmSupport();
     }
@@ -239,8 +376,24 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     logger.write('Building web assets...', progress: ProgressState.running);
 
     final compiler = useWasm ? 'dart2wasm' : 'dart2js';
-    final entrypointBuilder = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers:entrypoint';
-    final userDefines = getClientDartDefines().entries.map((e) => ',"-D${e.key}=${e.value}"').join();
+    final builders = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    final entrypointBuilder = '$builders:entrypoint';
+
+    var dartDefines = getClientDartDefines();
+    if (config!.usesFlutter) {
+      dartDefines.addAll(getFlutterDartDefines(useWasm, true));
+    }
+
+    final args = [
+      '-Djaspr.flags.release=true',
+      '-O${argResults!['optimize']}',
+      if (useWasm) //
+        ...argResults!['extra-wasm-compiler-option']
+      else
+        ...argResults!['extra-js-compiler-option'],
+      for (final entry in dartDefines.entries) //
+        '-D${entry.key}=${entry.value}',
+    ];
 
     final client = await d.connectClient(
       Directory.current.path,
@@ -249,7 +402,11 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--verbose',
         '--delete-conflicting-outputs',
         '--define=$entrypointBuilder=compiler=$compiler',
-        '--define=$entrypointBuilder=${compiler}_args=["-Djaspr.flags.release=true","-O${argResults!['optimize']}"$userDefines]',
+        '--define=$entrypointBuilder=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',
+        if (includeSourceMaps) ...[
+          '--define=$builders:dart2js_archive_extractor=filter_outputs=false',
+          '--define=$builders:dart_source_cleanup=enabled=false'
+        ],
       ],
       logger.writeServerLog,
     );
@@ -291,7 +448,21 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     await client.close();
     if (exitCode == 0) {
       logger.write('Completed building web assets.', progress: ProgressState.completed);
+
+      if (includeSourceMaps) {
+        _fixSourceMaps(outputLocation.output);
+      }
     }
     return exitCode;
+  }
+
+  void _fixSourceMaps(String root) {
+    final files = Directory(root).listSync(recursive: true);
+
+    for (final file in files) {
+      if (file is File && RegExp(r'\.dart\.js.*\.(map|deps)$').hasMatch(file.path)) {
+        file.writeAsStringSync(file.readAsStringSync().replaceAll('org-dartlang-app://', ''));
+      }
+    }
   }
 }

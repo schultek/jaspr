@@ -54,12 +54,13 @@ class SplitterState extends State<Splitter> {
 
   @override
   Iterable<Component> build(BuildContext context) sync* {
-    for (var i = 0; i < component.children.length; i++) {
+    for (var j = 0; j < component.children.length; j++) {
+      final i = j;
       if (i > 0) {
         var pair = splitPairs[i - 1];
         yield div(
           classes: 'gutter gutter-${component.horizontal ? 'horizontal' : 'vertical'}',
-          styles: Styles(flex: Flex(basis: FlexBasis(6.px))),
+          styles: Styles(flex: Flex(basis: 6.px)),
           events: {'mousedown': (e) => pair.startDragging(e as html.MouseEventOrStubbed)},
           [],
         );
@@ -70,11 +71,9 @@ class SplitterState extends State<Splitter> {
 
       yield DomComponent.wrap(
         styles: Styles(
-          raw: {
-            'flex-basis': 'calc(${sizes[i]}% - 3px)',
-          },
           userSelect: dragging ? UserSelect.none : null,
           pointerEvents: dragging ? PointerEvents.none : null,
+          raw: {'flex-basis': 'calc(${sizes[i]}% - 3px)'},
         ),
         child: DomNodeReader(
           onNode: (node) {

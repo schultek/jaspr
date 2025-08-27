@@ -25,33 +25,33 @@ class SessionCard extends StatelessComponent {
   }
 
   @css
-  static final styles = [
-    css('.session-card', [
-      css('&').styles(
-        display: Display.block,
-        position: Position.relative(),
-        radius: BorderRadius.all(Radius.circular(12.px)),
-        border: Border(),
-        padding: Padding.all(16.px),
-        textDecoration: TextDecoration(line: TextDecorationLine.none),
-        color: Color.initial,
-      ),
-      css('&:hover').styles(
-        backgroundColor: Color.hex('#0001'),
-      ),
-      css('span').styles(
-        fontSize: 0.7.em,
-      ),
-      css('h2').styles(
-        fontSize: 1.2.em,
-        margin: Margin.symmetric(vertical: 4.px),
-      ),
-      css('div').styles(
-        display: Display.flex,
-      ),
-      css('button').styles(
-        position: Position.absolute(right: 10.px, top: 10.px),
-      ),
-    ]),
-  ];
+  static List<StyleRule> get styles => [
+        css('.session-card', [
+          css('&').styles(
+            display: Display.block,
+            position: Position.relative(),
+            padding: Padding.all(16.px),
+            border: Border(),
+            radius: BorderRadius.all(Radius.circular(12.px)),
+            color: Color.initial,
+            textDecoration: TextDecoration(line: TextDecorationLine.none),
+          ),
+          css('&:hover').styles(
+            backgroundColor: Color('#0001'),
+          ),
+          css('span').styles(
+            fontSize: 0.7.em,
+          ),
+          css('h2').styles(
+            margin: Margin.symmetric(vertical: 4.px),
+            fontSize: 1.2.em,
+          ),
+          css('div').styles(
+            display: Display.flex,
+          ),
+          css('button').styles(
+            position: Position.absolute(right: 10.px, top: 10.px),
+          ),
+        ]),
+      ];
 }

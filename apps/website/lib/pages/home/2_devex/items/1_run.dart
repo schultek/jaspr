@@ -47,16 +47,16 @@ class Run extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
-    css('.run-preview', [
-      css('&').styles(padding: Padding.all(.5.rem)),
-      css('.console').styles(
-        display: Display.block,
-        opacity: .8,
-        color: textBlack,
-        textAlign: TextAlign.start,
-        fontSize: .7.rem,
-      ),
-    ]),
-  ];
+  static List<StyleRule> get styles => [
+        css('.run-preview', [
+          css('&').styles(padding: Padding.all(.5.rem)),
+          css('.console').styles(
+            display: Display.block,
+            opacity: .8,
+            color: textBlack,
+            textAlign: TextAlign.start,
+            fontSize: .7.rem,
+          ),
+        ]),
+      ];
 }

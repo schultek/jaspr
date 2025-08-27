@@ -1,0 +1,372 @@
+---
+title: Customizing Rendering
+description: Customize the look and feel of your content site.
+---
+
+---
+
+This guide explores some **advanced customization** options for `jaspr_content`. You'll learn how to use **page extensions** to dynamically add to or modify parts of your content, implement **custom components**, **create layouts** for a consistent look, or **apply theming** for a personalized appearance.
+
+## Page Extensions
+
+Extensions enhance the rendering of your content by adding features or modifying the output. They can **transform content**, add capabilities, or generate additional data during the rendering process.
+
+Page extensions are applied after the parsing of your content but before any rendering. They operate on a tree of `Nodes`, which represent the parsed content in a structured way. 
+
+<Info>
+Read more about `Nodes` and how they are structured in the [Page Extensions](/content/concepts/page_extensions) docs.
+</Info>
+
+Extensions have full control over the tree and can modify it in any way, enabling lots of different use-cases. `jaspr_content` comes with two convenient extensions out of the box:
+
+- [`HeadingAnchorsExtension`](/content/extensions/heading_anchors): Generates anchor links for all headings in the content and adds them as clickable '#' symbols to the headings.
+
+- [`TableOfContentsExtension`](/content/extensions/table_of_contents): Generates a table of contents for your pages based on the headings in the content.
+
+Additionally, you can also add your own extensions by implementing the `PageExtension` class like this:
+
+```dart
+class MyExtension implements PageExtension {
+
+  @override
+  List<Node> apply(Page page, List<Node> nodes) {
+    // Implement your extension logic here
+  }
+}
+```
+
+There is lots you can do with custom extensions, for example:
+
+- Customize standard elements like paragraphs, headings, blockquotes, images etc.
+- Analyze the structure of your content to generate things like table of contents, references, glossary etc.
+- Add new dynamic elements to the content.
+- *Whatever else you come up with*
+
+---
+
+Apart from extensions, you can also use **Custom Components** to achieve some of these things in a different way, which is discussed in the next section.
+
+## Components
+
+In the previous [Writing Content](/content/guides/writing_content) guide, we introduced the basics of using custom components in your content. Now let's dive deeper into customizing and creating your own components.
+
+### Using Jaspr Components
+
+You can make any normal Jaspr component available in your content using the html-like `<Component>` syntax. 
+
+Say you have written a `class Card extends StatelessComponent` class that takes a `String? title` and `Component child`, you can add it to your page configuration like this:
+
+```dart
+ContentApp(
+  ...
+  components: [
+    CustomComponent(
+      pattern: 'Card',
+      builder: (name, attributes, child) {
+        return Card(title: attributes['title'], child: child!);
+      }
+    )
+  ]
+)
+```
+
+Then you can write markdown like this to render your card component:
+
+```markdown
+<Card>Simple card with no title.</Card>
+
+<Card title="My Single Card">Simple card with title.</Card>
+
+<Card title="My Markdown Card">
+  Card that contains **markdown content**.
+
+  > You can even nest components like this:
+
+  <Card>Nested card</Card>
+</Card>
+```
+
+### Overriding Standard Elements
+
+Components can also override standard markdown elements. For example when using the [`CodeBlock`](/content/components/code_block) component, any standard markdown codeblock will be rendered as this component. This is used to add additional features to codeblocks, like syntax highlighting and a copy button.
+
+To add similar functionality to your own custom components, instead of using the `CustomComponent()` constructor, create a class implementing `CustomComponent` like this:
+
+```dart
+class CustomCard implements CustomComponent {
+
+  @override
+  Component? create(Node node, NodesBuilder builder) {
+    ...
+  }
+}
+```
+
+Here instead of using a `pattern`, you must implement the `create` method to detect and build your component. It will be called for each parsed `Node` from the content and should return either a `Component` to override this node or `null` otherwise.
+
+<Info>
+For more information on what a `Node` is and how to use it, check out the [Page Parsing](/content/concepts/page_parsing) docs.
+</Info>
+
+For example, to override the standard `blockquote` markdown syntax, write the following:
+
+```dart
+@override
+Component? create(Node node, NodesBuilder builder) {
+  if (node case ElementNode(tag: 'blockquote', :List<Node>? children)) {
+    return Card(child: builder.build(children));
+  }
+  return null;
+}
+```
+
+<Info>
+You can also use this in combination with custom markdown syntaxes. Checkout the [Markdown Parsing](/content/concepts/page_parsing#markdown) docs for more info.
+</Info>
+
+## Layouts
+
+So far we only covered how to customize the main content of a page. However a website usually consists of other parts as well, like headers, footers, sidebars or other ui before or after the content. This is where [PageLayouts](/content/concepts/page_layouts) come into play.
+
+Layouts define the structure of your pages and provide a consistent look and feel across your site. They can include headers, footers, sidebars, and other ui around your content. You can choose one of the **built-in layouts** or **create your own**.
+
+### Built-in Layouts
+
+Jaspr comes with two built-in layouts:
+
+- [DocsLayout](/content/layouts/docs_layout): A beautiful documentation layout with a sidebar, header and table of contents.
+- [BlogLayout](/content/layouts/blog_layout): A clean and minimal blog layout with a header and title block.
+
+To use a layout, simply add it to the page configuration like this:
+
+```dart
+ContentApp(
+  ...
+  layouts: [
+    DocsLayout(
+      ...
+    )
+  ]
+);
+```
+
+Both layouts have additional properties to configure their appearance.
+
+## Create Custom Layouts
+
+You can create your own layouts by implementing the `PageLayout` interface or by extending the `PageLayoutBase` class. This allows for full control over the structure and appearance of your pages.
+
+A custom layout typically involves:
+1.  Defining a unique `name` (pattern) to be used in frontmatter.
+2.  Optionally overriding `buildHead` to add custom meta tags, styles, or scripts.
+3.  Implementing `buildBody` to structure the page, incorporating the main `child` content alongside custom elements like headers, footers, or sidebars.
+
+```dart title="lib/my_custom_layout.dart"
+import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_content/jaspr_content.dart';
+
+class MyCustomLayout extends PageLayoutBase {
+  const MyCustomLayout();
+
+  @override
+  Pattern get name => 'my_custom_layout_name'; // To be used in frontmatter.
+
+  @override
+  Iterable<Component> buildHead(Page page) sync* {
+    yield* super.buildHead(page); // Add common meta tags.
+    // Add custom styles or scripts here
+  }
+
+  @override
+  Component buildBody(Page page, Component child) {
+    return div(classes: 'custom_layout', [
+      // Add a custom header, nav, etc.
+      main_([child]), // Main content
+      // Add a custom footer
+    ]);
+  }
+}
+```
+
+Then, register your custom layout in your `ContentApp` configuration:
+
+```dart
+ContentApp(
+  // ...
+  layouts: [
+    MyCustomLayout(),
+    // other layouts
+  ],
+)
+```
+
+<Info>
+For a more detailed guide on creating custom layouts, including how to add a table of contents and use layout components, refer to the [Page Layouts](/content/concepts/page_layouts) documentation.
+</Info>
+
+## Theming
+
+Theming allows you to customize the colors, typography, and overall look of your site.
+The `ContentTheme` class provides a way to define colors and other visual properties:
+
+```dart
+// Theming needs a separate import.
+import 'package:jaspr_content/theme.dart';
+
+// ...
+
+ContentApp(
+  theme: ContentTheme(
+    // Primary color for buttons, links, etc.
+    primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
+    
+    // Background color for the site
+    background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
+  ),
+)
+```
+
+The `ThemeColor` class allows you to specify different colors for light and dark modes, which work with the built-in [Theme Toggle](/content/concepts/page_layouts#themetoggle) component.
+
+You can also:
+
+- change content specific colors from `ContentColors`
+- add your own theme-aware `ColorToken`
+- pick any color from `ThemeColors`
+
+```dart
+// Define your token with light and dark colors.
+final myColorToken = ColorToken('myToken', ThemeColors.indigo.$500, dark: ThemeColors.indigo.$400);
+
+// ...
+
+// Provide it to ContentTheme
+theme: ContentTheme(
+  colors: [
+    // Add your own color token.
+    myColorToken,
+    // Change the color of an existing token.
+    ContentColors.quoteBorders.apply(ThemeColors.indigo),
+  ]
+)
+
+// ...
+
+// Use it in your components
+css('.my-component').styles(
+  // A [ColorToken] can be used anywhere a [Color] is expected and automatically respects light and dark mode.
+  backgroundColor: myColorToken, 
+  border: Border(color: ContentColors.quoteBorders)
+),
+```
+
+## Putting It All Together
+
+Here's a complete example that brings together all the customization options:
+
+```dart title="lib/main.dart"
+import 'package:jaspr/server.dart';
+import 'package:jaspr_content/jaspr_content.dart';
+import 'package:jaspr_content/theme.dart';
+
+import 'jaspr_options.dart';
+
+void main() {
+  Jaspr.initializeApp(options: defaultJasprOptions);
+
+  runApp(ContentApp.custom(
+    loaders: [
+      // Load pages from both the 'content/' directory and github repository.
+      FilesystemLoader('content'),
+      GitHubLoader(
+        '<username>/<repo>',
+        accessToken: '...',
+      ),
+    ],
+    // Resolve the same config for all pages.
+    configResolver: PageConfig.all(
+      dataLoaders: [
+        // Load data from the 'content/_data' directory.
+        FilesystemDataLoader('content/_data'),
+      ],
+      // Preprocess files with mustache.
+      templateEngine: MustacheTemplateEngine(),
+      parsers: [
+        // Parse both .html and .md files.
+        HtmlParser(),
+        MarkdownParser(),
+      ],
+      extensions: [
+        // Create a table of contents.
+        TableOfContentsExtension(),
+        // Add heading anchors.
+        HeadingAnchorsExtension(),
+      ],
+      components: {
+        // Support <Info>, <Warning>, <Error> and <Success> components.
+        Callout(),
+        // Support zoomable images with captions.
+        Image(zoom: true),
+        // Add syntax highlighting and copy button to code blocks.
+        CodeBlock(),
+        // Add a custom <Card> component.
+        CustomComponent(
+          pattern: 'Card',
+          builder: (_, __, child) => Card(child: child),
+        ),
+      }
+      layouts: [
+        // Render content in a docs layout with header and sidebar.
+        DocsLayout(
+          favicon: 'favicon.ico',
+          header: Header(
+            title: 'My Docs',
+            logo: 'assets/logo.png',
+            items: [
+              // Support toggling between light and dark mode.
+              ThemeToggle(),
+              // Show a github button with live stars and forks count.
+              GitHubButton(repo: '<username>/<repo>'),
+            ]
+          ),
+          sidebar: Sidebar(groups: [
+            // Render sidebar links.
+            SidebarGroup(
+              links: [
+                SidebarLink(text: "Overview", href: '/'),
+                SidebarLink(text: "About", href: '/about'),
+              ],
+            ),
+            SidebarGroup(title: 'Get Started', links: [
+              SidebarLink(text: "Installation", href: '/get_started/installation'),
+              SidebarLink(text: "Quick Start", href: '/get_started/quick_start'),
+            ]),
+          ]),
+        ),
+      ],
+      // Set custom theme colors.
+      theme: ContentTheme(
+        primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
+        background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
+      ),
+    ),
+  ));
+}
+```
+
+This configuration creates a comprehensive content site with:
+
+- Content loaded from both the local filesystem and a GitHub repository
+- Frontmatter data in all files with additional data from JSON/YAML files
+- Content parsed from markdown and HTML files
+- A table of contents automatically generated from headings
+- Anchor links for each heading for easy linking
+- Custom components like callout boxes, zoomable images and syntax highlighting in code blocks.
+- A documentation layout with header, theme toggle, GitHub button, and sidebar navigation.
+- Custom primary and background colors with light and dark variants.
+
+By combining these customization options, you can create a unique and feature-rich content site that matches your brand and meets your specific requirements.
+
+---
+
+Proceed to the [Assembling the Site](/content/guides/assembling_the_site) guide to learn how to finalize your site and deploy it to various hosting platforms.

@@ -1,0 +1,103 @@
+---
+title: Docs Layout
+description: A beautiful documentation layout with a sidebar, header and table of contents.
+---
+
+---
+
+The `DocsLayout` provides a beautiful layout for documentation sites.
+
+It looks like this:
+
+<Image src="/content/assets/docs_dark.png" zoom theme="light" width="600" caption="Docs Layout (Dark Theme)" />
+<Image src="/content/assets/docs_light.png" zoom theme="dark" width="600" caption="Docs Layout (Light Theme)" />
+
+<Info>
+Tip: Toggle the theme on this page to see the light / dark mode variant of this layout.
+</Info>
+
+The example above is achieved using the following content and code:
+
+```markdown title="content/index.md"
+---
+title: "Jaspr Docs"
+description: "Documentation for Jaspr"
+---
+
+Welcome to the Jaspr documentation! This guide is designed to help you understand and effectively use Jaspr, a powerful framework for building modern web applications. [...]
+
+## Features
+
+Jaspr provides a robust set of tools and features to create dynamic, high-performance web applications. With its intuitive design and developer-friendly approach, Jaspr simplifies the process of building scalable and maintainable projects. [...]
+
+<Info>
+We encourage you to explore the sections of this documentation at your own pace. [...]
+</Info>
+````
+
+```dart title="lib/main.dart"
+ContentApp(
+  parsers: [
+    MarkdownParser(),
+  ],
+  extensions: [
+    TableOfContentsExtension(),
+  ],
+  components: [
+    Callout()
+  ],
+  layouts: [
+    DocsLayout(
+      header: Header(
+        title: 'Jaspr',
+        logo: 'https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo.png',
+        items: [
+          ThemeToggle(),
+          GitHubButton(repo: 'schultek/jaspr'),
+        ],
+      ),
+      sidebar: Sidebar(groups: [
+        SidebarGroup(
+          links: [
+            SidebarLink(text: "Overview", href: '/'),
+          ],
+        ),
+        SidebarGroup(title: 'Get Started', links: [
+          SidebarLink(text: "Quickstart", href: '/get_started/quick_start'),
+          SidebarLink(text: "Installation", href: '/get_started/installation'),
+        ]),
+      ]),
+    ),
+  ]
+)
+```
+
+## Usage
+
+The `DocsLayout` takes the following parameters:
+
+<Card>
+  <Property name="sidebar" type="Component?">
+    The sidebar component to render on the page, usually a `Sidebar`.
+  </Property>
+
+  ---
+
+  <Property name="header" type="Component?">
+    The header component to render on the page, usually a `Header`.
+  </Property>
+
+  ---
+
+  <Property name="footer" type="Component?">
+    An optional footer component to render below the content.
+  </Property>
+</Card>
+
+### Table of Contents
+
+This layout supports the `TableOfContentsExtension()`. When used, it will render a table of contents on the right side of the content, as can be seen above.
+
+## Meta
+
+The layout also adds appropriate meta tags to the `<head>` of the page, like `title`, `description`, `keywords` and more. For more info, read the [Page Layouts](/content/concepts/page_layouts) docs.

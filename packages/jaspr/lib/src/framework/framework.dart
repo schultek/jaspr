@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-library framework;
+library;
 
 import 'dart:async';
 import 'dart:collection';
@@ -1063,7 +1063,8 @@ abstract class Element implements BuildContext {
 
   void updateLastChild(Element? child) {
     _lastChild = child;
-    _lastRenderObjectElement = _lastChild?._lastRenderObjectElement;
+    _lastRenderObjectElement =
+        _lastChild?._lastRenderObjectElement ?? _lastChild?._prevSibling?._lastRenderObjectElement;
     if (_parent?._lastChild == this && _parent?._lastRenderObjectElement != _lastRenderObjectElement) {
       _parent!.updateLastChild(this);
     }

@@ -57,3 +57,27 @@ class TestState<T> extends State<TestComponent> {
     yield* component.build(context, value);
   }
 }
+
+// ignore: must_be_immutable
+class FakeComponent implements ProxyComponent {
+  FakeComponent({this.key, this.children = const []});
+
+  @override
+  Component? get child => null;
+
+  @override
+  List<Component> children;
+
+  late ProxyElement _element;
+
+  @override
+  ProxyElement createElement() => _element = ProxyElement(this);
+
+  @override
+  final Key? key;
+
+  void updateChildren(List<Component> newChildren) {
+    children = newChildren;
+    _element.markNeedsBuild();
+  }
+}

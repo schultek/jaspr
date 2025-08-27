@@ -3,6 +3,9 @@ include: package:lints/recommended.yaml
 analyzer:
   exclude:
     - build/**
+  plugins:
+    - custom_lint
+
 linter:
   rules:
     file_names: false

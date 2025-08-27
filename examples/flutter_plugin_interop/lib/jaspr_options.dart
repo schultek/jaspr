@@ -1,3 +1,6 @@
+// dart format off
+// ignore_for_file: type=lint
+
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
@@ -20,8 +23,6 @@ import 'package:flutter_plugin_interop/components/app.dart' as prefix0;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(
-  clients: {
-    prefix0.App: ClientTarget<prefix0.App>('components/app'),
-  },
-);
+JasprOptions get defaultJasprOptions => JasprOptions(
+      clients: {prefix0.App: ClientTarget<prefix0.App>('components/app')},
+    );

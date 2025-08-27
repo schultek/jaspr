@@ -60,83 +60,146 @@ class CssUtility {
   }
 
   /// Renders a `@import url(...)` css rule.
+  ///
+  /// The `@import` CSS at-rule is used to import style rules from other valid stylesheets.
   ImportStyleRule import(String url) {
     return ImportStyleRule(url);
   }
 
   /// Renders a `@font-face` css rule.
+  ///
+  /// The `@font-face` CSS at-rule specifies a custom font with which to display text; the font can be loaded from
+  /// either a remote server or a locally-installed font on the user's own computer.
   FontFaceStyleRule fontFace({required String family, FontStyle? style, required String url}) {
     return FontFaceStyleRule(family: family, style: style, url: url);
   }
 
   /// Renders a `@media` css rule.
+  ///
+  /// The `@media` CSS at-rule can be used to apply part of a style sheet based on the result of one or more media
+  /// queries. With it, you specify a media query and a block of CSS to apply to the document if and only if the media
+  /// query matches the device on which the content is being used.
   MediaStyleRule media(MediaQuery query, List<StyleRule> styles) {
     return MediaStyleRule(query: query, styles: styles);
   }
 
   /// Renders a `@layer` css rule.
+  ///
+  /// The `@layer` CSS at-rule is used to declare a cascade layer and can also be used to define the order of
+  /// precedence in case of multiple cascade layers.
   LayerStyleRule layer(List<StyleRule> styles, {String? name}) {
     return LayerStyleRule(name: name, styles: styles);
   }
 
   /// Renders a `@supports` css rule.
+  ///
+  /// The `@supports` CSS at-rule lets you specify CSS declarations that depend on a browser's support for CSS
+  /// features. Using this at-rule is commonly called a feature query. The rule must be placed at the top level of
+  /// your code or nested inside any other conditional group at-rule.
   SupportsStyleRule supports(String condition, List<StyleRule> styles) {
     return SupportsStyleRule(condition: condition, styles: styles);
   }
 
   /// Renders a `@keyframes` css rule.
+  ///
+  /// The `@keyframes` CSS at-rule controls the intermediate steps in a CSS animation sequence by defining styles for
+  /// keyframes (or waypoints) along the animation sequence. This gives more control over the intermediate steps of
+  /// the animation sequence than transitions.
   KeyframesStyleRule keyframes(String name, Map<String, Styles> styles) {
     return KeyframesStyleRule(name: name, styles: styles);
   }
 }
 
 class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
-  NestedStyleRule._(Selector selector, Styles styles, this._children)
-      : _self = BlockStyleRule(selector: selector, styles: styles);
+  NestedStyleRule._(this._selector, this._styles, this._children);
 
-  final BlockStyleRule _self;
+  final Selector _selector;
+  final Styles _styles;
   final List<StyleRule> _children;
 
   @override
   NestedStyleRule combine(Styles styles) {
-    return NestedStyleRule._(_self.selector, _self.styles.combine(styles), _children);
+    return NestedStyleRule._(_selector, _styles.combine(styles), _children);
   }
 
   @override
-  String toCss([String indent = '', String parent = '']) {
+  String toCss([String indent = '']) {
     var rules = <String>[];
 
-    var self = _self;
-    var curr = self.selector.selector.startsWith('&') || parent.isEmpty
-        ? self.selector.selector.replaceAll('&', parent)
-        : '$parent ${self.selector.selector}';
-
-    if (_self.styles.properties.isNotEmpty) {
-      rules.add(_self._toCssWithParent(indent, parent));
-    }
-
-    for (var child in _children) {
-      if (child is NestedStyleRule) {
-        rules.add(child.toCss(indent, curr));
-      } else if (child is BlockStyleRule) {
-        rules.add(child._toCssWithParent(indent, curr));
-      } else {
-        throw UnsupportedError('Cannot nest ${child.runtimeType} inside other StyleRule.');
-      }
+    for (var rule in resolve('')) {
+      rules.add(rule.toCss(indent));
     }
 
     return rules.join(cssPropSpace);
   }
 }
 
-extension on BlockStyleRule {
-  String _toCssWithParent(String indent, String parent) {
-    var child = BlockStyleRule(
-      selector: Selector(selector.selector.startsWith('&') || parent.isEmpty
-          ? selector.selector.replaceAll('&', parent)
-          : '$parent ${selector.selector}'),
-      styles: styles,
+extension on Selector {
+  Selector resolve(String parent) {
+    return Selector(
+      selector.startsWith('&') || parent.isEmpty ? selector.replaceAll('&', parent) : '$parent $selector',
     );
-    return child.toCss(indent);
+  }
+}
+
+extension StyleRuleResolve on StyleRule {
+  List<StyleRule> resolve(String parent) {
+    var self = this;
+    return switch (self) {
+      NestedStyleRule() => self._resolve(parent),
+      BlockStyleRule() => [self._resolve(parent)],
+      MediaStyleRule() => [self._resolve(parent)],
+      LayerStyleRule() => [self._resolve(parent)],
+      SupportsStyleRule() => [self._resolve(parent)],
+      _ => throw UnsupportedError('Cannot nest ${self.runtimeType} inside other StyleRule.'),
+    };
+  }
+}
+
+extension on NestedStyleRule {
+  List<StyleRule> _resolve(String parent) {
+    var rules = <StyleRule>[];
+
+    var selector = _selector.resolve(parent);
+
+    if (_styles.properties.isNotEmpty) {
+      rules.add(StyleRule(selector: selector, styles: _styles));
+    }
+
+    for (var child in _children) {
+      rules.addAll(child.resolve(selector.selector));
+    }
+
+    return rules;
+  }
+}
+
+extension on BlockStyleRule {
+  StyleRule _resolve(String parent) {
+    return BlockStyleRule(selector: selector.resolve(parent), styles: styles);
+  }
+}
+
+extension on MediaStyleRule {
+  StyleRule _resolve(String parent) {
+    return MediaStyleRule(query: query, styles: [
+      for (var style in styles) ...style.resolve(parent),
+    ]);
+  }
+}
+
+extension on LayerStyleRule {
+  StyleRule _resolve(String parent) {
+    return LayerStyleRule(name: name, styles: [
+      for (var style in styles) ...style.resolve(parent),
+    ]);
+  }
+}
+
+extension on SupportsStyleRule {
+  StyleRule _resolve(String parent) {
+    return SupportsStyleRule(condition: condition, styles: [
+      for (var style in styles) ...style.resolve(parent),
+    ]);
   }
 }

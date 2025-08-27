@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 import 'package:path/path.dart' as path;
@@ -29,21 +29,17 @@ class ImportsModuleBuilder implements Builder {
       var outputId = buildStep.inputId.changeExtension('.imports.json');
       var partId = buildStep.inputId.changeExtension('.imports.dart');
 
-      var import = lib.definingCompilationUnit.libraryImports
-          .cast<Element>()
-          .followedBy(lib.definingCompilationUnit.libraryExports)
-          .where((Element e) => importChecker.hasAnnotationOf(e))
-          .where((Element e) {
-        var uri = switch (e) {
-          LibraryImportElement() => e.uri,
-          LibraryExportElement() => e.uri,
-          _ => null,
-        };
+      var import = lib.firstFragment.libraryImports2
+          .cast<ElementDirective>()
+          .followedBy(lib.firstFragment.libraryExports2)
+          .where((ElementDirective e) => importChecker.firstAnnotationOf(e) != null)
+          .where((ElementDirective e) {
+        var uri = e.uri;
         if (uri is DirectiveUriWithRelativeUriString && uri.relativeUriString == path.basename(partId.path)) {
           return true;
         }
         log.severe('@Import must only be applied to the respective "<filename>.imports.dart" import of a library. '
-            'Instead found it on "${uri.toString()}" in library ${lib.source.uri.toString()}.');
+            'Instead found it on "${uri.toString()}" in library ${lib.firstFragment.source.uri.toString()}.');
         return false;
       }).firstOrNull;
 
