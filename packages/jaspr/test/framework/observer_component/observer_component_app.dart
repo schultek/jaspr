@@ -19,8 +19,8 @@ class App extends TestComponent<ObserverParam> {
   final child = div([MyChildComponent(value: false)]);
 
   @override
-  Iterable<Component> build(BuildContext context, ObserverParam value) sync* {
-    yield MyObserverComponent(
+  Component build(BuildContext context, ObserverParam value) {
+    return MyObserverComponent(
       value: value,
       child: value.renderBoth
           ? MyObserverComponent(
@@ -90,8 +90,8 @@ class MyChildState extends State<MyChildComponent> with TrackStateLifecycle<MyCh
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield* super.build(context);
-    yield Text('Leaf ${component.value} ${notifier.value}');
+  Component build(BuildContext context) {
+    trackBuild();
+    return Text('Leaf ${component.value} ${notifier.value}');
   }
 }

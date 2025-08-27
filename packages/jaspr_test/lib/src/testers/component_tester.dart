@@ -66,7 +66,9 @@ class ComponentTester {
   /// Simulates [event] on the given element.
   void dispatchEvent(Finder finder, String event, [web.Event? data]) {
     var renderObject = _findDomElement(finder).renderObject as TestRenderObject;
-    renderObject.events?[event]?.call(data ?? web.Event(event));
+    if (renderObject is TestRenderElement) {
+      renderObject.events?[event]?.call(data ?? web.Event(event));
+    }
   }
 
   DomElement _findDomElement(Finder finder) {
@@ -138,14 +140,6 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
 }
 
 class TestRenderObject extends RenderObject {
-  String? tag;
-  String? id;
-  String? classes;
-  Map<String, String>? styles;
-  Map<String, String>? attributes;
-  Map<String, EventCallback>? events;
-  String? text;
-  bool? rawHtml;
   List<TestRenderObject> children = [];
 
   @override
@@ -154,32 +148,18 @@ class TestRenderObject extends RenderObject {
   web.Node? get node => null;
 
   @override
-  RenderObject createChildRenderObject() {
-    return TestRenderObject()..parent = this;
+  TestRenderElement createChildRenderElement(String tag) {
+    return TestRenderElement(tag)..parent = this;
   }
 
   @override
-  void updateElement(String tag, String? id, String? classes, Map<String, String>? styles,
-      Map<String, String>? attributes, Map<String, EventCallback>? events) {
-    this
-      ..tag = tag
-      ..id = id
-      ..classes = classes
-      ..styles = styles
-      ..attributes = attributes
-      ..events = events;
+  TestRenderFragment createChildRenderFragment() {
+    return TestRenderFragment()..parent = this;
   }
 
   @override
-  void updateText(String text, [bool rawHtml = false]) {
-    this
-      ..text = text
-      ..rawHtml = rawHtml;
-  }
-
-  @override
-  void skipChildren() {
-    // noop
+  TestRenderText createChildRenderText(String text) {
+    return TestRenderText(text)..parent = this;
   }
 
   @override
@@ -201,3 +181,41 @@ class TestRenderObject extends RenderObject {
     child.parent = null;
   }
 }
+
+class TestRenderElement extends TestRenderObject implements RenderElement {
+  TestRenderElement(this.tag);
+
+  final String tag;
+  String? id;
+  String? classes;
+  Map<String, String>? styles;
+  Map<String, String>? attributes;
+  Map<String, EventCallback>? events;
+
+  @override
+  void update(String? id, String? classes, Map<String, String>? styles, Map<String, String>? attributes,
+      Map<String, EventCallback>? events) {
+    this
+      ..id = id
+      ..classes = classes
+      ..styles = styles
+      ..attributes = attributes
+      ..events = events;
+  }
+}
+
+class TestRenderText extends TestRenderObject implements RenderText {
+  TestRenderText(this.text);
+
+  String text;
+  bool? rawHtml;
+
+  @override
+  void update(String text, [bool rawHtml = false]) {
+    this
+      ..text = text
+      ..rawHtml = rawHtml;
+  }
+}
+
+class TestRenderFragment extends TestRenderObject implements RenderFragment {}

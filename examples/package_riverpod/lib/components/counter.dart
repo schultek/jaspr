@@ -13,16 +13,17 @@ class Counter extends StatelessComponent with SyncProviderDependencies {
   Iterable<SyncProvider> get preloadDependencies => [initialCountProvider];
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Button(
-      label: 'Click Me',
-      onPressed: () {
-        context.read(countProvider.notifier).state++;
-      },
-    );
-
-    yield span([
-      text('Counter: ${context.watch(countProvider)}'),
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      Button(
+        label: 'Click Me',
+        onPressed: () {
+          context.read(countProvider.notifier).state++;
+        },
+      ),
+      span([
+        text('Counter: ${context.watch(countProvider)}'),
+      ]),
     ]);
   }
 }

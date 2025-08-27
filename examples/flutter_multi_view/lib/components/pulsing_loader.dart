@@ -5,8 +5,8 @@ class PulsingLoader extends StatelessComponent {
   const PulsingLoader({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'loader', []);
+  Component build(BuildContext context) {
+    return div(classes: 'loader', []);
   }
 
   @css

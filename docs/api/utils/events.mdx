@@ -7,7 +7,7 @@ title: events()
 You can attach event handlers to every html element like this:
 
 ```dart title="Using manual event handlers"
-yield div(events: {
+return div(events: {
   'click': (event) {
     print('Clicked');
   },
@@ -23,7 +23,7 @@ The `events()` utility method provides bindings to some common event types in a 
 type-safe way. The same element from above using the `events()` method looks like this:
 
 ```dart title="Using events utility"
-yield div(events: events(onClick: () {
+return div(events: events(onClick: () {
   print('Clicked');
 }), [text('Click Me')]);
 ```
@@ -59,7 +59,7 @@ It has bindings to the following events:
   - `Null` for all other elements
 
   ```dart
-  yield input(type: InputType.checkbox, events: events(onInput: (bool? value) {
+  return input(type: InputType.checkbox, events: events(onInput: (bool? value) {
     print('Checked: $value');
   }, []);
   ```
@@ -81,7 +81,7 @@ It has bindings to the following events:
   - `Null` for all other elements
 
   ```dart
-  yield textarea(events: events(onChange: (String value) {
+  return textarea(events: events(onChange: (String value) {
     print('Content: $value');
   }, []);
   ```

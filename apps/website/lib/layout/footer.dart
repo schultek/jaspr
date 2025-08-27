@@ -9,8 +9,8 @@ class Footer extends StatelessComponent {
   const Footer({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield footer([
+  Component build(BuildContext context) {
+    return footer([
       div(classes: 'footer-navigation', [
         div([
           Logo(),

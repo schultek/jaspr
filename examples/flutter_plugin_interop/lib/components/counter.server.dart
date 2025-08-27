@@ -4,7 +4,7 @@ class Counter extends StatelessComponent {
   const Counter({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'container', []);
+  Component build(BuildContext context) {
+    return div(classes: 'container', []);
   }
 }

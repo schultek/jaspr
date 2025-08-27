@@ -6,10 +6,9 @@ mixin ComponentsBinding on AppBinding {
   void attachRootComponent(Component app) async {
     var buildOwner = _rootElement?._owner ?? createRootBuildOwner();
 
-    var element = _Root(child: app).createElement();
+    var element = _Root(child: app, rootRenderObject: createRootRenderObject()).createElement();
     element._binding = this;
     element._owner = buildOwner;
-    element._renderObject = createRootRenderObject();
 
     _rootElement = element;
 
@@ -42,16 +41,27 @@ mixin ComponentsBinding on AppBinding {
   }
 }
 
-class _Root extends ProxyComponent {
-  _Root({required Component super.child});
+class _Root extends Component {
+  _Root({required this.child, required this.rootRenderObject});
+
+  final Component child;
+  final RenderObject rootRenderObject;
 
   @override
   _RootElement createElement() => _RootElement(this);
 }
 
-class _RootElement extends ProxyRenderObjectElement {
+class _RootElement extends MultiChildRenderObjectElement {
   _RootElement(_Root super.component);
 
   @override
-  void updateRenderObject() {}
+  List<Component> buildChildren() => [(component as _Root).child];
+
+  @override
+  RenderObject createRenderObject() {
+    return (component as _Root).rootRenderObject;
+  }
+
+  @override
+  void updateRenderObject(_) {}
 }

@@ -37,6 +37,12 @@ class CreateCommand extends BaseCommand {
         'docs': 'A template for creating a documentation site with jaspr_content.',
       },
     );
+    argParser.addFlag(
+      'pub-get',
+      negatable: true,
+      defaultsTo: true,
+      help: 'Run "dart pub get" after creating the project.',
+    );
     argParser.addSeparator('Project Presets:');
     argParser.addOption(
       'mode',
@@ -102,6 +108,8 @@ class CreateCommand extends BaseCommand {
 
   @override
   bool get requiresPubspec => false;
+
+  late final bool runPubGet = argResults!['pub-get'] as bool;
 
   @override
   Future<int> runCommand() async {
@@ -170,10 +178,12 @@ class CreateCommand extends BaseCommand {
     );
     progress.complete('Generated ${files.length} file(s)');
 
-    var process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
+    if (runPubGet) {
+      var process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
 
-    await watchProcess('pub', process,
-        tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s == '...' || s.contains('+'));
+      await watchProcess('pub', process,
+          tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s == '...' || s.contains('+'));
+    }
 
     logger.write('\n'
         'Created project $name! In order to get started, run the following commands:\n\n');
@@ -235,10 +245,12 @@ class CreateCommand extends BaseCommand {
     );
     progress.complete('Generated ${files.length} file(s)');
 
-    var process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
+    if (runPubGet) {
+      var process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
 
-    await watchProcess('pub', process,
-        tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s == '...' || s.contains('+'));
+      await watchProcess('pub', process,
+          tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s == '...' || s.contains('+'));
+    }
 
     logger.write('\n'
         'Created project $name! In order to get started, run the following commands:\n\n');

@@ -14,7 +14,7 @@ final syncMultiSources = {
       @sync
       String? b;
     
-      Iterable<Component> build(BuildContext context) => [];
+      Component build(BuildContext context) => text('');
     }
     
     class Component2 extends StatefulComponent {
@@ -28,7 +28,7 @@ final syncMultiSources = {
       @sync
       String? d;
     
-      Iterable<Component> build(BuildContext context) => [];
+      Component build(BuildContext context) => text('');
     }
   ''',
 };

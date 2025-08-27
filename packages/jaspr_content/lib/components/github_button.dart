@@ -111,8 +111,8 @@ class _GitHubButtonState extends State<GitHubButton> with PreloadStateMixin<GitH
   }
 
   @override
-  Iterable<Component> build(BuildContext _) sync* {
-    yield a(href: 'https://github.com/${component.repo}', target: Target.blank, classes: 'github-button not-content', [
+  Component build(BuildContext _) {
+    return a(href: 'https://github.com/${component.repo}', target: Target.blank, classes: 'github-button not-content', [
       div(classes: 'github-icon', const [
         _GitHubIcon(),
       ]),
@@ -134,8 +134,8 @@ class _GitHubIcon extends StatelessComponent {
   const _GitHubIcon();
 
   @override
-  Iterable<Component> build(BuildContext _) sync* {
-    yield svg(viewBox: '0 0 24 24', attributes: {
+  Component build(BuildContext _) {
+    return svg(viewBox: '0 0 24 24', attributes: {
       'fill': 'currentColor'
     }, [
       path(

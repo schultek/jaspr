@@ -22,8 +22,8 @@ class Particles extends StatelessComponent {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield svg(classes: 'particles', [
+  Component build(BuildContext context) {
+    return svg(classes: 'particles', [
       for (final particle in particles)
         DomComponent(
           key: ValueKey(particle.id),

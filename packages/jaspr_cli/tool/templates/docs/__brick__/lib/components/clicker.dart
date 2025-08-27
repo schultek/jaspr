@@ -14,8 +14,8 @@ class ClickerState extends State<Clicker> {
   int count = 0;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield button(classes: 'clicker', onClick: () {
+  Component build(BuildContext context) {
+    return button(classes: 'clicker', onClick: () {
       setState(() => count++);
     }, [
       text('Click me! ($count)'),

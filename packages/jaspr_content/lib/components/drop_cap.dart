@@ -15,8 +15,8 @@ class DropCap extends StatelessComponent with CustomComponentBase {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield span(classes: 'dropcap', []);
+  Component build(BuildContext context) {
+    return span(classes: 'dropcap', []);
   }
 
   @css

@@ -56,7 +56,7 @@ class ListView extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     final styles = Styles(
       listStyle: marker?.style,
       listImage: marker?.image,
@@ -66,12 +66,12 @@ class ListView extends StatelessComponent {
     );
 
     if (type == ListType.unordered) {
-      yield ul(
+      return ul(
         styles: styles,
         children,
       );
     } else {
-      yield ol(
+      return ol(
         styles: styles,
         children,
       );
@@ -88,7 +88,7 @@ class ListItem extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield li(children);
+  Component build(BuildContext context) {
+    return li(children);
   }
 }

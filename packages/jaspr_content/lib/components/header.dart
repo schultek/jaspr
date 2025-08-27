@@ -27,18 +27,19 @@ class Header extends StatelessComponent {
   final List<Component> items;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Document.head(children: [
-      Style(styles: _styles),
-    ]);
-
-    yield header(classes: 'header', [
-      ...leading,
-      a(classes: 'header-title', href: '/', [
-        img(src: logo, alt: 'Logo'),
-        span([text(title)]),
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      Document.head(children: [
+        Style(styles: _styles),
       ]),
-      div(classes: 'header-items', items),
+      header(classes: 'header', [
+        ...leading,
+        a(classes: 'header-title', href: '/', [
+          img(src: logo, alt: 'Logo'),
+          span([text(title)]),
+        ]),
+        div(classes: 'header-items', items),
+      ]),
     ]);
   }
 

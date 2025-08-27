@@ -88,7 +88,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   @override
   RenderObject createRootRenderObject() {
-    return MarkupRenderObject();
+    return RootMarkupRenderObject();
   }
 
   @override

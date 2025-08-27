@@ -16,6 +16,9 @@ class MockRenderObjectBinding extends TestComponentsBinding {
 }
 
 class MockRenderObject extends Mock implements RenderObject {}
+class MockRenderElement extends MockRenderObject implements RenderElement {}
+class MockRenderText extends MockRenderObject implements RenderText {}
+class MockRenderFragment extends MockRenderObject implements RenderFragment {}
 
 final mockChildren = Expando<List<MockRenderObject>>();
 
@@ -27,8 +30,20 @@ extension MockChildren on MockRenderObject {
 }
 
 void autoMockChildren(MockRenderObject renderObject) {
-  when(() => renderObject.createChildRenderObject()).thenAnswer((_) {
-    final child = MockRenderObject();
+  when(() => renderObject.createChildRenderElement(any())).thenAnswer((_) {
+    final child = MockRenderElement();
+    when(() => child.parent).thenReturn(renderObject);
+    autoMockChildren(child);
+    return child;
+  });
+  when(() => renderObject.createChildRenderText(any())).thenAnswer((_) {
+    final child = MockRenderText();
+    when(() => child.parent).thenReturn(renderObject);
+    autoMockChildren(child);
+    return child;
+  });
+  when(() => renderObject.createChildRenderFragment()).thenAnswer((_) {
+    final child = MockRenderFragment();
     when(() => child.parent).thenReturn(renderObject);
     autoMockChildren(child);
     return child;

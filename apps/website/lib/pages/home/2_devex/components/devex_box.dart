@@ -16,8 +16,8 @@ class DevexBox extends StatelessComponent {
   final Component preview;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'feature-box', [
+  Component build(BuildContext context) {
+    return div(classes: 'feature-box', [
       div(classes: 'feature-preview', [preview]),
       div(classes: 'feature-info', [
         span(classes: 'caption2 text-gradient', [text(caption)]),

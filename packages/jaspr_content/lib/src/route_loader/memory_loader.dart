@@ -134,14 +134,14 @@ class _BuilderPage extends Page {
   @override
   Future<Component> render() async {
     await loadData();
-    return Builder.single(builder: (context) {
+    return Builder(builder: (context) {
       if (kGenerateMode) {
         if (data.page['sitemap'] case final sitemap?) {
           context.setHeader('jaspr-sitemap-data', jsonEncode(sitemap));
         }
       }
 
-      final child = Builder.single(builder: builder);
+      final child = Builder(builder: builder);
 
       if (applyLayout) {
         final layout = buildLayout(child);

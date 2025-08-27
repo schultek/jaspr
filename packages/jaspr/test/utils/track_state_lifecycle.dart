@@ -33,9 +33,7 @@ mixin TrackStateLifecycle<T extends StatefulComponent> on State<T> {
     super.didChangeDependencies();
   }
 
-  @override
-  @mustCallSuper
-  Iterable<Component> build(BuildContext context) sync* {
+  void trackBuild() {
     lifecycle.add('build');
   }
 

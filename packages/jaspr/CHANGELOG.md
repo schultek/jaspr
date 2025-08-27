@@ -1,4 +1,8 @@
-## Unreleased minor
+## Unreleased breaking
+
+**Read the full [Release Notes](https://docs.jaspr.site/releases/v/0.21.0) for this version.**
+
+- **Breaking** Changed all `build()` methods and `builder` functions to return a single `Component` instead of `Iterable<Component>`. Use `jaspr migrate` to migrate automatically after updating.
 
 - Allow setting `Document(base: )` to `null`, and fix the path to the generated client script when no `<base>` element exists.
 - Added `--include-source-maps` option to `jaspr build` command.

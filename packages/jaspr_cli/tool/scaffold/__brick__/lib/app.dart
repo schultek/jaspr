@@ -49,15 +49,11 @@ class App extends StatelessComponent {
   const App({super.key});{{/server}}
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     // This method is rerun every time the component is rebuilt.
-    //
-    // Each build method can return multiple child components as an [Iterable]. The recommended approach
-    // is using the [sync* / yield] syntax for a streamlined control flow, but its also possible to simply
-    // create and return a [List] here.
-
+    
     // Renders a <div class="main"> html element with children.
-    yield div(classes: 'main', [{{#routing}}{{#multipage}}
+    return div(classes: 'main', [{{#routing}}{{#multipage}}
       const Header(),{{/multipage}}
       Router(routes: [{{#multipage}}
         Route(path: '/', title: 'Home', builder: (context, state) => const Home()),

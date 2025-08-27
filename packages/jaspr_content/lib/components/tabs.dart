@@ -30,7 +30,7 @@ class Tabs implements CustomComponent {
             TabItem(
               label: tab.attributes['label'] ?? '',
               value: tab.attributes['value'] ?? '',
-              child: builder.build(tab.children) ?? const Text(''),
+              child: builder.build(tab.children),
             ),
         ],
       );
@@ -59,9 +59,9 @@ class _Tabs extends StatelessComponent {
   final List<TabItem> items;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     final initialValue = defaultValue ?? items.first.value;
-    yield div(classes: 'tabs', [
+    return div(classes: 'tabs', [
       TabBar(initialValue: initialValue, items: {for (var item in items) item.value: item.label}),
       div([
         for (var item in items)
@@ -93,8 +93,10 @@ class TabItem extends StatelessComponent {
   final Component child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield span(classes: 'tab-item', [text(label)]);
-    yield child;
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      span(classes: 'tab-item', [text(label)]),
+      child,
+    ]);
   }
 }

@@ -246,8 +246,8 @@ import 'package:jaspr_router/jaspr_router.dart';
 
 class HomePage extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield h1([text('Welcome to My Custom Site!')]);
+  Component build(BuildContext context) {
+    return h1([text('Welcome to My Custom Site!')]);
   }
 }
 
