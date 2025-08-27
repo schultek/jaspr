@@ -336,7 +336,8 @@ class InspectData {
 
   bool isComponent(ClassElement2 clazz) {
     return clazz.allSupertypes.any((e) =>
-        e.element3.name3 == 'Component' && e.element3.library2.identifier == 'package:jaspr/src/framework/framework.dart');
+        e.element3.name3 == 'Component' &&
+        e.element3.library2.identifier == 'package:jaspr/src/framework/framework.dart');
   }
 
   bool hasClientAnnotation(ClassElement2 clazz) {

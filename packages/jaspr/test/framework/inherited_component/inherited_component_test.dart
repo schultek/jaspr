@@ -7,7 +7,6 @@ import 'package:jaspr_test/jaspr_test.dart';
 import '../../utils/test_component.dart';
 import '../../utils/track_state_lifecycle.dart';
 
-
 class MyInheritedComponent extends InheritedComponent {
   MyInheritedComponent({required this.value, required super.child});
 
@@ -42,12 +41,11 @@ class MyChildState extends State<MyChildComponent> with TrackStateLifecycle<MyCh
   }
 }
 
-
 void main() {
   group('inherited component test', () {
     testComponents('should inherit component', (tester) async {
       final component = FakeComponent(child: MyInheritedComponent(value: 0, child: const MyChildComponent()));
-      
+
       tester.pumpComponent(component);
 
       // phase 1: inherited component should be mounted
