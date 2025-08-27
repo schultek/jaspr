@@ -172,3 +172,46 @@ class Gap {
     }
   }
 }
+
+enum JustifyItems {
+  // Basic keywords/values
+  normal('normal'),
+  stretch('stretch'),
+
+  // Positional alignment
+  center('center'),
+  start('start'),
+  end('end'),
+  flexStart('flex-start'),
+  flexEnd('flex-end'),
+  selfStart('self-start'),
+  selfEnd('self-end'),
+  left('left'),
+  right('right'),
+  anchorCenter('anchor-center'),
+
+  // Baseline alignment
+  baseline('baseline'),
+  firstBaseline('first baseline'),
+  lastBaseline('last baseline'),
+
+  // Overflow alignment
+  safeCenter('safe center'),
+  unsafeCenter('unsafe center'),
+
+  // Legacy alignment
+  legacyRight('legacy right'),
+  legacyLeft('legacy left'),
+  legacyCenter('legacy center'),
+
+  // Global values
+  inherit('inherit'),
+  initial('initial'),
+  revert('revert'),
+  revertLayer('revert-layer'),
+  unset('unset');
+
+  /// The css value
+  final String value;
+  const JustifyItems(this.value);
+}

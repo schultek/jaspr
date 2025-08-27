@@ -10,6 +10,8 @@
 - Update `build` dependency to 3.0.0 and migrate to new analyzer model.
 - Added `jaspr tooling-daemon` command and component scope analysis.
 
+- Added `JustifyItems`, `JustifySelf` and `AlignContent` enums and style properties.
+
 ## 0.20.0
 
 - **Breaking**: Removed the children parameter from `input` and `col` methods as
