@@ -48,6 +48,11 @@
       "id": "content",
       "title": "Content",
       "href": "/content"
+    },
+    {
+      "id": "blog",
+      "title": "Blog",
+      "href": "/blog"
     }
   ],
   "sidebar": [
@@ -194,6 +199,10 @@
           "href": "/api/components/document"
         },
         {
+          "title": "Fragment",
+          "href": "/api/components/fragment"
+        },
+        {
           "title": "RawText",
           "href": "/api/components/raw_text"
         },
@@ -220,10 +229,6 @@
         {
           "title": "FlutterEmbedView",
           "href": "/api/components/flutter_embed_view"
-        },
-        {
-          "title": "Fragment",
-          "href": "/api/components/fragment"
         }
       ]
     },
@@ -441,6 +446,20 @@
         {
           "title": "PostBreak",
           "href": "/content/components/post_break"
+        }
+      ]
+    },
+    {
+      "tab": "blog",
+      "group": "Releases",
+      "pages": [
+        {
+          "title": "0.21.0",
+          "href": "/blog/releases/v/0.21.0"
+        },
+        {
+          "title": "\uD83E\uDD4A Jaspr vs Flutter Web",
+          "href": "/jaspr-vs-flutter-web"
         }
       ]
     }

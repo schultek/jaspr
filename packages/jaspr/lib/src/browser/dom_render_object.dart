@@ -259,6 +259,13 @@ class DomRenderFragment extends DomRenderObject
     return firstChild?.node;
   }
 
+  web.Node? get lastChildNode {
+    if (lastChild case DomRenderFragment c) {
+      return c.lastChildNode;
+    }
+    return lastChild?.node;
+  }
+
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
     attachChild(child, after, startNode: firstChildNode?.previousSibling);
@@ -276,7 +283,7 @@ class DomRenderFragment extends DomRenderObject
     assert(isAttached, 'Cannot move fragment that is not attached to a parent.');
 
     if (kVerboseMode) {
-      print("Move fragment $this to $targetNode after $afterNode");
+      print("Move fragment $node to $targetNode after $afterNode");
     }
 
     if (firstChildNode == null) {
@@ -284,13 +291,13 @@ class DomRenderFragment extends DomRenderObject
       return;
     }
 
-    assert(lastChild != null, 'Non-empty attached fragments must have a valid last child reference.');
+    assert(lastChildNode != null, 'Non-empty attached fragments must have a valid last child reference.');
 
     if (firstChildNode!.previousSibling == afterNode && firstChildNode!.parentNode == targetNode) {
       return;
     }
 
-    web.Node? currentNode = lastChild?.node;
+    web.Node? currentNode = lastChildNode;
     web.Node? beforeNode = afterNode == null ? targetNode.childNodes.item(0) : afterNode.nextSibling;
 
     // Move nodes in reverse order for efficient insertion.
@@ -306,6 +313,43 @@ class DomRenderFragment extends DomRenderObject
 
     assert(firstChildNode!.previousSibling == afterNode,
         'First child node should have been placed after the specified node.');
+  }
+
+  void removeChildren(DomRenderObject parent) {
+    assert(parent == this.parent, 'Cannot remove fragment from a different parent.');
+    assert(isAttached, 'Cannot remove fragment that is not attached to a parent.');
+
+    if (kVerboseMode) {
+      print("Remove fragment $node from ${parent.node}");
+    }
+
+    if (firstChildNode == null) {
+      // If fragment is empty, nothing to remove.
+      return;
+    }
+
+    assert(lastChildNode != null, 'Non-empty attached fragments must have a valid last child reference.');
+
+    web.Node? currentNode = lastChildNode;
+    web.Node? beforeNode;
+
+    while (currentNode != null) {
+      final prevNode = currentNode != firstChildNode ? currentNode.previousSibling : null;
+
+      assert(currentNode.parentNode == parent.node, 'Fragment child must be a child of the parent.');
+     
+      // Remove from parent, attach back to fragment.
+      node.insertBefore(currentNode, beforeNode);
+
+      beforeNode = currentNode;
+      currentNode = prevNode;
+    }
+
+    assert(firstChildNode == node.childNodes.item(0), 'First child node should be the first child of the fragment.');
+    assert(lastChildNode == node.childNodes.item(node.childNodes.length - 1),
+        'Last child node should be the last child of the fragment.');
+
+    isAttached = false;
   }
 
   @override
@@ -419,8 +463,14 @@ mixin MultiChildDomRenderObject on DomRenderObject {
   }
 
   void removeChild(DomRenderObject child) {
+    if (child case DomRenderFragment(isAttached: true)) {
+      child.removeChildren(this);
+      child.parent = null;
+      return;
+    }
+
     if (kVerboseMode) {
-      print("Remove child $child of $this");
+      print("Remove child ${child.node} of $node");
     }
 
     assert(node == child.node.parentNode, 'Child node must be a child of this element.');

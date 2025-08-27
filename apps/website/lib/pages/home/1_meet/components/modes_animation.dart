@@ -71,7 +71,7 @@ class ModesAnimationState extends State<ModesAnimation> {
 
   @override
   Component build(BuildContext context) {
-    var text = texts[index].$1;
-    return raw(text.substring(0, characters).replaceAll(' ', '&nbsp;'));
+    var t = texts[index].$1;
+    return span(styles: Styles(whiteSpace: WhiteSpace.noWrap), [text(t.substring(0, characters))]);
   }
 }
