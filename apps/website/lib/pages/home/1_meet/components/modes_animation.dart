@@ -70,8 +70,8 @@ class ModesAnimationState extends State<ModesAnimation> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    var text = texts[index].$1;
-    yield raw(text.substring(0, characters).replaceAll(' ', '&nbsp;'));
+  Component build(BuildContext context) {
+    var t = texts[index].$1;
+    return span(styles: Styles(whiteSpace: WhiteSpace.noWrap), [text(t.substring(0, characters))]);
   }
 }

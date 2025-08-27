@@ -12,14 +12,16 @@ class _CounterState extends State<Counter> {
   int counter = 0;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield span([text("Count: $counter ")]);
-    yield button(onClick: () {
-      setState(() {
-        counter++;
-      });
-    }, [
-      text("Increase"),
+  Component build(BuildContext context) {
+    return Fragment(children: [
+      span([text("Count: $counter ")]),
+      button(onClick: () {
+        setState(() {
+          counter++;
+        });
+      }, [
+        text("Increase"),
+      ]),
     ]);
   }
 }

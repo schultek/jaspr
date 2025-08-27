@@ -57,13 +57,13 @@ class CodeBlock implements CustomComponent {
         _initialized = true;
       }
 
-      return AsyncBuilder(builder: (context) async* {
+      return AsyncBuilder(builder: (context) async {
         final highlighter = Highlighter(
           language: language ?? defaultLanguage,
           theme: theme ?? (_defaultTheme ??= await HighlighterTheme.loadDarkTheme()),
         );
 
-        yield _CodeBlock(
+        return _CodeBlock(
           source: children?.map((c) => c.innerText).join(' ') ?? '',
           highlighter: highlighter,
         );
@@ -104,14 +104,14 @@ class _CodeBlock extends StatelessComponent {
   final Highlighter? highlighter;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     final codeblock = pre([
       code([
         if (highlighter != null) buildSpan(highlighter!.highlight(source)) else text(source),
       ])
     ]);
 
-    yield div(classes: 'code-block', [
+    return div(classes: 'code-block', [
       CodeBlockCopyButton(),
       codeblock,
     ]);

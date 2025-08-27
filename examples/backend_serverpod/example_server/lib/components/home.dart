@@ -6,8 +6,8 @@ class Home extends StatelessComponent {
   const Home({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: "content", [
+  Component build(BuildContext context) {
+    return div(classes: "content", [
       div(classes: "logo-box", [
         img(
           src: "/images/serverpod-logo.svg",

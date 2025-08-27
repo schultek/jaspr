@@ -12,12 +12,12 @@ void main() {
     testComponents('listens to provider state', (tester) async {
       int? wasCalledWith;
 
-      tester.pumpComponent(providerApp((context) sync* {
+      tester.pumpComponent(providerApp((context) {
         context.listen<int>(counter, (prev, next) {
           wasCalledWith = next;
         });
 
-        yield Button(
+        return Button(
           label: 'tap',
           onPressed: () {
             context.read(counter.notifier).state++;
@@ -36,12 +36,12 @@ void main() {
     testComponents('re-listens on rebuild', (tester) async {
       List<int> wasCalledWith = [];
 
-      tester.pumpComponent(providerApp((context) sync* {
+      tester.pumpComponent(providerApp((context) {
         context.listen<int>(counter, (prev, next) {
           wasCalledWith.add(next);
         }, fireImmediately: true);
 
-        yield Button(
+        return Button(
           label: '${context.watch(counter)}',
           onPressed: () {
             context.read(counter.notifier).state++;
@@ -60,21 +60,21 @@ void main() {
     testComponents('un-listens on dispose', (tester) async {
       List<int> wasCalledWith = [];
 
-      tester.pumpComponent(providerApp((context) sync* {
+      tester.pumpComponent(providerApp((context) {
         if (context.watch(counter.select((cnt) => cnt < 2))) {
-          yield Builder(
-            builder: (context) sync* {
+          return Builder(
+            builder: (context) {
               context.listen<int>(counter, (prev, next) {
                 wasCalledWith.add(next);
               }, fireImmediately: true);
 
-              yield button(onClick: () {
+              return button(onClick: () {
                 context.read(counter.notifier).state++;
               }, [text('a ${context.watch(counter)}')]);
             },
           );
         } else {
-          yield Button(
+          return Button(
             label: 'b ${context.watch(counter)}',
             onPressed: () {
               context.read(counter.notifier).state++;
@@ -113,14 +113,14 @@ void main() {
         late Element element;
         var shouldListen = true;
 
-        tester.pumpComponent(providerApp((context) sync* {
+        tester.pumpComponent(providerApp((context) {
           if (shouldListen) {
             context.listen(counterB, (_, int value) {
               wasCalledWith.add(value);
             }, fireImmediately: true);
           }
           element = context as Element;
-          yield const Text('test');
+          return const Text('test');
         }));
 
         expect(wasCalledWith, equals([0]));

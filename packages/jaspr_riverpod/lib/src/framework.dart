@@ -206,7 +206,7 @@ class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     assert(() {
       if (component.parent != null) {
         // didUpdateComponent already takes care of component.parent change
@@ -229,7 +229,7 @@ class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin {
       ]);
     }
 
-    yield UncontrolledProviderScope(
+    return UncontrolledProviderScope(
       container: container,
       child: component.child,
     );
@@ -306,13 +306,13 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
   }
 
   @override
-  void mount(Element? parent, Element? prevSibling) {
+  void mount(Element? parent, ElementSlot newSlot) {
     if (kDebugMode) {
       debugCanModifyProviders ??= _debugCanModifyProviders;
     }
 
     component.container.scheduler.flutterVsyncs.add(_jasprVsync);
-    super.mount(parent, prevSibling);
+    super.mount(parent, newSlot);
   }
 
   @override

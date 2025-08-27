@@ -14,7 +14,7 @@ class DomNodeReader extends StatefulComponent {
 
 class _NodeReaderState extends State<DomNodeReader> {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     if (kIsWeb) {
       context.binding.addPostFrameCallback(() {
         void handleChild(Element element) {
@@ -29,6 +29,6 @@ class _NodeReaderState extends State<DomNodeReader> {
       });
     }
 
-    yield component.child;
+    return component.child;
   }
 }

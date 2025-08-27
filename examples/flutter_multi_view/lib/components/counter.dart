@@ -16,8 +16,8 @@ class CounterState extends State<Counter> {
   int count = 0;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'counter-group', styles: Styles(raw: {'view-transition-name': component.name}), [
+  Component build(BuildContext context) {
+    return div(classes: 'counter-group', styles: Styles(raw: {'view-transition-name': component.name}), [
       div(classes: 'counter', [
         button(
           onClick: () {

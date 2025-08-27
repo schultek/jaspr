@@ -23,8 +23,8 @@ class EditorPanelState extends State<EditorPanel> {
   final _editorKey = GlobalKey();
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(id: 'editor-panel', [
+  Component build(BuildContext context) {
+    return div(id: 'editor-panel', [
       div(id: 'editor-panel-header', classes: 'header', [
         nav([
           TabBar(
@@ -49,8 +49,8 @@ class EditorPanelState extends State<EditorPanel> {
           )
         ]),
         div(classes: 'button-group', [
-          Builder(builder: (context) sync* {
-            yield Button(
+          Builder(builder: (context) {
+            return Button(
               id: 'run-button',
               dense: true,
               raised: true,
@@ -66,7 +66,7 @@ class EditorPanelState extends State<EditorPanel> {
       ]),
       OutputSplitView(
         key: ValueKey('output-split'),
-        child: Builder.single(builder: (context) {
+        child: Builder(builder: (context) {
           var activeFile = context.watch(activeDocKeyProvider);
           return div(
             styles: Styles(
@@ -75,7 +75,7 @@ class EditorPanelState extends State<EditorPanel> {
                 flexDirection: FlexDirection.column,
                 flex: Flex(grow: 1)),
             [
-              Builder.single(
+              Builder(
                 key: ValueKey('output-builder'),
                 builder: (context) {
                   var proj = context.watch(editProjectProvider);

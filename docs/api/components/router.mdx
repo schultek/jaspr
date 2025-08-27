@@ -23,8 +23,8 @@ import 'pages/about.dart' ;
 
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Router(routes: [
+  Component build(BuildContext context) {
+    return Router(routes: [
       Route(path: '/', builder: (context, state) => Home()),
       Route(path: '/about', builder: (context, state) => About()),
     ]);
@@ -268,7 +268,7 @@ This is usually done as a performance improvement to estimate when the user is a
 and already load in the needed `.js` files before it is visited.
 
 ```dart
-yield button(
+return button(
   events: {
     'mouseover': (event) {
       Router.of(context).preload('/about');

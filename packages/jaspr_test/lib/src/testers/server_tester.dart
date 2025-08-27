@@ -69,7 +69,7 @@ class ServerTester {
     _handler = ServerApp.createTestHandler(
       (r, render) => render((binding) {
         binding.initializeOptions(options);
-        binding.attachRootComponent(_comp.component ?? Builder(builder: (_) => []));
+        binding.attachRootComponent(_comp.component ?? Fragment(children: []));
       }),
       fileHandler: (Request request) {
         return Response.notFound('Not Found');

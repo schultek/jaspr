@@ -20,7 +20,7 @@ abstract class SecondaryOutput {
 }
 
 class InheritedSecondaryOutput extends InheritedComponent {
-  const InheritedSecondaryOutput({required this.builder, super.child});
+  const InheritedSecondaryOutput({required this.builder, required super.child});
 
   final Component Function(Page) builder;
 

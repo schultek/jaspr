@@ -51,9 +51,9 @@ class HeadingAnchorsExtension implements PageExtension {
       'anchor': 'true'
     }, [
       ElementNode('span', {}, children),
-      ComponentNode(Builder(builder: (context) sync* {
+      ComponentNode(Builder(builder: (context) {
         var route = RouteState.of(context);
-        yield a(href: '${route.path}#$id', [text('#')]);
+        return a(href: '${route.path}#$id', [text('#')]);
       })),
     ]);
   }

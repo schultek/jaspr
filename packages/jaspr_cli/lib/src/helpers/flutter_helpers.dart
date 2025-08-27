@@ -58,7 +58,7 @@ mixin FlutterHelper on BaseCommand {
       workingDirectory: Directory.current.path,
     );
 
-    var target = config!.mode != JasprMode.server ? 'build/jaspr' : 'build/jaspr/web';
+    var target = config.mode != JasprMode.server ? 'build/jaspr' : 'build/jaspr/web';
 
     var moveTargets = [
       'version.json',

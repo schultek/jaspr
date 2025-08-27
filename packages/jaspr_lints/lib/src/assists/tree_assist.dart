@@ -79,9 +79,9 @@ class TreeAssistProvider extends DartAssist {
 
     reporter.createChangeBuilder(priority: 2, message: 'Wrap with Builder').addDartFileEdit((builder) {
       builder.addReplacement(node.sourceRange, (edit) {
-        edit.write('Builder(builder: (context) sync* {\n');
+        edit.write('Builder(builder: (context) {\n');
         edit.write(''.padLeft(lineIndent, ' '));
-        edit.write('  yield ');
+        edit.write('  return ');
         edit.write(lines[0]);
         edit.write(lines.skip(1).map((s) => '\n  $s').join());
         edit.write(';\n${''.padLeft(lineIndent, ' ')}})');
@@ -140,7 +140,7 @@ class TreeAssistProvider extends DartAssist {
           }
         });
       });
-    } else if (node.parent is YieldStatement) {
+    } else if (node.parent is ReturnStatement) {
       reporter.createChangeBuilder(priority: 3, message: 'Remove this component').addDartFileEdit((builder) {
         builder.addReplacement(node.parent!.sourceRange, (edit) {
           for (var child in children) {
@@ -150,7 +150,7 @@ class TreeAssistProvider extends DartAssist {
             if (child != children.first) {
               edit.write(''.padLeft(lineIndent));
             }
-            edit.write('yield $source;');
+            edit.write('return $source;');
             if (child != children.last) {
               edit.write('\n');
             }
@@ -174,8 +174,8 @@ class TreeAssistProvider extends DartAssist {
         edit.write('();\n'
             '\n'
             '  @override\n'
-            '  Iterable<Component> build(BuildContext context) sync* {\n'
-            '    yield ');
+            '  Component build(BuildContext context) {\n'
+            '    return ');
         edit.write(source);
         edit.write(';\n'
             '  }\n}\n');

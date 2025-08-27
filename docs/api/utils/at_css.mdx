@@ -41,8 +41,8 @@ class App extends StatelessComponent {
   const App({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'main', [
+  Component build(BuildContext context) {
+    return div(classes: 'main', [
       p([text('Hello World')]),
     ]);
   }

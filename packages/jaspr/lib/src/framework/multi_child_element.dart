@@ -1,23 +1,9 @@
 part of 'framework.dart';
 
-abstract class ProxyComponent extends Component {
-  const ProxyComponent({
-    this.child,
-    this.children,
-    super.key,
-  }) : assert(child == null || children == null);
-
-  final Component? child;
-  final List<Component>? children;
-
-  @override
-  ProxyElement createElement() => ProxyElement(this);
-}
-
 /// An [Element] that has multiple children based on a proxy list.
-class ProxyElement extends Element {
+abstract class MultiChildElement extends Element {
   /// Creates an element that uses the given component as its configuration.
-  ProxyElement(ProxyComponent super.component);
+  MultiChildElement(super.component);
 
   /// The current list of children of this element.
   ///
@@ -35,8 +21,8 @@ class ProxyElement extends Element {
   bool get debugDoingBuild => false;
 
   @override
-  void mount(Element? parent, Element? prevSibling) {
-    super.mount(parent, prevSibling);
+  void mount(Element? parent, ElementSlot newSlot) {
+    super.mount(parent, newSlot);
     assert(_children == null);
   }
 
@@ -47,17 +33,18 @@ class ProxyElement extends Element {
   }
 
   @override
-  bool shouldRebuild(ProxyComponent newComponent) {
+  bool shouldRebuild(Component newComponent) {
     return true;
   }
+
+  @protected
+  List<Component> buildChildren();
 
   @override
   void performRebuild() {
     _dirty = false;
 
-    var comp = (component as ProxyComponent);
-    var newComponents = comp.children ?? [if (comp.child != null) comp.child!];
-
+    var newComponents = buildChildren();
     _children = updateChildren(_children ?? [], newComponents, forgottenChildren: _forgottenChildren);
     _forgottenChildren.clear();
   }
@@ -79,36 +66,4 @@ class ProxyElement extends Element {
     _forgottenChildren.add(child);
     super.forgetChild(child);
   }
-}
-
-abstract class LeafElement extends Element {
-  LeafElement(super.component);
-
-  @override
-  bool get debugDoingBuild => false;
-
-  @override
-  void mount(Element? parent, Element? prevSibling) {
-    super.mount(parent, prevSibling);
-    assert(_lifecycleState == _ElementLifecycle.active);
-  }
-
-  @override
-  void didMount() {
-    rebuild();
-    super.didMount();
-  }
-
-  @override
-  bool shouldRebuild(Component newComponent) {
-    return false;
-  }
-
-  @override
-  void performRebuild() {
-    _dirty = false;
-  }
-
-  @override
-  void visitChildren(ElementVisitor visitor) {}
 }

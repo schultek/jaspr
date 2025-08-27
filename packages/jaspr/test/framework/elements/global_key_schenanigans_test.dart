@@ -5,12 +5,31 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
 import '../../utils/test_component.dart';
-import 'global_key_schenanigans_app.dart';
+import '../../utils/track_state_lifecycle.dart';
+
+class Child extends StatefulComponent {
+  Child({super.key});
+
+  @override
+  State createState() => ChildState();
+}
+
+class ChildState extends State<Child> with TrackStateLifecycle<Child> {
+  @override
+  Component build(BuildContext context) {
+    trackBuild();
+    return Text('Child');
+  }
+}
 
 void main() {
+  final myKey = GlobalKey();
+
   group('global key schenanigans test', () {
     testComponents('should keep state on reparenting', (tester) async {
-      var controller = tester.pumpTestComponent(App());
+      final component = FakeComponent(child: Child(key: myKey));
+
+      tester.pumpComponent(component);
 
       // phase 1: component should be mounted directly
       expect(find.byType(Child), findsOneComponent);
@@ -23,7 +42,9 @@ void main() {
       state.lifecycle.clear();
 
       // phase 2: component should be mounted as child of a div element
-      await controller.rebuildWith(2);
+      component.updateChild(div([Child(key: myKey)]));
+      await tester.pump();
+
       expect(find.descendant(of: find.tag('div'), matching: find.byType(Child)), findsOneComponent);
 
       // lifecycle: state should be reparented, updated and built again
@@ -31,7 +52,9 @@ void main() {
       state.lifecycle.clear();
 
       // phase 3: component should be unmounted
-      await controller.rebuildWith(3);
+      component.updateChild(text(''));
+      await tester.pump();
+
       expect(find.byType(Child), findsNothing);
 
       // lifecycle: state should be disposed

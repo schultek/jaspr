@@ -19,8 +19,8 @@ class LinkCard extends StatelessComponent {
   final String link;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield a(classes: 'link-card', href: link, [
+  Component build(BuildContext context) {
+    return a(classes: 'link-card', href: link, [
       GradientBorder(
         radius: 12,
         child: div(classes: 'link-card-content', [

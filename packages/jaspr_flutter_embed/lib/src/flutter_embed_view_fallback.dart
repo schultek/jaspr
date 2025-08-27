@@ -39,8 +39,8 @@ class FlutterEmbedView extends StatelessComponent {
   static Future<void> preload() => Future.value();
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
+  Component build(BuildContext context) {
+    return div(
       id: id,
       classes: classes,
       styles: Styles.combine([

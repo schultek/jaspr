@@ -103,8 +103,8 @@ class Home extends StatelessComponent {
   const Home({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: "content", [
+  Component build(BuildContext context) {
+    return div(classes: "content", [
       div(classes: "logo-box", [
         img(
           src: "/images/serverpod-logo.svg",
@@ -157,14 +157,16 @@ class _CounterState extends State<Counter> {
   int counter = 0;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield span([text("Count: $counter ")]);
-    yield button(onClick: () {
-      setState(() {
-        counter++;
-      });
-    }, [
-      text("Increase"),
+  Component build(BuildContext context) {
+    return div([
+      span([text("Count: $counter ")]),
+      button(onClick: () {
+        setState(() {
+          counter++;
+        });
+      }, [
+        text("Increase"),
+      ]),
     ]);
   }
 }

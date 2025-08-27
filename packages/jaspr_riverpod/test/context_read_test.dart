@@ -9,8 +9,8 @@ final counter = StateProvider((ref) => 0);
 void main() {
   group('context.read', () {
     testComponents('returns provider state', (tester) async {
-      tester.pumpComponent(providerApp((context) sync* {
-        yield Text('${context.read(counter)}');
+      tester.pumpComponent(providerApp((context) {
+        return Text('${context.read(counter)}');
       }));
 
       expect(find.text('0'), findsOneComponent);
@@ -18,14 +18,16 @@ void main() {
     });
 
     testComponents('returns overridden provider state', (tester) async {
-      tester.pumpComponent(providerApp((context) sync* {
-        yield Text('a ${context.read(counter)}');
-        yield ProviderScope(
-          overrides: [counter.overrideWith((ref) => 1)],
-          child: Builder(builder: (context) sync* {
-            yield Text('b ${context.read(counter)}');
-          }),
-        );
+      tester.pumpComponent(providerApp((context) {
+        return Fragment(children: [
+          Text('a ${context.read(counter)}'),
+          ProviderScope(
+            overrides: [counter.overrideWith((ref) => 1)],
+            child: Builder(builder: (context) {
+              return Text('b ${context.read(counter)}');
+            }),
+          ),
+        ]);
       }));
 
       expect(find.text('a 0'), findsOneComponent);

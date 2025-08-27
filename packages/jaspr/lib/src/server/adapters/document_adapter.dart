@@ -2,31 +2,28 @@ import '../markup_render_object.dart';
 import '../server_binding.dart';
 
 mixin DocumentStructureMixin on RenderAdapter {
-  (MarkupRenderObject, MarkupRenderObject, MarkupRenderObject) createDocumentStructure(MarkupRenderObject root) {
-    var html = root.children.findWhere((c) => c.tag == 'html')?.node;
+  (MarkupRenderElement, MarkupRenderElement, MarkupRenderElement) createDocumentStructure(MarkupRenderObject root) {
+    var html =
+        root.children.findWhere((c) => c is MarkupRenderElement && c.tag == 'html')?.node as MarkupRenderElement?;
     if (html == null) {
       var range = root.children.range();
       root.children.insertAfter(
-        html = root.createChildRenderObject()
-          ..tag = 'html'
-          ..children.insertNodeAfter(range),
+        html = root.createChildRenderElement('html')..children.insertNodeAfter(range),
       );
     }
 
-    var headNode = html.children.findWhere((c) => c.tag == 'head');
-    var head = headNode?.node;
-    var bodyNode = html.children.findWhere((c) => c.tag == 'body');
-    var body = bodyNode?.node;
+    var headNode = html.children.findWhere((c) => c is MarkupRenderElement && c.tag == 'head');
+    var head = headNode?.node as MarkupRenderElement?;
+    var bodyNode = html.children.findWhere((c) => c is MarkupRenderElement && c.tag == 'body');
+    var body = bodyNode?.node as MarkupRenderElement?;
 
     if (head == null) {
-      head = html.createChildRenderObject()..tag = 'head';
-
+      head = html.createChildRenderElement('head');
+     
       if (body == null) {
         var range = html.children.range();
         html.children.insertAfter(head);
-        html.children.insertBefore(body = html.createChildRenderObject()
-          ..tag = 'body'
-          ..children.insertNodeAfter(range));
+        html.children.insertBefore(body = html.createChildRenderElement('body')..children.insertNodeAfter(range));
       } else {
         html.children.insertAfter(head);
       }
@@ -35,7 +32,7 @@ mixin DocumentStructureMixin on RenderAdapter {
         var rangeBefore = html.children.range(endBefore: headNode);
         var rangeAfter = html.children.range(startAfter: headNode);
 
-        body = html.createChildRenderObject()..tag = 'body';
+        body = html.createChildRenderElement('body');
         body.children
           ..insertNodeAfter(rangeAfter)
           ..insertNodeAfter(rangeBefore);
@@ -52,9 +49,9 @@ class DocumentAdapter extends RenderAdapter with DocumentStructureMixin {
   (MarkupRenderObject, MarkupRenderObject, MarkupRenderObject) apply(MarkupRenderObject root) {
     final (html, head, body) = createDocumentStructure(root);
 
-    var doctype = root.children.findWhere((r) => (r.text?.startsWith('<!DOCTYPE') ?? false) && (r.rawHtml ?? false));
+    var doctype = root.children.findWhere((r) => r is MarkupRenderText && r.text.startsWith('<!DOCTYPE') && r.rawHtml);
     if (doctype == null) {
-      root.children.insertAfter(root.createChildRenderObject()..updateText('<!DOCTYPE html>', true));
+      root.children.insertAfter(root.createChildRenderText('<!DOCTYPE html>', true));
     }
 
     return (html, head, body);

@@ -10,8 +10,8 @@ class GradientBorder extends StatelessComponent {
   final bool fixed;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'gradient-border-container${fixed ? ' fixed' : ''}', [
+  Component build(BuildContext context) {
+    return div(classes: 'gradient-border-container${fixed ? ' fixed' : ''}', [
       div(classes: 'gradient-border', [
         svg(width: 100.percent, height: 100.percent, [
           DomComponent(tag: 'defs', children: [
