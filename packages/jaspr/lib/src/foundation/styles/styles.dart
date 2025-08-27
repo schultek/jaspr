@@ -41,15 +41,18 @@ abstract class Styles with StylesMixin<Styles> {
     FlexWrap? flexWrap,
     JustifyContent? justifyContent,
     AlignItems? alignItems,
+    AlignContent? alignContent,
     // Grid Styles
     GridTemplate? gridTemplate,
     List<TrackSize>? autoRows,
     List<TrackSize>? autoColumns,
     Gap? gap,
+    JustifyItems? justifyItems,
     // Item Styles
     Flex? flex,
     int? order,
     AlignSelf? alignSelf,
+    JustifySelf? justifySelf,
     GridPlacement? gridPlacement,
     // List Styles
     ListStyle? listStyle,
@@ -124,15 +127,18 @@ abstract mixin class StylesMixin<T> {
     FlexWrap? flexWrap,
     JustifyContent? justifyContent,
     AlignItems? alignItems,
+    AlignContent? alignContent,
     // Grid Styles
     GridTemplate? gridTemplate,
     List<TrackSize>? autoRows,
     List<TrackSize>? autoColumns,
     Gap? gap,
+    JustifyItems? justifyItems,
     // Item Styles
     Flex? flex,
     int? order,
     AlignSelf? alignSelf,
+    JustifySelf? justifySelf,
     GridPlacement? gridPlacement,
     // List Styles
     ListStyle? listStyle,
@@ -218,10 +224,13 @@ abstract mixin class StylesMixin<T> {
         flexWrap: flexWrap,
         justifyContent: justifyContent,
         alignItems: alignItems,
+        alignContent: alignContent,
         gap: gap,
+        justifyItems: justifyItems,
         flex: flex,
         order: order,
         alignSelf: alignSelf,
+        justifySelf: justifySelf,
         gridTemplate: gridTemplate,
         autoRows: autoRows,
         autoColumns: autoColumns,
@@ -243,7 +252,8 @@ class _CombinedStyles extends Styles {
   const _CombinedStyles(this._styles) : super._();
 
   @override
-  Map<String, String> get properties => _styles.fold({}, (v, s) => v..addAll(s.properties));
+  Map<String, String> get properties =>
+      _styles.fold({}, (v, s) => v..addAll(s.properties));
 
   @override
   Styles combine(Styles styles) {
@@ -283,15 +293,18 @@ class _Styles extends Styles {
   final FlexWrap? flexWrap;
   final JustifyContent? justifyContent;
   final AlignItems? alignItems;
+  final AlignContent? alignContent;
   // Grid Style
   final GridTemplate? gridTemplate;
   final List<TrackSize>? autoRows;
   final List<TrackSize>? autoColumns;
   final Gap? gap;
+  final JustifyItems? justifyItems;
   // Item Style
   final Flex? flex;
   final int? order;
   final AlignSelf? alignSelf;
+  final JustifySelf? justifySelf;
   final GridPlacement? gridPlacement;
   // List Style
   final ListStyle? listStyle;
@@ -357,15 +370,18 @@ class _Styles extends Styles {
     this.flexWrap,
     this.justifyContent,
     this.alignItems,
+    this.alignContent,
     // Grid Styles
     this.gridTemplate,
     this.autoRows,
     this.autoColumns,
     this.gap,
+    this.justifyItems,
     // Item Styles
     this.flex,
     this.order,
     this.alignSelf,
+    this.justifySelf,
     this.gridPlacement,
     // List Styles
     this.listStyle,
@@ -449,12 +465,16 @@ class _Styles extends Styles {
         if (whiteSpace != null) 'white-space': whiteSpace!.value,
         // Background Styles
         if (backgroundColor != null) 'background-color': backgroundColor!.value,
-        if (backgroundAttachment != null) 'background-attachment': backgroundAttachment!.value,
+        if (backgroundAttachment != null)
+          'background-attachment': backgroundAttachment!.value,
         if (backgroundClip != null) 'background-clip': backgroundClip!.value,
         if (backgroundImage != null) 'background-image': backgroundImage!.value,
-        if (backgroundOrigin != null) 'background-origin': backgroundOrigin!.value,
-        if (backgroundPosition != null) 'background-position': backgroundPosition!.value,
-        if (backgroundRepeat != null) 'background-repeat': backgroundRepeat!.value,
+        if (backgroundOrigin != null)
+          'background-origin': backgroundOrigin!.value,
+        if (backgroundPosition != null)
+          'background-position': backgroundPosition!.value,
+        if (backgroundRepeat != null)
+          'background-repeat': backgroundRepeat!.value,
         if (backgroundSize != null) 'background-size': backgroundSize!.value,
         // Flexbox Styles
         if (flexDirection != null) 'flex-direction': flexDirection!.value,
@@ -463,13 +483,19 @@ class _Styles extends Styles {
         if (alignItems != null) 'align-items': alignItems!.value,
         ...?gap?.styles,
         ...?flex?.styles,
+        if (alignContent != null) 'align-content': alignContent!.value,
         if (order != null) 'order': order!.toString(),
         if (alignSelf != null) 'align-self': alignSelf!.value,
         // Grid Styles
         ...?gridTemplate?.styles,
-        if (autoRows != null) 'grid-auto-rows': autoRows!.map((s) => s.value).join(' '),
-        if (autoColumns != null) 'grid-auto-columns': autoColumns!.map((s) => s.value).join(' '),
+        if (autoRows != null)
+          'grid-auto-rows': autoRows!.map((s) => s.value).join(' '),
+        if (autoColumns != null)
+          'grid-auto-columns': autoColumns!.map((s) => s.value).join(' '),
         ...?gridPlacement?.styles,
+        if (justifyItems != null) 'justify-items': justifyItems!.value,
+        // Grid Item Styles
+        if (justifySelf != null) 'justify-self': justifySelf!.value,
         // List Styles
         if (listStyle != null) 'list-style-type': listStyle!.value,
         if (listPosition != null) 'list-style-position': listPosition!.value,
