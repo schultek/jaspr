@@ -22,7 +22,7 @@ void main() {
 
     for (var variant in allVariants) {
       test(variant.name, tags: variant.tag, () async {
-        await runner.run('create -v ${variant.options} myapp', dir: dirs.root);
+        await runner.run('create --no-pub-get -v ${variant.options} myapp', dir: dirs.root);
 
         for (var f in variant.files) {
           expect(File(p.join(dirs.app().path, f.$1)), f.$2, reason: f.$1);
