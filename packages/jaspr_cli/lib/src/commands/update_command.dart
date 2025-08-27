@@ -78,7 +78,7 @@ class UpdateCommand extends BaseCommand {
 
       if (results.isNotEmpty) {
         stdout.write(
-            '\nYour project has automatic migrations available for updating the code to the newest Jaspr syntax:\n\n'
+            '\nYour project has automatic migrations available for updating the code to the newest Jaspr version:\n\n'
             '${migrations.map((m) => '  ${m.name} · ${m.description}\n${m.hint}').join('\n')}\n\n');
 
         stdout.write(

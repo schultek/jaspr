@@ -22,6 +22,7 @@ A custom component that does not require any mutable state and looks like this:
 class MyComponent extends StatelessComponent {
   const MyComponent({Key? key}): super(key: key);
 
+  @override
   Component build(BuildContext context) {
     return p([text('Hello World')]);
   }
@@ -42,11 +43,13 @@ A custom component that has mutable state and looks like this:
 class MyComponent extends StatefulComponent {
   const MyComponent({Key? key}): super(key: key);
 
+  @override
   State createState() => MyComponentState();
 }
 
 class MyComponentState extends State<MyComponent> {
 
+  @override
   Component build(BuildContext context) {
     return p([text('Hello World')]);
   }
