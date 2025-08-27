@@ -50,9 +50,9 @@
       "href": "/content"
     },
     {
-      "id": "blog",
-      "title": "Blog",
-      "href": "/blog"
+      "id": "releases",
+      "title": "Releases",
+      "href": "/releases/v/0.21.0"
     }
   ],
   "sidebar": [
@@ -450,12 +450,12 @@
       ]
     },
     {
-      "tab": "blog",
+      "tab": "releases",
       "group": "Releases",
       "pages": [
         {
           "title": "0.21.0",
-          "href": "/blog/releases/v/0.21.0"
+          "href": "/releases/v/0.21.0"
         }
       ]
     }
