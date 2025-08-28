@@ -16,6 +16,8 @@ topics:
 environment:
   sdk: '>=3.6.0 <4.0.0'
 
+resolution: workspace
+
 dependencies:
   analyzer: ^7.5.9
   analyzer_plugin: ^0.13.4

@@ -209,7 +209,7 @@ class AttachRenderObject extends DomRenderText {
 
       children.remove(childNode);
       children.insert(afterNode != null ? children.indexOf(afterNode) + 1 : 0, childNode);
-      
+
       AttachAdapter.instanceFor(_target).update();
     } finally {
       child.finalize();

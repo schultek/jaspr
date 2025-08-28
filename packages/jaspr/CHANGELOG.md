@@ -1,4 +1,4 @@
-## Unreleased breaking
+## Unreleased breaking dev.0
 
 **Read the full [Release Notes](https://docs.jaspr.site/releases/v/0.21.0) for this version.**
 
@@ -11,6 +11,7 @@
 - Added `jaspr tooling-daemon` command and component scope analysis.
 
 - Added `JustifyItems`, `JustifySelf` and `AlignContent` enums and style properties.
+- Migrate project to use pub workspaces and `melos` 7.0.0.
 
 ## 0.20.0
 

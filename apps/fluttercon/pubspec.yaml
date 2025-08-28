@@ -8,11 +8,13 @@ issue_tracker: https://github.com/schultek/jaspr/issues
 environment:
   sdk: '>=3.6.0 <4.0.0'
 
+resolution: workspace
+
 dependencies:
   collection: ^1.18.0
   dart_mappable: ^4.2.2
   http: ^1.2.1
-  intl: ^0.19.0
+  intl: ^0.20.0
   jaspr: ^0.20.0
   jaspr_router: ^0.7.1
   shared_preferences: ^2.2.3

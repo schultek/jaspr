@@ -17,6 +17,8 @@ topics:
 environment:
   sdk: ^3.6.0
 
+resolution: workspace
+
 dependencies:
   fbh_front_matter: ^0.0.1
   file: ^7.0.1

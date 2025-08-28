@@ -27,18 +27,18 @@ void main() {
       expect(
           result.body,
           equals('<!DOCTYPE html>\n'
-            '<html lang="en">\n'
-            '  <head>\n'
-            '    <base href="/app/"/>\n'
-            '    <meta charset="utf-8"/>\n'
-            '    <!--\$-->\n'
-            '    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>\n'
-            '    <meta name="keywords" content="test"/>\n'
-            '    <!--/-->\n'
-            '  </head>\n'
-            '  <body><div id="test"></div></body>\n'
-            '</html>\n'
-            ''));
+              '<html lang="en">\n'
+              '  <head>\n'
+              '    <base href="/app/"/>\n'
+              '    <meta charset="utf-8"/>\n'
+              '    <!--\$-->\n'
+              '    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>\n'
+              '    <meta name="keywords" content="test"/>\n'
+              '    <!--/-->\n'
+              '  </head>\n'
+              '  <body><div id="test"></div></body>\n'
+              '</html>\n'
+              ''));
     });
 
     test('renders standalone component', () async {
