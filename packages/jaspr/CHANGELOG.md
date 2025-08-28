@@ -11,6 +11,7 @@
 - Added `jaspr tooling-daemon` command and component scope analysis.
 
 - Added `JustifyItems`, `JustifySelf` and `AlignContent` enums and style properties.
+- Added `Filter` and `BackdropFilter` style properties.
 
 ## 0.20.0
 
