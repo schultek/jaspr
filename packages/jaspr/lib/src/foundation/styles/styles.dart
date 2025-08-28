@@ -31,6 +31,8 @@ abstract class Styles with StylesMixin<Styles> {
     Visibility? visibility,
     Overflow? overflow,
     BoxShadow? shadow,
+    Filter? filter,
+    BackdropFilter? backdropFilter,
     Cursor? cursor,
     UserSelect? userSelect,
     PointerEvents? pointerEvents,
@@ -117,6 +119,8 @@ abstract mixin class StylesMixin<T> {
     Visibility? visibility,
     Overflow? overflow,
     BoxShadow? shadow,
+    Filter? filter,
+    BackdropFilter? backdropFilter,
     Cursor? cursor,
     UserSelect? userSelect,
     PointerEvents? pointerEvents,
@@ -193,6 +197,8 @@ abstract mixin class StylesMixin<T> {
         opacity: opacity,
         transform: transform,
         shadow: shadow,
+        filter: filter,
+        backdropFilter: backdropFilter,
         cursor: cursor,
         transition: transition,
         userSelect: userSelect,
@@ -283,6 +289,8 @@ class _Styles extends Styles {
   final Visibility? visibility;
   final Overflow? overflow;
   final BoxShadow? shadow;
+  final Filter? filter;
+  final BackdropFilter? backdropFilter;
   final Cursor? cursor;
   final UserSelect? userSelect;
   final PointerEvents? pointerEvents;
@@ -360,6 +368,8 @@ class _Styles extends Styles {
     this.visibility,
     this.overflow,
     this.shadow,
+    this.filter,
+    this.backdropFilter,
     this.cursor,
     this.userSelect,
     this.pointerEvents,
@@ -440,6 +450,8 @@ class _Styles extends Styles {
         if (visibility != null) 'visibility': visibility!.value,
         if (transform != null) 'transform': transform!.value,
         if (shadow != null) 'box-shadow': shadow!.value,
+        if (filter != null) 'filter': filter!.value,
+        if (backdropFilter != null) 'backdrop-filter': backdropFilter!.value,
         if (cursor != null) 'cursor': cursor!.value,
         if (transition != null) 'transition': transition!.value,
         if (userSelect != null) ...{
