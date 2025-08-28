@@ -50,10 +50,11 @@ class MigrateCommand extends BaseCommand {
   Future<int> runCommand() async {
     final directories = ['lib', 'web', 'test'];
 
-    final currentJasprVersion = assumeVersion ?? switch (config.pubspecLock) {
-      {'packages': {'jaspr': {'version': String version}}} => version,
-      _ => '',
-    };
+    final currentJasprVersion = assumeVersion ??
+        switch (config.pubspecLock) {
+          {'packages': {'jaspr': {'version': String version}}} => version,
+          _ => '',
+        };
 
     if (currentJasprVersion.isEmpty) {
       logger.write(
@@ -125,8 +126,7 @@ class MigrateCommand extends BaseCommand {
     }
 
     logger.write(
-      styleBold
-          .wrap('Applied $successCount changes and found $warningCount warnings across ${results.length} files.')!,
+      styleBold.wrap('Applied $successCount changes and found $warningCount warnings across ${results.length} files.')!,
       level: Level.info,
     );
 
