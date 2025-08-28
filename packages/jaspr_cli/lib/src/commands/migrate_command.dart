@@ -19,6 +19,11 @@ class MigrateCommand extends BaseCommand {
       help: 'Apply the proposed changes.',
       defaultsTo: false,
     );
+    argParser.addOption(
+      'assume-version',
+      help: 'Set the projects Jaspr version and skip auto-detection.',
+      hide: true,
+    );
   }
 
   @override
@@ -35,6 +40,7 @@ class MigrateCommand extends BaseCommand {
 
   late final bool dryRun = argResults!['dry-run'] as bool;
   late final bool apply = argResults!['apply'] as bool;
+  late final String? assumeVersion = argResults!['assume-version'] as String?;
 
   static List<Migration> get allMigrations => [
         BuildMethodMigration(),
@@ -44,10 +50,17 @@ class MigrateCommand extends BaseCommand {
   Future<int> runCommand() async {
     final directories = ['lib', 'web', 'test'];
 
-    final currentJasprVersion = switch (config.pubspecLock) {
+    final currentJasprVersion = assumeVersion ?? switch (config.pubspecLock) {
       {'packages': {'jaspr': {'version': String version}}} => version,
       _ => '',
     };
+
+    if (currentJasprVersion.isEmpty) {
+      logger.write(
+          'Could not determine current Jaspr version from pubspec.lock. Run with --assume-version=x.y.z to set a version manually.',
+          level: Level.critical);
+      return 1;
+    }
 
     var migrations = allMigrations.where((m) {
       return currentJasprVersion.compareTo(m.minimumJasprVersion) >= 0;
@@ -107,13 +120,13 @@ class MigrateCommand extends BaseCommand {
     final warningCount = results.fold<int>(0, (sum, result) => sum + result.reporter.warnings.length);
 
     if (successCount == 0 && warningCount == 0) {
-      logger.write('No migrations found.', level: Level.info);
+      logger.write('No migration changes found. All done.', level: Level.info);
       return 0;
     }
 
     logger.write(
       styleBold
-          .wrap('Processed ${results.length} files, applied $successCount migrations, found $warningCount warnings.')!,
+          .wrap('Applied $successCount changes and found $warningCount warnings across ${results.length} files.')!,
       level: Level.info,
     );
 
