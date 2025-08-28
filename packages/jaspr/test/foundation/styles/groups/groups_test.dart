@@ -67,7 +67,8 @@ void main() {
           letterSpacing: Unit.em(0.5),
           wordSpacing: Unit.points(10),
           lineHeight: Unit.rem(1.5),
-          textShadow: TextShadow(offsetX: Unit.zero, offsetY: Unit.zero, blur: Unit.pixels(10)),
+          textShadow: TextShadow(
+              offsetX: Unit.zero, offsetY: Unit.zero, blur: Unit.pixels(10)),
           textOverflow: TextOverflow.ellipsis,
         );
 
@@ -136,7 +137,8 @@ void main() {
           width: Unit.percent(80),
           height: Unit.percent(70),
           maxWidth: Unit.pixels(1000),
-          border: Border.only(top: BorderSide(style: BorderStyle.solid, color: Colors.green)),
+          border: Border.only(
+              top: BorderSide(style: BorderStyle.solid, color: Colors.green)),
           radius: BorderRadius.circular(Unit.pixels(20)),
           outline: Outline(color: Colors.yellow),
           overflow: Overflow.visible,
@@ -145,7 +147,22 @@ void main() {
           zIndex: ZIndex(100),
           opacity: 0.5,
           transform: Transform.scale(2),
-          shadow: BoxShadow(offsetX: Unit.zero, offsetY: Unit.zero, blur: Unit.pixels(10)),
+          shadow: BoxShadow(
+              offsetX: Unit.zero, offsetY: Unit.zero, blur: Unit.pixels(10)),
+          filter: Filter([
+            FilterFn.blur(Unit.rem(2)),
+            FilterFn.opacity(0.5),
+            FilterFn.hueRotate(Angle.deg(45))
+          ]),
+          backdropFilter: BackdropFilter([
+            FilterFn.dropShadow(
+                offsetX: Unit.rem(1),
+                offsetY: Unit.rem(1),
+                spread: Unit.rem(0.5),
+                color: Colors.red),
+            FilterFn.url("abc.svg#urltest"),
+            FilterFn.src("xyz.svg#srctest"),
+          ]),
           cursor: Cursor.crosshair,
           transition: Transition('width', duration: 500),
         );
@@ -172,6 +189,9 @@ void main() {
             'opacity': '0.5',
             'transform': 'scale(2)',
             'box-shadow': '0 0 10px',
+            'filter': 'blur(2rem) opacity(0.5) hue-rotate(45deg)',
+            'backdrop-filter':
+                'drop-shadow(1rem 1rem 0.5rem red) url(abc.svg#urltest) src(xyz.svg#srctest)',
             'cursor': 'crosshair',
             'transition': 'width 500ms',
           }),
@@ -234,7 +254,11 @@ void main() {
           ])),
           gap: Gap(row: Unit.pixels(20)),
           autoRows: [TrackSize(Unit.percent(20)), TrackSize.auto],
-          autoColumns: [TrackSize(Unit.pixels(100)), TrackSize.auto, TrackSize.auto],
+          autoColumns: [
+            TrackSize(Unit.pixels(100)),
+            TrackSize.auto,
+            TrackSize.auto
+          ],
           justifyItems: JustifyItems.center,
         );
 
