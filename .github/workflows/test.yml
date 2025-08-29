@@ -21,9 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
-      - uses: dart-lang/setup-dart@v1.3
       - uses: subosito/flutter-action@v2
 
       - name: Bootstrap
@@ -43,9 +42,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
-      - uses: dart-lang/setup-dart@v1.3
       - uses: subosito/flutter-action@v2
 
       - name: Bootstrap
