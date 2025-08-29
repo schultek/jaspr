@@ -206,7 +206,9 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       var process = await Process.start(
         Platform.executable,
         [
-          'run',
+          // Use direct `dart` entry point for now due to
+          // https://github.com/dart-lang/sdk/issues/61373.
+          // 'run',
           '--enable-asserts',
           '-Djaspr.flags.release=true',
           '-Djaspr.flags.generate=true',
