@@ -142,7 +142,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     var userDefines = getServerDartDefines();
 
     var args = [
-      'run',
+      // Use direct `dart` entry point for now due to
+      // https://github.com/dart-lang/sdk/issues/61373.
+      // 'run',
       if (!release) ...[
         '--enable-vm-service',
         '--enable-asserts',
