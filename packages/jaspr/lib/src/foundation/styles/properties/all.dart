@@ -2,6 +2,7 @@ export 'angle.dart';
 export 'background.dart';
 export 'box.dart';
 export 'color.dart';
+export 'filter.dart';
 export 'flex_item.dart';
 export 'flexbox.dart';
 export 'grid.dart';

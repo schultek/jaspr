@@ -60,6 +60,7 @@ void main() {
         expect(Angle.turn(0.5) + Angle.turn(0.5), equals(Angle.turn(1)));
         expect((Angle.deg(10) + Angle.rad(1)).value, equals('calc(10deg + 1rad)'));
         expect((Angle.deg(10) + Angle.turn(0.5) + Angle.turn(1)).value, equals('calc(10deg + 1.5turn)'));
+        expect((Angle.variable('theta') + Angle.variable('beta')).value, equals('calc(var(theta) + var(beta))'));
       });
     });
 
