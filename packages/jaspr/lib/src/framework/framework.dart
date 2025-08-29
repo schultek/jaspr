@@ -20,7 +20,7 @@ part 'build_context.dart';
 part 'build_owner.dart';
 part 'buildable_element.dart';
 part 'components_binding.dart';
-part 'dom_component.dart';
+part 'components.dart';
 part 'inactive_elements.dart';
 part 'inherited_component.dart';
 part 'inherited_model.dart';
@@ -32,7 +32,6 @@ part 'render_object.dart';
 part 'stateful_component.dart';
 part 'stateless_component.dart';
 part 'multi_child_element.dart';
-part 'fragment.dart';
 
 /// Describes the configuration for an [Element].
 ///
@@ -73,6 +72,33 @@ part 'fragment.dart';
 abstract class Component {
   /// Initializes [key] for subclasses.
   const Component({this.key});
+
+  const factory Component.text(String text, {Key? key}) = Text._;
+
+  const factory Component.element({
+    required String tag,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+    List<Component>? children,
+    Key? key,
+  }) = DomComponent._;
+
+  const factory Component.wrapElement({
+    Key? key,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+    required Component child,
+  }) = _WrappingDomComponent;
+
+  const factory Component.fragment({required List<Component> children, Key? key}) = Fragment._;
+
+  const factory Component.empty({Key? key}) = Fragment._empty;
 
   /// Controls how one component replaces another component in the tree.
   ///

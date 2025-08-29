@@ -79,7 +79,7 @@ class UpdateCommand extends BaseCommand {
       if (results.isNotEmpty) {
         stdout.write(
             '\nYour project has automatic migrations available for updating the code to the newest Jaspr version:\n\n'
-            '${migrations.map((m) => '  ${m.name} · ${m.description}\n${m.hint}').join('\n')}\n\n');
+            '${migrations.map((m) => '  ${m.name} · ${m.description}\n${m.hint}').join('\n\n')}\n\n');
 
         stdout.write(
             'Make sure to update the dependency constraint of jaspr in your pubspec.yaml file to include $latestVersion.\n');

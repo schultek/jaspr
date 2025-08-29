@@ -5,7 +5,7 @@ part of 'framework.dart';
 /// Must have a [tag] and any number of attributes.
 /// Can have a single [child] component or any amount of [children].
 class DomComponent extends Component {
-  const DomComponent({
+  const DomComponent._({
     super.key,
     required this.tag,
     this.id,
@@ -15,16 +15,6 @@ class DomComponent extends Component {
     this.events,
     this.children,
   });
-
-  const factory DomComponent.wrap({
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events,
-    required Component child,
-  }) = _WrappingDomComponent;
 
   final String tag;
   final String? id;
@@ -165,7 +155,7 @@ class _WrappingDomComponent extends InheritedComponent implements DomComponent {
 ///
 /// Styling is done through the parent element(s) and their styles.
 class Text extends Component {
-  const Text(this.text, {super.key});
+  const Text._(this.text, {super.key});
 
   final String text;
 
@@ -195,4 +185,36 @@ class TextElement extends LeafRenderObjectElement {
   void updateRenderObject(RenderText text) {
     text.update(component.text);
   }
+}
+
+/// A utility component that renders its [children] without any wrapper element.
+///
+/// This is meant to be used in places where you want to render multiple components,
+/// but only a single component is allowed by the API.
+class Fragment extends Component {
+  const Fragment._({required this.children, super.key});
+
+  const Fragment._empty({super.key}) : children = const [];
+
+  final List<Component> children;
+
+  @override
+  Element createElement() => _FragmentElement(this);
+}
+
+class _FragmentElement extends MultiChildRenderObjectElement {
+  _FragmentElement(Fragment super.component);
+
+  @override
+  List<Component> buildChildren() => (component as Fragment).children;
+
+  @override
+  RenderObject createRenderObject() {
+    final renderObject = _parentRenderObjectElement!.renderObject.createChildRenderFragment();
+    assert(renderObject.parent == _parentRenderObjectElement!.renderObject);
+    return renderObject;
+  }
+
+  @override
+  void updateRenderObject(RenderFragment fragment) {}
 }

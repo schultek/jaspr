@@ -14,12 +14,16 @@ part 'text.dart';
 
 final _events = events;
 
-/// Utility method to create a [Text] component.
+/// Utility method to create a [_Text] component.
 Component text(String text, {Key? key}) {
-  return Text(text, key: key);
+  return Component.text(text, key: key);
 }
 
 /// Utility method to create a [RawText] component.
 Component raw(String text, {Key? key}) {
   return RawText(text, key: key);
+}
+
+Component fragment(List<Component> children, {Key? key}) {
+  return Component.fragment(children: children, key: key);
 }

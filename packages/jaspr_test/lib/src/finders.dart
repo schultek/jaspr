@@ -18,7 +18,7 @@ const CommonFinders find = CommonFinders._();
 class CommonFinders {
   const CommonFinders._();
 
-  /// Finds [DomComponent] components with a tag equal to the `tag` argument.
+  /// Finds [Component.element] components with a tag equal to the `tag` argument.
   ///
   /// ## Sample code
   ///
@@ -29,7 +29,7 @@ class CommonFinders {
   /// This will match paragraph dom elements.
   Finder tag(String tag) => _TagFinder(tag);
 
-  /// Finds [Text] components containing string equal to the `text` argument.
+  /// Finds [Component.text] components containing string equal to the `text` argument.
   ///
   /// ## Sample code
   ///
@@ -37,10 +37,10 @@ class CommonFinders {
   /// expect(find.text('Back'), findsOneComponent);
   /// ```
   ///
-  /// This will match [Text] components that contain the "Back" string.
+  /// This will match [Component.text] components that contain the "Back" string.
   Finder text(String text) => _TextFinder(text);
 
-  /// Finds [Text] components which contain the given `pattern` argument.
+  /// Finds [Component.text] components which contain the given `pattern` argument.
   ///
   /// ## Sample code
   ///
@@ -50,7 +50,7 @@ class CommonFinders {
   /// ```
   Finder textContaining(Pattern pattern) => _TextContainingFinder(pattern);
 
-  /// Looks for components that contain a [Text] descendant with `text`
+  /// Looks for components that contain a [Component.text] descendant with `text`
   /// in it.
   ///
   /// ## Sample code

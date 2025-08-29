@@ -1,5 +1,7 @@
 ## Unreleased minor
 
+- Extend `prefer_html_methods` lint to also suggest using `text()` and `fragment()` methods, and offer fixes for them.
+
 - Update `analyzer` to `^7.5.9`.
 - Update `custom_lint` to `^0.8.0`.
 

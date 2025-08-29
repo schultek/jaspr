@@ -11,7 +11,7 @@ Component details(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'details',
     key: key,
     id: id,
@@ -37,7 +37,7 @@ Component dialog(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'dialog',
     key: key,
     id: id,
@@ -60,7 +60,7 @@ Component summary(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'summary',
     key: key,
     id: id,
@@ -90,7 +90,7 @@ Component meta(
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'meta',
     key: key,
     id: id,
@@ -124,7 +124,7 @@ Component link(
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'link',
     key: key,
     id: id,
@@ -168,7 +168,7 @@ Component script(
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'script',
     key: key,
     id: id,
