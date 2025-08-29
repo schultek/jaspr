@@ -19,7 +19,7 @@ class LiquidTemplateEngine implements TemplateEngine {
   Future<void> render(Page page, List<Page> pages) async {
     final template = Template.parse(
       page.content,
-      data: {...page.data, 'pages': pages.map((p) => p.data['page']).toList()},
+      data: {...page.data, 'pages': pages.map((p) => p.data.page).toList()},
       root: _IncludeResolver(page, Uri(path: includesPath)),
     );
 
