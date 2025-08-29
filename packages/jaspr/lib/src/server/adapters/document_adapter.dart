@@ -19,7 +19,7 @@ mixin DocumentStructureMixin on RenderAdapter {
 
     if (head == null) {
       head = html.createChildRenderElement('head');
-     
+
       if (body == null) {
         var range = html.children.range();
         html.children.insertAfter(head);
@@ -38,7 +38,6 @@ mixin DocumentStructureMixin on RenderAdapter {
           ..insertNodeAfter(rangeBefore);
         html.children.insertAfter(body, after: head);
       }
-
     }
 
     return (html, head, body);

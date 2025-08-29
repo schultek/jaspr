@@ -22,7 +22,7 @@ class BuildMethodMigration implements Migration {
   }
 
   bool _isBuildableClass(ClassDeclaration declaration) {
-    final superName = declaration.extendsClause?.superclass.name.lexeme;
+    final superName = declaration.extendsClause?.superclass.name2.lexeme;
     return superName == 'StatelessComponent' || superName == 'AsyncStatelessComponent' || superName == 'State';
   }
 

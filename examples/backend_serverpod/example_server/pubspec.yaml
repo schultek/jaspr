@@ -6,6 +6,8 @@ publish_to: none
 environment:
   sdk: '>=3.6.0 <4.0.0'
 
+resolution: workspace
+
 dependencies:
   jaspr: ^0.20.0
   jaspr_serverpod: ^0.5.6

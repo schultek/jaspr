@@ -47,7 +47,7 @@ void main() {
       binding.attachRootComponent(component);
 
       expect(root.children, hasLength(1));
-      final child = root.children[0]; 
+      final child = root.children[0];
 
       verifyInOrder([
         () => root.createChildRenderElement('div'),

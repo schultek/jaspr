@@ -16,8 +16,11 @@ class MockRenderObjectBinding extends TestComponentsBinding {
 }
 
 class MockRenderObject extends Mock implements RenderObject {}
+
 class MockRenderElement extends MockRenderObject implements RenderElement {}
+
 class MockRenderText extends MockRenderObject implements RenderText {}
+
 class MockRenderFragment extends MockRenderObject implements RenderFragment {}
 
 final mockChildren = Expando<List<MockRenderObject>>();

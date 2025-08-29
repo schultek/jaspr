@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 
 import 'commands/base_command.dart';
@@ -123,6 +124,22 @@ extension CommandConfig on BaseCommand {
 
     var pubspecLockPath = 'pubspec.lock';
     var pubspecLockFile = File(pubspecLockPath).absolute;
+
+    if (!pubspecLockFile.existsSync() && pubspecYaml['resolution'] == 'workspace') {
+      var n = 1;
+      while (n < 5) {
+        var parent = path.dirname(path.dirname(pubspecLockFile.path));
+        if (parent == pubspecLockFile.path) {
+          break;
+        }
+        pubspecLockFile = File(path.join(parent, 'pubspec.lock'));
+        if (pubspecLockFile.existsSync()) {
+          break;
+        }
+        n++;
+      }
+    }
+
     if (pubspecLockFile.existsSync()) {
       pubspecLock = loadYaml(pubspecLockFile.readAsStringSync()) as YamlMap;
     }

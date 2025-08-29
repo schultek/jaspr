@@ -10,7 +10,8 @@ import '../../utils/test_component.dart';
 void main() {
   group('fragments browser test', () {
     testBrowser('should attach fragment children to parent', (tester) async {
-      final component = FakeComponent(child: div([
+      final component = FakeComponent(
+          child: div([
         Fragment(children: [
           h1([text('Hello World')]),
           b([text('Bold Text')]),
@@ -48,7 +49,6 @@ void main() {
     });
 
     testBrowser('should attach fragment children to parent after start node', (tester) async {
-      
       tester.pumpComponent(div([
         text('Start'),
         Fragment(children: [
@@ -70,7 +70,6 @@ void main() {
     });
 
     testBrowser('should attach children in correct order with empty fragments', (tester) async {
-      
       tester.pumpComponent(div([
         text('Start'),
         Fragment(children: [
@@ -79,10 +78,12 @@ void main() {
           Fragment(children: [
             b([text('Bold Text')]),
             Fragment(children: []),
-            Fragment(children: [Fragment(children: [
-              Fragment(children: [Fragment(children: [])]),
-              p([text('Paragraph')]),
-            ])]),
+            Fragment(children: [
+              Fragment(children: [
+                Fragment(children: [Fragment(children: [])]),
+                p([text('Paragraph')]),
+              ])
+            ]),
           ]),
           text('Some text'),
         ]),
@@ -102,7 +103,8 @@ void main() {
     });
 
     testBrowser('should move fragment children when fragment moves', (tester) async {
-      final component = FakeComponent(child: div([
+      final component = FakeComponent(
+          child: div([
         text('Start'),
         Fragment(key: ValueKey('f1'), children: [
           h1([text('Hello World')]),

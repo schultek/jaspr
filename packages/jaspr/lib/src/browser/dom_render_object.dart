@@ -337,7 +337,7 @@ class DomRenderFragment extends DomRenderObject
       final prevNode = currentNode != firstChildNode ? currentNode.previousSibling : null;
 
       assert(currentNode.parentNode == parent.node, 'Fragment child must be a child of the parent.');
-     
+
       // Remove from parent, attach back to fragment.
       node.insertBefore(currentNode, beforeNode);
 
