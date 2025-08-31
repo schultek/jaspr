@@ -8,7 +8,7 @@ class HomePage extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       header([
         img(src: 'images/quote.jpg', alt: "Quote symbol", width: 100),
         h1([text('Dart Quotes')]),
@@ -17,7 +17,7 @@ class HomePage extends StatelessComponent {
         AsyncBuilder(builder: (context) async {
           var quotes = await QuotesService.loadQuotes(context.session);
           quotes.sort((a, b) => b.likes.length.compareTo(a.likes.length));
-          return Fragment(children: [
+          return fragment([
             for (var quote in quotes)
               li([
                 a(href: '/quote/${quote.id}', [

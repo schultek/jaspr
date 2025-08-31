@@ -10,7 +10,7 @@ import '5_community/community.dart';
 class Home extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       Document.head(title: 'Jaspr', meta: {
         'description': 'The Web Framework for Dart Developers.',
         'keywords': 'jaspr, dart, web, flutter',

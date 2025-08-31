@@ -12,7 +12,7 @@ class MenuButton extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       button(
           classes: 'menu-toggle',
           attributes: {'aria-label': 'Menu Toggle'},

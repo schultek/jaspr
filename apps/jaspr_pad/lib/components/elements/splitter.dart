@@ -70,7 +70,7 @@ class SplitterState extends State<Splitter> {
       var dragging =
           (i > 0 ? splitPairs[i - 1].dragging : false) || (i < splitPairs.length ? splitPairs[i].dragging : false);
 
-      children.add(DomComponent.wrap(
+      children.add(Component.wrapElement(
         styles: Styles(
           userSelect: dragging ? UserSelect.none : null,
           pointerEvents: dragging ? PointerEvents.none : null,
@@ -85,7 +85,7 @@ class SplitterState extends State<Splitter> {
         ),
       ));
     }
-    return Fragment(children: children);
+    return fragment(children);
   }
 }
 

@@ -34,7 +34,7 @@ class RouteBuilder {
     if (router.matchList.isEmpty) {
       // The build method can be called before async redirect finishes. Build an
       // empty text until then.
-      return Text('');
+      return Component.text('');
     }
 
     return InheritedRouter(
@@ -123,7 +123,7 @@ class RouteBuilder {
           future: l.future,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return Text('');
+              return Component.text('');
             }
             if (snapshot.hasError) {
               return _buildErrorPage(
@@ -158,7 +158,7 @@ class RouteBuilder {
           future: l.future,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return Text('');
+              return Component.text('');
             }
             if (snapshot.hasError) {
               return _buildErrorPage(

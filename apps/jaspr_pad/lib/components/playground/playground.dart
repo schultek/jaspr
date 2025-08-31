@@ -21,7 +21,7 @@ class Playground extends StatelessComponent {
       }, fireImmediately: true);
     }
 
-    return Fragment(children: [
+    return fragment([
       PlaygroundHeader(),
       MainSection(),
       PlaygroundFooter(),

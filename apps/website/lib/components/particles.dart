@@ -25,7 +25,7 @@ class Particles extends StatelessComponent {
   Component build(BuildContext context) {
     return svg(classes: 'particles', [
       for (final particle in particles)
-        DomComponent(
+        Component.element(
           key: ValueKey(particle.id),
           tag: 'g',
           styles: Styles(

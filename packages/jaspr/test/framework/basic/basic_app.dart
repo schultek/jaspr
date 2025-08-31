@@ -3,8 +3,8 @@ import 'package:jaspr/jaspr.dart';
 class App extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
-      Text('App'),
+    return Component.fragment(children: [
+      Component.text('App'),
       Counter(),
     ]);
   }
@@ -20,14 +20,14 @@ class CounterState extends State<Counter> {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return Component.fragment(children: [
       Button(
         label: 'Click Me',
         onPressed: () {
           setState(() => counter++);
         },
       ),
-      Text('Count: $counter'),
+      Component.text('Count: $counter'),
     ]);
   }
 }

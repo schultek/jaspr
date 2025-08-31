@@ -10,7 +10,7 @@ void main() {
   group('context.read', () {
     testComponents('returns provider state', (tester) async {
       tester.pumpComponent(providerApp((context) {
-        return Text('${context.read(counter)}');
+        return Component.text('${context.read(counter)}');
       }));
 
       expect(find.text('0'), findsOneComponent);
@@ -19,12 +19,12 @@ void main() {
 
     testComponents('returns overridden provider state', (tester) async {
       tester.pumpComponent(providerApp((context) {
-        return Fragment(children: [
-          Text('a ${context.read(counter)}'),
+        return Component.fragment(children: [
+          Component.text('a ${context.read(counter)}'),
           ProviderScope(
             overrides: [counter.overrideWith((ref) => 1)],
             child: Builder(builder: (context) {
-              return Text('b ${context.read(counter)}');
+              return Component.text('b ${context.read(counter)}');
             }),
           ),
         ]);

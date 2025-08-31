@@ -77,7 +77,7 @@ class ExampleComponent extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     buildCalledFor.add(componentKey);
-    return Fragment(children: [
+    return Component.fragment(children: [
       AComponent(),
       BComponent(),
     ]);
@@ -92,7 +92,7 @@ class AComponent extends StatelessComponent {
   Component build(BuildContext context) {
     buildCalledFor.add(componentKey);
     final value = ABModel.aOf(context);
-    return Text('A: $value');
+    return Component.text('A: $value');
   }
 }
 
@@ -105,6 +105,6 @@ class BComponent extends StatelessComponent {
     buildCalledFor.add(componentKey);
 
     final value = ABModel.bOf(context);
-    return Text('B: $value');
+    return Component.text('B: $value');
   }
 }

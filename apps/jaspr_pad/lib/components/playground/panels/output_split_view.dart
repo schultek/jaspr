@@ -32,7 +32,7 @@ class OutputSplitView extends StatelessComponent {
 
     var isClosed = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.closed));
 
-    return Fragment(children: [
+    return fragment([
       if (isClosed) ...[
         child,
         EditorTabs(key: GlobalObjectKey('editor-tabs')),
@@ -154,7 +154,7 @@ class EditorTabWindow extends StatelessComponent {
     var state = context.watch(tabsStateProvider);
     var isTutorial = context.watch(isTutorialProvider);
 
-    return Fragment(children: [
+    return fragment([
       if (isTutorial)
         Hidden(
           hidden: state != OutputTabsState.ui,

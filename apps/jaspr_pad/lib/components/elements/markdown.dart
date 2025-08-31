@@ -85,7 +85,7 @@ class _MarkdownState extends State<Markdown> {
         hljs.highlightAll();
       });
     }
-    return Fragment(children: [
+    return fragment([
       ...buildMarkdown(nodes),
     ]);
   }
@@ -95,7 +95,7 @@ class _MarkdownState extends State<Markdown> {
       if (node is md.Text) {
         yield span([raw(node.text)]);
       } else if (node is md.Element) {
-        yield DomComponent(
+        yield Component.element(
           tag: node.tag,
           id: node.generatedId,
           attributes: node.attributes,

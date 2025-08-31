@@ -9,7 +9,7 @@ class Style extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return DomComponent(
+    return Component.element(
       tag: 'style',
       children: [RawText(styles.render())],
     );

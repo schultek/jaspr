@@ -89,9 +89,9 @@ class HeadDocument extends StatelessComponent implements Document {
       target: AttachTarget.head,
       attributes: null,
       children: [
-        if (title != null) DomComponent(tag: 'title', children: [Text(title!)]),
+        if (title != null) Component.element(tag: 'title', children: [Component.text(title!)]),
         if (meta != null)
-          for (var e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+          for (var e in meta!.entries) Component.element(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
         ...?children,
       ],
     );

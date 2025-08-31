@@ -25,7 +25,7 @@ class ThemeToggleState extends State<ThemeToggle> {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return Component.fragment(children: [
       if (!kIsWeb)
         Document.head(children: [
           script(id: 'theme-script', content: '''

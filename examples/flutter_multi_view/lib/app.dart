@@ -39,7 +39,7 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       div(classes: 'main', [
         img(src: 'images/logo.svg', width: 80),
         div(classes: 'buttons', [

@@ -7,7 +7,7 @@ import 'pages/quote_page.dart';
 class App extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       div(classes: 'main', [
         Router(
           routes: [

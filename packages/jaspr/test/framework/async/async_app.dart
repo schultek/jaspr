@@ -11,15 +11,15 @@ class FutureTester<T> extends StatelessComponent {
       future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text('LOADING');
+          return Component.text('LOADING');
         } else if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
-            return Text('DATA: ${snapshot.data}');
+            return Component.text('DATA: ${snapshot.data}');
           } else if (snapshot.hasError) {
-            return Text('ERROR: ${snapshot.error}');
+            return Component.text('ERROR: ${snapshot.error}');
           }
         }
-        return Text('UNKNOWN STATE: ${snapshot.connectionState}');
+        return Component.text('UNKNOWN STATE: ${snapshot.connectionState}');
       },
     );
   }
@@ -36,17 +36,17 @@ class StreamTester<T> extends StatelessComponent {
       stream: stream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text('LOADING');
+          return Component.text('LOADING');
         } else if (snapshot.connectionState == ConnectionState.done) {
-          return Text('DONE');
+          return Component.text('DONE');
         } else if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData) {
-            return Text('DATA: ${snapshot.data}');
+            return Component.text('DATA: ${snapshot.data}');
           } else if (snapshot.hasError) {
-            return Text('ERROR: ${snapshot.error}');
+            return Component.text('ERROR: ${snapshot.error}');
           }
         }
-        return Text('UNKNOWN STATE: ${snapshot.connectionState}');
+        return Component.text('UNKNOWN STATE: ${snapshot.connectionState}');
       },
     );
   }

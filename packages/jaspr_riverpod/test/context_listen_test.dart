@@ -120,7 +120,7 @@ void main() {
             }, fireImmediately: true);
           }
           element = context as Element;
-          return const Text('test');
+          return const Component.text('test');
         }));
 
         expect(wasCalledWith, equals([0]));

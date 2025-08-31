@@ -14,7 +14,7 @@ final class SidebarToggleButton extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return Component.fragment(children: [
       if (!kIsWeb)
         Document.head(children: [
           Style(styles: _styles),

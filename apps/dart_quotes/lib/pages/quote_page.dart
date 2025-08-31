@@ -16,13 +16,13 @@ class QuotePage extends AsyncStatelessComponent {
 
     var quote = await FirebaseService.instance.getQuoteById(id).single;
     if (quote == null) {
-      return Fragment(children: [
+      return fragment([
         navChild,
         div(classes: "center", [text("Not Found")]),
       ]);
     }
 
-    return Fragment(children: [
+    return fragment([
       navChild,
       Document.head(
         title: quote.quote,
@@ -31,15 +31,18 @@ class QuotePage extends AsyncStatelessComponent {
           script(src: "https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js", defer: true),
         ],
       ),
-      div(classes: "center", [
-        div(classes: "quote-container", [
-          img(classes: "quotes-start", src: 'images/quote.jpg', alt: "Starting quote symbol", width: 100),
-          h1([text(quote.quote)]),
-          p([text(quote.author)]),
-          QuoteLikeButton(id: id, initialCount: quote.likes.length),
-          img(classes: "quotes-end", src: 'images/quote.jpg', alt: "Ending quote symbol", width: 100),
-        ])
-      ]),
+      div(
+        classes: "center",
+        [
+          div(classes: "quote-container", [
+            img(classes: "quotes-start", src: 'images/quote.jpg', alt: "Starting quote symbol", width: 100),
+            h1([text(quote.quote)]),
+            p([text(quote.author)]),
+            QuoteLikeButton(id: id, initialCount: quote.likes.length),
+            img(classes: "quotes-end", src: 'images/quote.jpg', alt: "Ending quote symbol", width: 100),
+          ])
+        ],
+      ),
     ]);
   }
 
