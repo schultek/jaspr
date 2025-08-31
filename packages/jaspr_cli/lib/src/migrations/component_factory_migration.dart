@@ -101,29 +101,23 @@ class ComponentVisitor extends RecursiveAstVisitor<void> {
       onDomComponent(SourceRange(node.type.offset, node.type.length));
     } else if (node.type.name2.lexeme == 'DomComponent' && node.name?.name == 'wrap') {
       onWrapDomComponent(SourceRange(node.type.offset, node.name!.end - node.type.offset));
-    } else {
-      super.visitConstructorName(node);
     }
+    super.visitConstructorName(node);
   }
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'Text' && node.target == null) {
       onText(SourceRange(node.methodName.offset, node.methodName.length));
-      return;
     } else if (node.methodName.name == 'Fragment' && node.target == null) {
       onFragment(SourceRange(node.methodName.offset, node.methodName.length));
-      return;
     } else if (node.methodName.name == 'DomComponent' && node.target == null) {
       onDomComponent(SourceRange(node.methodName.offset, node.methodName.length));
-      return;
     } else if (node.methodName.name == 'wrap' &&
         node.target is SimpleIdentifier &&
         (node.target as SimpleIdentifier).name == 'DomComponent') {
       onWrapDomComponent(SourceRange(node.target!.offset, node.methodName.end - node.target!.offset));
-      return;
-    } else {
-      super.visitMethodInvocation(node);
     }
+    super.visitMethodInvocation(node);
   }
 }

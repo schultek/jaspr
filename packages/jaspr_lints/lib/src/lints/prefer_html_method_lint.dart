@@ -20,12 +20,12 @@ class PreferHtmlMethodLint extends DartLintRule {
 
   final textCode = LintCode(
     name: 'prefer_html_methods',
-    problemMessage: "Prefer using 'text(...)' over 'Text(...)'",
+    problemMessage: "Prefer using 'text(...)' over 'Component.text(...)'",
   );
 
   final fragmentCode = LintCode(
     name: 'prefer_html_methods',
-    problemMessage: "Prefer using 'fragment(...)' over 'Fragment(children: ...)'",
+    problemMessage: "Prefer using 'fragment(...)' over 'Component.fragment(children: ...)'",
   );
 
   @override
@@ -53,8 +53,8 @@ class PreferHtmlMethodLint extends DartLintRule {
           return;
         }
         reporter.atOffset(
-          offset: node.offset,
-          length: node.length,
+          offset: node.constructorName.offset,
+          length: node.constructorName.length,
           errorCode: code,
           arguments: [tag],
           data: (ComponentType.element, node, tag),
@@ -62,16 +62,16 @@ class PreferHtmlMethodLint extends DartLintRule {
       }
       if (node.constructorName.name?.name == 'text') {
         reporter.atOffset(
-          offset: node.offset,
-          length: node.length,
+          offset: node.constructorName.offset,
+          length: node.constructorName.length,
           errorCode: textCode,
           data: (ComponentType.text, node),
         );
       }
       if (node.constructorName.name?.name == 'fragment') {
         reporter.atOffset(
-          offset: node.offset,
-          length: node.length,
+          offset: node.constructorName.offset,
+          length: node.constructorName.length,
           errorCode: fragmentCode,
           data: (ComponentType.fragment, node),
         );
@@ -80,7 +80,9 @@ class PreferHtmlMethodLint extends DartLintRule {
   }
 
   @override
-  List<Fix> getFixes() => [PreferHtmlMethodFix()];
+  List<Fix> getFixes() => [
+    PreferHtmlMethodFix()
+  ];
 }
 
 class PreferHtmlMethodFix extends DartFix {
@@ -98,26 +100,25 @@ class PreferHtmlMethodFix extends DartFix {
           if (argument is NamedExpression) {
             var name = argument.name.label.name;
             if (name == 'tag') {
-              var end = argument.endToken.next?.lexeme == ',' ? argument.endToken.next!.end : argument.end;
+              int end;
+              if (argument.endToken.next case final next? when next.lexeme == ',') {
+                end = next.next?.offset ?? next.end;
+              } else {
+                end = argument.endToken.next?.offset ?? argument.end;
+              }
               builder.addDeletion(SourceRange(argument.offset, end - argument.offset));
             } else if (name == 'children') {
-              builder.addDeletion(argument.name.sourceRange);
+              var end = argument.name.endToken.next?.offset ?? argument.end;
+              builder.addDeletion(SourceRange(argument.name.offset, end - argument.name.offset));
             }
           }
         }
 
-        builder.addReplacement(node.constructorName.sourceRange, (edit) {
-          edit.write(tag);
-        });
-
-        builder.format(node.sourceRange);
+        builder.addSimpleReplacement(node.constructorName.sourceRange, tag);
       });
     } else if (analysisError.data case (ComponentType.text, InstanceCreationExpression node)) {
       reporter.createChangeBuilder(message: 'Convert to text() method', priority: 2).addDartFileEdit((builder) {
-        builder.addReplacement(node.constructorName.sourceRange, (edit) {
-          edit.write('text');
-        });
-        builder.format(node.sourceRange);
+        builder.addSimpleReplacement(node.constructorName.sourceRange, 'text');
       });
     } else if (analysisError.data case (ComponentType.fragment, InstanceCreationExpression node)) {
       reporter.createChangeBuilder(message: 'Convert to fragment() method', priority: 2).addDartFileEdit((builder) {
@@ -125,16 +126,13 @@ class PreferHtmlMethodFix extends DartFix {
           if (argument is NamedExpression) {
             var name = argument.name.label.name;
             if (name == 'children') {
-              builder.addDeletion(argument.name.sourceRange);
+              var end = argument.name.endToken.next?.offset ?? argument.end;
+              builder.addDeletion(SourceRange(argument.name.offset, end - argument.name.offset));
             }
           }
         }
 
-        builder.addReplacement(node.constructorName.sourceRange, (edit) {
-          edit.write('fragment');
-        });
-
-        builder.format(node.sourceRange);
+        builder.addSimpleReplacement(node.constructorName.sourceRange, 'fragment');
       });
     }
   }
