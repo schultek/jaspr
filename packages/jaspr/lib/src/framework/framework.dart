@@ -73,10 +73,10 @@ abstract class Component {
   /// Initializes [key] for subclasses.
   const Component({this.key});
 
-  /// Creates a [Text] component which renders a html text node.
+  /// Creates a component which renders a html text node.
   const factory Component.text(String text, {Key? key}) = Text._;
 
-  /// Creates a [DomComponent] component which renders a html element node with the given [tag], like
+  /// Creates a component which renders a html element node with the given [tag], like
   /// a `<div>`, `<button>` etc.
   ///
   /// Example:
@@ -110,7 +110,7 @@ abstract class Component {
     Key? key,
   }) = DomComponent._;
 
-  /// Creates a [DomComponent] component which applies its parameters like [classes], [styles], etc. to all of its
+  /// Creates a component which applies its parameters (like [classes], [styles], etc.) to its
   /// direct child element(s).
   ///
   /// This does not create a html element itself. All properties are merged with the respective child element's
@@ -149,7 +149,7 @@ abstract class Component {
     required Component child,
   }) = _WrappingDomComponent;
 
-  /// Creates a [Fragment] component which renders a list of children without any wrapping element.
+  /// Creates a component which renders a list of child components without any wrapping element.
   ///
   /// This is useful when you want to return multiple elements from a build method without adding an extra
   /// wrapping element to the html DOM.
@@ -170,7 +170,7 @@ abstract class Component {
   ///
   const factory Component.fragment({required List<Component> children, Key? key}) = Fragment._;
 
-  /// Creates an empty [Fragment] component which renders nothing.
+  /// Creates an empty component which renders nothing.
   ///
   /// This is useful when you want to return "nothing" from a build method.
   const factory Component.empty({Key? key}) = Fragment._empty;

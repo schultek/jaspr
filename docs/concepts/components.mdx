@@ -8,8 +8,7 @@ description: An overview of Jasprs component system.
 **Jaspr** comes with a component system that is very similar to Flutters widgets. This is a core design decision of jaspr, in order to look and feel very familiar to developers coming from Flutter. You might think of it as just replacing the word 'Widget' with 'Component' *(which actually was a small part of jasprs development process 😉)*, while keeping the same structure and behavior.
 
 <Warning>
-The following page and other documentation assumes, that you have already a basic understanding of Flutters widget 
-system, especially the widget tree and the three base widgets: StatelessWidget, StatefulWidget and InheritedWidget.
+The following page and other documentation assumes, that you have already a basic understanding of Flutters widget system, especially the widget tree and the three base widgets: StatelessWidget, StatefulWidget and InheritedWidget.
 </Warning>
 
 When building an app or website with **jaspr** you will mostly use these **three** basic components:
@@ -90,3 +89,196 @@ class MyInheritedComponent extends InheritedComponent {
 ```
 
 In every aspect, this component behaves the same as Flutters `InheritedWidget`.
+
+
+## Foundation Components
+
+Jaspr has three foundational component types, which are accessible through factory constructors on the `Component` class: `Component.element()`, `Component.text()` and `Component.fragment()`. Additionally, there are two more `Component.empty()` and `Component.wrapElement()` which are all explained below.
+
+<Info>
+Other than Flutter, Jaspr has a fixed number of foundational components which make up all other components and represent the core building blocks of HTML: element nodes and text nodes. Flutter is different because it allows you to write custom render objects with your own layouting and painting logic. This isn't possible in Jaspr because with HTML, the browser handles both layouting and painting. 
+</Info>
+
+### Component.element()
+
+The foundational component that renders a single html element with a tag, attributes and other parameters, as well as a list of child components.
+
+The `Component.element()` factory constructor always creates a component of type `DomComponent`.
+
+<Info>
+In general, it is recommended to use the [html utility methods](/concepts/html) like `div()`, `button()`. You can use `Component.element()` directly for lower-level control (mainly specifying the tag as a `String`), but is more verbose. 
+</Info>
+
+```dart
+var component = Component.element(
+  tag: 'div',
+  id: 'my-id',
+  classes: 'class-a class-b',
+  styles: Styles(color: Colors.black),
+  attributes: {'my-attribute': 'my-value'},
+  events: {'click': (e) => print('clicked')},
+  children: [
+    /* ... */
+  ],
+);
+
+// The same component, but using the html utility method instead.
+var component2 = div(
+  id: 'my-id', 
+  classes: 'class-a class-b',
+  styles: Styles(color: Colors.black),
+  attributes: {'my-attribute': 'my-value'},
+  events: {'click': (e) => print('clicked')},
+  [
+    /* ... */
+  ],
+);
+```
+
+Either component renders the following HTML:
+
+```html
+<div id="my-id" class="class-a class-b" style="color: black;" my-attribute="my-value">
+  ...
+</div>
+```
+
+See [Writing HTML](/concepts/html) for more details and examples.
+
+### Component.text()
+
+A simple component that renders a text node. A text node in html is just some standalone string that is placed inside another html element. Therefore the `Component.text()` constructor also only receives a single string to render to the page.
+
+The `Component.text()` factory constructor always creates a component of type `Text`.
+
+<Info>
+As it is recommended to use `div()` and other html methods over `Component.element()`, the `text()` utility method may also be used over the `Component.text()` constructor for consistency. 
+</Info>
+
+```dart
+var component = Component.text('Hello World!');
+
+// The same component, but using the utility method instead.
+var component2 = text('Hello World!');
+```
+
+<Info>
+As usual for web, styling is done through a combination of CSS attributes, either in a **Stylesheet** or inline though the **`styles` attribute** of the parent elements.
+</Info>
+
+### Component.fragment()
+
+A component that renders its child components without any wrapper element.
+
+This is meant to be used in places where you want to render multiple components / elements, but only a single component is allowed by the API, like in the `build()` method of stateless and stateful components.
+
+The `Component.fragment()` factory constructor always creates a component of type `Fragment`.
+
+<Info>
+As it is recommended to use `div()` and other html methods over `Component.element()`, the `fragment()` utility method may also be used over the `Component.fragment()` constructor for consistency. 
+</Info>
+
+```dart
+var component = Component.fragment(children: [
+  Component.element(tag: 'h1', children: [Component.text('Welcome')]),
+  Component.element(tag: 'p', children: [Component.text('Hello World')]),
+]);
+
+// The same component, but using the utility methods instead.
+var component2 = fragment([
+  h1([text('Welcome')]),
+  p([text('Hello World')]),
+]);
+```
+
+Either component renders the following HTML:
+
+```html
+<h1>Welcome</h1>
+<p>Hello World</p>
+```
+
+### Component.empty()
+
+A helper constructor that creates an empty fragment, thus rendering nothing.
+
+This is useful when you want to return "nothing" from a build method.
+
+```dart
+var component = Component.empty();
+
+// The same component, but using the utility method
+var component2 = fragment([]);
+```
+
+### Component.wrapElement()
+
+A component which applies its attributes and parameters (like `classes`, `styles`,) etc.) to its direct child element(s).
+
+This does not create a HTML element itself. All properties are merged with the respective child element's properties, with the child's properties taking precedence where there are conflicts.
+
+```dart
+var component = Component.wrapElement(
+  classes: 'wrapping-class',
+  styles: Styles(backgroundColor: Colors.blue, padding: Padding.all(8.px)),
+  child: div(
+    classes: 'some-class',
+    styles: Styles(backgroundColor: Colors.red),
+    [
+      text('Hello World'),
+    ],
+  ),
+);
+```
+
+The above component renders the following HTML:
+
+```html
+<div class="wrapping-class some-class" style="padding: 8px; background-color: red;">
+  Hello World
+</div>
+```
+
+## Formatting Whitespace
+
+When pre-rendering your components in **server** and **static** mode, Jaspr will output cleanly formatted html on a best-effort basis. This means it will add newlines and indentations to your html element, while trying to not affect the way the html is rendered.
+
+For example lets look at this simple Jaspr code:
+
+```dart
+div([
+  b([text('A')]),
+  em([text('B')]),
+  span([text('C')]),
+])
+```
+
+Which will generate the following html:
+
+```html
+<div>
+  <b>A</b>
+  <em>B</em>
+  <span>C</span>
+</div>
+```
+
+Here Jaspr adds newlines and indentation for each child element. However in some cases, you might not want Jaspr to introduce extra whitespace because it would affect the way the html is rendered.
+
+If you don't want Jaspr to format the output html for a part of your code, wrap it in a `<span>` element. This works since Jaspr will not apply and additional formatting to `<span>` elements.
+
+So for example this code:
+
+```dart
+span([
+  b([text('A')]),
+  em([text('B')]),
+  span([text('C')]),
+]),
+```
+
+will generate to following html:
+
+```html
+<span><b>A</b><em>B</em><span>C</span></span>
+```
