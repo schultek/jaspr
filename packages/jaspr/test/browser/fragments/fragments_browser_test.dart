@@ -12,7 +12,7 @@ void main() {
     testBrowser('should attach fragment children to parent', (tester) async {
       final component = FakeComponent(
           child: div([
-        Component.fragment(children: [
+        fragment([
           h1([text('Hello World')]),
           b([text('Bold Text')]),
           text('Some text'),
@@ -30,7 +30,7 @@ void main() {
       expect(divElement.childNodes.item(2)?.textContent, equals('Some text'));
 
       component.updateChild(div([
-        Component.fragment(children: [
+        fragment([
           h1([text('Hello World')]),
           text('Some text'),
           p([text('Paragraph')]),
@@ -51,7 +51,7 @@ void main() {
     testBrowser('should attach fragment children to parent after start node', (tester) async {
       tester.pumpComponent(div([
         text('Start'),
-        Component.fragment(children: [
+        fragment([
           h1([text('Hello World')]),
           b([text('Bold Text')]),
           text('Some text'),
@@ -72,15 +72,15 @@ void main() {
     testBrowser('should attach children in correct order with empty fragments', (tester) async {
       tester.pumpComponent(div([
         text('Start'),
-        Component.fragment(children: [
-          Component.fragment(children: []),
+        fragment([
+          fragment([]),
           h1([text('Hello World')]),
-          Component.fragment(children: [
+          fragment([
             b([text('Bold Text')]),
-            Component.fragment(children: []),
-            Component.fragment(children: [
-              Component.fragment(children: [
-                Component.fragment(children: [Component.fragment(children: [])]),
+            fragment([]),
+            fragment([
+              fragment([
+                fragment([fragment([])]),
                 p([text('Paragraph')]),
               ])
             ]),
@@ -106,10 +106,10 @@ void main() {
       final component = FakeComponent(
           child: div([
         text('Start'),
-        Component.fragment(key: ValueKey('f1'), children: [
+        fragment(key: ValueKey('f1'), [
           h1([text('Hello World')]),
         ]),
-        Component.fragment(key: ValueKey('f2'), children: [
+        fragment(key: ValueKey('f2'), [
           b([text('Bold Text')]),
           text('Some text'),
         ]),
@@ -131,11 +131,11 @@ void main() {
       print("MOVE");
       component.updateChild(div([
         text('Start'),
-        Component.fragment(key: ValueKey('f2'), children: [
+        fragment(key: ValueKey('f2'), [
           b([text('Bold Text')]),
           text('Some text'),
         ]),
-        Component.fragment(key: ValueKey('f1'), children: [
+        fragment(key: ValueKey('f1'), [
           h1([text('Hello World')]),
         ]),
         text('End'),
