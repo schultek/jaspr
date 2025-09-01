@@ -2,8 +2,6 @@ import 'angle.dart';
 import 'color.dart';
 import 'unit.dart';
 
-typedef BackdropFilter = Filter;
-
 class Filter {
   const Filter._(this.value);
 
@@ -20,43 +18,48 @@ class Filter {
   static const Filter revertLayer = Filter._('revert-layer');
   static const Filter unset = Filter._('unset');
 
-  const factory Filter(List<FilterFn> filterValues) = _Filter;
+  const factory Filter.list(List<Filter> filterValues) = _FilterList;
+  const factory Filter.blur([Unit? length]) = _BlurFilter;
+  const factory Filter.brightness([double? percentage]) = _BrightnessFilter;
+  const factory Filter.contrast([double? percentage]) = _ContrastFilter;
+  const factory Filter.dropShadow({
+    required Unit offsetX,
+    required Unit offsetY,
+    Unit? spread,
+    Color? color,
+  }) = _DropShadowFilter;
+  const factory Filter.grayscale([double? percentage]) = _GrayscaleFilter;
+  const factory Filter.hueRotate([Angle? angle]) = _HueRotateFilter;
+  const factory Filter.invert([double? percentage]) = _InvertFilter;
+  const factory Filter.opacity([double? percentage]) = _OpacityFilter;
+  const factory Filter.sepia([double? percentage]) = _SepiaFilter;
+  const factory Filter.saturate([double? percentage]) = _SaturateFilter;
+  const factory Filter.url(String url) = _UrlFilter;
+  const factory Filter.src(String url) = _SrcFilter;
 }
 
-class _Filter implements Filter {
-  const _Filter(this._filterValues);
+class _FilterList implements Filter {
+  const _FilterList(this._filterValues);
 
-  final List<FilterFn> _filterValues;
+  final List<Filter> _filterValues;
 
   /// The css value
   @override
   String get value => _filterValues.map((e) => e.value).join(' ');
 }
 
-abstract class FilterFn {
-  const factory FilterFn.blur([Unit? length]) = _BlurFilter;
-  const factory FilterFn.brightness([double? percentage]) = _BrightnessFilter;
-  const factory FilterFn.contrast([double? percentage]) = _ContrastFilter;
-  const factory FilterFn.dropShadow({
-    required Unit offsetX,
-    required Unit offsetY,
-    Unit? spread,
-    Color? color,
-  }) = _DropShadowFilter;
-  const factory FilterFn.grayscale([double? percentage]) = _GrayscaleFilter;
-  const factory FilterFn.hueRotate([Angle? angle]) = _HueRotateFilter;
-  const factory FilterFn.invert([double? percentage]) = _InvertFilter;
-  const factory FilterFn.opacity([double? percentage]) = _OpacityFilter;
-  const factory FilterFn.sepia([double? percentage]) = _SepiaFilter;
-  const factory FilterFn.saturate([double? percentage]) = _SaturateFilter;
-  const factory FilterFn.url(String url) = _UrlFilter;
-  const factory FilterFn.src(String url) = _SrcFilter;
+class _FilterWithPercentage implements Filter {
+  const _FilterWithPercentage(this._percentage, this._name);
+
+  final double? _percentage;
+  final String _name;
 
   /// The css value
-  String get value;
+  @override
+  String get value => "$_name(${_percentage?.numstr ?? ''})";
 }
 
-class _BlurFilter implements FilterFn {
+class _BlurFilter implements Filter {
   const _BlurFilter([this._length]);
 
   final Unit? _length;
@@ -66,26 +69,16 @@ class _BlurFilter implements FilterFn {
   String get value => "blur(${_length?.value ?? ''})";
 }
 
-class _BrightnessFilter implements FilterFn {
-  const _BrightnessFilter([this._percentage]);
-
-  final double? _percentage;
-
-  /// The css value
-  @override
-  String get value => "brightness(${_percentage?.numstr ?? ''})";
+class _BrightnessFilter extends _FilterWithPercentage {
+  const _BrightnessFilter([double? percentage])
+      : super(percentage, 'brightness');
 }
 
-class _ContrastFilter implements FilterFn {
-  const _ContrastFilter([this._percentage]);
-
-  final double? _percentage;
-
-  @override
-  String get value => "contrast(${_percentage?.numstr ?? ''})";
+class _ContrastFilter extends _FilterWithPercentage {
+  const _ContrastFilter([double? percentage]) : super(percentage, 'contrast');
 }
 
-class _DropShadowFilter implements FilterFn {
+class _DropShadowFilter implements Filter {
   const _DropShadowFilter({
     required Unit offsetX,
     required Unit offsetY,
@@ -107,17 +100,11 @@ class _DropShadowFilter implements FilterFn {
       "drop-shadow(${_offsetX.value} ${_offsetY.value} ${_spread?.value ?? ''} ${_color?.value ?? ''})";
 }
 
-class _GrayscaleFilter implements FilterFn {
-  const _GrayscaleFilter([this._percentage]);
-
-  final double? _percentage;
-
-  /// The css value
-  @override
-  String get value => "grayscale(${_percentage?.numstr ?? ''})";
+class _GrayscaleFilter extends _FilterWithPercentage {
+  const _GrayscaleFilter([double? percentage]) : super(percentage, 'grayscale');
 }
 
-class _HueRotateFilter implements FilterFn {
+class _HueRotateFilter implements Filter {
   const _HueRotateFilter([this._angle]);
 
   final Angle? _angle;
@@ -127,47 +114,23 @@ class _HueRotateFilter implements FilterFn {
   String get value => "hue-rotate(${_angle?.value ?? ''})";
 }
 
-class _InvertFilter implements FilterFn {
-  const _InvertFilter([this._percentage]);
-
-  final double? _percentage;
-
-  /// The css value
-  @override
-  String get value => "invert(${_percentage?.numstr ?? ''})";
+class _InvertFilter extends _FilterWithPercentage {
+  const _InvertFilter([double? percentage]) : super(percentage, 'invert');
 }
 
-class _OpacityFilter implements FilterFn {
-  const _OpacityFilter([this._percentage]);
-
-  final double? _percentage;
-
-  /// The css value
-  @override
-  String get value => "opacity(${_percentage?.numstr ?? ''})";
+class _OpacityFilter extends _FilterWithPercentage {
+  const _OpacityFilter([double? percentage]) : super(percentage, 'opacity');
 }
 
-class _SepiaFilter implements FilterFn {
-  const _SepiaFilter([this._percentage]);
-
-  final double? _percentage;
-
-  /// The css value
-  @override
-  String get value => "sepia(${_percentage?.numstr ?? ''})";
+class _SepiaFilter extends _FilterWithPercentage {
+  const _SepiaFilter([double? percentage]) : super(percentage, 'sepia');
 }
 
-class _SaturateFilter implements FilterFn {
-  const _SaturateFilter([this._percentage]);
-
-  final double? _percentage;
-
-  /// The css value
-  @override
-  String get value => "saturate(${_percentage?.numstr ?? ''})";
+class _SaturateFilter extends _FilterWithPercentage {
+  const _SaturateFilter([double? percentage]) : super(percentage, 'saturate');
 }
 
-class _UrlFilter implements FilterFn {
+class _UrlFilter implements Filter {
   const _UrlFilter(this._url);
 
   final String _url;
@@ -177,7 +140,7 @@ class _UrlFilter implements FilterFn {
   String get value => "url($_url)";
 }
 
-class _SrcFilter implements FilterFn {
+class _SrcFilter implements Filter {
   const _SrcFilter(this._url);
 
   final String _url;

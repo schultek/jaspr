@@ -32,7 +32,7 @@ abstract class Styles with StylesMixin<Styles> {
     Overflow? overflow,
     BoxShadow? shadow,
     Filter? filter,
-    BackdropFilter? backdropFilter,
+    Filter? backdropFilter,
     Cursor? cursor,
     UserSelect? userSelect,
     PointerEvents? pointerEvents,
@@ -120,7 +120,7 @@ abstract mixin class StylesMixin<T> {
     Overflow? overflow,
     BoxShadow? shadow,
     Filter? filter,
-    BackdropFilter? backdropFilter,
+    Filter? backdropFilter,
     Cursor? cursor,
     UserSelect? userSelect,
     PointerEvents? pointerEvents,
@@ -258,7 +258,8 @@ class _CombinedStyles extends Styles {
   const _CombinedStyles(this._styles) : super._();
 
   @override
-  Map<String, String> get properties => _styles.fold({}, (v, s) => v..addAll(s.properties));
+  Map<String, String> get properties =>
+      _styles.fold({}, (v, s) => v..addAll(s.properties));
 
   @override
   Styles combine(Styles styles) {
@@ -289,7 +290,7 @@ class _Styles extends Styles {
   final Overflow? overflow;
   final BoxShadow? shadow;
   final Filter? filter;
-  final BackdropFilter? backdropFilter;
+  final Filter? backdropFilter;
   final Cursor? cursor;
   final UserSelect? userSelect;
   final PointerEvents? pointerEvents;
@@ -476,12 +477,16 @@ class _Styles extends Styles {
         if (whiteSpace != null) 'white-space': whiteSpace!.value,
         // Background Styles
         if (backgroundColor != null) 'background-color': backgroundColor!.value,
-        if (backgroundAttachment != null) 'background-attachment': backgroundAttachment!.value,
+        if (backgroundAttachment != null)
+          'background-attachment': backgroundAttachment!.value,
         if (backgroundClip != null) 'background-clip': backgroundClip!.value,
         if (backgroundImage != null) 'background-image': backgroundImage!.value,
-        if (backgroundOrigin != null) 'background-origin': backgroundOrigin!.value,
-        if (backgroundPosition != null) 'background-position': backgroundPosition!.value,
-        if (backgroundRepeat != null) 'background-repeat': backgroundRepeat!.value,
+        if (backgroundOrigin != null)
+          'background-origin': backgroundOrigin!.value,
+        if (backgroundPosition != null)
+          'background-position': backgroundPosition!.value,
+        if (backgroundRepeat != null)
+          'background-repeat': backgroundRepeat!.value,
         if (backgroundSize != null) 'background-size': backgroundSize!.value,
         // Flexbox Styles
         if (flexDirection != null) 'flex-direction': flexDirection!.value,
@@ -495,8 +500,10 @@ class _Styles extends Styles {
         if (alignSelf != null) 'align-self': alignSelf!.value,
         // Grid Styles
         ...?gridTemplate?.styles,
-        if (autoRows != null) 'grid-auto-rows': autoRows!.map((s) => s.value).join(' '),
-        if (autoColumns != null) 'grid-auto-columns': autoColumns!.map((s) => s.value).join(' '),
+        if (autoRows != null)
+          'grid-auto-rows': autoRows!.map((s) => s.value).join(' '),
+        if (autoColumns != null)
+          'grid-auto-columns': autoColumns!.map((s) => s.value).join(' '),
         ...?gridPlacement?.styles,
         if (justifyItems != null) 'justify-items': justifyItems!.value,
         // Grid Item Styles

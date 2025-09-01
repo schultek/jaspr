@@ -149,25 +149,26 @@ void main() {
           transform: Transform.scale(2),
           shadow: BoxShadow(
               offsetX: Unit.zero, offsetY: Unit.zero, blur: Unit.pixels(10)),
-          filter: Filter([
-            FilterFn.blur(Unit.rem(2)),
-            FilterFn.brightness(0.0),
-            FilterFn.contrast(0.1),
-            FilterFn.dropShadow(
-                offsetX: Unit.rem(1),
-                offsetY: Unit.rem(1),
-                spread: Unit.rem(0.2),
-                color: Colors.red),
-            FilterFn.grayscale(0.3),
-            FilterFn.hueRotate(Angle.deg(45))
+          filter: Filter.list([
+            Filter.blur(Unit.rem(2)),
+            Filter.brightness(0.0),
+            Filter.contrast(0.1),
+            Filter.dropShadow(
+              offsetX: Unit.rem(1),
+              offsetY: Unit.rem(1),
+              spread: Unit.rem(0.2),
+              color: Colors.red,
+            ),
+            Filter.grayscale(0.3),
+            Filter.hueRotate(Angle.deg(45))
           ]),
-          backdropFilter: BackdropFilter([
-            FilterFn.invert(0.4),
-            FilterFn.opacity(0.5),
-            FilterFn.sepia(0.6),
-            FilterFn.saturate(0.7),
-            FilterFn.url("abc.svg#urltest"),
-            FilterFn.src("xyz.svg#srctest"),
+          backdropFilter: Filter.list([
+            Filter.invert(0.4),
+            Filter.opacity(0.5),
+            Filter.sepia(0.6),
+            Filter.saturate(0.7),
+            Filter.url("abc.svg#urltest"),
+            Filter.src("xyz.svg#srctest"),
           ]),
           cursor: Cursor.crosshair,
           transition: Transition('width', duration: 500),
@@ -195,8 +196,10 @@ void main() {
             'opacity': '0.5',
             'transform': 'scale(2)',
             'box-shadow': '0 0 10px',
-            'filter': 'blur(2rem) brightness(0) contrast(0.1) drop-shadow(1rem 1rem 0.2rem red) grayscale(0.3) hue-rotate(45deg)',
-            'backdrop-filter': 'invert(0.4) opacity(0.5) sepia(0.6) saturate(0.7) url(abc.svg#urltest) src(xyz.svg#srctest)',
+            'filter':
+                'blur(2rem) brightness(0) contrast(0.1) drop-shadow(1rem 1rem 0.2rem red) grayscale(0.3) hue-rotate(45deg)',
+            'backdrop-filter':
+                'invert(0.4) opacity(0.5) sepia(0.6) saturate(0.7) url(abc.svg#urltest) src(xyz.svg#srctest)',
             'cursor': 'crosshair',
             'transition': 'width 500ms',
           }),
