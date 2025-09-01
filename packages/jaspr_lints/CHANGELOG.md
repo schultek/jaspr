@@ -1,4 +1,4 @@
-## Unreleased minor
+## Unreleased minor dev.0
 
 - Extend `prefer_html_methods` lint to also suggest using `text()` and `fragment()` methods, and offer fixes for them.
 
