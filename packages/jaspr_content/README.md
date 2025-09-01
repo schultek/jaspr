@@ -15,19 +15,19 @@
 
 A package for building **content-driven sites** like documentation, blogs or marketing pages with [Jaspr](https://pub.dev/packages/jaspr).
 
-It provides **out-of-the-box tools** for loading, parsing, and rendering content from various sources like markdown files. It is **fully customizable** and you are able to add your **own implementations** for each part.
+It provides **out-of-the-box tools** for loading, parsing, and rendering content from various sources like Markdown files. It is **fully customizable** and you are able to add your **own implementations** for each part.
 
-> Looking to get started? Head to the [Quickstart](https://docs.jaspr.site/content/quick_start) guide.
+> Looking to get started? Head to the [Quick Start](https://docs.jaspr.site/content/quick_start) guide.
 
 ## Features
 
-- **📖 Markdown**: Load and parse markdown files from your filesystem or a remote source (e.g. Github).
+- **📖 Markdown**: Load and parse markdown files from your filesystem or a remote source, such as GitHub.
 
-- **🗃️ Frontmatter**: Parse frontmatter data from markdown files and use it in your components.
+- **🗃️ Frontmatter**: Parse frontmatter data from Markdown files and use it in your components.
 
 - **🖋️ Templating**: Use a templating language like [mustache](https://mustache.github.io/mustache.5.html) to inject data into your content.
 
-- **🧩 Components**: Enhance your content with  Jaspr components like [`<Info>`](https://docs.jaspr.site/content/components/callout) or [`<Tabs>`](https://docs.jaspr.site/content/components/tabs). Choose from the built-in components or add your own.
+- **🧩 Components**: Enhance your content with Jaspr components like [`<Info>`](https://docs.jaspr.site/content/components/callout) or [`<Tabs>`](https://docs.jaspr.site/content/components/tabs). Choose from the built-in components or add your own.
 
 - **📐 Layouts**: Use pre-defined layouts like the [DocsLayout](https://docs.jaspr.site/content/layouts/docs_layout) or create your own.
 
@@ -37,11 +37,13 @@ It provides **out-of-the-box tools** for loading, parsing, and rendering content
 
 ## Documentation
 
-Checkout the official documentation at [docs.jaspr.site/content](https://docs.jaspr.site/content). The docs are split into:
+Check out the official documentation at [docs.jaspr.site/content](https://docs.jaspr.site/content). The docs are split into:
 
-- [**Quickstart**](https://docs.jaspr.site/content/quick_start): A quick introduction to get you started with `jaspr_content`.
-- [**Guides**](https://docs.jaspr.site/content/guides/adding_pages): Step-by-step guides for common use-cases and features.
-- [**Concepts**](https://docs.jaspr.site/content/concepts/pages): In-depth explanations of the core concepts and features of `jaspr_content`.
-- [**Components**](https://docs.jaspr.site/content/components/callout): 
+- [**Quickstart**](https://docs.jaspr.site/content/quick_start):
+  A quick introduction to get you started with `jaspr_content`.
+- [**Guides**](https://docs.jaspr.site/content/guides/adding_pages):
+  Step-by-step guides for common use-cases and features.
+- [**Concepts**](https://docs.jaspr.site/content/concepts/pages):
+  In-depth explanations of the core concepts and features of `jaspr_content`.
+- [**Components**](https://docs.jaspr.site/content/components/callout):
   A list of all built-in components and their usage.
-
