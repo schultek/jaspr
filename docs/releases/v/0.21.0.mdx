@@ -121,14 +121,43 @@ Using the command is straightforward and follows the same style as the `dart fix
 - Running `jaspr migrate --dry-run` will compute and print all proposed migrations, but makes no changes to the code.
 - Running `jaspr migrate --apply` will compute, print and apply all migrations.
 
-## New Component Scopes
+## New Component Scopes in VSCode
 
-TODO
+The newest version of the VSCode extension, released together with Jaspr 0.21.0, contains a big quality-of-life feature to help navigate the complexities of writing full-stack components: Component Scopes
+
+For each of your components, you will now get a small hint directly in the editor whether that component is rendered on the server and/or on the client. This helps with reasoning which sdk libraries are available and which APIs can be used. Before, this would only show up as compilation errors during build.
+
+The editor hints for a fullstack component look like this:
+
+
+
+You can click on either server and client hint to see the root(s) of the respective scope, which for the server scope is always the `main()` method of the server entrypoint, and for the client scope is one or more `@client` components.
+
+Scope hints can optionally be disabled in the settings.
 
 ## Base Handling
 
-TODO
+The `base` parameter of the `Document()` component can now be set to `null`, which causes the `<base>` head element to not be rendered. Previously this defaulted to `/` even when explicitly set to `null`. The default when not specifying the parameter is still `/`.
+
+When setting to `null`, the script src path of the generated client script is now corrected and does not produce an error.
+
+There is no migration needed, as the behavior for normal usage is still the same.
 
 ## New CSS Properties
 
-TODO (Filters and Flexbox Properties)
+The following css properties have been added to `Styles()` and `css.styles()`:
+
+```dart
+// For flexbox and grid layouts.
+JustifyItems justifyItems
+JustifySelf justifySelf
+AlignContent alignContent
+
+// For applying graphical effects like blur or color shift.
+Filter filter
+Filter backdropFilter
+```
+
+- `JustifyItems`, `JustifySelf` and `AlignContent` are enums with values like `JustifyItems.center`, `JustifySelf.start` or `AlignItems.spaceAround`.
+
+- `Filter` defines several filter methods like `Filter.blur(8.px)`, `Filter.hueRotate(90.deg)`, `Filter.opacity(0.5)` or `Filter.none`.

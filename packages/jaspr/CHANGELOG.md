@@ -7,14 +7,18 @@
 - **Breaking** Introduced new `Component.element()`, `Component.text()`, `Component.fragment()` and `Component.wrapElement()` constructors, replacing `DomComponent()`, `Text()`, `Fragment()` and `DomComponent.wrap()`, respectively. Also added `Component.empty()` to create an empty fragment.
 
 - Allow setting `Document(base: )` to `null`, and fix the path to the generated client script when no `<base>` element exists.
+
+- Added `justifyItems`, `justifySelf` and `alignContent` styles properties and respective enums `JustifyItems`, `JustifySelf` and `AlignContent`.
+- Added `filter` and `backdropFilter` styles properties and its implementation class `Filter`.
+
 - Added `--include-source-maps` option to `jaspr build` command.
+
+- Added `jaspr tooling-daemon` command and component scope analysis.
 - Fixed sitemap generation bug in top-level route ('/')
 - Update `build` dependency to 3.0.0 and migrate to new analyzer model.
-- Added `jaspr tooling-daemon` command and component scope analysis.
 
-- Added `JustifyItems`, `JustifySelf` and `AlignContent` enums and style properties.
 - Migrate project to use pub workspaces and `melos` 7.0.0.
-- Added `filter` and `backdropFilter` styles properties and its implementation class `Filter`.
+
 
 ## 0.20.0
 
