@@ -78,7 +78,7 @@ abstract class Component {
 
   /// Creates a [DomComponent] component which renders a html element node with the given [tag], like
   /// a `<div>`, `<button>` etc.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// return Component.element(
@@ -90,15 +90,15 @@ abstract class Component {
   ///   ],
   /// );
   /// ```
-  /// 
+  ///
   /// Renders:
-  /// 
+  ///
   /// ```html
   /// <div class="some-class" style="background-color: red;">
   ///   Hello World
   /// </div>
   /// ```
-  /// 
+  ///
   const factory Component.element({
     required String tag,
     String? id,
@@ -111,11 +111,11 @@ abstract class Component {
   }) = DomComponent._;
 
   /// Creates a [DomComponent] component which applies its parameters like [classes], [styles], etc. to all of its
-  /// direct child element(s). 
-  /// 
-  /// This does not create a html element itself. All properties are merged with the respective child element's 
+  /// direct child element(s).
+  ///
+  /// This does not create a html element itself. All properties are merged with the respective child element's
   /// properties, with the child's properties taking precedence where there are conflicts.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// return Component.wrapElement(
@@ -131,14 +131,14 @@ abstract class Component {
   ///   ),
   /// );
   /// ```
-  /// 
+  ///
   /// Renders:
   /// ```html
   /// <div class="wrapping-class some-class" style="padding: 8px; background-color: red;">
   ///   Hello World
   /// </div>
   /// ```
-  ///   
+  ///
   const factory Component.wrapElement({
     Key? key,
     String? id,
@@ -150,10 +150,10 @@ abstract class Component {
   }) = _WrappingDomComponent;
 
   /// Creates a [Fragment] component which renders a list of children without any wrapping element.
-  /// 
+  ///
   /// This is useful when you want to return multiple elements from a build method without adding an extra
   /// wrapping element to the html DOM.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// return Component.fragment([
@@ -161,17 +161,17 @@ abstract class Component {
   ///   Component.element(tag: 'button', children: []),
   /// ]);
   /// ```
-  /// 
+  ///
   /// Renders:
   /// ```html
   /// <span></span>
   /// <button></button>
   /// ```
-  /// 
+  ///
   const factory Component.fragment({required List<Component> children, Key? key}) = Fragment._;
 
   /// Creates an empty [Fragment] component which renders nothing.
-  /// 
+  ///
   /// This is useful when you want to return "nothing" from a build method.
   const factory Component.empty({Key? key}) = Fragment._empty;
 

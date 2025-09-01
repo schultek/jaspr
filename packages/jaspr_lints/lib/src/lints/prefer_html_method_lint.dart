@@ -80,9 +80,7 @@ class PreferHtmlMethodLint extends DartLintRule {
   }
 
   @override
-  List<Fix> getFixes() => [
-    PreferHtmlMethodFix()
-  ];
+  List<Fix> getFixes() => [PreferHtmlMethodFix()];
 }
 
 class PreferHtmlMethodFix extends DartFix {
