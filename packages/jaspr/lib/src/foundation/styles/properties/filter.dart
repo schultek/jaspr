@@ -19,21 +19,21 @@ class Filter {
   static const Filter unset = Filter._('unset');
 
   const factory Filter.list(List<Filter> filterValues) = _FilterList;
-  const factory Filter.blur([Unit? length]) = _BlurFilter;
-  const factory Filter.brightness([double? percentage]) = _BrightnessFilter;
-  const factory Filter.contrast([double? percentage]) = _ContrastFilter;
+  const factory Filter.blur([Unit length]) = _BlurFilter;
+  const factory Filter.brightness([double percentage]) = _BrightnessFilter;
+  const factory Filter.contrast([double percentage]) = _ContrastFilter;
   const factory Filter.dropShadow({
     required Unit offsetX,
     required Unit offsetY,
     Unit? spread,
     Color? color,
   }) = _DropShadowFilter;
-  const factory Filter.grayscale([double? percentage]) = _GrayscaleFilter;
-  const factory Filter.hueRotate([Angle? angle]) = _HueRotateFilter;
-  const factory Filter.invert([double? percentage]) = _InvertFilter;
-  const factory Filter.opacity([double? percentage]) = _OpacityFilter;
-  const factory Filter.sepia([double? percentage]) = _SepiaFilter;
-  const factory Filter.saturate([double? percentage]) = _SaturateFilter;
+  const factory Filter.grayscale([double percentage]) = _GrayscaleFilter;
+  const factory Filter.hueRotate([Angle angle]) = _HueRotateFilter;
+  const factory Filter.invert([double percentage]) = _InvertFilter;
+  const factory Filter.opacity([double percentage]) = _OpacityFilter;
+  const factory Filter.sepia([double percentage]) = _SepiaFilter;
+  const factory Filter.saturate([double percentage]) = _SaturateFilter;
   const factory Filter.url(String url) = _UrlFilter;
 }
 
@@ -50,31 +50,32 @@ class _FilterList implements Filter {
 class _FilterWithPercentage implements Filter {
   const _FilterWithPercentage(this._percentage, this._name);
 
-  final double? _percentage;
+  final double _percentage;
   final String _name;
 
   /// The css value
   @override
-  String get value => "$_name(${_percentage?.numstr ?? ''})";
+  String get value => "$_name(${_percentage.numstr})";
 }
 
 class _BlurFilter implements Filter {
-  const _BlurFilter([this._length]);
+  const _BlurFilter([this._length = Unit.zero]);
 
-  final Unit? _length;
+  final Unit _length;
 
   /// The css value
   @override
-  String get value => "blur(${_length?.value ?? ''})";
+  String get value => "blur(${_length.value})";
 }
 
 class _BrightnessFilter extends _FilterWithPercentage {
-  const _BrightnessFilter([double? percentage])
+  const _BrightnessFilter([double percentage = 1.0])
       : super(percentage, 'brightness');
 }
 
 class _ContrastFilter extends _FilterWithPercentage {
-  const _ContrastFilter([double? percentage]) : super(percentage, 'contrast');
+  const _ContrastFilter([double percentage = 1.0])
+      : super(percentage, 'contrast');
 }
 
 class _DropShadowFilter implements Filter {
@@ -95,38 +96,45 @@ class _DropShadowFilter implements Filter {
 
   /// The css value
   @override
-  String get value =>
-      "drop-shadow(${_offsetX.value} ${_offsetY.value} ${_spread?.value ?? ''} ${_color?.value ?? ''})";
+  String get value {
+    String val = '${_offsetX.value} ${_offsetY.value}';
+    if (_spread != null) val += ' ${_spread.value}';
+    if (_color != null) val += ' ${_color.value}';
+    return 'drop-shadow($val)';
+  }
 }
 
 class _GrayscaleFilter extends _FilterWithPercentage {
-  const _GrayscaleFilter([double? percentage]) : super(percentage, 'grayscale');
+  const _GrayscaleFilter([double percentage = 1.0])
+      : super(percentage, 'grayscale');
 }
 
 class _HueRotateFilter implements Filter {
-  const _HueRotateFilter([this._angle]);
+  const _HueRotateFilter([this._angle = Angle.zero]);
 
-  final Angle? _angle;
+  final Angle _angle;
 
   /// The css value
   @override
-  String get value => "hue-rotate(${_angle?.value ?? ''})";
+  String get value => "hue-rotate(${_angle.value})";
 }
 
 class _InvertFilter extends _FilterWithPercentage {
-  const _InvertFilter([double? percentage]) : super(percentage, 'invert');
+  const _InvertFilter([double percentage = 1.0]) : super(percentage, 'invert');
 }
 
 class _OpacityFilter extends _FilterWithPercentage {
-  const _OpacityFilter([double? percentage]) : super(percentage, 'opacity');
+  const _OpacityFilter([double percentage = 1.0])
+      : super(percentage, 'opacity');
 }
 
 class _SepiaFilter extends _FilterWithPercentage {
-  const _SepiaFilter([double? percentage]) : super(percentage, 'sepia');
+  const _SepiaFilter([double percentage = 1.0]) : super(percentage, 'sepia');
 }
 
 class _SaturateFilter extends _FilterWithPercentage {
-  const _SaturateFilter([double? percentage]) : super(percentage, 'saturate');
+  const _SaturateFilter([double percentage = 1.0])
+      : super(percentage, 'saturate');
 }
 
 class _UrlFilter implements Filter {
