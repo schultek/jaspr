@@ -42,12 +42,37 @@ class _FilterList implements Filter {
 
   final List<Filter> _filterValues;
 
+  bool _filtersListable() {
+    if (_filterValues.isEmpty) {
+      throw 'Filter.list cannot be empty.';
+    }
+
+    for (final filter in _filterValues) {
+      if (filter is _FilterList) {
+        throw 'Cannot nest [Filter.list] inside [Filter.list].';
+      }
+
+      if (filter is! _ListableFilter) {
+        throw 'Cannot use ${filter.value} as a filter list item, only standalone use supported.';
+      }
+    }
+
+    return true;
+  }
+
   /// The css value
   @override
-  String get value => _filterValues.map((e) => e.value).join(' ');
+  String get value {
+    assert(_filtersListable());
+    return _filterValues.map((filter) {
+      return filter.value;
+    }).join(' ');
+  }
 }
 
-class _FilterWithPercentage implements Filter {
+abstract class _ListableFilter implements Filter {}
+
+abstract class _FilterWithPercentage implements _ListableFilter {
   const _FilterWithPercentage(this._percentage, this._name);
 
   final double _percentage;
@@ -58,7 +83,7 @@ class _FilterWithPercentage implements Filter {
   String get value => "$_name(${_percentage.numstr})";
 }
 
-class _BlurFilter implements Filter {
+class _BlurFilter implements _ListableFilter {
   const _BlurFilter([this._length = Unit.zero]);
 
   final Unit _length;
@@ -78,7 +103,7 @@ class _ContrastFilter extends _FilterWithPercentage {
       : super(percentage, 'contrast');
 }
 
-class _DropShadowFilter implements Filter {
+class _DropShadowFilter implements _ListableFilter {
   const _DropShadowFilter({
     required Unit offsetX,
     required Unit offsetY,
@@ -109,7 +134,7 @@ class _GrayscaleFilter extends _FilterWithPercentage {
       : super(percentage, 'grayscale');
 }
 
-class _HueRotateFilter implements Filter {
+class _HueRotateFilter implements _ListableFilter {
   const _HueRotateFilter([this._angle = Angle.zero]);
 
   final Angle _angle;
@@ -137,7 +162,7 @@ class _SaturateFilter extends _FilterWithPercentage {
       : super(percentage, 'saturate');
 }
 
-class _UrlFilter implements Filter {
+class _UrlFilter implements _ListableFilter {
   const _UrlFilter(this._url);
 
   final String _url;
