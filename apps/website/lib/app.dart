@@ -1,9 +1,9 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
-import 'package:website/constants/theme.dart';
-import 'package:website/components/banner.dart';
 
+import 'components/banner.dart';
 import 'components/markdown_page.dart';
+import 'constants/theme.dart';
 import 'layout/footer.dart';
 import 'layout/header.dart';
 import 'pages/home/home.dart';

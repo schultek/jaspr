@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
+
+import '../constants/theme.dart';
 
 class Logo extends StatelessComponent {
   const Logo({super.key});

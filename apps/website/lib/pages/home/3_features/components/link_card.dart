@@ -1,8 +1,8 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
 
 import '../../../../components/gradient_border.dart';
 import '../../../../components/icon.dart';
+import '../../../../constants/theme.dart';
 
 class LinkCard extends StatelessComponent {
   const LinkCard({required this.icon, required this.title, required this.description, required this.link, super.key});

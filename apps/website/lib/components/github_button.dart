@@ -1,10 +1,9 @@
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
 import 'package:jaspr/jaspr.dart';
 
-import 'package:http/http.dart' as http;
-import 'package:website/constants/theme.dart';
-
+import '../constants/theme.dart';
 import 'icon.dart';
 
 class GitHubButton extends StatefulComponent {

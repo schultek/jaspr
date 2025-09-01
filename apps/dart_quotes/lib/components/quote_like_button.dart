@@ -1,6 +1,6 @@
-import 'package:dart_quotes/data/firebase.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../data/firebase.dart';
 @Import.onWeb('../interop/confetti.dart', show: [#JSConfetti])
 import 'quote_like_button.imports.dart';
 

@@ -1,6 +1,6 @@
-import 'package:fluttercon/models/session.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../models/session.dart';
 import 'like_button.dart';
 import 'tag.dart';
 

@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/components/gradient_border.dart';
-import 'package:website/constants/theme.dart';
 
+import '../constants/theme.dart';
+import 'gradient_border.dart';
 import 'icon.dart';
 
 class LinkButton extends StatelessComponent {

@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
 
+import '../../../constants/theme.dart';
 import 'components/testimonial_card.dart';
 
 class Testimonials extends StatelessComponent {

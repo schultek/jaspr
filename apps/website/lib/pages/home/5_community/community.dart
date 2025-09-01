@@ -1,6 +1,7 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/components/link_button.dart';
-import 'package:website/constants/theme.dart';
+
+import '../../../components/link_button.dart';
+import '../../../constants/theme.dart';
 import 'components/sponsors_list.dart';
 
 class Community extends StatelessComponent {

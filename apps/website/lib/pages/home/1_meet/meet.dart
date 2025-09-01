@@ -1,8 +1,8 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
 
 import '../../../components/code_window/code_window.dart';
 import '../../../components/link_button.dart';
+import '../../../constants/theme.dart';
 import 'components/modes_animation.dart';
 
 class Meet extends StatelessComponent {

@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/components/gradient_border.dart';
-import 'package:website/components/icon.dart';
 
+import '../../../../components/gradient_border.dart';
+import '../../../../components/icon.dart';
 import '../../../../constants/theme.dart';
 
 class HeroPill extends StatelessComponent {

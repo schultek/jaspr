@@ -1,16 +1,9 @@
-include: package:lints/recommended.yaml
+include: package:jaspr_repo/app.yaml
 
 analyzer:
   exclude:
     - build/**
-# TODO: Reenable once migrated to analyzer v8.
-#  plugins:
-#    - custom_lint
 
 linter:
   rules:
     file_names: false
-
-formatter:
-  page_width: 120
-  trailing_commas: preserve

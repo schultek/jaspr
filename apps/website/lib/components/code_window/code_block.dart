@@ -1,8 +1,8 @@
+import 'package:highlight/highlight.dart' show Node, Result, highlight;
 import 'package:jaspr/jaspr.dart';
 
-import 'package:highlight/highlight.dart' show Node, Result, highlight;
-import 'package:website/components/code_window/theme.dart';
-import 'package:website/constants/theme.dart';
+import '../../constants/theme.dart';
+import 'theme.dart';
 
 class CodeBlock extends StatelessComponent {
   const CodeBlock({

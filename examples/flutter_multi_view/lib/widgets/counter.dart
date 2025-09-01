@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_multi_view/constants/theme.dart';
+import '../constants/theme.dart';
 
 class CounterWidget extends StatelessWidget {
   const CounterWidget({this.count = 0, required this.onChange, super.key});

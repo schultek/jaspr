@@ -1,8 +1,6 @@
-// ignore_for_file: file_names
-
 import 'package:jaspr/jaspr.dart';
-import 'package:website/components/logo.dart';
 
+import '../components/logo.dart';
 import '../constants/theme.dart';
 
 class Footer extends StatelessComponent {
