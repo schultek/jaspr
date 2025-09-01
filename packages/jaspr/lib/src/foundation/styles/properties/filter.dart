@@ -35,7 +35,6 @@ class Filter {
   const factory Filter.sepia([double? percentage]) = _SepiaFilter;
   const factory Filter.saturate([double? percentage]) = _SaturateFilter;
   const factory Filter.url(String url) = _UrlFilter;
-  const factory Filter.src(String url) = _SrcFilter;
 }
 
 class _FilterList implements Filter {
@@ -138,14 +137,4 @@ class _UrlFilter implements Filter {
   /// The css value
   @override
   String get value => "url($_url)";
-}
-
-class _SrcFilter implements Filter {
-  const _SrcFilter(this._url);
-
-  final String _url;
-
-  /// The css value
-  @override
-  String get value => "src($_url)";
 }

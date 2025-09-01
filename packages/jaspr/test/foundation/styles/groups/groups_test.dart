@@ -168,7 +168,6 @@ void main() {
             Filter.sepia(0.6),
             Filter.saturate(0.7),
             Filter.url("abc.svg#urltest"),
-            Filter.src("xyz.svg#srctest"),
           ]),
           cursor: Cursor.crosshair,
           transition: Transition('width', duration: 500),
