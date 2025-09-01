@@ -59,7 +59,7 @@ class App extends StatelessComponent {
         Route(path: '/', title: 'Home', builder: (context, state) => const Home()),
         Route(path: '/about', title: 'About', builder: (context, state) => const About()),{{/multipage}}{{^multipage}}
         ShellRoute(
-          builder: (context, state, child) => Fragment(children: [
+          builder: (context, state, child) => fragment([
             const Header(),
             child,
           ]),
