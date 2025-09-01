@@ -21,7 +21,7 @@ abstract class Angle {
   /// Represents a css variable
   const factory Angle.variable(String value) = _VariableAngle;
 
-  operator +(Angle other);
+  Angle operator +(Angle other);
 
   /// The css value
   String get value;
@@ -37,7 +37,8 @@ class _ZeroAngle implements Angle {
   Angle operator +(Angle other) => other;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is _Angle && other._value == 0;
+  bool operator ==(Object other) =>
+      identical(this, other) || other is _Angle && other._value == 0;
 
   @override
   int get hashCode => 0;
@@ -58,7 +59,9 @@ class _VariableAngle implements Angle {
   }
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is _VariableAngle && other._value == _value;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _VariableAngle && other._value == _value;
 
   @override
   int get hashCode => _value.hashCode;
@@ -85,7 +88,8 @@ class _Angle implements Angle {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      _value == 0 && (other is _ZeroAngle || (other is _Angle && other._value == 0)) ||
+      _value == 0 &&
+          (other is _ZeroAngle || (other is _Angle && other._value == 0)) ||
       other is _Angle && _unit == other._unit && _value == other._value;
 
   @override
