@@ -12,6 +12,7 @@
 
 - Added `JustifyItems`, `JustifySelf` and `AlignContent` enums and style properties.
 - Migrate project to use pub workspaces and `melos` 7.0.0.
+- Added `filter` and `backdropFilter` styles properties and its implementation class `Filter`.
 
 ## 0.20.0
 

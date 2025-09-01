@@ -31,6 +31,8 @@ abstract class Styles with StylesMixin<Styles> {
     Visibility? visibility,
     Overflow? overflow,
     BoxShadow? shadow,
+    Filter? filter,
+    Filter? backdropFilter,
     Cursor? cursor,
     UserSelect? userSelect,
     PointerEvents? pointerEvents,
@@ -117,6 +119,8 @@ abstract mixin class StylesMixin<T> {
     Visibility? visibility,
     Overflow? overflow,
     BoxShadow? shadow,
+    Filter? filter,
+    Filter? backdropFilter,
     Cursor? cursor,
     UserSelect? userSelect,
     PointerEvents? pointerEvents,
@@ -193,6 +197,8 @@ abstract mixin class StylesMixin<T> {
         opacity: opacity,
         transform: transform,
         shadow: shadow,
+        filter: filter,
+        backdropFilter: backdropFilter,
         cursor: cursor,
         transition: transition,
         userSelect: userSelect,
@@ -252,7 +258,8 @@ class _CombinedStyles extends Styles {
   const _CombinedStyles(this._styles) : super._();
 
   @override
-  Map<String, String> get properties => _styles.fold({}, (v, s) => v..addAll(s.properties));
+  Map<String, String> get properties =>
+      _styles.fold({}, (v, s) => v..addAll(s.properties));
 
   @override
   Styles combine(Styles styles) {
@@ -282,6 +289,8 @@ class _Styles extends Styles {
   final Visibility? visibility;
   final Overflow? overflow;
   final BoxShadow? shadow;
+  final Filter? filter;
+  final Filter? backdropFilter;
   final Cursor? cursor;
   final UserSelect? userSelect;
   final PointerEvents? pointerEvents;
@@ -359,6 +368,8 @@ class _Styles extends Styles {
     this.visibility,
     this.overflow,
     this.shadow,
+    this.filter,
+    this.backdropFilter,
     this.cursor,
     this.userSelect,
     this.pointerEvents,
@@ -439,6 +450,8 @@ class _Styles extends Styles {
         if (visibility != null) 'visibility': visibility!.value,
         if (transform != null) 'transform': transform!.value,
         if (shadow != null) 'box-shadow': shadow!.value,
+        if (filter != null) 'filter': filter!.value,
+        if (backdropFilter != null) 'backdrop-filter': backdropFilter!.value,
         if (cursor != null) 'cursor': cursor!.value,
         if (transition != null) 'transition': transition!.value,
         if (userSelect != null) ...{
@@ -464,12 +477,16 @@ class _Styles extends Styles {
         if (whiteSpace != null) 'white-space': whiteSpace!.value,
         // Background Styles
         if (backgroundColor != null) 'background-color': backgroundColor!.value,
-        if (backgroundAttachment != null) 'background-attachment': backgroundAttachment!.value,
+        if (backgroundAttachment != null)
+          'background-attachment': backgroundAttachment!.value,
         if (backgroundClip != null) 'background-clip': backgroundClip!.value,
         if (backgroundImage != null) 'background-image': backgroundImage!.value,
-        if (backgroundOrigin != null) 'background-origin': backgroundOrigin!.value,
-        if (backgroundPosition != null) 'background-position': backgroundPosition!.value,
-        if (backgroundRepeat != null) 'background-repeat': backgroundRepeat!.value,
+        if (backgroundOrigin != null)
+          'background-origin': backgroundOrigin!.value,
+        if (backgroundPosition != null)
+          'background-position': backgroundPosition!.value,
+        if (backgroundRepeat != null)
+          'background-repeat': backgroundRepeat!.value,
         if (backgroundSize != null) 'background-size': backgroundSize!.value,
         // Flexbox Styles
         if (flexDirection != null) 'flex-direction': flexDirection!.value,
@@ -483,8 +500,10 @@ class _Styles extends Styles {
         if (alignSelf != null) 'align-self': alignSelf!.value,
         // Grid Styles
         ...?gridTemplate?.styles,
-        if (autoRows != null) 'grid-auto-rows': autoRows!.map((s) => s.value).join(' '),
-        if (autoColumns != null) 'grid-auto-columns': autoColumns!.map((s) => s.value).join(' '),
+        if (autoRows != null)
+          'grid-auto-rows': autoRows!.map((s) => s.value).join(' '),
+        if (autoColumns != null)
+          'grid-auto-columns': autoColumns!.map((s) => s.value).join(' '),
         ...?gridPlacement?.styles,
         if (justifyItems != null) 'justify-items': justifyItems!.value,
         // Grid Item Styles
