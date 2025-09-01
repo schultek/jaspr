@@ -30,7 +30,7 @@ class _AppState extends State<App> {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       SearchBar(
         placeholder: 'Enter Location',
         onSearch: (value) {
@@ -43,9 +43,9 @@ class _AppState extends State<App> {
           if (snapshot.hasData) {
             return SimpleWeather(snapshot.data!);
           } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
+            return text('Error: ${snapshot.error}');
           } else {
-            return Text('Loading');
+            return text('Loading');
           }
         },
       ),

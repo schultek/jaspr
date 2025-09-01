@@ -12,7 +12,7 @@ class _CounterState extends State<Counter> {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       text('Count: $count'),
       button(
         onClick: () {

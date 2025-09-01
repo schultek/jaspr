@@ -51,7 +51,7 @@ abstract class BuildableElement extends Element {
     } catch (e, st) {
       _debugDoingBuild = false;
       // TODO: implement actual error handling
-      built = DomComponent(
+      built = Component.element(
         tag: 'div',
         styles: Styles(
           padding: Padding.all(2.em),
@@ -59,7 +59,7 @@ abstract class BuildableElement extends Element {
           color: Colors.yellow,
           fontSize: 1.rem,
         ),
-        children: [Text("Error on building component: $e")],
+        children: [Component.text("Error on building component: $e")],
       );
       binding.reportBuildError(this, e, st);
     } finally {

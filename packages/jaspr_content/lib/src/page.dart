@@ -138,7 +138,7 @@ class Page {
       if (config.rawOutputPattern?.matchAsPrefix(path) != null) {
         context.setHeader('Content-Type', getContentType());
         context.setStatusCode(200, responseBody: content);
-        return Fragment(children: []);
+        return Component.fragment(children: []);
       }
 
       return await build();

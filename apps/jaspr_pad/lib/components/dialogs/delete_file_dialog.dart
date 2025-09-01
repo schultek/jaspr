@@ -16,7 +16,7 @@ class DeleteFileDialog extends StatelessComponent {
   Component build(BuildContext context) {
     return Dialog(
       title: 'Delete File',
-      content: Text('Delete file \'$file\'? This can\'t be undone.'),
+      content: text('Delete file \'$file\'? This can\'t be undone.'),
       actions: [
         Button(
           label: 'Cancel',

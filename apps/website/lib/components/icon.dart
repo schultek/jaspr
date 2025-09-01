@@ -11,13 +11,13 @@ class Icon extends StatelessComponent {
     final children = <Component>[];
     if (name == 'jasper') {
       children.add(img(src: 'images/jasper_icon.png', alt: 'jasper-icon', styles: Styles(height: size ?? 1.2.em)));
-      return Fragment(children: children);
+      return fragment(children);
     } else if (name == 'dart') {
       children.add(img(src: 'images/dart_icon.png', alt: 'dart-icon', styles: Styles(height: size ?? 1.2.em)));
-      return Fragment(children: children);
+      return fragment(children);
     }
     children.add(i(classes: 'icon-$name', styles: Styles(fontSize: size ?? 1.2.em), []));
-    return Fragment(children: children);
+    return fragment(children);
   }
 
   @css

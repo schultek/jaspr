@@ -14,7 +14,7 @@ class Hidden extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return DomComponent.wrap(
+    return Component.wrapElement(
       styles: Styles(
         visibility: hidden && visibilityMode ? Visibility.hidden : null,
       ),

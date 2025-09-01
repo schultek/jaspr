@@ -23,7 +23,7 @@ class MarkdownOutput extends SecondaryOutput {
     return Builder(builder: (context) {
       context.setHeader('Content-Type', 'text/markdown');
       context.setStatusCode(200, responseBody: page.content);
-      return Text('');
+      return Component.text('');
     });
   }
 }

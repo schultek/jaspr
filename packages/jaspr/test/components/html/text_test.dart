@@ -6,7 +6,7 @@ import 'package:jaspr_test/jaspr_test.dart';
 
 void main() {
   group('html components', () {
-    testComponents('renders text', (tester) async {
+    testComponents('renders text elements', (tester) async {
       tester.pumpComponent(div([
         a(
           download: "",
@@ -39,6 +39,32 @@ void main() {
       expect(find.tag('span'), findsOneComponent);
       expect(find.tag('strong'), findsOneComponent);
       expect(find.tag('u'), findsOneComponent);
+    });
+
+    testComponents('renders text', (tester) async {
+      tester.pumpComponent(div([
+        text('Hello '),
+        b([text('World')]),
+        text('!'),
+      ]));
+
+      expect(find.text('Hello '), findsOneComponent);
+      expect(find.text('World'), findsOneComponent);
+      expect(find.text('!'), findsOneComponent);
+    });
+
+    testComponents('renders fragments', (tester) async {
+      tester.pumpComponent(div([
+        fragment([
+          text('Hello '),
+          b([text('World')]),
+          text('!'),
+        ]),
+      ]));
+
+      expect(find.text('Hello '), findsOneComponent);
+      expect(find.text('World'), findsOneComponent);
+      expect(find.text('!'), findsOneComponent);
     });
   });
 }

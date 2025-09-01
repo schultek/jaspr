@@ -67,7 +67,7 @@ class RSSOutput extends SecondaryOutput {
     return Builder(builder: (context) {
       context.setHeader('Content-Type', 'text/xml');
       context.setStatusCode(200, responseBody: renderRssFeed(page, context.pages));
-      return Text('');
+      return Component.text('');
     });
   }
 

@@ -105,7 +105,7 @@ void main() {
 
       content.write(
           'Key? key, String? id, String? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
-          '  return DomComponent(\n'
+          '  return Component.element(\n'
           '    tag: \'$tagValue\',\n'
           '    key: key,\n'
           '    id: id,\n'

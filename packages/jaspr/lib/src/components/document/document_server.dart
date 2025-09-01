@@ -153,17 +153,17 @@ class BaseDocument extends StatelessComponent implements Document {
 
   @override
   Component build(BuildContext context) {
-    return DomComponent(
+    return Component.element(
       tag: 'html',
       attributes: {
         if (lang != null) 'lang': lang!,
       },
       children: [
-        DomComponent(
+        Component.element(
           tag: 'head',
           children: [
-            if (base != null) DomComponent(tag: 'base', attributes: {'href': _normalizedBase!}),
-            if (charset != null) DomComponent(tag: 'meta', attributes: {'charset': charset!}),
+            if (base != null) Component.element(tag: 'base', attributes: {'href': _normalizedBase!}),
+            if (charset != null) Component.element(tag: 'meta', attributes: {'charset': charset!}),
             HeadDocument(
               title: title,
               meta: {
@@ -176,7 +176,7 @@ class BaseDocument extends StatelessComponent implements Document {
             ...head,
           ],
         ),
-        DomComponent(tag: 'body', children: [body]),
+        Component.element(tag: 'body', children: [body]),
       ],
     );
   }
@@ -306,9 +306,9 @@ class HeadDocument extends StatelessComponent implements Document {
       target: 'head',
       attributes: null,
       children: [
-        if (title != null) DomComponent(tag: 'title', children: [Text(title!)]),
+        if (title != null) Component.element(tag: 'title', children: [Component.text(title!)]),
         if (meta != null)
-          for (var e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+          for (var e in meta!.entries) Component.element(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
         ...?children,
       ],
     );
@@ -331,7 +331,7 @@ class AttachDocument extends StatelessComponent implements Document {
   @override
   Component build(BuildContext context) {
     AttachAdapter.register(context, this);
-    return Fragment(children: children ?? []);
+    return Component.fragment(children: children ?? []);
   }
 }
 

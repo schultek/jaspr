@@ -4,6 +4,7 @@ import 'package:io/ansi.dart';
 
 import '../logging.dart';
 import '../migrations/build_method_migration.dart';
+import '../migrations/component_factory_migration.dart';
 import '../migrations/migration_models.dart';
 import 'base_command.dart';
 
@@ -24,6 +25,12 @@ class MigrateCommand extends BaseCommand {
       help: 'Set the projects Jaspr version and skip auto-detection.',
       hide: true,
     );
+    argParser.addMultiOption(
+      'include-dir',
+      help: 'Include the specified directory for migration (can be used multiple times).',
+      hide: true,
+      defaultsTo: ['lib', 'web', 'test'],
+    );
   }
 
   @override
@@ -37,19 +44,21 @@ class MigrateCommand extends BaseCommand {
 
   @override
   bool get preferBuilderDependency => false;
+  @override
+  bool get requiresPubspec => assumeVersion == null;
 
   late final bool dryRun = argResults!['dry-run'] as bool;
   late final bool apply = argResults!['apply'] as bool;
   late final String? assumeVersion = argResults!['assume-version'] as String?;
+  late final List<String> includeDirs = List<String>.from(argResults!['include-dir'] as List);
 
   static List<Migration> get allMigrations => [
         BuildMethodMigration(),
+        ComponentFactoryMigration(),
       ];
 
   @override
   Future<int> runCommand() async {
-    final directories = ['lib', 'web', 'test'];
-
     final currentJasprVersion = assumeVersion ??
         switch (config.pubspecLock) {
           {'packages': {'jaspr': {'version': String version}}} => version,
@@ -74,14 +83,14 @@ class MigrateCommand extends BaseCommand {
 
     if (!apply && !dryRun) {
       stdout.write('Available migrations:\n\n'
-          '${migrations.map((m) => '  ${m.name} · ${m.description}\n${m.hint}').join('\n')}\n\n');
+          '${migrations.map((m) => '  ${m.name} · ${m.description}\n${m.hint}').join('\n\n')}\n\n');
 
       stdout.write('Run with --dry-run to preview all migration changes or --apply to apply them.');
 
       return 1;
     }
 
-    final results = migrations.computeResults(directories, apply, (file, e, st) {
+    final results = migrations.computeResults(includeDirs, apply, (file, e, st) {
       logger.write('Error processing ${file.path}: $e\n$st', level: Level.error);
     });
 

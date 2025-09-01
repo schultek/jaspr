@@ -10,7 +10,7 @@ class SessionPage extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       Document.head(meta: {
         'description': session.description,
         'keywords': "Fluttercon, Sessions, Jaspr, Dart, Flutter",

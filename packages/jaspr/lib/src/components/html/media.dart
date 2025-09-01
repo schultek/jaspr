@@ -23,7 +23,7 @@ Component audio(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'audio',
     key: key,
     id: id,
@@ -95,7 +95,7 @@ Component img(
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'img',
     key: key,
     id: id,
@@ -156,7 +156,7 @@ Component video(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'video',
     key: key,
     id: id,
@@ -197,7 +197,7 @@ Component embed(
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'embed',
     key: key,
     id: id,
@@ -241,7 +241,7 @@ Component iframe(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'iframe',
     key: key,
     id: id,
@@ -313,7 +313,7 @@ Component object(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'object',
     key: key,
     id: id,
@@ -347,7 +347,7 @@ Component source(
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'source',
     key: key,
     id: id,
@@ -370,7 +370,7 @@ Component figure(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'figure',
     key: key,
     id: id,
@@ -390,7 +390,7 @@ Component figcaption(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'figcaption',
     key: key,
     id: id,

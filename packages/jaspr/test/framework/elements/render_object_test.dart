@@ -9,9 +9,9 @@ void main() {
     testComponents('correctly handles empty fragments', (tester) async {
       final component = div([
         text('A'),
-        Fragment(children: [
+        Component.fragment(children: [
           text('B'),
-          Fragment(children: []), // empty fragment
+          Component.fragment(children: []), // empty fragment
         ]),
         text('C'),
       ]);

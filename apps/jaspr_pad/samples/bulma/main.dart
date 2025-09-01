@@ -14,13 +14,13 @@ void main() {
 class App extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       ExampleNavbar(),
       ButtonGroup(children: [
-        Button(child: Text('Normal'), onPressed: () {}),
-        Button(child: Text('Outlined'), isOutlined: true, onPressed: () {}),
-        Button(child: Text('Primary'), color: Color.primary, onPressed: () {}),
-        Button(child: Text('Loading'), isLoading: true, onPressed: () {}),
+        Button(child: text('Normal'), onPressed: () {}),
+        Button(child: text('Outlined'), isOutlined: true, onPressed: () {}),
+        Button(child: text('Primary'), color: Color.primary, onPressed: () {}),
+        Button(child: text('Loading'), isLoading: true, onPressed: () {}),
       ]),
       ButtonGroup(isAttached: true, children: [
         Button(child: IconLabel(icon: 'align-left', label: 'Left'), onPressed: () {}),
@@ -30,7 +30,7 @@ class App extends StatelessComponent {
       ProgressBar(value: 70, color: Color.success),
       ProgressBar(color: Color.warning),
       Tabs(
-        tabs: [Text('Pictures'), Text('Music'), Text('Videos'), Text('Documents')],
+        tabs: [text('Pictures'), text('Music'), text('Videos'), text('Documents')],
         onSelected: (int value) {},
       ),
       Tabs(
@@ -70,14 +70,14 @@ class _ExampleNavbarState extends State<ExampleNavbar> {
         ),
       ]),
       menu: NavbarMenu(isActive: isActive, items: [
-        NavbarItem(child: Text('Home')),
-        NavbarItem(child: Text('Documentation')),
-        NavbarItem.dropdown(child: Text('More'), items: [
-          NavbarItem(child: Text('About')),
-          NavbarItem(child: Text('Jobs')),
-          NavbarItem(child: Text('Contact')),
+        NavbarItem(child: text('Home')),
+        NavbarItem(child: text('Documentation')),
+        NavbarItem.dropdown(child: text('More'), items: [
+          NavbarItem(child: text('About')),
+          NavbarItem(child: text('Jobs')),
+          NavbarItem(child: text('Contact')),
           NavbarDivider(),
-          NavbarItem(child: Text('Report an issue')),
+          NavbarItem(child: text('Report an issue')),
         ]),
       ]),
     );

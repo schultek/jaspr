@@ -8,7 +8,7 @@ Component table(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'table',
     key: key,
     id: id,
@@ -28,7 +28,7 @@ Component caption(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'caption',
     key: key,
     id: id,
@@ -48,7 +48,7 @@ Component thead(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'thead',
     key: key,
     id: id,
@@ -68,7 +68,7 @@ Component tbody(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'tbody',
     key: key,
     id: id,
@@ -88,7 +88,7 @@ Component tfoot(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'tfoot',
     key: key,
     id: id,
@@ -124,7 +124,7 @@ Component th(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'th',
     key: key,
     id: id,
@@ -151,7 +151,7 @@ Component tr(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'tr',
     key: key,
     id: id,
@@ -178,7 +178,7 @@ Component td(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'td',
     key: key,
     id: id,
@@ -206,7 +206,7 @@ Component col(
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'col',
     key: key,
     id: id,
@@ -231,7 +231,7 @@ Component colgroup(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'colgroup',
     key: key,
     id: id,

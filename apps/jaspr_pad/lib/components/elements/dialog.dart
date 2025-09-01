@@ -124,7 +124,7 @@ class DialogState extends State<DialogSlot> {
         classes: 'mdc-dialog',
         attributes: {'role': 'alertdialog', 'aria-modal': 'true'},
         [
-          if (state != null) state.builder(context) else Dialog(content: Text(''), title: '', actions: []),
+          if (state != null) state.builder(context) else Dialog(content: text(''), title: '', actions: []),
           div(classes: 'mdc-dialog__scrim', []),
         ],
       ),

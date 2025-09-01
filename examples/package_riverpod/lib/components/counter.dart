@@ -14,7 +14,7 @@ class Counter extends StatelessComponent with SyncProviderDependencies {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       Button(
         label: 'Click Me',
         onPressed: () {

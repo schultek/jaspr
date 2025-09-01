@@ -5,8 +5,7 @@ description: How to write concise html markup in Jaspr.
 
 ---
 
-With jaspr, you write html as part of your component tree. Each html tag (like `div`, `p`, `img`, etc.) has an assigned
-method you can use (reps. `div()`, `p()`, `img()`, etc.).
+With jaspr, you write html as part of your component tree. Each html tag (like `div`, `p`, `img`, etc.) has an assigned method you can use (reps. `div()`, `p()`, `img()`, etc.).
 
 Let's look at the following html snippet:
 
@@ -116,97 +115,3 @@ Finally, here are some more examples of this syntax. You can switch between the 
     <progress value="85" max="100"></progress>
     ```
 </CodeGroup>
-
-## Lower-Level Components
-
-### DomComponent
-
-Under the hood, every html element in jaspr is represented by a `DomComponent`, which is a special component that takes
-a **tag**, some other parameters and a list of children, which can again be other `DomComponents`.
-
-If you want to, you can write `DomComponent`s manually instead of using the utility methods. This gives you great low-level
-control over your html structure, but is more verbose.
-
-```dart
-  var component = DomComponent(
-    tag: 'div',
-    id: 'my-id',
-    classes: 'class-a class-b',
-    styles: Styles.text(color: Colors.black),
-    attributes: {'my-attribute': 'my-value'},
-    events: {'click': (e) => print('clicked')},
-    children: [
-      /* ... */
-    ],
-  );
-```
-
-Using this component would render the following html:
-
-```html
-<div id="my-id" style="color: red" class="class-a class-b" my-attribute="my-value">
-  ...
-</div>
-```
-
-### Text
-
-A simple component that renders a text node. The `text()` method simply returns a `Text` component.
-
-A text node in html is just some standalone string that is placed inside another html element. Therefore the `Text`
-component also only receives a single string to render to the page.
-
-```dart
-  var text = Text('Hello World!');
-```
-
-As usual for web, styling is done through a combination of CSS attributes, either in a **Stylesheet** or inline though
-the **`styles` attribute** of the parent elements.
-
-## Formatting Whitespace
-
-When pre-rendering your components in **server** and **static** mode, Jaspr will output cleanly formatted html on a best-effort
-basis. This means it will add newlines and indentations to your html element, while trying to not affect the way the html
-is rendered.
-
-For example lets look at this simple Jaspr code:
-
-```dart
-div([
-  b([text('A')]),
-  em([text('B')]),
-  span([text('C')]),
-])
-```
-
-Which will generate the following html:
-
-```html
-<div>
-  <b>A</b>
-  <em>B</em>
-  <span>C</span>
-</div>
-```
-
-Here Jaspr adds newlines and indentation for each child element. However in some cases, you might not want Jaspr
-to introduce extra whitespace because it would affect the way the html is rendered.
-
-If you don't want Jaspr to format the output html for a part of your code, wrap it in a `<span>` element. This works
-since Jaspr will not apply and additional formatting to `<span>` elements.
-
-So for example this code:
-
-```dart
-span([
-  b([text('A')]),
-  em([text('B')]),
-  span([text('C')]),
-]),
-```
-
-will generate to following html:
-
-```html
-<span><b>A</b><em>B</em><span>C</span></span>
-```

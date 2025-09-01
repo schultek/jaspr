@@ -10,7 +10,7 @@ class FavoritesPage extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       PagesNav(),
       ListenableBuilder(
         listenable: FavoritesService.instance,

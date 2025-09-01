@@ -12,7 +12,7 @@ class App extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       div([
         h1([text('Hello World!')]),
         p([text('You\'re great!')]),

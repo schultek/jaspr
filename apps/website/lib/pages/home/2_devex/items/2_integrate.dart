@@ -13,7 +13,7 @@ class Integrate extends StatelessComponent {
     return DevexBox(
       caption: 'INTEGRATE',
       title: 'Packages and Plugins',
-      description: Fragment(children: [
+      description: fragment([
         text('Import any Dart package from pub.dev or even use '),
         b([
           a(

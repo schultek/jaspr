@@ -233,7 +233,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return Component.fragment(children: [
       if (_matchList?.title case var title?) Document.head(title: title),
       component._builder.build(this),
     ]);

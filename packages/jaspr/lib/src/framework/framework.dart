@@ -20,7 +20,7 @@ part 'build_context.dart';
 part 'build_owner.dart';
 part 'buildable_element.dart';
 part 'components_binding.dart';
-part 'dom_component.dart';
+part 'components.dart';
 part 'inactive_elements.dart';
 part 'inherited_component.dart';
 part 'inherited_model.dart';
@@ -32,12 +32,11 @@ part 'render_object.dart';
 part 'stateful_component.dart';
 part 'stateless_component.dart';
 part 'multi_child_element.dart';
-part 'fragment.dart';
 
 /// Describes the configuration for an [Element].
 ///
-/// Components are the central class hierarchy in the jaspr framework and have the
-/// same structure and purpose as components do in Flutter. A component
+/// Components are the central class hierarchy in the Jaspr framework and have the
+/// same structure and purpose as widgets do in Flutter. A component
 /// is an immutable description of part of a user interface. Components can be
 /// inflated into elements, which manage the underlying DOM.
 ///
@@ -73,6 +72,108 @@ part 'fragment.dart';
 abstract class Component {
   /// Initializes [key] for subclasses.
   const Component({this.key});
+
+  /// Creates a component which renders a html text node.
+  const factory Component.text(String text, {Key? key}) = Text._;
+
+  /// Creates a component which renders a html element node with the given [tag], like
+  /// a `<div>`, `<button>` etc.
+  ///
+  /// Example:
+  /// ```dart
+  /// return Component.element(
+  ///   tag: 'div',
+  ///   classes: 'some-class',
+  ///   styles: Styles(backgroundColor: Colors.red),
+  ///   children: [
+  ///     Component.text('Hello World'),
+  ///   ],
+  /// );
+  /// ```
+  ///
+  /// Renders:
+  ///
+  /// ```html
+  /// <div class="some-class" style="background-color: red;">
+  ///   Hello World
+  /// </div>
+  /// ```
+  ///
+  const factory Component.element({
+    required String tag,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+    List<Component>? children,
+    Key? key,
+  }) = DomComponent._;
+
+  /// Creates a component which applies its parameters (like [classes], [styles], etc.) to its
+  /// direct child element(s).
+  ///
+  /// This does not create a html element itself. All properties are merged with the respective child element's
+  /// properties, with the child's properties taking precedence where there are conflicts.
+  ///
+  /// Example:
+  /// ```dart
+  /// return Component.wrapElement(
+  ///   classes: 'wrapping-class',
+  ///   styles: Styles(backgroundColor: Colors.blue, padding: Padding.all(8.px)),
+  ///   child: Component.element(
+  ///     tag: 'div',
+  ///     classes: 'some-class',
+  ///     styles: Styles(backgroundColor: Colors.red),
+  ///     children: [
+  ///       Component.text('Hello World'),
+  ///     ],
+  ///   ),
+  /// );
+  /// ```
+  ///
+  /// Renders:
+  /// ```html
+  /// <div class="wrapping-class some-class" style="padding: 8px; background-color: red;">
+  ///   Hello World
+  /// </div>
+  /// ```
+  ///
+  const factory Component.wrapElement({
+    Key? key,
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+    required Component child,
+  }) = _WrappingDomComponent;
+
+  /// Creates a component which renders a list of child components without any wrapping element.
+  ///
+  /// This is useful when you want to return multiple elements from a build method without adding an extra
+  /// wrapping element to the html DOM.
+  ///
+  /// Example:
+  /// ```dart
+  /// return Component.fragment([
+  ///   Component.element(tag: 'span', children: []),
+  ///   Component.element(tag: 'button', children: []),
+  /// ]);
+  /// ```
+  ///
+  /// Renders:
+  /// ```html
+  /// <span></span>
+  /// <button></button>
+  /// ```
+  ///
+  const factory Component.fragment({required List<Component> children, Key? key}) = Fragment._;
+
+  /// Creates an empty component which renders nothing.
+  ///
+  /// This is useful when you want to return "nothing" from a build method.
+  const factory Component.empty({Key? key}) = Fragment._empty;
 
   /// Controls how one component replaces another component in the tree.
   ///

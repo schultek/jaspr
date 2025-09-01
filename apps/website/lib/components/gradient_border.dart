@@ -14,17 +14,17 @@ class GradientBorder extends StatelessComponent {
     return div(classes: 'gradient-border-container${fixed ? ' fixed' : ''}', [
       div(classes: 'gradient-border', [
         svg(width: 100.percent, height: 100.percent, [
-          DomComponent(tag: 'defs', children: [
-            DomComponent(tag: 'linearGradient', attributes: {
+          Component.element(tag: 'defs', children: [
+            Component.element(tag: 'linearGradient', attributes: {
               'id': 'linear',
               'x1': '0%',
               'y1': '0%',
               'x2': '100%',
               'y2': '100%'
             }, children: [
-              DomComponent(tag: 'stop', attributes: {'offset': '0%', 'stop-color': primaryDark.value}),
-              DomComponent(tag: 'stop', attributes: {'offset': '50%', 'stop-color': primaryMid.value}),
-              DomComponent(tag: 'stop', attributes: {'offset': '100%', 'stop-color': primaryLight.value}),
+              Component.element(tag: 'stop', attributes: {'offset': '0%', 'stop-color': primaryDark.value}),
+              Component.element(tag: 'stop', attributes: {'offset': '50%', 'stop-color': primaryMid.value}),
+              Component.element(tag: 'stop', attributes: {'offset': '100%', 'stop-color': primaryLight.value}),
             ]),
           ]),
           rect(x: "0", y: "0", width: "100%", height: "100%", attributes: {

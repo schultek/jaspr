@@ -16,7 +16,7 @@ class App extends StatelessComponent {
     return div([
       Builder(builder: (context) {
         var count = context.watch(counterProvider);
-        return Text('Count is $count');
+        return text('Count is $count');
       }),
       button(
         onClick: () {

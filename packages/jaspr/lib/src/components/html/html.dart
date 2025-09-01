@@ -14,12 +14,27 @@ part 'text.dart';
 
 final _events = events;
 
-/// Utility method to create a [Text] component.
+/// Renders a text node.
+///
+/// Convenience method for `Component.text()`.
 Component text(String text, {Key? key}) {
-  return Text(text, key: key);
+  return Component.text(text, key: key);
 }
 
-/// Utility method to create a [RawText] component.
+/// Renders its input as raw unescaped html using [RawText].
+///
+/// **WARNING**: This component does not escape any user input and is vulnerable to
+/// [cross-site scripting (XSS) attacks](https://owasp.org/www-community/attacks/xss/).
+/// Make sure to sanitize any user input when using this component.
+///
+/// Convenience method for `RawText()`.
 Component raw(String text, {Key? key}) {
   return RawText(text, key: key);
+}
+
+/// Renders a list of children without any wrapping element.
+///
+/// Convenience method for `Component.fragment()`.
+Component fragment(List<Component> children, {Key? key}) {
+  return Component.fragment(children: children, key: key);
 }

@@ -53,7 +53,7 @@ class HeaderState extends State<Header> {
 
   @override
   Component build(BuildContext context) {
-    var content = Fragment(key: contentKey, children: [
+    var content = fragment(key: contentKey, [
       nav([
         if (component.showHome) a(href: '/', classes: 'animated-underline', [text("Home")]),
         a(href: "https://docs.jaspr.site", classes: 'animated-underline', [text("Docs")]),

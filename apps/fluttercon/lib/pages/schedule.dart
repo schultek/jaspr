@@ -12,7 +12,7 @@ class SchedulePage extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       Document.head(meta: {
         'description': "Schedule of all sessions on day $day.",
         'keywords': "Fluttercon, Sessions, Jaspr, Dart, Flutter",

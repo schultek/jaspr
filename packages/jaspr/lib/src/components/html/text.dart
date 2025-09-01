@@ -35,7 +35,7 @@ Component a(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'a',
     key: key,
     id: id,
@@ -83,7 +83,7 @@ Component b(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'b',
     key: key,
     id: id,
@@ -103,7 +103,7 @@ Component br(
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'br',
     key: key,
     id: id,
@@ -122,7 +122,7 @@ Component code(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'code',
     key: key,
     id: id,
@@ -142,7 +142,7 @@ Component em(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'em',
     key: key,
     id: id,
@@ -162,7 +162,7 @@ Component i(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'i',
     key: key,
     id: id,
@@ -182,7 +182,7 @@ Component s(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 's',
     key: key,
     id: id,
@@ -202,7 +202,7 @@ Component small(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'small',
     key: key,
     id: id,
@@ -222,7 +222,7 @@ Component span(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'span',
     key: key,
     id: id,
@@ -242,7 +242,7 @@ Component strong(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'strong',
     key: key,
     id: id,
@@ -262,7 +262,7 @@ Component u(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'u',
     key: key,
     id: id,
@@ -282,7 +282,7 @@ Component wbr(
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'wbr',
     key: key,
     id: id,

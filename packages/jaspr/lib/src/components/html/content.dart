@@ -8,7 +8,7 @@ Component article(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'article',
     key: key,
     id: id,
@@ -28,7 +28,7 @@ Component aside(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'aside',
     key: key,
     id: id,
@@ -48,7 +48,7 @@ Component body(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'body',
     key: key,
     id: id,
@@ -68,7 +68,7 @@ Component footer(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'footer',
     key: key,
     id: id,
@@ -88,7 +88,7 @@ Component head(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'head',
     key: key,
     id: id,
@@ -108,7 +108,7 @@ Component header(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'header',
     key: key,
     id: id,
@@ -128,7 +128,7 @@ Component html(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'html',
     key: key,
     id: id,
@@ -148,7 +148,7 @@ Component h1(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'h1',
     key: key,
     id: id,
@@ -168,7 +168,7 @@ Component h2(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'h2',
     key: key,
     id: id,
@@ -188,7 +188,7 @@ Component h3(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'h3',
     key: key,
     id: id,
@@ -208,7 +208,7 @@ Component h4(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'h4',
     key: key,
     id: id,
@@ -228,7 +228,7 @@ Component h5(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'h5',
     key: key,
     id: id,
@@ -248,7 +248,7 @@ Component h6(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'h6',
     key: key,
     id: id,
@@ -268,7 +268,7 @@ Component main_(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'main',
     key: key,
     id: id,
@@ -288,7 +288,7 @@ Component nav(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'nav',
     key: key,
     id: id,
@@ -308,7 +308,7 @@ Component section(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'section',
     key: key,
     id: id,
@@ -331,7 +331,7 @@ Component blockquote(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'blockquote',
     key: key,
     id: id,
@@ -354,7 +354,7 @@ Component div(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'div',
     key: key,
     id: id,
@@ -374,7 +374,7 @@ Component ul(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'ul',
     key: key,
     id: id,
@@ -402,7 +402,7 @@ Component ol(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'ol',
     key: key,
     id: id,
@@ -451,7 +451,7 @@ Component li(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'li',
     key: key,
     id: id,
@@ -474,7 +474,7 @@ Component hr(
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'hr',
     key: key,
     id: id,
@@ -493,7 +493,7 @@ Component p(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'p',
     key: key,
     id: id,
@@ -513,7 +513,7 @@ Component pre(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'pre',
     key: key,
     id: id,

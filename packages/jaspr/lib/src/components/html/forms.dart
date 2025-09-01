@@ -17,7 +17,7 @@ Component button(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'button',
     key: key,
     id: id,
@@ -77,7 +77,7 @@ Component form(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'form',
     key: key,
     id: id,
@@ -161,7 +161,7 @@ Component input(
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'input',
     key: key,
     id: id,
@@ -264,7 +264,7 @@ Component label(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'label',
     key: key,
     id: id,
@@ -287,7 +287,7 @@ Component datalist(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'datalist',
     key: key,
     id: id,
@@ -307,7 +307,7 @@ Component legend(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'legend',
     key: key,
     id: id,
@@ -340,7 +340,7 @@ Component meter(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'meter',
     key: key,
     id: id,
@@ -373,7 +373,7 @@ Component progress(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'progress',
     key: key,
     id: id,
@@ -402,7 +402,7 @@ Component optgroup(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'optgroup',
     key: key,
     id: id,
@@ -435,7 +435,7 @@ Component option(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'option',
     key: key,
     id: id,
@@ -482,7 +482,7 @@ Component select(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'select',
     key: key,
     id: id,
@@ -520,7 +520,7 @@ Component fieldset(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'fieldset',
     key: key,
     id: id,
@@ -573,7 +573,7 @@ Component textarea(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'textarea',
     key: key,
     id: id,

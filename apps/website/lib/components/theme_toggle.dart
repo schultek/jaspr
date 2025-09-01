@@ -25,13 +25,13 @@ class ThemeToggleState extends State<ThemeToggle> {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return fragment([
       if (kIsWeb)
         Document.html(attributes: {'class': isDark ? 'dark' : 'light'})
       else
         Document.head(children: [
           // ignore: prefer_html_methods
-          DomComponent(id: 'theme-script', tag: 'script', children: [
+          Component.element(id: 'theme-script', tag: 'script', children: [
             raw('''
             let userTheme = window.localStorage.getItem('active-theme');
             if (userTheme != null) {

@@ -61,7 +61,7 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
           });
         }));
       } else {
-        children.add(DomComponent.wrap(
+        children.add(Component.wrapElement(
           events: {
             'click': (event) {
               event.preventDefault();
@@ -74,11 +74,11 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
         ));
       }
 
-      return Fragment(children: children);
+      return fragment(children);
     }
 
     children.add(div(id: 'meet-jaspr-button', [
-      DomComponent.wrap(
+      Component.wrapElement(
         classes: touchTimer != null ? 'active' : null,
         events: {
           'mousemove': (event) {
@@ -119,7 +119,7 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
       ),
       Particles(particles: notifier.particles),
     ]));
-    return Fragment(children: children);
+    return fragment(children);
   }
 
   @css

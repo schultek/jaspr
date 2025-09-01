@@ -33,12 +33,12 @@ class TextSpan extends StatelessComponent {
 
     final lines = text.split('\n');
     for (var i = 0; i < lines.length; i++) {
-      children.add(Text(lines[i]));
+      children.add(Component.text(lines[i]));
       if (i < lines.length - 1 || breakLine) {
         children.add(br());
       }
     }
-    return Fragment(children: children);
+    return Component.fragment(children: children);
   }
 }
 
@@ -55,12 +55,12 @@ class Heading extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return switch (size) {
-      1 => h1([Text(text)]),
-      2 => h2([Text(text)]),
-      3 => h3([Text(text)]),
-      4 => h4([Text(text)]),
-      5 => h5([Text(text)]),
-      6 => h6([Text(text)]),
+      1 => h1([Component.text(text)]),
+      2 => h2([Component.text(text)]),
+      3 => h3([Component.text(text)]),
+      4 => h4([Component.text(text)]),
+      5 => h5([Component.text(text)]),
+      6 => h6([Component.text(text)]),
       _ => throw UnimplementedError(),
     };
   }
@@ -75,7 +75,7 @@ class BreakLine extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return Component.fragment(children: [
       for (var i = 0; i < numberLines; i++) br(),
     ]);
   }

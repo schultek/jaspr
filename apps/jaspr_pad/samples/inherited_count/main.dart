@@ -49,6 +49,6 @@ class CountLabel extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     var count = context.dependOnInheritedComponentOfExactType<InheritedCount>()!.count;
-    return Text('Count is $count');
+    return text('Count is $count');
   }
 }

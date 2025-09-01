@@ -17,13 +17,13 @@ class QuotePage extends AsyncStatelessComponent {
 
     var quote = await QuotesService.getQuoteById(context.session, id);
     if (quote == null) {
-      return Fragment(children: [
+      return fragment([
         navChild,
         div(classes: "center", [text("Not Found")]),
       ]);
     }
 
-    return Fragment(children: [
+    return fragment([
       navChild,
       Document.head(
         title: quote.quote,

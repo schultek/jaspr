@@ -15,7 +15,7 @@ Component svg(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'svg',
     key: key,
     id: id,
@@ -59,7 +59,7 @@ Component rect(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'rect',
     key: key,
     id: id,
@@ -103,7 +103,7 @@ Component circle(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'circle',
     key: key,
     id: id,
@@ -146,7 +146,7 @@ Component ellipse(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'ellipse',
     key: key,
     id: id,
@@ -190,7 +190,7 @@ Component line(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'line',
     key: key,
     id: id,
@@ -228,7 +228,7 @@ Component path(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'path',
     key: key,
     id: id,
@@ -263,7 +263,7 @@ Component polygon(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'polygon',
     key: key,
     id: id,
@@ -298,7 +298,7 @@ Component polyline(List<Component> children,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events}) {
-  return DomComponent(
+  return Component.element(
     tag: 'polyline',
     key: key,
     id: id,

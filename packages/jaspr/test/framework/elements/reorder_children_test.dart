@@ -32,7 +32,7 @@ class ChildElement extends BuildableElement {
   }
 
   @override
-  Component build() => Text('Child ${component.num}');
+  Component build() => Component.text('Child ${component.num}');
 }
 
 void main() {

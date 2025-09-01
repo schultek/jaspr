@@ -4,6 +4,8 @@
 
 - **Breaking** Changed all `build()` methods and `builder` functions to return a single `Component` instead of `Iterable<Component>`. Use `jaspr migrate` to migrate automatically after updating.
 
+- **Breaking** Introduced new `Component.element()`, `Component.text()`, `Component.fragment()` and `Component.wrapElement()` constructors, replacing `DomComponent()`, `Text()`, `Fragment()` and `DomComponent.wrap()`, respectively. Also added `Component.empty()` to create an empty fragment.
+
 - Allow setting `Document(base: )` to `null`, and fix the path to the generated client script when no `<base>` element exists.
 - Added `--include-source-maps` option to `jaspr build` command.
 - Fixed sitemap generation bug in top-level route ('/')

@@ -52,7 +52,7 @@ class Sidebar extends StatelessComponent {
   Component build(BuildContext context) {
     final currentRoute = this.currentRoute ?? context.page.url;
 
-    return Fragment(children: [
+    return Component.fragment(children: [
       Document.head(children: [
         Style(styles: _styles),
       ]),

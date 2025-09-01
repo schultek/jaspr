@@ -18,7 +18,7 @@ class ChildState extends State<Child> with TrackStateLifecycle<Child> {
   @override
   Component build(BuildContext context) {
     trackBuild();
-    return Text('Child');
+    return Component.text('Child');
   }
 }
 

@@ -94,13 +94,11 @@ class _BlurFilter implements _ListableFilter {
 }
 
 class _BrightnessFilter extends _FilterWithPercentage {
-  const _BrightnessFilter([double percentage = 1.0])
-      : super(percentage, 'brightness');
+  const _BrightnessFilter([double percentage = 1.0]) : super(percentage, 'brightness');
 }
 
 class _ContrastFilter extends _FilterWithPercentage {
-  const _ContrastFilter([double percentage = 1.0])
-      : super(percentage, 'contrast');
+  const _ContrastFilter([double percentage = 1.0]) : super(percentage, 'contrast');
 }
 
 class _DropShadowFilter implements _ListableFilter {
@@ -130,8 +128,7 @@ class _DropShadowFilter implements _ListableFilter {
 }
 
 class _GrayscaleFilter extends _FilterWithPercentage {
-  const _GrayscaleFilter([double percentage = 1.0])
-      : super(percentage, 'grayscale');
+  const _GrayscaleFilter([double percentage = 1.0]) : super(percentage, 'grayscale');
 }
 
 class _HueRotateFilter implements _ListableFilter {
@@ -149,8 +146,7 @@ class _InvertFilter extends _FilterWithPercentage {
 }
 
 class _OpacityFilter extends _FilterWithPercentage {
-  const _OpacityFilter([double percentage = 1.0])
-      : super(percentage, 'opacity');
+  const _OpacityFilter([double percentage = 1.0]) : super(percentage, 'opacity');
 }
 
 class _SepiaFilter extends _FilterWithPercentage {
@@ -158,8 +154,7 @@ class _SepiaFilter extends _FilterWithPercentage {
 }
 
 class _SaturateFilter extends _FilterWithPercentage {
-  const _SaturateFilter([double percentage = 1.0])
-      : super(percentage, 'saturate');
+  const _SaturateFilter([double percentage = 1.0]) : super(percentage, 'saturate');
 }
 
 class _UrlFilter implements _ListableFilter {
