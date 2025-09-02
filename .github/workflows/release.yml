@@ -31,7 +31,7 @@ jobs:
 
       - name: Bootstrap
         run: |
-          dart pub global activate melos
+          dart pub global activate melos 7.1.0
           dart pub global activate -s git https://github.com/schultek/semantic_changelog
           melos bootstrap --no-private
           jaspr --disable-analytics

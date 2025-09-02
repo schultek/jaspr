@@ -6,7 +6,8 @@ void main() async {
       '// GENERATED FILE - DO NOT MODIFY\n\n');
 
   var packages = await Process.run('melos', 'list --no-private --json'.split(' '), stdoutEncoding: utf8);
-  var packagesJson = jsonDecode(packages.stdout) as List;
+  var jsonStartIndex = (packages.stdout as String).indexOf('[');
+  var packagesJson = jsonDecode((packages.stdout as String).substring(jsonStartIndex)) as List;
 
   var jasprCliVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr_cli')['version'];
   var jasprVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr')['version'];
