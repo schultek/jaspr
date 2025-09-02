@@ -1,4 +1,4 @@
-## Unreleased patch dev.0
+## 0.3.1-dev.0
 
 - Fixed `HtmlParser` to treat html files as fragments.
 

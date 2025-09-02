@@ -72,12 +72,13 @@ class ComponentFactoryMigration implements Migration {
       reporter.createMigration('Replaced Fragment() with Component.fragment()', (builder) {
         for (final (node, arguments) in fragments) {
           builder.replace(node.offset, node.length, 'Component.fragment');
-          final childrenArg = arguments.arguments.where(
-              (arg) => arg is NamedExpression && arg.name.label.name == 'children').firstOrNull as NamedExpression?;
-              if (childrenArg != null) {
-                final end = childrenArg.expression.offset;
-                builder.delete(childrenArg.name.offset, end - childrenArg.name.offset);
-              }
+          final childrenArg = arguments.arguments
+              .where((arg) => arg is NamedExpression && arg.name.label.name == 'children')
+              .firstOrNull as NamedExpression?;
+          if (childrenArg != null) {
+            final end = childrenArg.expression.offset;
+            builder.delete(childrenArg.name.offset, end - childrenArg.name.offset);
+          }
         }
       });
     }
@@ -96,7 +97,6 @@ class ComponentVisitor extends RecursiveAstVisitor<void> {
   final void Function(SourceRange node) onDomComponent;
   final void Function(SourceRange node) onWrapDomComponent;
   final void Function(SourceRange node, ArgumentList arguments) onFragment;
-
 
   @override
   void visitMethodInvocation(MethodInvocation node) {

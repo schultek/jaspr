@@ -1,3 +1,11 @@
+## 0.1.8-dev.0
+
+- `jaspr` upgraded to `0.21.0-dev.0`
+- `jaspr_builder` upgraded to `0.21.0-dev.0`
+- `jaspr_lints` upgraded to `0.5.0-dev.0`
+- `jaspr_router` upgraded to `0.7.2-dev.0`
+- `jaspr_serverpod` upgraded to `0.5.7-dev.0`
+
 ## 0.1.7
 
 - `jaspr` upgraded to `0.20.0`
