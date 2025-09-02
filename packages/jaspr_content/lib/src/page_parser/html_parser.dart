@@ -19,8 +19,8 @@ class HtmlParser implements PageParser {
       page.content,
       lowercaseElementName: false,
     );
-    final document = html.parse(tokenizer);
-    return buildNodes(document.nodes);
+    final fragment = html.parseFragment(tokenizer);
+    return buildNodes(fragment.nodes);
   }
 
   static List<Node> buildNodes(Iterable<html.Node> htmlNodes) {
