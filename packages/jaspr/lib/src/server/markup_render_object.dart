@@ -63,6 +63,11 @@ abstract class MarkupRenderObject extends RenderObject {
       var childOutputLength = 0;
       var childOutputLinebreak = false;
 
+      // Special case: Detect parsed html by checking for initial whitespace-only text node containing a newline.
+      final firstChild = children.first;
+      childStrictFormatting |=
+          firstChild is MarkupRenderText && firstChild.text.contains('\n') && firstChild.text.trim().isEmpty;
+
       for (var child in children) {
         final (html, leading, trailing) = child._renderAndFormat(
           childStrictFormatting,

@@ -151,5 +151,21 @@ void main() {
             '        <p>E ---------------------------------------- </p>\n'
             '      </div>\n'
             '    </div>');
+
+    testOutput('with preformatted html',
+        input: div([
+          text('\n   '),
+          p([
+            text('\n      '),
+            text('Hello'),
+            text('\n   '),
+          ]),
+          text('\n')
+        ]),
+        output: '<div>\n'
+            '   <p>\n'
+            '      Hello\n'
+            '   </p>\n'
+            '</div>');
   });
 }
