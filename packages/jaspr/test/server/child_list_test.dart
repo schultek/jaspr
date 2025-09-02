@@ -207,7 +207,7 @@ void main() {
     test('wraps element multiple times (low then high)', () async {
       final r = await renderServerApp(Component.element(tag: 'html', children: [
         Component.element(tag: 'head', children: []),
-         Builder(builder: (context) {
+        Builder(builder: (context) {
           return Component.element(tag: 'body', children: []);
         }),
       ]));
@@ -245,14 +245,20 @@ void main() {
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
       expect(node, equals(range.start));
-      expect(node,
-          isA<ChildNodeBoundary>().having((n) => n.element, 'element', builderElement).having((n) => n.range, 'range', range));
+      expect(
+          node,
+          isA<ChildNodeBoundary>()
+              .having((n) => n.element, 'element', builderElement)
+              .having((n) => n.range, 'range', range));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
       expect(node, equals(range.end));
-      expect(node,
-          isA<ChildNodeBoundary>().having((n) => n.element, 'element', builderElement).having((n) => n.range, 'range', range));
+      expect(
+          node,
+          isA<ChildNodeBoundary>()
+              .having((n) => n.element, 'element', builderElement)
+              .having((n) => n.range, 'range', range));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
@@ -270,22 +276,34 @@ void main() {
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
       expect(node, equals(range.start));
-      expect(node,
-          isA<ChildNodeBoundary>().having((n) => n.element, 'element', builderElement).having((n) => n.range, 'range', range));
+      expect(
+          node,
+          isA<ChildNodeBoundary>()
+              .having((n) => n.element, 'element', builderElement)
+              .having((n) => n.range, 'range', range));
       node = node?.next;
       expect(node, equals(range2.start));
-      expect(node,
-          isA<ChildNodeBoundary>().having((n) => n.element, 'element', bodyElement).having((n) => n.range, 'range', range2));
+      expect(
+          node,
+          isA<ChildNodeBoundary>()
+              .having((n) => n.element, 'element', bodyElement)
+              .having((n) => n.range, 'range', range2));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
       expect(node, equals(range2.end));
-      expect(node,
-          isA<ChildNodeBoundary>().having((n) => n.element, 'element', bodyElement).having((n) => n.range, 'range', range2));
+      expect(
+          node,
+          isA<ChildNodeBoundary>()
+              .having((n) => n.element, 'element', bodyElement)
+              .having((n) => n.range, 'range', range2));
       node = node?.next;
       expect(node, equals(range.end));
-      expect(node,
-          isA<ChildNodeBoundary>().having((n) => n.element, 'element', builderElement).having((n) => n.range, 'range', range));
+      expect(
+          node,
+          isA<ChildNodeBoundary>()
+              .having((n) => n.element, 'element', builderElement)
+              .having((n) => n.range, 'range', range));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
@@ -294,7 +312,7 @@ void main() {
     test('wraps element multiple times (high then low)', () async {
       final r = await renderServerApp(Component.element(tag: 'html', children: [
         Component.element(tag: 'head', children: []),
-         Builder(builder: (context) {
+        Builder(builder: (context) {
           return Component.element(tag: 'body', children: []);
         }),
       ]));
@@ -332,14 +350,20 @@ void main() {
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
       expect(node, equals(range.start));
-      expect(node,
-          isA<ChildNodeBoundary>().having((n) => n.element, 'element', bodyElement).having((n) => n.range, 'range', range));
+      expect(
+          node,
+          isA<ChildNodeBoundary>()
+              .having((n) => n.element, 'element', bodyElement)
+              .having((n) => n.range, 'range', range));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
       expect(node, equals(range.end));
-      expect(node,
-          isA<ChildNodeBoundary>().having((n) => n.element, 'element', bodyElement).having((n) => n.range, 'range', range));
+      expect(
+          node,
+          isA<ChildNodeBoundary>()
+              .having((n) => n.element, 'element', bodyElement)
+              .having((n) => n.range, 'range', range));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
@@ -357,22 +381,34 @@ void main() {
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
       expect(node, equals(range2.start));
-      expect(node,
-          isA<ChildNodeBoundary>().having((n) => n.element, 'element', builderElement).having((n) => n.range, 'range', range2));
+      expect(
+          node,
+          isA<ChildNodeBoundary>()
+              .having((n) => n.element, 'element', builderElement)
+              .having((n) => n.range, 'range', range2));
       node = node?.next;
       expect(node, equals(range.start));
-      expect(node,
-          isA<ChildNodeBoundary>().having((n) => n.element, 'element', bodyElement).having((n) => n.range, 'range', range));
+      expect(
+          node,
+          isA<ChildNodeBoundary>()
+              .having((n) => n.element, 'element', bodyElement)
+              .having((n) => n.range, 'range', range));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
       //expect(node, equals(range.end));
-      expect(node,
-          isA<ChildNodeBoundary>().having((n) => n.element, 'element', bodyElement).having((n) => n.range, 'range', range));
+      expect(
+          node,
+          isA<ChildNodeBoundary>()
+              .having((n) => n.element, 'element', bodyElement)
+              .having((n) => n.range, 'range', range));
       node = node?.next;
       expect(node, equals(range2.end));
-      expect(node,
-          isA<ChildNodeBoundary>().having((n) => n.element, 'element', builderElement).having((n) => n.range, 'range', range2));
+      expect(
+          node,
+          isA<ChildNodeBoundary>()
+              .having((n) => n.element, 'element', builderElement)
+              .having((n) => n.range, 'range', range2));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));

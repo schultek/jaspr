@@ -108,7 +108,6 @@ class ChildList with Iterable<MarkupRenderObject> {
   @visibleForTesting
   ChildNode get lastNode => _last;
 
-
   final ChildNode _first = BaseChildNode();
   final ChildNode _last = BaseChildNode();
 
