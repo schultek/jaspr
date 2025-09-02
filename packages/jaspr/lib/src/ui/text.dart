@@ -38,7 +38,7 @@ class TextSpan extends StatelessComponent {
         children.add(br());
       }
     }
-    return Component.fragment(children: children);
+    return Component.fragment(children);
   }
 }
 
@@ -75,7 +75,7 @@ class BreakLine extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Component.fragment(children: [
+    return Component.fragment([
       for (var i = 0; i < numberLines; i++) br(),
     ]);
   }

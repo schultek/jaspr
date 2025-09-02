@@ -94,7 +94,7 @@ class TabItem extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Component.fragment(children: [
+    return Component.fragment([
       span(classes: 'tab-item', [text(label)]),
       child,
     ]);

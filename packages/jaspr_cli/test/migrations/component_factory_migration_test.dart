@@ -57,7 +57,7 @@ Component build() {
 import 'package:jaspr/jaspr.dart';
 
 Component build() {
-  return Component.fragment(children: [
+  return Component.fragment([
     Component.text('Hello, World!'),
     Component.text('Goodbye, World!'),
   ]);

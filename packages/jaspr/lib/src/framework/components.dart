@@ -192,7 +192,7 @@ class TextElement extends LeafRenderObjectElement {
 /// This is meant to be used in places where you want to render multiple components,
 /// but only a single component is allowed by the API.
 class Fragment extends Component {
-  const Fragment._({required this.children, super.key});
+  const Fragment._(this.children, {super.key});
 
   const Fragment._empty({super.key}) : children = const [];
 

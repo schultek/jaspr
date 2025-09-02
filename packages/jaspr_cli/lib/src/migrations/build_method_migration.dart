@@ -143,7 +143,7 @@ class BuildMethodMigration implements Migration {
 
         toMigrate.forEach(replaceYieldWithReturn);
       } else {
-        builder.insert(toMigrate.first.offset, 'return Component.fragment(children: [\n      ');
+        builder.insert(toMigrate.first.offset, 'return Component.fragment([\n      ');
         builder.indent(toMigrate.first.offset, toMigrate.last.end - toMigrate.first.offset, '  ');
 
         void replaceStatementWithElement(Statement s, [bool addComma = true]) {
@@ -194,7 +194,7 @@ class BuildMethodMigration implements Migration {
           }
           builder.insert(s.semicolon.offset, ')');
         } else if (s is ReturnStatement) {
-          builder.insert(s.semicolon.offset, ' Component.fragment(children: children)');
+          builder.insert(s.semicolon.offset, ' Component.fragment(children)');
         } else if (s is Block) {
           for (var child in s.statements) {
             replaceYieldAndReturnWithChildren(child);
@@ -213,7 +213,7 @@ class BuildMethodMigration implements Migration {
 
       if (toMigrate.last is! ReturnStatement) {
         final inset = builder.getLineIndent(toMigrate.last);
-        builder.insert(toMigrate.last.end, '\n${''.padLeft(inset)}return Component.fragment(children: children);');
+        builder.insert(toMigrate.last.end, '\n${''.padLeft(inset)}return Component.fragment(children);');
       }
     }
 

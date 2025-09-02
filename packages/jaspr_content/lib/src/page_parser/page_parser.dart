@@ -143,9 +143,9 @@ class NodesBuilder {
   /// Builds a component from the given nodes.
   Component build(List<Node>? nodes) {
     if (nodes == null || nodes.isEmpty) {
-      return Component.fragment(children: []);
+      return Component.fragment([]);
     }
-    return Component.fragment(children: _buildNodes(nodes));
+    return Component.fragment(_buildNodes(nodes));
   }
 
   List<Component> _buildNodes(List<Node> nodes) {

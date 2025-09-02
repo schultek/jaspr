@@ -77,7 +77,7 @@ class ExampleComponent extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     buildCalledFor.add(componentKey);
-    return Component.fragment(children: [
+    return Component.fragment([
       AComponent(),
       BComponent(),
     ]);

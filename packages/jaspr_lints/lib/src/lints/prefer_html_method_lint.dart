@@ -25,7 +25,7 @@ class PreferHtmlMethodLint extends DartLintRule {
 
   final fragmentCode = LintCode(
     name: 'prefer_html_methods',
-    problemMessage: "Prefer using 'fragment(...)' over 'Component.fragment(children: ...)'",
+    problemMessage: "Prefer using 'fragment(...)' over 'Component.fragment(...)'",
   );
 
   @override

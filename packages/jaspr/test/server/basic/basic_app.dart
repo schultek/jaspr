@@ -22,7 +22,7 @@ class CounterState extends State<Counter> {
 
   @override
   Component build(BuildContext context) {
-    return Component.fragment(children: [
+    return Component.fragment([
       Button(
         label: 'Click Me',
         onPressed: () {

@@ -28,7 +28,7 @@ class Header extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Component.fragment(children: [
+    return Component.fragment([
       Document.head(children: [
         Style(styles: _styles),
       ]),

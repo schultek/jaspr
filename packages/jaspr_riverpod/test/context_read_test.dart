@@ -19,7 +19,7 @@ void main() {
 
     testComponents('returns overridden provider state', (tester) async {
       tester.pumpComponent(providerApp((context) {
-        return Component.fragment(children: [
+        return Component.fragment([
           Component.text('a ${context.read(counter)}'),
           ProviderScope(
             overrides: [counter.overrideWith((ref) => 1)],

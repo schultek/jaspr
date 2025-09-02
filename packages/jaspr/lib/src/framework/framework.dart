@@ -168,7 +168,7 @@ abstract class Component {
   /// <button></button>
   /// ```
   ///
-  const factory Component.fragment({required List<Component> children, Key? key}) = Fragment._;
+  const factory Component.fragment(List<Component> children, {Key? key}) = Fragment._;
 
   /// Creates an empty component which renders nothing.
   ///

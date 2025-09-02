@@ -117,6 +117,6 @@ class Page extends StatelessComponent {
     if (child != null) {
       children.add(div([child!]));
     }
-    return Component.fragment(children: children);
+    return Component.fragment(children);
   }
 }

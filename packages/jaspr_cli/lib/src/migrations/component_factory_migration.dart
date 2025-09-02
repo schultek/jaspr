@@ -25,7 +25,7 @@ class ComponentFactoryMigration implements Migration {
   void runForUnit(CompilationUnit unit, MigrationReporter reporter) {
     final texts = <SourceRange>[];
     final domComponents = <SourceRange>[];
-    final fragments = <SourceRange>[];
+    final fragments = <(SourceRange, ArgumentList)>[];
     final wrapDomComponents = <SourceRange>[];
 
     if (!unit.directives
@@ -40,8 +40,8 @@ class ComponentFactoryMigration implements Migration {
       domComponents.add(node);
     }, onWrapDomComponent: (node) {
       wrapDomComponents.add(node);
-    }, onFragment: (node) {
-      fragments.add(node);
+    }, onFragment: (node, arguments) {
+      fragments.add((node, arguments));
     }));
 
     if (texts.isNotEmpty) {
@@ -70,8 +70,14 @@ class ComponentFactoryMigration implements Migration {
 
     if (fragments.isNotEmpty) {
       reporter.createMigration('Replaced Fragment() with Component.fragment()', (builder) {
-        for (final node in fragments) {
+        for (final (node, arguments) in fragments) {
           builder.replace(node.offset, node.length, 'Component.fragment');
+          final childrenArg = arguments.arguments.where(
+              (arg) => arg is NamedExpression && arg.name.label.name == 'children').firstOrNull as NamedExpression?;
+              if (childrenArg != null) {
+                final end = childrenArg.expression.offset;
+                builder.delete(childrenArg.name.offset, end - childrenArg.name.offset);
+              }
         }
       });
     }
@@ -89,28 +95,15 @@ class ComponentVisitor extends RecursiveAstVisitor<void> {
   final void Function(SourceRange node) onText;
   final void Function(SourceRange node) onDomComponent;
   final void Function(SourceRange node) onWrapDomComponent;
-  final void Function(SourceRange node) onFragment;
+  final void Function(SourceRange node, ArgumentList arguments) onFragment;
 
-  @override
-  void visitConstructorName(ConstructorName node) {
-    if (node.type.name2.lexeme == 'Text' && node.name == null) {
-      onText(SourceRange(node.type.offset, node.type.length));
-    } else if (node.type.name2.lexeme == 'Fragment' && node.name == null) {
-      onFragment(SourceRange(node.type.offset, node.type.length));
-    } else if (node.type.name2.lexeme == 'DomComponent' && node.name == null) {
-      onDomComponent(SourceRange(node.type.offset, node.type.length));
-    } else if (node.type.name2.lexeme == 'DomComponent' && node.name?.name == 'wrap') {
-      onWrapDomComponent(SourceRange(node.type.offset, node.name!.end - node.type.offset));
-    }
-    super.visitConstructorName(node);
-  }
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'Text' && node.target == null) {
       onText(SourceRange(node.methodName.offset, node.methodName.length));
     } else if (node.methodName.name == 'Fragment' && node.target == null) {
-      onFragment(SourceRange(node.methodName.offset, node.methodName.length));
+      onFragment(SourceRange(node.methodName.offset, node.methodName.length), node.argumentList);
     } else if (node.methodName.name == 'DomComponent' && node.target == null) {
       onDomComponent(SourceRange(node.methodName.offset, node.methodName.length));
     } else if (node.methodName.name == 'wrap' &&
@@ -119,5 +112,20 @@ class ComponentVisitor extends RecursiveAstVisitor<void> {
       onWrapDomComponent(SourceRange(node.target!.offset, node.methodName.end - node.target!.offset));
     }
     super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final constr = node.constructorName;
+    if (constr.type.name2.lexeme == 'Text' && constr.name == null) {
+      onText(SourceRange(constr.type.offset, constr.type.length));
+    } else if (constr.type.name2.lexeme == 'Fragment' && constr.name == null) {
+      onFragment(SourceRange(constr.type.offset, constr.type.length), node.argumentList);
+    } else if (constr.type.name2.lexeme == 'DomComponent' && constr.name == null) {
+      onDomComponent(SourceRange(constr.type.offset, constr.type.length));
+    } else if (constr.type.name2.lexeme == 'DomComponent' && constr.name?.name == 'wrap') {
+      onWrapDomComponent(SourceRange(constr.type.offset, constr.name!.end - constr.type.offset));
+    }
+    super.visitInstanceCreationExpression(node);
   }
 }

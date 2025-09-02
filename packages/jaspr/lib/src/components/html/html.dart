@@ -36,5 +36,5 @@ Component raw(String text, {Key? key}) {
 ///
 /// Convenience method for `Component.fragment()`.
 Component fragment(List<Component> children, {Key? key}) {
-  return Component.fragment(children: children, key: key);
+  return Component.fragment(children, key: key);
 }

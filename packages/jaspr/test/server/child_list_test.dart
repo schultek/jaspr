@@ -77,7 +77,7 @@ void main() {
 
     test('finds render objects with fragments', () async {
       final r = await renderServerApp(Component.element(tag: 'html', children: [
-        Component.fragment(children: [
+        Component.fragment([
           Component.element(tag: 'head', children: []),
         ]),
         Component.element(tag: 'body', children: [

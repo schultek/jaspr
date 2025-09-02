@@ -331,7 +331,7 @@ class AttachDocument extends StatelessComponent implements Document {
   @override
   Component build(BuildContext context) {
     AttachAdapter.register(context, this);
-    return Component.fragment(children: children ?? []);
+    return Component.fragment(children ?? []);
   }
 }
 

@@ -30,7 +30,7 @@ class Content extends StatelessComponent {
     }
 
     children.add(section(classes: 'content', [child]));
-    return Component.fragment(children: children);
+    return Component.fragment(children);
   }
 }
 

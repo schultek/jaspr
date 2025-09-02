@@ -3,7 +3,7 @@ import 'package:jaspr/jaspr.dart';
 class App extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return Component.fragment(children: [
+    return Component.fragment([
       Document.head(title: 'a', meta: {'test': 'b', 'c': 'd'}),
       Page(),
     ]);
@@ -22,7 +22,7 @@ class _PageState extends State<Page> {
 
   @override
   Component build(BuildContext context) {
-    return Component.fragment(children: [
+    return Component.fragment([
       div([
         if (!pressed) ...[
           Document.head(title: 'b', meta: {'c': 'e'}),
