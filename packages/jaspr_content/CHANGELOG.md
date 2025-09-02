@@ -1,3 +1,7 @@
+## Unreleased patch dev.0
+
+- Fixed `HtmlParser` to treat html files as fragments.
+
 ## 0.3.0
 
 - **Breaking**: `Page.data` now returns a `PageDataMap` with typed getters for
