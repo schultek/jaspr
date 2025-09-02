@@ -53,6 +53,8 @@ abstract class MarkupRenderObject extends RenderObject {
       bool childStrictWhitespace = false,
       String indent = '']) {
     final output = StringBuffer();
+    final childIndent = this is MarkupRenderFragment ? indent : '$indent  ';
+
     var leadingWhitespace = false;
     var trailingWhitespace = false;
 
@@ -62,8 +64,11 @@ abstract class MarkupRenderObject extends RenderObject {
       var childOutputLinebreak = false;
 
       for (var child in children) {
-        final (html, leading, trailing) =
-            child._renderAndFormat(childStrictFormatting, childStrictWhitespace, '$indent  ');
+        final (html, leading, trailing) = child._renderAndFormat(
+          childStrictFormatting,
+          childStrictWhitespace,
+          childIndent,
+        );
         childOutput.add((html, leading, trailing));
         childOutputLength += html.length;
         childOutputLinebreak |= html.contains('\n');
@@ -78,16 +83,19 @@ abstract class MarkupRenderObject extends RenderObject {
       } else {
         var allowNewline = strictWhitespace ? false : true;
         for (var child in childOutput) {
+          if (child.$1.isEmpty) continue;
           if (allowNewline || child.$2) {
-            output.write('\n$indent  ');
-            if (child == childOutput.first) leadingWhitespace = true;
+            if (this is! MarkupRenderFragment || child != childOutput.first) {
+              output.write('\n$childIndent');
+              if (child == childOutput.first) leadingWhitespace = true;
+            }
           }
           output.write(child.$1);
           allowNewline = childStrictWhitespace //
               ? child.$3
               : true;
         }
-        if (allowNewline || !strictWhitespace) {
+        if (this is! MarkupRenderFragment && (allowNewline || !strictWhitespace)) {
           output.write('\n$indent');
           trailingWhitespace = true;
         }
@@ -219,7 +227,7 @@ class MarkupRenderFragment extends MarkupRenderObject implements RenderFragment 
       strictWhitespace,
       strictFormatting,
       strictWhitespace,
-      indent.substring(0, indent.length - 2),
+      indent,
     );
     return result;
   }
