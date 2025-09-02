@@ -3,8 +3,7 @@ import '../server_binding.dart';
 
 mixin DocumentStructureMixin on RenderAdapter {
   (MarkupRenderElement, MarkupRenderElement, MarkupRenderElement) createDocumentStructure(MarkupRenderObject root) {
-    var html =
-        root.children.findWhere((c) => c is MarkupRenderElement && c.tag == 'html')?.node as MarkupRenderElement?;
+    var html = root.children.findWhere<MarkupRenderElement>((c) => c.tag == 'html')?.node as MarkupRenderElement?;
     if (html == null) {
       var range = root.children.range();
       root.children.insertAfter(
@@ -12,9 +11,9 @@ mixin DocumentStructureMixin on RenderAdapter {
       );
     }
 
-    var headNode = html.children.findWhere((c) => c is MarkupRenderElement && c.tag == 'head');
+    var headNode = html.children.findWhere<MarkupRenderElement>((c) => c.tag == 'head');
     var head = headNode?.node as MarkupRenderElement?;
-    var bodyNode = html.children.findWhere((c) => c is MarkupRenderElement && c.tag == 'body');
+    var bodyNode = html.children.findWhere<MarkupRenderElement>((c) => c.tag == 'body');
     var body = bodyNode?.node as MarkupRenderElement?;
 
     if (head == null) {
@@ -49,7 +48,7 @@ class DocumentAdapter extends RenderAdapter with DocumentStructureMixin {
   (MarkupRenderObject, MarkupRenderObject, MarkupRenderObject) apply(MarkupRenderObject root) {
     final (html, head, body) = createDocumentStructure(root);
 
-    var doctype = root.children.findWhere((r) => r is MarkupRenderText && r.text.startsWith('<!DOCTYPE') && r.rawHtml);
+    var doctype = root.children.findWhere<MarkupRenderText>((r) => r.text.startsWith('<!DOCTYPE') && r.rawHtml);
     if (doctype == null) {
       root.children.insertAfter(root.createChildRenderText('<!DOCTYPE html>', true));
     }

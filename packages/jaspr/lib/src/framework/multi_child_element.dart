@@ -10,6 +10,7 @@ abstract class MultiChildElement extends Element {
   /// This list is filtered to hide elements that have been forgotten (using
   /// [forgetChild]).
   @protected
+  @visibleForTesting
   Iterable<Element> get children => _children!.where((Element child) => !_forgottenChildren.contains(child));
 
   List<Element>? _children;

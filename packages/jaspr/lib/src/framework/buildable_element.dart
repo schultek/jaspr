@@ -9,6 +9,7 @@ abstract class BuildableElement extends Element {
 
   /// The current child of this element.
   @protected
+  @visibleForTesting
   Element? get child => _child;
 
   Element? _child;
