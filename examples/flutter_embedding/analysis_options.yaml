@@ -1,5 +1,6 @@
 include: package:flutter_lints/flutter.yaml
 
-analyzer:
-  plugins:
-    - custom_lint
+# TODO: Reenable once migrated to analyzer v8.
+#analyzer:
+#  plugins:
+#    - custom_lint
