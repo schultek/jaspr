@@ -56,7 +56,7 @@ jobs:
       - name: Update CLI
         run: |
           melos run generate:versions
-          melos run format
+          melos run format || true
 
       - name: Commit Versions
         if: steps.bump.outputs.did_bump != '0'
