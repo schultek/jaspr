@@ -1,3 +1,7 @@
+## Unreleased patch dev.0
+
+- Changed `Add styles` assist to create a getter instead of variable.
+
 ## 0.5.0-dev.0
 
 - Extend `prefer_html_methods` lint to also suggest using `text()` and `fragment()` methods, and offer fixes for them.
