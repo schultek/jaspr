@@ -1,3 +1,9 @@
+## 0.1.2-dev.1
+
+- `jaspr` upgraded to `0.21.0-dev.1`
+- `jaspr_builder` upgraded to `0.21.0-dev.1`
+- `jaspr_serverpod` upgraded to `0.5.7-dev.1`
+
 ## 0.1.2-dev.0
 
 - `jaspr` upgraded to `0.21.0-dev.0`

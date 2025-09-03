@@ -1,6 +1,6 @@
 name: package_riverpod
 description: An example showing how to use riverpod with jaspr.
-version: 0.1.8-dev.0
+version: 0.1.8-dev.1
 publish_to: none
 
 environment:

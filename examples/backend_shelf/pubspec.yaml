@@ -1,6 +1,6 @@
 name: backend_shelf
 description: An example of using a custom shelf server with jaspr.
-version: 0.1.8-dev.0
+version: 0.1.8-dev.1
 publish_to: none
 
 environment:

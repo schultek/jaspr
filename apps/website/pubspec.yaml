@@ -1,6 +1,6 @@
 name: website
 description: The Jaspr website hosted at https://jaspr.site
-version: 0.1.3-dev.0
+version: 0.1.3-dev.1
 publish_to: none
 
 environment:

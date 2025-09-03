@@ -1,3 +1,8 @@
+## 0.3.1-dev.1
+
+- `jaspr` upgraded to `0.21.0-dev.1`
+- `jaspr_router` upgraded to `0.7.2-dev.1`
+
 ## 0.3.1-dev.0
 
 - Fixed `HtmlParser` to treat html files as fragments.

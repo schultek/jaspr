@@ -1,6 +1,6 @@
 name: jaspr_pad
 description: Dartpad inspired online-editor for jaspr built with jaspr.
-version: 0.1.9-dev.0
+version: 0.1.9-dev.1
 publish_to: none
 
 environment:
