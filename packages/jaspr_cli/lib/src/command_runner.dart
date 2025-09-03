@@ -110,8 +110,11 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
   Future<void> _checkForUpdates() async {
     try {
       final latestVersion = await _updater.getLatestVersion(packageName);
-      final isUpToDate = jasprCliVersion == latestVersion;
-      if (!isUpToDate) {
+
+      final currentVersionDesc = Version.parse(jasprCliVersion);
+      final latestVersionDesc = Version.parse(latestVersion);
+
+      if (currentVersionDesc < latestVersionDesc) {
         _logger.info(wrapBox(
             '${lightYellow.wrap('Update available!')} ${lightCyan.wrap(jasprCliVersion)} \u2192 ${lightCyan.wrap(latestVersion)}\n'
             'Run ${cyan.wrap('$executableName update')} to update'));
