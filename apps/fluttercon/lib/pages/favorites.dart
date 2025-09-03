@@ -1,6 +1,6 @@
-import 'package:fluttercon/components/pages_nav.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../components/pages_nav.dart';
 import '../components/session_list.dart';
 import '../services/favorites.dart';
 

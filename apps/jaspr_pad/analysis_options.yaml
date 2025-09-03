@@ -1,4 +1,4 @@
-include: package:lints/recommended.yaml
+include: package:jaspr_repo/analysis_options.yaml
 
 analyzer:
   plugins:
@@ -6,9 +6,3 @@ analyzer:
   exclude:
     - lib/**.g.dart
     - templates/**
-
-linter:
-  rules:
-    sort_pub_dependencies: true
-    prefer_relative_imports: true
-    directives_ordering: true

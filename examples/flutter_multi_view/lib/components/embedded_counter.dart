@@ -1,7 +1,7 @@
-import 'package:flutter_multi_view/constants/theme.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
+import '../constants/theme.dart';
 @Import.onWeb('../widgets/counter.dart', show: [#CounterWidget])
 import 'embedded_counter.imports.dart' deferred as widget;
 import 'pulsing_loader.dart';

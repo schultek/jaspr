@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:dart_quotes/data/quote.dart';
 import 'package:jaspr/jaspr.dart';
 
 @Import.onWeb('package:firebase_core/firebase_core.dart', show: [#Firebase, #FirebaseApp])
@@ -11,6 +10,7 @@ import 'package:jaspr/jaspr.dart';
 @Import.onServer('package:dart_firebase_admin/dart_firebase_admin.dart', show: [#FirebaseAdminApp, #Credential])
 @Import.onServer('package:dart_firebase_admin/firestore.dart', show: [#Firestore])
 import 'firebase.imports.dart';
+import 'quote.dart';
 
 class FirebaseService {
   static FirebaseService instance = FirebaseService();

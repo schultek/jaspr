@@ -24,9 +24,10 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
   jaspr_builder: ^0.21.0-dev.0
-  jaspr_web_compilers: ^4.2.0
   jaspr_lints: #^0.4.0
     path: ../../packages/jaspr_lints
+  jaspr_repo: any
+  jaspr_web_compilers: ^4.2.0
 
 flutter:
   uses-material-design: true

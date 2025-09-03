@@ -2,10 +2,10 @@ import 'package:jaspr/jaspr.dart';
 
 import '../../../components/gradient_border.dart';
 import '../../../components/icon.dart';
-import 'components/install_command.dart';
 import '../../../components/link_button.dart';
-import 'components/meet_jaspr_button.dart';
 import '../../../constants/theme.dart';
+import 'components/install_command.dart';
+import 'components/meet_jaspr_button.dart';
 
 class Hero extends StatelessComponent {
   @override

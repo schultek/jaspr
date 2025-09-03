@@ -1,5 +1,6 @@
-import 'package:flutter_multi_view/constants/theme.dart';
 import 'package:jaspr/jaspr.dart';
+
+import '../constants/theme.dart';
 
 class PulsingLoader extends StatelessComponent {
   const PulsingLoader({super.key});

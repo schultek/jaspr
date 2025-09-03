@@ -1,7 +1,7 @@
-import 'package:fluttercon/services/favorites.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../models/session.dart';
+import '../services/favorites.dart';
 
 @client
 class LikeButton extends StatelessComponent {

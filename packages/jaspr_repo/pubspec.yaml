@@ -1,0 +1,10 @@
+name: jaspr_repo
+description: Shared utilities and tools for contributing to the Jaspr project.
+publish_to: none
+
+resolution: workspace
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  lints: ^5.1.1

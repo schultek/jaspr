@@ -1,7 +1,7 @@
-import 'package:dart_quotes/pages/home_page.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
+import 'pages/home_page.dart';
 import 'pages/quote_page.dart';
 
 class App extends StatelessComponent {

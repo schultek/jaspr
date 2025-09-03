@@ -3,12 +3,11 @@ import 'dart:math';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
-import 'package:website/utils/events.dart';
 import 'package:website/components/link_button.dart';
-import 'package:website/pages/home/0_hero/components/overlay.dart';
+import 'package:website/components/particles.dart';
 import 'package:website/constants/theme.dart';
-
-import '../../../../components/particles.dart';
+import 'package:website/pages/home/0_hero/components/overlay.dart';
+import 'package:website/utils/events.dart';
 
 @client
 class MeetJasprButton extends StatefulComponent {

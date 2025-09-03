@@ -35,8 +35,8 @@ dev_dependencies:
   jaspr_builder: ^0.21.0-dev.0
   jaspr_lints: #^0.4.0
     path: ../../packages/jaspr_lints
+  jaspr_repo: any
   jaspr_test: ^0.21.0-dev.0
-  lints: ^5.0.0
   test: ^1.25.0
   yaml_writer: ^1.0.1
 

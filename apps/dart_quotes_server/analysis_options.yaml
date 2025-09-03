@@ -1,5 +1,7 @@
-include: package:lints/recommended.yaml
+include: package:jaspr_repo/analysis_options.yaml
 
 analyzer:
   plugins:
     - custom_lint
+  errors:
+    directives_ordering: ignore

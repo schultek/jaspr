@@ -18,7 +18,7 @@ dev_dependencies:
   jaspr_builder: ^0.21.0-dev.0
   jaspr_lints: #^0.4.0
     path: ../../packages/jaspr_lints
-  lints: ^5.0.0
+  jaspr_repo: any
 
 jaspr:
   mode: server

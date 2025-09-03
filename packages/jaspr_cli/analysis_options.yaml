@@ -1,4 +1,4 @@
-include: package:lints/recommended.yaml
+include: package:jaspr_repo/analysis_options.yaml
 
 analyzer:
   exclude:
@@ -9,7 +9,5 @@ analyzer:
 
 linter:
   rules:
-    sort_pub_dependencies: false # to group packages semantically
-    prefer_relative_imports: true
-    directives_ordering: true
-    avoid_print: true
+    # Disabled so that we can group dependencies semantically.
+    sort_pub_dependencies: false

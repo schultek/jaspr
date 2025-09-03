@@ -1,8 +1,5 @@
-include: package:lints/recommended.yaml
+include: package:jaspr_repo/analysis_options.yaml
 
 linter:
   rules:
-    sort_pub_dependencies: true
-    prefer_relative_imports: true
-    directives_ordering: true
     avoid_types_as_parameter_names: false

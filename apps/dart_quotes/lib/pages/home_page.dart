@@ -1,5 +1,6 @@
-import 'package:dart_quotes/data/firebase.dart';
 import 'package:jaspr/server.dart';
+
+import '../data/firebase.dart';
 
 class HomePage extends StatelessComponent {
   const HomePage({super.key});
