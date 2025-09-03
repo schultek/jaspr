@@ -1,7 +1,27 @@
 ---
 title: Version 0.21.0
 description: Release notes and breaking changes.
+next: /releases/packages/jaspr-code-v0.2.1
+nextTitle: VSCode Extension Release Notes
 ---
+
+---
+
+## TLDR / Overview
+
+Version 0.21.0 comes with a major overhaul of the component syntax, making it easier and even more familiar to write components. It also ships a new `jaspr migrate` command for automatic migrations to new versions, and adds support for five new css properties.
+
+**TL;DR**
+
+- **Simplified Build Methods:** All component `build` methods now return a single `Component` instead of an `Iterable<Component>`, making code more concise and Flutter-like.
+- **Unified Component Factories:** New factory constructors on the core `Component` class replace `DomComponent()`, `Text()`, and `Fragment()` for a more consistent API.
+- **Automatic Migration Command:** The CLI now includes a `jaspr migrate` command to help you automatically update your codebase for breaking changes.
+- **Improved Base Handling:** The `base` parameter of the `Document()` component can now be set to `null` to suppress the `<base>` element.
+- **Expanded CSS Support:** New CSS properties like `justifyItems`, `justifySelf`, `alignContent`, `filter`, and `backdropFilter` are now available for more flexible styling.
+
+---
+
+Additionally, a new version of the [**Jaspr VSCode extension**](https://marketplace.visualstudio.com/items?itemName=schultek.jaspr-code) was released that contains a major improvement to the developer experience. Read more in the [Extension Release Notes](/releases/packages/jaspr-code-v0.2.1).
 
 ---
 
@@ -121,19 +141,7 @@ Using the command is straightforward and follows the same style as the `dart fix
 - Running `jaspr migrate --dry-run` will compute and print all proposed migrations, but makes no changes to the code.
 - Running `jaspr migrate --apply` will compute, print and apply all migrations.
 
-## New Component Scopes in VSCode
-
-The newest version of the VSCode extension, released together with Jaspr 0.21.0, contains a big quality-of-life feature to help navigate the complexities of writing full-stack components: Component Scopes
-
-For each of your components, you will now get a small hint directly in the editor whether that component is rendered on the server and/or on the client. This helps with reasoning which sdk libraries are available and which APIs can be used. Before, this would only show up as compilation errors during build.
-
-The editor hints for a fullstack component look like this:
-
-
-
-You can click on either server and client hint to see the root(s) of the respective scope, which for the server scope is always the `main()` method of the server entrypoint, and for the client scope is one or more `@client` components.
-
-Scope hints can optionally be disabled in the settings.
+<Image caption="Migrate options for version 0.21.0" src="/releases/assets/migrate_command.png"/>
 
 ## Base Handling
 

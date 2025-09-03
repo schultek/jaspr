@@ -21,4 +21,4 @@ export const getExecutableName = (cmd: string) => (executableNames as { [key: st
 export const dartVMPath = "bin/" + executableNames.dart;
 export const JASPR_CREATE_PROJECT_TRIGGER_FILE = 'jaspr.create';
 
-export const minimumJasprVersion = "0.18.2";
+export const minimumJasprVersion = "0.21.0";

@@ -458,6 +458,16 @@
           "href": "/releases/v/0.21.0"
         }
       ]
+    },
+    {
+      "tab": "releases",
+      "group": "Tooling & Packages",
+      "pages": [
+        {
+          "title": "VSCode Extension 0.2.1",
+          "href": "/releases/packages/jaspr-code-v0.2.1"
+        }
+      ]
     }
   ],
   "search": {
