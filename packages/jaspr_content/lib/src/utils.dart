@@ -14,7 +14,7 @@ extension YamlListNormalize on yaml.YamlList {
 }
 
 extension YamlNodeNormalize on yaml.YamlNode {
-  Object normalize() => switch (this) {
+  Object? normalize() => switch (this) {
         final yaml.YamlMap map => map.normalize(),
         final yaml.YamlList list => list.normalize(),
         final yaml.YamlScalar scalar => scalar.value,
