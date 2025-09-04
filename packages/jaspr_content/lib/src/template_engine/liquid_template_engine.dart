@@ -1,16 +1,25 @@
 import 'package:liquify/liquify.dart';
+import 'package:path/path.dart' as path;
 
 import '../page.dart';
 import 'template_engine.dart';
 
 /// A template engine that uses the Liquid templating language.
 ///
-/// This engine uses the `liquid_engine` package to render Liquid templates.
+/// This engine uses the `liquify` package to render Liquid templates.
 class LiquidTemplateEngine implements TemplateEngine {
-  const LiquidTemplateEngine({
-    this.includesPath = 'content/_includes/',
+  /// Creates a new template engine that
+  /// uses `package:liquify` to parse and render Liquid templates.
+  ///
+  /// To find the source files referenced in usages of `include` and `render`,
+  /// the engine resolves them relative to the specified [includesPath].
+  /// The [includesPath] should be an absolute path or
+  /// relative to the current working directory.
+  /// By default, includes are found in the `content/_includes` directory.
+  LiquidTemplateEngine({
+    String? includesPath,
     this.prepareTemplate,
-  });
+  }) : includesPath = includesPath ?? path.join('content', '_includes');
 
   final String includesPath;
   final void Function(Template, Page, List<Page> pages)? prepareTemplate;
@@ -20,7 +29,7 @@ class LiquidTemplateEngine implements TemplateEngine {
     final template = Template.parse(
       page.content,
       data: {...page.data, 'pages': pages.map((p) => p.data['page']).toList()},
-      root: _IncludeResolver(page, Uri(path: includesPath)),
+      root: _IncludeResolver(page, includesPath),
     );
 
     prepareTemplate?.call(template, page, pages);
@@ -30,22 +39,22 @@ class LiquidTemplateEngine implements TemplateEngine {
 }
 
 class _IncludeResolver implements Root {
-  _IncludeResolver(this.page, this._includesPath);
+  _IncludeResolver(this.page, this._includesDirectoryPath);
 
   final Page page;
-  final Uri _includesPath;
+  final String _includesDirectoryPath;
 
   @override
   Source resolve(String relPath) {
-    final file = _includesPath.resolve(relPath);
-    final content = page.readPartialSync(file.path);
-    return Source(file, content, this);
+    final filePath = path.join(_includesDirectoryPath, relPath);
+    final content = page.readPartialSync(filePath);
+    return Source(Uri.file(filePath), content, this);
   }
 
   @override
   Future<Source> resolveAsync(String relPath) async {
-    final file = _includesPath.resolve(relPath);
-    final content = await page.readPartial(file.path);
-    return Source(file, content, this);
+    final filePath = path.join(_includesDirectoryPath, relPath);
+    final content = await page.readPartial(filePath);
+    return Source(Uri.file(filePath), content, this);
   }
 }

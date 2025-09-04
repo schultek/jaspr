@@ -1,3 +1,8 @@
+## Unreleased minor dev.0
+
+- The `LiquidTemplateEngine` is no longer `const`.
+- Fixed resolution of partial files in `LiquidTemplateEngine`.
+
 ## 0.3.1-dev.1
 
 - `jaspr` upgraded to `0.21.0-dev.1`
