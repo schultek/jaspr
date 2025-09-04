@@ -5,13 +5,19 @@ on:
       - main
     paths:
       - '.github/workflows/test.yml'
+      - 'apps/**'
+      - 'examples/**'
       - 'packages/**'
+      - 'pubspec.lock'
   push:
     branches:
       - main
     paths:
       - '.github/workflows/test.yml'
+      - 'apps/**'
+      - 'examples/**'
       - 'packages/**'
+      - 'pubspec.lock'
 
 name: Test Pipeline
 
