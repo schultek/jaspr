@@ -56,12 +56,12 @@ melos:
         scope: [ jaspr, jaspr_builder, jaspr_content, jaspr_riverpod, jaspr_router ]
     coverage:
       run: |
-        dart test --coverage=coverage &&
+        dart test --coverage=coverage --exclude-tags=cli &&
         dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/\$MELOS_PACKAGE_NAME_lcov.info" -i ./coverage
       exec:
         concurrency: 1
       packageFilters:
-        scope: [jaspr, jaspr_builder, jaspr_content, jaspr_riverpod, jaspr_router]
+        scope: [jaspr, jaspr_builder, jaspr_cli, jaspr_content, jaspr_riverpod, jaspr_router]
     coverage:cli:
       run: |
         cd packages/jaspr_cli &&

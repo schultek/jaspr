@@ -5,7 +5,7 @@
 			"description": "Insert a StatelessComponent",
 			"body": [
 				"class $1 extends StatelessComponent {",
-				"  const $1({ Key? key }) : super(key: key);",
+				"  const $1({super.key});",
 				"",
 				"  @override",
 				"  Component build(BuildContext context) {",
@@ -19,7 +19,7 @@
 			"description": "Insert a StatefulComponent",
 			"body": [
 				"class $1 extends StatefulComponent {",
-				"  const $1({ Key? key }) : super(key: key);",
+				"  const $1({super.key});",
 				"",
 				"  @override",
 				"  State<$1> createState() => _$1State();",

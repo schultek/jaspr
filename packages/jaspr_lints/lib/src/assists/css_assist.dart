@@ -112,7 +112,7 @@ class CssAssistProvider extends DartAssist {
 
       if (styles == null) {
         builder.addInsertion(comp.$2.end, (edit) {
-          edit.write('\n\n  @css\n  static final List<StyleRule> styles = [\n  ');
+          edit.write('\n\n  @css\n  static List<StyleRule> get styles => [\n  ');
           writeCssRule(edit);
           edit.write('];');
         });

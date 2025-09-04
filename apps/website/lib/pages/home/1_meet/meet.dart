@@ -59,9 +59,8 @@ class Meet extends StatelessComponent {
             }
           }
           ''', lineClasses: {
-            8: 'select-trigger-1',
-            9: 'select-trigger-1',
-            10: 'select-trigger-2',
+            10: 'select-trigger-1',
+            11: 'select-trigger-2',
             12: 'select-trigger-3',
             13: 'select-trigger-4',
             14: 'select-trigger-4',
