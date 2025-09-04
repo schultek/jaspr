@@ -23,10 +23,12 @@ class Content extends StatelessComponent {
   Component build(BuildContext context) {
     final children = <Component>[];
     if (!kIsWeb) {
-      final theme = themeOf(context);
-      children.add(Document.head(children: [
-        Style(styles: theme.styles),
-      ]));
+      final styles = themeOf(context).styles;
+      if (styles.isNotEmpty) {
+        children.add(Document.head(children: [
+          Style(styles: styles),
+        ]));
+      }
     }
 
     children.add(section(classes: 'content', [child]));

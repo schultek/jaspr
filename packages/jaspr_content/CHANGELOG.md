@@ -2,6 +2,7 @@
 
 - The `LiquidTemplateEngine` is no longer `const`.
 - Fixed resolution of partial files in `LiquidTemplateEngine`.
+- Skip adding a `<style>` element for an empty `ContentTheme`.
 
 ## 0.3.1-dev.1
 
