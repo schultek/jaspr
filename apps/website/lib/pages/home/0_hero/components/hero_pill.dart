@@ -27,24 +27,24 @@ class HeroPill extends StatelessComponent {
 
   @css
   static List<StyleRule> get styles => [
-    css('.hero-pill', [
-      css('&').styles(
-        margin: Margin.only(bottom: 1.rem),
-        radius: BorderRadius.circular(20.px),
-        raw: {
-          'background': 'linear-gradient(175deg, ${primaryMid.value}33 0%, ${primaryMid.value}11 80%)',
-        },
-      ),
-      css('.pill-content').styles(
-        display: Display.flex,
-        padding: Padding.symmetric(vertical: 0.5.rem, horizontal: 0.8.rem),
-        alignItems: AlignItems.center,
-        gap: Gap(column: 0.5.rem),
-        color: textBlack,
-        fontSize: 0.8.rem,
-        fontWeight: FontWeight.w700,
-        raw: {'text-wrap' : 'balance'},
-      ),
-    ]),
-  ];
+        css('.hero-pill', [
+          css('&').styles(
+            margin: Margin.only(bottom: 1.rem),
+            radius: BorderRadius.circular(20.px),
+            raw: {
+              'background': 'linear-gradient(175deg, ${primaryMid.value}33 0%, ${primaryMid.value}11 80%)',
+            },
+          ),
+          css('.pill-content').styles(
+            display: Display.flex,
+            padding: Padding.symmetric(vertical: 0.5.rem, horizontal: 0.8.rem),
+            alignItems: AlignItems.center,
+            gap: Gap(column: 0.5.rem),
+            color: textBlack,
+            fontSize: 0.8.rem,
+            fontWeight: FontWeight.w700,
+            raw: {'text-wrap': 'balance'},
+          ),
+        ]),
+      ];
 }
