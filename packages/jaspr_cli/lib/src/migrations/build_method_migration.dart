@@ -160,11 +160,17 @@ class BuildMethodMigration implements Migration {
               builder.delete(s.semicolon.offset, s.semicolon.length);
             }
           } else if (s is Block) {
-            builder.delete(s.leftBracket.offset, s.leftBracket.length);
-            for (var child in s.statements) {
-              replaceStatementWithElement(child, addComma ? true : child != s.statements.last);
+            if (s.statements.length == 1) {
+              builder.delete(s.leftBracket.offset, s.leftBracket.length);
+              replaceStatementWithElement(s.statements.first, addComma);
+              builder.delete(s.rightBracket.offset, s.rightBracket.length);
+              return;
             }
-            builder.delete(s.rightBracket.offset, s.rightBracket.length);
+            builder.replace(s.leftBracket.offset, s.leftBracket.length, '...[');
+            for (var child in s.statements) {
+              replaceStatementWithElement(child, true);
+            }
+            builder.replace(s.rightBracket.offset, s.rightBracket.length, ']${addComma ? ',' : ''}');
           } else if (s is ForStatement) {
             replaceStatementWithElement(s.body, addComma);
           } else if (s is IfStatement) {

@@ -27,8 +27,8 @@ class MyComponent extends StatelessComponent {
 }
 ''',
           expectedMigrations: [
-            isA<MigrationInstance>().having((i) => i.description, 'description',
-                'Migrated build() method of MyComponent class'),
+            isA<MigrationInstance>()
+                .having((i) => i.description, 'description', 'Migrated build() method of MyComponent class'),
           ],
           expectedWarnings: [],
         );
@@ -50,7 +50,7 @@ class MyComponent extends StatelessComponent {
 class MyComponent extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return Component.fragment([
       Text('Hello, World!'),
       Text('Goodbye, World!'),
     ]);
@@ -87,7 +87,7 @@ class MyComponent extends StatelessComponent {
 class MyComponent extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return Fragment(children: [
+    return Component.fragment([
       Text('Hello, World!'),
       if (true) 
         Text('Conditional Text'),
@@ -142,6 +142,44 @@ class MyComponent extends StatelessComponent {
         );
       });
 
+      test('with multiple yields in if', () async {
+        testMigration(BuildMethodMigration(), input: '''
+class MyComponent extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    if (true) {
+      yield text('Hello');
+      yield text('World');
+    } else {
+      yield text('Goodbye');
+      for (var i = 0; i < 1; i++) {
+        yield text('\$i');
+      }
+      yield text('Jaspr');
+    }
+  }
+}
+''', expectedOutput: '''
+class MyComponent extends StatelessComponent {
+  @override
+  Component build(BuildContext context) {
+    return Component.fragment([
+      if (true) ...[
+        text('Hello'),
+        text('World'),
+      ] else ...[
+        text('Goodbye'),
+        for (var i = 0; i < 1; i++) 
+          text('\$i'),
+        
+        text('Jaspr'),
+      ],
+    ]);
+  }
+}
+''');
+      });
+
       test('with logic before yield', () async {
         testMigration(
           BuildMethodMigration(),
@@ -189,7 +227,7 @@ class MyComponent extends StatelessComponent {
     children.add(Text('Hello \$name!'));
     final greeting = 'Goodbye';
     children.add(Text('\$greeting \$name!'));
-    return Fragment(children: children);
+    return Component.fragment(children);
   }
 }
 ''',
@@ -230,7 +268,7 @@ class MyComponent extends StatelessComponent {
     final children = <Component>[];
     if (true) {
       children.add(Text('Hello, World!'));
-      return Fragment(children: children);
+      return Component.fragment(children);
     } else {
       children.add(Text('This will not be included'));
       for (var i = 0; i < 2; i++) {
@@ -238,14 +276,14 @@ class MyComponent extends StatelessComponent {
 
         if (i == 1) {
           children.add(Text('This is the last item'));
-          return Fragment(children: children);
+          return Component.fragment(children);
         }
       }
     }
 
     final greeting = 'Goodbye';
     children.add(Text('\$greeting World!'));
-    return Fragment(children: children);
+    return Component.fragment(children);
   }
 }
 ''',
@@ -305,7 +343,7 @@ class MyComponent extends StatelessComponent {
         ],
       ));
     }
-    return Fragment(children: children);
+    return Component.fragment(children);
   }
 }
 ''',
