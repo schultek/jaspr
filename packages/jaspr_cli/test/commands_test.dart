@@ -21,7 +21,7 @@ void main() {
     var runner = setupRunner();
 
     for (var variant in allVariants) {
-      test(variant.name, tags: variant.tag, () async {
+      test(variant.name, tags: ['cli', variant.tag], () async {
         await runner.run('create --no-pub-get -v ${variant.options} myapp', dir: dirs.root);
 
         for (var f in variant.files) {
