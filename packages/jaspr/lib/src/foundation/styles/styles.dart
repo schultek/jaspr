@@ -38,6 +38,7 @@ abstract class Styles with StylesMixin<Styles> {
     PointerEvents? pointerEvents,
     Transition? transition,
     Transform? transform,
+    All? all,
     // Flexbox Styles
     FlexDirection? flexDirection,
     FlexWrap? flexWrap,
@@ -126,6 +127,7 @@ abstract mixin class StylesMixin<T> {
     PointerEvents? pointerEvents,
     Transition? transition,
     Transform? transform,
+    All? all,
     // Flexbox Styles
     FlexDirection? flexDirection,
     FlexWrap? flexWrap,
@@ -196,6 +198,7 @@ abstract mixin class StylesMixin<T> {
         zIndex: zIndex,
         opacity: opacity,
         transform: transform,
+        all: all,
         shadow: shadow,
         filter: filter,
         backdropFilter: backdropFilter,
@@ -295,6 +298,7 @@ class _Styles extends Styles {
   final PointerEvents? pointerEvents;
   final Transition? transition;
   final Transform? transform;
+  final All? all;
   // Flexbox Style
   final FlexDirection? flexDirection;
   final FlexWrap? flexWrap;
@@ -374,6 +378,7 @@ class _Styles extends Styles {
     this.pointerEvents,
     this.transition,
     this.transform,
+    this.all,
     // Flexbox Styles
     this.flexDirection,
     this.flexWrap,
@@ -458,6 +463,7 @@ class _Styles extends Styles {
           '-webkit-user-select': userSelect!.value,
         },
         if (pointerEvents != null) 'pointer-events': pointerEvents!.value,
+        if (all != null) 'all': all!.value,
         // Text Styles
         if (color != null) 'color': color!.value,
         if (fontFamily != null) 'font-family': fontFamily!.value,

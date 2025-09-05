@@ -555,3 +555,14 @@ class _UrlCursor implements Cursor {
   @override
   String get value => 'url($url)${x != null || y != null ? ' ${x ?? 0} ${y ?? 0}' : ''}, ${fallback.value}';
 }
+
+enum All {
+  initial('initial'),
+  inherit('inherit'),
+  unset('unset'),
+  revert('revert'),
+  revertLayer('revert-layer');
+
+  const All(this.value);
+  final String value;
+}
