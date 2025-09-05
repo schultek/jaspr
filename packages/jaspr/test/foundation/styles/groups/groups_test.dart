@@ -149,6 +149,7 @@ void main() {
           cursor: Cursor.crosshair,
           transition: Transition('width', duration: 500),
           all: All.initial,
+          appearance: Appearance.baseSelect,
         );
 
         expect(
@@ -176,6 +177,7 @@ void main() {
             'cursor': 'crosshair',
             'transition': 'width 500ms',
             'all': 'initial',
+            'appearance': 'base-select',
           }),
         );
       });
