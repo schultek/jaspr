@@ -148,6 +148,7 @@ void main() {
           shadow: BoxShadow(offsetX: Unit.zero, offsetY: Unit.zero, blur: Unit.pixels(10)),
           cursor: Cursor.crosshair,
           transition: Transition('width', duration: 500),
+          all: All.initial,
         );
 
         expect(
@@ -174,6 +175,7 @@ void main() {
             'box-shadow': '0 0 10px',
             'cursor': 'crosshair',
             'transition': 'width 500ms',
+            'all': 'initial',
           }),
         );
       });
