@@ -563,6 +563,37 @@ enum All {
   revert('revert'),
   revertLayer('revert-layer');
 
-  const All(this.value);
+  /// The css value
   final String value;
+  const All(this.value);
+}
+
+enum Appearance {
+  // Global values
+  initial('initial'),
+  inherit('inherit'),
+  unset('unset'),
+  revert('revert'),
+  revertLayer('revert-layer'),
+
+  // Basic values
+  none('none'),
+  auto('auto'),
+  base('base'),
+  baseSelect('base-select'),
+  searchfield('searchfield'),
+  textArea('textarea'),
+  checkbox('checkbox'),
+  radio('radio'),
+  menulist('menulist'),
+  listbox('listbox'),
+  meter('meter'),
+  progressBar('progress-bar'),
+  button('button'),
+  textfield('textfield'),
+  menulistButton('menulist-button');
+
+  /// The css value
+  final String value;
+  const Appearance(this.value);
 }
