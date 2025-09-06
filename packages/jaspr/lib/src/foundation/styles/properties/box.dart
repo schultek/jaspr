@@ -612,8 +612,10 @@ class AspectRatio {
   static const revertLayer = AspectRatio._('revert-layer');
 
   // Basic value(s)
+  static const auto = AspectRatio._('auto');
+
   const factory AspectRatio(int num, [int? denom]) = _AspectRatio;
-  const factory AspectRatio.auto([int? num, int? denom]) = _AspectRatioAuto;
+  const factory AspectRatio.autoOrRatio(int num, [int? denom]) = _AspectAutoOrRatio;
 }
 
 class _AspectRatio implements AspectRatio {
@@ -627,13 +629,13 @@ class _AspectRatio implements AspectRatio {
   String get value => "$num${denom != null ? '/$denom' : ''}";
 }
 
-class _AspectRatioAuto implements AspectRatio {
-  const _AspectRatioAuto([this.num, this.denom]);
+class _AspectAutoOrRatio implements AspectRatio {
+  const _AspectAutoOrRatio(this.num, [this.denom]);
 
-  final int? num;
+  final int num;
   final int? denom;
 
   /// The css value
   @override
-  String get value => "auto${num != null ? ' $num' : ''}${denom != null ? '/$denom' : ''}";
+  String get value => "auto $num${denom != null ? '/$denom' : ''}";
 }

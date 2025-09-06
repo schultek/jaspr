@@ -102,10 +102,7 @@ void main() {
           backgroundImage: ImageStyle.url('abc.png'),
           backgroundOrigin: BackgroundOrigin.contentBox,
           backgroundPosition: BackgroundPosition(
-            alignX: BackgroundAlignX.left,
-            alignY: BackgroundAlignY.center,
-            offsetX: Unit.percent(20),
-          ),
+              alignX: BackgroundAlignX.left, alignY: BackgroundAlignY.center, offsetX: Unit.percent(20)),
           backgroundRepeat: BackgroundRepeat.noRepeat,
           backgroundSize: BackgroundSize.cover,
         );
@@ -281,17 +278,17 @@ void main() {
     });
 
     test('auto works', () {
-      const styles = Styles(aspectRatio: AspectRatio.auto());
+      const styles = Styles(aspectRatio: AspectRatio.auto);
       expect(styles.properties, equals({'aspect-ratio': 'auto'}));
     });
 
-    test('auto with numerator works', () {
-      const styles = Styles(aspectRatio: AspectRatio.auto(1));
+    test('autoOrRatio with numerator works', () {
+      const styles = Styles(aspectRatio: AspectRatio.autoOrRatio(1));
       expect(styles.properties, equals({'aspect-ratio': 'auto 1'}));
     });
 
-    test('auto with numerator and denominator works', () {
-      const styles = Styles(aspectRatio: AspectRatio.auto(1, 2));
+    test('autoOrRatio with numerator and denominator works', () {
+      const styles = Styles(aspectRatio: AspectRatio.autoOrRatio(1, 2));
       expect(styles.properties, equals({'aspect-ratio': 'auto 1/2'}));
     });
   });
