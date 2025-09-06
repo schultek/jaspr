@@ -150,6 +150,7 @@ void main() {
           transition: Transition('width', duration: 500),
           all: All.initial,
           appearance: Appearance.baseSelect,
+          aspectRatio: AspectRatio(1, 2),
         );
 
         expect(
@@ -178,6 +179,7 @@ void main() {
             'transition': 'width 500ms',
             'all': 'initial',
             'appearance': 'base-select',
+            'aspect-ratio': '1/2'
           }),
         );
       });
@@ -217,12 +219,11 @@ void main() {
         expect(
           styles.properties,
           equals({
-            'filter': 'blur(0) brightness(1) contrast(1) '
-                'drop-shadow(1rem 1rem) grayscale(1) hue-rotate(0) '
-                'invert(1) opacity(1) sepia(1) saturate(1) url(abc.svg#urltest)',
-            'backdrop-filter': 'blur(0.1rem) brightness(0.2) contrast(0.3) '
-                'drop-shadow(1rem 1rem 0.4rem red) grayscale(0.5) hue-rotate(45deg) '
-                'invert(0.6) opacity(0.7) sepia(0.8) saturate(0.9) url(xyz.svg#urltest)',
+            'filter': 'blur(0) brightness(1) contrast(1) drop-shadow(1rem 1rem) grayscale(1) hue-rotate(0) invert(1) '
+                'opacity(1) sepia(1) saturate(1) url(abc.svg#urltest)',
+            'backdrop-filter': 'blur(0.1rem) brightness(0.2) contrast(0.3) drop-shadow(1rem 1rem 0.4rem red) '
+                'grayscale(0.5) hue-rotate(45deg) invert(0.6) opacity(0.7) sepia(0.8) saturate(0.9) '
+                'url(xyz.svg#urltest)',
           }),
         );
       });
@@ -231,9 +232,7 @@ void main() {
         final filter = Filter.list([]);
         expect(
           () => filter.value,
-          throwsA(predicate((e) {
-            return e == 'Filter.list cannot be empty.';
-          })),
+          throwsA(predicate((e) => e == 'Filter.list cannot be empty.')),
         );
       });
 
@@ -241,9 +240,7 @@ void main() {
         final nestedFilter = Filter.list([Filter.list([])]);
         expect(
           () => nestedFilter.value,
-          throwsA(predicate((e) {
-            return e == 'Cannot nest [Filter.list] inside [Filter.list].';
-          })),
+          throwsA(predicate((e) => e == 'Cannot nest [Filter.list] inside [Filter.list].')),
         );
       });
 
@@ -259,13 +256,43 @@ void main() {
           expect(
             () => filter.value,
             throwsA(predicate((e) {
-              return e ==
-                  'Cannot use ${val.value} as a filter list item, '
-                      'only standalone use supported.';
+              return e == 'Cannot use ${val.value} as a filter list item, only standalone use supported.';
             })),
           );
         }
       });
+    });
+  });
+
+  group('aspect-ratio', () {
+    test('global values (private constructor) works', () {
+      const styles = Styles(aspectRatio: AspectRatio.initial);
+      expect(styles.properties, equals({'aspect-ratio': 'initial'}));
+    });
+
+    test('only numerator works', () {
+      const styles = Styles(aspectRatio: AspectRatio(1));
+      expect(styles.properties, equals({'aspect-ratio': '1'}));
+    });
+
+    test('numerator and denominator works', () {
+      const styles = Styles(aspectRatio: AspectRatio(1, 2));
+      expect(styles.properties, equals({'aspect-ratio': '1/2'}));
+    });
+
+    test('auto works', () {
+      const styles = Styles(aspectRatio: AspectRatio.auto());
+      expect(styles.properties, equals({'aspect-ratio': 'auto'}));
+    });
+
+    test('auto with numerator works', () {
+      const styles = Styles(aspectRatio: AspectRatio.auto(1));
+      expect(styles.properties, equals({'aspect-ratio': 'auto 1'}));
+    });
+
+    test('auto with numerator and denominator works', () {
+      const styles = Styles(aspectRatio: AspectRatio.auto(1, 2));
+      expect(styles.properties, equals({'aspect-ratio': 'auto 1/2'}));
     });
   });
 
@@ -316,12 +343,7 @@ void main() {
   group('grid', () {
     test('outputs all properties', () {
       var styles = const Styles(
-        gridTemplate: GridTemplate(
-            areas: GridAreas([
-          'header header',
-          'side content',
-          'side content',
-        ])),
+        gridTemplate: GridTemplate(areas: GridAreas(['header header', 'side content', 'side content'])),
         gap: Gap(row: Unit.pixels(20)),
         autoRows: [TrackSize(Unit.percent(20)), TrackSize.auto],
         autoColumns: [TrackSize(Unit.pixels(100)), TrackSize.auto, TrackSize.auto],
