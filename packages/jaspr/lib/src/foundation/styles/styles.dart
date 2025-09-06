@@ -11,6 +11,7 @@ abstract class Styles with StylesMixin<Styles> {
   /// Constructs an empty [Styles] instance.
   const factory Styles({
     // Box Styles
+    All? all,
     String? content,
     Display? display,
     Position? position,
@@ -21,6 +22,7 @@ abstract class Styles with StylesMixin<Styles> {
     Unit? minHeight,
     Unit? maxWidth,
     Unit? maxHeight,
+    AspectRatio? aspectRatio,
     Padding? padding,
     Margin? margin,
     BoxSizing? boxSizing,
@@ -30,6 +32,7 @@ abstract class Styles with StylesMixin<Styles> {
     double? opacity,
     Visibility? visibility,
     Overflow? overflow,
+    Appearance? appearance,
     BoxShadow? shadow,
     Filter? filter,
     Filter? backdropFilter,
@@ -38,9 +41,6 @@ abstract class Styles with StylesMixin<Styles> {
     PointerEvents? pointerEvents,
     Transition? transition,
     Transform? transform,
-    All? all,
-    Appearance? appearance,
-    AspectRatio? aspectRatio,
     // Flexbox Styles
     FlexDirection? flexDirection,
     FlexWrap? flexWrap,
@@ -102,6 +102,7 @@ abstract class Styles with StylesMixin<Styles> {
 abstract mixin class StylesMixin<T> {
   T styles({
     // Box Styles
+    All? all,
     String? content,
     Display? display,
     Position? position,
@@ -112,6 +113,7 @@ abstract mixin class StylesMixin<T> {
     Unit? minHeight,
     Unit? maxWidth,
     Unit? maxHeight,
+    AspectRatio? aspectRatio,
     Padding? padding,
     Margin? margin,
     BoxSizing? boxSizing,
@@ -121,6 +123,7 @@ abstract mixin class StylesMixin<T> {
     double? opacity,
     Visibility? visibility,
     Overflow? overflow,
+    Appearance? appearance,
     BoxShadow? shadow,
     Filter? filter,
     Filter? backdropFilter,
@@ -129,9 +132,6 @@ abstract mixin class StylesMixin<T> {
     PointerEvents? pointerEvents,
     Transition? transition,
     Transform? transform,
-    All? all,
-    Appearance? appearance,
-    AspectRatio? aspectRatio,
     // Flexbox Styles
     FlexDirection? flexDirection,
     FlexWrap? flexWrap,
@@ -183,6 +183,7 @@ abstract mixin class StylesMixin<T> {
     Map<String, String>? raw,
   }) =>
       combine(Styles(
+        all: all,
         padding: padding,
         margin: margin,
         display: display,
@@ -193,18 +194,17 @@ abstract mixin class StylesMixin<T> {
         maxWidth: maxWidth,
         minHeight: minHeight,
         maxHeight: maxHeight,
+        aspectRatio: aspectRatio,
         border: border,
         radius: radius,
         outline: outline,
         overflow: overflow,
+        appearance: appearance,
         visibility: visibility,
         position: position,
         zIndex: zIndex,
         opacity: opacity,
         transform: transform,
-        all: all,
-        appearance: appearance,
-        aspectRatio: aspectRatio,
         shadow: shadow,
         filter: filter,
         backdropFilter: backdropFilter,
@@ -277,6 +277,7 @@ class _CombinedStyles extends Styles {
 
 class _Styles extends Styles {
   // Box Styles
+  final All? all;
   final String? content;
   final Display? display;
   final Position? position;
@@ -287,6 +288,7 @@ class _Styles extends Styles {
   final Unit? minHeight;
   final Unit? maxWidth;
   final Unit? maxHeight;
+  final AspectRatio? aspectRatio;
   final Padding? padding;
   final Margin? margin;
   final BoxSizing? boxSizing;
@@ -296,6 +298,7 @@ class _Styles extends Styles {
   final double? opacity;
   final Visibility? visibility;
   final Overflow? overflow;
+  final Appearance? appearance;
   final BoxShadow? shadow;
   final Filter? filter;
   final Filter? backdropFilter;
@@ -304,9 +307,6 @@ class _Styles extends Styles {
   final PointerEvents? pointerEvents;
   final Transition? transition;
   final Transform? transform;
-  final All? all;
-  final Appearance? appearance;
-  final AspectRatio? aspectRatio;
   // Flexbox Style
   final FlexDirection? flexDirection;
   final FlexWrap? flexWrap;
@@ -359,6 +359,7 @@ class _Styles extends Styles {
 
   const _Styles({
     // Box Styles
+    this.all,
     this.content,
     this.display,
     this.position,
@@ -369,6 +370,7 @@ class _Styles extends Styles {
     this.minHeight,
     this.maxWidth,
     this.maxHeight,
+    this.aspectRatio,
     this.padding,
     this.margin,
     this.boxSizing,
@@ -378,6 +380,7 @@ class _Styles extends Styles {
     this.opacity,
     this.visibility,
     this.overflow,
+    this.appearance,
     this.shadow,
     this.filter,
     this.backdropFilter,
@@ -386,9 +389,6 @@ class _Styles extends Styles {
     this.pointerEvents,
     this.transition,
     this.transform,
-    this.all,
-    this.appearance,
-    this.aspectRatio,
     // Flexbox Styles
     this.flexDirection,
     this.flexWrap,
