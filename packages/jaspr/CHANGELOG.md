@@ -1,7 +1,10 @@
+## 0.21.0-dev.2
+
+- Added `All`, `Appearance` and `AspectRatio` styles properties.
+
 ## 0.21.0-dev.1
 
 - Fixed update check for pre-release versions.
-- Added `All`, `Appearance` and `AspectRatio` styles properties.
 
 ## 0.21.0-dev.0
 
