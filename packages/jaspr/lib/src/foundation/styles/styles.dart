@@ -40,6 +40,7 @@ abstract class Styles with StylesMixin<Styles> {
     Transform? transform,
     All? all,
     Appearance? appearance,
+    AspectRatio? aspectRatio,
     // Flexbox Styles
     FlexDirection? flexDirection,
     FlexWrap? flexWrap,
@@ -130,6 +131,7 @@ abstract mixin class StylesMixin<T> {
     Transform? transform,
     All? all,
     Appearance? appearance,
+    AspectRatio? aspectRatio,
     // Flexbox Styles
     FlexDirection? flexDirection,
     FlexWrap? flexWrap,
@@ -202,6 +204,7 @@ abstract mixin class StylesMixin<T> {
         transform: transform,
         all: all,
         appearance: appearance,
+        aspectRatio: aspectRatio,
         shadow: shadow,
         filter: filter,
         backdropFilter: backdropFilter,
@@ -303,6 +306,7 @@ class _Styles extends Styles {
   final Transform? transform;
   final All? all;
   final Appearance? appearance;
+  final AspectRatio? aspectRatio;
   // Flexbox Style
   final FlexDirection? flexDirection;
   final FlexWrap? flexWrap;
@@ -384,6 +388,7 @@ class _Styles extends Styles {
     this.transform,
     this.all,
     this.appearance,
+    this.aspectRatio,
     // Flexbox Styles
     this.flexDirection,
     this.flexWrap,
@@ -470,6 +475,7 @@ class _Styles extends Styles {
         if (pointerEvents != null) 'pointer-events': pointerEvents!.value,
         if (all != null) 'all': all!.value,
         if (appearance != null) 'appearance': appearance!.value,
+        if (aspectRatio != null) 'aspect-ratio': aspectRatio!.value,
         // Text Styles
         if (color != null) 'color': color!.value,
         if (fontFamily != null) 'font-family': fontFamily!.value,

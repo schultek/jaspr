@@ -597,3 +597,43 @@ enum Appearance {
   final String value;
   const Appearance(this.value);
 }
+
+class AspectRatio {
+  const AspectRatio._(this.value);
+
+  /// The css value
+  final String value;
+
+  // Global values
+  static const initial = AspectRatio._('initial');
+  static const inherit = AspectRatio._('inherit');
+  static const unset = AspectRatio._('unset');
+  static const revert = AspectRatio._('revert');
+  static const revertLayer = AspectRatio._('revert-layer');
+
+  // Basic value(s)
+  const factory AspectRatio(int num, [int? denom]) = _AspectRatio;
+  const factory AspectRatio.auto([int? num, int? denom]) = _AspectRatioAuto;
+}
+
+class _AspectRatio implements AspectRatio {
+  const _AspectRatio(this.num, [this.denom]);
+
+  final int num;
+  final int? denom;
+
+  /// The css value
+  @override
+  String get value => "$num${denom != null ? '/$denom' : ''}";
+}
+
+class _AspectRatioAuto implements AspectRatio {
+  const _AspectRatioAuto([this.num, this.denom]);
+
+  final int? num;
+  final int? denom;
+
+  /// The css value
+  @override
+  String get value => "auto${num != null ? ' $num' : ''}${denom != null ? '/$denom' : ''}";
+}
