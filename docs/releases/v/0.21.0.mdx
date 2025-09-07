@@ -24,7 +24,7 @@ Version 0.21.0 comes with a major overhaul of the component syntax, making it ea
 - **Unified Component Factories:** New factory constructors on the core `Component` class replace `DomComponent()`, `Text()`, and `Fragment()` for a more consistent API.
 - **Automatic Migration Command:** The CLI now includes a `jaspr migrate` command to help you automatically update your codebase for breaking changes.
 - **Improved Base Handling:** The `base` parameter of the `Document()` component can now be set to `null` to suppress the `<base>` element.
-- **Expanded CSS Support:** New CSS properties like `justifyItems`, `justifySelf`, `alignContent`, `filter`, and `backdropFilter` are now available for more flexible styling.
+- **Expanded CSS Support:** Eight new CSS properties are now available for more flexible styling: `all`, `aspectRatio`, `appearance`, `justifyItems`, `justifySelf`, `alignContent`, `filter`, and `backdropFilter`.
 
 ---
 
@@ -163,6 +163,13 @@ There is no migration needed, as the behavior for normal usage is still the same
 The following css properties have been added to `Styles()` and `css.styles()`:
 
 ```dart
+// For resetting default styles.
+All all
+
+// For box sizing and layout.
+AspectRatio aspectRatio
+Appearance appearance
+
 // For flexbox and grid layouts.
 JustifyItems justifyItems
 JustifySelf justifySelf
