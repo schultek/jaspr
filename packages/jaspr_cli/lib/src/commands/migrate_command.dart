@@ -42,11 +42,6 @@ class MigrateCommand extends BaseCommand {
   @override
   String get category => 'Tooling';
 
-  @override
-  bool get preferBuilderDependency => false;
-  @override
-  bool get requiresPubspec => assumeVersion == null;
-
   late final bool dryRun = argResults!['dry-run'] as bool;
   late final bool apply = argResults!['apply'] as bool;
   late final String? assumeVersion = argResults!['assume-version'] as String?;
@@ -59,8 +54,12 @@ class MigrateCommand extends BaseCommand {
 
   @override
   Future<int> runCommand() async {
+    if (assumeVersion == null) {
+      ensureInProject(requireJasprMode: false, preferBuilderDependency: false);
+    }
+    
     final currentJasprVersion = assumeVersion ??
-        switch (config.pubspecLock) {
+        switch (project.pubspecLock) {
           {'packages': {'jaspr': {'version': String version}}} => version,
           _ => '',
         };
