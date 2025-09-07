@@ -444,6 +444,7 @@ class _Styles extends Styles {
   @override
   Map<String, String> get properties => {
         // Box Styles
+        if (all != null) 'all': all!.value,
         ...?padding?.styles._prefixed('padding'),
         ...?margin?.styles._prefixed('margin'),
         if (display != null) 'display': display!.value,
@@ -454,11 +455,13 @@ class _Styles extends Styles {
         if (maxWidth != null) 'max-width': maxWidth!.value,
         if (minHeight != null) 'min-height': minHeight!.value,
         if (maxHeight != null) 'max-height': maxHeight!.value,
+        if (aspectRatio != null) 'aspect-ratio': aspectRatio!.value,
         ...?border?.styles,
         if (opacity != null) 'opacity': opacity!.toString(),
         ...?outline?.styles,
         ...?radius?.styles,
         ...?overflow?.styles,
+        if (appearance != null) 'appearance': appearance!.value,
         ...?position?.styles,
         if (zIndex != null) 'z-index': zIndex!.value,
         if (visibility != null) 'visibility': visibility!.value,
@@ -473,9 +476,6 @@ class _Styles extends Styles {
           '-webkit-user-select': userSelect!.value,
         },
         if (pointerEvents != null) 'pointer-events': pointerEvents!.value,
-        if (all != null) 'all': all!.value,
-        if (appearance != null) 'appearance': appearance!.value,
-        if (aspectRatio != null) 'aspect-ratio': aspectRatio!.value,
         // Text Styles
         if (color != null) 'color': color!.value,
         if (fontFamily != null) 'font-family': fontFamily!.value,
