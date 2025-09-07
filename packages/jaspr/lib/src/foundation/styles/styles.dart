@@ -493,7 +493,7 @@ class _Styles extends Styles {
         ...?flex?.styles,
         if (order != null) 'order': order!.toString(),
         if (alignSelf != null) 'align-self': alignSelf!.value,
-        if (justifySelf != null) 'justify-self': justifySelf!.value,        
+        if (justifySelf != null) 'justify-self': justifySelf!.value,
         ...?gridPlacement?.styles,
         // List Styles
         if (listStyle != null) 'list-style-type': listStyle!.value,
