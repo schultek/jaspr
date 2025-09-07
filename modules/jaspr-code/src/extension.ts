@@ -6,7 +6,7 @@ import {
 } from "./debug";
 
 import { createJasprProject, handleNewProjects } from "./create";
-import { jasprClean, jasprDoctor } from "./commands";
+import { jasprClean, jasprDoctor, pastHtmlAsJaspr } from "./commands";
 import { ComponentCodeLensProvider } from "./code_lens";
 import { JasprServeDaemon } from "./jaspr/serve_daemon";
 import {
@@ -82,7 +82,6 @@ export async function activate(context: vscode.ExtensionContext) {
       });
     })
   );
-  
 
   const toolingDaemon = new JasprToolingDaemon();
   context.subscriptions.push(toolingDaemon);
@@ -96,5 +95,9 @@ export async function activate(context: vscode.ExtensionContext) {
       { language: "dart", scheme: "file" },
       new ComponentCodeLensProvider(scopesDomain)
     )
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("jaspr.pasteHTMLAsJaspr", pastHtmlAsJaspr)
   );
 }

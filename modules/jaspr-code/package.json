@@ -60,6 +60,11 @@
         "command": "jaspr.doctor",
         "title": "Doctor",
         "category": "Jaspr"
+      },
+      {
+        "command": "jaspr.pasteHTMLAsJaspr",
+        "title": "Paste HTML as Jaspr Code",
+        "category": "Jaspr"
       }
     ],
     "menus": {
@@ -77,6 +82,13 @@
         },
         {
           "command": "jaspr.doctor"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "jaspr.pasteHTMLAsJaspr",
+          "when": "jaspr-code:anyJasprProjectLoaded && resourceLangId == dart",
+          "group": "9_cutcopypaste@4"
         }
       ]
     },
@@ -140,7 +152,11 @@
         },
         "jaspr.scopes.unsafeImportDiagnosticSeverity": {
           "type": "number",
-          "enum": ["Error", "Warning", "Information"],
+          "enum": [
+            "Error",
+            "Warning",
+            "Information"
+          ],
           "default": "Error",
           "markdownDescription": "The severity of diagnostics for unsafe imports detected for a component file. Only applies when `#jaspr.scopes.showUnsafeImportDiagnostics#` is set to `true`."
         }
@@ -173,6 +189,7 @@
   },
   "dependencies": {
     "chalk": "^5.4.1",
+    "node-html-parser": "^7.0.1",
     "vscode-uri": "^3.1.0",
     "yaml": "^2.7.0"
   }

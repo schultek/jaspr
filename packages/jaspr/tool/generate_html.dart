@@ -5,6 +5,15 @@ void main() {
   var specFile = File('tool/data/html.json');
   var specJson = jsonDecode(specFile.readAsStringSync()) as Map<String, dynamic>;
 
+  var extensionSpecFile = File('../../modules/jaspr-code/src/jaspr/html_spec.ts');
+
+  extensionSpecFile.writeAsString('''
+// GENERATED FILE - DO NOT EDIT
+// Generated from packages/jaspr/tool/generate_html.dart
+
+export const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
+''');
+
   var allTags = <String>{};
 
   for (var key in specJson.keys) {
