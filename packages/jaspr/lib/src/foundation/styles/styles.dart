@@ -10,6 +10,7 @@ abstract class Styles with StylesMixin<Styles> {
 
   /// Constructs an empty [Styles] instance.
   const factory Styles({
+    All? all,
     // Box Styles
     String? content,
     Display? display,
@@ -21,6 +22,7 @@ abstract class Styles with StylesMixin<Styles> {
     Unit? minHeight,
     Unit? maxWidth,
     Unit? maxHeight,
+    AspectRatio? aspectRatio,
     Padding? padding,
     Margin? margin,
     BoxSizing? boxSizing,
@@ -30,6 +32,7 @@ abstract class Styles with StylesMixin<Styles> {
     double? opacity,
     Visibility? visibility,
     Overflow? overflow,
+    Appearance? appearance,
     BoxShadow? shadow,
     Filter? filter,
     Filter? backdropFilter,
@@ -48,8 +51,8 @@ abstract class Styles with StylesMixin<Styles> {
     GridTemplate? gridTemplate,
     List<TrackSize>? autoRows,
     List<TrackSize>? autoColumns,
-    Gap? gap,
     JustifyItems? justifyItems,
+    Gap? gap,
     // Item Styles
     Flex? flex,
     int? order,
@@ -99,6 +102,7 @@ abstract class Styles with StylesMixin<Styles> {
 abstract mixin class StylesMixin<T> {
   T styles({
     // Box Styles
+    All? all,
     String? content,
     Display? display,
     Position? position,
@@ -109,6 +113,7 @@ abstract mixin class StylesMixin<T> {
     Unit? minHeight,
     Unit? maxWidth,
     Unit? maxHeight,
+    AspectRatio? aspectRatio,
     Padding? padding,
     Margin? margin,
     BoxSizing? boxSizing,
@@ -118,6 +123,7 @@ abstract mixin class StylesMixin<T> {
     double? opacity,
     Visibility? visibility,
     Overflow? overflow,
+    Appearance? appearance,
     BoxShadow? shadow,
     Filter? filter,
     Filter? backdropFilter,
@@ -136,8 +142,8 @@ abstract mixin class StylesMixin<T> {
     GridTemplate? gridTemplate,
     List<TrackSize>? autoRows,
     List<TrackSize>? autoColumns,
-    Gap? gap,
     JustifyItems? justifyItems,
+    Gap? gap,
     // Item Styles
     Flex? flex,
     int? order,
@@ -177,6 +183,7 @@ abstract mixin class StylesMixin<T> {
     Map<String, String>? raw,
   }) =>
       combine(Styles(
+        all: all,
         padding: padding,
         margin: margin,
         display: display,
@@ -187,10 +194,12 @@ abstract mixin class StylesMixin<T> {
         maxWidth: maxWidth,
         minHeight: minHeight,
         maxHeight: maxHeight,
+        aspectRatio: aspectRatio,
         border: border,
         radius: radius,
         outline: outline,
         overflow: overflow,
+        appearance: appearance,
         visibility: visibility,
         position: position,
         zIndex: zIndex,
@@ -231,8 +240,8 @@ abstract mixin class StylesMixin<T> {
         justifyContent: justifyContent,
         alignItems: alignItems,
         alignContent: alignContent,
-        gap: gap,
         justifyItems: justifyItems,
+        gap: gap,
         flex: flex,
         order: order,
         alignSelf: alignSelf,
@@ -268,6 +277,7 @@ class _CombinedStyles extends Styles {
 
 class _Styles extends Styles {
   // Box Styles
+  final All? all;
   final String? content;
   final Display? display;
   final Position? position;
@@ -278,6 +288,7 @@ class _Styles extends Styles {
   final Unit? minHeight;
   final Unit? maxWidth;
   final Unit? maxHeight;
+  final AspectRatio? aspectRatio;
   final Padding? padding;
   final Margin? margin;
   final BoxSizing? boxSizing;
@@ -287,6 +298,7 @@ class _Styles extends Styles {
   final double? opacity;
   final Visibility? visibility;
   final Overflow? overflow;
+  final Appearance? appearance;
   final BoxShadow? shadow;
   final Filter? filter;
   final Filter? backdropFilter;
@@ -346,6 +358,7 @@ class _Styles extends Styles {
   final Map<String, String>? _raw;
 
   const _Styles({
+    this.all,
     // Box Styles
     this.content,
     this.display,
@@ -357,6 +370,7 @@ class _Styles extends Styles {
     this.minHeight,
     this.maxWidth,
     this.maxHeight,
+    this.aspectRatio,
     this.padding,
     this.margin,
     this.boxSizing,
@@ -366,6 +380,7 @@ class _Styles extends Styles {
     this.opacity,
     this.visibility,
     this.overflow,
+    this.appearance,
     this.shadow,
     this.filter,
     this.backdropFilter,
@@ -384,8 +399,8 @@ class _Styles extends Styles {
     this.gridTemplate,
     this.autoRows,
     this.autoColumns,
-    this.gap,
     this.justifyItems,
+    this.gap,
     // Item Styles
     this.flex,
     this.order,
@@ -428,43 +443,69 @@ class _Styles extends Styles {
 
   @override
   Map<String, String> get properties => {
+        if (all != null) 'all': all!.value,
         // Box Styles
-        ...?padding?.styles._prefixed('padding'),
-        ...?margin?.styles._prefixed('margin'),
+        if (content != null) 'content': '"$content"',
         if (display != null) 'display': display!.value,
-        if (boxSizing != null) 'box-sizing': boxSizing!.value,
+        ...?position?.styles,
+        if (zIndex != null) 'z-index': zIndex!.value,
         if (width != null) 'width': width!.value,
         if (height != null) 'height': height!.value,
         if (minWidth != null) 'min-width': minWidth!.value,
-        if (maxWidth != null) 'max-width': maxWidth!.value,
         if (minHeight != null) 'min-height': minHeight!.value,
+        if (maxWidth != null) 'max-width': maxWidth!.value,
         if (maxHeight != null) 'max-height': maxHeight!.value,
+        if (aspectRatio != null) 'aspect-ratio': aspectRatio!.value,
+        ...?padding?.styles._prefixed('padding'),
+        ...?margin?.styles._prefixed('margin'),
+        if (boxSizing != null) 'box-sizing': boxSizing!.value,
         ...?border?.styles,
-        if (opacity != null) 'opacity': opacity!.toString(),
-        ...?outline?.styles,
         ...?radius?.styles,
-        ...?overflow?.styles,
-        ...?position?.styles,
-        if (zIndex != null) 'z-index': zIndex!.value,
+        ...?outline?.styles,
+        if (opacity != null) 'opacity': opacity!.toString(),
         if (visibility != null) 'visibility': visibility!.value,
-        if (transform != null) 'transform': transform!.value,
+        ...?overflow?.styles,
+        if (appearance != null) 'appearance': appearance!.value,
         if (shadow != null) 'box-shadow': shadow!.value,
         if (filter != null) 'filter': filter!.value,
         if (backdropFilter != null) 'backdrop-filter': backdropFilter!.value,
         if (cursor != null) 'cursor': cursor!.value,
-        if (transition != null) 'transition': transition!.value,
         if (userSelect != null) ...{
           'user-select': userSelect!.value,
           '-webkit-user-select': userSelect!.value,
         },
         if (pointerEvents != null) 'pointer-events': pointerEvents!.value,
+        if (transition != null) 'transition': transition!.value,
+        if (transform != null) 'transform': transform!.value,
+        // Flexbox Styles
+        if (flexDirection != null) 'flex-direction': flexDirection!.value,
+        if (flexWrap != null) 'flex-wrap': flexWrap!.value,
+        if (justifyContent != null) 'justify-content': justifyContent!.value,
+        if (alignItems != null) 'align-items': alignItems!.value,
+        if (alignContent != null) 'align-content': alignContent!.value,
+        // Grid Styles
+        ...?gridTemplate?.styles,
+        if (autoRows != null) 'grid-auto-rows': autoRows!.map((s) => s.value).join(' '),
+        if (autoColumns != null) 'grid-auto-columns': autoColumns!.map((s) => s.value).join(' '),
+        if (justifyItems != null) 'justify-items': justifyItems!.value,
+        ...?gap?.styles,
+        // Grid Item Styles
+        ...?flex?.styles,
+        if (order != null) 'order': order!.toString(),
+        if (alignSelf != null) 'align-self': alignSelf!.value,
+        if (justifySelf != null) 'justify-self': justifySelf!.value,
+        ...?gridPlacement?.styles,
+        // List Styles
+        if (listStyle != null) 'list-style-type': listStyle!.value,
+        if (listImage != null) 'list-style-image': listImage!.value,
+        if (listPosition != null) 'list-style-position': listPosition!.value,
         // Text Styles
         if (color != null) 'color': color!.value,
+        if (textAlign != null) 'text-align': textAlign!.value,
         if (fontFamily != null) 'font-family': fontFamily!.value,
-        if (fontStyle != null) 'font-style': fontStyle!.value,
         if (fontSize != null) 'font-size': fontSize!.value,
         if (fontWeight != null) 'font-weight': fontWeight!.value,
-        if (textAlign != null) 'text-align': textAlign!.value,
+        if (fontStyle != null) 'font-style': fontStyle!.value,
         if (textDecoration != null) 'text-decoration': textDecoration!.value,
         if (textTransform != null) 'text-transform': textTransform!.value,
         if (textIndent != null) 'text-indent': textIndent!.value,
@@ -476,37 +517,13 @@ class _Styles extends Styles {
         if (whiteSpace != null) 'white-space': whiteSpace!.value,
         // Background Styles
         if (backgroundColor != null) 'background-color': backgroundColor!.value,
-        if (backgroundAttachment != null) 'background-attachment': backgroundAttachment!.value,
-        if (backgroundClip != null) 'background-clip': backgroundClip!.value,
         if (backgroundImage != null) 'background-image': backgroundImage!.value,
         if (backgroundOrigin != null) 'background-origin': backgroundOrigin!.value,
         if (backgroundPosition != null) 'background-position': backgroundPosition!.value,
+        if (backgroundAttachment != null) 'background-attachment': backgroundAttachment!.value,
         if (backgroundRepeat != null) 'background-repeat': backgroundRepeat!.value,
         if (backgroundSize != null) 'background-size': backgroundSize!.value,
-        // Flexbox Styles
-        if (flexDirection != null) 'flex-direction': flexDirection!.value,
-        if (flexWrap != null) 'flex-wrap': flexWrap!.value,
-        if (justifyContent != null) 'justify-content': justifyContent!.value,
-        if (alignItems != null) 'align-items': alignItems!.value,
-        ...?gap?.styles,
-        ...?flex?.styles,
-        if (alignContent != null) 'align-content': alignContent!.value,
-        if (order != null) 'order': order!.toString(),
-        if (alignSelf != null) 'align-self': alignSelf!.value,
-        // Grid Styles
-        ...?gridTemplate?.styles,
-        if (autoRows != null) 'grid-auto-rows': autoRows!.map((s) => s.value).join(' '),
-        if (autoColumns != null) 'grid-auto-columns': autoColumns!.map((s) => s.value).join(' '),
-        ...?gridPlacement?.styles,
-        if (justifyItems != null) 'justify-items': justifyItems!.value,
-        // Grid Item Styles
-        if (justifySelf != null) 'justify-self': justifySelf!.value,
-        // List Styles
-        if (listStyle != null) 'list-style-type': listStyle!.value,
-        if (listPosition != null) 'list-style-position': listPosition!.value,
-        if (listImage != null) 'list-style-image': listImage!.value,
-        // Other Styles
-        if (content != null) 'content': '"$content"',
+        if (backgroundClip != null) 'background-clip': backgroundClip!.value,
         // Raw Styles
         ...?_raw,
       };

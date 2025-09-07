@@ -555,3 +555,87 @@ class _UrlCursor implements Cursor {
   @override
   String get value => 'url($url)${x != null || y != null ? ' ${x ?? 0} ${y ?? 0}' : ''}, ${fallback.value}';
 }
+
+enum All {
+  initial('initial'),
+  inherit('inherit'),
+  unset('unset'),
+  revert('revert'),
+  revertLayer('revert-layer');
+
+  /// The css value
+  final String value;
+  const All(this.value);
+}
+
+enum Appearance {
+  // Global values
+  initial('initial'),
+  inherit('inherit'),
+  unset('unset'),
+  revert('revert'),
+  revertLayer('revert-layer'),
+
+  // Basic values
+  none('none'),
+  auto('auto'),
+  base('base'),
+  baseSelect('base-select'),
+  searchfield('searchfield'),
+  textArea('textarea'),
+  checkbox('checkbox'),
+  radio('radio'),
+  menulist('menulist'),
+  listbox('listbox'),
+  meter('meter'),
+  progressBar('progress-bar'),
+  button('button'),
+  textfield('textfield'),
+  menulistButton('menulist-button');
+
+  /// The css value
+  final String value;
+  const Appearance(this.value);
+}
+
+class AspectRatio {
+  const AspectRatio._(this.value);
+
+  /// The css value
+  final String value;
+
+  // Global values
+  static const initial = AspectRatio._('initial');
+  static const inherit = AspectRatio._('inherit');
+  static const unset = AspectRatio._('unset');
+  static const revert = AspectRatio._('revert');
+  static const revertLayer = AspectRatio._('revert-layer');
+
+  // Basic value(s)
+  static const auto = AspectRatio._('auto');
+
+  const factory AspectRatio(int num, [int? denom]) = _AspectRatio;
+  const factory AspectRatio.autoOrRatio(int num, [int? denom]) = _AspectAutoOrRatio;
+}
+
+class _AspectRatio implements AspectRatio {
+  const _AspectRatio(this.num, [this.denom]);
+
+  final int num;
+  final int? denom;
+
+  /// The css value
+  @override
+  String get value => "$num${denom != null ? '/$denom' : ''}";
+}
+
+class _AspectAutoOrRatio implements AspectRatio {
+  const _AspectAutoOrRatio(this.num, [this.denom]);
+
+  final int num;
+  final int? denom;
+
+  /// The css value
+  @override
+  String get value => "auto $num${denom != null ? '/$denom' : ''}";
+}
