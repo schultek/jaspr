@@ -8,13 +8,12 @@ import 'logging.dart';
 enum JasprMode { static, server, client }
 
 class Project {
-
   Project(this.logger);
 
   final Logger logger;
 
-  late final YamlMap? pubspecYaml = _pubspecYaml;
-  late final YamlMap requirePubspecYaml = () {
+  YamlMap? get pubspecYaml => _pubspecYaml;
+  YamlMap get requirePubspecYaml {
     final pubspecYaml = _pubspecYaml;
     if (pubspecYaml == null) {
       logger.write('Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.',
@@ -22,9 +21,9 @@ class Project {
       exit(1);
     }
     return pubspecYaml;
-  }();
+  }
 
-  YamlMap? get _pubspecYaml {
+  late final YamlMap? _pubspecYaml = () {
     var pubspecPath = 'pubspec.yaml';
     var pubspecFile = File(pubspecPath).absolute;
     if (!pubspecFile.existsSync()) {
@@ -37,7 +36,7 @@ class Project {
       logger.write('Could not parse pubspec.yaml file: $e', tag: Tag.cli, level: Level.critical);
       exit(1);
     }
-  }
+  }();
 
   void get requireJasprDependency {
     if (requirePubspecYaml case {'dependencies': {'jaspr': _}}) {
@@ -78,21 +77,21 @@ class Project {
     }
   }
 
-  late final bool usesJasprWebCompilers = () {
+  bool get usesJasprWebCompilers {
     return switch (requirePubspecYaml) {
       {'dev_dependencies': {'jaspr_web_compilers': _}} => true,
       _ => false,
     };
-  }();
+  }
 
-  late final bool usesFlutter = () {
+  bool get usesFlutter {
     return switch (requirePubspecYaml) {
       {'dependencies': {'flutter': _}} => true,
       _ => false,
     };
-  }();
+  }
 
-  late final YamlMap _requireJasprOptions = () {
+  YamlMap get _requireJasprOptions {
     var configYaml = requirePubspecYaml['jaspr'];
     if (configYaml == null) {
       logger.write('Missing \'jaspr\' options in pubspec.yaml.', tag: Tag.cli, level: Level.critical);
@@ -103,10 +102,10 @@ class Project {
       exit(1);
     }
     return configYaml;
-  }();
+  }
 
-  late final JasprMode? modeOrNull = () {
-    var configYaml = requirePubspecYaml['jaspr'];
+  JasprMode? get modeOrNull {
+    var configYaml = pubspecYaml?['jaspr'];
     if (configYaml is! YamlMap) {
       return null;
     }
@@ -116,27 +115,27 @@ class Project {
     }
     var modeOrNull = JasprMode.values.where((v) => v.name == modeYaml).firstOrNull;
     return modeOrNull;
-  }();
-  late final JasprMode requireMode = () {
+  }
+
+  JasprMode get requireMode {
     var configYaml = _requireJasprOptions;
 
     var modeYaml = configYaml['mode'];
     if (modeYaml == null) {
-      logger.write('\'jaspr.mode\' option is required but missing in pubspec.yaml.', tag: Tag.cli, level: Level.critical);
+      logger.write('\'jaspr.mode\' option is required but missing in pubspec.yaml.',
+          tag: Tag.cli, level: Level.critical);
       exit(1);
     }
     var modeOrNull = JasprMode.values.where((v) => v.name == modeYaml).firstOrNull;
     if (modeOrNull == null) {
-      logger.write(
-          '\'jaspr.mode\' must be one of ${JasprMode.values.map((v) => v.name).join(', ')} in pubspec.yaml.',
-          tag: Tag.cli,
-          level: Level.critical);
+      logger.write('\'jaspr.mode\' must be one of ${JasprMode.values.map((v) => v.name).join(', ')} in pubspec.yaml.',
+          tag: Tag.cli, level: Level.critical);
       exit(1);
     }
     return modeOrNull;
-  }();
+  }
 
-  late final String? devCommand = () {
+  String? get devCommand {
     var configYaml = _requireJasprOptions;
 
     var devCommandYaml = configYaml['dev-command'];
@@ -149,13 +148,13 @@ class Project {
       return devCommandYaml;
     }
     return null;
-  }();
+  }
 
   late final YamlMap? pubspecLock = () {
     var pubspecLockPath = 'pubspec.lock';
     var pubspecLockFile = File(pubspecLockPath).absolute;
 
-    if (!pubspecLockFile.existsSync() && requirePubspecYaml['resolution'] == 'workspace') {
+    if (!pubspecLockFile.existsSync() && pubspecYaml?['resolution'] == 'workspace') {
       var n = 1;
       while (n < 5) {
         var parent = path.dirname(path.dirname(pubspecLockFile.path));
@@ -180,8 +179,4 @@ class Project {
     }
     return null;
   }();
-
-
-
 }
-

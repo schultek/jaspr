@@ -57,7 +57,7 @@ class MigrateCommand extends BaseCommand {
     if (assumeVersion == null) {
       ensureInProject(requireJasprMode: false, preferBuilderDependency: false);
     }
-    
+
     final currentJasprVersion = assumeVersion ??
         switch (project.pubspecLock) {
           {'packages': {'jaspr': {'version': String version}}} => version,

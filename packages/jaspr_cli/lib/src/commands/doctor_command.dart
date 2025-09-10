@@ -83,7 +83,7 @@ class DoctorCommand extends BaseCommand {
         out.write('\n  • $i');
       }
       out.writeln();
-      logger.write(out.toString());
+      stdout.write(out.toString());
     }
 
     return 0;
