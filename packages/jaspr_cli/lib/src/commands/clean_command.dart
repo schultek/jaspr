@@ -25,29 +25,28 @@ class CleanCommand extends BaseCommand {
   String get category => 'Tooling';
 
   @override
-  bool get preferBuilderDependency => false;
-
-  @override
   Future<int> runCommand() async {
-    var genDir = Directory('.dart_tool/jaspr/').absolute;
-    if (await genDir.exists()) {
-      logger.write('Deleting .dart_tool/jaspr...');
-      await genDir.delete(recursive: true);
-    }
+    if (project.pubspecYaml != null) {
+      var genDir = Directory('.dart_tool/jaspr/').absolute;
+      if (genDir.existsSync()) {
+        logger.write('Deleting .dart_tool/jaspr...');
+        genDir.deleteSync(recursive: true);
+      }
 
-    var chromeDir = Directory('.dart_tool/webdev/chrome_user_data').absolute;
-    if (await chromeDir.exists()) {
-      await chromeDir.delete(recursive: true);
-    }
+      var chromeDir = Directory('.dart_tool/webdev/chrome_user_data').absolute;
+      if (chromeDir.existsSync()) {
+        chromeDir.deleteSync(recursive: true);
+      }
 
-    var buildDir = Directory('build/jaspr/').absolute;
-    if (await buildDir.exists()) {
-      logger.write('Deleting build/jaspr...');
-      await buildDir.delete(recursive: true);
-    }
+      var buildDir = Directory('build/jaspr/').absolute;
+      if (buildDir.existsSync()) {
+        logger.write('Deleting build/jaspr...');
+        buildDir.deleteSync(recursive: true);
+      }
 
-    logger.write("Running 'dart run build_runner clean'...");
-    await Process.run('dart', ['run', 'build_runner', 'clean']);
+      logger.write("Running 'dart run build_runner clean'...");
+      await Process.run('dart', ['run', 'build_runner', 'clean']);
+    }
 
     // TODO support windows
     if (Platform.isMacOS || Platform.isLinux) {
