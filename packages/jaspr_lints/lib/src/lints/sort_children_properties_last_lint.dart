@@ -1,5 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError;
+import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -17,7 +17,7 @@ class SortChildrenPropertiesLastLint extends DartLintRule {
         );
 
   @override
-  void run(CustomLintResolver resolver, ErrorReporter reporter, CustomLintContext context) {
+  void run(CustomLintResolver resolver, DiagnosticReporter reporter, CustomLintContext context) {
     context.registry.addInvocationExpression((node) {
       if (!isComponentType(node.staticType)) {
         return;
@@ -32,7 +32,7 @@ class SortChildrenPropertiesLastLint extends DartLintRule {
         }
       }
       if (violatesLint) {
-        reporter.atOffset(offset: node.offset, length: node.length, errorCode: code, data: (node, childrenArg));
+        reporter.atOffset(offset: node.offset, length: node.length, diagnosticCode: code, data: (node, childrenArg));
       }
     });
   }
@@ -47,8 +47,8 @@ class SortChildrenPropertiesLastFix extends DartFix {
     CustomLintResolver resolver,
     ChangeReporter reporter,
     CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
+    Diagnostic analysisError,
+    List<Diagnostic> others,
   ) {
     if (analysisError.data case (InvocationExpression node, ListLiteral childrenArg)) {
       reporter.createChangeBuilder(message: 'Sort children last', priority: 2).addDartFileEdit((builder) {

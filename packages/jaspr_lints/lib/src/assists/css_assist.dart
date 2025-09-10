@@ -24,7 +24,7 @@ class CssAssistProvider extends DartAssist {
         return;
       }
       if (isComponentType(node.staticType)) {
-        if (node.staticInvokeType case FunctionType t when hasClassesParameter(t.parameters)) {
+        if (node.staticInvokeType case FunctionType t when hasClassesParameter(t.formalParameters)) {
           final indent = getLineIndent(resolver.lineInfo, node);
           addStyles(resolver, reporter, node, indent, node.argumentList);
         }
@@ -43,7 +43,7 @@ class CssAssistProvider extends DartAssist {
       if (!isComponentType(node.staticType)) {
         return;
       }
-      if (!hasClassesParameter(node.constructorName.staticElement?.parameters)) {
+      if (!hasClassesParameter(node.constructorName.element?.formalParameters)) {
         return;
       }
       final indent = getLineIndent(resolver.lineInfo, node);

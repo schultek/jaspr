@@ -1,8 +1,6 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:async';
 
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 
 import '../codec/codecs.dart';
@@ -49,20 +47,20 @@ class SyncMixinsBuilder implements Builder {
     var annotated = library.classes
         .map((clazz) => (
               clazz,
-              clazz.fields2.where((element) => syncChecker.firstAnnotationOfExact(element) != null).where((element) {
+              clazz.fields.where((element) => syncChecker.firstAnnotationOfExact(element) != null).where((element) {
                 if (element.isStatic) {
                   log.severe(
-                      '@sync cannot be used on static fields. Failing element: ${clazz.name3}.${element.name3} in library ${library.firstFragment.source.fullName}.');
+                      '@sync cannot be used on static fields. Failing element: ${clazz.name}.${element.name} in library ${library.firstFragment.source.fullName}.');
                   return false;
                 }
                 if (element.isFinal) {
                   log.severe(
-                      '@sync cannot be used on final fields. Failing element: ${clazz.name3}.${element.name3} in library ${library.firstFragment.source.fullName}.');
+                      '@sync cannot be used on final fields. Failing element: ${clazz.name}.${element.name} in library ${library.firstFragment.source.fullName}.');
                   return false;
                 }
                 if (element.isPrivate) {
                   log.severe(
-                      '@sync cannot be used on private fields. Failing element: ${clazz.name3}.${element.name3} in library ${library.firstFragment.source.fullName}.');
+                      '@sync cannot be used on private fields. Failing element: ${clazz.name}.${element.name} in library ${library.firstFragment.source.fullName}.');
                   return false;
                 }
 
@@ -73,7 +71,7 @@ class SyncMixinsBuilder implements Builder {
         .where((c) {
       if (!stateChecker.isSuperOf(c.$1)) {
         log.severe(
-            '@sync can only be used on fields in a State class. Failing element: ${c.$1.name3} in library ${library.firstFragment.source.fullName}.');
+            '@sync can only be used on fields in a State class. Failing element: ${c.$1.name} in library ${library.firstFragment.source.fullName}.');
         return false;
       }
       return true;
@@ -104,36 +102,36 @@ class SyncMixinsBuilder implements Builder {
     await buildStep.writeAsFormattedDart(outputId, source);
   }
 
-  String generateMixinFromEntry((ClassElement2, Iterable<FieldElement2>) element, Codecs codecs, String baseImport) {
+  String generateMixinFromEntry((ClassElement, Iterable<FieldElement>) element, Codecs codecs, String baseImport) {
     final (clazz, fields) = element;
     final comp = clazz.supertype!.typeArguments.first.element!;
 
     final members = fields.map((f) {
       var type = codecs.getPrefixedType(f.type);
       return """
-        $type get ${f.name3};
-        set ${f.name3}($type ${f.name3});
+        $type get ${f.name};
+        set ${f.name}($type ${f.name});
       """;
     }).join('\n');
 
     final decoders = fields.map((f) {
       try {
-        var decoder = codecs.getDecoderFor(f.type, "value['${f.name3}']");
-        return "${f.name3} = $decoder;";
+        var decoder = codecs.getDecoderFor(f.type, "value['${f.name}']");
+        return "${f.name} = $decoder;";
       } on InvalidParameterException catch (_) {
         throw UnsupportedError(
             'Fields annotated with @sync must have a primitive serializable type or a type that defines @decoder and @encoder methods. '
-            'Failing field: [$f] in ${clazz.name3}');
+            'Failing field: [$f] in ${clazz.name}');
       }
     }).join('\n');
 
     final encoders = fields.map((f) {
-      var encoder = codecs.getEncoderFor(f.type, f.name3 ?? '');
-      return "'${f.name3}': $encoder,";
+      var encoder = codecs.getEncoderFor(f.type, f.name ?? '');
+      return "'${f.name}': $encoder,";
     }).join('\n');
 
     return """
-      mixin ${clazz.name3?.startsWith('_') ?? false ? clazz.name3!.substring(1) : clazz.name3}SyncMixin on State<[[$baseImport]].${comp.name}> implements SyncStateMixin<[[$baseImport]].${comp.name}, Map<String, dynamic>> {
+      mixin ${clazz.name?.startsWith('_') ?? false ? clazz.name!.substring(1) : clazz.name}SyncMixin on State<[[$baseImport]].${comp.name}> implements SyncStateMixin<[[$baseImport]].${comp.name}, Map<String, dynamic>> {
         $members
       
         @override
