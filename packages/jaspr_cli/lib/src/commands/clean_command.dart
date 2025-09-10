@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import '../logging.dart';
 import 'base_command.dart';
 
 class CleanCommand extends BaseCommand {
