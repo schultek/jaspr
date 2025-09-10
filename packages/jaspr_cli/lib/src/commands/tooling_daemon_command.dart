@@ -31,9 +31,6 @@ class ToolingDaemonCommand extends BaseCommand with DaemonHelper {
   bool get hidden => true;
 
   @override
-  bool get requiresPubspec => false;
-
-  @override
   bool get verbose => true;
 
   @override

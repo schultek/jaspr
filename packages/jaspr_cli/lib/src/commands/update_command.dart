@@ -25,9 +25,6 @@ class UpdateCommand extends BaseCommand {
   String get category => 'Tooling';
 
   @override
-  bool get requiresPubspec => false;
-
-  @override
   Future<int> runCommand() async {
     logger.write('Checking for updates', progress: ProgressState.running);
     late final String latestVersion;

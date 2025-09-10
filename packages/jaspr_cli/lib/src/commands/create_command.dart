@@ -106,9 +106,6 @@ class CreateCommand extends BaseCommand {
   @override
   String get category => 'Project';
 
-  @override
-  bool get requiresPubspec => false;
-
   late final bool runPubGet = argResults!['pub-get'] as bool;
 
   @override
