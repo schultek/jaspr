@@ -1,9 +1,8 @@
 include: package:lints/recommended.yaml
 
 analyzer:
-# TODO: Reenable once migrated to analyzer v8.
-#  plugins:
-#    - custom_lint
+  plugins:
+    - custom_lint
   exclude:
     - lib/**.g.dart
     - templates/**

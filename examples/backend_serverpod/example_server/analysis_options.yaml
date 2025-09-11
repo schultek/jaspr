@@ -1,5 +1,5 @@
 include: package:lints/recommended.yaml
 
-# TODO: Reenable once migrated to analyzer v8.
-#  plugins:
-#    - custom_lint
+analyzer:
+  plugins:
+    - custom_lint
