@@ -19,6 +19,8 @@ jobs:
           ref: "refs/pull/${{ github.event.number }}/merge"
 
       - uses: subosito/flutter-action@v2
+        with:
+          channel: beta # remove once Flutter stable supports analyzer 8
 
       - name: Bootstrap
         run: |
