@@ -51,8 +51,7 @@ mixin FlutterHelper on BaseCommand {
         'web',
         '-t',
         '.dart_tool/jaspr/flutter_target.dart',
-        if (wasm) '--wasm'
-        else '--no-wasm-dry-run',
+        if (wasm) '--wasm' else '--no-wasm-dry-run',
         '--output=build/flutter',
       ],
       runInShell: true,
