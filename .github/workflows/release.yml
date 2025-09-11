@@ -23,6 +23,8 @@ jobs:
           token: ${{ secrets.PUSH_TOKEN }}
 
       - uses: subosito/flutter-action@v2
+        with:
+          channel: beta # remove once Flutter stable supports analyzer 8
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
