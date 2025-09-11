@@ -35,6 +35,7 @@ jobs:
 
       - name: Bootstrap
         run: |
+          flutter doctor
           dart pub global activate melos
           melos bootstrap
           jaspr --disable-analytics

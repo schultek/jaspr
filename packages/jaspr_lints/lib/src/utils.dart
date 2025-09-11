@@ -37,7 +37,7 @@ int getLineIndent(LineInfo lineInfo, AstNode node) {
   return token.offset - lineOffset;
 }
 
-bool hasClassesParameter(List<ParameterElement>? params) {
+bool hasClassesParameter(List<FormalParameterElement>? params) {
   if (params == null) return false;
   return params.where((p) => p.isNamed && p.name == 'classes' && p.type.isDartCoreString).isNotEmpty;
 }

@@ -4,9 +4,7 @@ analyzer:
   exclude:
     - tool/scaffold/**
     - tool/templates/**
-  errors:
-    deprecated_member_use: ignore # TODO: remove when upgrading to analyzer 8
-
+  
 linter:
   rules:
     sort_pub_dependencies: false # to group packages semantically

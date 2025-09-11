@@ -22,7 +22,7 @@ executables:
   jaspr:
 
 dependencies:
-  analyzer: ^7.5.9
+  analyzer: ^8.0.0
   ansi_styles: ^0.3.2
   args: ^2.3.0
   cli_completion: ^0.5.0

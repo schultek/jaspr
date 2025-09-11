@@ -44,7 +44,7 @@ class ComponentAssistProvider extends DartAssist {
       if (target.offset < node.offset || target.end > node.leftBracket.end) {
         return;
       }
-      if (node.extendsClause?.superclass.name2.lexeme != 'StatelessComponent') {
+      if (node.extendsClause?.superclass.name.lexeme != 'StatelessComponent') {
         return;
       }
 
@@ -207,11 +207,10 @@ class StateBuildVisitor extends UnifyingAstVisitor {
 
   @override
   visitSimpleIdentifier(SimpleIdentifier node) {
-    var elem = node.staticElement;
+    var elem = node.element;
     if (elem == null) return;
 
-    // ignore: deprecated_member_use
-    if (elem.enclosingElement3 == clazz.declaredElement) {
+    if (elem.enclosingElement == clazz.declaredFragment?.element) {
       builder.addSimpleInsertion(node.offset, 'component.');
     }
   }

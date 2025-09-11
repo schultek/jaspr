@@ -5,7 +5,7 @@ import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:collection/collection.dart';
 import 'package:watcher/watcher.dart';
@@ -261,12 +261,12 @@ class ScopesDomain extends Domain {
 
 class InspectData {
   InspectData._(this.usesJasprWebCompilers, this.logger);
-  static Future<InspectData> analyze(LibraryElement2 root, bool usesJasprWebCompilers, Logger logger) async {
+  static Future<InspectData> analyze(LibraryElement root, bool usesJasprWebCompilers, Logger logger) async {
     final inspectData = InspectData._(usesJasprWebCompilers, logger);
 
-    final mainFunction = root.topLevelFunctions.where((e) => e.name3 == 'main').firstOrNull?.firstFragment;
+    final mainFunction = root.topLevelFunctions.where((e) => e.name == 'main').firstOrNull?.firstFragment;
     final mainLocation =
-        mainFunction?.libraryFragment.lineInfo.getLocation(mainFunction.nameOffset2 ?? mainFunction.offset);
+        mainFunction?.libraryFragment.lineInfo.getLocation(mainFunction.nameOffset ?? mainFunction.offset);
     final mainTarget = InspectTarget(
       root.firstFragment.source.fullName,
       'main',
@@ -283,7 +283,7 @@ class InspectData {
   final Logger logger;
   Map<String, InspectDataItem> libraries = {};
 
-  Future<InspectDataItem> inspectLibrary(LibraryElement2 library, InspectDataItem? parent,
+  Future<InspectDataItem> inspectLibrary(LibraryElement library, InspectDataItem? parent,
       [Set<InspectTarget> clientScopeRoots = const {}, Set<InspectTarget> serverScopeRoots = const {}]) async {
     final path = library.firstFragment.source.fullName;
 
@@ -318,8 +318,8 @@ class InspectData {
 
     for (final clazz in library.classes) {
       final location = clazz.firstFragment.libraryFragment.lineInfo
-          .getLocation(clazz.firstFragment.nameOffset2 ?? clazz.firstFragment.offset);
-      final target = InspectTarget(path, clazz.name3 ?? '', location.lineNumber, location.columnNumber);
+          .getLocation(clazz.firstFragment.nameOffset ?? clazz.firstFragment.offset);
+      final target = InspectTarget(path, clazz.name ?? '', location.lineNumber, location.columnNumber);
       if (isComponent(clazz)) {
         data.components.add(target);
         if (hasClientAnnotation(clazz)) {
@@ -331,19 +331,18 @@ class InspectData {
     return data;
   }
 
-  bool isComponent(ClassElement2 clazz) {
+  bool isComponent(ClassElement clazz) {
     return clazz.allSupertypes.any((e) =>
-        e.element3.name3 == 'Component' &&
-        e.element3.library2.identifier == 'package:jaspr/src/framework/framework.dart');
+        e.element.name == 'Component' && e.element.library.identifier == 'package:jaspr/src/framework/framework.dart');
   }
 
-  bool hasClientAnnotation(ClassElement2 clazz) {
-    return clazz.metadata2.annotations.any((a) =>
-        a.element2?.name3 == 'client' &&
-        a.element2?.library2?.identifier == 'package:jaspr/src/foundation/annotations.dart');
+  bool hasClientAnnotation(ClassElement clazz) {
+    return clazz.metadata.annotations.any((a) =>
+        a.element?.name == 'client' &&
+        a.element?.library?.identifier == 'package:jaspr/src/foundation/annotations.dart');
   }
 
-  bool isClientLib(LibraryElement2 lib) {
+  bool isClientLib(LibraryElement lib) {
     return lib.identifier == 'package:jaspr/browser.dart' ||
         lib.identifier == 'package:web/web.dart' ||
         lib.identifier == 'dart:js_interop' ||
@@ -353,7 +352,7 @@ class InspectData {
         lib.identifier == 'dart:js_util';
   }
 
-  bool isServerLib(LibraryElement2 lib) {
+  bool isServerLib(LibraryElement lib) {
     return lib.identifier == 'package:jaspr/server.dart' ||
         (!usesJasprWebCompilers && lib.identifier == 'dart:io') ||
         lib.identifier == 'dart:ffi' ||
@@ -365,7 +364,7 @@ class InspectData {
 class InspectDataItem {
   InspectDataItem(this.library, this.parent, this.data);
 
-  final LibraryElement2 library;
+  final LibraryElement library;
   final InspectDataItem? parent;
   final InspectData data;
 
@@ -419,8 +418,8 @@ class InspectDataItem {
     }
   }
 
-  Future<List<({LibraryElement2 lib, DirectiveTarget dir, bool onClient, bool onServer})>> resolveDependencies(
-      LibraryElement2 library) async {
+  Future<List<({LibraryElement lib, DirectiveTarget dir, bool onClient, bool onServer})>> resolveDependencies(
+      LibraryElement library) async {
     if (library.isInSdk) {
       // Skip SDK libraries.
       return [];
@@ -432,23 +431,23 @@ class InspectDataItem {
       return [];
     }
 
-    final imports = library.fragments.expand((f) => f.libraryImports2).toList();
-    final exports = library.fragments.expand((f) => f.libraryExports2).toList();
+    final imports = library.fragments.expand((f) => f.libraryImports).toList();
+    final exports = library.fragments.expand((f) => f.libraryExports).toList();
 
-    LibraryElement2? getBaseLibraryForDirective(NamespaceDirective directive) {
+    LibraryElement? getBaseLibraryForDirective(NamespaceDirective directive) {
       bool matchesUri(ElementDirective d) => switch (d.uri) {
             DirectiveUriWithRelativeUriString uri => uri.relativeUriString == directive.uri.stringValue,
             _ => false,
           };
       if (directive is ImportDirective) {
-        return directive.libraryImport?.importedLibrary2 ?? imports.where(matchesUri).firstOrNull?.importedLibrary2;
+        return directive.libraryImport?.importedLibrary ?? imports.where(matchesUri).firstOrNull?.importedLibrary;
       } else if (directive is ExportDirective) {
-        return directive.libraryExport?.exportedLibrary2 ?? exports.where(matchesUri).firstOrNull?.exportedLibrary2;
+        return directive.libraryExport?.exportedLibrary ?? exports.where(matchesUri).firstOrNull?.exportedLibrary;
       }
       return null;
     }
 
-    Future<LibraryElement2?> resolveLibraryFromUri(String? uri) async {
+    Future<LibraryElement?> resolveLibraryFromUri(String? uri) async {
       if (uri == null) return null;
       final absolutePath = library.session.uriConverter.uriToPath(library.uri.resolve(uri));
       if (absolutePath == null) return null;
@@ -459,7 +458,7 @@ class InspectDataItem {
       return null;
     }
 
-    final dependencies = <({LibraryElement2 lib, DirectiveTarget dir, bool onClient, bool onServer})>[];
+    final dependencies = <({LibraryElement lib, DirectiveTarget dir, bool onClient, bool onServer})>[];
 
     for (final unit in result.units) {
       for (final directive in unit.unit.directives) {

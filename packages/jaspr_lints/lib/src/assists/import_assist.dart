@@ -21,7 +21,7 @@ class ImportAssistProvider extends DartAssist {
       }
 
       var unit = node.parent;
-      if (unit is! CompilationUnit || unit.declaredElement == null) return;
+      if (unit is! CompilationUnit || unit.declaredFragment == null) return;
 
       var fileName = resolver.source.shortName;
       if (fileName.endsWith('.dart')) fileName = fileName.substring(0, fileName.length - 5);
@@ -32,12 +32,12 @@ class ImportAssistProvider extends DartAssist {
           .firstOrNull;
 
       var elements = <Element>[];
-      if (node.element case var libraryElement?) {
-        var visitor = GatherUsedImportedElementsVisitor(unit.declaredElement!.library);
+      if (node.libraryImport case var libraryElement?) {
+        var visitor = GatherUsedImportedElementsVisitor(unit.declaredFragment!.element);
         unit.accept(visitor);
         elements = visitor.usedElements.elements
             .followedBy(visitor.usedElements.usedExtensions)
-            .where((e) => libraryElement.namespace.get(e.name ?? '') == e)
+            .where((e) => libraryElement.namespace.get2(e.name ?? '') == e)
             .toList();
       }
 
@@ -80,7 +80,7 @@ class ReplaceStubbedTypesVisitor extends RecursiveAstVisitor<void> {
   void visitNamedType(NamedType node) {
     if (elements.contains(node.type?.element)) {
       if (node.parent is ConstructorName) return;
-      builder.addSimpleInsertion(node.name2.end, 'OrStubbed');
+      builder.addSimpleInsertion(node.name.end, 'OrStubbed');
     }
   }
 }

@@ -24,6 +24,7 @@ jobs:
 
       - name: Bootstrap
         run: |
+          flutter doctor
           dart pub global activate melos
           dart pub global activate -s git https://github.com/schultek/semantic_changelog
           melos bootstrap --no-private

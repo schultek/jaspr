@@ -117,13 +117,13 @@ class ComponentVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     final constr = node.constructorName;
-    if (constr.type.name2.lexeme == 'Text' && constr.name == null) {
+    if (constr.type.name.lexeme == 'Text' && constr.name == null) {
       onText(SourceRange(constr.type.offset, constr.type.length));
-    } else if (constr.type.name2.lexeme == 'Fragment' && constr.name == null) {
+    } else if (constr.type.name.lexeme == 'Fragment' && constr.name == null) {
       onFragment(SourceRange(constr.type.offset, constr.type.length), node.argumentList);
-    } else if (constr.type.name2.lexeme == 'DomComponent' && constr.name == null) {
+    } else if (constr.type.name.lexeme == 'DomComponent' && constr.name == null) {
       onDomComponent(SourceRange(constr.type.offset, constr.type.length));
-    } else if (constr.type.name2.lexeme == 'DomComponent' && constr.name?.name == 'wrap') {
+    } else if (constr.type.name.lexeme == 'DomComponent' && constr.name?.name == 'wrap') {
       onWrapDomComponent(SourceRange(constr.type.offset, constr.name!.end - constr.type.offset));
     }
     super.visitInstanceCreationExpression(node);
