@@ -21,13 +21,8 @@ Future<Response> downloadProject(Request request) async {
 }
 
 class ZipProjectEncoder {
-  late OutputStream _output;
-  late ZipEncoder _encoder;
-
-  ZipProjectEncoder() {
-    _encoder = ZipEncoder();
-    _output = OutputStream();
-  }
+  final OutputMemoryStream _output = OutputMemoryStream();
+  final ZipEncoder _encoder = ZipEncoder();
 
   Future<void> zipProject(ProjectData project) async {
     _encoder.startEncode(_output);
@@ -66,7 +61,7 @@ class ZipProjectEncoder {
   }
 
   void addFromSource(String file, String source) {
-    _encoder.addFile(ArchiveFile.string(file, source));
+    _encoder.add(ArchiveFile.string(file, source));
   }
 
   void close() {
