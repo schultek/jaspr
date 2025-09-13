@@ -19,7 +19,10 @@ Component details(
     id: id,
     classes: classes,
     styles: styles,
-    attributes: {...?attributes, if (open == true) 'open': ''},
+    attributes: {
+      ...?attributes,
+      if (open == true) 'open': '',
+    },
     events: events,
     children: children,
   );
@@ -44,7 +47,10 @@ Component dialog(
     id: id,
     classes: classes,
     styles: styles,
-    attributes: {...?attributes, if (open == true) 'open': ''},
+    attributes: {
+      ...?attributes,
+      if (open == true) 'open': '',
+    },
     events: events,
     children: children,
   );
@@ -99,10 +105,10 @@ Component meta({
     styles: styles,
     attributes: {
       ...?attributes,
-      if (name != null) 'name': name,
-      if (content != null) 'content': content,
-      if (charset != null) 'charset': charset,
-      if (httpEquiv != null) 'http-equiv': httpEquiv,
+      'name': ?name,
+      'content': ?content,
+      'charset': ?charset,
+      'http-equiv': ?httpEquiv,
     },
     events: events,
   );
@@ -135,9 +141,9 @@ Component link({
     attributes: {
       ...?attributes,
       'href': href,
-      if (rel != null) 'rel': rel,
-      if (type != null) 'type': type,
-      if (as != null) 'as': as,
+      'rel': ?rel,
+      'type': ?type,
+      'as': ?as,
     },
     events: events,
   );
@@ -181,7 +187,7 @@ Component script({
       ...?attributes,
       if (async == true) 'async': '',
       if (defer == true) 'defer': '',
-      if (src != null) 'src': src,
+      'src': ?src,
     },
     events: events,
     children: [if (content != null) raw(content)],

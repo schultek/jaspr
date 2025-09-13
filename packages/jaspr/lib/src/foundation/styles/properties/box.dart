@@ -81,18 +81,18 @@ class _OnlyBorder implements Border {
 
   @override
   Map<String, String> get styles => {
-    if (left?.style != null) 'border-left-style': left!.style!.value,
-    if (top?.style != null) 'border-top-style': top!.style!.value,
-    if (right?.style != null) 'border-right-style': right!.style!.value,
-    if (bottom?.style != null) 'border-bottom-style': bottom!.style!.value,
-    if (left?.color != null) 'border-left-color': left!.color!.value,
-    if (top?.color != null) 'border-top-color': top!.color!.value,
-    if (right?.color != null) 'border-right-color': right!.color!.value,
-    if (bottom?.color != null) 'border-bottom-color': bottom!.color!.value,
-    if (left?.width != null) 'border-left-width': left!.width!.value,
-    if (top?.width != null) 'border-top-width': top!.width!.value,
-    if (right?.width != null) 'border-right-width': right!.width!.value,
-    if (bottom?.width != null) 'border-bottom-width': bottom!.width!.value,
+    'border-left-style': ?left?.style?.value,
+    'border-top-style': ?top?.style?.value,
+    'border-right-style': ?right?.style?.value,
+    'border-bottom-style': ?bottom?.style?.value,
+    'border-left-color': ?left?.color?.value,
+    'border-top-color': ?top?.color?.value,
+    'border-right-color': ?right?.color?.value,
+    'border-bottom-color': ?bottom?.color?.value,
+    'border-left-width': ?left?.width?.value,
+    'border-top-width': ?top?.width?.value,
+    'border-right-width': ?right?.width?.value,
+    'border-bottom-width': ?bottom?.width?.value,
   };
 }
 
@@ -108,26 +108,26 @@ class _SymmetricBorder implements Border {
       if (vertical?.style != null && horizontal?.style != null)
         'border-style': '${vertical!.style!.value} ${horizontal!.style!.value}'
       else ...{
-        if (vertical?.style != null) 'border-top-style': vertical!.style!.value,
-        if (vertical?.style != null) 'border-bottom-style': vertical!.style!.value,
-        if (horizontal?.style != null) 'border-left-style': horizontal!.style!.value,
-        if (horizontal?.style != null) 'border-right-style': horizontal!.style!.value,
+        'border-top-style': ?vertical?.style?.value,
+        'border-bottom-style': ?vertical?.style?.value,
+        'border-left-style': ?horizontal?.style?.value,
+        'border-right-style': ?horizontal?.style?.value,
       },
       if (vertical?.color != null && horizontal?.color != null)
         'border-color': '${vertical!.color!.value} ${horizontal!.color!.value}'
       else ...{
-        if (vertical?.color != null) 'border-top-color': vertical!.color!.value,
-        if (vertical?.color != null) 'border-bottom-color': vertical!.color!.value,
-        if (horizontal?.color != null) 'border-left-color': horizontal!.color!.value,
-        if (horizontal?.color != null) 'border-right-color': horizontal!.color!.value,
+        'border-top-color': ?vertical?.color?.value,
+        'border-bottom-color': ?vertical?.color?.value,
+        'border-left-color': ?horizontal?.color?.value,
+        'border-right-color': ?horizontal?.color?.value,
       },
       if (vertical?.width != null && horizontal?.width != null)
         'border-width': '${vertical!.width!.value} ${horizontal!.width!.value}'
       else ...{
-        if (vertical?.width != null) 'border-top-width': vertical!.width!.value,
-        if (vertical?.width != null) 'border-bottom-width': vertical!.width!.value,
-        if (horizontal?.width != null) 'border-left-width': horizontal!.width!.value,
-        if (horizontal?.width != null) 'border-right-width': horizontal!.width!.value,
+        'border-top-width': ?vertical?.width?.value,
+        'border-bottom-width': ?vertical?.width?.value,
+        'border-left-width': ?horizontal?.width?.value,
+        'border-right-width': ?horizontal?.width?.value,
       },
     };
   }
@@ -227,10 +227,10 @@ class _OnlyBorderRadius implements BorderRadius {
       }
     } else {
       return {
-        if (topLeft != null) 'border-top-left-radius': topLeft!._values.join(' '),
-        if (topRight != null) 'border-top-right-radius': topRight!._values.join(' '),
-        if (bottomRight != null) 'border-bottom-right-radius': bottomRight!._values.join(' '),
-        if (bottomLeft != null) 'border-bottom-left-radius': bottomLeft!._values.join(' '),
+        'border-top-left-radius': ?topLeft?._values.join(' '),
+        'border-top-right-radius': ?topRight?._values.join(' '),
+        'border-bottom-right-radius': ?bottomRight?._values.join(' '),
+        'border-bottom-left-radius': ?bottomLeft?._values.join(' '),
       };
     }
   }
@@ -301,10 +301,10 @@ class _Outline implements Outline {
 
   @override
   Map<String, String> get styles => {
-    if (color != null) 'outline-color': color!.value,
-    if (style != null) 'outline-style': style!.value,
-    if (width != null) 'outline-width': width!.value,
-    if (offset != null) 'outline-offset': offset!.value,
+    'outline-color': ?color?.value,
+    'outline-style': ?style?.value,
+    'outline-width': ?width?.value,
+    'outline-offset': ?offset?.value,
   };
 }
 
@@ -407,8 +407,8 @@ class _OnlyOverflow implements Overflow {
     if (x != null && y != null)
       'overflow': '${x!._value} ${y!._value}'
     else ...{
-      if (x != null) 'overflow-x': x!._value,
-      if (y != null) 'overflow-y': y!._value,
+      'overflow-x': ?x?._value,
+      'overflow-y': ?y?._value,
     },
   };
 }

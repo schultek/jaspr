@@ -55,7 +55,7 @@ abstract class Quote implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
+      'id': ?id,
       'quote': quote,
       'author': author,
       'likes': likes.toJson(),

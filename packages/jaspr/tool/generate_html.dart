@@ -132,24 +132,24 @@ void main() {
 
           if (type == 'boolean') {
             content.write('if ($name == true) ');
-          } else if (!required) {
-            content.write('if ($name != null) ');
           }
 
           content.write("'$attr': ");
 
+          var nullCheck = !required && type != 'boolean' ? '?' : '';
+
           if (type == 'string') {
-            content.write('$name');
+            content.write('$nullCheck$name');
           } else if (type == 'boolean') {
             content.write("''");
           } else if (type == 'int' || type == 'double') {
-            content.write("'\$$name'");
+            content.write("$nullCheck$name$nullCheck.toString()");
           } else if (type is String && type.startsWith('enum:')) {
-            content.write('$name.value');
+            content.write('$nullCheck$name$nullCheck.value');
           } else if (type is String && type.startsWith('css:')) {
-            content.write('$name.value');
+            content.write('$nullCheck$name$nullCheck.value');
           } else if (type is Map<String, dynamic>) {
-            content.write('$name.value');
+            content.write('$nullCheck$name$nullCheck.value');
           } else {
             throw ArgumentError('Attribute type is unknown ($type) for attribute $key.$tag.$attr');
           }

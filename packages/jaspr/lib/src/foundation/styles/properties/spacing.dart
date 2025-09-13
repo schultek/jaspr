@@ -59,10 +59,10 @@ class _QuadEdgeInsets implements Spacing {
       return {'': '${_top.value} ${_right.value} ${_bottom.value} ${_left.value}'};
     } else {
       return {
-        if (_top != null) 'top': _top.value,
-        if (_left != null) 'left': _left.value,
-        if (_right != null) 'right': _right.value,
-        if (_bottom != null) 'bottom': _bottom.value,
+        'top': ?_top?.value,
+        'left': ?_left?.value,
+        'right': ?_right?.value,
+        'bottom': ?_bottom?.value,
       };
     }
   }
@@ -98,10 +98,10 @@ class _SymmetricEdgeInsets implements Spacing {
       return {'': '${vertical!.value} ${horizontal!.value}'};
     } else {
       return {
-        if (vertical != null) 'top': vertical!.value,
-        if (vertical != null) 'bottom': vertical!.value,
-        if (horizontal != null) 'left': horizontal!.value,
-        if (horizontal != null) 'right': horizontal!.value,
+        'top': ?vertical?.value,
+        'bottom': ?vertical?.value,
+        'left': ?horizontal?.value,
+        'right': ?horizontal?.value,
       };
     }
   }

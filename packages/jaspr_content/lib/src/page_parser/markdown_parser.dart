@@ -105,7 +105,7 @@ class MarkdownParser implements PageParser {
       } else if (node is md.Element) {
         final children = buildNodes(node.children ?? []);
         currentNodes.add(
-          ElementNode(node.tag, {if (node.generatedId != null) 'id': node.generatedId!, ...node.attributes}, children),
+          ElementNode(node.tag, {'id': ?node.generatedId, ...node.attributes}, children),
         );
       }
     }

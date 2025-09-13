@@ -25,7 +25,10 @@ class Image extends StatelessComponent {
       width: width,
       height: height,
       alt: description,
-      attributes: {if (tooltip != null) 'title': tooltip!, if (lazyLoading) 'loading': 'lazy'},
+      attributes: {
+        'title': ?tooltip,
+        if (lazyLoading) 'loading': 'lazy',
+      },
     );
   }
 }

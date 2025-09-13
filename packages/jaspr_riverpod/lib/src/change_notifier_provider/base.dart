@@ -241,8 +241,8 @@ class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?> extends P
 // ignore: subtype_of_sealed_class
 /// The [Family] of [ChangeNotifierProvider].
 class ChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?, Arg>
+    extends
         // ignore: deprecated_member_use, deprecated_member_use_from_same_package
-        extends
         FamilyBase<ChangeNotifierProviderRef<NotifierT>, NotifierT, Arg, NotifierT, ChangeNotifierProvider<NotifierT>> {
   /// The [Family] of [ChangeNotifierProvider].
   ChangeNotifierProviderFamily(super._createFn, {super.name, super.dependencies})

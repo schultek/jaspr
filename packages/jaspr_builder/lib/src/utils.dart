@@ -54,7 +54,7 @@ extension TypeStub on String {
 
 extension ElementNode on Element {
   AstNode? get node {
-    var result = session?.getParsedLibraryByElement2(library!);
+    var result = session?.getParsedLibraryByElement(library!);
     if (result is ParsedLibraryResult) {
       return result.getFragmentDeclaration(firstFragment)?.node;
     } else {

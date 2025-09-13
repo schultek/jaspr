@@ -276,10 +276,10 @@ class CodecElement {
 
   Map<String, dynamic> serialize() => {
     'name': name,
-    if (extension != null) 'extension': extension,
+    'extension': ?extension,
     'decoder': decoder,
     'encoder': encoder,
     'import': import,
-    if (typeImport != null) 'typeImport': typeImport,
+    'typeImport': ?typeImport,
   };
 }

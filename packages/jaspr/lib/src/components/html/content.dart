@@ -371,7 +371,10 @@ Component blockquote(
     id: id,
     classes: classes,
     styles: styles,
-    attributes: {...?attributes, if (cite != null) 'cite': cite},
+    attributes: {
+      ...?attributes,
+      'cite': ?cite,
+    },
     events: events,
     children: children,
   );
@@ -448,8 +451,8 @@ Component ol(
     attributes: {
       ...?attributes,
       if (reversed == true) 'reversed': '',
-      if (start != null) 'start': '$start',
-      if (type != null) 'type': type.value,
+      'start': ?start?.toString(),
+      'type': ?type?.value,
     },
     events: events,
     children: children,
@@ -496,7 +499,10 @@ Component li(
     id: id,
     classes: classes,
     styles: styles,
-    attributes: {...?attributes, if (value != null) 'value': '$value'},
+    attributes: {
+      ...?attributes,
+      'value': ?value?.toString(),
+    },
     events: events,
     children: children,
   );

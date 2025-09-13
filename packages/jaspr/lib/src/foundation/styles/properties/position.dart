@@ -40,10 +40,10 @@ class _Positioned extends _Position {
   @override
   Map<String, String> get styles => {
     ...super.styles,
-    if (top != null) 'top': top!.value,
-    if (left != null) 'left': left!.value,
-    if (bottom != null) 'bottom': bottom!.value,
-    if (right != null) 'right': right!.value,
+    'top': ?top?.value,
+    'left': ?left?.value,
+    'bottom': ?bottom?.value,
+    'right': ?right?.value,
   };
 }
 

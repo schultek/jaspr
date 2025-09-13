@@ -45,11 +45,11 @@ Component a(
     styles: styles,
     attributes: {
       ...?attributes,
-      if (download != null) 'download': download,
+      'download': ?download,
       'href': href,
-      if (target != null) 'target': target.value,
-      if (type != null) 'type': type,
-      if (referrerPolicy != null) 'referrerpolicy': referrerPolicy.value,
+      'target': ?target?.value,
+      'type': ?type,
+      'referrerpolicy': ?referrerPolicy?.value,
     },
     events: {
       ...?events,

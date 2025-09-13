@@ -144,11 +144,11 @@ Component th(
     styles: styles,
     attributes: {
       ...?attributes,
-      if (abbr != null) 'abbr': abbr,
-      if (colspan != null) 'colspan': '$colspan',
-      if (headers != null) 'headers': headers,
-      if (rowspan != null) 'rowspan': '$rowspan',
-      if (scope != null) 'scope': scope,
+      'abbr': ?abbr,
+      'colspan': ?colspan?.toString(),
+      'headers': ?headers,
+      'rowspan': ?rowspan?.toString(),
+      'scope': ?scope,
     },
     events: events,
     children: children,
@@ -202,9 +202,9 @@ Component td(
     styles: styles,
     attributes: {
       ...?attributes,
-      if (colspan != null) 'colspan': '$colspan',
-      if (headers != null) 'headers': headers,
-      if (rowspan != null) 'rowspan': '$rowspan',
+      'colspan': ?colspan?.toString(),
+      'headers': ?headers,
+      'rowspan': ?rowspan?.toString(),
     },
     events: events,
     children: children,
@@ -229,7 +229,10 @@ Component col({
     id: id,
     classes: classes,
     styles: styles,
-    attributes: {...?attributes, if (span != null) 'span': '$span'},
+    attributes: {
+      ...?attributes,
+      'span': ?span?.toString(),
+    },
     events: events,
   );
 }
@@ -253,7 +256,10 @@ Component colgroup(
     id: id,
     classes: classes,
     styles: styles,
-    attributes: {...?attributes, if (span != null) 'span': '$span'},
+    attributes: {
+      ...?attributes,
+      'span': ?span?.toString(),
+    },
     events: events,
     children: children,
   );

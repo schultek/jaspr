@@ -34,9 +34,9 @@ class _Flex implements Flex {
   @override
   Map<String, String> get styles {
     return {
-      if (grow != null) 'flex-grow': grow!.numstr,
-      if (shrink != null) 'flex-shrink': shrink!.numstr,
-      if (basis != null) 'flex-basis': basis!.value,
+      'flex-grow': ?grow?.numstr,
+      'flex-shrink': ?shrink?.numstr,
+      'flex-basis': ?basis?.value,
     };
   }
 }
