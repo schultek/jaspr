@@ -28,21 +28,29 @@ class ComponentFactoryMigration implements Migration {
     final fragments = <(SourceRange, ArgumentList)>[];
     final wrapDomComponents = <SourceRange>[];
 
-    if (!unit.directives
-        .any((d) => d is ImportDirective && (d.uri.stringValue?.startsWith('package:jaspr/') ?? false))) {
+    if (!unit.directives.any(
+      (d) => d is ImportDirective && (d.uri.stringValue?.startsWith('package:jaspr/') ?? false),
+    )) {
       // Only run if jaspr is imported.
       return;
     }
 
-    unit.accept(ComponentVisitor(onText: (node) {
-      texts.add(node);
-    }, onDomComponent: (node) {
-      domComponents.add(node);
-    }, onWrapDomComponent: (node) {
-      wrapDomComponents.add(node);
-    }, onFragment: (node, arguments) {
-      fragments.add((node, arguments));
-    }));
+    unit.accept(
+      ComponentVisitor(
+        onText: (node) {
+          texts.add(node);
+        },
+        onDomComponent: (node) {
+          domComponents.add(node);
+        },
+        onWrapDomComponent: (node) {
+          wrapDomComponents.add(node);
+        },
+        onFragment: (node, arguments) {
+          fragments.add((node, arguments));
+        },
+      ),
+    );
 
     if (texts.isNotEmpty) {
       reporter.createMigration('Replaced Text() with Component.text()', (builder) {
@@ -72,9 +80,11 @@ class ComponentFactoryMigration implements Migration {
       reporter.createMigration('Replaced Fragment() with Component.fragment()', (builder) {
         for (final (node, arguments) in fragments) {
           builder.replace(node.offset, node.length, 'Component.fragment');
-          final childrenArg = arguments.arguments
-              .where((arg) => arg is NamedExpression && arg.name.label.name == 'children')
-              .firstOrNull as NamedExpression?;
+          final childrenArg =
+              arguments.arguments
+                      .where((arg) => arg is NamedExpression && arg.name.label.name == 'children')
+                      .firstOrNull
+                  as NamedExpression?;
           if (childrenArg != null) {
             final end = childrenArg.expression.offset;
             builder.delete(childrenArg.name.offset, end - childrenArg.name.offset);

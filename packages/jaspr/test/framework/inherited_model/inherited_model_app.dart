@@ -5,10 +5,7 @@ import '../../utils/test_component.dart';
 final buildCalledFor = <Key>{};
 
 class MyDto {
-  const MyDto({
-    required this.a,
-    required this.b,
-  });
+  const MyDto({required this.a, required this.b});
 
   final int? a;
   final double? b;
@@ -17,10 +14,7 @@ class MyDto {
 enum ABAspect { a, b }
 
 class App extends TestComponent<MyDto> {
-  App()
-      : super(
-          initialValue: MyDto(a: 0, b: 0),
-        );
+  App() : super(initialValue: MyDto(a: 0, b: 0));
 
   final child = div([ExampleComponent()]);
 
@@ -29,21 +23,12 @@ class App extends TestComponent<MyDto> {
   @override
   Component build(BuildContext context, MyDto dto) {
     buildCalledFor.add(componentKey);
-    return ABModel(
-      a: dto.a,
-      b: dto.b,
-      child: child,
-    );
+    return ABModel(a: dto.a, b: dto.b, child: child);
   }
 }
 
 class ABModel extends InheritedModel<ABAspect> {
-  const ABModel({
-    super.key,
-    this.a,
-    this.b,
-    required super.child,
-  });
+  const ABModel({super.key, this.a, this.b, required super.child});
 
   final int? a;
   final double? b;
@@ -54,10 +39,7 @@ class ABModel extends InheritedModel<ABAspect> {
   }
 
   @override
-  bool updateShouldNotifyDependent(
-    ABModel oldWidget,
-    Set<ABAspect> dependencies,
-  ) {
+  bool updateShouldNotifyDependent(ABModel oldWidget, Set<ABAspect> dependencies) {
     return (a != oldWidget.a && dependencies.contains(ABAspect.a)) ||
         (b != oldWidget.b && dependencies.contains(ABAspect.b));
   }
@@ -77,10 +59,7 @@ class ExampleComponent extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     buildCalledFor.add(componentKey);
-    return Component.fragment([
-      AComponent(),
-      BComponent(),
-    ]);
+    return Component.fragment([AComponent(), BComponent()]);
   }
 }
 

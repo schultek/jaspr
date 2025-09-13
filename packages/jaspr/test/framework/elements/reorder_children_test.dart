@@ -54,8 +54,9 @@ void main() {
       // phase 1 (1, 2, 3): children should be mounted
       expect(find.textContaining('Child'), findsNComponents(3));
 
-      final divElement = find.descendant(of: find.byComponent(component), matching: find.tag('div')).evaluate().first
-          as MultiChildElement;
+      final divElement =
+          find.descendant(of: find.byComponent(component), matching: find.tag('div')).evaluate().first
+              as MultiChildElement;
 
       var elements1 = divElement.children.whereType<ChildElement>().toList();
       expect(elements1.map((e) => e.component.num), equals([1, 2, 3]));
@@ -71,10 +72,7 @@ void main() {
       expect(elements2, equals([elements1[1]]));
 
       // phase 3 (3, 2): children should be reordered
-      component.updateChild(div([
-        ChildComponent(key: child3Key, num: 3),
-        ChildComponent(key: child2Key, num: 2),
-      ]));
+      component.updateChild(div([ChildComponent(key: child3Key, num: 3), ChildComponent(key: child2Key, num: 2)]));
       await tester.pump();
 
       expect(find.textContaining('Child'), findsNComponents(2));
@@ -85,11 +83,13 @@ void main() {
       expect(elements3[1], equals(elements1[1]));
 
       // phase 4 (1, 3, 2): children should be reordered
-      component.updateChild(div([
-        ChildComponent(key: child1Key, num: 1),
-        ChildComponent(key: child3Key, num: 3),
-        ChildComponent(key: child2Key, num: 2),
-      ]));
+      component.updateChild(
+        div([
+          ChildComponent(key: child1Key, num: 1),
+          ChildComponent(key: child3Key, num: 3),
+          ChildComponent(key: child2Key, num: 2),
+        ]),
+      );
       await tester.pump();
 
       expect(find.textContaining('Child'), findsNComponents(3));

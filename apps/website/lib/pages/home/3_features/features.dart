@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
 
+import '../../../constants/theme.dart';
 import 'components/link_card.dart';
 
 class Features extends StatelessComponent {
@@ -66,29 +66,29 @@ class Features extends StatelessComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('#features', [
-          css('&').styles(
-            display: Display.flex,
-            padding: Padding.only(top: sectionPadding),
-            flexDirection: FlexDirection.column,
-            alignItems: AlignItems.center,
-            textAlign: TextAlign.center,
-          ),
-          css('.feature-grid', [
-            css('&').styles(
-              display: Display.flex,
-              maxWidth: maxContentWidth,
-              padding: Padding.symmetric(horizontal: contentPadding),
-              margin: Margin.only(top: 3.rem, bottom: 4.rem),
-              flexDirection: FlexDirection.row,
-              flexWrap: FlexWrap.wrap,
-              gap: Gap.all(1.5.rem),
-            ),
-            css('& > *').styles(
-              boxSizing: BoxSizing.borderBox,
-              flex: Flex(grow: 1, shrink: 0, basis: 13.rem),
-            ),
-          ]),
-        ]),
-      ];
+    css('#features', [
+      css('&').styles(
+        display: Display.flex,
+        padding: Padding.only(top: sectionPadding),
+        flexDirection: FlexDirection.column,
+        alignItems: AlignItems.center,
+        textAlign: TextAlign.center,
+      ),
+      css('.feature-grid', [
+        css('&').styles(
+          display: Display.flex,
+          maxWidth: maxContentWidth,
+          padding: Padding.symmetric(horizontal: contentPadding),
+          margin: Margin.only(top: 3.rem, bottom: 4.rem),
+          flexDirection: FlexDirection.row,
+          flexWrap: FlexWrap.wrap,
+          gap: Gap.all(1.5.rem),
+        ),
+        css('& > *').styles(
+          boxSizing: BoxSizing.borderBox,
+          flex: Flex(grow: 1, shrink: 0, basis: 13.rem),
+        ),
+      ]),
+    ]),
+  ];
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 
 import '../../adapters/mdc.dart';
 import '../utils/node_reader.dart';
@@ -22,12 +23,7 @@ class DialogAction {
   DialogAction(this.label, this.result);
 }
 
-enum DialogResult {
-  yes,
-  no,
-  ok,
-  cancel,
-}
+enum DialogResult { yes, no, ok, cancel }
 
 Future<T?> showDialog<T>(BuildContext context, {required String slotId, required ComponentBuilder builder}) {
   var completer = Completer<T?>();
@@ -84,7 +80,7 @@ class DialogState extends State<DialogSlot> {
 
   void subscribeToOpenState() {
     _sub?.close();
-    _sub = context.subscribe<_DialogState?>(_dialogStateProvider(component.slotId), (_, state) {
+    _sub = context.listenManual<_DialogState?>(_dialogStateProvider(component.slotId), (_, state) {
       if (state != null && _dialog != null && !_dialog!.isOpen) {
         context.binding.addPostFrameCallback(() {
           _dialog!.open();

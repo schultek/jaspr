@@ -21,16 +21,18 @@ class ContentTheme {
     FontFamily? font,
     FontFamily? codeFont,
     ContentTypography? typography,
-  })  : colors = ContentColors._base.apply(colors: [
-          ...colors,
-          if (primary != null) ContentColors.primary.apply(primary),
-          if (background != null) ContentColors.background.apply(background),
-          if (text != null) ContentColors.text.apply(text),
-        ]),
-        font = font ?? defaultFont,
-        codeFont = codeFont ?? defaultCodeFont,
-        typography = typography ?? ContentTypography.base,
-        reset = true;
+  }) : colors = ContentColors._base.apply(
+         colors: [
+           ...colors,
+           if (primary != null) ContentColors.primary.apply(primary),
+           if (background != null) ContentColors.background.apply(background),
+           if (text != null) ContentColors.text.apply(text),
+         ],
+       ),
+       font = font ?? defaultFont,
+       codeFont = codeFont ?? defaultCodeFont,
+       typography = typography ?? ContentTypography.base,
+       reset = true;
 
   /// Disables any theming and styles for the page.
   const factory ContentTheme.none() = _NoContentTheme;
@@ -95,14 +97,8 @@ class ContentTheme {
     return [
       ...colors.build(),
       if (reset) ..._resetStyles,
-      if (font != null)
-        css(':host,html').styles(
-          fontFamily: font,
-        ),
-      if (codeFont != null)
-        css('code, kbd, pre, samp').styles(
-          fontFamily: codeFont,
-        ),
+      if (font != null) css(':host,html').styles(fontFamily: font),
+      if (codeFont != null) css('code, kbd, pre, samp').styles(fontFamily: codeFont),
       if (hasTextToken || hasBackgroundToken)
         css('body').styles(
           color: hasTextToken ? ContentColors.text : null,
@@ -141,8 +137,7 @@ class _NoContentTheme implements ContentTheme {
     FontFamily? codeFont,
     ContentTypography? typography,
     bool mergeColors = true,
-  }) =>
-      this;
+  }) => this;
 
   @override
   ContentTheme copyWith({
@@ -150,6 +145,5 @@ class _NoContentTheme implements ContentTheme {
     FontFamily? font,
     FontFamily? codeFont,
     ContentTypography? typography,
-  }) =>
-      this;
+  }) => this;
 }

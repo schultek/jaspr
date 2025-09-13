@@ -10,22 +10,24 @@ final counter = StateProvider((ref) => 0);
 void main() {
   group('context.refresh', () {
     testComponents('refreshes provider state', (tester) async {
-      tester.pumpComponent(providerApp((context) {
-        return div([
-          Button(
-            label: '${context.watch(counter)}',
-            onPressed: () {
-              context.read(counter.notifier).state++;
-            },
-          ),
-          Button(
-            label: 'refresh',
-            onPressed: () {
-              context.refresh(counter);
-            },
-          ),
-        ]);
-      }));
+      tester.pumpComponent(
+        providerApp((context) {
+          return div([
+            Button(
+              label: '${context.watch(counter)}',
+              onPressed: () {
+                context.read(counter.notifier).state++;
+              },
+            ),
+            Button(
+              label: 'refresh',
+              onPressed: () {
+                context.refresh(counter);
+              },
+            ),
+          ]);
+        }),
+      );
 
       expect(find.text('0'), findsOneComponent);
 
@@ -43,47 +45,53 @@ void main() {
     });
 
     testComponents('refreshes overridden provider state', (tester) async {
-      tester.pumpComponent(providerApp((context) {
-        return div([
-          Builder(builder: (context) {
-            return div([
-              Button(
-                key: const ValueKey('a'),
-                label: 'a ${context.watch(counter)}',
-                onPressed: () {
-                  context.read(counter.notifier).state++;
+      tester.pumpComponent(
+        providerApp((context) {
+          return div([
+            Builder(
+              builder: (context) {
+                return div([
+                  Button(
+                    key: const ValueKey('a'),
+                    label: 'a ${context.watch(counter)}',
+                    onPressed: () {
+                      context.read(counter.notifier).state++;
+                    },
+                  ),
+                  Button(
+                    label: 'refresh_a',
+                    onPressed: () {
+                      context.refresh(counter);
+                    },
+                  ),
+                ]);
+              },
+            ),
+            ProviderScope(
+              overrides: [counter.overrideWith((ref) => 10)],
+              child: Builder(
+                builder: (context) {
+                  return div([
+                    Button(
+                      key: const ValueKey('b'),
+                      label: 'b ${context.watch(counter)}',
+                      onPressed: () {
+                        context.read(counter.notifier).state++;
+                      },
+                    ),
+                    Button(
+                      label: 'refresh_b',
+                      onPressed: () {
+                        context.refresh(counter);
+                      },
+                    ),
+                  ]);
                 },
               ),
-              Button(
-                label: 'refresh_a',
-                onPressed: () {
-                  context.refresh(counter);
-                },
-              ),
-            ]);
-          }),
-          ProviderScope(
-            overrides: [counter.overrideWith((ref) => 10)],
-            child: Builder(builder: (context) {
-              return div([
-                Button(
-                  key: const ValueKey('b'),
-                  label: 'b ${context.watch(counter)}',
-                  onPressed: () {
-                    context.read(counter.notifier).state++;
-                  },
-                ),
-                Button(
-                  label: 'refresh_b',
-                  onPressed: () {
-                    context.refresh(counter);
-                  },
-                ),
-              ]);
-            }),
-          ),
-        ]);
-      }));
+            ),
+          ]);
+        }),
+      );
 
       expect(find.text('a 0'), findsOneComponent);
       expect(find.text('b 10'), findsOneComponent);

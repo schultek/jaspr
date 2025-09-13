@@ -88,7 +88,7 @@ class Link extends StatelessComponent {
               router.replace(to, extra: extra);
             }
           }
-        }
+        },
       },
       [if (child != null) child!, ...?children],
     );

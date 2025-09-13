@@ -35,11 +35,9 @@ void main() {
         // Assert
         expect(sources, hasLength(2));
         expect(
-            sources,
-            equals([
-              pageSource('index.md', '/', private: false),
-              pageSource('about.html', '/about', private: false),
-            ]));
+          sources,
+          equals([pageSource('index.md', '/', private: false), pageSource('about.html', '/about', private: false)]),
+        );
       });
 
       test('loads nested file structure', () async {
@@ -57,11 +55,12 @@ void main() {
         // Assert
         expect(sources, hasLength(2));
         expect(
-            sources,
-            equals([
-              pageSource('index.md', '/', private: false),
-              pageSource('blog/post-1.md', '/blog/post-1', private: false),
-            ]));
+          sources,
+          equals([
+            pageSource('index.md', '/', private: false),
+            pageSource('blog/post-1.md', '/blog/post-1', private: false),
+          ]),
+        );
       });
 
       test('loads nested file structure on windows', () async {
@@ -80,11 +79,12 @@ void main() {
         // Assert
         expect(sources, hasLength(2));
         expect(
-            sources,
-            equals([
-              pageSource('index.md', '/', private: false),
-              pageSource(r'blog\post-1.md', '/blog/post-1', private: false),
-            ]));
+          sources,
+          equals([
+            pageSource('index.md', '/', private: false),
+            pageSource(r'blog\post-1.md', '/blog/post-1', private: false),
+          ]),
+        );
       });
 
       test('marks files and directories starting with an underscore as private', () async {
@@ -103,12 +103,13 @@ void main() {
         // Assert
         expect(sources, hasLength(3));
         expect(
-            sources,
-            equals([
-              pageSource('index.md', '/', private: false),
-              pageSource('_config.yaml', '/_config', private: true),
-              pageSource('_includes/header.html', '/_includes/header', private: true),
-            ]));
+          sources,
+          equals([
+            pageSource('index.md', '/', private: false),
+            pageSource('_config.yaml', '/_config', private: true),
+            pageSource('_includes/header.html', '/_includes/header', private: true),
+          ]),
+        );
       });
 
       test('keeps suffix for matching patterns', () async {
@@ -117,11 +118,7 @@ void main() {
         pagesDir.childFile('sitemap.xml').createSync();
         pagesDir.childFile('feed.rss').createSync();
 
-        final loader = FilesystemLoader(
-          'pages',
-          fileSystem: fileSystem,
-          keepSuffixPattern: RegExp(r'.*\.xml$'),
-        );
+        final loader = FilesystemLoader('pages', fileSystem: fileSystem, keepSuffixPattern: RegExp(r'.*\.xml$'));
 
         // Act
         final sources = await loader.loadPageSources();
@@ -129,11 +126,12 @@ void main() {
         // Assert
         expect(sources, hasLength(2));
         expect(
-            sources,
-            equals([
-              pageSource('sitemap.xml', '/sitemap.xml', private: false),
-              pageSource('feed.rss', '/feed', private: false),
-            ]));
+          sources,
+          equals([
+            pageSource('sitemap.xml', '/sitemap.xml', private: false),
+            pageSource('feed.rss', '/feed', private: false),
+          ]),
+        );
       });
     });
 
@@ -148,11 +146,7 @@ void main() {
         when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
 
         fileSystem.directory('pages').createSync();
-        loader = FilesystemLoader(
-          'pages',
-          fileSystem: fileSystem,
-          watcherFactory: (_) => mockWatcher,
-        );
+        loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
       });
 
       test('adds new source on file add event', () async {
@@ -197,11 +191,7 @@ void main() {
         when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
 
         final pagesDir = fileSystem.directory('pages')..createSync();
-        final loader = FilesystemLoader(
-          'pages',
-          fileSystem: fileSystem,
-          watcherFactory: (_) => mockWatcher,
-        );
+        final loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
 
         final partialPath = fileSystem.path.join('pages', '_includes', 'header.html');
         fileSystem.file(partialPath)

@@ -7,27 +7,29 @@ import 'jaspr_options.dart';
 void main() {
   Jaspr.initializeApp(options: defaultJasprOptions);
 
-  runApp(Document(
-    title: 'Element embedding',
-    meta: {
-      'description': 'A Flutter Web Element embedding demo.',
-      // iOS meta tags & icons
-      'apple-mobile-web-app-capable': 'yes',
-      'apple-mobile-web-app-status-bar-style': 'black',
-      'apple-mobile-web-app-title': 'Flutter Element embedding',
-    },
-    head: [
-      link(rel: 'apple-touch-icon', href: 'icons/Icon-192.png'),
-      link(rel: 'preload', as: 'image', href: 'icons/unsplash-x9WGMWwp1NM.png'),
+  runApp(
+    Document(
+      title: 'Element embedding',
+      meta: {
+        'description': 'A Flutter Web Element embedding demo.',
+        // iOS meta tags & icons
+        'apple-mobile-web-app-capable': 'yes',
+        'apple-mobile-web-app-status-bar-style': 'black',
+        'apple-mobile-web-app-title': 'Flutter Element embedding',
+      },
+      head: [
+        link(rel: 'apple-touch-icon', href: 'icons/Icon-192.png'),
+        link(rel: 'preload', as: 'image', href: 'icons/unsplash-x9WGMWwp1NM.png'),
 
-      // Favicon
-      link(rel: 'icon', href: 'icons/favicon.png', type: 'image/png'),
+        // Favicon
+        link(rel: 'icon', href: 'icons/favicon.png', type: 'image/png'),
 
-      link(rel: 'manifest', href: 'manifest.json'),
-      link(rel: 'stylesheet', href: 'css/style.css', type: 'text/css'),
+        link(rel: 'manifest', href: 'manifest.json'),
+        link(rel: 'stylesheet', href: 'css/style.css', type: 'text/css'),
 
-      script(src: "flutter_bootstrap.js", async: true),
-    ],
-    body: App(),
-  ));
+        script(src: "flutter_bootstrap.js", async: true),
+      ],
+      body: App(),
+    ),
+  );
 }

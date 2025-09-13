@@ -24,10 +24,7 @@ void main() {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientBasicSources,
-          outputs: {
-            ...clientBasicJsonOutputs,
-            'site|lib/component_basic.client.dart': isNotEmpty,
-          },
+          outputs: {...clientBasicJsonOutputs, 'site|lib/component_basic.client.dart': isNotEmpty},
           readerWriter: reader,
         );
       });
@@ -36,10 +33,7 @@ void main() {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientBasicSources,
-          outputs: {
-            'site|lib/component_basic.client.json': isNotEmpty,
-            ...clientBasicDartOutputs,
-          },
+          outputs: {'site|lib/component_basic.client.json': isNotEmpty, ...clientBasicDartOutputs},
           readerWriter: reader,
         );
       });
@@ -50,10 +44,7 @@ void main() {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientModelClassSources,
-          outputs: {
-            ...clientModelClassJsonOutputs,
-            'site|lib/component_model_class.client.dart': isNotEmpty,
-          },
+          outputs: {...clientModelClassJsonOutputs, 'site|lib/component_model_class.client.dart': isNotEmpty},
           readerWriter: reader,
         );
       });
@@ -62,10 +53,7 @@ void main() {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientModelClassSources,
-          outputs: {
-            'site|lib/component_model_class.client.json': isNotEmpty,
-            ...clientModelClassDartOutputs,
-          },
+          outputs: {'site|lib/component_model_class.client.json': isNotEmpty, ...clientModelClassDartOutputs},
           readerWriter: reader,
         );
       });
@@ -76,10 +64,7 @@ void main() {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientModelExtensionSources,
-          outputs: {
-            ...clientModelExtensionJsonOutputs,
-            'site|lib/component_model_extension.client.dart': isNotEmpty,
-          },
+          outputs: {...clientModelExtensionJsonOutputs, 'site|lib/component_model_extension.client.dart': isNotEmpty},
           readerWriter: reader,
         );
       });
@@ -88,10 +73,7 @@ void main() {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientModelExtensionSources,
-          outputs: {
-            'site|lib/component_model_extension.client.json': isNotEmpty,
-            ...clientModelExtensionDartOutputs,
-          },
+          outputs: {'site|lib/component_model_extension.client.json': isNotEmpty, ...clientModelExtensionDartOutputs},
           readerWriter: reader,
         );
       });
@@ -116,8 +98,9 @@ void main() {
         expect(
           errorLog,
           equals(
-              'ClientModuleBuilder on lib/component_basic.dart:\nClient components only support initializing formal constructor parameters. '
-              'Failing element: Component.new(String a)'),
+            'ClientModuleBuilder on lib/component_basic.dart:\nClient components only support initializing formal constructor parameters. '
+            'Failing element: Component.new(String a)',
+          ),
         );
       });
 
@@ -139,7 +122,8 @@ void main() {
         expect(
           errorLog,
           equals(
-              'ClientModuleBuilder on lib/component_basic.dart:\n@client components only support parameters of primitive serializable types or types that define @decoder and @encoder methods. Failing parameter: [DateTime time] in Component.new()'),
+            'ClientModuleBuilder on lib/component_basic.dart:\n@client components only support parameters of primitive serializable types or types that define @decoder and @encoder methods. Failing parameter: [DateTime time] in Component.new()',
+          ),
         );
       });
     });
@@ -147,11 +131,7 @@ void main() {
     test('generates bundle', () async {
       await testBuilder(
         ClientsBundleBuilder(BuilderOptions({})),
-        {
-          ...clientBasicJsonOutputs,
-          ...clientModelClassJsonOutputs,
-          ...clientModelExtensionJsonOutputs,
-        },
+        {...clientBasicJsonOutputs, ...clientModelClassJsonOutputs, ...clientModelExtensionJsonOutputs},
         outputs: clientBundleOutputs,
         readerWriter: reader,
       );

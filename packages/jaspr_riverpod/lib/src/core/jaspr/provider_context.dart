@@ -1,6 +1,6 @@
 part of '../../core.dart';
 
-extension ProviderContext on BuildContext  {
+extension ProviderContext on BuildContext {
   /// Reads a provider without listening to it
   T read<T>(ProviderListenable<T> provider) {
     return ProviderScope.containerOf(this, listen: false).read(provider);
@@ -34,13 +34,10 @@ extension ProviderContext on BuildContext  {
     bool fireImmediately = false,
   }) {
     _ensureDebugDoingBuild('listen');
-    return ProviderScope._scopeOf(this, listen: true)._listen(
+    return ProviderScope._scopeOf(
       this,
-      provider,
-      listener,
-      onError: onError,
-      fireImmediately: fireImmediately,
-    );
+      listen: true,
+    )._listen(this, provider, listener, onError: onError, fireImmediately: fireImmediately);
   }
 
   /// Listens to a provider and returns the subscription.
@@ -62,7 +59,8 @@ extension ProviderContext on BuildContext  {
     assert(() {
       if (!debugDoingBuild) {
         throw StateError(
-            'context.$method can only be used within the build method of a widget. When calling: ${StackTrace.current}');
+          'context.$method can only be used within the build method of a widget. When calling: ${StackTrace.current}',
+        );
       }
       return true;
     }());

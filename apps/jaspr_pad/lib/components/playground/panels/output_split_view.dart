@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 
 import '../../../models/api_models.dart';
 import '../../../providers/issues_provider.dart';
@@ -58,64 +59,47 @@ class EditorTabs extends StatelessComponent {
     var isTutorial = context.watch(isTutorialProvider);
     var isClosed = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.closed));
 
-    return div(
-      id: 'editor-panel-footer',
-      classes: 'editor-tab-host ${isClosed ? ' border-top' : ''}',
-      [
-        div(classes: 'editor-tabs', [
-          div(classes: 'tab-group', [
-            if (isTutorial)
-              EditorTab(
-                id: 'editor-panel-ui-tab',
-                label: 'UI Output',
-                value: OutputTabsState.ui,
-              ),
-            EditorTab(
-              id: 'editor-panel-console-tab',
-              label: 'Console',
-              value: OutputTabsState.console,
-            ),
-            EditorTab(
-              id: 'editor-panel-docs-tab',
-              label: 'Documentation',
-              value: OutputTabsState.docs,
-            ),
-            EditorTab(
-              id: 'editor-panel-issues-tab',
-              label: 'Issues',
-              value: OutputTabsState.issues,
-            ),
-          ]),
-          div(id: 'console-expand-icon-container', [
-            Builder(builder: (context) {
+    return div(id: 'editor-panel-footer', classes: 'editor-tab-host ${isClosed ? ' border-top' : ''}', [
+      div(classes: 'editor-tabs', [
+        div(classes: 'tab-group', [
+          if (isTutorial) EditorTab(id: 'editor-panel-ui-tab', label: 'UI Output', value: OutputTabsState.ui),
+          EditorTab(id: 'editor-panel-console-tab', label: 'Console', value: OutputTabsState.console),
+          EditorTab(id: 'editor-panel-docs-tab', label: 'Documentation', value: OutputTabsState.docs),
+          EditorTab(id: 'editor-panel-issues-tab', label: 'Issues', value: OutputTabsState.issues),
+        ]),
+        div(id: 'console-expand-icon-container', [
+          Builder(
+            builder: (context) {
               var isConsole = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.console));
               return button(
                 id: 'left-console-clear-button',
                 classes: 'console-clear-icon mdc-icon-button',
                 styles: !isConsole ? Styles(visibility: Visibility.hidden) : null,
                 attributes: {'title': 'Clear console'},
-                events: events(onClick: () {
-                  context.read(consoleMessagesProvider.notifier).state = [];
-                }),
+                events: events(
+                  onClick: () {
+                    context.read(consoleMessagesProvider.notifier).state = [];
+                  },
+                ),
                 [],
               );
-            }),
-            button(
-              id: 'editor-panel-close-button',
-              classes: 'mdc-icon-button material-icons',
-              attributes: {if (isClosed) 'hidden': ''},
-              events: events(onClick: () {
+            },
+          ),
+          button(
+            id: 'editor-panel-close-button',
+            classes: 'mdc-icon-button material-icons',
+            attributes: {if (isClosed) 'hidden': ''},
+            events: events(
+              onClick: () {
                 context.read(tabsStateProvider.notifier).state = OutputTabsState.closed;
-              }),
-              [text('close')],
+              },
             ),
-          ]),
+            [text('close')],
+          ),
         ]),
-        div(id: 'editor-panel-tab-host', styles: Styles(overflow: Overflow.scroll), [
-          EditorTabWindow(),
-        ]),
-      ],
-    );
+      ]),
+      div(id: 'editor-panel-tab-host', styles: Styles(overflow: Overflow.scroll), [EditorTabWindow()]),
+    ]);
   }
 }
 
@@ -133,14 +117,16 @@ class EditorTab extends StatelessComponent {
     return button(
       id: id,
       classes: 'editor-tab mdc-button${selected ? ' active' : ''}',
-      events: events(onClick: () {
-        var notifier = context.read(tabsStateProvider.notifier);
-        if (selected) {
-          notifier.state = OutputTabsState.closed;
-        } else {
-          notifier.state = value;
-        }
-      }),
+      events: events(
+        onClick: () {
+          var notifier = context.read(tabsStateProvider.notifier);
+          if (selected) {
+            notifier.state = OutputTabsState.closed;
+          } else {
+            notifier.state = value;
+          }
+        },
+      ),
       [text(label)],
     );
   }
@@ -155,11 +141,7 @@ class EditorTabWindow extends StatelessComponent {
     var isTutorial = context.watch(isTutorialProvider);
 
     return fragment([
-      if (isTutorial)
-        Hidden(
-          hidden: state != OutputTabsState.ui,
-          child: OutputPanel(),
-        ),
+      if (isTutorial) Hidden(hidden: state != OutputTabsState.ui, child: OutputPanel()),
       if (state == OutputTabsState.issues)
         IssuesPanel()
       else if (state == OutputTabsState.console)

@@ -6,12 +6,12 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 class PreferStylesGetterLint extends DartLintRule {
   PreferStylesGetterLint()
-      : super(
-          code: LintCode(
-            name: 'prefer_styles_getter',
-            problemMessage: "Prefer using a getter over a variable declaration for style rules to support hot-reload.",
-          ),
-        );
+    : super(
+        code: LintCode(
+          name: 'prefer_styles_getter',
+          problemMessage: "Prefer using a getter over a variable declaration for style rules to support hot-reload.",
+        ),
+      );
 
   @override
   void run(CustomLintResolver resolver, DiagnosticReporter reporter, CustomLintContext context) {

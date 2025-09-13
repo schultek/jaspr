@@ -4,14 +4,16 @@ import 'package:test/test.dart';
 void main() {
   group('MarkdownParser', () {
     List<Node> parseMarkdown(String content) {
-      return MarkdownParser().parsePage(Page(
-        url: '/test',
-        path: 'test.md',
-        content: content,
-        initialData: {},
-        config: PageConfig(),
-        loader: FilesystemLoader('_'),
-      ));
+      return MarkdownParser().parsePage(
+        Page(
+          url: '/test',
+          path: 'test.md',
+          content: content,
+          initialData: {},
+          config: PageConfig(),
+          loader: FilesystemLoader('_'),
+        ),
+      );
     }
 
     group('Basic Markdown', () {
@@ -20,16 +22,8 @@ void main() {
         expect(
           nodes,
           matchNodes([
-            ElementNode(
-              'h1',
-              {'id': 'hello-world'},
-              [TextNode('Hello World')],
-            ),
-            ElementNode(
-              'p',
-              {},
-              [TextNode('This is a test.')],
-            ),
+            ElementNode('h1', {'id': 'hello-world'}, [TextNode('Hello World')]),
+            ElementNode('p', {}, [TextNode('This is a test.')]),
           ]),
         );
       });
@@ -68,8 +62,8 @@ void main() {
               ElementNode('li', {}, [
                 TextNode('List item 2'),
                 ElementNode('ul', {}, [
-                  ElementNode('li', {}, [TextNode('List item 2.1')])
-                ])
+                  ElementNode('li', {}, [TextNode('List item 2.1')]),
+                ]),
               ]),
             ]),
             ElementNode('p', {}, [
@@ -90,11 +84,11 @@ void main() {
               ElementNode('p', {}, [TextNode('Blockquote text.')]),
             ]),
             ElementNode('pre', {}, [
-              ElementNode('code', {
-                'class': 'language-dart'
-              }, [
-                TextNode("void main() {\n  print('Hello, World!');\n}\n"),
-              ]),
+              ElementNode(
+                'code',
+                {'class': 'language-dart'},
+                [TextNode("void main() {\n  print('Hello, World!');\n}\n")],
+              ),
             ]),
             ElementNode('hr', {}, []),
           ]),
@@ -142,11 +136,7 @@ Some <sub>inline</sub> HTML.<br>Span with <strong>bold</strong> text.
             ElementNode('div', {'class': 'custom-html'}, [TextNode('This is custom HTML.')]),
             ElementNode('p', {}, [TextNode('A normal paragraph.')]),
             ElementNode('pre', {}, [
-              ElementNode('code', {
-                'class': 'language-html'
-              }, [
-                TextNode('<div>HTML code block</div>\n'),
-              ]),
+              ElementNode('code', {'class': 'language-html'}, [TextNode('<div>HTML code block</div>\n')]),
             ]),
             ElementNode('p', {}, [
               TextNode('Some '),
@@ -181,22 +171,26 @@ Some <sub>inline</sub> HTML.<br>Span with <strong>bold</strong> text.
           matchNodes([
             ElementNode('h1', {'id': 'markdown-with-html'}, [TextNode('Markdown with HTML')]),
             ElementNode('div', {'class': 'inline-html'}, [TextNode('This is **not** markdown.')]),
-            ElementNode('div', {
-              'class': 'block-html'
-            }, [
-              ElementNode('p', {}, [
-                TextNode('  This '),
-                ElementNode('strong', {}, [TextNode('is')]),
-                TextNode(' markdown.'),
-              ]),
-            ]),
-            ElementNode('div', {
-              'class': 'quote'
-            }, [
-              ElementNode('blockquote', {}, [
-                ElementNode('p', {}, [TextNode('Some quoted text.')]),
-              ]),
-            ]),
+            ElementNode(
+              'div',
+              {'class': 'block-html'},
+              [
+                ElementNode('p', {}, [
+                  TextNode('  This '),
+                  ElementNode('strong', {}, [TextNode('is')]),
+                  TextNode(' markdown.'),
+                ]),
+              ],
+            ),
+            ElementNode(
+              'div',
+              {'class': 'quote'},
+              [
+                ElementNode('blockquote', {}, [
+                  ElementNode('p', {}, [TextNode('Some quoted text.')]),
+                ]),
+              ],
+            ),
           ]),
         );
       });
@@ -222,16 +216,17 @@ Some text after the image.
             ElementNode('img', {'src': 'image.png', 'alt': 'Image'}, []),
             ElementNode('p', {}, [TextNode('Some text after the image.')]),
             ElementNode('br', {}, []),
-            ElementNode('a', {
-              'href': '/world',
-              'class': 'link'
-            }, [
-              TextNode('\n  '),
-              ElementNode('img', {'src': '/assets/the-world.png', 'alt': 'The World'}, []),
-              TextNode('\n  '),
-              ElementNode('span', {}, [TextNode('Hello world!')]),
-              TextNode('\n'),
-            ]),
+            ElementNode(
+              'a',
+              {'href': '/world', 'class': 'link'},
+              [
+                TextNode('\n  '),
+                ElementNode('img', {'src': '/assets/the-world.png', 'alt': 'The World'}, []),
+                TextNode('\n  '),
+                ElementNode('span', {}, [TextNode('Hello world!')]),
+                TextNode('\n'),
+              ],
+            ),
           ]),
         );
       });
@@ -246,8 +241,11 @@ Content after comment and processing instruction.
         expect(
           nodes,
           matchNodes([
-            ElementNode('h1', {'id': 'html-comments-and-processing-instructions'},
-                [TextNode('HTML Comments and Processing Instructions')]),
+            ElementNode(
+              'h1',
+              {'id': 'html-comments-and-processing-instructions'},
+              [TextNode('HTML Comments and Processing Instructions')],
+            ),
             TextNode('<!-- This is a comment -->', raw: true),
             TextNode('\n'),
             TextNode('<!--php echo "Hello, World!"; -->', raw: true),
@@ -270,12 +268,13 @@ Content after comment and processing instruction.
           nodes,
           matchNodes([
             ElementNode('h1', {'id': 'html-with-line-breaks'}, [TextNode('HTML with Line-Breaks')]),
-            ElementNode('div', {
-              'id': 'foo',
-              'class': 'bar'
-            }, [
-              ElementNode('p', {}, [TextNode('  Some content here.')]),
-            ]),
+            ElementNode(
+              'div',
+              {'id': 'foo', 'class': 'bar'},
+              [
+                ElementNode('p', {}, [TextNode('  Some content here.')]),
+              ],
+            ),
           ]),
         );
       });
@@ -298,11 +297,7 @@ void method<T>(T t) {
             ElementNode('h1', {'id': 'code-blocks-in-html'}, [TextNode('Code Blocks in HTML')]),
             ElementNode('div', {}, [
               ElementNode('pre', {}, [
-                ElementNode('code', {
-                  'class': 'language-dart'
-                }, [
-                  TextNode('void method<T>(T t) {\n  print(t);\n}\n'),
-                ]),
+                ElementNode('code', {'class': 'language-dart'}, [TextNode('void method<T>(T t) {\n  print(t);\n}\n')]),
               ]),
             ]),
           ]),
@@ -313,9 +308,7 @@ void method<T>(T t) {
 }
 
 Matcher matchNodes(List<Node> expected) {
-  return equals([
-    for (final node in expected) matchNode(node),
-  ]);
+  return equals([for (final node in expected) matchNode(node)]);
 }
 
 Matcher matchNode(Node expected) {

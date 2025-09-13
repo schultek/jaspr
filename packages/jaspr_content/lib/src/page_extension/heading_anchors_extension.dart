@@ -9,9 +9,7 @@ import 'page_extension.dart';
 ///
 /// The resulting anchor links are appended to the headers as a clickable '#' symbol.
 class HeadingAnchorsExtension implements PageExtension {
-  HeadingAnchorsExtension({
-    this.maxHeaderDepth = 3,
-  });
+  HeadingAnchorsExtension({this.maxHeaderDepth = 3});
 
   /// The maximum header depth to generate anchors for.
   final int maxHeaderDepth;
@@ -21,9 +19,7 @@ class HeadingAnchorsExtension implements PageExtension {
   @override
   Future<List<Node>> apply(Page page, List<Node> nodes) async {
     return [
-      ComponentNode(Document.head(children: [
-        Style(styles: _styles),
-      ])),
+      ComponentNode(Document.head(children: [Style(styles: _styles)])),
       for (final node in nodes) _processNode(node),
     ];
   }
@@ -46,16 +42,21 @@ class HeadingAnchorsExtension implements PageExtension {
 
     final children = node.children;
 
-    return ElementNode(node.tag, {
-      ...node.attributes,
-      'anchor': 'true'
-    }, [
-      ElementNode('span', {}, children),
-      ComponentNode(Builder(builder: (context) {
-        var route = RouteState.of(context);
-        return a(href: '${route.path}#$id', [text('#')]);
-      })),
-    ]);
+    return ElementNode(
+      node.tag,
+      {...node.attributes, 'anchor': 'true'},
+      [
+        ElementNode('span', {}, children),
+        ComponentNode(
+          Builder(
+            builder: (context) {
+              var route = RouteState.of(context);
+              return a(href: '${route.path}#$id', [text('#')]);
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   Node _processChildren(Node node) {
@@ -66,24 +67,20 @@ class HeadingAnchorsExtension implements PageExtension {
   }
 
   List<StyleRule> get _styles => [
-        css(':is(h1, h2, h3, h4, h5, h6)[anchor="true"]', [
-          css('&').styles(
-            display: Display.flex,
-            alignItems: AlignItems.baseline,
-            gap: Gap(column: 0.5.rem),
-          ),
-          css('> a').styles(
-            textDecoration: TextDecoration.none,
-            opacity: 0,
-            fontSize: 0.8.em,
-            transition: Transition('opacity', duration: 300),
-          ),
-          css('&:hover > a').styles(
-            opacity: 0.8,
-          ),
-          css('& > a:hover').styles(
-            opacity: 1,
-          ),
-        ]),
-      ];
+    css(':is(h1, h2, h3, h4, h5, h6)[anchor="true"]', [
+      css('&').styles(
+        display: Display.flex,
+        alignItems: AlignItems.baseline,
+        gap: Gap(column: 0.5.rem),
+      ),
+      css('> a').styles(
+        textDecoration: TextDecoration.none,
+        opacity: 0,
+        fontSize: 0.8.em,
+        transition: Transition('opacity', duration: 300),
+      ),
+      css('&:hover > a').styles(opacity: 0.8),
+      css('& > a:hover').styles(opacity: 1),
+    ]),
+  ];
 }

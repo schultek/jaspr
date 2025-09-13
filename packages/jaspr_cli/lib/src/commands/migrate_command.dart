@@ -10,21 +10,9 @@ import 'base_command.dart';
 
 class MigrateCommand extends BaseCommand {
   MigrateCommand({super.logger}) {
-    argParser.addFlag(
-      'dry-run',
-      help: 'Preview the proposed changes but make no changes.',
-      defaultsTo: false,
-    );
-    argParser.addFlag(
-      'apply',
-      help: 'Apply the proposed changes.',
-      defaultsTo: false,
-    );
-    argParser.addOption(
-      'assume-version',
-      help: 'Set the projects Jaspr version and skip auto-detection.',
-      hide: true,
-    );
+    argParser.addFlag('dry-run', help: 'Preview the proposed changes but make no changes.', defaultsTo: false);
+    argParser.addFlag('apply', help: 'Apply the proposed changes.', defaultsTo: false);
+    argParser.addOption('assume-version', help: 'Set the projects Jaspr version and skip auto-detection.', hide: true);
     argParser.addMultiOption(
       'include-dir',
       help: 'Include the specified directory for migration (can be used multiple times).',
@@ -47,10 +35,7 @@ class MigrateCommand extends BaseCommand {
   late final String? assumeVersion = argResults!['assume-version'] as String?;
   late final List<String> includeDirs = List<String>.from(argResults!['include-dir'] as List);
 
-  static List<Migration> get allMigrations => [
-        BuildMethodMigration(),
-        ComponentFactoryMigration(),
-      ];
+  static List<Migration> get allMigrations => [BuildMethodMigration(), ComponentFactoryMigration()];
 
   @override
   Future<int> runCommand() async {
@@ -58,7 +43,8 @@ class MigrateCommand extends BaseCommand {
       ensureInProject(requireJasprMode: false, preferBuilderDependency: false);
     }
 
-    final currentJasprVersion = assumeVersion ??
+    final currentJasprVersion =
+        assumeVersion ??
         switch (project.pubspecLock) {
           {'packages': {'jaspr': {'version': String version}}} => version,
           _ => '',
@@ -66,8 +52,9 @@ class MigrateCommand extends BaseCommand {
 
     if (currentJasprVersion.isEmpty) {
       logger.write(
-          'Could not determine current Jaspr version from pubspec.lock. Run with --assume-version=x.y.z to set a version manually.',
-          level: Level.critical);
+        'Could not determine current Jaspr version from pubspec.lock. Run with --assume-version=x.y.z to set a version manually.',
+        level: Level.critical,
+      );
       return 1;
     }
 
@@ -81,8 +68,10 @@ class MigrateCommand extends BaseCommand {
     }
 
     if (!apply && !dryRun) {
-      stdout.write('Available migrations:\n\n'
-          '${migrations.map((m) => '  ${m.name} · ${m.description}\n${m.hint}').join('\n\n')}\n\n');
+      stdout.write(
+        'Available migrations:\n\n'
+        '${migrations.map((m) => '  ${m.name} · ${m.description}\n${m.hint}').join('\n\n')}\n\n',
+      );
 
       stdout.write('Run with --dry-run to preview all migration changes or --apply to apply them.');
 

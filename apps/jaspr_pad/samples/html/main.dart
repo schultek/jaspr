@@ -34,11 +34,11 @@ class App extends StatelessComponent {
         },
         [
           option(value: 'test', [text('Select me!')]),
-          option(value: 'other', selected: true, [text('Or me!')])
+          option(value: 'other', selected: true, [text('Or me!')]),
         ],
       ),
       // most common and some uncommon elements are supported
-      progress(value: 85, max: 100, [])
+      progress(value: 85, max: 100, []),
     ]);
   }
 }

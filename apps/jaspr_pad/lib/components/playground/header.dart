@@ -4,6 +4,7 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import '../../providers/logic_provider.dart';
 import '../../providers/project_provider.dart';
 import '../../providers/samples_provider.dart';
+import '../../providers/utils.dart';
 import '../dialogs/new_pad_dialog.dart';
 import '../dialogs/reset_dialog.dart';
 import '../elements/button.dart';
@@ -59,10 +60,12 @@ class PlaygroundHeader extends StatelessComponent {
           },
         ),
       ]),
-      Builder(builder: (context) {
-        var name = context.watch(projectNameProvider);
-        return div(classes: 'header-gist-name', [text(name ?? '')]);
-      }),
+      Builder(
+        builder: (context) {
+          var name = context.watch(projectNameProvider);
+          return div(classes: 'header-gist-name', [text(name ?? '')]);
+        },
+      ),
       Button(
         dense: true,
         raised: true,
@@ -88,28 +91,32 @@ class PlaygroundHeader extends StatelessComponent {
             ),
           ]),
         ],
-      )
+      ),
     ]);
   }
 }
 
-class SamplesMenuButton extends StatelessComponent with SyncProviderDependencies {
+class SamplesMenuButton extends StatelessComponent {
   const SamplesMenuButton({super.key});
 
   @override
-  Iterable<SyncProvider> get preloadDependencies => [syncSamplesProvider];
-
-  @override
   Component build(BuildContext context) {
-    var samples = context.watch(syncSamplesProvider).valueOrNull ?? [];
-
-    return Menu(
-      items: [
-        for (var sample in samples) MenuItem(label: sample.description),
+    return ProviderScope(
+      sync: [
+        syncSamplesProvider.syncWith('samples', codec: MapperCodec()),
       ],
-      onItemSelected: (index) {
-        context.read(logicProvider).selectSample(samples[index]);
-      },
+      child: Builder(
+        builder: (context) {
+          var samples = context.watch(syncSamplesProvider);
+
+          return Menu(
+            items: [for (var sample in samples) MenuItem(label: sample.description)],
+            onItemSelected: (index) {
+              context.read(logicProvider).selectSample(samples[index]);
+            },
+          );
+        },
+      ),
     );
   }
 }

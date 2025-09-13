@@ -7,11 +7,7 @@ import '_internal/tab_bar.dart';
 class Tabs implements CustomComponent {
   const Tabs();
 
-  static Component from({
-    String? defaultValue,
-    required List<TabItem> items,
-    Key? key,
-  }) {
+  static Component from({String? defaultValue, required List<TabItem> items, Key? key}) {
     return _Tabs(defaultValue: defaultValue, items: items, key: key);
   }
 
@@ -40,13 +36,10 @@ class Tabs implements CustomComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('.tabs', [
-          css('.tab-content', [
-            css('&').styles(display: Display.none),
-            css('&[active]').styles(display: Display.initial),
-          ])
-        ]),
-      ];
+    css('.tabs', [
+      css('.tab-content', [css('&').styles(display: Display.none), css('&[active]').styles(display: Display.initial)]),
+    ]),
+  ];
 }
 
 class _Tabs extends StatelessComponent {
@@ -76,12 +69,7 @@ class _Tabs extends StatelessComponent {
 }
 
 class TabItem extends StatelessComponent {
-  const TabItem({
-    required this.label,
-    required this.value,
-    required this.child,
-    super.key,
-  });
+  const TabItem({required this.label, required this.value, required this.child, super.key});
 
   /// The label of the tab.
   final String label;

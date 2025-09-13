@@ -6,17 +6,19 @@ part of 'html.dart';
 /// - [disabled]: Prevents the user from interacting with the button: it cannot be pressed or focused.
 /// - [type]: The default behavior of the button.
 /// - [onClick]: Callback for the 'click' event.
-Component button(List<Component> children,
-    {bool? autofocus,
-    bool? disabled,
-    ButtonType? type,
-    VoidCallback? onClick,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component button(
+  List<Component> children, {
+  bool? autofocus,
+  bool? disabled,
+  ButtonType? type,
+  VoidCallback? onClick,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'button',
     key: key,
@@ -27,7 +29,7 @@ Component button(List<Component> children,
       ...?attributes,
       if (autofocus == true) 'autofocus': '',
       if (disabled == true) 'disabled': '',
-      if (type != null) 'type': type.value,
+      'type': ?type?.value,
     },
     events: {
       ...?events,
@@ -63,20 +65,22 @@ enum ButtonType {
 /// - [name]: The name of the form. The value must not be the empty string, and must be unique among the form elements in the forms collection that it is in, if any.
 /// - [noValidate]: Indicates that the form shouldn't be validated when submitted. If this attribute is not set (and therefore the form is validated), it can be overridden by a formnovalidate attribute on a &lt;button&gt;, &lt;input type="submit"&gt;, or &lt;input type="image"&gt; element belonging to the form.
 /// - [target]: Indicates where to display the response after submitting the form. In HTML 4, this is the name/keyword for a frame. In HTML5, it is a name/keyword for a browsing context (for example, tab, window, or iframe).
-Component form(List<Component> children,
-    {String? action,
-    FormMethod? method,
-    FormEncType? encType,
-    AutoComplete? autoComplete,
-    String? name,
-    bool? noValidate,
-    Target? target,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component form(
+  List<Component> children, {
+  String? action,
+  FormMethod? method,
+  FormEncType? encType,
+  AutoComplete? autoComplete,
+  String? name,
+  bool? noValidate,
+  Target? target,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'form',
     key: key,
@@ -85,13 +89,13 @@ Component form(List<Component> children,
     styles: styles,
     attributes: {
       ...?attributes,
-      if (action != null) 'action': action,
-      if (method != null) 'method': method.value,
-      if (encType != null) 'enctype': encType.value,
-      if (autoComplete != null) 'autocomplete': autoComplete.value,
-      if (name != null) 'name': name,
+      'action': ?action,
+      'method': ?method?.value,
+      'enctype': ?encType?.value,
+      'autocomplete': ?autoComplete?.value,
+      'name': ?name,
       if (noValidate == true) 'novalidate': '',
-      if (target != null) 'target': target.value,
+      'target': ?target?.value,
     },
     events: events,
     children: children,
@@ -148,19 +152,20 @@ enum AutoComplete {
 /// - [disabled]: Indicates that the user should not be able to interact with the input. Disabled inputs are typically rendered with a dimmer color or using some other form of indication that the field is not available for use.
 /// - [onInput]: Callback for the 'input' event. The type of [value] depends on [type].
 /// - [onChange]: Callback for the 'change' event. The type of [value] depends on [type].
-Component input(
-    {InputType? type,
-    String? name,
-    String? value,
-    bool? disabled,
-    ValueChanged<dynamic>? onInput,
-    ValueChanged<dynamic>? onChange,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component input({
+  InputType? type,
+  String? name,
+  String? value,
+  bool? disabled,
+  ValueChanged<dynamic>? onInput,
+  ValueChanged<dynamic>? onChange,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'input',
     key: key,
@@ -169,9 +174,9 @@ Component input(
     styles: styles,
     attributes: {
       ...?attributes,
-      if (type != null) 'type': type.value,
-      if (name != null) 'name': name,
-      if (value != null) 'value': value,
+      'type': ?type?.value,
+      'name': ?name,
+      'value': ?value,
       if (disabled == true) 'disabled': '',
     },
     events: {
@@ -256,14 +261,16 @@ enum InputType {
 /// The &lt;label&gt; HTML element represents a caption for an item in a user interface.
 ///
 /// - [htmlFor]: The value of the for attribute must be a single id for a labelable form-related element in the same document as the &lt;label&gt; element. So, any given label element can be associated with only one form control.
-Component label(List<Component> children,
-    {String? htmlFor,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component label(
+  List<Component> children, {
+  String? htmlFor,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'label',
     key: key,
@@ -272,7 +279,7 @@ Component label(List<Component> children,
     styles: styles,
     attributes: {
       ...?attributes,
-      if (htmlFor != null) 'for': htmlFor,
+      'for': ?htmlFor,
     },
     events: events,
     children: children,
@@ -280,13 +287,15 @@ Component label(List<Component> children,
 }
 
 /// The &lt;datalist&gt; HTML element contains a set of &lt;option&gt; elements that represent the permissible or recommended options available to choose from within other controls.
-Component datalist(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component datalist(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'datalist',
     key: key,
@@ -300,13 +309,15 @@ Component datalist(List<Component> children,
 }
 
 /// The &lt;legend&gt; HTML element represents a caption for the content of its parent &lt;fieldset&gt;.
-Component legend(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component legend(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'legend',
     key: key,
@@ -327,19 +338,21 @@ Component legend(List<Component> children,
 /// - [low]: The upper numeric bound of the low end of the measured range. This must be greater than the minimum value (min attribute), and it also must be less than the high value and maximum value (high attribute and max attribute, respectively), if any are specified. If unspecified, or if less than the minimum value, the low value is equal to the minimum value.
 /// - [high]: The lower numeric bound of the high end of the measured range. This must be less than the maximum value (max attribute), and it also must be greater than the low value and minimum value (low attribute and min attribute, respectively), if any are specified. If unspecified, or if greater than the maximum value, the high value is equal to the maximum value.
 /// - [optimum]: Indicates the optimal numeric value. It must be within the range (as defined by the min attribute and max attribute). When used with the low attribute and high attribute, it gives an indication where along the range is considered preferable. For example, if it is between the min attribute and the low attribute, then the lower range is considered preferred. The browser may color the meter's bar differently depending on whether the value is less than or equal to the optimum value.
-Component meter(List<Component> children,
-    {double? value,
-    double? min,
-    double? max,
-    double? low,
-    double? high,
-    double? optimum,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component meter(
+  List<Component> children, {
+  double? value,
+  double? min,
+  double? max,
+  double? low,
+  double? high,
+  double? optimum,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'meter',
     key: key,
@@ -348,12 +361,12 @@ Component meter(List<Component> children,
     styles: styles,
     attributes: {
       ...?attributes,
-      if (value != null) 'value': '$value',
-      if (min != null) 'min': '$min',
-      if (max != null) 'max': '$max',
-      if (low != null) 'low': '$low',
-      if (high != null) 'high': '$high',
-      if (optimum != null) 'optimum': '$optimum',
+      'value': ?value?.toString(),
+      'min': ?min?.toString(),
+      'max': ?max?.toString(),
+      'low': ?low?.toString(),
+      'high': ?high?.toString(),
+      'optimum': ?optimum?.toString(),
     },
     events: events,
     children: children,
@@ -364,15 +377,17 @@ Component meter(List<Component> children,
 ///
 /// - [value]: This attribute specifies how much of the task that has been completed. It must be a valid floating point number between 0 and max, or between 0 and 1 if max is omitted. If there is no value attribute, the progress bar is indeterminate; this indicates that an activity is ongoing with no indication of how long it is expected to take.
 /// - [max]: This attribute describes how much work the task indicated by the progress element requires. The max attribute, if present, must have a value greater than 0 and be a valid floating point number. The default value is 1.
-Component progress(List<Component> children,
-    {double? value,
-    double? max,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component progress(
+  List<Component> children, {
+  double? value,
+  double? max,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'progress',
     key: key,
@@ -381,8 +396,8 @@ Component progress(List<Component> children,
     styles: styles,
     attributes: {
       ...?attributes,
-      if (value != null) 'value': '$value',
-      if (max != null) 'max': '$max',
+      'value': ?value?.toString(),
+      'max': ?max?.toString(),
     },
     events: events,
     children: children,
@@ -393,15 +408,17 @@ Component progress(List<Component> children,
 ///
 /// - [label]: The name of the group of options, which the browser can use when labeling the options in the user interface.
 /// - [disabled]: If this attribute is set, none of the items in this option group is selectable. Often browsers grey out such control and it won't receive any browsing events, like mouse clicks or focus-related ones.
-Component optgroup(List<Component> children,
-    {required String label,
-    bool? disabled,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component optgroup(
+  List<Component> children, {
+  required String label,
+  bool? disabled,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'optgroup',
     key: key,
@@ -424,17 +441,19 @@ Component optgroup(List<Component> children,
 /// - [value]: The content of this attribute represents the value to be submitted with the form, should this option be selected. If this attribute is omitted, the value is taken from the text content of the option element.
 /// - [selected]: Indicates that the option is initially selected. If the &lt;option&gt; element is the descendant of a &lt;select&gt; element whose multiple attribute is not set, only one single &lt;option&gt; of this &lt;select&gt; element may have the selected attribute.
 /// - [disabled]: If this attribute is set, this option is not checkable. Often browsers grey out such control and it won't receive any browsing event, like mouse clicks or focus-related ones. If this attribute is not set, the element can still be disabled if one of its ancestors is a disabled &lt;optgroup&gt; element.
-Component option(List<Component> children,
-    {String? label,
-    String? value,
-    bool? selected,
-    bool? disabled,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component option(
+  List<Component> children, {
+  String? label,
+  String? value,
+  bool? selected,
+  bool? disabled,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'option',
     key: key,
@@ -443,8 +462,8 @@ Component option(List<Component> children,
     styles: styles,
     attributes: {
       ...?attributes,
-      if (label != null) 'label': label,
-      if (value != null) 'value': value,
+      'label': ?label,
+      'value': ?value,
       if (selected == true) 'selected': '',
       if (disabled == true) 'disabled': '',
     },
@@ -465,23 +484,25 @@ Component option(List<Component> children,
 /// - [size]: If the control is presented as a scrolling list box (e.g. when multiple is specified), this attribute represents the number of rows in the list that should be visible at one time. Browsers are not required to present a select element as a scrolled list box. The default value is 0.
 /// - [onInput]: Callback for the 'input' event.
 /// - [onChange]: Callback for the 'change' event.
-Component select(List<Component> children,
-    {String? name,
-    String? value,
-    bool? multiple,
-    bool? required,
-    bool? disabled,
-    bool? autofocus,
-    String? autocomplete,
-    int? size,
-    ValueChanged<List<String>>? onInput,
-    ValueChanged<List<String>>? onChange,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component select(
+  List<Component> children, {
+  String? name,
+  String? value,
+  bool? multiple,
+  bool? required,
+  bool? disabled,
+  bool? autofocus,
+  String? autocomplete,
+  int? size,
+  ValueChanged<List<String>>? onInput,
+  ValueChanged<List<String>>? onChange,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'select',
     key: key,
@@ -490,14 +511,14 @@ Component select(List<Component> children,
     styles: styles,
     attributes: {
       ...?attributes,
-      if (name != null) 'name': name,
-      if (value != null) 'value': value,
+      'name': ?name,
+      'value': ?value,
       if (multiple == true) 'multiple': '',
       if (required == true) 'required': '',
       if (disabled == true) 'disabled': '',
       if (autofocus == true) 'autofocus': '',
-      if (autocomplete != null) 'autocomplete': autocomplete,
-      if (size != null) 'size': '$size',
+      'autocomplete': ?autocomplete,
+      'size': ?size?.toString(),
     },
     events: {
       ...?events,
@@ -511,15 +532,17 @@ Component select(List<Component> children,
 ///
 /// - [name]: The name associated with the group.
 /// - [disabled]: If this Boolean attribute is set, all form controls that are descendants of the &lt;fieldset&gt;, are disabled, meaning they are not editable and won't be submitted along with the &lt;form&gt;. They won't receive any browsing events, like mouse clicks or focus-related events. By default browsers display such controls grayed out. Note that form elements inside the &lt;legend&gt; element won't be disabled.
-Component fieldset(List<Component> children,
-    {String? name,
-    bool? disabled,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component fieldset(
+  List<Component> children, {
+  String? name,
+  bool? disabled,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'fieldset',
     key: key,
@@ -528,7 +551,7 @@ Component fieldset(List<Component> children,
     styles: styles,
     attributes: {
       ...?attributes,
-      if (name != null) 'name': name,
+      'name': ?name,
       if (disabled == true) 'disabled': '',
     },
     events: events,
@@ -552,27 +575,29 @@ Component fieldset(List<Component> children,
 /// - [wrap]: Indicates how the control wraps text. If this attribute is not specified, soft is its default value.
 /// - [onInput]: Callback for the 'input' event.
 /// - [onChange]: Callback for the 'change' event.
-Component textarea(List<Component> children,
-    {AutoComplete? autoComplete,
-    bool? autofocus,
-    int? cols,
-    bool? disabled,
-    int? minLength,
-    String? name,
-    String? placeholder,
-    bool? readonly,
-    bool? required,
-    int? rows,
-    SpellCheck? spellCheck,
-    TextWrap? wrap,
-    ValueChanged<String>? onInput,
-    ValueChanged<String>? onChange,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component textarea(
+  List<Component> children, {
+  AutoComplete? autoComplete,
+  bool? autofocus,
+  int? cols,
+  bool? disabled,
+  int? minLength,
+  String? name,
+  String? placeholder,
+  bool? readonly,
+  bool? required,
+  int? rows,
+  SpellCheck? spellCheck,
+  TextWrap? wrap,
+  ValueChanged<String>? onInput,
+  ValueChanged<String>? onChange,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'textarea',
     key: key,
@@ -581,18 +606,18 @@ Component textarea(List<Component> children,
     styles: styles,
     attributes: {
       ...?attributes,
-      if (autoComplete != null) 'autocomplete': autoComplete.value,
+      'autocomplete': ?autoComplete?.value,
       if (autofocus == true) 'autofocus': '',
-      if (cols != null) 'cols': '$cols',
+      'cols': ?cols?.toString(),
       if (disabled == true) 'disabled': '',
-      if (minLength != null) 'minlength': '$minLength',
-      if (name != null) 'name': name,
-      if (placeholder != null) 'placeholder': placeholder,
+      'minlength': ?minLength?.toString(),
+      'name': ?name,
+      'placeholder': ?placeholder,
       if (readonly == true) 'readonly': '',
       if (required == true) 'required': '',
-      if (rows != null) 'rows': '$rows',
-      if (spellCheck != null) 'spellcheck': spellCheck.value,
-      if (wrap != null) 'wrap': wrap.value,
+      'rows': ?rows?.toString(),
+      'spellcheck': ?spellCheck?.value,
+      'wrap': ?wrap?.value,
     },
     events: {
       ...?events,

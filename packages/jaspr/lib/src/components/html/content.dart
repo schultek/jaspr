@@ -1,13 +1,15 @@
 part of 'html.dart';
 
 /// The &lt;article&gt; HTML element represents a self-contained composition in a document, page, application, or site, which is intended to be independently distributable or reusable (e.g., in syndication). Examples include: a forum post, a magazine or newspaper article, or a blog entry, a product card, a user-submitted comment, an interactive widget or gadget, or any other independent item of content.
-Component article(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component article(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'article',
     key: key,
@@ -21,13 +23,15 @@ Component article(List<Component> children,
 }
 
 /// The &lt;aside&gt; HTML element represents a portion of a document whose content is only indirectly related to the document's main content. Asides are frequently presented as sidebars or call-out boxes.
-Component aside(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component aside(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'aside',
     key: key,
@@ -41,13 +45,15 @@ Component aside(List<Component> children,
 }
 
 /// The &lt;body&gt; HTML element represents the content of an HTML document. There can be only one &lt;body&gt; element in a document.
-Component body(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component body(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'body',
     key: key,
@@ -61,13 +67,15 @@ Component body(List<Component> children,
 }
 
 /// The &lt;footer&gt; HTML element represents a footer for its nearest ancestor sectioning content or sectioning root element. A &lt;footer&gt; typically contains information about the author of the section, copyright data or links to related documents.
-Component footer(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component footer(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'footer',
     key: key,
@@ -81,13 +89,15 @@ Component footer(List<Component> children,
 }
 
 /// The &lt;head&gt; HTML element contains machine-readable information (metadata) about the document, like its title, scripts, and style sheets.
-Component head(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component head(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'head',
     key: key,
@@ -101,13 +111,15 @@ Component head(List<Component> children,
 }
 
 /// The &lt;header&gt; HTML element represents introductory content, typically a group of introductory or navigational aids. It may contain some heading elements but also a logo, a search form, an author name, and other elements.
-Component header(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component header(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'header',
     key: key,
@@ -121,13 +133,15 @@ Component header(List<Component> children,
 }
 
 /// The &lt;html&gt; HTML element represents the root (top-level element) of an HTML document, so it is also referred to as the root element. All other elements must be descendants of this element.
-Component html(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component html(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'html',
     key: key,
@@ -141,13 +155,15 @@ Component html(List<Component> children,
 }
 
 /// The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest.
-Component h1(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component h1(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'h1',
     key: key,
@@ -161,13 +177,15 @@ Component h1(List<Component> children,
 }
 
 /// The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest.
-Component h2(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component h2(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'h2',
     key: key,
@@ -181,13 +199,15 @@ Component h2(List<Component> children,
 }
 
 /// The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest.
-Component h3(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component h3(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'h3',
     key: key,
@@ -201,13 +221,15 @@ Component h3(List<Component> children,
 }
 
 /// The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest.
-Component h4(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component h4(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'h4',
     key: key,
@@ -221,13 +243,15 @@ Component h4(List<Component> children,
 }
 
 /// The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest.
-Component h5(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component h5(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'h5',
     key: key,
@@ -241,13 +265,15 @@ Component h5(List<Component> children,
 }
 
 /// The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest.
-Component h6(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component h6(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'h6',
     key: key,
@@ -261,13 +287,15 @@ Component h6(List<Component> children,
 }
 
 /// The &lt;main&gt; HTML element represents the primary content of a document, distinct from content that is repeated across multiple pages such as site headers, footers, and navigation bars.
-Component main_(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component main_(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'main',
     key: key,
@@ -281,13 +309,15 @@ Component main_(List<Component> children,
 }
 
 /// The &lt;nav&gt; HTML element represents a section of a page whose purpose is to provide navigation links, either within the current document or to other documents. Common examples of navigation sections are menus, tables of contents, and indexes.
-Component nav(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component nav(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'nav',
     key: key,
@@ -301,13 +331,15 @@ Component nav(List<Component> children,
 }
 
 /// The &lt;section&gt; HTML element represents a generic standalone section of a document, which doesn't have a more specific semantic element to represent it. Sections should always have a heading, with very few exceptions.
-Component section(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component section(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'section',
     key: key,
@@ -323,14 +355,16 @@ Component section(List<Component> children,
 /// The &lt;blockquote&gt; HTML element indicates that the enclosed text is an extended quotation. Usually, this is rendered visually by indentation. A URL for the source of the quotation may be given using the cite attribute, while a text representation of the source can be given using the &lt;cite&gt; element.
 ///
 /// - [cite]: A URL that designates a source document or message for the information quoted. This attribute is intended to point to information explaining the context or the reference for the quote.
-Component blockquote(List<Component> children,
-    {String? cite,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component blockquote(
+  List<Component> children, {
+  String? cite,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'blockquote',
     key: key,
@@ -339,7 +373,7 @@ Component blockquote(List<Component> children,
     styles: styles,
     attributes: {
       ...?attributes,
-      if (cite != null) 'cite': cite,
+      'cite': ?cite,
     },
     events: events,
     children: children,
@@ -347,13 +381,15 @@ Component blockquote(List<Component> children,
 }
 
 /// The &lt;div&gt; HTML element is the generic container for flow content. It has no effect on the content or layout until styled in some way using CSS (e.g. styling is directly applied to it, or some kind of layout model like Flexbox is applied to its parent element).
-Component div(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component div(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'div',
     key: key,
@@ -367,13 +403,15 @@ Component div(List<Component> children,
 }
 
 /// The &lt;ul&gt; HTML element represents an unordered list of items, typically rendered as a bulleted list.
-Component ul(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component ul(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'ul',
     key: key,
@@ -392,16 +430,18 @@ Component ul(List<Component> children,
 /// - [start]: An integer to start counting from for the list items. Always an Arabic numeral (1, 2, 3, etc.), even when the numbering type is letters or Roman numerals. For example, to start numbering elements from the letter "d" or the Roman numeral "iv," use start="4".
 /// - [type]: Sets the numbering type.
 ///   The specified type is used for the entire list unless a different type attribute is used on an enclosed &lt;li&gt; element.
-Component ol(List<Component> children,
-    {bool? reversed,
-    int? start,
-    NumberingType? type,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component ol(
+  List<Component> children, {
+  bool? reversed,
+  int? start,
+  NumberingType? type,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'ol',
     key: key,
@@ -411,8 +451,8 @@ Component ol(List<Component> children,
     attributes: {
       ...?attributes,
       if (reversed == true) 'reversed': '',
-      if (start != null) 'start': '$start',
-      if (type != null) 'type': type.value,
+      'start': ?start?.toString(),
+      'type': ?type?.value,
     },
     events: events,
     children: children,
@@ -443,14 +483,16 @@ enum NumberingType {
 /// The &lt;li&gt; HTML element is used to represent an item in a list. It must be contained in a parent element: an ordered list (&lt;ol&gt;), an unordered list (&lt;ul&gt;), or a menu (&lt;menu&gt;). In menus and unordered lists, list items are usually displayed using bullet points. In ordered lists, they are usually displayed with an ascending counter on the left, such as a number or letter.
 ///
 /// - [value]: This integer attribute indicates the current ordinal value of the list item as defined by the &lt;ol&gt; element. The only allowed value for this attribute is a number, even if the list is displayed with Roman numerals or letters. List items that follow this one continue numbering from the value set. The value attribute has no meaning for unordered lists (&lt;ul&gt;) or for menus (&lt;menu&gt;).
-Component li(List<Component> children,
-    {int? value,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component li(
+  List<Component> children, {
+  int? value,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'li',
     key: key,
@@ -459,7 +501,7 @@ Component li(List<Component> children,
     styles: styles,
     attributes: {
       ...?attributes,
-      if (value != null) 'value': '$value',
+      'value': ?value?.toString(),
     },
     events: events,
     children: children,
@@ -467,13 +509,14 @@ Component li(List<Component> children,
 }
 
 /// The &lt;hr&gt; HTML element represents a thematic break between paragraph-level elements: for example, a change of scene in a story, or a shift of topic within a section.
-Component hr(
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component hr({
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'hr',
     key: key,
@@ -486,13 +529,15 @@ Component hr(
 }
 
 /// The &lt;p&gt; HTML element represents a paragraph. Paragraphs are usually represented in visual media as blocks of text separated from adjacent blocks by blank lines and/or first-line indentation, but HTML paragraphs can be any structural grouping of related content, such as images or form fields.
-Component p(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component p(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'p',
     key: key,
@@ -506,13 +551,15 @@ Component p(List<Component> children,
 }
 
 /// The &lt;pre&gt; HTML element represents preformatted text which is to be presented exactly as written in the HTML file. The text is typically rendered using a non-proportional, or monospaced, font. Whitespace inside this element is displayed as written.
-Component pre(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component pre(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'pre',
     key: key,

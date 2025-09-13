@@ -54,9 +54,7 @@ class TabBarState extends State<TabBar> {
                 for (var i = 0; i < component.tabs.length; i++)
                   ProviderScope(
                     key: ValueKey('tab-provider'),
-                    overrides: [
-                      _tabProvider.overrideWithValue((i == component.selected, i, () => _select(i))),
-                    ],
+                    overrides: [_tabProvider.overrideWithValue((i == component.selected, i, () => _select(i)))],
                     child: component.tabs[i],
                   ),
               ]),
@@ -79,11 +77,10 @@ class ButtonTab extends Tab {
     return button(
       classes: 'mdc-tab',
       events: {'click': (e) => onPressed()},
-      attributes: {
-        'role': 'tab',
-        'tabindex': '0',
-      },
-      styles: Styles(padding: Padding.symmetric(vertical: Unit.zero, horizontal: 16.px)),
+      attributes: {'role': 'tab', 'tabindex': '0'},
+      styles: Styles(
+        padding: Padding.symmetric(vertical: Unit.zero, horizontal: 16.px),
+      ),
       [
         span(classes: 'mdc-tab__content', [
           span(
@@ -92,7 +89,10 @@ class ButtonTab extends Tab {
             [
               i(
                 classes: 'material-icons mdc-tab__icon',
-                styles: Styles(margin: Margin.only(right: this.label.isNotEmpty ? 4.px : null), fontSize: 20.px),
+                styles: Styles(
+                  margin: Margin.only(right: this.label.isNotEmpty ? 4.px : null),
+                  fontSize: 20.px,
+                ),
                 [text(icon)],
               ),
               text(this.label),
@@ -120,11 +120,7 @@ class Tab extends StatelessComponent {
     return button(
       classes: 'mdc-tab ${selected ? ' mdc-tab--active' : ''}',
       events: {'click': (e) => onSelect()},
-      attributes: {
-        'role': 'tab',
-        'tabindex': '$index',
-        if (selected) 'aria-selected': "true",
-      },
+      attributes: {'role': 'tab', 'tabindex': '$index', if (selected) 'aria-selected': "true"},
       [
         span(classes: 'mdc-tab__content', [
           span(classes: 'mdc-tab__text-label', [text(label)]),

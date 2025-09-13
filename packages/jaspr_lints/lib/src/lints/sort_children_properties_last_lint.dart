@@ -8,13 +8,13 @@ import '../utils.dart';
 
 class SortChildrenPropertiesLastLint extends DartLintRule {
   SortChildrenPropertiesLastLint()
-      : super(
-          code: LintCode(
-            name: 'sort_children_properties_last',
-            problemMessage: 'Sort children properties last in html component methods.',
-            correctionMessage: 'This improves readability and best represents actual html.',
-          ),
-        );
+    : super(
+        code: LintCode(
+          name: 'sort_children_properties_last',
+          problemMessage: 'Sort children properties last in html component methods.',
+          correctionMessage: 'This improves readability and best represents actual html.',
+        ),
+      );
 
   @override
   void run(CustomLintResolver resolver, DiagnosticReporter reporter, CustomLintContext context) {

@@ -1,6 +1,6 @@
-import 'package:dart_quotes/data/firebase.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../data/firebase.dart';
 @Import.onWeb('../interop/confetti.dart', show: [#JSConfetti])
 import 'quote_like_button.imports.dart';
 
@@ -28,10 +28,7 @@ class QuoteLikeButton extends StatelessComponent {
               JSConfetti.instance.show(emojis: ['🎯', '💙']);
             }
           },
-          [
-            span(classes: "icon-heart${hasLiked ?? false ? '' : '-o'}", []),
-            text(' $count'),
-          ],
+          [span(classes: "icon-heart${hasLiked ?? false ? '' : '-o'}", []), text(' $count')],
         );
       },
     );
@@ -39,22 +36,16 @@ class QuoteLikeButton extends StatelessComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('.quote-like-btn', [
-          css('&').styles(
-            border: Border.none,
-            outline: Outline(style: OutlineStyle.none),
-            fontSize: 18.px,
-            backgroundColor: Colors.transparent,
-          ),
-          css('&:hover span').styles(
-            transform: Transform.scale(1.2),
-          ),
-          css('&.active span').styles(
-            color: Colors.blue,
-          ),
-          css('span').styles(
-            transition: Transition('transform', duration: 300, curve: Curve.ease),
-          ),
-        ])
-      ];
+    css('.quote-like-btn', [
+      css('&').styles(
+        border: Border.none,
+        outline: Outline(style: OutlineStyle.none),
+        fontSize: 18.px,
+        backgroundColor: Colors.transparent,
+      ),
+      css('&:hover span').styles(transform: Transform.scale(1.2)),
+      css('&.active span').styles(color: Colors.blue),
+      css('span').styles(transition: Transition('transform', duration: 300, curve: Curve.ease)),
+    ]),
+  ];
 }

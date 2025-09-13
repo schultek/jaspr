@@ -45,9 +45,7 @@ abstract class RouteLoader {
 
 /// A base class for [RouteLoader] implementations.
 abstract class RouteLoaderBase implements RouteLoader {
-  RouteLoaderBase({
-    this.debugPrint = false,
-  });
+  RouteLoaderBase({this.debugPrint = false});
 
   final bool debugPrint;
 
@@ -93,9 +91,7 @@ abstract class RouteLoaderBase implements RouteLoader {
 
     _routes ??= _buildRoutes();
     if (eager && _sources != null) {
-      await Future.wait([
-        for (final s in _sources!) s.onLoad,
-      ]);
+      await Future.wait([for (final s in _sources!) s.onLoad]);
     }
     return _routes ?? [];
   }
@@ -119,20 +115,16 @@ abstract class RouteLoaderBase implements RouteLoader {
       }
       final pageBuilder = AsyncBuilder(builder: (_) => source.load());
 
-      routes.add(Route(
-        path: source.url,
-        builder: (_, __) => pageBuilder,
-      ));
+      routes.add(Route(path: source.url, builder: (_, __) => pageBuilder));
 
       for (final output in config.secondaryOutputs) {
         if (output.pattern.matchAsPrefix(source.path) != null) {
-          routes.add(Route(
-            path: output.createRoute(source.url),
-            builder: (_, __) => InheritedSecondaryOutput(
-              builder: output.build,
-              child: pageBuilder,
+          routes.add(
+            Route(
+              path: output.createRoute(source.url),
+              builder: (_, __) => InheritedSecondaryOutput(builder: output.build, child: pageBuilder),
             ),
-          ));
+          );
         }
       }
     }

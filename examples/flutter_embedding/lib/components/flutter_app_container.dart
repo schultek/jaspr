@@ -15,10 +15,7 @@ class FlutterAppContainer extends StatelessComponent {
     return FlutterTarget(
       loader: RippleLoader(),
       app: kIsWeb
-          ? flt.UncontrolledProviderScope(
-              container: ProviderScope.containerOf(context),
-              child: flt.MyApp(),
-            )
+          ? flt.UncontrolledProviderScope(container: ProviderScope.containerOf(context), child: flt.MyApp())
           : null,
     );
   }

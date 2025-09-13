@@ -133,19 +133,23 @@ class _StreamBuilderBaseState<T, S> extends State<StreamBuilderBase<T, S>> {
 
   void _subscribe() {
     if (component.stream != null) {
-      _subscription = component.stream!.listen((T data) {
-        setState(() {
-          _summary = component.afterData(_summary, data);
-        });
-      }, onError: (Object error, StackTrace stackTrace) {
-        setState(() {
-          _summary = component.afterError(_summary, error, stackTrace);
-        });
-      }, onDone: () {
-        setState(() {
-          _summary = component.afterDone(_summary);
-        });
-      });
+      _subscription = component.stream!.listen(
+        (T data) {
+          setState(() {
+            _summary = component.afterData(_summary, data);
+          });
+        },
+        onError: (Object error, StackTrace stackTrace) {
+          setState(() {
+            _summary = component.afterError(_summary, error, stackTrace);
+          });
+        },
+        onDone: () {
+          setState(() {
+            _summary = component.afterDone(_summary);
+          });
+        },
+      );
       _summary = component.afterConnected(_summary);
     }
   }
@@ -206,8 +210,8 @@ class AsyncSnapshot<T> {
   /// and optionally either [data] or [error] with an optional [stackTrace]
   /// (but not both data and error).
   const AsyncSnapshot._(this.connectionState, this.data, this.error, this.stackTrace)
-      : assert(!(data != null && error != null)),
-        assert(stackTrace == null || error != null);
+    : assert(!(data != null && error != null)),
+      assert(stackTrace == null || error != null);
 
   /// Creates an [AsyncSnapshot] in [ConnectionState.none] with null data and error.
   const AsyncSnapshot.nothing() : this._(ConnectionState.none, null, null, null);
@@ -222,11 +226,8 @@ class AsyncSnapshot<T> {
   /// and a [stackTrace].
   ///
   /// If no [stackTrace] is explicitly specified, [StackTrace.empty] will be used instead.
-  const AsyncSnapshot.withError(
-    ConnectionState state,
-    Object error, [
-    StackTrace stackTrace = StackTrace.empty,
-  ]) : this._(state, null, error, stackTrace);
+  const AsyncSnapshot.withError(ConnectionState state, Object error, [StackTrace stackTrace = StackTrace.empty])
+    : this._(state, null, error, stackTrace);
 
   /// Current state of connection to the asynchronous computation.
   final ConnectionState connectionState;
@@ -388,12 +389,7 @@ class StreamBuilder<T> extends StreamBuilderBase<T, AsyncSnapshot<T>> {
   /// The [initialData] is used to create the initial snapshot.
   ///
   /// The [builder] must not be null.
-  const StreamBuilder({
-    super.key,
-    this.initialData,
-    super.stream,
-    required this.builder,
-  });
+  const StreamBuilder({super.key, this.initialData, super.stream, required this.builder});
 
   /// The build strategy currently used by this builder.
   ///
@@ -518,12 +514,7 @@ class FutureBuilder<T> extends StatefulComponent {
   /// interaction with a [Future].
   ///
   /// The [builder] must not be null.
-  const FutureBuilder({
-    super.key,
-    this.future,
-    this.initialData,
-    required this.builder,
-  });
+  const FutureBuilder({super.key, this.future, this.initialData, required this.builder});
 
   /// The asynchronous computation to which this builder is currently connected,
   /// possibly null.
@@ -620,25 +611,28 @@ class _FutureBuilderState<T> extends State<FutureBuilder<T>> {
     if (component.future != null) {
       final Object callbackIdentity = Object();
       _activeCallbackIdentity = callbackIdentity;
-      component.future!.then<void>((T data) {
-        if (_activeCallbackIdentity == callbackIdentity) {
-          setState(() {
-            _snapshot = AsyncSnapshot<T>.withData(ConnectionState.done, data);
-          });
-        }
-      }, onError: (Object error, StackTrace stackTrace) {
-        if (_activeCallbackIdentity == callbackIdentity) {
-          setState(() {
-            _snapshot = AsyncSnapshot<T>.withError(ConnectionState.done, error, stackTrace);
-          });
-        }
-        assert(() {
-          if (FutureBuilder.debugRethrowError) {
-            Future<Object>.error(error, stackTrace);
+      component.future!.then<void>(
+        (T data) {
+          if (_activeCallbackIdentity == callbackIdentity) {
+            setState(() {
+              _snapshot = AsyncSnapshot<T>.withData(ConnectionState.done, data);
+            });
           }
-          return true;
-        }());
-      });
+        },
+        onError: (Object error, StackTrace stackTrace) {
+          if (_activeCallbackIdentity == callbackIdentity) {
+            setState(() {
+              _snapshot = AsyncSnapshot<T>.withError(ConnectionState.done, error, stackTrace);
+            });
+          }
+          assert(() {
+            if (FutureBuilder.debugRethrowError) {
+              Future<Object>.error(error, stackTrace);
+            }
+            return true;
+          }());
+        },
+      );
       _snapshot = _snapshot.inState(ConnectionState.waiting);
     }
   }

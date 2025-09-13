@@ -14,8 +14,6 @@ class EmptyLayout extends PageLayoutBase {
 
   @override
   Component buildBody(Page page, Component child) {
-    return main_([
-      child,
-    ]);
+    return main_([child]);
   }
 }

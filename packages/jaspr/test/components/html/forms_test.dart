@@ -7,19 +7,14 @@ import 'package:jaspr_test/jaspr_test.dart';
 void main() {
   group('html components', () {
     testComponents('renders button', (tester) async {
-      tester.pumpComponent(button(
-        autofocus: false,
-        disabled: false,
-        type: ButtonType.button,
-        onClick: () {},
-        [],
-      ));
+      tester.pumpComponent(button(autofocus: false, disabled: false, type: ButtonType.button, onClick: () {}, []));
 
       expect(find.tag('button'), findsOneComponent);
     });
 
     testComponents('renders form', (tester) async {
-      tester.pumpComponent(form(
+      tester.pumpComponent(
+        form(
           action: "",
           method: FormMethod.post,
           encType: FormEncType.text,
@@ -27,26 +22,11 @@ void main() {
           noValidate: false,
           target: Target.self,
           [
-            input(
-              type: InputType.text,
-              name: "a",
-              value: "a",
-              disabled: false,
-              onInput: (_) {},
-              onChange: (_) {},
-            ),
+            input(type: InputType.text, name: "a", value: "a", disabled: false, onInput: (_) {}, onChange: (_) {}),
             label(htmlFor: 'a', []),
             datalist([]),
             legend([]),
-            meter(
-              value: 100,
-              min: 0,
-              max: 100,
-              low: 0,
-              high: 100,
-              optimum: 100,
-              [],
-            ),
+            meter(value: 100, min: 0, max: 100, low: 0, high: 100, optimum: 100, []),
             progress(value: 100, max: 100, []),
             select(
               name: "a",
@@ -61,7 +41,7 @@ void main() {
               [
                 optgroup(label: 'a', disabled: false, [
                   option(label: "a", value: "a", selected: true, disabled: false, []),
-                ])
+                ]),
               ],
             ),
             fieldset(name: "a", disabled: false, []),
@@ -82,7 +62,9 @@ void main() {
               onChange: (_) {},
               [],
             ),
-          ]));
+          ],
+        ),
+      );
 
       expect(find.tag('form'), findsOneComponent);
       expect(find.tag('input'), findsOneComponent);

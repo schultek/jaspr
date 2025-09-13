@@ -20,9 +20,10 @@ Future<Chrome?> startChrome(int port, Logger logger) async {
     return await Chrome.start([uri], port: 0, chromeUserDir: chromeUserDir);
   } on StateError catch (_) {
     logger.write(
-        'Could not attach debugger to Chrome, since it is already running in a different session. Close Chrome and try again, or continue without debugging.',
-        tag: Tag.cli,
-        level: Level.error);
+      'Could not attach debugger to Chrome, since it is already running in a different session. Close Chrome and try again, or continue without debugging.',
+      tag: Tag.cli,
+      level: Level.error,
+    );
     return null;
   } catch (e) {
     logger.write('Unexpected error starting Chrome: $e', tag: Tag.cli, level: Level.error);
@@ -60,10 +61,7 @@ class Chrome {
   final webdev.Chrome wChrome;
   final browser_launcher.Chrome? bChrome;
 
-  Chrome._(
-    this.wChrome,
-    this.bChrome,
-  );
+  Chrome._(this.wChrome, this.bChrome);
 
   Future<void> close() async {
     wChrome.close();
@@ -71,8 +69,12 @@ class Chrome {
   }
 
   static Future<Chrome> start(List<String> urls, {required int port, required Directory? chromeUserDir}) async {
-    final browser = await browser_launcher.Chrome.startWithDebugPort(urls,
-        debugPort: port, userDataDir: chromeUserDir?.path, signIn: true);
+    final browser = await browser_launcher.Chrome.startWithDebugPort(
+      urls,
+      debugPort: port,
+      userDataDir: chromeUserDir?.path,
+      signIn: true,
+    );
     return Chrome._(await webdev.Chrome.fromExisting(browser.debugPort), browser);
   }
 

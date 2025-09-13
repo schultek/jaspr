@@ -8,10 +8,7 @@ void main() {
   group('style', () {
     group('transform', () {
       test('combine', () {
-        var transform = Transform.combine([
-          Transform.scale(2),
-          Transform.translate(x: 100.px),
-        ]);
+        var transform = Transform.combine([Transform.scale(2), Transform.translate(x: 100.px)]);
         expect(transform.value, equals('scale(2) translateX(100px)'));
       });
 

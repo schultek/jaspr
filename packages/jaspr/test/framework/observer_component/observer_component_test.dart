@@ -142,8 +142,10 @@ void main() {
       events.clear();
 
       // observer value should be updated, but without notifying dependants
-      expect(find.byComponentPredicate((component) => component is MyObserverComponent && component.value == params),
-          findsOneComponent);
+      expect(
+        find.byComponentPredicate((component) => component is MyObserverComponent && component.value == params),
+        findsOneComponent,
+      );
     });
   });
 }

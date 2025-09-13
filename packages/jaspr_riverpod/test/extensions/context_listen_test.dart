@@ -13,18 +13,20 @@ void main() {
     testComponents('listens to provider state', (tester) async {
       int? wasCalledWith;
 
-      tester.pumpComponent(providerApp((context) {
-        context.listen<int>(counter, (prev, next) {
-          wasCalledWith = next;
-        });
+      tester.pumpComponent(
+        providerApp((context) {
+          context.listen<int>(counter, (prev, next) {
+            wasCalledWith = next;
+          });
 
-        return Button(
-          label: 'tap',
-          onPressed: () {
-            context.read(counter.notifier).state++;
-          },
-        );
-      }));
+          return Button(
+            label: 'tap',
+            onPressed: () {
+              context.read(counter.notifier).state++;
+            },
+          );
+        }),
+      );
 
       expect(wasCalledWith, isNull);
 
@@ -37,18 +39,20 @@ void main() {
     testComponents('re-listens on rebuild', (tester) async {
       List<int> wasCalledWith = [];
 
-      tester.pumpComponent(providerApp((context) {
-        context.listen<int>(counter, (prev, next) {
-          wasCalledWith.add(next);
-        }, fireImmediately: true);
+      tester.pumpComponent(
+        providerApp((context) {
+          context.listen<int>(counter, (prev, next) {
+            wasCalledWith.add(next);
+          }, fireImmediately: true);
 
-        return Button(
-          label: '${context.watch(counter)}',
-          onPressed: () {
-            context.read(counter.notifier).state++;
-          },
-        );
-      }));
+          return Button(
+            label: '${context.watch(counter)}',
+            onPressed: () {
+              context.read(counter.notifier).state++;
+            },
+          );
+        }),
+      );
 
       expect(wasCalledWith, equals([0]));
 
@@ -61,28 +65,33 @@ void main() {
     testComponents('un-listens on dispose', (tester) async {
       List<int> wasCalledWith = [];
 
-      tester.pumpComponent(providerApp((context) {
-        if (context.watch(counter.select((cnt) => cnt < 2))) {
-          return Builder(
-            builder: (context) {
-              context.listen<int>(counter, (prev, next) {
-                wasCalledWith.add(next);
-              }, fireImmediately: true);
+      tester.pumpComponent(
+        providerApp((context) {
+          if (context.watch(counter.select((cnt) => cnt < 2))) {
+            return Builder(
+              builder: (context) {
+                context.listen<int>(counter, (prev, next) {
+                  wasCalledWith.add(next);
+                }, fireImmediately: true);
 
-              return button(onClick: () {
+                return button(
+                  onClick: () {
+                    context.read(counter.notifier).state++;
+                  },
+                  [text('a ${context.watch(counter)}')],
+                );
+              },
+            );
+          } else {
+            return Button(
+              label: 'b ${context.watch(counter)}',
+              onPressed: () {
                 context.read(counter.notifier).state++;
-              }, [text('a ${context.watch(counter)}')]);
-            },
-          );
-        } else {
-          return Button(
-            label: 'b ${context.watch(counter)}',
-            onPressed: () {
-              context.read(counter.notifier).state++;
-            },
-          );
-        }
-      }));
+              },
+            );
+          }
+        }),
+      );
 
       expect(wasCalledWith, equals([0]));
       expect(find.text('a 0'), findsOneComponent);
@@ -106,15 +115,14 @@ void main() {
       expect(find.text('b 3'), findsOneComponent);
     });
 
-    testComponents(
-      'omitting closes an active listener',
-      (tester) async {
-        List<int> wasCalledWith = [];
+    testComponents('omitting closes an active listener', (tester) async {
+      List<int> wasCalledWith = [];
 
-        late Element element;
-        var shouldListen = true;
+      late Element element;
+      var shouldListen = true;
 
-        tester.pumpComponent(providerApp((context) {
+      tester.pumpComponent(
+        providerApp((context) {
           if (shouldListen) {
             context.listen(counterB, (_, int value) {
               wasCalledWith.add(value);
@@ -122,27 +130,27 @@ void main() {
           }
           element = context as Element;
           return const Component.text('test');
-        }));
+        }),
+      );
 
-        expect(wasCalledWith, equals([0]));
-        expect(element.read(counterB), equals(0));
+      expect(wasCalledWith, equals([0]));
+      expect(element.read(counterB), equals(0));
 
-        // increase counter
-        element.read(counterB.notifier).state = 1;
+      // increase counter
+      element.read(counterB.notifier).state = 1;
 
-        expect(wasCalledWith, equals([0, 1]));
+      expect(wasCalledWith, equals([0, 1]));
 
-        // remove listener
-        shouldListen = false;
-        element.markNeedsBuild();
-        await tester.pump();
+      // remove listener
+      shouldListen = false;
+      element.markNeedsBuild();
+      await tester.pump();
 
-        expect(wasCalledWith, equals([0, 1]));
+      expect(wasCalledWith, equals([0, 1]));
 
-        // was disposed
-        await tester.pump();
-        expect(element.read(counterB), equals(0));
-      },
-    );
+      // was disposed
+      await tester.pump();
+      expect(element.read(counterB), equals(0));
+    });
   });
 }

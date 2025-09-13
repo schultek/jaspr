@@ -10,10 +10,7 @@ import '../utils.dart';
 void main() {
   group('router', () {
     testBrowser('should push route', (tester) async {
-      tester.pumpComponent(Router(routes: [
-        homeRoute(),
-        route('/a'),
-      ]));
+      tester.pumpComponent(Router(routes: [homeRoute(), route('/a')]));
 
       expect(find.text('home'), findsOneComponent);
 
@@ -34,11 +31,7 @@ void main() {
     });
 
     testBrowser('should replace route', (tester) async {
-      tester.pumpComponent(Router(routes: [
-        homeRoute(),
-        route('/a'),
-        route('/b'),
-      ]));
+      tester.pumpComponent(Router(routes: [homeRoute(), route('/a'), route('/b')]));
 
       expect(find.text('home'), findsOneComponent);
 

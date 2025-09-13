@@ -182,24 +182,18 @@ extension on BlockStyleRule {
 
 extension on MediaStyleRule {
   StyleRule _resolve(String parent) {
-    return MediaStyleRule(query: query, styles: [
-      for (var style in styles) ...style.resolve(parent),
-    ]);
+    return MediaStyleRule(query: query, styles: [for (var style in styles) ...style.resolve(parent)]);
   }
 }
 
 extension on LayerStyleRule {
   StyleRule _resolve(String parent) {
-    return LayerStyleRule(name: name, styles: [
-      for (var style in styles) ...style.resolve(parent),
-    ]);
+    return LayerStyleRule(name: name, styles: [for (var style in styles) ...style.resolve(parent)]);
   }
 }
 
 extension on SupportsStyleRule {
   StyleRule _resolve(String parent) {
-    return SupportsStyleRule(condition: condition, styles: [
-      for (var style in styles) ...style.resolve(parent),
-    ]);
+    return SupportsStyleRule(condition: condition, styles: [for (var style in styles) ...style.resolve(parent)]);
   }
 }

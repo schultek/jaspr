@@ -15,20 +15,24 @@ class ClickerState extends State<Clicker> {
 
   @override
   Component build(BuildContext context) {
-    return button(classes: 'clicker', onClick: () {
-      setState(() => count++);
-    }, [
-      text('Click me! ($count)'),
-    ]);
+    return button(
+      classes: 'clicker',
+      onClick: () {
+        setState(() => count++);
+      },
+      [
+        text('Click me! ($count)'),
+      ],
+    );
   }
-  
+
   @css
   static List<StyleRule> get styles => [
-        css('.clicker').styles(
-          padding: Padding.all(0.5.rem),
-          margin: Margin.only(top: 1.rem),
-          border: Border(color: ContentColors.primary),
-          radius: BorderRadius.circular(0.5.rem),
-        ),
-      ];
+    css('.clicker').styles(
+      padding: Padding.all(0.5.rem),
+      margin: Margin.only(top: 1.rem),
+      border: Border(color: ContentColors.primary),
+      radius: BorderRadius.circular(0.5.rem),
+    ),
+  ];
 }

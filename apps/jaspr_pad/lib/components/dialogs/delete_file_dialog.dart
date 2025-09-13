@@ -9,7 +9,11 @@ class DeleteFileDialog extends StatelessComponent {
   final String file;
 
   static Future<bool?> show(BuildContext context, String file) {
-    return showDialog(context, slotId: 'dialog', builder: (_) => DeleteFileDialog(file: file));
+    return showDialog(
+      context,
+      slotId: 'dialog',
+      builder: (_) => DeleteFileDialog(file: file),
+    );
   }
 
   @override

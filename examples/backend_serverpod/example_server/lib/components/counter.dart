@@ -15,13 +15,14 @@ class _CounterState extends State<Counter> {
   Component build(BuildContext context) {
     return fragment([
       span([text("Count: $counter ")]),
-      button(onClick: () {
-        setState(() {
-          counter++;
-        });
-      }, [
-        text("Increase"),
-      ]),
+      button(
+        onClick: () {
+          setState(() {
+            counter++;
+          });
+        },
+        [text("Increase")],
+      ),
     ]);
   }
 }

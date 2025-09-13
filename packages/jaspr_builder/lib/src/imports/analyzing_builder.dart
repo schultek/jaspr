@@ -34,14 +34,17 @@ class ImportsModuleBuilder implements Builder {
           .followedBy(lib.firstFragment.libraryExports)
           .where((ElementDirective e) => importChecker.firstAnnotationOf(e) != null)
           .where((ElementDirective e) {
-        var uri = e.uri;
-        if (uri is DirectiveUriWithRelativeUriString && uri.relativeUriString == path.basename(partId.path)) {
-          return true;
-        }
-        log.severe('@Import must only be applied to the respective "<filename>.imports.dart" import of a library. '
-            'Instead found it on "${uri.toString()}" in library ${lib.firstFragment.source.uri.toString()}.');
-        return false;
-      }).firstOrNull;
+            var uri = e.uri;
+            if (uri is DirectiveUriWithRelativeUriString && uri.relativeUriString == path.basename(partId.path)) {
+              return true;
+            }
+            log.severe(
+              '@Import must only be applied to the respective "<filename>.imports.dart" import of a library. '
+              'Instead found it on "${uri.toString()}" in library ${lib.firstFragment.source.uri.toString()}.',
+            );
+            return false;
+          })
+          .firstOrNull;
 
       if (import == null) {
         return;
@@ -72,6 +75,6 @@ class ImportsModuleBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-        '.dart': ['.imports.json']
-      };
+    '.dart': ['.imports.json'],
+  };
 }

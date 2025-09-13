@@ -35,38 +35,27 @@ class Particles extends StatelessComponent {
             ]),
             raw: {'--particle-offset': '${particle.offset}px'},
           ),
-          children: [
-            circle(cx: "0", cy: "0", r: "${particle.size}", fill: primaryMid, []),
-          ],
+          children: [circle(cx: "0", cy: "0", r: "${particle.size}", fill: primaryMid, [])],
         ),
     ]);
   }
 
   @css
   static List<StyleRule> get styles => [
-        css('svg.particles', [
-          css('&').styles(
-            position: Position.absolute(top: Unit.zero, left: Unit.zero),
-            width: 100.percent,
-            height: 100.percent,
-            overflow: Overflow.visible,
-            pointerEvents: PointerEvents.none,
-          ),
-          css('circle').styles(
-            raw: {'animation': 'particle 1s linear forwards'},
-          ),
-        ]),
-        css.keyframes('particle', {
-          '0%': Styles(
-            transform: Transform.translate(y: 0.px),
-          ),
-          '90%': Styles(
-            opacity: 1,
-          ),
-          '100%': Styles(
-            opacity: 0,
-            transform: Transform.translate(x: Unit.variable('--particle-offset')),
-          ),
-        })
-      ];
+    css('svg.particles', [
+      css('&').styles(
+        position: Position.absolute(top: Unit.zero, left: Unit.zero),
+        width: 100.percent,
+        height: 100.percent,
+        overflow: Overflow.visible,
+        pointerEvents: PointerEvents.none,
+      ),
+      css('circle').styles(raw: {'animation': 'particle 1s linear forwards'}),
+    ]),
+    css.keyframes('particle', {
+      '0%': Styles(transform: Transform.translate(y: 0.px)),
+      '90%': Styles(opacity: 1),
+      '100%': Styles(opacity: 0, transform: Transform.translate(x: Unit.variable('--particle-offset'))),
+    }),
+  ];
 }

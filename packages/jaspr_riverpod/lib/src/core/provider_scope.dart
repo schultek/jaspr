@@ -88,8 +88,9 @@ final class ProviderScope extends StatefulComponent {
   }
 
   static _UncontrolledProviderScopeElement _scopeOf(BuildContext context, {bool listen = true}) {
-    var element = context.getElementForInheritedComponentOfExactType<UncontrolledProviderScope>()
-        as _UncontrolledProviderScopeElement?;
+    var element =
+        context.getElementForInheritedComponentOfExactType<UncontrolledProviderScope>()
+            as _UncontrolledProviderScopeElement?;
 
     if (element == null) {
       throw StateError('No ProviderScope found');
@@ -175,7 +176,8 @@ final class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin 
 
       for (final s in component.sync) {
         if ((s as _ProviderSync).provider.dependencies == null) {
-          print('[WARNING] Tried to sync provider "${s.provider.name ?? s.provider.runtimeType}" on a nested ProviderScope, but the provider did not specify dependencies.\n'
+          print(
+            '[WARNING] Tried to sync provider "${s.provider.name ?? s.provider.runtimeType}" on a nested ProviderScope, but the provider did not specify dependencies.\n'
             '  Because syncing a provider will override it on the client, and overriding in a nested ProviderScope requires the provider to specify dependencies, the sync will fail.\n'
             '  To fix this, either specify dependencies for the provider (e.g. `Provider(..., dependencies: [])`) and its dependents, or sync it on the root ProviderScope.',
           );
@@ -200,8 +202,9 @@ final class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin 
   }
 
   ProviderContainer? _getParent() {
-    final scope = context.getElementForInheritedComponentOfExactType<UncontrolledProviderScope>()?.component
-        as UncontrolledProviderScope?;
+    final scope =
+        context.getElementForInheritedComponentOfExactType<UncontrolledProviderScope>()?.component
+            as UncontrolledProviderScope?;
 
     return scope?.container;
   }
@@ -228,10 +231,7 @@ final class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin 
 
     if (_dirty) {
       _dirty = false;
-      container.updateOverrides([
-        _bindingProvider.overrideWithValue(context.binding),
-        ...component.overrides,
-      ]);
+      container.updateOverrides([_bindingProvider.overrideWithValue(context.binding), ...component.overrides]);
     }
 
     return UncontrolledProviderScope(container: container, child: component.child);
@@ -256,11 +256,7 @@ final class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin 
 /// {@category Core}
 class UncontrolledProviderScope extends InheritedComponent {
   /// {@macro riverpod.UncontrolledProviderScope}
-  const UncontrolledProviderScope({
-    super.key,
-    required this.container,
-    required super.child,
-  });
+  const UncontrolledProviderScope({super.key, required this.container, required super.child});
 
   /// The [ProviderContainer] exposed to the component tree.
   final ProviderContainer container;

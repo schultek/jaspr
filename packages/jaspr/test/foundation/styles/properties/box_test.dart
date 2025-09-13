@@ -13,41 +13,26 @@ void main() {
       });
 
       test('all', () {
-        var border = Border(
-          style: BorderStyle.dashed,
-          color: Colors.blue,
-          width: 2.px,
-        );
+        var border = Border(style: BorderStyle.dashed, color: Colors.blue, width: 2.px);
 
         expect(border.styles, equals({'border': 'dashed blue 2px'}));
       });
 
       test('only', () {
         var border = Border.only(
-          left: BorderSide.groove(
-            color: Colors.black,
-            width: 2.pt,
-          ),
+          left: BorderSide.groove(color: Colors.black, width: 2.pt),
         );
 
         expect(
           border.styles,
-          equals({
-            'border-left-style': 'groove',
-            'border-left-color': 'black',
-            'border-left-width': '2pt',
-          }),
+          equals({'border-left-style': 'groove', 'border-left-color': 'black', 'border-left-width': '2pt'}),
         );
       });
 
       test('symmetric', () {
         var border = Border.symmetric(
-          vertical: BorderSide.solid(
-            color: Colors.blue,
-          ),
-          horizontal: BorderSide.dashed(
-            width: 2.pt,
-          ),
+          vertical: BorderSide.solid(color: Colors.blue),
+          horizontal: BorderSide.dashed(width: 2.pt),
         );
 
         expect(
@@ -63,11 +48,7 @@ void main() {
       });
 
       test('symmetric only', () {
-        var border = Border.symmetric(
-          vertical: BorderSide.dotted(
-            color: Colors.blue,
-          ),
-        );
+        var border = Border.symmetric(vertical: BorderSide.dotted(color: Colors.blue));
 
         expect(
           border.styles,
@@ -83,10 +64,7 @@ void main() {
       test('none', () {
         var border = Border.none;
 
-        expect(
-          border.styles,
-          equals({'border': 'none'}),
-        );
+        expect(border.styles, equals({'border': 'none'}));
       });
     });
 
@@ -105,25 +83,13 @@ void main() {
       });
 
       test('only double circle', () {
-        var radius = BorderRadius.only(
-          topLeft: Radius.circular(20.px),
-          topRight: Radius.circular(10.px),
-        );
-        expect(
-          radius.styles,
-          equals({'border-top-left-radius': '20px', 'border-top-right-radius': '10px'}),
-        );
+        var radius = BorderRadius.only(topLeft: Radius.circular(20.px), topRight: Radius.circular(10.px));
+        expect(radius.styles, equals({'border-top-left-radius': '20px', 'border-top-right-radius': '10px'}));
       });
 
       test('only double mixed', () {
-        var radius = BorderRadius.only(
-          topLeft: Radius.circular(20.px),
-          topRight: Radius.elliptical(10.px, 5.px),
-        );
-        expect(
-          radius.styles,
-          equals({'border-top-left-radius': '20px', 'border-top-right-radius': '10px 5px'}),
-        );
+        var radius = BorderRadius.only(topLeft: Radius.circular(20.px), topRight: Radius.elliptical(10.px, 5.px));
+        expect(radius.styles, equals({'border-top-left-radius': '20px', 'border-top-right-radius': '10px 5px'}));
       });
 
       test('only all mixed', () {
@@ -133,10 +99,7 @@ void main() {
           bottomLeft: Radius.elliptical(Unit.zero, 25.px),
           bottomRight: Radius.circular(2.em),
         );
-        expect(
-          radius.styles,
-          equals({'border-radius': '20px 10px 2em 0 / 20px 5pt 2em 25px'}),
-        );
+        expect(radius.styles, equals({'border-radius': '20px 10px 2em 0 / 20px 5pt 2em 25px'}));
       });
     });
 

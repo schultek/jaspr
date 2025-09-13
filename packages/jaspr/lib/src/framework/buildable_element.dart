@@ -54,12 +54,7 @@ abstract class BuildableElement extends Element {
       // TODO: implement actual error handling
       built = Component.element(
         tag: 'div',
-        styles: Styles(
-          padding: Padding.all(2.em),
-          backgroundColor: Colors.red,
-          color: Colors.yellow,
-          fontSize: 1.rem,
-        ),
+        styles: Styles(padding: Padding.all(2.em), backgroundColor: Colors.red, color: Colors.yellow, fontSize: 1.rem),
         children: [Component.text("Error on building component: $e")],
       );
       binding.reportBuildError(this, e, st);

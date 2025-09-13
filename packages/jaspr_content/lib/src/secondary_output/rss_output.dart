@@ -64,11 +64,13 @@ class RSSOutput extends SecondaryOutput {
 
   @override
   Component build(Page page) {
-    return Builder(builder: (context) {
-      context.setHeader('Content-Type', 'text/xml');
-      context.setStatusCode(200, responseBody: renderRssFeed(page, context.pages));
-      return Component.text('');
-    });
+    return Builder(
+      builder: (context) {
+        context.setHeader('Content-Type', 'text/xml');
+        context.setStatusCode(200, responseBody: renderRssFeed(page, context.pages));
+        return Component.text('');
+      },
+    );
   }
 
   /// The standard date format for dates within an RSS feed.
@@ -103,7 +105,8 @@ class RSSOutput extends SecondaryOutput {
 
       final item = itemBuilder(page);
 
-      var itemSource = '''
+      var itemSource =
+          '''
     <item>
       <title>${item.title}</title>
       <link>$siteUrl${page.url}</link>''';
@@ -128,7 +131,8 @@ class RSSOutput extends SecondaryOutput {
       items.add(itemSource);
     }
 
-    final feed = '''
+    final feed =
+        '''
 <rss version="2.0">
   <channel>
     <title>$title</title>
@@ -145,12 +149,7 @@ ${items.reversed.join('\n')}
 }
 
 class RSSItem {
-  const RSSItem({
-    required this.title,
-    this.description,
-    this.pubDate,
-    this.author,
-  });
+  const RSSItem({required this.title, this.description, this.pubDate, this.author});
 
   final String title;
   final String? description;

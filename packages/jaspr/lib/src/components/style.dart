@@ -9,9 +9,6 @@ class Style extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Component.element(
-      tag: 'style',
-      children: [RawText(styles.render())],
-    );
+    return Component.element(tag: 'style', children: [RawText(styles.render())]);
   }
 }

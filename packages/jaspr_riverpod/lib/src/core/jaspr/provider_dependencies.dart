@@ -17,10 +17,7 @@ class ProviderDependencies {
   Map<ProviderListenable, ProviderSubscription> oldListeners = {};
 
   void didRebuild() {
-    var oldSubscriptions = [
-      ...oldWatchers.values,
-      ...oldListeners.values,
-    ];
+    var oldSubscriptions = [...oldWatchers.values, ...oldListeners.values];
     for (var subscription in oldSubscriptions) {
       subscription.close();
     }
@@ -32,12 +29,7 @@ class ProviderDependencies {
   }
 
   void deactivate() {
-    var allSubscriptions = [
-      ...watchers.values,
-      ...oldWatchers.values,
-      ...listeners.values,
-      ...oldListeners.values,
-    ];
+    var allSubscriptions = [...watchers.values, ...oldWatchers.values, ...listeners.values, ...oldListeners.values];
     for (var subscription in allSubscriptions) {
       subscription.close();
     }
@@ -79,8 +71,12 @@ class ProviderDependencies {
     return watchers[target]!.readSafe().valueOrProviderException;
   }
 
-  void listen<T>(ProviderListenable<T> target, void Function(T? previous, T value) listener,
-      {void Function(Object error, StackTrace stackTrace)? onError, bool fireImmediately = false}) {
+  void listen<T>(
+    ProviderListenable<T> target,
+    void Function(T? previous, T value) listener, {
+    void Function(Object error, StackTrace stackTrace)? onError,
+    bool fireImmediately = false,
+  }) {
     var container = checkContainer();
 
     // close any existing listeners for the same provider

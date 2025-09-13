@@ -59,31 +59,35 @@ class SplitterState extends State<Splitter> {
       final i = j;
       if (i > 0) {
         var pair = splitPairs[i - 1];
-        children.add(div(
-          classes: 'gutter gutter-${component.horizontal ? 'horizontal' : 'vertical'}',
-          styles: Styles(flex: Flex(basis: 6.px)),
-          events: {'mousedown': (e) => pair.startDragging(e as html.MouseEventOrStubbed)},
-          [],
-        ));
+        children.add(
+          div(
+            classes: 'gutter gutter-${component.horizontal ? 'horizontal' : 'vertical'}',
+            styles: Styles(flex: Flex(basis: 6.px)),
+            events: {'mousedown': (e) => pair.startDragging(e as html.MouseEventOrStubbed)},
+            [],
+          ),
+        );
       }
 
       var dragging =
           (i > 0 ? splitPairs[i - 1].dragging : false) || (i < splitPairs.length ? splitPairs[i].dragging : false);
 
-      children.add(Component.wrapElement(
-        styles: Styles(
-          userSelect: dragging ? UserSelect.none : null,
-          pointerEvents: dragging ? PointerEvents.none : null,
-          raw: {'flex-basis': 'calc(${sizes[i]}% - 3px)'},
+      children.add(
+        Component.wrapElement(
+          styles: Styles(
+            userSelect: dragging ? UserSelect.none : null,
+            pointerEvents: dragging ? PointerEvents.none : null,
+            raw: {'flex-basis': 'calc(${sizes[i]}% - 3px)'},
+          ),
+          child: DomNodeReader(
+            onNode: (node) {
+              if (i > 0) splitPairs[i - 1].b = node;
+              if (i < splitPairs.length) splitPairs[i].a = node;
+            },
+            child: component.children[i],
+          ),
         ),
-        child: DomNodeReader(
-          onNode: (node) {
-            if (i > 0) splitPairs[i - 1].b = node;
-            if (i < splitPairs.length) splitPairs[i].a = node;
-          },
-          child: component.children[i],
-        ),
-      ));
+      );
     }
     return fragment(children);
   }

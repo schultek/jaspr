@@ -28,11 +28,7 @@ class SampleMapper extends ClassMapperBase<Sample> {
   static const Field<Sample, int> _f$index = Field('index', _$index);
 
   @override
-  final MappableFields<Sample> fields = const {
-    #id: _f$id,
-    #description: _f$description,
-    #index: _f$index,
-  };
+  final MappableFields<Sample> fields = const {#id: _f$id, #description: _f$description, #index: _f$index};
 
   static Sample _instantiate(DecodingData data) {
     return Sample(data.dec(_f$id), data.dec(_f$description), data.dec(_f$index));
@@ -93,14 +89,19 @@ class _SampleCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Sample, $Out>
   @override
   late final ClassMapperBase<Sample> $mapper = SampleMapper.ensureInitialized();
   @override
-  $R call({String? id, String? description, Object? index = $none}) => $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (description != null) #description: description,
-        if (index != $none) #index: index
-      }));
+  $R call({String? id, String? description, Object? index = $none}) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (description != null) #description: description,
+      if (index != $none) #index: index,
+    }),
+  );
   @override
   Sample $make(CopyWithData data) => Sample(
-      data.get(#id, or: $value.id), data.get(#description, or: $value.description), data.get(#index, or: $value.index));
+    data.get(#id, or: $value.id),
+    data.get(#description, or: $value.description),
+    data.get(#index, or: $value.index),
+  );
 
   @override
   SampleCopyWith<$R2, Sample, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
@@ -128,10 +129,7 @@ class SampleResponseMapper extends ClassMapperBase<SampleResponse> {
   static const Field<SampleResponse, String> _f$error = Field('error', _$error);
 
   @override
-  final MappableFields<SampleResponse> fields = const {
-    #project: _f$project,
-    #error: _f$error,
-  };
+  final MappableFields<SampleResponse> fields = const {#project: _f$project, #error: _f$error};
 
   static SampleResponse _instantiate(DecodingData data) {
     return SampleResponse(data.dec(_f$project), data.dec(_f$error));

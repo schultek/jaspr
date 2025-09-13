@@ -52,7 +52,6 @@ extension SyncAsyncNotifierExtension<NotifierT extends AsyncNotifier<T>, T> on A
   }
 }
 
-
 mixin SyncScopeMixin on State<ProviderScope>
     implements PreloadStateMixin<ProviderScope>, SyncStateMixin<ProviderScope, Map<String, dynamic>?> {
   ProviderContainer get container;
@@ -103,7 +102,6 @@ mixin SyncScopeMixin on State<ProviderScope>
       final decodedValue = encodedValue != null && s.codec != null ? s.codec!.decode(encodedValue) : encodedValue;
 
       _syncOverrides.add(s.fn(decodedValue));
-      
     }
   }
 

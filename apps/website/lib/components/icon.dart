@@ -10,34 +10,52 @@ class Icon extends StatelessComponent {
   Component build(BuildContext context) {
     final children = <Component>[];
     if (name == 'jasper') {
-      children.add(img(src: 'images/jasper_icon.png', alt: 'jasper-icon', styles: Styles(height: size ?? 1.2.em)));
+      children.add(
+        img(
+          src: 'images/jasper_icon.png',
+          alt: 'jasper-icon',
+          styles: Styles(height: size ?? 1.2.em),
+        ),
+      );
       return fragment(children);
     } else if (name == 'dart') {
-      children.add(img(src: 'images/dart_icon.png', alt: 'dart-icon', styles: Styles(height: size ?? 1.2.em)));
+      children.add(
+        img(
+          src: 'images/dart_icon.png',
+          alt: 'dart-icon',
+          styles: Styles(height: size ?? 1.2.em),
+        ),
+      );
       return fragment(children);
     }
-    children.add(i(classes: 'icon-$name', styles: Styles(fontSize: size ?? 1.2.em), []));
+    children.add(
+      i(
+        classes: 'icon-$name',
+        styles: Styles(fontSize: size ?? 1.2.em),
+        [],
+      ),
+    );
     return fragment(children);
   }
 
   @css
   static List<StyleRule> get styles => [
-        css('[class^=icon-custom-]').styles(
-          width: 1.em,
-          height: 1.em,
-          color: Color.inherit,
-          raw: {
-            '-webkit-mask': 'var(--icon) no-repeat',
-            'mask': 'var(--icon) no-repeat',
-            '-webkit-mask-size': '100% 100%',
-            'mask-size': '100% 100%',
-            'background-color': 'currentColor',
-          },
-        ),
-        css('.icon-custom-discord').styles(raw: {'--icon': 'url("$discordIcon")'}),
-        css('.icon-custom-github').styles(raw: {'--icon': 'url("$githubIcon")'}),
-        css('.icon-custom-jaspr').styles(raw: {'--icon': 'url("$jasprIcon")'}),
-      ];
+    css('[class^=icon-custom-]').styles(
+      width: 1.em,
+      height: 1.em,
+      color: Color.inherit,
+      raw: {
+        '-webkit-mask': 'var(--icon) no-repeat',
+        'mask': 'var(--icon) no-repeat',
+        '-webkit-mask-size': '100% 100%',
+        'mask-size': '100% 100%',
+        'background-color': 'currentColor',
+      },
+    ),
+    css('.icon-custom-discord').styles(raw: {'--icon': 'url("$discordIcon")'}),
+    css('.icon-custom-github').styles(raw: {'--icon': 'url("$githubIcon")'}),
+    css('.icon-custom-jaspr').styles(raw: {'--icon': 'url("$jasprIcon")'}),
+  ];
 }
 
 const githubIcon =

@@ -17,11 +17,11 @@ class _Transition implements Transition {
 
   @override
   String get value => [
-        property,
-        '${duration.numstr}ms',
-        if (curve != null) curve!.value,
-        if (delay != null) '${delay!.numstr}ms'
-      ].join(' ');
+    property,
+    '${duration.numstr}ms',
+    if (curve != null) curve!.value,
+    if (delay != null) '${delay!.numstr}ms',
+  ].join(' ');
 }
 
 class _CombineTransition implements Transition {

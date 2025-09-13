@@ -14,10 +14,7 @@ class ConsolePanel extends StatelessComponent {
       classes: 'console custom-scrollbar',
       styles: Styles(display: Display.flex, flexDirection: FlexDirection.column),
       [
-        for (var msg in messages)
-          span(styles: Styles(width: Unit.zero), [
-            raw(msg),
-          ]),
+        for (var msg in messages) span(styles: Styles(width: Unit.zero), [raw(msg)]),
       ],
     );
   }

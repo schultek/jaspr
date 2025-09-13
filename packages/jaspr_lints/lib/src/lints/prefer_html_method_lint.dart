@@ -11,12 +11,12 @@ enum ComponentType { text, element, fragment }
 
 class PreferHtmlMethodLint extends DartLintRule {
   PreferHtmlMethodLint()
-      : super(
-          code: LintCode(
-            name: 'prefer_html_methods',
-            problemMessage: "Prefer using '{0}(...)' over 'Component.element(tag: \"{0}\", ...)'",
-          ),
-        );
+    : super(
+        code: LintCode(
+          name: 'prefer_html_methods',
+          problemMessage: "Prefer using '{0}(...)' over 'Component.element(tag: \"{0}\", ...)'",
+        ),
+      );
 
   final textCode = LintCode(
     name: 'prefer_html_methods',

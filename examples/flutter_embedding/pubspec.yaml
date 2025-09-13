@@ -4,7 +4,7 @@ version: 0.1.8-dev.1
 publish_to: none
 
 environment:
-  sdk: ">=3.6.0 <4.0.0"
+  sdk: '>=3.8.0 <4.0.0'
 
 resolution: workspace
 
@@ -12,21 +12,19 @@ dependencies:
   firebase_core: ^3.4.1
   flutter:
     sdk: flutter
-  flutter_riverpod: ^2.4.0
+  flutter_riverpod: ^3.0.0
   jaspr: ^0.21.0-dev.0
   jaspr_flutter_embed: ^0.4.7
   jaspr_riverpod: ^0.3.21
-  riverpod: ^2.4.0
+  riverpod: ^3.0.0
 
 dev_dependencies:
   build_runner: ^2.6.0
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
   jaspr_builder: ^0.21.0-dev.0
+  jaspr_repo: any
   jaspr_web_compilers: ^4.2.0
-  jaspr_lints: #^0.4.0
-    path: ../../packages/jaspr_lints
 
 flutter:
   uses-material-design: true

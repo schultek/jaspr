@@ -28,6 +28,7 @@ export 'src/internals.dart'
         ProviderScope,
         UncontrolledProviderScope,
         //RiverpodWidgetTesterX,
+        BindingRef,
         ProviderListenableSelect,
         AsyncResult,
         AsyncValueExtensions,

@@ -120,11 +120,9 @@ final class ChangeNotifierProvider<NotifierT extends ChangeNotifier?>
   /// changes.
   /// This may happen if the provider is refreshed or one of its dependencies
   /// has changes.
-  Refreshable<NotifierT> get notifier =>
-      ProviderElementProxy<NotifierT, NotifierT>(this, (element) {
-        return (element as _ChangeNotifierProviderElement<NotifierT>)
-            ._notifierNotifier;
-      });
+  Refreshable<NotifierT> get notifier => ProviderElementProxy<NotifierT, NotifierT>(this, (element) {
+    return (element as _ChangeNotifierProviderElement<NotifierT>)._notifierNotifier;
+  });
 
   final NotifierT Function(Ref ref) _createFn;
   @override
@@ -193,18 +191,8 @@ class _ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?>
 
 /// The [Family] of [ChangeNotifierProvider].
 @publicInMisc
-final class ChangeNotifierProviderFamily<
-  NotifierT extends ChangeNotifier?,
-  ArgT
->
-    extends
-        FunctionalFamily<
-          NotifierT,
-          NotifierT,
-          ArgT,
-          NotifierT,
-          ChangeNotifierProvider<NotifierT>
-        > {
+final class ChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?, ArgT>
+    extends FunctionalFamily<NotifierT, NotifierT, ArgT, NotifierT, ChangeNotifierProvider<NotifierT>> {
   /// The [Family] of [ChangeNotifierProvider].
   /// @nodoc
   @internal

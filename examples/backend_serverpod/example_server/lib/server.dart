@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
-import 'jaspr_options.dart';
 import 'package:serverpod/serverpod.dart';
 
+import 'jaspr_options.dart';
 import 'src/generated/endpoints.dart';
 import 'src/generated/protocol.dart';
 import 'src/web/routes/root.dart';
@@ -12,11 +12,7 @@ import 'src/web/routes/root.dart';
 
 void run(List<String> args) async {
   // Initialize Serverpod and connect it with your generated code.
-  final pod = Serverpod(
-    args,
-    Protocol(),
-    Endpoints(),
-  );
+  final pod = Serverpod(args, Protocol(), Endpoints());
 
   // If you are using any future calls, they need to be registered here.
   // pod.registerFutureCall(ExampleFutureCall(), 'exampleFutureCall');

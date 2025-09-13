@@ -172,11 +172,13 @@ class StatelessElement extends BuildableElement {
   @override
   FutureOr<void> performRebuild() {
     if (owner.isFirstBuild && _asyncFirstBuild != null) {
-      return _asyncFirstBuild!.then((_) {
-        super.performRebuild();
-      }).catchError((e, st) {
-        failRebuild(e, st);
-      });
+      return _asyncFirstBuild!
+          .then((_) {
+            super.performRebuild();
+          })
+          .catchError((e, st) {
+            failRebuild(e, st);
+          });
     }
     super.performRebuild();
   }

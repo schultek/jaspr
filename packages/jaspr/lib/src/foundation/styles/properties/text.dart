@@ -292,11 +292,11 @@ class _TextDecoration implements TextDecoration {
 
   @override
   String get value => [
-        if (line != null) line!.value,
-        if (style != null) style!.value,
-        if (color != null) color!.value,
-        if (thickness != null) thickness!.value,
-      ].join(' ');
+    if (line != null) line!.value,
+    if (style != null) style!.value,
+    if (color != null) color!.value,
+    if (thickness != null) thickness!.value,
+  ].join(' ');
 }
 
 abstract class TextShadow {

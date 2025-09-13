@@ -42,8 +42,10 @@ class RawNodeElement extends LeafRenderObjectElement {
 
   @override
   void update(RawNode newComponent) {
-    assert(newComponent.node == component.node,
-        'RawNode cannot be updated with a different node. Use a new RawNode instance instead.');
+    assert(
+      newComponent.node == component.node,
+      'RawNode cannot be updated with a different node. Use a new RawNode instance instead.',
+    );
     super.update(newComponent);
   }
 

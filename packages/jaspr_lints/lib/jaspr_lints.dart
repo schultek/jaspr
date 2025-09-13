@@ -14,17 +14,17 @@ PluginBase createPlugin() => JasprLinter();
 class JasprLinter extends PluginBase {
   @override
   List<LintRule> getLintRules(CustomLintConfigs configs) => [
-        SortChildrenPropertiesLastLint(),
-        PreferHtmlMethodLint(),
-        StylesOrderingLint(),
-        PreferStylesGetterLint(),
-      ];
+    SortChildrenPropertiesLastLint(),
+    PreferHtmlMethodLint(),
+    StylesOrderingLint(),
+    PreferStylesGetterLint(),
+  ];
 
   @override
   List<Assist> getAssists() => [
-        ComponentAssistProvider(),
-        TreeAssistProvider(),
-        CssAssistProvider(),
-        ImportAssistProvider(),
-      ];
+    ComponentAssistProvider(),
+    TreeAssistProvider(),
+    CssAssistProvider(),
+    ImportAssistProvider(),
+  ];
 }

@@ -21,9 +21,7 @@ class ExecutionIFrame extends StatelessComponent {
         id: 'frame',
         src: './scripts/frame_dark.html',
         sandbox: 'allow-scripts allow-popups',
-        attributes: {
-          'flex': '',
-        },
+        attributes: {'flex': ''},
         [],
       ),
     );

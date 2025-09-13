@@ -9,12 +9,7 @@ import '../utils/imports_verifier.dart';
 
 class ImportAssistProvider extends DartAssist {
   @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    SourceRange target,
-  ) {
+  void run(CustomLintResolver resolver, ChangeReporter reporter, CustomLintContext context, SourceRange target) {
     context.registry.addImportDirective((node) {
       if (!target.coveredBy(node.sourceRange)) {
         return;
@@ -47,21 +42,21 @@ class ImportAssistProvider extends DartAssist {
         reporter
             .createChangeBuilder(message: 'Convert to ${name.toLowerCase()}-only import', priority: 1)
             .addDartFileEdit((builder) {
-          var annotation = '@Import.on$name(\'${node.uri.stringValue}\', show: [$show])\n';
+              var annotation = '@Import.on$name(\'${node.uri.stringValue}\', show: [$show])\n';
 
-          if (importTarget != null) {
-            builder.addSimpleInsertion(importTarget.importKeyword.offset, annotation);
-          } else {
-            builder.addSimpleInsertion(
-              unit.directives.lastOrNull?.end ?? 0,
-              '\n${annotation}import \'$fileName.imports.dart\';',
-            );
-          }
+              if (importTarget != null) {
+                builder.addSimpleInsertion(importTarget.importKeyword.offset, annotation);
+              } else {
+                builder.addSimpleInsertion(
+                  unit.directives.lastOrNull?.end ?? 0,
+                  '\n${annotation}import \'$fileName.imports.dart\';',
+                );
+              }
 
-          unit.accept(ReplaceStubbedTypesVisitor(builder, elements));
+              unit.accept(ReplaceStubbedTypesVisitor(builder, elements));
 
-          builder.addDeletion(node.sourceRange);
-        });
+              builder.addDeletion(node.sourceRange);
+            });
       }
 
       convertImport('Web');

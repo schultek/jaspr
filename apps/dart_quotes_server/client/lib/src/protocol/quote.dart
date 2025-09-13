@@ -55,7 +55,7 @@ abstract class Quote implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
+      'id': ?id,
       'quote': quote,
       'author': author,
       'likes': likes.toJson(),
@@ -77,11 +77,11 @@ class _QuoteImpl extends Quote {
     required String author,
     required List<int> likes,
   }) : super._(
-          id: id,
-          quote: quote,
-          author: author,
-          likes: likes,
-        );
+         id: id,
+         quote: quote,
+         author: author,
+         likes: likes,
+       );
 
   @override
   Quote copyWith({

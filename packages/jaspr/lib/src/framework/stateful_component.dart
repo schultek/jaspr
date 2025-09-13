@@ -596,9 +596,7 @@ mixin PreloadStateMixin<T extends StatefulComponent> on State<T> {
 /// An [Element] that uses a [StatefulComponent] as its configuration.
 class StatefulElement extends BuildableElement {
   /// Creates an element that uses the given component as its configuration.
-  StatefulElement(StatefulComponent component)
-      : _state = component.createState(),
-        super(component) {
+  StatefulElement(StatefulComponent component) : _state = component.createState(), super(component) {
     assert(() {
       if (!state._debugTypesAreRight(component)) {
         throw 'StatefulComponent.createState must return a subtype of State<${component.runtimeType}>\n\n'
@@ -678,15 +676,17 @@ class StatefulElement extends BuildableElement {
   @override
   FutureOr<void> performRebuild() {
     if (owner.isFirstBuild && _asyncInitState != null) {
-      return _asyncInitState!.then((_) {
-        if (_didChangeDependencies) {
-          state.didChangeDependencies();
-          _didChangeDependencies = false;
-        }
-        super.performRebuild();
-      }).catchError((e, st) {
-        failRebuild(e, st);
-      });
+      return _asyncInitState!
+          .then((_) {
+            if (_didChangeDependencies) {
+              state.didChangeDependencies();
+              _didChangeDependencies = false;
+            }
+            super.performRebuild();
+          })
+          .catchError((e, st) {
+            failRebuild(e, st);
+          });
     }
     if (_didChangeDependencies) {
       state.didChangeDependencies();
