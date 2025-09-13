@@ -1,6 +1,6 @@
 name: flutter_embedding_demo
 description: A demo of embedding a flutter app into a jaspr website.
-version: 0.1.8-dev.1
+version: 0.1.7
 publish_to: none
 
 environment:
