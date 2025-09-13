@@ -15,7 +15,7 @@ class Playground extends StatelessComponent {
   Component build(BuildContext context) {
     if (kIsWeb) {
       context.listen(loadedProjectProvider, (_, proj) {
-        if (proj.valueOrNull != null) {
+        if (proj.value != null) {
           Future(() => context.read(logicProvider).compileFiles());
         }
       }, fireImmediately: true);

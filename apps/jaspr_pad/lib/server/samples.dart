@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:jaspr/server.dart';
-import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:path/path.dart' as path;
 
 import '../models/sample.dart';
@@ -48,7 +47,7 @@ Future<Response> getSample(Request request, String id) async {
   return Response.ok(result.toJson(), headers: {'Content-Type': 'application/json'});
 }
 
-Future<List<Sample>> loadSamplesProviderOverride(SyncProviderRef<List<Sample>> ref) async {
+Future<List<Sample>> loadSamples() async {
   var dirs = await Directory(samplesPath).list().toList();
 
   var loadedSamples = (await Future.wait(

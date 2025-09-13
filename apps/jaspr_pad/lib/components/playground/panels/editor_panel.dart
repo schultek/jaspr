@@ -106,9 +106,7 @@ class EditorPanelState extends State<EditorPanel> {
                         doc('styles.css', 'css'),
                       ],
                       onDocumentChanged: (String key, String content) {
-                        context
-                            .read(editProjectProvider.notifier)
-                            .update((state) => state?.updateContent(key, content));
+                        context.read(editProjectProvider.notifier).updateContent(key, content);
                       },
                       onSelectionChanged: (key, index, isWhitespace) {
                         context.read(fileSelectionProvider(key).notifier).state = null;

@@ -1,8 +1,9 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
-import 'utils.dart';
+import '../utils.dart';
 
 final counter = StateProvider((ref) => 0);
 final autoDisposeCounter = StateProvider.autoDispose((ref) => 0);

@@ -33,10 +33,12 @@ void main() async {
       return render(
         Document.template(
           name: 'main',
-          child: Builder(
-            builder: (context) {
+          child: AsyncBuilder(
+            builder: (context) async {
               return ProviderScope(
-                overrides: [syncSamplesProvider.overrideWith(loadSamplesProviderOverride)],
+                overrides: [
+                  syncSamplesProvider.overrideWithValue(await loadSamples()),
+                ],
                 child: Playground(),
               );
             },

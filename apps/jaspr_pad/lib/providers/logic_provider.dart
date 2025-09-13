@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 
 import '../adapters/html.dart';
 import '../components/playground/output/execution_service.dart';
@@ -66,7 +67,7 @@ class Logic {
   void prevTutorialStep() async {
     var tut = ref.read(editProjectProvider) as TutorialData;
     var updated = await changeStep(tut, tut.configs[tut.currentStep - 1].id);
-    ref.read(editProjectProvider.notifier).state = updated;
+    ref.read(editProjectProvider.notifier).updateProject(updated);
     window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=${updated.step.id}');
     ref.invalidate(activeDocIndexProvider);
     compileFiles();
@@ -75,7 +76,7 @@ class Logic {
   void nextTutorialStep() async {
     var tut = ref.read(editProjectProvider) as TutorialData;
     var updated = await changeStep(tut, tut.configs[tut.currentStep + 1].id);
-    ref.read(editProjectProvider.notifier).state = updated;
+    ref.read(editProjectProvider.notifier).updateProject(updated);
     window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=${updated.step.id}');
     ref.invalidate(activeDocIndexProvider);
     compileFiles();
@@ -84,14 +85,14 @@ class Logic {
   void selectTutorialStep(String id) async {
     var tut = ref.read(editProjectProvider) as TutorialData;
     var updated = await changeStep(tut, id);
-    ref.read(editProjectProvider.notifier).state = updated;
+    ref.read(editProjectProvider.notifier).updateProject(updated);
     window.history.pushState(null, 'JasprPad', '${window.location.origin}?tutorial=${updated.step.id}');
     ref.invalidate(activeDocIndexProvider);
     compileFiles();
   }
 
   void toggleSolution() {
-    ref.read(editProjectProvider.notifier).update((s) => (s as TutorialData).toggleSolution());
+    ref.read(editProjectProvider.notifier).toggleSolution();
     compileFiles();
   }
 
@@ -102,13 +103,11 @@ class Logic {
 
     await Future.wait([
       for (var e in proj.allDartFiles.entries)
-        ref
-            .read(dartServiceProvider)
-            .format(e.value)
-            .then(
-              (res) =>
-                  ref.read(editProjectProvider.notifier).update((state) => state?.updateContent(e.key, res.newString)),
-            ),
+        ref.read(dartServiceProvider).format(e.value).then(
+          (res) {
+            ref.read(editProjectProvider.notifier).updateContent(e.key, res.newString);
+          },
+        ),
     ]);
   }
 
@@ -167,10 +166,10 @@ class Logic {
   }
 
   void addNewFile(String result) {
-    ref.read(editProjectProvider.notifier).update((proj) => proj?.updateContent(result, ''));
+    ref.read(editProjectProvider.notifier).updateContent(result, '');
   }
 
   void deleteFile(String key) {
-    ref.read(editProjectProvider.notifier).update((proj) => proj?.updateContent(key, null));
+    ref.read(editProjectProvider.notifier).updateContent(key, null);
   }
 }
