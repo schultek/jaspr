@@ -21,7 +21,7 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
-  jaspr: ^0.21.0-dev.0
+  jaspr: ^0.21.0
   web: ^1.0.0
 
 dev_dependencies:

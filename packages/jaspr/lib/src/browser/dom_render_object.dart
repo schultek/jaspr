@@ -420,7 +420,7 @@ mixin MultiChildDomRenderObject on DomRenderObject {
       final node = getRealNodeOf(after.lastChild);
       return node ?? getRealNodeOf(after.previousSibling);
     }
-    if (after == null && this is DomRenderFragment) {
+    if (after == null && this is DomRenderFragment && (this as DomRenderFragment).isAttached) {
       return (parent as MultiChildDomRenderObject).getRealNodeOf(previousSibling);
     }
     return after?.node;

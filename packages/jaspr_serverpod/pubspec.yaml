@@ -19,7 +19,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  jaspr: ^0.21.0-dev.0
+  jaspr: ^0.21.0
   serverpod: '>=2.3.0 <3.0.0'
   serverpod_client: '>=2.3.0 <3.0.0'
   shelf: ^1.4.0
