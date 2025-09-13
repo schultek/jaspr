@@ -1,14 +1,11 @@
-# 🌊 Riverpod for Jaspr
+# 🌊 jaspr_riverpod
 
-Jaspr comes with a Riverpod package that ports over flutter_riverpod to Jaspr. It is based
-on Riverpod 2 and supports all providers and modifiers.
+A port of [`flutter_riverpod`](https://pub.dev/packages/flutter_riverpod) for [Jaspr](https://jaspr.site). It is based on Riverpod 3 and supports all providers and modifiers.
 
 **TLDR: Differences to flutter_riverpod**
 
 - No `Consumer` / `ConsumerComponent`, just use `context.read` / `context.watch`
-- Additional `SyncProvider` to sync values between server and client.
-
-> Also check out [this example](https://github.com/schultek/jaspr/tree/main/examples/riverpod_app).
+- Additional `sync` option to sync providers between server and client.
 
 ## 🪄 Accessing Providers
 
@@ -74,28 +71,30 @@ Builder(
 );
 ```
 
-## ♻️ Preloading and Syncing Provider State
+## ♻️ Syncing Provider State
 
-Jaspr allows `StatefulComponent`s to preload state as well as sync state between server and client
-(when using server-side rendering).
-
-Since providers often are used to replace `StatefulComponent`s, `jaspr_riverpod` offers the same
-mechanisms inside a special provider, called `SyncProvider`:
+Jaspr allows data that is loaded during pre-rendering to be synced to the client for further use. `jaspr_riverpod` extends this for providers, allowing to sync provider state from server to client like this:
 
 ```dart
-final mySyncProvider = SyncProvider<int>((ref) async {
-  // do some async work on the server, like fetching data from a database
-  await Future.delayed(Duration(seconds: 1));
-  return 100;
-}, id: 'initial_count');
+@override
+Component build() {
+  return ProviderScope(
+    sync: [
+      myProvider.syncWith('some-unique-key'),
+    ],
+    child: ...
+  );
+}
 ```
 
-This provider needs an additional id to be synced with the client.
-The create function of a `SyncProvider` is only executed on the server, and
-never on the client. Instead the synced value is returned.
+The `sync` property of `ProviderScope` receives a list of `provier.syncWith(String key)`, where `provider` can be any Provider. It will:
 
-It then can be used like any other provider. It functions like a `FutureProvider` and exposes a
-value of type `AsyncValue<T>`.
+- on the server: read the value of the provider and send it to the client
+- on the client: receive the value from the server and override the provider with it.
+
+Therefore, accessing a synced provider on the client will always return the synced value and skip it's computation.
+
+Additionally during pre-rendering on the server, if provider is a `FutureProvider`, `StreamProvider` or `AsyncNotifier`, the `ProviderScope` will wait for the providers future to complete before building its child. Therefore reading the provider inside the subtree will already return the completed value.
 
 ## 📜 Backstory: Why context extensions instead of Consumer?
 
