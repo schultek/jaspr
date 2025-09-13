@@ -1,10 +1,10 @@
 import 'package:jaspr/jaspr.dart';
 
+import '../../../components/link_button.dart';
+import '../../../constants/theme.dart';
 import 'components/hero_pill.dart';
 import 'components/install_command.dart';
-import '../../../components/link_button.dart';
 import 'components/meet_jaspr_button.dart';
-import '../../../constants/theme.dart';
 
 class Hero extends StatelessComponent {
   @override

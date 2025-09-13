@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:fluttercon/pages/favorites.dart';
 import 'package:http/http.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
 import 'models/session.dart';
+import 'pages/favorites.dart';
 import 'pages/schedule.dart';
 import 'pages/session.dart';
 

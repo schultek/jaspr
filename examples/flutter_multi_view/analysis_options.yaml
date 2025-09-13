@@ -1,10 +1,1 @@
-include: package:flutter_lints/flutter.yaml
-
-# TODO: Reenable once migrated to analyzer v8.
-#analyzer:
-#  plugins:
-#    - custom_lint
-
-formatter:
-  page_width: 120
-  trailing_commas: preserve
+include: package:jaspr_repo/flutter_app.yaml

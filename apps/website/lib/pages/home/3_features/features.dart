@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
 
+import '../../../constants/theme.dart';
 import 'components/link_card.dart';
 
 class Features extends StatelessComponent {

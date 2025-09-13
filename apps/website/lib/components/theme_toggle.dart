@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
-import 'package:website/constants/theme.dart';
 
+import '../constants/theme.dart';
 import 'icon.dart';
 
 class ThemeToggle extends StatefulComponent {

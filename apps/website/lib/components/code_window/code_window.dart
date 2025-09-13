@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
 
+import '../../constants/theme.dart';
 import '../icon.dart';
 import 'code_block.dart';
 

@@ -25,4 +25,4 @@ dependencies:
   web: ^1.0.0
 
 dev_dependencies:
-  lints: ^5.0.0
+  jaspr_repo: any

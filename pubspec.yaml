@@ -1,4 +1,5 @@
 name: jaspr_workspace
+publish_to: none
 repository: https://github.com/schultek/jaspr
 
 environment:
@@ -11,6 +12,7 @@ workspace:
   - packages/jaspr_content
   - packages/jaspr_flutter_embed
   - packages/jaspr_lints
+  - packages/jaspr_repo
   - packages/jaspr_riverpod
   - packages/jaspr_router
   - packages/jaspr_serverpod

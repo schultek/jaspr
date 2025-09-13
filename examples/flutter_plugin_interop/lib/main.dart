@@ -1,7 +1,7 @@
-import 'package:flutter_plugin_interop/jaspr_options.dart';
 import 'package:jaspr/server.dart';
 
 import 'components/app.dart';
+import 'jaspr_options.dart';
 
 void main() {
   Jaspr.initializeApp(options: defaultJasprOptions);

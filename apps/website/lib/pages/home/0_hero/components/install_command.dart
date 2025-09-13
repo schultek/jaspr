@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart';
-import 'package:website/constants/theme.dart';
 
 import '../../../../components/icon.dart';
+import '../../../../constants/theme.dart';
 
 @client
 class InstallCommand extends StatefulComponent {
