@@ -1,12 +1,4 @@
-## Unreleased 0.21.0-dev.2
-
-- Added `All`, `Appearance` and `AspectRatio` styles properties.
-
-## 0.21.0-dev.1
-
-- Fixed update check for pre-release versions.
-
-## 0.21.0-dev.0
+## Unreleased minor
 
 **Read the full [Release Notes](https://docs.jaspr.site/releases/v/0.21.0) for this version.**
 
@@ -16,17 +8,17 @@
 
 - Allow setting `Document(base: )` to `null`, and fix the path to the generated client script when no `<base>` element exists.
 
-- Added `justifyItems`, `justifySelf` and `alignContent` styles properties and respective enums `JustifyItems`, `JustifySelf` and `AlignContent`.
-- Added `filter` and `backdropFilter` styles properties and its implementation class `Filter`.
+- Added `justifyItems`, `justifySelf` and `alignContent` styles properties.
+- Added `filter` and `backdropFilter` styles properties.
+- Added `all`, `appearance` and `aspectRatio` styles properties.
 
 - Added `--include-source-maps` option to `jaspr build` command.
 
 - Added `jaspr tooling-daemon` command and component scope analysis.
 - Fixed sitemap generation bug in top-level route ('/')
-- Update `build` dependency to 3.0.0 and migrate to new analyzer model.
 
-- Migrate project to use pub workspaces and `melos` 7.0.0.
-
+- Update `analyzer` to `^8.0.0` and `build` to `^4.0.0`.
+- Migrate project to use pub workspaces and bump `melos` to `^7.1.0`.
 
 ## 0.20.0
 
