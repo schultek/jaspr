@@ -1,6 +1,6 @@
 name: dart_quotes
 description: A collection of Dart quotes. Built for FullStackFlutter Conference.
-version: 0.1.8
+version: 0.1.9
 publish_to: none
 
 environment:

@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.21.1
 
 - Fix rendering issue with fragments.
 

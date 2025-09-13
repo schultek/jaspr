@@ -1,6 +1,6 @@
 name: example_server
 description: Starting point for a Serverpod server.
-version: 0.1.3
+version: 0.1.4
 publish_to: none
 
 environment:
