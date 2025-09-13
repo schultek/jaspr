@@ -12,11 +12,13 @@ class Home extends StatelessComponent {
         img(
           src: "/images/serverpod-logo.svg",
           width: 160,
-          styles: Styles(margin: Margin.only(top: 8.px, bottom: 12.px)),
+          styles: Styles(
+            margin: Margin.only(top: 8.px, bottom: 12.px),
+          ),
         ),
         p([
-          a(href: "https://serverpod.dev/", [text("Serverpod + Jaspr")])
-        ])
+          a(href: "https://serverpod.dev/", [text("Serverpod + Jaspr")]),
+        ]),
       ]),
       hr(),
       div(classes: "info-box", [
@@ -37,7 +39,7 @@ class Home extends StatelessComponent {
         a(href: "https://docs.jaspr.site/quick-start", [text("Get Started")]),
         text('•'),
         a(href: "https://github.com/schultek/jaspr", [text("Github")]),
-      ])
+      ]),
     ]);
   }
 }

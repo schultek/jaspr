@@ -21,6 +21,6 @@ const stylesGlobalSources = {
 final stylesGlobalOutputs = {
   'site|lib/styles_global.styles.json': jsonEncode({
     "elements": ["styles", "styles2"],
-    "id": ["site", "lib/styles_global.dart"]
+    "id": ["site", "lib/styles_global.dart"],
   }),
 };

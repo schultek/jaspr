@@ -37,26 +37,22 @@ class Run extends StatelessComponent {
           for (final line in lines) ...[
             span([
               span(styles: Styles(color: line.$2), [text(line.$1)]),
-              text(line.$3)
+              text(line.$3),
             ]),
             br(),
           ],
-        ])
+        ]),
       ]),
     );
   }
 
   @css
   static List<StyleRule> get styles => [
-        css('.run-preview', [
-          css('&').styles(padding: Padding.all(.5.rem)),
-          css('.console').styles(
-            display: Display.block,
-            opacity: .8,
-            color: textBlack,
-            textAlign: TextAlign.start,
-            fontSize: .7.rem,
-          ),
-        ]),
-      ];
+    css('.run-preview', [
+      css('&').styles(padding: Padding.all(.5.rem)),
+      css(
+        '.console',
+      ).styles(display: Display.block, opacity: .8, color: textBlack, textAlign: TextAlign.start, fontSize: .7.rem),
+    ]),
+  ];
 }

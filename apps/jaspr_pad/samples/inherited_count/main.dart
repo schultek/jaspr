@@ -29,10 +29,7 @@ class _AppState extends State<App> {
   @override
   Component build(BuildContext context) {
     return div([
-      InheritedCount(
-        count,
-        child: CountLabel(),
-      ),
+      InheritedCount(count, child: CountLabel()),
       button(
         onClick: () {
           setState(() => count++);

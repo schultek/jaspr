@@ -13,10 +13,7 @@ void main() {
     });
 
     testComponents('should resolve route params', (tester) async {
-      tester.pumpComponent(Router(routes: [
-        homeRoute(),
-        route('/a/:aId'),
-      ]));
+      tester.pumpComponent(Router(routes: [homeRoute(), route('/a/:aId')]));
 
       expect(find.text('home'), findsOneComponent);
 

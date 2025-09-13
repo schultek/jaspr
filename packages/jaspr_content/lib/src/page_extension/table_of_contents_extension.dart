@@ -10,9 +10,7 @@ import 'page_extension.dart';
 /// The resulting [TableOfContents] object is stored in the page's data under the 'toc' key.
 /// It may be consumed by a layout to display the table of contents.
 class TableOfContentsExtension implements PageExtension {
-  const TableOfContentsExtension({
-    this.maxHeaderDepth = 3,
-  });
+  const TableOfContentsExtension({this.maxHeaderDepth = 3});
 
   final int maxHeaderDepth;
 
@@ -75,10 +73,12 @@ class TableOfContents {
   Iterable<Component> _buildToc(List<TocEntry> toc, [int indent = 0]) sync* {
     for (final entry in toc) {
       yield li(styles: Styles(padding: Padding.only(left: (0.75 * indent).em)), [
-        Builder(builder: (context) {
-          var route = RouteState.of(context);
-          return a(href: '${route.path}#${entry.id}', [text(entry.text)]);
-        }),
+        Builder(
+          builder: (context) {
+            var route = RouteState.of(context);
+            return a(href: '${route.path}#${entry.id}', [text(entry.text)]);
+          },
+        ),
       ]);
       if (entry.children.isNotEmpty) {
         yield* _buildToc(entry.children, indent + 1);

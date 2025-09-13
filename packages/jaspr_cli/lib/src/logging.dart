@@ -135,8 +135,10 @@ extension LevelFormat on Level {
       Level.info => s,
       Level.warning => yellow.wrap(styleBold.wrap('[WARNING] $s', forScript: daemon), forScript: daemon),
       Level.error => lightRed.wrap('[ERROR] $s', forScript: daemon),
-      Level.critical => backgroundRed
-          .wrap(styleBold.wrap(white.wrap('[CRITICAL] $s', forScript: daemon), forScript: daemon), forScript: daemon),
+      Level.critical => backgroundRed.wrap(
+        styleBold.wrap(white.wrap('[CRITICAL] $s', forScript: daemon), forScript: daemon),
+        forScript: daemon,
+      ),
       Level.quiet => s,
     }!;
   }

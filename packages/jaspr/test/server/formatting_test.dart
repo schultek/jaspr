@@ -8,11 +8,7 @@ import 'package:meta/meta.dart';
 final _ = ''.padLeft(40, '-');
 
 @isTest
-void testOutput(
-  String description, {
-  required Component input,
-  required String output,
-}) {
+void testOutput(String description, {required Component input, required String output}) {
   testServer('formats $description', (tester) async {
     tester.pumpComponent(input);
 
@@ -44,7 +40,8 @@ void main() {
         span([text('B $_')]),
         span([text('C $_')]),
       ]),
-      output: '<div>\n'
+      output:
+          '<div>\n'
           '      <span>A $_</span>\n'
           '      <span>B $_</span>\n'
           '      <span>C $_</span>\n'
@@ -59,7 +56,8 @@ void main() {
         span([text(' C $_')]),
         span([text('D')]),
       ]),
-      output: '<p>\n'
+      output:
+          '<p>\n'
           '      <span>A $_ </span>\n'
           '      <span>B $_</span>\n'
           '      <span> C $_</span><span>D</span>\n'
@@ -73,7 +71,8 @@ void main() {
         b([text('World $_')]),
         text('C $_'),
       ]),
-      output: '<p>\n'
+      output:
+          '<p>\n'
           '      Hello $_ \n'
           '      <b>World $_</b>C $_\n'
           '    </p>',
@@ -89,7 +88,8 @@ void main() {
         ]),
         span([text('C $_')]),
       ]),
-      output: '<p>\n'
+      output:
+          '<p>\n'
           '      <span>A $_</span><em>Hello $_ \n'
           '        <b>World $_</b></em><span>C $_</span>\n'
           '    </p>',
@@ -97,10 +97,9 @@ void main() {
 
     testOutput(
       'formatted text',
-      input: p([
-        text('A $_\nB $_\nC'),
-      ]),
-      output: '<p>\n'
+      input: p([text('A $_\nB $_\nC')]),
+      output:
+          '<p>\n'
           '      A $_\n'
           '      B $_\n'
           '      C\n'
@@ -113,7 +112,8 @@ void main() {
         span([text('A $_\nB $_\nC')]),
         b([text('D $_')]),
       ]),
-      output: '<div>\n'
+      output:
+          '<div>\n'
           '      <span>A $_\n'
           'B $_\n'
           'C</span>\n'
@@ -121,51 +121,53 @@ void main() {
           '    </div>',
     );
 
-    testOutput('with fragments',
-        input: div([
+    testOutput(
+      'with fragments',
+      input: div([
+        fragment([
+          p([text('A $_ ')]),
+          fragment([]),
           fragment([
-            p([text('A $_ ')]),
-            fragment([]),
-            fragment([
-              p([text('B $_ ')]),
-              p([
-                fragment([text('C $_ ')]),
-              ]),
+            p([text('B $_ ')]),
+            p([
+              fragment([text('C $_ ')]),
             ]),
           ]),
-          div([
+        ]),
+        div([
+          fragment([
             fragment([
-              fragment([
-                p([text('D $_ ')]),
-                p([text('E $_ ')]),
-              ]),
-            ])
+              p([text('D $_ ')]),
+              p([text('E $_ ')]),
+            ]),
           ]),
         ]),
-        output: '<div>\n'
-            '      <p>A ---------------------------------------- </p>\n'
-            '      <p>B ---------------------------------------- </p>\n'
-            '      <p>C ---------------------------------------- </p>\n'
-            '      <div>\n'
-            '        <p>D ---------------------------------------- </p>\n'
-            '        <p>E ---------------------------------------- </p>\n'
-            '      </div>\n'
-            '    </div>');
+      ]),
+      output:
+          '<div>\n'
+          '      <p>A ---------------------------------------- </p>\n'
+          '      <p>B ---------------------------------------- </p>\n'
+          '      <p>C ---------------------------------------- </p>\n'
+          '      <div>\n'
+          '        <p>D ---------------------------------------- </p>\n'
+          '        <p>E ---------------------------------------- </p>\n'
+          '      </div>\n'
+          '    </div>',
+    );
 
-    testOutput('with preformatted html',
-        input: div([
-          text('\n   '),
-          p([
-            text('\n      '),
-            text('Hello'),
-            text('\n   '),
-          ]),
-          text('\n')
-        ]),
-        output: '<div>\n'
-            '   <p>\n'
-            '      Hello\n'
-            '   </p>\n'
-            '</div>');
+    testOutput(
+      'with preformatted html',
+      input: div([
+        text('\n   '),
+        p([text('\n      '), text('Hello'), text('\n   ')]),
+        text('\n'),
+      ]),
+      output:
+          '<div>\n'
+          '   <p>\n'
+          '      Hello\n'
+          '   </p>\n'
+          '</div>',
+    );
   });
 }

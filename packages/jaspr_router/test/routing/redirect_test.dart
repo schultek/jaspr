@@ -14,18 +14,17 @@ void main() {
     });
 
     testComponents('should redirect toplevel', (tester) async {
-      tester.pumpComponent(Router(
-        routes: [
-          homeRoute(),
-          route('/b'),
-        ],
-        redirect: (_, s) {
-          if (s.location == '/a') {
-            return '/b';
-          }
-          return null;
-        },
-      ));
+      tester.pumpComponent(
+        Router(
+          routes: [homeRoute(), route('/b')],
+          redirect: (_, s) {
+            if (s.location == '/a') {
+              return '/b';
+            }
+            return null;
+          },
+        ),
+      );
 
       expect(find.text('home'), findsOneComponent);
 
@@ -39,16 +38,20 @@ void main() {
     testComponents('should redirect on route', (tester) async {
       var blocked = true;
 
-      tester.pumpComponent(Router(routes: [
-        homeRoute(),
-        route('/a'),
-        route('/b', [], null, (_, s) {
-          if (blocked) {
-            return '/a';
-          }
-          return null;
-        }),
-      ]));
+      tester.pumpComponent(
+        Router(
+          routes: [
+            homeRoute(),
+            route('/a'),
+            route('/b', [], null, (_, s) {
+              if (blocked) {
+                return '/a';
+              }
+              return null;
+            }),
+          ],
+        ),
+      );
 
       expect(find.text('home'), findsOneComponent);
 
@@ -71,22 +74,23 @@ void main() {
       var blocked = false;
       late void Function(VoidCallback) setState;
 
-      tester.pumpComponent(StatefulBuilder(builder: (context, cb) {
-        setState = cb;
-        return Router(
-          routes: [
-            homeRoute(),
-            route('/a'),
-          ],
-          redirect: (_, s) async {
-            await Future(() async {});
-            if (s.location == '/a' && blocked) {
-              return '/';
-            }
-            return null;
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, cb) {
+            setState = cb;
+            return Router(
+              routes: [homeRoute(), route('/a')],
+              redirect: (_, s) async {
+                await Future(() async {});
+                if (s.location == '/a' && blocked) {
+                  return '/';
+                }
+                return null;
+              },
+            );
           },
-        );
-      }));
+        ),
+      );
 
       await pumpEventQueue();
       expect(find.text('home'), findsOneComponent);

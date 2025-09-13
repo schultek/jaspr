@@ -7,37 +7,27 @@ import 'package:jaspr_test/jaspr_test.dart';
 void main() {
   group('html components', () {
     testComponents('renders content', (tester) async {
-      tester.pumpComponent(html([
-        head([]),
-        body([
-          header([
-            nav([]),
-          ]),
-          main_([
-            article([
-              h1([]),
-              h2([]),
-              h3([]),
-              h4([]),
-              h5([]),
-              h6([]),
-              p([]),
-            ]),
-            section([
-              blockquote([]),
-              div([]),
-              ul([
-                li([]),
+      tester.pumpComponent(
+        html([
+          head([]),
+          body([
+            header([nav([])]),
+            main_([
+              article([h1([]), h2([]), h3([]), h4([]), h5([]), h6([]), p([])]),
+              section([
+                blockquote([]),
+                div([]),
+                ul([li([])]),
+                ol([]),
+                hr(),
+                pre([]),
               ]),
-              ol([]),
-              hr(),
-              pre([]),
             ]),
+            aside([]),
+            footer([]),
           ]),
-          aside([]),
-          footer([]),
         ]),
-      ]));
+      );
 
       expect(find.tag('html'), findsOneComponent);
       expect(find.tag('head'), findsOneComponent);

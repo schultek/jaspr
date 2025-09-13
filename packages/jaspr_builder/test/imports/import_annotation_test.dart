@@ -28,10 +28,7 @@ void main() {
     test('generates dart output', () async {
       await testBuilder(
         ImportsOutputBuilder(BuilderOptions({})),
-        {
-          ...importsSources,
-          ...importsModuleOutput,
-        },
+        {...importsSources, ...importsModuleOutput},
         outputs: importsOutput,
         readerWriter: reader,
       );
@@ -40,10 +37,7 @@ void main() {
     test('generates stubs', () async {
       await testBuilder(
         ImportsStubsBuilder(BuilderOptions({})),
-        {
-          ...importsSources,
-          ...importsModuleOutput,
-        },
+        {...importsSources, ...importsModuleOutput},
         outputs: importsStubsOutput,
         readerWriter: reader,
       );

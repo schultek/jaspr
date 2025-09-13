@@ -18,9 +18,7 @@ void main() {
         path: 'test.md',
         url: '/test',
         content: '',
-        config: PageConfig(
-          dataLoaders: [loader],
-        ),
+        config: PageConfig(dataLoaders: [loader]),
         loader: mockLoader,
       );
 
@@ -33,18 +31,13 @@ void main() {
 
     test('merges with existing data', () async {
       // Arrange
-      final loader = MemoryDataLoader({
-        'b': 20,
-        'c': 3,
-      });
+      final loader = MemoryDataLoader({'b': 20, 'c': 3});
       final page = Page(
         path: 'test.md',
         url: '/test',
         content: '',
         initialData: {'a': 1, 'b': 2},
-        config: PageConfig(
-          dataLoaders: [loader],
-        ),
+        config: PageConfig(dataLoaders: [loader]),
         loader: mockLoader,
       );
 
@@ -62,7 +55,7 @@ void main() {
         'page': {
           'title': 'Loader Title', // This should be overridden
           'author': 'Loader Author', // This should be kept
-        }
+        },
       });
 
       final page = Page(
@@ -70,11 +63,9 @@ void main() {
         url: '/test',
         content: '',
         initialData: {
-          'page': {'title': 'Initial Title'}
+          'page': {'title': 'Initial Title'},
         },
-        config: PageConfig(
-          dataLoaders: [loader],
-        ),
+        config: PageConfig(dataLoaders: [loader]),
         loader: mockLoader,
       );
 
@@ -83,35 +74,32 @@ void main() {
 
       // Assert
       expect(
-          page.data,
-          equals({
-            'title': 'Global Title',
-            'page': {
-              'title': 'Initial Title', // Preserved from initialData
-              'author': 'Loader Author', // Merged from loader
-            }
-          }));
+        page.data,
+        equals({
+          'title': 'Global Title',
+          'page': {
+            'title': 'Initial Title', // Preserved from initialData
+            'author': 'Loader Author', // Merged from loader
+          },
+        }),
+      );
     });
 
     test('frontmatter data takes precedence over loader data', () async {
       // Arrange
       final loader = MemoryDataLoader({
-        'page': {
-          'title': 'Loader Title',
-          'author': 'Loader Author',
-        }
+        'page': {'title': 'Loader Title', 'author': 'Loader Author'},
       });
 
       final page = Page(
         path: 'test.md',
         url: '/test',
-        content: '---\n'
+        content:
+            '---\n'
             'title: Frontmatter Title\n'
             '---\n'
             '# Hello World',
-        config: PageConfig(
-          dataLoaders: [loader],
-        ),
+        config: PageConfig(dataLoaders: [loader]),
         loader: mockLoader,
       );
 
@@ -121,13 +109,11 @@ void main() {
 
       // Assert
       expect(
-          page.data,
-          equals({
-            'page': {
-              'title': 'Frontmatter Title',
-              'author': 'Loader Author',
-            }
-          }));
+        page.data,
+        equals({
+          'page': {'title': 'Frontmatter Title', 'author': 'Loader Author'},
+        }),
+      );
     });
 
     test('does not change data if loader data is empty', () async {
@@ -138,9 +124,7 @@ void main() {
         url: '/test',
         content: '',
         initialData: {'a': 1},
-        config: PageConfig(
-          dataLoaders: [loader],
-        ),
+        config: PageConfig(dataLoaders: [loader]),
         loader: mockLoader,
       );
 

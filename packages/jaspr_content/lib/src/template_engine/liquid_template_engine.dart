@@ -16,10 +16,8 @@ class LiquidTemplateEngine implements TemplateEngine {
   /// The [includesPath] should be an absolute path or
   /// relative to the current working directory.
   /// By default, includes are found in the `content/_includes` directory.
-  LiquidTemplateEngine({
-    String? includesPath,
-    this.prepareTemplate,
-  }) : includesPath = includesPath ?? path.join('content', '_includes');
+  LiquidTemplateEngine({String? includesPath, this.prepareTemplate})
+    : includesPath = includesPath ?? path.join('content', '_includes');
 
   final String includesPath;
   final void Function(Template, Page, List<Page> pages)? prepareTemplate;

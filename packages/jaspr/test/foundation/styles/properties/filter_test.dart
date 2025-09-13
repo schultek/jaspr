@@ -37,9 +37,11 @@ void main() {
         expect(
           styles.properties,
           equals({
-            'filter': 'blur(0) brightness(1) contrast(1) drop-shadow(1rem 1rem) grayscale(1) hue-rotate(0) invert(1) '
+            'filter':
+                'blur(0) brightness(1) contrast(1) drop-shadow(1rem 1rem) grayscale(1) hue-rotate(0) invert(1) '
                 'opacity(1) sepia(1) saturate(1) url(abc.svg#urltest)',
-            'backdrop-filter': 'blur(0.1rem) brightness(0.2) contrast(0.3) drop-shadow(1rem 1rem 0.4rem red) '
+            'backdrop-filter':
+                'blur(0.1rem) brightness(0.2) contrast(0.3) drop-shadow(1rem 1rem 0.4rem red) '
                 'grayscale(0.5) hue-rotate(45deg) invert(0.6) opacity(0.7) sepia(0.8) saturate(0.9) '
                 'url(xyz.svg#urltest)',
           }),
@@ -48,10 +50,7 @@ void main() {
 
       test("Filter.list does not allow empty list", () {
         final filter = Filter.list([]);
-        expect(
-          () => filter.value,
-          throwsA(predicate((e) => e == 'Filter.list cannot be empty.')),
-        );
+        expect(() => filter.value, throwsA(predicate((e) => e == 'Filter.list cannot be empty.')));
       });
 
       test("Filter.list does not allow nesting another Filter.list", () {
@@ -73,9 +72,11 @@ void main() {
           final filter = Filter.list([val]);
           expect(
             () => filter.value,
-            throwsA(predicate((e) {
-              return e == 'Cannot use ${val.value} as a filter list item, only standalone use supported.';
-            })),
+            throwsA(
+              predicate((e) {
+                return e == 'Cannot use ${val.value} as a filter list item, only standalone use supported.';
+              }),
+            ),
           );
         }
       });

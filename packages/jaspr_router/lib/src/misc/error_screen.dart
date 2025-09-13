@@ -14,10 +14,6 @@ class ErrorScreen extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return div([
-      text('Page Not Found'),
-      br(),
-      text(error?.toString() ?? 'page not found'),
-    ]);
+    return div([text('Page Not Found'), br(), text(error?.toString() ?? 'page not found')]);
   }
 }

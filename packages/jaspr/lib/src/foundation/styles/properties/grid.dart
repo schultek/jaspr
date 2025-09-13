@@ -8,11 +8,11 @@ class GridTemplate {
   final GridTracks? rows;
   final GridAreas? areas;
 
-  Map<String, dynamic> get styles {
+  Map<String, String> get styles {
     return {
-      if (columns != null) 'grid-template-columns': columns!.value,
-      if (rows != null) 'grid-template-rows': rows!.value,
-      if (areas != null) 'grid-template-areas': areas!.value,
+      'grid-template-columns': ?columns?.value,
+      'grid-template-rows': ?rows?.value,
+      'grid-template-areas': ?areas?.value,
     };
   }
 }
@@ -152,9 +152,7 @@ class TrackRepeat {
 class Gap {
   const Gap({this.row, this.column});
 
-  const Gap.all(Unit value)
-      : row = value,
-        column = value;
+  const Gap.all(Unit value) : row = value, column = value;
 
   final Unit? row;
   final Unit? column;
@@ -166,8 +164,8 @@ class Gap {
       return {'gap': '${row!.value} ${column!.value}'};
     } else {
       return {
-        if (row != null) 'row-gap': row!.value,
-        if (column != null) 'column-gap': column!.value,
+        'row-gap': ?row?.value,
+        'column-gap': ?column?.value,
       };
     }
   }

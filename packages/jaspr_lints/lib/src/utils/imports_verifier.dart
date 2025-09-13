@@ -80,10 +80,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
     _visitIdentifier(node, node.element);
   }
 
-  void _recordAssignmentTarget(
-    CompoundAssignmentExpression node,
-    Expression target,
-  ) {
+  void _recordAssignmentTarget(CompoundAssignmentExpression node, Expression target) {
     if (target is IndexExpression) {
       _recordIfExtensionMember(node.readElement);
       _recordIfExtensionMember(node.writeElement);
@@ -108,10 +105,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
     }
   }
 
-  void _recordPrefixedElement(
-    ImportPrefixReference? importPrefix,
-    Element? element,
-  ) {
+  void _recordPrefixedElement(ImportPrefixReference? importPrefix, Element? element) {
     if (element is MultiplyDefinedElement) {
       for (var component in element.conflictingElements) {
         _recordPrefixedElement(importPrefix, component);

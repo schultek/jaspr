@@ -4,10 +4,7 @@ import 'styles.dart';
 
 abstract class StyleRule {
   /// Renders a css rule with the given selector and styles.
-  const factory StyleRule({
-    required Selector selector,
-    required Styles styles,
-  }) = BlockStyleRule;
+  const factory StyleRule({required Selector selector, required Styles styles}) = BlockStyleRule;
 
   /// Renders a `@import url(...)` css rule.
   ///
@@ -18,50 +15,34 @@ abstract class StyleRule {
   ///
   /// The `@font-face` CSS at-rule specifies a custom font with which to display text; the font can be loaded from
   /// either a remote server or a locally-installed font on the user's own computer.
-  const factory StyleRule.fontFace({
-    required String family,
-    FontStyle? style,
-    required String url,
-  }) = FontFaceStyleRule;
+  const factory StyleRule.fontFace({required String family, FontStyle? style, required String url}) = FontFaceStyleRule;
 
   /// Renders a `@media` css rule.
   ///
   /// The `@media` CSS at-rule can be used to apply part of a style sheet based on the result of one or more media
   /// queries. With it, you specify a media query and a block of CSS to apply to the document if and only if the media
   /// query matches the device on which the content is being used.
-  const factory StyleRule.media({
-    required MediaQuery query,
-    required List<StyleRule> styles,
-  }) = MediaStyleRule;
+  const factory StyleRule.media({required MediaQuery query, required List<StyleRule> styles}) = MediaStyleRule;
 
   /// Renders a `@layer` css rule.
   ///
   /// The `@layer` CSS at-rule is used to declare a cascade layer and can also be used to define the order of
   /// precedence in case of multiple cascade layers.
-  const factory StyleRule.layer({
-    String? name,
-    required List<StyleRule> styles,
-  }) = LayerStyleRule;
+  const factory StyleRule.layer({String? name, required List<StyleRule> styles}) = LayerStyleRule;
 
   /// Renders a `@supports` css rule.
   ///
   /// The `@supports` CSS at-rule lets you specify CSS declarations that depend on a browser's support for CSS
   /// features. Using this at-rule is commonly called a feature query. The rule must be placed at the top level of
   /// your code or nested inside any other conditional group at-rule.
-  const factory StyleRule.supports({
-    required String condition,
-    required List<StyleRule> styles,
-  }) = SupportsStyleRule;
+  const factory StyleRule.supports({required String condition, required List<StyleRule> styles}) = SupportsStyleRule;
 
   /// Renders a `@keyframes` css rule.
   ///
   /// The `@keyframes` CSS at-rule controls the intermediate steps in a CSS animation sequence by defining styles for
   /// keyframes (or waypoints) along the animation sequence. This gives more control over the intermediate steps of
   /// the animation sequence than transitions.
-  const factory StyleRule.keyframes({
-    required String name,
-    required Map<String, Styles> styles,
-  }) = KeyframesStyleRule;
+  const factory StyleRule.keyframes({required String name, required Map<String, Styles> styles}) = KeyframesStyleRule;
 
   /// Returns the rendered css for this rule.
   String toCss([String indent]);
@@ -186,7 +167,7 @@ enum Orientation {
   portrait,
 
   /// The viewport is in a landscape orientation, i.e., the width is greater than the height.
-  landscape;
+  landscape,
 }
 
 /// The `prefers-color-scheme` CSS media feature is used to detect if a user has requested light or dark color themes.
@@ -198,7 +179,7 @@ enum ColorScheme {
   light,
 
   /// Indicates that user has notified that they prefer an interface that has a dark theme.
-  dark;
+  dark,
 }
 
 /// The `prefers-contrast` CSS media feature is used to detect whether the user has requested the web content to be
@@ -271,7 +252,8 @@ class _MediaRuleQuery implements MediaQuery {
   final Contrast? prefersContrast;
 
   @override
-  String get _value => '$target'
+  String get _value =>
+      '$target'
       '${minWidth != null ? ' and (min-width: ${minWidth!.value})' : ''}'
       '${maxWidth != null ? ' and (max-width: ${maxWidth!.value})' : ''}'
       '${minHeight != null ? ' and (min-height: ${minHeight!.value})' : ''}'
@@ -290,15 +272,17 @@ class _NotMediaRuleQuery implements MediaQuery {
 
   @override
   String get _value {
-    assert((() {
-      if (query is _AnyMediaRuleQuery) {
-        throw 'Cannot apply MediaRuleQuery.not() on MediaRuleQuery.any(). Apply on each individual rule instead.';
-      }
-      if (query is _NotMediaRuleQuery) {
-        throw 'Cannot apply MediaRuleQuery.not() twice.';
-      }
-      return true;
-    })());
+    assert(
+      (() {
+        if (query is _AnyMediaRuleQuery) {
+          throw 'Cannot apply MediaRuleQuery.not() on MediaRuleQuery.any(). Apply on each individual rule instead.';
+        }
+        if (query is _NotMediaRuleQuery) {
+          throw 'Cannot apply MediaRuleQuery.not() twice.';
+        }
+        return true;
+      })(),
+    );
     return 'not ${query._value}';
   }
 }
@@ -332,11 +316,7 @@ class ImportStyleRule implements StyleRule {
 }
 
 class FontFaceStyleRule implements StyleRule {
-  const FontFaceStyleRule({
-    required this.family,
-    this.style,
-    required this.url,
-  });
+  const FontFaceStyleRule({required this.family, this.style, required this.url});
 
   final String family;
   final FontStyle? style;

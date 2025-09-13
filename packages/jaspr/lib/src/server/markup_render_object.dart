@@ -44,14 +44,18 @@ abstract class MarkupRenderObject extends RenderObject {
     return _renderAndFormat().$1;
   }
 
-  (String, bool, bool) _renderAndFormat(
-      [bool strictFormatting = false, bool strictWhitespace = false, String indent = '']);
+  (String, bool, bool) _renderAndFormat([
+    bool strictFormatting = false,
+    bool strictWhitespace = false,
+    String indent = '',
+  ]);
 
-  (String, bool, bool) _renderChildren(
-      [bool strictWhitespace = false,
-      bool childStrictFormatting = false,
-      bool childStrictWhitespace = false,
-      String indent = '']) {
+  (String, bool, bool) _renderChildren([
+    bool strictWhitespace = false,
+    bool childStrictFormatting = false,
+    bool childStrictWhitespace = false,
+    String indent = '',
+  ]) {
     final output = StringBuffer();
     final childIndent = this is MarkupRenderFragment ? indent : '$indent  ';
 
@@ -96,7 +100,8 @@ abstract class MarkupRenderObject extends RenderObject {
             }
           }
           output.write(child.$1);
-          allowNewline = childStrictWhitespace //
+          allowNewline =
+              childStrictWhitespace //
               ? child.$3
               : true;
         }
@@ -126,8 +131,13 @@ class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
   Map<String, String>? attributes;
 
   @override
-  void update(String? id, String? classes, Map<String, String>? styles, Map<String, String>? attributes,
-      Map<String, EventCallback>? events) {
+  void update(
+    String? id,
+    String? classes,
+    Map<String, String>? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+  ) {
     this.id = id;
     this.classes = classes;
     this.styles = styles;
@@ -135,8 +145,11 @@ class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
   }
 
   @override
-  (String, bool, bool) _renderAndFormat(
-      [bool strictFormatting = false, bool strictWhitespace = false, String indent = '']) {
+  (String, bool, bool) _renderAndFormat([
+    bool strictFormatting = false,
+    bool strictWhitespace = false,
+    String indent = '',
+  ]) {
     var output = StringBuffer();
     var leadingWhitespace = false;
     var trailingWhitespace = false;
@@ -173,12 +186,7 @@ class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
         final childStrictFormatting = strictFormatting || _domValidator.hasStrictFormatting(tag);
         final childStrictWhitespace = strictWhitespace || _domValidator.hasStrictWhitespace(tag);
 
-        final result = _renderChildren(
-          strictWhitespace,
-          childStrictFormatting,
-          childStrictWhitespace,
-          indent,
-        );
+        final result = _renderChildren(strictWhitespace, childStrictFormatting, childStrictWhitespace, indent);
 
         output.write(result.$1);
         leadingWhitespace = result.$2;
@@ -204,8 +212,11 @@ class MarkupRenderText extends MarkupRenderObject implements RenderText {
   }
 
   @override
-  (String, bool, bool) _renderAndFormat(
-      [bool strictFormatting = false, bool strictWhitespace = false, String indent = '']) {
+  (String, bool, bool) _renderAndFormat([
+    bool strictFormatting = false,
+    bool strictWhitespace = false,
+    String indent = '',
+  ]) {
     var output = StringBuffer();
     var leadingWhitespace = false;
     var trailingWhitespace = false;
@@ -226,22 +237,23 @@ class MarkupRenderText extends MarkupRenderObject implements RenderText {
 
 class MarkupRenderFragment extends MarkupRenderObject implements RenderFragment {
   @override
-  (String, bool, bool) _renderAndFormat(
-      [bool strictFormatting = false, bool strictWhitespace = false, String indent = '']) {
-    final result = _renderChildren(
-      strictWhitespace,
-      strictFormatting,
-      strictWhitespace,
-      indent,
-    );
+  (String, bool, bool) _renderAndFormat([
+    bool strictFormatting = false,
+    bool strictWhitespace = false,
+    String indent = '',
+  ]) {
+    final result = _renderChildren(strictWhitespace, strictFormatting, strictWhitespace, indent);
     return result;
   }
 }
 
 class RootMarkupRenderObject extends MarkupRenderObject {
   @override
-  (String, bool, bool) _renderAndFormat(
-      [bool strictFormatting = false, bool strictWhitespace = false, String indent = '']) {
+  (String, bool, bool) _renderAndFormat([
+    bool strictFormatting = false,
+    bool strictWhitespace = false,
+    String indent = '',
+  ]) {
     final output = StringBuffer();
     var leadingWhitespace = false;
     var trailingWhitespace = false;

@@ -13,10 +13,7 @@ void main() {
     });
 
     testComponents('should push route', (tester) async {
-      tester.pumpComponent(Router(routes: [
-        homeRoute(),
-        route('/a'),
-      ]));
+      tester.pumpComponent(Router(routes: [homeRoute(), route('/a')]));
 
       expect(find.text('home'), findsOneComponent);
 
@@ -37,11 +34,7 @@ void main() {
     });
 
     testComponents('should replace route', (tester) async {
-      tester.pumpComponent(Router(routes: [
-        homeRoute(),
-        route('/a'),
-        route('/b'),
-      ]));
+      tester.pumpComponent(Router(routes: [homeRoute(), route('/a'), route('/b')]));
 
       expect(find.text('home'), findsOneComponent);
 
@@ -62,14 +55,16 @@ void main() {
     });
 
     testComponents('should build shell route', (tester) async {
-      tester.pumpComponent(Router(routes: [
-        homeRoute(),
-        route('/a', [
-          shellRoute('b', [
-            route('c'),
-          ]),
-        ]),
-      ]));
+      tester.pumpComponent(
+        Router(
+          routes: [
+            homeRoute(),
+            route('/a', [
+              shellRoute('b', [route('c')]),
+            ]),
+          ],
+        ),
+      );
 
       expect(find.text('home'), findsOneComponent);
 

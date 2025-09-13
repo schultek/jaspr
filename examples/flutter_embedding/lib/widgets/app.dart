@@ -20,9 +20,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Element embedding',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
       home: Consumer(
         builder: (context, ref, _) {
@@ -58,20 +56,13 @@ class _CounterDemoState extends ConsumerState<CounterDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: AppBar(title: Text(widget.title)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '${ref.watch(appStateProvider).count}',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            const Text('You have pushed the button this many times:'),
+            Text('${ref.watch(appStateProvider).count}', style: Theme.of(context).textTheme.headlineMedium),
           ],
         ),
       ),
@@ -92,9 +83,7 @@ class TextFieldDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
+      appBar: AppBar(title: Text(title)),
       body: const Center(
         child: Padding(
           padding: EdgeInsets.all(14.0),
@@ -155,13 +144,8 @@ class _CustomDemoState extends State<CustomDemo> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'COUNT WITH DASH!',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-              const SizedBox(
-                height: 26,
-              ),
+              const Text('COUNT WITH DASH!', style: TextStyle(color: Colors.white, fontSize: 18)),
+              const SizedBox(height: 26),
               Container(
                 width: 98,
                 height: 98,
@@ -174,10 +158,7 @@ class _CustomDemoState extends State<CustomDemo> {
                     width: 90,
                     height: 90,
                     decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/dash.png'),
-                        fit: BoxFit.cover,
-                      ),
+                      image: DecorationImage(image: AssetImage('assets/dash.png'), fit: BoxFit.cover),
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
@@ -185,10 +166,7 @@ class _CustomDemoState extends State<CustomDemo> {
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
-                totalCharCount.toString(),
-                style: const TextStyle(color: Colors.white, fontSize: 52),
-              ),
+              Text(totalCharCount.toString(), style: const TextStyle(color: Colors.white, fontSize: 52)),
               // const Text(
               //   'characters typed',
               //   style: TextStyle(color: Colors.white, fontSize: 14),
@@ -217,22 +195,15 @@ class _CustomDemoState extends State<CustomDemo> {
                           handleChange();
                         },
                         maxLines: 1,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                        ),
+                        decoration: const InputDecoration(border: OutlineInputBorder()),
                       ),
                     ),
-                    const SizedBox(
-                      width: 12,
-                    ),
+                    const SizedBox(width: 12),
                     Center(
                       child: Container(
                         width: 42,
                         height: 42,
-                        decoration: BoxDecoration(
-                          color: colorPrimary,
-                          shape: BoxShape.circle,
-                        ),
+                        decoration: BoxDecoration(color: colorPrimary, shape: BoxShape.circle),
                         child: IconButton(
                           icon: const Icon(Icons.refresh),
                           color: Colors.white,

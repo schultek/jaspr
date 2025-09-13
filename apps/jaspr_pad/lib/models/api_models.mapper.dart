@@ -74,9 +74,7 @@ class CompileRequestMapper extends ClassMapperBase<CompileRequest> {
   static const Field<CompileRequest, Map<String, String>> _f$sources = Field('sources', _$sources);
 
   @override
-  final MappableFields<CompileRequest> fields = const {
-    #sources: _f$sources,
-  };
+  final MappableFields<CompileRequest> fields = const {#sources: _f$sources};
 
   static CompileRequest _instantiate(DecodingData data) {
     return CompileRequest(data.dec(_f$sources));
@@ -171,10 +169,7 @@ class CompileResponseMapper extends ClassMapperBase<CompileResponse> {
   static const Field<CompileResponse, String> _f$error = Field('error', _$error);
 
   @override
-  final MappableFields<CompileResponse> fields = const {
-    #result: _f$result,
-    #error: _f$error,
-  };
+  final MappableFields<CompileResponse> fields = const {#result: _f$result, #error: _f$error};
 
   static CompileResponse _instantiate(DecodingData data) {
     return CompileResponse(data.dec(_f$result), data.dec(_f$error));
@@ -265,9 +260,7 @@ class AnalyzeRequestMapper extends ClassMapperBase<AnalyzeRequest> {
   static const Field<AnalyzeRequest, Map<String, String>> _f$sources = Field('sources', _$sources);
 
   @override
-  final MappableFields<AnalyzeRequest> fields = const {
-    #sources: _f$sources,
-  };
+  final MappableFields<AnalyzeRequest> fields = const {#sources: _f$sources};
 
   static AnalyzeRequest _instantiate(DecodingData data) {
     return AnalyzeRequest(data.dec(_f$sources));
@@ -362,10 +355,7 @@ class FormatResponseMapper extends ClassMapperBase<FormatResponse> {
   static const Field<FormatResponse, int> _f$newOffset = Field('newOffset', _$newOffset);
 
   @override
-  final MappableFields<FormatResponse> fields = const {
-    #newString: _f$newString,
-    #newOffset: _f$newOffset,
-  };
+  final MappableFields<FormatResponse> fields = const {#newString: _f$newString, #newOffset: _f$newOffset};
 
   static FormatResponse _instantiate(DecodingData data) {
     return FormatResponse(data.dec(_f$newString), data.dec(_f$newOffset));
@@ -428,7 +418,8 @@ class _FormatResponseCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Format
   late final ClassMapperBase<FormatResponse> $mapper = FormatResponseMapper.ensureInitialized();
   @override
   $R call({String? newString, int? newOffset}) => $apply(
-      FieldCopyWithData({if (newString != null) #newString: newString, if (newOffset != null) #newOffset: newOffset}));
+    FieldCopyWithData({if (newString != null) #newString: newString, if (newOffset != null) #newOffset: newOffset}),
+  );
   @override
   FormatResponse $make(CopyWithData data) =>
       FormatResponse(data.get(#newString, or: $value.newString), data.get(#newOffset, or: $value.newOffset));
@@ -458,10 +449,7 @@ class FormatRequestMapper extends ClassMapperBase<FormatRequest> {
   static const Field<FormatRequest, int> _f$offset = Field('offset', _$offset);
 
   @override
-  final MappableFields<FormatRequest> fields = const {
-    #source: _f$source,
-    #offset: _f$offset,
-  };
+  final MappableFields<FormatRequest> fields = const {#source: _f$source, #offset: _f$offset};
 
   static FormatRequest _instantiate(DecodingData data) {
     return FormatRequest(data.dec(_f$source), data.dec(_f$offset));
@@ -553,9 +541,7 @@ class AnalyzeResponseMapper extends ClassMapperBase<AnalyzeResponse> {
   static const Field<AnalyzeResponse, List<Issue>> _f$issues = Field('issues', _$issues, opt: true, def: const []);
 
   @override
-  final MappableFields<AnalyzeResponse> fields = const {
-    #issues: _f$issues,
-  };
+  final MappableFields<AnalyzeResponse> fields = const {#issues: _f$issues};
 
   static AnalyzeResponse _instantiate(DecodingData data) {
     return AnalyzeResponse(data.dec(_f$issues));
@@ -674,13 +660,14 @@ class IssueMapper extends ClassMapperBase<Issue> {
 
   static Issue _instantiate(DecodingData data) {
     return Issue(
-        kind: data.dec(_f$kind),
-        location: data.dec(_f$location),
-        message: data.dec(_f$message),
-        hasFixes: data.dec(_f$hasFixes),
-        sourceName: data.dec(_f$sourceName),
-        correction: data.dec(_f$correction),
-        url: data.dec(_f$url));
+      kind: data.dec(_f$kind),
+      location: data.dec(_f$location),
+      message: data.dec(_f$message),
+      hasFixes: data.dec(_f$hasFixes),
+      sourceName: data.dec(_f$sourceName),
+      correction: data.dec(_f$correction),
+      url: data.dec(_f$url),
+    );
   }
 
   @override
@@ -728,14 +715,15 @@ extension IssueValueCopy<$R, $Out> on ObjectCopyWith<$R, Issue, $Out> {
 
 abstract class IssueCopyWith<$R, $In extends Issue, $Out> implements ClassCopyWith<$R, $In, $Out> {
   IssueLocationCopyWith<$R, IssueLocation, IssueLocation> get location;
-  $R call(
-      {IssueKind? kind,
-      IssueLocation? location,
-      String? message,
-      bool? hasFixes,
-      String? sourceName,
-      String? correction,
-      String? url});
+  $R call({
+    IssueKind? kind,
+    IssueLocation? location,
+    String? message,
+    bool? hasFixes,
+    String? sourceName,
+    String? correction,
+    String? url,
+  });
   IssueCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -749,32 +737,35 @@ class _IssueCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Issue, $Out>
   IssueLocationCopyWith<$R, IssueLocation, IssueLocation> get location =>
       $value.location.copyWith.$chain((v) => call(location: v));
   @override
-  $R call(
-          {IssueKind? kind,
-          IssueLocation? location,
-          String? message,
-          bool? hasFixes,
-          String? sourceName,
-          Object? correction = $none,
-          Object? url = $none}) =>
-      $apply(FieldCopyWithData({
-        if (kind != null) #kind: kind,
-        if (location != null) #location: location,
-        if (message != null) #message: message,
-        if (hasFixes != null) #hasFixes: hasFixes,
-        if (sourceName != null) #sourceName: sourceName,
-        if (correction != $none) #correction: correction,
-        if (url != $none) #url: url
-      }));
+  $R call({
+    IssueKind? kind,
+    IssueLocation? location,
+    String? message,
+    bool? hasFixes,
+    String? sourceName,
+    Object? correction = $none,
+    Object? url = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (kind != null) #kind: kind,
+      if (location != null) #location: location,
+      if (message != null) #message: message,
+      if (hasFixes != null) #hasFixes: hasFixes,
+      if (sourceName != null) #sourceName: sourceName,
+      if (correction != $none) #correction: correction,
+      if (url != $none) #url: url,
+    }),
+  );
   @override
   Issue $make(CopyWithData data) => Issue(
-      kind: data.get(#kind, or: $value.kind),
-      location: data.get(#location, or: $value.location),
-      message: data.get(#message, or: $value.message),
-      hasFixes: data.get(#hasFixes, or: $value.hasFixes),
-      sourceName: data.get(#sourceName, or: $value.sourceName),
-      correction: data.get(#correction, or: $value.correction),
-      url: data.get(#url, or: $value.url));
+    kind: data.get(#kind, or: $value.kind),
+    location: data.get(#location, or: $value.location),
+    message: data.get(#message, or: $value.message),
+    hasFixes: data.get(#hasFixes, or: $value.hasFixes),
+    sourceName: data.get(#sourceName, or: $value.sourceName),
+    correction: data.get(#correction, or: $value.correction),
+    url: data.get(#url, or: $value.url),
+  );
 
   @override
   IssueCopyWith<$R2, Issue, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
@@ -814,10 +805,11 @@ class IssueLocationMapper extends ClassMapperBase<IssueLocation> {
 
   static IssueLocation _instantiate(DecodingData data) {
     return IssueLocation(
-        startLine: data.dec(_f$startLine),
-        endLine: data.dec(_f$endLine),
-        startColumn: data.dec(_f$startColumn),
-        endColumn: data.dec(_f$endColumn));
+      startLine: data.dec(_f$startLine),
+      endLine: data.dec(_f$endLine),
+      startColumn: data.dec(_f$startColumn),
+      endColumn: data.dec(_f$endColumn),
+    );
   }
 
   @override
@@ -876,18 +868,21 @@ class _IssueLocationCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, IssueLo
   @override
   late final ClassMapperBase<IssueLocation> $mapper = IssueLocationMapper.ensureInitialized();
   @override
-  $R call({int? startLine, int? endLine, int? startColumn, int? endColumn}) => $apply(FieldCopyWithData({
-        if (startLine != null) #startLine: startLine,
-        if (endLine != null) #endLine: endLine,
-        if (startColumn != null) #startColumn: startColumn,
-        if (endColumn != null) #endColumn: endColumn
-      }));
+  $R call({int? startLine, int? endLine, int? startColumn, int? endColumn}) => $apply(
+    FieldCopyWithData({
+      if (startLine != null) #startLine: startLine,
+      if (endLine != null) #endLine: endLine,
+      if (startColumn != null) #startColumn: startColumn,
+      if (endColumn != null) #endColumn: endColumn,
+    }),
+  );
   @override
   IssueLocation $make(CopyWithData data) => IssueLocation(
-      startLine: data.get(#startLine, or: $value.startLine),
-      endLine: data.get(#endLine, or: $value.endLine),
-      startColumn: data.get(#startColumn, or: $value.startColumn),
-      endColumn: data.get(#endColumn, or: $value.endColumn));
+    startLine: data.get(#startLine, or: $value.startLine),
+    endLine: data.get(#endLine, or: $value.endLine),
+    startColumn: data.get(#startColumn, or: $value.startColumn),
+    endColumn: data.get(#endColumn, or: $value.endColumn),
+  );
 
   @override
   IssueLocationCopyWith<$R2, IssueLocation, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
@@ -915,10 +910,7 @@ class DocumentResponseMapper extends ClassMapperBase<DocumentResponse> {
   static const Field<DocumentResponse, String> _f$error = Field('error', _$error);
 
   @override
-  final MappableFields<DocumentResponse> fields = const {
-    #info: _f$info,
-    #error: _f$error,
-  };
+  final MappableFields<DocumentResponse> fields = const {#info: _f$info, #error: _f$error};
 
   static DocumentResponse _instantiate(DecodingData data) {
     return DocumentResponse(data.dec(_f$info), data.dec(_f$error));
@@ -1016,8 +1008,11 @@ class HoverInfoMapper extends ClassMapperBase<HoverInfo> {
   static String? _$dartdoc(HoverInfo v) => v.dartdoc;
   static const Field<HoverInfo, String> _f$dartdoc = Field('dartdoc', _$dartdoc, opt: true);
   static String? _$enclosingClassName(HoverInfo v) => v.enclosingClassName;
-  static const Field<HoverInfo, String> _f$enclosingClassName =
-      Field('enclosingClassName', _$enclosingClassName, opt: true);
+  static const Field<HoverInfo, String> _f$enclosingClassName = Field(
+    'enclosingClassName',
+    _$enclosingClassName,
+    opt: true,
+  );
   static String? _$libraryName(HoverInfo v) => v.libraryName;
   static const Field<HoverInfo, String> _f$libraryName = Field('libraryName', _$libraryName, opt: true);
   static String? _$parameter(HoverInfo v) => v.parameter;
@@ -1044,15 +1039,16 @@ class HoverInfoMapper extends ClassMapperBase<HoverInfo> {
 
   static HoverInfo _instantiate(DecodingData data) {
     return HoverInfo(
-        description: data.dec(_f$description),
-        kind: data.dec(_f$kind),
-        dartdoc: data.dec(_f$dartdoc),
-        enclosingClassName: data.dec(_f$enclosingClassName),
-        libraryName: data.dec(_f$libraryName),
-        parameter: data.dec(_f$parameter),
-        deprecated: data.dec(_f$deprecated),
-        staticType: data.dec(_f$staticType),
-        propagatedType: data.dec(_f$propagatedType));
+      description: data.dec(_f$description),
+      kind: data.dec(_f$kind),
+      dartdoc: data.dec(_f$dartdoc),
+      enclosingClassName: data.dec(_f$enclosingClassName),
+      libraryName: data.dec(_f$libraryName),
+      parameter: data.dec(_f$parameter),
+      deprecated: data.dec(_f$deprecated),
+      staticType: data.dec(_f$staticType),
+      propagatedType: data.dec(_f$propagatedType),
+    );
   }
 
   @override
@@ -1100,16 +1096,17 @@ extension HoverInfoValueCopy<$R, $Out> on ObjectCopyWith<$R, HoverInfo, $Out> {
 }
 
 abstract class HoverInfoCopyWith<$R, $In extends HoverInfo, $Out> implements ClassCopyWith<$R, $In, $Out> {
-  $R call(
-      {String? description,
-      String? kind,
-      String? dartdoc,
-      String? enclosingClassName,
-      String? libraryName,
-      String? parameter,
-      bool? deprecated,
-      String? staticType,
-      String? propagatedType});
+  $R call({
+    String? description,
+    String? kind,
+    String? dartdoc,
+    String? enclosingClassName,
+    String? libraryName,
+    String? parameter,
+    bool? deprecated,
+    String? staticType,
+    String? propagatedType,
+  });
   HoverInfoCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -1120,38 +1117,41 @@ class _HoverInfoCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, HoverInfo, 
   @override
   late final ClassMapperBase<HoverInfo> $mapper = HoverInfoMapper.ensureInitialized();
   @override
-  $R call(
-          {Object? description = $none,
-          Object? kind = $none,
-          Object? dartdoc = $none,
-          Object? enclosingClassName = $none,
-          Object? libraryName = $none,
-          Object? parameter = $none,
-          Object? deprecated = $none,
-          Object? staticType = $none,
-          Object? propagatedType = $none}) =>
-      $apply(FieldCopyWithData({
-        if (description != $none) #description: description,
-        if (kind != $none) #kind: kind,
-        if (dartdoc != $none) #dartdoc: dartdoc,
-        if (enclosingClassName != $none) #enclosingClassName: enclosingClassName,
-        if (libraryName != $none) #libraryName: libraryName,
-        if (parameter != $none) #parameter: parameter,
-        if (deprecated != $none) #deprecated: deprecated,
-        if (staticType != $none) #staticType: staticType,
-        if (propagatedType != $none) #propagatedType: propagatedType
-      }));
+  $R call({
+    Object? description = $none,
+    Object? kind = $none,
+    Object? dartdoc = $none,
+    Object? enclosingClassName = $none,
+    Object? libraryName = $none,
+    Object? parameter = $none,
+    Object? deprecated = $none,
+    Object? staticType = $none,
+    Object? propagatedType = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (description != $none) #description: description,
+      if (kind != $none) #kind: kind,
+      if (dartdoc != $none) #dartdoc: dartdoc,
+      if (enclosingClassName != $none) #enclosingClassName: enclosingClassName,
+      if (libraryName != $none) #libraryName: libraryName,
+      if (parameter != $none) #parameter: parameter,
+      if (deprecated != $none) #deprecated: deprecated,
+      if (staticType != $none) #staticType: staticType,
+      if (propagatedType != $none) #propagatedType: propagatedType,
+    }),
+  );
   @override
   HoverInfo $make(CopyWithData data) => HoverInfo(
-      description: data.get(#description, or: $value.description),
-      kind: data.get(#kind, or: $value.kind),
-      dartdoc: data.get(#dartdoc, or: $value.dartdoc),
-      enclosingClassName: data.get(#enclosingClassName, or: $value.enclosingClassName),
-      libraryName: data.get(#libraryName, or: $value.libraryName),
-      parameter: data.get(#parameter, or: $value.parameter),
-      deprecated: data.get(#deprecated, or: $value.deprecated),
-      staticType: data.get(#staticType, or: $value.staticType),
-      propagatedType: data.get(#propagatedType, or: $value.propagatedType));
+    description: data.get(#description, or: $value.description),
+    kind: data.get(#kind, or: $value.kind),
+    dartdoc: data.get(#dartdoc, or: $value.dartdoc),
+    enclosingClassName: data.get(#enclosingClassName, or: $value.enclosingClassName),
+    libraryName: data.get(#libraryName, or: $value.libraryName),
+    parameter: data.get(#parameter, or: $value.parameter),
+    deprecated: data.get(#deprecated, or: $value.deprecated),
+    staticType: data.get(#staticType, or: $value.staticType),
+    propagatedType: data.get(#propagatedType, or: $value.propagatedType),
+  );
 
   @override
   HoverInfoCopyWith<$R2, HoverInfo, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
@@ -1180,11 +1180,7 @@ class DocumentRequestMapper extends ClassMapperBase<DocumentRequest> {
   static const Field<DocumentRequest, int> _f$offset = Field('offset', _$offset);
 
   @override
-  final MappableFields<DocumentRequest> fields = const {
-    #sources: _f$sources,
-    #name: _f$name,
-    #offset: _f$offset,
-  };
+  final MappableFields<DocumentRequest> fields = const {#sources: _f$sources, #name: _f$name, #offset: _f$offset};
 
   static DocumentRequest _instantiate(DecodingData data) {
     return DocumentRequest(data.dec(_f$sources), data.dec(_f$name), data.dec(_f$offset));
@@ -1250,11 +1246,19 @@ class _DocumentRequestCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Docum
   MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get sources =>
       MapCopyWith($value.sources, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(sources: v));
   @override
-  $R call({Map<String, String>? sources, String? name, int? offset}) => $apply(FieldCopyWithData(
-      {if (sources != null) #sources: sources, if (name != null) #name: name, if (offset != null) #offset: offset}));
+  $R call({Map<String, String>? sources, String? name, int? offset}) => $apply(
+    FieldCopyWithData({
+      if (sources != null) #sources: sources,
+      if (name != null) #name: name,
+      if (offset != null) #offset: offset,
+    }),
+  );
   @override
   DocumentRequest $make(CopyWithData data) => DocumentRequest(
-      data.get(#sources, or: $value.sources), data.get(#name, or: $value.name), data.get(#offset, or: $value.offset));
+    data.get(#sources, or: $value.sources),
+    data.get(#name, or: $value.name),
+    data.get(#offset, or: $value.offset),
+  );
 
   @override
   DocumentRequestCopyWith<$R2, DocumentRequest, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>

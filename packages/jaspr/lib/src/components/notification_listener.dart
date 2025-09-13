@@ -20,11 +20,7 @@ typedef NotificationListenerCallback<T extends Notification> = bool Function(T n
 /// To dispatch notifications, use the [Notification.dispatch] method.
 class NotificationListener<T extends Notification> extends Component {
   /// Creates a component that listens for notifications.
-  const NotificationListener({
-    this.onNotification,
-    required this.child,
-    super.key,
-  });
+  const NotificationListener({this.onNotification, required this.child, super.key});
 
   /// Called when a notification of the appropriate type arrives at this
   /// location in the tree.

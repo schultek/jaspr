@@ -7,15 +7,17 @@ import 'package:jaspr_test/jaspr_test.dart';
 void main() {
   group('html components', () {
     testComponents('renders other', (tester) async {
-      tester.pumpComponent(div([
-        details(open: false, []),
-        dialog(open: false, []),
-        summary([]),
-        meta(httpEquiv: "x-ua-compatible", content: "ie=edge"),
-        meta(name: "description", content: "Hello world"),
-        link(href: "a", rel: "", type: "", as: ""),
-        script(async: false, defer: false, src: "a.js"),
-      ]));
+      tester.pumpComponent(
+        div([
+          details(open: false, []),
+          dialog(open: false, []),
+          summary([]),
+          meta(httpEquiv: "x-ua-compatible", content: "ie=edge"),
+          meta(name: "description", content: "Hello world"),
+          link(href: "a", rel: "", type: "", as: ""),
+          script(async: false, defer: false, src: "a.js"),
+        ]),
+      );
 
       expect(find.tag('details'), findsOneComponent);
       expect(find.tag('dialog'), findsOneComponent);

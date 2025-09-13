@@ -7,10 +7,7 @@ class ObserverParam {
   final List<MapEntry<Element, ObserverElementEvent>> events;
   final bool renderBoth;
 
-  ObserverParam({
-    required this.renderBoth,
-    required this.events,
-  });
+  ObserverParam({required this.renderBoth, required this.events});
 }
 
 class App extends TestComponent<ObserverParam> {
@@ -22,12 +19,7 @@ class App extends TestComponent<ObserverParam> {
   Component build(BuildContext context, ObserverParam value) {
     return MyObserverComponent(
       value: value,
-      child: value.renderBoth
-          ? MyObserverComponent(
-              value: value,
-              child: div([MyChildComponent(value: true)]),
-            )
-          : child,
+      child: value.renderBoth ? MyObserverComponent(value: value, child: div([MyChildComponent(value: true)])) : child,
     );
   }
 }
@@ -41,11 +33,7 @@ class MyObserverComponent extends ObserverComponent {
   MyObserverElement createElement() => MyObserverElement(this);
 }
 
-enum ObserverElementEvent {
-  didRebuild,
-  didUnmount,
-  willRebuild,
-}
+enum ObserverElementEvent { didRebuild, didUnmount, willRebuild }
 
 class MyObserverElement extends ObserverElement {
   MyObserverElement(super.component);
@@ -70,9 +58,7 @@ class MyObserverElement extends ObserverElement {
 
 class MyChildComponent extends StatefulComponent {
   final dynamic value;
-  MyChildComponent({
-    required this.value,
-  });
+  MyChildComponent({required this.value});
   @override
   State<StatefulComponent> createState() => MyChildState();
 }

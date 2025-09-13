@@ -3,11 +3,12 @@ abstract class GridPlacement {
 
   static const GridPlacement auto = _GridPlacement('auto');
 
-  const factory GridPlacement(
-      {LinePlacement? rowStart,
-      LinePlacement? rowEnd,
-      LinePlacement? columnStart,
-      LinePlacement? columnEnd}) = _LineGridPlacement;
+  const factory GridPlacement({
+    LinePlacement? rowStart,
+    LinePlacement? rowEnd,
+    LinePlacement? columnStart,
+    LinePlacement? columnEnd,
+  }) = _LineGridPlacement;
 
   Map<String, String> get styles;
 }
@@ -37,7 +38,7 @@ class _LineGridPlacement implements GridPlacement {
           rowStart!.value,
           columnStart!.value,
           if (rowEnd != null) rowEnd!.value,
-          if (columnEnd != null) columnEnd!.value
+          if (columnEnd != null) columnEnd!.value,
         ].join(' / '),
       };
     } else {

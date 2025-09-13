@@ -14,18 +14,17 @@ void main() {
         tracks = GridTracks([
           GridTrack(TrackSize.auto),
           GridTrack.line('div'),
-          GridTrack.repeat(TrackRepeat(2), [
-            GridTrack(TrackSize.fr(0.2)),
-            GridTrack(TrackSize.maxContent),
-          ]),
+          GridTrack.repeat(TrackRepeat(2), [GridTrack(TrackSize.fr(0.2)), GridTrack(TrackSize.maxContent)]),
           GridTrack(TrackSize.minContent),
           GridTrack(TrackSize.fitContent(100.px)),
           GridTrack(TrackSize.minmax(TrackSize(10.px), TrackSize(100.px))),
         ]);
         expect(
           tracks.value,
-          equals('auto [div] repeat(2, 0.2fr max-content) min-content '
-              'fit-content(100px) minmax(10px, 100px)'),
+          equals(
+            'auto [div] repeat(2, 0.2fr max-content) min-content '
+            'fit-content(100px) minmax(10px, 100px)',
+          ),
         );
       });
 
@@ -51,20 +50,14 @@ void main() {
           columnEnd: LinePlacement(3, lineName: 'other'),
         );
 
-        expect(
-          placement.styles,
-          equals({'grid-area': 'auto / span 2 / test / 3 other'}),
-        );
+        expect(placement.styles, equals({'grid-area': 'auto / span 2 / test / 3 other'}));
 
         placement = GridPlacement(
           rowStart: LinePlacement.span(3, lineName: 'test'),
           columnEnd: LinePlacement.auto,
         );
 
-        expect(
-          placement.styles,
-          equals({'grid-row': 'span 3 test', 'grid-column-end': 'auto'}),
-        );
+        expect(placement.styles, equals({'grid-row': 'span 3 test', 'grid-column-end': 'auto'}));
       });
     });
   });

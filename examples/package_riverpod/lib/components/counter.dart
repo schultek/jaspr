@@ -21,9 +21,7 @@ class Counter extends StatelessComponent with SyncProviderDependencies {
           context.read(countProvider.notifier).state++;
         },
       ),
-      span([
-        text('Counter: ${context.watch(countProvider)}'),
-      ]),
+      span([text('Counter: ${context.watch(countProvider)}')]),
     ]);
   }
 }

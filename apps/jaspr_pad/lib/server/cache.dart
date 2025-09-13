@@ -27,8 +27,9 @@ class StorageCache {
   Future<String?> getCachedResult(int hash) async {
     var storage = await _storage;
     try {
-      var dataStream = await storage.objects
-          .get(_bucket, 'compilation_result_$hash.js', downloadOptions: DownloadOptions.fullMedia) as Media;
+      var dataStream =
+          await storage.objects.get(_bucket, 'compilation_result_$hash.js', downloadOptions: DownloadOptions.fullMedia)
+              as Media;
       var result = await utf8.decodeStream(dataStream.stream);
       await storage.objects.patch(Object(customTime: DateTime.now()), _bucket, 'compilation_result_$hash.js');
       return result;

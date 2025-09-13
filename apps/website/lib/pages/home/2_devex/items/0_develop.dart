@@ -14,8 +14,10 @@ class Develop extends StatelessComponent {
     return DevexBox(
       caption: 'DEVELOP',
       title: 'Familiar Concepts',
-      description: text('Apply your Flutter skills to build websites. '
-          'Reuse already learned concepts like BuildContext, setState and much more.'),
+      description: text(
+        'Apply your Flutter skills to build websites. '
+        'Reuse already learned concepts like BuildContext, setState and much more.',
+      ),
       preview: div(classes: 'develop-preview', [
         div([
           div([
@@ -34,9 +36,7 @@ class Develop extends StatelessComponent {
                 }
               ''',
             ),
-            div(classes: 'counter-button', [
-              CounterButton(),
-            ]),
+            div(classes: 'counter-button', [CounterButton()]),
           ]),
         ]),
       ]),
@@ -45,25 +45,23 @@ class Develop extends StatelessComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('.develop-preview', [
-          css('&').styles(
-            position: Position.relative(),
-            height: 100.percent,
-            padding: Padding.all(1.rem),
-            boxSizing: BoxSizing.borderBox,
-          ),
-          css('& > div').styles(
-            position: Position.absolute(top: 50.percent, left: 47.percent),
-            width: 33.rem,
-            maxWidth: 100.percent,
-            transform: Transform.translate(x: (-50).percent, y: (-50).percent),
-          ),
-          css('& > div > div').styles(
-            position: Position.relative(),
-          ),
-          css('.counter-button').styles(
-            position: Position.absolute(right: (-1.5).rem, bottom: (-0.5).rem),
-          ),
-        ]),
-      ];
+    css('.develop-preview', [
+      css('&').styles(
+        position: Position.relative(),
+        height: 100.percent,
+        padding: Padding.all(1.rem),
+        boxSizing: BoxSizing.borderBox,
+      ),
+      css('& > div').styles(
+        position: Position.absolute(top: 50.percent, left: 47.percent),
+        width: 33.rem,
+        maxWidth: 100.percent,
+        transform: Transform.translate(x: (-50).percent, y: (-50).percent),
+      ),
+      css('& > div > div').styles(position: Position.relative()),
+      css('.counter-button').styles(
+        position: Position.absolute(right: (-1.5).rem, bottom: (-0.5).rem),
+      ),
+    ]),
+  ];
 }

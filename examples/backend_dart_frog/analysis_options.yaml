@@ -10,3 +10,7 @@ analyzer:
 linter:
   rules:
     file_names: false
+
+formatter:
+  page_width: 120
+  trailing_commas: preserve

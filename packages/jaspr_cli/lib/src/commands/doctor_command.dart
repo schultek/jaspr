@@ -29,7 +29,7 @@ class DoctorCommand extends BaseCommand {
         'Dart Version ${Platform.version} at ${Platform.executable}',
         'Running on ${Platform.operatingSystem} ${Platform.operatingSystemVersion} - Locale ${Platform.localeName}',
         'Analytics: ${analyticsEnabled ? 'Enabled' : 'Disabled'}',
-      ]
+      ],
     ));
 
     if (project.pubspecYaml != null) {
@@ -70,7 +70,7 @@ class DoctorCommand extends BaseCommand {
           'Rendering mode: ${project.modeOrNull?.name}',
           'Uses jaspr compilers: ${project.usesJasprWebCompilers}',
           'Uses flutter embedding: ${project.usesFlutter}',
-        ]
+        ],
       ));
     }
 

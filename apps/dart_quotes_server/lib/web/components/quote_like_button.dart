@@ -3,10 +3,14 @@ import 'dart:async';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_serverpod/jaspr_serverpod.dart';
 
-@Import.onWeb('package:dart_quotes_client/dart_quotes_client.dart',
-    show: [#StreamingConnectionHandler, #Client, #QuoteInit])
-@Import.onWeb('package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart',
-    show: [#FlutterAuthenticationKeyManager, #SessionManager])
+@Import.onWeb(
+  'package:dart_quotes_client/dart_quotes_client.dart',
+  show: [#StreamingConnectionHandler, #Client, #QuoteInit],
+)
+@Import.onWeb(
+  'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart',
+  show: [#FlutterAuthenticationKeyManager, #SessionManager],
+)
 @Import.onWeb('../interop/confetti.dart', show: [#JSConfetti])
 @Import.onWeb('package:serverpod_auth_google_flutter/serverpod_auth_google_flutter.dart', show: [#signInWithGoogle])
 import 'quote_like_button.imports.dart';
@@ -51,9 +55,7 @@ class QuoteLikeButtonState extends State<QuoteLikeButton> {
     // The session manager keeps track of the signed-in state of the user. You
     // can query it to see if the user is currently signed in and get information
     // about the user.
-    sessionManager = SessionManager(
-      caller: client.modules.auth,
-    );
+    sessionManager = SessionManager(caller: client.modules.auth);
     await sessionManager.initialize();
 
     subscription = client.quotes.subscribeToQuote(component.id).listen((quote) {
@@ -95,25 +97,22 @@ class QuoteLikeButtonState extends State<QuoteLikeButton> {
           JSConfetti.instance.show(emojis: ['🎯', '💙']);
         }
       },
-      [
-        span(classes: "icon-heart${hasLiked ?? false ? '' : '-o'}", []),
-        text(' $count'),
-      ],
+      [span(classes: "icon-heart${hasLiked ?? false ? '' : '-o'}", []), text(' $count')],
     );
   }
 
   @css
   static List<StyleRule> get styles => [
-        css('.quote-like-btn', [
-          css('&').styles(
-            border: Border.none,
-            outline: Outline(style: OutlineStyle.none),
-            fontSize: 18.px,
-            backgroundColor: Colors.transparent,
-          ),
-          css('&:hover span').styles(transform: Transform.scale(1.2)),
-          css('&.active span').styles(color: Colors.blue),
-          css('span').styles(transition: Transition('transform', duration: 300, curve: Curve.ease)),
-        ])
-      ];
+    css('.quote-like-btn', [
+      css('&').styles(
+        border: Border.none,
+        outline: Outline(style: OutlineStyle.none),
+        fontSize: 18.px,
+        backgroundColor: Colors.transparent,
+      ),
+      css('&:hover span').styles(transform: Transform.scale(1.2)),
+      css('&.active span').styles(color: Colors.blue),
+      css('span').styles(transition: Transition('transform', duration: 300, curve: Curve.ease)),
+    ]),
+  ];
 }

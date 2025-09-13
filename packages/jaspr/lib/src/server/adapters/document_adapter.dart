@@ -6,9 +6,7 @@ mixin DocumentStructureMixin on RenderAdapter {
     var html = root.children.findWhere<MarkupRenderElement>((c) => c.tag == 'html')?.node as MarkupRenderElement?;
     if (html == null) {
       var range = root.children.range();
-      root.children.insertAfter(
-        html = root.createChildRenderElement('html')..children.insertNodeAfter(range),
-      );
+      root.children.insertAfter(html = root.createChildRenderElement('html')..children.insertNodeAfter(range));
     }
 
     var headNode = html.children.findWhere<MarkupRenderElement>((c) => c.tag == 'head');

@@ -3,14 +3,16 @@ part of 'html.dart';
 /// The &lt;details&gt; HTML element creates a disclosure widget in which information is visible only when the widget is toggled into an "open" state. A summary or label must be provided using the &lt;summary&gt; element.
 ///
 /// - [open]: Indicates whether or not the details — that is, the contents of the &lt;details&gt; element — are currently visible.
-Component details(List<Component> children,
-    {bool? open,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component details(
+  List<Component> children, {
+  bool? open,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'details',
     key: key,
@@ -29,14 +31,16 @@ Component details(List<Component> children,
 /// The &lt;dialog&gt; HTML element represents a dialog box or other interactive component, such as a dismissible alert, inspector, or subwindow.
 ///
 /// - [open]: Indicates that the dialog is active and can be interacted with. When the open attribute is not set, the dialog shouldn't be shown to the user.
-Component dialog(List<Component> children,
-    {bool? open,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component dialog(
+  List<Component> children, {
+  bool? open,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'dialog',
     key: key,
@@ -53,13 +57,15 @@ Component dialog(List<Component> children,
 }
 
 /// The &lt;summary&gt; HTML element specifies a summary, caption, or legend for a &lt;details&gt; element's disclosure box. Clicking the &lt;summary&gt; element toggles the state of the parent &lt;details&gt; element open and closed.
-Component summary(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component summary(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'summary',
     key: key,
@@ -79,17 +85,18 @@ Component summary(List<Component> children,
 /// - [content]: This attribute contains the value for the 'http-equiv' or 'name' attribute, depending on which is used.
 /// - [charset]: This attribute declares the document's character encoding. If the attribute is present, its value must be an ASCII case-insensitive match for the string "utf-8", because UTF-8 is the only valid encoding for HTML5 documents. &lt;meta&gt; elements which declare a character encoding must be located entirely within the first 1024 bytes of the document.
 /// - [httpEquiv]: Defines a pragma directive. The attribute's name, short for http-equivalent, is because all the allowed values are names of particular HTTP headers.
-Component meta(
-    {String? name,
-    String? content,
-    String? charset,
-    String? httpEquiv,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component meta({
+  String? name,
+  String? content,
+  String? charset,
+  String? httpEquiv,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'meta',
     key: key,
@@ -98,10 +105,10 @@ Component meta(
     styles: styles,
     attributes: {
       ...?attributes,
-      if (name != null) 'name': name,
-      if (content != null) 'content': content,
-      if (charset != null) 'charset': charset,
-      if (httpEquiv != null) 'http-equiv': httpEquiv,
+      'name': ?name,
+      'content': ?content,
+      'charset': ?charset,
+      'http-equiv': ?httpEquiv,
     },
     events: events,
   );
@@ -113,17 +120,18 @@ Component meta(
 /// - [rel]: This attribute names a relationship of the linked document to the current document. The attribute must be a space-separated list of link type values.
 /// - [type]: This attribute is used to define the type of the content linked to. The value of the attribute should be a MIME type such as text/html, text/css, and so on. The common use of this attribute is to define the type of stylesheet being referenced (such as text/css), but given that CSS is the only stylesheet language used on the web, not only is it possible to omit the type attribute, but is actually now recommended practice. It is also used on rel="preload" link types, to make sure the browser only downloads file types that it supports.
 /// - [as]: This attribute is only used when rel="preload" or rel="prefetch" has been set on the &lt;link&gt; element. It specifies the type of content being loaded by the &lt;link&gt;, which is necessary for request matching, application of correct content security policy, and setting of correct Accept request header. Furthermore, rel="preload" uses this as a signal for request prioritization.
-Component link(
-    {required String href,
-    String? rel,
-    String? type,
-    String? as,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component link({
+  required String href,
+  String? rel,
+  String? type,
+  String? as,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'link',
     key: key,
@@ -133,9 +141,9 @@ Component link(
     attributes: {
       ...?attributes,
       'href': href,
-      if (rel != null) 'rel': rel,
-      if (type != null) 'type': type,
-      if (as != null) 'as': as,
+      'rel': ?rel,
+      'type': ?type,
+      'as': ?as,
     },
     events: events,
   );
@@ -157,17 +165,18 @@ Component link(
 ///   This attribute allows the elimination of parser-blocking JavaScript where the browser would have to load and evaluate scripts before continuing to parse. async has a similar effect in this case.
 /// - [src]: This attribute specifies the URI of an external script; this can be used as an alternative to embedding a script directly within a document.
 /// - [content]: The content of the script element, if it is not an external script.
-Component script(
-    {bool? async,
-    bool? defer,
-    String? src,
-    String? content,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component script({
+  bool? async,
+  bool? defer,
+  String? src,
+  String? content,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'script',
     key: key,
@@ -178,7 +187,7 @@ Component script(
       ...?attributes,
       if (async == true) 'async': '',
       if (defer == true) 'defer': '',
-      if (src != null) 'src': src,
+      'src': ?src,
     },
     events: events,
     children: [if (content != null) raw(content)],

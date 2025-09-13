@@ -28,13 +28,14 @@ final clientBasicJsonOutputs = {
       {"name": "a", "isNamed": false, "decoder": "p['a']", "encoder": "c.a"},
       {"name": "b", "isNamed": true, "decoder": "p['b']", "encoder": "c.b"},
       {"name": "c", "isNamed": true, "decoder": "p['c']", "encoder": "c.c"},
-      {"name": "d", "isNamed": true, "decoder": "p['d']", "encoder": "c.d"}
-    ]
+      {"name": "d", "isNamed": true, "decoder": "p['d']", "encoder": "c.d"},
+    ],
   }),
 };
 
 final clientBasicDartOutputs = {
-  'site|lib/component_basic.client.dart': '// dart format off\n'
+  'site|lib/component_basic.client.dart':
+      '// dart format off\n'
       '// ignore_for_file: type=lint\n'
       '\n'
       '// GENERATED FILE, DO NOT MODIFY\n'

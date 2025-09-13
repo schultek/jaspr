@@ -9,12 +9,7 @@ import 'route.dart';
 ///  An instance of a Route plus information about the current location.
 class RouteMatch {
   /// Constructor for [RouteMatch].
-  RouteMatch({
-    required this.route,
-    required this.subloc,
-    required this.extra,
-    required this.error,
-  });
+  RouteMatch({required this.route, required this.subloc, required this.extra, required this.error});
 
   // ignore: public_member_api_docs
   static RouteMatch? match({
@@ -25,12 +20,7 @@ class RouteMatch {
     required Object? extra,
   }) {
     if (route is ShellRoute) {
-      return RouteMatch(
-        route: route,
-        subloc: restLoc,
-        extra: extra,
-        error: null,
-      );
+      return RouteMatch(route: route, subloc: restLoc, extra: extra, error: null);
     } else if (route is Route) {
       assert(!route.path.contains('//'));
 
@@ -45,12 +35,7 @@ class RouteMatch {
       }
       final String pathLoc = patternToPath(route.path, encodedParams);
       final String subloc = concatenatePaths(parentSubloc, pathLoc);
-      return RouteMatch(
-        route: route,
-        subloc: subloc,
-        extra: extra,
-        error: null,
-      );
+      return RouteMatch(route: route, subloc: subloc, extra: extra, error: null);
     }
     throw MatcherError('Unexpected route type: $route', restLoc);
   }

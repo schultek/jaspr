@@ -31,7 +31,9 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: beta # remove once Flutter stable supports analyzer 8
+          # remove once Flutter stable supports analyzer 8
+          channel: beta 
+          flutter-version: 3.36.0-0.4.pre
 
       - name: Bootstrap
         run: |
@@ -55,7 +57,9 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: beta # remove once Flutter stable supports analyzer 8
+          # remove once Flutter stable supports analyzer 8
+          channel: beta 
+          flutter-version: 3.36.0-0.4.pre
 
       - name: Bootstrap
         run: |

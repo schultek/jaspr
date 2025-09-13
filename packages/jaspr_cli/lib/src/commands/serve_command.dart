@@ -38,8 +38,10 @@ class ServeCommand extends DevCommand {
       //print(data);
       if (data['event'] == 'client.debugPort') {
         final wsUri = data['params']['wsUri'] as String;
-        logger.write('The Dart VM service is listening on http${wsUri.substring(2, wsUri.length - 2)}',
-            tag: Tag.client);
+        logger.write(
+          'The Dart VM service is listening on http${wsUri.substring(2, wsUri.length - 2)}',
+          tag: Tag.client,
+        );
       }
       if (data['event'] == 'client.log') {
         logger.write(data['params']['log'], tag: Tag.client);

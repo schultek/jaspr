@@ -14,14 +14,14 @@ class Logo extends StatelessComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('.logo').styles(
-          display: Display.flex,
-          userSelect: UserSelect.none,
-          alignItems: AlignItems.center,
-          gap: Gap(column: 0.5.rem),
-          color: textBlack,
-          fontSize: 1.8.rem,
-          fontWeight: FontWeight.w600,
-        ),
-      ];
+    css('.logo').styles(
+      display: Display.flex,
+      userSelect: UserSelect.none,
+      alignItems: AlignItems.center,
+      gap: Gap(column: 0.5.rem),
+      color: textBlack,
+      fontSize: 1.8.rem,
+      fontWeight: FontWeight.w600,
+    ),
+  ];
 }

@@ -5,21 +5,9 @@ import 'base_command.dart';
 
 class AnalyzeCommand extends BaseCommand {
   AnalyzeCommand({super.logger}) {
-    argParser.addFlag(
-      'fatal-infos',
-      help: 'Treat info level issues as fatal',
-      defaultsTo: true,
-    );
-    argParser.addFlag(
-      'fatal-warnings',
-      help: 'Treat warning level issues as fatal',
-      defaultsTo: true,
-    );
-    argParser.addFlag(
-      'fix',
-      help: 'Apply all possible fixes to the lint issues found.',
-      negatable: false,
-    );
+    argParser.addFlag('fatal-infos', help: 'Treat info level issues as fatal', defaultsTo: true);
+    argParser.addFlag('fatal-warnings', help: 'Treat warning level issues as fatal', defaultsTo: true);
+    argParser.addFlag('fix', help: 'Apply all possible fixes to the lint issues found.', negatable: false);
   }
 
   @override

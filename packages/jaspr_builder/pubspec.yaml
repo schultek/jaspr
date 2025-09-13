@@ -9,7 +9,7 @@ funding:
   - https://github.com/sponsors/schultek
 
 environment:
-  sdk: '>=3.6.0 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 
 resolution: workspace
 
@@ -20,14 +20,14 @@ topics:
   - build-runner
 
 dependencies:
-  analyzer: ^8.0.0
-  build: ^3.0.0
+  analyzer: ^8.1.0
+  build: ^4.0.0
   collection: ^1.15.0
   dart_style: ^3.0.0
   glob: ^2.1.1
   jaspr: 0.21.0-dev.1
   path: ^1.8.0
-  source_gen: ^3.0.0
+  source_gen: ^4.0.0
   yaml: ^3.1.2
 
 dev_dependencies:

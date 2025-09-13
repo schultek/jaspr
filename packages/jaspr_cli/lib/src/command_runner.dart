@@ -29,12 +29,7 @@ const executableName = 'jaspr';
 /// A [CommandRunner] for the Jaspr CLI.
 class JasprCommandRunner extends CompletionCommandRunner<int> {
   JasprCommandRunner() : super(executableName, 'jaspr - A modern web framework for building websites in Dart.') {
-    argParser.addFlag(
-      'version',
-      abbr: 'v',
-      negatable: false,
-      help: 'Print the current version info.',
-    );
+    argParser.addFlag('version', abbr: 'v', negatable: false, help: 'Print the current version info.');
     argParser.addFlag('enable-analytics', negatable: false, help: 'Enable anonymous analytics.');
     argParser.addFlag('disable-analytics', negatable: false, help: 'Disable anonymous analytics.');
     addCommand(CreateCommand());
@@ -115,9 +110,12 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
       final latestVersionDesc = Version.parse(latestVersion);
 
       if (currentVersionDesc < latestVersionDesc) {
-        _logger.info(wrapBox(
+        _logger.info(
+          wrapBox(
             '${lightYellow.wrap('Update available!')} ${lightCyan.wrap(jasprCliVersion)} \u2192 ${lightCyan.wrap(latestVersion)}\n'
-            'Run ${cyan.wrap('$executableName update')} to update'));
+            'Run ${cyan.wrap('$executableName update')} to update',
+          ),
+        );
       }
     } catch (_) {}
   }

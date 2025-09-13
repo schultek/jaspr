@@ -52,7 +52,12 @@ class TutorialDataMapper extends SubClassMapperBase<TutorialData> {
 
   static TutorialData _instantiate(DecodingData data) {
     return TutorialData(
-        data.dec(_f$id), data.dec(_f$description), data.dec(_f$currentStep), data.dec(_f$configs), data.dec(_f$steps));
+      data.dec(_f$id),
+      data.dec(_f$description),
+      data.dec(_f$currentStep),
+      data.dec(_f$configs),
+      data.dec(_f$steps),
+    );
   }
 
   @override
@@ -101,14 +106,15 @@ extension TutorialDataValueCopy<$R, $Out> on ObjectCopyWith<$R, TutorialData, $O
 
 abstract class TutorialDataCopyWith<$R, $In extends TutorialData, $Out> implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, TutorialStepConfig, TutorialStepConfigCopyWith<$R, TutorialStepConfig, TutorialStepConfig>>
-      get configs;
+  get configs;
   MapCopyWith<$R, String, TutorialStep, TutorialStepCopyWith<$R, TutorialStep, TutorialStep>> get steps;
-  $R call(
-      {String? id,
-      String? description,
-      int? currentStep,
-      List<TutorialStepConfig>? configs,
-      Map<String, TutorialStep>? steps});
+  $R call({
+    String? id,
+    String? description,
+    int? currentStep,
+    List<TutorialStepConfig>? configs,
+    Map<String, TutorialStep>? steps,
+  });
   TutorialDataCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -120,31 +126,34 @@ class _TutorialDataCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Tutorial
   late final ClassMapperBase<TutorialData> $mapper = TutorialDataMapper.ensureInitialized();
   @override
   ListCopyWith<$R, TutorialStepConfig, TutorialStepConfigCopyWith<$R, TutorialStepConfig, TutorialStepConfig>>
-      get configs => ListCopyWith($value.configs, (v, t) => v.copyWith.$chain(t), (v) => call(configs: v));
+  get configs => ListCopyWith($value.configs, (v, t) => v.copyWith.$chain(t), (v) => call(configs: v));
   @override
   MapCopyWith<$R, String, TutorialStep, TutorialStepCopyWith<$R, TutorialStep, TutorialStep>> get steps =>
       MapCopyWith($value.steps, (v, t) => v.copyWith.$chain(t), (v) => call(steps: v));
   @override
-  $R call(
-          {String? id,
-          String? description,
-          int? currentStep,
-          List<TutorialStepConfig>? configs,
-          Map<String, TutorialStep>? steps}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (description != null) #description: description,
-        if (currentStep != null) #currentStep: currentStep,
-        if (configs != null) #configs: configs,
-        if (steps != null) #steps: steps
-      }));
+  $R call({
+    String? id,
+    String? description,
+    int? currentStep,
+    List<TutorialStepConfig>? configs,
+    Map<String, TutorialStep>? steps,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (description != null) #description: description,
+      if (currentStep != null) #currentStep: currentStep,
+      if (configs != null) #configs: configs,
+      if (steps != null) #steps: steps,
+    }),
+  );
   @override
   TutorialData $make(CopyWithData data) => TutorialData(
-      data.get(#id, or: $value.id),
-      data.get(#description, or: $value.description),
-      data.get(#currentStep, or: $value.currentStep),
-      data.get(#configs, or: $value.configs),
-      data.get(#steps, or: $value.steps));
+    data.get(#id, or: $value.id),
+    data.get(#description, or: $value.description),
+    data.get(#currentStep, or: $value.currentStep),
+    data.get(#configs, or: $value.configs),
+    data.get(#steps, or: $value.steps),
+  );
 
   @override
   TutorialDataCopyWith<$R2, TutorialData, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
@@ -171,10 +180,7 @@ class TutorialStepConfigMapper extends ClassMapperBase<TutorialStepConfig> {
   static const Field<TutorialStepConfig, String> _f$name = Field('name', _$name);
 
   @override
-  final MappableFields<TutorialStepConfig> fields = const {
-    #id: _f$id,
-    #name: _f$name,
-  };
+  final MappableFields<TutorialStepConfig> fields = const {#id: _f$id, #name: _f$name};
 
   static TutorialStepConfig _instantiate(DecodingData data) {
     return TutorialStepConfig(data.dec(_f$id), data.dec(_f$name));
@@ -203,7 +209,10 @@ mixin TutorialStepConfigMappable {
 
   TutorialStepConfigCopyWith<TutorialStepConfig, TutorialStepConfig, TutorialStepConfig> get copyWith =>
       _TutorialStepConfigCopyWithImpl<TutorialStepConfig, TutorialStepConfig>(
-          this as TutorialStepConfig, $identity, $identity);
+        this as TutorialStepConfig,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
     return TutorialStepConfigMapper.ensureInitialized().stringifyValue(this as TutorialStepConfig);
@@ -296,8 +305,14 @@ class TutorialStepMapper extends SubClassMapperBase<TutorialStep> {
   late final ClassMapperBase superMapper = ProjectDataBaseMapper.ensureInitialized();
 
   static TutorialStep _instantiate(DecodingData data) {
-    return TutorialStep(data.dec(_f$id), data.dec(_f$name), data.dec(_f$text), data.dec(_f$step), data.dec(_f$solution),
-        data.dec(_f$showSolution));
+    return TutorialStep(
+      data.dec(_f$id),
+      data.dec(_f$name),
+      data.dec(_f$text),
+      data.dec(_f$step),
+      data.dec(_f$solution),
+      data.dec(_f$showSolution),
+    );
   }
 
   @override
@@ -364,22 +379,25 @@ class _TutorialStepCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Tutorial
       $value.solution?.copyWith.$chain((v) => call(solution: v));
   @override
   $R call({String? id, String? name, String? text, ProjectData? step, Object? solution = $none, bool? showSolution}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (name != null) #name: name,
-        if (text != null) #text: text,
-        if (step != null) #step: step,
-        if (solution != $none) #solution: solution,
-        if (showSolution != null) #showSolution: showSolution
-      }));
+      $apply(
+        FieldCopyWithData({
+          if (id != null) #id: id,
+          if (name != null) #name: name,
+          if (text != null) #text: text,
+          if (step != null) #step: step,
+          if (solution != $none) #solution: solution,
+          if (showSolution != null) #showSolution: showSolution,
+        }),
+      );
   @override
   TutorialStep $make(CopyWithData data) => TutorialStep(
-      data.get(#id, or: $value.id),
-      data.get(#name, or: $value.name),
-      data.get(#text, or: $value.text),
-      data.get(#step, or: $value.step),
-      data.get(#solution, or: $value.solution),
-      data.get(#showSolution, or: $value.showSolution));
+    data.get(#id, or: $value.id),
+    data.get(#name, or: $value.name),
+    data.get(#text, or: $value.text),
+    data.get(#step, or: $value.step),
+    data.get(#solution, or: $value.solution),
+    data.get(#showSolution, or: $value.showSolution),
+  );
 
   @override
   TutorialStepCopyWith<$R2, TutorialStep, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
@@ -407,10 +425,7 @@ class TutorialResponseMapper extends ClassMapperBase<TutorialResponse> {
   static const Field<TutorialResponse, String> _f$error = Field('error', _$error);
 
   @override
-  final MappableFields<TutorialResponse> fields = const {
-    #tutorial: _f$tutorial,
-    #error: _f$error,
-  };
+  final MappableFields<TutorialResponse> fields = const {#tutorial: _f$tutorial, #error: _f$error};
 
   static TutorialResponse _instantiate(DecodingData data) {
     return TutorialResponse(data.dec(_f$tutorial), data.dec(_f$error));
@@ -571,7 +586,7 @@ extension TutorialConfigValueCopy<$R, $Out> on ObjectCopyWith<$R, TutorialConfig
 
 abstract class TutorialConfigCopyWith<$R, $In extends TutorialConfig, $Out> implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, TutorialStepConfig, TutorialStepConfigCopyWith<$R, TutorialStepConfig, TutorialStepConfig>>
-      get steps;
+  get steps;
   TutorialStepCopyWith<$R, TutorialStep, TutorialStep> get initialStep;
   $R call({String? id, String? name, List<TutorialStepConfig>? steps, TutorialStep? initialStep});
   TutorialConfigCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
@@ -585,24 +600,26 @@ class _TutorialConfigCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Tutori
   late final ClassMapperBase<TutorialConfig> $mapper = TutorialConfigMapper.ensureInitialized();
   @override
   ListCopyWith<$R, TutorialStepConfig, TutorialStepConfigCopyWith<$R, TutorialStepConfig, TutorialStepConfig>>
-      get steps => ListCopyWith($value.steps, (v, t) => v.copyWith.$chain(t), (v) => call(steps: v));
+  get steps => ListCopyWith($value.steps, (v, t) => v.copyWith.$chain(t), (v) => call(steps: v));
   @override
   TutorialStepCopyWith<$R, TutorialStep, TutorialStep> get initialStep =>
       $value.initialStep.copyWith.$chain((v) => call(initialStep: v));
   @override
-  $R call({String? id, String? name, List<TutorialStepConfig>? steps, TutorialStep? initialStep}) =>
-      $apply(FieldCopyWithData({
-        if (id != null) #id: id,
-        if (name != null) #name: name,
-        if (steps != null) #steps: steps,
-        if (initialStep != null) #initialStep: initialStep
-      }));
+  $R call({String? id, String? name, List<TutorialStepConfig>? steps, TutorialStep? initialStep}) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (name != null) #name: name,
+      if (steps != null) #steps: steps,
+      if (initialStep != null) #initialStep: initialStep,
+    }),
+  );
   @override
   TutorialConfig $make(CopyWithData data) => TutorialConfig(
-      data.get(#id, or: $value.id),
-      data.get(#name, or: $value.name),
-      data.get(#steps, or: $value.steps),
-      data.get(#initialStep, or: $value.initialStep));
+    data.get(#id, or: $value.id),
+    data.get(#name, or: $value.name),
+    data.get(#steps, or: $value.steps),
+    data.get(#initialStep, or: $value.initialStep),
+  );
 
   @override
   TutorialConfigCopyWith<$R2, TutorialConfig, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>

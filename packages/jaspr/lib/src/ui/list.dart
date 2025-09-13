@@ -5,44 +5,19 @@ class ListItemMarker {
   final ImageStyle? image;
   final ListStylePosition? position;
 
-  const ListItemMarker({
-    this.style,
-    this.image,
-    this.position,
-  });
+  const ListItemMarker({this.style, this.image, this.position});
 }
 
-enum ListType {
-  ordered,
-  unordered;
-}
+enum ListType { ordered, unordered }
 
 class ListView extends StatelessComponent {
-  const ListView({
-    super.key,
-    this.type = ListType.unordered,
-    this.marker,
-    required this.children,
-  });
+  const ListView({super.key, this.type = ListType.unordered, this.marker, required this.children});
 
-  factory ListView.ordered({
-    Key? key,
-    ListItemMarker? marker,
-    required List<Component> children,
-  }) {
-    return ListView(
-      key: key,
-      type: ListType.ordered,
-      marker: marker,
-      children: children,
-    );
+  factory ListView.ordered({Key? key, ListItemMarker? marker, required List<Component> children}) {
+    return ListView(key: key, type: ListType.ordered, marker: marker, children: children);
   }
 
-  factory ListView.unordered({
-    Key? key,
-    ListItemMarker? marker,
-    required List<Component> children,
-  }) {
+  factory ListView.unordered({Key? key, ListItemMarker? marker, required List<Component> children}) {
     return ListView(
       key: key,
       type: ListType.unordered,
@@ -66,24 +41,15 @@ class ListView extends StatelessComponent {
     );
 
     if (type == ListType.unordered) {
-      return ul(
-        styles: styles,
-        children,
-      );
+      return ul(styles: styles, children);
     } else {
-      return ol(
-        styles: styles,
-        children,
-      );
+      return ol(styles: styles, children);
     }
   }
 }
 
 class ListItem extends StatelessComponent {
-  const ListItem({
-    super.key,
-    required this.children,
-  });
+  const ListItem({super.key, required this.children});
 
   final List<Component> children;
 

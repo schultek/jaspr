@@ -11,10 +11,14 @@ void main() {
       String text = "Hello";
       late void Function(void Function() cb) setState;
 
-      tester.pumpComponent(StatefulBuilder(builder: (context, s) {
-        setState = s;
-        return input(value: text);
-      }));
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, s) {
+            setState = s;
+            return input(value: text);
+          },
+        ),
+      );
 
       final node = tester.findNode(find.tag('input')) as HTMLInputElement;
 
@@ -33,13 +37,14 @@ void main() {
       String value = "a";
       late void Function(void Function() cb) setState;
 
-      tester.pumpComponent(StatefulBuilder(builder: (context, s) {
-        setState = s;
-        return select(value: value, [
-          option(value: "a", []),
-          option(value: "b", []),
-        ]);
-      }));
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, s) {
+            setState = s;
+            return select(value: value, [option(value: "a", []), option(value: "b", [])]);
+          },
+        ),
+      );
 
       final node = tester.findNode(find.tag('select')) as HTMLSelectElement;
 

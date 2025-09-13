@@ -70,8 +70,12 @@ class ProjectDataMapper extends SubClassMapperBase<ProjectData> {
   static String _$mainDartFile(ProjectData v) => v.mainDartFile;
   static const Field<ProjectData, String> _f$mainDartFile = Field('mainDartFile', _$mainDartFile);
   static Map<String, String> _$dartFiles(ProjectData v) => v.dartFiles;
-  static const Field<ProjectData, Map<String, String>> _f$dartFiles =
-      Field('dartFiles', _$dartFiles, opt: true, def: const {});
+  static const Field<ProjectData, Map<String, String>> _f$dartFiles = Field(
+    'dartFiles',
+    _$dartFiles,
+    opt: true,
+    def: const {},
+  );
 
   @override
   final MappableFields<ProjectData> fields = const {
@@ -92,12 +96,13 @@ class ProjectDataMapper extends SubClassMapperBase<ProjectData> {
 
   static ProjectData _instantiate(DecodingData data) {
     return ProjectData(
-        id: data.dec(_f$id),
-        description: data.dec(_f$description),
-        htmlFile: data.dec(_f$htmlFile),
-        cssFile: data.dec(_f$cssFile),
-        mainDartFile: data.dec(_f$mainDartFile),
-        dartFiles: data.dec(_f$dartFiles));
+      id: data.dec(_f$id),
+      description: data.dec(_f$description),
+      htmlFile: data.dec(_f$htmlFile),
+      cssFile: data.dec(_f$cssFile),
+      mainDartFile: data.dec(_f$mainDartFile),
+      dartFiles: data.dec(_f$dartFiles),
+    );
   }
 
   @override
@@ -146,13 +151,14 @@ extension ProjectDataValueCopy<$R, $Out> on ObjectCopyWith<$R, ProjectData, $Out
 
 abstract class ProjectDataCopyWith<$R, $In extends ProjectData, $Out> implements ClassCopyWith<$R, $In, $Out> {
   MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get dartFiles;
-  $R call(
-      {String? id,
-      String? description,
-      String? htmlFile,
-      String? cssFile,
-      String? mainDartFile,
-      Map<String, String>? dartFiles});
+  $R call({
+    String? id,
+    String? description,
+    String? htmlFile,
+    String? cssFile,
+    String? mainDartFile,
+    Map<String, String>? dartFiles,
+  });
   ProjectDataCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -166,29 +172,32 @@ class _ProjectDataCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, ProjectDa
   MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get dartFiles =>
       MapCopyWith($value.dartFiles, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(dartFiles: v));
   @override
-  $R call(
-          {Object? id = $none,
-          Object? description = $none,
-          Object? htmlFile = $none,
-          Object? cssFile = $none,
-          String? mainDartFile,
-          Map<String, String>? dartFiles}) =>
-      $apply(FieldCopyWithData({
-        if (id != $none) #id: id,
-        if (description != $none) #description: description,
-        if (htmlFile != $none) #htmlFile: htmlFile,
-        if (cssFile != $none) #cssFile: cssFile,
-        if (mainDartFile != null) #mainDartFile: mainDartFile,
-        if (dartFiles != null) #dartFiles: dartFiles
-      }));
+  $R call({
+    Object? id = $none,
+    Object? description = $none,
+    Object? htmlFile = $none,
+    Object? cssFile = $none,
+    String? mainDartFile,
+    Map<String, String>? dartFiles,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != $none) #id: id,
+      if (description != $none) #description: description,
+      if (htmlFile != $none) #htmlFile: htmlFile,
+      if (cssFile != $none) #cssFile: cssFile,
+      if (mainDartFile != null) #mainDartFile: mainDartFile,
+      if (dartFiles != null) #dartFiles: dartFiles,
+    }),
+  );
   @override
   ProjectData $make(CopyWithData data) => ProjectData(
-      id: data.get(#id, or: $value.id),
-      description: data.get(#description, or: $value.description),
-      htmlFile: data.get(#htmlFile, or: $value.htmlFile),
-      cssFile: data.get(#cssFile, or: $value.cssFile),
-      mainDartFile: data.get(#mainDartFile, or: $value.mainDartFile),
-      dartFiles: data.get(#dartFiles, or: $value.dartFiles));
+    id: data.get(#id, or: $value.id),
+    description: data.get(#description, or: $value.description),
+    htmlFile: data.get(#htmlFile, or: $value.htmlFile),
+    cssFile: data.get(#cssFile, or: $value.cssFile),
+    mainDartFile: data.get(#mainDartFile, or: $value.mainDartFile),
+    dartFiles: data.get(#dartFiles, or: $value.dartFiles),
+  );
 
   @override
   ProjectDataCopyWith<$R2, ProjectData, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>

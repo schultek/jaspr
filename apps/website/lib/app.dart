@@ -13,42 +13,32 @@ class App extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Router(routes: [
-      Route(
-        path: '/',
-        builder: (_, __) => fragment([
-          Banner(),
-          Header(),
-          main_([
-            Home(),
+    return Router(
+      routes: [
+        Route(
+          path: '/',
+          builder: (_, __) => fragment([
+            Banner(),
+            Header(),
+            main_([Home()]),
+            Footer(),
           ]),
-          Footer(),
-        ]),
-      ),
-      Route(
-        path: '/imprint',
-        title: 'Imprint',
-        builder: (_, __) => MarkdownPage('lib/content/imprint.md'),
-      ),
-      Route(
-        path: '/privacy',
-        title: 'Privacy Policy',
-        builder: (_, __) => MarkdownPage('lib/content/privacy.md'),
-      ),
-    ]);
+        ),
+        Route(path: '/imprint', title: 'Imprint', builder: (_, __) => MarkdownPage('lib/content/imprint.md')),
+        Route(path: '/privacy', title: 'Privacy Policy', builder: (_, __) => MarkdownPage('lib/content/privacy.md')),
+      ],
+    );
   }
 
   @css
   static List<StyleRule> get styles => [
-        css('main').styles(
-          overflow: Overflow.hidden,
-        ),
-        css('section').styles(position: Position.relative()),
-        css('#hero:before').combine(backgroundShade(40.vh, (-20).vw, w: 80.vw, h: 160.vh)),
-        css('#devex:before').combine(backgroundShade(10.vh, 20.vw, w: 80.vw, h: 60.vh)),
-        css('#testimonials:before').combine(backgroundShade((-10).vh, (-10).vw, w: 60.vw, h: 60.vh)),
-        css('#community:before').combine(backgroundShade(60.vh, 10.vw, w: 80.vw, b: (-20).vh)),
-      ];
+    css('main').styles(overflow: Overflow.hidden),
+    css('section').styles(position: Position.relative()),
+    css('#hero:before').combine(backgroundShade(40.vh, (-20).vw, w: 80.vw, h: 160.vh)),
+    css('#devex:before').combine(backgroundShade(10.vh, 20.vw, w: 80.vw, h: 60.vh)),
+    css('#testimonials:before').combine(backgroundShade((-10).vh, (-10).vw, w: 60.vw, h: 60.vh)),
+    css('#community:before').combine(backgroundShade(60.vh, 10.vw, w: 80.vw, b: (-20).vh)),
+  ];
 
   static Styles backgroundShade(Unit top, Unit left, {Unit? w, Unit? h, Unit? b, Unit? r}) {
     return Styles(

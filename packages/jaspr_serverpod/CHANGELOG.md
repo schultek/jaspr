@@ -1,11 +1,3 @@
-## 0.5.7-dev.1
-
-- `jaspr` upgraded to `0.21.0-dev.1`
-
-## 0.5.7-dev.0
-
-- `jaspr` upgraded to `0.21.0-dev.0`
-
 ## 0.5.6
 
 - `jaspr` upgraded to `0.20.0`

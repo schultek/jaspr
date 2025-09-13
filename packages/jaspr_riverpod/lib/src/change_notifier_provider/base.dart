@@ -85,9 +85,7 @@ class ChangeNotifierProvider<NotifierT extends ChangeNotifier?> extends _ChangeN
     @Deprecated('Will be removed in 3.0.0') super.from,
     @Deprecated('Will be removed in 3.0.0') super.argument,
     @Deprecated('Will be removed in 3.0.0') super.debugGetCreateSourceHash,
-  }) : super(
-          allTransitiveDependencies: computeAllTransitiveDependencies(dependencies),
-        );
+  }) : super(allTransitiveDependencies: computeAllTransitiveDependencies(dependencies));
 
   /// An implementation detail of Riverpod
   @internal
@@ -110,7 +108,8 @@ class ChangeNotifierProvider<NotifierT extends ChangeNotifier?> extends _ChangeN
   final NotifierT Function(
     // ignore: deprecated_member_use, deprecated_member_use_from_same_package
     ChangeNotifierProviderRef<NotifierT> ref,
-  ) _createFn;
+  )
+  _createFn;
 
   @override
   NotifierT _create(ChangeNotifierProviderElement<NotifierT> ref) {
@@ -181,13 +180,11 @@ class ChangeNotifierProvider<NotifierT extends ChangeNotifier?> extends _ChangeN
 
 /// The element of [ChangeNotifierProvider].
 class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?> extends ProviderElementBase<NotifierT>
-    // ignore: deprecated_member_use, deprecated_member_use_from_same_package
-    implements
+        // ignore: deprecated_member_use, deprecated_member_use_from_same_package
+        implements
         // ignore: deprecated_member_use, deprecated_member_use_from_same_package
         ChangeNotifierProviderRef<NotifierT> {
-  ChangeNotifierProviderElement._(
-    _ChangeNotifierProviderBase<NotifierT> super._provider,
-  );
+  ChangeNotifierProviderElement._(_ChangeNotifierProviderBase<NotifierT> super._provider);
 
   @override
   NotifierT get notifier => _notifierNotifier.value;
@@ -236,10 +233,7 @@ class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?> extends P
     required void Function(ProviderElementBase<Object?> element) elementVisitor,
     required void Function(ProxyElementValueNotifier<Object?> element) notifierVisitor,
   }) {
-    super.visitChildren(
-      elementVisitor: elementVisitor,
-      notifierVisitor: notifierVisitor,
-    );
+    super.visitChildren(elementVisitor: elementVisitor, notifierVisitor: notifierVisitor);
     notifierVisitor(_notifierNotifier);
   }
 }
@@ -247,19 +241,16 @@ class ChangeNotifierProviderElement<NotifierT extends ChangeNotifier?> extends P
 // ignore: subtype_of_sealed_class
 /// The [Family] of [ChangeNotifierProvider].
 class ChangeNotifierProviderFamily<NotifierT extends ChangeNotifier?, Arg>
-    // ignore: deprecated_member_use, deprecated_member_use_from_same_package
-    extends FamilyBase<ChangeNotifierProviderRef<NotifierT>, NotifierT, Arg, NotifierT,
-        ChangeNotifierProvider<NotifierT>> {
+    extends
+        // ignore: deprecated_member_use, deprecated_member_use_from_same_package
+        FamilyBase<ChangeNotifierProviderRef<NotifierT>, NotifierT, Arg, NotifierT, ChangeNotifierProvider<NotifierT>> {
   /// The [Family] of [ChangeNotifierProvider].
-  ChangeNotifierProviderFamily(
-    super._createFn, {
-    super.name,
-    super.dependencies,
-  }) : super(
-          providerFactory: ChangeNotifierProvider.internal,
-          debugGetCreateSourceHash: null,
-          allTransitiveDependencies: computeAllTransitiveDependencies(dependencies),
-        );
+  ChangeNotifierProviderFamily(super._createFn, {super.name, super.dependencies})
+    : super(
+        providerFactory: ChangeNotifierProvider.internal,
+        debugGetCreateSourceHash: null,
+        allTransitiveDependencies: computeAllTransitiveDependencies(dependencies),
+      );
 
   /// {@macro riverpod.override_with}
   Override overrideWith(

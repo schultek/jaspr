@@ -6,15 +6,7 @@ import 'run_flutter_app.dart';
 import 'view_constraints.dart';
 
 class FlutterEmbedView extends StatefulComponent {
-  const FlutterEmbedView({
-    this.id,
-    this.classes,
-    this.styles,
-    this.constraints,
-    this.loader,
-    this.widget,
-    super.key,
-  });
+  const FlutterEmbedView({this.id, this.classes, this.styles, this.constraints, this.loader, this.widget, super.key});
 
   final flt.Widget? widget;
   final Component? loader;
@@ -42,14 +34,20 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
       context.binding.addPostFrameCallback(() async {
         var element = findChildDomElement(context as Element)!;
         element = element.children.item(element.children.length - 1)!;
-        viewId = await addView(element, component.constraints, flt.StatefulBuilder(builder: (context, setState) {
-          rebuildFlutterApp = () {
-            if (!context.mounted) return;
-            setState(() {});
-          };
-          waitOnWarmupFrames();
-          return component.widget ?? flt.SizedBox.shrink();
-        }));
+        viewId = await addView(
+          element,
+          component.constraints,
+          flt.StatefulBuilder(
+            builder: (context, setState) {
+              rebuildFlutterApp = () {
+                if (!context.mounted) return;
+                setState(() {});
+              };
+              waitOnWarmupFrames();
+              return component.widget ?? flt.SizedBox.shrink();
+            },
+          ),
+        );
       });
     }
   }
@@ -114,11 +112,15 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
             minHeight: c.minHeight != double.infinity ? c.minHeight?.px : null,
             maxHeight: c.maxHeight != double.infinity ? c.maxHeight?.px : null,
           ),
-        if (component.styles != null) component.styles!
+        if (component.styles != null) component.styles!,
       ]),
       [
         if (component.loader != null && !didRenderView) component.loader!,
-        div(key: flutterDivKey, styles: Styles(height: 100.percent), []),
+        div(
+          key: flutterDivKey,
+          styles: Styles(height: 100.percent),
+          [],
+        ),
       ],
     );
   }

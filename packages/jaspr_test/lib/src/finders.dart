@@ -202,11 +202,7 @@ class CommonFinders {
   ///
   /// If the [matchRoot] argument is true then the component(s) specified by [of]
   /// will be matched along with the ancestors.
-  Finder ancestor({
-    required Finder of,
-    required Finder matching,
-    bool matchRoot = false,
-  }) {
+  Finder ancestor({required Finder of, required Finder matching, bool matchRoot = false}) {
     return _AncestorFinder(of, matching, matchRoot: matchRoot);
   }
 }
@@ -476,9 +472,7 @@ class _ComponentFinder extends MatchFinder {
 }
 
 class _ComponentPredicateFinder extends MatchFinder {
-  _ComponentPredicateFinder(this.predicate, {String? description})
-      : _description = description,
-        super();
+  _ComponentPredicateFinder(this.predicate, {String? description}) : _description = description, super();
 
   final ComponentPredicate predicate;
   final String? _description;
@@ -493,9 +487,7 @@ class _ComponentPredicateFinder extends MatchFinder {
 }
 
 class _ElementPredicateFinder extends MatchFinder {
-  _ElementPredicateFinder(this.predicate, {String? description})
-      : _description = description,
-        super();
+  _ElementPredicateFinder(this.predicate, {String? description}) : _description = description, super();
 
   final ElementPredicate predicate;
   final String? _description;
@@ -510,11 +502,7 @@ class _ElementPredicateFinder extends MatchFinder {
 }
 
 class _DescendantFinder extends Finder {
-  _DescendantFinder(
-    this.ancestor,
-    this.descendant, {
-    this.matchRoot = false,
-  }) : super();
+  _DescendantFinder(this.ancestor, this.descendant, {this.matchRoot = false}) : super();
 
   final Finder ancestor;
   final Finder descendant;
@@ -536,8 +524,10 @@ class _DescendantFinder extends Finder {
   @override
   Iterable<Element> get allCandidates {
     final Iterable<Element> ancestorElements = ancestor.evaluate();
-    final List<Element> candidates =
-        ancestorElements.expand<Element>((Element element) => collectAllElementsFrom(element)).toSet().toList();
+    final List<Element> candidates = ancestorElements
+        .expand<Element>((Element element) => collectAllElementsFrom(element))
+        .toSet()
+        .toList();
     if (matchRoot) candidates.insertAll(0, ancestorElements);
     return candidates;
   }

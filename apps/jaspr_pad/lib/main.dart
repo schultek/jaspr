@@ -27,17 +27,24 @@ void main() async {
   var router = Router();
 
   router.mount('/api', apiRouter);
-  router.mount('/', serveApp((r, render) {
-    return render(Document.template(
-      name: 'main',
-      child: Builder(builder: (context) {
-        return ProviderScope(
-          overrides: [syncSamplesProvider.overrideWith(loadSamplesProviderOverride)],
-          child: Playground(),
-        );
-      }),
-    ));
-  }));
+  router.mount(
+    '/',
+    serveApp((r, render) {
+      return render(
+        Document.template(
+          name: 'main',
+          child: Builder(
+            builder: (context) {
+              return ProviderScope(
+                overrides: [syncSamplesProvider.overrideWith(loadSamplesProviderOverride)],
+                child: Playground(),
+              );
+            },
+          ),
+        ),
+      );
+    }),
+  );
 
   var handler = Pipeline().addHandler(router.call);
 

@@ -29,11 +29,14 @@ class _PageState extends State<Page> {
           Document.head(title: 'c'),
         ] else ...[
           Document.head(title: 'd'),
-        ]
+        ],
       ]),
-      button(onClick: () {
-        setState(() => pressed = true);
-      }, [text('Toggle')]),
+      button(
+        onClick: () {
+          setState(() => pressed = true);
+        },
+        [text('Toggle')],
+      ),
     ]);
   }
 }

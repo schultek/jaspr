@@ -10,12 +10,9 @@ import '../utils.dart';
 
 class StylesOrderingLint extends DartLintRule {
   StylesOrderingLint()
-      : super(
-          code: LintCode(
-            name: 'styles_ordering',
-            problemMessage: "Styles are not ordered. Try sorting them.",
-          ),
-        );
+    : super(
+        code: LintCode(name: 'styles_ordering', problemMessage: "Styles are not ordered. Try sorting them."),
+      );
 
   @override
   void run(CustomLintResolver resolver, DiagnosticReporter reporter, CustomLintContext context) {
@@ -131,7 +128,8 @@ class OrderStylesFix extends DartFix {
           breaks.add(content.substring(arguments[i].end, arguments[i + 1].offset));
         }
 
-        var args = [...arguments]..sort((a, b) {
+        var args = [...arguments]
+          ..sort((a, b) {
             if (a is NamedExpression && b is NamedExpression) {
               return params.indexOf(a.name.label.name).compareTo(params.indexOf(b.name.label.name));
             }
