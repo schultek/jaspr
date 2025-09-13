@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.21.0
 
 **Read the full [Release Notes](https://docs.jaspr.site/releases/v/0.21.0) for this version.**
 

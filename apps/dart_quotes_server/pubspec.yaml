@@ -1,6 +1,6 @@
 name: dart_quotes_server
 description: Collection of Dart quotes.
-version: 0.1.7
+version: 0.1.8
 publish_to: none
 
 environment:

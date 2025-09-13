@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.4.0
 
 - The `LiquidTemplateEngine` is no longer `const`.
 - Fixed resolution of partial files in `LiquidTemplateEngine`.
