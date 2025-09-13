@@ -1,7 +1,4 @@
-@JS()
-library;
-
-import 'package:js/js.dart';
+import 'dart:js_interop';
 
 @JS('hljs.highlightAll')
 external void highlightAll();
