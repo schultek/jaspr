@@ -18,11 +18,7 @@ import 'base_command.dart';
 
 abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   DevCommand({super.logger}) {
-    argParser.addOption(
-      'input',
-      abbr: 'i',
-      help: 'Specify the input file for the web app.',
-    );
+    argParser.addOption('input', abbr: 'i', help: 'Specify the input file for the web app.');
     argParser.addOption(
       'mode',
       abbr: 'm',
@@ -34,29 +30,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: 'refresh',
     );
-    argParser.addOption(
-      'port',
-      abbr: 'p',
-      help: 'Specify a port to run the dev server on.',
-      defaultsTo: '8080',
-    );
-    argParser.addFlag(
-      'debug',
-      abbr: 'd',
-      help: 'Serves the app in debug mode.',
-      negatable: false,
-    );
-    argParser.addFlag(
-      'release',
-      abbr: 'r',
-      help: 'Serves the app in release mode.',
-      negatable: false,
-    );
-    argParser.addFlag(
-      'experimental-wasm',
-      help: 'Compile to wasm',
-      negatable: false,
-    );
+    argParser.addOption('port', abbr: 'p', help: 'Specify a port to run the dev server on.', defaultsTo: '8080');
+    argParser.addFlag('debug', abbr: 'd', help: 'Serves the app in debug mode.', negatable: false);
+    argParser.addFlag('release', abbr: 'r', help: 'Serves the app in release mode.', negatable: false);
+    argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
     addDartDefineArgs();
   }
 
@@ -95,9 +72,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (project.usesFlutter) {
       var flutterProcess = await serveFlutter(flutterPort, useWasm);
 
-      workflow.serverManager.servers.first.buildResults
-          .where((event) => event.status == BuildStatus.succeeded)
-          .listen((event) {
+      workflow.serverManager.servers.first.buildResults.where((event) => event.status == BuildStatus.succeeded).listen((
+        event,
+      ) {
         // trigger reload
         flutterProcess.stdin.writeln('r');
       });
@@ -147,11 +124,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       // Use direct `dart` entry point for now due to
       // https://github.com/dart-lang/sdk/issues/61373.
       // 'run',
-      if (!release) ...[
-        '--enable-vm-service',
-        '--enable-asserts',
-      ] else
-        '-Djaspr.flags.release=true',
+      if (!release) ...['--enable-vm-service', '--enable-asserts'] else '-Djaspr.flags.release=true',
       '-Djaspr.flags.verbose=$debug',
       for (var define in userDefines.entries) '-D${define.key}=${define.value}',
     ];
@@ -181,11 +154,20 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     logger.write('Server started.', tag: Tag.cli, progress: ProgressState.completed);
 
-    var serverFuture = watchProcess('server', process, tag: Tag.server, onFail: () {
-      logger.write('Server stopped unexpectedly. There is probably more output above.',
-          tag: Tag.cli, level: Level.error, progress: ProgressState.completed);
-      return true;
-    });
+    var serverFuture = watchProcess(
+      'server',
+      process,
+      tag: Tag.server,
+      onFail: () {
+        logger.write(
+          'Server stopped unexpectedly. There is probably more output above.',
+          tag: Tag.cli,
+          level: Level.error,
+          progress: ProgressState.completed,
+        );
+        return true;
+      },
+    );
 
     var serverClosed = false;
     serverFuture.whenComplete(() {
@@ -206,9 +188,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       n++;
       if (n > 10) {
         logger.write(
-            'Server at http://localhost:$port not reachable after ${n * 2} seconds. Please check the server logs for errors.',
-            tag: Tag.cli,
-            level: Level.error);
+          'Server at http://localhost:$port not reachable after ${n * 2} seconds. Please check the server logs for errors.',
+          tag: Tag.cli,
+          level: Level.error,
+        );
         return 1;
       }
     }
@@ -228,8 +211,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
     var userDefines = getServerDartDefines();
     if (userDefines.isNotEmpty) {
-      logger.write("Ignoring all --dart-define options since custom dev command is used.",
-          tag: Tag.cli, level: Level.warning);
+      logger.write(
+        "Ignoring all --dart-define options since custom dev command is used.",
+        tag: Tag.cli,
+        level: Level.warning,
+      );
     }
 
     var [exec, ...args] = command.split(" ");
@@ -284,8 +270,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     var compiler = useWasm
         ? 'dart2wasm'
         : release
-            ? 'dart2js'
-            : 'dartdevc';
+        ? 'dart2js'
+        : 'dartdevc';
 
     var dartDefines = getClientDartDefines();
     if (project.usesFlutter) {
@@ -320,8 +306,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     var timer = Timer(Duration(seconds: 20), () {
       if (!buildCompleter.isCompleted) {
-        logger.write('Building web assets... (This takes longer for the initial build)',
-            tag: Tag.cli, progress: ProgressState.running);
+        logger.write(
+          'Building web assets... (This takes longer for the initial build)',
+          tag: Tag.cli,
+          progress: ProgressState.running,
+        );
       }
     });
 
@@ -333,8 +322,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           logger.write('Rebuilt web assets.', tag: Tag.cli, progress: ProgressState.completed);
         }
       } else if (event.status == BuildStatus.failed) {
-        logger.write('Failed building web assets. There is probably more output above.',
-            tag: Tag.cli, level: Level.error, progress: ProgressState.completed);
+        logger.write(
+          'Failed building web assets. There is probably more output above.',
+          tag: Tag.cli,
+          level: Level.error,
+          progress: ProgressState.completed,
+        );
         if (!buildCompleter.isCompleted) {
           buildCompleter.completeError(event);
         }
@@ -360,8 +353,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       await buildCompleter.future;
       logger.write('Done building web assets.', tag: Tag.cli, progress: ProgressState.completed);
     } on BuildResult catch (_) {
-      logger.write('Could not start dev server due to build errors.',
-          tag: Tag.cli, level: Level.error, progress: ProgressState.completed);
+      logger.write(
+        'Could not start dev server due to build errors.',
+        tag: Tag.cli,
+        level: Level.error,
+        progress: ProgressState.completed,
+      );
 
       return null;
     } catch (_) {
@@ -377,7 +374,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   }
 }
 
-String serverEntrypoint(String import) => '''
+String serverEntrypoint(String import) =>
+    '''
   import '$import' as m;
   import 'package:hotreloader/hotreloader.dart';
       

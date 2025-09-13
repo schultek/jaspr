@@ -10,14 +10,16 @@ final autoDisposeCounter = StateProvider.autoDispose((ref) => 0);
 void main() {
   group('context.watch', () {
     testComponents('returns provider state and rebuilds on change', (tester) async {
-      tester.pumpComponent(providerApp((context) {
-        return Button(
-          label: '${context.watch(counter)}',
-          onPressed: () {
-            context.read(counter.notifier).state++;
-          },
-        );
-      }));
+      tester.pumpComponent(
+        providerApp((context) {
+          return Button(
+            label: '${context.watch(counter)}',
+            onPressed: () {
+              context.read(counter.notifier).state++;
+            },
+          );
+        }),
+      );
 
       expect(find.text('0'), findsOneComponent);
 
@@ -28,31 +30,37 @@ void main() {
     });
 
     testComponents('returns overridden provider state', (tester) async {
-      tester.pumpComponent(providerApp((context) {
-        return div([
-          Builder(builder: (context) {
-            return Button(
-              key: const ValueKey('a'),
-              label: 'a ${context.watch(counter)}',
-              onPressed: () {
-                context.read(counter.notifier).state++;
+      tester.pumpComponent(
+        providerApp((context) {
+          return div([
+            Builder(
+              builder: (context) {
+                return Button(
+                  key: const ValueKey('a'),
+                  label: 'a ${context.watch(counter)}',
+                  onPressed: () {
+                    context.read(counter.notifier).state++;
+                  },
+                );
               },
-            );
-          }),
-          ProviderScope(
-            overrides: [counter.overrideWith((ref) => 10)],
-            child: Builder(builder: (context) {
-              return Button(
-                key: const ValueKey('b'),
-                label: 'b ${context.watch(counter)}',
-                onPressed: () {
-                  context.read(counter.notifier).state++;
+            ),
+            ProviderScope(
+              overrides: [counter.overrideWith((ref) => 10)],
+              child: Builder(
+                builder: (context) {
+                  return Button(
+                    key: const ValueKey('b'),
+                    label: 'b ${context.watch(counter)}',
+                    onPressed: () {
+                      context.read(counter.notifier).state++;
+                    },
+                  );
                 },
-              );
-            }),
-          ),
-        ]);
-      }));
+              ),
+            ),
+          ]);
+        }),
+      );
 
       expect(find.text('a 0'), findsOneComponent);
       expect(find.text('b 10'), findsOneComponent);
@@ -71,29 +79,31 @@ void main() {
     });
 
     testComponents('provider is autodisposed when no longer watched', (tester) async {
-      tester.pumpComponent(providerApp((context) {
-        var showCounter = true;
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return div([
-              Button(
-                label: showCounter ? '${context.watch(autoDisposeCounter)}' : 'hidden',
-                onPressed: () {
-                  context.read(autoDisposeCounter.notifier).state++;
-                },
-              ),
-              Button(
-                label: 'toggle',
-                onPressed: () {
-                  setState(() {
-                    showCounter = !showCounter;
-                  });
-                },
-              ),
-            ]);
-          },
-        );
-      }));
+      tester.pumpComponent(
+        providerApp((context) {
+          var showCounter = true;
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return div([
+                Button(
+                  label: showCounter ? '${context.watch(autoDisposeCounter)}' : 'hidden',
+                  onPressed: () {
+                    context.read(autoDisposeCounter.notifier).state++;
+                  },
+                ),
+                Button(
+                  label: 'toggle',
+                  onPressed: () {
+                    setState(() {
+                      showCounter = !showCounter;
+                    });
+                  },
+                ),
+              ]);
+            },
+          );
+        }),
+      );
 
       expect(find.text('0'), findsOneComponent);
       expect(find.text('hidden'), findsNothing);

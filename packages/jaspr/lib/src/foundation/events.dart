@@ -35,39 +35,38 @@ EventCallbacks events<V1, V2>({
   /// - `String` for text input and textarea elements
   /// - `Null` for all other elements
   ValueChanged<V2>? onChange,
-}) =>
-    {
-      if (onClick != null)
-        'click': (event) {
-          if (kIsWeb && (event.target.isHtmlAnchorElement)) {
-            event.preventDefault();
-          }
-          onClick();
-        },
-      if (onInput != null) 'input': _callWithValue('onInput', onInput),
-      if (onChange != null) 'change': _callWithValue('onChange', onChange),
-    };
+}) => {
+  if (onClick != null)
+    'click': (event) {
+      if (kIsWeb && (event.target.isHtmlAnchorElement)) {
+        event.preventDefault();
+      }
+      onClick();
+    },
+  if (onInput != null) 'input': _callWithValue('onInput', onInput),
+  if (onChange != null) 'change': _callWithValue('onChange', onChange),
+};
 
 void Function(web.Event) _callWithValue<V>(String event, void Function(V) fn) {
   return (e) {
     var target = e.target;
     var value = switch (target) {
       web.HTMLInputElement() when target.isHtmlInputElement => () {
-          final targetType = target.type;
-          final type = InputType.values.where((v) => v.name == targetType).firstOrNull;
-          return switch (type) {
-            InputType.checkbox || InputType.radio => target.checked,
-            InputType.number => target.valueAsNumber,
-            InputType.date || InputType.dateTimeLocal => target.valueAsDate,
-            InputType.file => target.files,
-            _ => target.value,
-          };
-        }(),
+        final targetType = target.type;
+        final type = InputType.values.where((v) => v.name == targetType).firstOrNull;
+        return switch (type) {
+          InputType.checkbox || InputType.radio => target.checked,
+          InputType.number => target.valueAsNumber,
+          InputType.date || InputType.dateTimeLocal => target.valueAsDate,
+          InputType.file => target.files,
+          _ => target.value,
+        };
+      }(),
       web.HTMLTextAreaElement() when target.isTextAreaElement => target.value,
       web.HTMLSelectElement() when target.isHtmlSelectElement => [
-          for (final o in target.selectedOptions.toIterable())
-            if (o.isHtmlOptionElement) (o as web.HTMLOptionElement).value,
-        ],
+        for (final o in target.selectedOptions.toIterable())
+          if (o.isHtmlOptionElement) (o as web.HTMLOptionElement).value,
+      ],
       _ => null,
     };
     assert(() {

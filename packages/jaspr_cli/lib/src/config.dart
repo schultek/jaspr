@@ -16,8 +16,11 @@ class Project {
   YamlMap get requirePubspecYaml {
     final pubspecYaml = _pubspecYaml;
     if (pubspecYaml == null) {
-      logger.write('Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.',
-          tag: Tag.cli, level: Level.critical);
+      logger.write(
+        'Could not find pubspec.yaml file. Make sure to run jaspr in your root project directory.',
+        tag: Tag.cli,
+        level: Level.critical,
+      );
       exit(1);
     }
     return pubspecYaml;
@@ -42,8 +45,11 @@ class Project {
     if (requirePubspecYaml case {'dependencies': {'jaspr': _}}) {
       // ok
     } else {
-      logger.write('Missing dependency on jaspr in pubspec.yaml file. Make sure to add jaspr to your dependencies.',
-          tag: Tag.cli, level: Level.critical);
+      logger.write(
+        'Missing dependency on jaspr in pubspec.yaml file. Make sure to add jaspr to your dependencies.',
+        tag: Tag.cli,
+        level: Level.critical,
+      );
       exit(1);
     }
   }
@@ -55,19 +61,24 @@ class Project {
       var log = logger.logger;
       if (log == null) {
         logger.write(
-            'Missing dependency on jaspr_builder in pubspec.yaml file. Make sure to add jaspr_builder to your dev_dependencies.',
-            tag: Tag.cli,
-            level: Level.warning);
+          'Missing dependency on jaspr_builder in pubspec.yaml file. Make sure to add jaspr_builder to your dev_dependencies.',
+          tag: Tag.cli,
+          level: Level.warning,
+        );
       } else {
         var result = log.confirm(
-            'Missing dependency on jaspr_builder package. Do you want to add jaspr_builder to your dev_dependencies now?',
-            defaultValue: true);
+          'Missing dependency on jaspr_builder package. Do you want to add jaspr_builder to your dev_dependencies now?',
+          defaultValue: true,
+        );
         if (result) {
           var result = Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
           if (result.exitCode != 0) {
             log.err(result.stderr);
-            logger.write('Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.',
-                tag: Tag.cli, level: Level.critical);
+            logger.write(
+              'Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.',
+              tag: Tag.cli,
+              level: Level.critical,
+            );
             exit(1);
           }
 
@@ -122,14 +133,20 @@ class Project {
 
     var modeYaml = configYaml['mode'];
     if (modeYaml == null) {
-      logger.write('\'jaspr.mode\' option is required but missing in pubspec.yaml.',
-          tag: Tag.cli, level: Level.critical);
+      logger.write(
+        '\'jaspr.mode\' option is required but missing in pubspec.yaml.',
+        tag: Tag.cli,
+        level: Level.critical,
+      );
       exit(1);
     }
     var modeOrNull = JasprMode.values.where((v) => v.name == modeYaml).firstOrNull;
     if (modeOrNull == null) {
-      logger.write('\'jaspr.mode\' must be one of ${JasprMode.values.map((v) => v.name).join(', ')} in pubspec.yaml.',
-          tag: Tag.cli, level: Level.critical);
+      logger.write(
+        '\'jaspr.mode\' must be one of ${JasprMode.values.map((v) => v.name).join(', ')} in pubspec.yaml.',
+        tag: Tag.cli,
+        level: Level.critical,
+      );
       exit(1);
     }
     return modeOrNull;

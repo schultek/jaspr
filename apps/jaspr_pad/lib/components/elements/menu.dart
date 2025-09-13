@@ -16,14 +16,8 @@ class MenuItem extends StatelessComponent {
       classes: 'mdc-list-item channel-menu-list',
       attributes: {'role': 'menuitem'},
       [
-        img(
-          classes: 'mdc-list-item__graphic',
-          src: './pictures/logo_dart.png',
-        ),
-        span(
-          classes: 'mdc-list-item__text',
-          [text(label)],
-        ),
+        img(classes: 'mdc-list-item__graphic', src: './pictures/logo_dart.png'),
+        span(classes: 'mdc-list-item__text', [text(label)]),
       ],
     );
   }
@@ -70,43 +64,36 @@ class MenuElement extends StatelessElement {
 
   @override
   Component build() {
-    return div(
-      styles: Styles(position: Position.relative()),
-      [
-        DomNodeReader(
-          onNode: (node) {
-            setMenuNodes(null, node);
+    return div(styles: Styles(position: Position.relative()), [
+      DomNodeReader(
+        onNode: (node) {
+          setMenuNodes(null, node);
+        },
+        child: Button(
+          id: 'samples-dropdown-button',
+          label: 'Samples',
+          icon: 'expand_more',
+          hideIcon: true,
+          iconAffinity: IconAffinity.right,
+          onPressed: () {
+            if (_menu != null) {
+              _menu!.open = !(_menu!.open ?? false);
+            }
           },
-          child: Button(
-            id: 'samples-dropdown-button',
-            label: 'Samples',
-            icon: 'expand_more',
-            hideIcon: true,
-            iconAffinity: IconAffinity.right,
-            onPressed: () {
-              if (_menu != null) {
-                _menu!.open = !(_menu!.open ?? false);
-              }
-            },
-          ),
         ),
-        DomNodeReader(
-          onNode: (node) {
-            setMenuNodes(node, null);
-          },
-          child: div(
-            id: 'samples-menu',
-            classes: 'mdc-menu mdc-menu-surface',
-            [
-              ul(
-                classes: 'mdc-list',
-                attributes: {'aria-hidden': 'true', 'aria-orientation': 'vertical', 'tabindex': '-1'},
-                component.items,
-              ),
-            ],
+      ),
+      DomNodeReader(
+        onNode: (node) {
+          setMenuNodes(node, null);
+        },
+        child: div(id: 'samples-menu', classes: 'mdc-menu mdc-menu-surface', [
+          ul(
+            classes: 'mdc-list',
+            attributes: {'aria-hidden': 'true', 'aria-orientation': 'vertical', 'tabindex': '-1'},
+            component.items,
           ),
-        ),
-      ],
-    );
+        ]),
+      ),
+    ]);
   }
 }

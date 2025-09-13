@@ -57,10 +57,10 @@ class _RotateAxisTransform implements Transform {
 
   @override
   String get value => [
-        if (x != null) 'rotateX(${x!.value})',
-        if (y != null) 'rotateY(${y!.value})',
-        if (z != null) 'rotateZ(${z!.value})',
-      ].join(' ');
+    if (x != null) 'rotateX(${x!.value})',
+    if (y != null) 'rotateY(${y!.value})',
+    if (z != null) 'rotateZ(${z!.value})',
+  ].join(' ');
 }
 
 class _TranslateTransform implements Transform {
@@ -121,7 +121,8 @@ class _MatrixTransform implements Transform {
   final double ty;
 
   @override
-  String get value => 'matrix(${a.numstr}, ${b.numstr}, ${c.numstr}, '
+  String get value =>
+      'matrix(${a.numstr}, ${b.numstr}, ${c.numstr}, '
       '${d.numstr}, ${tx.numstr}, ${ty.numstr})';
 }
 

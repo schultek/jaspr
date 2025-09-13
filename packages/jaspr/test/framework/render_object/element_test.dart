@@ -10,14 +10,16 @@ void main() {
   group('RenderObjectElement', () {
     testRenderObjectMock('should create and attach single html element', (binding) {
       final root = binding.root;
-      binding.attachRootComponent(div(
-        id: 'test',
-        classes: 'test-class',
-        styles: Styles(color: Colors.red),
-        attributes: {'data-test': 'value'},
-        events: {'click': (event) {}},
-        [],
-      ));
+      binding.attachRootComponent(
+        div(
+          id: 'test',
+          classes: 'test-class',
+          styles: Styles(color: Colors.red),
+          attributes: {'data-test': 'value'},
+          events: {'click': (event) {}},
+          [],
+        ),
+      );
 
       expect(root.children, hasLength(1));
       final child = root.children[0];
@@ -25,8 +27,13 @@ void main() {
       verifyInOrder([
         () => root.createChildRenderElement('div'),
         () => child.parent,
-        () => (child as RenderElement)
-            .update('test', 'test-class', {'color': 'red'}, {'data-test': 'value'}, any(that: hasLength(1))),
+        () => (child as RenderElement).update(
+          'test',
+          'test-class',
+          {'color': 'red'},
+          {'data-test': 'value'},
+          any(that: hasLength(1)),
+        ),
         () => root.attach(child, after: null),
         () => child.parent,
       ]);
@@ -52,27 +59,39 @@ void main() {
       verifyInOrder([
         () => root.createChildRenderElement('div'),
         () => child.parent,
-        () => (child as RenderElement)
-            .update('test', 'test-class', {'color': 'red'}, {'data-test': 'value'}, any(that: hasLength(1))),
+        () => (child as RenderElement).update(
+          'test',
+          'test-class',
+          {'color': 'red'},
+          {'data-test': 'value'},
+          any(that: hasLength(1)),
+        ),
         () => root.attach(child, after: null),
         () => child.parent,
       ]);
 
       verifyNoMoreRenderInteractions(root);
 
-      component.updateChild(div(
-        id: 'test2',
-        classes: 'test-class2',
-        styles: Styles(color: Colors.blue),
-        attributes: {'data-test': 'value2'},
-        events: {'click': (event) {}},
-        [],
-      ));
+      component.updateChild(
+        div(
+          id: 'test2',
+          classes: 'test-class2',
+          styles: Styles(color: Colors.blue),
+          attributes: {'data-test': 'value2'},
+          events: {'click': (event) {}},
+          [],
+        ),
+      );
       await pumpEventQueue();
 
       verifyInOrder([
-        () => (child as RenderElement)
-            .update('test2', 'test-class2', {'color': 'blue'}, {'data-test': 'value2'}, any(that: hasLength(1))),
+        () => (child as RenderElement).update(
+          'test2',
+          'test-class2',
+          {'color': 'blue'},
+          {'data-test': 'value2'},
+          any(that: hasLength(1)),
+        ),
       ]);
     });
 
@@ -108,59 +127,7 @@ void main() {
     testRenderObjectMock('should re-attach element after reordering', (binding) async {
       final root = binding.root;
       final component = FakeComponent(
-          child: div([
-        h1(key: ValueKey(1), []),
-        h2(key: ValueKey(2), []),
-      ]));
-      binding.attachRootComponent(component);
-
-      expect(root.children, hasLength(1));
-      final rDiv = root.children[0];
-      expect(rDiv.children, hasLength(2));
-      final rH1 = rDiv.children[0];
-      final rH2 = rDiv.children[1];
-
-      verifyInOrder([
-        () => root.createChildRenderElement('div'),
-        () => rDiv.parent,
-        () => (rDiv as RenderElement).update(null, null, null, null, null),
-        () => rDiv.createChildRenderElement('h1'),
-        () => rH1.parent,
-        () => (rH1 as RenderElement).update(null, null, null, null, null),
-        () => rDiv.attach(rH1, after: null),
-        () => rH1.parent,
-        () => rDiv.createChildRenderElement('h2'),
-        () => rH2.parent,
-        () => (rH2 as RenderElement).update(null, null, null, null, null),
-        () => rDiv.attach(rH2, after: rH1),
-        () => rH2.parent,
-        () => root.attach(rDiv, after: null),
-        () => rDiv.parent,
-      ]);
-
-      verifyNoMoreRenderInteractions(root);
-
-      component.updateChild(div([
-        h2(key: ValueKey(2), []),
-        h1(key: ValueKey(1), []),
-      ]));
-      await pumpEventQueue();
-
-      verifyInOrder([
-        () => rDiv.attach(rH2, after: null),
-        () => rH2.parent,
-        () => rDiv.attach(rH1, after: rH2),
-        () => rH1.parent,
-      ]);
-    });
-
-    testRenderObjectMock('should remove element after update', (binding) async {
-      final root = binding.root;
-      final component = FakeComponent(
-        child: div([
-          h1([]),
-          h2([]),
-        ]),
+        child: div([h1(key: ValueKey(1), []), h2(key: ValueKey(2), [])]),
       );
       binding.attachRootComponent(component);
 
@@ -190,17 +157,52 @@ void main() {
 
       verifyNoMoreRenderInteractions(root);
 
-      component.updateChild(div([
-        h2([]),
-      ]));
+      component.updateChild(div([h2(key: ValueKey(2), []), h1(key: ValueKey(1), [])]));
       await pumpEventQueue();
 
       verifyInOrder([
-        () => rDiv.remove(rH1),
-        () => rH1.parent,
         () => rDiv.attach(rH2, after: null),
         () => rH2.parent,
+        () => rDiv.attach(rH1, after: rH2),
+        () => rH1.parent,
       ]);
+    });
+
+    testRenderObjectMock('should remove element after update', (binding) async {
+      final root = binding.root;
+      final component = FakeComponent(child: div([h1([]), h2([])]));
+      binding.attachRootComponent(component);
+
+      expect(root.children, hasLength(1));
+      final rDiv = root.children[0];
+      expect(rDiv.children, hasLength(2));
+      final rH1 = rDiv.children[0];
+      final rH2 = rDiv.children[1];
+
+      verifyInOrder([
+        () => root.createChildRenderElement('div'),
+        () => rDiv.parent,
+        () => (rDiv as RenderElement).update(null, null, null, null, null),
+        () => rDiv.createChildRenderElement('h1'),
+        () => rH1.parent,
+        () => (rH1 as RenderElement).update(null, null, null, null, null),
+        () => rDiv.attach(rH1, after: null),
+        () => rH1.parent,
+        () => rDiv.createChildRenderElement('h2'),
+        () => rH2.parent,
+        () => (rH2 as RenderElement).update(null, null, null, null, null),
+        () => rDiv.attach(rH2, after: rH1),
+        () => rH2.parent,
+        () => root.attach(rDiv, after: null),
+        () => rDiv.parent,
+      ]);
+
+      verifyNoMoreRenderInteractions(root);
+
+      component.updateChild(div([h2([])]));
+      await pumpEventQueue();
+
+      verifyInOrder([() => rDiv.remove(rH1), () => rH1.parent, () => rDiv.attach(rH2, after: null), () => rH2.parent]);
     });
 
     testRenderObjectMock('should attach on keyed reparenting', (binding) async {
@@ -238,9 +240,7 @@ void main() {
 
       verifyNoMoreRenderInteractions(root);
 
-      component.updateChild(
-        h1(key: GlobalObjectKey(1), [text('Hello World!')]),
-      );
+      component.updateChild(h1(key: GlobalObjectKey(1), [text('Hello World!')]));
       await pumpEventQueue();
 
       verifyInOrder([

@@ -23,13 +23,15 @@ void main() {
       final pKey = GlobalNodeKey();
       final bKey = GlobalNodeKey();
 
-      tester.pumpComponent(div([
-        p(key: pKey, [
-          text('Hello '),
-          b(key: bKey, [text('World2')]),
-          text('!')
+      tester.pumpComponent(
+        div([
+          p(key: pKey, [
+            text('Hello '),
+            b(key: bKey, [text('World2')]),
+            text('!'),
+          ]),
         ]),
-      ]));
+      );
 
       expect(divElement.parentNode, equals(window.document.body));
       expect(pElement.parentNode, equals(divElement));
@@ -43,13 +45,14 @@ void main() {
 
     testBrowser('should find and hydrate marker', (tester) async {
       var marker = DomValidator.clientMarkerPrefix;
-      window.document.body!.innerHTML = '<div>'
-              '  <p>A</p>'
-              '  <!--${marker}app-->'
-              '  <p>B</p>'
-              '  <!--/${marker}app-->'
-              '</div>'
-          .toJS;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <p>A</p>'
+                  '  <!--${marker}app-->'
+                  '  <p>B</p>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
 
       final divElement = window.document.querySelector('body div')!;
       final p1Element = window.document.querySelector('body p:first-child')!;
@@ -75,15 +78,16 @@ void main() {
 
     testBrowser('should find and hydrate multiple markers with params', (tester) async {
       var marker = DomValidator.clientMarkerPrefix;
-      window.document.body!.innerHTML = '<div>'
-              '  <!--${marker}app data={"name": "A"}-->'
-              '  <p>Hello</p>'
-              '  <!--/${marker}app-->'
-              '  <!--${marker}app data={"name": "B"}-->'
-              '  <p>Hello</p>'
-              '  <!--/${marker}app-->'
-              '</div>'
-          .toJS;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"name": "A"}-->'
+                  '  <p>Hello</p>'
+                  '  <!--/${marker}app-->'
+                  '  <!--${marker}app data={"name": "B"}-->'
+                  '  <p>Hello</p>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
 
       final divElement = window.document.querySelector('body div')!;
       final p1Element = window.document.querySelector('body p:first-child')!;

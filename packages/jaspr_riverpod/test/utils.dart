@@ -2,9 +2,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 Component providerApp(ComponentBuilder builder) {
-  return ProviderScope(
-    child: Builder(builder: builder),
-  );
+  return ProviderScope(child: Builder(builder: builder));
 }
 
 class Button extends StatelessComponent {
@@ -15,9 +13,6 @@ class Button extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return button(
-      events: {'click': (e) => onPressed()},
-      [text(label)],
-    );
+    return button(events: {'click': (e) => onPressed()}, [text(label)]);
   }
 }

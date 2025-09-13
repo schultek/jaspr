@@ -74,8 +74,10 @@ void main() {
       expect(find.text('Inherited value: 1'), findsOneComponent);
 
       // inherited value should be updated, but without notifying dependants
-      expect(find.byComponentPredicate((component) => component is MyInheritedComponent && component.value == 2),
-          findsOneComponent);
+      expect(
+        find.byComponentPredicate((component) => component is MyInheritedComponent && component.value == 2),
+        findsOneComponent,
+      );
 
       // lifecycle: state should not be updated
       expect(state.lifecycle, equals([]));

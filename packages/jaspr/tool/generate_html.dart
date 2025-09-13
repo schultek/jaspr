@@ -104,18 +104,21 @@ void main() {
       final tagValue = data["tag"] ?? tag;
 
       content.write(
-          'Key? key, String? id, String? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
-          '  return Component.element(\n'
-          '    tag: \'$tagValue\',\n'
-          '    key: key,\n'
-          '    id: id,\n'
-          '    classes: classes,\n'
-          '    styles: styles,\n'
-          '    attributes: ');
+        'Key? key, String? id, String? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
+        '  return Component.element(\n'
+        '    tag: \'$tagValue\',\n'
+        '    key: key,\n'
+        '    id: id,\n'
+        '    classes: classes,\n'
+        '    styles: styles,\n'
+        '    attributes: ',
+      );
 
       if (attrs != null) {
-        content.write('{\n'
-            '      ...?attributes,\n');
+        content.write(
+          '{\n'
+          '      ...?attributes,\n',
+        );
 
         for (var attr in attrs.keys) {
           var name = attrs[attr]['name'] ?? attr;
@@ -162,10 +165,12 @@ void main() {
       content.write('    events: ');
 
       if (events.isNotEmpty) {
-        content.write('{\n'
-            '      ...?events,\n'
-            '      ..._events(${events.map((e) => '$e: $e').join(', ')}),\n'
-            '    },\n');
+        content.write(
+          '{\n'
+          '      ...?events,\n'
+          '      ..._events(${events.map((e) => '$e: $e').join(', ')}),\n'
+          '    },\n',
+        );
       } else {
         content.write('events,\n');
       }
@@ -176,8 +181,10 @@ void main() {
         content.write('    children: [if ($contentParam != null) raw($contentParam)],\n');
       }
 
-      content.writeln('  );\n'
-          '}');
+      content.writeln(
+        '  );\n'
+        '}',
+      );
 
       if (attrs != null) {
         for (var attr in attrs.keys) {
@@ -203,10 +210,12 @@ void main() {
                 }
               }
 
-              content.writeln('\n'
-                  '  final String value;\n'
-                  '  const $name(this.value);\n'
-                  '}');
+              content.writeln(
+                '\n'
+                '  final String value;\n'
+                '  const $name(this.value);\n'
+                '}',
+              );
             }
           }
         }

@@ -25,12 +25,20 @@ class IssueItem extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return span(classes: 'issue-item ${issue.kind.name}', events: events(onClick: () {
-      context.read(fileSelectionProvider(issue.sourceName).notifier).state = issue.location;
-      context.read(activeDocIndexProvider.notifier).state = context.read(fileNamesProvider).indexOf(issue.sourceName);
-    }), [
-      i(classes: 'material-icons', [text(issue.kind.name)]),
-      text(issue.message),
-    ]);
+    return span(
+      classes: 'issue-item ${issue.kind.name}',
+      events: events(
+        onClick: () {
+          context.read(fileSelectionProvider(issue.sourceName).notifier).state = issue.location;
+          context.read(activeDocIndexProvider.notifier).state = context
+              .read(fileNamesProvider)
+              .indexOf(issue.sourceName);
+        },
+      ),
+      [
+        i(classes: 'material-icons', [text(issue.kind.name)]),
+        text(issue.message),
+      ],
+    );
   }
 }

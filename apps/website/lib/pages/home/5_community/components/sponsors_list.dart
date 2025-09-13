@@ -51,23 +51,20 @@ class SponsorsListState extends State<SponsorsList> {
 
   @css
   static List<StyleRule> get styles => [
-        css('.sponsors-list', [
-          css('&').styles(
-            display: Display.flex,
-            flexDirection: FlexDirection.row,
-            flexWrap: FlexWrap.wrap,
-            gap: Gap.all(0.4.rem),
-          ),
-          css('& > *', [
-            css('&').styles(
-              width: 2.rem,
-              height: 2.rem,
-              radius: BorderRadius.circular(1.rem),
-              overflow: Overflow.hidden,
-              backgroundColor: Colors.gray,
-            ),
-            css('img').styles(width: 100.percent),
-          ]),
-        ]),
-      ];
+    css('.sponsors-list', [
+      css(
+        '&',
+      ).styles(display: Display.flex, flexDirection: FlexDirection.row, flexWrap: FlexWrap.wrap, gap: Gap.all(0.4.rem)),
+      css('& > *', [
+        css('&').styles(
+          width: 2.rem,
+          height: 2.rem,
+          radius: BorderRadius.circular(1.rem),
+          overflow: Overflow.hidden,
+          backgroundColor: Colors.gray,
+        ),
+        css('img').styles(width: 100.percent),
+      ]),
+    ]),
+  ];
 }

@@ -9,11 +9,7 @@ import '../state.dart';
 /// when routing from anywhere in your app.
 class InheritedRouter extends InheritedComponent {
   /// Default constructor for the inherited go router.
-  const InheritedRouter({
-    required super.child,
-    required this.router,
-    super.key,
-  });
+  const InheritedRouter({required super.child, required this.router, super.key});
 
   /// The [RouterState] that is made available to the widget tree.
   final RouterState router;
@@ -30,11 +26,7 @@ class InheritedRouter extends InheritedComponent {
 /// when checking the current route from anywhere in your app.
 class InheritedRouteState extends InheritedComponent {
   /// Default constructor for the inherited go router.
-  const InheritedRouteState({
-    required super.child,
-    required this.state,
-    super.key,
-  });
+  const InheritedRouteState({required super.child, required this.state, super.key});
 
   /// The [RouteState] that is made available to the widget tree.
   final RouteState state;

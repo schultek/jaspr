@@ -22,12 +22,8 @@ class Filter {
   const factory Filter.blur([Unit length]) = _BlurFilter;
   const factory Filter.brightness([double percentage]) = _BrightnessFilter;
   const factory Filter.contrast([double percentage]) = _ContrastFilter;
-  const factory Filter.dropShadow({
-    required Unit offsetX,
-    required Unit offsetY,
-    Unit? spread,
-    Color? color,
-  }) = _DropShadowFilter;
+  const factory Filter.dropShadow({required Unit offsetX, required Unit offsetY, Unit? spread, Color? color}) =
+      _DropShadowFilter;
   const factory Filter.grayscale([double percentage]) = _GrayscaleFilter;
   const factory Filter.hueRotate([Angle angle]) = _HueRotateFilter;
   const factory Filter.invert([double percentage]) = _InvertFilter;
@@ -64,9 +60,11 @@ class _FilterList implements Filter {
   @override
   String get value {
     assert(_filtersListable());
-    return _filterValues.map((filter) {
-      return filter.value;
-    }).join(' ');
+    return _filterValues
+        .map((filter) {
+          return filter.value;
+        })
+        .join(' ');
   }
 }
 
@@ -102,15 +100,11 @@ class _ContrastFilter extends _FilterWithPercentage {
 }
 
 class _DropShadowFilter implements _ListableFilter {
-  const _DropShadowFilter({
-    required Unit offsetX,
-    required Unit offsetY,
-    Unit? spread,
-    Color? color,
-  })  : _offsetX = offsetX,
-        _offsetY = offsetX,
-        _spread = spread,
-        _color = color;
+  const _DropShadowFilter({required Unit offsetX, required Unit offsetY, Unit? spread, Color? color})
+    : _offsetX = offsetX,
+      _offsetY = offsetX,
+      _spread = spread,
+      _color = color;
 
   final Unit _offsetX;
   final Unit _offsetY;

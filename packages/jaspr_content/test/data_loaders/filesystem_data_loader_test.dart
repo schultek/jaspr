@@ -32,11 +32,7 @@ void main() {
       dataDir.childFile('site.json').writeAsStringSync('{"name": "My Site"}');
       dataDir.childFile('user.yaml').writeAsStringSync('name: Test User');
 
-      final loader = FilesystemDataLoader(
-        '_data',
-        fileSystem: fileSystem,
-        watcherFactory: (_) => mockWatcher,
-      );
+      final loader = FilesystemDataLoader('_data', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
       final page = Page(
         path: 'test.md',
         url: '/test',
@@ -50,12 +46,13 @@ void main() {
 
       // Assert
       expect(
-          page.data,
-          equals({
-            'site': {'name': 'My Site'},
-            'user': {'name': 'Test User'},
-            'page': {},
-          }));
+        page.data,
+        equals({
+          'site': {'name': 'My Site'},
+          'user': {'name': 'Test User'},
+          'page': {},
+        }),
+      );
     });
 
     test('loads data from nested directories', () async {
@@ -63,11 +60,7 @@ void main() {
       final navDir = fileSystem.directory('_data/nav')..createSync(recursive: true);
       navDir.childFile('main.json').writeAsStringSync('{"items": []}');
 
-      final loader = FilesystemDataLoader(
-        '_data',
-        fileSystem: fileSystem,
-        watcherFactory: (_) => mockWatcher,
-      );
+      final loader = FilesystemDataLoader('_data', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
       final page = Page(
         path: 'test.md',
         url: '/test',
@@ -81,13 +74,14 @@ void main() {
 
       // Assert
       expect(
-          page.data,
-          equals({
-            'nav': {
-              'main': {'items': []}
-            },
-            'page': {},
-          }));
+        page.data,
+        equals({
+          'nav': {
+            'main': {'items': []},
+          },
+          'page': {},
+        }),
+      );
     });
 
     test('does nothing if data directory does not exist', () async {
@@ -113,11 +107,7 @@ void main() {
       test('calls markNeedsRebuild on registered pages when a file changes', () async {
         // Arrange
         fileSystem.directory('_data').createSync();
-        final loader = FilesystemDataLoader(
-          '_data',
-          fileSystem: fileSystem,
-          watcherFactory: (_) => mockWatcher,
-        );
+        final loader = FilesystemDataLoader('_data', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
 
         final page1 = MockPage();
         when(() => page1.data).thenReturn({'page': {}} as PageDataMap);
@@ -146,11 +136,7 @@ void main() {
         final dataDir = fileSystem.directory('_data')..createSync();
         final siteFile = dataDir.childFile('site.json')..writeAsStringSync('{"version": 1}');
 
-        final loader = FilesystemDataLoader(
-          '_data',
-          fileSystem: fileSystem,
-          watcherFactory: (_) => mockWatcher,
-        );
+        final loader = FilesystemDataLoader('_data', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
 
         final page1 = Page(
           path: '',

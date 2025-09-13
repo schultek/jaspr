@@ -21,11 +21,6 @@ class Playground extends StatelessComponent {
       }, fireImmediately: true);
     }
 
-    return fragment([
-      PlaygroundHeader(),
-      MainSection(),
-      PlaygroundFooter(),
-      DialogSlot(slotId: 'dialog'),
-    ]);
+    return fragment([PlaygroundHeader(), MainSection(), PlaygroundFooter(), DialogSlot(slotId: 'dialog')]);
   }
 }

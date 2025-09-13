@@ -6,12 +6,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 class ComponentAssistProvider extends DartAssist {
   @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    SourceRange target,
-  ) {
+  void run(CustomLintResolver resolver, ChangeReporter reporter, CustomLintContext context, SourceRange target) {
     context.registry.addCompilationUnit((node) {
       var hasJasprImport = false;
 
@@ -75,12 +70,16 @@ class ComponentAssistProvider extends DartAssist {
       builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
         edit.write('class ');
         edit.addSimpleLinkedEdit('name', nameSuggestion);
-        edit.write(' extends StatelessComponent {\n'
-            '  const ');
+        edit.write(
+          ' extends StatelessComponent {\n'
+          '  const ',
+        );
 
         edit.addSimpleLinkedEdit('name', nameSuggestion);
-        edit.write('({super.key});\n\n  @override\n  Component build(BuildContext context) {\n'
-            '    return ');
+        edit.write(
+          '({super.key});\n\n  @override\n  Component build(BuildContext context) {\n'
+          '    return ',
+        );
         edit.addSimpleLinkedEdit('child', "div([])");
         edit.write(';\n  }\n}\n');
       });
@@ -100,8 +99,10 @@ class ComponentAssistProvider extends DartAssist {
       builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
         edit.write('class ');
         edit.addSimpleLinkedEdit('name', nameSuggestion);
-        edit.write(' extends StatefulComponent {\n'
-            '  const ');
+        edit.write(
+          ' extends StatefulComponent {\n'
+          '  const ',
+        );
 
         edit.addSimpleLinkedEdit('name', nameSuggestion);
         edit.write('({super.key});\n\n  @override\n  State createState() => ');
@@ -110,8 +111,10 @@ class ComponentAssistProvider extends DartAssist {
         edit.addSimpleLinkedEdit('name', nameSuggestion);
         edit.write('State extends State<');
         edit.addSimpleLinkedEdit('name', nameSuggestion);
-        edit.write('> {\n\n  @override\n  Component build(BuildContext context) {\n'
-            '    return ');
+        edit.write(
+          '> {\n\n  @override\n  Component build(BuildContext context) {\n'
+          '    return ',
+        );
         edit.addSimpleLinkedEdit('child', "div([])");
         edit.write(';\n  }\n}\n');
       });
@@ -135,8 +138,10 @@ class ComponentAssistProvider extends DartAssist {
       builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
         edit.write('class ');
         edit.addSimpleLinkedEdit('name', nameSuggestion);
-        edit.write(' extends InheritedComponent {\n'
-            '  const ');
+        edit.write(
+          ' extends InheritedComponent {\n'
+          '  const ',
+        );
 
         edit.addSimpleLinkedEdit('name', nameSuggestion);
         edit.write('({super.child, super.children, super.key});\n\n  static ');
@@ -148,7 +153,8 @@ class ComponentAssistProvider extends DartAssist {
         edit.write('>();\n    assert(result != null, \'No ');
         edit.addSimpleLinkedEdit('name', nameSuggestion);
         edit.write(
-            ' found in context.\');\n    return result!;\n  }\n\n  @override\n  bool updateShouldNotify(covariant ');
+          ' found in context.\');\n    return result!;\n  }\n\n  @override\n  bool updateShouldNotify(covariant ',
+        );
 
         edit.addSimpleLinkedEdit('name', nameSuggestion);
         edit.write(' oldComponent) {\n    return false;\n  }\n}\n');
@@ -168,8 +174,10 @@ class ComponentAssistProvider extends DartAssist {
       var name = node.name.lexeme;
 
       builder.addInsertion(splitToken.offset, (edit) {
-        edit.write("$indent@override\n  State createState() => ${name}State();\n"
-            "}\n\nclass ${name}State extends State<$name> {\n$endIndent");
+        edit.write(
+          "$indent@override\n  State createState() => ${name}State();\n"
+          "}\n\nclass ${name}State extends State<$name> {\n$endIndent",
+        );
       });
 
       buildMethod?.body.visitChildren(StateBuildVisitor(builder, node));

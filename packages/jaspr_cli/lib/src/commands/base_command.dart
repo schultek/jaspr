@@ -14,12 +14,7 @@ abstract class BaseCommand extends Command<int> {
   Set<FutureOr<void> Function()> guards = {};
 
   BaseCommand({Logger? logger}) : _logger = logger {
-    argParser.addFlag(
-      'verbose',
-      abbr: 'v',
-      help: 'Enable verbose logging.',
-      negatable: false,
-    );
+    argParser.addFlag('verbose', abbr: 'v', help: 'Enable verbose logging.', negatable: false);
   }
 
   /// [Logger] instance used to wrap stdout.
@@ -33,22 +28,19 @@ abstract class BaseCommand extends Command<int> {
   @override
   @mustCallSuper
   Future<int> run() async {
-    await trackEvent(
-      name,
-      projectName: project.pubspecYaml?['name'],
-      projectMode: project.modeOrNull?.name,
-    );
+    await trackEvent(name, projectName: project.pubspecYaml?['name'], projectMode: project.modeOrNull?.name);
 
     var cancelCount = 0;
-    final cancelSub = StreamGroup.merge([
-      ProcessSignal.sigint.watch(),
-      // SIGTERM is not supported on Windows.
-      Platform.isWindows ? const Stream.empty() : ProcessSignal.sigterm.watch()
-    ]).listen((signal) async {
-      cancelCount++;
-      if (cancelCount > 1) exit(1);
-      shutdown();
-    });
+    final cancelSub =
+        StreamGroup.merge([
+          ProcessSignal.sigint.watch(),
+          // SIGTERM is not supported on Windows.
+          Platform.isWindows ? const Stream.empty() : ProcessSignal.sigterm.watch(),
+        ]).listen((signal) async {
+          cancelCount++;
+          if (cancelCount > 1) exit(1);
+          shutdown();
+        });
 
     try {
       final result = await runCommand();
@@ -107,8 +99,10 @@ abstract class BaseCommand extends Command<int> {
 
     if (!File(entryPoint).absolute.existsSync()) {
       logger.complete(false);
-      logger.write("Cannot find entry point. Create a lib/main.dart file, or specify a file using --input.",
-          level: Level.critical);
+      logger.write(
+        "Cannot find entry point. Create a lib/main.dart file, or specify a file using --input.",
+        level: Level.critical,
+      );
       await shutdown();
       exit(1);
     }
@@ -203,18 +197,20 @@ abstract class BaseCommand extends Command<int> {
 extension on Stream<String> {
   Stream<String> splitLines() {
     var data = '';
-    return transform(StreamTransformer.fromHandlers(
-      handleData: (d, s) {
-        data += d;
-        int index;
-        while ((index = data.indexOf('\n')) != -1) {
-          s.add(data.substring(0, index + 1));
-          data = data.substring(index + 1);
-        }
-      },
-      handleDone: (s) {
-        s.add(data);
-      },
-    ));
+    return transform(
+      StreamTransformer.fromHandlers(
+        handleData: (d, s) {
+          data += d;
+          int index;
+          while ((index = data.indexOf('\n')) != -1) {
+            s.add(data.substring(0, index + 1));
+            data = data.substring(index + 1);
+          }
+        },
+        handleDone: (s) {
+          s.add(data);
+        },
+      ),
+    );
   }
 }

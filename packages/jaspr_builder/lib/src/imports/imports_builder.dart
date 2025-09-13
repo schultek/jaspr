@@ -35,9 +35,7 @@ class ImportsOutputBuilder implements Builder {
       var outputDir = 'lib/generated/imports';
       var relativeDir = path.relative(outputDir, from: path.dirname(buildStep.inputId.path));
 
-      await buildStep.writeAsFormattedDart(
-        outputId,
-        """
+      await buildStep.writeAsFormattedDart(outputId, """
           ${webShow.isNotEmpty ? """
             export '$relativeDir/_web.dart' 
               if (dart.library.io) '$relativeDir/_stubs.dart' 
@@ -49,8 +47,7 @@ class ImportsOutputBuilder implements Builder {
               if (dart.library.js_interop) '$relativeDir/_stubs.dart' 
               show ${vmShow.join(', ')};
           """ : ''}
-        """,
-      );
+        """);
     } catch (e, st) {
       print(e);
       print(st);
@@ -59,6 +56,6 @@ class ImportsOutputBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-        '.imports.json': ['.imports.dart']
-      };
+    '.imports.json': ['.imports.dart'],
+  };
 }

@@ -17,8 +17,8 @@
 - Added `jaspr tooling-daemon` command and component scope analysis.
 - Fixed sitemap generation bug in top-level route ('/')
 
+- Require `sdk: ^3.8.0`.
 - Update `analyzer` to `^8.0.0` and `build` to `^4.0.0`.
-- Migrate project to use pub workspaces and bump `melos` to `^7.1.0`.
 
 ## 0.20.0
 

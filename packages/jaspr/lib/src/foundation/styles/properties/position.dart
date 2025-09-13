@@ -23,9 +23,7 @@ class _Position implements Position {
   const _Position(this.value);
 
   @override
-  Map<String, String> get styles => {
-        'position': value,
-      };
+  Map<String, String> get styles => {'position': value};
 }
 
 class _Positioned extends _Position {
@@ -41,12 +39,12 @@ class _Positioned extends _Position {
 
   @override
   Map<String, String> get styles => {
-        ...super.styles,
-        if (top != null) 'top': top!.value,
-        if (left != null) 'left': left!.value,
-        if (bottom != null) 'bottom': bottom!.value,
-        if (right != null) 'right': right!.value,
-      };
+    ...super.styles,
+    if (top != null) 'top': top!.value,
+    if (left != null) 'left': left!.value,
+    if (bottom != null) 'bottom': bottom!.value,
+    if (right != null) 'right': right!.value,
+  };
 }
 
 class ZIndex {

@@ -53,8 +53,10 @@ class Logic {
     } else {
       var project = await ref.read(dartServiceProvider).getTutorial(newId);
       if (project.tutorial != null) {
-        return tutorial
-            .copyWith(currentStep: newStep, steps: {...tutorial.steps, newId: project.tutorial!.initialStep});
+        return tutorial.copyWith(
+          currentStep: newStep,
+          steps: {...tutorial.steps, newId: project.tutorial!.initialStep},
+        );
       } else {
         throw project.error!;
       }
@@ -100,8 +102,13 @@ class Logic {
 
     await Future.wait([
       for (var e in proj.allDartFiles.entries)
-        ref.read(dartServiceProvider).format(e.value).then((res) =>
-            ref.read(editProjectProvider.notifier).update((state) => state?.updateContent(e.key, res.newString))),
+        ref
+            .read(dartServiceProvider)
+            .format(e.value)
+            .then(
+              (res) =>
+                  ref.read(editProjectProvider.notifier).update((state) => state?.updateContent(e.key, res.newString)),
+            ),
     ]);
   }
 
@@ -122,12 +129,7 @@ class Logic {
         var executionService = ref.read(executionProvider);
         if (executionService == null) return;
 
-        await executionService.execute(
-          proj.htmlFile,
-          proj.cssFile,
-          response.result!,
-          destroyFrame: false,
-        );
+        await executionService.execute(proj.htmlFile, proj.cssFile, response.result!, destroyFrame: false);
       } else if (response.error != null) {
         ref.read(consoleMessagesProvider.notifier).update((l) => [...l, response.error!]);
       }

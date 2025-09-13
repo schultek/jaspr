@@ -39,10 +39,10 @@ class _QuadEdgeInsets implements Spacing {
 
   const _QuadEdgeInsets(this._left, this._top, this._right, this._bottom);
   const _QuadEdgeInsets.only({Unit? left, Unit? top, Unit? right, Unit? bottom})
-      : _left = left,
-        _top = top,
-        _right = right,
-        _bottom = bottom;
+    : _left = left,
+      _top = top,
+      _right = right,
+      _bottom = bottom;
 
   @override
   Unit get left => _left ?? Unit.zero;

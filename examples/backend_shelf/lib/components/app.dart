@@ -4,8 +4,6 @@ import 'package:jaspr/jaspr.dart';
 class App extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return p([
-      text('Hello World from Jaspr'),
-    ]);
+    return p([text('Hello World from Jaspr')]);
   }
 }

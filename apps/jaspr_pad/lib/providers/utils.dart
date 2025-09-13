@@ -25,9 +25,7 @@ void Function(T, U) debounce2<T, U>(void Function(T, U) fn, Duration duration) {
 
 extension DebounceStream<T> on Stream<T> {
   Stream<T> debounce(Duration duration) {
-    return transform(StreamTransformer.fromHandlers(
-      handleData: debounce2((data, sink) => sink.add(data), duration),
-    ));
+    return transform(StreamTransformer.fromHandlers(handleData: debounce2((data, sink) => sink.add(data), duration)));
   }
 }
 

@@ -11,10 +11,6 @@ class OutputPanel extends StatelessComponent {
   Component build(BuildContext context) {
     var isTutorial = context.watch(isTutorialProvider);
 
-    return div(
-      id: 'output-panel',
-      styles: isTutorial ? Styles(width: Unit.auto) : null,
-      [ExecutionIFrame()],
-    );
+    return div(id: 'output-panel', styles: isTutorial ? Styles(width: Unit.auto) : null, [ExecutionIFrame()]);
   }
 }

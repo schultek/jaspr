@@ -69,9 +69,11 @@ class ProjectData with ProjectDataMappable implements ProjectDataBase {
     if (dartFile == null) throw 'Missing main.dart file';
     if (dartFile.type != 'application/vnd.dart') throw 'main.dart has wrong type "${dartFile.type}"';
 
-    var dartFiles = Map.fromEntries(gist.files.entries
-        .where((e) => e.value.type == 'application/vnd.dart' && e.key != 'main.dart')
-        .map((e) => MapEntry(e.key, e.value.content)));
+    var dartFiles = Map.fromEntries(
+      gist.files.entries
+          .where((e) => e.value.type == 'application/vnd.dart' && e.key != 'main.dart')
+          .map((e) => MapEntry(e.key, e.value.content)),
+    );
 
     return ProjectData(
       id: 'gist-${gist.id}',
@@ -84,8 +86,12 @@ class ProjectData with ProjectDataMappable implements ProjectDataBase {
   }
 
   @override
-  List<String> get fileNames =>
-      ['main.dart', ...dartFiles.keys, if (htmlFile != null) 'index.html', if (cssFile != null) 'styles.css'];
+  List<String> get fileNames => [
+    'main.dart',
+    ...dartFiles.keys,
+    if (htmlFile != null) 'index.html',
+    if (cssFile != null) 'styles.css',
+  ];
 
   @override
   Map<String, String> get allDartFiles => {'main.dart': mainDartFile, ...dartFiles};

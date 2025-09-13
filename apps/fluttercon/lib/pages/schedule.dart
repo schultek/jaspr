@@ -13,12 +13,14 @@ class SchedulePage extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return fragment([
-      Document.head(meta: {
-        'description': "Schedule of all sessions on day $day.",
-        'keywords': "Fluttercon, Sessions, Jaspr, Dart, Flutter",
-        'og:title': "Fluttercon Berlin 2024 - Schedule for Day $day",
-        'og:image': "https://sessionize.com/image/1314-1140o400o3-h467LSBSMTzb8do1dJniEh.jpg"
-      }),
+      Document.head(
+        meta: {
+          'description': "Schedule of all sessions on day $day.",
+          'keywords': "Fluttercon, Sessions, Jaspr, Dart, Flutter",
+          'og:title': "Fluttercon Berlin 2024 - Schedule for Day $day",
+          'og:image': "https://sessionize.com/image/1314-1140o400o3-h467LSBSMTzb8do1dJniEh.jpg",
+        },
+      ),
       PagesNav(day: day),
       SessionList(sessions: sessions),
       footer([
@@ -35,10 +37,6 @@ class SchedulePage extends StatelessComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('footer').styles(
-          margin: Margin.all(40.px),
-          textAlign: TextAlign.center,
-          fontStyle: FontStyle.italic,
-        ),
-      ];
+    css('footer').styles(margin: Margin.all(40.px), textAlign: TextAlign.center, fontStyle: FontStyle.italic),
+  ];
 }

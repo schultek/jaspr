@@ -13,3 +13,7 @@ linter:
     sort_pub_dependencies: true
     prefer_relative_imports: true
     directives_ordering: true
+
+formatter:
+  page_width: 120
+  trailing_commas: preserve

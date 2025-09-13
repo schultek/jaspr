@@ -84,20 +84,12 @@ class ServerApp {
       }
 
       _requestedRoutes[route] = settings;
-      await _sendDebugMessage({
-        'route': route,
-        'lastmod': lastMod,
-        'changefreq': changefreq,
-        'priority': priority,
-      });
+      await _sendDebugMessage({'route': route, 'lastmod': lastMod, 'changefreq': changefreq, 'priority': priority});
     }
   }
 
   static Future<void> _sendDebugMessage(Object message) async {
     final postWithClient = _client?.post ?? http.post;
-    await postWithClient(
-      Uri.http('localhost:$jasprProxyPort', r'$jasprMessageHandler'),
-      body: jsonEncode(message),
-    );
+    await postWithClient(Uri.http('localhost:$jasprProxyPort', r'$jasprMessageHandler'), body: jsonEncode(message));
   }
 }

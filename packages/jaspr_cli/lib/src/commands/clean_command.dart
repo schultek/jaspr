@@ -5,13 +5,7 @@ import 'base_command.dart';
 class CleanCommand extends BaseCommand {
   CleanCommand({super.logger}) {
     if (Platform.isMacOS || Platform.isLinux) {
-      argParser.addFlag(
-        'kill',
-        abbr: 'k',
-        help: 'Kill runaway processes.',
-        defaultsTo: null,
-        negatable: false,
-      );
+      argParser.addFlag('kill', abbr: 'k', help: 'Kill runaway processes.', defaultsTo: null, negatable: false);
     }
   }
 
@@ -52,7 +46,7 @@ class CleanCommand extends BaseCommand {
     if (Platform.isMacOS || Platform.isLinux) {
       var pids = await findRunawayProcesses([
         // server, vm, build_runner, flutter
-        '8080', '8181', '5467', '5678'
+        '8080', '8181', '5467', '5678',
       ]);
 
       if (pids.isNotEmpty) {

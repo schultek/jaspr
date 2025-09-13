@@ -27,14 +27,18 @@ mixin SyncScopeMixin on State<ProviderScope> implements SyncStateMixin<ProviderS
     for (var elem in syncElements) {
       var provider = elem.provider as SyncProvider;
       if (elem.state.isLoading) {
-        print("[WARNING] Used SyncProvider without properly preloading the value.\n\n"
-            "The unloaded provider is ${provider.id}.");
+        print(
+          "[WARNING] Used SyncProvider without properly preloading the value.\n\n"
+          "The unloaded provider is ${provider.id}.",
+        );
         continue;
       }
       if (elem.state.hasError) {
-        print("[WARNING] SyncProvider had an error when preloading.\n\n"
-            "The provider is ${provider.id}.\n"
-            "The error is: ${elem.state.error}");
+        print(
+          "[WARNING] SyncProvider had an error when preloading.\n\n"
+          "The provider is ${provider.id}.\n"
+          "The error is: ${elem.state.error}",
+        );
         continue;
       }
       map[provider.id] = provider.codec != null ? provider.codec!.encode(elem.state.value) : elem.state.value;

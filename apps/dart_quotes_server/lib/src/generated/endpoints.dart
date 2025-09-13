@@ -16,14 +16,7 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 class Endpoints extends _i1.EndpointDispatch {
   @override
   void initializeEndpoints(_i1.Server server) {
-    var endpoints = <String, _i1.Endpoint>{
-      'quotes': _i2.QuotesEndpoint()
-        ..initialize(
-          server,
-          'quotes',
-          null,
-        )
-    };
+    var endpoints = <String, _i1.Endpoint>{'quotes': _i2.QuotesEndpoint()..initialize(server, 'quotes', null)};
     connectors['quotes'] = _i1.EndpointConnector(
       name: 'quotes',
       endpoint: endpoints['quotes']!,
@@ -31,47 +24,19 @@ class Endpoints extends _i1.EndpointDispatch {
         'toggleLikeOnQuote': _i1.MethodConnector(
           name: 'toggleLikeOnQuote',
           params: {
-            'id': _i1.ParameterDescription(
-              name: 'id',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'liked': _i1.ParameterDescription(
-              name: 'liked',
-              type: _i1.getType<bool>(),
-              nullable: false,
-            ),
+            'id': _i1.ParameterDescription(name: 'id', type: _i1.getType<int>(), nullable: false),
+            'liked': _i1.ParameterDescription(name: 'liked', type: _i1.getType<bool>(), nullable: false),
           },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['quotes'] as _i2.QuotesEndpoint).toggleLikeOnQuote(
-            session,
-            params['id'],
-            params['liked'],
-          ),
+          call: (_i1.Session session, Map<String, dynamic> params) async =>
+              (endpoints['quotes'] as _i2.QuotesEndpoint).toggleLikeOnQuote(session, params['id'], params['liked']),
         ),
         'subscribeToQuote': _i1.MethodStreamConnector(
           name: 'subscribeToQuote',
-          params: {
-            'id': _i1.ParameterDescription(
-              name: 'id',
-              type: _i1.getType<int>(),
-              nullable: false,
-            )
-          },
+          params: {'id': _i1.ParameterDescription(name: 'id', type: _i1.getType<int>(), nullable: false)},
           streamParams: {},
           returnType: _i1.MethodStreamReturnType.streamType,
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-            Map<String, Stream> streamParams,
-          ) =>
-              (endpoints['quotes'] as _i2.QuotesEndpoint).subscribeToQuote(
-            session,
-            params['id'],
-          ),
+          call: (_i1.Session session, Map<String, dynamic> params, Map<String, Stream> streamParams) =>
+              (endpoints['quotes'] as _i2.QuotesEndpoint).subscribeToQuote(session, params['id']),
         ),
       },
     );

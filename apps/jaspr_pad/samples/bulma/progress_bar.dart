@@ -15,11 +15,8 @@ class ProgressBar extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return progress(
-      classes: 'progress ${color != null ? ' is-${color!.name}' : ''}',
-      value: value,
-      max: max,
-      [if (child != null) child!],
-    );
+    return progress(classes: 'progress ${color != null ? ' is-${color!.name}' : ''}', value: value, max: max, [
+      if (child != null) child!,
+    ]);
   }
 }

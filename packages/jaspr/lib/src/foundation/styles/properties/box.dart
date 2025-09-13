@@ -63,12 +63,12 @@ class __Border implements Border {
 
   @override
   Map<String, String> get styles => {
-        'border': [
-          if (style != null) style!.value,
-          if (color != null) color!.value,
-          if (width != null) width!.value,
-        ].join(' ')
-      };
+    'border': [
+      if (style != null) style!.value,
+      if (color != null) color!.value,
+      if (width != null) width!.value,
+    ].join(' '),
+  };
 }
 
 class _OnlyBorder implements Border {
@@ -81,19 +81,19 @@ class _OnlyBorder implements Border {
 
   @override
   Map<String, String> get styles => {
-        if (left?.style != null) 'border-left-style': left!.style!.value,
-        if (top?.style != null) 'border-top-style': top!.style!.value,
-        if (right?.style != null) 'border-right-style': right!.style!.value,
-        if (bottom?.style != null) 'border-bottom-style': bottom!.style!.value,
-        if (left?.color != null) 'border-left-color': left!.color!.value,
-        if (top?.color != null) 'border-top-color': top!.color!.value,
-        if (right?.color != null) 'border-right-color': right!.color!.value,
-        if (bottom?.color != null) 'border-bottom-color': bottom!.color!.value,
-        if (left?.width != null) 'border-left-width': left!.width!.value,
-        if (top?.width != null) 'border-top-width': top!.width!.value,
-        if (right?.width != null) 'border-right-width': right!.width!.value,
-        if (bottom?.width != null) 'border-bottom-width': bottom!.width!.value,
-      };
+    if (left?.style != null) 'border-left-style': left!.style!.value,
+    if (top?.style != null) 'border-top-style': top!.style!.value,
+    if (right?.style != null) 'border-right-style': right!.style!.value,
+    if (bottom?.style != null) 'border-bottom-style': bottom!.style!.value,
+    if (left?.color != null) 'border-left-color': left!.color!.value,
+    if (top?.color != null) 'border-top-color': top!.color!.value,
+    if (right?.color != null) 'border-right-color': right!.color!.value,
+    if (bottom?.color != null) 'border-bottom-color': bottom!.color!.value,
+    if (left?.width != null) 'border-left-width': left!.width!.value,
+    if (top?.width != null) 'border-top-width': top!.width!.value,
+    if (right?.width != null) 'border-right-width': right!.width!.value,
+    if (bottom?.width != null) 'border-bottom-width': bottom!.width!.value,
+  };
 }
 
 class _SymmetricBorder implements Border {
@@ -140,10 +140,7 @@ class BorderSide {
 
   const BorderSide({this.style = BorderStyle.solid, this.color, this.width});
 
-  const BorderSide.none()
-      : color = null,
-        width = null,
-        style = BorderStyle.none;
+  const BorderSide.none() : color = null, width = null, style = BorderStyle.none;
   const BorderSide.solid({this.color, this.width}) : style = BorderStyle.solid;
   const BorderSide.dotted({this.color, this.width}) : style = BorderStyle.dotted;
   const BorderSide.dashed({this.color, this.width}) : style = BorderStyle.dashed;
@@ -189,9 +186,7 @@ class _AllBorderRadius implements BorderRadius {
   const _AllBorderRadius(this.radius);
 
   @override
-  Map<String, String> get styles => {
-        'border-radius': radius._values.join(' / '),
-      };
+  Map<String, String> get styles => {'border-radius': radius._values.join(' / ')};
 }
 
 class _CircularBorderRadius implements BorderRadius {
@@ -211,15 +206,15 @@ class _OnlyBorderRadius implements BorderRadius {
 
   const _OnlyBorderRadius({this.topLeft, this.topRight, this.bottomLeft, this.bottomRight});
   const _OnlyBorderRadius.vertical({Radius? top, Radius? bottom})
-      : topLeft = top,
-        topRight = top,
-        bottomLeft = bottom,
-        bottomRight = bottom;
+    : topLeft = top,
+      topRight = top,
+      bottomLeft = bottom,
+      bottomRight = bottom;
   const _OnlyBorderRadius.horizontal({Radius? left, Radius? right})
-      : topLeft = left,
-        topRight = right,
-        bottomLeft = left,
-        bottomRight = right;
+    : topLeft = left,
+      topRight = right,
+      bottomLeft = left,
+      bottomRight = right;
 
   @override
   Map<String, String> get styles {
@@ -306,11 +301,11 @@ class _Outline implements Outline {
 
   @override
   Map<String, String> get styles => {
-        if (color != null) 'outline-color': color!.value,
-        if (style != null) 'outline-style': style!.value,
-        if (width != null) 'outline-width': width!.value,
-        if (offset != null) 'outline-offset': offset!.value,
-      };
+    if (color != null) 'outline-color': color!.value,
+    if (style != null) 'outline-style': style!.value,
+    if (width != null) 'outline-width': width!.value,
+    if (offset != null) 'outline-offset': offset!.value,
+  };
 }
 
 enum OutlineStyle {
@@ -394,9 +389,7 @@ class _Overflow implements Overflow {
   const _Overflow(this._value);
 
   @override
-  Map<String, String> get styles => {
-        'overflow': _value,
-      };
+  Map<String, String> get styles => {'overflow': _value};
 }
 
 class OverflowValue extends _Overflow {
@@ -411,13 +404,13 @@ class _OnlyOverflow implements Overflow {
 
   @override
   Map<String, String> get styles => {
-        if (x != null && y != null)
-          'overflow': '${x!._value} ${y!._value}'
-        else ...{
-          if (x != null) 'overflow-x': x!._value,
-          if (y != null) 'overflow-y': y!._value,
-        },
-      };
+    if (x != null && y != null)
+      'overflow': '${x!._value} ${y!._value}'
+    else ...{
+      if (x != null) 'overflow-x': x!._value,
+      if (y != null) 'overflow-y': y!._value,
+    },
+  };
 }
 
 enum Visibility {
@@ -455,8 +448,13 @@ abstract class BoxShadow {
   const factory BoxShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Unit? spread, Color? color}) =
       _BoxShadow;
 
-  const factory BoxShadow.inset(
-      {required Unit offsetX, required Unit offsetY, Unit? blur, Unit? spread, Color? color}) = _InsetBoxShadow;
+  const factory BoxShadow.inset({
+    required Unit offsetX,
+    required Unit offsetY,
+    Unit? blur,
+    Unit? spread,
+    Color? color,
+  }) = _InsetBoxShadow;
 
   const factory BoxShadow.combine(List<BoxShadow> shadows) = _CombineBoxShadow;
 
@@ -464,8 +462,14 @@ abstract class BoxShadow {
 }
 
 class _BoxShadow implements BoxShadow {
-  const _BoxShadow(
-      {required this.offsetX, required this.offsetY, this.blur, this.spread, this.color, this.inset = false});
+  const _BoxShadow({
+    required this.offsetX,
+    required this.offsetY,
+    this.blur,
+    this.spread,
+    this.color,
+    this.inset = false,
+  });
 
   final Unit offsetX;
   final Unit offsetY;
@@ -476,18 +480,18 @@ class _BoxShadow implements BoxShadow {
 
   @override
   String get value => [
-        if (inset) 'inset',
-        offsetX.value,
-        offsetY.value,
-        if (blur != null || spread != null) blur?.value ?? '0',
-        if (spread != null) spread!.value,
-        if (color != null) color!.value
-      ].join(' ');
+    if (inset) 'inset',
+    offsetX.value,
+    offsetY.value,
+    if (blur != null || spread != null) blur?.value ?? '0',
+    if (spread != null) spread!.value,
+    if (color != null) color!.value,
+  ].join(' ');
 }
 
 class _InsetBoxShadow extends _BoxShadow {
   const _InsetBoxShadow({required super.offsetX, required super.offsetY, super.blur, super.spread, super.color})
-      : super(inset: true);
+    : super(inset: true);
 }
 
 class _CombineBoxShadow implements BoxShadow {

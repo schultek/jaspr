@@ -13,12 +13,9 @@ part 'change_notifier_provider/base.dart';
 ProviderElementProxy<NotifierT, NotifierT> _notifier<NotifierT extends ChangeNotifier?>(
   _ChangeNotifierProviderBase<NotifierT> that,
 ) {
-  return ProviderElementProxy<NotifierT, NotifierT>(
-    that,
-    (element) {
-      return (element as ChangeNotifierProviderElement<NotifierT>)._notifierNotifier;
-    },
-  );
+  return ProviderElementProxy<NotifierT, NotifierT>(that, (element) {
+    return (element as ChangeNotifierProviderElement<NotifierT>)._notifierNotifier;
+  });
 }
 
 // ignore: subtype_of_sealed_class

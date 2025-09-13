@@ -16,7 +16,10 @@ abstract class Migration {
 
 extension MigrationExtension on List<Migration> {
   List<MigrationResult> computeResults(
-      List<String> directories, bool apply, void Function(File, Object, StackTrace) onError) {
+    List<String> directories,
+    bool apply,
+    void Function(File, Object, StackTrace) onError,
+  ) {
     final results = <MigrationResult>[];
 
     for (final path in directories) {

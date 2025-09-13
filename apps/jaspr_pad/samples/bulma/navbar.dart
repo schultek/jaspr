@@ -11,13 +11,7 @@ class NavBar extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return nav(
-      classes: 'navbar block',
-      [
-        if (brand != null) brand!,
-        if (menu != null) menu!,
-      ],
-    );
+    return nav(classes: 'navbar block', [if (brand != null) brand!, if (menu != null) menu!]);
   }
 }
 
@@ -43,9 +37,11 @@ class NavbarBurger extends StatelessComponent {
     return button(
       classes: "navbar-burger${isActive ? ' is-active' : ''}",
       attributes: {"role": "button", "data-target": "navMenu"},
-      events: events(onClick: () {
-        onToggle();
-      }),
+      events: events(
+        onClick: () {
+          onToggle();
+        },
+      ),
       [
         span(attributes: {"aria-hidden": "true"}, []),
         span(attributes: {"aria-hidden": "true"}, []),

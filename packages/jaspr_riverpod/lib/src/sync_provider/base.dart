@@ -38,9 +38,7 @@ class SyncProvider<T> extends _SyncProviderBase<T>
     @Deprecated('Will be removed in 3.0.0') super.from,
     @Deprecated('Will be removed in 3.0.0') super.argument,
     @Deprecated('Will be removed in 3.0.0') super.debugGetCreateSourceHash,
-  }) : super(
-          allTransitiveDependencies: computeAllTransitiveDependencies(dependencies),
-        );
+  }) : super(allTransitiveDependencies: computeAllTransitiveDependencies(dependencies));
 
   /// An implementation detail of Riverpod
   @internal
@@ -73,13 +71,15 @@ class SyncProvider<T> extends _SyncProviderBase<T>
   @override
   FutureOr<T> _create(SyncProviderElement<T> ref) {
     if (kIsWeb) {
-      return ref.watch(_syncStateProvider.select((s) {
-        if (!s.containsKey(id)) {
-          return Completer<T>().future;
-        }
-        var value = s[id];
-        return value != null && codec != null ? codec!.decode(value) : value;
-      }));
+      return ref.watch(
+        _syncStateProvider.select((s) {
+          if (!s.containsKey(id)) {
+            return Completer<T>().future;
+          }
+          var value = s[id];
+          return value != null && codec != null ? codec!.decode(value) : value;
+        }),
+      );
     }
     return _createFn(ref);
   }
@@ -120,20 +120,14 @@ class SyncProviderElement<T> extends ProviderElementBase<AsyncValue<T>>
 
   @override
   bool updateShouldNotify(AsyncValue<T> previous, AsyncValue<T> next) {
-    return FutureHandlerProviderElementMixin.handleUpdateShouldNotify(
-      previous,
-      next,
-    );
+    return FutureHandlerProviderElementMixin.handleUpdateShouldNotify(previous, next);
   }
 
   @override
   void create({required bool didChangeDependency}) {
     final provider = this.provider as _SyncProviderBase<T>;
 
-    return handleFuture(
-      () => provider._create(this),
-      didChangeDependency: didChangeDependency,
-    );
+    return handleFuture(() => provider._create(this), didChangeDependency: didChangeDependency);
   }
 }
 
@@ -141,43 +135,38 @@ class SyncProviderElement<T> extends ProviderElementBase<AsyncValue<T>>
 class SyncProviderFamily<R, Arg>
     extends FamilyBase<SyncProviderRef<R>, AsyncValue<R>, Arg, FutureOr<R>, SyncProvider<R>> {
   /// The [Family] of a [SyncProvider]
-  SyncProviderFamily(
-    super.create, {
-    required this.id,
-    this.codec,
-    super.name,
-    super.dependencies,
-  }) : super(
-          providerFactory: (
-            Create<FutureOr<R>, SyncProviderRef<R>> create, {
-            required String? name,
-            Family? from,
-            Object? argument,
-            required Iterable<ProviderOrFamily>? dependencies,
-            required String Function()? debugGetCreateSourceHash,
-            required Set<ProviderOrFamily>? allTransitiveDependencies,
-          }) =>
-              SyncProvider<R>.internal(create,
-                  id: id,
-                  codec: codec,
-                  name: name,
-                  dependencies: dependencies,
-                  allTransitiveDependencies: allTransitiveDependencies,
-                  debugGetCreateSourceHash: debugGetCreateSourceHash,
-                  from: from,
-                  argument: argument),
-          allTransitiveDependencies: computeAllTransitiveDependencies(dependencies),
-          debugGetCreateSourceHash: null,
-        );
+  SyncProviderFamily(super.create, {required this.id, this.codec, super.name, super.dependencies})
+    : super(
+        providerFactory:
+            (
+              Create<FutureOr<R>, SyncProviderRef<R>> create, {
+              required String? name,
+              Family? from,
+              Object? argument,
+              required Iterable<ProviderOrFamily>? dependencies,
+              required String Function()? debugGetCreateSourceHash,
+              required Set<ProviderOrFamily>? allTransitiveDependencies,
+            }) => SyncProvider<R>.internal(
+              create,
+              id: id,
+              codec: codec,
+              name: name,
+              dependencies: dependencies,
+              allTransitiveDependencies: allTransitiveDependencies,
+              debugGetCreateSourceHash: debugGetCreateSourceHash,
+              from: from,
+              argument: argument,
+            ),
+        allTransitiveDependencies: computeAllTransitiveDependencies(dependencies),
+        debugGetCreateSourceHash: null,
+      );
 
   final String id;
 
   final Codec<R, dynamic>? codec;
 
   /// {@macro riverpod.override_with}
-  Override overrideWith(
-    FutureOr<R> Function(SyncProviderRef<R> ref, Arg arg) create,
-  ) {
+  Override overrideWith(FutureOr<R> Function(SyncProviderRef<R> ref, Arg arg) create) {
     return FamilyOverrideImpl<AsyncValue<R>, Arg, SyncProvider<R>>(
       this,
       (arg) => SyncProvider<R>.internal(
@@ -208,12 +197,6 @@ class SyncProviderFamilyBuilder {
     String? name,
     List<ProviderOrFamily>? dependencies,
   }) {
-    return SyncProviderFamily<State, Arg>(
-      create,
-      id: id,
-      codec: codec,
-      name: name,
-      dependencies: dependencies,
-    );
+    return SyncProviderFamily<State, Arg>(create, id: id, codec: codec, name: name, dependencies: dependencies);
   }
 }

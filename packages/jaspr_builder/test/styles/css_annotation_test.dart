@@ -42,10 +42,7 @@ void main() {
     test('generates bundle', () async {
       await testBuilder(
         StylesBundleBuilder(BuilderOptions({})),
-        {
-          ...stylesClassOutputs,
-          ...stylesGlobalOutputs,
-        },
+        {...stylesClassOutputs, ...stylesGlobalOutputs},
         outputs: stylesBundleOutputs,
         readerWriter: reader,
       );

@@ -6,7 +6,7 @@ homepage: https://fluttercon.schultek.de
 issue_tracker: https://github.com/schultek/jaspr/issues
 
 environment:
-  sdk: '>=3.6.0 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 
 resolution: workspace
 

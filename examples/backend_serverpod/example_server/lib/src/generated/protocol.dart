@@ -25,10 +25,7 @@ class Protocol extends _i1.SerializationManagerServer {
   static final List<_i2.TableDefinition> targetTableDefinitions = [..._i2.Protocol.targetTableDefinitions];
 
   @override
-  T deserialize<T>(
-    dynamic data, [
-    Type? t,
-  ]) {
+  T deserialize<T>(dynamic data, [Type? t]) {
     t ??= T;
     if (t == _i3.Example) {
       return _i3.Example.fromJson(data) as T;

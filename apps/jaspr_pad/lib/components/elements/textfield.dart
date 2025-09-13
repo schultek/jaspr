@@ -26,9 +26,7 @@ class TextFieldState extends State<TextField> {
         _textField ??= MDCTextField(node);
       },
       child: div(classes: 'mdc-text-field', styles: component.expand ? Styles(width: 100.percent) : null, [
-        span(classes: 'mdc-floating-label', [
-          text(component.label),
-        ]),
+        span(classes: 'mdc-floating-label', [text(component.label)]),
         input(
           type: InputType.text,
           attributes: {if (component.placeholder != null) 'placeholder': component.placeholder!},

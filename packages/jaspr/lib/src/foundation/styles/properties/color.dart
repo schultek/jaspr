@@ -308,10 +308,7 @@ abstract class _RelativeColor with _ColorMixin {
   final Color from;
   final (double, bool)? alpha;
 
-  const _RelativeColor({
-    required this.from,
-    this.alpha,
-  });
+  const _RelativeColor({required this.from, this.alpha});
 
   String _channel((double, bool)? data, String origin) {
     if (data == null) return origin;
@@ -352,23 +349,11 @@ class _RelativeRGBColor extends _RelativeColor {
   final (double, bool)? green;
   final (double, bool)? blue;
 
-  const _RelativeRGBColor({
-    required super.from,
-    this.red,
-    this.green,
-    this.blue,
-    super.alpha,
-  });
+  const _RelativeRGBColor({required super.from, this.red, this.green, this.blue, super.alpha});
 
   @override
   Color withOpacity(double opacity, {bool replace = true}) {
-    return _RelativeRGBColor(
-      from: from,
-      red: red,
-      green: green,
-      blue: blue,
-      alpha: alpha.apply(opacity, replace),
-    );
+    return _RelativeRGBColor(from: from, red: red, green: green, blue: blue, alpha: alpha.apply(opacity, replace));
   }
 
   @override
@@ -388,12 +373,7 @@ class _RelativeRGBColor extends _RelativeColor {
   }
 
   @override
-  Color withValues({
-    double? red,
-    double? green,
-    double? blue,
-    double? alpha,
-  }) {
+  Color withValues({double? red, double? green, double? blue, double? alpha}) {
     return _RelativeRGBColor(
       from: from,
       red: this.red.maybeApply(red, true),
@@ -419,20 +399,12 @@ class _RelativeHSLColor extends _RelativeColor {
 
   @override
   Color withOpacity(double opacity, {bool replace = true}) {
-    return _RelativeHSLColor(
-      from: from,
-      lightness: lightness,
-      alpha: alpha.apply(opacity, replace),
-    );
+    return _RelativeHSLColor(from: from, lightness: lightness, alpha: alpha.apply(opacity, replace));
   }
 
   @override
   Color withLightness(double lightness, {bool replace = true}) {
-    return _RelativeHSLColor(
-      from: from,
-      lightness: this.lightness.apply(lightness, replace),
-      alpha: alpha,
-    );
+    return _RelativeHSLColor(from: from, lightness: this.lightness.apply(lightness, replace), alpha: alpha);
   }
 
   @override
@@ -449,20 +421,12 @@ class _RelativeOKLCHColor extends _RelativeColor {
 
   @override
   Color withOpacity(double opacity, {bool replace = true}) {
-    return _RelativeOKLCHColor(
-      from: from,
-      hue: hue,
-      alpha: alpha.apply(opacity, replace),
-    );
+    return _RelativeOKLCHColor(from: from, hue: hue, alpha: alpha.apply(opacity, replace));
   }
 
   @override
   Color withHue(double hue, {bool replace = true}) {
-    return _RelativeOKLCHColor(
-      from: from,
-      hue: this.hue.apply(hue, replace),
-      alpha: alpha,
-    );
+    return _RelativeOKLCHColor(from: from, hue: this.hue.apply(hue, replace), alpha: alpha);
   }
 
   @override

@@ -20,10 +20,13 @@ class Image extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return img(src: source.toString(), width: width, height: height, alt: description, attributes: {
-      if (tooltip != null) 'title': tooltip!,
-      if (lazyLoading) 'loading': 'lazy',
-    });
+    return img(
+      src: source.toString(),
+      width: width,
+      height: height,
+      alt: description,
+      attributes: {if (tooltip != null) 'title': tooltip!, if (lazyLoading) 'loading': 'lazy'},
+    );
   }
 }
 
@@ -87,13 +90,8 @@ class Audio extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return audio(
-      src: source.toString(),
-      autoplay: autoplay,
-      loop: loop,
-      muted: muted,
-      controls: showControls,
-      [if (defaultText != null) text(defaultText!)],
-    );
+    return audio(src: source.toString(), autoplay: autoplay, loop: loop, muted: muted, controls: showControls, [
+      if (defaultText != null) text(defaultText!),
+    ]);
   }
 }

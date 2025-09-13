@@ -41,25 +41,13 @@ class ClientDomain extends Domain {
     switch (result.status) {
       case BuildStatus.started:
         _buildProgressEventId = _progressEventId++;
-        sendEvent('client.progress', {
-          'appId': appId,
-          'id': '$_buildProgressEventId',
-          'message': 'Building...',
-        });
+        sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'message': 'Building...'});
         break;
       case BuildStatus.failed:
-        sendEvent('client.progress', {
-          'appId': appId,
-          'id': '$_buildProgressEventId',
-          'finished': true,
-        });
+        sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'finished': true});
         break;
       case BuildStatus.succeeded:
-        sendEvent('client.progress', {
-          'appId': appId,
-          'id': '$_buildProgressEventId',
-          'finished': true,
-        });
+        sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'finished': true});
         break;
       default:
         break;
@@ -121,10 +109,7 @@ class ClientDomain extends Domain {
     }
     final fullRestart = getBoolArg(args, 'fullRestart') ?? false;
     if (!fullRestart) {
-      return {
-        'code': 1,
-        'message': 'hot reload not yet supported by webdev',
-      };
+      return {'code': 1, 'message': 'hot reload not yet supported by webdev'};
     }
     // TODO(grouma) - Support pauseAfterRestart.
     // var pauseAfterRestart = getBoolArg(args, 'pause') ?? false;
@@ -193,17 +178,14 @@ class _ClientState {
 
       if (_isDisposed) return;
 
-      unawaited(debugConnection.onDone.then((_) {
-        domain.sendEvent('client.log', {
-          'appId': appId,
-          'log': 'Lost connection to device.',
-        });
-        domain.sendEvent('client.stop', {
-          'appId': appId,
-        });
-        dispose();
-        domain._clientStates.remove(appId);
-      }));
+      unawaited(
+        debugConnection.onDone.then((_) {
+          domain.sendEvent('client.log', {'appId': appId, 'log': 'Lost connection to device.'});
+          domain.sendEvent('client.stop', {'appId': appId});
+          dispose();
+          domain._clientStates.remove(appId);
+        }),
+      );
 
       domain.sendEvent('client.start', {
         'appId': appId,
@@ -227,10 +209,7 @@ class _ClientState {
       if (_isDisposed) return;
 
       _stdOutSub = vmService.onStdoutEvent.listen((log) {
-        domain.sendEvent('client.log', {
-          'appId': appId,
-          'log': utf8.decode(base64.decode(log.bytes!)),
-        });
+        domain.sendEvent('client.log', {'appId': appId, 'log': utf8.decode(base64.decode(log.bytes!))});
       });
 
       domain.sendEvent('client.debugPort', {
@@ -246,9 +225,7 @@ class _ClientState {
       domain._handleBuildResult(r, appId);
     });
 
-    domain.sendEvent('app.started', {
-      'appId': appId,
-    });
+    domain.sendEvent('app.started', {'appId': appId});
 
     _appConnection.runMain();
   }

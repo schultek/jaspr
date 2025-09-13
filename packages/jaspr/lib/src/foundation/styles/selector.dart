@@ -85,9 +85,7 @@ class AttrCheck {
   final String value;
   final bool caseSensitive;
 
-  const AttrCheck.exists()
-      : value = '',
-        caseSensitive = true;
+  const AttrCheck.exists() : value = '', caseSensitive = true;
   const AttrCheck.exactly(String value, {this.caseSensitive = true}) : value = '="$value"';
   const AttrCheck.containsWord(String value, {this.caseSensitive = true}) : value = '~="$value"';
   const AttrCheck.startsWith(String prefix, {this.caseSensitive = true}) : value = '^="$prefix"';
@@ -103,12 +101,14 @@ class _ChainSelector implements Selector {
 
   @override
   String get selector {
-    assert((() {
-      if (selectors.any((s) => s is _ListSelector)) {
-        throw 'Cannot further chain selector list, only single selectors supported.';
-      }
-      return true;
-    })());
+    assert(
+      (() {
+        if (selectors.any((s) => s is _ListSelector)) {
+          throw 'Cannot further chain selector list, only single selectors supported.';
+        }
+        return true;
+      })(),
+    );
     return selectors.map((s) => s.selector).join('');
   }
 }

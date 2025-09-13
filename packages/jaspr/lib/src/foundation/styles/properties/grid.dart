@@ -152,9 +152,7 @@ class TrackRepeat {
 class Gap {
   const Gap({this.row, this.column});
 
-  const Gap.all(Unit value)
-      : row = value,
-        column = value;
+  const Gap.all(Unit value) : row = value, column = value;
 
   final Unit? row;
   final Unit? column;
@@ -165,10 +163,7 @@ class Gap {
     } else if (row != null && column != null) {
       return {'gap': '${row!.value} ${column!.value}'};
     } else {
-      return {
-        if (row != null) 'row-gap': row!.value,
-        if (column != null) 'column-gap': column!.value,
-      };
+      return {if (row != null) 'row-gap': row!.value, if (column != null) 'column-gap': column!.value};
     }
   }
 }

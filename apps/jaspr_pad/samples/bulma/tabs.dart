@@ -21,7 +21,8 @@ class _TabsState extends State<Tabs> {
   @override
   Component build(BuildContext context) {
     return div(
-      classes: 'tabs'
+      classes:
+          'tabs'
           '${component.isBoxed ? ' is-boxed' : ''}'
           '${component.isToggle ? ' is-toggle' : ''}',
       [
@@ -50,11 +51,8 @@ class Tab extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return li(
-      classes: selected ? 'is-active' : null,
-      [
-        a(href: '#', onClick: onSelected, [child])
-      ],
-    );
+    return li(classes: selected ? 'is-active' : null, [
+      a(href: '#', onClick: onSelected, [child]),
+    ]);
   }
 }

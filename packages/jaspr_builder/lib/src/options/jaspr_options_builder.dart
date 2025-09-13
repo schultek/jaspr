@@ -20,21 +20,24 @@ class JasprOptionsBuilder implements Builder {
     try {
       await generateOptionsOutput(buildStep);
     } catch (e, st) {
-      print('An unexpected error occurred.\n'
-          'This is probably a bug in jaspr_builder.\n'
-          'Please report this here: '
-          'https://github.com/schultek/jaspr/issues\n\n'
-          'The error was:\n$e\n\n$st');
+      print(
+        'An unexpected error occurred.\n'
+        'This is probably a bug in jaspr_builder.\n'
+        'Please report this here: '
+        'https://github.com/schultek/jaspr/issues\n\n'
+        'The error was:\n$e\n\n$st',
+      );
       rethrow;
     }
   }
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-        r'lib/$lib$': ['lib/jaspr_options.dart'],
-      };
+    r'lib/$lib$': ['lib/jaspr_options.dart'],
+  };
 
-  String get generationHeader => "// GENERATED FILE, DO NOT MODIFY\n"
+  String get generationHeader =>
+      "// GENERATED FILE, DO NOT MODIFY\n"
       "// Generated with jaspr_builder\n";
 
   Future<void> generateOptionsOutput(BuildStep buildStep) async {
@@ -56,19 +59,19 @@ class JasprOptionsBuilder implements Builder {
     if (sources.isNotEmpty) {
       clients = clients.where((c) => sources.contains(c.id)).toList();
       styles = styles
-          .map((s) => sources.contains(s.id)
-              ? s
-              : StylesModule(
-                  id: s.id,
-                  elements: s.elements.where((e) => !e.contains('.')).toList(),
-                ))
+          .map(
+            (s) => sources.contains(s.id)
+                ? s
+                : StylesModule(id: s.id, elements: s.elements.where((e) => !e.contains('.')).toList()),
+          )
           .toList();
     }
 
     clients.sortByCompare((c) => '${c.import}/${c.name}', ImportsWriter.compareImports);
     styles.sortByCompare((s) => s.id.toImportUrl(), ImportsWriter.compareImports);
 
-    var source = '''
+    var source =
+        '''
       import 'package:jaspr/jaspr.dart';
       [[/]]
       
@@ -112,9 +115,12 @@ class JasprOptionsBuilder implements Builder {
   }
 
   String buildClientParamGetters(List<ClientModule> clients) {
-    return clients.where((c) => c.params.isNotEmpty).map((c) {
-      return 'Map<String, dynamic> _[[${c.import}]]${c.name}([[${c.import}]].${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};';
-    }).join('\n');
+    return clients
+        .where((c) => c.params.isNotEmpty)
+        .map((c) {
+          return 'Map<String, dynamic> _[[${c.import}]]${c.name}([[${c.import}]].${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};';
+        })
+        .join('\n');
   }
 
   String buildStylesEntries(List<StylesModule> styles) {

@@ -1,13 +1,15 @@
 part of 'html.dart';
 
 /// The &lt;table&gt; HTML element represents tabular data—that is, information presented in a two-dimensional table comprised of rows and columns of cells containing data.
-Component table(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component table(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'table',
     key: key,
@@ -21,13 +23,15 @@ Component table(List<Component> children,
 }
 
 /// The &lt;caption&gt; HTML element specifies the caption (or title) of a table, providing the table an accessible description.
-Component caption(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component caption(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'caption',
     key: key,
@@ -41,13 +45,15 @@ Component caption(List<Component> children,
 }
 
 /// The &lt;thead&gt; HTML element encapsulates a set of table rows (&lt;tr&gt; elements), indicating that they comprise the head of a table with information about the table's columns. This is usually in the form of column headers (&lt;th&gt; elements).
-Component thead(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component thead(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'thead',
     key: key,
@@ -61,13 +67,15 @@ Component thead(List<Component> children,
 }
 
 /// The &lt;tbody&gt; HTML element encapsulates a set of table rows (&lt;tr&gt; elements), indicating that they comprise the body of a table's (main) data.
-Component tbody(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component tbody(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'tbody',
     key: key,
@@ -81,13 +89,15 @@ Component tbody(List<Component> children,
 }
 
 /// The &lt;tfoot&gt; HTML element encapsulates a set of table rows (&lt;tr&gt; elements), indicating that they comprise the foot of a table with information about the table's columns. This is usually a summary of the columns, e.g., a sum of the given numbers in a column.
-Component tfoot(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component tfoot(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'tfoot',
     key: key,
@@ -112,18 +122,20 @@ Component tfoot(List<Component> children,
 ///   - rowgroup: the header belongs to a rowgroup and relates to all of its cells;
 ///   - colgroup: the header belongs to a colgroup and relates to all of its cells.
 ///   If the scope attribute is not specified, or its value is not row, col, rowgroup, or colgroup, then browsers automatically select the set of cells to which the header cell applies.
-Component th(List<Component> children,
-    {String? abbr,
-    int? colspan,
-    String? headers,
-    int? rowspan,
-    String? scope,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component th(
+  List<Component> children, {
+  String? abbr,
+  int? colspan,
+  String? headers,
+  int? rowspan,
+  String? scope,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'th',
     key: key,
@@ -144,13 +156,15 @@ Component th(List<Component> children,
 }
 
 /// The &lt;tr&gt; HTML element defines a row of cells in a table. The row's cells can then be established using a mix of &lt;td&gt; (data cell) and &lt;th&gt; (header cell) elements.
-Component tr(List<Component> children,
-    {Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component tr(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'tr',
     key: key,
@@ -168,16 +182,18 @@ Component tr(List<Component> children,
 /// - [colspan]: Contains a non-negative integer value that indicates how many columns the data cell spans or extends. The default value is 1. User agents dismiss values higher than 1000 as incorrect, setting to the default value (1).
 /// - [headers]: Contains a list of space-separated strings, each corresponding to the id attribute of the &lt;th&gt; elements that provide headings for this table cell.
 /// - [rowspan]: Contains a non-negative integer value that indicates for how many rows the data cell spans or extends. The default value is 1; if its value is set to 0, it extends until the end of the table grouping section (&lt;thead&gt;, &lt;tbody&gt;, &lt;tfoot&gt;, even if implicitly defined), that the cell belongs to. Values higher than 65534 are clipped to 65534.
-Component td(List<Component> children,
-    {int? colspan,
-    String? headers,
-    int? rowspan,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component td(
+  List<Component> children, {
+  int? colspan,
+  String? headers,
+  int? rowspan,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'td',
     key: key,
@@ -198,24 +214,22 @@ Component td(List<Component> children,
 /// The &lt;col&gt; HTML element defines one or more columns in a column group represented by its parent &lt;colgroup&gt; element. The &lt;col&gt; element is only valid as a child of a &lt;colgroup&gt; element that has no span attribute defined.
 ///
 /// - [span]: Specifies the number of consecutive columns the &lt;col&gt; element spans. The value must be a positive integer greater than zero. If not present, its default value is 1.
-Component col(
-    {int? span,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component col({
+  int? span,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'col',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
-    attributes: {
-      ...?attributes,
-      if (span != null) 'span': '$span',
-    },
+    attributes: {...?attributes, if (span != null) 'span': '$span'},
     events: events,
   );
 }
@@ -223,24 +237,23 @@ Component col(
 /// The &lt;colgroup&gt; HTML element defines a group of columns within a table.
 ///
 /// - [span]: Specifies the number of consecutive columns the &lt;colgroup&gt; element spans. The value must be a positive integer greater than zero. If not present, its default value is 1.
-Component colgroup(List<Component> children,
-    {int? span,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component colgroup(
+  List<Component> children, {
+  int? span,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'colgroup',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
-    attributes: {
-      ...?attributes,
-      if (span != null) 'span': '$span',
-    },
+    attributes: {...?attributes, if (span != null) 'span': '$span'},
     events: events,
     children: children,
   );

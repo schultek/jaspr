@@ -20,21 +20,19 @@ class MarkdownPage extends StatelessComponent {
 
     return fragment([
       Header(showHome: true),
-      main_(classes: 'markdown-content', [
-        raw(html),
-      ]),
+      main_(classes: 'markdown-content', [raw(html)]),
       Footer(),
     ]);
   }
 
   @css
   static List<StyleRule> get styles => [
-        css('.markdown-content', [
-          css('&').styles(
-            minHeight: 50.vh,
-            padding: Padding.only(top: 8.rem, left: contentPadding, right: contentPadding, bottom: 4.rem),
-          ),
-          css('h3').styles(margin: Margin.only(top: 3.rem)),
-        ]),
-      ];
+    css('.markdown-content', [
+      css('&').styles(
+        minHeight: 50.vh,
+        padding: Padding.only(top: 8.rem, left: contentPadding, right: contentPadding, bottom: 4.rem),
+      ),
+      css('h3').styles(margin: Margin.only(top: 3.rem)),
+    ]),
+  ];
 }

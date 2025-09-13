@@ -104,16 +104,17 @@ class HoverInfo with HoverInfoMappable {
   final String? staticType;
   final String? propagatedType;
 
-  HoverInfo(
-      {this.description,
-      this.kind,
-      this.dartdoc,
-      this.enclosingClassName,
-      this.libraryName,
-      this.parameter,
-      this.deprecated,
-      this.staticType,
-      this.propagatedType});
+  HoverInfo({
+    this.description,
+    this.kind,
+    this.dartdoc,
+    this.enclosingClassName,
+    this.libraryName,
+    this.parameter,
+    this.deprecated,
+    this.staticType,
+    this.propagatedType,
+  });
 }
 
 @MappableClass()

@@ -104,12 +104,6 @@ abstract class PageLayoutBase implements PageLayout {
       _ => '/',
     };
 
-    return Document(
-      lang: lang,
-      base: base,
-      meta: {},
-      head: buildHead(page).toList(),
-      body: buildBody(page, child),
-    );
+    return Document(lang: lang, base: base, meta: {}, head: buildHead(page).toList(), body: buildBody(page, child));
   }
 }

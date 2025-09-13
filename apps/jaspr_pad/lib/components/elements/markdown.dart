@@ -85,9 +85,7 @@ class _MarkdownState extends State<Markdown> {
         hljs.highlightAll();
       });
     }
-    return fragment([
-      ...buildMarkdown(nodes),
-    ]);
+    return fragment([...buildMarkdown(nodes)]);
   }
 
   Iterable<Component> buildMarkdown(Iterable<Node> nodes) sync* {

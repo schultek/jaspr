@@ -11,10 +11,7 @@ import 'html_parser.dart';
 import 'page_parser.dart';
 
 md.Document _defaultDocumentBuilder(Page _) {
-  return md.Document(
-    blockSyntaxes: MarkdownParser.defaultBlockSyntaxes,
-    extensionSet: md.ExtensionSet.gitHubWeb,
-  );
+  return md.Document(blockSyntaxes: MarkdownParser.defaultBlockSyntaxes, extensionSet: md.ExtensionSet.gitHubWeb);
 }
 
 typedef DocumentBuilder = md.Document Function(Page page);
@@ -34,9 +31,7 @@ class MarkdownParser implements PageParser {
 
   final DocumentBuilder documentBuilder;
 
-  static const List<md.BlockSyntax> defaultBlockSyntaxes = [
-    JasprHtmlBlockSyntax(),
-  ];
+  static const List<md.BlockSyntax> defaultBlockSyntaxes = [JasprHtmlBlockSyntax()];
 
   @override
   Pattern get pattern => RegExp(r'.*\.mdx?$');
@@ -59,10 +54,7 @@ class MarkdownParser implements PageParser {
 
     for (final node in markdownNodes) {
       if (node is HtmlText) {
-        final tokenizer = html.HtmlTokenizer(
-          node.text,
-          lowercaseElementName: false,
-        );
+        final tokenizer = html.HtmlTokenizer(node.text, lowercaseElementName: false);
 
         while (tokenizer.moveNext()) {
           final token = tokenizer.current;
@@ -112,11 +104,9 @@ class MarkdownParser implements PageParser {
         currentNodes.addAll(HtmlParser.buildNodes(html.parseFragment(node.text).nodes));
       } else if (node is md.Element) {
         final children = buildNodes(node.children ?? []);
-        currentNodes.add(ElementNode(
-          node.tag,
-          {if (node.generatedId != null) 'id': node.generatedId!, ...node.attributes},
-          children,
-        ));
+        currentNodes.add(
+          ElementNode(node.tag, {if (node.generatedId != null) 'id': node.generatedId!, ...node.attributes}, children),
+        );
       }
     }
 

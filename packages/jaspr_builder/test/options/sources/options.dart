@@ -18,7 +18,8 @@ final optionsSources = {
 };
 
 final optionsOutputs = {
-  'site|lib/jaspr_options.dart': '// dart format off\n'
+  'site|lib/jaspr_options.dart':
+      '// dart format off\n'
       '// ignore_for_file: type=lint\n'
       '\n'
       '// GENERATED FILE, DO NOT MODIFY\n'

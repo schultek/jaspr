@@ -2,7 +2,7 @@ name: jaspr_workspace
 repository: https://github.com/schultek/jaspr
 
 environment:
-  sdk: '>=3.6.0 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 
 workspace:
   - packages/jaspr
@@ -45,8 +45,8 @@ melos:
   scripts:
     format:
       steps:
-        - melos exec --ignore=jaspr_cli -- "dart format . --line-length=120 --set-exit-if-changed"
-        - melos exec --scope=jaspr_cli -- "dart format lib  --line-length=120 --set-exit-if-changed"
+        - melos exec --ignore=jaspr_cli -- "dart format . --set-exit-if-changed"
+        - melos exec --scope=jaspr_cli -- "dart format lib --set-exit-if-changed"
     analyze: melos exec -- "dart analyze . --fatal-infos"
     test:
       run: dart test

@@ -15,13 +15,7 @@ class EditorDocument {
   final List<Issue> issues;
   final IssueLocation? selection;
 
-  EditorDocument({
-    required this.key,
-    required this.source,
-    required this.mode,
-    this.issues = const [],
-    this.selection,
-  });
+  EditorDocument({required this.key, required this.source, required this.mode, this.issues = const [], this.selection});
 }
 
 class Editor extends StatefulComponent {
@@ -74,10 +68,7 @@ class EditorState extends State<Editor> {
     Component child = div(id: 'editor-host', []);
 
     if (kIsWeb) {
-      child = DomNodeReader(
-        onNode: createEditor,
-        child: child,
-      );
+      child = DomNodeReader(onNode: createEditor, child: child);
     }
     return child;
   }
@@ -109,17 +100,17 @@ class EditorState extends State<Editor> {
         }
         for (final issue in document.issues) {
           // Create in-line squiggles.
-          doc.markText(Position(issue.location.startLine, issue.location.startColumn),
-              Position(issue.location.endLine, issue.location.endColumn),
-              className: 'squiggle-${issue.kind.name}', title: issue.message);
+          doc.markText(
+            Position(issue.location.startLine, issue.location.startColumn),
+            Position(issue.location.endLine, issue.location.endColumn),
+            className: 'squiggle-${issue.kind.name}',
+            title: issue.message,
+          );
         }
 
         if (document.selection != null) {
           var sel = document.selection!;
-          doc.setSelection(
-            Position(sel.startLine, sel.startColumn),
-            head: Position(sel.endLine, sel.endColumn),
-          );
+          doc.setSelection(Position(sel.startLine, sel.startColumn), head: Position(sel.endLine, sel.endColumn));
           _editor!.focus();
         }
       }

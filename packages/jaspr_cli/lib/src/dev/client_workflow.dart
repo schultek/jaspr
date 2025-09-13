@@ -36,30 +36,32 @@ class ClientWorkflow {
   ) async {
     var cancelled = false;
 
-    var op = CancelableOperation<ClientWorkflow?>.fromFuture(Future(() async {
-      final workingDirectory = Directory.current.path;
-      final targetPorts = {'web': int.parse(targetPort)};
+    var op = CancelableOperation<ClientWorkflow?>.fromFuture(
+      Future(() async {
+        final workingDirectory = Directory.current.path;
+        final targetPorts = {'web': int.parse(targetPort)};
 
-      final client = await _startBuildDaemon(workingDirectory, buildOptions, logger);
-      if (client == null) return null;
-      if (cancelled) {
-        client.close();
-        return null;
-      }
-      _registerBuildTargets(client, configuration, targetPorts);
+        final client = await _startBuildDaemon(workingDirectory, buildOptions, logger);
+        if (client == null) return null;
+        if (cancelled) {
+          client.close();
+          return null;
+        }
+        _registerBuildTargets(client, configuration, targetPorts);
 
-      logger.write('Starting initial build...', tag: Tag.builder, progress: ProgressState.running);
-      client.startBuild();
+        logger.write('Starting initial build...', tag: Tag.builder, progress: ProgressState.running);
+        client.startBuild();
 
-      final serverManager = await _startServerManager(configuration, targetPorts, workingDirectory, client, logger);
-      if (cancelled) {
-        await client.close();
-        await serverManager.stop();
-        return null;
-      }
+        final serverManager = await _startServerManager(configuration, targetPorts, workingDirectory, client, logger);
+        if (cancelled) {
+          await client.close();
+          await serverManager.stop();
+          return null;
+        }
 
-      return ClientWorkflow._(client, serverManager, logger);
-    }));
+        return ClientWorkflow._(client, serverManager, logger);
+      }),
+    );
 
     guard(() {
       op.cancel();
@@ -69,11 +71,7 @@ class ClientWorkflow {
     return op.valueOrCancellation(null);
   }
 
-  ClientWorkflow._(
-    this.client,
-    this.serverManager,
-    this.logger,
-  ) {
+  ClientWorkflow._(this.client, this.serverManager, this.logger) {
     client.shutdownNotifications.listen((data) {
       logger.write(data.message, tag: Tag.builder, level: Level.warning);
       if (data.failureType == 75) {
@@ -101,26 +99,22 @@ class ClientWorkflow {
 Future<BuildDaemonClient?> _startBuildDaemon(String workingDirectory, List<String> buildOptions, Logger logger) async {
   try {
     logger.write('Connecting to the build daemon...', tag: Tag.builder, progress: ProgressState.running);
-    return await connectClient(
-      workingDirectory,
-      buildOptions,
-      (serverLog) {
-        var level = mapBuilderLevel(toLoggingLevel(serverLog.level));
-        if (!logger.verbose && level.index < Level.info.index) return;
+    return await connectClient(workingDirectory, buildOptions, (serverLog) {
+      var level = mapBuilderLevel(toLoggingLevel(serverLog.level));
+      if (!logger.verbose && level.index < Level.info.index) return;
 
-        var buffer = StringBuffer(serverLog.message);
-        if (serverLog.error != null) {
-          buffer.writeln(serverLog.error);
-        }
+      var buffer = StringBuffer(serverLog.message);
+      if (serverLog.error != null) {
+        buffer.writeln(serverLog.error);
+      }
 
-        var log = buffer.toString().trim();
-        if (log.isEmpty) {
-          return;
-        }
+      var log = buffer.toString().trim();
+      if (log.isEmpty) {
+        return;
+      }
 
-        logger.write(log, tag: Tag.builder, level: level);
-      },
-    );
+      logger.write(log, tag: Tag.builder, level: level);
+    });
   } on OptionsSkew {
     logger.write(
       'Incompatible options with current running build daemon.\n\n'
@@ -156,46 +150,49 @@ Future<ServerManager> _startServerManager(
   final assetPort = daemonPort(workingDirectory);
   final serverOptions = <ServerOptions>{};
   for (final target in targetPorts.keys) {
-    serverOptions.add(ServerOptions(
-      configuration,
-      targetPorts[target]!,
-      target,
-      assetPort,
-    ));
+    serverOptions.add(ServerOptions(configuration, targetPorts[target]!, target, assetPort));
   }
 
   final serverManager = await ServerManager.start(serverOptions, client.buildResults);
   return serverManager;
 }
 
-void _registerBuildTargets(
-  BuildDaemonClient client,
-  Configuration configuration,
-  Map<String, int> targetPorts,
-) {
+void _registerBuildTargets(BuildDaemonClient client, Configuration configuration, Map<String, int> targetPorts) {
   // Register a target for each serve target.
   for (final target in targetPorts.keys) {
     OutputLocation? outputLocation;
     if (configuration.outputPath != null &&
         (configuration.outputInput == null || target == configuration.outputInput)) {
-      outputLocation = OutputLocation((b) => b
-        ..output = configuration.outputPath
-        ..useSymlinks = true
-        ..hoist = true);
+      outputLocation = OutputLocation(
+        (b) => b
+          ..output = configuration.outputPath
+          ..useSymlinks = true
+          ..hoist = true,
+      );
     }
-    client.registerBuildTarget(DefaultBuildTarget((b) => b
-      ..target = target
-      ..outputLocation = outputLocation?.toBuilder()));
+    client.registerBuildTarget(
+      DefaultBuildTarget(
+        (b) => b
+          ..target = target
+          ..outputLocation = outputLocation?.toBuilder(),
+      ),
+    );
   }
   // Empty string indicates we should build everything, register a corresponding
   // target.
   if (configuration.outputInput == '' && configuration.outputPath != null) {
-    final outputLocation = OutputLocation((b) => b
-      ..output = configuration.outputPath
-      ..useSymlinks = true
-      ..hoist = false);
-    client.registerBuildTarget(DefaultBuildTarget((b) => b
-      ..target = ''
-      ..outputLocation = outputLocation.toBuilder()));
+    final outputLocation = OutputLocation(
+      (b) => b
+        ..output = configuration.outputPath
+        ..useSymlinks = true
+        ..hoist = false,
+    );
+    client.registerBuildTarget(
+      DefaultBuildTarget(
+        (b) => b
+          ..target = ''
+          ..outputLocation = outputLocation.toBuilder(),
+      ),
+    );
   }
 }

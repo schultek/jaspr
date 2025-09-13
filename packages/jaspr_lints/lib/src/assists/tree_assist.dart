@@ -7,12 +7,7 @@ import '../utils.dart';
 
 class TreeAssistProvider extends DartAssist {
   @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    SourceRange target,
-  ) {
+  void run(CustomLintResolver resolver, ChangeReporter reporter, CustomLintContext context, SourceRange target) {
     void treeAssistsFor(Expression node, AstNode anchor, ArgumentList argumentList) {
       if (!target.coveredBy(anchor.sourceRange)) {
         return;
@@ -168,17 +163,23 @@ class TreeAssistProvider extends DartAssist {
       builder.addInsertion(resolver.source.contents.data.length, (edit) {
         edit.write('\nclass ');
         edit.addSimpleLinkedEdit('name', 'MyComponent');
-        edit.write(' extends StatelessComponent {\n'
-            '  const ');
+        edit.write(
+          ' extends StatelessComponent {\n'
+          '  const ',
+        );
         edit.addSimpleLinkedEdit('name', 'MyComponent');
-        edit.write('();\n'
-            '\n'
-            '  @override\n'
-            '  Component build(BuildContext context) {\n'
-            '    return ');
+        edit.write(
+          '();\n'
+          '\n'
+          '  @override\n'
+          '  Component build(BuildContext context) {\n'
+          '    return ',
+        );
         edit.write(source);
-        edit.write(';\n'
-            '  }\n}\n');
+        edit.write(
+          ';\n'
+          '  }\n}\n',
+        );
       });
 
       builder.addReplacement(node.sourceRange, (edit) {

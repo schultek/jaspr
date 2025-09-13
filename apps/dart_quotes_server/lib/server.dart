@@ -13,12 +13,7 @@ import 'src/routes/root.dart';
 
 void run(List<String> args) async {
   // Initialize Serverpod and connect it with your generated code.
-  final pod = Serverpod(
-    args,
-    Protocol(),
-    Endpoints(),
-    authenticationHandler: auth.authenticationHandler,
-  );
+  final pod = Serverpod(args, Protocol(), Endpoints(), authenticationHandler: auth.authenticationHandler);
 
   Jaspr.initializeApp(options: defaultJasprOptions, useIsolates: false);
 

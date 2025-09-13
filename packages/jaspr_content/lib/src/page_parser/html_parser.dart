@@ -15,10 +15,7 @@ class HtmlParser implements PageParser {
 
   @override
   List<Node> parsePage(Page page) {
-    final tokenizer = html.HtmlTokenizer(
-      page.content,
-      lowercaseElementName: false,
-    );
+    final tokenizer = html.HtmlTokenizer(page.content, lowercaseElementName: false);
     final fragment = html.parseFragment(tokenizer);
     return buildNodes(fragment.nodes);
   }

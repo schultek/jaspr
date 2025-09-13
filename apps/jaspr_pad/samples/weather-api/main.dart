@@ -64,8 +64,8 @@ class SimpleWeather extends StatelessComponent {
       img(src: weather.condition.icon),
       div(classes: 'info', [
         h1([text('${weather.temp}°')]),
-        span([text('${weather.location.name}, ${weather.location.country}')])
-      ])
+        span([text('${weather.location.name}, ${weather.location.country}')]),
+      ]),
     ]);
   }
 }

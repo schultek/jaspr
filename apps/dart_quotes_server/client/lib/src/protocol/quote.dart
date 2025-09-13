@@ -77,11 +77,11 @@ class _QuoteImpl extends Quote {
     required String author,
     required List<int> likes,
   }) : super._(
-          id: id,
-          quote: quote,
-          author: author,
-          likes: likes,
-        );
+         id: id,
+         quote: quote,
+         author: author,
+         likes: likes,
+       );
 
   @override
   Quote copyWith({

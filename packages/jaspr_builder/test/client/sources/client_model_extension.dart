@@ -36,12 +36,13 @@ final clientModelExtensionJsonOutputs = {
         "decoder": "[[package:site/model_extension.dart]].ModelBCodec.fromRaw(p['b'])",
         "encoder": "[[package:site/model_extension.dart]].ModelBCodec(c.b).toRaw()",
       },
-    ]
+    ],
   }),
 };
 
 final clientModelExtensionDartOutputs = {
-  'site|lib/component_model_extension.client.dart': '// dart format off\n'
+  'site|lib/component_model_extension.client.dart':
+      '// dart format off\n'
       '// ignore_for_file: type=lint\n'
       '\n'
       '// GENERATED FILE, DO NOT MODIFY\n'

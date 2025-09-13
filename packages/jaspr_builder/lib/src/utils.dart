@@ -10,7 +10,8 @@ import 'package:jaspr/jaspr.dart'
     show ClientAnnotation, CssUtility, Import, Component, Key, StyleRule, SyncAnnotation, State;
 import 'package:source_gen/source_gen.dart';
 
-const String generationHeader = "// dart format off\n"
+const String generationHeader =
+    "// dart format off\n"
     "// ignore_for_file: type=lint\n\n"
     "// GENERATED FILE, DO NOT MODIFY\n"
     "// Generated with jaspr_builder\n\n";

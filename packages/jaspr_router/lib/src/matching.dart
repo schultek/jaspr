@@ -50,8 +50,8 @@ class RouteMatcher {
 class RouteMatchList {
   /// RouteMatchList constructor.
   RouteMatchList(List<RouteMatch> matches, this.uri, this.pathParameters)
-      : _matches = matches,
-        fullpath = _generateFullPath(matches);
+    : _matches = matches,
+      fullpath = _generateFullPath(matches);
 
   /// Constructs an empty matches object.
   static RouteMatchList empty = RouteMatchList(<RouteMatch>[], Uri.parse(''), const <String, String>{});
@@ -256,19 +256,20 @@ List<RouteMatch>? _getLocRouteRecursively({
 RouteMatchList errorScreen(Uri uri, String errorMessage) {
   final Exception error = Exception(errorMessage);
   return RouteMatchList(
-      <RouteMatch>[
-        RouteMatch(
-          subloc: uri.path,
-          extra: null,
-          error: error,
-          route: Route(
-            path: uri.toString(),
-            builder: (BuildContext context, RouteState state) {
-              throw UnimplementedError();
-            },
-          ),
+    <RouteMatch>[
+      RouteMatch(
+        subloc: uri.path,
+        extra: null,
+        error: error,
+        route: Route(
+          path: uri.toString(),
+          builder: (BuildContext context, RouteState state) {
+            throw UnimplementedError();
+          },
         ),
-      ],
-      uri,
-      const <String, String>{});
+      ),
+    ],
+    uri,
+    const <String, String>{},
+  );
 }

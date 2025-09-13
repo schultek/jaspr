@@ -59,10 +59,12 @@ class PlaygroundHeader extends StatelessComponent {
           },
         ),
       ]),
-      Builder(builder: (context) {
-        var name = context.watch(projectNameProvider);
-        return div(classes: 'header-gist-name', [text(name ?? '')]);
-      }),
+      Builder(
+        builder: (context) {
+          var name = context.watch(projectNameProvider);
+          return div(classes: 'header-gist-name', [text(name ?? '')]);
+        },
+      ),
       Button(
         dense: true,
         raised: true,
@@ -88,7 +90,7 @@ class PlaygroundHeader extends StatelessComponent {
             ),
           ]),
         ],
-      )
+      ),
     ]);
   }
 }
@@ -104,9 +106,7 @@ class SamplesMenuButton extends StatelessComponent with SyncProviderDependencies
     var samples = context.watch(syncSamplesProvider).valueOrNull ?? [];
 
     return Menu(
-      items: [
-        for (var sample in samples) MenuItem(label: sample.description),
-      ],
+      items: [for (var sample in samples) MenuItem(label: sample.description)],
       onItemSelected: (index) {
         context.read(logicProvider).selectSample(samples[index]);
       },

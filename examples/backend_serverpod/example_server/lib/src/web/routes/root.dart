@@ -11,9 +11,7 @@ class RootRoute extends JasprRoute {
   Future<Component> build(Session session, HttpRequest request) async {
     return Document(
       title: "Built with Serverpod & Jaspr",
-      head: [
-        link(rel: "stylesheet", href: "/css/style.css"),
-      ],
+      head: [link(rel: "stylesheet", href: "/css/style.css")],
       body: Home(),
     );
   }

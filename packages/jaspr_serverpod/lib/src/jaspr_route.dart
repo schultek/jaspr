@@ -31,10 +31,7 @@ abstract class JasprRoute extends Route {
   @override
   Future<bool> handleCall(Session session, HttpRequest request) async {
     await shelf_io.handleRequest(request, (req) {
-      return handler(req.change(context: {
-        'session': session,
-        'request': request,
-      }));
+      return handler(req.change(context: {'session': session, 'request': request}));
     }, poweredByHeader: null);
     // Needed to flush hijacked requests before returning.
     await Future(() {});

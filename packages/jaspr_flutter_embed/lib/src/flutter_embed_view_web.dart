@@ -6,16 +6,9 @@ import 'view_constraints.dart';
 import 'widget.dart';
 
 class FlutterEmbedView extends StatefulComponent {
-  const FlutterEmbedView({
-    this.id,
-    this.classes,
-    this.styles,
-    this.constraints,
-    this.loader,
-    this.widget,
-    super.key,
-  })  : loadLibrary = null,
-        builder = null;
+  const FlutterEmbedView({this.id, this.classes, this.styles, this.constraints, this.loader, this.widget, super.key})
+    : loadLibrary = null,
+      builder = null;
 
   const FlutterEmbedView.deferred({
     this.id,

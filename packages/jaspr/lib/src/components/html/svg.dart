@@ -5,16 +5,18 @@ part of 'html.dart';
 /// - [viewBox]: The SVG viewport coordinates for the current SVG fragment.
 /// - [width]: The displayed width of the rectangular viewport. (Not the width of its coordinate system.)
 /// - [height]: The displayed height of the rectangular viewport. (Not the height of its coordinate system.)
-Component svg(List<Component> children,
-    {String? viewBox,
-    Unit? width,
-    Unit? height,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component svg(
+  List<Component> children, {
+  String? viewBox,
+  Unit? width,
+  Unit? height,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'svg',
     key: key,
@@ -43,22 +45,24 @@ Component svg(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component rect(List<Component> children,
-    {String? x,
-    String? y,
-    String? rx,
-    String? ry,
-    String? width,
-    String? height,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component rect(
+  List<Component> children, {
+  String? x,
+  String? y,
+  String? rx,
+  String? ry,
+  String? width,
+  String? height,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'rect',
     key: key,
@@ -90,19 +94,21 @@ Component rect(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component circle(List<Component> children,
-    {String? cx,
-    String? cy,
-    String? r,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component circle(
+  List<Component> children, {
+  String? cx,
+  String? cy,
+  String? r,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'circle',
     key: key,
@@ -132,20 +138,22 @@ Component circle(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component ellipse(List<Component> children,
-    {String? cx,
-    String? cy,
-    String? rx,
-    String? ry,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component ellipse(
+  List<Component> children, {
+  String? cx,
+  String? cy,
+  String? rx,
+  String? ry,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'ellipse',
     key: key,
@@ -176,20 +184,22 @@ Component ellipse(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component line(List<Component> children,
-    {String? x1,
-    String? y1,
-    String? x2,
-    String? y2,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component line(
+  List<Component> children, {
+  String? x1,
+  String? y1,
+  String? x2,
+  String? y2,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'line',
     key: key,
@@ -217,17 +227,19 @@ Component line(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component path(List<Component> children,
-    {String? d,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component path(
+  List<Component> children, {
+  String? d,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'path',
     key: key,
@@ -252,17 +264,19 @@ Component path(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component polygon(List<Component> children,
-    {String? points,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component polygon(
+  List<Component> children, {
+  String? points,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'polygon',
     key: key,
@@ -287,17 +301,19 @@ Component polygon(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component polyline(List<Component> children,
-    {String? points,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
+Component polyline(
+  List<Component> children, {
+  String? points,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
   return Component.element(
     tag: 'polyline',
     key: key,

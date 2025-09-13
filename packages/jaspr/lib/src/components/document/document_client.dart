@@ -12,10 +12,7 @@ abstract class Document implements Component {
   ///
   /// Can be used multiple times in an application where deeper or latter mounted
   /// components will override duplicate attributes from other `.html()` components.
-  const factory Document.html({
-    Map<String, String>? attributes,
-    Key? key,
-  }) = AttachDocument.html;
+  const factory Document.html({Map<String, String>? attributes, Key? key}) = AttachDocument.html;
 
   /// Renders metadata and other elements inside the `<head>` of the document.
   ///
@@ -56,12 +53,8 @@ abstract class Document implements Component {
   /// - elements with an `id` override other elements with the same `id`
   /// - `<title>` and `<base>` elements override other `<title>` or `<base>` elements respectively
   /// - `<meta>` elements override other `<meta>` elements with the same `name`
-  const factory Document.head({
-    String? title,
-    Map<String, String>? meta,
-    List<Component>? children,
-    Key? key,
-  }) = HeadDocument;
+  const factory Document.head({String? title, Map<String, String>? meta, List<Component>? children, Key? key}) =
+      HeadDocument;
 
   /// Attaches a set of attributes to the `<body>` element.
   ///
@@ -70,10 +63,7 @@ abstract class Document implements Component {
   ///
   /// Can be used multiple times in an application where deeper or latter mounted
   /// components will override duplicate attributes from other `.body()` components.
-  const factory Document.body({
-    Map<String, String>? attributes,
-    Key? key,
-  }) = AttachDocument.body;
+  const factory Document.body({Map<String, String>? attributes, Key? key}) = AttachDocument.body;
 }
 
 class HeadDocument extends StatelessComponent implements Document {
@@ -109,12 +99,8 @@ enum AttachTarget {
 }
 
 class AttachDocument extends Component implements Document {
-  const AttachDocument.html({this.attributes, super.key})
-      : target = AttachTarget.html,
-        children = const [];
-  const AttachDocument.body({this.attributes, super.key})
-      : target = AttachTarget.body,
-        children = const [];
+  const AttachDocument.html({this.attributes, super.key}) : target = AttachTarget.html, children = const [];
+  const AttachDocument.body({this.attributes, super.key}) : target = AttachTarget.body, children = const [];
   const AttachDocument({required this.target, this.attributes, required this.children});
 
   final AttachTarget target;
@@ -285,9 +271,9 @@ class AttachAdapter {
       web.Element(id: String id) when id.isNotEmpty => id,
       web.Element(tagName: "TITLE" || "BASE") => '__${node.tagName}',
       web.Element(tagName: "META") => switch (node.attributes.getNamedItem("name")) {
-          web.Attr name => '__meta:${name.value}',
-          _ => null
-        },
+        web.Attr name => '__meta:${name.value}',
+        _ => null,
+      },
       _ => null,
     };
   }

@@ -30,13 +30,10 @@ extension ProviderContext on BuildContext {
     bool fireImmediately = false,
   }) {
     _ensureDebugDoingBuild('listen');
-    return ProviderScope._scopeOf(this, listen: true)._listen(
+    return ProviderScope._scopeOf(
       this,
-      provider,
-      listener,
-      onError: onError,
-      fireImmediately: fireImmediately,
-    );
+      listen: true,
+    )._listen(this, provider, listener, onError: onError, fireImmediately: fireImmediately);
   }
 
   /// Listens to a provider and returns the subscription.
@@ -46,19 +43,18 @@ extension ProviderContext on BuildContext {
     void Function(Object error, StackTrace stackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    return ProviderScope._scopeOf(this, listen: false)._subscribe(
-      provider,
-      listener,
-      onError: onError,
-      fireImmediately: fireImmediately,
-    );
+    return ProviderScope._scopeOf(
+      this,
+      listen: false,
+    )._subscribe(provider, listener, onError: onError, fireImmediately: fireImmediately);
   }
 
   void _ensureDebugDoingBuild(String method) {
     assert(() {
       if (!debugDoingBuild) {
         throw StateError(
-            'context.$method can only be used within the build method of a widget. When calling: ${StackTrace.current}');
+          'context.$method can only be used within the build method of a widget. When calling: ${StackTrace.current}',
+        );
       }
       return true;
     }());

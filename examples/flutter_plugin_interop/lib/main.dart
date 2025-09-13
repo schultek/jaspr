@@ -6,11 +6,11 @@ import 'components/app.dart';
 void main() {
   Jaspr.initializeApp(options: defaultJasprOptions);
 
-  runApp(Document(
-    title: "Flutter Plugin Interop",
-    head: [
-      link(rel: "stylesheet", href: "styles.css"),
-    ],
-    body: App(),
-  ));
+  runApp(
+    Document(
+      title: "Flutter Plugin Interop",
+      head: [link(rel: "stylesheet", href: "styles.css")],
+      body: App(),
+    ),
+  );
 }

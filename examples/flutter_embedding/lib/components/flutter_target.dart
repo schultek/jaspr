@@ -25,10 +25,7 @@ class FlutterTarget extends StatelessComponent {
       classes: isHandheld ? 'handheld' : effects.join(' '),
       styles: !isHandheld && rotation != 0
           ? Styles(
-              transform: Transform.combine([
-                Transform.perspective(1000.px),
-                Transform.rotateAxis(y: rotation.deg),
-              ]),
+              transform: Transform.combine([Transform.perspective(1000.px), Transform.rotateAxis(y: rotation.deg)]),
             )
           : null,
       loader: loader,

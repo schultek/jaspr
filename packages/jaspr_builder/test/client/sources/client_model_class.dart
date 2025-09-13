@@ -36,12 +36,13 @@ final clientModelClassJsonOutputs = {
         "decoder": "[[package:site/model_class.dart]].ModelA.fromRaw(p['b'])",
         "encoder": "c.b.toRaw()",
       },
-    ]
+    ],
   }),
 };
 
 final clientModelClassDartOutputs = {
-  'site|lib/component_model_class.client.dart': '// dart format off\n'
+  'site|lib/component_model_class.client.dart':
+      '// dart format off\n'
       '// ignore_for_file: type=lint\n'
       '\n'
       '// GENERATED FILE, DO NOT MODIFY\n'

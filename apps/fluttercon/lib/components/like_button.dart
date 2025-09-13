@@ -24,9 +24,7 @@ class LikeButton extends StatelessComponent {
               FavoritesService.instance.toggle(session);
             },
           },
-          [
-            span(classes: "icon-heart${isFavorite ? '' : '-o'}", []),
-          ],
+          [span(classes: "icon-heart${isFavorite ? '' : '-o'}", [])],
         );
       },
     );
@@ -34,19 +32,19 @@ class LikeButton extends StatelessComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('.like-button', [
-          css('&').styles(
-            border: Border.none,
-            outline: Outline(style: OutlineStyle.none),
-            fontSize: 1.5.em,
-            backgroundColor: Colors.transparent,
-          ),
-          css('&:hover span').styles(transform: Transform.scale(1.2)),
-          css('&.active span').styles(color: Colors.red),
-          css('span').styles(
-            display: Display.inlineBlock,
-            transition: Transition('transform', duration: 300, curve: Curve.ease),
-          ),
-        ]),
-      ];
+    css('.like-button', [
+      css('&').styles(
+        border: Border.none,
+        outline: Outline(style: OutlineStyle.none),
+        fontSize: 1.5.em,
+        backgroundColor: Colors.transparent,
+      ),
+      css('&:hover span').styles(transform: Transform.scale(1.2)),
+      css('&.active span').styles(color: Colors.red),
+      css('span').styles(
+        display: Display.inlineBlock,
+        transition: Transition('transform', duration: 300, curve: Curve.ease),
+      ),
+    ]),
+  ];
 }

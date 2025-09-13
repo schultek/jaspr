@@ -17,34 +17,22 @@ class PagesNav extends StatelessComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('nav', [
-          css('&').styles(
-            display: Display.flex,
-            padding: Padding.all(40.px),
-            justifyContent: JustifyContent.center,
-          ),
-          css('a', [
-            css('&').styles(
-              display: Display.block,
-              padding: Padding.symmetric(horizontal: 8.px, vertical: 4.px),
-              margin: Margin.symmetric(horizontal: 2.px),
-              border: Border(),
-              color: Color.initial,
-              textDecoration: TextDecoration.none,
-            ),
-            css('&:first-child').styles(
-              radius: BorderRadius.horizontal(left: Radius.circular(0.6.em)),
-            ),
-            css('&:last-child').styles(
-              radius: BorderRadius.horizontal(right: Radius.circular(0.6.em)),
-            ),
-            css('&.active').styles(
-              backgroundColor: Color('#0002'),
-            ),
-            css('&:hover').styles(
-              backgroundColor: Color('#0001'),
-            ),
-          ]),
-        ]),
-      ];
+    css('nav', [
+      css('&').styles(display: Display.flex, padding: Padding.all(40.px), justifyContent: JustifyContent.center),
+      css('a', [
+        css('&').styles(
+          display: Display.block,
+          padding: Padding.symmetric(horizontal: 8.px, vertical: 4.px),
+          margin: Margin.symmetric(horizontal: 2.px),
+          border: Border(),
+          color: Color.initial,
+          textDecoration: TextDecoration.none,
+        ),
+        css('&:first-child').styles(radius: BorderRadius.horizontal(left: Radius.circular(0.6.em))),
+        css('&:last-child').styles(radius: BorderRadius.horizontal(right: Radius.circular(0.6.em))),
+        css('&.active').styles(backgroundColor: Color('#0002')),
+        css('&:hover').styles(backgroundColor: Color('#0001')),
+      ]),
+    ]),
+  ];
 }
