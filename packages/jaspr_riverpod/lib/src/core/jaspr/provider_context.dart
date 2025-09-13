@@ -1,6 +1,6 @@
-part of 'framework.dart';
+part of '../../core.dart';
 
-extension ProviderContext on BuildContext {
+extension ProviderContext on BuildContext  {
   /// Reads a provider without listening to it
   T read<T>(ProviderListenable<T> provider) {
     return ProviderScope.containerOf(this, listen: false).read(provider);
@@ -12,14 +12,18 @@ extension ProviderContext on BuildContext {
   }
 
   /// Invalidates a provider
-  void invalidate(ProviderOrFamily provider) {
-    ProviderScope.containerOf(this, listen: false).invalidate(provider);
+  void invalidate(ProviderOrFamily provider, {bool asReload = false}) {
+    ProviderScope.containerOf(this, listen: false).invalidate(provider, asReload: asReload);
   }
 
   /// Watches a provider and rebuilds the current context on change
   T watch<T>(ProviderListenable<T> provider) {
     _ensureDebugDoingBuild('watch');
     return ProviderScope._scopeOf(this, listen: true)._watch(this, provider);
+  }
+
+  bool exists(ProviderBase<Object?> provider) {
+    return ProviderScope.containerOf(this, listen: false).exists(provider);
   }
 
   /// Listens to a provider and automatically manages the subscription
@@ -40,13 +44,13 @@ extension ProviderContext on BuildContext {
   }
 
   /// Listens to a provider and returns the subscription.
-  ProviderSubscription<T> subscribe<T>(
+  ProviderSubscription<T> listenManual<T>(
     ProviderListenable<T> provider,
     void Function(T? previous, T value) listener, {
     void Function(Object error, StackTrace stackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    return ProviderScope._scopeOf(this, listen: false)._subscribe(
+    return ProviderScope._scopeOf(this, listen: false)._listenManual(
       provider,
       listener,
       onError: onError,

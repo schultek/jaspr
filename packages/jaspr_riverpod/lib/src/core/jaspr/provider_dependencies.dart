@@ -1,6 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
 
-part of 'framework.dart';
+part of '../../core.dart';
 
 class ProviderDependencies {
   final Element dependent;
@@ -76,7 +76,7 @@ class ProviderDependencies {
       }
     }
 
-    return watchers[target]!.read();
+    return watchers[target]!.readSafe().valueOrProviderException;
   }
 
   void listen<T>(ProviderListenable<T> target, void Function(T? previous, T value) listener,
