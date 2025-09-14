@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.5.1
 
 - Fixed conflicting analysis error for "Sort children last" quick fix.
 
