@@ -8,10 +8,7 @@ class Page extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return div(
-      styles: Styles(overflow: overflow),
-      children,
-    );
+    return div(styles: Styles(overflow: overflow), children);
   }
 }
 
@@ -23,11 +20,7 @@ class Center extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return div(
-      styles: Styles(
-        display: Display.flex,
-        justifyContent: JustifyContent.center,
-        alignItems: AlignItems.center,
-      ),
+      styles: Styles(display: Display.flex, justifyContent: JustifyContent.center, alignItems: AlignItems.center),
       children,
     );
   }
@@ -41,16 +34,15 @@ class Spacer extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return div(styles: Styles(width: width, height: height), []);
+    return div(
+      styles: Styles(width: width, height: height),
+      [],
+    );
   }
 }
 
 class Padding extends StatelessComponent {
-  const Padding({
-    super.key,
-    required this.padding,
-    required this.children,
-  });
+  const Padding({super.key, required this.padding, required this.children});
 
   final Spacing padding;
   final List<Component> children;
@@ -98,12 +90,7 @@ class Container extends StatelessComponent {
           border: border,
           backgroundColor: color,
         ),
-        if (center)
-          Styles(
-            display: Display.flex,
-            justifyContent: JustifyContent.center,
-            alignItems: AlignItems.center,
-          ),
+        if (center) Styles(display: Display.flex, justifyContent: JustifyContent.center, alignItems: AlignItems.center),
       ]),
       children,
     );
@@ -111,12 +98,7 @@ class Container extends StatelessComponent {
 }
 
 class Column extends StatelessComponent {
-  const Column({
-    super.key,
-    this.mainAxisAlignment,
-    this.crossAxisAlignment,
-    required this.children,
-  });
+  const Column({super.key, this.mainAxisAlignment, this.crossAxisAlignment, required this.children});
 
   final JustifyContent? mainAxisAlignment;
   final AlignItems? crossAxisAlignment;
@@ -138,12 +120,7 @@ class Column extends StatelessComponent {
 }
 
 class Row extends StatelessComponent {
-  const Row({
-    super.key,
-    this.mainAxisAlignment,
-    this.crossAxisAlignment,
-    required this.children,
-  });
+  const Row({super.key, this.mainAxisAlignment, this.crossAxisAlignment, required this.children});
 
   final JustifyContent? mainAxisAlignment;
   final AlignItems? crossAxisAlignment;
@@ -165,12 +142,7 @@ class Row extends StatelessComponent {
 }
 
 class Grid extends StatelessComponent {
-  const Grid({
-    required this.columns,
-    this.gap,
-    this.spread = false,
-    required this.children,
-  });
+  const Grid({required this.columns, this.gap, this.spread = false, required this.children});
 
   final int columns;
   final Unit? gap;
@@ -180,11 +152,13 @@ class Grid extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return div(
-      styles: Styles(raw: {
-        "display": "grid",
-        "grid-template-columns": "repeat($columns, ${spread ? "1fr" : "0fr"})",
-        if (gap != null) "gap": gap!.value,
-      }),
+      styles: Styles(
+        raw: {
+          "display": "grid",
+          "grid-template-columns": "repeat($columns, ${spread ? "1fr" : "0fr"})",
+          if (gap != null) "gap": gap!.value,
+        },
+      ),
       children,
     );
   }

@@ -14,15 +14,13 @@ class _CounterState extends State<Counter> {
   @override
   Component build(BuildContext context) {
     return fragment([
-      p([
-        text('Count: $count'),
-      ]),
+      p([text('Count: $count')]),
       button(
         events: {
           'click': (_) {
             print("clicked $count");
             setState(() => count++);
-          }
+          },
         },
         [text('Increment')],
       ),

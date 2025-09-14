@@ -41,7 +41,7 @@ final modelExtensionOutputs = {
         "encoder": "toRaw",
         "import": "package:site/model_extension.dart",
         "typeImport": "package:site/model_type.dart",
-      }
-    ]
+      },
+    ],
   }),
 };

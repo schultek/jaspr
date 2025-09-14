@@ -24,31 +24,33 @@ Future<ProjectData> loadProjectFromDirectory(String id, String dirPath) async {
   } else {
     var files = await dir.list().toList();
 
-    await Future.wait(files.map((file) async {
-      if ((await file.stat()).type == FileSystemEntityType.directory) {
-        return;
-      }
-
-      var name = path.basename(file.path);
-      Future<String> read() => File(file.path).readAsString();
-
-      if (name == 'main.dart') {
-        dart = await read();
-        var config = SampleConfig.from(dart!);
-        if (config != null) {
-          description = config.description;
-          dart = config.source;
+    await Future.wait(
+      files.map((file) async {
+        if ((await file.stat()).type == FileSystemEntityType.directory) {
+          return;
         }
-      } else if (name == 'index.html') {
-        html = await read();
-      } else if (name == 'styles.css') {
-        css = await read();
-      } else if (name.endsWith('.dart')) {
-        dartFiles[name] = await read();
-      } else {
-        print('[WARNING] Unsupported file $name in sample $id');
-      }
-    }));
+
+        var name = path.basename(file.path);
+        Future<String> read() => File(file.path).readAsString();
+
+        if (name == 'main.dart') {
+          dart = await read();
+          var config = SampleConfig.from(dart!);
+          if (config != null) {
+            description = config.description;
+            dart = config.source;
+          }
+        } else if (name == 'index.html') {
+          html = await read();
+        } else if (name == 'styles.css') {
+          css = await read();
+        } else if (name.endsWith('.dart')) {
+          dartFiles[name] = await read();
+        } else {
+          print('[WARNING] Unsupported file $name in sample $id');
+        }
+      }),
+    );
 
     if (dart == null) {
       throw MainDartFileMissingException();

@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/type_visitor.dart';
@@ -10,8 +8,8 @@ import 'package:source_gen/source_gen.dart';
 import '../utils.dart';
 import 'codec_module_builder.dart';
 
-final encoderChecker = TypeChecker.fromRuntime(EncoderAnnotation);
-final decoderChecker = TypeChecker.fromRuntime(DecoderAnnotation);
+final encoderChecker = TypeChecker.typeNamed(EncoderAnnotation, inPackage: 'jaspr');
+final decoderChecker = TypeChecker.typeNamed(DecoderAnnotation, inPackage: 'jaspr');
 
 typedef Codecs = Map<String, CodecElement>;
 

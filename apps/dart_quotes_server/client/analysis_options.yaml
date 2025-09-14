@@ -8,6 +8,10 @@
 #   rules:
 #     - camel_case_types
 
-analyzer:
+# analyzer:
 #   exclude:
 #     - path/to/excluded/files/**
+
+formatter: 
+  page_width: 120
+  trailing_commas: preserve

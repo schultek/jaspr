@@ -1,7 +1,8 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:jaspr/server.dart' hide Response;
-import 'package:backend_dart_frog/jaspr_options.dart';
 import 'package:shelf/shelf.dart' as shelf;
+
+import 'jaspr_options.dart';
 
 /// Wraps jasprs [serveApp] as a dart_frog middleware.
 ///
@@ -12,9 +13,7 @@ Middleware serveJasprApp() {
 
   return fromShelfMiddleware((handler) {
     return serveApp((request, _) {
-      return handler(request.change(
-        context: {...request.context, '$BasePath': () => BasePath(request.handlerPath)},
-      ));
+      return handler(request.change(context: {...request.context, '$BasePath': () => BasePath(request.handlerPath)}));
     });
   });
 }
@@ -28,18 +27,10 @@ Future<Response> renderJasprComponent(RequestContext context, Component child) a
 
   var response = await renderComponent(
     Document(base: base.path, body: child),
-    request: shelf.Request(
-      context.request.method.name,
-      context.request.url,
-      headers: context.request.headers,
-    ),
+    request: shelf.Request(context.request.method.name, context.request.url, headers: context.request.headers),
   );
 
-  return Response(
-    statusCode: response.statusCode,
-    body: response.body,
-    headers: response.headers,
-  );
+  return Response(statusCode: response.statusCode, body: response.body, headers: response.headers);
 }
 
 class BasePath {

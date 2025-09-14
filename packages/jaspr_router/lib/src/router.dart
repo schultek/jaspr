@@ -15,25 +15,14 @@ import 'typedefs.dart';
 
 /// Router component.
 class Router extends StatefulComponent {
-  Router({
-    required this.routes,
-    this.errorBuilder,
-    this.redirect,
-    this.redirectLimit = 5,
-    super.key,
-  }) {
+  Router({required this.routes, this.errorBuilder, this.redirect, this.redirectLimit = 5, super.key}) {
     _configuration = RouteConfiguration(
       routes: routes,
       redirectLimit: redirectLimit,
       topRedirect: redirect ?? (_, __) => null,
     );
-    _parser = RouteInformationParser(
-      configuration: _configuration,
-    );
-    _builder = RouteBuilder(
-      configuration: _configuration,
-      errorBuilder: errorBuilder,
-    );
+    _parser = RouteInformationParser(configuration: _configuration);
+    _builder = RouteBuilder(configuration: _configuration, errorBuilder: errorBuilder);
   }
 
   final List<RouteBase> routes;
@@ -77,9 +66,12 @@ class RouterState extends State<Router> with PreloadStateMixin {
   @override
   void initState() {
     super.initState();
-    PlatformRouter.instance.history.init(context, onChangeState: (state, {url}) {
-      _update(url ?? context.url, extra: state, updateHistory: false, replace: true);
-    });
+    PlatformRouter.instance.history.init(
+      context,
+      onChangeState: (state, {url}) {
+        _update(url ?? context.url, extra: state, updateHistory: false, replace: true);
+      },
+    );
     if (_matchList == null) {
       assert(context.binding.isClient);
       initRoutes();
@@ -191,12 +183,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
     return component._configuration.namedLocation(name, params: params, queryParams: queryParams);
   }
 
-  Future<void> _update(
-    String location, {
-    Object? extra,
-    bool updateHistory = true,
-    bool replace = false,
-  }) {
+  Future<void> _update(String location, {Object? extra, bool updateHistory = true, bool replace = false}) {
     return _matchRoute(location, extra: extra).then((match) {
       if (!mounted) return;
       setState(() {

@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
+
+import '../../constants/theme.dart';
 
 final jasprTheme = {
   'root': Styles(color: textDark),

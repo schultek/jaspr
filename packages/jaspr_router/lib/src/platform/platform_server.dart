@@ -47,8 +47,10 @@ class RouteRegistryImpl implements RouteRegistry {
         }
       } else if (route is Route) {
         var p = path + (path.endsWith('/') || route.path.startsWith('/') ? '' : '/') + route.path;
-        assert(route.pathParams.isEmpty,
-            'Routes with path parameters are not supported when using static-site generation.');
+        assert(
+          route.pathParams.isEmpty,
+          'Routes with path parameters are not supported when using static-site generation.',
+        );
         paths[p] = route.settings;
         for (var route in route.routes) {
           registerRoute(route, p);

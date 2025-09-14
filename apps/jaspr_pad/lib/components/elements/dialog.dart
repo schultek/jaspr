@@ -22,12 +22,7 @@ class DialogAction {
   DialogAction(this.label, this.result);
 }
 
-enum DialogResult {
-  yes,
-  no,
-  ok,
-  cancel,
-}
+enum DialogResult { yes, no, ok, cancel }
 
 Future<T?> showDialog<T>(BuildContext context, {required String slotId, required ComponentBuilder builder}) {
   var completer = Completer<T?>();

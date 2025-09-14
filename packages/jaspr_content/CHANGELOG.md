@@ -1,16 +1,13 @@
-## Unreleased minor dev.0
+## 0.4.1
+
+- `jaspr` upgraded to `0.21.1`
+- `jaspr_router` upgraded to `0.7.3`
+
+## 0.4.0
 
 - The `LiquidTemplateEngine` is no longer `const`.
 - Fixed resolution of partial files in `LiquidTemplateEngine`.
 - Skip adding a `<style>` element for an empty `ContentTheme`.
-
-## 0.3.1-dev.1
-
-- `jaspr` upgraded to `0.21.0-dev.1`
-- `jaspr_router` upgraded to `0.7.2-dev.1`
-
-## 0.3.1-dev.0
-
 - Fixed `HtmlParser` to treat html files as fragments.
 
 ## 0.3.0

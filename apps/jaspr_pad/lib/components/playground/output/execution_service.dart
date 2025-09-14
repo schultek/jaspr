@@ -81,7 +81,8 @@ class ExecutionService {
     _frame.src = src;
   }
 
-  String get testResultDecoration => '''
+  String get testResultDecoration =>
+      '''
 void _result(bool success, [List<String> messages = const []]) {
   // Join messages into a comma-separated list for inclusion in the JSON array.
   final joinedMessages = messages.map((m) => '"\$m"').join(',');
@@ -96,11 +97,7 @@ var resultFunction = _result;
 Never TODO([String message = '']) => throw UnimplementedError(message);
 ''';
 
-  String _decorateJavaScript(
-    String javaScript, {
-    required String? modulesBaseUrl,
-    required bool requireFirebase,
-  }) {
+  String _decorateJavaScript(String javaScript, {required String? modulesBaseUrl, required bool requireFirebase}) {
     final completeScript = StringBuffer();
     final usesRequireJs = modulesBaseUrl != null;
     // postMessagePrint:
@@ -214,10 +211,7 @@ require(["dartpad_main", "dart_sdk"], function(dartpad_main, dart_sdk) {
   Stream<TestResult> get testResults => _testResultsController.stream;
 
   Future<void> _send(String command, Map<String, Object> params) {
-    final message = {
-      'command': command,
-      ...params,
-    };
+    final message = {'command': command, ...params};
     _frame.contentWindow?.postMessage(message, '*');
     lastCommand = message;
 
@@ -242,8 +236,9 @@ require(["dartpad_main", "dart_sdk"], function(dartpad_main, dart_sdk) {
         final type = data['type'] as String?;
 
         if (type == 'testResult') {
-          _testResultsController
-              .add(TestResult(data['success'] as bool, List<String>.from(data['messages'] as Iterable? ?? [])));
+          _testResultsController.add(
+            TestResult(data['success'] as bool, List<String>.from(data['messages'] as Iterable? ?? [])),
+          );
         } else if (type == 'stderr') {
           // Ignore any exceptions before the iframe has completed initialization.
           if (_readyCompleter.isCompleted) {

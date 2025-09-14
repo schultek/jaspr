@@ -39,10 +39,10 @@ class DaemonLogger implements Logger {
   DaemonLogger();
 
   static Stream<Map<String, dynamic>> get stdinCommandStream => stdin
-          .transform<String>(utf8.decoder)
-          .transform<String>(const LineSplitter())
-          .where((String line) => line.startsWith('[{') && line.endsWith('}]'))
-          .map<Map<String, dynamic>>((String line) {
+      .transform<String>(utf8.decoder)
+      .transform<String>(const LineSplitter())
+      .where((String line) => line.startsWith('[{') && line.endsWith('}]'))
+      .map<Map<String, dynamic>>((String line) {
         line = line.substring(1, line.length - 1);
         return json.decode(line) as Map<String, dynamic>;
       });
@@ -74,16 +74,11 @@ class DaemonLogger implements Logger {
       const vmUriPrefix = "The Dart VM service is listening on ";
       if (message.startsWith(vmUriPrefix)) {
         final uri = message.substring(vmUriPrefix.length);
-        event("server.started", {
-          "vmServiceUri": uri,
-        });
+        event("server.started", {"vmServiceUri": uri});
         return;
       }
 
-      event("server.log", {
-        'message': message,
-        'level': level.name,
-      });
+      event("server.log", {'message': message, 'level': level.name});
 
       if (level.index < Level.error.index) {
         return;

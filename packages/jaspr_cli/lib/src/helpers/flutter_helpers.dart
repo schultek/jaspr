@@ -30,7 +30,7 @@ mixin FlutterHelper on BaseCommand {
         '.dart_tool/jaspr/flutter_target.dart',
         '--web-port=$flutterPort',
         if (wasm) '--wasm',
-        if (argResults!['release']) '--release'
+        if (argResults!['release']) '--release',
       ],
       runInShell: true,
       workingDirectory: Directory.current.path,
@@ -51,22 +51,16 @@ mixin FlutterHelper on BaseCommand {
         'web',
         '-t',
         '.dart_tool/jaspr/flutter_target.dart',
-        if (wasm) '--wasm',
+        if (wasm) '--wasm' else '--no-wasm-dry-run',
         '--output=build/flutter',
       ],
       runInShell: true,
       workingDirectory: Directory.current.path,
     );
 
-    var target = config.mode != JasprMode.server ? 'build/jaspr' : 'build/jaspr/web';
+    var target = project.requireMode != JasprMode.server ? 'build/jaspr' : 'build/jaspr/web';
 
-    var moveTargets = [
-      'version.json',
-      'flutter_service_worker.js',
-      'flutter_bootstrap.js',
-      'assets/',
-      'canvaskit/',
-    ];
+    var moveTargets = ['version.json', 'flutter_service_worker.js', 'flutter_bootstrap.js', 'assets/', 'canvaskit/'];
 
     await watchProcess('flutter build', flutterProcess, tag: Tag.flutter);
 

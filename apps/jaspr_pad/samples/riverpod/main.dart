@@ -14,10 +14,12 @@ class App extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return div([
-      Builder(builder: (context) {
-        var count = context.watch(counterProvider);
-        return text('Count is $count');
-      }),
+      Builder(
+        builder: (context) {
+          var count = context.watch(counterProvider);
+          return text('Count is $count');
+        },
+      ),
       button(
         onClick: () {
           context.read(counterProvider.notifier).state++;

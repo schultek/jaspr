@@ -94,13 +94,15 @@ class FilesystemLoader extends RouteLoaderBase {
       for (final entry in dir.listSync()) {
         final path = entry.path.substring(root.path.length + 1);
         if (entry is File) {
-          entities.add(FilePageSource(
-            path,
-            entry,
-            this,
-            keepSuffix: keepSuffixPattern?.matchAsPrefix(entry.path) != null,
-            context: fileSystem.path,
-          ));
+          entities.add(
+            FilePageSource(
+              path,
+              entry,
+              this,
+              keepSuffix: keepSuffixPattern?.matchAsPrefix(entry.path) != null,
+              context: fileSystem.path,
+            ),
+          );
         } else if (entry is Directory) {
           entities.addAll(loadFiles(entry));
         }
@@ -112,13 +114,15 @@ class FilesystemLoader extends RouteLoaderBase {
   }
 
   void addFile(String path) {
-    addSource(FilePageSource(
-      path.substring(directory.length + 1),
-      fileSystem.file(path),
-      this,
-      keepSuffix: keepSuffixPattern?.matchAsPrefix(path) != null,
-      context: fileSystem.path,
-    ));
+    addSource(
+      FilePageSource(
+        path.substring(directory.length + 1),
+        fileSystem.file(path),
+        this,
+        keepSuffix: keepSuffixPattern?.matchAsPrefix(path) != null,
+        context: fileSystem.path,
+      ),
+    );
   }
 
   void removeFile(String path) {
@@ -154,13 +158,7 @@ class FilesystemLoader extends RouteLoaderBase {
 }
 
 class FilePageSource extends PageSource {
-  FilePageSource(
-    super.path,
-    this.file,
-    super.loader, {
-    super.keepSuffix,
-    super.context,
-  });
+  FilePageSource(super.path, this.file, super.loader, {super.keepSuffix, super.context});
 
   final File file;
 
@@ -168,12 +166,6 @@ class FilePageSource extends PageSource {
   Future<Page> buildPage() async {
     final content = await file.readAsString();
 
-    return Page(
-      path: this.path,
-      url: url,
-      content: content,
-      config: config,
-      loader: loader,
-    );
+    return Page(path: this.path, url: url, content: content, config: config, loader: loader);
   }
 }

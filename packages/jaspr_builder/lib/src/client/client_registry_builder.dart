@@ -19,19 +19,21 @@ class ClientRegistryBuilder implements Builder {
         await buildStep.writeAsFormattedDart(outputId, source);
       }
     } catch (e, st) {
-      print('An unexpected error occurred.\n'
-          'This is probably a bug in jaspr_builder.\n'
-          'Please report this here: '
-          'https://github.com/schultek/jaspr/issues\n\n'
-          'The error was:\n$e\n\n$st');
+      print(
+        'An unexpected error occurred.\n'
+        'This is probably a bug in jaspr_builder.\n'
+        'Please report this here: '
+        'https://github.com/schultek/jaspr/issues\n\n'
+        'The error was:\n$e\n\n$st',
+      );
       rethrow;
     }
   }
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-        'lib/\$lib\$': ['web/main.clients.dart']
-      };
+    'lib/\$lib\$': ['web/main.clients.dart'],
+  };
 
   Future<String?> generateClients(BuildStep buildStep) async {
     final pubspecYaml = await buildStep.readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
@@ -41,10 +43,7 @@ class ClientRegistryBuilder implements Builder {
       return null;
     }
 
-    var (clients, sources) = await (
-      buildStep.loadClients(),
-      buildStep.loadTransitiveSources(),
-    ).wait;
+    var (clients, sources) = await (buildStep.loadClients(), buildStep.loadTransitiveSources()).wait;
 
     clients = clients.where((c) => sources.contains(c.id)).toList();
 
@@ -54,20 +53,21 @@ class ClientRegistryBuilder implements Builder {
 
     final package = buildStep.inputId.package;
 
-    var source = '''
+    var source =
+        '''
       import 'package:jaspr/browser.dart';
       [[/]]
       
       void main() {
         registerClients({
           ${clients.map((c) {
-      final id = c.resolveId(package);
-      final import = c.import.replaceFirst('.dart', '.client.dart');
+          final id = c.resolveId(package);
+          final import = c.import.replaceFirst('.dart', '.client.dart');
 
-      return '''
+          return '''
         '$id': loadClient([[$import]].loadLibrary, (p) => [[$import]].getComponentForParams(p)),
       ''';
-    }).join('\n')}
+        }).join('\n')}
         });
       }
     ''';

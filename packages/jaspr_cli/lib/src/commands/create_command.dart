@@ -33,9 +33,7 @@ class CreateCommand extends BaseCommand {
       abbr: 't',
       help: 'The template to use for the project.',
       allowed: ['docs'],
-      allowedHelp: {
-        'docs': 'A template for creating a documentation site with jaspr_content.',
-      },
+      allowedHelp: {'docs': 'A template for creating a documentation site with jaspr_content.'},
     );
     argParser.addFlag(
       'pub-get',
@@ -49,13 +47,13 @@ class CreateCommand extends BaseCommand {
       abbr: 'm',
       help: 'Choose a rendering mode for the project.',
       allowed: [
-        for (var m in RenderingMode.values) ...[m.name, if (m.useServer) '${m.name}:auto']
+        for (var m in RenderingMode.values) ...[m.name, if (m.useServer) '${m.name}:auto'],
       ],
       allowedHelp: {
         for (var v in RenderingMode.values) ...{
           v.name: '${v.help}.',
           if (v.useServer) '${v.name}:auto': '${v.recommend}${v.help} with automatic client-side hydration.',
-        }
+        },
       },
     );
     argParser.addOption(
@@ -77,7 +75,7 @@ class CreateCommand extends BaseCommand {
       allowedHelp: {
         'none': 'No preconfigured Flutter support.',
         'embedded': 'Sets up an embedded Flutter app inside your site.',
-        'plugins-only': '(Recommended) Enables support for using Flutter web plugins.'
+        'plugins-only': '(Recommended) Enables support for using Flutter web plugins.',
       },
     );
     argParser.addOption(
@@ -85,10 +83,7 @@ class CreateCommand extends BaseCommand {
       abbr: 'b',
       help: 'Choose the backend setup for the project (only valid in "server" mode).',
       allowed: ['none', 'shelf'],
-      allowedHelp: {
-        'none': 'No custom backend setup.',
-        'shelf': 'Sets up a custom backend using the shelf package.',
-      },
+      allowedHelp: {'none': 'No custom backend setup.', 'shelf': 'Sets up a custom backend using the shelf package.'},
     );
   }
 
@@ -105,9 +100,6 @@ class CreateCommand extends BaseCommand {
 
   @override
   String get category => 'Project';
-
-  @override
-  bool get requiresPubspec => false;
 
   late final bool runPubGet = argResults!['pub-get'] as bool;
 
@@ -139,12 +131,7 @@ class CreateCommand extends BaseCommand {
 
     var webCompilersPackage = usePlugins ? 'jaspr_web_compilers' : 'build_web_compilers';
 
-    var [
-      jasprFlutterEmbedVersion,
-      jasprRouterVersion,
-      jasprLintsVersion,
-      webCompilersVersion,
-    ] = await Future.wait([
+    var [jasprFlutterEmbedVersion, jasprRouterVersion, jasprLintsVersion, webCompilersVersion] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
       updater.getLatestVersion('jaspr_lints'),
@@ -181,12 +168,19 @@ class CreateCommand extends BaseCommand {
     if (runPubGet) {
       var process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
 
-      await watchProcess('pub', process,
-          tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s == '...' || s.contains('+'));
+      await watchProcess(
+        'pub',
+        process,
+        tag: Tag.cli,
+        progress: 'Resolving dependencies...',
+        hide: (s) => s == '...' || s.contains('+'),
+      );
     }
 
-    logger.write('\n'
-        'Created project $name! In order to get started, run the following commands:\n\n');
+    logger.write(
+      '\n'
+      'Created project $name! In order to get started, run the following commands:\n\n',
+    );
 
     var relativePath = p.relative(dir.path, from: Directory.current.absolute.path);
     if (relativePath != '.') {
@@ -197,11 +191,7 @@ class CreateCommand extends BaseCommand {
     return 0;
   }
 
-  Future<int> createFromTemplate(
-    String template,
-    Directory dir,
-    String name,
-  ) async {
+  Future<int> createFromTemplate(String template, Directory dir, String name) async {
     final bundle = templates[template];
     if (bundle == null) {
       usageException('Template "$template" not found.');
@@ -248,12 +238,19 @@ class CreateCommand extends BaseCommand {
     if (runPubGet) {
       var process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
 
-      await watchProcess('pub', process,
-          tag: Tag.cli, progress: 'Resolving dependencies...', hide: (s) => s == '...' || s.contains('+'));
+      await watchProcess(
+        'pub',
+        process,
+        tag: Tag.cli,
+        progress: 'Resolving dependencies...',
+        hide: (s) => s == '...' || s.contains('+'),
+      );
     }
 
-    logger.write('\n'
-        'Created project $name! In order to get started, run the following commands:\n\n');
+    logger.write(
+      '\n'
+      'Created project $name! In order to get started, run the following commands:\n\n',
+    );
 
     var relativePath = p.relative(dir.path, from: Directory.current.absolute.path);
     if (relativePath != '.') {
@@ -293,15 +290,16 @@ class CreateCommand extends BaseCommand {
       [var m, 'auto'] => (RenderingMode.values.byName(m), true),
       [var m] => (RenderingMode.values.byName(m), false),
       _ => () {
-          var mode = logger.logger!.chooseOne(
-            'Select a rendering mode:',
-            choices: RenderingMode.values,
-            display: (o) => '${o.name}: ${o.help}.',
-          );
-          var hydration = mode.useServer &&
-              logger.logger!.confirm('(Recommended) Enable automatic hydration on the client?', defaultValue: true);
-          return (mode, hydration);
-        }(),
+        var mode = logger.logger!.chooseOne(
+          'Select a rendering mode:',
+          choices: RenderingMode.values,
+          display: (o) => '${o.name}: ${o.help}.',
+        );
+        var hydration =
+            mode.useServer &&
+            logger.logger!.confirm('(Recommended) Enable automatic hydration on the client?', defaultValue: true);
+        return (mode, hydration);
+      }(),
     };
   }
 
@@ -311,22 +309,23 @@ class CreateCommand extends BaseCommand {
     return switch (opt) {
       'none' => (false, false),
       'single-page' => (true, false),
-      'multi-page' => !useServer
-          ? usageException("Cannot use multi-page routing in client mode.")
-          : !useHydration
-              ? usageException("Cannot use multi-page routing with manual hydration.")
-              : (true, true),
+      'multi-page' =>
+        !useServer
+            ? usageException("Cannot use multi-page routing in client mode.")
+            : !useHydration
+            ? usageException("Cannot use multi-page routing with manual hydration.")
+            : (true, true),
       _ => () {
-          var routing = logger.logger!.confirm('Setup routing for different pages of your site?', defaultValue: true);
-          var multiPage = routing && useServer && useHydration
-              ? logger.logger!.confirm(
-                  '(Recommended) Use multi-page (server-side) routing? '
-                  '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',
-                  defaultValue: true,
-                )
-              : false;
-          return (routing, multiPage);
-        }(),
+        var routing = logger.logger!.confirm('Setup routing for different pages of your site?', defaultValue: true);
+        var multiPage = routing && useServer && useHydration
+            ? logger.logger!.confirm(
+                '(Recommended) Use multi-page (server-side) routing? '
+                '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',
+                defaultValue: true,
+              )
+            : false;
+        return (routing, multiPage);
+      }(),
     };
   }
 
@@ -338,14 +337,12 @@ class CreateCommand extends BaseCommand {
       'embedded' => (true, true),
       'plugins-only' => (false, true),
       _ => () {
-          var flutter = logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
-          var plugins = flutter ||
-              logger.logger!.confirm(
-                'Enable support for using Flutter web plugins in your project?',
-                defaultValue: true,
-              );
-          return (flutter, plugins);
-        }(),
+        var flutter = logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
+        var plugins =
+            flutter ||
+            logger.logger!.confirm('Enable support for using Flutter web plugins in your project?', defaultValue: true);
+        return (flutter, plugins);
+      }(),
     };
   }
 
@@ -356,32 +353,32 @@ class CreateCommand extends BaseCommand {
       'none' => null,
       String b => b,
       null => () {
-          var backend = logger.logger!.confirm(
-            'Use a custom backend package or framework for the server part of your project?',
-            defaultValue: false,
-          );
-          if (!backend) return null;
+        var backend = logger.logger!.confirm(
+          'Use a custom backend package or framework for the server part of your project?',
+          defaultValue: false,
+        );
+        if (!backend) return null;
 
-          var b = logger.logger!
-              .chooseOne(
-                'Select a backend framework:',
-                choices: [
-                  ('shelf', 'Shelf: An official and well-supported minimal server package by the Dart Team.'),
-                  (
-                    'dart_frog',
-                    'Dart Frog: (Coming Soon) A fast, minimalistic backend framework for Dart built by Very Good Ventures.'
-                  ),
-                ],
-                display: (o) => o.$2,
-              )
-              .$1;
+        var b = logger.logger!
+            .chooseOne(
+              'Select a backend framework:',
+              choices: [
+                ('shelf', 'Shelf: An official and well-supported minimal server package by the Dart Team.'),
+                (
+                  'dart_frog',
+                  'Dart Frog: (Coming Soon) A fast, minimalistic backend framework for Dart built by Very Good Ventures.',
+                ),
+              ],
+              display: (o) => o.$2,
+            )
+            .$1;
 
-          if (b == 'dart_frog') {
-            usageException('Support for Dart Frog is coming soon.');
-          }
+        if (b == 'dart_frog') {
+          usageException('Support for Dart Frog is coming soon.');
+        }
 
-          return b;
-        }(),
+        return b;
+      }(),
     };
   }
 }
@@ -392,8 +389,12 @@ class ScaffoldGeneratorTarget extends DirectoryGeneratorTarget {
   final Set<String> prefixes;
 
   @override
-  Future<GeneratedFile> createFile(String path, List<int> contents,
-      {m.Logger? logger, OverwriteRule? overwriteRule}) async {
+  Future<GeneratedFile> createFile(
+    String path,
+    List<int> contents, {
+    m.Logger? logger,
+    OverwriteRule? overwriteRule,
+  }) async {
     var filename = p.basename(path);
     if (filename.contains('#')) {
       var [prefix, ...] = filename.split('#');

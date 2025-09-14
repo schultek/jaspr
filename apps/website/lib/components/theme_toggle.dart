@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
-import 'package:website/constants/theme.dart';
 
+import '../constants/theme.dart';
 import 'icon.dart';
 
 class ThemeToggle extends StatefulComponent {
@@ -29,10 +29,14 @@ class ThemeToggleState extends State<ThemeToggle> {
       if (kIsWeb)
         Document.html(attributes: {'class': isDark ? 'dark' : 'light'})
       else
-        Document.head(children: [
-          // ignore: prefer_html_methods
-          Component.element(id: 'theme-script', tag: 'script', children: [
-            raw('''
+        Document.head(
+          children: [
+            // ignore: prefer_html_methods
+            Component.element(
+              id: 'theme-script',
+              tag: 'script',
+              children: [
+                raw('''
             let userTheme = window.localStorage.getItem('active-theme');
             if (userTheme != null) {
               document.documentElement.className = userTheme;
@@ -41,9 +45,11 @@ class ThemeToggleState extends State<ThemeToggle> {
             } else {
               document.documentElement.className = 'light';
             }
-          ''')
-          ]),
-        ]),
+          '''),
+              ],
+            ),
+          ],
+        ),
       button(
         classes: 'theme-toggle',
         attributes: {'aria-label': 'Theme Toggle'},
@@ -61,20 +67,18 @@ class ThemeToggleState extends State<ThemeToggle> {
 
   @css
   static List<StyleRule> get styles => [
-        css('.theme-toggle', [
-          css('&').styles(
-            display: Display.flex,
-            padding: Padding.all(.7.rem),
-            border: Border.unset,
-            radius: BorderRadius.circular(8.px),
-            outline: Outline.unset,
-            alignItems: AlignItems.center,
-            color: textBlack,
-            backgroundColor: Colors.transparent,
-          ),
-          css('&:hover').styles(
-            backgroundColor: hoverOverlayColor,
-          ),
-        ]),
-      ];
+    css('.theme-toggle', [
+      css('&').styles(
+        display: Display.flex,
+        padding: Padding.all(.7.rem),
+        border: Border.unset,
+        radius: BorderRadius.circular(8.px),
+        outline: Outline.unset,
+        alignItems: AlignItems.center,
+        color: textBlack,
+        backgroundColor: Colors.transparent,
+      ),
+      css('&:hover').styles(backgroundColor: hoverOverlayColor),
+    ]),
+  ];
 }

@@ -243,7 +243,5 @@ class Factory<T> {
 
 /// Linearly interpolate between two `Duration`s.
 Duration lerpDuration(Duration a, Duration b, double t) {
-  return Duration(
-    microseconds: (a.inMicroseconds + (b.inMicroseconds - a.inMicroseconds) * t).round(),
-  );
+  return Duration(microseconds: (a.inMicroseconds + (b.inMicroseconds - a.inMicroseconds) * t).round());
 }

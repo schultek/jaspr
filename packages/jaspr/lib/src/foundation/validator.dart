@@ -23,20 +23,8 @@ class DomValidator {
     'track',
     'wbr',
   };
-  static const _strictWhitespace = <String>{
-    'p',
-    'h1',
-    'h2',
-    'h3',
-    'h4',
-    'h5',
-    'h6',
-    'label',
-  };
-  static const _strictFormatting = <String>{
-    'span',
-    'pre',
-  };
+  static const _strictWhitespace = <String>{'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'label'};
+  static const _strictFormatting = <String>{'span', 'pre'};
   static final whitespace = RegExp(r'\s');
   static final _tags = <String>{};
   static final _attrs = <String>{};
@@ -81,7 +69,12 @@ class DomValidator {
 
   String unescapeMarkerText(String text) {
     return text.replaceAllMapped(_escapeRegex, (match) {
-      return switch (match.group(1)) { 'amp' => '&', 'lt' => '<', 'gt' => '>', _ => match.group(0)! };
+      return switch (match.group(1)) {
+        'amp' => '&',
+        'lt' => '<',
+        'gt' => '>',
+        _ => match.group(0)!,
+      };
     });
   }
 

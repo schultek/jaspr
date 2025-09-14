@@ -1,5 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError;
+import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -11,12 +11,12 @@ enum ComponentType { text, element, fragment }
 
 class PreferHtmlMethodLint extends DartLintRule {
   PreferHtmlMethodLint()
-      : super(
-          code: LintCode(
-            name: 'prefer_html_methods',
-            problemMessage: "Prefer using '{0}(...)' over 'Component.element(tag: \"{0}\", ...)'",
-          ),
-        );
+    : super(
+        code: LintCode(
+          name: 'prefer_html_methods',
+          problemMessage: "Prefer using '{0}(...)' over 'Component.element(tag: \"{0}\", ...)'",
+        ),
+      );
 
   final textCode = LintCode(
     name: 'prefer_html_methods',
@@ -29,9 +29,9 @@ class PreferHtmlMethodLint extends DartLintRule {
   );
 
   @override
-  void run(CustomLintResolver resolver, ErrorReporter reporter, CustomLintContext context) {
+  void run(CustomLintResolver resolver, DiagnosticReporter reporter, CustomLintContext context) {
     context.registry.addInstanceCreationExpression((node) {
-      if (node.constructorName.type.name2.lexeme != 'Component') {
+      if (node.constructorName.type.name.lexeme != 'Component') {
         return;
       }
       if (!isComponentType(node.staticType)) {
@@ -55,7 +55,7 @@ class PreferHtmlMethodLint extends DartLintRule {
         reporter.atOffset(
           offset: node.constructorName.offset,
           length: node.constructorName.length,
-          errorCode: code,
+          diagnosticCode: code,
           arguments: [tag],
           data: (ComponentType.element, node, tag),
         );
@@ -64,7 +64,7 @@ class PreferHtmlMethodLint extends DartLintRule {
         reporter.atOffset(
           offset: node.constructorName.offset,
           length: node.constructorName.length,
-          errorCode: textCode,
+          diagnosticCode: textCode,
           data: (ComponentType.text, node),
         );
       }
@@ -72,7 +72,7 @@ class PreferHtmlMethodLint extends DartLintRule {
         reporter.atOffset(
           offset: node.constructorName.offset,
           length: node.constructorName.length,
-          errorCode: fragmentCode,
+          diagnosticCode: fragmentCode,
           data: (ComponentType.fragment, node),
         );
       }
@@ -89,8 +89,8 @@ class PreferHtmlMethodFix extends DartFix {
     CustomLintResolver resolver,
     ChangeReporter reporter,
     CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
+    Diagnostic analysisError,
+    List<Diagnostic> others,
   ) {
     if (analysisError.data case (ComponentType.element, InstanceCreationExpression node, String tag)) {
       reporter.createChangeBuilder(message: 'Convert to $tag() method', priority: 2).addDartFileEdit((builder) {

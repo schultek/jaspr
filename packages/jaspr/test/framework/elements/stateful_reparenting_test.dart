@@ -37,9 +37,8 @@ void main() {
   group('stateful reparenting test', () {
     testComponents('should keep state on reparenting', (tester) async {
       var component = FakeComponent(
-          child: InheritedData(
-        child: MyStatefulComponent(key: myKey),
-      ));
+        child: InheritedData(child: MyStatefulComponent(key: myKey)),
+      );
       tester.pumpComponent(component);
 
       // phase 1: component should be mounted directly
@@ -53,11 +52,7 @@ void main() {
       state.lifecycle.clear();
 
       // phase 2: component should be mounted as child of a div element
-      component.updateChild(InheritedData(
-        child: div([
-          MyStatefulComponent(key: myKey),
-        ]),
-      ));
+      component.updateChild(InheritedData(child: div([MyStatefulComponent(key: myKey)])));
       await tester.pump();
 
       expect(find.descendant(of: find.tag('div'), matching: find.byType(MyStatefulComponent)), findsOneComponent);

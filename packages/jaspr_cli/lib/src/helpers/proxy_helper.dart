@@ -11,12 +11,14 @@ import '../commands/base_command.dart';
 import '../logging.dart';
 
 mixin ProxyHelper on BaseCommand {
-  Future<HttpServer> startProxy(String port,
-      {required String webPort,
-      required String serverPort,
-      String? flutterPort,
-      bool redirectNotFound = false,
-      void Function(dynamic)? onMessage}) async {
+  Future<HttpServer> startProxy(
+    String port, {
+    required String webPort,
+    required String serverPort,
+    String? flutterPort,
+    bool redirectNotFound = false,
+    void Function(dynamic)? onMessage,
+  }) async {
     var client = http.Client();
     var webdevHandler = proxyHandler(Uri.parse('http://localhost:$webPort'), client: client);
     var flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
@@ -54,14 +56,16 @@ mixin ProxyHelper on BaseCommand {
       }
 
       if (res.statusCode == 404 && redirectNotFound) {
-        return webdevHandler(Request(
-          req.method,
-          req.requestedUri.replace(path: '/'),
-          protocolVersion: req.protocolVersion,
-          headers: req.headers,
-          body: body,
-          encoding: req.encoding,
-        ));
+        return webdevHandler(
+          Request(
+            req.method,
+            req.requestedUri.replace(path: '/'),
+            protocolVersion: req.protocolVersion,
+            headers: req.headers,
+            body: body,
+            encoding: req.encoding,
+          ),
+        );
       }
 
       return res;
@@ -93,28 +97,38 @@ Handler _sseProxyHandler(http.Client client, String webPort, Logger logger) {
 
     req.hijack((channel) {
       final sink = utf8.encoder.startChunkedConversion(channel.sink)
-        ..add('HTTP/1.1 200 OK\r\n'
-            'Content-Type: text/event-stream\r\n'
-            'Cache-Control: no-cache\r\n'
-            'Connection: keep-alive\r\n'
-            'Access-Control-Allow-Credentials: true\r\n'
-            'Access-Control-Allow-Origin: ${req.headers['origin']}\r\n'
-            '\r\n');
+        ..add(
+          'HTTP/1.1 200 OK\r\n'
+          'Content-Type: text/event-stream\r\n'
+          'Cache-Control: no-cache\r\n'
+          'Connection: keep-alive\r\n'
+          'Access-Control-Allow-Credentials: true\r\n'
+          'Access-Control-Allow-Origin: ${req.headers['origin']}\r\n'
+          '\r\n',
+        );
 
       StreamSubscription? serverSseSub;
       StreamSubscription? reqChannelSub;
 
-      serverSseSub = utf8.decoder.bind(serverResponse.stream).listen(sink.add, onDone: () {
-        reqChannelSub?.cancel();
-        sink.close();
-      });
+      serverSseSub = utf8.decoder
+          .bind(serverResponse.stream)
+          .listen(
+            sink.add,
+            onDone: () {
+              reqChannelSub?.cancel();
+              sink.close();
+            },
+          );
 
-      reqChannelSub = channel.stream.listen((_) {
-        // SSE is unidirectional.
-      }, onDone: () {
-        serverSseSub?.cancel();
-        sink.close();
-      });
+      reqChannelSub = channel.stream.listen(
+        (_) {
+          // SSE is unidirectional.
+        },
+        onDone: () {
+          serverSseSub?.cancel();
+          sink.close();
+        },
+      );
     });
   }
 

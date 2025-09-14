@@ -1,20 +1,20 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError;
+import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 class PreferStylesGetterLint extends DartLintRule {
   PreferStylesGetterLint()
-      : super(
-          code: LintCode(
-            name: 'prefer_styles_getter',
-            problemMessage: "Prefer using a getter over a variable declaration for style rules to support hot-reload.",
-          ),
-        );
+    : super(
+        code: LintCode(
+          name: 'prefer_styles_getter',
+          problemMessage: "Prefer using a getter over a variable declaration for style rules to support hot-reload.",
+        ),
+      );
 
   @override
-  void run(CustomLintResolver resolver, ErrorReporter reporter, CustomLintContext context) {
+  void run(CustomLintResolver resolver, DiagnosticReporter reporter, CustomLintContext context) {
     context.registry.addVariableDeclarationList((node) {
       if (node.variables.length != 1) return;
       if (node.parent
@@ -23,14 +23,14 @@ class PreferStylesGetterLint extends DartLintRule {
           when metadata.any(checkCss)) {
         final start = token.offset;
         final end = node.variables.first.name.end;
-        reporter.atOffset(offset: start, length: end - start, errorCode: code, data: node);
+        reporter.atOffset(offset: start, length: end - start, diagnosticCode: code, data: node);
       }
     });
   }
 
   bool checkCss(Annotation a) {
     return a.name.name == 'css' &&
-        a.name.staticElement?.librarySource?.uri.toString() == 'package:jaspr/src/foundation/styles/css.dart';
+        a.name.element?.library?.firstFragment.source.uri.toString() == 'package:jaspr/src/foundation/styles/css.dart';
   }
 
   @override
@@ -43,8 +43,8 @@ class ReplaceWithGetterFix extends DartFix {
     CustomLintResolver resolver,
     ChangeReporter reporter,
     CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
+    Diagnostic analysisError,
+    List<Diagnostic> others,
   ) {
     if (analysisError.data case VariableDeclarationList node) {
       reporter.createChangeBuilder(message: 'Replace with getter', priority: 1).addDartFileEdit((builder) {

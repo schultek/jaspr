@@ -10,9 +10,11 @@
 
 library; // ignore_for_file: no_leading_underscores_for_library_prefixes
 
-import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod/protocol.dart' as _i2;
+import 'package:serverpod/serverpod.dart' as _i1;
+
 import 'example.dart' as _i3;
+
 export 'example.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
@@ -25,10 +27,7 @@ class Protocol extends _i1.SerializationManagerServer {
   static final List<_i2.TableDefinition> targetTableDefinitions = [..._i2.Protocol.targetTableDefinitions];
 
   @override
-  T deserialize<T>(
-    dynamic data, [
-    Type? t,
-  ]) {
+  T deserialize<T>(dynamic data, [Type? t]) {
     t ??= T;
     if (t == _i3.Example) {
       return _i3.Example.fromJson(data) as T;

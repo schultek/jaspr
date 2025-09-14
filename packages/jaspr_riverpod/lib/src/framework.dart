@@ -82,13 +82,7 @@ part 'provider_dependencies.dart';
 @sealed
 class ProviderScope extends StatefulComponent {
   /// {@macro riverpod.provider_scope}
-  const ProviderScope({
-    super.key,
-    this.overrides = const [],
-    this.observers,
-    this.parent,
-    required this.child,
-  });
+  const ProviderScope({super.key, this.overrides = const [], this.observers, this.parent, required this.child});
 
   /// Read the current [ProviderContainer] for a [BuildContext].
   static ProviderContainer containerOf(BuildContext context, {bool listen = true}) {
@@ -96,8 +90,9 @@ class ProviderScope extends StatefulComponent {
   }
 
   static _UncontrolledProviderScopeElement _scopeOf(BuildContext context, {bool listen = true}) {
-    var element = context.getElementForInheritedComponentOfExactType<UncontrolledProviderScope>()
-        as _UncontrolledProviderScopeElement?;
+    var element =
+        context.getElementForInheritedComponentOfExactType<UncontrolledProviderScope>()
+            as _UncontrolledProviderScopeElement?;
 
     if (element == null) {
       throw StateError('No ProviderScope found');
@@ -174,10 +169,7 @@ class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin {
 
     container = ProviderContainer(
       parent: parent,
-      overrides: [
-        _bindingProvider.overrideWithValue(context.binding),
-        ...component.overrides,
-      ],
+      overrides: [_bindingProvider.overrideWithValue(context.binding), ...component.overrides],
       observers: component.observers,
     );
 
@@ -188,8 +180,9 @@ class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin {
     if (component.parent != null) {
       return component.parent;
     } else {
-      final scope = context.getElementForInheritedComponentOfExactType<UncontrolledProviderScope>()?.component
-          as UncontrolledProviderScope?;
+      final scope =
+          context.getElementForInheritedComponentOfExactType<UncontrolledProviderScope>()?.component
+              as UncontrolledProviderScope?;
 
       return scope?.container;
     }
@@ -215,24 +208,16 @@ class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin {
       final parent = _getParent();
 
       if (parent != _debugParentOwner) {
-        throw UnsupportedError(
-          'ProviderScope was rebuilt with a different ProviderScope ancestor',
-        );
+        throw UnsupportedError('ProviderScope was rebuilt with a different ProviderScope ancestor');
       }
       return true;
     }(), '');
     if (_dirty) {
       _dirty = false;
-      container.updateOverrides([
-        _bindingProvider.overrideWithValue(context.binding),
-        ...component.overrides,
-      ]);
+      container.updateOverrides([_bindingProvider.overrideWithValue(context.binding), ...component.overrides]);
     }
 
-    return UncontrolledProviderScope(
-      container: container,
-      child: component.child,
-    );
+    return UncontrolledProviderScope(container: container, child: component.child);
   }
 
   @override
@@ -250,11 +235,7 @@ class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin {
 @sealed
 class UncontrolledProviderScope extends InheritedComponent {
   /// {@macro riverpod.UncontrolledProviderScope}
-  const UncontrolledProviderScope({
-    super.key,
-    required this.container,
-    required super.child,
-  });
+  const UncontrolledProviderScope({super.key, required this.container, required super.child});
 
   /// The [ProviderContainer] exposed to the component tree.
   final ProviderContainer container;

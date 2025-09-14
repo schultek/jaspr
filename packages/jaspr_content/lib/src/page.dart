@@ -80,14 +80,7 @@ class Page {
   }
 
   Page copy() {
-    return Page(
-      path: path,
-      url: url,
-      content: content,
-      initialData: data,
-      config: config,
-      loader: loader,
-    );
+    return Page(path: path, url: url, content: content, initialData: data, config: config, loader: loader);
   }
 
   void markNeedsRebuild() {
@@ -122,27 +115,29 @@ class Page {
   Future<Component> render() async {
     parseFrontmatter();
     await loadData();
-    return AsyncBuilder(builder: (context) async {
-      await renderTemplate(context.pages);
+    return AsyncBuilder(
+      builder: (context) async {
+        await renderTemplate(context.pages);
 
-      if (kGenerateMode) {
-        if (data.page['sitemap'] case final sitemap?) {
-          context.setHeader('jaspr-sitemap-data', jsonEncode(sitemap));
+        if (kGenerateMode) {
+          if (data.page['sitemap'] case final sitemap?) {
+            context.setHeader('jaspr-sitemap-data', jsonEncode(sitemap));
+          }
         }
-      }
 
-      if (InheritedSecondaryOutput.of(context) case final secondaryOutput?) {
-        return secondaryOutput.builder(this);
-      }
+        if (InheritedSecondaryOutput.of(context) case final secondaryOutput?) {
+          return secondaryOutput.builder(this);
+        }
 
-      if (config.rawOutputPattern?.matchAsPrefix(path) != null) {
-        context.setHeader('Content-Type', getContentType());
-        context.setStatusCode(200, responseBody: content);
-        return Component.fragment([]);
-      }
+        if (config.rawOutputPattern?.matchAsPrefix(path) != null) {
+          context.setHeader('Content-Type', getContentType());
+          context.setStatusCode(200, responseBody: content);
+          return Component.fragment([]);
+        }
 
-      return await build();
-    });
+        return await build();
+      },
+    );
   }
 
   Future<Component> build() async {
@@ -387,16 +382,16 @@ class _InheritedPage extends InheritedComponent {
 extension type PageDataMap._(Map<String, Object?> _data) implements Map<String, Object?> {
   /// Data specific to this page, namespaced under 'page' in [data].
   Map<String, Object?> get page => switch (_data['page']) {
-        final Map<String, Object?> nestedPageData => nestedPageData,
-        _ => const {},
-      };
+    final Map<String, Object?> nestedPageData => nestedPageData,
+    _ => const {},
+  };
 
   /// Data declared under the 'site' key in [data],
   /// often loaded from a `_data/site.yml` file and shared across the site.
   Map<String, Object?> get site => switch (_data['site']) {
-        final Map<String, Object?> siteData => siteData,
-        _ => const {},
-      };
+    final Map<String, Object?> siteData => siteData,
+    _ => const {},
+  };
 }
 
 extension on Map<String, Object?> {

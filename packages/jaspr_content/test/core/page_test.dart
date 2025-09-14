@@ -33,10 +33,11 @@ author: Test User
 
       // Assert
       expect(
-          page.data,
-          equals({
-            'page': {'title': 'My Test Page', 'author': 'Test User'}
-          }));
+        page.data,
+        equals({
+          'page': {'title': 'My Test Page', 'author': 'Test User'},
+        }),
+      );
       expect(page.content.trim(), equals('# Hello World'));
     });
 
@@ -88,14 +89,14 @@ author: Test User
         content: 'initial content',
         initialData: {
           'a': 1,
-          'nested': {'x': 100, 'z': 300}
+          'nested': {'x': 100, 'z': 300},
         },
         config: PageConfig(),
         loader: mockLoader,
       );
       final newData = {
         'b': 2,
-        'nested': {'y': 200, 'z': 301}
+        'nested': {'y': 200, 'z': 301},
       };
 
       // Act
@@ -107,7 +108,7 @@ author: Test User
         equals({
           'a': 1,
           'b': 2,
-          'nested': {'x': 100, 'y': 200, 'z': 301}
+          'nested': {'x': 100, 'y': 200, 'z': 301},
         }),
       );
       expect(page.content, 'initial content');

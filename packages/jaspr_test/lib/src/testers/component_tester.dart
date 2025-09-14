@@ -193,8 +193,13 @@ class TestRenderElement extends TestRenderObject implements RenderElement {
   Map<String, EventCallback>? events;
 
   @override
-  void update(String? id, String? classes, Map<String, String>? styles, Map<String, String>? attributes,
-      Map<String, EventCallback>? events) {
+  void update(
+    String? id,
+    String? classes,
+    Map<String, String>? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+  ) {
     this
       ..id = id
       ..classes = classes

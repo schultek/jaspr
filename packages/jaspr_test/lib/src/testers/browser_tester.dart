@@ -58,13 +58,25 @@ class BrowserTester {
   }
 
   Future<void> input(Finder finder, {bool? checked, double? valueAsNumber, String? value, bool pump = true}) async {
-    await _dispatchInputEvent(finder, 'input',
-        checked: checked, valueAsNumber: valueAsNumber, value: value, pump: pump);
+    await _dispatchInputEvent(
+      finder,
+      'input',
+      checked: checked,
+      valueAsNumber: valueAsNumber,
+      value: value,
+      pump: pump,
+    );
   }
 
   Future<void> change(Finder finder, {bool? checked, double? valueAsNumber, String? value, bool pump = true}) async {
-    await _dispatchInputEvent(finder, 'change',
-        checked: checked, valueAsNumber: valueAsNumber, value: value, pump: pump);
+    await _dispatchInputEvent(
+      finder,
+      'change',
+      checked: checked,
+      valueAsNumber: valueAsNumber,
+      value: value,
+      pump: pump,
+    );
   }
 
   Future<void> _dispatchInputEvent(
@@ -75,15 +87,24 @@ class BrowserTester {
     String? value,
     bool pump = true,
   }) async {
-    dispatchEvent(finder, web.InputEvent(type), before: (e) {
-      if (checked != null) (e as web.HTMLInputElement).checked = checked;
-      if (valueAsNumber != null) (e as web.HTMLInputElement).valueAsNumber = valueAsNumber;
-      if (value != null) (e as web.HTMLInputElement).value = value;
-    }, pump: pump);
+    dispatchEvent(
+      finder,
+      web.InputEvent(type),
+      before: (e) {
+        if (checked != null) (e as web.HTMLInputElement).checked = checked;
+        if (valueAsNumber != null) (e as web.HTMLInputElement).valueAsNumber = valueAsNumber;
+        if (value != null) (e as web.HTMLInputElement).value = value;
+      },
+      pump: pump,
+    );
   }
 
-  Future<void> dispatchEvent(Finder finder, web.Event event,
-      {void Function(web.Element)? before, bool pump = true}) async {
+  Future<void> dispatchEvent(
+    Finder finder,
+    web.Event event, {
+    void Function(web.Element)? before,
+    bool pump = true,
+  }) async {
     var element = _findDomElement(finder);
 
     var source = (element.renderObject as DomRenderObject).node;

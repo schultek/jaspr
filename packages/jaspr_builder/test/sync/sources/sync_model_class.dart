@@ -34,7 +34,8 @@ final syncModelClassSources = {
 };
 
 final syncModelClassOutputs = {
-  'site|lib/component.sync.dart': '// dart format off\n'
+  'site|lib/component.sync.dart':
+      '// dart format off\n'
       '// ignore_for_file: type=lint\n'
       '\n'
       '// GENERATED FILE, DO NOT MODIFY\n'

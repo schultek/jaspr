@@ -78,13 +78,15 @@ class GitHubLoader extends RouteLoaderBase {
       if (path.startsWith('/')) path = path.substring(1);
       if (path.isEmpty) continue;
 
-      routes.add(_GitHubPageSource(
-        path,
-        fileUrl,
-        this,
-        accessToken: accessToken,
-        keepSuffix: keepSuffixPattern?.matchAsPrefix(path) != null,
-      ));
+      routes.add(
+        _GitHubPageSource(
+          path,
+          fileUrl,
+          this,
+          accessToken: accessToken,
+          keepSuffix: keepSuffixPattern?.matchAsPrefix(path) != null,
+        ),
+      );
     }
 
     return routes;
@@ -103,32 +105,23 @@ extension type _GitHubTree._(Map<String, Object?> tree) {
 }
 
 class _GitHubPageSource extends PageSource {
-  _GitHubPageSource(
-    super.path,
-    this.blobUrl,
-    super.loader, {
-    this.accessToken,
-    super.keepSuffix = false,
-  });
+  _GitHubPageSource(super.path, this.blobUrl, super.loader, {this.accessToken, super.keepSuffix = false});
 
   final String blobUrl;
   final String? accessToken;
 
   @override
   Future<Page> buildPage() async {
-    final response = await http.get(Uri.parse(blobUrl), headers: {
-      'Accept': 'application/vnd.github.raw+json',
-      if (accessToken != null) 'Authorization': 'Bearer $accessToken',
-      'X-GitHub-Api-Version': '2022-11-28',
-    });
+    final response = await http.get(
+      Uri.parse(blobUrl),
+      headers: {
+        'Accept': 'application/vnd.github.raw+json',
+        if (accessToken != null) 'Authorization': 'Bearer $accessToken',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    );
     final content = response.body;
 
-    return Page(
-      path: path,
-      url: url,
-      content: content,
-      config: config,
-      loader: loader,
-    );
+    return Page(path: path, url: url, content: content, config: config, loader: loader);
   }
 }

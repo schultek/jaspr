@@ -67,7 +67,9 @@ void _applyClients(FutureOr<ClientBuilder> Function(String) fn) {
         // Remove the data string.
         start.textContent = '${DomValidator.clientMarkerPrefix}${comp.$1}';
 
-        final params = comp.$2 != null //
+        final params =
+            comp.$2 !=
+                null //
             ? jsonDecode(const DomValidator().unescapeMarkerText(comp.$2!)) as Map<String, dynamic>
             : <String, dynamic>{};
         unawaited(_runBuilder(name, fn(name), params, between));

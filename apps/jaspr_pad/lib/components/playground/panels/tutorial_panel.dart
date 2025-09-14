@@ -20,9 +20,7 @@ class TutorialPanel extends StatelessComponent {
     }
 
     return div(id: 'steps-panel', [
-      div(id: 'markdown-content', classes: 'custom-scrollbar', [
-        Markdown(markdown: tutorial.step.text),
-      ]),
+      div(id: 'markdown-content', classes: 'custom-scrollbar', [Markdown(markdown: tutorial.step.text)]),
       div(id: 'steps-row', [
         div(id: 'step-button-container', [
           Button(
@@ -33,17 +31,17 @@ class TutorialPanel extends StatelessComponent {
             },
           ),
           div(id: 'steps-container', [
-            div(id: 'steps-label', [
-              text(tutorial.configs[tutorial.currentStep].name),
-            ]),
+            div(id: 'steps-label', [text(tutorial.configs[tutorial.currentStep].name)]),
             div(id: 'steps-menu-items', [
               for (var step in tutorial.configs.reversed)
                 a(
                   href: '',
                   classes: 'step-menu-item',
-                  events: events(onClick: () {
-                    context.read(logicProvider).selectTutorialStep(step.id);
-                  }),
+                  events: events(
+                    onClick: () {
+                      context.read(logicProvider).selectTutorialStep(step.id);
+                    },
+                  ),
                   [text(step.name)],
                 ),
             ]),
@@ -69,7 +67,7 @@ class TutorialPanel extends StatelessComponent {
             },
           ),
         ),
-      ])
+      ]),
     ]);
   }
 }

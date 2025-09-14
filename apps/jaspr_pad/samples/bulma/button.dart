@@ -28,7 +28,8 @@ class Button extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return button(
-      classes: 'button'
+      classes:
+          'button'
           '${color != null ? ' is-${color!.name}' : ''}'
           '${isOutlined ? ' is-outlined' : ''}'
           '${isLoading ? ' is-loading' : ''}'

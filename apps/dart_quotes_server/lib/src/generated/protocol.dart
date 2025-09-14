@@ -38,40 +38,20 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'int?',
           columnDefault: 'nextval(\'quotes_id_seq\'::regclass)',
         ),
-        _i2.ColumnDefinition(
-          name: 'quote',
-          columnType: _i2.ColumnType.text,
-          isNullable: false,
-          dartType: 'String',
-        ),
-        _i2.ColumnDefinition(
-          name: 'author',
-          columnType: _i2.ColumnType.text,
-          isNullable: false,
-          dartType: 'String',
-        ),
-        _i2.ColumnDefinition(
-          name: 'likes',
-          columnType: _i2.ColumnType.json,
-          isNullable: false,
-          dartType: 'List<int>',
-        ),
+        _i2.ColumnDefinition(name: 'quote', columnType: _i2.ColumnType.text, isNullable: false, dartType: 'String'),
+        _i2.ColumnDefinition(name: 'author', columnType: _i2.ColumnType.text, isNullable: false, dartType: 'String'),
+        _i2.ColumnDefinition(name: 'likes', columnType: _i2.ColumnType.json, isNullable: false, dartType: 'List<int>'),
       ],
       foreignKeys: [],
       indexes: [
         _i2.IndexDefinition(
           indexName: 'quotes_pkey',
           tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'id',
-            )
-          ],
+          elements: [_i2.IndexElementDefinition(type: _i2.IndexElementDefinitionType.column, definition: 'id')],
           type: 'btree',
           isUnique: true,
           isPrimary: true,
-        )
+        ),
       ],
       managed: true,
     ),
@@ -80,10 +60,7 @@ class Protocol extends _i1.SerializationManagerServer {
   ];
 
   @override
-  T deserialize<T>(
-    dynamic data, [
-    Type? t,
-  ]) {
+  T deserialize<T>(dynamic data, [Type? t]) {
     t ??= T;
     if (t == _i4.Quote) {
       return _i4.Quote.fromJson(data) as T;

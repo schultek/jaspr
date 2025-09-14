@@ -28,21 +28,29 @@ class ComponentFactoryMigration implements Migration {
     final fragments = <(SourceRange, ArgumentList)>[];
     final wrapDomComponents = <SourceRange>[];
 
-    if (!unit.directives
-        .any((d) => d is ImportDirective && (d.uri.stringValue?.startsWith('package:jaspr/') ?? false))) {
+    if (!unit.directives.any(
+      (d) => d is ImportDirective && (d.uri.stringValue?.startsWith('package:jaspr/') ?? false),
+    )) {
       // Only run if jaspr is imported.
       return;
     }
 
-    unit.accept(ComponentVisitor(onText: (node) {
-      texts.add(node);
-    }, onDomComponent: (node) {
-      domComponents.add(node);
-    }, onWrapDomComponent: (node) {
-      wrapDomComponents.add(node);
-    }, onFragment: (node, arguments) {
-      fragments.add((node, arguments));
-    }));
+    unit.accept(
+      ComponentVisitor(
+        onText: (node) {
+          texts.add(node);
+        },
+        onDomComponent: (node) {
+          domComponents.add(node);
+        },
+        onWrapDomComponent: (node) {
+          wrapDomComponents.add(node);
+        },
+        onFragment: (node, arguments) {
+          fragments.add((node, arguments));
+        },
+      ),
+    );
 
     if (texts.isNotEmpty) {
       reporter.createMigration('Replaced Text() with Component.text()', (builder) {
@@ -72,9 +80,11 @@ class ComponentFactoryMigration implements Migration {
       reporter.createMigration('Replaced Fragment() with Component.fragment()', (builder) {
         for (final (node, arguments) in fragments) {
           builder.replace(node.offset, node.length, 'Component.fragment');
-          final childrenArg = arguments.arguments
-              .where((arg) => arg is NamedExpression && arg.name.label.name == 'children')
-              .firstOrNull as NamedExpression?;
+          final childrenArg =
+              arguments.arguments
+                      .where((arg) => arg is NamedExpression && arg.name.label.name == 'children')
+                      .firstOrNull
+                  as NamedExpression?;
           if (childrenArg != null) {
             final end = childrenArg.expression.offset;
             builder.delete(childrenArg.name.offset, end - childrenArg.name.offset);
@@ -117,13 +127,13 @@ class ComponentVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     final constr = node.constructorName;
-    if (constr.type.name2.lexeme == 'Text' && constr.name == null) {
+    if (constr.type.name.lexeme == 'Text' && constr.name == null) {
       onText(SourceRange(constr.type.offset, constr.type.length));
-    } else if (constr.type.name2.lexeme == 'Fragment' && constr.name == null) {
+    } else if (constr.type.name.lexeme == 'Fragment' && constr.name == null) {
       onFragment(SourceRange(constr.type.offset, constr.type.length), node.argumentList);
-    } else if (constr.type.name2.lexeme == 'DomComponent' && constr.name == null) {
+    } else if (constr.type.name.lexeme == 'DomComponent' && constr.name == null) {
       onDomComponent(SourceRange(constr.type.offset, constr.type.length));
-    } else if (constr.type.name2.lexeme == 'DomComponent' && constr.name?.name == 'wrap') {
+    } else if (constr.type.name.lexeme == 'DomComponent' && constr.name?.name == 'wrap') {
       onWrapDomComponent(SourceRange(constr.type.offset, constr.name!.end - constr.type.offset));
     }
     super.visitInstanceCreationExpression(node);

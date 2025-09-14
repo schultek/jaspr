@@ -4,16 +4,9 @@ import 'view_constraints.dart';
 import 'widget.dart';
 
 class FlutterEmbedView extends StatelessComponent {
-  const FlutterEmbedView({
-    this.id,
-    this.classes,
-    this.styles,
-    this.constraints,
-    this.loader,
-    this.widget,
-    super.key,
-  })  : loadLibrary = null,
-        builder = null;
+  const FlutterEmbedView({this.id, this.classes, this.styles, this.constraints, this.loader, this.widget, super.key})
+    : loadLibrary = null,
+      builder = null;
 
   const FlutterEmbedView.deferred({
     this.id,
@@ -51,11 +44,9 @@ class FlutterEmbedView extends StatelessComponent {
             minHeight: c.minHeight != double.infinity ? c.minHeight?.px : null,
             maxHeight: c.maxHeight != double.infinity ? c.maxHeight?.px : null,
           ),
-        if (styles != null) styles!
+        if (styles != null) styles!,
       ]),
-      [
-        if (loader != null) loader!,
-      ],
+      [if (loader != null) loader!],
     );
   }
 }

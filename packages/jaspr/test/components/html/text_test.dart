@@ -7,26 +7,21 @@ import 'package:jaspr_test/jaspr_test.dart';
 void main() {
   group('html components', () {
     testComponents('renders text elements', (tester) async {
-      tester.pumpComponent(div([
-        a(
-          download: "",
-          href: "a",
-          target: Target.blank,
-          type: "",
-          referrerPolicy: ReferrerPolicy.noReferrer,
-          [],
-        ),
-        b([]),
-        br(),
-        code([]),
-        em([]),
-        i([]),
-        s([]),
-        small([]),
-        span([]),
-        strong([]),
-        u([]),
-      ]));
+      tester.pumpComponent(
+        div([
+          a(download: "", href: "a", target: Target.blank, type: "", referrerPolicy: ReferrerPolicy.noReferrer, []),
+          b([]),
+          br(),
+          code([]),
+          em([]),
+          i([]),
+          s([]),
+          small([]),
+          span([]),
+          strong([]),
+          u([]),
+        ]),
+      );
 
       expect(find.tag('a'), findsOneComponent);
       expect(find.tag('b'), findsOneComponent);
@@ -42,11 +37,13 @@ void main() {
     });
 
     testComponents('renders text', (tester) async {
-      tester.pumpComponent(div([
-        text('Hello '),
-        b([text('World')]),
-        text('!'),
-      ]));
+      tester.pumpComponent(
+        div([
+          text('Hello '),
+          b([text('World')]),
+          text('!'),
+        ]),
+      );
 
       expect(find.text('Hello '), findsOneComponent);
       expect(find.text('World'), findsOneComponent);
@@ -54,13 +51,15 @@ void main() {
     });
 
     testComponents('renders fragments', (tester) async {
-      tester.pumpComponent(div([
-        fragment([
-          text('Hello '),
-          b([text('World')]),
-          text('!'),
+      tester.pumpComponent(
+        div([
+          fragment([
+            text('Hello '),
+            b([text('World')]),
+            text('!'),
+          ]),
         ]),
-      ]));
+      );
 
       expect(find.text('Hello '), findsOneComponent);
       expect(find.text('World'), findsOneComponent);

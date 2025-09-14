@@ -5,7 +5,7 @@ import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:collection/collection.dart';
 import 'package:watcher/watcher.dart';
@@ -29,9 +29,6 @@ class ToolingDaemonCommand extends BaseCommand with DaemonHelper {
 
   @override
   bool get hidden => true;
-
-  @override
-  bool get requiresPubspec => false;
 
   @override
   bool get verbose => true;
@@ -73,21 +70,21 @@ class ScopesDomain extends Domain {
     );
 
     for (final context in _collection!.contexts) {
-      _watcherSubscriptions.add(DirectoryWatcher(
-        context.contextRoot.root.path,
-      ).events.listen((event) {
-        final path = event.path;
-        logger.write('File changed: $path');
+      _watcherSubscriptions.add(
+        DirectoryWatcher(context.contextRoot.root.path).events.listen((event) {
+          final path = event.path;
+          logger.write('File changed: $path');
 
-        if (path.endsWith('.dart')) {
-          _reanalyze(path);
-        } else if (path.endsWith('pubspec.yaml') ||
-            path.endsWith('pubspec.lock') ||
-            path.endsWith('package_config.json')) {
-          // Recreate all scopes if pubspec or package config changes.
-          _registerScopes(params);
-        }
-      }));
+          if (path.endsWith('.dart')) {
+            _reanalyze(path);
+          } else if (path.endsWith('pubspec.yaml') ||
+              path.endsWith('pubspec.lock') ||
+              path.endsWith('package_config.json')) {
+            // Recreate all scopes if pubspec or package config changes.
+            _registerScopes(params);
+          }
+        }),
+      );
     }
 
     for (final context in _collection!.contexts) {
@@ -158,15 +155,16 @@ class ScopesDomain extends Domain {
       try {
         final packagesContent = context.contextRoot.packagesFile?.readAsStringSync();
         final packagesJson = jsonDecode(packagesContent ?? '{}');
-        if (packagesJson case {'packages': List packages}
-            when packages.any((p) => p['name'] == 'jaspr_web_compilers')) {
+        if (packagesJson case {
+          'packages': List packages,
+        } when packages.any((p) => p['name'] == 'jaspr_web_compilers')) {
           usesJasprWebCompilers = true;
         }
       } catch (_) {
         // Ignore errors in reading packages file.
       }
 
-      final inspectData = await InspectData.analyze(result.element2, usesJasprWebCompilers, logger);
+      final inspectData = await InspectData.analyze(result.element, usesJasprWebCompilers, logger);
       _inspectedData[context] = inspectData;
       emitScopes();
     } finally {
@@ -264,12 +262,13 @@ class ScopesDomain extends Domain {
 
 class InspectData {
   InspectData._(this.usesJasprWebCompilers, this.logger);
-  static Future<InspectData> analyze(LibraryElement2 root, bool usesJasprWebCompilers, Logger logger) async {
+  static Future<InspectData> analyze(LibraryElement root, bool usesJasprWebCompilers, Logger logger) async {
     final inspectData = InspectData._(usesJasprWebCompilers, logger);
 
-    final mainFunction = root.topLevelFunctions.where((e) => e.name3 == 'main').firstOrNull?.firstFragment;
-    final mainLocation =
-        mainFunction?.libraryFragment.lineInfo.getLocation(mainFunction.nameOffset2 ?? mainFunction.offset);
+    final mainFunction = root.topLevelFunctions.where((e) => e.name == 'main').firstOrNull?.firstFragment;
+    final mainLocation = mainFunction?.libraryFragment.lineInfo.getLocation(
+      mainFunction.nameOffset ?? mainFunction.offset,
+    );
     final mainTarget = InspectTarget(
       root.firstFragment.source.fullName,
       'main',
@@ -286,8 +285,12 @@ class InspectData {
   final Logger logger;
   Map<String, InspectDataItem> libraries = {};
 
-  Future<InspectDataItem> inspectLibrary(LibraryElement2 library, InspectDataItem? parent,
-      [Set<InspectTarget> clientScopeRoots = const {}, Set<InspectTarget> serverScopeRoots = const {}]) async {
+  Future<InspectDataItem> inspectLibrary(
+    LibraryElement library,
+    InspectDataItem? parent, [
+    Set<InspectTarget> clientScopeRoots = const {},
+    Set<InspectTarget> serverScopeRoots = const {},
+  ]) async {
     final path = library.firstFragment.source.fullName;
 
     if (isServerLib(library)) {
@@ -299,7 +302,8 @@ class InspectData {
 
     if (libraries.containsKey(path)) {
       var data = libraries[path]!;
-      bool hasChangedScopes = clientScopeRoots.any((e) => !data.clientScopeRoots.contains(e)) ||
+      bool hasChangedScopes =
+          clientScopeRoots.any((e) => !data.clientScopeRoots.contains(e)) ||
           serverScopeRoots.any((e) => !data.serverScopeRoots.contains(e));
       if (hasChangedScopes) {
         data.clientScopeRoots.addAll(clientScopeRoots);
@@ -320,9 +324,10 @@ class InspectData {
     libraries[path] = data;
 
     for (final clazz in library.classes) {
-      final location = clazz.firstFragment.libraryFragment.lineInfo
-          .getLocation(clazz.firstFragment.nameOffset2 ?? clazz.firstFragment.offset);
-      final target = InspectTarget(path, clazz.name3 ?? '', location.lineNumber, location.columnNumber);
+      final location = clazz.firstFragment.libraryFragment.lineInfo.getLocation(
+        clazz.firstFragment.nameOffset ?? clazz.firstFragment.offset,
+      );
+      final target = InspectTarget(path, clazz.name ?? '', location.lineNumber, location.columnNumber);
       if (isComponent(clazz)) {
         data.components.add(target);
         if (hasClientAnnotation(clazz)) {
@@ -334,19 +339,22 @@ class InspectData {
     return data;
   }
 
-  bool isComponent(ClassElement2 clazz) {
-    return clazz.allSupertypes.any((e) =>
-        e.element3.name3 == 'Component' &&
-        e.element3.library2.identifier == 'package:jaspr/src/framework/framework.dart');
+  bool isComponent(ClassElement clazz) {
+    return clazz.allSupertypes.any(
+      (e) =>
+          e.element.name == 'Component' && e.element.library.identifier == 'package:jaspr/src/framework/framework.dart',
+    );
   }
 
-  bool hasClientAnnotation(ClassElement2 clazz) {
-    return clazz.metadata2.annotations.any((a) =>
-        a.element2?.name3 == 'client' &&
-        a.element2?.library2?.identifier == 'package:jaspr/src/foundation/annotations.dart');
+  bool hasClientAnnotation(ClassElement clazz) {
+    return clazz.metadata.annotations.any(
+      (a) =>
+          a.element?.name == 'client' &&
+          a.element?.library?.identifier == 'package:jaspr/src/foundation/annotations.dart',
+    );
   }
 
-  bool isClientLib(LibraryElement2 lib) {
+  bool isClientLib(LibraryElement lib) {
     return lib.identifier == 'package:jaspr/browser.dart' ||
         lib.identifier == 'package:web/web.dart' ||
         lib.identifier == 'dart:js_interop' ||
@@ -356,7 +364,7 @@ class InspectData {
         lib.identifier == 'dart:js_util';
   }
 
-  bool isServerLib(LibraryElement2 lib) {
+  bool isServerLib(LibraryElement lib) {
     return lib.identifier == 'package:jaspr/server.dart' ||
         (!usesJasprWebCompilers && lib.identifier == 'dart:io') ||
         lib.identifier == 'dart:ffi' ||
@@ -368,7 +376,7 @@ class InspectData {
 class InspectDataItem {
   InspectDataItem(this.library, this.parent, this.data);
 
-  final LibraryElement2 library;
+  final LibraryElement library;
   final InspectDataItem? parent;
   final InspectData data;
 
@@ -382,8 +390,12 @@ class InspectDataItem {
     final dependencies = await resolveDependencies(library);
 
     for (final (:lib, :dir, :onClient, :onServer) in dependencies) {
-      var child =
-          await data.inspectLibrary(lib, this, onClient ? clientScopeRoots : {}, onServer ? serverScopeRoots : {});
+      var child = await data.inspectLibrary(
+        lib,
+        this,
+        onClient ? clientScopeRoots : {},
+        onServer ? serverScopeRoots : {},
+      );
       var dep = InspectItemDependency(child, dir, onClient, onServer);
       dep.invalidOnClient = onClient && data.isServerLib(lib) ? dir : null;
       dep.invalidOnServer = onServer && data.isClientLib(lib) ? dir : null;
@@ -398,8 +410,9 @@ class InspectDataItem {
     for (final child in children) {
       if (child.item.components.isEmpty) {
         if (child.invalidOnClient == null) {
-          var childInvalidOnClient =
-              child.onClient ? child.item.children.map((c) => c.invalidOnClient).nonNulls.firstOrNull : null;
+          var childInvalidOnClient = child.onClient
+              ? child.item.children.map((c) => c.invalidOnClient).nonNulls.firstOrNull
+              : null;
           if (childInvalidOnClient != null) {
             child.invalidOnClient = child.dir.withTarget(childInvalidOnClient);
             for (var c in child.item.children) {
@@ -409,8 +422,9 @@ class InspectDataItem {
         }
 
         if (child.invalidOnServer == null) {
-          var childInvalidOnServer =
-              child.onServer ? child.item.children.map((c) => c.invalidOnServer).nonNulls.firstOrNull : null;
+          var childInvalidOnServer = child.onServer
+              ? child.item.children.map((c) => c.invalidOnServer).nonNulls.firstOrNull
+              : null;
           if (childInvalidOnServer != null) {
             child.invalidOnServer = child.dir.withTarget(childInvalidOnServer);
             for (var c in child.item.children) {
@@ -422,47 +436,48 @@ class InspectDataItem {
     }
   }
 
-  Future<List<({LibraryElement2 lib, DirectiveTarget dir, bool onClient, bool onServer})>> resolveDependencies(
-      LibraryElement2 library) async {
+  Future<List<({LibraryElement lib, DirectiveTarget dir, bool onClient, bool onServer})>> resolveDependencies(
+    LibraryElement library,
+  ) async {
     if (library.isInSdk) {
       // Skip SDK libraries.
       return [];
     }
 
-    final result = library.session.getParsedLibraryByElement2(library);
+    final result = library.session.getParsedLibraryByElement(library);
     if (result is! ParsedLibraryResult) {
       data.logger.write('Tooling Daemon: Failed to parse library ${library.uri}', level: Level.warning);
       return [];
     }
 
-    final imports = library.fragments.expand((f) => f.libraryImports2).toList();
-    final exports = library.fragments.expand((f) => f.libraryExports2).toList();
+    final imports = library.fragments.expand((f) => f.libraryImports).toList();
+    final exports = library.fragments.expand((f) => f.libraryExports).toList();
 
-    LibraryElement2? getBaseLibraryForDirective(NamespaceDirective directive) {
+    LibraryElement? getBaseLibraryForDirective(NamespaceDirective directive) {
       bool matchesUri(ElementDirective d) => switch (d.uri) {
-            DirectiveUriWithRelativeUriString uri => uri.relativeUriString == directive.uri.stringValue,
-            _ => false,
-          };
+        DirectiveUriWithRelativeUriString uri => uri.relativeUriString == directive.uri.stringValue,
+        _ => false,
+      };
       if (directive is ImportDirective) {
-        return directive.libraryImport?.importedLibrary2 ?? imports.where(matchesUri).firstOrNull?.importedLibrary2;
+        return directive.libraryImport?.importedLibrary ?? imports.where(matchesUri).firstOrNull?.importedLibrary;
       } else if (directive is ExportDirective) {
-        return directive.libraryExport?.exportedLibrary2 ?? exports.where(matchesUri).firstOrNull?.exportedLibrary2;
+        return directive.libraryExport?.exportedLibrary ?? exports.where(matchesUri).firstOrNull?.exportedLibrary;
       }
       return null;
     }
 
-    Future<LibraryElement2?> resolveLibraryFromUri(String? uri) async {
+    Future<LibraryElement?> resolveLibraryFromUri(String? uri) async {
       if (uri == null) return null;
       final absolutePath = library.session.uriConverter.uriToPath(library.uri.resolve(uri));
       if (absolutePath == null) return null;
       var lib2 = await library.session.getResolvedLibrary(absolutePath);
       if (lib2 is ResolvedLibraryResult) {
-        return lib2.element2;
+        return lib2.element;
       }
       return null;
     }
 
-    final dependencies = <({LibraryElement2 lib, DirectiveTarget dir, bool onClient, bool onServer})>[];
+    final dependencies = <({LibraryElement lib, DirectiveTarget dir, bool onClient, bool onServer})>[];
 
     for (final unit in result.units) {
       for (final directive in unit.unit.directives) {
@@ -472,20 +487,26 @@ class InspectDataItem {
           const clientLibs = ['js_interop', 'js_interop_unsafe', 'html', 'js', 'js_util'];
           const serverLibs = ['io', 'ffi', 'isolate', 'mirrors'];
 
-          final libConfigurations = configuration.where((c) =>
-              c.name.components.length == 3 &&
-              c.name.components[0].name == 'dart' &&
-              c.name.components[1].name == 'library');
+          final libConfigurations = configuration.where(
+            (c) =>
+                c.name.components.length == 3 &&
+                c.name.components[0].name == 'dart' &&
+                c.name.components[1].name == 'library',
+          );
 
-          final clientConfiguration =
-              libConfigurations.where((c) => clientLibs.contains(c.name.components.last.name)).firstOrNull;
-          final serverConfiguration =
-              libConfigurations.where((c) => serverLibs.contains(c.name.components.last.name)).firstOrNull;
+          final clientConfiguration = libConfigurations
+              .where((c) => clientLibs.contains(c.name.components.last.name))
+              .firstOrNull;
+          final serverConfiguration = libConfigurations
+              .where((c) => serverLibs.contains(c.name.components.last.name))
+              .firstOrNull;
 
           final baseLib = getBaseLibraryForDirective(directive);
           if (baseLib == null) {
-            data.logger.write('Tooling Daemon: Could not resolve base library for ${directive.uri.stringValue}',
-                level: Level.warning);
+            data.logger.write(
+              'Tooling Daemon: Could not resolve base library for ${directive.uri.stringValue}',
+              level: Level.warning,
+            );
           }
 
           final baseLoc = unit.lineInfo.getLocation(directive.offset);
@@ -518,8 +539,10 @@ class InspectDataItem {
               );
               dependencies.add((lib: clientLib, dir: clientDir, onClient: true, onServer: false));
             } else {
-              data.logger.write('Tooling Daemon: Could not resolve client library for ${directive.uri.stringValue}',
-                  level: Level.warning);
+              data.logger.write(
+                'Tooling Daemon: Could not resolve client library for ${directive.uri.stringValue}',
+                level: Level.warning,
+              );
             }
           } else {
             // On the client, the base import is used.
@@ -541,8 +564,10 @@ class InspectDataItem {
               );
               dependencies.add((lib: serverLib, dir: serverDir, onClient: false, onServer: true));
             } else {
-              data.logger.write('Tooling Daemon: Could not resolve server library for ${directive.uri.stringValue}',
-                  level: Level.warning);
+              data.logger.write(
+                'Tooling Daemon: Could not resolve server library for ${directive.uri.stringValue}',
+                level: Level.warning,
+              );
             }
           } else {
             // On the server, the base import is used.
@@ -580,23 +605,11 @@ class DirectiveTarget {
   DirectiveTarget(this.uri, this.target, this.line, this.character, this.length);
 
   Map<String, dynamic> toJson() {
-    return {
-      'uri': uri,
-      'target': target,
-      'line': line,
-      'character': character,
-      'length': length,
-    };
+    return {'uri': uri, 'target': target, 'line': line, 'character': character, 'length': length};
   }
 
   DirectiveTarget withTarget(DirectiveTarget childDir) {
-    return DirectiveTarget(
-      uri,
-      childDir.target,
-      line,
-      character,
-      length,
-    );
+    return DirectiveTarget(uri, childDir.target, line, character, length);
   }
 }
 
@@ -609,11 +622,6 @@ class InspectTarget {
   InspectTarget(this.path, this.name, this.line, this.character);
 
   Map<String, dynamic> toJson() {
-    return {
-      'path': path,
-      'name': name,
-      'line': line,
-      'character': character,
-    };
+    return {'path': path, 'name': name, 'line': line, 'character': character};
   }
 }

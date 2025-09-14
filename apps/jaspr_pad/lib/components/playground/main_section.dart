@@ -17,13 +17,7 @@ class MainSection extends StatelessComponent {
 
     return section(classes: 'main-section', [
       div(classes: 'panels', [
-        Splitter(
-          children: [
-            if (isTutorial) TutorialPanel(),
-            EditorPanel(),
-            if (!isTutorial) OutputPanel(),
-          ],
-        )
+        Splitter(children: [if (isTutorial) TutorialPanel(), EditorPanel(), if (!isTutorial) OutputPanel()]),
       ]),
       SnackBar(),
     ]);

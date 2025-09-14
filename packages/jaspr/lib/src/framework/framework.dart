@@ -245,12 +245,7 @@ typedef ComponentBuilder = Component Function(BuildContext context);
 /// this callback.
 typedef ElementVisitor = void Function(Element element);
 
-enum _ElementLifecycle {
-  initial,
-  active,
-  inactive,
-  defunct,
-}
+enum _ElementLifecycle { initial, active, inactive, defunct }
 
 /// An instantiation of a [Component] at a particular location in the tree.
 ///
@@ -454,8 +449,11 @@ abstract class Element implements BuildContext {
   /// This function is a convenience wrapper around [updateChild], which updates
   /// each individual child.
   @protected
-  List<Element> updateChildren(List<Element> oldChildren, List<Component> newComponents,
-      {Set<Element>? forgottenChildren}) {
+  List<Element> updateChildren(
+    List<Element> oldChildren,
+    List<Component> newComponents, {
+    Set<Element>? forgottenChildren,
+  }) {
     Element? replaceWithNullIfForgotten(Element? child) {
       return child != null && forgottenChildren != null && forgottenChildren.contains(child) ? null : child;
     }

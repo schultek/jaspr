@@ -17,10 +17,7 @@ import 'redirection.dart';
 /// Also performs redirection using [RouteRedirector].
 class RouteInformationParser {
   /// Creates a [RouteInformationParser].
-  RouteInformationParser({
-    required this.configuration,
-  })  : matcher = RouteMatcher(configuration),
-        redirector = redirect;
+  RouteInformationParser({required this.configuration}) : matcher = RouteMatcher(configuration), redirector = redirect;
 
   /// The route configuration for the app.
   final RouteConfiguration configuration;
@@ -32,11 +29,7 @@ class RouteInformationParser {
   final RouteRedirector redirector;
 
   /// Called by the [Router].
-  Future<RouteMatchList> parseRouteInformation(
-    String location,
-    BuildContext context, {
-    Object? extra,
-  }) {
+  Future<RouteMatchList> parseRouteInformation(String location, BuildContext context, {Object? extra}) {
     late final RouteMatchList initialMatches;
     try {
       initialMatches = matcher.findMatch(location, extra: extra);
@@ -45,18 +38,13 @@ class RouteInformationParser {
 
       // If there is a matching error for the initial location, we should
       // still try to process the top-level redirects.
-      initialMatches = RouteMatchList(
-        <RouteMatch>[],
-        Uri.parse(canonicalUri(location)),
-        const <String, String>{},
-      );
+      initialMatches = RouteMatchList(<RouteMatch>[], Uri.parse(canonicalUri(location)), const <String, String>{});
     }
     Future<RouteMatchList> processRedirectorResult(RouteMatchList matches) {
       if (matches.isEmpty) {
-        return SynchronousFuture(errorScreen(
-          Uri.parse(location),
-          MatcherError('no routes for location', location).toString(),
-        ));
+        return SynchronousFuture(
+          errorScreen(Uri.parse(location), MatcherError('no routes for location', location).toString()),
+        );
       }
       return SynchronousFuture(matches);
     }

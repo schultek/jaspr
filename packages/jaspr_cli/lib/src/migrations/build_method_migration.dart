@@ -22,7 +22,7 @@ class BuildMethodMigration implements Migration {
   }
 
   bool _isBuildableClass(ClassDeclaration declaration) {
-    final superName = declaration.extendsClause?.superclass.name2.lexeme;
+    final superName = declaration.extendsClause?.superclass.name.lexeme;
     return superName == 'StatelessComponent' || superName == 'AsyncStatelessComponent' || superName == 'State';
   }
 
@@ -54,20 +54,29 @@ class BuildMethodMigration implements Migration {
 
   void _migrateBuildMethod(MethodDeclaration node, String className, MigrationReporter reporter) {
     if (node.body.keyword == null) {
-      reporter.reportManualMigrationNeeded(node.offset, node.length,
-          'Cannot migrate $className.build(): Only build methods using sync* or async* can be migrated automatically');
+      reporter.reportManualMigrationNeeded(
+        node.offset,
+        node.length,
+        'Cannot migrate $className.build(): Only build methods using sync* or async* can be migrated automatically',
+      );
       return;
     }
     if (node.body is! BlockFunctionBody) {
-      reporter.reportManualMigrationNeeded(node.offset, node.length,
-          'Cannot migrate $className.build(): Only build methods with a block function body can be migrated automatically');
+      reporter.reportManualMigrationNeeded(
+        node.offset,
+        node.length,
+        'Cannot migrate $className.build(): Only build methods with a block function body can be migrated automatically',
+      );
       return;
     }
 
     final firstReturningStatement = (node.body as BlockFunctionBody).block.statements.indexWhere(_isReturningStatement);
     if (firstReturningStatement == -1) {
-      reporter.reportManualMigrationNeeded(node.offset, node.length,
-          'Cannot migrate $className.build(): No "yield" statement found, please migrate manually');
+      reporter.reportManualMigrationNeeded(
+        node.offset,
+        node.length,
+        'Cannot migrate $className.build(): No "yield" statement found, please migrate manually',
+      );
       return;
     }
 
@@ -223,11 +232,16 @@ class BuildMethodMigration implements Migration {
       }
     }
 
-    node.visitChildren(BuilderVisitor(onBuilderFunction: (node) {
-      _migrateFunctionBody(node, builder);
-    }, onSingleBuilder: (node) {
-      builder.delete(node.operator!.offset, node.operator!.length + node.methodName.length);
-    }));
+    node.visitChildren(
+      BuilderVisitor(
+        onBuilderFunction: (node) {
+          _migrateFunctionBody(node, builder);
+        },
+        onSingleBuilder: (node) {
+          builder.delete(node.operator!.offset, node.operator!.length + node.methodName.length);
+        },
+      ),
+    );
   }
 
   bool _isReturningStatement(Statement s) {
@@ -255,50 +269,44 @@ class BuildMethodMigration implements Migration {
 }
 
 class BuilderVisitor extends RecursiveAstVisitor<void> {
-  BuilderVisitor({
-    required this.onBuilderFunction,
-    required this.onSingleBuilder,
-  });
+  BuilderVisitor({required this.onBuilderFunction, required this.onSingleBuilder});
 
   final void Function(FunctionBody) onBuilderFunction;
   final void Function(MethodInvocation) onSingleBuilder;
 
   @override
   void visitBlockFunctionBody(BlockFunctionBody node) {
-    if (node.parent
-        case FunctionExpression(
-          parent: NamedExpression(
-            name: Label(label: SimpleIdentifier(name: 'builder')),
-            parent: ArgumentList(
-              parent: MethodInvocation(
-                methodName: SimpleIdentifier(
-                  name: 'Builder' ||
-                      'StatefulBuilder' ||
-                      'AsyncBuilder' ||
-                      'ListenableBuilder' ||
-                      'StreamBuilder' ||
-                      'FutureBuilder'
-                )
-              )
-            )
-          )
-        )) {
+    if (node.parent case FunctionExpression(
+      parent: NamedExpression(
+        name: Label(label: SimpleIdentifier(name: 'builder')),
+        parent: ArgumentList(
+          parent: MethodInvocation(
+            methodName: SimpleIdentifier(
+              name: 'Builder' ||
+                  'StatefulBuilder' ||
+                  'AsyncBuilder' ||
+                  'ListenableBuilder' ||
+                  'StreamBuilder' ||
+                  'FutureBuilder',
+            ),
+          ),
+        ),
+      ),
+    )) {
       onBuilderFunction(node);
       return;
     }
 
-    if (node.parent
-        case FunctionExpression(
-          parent: NamedExpression(
-            name: Label(label: SimpleIdentifier(name: 'builder')),
-            parent: ArgumentList(parent: MethodInvocation m)
-          )
-        )) {
-      if (m
-          case MethodInvocation(
-            methodName: SimpleIdentifier(name: 'single'),
-            target: SimpleIdentifier(name: 'Builder')
-          )) {
+    if (node.parent case FunctionExpression(
+      parent: NamedExpression(
+        name: Label(label: SimpleIdentifier(name: 'builder')),
+        parent: ArgumentList(parent: MethodInvocation m),
+      ),
+    )) {
+      if (m case MethodInvocation(
+        methodName: SimpleIdentifier(name: 'single'),
+        target: SimpleIdentifier(name: 'Builder'),
+      )) {
         onSingleBuilder(m);
         return;
       }

@@ -27,11 +27,7 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
     var binding = ServerAppBinding(r, loadFile: loadFile);
     setup(binding);
     final body = await binding.render(standalone: standalone);
-    return (
-      statusCode: binding.responseStatusCode,
-      body: body,
-      headers: binding.responseHeaders,
-    );
+    return (statusCode: binding.responseStatusCode, body: body, headers: binding.responseHeaders);
   }
 
   var resultCompleter = Completer<ResponseLike>.sync();
@@ -68,19 +64,18 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
 void _render(_RenderMessage message) async {
   ReceivePort? receivePort;
 
-  var binding = ServerAppBinding(message.request, loadFile: (name) {
-    receivePort ??= ReceivePort();
-    message.sendPort.send(_LoadFileRequest(name, receivePort!.sendPort));
-    return receivePort!.first.then((value) => value);
-  });
+  var binding = ServerAppBinding(
+    message.request,
+    loadFile: (name) {
+      receivePort ??= ReceivePort();
+      message.sendPort.send(_LoadFileRequest(name, receivePort!.sendPort));
+      return receivePort!.first.then((value) => value);
+    },
+  );
   message.setup(binding);
 
   var body = await binding.render(standalone: message.standalone);
-  final ResponseLike response = (
-    statusCode: binding.responseStatusCode,
-    body: body,
-    headers: binding.responseHeaders,
-  );
+  final ResponseLike response = (statusCode: binding.responseStatusCode, body: body, headers: binding.responseHeaders);
   message.sendPort.send(response);
 }
 

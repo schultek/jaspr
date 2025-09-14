@@ -33,13 +33,9 @@ class MemoryPage {
   /// Creates a new [MemoryPage] with the given [path] and [content].
   ///
   /// Optionally takes [initialData] to pass to the page.
-  const MemoryPage({
-    required this.path,
-    this.keepSuffix = false,
-    this.content,
-    this.initialData = const {},
-  })  : builder = null,
-        applyLayout = true;
+  const MemoryPage({required this.path, this.keepSuffix = false, this.content, this.initialData = const {}})
+    : builder = null,
+      applyLayout = true;
 
   /// Creates a new [MemoryPage] with the given [path] and builds it using the [builder].
   ///
@@ -134,21 +130,23 @@ class _BuilderPage extends Page {
   @override
   Future<Component> render() async {
     await loadData();
-    return Builder(builder: (context) {
-      if (kGenerateMode) {
-        if (data.page['sitemap'] case final sitemap?) {
-          context.setHeader('jaspr-sitemap-data', jsonEncode(sitemap));
+    return Builder(
+      builder: (context) {
+        if (kGenerateMode) {
+          if (data.page['sitemap'] case final sitemap?) {
+            context.setHeader('jaspr-sitemap-data', jsonEncode(sitemap));
+          }
         }
-      }
 
-      final child = Builder(builder: builder);
+        final child = Builder(builder: builder);
 
-      if (applyLayout) {
-        final layout = buildLayout(child);
-        return wrapTheme(layout);
-      }
+        if (applyLayout) {
+          final layout = buildLayout(child);
+          return wrapTheme(layout);
+        }
 
-      return child;
-    });
+        return child;
+      },
+    );
   }
 }

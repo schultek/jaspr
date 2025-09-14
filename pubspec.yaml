@@ -1,8 +1,9 @@
 name: jaspr_workspace
+publish_to: none
 repository: https://github.com/schultek/jaspr
 
 environment:
-  sdk: '>=3.6.0 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 
 workspace:
   - packages/jaspr
@@ -11,6 +12,7 @@ workspace:
   - packages/jaspr_content
   - packages/jaspr_flutter_embed
   - packages/jaspr_lints
+  - packages/jaspr_repo
   - packages/jaspr_riverpod
   - packages/jaspr_router
   - packages/jaspr_serverpod
@@ -18,7 +20,6 @@ workspace:
   - apps/dart_quotes
   - apps/dart_quotes_server
   - apps/fluttercon
-  - apps/jaspr_pad
   - apps/website
   - examples/backend_dart_frog
   - examples/backend_serverpod/example_server
@@ -45,8 +46,8 @@ melos:
   scripts:
     format:
       steps:
-        - melos exec --ignore=jaspr_cli -- "dart format . --line-length=120 --set-exit-if-changed"
-        - melos exec --scope=jaspr_cli -- "dart format lib  --line-length=120 --set-exit-if-changed"
+        - melos exec --ignore=jaspr_cli -- "dart format . --set-exit-if-changed"
+        - melos exec --scope=jaspr_cli -- "dart format lib --set-exit-if-changed"
     analyze: melos exec -- "dart analyze . --fatal-infos"
     test:
       run: dart test

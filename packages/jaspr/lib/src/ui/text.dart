@@ -1,10 +1,7 @@
 import '../../jaspr.dart';
 
 class TextParagraph extends StatelessComponent {
-  const TextParagraph({
-    super.key,
-    required this.children,
-  });
+  const TextParagraph({super.key, required this.children});
 
   final List<Component> children;
 
@@ -15,12 +12,7 @@ class TextParagraph extends StatelessComponent {
 }
 
 class TextSpan extends StatelessComponent {
-  const TextSpan({
-    super.key,
-    required this.text,
-    this.breakLine = false,
-    this.newLine = false,
-  });
+  const TextSpan({super.key, required this.text, this.breakLine = false, this.newLine = false});
 
   final String text;
   final bool breakLine;
@@ -43,11 +35,7 @@ class TextSpan extends StatelessComponent {
 }
 
 class Heading extends StatelessComponent {
-  const Heading({
-    super.key,
-    this.size = 1,
-    required this.text,
-  }) : assert(size >= 1 && size <= 6);
+  const Heading({super.key, this.size = 1, required this.text}) : assert(size >= 1 && size <= 6);
 
   final String text;
   final int size;
@@ -69,14 +57,10 @@ class Heading extends StatelessComponent {
 class BreakLine extends StatelessComponent {
   final int numberLines;
 
-  const BreakLine({
-    this.numberLines = 1,
-  });
+  const BreakLine({this.numberLines = 1});
 
   @override
   Component build(BuildContext context) {
-    return Component.fragment([
-      for (var i = 0; i < numberLines; i++) br(),
-    ]);
+    return Component.fragment([for (var i = 0; i < numberLines; i++) br()]);
   }
 }

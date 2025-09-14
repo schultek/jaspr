@@ -52,51 +52,64 @@ class OverlayState extends State<Overlay> {
 
   @override
   Component build(BuildContext context) {
-    return div(classes: 'blur-backdrop', events: events(onClick: () {
-      showRandomImage();
-    }), [
-      img(src: 'images/jasper_resized/$currentImage.webp', alt: 'Jasper'),
-      span([
-        text('Click anywhere to see another image.'),
-        br(),
-        text('Press ESC or click '),
-        a(href: '', events: {
-          'click': (e) {
-            e.preventDefault();
-            component.onClose();
-          }
-        }, [
-          text('here')
+    return div(
+      classes: 'blur-backdrop',
+      events: events(
+        onClick: () {
+          showRandomImage();
+        },
+      ),
+      [
+        img(src: 'images/jasper_resized/$currentImage.webp', alt: 'Jasper'),
+        span([
+          text('Click anywhere to see another image.'),
+          br(),
+          text('Press ESC or click '),
+          a(
+            href: '',
+            events: {
+              'click': (e) {
+                e.preventDefault();
+                component.onClose();
+              },
+            },
+            [text('here')],
+          ),
+          text(' to close.'),
         ]),
-        text(' to close.'),
-      ]),
-    ]);
+      ],
+    );
   }
 
   @css
   static List<StyleRule> get styles => [
-        css('.blur-backdrop', [
-          css('&').styles(
-            display: Display.flex,
-            position: Position.fixed(top: Unit.zero, left: Unit.zero, right: Unit.zero, bottom: Unit.zero),
-            zIndex: ZIndex(1),
-            userSelect: UserSelect.none,
-            flexDirection: FlexDirection.column,
-            justifyContent: JustifyContent.center,
-            alignItems: AlignItems.center,
-            backgroundColor: backgroundFaded,
-            raw: {'backdrop-filter': 'blur(5px)', '-webkit-backdrop-filter': 'blur(5px)'},
-          ),
-          css('img', [
-            css('&').styles(
-              maxWidth: 80.percent,
-              maxHeight: 80.percent,
-              radius: BorderRadius.circular(20.px),
-              pointerEvents: PointerEvents.none,
-              raw: {'object-fit': 'cover'},
-            ),
-          ]),
-          css('span').styles(display: Display.inlineBlock, margin: Margin.only(top: 1.rem)).combine(bodySmall),
-        ]),
-      ];
+    css('.blur-backdrop', [
+      css('&').styles(
+        display: Display.flex,
+        position: Position.fixed(top: Unit.zero, left: Unit.zero, right: Unit.zero, bottom: Unit.zero),
+        zIndex: ZIndex(1),
+        userSelect: UserSelect.none,
+        flexDirection: FlexDirection.column,
+        justifyContent: JustifyContent.center,
+        alignItems: AlignItems.center,
+        backgroundColor: backgroundFaded,
+        raw: {'backdrop-filter': 'blur(5px)', '-webkit-backdrop-filter': 'blur(5px)'},
+      ),
+      css('img', [
+        css('&').styles(
+          maxWidth: 80.percent,
+          maxHeight: 80.percent,
+          radius: BorderRadius.circular(20.px),
+          pointerEvents: PointerEvents.none,
+          raw: {'object-fit': 'cover'},
+        ),
+      ]),
+      css('span')
+          .styles(
+            display: Display.inlineBlock,
+            margin: Margin.only(top: 1.rem),
+          )
+          .combine(bodySmall),
+    ]),
+  ];
 }

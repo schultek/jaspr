@@ -1,0 +1,16 @@
+include: package:lints/recommended.yaml
+
+# TODO: Reenable once migrated to analyzer v8.
+#analyzer:
+#  plugins:
+#    - custom_lint
+
+linter:
+  rules:
+    sort_pub_dependencies: true
+    prefer_relative_imports: true
+    directives_ordering: true
+
+formatter:
+  page_width: 120
+  trailing_commas: preserve

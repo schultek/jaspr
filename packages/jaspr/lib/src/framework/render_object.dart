@@ -21,8 +21,13 @@ abstract class RenderObject {
 }
 
 abstract class RenderElement implements RenderObject {
-  void update(String? id, String? classes, Map<String, String>? styles, Map<String, String>? attributes,
-      Map<String, EventCallback>? events);
+  void update(
+    String? id,
+    String? classes,
+    Map<String, String>? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+  );
 }
 
 abstract class RenderText implements RenderObject {

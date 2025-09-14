@@ -1,12 +1,7 @@
 import '../../jaspr.dart';
 
 class Link extends StatelessComponent {
-  const Link({
-    super.key,
-    required this.url,
-    this.openInNewTab = false,
-    required this.children,
-  });
+  const Link({super.key, required this.url, this.openInNewTab = false, required this.children});
 
   final Uri url;
   final bool openInNewTab;

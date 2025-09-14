@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError;
+import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -10,30 +10,27 @@ import '../utils.dart';
 
 class StylesOrderingLint extends DartLintRule {
   StylesOrderingLint()
-      : super(
-          code: LintCode(
-            name: 'styles_ordering',
-            problemMessage: "Styles are not ordered. Try sorting them.",
-          ),
-        );
+    : super(
+        code: LintCode(name: 'styles_ordering', problemMessage: "Styles are not ordered. Try sorting them."),
+      );
 
   @override
-  void run(CustomLintResolver resolver, ErrorReporter reporter, CustomLintContext context) {
+  void run(CustomLintResolver resolver, DiagnosticReporter reporter, CustomLintContext context) {
     context.registry.addInvocationExpression((node) {
       var fn = node.function;
       if (fn is! SimpleIdentifier || fn.name != 'styles') {
         return;
       }
-      var method = fn.staticElement?.declaration;
+      var method = fn.element;
       if (method is! MethodElement) {
         return;
       }
-      var mixin = method.enclosingElement3;
+      var mixin = method.enclosingElement;
       if (mixin is! ClassElement || mixin.name != 'StylesMixin') {
         return;
       }
 
-      final params = method.parameters.map((p) => p.name).toList();
+      final params = method.formalParameters.map((p) => p.name).toList();
       final arguments = node.argumentList.arguments;
 
       var violatesOrder = !isOrdered(arguments, params);
@@ -41,25 +38,25 @@ class StylesOrderingLint extends DartLintRule {
         reporter.atOffset(
           offset: arguments.beginToken!.offset,
           length: arguments.endToken!.end - arguments.beginToken!.offset,
-          errorCode: code,
+          diagnosticCode: code,
           data: (arguments, params),
         );
       }
     });
 
     context.registry.addInstanceCreationExpression((node) {
-      if (node.constructorName.type.name2.lexeme != 'Styles' || node.constructorName.name != null) {
+      if (node.constructorName.type.name.lexeme != 'Styles' || node.constructorName.name != null) {
         return;
       }
       if (!isStylesType(node.staticType)) {
         return;
       }
-      var constructor = node.constructorName.staticElement;
+      var constructor = node.constructorName.element;
       if (constructor == null) {
         return;
       }
 
-      final params = constructor.parameters.map((p) => p.name).toList();
+      final params = constructor.formalParameters.map((p) => p.name).toList();
       final arguments = node.argumentList.arguments;
 
       var violatesOrder = !isOrdered(arguments, params);
@@ -67,7 +64,7 @@ class StylesOrderingLint extends DartLintRule {
         reporter.atOffset(
           offset: arguments.beginToken!.offset,
           length: arguments.endToken!.end - arguments.beginToken!.offset,
-          errorCode: code,
+          diagnosticCode: code,
           data: (arguments, params),
         );
       }
@@ -77,12 +74,12 @@ class StylesOrderingLint extends DartLintRule {
   @override
   List<Fix> getFixes() => [OrderStylesFix()];
 
-  List<ParameterElement> findStylesOrder(InterfaceType stylesType) {
+  List<FormalParameterElement> findStylesOrder(InterfaceType stylesType) {
     final constructor = stylesType.constructors.where((c) => c.name == '').first;
-    return constructor.parameters;
+    return constructor.formalParameters;
   }
 
-  static bool isOrdered(NodeList<Expression> args, List<String> params) {
+  static bool isOrdered(NodeList<Expression> args, List<String?> params) {
     int lastSeenParam = -1;
     var violatesOrder = false;
 
@@ -110,10 +107,10 @@ class OrderStylesFix extends DartFix {
     CustomLintResolver resolver,
     ChangeReporter reporter,
     CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
+    Diagnostic analysisError,
+    List<Diagnostic> others,
   ) {
-    if (analysisError.data case (NodeList<Expression> arguments, List<String> params)) {
+    if (analysisError.data case (NodeList<Expression> arguments, List<String?> params)) {
       var violatesOrder = !StylesOrderingLint.isOrdered(arguments, params);
       if (!violatesOrder) {
         return;
@@ -131,7 +128,8 @@ class OrderStylesFix extends DartFix {
           breaks.add(content.substring(arguments[i].end, arguments[i + 1].offset));
         }
 
-        var args = [...arguments]..sort((a, b) {
+        var args = [...arguments]
+          ..sort((a, b) {
             if (a is NamedExpression && b is NamedExpression) {
               return params.indexOf(a.name.label.name).compareTo(params.indexOf(b.name.label.name));
             }

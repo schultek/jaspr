@@ -52,8 +52,8 @@ String? _tryFindRootProjectDir(String startingDir) {
 Handler staticFileHandler([http.Client? client]) => jasprProxyPort != null
     ? proxyHandler('http://localhost:$jasprProxyPort/', client: client)
     : Directory(webDir).existsSync()
-        ? createStaticHandler(webDir, defaultDocument: 'index.html')
-        : (_) => Response.notFound('');
+    ? createStaticHandler(webDir, defaultDocument: 'index.html')
+    : (_) => Response.notFound('');
 
 typedef SetupHandler = FutureOr<Response> Function(Request, FutureOr<Response> Function(SetupFunction setup));
 
@@ -104,8 +104,14 @@ Handler createHandler(
 
 Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandler) {
   return (name) async {
-    final indexRequest = Request('GET', req.requestedUri.replace(path: '/$name'),
-        context: req.context, encoding: req.encoding, headers: req.headers, protocolVersion: req.protocolVersion);
+    final indexRequest = Request(
+      'GET',
+      req.requestedUri.replace(path: '/$name'),
+      context: req.context,
+      encoding: req.encoding,
+      headers: req.headers,
+      protocolVersion: req.protocolVersion,
+    );
     var response = await proxyHandler(indexRequest);
     return response.statusCode == 200 ? response.readAsString() : null;
   };
@@ -128,28 +134,38 @@ Handler _sseProxyHandler(http.Client client, String webPort) {
 
     req.hijack((channel) {
       final sink = utf8.encoder.startChunkedConversion(channel.sink)
-        ..add('HTTP/1.1 200 OK\r\n'
-            'Content-Type: text/event-stream\r\n'
-            'Cache-Control: no-cache\r\n'
-            'Connection: keep-alive\r\n'
-            'Access-Control-Allow-Credentials: true\r\n'
-            'Access-Control-Allow-Origin: ${req.headers['origin']}\r\n'
-            '\r\n');
+        ..add(
+          'HTTP/1.1 200 OK\r\n'
+          'Content-Type: text/event-stream\r\n'
+          'Cache-Control: no-cache\r\n'
+          'Connection: keep-alive\r\n'
+          'Access-Control-Allow-Credentials: true\r\n'
+          'Access-Control-Allow-Origin: ${req.headers['origin']}\r\n'
+          '\r\n',
+        );
 
       StreamSubscription? serverSseSub;
       StreamSubscription? reqChannelSub;
 
-      serverSseSub = utf8.decoder.bind(serverResponse.stream).listen(sink.add, onDone: () {
-        reqChannelSub?.cancel();
-        sink.close();
-      });
+      serverSseSub = utf8.decoder
+          .bind(serverResponse.stream)
+          .listen(
+            sink.add,
+            onDone: () {
+              reqChannelSub?.cancel();
+              sink.close();
+            },
+          );
 
-      reqChannelSub = channel.stream.listen((_) {
-        // SSE is unidirectional.
-      }, onDone: () {
-        serverSseSub?.cancel();
-        sink.close();
-      });
+      reqChannelSub = channel.stream.listen(
+        (_) {
+          // SSE is unidirectional.
+        },
+        onDone: () {
+          serverSseSub?.cancel();
+          sink.close();
+        },
+      );
     });
   }
 

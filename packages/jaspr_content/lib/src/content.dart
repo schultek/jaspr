@@ -25,9 +25,7 @@ class Content extends StatelessComponent {
     if (!kIsWeb) {
       final styles = themeOf(context).styles;
       if (styles.isNotEmpty) {
-        children.add(Document.head(children: [
-          Style(styles: styles),
-        ]));
+        children.add(Document.head(children: [Style(styles: styles)]));
       }
     }
 
@@ -37,10 +35,7 @@ class Content extends StatelessComponent {
 }
 
 class _InheritedContentTheme extends InheritedComponent {
-  _InheritedContentTheme({
-    required this.theme,
-    required super.child,
-  });
+  _InheritedContentTheme({required this.theme, required super.child});
 
   final ContentTheme theme;
 

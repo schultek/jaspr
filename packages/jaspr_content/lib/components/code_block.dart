@@ -6,22 +6,10 @@ import '_internal/code_block_copy_button.dart';
 
 /// A code block component that renders syntax-highlighted code.
 class CodeBlock implements CustomComponent {
-  CodeBlock({
-    this.defaultLanguage = 'dart',
-    this.grammars = const {},
-    this.theme,
-  });
+  CodeBlock({this.defaultLanguage = 'dart', this.grammars = const {}, this.theme});
 
-  static Component from({
-    required String source,
-    Highlighter? highlighter,
-    Key? key,
-  }) {
-    return _CodeBlock(
-      source: source,
-      highlighter: highlighter,
-      key: key,
-    );
+  static Component from({required String source, Highlighter? highlighter, Key? key}) {
+    return _CodeBlock(source: source, highlighter: highlighter, key: key);
   }
 
   /// The default language for the code block.
@@ -57,45 +45,40 @@ class CodeBlock implements CustomComponent {
         _initialized = true;
       }
 
-      return AsyncBuilder(builder: (context) async {
-        final highlighter = Highlighter(
-          language: language ?? defaultLanguage,
-          theme: theme ?? (_defaultTheme ??= await HighlighterTheme.loadDarkTheme()),
-        );
+      return AsyncBuilder(
+        builder: (context) async {
+          final highlighter = Highlighter(
+            language: language ?? defaultLanguage,
+            theme: theme ?? (_defaultTheme ??= await HighlighterTheme.loadDarkTheme()),
+          );
 
-        return _CodeBlock(
-          source: children?.map((c) => c.innerText).join(' ') ?? '',
-          highlighter: highlighter,
-        );
-      });
+          return _CodeBlock(source: children?.map((c) => c.innerText).join(' ') ?? '', highlighter: highlighter);
+        },
+      );
     }
     return null;
   }
 
   @css
   static List<StyleRule> get styles => [
-        css('.code-block', [
-          css('&').styles(position: Position.relative()),
-          css('button').styles(
-            position: Position.absolute(top: 1.rem, right: 1.rem),
-            opacity: 0,
-            color: Colors.white,
-            width: 1.25.rem,
-            height: 1.25.rem,
-            zIndex: ZIndex(10),
-          ),
-          css('&:hover button').styles(opacity: 0.75),
-        ]),
-      ];
+    css('.code-block', [
+      css('&').styles(position: Position.relative()),
+      css('button').styles(
+        position: Position.absolute(top: 1.rem, right: 1.rem),
+        opacity: 0,
+        color: Colors.white,
+        width: 1.25.rem,
+        height: 1.25.rem,
+        zIndex: ZIndex(10),
+      ),
+      css('&:hover button').styles(opacity: 0.75),
+    ]),
+  ];
 }
 
 /// A code block component with syntax highlighting.
 class _CodeBlock extends StatelessComponent {
-  const _CodeBlock({
-    required this.source,
-    this.highlighter,
-    super.key,
-  });
+  const _CodeBlock({required this.source, this.highlighter, super.key});
 
   /// The source code of the code block.
   final String source;
@@ -106,15 +89,10 @@ class _CodeBlock extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     final codeblock = pre([
-      code([
-        if (highlighter != null) buildSpan(highlighter!.highlight(source)) else text(source),
-      ])
+      code([if (highlighter != null) buildSpan(highlighter!.highlight(source)) else text(source)]),
     ]);
 
-    return div(classes: 'code-block', [
-      CodeBlockCopyButton(),
-      codeblock,
-    ]);
+    return div(classes: 'code-block', [CodeBlockCopyButton(), codeblock]);
   }
 
   Component buildSpan(TextSpan textSpan) {

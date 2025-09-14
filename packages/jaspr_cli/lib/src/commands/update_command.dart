@@ -25,9 +25,6 @@ class UpdateCommand extends BaseCommand {
   String get category => 'Tooling';
 
   @override
-  bool get requiresPubspec => false;
-
-  @override
   Future<int> runCommand() async {
     logger.write('Checking for updates', progress: ProgressState.running);
     late final String latestVersion;
@@ -49,10 +46,7 @@ class UpdateCommand extends BaseCommand {
     logger.write('Updating to $latestVersion', progress: ProgressState.running);
     late final ProcessResult result;
     try {
-      result = await _updater.update(
-        packageName: packageName,
-        versionConstraint: latestVersion,
-      );
+      result = await _updater.update(packageName: packageName, versionConstraint: latestVersion);
     } catch (error) {
       logger.complete(false);
       logger.write('$error', level: Level.error);
@@ -78,11 +72,13 @@ class UpdateCommand extends BaseCommand {
 
       if (results.isNotEmpty) {
         stdout.write(
-            '\nYour project has automatic migrations available for updating the code to the newest Jaspr version:\n\n'
-            '${migrations.map((m) => '  ${m.name} · ${m.description}\n${m.hint}').join('\n\n')}\n\n');
+          '\nYour project has automatic migrations available for updating the code to the newest Jaspr version:\n\n'
+          '${migrations.map((m) => '  ${m.name} · ${m.description}\n${m.hint}').join('\n\n')}\n\n',
+        );
 
         stdout.write(
-            'Make sure to update the dependency constraint of jaspr in your pubspec.yaml file to include $latestVersion.\n');
+          'Make sure to update the dependency constraint of jaspr in your pubspec.yaml file to include $latestVersion.\n',
+        );
         stdout.write('Then run \'jaspr migrate --dry-run\' to preview all migration changes.');
       }
     }

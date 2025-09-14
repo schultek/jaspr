@@ -11,17 +11,10 @@ import 'internals.dart';
 part 'sync_provider/base.dart';
 part 'sync_provider/sync_scope.dart';
 
-ProviderElementProxy<AsyncValue<T>, Future<T>> _future<T>(
-  _SyncProviderBase<T> that,
-) {
-  return ProviderElementProxy<AsyncValue<T>, Future<T>>(
-    that,
-    (element) {
-      return FutureHandlerProviderElementMixin.futureNotifierOf(
-        element as FutureHandlerProviderElementMixin<T>,
-      );
-    },
-  );
+ProviderElementProxy<AsyncValue<T>, Future<T>> _future<T>(_SyncProviderBase<T> that) {
+  return ProviderElementProxy<AsyncValue<T>, Future<T>>(that, (element) {
+    return FutureHandlerProviderElementMixin.futureNotifierOf(element as FutureHandlerProviderElementMixin<T>);
+  });
 }
 
 /// {@template jaspr_riverpod.sync_provider}

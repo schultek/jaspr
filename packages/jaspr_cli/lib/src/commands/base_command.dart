@@ -14,12 +14,7 @@ abstract class BaseCommand extends Command<int> {
   Set<FutureOr<void> Function()> guards = {};
 
   BaseCommand({Logger? logger}) : _logger = logger {
-    argParser.addFlag(
-      'verbose',
-      abbr: 'v',
-      help: 'Enable verbose logging.',
-      negatable: false,
-    );
+    argParser.addFlag('verbose', abbr: 'v', help: 'Enable verbose logging.', negatable: false);
   }
 
   /// [Logger] instance used to wrap stdout.
@@ -28,30 +23,24 @@ abstract class BaseCommand extends Command<int> {
 
   late final bool verbose = argResults?['verbose'] as bool? ?? false;
 
-  final bool requiresPubspec = true;
-  final bool preferBuilderDependency = true;
-  JasprConfig get config => _config!;
-  JasprConfig? _config;
+  late final Project project = Project(logger);
 
   @override
   @mustCallSuper
   Future<int> run() async {
-    if (requiresPubspec) {
-      _config = await getConfig(logger);
-    }
-
-    await trackEvent(name, projectName: _config?.pubspecYaml['name'], projectMode: _config?.mode.name);
+    await trackEvent(name, projectName: project.pubspecYaml?['name'], projectMode: project.modeOrNull?.name);
 
     var cancelCount = 0;
-    final cancelSub = StreamGroup.merge([
-      ProcessSignal.sigint.watch(),
-      // SIGTERM is not supported on Windows.
-      Platform.isWindows ? const Stream.empty() : ProcessSignal.sigterm.watch()
-    ]).listen((signal) async {
-      cancelCount++;
-      if (cancelCount > 1) exit(1);
-      shutdown();
-    });
+    final cancelSub =
+        StreamGroup.merge([
+          ProcessSignal.sigint.watch(),
+          // SIGTERM is not supported on Windows.
+          Platform.isWindows ? const Stream.empty() : ProcessSignal.sigterm.watch(),
+        ]).listen((signal) async {
+          cancelCount++;
+          if (cancelCount > 1) exit(1);
+          shutdown();
+        });
 
     try {
       final result = await runCommand();
@@ -85,13 +74,35 @@ abstract class BaseCommand extends Command<int> {
     logger.logger?.flush();
   }
 
+  void ensureInProject({
+    bool requirePubspecYaml = true,
+    bool requireJasprDependency = true,
+    bool requireJasprMode = true,
+    bool preferBuilderDependency = true,
+  }) {
+    if (requirePubspecYaml) {
+      project.requirePubspecYaml;
+    }
+    if (requireJasprDependency) {
+      project.requireJasprDependency;
+    }
+    if (requireJasprMode) {
+      project.requireMode;
+    }
+    if (preferBuilderDependency) {
+      project.preferJasprBuilderDependency;
+    }
+  }
+
   Future<String> getEntryPoint(String? input, [bool forceInsideLib = false]) async {
     var entryPoint = input ?? 'lib/main.dart';
 
     if (!File(entryPoint).absolute.existsSync()) {
       logger.complete(false);
-      logger.write("Cannot find entry point. Create a lib/main.dart file, or specify a file using --input.",
-          level: Level.critical);
+      logger.write(
+        "Cannot find entry point. Create a lib/main.dart file, or specify a file using --input.",
+        level: Level.critical,
+      );
       await shutdown();
       exit(1);
     }
@@ -171,13 +182,13 @@ abstract class BaseCommand extends Command<int> {
   }
 
   void checkWasmSupport() {
-    var package = '${config.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
-    var version = config.pubspecYaml['dev_dependencies']?[package];
+    var package = '${project.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    var version = project.pubspecYaml?['dev_dependencies']?[package];
     if (version is! String || !version.startsWith(RegExp(r'\^?4.1.'))) {
       usageException('Using "--experimental-wasm" requires $package 4.1.0 or newer.');
     }
 
-    if (config.usesFlutter) {
+    if (project.usesFlutter) {
       usageException('Using "--experimental-wasm" is not supported together with flutter embedding.');
     }
   }
@@ -186,18 +197,20 @@ abstract class BaseCommand extends Command<int> {
 extension on Stream<String> {
   Stream<String> splitLines() {
     var data = '';
-    return transform(StreamTransformer.fromHandlers(
-      handleData: (d, s) {
-        data += d;
-        int index;
-        while ((index = data.indexOf('\n')) != -1) {
-          s.add(data.substring(0, index + 1));
-          data = data.substring(index + 1);
-        }
-      },
-      handleDone: (s) {
-        s.add(data);
-      },
-    ));
+    return transform(
+      StreamTransformer.fromHandlers(
+        handleData: (d, s) {
+          data += d;
+          int index;
+          while ((index = data.indexOf('\n')) != -1) {
+            s.add(data.substring(0, index + 1));
+            data = data.substring(index + 1);
+          }
+        },
+        handleDone: (s) {
+          s.add(data);
+        },
+      ),
+    );
   }
 }

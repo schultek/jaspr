@@ -80,5 +80,5 @@ const allHtmlTags = {
   'tr',
   'td',
   'col',
-  'colgroup'
+  'colgroup',
 };

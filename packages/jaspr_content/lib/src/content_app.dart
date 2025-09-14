@@ -89,20 +89,18 @@ class ContentApp extends AsyncStatelessComponent {
     /// The [ContentTheme] to use for the pages.
     ContentTheme? theme,
     bool debugPrint = false,
-  })  : loaders = [FilesystemLoader(directory, debugPrint: debugPrint)],
-        configResolver = PageConfig.all(
-          enableFrontmatter: enableFrontmatter,
-          dataLoaders: [
-            FilesystemDataLoader(dataDirectory),
-          ],
-          templateEngine: templateEngine,
-          parsers: parsers,
-          extensions: extensions,
-          components: components,
-          layouts: layouts,
-          theme: theme,
-        ),
-        routerBuilder = _defaultRouterBuilder {
+  }) : loaders = [FilesystemLoader(directory, debugPrint: debugPrint)],
+       configResolver = PageConfig.all(
+         enableFrontmatter: enableFrontmatter,
+         dataLoaders: [FilesystemDataLoader(dataDirectory)],
+         templateEngine: templateEngine,
+         parsers: parsers,
+         extensions: extensions,
+         components: components,
+         layouts: layouts,
+         theme: theme,
+       ),
+       routerBuilder = _defaultRouterBuilder {
     _overrideGlobalOptions();
   }
 

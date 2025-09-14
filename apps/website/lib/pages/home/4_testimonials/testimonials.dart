@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
 
+import '../../../constants/theme.dart';
 import 'components/testimonial_card.dart';
 
 class Testimonials extends StatelessComponent {
@@ -49,34 +49,34 @@ class Testimonials extends StatelessComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('#testimonials', [
-          css('&').styles(
-            display: Display.flex,
-            padding: Padding.only(top: sectionPadding),
-            flexDirection: FlexDirection.column,
-            alignItems: AlignItems.center,
-            textAlign: TextAlign.center,
-          ),
-          css('.testimonials-grid', [
-            css('&').styles(
-              maxWidth: maxContentWidth,
-              padding: Padding.symmetric(horizontal: contentPadding),
-              margin: Margin.only(top: 3.rem, bottom: 4.rem),
-              gap: Gap.all(1.5.rem),
-              raw: {'column-count': '3'},
-            ),
-            css('& > *').styles(raw: {'break-inside': 'avoid'}),
-          ]),
-        ]),
-        css.media(MediaQuery.screen(maxWidth: 1200.px), [
-          css('#testimonials .testimonials-grid', [
-            css('&').styles(raw: {'column-count': '2'}),
-          ]),
-        ]),
-        css.media(MediaQuery.screen(maxWidth: 750.px), [
-          css('#testimonials .testimonials-grid', [
-            css('&').styles(raw: {'column-count': '1'}),
-          ]),
-        ]),
-      ];
+    css('#testimonials', [
+      css('&').styles(
+        display: Display.flex,
+        padding: Padding.only(top: sectionPadding),
+        flexDirection: FlexDirection.column,
+        alignItems: AlignItems.center,
+        textAlign: TextAlign.center,
+      ),
+      css('.testimonials-grid', [
+        css('&').styles(
+          maxWidth: maxContentWidth,
+          padding: Padding.symmetric(horizontal: contentPadding),
+          margin: Margin.only(top: 3.rem, bottom: 4.rem),
+          gap: Gap.all(1.5.rem),
+          raw: {'column-count': '3'},
+        ),
+        css('& > *').styles(raw: {'break-inside': 'avoid'}),
+      ]),
+    ]),
+    css.media(MediaQuery.screen(maxWidth: 1200.px), [
+      css('#testimonials .testimonials-grid', [
+        css('&').styles(raw: {'column-count': '2'}),
+      ]),
+    ]),
+    css.media(MediaQuery.screen(maxWidth: 750.px), [
+      css('#testimonials .testimonials-grid', [
+        css('&').styles(raw: {'column-count': '1'}),
+      ]),
+    ]),
+  ];
 }

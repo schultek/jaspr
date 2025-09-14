@@ -15,18 +15,19 @@ final importsModuleOutput = {
     {
       "url": "dart:html",
       "show": ["window", "Window"],
-      "platform": 0
+      "platform": 0,
     },
     {
       "url": "dart:io",
       "show": ["HttpServer"],
-      "platform": 1
-    }
+      "platform": 1,
+    },
   ]),
 };
 
 final importsOutput = {
-  'site|lib/target.imports.dart': '// dart format off\n'
+  'site|lib/target.imports.dart':
+      '// dart format off\n'
       '// ignore_for_file: type=lint\n'
       '\n'
       '// GENERATED FILE, DO NOT MODIFY\n'
@@ -43,7 +44,8 @@ final importsOutput = {
 };
 
 final importsStubsOutput = {
-  'site|lib/generated/imports/_web.dart': '// dart format off\n'
+  'site|lib/generated/imports/_web.dart':
+      '// dart format off\n'
       '// ignore_for_file: type=lint\n\n'
       '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
@@ -55,7 +57,8 @@ final importsStubsOutput = {
       '\n'
       'typedef WindowOrStubbed = Window;\n'
       '',
-  'site|lib/generated/imports/_vm.dart': '// dart format off\n'
+  'site|lib/generated/imports/_vm.dart':
+      '// dart format off\n'
       '// ignore_for_file: type=lint\n\n'
       '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
@@ -67,7 +70,8 @@ final importsStubsOutput = {
       '\n'
       'typedef HttpServerOrStubbed = HttpServer;\n'
       '',
-  'site|lib/generated/imports/_stubs.dart': '// dart format off\n'
+  'site|lib/generated/imports/_stubs.dart':
+      '// dart format off\n'
       '// ignore_for_file: type=lint\n\n'
       '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'

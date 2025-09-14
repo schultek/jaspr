@@ -27,8 +27,11 @@ class ThemeToggleState extends State<ThemeToggle> {
   Component build(BuildContext context) {
     return Component.fragment([
       if (!kIsWeb)
-        Document.head(children: [
-          script(id: 'theme-script', content: '''
+        Document.head(
+          children: [
+            script(
+              id: 'theme-script',
+              content: '''
             let userTheme = window.localStorage.getItem('jaspr:theme');
             if (userTheme != null) {
               document.documentElement.setAttribute('data-theme', userTheme);
@@ -37,8 +40,10 @@ class ThemeToggleState extends State<ThemeToggle> {
             } else {
               document.documentElement.setAttribute('data-theme', 'light');
             }
-          '''),
-        ]),
+          ''',
+            ),
+          ],
+        ),
       if (kIsWeb) Document.html(attributes: {'data-theme': isDark ? 'dark' : 'light'}),
       button(
         classes: 'theme-toggle',
@@ -70,9 +75,7 @@ class ThemeToggleState extends State<ThemeToggle> {
         alignItems: AlignItems.center,
         backgroundColor: Colors.transparent,
       ),
-      css('&:hover').styles(
-        backgroundColor: Color('color-mix(in srgb, currentColor 5%, transparent)'),
-      ),
+      css('&:hover').styles(backgroundColor: Color('color-mix(in srgb, currentColor 5%, transparent)')),
     ]),
   ];
 }

@@ -1,6 +1,5 @@
-include: package:lints/recommended.yaml
+include: package:jaspr_repo/app.yaml
 
-# TODO: Reenable once migrated to analyzer v8.
-#analyzer:
-#  plugins:
-#    - custom_lint
+analyzer:
+  errors:
+    directives_ordering: ignore

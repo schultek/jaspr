@@ -10,10 +10,7 @@ import '../framework/framework.dart';
 import 'utils.dart';
 
 const htmlns = 'http://www.w3.org/1999/xhtml';
-const xmlns = {
-  'svg': 'http://www.w3.org/2000/svg',
-  'math': 'http://www.w3.org/1998/Math/MathML',
-};
+const xmlns = {'svg': 'http://www.w3.org/2000/svg', 'math': 'http://www.w3.org/1998/Math/MathML'};
 
 abstract class DomRenderObject implements RenderObject {
   @override
@@ -91,8 +88,13 @@ class DomRenderElement extends DomRenderObject
   }
 
   @override
-  void update(String? id, String? classes, Map<String, String>? styles, Map<String, String>? attributes,
-      Map<String, EventCallback>? events) {
+  void update(
+    String? id,
+    String? classes,
+    Map<String, String>? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+  ) {
     late Set<String> attributesToRemove;
 
     attributesToRemove = {};
@@ -102,8 +104,10 @@ class DomRenderElement extends DomRenderObject
 
     node.clearOrSetAttribute('id', id);
     node.clearOrSetAttribute('class', classes == null || classes.isEmpty ? null : classes);
-    node.clearOrSetAttribute('style',
-        styles == null || styles.isEmpty ? null : styles.entries.map((e) => '${e.key}: ${e.value}').join('; '));
+    node.clearOrSetAttribute(
+      'style',
+      styles == null || styles.isEmpty ? null : styles.entries.map((e) => '${e.key}: ${e.value}').join('; '),
+    );
 
     if (attributes != null && attributes.isNotEmpty) {
       for (final attr in attributes.entries) {
@@ -311,8 +315,10 @@ class DomRenderFragment extends DomRenderObject
       currentNode = prevNode;
     }
 
-    assert(firstChildNode!.previousSibling == afterNode,
-        'First child node should have been placed after the specified node.');
+    assert(
+      firstChildNode!.previousSibling == afterNode,
+      'First child node should have been placed after the specified node.',
+    );
   }
 
   void removeChildren(DomRenderObject parent) {
@@ -346,8 +352,10 @@ class DomRenderFragment extends DomRenderObject
     }
 
     assert(firstChildNode == node.childNodes.item(0), 'First child node should be the first child of the fragment.');
-    assert(lastChildNode == node.childNodes.item(node.childNodes.length - 1),
-        'Last child node should be the last child of the fragment.');
+    assert(
+      lastChildNode == node.childNodes.item(node.childNodes.length - 1),
+      'Last child node should be the last child of the fragment.',
+    );
 
     isAttached = false;
   }
@@ -412,7 +420,7 @@ mixin MultiChildDomRenderObject on DomRenderObject {
       final node = getRealNodeOf(after.lastChild);
       return node ?? getRealNodeOf(after.previousSibling);
     }
-    if (after == null && this is DomRenderFragment) {
+    if (after == null && this is DomRenderFragment && (this as DomRenderFragment).isAttached) {
       return (parent as MultiChildDomRenderObject).getRealNodeOf(previousSibling);
     }
     return after?.node;
@@ -448,8 +456,10 @@ mixin MultiChildDomRenderObject on DomRenderObject {
       if (child is! DomRenderFragment) {
         assert(childNode.previousSibling == afterNode, 'Child node should have been placed after the specified node.');
       } else if (child.firstChildNode != null) {
-        assert(child.firstChildNode?.previousSibling == afterNode,
-            'Fragment first child should have been placed after the specified node.');
+        assert(
+          child.firstChildNode?.previousSibling == afterNode,
+          'Fragment first child should have been placed after the specified node.',
+        );
       }
 
       final next = after?.nextSibling;

@@ -113,18 +113,21 @@ export const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
       final tagValue = data["tag"] ?? tag;
 
       content.write(
-          'Key? key, String? id, String? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
-          '  return Component.element(\n'
-          '    tag: \'$tagValue\',\n'
-          '    key: key,\n'
-          '    id: id,\n'
-          '    classes: classes,\n'
-          '    styles: styles,\n'
-          '    attributes: ');
+        'Key? key, String? id, String? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
+        '  return Component.element(\n'
+        '    tag: \'$tagValue\',\n'
+        '    key: key,\n'
+        '    id: id,\n'
+        '    classes: classes,\n'
+        '    styles: styles,\n'
+        '    attributes: ',
+      );
 
       if (attrs != null) {
-        content.write('{\n'
-            '      ...?attributes,\n');
+        content.write(
+          '{\n'
+          '      ...?attributes,\n',
+        );
 
         for (var attr in attrs.keys) {
           var name = attrs[attr]['name'] ?? attr;
@@ -138,24 +141,24 @@ export const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
 
           if (type == 'boolean') {
             content.write('if ($name == true) ');
-          } else if (!required) {
-            content.write('if ($name != null) ');
           }
 
           content.write("'$attr': ");
 
+          var nullCheck = !required && type != 'boolean' ? '?' : '';
+
           if (type == 'string') {
-            content.write('$name');
+            content.write('$nullCheck$name');
           } else if (type == 'boolean') {
             content.write("''");
           } else if (type == 'int' || type == 'double') {
-            content.write("'\$$name'");
+            content.write("$nullCheck$name$nullCheck.toString()");
           } else if (type is String && type.startsWith('enum:')) {
-            content.write('$name.value');
+            content.write('$nullCheck$name$nullCheck.value');
           } else if (type is String && type.startsWith('css:')) {
-            content.write('$name.value');
+            content.write('$nullCheck$name$nullCheck.value');
           } else if (type is Map<String, dynamic>) {
-            content.write('$name.value');
+            content.write('$nullCheck$name$nullCheck.value');
           } else {
             throw ArgumentError('Attribute type is unknown ($type) for attribute $key.$tag.$attr');
           }
@@ -171,10 +174,12 @@ export const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
       content.write('    events: ');
 
       if (events.isNotEmpty) {
-        content.write('{\n'
-            '      ...?events,\n'
-            '      ..._events(${events.map((e) => '$e: $e').join(', ')}),\n'
-            '    },\n');
+        content.write(
+          '{\n'
+          '      ...?events,\n'
+          '      ..._events(${events.map((e) => '$e: $e').join(', ')}),\n'
+          '    },\n',
+        );
       } else {
         content.write('events,\n');
       }
@@ -185,8 +190,10 @@ export const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
         content.write('    children: [if ($contentParam != null) raw($contentParam)],\n');
       }
 
-      content.writeln('  );\n'
-          '}');
+      content.writeln(
+        '  );\n'
+        '}',
+      );
 
       if (attrs != null) {
         for (var attr in attrs.keys) {
@@ -212,10 +219,12 @@ export const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
                 }
               }
 
-              content.writeln('\n'
-                  '  final String value;\n'
-                  '  const $name(this.value);\n'
-                  '}');
+              content.writeln(
+                '\n'
+                '  final String value;\n'
+                '  const $name(this.value);\n'
+                '}',
+              );
             }
           }
         }

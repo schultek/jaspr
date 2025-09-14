@@ -1,8 +1,8 @@
+import 'package:highlight/highlight.dart' show Node, Result, highlight;
 import 'package:jaspr/jaspr.dart';
 
-import 'package:highlight/highlight.dart' show Node, Result, highlight;
-import 'package:website/components/code_window/theme.dart';
-import 'package:website/constants/theme.dart';
+import '../../constants/theme.dart';
+import 'theme.dart';
 
 class CodeBlock extends StatelessComponent {
   const CodeBlock({
@@ -45,8 +45,8 @@ class CodeBlock extends StatelessComponent {
                 span([raw(lines[i])]),
                 raw('&nbsp;'),
               ]),
-              br()
-            ]
+              br(),
+            ],
           ]),
         ]),
       ]),
@@ -55,76 +55,66 @@ class CodeBlock extends StatelessComponent {
 
   @css
   static List<StyleRule> get styles => [
-        css('.code-block', [
-          css('&').styles(display: Display.flex),
-          css('pre', [
+    css('.code-block', [
+      css('&').styles(display: Display.flex),
+      css('pre', [
+        css('&').styles(
+          position: Position.relative(),
+          width: Unit.zero,
+          padding: Padding.only(left: 3.em),
+          margin: Margin.zero,
+          flex: Flex(grow: 1),
+        ),
+        css('&::before').styles(
+          content: '',
+          display: Display.block,
+          position: Position.absolute(left: Unit.zero),
+          width: 3.em,
+          height: 100.percent,
+          backgroundColor: surfaceLow,
+        ),
+        css('code', [
+          css('&')
+              .styles(
+                display: Display.inlineBlock,
+                width: 100.percent,
+                padding: Padding.only(top: 0.5.em, bottom: 0.5.em, right: 0.5.em),
+                boxSizing: BoxSizing.borderBox,
+                overflow: Overflow.only(x: Overflow.hidden),
+                textAlign: TextAlign.start,
+                backgroundColor: surfaceLowest,
+              )
+              .combine(jasprTheme['root']!),
+          css('&.scroll').styles(overflow: Overflow.only(x: Overflow.scroll)),
+        ]),
+        css('.lines', [
+          css('&').styles(display: Display.inlineBlock, minWidth: 100.percent),
+          css('.line', [
             css('&').styles(
-              position: Position.relative(),
-              width: Unit.zero,
-              padding: Padding.only(left: 3.em),
-              margin: Margin.zero,
-              flex: Flex(grow: 1),
+              display: Display.inlineBlock,
+              width: 100.percent,
+              padding: Padding.only(left: .5.em),
             ),
-            css('&::before').styles(
-              content: '',
-              display: Display.block,
+            css('.line-number').styles(
+              display: Display.inlineBlock,
               position: Position.absolute(left: Unit.zero),
               width: 3.em,
-              height: 100.percent,
-              backgroundColor: surfaceLow,
+              padding: Padding.only(right: 0.6.em),
+              boxSizing: BoxSizing.borderBox,
+              opacity: 0.5,
+              color: textBlack,
+              textAlign: TextAlign.right,
             ),
-            css('code', [
-              css('&')
-                  .styles(
-                    display: Display.inlineBlock,
-                    width: 100.percent,
-                    padding: Padding.only(top: 0.5.em, bottom: 0.5.em, right: 0.5.em),
-                    boxSizing: BoxSizing.borderBox,
-                    overflow: Overflow.only(x: Overflow.hidden),
-                    textAlign: TextAlign.start,
-                    backgroundColor: surfaceLowest,
-                  )
-                  .combine(jasprTheme['root']!),
-              css('&.scroll').styles(
-                overflow: Overflow.only(x: Overflow.scroll),
-              ),
-            ]),
-            css('.lines', [
-              css('&').styles(
-                display: Display.inlineBlock,
-                minWidth: 100.percent,
-              ),
-              css('.line', [
-                css('&').styles(
-                  display: Display.inlineBlock,
-                  width: 100.percent,
-                  padding: Padding.only(left: .5.em),
-                ),
-                css('.line-number').styles(
-                  display: Display.inlineBlock,
-                  position: Position.absolute(left: Unit.zero),
-                  width: 3.em,
-                  padding: Padding.only(right: 0.6.em),
-                  boxSizing: BoxSizing.borderBox,
-                  opacity: 0.5,
-                  color: textBlack,
-                  textAlign: TextAlign.right,
-                ),
-              ]),
-              css('&.selectable .line:hover', [
-                css('&').styles(
-                  backgroundColor: hoverOverlayColor,
-                ),
-                css('.line-number').styles(
-                  opacity: 1,
-                  backgroundColor: hoverOverlayColor,
-                ),
-              ]),
-            ]),
-            for (final e in jasprTheme.entries) css('code span.hljs-${e.key}').combine(e.value),
+          ]),
+          css('&.selectable .line:hover', [
+            css('&').styles(backgroundColor: hoverOverlayColor),
+            css('.line-number').styles(opacity: 1, backgroundColor: hoverOverlayColor),
           ]),
         ]),
-      ];
+        for (final e in jasprTheme.entries) css('code span.hljs-${e.key}').combine(e.value),
+      ]),
+    ]),
+  ];
 }
 
 extension on Result {

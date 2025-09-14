@@ -20,19 +20,18 @@ Future<FlutterApp> _flutterApp = Future(() {
   flutter!.loader!.didCreateEngineInitializer = (EngineInitializer engineInitializer) {
     return Future(() async {
       var engine = await engineInitializer
-          .initializeEngine(InitializeEngineOptions(
-            multiViewEnabled: true,
-            renderer: 'canvaskit',
-          ))
+          .initializeEngine(InitializeEngineOptions(multiViewEnabled: true, renderer: 'canvaskit'))
           .toDart;
       var app = await engine.runApp().toDart;
       completer.complete(app);
     }).toJS;
   }.toJS;
 
-  ui_web.bootstrapEngine(runApp: () {
-    flt.runWidget(MultiViewApp(viewBuilder: (viewId) => _viewWidgets[viewId]));
-  });
+  ui_web.bootstrapEngine(
+    runApp: () {
+      flt.runWidget(MultiViewApp(viewBuilder: (viewId) => _viewWidgets[viewId]));
+    },
+  );
 
   return completer.future;
 });
@@ -73,10 +72,7 @@ extension type FlutterLoader._(JSObject _) {
 }
 
 extension type LoadOptions._(JSObject _) {
-  external LoadOptions({
-    String? entrypointUrl,
-    JSFunction? onEntrypointLoaded,
-  });
+  external LoadOptions({String? entrypointUrl, JSFunction? onEntrypointLoaded});
 }
 
 extension type EngineInitializer._(JSObject _) {
@@ -86,11 +82,7 @@ extension type EngineInitializer._(JSObject _) {
 }
 
 extension type InitializeEngineOptions._(JSObject _) {
-  external InitializeEngineOptions({
-    Element? hostElement,
-    bool? multiViewEnabled,
-    String? renderer,
-  });
+  external InitializeEngineOptions({Element? hostElement, bool? multiViewEnabled, String? renderer});
 }
 
 extension type AppRunner._(JSObject _) implements JSObject {

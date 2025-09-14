@@ -1,10 +1,8 @@
-// ignore_for_file: implementation_imports, deprecated_member_use
-
 import 'dart:convert';
 
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_style/dart_style.dart';
@@ -12,7 +10,8 @@ import 'package:jaspr/jaspr.dart'
     show ClientAnnotation, CssUtility, Import, Component, Key, StyleRule, SyncAnnotation, State;
 import 'package:source_gen/source_gen.dart';
 
-const String generationHeader = "// dart format off\n"
+const String generationHeader =
+    "// dart format off\n"
     "// ignore_for_file: type=lint\n\n"
     "// GENERATED FILE, DO NOT MODIFY\n"
     "// Generated with jaspr_builder\n\n";
@@ -25,14 +24,14 @@ extension DartOutput on BuildStep {
   }
 }
 
-var clientChecker = TypeChecker.fromRuntime(ClientAnnotation);
-var componentChecker = TypeChecker.fromRuntime(Component);
-final keyChecker = TypeChecker.fromRuntime(Key);
-var stylesChecker = TypeChecker.fromRuntime(CssUtility);
-var styleRuleChecker = TypeChecker.fromRuntime(StyleRule);
-var syncChecker = TypeChecker.fromRuntime(SyncAnnotation);
-var stateChecker = TypeChecker.fromRuntime(State);
-var importChecker = TypeChecker.fromRuntime(Import);
+var clientChecker = TypeChecker.typeNamed(ClientAnnotation, inPackage: 'jaspr');
+var componentChecker = TypeChecker.typeNamed(Component, inPackage: 'jaspr');
+final keyChecker = TypeChecker.typeNamed(Key, inPackage: 'jaspr');
+var stylesChecker = TypeChecker.typeNamed(CssUtility, inPackage: 'jaspr');
+var styleRuleChecker = TypeChecker.typeNamed(StyleRule, inPackage: 'jaspr');
+var syncChecker = TypeChecker.typeNamed(SyncAnnotation, inPackage: 'jaspr');
+var stateChecker = TypeChecker.typeNamed(State, inPackage: 'jaspr');
+var importChecker = TypeChecker.typeNamed(Import, inPackage: 'jaspr');
 
 class ImportEntry {
   String url;
@@ -53,9 +52,9 @@ extension TypeStub on String {
   }
 }
 
-extension ElementNode on Element2 {
+extension ElementNode on Element {
   AstNode? get node {
-    var result = session?.getParsedLibraryByElement2(library2!);
+    var result = session?.getParsedLibraryByElement(library!);
     if (result is ParsedLibraryResult) {
       return result.getFragmentDeclaration(firstFragment)?.node;
     } else {

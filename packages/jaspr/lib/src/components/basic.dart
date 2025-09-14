@@ -89,10 +89,7 @@ class Builder extends StatelessComponent {
   /// Creates a component that delegates its build to a callback.
   ///
   /// The [builder] argument must not be null.
-  const Builder({
-    super.key,
-    required this.builder,
-  });
+  const Builder({super.key, required this.builder});
 
   /// Called to obtain the child component.
   ///
@@ -127,10 +124,7 @@ class StatefulBuilder extends StatefulComponent {
   /// Creates a component that both has state and delegates its build to a callback.
   ///
   /// The [builder] argument must not be null.
-  const StatefulBuilder({
-    super.key,
-    required this.builder,
-  });
+  const StatefulBuilder({super.key, required this.builder});
 
   /// Called to obtain the child component.
   ///

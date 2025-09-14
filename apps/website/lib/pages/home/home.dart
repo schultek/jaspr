@@ -11,17 +11,22 @@ class Home extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return fragment([
-      Document.head(title: 'Jaspr', meta: {
-        'description': 'The Web Framework for Dart Developers.',
-        'keywords': 'jaspr, dart, web, flutter',
-        "author": "Kilian Schulte",
-      }, children: [
-        meta(attributes: {'property': 'og:title'}, content: 'Jaspr | Dart Web Framework'),
-        meta(
+      Document.head(
+        title: 'Jaspr',
+        meta: {
+          'description': 'The Web Framework for Dart Developers.',
+          'keywords': 'jaspr, dart, web, flutter',
+          "author": "Kilian Schulte",
+        },
+        children: [
+          meta(attributes: {'property': 'og:title'}, content: 'Jaspr | Dart Web Framework'),
+          meta(
             attributes: {'property': 'og:description'},
-            content: 'Jaspr is a free and open source framework for building websites in Dart.'),
-        meta(attributes: {'property': 'og:image'}, content: 'https://jaspr.site/images/og_image.png'),
-      ]),
+            content: 'Jaspr is a free and open source framework for building websites in Dart.',
+          ),
+          meta(attributes: {'property': 'og:image'}, content: 'https://jaspr.site/images/og_image.png'),
+        ],
+      ),
       Hero(),
       Meet(),
       DevExp(),

@@ -13,9 +13,15 @@ import 'matching.dart';
 import 'route.dart';
 
 /// A GoRouter redirector function.
-typedef RouteRedirector = FutureOr<RouteMatchList> Function(
-    BuildContext, RouteMatchList, RouteConfiguration, RouteMatcher,
-    {List<RouteMatchList>? redirectHistory, Object? extra});
+typedef RouteRedirector =
+    FutureOr<RouteMatchList> Function(
+      BuildContext,
+      RouteMatchList,
+      RouteConfiguration,
+      RouteMatcher, {
+      List<RouteMatchList>? redirectHistory,
+      Object? extra,
+    });
 
 /// Processes redirects by returning a new [RouteMatchList] representing the new
 /// location.
@@ -40,14 +46,7 @@ FutureOr<RouteMatchList> redirect(
       if (newMatch.isError) {
         return newMatch;
       }
-      return redirect(
-        context,
-        newMatch,
-        configuration,
-        matcher,
-        redirectHistory: redirectHistory,
-        extra: extra,
-      );
+      return redirect(context, newMatch, configuration, matcher, redirectHistory: redirectHistory, extra: extra);
     }
 
     FutureOr<RouteMatchList> processRouteLevelRedirect(String? routeRedirectLocation) {
@@ -63,14 +62,7 @@ FutureOr<RouteMatchList> redirect(
         if (newMatch.isError) {
           return newMatch;
         }
-        return redirect(
-          context,
-          newMatch,
-          configuration,
-          matcher,
-          redirectHistory: redirectHistory,
-          extra: extra,
-        );
+        return redirect(context, newMatch, configuration, matcher, redirectHistory: redirectHistory, extra: extra);
       }
       return prevMatchList;
     }
@@ -188,9 +180,8 @@ class RedirectionError extends Error implements UnsupportedError {
   final Uri location;
 
   @override
-  String toString() => '${super.toString()} ${<String>[
-        ...matches.map((RouteMatchList routeMatches) => routeMatches.uri.toString()),
-      ].join(' => ')}';
+  String toString() =>
+      '${super.toString()} ${<String>[...matches.map((RouteMatchList routeMatches) => routeMatches.uri.toString())].join(' => ')}';
 }
 
 /// Adds the redirect to [redirects] if it is valid.

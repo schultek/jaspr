@@ -35,9 +35,6 @@ class Button extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return button(
-      onClick: onPressed,
-      [text(label)],
-    );
+    return button(onClick: onPressed, [text(label)]);
   }
 }

@@ -1,12 +1,12 @@
-## 0.3.22-dev.1
+## 0.3.23
 
-- `jaspr` upgraded to `0.21.0-dev.1`
-- `jaspr_test` upgraded to `0.21.0-dev.1`
+- `jaspr` upgraded to `0.21.1`
+- `jaspr_test` upgraded to `0.21.1`
 
-## 0.3.22-dev.0
+## 0.3.22
 
-- `jaspr` upgraded to `0.21.0-dev.0`
-- `jaspr_test` upgraded to `0.21.0-dev.0`
+- `jaspr` upgraded to `0.21.0`
+- `jaspr_test` upgraded to `0.21.0`
 
 ## 0.3.21
 

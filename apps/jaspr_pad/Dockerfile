@@ -6,9 +6,7 @@ WORKDIR /app
 COPY . /app
 WORKDIR /app
 
-RUN dart pub global activate jaspr_cli 0.15.1
-
-RUN rm -f pubspec_overrides.yaml
+RUN dart pub global activate jaspr_cli 0.21.0
 RUN dart pub get
 
 RUN jaspr build

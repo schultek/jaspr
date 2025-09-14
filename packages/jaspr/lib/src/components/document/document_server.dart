@@ -36,11 +36,7 @@ abstract class Document implements Component {
   ///
   /// The `name` (default 'index') defines which template file to load: `web/<name>.template.html`.
   /// The `attachTo`(default 'body') defines where to attach the child component in the loaded template.
-  const factory Document.template({
-    String name,
-    String attachTo,
-    required Component child,
-  }) = TemplateDocument;
+  const factory Document.template({String name, String attachTo, required Component child}) = TemplateDocument;
 
   /// Attaches a set of attributes to the `<html>` element.
   ///
@@ -49,10 +45,7 @@ abstract class Document implements Component {
   ///
   /// Can be used multiple times in an application where deeper or latter mounted
   /// components will override duplicate attributes from other `.html()` components.
-  const factory Document.html({
-    Map<String, String>? attributes,
-    Key? key,
-  }) = AttachDocument.html;
+  const factory Document.html({Map<String, String>? attributes, Key? key}) = AttachDocument.html;
 
   /// Renders metadata and other elements inside the `<head>` of the document.
   ///
@@ -93,12 +86,8 @@ abstract class Document implements Component {
   /// - elements with an `id` override other elements with the same `id`
   /// - `<title>` and `<base>` elements override other `<title>` or `<base>` elements respectively
   /// - `<meta>` elements override other `<meta>` elements with the same `name`
-  const factory Document.head({
-    String? title,
-    Map<String, String>? meta,
-    List<Component>? children,
-    Key? key,
-  }) = HeadDocument;
+  const factory Document.head({String? title, Map<String, String>? meta, List<Component>? children, Key? key}) =
+      HeadDocument;
 
   /// Attaches a set of attributes to the `<body>` element.
   ///
@@ -107,10 +96,7 @@ abstract class Document implements Component {
   ///
   /// Can be used multiple times in an application where deeper or latter mounted
   /// components will override duplicate attributes from other `.body()` components.
-  const factory Document.body({
-    Map<String, String>? attributes,
-    Key? key,
-  }) = AttachDocument.body;
+  const factory Document.body({Map<String, String>? attributes, Key? key}) = AttachDocument.body;
 }
 
 // Only allow a single Document.
@@ -155,22 +141,14 @@ class BaseDocument extends StatelessComponent implements Document {
   Component build(BuildContext context) {
     return Component.element(
       tag: 'html',
-      attributes: {
-        if (lang != null) 'lang': lang!,
-      },
+      attributes: {if (lang != null) 'lang': lang!},
       children: [
         Component.element(
           tag: 'head',
           children: [
             if (base != null) Component.element(tag: 'base', attributes: {'href': _normalizedBase!}),
             if (charset != null) Component.element(tag: 'meta', attributes: {'charset': charset!}),
-            HeadDocument(
-              title: title,
-              meta: {
-                if (viewport != null) 'viewport': viewport!,
-                ...meta,
-              },
-            ),
+            HeadDocument(title: title, meta: {if (viewport != null) 'viewport': viewport!, ...meta}),
             if (styles.isNotEmpty) //
               Style(styles: styles),
             ...head,
@@ -183,11 +161,7 @@ class BaseDocument extends StatelessComponent implements Document {
 }
 
 class TemplateDocument extends StatelessComponent implements Document {
-  const TemplateDocument({
-    this.name = 'index',
-    this.attachTo = 'body',
-    required this.child,
-  }) : super(key: _documentKey);
+  const TemplateDocument({this.name = 'index', this.attachTo = 'body', required this.child}) : super(key: _documentKey);
 
   final String name;
   final String attachTo;
@@ -316,12 +290,8 @@ class HeadDocument extends StatelessComponent implements Document {
 }
 
 class AttachDocument extends StatelessComponent implements Document {
-  const AttachDocument.html({this.attributes, super.key})
-      : target = 'html',
-        children = null;
-  const AttachDocument.body({this.attributes, super.key})
-      : target = 'body',
-        children = null;
+  const AttachDocument.html({this.attributes, super.key}) : target = 'html', children = null;
+  const AttachDocument.body({this.attributes, super.key}) : target = 'body', children = null;
   const AttachDocument({required this.target, this.attributes, this.children});
 
   final String target;
