@@ -83,13 +83,6 @@
         {
           "command": "jaspr.doctor"
         }
-      ],
-      "editor/context": [
-        {
-          "command": "jaspr.pasteHTMLAsJaspr",
-          "when": "jaspr-code:anyJasprProjectLoaded && resourceLangId == dart",
-          "group": "9_cutcopypaste@4"
-        }
       ]
     },
     "debuggers": [

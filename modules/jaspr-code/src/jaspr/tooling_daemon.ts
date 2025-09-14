@@ -2,12 +2,17 @@ import * as vscode from "vscode";
 
 import { dartExtensionApi, DartProcess } from "../api";
 import { checkJasprInstalled } from "../helpers/install_helper";
+import { spawn } from "child_process";
 
 export class JasprToolingDaemon implements vscode.Disposable {
   private _disposables: vscode.Disposable[] = [];
 
   private statusItem: vscode.LanguageStatusItem | undefined;
   private process: DartProcess | undefined;
+
+  private _onDidRestart: vscode.EventEmitter<void> =
+    new vscode.EventEmitter<void>();
+  public readonly onDidRestart: vscode.Event<void> = this._onDidRestart.event;
 
   async start(context: vscode.ExtensionContext): Promise<void> {
     const isInstalled = await checkJasprInstalled();
@@ -16,8 +21,11 @@ export class JasprToolingDaemon implements vscode.Disposable {
     }
 
     this._disposables.push(
-      vscode.commands.registerCommand("jaspr.restartToolingDaemon", () => {
-        this._startProcess();
+      vscode.commands.registerCommand("jaspr.restartToolingDaemon", async () => {
+        await this._startProcess(context);
+        if (this.process) {
+          this._onDidRestart.fire();
+        }
       })
     );
 
@@ -30,7 +38,7 @@ export class JasprToolingDaemon implements vscode.Disposable {
     );
     this.statusItem.name = "Jaspr Tooling Daemon";
 
-    await this._startProcess();
+    await this._startProcess(context);
   }
 
   public setBusy(busy: boolean) {
@@ -40,15 +48,33 @@ export class JasprToolingDaemon implements vscode.Disposable {
     this.statusItem!.busy = busy;
   }
 
-  async _startProcess() {
+  async _startProcess(context: vscode.ExtensionContext) {
     this.statusItem!.text = "$(loading~spin) Starting Jaspr Tooling Daemon...";
     this.statusItem!.severity = vscode.LanguageStatusSeverity.Information;
     this.statusItem!.command = undefined;
     this.statusItem!.busy = true;
 
-    const args = ["pub", "global", "run", "jaspr_cli:jaspr", "tooling-daemon"];
+    this.process?.kill();
 
-    this.process = await dartExtensionApi.sdk.startDart("", args);
+    if (context.extensionMode === vscode.ExtensionMode.Development) {
+      this.process = spawn("jaspr", ["tooling-daemon"], {
+        stdio: ["pipe", "pipe", "pipe"],
+        shell: true,
+      });
+    } else {
+      const args = [
+        "pub",
+        "global",
+        "run",
+        "jaspr_cli:jaspr",
+        "tooling-daemon",
+      ];
+
+      this.process = await dartExtensionApi.sdk.startDart("", args);
+    }
+
+    // Give it a moment to start before marking it as not busy.
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     this.statusItem!.busy = false;
 
@@ -62,7 +88,12 @@ export class JasprToolingDaemon implements vscode.Disposable {
       return;
     }
 
+    this.statusItem!.severity = vscode.LanguageStatusSeverity.Information;
     this.statusItem!.text = "Jaspr Tooling Daemon";
+    this.statusItem!.command = {
+      title: "Restart",
+      command: "jaspr.restartToolingDaemon",
+    };
 
     this.process.stdout.setEncoding("utf8");
     this.process.stdout.on("data", (data: Buffer | string) => {
@@ -72,8 +103,9 @@ export class JasprToolingDaemon implements vscode.Disposable {
     this.process.stderr.on("data", (data: Buffer | string) => {
       this.handleData(data, true);
     });
+    const p = this.process;
     this.process.on("close", (code: any) => {
-      if (this.statusItem) {
+      if (this.statusItem && code) {
         this.statusItem!.severity = vscode.LanguageStatusSeverity.Error;
         this.statusItem!.text = `Jaspr Tooling Daemon exited with code ${code}`;
         this.statusItem!.command = {
@@ -81,9 +113,10 @@ export class JasprToolingDaemon implements vscode.Disposable {
           command: "jaspr.restartToolingDaemon",
         };
       }
-    });
-    this.process.on("exit", (code: any) => {
-      console.log("exit", code);
+
+      if (this.process === p) {
+        this.process = undefined;
+      }
     });
   }
 
@@ -115,6 +148,8 @@ export class JasprToolingDaemon implements vscode.Disposable {
         } catch (_) {}
         if (event && event.event) {
           this.handleEvent(event);
+        } else if (event && event.id) {
+          this.handleResponse(event);
         } else {
           console.log("Tooling Daemon Log:", currentLine);
         }
@@ -139,14 +174,64 @@ export class JasprToolingDaemon implements vscode.Disposable {
     }
   }
 
-  sendMessage(method: string, params: any): void {
+  handleResponse(response: any) {
+    var id = response.id;
+    var result = response.result;
+    var error = response.error;
+
+    console.log("Tooling Daemon Response:", id, result, error);
+
+    if (this._responseListeners[id]) {
+      try {
+        this._responseListeners[id](result, error);
+      } catch (e) {
+        console.error(`Error in response listener for ${id}:`, e);
+      }
+    }
+  }
+
+  private _responseListeners: {
+    [id: string]: (result: any, error?: any) => void;
+  } = {};
+
+  async sendMessage(
+    method: string,
+    params: any,
+    timeout?: number
+  ): Promise<any> {
     if (!this.process) {
       console.error("Tooling Daemon is not running");
-      return;
+      return null;
     }
 
-    const message = JSON.stringify([{ method, params, id: "0" }]) + "\n";
+    const id = Math.random().toString(36).substring(2, 15);
+
+    const message = JSON.stringify([{ method, params, id: id }]) + "\n";
     this.process.stdin.write(message);
+
+    return new Promise((resolve, reject) => {
+      this._responseListeners[id] = (response: any, error?: any) => {
+        delete this._responseListeners[id];
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(response);
+      };
+
+      if (timeout) {
+        setTimeout(() => {
+          if (this._responseListeners[id]) {
+            delete this._responseListeners[id];
+            reject(
+              new Error(
+                `Timeout waiting for response from tooling daemon. Please try again.`
+              )
+            );
+          }
+        }, timeout);
+      }
+    });
   }
 
   private _eventListeners: { [name: string]: (params: any) => void } = {};

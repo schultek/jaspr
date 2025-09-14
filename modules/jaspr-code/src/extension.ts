@@ -6,7 +6,7 @@ import {
 } from "./debug";
 
 import { createJasprProject, handleNewProjects } from "./create";
-import { jasprClean, jasprDoctor, pastHtmlAsJaspr } from "./commands";
+import { jasprClean, jasprDoctor } from "./commands";
 import { ComponentCodeLensProvider } from "./code_lens";
 import { JasprServeDaemon } from "./jaspr/serve_daemon";
 import {
@@ -15,6 +15,7 @@ import {
 } from "./helpers/project_helper";
 import { JasprToolingDaemon } from "./jaspr/tooling_daemon";
 import { ScopesDomain } from "./jaspr/scopes_domain";
+import { HtmlDomain } from "./jaspr/html_domain";
 
 export async function activate(context: vscode.ExtensionContext) {
   let projects = await findJasprProjectFolders();
@@ -97,7 +98,6 @@ export async function activate(context: vscode.ExtensionContext) {
     )
   );
 
-  context.subscriptions.push(
-    vscode.commands.registerCommand("jaspr.pasteHTMLAsJaspr", pastHtmlAsJaspr)
-  );
+  const htmlDomain = new HtmlDomain(toolingDaemon);
+  context.subscriptions.push(htmlDomain);
 }

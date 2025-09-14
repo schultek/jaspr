@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Added html domain to tooling daemon.
+
 ## 0.21.1
 
 - Fix rendering issue with fragments.
