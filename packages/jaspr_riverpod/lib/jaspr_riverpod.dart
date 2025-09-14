@@ -33,8 +33,8 @@ export 'src/internals.dart'
         AsyncResult,
         AsyncValueExtensions,
         ProviderContext,
-        SyncFutureProviderExtension,
-        SyncProviderExtension,
-        SyncStateProviderExtension,
         SyncNotifierExtension,
-        SyncAsyncNotifierExtension;
+        SyncAsyncNotifierExtension,
+        SyncProviderExtension,
+        SyncFutureProviderExtension,
+        SyncStreamProviderExtension;

@@ -199,10 +199,6 @@
           "href": "/api/components/document"
         },
         {
-          "title": "Fragment",
-          "href": "/api/components/fragment"
-        },
-        {
           "title": "RawText",
           "href": "/api/components/raw_text"
         },

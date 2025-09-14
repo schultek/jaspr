@@ -87,7 +87,7 @@ Component build() {
 }
 ```
 
-The `sync` property of `ProviderScope` receives a list of `provier.syncWith(String key)`, where `provider` can be any Provider. It will:
+The `sync` property of `ProviderScope` receives a list of `provier.syncWith(String key, {Codec<T, Object?>? codec})`, where `provider` can be any Provider. It will:
 
 - on the server: read the value of the provider and send it to the client
 - on the client: receive the value from the server and override the provider with it.

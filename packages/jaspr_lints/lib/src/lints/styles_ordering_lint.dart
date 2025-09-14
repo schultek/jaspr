@@ -110,7 +110,7 @@ class OrderStylesFix extends DartFix {
     Diagnostic analysisError,
     List<Diagnostic> others,
   ) {
-    if (analysisError.data case (NodeList<Expression> arguments, List<String> params)) {
+    if (analysisError.data case (NodeList<Expression> arguments, List<String?> params)) {
       var violatesOrder = !StylesOrderingLint.isOrdered(arguments, params);
       if (!violatesOrder) {
         return;

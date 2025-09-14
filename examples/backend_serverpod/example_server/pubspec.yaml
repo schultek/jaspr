@@ -1,6 +1,6 @@
 name: example_server
 description: Starting point for a Serverpod server.
-version: 0.1.2-dev.1
+version: 0.1.4
 publish_to: none
 
 environment:
@@ -9,14 +9,14 @@ environment:
 resolution: workspace
 
 dependencies:
-  jaspr: ^0.21.0-dev.0
+  jaspr: ^0.21.0
   jaspr_serverpod: ^0.5.6
   serverpod: 2.3.0
 
 dev_dependencies:
   build_runner: ^2.6.0
   build_web_compilers: ^4.2.0
-  jaspr_builder: ^0.21.0-dev.0
+  jaspr_builder: ^0.21.0
   jaspr_repo: any
 
 jaspr:

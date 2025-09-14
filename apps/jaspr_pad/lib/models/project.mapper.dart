@@ -1,5 +1,6 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
@@ -27,7 +28,11 @@ class ProjectDataBaseMapper extends ClassMapperBase<ProjectDataBase> {
   final MappableFields<ProjectDataBase> fields = const {};
 
   static ProjectDataBase _instantiate(DecodingData data) {
-    throw MapperException.missingSubclass('ProjectDataBase', 'type', '${data.value['type']}');
+    throw MapperException.missingSubclass(
+      'ProjectDataBase',
+      'type',
+      '${data.value['type']}',
+    );
   }
 
   @override
@@ -62,13 +67,28 @@ class ProjectDataMapper extends SubClassMapperBase<ProjectData> {
   static String? _$id(ProjectData v) => v.id;
   static const Field<ProjectData, String> _f$id = Field('id', _$id, opt: true);
   static String? _$description(ProjectData v) => v.description;
-  static const Field<ProjectData, String> _f$description = Field('description', _$description, opt: true);
+  static const Field<ProjectData, String> _f$description = Field(
+    'description',
+    _$description,
+    opt: true,
+  );
   static String? _$htmlFile(ProjectData v) => v.htmlFile;
-  static const Field<ProjectData, String> _f$htmlFile = Field('htmlFile', _$htmlFile, opt: true);
+  static const Field<ProjectData, String> _f$htmlFile = Field(
+    'htmlFile',
+    _$htmlFile,
+    opt: true,
+  );
   static String? _$cssFile(ProjectData v) => v.cssFile;
-  static const Field<ProjectData, String> _f$cssFile = Field('cssFile', _$cssFile, opt: true);
+  static const Field<ProjectData, String> _f$cssFile = Field(
+    'cssFile',
+    _$cssFile,
+    opt: true,
+  );
   static String _$mainDartFile(ProjectData v) => v.mainDartFile;
-  static const Field<ProjectData, String> _f$mainDartFile = Field('mainDartFile', _$mainDartFile);
+  static const Field<ProjectData, String> _f$mainDartFile = Field(
+    'mainDartFile',
+    _$mainDartFile,
+  );
   static Map<String, String> _$dartFiles(ProjectData v) => v.dartFiles;
   static const Field<ProjectData, Map<String, String>> _f$dartFiles = Field(
     'dartFiles',
@@ -92,7 +112,8 @@ class ProjectDataMapper extends SubClassMapperBase<ProjectData> {
   @override
   final dynamic discriminatorValue = 'ProjectData';
   @override
-  late final ClassMapperBase superMapper = ProjectDataBaseMapper.ensureInitialized();
+  late final ClassMapperBase superMapper =
+      ProjectDataBaseMapper.ensureInitialized();
 
   static ProjectData _instantiate(DecodingData data) {
     return ProjectData(
@@ -119,23 +140,36 @@ class ProjectDataMapper extends SubClassMapperBase<ProjectData> {
 
 mixin ProjectDataMappable {
   String toJson() {
-    return ProjectDataMapper.ensureInitialized().encodeJson<ProjectData>(this as ProjectData);
+    return ProjectDataMapper.ensureInitialized().encodeJson<ProjectData>(
+      this as ProjectData,
+    );
   }
 
   Map<String, dynamic> toMap() {
-    return ProjectDataMapper.ensureInitialized().encodeMap<ProjectData>(this as ProjectData);
+    return ProjectDataMapper.ensureInitialized().encodeMap<ProjectData>(
+      this as ProjectData,
+    );
   }
 
   ProjectDataCopyWith<ProjectData, ProjectData, ProjectData> get copyWith =>
-      _ProjectDataCopyWithImpl<ProjectData, ProjectData>(this as ProjectData, $identity, $identity);
+      _ProjectDataCopyWithImpl<ProjectData, ProjectData>(
+        this as ProjectData,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
-    return ProjectDataMapper.ensureInitialized().stringifyValue(this as ProjectData);
+    return ProjectDataMapper.ensureInitialized().stringifyValue(
+      this as ProjectData,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return ProjectDataMapper.ensureInitialized().equalsValue(this as ProjectData, other);
+    return ProjectDataMapper.ensureInitialized().equalsValue(
+      this as ProjectData,
+      other,
+    );
   }
 
   @override
@@ -144,13 +178,16 @@ mixin ProjectDataMappable {
   }
 }
 
-extension ProjectDataValueCopy<$R, $Out> on ObjectCopyWith<$R, ProjectData, $Out> {
+extension ProjectDataValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, ProjectData, $Out> {
   ProjectDataCopyWith<$R, ProjectData, $Out> get $asProjectData =>
       $base.as((v, t, t2) => _ProjectDataCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
-abstract class ProjectDataCopyWith<$R, $In extends ProjectData, $Out> implements ClassCopyWith<$R, $In, $Out> {
-  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get dartFiles;
+abstract class ProjectDataCopyWith<$R, $In extends ProjectData, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
+  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>>
+  get dartFiles;
   $R call({
     String? id,
     String? description,
@@ -162,15 +199,21 @@ abstract class ProjectDataCopyWith<$R, $In extends ProjectData, $Out> implements
   ProjectDataCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _ProjectDataCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, ProjectData, $Out>
+class _ProjectDataCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, ProjectData, $Out>
     implements ProjectDataCopyWith<$R, ProjectData, $Out> {
   _ProjectDataCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<ProjectData> $mapper = ProjectDataMapper.ensureInitialized();
+  late final ClassMapperBase<ProjectData> $mapper =
+      ProjectDataMapper.ensureInitialized();
   @override
-  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>> get dartFiles =>
-      MapCopyWith($value.dartFiles, (v, t) => ObjectCopyWith(v, $identity, t), (v) => call(dartFiles: v));
+  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>>
+  get dartFiles => MapCopyWith(
+    $value.dartFiles,
+    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v) => call(dartFiles: v),
+  );
   @override
   $R call({
     Object? id = $none,
@@ -200,6 +243,8 @@ class _ProjectDataCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, ProjectDa
   );
 
   @override
-  ProjectDataCopyWith<$R2, ProjectData, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _ProjectDataCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  ProjectDataCopyWith<$R2, ProjectData, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _ProjectDataCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

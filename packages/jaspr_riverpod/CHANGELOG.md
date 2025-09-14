@@ -15,11 +15,21 @@
   )
   ```
 
-  The `.syncWith` extension is available on `Provider`, `FutureProvider`, `StateProvider`, `NotifierProvider` and `AsyncNotifierProvider`.
+  The `.syncWith` extension is available on `Provider`, `FutureProvider`, `StreamProvider`, `StateProvider`, `NotifierProvider` and `AsyncNotifierProvider`.
 
-  For `FutureProvider` and `AsyncNotifierProvider` this also awaits the future during pre-rendering before building the child component.
+  For `FutureProvider`, `StreamProvider` and `AsyncNotifierProvider` this also awaits the future during pre-rendering before building the child component.
 
 - **Breaking**: Renamed `context.subscribe()` to `context.listenManual()`.
+
+## 0.3.23
+
+- `jaspr` upgraded to `0.21.1`
+- `jaspr_test` upgraded to `0.21.1`
+
+## 0.3.22
+
+- `jaspr` upgraded to `0.21.0`
+- `jaspr_test` upgraded to `0.21.0`
 
 ## 0.3.21
 

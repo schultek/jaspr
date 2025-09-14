@@ -12,30 +12,6 @@ class _ProviderSync implements ProviderSync {
   final Override Function(dynamic value) fn;
 }
 
-extension SyncFutureProviderExtension<T> on FutureProvider<T> {
-  ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
-    return _ProviderSync(this, id, codec, (value) {
-      return overrideWithValue(AsyncValue.data(value as T));
-    });
-  }
-}
-
-extension SyncProviderExtension<T> on Provider<T> {
-  ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
-    return _ProviderSync(this, id, codec, (value) {
-      return overrideWithValue(value as T);
-    });
-  }
-}
-
-extension SyncStateProviderExtension<T> on StateProvider<T> {
-  ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
-    return _ProviderSync(this, id, codec, (value) {
-      return overrideWith((_) => value as T);
-    });
-  }
-}
-
 extension SyncNotifierExtension<NotifierT extends Notifier<T>, T> on NotifierProvider<NotifierT, T> {
   ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
     return _ProviderSync(this, id, codec, (value) {
@@ -48,6 +24,38 @@ extension SyncAsyncNotifierExtension<NotifierT extends AsyncNotifier<T>, T> on A
   ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
     return _ProviderSync(this, id, codec, (value) {
       return overrideWithBuild((_, __) => value as T);
+    });
+  }
+}
+
+extension SyncProviderExtension<T> on Provider<T> {
+  ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
+    return _ProviderSync(this, id, codec, (value) {
+      return overrideWithValue(value as T);
+    });
+  }
+}
+
+extension SyncFutureProviderExtension<T> on FutureProvider<T> {
+  ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
+    return _ProviderSync(this, id, codec, (value) {
+      return overrideWithValue(AsyncValue.data(value as T));
+    });
+  }
+}
+
+extension SyncStreamProviderExtension<T> on StreamProvider<T> {
+  ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
+    return _ProviderSync(this, id, codec, (value) {
+      return overrideWithValue(AsyncValue.data(value as T));
+    });
+  }
+}
+
+extension SyncStateProviderExtension<T> on StateProvider<T> {
+  ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
+    return _ProviderSync(this, id, codec, (value) {
+      return overrideWith((_) => value as T);
     });
   }
 }

@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.5.0
 
 - Extend `prefer_html_methods` lint to also suggest using `text()` and `fragment()` methods, and offer fixes for them.
 - Changed `Add styles` assist to create a getter instead of variable.

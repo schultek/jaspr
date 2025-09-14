@@ -1,6 +1,16 @@
-include: package:jaspr_repo/app.yaml
+include: package:lints/recommended.yaml
 
 analyzer:
   exclude:
     - lib/**.g.dart
     - templates/**
+
+linter:
+  rules:
+    sort_pub_dependencies: true
+    prefer_relative_imports: true
+    directives_ordering: true
+
+formatter:
+  page_width: 120
+  trailing_commas: preserve

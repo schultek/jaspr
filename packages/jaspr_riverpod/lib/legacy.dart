@@ -6,4 +6,5 @@ export 'src/internals.dart'
         StateProvider,
         ChangeNotifierProvider,
         StateNotifierProviderFamily,
-        StateProviderFamily;
+        StateProviderFamily,
+        SyncStateProviderExtension;

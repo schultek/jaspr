@@ -20,7 +20,6 @@ workspace:
   - apps/dart_quotes
   - apps/dart_quotes_server
   - apps/fluttercon
-  - apps/jaspr_pad
   - apps/website
   - examples/backend_dart_frog
   - examples/backend_serverpod/example_server

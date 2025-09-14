@@ -1,4 +1,9 @@
-## Unreleased minor
+## 0.4.1
+
+- `jaspr` upgraded to `0.21.1`
+- `jaspr_router` upgraded to `0.7.3`
+
+## 0.4.0
 
 - The `LiquidTemplateEngine` is no longer `const`.
 - Fixed resolution of partial files in `LiquidTemplateEngine`.

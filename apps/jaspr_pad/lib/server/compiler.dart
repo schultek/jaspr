@@ -42,7 +42,6 @@ class Compiler {
         '--suppress-hints',
         '--terse',
         '--packages=${path.join('.dart_tool', 'package_config.json')}',
-        '--sound-null-safety',
         '--enable-asserts',
         '-o',
         'main.js',
