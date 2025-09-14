@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed conflicting analysis error for "Sort children last" quick fix.
+
 ## 0.5.0
 
 - Extend `prefer_html_methods` lint to also suggest using `text()` and `fragment()` methods, and offer fixes for them.

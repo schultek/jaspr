@@ -53,17 +53,22 @@ class SortChildrenPropertiesLastFix extends DartFix {
     if (analysisError.data case (InvocationExpression node, ListLiteral childrenArg)) {
       reporter.createChangeBuilder(message: 'Sort children last', priority: 2).addDartFileEdit((builder) {
         var content = resolver.source.contents.data;
-        var lines = content.substring(childrenArg.offset, childrenArg.end);
-
-        builder.addInsertion(node.argumentList.rightParenthesis.offset, (edit) {
-          if (node.argumentList.rightParenthesis.previous?.lexeme != ',') {
-            edit.write(', ');
-          }
-          edit.write(lines);
-        });
 
         var nextArg = node.argumentList.arguments[node.argumentList.arguments.indexOf(childrenArg) + 1];
-        builder.addDeletion(SourceRange(childrenArg.offset, nextArg.offset - childrenArg.offset));
+
+        var start = childrenArg.end;
+        var argStart = nextArg.offset;
+        var end = node.argumentList.arguments.last.end;
+
+        var divider = content.substring(start, argStart);
+        var args = content.substring(argStart, end);
+
+        builder.addInsertion(childrenArg.offset, (edit) {
+          edit.write(args);
+          edit.write(divider);
+        });
+
+        builder.addDeletion(SourceRange(start, end - start));
       });
     }
   }
