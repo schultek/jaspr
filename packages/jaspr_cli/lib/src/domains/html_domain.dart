@@ -9,12 +9,12 @@ import '../logging.dart';
 
 class HtmlDomain extends Domain {
   HtmlDomain(Daemon daemon, this.logger) : super(daemon, 'html') {
-    registerHandler('convert', _convertHtml);
+    registerHandler('convert', convertHtml);
   }
 
   final Logger logger;
 
-  Future<String> _convertHtml(Map<String, dynamic> params) async {
+  Future<String> convertHtml(Map<String, dynamic> params) async {
     final html = params['html'] as String;
     final parsed = parseFragment(html);
 
@@ -52,7 +52,6 @@ class HtmlDomain extends Domain {
 
       String? idString;
       String? classString;
-      String? contentParam;
       var paramStrings = <String>[];
       var attrStrings = <String>[];
 
@@ -72,10 +71,6 @@ class HtmlDomain extends Domain {
             }
             if (attrType == 'boolean') {
               paramStrings.add('$attrName: true');
-              continue;
-            }
-            if (attrType == 'content') {
-              contentParam = attrName;
               continue;
             }
             if (attrType is String && attrType.startsWith('enum:')) {
@@ -127,8 +122,13 @@ class HtmlDomain extends Domain {
         result += '}, ';
       }
 
+      final contentParam = (spec['attributes'] as Map?)?.entries
+          .where((e) => e.value['type'] == 'content').firstOrNull
+          ;
+
       if (contentParam != null && children.isNotEmpty) {
-        result += '$contentParam: ${_escapeString(node.innerHtml)}';
+        final contentParamName = contentParam.value['name'] as String? ?? contentParam.key;
+        result += '$contentParamName: ${_escapeString(node.innerHtml)}';
       }
 
       if (contentParam == null && spec['self_closing'] != true) {
