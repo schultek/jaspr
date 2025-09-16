@@ -77,8 +77,22 @@ class _LinePlacement implements LinePlacement {
   final bool span;
   final String? lineName;
 
+  bool _validLinePlacement() {
+    if (!span && number == null && lineName == null) {
+      throw 'Invalid use of [LinePlacement], cannot have `span == false && number == null && lineName == null`.';
+    }
+    return true;
+  }
+
   @override
-  String get value => [if (span) 'span', if (number != null) number, if (lineName != null) lineName].join(' ');
+  String get value {
+    assert(_validLinePlacement());
+    return [
+      if (span) 'span',
+      if (number != null) number!,
+      if (lineName != null) lineName!,
+    ].join(' ');
+  }
 }
 
 class _NamedLinePlacement extends _LinePlacement {
