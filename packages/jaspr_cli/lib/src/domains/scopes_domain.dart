@@ -269,7 +269,9 @@ class InspectData {
   ]) async {
     final path = library.firstFragment.source.fullName;
 
-    if (library.isInSdk || library.identifier.startsWith('package:jaspr/') || library.identifier.startsWith('package:web/')) {
+    if (library.isInSdk ||
+        library.identifier.startsWith('package:jaspr/') ||
+        library.identifier.startsWith('package:web/')) {
       // Skip SDK and framework libraries.
       return libraries[path] ??= InspectDataItem(library, parent, this);
     }
@@ -413,7 +415,9 @@ class InspectDataItem {
   Future<List<({LibraryElement lib, DirectiveTarget dir, bool onClient, bool onServer})>> resolveDependencies(
     LibraryElement library,
   ) async {
-    if (library.isInSdk || library.identifier.startsWith('package:jaspr/') || library.identifier.startsWith('package:web/')) {
+    if (library.isInSdk ||
+        library.identifier.startsWith('package:jaspr/') ||
+        library.identifier.startsWith('package:web/')) {
       // Skip SDK and framework libraries.
       return [];
     }
