@@ -1,3 +1,4 @@
+import 'angle.dart';
 import 'color.dart';
 import 'unit.dart';
 
@@ -113,8 +114,7 @@ class FontStyle {
   static const FontStyle italic = FontStyle._('italic');
   static const FontStyle oblique = FontStyle._('oblique');
 
-  // TODO Angle class
-  const factory FontStyle.obliqueAngle(double degrees) = _ObliqueAngleFontStyle;
+  const factory FontStyle.obliqueAngle(Angle angle) = _ObliqueAngleFontStyle;
 
   static const FontStyle inherit = FontStyle._('inherit');
   static const FontStyle initial = FontStyle._('initial');
@@ -124,12 +124,12 @@ class FontStyle {
 }
 
 class _ObliqueAngleFontStyle implements FontStyle {
-  final double angle;
+  final Angle angle;
 
   const _ObliqueAngleFontStyle(this.angle);
 
   @override
-  String get value => 'oblique ${angle}deg';
+  String get value => 'oblique ${angle.value}';
 }
 
 enum TextTransform {
