@@ -6,6 +6,7 @@ import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:collection/collection.dart';
 import 'package:watcher/watcher.dart';
@@ -16,7 +17,7 @@ import '../logging.dart';
 
 class ScopesDomain extends Domain {
   ScopesDomain(Daemon daemon, this.logger) : super(daemon, 'scopes') {
-    registerHandler('register', _registerScopes);
+    registerHandler('register', registerScopes);
   }
 
   final Logger logger;
@@ -25,7 +26,10 @@ class ScopesDomain extends Domain {
   final Map<AnalysisContext, bool> _analysisStatus = {};
   final Map<AnalysisContext, InspectData> _inspectedData = {};
 
-  Future<dynamic> _registerScopes(Map<String, dynamic> params) async {
+  Future<void> registerScopes(
+    Map<String, dynamic> params, {
+    ResourceProvider? resourceProvider,
+  }) async {
     await _collection?.dispose();
     // ignore: avoid_function_literals_in_foreach_calls
     _watcherSubscriptions.forEach((sub) => sub.cancel());
@@ -36,25 +40,27 @@ class ScopesDomain extends Domain {
 
     _collection = AnalysisContextCollection(
       includedPaths: folders.cast(),
-      resourceProvider: PhysicalResourceProvider.INSTANCE,
+      resourceProvider: resourceProvider ?? PhysicalResourceProvider.INSTANCE,
     );
 
-    for (final context in _collection!.contexts) {
-      _watcherSubscriptions.add(
-        DirectoryWatcher(context.contextRoot.root.path).events.listen((event) {
-          final path = event.path;
-          logger.write('File changed: $path');
+    if (resourceProvider == null) {
+      for (final context in _collection!.contexts) {
+        _watcherSubscriptions.add(
+          DirectoryWatcher(context.contextRoot.root.path).events.listen((event) {
+            final path = event.path;
+            logger.write('File changed: $path');
 
-          if (path.endsWith('.dart')) {
-            _reanalyze(path);
-          } else if (path.endsWith('pubspec.yaml') ||
-              path.endsWith('pubspec.lock') ||
-              path.endsWith('package_config.json')) {
-            // Recreate all scopes if pubspec or package config changes.
-            _registerScopes(params);
-          }
-        }),
-      );
+            if (path.endsWith('.dart')) {
+              _reanalyze(path);
+            } else if (path.endsWith('pubspec.yaml') ||
+                path.endsWith('pubspec.lock') ||
+                path.endsWith('package_config.json')) {
+              // Recreate all scopes if pubspec or package config changes.
+              registerScopes(params);
+            }
+          }),
+        );
+      }
     }
 
     for (final context in _collection!.contexts) {
@@ -263,11 +269,9 @@ class InspectData {
   ]) async {
     final path = library.firstFragment.source.fullName;
 
-    if (isServerLib(library)) {
-      clientScopeRoots = {};
-    }
-    if (isClientLib(library)) {
-      serverScopeRoots = {};
+    if (library.isInSdk || library.identifier.startsWith('package:jaspr/') || library.identifier.startsWith('package:web/')) {
+      // Skip SDK and framework libraries.
+      return libraries[path] ??= InspectDataItem(library, parent, this);
     }
 
     if (libraries.containsKey(path)) {
@@ -409,8 +413,8 @@ class InspectDataItem {
   Future<List<({LibraryElement lib, DirectiveTarget dir, bool onClient, bool onServer})>> resolveDependencies(
     LibraryElement library,
   ) async {
-    if (library.isInSdk) {
-      // Skip SDK libraries.
+    if (library.isInSdk || library.identifier.startsWith('package:jaspr/') || library.identifier.startsWith('package:web/')) {
+      // Skip SDK and framework libraries.
       return [];
     }
 
