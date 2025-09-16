@@ -35,8 +35,18 @@ class _GridTracks implements GridTracks {
 
   final List<GridTrack> tracks;
 
+  bool _validGridTracks() {
+    if (tracks.isEmpty) {
+      throw '[GridTracks] cannot be empty.';
+    }
+    return true;
+  }
+
   @override
-  String get value => tracks.map((t) => t.value).join(' ');
+  String get value {
+    assert(_validGridTracks());
+    return tracks.map((t) => t.value).join(' ');
+  }
 }
 
 class GridAreas {
@@ -44,7 +54,17 @@ class GridAreas {
 
   final List<String> lines;
 
-  String get value => lines.map((l) => '"$l"').join(kDebugMode ? '\n' : ' ');
+  bool _validGridAreas() {
+    if (lines.isEmpty) {
+      throw '[GridAreas] cannot be empty.';
+    }
+    return true;
+  }
+
+  String get value {
+    assert(_validGridAreas());
+    return lines.map((l) => '"$l"').join(kDebugMode ? '\n' : ' ');
+  }
 }
 
 abstract class GridTrack {
