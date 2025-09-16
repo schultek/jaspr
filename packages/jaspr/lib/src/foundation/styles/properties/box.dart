@@ -453,7 +453,19 @@ enum BoxSizing {
   const BoxSizing(this.value);
 }
 
-abstract class BoxShadow {
+class BoxShadow {
+  const BoxShadow._(this.value);
+
+  final String value;
+
+  // Keyword and global values
+  static const BoxShadow none = BoxShadow._('none');
+  static const BoxShadow initial = BoxShadow._('initial');
+  static const BoxShadow inherit = BoxShadow._('inherit');
+  static const BoxShadow revert = BoxShadow._('revert');
+  static const BoxShadow revertLayer = BoxShadow._('revert-layer');
+  static const BoxShadow unset = BoxShadow._('unset');
+
   const factory BoxShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Unit? spread, Color? color}) =
       _BoxShadow;
 
@@ -466,11 +478,11 @@ abstract class BoxShadow {
   }) = _InsetBoxShadow;
 
   const factory BoxShadow.combine(List<BoxShadow> shadows) = _CombineBoxShadow;
-
-  String get value;
 }
 
-class _BoxShadow implements BoxShadow {
+abstract class _ListableBoxShadow implements BoxShadow {}
+
+class _BoxShadow implements _ListableBoxShadow {
   const _BoxShadow({
     required this.offsetX,
     required this.offsetY,
@@ -508,8 +520,29 @@ class _CombineBoxShadow implements BoxShadow {
 
   final List<BoxShadow> shadows;
 
+  bool _shadowsListable() {
+    if (shadows.isEmpty) {
+      throw '[BoxShadow.combine] cannot be empty.';
+    }
+
+    for (final shadow in shadows) {
+      if (shadow is _CombineBoxShadow) {
+        throw 'Cannot nest [BoxShadow.combine] inside [BoxShadow.combine]';
+      }
+
+      if (shadow is _ListableBoxShadow) {
+        throw 'Cannot use ${shadow.value} as a list item, only standalone use supported.';
+      }
+    }
+
+    return true;
+  }
+
   @override
-  String get value => shadows.map((s) => s.value).join(', ');
+  String get value {
+    assert(_shadowsListable());
+    return shadows.map((s) => s.value).join(', ');
+  }
 }
 
 class Cursor {
