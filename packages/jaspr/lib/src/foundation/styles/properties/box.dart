@@ -531,7 +531,7 @@ class _CombineBoxShadow implements BoxShadow {
         throw 'Cannot nest [BoxShadow.combine] inside [BoxShadow.combine]';
       }
 
-      if (shadow is _ListableBoxShadow) {
+      if (shadow is! _ListableBoxShadow) {
         throw 'Cannot use ${shadow.value} as a list item, only standalone use supported.';
       }
     }
