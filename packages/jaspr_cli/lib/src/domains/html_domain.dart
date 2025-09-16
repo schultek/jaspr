@@ -122,9 +122,7 @@ class HtmlDomain extends Domain {
         result += '}, ';
       }
 
-      final contentParam = (spec['attributes'] as Map?)?.entries
-          .where((e) => e.value['type'] == 'content').firstOrNull
-          ;
+      final contentParam = (spec['attributes'] as Map?)?.entries.where((e) => e.value['type'] == 'content').firstOrNull;
 
       if (contentParam != null && children.isNotEmpty) {
         final contentParamName = contentParam.value['name'] as String? ?? contentParam.key;
