@@ -61,14 +61,23 @@ class __Border implements Border {
 
   const __Border({this.style = BorderStyle.solid, this.color, this.width});
 
+  bool _propertyStrNotEmpty(String property) {
+    if (property.isEmpty) {
+      throw '[Border] cannot have all attributes null.';
+    }
+    return true;
+  }
+
   @override
-  Map<String, String> get styles => {
-    'border': [
+  Map<String, String> get styles {
+    final borderProperty = <String>[
       if (style != null) style!.value,
       if (color != null) color!.value,
       if (width != null) width!.value,
-    ].join(' '),
-  };
+    ].join(' ');
+    assert(_propertyStrNotEmpty(borderProperty));
+    return <String, String>{'border': borderProperty};
+  }
 }
 
 class _OnlyBorder implements Border {
