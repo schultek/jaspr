@@ -172,8 +172,6 @@ class HtmlDomain extends Domain {
   }
 }
 
-
-
 final elementSpecs = (() {
   final config = <String, dynamic>{};
   for (final group in htmlSpec.values) {
