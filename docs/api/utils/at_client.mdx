@@ -47,7 +47,7 @@ Only one `@client` component per file is allowed.
 You can use `@client` components normally as any other component. You can also have multiple components annotated with
 `@client` to have separate interactive parts on the client. However, nesting client components is currently not possible.
 
-### Initializing client logic
+### Initializing Client Logic
 
 When using `@client` components there is no default `main()` function on the client where you would normally
 run any client-side initialization logic. Instead, you can make your `@client` component stateful and use the `initState()`
@@ -64,7 +64,7 @@ void initState() {
 }
 ```
 
-### Sharing state
+### Sharing State
 
 When you use multiple `@client` components, each one will be mounted on the client in a separate component tree as the root.
 Therefore if you want to share state across different `@client` components on the client, you cannot use any tree-based
@@ -107,11 +107,11 @@ class MyClientComponent extends StatelessComponent {
 ```
 
 ---
-Many state-management solutions also have some support for this. The same concept using `jaspr_riverpod` would
-look like this:
+
+Many state-management solutions also have some support for this. The same concept using `jaspr_riverpod` would look like this:
 
 ```dart
-final _container = ProviderContainer();
+final container = ProviderContainer();
 
 @client
 class MyClientComponent extends StatelessComponent {
@@ -119,19 +119,32 @@ class MyClientComponent extends StatelessComponent {
   @override
   Component build(context) {
     // Use the shared container for the provider scope.
-    return ProviderScope(
-      container: _container,
+    return UncontrolledProviderScope(
+      container: container,
       child: /* ... */,
     );
   }
 }
 ```
 
-### Passing data
+<Info>
+  If you need to use features like `overrides` or `sync` that are only available on `ProviderScope` and not on `UncontrolledProviderScope`, it is possible to set them up like this:
 
-As any other component, `@client` components can have parameters, *with certain limitations*. Parameters are automatically
-serialized on the server and de-serialized on the client when hydrating the component. Therefore, using `@client` components
-with parameters are a **great way to pass data from the server to the client**. For this to work, the following requirements apply:
+  ```dart
+  UncontrolledProviderScope(
+    container: container,
+    child: ProviderScope(
+      sync: [],
+      overrides: []
+      child: ...
+    ),
+  )
+  ```
+</Info>
+
+### Passing Data
+
+As any other component, `@client` components can have parameters, *with certain limitations*. Parameters are automatically serialized on the server and de-serialized on the client when hydrating the component. Therefore, using `@client` components with parameters are a **great way to pass data from the server to the client**. For this to work, the following requirements apply:
 
 #### 1. All parameters must be **initializing field** parameters (`this.<fieldname>`):
 

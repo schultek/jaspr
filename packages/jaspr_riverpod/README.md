@@ -9,12 +9,9 @@ A port of [`flutter_riverpod`](https://pub.dev/packages/flutter_riverpod) for [J
 
 ## 🪄 Accessing Providers
 
-While it has feature-parity for defining `Provider`s, it comes with some quality-of-life improvements
-on the `Consumer` side. Mainly:
+While it has feature-parity for defining `Provider`s, it comes with some quality-of-life improvements on the `Consumer` side. Mainly:
 
-**It does not have `Consumer`, `ConsumerWidget` or `StatefulConsumerWidget`.** This is because it
-does not rely on `WidgetRef` to access providers but instead comes with **context extensions** on the
-`BuildContext` of **any** component.
+**It does not have `Consumer`, `ConsumerWidget` or `StatefulConsumerWidget`.** This is because it does not rely on `WidgetRef` to access providers but instead comes with **context extensions** on the `BuildContext` of **any** component.
 
 As an example, this (in Flutter):
 
@@ -48,18 +45,19 @@ class MyComponent extends StatelessComponent {
 }
 ```
 
-The extension on `BuildContext` supports all the normal methods from `WidgetRef``
+The extension on `BuildContext` supports all the normal methods from `WidgetRef`
 
-- `context.read()`,
-- `context.watch()`,
-- `context.refresh()`,
-- `context.invalidate()`,
+- `context.read()`
+- `context.watch()`
 - `context.listen()`
+- `context.listenManual()`
+- `context.invalidate()`
+- `context.refresh()`
+- `context.exists()`
 
 #### Replacement for Consumer
 
-Same as with `ConsumerComponent`, we don't need the `Consumer` anymore. If you want only parts of your
-component tree to rebuild when watching a provider, simply use the `Builder` component. This will
+Same as with `ConsumerComponent`, we don't need the `Consumer` anymore. If you want only parts of your component tree to rebuild when watching a provider, simply use the `Builder` component. This will
 give you a new context which you can call `context.watch` on:
 
 ```dart
@@ -73,7 +71,7 @@ Builder(
 
 ## ♻️ Syncing Provider State
 
-Jaspr allows data that is loaded during pre-rendering to be synced to the client for further use. `jaspr_riverpod` extends this for providers, allowing to sync provider state from server to client like this:
+Jaspr allows data that is loaded during pre-rendering (in **server** or **static** mode) to be synced to the client for further use. `jaspr_riverpod` extends this for providers, allowing to sync provider state from server to client like this:
 
 ```dart
 @override
@@ -87,14 +85,29 @@ Component build() {
 }
 ```
 
-The `sync` property of `ProviderScope` receives a list of `provier.syncWith(String key, {Codec<T, Object?>? codec})`, where `provider` can be any Provider. It will:
+This will cause the value of `myProvider` to be evaulated and serialized on the server, and deserialized on the client. Then when accessing `myProvider` on the client, it will return the original value from the server.
 
-- on the server: read the value of the provider and send it to the client
-- on the client: receive the value from the server and override the provider with it.
+The `syncWith()` method takes a unique `String key` to identify the provider, and an optional `Codec<T, Object?>? codec` parameter for converting the provider value of type `T` to/from a serializable value. The `codec` parameter is not needed for serializable values, like primitives (`String`, numbers, `bool`, etc.) or `Map`s and `List`s of these.
 
-Therefore, accessing a synced provider on the client will always return the synced value and skip it's computation.
+The following provider types support syncing: `NotifierProvider`, `AsyncNotifierProvider`, `Provider`, `FutureProvider`, `StreamProvider` and `StateProvider`.
 
-Additionally during pre-rendering on the server, if provider is a `FutureProvider`, `StreamProvider` or `AsyncNotifier`, the `ProviderScope` will wait for the providers future to complete before building its child. Therefore reading the provider inside the subtree will already return the completed value.
+### Awaiting Async Providers
+
+If a synced provider is a `FutureProvider`, `StreamProvider` or `AsyncNotifier`, the `ProviderScope` will wait for the providers future to complete before building its child (on the server). Therefore reading the provider inside the subtree will already return the completed value.
+
+### Sync Overrides and Scoping
+
+In detail, the process of syncing a provider between server and client works like this:
+
+- During pre-rendering on the server, the value of a synced provider is read, serialized and embedded into the rendered html.
+- Together with the html it is then sent to the client.
+- When the client first builds your component containing the `ProviderScope`, the embedded provider value is read and deserialized.
+- The provider is then **overridden** with the received value, using the normal `.overrideWith()` feature of Riverpod.
+- Accessing a synced provider on the client will always return the overridden value and skip it's initial computation.
+
+It is important to note that overrides in Riverpod only propagate the provider chain when they are defined on the root `ProviderScope`, and the same applies to synced providers. Therefore, either make sure to define synced providers only on the root client-side `ProviderScope`, or set the `dependencies` option required for scoping providers.
+
+Read more about scoping providers [here](https://riverpod.dev/de/docs/concepts2/scoping).
 
 ## 📜 Backstory: Why context extensions instead of Consumer?
 

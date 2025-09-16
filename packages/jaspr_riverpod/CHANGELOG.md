@@ -4,7 +4,7 @@
 
 - **Breaking**: Removed `SyncProvider`. Migrate to `ProviderScope(sync: [...])`.
 
-  Added `sync` option to `ProviderScope`, which allows to specify providers that should sync its value to the client using:
+- Added `sync` option to `ProviderScope`, which allows to specify providers that should sync its value to the client using:
 
   ```dart
   ProviderScope(
@@ -19,7 +19,7 @@
 
   For `FutureProvider`, `StreamProvider` and `AsyncNotifierProvider` this also awaits the future during pre-rendering before building the child component.
 
-- **Breaking**: Renamed `context.subscribe()` to `context.listenManual()`.
+- **Breaking**: Renamed `context.subscribe()` to `context.listenManual()` to be consistent with `WidgetRef`.
 
 ## 0.3.23
 
