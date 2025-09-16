@@ -29,8 +29,25 @@ class _CombineTransition implements Transition {
 
   final List<Transition> transitions;
 
+  bool _transitionsListable() {
+    if (transitions.isEmpty) {
+      throw 'Filter.list cannot be empty.';
+    }
+
+    for (final transition in transitions) {
+      if (transition is! _Transition) {
+        throw 'Cannot use ${transition.value} as a transition list item, only standalone use supported.';
+      }
+    }
+
+    return true;
+  }
+
   @override
-  String get value => transitions.map((t) => t.value).join(', ');
+  String get value {
+    assert(_transitionsListable());
+    return transitions.map((t) => t.value).join(', ');
+  }
 }
 
 class Curve {
