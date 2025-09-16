@@ -60,11 +60,7 @@ class _FilterList implements Filter {
   @override
   String get value {
     assert(_filtersListable());
-    return _filterValues
-        .map((filter) {
-          return filter.value;
-        })
-        .join(' ');
+    return _filterValues.map((filter) => filter.value).join(' ');
   }
 }
 
