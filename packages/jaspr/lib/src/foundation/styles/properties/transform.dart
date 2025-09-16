@@ -35,11 +35,34 @@ class _CombineTransform implements Transform {
 
   final List<Transform> transforms;
 
+  bool _transformsListable() {
+    if (transforms.isEmpty) {
+      throw '[Transform.combine] cannot be empty.';
+    }
+
+    for (final transform in transforms) {
+      if (transform is _CombineTransform) {
+        throw 'Cannot nest [Transform.combine] inside [Transform.combine].';
+      }
+
+      if (transform is! _ListableTransform) {
+        throw 'Cannot use ${transform.value} as a filter list item, only standalone use supported.';
+      }
+    }
+
+    return true;
+  }
+
   @override
-  String get value => transforms.map((t) => t.value).join(' ');
+  String get value {
+    assert(_transformsListable());
+    return transforms.map((t) => t.value).join(' ');
+  }
 }
 
-class _RotateTransform implements Transform {
+abstract class _ListableTransform implements Transform {}
+
+class _RotateTransform implements _ListableTransform {
   const _RotateTransform(this.angle);
 
   final Angle angle;
@@ -48,22 +71,32 @@ class _RotateTransform implements Transform {
   String get value => 'rotate(${angle.value})';
 }
 
-class _RotateAxisTransform implements Transform {
+class _RotateAxisTransform implements _ListableTransform {
   const _RotateAxisTransform({this.x, this.y, this.z});
 
   final Angle? x;
   final Angle? y;
   final Angle? z;
 
+  bool _anglesAvailable() {
+    if (x == null && y == null && z == null) {
+      throw '[Transform.rotateAxis] missing angles (found every angle null).';
+    }
+    return true;
+  }
+
   @override
-  String get value => [
-    if (x != null) 'rotateX(${x!.value})',
-    if (y != null) 'rotateY(${y!.value})',
-    if (z != null) 'rotateZ(${z!.value})',
-  ].join(' ');
+  String get value {
+    assert(_anglesAvailable());
+    return [
+      if (x != null) 'rotateX(${x!.value})',
+      if (y != null) 'rotateY(${y!.value})',
+      if (z != null) 'rotateZ(${z!.value})',
+    ].join(' ');
+  }
 }
 
-class _TranslateTransform implements Transform {
+class _TranslateTransform implements _ListableTransform {
   const _TranslateTransform({this.x, this.y});
 
   final Unit? x;
@@ -82,7 +115,7 @@ class _TranslateTransform implements Transform {
   }
 }
 
-class _ScaleTransform implements Transform {
+class _ScaleTransform implements _ListableTransform {
   const _ScaleTransform(this.scale);
 
   final double scale;
@@ -91,7 +124,7 @@ class _ScaleTransform implements Transform {
   String get value => 'scale(${scale.numstr})';
 }
 
-class _SkewTransform implements Transform {
+class _SkewTransform implements _ListableTransform {
   const _SkewTransform({this.x, this.y});
 
   final Angle? x;
@@ -110,7 +143,7 @@ class _SkewTransform implements Transform {
   }
 }
 
-class _MatrixTransform implements Transform {
+class _MatrixTransform implements _ListableTransform {
   const _MatrixTransform(this.a, this.b, this.c, this.d, this.tx, this.ty);
 
   final double a;
@@ -126,7 +159,7 @@ class _MatrixTransform implements Transform {
       '${d.numstr}, ${tx.numstr}, ${ty.numstr})';
 }
 
-class _PerspectiveTransform implements Transform {
+class _PerspectiveTransform implements _ListableTransform {
   const _PerspectiveTransform(this.perspective);
 
   final Unit perspective;
