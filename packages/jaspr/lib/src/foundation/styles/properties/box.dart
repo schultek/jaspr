@@ -510,7 +510,7 @@ class _InsetBoxShadow extends _BoxShadow {
     : super(inset: true);
 }
 
-class _CombineBoxShadow implements BoxShadow {
+class _CombineBoxShadow implements _ListableBoxShadow {
   const _CombineBoxShadow(this.shadows);
 
   final List<BoxShadow> shadows;

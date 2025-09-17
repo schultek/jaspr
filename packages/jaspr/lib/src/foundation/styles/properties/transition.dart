@@ -1,13 +1,16 @@
 import 'unit.dart';
 
 abstract class Transition {
+  // TODO: Add global values (initial, revert, etc.)
   const factory Transition(String property, {required double duration, Curve? curve, double? delay}) = _Transition;
   const factory Transition.combine(List<Transition> transitions) = _CombineTransition;
 
   String get value;
 }
 
-class _Transition implements Transition {
+abstract class _ListableTransition implements Transition {}
+
+class _Transition implements _ListableTransition {
   const _Transition(this.property, {required this.duration, this.curve, this.delay});
 
   final String property;
@@ -24,7 +27,7 @@ class _Transition implements Transition {
   ].join(' ');
 }
 
-class _CombineTransition implements Transition {
+class _CombineTransition implements _ListableTransition {
   const _CombineTransition(this.transitions);
 
   final List<Transition> transitions;
@@ -35,7 +38,7 @@ class _CombineTransition implements Transition {
     }
 
     for (final transition in transitions) {
-      if (transition is! _Transition) {
+      if (transition is! _ListableTransition) {
         throw 'Cannot use ${transition.value} as a transition list item, only standalone use supported.';
       }
     }

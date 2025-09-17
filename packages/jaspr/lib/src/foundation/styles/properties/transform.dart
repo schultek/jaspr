@@ -30,7 +30,7 @@ class Transform {
   static const Transform unset = Transform._('unset');
 }
 
-class _CombineTransform implements Transform {
+class _CombineTransform implements _ListableTransform {
   const _CombineTransform(this.transforms);
 
   final List<Transform> transforms;
