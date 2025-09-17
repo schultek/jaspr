@@ -59,26 +59,20 @@ class __Border implements Border {
   final Color? color;
   final Unit? width;
 
-  const __Border({this.style = BorderStyle.solid, this.color, this.width});
-
-  bool _attributesNotEntirelyNull() {
-    if (style == null && color == null && width == null) {
-      throw '[Border] cannot have all attributes null.';
-    }
-    return true;
-  }
+  const __Border({this.style = BorderStyle.solid, this.color, this.width})
+    : assert(
+        style != null || color != null || width != null,
+        'At least one of style, color or width must be not null. For no border, use Border.none',
+      );
 
   @override
-  Map<String, String> get styles {
-    assert(_attributesNotEntirelyNull());
-    return <String, String>{
-      'border': [
-        if (style != null) style!.value,
-        if (color != null) color!.value,
-        if (width != null) width!.value,
-      ].join(' '),
-    };
-  }
+  Map<String, String> get styles => <String, String>{
+    'border': [
+      if (style != null) style!.value,
+      if (color != null) color!.value,
+      if (width != null) width!.value,
+    ].join(' '),
+  };
 }
 
 class _OnlyBorder implements Border {
@@ -527,10 +521,6 @@ class _CombineBoxShadow implements BoxShadow {
     }
 
     for (final shadow in shadows) {
-      if (shadow is _CombineBoxShadow) {
-        throw 'Cannot nest [BoxShadow.combine] inside [BoxShadow.combine]';
-      }
-
       if (shadow is! _ListableBoxShadow) {
         throw 'Cannot use ${shadow.value} as a list item, only standalone use supported.';
       }
