@@ -41,10 +41,6 @@ class _CombineTransform implements Transform {
     }
 
     for (final transform in transforms) {
-      if (transform is _CombineTransform) {
-        throw 'Cannot nest [Transform.combine] inside [Transform.combine].';
-      }
-
       if (transform is! _ListableTransform) {
         throw 'Cannot use ${transform.value} as a filter list item, only standalone use supported.';
       }
@@ -72,28 +68,19 @@ class _RotateTransform implements _ListableTransform {
 }
 
 class _RotateAxisTransform implements _ListableTransform {
-  const _RotateAxisTransform({this.x, this.y, this.z});
+  const _RotateAxisTransform({this.x, this.y, this.z})
+    : assert(x != null || y != null || z != null, 'At least one of the angles x, y or z has to be not null');
 
   final Angle? x;
   final Angle? y;
   final Angle? z;
 
-  bool _anglesAvailable() {
-    if (x == null && y == null && z == null) {
-      throw '[Transform.rotateAxis] missing angles (found every angle null).';
-    }
-    return true;
-  }
-
   @override
-  String get value {
-    assert(_anglesAvailable());
-    return [
-      if (x != null) 'rotateX(${x!.value})',
-      if (y != null) 'rotateY(${y!.value})',
-      if (z != null) 'rotateZ(${z!.value})',
-    ].join(' ');
-  }
+  String get value => [
+    if (x != null) 'rotateX(${x!.value})',
+    if (y != null) 'rotateY(${y!.value})',
+    if (z != null) 'rotateZ(${z!.value})',
+  ].join(' ');
 }
 
 class _TranslateTransform implements _ListableTransform {
