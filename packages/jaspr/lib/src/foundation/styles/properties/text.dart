@@ -46,21 +46,10 @@ class FontFamily {
 
 class _ListFontFamily implements FontFamily {
   final List<FontFamily> families;
-  const _ListFontFamily(this.families);
-
-  bool _validFontFamilies() {
-    if (families.isEmpty) {
-      throw '[FontFamily.list] cannot be empty.';
-    }
-
-    return true;
-  }
+  const _ListFontFamily(this.families) : assert(families.length > 0, 'FontFamily.list cannot be empty');
 
   @override
-  String get value {
-    assert(_validFontFamilies());
-    return families.map((f) => f.value).join(', ');
-  }
+  String get value => families.map((f) => f.value).join(', ');
 }
 
 class _VariableFontFamily implements FontFamily {
@@ -222,20 +211,10 @@ enum TextDecorationLineKeyword implements TextDecorationLine {
 class _MultiTextDecorationLine implements TextDecorationLine {
   final List<TextDecorationLineKeyword> lines;
 
-  const _MultiTextDecorationLine(this.lines);
-
-  bool _validLines() {
-    if (lines.isEmpty) {
-      throw '[TextDecorationLine.multi] cannot be empty.';
-    }
-    return true;
-  }
+  const _MultiTextDecorationLine(this.lines) : assert(lines.length > 0, 'TextDecorationLine.multi cannot be empty.');
 
   @override
-  String get value {
-    assert(_validLines());
-    return lines.map((l) => l.value).join(' ');
-  }
+  String get value => lines.map((l) => l.value).join(' ');
 }
 
 enum TextDecorationStyle {
@@ -309,25 +288,19 @@ class _TextDecoration implements TextDecoration {
   final TextDecorationStyle? style;
   final TextDecorationThickness? thickness;
 
-  const _TextDecoration({this.line, this.color, this.style, this.thickness});
-
-  bool _attributesNotEntirelyNull() {
-    if (line == null && style == null && color == null && thickness == null) {
-      throw '[TextDecoration] cannot have all attributes null.';
-    }
-    return true;
-  }
+  const _TextDecoration({this.line, this.color, this.style, this.thickness})
+    : assert(
+        line != null || style != null || color != null || thickness != null,
+        'At least one of line, style or color must not be null. For no text decoration, use TextDecoration.none',
+      );
 
   @override
-  String get value {
-    assert(_attributesNotEntirelyNull());
-    return [
-      if (line != null) line!.value,
-      if (style != null) style!.value,
-      if (color != null) color!.value,
-      if (thickness != null) thickness!.value,
-    ].join(' ');
-  }
+  String get value => [
+    if (line != null) line!.value,
+    if (style != null) style!.value,
+    if (color != null) color!.value,
+    if (thickness != null) thickness!.value,
+  ].join(' ');
 }
 
 abstract class TextShadow {
@@ -347,34 +320,21 @@ class _TextShadow implements TextShadow {
   final Color? color;
 
   @override
-  String get value =>
-      [offsetX.value, offsetY.value, if (blur != null) blur!.value, if (color != null) color!.value].join(' ');
+  String get value => [
+    offsetX.value,
+    offsetY.value,
+    if (blur != null) blur!.value,
+    if (color != null) color!.value,
+  ].join(' ');
 }
 
 class _CombineTextShadow implements TextShadow {
-  const _CombineTextShadow(this.shadows);
+  const _CombineTextShadow(this.shadows) : assert(shadows.length > 0, 'TextShadow.combine cannot be empty');
 
   final List<TextShadow> shadows;
 
-  bool _shadowsListable() {
-    if (shadows.isEmpty) {
-      throw '[TextShadow.combine] cannot be empty.';
-    }
-
-    for (final shadow in shadows) {
-      if (shadow is _CombineTextShadow) {
-        throw 'Cannot next [TextShadow.combine] inside [TextShadow.combine].';
-      }
-    }
-
-    return true;
-  }
-
   @override
-  String get value {
-    assert(_shadowsListable());
-    return shadows.map((s) => s.value).join(', ');
-  }
+  String get value => shadows.map((s) => s.value).join(', ');
 }
 
 enum TextOverflow {
