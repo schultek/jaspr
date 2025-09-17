@@ -34,7 +34,7 @@ class _CombineTransition implements _ListableTransition {
 
   bool _transitionsListable() {
     if (transitions.isEmpty) {
-      throw 'Filter.list cannot be empty.';
+      throw 'Transition.combine cannot be empty.';
     }
 
     for (final transition in transitions) {
