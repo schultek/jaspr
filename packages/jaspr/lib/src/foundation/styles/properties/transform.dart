@@ -75,22 +75,12 @@ class _RotateAxisTransform implements _ListableTransform {
   final Angle? y;
   final Angle? z;
 
-  bool _anglesAvailable() {
-    if (x == null && y == null && z == null) {
-      throw '[Transform.rotateAxis] missing angles (found every angle null).';
-    }
-    return true;
-  }
-
   @override
-  String get value {
-    assert(_anglesAvailable());
-    return [
-      if (x != null) 'rotateX(${x!.value})',
-      if (y != null) 'rotateY(${y!.value})',
-      if (z != null) 'rotateZ(${z!.value})',
-    ].join(' ');
-  }
+  String get value => [
+    if (x != null) 'rotateX(${x!.value})',
+    if (y != null) 'rotateY(${y!.value})',
+    if (z != null) 'rotateZ(${z!.value})',
+  ].join(' ');
 }
 
 class _TranslateTransform implements _ListableTransform {
