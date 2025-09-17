@@ -31,40 +31,20 @@ class GridTracks {
 }
 
 class _GridTracks implements GridTracks {
-  const _GridTracks(this.tracks);
+  const _GridTracks(this.tracks) : assert(tracks.length > 0, 'GridTracks cannot be empty');
 
   final List<GridTrack> tracks;
 
-  bool _validGridTracks() {
-    if (tracks.isEmpty) {
-      throw '[GridTracks] cannot be empty.';
-    }
-    return true;
-  }
-
   @override
-  String get value {
-    assert(_validGridTracks());
-    return tracks.map((t) => t.value).join(' ');
-  }
+  String get value => tracks.map((t) => t.value).join(' ');
 }
 
 class GridAreas {
-  const GridAreas(this.lines);
+  const GridAreas(this.lines) : assert(lines.length > 0, 'GridAreas cannot be empty');
 
   final List<String> lines;
 
-  bool _validGridAreas() {
-    if (lines.isEmpty) {
-      throw '[GridAreas] cannot be empty.';
-    }
-    return true;
-  }
-
-  String get value {
-    assert(_validGridAreas());
-    return lines.map((l) => '"$l"').join(kDebugMode ? '\n' : ' ');
-  }
+  String get value => lines.map((l) => '"$l"').join(kDebugMode ? '\n' : ' ');
 }
 
 abstract class GridTrack {
