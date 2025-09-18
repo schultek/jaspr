@@ -1,3 +1,4 @@
+import 'angle.dart';
 import 'color.dart';
 import 'unit.dart';
 
@@ -45,7 +46,7 @@ class FontFamily {
 
 class _ListFontFamily implements FontFamily {
   final List<FontFamily> families;
-  const _ListFontFamily(this.families);
+  const _ListFontFamily(this.families) : assert(families.length > 0, 'FontFamily.list cannot be empty');
 
   @override
   String get value => families.map((f) => f.value).join(', ');
@@ -113,8 +114,7 @@ class FontStyle {
   static const FontStyle italic = FontStyle._('italic');
   static const FontStyle oblique = FontStyle._('oblique');
 
-  // TODO Angle class
-  const factory FontStyle.obliqueAngle(double degrees) = _ObliqueAngleFontStyle;
+  const factory FontStyle.obliqueAngle(Angle angle) = _ObliqueAngleFontStyle;
 
   static const FontStyle inherit = FontStyle._('inherit');
   static const FontStyle initial = FontStyle._('initial');
@@ -124,12 +124,12 @@ class FontStyle {
 }
 
 class _ObliqueAngleFontStyle implements FontStyle {
-  final double angle;
+  final Angle angle;
 
   const _ObliqueAngleFontStyle(this.angle);
 
   @override
-  String get value => 'oblique ${angle}deg';
+  String get value => 'oblique ${angle.value}';
 }
 
 enum TextTransform {
@@ -211,7 +211,7 @@ enum TextDecorationLineKeyword implements TextDecorationLine {
 class _MultiTextDecorationLine implements TextDecorationLine {
   final List<TextDecorationLineKeyword> lines;
 
-  const _MultiTextDecorationLine(this.lines);
+  const _MultiTextDecorationLine(this.lines) : assert(lines.length > 0, 'TextDecorationLine.multi cannot be empty.');
 
   @override
   String get value => lines.map((l) => l.value).join(' ');
@@ -288,7 +288,11 @@ class _TextDecoration implements TextDecoration {
   final TextDecorationStyle? style;
   final TextDecorationThickness? thickness;
 
-  const _TextDecoration({this.line, this.color, this.style, this.thickness});
+  const _TextDecoration({this.line, this.color, this.style, this.thickness})
+    : assert(
+        line != null || style != null || color != null || thickness != null,
+        'At least one of line, style or color must not be null. For no text decoration, use TextDecoration.none',
+      );
 
   @override
   String get value => [
@@ -316,12 +320,16 @@ class _TextShadow implements TextShadow {
   final Color? color;
 
   @override
-  String get value =>
-      [offsetX.value, offsetY.value, if (blur != null) blur!.value, if (color != null) color!.value].join(' ');
+  String get value => [
+    offsetX.value,
+    offsetY.value,
+    if (blur != null) blur!.value,
+    if (color != null) color!.value,
+  ].join(' ');
 }
 
 class _CombineTextShadow implements TextShadow {
-  const _CombineTextShadow(this.shadows);
+  const _CombineTextShadow(this.shadows) : assert(shadows.length > 0, 'TextShadow.combine cannot be empty');
 
   final List<TextShadow> shadows;
 
