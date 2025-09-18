@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 
 import '../../adapters/mdc.dart';
 import '../utils/node_reader.dart';
@@ -20,7 +21,7 @@ class SnackBarState extends State<SnackBar> {
   @override
   void initState() {
     super.initState();
-    _sub = context.subscribe<String?>(snackBarProvider, (_, msg) {
+    _sub = context.listenManual<String?>(snackBarProvider, (_, msg) {
       if (msg != null) _snackbar?.showMessage(msg);
     });
   }

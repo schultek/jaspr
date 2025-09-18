@@ -1,3 +1,26 @@
+## Unreleased minor
+
+- Upgrade `riverpod` to `^3.0.0`
+
+- **Breaking**: Removed `SyncProvider`. Migrate to `ProviderScope(sync: [...])`.
+
+- Added `sync` option to `ProviderScope`, which allows to specify providers that should sync its value to the client using:
+
+  ```dart
+  ProviderScope(
+    sync: [
+      myProvider.syncWith('my-unique-id'),
+    ],
+    child: ...
+  )
+  ```
+
+  The `.syncWith` extension is available on `Provider`, `FutureProvider`, `StreamProvider`, `StateProvider`, `NotifierProvider` and `AsyncNotifierProvider`.
+
+  For `FutureProvider`, `StreamProvider` and `AsyncNotifierProvider` this also awaits the future during pre-rendering before building the child component.
+
+- **Breaking**: Renamed `context.subscribe()` to `context.listenManual()` to be consistent with `WidgetRef`.
+
 ## 0.3.23
 
 - `jaspr` upgraded to `0.21.1`

@@ -1,5 +1,40 @@
-export 'package:riverpod/riverpod.dart';
-
-export 'src/change_notifier_provider.dart';
-export 'src/framework.dart';
-export 'src/sync_provider.dart';
+// ignore: invalid_export_of_internal_element, Already tackled by riverpod/riverpod.dart. If we export internals, that's on purpose.
+export 'src/internals.dart'
+    show
+        AsyncValue,
+        AsyncData,
+        AsyncLoading,
+        AsyncError,
+        ProviderContainer,
+        ProviderObserverContext,
+        ProviderObserver,
+        ProviderSubscription,
+        Ref,
+        AsyncNotifier,
+        AsyncNotifierProvider,
+        FutureProvider,
+        Notifier,
+        NotifierProvider,
+        Provider,
+        StreamNotifier,
+        StreamNotifierProvider,
+        StreamProvider,
+        AnyNotifier,
+        // Consumer,
+        // ConsumerWidget,
+        // ConsumerStatefulWidget,
+        // ConsumerState,
+        // WidgetRef,
+        ProviderScope,
+        UncontrolledProviderScope,
+        //RiverpodWidgetTesterX,
+        BindingRef,
+        ProviderListenableSelect,
+        AsyncResult,
+        AsyncValueExtensions,
+        ProviderContext,
+        SyncNotifierExtension,
+        SyncAsyncNotifierExtension,
+        SyncProviderExtension,
+        SyncFutureProviderExtension,
+        SyncStreamProviderExtension;

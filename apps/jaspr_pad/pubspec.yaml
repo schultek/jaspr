@@ -36,5 +36,9 @@ dev_dependencies:
   test: ^1.25.0
   yaml_writer: ^1.0.1
 
+dependency_overrides: 
+  jaspr_riverpod:
+    path: ../../packages/jaspr_riverpod
+
 jaspr:
   mode: server

@@ -1,23 +1,17 @@
-# 🌊 Riverpod for Jaspr
+# 🌊 jaspr_riverpod
 
-Jaspr comes with a Riverpod package that ports over flutter_riverpod to Jaspr. It is based
-on Riverpod 2 and supports all providers and modifiers.
+A port of [`flutter_riverpod`](https://pub.dev/packages/flutter_riverpod) for [Jaspr](https://jaspr.site). It is based on Riverpod 3 and supports all providers and modifiers.
 
 **TLDR: Differences to flutter_riverpod**
 
 - No `Consumer` / `ConsumerComponent`, just use `context.read` / `context.watch`
-- Additional `SyncProvider` to sync values between server and client.
-
-> Also check out [this example](https://github.com/schultek/jaspr/tree/main/examples/riverpod_app).
+- Additional `sync` option to sync providers between server and client.
 
 ## 🪄 Accessing Providers
 
-While it has feature-parity for defining `Provider`s, it comes with some quality-of-life improvements
-on the `Consumer` side. Mainly:
+While it has feature-parity for defining `Provider`s, it comes with some quality-of-life improvements on the `Consumer` side. Mainly:
 
-**It does not have `Consumer`, `ConsumerWidget` or `StatefulConsumerWidget`.** This is because it
-does not rely on `WidgetRef` to access providers but instead comes with **context extensions** on the
-`BuildContext` of **any** component.
+**It does not have `Consumer`, `ConsumerWidget` or `StatefulConsumerWidget`.** This is because it does not rely on `WidgetRef` to access providers but instead comes with **context extensions** on the `BuildContext` of **any** component.
 
 As an example, this (in Flutter):
 
@@ -51,18 +45,19 @@ class MyComponent extends StatelessComponent {
 }
 ```
 
-The extension on `BuildContext` supports all the normal methods from `WidgetRef``
+The extension on `BuildContext` supports all the normal methods from `WidgetRef`
 
-- `context.read()`,
-- `context.watch()`,
-- `context.refresh()`,
-- `context.invalidate()`,
+- `context.read()`
+- `context.watch()`
 - `context.listen()`
+- `context.listenManual()`
+- `context.invalidate()`
+- `context.refresh()`
+- `context.exists()`
 
 #### Replacement for Consumer
 
-Same as with `ConsumerComponent`, we don't need the `Consumer` anymore. If you want only parts of your
-component tree to rebuild when watching a provider, simply use the `Builder` component. This will
+Same as with `ConsumerComponent`, we don't need the `Consumer` anymore. If you want only parts of your component tree to rebuild when watching a provider, simply use the `Builder` component. This will
 give you a new context which you can call `context.watch` on:
 
 ```dart
@@ -74,28 +69,45 @@ Builder(
 );
 ```
 
-## ♻️ Preloading and Syncing Provider State
+## ♻️ Syncing Provider State
 
-Jaspr allows `StatefulComponent`s to preload state as well as sync state between server and client
-(when using server-side rendering).
-
-Since providers often are used to replace `StatefulComponent`s, `jaspr_riverpod` offers the same
-mechanisms inside a special provider, called `SyncProvider`:
+Jaspr allows data that is loaded during pre-rendering (in **server** or **static** mode) to be synced to the client for further use. `jaspr_riverpod` extends this for providers, allowing to sync provider state from server to client like this:
 
 ```dart
-final mySyncProvider = SyncProvider<int>((ref) async {
-  // do some async work on the server, like fetching data from a database
-  await Future.delayed(Duration(seconds: 1));
-  return 100;
-}, id: 'initial_count');
+@override
+Component build() {
+  return ProviderScope(
+    sync: [
+      myProvider.syncWith('some-unique-key'),
+    ],
+    child: ...
+  );
+}
 ```
 
-This provider needs an additional id to be synced with the client.
-The create function of a `SyncProvider` is only executed on the server, and
-never on the client. Instead the synced value is returned.
+This will cause the value of `myProvider` to be evaulated and serialized on the server, and deserialized on the client. Then when accessing `myProvider` on the client, it will return the original value from the server.
 
-It then can be used like any other provider. It functions like a `FutureProvider` and exposes a
-value of type `AsyncValue<T>`.
+The `syncWith()` method takes a unique `String key` to identify the provider, and an optional `Codec<T, Object?>? codec` parameter for converting the provider value of type `T` to/from a serializable value. The `codec` parameter is not needed for serializable values, like primitives (`String`, numbers, `bool`, etc.) or `Map`s and `List`s of these.
+
+The following provider types support syncing: `NotifierProvider`, `AsyncNotifierProvider`, `Provider`, `FutureProvider`, `StreamProvider` and `StateProvider`.
+
+### Awaiting Async Providers
+
+If a synced provider is a `FutureProvider`, `StreamProvider` or `AsyncNotifier`, the `ProviderScope` will wait for the providers future to complete before building its child (on the server). Therefore reading the provider inside the subtree will already return the completed value.
+
+### Sync Overrides and Scoping
+
+In detail, the process of syncing a provider between server and client works like this:
+
+- During pre-rendering on the server, the value of a synced provider is read, serialized and embedded into the rendered html.
+- Together with the html it is then sent to the client.
+- When the client first builds your component containing the `ProviderScope`, the embedded provider value is read and deserialized.
+- The provider is then **overridden** with the received value, using the normal `.overrideWith()` feature of Riverpod.
+- Accessing a synced provider on the client will always return the overridden value and skip it's initial computation.
+
+It is important to note that overrides in Riverpod only propagate the provider chain when they are defined on the root `ProviderScope`, and the same applies to synced providers. Therefore, either make sure to define synced providers only on the root client-side `ProviderScope`, or set the `dependencies` option required for scoping providers.
+
+Read more about scoping providers [here](https://riverpod.dev/de/docs/concepts2/scoping).
 
 ## 📜 Backstory: Why context extensions instead of Consumer?
 
