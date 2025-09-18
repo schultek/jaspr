@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.4.0
 
 - Upgrade `riverpod` to `^3.0.0`
 
