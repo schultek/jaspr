@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.21.2
 
 - Added html domain to tooling daemon.
 
