@@ -26,7 +26,7 @@ void main() {
       await page.loadData();
 
       // Assert
-      expect(page.data, equals({'a': 1, 'b': 2, 'page': {}}));
+      expect(page.data, equals({'a': 1, 'b': 2, 'page': <String, Object?>{}}));
     });
 
     test('merges with existing data', () async {
@@ -45,7 +45,7 @@ void main() {
       await page.loadData();
 
       // Assert
-      expect(page.data, equals({'a': 1, 'b': 20, 'c': 3, 'page': {}}));
+      expect(page.data, equals({'a': 1, 'b': 20, 'c': 3, 'page': <String, Object?>{}}));
     });
 
     test('initial data takes precedence over loader data', () async {
@@ -132,7 +132,7 @@ void main() {
       await page.loadData();
 
       // Assert
-      expect(page.data, equals({'a': 1, 'page': {}}));
+      expect(page.data, equals({'a': 1, 'page': <String, Object?>{}}));
     });
   });
 }

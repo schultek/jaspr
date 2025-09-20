@@ -146,7 +146,7 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
       zoomed = false;
     });
     dialogSetState?.call(() {});
-    await Future.delayed(Duration(milliseconds: 300));
+    await Future<void>.delayed(const Duration(milliseconds: 300));
     if (zoomed) return;
     dialog.close();
     document.body!.style.overflow = 'auto';
@@ -168,7 +168,7 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
         src: component.src,
         alt: component.alt ?? component.caption,
         styles: zoomed ? Styles(visibility: Visibility.hidden) : null,
-        events: events(
+        events: events<void, void>(
           onClick: () {
             zoomIn();
           },
