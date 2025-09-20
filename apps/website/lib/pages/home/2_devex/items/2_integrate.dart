@@ -15,11 +15,11 @@ class Integrate extends StatelessComponent {
       title: 'Packages and Plugins',
       description: fragment([
         text('Import any Dart package from pub.dev or even use '),
-        b([
-          a(href: 'https://pub.dev/packages?q=is%3Aplugin+platform%3Aweb', classes: 'animated-underline', [
-            text('Flutter web plugins'),
-          ]),
+
+        a(href: 'https://pub.dev/packages?q=is%3Aplugin+platform%3Aweb', [
+          text('Flutter web plugins'),
         ]),
+
         text(' through Jasprs custom compiler pipeline.'),
       ]),
       preview: div([

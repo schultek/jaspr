@@ -45,6 +45,11 @@ class DevexBox extends StatelessComponent {
           padding: Padding.only(left: 1.rem, right: 1.rem, bottom: .5.rem),
           textAlign: TextAlign.start,
         ),
+        css('a').styles(
+          fontWeight: FontWeight.bold,
+          textDecoration: TextDecoration(line: TextDecorationLine.underline),
+          color: textBlack,
+        ),
       ]),
     ]),
   ];
