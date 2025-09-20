@@ -27,8 +27,18 @@ class Run extends StatelessComponent {
   Component build(BuildContext context) {
     return DevexBox(
       caption: 'RUN',
-      title: 'Jaspr CLI',
-      description: text('Create, serve and build your site using simple cli commands.'),
+      title: 'Integrated Tooling',
+      description: fragment([
+        text('Create, serve and build your site using simple cli commands, or the official '),
+        a(
+          href: 'https://marketplace.visualstudio.com/items?itemName=schultek.jaspr-code',
+          target: Target.blank,
+          [
+            text('VSCode Extension'),
+          ],
+        ),
+        text('.'),
+      ]),
       preview: div(classes: 'run-preview', [
         code(classes: 'console', [
           text(r'$'),
