@@ -3,28 +3,49 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 
 import '../models/api_models.dart';
 import '../models/project.dart';
+import '../models/tutorial.dart';
 import 'project_provider.dart';
 import 'utils.dart';
 
-final editProjectProvider = StateProvider<ProjectDataBase?>((ref) {
-  var loadedProject = ref.watch(loadedProjectProvider).value;
+final editProjectProvider = NotifierProvider<EditProjectNotifier, ProjectDataBase?>(
+  EditProjectNotifier.new,
+  name: 'editProject',
+);
 
-  if (kIsWeb) {
-    var update = debounce((ProjectDataBase? project) {
-      if (project != null) {
-        ref.read(storageProvider)['project'] = project.toJson();
-      }
-    }, Duration(seconds: 1));
+class EditProjectNotifier extends Notifier<ProjectDataBase?> {
+  @override
+  ProjectDataBase? build() {
+    var loadedProject = ref.watch(loadedProjectProvider).value;
 
-    // ignore: deprecated_member_use
-    ref.listenSelf((_, data) => update(data));
+    if (kIsWeb) {
+      var update = debounce((ProjectDataBase? project) {
+        if (project != null) {
+          ref.read(storageProvider)['project'] = project.toJson();
+        }
+      }, Duration(seconds: 1));
+
+      listenSelf((_, data) => update(data));
+    }
+
+    return loadedProject;
   }
 
-  return loadedProject;
-}, name: 'editProject');
+  void updateContent(String key, String? content) {
+    state = state?.updateContent(key, content);
+  }
+
+  void toggleSolution() {
+    state = (state as TutorialData).toggleSolution();
+  }
+
+  void updateProject(TutorialData updated) {
+    state = updated;
+  }
+}
 
 final fileSelectionProvider = StateProvider.family<IssueLocation?, String>((ref, String key) => null);
 

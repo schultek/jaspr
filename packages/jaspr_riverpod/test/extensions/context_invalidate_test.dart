@@ -1,14 +1,15 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
-import 'utils.dart';
+import '../utils.dart';
 
 final counter = StateProvider((ref) => 0);
 
 void main() {
-  group('context.refresh', () {
-    testComponents('refreshes provider state', (tester) async {
+  group('context.invalidate', () {
+    testComponents('invalidates provider state', (tester) async {
       tester.pumpComponent(
         providerApp((context) {
           return div([
@@ -19,9 +20,9 @@ void main() {
               },
             ),
             Button(
-              label: 'refresh',
+              label: 'invalidate',
               onPressed: () {
-                context.refresh(counter);
+                context.invalidate(counter);
               },
             ),
           ]);
@@ -36,14 +37,14 @@ void main() {
 
       expect(find.text('1'), findsOneComponent);
 
-      // refresh counter
-      await tester.click(find.componentWithText(Button, 'refresh'));
+      // invalidate counter
+      await tester.click(find.componentWithText(Button, 'invalidate'));
       await tester.pump();
 
       expect(find.text('0'), findsOneComponent);
     });
 
-    testComponents('refreshes overridden provider state', (tester) async {
+    testComponents('invalidates overridden provider state', (tester) async {
       tester.pumpComponent(
         providerApp((context) {
           return div([
@@ -58,9 +59,9 @@ void main() {
                     },
                   ),
                   Button(
-                    label: 'refresh_a',
+                    label: 'invalidate_a',
                     onPressed: () {
-                      context.refresh(counter);
+                      context.invalidate(counter);
                     },
                   ),
                 ]);
@@ -79,9 +80,9 @@ void main() {
                       },
                     ),
                     Button(
-                      label: 'refresh_b',
+                      label: 'invalidate_b',
                       onPressed: () {
-                        context.refresh(counter);
+                        context.invalidate(counter);
                       },
                     ),
                   ]);
@@ -104,17 +105,17 @@ void main() {
       expect(find.text('a 1'), findsOneComponent);
       expect(find.text('b 11'), findsOneComponent);
 
-      // refresh counter a
-      await tester.click(find.componentWithText(Button, 'refresh_a'));
+      // invalidate counter a
+      await tester.click(find.componentWithText(Button, 'invalidate_a'));
       await tester.pump();
 
       expect(find.text('a 0'), findsOneComponent);
       expect(find.text('b 11'), findsOneComponent);
 
-      // increase counter a, refresh counter b
+      // increase counter a, invalidate counter b
       await tester.click(find.byKey(const ValueKey('a')));
       await tester.pump();
-      await tester.click(find.componentWithText(Button, 'refresh_b'));
+      await tester.click(find.componentWithText(Button, 'invalidate_b'));
       await tester.pump();
 
       expect(find.text('a 1'), findsOneComponent);

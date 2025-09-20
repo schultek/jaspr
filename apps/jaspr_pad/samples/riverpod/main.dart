@@ -1,6 +1,7 @@
 // [sample=2] Jaspr Riverpod
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 
 void main() {
   runApp(ProviderScope(child: App()));
