@@ -15,6 +15,7 @@ import {
 } from "./helpers/project_helper";
 import { JasprToolingDaemon } from "./jaspr/tooling_daemon";
 import { ScopesDomain } from "./jaspr/scopes_domain";
+import { HtmlDomain } from "./jaspr/html_domain";
 
 export async function activate(context: vscode.ExtensionContext) {
   let projects = await findJasprProjectFolders();
@@ -82,7 +83,6 @@ export async function activate(context: vscode.ExtensionContext) {
       });
     })
   );
-  
 
   const toolingDaemon = new JasprToolingDaemon();
   context.subscriptions.push(toolingDaemon);
@@ -97,4 +97,7 @@ export async function activate(context: vscode.ExtensionContext) {
       new ComponentCodeLensProvider(scopesDomain)
     )
   );
+
+  const htmlDomain = new HtmlDomain(toolingDaemon);
+  context.subscriptions.push(htmlDomain);
 }

@@ -2,7 +2,7 @@
   "name": "jaspr-code",
   "displayName": "Jaspr",
   "description": "Jaspr framework support for Visual Studio Code",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "repository": {
     "url": "https://github.com/schultek/jaspr",
     "directory": "modules/jaspr-code"
@@ -140,7 +140,11 @@
         },
         "jaspr.scopes.unsafeImportDiagnosticSeverity": {
           "type": "number",
-          "enum": ["Error", "Warning", "Information"],
+          "enum": [
+            "Error",
+            "Warning",
+            "Information"
+          ],
           "default": "Error",
           "markdownDescription": "The severity of diagnostics for unsafe imports detected for a component file. Only applies when `#jaspr.scopes.showUnsafeImportDiagnostics#` is set to `true`."
         }

@@ -47,6 +47,8 @@ dependencies:
   shelf_proxy: ^1.0.4
   async: ^2.13.0
   watcher: ^1.1.2
+  html: ^0.15.6
+  mocktail: ^1.0.4
 
 dev_dependencies:
   jaspr_repo: any

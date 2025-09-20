@@ -1,3 +1,7 @@
+## 0.2.2
+
+- Convert HTML to Jaspr code when pasting into a Dart editor.
+
 ## 0.2.1
 
 - Added code lenses for component scopes.
