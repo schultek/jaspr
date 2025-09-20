@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { JasprToolingDaemon } from "./tooling_daemon";
 import { findJasprProjectFolders } from "../helpers/project_helper";
-import { stat } from "fs";
+import { join } from "path";
 
 export type ScopeResults = Record<string, ScopeLibraryResult>;
 
@@ -63,6 +63,7 @@ export class ScopesDomain implements vscode.Disposable {
 
   private async registerFolders() {
     var folders = await findJasprProjectFolders();
+    folders = folders.map((f) => join(f, "lib", 'main.dart'));
 
     this.statusBarItem = vscode.window.createStatusBarItem(
       vscode.StatusBarAlignment.Left,
@@ -70,7 +71,7 @@ export class ScopesDomain implements vscode.Disposable {
     );
     this.statusBarItem.text = `$(loading~spin) Analyzing Jaspr Scopes`;
     this.statusBarItem.command = "jaspr.action.showScopeHint";
-
+    
     this.toolingDaemon.sendMessage("scopes.register", { folders: folders });
     this.toolingDaemon.onEvent("scopes.result", (results: ScopeResults) => {
       this.scopeResults = results;

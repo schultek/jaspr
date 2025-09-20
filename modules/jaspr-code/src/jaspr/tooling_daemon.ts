@@ -1,8 +1,12 @@
 import * as vscode from "vscode";
 
 import { dartExtensionApi, DartProcess } from "../api";
-import { checkJasprInstalled } from "../helpers/install_helper";
+import {
+  checkJasprInstalled,
+  checkJasprVersion,
+} from "../helpers/install_helper";
 import { spawn } from "child_process";
+import { minimumJasprVersion } from "../constants";
 
 export class JasprToolingDaemon implements vscode.Disposable {
   private _disposables: vscode.Disposable[] = [];
@@ -14,19 +18,27 @@ export class JasprToolingDaemon implements vscode.Disposable {
     new vscode.EventEmitter<void>();
   public readonly onDidRestart: vscode.Event<void> = this._onDidRestart.event;
 
+  private _isDevMode: boolean = false;
+  public jasprVersion: string | undefined;
+
   async start(context: vscode.ExtensionContext): Promise<void> {
     const isInstalled = await checkJasprInstalled();
     if (!isInstalled) {
       return;
     }
 
+    this._isDevMode = context.extensionMode === vscode.ExtensionMode.Development;
+
     this._disposables.push(
-      vscode.commands.registerCommand("jaspr.restartToolingDaemon", async () => {
-        await this._startProcess(context);
-        if (this.process) {
-          this._onDidRestart.fire();
+      vscode.commands.registerCommand(
+        "jaspr.restartToolingDaemon",
+        async () => {
+          await this._startProcess();
+          if (this.process) {
+            this._onDidRestart.fire();
+          }
         }
-      })
+      )
     );
 
     this.statusItem = vscode.languages.createLanguageStatusItem(
@@ -38,7 +50,8 @@ export class JasprToolingDaemon implements vscode.Disposable {
     );
     this.statusItem.name = "Jaspr Tooling Daemon";
 
-    await this._startProcess(context);
+    await this._startProcess();
+    this._isDevMode = false;
   }
 
   public setBusy(busy: boolean) {
@@ -48,15 +61,17 @@ export class JasprToolingDaemon implements vscode.Disposable {
     this.statusItem!.busy = busy;
   }
 
-  async _startProcess(context: vscode.ExtensionContext) {
-    this.statusItem!.text = "$(loading~spin) Starting Jaspr Tooling Daemon...";
+  async _startProcess() {
+    this.statusItem!.text = "Starting Jaspr Tooling Daemon...";
     this.statusItem!.severity = vscode.LanguageStatusSeverity.Information;
     this.statusItem!.command = undefined;
     this.statusItem!.busy = true;
 
     this.process?.kill();
 
-    if (context.extensionMode === vscode.ExtensionMode.Development) {
+    this.jasprVersion = await checkJasprVersion();
+
+    if (this._isDevMode) {
       this.process = spawn("jaspr", ["tooling-daemon"], {
         stdio: ["pipe", "pipe", "pipe"],
         shell: true,
@@ -135,7 +150,7 @@ export class JasprToolingDaemon implements vscode.Disposable {
         this._currentLine = line;
       } else if (this._currentLine.length > 0) {
         this._currentLine += line;
-      } else {
+      } else if (this._isDevMode) {
         console.log("Tooling Daemon Log:", line);
       }
       if (this._currentLine.endsWith("}]")) {
@@ -150,7 +165,7 @@ export class JasprToolingDaemon implements vscode.Disposable {
           this.handleEvent(event);
         } else if (event && event.id) {
           this.handleResponse(event);
-        } else {
+        } else if (this._isDevMode) {
           console.log("Tooling Daemon Log:", currentLine);
         }
       }
@@ -167,10 +182,12 @@ export class JasprToolingDaemon implements vscode.Disposable {
       } catch (e) {
         console.error(`Error in event listener for ${eventName}:`, e);
       }
-    } else if (eventName === "daemon.log") {
-      console.log("Tooling Daemon Log:", params.message);
-    } else {
-      console.log("Tooling Daemon Event:", eventName, params);
+    } else if (this._isDevMode) {
+      if (eventName === "daemon.log") {
+        console.log("Tooling Daemon Log:", params.message);
+      } else {
+        console.log("Tooling Daemon Event:", eventName, params);
+      }
     }
   }
 
@@ -179,8 +196,9 @@ export class JasprToolingDaemon implements vscode.Disposable {
     var result = response.result;
     var error = response.error;
 
-    console.log("Tooling Daemon Response:", id, result, error);
-
+    if (this._isDevMode) {
+      console.log("Tooling Daemon Response:", id, result, error);
+    }
     if (this._responseListeners[id]) {
       try {
         this._responseListeners[id](result, error);

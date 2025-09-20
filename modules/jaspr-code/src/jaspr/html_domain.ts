@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { JasprToolingDaemon } from "./tooling_daemon";
+import { checkJasprVersion } from "../helpers/install_helper";
 
 export class HtmlDomain
   implements vscode.DocumentPasteEditProvider, vscode.Disposable
@@ -34,6 +35,13 @@ export class HtmlDomain
     context: vscode.DocumentPasteEditContext,
     token: vscode.CancellationToken
   ) {
+    if (
+      this.toolingDaemon.jasprVersion === undefined ||
+      this.toolingDaemon.jasprVersion < "0.21.2"
+    ) {
+      return;
+    }
+
     const content = await data.get("text/plain")?.asString();
     if (content?.startsWith("<")) {
       try {
@@ -55,10 +63,9 @@ export class HtmlDomain
         ];
       } catch (e) {
         vscode.window.showErrorMessage("Failed to convert HTML to Jaspr: " + e);
-        return [];
+        return;
       }
     }
-    return [];
   }
 
   public dispose() {
