@@ -33,7 +33,9 @@ class Filter {
   const factory Filter.url(String url) = _UrlFilter;
 }
 
-class _FilterList implements Filter {
+abstract class _ListableFilter implements Filter {}
+
+class _FilterList implements _ListableFilter {
   const _FilterList(this._filterValues);
 
   final List<Filter> _filterValues;
@@ -44,10 +46,6 @@ class _FilterList implements Filter {
     }
 
     for (final filter in _filterValues) {
-      if (filter is _FilterList) {
-        throw 'Cannot nest [Filter.list] inside [Filter.list].';
-      }
-
       if (filter is! _ListableFilter) {
         throw 'Cannot use ${filter.value} as a filter list item, only standalone use supported.';
       }
@@ -63,8 +61,6 @@ class _FilterList implements Filter {
     return _filterValues.map((filter) => filter.value).join(' ');
   }
 }
-
-abstract class _ListableFilter implements Filter {}
 
 abstract class _FilterWithPercentage implements _ListableFilter {
   const _FilterWithPercentage(this._percentage, this._name);
