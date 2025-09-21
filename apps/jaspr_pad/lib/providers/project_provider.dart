@@ -2,6 +2,7 @@ import 'package:dart_mappable/dart_mappable.dart';
 import 'package:http/http.dart' as http;
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 
 import '../adapters/html.dart';
 import '../components/elements/snackbar.dart';

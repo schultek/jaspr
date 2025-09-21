@@ -75,7 +75,7 @@ author: Test User
       page.parseFrontmatter();
 
       // Assert
-      expect(page.data, {'page': {}});
+      expect(page.data, {'page': <String, Object?>{}});
       expect(page.content, equals(rawContent));
     });
   });

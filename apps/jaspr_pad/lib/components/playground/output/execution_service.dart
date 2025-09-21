@@ -7,6 +7,7 @@ import 'dart:math';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 
 import '../../../providers/project_provider.dart';
 import '../panels/output_split_view.dart';

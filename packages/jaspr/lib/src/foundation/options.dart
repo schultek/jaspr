@@ -22,7 +22,7 @@ class Jaspr {
   static JasprOptions? _options;
 
   static bool get useIsolates => _useIsolates;
-  static bool _useIsolates = true;
+  static bool _useIsolates = false;
 
   static List<String> get allowedPathSuffixes => _allowedPathSuffixes;
   static List<String> _allowedPathSuffixes = [];

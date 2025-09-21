@@ -7,20 +7,25 @@ import 'dart_service_provider.dart';
 import 'edit_provider.dart';
 import 'utils.dart';
 
-final issuesProvider = Provider<List<Issue>>((ref) {
-  if (!kIsWeb) return [];
+final issuesProvider = NotifierProvider<IssuesNotifier, List<Issue>>(IssuesNotifier.new, name: 'issues');
 
-  var fetchIssues = debounce((ProjectDataBase proj) async {
-    var response = await ref.read(dartServiceProvider).analyze(proj.allDartFiles);
-    ref.state = response.issues;
-  }, Duration(milliseconds: 500));
+class IssuesNotifier extends Notifier<List<Issue>> {
+  @override
+  List<Issue> build() {
+    if (!kIsWeb) return [];
 
-  ref.listen<ProjectDataBase?>(editProjectProvider, (_, proj) {
-    if (proj != null) fetchIssues(proj);
-  }, fireImmediately: true);
+    var fetchIssues = debounce((ProjectDataBase proj) async {
+      var response = await ref.read(dartServiceProvider).analyze(proj.allDartFiles);
+      state = response.issues;
+    }, Duration(milliseconds: 500));
 
-  return [];
-}, name: 'issues');
+    ref.listen<ProjectDataBase?>(editProjectProvider, (_, proj) {
+      if (proj != null) fetchIssues(proj);
+    }, fireImmediately: true);
+
+    return [];
+  }
+}
 
 final docIssuesProvider = Provider.family((ref, String key) {
   return ref.watch(issuesProvider.select((issues) => issues.where((i) => i.sourceName == key).toList()));

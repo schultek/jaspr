@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { JasprToolingDaemon } from "./tooling_daemon";
 import { findJasprProjectFolders } from "../helpers/project_helper";
-import { stat } from "fs";
+import { join } from "path";
 
 export type ScopeResults = Record<string, ScopeLibraryResult>;
 
@@ -55,6 +55,7 @@ export class ScopesDomain implements vscode.Disposable {
     this.workspaceSubscriptions = vscode.workspace.onDidChangeWorkspaceFolders(
       (_) => this.registerFolders()
     );
+    this.toolingDaemon.onDidRestart(() => this.registerFolders());
     this.configurationSubscriptions = vscode.workspace.onDidChangeConfiguration(
       (_) => this.updateDiagnostics()
     );
@@ -62,6 +63,7 @@ export class ScopesDomain implements vscode.Disposable {
 
   private async registerFolders() {
     var folders = await findJasprProjectFolders();
+    folders = folders.map((f) => join(f, "lib", 'main.dart'));
 
     this.statusBarItem = vscode.window.createStatusBarItem(
       vscode.StatusBarAlignment.Left,
@@ -69,7 +71,7 @@ export class ScopesDomain implements vscode.Disposable {
     );
     this.statusBarItem.text = `$(loading~spin) Analyzing Jaspr Scopes`;
     this.statusBarItem.command = "jaspr.action.showScopeHint";
-
+    
     this.toolingDaemon.sendMessage("scopes.register", { folders: folders });
     this.toolingDaemon.onEvent("scopes.result", (results: ScopeResults) => {
       this.scopeResults = results;
@@ -149,7 +151,10 @@ export class ScopesDomain implements vscode.Disposable {
             let message = `Unsafe import: '${dep.invalidOnServer.uri}' depends on '${dep.invalidOnServer.target}', which is not available on the server.\nTry using a platform-independent library ${messageSuffix}`;
             if (s.uri === "package:jaspr/browser.dart") {
               message = `Unsafe import: '${s.uri}' is not available on the server.\nTry using 'package:jaspr/jaspr.dart' instead ${messageSuffix}`;
-            } else if (s.uri === "package:web/web.dart" || s.uri === "dart:js_interop") {
+            } else if (
+              s.uri === "package:web/web.dart" ||
+              s.uri === "dart:js_interop"
+            ) {
               message = `Unsafe import: '${s.uri}' is not available on the server.\nTry using the 'universal_web' package instead ${messageSuffix}`;
             } else if (dep.invalidOnServer.uri === dep.invalidOnServer.target) {
               message = `Unsafe import: '${dep.invalidOnServer.uri}' is not available on the server.\nTry using a platform-independent library ${messageSuffix}`;
