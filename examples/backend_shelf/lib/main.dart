@@ -14,7 +14,7 @@ void main() async {
 
   HttpServer? server;
 
-  var router = Router();
+  final router = Router();
 
   router.get('/', (request) => Response.ok('Hello World from Shelf'));
 
@@ -45,12 +45,13 @@ void main() async {
     );
   });
 
-  var handler =
+  final handler =
       const Pipeline() //
           .addMiddleware(logRequests())
           .addHandler(router.call);
 
-  server = await shelf_io.serve(handler, InternetAddress.anyIPv4, 8080);
+  final port = int.parse(Platform.environment['PORT'] ?? '8080');
+  server = await shelf_io.serve(handler, InternetAddress.anyIPv4, port);
 
   // Enable content compression
   server.autoCompress = true;

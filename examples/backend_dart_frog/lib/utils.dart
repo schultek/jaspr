@@ -23,9 +23,9 @@ Middleware serveJasprApp() {
 /// Renders the component wrapped in the default document and
 /// uses the base path provided by the middleware.
 Future<Response> renderJasprComponent(RequestContext context, Component child) async {
-  var base = context.read<BasePath>();
+  final base = context.read<BasePath>();
 
-  var response = await renderComponent(
+  final response = await renderComponent(
     Document(base: base.path, body: child),
     request: shelf.Request(context.request.method.name, context.request.url, headers: context.request.headers),
   );
