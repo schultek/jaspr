@@ -57,6 +57,6 @@ export async function jasprClean(): Promise<number | undefined> {
   return runJaspr(["clean"]);
 }
 
-export function jasprDoctor() : Promise<number | undefined> {
+export function jasprDoctor(): Promise<number | undefined> {
   return runJaspr(["doctor"], true);
 }

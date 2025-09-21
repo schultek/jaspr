@@ -32,7 +32,7 @@ class HeroPill extends StatelessComponent {
       css('&').styles(
         margin: Margin.only(bottom: 1.rem),
         radius: BorderRadius.circular(20.px),
-        raw: {'background': 'linear-gradient(175deg, ${primaryMid.value}33 0%, ${primaryMid.value}11 80%)'},
+        raw: {'background': 'linear-gradient(175deg, ${primaryMid.value}05 0%, ${primaryMid.value}10 80%)'},
       ),
       css('.pill-content').styles(
         display: Display.flex,
