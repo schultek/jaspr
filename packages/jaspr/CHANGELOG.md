@@ -2,6 +2,7 @@
 
 - **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
 - Allow nesting non-empty `Filter.list` inside each other.
+- Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`.
 
 ## 0.21.2
 
