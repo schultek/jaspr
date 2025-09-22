@@ -7,6 +7,7 @@
 - Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`.
 - Added `none`, `initial`, `revert`, `revertLayer` and `unset` to `TextShadow` and `BoxShadow`.
 - Allow nesting non-empty `Filter.list` inside each other.
+- Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`.
 
 - **Breaking**: `ResponseLike.body` (returned from `renderComponent()`) is now a `Uint8List` instead of `String`.
 - Allow binary responses in `AppContext.setStatusCode`.
