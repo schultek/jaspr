@@ -14,7 +14,7 @@ class Banner extends StatelessComponent {
         p([
           text('Jaspr 0.21.0 is out! This release is all about improving component syntax and reducing complexity. '),
           a(classes: 'animated-underline', href: 'https://docs.jaspr.site/releases/v/0.21.0', target: Target.blank, [
-            text('Lean more'),
+            text('Learn more'),
           ]),
         ]),
       ],
