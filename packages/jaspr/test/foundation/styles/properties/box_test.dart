@@ -13,9 +13,10 @@ void main() {
       });
 
       test('all', () {
-        var border = Border(style: BorderStyle.dashed, color: Colors.blue, width: 2.px);
+        var okBorder = Border(style: BorderStyle.dashed, color: Colors.blue, width: 2.px);
+        expect(okBorder.styles, equals({'border': 'dashed blue 2px'}));
 
-        expect(border.styles, equals({'border': 'dashed blue 2px'}));
+        expect(() => Border(style: null, color: null, width: null), throwsAssertionError);
       });
 
       test('only', () {
@@ -122,6 +123,7 @@ void main() {
         expect(Overflow.only(x: Overflow.clip).styles, equals({'overflow-x': 'clip'}));
       });
     });
+
     group('aspect-ratio', () {
       test('global values (private constructor) works', () {
         const styles = Styles(aspectRatio: AspectRatio.initial);
@@ -151,6 +153,51 @@ void main() {
       test('autoOrRatio with numerator and denominator works', () {
         const styles = Styles(aspectRatio: AspectRatio.autoOrRatio(1, 2));
         expect(styles.properties, equals({'aspect-ratio': 'auto 1/2'}));
+      });
+    });
+
+    group('box shadow', () {
+      test('global values', () {
+        const styles = Styles(shadow: BoxShadow.initial);
+        expect(styles.properties, equals({'box-shadow': 'initial'}));
+      });
+
+      test('all', () {
+        var styles = Styles(
+          shadow: BoxShadow(
+            offsetX: 1.rem,
+            offsetY: 2.rem,
+            blur: 3.rem,
+            spread: 4.rem,
+            color: Colors.red,
+          ),
+        );
+        expect(styles.properties, {'box-shadow': '1rem 2rem 3rem 4rem red'});
+      });
+
+      test('inset', () {
+        var styles = Styles(
+          shadow: BoxShadow.inset(
+            offsetX: 1.rem,
+            offsetY: 2.rem,
+            blur: 3.rem,
+            spread: 4.rem,
+            color: Colors.red,
+          ),
+        );
+        expect(styles.properties, {'box-shadow': 'inset 1rem 2rem 3rem 4rem red'});
+      });
+
+      test('combine', () {
+        var styles = Styles(
+          shadow: BoxShadow.combine([BoxShadow(offsetX: 1.rem, offsetY: 2.rem)]),
+        );
+        expect(styles.properties, equals({'box-shadow': '1rem 2rem'}));
+
+        expect(
+          () => BoxShadow.combine([]).value,
+          throwsA(predicate((e) => e == '[BoxShadow.combine] cannot be empty.')),
+        );
       });
     });
   });
