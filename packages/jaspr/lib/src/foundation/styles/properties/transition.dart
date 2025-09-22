@@ -1,11 +1,18 @@
 import 'unit.dart';
 
-abstract class Transition {
-  // TODO: Add global values (initial, revert, etc.)
+class Transition {
+  const Transition._(this.value);
+
+  static const inherit = Transition._('inherit');
+  static const initial = Transition._('initial');
+  static const revert = Transition._('revert');
+  static const revertLayer = Transition._('revert-layer');
+  static const unset = Transition._('unset');
+
   const factory Transition(String property, {required double duration, Curve? curve, double? delay}) = _Transition;
   const factory Transition.combine(List<Transition> transitions) = _CombineTransition;
 
-  String get value;
+  final String value;
 }
 
 abstract class _ListableTransition implements Transition {}
