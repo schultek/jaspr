@@ -1,0 +1,178 @@
+---
+title: Version 0.21.0
+description: Release notes and breaking changes.
+next: /releases/packages/jaspr-code-v0.2.1
+nextTitle: VSCode Extension Release Notes
+---
+
+---
+
+## TLDR / Overview
+
+Version 0.21.0 comes with a major overhaul of the component syntax, making it easier and even more familiar to write components. It also ships a new `jaspr migrate` command for automatic migrations to new versions, and adds support for five new css properties.
+
+**TL;DR**
+
+- **Simplified Build Methods:** All component `build` methods now return a single `Component` instead of an `Iterable<Component>`, making code more concise and Flutter-like.
+- **Unified Component Factories:** New factory constructors on the core `Component` class replace `DomComponent()`, `Text()`, and `Fragment()` for a more consistent API.
+- **Automatic Migration Command:** The CLI now includes a `jaspr migrate` command to help you automatically update your codebase for breaking changes.
+- **Improved Base Handling:** The `base` parameter of the `Document()` component can now be set to `null` to suppress the `<base>` element.
+- **Expanded CSS Support:** Eight new CSS properties are now available for more flexible styling: `all`, `aspectRatio`, `appearance`, `justifyItems`, `justifySelf`, `alignContent`, `filter`, and `backdropFilter`.
+
+---
+
+Additionally, a new version of the [**Jaspr VSCode extension**](https://marketplace.visualstudio.com/items?itemName=schultek.jaspr-code) was released that contains a major improvement to the developer experience. Read more in the [Extension Release Notes](/releases/packages/jaspr-code-v0.2.1).
+
+---
+
+## Build Method Improvement
+
+All component `build` methods now return a **single `Component`** instead of an `Iterable<Component>`. This includes:
+
+- The `build()` methods of `StatelessComponent` and `StatefulComponent`s `State`:
+
+  ```dart
+  @override
+  Iterable<Component> build(BuildContext context) sync* { // [!code --]
+    yield ... // [!code --]
+  Component build(BuildContext context) { // [!code ++]
+    return ... // [!code ++]
+  }
+  ```
+
+- The `builder` parameter of `Builder`, `ListenableBuilder`, `FutureBuilder`, `StreamBuilder` and `AsyncBuilder`, e.g.:
+
+  ```dart
+  return Builder(
+    builder: (context) sync* { // [!code --]
+      yield ... // [!code --]
+    builder: (context) { // [!code ++]
+      return ... // [!code ++]
+    }
+  );
+  ```
+
+- The `build()` method of `AsyncStatelessComponent`:
+
+  ```dart
+  Stream<Component> build(BuildContext context) async* { // [!code --]
+    yield ... // [!code --]
+  Future<Component> build(BuildContext context) async { // [!code ++]
+    return ... // [!code ++]
+  }
+  ```
+
+### Migration
+
+<Info>
+After upgrading Jaspr CLI to `0.21.0`, you can use the `jaspr migrate` command to **automatically migrate your components** to the new build method signature.
+
+The automatic migration will be able to migrate most of your components (90% to 99%).
+</Info>
+
+In case you need or want to manually migrate single components to the new build method, migrating is straightforward and in most cases trivial:
+
+1. Change the method signature to `Component build(BuildContext context)` for normal components/builders, and `Future<Component> build(BuildContext context)` for [async components/builders](/api/components/async_components).
+2. For build methods `yield`ing a single child, simply remove the `sync*` modifier and `return` that child intead.
+3. For build methods `yield`ing multiple children, return a [`Fragment`](/api/components/fragment) and provide the children as a `List<Component>`.
+
+### Reason for the Change
+
+We noticed that in practice most components already only return/yield a single child component. For those components, changing to a single child build method is the natural choice.
+
+Additionally, this change allows to discontinue the special `sync*/yield` syntax used before and instead aligns more closely with Flutter's widget syntax. And while this syntax is not officially deprecated, it is not really recommended by the Dart team as it lacks certain performance optimizations (especially in the js compiler) and doesn't support newer language features (e.g. no null-aware yield).
+
+Lastly, changing to single-child components allowed for major simplifications and optimizations of the internal framework code of Jaspr, resulting in a less-complex, easier to maintain and more performant implementation.
+
+## Foundational Component Factories
+
+New factory constructors on the core `Component` class have been introduced and replace the separate `DomComponent()`, `Text()` and `Fragment()` constructors:
+
+```dart
+return DomComponent(tag: 'div', ...); // [!code --]
+return Component.element(tag: 'div', ...); // [!code ++]
+
+return Text("..."); // [!code --]
+return Component.text("..."); // [!code ++]
+
+return Fragment(children: [...]); // [!code --]
+return Component.fragment([...]); // [!code ++]
+```
+
+The `DomComponent`, `Text` and `Fragment` classes still exist in the implementation, but cannot be created directly anymore.
+
+Additionally, a new `Component.empty()` convenience constructor was added to create an empty fragment.
+
+<Info>
+The html utility methods (`div()`, `button()` etc.) still exist and are still recommended over using the `Component.element` constructor. Same goes for the `text()` method and the new `fragment()` method for consistency, both of which are now also part of the 'prefer_html_methods' lint of `jaspr_lints`.
+</Info>
+
+### Migration
+
+<Info>
+After upgrading Jaspr CLI to `0.21.0`, you can use the `jaspr migrate` command to **automatically migrate your components** to the new factory API.
+
+The automatic migration will be able to migrate 99% of your components.
+</Info>
+
+In case you need or want to manually migrate single components to the new factory API, migrating is straightforward and in most cases trivial:
+
+1. Replace any `DomComponent()` invocation with `Component.element()`.
+2. Replace any `Text()` invocation with `Component.text()`.
+3. Replace any `Fragment()` invocation with `Component.fragment()` (or `Component.empty()` if it is an empty fragment).
+
+### Reason for the Change
+
+This change was made to improve the API in terms of concistency and discoverability.
+
+It is also designed to work well with the new dot shorthand syntax introduced in Dart 3.10. This allows you to omit the type name (in this case `Component`) when accessing a static member in a context where that type is expected (in this case e.g. a component's build method or children parameter).
+
+It also better encapsulates the concept that Jaspr has (different to Flutter) a fixed set of foundational component types (instead of allowing to write any number of custom render objects), and thus better aligns with the internal implementation.
+
+In real-world use we don't expect this to make much of a difference, as most Jaspr code should use the HTML utility methods anyways.
+
+## New Migrate Command
+
+The CLI will include a new `migrate` command meant for helping with the migration of breaking changes in new versions. This will not only be used for the **Build Method Change** and **Component Factories Change** of this release, but also for any future change that allows for automatic migration.
+
+Using the command is straightforward and follows the same style as the `dart fix` command:
+
+- Running `jaspr migrate` with no options will check only show which migrations are available for the currently used Jaspr version, e.g. **Build Method Migration** for version 0.21.0 and newer.
+- Running `jaspr migrate --dry-run` will compute and print all proposed migrations, but makes no changes to the code.
+- Running `jaspr migrate --apply` will compute, print and apply all migrations.
+
+<Image caption="Migrate options for version 0.21.0" src="/releases/assets/migrate_command.png"/>
+
+## Base Handling
+
+The `base` parameter of the `Document()` component can now be set to `null`, which causes the `<base>` head element to not be rendered. Previously this defaulted to `/` even when explicitly set to `null`. The default when not specifying the parameter is still `/`.
+
+When setting to `null`, the script src path of the generated client script is now corrected and does not produce an error.
+
+There is no migration needed, as the behavior for normal usage is still the same.
+
+## New CSS Properties
+
+The following css properties have been added to `Styles()` and `css.styles()`:
+
+```dart
+// For resetting default styles.
+All all
+
+// For box sizing and layout.
+AspectRatio aspectRatio
+Appearance appearance
+
+// For flexbox and grid layouts.
+JustifyItems justifyItems
+JustifySelf justifySelf
+AlignContent alignContent
+
+// For applying graphical effects like blur or color shift.
+Filter filter
+Filter backdropFilter
+```
+
+- `JustifyItems`, `JustifySelf` and `AlignContent` are enums with values like `JustifyItems.center`, `JustifySelf.start` or `AlignItems.spaceAround`.
+
+- `Filter` defines several filter methods like `Filter.blur(8.px)`, `Filter.hueRotate(90.deg)`, `Filter.opacity(0.5)` or `Filter.none`.

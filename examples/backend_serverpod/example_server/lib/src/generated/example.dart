@@ -11,47 +11,28 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
-abstract class Example
-    implements _i1.SerializableModel, _i1.ProtocolSerialization {
-  Example._({
-    required this.name,
-    required this.data,
-  });
+abstract class Example implements _i1.SerializableModel, _i1.ProtocolSerialization {
+  Example._({required this.name, required this.data});
 
-  factory Example({
-    required String name,
-    required int data,
-  }) = _ExampleImpl;
+  factory Example({required String name, required int data}) = _ExampleImpl;
 
   factory Example.fromJson(Map<String, dynamic> jsonSerialization) {
-    return Example(
-      name: jsonSerialization['name'] as String,
-      data: jsonSerialization['data'] as int,
-    );
+    return Example(name: jsonSerialization['name'] as String, data: jsonSerialization['data'] as int);
   }
 
   String name;
 
   int data;
 
-  Example copyWith({
-    String? name,
-    int? data,
-  });
+  Example copyWith({String? name, int? data});
   @override
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'data': data,
-    };
+    return {'name': name, 'data': data};
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {
-      'name': name,
-      'data': data,
-    };
+    return {'name': name, 'data': data};
   }
 
   @override
@@ -61,22 +42,10 @@ abstract class Example
 }
 
 class _ExampleImpl extends Example {
-  _ExampleImpl({
-    required String name,
-    required int data,
-  }) : super._(
-          name: name,
-          data: data,
-        );
+  _ExampleImpl({required String name, required int data}) : super._(name: name, data: data);
 
   @override
-  Example copyWith({
-    String? name,
-    int? data,
-  }) {
-    return Example(
-      name: name ?? this.name,
-      data: data ?? this.data,
-    );
+  Example copyWith({String? name, int? data}) {
+    return Example(name: name ?? this.name, data: data ?? this.data);
   }
 }

@@ -14,12 +14,9 @@ class ProgressBar extends StatelessComponent {
   final Color? color;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield progress(
-      classes: 'progress ${color != null ? ' is-${color!.name}' : ''}',
-      value: value,
-      max: max,
-      [if (child != null) child!],
-    );
+  Component build(BuildContext context) {
+    return progress(classes: 'progress ${color != null ? ' is-${color!.name}' : ''}', value: value, max: max, [
+      if (child != null) child!,
+    ]);
   }
 }

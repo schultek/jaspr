@@ -11,19 +11,20 @@ class MenuButton extends StatelessComponent {
   final Component? child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield button(
+  Component build(BuildContext context) {
+    return fragment([
+      button(
         classes: 'menu-toggle',
         attributes: {'aria-label': 'Menu Toggle'},
         onClick: onClick,
-        [Icon(child != null ? 'x' : 'menu')]);
-    if (child != null) {
-      yield div(classes: 'menu-overlay', [child!]);
-    }
+        [Icon(child != null ? 'x' : 'menu')],
+      ),
+      if (child != null) div(classes: 'menu-overlay', [child!]),
+    ]);
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.menu-toggle').styles(
       display: Display.none,
       padding: Padding.all(.7.rem),
@@ -35,9 +36,7 @@ class MenuButton extends StatelessComponent {
       fontSize: 1.5.rem,
       backgroundColor: Colors.transparent,
     ),
-    css('.menu-toggle:hover').styles(
-      backgroundColor: hoverOverlayColor,
-    ),
+    css('.menu-toggle:hover').styles(backgroundColor: hoverOverlayColor),
     css('.menu-overlay', [
       css('&').styles(
         display: Display.flex,
@@ -61,18 +60,11 @@ class MenuButton extends StatelessComponent {
         ),
         css('a').styles(fontSize: 2.rem),
       ]),
-      css('.header-actions').styles(
-        display: Display.flex,
-        flexDirection: FlexDirection.row,
-      ),
+      css('.header-actions').styles(display: Display.flex, flexDirection: FlexDirection.row),
     ]),
     css.media(MediaQuery.screen(maxWidth: HeaderState.mobileBreakpoint.px), [
       css('header', [
-        css('.menu-toggle').styles(
-          display: Display.flex,
-          position: Position.relative(),
-          zIndex: ZIndex(101),
-        ),
+        css('.menu-toggle').styles(display: Display.flex, position: Position.relative(), zIndex: ZIndex(101)),
       ]),
     ]),
   ];

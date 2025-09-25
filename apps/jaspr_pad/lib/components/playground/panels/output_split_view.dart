@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 
 import '../../../models/api_models.dart';
 import '../../../providers/issues_provider.dart';
@@ -22,7 +23,7 @@ class OutputSplitView extends StatelessComponent {
   final Component child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     context.listen<List<Issue>>(issuesProvider, (_, issues) {
       if (issues.where((i) => i.kind == IssueKind.error).isNotEmpty &&
           context.read(tabsStateProvider) == OutputTabsState.closed) {
@@ -32,20 +33,21 @@ class OutputSplitView extends StatelessComponent {
 
     var isClosed = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.closed));
 
-    if (isClosed) {
-      yield child;
-      yield EditorTabs(key: GlobalObjectKey('editor-tabs'));
-    } else {
-      yield Splitter(
-        key: ValueKey('editor-splitter'),
-        horizontal: false,
-        initialSizes: [70, 30],
-        children: [
-          child,
-          EditorTabs(key: GlobalObjectKey('editor-tabs')),
-        ],
-      );
-    }
+    return fragment([
+      if (isClosed) ...[
+        child,
+        EditorTabs(key: GlobalObjectKey('editor-tabs')),
+      ] else
+        Splitter(
+          key: ValueKey('editor-splitter'),
+          horizontal: false,
+          initialSizes: [70, 30],
+          children: [
+            child,
+            EditorTabs(key: GlobalObjectKey('editor-tabs')),
+          ],
+        ),
+    ]);
   }
 }
 
@@ -53,68 +55,51 @@ class EditorTabs extends StatelessComponent {
   const EditorTabs({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var isTutorial = context.watch(isTutorialProvider);
     var isClosed = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.closed));
 
-    yield div(
-      id: 'editor-panel-footer',
-      classes: 'editor-tab-host ${isClosed ? ' border-top' : ''}',
-      [
-        div(classes: 'editor-tabs', [
-          div(classes: 'tab-group', [
-            if (isTutorial)
-              EditorTab(
-                id: 'editor-panel-ui-tab',
-                label: 'UI Output',
-                value: OutputTabsState.ui,
-              ),
-            EditorTab(
-              id: 'editor-panel-console-tab',
-              label: 'Console',
-              value: OutputTabsState.console,
-            ),
-            EditorTab(
-              id: 'editor-panel-docs-tab',
-              label: 'Documentation',
-              value: OutputTabsState.docs,
-            ),
-            EditorTab(
-              id: 'editor-panel-issues-tab',
-              label: 'Issues',
-              value: OutputTabsState.issues,
-            ),
-          ]),
-          div(id: 'console-expand-icon-container', [
-            Builder(builder: (context) sync* {
+    return div(id: 'editor-panel-footer', classes: 'editor-tab-host ${isClosed ? ' border-top' : ''}', [
+      div(classes: 'editor-tabs', [
+        div(classes: 'tab-group', [
+          if (isTutorial) EditorTab(id: 'editor-panel-ui-tab', label: 'UI Output', value: OutputTabsState.ui),
+          EditorTab(id: 'editor-panel-console-tab', label: 'Console', value: OutputTabsState.console),
+          EditorTab(id: 'editor-panel-docs-tab', label: 'Documentation', value: OutputTabsState.docs),
+          EditorTab(id: 'editor-panel-issues-tab', label: 'Issues', value: OutputTabsState.issues),
+        ]),
+        div(id: 'console-expand-icon-container', [
+          Builder(
+            builder: (context) {
               var isConsole = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.console));
-              yield button(
+              return button(
                 id: 'left-console-clear-button',
                 classes: 'console-clear-icon mdc-icon-button',
                 styles: !isConsole ? Styles(visibility: Visibility.hidden) : null,
                 attributes: {'title': 'Clear console'},
-                events: events(onClick: () {
-                  context.read(consoleMessagesProvider.notifier).state = [];
-                }),
+                events: events(
+                  onClick: () {
+                    context.read(consoleMessagesProvider.notifier).state = [];
+                  },
+                ),
                 [],
               );
-            }),
-            button(
-              id: 'editor-panel-close-button',
-              classes: 'mdc-icon-button material-icons',
-              attributes: {if (isClosed) 'hidden': ''},
-              events: events(onClick: () {
+            },
+          ),
+          button(
+            id: 'editor-panel-close-button',
+            classes: 'mdc-icon-button material-icons',
+            attributes: {if (isClosed) 'hidden': ''},
+            events: events(
+              onClick: () {
                 context.read(tabsStateProvider.notifier).state = OutputTabsState.closed;
-              }),
-              [text('close')],
+              },
             ),
-          ]),
+            [text('close')],
+          ),
         ]),
-        div(id: 'editor-panel-tab-host', styles: Styles(overflow: Overflow.scroll), [
-          EditorTabWindow(),
-        ]),
-      ],
-    );
+      ]),
+      div(id: 'editor-panel-tab-host', styles: Styles(overflow: Overflow.scroll), [EditorTabWindow()]),
+    ]);
   }
 }
 
@@ -126,20 +111,22 @@ class EditorTab extends StatelessComponent {
   final OutputTabsState value;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var selected = context.watch(tabsStateProvider.select((state) => state == value));
 
-    yield button(
+    return button(
       id: id,
       classes: 'editor-tab mdc-button${selected ? ' active' : ''}',
-      events: events(onClick: () {
-        var notifier = context.read(tabsStateProvider.notifier);
-        if (selected) {
-          notifier.state = OutputTabsState.closed;
-        } else {
-          notifier.state = value;
-        }
-      }),
+      events: events(
+        onClick: () {
+          var notifier = context.read(tabsStateProvider.notifier);
+          if (selected) {
+            notifier.state = OutputTabsState.closed;
+          } else {
+            notifier.state = value;
+          }
+        },
+      ),
       [text(label)],
     );
   }
@@ -149,23 +136,18 @@ class EditorTabWindow extends StatelessComponent {
   const EditorTabWindow({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var state = context.watch(tabsStateProvider);
     var isTutorial = context.watch(isTutorialProvider);
 
-    if (isTutorial) {
-      yield Hidden(
-        hidden: state != OutputTabsState.ui,
-        child: OutputPanel(),
-      );
-    }
-
-    if (state == OutputTabsState.issues) {
-      yield IssuesPanel();
-    } else if (state == OutputTabsState.console) {
-      yield ConsolePanel();
-    } else if (state == OutputTabsState.docs) {
-      yield DocumentPanel();
-    }
+    return fragment([
+      if (isTutorial) Hidden(hidden: state != OutputTabsState.ui, child: OutputPanel()),
+      if (state == OutputTabsState.issues)
+        IssuesPanel()
+      else if (state == OutputTabsState.console)
+        ConsolePanel()
+      else if (state == OutputTabsState.docs)
+        DocumentPanel(),
+    ]);
   }
 }

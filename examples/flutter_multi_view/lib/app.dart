@@ -22,57 +22,62 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
   }
 
   void addCounter() async {
-    setStateWithViewTransition(() {
-      counters.add('targeted-counter');
-    }, postTransition: () {
-      counters[counters.length - 1] = 'counter-${counters.length}';
-    });
+    setStateWithViewTransition(
+      () {
+        counters.add('targeted-counter');
+      },
+      postTransition: () {
+        counters[counters.length - 1] = 'counter-${counters.length}';
+      },
+    );
   }
 
   void removeCounter() {
-    setStateWithViewTransition(preTransition: () {
-      counters[counters.length - 1] = 'targeted-counter';
-    }, () {
-      counters.removeLast();
-    });
+    setStateWithViewTransition(
+      preTransition: () {
+        counters[counters.length - 1] = 'targeted-counter';
+      },
+      () {
+        counters.removeLast();
+      },
+    );
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'main', [
-      img(src: 'images/logo.svg', width: 80),
-      div(classes: 'buttons', [
-        button(
-          onClick: () {
-            removeCounter();
-          },
-          [text('Less Counters')],
-        ),
-        button(
-          onClick: () {
-            addCounter();
-          },
-          [text('More Counters')],
-        ),
+  Component build(BuildContext context) {
+    return fragment([
+      div(classes: 'main', [
+        img(src: 'images/logo.svg', width: 80),
+        div(classes: 'buttons', [
+          button(
+            onClick: () {
+              removeCounter();
+            },
+            [text('Less Counters')],
+          ),
+          button(
+            onClick: () {
+              addCounter();
+            },
+            [text('More Counters')],
+          ),
+        ]),
+        div(classes: 'counters', [for (var name in counters) Counter(name: name)]),
       ]),
-      div(classes: 'counters', [
-        for (var name in counters) Counter(name: name),
+      footer([
+        text('💙 Built with '),
+        a(href: "https://github.com/schultek/jaspr", [text('Jaspr')]),
+        text(' by '),
+        a(href: "https://x.com/schultek_dev", [text('@schultek')]),
+        text(' 💙'),
+        br(),
+        a(href: "https://github.com/schultek/jaspr/tree/main/examples/flutter_multi_view", [text('See the code')]),
       ]),
-    ]);
-
-    yield footer([
-      text('💙 Built with '),
-      a(href: "https://github.com/schultek/jaspr", [text('Jaspr')]),
-      text(' by '),
-      a(href: "https://x.com/schultek_dev", [text('@schultek')]),
-      text(' 💙'),
-      br(),
-      a(href: "https://github.com/schultek/jaspr/tree/main/examples/flutter_multi_view", [text('See the code')]),
     ]);
   }
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.main', [
       css('&').styles(
         display: Display.flex,
@@ -81,10 +86,7 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
         alignItems: AlignItems.center,
       ),
       css('.buttons', [
-        css('&').styles(
-          display: Display.flex,
-          flexDirection: FlexDirection.row,
-        ),
+        css('&').styles(display: Display.flex, flexDirection: FlexDirection.row),
         css('button').styles(
           padding: Padding.all(8.px),
           border: Border(color: primaryColor, width: 1.px),
@@ -107,11 +109,8 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
         ),
       ]),
     ]),
-    css('footer').styles(
-      margin: Margin.all(40.px),
-      textAlign: TextAlign.center,
-      fontSize: 12.px,
-      fontStyle: FontStyle.italic,
-    ),
+    css(
+      'footer',
+    ).styles(margin: Margin.all(40.px), textAlign: TextAlign.center, fontSize: 12.px, fontStyle: FontStyle.italic),
   ];
 }

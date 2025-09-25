@@ -1,0 +1,26 @@
+---
+title: "GlobalNodeKey"
+description: Get access to the unterlying dom node of a component.
+---
+
+---
+
+For accessing the underlying DOM node of a component, provide a `GlobalNodeKey` to the component and access the node using `myGlobalNodeKey.currentNode`.
+
+```dart
+// 1. Import universal_web
+import 'package:universal_web/web.dart';
+
+// 2. Create a GlobalNodeKey with a node type
+final GlobalNodeKey<HTMLFormElement> myFormKey = GlobalNodeKey();
+
+// 3. Provide to a html component
+return form(key: myFormKey, [ ... ]);
+
+// 4. Access dom node from key
+myFormKey.currentNode?.checkValidity();
+```
+
+<Info>
+The `universal_web` package is a drop-in replacement for the `web` package that adds compatability for non-web platforms. Therefore its safe to use in components that are both rendered on the server and client.
+</Info>

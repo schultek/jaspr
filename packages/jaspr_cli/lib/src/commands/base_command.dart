@@ -3,48 +3,18 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:async/async.dart';
 import 'package:meta/meta.dart';
 
 import '../config.dart';
 import '../helpers/analytics.dart';
 import '../logging.dart';
 
-sealed class CommandResult {
-  const factory CommandResult.done(int status) = DoneCommandResult;
-  const factory CommandResult.running(Future<dynamic> future, Future<void> Function() stop) = RunningCommandResult;
-}
-
-extension CommandResultDone on CommandResult? {
-  FutureOr<int> get done async => switch (this) {
-        DoneCommandResult r => r.status as FutureOr<int>,
-        RunningCommandResult r => r.future.then((v) => v is int ? v : 0),
-        _ => 0,
-      };
-}
-
-class DoneCommandResult implements CommandResult {
-  final int status;
-
-  const DoneCommandResult(this.status);
-}
-
-class RunningCommandResult implements CommandResult {
-  final Future<dynamic> future;
-  final Future<void> Function() stop;
-
-  const RunningCommandResult(this.future, this.stop);
-}
-
-abstract class BaseCommand extends Command<CommandResult?> {
+abstract class BaseCommand extends Command<int> {
   Set<FutureOr<void> Function()> guards = {};
 
   BaseCommand({Logger? logger}) : _logger = logger {
-    argParser.addFlag(
-      'verbose',
-      abbr: 'v',
-      help: 'Enable verbose logging.',
-      negatable: false,
-    );
+    argParser.addFlag('verbose', abbr: 'v', help: 'Enable verbose logging.', negatable: false);
   }
 
   /// [Logger] instance used to wrap stdout.
@@ -53,23 +23,35 @@ abstract class BaseCommand extends Command<CommandResult?> {
 
   late final bool verbose = argResults?['verbose'] as bool? ?? false;
 
-  final bool requiresPubspec = true;
-  late JasprConfig? config;
+  late final Project project = Project(logger);
 
   @override
   @mustCallSuper
-  Future<CommandResult?> run() async {
-    config = requiresPubspec ? await getConfig(logger) : null;
+  Future<int> run() async {
+    await trackEvent(name, projectName: project.pubspecYaml?['name'], projectMode: project.modeOrNull?.name);
 
-    await trackEvent(name, projectName: config?.pubspecYaml['name'], projectMode: config?.mode.name);
+    var cancelCount = 0;
+    final cancelSub =
+        StreamGroup.merge([
+          ProcessSignal.sigint.watch(),
+          // SIGTERM is not supported on Windows.
+          Platform.isWindows ? const Stream.empty() : ProcessSignal.sigterm.watch(),
+        ]).listen((signal) async {
+          cancelCount++;
+          if (cancelCount > 1) exit(1);
+          shutdown();
+        });
 
-    ProcessSignal.sigint.watch().listen((signal) => shutdown());
-    if (!Platform.isWindows) {
-      ProcessSignal.sigterm.watch().listen((signal) => shutdown());
+    try {
+      final result = await runCommand();
+      return result;
+    } finally {
+      await cancelSub.cancel();
+      await stop();
     }
-
-    return null;
   }
+
+  Future<int> runCommand();
 
   Future<void> stop() async {
     var gs = [...guards];
@@ -79,11 +61,37 @@ abstract class BaseCommand extends Command<CommandResult?> {
     }
   }
 
-  Future<Never> shutdown([int exitCode = 1]) async {
+  bool _isShutdown = false;
+
+  Future<void> shutdown() async {
+    if (_isShutdown) return;
+    _isShutdown = true;
+
     logger.complete(false);
     logger.write('Shutting down...');
+
     await stop();
-    exit(exitCode);
+    logger.logger?.flush();
+  }
+
+  void ensureInProject({
+    bool requirePubspecYaml = true,
+    bool requireJasprDependency = true,
+    bool requireJasprMode = true,
+    bool preferBuilderDependency = true,
+  }) {
+    if (requirePubspecYaml) {
+      project.requirePubspecYaml;
+    }
+    if (requireJasprDependency) {
+      project.requireJasprDependency;
+    }
+    if (requireJasprMode) {
+      project.requireMode;
+    }
+    if (preferBuilderDependency) {
+      project.preferJasprBuilderDependency;
+    }
   }
 
   Future<String> getEntryPoint(String? input, [bool forceInsideLib = false]) async {
@@ -91,14 +99,18 @@ abstract class BaseCommand extends Command<CommandResult?> {
 
     if (!File(entryPoint).absolute.existsSync()) {
       logger.complete(false);
-      logger.write("Cannot find entry point. Create a lib/main.dart file, or specify a file using --input.",
-          level: Level.critical);
+      logger.write(
+        "Cannot find entry point. Create a lib/main.dart file, or specify a file using --input.",
+        level: Level.critical,
+      );
       await shutdown();
+      exit(1);
     }
 
     if (forceInsideLib && !entryPoint.startsWith('lib/')) {
       logger.write("Entry point must be located inside lib/ folder, got '$entryPoint'.", level: Level.critical);
       await shutdown();
+      exit(1);
     }
 
     return entryPoint;
@@ -147,20 +159,21 @@ abstract class BaseCommand extends Command<CommandResult?> {
       }
     });
 
-    exitCode = await process.exitCode;
+    exitCode = await process.exitCode.then<int>((c) => Future.delayed(Duration(seconds: 1), () => c));
 
     if (wasKilled) {
       return exitCode;
     }
 
-    await Future.delayed(Duration(seconds: 10));
+    await Future.delayed(Duration(seconds: 2));
 
     await errSub.cancel();
     await outSub.cancel();
 
     if (exitCode != 0 && (onFail == null || onFail())) {
       logger.complete(false);
-      shutdown(exitCode);
+      await shutdown();
+      exit(exitCode);
     }
 
     logger.complete(true);
@@ -169,10 +182,14 @@ abstract class BaseCommand extends Command<CommandResult?> {
   }
 
   void checkWasmSupport() {
-    var package = '${config!.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
-    var version = config!.pubspecYaml['dev_dependencies']?[package];
+    var package = '${project.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    var version = project.pubspecYaml?['dev_dependencies']?[package];
     if (version is! String || !version.startsWith(RegExp(r'\^?4.1.'))) {
       usageException('Using "--experimental-wasm" requires $package 4.1.0 or newer.');
+    }
+
+    if (project.usesFlutter) {
+      usageException('Using "--experimental-wasm" is not supported together with flutter embedding.');
     }
   }
 }
@@ -180,18 +197,20 @@ abstract class BaseCommand extends Command<CommandResult?> {
 extension on Stream<String> {
   Stream<String> splitLines() {
     var data = '';
-    return transform(StreamTransformer.fromHandlers(
-      handleData: (d, s) {
-        data += d;
-        int index;
-        while ((index = data.indexOf('\n')) != -1) {
-          s.add(data.substring(0, index + 1));
-          data = data.substring(index + 1);
-        }
-      },
-      handleDone: (s) {
-        s.add(data);
-      },
-    ));
+    return transform(
+      StreamTransformer.fromHandlers(
+        handleData: (d, s) {
+          data += d;
+          int index;
+          while ((index = data.indexOf('\n')) != -1) {
+            s.add(data.substring(0, index + 1));
+            data = data.substring(index + 1);
+          }
+        },
+        handleDone: (s) {
+          s.add(data);
+        },
+      ),
+    );
   }
 }

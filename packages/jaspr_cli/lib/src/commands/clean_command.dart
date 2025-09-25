@@ -5,13 +5,7 @@ import 'base_command.dart';
 class CleanCommand extends BaseCommand {
   CleanCommand({super.logger}) {
     if (Platform.isMacOS || Platform.isLinux) {
-      argParser.addFlag(
-        'kill',
-        abbr: 'k',
-        help: 'Kill runaway processes.',
-        defaultsTo: null,
-        negatable: false,
-      );
+      argParser.addFlag('kill', abbr: 'k', help: 'Kill runaway processes.', defaultsTo: null, negatable: false);
     }
   }
 
@@ -25,42 +19,45 @@ class CleanCommand extends BaseCommand {
   String get category => 'Tooling';
 
   @override
-  Future<CommandResult?> run() async {
-    await super.run();
+  Future<int> runCommand() async {
+    if (project.pubspecYaml != null) {
+      var genDir = Directory('.dart_tool/jaspr/').absolute;
+      if (genDir.existsSync()) {
+        logger.write('Deleting .dart_tool/jaspr...');
+        genDir.deleteSync(recursive: true);
+      }
 
-    var genDir = Directory('.dart_tool/jaspr/').absolute;
+      var chromeDir = Directory('.dart_tool/webdev/chrome_user_data').absolute;
+      if (chromeDir.existsSync()) {
+        chromeDir.deleteSync(recursive: true);
+      }
 
-    logger.write('Deleting .dart_tool/jaspr...');
-    if (await genDir.exists()) {
-      await genDir.delete(recursive: true);
+      var buildDir = Directory('build/jaspr/').absolute;
+      if (buildDir.existsSync()) {
+        logger.write('Deleting build/jaspr...');
+        buildDir.deleteSync(recursive: true);
+      }
+
+      logger.write("Running 'dart run build_runner clean'...");
+      await Process.run('dart', ['run', 'build_runner', 'clean']);
     }
-
-    var buildDir = Directory('build/jaspr/').absolute;
-
-    logger.write('Deleting build/jaspr...');
-    if (await buildDir.exists()) {
-      await buildDir.delete(recursive: true);
-    }
-
-    logger.write("Running 'dart run build_runner clean'...");
-    await Process.run('dart', ['run', 'build_runner', 'clean']);
 
     // TODO support windows
     if (Platform.isMacOS || Platform.isLinux) {
       var pids = await findRunawayProcesses([
         // server, vm, build_runner, flutter
-        '8080', '8181', '5467', '5678'
+        '8080', '8181', '5467', '5678',
       ]);
 
       if (pids.isNotEmpty) {
-        bool kill;
+        bool kill = false;
         if (argResults!['kill'] != null) {
           kill = argResults!['kill'];
           if (kill) {
             logger.write("Killing ${pids.length} runaway processes.");
           }
-        } else {
-          kill = logger.logger.confirm('Kill ${pids.length} runaway processes?');
+        } else if (stdout.hasTerminal) {
+          kill = logger.logger!.confirm('Kill ${pids.length} runaway processes?');
         }
 
         if (kill) {
@@ -71,7 +68,7 @@ class CleanCommand extends BaseCommand {
       }
     }
 
-    return null;
+    return 0;
   }
 }
 

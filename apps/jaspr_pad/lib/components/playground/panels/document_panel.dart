@@ -9,12 +9,12 @@ class DocumentPanel extends StatelessComponent {
   const DocumentPanel({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var info = context.watch(activeDocumentationProvider);
     if (info == null) {
-      return;
+      return text('');
     }
-    yield _DocumentHintMarkdown(info);
+    return _DocumentHintMarkdown(info);
   }
 }
 
@@ -43,11 +43,8 @@ class __DocumentHintMarkdownState extends State<_DocumentHintMarkdown> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield p(
-      classes: 'documentation custom-scrollbar',
-      [Markdown(markdown: markdown)],
-    );
+  Component build(BuildContext context) {
+    return p(classes: 'documentation custom-scrollbar', [Markdown(markdown: markdown)]);
   }
 
   String _getMarkdownFor(HoverInfo info) {
@@ -63,7 +60,8 @@ class __DocumentHintMarkdownState extends State<_DocumentHintMarkdown> {
     final apiLink = _dartApiLink(libraryName);
 
     final propagatedType = info.propagatedType;
-    final mdDocs = '''### `${info.description?.replaceAll('\n', ' ')}`\n\n
+    final mdDocs =
+        '''### `${info.description?.replaceAll('\n', ' ')}`\n\n
 ${hasDartdoc ? "${info.dartdoc}\n\n" : ''}
 ${isVariable ? "$kind\n\n" : ''}
 ${(isVariable && propagatedType != null) ? "**Propagated type:** $propagatedType\n\n" : ''}

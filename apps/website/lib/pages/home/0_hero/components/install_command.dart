@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart';
-import 'package:website/constants/theme.dart';
 
 import '../../../../components/icon.dart';
+import '../../../../constants/theme.dart';
 
 @client
 class InstallCommand extends StatefulComponent {
@@ -18,32 +18,38 @@ class InstallCommandState extends State<InstallCommand> {
   bool copied = false;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'install-jaspr', events: events(onClick: () {
-      window.navigator.clipboard.writeText('dart pub global activate jaspr');
-      setState(() {
-        copied = true;
-      });
-      Timer(const Duration(seconds: 2), () {
-        setState(() {
-          copied = false;
-        });
-      });
-    }), [
-      span([
-        Icon('terminal'),
-        code([text('dart pub global activate jaspr_cli')]),
-        button(styles: copied ? Styles(color: Colors.forestGreen) : null, attributes: {
-          'aria-label': 'Copy'
-        }, [
-          Icon(copied ? 'check' : 'copy'),
+  Component build(BuildContext context) {
+    return div(
+      classes: 'install-jaspr',
+      events: events(
+        onClick: () {
+          window.navigator.clipboard.writeText('dart pub global activate jaspr_cli');
+          setState(() {
+            copied = true;
+          });
+          Timer(const Duration(seconds: 2), () {
+            setState(() {
+              copied = false;
+            });
+          });
+        },
+      ),
+      [
+        span([
+          Icon('terminal'),
+          code([text('dart pub global activate jaspr_cli')]),
+          button(
+            styles: copied ? Styles(color: Colors.forestGreen) : null,
+            attributes: {'aria-label': 'Copy'},
+            [Icon(copied ? 'check' : 'copy')],
+          ),
         ]),
-      ]),
-    ]);
+      ],
+    );
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.install-jaspr', [
       css('&').styles(
         padding: Padding.symmetric(horizontal: .8.rem, vertical: .6.rem),

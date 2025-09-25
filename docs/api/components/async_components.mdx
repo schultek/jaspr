@@ -1,0 +1,72 @@
+---
+title: AsyncBuilder and AsyncStatelessComponent
+descriptions: Server-side components with an async build method.
+previous: /api/components/raw_text
+next: /api/components/router
+---
+
+---
+
+The `AsyncBuilder` and `AsyncStatelessComponents` are special server-side components that
+can have an async build method that lets you do any asynchronous work before rendering the component.
+
+<Warning>
+These components can only be used on the server and are only available using the `package:jaspr/server.dart` import.
+</Warning>
+
+Typically during pre-rendering, you have some additional data you want to load and display as part
+of the pre-rendered html. If this data is loaded asynchronously (e.g. from a database, network request etc.)
+you need to **delay the build phase** until all data is loaded.
+
+## Usage
+
+The async components allow you to put your data-loading logic directly into the build method.
+
+- The `AsyncBuilder` component takes an async `builder: Future<Component> Function(BuildContext context)` parameter.
+- The `AsyncStatelessComponent` has an abstract `Future<Component> build(BuildContext context)` method.
+
+Both methods are designed to resemble an async variant of the standard `Component Function(BuildContext context)`
+build method.
+
+```dart
+class MyAsyncComponent extends AsyncStatelessComponent {
+
+  @override
+  Future<Component> build(BuildContext context) async {
+    // Simply use "await" inside the build method.
+    var data = await loadDataFromDatabase();
+
+    // Renders the component after the data has loaded.
+    return MyOtherComponent(data: data);
+  }
+}
+```
+
+or using the `AsyncBuilder` component:
+
+```dart
+return AsyncBuilder(builder: (context) async {
+  // Simply use "await" inside the build method.
+  var data = await loadDataFromDatabase();
+
+  // Renders the component after the data has loaded.
+  return MyOtherComponent(data: data);
+});
+```
+
+When using these components and performing async work, the pre-rendering of **the whole page will be delayed** until all async work is done.
+While this is less of a concern in static mode, be aware that in server mode this can potentially **affect the load time of your website**.
+
+<Warning>
+As a Flutter developer, it may feel very strange or dangerous to use `async/await` as part of the build method for a component.
+Be assured that this is perfectly safe, mainly for the reason that this component is **only executed on the server** and
+**only built once** during pre-rendering. Therefore, you don't need to worry about potentially expensive rebuilds or floating async
+operations with these components.
+</Warning>
+
+---
+
+## Alternatives
+
+- Check out the [PreloadStateMixin](/api/utils/preload_state_mixin) for an alternative way to load async data on the server
+  as part of a `StatefulComponent`.

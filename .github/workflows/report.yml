@@ -14,15 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           ref: "refs/pull/${{ github.event.number }}/merge"
 
-      - uses: dart-lang/setup-dart@v1.3
       - uses: subosito/flutter-action@v2
+        with:
+          # remove once Flutter stable supports analyzer 8
+          channel: beta 
+          flutter-version: 3.36.0-0.4.pre
 
       - name: Bootstrap
         run: |
+          flutter doctor
           dart pub global activate melos
           dart pub global activate -s git https://github.com/schultek/semantic_changelog
           melos bootstrap --no-private

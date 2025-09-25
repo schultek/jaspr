@@ -11,14 +11,11 @@ class FlutterAppContainer extends StatelessComponent {
   const FlutterAppContainer({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield FlutterTarget(
+  Component build(BuildContext context) {
+    return FlutterTarget(
       loader: RippleLoader(),
       app: kIsWeb
-          ? flt.UncontrolledProviderScope(
-              container: ProviderScope.containerOf(context),
-              child: flt.MyApp(),
-            )
+          ? flt.UncontrolledProviderScope(container: ProviderScope.containerOf(context), child: flt.MyApp())
           : null,
     );
   }

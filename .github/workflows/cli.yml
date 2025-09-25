@@ -32,12 +32,15 @@ jobs:
           - cnspn
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
 
-      - uses: dart-lang/setup-dart@v1.3
       - uses: subosito/flutter-action@v2
+        with:
+          # remove once Flutter stable supports analyzer 8
+          channel: beta 
+          flutter-version: 3.36.0-0.4.pre
 
       - name: Bootstrap
         run: |

@@ -8,11 +8,11 @@ class GridTemplate {
   final GridTracks? rows;
   final GridAreas? areas;
 
-  Map<String, dynamic> get styles {
+  Map<String, String> get styles {
     return {
-      if (columns != null) 'grid-template-columns': columns!.value,
-      if (rows != null) 'grid-template-rows': rows!.value,
-      if (areas != null) 'grid-template-areas': areas!.value,
+      'grid-template-columns': ?columns?.value,
+      'grid-template-rows': ?rows?.value,
+      'grid-template-areas': ?areas?.value,
     };
   }
 }
@@ -152,9 +152,7 @@ class TrackRepeat {
 class Gap {
   const Gap({this.row, this.column});
 
-  const Gap.all(Unit value)
-      : row = value,
-        column = value;
+  const Gap.all(Unit value) : row = value, column = value;
 
   final Unit? row;
   final Unit? column;
@@ -166,9 +164,52 @@ class Gap {
       return {'gap': '${row!.value} ${column!.value}'};
     } else {
       return {
-        if (row != null) 'row-gap': row!.value,
-        if (column != null) 'column-gap': column!.value,
+        'row-gap': ?row?.value,
+        'column-gap': ?column?.value,
       };
     }
   }
+}
+
+enum JustifyItems {
+  // Basic keywords/values
+  normal('normal'),
+  stretch('stretch'),
+
+  // Positional alignment
+  center('center'),
+  start('start'),
+  end('end'),
+  flexStart('flex-start'),
+  flexEnd('flex-end'),
+  selfStart('self-start'),
+  selfEnd('self-end'),
+  left('left'),
+  right('right'),
+  anchorCenter('anchor-center'),
+
+  // Baseline alignment
+  baseline('baseline'),
+  firstBaseline('first baseline'),
+  lastBaseline('last baseline'),
+
+  // Overflow alignment
+  safeCenter('safe center'),
+  unsafeCenter('unsafe center'),
+
+  // Legacy alignment
+  legacyRight('legacy right'),
+  legacyLeft('legacy left'),
+  legacyCenter('legacy center'),
+
+  // Global values
+  inherit('inherit'),
+  initial('initial'),
+  revert('revert'),
+  revertLayer('revert-layer'),
+  unset('unset');
+
+  /// The css value
+  final String value;
+  const JustifyItems(this.value);
 }

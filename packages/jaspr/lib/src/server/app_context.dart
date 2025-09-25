@@ -44,6 +44,7 @@ extension AppContext on BuildContext {
 
     /// The value of the cookie.
     String value, {
+
     /// The time at which the cookie expires.
     DateTime? expires,
 
@@ -85,6 +86,6 @@ extension AppContext on BuildContext {
   void setStatusCode(int statusCode, {String? responseBody}) {
     _binding
       ..responseStatusCode = statusCode
-      ..responseErrorBody = responseBody;
+      ..responseBodyOverride = responseBody;
   }
 }

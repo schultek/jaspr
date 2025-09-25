@@ -20,21 +20,18 @@ class TextFieldState extends State<TextField> {
   MDCTextFieldOrStubbed? _textField;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomNodeReader(
+  Component build(BuildContext context) {
+    return DomNodeReader(
       onNode: (node) {
         _textField ??= MDCTextField(node);
       },
       child: div(classes: 'mdc-text-field', styles: component.expand ? Styles(width: 100.percent) : null, [
-        span(classes: 'mdc-floating-label', [
-          text(component.label),
-        ]),
+        span(classes: 'mdc-floating-label', [text(component.label)]),
         input(
           type: InputType.text,
           attributes: {if (component.placeholder != null) 'placeholder': component.placeholder!},
           events: {'input': (e) => component.onChange?.call((e.target as html.InputElementOrStubbed).value!)},
           classes: 'mdc-text-field__input',
-          [],
         ),
       ]),
     );

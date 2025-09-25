@@ -1,15 +1,52 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
 import '../../utils/test_component.dart';
-import 'inherited_component_app.dart';
+import '../../utils/track_state_lifecycle.dart';
+
+class MyInheritedComponent extends InheritedComponent {
+  MyInheritedComponent({required this.value, required super.child});
+
+  final dynamic value;
+
+  @override
+  bool updateShouldNotify(covariant MyInheritedComponent oldComponent) {
+    return value != oldComponent.value && value < 2;
+  }
+}
+
+class MyChildComponent extends StatefulComponent {
+  const MyChildComponent();
+
+  @override
+  State<StatefulComponent> createState() => MyChildState();
+}
+
+class MyChildState extends State<MyChildComponent> with TrackStateLifecycle<MyChildComponent> {
+  dynamic inheritedValue;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    inheritedValue = context.dependOnInheritedComponentOfExactType<MyInheritedComponent>()!.value;
+  }
+
+  @override
+  Component build(BuildContext context) {
+    trackBuild();
+    return Component.text('Inherited value: $inheritedValue');
+  }
+}
 
 void main() {
   group('inherited component test', () {
     testComponents('should inherit component', (tester) async {
-      var controller = tester.pumpTestComponent(App());
+      final component = FakeComponent(child: MyInheritedComponent(value: 0, child: const MyChildComponent()));
+
+      tester.pumpComponent(component);
 
       // phase 1: inherited component should be mounted
       expect(find.text('Inherited value: 0'), findsOneComponent);
@@ -21,7 +58,9 @@ void main() {
       state.lifecycle.clear();
 
       // phase 2: component should be update when inherited value changes
-      await controller.rebuildWith(1);
+      component.updateChild(MyInheritedComponent(value: 1, child: const MyChildComponent()));
+      await tester.pump();
+
       expect(find.text('Inherited value: 1'), findsOneComponent);
 
       // lifecycle: state should be notified about changed dependencies and built again
@@ -29,12 +68,16 @@ void main() {
       state.lifecycle.clear();
 
       // phase 3: should not rebuild child when InheritedComponent.updateShouldNotify returns false
-      await controller.rebuildWith(2);
+      component.updateChild(MyInheritedComponent(value: 2, child: const MyChildComponent()));
+      await tester.pump();
+
       expect(find.text('Inherited value: 1'), findsOneComponent);
 
       // inherited value should be updated, but without notifying dependants
-      expect(find.byComponentPredicate((component) => component is MyInheritedComponent && component.value == 2),
-          findsOneComponent);
+      expect(
+        find.byComponentPredicate((component) => component is MyInheritedComponent && component.value == 2),
+        findsOneComponent,
+      );
 
       // lifecycle: state should not be updated
       expect(state.lifecycle, equals([]));

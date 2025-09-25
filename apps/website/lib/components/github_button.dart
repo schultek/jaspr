@@ -1,20 +1,19 @@
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
 import 'package:jaspr/jaspr.dart';
 
-import 'package:http/http.dart' as http;
-import 'package:website/constants/theme.dart';
-
+import '../constants/theme.dart';
 import 'icon.dart';
 
-class GithubButton extends StatefulComponent {
-  const GithubButton({super.key});
+class GitHubButton extends StatefulComponent {
+  const GitHubButton({super.key});
 
   @override
-  State createState() => GithubButtonState();
+  State createState() => GitHubButtonState();
 }
 
-class GithubButtonState extends State<GithubButton> {
+class GitHubButtonState extends State<GitHubButton> {
   bool loaded = false;
 
   int stars = 9999;
@@ -31,19 +30,26 @@ class GithubButtonState extends State<GithubButton> {
 
   Future<void> loadRepositoryData() async {
     final response = await http.get(Uri.parse('https://api.github.com/repos/schultek/jaspr'));
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    final {"stargazers_count": int stars, "forks_count": int forks} = data;
+    try {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final {"stargazers_count": int stars, "forks_count": int forks} = data;
 
-    setState(() {
-      this.stars = stars;
-      this.forks = forks;
-      loaded = true;
-    });
+      setState(() {
+        this.stars = stars;
+        this.forks = forks;
+        loaded = true;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error parsing GitHub data: $e\n${response.body}');
+      }
+      // noop
+    }
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield a(href: 'https://github.com/schultek/jaspr', target: Target.blank, classes: 'github-button', [
+  Component build(BuildContext context) {
+    return a(href: 'https://github.com/schultek/jaspr', target: Target.blank, classes: 'github-button', [
       Icon('custom-github', size: 1.2.rem),
       div([
         span([text('schultek/jaspr')]),
@@ -52,14 +58,14 @@ class GithubButtonState extends State<GithubButton> {
           span(styles: !loaded ? Styles(opacity: 0) : null, [text('$stars')]),
           span([]),
           Icon('git-fork'),
-          span(styles: !loaded ? Styles(opacity: 0) : null, [text('$forks')])
-        ])
-      ])
+          span(styles: !loaded ? Styles(opacity: 0) : null, [text('$forks')]),
+        ]),
+      ]),
     ]);
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.github-button', [
       css('&').styles(
         display: Display.flex,
@@ -71,23 +77,12 @@ class GithubButtonState extends State<GithubButton> {
         fontSize: 0.7.rem,
         textDecoration: TextDecoration.none,
       ),
-      css('&:hover').styles(
-        backgroundColor: hoverOverlayColor,
-      ),
-      css('& *').styles(
-        transition: Transition('opacity', duration: 200, curve: Curve.easeInOut),
-      ),
-      css('&:hover *').styles(
-        raw: {'opacity': '1 !important'},
-      ),
-      css('& > i').styles(
-        opacity: 0.9,
-      ),
+      css('&:hover').styles(backgroundColor: hoverOverlayColor),
+      css('& *').styles(transition: Transition('opacity', duration: 200, curve: Curve.easeInOut)),
+      css('&:hover *').styles(raw: {'opacity': '1 !important'}),
+      css('& > i').styles(opacity: 0.9),
       css('div', [
-        css('&').styles(
-          display: Display.flex,
-          flexDirection: FlexDirection.column,
-        ),
+        css('&').styles(display: Display.flex, flexDirection: FlexDirection.column),
         css('& > span:first-child').styles(
           margin: Margin.only(bottom: 2.px),
           opacity: 0.8,

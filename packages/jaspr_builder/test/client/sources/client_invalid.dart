@@ -9,7 +9,7 @@ const clientInvalidConstructorSources = {
       final String a;
     
       @override
-      Iterable<Component> build(BuildContext context) => [];
+      Component build(BuildContext context) => text('');
     }
   ''',
 };
@@ -25,7 +25,7 @@ const clientInvalidParamSources = {
       final DateTime time;
     
       @override
-      Iterable<Component> build(BuildContext context) => [];
+      Component build(BuildContext context) => text('');
     }
   ''',
 };

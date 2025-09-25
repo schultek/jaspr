@@ -1,11 +1,16 @@
 import 'dart:io';
 
 import 'package:jaspr_cli/src/command_runner.dart';
-import 'package:jaspr_cli/src/commands/base_command.dart';
 
 void main(List<String> args) async {
-  var result = await JasprCommandRunner().run(args);
-  await flushThenExit(await result.done);
+  try {
+    var result = await JasprCommandRunner().run(args);
+    await flushThenExit(result ?? 0);
+  } catch (e, stackTrace) {
+    stderr.writeln('Error: $e');
+    stderr.writeln('Stack trace: $stackTrace');
+    await flushThenExit(1);
+  }
 }
 
 /// Flushes the stdout and stderr streams, then exits the program with the given

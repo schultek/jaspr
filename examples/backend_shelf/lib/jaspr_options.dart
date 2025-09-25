@@ -1,3 +1,6 @@
+// dart format off
+// ignore_for_file: type=lint
+
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
@@ -21,9 +24,9 @@ import 'package:backend_shelf/components/hello.dart' as prefix1;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(
-  clients: {
-    prefix0.App: ClientTarget<prefix0.App>('components/app'),
-    prefix1.Hello: ClientTarget<prefix1.Hello>('components/hello'),
-  },
-);
+JasprOptions get defaultJasprOptions => JasprOptions(
+      clients: {
+        prefix0.App: ClientTarget<prefix0.App>('components/app'),
+        prefix1.Hello: ClientTarget<prefix1.Hello>('components/hello'),
+      },
+    );

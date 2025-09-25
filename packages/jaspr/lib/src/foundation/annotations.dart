@@ -1,21 +1,24 @@
 /// Used to annotate a client component.
 const client = ClientAnnotation._();
 
-class ClientAnnotation {
+/// Use with [client] to annotate a client component.
+final class ClientAnnotation {
   const ClientAnnotation._();
 }
 
 /// Used to annotate an encoder function for a custom model.
 const encoder = EncoderAnnotation._();
 
-class EncoderAnnotation {
+/// Use with [encoder] to annotate an encoder function for a custom model.
+final class EncoderAnnotation {
   const EncoderAnnotation._();
 }
 
 /// Used to annotate an decoder function for a custom model.
 const decoder = DecoderAnnotation._();
 
-class DecoderAnnotation {
+/// Use with [decoder] to annotate an decoder function for a custom model.
+final class DecoderAnnotation {
   const DecoderAnnotation._();
 }
 
@@ -35,7 +38,7 @@ class DecoderAnnotation {
 /// 1. Put the actual import in the annotation.
 /// 3. Define what elements or types to 'show' as symbols (prefixed by #).
 ///   - This is required to reduce the amount of stubbing needed.
-/// 2. Import the file '<current filename>.imports.dart'.
+/// 2. Import the file '&lt;current filename&gt;.imports.dart'.
 ///
 /// The associated file will be generated the next time you run `jaspr serve`.
 ///
@@ -48,7 +51,7 @@ class DecoderAnnotation {
 /// ```
 ///
 /// Accessing your imported elements on the wrong platform will result in runtime exceptions.
-class Import {
+final class Import {
   const Import.onWeb(this.import, {required this.show}) : platform = ImportPlatform.web;
   const Import.onServer(this.import, {required this.show}) : platform = ImportPlatform.server;
 

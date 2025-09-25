@@ -51,32 +51,41 @@ class OverlayState extends State<Overlay> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'blur-backdrop', events: events(onClick: () {
-      showRandomImage();
-    }), [
-      img(src: 'images/jasper_resized/$currentImage.webp', alt: 'Jasper'),
-      span([
-        text('Click anywhere to see another image.'),
-        br(),
-        text('Press ESC or click '),
-        a(href: '', events: {
-          'click': (e) {
-            e.preventDefault();
-            component.onClose();
-          }
-        }, [
-          text('here')
+  Component build(BuildContext context) {
+    return div(
+      classes: 'blur-backdrop',
+      events: events(
+        onClick: () {
+          showRandomImage();
+        },
+      ),
+      [
+        img(src: 'images/jasper_resized/$currentImage.webp', alt: 'Jasper'),
+        span([
+          text('Click anywhere to see another image.'),
+          br(),
+          text('Press ESC or click '),
+          a(
+            href: '',
+            events: {
+              'click': (e) {
+                e.preventDefault();
+                component.onClose();
+              },
+            },
+            [text('here')],
+          ),
+          text(' to close.'),
         ]),
-        text(' to close.'),
-      ]),
-    ]);
+      ],
+    );
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.blur-backdrop', [
       css('&').styles(
+        display: Display.flex,
         position: Position.fixed(top: Unit.zero, left: Unit.zero, right: Unit.zero, bottom: Unit.zero),
         zIndex: ZIndex(1),
         userSelect: UserSelect.none,
@@ -95,7 +104,12 @@ class OverlayState extends State<Overlay> {
           raw: {'object-fit': 'cover'},
         ),
       ]),
-      css('span').styles(display: Display.inlineBlock, margin: Margin.only(top: 1.rem)).combine(bodySmall),
+      css('span')
+          .styles(
+            display: Display.inlineBlock,
+            margin: Margin.only(top: 1.rem),
+          )
+          .combine(bodySmall),
     ]),
   ];
 }

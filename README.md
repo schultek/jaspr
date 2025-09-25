@@ -15,7 +15,7 @@
 
 <p align="center">
   <a href="https://jaspr.site">Website</a> •
-  <a href="https://docs.jaspr.site/get_started/installation">Quickstart</a> •
+  <a href="https://docs.jaspr.site/get_started/quick_start">Quickstart</a> •
   <a href="https://docs.jaspr.site">Documentation</a> •
   <a href="https://playground.jaspr.site">Playground</a> •
   <a href="https://discord.gg/XGXrGEk4c6">Community & Support</a> •
@@ -70,30 +70,30 @@ That just means that while Flutter Web is a great technology for sharing your ap
 platforms including the web, it may not be suited for all types of websites that you want to build.
 
 Jaspr works by giving you the familiar look and feel of the Flutter framework, while using native web
-technologies, like HTML, the DOM and CSS to enable you building **all** kinds of websites using **Dart**.
+technologies, like HTML, the DOM and CSS to enable you to build **all** kinds of websites using **Dart**.
 
 Instead of trying to mirror every little thing from Flutter, Jaspr tries to give a general Fluttery feeling
 by matching features where it makes sense without compromising on the unique properties of the web platform.
-Rather it embraces these differences to give the best of both worlds.
+Rather, it embraces these differences to give the best of both worlds.
 
-[More](https://docs.jaspr.site/jaspr-vs-flutter-web)
+[Learn more.](https://docs.jaspr.site/jaspr-vs-flutter-web)
 
 ## Directories
 
-- **/apps**: Production apps built with Jaspr
-  - **/jaspr_pad**: Online Editor and Playground inspired by DartPad, built with Jaspr. Hosted at [playground.jaspr.site](https://playground.jaspr.site)
-  - **/website**: The Jaspr website, built with Jaspr itself. Hosted at [jaspr.site](https://jaspr.site)
+- **/apps**: Production apps built with Jaspr.
+  - **/jaspr_pad**: Online Editor and Playground inspired by DartPad, built with Jaspr. Hosted at [playground.jaspr.site](https://playground.jaspr.site).
+  - **/website**: The Jaspr website, built with Jaspr itself. Hosted at [jaspr.site](https://jaspr.site).
 - **/assets**: Branding images and other assets for Jaspr.
-- **/docs**: Documentation hosted at [docs.jaspr.site](https://docs.jaspr.site)
+- **/docs**: Documentation hosted at [docs.jaspr.site](https://docs.jaspr.site).
 - **/examples**: Examples for showcasing different Jaspr features.
 - **/packages**:
   - **/jaspr**: The core framework package.
   - **/jaspr_builder**: Code-generation builders for Jaspr.
   - **/jaspr_cli**: The command line interface of Jaspr.
+  - **/jaspr_content**: Jaspr plugin for building content-driven sites like documentation, blogs, or marketing pages. Documented at [docs.jaspr.site/content](https://docs.jaspr.site/content).
   - **/jaspr_flutter_embed**: Flutter element embedding bindings for Jaspr.
   - **/jaspr_lints**: A collection of lints and assists for Jaspr projects.
   - **/jaspr_riverpod**: An unofficial Riverpod implementation for Jaspr.
   - **/jaspr_router**: A router implementation for Jaspr.
   - **/jaspr_serverpod**: An official Jaspr integration for [Serverpod](serverpod.dev).
-  - **/jaspr_tailwind**: A tailwind integration for Jaspr.
   - **/jaspr_test**: A testing package for Jaspr.

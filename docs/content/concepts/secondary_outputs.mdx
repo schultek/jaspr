@@ -1,0 +1,191 @@
+---
+title: Secondary Outputs
+description: Learn how to generate additional outputs like raw markdown or RSS feeds for your content pages.
+---
+
+---
+
+Secondary outputs in `jaspr_content` allow you to generate **additional files** or representations of your page content alongside the primary HTML output. This is useful for a variety of purposes, such as providing raw content for other tools, creating alternative data formats, or generating feeds.
+
+## Use-Cases
+
+Common use-cases for secondary outputs include:
+
+- **Raw Markdown Files**: Generating a `.md` file containing the original (but pre-processed) markdown content of a page. This can be useful for AI crawling, content syndication or for users who prefer to read the raw markdown.
+- **RSS Feeds**: Creating an `rss.xml` feed for your blog or site, allowing users to subscribe to updates.
+- **JSON Data**: Outputting page data or content in JSON or other formats for consumption by other applications or services.
+- **Custom Text Formats**: Generating plain text versions of pages for accessibility or specific use-cases.
+
+## Built-In Outputs
+
+`jaspr_content` provides some common secondary outputs out of the box. You can add them to your site by including them in the `secondaryOutputs` list of your `PageConfig`. As its an advanced feature, its only available through the `ContentApp.custom()` constructor.
+
+```dart
+ContentApp.custom(
+  configResolver: PageConfig.all(
+    secondaryOutputs: [
+      MarkdownOutput(),
+      RSSOutput(),
+    ],
+  ),
+)
+```
+
+### MarkdownOutput
+
+The `MarkdownOutput` generates a `.md` file for each page that matches its pattern (files ending in `.md` or `.mdx`). This output file contains the raw, unparsed markdown content of the page. It will however be processed by the configured template engine, so any variables or templating blocks will be resolved.
+
+**Example:**
+
+If you have a page at `content/blog/my-post.md`, `jaspr_content` will produce a `content/blog/my-post/index.html`. Using the `MarkdownOutput` will generate an additional `blog/my-post/index.html.md` file containing the processed markdown.
+
+### RSSOutput
+
+The `RSSOutput` generates a `rss.xml` file for your site. This is a standard XML-based format for distributing a feed of resource items like blog posts or news articles.
+
+**Configuration:**
+
+You can configure the `RSSOutput` with several options:
+
+```dart
+ContentApp.custom(
+  // ...
+  eagerlyLoadAllPages: true,
+  configResolver: PageConfig.all(
+    // ...
+    secondaryOutputs: [
+      RSSOutput(
+        title: 'My Awesome Blog Feed',
+        description: 'The latest updates from my awesome blog.',
+        siteUrl: 'https://www.myawesomesite.com', // Base URL for your site
+        language: 'en-US', // Optional: language of the feed (defaults to 'en-US')
+      ),
+      // ... other outputs
+    ],
+  ),
+)
+```
+
+<Info>
+For `RSSOutput` to work property, you need to set `eagerlyLoadAllPages` to `true`. [Read more about this](/content/concepts/route_loading#eager-loading)
+</Info>
+
+---
+
+#### Choosing Pages
+
+1. By default, all pages are included in the feed, but you can **opt out** a specific page by setting its frontmatter property `rss: false`.
+
+2. You can also change to **opt in** by setting the `filter` parameter on `RSSOutput` to `RSSFilter.optIn`. Then only pages with the frontmatter property `rss: true` will be included in the feed.
+
+3. As a third option, you can define a **custom filter**. For example, this filter only includes pages in the `posts/` directory:
+
+  ```dart
+  RSSOutput(
+    // ...
+    filter: RSSFilter.custom((Page page) {
+      // Include only posts based on the page url. 
+      return page.url.startsWith('/posts');
+   }),
+  )
+  ```
+
+---
+
+#### Customizing Items
+
+By default, the `RSSItem`s for each page are created based on the page's data (from frontmatter) using these properties:
+
+```xml
+<item>
+  <title>{{page.title}}</title>
+  <description>{{page.description}}</title>
+  <pubDate>{{page.publishDate}}</pubDate>
+  <author>{{page.author}}</author>
+</item>
+```
+
+To customize how an `RSSItem` is created from a `Page` provide an `itemBuilder` function to `RSSOutput`:
+
+```dart
+RSSOutput(
+  // ...
+  itemBuilder: (Page page) {
+    return RSSItem(
+      title: '...',
+      description: '...',
+      pubDate: '...',
+      author: '...',
+    );
+  },
+)
+```
+
+## Creating Custom Outputs
+
+You can create your own secondary outputs by extending the `SecondaryOutput` class. This allows you to generate any kind of additional files or data representation based on your page content.
+
+To create a custom output, you need to:
+
+1.  Extend the `SecondaryOutput` class.
+2.  Define a `pattern`: A `Pattern` (usually a `RegExp`) that matches the routes of the pages for which this output should be generated.
+3.  Implement `String createRoute(String route)`: A method that takes the original page's route and returns the new route for the secondary output file.
+4.  Implement `Component build(Page page)`: A method that returns a Jaspr `Component` responsible for rendering the output. This component will typically use `context.setHeader()` to set the `Content-Type` and `context.setStatusCode()` with the `responseBody` to provide the content of the output.
+
+Here's an example of a `SimpleTextOutput` that generates a `.txt` file for each page, containing some basic information and its raw content:
+
+```dart
+class SimpleTextOutput extends SecondaryOutput {
+  @override
+  Pattern get pattern => RegExp(r'.*'); // Apply to all routes
+
+  @override
+  String createRoute(String route) {
+    // Normalize route and append .txt
+    // Example: /about/ -> /about/index.txt
+    // Example: /blog/post.html -> /blog/post.txt
+    String basePath = route;
+    if (basePath.endsWith('/')) {
+      basePath += 'index';
+    } else if (basePath.contains('.')) {
+      basePath = basePath.substring(0, basePath.lastIndexOf('.'));
+    }
+    return '$basePath.txt';
+  }
+
+  @override
+  Component build(Page page) {
+    // The 'page' object contains all data about the page,
+    // including frontmatter (page.data) and raw content (page.content)
+    return Builder(builder: (context) {
+      context.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      final textContent = '''
+Page URL: ${page.url}
+Title: ${page.data['page']?['title'] ?? 'Untitled'}
+
+--- Raw Content ---
+${page.content}
+''';
+      context.setStatusCode(200, responseBody: textContent);
+
+      return text('');
+    });
+  }
+}
+```
+
+**Using the Custom Output:**
+
+Once defined, add an instance of your custom output to the `secondaryOutputs` list in your `PageConfig`:
+
+```dart
+// ...
+secondaryOutputs: [
+  MarkdownOutput(),
+  RSSOutput(...),
+  SimpleTextOutput(), // Your custom output
+],
+// ...
+```
+
+This `SimpleTextOutput` will now generate a `.txt` file for every page processed by `jaspr_content`, alongside the standard HTML output and any other configured secondary outputs.

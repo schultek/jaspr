@@ -1,6 +1,6 @@
-import 'package:dart_quotes/data/firebase.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../data/firebase.dart';
 @Import.onWeb('../interop/confetti.dart', show: [#JSConfetti])
 import 'quote_like_button.imports.dart';
 
@@ -12,14 +12,14 @@ class QuoteLikeButton extends StatelessComponent {
   final int initialCount;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield StreamBuilder(
+  Component build(BuildContext context) {
+    return StreamBuilder(
       stream: FirebaseService.instance.getQuoteById(id),
-      builder: (context, snapshot) sync* {
+      builder: (context, snapshot) {
         int count = snapshot.data?.likes.length ?? initialCount;
         bool? hasLiked = snapshot.data?.likes.contains(FirebaseService.instance.getUserId());
 
-        yield button(
+        return button(
           classes: "quote-like-btn${hasLiked == true ? ' active' : ''}",
           onClick: () {
             if (hasLiked == null) return;
@@ -28,33 +28,24 @@ class QuoteLikeButton extends StatelessComponent {
               JSConfetti.instance.show(emojis: ['🎯', '💙']);
             }
           },
-          [
-            span(classes: "icon-heart${hasLiked ?? false ? '' : '-o'}", []),
-            text(' $count'),
-          ],
+          [span(classes: "icon-heart${hasLiked ?? false ? '' : '-o'}", []), text(' $count')],
         );
       },
     );
   }
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.quote-like-btn', [
       css('&').styles(
         border: Border.none,
         outline: Outline(style: OutlineStyle.none),
-        backgroundColor: Colors.transparent,
         fontSize: 18.px,
+        backgroundColor: Colors.transparent,
       ),
-      css('&:hover span').styles(
-        transform: Transform.scale(1.2),
-      ),
-      css('&.active span').styles(
-        color: Colors.blue,
-      ),
-      css('span').styles(
-        transition: Transition('transform', duration: 300, curve: Curve.ease),
-      ),
-    ])
+      css('&:hover span').styles(transform: Transform.scale(1.2)),
+      css('&.active span').styles(color: Colors.blue),
+      css('span').styles(transition: Transition('transform', duration: 300, curve: Curve.ease)),
+    ]),
   ];
 }

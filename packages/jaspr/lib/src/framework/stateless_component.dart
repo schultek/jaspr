@@ -117,7 +117,7 @@ abstract class StatelessComponent extends Component {
   ///
   ///  * [StatelessComponent], which contains the discussion on performance considerations.
   @protected
-  Iterable<Component> build(BuildContext context);
+  Component build(BuildContext context);
 
   /// Implement this method to determine whether a rebuild can be skipped.
   ///
@@ -167,14 +167,18 @@ class StatelessElement extends BuildableElement {
   }
 
   @override
-  Iterable<Component> build() => component.build(this);
+  Component build() => component.build(this);
 
   @override
   FutureOr<void> performRebuild() {
     if (owner.isFirstBuild && _asyncFirstBuild != null) {
-      return _asyncFirstBuild!.then((_) {
-        super.performRebuild();
-      });
+      return _asyncFirstBuild!
+          .then((_) {
+            super.performRebuild();
+          })
+          .catchError((e, st) {
+            failRebuild(e, st);
+          });
     }
     super.performRebuild();
   }

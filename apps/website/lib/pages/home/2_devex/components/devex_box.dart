@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
+
+import '../../../../constants/theme.dart';
 
 class DevexBox extends StatelessComponent {
   const DevexBox({
@@ -16,19 +17,19 @@ class DevexBox extends StatelessComponent {
   final Component preview;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'feature-box', [
+  Component build(BuildContext context) {
+    return div(classes: 'feature-box', [
       div(classes: 'feature-preview', [preview]),
       div(classes: 'feature-info', [
         span(classes: 'caption2 text-gradient', [text(caption)]),
         h4([text(title)]),
         p([description]),
-      ])
+      ]),
     ]);
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.feature-box', [
       css('&').styles(
         display: Display.flex,
@@ -43,6 +44,11 @@ class DevexBox extends StatelessComponent {
         css('&').styles(
           padding: Padding.only(left: 1.rem, right: 1.rem, bottom: .5.rem),
           textAlign: TextAlign.start,
+        ),
+        css('a').styles(
+          fontWeight: FontWeight.bold,
+          textDecoration: TextDecoration(line: TextDecorationLine.underline),
+          color: textBlack,
         ),
       ]),
     ]),

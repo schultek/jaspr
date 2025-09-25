@@ -4,7 +4,7 @@ abstract class Flex {
   static const Flex auto = _FlexKeyword('auto');
   static const Flex none = _FlexKeyword('none');
 
-  const factory Flex({double? grow, double? shrink, FlexBasis? basis}) = _Flex;
+  const factory Flex({double? grow, double? shrink, Unit? basis}) = _Flex;
 
   static const Flex inherit = _FlexKeyword('inherit');
   static const Flex initial = _FlexKeyword('initial');
@@ -29,35 +29,16 @@ class _Flex implements Flex {
 
   final double? grow;
   final double? shrink;
-  final FlexBasis? basis;
+  final Unit? basis;
 
   @override
   Map<String, String> get styles {
     return {
-      if (grow != null) 'flex-grow': grow!.numstr,
-      if (shrink != null) 'flex-shrink': shrink!.numstr,
-      if (basis != null) 'flex-basis': basis!.value,
+      'flex-grow': ?grow?.numstr,
+      'flex-shrink': ?shrink?.numstr,
+      'flex-basis': ?basis?.value,
     };
   }
-}
-
-class FlexBasis {
-  const FlexBasis._(this.value);
-
-  final String value;
-
-  static const FlexBasis auto = FlexBasis._('auto');
-
-  const factory FlexBasis(Unit value) = _FlexBasis;
-}
-
-class _FlexBasis implements FlexBasis {
-  const _FlexBasis(this._value);
-
-  final Unit _value;
-
-  @override
-  String get value => _value.value;
 }
 
 enum AlignSelf {

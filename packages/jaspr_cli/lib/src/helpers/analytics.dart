@@ -45,11 +45,7 @@ void disableAnalytics(Logger logger) {
   }
 }
 
-Future<void> trackEvent(
-  String command, {
-  String? projectName,
-  String? projectMode,
-}) async {
+Future<void> trackEvent(String command, {String? projectName, String? projectMode}) async {
   try {
     if (!analyticsEnabled) {
       return;
@@ -75,8 +71,8 @@ Future<void> trackEvent(
             'cli_version': jasprCliVersion,
             if (projectHash != null) 'project_id': projectHash,
             'os': Platform.operatingSystem,
-          }
-        }
+          },
+        },
       ]),
     ).timeout(Duration(milliseconds: 300));
   } catch (_) {}

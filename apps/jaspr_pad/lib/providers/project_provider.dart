@@ -2,6 +2,7 @@ import 'package:dart_mappable/dart_mappable.dart';
 import 'package:http/http.dart' as http;
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 
 import '../adapters/html.dart';
 import '../components/elements/snackbar.dart';
@@ -78,10 +79,10 @@ final loadedProjectProvider = Provider<AsyncValue<ProjectDataBase>>((ref) {
   var queryId = uri.queryParameters['gist'] != null
       ? 'gist-${uri.queryParameters['gist']}'
       : uri.queryParameters['sample'] != null
-          ? 'sample-${uri.queryParameters['sample']}'
-          : uri.queryParameters['tutorial'] != null
-              ? 'tutorial-${uri.queryParameters['tutorial']}'
-              : null;
+      ? 'sample-${uri.queryParameters['sample']}'
+      : uri.queryParameters['tutorial'] != null
+      ? 'tutorial-${uri.queryParameters['tutorial']}'
+      : null;
   if (storedProject != null && storedProject.id == queryId) {
     return AsyncValue.data(storedProject);
   } else {
@@ -113,7 +114,8 @@ ProjectDataBase createDefaultProject() {
   return ProjectData(
     id: 'basic',
     description: 'jaspr_basic',
-    cssFile: 'html, body {\n'
+    cssFile:
+        'html, body {\n'
         '  display: flex;\n'
         '  justify-content: center;\n'
         '  align-items: center;\n'
@@ -121,7 +123,8 @@ ProjectDataBase createDefaultProject() {
         '  color: white;\n'
         '  font-family: sans-serif;\n'
         '}',
-    mainDartFile: "import 'package:jaspr/jaspr.dart';\n\n"
+    mainDartFile:
+        "import 'package:jaspr/jaspr.dart';\n\n"
         "void main() {\n"
         "  runApp(h1([\n"
         "    text('Hello World!'),\n"

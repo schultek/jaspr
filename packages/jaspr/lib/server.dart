@@ -1,4 +1,4 @@
-library server;
+library;
 
 export 'package:shelf/shelf.dart' show Handler, Request, Response;
 

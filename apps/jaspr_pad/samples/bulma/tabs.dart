@@ -19,9 +19,10 @@ class _TabsState extends State<Tabs> {
   var selected = 0;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
-      classes: 'tabs'
+  Component build(BuildContext context) {
+    return div(
+      classes:
+          'tabs'
           '${component.isBoxed ? ' is-boxed' : ''}'
           '${component.isToggle ? ' is-toggle' : ''}',
       [
@@ -49,13 +50,9 @@ class Tab extends StatelessComponent {
   final Component child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield li(
-      classes: selected ? 'is-active' : null,
-      events: events(onClick: onSelected),
-      [
-        a(href: '', [child])
-      ],
-    );
+  Component build(BuildContext context) {
+    return li(classes: selected ? 'is-active' : null, [
+      a(href: '#', onClick: onSelected, [child]),
+    ]);
   }
 }

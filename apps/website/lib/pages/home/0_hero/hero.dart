@@ -1,19 +1,21 @@
 import 'package:jaspr/jaspr.dart';
 
-import 'components/install_command.dart';
 import '../../../components/link_button.dart';
-import 'components/meet_jaspr_button.dart';
 import '../../../constants/theme.dart';
+import 'components/hero_pill.dart';
+import 'components/install_command.dart';
+import 'components/meet_jaspr_button.dart';
 
 class Hero extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section(id: "hero", [
+  Component build(BuildContext context) {
+    return section(id: "hero", [
       div([
+        HeroPill(),
         h1([
           text('The '),
           span(classes: 'text-gradient', [text('Web Framework')]),
-          text(' for Dart Developers')
+          text(' for Dart Developers'),
         ]),
         p([
           text('Jaspr is a free and open source framework for building websites in Dart.'),
@@ -24,7 +26,10 @@ class Hero extends StatelessComponent {
           InstallCommand(),
           div(classes: 'actions', [
             LinkButton.filled(
-                label: 'Get Started', icon: 'arrow-right', to: 'https://docs.jaspr.site/get_started/installation'),
+              label: 'Get Started',
+              icon: 'arrow-right',
+              to: 'https://docs.jaspr.site/get_started/quick_start',
+            ),
             MeetJasprButton(),
           ]),
         ]),
@@ -33,7 +38,7 @@ class Hero extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('#hero', [
       css('&').styles(
         display: Display.flex,
@@ -51,7 +56,7 @@ class Hero extends StatelessComponent {
         justifyContent: JustifyContent.center,
         alignItems: AlignItems.center,
       ),
-      css('p').combine(bodyMedium),
+      css('p').styles(raw: {'text-wrap': 'balance'}).combine(bodyMedium),
       css('.cta').styles(
         display: Display.flex,
         margin: Margin.only(top: 2.rem),
@@ -59,8 +64,6 @@ class Hero extends StatelessComponent {
         alignItems: AlignItems.center,
       ),
     ]),
-    css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [
-      css('#hero').styles(minHeight: 95.vh),
-    ])
+    css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [css('#hero').styles(minHeight: 95.vh)]),
   ];
 }

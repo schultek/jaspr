@@ -11,10 +11,10 @@ class ResetDialog extends StatelessComponent {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Dialog(
+  Component build(BuildContext context) {
+    return Dialog(
       title: 'Reset Pad',
-      content: Text('Discard changes to the current pad?'),
+      content: text('Discard changes to the current pad?'),
       actions: [
         Button(
           label: 'Cancel',

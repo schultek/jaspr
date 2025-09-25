@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://jaspr.site">Website</a> •
-  <a href="https://docs.jaspr.site/get_started/installation">Quickstart</a> •
+  <a href="https://docs.jaspr.site/get_started/quick_start">Quickstart</a> •
   <a href="https://docs.jaspr.site">Documentation</a> •
   <a href="https://playground.jaspr.site">Playground</a> •
   <a href="https://github.com/schultek/jaspr/tree/main/examples/">Examples</a> •
@@ -26,22 +26,18 @@
 
 > A modern web framework for building websites in Dart with support for both **client-side** and **server-side rendering**.
 
-- 🔮 **Why?**: Jaspr was made with the premise to make a web-framework that looks and feels just like Flutter, but
-  renders normal html/css like Vue or React.
-- 👥 **Who?**: Jaspr is targeted mainly at Flutter developers that want to build any type of websites
-  (especially ones that are not suitable for Flutter Web).
-- 🚀 **What?**: Jaspr wants to push the boundaries of Dart on the web and server, by giving you a thought-through fullstack
-  web framework written completely in Dart.
+- 🔮 **Why?**: Jaspr was made with the premise to make a web-framework that looks and feels just like Flutter, but renders normal HTML and CSS like React or Vue.
+- 👥 **Who?**: Jaspr is targeted mainly at Flutter developers that want to build any type of websites (especially ones that are not suitable for Flutter Web).
+- 🚀 **What?**: Jaspr wants to push the boundaries of Dart on the web and server, by giving you a thought-through fullstack web framework written completely in Dart.
 
-> Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of
-> developers around Jaspr and check out the [Contributing Guide](https://docs.jaspr.site/going_further/contributing).
+> Want to contribute to Jaspr? Join our open [Discord Community](https://discord.gg/XGXrGEk4c6) of developers around Jaspr and check out the [Contributing Guide](https://docs.jaspr.site/going_further/contributing).
 
 ### Core Features
 
 - 💙 **Familiar**: Works with a similar component model to flutter widgets.
 - 🏗 **Powerful**: Comes with server side rendering out of the box.
 - ♻️ **Easy**: Syncs component state between server and client automatically.
-- ⚡️ **Fast**: Performs incremental DOM updates only where needed.
+- ⚡️ **Fast**: Performs optimized DOM updates only where needed.
 - 🎛 **Flexible**: Runs on the server, client or both with manual or automatic setup. You decide.
 
 > If you want to say thank you, star the project on GitHub and like the package on pub.dev 🙌💙
@@ -129,32 +125,14 @@ Instead of trying to mirror every little thing from Flutter, `jaspr` tries to gi
 by matching features where it makes sense without compromising on the unique properties of the web platform.
 Rather it embraces these differences to give the best of both worlds.
 
-1. The `build()` method of a `StatelessComponent` or `StatefulComponent` returns an `Iterable<Component>` 
-   instead of a single component. This is because a HTML element can always have multiple child elements.
-   The recommended way of using this is with a [**synchronous generator**](https://dart.dev/guides/language/language-tour#generators). 
-   Simply use the `sync*` keyword in the method definition and `yield` one or multiple components:
-   
-   ```dart
-   class MyComponent extends StatelessComponent {
-     @override
-     Iterable<Component> build(BuildContext context) sync* {
-       yield ChildA();
-       yield ChildB();
-     } 
-   }
-   ```
-   
-   *Trade-Off: Returning a single component and having an extra multi-child component would be superficial 
-   to how html works and thereby not a good practice.*
-   
-2. Jaspr does not care about the styling of components. There are (currently) no prestyled components
+1. Jaspr does not care about the styling of components. There are (currently) no prestyled components
    like in Flutters material or cupertino libraries.
    
    *Trade-Off: Providing styled components would be a lot of extra work and is currently not feasible.
     Also there exist a lot of different, well established CSS frameworks for web that you can already
     integrate and use with jaspr (e.g. [Bulma](https://playground.jaspr.site/?sample=bulma).*
    
-3. `Text` receives only a `String` and nothing else. As usual for web, styling is done through a combination
+2. `Text` receives only a `String` and nothing else. As usual for web, styling is done through a combination
    of CSS attributes, either in a **Stylesheet** or though the **`style` attribute** of the parent elements. 
    
    *Trade-Off: Giving `Text` a style option would be superficial and not native to web, and thereby not

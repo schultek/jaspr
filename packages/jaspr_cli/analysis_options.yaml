@@ -1,12 +1,11 @@
-include: package:lints/recommended.yaml
+include: package:jaspr_repo/package.yaml
 
 analyzer:
   exclude:
     - tool/scaffold/**
-
+    - tool/templates/**
+  
 linter:
   rules:
-    sort_pub_dependencies: false # to group packages semantically
-    prefer_relative_imports: true
-    directives_ordering: true
-    avoid_print: true
+    # Disabled so that we can group dependencies semantically.
+    sort_pub_dependencies: false

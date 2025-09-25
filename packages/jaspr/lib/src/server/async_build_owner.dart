@@ -18,17 +18,19 @@ class AsyncBuildOwner extends BuildOwner {
   }
 
   @override
-  void performRebuildOn(Element child, void Function() whenComplete) {
+  void performRebuildOn(Element child) {
     var parentAsyncBuildLock = child.parent?._asyncBuildLock;
+    if (child is! RenderObjectElement) {
+      child._asyncBuildLock = parentAsyncBuildLock;
+    }
 
     var chain = TaskChain.start()
         .then(() => child.performRebuild())
-        .then(() => whenComplete())
+        // Wait on children
+        .then(() => child._asyncBuildLock)
         // Wait on previous siblings
         .then(() => parentAsyncBuildLock)
-        .then(() => child.attachRenderObject())
-        // Wait on children
-        .then(() => child._asyncBuildLock);
+        .then(() => child.didRebuild());
 
     child.parent?._asyncBuildLock = chain;
   }

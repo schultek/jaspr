@@ -12,19 +12,9 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 
 abstract class Quote implements _i1.TableRow, _i1.ProtocolSerialization {
-  Quote._({
-    this.id,
-    required this.quote,
-    required this.author,
-    required this.likes,
-  });
+  Quote._({this.id, required this.quote, required this.author, required this.likes});
 
-  factory Quote({
-    int? id,
-    required String quote,
-    required String author,
-    required List<int> likes,
-  }) = _QuoteImpl;
+  factory Quote({int? id, required String quote, required String author, required List<int> likes}) = _QuoteImpl;
 
   factory Quote.fromJson(Map<String, dynamic> jsonSerialization) {
     return Quote(
@@ -51,30 +41,15 @@ abstract class Quote implements _i1.TableRow, _i1.ProtocolSerialization {
   @override
   _i1.Table get table => t;
 
-  Quote copyWith({
-    int? id,
-    String? quote,
-    String? author,
-    List<int>? likes,
-  });
+  Quote copyWith({int? id, String? quote, String? author, List<int>? likes});
   @override
   Map<String, dynamic> toJson() {
-    return {
-      if (id != null) 'id': id,
-      'quote': quote,
-      'author': author,
-      'likes': likes.toJson(),
-    };
+    return {if (id != null) 'id': id, 'quote': quote, 'author': author, 'likes': likes.toJson()};
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {
-      if (id != null) 'id': id,
-      'quote': quote,
-      'author': author,
-      'likes': likes.toJson(),
-    };
+    return {if (id != null) 'id': id, 'quote': quote, 'author': author, 'likes': likes.toJson()};
   }
 
   static QuoteInclude include() {
@@ -110,25 +85,11 @@ abstract class Quote implements _i1.TableRow, _i1.ProtocolSerialization {
 class _Undefined {}
 
 class _QuoteImpl extends Quote {
-  _QuoteImpl({
-    int? id,
-    required String quote,
-    required String author,
-    required List<int> likes,
-  }) : super._(
-          id: id,
-          quote: quote,
-          author: author,
-          likes: likes,
-        );
+  _QuoteImpl({int? id, required String quote, required String author, required List<int> likes})
+    : super._(id: id, quote: quote, author: author, likes: likes);
 
   @override
-  Quote copyWith({
-    Object? id = _Undefined,
-    String? quote,
-    String? author,
-    List<int>? likes,
-  }) {
+  Quote copyWith({Object? id = _Undefined, String? quote, String? author, List<int>? likes}) {
     return Quote(
       id: id is int? ? id : this.id,
       quote: quote ?? this.quote,
@@ -140,18 +101,9 @@ class _QuoteImpl extends Quote {
 
 class QuoteTable extends _i1.Table {
   QuoteTable({super.tableRelation}) : super(tableName: 'quotes') {
-    quote = _i1.ColumnString(
-      'quote',
-      this,
-    );
-    author = _i1.ColumnString(
-      'author',
-      this,
-    );
-    likes = _i1.ColumnSerializable(
-      'likes',
-      this,
-    );
+    quote = _i1.ColumnString('quote', this);
+    author = _i1.ColumnString('author', this);
+    likes = _i1.ColumnSerializable('likes', this);
   }
 
   late final _i1.ColumnString quote;
@@ -161,12 +113,7 @@ class QuoteTable extends _i1.Table {
   late final _i1.ColumnSerializable likes;
 
   @override
-  List<_i1.Column> get columns => [
-        id,
-        quote,
-        author,
-        likes,
-      ];
+  List<_i1.Column> get columns => [id, quote, author, likes];
 }
 
 class QuoteInclude extends _i1.IncludeObject {
@@ -242,37 +189,16 @@ class QuoteRepository {
     );
   }
 
-  Future<Quote?> findById(
-    _i1.Session session,
-    int id, {
-    _i1.Transaction? transaction,
-  }) async {
-    return session.db.findById<Quote>(
-      id,
-      transaction: transaction,
-    );
+  Future<Quote?> findById(_i1.Session session, int id, {_i1.Transaction? transaction}) async {
+    return session.db.findById<Quote>(id, transaction: transaction);
   }
 
-  Future<List<Quote>> insert(
-    _i1.Session session,
-    List<Quote> rows, {
-    _i1.Transaction? transaction,
-  }) async {
-    return session.db.insert<Quote>(
-      rows,
-      transaction: transaction,
-    );
+  Future<List<Quote>> insert(_i1.Session session, List<Quote> rows, {_i1.Transaction? transaction}) async {
+    return session.db.insert<Quote>(rows, transaction: transaction);
   }
 
-  Future<Quote> insertRow(
-    _i1.Session session,
-    Quote row, {
-    _i1.Transaction? transaction,
-  }) async {
-    return session.db.insertRow<Quote>(
-      row,
-      transaction: transaction,
-    );
+  Future<Quote> insertRow(_i1.Session session, Quote row, {_i1.Transaction? transaction}) async {
+    return session.db.insertRow<Quote>(row, transaction: transaction);
   }
 
   Future<List<Quote>> update(
@@ -281,11 +207,7 @@ class QuoteRepository {
     _i1.ColumnSelections<QuoteTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.update<Quote>(
-      rows,
-      columns: columns?.call(Quote.t),
-      transaction: transaction,
-    );
+    return session.db.update<Quote>(rows, columns: columns?.call(Quote.t), transaction: transaction);
   }
 
   Future<Quote> updateRow(
@@ -294,33 +216,15 @@ class QuoteRepository {
     _i1.ColumnSelections<QuoteTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateRow<Quote>(
-      row,
-      columns: columns?.call(Quote.t),
-      transaction: transaction,
-    );
+    return session.db.updateRow<Quote>(row, columns: columns?.call(Quote.t), transaction: transaction);
   }
 
-  Future<List<Quote>> delete(
-    _i1.Session session,
-    List<Quote> rows, {
-    _i1.Transaction? transaction,
-  }) async {
-    return session.db.delete<Quote>(
-      rows,
-      transaction: transaction,
-    );
+  Future<List<Quote>> delete(_i1.Session session, List<Quote> rows, {_i1.Transaction? transaction}) async {
+    return session.db.delete<Quote>(rows, transaction: transaction);
   }
 
-  Future<Quote> deleteRow(
-    _i1.Session session,
-    Quote row, {
-    _i1.Transaction? transaction,
-  }) async {
-    return session.db.deleteRow<Quote>(
-      row,
-      transaction: transaction,
-    );
+  Future<Quote> deleteRow(_i1.Session session, Quote row, {_i1.Transaction? transaction}) async {
+    return session.db.deleteRow<Quote>(row, transaction: transaction);
   }
 
   Future<List<Quote>> deleteWhere(
@@ -328,10 +232,7 @@ class QuoteRepository {
     required _i1.WhereExpressionBuilder<QuoteTable> where,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteWhere<Quote>(
-      where: where(Quote.t),
-      transaction: transaction,
-    );
+    return session.db.deleteWhere<Quote>(where: where(Quote.t), transaction: transaction);
   }
 
   Future<int> count(
@@ -340,10 +241,6 @@ class QuoteRepository {
     int? limit,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.count<Quote>(
-      where: where?.call(Quote.t),
-      limit: limit,
-      transaction: transaction,
-    );
+    return session.db.count<Quote>(where: where?.call(Quote.t), limit: limit, transaction: transaction);
   }
 }

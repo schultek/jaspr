@@ -1,0 +1,188 @@
+---
+title: "@css / css()"
+description: Styling utility to write nested style rules.
+---
+
+---
+
+To style your website in Jaspr you need to write css styles alongside your html markup. See the [Styling](/concepts/styling) docs for a general overview of the different ways to add styling to your website.
+
+The `css` utility gives you a convenient way of writing CSS style rules in Dart alongside your Jaspr components. It uses a combination of nested css selectors and Jasprs fully typed [CSS bindings](/api/utils/styles) in Dart.
+
+---
+
+## Registering style rules
+
+When used as the `@css` annotation, you can register any amount of style definitions to be automatically included in your server-rendered html output.
+
+```dart
+@css
+final List<StyleRule> styles = [
+  // Style rules in here (covered in next section)
+  /* ... */
+];
+```
+
+This is then automatically rendered to css and included in your html output after pre-rendering.
+
+<Warning>
+Because `@css` requires pre-rendering, it is only supported in **server** and **static** mode.
+</Warning>
+
+The `@css` annotation can be applied to the following elements:
+
+- global variables or static fields of type `List<StyleRule>`
+- global or static getters returning `List<StyleRule>`
+
+The recommended approach is to define your styles inside your components for better locality of your code:
+
+```dart lib/app.dart
+class App extends StatelessComponent {
+  const App({super.key});
+
+  @override
+  Component build(BuildContext context) {
+    return div(classes: 'main', [
+      p([text('Hello World')]),
+    ]);
+  }
+
+  @css
+  static final styles = [
+    css('.main', [
+      css('&').styles(
+        width: 100.px,
+        padding: Padding.all(10.rem),
+      ),
+      css('p').styles(
+        color: Colors.blue,
+      ),
+    ]),
+  ];
+}
+```
+
+<Warning>
+Styles defined in a component and registered using `@css` are **not** scoped to that component.
+You should try to use ids or unique class names as selectors to prevent unwanted effects on other components or conflicting style definitions.
+</Warning>
+
+<Success>
+**Tip:** The `jaspr_lints` package provides a convenient lint rule to keep your styles properties organized. Learn more about it [here](/get_started/linting#lint-rules).
+</Success>
+
+---
+
+## Defining style rules
+
+The default `css()` method takes a selector and calls [styles()](/api/utils/styles).
+
+```dart
+css('.main').styles(
+  width: 100.px, 
+  minHeight: 100.vh,
+  color: Colors.black,
+)
+```
+
+Which renders to:
+
+```css
+.main {
+  width: 100px;
+  min-height: 100vh;
+  color: black;
+}
+```
+
+### Nested style rules
+
+Alternatively, calls of `css()` can take an additional list of nested rules like this:
+
+```dart
+css('.main', [
+  css('&').styles(width: 100.px),
+  css('&:hover').styles(backgroundColor: Colors.blue),
+  css('p').styles(fontSize: 1.5em),
+])
+```
+
+This renders to:
+
+```css
+.main {
+  width: 100px;
+}
+.main:hover {
+  background-color: blue;
+}
+.main p {
+  font-size: 1.5em;
+}
+```
+
+Nested style rules will be scoped to the parent. Using the `&` symbol as part of a child selector
+refers to the parent selector.
+
+Style rules can also be nested any level deep.
+
+### Special style rules
+
+In addition to the default style rule, the `css` utility also supports other rule variants:
+
+#### css.import()
+
+The `css.import()` function takes an url and renders a `@import` css rule:
+
+```dart
+css.import('https://fonts.googleapis.com/css?family=Roboto')
+```
+
+Renders to:
+
+```css
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+```
+
+#### css.fontFace()
+
+The `css.fontFace()` function renders a `@font-face` css rule.
+
+```dart
+css.fontFace(
+  family: 'Roboto',
+  style: FontStyle.italic,
+  url: '/fonts/Roboto-italic.ttf',
+)
+```
+
+Renders to:
+
+```css
+@font-face {
+  font-family: "Roboto";
+  font-style: italic;
+  src: url(/fonts/Roboto-italic.ttf);
+}
+```
+
+#### css.media()
+
+The `css.media()` function renders a `@media` css rule.
+
+```dart
+css.media(MediaQuery.screen(minWidth: 1000.px), [
+  css('.main').styles(width: 200.px),
+])
+```
+
+Renders to:
+
+```css
+@media screen and (min-width: 1000px) {
+  .main {
+    width: 200px;
+  }
+}
+```
+

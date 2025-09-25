@@ -1,17 +1,11 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
 
 import '../../../../components/gradient_border.dart';
 import '../../../../components/icon.dart';
+import '../../../../constants/theme.dart';
 
 class LinkCard extends StatelessComponent {
-  const LinkCard({
-    required this.icon,
-    required this.title,
-    required this.description,
-    required this.link,
-    super.key,
-  });
+  const LinkCard({required this.icon, required this.title, required this.description, required this.link, super.key});
 
   final String icon;
   final String title;
@@ -19,8 +13,8 @@ class LinkCard extends StatelessComponent {
   final String link;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield a(classes: 'link-card', href: link, [
+  Component build(BuildContext context) {
+    return a(classes: 'link-card', href: link, [
       GradientBorder(
         radius: 12,
         child: div(classes: 'link-card-content', [
@@ -33,7 +27,7 @@ class LinkCard extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.link-card', [
       css('&').styles(
         display: Display.block,
@@ -57,7 +51,11 @@ class LinkCard extends StatelessComponent {
         color: primaryMid,
         fontSize: 1.5.em,
       ),
-      css('p').styles(margin: Margin.only(top: 0.4.em, bottom: Unit.zero)).combine(bodySmall),
+      css('p')
+          .styles(
+            margin: Margin.only(top: 0.4.em, bottom: Unit.zero),
+          )
+          .combine(bodySmall),
     ]),
   ];
 }

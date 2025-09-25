@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -12,11 +13,7 @@ void main() {
     });
 
     testComponents('should push named route', (tester) async {
-      tester.pumpComponent(Router(routes: [
-        homeRoute(),
-        route('/a', [], 'alicia'),
-        route('/b', [], 'bob'),
-      ]));
+      tester.pumpComponent(Router(routes: [homeRoute(), route('/a', [], 'alicia'), route('/b', [], 'bob')]));
 
       expect(find.text('home'), findsOneComponent);
 
@@ -37,11 +34,7 @@ void main() {
     });
 
     testComponents('should replace named route', (tester) async {
-      tester.pumpComponent(Router(routes: [
-        homeRoute(),
-        route('/a', [], 'alicia'),
-        route('/b', [], 'bob'),
-      ]));
+      tester.pumpComponent(Router(routes: [homeRoute(), route('/a', [], 'alicia'), route('/b', [], 'bob')]));
 
       expect(find.text('home'), findsOneComponent);
 

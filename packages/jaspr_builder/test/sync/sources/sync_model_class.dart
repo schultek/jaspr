@@ -25,7 +25,8 @@ final syncModelClassSources = {
       @sync
       Map<String, ModelA?> m6 = {};
       
-      Iterable<Component> build(BuildContext context) => [];
+      @override
+      Component build(BuildContext context) => text('');
     }
   ''',
   ...modelClassSources,
@@ -33,7 +34,11 @@ final syncModelClassSources = {
 };
 
 final syncModelClassOutputs = {
-  'site|lib/component.sync.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+  'site|lib/component.sync.dart':
+      '// dart format off\n'
+      '// ignore_for_file: type=lint\n'
+      '\n'
+      '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
       'import \'package:jaspr/jaspr.dart\';\n'
@@ -64,11 +69,18 @@ final syncModelClassOutputs = {
       '  void updateState(Map<String, dynamic> value) {\n'
       '    m = value[\'m\'] != null ? prefix1.ModelA.fromRaw(value[\'m\']!) : null;\n'
       '    m2 = prefix1.ModelA.fromRaw(value[\'m2\']);\n'
-      '    m3 = (value[\'m3\'] as List<dynamic>).map((i) => prefix1.ModelA.fromRaw(i)).toList();\n'
-      '    m4 = (value[\'m4\'] as List<dynamic>).map((i) => i != null ? prefix1.ModelA.fromRaw(i!) : null).toList();\n'
-      '    m5 = (value[\'m5\'] as Map<String, dynamic>).map((k, v) => MapEntry(k, prefix1.ModelA.fromRaw(v)));\n'
-      '    m6 =\n'
-      '        (value[\'m6\'] as Map<String, dynamic>).map((k, v) => MapEntry(k, v != null ? prefix1.ModelA.fromRaw(v!) : null));\n'
+      '    m3 = (value[\'m3\'] as List<dynamic>)\n'
+      '        .map((i) => prefix1.ModelA.fromRaw(i))\n'
+      '        .toList();\n'
+      '    m4 = (value[\'m4\'] as List<dynamic>)\n'
+      '        .map((i) => i != null ? prefix1.ModelA.fromRaw(i!) : null)\n'
+      '        .toList();\n'
+      '    m5 = (value[\'m5\'] as Map<String, dynamic>).map(\n'
+      '      (k, v) => MapEntry(k, prefix1.ModelA.fromRaw(v)),\n'
+      '    );\n'
+      '    m6 = (value[\'m6\'] as Map<String, dynamic>).map(\n'
+      '      (k, v) => MapEntry(k, v != null ? prefix1.ModelA.fromRaw(v!) : null),\n'
+      '    );\n'
       '  }\n'
       '\n'
       '  @override\n'
@@ -88,5 +100,6 @@ final syncModelClassOutputs = {
       '    super.initState();\n'
       '    SyncStateMixin.initSyncState(this);\n'
       '  }\n'
-      '}\n',
+      '}\n'
+      '',
 };

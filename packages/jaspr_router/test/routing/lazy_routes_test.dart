@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'dart:async';
 
@@ -16,11 +17,7 @@ void main() {
     testComponents('should push lazy route', (tester) async {
       var bCompleter = Completer.sync();
 
-      tester.pumpComponent(Router(routes: [
-        homeRoute(),
-        route('/a'),
-        lazyRoute('/b', bCompleter.future),
-      ]));
+      tester.pumpComponent(Router(routes: [homeRoute(), route('/a'), lazyRoute('/b', bCompleter.future)]));
 
       expect(find.text('home'), findsOneComponent);
 
@@ -43,13 +40,15 @@ void main() {
     testComponents('should push lazy shell route', (tester) async {
       var bCompleter = Completer.sync();
 
-      tester.pumpComponent(Router(routes: [
-        homeRoute(),
-        route('/a'),
-        lazyShellRoute('b', bCompleter.future, [
-          route('/c'),
-        ]),
-      ]));
+      tester.pumpComponent(
+        Router(
+          routes: [
+            homeRoute(),
+            route('/a'),
+            lazyShellRoute('b', bCompleter.future, [route('/c')]),
+          ],
+        ),
+      );
 
       expect(find.text('home'), findsOneComponent);
 

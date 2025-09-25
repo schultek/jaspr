@@ -1,8 +1,8 @@
+import 'package:highlight/highlight.dart' show Node, Result, highlight;
 import 'package:jaspr/jaspr.dart';
 
-import 'package:highlight/highlight.dart' show Node, Result, highlight;
-import 'package:website/components/code_window/theme.dart';
-import 'package:website/constants/theme.dart';
+import '../../constants/theme.dart';
+import 'theme.dart';
 
 class CodeBlock extends StatelessComponent {
   const CodeBlock({
@@ -21,7 +21,7 @@ class CodeBlock extends StatelessComponent {
   final Map<int, String> lineClasses;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     final indent = this.source.indexOf(this.source.trimLeft());
     var source = this.source;
 
@@ -35,7 +35,7 @@ class CodeBlock extends StatelessComponent {
     final result = highlight.parse(source.trim(), language: language);
     final lines = result.toLines();
 
-    yield div(classes: 'code-block', [
+    return div(classes: 'code-block', [
       pre([
         code(classes: 'language-$language ${scroll ? 'scroll' : ''}', [
           span(classes: 'lines ${selectable ? 'selectable' : ''}', [
@@ -45,8 +45,8 @@ class CodeBlock extends StatelessComponent {
                 span([raw(lines[i])]),
                 raw('&nbsp;'),
               ]),
-              br()
-            ]
+              br(),
+            ],
           ]),
         ]),
       ]),
@@ -54,7 +54,7 @@ class CodeBlock extends StatelessComponent {
   }
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.code-block', [
       css('&').styles(display: Display.flex),
       css('pre', [
@@ -85,15 +85,10 @@ class CodeBlock extends StatelessComponent {
                 backgroundColor: surfaceLowest,
               )
               .combine(jasprTheme['root']!),
-          css('&.scroll').styles(
-            overflow: Overflow.only(x: Overflow.scroll),
-          ),
+          css('&.scroll').styles(overflow: Overflow.only(x: Overflow.scroll)),
         ]),
         css('.lines', [
-          css('&').styles(
-            display: Display.inlineBlock,
-            minWidth: 100.percent,
-          ),
+          css('&').styles(display: Display.inlineBlock, minWidth: 100.percent),
           css('.line', [
             css('&').styles(
               display: Display.inlineBlock,
@@ -112,13 +107,8 @@ class CodeBlock extends StatelessComponent {
             ),
           ]),
           css('&.selectable .line:hover', [
-            css('&').styles(
-              backgroundColor: hoverOverlayColor,
-            ),
-            css('.line-number').styles(
-              opacity: 1,
-              backgroundColor: hoverOverlayColor,
-            ),
+            css('&').styles(backgroundColor: hoverOverlayColor),
+            css('.line-number').styles(opacity: 1, backgroundColor: hoverOverlayColor),
           ]),
         ]),
         for (final e in jasprTheme.entries) css('code span.hljs-${e.key}').combine(e.value),

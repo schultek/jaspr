@@ -1,6 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
+import '../providers/count_provider.dart';
 import 'counter.dart';
 
 /// App component that displays a simple counter.
@@ -11,7 +12,12 @@ import 'counter.dart';
 @client
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield ProviderScope(child: Counter());
+  Component build(BuildContext context) {
+    return ProviderScope(
+      sync: [
+        initialCountProvider.syncWith('initial_count'),
+      ],
+      child: Counter(),
+    );
   }
 }

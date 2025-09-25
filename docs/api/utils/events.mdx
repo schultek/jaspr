@@ -1,0 +1,100 @@
+---
+title: events()
+---
+
+---
+
+You can attach event handlers to every html element like this:
+
+```dart title="Using manual event handlers"
+return div(events: {
+  'click': (event) {
+    print('Clicked');
+  },
+}, [text('Click Me')]);
+```
+
+By default, you provide a `Map<String, EventCallback>` with the **event name** and a
+callback, taking in the `Event` as its only parameter.
+
+---
+
+The `events()` utility method provides bindings to some common event types in a more
+type-safe way. The same element from above using the `events()` method looks like this:
+
+```dart title="Using events utility"
+return div(events: events(onClick: () {
+  print('Clicked');
+}), [text('Click Me')]);
+```
+
+As shown, the result of the `events()` call can be passed directly to the `events:` parameter of a html component.
+
+<Info>
+When using the `events()` utility you don't have access to the original `Event` property. When this is needed you need
+to fall back to using a normal `Map` of event names to callbacks.
+</Info>
+
+## Event Bindings
+
+It has bindings to the following events:
+
+<Property name="onClick" type="void Function()" optional>
+  The `onClick` handler binds to the `click` event and receives no parameters.
+</Property>
+
+---
+
+<Property name="onInput" type="void Function(T value)" optional>
+  The `onInput` handler binds to the `input` event and receives a single parameter `value`.
+
+  The type of the `value` parameter must be a generic type according to the target element:
+
+  - `bool?` for checkbox or radio input elements
+  - `num?` for number input elements
+  - `DateTime` for date input elements
+  - `List<File>?` for file input elements
+  - `List<String>` for select elements
+  - `String` for text input and textarea elements
+  - `Null` for all other elements
+
+  ```dart
+  return input(type: InputType.checkbox, events: events(onInput: (bool? value) {
+    print('Checked: $value');
+  }, []);
+  ```
+</Property>
+
+---
+
+<Property name="onChange" type="void Function(T value)" optional>
+  The `onChange` handler binds to the `change` event and receives a single parameter `value`.
+
+  The type of the `value` parameter must be a generic type according to the target element:
+
+  - `bool?` for checkbox or radio input elements
+  - `num?` for number input elements
+  - `DateTime` for date input elements
+  - `List<File>?` for file input elements
+  - `List<String>` for select elements
+  - `String` for text input and textarea elements
+  - `Null` for all other elements
+
+  ```dart
+  return textarea(events: events(onChange: (String value) {
+    print('Content: $value');
+  }, []);
+  ```
+</Property>
+
+---
+
+## Component Shortcuts
+
+Some interactive html components have shortcut parameters for certain common event types. These
+work the same as above but are direct parameters on the html component accepting the respective event handler:
+
+- `button(onClick: () {})`
+- `input(onInput: (value) {}, onChange: (value) {})`
+- `select(onInput: (value) {}, onChange: (value) {})`
+- `textarea(onInput: (value) {}, onChange: (value) {})`

@@ -14,33 +14,34 @@ class CounterState extends State<Counter> {
   int count = 0;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'counter', [
-      button(
-        onClick: () {
-          setState(() => count--);
+  Component build(BuildContext context) {
+    return div([
+      div(classes: 'counter', [
+        button(
+          onClick: () {
+            setState(() => count--);
+          },
+          [text('-')],
+        ),
+        span([text('$count')]),
+        button(
+          onClick: () {
+            setState(() => count++);
+          },
+          [text('+')],
+        ),
+      ]),{{#flutter}}
+      EmbeddedCounter(
+        count: count,
+        onChange: (value) {
+          setState(() => count = value);
         },
-        [text('-')],
-      ),
-      span([text('$count')]),
-      button(
-        onClick: () {
-          setState(() => count++);
-        },
-        [text('+')],
-      ),
-    ]);{{#flutter}}
-
-    yield EmbeddedCounter(
-      count: count,
-      onChange: (value) {
-        setState(() => count = value);
-      },
-    );{{/flutter}}
+      ),{{/flutter}}
+    ]);
   }{{#server}}
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.counter', [
       css('&').styles(
         display: Display.flex,
@@ -62,7 +63,7 @@ class CounterState extends State<Counter> {
           backgroundColor: Colors.transparent,
         ),
         css('&:hover').styles(
-          backgroundColor: const Color.hex('#0001'),
+          backgroundColor: const Color('#0001'),
         ),
       ]),
       css('span').styles(

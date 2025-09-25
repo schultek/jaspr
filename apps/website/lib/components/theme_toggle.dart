@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
-import 'package:website/constants/theme.dart';
 
+import '../constants/theme.dart';
 import 'icon.dart';
 
 class ThemeToggle extends StatefulComponent {
@@ -24,45 +24,49 @@ class ThemeToggleState extends State<ThemeToggle> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    if (!kIsWeb) {
-      yield Document.head(children: [
-        // ignore: prefer_html_methods
-        DomComponent(id: 'theme-script', tag: 'script', children: [
-          raw('''
-          let userTheme = window.localStorage.getItem('active-theme');
-          if (userTheme != null) {
-            document.documentElement.className = userTheme;
-          } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.className = 'dark';
-          } else {
-            document.documentElement.className = 'light';
-          }
-        ''')
-        ]),
-      ]);
-    }
-
-    if (kIsWeb) {
-      yield Document.html(attributes: {'class': isDark ? 'dark' : 'light'});
-    }
-
-    yield button(
-      classes: 'theme-toggle',
-      attributes: {'aria-label': 'Theme Toggle'},
-      onClick: () {
-        setState(() {
-          isDark = !isDark;
-        });
-        web.window.localStorage.setItem('active-theme', isDark ? 'dark' : 'light');
-      },
-      styles: !kIsWeb ? Styles(visibility: Visibility.hidden) : null,
-      [Icon(isDark ? 'moon' : 'sun')],
-    );
+  Component build(BuildContext context) {
+    return fragment([
+      if (kIsWeb)
+        Document.html(attributes: {'class': isDark ? 'dark' : 'light'})
+      else
+        Document.head(
+          children: [
+            // ignore: prefer_html_methods
+            Component.element(
+              id: 'theme-script',
+              tag: 'script',
+              children: [
+                raw('''
+            let userTheme = window.localStorage.getItem('active-theme');
+            if (userTheme != null) {
+              document.documentElement.className = userTheme;
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+              document.documentElement.className = 'dark';
+            } else {
+              document.documentElement.className = 'light';
+            }
+          '''),
+              ],
+            ),
+          ],
+        ),
+      button(
+        classes: 'theme-toggle',
+        attributes: {'aria-label': 'Theme Toggle'},
+        onClick: () {
+          setState(() {
+            isDark = !isDark;
+          });
+          web.window.localStorage.setItem('active-theme', isDark ? 'dark' : 'light');
+        },
+        styles: !kIsWeb ? Styles(visibility: Visibility.hidden) : null,
+        [Icon(isDark ? 'moon' : 'sun')],
+      ),
+    ]);
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.theme-toggle', [
       css('&').styles(
         display: Display.flex,
@@ -74,9 +78,7 @@ class ThemeToggleState extends State<ThemeToggle> {
         color: textBlack,
         backgroundColor: Colors.transparent,
       ),
-      css('&:hover').styles(
-        backgroundColor: hoverOverlayColor,
-      ),
+      css('&:hover').styles(backgroundColor: hoverOverlayColor),
     ]),
   ];
 }

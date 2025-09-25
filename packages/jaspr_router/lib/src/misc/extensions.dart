@@ -31,8 +31,7 @@ extension GoRouterHelper on BuildContext {
     Map<String, String> params = const <String, String>{},
     Map<String, dynamic> queryParams = const <String, dynamic>{},
     Object? extra,
-  }) =>
-      Router.of(this).pushNamed(name, params: params, queryParams: queryParams, extra: extra);
+  }) => Router.of(this).pushNamed(name, params: params, queryParams: queryParams, extra: extra);
 
   /// Replaces the current history entry with a new route.
   ///
@@ -56,8 +55,7 @@ extension GoRouterHelper on BuildContext {
     Map<String, String> params = const <String, String>{},
     Map<String, dynamic> queryParams = const <String, dynamic>{},
     Object? extra,
-  }) =>
-      Router.of(this).replaceNamed(name, params: params, queryParams: queryParams, extra: extra);
+  }) => Router.of(this).replaceNamed(name, params: params, queryParams: queryParams, extra: extra);
 
   /// Triggers the browsers back navigation.
   void back() => Router.of(this).back();

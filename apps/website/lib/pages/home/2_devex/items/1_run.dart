@@ -24,11 +24,21 @@ class Run extends StatelessComponent {
   ];
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DevexBox(
+  Component build(BuildContext context) {
+    return DevexBox(
       caption: 'RUN',
-      title: 'Jaspr CLI',
-      description: text('Create, serve and build your site using simple cli commands.'),
+      title: 'Integrated Tooling',
+      description: fragment([
+        text('Create, serve and build your site using simple cli commands, or the official '),
+        a(
+          href: 'https://marketplace.visualstudio.com/items?itemName=schultek.jaspr-code',
+          target: Target.blank,
+          [
+            text('VSCode Extension'),
+          ],
+        ),
+        text('.'),
+      ]),
       preview: div(classes: 'run-preview', [
         code(classes: 'console', [
           text(r'$'),
@@ -37,26 +47,22 @@ class Run extends StatelessComponent {
           for (final line in lines) ...[
             span([
               span(styles: Styles(color: line.$2), [text(line.$1)]),
-              text(line.$3)
+              text(line.$3),
             ]),
             br(),
           ],
-        ])
+        ]),
       ]),
     );
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.run-preview', [
       css('&').styles(padding: Padding.all(.5.rem)),
-      css('.console').styles(
-        display: Display.block,
-        opacity: .8,
-        color: textBlack,
-        textAlign: TextAlign.start,
-        fontSize: .7.rem,
-      ),
+      css(
+        '.console',
+      ).styles(display: Display.block, opacity: .8, color: textBlack, textAlign: TextAlign.start, fontSize: .7.rem),
     ]),
   ];
 }

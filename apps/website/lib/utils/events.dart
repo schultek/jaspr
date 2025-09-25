@@ -11,9 +11,7 @@ final analytics = LukehogClient(
 
 void captureVisit() {
   if (!kIsWeb) return;
-  analytics.capture("page_visit", properties: {
-    "path": web.window.location.pathname,
-  });
+  analytics.capture("page_visit", properties: {"path": web.window.location.pathname});
 }
 
 void captureEasterEgg() {

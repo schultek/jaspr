@@ -1,0 +1,83 @@
+{
+	".source.dart": {
+		"Jaspr Stateless Component": {
+			"prefix": "jstless",
+			"description": "Insert a StatelessComponent",
+			"body": [
+				"class $1 extends StatelessComponent {",
+				"  const $1({super.key});",
+				"",
+				"  @override",
+				"  Component build(BuildContext context) {",
+				"    return ${0:div([])};",
+				"  }",
+				"}"
+			]
+		},
+		"Jaspr Stateful Component": {
+			"prefix": "jstful",
+			"description": "Insert a StatefulComponent",
+			"body": [
+				"class $1 extends StatefulComponent {",
+				"  const $1({super.key});",
+				"",
+				"  @override",
+				"  State<$1> createState() => _$1State();",
+				"}",
+				"",
+				"class _$1State extends State<$1> {",
+				"  @override",
+				"  Component build(BuildContext context) {",
+				"    return ${2:div([$3])};",
+				"  }",
+				"}"
+			]
+		},
+		"Jaspr HTML Component": {
+			"prefix": "jhtml",
+			"description": "Insert a html component",
+			"body": [
+				"$1([$2]),"
+			]
+		},
+    "Jaspr Text Component": {
+			"prefix": "jtext",
+			"description": "Insert a text component",
+			"body": [
+				"text(\"$1\"),"
+			]
+		},
+		"Jaspr Styles": {
+			"prefix": "jstyls",
+			"description": "Insert a styles definition",
+			"body": [
+				"@css",
+				"List<StyleRule> get styles => [",
+				"  css('$1', [",
+				"    css('&').styles(",
+				"      $2,",
+        "    ),",
+        "  ]),",
+        "];"
+			]
+		},
+		"Jaspr Event": {
+			"prefix": "jevt",
+			"description": "Insert an event handler",
+			"body": [
+				"events: {'$1': (event) {",
+        "  $2",
+        "}},"
+			]
+		},
+    "Jaspr Click Event": {
+			"prefix": "jclick",
+			"description": "Insert an click event handler",
+			"body": [
+				"events: events(onClick: () {",
+        "  $2",
+        "}),"
+			]
+		}
+	}
+}

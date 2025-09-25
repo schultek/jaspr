@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
-import 'package:website/utils/events.dart';
 
-import '../components/menu_button.dart';
-import '../constants/theme.dart';
 import '../components/github_button.dart';
 import '../components/link_button.dart';
 import '../components/logo.dart';
+import '../components/menu_button.dart';
 import '../components/theme_toggle.dart';
+import '../constants/theme.dart';
+import '../utils/events.dart';
 
 @client
 class Header extends StatefulComponent {
@@ -52,8 +52,8 @@ class HeaderState extends State<Header> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    var content = Fragment(key: contentKey, children: [
+  Component build(BuildContext context) {
+    var content = fragment(key: contentKey, [
       nav([
         if (component.showHome) a(href: '/', classes: 'animated-underline', [text("Home")]),
         a(href: "https://docs.jaspr.site", classes: 'animated-underline', [text("Docs")]),
@@ -64,16 +64,17 @@ class HeaderState extends State<Header> {
         ThemeToggle(),
         div(classes: 'discord-button', [
           LinkButton.icon(
-              icon: 'custom-discord',
-              to: 'https://discord.gg/XGXrGEk4c6',
-              target: Target.blank,
-              ariaLabel: 'Join Discord'),
+            icon: 'custom-discord',
+            to: 'https://discord.gg/XGXrGEk4c6',
+            target: Target.blank,
+            ariaLabel: 'Join Discord',
+          ),
         ]),
-        GithubButton(),
+        GitHubButton(),
       ]),
     ]);
 
-    yield header([
+    return header([
       Logo(),
       if (!menuOpen) content,
       MenuButton(
@@ -88,7 +89,7 @@ class HeaderState extends State<Header> {
   }
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('header', [
       css('&').styles(
         display: Display.flex,
@@ -97,10 +98,7 @@ class HeaderState extends State<Header> {
         padding: Padding.symmetric(horizontal: 2.rem, vertical: 2.rem),
         gap: Gap(column: 2.rem),
       ),
-      css('& > *').styles(
-        display: Display.flex,
-        alignItems: AlignItems.center,
-      ),
+      css('& > *').styles(display: Display.flex, alignItems: AlignItems.center),
       css('nav', [
         css('&').styles(
           display: Display.flex,
@@ -109,23 +107,15 @@ class HeaderState extends State<Header> {
           flex: Flex(grow: 1),
           color: textBlack,
         ),
-        css('& a').styles(
-          color: textBlack,
-          fontSize: 1.rem,
-          fontWeight: FontWeight.w500,
-          textDecoration: TextDecoration.none,
-        ),
-        css('& a:hover').styles(
-          color: primaryMid,
-        ),
+        css(
+          '& a',
+        ).styles(color: textBlack, fontSize: 1.rem, fontWeight: FontWeight.w500, textDecoration: TextDecoration.none),
+        css('& a:hover').styles(color: primaryMid),
       ]),
     ]),
     css.media(MediaQuery.screen(maxWidth: mobileBreakpoint.px), [
       css('header', [
-        css('&').styles(
-          display: Display.flex,
-          justifyContent: JustifyContent.spaceBetween,
-        ),
+        css('&').styles(display: Display.flex, justifyContent: JustifyContent.spaceBetween),
         css('& > nav').styles(display: Display.none),
         css('& > .header-actions').styles(display: Display.none),
       ]),

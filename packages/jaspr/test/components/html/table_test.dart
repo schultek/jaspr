@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -6,29 +7,28 @@ import 'package:jaspr_test/jaspr_test.dart';
 void main() {
   group('html components', () {
     testComponents('renders table', (tester) async {
-      tester.pumpComponent(table([
-        thead([
-          tr([
-            th([text("Name")]),
-            th([text("Age")]),
+      tester.pumpComponent(
+        table([
+          thead([
+            tr([
+              th([text("Name")]),
+              th([text("Age")]),
+            ]),
           ]),
+          tbody([
+            tr([
+              td([text("Alice")]),
+              td([text("20")]),
+            ]),
+            tr([
+              td([text("Bob")]),
+              td([text("30")]),
+            ]),
+            tr([col(span: 2), colgroup(span: 2, [])]),
+          ]),
+          tfoot([]),
         ]),
-        tbody([
-          tr([
-            td([text("Alice")]),
-            td([text("20")]),
-          ]),
-          tr([
-            td([text("Bob")]),
-            td([text("30")]),
-          ]),
-          tr([
-            col(span: 2, []),
-            colgroup(span: 2, []),
-          ])
-        ]),
-        tfoot([]),
-      ]));
+      );
 
       expect(find.tag('table'), findsOneComponent);
       expect(find.tag('thead'), findsOneComponent);

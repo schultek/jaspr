@@ -1,12 +1,18 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/components/gradient_border.dart';
-import 'package:website/constants/theme.dart';
 
+import '../constants/theme.dart';
+import 'gradient_border.dart';
 import 'icon.dart';
 
 class LinkButton extends StatelessComponent {
-  const LinkButton._(
-      {this.label, required this.icon, required this.to, required this.style, this.target, this.ariaLabel});
+  const LinkButton._({
+    this.label,
+    required this.icon,
+    required this.to,
+    required this.style,
+    this.target,
+    this.ariaLabel,
+  });
 
   final String? label;
   final String? icon;
@@ -28,24 +34,23 @@ class LinkButton extends StatelessComponent {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    var child = span(classes: 'link-button-content', [
-      if (label != null) text(label!),
-      if (icon != null) Icon(icon!),
-    ]);
+  Component build(BuildContext context) {
+    var child = span(classes: 'link-button-content', [if (label != null) text(label!), if (icon != null) Icon(icon!)]);
 
     if (style == 'outlined') {
       child = GradientBorder(child: child, radius: 7);
     }
-    yield a(classes: 'link-button link-button-$style', href: to, target: target, attributes: {
-      if (ariaLabel != null) 'aria-label': ariaLabel!
-    }, [
-      child,
-    ]);
+    return a(
+      classes: 'link-button link-button-$style',
+      href: to,
+      target: target,
+      attributes: {if (ariaLabel != null) 'aria-label': ariaLabel!},
+      [child],
+    );
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.link-button', [
       css('&').styles(
         display: Display.block,
@@ -93,25 +98,13 @@ class LinkButton extends StatelessComponent {
           opacity: 0.9,
           color: textBlack,
         ),
-        css('&:hover, &.active').styles(
-          opacity: 1,
-          backgroundColor: surface,
-        ),
+        css('&:hover, &.active').styles(opacity: 1, backgroundColor: surface),
       ]),
       css('&.link-button-icon', [
-        css('&').styles(
-          opacity: 0.9,
-          color: textBlack,
-          backgroundColor: Colors.transparent,
-        ),
-        css('.link-button-content').styles(
-          padding: Padding.all(.7.rem),
-        ),
-        css('&:hover').styles(
-          opacity: 1,
-          backgroundColor: hoverOverlayColor,
-        ),
+        css('&').styles(opacity: 0.9, color: textBlack, backgroundColor: Colors.transparent),
+        css('.link-button-content').styles(padding: Padding.all(.7.rem)),
+        css('&:hover').styles(opacity: 1, backgroundColor: hoverOverlayColor),
       ]),
-    ])
+    ]),
   ];
 }

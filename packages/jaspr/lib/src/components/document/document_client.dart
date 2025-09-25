@@ -1,9 +1,8 @@
-import 'dart:js_interop';
-
 import 'package:universal_web/web.dart' as web;
 
 import '../../../browser.dart';
 import '../../browser/utils.dart';
+import '../../foundation/type_checks.dart';
 
 abstract class Document implements Component {
   /// Attaches a set of attributes to the `<html>` element.
@@ -13,10 +12,7 @@ abstract class Document implements Component {
   ///
   /// Can be used multiple times in an application where deeper or latter mounted
   /// components will override duplicate attributes from other `.html()` components.
-  const factory Document.html({
-    Map<String, String>? attributes,
-    Key? key,
-  }) = AttachDocument.html;
+  const factory Document.html({Map<String, String>? attributes, Key? key}) = AttachDocument.html;
 
   /// Renders metadata and other elements inside the `<head>` of the document.
   ///
@@ -57,12 +53,8 @@ abstract class Document implements Component {
   /// - elements with an `id` override other elements with the same `id`
   /// - `<title>` and `<base>` elements override other `<title>` or `<base>` elements respectively
   /// - `<meta>` elements override other `<meta>` elements with the same `name`
-  const factory Document.head({
-    String? title,
-    Map<String, String>? meta,
-    List<Component>? children,
-    Key? key,
-  }) = HeadDocument;
+  const factory Document.head({String? title, Map<String, String>? meta, List<Component>? children, Key? key}) =
+      HeadDocument;
 
   /// Attaches a set of attributes to the `<body>` element.
   ///
@@ -71,10 +63,7 @@ abstract class Document implements Component {
   ///
   /// Can be used multiple times in an application where deeper or latter mounted
   /// components will override duplicate attributes from other `.body()` components.
-  const factory Document.body({
-    Map<String, String>? attributes,
-    Key? key,
-  }) = AttachDocument.body;
+  const factory Document.body({Map<String, String>? attributes, Key? key}) = AttachDocument.body;
 }
 
 class HeadDocument extends StatelessComponent implements Document {
@@ -85,14 +74,14 @@ class HeadDocument extends StatelessComponent implements Document {
   final List<Component>? children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield AttachDocument(
+  Component build(BuildContext context) {
+    return AttachDocument(
       target: AttachTarget.head,
       attributes: null,
       children: [
-        if (title != null) DomComponent(tag: 'title', child: Text(title!)),
+        if (title != null) Component.element(tag: 'title', children: [Component.text(title!)]),
         if (meta != null)
-          for (var e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+          for (var e in meta!.entries) Component.element(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
         ...?children,
       ],
     );
@@ -109,31 +98,35 @@ enum AttachTarget {
   final bool attachChildren;
 }
 
-class AttachDocument extends ProxyComponent implements Document {
-  const AttachDocument.html({this.attributes, super.key}) : target = AttachTarget.html;
-  const AttachDocument.body({this.attributes, super.key}) : target = AttachTarget.body;
-  const AttachDocument({required this.target, this.attributes, super.children});
+class AttachDocument extends Component implements Document {
+  const AttachDocument.html({this.attributes, super.key}) : target = AttachTarget.html, children = const [];
+  const AttachDocument.body({this.attributes, super.key}) : target = AttachTarget.body, children = const [];
+  const AttachDocument({required this.target, this.attributes, required this.children});
 
   final AttachTarget target;
   final Map<String, String>? attributes;
+  final List<Component> children;
 
   @override
-  ProxyElement createElement() => _AttachElement(this);
+  Element createElement() => _AttachElement(this);
 }
 
-class _AttachElement extends ProxyRenderObjectElement {
+class _AttachElement extends MultiChildRenderObjectElement {
   _AttachElement(AttachDocument super.component);
 
   @override
+  List<Component> buildChildren() => (component as AttachDocument).children;
+
+  @override
   RenderObject createRenderObject() {
-    var AttachDocument(:target) = component as AttachDocument;
-    return AttachRenderObject(target, depth);
+    var AttachDocument(:target, :attributes) = component as AttachDocument;
+    return AttachRenderObject(target, depth)..attributes = attributes;
   }
 
   @override
-  void updateRenderObject() {
+  void updateRenderObject(AttachRenderObject renderObject) {
     var AttachDocument(:target, :attributes) = component as AttachDocument;
-    (renderObject as AttachRenderObject)
+    renderObject
       ..target = target
       ..attributes = attributes;
   }
@@ -152,9 +145,8 @@ class _AttachElement extends ProxyRenderObjectElement {
   }
 }
 
-class AttachRenderObject extends DomRenderObject {
-  AttachRenderObject(this._target, this._depth) {
-    node = web.Text('');
+class AttachRenderObject extends DomRenderText {
+  AttachRenderObject(this._target, this._depth) : super('', null) {
     AttachAdapter.instanceFor(_target).register(this);
   }
 
@@ -186,9 +178,10 @@ class AttachRenderObject extends DomRenderObject {
 
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
+    child.parent = this;
+
     try {
       var childNode = child.node;
-      if (childNode == null) return;
 
       var afterNode = after?.node;
       if (afterNode == null && children.contains(childNode)) {
@@ -202,6 +195,7 @@ class AttachRenderObject extends DomRenderObject {
 
       children.remove(childNode);
       children.insert(afterNode != null ? children.indexOf(afterNode) + 1 : 0, childNode);
+
       AttachAdapter.instanceFor(_target).update();
     } finally {
       child.finalize();
@@ -210,8 +204,9 @@ class AttachRenderObject extends DomRenderObject {
 
   @override
   void remove(DomRenderObject child) {
-    super.remove(child);
     children.remove(child.node);
+    child.parent = null;
+
     AttachAdapter.instanceFor(_target).update();
   }
 }
@@ -271,14 +266,14 @@ class AttachAdapter {
   };
 
   String? keyFor(web.Node node) {
-    if (!node.instanceOfString('Element')) return null;
+    if (!node.isElement) return null;
     return switch (node as web.Element) {
       web.Element(id: String id) when id.isNotEmpty => id,
       web.Element(tagName: "TITLE" || "BASE") => '__${node.tagName}',
       web.Element(tagName: "META") => switch (node.attributes.getNamedItem("name")) {
-          web.Attr name => '__meta:${name.value}',
-          _ => null
-        },
+        web.Attr name => '__meta:${name.value}',
+        _ => null,
+      },
       _ => null,
     };
   }

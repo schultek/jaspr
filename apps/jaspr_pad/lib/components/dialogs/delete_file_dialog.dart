@@ -9,14 +9,18 @@ class DeleteFileDialog extends StatelessComponent {
   final String file;
 
   static Future<bool?> show(BuildContext context, String file) {
-    return showDialog(context, slotId: 'dialog', builder: (_) => DeleteFileDialog(file: file));
+    return showDialog(
+      context,
+      slotId: 'dialog',
+      builder: (_) => DeleteFileDialog(file: file),
+    );
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Dialog(
+  Component build(BuildContext context) {
+    return Dialog(
       title: 'Delete File',
-      content: Text('Delete file \'$file\'? This can\'t be undone.'),
+      content: text('Delete file \'$file\'? This can\'t be undone.'),
       actions: [
         Button(
           label: 'Cancel',

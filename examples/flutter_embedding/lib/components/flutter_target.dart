@@ -13,7 +13,7 @@ class FlutterTarget extends StatelessComponent {
   final Component? loader;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var effects = context.watch(effectsProvider);
     var rotation = context.watch(rotationProvider);
 
@@ -25,10 +25,7 @@ class FlutterTarget extends StatelessComponent {
       classes: isHandheld ? 'handheld' : effects.join(' '),
       styles: !isHandheld && rotation != 0
           ? Styles(
-              transform: Transform.combine([
-                Transform.perspective(1000.px),
-                Transform.rotateAxis(y: rotation.deg),
-              ]),
+              transform: Transform.combine([Transform.perspective(1000.px), Transform.rotateAxis(y: rotation.deg)]),
             )
           : null,
       loader: loader,
@@ -51,6 +48,6 @@ class FlutterTarget extends StatelessComponent {
       ]);
     }
 
-    yield article([child]);
+    return article([child]);
   }
 }

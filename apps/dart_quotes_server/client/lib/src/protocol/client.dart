@@ -25,15 +25,14 @@ class EndpointQuotes extends _i1.EndpointRef {
   _i2.Future<void> toggleLikeOnQuote(
     int id,
     bool liked,
-  ) =>
-      caller.callServerEndpoint<void>(
-        'quotes',
-        'toggleLikeOnQuote',
-        {
-          'id': id,
-          'liked': liked,
-        },
-      );
+  ) => caller.callServerEndpoint<void>(
+    'quotes',
+    'toggleLikeOnQuote',
+    {
+      'id': id,
+      'liked': liked,
+    },
+  );
 
   _i2.Stream<_i3.Quote> subscribeToQuote(int id) =>
       caller.callStreamingServerEndpoint<_i2.Stream<_i3.Quote>, _i3.Quote>(
@@ -63,20 +62,21 @@ class Client extends _i1.ServerpodClientShared {
       _i1.MethodCallContext,
       Object,
       StackTrace,
-    )? onFailedCall,
+    )?
+    onFailedCall,
     Function(_i1.MethodCallContext)? onSucceededCall,
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
-          host,
-          _i5.Protocol(),
-          securityContext: securityContext,
-          authenticationKeyManager: authenticationKeyManager,
-          streamingConnectionTimeout: streamingConnectionTimeout,
-          connectionTimeout: connectionTimeout,
-          onFailedCall: onFailedCall,
-          onSucceededCall: onSucceededCall,
-          disconnectStreamsOnLostInternetConnection: disconnectStreamsOnLostInternetConnection,
-        ) {
+         host,
+         _i5.Protocol(),
+         securityContext: securityContext,
+         authenticationKeyManager: authenticationKeyManager,
+         streamingConnectionTimeout: streamingConnectionTimeout,
+         connectionTimeout: connectionTimeout,
+         onFailedCall: onFailedCall,
+         onSucceededCall: onSucceededCall,
+         disconnectStreamsOnLostInternetConnection: disconnectStreamsOnLostInternetConnection,
+       ) {
     quotes = EndpointQuotes(this);
     modules = Modules(this);
   }

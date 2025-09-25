@@ -79,13 +79,13 @@ class _MarkdownState extends State<Markdown> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     if (kIsWeb) {
       context.binding.addPostFrameCallback(() {
         hljs.highlightAll();
       });
     }
-    yield* buildMarkdown(nodes);
+    return fragment([...buildMarkdown(nodes)]);
   }
 
   Iterable<Component> buildMarkdown(Iterable<Node> nodes) sync* {
@@ -93,7 +93,7 @@ class _MarkdownState extends State<Markdown> {
       if (node is md.Text) {
         yield span([raw(node.text)]);
       } else if (node is md.Element) {
-        yield DomComponent(
+        yield Component.element(
           tag: node.tag,
           id: node.generatedId,
           attributes: node.attributes,

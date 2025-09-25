@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
 
+import '../../constants/theme.dart';
 import '../icon.dart';
 import 'code_block.dart';
 
@@ -27,8 +27,8 @@ class CodeWindow extends StatelessComponent {
   final Map<int, String> lineClasses;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'code-window ${framed ? 'framed' : ''}', [
+  Component build(BuildContext context) {
+    return div(classes: 'code-window ${framed ? 'framed' : ''}', [
       div(classes: 'code-window-header', [
         div(classes: 'code-window-tab', [
           if (name.endsWith('.dart')) Icon('dart'),
@@ -49,11 +49,9 @@ class CodeWindow extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.code-window', [
-      css('&').styles(
-        radius: BorderRadius.circular(13.px),
-      ),
+      css('&').styles(radius: BorderRadius.circular(13.px)),
       css('&.framed', [
         css('&').styles(
           border: Border(color: borderColor, width: 6.px),
@@ -75,25 +73,18 @@ class CodeWindow extends StatelessComponent {
         ),
         css('.code-window-tab', [
           css('&').styles(
-              display: Display.flex,
-              padding: Padding.only(left: .8.em, right: 1.2.em, top: .5.em, bottom: .5.em),
-              radius: BorderRadius.only(topLeft: Radius.circular(6.px), topRight: Radius.circular(6.px)),
-              shadow: BoxShadow(offsetX: 0.px, offsetY: (-2).px, blur: 3.px, color: shadowColor1),
-              alignItems: AlignItems.center,
-              gap: Gap(column: 0.4.rem),
-              color: textBlack,
-              backgroundColor: surfaceLowest),
-          css('&.inactive').styles(
-            width: 0.px,
-            opacity: 0.5,
-            flex: Flex(grow: 1),
-            raw: {'max-width': 'fit-content'},
+            display: Display.flex,
+            padding: Padding.only(left: .8.em, right: 1.2.em, top: .5.em, bottom: .5.em),
+            radius: BorderRadius.only(topLeft: Radius.circular(6.px), topRight: Radius.circular(6.px)),
+            shadow: BoxShadow(offsetX: 0.px, offsetY: (-2).px, blur: 3.px, color: shadowColor1),
+            alignItems: AlignItems.center,
+            gap: Gap(column: 0.4.rem),
+            color: textBlack,
+            backgroundColor: surfaceLowest,
           ),
+          css('&.inactive').styles(width: 0.px, opacity: 0.5, flex: Flex(grow: 1), raw: {'max-width': 'fit-content'}),
         ]),
-        css('.code-window-title').styles(
-          fontSize: 0.9.rem,
-          fontWeight: FontWeight.w400,
-        ),
+        css('.code-window-title').styles(fontSize: 0.9.rem, fontWeight: FontWeight.w400),
       ]),
       css('.code-window-body', [
         css('&').styles(

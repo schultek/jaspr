@@ -1,7 +1,8 @@
 name: jaspr_lints
 description: A collection of lints and assists for jaspr projects.
-version: 0.3.1
+version: 0.5.1
 homepage: https://jaspr.site
+repository: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
 documentation: https://docs.jaspr.site/get_started/linting
 funding:
@@ -13,14 +14,16 @@ topics:
   - lints
 
 environment:
-  sdk: '>=3.5.0 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
+
+resolution: workspace
 
 dependencies:
-  analyzer: ^7.0.0
-  analyzer_plugin: ^0.12.0
-  custom_lint_builder: ^0.7.0
+  analyzer: ^8.0.0
+  analyzer_plugin: ^0.13.4
+  custom_lint_builder: ^0.8.1
   path: ^1.9.0
   yaml: ^3.1.2
 
 dev_dependencies:
-  lints: ^5.0.0
+  jaspr_repo: any

@@ -1,0 +1,183 @@
+{
+  "name": "jaspr-code",
+  "displayName": "Jaspr",
+  "description": "Jaspr framework support for Visual Studio Code",
+  "version": "0.2.2",
+  "repository": {
+    "url": "https://github.com/schultek/jaspr",
+    "directory": "modules/jaspr-code"
+  },
+  "homepage": "https://jaspr.site",
+  "funding": "https://github.com/sponsors/schultek",
+  "license": "MIT",
+  "publisher": "schultek",
+  "author": {
+    "name": "Kilian Schulte"
+  },
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "categories": [
+    "Debuggers",
+    "Snippets"
+  ],
+  "keywords": [
+    "jaspr",
+    "dart",
+    "flutter",
+    "web"
+  ],
+  "icon": "media/jaspr.png",
+  "activationEvents": [
+    "workspaceContains:pubspec.yaml",
+    "workspaceContains:jaspr.create",
+    "onDebug",
+    "onDebugDynamicConfigurations",
+    "onLanguage:dart"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "jaspr.create",
+        "title": "New Project",
+        "category": "Jaspr"
+      },
+      {
+        "command": "jaspr.serve",
+        "title": "Serve",
+        "category": "Jaspr"
+      },
+      {
+        "command": "jaspr.clean",
+        "title": "Clean",
+        "category": "Jaspr"
+      },
+      {
+        "command": "jaspr.doctor",
+        "title": "Doctor",
+        "category": "Jaspr"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "jaspr.create"
+        },
+        {
+          "command": "jaspr.serve",
+          "when": "jaspr-code:anyJasprProjectLoaded"
+        },
+        {
+          "command": "jaspr.clean",
+          "when": "jaspr-code:anyJasprProjectLoaded"
+        },
+        {
+          "command": "jaspr.doctor"
+        }
+      ]
+    },
+    "debuggers": [
+      {
+        "type": "jaspr",
+        "languages": [
+          "dart"
+        ],
+        "label": "Jaspr",
+        "configurationAttributes": {
+          "launch": {
+            "properties": {
+              "args": {
+                "type": "array",
+                "description": "Arguments to pass to 'jaspr serve'",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              },
+              "cwd": {
+                "type": "string",
+                "description": "Project root."
+              }
+            }
+          }
+        },
+        "configurationSnippets": [
+          {
+            "label": "Jaspr",
+            "description": "A new configuration for launching a Jaspr app.",
+            "body": {
+              "name": "Jaspr",
+              "request": "launch",
+              "type": "jaspr"
+            }
+          }
+        ]
+      }
+    ],
+    "snippets": [
+      {
+        "language": "dart",
+        "path": "./snippets.json"
+      }
+    ],
+    "configuration": {
+      "title": "Jaspr",
+      "type": "object",
+      "properties": {
+        "jaspr.scopes.showHint": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the 'What is this?' hint next to the identified component scopes in the editor."
+        },
+        "jaspr.scopes.showUnsafeImportDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show diagnostics for unsafe imports detected for a component file."
+        },
+        "jaspr.scopes.unsafeImportDiagnosticSeverity": {
+          "type": "number",
+          "enum": [
+            "Error",
+            "Warning",
+            "Information"
+          ],
+          "default": "Error",
+          "markdownDescription": "The severity of diagnostics for unsafe imports detected for a component file. Only applies when `#jaspr.scopes.showUnsafeImportDiagnostics#` is set to `true`."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "extensionDependencies": [
+    "Dart-Code.dart-code"
+  ],
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/semver": "^7.7.0",
+    "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^8.25.0",
+    "@typescript-eslint/parser": "^8.25.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "dart-code": "github:Dart-Code/Dart-Code",
+    "eslint": "^9.21.0",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "vscode-uri": "^3.1.0",
+    "yaml": "^2.7.0"
+  }
+}

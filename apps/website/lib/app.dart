@@ -1,8 +1,9 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
-import 'package:website/constants/theme.dart';
 
+import 'components/banner.dart';
 import 'components/markdown_page.dart';
+import 'constants/theme.dart';
 import 'layout/footer.dart';
 import 'layout/header.dart';
 import 'pages/home/home.dart';
@@ -11,36 +12,27 @@ class App extends StatelessComponent {
   const App({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Router(routes: [
-      Route(
-        path: '/',
-        builder: (_, __) => Fragment(children: [
-          Header(),
-          main_([
-            Home(),
+  Component build(BuildContext context) {
+    return Router(
+      routes: [
+        Route(
+          path: '/',
+          builder: (_, __) => fragment([
+            Banner(),
+            Header(),
+            main_([Home()]),
+            Footer(),
           ]),
-          Footer(),
-        ]),
-      ),
-      Route(
-        path: '/imprint',
-        title: 'Imprint',
-        builder: (_, __) => MarkdownPage('lib/content/imprint.md'),
-      ),
-      Route(
-        path: '/privacy',
-        title: 'Privacy Policy',
-        builder: (_, __) => MarkdownPage('lib/content/privacy.md'),
-      ),
-    ]);
+        ),
+        Route(path: '/imprint', title: 'Imprint', builder: (_, __) => MarkdownPage('lib/content/imprint.md')),
+        Route(path: '/privacy', title: 'Privacy Policy', builder: (_, __) => MarkdownPage('lib/content/privacy.md')),
+      ],
+    );
   }
 
   @css
-  static final List<StyleRule> styles = [
-    css('main').styles(
-      overflow: Overflow.hidden,
-    ),
+  static List<StyleRule> get styles => [
+    css('main').styles(overflow: Overflow.hidden),
     css('section').styles(position: Position.relative()),
     css('#hero:before').combine(backgroundShade(40.vh, (-20).vw, w: 80.vw, h: 160.vh)),
     css('#devex:before').combine(backgroundShade(10.vh, 20.vw, w: 80.vw, h: 60.vh)),

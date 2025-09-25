@@ -27,18 +27,16 @@ class _AppState extends State<App> {
   int count = 0;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield InheritedCount(
-      count,
-      child: CountLabel(),
-    );
-
-    yield button(
-      onClick: () {
-        setState(() => count++);
-      },
-      [text('Press Me')],
-    );
+  Component build(BuildContext context) {
+    return div([
+      InheritedCount(count, child: CountLabel()),
+      button(
+        onClick: () {
+          setState(() => count++);
+        },
+        [text('Press Me')],
+      ),
+    ]);
   }
 }
 
@@ -46,8 +44,8 @@ class CountLabel extends StatelessComponent {
   const CountLabel({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var count = context.dependOnInheritedComponentOfExactType<InheritedCount>()!.count;
-    yield Text('Count is $count');
+    return text('Count is $count');
   }
 }

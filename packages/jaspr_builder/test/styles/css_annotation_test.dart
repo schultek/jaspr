@@ -10,13 +10,20 @@ import 'sources/styles_global.dart';
 
 void main() {
   group('css annotation', () {
+    late TestReaderWriter reader;
+
+    setUp(() async {
+      reader = TestReaderWriter(rootPackage: 'models');
+      await reader.testing.loadIsolateSources();
+    });
+
     group('on global elements', () {
       test('generates json module', () async {
         await testBuilder(
           StylesModuleBuilder(BuilderOptions({})),
           stylesGlobalSources,
           outputs: stylesGlobalOutputs,
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
     });
@@ -27,7 +34,7 @@ void main() {
           StylesModuleBuilder(BuilderOptions({})),
           stylesClassSources,
           outputs: stylesClassOutputs,
-          reader: await PackageAssetReader.currentIsolate(),
+          readerWriter: reader,
         );
       });
     });
@@ -35,12 +42,9 @@ void main() {
     test('generates bundle', () async {
       await testBuilder(
         StylesBundleBuilder(BuilderOptions({})),
-        {
-          ...stylesClassOutputs,
-          ...stylesGlobalOutputs,
-        },
+        {...stylesClassOutputs, ...stylesGlobalOutputs},
         outputs: stylesBundleOutputs,
-        reader: await PackageAssetReader.currentIsolate(),
+        readerWriter: reader,
       );
     });
   });

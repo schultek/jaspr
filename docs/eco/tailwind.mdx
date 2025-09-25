@@ -8,14 +8,14 @@ description: A tailwind integration for Jaspr.
 [Tailwind](https://tailwindcss.com/) is a popular css framework to quickly compose beautiful websites without needing
 to write a lot of css.
 
-Jaspr has a first-class tailwind integration called `jaspr_tailwind`.
+Jaspr can be integrated with Tailwind using the [`jaspr_tailwind`](https://pub.dev/packages/jaspr_tailwind) package.
 
 ## Prerequisites
 
 This package expects tailwind to be installed through the `tailwindcss` command. The recommended way is to use
 the [standalone tailwind cli](https://tailwindcss.com/blog/standalone-cli).
 
-To install it, download the executable for your platform from the [latest release](https://github.com/tailwindlabs/tailwindcss/releases/latest)
+To install it, download the executable for your platform, preferably the [latest release](https://github.com/tailwindlabs/tailwindcss/releases/latest)
 on GitHub and give it executable permissions:
 
 ```shell
@@ -44,10 +44,18 @@ Simply add `jaspr_tailwind` as a dev dependency to your project:
 
 Next add a `styles.tw.css` file inside the `web` directory with the following content:
 
+If you are using tailwindcss v4, then:
+
+```css title="styles.tw.css"
+@import "tailwindcss";
+```
+
+Or else, if you are using tailwindcss v3, then:
+
 ```css title="styles.tw.css"
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities
 ```
 
 Finally, link the generated `styles.css` in your document, or otherwise add it to your website:
@@ -106,8 +114,8 @@ class SimpleCard extends StatelessComponent {
   final String message;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4', [
+  Component build(BuildContext context) {
+    return div(classes: 'p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4', [
       div(classes: 'shrink-0', [
         img(classes: 'h-12 w-12', src: '/img/logo.svg', alt: '$title Logo'),
       ]),

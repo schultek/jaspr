@@ -9,19 +9,17 @@ class Integrate extends StatelessComponent {
   const Integrate({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DevexBox(
+  Component build(BuildContext context) {
+    return DevexBox(
       caption: 'INTEGRATE',
       title: 'Packages and Plugins',
-      description: Fragment(children: [
+      description: fragment([
         text('Import any Dart package from pub.dev or even use '),
-        b([
-          a(
-            href: 'https://pub.dev/packages?q=is%3Aplugin+platform%3Aweb',
-            classes: 'animated-underline',
-            [text('Flutter web plugins')],
-          )
+
+        a(href: 'https://pub.dev/packages?q=is%3Aplugin+platform%3Aweb', [
+          text('Flutter web plugins'),
         ]),
+
         text(' through Jasprs custom compiler pipeline.'),
       ]),
       preview: div([
@@ -35,7 +33,7 @@ class Integrate extends StatelessComponent {
                   dart_mappable: ^4.3.0
                   http: ^1.3.0
                   intl: ^0.19.0
-                  jaspr: ^0.17.0
+                  jaspr: ^0.19.0
                   logging: ^1.3.0
                   riverpod: ^2.6.1
                   shared_preferences: ^2.4.0

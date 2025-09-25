@@ -1,19 +1,20 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
+
+import '../constants/theme.dart';
 
 class Logo extends StatelessComponent {
   const Logo({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield a(href: '/', classes: "logo", [
+  Component build(BuildContext context) {
+    return a(href: '/', classes: "logo", [
       img(src: 'images/logo.svg', alt: 'logo', height: 40),
       span([text('Jaspr')]),
     ]);
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.logo').styles(
       display: Display.flex,
       userSelect: UserSelect.none,

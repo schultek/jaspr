@@ -8,8 +8,8 @@ import 'package:source_gen/source_gen.dart';
 import '../utils.dart';
 import 'codec_module_builder.dart';
 
-final encoderChecker = TypeChecker.fromRuntime(EncoderAnnotation);
-final decoderChecker = TypeChecker.fromRuntime(DecoderAnnotation);
+final encoderChecker = TypeChecker.typeNamed(EncoderAnnotation, inPackage: 'jaspr');
+final decoderChecker = TypeChecker.typeNamed(DecoderAnnotation, inPackage: 'jaspr');
 
 typedef Codecs = Map<String, CodecElement>;
 
@@ -82,7 +82,7 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
   @override
   String? visitDartType(DartType type, String argument) {
     if (!type.isDartPrimitive) {
-      throw UnsupportedError('Unsupported parameter type: Expected primitive type or Component, found ${type.getDisplayString()}');
+      throw const InvalidParameterException();
     }
     return argument;
   }
@@ -103,8 +103,7 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
       }
     } else if (type.isDartCoreMap) {
       if (!type.typeArguments.first.isDartCoreString) {
-        throw UnsupportedError(
-            'Unsupported Map key type: Expected String, found ${type.typeArguments.first.getDisplayString()}');
+        throw const InvalidParameterException();
       }
 
       var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
@@ -166,4 +165,8 @@ extension on DartType {
             (this as InterfaceType).typeArguments.first.isDartCoreString &&
             (this as InterfaceType).typeArguments.last is DynamicType);
   }
+}
+
+class InvalidParameterException implements Exception {
+  const InvalidParameterException();
 }

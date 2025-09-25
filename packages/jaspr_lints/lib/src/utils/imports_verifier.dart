@@ -19,7 +19,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitBinaryExpression(BinaryExpression node) {
-    _recordIfExtensionMember(node.staticElement);
+    _recordIfExtensionMember(node.element);
     return super.visitBinaryExpression(node);
   }
 
@@ -30,7 +30,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
-    _recordIfExtensionMember(node.staticElement);
+    _recordIfExtensionMember(node.element);
     return super.visitFunctionExpressionInvocation(node);
   }
 
@@ -41,7 +41,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitIndexExpression(IndexExpression node) {
-    _recordIfExtensionMember(node.staticElement);
+    _recordIfExtensionMember(node.element);
     return super.visitIndexExpression(node);
   }
 
@@ -71,19 +71,16 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitPrefixExpression(PrefixExpression node) {
     _recordAssignmentTarget(node, node.operand);
-    _recordIfExtensionMember(node.staticElement);
+    _recordIfExtensionMember(node.element);
     return super.visitPrefixExpression(node);
   }
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    _visitIdentifier(node, node.staticElement);
+    _visitIdentifier(node, node.element);
   }
 
-  void _recordAssignmentTarget(
-    CompoundAssignmentExpression node,
-    Expression target,
-  ) {
+  void _recordAssignmentTarget(CompoundAssignmentExpression node, Expression target) {
     if (target is IndexExpression) {
       _recordIfExtensionMember(node.readElement);
       _recordIfExtensionMember(node.writeElement);
@@ -101,18 +98,14 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
 
   void _recordIfExtensionMember(Element? element) {
     if (element != null) {
-      // ignore: deprecated_member_use
-      var enclosingElement = element.enclosingElement3;
+      var enclosingElement = element.enclosingElement;
       if (enclosingElement is ExtensionElement) {
         _recordUsedExtension(enclosingElement);
       }
     }
   }
 
-  void _recordPrefixedElement(
-    ImportPrefixReference? importPrefix,
-    Element? element,
-  ) {
+  void _recordPrefixedElement(ImportPrefixReference? importPrefix, Element? element) {
     if (element is MultiplyDefinedElement) {
       for (var component in element.conflictingElements) {
         _recordPrefixedElement(importPrefix, component);
@@ -144,7 +137,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
   bool _recordPrefixMap(SimpleIdentifier identifier, Element element) {
     bool recordIfTargetIsPrefixElement(Expression? target) {
       if (target is SimpleIdentifier) {
-        var targetElement = target.staticElement;
+        var targetElement = target.element;
         if (targetElement is PrefixElement) {
           List<Element> prefixedElements = usedElements.prefixMap.putIfAbsent(targetElement, () => <Element>[]);
           prefixedElements.add(element);
@@ -202,9 +195,8 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
     if (_recordPrefixMap(identifier, element)) {
       return;
     }
-    // ignore: deprecated_member_use
-    var enclosingElement = element.enclosingElement3;
-    if (enclosingElement is CompilationUnitElement) {
+    var enclosingElement = element.enclosingElement;
+    if (enclosingElement is LibraryElement) {
       _recordUsedElement(element);
     } else if (enclosingElement is ExtensionElement) {
       _recordUsedExtension(enclosingElement);

@@ -1,0 +1,155 @@
+---
+title: Styles
+description: Type-safe Dart bindings of CSS properties.
+---
+
+---
+
+The `Styles` class can be used to write type-safe css styles in Dart.
+
+It contains typed parameters for most css properties, like `width`, `padding`, `color` and more. Here is the full list of available properties:
+
+```dart
+const Styles({
+  // Box Styles
+  All? all,
+  String? content,
+  Display? display,
+  Position? position,
+  ZIndex? zIndex,
+  Unit? width,
+  Unit? height,
+  Unit? minWidth,
+  Unit? minHeight,
+  Unit? maxWidth,
+  Unit? maxHeight,
+  AspectRatio? aspectRatio,
+  Padding? padding,
+  Margin? margin,
+  BoxSizing? boxSizing,
+  Border? border,
+  BorderRadius? radius,
+  Outline? outline,
+  double? opacity,
+  Visibility? visibility,
+  Overflow? overflow,
+  Appearance? appearance,
+  BoxShadow? shadow,
+  Filter? filter,
+  Filter? backdropFilter,
+  Cursor? cursor,
+  UserSelect? userSelect,
+  PointerEvents? pointerEvents,
+  Transition? transition,
+  Transform? transform,
+  // Flexbox Styles
+  FlexDirection? flexDirection,
+  FlexWrap? flexWrap,
+  JustifyContent? justifyContent,
+  AlignItems? alignItems,
+  AlignContent? alignContent,
+  // Grid Styles
+  GridTemplate? gridTemplate,
+  List<TrackSize>? autoRows,
+  List<TrackSize>? autoColumns,
+  Gap? gap,
+  JustifyItems? justifyItems,
+  // Item Styles
+  Flex? flex,
+  int? order,
+  AlignSelf? alignSelf,
+  JustifySelf? justifySelf,
+  GridPlacement? gridPlacement,
+  // List Styles
+  ListStyle? listStyle,
+  ImageStyle? listImage,
+  ListStylePosition? listPosition,
+  // Text Styles
+  Color? color,
+  TextAlign? textAlign,
+  FontFamily? fontFamily,
+  Unit? fontSize,
+  FontWeight? fontWeight,
+  FontStyle? fontStyle,
+  TextDecoration? textDecoration,
+  TextTransform? textTransform,
+  Unit? textIndent,
+  Unit? letterSpacing,
+  Unit? wordSpacing,
+  Unit? lineHeight,
+  TextShadow? textShadow,
+  TextOverflow? textOverflow,
+  WhiteSpace? whiteSpace,
+  // Background Styles
+  Color? backgroundColor,
+  ImageStyle? backgroundImage,
+  BackgroundOrigin? backgroundOrigin,
+  BackgroundPosition? backgroundPosition,
+  BackgroundAttachment? backgroundAttachment,
+  BackgroundRepeat? backgroundRepeat,
+  BackgroundSize? backgroundSize,
+  BackgroundClip? backgroundClip,
+  // Raw Styles
+  Map<String, String>? raw,
+})
+```
+
+<Success>
+**Tip:** The `jaspr_lints` package provides a convenient lint rule to keep your styles properties organized. Learn more about it [here](/get_started/linting#lint-rules).
+</Success>
+
+---
+
+### Raw Styles
+
+If you want to work with raw CSS properties or need to use a property that is not available in the current properties, use the `raw` parameter and provide a map of properties and values:
+
+```dart
+const myStyle = Styles(
+  color: Colors.red,
+  raw: {
+    'some_advanced_css_property': 'special_value',
+  },
+);
+```
+
+---
+
+### Combining Styles
+
+You can chain and combine multiple styles like this:
+
+```dart
+final myStyle = Styles(color: Colors.red)
+    .combine(Styles(textAlign: TextAlign.center));
+```
+
+Note that this does not produce a constant value. Alternatively you can use the `Styles.combine()` constructor to get the same value as a constant:
+
+```dart
+const myStyle = Styles.combine([
+  Styles(color: Colors.red),
+  Styles(backgroundColor: Colors.blue),
+  Styles(textAlign: TextAlign.center),
+]);
+```
+
+---
+
+### Reusing Styles
+
+Finally, you can store styles in variables and mix'n'match:
+
+```dart
+const redText = Styles(color: Colors.red);
+
+const redOnBlueText = Styles.combine([
+  redText,
+  Styles(backgroundColor: Colors.blue),
+]);
+
+const redOnGreenText = Styles.combine([
+  redText,
+  Styles(backgroundColor: Colors.green),
+]);
+```

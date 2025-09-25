@@ -1,8 +1,9 @@
-include: package:lints/recommended.yaml
+include: package:jaspr_repo/app.yaml
 
 analyzer:
   exclude:
     - build/**
+
 linter:
   rules:
     file_names: false

@@ -1,4 +1,5 @@
 @TestOn('browser')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/browser_test.dart';
@@ -9,7 +10,7 @@ void main() {
     testBrowser('should access node from GlobalNodeKey', (tester) async {
       final key = GlobalNodeKey<HTMLInputElement>();
 
-      tester.pumpComponent(input(key: key, type: InputType.checkbox, []));
+      tester.pumpComponent(input(key: key, type: InputType.checkbox));
 
       expect(key.currentNode, isNotNull);
 

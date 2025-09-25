@@ -10,25 +10,19 @@ class DevExp extends StatelessComponent {
   const DevExp({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section(id: 'devex', [
+  Component build(BuildContext context) {
+    return section(id: 'devex', [
       span(classes: 'caption text-gradient', [text('Developer Experience')]),
       h2([text('The productivity of Dart'), br(), text('brought to the Web')]),
       div(classes: 'devex-grid', [
-        div([
-          Develop(),
-          Run(),
-        ]),
-        div([
-          Integrate(),
-          Analyze(),
-        ]),
+        div([Develop(), Run()]),
+        div([Integrate(), Analyze()]),
       ]),
     ]);
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('#devex', [
       css('&').styles(
         display: Display.flex,
@@ -53,13 +47,11 @@ class DevExp extends StatelessComponent {
             flexWrap: FlexWrap.wrap,
             gap: Gap.all(3.rem),
           ),
-          css('& > *').styles(
-            flex: Flex(grow: 1, shrink: 1, basis: FlexBasis(16.rem)),
-          ),
-          css('&:first-child > *:first-child').styles(flex: Flex(basis: FlexBasis(30.rem))),
-          css('&:last-child > *:last-child').styles(flex: Flex(basis: FlexBasis(30.rem))),
+          css('& > *').styles(flex: Flex(grow: 1, shrink: 1, basis: 16.rem)),
+          css('&:first-child > *:first-child').styles(flex: Flex(basis: 30.rem)),
+          css('&:last-child > *:last-child').styles(flex: Flex(basis: 30.rem)),
         ]),
-      ])
+      ]),
     ]),
   ];
 }

@@ -5,6 +5,15 @@ void main() {
   var specFile = File('tool/data/html.json');
   var specJson = jsonDecode(specFile.readAsStringSync()) as Map<String, dynamic>;
 
+  var cliSpecFile = File('../jaspr_cli/lib/src/html_spec.dart');
+
+  cliSpecFile.writeAsString('''
+// GENERATED FILE - DO NOT EDIT
+// Generated from packages/jaspr/tool/generate_html.dart
+
+const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
+''');
+
   var allTags = <String>{};
 
   for (var key in specJson.keys) {
@@ -49,6 +58,7 @@ void main() {
       content.write('{');
 
       var events = <String>{};
+      String? contentParam;
 
       if (attrs != null) {
         for (var attr in attrs.keys) {
@@ -85,6 +95,9 @@ void main() {
           } else if (type is Map<String, dynamic>) {
             var name = type['name'];
             content.write(name);
+          } else if (type == 'content') {
+            content.write('String');
+            contentParam = name;
           } else {
             throw ArgumentError('Attribute type is unknown ($type) for attribute $key.$tag.$attr');
           }
@@ -100,24 +113,27 @@ void main() {
       final tagValue = data["tag"] ?? tag;
 
       content.write(
-          'Key? key, String? id, String? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
-          '  return DomComponent(\n'
-          '    tag: \'$tagValue\',\n'
-          '    key: key,\n'
-          '    id: id,\n'
-          '    classes: classes,\n'
-          '    styles: styles,\n'
-          '    attributes: ');
+        'Key? key, String? id, String? classes, Styles? styles, Map<String, String>? attributes, Map<String, EventCallback>? events}) {\n'
+        '  return Component.element(\n'
+        '    tag: \'$tagValue\',\n'
+        '    key: key,\n'
+        '    id: id,\n'
+        '    classes: classes,\n'
+        '    styles: styles,\n'
+        '    attributes: ',
+      );
 
       if (attrs != null) {
-        content.write('{\n'
-            '      ...attributes ?? {},\n');
+        content.write(
+          '{\n'
+          '      ...?attributes,\n',
+        );
 
         for (var attr in attrs.keys) {
           var name = attrs[attr]['name'] ?? attr;
           var type = attrs[attr]['type'];
 
-          if (type is String && type.startsWith('event:')) continue;
+          if (type is String && (type.startsWith('event:') || type == 'content')) continue;
 
           content.write('      ');
 
@@ -125,24 +141,24 @@ void main() {
 
           if (type == 'boolean') {
             content.write('if ($name == true) ');
-          } else if (!required) {
-            content.write('if ($name != null) ');
           }
 
           content.write("'$attr': ");
 
+          var nullCheck = !required && type != 'boolean' ? '?' : '';
+
           if (type == 'string') {
-            content.write('$name');
+            content.write('$nullCheck$name');
           } else if (type == 'boolean') {
             content.write("''");
           } else if (type == 'int' || type == 'double') {
-            content.write("'\$$name'");
+            content.write("$nullCheck$name$nullCheck.toString()");
           } else if (type is String && type.startsWith('enum:')) {
-            content.write('$name.value');
+            content.write('$nullCheck$name$nullCheck.value');
           } else if (type is String && type.startsWith('css:')) {
-            content.write('$name.value');
+            content.write('$nullCheck$name$nullCheck.value');
           } else if (type is Map<String, dynamic>) {
-            content.write('$name.value');
+            content.write('$nullCheck$name$nullCheck.value');
           } else {
             throw ArgumentError('Attribute type is unknown ($type) for attribute $key.$tag.$attr');
           }
@@ -158,20 +174,26 @@ void main() {
       content.write('    events: ');
 
       if (events.isNotEmpty) {
-        content.write('{\n'
-            '      ...?events,\n'
-            '      ..._events(${events.map((e) => '$e: $e').join(', ')}),\n'
-            '    },\n');
+        content.write(
+          '{\n'
+          '      ...?events,\n'
+          '      ..._events(${events.map((e) => '$e: $e').join(', ')}),\n'
+          '    },\n',
+        );
       } else {
         content.write('events,\n');
       }
 
       if (!selfClosing) {
         content.write('    children: children,\n');
+      } else if (contentParam != null) {
+        content.write('    children: [if ($contentParam != null) raw($contentParam)],\n');
       }
 
-      content.writeln('  );\n'
-          '}');
+      content.writeln(
+        '  );\n'
+        '}',
+      );
 
       if (attrs != null) {
         for (var attr in attrs.keys) {
@@ -197,10 +219,12 @@ void main() {
                 }
               }
 
-              content.writeln('\n'
-                  '  final String value;\n'
-                  '  const $name(this.value);\n'
-                  '}');
+              content.writeln(
+                '\n'
+                '  final String value;\n'
+                '  const $name(this.value);\n'
+                '}',
+              );
             }
           }
         }

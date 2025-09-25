@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
+
+import '../../../../constants/theme.dart';
 
 class TestimonialCard extends StatelessComponent {
   const TestimonialCard({
@@ -18,8 +19,8 @@ class TestimonialCard extends StatelessComponent {
   final String link;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'testimonial-card', [
+  Component build(BuildContext context) {
+    return div(classes: 'testimonial-card', [
       p([raw('&ldquo;'), text(quote), raw('&rdquo;')]),
       a(href: link, [
         img(src: picture, height: 40, width: 40, alt: name),
@@ -33,7 +34,7 @@ class TestimonialCard extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.testimonial-card', [
       css('&').styles(
         display: Display.flex,
@@ -47,7 +48,11 @@ class TestimonialCard extends StatelessComponent {
         textAlign: TextAlign.start,
         textDecoration: TextDecoration.none,
       ),
-      css('p').styles(margin: Margin.only(top: 0.4.em, bottom: Unit.zero)).combine(bodyMedium),
+      css('p')
+          .styles(
+            margin: Margin.only(top: 0.4.em, bottom: Unit.zero),
+          )
+          .combine(bodyMedium),
       css('a', [
         css('&').styles(
           display: Display.flex,
@@ -61,10 +66,7 @@ class TestimonialCard extends StatelessComponent {
           raw: {'object-fit': 'cover'},
         ),
         css('p').styles(margin: Margin.zero).combine(bodySmall),
-        css('p span:first-child').styles(
-          color: textBlack,
-          fontWeight: FontWeight.w600,
-        ),
+        css('p span:first-child').styles(color: textBlack, fontWeight: FontWeight.w600),
       ]),
     ]),
   ];

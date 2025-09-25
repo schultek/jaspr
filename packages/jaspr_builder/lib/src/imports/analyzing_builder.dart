@@ -29,23 +29,22 @@ class ImportsModuleBuilder implements Builder {
       var outputId = buildStep.inputId.changeExtension('.imports.json');
       var partId = buildStep.inputId.changeExtension('.imports.dart');
 
-      var import = lib.definingCompilationUnit.libraryImports
-          .cast<Element>()
-          .followedBy(lib.definingCompilationUnit.libraryExports)
-          .where((Element e) => importChecker.hasAnnotationOf(e))
-          .where((Element e) {
-        var uri = switch (e) {
-          LibraryImportElement() => e.uri,
-          LibraryExportElement() => e.uri,
-          _ => null,
-        };
-        if (uri is DirectiveUriWithRelativeUriString && uri.relativeUriString == path.basename(partId.path)) {
-          return true;
-        }
-        log.severe('@Import must only be applied to the respective "<filename>.imports.dart" import of a library. '
-            'Instead found it on "${uri.toString()}" in library ${lib.source.uri.toString()}.');
-        return false;
-      }).firstOrNull;
+      var import = lib.firstFragment.libraryImports
+          .cast<ElementDirective>()
+          .followedBy(lib.firstFragment.libraryExports)
+          .where((ElementDirective e) => importChecker.firstAnnotationOf(e) != null)
+          .where((ElementDirective e) {
+            var uri = e.uri;
+            if (uri is DirectiveUriWithRelativeUriString && uri.relativeUriString == path.basename(partId.path)) {
+              return true;
+            }
+            log.severe(
+              '@Import must only be applied to the respective "<filename>.imports.dart" import of a library. '
+              'Instead found it on "${uri.toString()}" in library ${lib.firstFragment.source.uri.toString()}.',
+            );
+            return false;
+          })
+          .firstOrNull;
 
       if (import == null) {
         return;
@@ -76,6 +75,6 @@ class ImportsModuleBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-        '.dart': ['.imports.json']
-      };
+    '.dart': ['.imports.json'],
+  };
 }

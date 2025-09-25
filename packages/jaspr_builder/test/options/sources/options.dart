@@ -1,13 +1,16 @@
-import '../../client/sources/client_basic.dart';
-import '../../client/sources/client_model_class.dart';
-import '../../client/sources/client_model_extension.dart';
+import '../../client/sources/bundle.dart';
 import '../../styles/sources/bundle.dart';
 
 final optionsSources = {
-  ...clientBasicJsonOutputs,
-  ...clientModelClassJsonOutputs,
-  ...clientModelExtensionJsonOutputs,
+  ...clientBundleOutputs,
   ...stylesBundleOutputs,
+  'site|lib/main.dart': '''
+    import 'package:site/component_basic.dart';
+    // import 'package:site/component_model_class.dart';
+    import 'package:site/component_model_extension.dart';
+
+    void main() {}
+  ''',
   'site|pubspec.yaml': '''
     jaspr:
       mode: static
@@ -15,15 +18,18 @@ final optionsSources = {
 };
 
 final optionsOutputs = {
-  'site|lib/jaspr_options.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+  'site|lib/jaspr_options.dart':
+      '// dart format off\n'
+      '// ignore_for_file: type=lint\n'
+      '\n'
+      '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
       'import \'package:jaspr/jaspr.dart\';\n'
       'import \'package:site/component_basic.dart\' as prefix0;\n'
-      'import \'package:site/component_model_class.dart\' as prefix1;\n'
-      'import \'package:site/component_model_extension.dart\' as prefix2;\n'
-      'import \'package:site/model_extension.dart\' as prefix3;\n'
-      'import \'package:site/styles_global.dart\' as prefix4;\n'
+      'import \'package:site/component_model_extension.dart\' as prefix1;\n'
+      'import \'package:site/model_extension.dart\' as prefix2;\n'
+      'import \'package:site/styles_global.dart\' as prefix3;\n'
       '\n'
       '/// Default [JasprOptions] for use with your jaspr project.\n'
       '///\n'
@@ -41,20 +47,30 @@ final optionsOutputs = {
       '///   runApp(...);\n'
       '/// }\n'
       '/// ```\n'
-      'final defaultJasprOptions = JasprOptions(\n'
+      'JasprOptions get defaultJasprOptions => JasprOptions(\n'
       '  clients: {\n'
-      '    prefix0.Component: ClientTarget<prefix0.Component>(\'component_basic\', params: _prefix0Component),\n'
-      '    prefix1.Component: ClientTarget<prefix1.Component>(\'component_model_class\', params: _prefix1Component),\n'
-      '    prefix2.Component: ClientTarget<prefix2.Component>(\'component_model_extension\', params: _prefix2Component),\n'
+      '    prefix0.Component: ClientTarget<prefix0.Component>(\n'
+      '      \'component_basic\',\n'
+      '      params: _prefix0Component,\n'
+      '    ),\n'
+      '\n'
+      '    prefix1.Component: ClientTarget<prefix1.Component>(\n'
+      '      \'component_model_extension\',\n'
+      '      params: _prefix1Component,\n'
+      '    ),\n'
       '  },\n'
-      '  styles: () => [\n'
-      '    ...prefix4.styles,\n'
-      '    ...prefix4.styles2,\n'
-      '  ],\n'
+      '  styles: () => [...prefix3.styles, ...prefix3.styles2],\n'
       ');\n'
       '\n'
-      'Map<String, dynamic> _prefix0Component(prefix0.Component c) => {\'a\': c.a, \'b\': c.b, \'c\': c.c, \'d\': c.d};\n'
-      'Map<String, dynamic> _prefix1Component(prefix1.Component c) => {\'a\': c.a, \'b\': c.b.toRaw()};\n'
-      'Map<String, dynamic> _prefix2Component(prefix2.Component c) => {\'a\': c.a, \'b\': prefix3.ModelBCodec(c.b).toRaw()};\n'
+      'Map<String, dynamic> _prefix0Component(prefix0.Component c) => {\n'
+      '  \'a\': c.a,\n'
+      '  \'b\': c.b,\n'
+      '  \'c\': c.c,\n'
+      '  \'d\': c.d,\n'
+      '};\n'
+      'Map<String, dynamic> _prefix1Component(prefix1.Component c) => {\n'
+      '  \'a\': c.a,\n'
+      '  \'b\': prefix2.ModelBCodec(c.b).toRaw(),\n'
+      '};\n'
       '',
 };

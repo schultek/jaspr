@@ -1,0 +1,102 @@
+---
+title: Static Sites
+description: Generate static sites with Jaspr.
+---
+
+---
+
+To generate a static site with Jaspr, you need to use the `static` rendering mode. This mode allows you to pre-render your website at build time, generating static HTML and CSS files that can be hosted on any static hosting provider.
+
+## Generating Pages
+
+Static-Site Generation (SSG) describes the process of generating all your website routes at build time. Different to SSR, this doesn't require a running server that generates your website on each request. Instead, `jaspr build` will generate all the routes for your website and outputs only static files (`.html`, etc.) that can be deployed to any static hosting provider.
+
+Say you have a project in `static` mode with the routes `/`, `/about` and `/contact`. Then running `jaspr build` will output the `index.html`, `about/index.html` and `contact/index.html` files.
+
+To make sure all pages are generated for your site, you need to tell Jaspr about the routes of your website.
+
+### Using `jaspr_router`
+
+It is recommended you use `jaspr_router` together with `static` mode, since it automatically renders all routes that you define.
+
+The following shows a router that would render the above three routes:
+
+```dart
+Router(
+  routes: [
+    Route(path: '/', builder: (_, __) => HomePage()),
+    Route(path: '/about', builder: (_, __) => AboutPage()),
+    Route(path: '/contact', builder: (_, __) => ContactPage()),
+  ]
+);
+```
+
+#### Generating dynamic routes
+
+You may want to generate dynamic routes based on some data for your application.
+
+Take for example a typical blog site, where each blog post has its own route, e.g. `/posts/{postId}`, and you want
+to render these as separate pages when running `jaspr build`. Normally, you could use routes with path parameters for this,
+however for static-site generation, path parameters are not supported, since all routes need to be resolvable when initializing the router.
+
+Instead, you need to add a route for each page you want generated:
+
+```dart
+Router(
+  routes: [
+    for (var post in posts)
+      Route(path: '/posts/${post.id}', /* ... */),
+  ],
+);
+```
+
+Here, the `posts` list may be loaded from a database before the component builds.
+
+<Info>
+  Check the [Data Fetching](/concepts/data_fetching) guide on how to do this.
+</Info>
+
+### Manual usage
+
+If you want to set this up manually, you need to call `ServerApp.requestRouteGeneration('/my_route');` for any of your
+routes you want to generate.
+
+Since `ServerApp` is only available through the `package:jaspr/server.dart` import, you need to make sure this is only part of your
+server code and not the client.
+
+The method should be called during the initial build of your app, so putting it into `initState()` of your root component is a good choice.
+
+## Generating a Sitemap
+
+Jaspr can automatically generate a sitemap for your static site. To enable this, pass the `--sitemap-domain` argument to the `jaspr build` command, e.g.
+
+```bash
+jaspr build --sitemap-domain https://example.com
+```
+
+This will generate a `sitemap.xml` file in the output directory, which contains all the routes that were generated during the build process.
+
+You can customize the sitemap entries by passing a `RouteSettings` object to your routes:
+
+```dart
+Router(
+  routes: [
+    Route(path: '/summary', settings: RouteSettings(changeFreq: ChangeFreq.weekly, priority: 0.9)),
+  ],
+);
+````
+
+This will set the `changefreq` and `priority` attributes for the sitemap entry of this route like this:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  ...
+  <url>
+    <loc>https://example.com/summary</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  ...
+</urlset>
+```

@@ -11,12 +11,13 @@ class Analyze extends StatelessComponent {
   const Analyze({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DevexBox(
+  Component build(BuildContext context) {
+    return DevexBox(
       caption: 'ANALYZE',
       title: 'Linter and Code Completions',
-      description:
-          text('Jaspr comes with its own lints and code completions to boost your productivity during development.'),
+      description: text(
+        'Jaspr comes with its own lints and code completions to boost your productivity during development.',
+      ),
       preview: div(classes: 'analyze-preview', [
         div([
           div([
@@ -28,8 +29,8 @@ class Analyze extends StatelessComponent {
                 class App extends StatelessComponent {
                   const App({super.key});
 
-                  Iterable<Component> build(BuildContext context) sync* {
-                    yield div([
+                  Component build(BuildContext context) {
+                    return div([
                       ...
                 ''',
               lineClasses: {0: 'quick-select'},
@@ -38,11 +39,11 @@ class Analyze extends StatelessComponent {
               span([text('Quick Actions:')]),
               span([
                 Icon('lightbulb'),
-                span([text('Convert to StatefulComponent')])
+                span([text('Convert to StatefulComponent')]),
               ]),
               span([
                 Icon('lightbulb'),
-                span([text('Convert to AsyncStatelessComponent')])
+                span([text('Convert to AsyncStatelessComponent')]),
               ]),
             ]),
           ]),
@@ -52,7 +53,7 @@ class Analyze extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.analyze-preview', [
       css('&').styles(
         position: Position.relative(),
@@ -66,12 +67,8 @@ class Analyze extends StatelessComponent {
         maxWidth: 100.percent,
         transform: Transform.translate(x: (-50).percent, y: (-50).percent),
       ),
-      css('.quick-select  span.hljs-title:last-child').styles(
-        backgroundColor: primaryFaded,
-      ),
-      css('& > div > div').styles(
-        position: Position.relative(),
-      ),
+      css('.quick-select  span.hljs-title:last-child').styles(backgroundColor: primaryFaded),
+      css('& > div > div').styles(position: Position.relative()),
       css('.quick-actions', [
         css('&').styles(
           display: Display.flex,
@@ -87,10 +84,7 @@ class Analyze extends StatelessComponent {
           backgroundColor: surfaceLow,
           raw: {'width': 'max-content'},
         ),
-        css('& > span:first-child').styles(
-          color: textDim,
-          fontWeight: FontWeight.w600,
-        ),
+        css('& > span:first-child').styles(color: textDim, fontWeight: FontWeight.w600),
         css('& > span').styles(
           display: Display.flex,
           padding: Padding.symmetric(horizontal: 0.5.rem, vertical: 0.2.rem),
@@ -100,9 +94,7 @@ class Analyze extends StatelessComponent {
           gap: Gap(column: 0.2.rem),
           textAlign: TextAlign.left,
         ),
-        css('& > span:nth-child(2)').styles(
-          backgroundColor: hoverOverlayColor,
-        ),
+        css('& > span:nth-child(2)').styles(backgroundColor: hoverOverlayColor),
       ]),
     ]),
   ];

@@ -21,19 +21,21 @@ class ClientModuleBuilder implements Builder {
     } on SyntaxErrorInAssetException {
       rethrow;
     } catch (e, st) {
-      print('An unexpected error occurred.\n'
-          'This is probably a bug in jaspr_builder.\n'
-          'Please report this here: '
-          'https://github.com/schultek/jaspr/issues\n\n'
-          'The error was:\n$e\n\n$st');
+      print(
+        'An unexpected error occurred.\n'
+        'This is probably a bug in jaspr_builder.\n'
+        'Please report this here: '
+        'https://github.com/schultek/jaspr/issues\n\n'
+        'The error was:\n$e\n\n$st',
+      );
       rethrow;
     }
   }
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-        'lib/{{file}}.dart': ['lib/{{file}}.client.json', 'web/{{file}}.client.dart'],
-      };
+    'lib/{{file}}.dart': ['lib/{{file}}.client.json', 'lib/{{file}}.client.dart'],
+  };
 
   Future<void> generateClientModule(BuildStep buildStep) async {
     // Performance optimization
@@ -59,20 +61,23 @@ class ClientModuleBuilder implements Builder {
 
     if (annotated.length > 1) {
       log.severe(
-          "Cannot have multiple components annotated with @client in a single library. Failing library: ${library.source.fullName}.");
+        "Cannot have multiple components annotated with @client in a single library. Failing library: ${library.firstFragment.source.fullName}.",
+      );
     }
 
     var element = annotated.first;
 
     if (element is! ClassElement) {
       log.severe(
-          '@client can only be applied on classes. Failing element: ${element.name} in library ${library.source.fullName}.');
+        '@client can only be applied on classes. Failing element: ${element.name} in library ${library.firstFragment.source.fullName}.',
+      );
       return;
     }
 
     if (!componentChecker.isAssignableFrom(element)) {
       log.severe(
-          '@client can only be applied on classes extending Component. Failing element: ${element.name} in library ${library.source.fullName}.');
+        '@client can only be applied on classes extending Component. Failing element: ${element.name} in library ${library.firstFragment.source.fullName}.',
+      );
       return;
     }
 
@@ -93,19 +98,14 @@ class ClientModuleBuilder implements Builder {
   }
 
   Future<void> generateWebEntrypoint(ClientModule module, BuildStep buildStep) async {
-    var source = '''
+    var source =
+        '''
       $generationHeader
       
       import 'package:jaspr/browser.dart';
       [[/]]
             
-      void main() {
-        registerClientsSync({
-          '${module.id}': getComponentForParams,
-        });
-      }
-      
-      Component getComponentForParams(ConfigParams p) {
+      Component getComponentForParams(Map<String, dynamic> p) {
         return ${module.componentFactory()};
       }
     ''';
@@ -116,15 +116,15 @@ class ClientModuleBuilder implements Builder {
     ).format(source);
 
     var moduleId = AssetId.resolve(Uri.parse(module.import));
-    var webId =
-        AssetId(moduleId.package, moduleId.path.replaceFirst('lib/', 'web/').replaceFirst('.dart', '.client.dart'));
-    await buildStep.writeAsString(webId, source);
+
+    var entryId = AssetId(moduleId.package, moduleId.path.replaceFirst('.dart', '.client.dart'));
+    await buildStep.writeAsString(entryId, source);
   }
 }
 
 class ClientModule {
   final String name;
-  final String id;
+  final AssetId id;
   final String import;
   final List<ClientParam> params;
 
@@ -134,32 +134,34 @@ class ClientModule {
     var params = getParamsFor(element, codecs);
 
     return ClientModule(
-      name: element.name,
-      id: path.url.withoutExtension(buildStep.inputId.path).replaceFirst('lib/', ''),
+      name: element.name ?? '',
+      id: buildStep.inputId,
       import: buildStep.inputId.toImportUrl(),
       params: params,
     );
   }
 
+  String resolveId(String package) {
+    final a = package != id.package ? '${id.package}:' : '';
+    final b = path.url.withoutExtension(id.path).replaceFirst('lib/', '');
+    return '$a$b';
+  }
+
   factory ClientModule.deserialize(Map<String, dynamic> map) {
     return ClientModule(
       name: map['name'],
-      id: map['id'],
+      id: AssetId.deserialize(map['id']),
       import: map['import'],
-      params: [
-        for (var p in map['params']) ClientParam.deserialize(p),
-      ],
+      params: [for (var p in map['params']) ClientParam.deserialize(p)],
     );
   }
 
   Map<String, dynamic> serialize() => {
-        'name': name,
-        'id': id,
-        'import': import,
-        'params': [
-          for (var p in params) p.serialize(),
-        ],
-      };
+    'name': name,
+    'id': id.serialize(),
+    'import': import,
+    'params': [for (var p in params) p.serialize()],
+  };
 
   String componentFactory() {
     return '[[$import]].$name(${params.where((p) => !p.isNamed).map((p) => p.decoder).followedBy(params.where((p) => p.isNamed).map((p) => '${p.name}: ${p.decoder}')).join(', ')})';
@@ -172,41 +174,40 @@ class ClientParam {
   final String decoder;
   final String encoder;
 
-  ClientParam({
-    required this.name,
-    this.isNamed = false,
-    required this.decoder,
-    required this.encoder,
-  });
+  ClientParam({required this.name, this.isNamed = false, required this.decoder, required this.encoder});
 
   ClientParam.deserialize(Map<String, dynamic> map)
-      : name = map['name'],
-        isNamed = map['isNamed'],
-        decoder = map['decoder'],
-        encoder = map['encoder'];
+    : name = map['name'],
+      isNamed = map['isNamed'],
+      decoder = map['decoder'],
+      encoder = map['encoder'];
 
-  Map<String, dynamic> serialize() => {
-        'name': name,
-        'isNamed': isNamed,
-        'decoder': decoder,
-        'encoder': encoder,
-      };
+  Map<String, dynamic> serialize() => {'name': name, 'isNamed': isNamed, 'decoder': decoder, 'encoder': encoder};
 }
 
 List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
   final constr = e.constructors.first;
-  var params = constr.parameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
+  var params = constr.formalParameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
 
   for (var param in params) {
     if (!param.isInitializingFormal) {
-      throw UnsupportedError('Client components only support initializing formal constructor parameters. '
-          'Failing element: ${e.name}.${constr.name}($param)');
+      throw UnsupportedError(
+        'Client components only support initializing formal constructor parameters. '
+        'Failing element: ${e.name}.${constr.name}($param)',
+      );
     }
   }
 
   return params.map((p) {
-    var decoder = codecs.getDecoderFor(p.type, "p.get('${p.name}')");
-    var encoder = codecs.getEncoderFor(p.type, 'c.${p.name}');
-    return ClientParam(name: p.name, isNamed: p.isNamed, decoder: decoder, encoder: encoder);
+    try {
+      var decoder = codecs.getDecoderFor(p.type, "p.get('${p.name}')");
+      var encoder = codecs.getEncoderFor(p.type, 'c.${p.name}');
+      return ClientParam(name: p.name ?? '', isNamed: p.isNamed, decoder: decoder, encoder: encoder);
+    } on InvalidParameterException catch (_) {
+      throw UnsupportedError(
+        '@client components only support parameters of primitive serializable types or types that define @decoder and @encoder methods. '
+        'Failing parameter: [$p] in ${e.name}.${constr.name}()',
+      );
+    }
   }).toList();
 }

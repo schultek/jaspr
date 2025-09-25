@@ -1,16 +1,17 @@
-import 'package:flutter_multi_view/constants/theme.dart';
 import 'package:jaspr/jaspr.dart';
+
+import '../constants/theme.dart';
 
 class PulsingLoader extends StatelessComponent {
   const PulsingLoader({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'loader', []);
+  Component build(BuildContext context) {
+    return div(classes: 'loader', []);
   }
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.loader').styles(
       margin: Margin.all(Unit.auto),
       boxSizing: BoxSizing.borderBox,
@@ -19,14 +20,8 @@ class PulsingLoader extends StatelessComponent {
       raw: {'animation': 'loading 1s infinite ease-out'},
     ),
     css.keyframes('loading', {
-      '0%': Styles(
-        width: 0.px,
-        height: 0.px,
-        backgroundColor: loaderColor,
-      ),
-      '29%': Styles(
-        backgroundColor: loaderColor,
-      ),
+      '0%': Styles(width: 0.px, height: 0.px, backgroundColor: loaderColor),
+      '29%': Styles(backgroundColor: loaderColor),
       '30%': Styles(
         width: 30.px,
         height: 30.px,
@@ -41,7 +36,7 @@ class PulsingLoader extends StatelessComponent {
         opacity: 0,
         backgroundColor: Colors.transparent,
       ),
-    })
+    }),
   ];
 }
 

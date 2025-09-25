@@ -69,7 +69,7 @@ class ServerTester {
     _handler = ServerApp.createTestHandler(
       (r, render) => render((binding) {
         binding.initializeOptions(options);
-        binding.attachRootComponent(_comp.component ?? Builder(builder: (_) => []));
+        binding.attachRootComponent(_comp.component ?? Component.fragment([]));
       }),
       fileHandler: (Request request) {
         return Response.notFound('Not Found');
@@ -92,11 +92,7 @@ class ServerTester {
 
     var doc = statusCode == 200 ? parse(body) : null;
 
-    return DocumentResponse(
-      statusCode: statusCode,
-      body: body,
-      document: doc?.body != null ? doc : null,
-    );
+    return DocumentResponse(statusCode: statusCode, body: body, document: doc?.body != null ? doc : null);
   }
 }
 

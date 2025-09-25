@@ -4,9 +4,7 @@ import 'path_utils.dart';
 import 'typedefs.dart';
 
 abstract class RouteBase {
-  const RouteBase._({
-    this.routes = const <RouteBase>[],
-  });
+  const RouteBase._({this.routes = const <RouteBase>[]});
 
   /// The list of child routes associated with this route.
   final List<RouteBase> routes;
@@ -23,11 +21,12 @@ class Route extends RouteBase {
     this.title,
     this.builder,
     this.redirect,
+    this.settings,
     super.routes = const <RouteBase>[],
-  })  : assert(path.isNotEmpty, 'Route path cannot be empty'),
-        assert(name == null || name.isNotEmpty, 'Route name cannot be empty'),
-        assert(builder != null || redirect != null, 'Route builder or redirect must be provided'),
-        super._() {
+  }) : assert(path.isNotEmpty, 'Route path cannot be empty'),
+       assert(name == null || name.isNotEmpty, 'Route name cannot be empty'),
+       assert(builder != null || redirect != null, 'Route builder or redirect must be provided'),
+       super._() {
     // cache the path regexp and parameters
     _pathRE = patternToRegExp(path, pathParams);
   }
@@ -38,6 +37,7 @@ class Route extends RouteBase {
     String? title,
     RouterComponentBuilder? builder,
     RouterRedirect? redirect,
+    RouteSettings? settings,
     required AsyncCallback load,
     List<RouteBase> routes,
   }) = LazyRoute;
@@ -67,6 +67,9 @@ class Route extends RouteBase {
   /// this parameter over the global redirect function of the [Router].
   final RouterRedirect? redirect;
 
+  /// The sitemap settings for this route.
+  final RouteSettings? settings;
+
   // @internal
   final List<String> pathParams = <String>[];
 
@@ -86,6 +89,7 @@ class LazyRoute extends Route with LazyRouteBase {
     super.title,
     super.builder,
     super.redirect,
+    super.settings,
     required AsyncCallback load,
     super.routes = const <RouteBase>[],
   }) {
@@ -95,17 +99,10 @@ class LazyRoute extends Route with LazyRouteBase {
 
 /// A route that displays a UI shell around the matching child route.
 class ShellRoute extends RouteBase {
-  ShellRoute({
-    required this.builder,
-    super.routes,
-  })  : assert(routes.isNotEmpty),
-        super._();
+  ShellRoute({required this.builder, super.routes}) : assert(routes.isNotEmpty), super._();
 
-  factory ShellRoute.lazy({
-    required ShellRouteBuilder builder,
-    required AsyncCallback load,
-    List<RouteBase> routes,
-  }) = LazyShellRoute;
+  factory ShellRoute.lazy({required ShellRouteBuilder builder, required AsyncCallback load, List<RouteBase> routes}) =
+      LazyShellRoute;
 
   /// The builder for a shell route.
   ///
@@ -117,11 +114,7 @@ class ShellRoute extends RouteBase {
 
 /// A [ShellRoute] that is lazily loaded like a [LazyRoute].
 class LazyShellRoute extends ShellRoute with LazyRouteBase {
-  LazyShellRoute({
-    required super.builder,
-    required AsyncCallback load,
-    super.routes,
-  }) {
+  LazyShellRoute({required super.builder, required AsyncCallback load, super.routes}) {
     this.load = load;
   }
 }
@@ -130,3 +123,27 @@ mixin LazyRouteBase on RouteBase {
   /// Called when the route is matched and defers the rendering until completed.
   late final AsyncCallback load;
 }
+
+/// Settings for a route.
+class RouteSettings {
+  const RouteSettings({this.lastMod, this.changeFreq, this.priority = 0.5});
+
+  /// The date of last modification of the page.
+  final DateTime? lastMod;
+
+  /// How frequently the page is likely to change.
+  final ChangeFreq? changeFreq;
+
+  /// The priority of this URL relative to other pages on the site.
+  /// Valid values are between 0.0 and 1.0, with 0.5 being the default.
+  ///
+  /// Search engines may use this value to prioritize crawling.
+  final double priority;
+}
+
+/// How frequently the page is likely to change. This value provides general information to search engines and may not correlate exactly to how often they crawl the page.
+///
+/// The value "always" should be used to describe documents that change each time they are accessed. The value "never" should be used to describe archived URLs.
+///
+/// Please note that the value of this tag is considered a hint and not a command. Even though search engine crawlers may consider this information when making decisions, they may crawl pages marked "hourly" less frequently than that, and they may crawl pages marked "yearly" more frequently than that. Crawlers may periodically crawl pages marked "never" so that they can handle unexpected changes to those pages.
+enum ChangeFreq { always, hourly, daily, weekly, monthly, yearly, never }

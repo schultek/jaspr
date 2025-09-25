@@ -28,7 +28,7 @@ The Flutter team itself has stated on multiple occasions that
 That just means that while Flutter Web is a great technology for sharing your apps across multiple 
 platforms including the web, it may not be suited for all types of websites that you want to build.
 
-The [flutter docs](https://docs.flutter.dev/web) write in that regard:
+The [flutter docs](https://docs.flutter.dev/platform-integration/web) write in that regard:
 
 > Not every HTML scenario is ideally suited for Flutter at this time. For example, text-rich, flow-based, 
 > static content such as blog articles benefit from the document-centric model that the web is built around, 
@@ -39,35 +39,15 @@ The [flutter docs](https://docs.flutter.dev/web) write in that regard:
 ## Conceptual Differences
 
 As you might know Flutter renders Widgets by manually painting pixels to a canvas. However, rendering web-pages
-with HTML & CSS works **fundamentally different** to Flutters painting approach. Also, Flutter has a vast variety
-of widgets with different purposes and styling, whereas in html you can uniquely style each html element however
+with HTML & CSS works **fundamentally different** to Flutter's painting approach. Also, Flutter has a vast variety
+of widgets with different purposes and styling, whereas in HTML you can uniquely style each HTML element however
 you like.
 
 Instead of trying to mirror every little thing from Flutter, `jaspr` tries to give a general Fluttery feeling
 by matching features where it makes sense without compromising on the unique properties of the web platform.
 Rather it **embraces these differences** to give the best of both worlds.
 
-1. The `build()` method of a `StatelessComponent` or `StatefulComponent` returns an `Iterable<Component>`
-   instead of a single component. This is because a HTML element can always have multiple child elements.
-   The recommended way of using this is with a [**synchronous generator**](https://dart.dev/guides/language/language-tour#generators).
-   Simply use the `sync*` keyword in the method definition and `yield` one or multiple components:
-
-   ```dart
-   class MyComponent extends StatelessComponent {
-     @override
-     Iterable<Component> build(BuildContext context) sync* {
-       yield ChildA();
-       yield ChildB();
-     } 
-   }
-   ```
-
-   <Info>
-   Trade-Off: Returning a single component and having an extra multi-child component would be superficial
-   to how html works and thereby not a good practice.
-   </Info>
-
-2. Jaspr does not care about the styling of components. There are (currently) no pre-styled components
+1. Jaspr does not care about the styling of components. There are (currently) no pre-styled components
    like in Flutters material or cupertino libraries.
 
    <Info>
@@ -76,7 +56,7 @@ Rather it **embraces these differences** to give the best of both worlds.
    integrate and use with jaspr (e.g. [Bulma](https://playground.jaspr.site/?sample=bulma)).
    </Info>
 
-3. `Text` receives only a `String` and nothing else. As usual for web, styling is done through a combination
+2. `Text` receives only a `String` and nothing else. As usual for web, styling is done through a combination
    of CSS attributes, either in a **Stylesheet** or though the **`style` attribute** of the parent elements.
 
    <Info>
@@ -88,7 +68,7 @@ Rather it **embraces these differences** to give the best of both worlds.
 
 ## Flutter Web Embedding
 
-A Flutter web app can be embedded in a normal website using Flutters **element embedding** feature. Jaspr has first-class
+A Flutter web app can be embedded in a normal website using Flutter's **element embedding** feature. Jaspr has first-class
 support for this feature and allows the embedding of a flutter web app as part of a jaspr website.
 
 For more details on this feature refer to the [Flutter Embedding](/going_further/flutter_embedding) page.

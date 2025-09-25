@@ -9,35 +9,37 @@ part of 'html.dart';
 /// - [muted]: Indicates whether the audio will be initially silenced. Its default value is false.
 /// - [preload]: Provides a hint to the browser about what the author thinks will lead to the best user experience.
 /// - [src]: The URL of the audio to embed. This is subject to HTTP access controls. This is optional; you may instead use the &lt;source&gt; element within the audio block to specify the audio to embed.
-Component audio(List<Component> children,
-    {bool? autoplay,
-    bool? controls,
-    CrossOrigin? crossOrigin,
-    bool? loop,
-    bool? muted,
-    Preload? preload,
-    String? src,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component audio(
+  List<Component> children, {
+  bool? autoplay,
+  bool? controls,
+  CrossOrigin? crossOrigin,
+  bool? loop,
+  bool? muted,
+  Preload? preload,
+  String? src,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'audio',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (autoplay == true) 'autoplay': '',
       if (controls == true) 'controls': '',
-      if (crossOrigin != null) 'crossorigin': crossOrigin.value,
+      'crossorigin': ?crossOrigin?.value,
       if (loop == true) 'loop': '',
       if (muted == true) 'muted': '',
-      if (preload != null) 'preload': preload.value,
-      if (src != null) 'src': src,
+      'preload': ?preload?.value,
+      'src': ?src,
     },
     events: events,
     children: children,
@@ -81,35 +83,36 @@ enum Preload {
 /// - [loading]: Indicates how the browser should load the image.
 /// - [src]: The image URL.
 /// - [referrerPolicy]: Indicates which referrer to send when fetching the resource.
-Component img(
-    {String? alt,
-    CrossOrigin? crossOrigin,
-    int? width,
-    int? height,
-    MediaLoading? loading,
-    required String src,
-    ReferrerPolicy? referrerPolicy,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component img({
+  String? alt,
+  CrossOrigin? crossOrigin,
+  int? width,
+  int? height,
+  MediaLoading? loading,
+  required String src,
+  ReferrerPolicy? referrerPolicy,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'img',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
-      if (alt != null) 'alt': alt,
-      if (crossOrigin != null) 'crossorigin': crossOrigin.value,
-      if (width != null) 'width': '$width',
-      if (height != null) 'height': '$height',
-      if (loading != null) 'loading': loading.value,
+      ...?attributes,
+      'alt': ?alt,
+      'crossorigin': ?crossOrigin?.value,
+      'width': ?width?.toString(),
+      'height': ?height?.toString(),
+      'loading': ?loading?.value,
       'src': src,
-      if (referrerPolicy != null) 'referrerpolicy': referrerPolicy.value,
+      'referrerpolicy': ?referrerPolicy?.value,
     },
     events: events,
   );
@@ -139,41 +142,43 @@ enum MediaLoading {
 /// - [src]: The URL of the video to embed. This is optional; you may instead use the &lt;source&gt; element within the video block to specify the video to embed.
 /// - [width]: The width of the video's display area, in CSS pixels.
 /// - [height]: The height of the video's display area, in CSS pixels.
-Component video(List<Component> children,
-    {bool? autoplay,
-    bool? controls,
-    CrossOrigin? crossOrigin,
-    bool? loop,
-    bool? muted,
-    String? poster,
-    Preload? preload,
-    String? src,
-    int? width,
-    int? height,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component video(
+  List<Component> children, {
+  bool? autoplay,
+  bool? controls,
+  CrossOrigin? crossOrigin,
+  bool? loop,
+  bool? muted,
+  String? poster,
+  Preload? preload,
+  String? src,
+  int? width,
+  int? height,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'video',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       if (autoplay == true) 'autoplay': '',
       if (controls == true) 'controls': '',
-      if (crossOrigin != null) 'crossorigin': crossOrigin.value,
+      'crossorigin': ?crossOrigin?.value,
       if (loop == true) 'loop': '',
       if (muted == true) 'muted': '',
-      if (poster != null) 'poster': poster,
-      if (preload != null) 'preload': preload.value,
-      if (src != null) 'src': src,
-      if (width != null) 'width': '$width',
-      if (height != null) 'height': '$height',
+      'poster': ?poster,
+      'preload': ?preload?.value,
+      'src': ?src,
+      'width': ?width?.toString(),
+      'height': ?height?.toString(),
     },
     events: events,
     children: children,
@@ -186,29 +191,30 @@ Component video(List<Component> children,
 /// - [type]: The MIME type to use to select the plug-in to instantiate.
 /// - [width]: The displayed width of the resource, in CSS pixels.
 /// - [height]: The displayed height of the resource, in CSS pixels.
-Component embed(
-    {required String src,
-    String? type,
-    int? width,
-    int? height,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component embed({
+  required String src,
+  String? type,
+  int? width,
+  int? height,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'embed',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       'src': src,
-      if (type != null) 'type': type,
-      if (width != null) 'width': '$width',
-      if (height != null) 'height': '$height',
+      'type': ?type,
+      'width': ?width?.toString(),
+      'height': ?height?.toString(),
     },
     events: events,
   );
@@ -225,39 +231,41 @@ Component embed(
 /// - [referrerPolicy]: Indicates which referrer to send when fetching the frame's resource.
 /// - [width]: The width of the frame in CSS pixels. Default is 300.
 /// - [height]: The height of the frame in CSS pixels. Default is 150.
-Component iframe(List<Component> children,
-    {required String src,
-    String? allow,
-    String? csp,
-    MediaLoading? loading,
-    String? name,
-    String? sandbox,
-    ReferrerPolicy? referrerPolicy,
-    int? width,
-    int? height,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component iframe(
+  List<Component> children, {
+  required String src,
+  String? allow,
+  String? csp,
+  MediaLoading? loading,
+  String? name,
+  String? sandbox,
+  ReferrerPolicy? referrerPolicy,
+  int? width,
+  int? height,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'iframe',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
+      ...?attributes,
       'src': src,
-      if (allow != null) 'allow': allow,
-      if (csp != null) 'csp': csp,
-      if (loading != null) 'loading': loading.value,
-      if (name != null) 'name': name,
-      if (sandbox != null) 'sandbox': sandbox,
-      if (referrerPolicy != null) 'referrerpolicy': referrerPolicy.value,
-      if (width != null) 'width': '$width',
-      if (height != null) 'height': '$height',
+      'allow': ?allow,
+      'csp': ?csp,
+      'loading': ?loading?.value,
+      'name': ?name,
+      'sandbox': ?sandbox,
+      'referrerpolicy': ?referrerPolicy?.value,
+      'width': ?width?.toString(),
+      'height': ?height?.toString(),
     },
     events: events,
     children: children,
@@ -301,31 +309,33 @@ enum ReferrerPolicy {
 /// - [type]: The content type of the resource specified by data. At least one of data and type must be defined.
 /// - [width]: The width of the displayed resource in CSS pixels.
 /// - [height]: The height of the displayed resource in CSS pixels.
-Component object(List<Component> children,
-    {String? data,
-    String? name,
-    String? type,
-    int? width,
-    int? height,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component object(
+  List<Component> children, {
+  String? data,
+  String? name,
+  String? type,
+  int? width,
+  int? height,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'object',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
-      if (data != null) 'data': data,
-      if (name != null) 'name': name,
-      if (type != null) 'type': type,
-      if (width != null) 'width': '$width',
-      if (height != null) 'height': '$height',
+      ...?attributes,
+      'data': ?data,
+      'name': ?name,
+      'type': ?type,
+      'width': ?width?.toString(),
+      'height': ?height?.toString(),
     },
     events: events,
     children: children,
@@ -338,26 +348,71 @@ Component object(List<Component> children,
 /// - [src]: Address of the media resource.
 ///
 ///   Required if the source element's parent is an &lt;audio&gt; and &lt;video&gt; element, but not allowed if the source element's parent is a &lt;picture&gt; element.
-Component source(
-    {String? type,
-    String? src,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component source({
+  String? type,
+  String? src,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'source',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
-      if (type != null) 'type': type,
-      if (src != null) 'src': src,
+      ...?attributes,
+      'type': ?type,
+      'src': ?src,
     },
     events: events,
+  );
+}
+
+/// The &lt;figure&gt; HTML element represents self-contained content, potentially with an optional caption, which is specified using the &lt;figcaption&gt; element. The figure, its caption, and its contents are referenced as a single unit.
+Component figure(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
+    tag: 'figure',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: attributes,
+    events: events,
+    children: children,
+  );
+}
+
+/// The &lt;figcaption&gt; HTML element represents a caption or legend describing the rest of the contents of its parent &lt;figure&gt; element, providing the &lt;figure&gt;> an accessible description.
+Component figcaption(
+  List<Component> children, {
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
+    tag: 'figcaption',
+    key: key,
+    id: id,
+    classes: classes,
+    styles: styles,
+    attributes: attributes,
+    events: events,
+    children: children,
   );
 }

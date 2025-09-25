@@ -9,20 +9,21 @@ class App extends StatelessComponent {
   const App({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Button(
-      label: 'Button 1',
-      onPressed: () {
-        print("Button 1 pressed");
-      },
-    );
-
-    yield Button(
-      label: 'Button 2',
-      onPressed: () {
-        print("Button 2 pressed");
-      },
-    );
+  Component build(BuildContext context) {
+    return div([
+      Button(
+        label: 'Button 1',
+        onPressed: () {
+          print("Button 1 pressed");
+        },
+      ),
+      Button(
+        label: 'Button 2',
+        onPressed: () {
+          print("Button 2 pressed");
+        },
+      ),
+    ]);
   }
 }
 
@@ -33,10 +34,7 @@ class Button extends StatelessComponent {
   final VoidCallback onPressed;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield button(
-      onClick: onPressed,
-      [text(label)],
-    );
+  Component build(BuildContext context) {
+    return button(onClick: onPressed, [text(label)]);
   }
 }

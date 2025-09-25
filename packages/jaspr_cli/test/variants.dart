@@ -168,7 +168,6 @@ enum FlutterOption {
             ('version.json', fileExists),
             ('flutter_service_worker.js', fileExists),
             ('canvaskit/canvaskit.js', fileExists),
-            ('assets/AssetManifest.json', fileExists),
           },
         pluginsOnly => {},
       };

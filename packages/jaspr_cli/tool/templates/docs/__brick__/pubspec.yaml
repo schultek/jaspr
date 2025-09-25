@@ -1,0 +1,21 @@
+name: {{name}}
+description: {{description}}
+version: 0.0.1
+
+environment:
+  sdk: '>=3.8.0 <4.0.0'
+
+dependencies:
+  jaspr: ^{{jasprCoreVersion}}
+  jaspr_content: ^{{jasprContentVersion}}
+  jaspr_router: ^{{jasprRouterVersion}}
+
+dev_dependencies:
+  build_runner: ^2.6.0
+  jaspr_web_compilers: ^{{jasprWebCompilersVersion}}
+  jaspr_builder: ^{{jasprBuilderVersion}}
+  jaspr_lints: ^{{jasprLintsVersion}}
+  lints: ^5.0.0
+
+jaspr:
+  mode: static

@@ -7,19 +7,39 @@ class Icon extends StatelessComponent {
   final Unit? size;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
+    final children = <Component>[];
     if (name == 'jasper') {
-      yield img(src: 'images/jasper_icon.png', alt: 'jasper-icon', styles: Styles(height: size ?? 1.2.em));
-      return;
+      children.add(
+        img(
+          src: 'images/jasper_icon.png',
+          alt: 'jasper-icon',
+          styles: Styles(height: size ?? 1.2.em),
+        ),
+      );
+      return fragment(children);
     } else if (name == 'dart') {
-      yield img(src: 'images/dart_icon.png', alt: 'dart-icon', styles: Styles(height: size ?? 1.2.em));
-      return;
+      children.add(
+        img(
+          src: 'images/dart_icon.png',
+          alt: 'dart-icon',
+          styles: Styles(height: size ?? 1.2.em),
+        ),
+      );
+      return fragment(children);
     }
-    yield i(classes: 'icon-$name', styles: Styles(fontSize: size ?? 1.2.em), []);
+    children.add(
+      i(
+        classes: 'icon-$name',
+        styles: Styles(fontSize: size ?? 1.2.em),
+        [],
+      ),
+    );
+    return fragment(children);
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('[class^=icon-custom-]').styles(
       width: 1.em,
       height: 1.em,

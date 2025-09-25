@@ -73,29 +73,32 @@ class MockRouteRegistry implements RouteRegistry {
   Future<void> registerRoutes(List<RouteBase> routes) async {}
 }
 
-Route homeRoute() => Route(path: '/', builder: (_, __) => Page(path: 'home'));
+Route homeRoute() => Route(
+  path: '/',
+  builder: (_, __) => Page(path: 'home'),
+);
 Route route(String path, [List<RouteBase> routes = const [], String? name, RouterRedirect? redirect]) => Route(
-      path: path,
-      name: name,
-      redirect: redirect,
-      builder: (_, s) => Page(path: s.subloc),
-      routes: routes,
-    );
+  path: path,
+  name: name,
+  redirect: redirect,
+  builder: (_, s) => Page(path: s.subloc),
+  routes: routes,
+);
 Route lazyRoute(String path, Future future, [List<RouteBase> routes = const []]) => Route.lazy(
-      path: path,
-      builder: (_, s) => Page(path: s.subloc),
-      load: () => future,
-      routes: routes,
-    );
+  path: path,
+  builder: (_, s) => Page(path: s.subloc),
+  load: () => future,
+  routes: routes,
+);
 ShellRoute shellRoute(String name, List<RouteBase> routes) => ShellRoute(
-      builder: (_, s, c) => Page(path: name, child: c),
-      routes: routes,
-    );
+  builder: (_, s, c) => Page(path: name, child: c),
+  routes: routes,
+);
 ShellRoute lazyShellRoute(String name, Future future, List<RouteBase> routes) => ShellRoute.lazy(
-      builder: (_, s, c) => Page(path: name, child: c),
-      load: () => future,
-      routes: routes,
-    );
+  builder: (_, s, c) => Page(path: name, child: c),
+  load: () => future,
+  routes: routes,
+);
 
 class Page extends StatelessComponent {
   Page({required this.path, this.child});
@@ -104,17 +107,19 @@ class Page extends StatelessComponent {
   final Component? child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var label = path.startsWith('/') ? path.substring(1) : path;
-    yield span([text(label)]);
+    final children = <Component>[];
+    children.add(span([text(label)]));
 
     var state = RouteState.of(context);
     if (state.params.isNotEmpty) {
-      yield span([text(state.params.entries.map((e) => '${e.key}=${e.value}').join(','))]);
+      children.add(span([text(state.params.entries.map((e) => '${e.key}=${e.value}').join(','))]));
     }
 
     if (child != null) {
-      yield div([child!]);
+      children.add(div([child!]));
     }
+    return Component.fragment(children);
   }
 }

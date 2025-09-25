@@ -12,12 +12,9 @@ export 'state.dart';
 /// The route configuration for GoRouter configured by the app.
 class RouteConfiguration {
   /// Constructs a [RouteConfiguration].
-  RouteConfiguration({
-    required this.routes,
-    required this.redirectLimit,
-    required this.topRedirect,
-  })  : assert(_debugCheckPath(routes, true)),
-        assert(_debugVerifyNoDuplicatePathParameter(routes, <String, Route>{})) {
+  RouteConfiguration({required this.routes, required this.redirectLimit, required this.topRedirect})
+    : assert(_debugCheckPath(routes, true)),
+      assert(_debugVerifyNoDuplicatePathParameter(routes, <String, Route>{})) {
     _cacheNameToPath('', routes);
   }
 
@@ -28,8 +25,10 @@ class RouteConfiguration {
         if (isTopLevel) {
           assert(route.path.startsWith('/'), 'top-level path must start with "/": $route');
         } else {
-          assert(!route.path.startsWith('/') && !route.path.endsWith('/'),
-              'sub-route path may not start or end with /: $route');
+          assert(
+            !route.path.startsWith('/') && !route.path.endsWith('/'),
+            'sub-route path may not start or end with /: $route',
+          );
         }
         subRouteIsTopLevel = false;
       } else if (route is ShellRoute) {
@@ -49,7 +48,8 @@ class RouteConfiguration {
         if (usedPathParams.containsKey(pathParam)) {
           final bool sameRoute = usedPathParams[pathParam] == route;
           throw RouterError(
-              "duplicate path parameter, '$pathParam' found in ${sameRoute ? '$route' : '${usedPathParams[pathParam]}, and $route'}");
+            "duplicate path parameter, '$pathParam' found in ${sameRoute ? '$route' : '${usedPathParams[pathParam]}, and $route'}",
+          );
         }
         usedPathParams[pathParam] = route;
       }
@@ -77,10 +77,12 @@ class RouteConfiguration {
     Map<String, dynamic> queryParams = const <String, dynamic>{},
   }) {
     assert(() {
-      log('getting location for name: '
-          '"$name"'
-          '${params.isEmpty ? '' : ', params: $params'}'
-          '${queryParams.isEmpty ? '' : ', queryParams: $queryParams'}');
+      log(
+        'getting location for name: '
+        '"$name"'
+        '${params.isEmpty ? '' : ', params: $params'}'
+        '${queryParams.isEmpty ? '' : ', queryParams: $queryParams'}',
+      );
       return true;
     }());
     final String keyName = name.toLowerCase();
@@ -101,7 +103,7 @@ class RouteConfiguration {
       return true;
     }());
     final Map<String, String> encodedParams = <String, String>{
-      for (final MapEntry<String, String> param in params.entries) param.key: Uri.encodeComponent(param.value)
+      for (final MapEntry<String, String> param in params.entries) param.key: Uri.encodeComponent(param.value),
     };
     final String location = patternToPath(path, encodedParams);
     return Uri(path: location, queryParameters: queryParams.isEmpty ? null : queryParams).toString();
@@ -152,9 +154,10 @@ class RouteConfiguration {
         if (route.name != null) {
           final String name = route.name!.toLowerCase();
           assert(
-              !_nameToPath.containsKey(name),
-              'duplication fullpaths for name '
-              '"$name":${_nameToPath[name]}, $fullPath');
+            !_nameToPath.containsKey(name),
+            'duplication fullpaths for name '
+            '"$name":${_nameToPath[name]}, $fullPath',
+          );
           _nameToPath[name] = fullPath;
         }
 

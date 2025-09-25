@@ -1,25 +1,26 @@
 name: flutter_multi_view
 description: A new jaspr project.
-version: 0.0.4
+version: 0.0.8
 publish_to: none
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
+
+resolution: workspace
 
 dependencies:
   flutter:
     sdk: flutter
-  jaspr: ^0.18.0
-  jaspr_flutter_embed: ^0.4.5
+  jaspr: ^0.21.0
+  jaspr_flutter_embed: ^0.4.7
 
 dev_dependencies:
-  build_runner: ^2.4.0
-  jaspr_web_compilers: ^4.0.10
-  jaspr_builder: ^0.16.3
+  build_runner: ^2.6.0
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
-  jaspr_lints: ^0.2.0
+  jaspr_builder: ^0.21.0
+  jaspr_repo: any
+  jaspr_web_compilers: ^4.2.0
 
 jaspr:
   mode: static

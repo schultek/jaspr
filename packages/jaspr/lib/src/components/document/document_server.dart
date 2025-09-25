@@ -11,9 +11,11 @@ export '../style.dart' hide Style;
 abstract class Document implements Component {
   /// Sets up a basic document structure at the root of your app and renders the main `<html>`, `<head>` and `<body>` tags.
   ///
-  /// The `title` and `base` parameters are rendered as the `<title>` and `<base>` elements respectively.
+  /// The `title` parameter is rendered as the `<title>` element.
+  /// The `lang` parameter is set as the `lang` attribute on the `<html>` element.
+  /// The `base` parameter is rendered as the `<base href=...>` element and defaults to `'/'`.
   /// The `charset`, `viewport` and `meta` values are rendered as `<meta>` elements in `<head>`.
-  /// The `styles` parameter is rendered to css in a `<style` element inside `<head>`.
+  /// The `styles` parameter is rendered to css in a `<style>` element inside `<head>`.
   /// The `head` components are also rendered inside `<head>`.
   ///
   /// The `body` component is rendered inside the `<body>` element.
@@ -34,11 +36,7 @@ abstract class Document implements Component {
   ///
   /// The `name` (default 'index') defines which template file to load: `web/<name>.template.html`.
   /// The `attachTo`(default 'body') defines where to attach the child component in the loaded template.
-  const factory Document.template({
-    String name,
-    String attachTo,
-    required Component child,
-  }) = TemplateDocument;
+  const factory Document.template({String name, String attachTo, required Component child}) = TemplateDocument;
 
   /// Attaches a set of attributes to the `<html>` element.
   ///
@@ -47,10 +45,7 @@ abstract class Document implements Component {
   ///
   /// Can be used multiple times in an application where deeper or latter mounted
   /// components will override duplicate attributes from other `.html()` components.
-  const factory Document.html({
-    Map<String, String>? attributes,
-    Key? key,
-  }) = AttachDocument.html;
+  const factory Document.html({Map<String, String>? attributes, Key? key}) = AttachDocument.html;
 
   /// Renders metadata and other elements inside the `<head>` of the document.
   ///
@@ -91,12 +86,8 @@ abstract class Document implements Component {
   /// - elements with an `id` override other elements with the same `id`
   /// - `<title>` and `<base>` elements override other `<title>` or `<base>` elements respectively
   /// - `<meta>` elements override other `<meta>` elements with the same `name`
-  const factory Document.head({
-    String? title,
-    Map<String, String>? meta,
-    List<Component>? children,
-    Key? key,
-  }) = HeadDocument;
+  const factory Document.head({String? title, Map<String, String>? meta, List<Component>? children, Key? key}) =
+      HeadDocument;
 
   /// Attaches a set of attributes to the `<body>` element.
   ///
@@ -105,10 +96,7 @@ abstract class Document implements Component {
   ///
   /// Can be used multiple times in an application where deeper or latter mounted
   /// components will override duplicate attributes from other `.body()` components.
-  const factory Document.body({
-    Map<String, String>? attributes,
-    Key? key,
-  }) = AttachDocument.body;
+  const factory Document.body({Map<String, String>? attributes, Key? key}) = AttachDocument.body;
 }
 
 // Only allow a single Document.
@@ -122,7 +110,7 @@ class BaseDocument extends StatelessComponent implements Document {
   const BaseDocument({
     this.title,
     this.lang,
-    this.base,
+    this.base = '/',
     this.charset = 'utf-8',
     this.viewport = 'width=device-width, initial-scale=1.0',
     this.meta = const {},
@@ -150,50 +138,38 @@ class BaseDocument extends StatelessComponent implements Document {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
+  Component build(BuildContext context) {
+    return Component.element(
       tag: 'html',
-      attributes: {
-        if (lang != null) 'lang': lang!,
-      },
+      attributes: {if (lang != null) 'lang': lang!},
       children: [
-        DomComponent(
+        Component.element(
           tag: 'head',
           children: [
-            if (base != null) DomComponent(tag: 'base', attributes: {'href': _normalizedBase!}),
-            if (charset != null) DomComponent(tag: 'meta', attributes: {'charset': charset!}),
-            HeadDocument(
-              title: title,
-              meta: {
-                if (viewport != null) 'viewport': viewport!,
-                ...meta,
-              },
-            ),
+            if (base != null) Component.element(tag: 'base', attributes: {'href': _normalizedBase!}),
+            if (charset != null) Component.element(tag: 'meta', attributes: {'charset': charset!}),
+            HeadDocument(title: title, meta: {if (viewport != null) 'viewport': viewport!, ...meta}),
             if (styles.isNotEmpty) //
               Style(styles: styles),
             ...head,
           ],
         ),
-        DomComponent(tag: 'body', child: body),
+        Component.element(tag: 'body', children: [body]),
       ],
     );
   }
 }
 
 class TemplateDocument extends StatelessComponent implements Document {
-  const TemplateDocument({
-    this.name = 'index',
-    this.attachTo = 'body',
-    required this.child,
-  }) : super(key: _documentKey);
+  const TemplateDocument({this.name = 'index', this.attachTo = 'body', required this.child}) : super(key: _documentKey);
 
   final String name;
   final String attachTo;
   final Component child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield child;
+  Component build(BuildContext context) {
+    return child;
   }
 
   @override
@@ -206,7 +182,7 @@ class _TemplateDocumentElement extends StatelessElement {
   Future<String?>? _templateFuture;
 
   @override
-  Iterable<Component> build() {
+  Component build() {
     (binding as ServerAppBinding).addRenderAdapter(TemplateDocumentAdapter(this));
     _templateFuture ??= (binding as ServerAppBinding).loadFile('${(component as TemplateDocument).name}.template.html');
     return super.build();
@@ -235,20 +211,22 @@ class TemplateDocumentAdapter extends ElementBoundaryAdapter {
     var document = parse(template);
     var target = document.querySelector((element.component as TemplateDocument).attachTo)!;
 
+    final MarkupRenderObject parent = element.parentRenderObjectElement!.renderObject as MarkupRenderObject;
+
     MarkupRenderObject? createTree(dom.Node node) {
-      var n = element.parentRenderObjectElement!.renderObject.createChildRenderObject() as MarkupRenderObject;
+      MarkupRenderObject n;
 
       if (node is dom.Text) {
         if (node.text.trim().isEmpty) {
           return null;
         }
-        n.updateText(node.text.trim(), true);
+        n = parent.createChildRenderText(node.text.trim(), true);
       } else if (node is dom.Comment) {
-        n.updateText('<!--${node.data}-->', true);
+        n = parent.createChildRenderText('<!--${node.data}-->', true);
       } else if (node is dom.Element) {
-        n.updateElement(node.localName!, null, null, null, node.attributes.cast(), null);
+        n = parent.createChildRenderElement(node.localName!)..update(null, null, null, node.attributes.cast(), null);
       } else if (node is dom.DocumentType) {
-        n.updateText(node.toString(), true);
+        n = parent.createChildRenderText(node.toString(), true);
       } else {
         throw UnsupportedError('Unsupported node type ${node.nodeType}');
       }
@@ -297,14 +275,14 @@ class HeadDocument extends StatelessComponent implements Document {
   final List<Component>? children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield AttachDocument(
+  Component build(BuildContext context) {
+    return AttachDocument(
       target: 'head',
       attributes: null,
       children: [
-        if (title != null) DomComponent(tag: 'title', child: Text(title!)),
+        if (title != null) Component.element(tag: 'title', children: [Component.text(title!)]),
         if (meta != null)
-          for (var e in meta!.entries) DomComponent(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+          for (var e in meta!.entries) Component.element(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
         ...?children,
       ],
     );
@@ -312,12 +290,8 @@ class HeadDocument extends StatelessComponent implements Document {
 }
 
 class AttachDocument extends StatelessComponent implements Document {
-  const AttachDocument.html({this.attributes, super.key})
-      : target = 'html',
-        children = null;
-  const AttachDocument.body({this.attributes, super.key})
-      : target = 'body',
-        children = null;
+  const AttachDocument.html({this.attributes, super.key}) : target = 'html', children = null;
+  const AttachDocument.body({this.attributes, super.key}) : target = 'body', children = null;
   const AttachDocument({required this.target, this.attributes, this.children});
 
   final String target;
@@ -325,31 +299,31 @@ class AttachDocument extends StatelessComponent implements Document {
   final List<Component>? children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     AttachAdapter.register(context, this);
-    if (children != null) {
-      yield* children!;
-    }
+    return Component.fragment(children ?? []);
   }
 }
 
-class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
-  static AttachAdapter instance = AttachAdapter();
+final Expando<AttachAdapter> _attach = Expando();
 
-  static bool _registered = false;
+class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
   static void register(BuildContext context, AttachDocument item) {
-    var binding = (context.binding as ServerAppBinding);
-    if (!_registered) {
-      binding.addRenderAdapter(instance);
-      _registered = true;
+    if (context.binding is! ServerAppBinding) {
+      // Return early in component tests.
+      return;
     }
 
-    var entry = instance.entries[item.target] ??= (attributes: {}, children: []);
+    var binding = (context.binding as ServerAppBinding);
+    var adapter = _attach[binding] ??= AttachAdapter();
+    binding.addRenderAdapter(adapter);
+
+    var entry = adapter.entries[item.target] ??= (attributes: {}, children: []);
     if (item.attributes != null) {
       entry.attributes.addAll(item.attributes!);
     }
     if (item.children != null) {
-      binding.addRenderAdapter(_AttachChildrenAdapter(item.target, context as Element));
+      binding.addRenderAdapter(_AttachChildrenAdapter(adapter, item.target, context as Element));
     }
   }
 
@@ -361,9 +335,9 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
 
     String? keyFor(MarkupRenderObject n) {
       return switch (n) {
-        MarkupRenderObject(id: String id) when id.isNotEmpty => id,
-        MarkupRenderObject(tag: "title" || "base") => '__${n.tag}',
-        MarkupRenderObject(tag: "meta", attributes: {'name': String name}) => '__meta:$name',
+        MarkupRenderElement(id: String id) when id.isNotEmpty => id,
+        MarkupRenderElement(tag: "title" || "base") => '__${n.tag}',
+        MarkupRenderElement(tag: "meta", attributes: {'name': String name}) => '__meta:$name',
         _ => null,
       };
     }
@@ -381,27 +355,38 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
       }
 
       if (value.children.isNotEmpty) {
-        target.children.insertBefore(target.createChildRenderObject()..updateText(r'<!--$-->', true));
+        target.children.insertBefore(target.createChildRenderText(r'<!--$-->', true));
 
         List<MarkupRenderObject> nodes = [];
         Map<String, (int, int)> indices = {};
 
+        void visitRenderObject(MarkupRenderObject o, int depth) {
+          if (o is MarkupRenderFragment) {
+            for (final child in o.children) {
+              visitRenderObject(child, depth);
+            }
+            return;
+          }
+
+          var key = keyFor(o);
+          if (key == null) {
+            nodes.add(o);
+            return;
+          }
+          var index = indices[key];
+          if (index == null) {
+            nodes.add(o);
+            indices[key] = (nodes.length - 1, depth);
+          }
+          if (index != null && depth >= index.$2) {
+            nodes[index.$1] = o;
+          }
+        }
+
         for (var e in value.children) {
           e.$1.remove();
           for (var n in e.$1) {
-            var key = keyFor(n);
-            if (key == null) {
-              nodes.add(n);
-              continue;
-            }
-            var index = indices[key];
-            if (index == null) {
-              nodes.add(n);
-              indices[key] = (nodes.length - 1, e.$2);
-            }
-            if (index != null && e.$2 >= index.$2) {
-              nodes[index.$1] = n;
-            }
+            visitRenderObject(n, e.$2);
           }
         }
 
@@ -409,19 +394,20 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
           target.children.insertBefore(n);
         }
 
-        target.children.insertBefore(target.createChildRenderObject()..updateText(r'<!--/-->', true));
+        target.children.insertBefore(target.createChildRenderText(r'<!--/-->', true));
       }
     }
   }
 }
 
 class _AttachChildrenAdapter extends ElementBoundaryAdapter {
-  _AttachChildrenAdapter(this.target, super.element);
+  _AttachChildrenAdapter(this.adapter, this.target, super.element);
 
+  final AttachAdapter adapter;
   final String target;
 
   @override
   void prepareBoundary(ChildListRange range) {
-    AttachAdapter.instance.entries[target]!.children.add((range, element.depth));
+    adapter.entries[target]!.children.add((range, element.depth));
   }
 }

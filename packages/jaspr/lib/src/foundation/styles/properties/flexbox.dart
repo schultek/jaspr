@@ -69,3 +69,36 @@ enum AlignItems {
   final String value;
   const AlignItems(this.value);
 }
+
+enum AlignContent {
+  // Normal alignment
+  normal('normal'),
+
+  // Basic positional alignment
+  start('start'),
+  center('center'),
+  end('end'),
+  flexStart('flex-start'),
+  flexEnd('flex-end'),
+
+  // Distributed alignment
+  spaceBetween('space-between'),
+  spaceAround('space-around'),
+  spaceEvenly('space-evenly'),
+  stretch('stretch'),
+
+  // Overflow alignment
+  safeCenter('safe center'),
+  unsafeCenter('unsafe center'),
+
+  // Global values
+  inherit('inherit'),
+  initial('initial'),
+  revert('revert'),
+  revertLayer('revert-layer'),
+  unset('unset');
+
+  /// The css value
+  final String value;
+  const AlignContent(this.value);
+}

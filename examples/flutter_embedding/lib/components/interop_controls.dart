@@ -12,34 +12,41 @@ class InteropControls extends StatefulComponent {
 
 class _InteropControlsState extends State<InteropControls> {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var state = context.watch(appStateProvider);
 
-    yield fieldset(id: 'interop', [
+    return fieldset(id: 'interop', [
       legend([text('JS Interop')]),
       label(htmlFor: 'screen-selector', [
         text('Screen'),
-        select(name: 'screen-select', id: 'screen-selector', classes: 'screen', onChange: (value) {
-          context.read(appStateProvider.notifier).changeDemoScreenTo(DemoScreen.values.byName(value.first));
-        }, [
-          option(value: 'counter', [text('Counter')]),
-          option(value: 'textField', [text('TextField')]),
-          option(value: 'custom', [text('Custom App')]),
-        ]),
+        select(
+          name: 'screen-select',
+          id: 'screen-selector',
+          classes: 'screen',
+          onChange: (value) {
+            context.read(appStateProvider.notifier).changeDemoScreenTo(DemoScreen.values.byName(value.first));
+          },
+          [
+            option(value: 'counter', [text('Counter')]),
+            option(value: 'textField', [text('TextField')]),
+            option(value: 'custom', [text('Custom App')]),
+          ],
+        ),
       ]),
       label(htmlFor: 'value', classes: state.currentScreen != DemoScreen.counter ? 'disabled' : null, [
         text('Value'),
-        input(id: 'value', value: state.count.toString(), type: InputType.text, attributes: {'readonly': ''}, []),
+        input(id: 'value', value: state.count.toString(), type: InputType.text, attributes: {'readonly': ''}),
       ]),
       input(
         id: 'increment',
         value: 'Increment',
         type: InputType.button,
         classes: state.currentScreen != DemoScreen.counter ? 'disabled' : null,
-        events: events(onClick: () {
-          context.read(appStateProvider.notifier).increment();
-        }),
-        [],
+        events: events(
+          onClick: () {
+            context.read(appStateProvider.notifier).increment();
+          },
+        ),
       ),
     ]);
   }

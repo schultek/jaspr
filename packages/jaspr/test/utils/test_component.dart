@@ -37,7 +37,7 @@ abstract class TestComponent<T> extends StatefulComponent {
   final T initialValue;
 
   @protected
-  Iterable<Component> build(BuildContext context, T value);
+  Component build(BuildContext context, T value);
 
   @override
   State<StatefulComponent> createState() => TestState();
@@ -53,7 +53,29 @@ class TestState<T> extends State<TestComponent> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield* component.build(context, value);
+  Component build(BuildContext context) {
+    return component.build(context, value);
+  }
+}
+
+// ignore: must_be_immutable
+class FakeComponent extends StatelessComponent {
+  FakeComponent({super.key, required this.child});
+
+  Component child;
+
+  @override
+  Component build(BuildContext context) {
+    return child;
+  }
+
+  @override
+  StatelessElement createElement() => _element = StatelessElement(this);
+
+  late StatelessElement _element;
+
+  void updateChild(Component newChild) {
+    child = newChild;
+    _element.markNeedsBuild();
   }
 }

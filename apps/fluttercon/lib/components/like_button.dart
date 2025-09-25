@@ -1,7 +1,7 @@
-import 'package:fluttercon/services/favorites.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../models/session.dart';
+import '../services/favorites.dart';
 
 @client
 class LikeButton extends StatelessComponent {
@@ -10,13 +10,13 @@ class LikeButton extends StatelessComponent {
   final Session session;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield ListenableBuilder(
+  Component build(BuildContext context) {
+    return ListenableBuilder(
       listenable: FavoritesService.instance,
-      builder: (context) sync* {
+      builder: (context) {
         final isFavorite = FavoritesService.instance.favorites.containsKey(session.id);
 
-        yield button(
+        return button(
           classes: 'like-button${isFavorite ? ' active' : ''}',
           events: {
             'click': (e) {
@@ -24,22 +24,20 @@ class LikeButton extends StatelessComponent {
               FavoritesService.instance.toggle(session);
             },
           },
-          [
-            span(classes: "icon-heart${isFavorite ? '' : '-o'}", []),
-          ],
+          [span(classes: "icon-heart${isFavorite ? '' : '-o'}", [])],
         );
       },
     );
   }
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.like-button', [
       css('&').styles(
         border: Border.none,
         outline: Outline(style: OutlineStyle.none),
-        backgroundColor: Colors.transparent,
         fontSize: 1.5.em,
+        backgroundColor: Colors.transparent,
       ),
       css('&:hover span').styles(transform: Transform.scale(1.2)),
       css('&.active span').styles(color: Colors.red),

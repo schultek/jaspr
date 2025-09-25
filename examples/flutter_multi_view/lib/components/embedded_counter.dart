@@ -1,7 +1,7 @@
-import 'package:flutter_multi_view/constants/theme.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
+import '../constants/theme.dart';
 @Import.onWeb('../widgets/counter.dart', show: [#CounterWidget])
 import 'embedded_counter.imports.dart' deferred as widget;
 import 'pulsing_loader.dart';
@@ -13,8 +13,8 @@ class EmbeddedCounter extends StatelessComponent {
   final Function(int) onChange;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield FlutterEmbedView.deferred(
+  Component build(BuildContext context) {
+    return FlutterEmbedView.deferred(
       classes: 'flutter-counter',
       styles: Styles(margin: Margin.only(top: 20.px)),
       constraints: ViewConstraints(
@@ -30,18 +30,15 @@ class EmbeddedCounter extends StatelessComponent {
   }
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.flutter-counter', [
       css('&').styles(
         display: Display.flex,
         radius: BorderRadius.circular(cardBorderRadius.px),
         backgroundColor: surfaceColor,
       ),
-      css('& > div[flt-embedding]').styles(
-        opacity: 0,
-        transition: Transition('opacity', duration: 400),
-      ),
+      css('& > div[flt-embedding]').styles(opacity: 0, transition: Transition('opacity', duration: 400)),
       css('&.active > div[flt-embedding]').styles(opacity: 1),
-    ])
+    ]),
   ];
 }

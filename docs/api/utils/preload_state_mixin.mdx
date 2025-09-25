@@ -1,0 +1,36 @@
+---
+title: PreloadStateMixin
+description: Asynchronously preloading the state of a StatefulComponent on the server.
+---
+
+---
+
+The `PreloadStateMixin` lets you asynchronously load the state of a StatefulComponent before it is rendered on the server during pre-rendering.
+
+<Info>
+For a general guide about data-fetching on the server see [Data Fetching](/concepts/data_fetching).
+</Info>
+
+## Usage
+
+Start by adding the `PreloadStateMixin` on a `StatefulComponent`s `State` class and implement the `Future<T> preloadState()` method.
+
+```dart
+class MyStatefulComponent extends StatefulComponent { /* ... */ }
+
+class MyState extends State<MyStatefulComponent> with PreloadStateMixin {
+
+  @override
+  Future<void> preloadState() async {
+    /* ... */
+  }
+}
+```
+
+This method will only be executed on the server and will be called before `initState()`. It will defer
+`initState()` as well as building the component until the future returned by the method is completed.
+
+## Alternatives
+
+- Check out the [AsyncStatelessComponent](/api/components/async_components) and [AsyncBuilder](/api/components/async_components)
+  components that have a convenient async build method.

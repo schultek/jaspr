@@ -9,36 +9,37 @@ import 'sources/imports.dart';
 
 void main() {
   group('import annotation', () {
+    late TestReaderWriter reader;
+
+    setUp(() async {
+      reader = TestReaderWriter(rootPackage: 'models');
+      await reader.testing.loadIsolateSources();
+    });
+
     test('generates json module', () async {
       await testBuilder(
         ImportsModuleBuilder(BuilderOptions({})),
         importsSources,
         outputs: importsModuleOutput,
-        reader: await PackageAssetReader.currentIsolate(),
+        readerWriter: reader,
       );
     });
 
     test('generates dart output', () async {
       await testBuilder(
         ImportsOutputBuilder(BuilderOptions({})),
-        {
-          ...importsSources,
-          ...importsModuleOutput,
-        },
+        {...importsSources, ...importsModuleOutput},
         outputs: importsOutput,
-        reader: await PackageAssetReader.currentIsolate(),
+        readerWriter: reader,
       );
     });
 
     test('generates stubs', () async {
       await testBuilder(
         ImportsStubsBuilder(BuilderOptions({})),
-        {
-          ...importsSources,
-          ...importsModuleOutput,
-        },
+        {...importsSources, ...importsModuleOutput},
         outputs: importsStubsOutput,
-        reader: await PackageAssetReader.currentIsolate(),
+        readerWriter: reader,
       );
     });
   });

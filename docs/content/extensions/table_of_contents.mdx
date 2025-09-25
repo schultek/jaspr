@@ -1,0 +1,69 @@
+---
+title: Table of Contents
+description: Generate a table of contents for your pages.
+---
+
+---
+
+The **Table of Contents** etension generates a table of contents for your pages based on the headings in the content.
+
+Content like this:
+
+```markdown title="content/example.md"
+# Documentation
+
+## Introduction
+
+...
+
+### Features
+
+...
+
+## Getting Started
+
+### Installation
+
+...
+
+### Configuration
+
+...
+```
+
+Will generate a table of contents like this:
+
+<Card>
+- Introduction
+  - Features
+- Getting Started
+  - Installation
+  - Configuration
+</Card>
+
+## Usage
+
+To use the `TableOfContentsExtension`, add it to the `extensions` list of the `ContentApp` component:
+
+```dart
+ContentApp(
+  ...
+  extensions: [
+    TableOfContentsExtension(),
+  ],
+);
+```
+
+The extension takes the following properties to customize the behavior:
+
+---
+
+<Property name="maxHeaderDepth" type="int">
+  The maximum header depth to include in the table of contents. Defaults to 3.
+</Property>
+
+---
+
+The extension does not render anything by default. Instead the generated `TableOfContents` object is stored in the page's data under the `'toc'` key. It may then be consumed by a layout to display the table of contents.
+
+For example, the [DocsLayout](/content/layouts/docs_layout) uses the `TableOfContents` object to render a table of contents in the sidebar.

@@ -1,7 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/source_range.dart';
-import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_dart.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -9,12 +8,7 @@ import '../utils.dart';
 
 class CssAssistProvider extends DartAssist {
   @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    SourceRange target,
-  ) {
+  void run(CustomLintResolver resolver, ChangeReporter reporter, CustomLintContext context, SourceRange target) {
     var config = readJasprConfig(resolver.path);
     if (config['mode'] != 'server' && config['mode'] != 'static') {
       return;
@@ -25,7 +19,7 @@ class CssAssistProvider extends DartAssist {
         return;
       }
       if (isComponentType(node.staticType)) {
-        if (node.staticInvokeType case FunctionType t when hasClassesParameter(t.parameters)) {
+        if (node.staticInvokeType case FunctionType t when hasClassesParameter(t.formalParameters)) {
           final indent = getLineIndent(resolver.lineInfo, node);
           addStyles(resolver, reporter, node, indent, node.argumentList);
         }
@@ -44,7 +38,7 @@ class CssAssistProvider extends DartAssist {
       if (!isComponentType(node.staticType)) {
         return;
       }
-      if (!hasClassesParameter(node.constructorName.staticElement?.parameters)) {
+      if (!hasClassesParameter(node.constructorName.element?.formalParameters)) {
         return;
       }
       final indent = getLineIndent(resolver.lineInfo, node);
@@ -69,8 +63,13 @@ class CssAssistProvider extends DartAssist {
     return null;
   }
 
-  void addStyles(CustomLintResolver resolver, ChangeReporter reporter, Expression node, int lineIndent,
-      ArgumentList argumentList) {
+  void addStyles(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    Expression node,
+    int lineIndent,
+    ArgumentList argumentList,
+  ) {
     var comp = findParentComponent(node);
     if (comp == null) {
       return;
@@ -79,21 +78,25 @@ class CssAssistProvider extends DartAssist {
     var idArg = argumentList.arguments.whereType<NamedExpression>().where((e) => e.name.label.name == 'id').firstOrNull;
     var idVal = idArg?.expression is StringLiteral ? (idArg!.expression as StringLiteral).stringValue : null;
 
-    var classesArg =
-        argumentList.arguments.whereType<NamedExpression>().where((e) => e.name.label.name == 'classes').firstOrNull;
+    var classesArg = argumentList.arguments
+        .whereType<NamedExpression>()
+        .where((e) => e.name.label.name == 'classes')
+        .firstOrNull;
     var classesVal = classesArg?.expression is StringLiteral
         ? (classesArg!.expression as StringLiteral).stringValue?.split(' ').first
         : null;
 
     var styles = comp.$1.members
         .where((m) => m.metadata.where((a) => a.name.name == 'css').isNotEmpty)
-        .map((m) => switch (m) {
-              MethodDeclaration(body: BlockFunctionBody body) =>
-                body.block.statements.whereType<ReturnStatement>().firstOrNull?.expression,
-              MethodDeclaration(body: ExpressionFunctionBody body) => body.expression,
-              FieldDeclaration() => m.fields.variables.first.initializer,
-              _ => null,
-            })
+        .map(
+          (m) => switch (m) {
+            MethodDeclaration(body: BlockFunctionBody body) =>
+              body.block.statements.whereType<ReturnStatement>().firstOrNull?.expression,
+            MethodDeclaration(body: ExpressionFunctionBody body) => body.expression,
+            FieldDeclaration() => m.fields.variables.first.initializer,
+            _ => null,
+          },
+        )
         .whereType<ListLiteral>()
         .firstOrNull;
 
@@ -113,7 +116,7 @@ class CssAssistProvider extends DartAssist {
 
       if (styles == null) {
         builder.addInsertion(comp.$2.end, (edit) {
-          edit.write('\n\n  @css\n  static final List<StyleRule> styles = [\n  ');
+          edit.write('\n\n  @css\n  static List<StyleRule> get styles => [\n  ');
           writeCssRule(edit);
           edit.write('];');
         });
@@ -144,12 +147,7 @@ class CssAssistProvider extends DartAssist {
     });
   }
 
-  void convertToNested(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    InvocationExpression css,
-    int lineIndent,
-  ) {
+  void convertToNested(CustomLintResolver resolver, ChangeReporter reporter, InvocationExpression css, int lineIndent) {
     if (css.argumentList.arguments.length != 1) {
       return;
     }

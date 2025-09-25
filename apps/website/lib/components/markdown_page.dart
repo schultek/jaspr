@@ -13,20 +13,20 @@ class MarkdownPage extends StatelessComponent {
   final String filename;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     final file = File(filename);
     final content = file.readAsStringSync();
     final html = markdownToHtml(content);
 
-    yield Header(showHome: true);
-    yield main_(classes: 'markdown-content', [
-      raw(html),
+    return fragment([
+      Header(showHome: true),
+      main_(classes: 'markdown-content', [raw(html)]),
+      Footer(),
     ]);
-    yield Footer();
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.markdown-content', [
       css('&').styles(
         minHeight: 50.vh,

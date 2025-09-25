@@ -34,8 +34,8 @@ class TabBarState extends State<TabBar> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomNodeReader(
+  Component build(BuildContext context) {
+    return DomNodeReader(
       onNode: (node) {
         if (kIsWeb && _tabBar == null) {
           _tabBar = MDCTabBar(node)..activateTab(component.selected + (component.leading != null ? 1 : 0));
@@ -54,9 +54,7 @@ class TabBarState extends State<TabBar> {
                 for (var i = 0; i < component.tabs.length; i++)
                   ProviderScope(
                     key: ValueKey('tab-provider'),
-                    overrides: [
-                      _tabProvider.overrideWithValue((i == component.selected, i, () => _select(i))),
-                    ],
+                    overrides: [_tabProvider.overrideWithValue((i == component.selected, i, () => _select(i)))],
                     child: component.tabs[i],
                   ),
               ]),
@@ -75,15 +73,14 @@ class ButtonTab extends Tab {
   final VoidCallback onPressed;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield button(
+  Component build(BuildContext context) {
+    return button(
       classes: 'mdc-tab',
       events: {'click': (e) => onPressed()},
-      attributes: {
-        'role': 'tab',
-        'tabindex': '0',
-      },
-      styles: Styles(padding: Padding.symmetric(vertical: Unit.zero, horizontal: 16.px)),
+      attributes: {'role': 'tab', 'tabindex': '0'},
+      styles: Styles(
+        padding: Padding.symmetric(vertical: Unit.zero, horizontal: 16.px),
+      ),
       [
         span(classes: 'mdc-tab__content', [
           span(
@@ -92,7 +89,10 @@ class ButtonTab extends Tab {
             [
               i(
                 classes: 'material-icons mdc-tab__icon',
-                styles: Styles(fontSize: 20.px, margin: Margin.only(right: this.label.isNotEmpty ? 4.px : null)),
+                styles: Styles(
+                  margin: Margin.only(right: this.label.isNotEmpty ? 4.px : null),
+                  fontSize: 20.px,
+                ),
                 [text(icon)],
               ),
               text(this.label),
@@ -114,17 +114,13 @@ class Tab extends StatelessComponent {
   final String label;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var (selected, index, onSelect) = context.watch(_tabProvider);
 
-    yield button(
+    return button(
       classes: 'mdc-tab ${selected ? ' mdc-tab--active' : ''}',
       events: {'click': (e) => onSelect()},
-      attributes: {
-        'role': 'tab',
-        'tabindex': '$index',
-        if (selected) 'aria-selected': "true",
-      },
+      attributes: {'role': 'tab', 'tabindex': '$index', if (selected) 'aria-selected': "true"},
       [
         span(classes: 'mdc-tab__content', [
           span(classes: 'mdc-tab__text-label', [text(label)]),

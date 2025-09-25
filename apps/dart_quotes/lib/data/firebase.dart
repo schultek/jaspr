@@ -1,16 +1,18 @@
 import 'dart:io';
 
-import 'package:dart_quotes/data/quote.dart';
 import 'package:jaspr/jaspr.dart';
 
 @Import.onWeb('package:firebase_core/firebase_core.dart', show: [#Firebase, #FirebaseApp])
-@Import.onWeb('package:cloud_firestore/cloud_firestore.dart',
-    show: [#FirebaseFirestore, #FieldValue, #DocumentSnapshot])
+@Import.onWeb(
+  'package:cloud_firestore/cloud_firestore.dart',
+  show: [#FirebaseFirestore, #FieldValue, #DocumentSnapshot],
+)
 @Import.onWeb('package:firebase_auth/firebase_auth.dart', show: [#FirebaseAuth])
 @Import.onWeb('../firebase_options.dart', show: [#DefaultFirebaseOptions])
 @Import.onServer('package:dart_firebase_admin/dart_firebase_admin.dart', show: [#FirebaseAdminApp, #Credential])
 @Import.onServer('package:dart_firebase_admin/firestore.dart', show: [#Firestore])
 import 'firebase.imports.dart';
+import 'quote.dart';
 
 class FirebaseService {
   static FirebaseService instance = FirebaseService();
@@ -27,9 +29,7 @@ class FirebaseService {
   // === client logic ===
 
   late final Future<FirebaseAppOrStubbed> clientApp = Future(() async {
-    var app = await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    var app = await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
     await FirebaseAuth.instance.signInAnonymously();
 

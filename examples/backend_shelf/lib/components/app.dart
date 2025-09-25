@@ -3,10 +3,7 @@ import 'package:jaspr/jaspr.dart';
 @client
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'p',
-      child: Text('Hello World from Jaspr'),
-    );
+  Component build(BuildContext context) {
+    return p([text('Hello World from Jaspr')]);
   }
 }

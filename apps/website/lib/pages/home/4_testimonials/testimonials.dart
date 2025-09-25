@@ -1,14 +1,14 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
 
+import '../../../constants/theme.dart';
 import 'components/testimonial_card.dart';
 
 class Testimonials extends StatelessComponent {
   const Testimonials({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section(id: 'testimonials', [
+  Component build(BuildContext context) {
+    return section(id: 'testimonials', [
       h2([text('Trusted by '), br(), text('Dart Experts')]),
       div(classes: 'testimonials-grid', [
         TestimonialCard(
@@ -48,7 +48,7 @@ class Testimonials extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('#testimonials', [
       css('&').styles(
         display: Display.flex,

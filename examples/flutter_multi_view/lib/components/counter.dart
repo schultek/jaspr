@@ -16,8 +16,8 @@ class CounterState extends State<Counter> {
   int count = 0;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'counter-group', styles: Styles(raw: {'view-transition-name': component.name}), [
+  Component build(BuildContext context) {
+    return div(classes: 'counter-group', styles: Styles(raw: {'view-transition-name': component.name}), [
       div(classes: 'counter', [
         button(
           onClick: () {
@@ -47,7 +47,7 @@ class CounterState extends State<Counter> {
   }
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.counter-group').styles(
       padding: Padding.all(10.px),
       margin: Margin.all(10.px),
@@ -81,14 +81,9 @@ class CounterState extends State<Counter> {
           fontSize: 1.5.rem,
           backgroundColor: Colors.transparent,
         ),
-        css('&:hover').styles(
-          backgroundColor: const Color.hex('#0001'),
-        ),
+        css('&:hover').styles(backgroundColor: const Color('#0001')),
       ]),
-      css('span').styles(
-        textAlign: TextAlign.center,
-        fontSize: 14.px,
-      ),
+      css('span').styles(textAlign: TextAlign.center, fontSize: 14.px),
       css('b').styles(fontSize: 18.px),
     ]),
   ];

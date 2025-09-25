@@ -1,14 +1,15 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/components/link_button.dart';
-import 'package:website/constants/theme.dart';
+
+import '../../../components/link_button.dart';
+import '../../../constants/theme.dart';
 import 'components/sponsors_list.dart';
 
 class Community extends StatelessComponent {
   const Community({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section(id: 'community', [
+  Component build(BuildContext context) {
+    return section(id: 'community', [
       span(classes: 'caption text-gradient', [text('Community')]),
       h2([text('Join the Community')]),
       div(classes: 'community-card', [
@@ -16,7 +17,8 @@ class Community extends StatelessComponent {
           h4([text('Sponsor Jaspr')]),
           p([
             text(
-                'Jaspr is free and open source. Sponsorships allow me to spend more time developing the framework and keep the project sustainable in the years to come. I\'m super thankful for all support.')
+              'Jaspr is free and open source. Sponsorships allow me to spend more time developing the framework and keep the project sustainable in the years to come. I\'m super thankful for all support.',
+            ),
           ]),
           h5([text('Current Sponsors')]),
           SponsorsList(),
@@ -30,7 +32,8 @@ class Community extends StatelessComponent {
           p([
             em([
               text(
-                  'Are you interested in a larger sponsoring including a prominent logo placement on this website? Contact me at '),
+                'Are you interested in a larger sponsoring including a prominent logo placement on this website? Contact me at ',
+              ),
               a(href: 'mailto:kilian@schultek.dev', classes: 'animated-underline', [text('kilian@schultek.dev')]),
               text('.'),
             ]),
@@ -40,26 +43,20 @@ class Community extends StatelessComponent {
           h4([text('Discord')]),
           p([
             text(
-                'Join our Discord community with over 400 developers. Chat with other developers, ask questions, and share your projects.')
+              'Join our Discord community with over 500 developers. Chat with other developers, ask questions, and share your projects.',
+            ),
           ]),
           div(classes: 'actions', [
-            LinkButton.outlined(
-              icon: 'custom-discord',
-              label: 'Join Discord',
-              to: 'https://discord.gg/XGXrGEk4c6',
-            ),
+            LinkButton.outlined(icon: 'custom-discord', label: 'Join Discord', to: 'https://discord.gg/XGXrGEk4c6'),
           ]),
           h4([text('Enterprise Support')]),
           p([
             text(
-                'Are you a startup or enterprise looking for paid support, consulting, or custom development? Don\'t hesitate to contact me.')
+              'Are you a startup or enterprise looking for paid support, consulting, or custom development? Don\'t hesitate to contact me.',
+            ),
           ]),
           div(classes: 'actions', [
-            LinkButton.outlined(
-              icon: 'send',
-              label: 'Get Support',
-              to: 'mailto:kilian@schultek.dev',
-            ),
+            LinkButton.outlined(icon: 'send', label: 'Get Support', to: 'mailto:kilian@schultek.dev'),
           ]),
         ]),
       ]),
@@ -67,7 +64,7 @@ class Community extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('#community', [
       css('&').styles(
         display: Display.flex,
@@ -91,20 +88,20 @@ class Community extends StatelessComponent {
         ),
         css('& > div').styles(
           padding: Padding.all(2.rem),
-          flex: Flex(grow: 1, basis: FlexBasis(20.rem)),
+          flex: Flex(grow: 1, basis: 20.rem),
         ),
-        css('& > div > h4:not(:first-child)').styles(
-          margin: Margin.only(top: 3.rem),
-        ),
+        css('& > div > h4:not(:first-child)').styles(margin: Margin.only(top: 3.rem)),
         css('.sponsor', [
           css('&').styles(
-            border: Border.only(right: BorderSide(color: borderColor, width: 2.px)),
+            border: Border.only(
+              right: BorderSide(color: borderColor, width: 2.px),
+            ),
           ),
           css('h5').styles(margin: Margin.only(bottom: 0.5.rem)),
           css('.actions').styles(margin: Margin.only(top: 2.rem)),
           css('p:last-child').styles(margin: Margin.only(top: 2.rem)).combine(bodySmall),
         ]),
-      ])
+      ]),
     ]),
   ];
 }

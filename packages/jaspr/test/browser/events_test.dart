@@ -1,4 +1,5 @@
 @TestOn('browser')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/browser_test.dart';
@@ -8,9 +9,14 @@ void main() {
     testBrowser('handle click events', (tester) async {
       int clicked = 0;
 
-      tester.pumpComponent(button(onClick: () {
-        clicked++;
-      }, []));
+      tester.pumpComponent(
+        button(
+          onClick: () {
+            clicked++;
+          },
+          [],
+        ),
+      );
 
       await tester.click(find.tag('button'));
       expect(clicked, equals(1));
@@ -20,12 +26,13 @@ void main() {
       bool checkedInput = false;
       bool checkedChange = false;
 
-      tester.pumpComponent(input(
-        type: InputType.checkbox,
-        onInput: (value) => checkedInput = value,
-        onChange: (value) => checkedChange = value,
-        [],
-      ));
+      tester.pumpComponent(
+        input(
+          type: InputType.checkbox,
+          onInput: (value) => checkedInput = value,
+          onChange: (value) => checkedChange = value,
+        ),
+      );
 
       await tester.input(find.tag('input'), checked: true);
       expect(checkedInput, isTrue);
@@ -38,12 +45,13 @@ void main() {
       double numberInput = 0;
       double numberChange = 0;
 
-      tester.pumpComponent(input(
-        type: InputType.number,
-        onInput: (value) => numberInput = value,
-        onChange: (value) => numberChange = value,
-        [],
-      ));
+      tester.pumpComponent(
+        input(
+          type: InputType.number,
+          onInput: (value) => numberInput = value,
+          onChange: (value) => numberChange = value,
+        ),
+      );
 
       await tester.input(find.tag('input'), valueAsNumber: 2.0);
       expect(numberInput, equals(2.0));
@@ -56,12 +64,9 @@ void main() {
       String textInput = "";
       String textChange = "";
 
-      tester.pumpComponent(input(
-        type: InputType.text,
-        onInput: (value) => textInput = value,
-        onChange: (value) => textChange = value,
-        [],
-      ));
+      tester.pumpComponent(
+        input(type: InputType.text, onInput: (value) => textInput = value, onChange: (value) => textChange = value),
+      );
 
       await tester.input(find.tag('input'), value: "Hello");
       expect(textInput, equals("Hello"));
@@ -74,11 +79,9 @@ void main() {
       String textInput = "";
       String textChange = "";
 
-      tester.pumpComponent(textarea(
-        onInput: (value) => textInput = value,
-        onChange: (value) => textChange = value,
-        [],
-      ));
+      tester.pumpComponent(
+        textarea(onInput: (value) => textInput = value, onChange: (value) => textChange = value, []),
+      );
 
       await tester.input(find.tag('textarea'), value: "Hello");
       expect(textInput, equals("Hello"));

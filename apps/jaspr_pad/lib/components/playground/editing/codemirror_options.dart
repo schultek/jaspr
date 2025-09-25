@@ -4,7 +4,7 @@ const codeMirrorOptions = {
   'autoCloseTags': {
     'whenOpening': true,
     'whenClosing': true,
-    'indentTags': [] // Android Studio/VSCode do not auto indent/add newlines for any completed tags
+    'indentTags': [], // Android Studio/VSCode do not auto indent/add newlines for any completed tags
     //  The default (below) would be the following tags cause indenting and blank line inserted
     // ['applet', 'blockquote', 'body', 'button', 'div', 'dl', 'fieldset',
     //    'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head',
@@ -48,15 +48,9 @@ const codeMirrorOptions = {
     'minFoldSize': 1,
     'widget': '\u00b7\u00b7\u00b7', // like '...', but middle dots
   },
-  'matchTags': {
-    'bothTags': true,
-  },
+  'matchTags': {'bothTags': true},
   'gutters': ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-  'highlightSelectionMatches': {
-    'style': 'highlight-selection-matches',
-    'showToken': false,
-    'annotateScrollbar': true,
-  },
+  'highlightSelectionMatches': {'style': 'highlight-selection-matches', 'showToken': false, 'annotateScrollbar': true},
   'hintOptions': {'completeSingle': false},
   'scrollbarStyle': 'simple',
   'theme': 'darkpad', // ambiance, vibrant-ink, monokai, zenburn

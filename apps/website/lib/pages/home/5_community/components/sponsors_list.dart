@@ -1,8 +1,7 @@
 import 'dart:convert';
 
-import 'package:jaspr/jaspr.dart';
-
 import 'package:http/http.dart' as http;
+import 'package:jaspr/jaspr.dart';
 
 @client
 class SponsorsList extends StatefulComponent {
@@ -37,8 +36,8 @@ class SponsorsListState extends State<SponsorsList> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'sponsors-list', [
+  Component build(BuildContext context) {
+    return div(classes: 'sponsors-list', [
       if (!loaded)
         for (var i = 0; i < 6; i++) div(classes: 'sponsor-avatar', [])
       else
@@ -50,14 +49,11 @@ class SponsorsListState extends State<SponsorsList> {
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.sponsors-list', [
-      css('&').styles(
-        display: Display.flex,
-        flexDirection: FlexDirection.row,
-        flexWrap: FlexWrap.wrap,
-        gap: Gap.all(0.4.rem),
-      ),
+      css(
+        '&',
+      ).styles(display: Display.flex, flexDirection: FlexDirection.row, flexWrap: FlexWrap.wrap, gap: Gap.all(0.4.rem)),
       css('& > *', [
         css('&').styles(
           width: 2.rem,

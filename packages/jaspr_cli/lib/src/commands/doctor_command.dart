@@ -19,9 +19,7 @@ class DoctorCommand extends BaseCommand {
   String get category => 'Tooling';
 
   @override
-  Future<CommandResult?> run() async {
-    await super.run();
-
+  Future<int> runCommand() async {
     var sections = <DoctorSection>[];
 
     sections.add((
@@ -31,48 +29,50 @@ class DoctorCommand extends BaseCommand {
         'Dart Version ${Platform.version} at ${Platform.executable}',
         'Running on ${Platform.operatingSystem} ${Platform.operatingSystemVersion} - Locale ${Platform.localeName}',
         'Analytics: ${analyticsEnabled ? 'Enabled' : 'Disabled'}',
-      ]
+      ],
     ));
 
-    String? findDependency(String name, {bool reportMissing = false}) {
-      var isDev = false;
-      var dep = config!.pubspecYaml['dependencies']?[name];
-      if (dep == null) {
-        dep = config!.pubspecYaml['dev_dependencies']?[name];
-        isDev = true;
-      }
-      if (dep == null) {
-        if (reportMissing) {
-          return '\n    • $name: Missing Dependency';
-        } else {
-          return null;
+    if (project.pubspecYaml != null) {
+      String? findDependency(String name, {bool reportMissing = false}) {
+        var isDev = false;
+        var dep = project.requirePubspecYaml['dependencies']?[name];
+        if (dep == null) {
+          dep = project.requirePubspecYaml['dev_dependencies']?[name];
+          isDev = true;
         }
-      } else {
-        return '\n    • $name: $dep${isDev ? ' (dev)' : ''}';
+        if (dep == null) {
+          if (reportMissing) {
+            return '\n    • $name: Missing Dependency';
+          } else {
+            return null;
+          }
+        } else {
+          return '\n    • $name: $dep${isDev ? ' (dev)' : ''}';
+        }
       }
+
+      var dependencies = [
+        findDependency('jaspr', reportMissing: true),
+        findDependency('jaspr_builder'),
+        findDependency('jaspr_web_compilers'),
+        findDependency('jaspr_test'),
+        findDependency('jaspr_flutter_embed'),
+        findDependency('jaspr_riverpod'),
+        findDependency('jaspr_router'),
+        findDependency('jaspr_tailwind'),
+      ].whereType<String>();
+
+      sections.add((
+        name: 'Current Project',
+        details: null,
+        items: [
+          'Dependencies on core packages:${dependencies.join()}',
+          'Rendering mode: ${project.modeOrNull?.name}',
+          'Uses jaspr compilers: ${project.usesJasprWebCompilers}',
+          'Uses flutter embedding: ${project.usesFlutter}',
+        ],
+      ));
     }
-
-    var dependencies = [
-      findDependency('jaspr', reportMissing: true),
-      findDependency('jaspr_builder'),
-      findDependency('jaspr_web_compilers'),
-      findDependency('jaspr_test'),
-      findDependency('jaspr_flutter_embed'),
-      findDependency('jaspr_riverpod'),
-      findDependency('jaspr_router'),
-      findDependency('jaspr_tailwind'),
-    ].whereType<String>();
-
-    sections.add((
-      name: 'Current Project',
-      details: null,
-      items: [
-        'Dependencies on core packages:${dependencies.join()}',
-        'Rendering mode: ${config!.mode.name}',
-        'Uses jaspr compilers: ${config!.usesJasprWebCompilers}',
-        'Uses flutter embedding: ${config!.usesFlutter}',
-      ]
-    ));
 
     for (var s in sections) {
       var out = StringBuffer('${green.wrap('[✓]')} ${styleBold.wrap(lightBlue.wrap(s.name))!}');
@@ -83,10 +83,10 @@ class DoctorCommand extends BaseCommand {
         out.write('\n  • $i');
       }
       out.writeln();
-      logger.logger.info(out.toString());
+      stdout.write(out.toString());
     }
 
-    return null;
+    return 0;
   }
 }
 

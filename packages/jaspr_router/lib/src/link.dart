@@ -62,8 +62,8 @@ class Link extends StatelessComponent {
   final List<Component>? children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield a(
+  Component build(BuildContext context) {
+    return a(
       href: to,
       target: target,
       referrerPolicy: referrer,
@@ -88,7 +88,7 @@ class Link extends StatelessComponent {
               router.replace(to, extra: extra);
             }
           }
-        }
+        },
       },
       [if (child != null) child!, ...?children],
     );

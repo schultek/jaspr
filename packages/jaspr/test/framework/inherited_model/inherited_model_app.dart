@@ -5,10 +5,7 @@ import '../../utils/test_component.dart';
 final buildCalledFor = <Key>{};
 
 class MyDto {
-  const MyDto({
-    required this.a,
-    required this.b,
-  });
+  const MyDto({required this.a, required this.b});
 
   final int? a;
   final double? b;
@@ -17,36 +14,21 @@ class MyDto {
 enum ABAspect { a, b }
 
 class App extends TestComponent<MyDto> {
-  App()
-      : super(
-          initialValue: MyDto(a: 0, b: 0),
-        );
+  App() : super(initialValue: MyDto(a: 0, b: 0));
 
-  final child = DomComponent(
-    tag: 'div',
-    child: ExampleComponent(),
-  );
+  final child = div([ExampleComponent()]);
 
   static final componentKey = Key('App');
 
   @override
-  Iterable<Component> build(BuildContext context, MyDto dto) sync* {
+  Component build(BuildContext context, MyDto dto) {
     buildCalledFor.add(componentKey);
-    yield ABModel(
-      a: dto.a,
-      b: dto.b,
-      child: child,
-    );
+    return ABModel(a: dto.a, b: dto.b, child: child);
   }
 }
 
 class ABModel extends InheritedModel<ABAspect> {
-  const ABModel({
-    super.key,
-    this.a,
-    this.b,
-    required super.child,
-  });
+  const ABModel({super.key, this.a, this.b, required super.child});
 
   final int? a;
   final double? b;
@@ -57,10 +39,7 @@ class ABModel extends InheritedModel<ABAspect> {
   }
 
   @override
-  bool updateShouldNotifyDependent(
-    ABModel oldWidget,
-    Set<ABAspect> dependencies,
-  ) {
+  bool updateShouldNotifyDependent(ABModel oldWidget, Set<ABAspect> dependencies) {
     return (a != oldWidget.a && dependencies.contains(ABAspect.a)) ||
         (b != oldWidget.b && dependencies.contains(ABAspect.b));
   }
@@ -78,10 +57,9 @@ class ExampleComponent extends StatelessComponent {
   const ExampleComponent({super.key});
   static final componentKey = Key('ExampleComponent');
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     buildCalledFor.add(componentKey);
-    yield AComponent();
-    yield BComponent();
+    return Component.fragment([AComponent(), BComponent()]);
   }
 }
 
@@ -90,10 +68,10 @@ class AComponent extends StatelessComponent {
   static final componentKey = Key('AComponent');
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     buildCalledFor.add(componentKey);
     final value = ABModel.aOf(context);
-    yield Text('A: $value');
+    return Component.text('A: $value');
   }
 }
 
@@ -102,10 +80,10 @@ class BComponent extends StatelessComponent {
   static final componentKey = Key('BComponent');
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     buildCalledFor.add(componentKey);
 
     final value = ABModel.bOf(context);
-    yield Text('B: $value');
+    return Component.text('B: $value');
   }
 }

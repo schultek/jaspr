@@ -5,27 +5,29 @@ part of 'html.dart';
 /// - [viewBox]: The SVG viewport coordinates for the current SVG fragment.
 /// - [width]: The displayed width of the rectangular viewport. (Not the width of its coordinate system.)
 /// - [height]: The displayed height of the rectangular viewport. (Not the height of its coordinate system.)
-Component svg(List<Component> children,
-    {String? viewBox,
-    Unit? width,
-    Unit? height,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component svg(
+  List<Component> children, {
+  String? viewBox,
+  Unit? width,
+  Unit? height,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'svg',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
-      if (viewBox != null) 'viewBox': viewBox,
-      if (width != null) 'width': width.value,
-      if (height != null) 'height': height.value,
+      ...?attributes,
+      'viewBox': ?viewBox,
+      'width': ?width?.value,
+      'height': ?height?.value,
     },
     events: events,
     children: children,
@@ -36,40 +38,48 @@ Component svg(List<Component> children,
 ///
 /// - [x]: The x coordinate of the rect.
 /// - [y]: The y coordinate of the rect.
+/// - [rx]: The horizontal corner radius of the rect.
+/// - [ry]: The vertical corner radius of the rect.
 /// - [width]: The width of the rect.
 /// - [height]: The height of the rect.
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component rect(List<Component> children,
-    {String? x,
-    String? y,
-    String? width,
-    String? height,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component rect(
+  List<Component> children, {
+  String? x,
+  String? y,
+  String? rx,
+  String? ry,
+  String? width,
+  String? height,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'rect',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
-      if (x != null) 'x': x,
-      if (y != null) 'y': y,
-      if (width != null) 'width': width,
-      if (height != null) 'height': height,
-      if (fill != null) 'fill': fill.value,
-      if (stroke != null) 'stroke': stroke.value,
-      if (strokeWidth != null) 'stroke-width': strokeWidth,
+      ...?attributes,
+      'x': ?x,
+      'y': ?y,
+      'rx': ?rx,
+      'ry': ?ry,
+      'width': ?width,
+      'height': ?height,
+      'fill': ?fill?.value,
+      'stroke': ?stroke?.value,
+      'stroke-width': ?strokeWidth,
     },
     events: events,
     children: children,
@@ -84,33 +94,35 @@ Component rect(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component circle(List<Component> children,
-    {String? cx,
-    String? cy,
-    String? r,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component circle(
+  List<Component> children, {
+  String? cx,
+  String? cy,
+  String? r,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'circle',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
-      if (cx != null) 'cx': cx,
-      if (cy != null) 'cy': cy,
-      if (r != null) 'r': r,
-      if (fill != null) 'fill': fill.value,
-      if (stroke != null) 'stroke': stroke.value,
-      if (strokeWidth != null) 'stroke-width': strokeWidth,
+      ...?attributes,
+      'cx': ?cx,
+      'cy': ?cy,
+      'r': ?r,
+      'fill': ?fill?.value,
+      'stroke': ?stroke?.value,
+      'stroke-width': ?strokeWidth,
     },
     events: events,
     children: children,
@@ -126,35 +138,37 @@ Component circle(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component ellipse(List<Component> children,
-    {String? cx,
-    String? cy,
-    String? rx,
-    String? ry,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component ellipse(
+  List<Component> children, {
+  String? cx,
+  String? cy,
+  String? rx,
+  String? ry,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'ellipse',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
-      if (cx != null) 'cx': cx,
-      if (cy != null) 'cy': cy,
-      if (rx != null) 'rx': rx,
-      if (ry != null) 'ry': ry,
-      if (fill != null) 'fill': fill.value,
-      if (stroke != null) 'stroke': stroke.value,
-      if (strokeWidth != null) 'stroke-width': strokeWidth,
+      ...?attributes,
+      'cx': ?cx,
+      'cy': ?cy,
+      'rx': ?rx,
+      'ry': ?ry,
+      'fill': ?fill?.value,
+      'stroke': ?stroke?.value,
+      'stroke-width': ?strokeWidth,
     },
     events: events,
     children: children,
@@ -170,35 +184,37 @@ Component ellipse(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component line(List<Component> children,
-    {String? x1,
-    String? y1,
-    String? x2,
-    String? y2,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component line(
+  List<Component> children, {
+  String? x1,
+  String? y1,
+  String? x2,
+  String? y2,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'line',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
-      if (x1 != null) 'x1': x1,
-      if (y1 != null) 'y1': y1,
-      if (x2 != null) 'x2': x2,
-      if (y2 != null) 'y2': y2,
-      if (fill != null) 'fill': fill.value,
-      if (stroke != null) 'stroke': stroke.value,
-      if (strokeWidth != null) 'stroke-width': strokeWidth,
+      ...?attributes,
+      'x1': ?x1,
+      'y1': ?y1,
+      'x2': ?x2,
+      'y2': ?y2,
+      'fill': ?fill?.value,
+      'stroke': ?stroke?.value,
+      'stroke-width': ?strokeWidth,
     },
     events: events,
     children: children,
@@ -211,29 +227,31 @@ Component line(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component path(List<Component> children,
-    {String? d,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component path(
+  List<Component> children, {
+  String? d,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'path',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
-      if (d != null) 'd': d,
-      if (fill != null) 'fill': fill.value,
-      if (stroke != null) 'stroke': stroke.value,
-      if (strokeWidth != null) 'stroke-width': strokeWidth,
+      ...?attributes,
+      'd': ?d,
+      'fill': ?fill?.value,
+      'stroke': ?stroke?.value,
+      'stroke-width': ?strokeWidth,
     },
     events: events,
     children: children,
@@ -246,29 +264,31 @@ Component path(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component polygon(List<Component> children,
-    {String? points,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component polygon(
+  List<Component> children, {
+  String? points,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'polygon',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
-      if (points != null) 'points': points,
-      if (fill != null) 'fill': fill.value,
-      if (stroke != null) 'stroke': stroke.value,
-      if (strokeWidth != null) 'stroke-width': strokeWidth,
+      ...?attributes,
+      'points': ?points,
+      'fill': ?fill?.value,
+      'stroke': ?stroke?.value,
+      'stroke-width': ?strokeWidth,
     },
     events: events,
     children: children,
@@ -281,29 +301,31 @@ Component polygon(List<Component> children,
 /// - [fill]: The color (or gradient or pattern) used to paint the shape.
 /// - [stroke]: The color (or gradient or pattern) used to paint the outline of the shape.
 /// - [strokeWidth]: The width of the stroke to be applied to the shape.
-Component polyline(List<Component> children,
-    {String? points,
-    Color? fill,
-    Color? stroke,
-    String? strokeWidth,
-    Key? key,
-    String? id,
-    String? classes,
-    Styles? styles,
-    Map<String, String>? attributes,
-    Map<String, EventCallback>? events}) {
-  return DomComponent(
+Component polyline(
+  List<Component> children, {
+  String? points,
+  Color? fill,
+  Color? stroke,
+  String? strokeWidth,
+  Key? key,
+  String? id,
+  String? classes,
+  Styles? styles,
+  Map<String, String>? attributes,
+  Map<String, EventCallback>? events,
+}) {
+  return Component.element(
     tag: 'polyline',
     key: key,
     id: id,
     classes: classes,
     styles: styles,
     attributes: {
-      ...attributes ?? {},
-      if (points != null) 'points': points,
-      if (fill != null) 'fill': fill.value,
-      if (stroke != null) 'stroke': stroke.value,
-      if (strokeWidth != null) 'stroke-width': strokeWidth,
+      ...?attributes,
+      'points': ?points,
+      'fill': ?fill?.value,
+      'stroke': ?stroke?.value,
+      'stroke-width': ?strokeWidth,
     },
     events: events,
     children: children,

@@ -40,8 +40,8 @@ class ButtonState extends State<Button> {
   MDCRippleOrStubbed? _ripple;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomNodeReader(
+  Component build(BuildContext context) {
+    return DomNodeReader(
       onNode: (ElementOrStubbed node) {
         _ripple?.destroy();
         if (component.label != null) {
@@ -55,24 +55,22 @@ class ButtonState extends State<Button> {
           if (component.label == null && component.icon != null) 'material-icons',
           if (component.raised) 'mdc-button--raised',
           if (component.dense) 'mdc-button--dense',
-          if (component.dialog) 'mdc-dialog__button'
+          if (component.dialog) 'mdc-dialog__button',
         ].join(' '),
         id: component.id,
         attributes: {if (component.label != null) 'type': 'button', if (component.disabled) 'disabled': ''},
         events: {'click': (e) => component.onPressed()},
         [
           if (component.label != null && component.iconAffinity == IconAffinity.right)
-            span(classes: 'mdc-button__label', [
-              text(component.label!),
-            ]),
+            span(classes: 'mdc-button__label', [text(component.label!)]),
           if (component.label != null && component.icon != null)
             i(
               classes: 'material-icons mdc-button__icon',
               attributes: {if (component.hideIcon) 'aria-hidden': 'true'},
               [text(component.icon!)],
             ),
-          if (component.label == null && component.icon != null) Text(component.icon!),
-          if (component.label != null && component.iconAffinity == IconAffinity.left) Text(component.label!),
+          if (component.label == null && component.icon != null) text(component.icon!),
+          if (component.label != null && component.iconAffinity == IconAffinity.left) text(component.label!),
         ],
       ),
     );

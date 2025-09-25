@@ -4,17 +4,17 @@ class RippleLoader extends StatelessComponent {
   const RippleLoader({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
+  Component build(BuildContext context) {
+    return div(
       styles: Styles(
-        height: 100.percent,
         display: Display.flex,
+        height: 100.percent,
         justifyContent: JustifyContent.center,
         alignItems: AlignItems.center,
         backgroundColor: Colors.black,
       ),
       [
-        div(classes: 'lds-ripple', [div([]), div([])])
+        div(classes: 'lds-ripple', [div([]), div([])]),
       ],
     );
   }

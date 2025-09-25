@@ -11,12 +11,13 @@ class App extends StatelessComponent {
   const App({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div([
-      h1([text('Hello World!')]),
-      p([text('You\'re great!')]),
+  Component build(BuildContext context) {
+    return fragment([
+      div([
+        h1([text('Hello World!')]),
+        p([text('You\'re great!')]),
+      ]),
+      Counter(),
     ]);
-
-    yield Counter();
   }
 }

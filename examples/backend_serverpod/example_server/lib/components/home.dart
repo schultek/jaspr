@@ -6,17 +6,19 @@ class Home extends StatelessComponent {
   const Home({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: "content", [
+  Component build(BuildContext context) {
+    return div(classes: "content", [
       div(classes: "logo-box", [
         img(
           src: "/images/serverpod-logo.svg",
           width: 160,
-          styles: Styles.box(margin: EdgeInsets.only(top: 8.px, bottom: 12.px)),
+          styles: Styles(
+            margin: Margin.only(top: 8.px, bottom: 12.px),
+          ),
         ),
         p([
-          a(href: "https://serverpod.dev/", [text("Serverpod + Jaspr")])
-        ])
+          a(href: "https://serverpod.dev/", [text("Serverpod + Jaspr")]),
+        ]),
       ]),
       hr(),
       div(classes: "info-box", [
@@ -37,7 +39,7 @@ class Home extends StatelessComponent {
         a(href: "https://docs.jaspr.site/quick-start", [text("Get Started")]),
         text('•'),
         a(href: "https://github.com/schultek/jaspr", [text("Github")]),
-      ])
+      ]),
     ]);
   }
 }

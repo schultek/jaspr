@@ -1,18 +1,6 @@
-library style;
-
 import 'properties/all.dart';
 
 export 'properties/all.dart' hide NumberString;
-
-part 'groups/background.dart';
-part 'groups/box.dart';
-part 'groups/flexbox.dart';
-part 'groups/flexitem.dart';
-part 'groups/general.dart';
-part 'groups/grid.dart';
-part 'groups/grid_item.dart';
-part 'groups/list.dart';
-part 'groups/text.dart';
 
 /// Represents a set of css styles by pairs of property and value.
 abstract class Styles with StylesMixin<Styles> {
@@ -22,6 +10,7 @@ abstract class Styles with StylesMixin<Styles> {
 
   /// Constructs an empty [Styles] instance.
   const factory Styles({
+    All? all,
     // Box Styles
     String? content,
     Display? display,
@@ -33,6 +22,7 @@ abstract class Styles with StylesMixin<Styles> {
     Unit? minHeight,
     Unit? maxWidth,
     Unit? maxHeight,
+    AspectRatio? aspectRatio,
     Padding? padding,
     Margin? margin,
     BoxSizing? boxSizing,
@@ -42,7 +32,10 @@ abstract class Styles with StylesMixin<Styles> {
     double? opacity,
     Visibility? visibility,
     Overflow? overflow,
+    Appearance? appearance,
     BoxShadow? shadow,
+    Filter? filter,
+    Filter? backdropFilter,
     Cursor? cursor,
     UserSelect? userSelect,
     PointerEvents? pointerEvents,
@@ -53,15 +46,18 @@ abstract class Styles with StylesMixin<Styles> {
     FlexWrap? flexWrap,
     JustifyContent? justifyContent,
     AlignItems? alignItems,
+    AlignContent? alignContent,
     // Grid Styles
     GridTemplate? gridTemplate,
     List<TrackSize>? autoRows,
     List<TrackSize>? autoColumns,
+    JustifyItems? justifyItems,
     Gap? gap,
     // Item Styles
     Flex? flex,
     int? order,
     AlignSelf? alignSelf,
+    JustifySelf? justifySelf,
     GridPlacement? gridPlacement,
     // List Styles
     ListStyle? listStyle,
@@ -96,121 +92,17 @@ abstract class Styles with StylesMixin<Styles> {
     Map<String, String>? raw,
   }) = _Styles;
 
-  /// Constructs a [Styles] instance from a [Map] of raw css style properties and values.
-  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
-  const factory Styles.raw(Map<String, String> styles) = _RawStyles;
-
   /// Constructs a [Styles] instance by combining multiple other [Styles] instances.
   const factory Styles.combine(List<Styles> styles) = _CombinedStyles;
 
   @override
   Styles combine(Styles styles) => Styles.combine([this, styles]);
-
-  /// Constructs a [Styles] instance for common text-related style properties.
-  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
-  const factory Styles.text({
-    Color? color,
-    TextAlign? align,
-    FontFamily? fontFamily,
-    FontStyle? fontStyle,
-    Unit? fontSize,
-    FontWeight? fontWeight,
-    TextDecoration? decoration,
-    TextTransform? transform,
-    Unit? indent,
-    Unit? letterSpacing,
-    Unit? wordSpacing,
-    Unit? lineHeight,
-    TextShadow? shadow,
-    TextOverflow? overflow,
-    WhiteSpace? whiteSpace,
-  }) = _TextStyles;
-
-  /// Constructs a [Styles] instance for common background style properties.
-  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
-  const factory Styles.background({
-    Color? color,
-    BackgroundAttachment? attachment,
-    BackgroundClip? clip,
-    ImageStyle? image,
-    BackgroundOrigin? origin,
-    BackgroundPosition? position,
-    BackgroundRepeat? repeat,
-    BackgroundSize? size,
-  }) = _BackgroundStyles;
-
-  /// Constructs a [Styles] instance for common box style properties.
-  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
-  const factory Styles.box({
-    EdgeInsets? padding,
-    EdgeInsets? margin,
-    Display? display,
-    BoxSizing? boxSizing,
-    Unit? width,
-    Unit? height,
-    Unit? minWidth,
-    Unit? maxWidth,
-    Unit? minHeight,
-    Unit? maxHeight,
-    Border? border,
-    BorderRadius? radius,
-    Outline? outline,
-    Overflow? overflow,
-    Visibility? visibility,
-    Position? position,
-    ZIndex? zIndex,
-    double? opacity,
-    Transform? transform,
-    BoxShadow? shadow,
-    Cursor? cursor,
-    Transition? transition,
-  }) = _BoxStyles;
-
-  /// Constructs a [Styles] instance for common flexbox style properties.
-  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
-  const factory Styles.flexbox({
-    FlexDirection? direction,
-    FlexWrap? wrap,
-    JustifyContent? justifyContent,
-    AlignItems? alignItems,
-    Gap? gap,
-  }) = _FlexBoxStyles;
-
-  /// Constructs a [Styles] instance for children of a flex-box parent.
-  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
-  const factory Styles.flexItem({
-    Flex? flex,
-    int? order,
-    AlignSelf? alignSelf,
-  }) = _FlexItemStyles;
-
-  /// Constructs a [Styles] instance for common grid style properties.
-  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
-  const factory Styles.grid({
-    GridTemplate? template,
-    Gap? gap,
-    List<TrackSize>? autoRows,
-    List<TrackSize>? autoColumns,
-  }) = _GridStyles;
-
-  /// Constructs a [Styles] instance for children of a grid parent.
-  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
-  const factory Styles.gridItem({
-    GridPlacement? placement,
-  }) = _GridItemStyles;
-
-  /// Constructs a [Styles] instance for a list.
-  @Deprecated('Will be removed in 0.20.0. Use Styles() instead.')
-  const factory Styles.list({
-    ListStyle? style,
-    ImageStyle? image,
-    ListStylePosition? position,
-  }) = _ListStyles;
 }
 
 abstract mixin class StylesMixin<T> {
   T styles({
     // Box Styles
+    All? all,
     String? content,
     Display? display,
     Position? position,
@@ -221,6 +113,7 @@ abstract mixin class StylesMixin<T> {
     Unit? minHeight,
     Unit? maxWidth,
     Unit? maxHeight,
+    AspectRatio? aspectRatio,
     Padding? padding,
     Margin? margin,
     BoxSizing? boxSizing,
@@ -230,7 +123,10 @@ abstract mixin class StylesMixin<T> {
     double? opacity,
     Visibility? visibility,
     Overflow? overflow,
+    Appearance? appearance,
     BoxShadow? shadow,
+    Filter? filter,
+    Filter? backdropFilter,
     Cursor? cursor,
     UserSelect? userSelect,
     PointerEvents? pointerEvents,
@@ -241,15 +137,18 @@ abstract mixin class StylesMixin<T> {
     FlexWrap? flexWrap,
     JustifyContent? justifyContent,
     AlignItems? alignItems,
+    AlignContent? alignContent,
     // Grid Styles
     GridTemplate? gridTemplate,
     List<TrackSize>? autoRows,
     List<TrackSize>? autoColumns,
+    JustifyItems? justifyItems,
     Gap? gap,
     // Item Styles
     Flex? flex,
     int? order,
     AlignSelf? alignSelf,
+    JustifySelf? justifySelf,
     GridPlacement? gridPlacement,
     // List Styles
     ListStyle? listStyle,
@@ -282,268 +181,85 @@ abstract mixin class StylesMixin<T> {
     BackgroundClip? backgroundClip,
     // Raw Styles
     Map<String, String>? raw,
-  }) =>
-      combine(Styles(
-        padding: padding,
-        margin: margin,
-        display: display,
-        boxSizing: boxSizing,
-        width: width,
-        height: height,
-        minWidth: minWidth,
-        maxWidth: maxWidth,
-        minHeight: minHeight,
-        maxHeight: maxHeight,
-        border: border,
-        radius: radius,
-        outline: outline,
-        overflow: overflow,
-        visibility: visibility,
-        position: position,
-        zIndex: zIndex,
-        opacity: opacity,
-        transform: transform,
-        shadow: shadow,
-        cursor: cursor,
-        transition: transition,
-        userSelect: userSelect,
-        pointerEvents: pointerEvents,
-        color: color,
-        textAlign: textAlign,
-        fontFamily: fontFamily,
-        fontStyle: fontStyle,
-        fontSize: fontSize,
-        fontWeight: fontWeight,
-        textDecoration: textDecoration,
-        textTransform: textTransform,
-        textIndent: textIndent,
-        letterSpacing: letterSpacing,
-        wordSpacing: wordSpacing,
-        lineHeight: lineHeight,
-        textShadow: textShadow,
-        textOverflow: textOverflow,
-        whiteSpace: whiteSpace,
-        backgroundColor: backgroundColor,
-        backgroundAttachment: backgroundAttachment,
-        backgroundClip: backgroundClip,
-        backgroundImage: backgroundImage,
-        backgroundOrigin: backgroundOrigin,
-        backgroundPosition: backgroundPosition,
-        backgroundRepeat: backgroundRepeat,
-        backgroundSize: backgroundSize,
-        flexDirection: flexDirection,
-        flexWrap: flexWrap,
-        justifyContent: justifyContent,
-        alignItems: alignItems,
-        gap: gap,
-        flex: flex,
-        order: order,
-        alignSelf: alignSelf,
-        gridTemplate: gridTemplate,
-        autoRows: autoRows,
-        autoColumns: autoColumns,
-        gridPlacement: gridPlacement,
-        listStyle: listStyle,
-        listImage: listImage,
-        listPosition: listPosition,
-        content: content,
-        raw: raw,
-      ));
-
-  /// Combines the current styles with a [Map] of raw css style properties and values.
-  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
-  T raw(Map<String, String> styles) => combine(Styles.raw(styles));
+  }) => combine(
+    Styles(
+      all: all,
+      padding: padding,
+      margin: margin,
+      display: display,
+      boxSizing: boxSizing,
+      width: width,
+      height: height,
+      minWidth: minWidth,
+      maxWidth: maxWidth,
+      minHeight: minHeight,
+      maxHeight: maxHeight,
+      aspectRatio: aspectRatio,
+      border: border,
+      radius: radius,
+      outline: outline,
+      overflow: overflow,
+      appearance: appearance,
+      visibility: visibility,
+      position: position,
+      zIndex: zIndex,
+      opacity: opacity,
+      transform: transform,
+      shadow: shadow,
+      filter: filter,
+      backdropFilter: backdropFilter,
+      cursor: cursor,
+      transition: transition,
+      userSelect: userSelect,
+      pointerEvents: pointerEvents,
+      color: color,
+      textAlign: textAlign,
+      fontFamily: fontFamily,
+      fontStyle: fontStyle,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      textDecoration: textDecoration,
+      textTransform: textTransform,
+      textIndent: textIndent,
+      letterSpacing: letterSpacing,
+      wordSpacing: wordSpacing,
+      lineHeight: lineHeight,
+      textShadow: textShadow,
+      textOverflow: textOverflow,
+      whiteSpace: whiteSpace,
+      backgroundColor: backgroundColor,
+      backgroundAttachment: backgroundAttachment,
+      backgroundClip: backgroundClip,
+      backgroundImage: backgroundImage,
+      backgroundOrigin: backgroundOrigin,
+      backgroundPosition: backgroundPosition,
+      backgroundRepeat: backgroundRepeat,
+      backgroundSize: backgroundSize,
+      flexDirection: flexDirection,
+      flexWrap: flexWrap,
+      justifyContent: justifyContent,
+      alignItems: alignItems,
+      alignContent: alignContent,
+      justifyItems: justifyItems,
+      gap: gap,
+      flex: flex,
+      order: order,
+      alignSelf: alignSelf,
+      justifySelf: justifySelf,
+      gridTemplate: gridTemplate,
+      autoRows: autoRows,
+      autoColumns: autoColumns,
+      gridPlacement: gridPlacement,
+      listStyle: listStyle,
+      listImage: listImage,
+      listPosition: listPosition,
+      content: content,
+      raw: raw,
+    ),
+  );
 
   /// Combines the current styles with another [Styles] instances.
   T combine(Styles styles);
-
-  /// Combines the current styles with common text-related style properties.
-  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
-  T text({
-    Color? color,
-    TextAlign? align,
-    FontFamily? fontFamily,
-    FontStyle? fontStyle,
-    Unit? fontSize,
-    FontWeight? fontWeight,
-    TextDecoration? decoration,
-    TextTransform? transform,
-    Unit? indent,
-    Unit? letterSpacing,
-    Unit? wordSpacing,
-    Unit? lineHeight,
-    TextShadow? shadow,
-    TextOverflow? overflow,
-    WhiteSpace? whiteSpace,
-  }) =>
-      combine(Styles.text(
-        color: color,
-        align: align,
-        fontFamily: fontFamily,
-        fontStyle: fontStyle,
-        fontSize: fontSize,
-        fontWeight: fontWeight,
-        decoration: decoration,
-        transform: transform,
-        indent: indent,
-        letterSpacing: letterSpacing,
-        wordSpacing: wordSpacing,
-        lineHeight: lineHeight,
-        shadow: shadow,
-        overflow: overflow,
-        whiteSpace: whiteSpace,
-      ));
-
-  /// Combines the current styles with common background style properties.
-  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
-  T background({
-    Color? color,
-    BackgroundAttachment? attachment,
-    BackgroundClip? clip,
-    ImageStyle? image,
-    BackgroundOrigin? origin,
-    BackgroundPosition? position,
-    BackgroundRepeat? repeat,
-    BackgroundSize? size,
-  }) =>
-      combine(Styles.background(
-        color: color,
-        attachment: attachment,
-        clip: clip,
-        image: image,
-        origin: origin,
-        position: position,
-        repeat: repeat,
-        size: size,
-      ));
-
-  /// Combines the current styles with common box style properties.
-  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
-  T box({
-    EdgeInsets? padding,
-    EdgeInsets? margin,
-    Display? display,
-    BoxSizing? boxSizing,
-    Unit? width,
-    Unit? height,
-    Unit? minWidth,
-    Unit? maxWidth,
-    Unit? minHeight,
-    Unit? maxHeight,
-    Border? border,
-    BorderRadius? radius,
-    Outline? outline,
-    Overflow? overflow,
-    Visibility? visibility,
-    Position? position,
-    double? opacity,
-    Transform? transform,
-    BoxShadow? shadow,
-    Cursor? cursor,
-    Transition? transition,
-  }) =>
-      combine(Styles.box(
-        padding: padding,
-        margin: margin,
-        display: display,
-        boxSizing: boxSizing,
-        width: width,
-        height: height,
-        minWidth: minWidth,
-        maxWidth: maxWidth,
-        minHeight: minHeight,
-        maxHeight: maxHeight,
-        border: border,
-        radius: radius,
-        outline: outline,
-        overflow: overflow,
-        visibility: visibility,
-        position: position,
-        opacity: opacity,
-        transform: transform,
-        shadow: shadow,
-        cursor: cursor,
-        transition: transition,
-      ));
-
-  /// Combines the current styles with common flexbox style properties.
-  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
-  T flexbox({
-    FlexDirection? direction,
-    FlexWrap? wrap,
-    JustifyContent? justifyContent,
-    AlignItems? alignItems,
-    Gap? gap,
-  }) =>
-      combine(Styles.flexbox(
-        direction: direction,
-        wrap: wrap,
-        justifyContent: justifyContent,
-        alignItems: alignItems,
-        gap: gap,
-      ));
-
-  /// Combines the current styles with common flex child properties.
-  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
-  T flexItem({
-    Flex? flex,
-    int? order,
-    AlignSelf? alignSelf,
-  }) =>
-      combine(Styles.flexItem(
-        flex: flex,
-        order: order,
-        alignSelf: alignSelf,
-      ));
-
-  /// Combines the current styles with common grid style properties.
-  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
-  T grid({
-    GridTemplate? template,
-    Gap? gap,
-    List<TrackSize>? autoRows,
-    List<TrackSize>? autoColumns,
-  }) =>
-      combine(Styles.grid(
-        template: template,
-        gap: gap,
-        autoRows: autoRows,
-        autoColumns: autoColumns,
-      ));
-
-  /// Combines the current styles with common grid child properties.
-  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
-  T gridItem({
-    GridPlacement? placement,
-  }) =>
-      combine(Styles.gridItem(
-        placement: placement,
-      ));
-
-  /// Combines the current styles with common list style properties.
-  @Deprecated('Will be removed in 0.20.0. Use .styles() instead.')
-  T list({
-    ListStyle? style,
-    ImageStyle? image,
-    ListStylePosition? position,
-  }) =>
-      combine(Styles.list(
-        style: style,
-        image: image,
-        position: position,
-      ));
-}
-
-class _RawStyles extends Styles {
-  @override
-  final Map<String, String> properties;
-
-  const _RawStyles(this.properties) : super._();
-
-  @override
-  Styles raw(Map<String, String> styles) {
-    return Styles(raw: {...properties, ...styles});
-  }
 }
 
 class _CombinedStyles extends Styles {
@@ -557,5 +273,263 @@ class _CombinedStyles extends Styles {
   @override
   Styles combine(Styles styles) {
     return Styles.combine([..._styles, styles]);
+  }
+}
+
+class _Styles extends Styles {
+  // Box Styles
+  final All? all;
+  final String? content;
+  final Display? display;
+  final Position? position;
+  final ZIndex? zIndex;
+  final Unit? width;
+  final Unit? height;
+  final Unit? minWidth;
+  final Unit? minHeight;
+  final Unit? maxWidth;
+  final Unit? maxHeight;
+  final AspectRatio? aspectRatio;
+  final Padding? padding;
+  final Margin? margin;
+  final BoxSizing? boxSizing;
+  final Border? border;
+  final BorderRadius? radius;
+  final Outline? outline;
+  final double? opacity;
+  final Visibility? visibility;
+  final Overflow? overflow;
+  final Appearance? appearance;
+  final BoxShadow? shadow;
+  final Filter? filter;
+  final Filter? backdropFilter;
+  final Cursor? cursor;
+  final UserSelect? userSelect;
+  final PointerEvents? pointerEvents;
+  final Transition? transition;
+  final Transform? transform;
+  // Flexbox Style
+  final FlexDirection? flexDirection;
+  final FlexWrap? flexWrap;
+  final JustifyContent? justifyContent;
+  final AlignItems? alignItems;
+  final AlignContent? alignContent;
+  // Grid Style
+  final GridTemplate? gridTemplate;
+  final List<TrackSize>? autoRows;
+  final List<TrackSize>? autoColumns;
+  final Gap? gap;
+  final JustifyItems? justifyItems;
+  // Item Style
+  final Flex? flex;
+  final int? order;
+  final AlignSelf? alignSelf;
+  final JustifySelf? justifySelf;
+  final GridPlacement? gridPlacement;
+  // List Style
+  final ListStyle? listStyle;
+  final ImageStyle? listImage;
+  final ListStylePosition? listPosition;
+  // Text Style
+  final Color? color;
+  final TextAlign? textAlign;
+  final FontFamily? fontFamily;
+  final Unit? fontSize;
+  final FontWeight? fontWeight;
+  final FontStyle? fontStyle;
+  final TextDecoration? textDecoration;
+  final TextTransform? textTransform;
+  final Unit? textIndent;
+  final Unit? letterSpacing;
+  final Unit? wordSpacing;
+  final Unit? lineHeight;
+  final TextShadow? textShadow;
+  final TextOverflow? textOverflow;
+  final WhiteSpace? whiteSpace;
+  // Background Style
+  final Color? backgroundColor;
+  final ImageStyle? backgroundImage;
+  final BackgroundOrigin? backgroundOrigin;
+  final BackgroundPosition? backgroundPosition;
+  final BackgroundAttachment? backgroundAttachment;
+  final BackgroundRepeat? backgroundRepeat;
+  final BackgroundSize? backgroundSize;
+  final BackgroundClip? backgroundClip;
+  // Raw Styles
+  final Map<String, String>? _raw;
+
+  const _Styles({
+    this.all,
+    // Box Styles
+    this.content,
+    this.display,
+    this.position,
+    this.zIndex,
+    this.width,
+    this.height,
+    this.minWidth,
+    this.minHeight,
+    this.maxWidth,
+    this.maxHeight,
+    this.aspectRatio,
+    this.padding,
+    this.margin,
+    this.boxSizing,
+    this.border,
+    this.radius,
+    this.outline,
+    this.opacity,
+    this.visibility,
+    this.overflow,
+    this.appearance,
+    this.shadow,
+    this.filter,
+    this.backdropFilter,
+    this.cursor,
+    this.userSelect,
+    this.pointerEvents,
+    this.transition,
+    this.transform,
+    // Flexbox Styles
+    this.flexDirection,
+    this.flexWrap,
+    this.justifyContent,
+    this.alignItems,
+    this.alignContent,
+    // Grid Styles
+    this.gridTemplate,
+    this.autoRows,
+    this.autoColumns,
+    this.justifyItems,
+    this.gap,
+    // Item Styles
+    this.flex,
+    this.order,
+    this.alignSelf,
+    this.justifySelf,
+    this.gridPlacement,
+    // List Styles
+    this.listStyle,
+    this.listImage,
+    this.listPosition,
+    // Text Styles
+    this.color,
+    this.textAlign,
+    this.fontFamily,
+    this.fontSize,
+    this.fontWeight,
+    this.fontStyle,
+    this.textDecoration,
+    this.textTransform,
+    this.textIndent,
+    this.letterSpacing,
+    this.wordSpacing,
+    this.lineHeight,
+    this.textShadow,
+    this.textOverflow,
+    this.whiteSpace,
+    // Background Styles
+    this.backgroundColor,
+    this.backgroundImage,
+    this.backgroundOrigin,
+    this.backgroundPosition,
+    this.backgroundAttachment,
+    this.backgroundRepeat,
+    this.backgroundSize,
+    this.backgroundClip,
+    // Raw Styles
+    Map<String, String>? raw,
+  }) : _raw = raw,
+       super._();
+
+  @override
+  Map<String, String> get properties => {
+    'all': ?all?.value,
+    // Box Styles
+    if (content != null) 'content': '"$content"',
+    'display': ?display?.value,
+    ...?position?.styles,
+    'z-index': ?zIndex?.value,
+    'width': ?width?.value,
+    'height': ?height?.value,
+    'min-width': ?minWidth?.value,
+    'min-height': ?minHeight?.value,
+    'max-width': ?maxWidth?.value,
+    'max-height': ?maxHeight?.value,
+    'aspect-ratio': ?aspectRatio?.value,
+    ...?padding?.styles._prefixed('padding'),
+    ...?margin?.styles._prefixed('margin'),
+    'box-sizing': ?boxSizing?.value,
+    ...?border?.styles,
+    ...?radius?.styles,
+    ...?outline?.styles,
+    'opacity': ?opacity?.toString(),
+    'visibility': ?visibility?.value,
+    ...?overflow?.styles,
+    'appearance': ?appearance?.value,
+    'box-shadow': ?shadow?.value,
+    'filter': ?filter?.value,
+    'backdrop-filter': ?backdropFilter?.value,
+    'cursor': ?cursor?.value,
+    'user-select': ?userSelect?.value,
+    '-webkit-user-select': ?userSelect?.value,
+    'pointer-events': ?pointerEvents?.value,
+    'transition': ?transition?.value,
+    'transform': ?transform?.value,
+    // Flexbox Styles
+    'flex-direction': ?flexDirection?.value,
+    'flex-wrap': ?flexWrap?.value,
+    'justify-content': ?justifyContent?.value,
+    'align-items': ?alignItems?.value,
+    'align-content': ?alignContent?.value,
+    // Grid Styles
+    ...?gridTemplate?.styles,
+    'grid-auto-rows': ?autoRows?.map((s) => s.value).join(' '),
+    'grid-auto-columns': ?autoColumns?.map((s) => s.value).join(' '),
+    'justify-items': ?justifyItems?.value,
+    ...?gap?.styles,
+    // Grid Item Styles
+    ...?flex?.styles,
+    'order': ?order?.toString(),
+    'align-self': ?alignSelf?.value,
+    'justify-self': ?justifySelf?.value,
+    ...?gridPlacement?.styles,
+    // List Styles
+    'list-style-type': ?listStyle?.value,
+    'list-style-image': ?listImage?.value,
+    'list-style-position': ?listPosition?.value,
+    // Text Styles
+    'color': ?color?.value,
+    'text-align': ?textAlign?.value,
+    'font-family': ?fontFamily?.value,
+    'font-size': ?fontSize?.value,
+    'font-weight': ?fontWeight?.value,
+    'font-style': ?fontStyle?.value,
+    'text-decoration': ?textDecoration?.value,
+    'text-transform': ?textTransform?.value,
+    'text-indent': ?textIndent?.value,
+    'letter-spacing': ?letterSpacing?.value,
+    'word-spacing': ?wordSpacing?.value,
+    'line-height': ?lineHeight?.value,
+    'text-shadow': ?textShadow?.value,
+    'text-overflow': ?textOverflow?.value,
+    'white-space': ?whiteSpace?.value,
+    // Background Styles
+    'background-color': ?backgroundColor?.value,
+    'background-image': ?backgroundImage?.value,
+    'background-origin': ?backgroundOrigin?.value,
+    'background-position': ?backgroundPosition?.value,
+    'background-attachment': ?backgroundAttachment?.value,
+    'background-repeat': ?backgroundRepeat?.value,
+    'background-size': ?backgroundSize?.value,
+    'background-clip': ?backgroundClip?.value,
+    // Raw Styles
+    ...?_raw,
+  };
+}
+
+extension on Map<String, String> {
+  Map<String, String> _prefixed(String prefix) {
+    return map((k, v) => MapEntry(prefix + (k.isNotEmpty ? '-$k' : ''), v));
   }
 }

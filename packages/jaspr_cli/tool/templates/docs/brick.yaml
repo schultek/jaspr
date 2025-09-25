@@ -1,0 +1,7 @@
+name: docs
+description: A documentation site built with Jaspr
+
+version: 0.1.0
+
+environment:
+  mason: ">=0.1.0-dev.52 <0.1.0"

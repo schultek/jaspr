@@ -1,14 +1,14 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:website/constants/theme.dart';
 
+import '../../../constants/theme.dart';
 import 'components/link_card.dart';
 
 class Features extends StatelessComponent {
   const Features({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section(id: 'features', [
+  Component build(BuildContext context) {
+    return section(id: 'features', [
       span(classes: 'caption text-gradient', [text('Features')]),
       h2([text('Comes with '), br(), text('Everything You Need')]),
       div(classes: 'feature-grid', [
@@ -65,7 +65,7 @@ class Features extends StatelessComponent {
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('#features', [
       css('&').styles(
         display: Display.flex,
@@ -86,7 +86,7 @@ class Features extends StatelessComponent {
         ),
         css('& > *').styles(
           boxSizing: BoxSizing.borderBox,
-          flex: Flex(grow: 1, shrink: 0, basis: FlexBasis(13.rem)),
+          flex: Flex(grow: 1, shrink: 0, basis: 13.rem),
         ),
       ]),
     ]),

@@ -12,18 +12,12 @@ class MainSection extends StatelessComponent {
   const MainSection({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var isTutorial = context.watch(isTutorialProvider);
 
-    yield section(classes: 'main-section', [
+    return section(classes: 'main-section', [
       div(classes: 'panels', [
-        Splitter(
-          children: [
-            if (isTutorial) TutorialPanel(),
-            EditorPanel(),
-            if (!isTutorial) OutputPanel(),
-          ],
-        )
+        Splitter(children: [if (isTutorial) TutorialPanel(), EditorPanel(), if (!isTutorial) OutputPanel()]),
       ]),
       SnackBar(),
     ]);

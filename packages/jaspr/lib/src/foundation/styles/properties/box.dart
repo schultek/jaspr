@@ -13,6 +13,7 @@ enum Display {
   inlineGrid('inline-grid'),
   flowRoot('flow-root'),
   contents('contents'),
+  listItem('list-item'),
 
   inherit('inherit'),
   initial('initial'),
@@ -28,8 +29,6 @@ enum Display {
 abstract class Border {
   const factory Border({BorderStyle? style, Color? color, Unit? width}) = __Border;
 
-  @Deprecated('Use Border() instead.')
-  const factory Border.all(BorderSide side) = _AllBorder;
   const factory Border.only({BorderSide? left, BorderSide? top, BorderSide? right, BorderSide? bottom}) = _OnlyBorder;
   const factory Border.symmetric({BorderSide? vertical, BorderSide? horizontal}) = _SymmetricBorder;
 
@@ -64,27 +63,12 @@ class __Border implements Border {
 
   @override
   Map<String, String> get styles => {
-        'border': [
-          if (style != null) style!.value,
-          if (color != null) color!.value,
-          if (width != null) width!.value,
-        ].join(' ')
-      };
-}
-
-class _AllBorder implements Border {
-  final BorderSide side;
-
-  const _AllBorder(this.side);
-
-  @override
-  Map<String, String> get styles => {
-        'border': [
-          if (side.style != null) side.style!.value,
-          if (side.color != null) side.color!.value,
-          if (side.width != null) side.width!.value,
-        ].join(' ')
-      };
+    'border': [
+      if (style != null) style!.value,
+      if (color != null) color!.value,
+      if (width != null) width!.value,
+    ].join(' '),
+  };
 }
 
 class _OnlyBorder implements Border {
@@ -97,19 +81,19 @@ class _OnlyBorder implements Border {
 
   @override
   Map<String, String> get styles => {
-        if (left?.style != null) 'border-left-style': left!.style!.value,
-        if (top?.style != null) 'border-top-style': top!.style!.value,
-        if (right?.style != null) 'border-right-style': right!.style!.value,
-        if (bottom?.style != null) 'border-bottom-style': bottom!.style!.value,
-        if (left?.color != null) 'border-left-color': left!.color!.value,
-        if (top?.color != null) 'border-top-color': top!.color!.value,
-        if (right?.color != null) 'border-right-color': right!.color!.value,
-        if (bottom?.color != null) 'border-bottom-color': bottom!.color!.value,
-        if (left?.width != null) 'border-left-width': left!.width!.value,
-        if (top?.width != null) 'border-top-width': top!.width!.value,
-        if (right?.width != null) 'border-right-width': right!.width!.value,
-        if (bottom?.width != null) 'border-bottom-width': bottom!.width!.value,
-      };
+    'border-left-style': ?left?.style?.value,
+    'border-top-style': ?top?.style?.value,
+    'border-right-style': ?right?.style?.value,
+    'border-bottom-style': ?bottom?.style?.value,
+    'border-left-color': ?left?.color?.value,
+    'border-top-color': ?top?.color?.value,
+    'border-right-color': ?right?.color?.value,
+    'border-bottom-color': ?bottom?.color?.value,
+    'border-left-width': ?left?.width?.value,
+    'border-top-width': ?top?.width?.value,
+    'border-right-width': ?right?.width?.value,
+    'border-bottom-width': ?bottom?.width?.value,
+  };
 }
 
 class _SymmetricBorder implements Border {
@@ -124,26 +108,26 @@ class _SymmetricBorder implements Border {
       if (vertical?.style != null && horizontal?.style != null)
         'border-style': '${vertical!.style!.value} ${horizontal!.style!.value}'
       else ...{
-        if (vertical?.style != null) 'border-top-style': vertical!.style!.value,
-        if (vertical?.style != null) 'border-bottom-style': vertical!.style!.value,
-        if (horizontal?.style != null) 'border-left-style': horizontal!.style!.value,
-        if (horizontal?.style != null) 'border-right-style': horizontal!.style!.value,
+        'border-top-style': ?vertical?.style?.value,
+        'border-bottom-style': ?vertical?.style?.value,
+        'border-left-style': ?horizontal?.style?.value,
+        'border-right-style': ?horizontal?.style?.value,
       },
       if (vertical?.color != null && horizontal?.color != null)
         'border-color': '${vertical!.color!.value} ${horizontal!.color!.value}'
       else ...{
-        if (vertical?.color != null) 'border-top-color': vertical!.color!.value,
-        if (vertical?.color != null) 'border-bottom-color': vertical!.color!.value,
-        if (horizontal?.color != null) 'border-left-color': horizontal!.color!.value,
-        if (horizontal?.color != null) 'border-right-color': horizontal!.color!.value,
+        'border-top-color': ?vertical?.color?.value,
+        'border-bottom-color': ?vertical?.color?.value,
+        'border-left-color': ?horizontal?.color?.value,
+        'border-right-color': ?horizontal?.color?.value,
       },
       if (vertical?.width != null && horizontal?.width != null)
         'border-width': '${vertical!.width!.value} ${horizontal!.width!.value}'
       else ...{
-        if (vertical?.width != null) 'border-top-width': vertical!.width!.value,
-        if (vertical?.width != null) 'border-bottom-width': vertical!.width!.value,
-        if (horizontal?.width != null) 'border-left-width': horizontal!.width!.value,
-        if (horizontal?.width != null) 'border-right-width': horizontal!.width!.value,
+        'border-top-width': ?vertical?.width?.value,
+        'border-bottom-width': ?vertical?.width?.value,
+        'border-left-width': ?horizontal?.width?.value,
+        'border-right-width': ?horizontal?.width?.value,
       },
     };
   }
@@ -156,10 +140,7 @@ class BorderSide {
 
   const BorderSide({this.style = BorderStyle.solid, this.color, this.width});
 
-  const BorderSide.none()
-      : color = null,
-        width = null,
-        style = BorderStyle.none;
+  const BorderSide.none() : color = null, width = null, style = BorderStyle.none;
   const BorderSide.solid({this.color, this.width}) : style = BorderStyle.solid;
   const BorderSide.dotted({this.color, this.width}) : style = BorderStyle.dotted;
   const BorderSide.dashed({this.color, this.width}) : style = BorderStyle.dashed;
@@ -205,9 +186,7 @@ class _AllBorderRadius implements BorderRadius {
   const _AllBorderRadius(this.radius);
 
   @override
-  Map<String, String> get styles => {
-        'border-radius': radius._values.join(' / '),
-      };
+  Map<String, String> get styles => {'border-radius': radius._values.join(' / ')};
 }
 
 class _CircularBorderRadius implements BorderRadius {
@@ -227,15 +206,15 @@ class _OnlyBorderRadius implements BorderRadius {
 
   const _OnlyBorderRadius({this.topLeft, this.topRight, this.bottomLeft, this.bottomRight});
   const _OnlyBorderRadius.vertical({Radius? top, Radius? bottom})
-      : topLeft = top,
-        topRight = top,
-        bottomLeft = bottom,
-        bottomRight = bottom;
+    : topLeft = top,
+      topRight = top,
+      bottomLeft = bottom,
+      bottomRight = bottom;
   const _OnlyBorderRadius.horizontal({Radius? left, Radius? right})
-      : topLeft = left,
-        topRight = right,
-        bottomLeft = left,
-        bottomRight = right;
+    : topLeft = left,
+      topRight = right,
+      bottomLeft = left,
+      bottomRight = right;
 
   @override
   Map<String, String> get styles {
@@ -248,10 +227,10 @@ class _OnlyBorderRadius implements BorderRadius {
       }
     } else {
       return {
-        if (topLeft != null) 'border-top-left-radius': topLeft!._values.join(' '),
-        if (topRight != null) 'border-top-right-radius': topRight!._values.join(' '),
-        if (bottomRight != null) 'border-bottom-right-radius': bottomRight!._values.join(' '),
-        if (bottomLeft != null) 'border-bottom-left-radius': bottomLeft!._values.join(' '),
+        'border-top-left-radius': ?topLeft?._values.join(' '),
+        'border-top-right-radius': ?topRight?._values.join(' '),
+        'border-bottom-right-radius': ?bottomRight?._values.join(' '),
+        'border-bottom-left-radius': ?bottomLeft?._values.join(' '),
       };
     }
   }
@@ -322,11 +301,11 @@ class _Outline implements Outline {
 
   @override
   Map<String, String> get styles => {
-        if (color != null) 'outline-color': color!.value,
-        if (style != null) 'outline-style': style!.value,
-        if (width != null) 'outline-width': width!.value,
-        if (offset != null) 'outline-offset': offset!.value,
-      };
+    'outline-color': ?color?.value,
+    'outline-style': ?style?.value,
+    'outline-width': ?width?.value,
+    'outline-offset': ?offset?.value,
+  };
 }
 
 enum OutlineStyle {
@@ -410,9 +389,7 @@ class _Overflow implements Overflow {
   const _Overflow(this._value);
 
   @override
-  Map<String, String> get styles => {
-        'overflow': _value,
-      };
+  Map<String, String> get styles => {'overflow': _value};
 }
 
 class OverflowValue extends _Overflow {
@@ -427,13 +404,13 @@ class _OnlyOverflow implements Overflow {
 
   @override
   Map<String, String> get styles => {
-        if (x != null && y != null)
-          'overflow': '${x!._value} ${y!._value}'
-        else ...{
-          if (x != null) 'overflow-x': x!._value,
-          if (y != null) 'overflow-y': y!._value,
-        },
-      };
+    if (x != null && y != null)
+      'overflow': '${x!._value} ${y!._value}'
+    else ...{
+      'overflow-x': ?x?._value,
+      'overflow-y': ?y?._value,
+    },
+  };
 }
 
 enum Visibility {
@@ -471,8 +448,13 @@ abstract class BoxShadow {
   const factory BoxShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Unit? spread, Color? color}) =
       _BoxShadow;
 
-  const factory BoxShadow.inset(
-      {required Unit offsetX, required Unit offsetY, Unit? blur, Unit? spread, Color? color}) = _InsetBoxShadow;
+  const factory BoxShadow.inset({
+    required Unit offsetX,
+    required Unit offsetY,
+    Unit? blur,
+    Unit? spread,
+    Color? color,
+  }) = _InsetBoxShadow;
 
   const factory BoxShadow.combine(List<BoxShadow> shadows) = _CombineBoxShadow;
 
@@ -480,8 +462,14 @@ abstract class BoxShadow {
 }
 
 class _BoxShadow implements BoxShadow {
-  const _BoxShadow(
-      {required this.offsetX, required this.offsetY, this.blur, this.spread, this.color, this.inset = false});
+  const _BoxShadow({
+    required this.offsetX,
+    required this.offsetY,
+    this.blur,
+    this.spread,
+    this.color,
+    this.inset = false,
+  });
 
   final Unit offsetX;
   final Unit offsetY;
@@ -492,18 +480,18 @@ class _BoxShadow implements BoxShadow {
 
   @override
   String get value => [
-        if (inset) 'inset',
-        offsetX.value,
-        offsetY.value,
-        if (blur != null || spread != null) blur?.value ?? '0',
-        if (spread != null) spread!.value,
-        if (color != null) color!.value
-      ].join(' ');
+    if (inset) 'inset',
+    offsetX.value,
+    offsetY.value,
+    if (blur != null || spread != null) blur?.value ?? '0',
+    if (spread != null) spread!.value,
+    if (color != null) color!.value,
+  ].join(' ');
 }
 
 class _InsetBoxShadow extends _BoxShadow {
   const _InsetBoxShadow({required super.offsetX, required super.offsetY, super.blur, super.spread, super.color})
-      : super(inset: true);
+    : super(inset: true);
 }
 
 class _CombineBoxShadow implements BoxShadow {
@@ -570,4 +558,88 @@ class _UrlCursor implements Cursor {
 
   @override
   String get value => 'url($url)${x != null || y != null ? ' ${x ?? 0} ${y ?? 0}' : ''}, ${fallback.value}';
+}
+
+enum All {
+  initial('initial'),
+  inherit('inherit'),
+  unset('unset'),
+  revert('revert'),
+  revertLayer('revert-layer');
+
+  /// The css value
+  final String value;
+  const All(this.value);
+}
+
+enum Appearance {
+  // Global values
+  initial('initial'),
+  inherit('inherit'),
+  unset('unset'),
+  revert('revert'),
+  revertLayer('revert-layer'),
+
+  // Basic values
+  none('none'),
+  auto('auto'),
+  base('base'),
+  baseSelect('base-select'),
+  searchfield('searchfield'),
+  textArea('textarea'),
+  checkbox('checkbox'),
+  radio('radio'),
+  menulist('menulist'),
+  listbox('listbox'),
+  meter('meter'),
+  progressBar('progress-bar'),
+  button('button'),
+  textfield('textfield'),
+  menulistButton('menulist-button');
+
+  /// The css value
+  final String value;
+  const Appearance(this.value);
+}
+
+class AspectRatio {
+  const AspectRatio._(this.value);
+
+  /// The css value
+  final String value;
+
+  // Global values
+  static const initial = AspectRatio._('initial');
+  static const inherit = AspectRatio._('inherit');
+  static const unset = AspectRatio._('unset');
+  static const revert = AspectRatio._('revert');
+  static const revertLayer = AspectRatio._('revert-layer');
+
+  // Basic value(s)
+  static const auto = AspectRatio._('auto');
+
+  const factory AspectRatio(int num, [int? denom]) = _AspectRatio;
+  const factory AspectRatio.autoOrRatio(int num, [int? denom]) = _AspectAutoOrRatio;
+}
+
+class _AspectRatio implements AspectRatio {
+  const _AspectRatio(this.num, [this.denom]);
+
+  final int num;
+  final int? denom;
+
+  /// The css value
+  @override
+  String get value => "$num${denom != null ? '/$denom' : ''}";
+}
+
+class _AspectAutoOrRatio implements AspectRatio {
+  const _AspectAutoOrRatio(this.num, [this.denom]);
+
+  final int num;
+  final int? denom;
+
+  /// The css value
+  @override
+  String get value => "auto $num${denom != null ? '/$denom' : ''}";
 }

@@ -5,7 +5,7 @@ import 'package:universal_web/web.dart' as web;
 
 import '../components/basic.dart';
 import '../components/raw_text/raw_text.dart';
-import '../foundation/marker_utils.dart';
+import '../foundation/validator.dart';
 import '../framework/framework.dart';
 import 'browser_binding.dart';
 import 'utils.dart';
@@ -47,12 +47,12 @@ class ConfigParams {
   T get<T>(String key) {
     if (T == Component) {
       var sId = _params[key];
-      assert(sId is String && sId.startsWith('s$componentMarkerPrefix'));
+      assert(sId is String && sId.startsWith('s${DomValidator.clientMarkerPrefixRegex}'));
       var s = serverComponents[sId.substring(2)];
       if (s != null) {
         return s.build() as T;
       } else {
-        return Text("") as T;
+        return const Component.text("") as T;
       }
     }
     if (_params[key] is! T) {
@@ -62,11 +62,11 @@ class ConfigParams {
   }
 }
 
-final _clientStartRegex = RegExp('^$componentMarkerPrefixRegex(\\S+)(?:\\s+data=(.*))?\$');
-final _clientEndRegex = RegExp('^/$componentMarkerPrefixRegex(\\S+)\$');
+final _clientStartRegex = RegExp('^${DomValidator.clientMarkerPrefixRegex}(\\S+)(?:\\s+data=(.*))?\$');
+final _clientEndRegex = RegExp('^/${DomValidator.clientMarkerPrefixRegex}(\\S+)\$');
 
-final _serverStartRegex = RegExp('^s$componentMarkerPrefixRegex(\\d+)\$');
-final _serverEndRegex = RegExp('^/s$componentMarkerPrefixRegex(\\d+)\$');
+final _serverStartRegex = RegExp('^s${DomValidator.clientMarkerPrefixRegex}(\\d+)\$');
+final _serverEndRegex = RegExp('^/s${DomValidator.clientMarkerPrefixRegex}(\\d+)\$');
 
 sealed class ComponentAnchor {
   ComponentAnchor(this.name, this.startNode);
@@ -90,7 +90,7 @@ class ClientComponentAnchor extends ComponentAnchor {
 
   Component build() {
     assert(builder is ClientBuilder, "ClientComponentAnchor was not resolved before calling build()");
-    var params = ConfigParams(data != null ? jsonDecode(unescapeMarkerText(data!)) : {}, serverAnchors);
+    var params = ConfigParams(data != null ? jsonDecode(const DomValidator().unescapeMarkerText(data!)) : {}, serverAnchors);
     return (builder as ClientBuilder)(params);
   }
 
@@ -142,7 +142,7 @@ class ServerComponentAnchor extends ComponentAnchor {
       elementFactories['${name}_$n'] = (_) {
         if (child == null) {
           var c = client.build();
-          child = Builder.single(key: GlobalKey(), builder: (_) => c);
+          child = Builder(key: GlobalKey(), builder: (_) => c);
         }
         return child!;
       };
@@ -161,7 +161,9 @@ class ServerComponentAnchor extends ComponentAnchor {
 
   Component build() {
     return Builder(builder: (context) {
-      return fragment.childNodes.toIterable().map((n) => RawNode(n, elementFactories: elementFactories));
+      return Component.fragment([
+        for (final n in fragment.childNodes.toIterable())  RawNode(n, elementFactories: elementFactories),
+      ]);
     });
   }
 }
@@ -201,8 +203,6 @@ List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, we
       // Nested client components are handled recursively.
       if (anchors.isNotEmpty) continue;
 
-      assert(anchors.isEmpty);
-
       var start = comp.startNode;
       assert(start.parentNode == currNode.parentNode, "Found client component anchors with different parent nodes.");
 
@@ -210,7 +210,7 @@ List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, we
       comp.builder = clientByName(name);
 
       // Remove the data string.
-      start.text = '$componentMarkerPrefix${comp.name}';
+      start.textContent = '${DomValidator.clientMarkerPrefix}${comp.name}';
 
       if (runEagerly) {
         // Instantly run the client component.

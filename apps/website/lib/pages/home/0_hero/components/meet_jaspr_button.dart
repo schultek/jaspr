@@ -3,12 +3,12 @@ import 'dart:math';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
-import 'package:website/utils/events.dart';
-import 'package:website/components/link_button.dart';
-import 'package:website/pages/home/0_hero/components/overlay.dart';
-import 'package:website/constants/theme.dart';
 
+import '../../../../components/link_button.dart';
 import '../../../../components/particles.dart';
+import '../../../../constants/theme.dart';
+import '../../../../utils/events.dart';
+import 'overlay.dart';
 
 @client
 class MeetJasprButton extends StatefulComponent {
@@ -50,88 +50,99 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
+    final children = <Component>[];
     if (notifier.done) {
       if (showOverlay) {
-        yield LinkButton.outlined(label: 'Meet Jasper', icon: 'jasper', to: '#meet');
-        yield Overlay(onClose: () {
-          setState(() {
-            showOverlay = false;
-          });
-        });
-      } else {
-        yield DomComponent.wrap(
-          events: {
-            'click': (event) {
-              event.preventDefault();
+        children.add(LinkButton.outlined(label: 'Meet Jasper', icon: 'jasper', to: '#meet'));
+        children.add(
+          Overlay(
+            onClose: () {
               setState(() {
-                showOverlay = true;
+                showOverlay = false;
               });
             },
-          },
-          child: LinkButton.outlined(label: 'Meet Jasper', icon: 'jasper', to: '#meet'),
+          ),
+        );
+      } else {
+        children.add(
+          Component.wrapElement(
+            events: {
+              'click': (event) {
+                event.preventDefault();
+                setState(() {
+                  showOverlay = true;
+                });
+              },
+            },
+            child: LinkButton.outlined(label: 'Meet Jasper', icon: 'jasper', to: '#meet'),
+          ),
         );
       }
 
-      return;
+      return fragment(children);
     }
 
-    yield div(id: 'meet-jaspr-button', [
-      DomComponent.wrap(
-        classes: touchTimer != null ? 'active' : null,
-        events: {
-          'mousemove': (event) {
-            var e = event as web.MouseEvent;
-            var movement = (e.movementX.abs() + e.movementY.abs()) / 10;
-            notifier.add(movement);
-          },
-          'touchstart': (event) {
-            event.preventDefault();
-            touchTimer = Timer(Duration(seconds: 1), () {
-              touchTimer = Timer.periodic(Duration(milliseconds: 50), (_) {
-                notifier.add(2, linear: true);
+    children.add(
+      div(id: 'meet-jaspr-button', [
+        Component.wrapElement(
+          classes: touchTimer != null ? 'active' : null,
+          events: {
+            'mousemove': (event) {
+              var e = event as web.MouseEvent;
+              var movement = (e.movementX.abs() + e.movementY.abs()) / 10;
+              notifier.add(movement);
+            },
+            'touchstart': (event) {
+              event.preventDefault();
+              touchTimer = Timer(Duration(seconds: 1), () {
+                touchTimer = Timer.periodic(Duration(milliseconds: 50), (_) {
+                  notifier.add(2, linear: true);
+                });
               });
-            });
-            setState(() {});
-          },
-          'touchend': (event) {
-            touchTimer?.cancel();
-            setState(() {
-              touchTimer = null;
-            });
-            if (notifier.progressAfterCliff == 0) {
+              setState(() {});
+            },
+            'touchend': (event) {
+              touchTimer?.cancel();
+              setState(() {
+                touchTimer = null;
+              });
+              if (notifier.progressAfterCliff == 0) {
+                scrollToMeet();
+              }
+            },
+            'click': (event) {
+              event.preventDefault();
               scrollToMeet();
-            }
+            },
           },
-          'click': (event) {
-            event.preventDefault();
-            scrollToMeet();
-          },
-        },
-        styles: notifier.progressAfterCliff > 0
-            ? Styles(raw: {
-                'background':
-                    'linear-gradient(to right, ${primaryFaded.value} ${notifier.progressAfterCliff - 1}%, ${surface.value} ${notifier.progressAfterCliff}%)'
-              })
-            : null,
-        child: LinkButton.outlined(label: 'Meet Jaspr', icon: 'custom-jaspr', to: '#meet'),
-      ),
-      Particles(particles: notifier.particles),
-    ]);
+          styles: notifier.progressAfterCliff > 0
+              ? Styles(
+                  raw: {
+                    'background':
+                        'linear-gradient(to right, ${primaryFaded.value} ${notifier.progressAfterCliff - 1}%, ${surface.value} ${notifier.progressAfterCliff}%)',
+                  },
+                )
+              : null,
+          child: LinkButton.outlined(label: 'Meet Jaspr', icon: 'custom-jaspr', to: '#meet'),
+        ),
+        Particles(particles: notifier.particles),
+      ]),
+    );
+    return fragment(children);
   }
 
   @css
-  static final List<StyleRule> styles = [
-    css('#meet-jaspr-button', [
-      css('&').styles(position: Position.relative()),
-    ]),
+  static List<StyleRule> get styles => [
+    css('#meet-jaspr-button', [css('&').styles(position: Position.relative())]),
   ];
 }
 
 class ProgressNotifier extends ValueNotifier<double> {
   ProgressNotifier() : super(0);
 
-  final isSafari = kIsWeb &&
+  final isSafari =
+      kIsWeb &&
       RegExp(r'^((?!chrome|android).)*safari', caseSensitive: false) //
           .hasMatch(web.window.navigator.userAgent);
   late final scaleFactor = isSafari ? 2 : 1;

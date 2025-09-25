@@ -18,7 +18,7 @@ const CommonFinders find = CommonFinders._();
 class CommonFinders {
   const CommonFinders._();
 
-  /// Finds [DomComponent] components with a tag equal to the `tag` argument.
+  /// Finds [Component.element] components with a tag equal to the `tag` argument.
   ///
   /// ## Sample code
   ///
@@ -29,7 +29,7 @@ class CommonFinders {
   /// This will match paragraph dom elements.
   Finder tag(String tag) => _TagFinder(tag);
 
-  /// Finds [Text] components containing string equal to the `text` argument.
+  /// Finds [Component.text] components containing string equal to the `text` argument.
   ///
   /// ## Sample code
   ///
@@ -37,10 +37,10 @@ class CommonFinders {
   /// expect(find.text('Back'), findsOneComponent);
   /// ```
   ///
-  /// This will match [Text] components that contain the "Back" string.
+  /// This will match [Component.text] components that contain the "Back" string.
   Finder text(String text) => _TextFinder(text);
 
-  /// Finds [Text] components which contain the given `pattern` argument.
+  /// Finds [Component.text] components which contain the given `pattern` argument.
   ///
   /// ## Sample code
   ///
@@ -50,7 +50,7 @@ class CommonFinders {
   /// ```
   Finder textContaining(Pattern pattern) => _TextContainingFinder(pattern);
 
-  /// Looks for components that contain a [Text] descendant with `text`
+  /// Looks for components that contain a [Component.text] descendant with `text`
   /// in it.
   ///
   /// ## Sample code
@@ -202,11 +202,7 @@ class CommonFinders {
   ///
   /// If the [matchRoot] argument is true then the component(s) specified by [of]
   /// will be matched along with the ancestors.
-  Finder ancestor({
-    required Finder of,
-    required Finder matching,
-    bool matchRoot = false,
-  }) {
+  Finder ancestor({required Finder of, required Finder matching, bool matchRoot = false}) {
     return _AncestorFinder(of, matching, matchRoot: matchRoot);
   }
 }
@@ -476,9 +472,7 @@ class _ComponentFinder extends MatchFinder {
 }
 
 class _ComponentPredicateFinder extends MatchFinder {
-  _ComponentPredicateFinder(this.predicate, {String? description})
-      : _description = description,
-        super();
+  _ComponentPredicateFinder(this.predicate, {String? description}) : _description = description, super();
 
   final ComponentPredicate predicate;
   final String? _description;
@@ -493,9 +487,7 @@ class _ComponentPredicateFinder extends MatchFinder {
 }
 
 class _ElementPredicateFinder extends MatchFinder {
-  _ElementPredicateFinder(this.predicate, {String? description})
-      : _description = description,
-        super();
+  _ElementPredicateFinder(this.predicate, {String? description}) : _description = description, super();
 
   final ElementPredicate predicate;
   final String? _description;
@@ -510,11 +502,7 @@ class _ElementPredicateFinder extends MatchFinder {
 }
 
 class _DescendantFinder extends Finder {
-  _DescendantFinder(
-    this.ancestor,
-    this.descendant, {
-    this.matchRoot = false,
-  }) : super();
+  _DescendantFinder(this.ancestor, this.descendant, {this.matchRoot = false}) : super();
 
   final Finder ancestor;
   final Finder descendant;
@@ -536,8 +524,10 @@ class _DescendantFinder extends Finder {
   @override
   Iterable<Element> get allCandidates {
     final Iterable<Element> ancestorElements = ancestor.evaluate();
-    final List<Element> candidates =
-        ancestorElements.expand<Element>((Element element) => collectAllElementsFrom(element)).toSet().toList();
+    final List<Element> candidates = ancestorElements
+        .expand<Element>((Element element) => collectAllElementsFrom(element))
+        .toSet()
+        .toList();
     if (matchRoot) candidates.insertAll(0, ancestorElements);
     return candidates;
   }

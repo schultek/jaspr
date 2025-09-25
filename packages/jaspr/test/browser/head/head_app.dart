@@ -2,9 +2,11 @@ import 'package:jaspr/jaspr.dart';
 
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Document.head(title: 'a', meta: {'test': 'b', 'c': 'd'});
-    yield Page();
+  Component build(BuildContext context) {
+    return Component.fragment([
+      Document.head(title: 'a', meta: {'test': 'b', 'c': 'd'}),
+      Page(),
+    ]);
   }
 }
 
@@ -19,17 +21,22 @@ class _PageState extends State<Page> {
   bool pressed = false;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div([
-      if (!pressed) ...[
-        Document.head(title: 'b', meta: {'c': 'e'}),
-        Document.head(title: 'c'),
-      ] else ...[
-        Document.head(title: 'd'),
-      ]
+  Component build(BuildContext context) {
+    return Component.fragment([
+      div([
+        if (!pressed) ...[
+          Document.head(title: 'b', meta: {'c': 'e'}),
+          Document.head(title: 'c'),
+        ] else ...[
+          Document.head(title: 'd'),
+        ],
+      ]),
+      button(
+        onClick: () {
+          setState(() => pressed = true);
+        },
+        [text('Toggle')],
+      ),
     ]);
-    yield button(onClick: () {
-      setState(() => pressed = true);
-    }, [text('Toggle')]);
   }
 }

@@ -1,0 +1,85 @@
+---
+title: "@Import Annotation"
+description: How to import platform-specific libraries in shared components.
+---
+
+---
+
+Jaspr components can be rendered both on the server and client. The same code will be compiled twice for the server and
+the web platform. Most of the time this isn't an issue, however sometimes you might want to use a package or library that
+is only supported on one side, e.g.:
+
+- `dart:html` is only supported on the client,
+- `dart:io` is only supported on the server.
+
+<Info>
+When using `package:web` you should instead use `package:universal_web` which already works across web **and server** environments. No need to use conditional imports or the `@Import` annotation shown on this page.
+</Info>
+
+When you want to use such a library in your project, you would have to resort to *conditional imports*, 
+which are quite cumbersome to use since you have to create multiple files and stub everything you want to use.
+
+Jaspr can do this for you using the `@Import` annotation. Say you have the following component:
+
+```dart title="lib/app.dart"
+import 'dart:html' show window;
+
+import 'package:jaspr/jaspr.dart';
+
+class App extends StatelessComponent {
+  @override
+  Component build(BuildContext context) {
+    if (kIsWeb) {
+      window.alert('Hi Jaspr');
+    }
+    return p([text('Hello World')]);
+  }
+}
+```
+
+This component wants to show an alert when being built, but only on web. We can correctly use the `kIsWeb`
+constant to check the platform **during runtime**, but this example would still lead to a 
+**compile time error** when running on the server - because `dart:html` is unsupported there.
+
+With Jasprs **platform-specific imports** you can change the code to this:
+
+```dart title="lib/app.dart"
+@Import.onWeb('dart:html', show: [#window])
+import 'app.imports.dart';
+
+import 'package:jaspr/jaspr.dart';
+
+class App extends StatelessComponent {
+  @override
+  Component build(BuildContext context) {
+    if (kIsWeb) {
+      window.alert('Hi Jaspr');
+    }
+    return p([text('Hello World')]);
+  }
+}
+```
+
+This will:
+
+- generate the `app.imports.dart` file
+- setup conditional imports for `dart:html` on the web
+- write stubs on the server for all imported members.
+
+<Success>
+There is a code-assist available from `jaspr_lints` that converts your imports automatically!
+See [Linting](/get_started/linting).
+</Success>
+---
+
+You can extend this to multiple imports and mix web and server imports like this:
+
+```dart title="lib/app.dart"
+@Import.onWeb('dart:html', show: [#window])
+@Import.onWeb('package:some_package', show: [#someMember])
+@Import.onServer('dart:io', show: [#Platform])
+import 'app.imports.dart';
+```
+
+The `show` list must contain all the variables and types you want to access in your code, similar to
+the `import ... show ...;` syntax. Here each item in the list must be a symbol starting with `#`.

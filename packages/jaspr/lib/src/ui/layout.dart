@@ -7,11 +7,8 @@ class Page extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
-      styles: Styles(overflow: overflow),
-      children,
-    );
+  Component build(BuildContext context) {
+    return div(styles: Styles(overflow: overflow), children);
   }
 }
 
@@ -21,13 +18,9 @@ class Center extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
-      styles: Styles(
-        display: Display.flex,
-        justifyContent: JustifyContent.center,
-        alignItems: AlignItems.center,
-      ),
+  Component build(BuildContext context) {
+    return div(
+      styles: Styles(display: Display.flex, justifyContent: JustifyContent.center, alignItems: AlignItems.center),
       children,
     );
   }
@@ -40,24 +33,23 @@ class Spacer extends StatelessComponent {
   final Unit? height;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(styles: Styles(width: width, height: height), []);
+  Component build(BuildContext context) {
+    return div(
+      styles: Styles(width: width, height: height),
+      [],
+    );
   }
 }
 
 class Padding extends StatelessComponent {
-  const Padding({
-    super.key,
-    required this.padding,
-    required this.children,
-  });
+  const Padding({super.key, required this.padding, required this.children});
 
   final Spacing padding;
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(styles: Styles(padding: padding), children);
+  Component build(BuildContext context) {
+    return div(styles: Styles(padding: padding), children);
   }
 }
 
@@ -86,8 +78,8 @@ class Container extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
+  Component build(BuildContext context) {
+    return div(
       styles: Styles.combine([
         Styles(
           width: width,
@@ -98,12 +90,7 @@ class Container extends StatelessComponent {
           border: border,
           backgroundColor: color,
         ),
-        if (center)
-          Styles(
-            display: Display.flex,
-            justifyContent: JustifyContent.center,
-            alignItems: AlignItems.center,
-          ),
+        if (center) Styles(display: Display.flex, justifyContent: JustifyContent.center, alignItems: AlignItems.center),
       ]),
       children,
     );
@@ -111,20 +98,15 @@ class Container extends StatelessComponent {
 }
 
 class Column extends StatelessComponent {
-  const Column({
-    super.key,
-    this.mainAxisAlignment,
-    this.crossAxisAlignment,
-    required this.children,
-  });
+  const Column({super.key, this.mainAxisAlignment, this.crossAxisAlignment, required this.children});
 
   final JustifyContent? mainAxisAlignment;
   final AlignItems? crossAxisAlignment;
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
+  Component build(BuildContext context) {
+    return div(
       styles: Styles(
         display: Display.flex,
         flexDirection: FlexDirection.column,
@@ -138,20 +120,15 @@ class Column extends StatelessComponent {
 }
 
 class Row extends StatelessComponent {
-  const Row({
-    super.key,
-    this.mainAxisAlignment,
-    this.crossAxisAlignment,
-    required this.children,
-  });
+  const Row({super.key, this.mainAxisAlignment, this.crossAxisAlignment, required this.children});
 
   final JustifyContent? mainAxisAlignment;
   final AlignItems? crossAxisAlignment;
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
+  Component build(BuildContext context) {
+    return div(
       styles: Styles(
         display: Display.flex,
         flexDirection: FlexDirection.row,
@@ -165,12 +142,7 @@ class Row extends StatelessComponent {
 }
 
 class Grid extends StatelessComponent {
-  const Grid({
-    required this.columns,
-    this.gap,
-    this.spread = false,
-    required this.children,
-  });
+  const Grid({required this.columns, this.gap, this.spread = false, required this.children});
 
   final int columns;
   final Unit? gap;
@@ -178,13 +150,15 @@ class Grid extends StatelessComponent {
   final List<Component> children;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(
-      styles: Styles(raw: {
-        "display": "grid",
-        "grid-template-columns": "repeat($columns, ${spread ? "1fr" : "0fr"})",
-        if (gap != null) "gap": gap!.value,
-      }),
+  Component build(BuildContext context) {
+    return div(
+      styles: Styles(
+        raw: {
+          "display": "grid",
+          "grid-template-columns": "repeat($columns, ${spread ? "1fr" : "0fr"})",
+          if (gap != null) "gap": gap!.value,
+        },
+      ),
       children,
     );
   }

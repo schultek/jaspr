@@ -5,17 +5,13 @@ import 'jaspr_options.dart';
 
 /// Entrypoint for the server
 void main() async {
-  Jaspr.initializeApp(
-    options: defaultJasprOptions,
-  );
+  Jaspr.initializeApp(options: defaultJasprOptions);
 
-  runApp(
-    Document(body: App()),
-  );
+  runApp(Document(body: App()));
 }
 
 @css
-final styles = [
+List<StyleRule> get styles => [
   css('.main').styles(minWidth: 12.px),
   css.media(MediaQuery.screen(minWidth: 200.px), []),
 ];

@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -21,10 +22,7 @@ void main() {
   group('inherited model test', () {
     testComponents('should update dependencies only', (tester) async {
       var controller = tester.pumpTestComponent(App());
-      Future<void> rebuildThenTestAgainstDto(
-        MyDto src, {
-        required Set<Key> expectedRebuilds,
-      }) async {
+      Future<void> rebuildThenTestAgainstDto(MyDto src, {required Set<Key> expectedRebuilds}) async {
         await controller.rebuildWith(src);
         testAgainstDto(src, expectedRebuilds: expectedRebuilds);
       }
@@ -41,36 +39,48 @@ void main() {
       );
 
       // phase 2: component should be update when inherited value changes
-      await rebuildThenTestAgainstDto(MyDto(a: 1, b: 2.5), expectedRebuilds: {
-        App.componentKey,
-        // ExampleComponent should NOT be rebuilt
-        AComponent.componentKey,
-        BComponent.componentKey,
-      });
+      await rebuildThenTestAgainstDto(
+        MyDto(a: 1, b: 2.5),
+        expectedRebuilds: {
+          App.componentKey,
+          // ExampleComponent should NOT be rebuilt
+          AComponent.componentKey,
+          BComponent.componentKey,
+        },
+      );
 
       // phase 3: only b has changed, a should not rebuild
-      await rebuildThenTestAgainstDto(MyDto(a: 1, b: 3.5), expectedRebuilds: {
-        App.componentKey,
-        // ExampleComponent should NOT be rebuilt
-        // AComponent should NOT be rebuilt
-        BComponent.componentKey,
-      });
+      await rebuildThenTestAgainstDto(
+        MyDto(a: 1, b: 3.5),
+        expectedRebuilds: {
+          App.componentKey,
+          // ExampleComponent should NOT be rebuilt
+          // AComponent should NOT be rebuilt
+          BComponent.componentKey,
+        },
+      );
 
       // phase 4: only a has changed, b should not rebuild
-      await rebuildThenTestAgainstDto(MyDto(a: 2, b: 3.5), expectedRebuilds: {
-        App.componentKey,
-        // ExampleComponent should NOT be rebuilt
-        AComponent.componentKey,
-        // BComponent should NOT be rebuilt
-      });
+      await rebuildThenTestAgainstDto(
+        MyDto(a: 2, b: 3.5),
+        expectedRebuilds: {
+          App.componentKey,
+          // ExampleComponent should NOT be rebuilt
+          AComponent.componentKey,
+          // BComponent should NOT be rebuilt
+        },
+      );
 
       // phase 5: nothing changed, nothing should be rebuilt.
-      await rebuildThenTestAgainstDto(MyDto(a: 2, b: 3.5), expectedRebuilds: {
-        App.componentKey,
-        // ExampleComponent should NOT be rebuilt
-        // BComponent should NOT be rebuilt
-        // AComponent should NOT be rebuilt
-      });
+      await rebuildThenTestAgainstDto(
+        MyDto(a: 2, b: 3.5),
+        expectedRebuilds: {
+          App.componentKey,
+          // ExampleComponent should NOT be rebuilt
+          // BComponent should NOT be rebuilt
+          // AComponent should NOT be rebuilt
+        },
+      );
     });
   });
 }

@@ -8,13 +8,9 @@ class OutputPanel extends StatelessComponent {
   const OutputPanel({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var isTutorial = context.watch(isTutorialProvider);
 
-    yield div(
-      id: 'output-panel',
-      styles: isTutorial ? Styles(width: Unit.auto) : null,
-      [ExecutionIFrame()],
-    );
+    return div(id: 'output-panel', styles: isTutorial ? Styles(width: Unit.auto) : null, [ExecutionIFrame()]);
   }
 }

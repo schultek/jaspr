@@ -260,9 +260,9 @@ class GlobalStateKey<T extends State<StatefulComponent>> extends GlobalKey {
   /// matches this global key, (2) that component is not a [StatefulComponent], or the
   /// associated [State] object is not a subtype of `T`.
   T? get currentState => switch (_currentElement) {
-        StatefulElement(:final T state) => state,
-        _ => null,
-      };
+    StatefulElement(:final T state) => state,
+    _ => null,
+  };
 }
 
 /// A global state key with a debugging label.
@@ -363,9 +363,9 @@ class GlobalNodeKey<T extends web.Node> extends GlobalKey {
   /// The current node is null if (1) the current environment is not web, (2) there is no component
   /// in the tree that matches this global key, or (3) its element is not a [RenderObjectElement].
   T? get currentNode => switch (_currentElement) {
-        RenderObjectElement(renderObject: RenderObject(:final T node)) => node,
-        _ => null,
-      };
+    RenderObjectElement(renderObject: RenderObject(:final T node)) => node,
+    _ => null,
+  };
 }
 
 /// A global node key with a debugging label.

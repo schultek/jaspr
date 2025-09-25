@@ -17,19 +17,21 @@ class CodecBundleBuilder implements Builder {
     } on SyntaxErrorInAssetException {
       rethrow;
     } catch (e, st) {
-      print('An unexpected error occurred.\n'
-          'This is probably a bug in jaspr_builder.\n'
-          'Please report this here: '
-          'https://github.com/schultek/jaspr/issues\n\n'
-          'The error was:\n$e\n\n$st');
+      print(
+        'An unexpected error occurred.\n'
+        'This is probably a bug in jaspr_builder.\n'
+        'Please report this here: '
+        'https://github.com/schultek/jaspr/issues\n\n'
+        'The error was:\n$e\n\n$st',
+      );
       rethrow;
     }
   }
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-        r'lib/$lib$': ['lib/codec.bundle.json'],
-      };
+    r'lib/$lib$': ['lib/codec.bundle.json'],
+  };
 
   Future<void> generateCodecBundle(BuildStep buildStep) async {
     var modules = buildStep

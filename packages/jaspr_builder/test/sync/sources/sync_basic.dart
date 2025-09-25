@@ -20,13 +20,18 @@ final syncBasicSources = {
       @sync
       Map<String, Object> d = {};
     
-      Iterable<Component> build(BuildContext context) => [];
+      @override
+      Component build(BuildContext context) => text('');
     }
   ''',
 };
 
 final syncBasicOutputs = {
-  'site|lib/component.sync.dart': '// GENERATED FILE, DO NOT MODIFY\n'
+  'site|lib/component.sync.dart':
+      '// dart format off\n'
+      '// ignore_for_file: type=lint\n'
+      '\n'
+      '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
       'import \'package:jaspr/jaspr.dart\';\n'
@@ -56,12 +61,7 @@ final syncBasicOutputs = {
       '\n'
       '  @override\n'
       '  Map<String, dynamic> getState() {\n'
-      '    return {\n'
-      '      \'a\': a,\n'
-      '      \'b\': b,\n'
-      '      \'c\': c,\n'
-      '      \'d\': d,\n'
-      '    };\n'
+      '    return {\'a\': a, \'b\': b, \'c\': c, \'d\': d};\n'
       '  }\n'
       '\n'
       '  @override\n'
@@ -69,5 +69,6 @@ final syncBasicOutputs = {
       '    super.initState();\n'
       '    SyncStateMixin.initSyncState(this);\n'
       '  }\n'
-      '}\n',
+      '}\n'
+      '',
 };

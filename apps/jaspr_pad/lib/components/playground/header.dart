@@ -4,6 +4,7 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import '../../providers/logic_provider.dart';
 import '../../providers/project_provider.dart';
 import '../../providers/samples_provider.dart';
+import '../../providers/utils.dart';
 import '../dialogs/new_pad_dialog.dart';
 import '../dialogs/reset_dialog.dart';
 import '../elements/button.dart';
@@ -13,8 +14,8 @@ class PlaygroundHeader extends StatelessComponent {
   const PlaygroundHeader({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield header(classes: 'mdc-elevation--z4', [
+  Component build(BuildContext context) {
+    return header(classes: 'mdc-elevation--z4', [
       div(classes: 'header-title', [
         img(classes: 'logo', src: "jaspr-192.png", alt: "JasprPad Logo"),
         span([text('JasprPad')]),
@@ -59,10 +60,12 @@ class PlaygroundHeader extends StatelessComponent {
           },
         ),
       ]),
-      Builder(builder: (context) sync* {
-        var name = context.watch(projectNameProvider);
-        yield div(classes: 'header-gist-name', [text(name ?? '')]);
-      }),
+      Builder(
+        builder: (context) {
+          var name = context.watch(projectNameProvider);
+          return div(classes: 'header-gist-name', [text(name ?? '')]);
+        },
+      ),
       Button(
         dense: true,
         raised: true,
@@ -75,8 +78,8 @@ class PlaygroundHeader extends StatelessComponent {
       SamplesMenuButton(),
       div(
         styles: Styles(
-          padding: Padding.symmetric(vertical: Unit.zero, horizontal: 10.px),
           display: Display.flex,
+          padding: Padding.symmetric(vertical: Unit.zero, horizontal: 10.px),
           justifyContent: JustifyContent.center,
           alignItems: AlignItems.center,
         ),
@@ -88,28 +91,32 @@ class PlaygroundHeader extends StatelessComponent {
             ),
           ]),
         ],
-      )
+      ),
     ]);
   }
 }
 
-class SamplesMenuButton extends StatelessComponent with SyncProviderDependencies {
+class SamplesMenuButton extends StatelessComponent {
   const SamplesMenuButton({super.key});
 
   @override
-  Iterable<SyncProvider> get preloadDependencies => [syncSamplesProvider];
-
-  @override
-  Iterable<Component> build(BuildContext context) sync* {
-    var samples = context.watch(syncSamplesProvider).valueOrNull ?? [];
-
-    yield Menu(
-      items: [
-        for (var sample in samples) MenuItem(label: sample.description),
+  Component build(BuildContext context) {
+    return ProviderScope(
+      sync: [
+        syncSamplesProvider.syncWith('samples', codec: MapperCodec()),
       ],
-      onItemSelected: (index) {
-        context.read(logicProvider).selectSample(samples[index]);
-      },
+      child: Builder(
+        builder: (context) {
+          var samples = context.watch(syncSamplesProvider);
+
+          return Menu(
+            items: [for (var sample in samples) MenuItem(label: sample.description)],
+            onItemSelected: (index) {
+              context.read(logicProvider).selectSample(samples[index]);
+            },
+          );
+        },
+      ),
     );
   }
 }

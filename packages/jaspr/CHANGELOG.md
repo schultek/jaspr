@@ -1,3 +1,106 @@
+## 0.21.2
+
+- Added html domain to tooling daemon.
+
+## 0.21.1
+
+- Fix rendering issue with fragments.
+
+## 0.21.0
+
+**Read the full [Release Notes](https://docs.jaspr.site/releases/v/0.21.0) for this version.**
+
+- **Breaking** Changed all `build()` methods and `builder` functions to return a single `Component` instead of `Iterable<Component>`. Use `jaspr migrate` to migrate automatically after updating.
+
+- **Breaking** Introduced new `Component.element()`, `Component.text()`, `Component.fragment()` and `Component.wrapElement()` constructors, replacing `DomComponent()`, `Text()`, `Fragment()` and `DomComponent.wrap()`, respectively. Also added `Component.empty()` to create an empty fragment.
+
+- Allow setting `Document(base: )` to `null`, and fix the path to the generated client script when no `<base>` element exists.
+
+- Added `justifyItems`, `justifySelf` and `alignContent` styles properties.
+- Added `filter` and `backdropFilter` styles properties.
+- Added `all`, `appearance` and `aspectRatio` styles properties.
+
+- Added `--include-source-maps` option to `jaspr build` command.
+
+- Added `jaspr tooling-daemon` command and component scope analysis.
+- Fixed sitemap generation bug in top-level route ('/')
+
+- Require `sdk: ^3.8.0`.
+- Update `analyzer` to `^8.0.0` and `build` to `^4.0.0`.
+
+## 0.20.0
+
+- **Breaking**: Removed the children parameter from `input` and `col` methods as
+  they are void elements and shouldn't be passed children.
+- **Breaking**: Replaced the children parameter from `script` method with a `String? content` parameter, as it can only contain text content. Also made `src` parameter optional.
+
+- **Breaking**: Removed deprecated `Color.hex` and `Color.named` constructors.
+- **Breaking**: Removed deprecated style groups (`Styles.box()`, `Styles.text()`, `Styles.background()`, etc. as well as `.box()`, `.text()`, etc.).
+- **Breaking**: Removed deprecated `EdgeInsets` type.
+- **Breaking**: Removed deprecated `Border.all` constructor.
+
+- Added `withOpacity()`, `withLightness()`, `withHue()` and `withValues()` methods to `Color`.
+  
+- Added `figure` and `figcaption` html methods.  
+- Added the `wbr` html method for creating a line-break opportunity element.
+
+- Moved `DomValidator` class to foundation library.
+- Added support for disabling the sitemap generation for specific pages of `jaspr_content` sites.
+- Better error handling for async components.
+- Fixed an error where building too many routes in succession caused ports to be exhausted on macOS.
+
+## 0.19.1
+
+- Added `Color.currentColor` constant.
+- Added `rx` and `ry` properties for svg `rect()`.
+- Added `prefersContrast: Contrast.<more|less|noPreference>` to `MediaQuery`.
+- Added `MediaQuery.raw()` for creating a custom media query from a `String`.
+
+- Fixed rendering bug when nesting components with empty children.
+
+## 0.19.0
+
+- **BREAKING** `JasprOptions.useIsolates` is now `false` by default (was `true`).
+  
+  If you want to keep the old behaviour of rendering each request in a separate isolate, use `Jaspr.initializeApp(..., useIsolates: true)`.
+
+- Added `allowedPathSuffixes` option to `Jaspr.initializeApp()` to enable handling route paths with extensions other than `html`.
+
+- Added support for generating a **sitemap.xml** in static mode. To enable this, pass `--sitemap-domain=my.domain.com` to `jaspr build`. 
+
+  Add sitemap params like `changefreq` and `priority` to your routes by using `Route(settings: RouteSettings(priority: 0.5))` or set them through `ServerApp.requestRouteGeneration()`.
+
+  Exclude routes from the sitemap through the `--sitemap-exclude` option to `jaspr build`.
+
+  Read more about [Generating a Sitemap](https://docs.jaspr.site/concepts/static_sites#generating-a-sitemap).
+
+- Added support `@client` components from other packages.
+
+  Components annotated with `@client` from other dependent packages are now also part of the js bundle when used during pre-rendering.
+
+- **BREAKING** The `Flex(basis: ...)` style now accepts a `Unit` value directly instead of a `FlexBasis`.
+
+- Allow nesting `css.media` and `css.supports` rules.
+- Deprecated `Color.hex()` and `Color.named()` in favor of the default `Color()` constructor.
+
+- Added `onReassemble` stream to `ServerApp`.
+
+- Various bug fixes.
+
+## 0.18.2
+
+- Added `jaspr daemon` command to run a daemon server (used by the new [VSCode extension]()).
+- Added `--launch-in-chrome` option to `jaspr serve` command to open the browser automatically.
+- Added support for running `jaspr create .` in an empty directory.
+
+## 0.18.1
+
+- Better report errors during static build.
+- Fixed flutter embedding issue with version 3.29.0.
+- Added `onClick` override to the `a` html tag. When used, this will override the default behaviour of the link and not visit its url when clicked.
+- Added `--extra-js-compiler-option` and `--extra-wasm-compiler-option` to `jaspr build` command.
+- Added `// dart format off` and `// ignore_for_file: type=lint` headers to all generated files.
+
 ## 0.18.0
 
 - **BREAKING** Changed `AppBinding`s `Uri get currentUri` to `String get currentUrl`.

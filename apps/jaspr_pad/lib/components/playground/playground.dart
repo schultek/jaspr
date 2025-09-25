@@ -12,18 +12,15 @@ class Playground extends StatelessComponent {
   const Playground({super.key});
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     if (kIsWeb) {
       context.listen(loadedProjectProvider, (_, proj) {
-        if (proj.valueOrNull != null) {
+        if (proj.value != null) {
           Future(() => context.read(logicProvider).compileFiles());
         }
       }, fireImmediately: true);
     }
 
-    yield PlaygroundHeader();
-    yield MainSection();
-    yield PlaygroundFooter();
-    yield DialogSlot(slotId: 'dialog');
+    return fragment([PlaygroundHeader(), MainSection(), PlaygroundFooter(), DialogSlot(slotId: 'dialog')]);
   }
 }

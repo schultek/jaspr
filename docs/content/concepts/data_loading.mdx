@@ -1,0 +1,141 @@
+---
+title: Data Loading
+description: Loading additional data for a page.
+---
+
+---
+
+In content-driven websites, you often need to access **additional data** beyond what's in your page content files. This might include reusable data like site configuration, navigation menus, or product information. `jaspr_content` provides a flexible system for **loading data** from various sources and making it available during the page rendering process.
+
+By default, each content page has access to its own **frontmatter data** via the `page` variable. But with data loading, you can also include additional structured data from **external files** or other sources.
+
+Data loading is done by the configured `DateLoader`s. The default `ContentApp` configures a `FilesystemDataLoader` reading from the specified data directory:
+
+```dart
+ContentApp(
+  // Default configuration loads data from content/_data directory
+  dataDirectory: 'content/_data',
+)
+```
+
+For more control use the `ContentApp.custom()` constructor and provide one or more `DataLoader`s to your page configuration:
+
+```dart
+ContentApp.custom(
+  configResolver: PageConfig.all(
+    dataLoaders: [
+      FilesystemDataLoader(...),
+      MemoryDataLoader(...),
+      MyCustomDataLoader(...)
+    ]
+  )
+)
+```
+
+## Built-in Data Loaders
+
+### FilesystemDataLoader
+
+The `FilesystemDataLoader` loads data from files in a directory of your project. 
+
+The files are parsed based on their extension:
+- **.yaml** and **.json** files are loaded and parsed into a `Map<String, dynamic>`
+- all other files are loaded as a raw `String`
+
+#### Directory Structure to Data Access
+
+The directory structure in your data folder determines how you access the data in your templates:
+
+```
+content/_data/
+  └── site.yaml        # Access as {{ site.property }}
+  └── navigation.json  # Access as {{ navigation[0].link }}
+  └── products/
+      └── cloud.yaml   # Access as {{ products.cloud.pricing }}
+```
+
+#### Hot Reloading
+
+The `FilesystemDataLoader` automatically watches the data directory for changes. If any files change, all pages using that data will be rebuilt automatically when running in development mode.
+
+<Info>
+After changing a data file, you still need to manually refresh the page. Then the page will be rebuilt with the new data.
+</Info>
+
+### MemoryDataLoader
+
+The `MemoryDataLoader` allows you to provide data programmatically instead of loading it from files. This is useful for:
+
+- Configuration data
+- Test data
+- Other dynamic data
+
+#### Usage
+
+```dart
+ContentApp.custom(
+  // ... other configuration ...
+  configResolver: PageConfig.all(
+    dataLoaders: [
+      MemoryDataLoader({
+        'site': {
+          'title': 'My Amazing Website',
+          'description': 'Built with Jaspr'
+        },
+        'settings': {
+          'showComments': true,
+          'theme': 'dark'
+        }
+      })
+    ],
+  )
+)
+```
+
+Now this data is available in your content pipeline, including [Templates](/content/concepts/templating) and [Layouts](/content/concepts/page_layouts).
+
+```markdown
+# {{site.title}}
+
+{{#settings.showComments}}
+<Comments />
+{{/settings.showComments}}
+```
+
+## Creating Custom Data Loaders
+
+You can create your own data loader by implementing the `DataLoader` interface. This gives you complete flexibility in how and from where you load data.
+
+```dart
+class MyCustomDataLoader implements DataLoader {
+  @override
+  Future<void> loadData(Page page) async {
+    // Load data from anywhere: APIs, databases, etc.
+    final myData = await fetchDataFromExternalSource();
+    
+    // Add your custom data to the page.
+    page.apply(data: {'myCustomData': myData});
+  }
+}
+```
+
+## Multiple Data Loaders
+
+You can use multiple data loaders together to combine data from different sources:
+
+```dart
+ContentApp.custom(
+  // ... other configuration ...
+  configResolver: PageConfig.all(
+    dataLoaders: [
+      FilesystemDataLoader('content/_data'),
+      MemoryDataLoader({'site': {'version': '1.0.0'}}),
+      MyCustomDataLoader(),
+    ],
+  )
+)
+```
+
+When using multiple data loaders, they are applied in order, so data from later loaders can override data from earlier ones if they use the same keys.
+
+Data is combined by deeply merging the current and new `Map`s, which means different data loaders can contribute data to the same top-level keys.

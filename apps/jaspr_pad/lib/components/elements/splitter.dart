@@ -53,38 +53,43 @@ class SplitterState extends State<Splitter> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    for (var i = 0; i < component.children.length; i++) {
+  Component build(BuildContext context) {
+    final children = <Component>[];
+    for (var j = 0; j < component.children.length; j++) {
+      final i = j;
       if (i > 0) {
         var pair = splitPairs[i - 1];
-        yield div(
-          classes: 'gutter gutter-${component.horizontal ? 'horizontal' : 'vertical'}',
-          styles: Styles(flex: Flex(basis: FlexBasis(6.px))),
-          events: {'mousedown': (e) => pair.startDragging(e as html.MouseEventOrStubbed)},
-          [],
+        children.add(
+          div(
+            classes: 'gutter gutter-${component.horizontal ? 'horizontal' : 'vertical'}',
+            styles: Styles(flex: Flex(basis: 6.px)),
+            events: {'mousedown': (e) => pair.startDragging(e as html.MouseEventOrStubbed)},
+            [],
+          ),
         );
       }
 
       var dragging =
           (i > 0 ? splitPairs[i - 1].dragging : false) || (i < splitPairs.length ? splitPairs[i].dragging : false);
 
-      yield DomComponent.wrap(
-        styles: Styles(
-          raw: {
-            'flex-basis': 'calc(${sizes[i]}% - 3px)',
-          },
-          userSelect: dragging ? UserSelect.none : null,
-          pointerEvents: dragging ? PointerEvents.none : null,
-        ),
-        child: DomNodeReader(
-          onNode: (node) {
-            if (i > 0) splitPairs[i - 1].b = node;
-            if (i < splitPairs.length) splitPairs[i].a = node;
-          },
-          child: component.children[i],
+      children.add(
+        Component.wrapElement(
+          styles: Styles(
+            userSelect: dragging ? UserSelect.none : null,
+            pointerEvents: dragging ? PointerEvents.none : null,
+            raw: {'flex-basis': 'calc(${sizes[i]}% - 3px)'},
+          ),
+          child: DomNodeReader(
+            onNode: (node) {
+              if (i > 0) splitPairs[i - 1].b = node;
+              if (i < splitPairs.length) splitPairs[i].a = node;
+            },
+            child: component.children[i],
+          ),
         ),
       );
     }
+    return fragment(children);
   }
 }
 

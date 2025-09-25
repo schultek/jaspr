@@ -1,0 +1,75 @@
+---
+title: Tabs
+description: Display content within different tabs.
+---
+
+---
+
+The Tabs component allows you to organize content into different sections that can be switched between by the user. This is useful for displaying related information in a compact and user-friendly way.
+
+## Usage
+
+To use the `Tabs` component, you first need to add it to the `components` list of your `ContentApp`:
+
+```dart
+import 'package:jaspr_content/components/tabs.dart';
+
+// ...
+
+ContentApp(
+  components: [
+    Tabs(),
+  ],
+)
+```
+
+Then, you can use the `<Tabs>` and `<TabItem>` components in your content files:
+
+```jsx
+<Tabs defaultValue="item2">
+  <TabItem label="Tab 1" value="item1">
+    This is the content for the first tab.
+  </TabItem>
+  <TabItem label="Tab 2" value="item2">
+    This is the content for the second tab.
+    
+    You can include other components and **markdown** inside a `TabItem`.
+  </TabItem>
+  <TabItem label="Tab 3" value="item3">
+    This is the content for the third tab.
+  </TabItem>
+</Tabs>
+```
+
+This will render a set of tabs where users can click on "Tab 1", "Tab 2", or "Tab 3" to view their respective content. In this example, "Tab 2" will be selected by default.
+
+---
+
+### Tabs Properties
+
+The `<Tabs>` component serves as a container for `TabItem`s and has the following attribute:
+
+<Property name="defaultValue" type="String">
+  The `value` of the `TabItem` that should be selected by default when the tabs are first rendered. If not provided, the first `TabItem` will be selected.
+</Property>
+
+---
+
+### TabItem Properties
+
+The `<TabItem>` component defines an individual tab and its content. It has the following attributes:
+
+<Property name="label" type="String" required>
+  The text that will be displayed on the tab itself.
+</Property>
+
+---
+
+<Property name="value" type="String" required>
+  A unique identifier for this tab. This value is used by the `defaultValue` attribute of the parent `<Tabs>` component to specify which tab to select initially.
+</Property>
+
+---
+
+The content nested inside a `<TabItem>` tag will be displayed when that tab is active. You can include any valid markdown or other custom components within a `<TabItem>`.
+

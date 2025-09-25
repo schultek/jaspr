@@ -1,0 +1,183 @@
+---
+title: Pages
+description: Understand how pages are built in jaspr_content.
+---
+
+---
+
+Pages are the core of any content-driven site. They represent a single piece of content that can be requested through its url.
+
+For example, you might have a `about.md` file that is rendered as a page at the `/about` url. 
+
+## Rendering Pipeline
+
+In `jaspr_content` pages are built based on the configuration provided to the `ContentApp` component. This configuration defines how the content is loaded, parsed, and rendered.
+
+For a single page, the following steps are taken:
+
+1. The page is created by one of the provided `RouteLoader`s.
+2. The page's configuration is resolved by the provided `ConfigResolver` based on its route.
+3. The page's frontmatter is parsed and additional data is loaded by the configured `DataLoader`s.
+4. The page's content is pre-processed by the configured `TemplateEngine`.
+5. The page's content is parsed by one of the configured `PageParser`s.
+6. The parsed content is further processed by the configured `PageExtension`s.
+7. The processed content is rendered using the configured `CustomComponent`s and wrapped in a `Content` component.
+8. The content component is wrapped in a `PageLayout` and gets applied the configured `ContentTheme`.
+9. The result is rendered to HTML.
+
+All of the different parts used to build a page are configurable. They can be switched out, extended, or replaced with custom implementations. This allows you to create a content-driven site that fits your needs perfectly.
+
+---
+
+## Page
+
+The `Page` class is the main data object that holds all information about a single page.
+
+<Card title="Fields" icon="file">
+  <Property name="path" type="String">
+    The path of the page including its suffix, e.g. 'index.html', 'some/path.md'.
+  </Property>
+
+  ---
+
+  <Property name="url" type="String">
+    The url of the page, e.g. '/', '/some/path'.
+  </Property>
+
+  ---
+
+  <Property name="content" type="String">
+    The (unparsed) content of the page.
+
+    This may be modified by the different modules during the page building process.
+  </Property>
+
+  ---
+
+  <Property name="data" type="Map<String, dynamic>">
+    Additional data for the page.
+
+    This contains data from the frontmatter, data loaders, and any other data that is added to the page during the building process.
+
+    This may be modified by the different modules during the page building process.
+  </Property>
+
+  ---
+
+  <Property name="config" type="PageConfig">
+    The configuration for the page. 
+
+    This determines how the page is built.
+  </Property>
+</Card>
+
+Each part in the pipeline can modify the page's content or data by using the `apply()` method like this:
+
+```dart
+page.apply(
+  content: 'updated content',
+  data: {'key': 'value'},
+);
+```
+
+With this the content is overridden and the data is deeply merged with the existing data, unless `mergeData` is set to `false`.
+
+### Accessing a Page
+
+For most parts of the pipeline, you will have access to the page object directly. E.g. a `DataLoader` will receive the current page as an argument in its `loadData(Page page)` method.
+
+You can also access the current page from within any Jaspr component by using the `context.page` extension getter:
+
+```dart
+class MyComponent extends StatelessComponent {
+  @override
+  Component build(BuildContext context) {
+    return text('Page URL: ${context.page.url}');
+  }
+}
+```
+
+---
+
+## PageConfig
+
+The `PageConfig` class is the main configuration object for a page. It holds all the settings for loading, parsing, and rendering the page.
+
+<Card title="Properties" icon="sliders">
+  <Property name="enableFrontmatter" type="bool">
+    Whether to enable frontmatter parsing. Defaults to `true`.
+  </Property>
+
+  ---
+
+  <Property name="dataLoaders" type="List<DataLoader>">
+    The data loaders to use for loading additional data for the page.
+  </Property>
+
+  ---
+
+  <Property name="templateEngine" type="TemplateEngine">
+    The template engine to use for preprocessing the page content before parsing.
+  </Property>
+
+  ---
+
+  <Property name="rawOutputPattern" type="Pattern">
+    A pattern to match pages that should output their raw content.
+    When this matches a page's path, this will skip parsing and rendering the page and return the content as is.
+    This may be used for matching non-html pages like robots.txt, sitemap.xml, etc.
+  </Property>
+
+  ---
+
+  <Property name="secondaryOutputs" type="List<SecondaryOutput>">
+    A collection of secondary outputs to create for matching pages.
+    When an output matches a page's path, it is used to generate additional files for the page.
+    This may be used for outputting supplementary files like a 'index.html.md' file containing the raw markdown of a page.
+  </Property>
+
+  ---
+
+  <Property name="parsers" type="List<PageParser>">
+    The parsers to use for parsing the page content.
+    Each parser may be responsible for a file type like markdown, html, etc.
+  </Property>
+
+  ---
+
+  <Property name="extensions" type="List<PageExtension>">
+    The extensions to use for processing the parsed page nodes.
+    Each extension may add or modify the nodes of the page.
+    Extensions are applied in the order they are listed.
+  </Property>
+
+  ---
+
+  <Property name="components" type="List<CustomComponent>">
+    A collection of custom components to render in the page.
+  </Property>
+
+  ---
+
+  <Property name="layouts" type="List<PageLayout>">
+    The layouts to use for building the page.
+    When more than one layout is provided, the layout to use is determined by the 'layout' key in the page data.
+    Therefore a page can choose its layout by setting 'layout: ___' in its frontmatter.
+    When no key is set or matching, the first provided layout is used.
+  </Property>
+  
+  ---
+
+  <Property name="theme" type="ContentTheme">
+    The theme to use for the page.
+  </Property>
+</Card>
+
+There are two ways to create a `PageConfig`:
+
+- The `ContentApp()` constructor creates a single `PageConfig` that is used for all pages. 
+
+- Alternatively the `ContentApp.custom()` constructor takes a `ConfigResolver` function that can return different `PageConfig`s for different pages. This allows you to have different configurations for different parts of your site. In addition to writing a custom function, you can:
+
+  - use `PageConfig.all(...)` to create a `ConfigResolver` that resolves the same `PageConfig` for all pages.
+  - use `PageConfig.match(Map<Pattern, PageConfig>)` to resolve a `PageConfig` based on the page's path.

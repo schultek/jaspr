@@ -7,12 +7,19 @@ import 'sources/options.dart';
 
 void main() {
   group('jaspr options builder', () {
+    late TestReaderWriter reader;
+
+    setUp(() async {
+      reader = TestReaderWriter(rootPackage: 'models');
+      await reader.testing.loadIsolateSources();
+    });
+
     test('generates options', () async {
       await testBuilder(
         JasprOptionsBuilder(BuilderOptions({})),
         optionsSources,
         outputs: optionsOutputs,
-        reader: await PackageAssetReader.currentIsolate(),
+        readerWriter: reader,
       );
     });
   });

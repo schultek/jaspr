@@ -1,0 +1,68 @@
+---
+title: Callout
+description: A callout box component to display important information.
+---
+
+---
+
+Use one of the callout variants to draw attention to important information on your page, such as a success, warning, information or error message.
+
+## Usage
+
+Add the `Callout()` component to your `components` list in your `main.dart` file:
+
+```dart
+import 'package:jaspr_content/components/callout.dart';
+
+// ...
+
+ContentApp(
+  components: [
+    Callout(),
+  ],
+)
+```
+
+Then use the callout variants (`<Info`, `<Warning>`, `<Error>`, `<Success>`) in your content files to display the callout boxes.
+
+## Examples
+
+### Info Callout
+
+Displays a soft blue box with an info icon, useful for information based information.
+
+<Info>This draws attention to useful page information.</Info>
+
+```jsx
+<Info>This draws attention to useful page information.</Info>
+```
+
+### Warning Callout
+
+Displays a yellow box with a warning icon, useful for warning the user about something.
+
+<Warning>This draws attention to a warning they should take notice of.</Warning>
+
+```jsx
+<Warning>This draws attention to a warning they should take notice of.</Warning>
+```
+
+### Error Callout
+
+Displays a red box with an error icon, useful for loud pieces of information.
+
+<Error>This draws attention to an error the user might run into if they don't pay attenion.</Error>
+
+```jsx
+<Error>This draws attention to an error the user might run into if they don't pay attenion.</Error>
+```
+
+### Success Callout
+
+Displays a green box with a check icon, useful for showing the user they did something right.
+
+<Success>This draws attention to a successful action the user has taken.</Success>
+
+```jsx
+<Success>This draws attention to a successful action the user has taken.</Success>
+```

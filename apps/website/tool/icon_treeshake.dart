@@ -30,13 +30,11 @@ final icons = [
   0xe156, // server
   0xe1dc, // palette
   0xe409, // test-tube
+  0xe205, // code-xml
 ];
 
 void main() async {
-  final args = [
-    p.absolute('web/font/lucide/lucide.ttf'),
-    p.absolute('tool/lucide.ttf'),
-  ];
+  final args = [p.absolute('web/font/lucide/lucide.ttf'), p.absolute('tool/lucide.ttf')];
 
   final process = await Process.start(fontSubsetPath, args);
 
@@ -64,12 +62,21 @@ void main() async {
 final fontSubsetPath = (() {
   var result = Process.runSync('flutter', ['doctor', '--version', '--machine'], stdoutEncoding: utf8, runInShell: true);
   if ((result.stderr as String).isNotEmpty) {
-    throw UnsupportedError('Calling "flutter doctor" resulted in: "${result.stderr}". '
-        'Make sure flutter is installed and setup correctly.');
+    throw UnsupportedError(
+      'Calling "flutter doctor" resulted in: "${result.stderr}". '
+      'Make sure flutter is installed and setup correctly.',
+    );
   }
   var output = jsonDecode(result.stdout as String) as Map;
-  var fontSubsetPath =
-      p.join(output['flutterRoot'] as String, 'bin', 'cache', 'artifacts', 'engine', 'darwin-x64', 'font-subset');
+  var fontSubsetPath = p.join(
+    output['flutterRoot'] as String,
+    'bin',
+    'cache',
+    'artifacts',
+    'engine',
+    'darwin-x64',
+    'font-subset',
+  );
 
   if (!File(fontSubsetPath).existsSync()) {
     throw UnsupportedError('Could not find font_subset tool in $fontSubsetPath.');

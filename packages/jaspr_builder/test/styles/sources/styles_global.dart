@@ -6,13 +6,13 @@ const stylesGlobalSources = {
         
     @css
     final styles = [
-      css('.main').box(width: 100.px),
+      css('.main').styles(width: 100.px),
     ];
     
     @css
     List<StyleRule> get styles2 => [
       css('.main', [
-        css('&').box(width: 100.px),
+        css('&').styles(width: 100.px),
       ]),
     ];
   ''',
@@ -21,6 +21,6 @@ const stylesGlobalSources = {
 final stylesGlobalOutputs = {
   'site|lib/styles_global.styles.json': jsonEncode({
     "elements": ["styles", "styles2"],
-    "id": ["site", "lib/styles_global.dart"]
+    "id": ["site", "lib/styles_global.dart"],
   }),
 };

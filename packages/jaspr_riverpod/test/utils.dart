@@ -2,9 +2,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 Component providerApp(ComponentBuilder builder) {
-  return ProviderScope(
-    child: Builder(builder: builder),
-  );
+  return ProviderScope(child: Builder(builder: builder));
 }
 
 class Button extends StatelessComponent {
@@ -14,11 +12,7 @@ class Button extends StatelessComponent {
   final void Function() onPressed;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'button',
-      child: Text(label),
-      events: {'click': (e) => onPressed()},
-    );
+  Component build(BuildContext context) {
+    return button(events: {'click': (e) => onPressed()}, [text(label)]);
   }
 }

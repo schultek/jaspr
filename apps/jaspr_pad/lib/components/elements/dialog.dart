@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 
 import '../../adapters/mdc.dart';
 import '../utils/node_reader.dart';
@@ -9,7 +10,7 @@ import '../utils/node_reader.dart';
 final _dialogStateProvider = StateProvider.family<_DialogState?, String>((ref, String id) => null);
 
 class _DialogState<T> {
-  final SingleComponentBuilder builder;
+  final ComponentBuilder builder;
   final ValueChanged<T?> onResult;
 
   _DialogState(this.builder, this.onResult);
@@ -22,14 +23,9 @@ class DialogAction {
   DialogAction(this.label, this.result);
 }
 
-enum DialogResult {
-  yes,
-  no,
-  ok,
-  cancel,
-}
+enum DialogResult { yes, no, ok, cancel }
 
-Future<T?> showDialog<T>(BuildContext context, {required String slotId, required SingleComponentBuilder builder}) {
+Future<T?> showDialog<T>(BuildContext context, {required String slotId, required ComponentBuilder builder}) {
   var completer = Completer<T?>();
   context.read(_dialogStateProvider(slotId).notifier).state = _DialogState(builder, (result) {
     if (!completer.isCompleted) {
@@ -52,8 +48,8 @@ class Dialog extends StatelessComponent {
   final List<Component> actions;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div(classes: 'mdc-dialog__container', [
+  Component build(BuildContext context) {
+    return div(classes: 'mdc-dialog__container', [
       div(classes: 'mdc-dialog__surface', [
         h2(classes: 'mdc-dialog__title', [text(title)]),
         div(classes: 'mdc-dialog__content', [content]),
@@ -84,7 +80,7 @@ class DialogState extends State<DialogSlot> {
 
   void subscribeToOpenState() {
     _sub?.close();
-    _sub = context.subscribe<_DialogState?>(_dialogStateProvider(component.slotId), (_, state) {
+    _sub = context.listenManual<_DialogState?>(_dialogStateProvider(component.slotId), (_, state) {
       if (state != null && _dialog != null && !_dialog!.isOpen) {
         context.binding.addPostFrameCallback(() {
           _dialog!.open();
@@ -110,10 +106,10 @@ class DialogState extends State<DialogSlot> {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     var state = context.watch(_dialogStateProvider(component.slotId));
 
-    yield DomNodeReader(
+    return DomNodeReader(
       onNode: (node) {
         _dialog ??= MDCDialog(node);
         _dialog!.listen('MDCDialog:closed', (event) {
@@ -124,7 +120,7 @@ class DialogState extends State<DialogSlot> {
         classes: 'mdc-dialog',
         attributes: {'role': 'alertdialog', 'aria-modal': 'true'},
         [
-          if (state != null) state.builder(context) else Dialog(content: Text(''), title: '', actions: []),
+          if (state != null) state.builder(context) else Dialog(content: text(''), title: '', actions: []),
           div(classes: 'mdc-dialog__scrim', []),
         ],
       ),

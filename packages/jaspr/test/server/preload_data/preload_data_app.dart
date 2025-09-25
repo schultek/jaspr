@@ -2,11 +2,8 @@ import 'package:jaspr/jaspr.dart';
 
 class App extends StatelessComponent {
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(tag: 'div', children: [
-      Text('App'),
-      Counter(),
-    ]);
+  Component build(BuildContext context) {
+    return div([Component.text('App'), Counter()]);
   }
 }
 
@@ -34,15 +31,16 @@ class CounterState extends State<Counter> with PreloadStateMixin, SyncStateMixin
   void updateState(int? value) => throw UnimplementedError();
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield Button(
-      label: 'Click Me',
-      onPressed: () {
-        setState(() => counter++);
-      },
-    );
-
-    yield Text('Count: $counter');
+  Component build(BuildContext context) {
+    return Component.fragment([
+      Button(
+        label: 'Click Me',
+        onPressed: () {
+          setState(() => counter++);
+        },
+      ),
+      Component.text('Count: $counter'),
+    ]);
   }
 }
 
@@ -53,11 +51,7 @@ class Button extends StatelessComponent {
   final void Function() onPressed;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield DomComponent(
-      tag: 'button',
-      child: Text(label),
-      events: {'click': (e) => onPressed()},
-    );
+  Component build(BuildContext context) {
+    return button(events: {'click': (e) => onPressed()}, [text(label)]);
   }
 }

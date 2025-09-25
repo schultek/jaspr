@@ -1,5 +1,5 @@
-import '../../foundation/marker_utils.dart';
 import '../../foundation/options.dart';
+import '../../foundation/validator.dart';
 import '../../framework/framework.dart';
 import '../markup_render_object.dart';
 import 'client_script_adapter.dart';
@@ -41,10 +41,14 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
       return;
     }
 
-    range.start.insertNext(ChildNodeData(MarkupRenderObject()
-      ..updateText('<!--$componentMarkerPrefix${target.name}${data != null ? ' data=$data' : ''}-->', true)));
-    range.end.insertPrev(
-        ChildNodeData(MarkupRenderObject()..updateText('<!--/$componentMarkerPrefix${target.name}-->', true)));
+    final startMarker = MarkupRenderText(
+      '<!--${DomValidator.clientMarkerPrefix}${target.name}${data != null ? ' data=$data' : ''}-->',
+      true,
+    );
+    final endMarker = MarkupRenderText('<!--/${DomValidator.clientMarkerPrefix}${target.name}-->', true);
+
+    range.start.insertNext(ChildNodeData(startMarker));
+    range.end.insertPrev(ChildNodeData(endMarker));
   }
 
   String? getData() {
@@ -59,7 +63,7 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 
   String getDataForServerComponent(Component component, Element parent) {
     if (adapter.serverComponents[component] case var s?) {
-      return 's$componentMarkerPrefix$s';
+      return 's${DomValidator.clientMarkerPrefix}$s';
     }
 
     Element? element;
@@ -81,7 +85,7 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
       print("Warning: Component parameter not used in build method. This will result in empty html on the client.");
       
       adapter.serverComponents[component] = 0;
-      return 's${componentMarkerPrefix}_';
+      return 's${DomValidator.clientMarkerPrefix}_';
     }
 
     var s = adapter.serverComponents[component] = adapter.serverElementNum++;
@@ -89,6 +93,6 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 
     binding.addRenderAdapter(ServerComponentAdapter(s, element!));
 
-    return 's$componentMarkerPrefix$s';
+    return 's${DomValidator.clientMarkerPrefix}$s';
   }
 }

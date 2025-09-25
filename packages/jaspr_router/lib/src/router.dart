@@ -1,4 +1,4 @@
-library router;
+library;
 
 import 'dart:async';
 
@@ -15,24 +15,14 @@ import 'typedefs.dart';
 
 /// Router component.
 class Router extends StatefulComponent {
-  Router({
-    required this.routes,
-    this.errorBuilder,
-    this.redirect,
-    this.redirectLimit = 5,
-  }) {
+  Router({required this.routes, this.errorBuilder, this.redirect, this.redirectLimit = 5, super.key}) {
     _configuration = RouteConfiguration(
       routes: routes,
       redirectLimit: redirectLimit,
       topRedirect: redirect ?? (_, __) => null,
     );
-    _parser = RouteInformationParser(
-      configuration: _configuration,
-    );
-    _builder = RouteBuilder(
-      configuration: _configuration,
-      errorBuilder: errorBuilder,
-    );
+    _parser = RouteInformationParser(configuration: _configuration);
+    _builder = RouteBuilder(configuration: _configuration, errorBuilder: errorBuilder);
   }
 
   final List<RouteBase> routes;
@@ -76,14 +66,15 @@ class RouterState extends State<Router> with PreloadStateMixin {
   @override
   void initState() {
     super.initState();
-    PlatformRouter.instance.history.init(context, onChangeState: (state, {url}) {
-      _update(url ?? context.url, extra: state, updateHistory: false, replace: true);
-    });
+    PlatformRouter.instance.history.init(
+      context,
+      onChangeState: (state, {url}) {
+        _update(url ?? context.url, extra: state, updateHistory: false, replace: true);
+      },
+    );
     if (_matchList == null) {
       assert(context.binding.isClient);
-      initRoutes().then((_) {
-        setState(() {});
-      });
+      initRoutes();
     }
   }
 
@@ -97,7 +88,11 @@ class RouterState extends State<Router> with PreloadStateMixin {
   Future<void> initRoutes() {
     final location = context.url;
     return _matchRoute(location).then(_preload).then((match) {
+      if (!mounted) return;
       _matchList = match;
+      if (context.binding.isClient) {
+        setState(() {});
+      }
       if (context.binding.isClient && match.uri.toString() != location) {
         PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title);
       }
@@ -188,13 +183,9 @@ class RouterState extends State<Router> with PreloadStateMixin {
     return component._configuration.namedLocation(name, params: params, queryParams: queryParams);
   }
 
-  Future<void> _update(
-    String location, {
-    Object? extra,
-    bool updateHistory = true,
-    bool replace = false,
-  }) {
+  Future<void> _update(String location, {Object? extra, bool updateHistory = true, bool replace = false}) {
     return _matchRoute(location, extra: extra).then((match) {
+      if (!mounted) return;
       setState(() {
         _matchList = match;
         if (updateHistory || location != match.uri.toString()) {
@@ -228,11 +219,11 @@ class RouterState extends State<Router> with PreloadStateMixin {
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    if (_matchList?.title case var title?) {
-      yield Document.head(title: title);
-    }
-    yield* component._builder.build(this);
+  Component build(BuildContext context) {
+    return Component.fragment([
+      if (_matchList?.title case var title?) Document.head(title: title),
+      component._builder.build(this),
+    ]);
   }
 }
 

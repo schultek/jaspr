@@ -1,1 +1,9 @@
 include: package:lints/recommended.yaml
+
+analyzer:
+  plugins:
+    - custom_lint
+
+formatter:
+  page_width: 120
+  trailing_commas: preserve
