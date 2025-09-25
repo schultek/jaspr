@@ -7,8 +7,8 @@ class Root2 extends StatelessComponent {
   final Component child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section([
+  Component build(BuildContext context) {
+    return section([
       text("Child: "),
       if (kIsWeb) child,
     ]);

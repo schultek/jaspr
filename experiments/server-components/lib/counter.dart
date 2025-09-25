@@ -1,5 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
+import 'package:jaspr_riverpod/legacy.dart';
 
 final counter = StateProvider((_) => 0);
 
@@ -16,8 +17,8 @@ class CounterState extends State<Counter> {
   int count = 0;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield div([
+  Component build(BuildContext context) {
+    return div([
       text('$count'),
       text(' Shared: ${context.watch(counter)}'),
       button(onClick: () {

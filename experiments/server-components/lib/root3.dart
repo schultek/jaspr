@@ -7,8 +7,8 @@ class Root3 extends StatelessComponent {
   final Component child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield section([
+  Component build(BuildContext context) {
+    return section([
       p([
         text("Child 1: "),
         child,

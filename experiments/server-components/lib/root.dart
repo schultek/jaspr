@@ -8,7 +8,7 @@ class Root extends StatelessComponent {
   final Component child;
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
-    yield ProviderScope(child: child);
+  Component build(BuildContext context) {
+    return ProviderScope(child: child);
   }
 }

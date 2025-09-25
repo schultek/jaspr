@@ -1,3 +1,6 @@
+// dart format off
+// ignore_for_file: type=lint
+
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
@@ -23,11 +26,14 @@ import 'package:server_components/root3.dart' as prefix3;
 ///   runApp(...);
 /// }
 /// ```
-final defaultJasprOptions = JasprOptions(
+JasprOptions get defaultJasprOptions => JasprOptions(
   clients: {
     prefix0.Counter: ClientTarget<prefix0.Counter>('counter'),
+
     prefix1.Root: ClientTarget<prefix1.Root>('root', params: _prefix1Root),
+
     prefix2.Root2: ClientTarget<prefix2.Root2>('root2', params: _prefix2Root2),
+
     prefix3.Root3: ClientTarget<prefix3.Root3>('root3', params: _prefix3Root3),
   },
 );

@@ -105,7 +105,7 @@ class ClientModuleBuilder implements Builder {
       import 'package:jaspr/browser.dart';
       [[/]]
             
-      Component getComponentForParams(Map<String, dynamic> p) {
+      Component getComponentForParams(ConfigParams p) {
         return ${module.componentFactory()};
       }
     ''';
