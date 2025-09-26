@@ -51,7 +51,6 @@ export class JasprToolingDaemon implements vscode.Disposable {
     this.statusItem.name = "Jaspr Tooling Daemon";
 
     await this._startProcess();
-    this._isDevMode = false;
   }
 
   public setBusy(busy: boolean) {

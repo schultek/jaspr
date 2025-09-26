@@ -1,3 +1,7 @@
+## 0.2.3
+
+- Improve stability of component scope analysis.
+
 ## 0.2.2
 
 - Convert HTML to Jaspr code when pasting into a Dart editor.
