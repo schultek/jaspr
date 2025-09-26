@@ -26,6 +26,21 @@ void main() {
             'fit-content(100px) minmax(10px, 100px)',
           ),
         );
+
+        expect(
+          () => GridTracks([]).value,
+          throwsA(predicate((e) => e == 'GridTracks cannot be empty')),
+        );
+      });
+
+      test('areas', () {
+        const areas = GridAreas(['foo', 'bar']);
+        expect(areas.value, equals('"foo"\n"bar"'));
+
+        expect(
+          () => GridAreas([]).value,
+          throwsA(predicate((e) => e == 'GridAreas cannot be empty')),
+        );
       });
 
       test('gap', () {
