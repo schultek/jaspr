@@ -4,6 +4,10 @@
 - Allow nesting non-empty `Filter.list` inside each other.
 - Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`.
 
+## 0.21.3
+
+- Fix tooling daemon crash while analyzing component scopes.
+
 ## 0.21.2
 
 - Added html domain to tooling daemon.
