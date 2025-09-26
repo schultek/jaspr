@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.21.3
 
 - Fix tooling daemon crash while analyzing component scopes.
 
