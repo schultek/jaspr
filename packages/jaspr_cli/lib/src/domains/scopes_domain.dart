@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
+import 'package:analyzer/dart/analysis/session.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/file_system/file_system.dart';
@@ -143,6 +144,10 @@ class ScopesDomain extends Domain {
       final inspectData = await InspectData.analyze(result.element, usesJasprWebCompilers, logger);
       _inspectedData[context] = inspectData;
       emitScopes();
+    } on InconsistentAnalysisException catch (e) {
+      logger.write('Skipping inconsistent analysis for $rootPath');
+    } on Exception catch (e) {
+      logger.write('Error analyzing $rootPath: $e');
     } finally {
       _analysisStatus[context] = false;
       emitStatus();

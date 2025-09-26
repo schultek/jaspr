@@ -65,6 +65,7 @@ export class ScopesDomain implements vscode.Disposable {
     var folders = await findJasprProjectFolders();
     folders = folders.map((f) => join(f, "lib", 'main.dart'));
 
+    this.statusBarItem?.dispose();
     this.statusBarItem = vscode.window.createStatusBarItem(
       vscode.StatusBarAlignment.Left,
       1
@@ -79,12 +80,15 @@ export class ScopesDomain implements vscode.Disposable {
       this.updateDiagnostics();
     });
 
+    let didReceiveStatus = false;
+
     this.toolingDaemon.onEvent(
       "scopes.status",
       (results: Record<string, boolean>) => {
         if (!this.statusBarItem) {
           return;
         }
+        didReceiveStatus = true;
         var isBusy = Object.values(results).some((status) => status);
         if (isBusy) {
           this.statusBarItem!.show();
@@ -97,6 +101,13 @@ export class ScopesDomain implements vscode.Disposable {
         }
       }
     );
+
+    setTimeout(() => {
+      if (!didReceiveStatus && this.statusBarItem) {
+        this.statusBarItem.dispose();
+        this.statusBarItem = undefined;
+      }
+    }, 30000);
   }
 
   private updateDiagnostics() {

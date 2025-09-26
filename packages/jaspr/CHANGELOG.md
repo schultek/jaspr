@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fix tooling daemon crash while analyzing component scopes.
+
 ## 0.21.2
 
 - Added html domain to tooling daemon.
