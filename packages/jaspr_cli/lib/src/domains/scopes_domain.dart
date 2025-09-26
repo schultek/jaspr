@@ -144,7 +144,7 @@ class ScopesDomain extends Domain {
       final inspectData = await InspectData.analyze(result.element, usesJasprWebCompilers, logger);
       _inspectedData[context] = inspectData;
       emitScopes();
-    } on InconsistentAnalysisException catch (e) {
+    } on InconsistentAnalysisException catch (_) {
       logger.write('Skipping inconsistent analysis for $rootPath');
     } on Exception catch (e) {
       logger.write('Error analyzing $rootPath: $e');
