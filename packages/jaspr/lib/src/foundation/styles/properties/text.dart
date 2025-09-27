@@ -404,6 +404,11 @@ enum WhiteSpace {
 class Quotes {
   const Quotes._(this.value);
 
+  static const inherit = Quotes._('inherit');
+  static const initial = Quotes._('initial');
+  static const revert = Quotes._('revert');
+  static const revertLayer = Quotes._('revert-layer');
+  static const unset = Quotes._('unset');
   static const none = Quotes._('none');
   static const auto = Quotes._('auto');
   static const matchParent = Quotes._('match-parent');
