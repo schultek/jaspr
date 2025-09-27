@@ -418,3 +418,36 @@ enum WhiteSpace {
   final String value;
   const WhiteSpace(this.value);
 }
+
+class Quotes {
+  const Quotes._(this.value);
+
+  static const none = Quotes._('none');
+  static const auto = Quotes._('auto');
+  static const matchParent = Quotes._('match-parent');
+
+  const factory Quotes({
+    required (String, String) primary,
+    (String, String)? secondary,
+  }) = _Quotes;
+
+  /// The css value
+  final String value;
+}
+
+class _Quotes implements Quotes {
+  const _Quotes({
+    required this.primary,
+    this.secondary,
+  });
+
+  final (String, String) primary;
+  final (String, String)? secondary;
+
+  @override
+  String get value {
+    var quotes = '"${primary.$1}" "${primary.$2}"';
+    quotes += secondary != null ? ' "${secondary!.$1}" "${secondary!.$2}"' : '';
+    return quotes;
+  }
+}
