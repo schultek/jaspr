@@ -82,7 +82,7 @@ class _LinearCurve implements Curve {
   final List<Linear> vals;
 
   @override
-  String get value => vals.join(', ');
+  String get value => vals.map((e) => e.value).join(', ');
 }
 
 /// Tuple used with [Curve.linear]. The optional arguments are percentages between 0-100.
