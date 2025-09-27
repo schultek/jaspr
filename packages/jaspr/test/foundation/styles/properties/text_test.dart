@@ -98,6 +98,23 @@ void main() {
           });
         });
       });
+
+      group('quotes', () {
+        test('named', () {
+          const styles = Styles(quotes: Quotes.none);
+          expect(styles.properties, equals({'quotes': 'none'}));
+        });
+
+        test('primary', () {
+          const styles = Styles(quotes: Quotes(('+', '-')));
+          expect(styles.properties, equals({'quotes': '"+" "-"'}));
+        });
+
+        test('secondary', () {
+          const styles = Styles(quotes: Quotes(('+', '-'), ('*', '/')));
+          expect(styles.properties, equals({'quotes': '"+" "-" "*" "/"'}));
+        });
+      });
     });
   });
 }
