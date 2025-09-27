@@ -79,6 +79,7 @@ abstract class Styles with StylesMixin<Styles> {
     TextShadow? textShadow,
     TextOverflow? textOverflow,
     WhiteSpace? whiteSpace,
+    Quotes? quotes,
     // Background Styles
     Color? backgroundColor,
     ImageStyle? backgroundImage,
@@ -170,6 +171,7 @@ abstract mixin class StylesMixin<T> {
     TextShadow? textShadow,
     TextOverflow? textOverflow,
     WhiteSpace? whiteSpace,
+    Quotes? quotes,
     // Background Styles
     Color? backgroundColor,
     ImageStyle? backgroundImage,
@@ -227,6 +229,7 @@ abstract mixin class StylesMixin<T> {
       textShadow: textShadow,
       textOverflow: textOverflow,
       whiteSpace: whiteSpace,
+      quotes: quotes,
       backgroundColor: backgroundColor,
       backgroundAttachment: backgroundAttachment,
       backgroundClip: backgroundClip,
@@ -346,6 +349,7 @@ class _Styles extends Styles {
   final TextShadow? textShadow;
   final TextOverflow? textOverflow;
   final WhiteSpace? whiteSpace;
+  final Quotes? quotes;
   // Background Style
   final Color? backgroundColor;
   final ImageStyle? backgroundImage;
@@ -428,6 +432,7 @@ class _Styles extends Styles {
     this.textShadow,
     this.textOverflow,
     this.whiteSpace,
+    this.quotes,
     // Background Styles
     this.backgroundColor,
     this.backgroundImage,
@@ -514,6 +519,7 @@ class _Styles extends Styles {
     'text-shadow': ?textShadow?.value,
     'text-overflow': ?textOverflow?.value,
     'white-space': ?whiteSpace?.value,
+    'quotes': ?quotes?.value,
     // Background Styles
     'background-color': ?backgroundColor?.value,
     'background-image': ?backgroundImage?.value,
