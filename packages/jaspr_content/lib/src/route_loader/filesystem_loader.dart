@@ -46,6 +46,8 @@ class FilesystemLoader extends RouteLoaderBase {
   Future<List<RouteBase>> loadRoutes(ConfigResolver resolver, bool eager) async {
     if (kDebugMode) {
       _watcherSub ??= watcherFactory(directory).events.listen((event) {
+        // It looks like event.path is relative on most platforms, but an
+        // absolute path on Linux. Turn this into the expected relative path.
         var path = p.normalize(p.relative(event.path));
         if (event.type == ChangeType.MODIFY) {
           invalidateFile(path);
