@@ -4,6 +4,7 @@ import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
+import 'package:path/path.dart' as p;
 import 'package:watcher/watcher.dart';
 
 import '../page.dart';
@@ -45,7 +46,7 @@ class FilesystemLoader extends RouteLoaderBase {
   Future<List<RouteBase>> loadRoutes(ConfigResolver resolver, bool eager) async {
     if (kDebugMode) {
       _watcherSub ??= watcherFactory(directory).events.listen((event) {
-        var path = event.path;
+        var path = p.normalize(p.relative(event.path));
         if (event.type == ChangeType.MODIFY) {
           invalidateFile(path);
         } else if (event.type == ChangeType.REMOVE) {

@@ -1,3 +1,7 @@
+## 0.4.2 (unreleased)
+
+- Fix `FilesystemLoader` not recognizing file changes on Linux.
+
 ## 0.4.1
 
 - `jaspr` upgraded to `0.21.1`
