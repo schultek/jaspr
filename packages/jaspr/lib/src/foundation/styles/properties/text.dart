@@ -431,20 +431,20 @@ class Quotes {
   static const auto = Quotes._('auto');
   static const matchParent = Quotes._('match-parent');
 
-  const factory Quotes({
-    required (String, String) primary,
+  const factory Quotes(
+    (String, String) primary, [
     (String, String)? secondary,
-  }) = _Quotes;
+  ]) = _Quotes;
 
   /// The css value
   final String value;
 }
 
 class _Quotes implements Quotes {
-  const _Quotes({
-    required this.primary,
+  const _Quotes(
+    this.primary, [
     this.secondary,
-  });
+  ]);
 
   final (String, String) primary;
   final (String, String)? secondary;
