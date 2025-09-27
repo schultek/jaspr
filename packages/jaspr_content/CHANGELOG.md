@@ -1,4 +1,4 @@
-## 0.4.2 (unreleased)
+## Unreleased patch
 
 - Fix `FilesystemLoader` not recognizing file changes on Linux.
 
