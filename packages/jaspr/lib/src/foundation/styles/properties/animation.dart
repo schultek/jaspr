@@ -48,7 +48,7 @@ class _Animation implements Animation {
 
   @override
   String get value {
-    var val = '${duration}ms';
+    var val = '${duration.numstr}ms';
     if (easeFunc != null) val += ' ${easeFunc!.value}';
     if (delay != null) val += ' ${delay}ms';
     if (iterCount != null) val += ' ${iterCount!.numstr}';
