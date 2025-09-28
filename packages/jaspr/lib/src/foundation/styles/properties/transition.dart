@@ -83,8 +83,18 @@ class _LinearCurve implements Curve {
 
   final List<Linear> vals;
 
+  bool _validateLinears() {
+    if (vals.isEmpty) {
+      throw 'Curve.linear cannot be empty';
+    }
+    return true;
+  }
+
   @override
-  String get value => vals.map((e) => e.value).join(', ');
+  String get value {
+    assert(_validateLinears());
+    return "linear(${vals.map((e) => e.value).join(', ')})";
+  }
 }
 
 /// Tuple used with [Curve.linear]. The optional arguments are percentages between 0-100.
@@ -101,7 +111,7 @@ class Linear {
   final double n;
   final double? p1, p2;
 
-  String get value => "$n${p1 != null ? ' $p1%' : ''}${p2 != null ? ' $p2%' : ''}";
+  String get value => "${n.numstr}${p1 != null ? ' ${p1!.numstr}%' : ''}${p2 != null ? ' ${p2!.numstr}%' : ''}";
 }
 
 class _CubicBezierCurve implements Curve {

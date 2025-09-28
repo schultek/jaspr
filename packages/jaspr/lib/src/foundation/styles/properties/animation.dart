@@ -1,4 +1,5 @@
 import 'transition.dart' show Curve;
+import 'unit.dart';
 
 class Animation {
   const Animation._(this.value);
@@ -50,7 +51,7 @@ class _Animation implements Animation {
     var val = '${duration}ms';
     if (easeFunc != null) val += ' ${easeFunc!.value}';
     if (delay != null) val += ' ${delay}ms';
-    if (iterCount != null) val += ' $iterCount';
+    if (iterCount != null) val += ' ${iterCount!.numstr}';
     if (direction != null) val += ' ${direction!.value}';
     if (fillMode != null) val += ' ${fillMode!.value}';
     if (playState != null) val += ' ${playState!.value}';
@@ -67,7 +68,7 @@ class _AnimationList implements Animation {
 
   bool _validateAnimations() {
     if (animations.isEmpty) {
-      throw 'Cannot have empty Animation.list. For no animation, use Animation.none instead.';
+      throw 'Cannot have empty Animation.list. For no animation, use Animation.none instead';
     }
     return true;
   }
