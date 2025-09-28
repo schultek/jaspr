@@ -39,6 +39,7 @@ abstract class Styles with StylesMixin<Styles> {
     Cursor? cursor,
     UserSelect? userSelect,
     PointerEvents? pointerEvents,
+    Animation? animation,
     Transition? transition,
     Transform? transform,
     // Flexbox Styles
@@ -131,6 +132,7 @@ abstract mixin class StylesMixin<T> {
     Cursor? cursor,
     UserSelect? userSelect,
     PointerEvents? pointerEvents,
+    Animation? animation,
     Transition? transition,
     Transform? transform,
     // Flexbox Styles
@@ -211,6 +213,7 @@ abstract mixin class StylesMixin<T> {
       filter: filter,
       backdropFilter: backdropFilter,
       cursor: cursor,
+      animation: animation,
       transition: transition,
       userSelect: userSelect,
       pointerEvents: pointerEvents,
@@ -309,6 +312,7 @@ class _Styles extends Styles {
   final Cursor? cursor;
   final UserSelect? userSelect;
   final PointerEvents? pointerEvents;
+  final Animation? animation;
   final Transition? transition;
   final Transform? transform;
   // Flexbox Style
@@ -392,6 +396,7 @@ class _Styles extends Styles {
     this.cursor,
     this.userSelect,
     this.pointerEvents,
+    this.animation,
     this.transition,
     this.transform,
     // Flexbox Styles
@@ -479,6 +484,7 @@ class _Styles extends Styles {
     'user-select': ?userSelect?.value,
     '-webkit-user-select': ?userSelect?.value,
     'pointer-events': ?pointerEvents?.value,
+    'animation': ?animation?.value,
     'transition': ?transition?.value,
     'transform': ?transform?.value,
     // Flexbox Styles
