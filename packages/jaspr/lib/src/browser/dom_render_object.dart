@@ -249,6 +249,11 @@ class DomRenderFragment extends DomRenderObject
     toHydrate = parent is HydratableDomRenderObject ? parent.toHydrate : [];
   }
 
+  DomRenderFragment.from(this.node, DomRenderObject? parent) {
+    this.parent = parent;
+    toHydrate = [...node.childNodes.toIterable()];
+  }
+
   @override
   final web.DocumentFragment node;
   bool isAttached = false;
