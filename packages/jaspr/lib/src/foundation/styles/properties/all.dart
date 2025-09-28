@@ -1,4 +1,5 @@
 export 'angle.dart';
+export 'animation.dart';
 export 'background.dart';
 export 'box.dart';
 export 'color.dart';
