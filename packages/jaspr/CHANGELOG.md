@@ -3,6 +3,8 @@
 - **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
 - Allow nesting non-empty `Filter.list` inside each other.
 - Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`.
+- Added `Animation`, `Quotes` CSS properties.
+- **Breaking**: Renamed `Curve.linear` to `Curve.linear_` and added `Curve.linear()` function.
 
 ## 0.21.3
 
