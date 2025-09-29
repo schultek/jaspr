@@ -50,7 +50,7 @@ class _Animation implements Animation {
   String get value {
     var val = '${duration.numstr}ms';
     if (easeFunc != null) val += ' ${easeFunc!.value}';
-    if (delay != null) val += ' ${delay}ms';
+    if (delay != null) val += ' ${delay!.numstr}ms';
     if (iterCount != null) val += ' ${iterCount!.numstr}';
     if (direction != null) val += ' ${direction!.value}';
     if (fillMode != null) val += ' ${fillMode!.value}';
