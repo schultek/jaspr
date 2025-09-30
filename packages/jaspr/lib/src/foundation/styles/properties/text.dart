@@ -323,15 +323,26 @@ class _TextDecoration implements TextDecoration {
   ].join(' ');
 }
 
-abstract class TextShadow {
-  const factory TextShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Color? color}) = _TextShadow;
+class TextShadow {
+  const TextShadow._(this.value);
 
+  static const none = TextShadow._('none');
+  static const initial = TextShadow._('initial');
+  static const inherit = TextShadow._('inherit');
+  static const revert = TextShadow._('revert');
+  static const revertLayer = TextShadow._('revert-layer');
+  static const unset = TextShadow._('unset');
+
+  const factory TextShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Color? color}) = _TextShadow;
   const factory TextShadow.combine(List<TextShadow> shadows) = _CombineTextShadow;
 
-  String get value;
+  /// The css value
+  final String value;
 }
 
-class _TextShadow implements TextShadow {
+abstract class _ListableTextShadow implements TextShadow {}
+
+class _TextShadow implements _ListableTextShadow {
   const _TextShadow({required this.offsetX, required this.offsetY, this.blur, this.color});
 
   final Unit offsetX;
@@ -348,15 +359,22 @@ class _TextShadow implements TextShadow {
   ].join(' ');
 }
 
-class _CombineTextShadow implements TextShadow {
+class _CombineTextShadow implements _ListableTextShadow {
   const _CombineTextShadow(this.shadows);
 
   final List<TextShadow> shadows;
 
   bool _validateShadows() {
     if (shadows.isEmpty) {
-      throw 'TextShadow.combine cannot be empty';
+      throw 'TextShadow.combine cannot be empty. For no text shadow, use TextShadow.none';
     }
+
+    for (final shadow in shadows) {
+      if (shadow is! _ListableTextShadow) {
+        throw 'Cannot use ${shadow.value} as a text shadow list item, only standalone use supported';
+      }
+    }
+
     return true;
   }
 

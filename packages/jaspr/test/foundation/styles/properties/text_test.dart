@@ -98,6 +98,48 @@ void main() {
           });
         });
       });
+
+      group('shadow', () {
+        test('named', () {
+          const textShadow = TextShadow.initial;
+          expect(textShadow.value, equals('initial'));
+        });
+
+        test('basic', () {
+          final textShadow = TextShadow(offsetX: 1.rem, offsetY: 2.rem, blur: 3.rem, color: Colors.red);
+          expect(textShadow.value, equals('1rem 2rem 3rem red'));
+        });
+
+        group('combine', () {
+          test('basic', () {
+            final textShadow = TextShadow.combine([
+              TextShadow(offsetX: 1.rem, offsetY: 2.rem),
+              TextShadow(offsetX: 3.rem, offsetY: 4.rem),
+            ]);
+            expect(textShadow.value, equals('1rem 2rem, 3rem 4rem'));
+          });
+
+          test('disallow empty list', () {
+            const emptyTextShadow = TextShadow.combine([]);
+            expect(
+              () => emptyTextShadow.value,
+              throwsA(
+                predicate((e) => e == 'TextShadow.combine cannot be empty. For no text shadow, use TextShadow.none'),
+              ),
+            );
+          });
+
+          test('disallow named values', () {
+            const illegalTextShadow = TextShadow.combine([TextShadow.unset]);
+            expect(
+              () => illegalTextShadow.value,
+              throwsA(
+                predicate((e) => e == 'Cannot use unset as a text shadow list item, only standalone use supported'),
+              ),
+            );
+          });
+        });
+      });
     });
   });
 }
