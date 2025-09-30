@@ -188,16 +188,28 @@ void main() {
         expect(styles.properties, {'box-shadow': 'inset 1rem 2rem 3rem 4rem red'});
       });
 
-      test('combine', () {
-        var styles = Styles(
-          shadow: BoxShadow.combine([BoxShadow(offsetX: 1.rem, offsetY: 2.rem)]),
-        );
-        expect(styles.properties, equals({'box-shadow': '1rem 2rem'}));
+      group('combine', () {
+        test('basic', () {
+          const styles = Styles(
+            shadow: BoxShadow.combine([BoxShadow(offsetX: Unit.rem(1), offsetY: Unit.rem(2))]),
+          );
+          expect(styles.properties, equals({'box-shadow': '1rem 2rem'}));
+        });
 
-        expect(
-          () => BoxShadow.combine([]).value,
-          throwsA(predicate((e) => e == '[BoxShadow.combine] cannot be empty.')),
-        );
+        test('disallow empty list', () {
+          expect(
+            () => BoxShadow.combine([]).value,
+            throwsA(predicate((e) => e == '[BoxShadow.combine] cannot be empty.')),
+          );
+        });
+
+        test('disallow named values', () {
+          const badBoxShadow = BoxShadow.combine([BoxShadow.initial]);
+          expect(
+            () => badBoxShadow.value,
+            throwsA(predicate((e) => e == 'Cannot use initial as a list item, only standalone use supported.')),
+          );
+        });
       });
     });
   });

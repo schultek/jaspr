@@ -112,9 +112,9 @@ void main() {
 
         group('combine', () {
           test('basic', () {
-            final textShadow = TextShadow.combine([
-              TextShadow(offsetX: 1.rem, offsetY: 2.rem),
-              TextShadow(offsetX: 3.rem, offsetY: 4.rem),
+            const textShadow = TextShadow.combine([
+              TextShadow(offsetX: Unit.rem(1), offsetY: Unit.rem(2)),
+              TextShadow(offsetX: Unit.rem(3), offsetY: Unit.rem(4)),
             ]);
             expect(textShadow.value, equals('1rem 2rem, 3rem 4rem'));
           });
