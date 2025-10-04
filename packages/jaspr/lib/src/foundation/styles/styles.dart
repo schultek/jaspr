@@ -1,6 +1,6 @@
 import 'properties/all.dart';
 
-export 'properties/all.dart' hide NumberString;
+export 'properties/all.dart' hide NumberString, CssDurationFormat;
 
 /// Represents a set of css styles by pairs of property and value.
 abstract class Styles with StylesMixin<Styles> {

@@ -193,7 +193,7 @@ List<StyleRule> get root => [
   // Animated underline
   css('.animated-underline', [
     css('&').styles(
-      transition: Transition('background-size', duration: 300, curve: Curve.easeInOut),
+      transition: Transition('background-size', duration: 300.ms, curve: Curve.easeInOut),
       backgroundPosition: BackgroundPosition(offsetX: Unit.zero, offsetY: 100.percent),
       backgroundRepeat: BackgroundRepeat.noRepeat,
       backgroundSize: BackgroundSize.sides(Unit.zero, 1.5.px),

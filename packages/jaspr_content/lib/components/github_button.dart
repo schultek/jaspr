@@ -34,7 +34,9 @@ final class GitHubButton extends StatefulComponent {
         lineHeight: 1.2.em,
       ),
       css('&:hover').styles(backgroundColor: Color('color-mix(in srgb, currentColor 5%, transparent)')),
-      css('& *').styles(transition: Transition('opacity', duration: 200, curve: Curve.easeInOut)),
+      css('& *').styles(
+        transition: Transition('opacity', duration: 200.ms, curve: Curve.easeInOut),
+      ),
       css('&:hover *').styles(raw: {'opacity': '1 !important'}),
       css('.github-icon').styles(width: 1.2.rem),
       css('.github-info', [
