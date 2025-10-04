@@ -71,14 +71,22 @@ class LinePlacement {
 }
 
 class _LinePlacement implements LinePlacement {
-  const _LinePlacement({this.number, this.span = false, this.lineName});
+  const _LinePlacement({this.number, this.span = false, this.lineName})
+    : assert(
+        span || number != null || lineName != null,
+        'At least one of span, number or lineName must be set. Otherwise, use LinePlacement.auto',
+      );
 
   final int? number;
   final bool span;
   final String? lineName;
 
   @override
-  String get value => [if (span) 'span', if (number != null) number, if (lineName != null) lineName].join(' ');
+  String get value => [
+    if (span) 'span',
+    if (number != null) number!,
+    if (lineName != null) lineName!,
+  ].join(' ');
 }
 
 class _NamedLinePlacement extends _LinePlacement {
