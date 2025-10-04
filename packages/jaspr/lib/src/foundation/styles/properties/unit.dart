@@ -182,3 +182,13 @@ extension NumberString on double {
     return roundToDouble() == this ? round().toString() : toString();
   }
 }
+
+extension DurationExt on int {
+  /// Shorthand for `Duration(milliseconds: this)`
+  Duration get ms => Duration(milliseconds: this);
+}
+
+extension CssDurationFormat on Duration {
+  /// Get time in CSS milliseconds format i.e., `<duration>ms`
+  String get cssMs => '${inMilliseconds}ms';
+}
