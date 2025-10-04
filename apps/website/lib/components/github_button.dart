@@ -78,7 +78,9 @@ class GitHubButtonState extends State<GitHubButton> {
         textDecoration: TextDecoration.none,
       ),
       css('&:hover').styles(backgroundColor: hoverOverlayColor),
-      css('& *').styles(transition: Transition('opacity', duration: 200, curve: Curve.easeInOut)),
+      css('& *').styles(
+        transition: Transition('opacity', duration: 200.ms, curve: Curve.easeInOut),
+      ),
       css('&:hover *').styles(raw: {'opacity': '1 !important'}),
       css('& > i').styles(opacity: 0.9),
       css('div', [
