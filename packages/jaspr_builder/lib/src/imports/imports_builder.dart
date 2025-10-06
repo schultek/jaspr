@@ -6,7 +6,7 @@ import 'package:path/path.dart' as p;
 
 import '../utils.dart';
 
-var path = p.posix;
+final p.Context path = p.posix;
 
 class ImportsOutputBuilder implements Builder {
   ImportsOutputBuilder(BuilderOptions options);
@@ -14,15 +14,15 @@ class ImportsOutputBuilder implements Builder {
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     try {
-      var json = jsonDecode(await buildStep.readAsString(buildStep.inputId));
+      var json = jsonDecode(await buildStep.readAsString(buildStep.inputId)) as List<Object?>;
       var outputId = buildStep.inputId.changeExtension('.dart');
 
       var webShow = <String>{};
       var vmShow = <String>{};
 
-      for (var e in json) {
-        var platform = e['platform'];
-        var show = (e['show'] as List).cast<String>();
+      for (var e in json.cast<Map<String, Object?>>()) {
+        var platform = e['platform'] as int?;
+        var show = (e['show'] as List<Object?>).cast<String>();
 
         var items = <String>[...show, ...show.where((v) => v.isType).map((v) => '${v}OrStubbed')];
         if (platform == 0) {
