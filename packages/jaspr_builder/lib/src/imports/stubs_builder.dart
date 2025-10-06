@@ -22,11 +22,11 @@ class ImportsStubsBuilder implements Builder {
     var stubs = <String>{};
 
     await for (var id in imports) {
-      var entries = jsonDecode(await buildStep.readAsString(id)) as Iterable;
-      for (var entry in entries) {
-        var url = entry['url'];
-        var platform = entry['platform'];
-        var show = entry['show'] as List;
+      var entries = jsonDecode(await buildStep.readAsString(id)) as List<Object?>;
+      for (var entry in entries.cast<Map<String, Object?>>()) {
+        var url = entry['url'] as String;
+        var platform = entry['platform'] as int?;
+        var show = (entry['show'] as List<Object?>).cast<String>();
 
         stubs.addAll(show.map((n) => 'dynamic $n;'));
 

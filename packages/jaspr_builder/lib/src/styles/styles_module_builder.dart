@@ -127,9 +127,15 @@ class StylesModule {
 
   StylesModule({required this.elements, required this.id});
 
-  factory StylesModule.deserialize(Map<String, dynamic> map) {
-    return StylesModule(elements: (map['elements'] as List).cast<String>(), id: AssetId.deserialize(map['id']));
+  factory StylesModule.deserialize(Map<String, Object?> map) {
+    return StylesModule(
+      elements: (map['elements'] as List<Object?>).cast<String>(),
+      id: AssetId.deserialize(map['id'] as List<Object?>),
+    );
   }
 
-  Map<String, dynamic> serialize() => {'elements': elements, 'id': id.serialize()};
+  Map<String, Object?> serialize() => {
+    'elements': elements,
+    'id': id.serialize(),
+  };
 }

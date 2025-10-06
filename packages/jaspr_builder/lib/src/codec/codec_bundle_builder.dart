@@ -37,13 +37,11 @@ class CodecBundleBuilder implements Builder {
     var modules = buildStep
         .findAssets(Glob('lib/**.codec.json'))
         .asyncMap((id) => buildStep.readAsString(id))
-        .map((c) => CodecModule.deserialize(jsonDecode(c)));
-    var bundle = [];
-    await for (final module in modules) {
-      for (var element in module.elements) {
-        bundle.add(element.serialize());
-      }
-    }
+        .map((c) => CodecModule.deserialize(jsonDecode(c) as Map<String, Object?>));
+    var bundle = <Map<String, Object?>>[
+      await for (final module in modules)
+        for (var element in module.elements) element.serialize(),
+    ];
 
     if (bundle.isEmpty) return;
 

@@ -24,14 +24,14 @@ extension DartOutput on BuildStep {
   }
 }
 
-var clientChecker = TypeChecker.typeNamed(ClientAnnotation, inPackage: 'jaspr');
-var componentChecker = TypeChecker.typeNamed(Component, inPackage: 'jaspr');
-final keyChecker = TypeChecker.typeNamed(Key, inPackage: 'jaspr');
-var stylesChecker = TypeChecker.typeNamed(CssUtility, inPackage: 'jaspr');
-var styleRuleChecker = TypeChecker.typeNamed(StyleRule, inPackage: 'jaspr');
-var syncChecker = TypeChecker.typeNamed(SyncAnnotation, inPackage: 'jaspr');
-var stateChecker = TypeChecker.typeNamed(State, inPackage: 'jaspr');
-var importChecker = TypeChecker.typeNamed(Import, inPackage: 'jaspr');
+final TypeChecker clientChecker = TypeChecker.typeNamed(ClientAnnotation, inPackage: 'jaspr');
+final TypeChecker componentChecker = TypeChecker.typeNamed(Component, inPackage: 'jaspr');
+final TypeChecker keyChecker = TypeChecker.typeNamed(Key, inPackage: 'jaspr');
+final TypeChecker stylesChecker = TypeChecker.typeNamed(CssUtility, inPackage: 'jaspr');
+final TypeChecker styleRuleChecker = TypeChecker.typeNamed(StyleRule, inPackage: 'jaspr');
+final TypeChecker syncChecker = TypeChecker.typeNamed(SyncAnnotation, inPackage: 'jaspr');
+final TypeChecker stateChecker = TypeChecker.typeNamed(State, inPackage: 'jaspr');
+final TypeChecker importChecker = TypeChecker.typeNamed(Import, inPackage: 'jaspr');
 
 class ImportEntry {
   String url;
@@ -40,7 +40,7 @@ class ImportEntry {
 
   ImportEntry(this.url, this.show, this.platform);
 
-  Map<String, dynamic> toJson() {
+  Map<String, Object?> toJson() {
     return {'url': url, 'show': show, 'platform': platform};
   }
 }
@@ -157,13 +157,13 @@ extension ResolveImports on String {
 }
 
 extension LoadBundle on BuildStep {
-  Stream<T> loadBundle<T>(String name, T Function(Map<String, dynamic>) decoder) async* {
+  Stream<T> loadBundle<T>(String name, T Function(Map<String, Object?>) decoder) async* {
     var packages = {inputId.package, ...(await packageConfig).packages.map((p) => p.name)};
     for (var package in packages) {
       var bundleId = AssetId(package, 'lib/$name.bundle.json');
       if (await canRead(bundleId)) {
-        var bundle = jsonDecode(await readAsString(bundleId)) as List;
-        for (var element in bundle) {
+        var bundle = jsonDecode(await readAsString(bundleId)) as List<Object?>;
+        for (var element in bundle.cast<Map<String, Object?>>()) {
           yield decoder(element);
         }
       }
