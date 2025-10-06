@@ -5,7 +5,7 @@ import 'package:jaspr_test/jaspr_test.dart';
 
 RouterState findRouter(Element root) {
   RouterState? router;
-  findRouter(Element element) {
+  void findRouter(Element element) {
     if (element is StatefulElement && element.state is RouterState) {
       router = element.state as RouterState;
     } else {
@@ -77,6 +77,7 @@ Route homeRoute() => Route(
   path: '/',
   builder: (_, __) => Page(path: 'home'),
 );
+
 Route route(String path, [List<RouteBase> routes = const [], String? name, RouterRedirect? redirect]) => Route(
   path: path,
   name: name,
@@ -84,17 +85,20 @@ Route route(String path, [List<RouteBase> routes = const [], String? name, Route
   builder: (_, s) => Page(path: s.subloc),
   routes: routes,
 );
-Route lazyRoute(String path, Future future, [List<RouteBase> routes = const []]) => Route.lazy(
+
+Route lazyRoute(String path, Future<void> future, [List<RouteBase> routes = const []]) => Route.lazy(
   path: path,
   builder: (_, s) => Page(path: s.subloc),
   load: () => future,
   routes: routes,
 );
+
 ShellRoute shellRoute(String name, List<RouteBase> routes) => ShellRoute(
   builder: (_, s, c) => Page(path: name, child: c),
   routes: routes,
 );
-ShellRoute lazyShellRoute(String name, Future future, List<RouteBase> routes) => ShellRoute.lazy(
+
+ShellRoute lazyShellRoute(String name, Future<void> future, List<RouteBase> routes) => ShellRoute.lazy(
   builder: (_, s, c) => Page(path: name, child: c),
   load: () => future,
   routes: routes,
