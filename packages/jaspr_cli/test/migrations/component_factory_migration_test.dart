@@ -31,10 +31,16 @@ Component build() {
 }
 ''',
           expectedMigrations: [
-            isA<MigrationInstance>().having((i) => i.description, 'description',
-                'Replaced Text() with Component.text()'),
-                isA<MigrationInstance>().having((i) => i.description, 'description',
-                'Replaced DomComponent() with Component.element()'),
+            isA<MigrationInstance>().having(
+              (i) => i.description,
+              'description',
+              'Replaced Text() with Component.text()',
+            ),
+            isA<MigrationInstance>().having(
+              (i) => i.description,
+              'description',
+              'Replaced DomComponent() with Component.element()',
+            ),
           ],
           expectedWarnings: [],
         );

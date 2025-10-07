@@ -133,7 +133,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       args.add('--pause-isolates-on-start');
     }
 
-    var entryPoint = await getEntryPoint(argResults!['input'], true);
+    var entryPoint = await getEntryPoint(argResults!.option('input'), true);
 
     if (!release) {
       var import = entryPoint.replaceFirst('lib', 'package:${project.requirePubspecYaml['name']}');
@@ -177,7 +177,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     // Wait until server is reachable.
     var n = 0;
     while (true) {
-      await Future.delayed(Duration(seconds: 2));
+      await Future<void>.delayed(Duration(seconds: 2));
       try {
         await http.head(Uri.parse('http://localhost:$port'));
         break;
@@ -302,7 +302,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       await workflow.shutDown();
     });
 
-    var buildCompleter = Completer();
+    var buildCompleter = Completer<void>();
 
     var timer = Timer(Duration(seconds: 20), () {
       if (!buildCompleter.isCompleted) {

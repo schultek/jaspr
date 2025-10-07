@@ -89,10 +89,10 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
       await _checkForUpdates();
     }
     if (!isVersionCommand) {
-      if (topLevelResults['disable-analytics']) {
+      if (topLevelResults.flag('disable-analytics')) {
         disableAnalytics(_logger);
         exitCode = ExitCode.success.code;
-      } else if (topLevelResults['enable-analytics']) {
+      } else if (topLevelResults.flag('enable-analytics')) {
         enableAnalytics(_logger);
         exitCode = ExitCode.success.code;
       } else {

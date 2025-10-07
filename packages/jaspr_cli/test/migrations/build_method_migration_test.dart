@@ -27,8 +27,11 @@ class MyComponent extends StatelessComponent {
 }
 ''',
           expectedMigrations: [
-            isA<MigrationInstance>()
-                .having((i) => i.description, 'description', 'Migrated build() method of MyComponent class'),
+            isA<MigrationInstance>().having(
+              (i) => i.description,
+              'description',
+              'Migrated build() method of MyComponent class',
+            ),
           ],
           expectedWarnings: [],
         );
@@ -143,7 +146,9 @@ class MyComponent extends StatelessComponent {
       });
 
       test('with multiple yields in if', () async {
-        testMigration(BuildMethodMigration(), input: '''
+        testMigration(
+          BuildMethodMigration(),
+          input: '''
 class MyComponent extends StatelessComponent {
   @override
   Iterable<Component> build(BuildContext context) sync* {
@@ -159,7 +164,8 @@ class MyComponent extends StatelessComponent {
     }
   }
 }
-''', expectedOutput: '''
+''',
+          expectedOutput: '''
 class MyComponent extends StatelessComponent {
   @override
   Component build(BuildContext context) {
@@ -177,7 +183,8 @@ class MyComponent extends StatelessComponent {
     ]);
   }
 }
-''');
+''',
+        );
       });
 
       test('with logic before yield', () async {
