@@ -81,6 +81,14 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'sitemap-exclude',
       help: 'A regex pattern of routes that should be excluded from the sitemap. ',
     );
+    argParser.addFlag(
+      'managed-build-options',
+      help:
+          'Whether jaspr will launch `build_runner` with options derived from command line arguments (the default).'
+          'When disabled, builders compiling to the web need to be configured manually.',
+      negatable: true,
+      defaultsTo: true,
+    );
     addDartDefineArgs();
   }
 
@@ -97,6 +105,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final includeSourceMaps = argResults!['include-source-maps'] as bool;
   late final sitemapDomain = argResults!['sitemap-domain'] as String?;
   late final sitemapExclude = argResults!['sitemap-exclude'] as String?;
+  late final managedBuildOptions = argResults!['managed-build-options'] as bool;
 
   @override
   Future<int> runCommand() async {
@@ -414,11 +423,13 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       '--release',
       '--verbose',
       '--delete-conflicting-outputs',
-      '--define=$entrypointBuilder=compiler=$compiler',
-      '--define=$entrypointBuilder=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',
-      if (includeSourceMaps) ...[
-        '--define=$builders:dart2js_archive_extractor=filter_outputs=false',
-        '--define=$builders:dart_source_cleanup=enabled=false',
+      if (managedBuildOptions) ...[
+        '--define=$entrypointBuilder=compiler=$compiler',
+        '--define=$entrypointBuilder=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',
+        if (includeSourceMaps) ...[
+          '--define=$builders:dart2js_archive_extractor=filter_outputs=false',
+          '--define=$builders:dart_source_cleanup=enabled=false',
+        ],
       ],
     ], logger.writeServerLog);
     OutputLocation outputLocation = OutputLocation(

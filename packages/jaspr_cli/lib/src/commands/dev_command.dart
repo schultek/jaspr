@@ -34,6 +34,14 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addFlag('debug', abbr: 'd', help: 'Serves the app in debug mode.', negatable: false);
     argParser.addFlag('release', abbr: 'r', help: 'Serves the app in release mode.', negatable: false);
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
+    argParser.addFlag(
+      'managed-build-options',
+      help:
+          'Whether jaspr will launch `build_runner` with options derived from command line arguments (the default).'
+          'When disabled, builders compiling to the web need to be configured manually.',
+      negatable: true,
+      defaultsTo: true,
+    );
     addDartDefineArgs();
   }
 
@@ -45,6 +53,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final mode = argResults!['mode'] as String;
   late final port = argResults!['port'] as String;
   late final useWasm = argResults!['experimental-wasm'] as bool;
+  late final managedBuildOptions = argResults!['managed-build-options'] as bool;
 
   bool get launchInChrome;
   bool get autoRun;
@@ -283,13 +292,15 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final buildArgs = [
       if (release) '--release',
-      '--define',
-      '$package:ddc=generate-full-dill=true',
-      '--delete-conflicting-outputs',
-      '--define=$package:entrypoint=compiler=$compiler',
-      if (compiler == 'dartdevc') '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug$dartdevcDefines}',
-      if (compiler != 'dartdevc')
-        '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"$dart2jsDefines${!release ? ',"--enable-asserts"' : ''}]',
+      if (managedBuildOptions) ...[
+        '--define',
+        '$package:ddc=generate-full-dill=true',
+        '--delete-conflicting-outputs',
+        '--define=$package:entrypoint=compiler=$compiler',
+        if (compiler == 'dartdevc') '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug$dartdevcDefines}',
+        if (compiler != 'dartdevc')
+          '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"$dart2jsDefines${!release ? ',"--enable-asserts"' : ''}]',
+      ],
     ];
 
     var workflow = await ClientWorkflow.start(configuration, buildArgs, webPort, logger, guardResource);
