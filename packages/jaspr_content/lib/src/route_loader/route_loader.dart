@@ -115,14 +115,14 @@ abstract class RouteLoaderBase implements RouteLoader {
       }
       final pageBuilder = AsyncBuilder(builder: (_) => source.load());
 
-      routes.add(Route(path: source.url, builder: (_, __) => pageBuilder));
+      routes.add(Route(path: source.url, builder: (_, _) => pageBuilder));
 
       for (final output in config.secondaryOutputs) {
         if (output.pattern.matchAsPrefix(source.path) != null) {
           routes.add(
             Route(
               path: output.createRoute(source.url),
-              builder: (_, __) => InheritedSecondaryOutput(builder: output.build, child: pageBuilder),
+              builder: (_, _) => InheritedSecondaryOutput(builder: output.build, child: pageBuilder),
             ),
           );
         }

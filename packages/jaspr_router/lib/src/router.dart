@@ -19,7 +19,7 @@ class Router extends StatefulComponent {
     _configuration = RouteConfiguration(
       routes: routes,
       redirectLimit: redirectLimit,
-      topRedirect: redirect ?? (_, __) => null,
+      topRedirect: redirect ?? (_, _) => null,
     );
     _parser = RouteInformationParser(configuration: _configuration);
     _builder = RouteBuilder(configuration: _configuration, errorBuilder: errorBuilder);
