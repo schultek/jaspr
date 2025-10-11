@@ -51,7 +51,7 @@ void main() {
       // Adds a custom Jaspr component to be used as <Clicker/> in markdown.
       CustomComponent(
         pattern: 'Clicker',
-        builder: (_, __, ___) => Clicker(),
+        builder: (_, _, _) => Clicker(),
       ),
       // Adds zooming and caption support to images.
       Image(zoom: true),

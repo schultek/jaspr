@@ -75,7 +75,7 @@ class MockRouteRegistry implements RouteRegistry {
 
 Route homeRoute() => Route(
   path: '/',
-  builder: (_, __) => Page(path: 'home'),
+  builder: (_, _) => Page(path: 'home'),
 );
 Route route(String path, [List<RouteBase> routes = const [], String? name, RouterRedirect? redirect]) => Route(
   path: path,
