@@ -276,7 +276,7 @@ class UncontrolledProviderScope extends InheritedComponent {
 class _UncontrolledProviderScopeElement extends InheritedElement {
   _UncontrolledProviderScopeElement(UncontrolledProviderScope super.component);
 
-  void Function()? _task;
+  Task? _task;
   // ignore: unused_field
   bool _mounted = true;
 
@@ -321,7 +321,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     setDependencies(dependent, getDependencies(dependent) ?? ProviderDependencies(dependent, this));
   }
 
-  void _jasprVsync(void Function() task) {
+  void _jasprVsync(Task task) {
     assert(_task == null, 'Only one task can be scheduled at a time');
     _task = task;
 
