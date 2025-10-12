@@ -15,7 +15,7 @@ class _ProviderSync implements ProviderSync {
 extension SyncNotifierExtension<NotifierT extends Notifier<T>, T> on NotifierProvider<NotifierT, T> {
   ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
     return _ProviderSync(this, id, codec, (value) {
-      return overrideWithBuild((_, __) => value as T);
+      return overrideWithBuild((_, _) => value as T);
     });
   }
 }
@@ -23,7 +23,7 @@ extension SyncNotifierExtension<NotifierT extends Notifier<T>, T> on NotifierPro
 extension SyncAsyncNotifierExtension<NotifierT extends AsyncNotifier<T>, T> on AsyncNotifierProvider<NotifierT, T> {
   ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
     return _ProviderSync(this, id, codec, (value) {
-      return overrideWithBuild((_, __) => value as T);
+      return overrideWithBuild((_, _) => value as T);
     });
   }
 }

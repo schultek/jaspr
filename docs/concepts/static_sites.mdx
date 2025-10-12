@@ -24,9 +24,9 @@ The following shows a router that would render the above three routes:
 ```dart
 Router(
   routes: [
-    Route(path: '/', builder: (_, __) => HomePage()),
-    Route(path: '/about', builder: (_, __) => AboutPage()),
-    Route(path: '/contact', builder: (_, __) => ContactPage()),
+    Route(path: '/', builder: (_, _) => HomePage()),
+    Route(path: '/about', builder: (_, _) => AboutPage()),
+    Route(path: '/contact', builder: (_, _) => ContactPage()),
   ]
 );
 ```

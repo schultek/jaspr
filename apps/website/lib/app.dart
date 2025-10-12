@@ -17,15 +17,15 @@ class App extends StatelessComponent {
       routes: [
         Route(
           path: '/',
-          builder: (_, __) => fragment([
+          builder: (_, _) => fragment([
             Banner(),
             Header(),
             main_([Home()]),
             Footer(),
           ]),
         ),
-        Route(path: '/imprint', title: 'Imprint', builder: (_, __) => MarkdownPage('lib/content/imprint.md')),
-        Route(path: '/privacy', title: 'Privacy Policy', builder: (_, __) => MarkdownPage('lib/content/privacy.md')),
+        Route(path: '/imprint', title: 'Imprint', builder: (_, _) => MarkdownPage('lib/content/imprint.md')),
+        Route(path: '/privacy', title: 'Privacy Policy', builder: (_, _) => MarkdownPage('lib/content/privacy.md')),
       ],
     );
   }
