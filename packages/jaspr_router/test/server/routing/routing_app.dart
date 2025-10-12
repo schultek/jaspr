@@ -26,9 +26,9 @@ class Home extends StatelessComponent {
     return span([text('Home')]);
   }
 
-  void shouldThrow(Function fn) async {
+  void shouldThrow(void Function() fn) {
     try {
-      await fn();
+      fn();
     } on UnimplementedError catch (_) {
       return;
     }
