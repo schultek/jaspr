@@ -1,6 +1,9 @@
 @TestOn('vm')
 library;
 
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
 
@@ -15,7 +18,7 @@ void main() {
 
       expect(
         result.body,
-        equals(
+        _decodedMatches(
           '<!DOCTYPE html>\n'
           '<html><head></head><body><div id="test"></div></body></html>\n'
           '',
@@ -35,7 +38,7 @@ void main() {
 
       expect(
         result.body,
-        equals(
+        _decodedMatches(
           '<!DOCTYPE html>\n'
           '<html lang="en">\n'
           '  <head>\n'
@@ -56,7 +59,7 @@ void main() {
     test('renders standalone component', () async {
       var result = await renderComponent(div(id: 'test', []), standalone: true);
 
-      expect(result.body, equals('<div id="test"></div>\n'));
+      expect(result.body, _decodedMatches('<div id="test"></div>\n'));
     });
 
     test('renders component with headers', () async {
@@ -73,7 +76,7 @@ void main() {
       );
 
       expect(result.statusCode, equals(200));
-      expect(result.body, equals('<div id="test">abc</div>\n'));
+      expect(result.body, _decodedMatches('<div id="test">abc</div>\n'));
       expect(
         result.headers,
         equals({
@@ -97,7 +100,7 @@ void main() {
       );
 
       expect(result.statusCode, equals(200));
-      expect(result.body, equals('<div id="test">abc</div>\n'));
+      expect(result.body, _decodedMatches('<div id="test">abc</div>\n'));
       expect(
         result.headers,
         equals({
@@ -106,5 +109,57 @@ void main() {
         }),
       );
     });
+
+    test('renders custom text responses', () async {
+      var result = await renderComponent(
+        Builder(
+          builder: (context) {
+            var value = context.cookies['test'];
+            context.setStatusCode(201, responseBody: 'custom');
+            return div(id: 'test', [text(value ?? '')]);
+          },
+        ),
+        request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'cookie': 'test=abc'}),
+        standalone: true,
+      );
+
+      expect(result.statusCode, equals(201));
+      expect(result.body, _decodedMatches('custom'));
+    });
+
+    test('renders custom binary responses', () async {
+      var result = await renderComponent(
+        Builder(
+          builder: (context) {
+            var value = context.cookies['test'];
+            context.setStatusCode(201, responseBody: Uint8List.fromList([1, 2, 3]));
+            return div(id: 'test', [text(value ?? '')]);
+          },
+        ),
+        request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'cookie': 'test=abc'}),
+        standalone: true,
+      );
+
+      expect(result.statusCode, equals(201));
+      expect(result.body, equals([1, 2, 3]));
+    });
+
+    test('forbids rendering custom objects', () async {
+      await renderComponent(
+        Builder(
+          builder: (context) {
+            var value = context.cookies['test'];
+            expect(() => context.setStatusCode(201, responseBody: DateTime.now()), throwsArgumentError);
+            return div(id: 'test', [text(value ?? '')]);
+          },
+        ),
+        request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'cookie': 'test=abc'}),
+        standalone: true,
+      );
+    });
   });
+}
+
+TypeMatcher<List<int>> _decodedMatches(dynamic string) {
+  return isA<List<int>>().having((e) => utf8.decode(e), 'decoded', string);
 }
