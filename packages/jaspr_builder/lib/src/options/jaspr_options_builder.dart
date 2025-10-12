@@ -42,7 +42,8 @@ class JasprOptionsBuilder implements Builder {
 
   Future<void> generateOptionsOutput(BuildStep buildStep) async {
     final pubspecYaml = await buildStep.readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
-    final mode = yaml.loadYaml(pubspecYaml)?['jaspr']?['mode'];
+    final jasprConfig = (yaml.loadYaml(pubspecYaml) as Map<Object?, Object?>?)?['jaspr'] as Map<Object?, Object?>?;
+    final mode = jasprConfig?['mode'] as String?;
 
     if (mode != 'static' && mode != 'server') {
       return;

@@ -2,9 +2,10 @@ include: package:lints/recommended.yaml
 
 linter:
   rules:
-    sort_pub_dependencies: true
-    prefer_relative_imports: true
     directives_ordering: true
+    prefer_relative_imports: true
+    sort_pub_dependencies: true
+    unnecessary_underscores: true
 
 formatter:
   page_width: 120

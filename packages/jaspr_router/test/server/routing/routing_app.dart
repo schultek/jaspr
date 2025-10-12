@@ -6,8 +6,8 @@ class App extends StatelessComponent {
   Component build(BuildContext context) {
     return Router(
       routes: [
-        Route(path: '/', builder: (_, __) => Home()),
-        Route(path: '/about', builder: (_, __) => About()),
+        Route(path: '/', builder: (_, _) => Home()),
+        Route(path: '/about', builder: (_, _) => About()),
       ],
       errorBuilder: (_, state) {
         return span([text('Unknown (${state.location})')]);
@@ -26,9 +26,9 @@ class Home extends StatelessComponent {
     return span([text('Home')]);
   }
 
-  void shouldThrow(Function fn) async {
+  void shouldThrow(void Function() fn) {
     try {
-      await fn();
+      fn();
     } on UnimplementedError catch (_) {
       return;
     }

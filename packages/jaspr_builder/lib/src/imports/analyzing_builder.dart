@@ -55,7 +55,7 @@ class ImportsModuleBuilder implements Builder {
         return;
       }
 
-      var entries = [];
+      var entries = <ImportEntry>[];
 
       for (var annotation in annotations) {
         var url = annotation.getField('import')!.toStringValue()!;

@@ -19,7 +19,7 @@ class Router extends StatefulComponent {
     _configuration = RouteConfiguration(
       routes: routes,
       redirectLimit: redirectLimit,
-      topRedirect: redirect ?? (_, __) => null,
+      topRedirect: redirect ?? (_, _) => null,
     );
     _parser = RouteInformationParser(configuration: _configuration);
     _builder = RouteBuilder(configuration: _configuration, errorBuilder: errorBuilder);
@@ -234,14 +234,14 @@ class RouteLoader {
     });
   }
 
-  final Future future;
+  final Future<void> future;
 
   bool isPending;
 
   static Future<void> wait(Iterable<RouteLoader> loaders) {
-    var l = loaders.where((l) => l.isPending).map((l) => l.future);
-    if (l.isNotEmpty) {
-      return Future.wait(l);
+    final pendingLoaders = loaders.where((l) => l.isPending).map((l) => l.future);
+    if (pendingLoaders.isNotEmpty) {
+      return pendingLoaders.wait;
     } else {
       return SynchronousFuture(null);
     }
