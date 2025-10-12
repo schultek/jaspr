@@ -186,9 +186,7 @@ extension NumberString on double {
 extension DurationExt on int {
   /// Shorthand for `Duration(milliseconds: this)`
   Duration get ms => Duration(milliseconds: this);
-}
 
-extension CssDurationFormat on Duration {
-  /// Get time in CSS milliseconds format i.e., `<duration>ms`
-  String get cssMs => '${inMilliseconds}ms';
+  /// Shorthand for `Duration(seconds: this)`
+  Duration get seconds => Duration(seconds: this);
 }
