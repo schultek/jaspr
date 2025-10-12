@@ -96,7 +96,7 @@ In every aspect, this component behaves the same as Flutters `InheritedWidget`.
 Jaspr has three foundational component types, which are accessible through factory constructors on the `Component` class: `Component.element()`, `Component.text()` and `Component.fragment()`. Additionally, there are two more `Component.empty()` and `Component.wrapElement()` which are all explained below.
 
 <Info>
-Other than Flutter, Jaspr has a fixed number of foundational components which make up all other components and represent the core building blocks of HTML: element nodes and text nodes. Flutter is different because it allows you to write custom render objects with your own layouting and painting logic. This isn't possible in Jaspr because with HTML, the browser handles both layouting and painting. 
+Unlike Flutter, Jaspr has a fixed number of foundational components which make up all other components and represent the core building blocks of HTML: element nodes and text nodes. Flutter is different because it allows you to write custom render objects with your own layouting and painting logic. This isn't possible in Jaspr because with HTML, the browser handles both layouting and painting. 
 </Info>
 
 ### Component.element()
@@ -265,7 +265,7 @@ Which will generate the following html:
 
 Here Jaspr adds newlines and indentation for each child element. However in some cases, you might not want Jaspr to introduce extra whitespace because it would affect the way the html is rendered.
 
-If you don't want Jaspr to format the output html for a part of your code, wrap it in a `<span>` element. This works since Jaspr will not apply and additional formatting to `<span>` elements.
+If you don't want Jaspr to format the output html for a part of your code, wrap it in a `<span>` element. This works since Jaspr will not apply any additional formatting to `<span>` elements.
 
 So for example this code:
 
