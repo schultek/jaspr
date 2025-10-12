@@ -205,11 +205,13 @@ class CodecModule {
     );
   }
 
-  factory CodecModule.deserialize(Map<String, dynamic> map) {
-    return CodecModule(elements: [for (var e in map['elements']) CodecElement.deserialize(e)]);
+  factory CodecModule.deserialize(Map<String, Object?> map) {
+    return CodecModule(
+      elements: [for (var e in map['elements'] as List<Object?>) CodecElement.deserialize(e as Map<String, Object?>)],
+    );
   }
 
-  Map<String, dynamic> serialize() => {
+  Map<String, Object?> serialize() => {
     'elements': [for (var e in elements) e.serialize()],
   };
 }
@@ -266,15 +268,15 @@ class CodecElement {
     }
   }
 
-  CodecElement.deserialize(Map<String, dynamic> map)
-    : name = map['name'],
-      extension = map['extension'],
-      decoder = map['decoder'],
-      encoder = map['encoder'],
-      import = map['import'],
-      typeImport = map['typeImport'];
+  CodecElement.deserialize(Map<String, Object?> map)
+    : name = map['name'] as String,
+      extension = map['extension'] as String?,
+      decoder = map['decoder'] as String,
+      encoder = map['encoder'] as String,
+      import = map['import'] as String,
+      typeImport = map['typeImport'] as String?;
 
-  Map<String, dynamic> serialize() => {
+  Map<String, Object?> serialize() => {
     'name': name,
     'extension': ?extension,
     'decoder': decoder,

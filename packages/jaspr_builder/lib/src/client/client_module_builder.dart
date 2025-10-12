@@ -147,16 +147,18 @@ class ClientModule {
     return '$a$b';
   }
 
-  factory ClientModule.deserialize(Map<String, dynamic> map) {
+  factory ClientModule.deserialize(Map<String, Object?> map) {
     return ClientModule(
-      name: map['name'],
-      id: AssetId.deserialize(map['id']),
-      import: map['import'],
-      params: [for (var p in map['params']) ClientParam.deserialize(p)],
+      name: map['name'] as String,
+      id: AssetId.deserialize(map['id'] as List<Object?>),
+      import: map['import'] as String,
+      params: [
+        for (var param in map['params'] as List<Object?>) ClientParam.deserialize(param as Map<String, Object?>),
+      ],
     );
   }
 
-  Map<String, dynamic> serialize() => {
+  Map<String, Object?> serialize() => {
     'name': name,
     'id': id.serialize(),
     'import': import,
@@ -176,13 +178,18 @@ class ClientParam {
 
   ClientParam({required this.name, this.isNamed = false, required this.decoder, required this.encoder});
 
-  ClientParam.deserialize(Map<String, dynamic> map)
-    : name = map['name'],
-      isNamed = map['isNamed'],
-      decoder = map['decoder'],
-      encoder = map['encoder'];
+  ClientParam.deserialize(Map<String, Object?> map)
+    : name = map['name'] as String,
+      isNamed = map['isNamed'] as bool,
+      decoder = map['decoder'] as String,
+      encoder = map['encoder'] as String;
 
-  Map<String, dynamic> serialize() => {'name': name, 'isNamed': isNamed, 'decoder': decoder, 'encoder': encoder};
+  Map<String, Object?> serialize() => {
+    'name': name,
+    'isNamed': isNamed,
+    'decoder': decoder,
+    'encoder': encoder,
+  };
 }
 
 List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
