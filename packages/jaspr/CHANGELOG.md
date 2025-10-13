@@ -1,3 +1,8 @@
+## Unreleased breaking
+
+- Added `ms` getter on int to allow shorthand conversion to durations (in milliseconds).
+- **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
+
 ## Unreleased patch
 
 - Add the `--no-managed-build-options` flag to commands launching a build daemon. Without managed
@@ -6,9 +11,6 @@
 ## 0.21.3
 
 - Fix tooling daemon crash while analyzing component scopes.
-
-- Added `ms` getter on int to allow shorthand conversion to durations (in milliseconds).
-- **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
 
 ## 0.21.2
 
