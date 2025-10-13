@@ -225,6 +225,10 @@
         {
           "title": "FlutterEmbedView",
           "href": "/api/components/flutter_embed_view"
+        },
+        {
+          "title": "JasprBadge",
+          "href": "/api/components/jaspr_badge"
         }
       ]
     },

@@ -1,5 +1,6 @@
 ## Unreleased patch
 
+- Added `JasprBadge` component that renders a "Built with Jaspr" badge.
 - Add the `--no-managed-build-options` flag to commands launching a build daemon. Without managed
   build options, users are responsible for configuring `build_web_compilers`.
 
