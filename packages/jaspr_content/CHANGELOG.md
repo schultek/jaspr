@@ -1,6 +1,7 @@
 ## Unreleased patch
 
 - Fix `FilesystemLoader` not recognizing file changes on Linux.
+- Fix the default `PageSource` stripping dots (`.`) from file names when loaded.
 
 ## 0.4.1
 
