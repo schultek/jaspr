@@ -22,6 +22,8 @@ class JasprBadge extends StatelessComponent {
       textColor = _lightBackground,
       iconColor = _lightBackground;
 
+  /// Creates a two-tone "Built with Jaspr" badge with a
+  /// light background, blue icon, and dark text.
   const JasprBadge.lightTwoTone({super.key})
     : backgroundColor = _lightBackground,
       textColor = _darkBackground,
