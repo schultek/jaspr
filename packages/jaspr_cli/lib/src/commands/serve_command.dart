@@ -33,18 +33,19 @@ class ServeCommand extends DevCommand {
 
   @override
   Future<int> runCommand() async {
-    var fakeInput = StreamController<Map<String, dynamic>>();
+    var fakeInput = StreamController<Map<String, Object?>>();
     daemon = Daemon(fakeInput.stream, (data) {
-      //print(data);
       if (data['event'] == 'client.debugPort') {
-        final wsUri = data['params']['wsUri'] as String;
+        final params = data['params'] as Map<String, Object?>;
+        final wsUri = params['wsUri'] as String;
         logger.write(
           'The Dart VM service is listening on http${wsUri.substring(2, wsUri.length - 2)}',
           tag: Tag.client,
         );
       }
       if (data['event'] == 'client.log') {
-        logger.write(data['params']['log'], tag: Tag.client);
+        final params = data['params'] as Map<String, Object?>;
+        logger.write(params['log'] as String, tag: Tag.client);
       }
     });
     guardResource(() {

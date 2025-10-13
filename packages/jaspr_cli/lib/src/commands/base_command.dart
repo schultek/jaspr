@@ -28,14 +28,18 @@ abstract class BaseCommand extends Command<int> {
   @override
   @mustCallSuper
   Future<int> run() async {
-    await trackEvent(name, projectName: project.pubspecYaml?['name'], projectMode: project.modeOrNull?.name);
+    await trackEvent(
+      name,
+      projectName: project.pubspecYaml?['name'] as String?,
+      projectMode: project.modeOrNull?.name,
+    );
 
     var cancelCount = 0;
     final cancelSub =
         StreamGroup.merge([
           ProcessSignal.sigint.watch(),
           // SIGTERM is not supported on Windows.
-          Platform.isWindows ? const Stream.empty() : ProcessSignal.sigterm.watch(),
+          Platform.isWindows ? const Stream<void>.empty() : ProcessSignal.sigterm.watch(),
         ]).listen((signal) async {
           cancelCount++;
           if (cancelCount > 1) exit(1);
@@ -165,7 +169,7 @@ abstract class BaseCommand extends Command<int> {
       return exitCode;
     }
 
-    await Future.delayed(Duration(seconds: 2));
+    await Future<void>.delayed(Duration(seconds: 2));
 
     await errSub.cancel();
     await outSub.cancel();
@@ -183,7 +187,7 @@ abstract class BaseCommand extends Command<int> {
 
   void checkWasmSupport() {
     var package = '${project.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
-    var version = project.pubspecYaml?['dev_dependencies']?[package];
+    var version = (project.pubspecYaml?['dev_dependencies'] as Map<Object?, Object?>?)?[package];
     if (version is! String || !version.startsWith(RegExp(r'\^?4.1.'))) {
       usageException('Using "--experimental-wasm" requires $package 4.1.0 or newer.');
     }

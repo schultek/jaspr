@@ -35,9 +35,11 @@ class DoctorCommand extends BaseCommand {
     if (project.pubspecYaml != null) {
       String? findDependency(String name, {bool reportMissing = false}) {
         var isDev = false;
-        var dep = project.requirePubspecYaml['dependencies']?[name];
+        var dependencies = project.requirePubspecYaml['dependencies'] as Map<Object?, Object?>?;
+        var dep = dependencies?[name];
         if (dep == null) {
-          dep = project.requirePubspecYaml['dev_dependencies']?[name];
+          var devDependencies = project.requirePubspecYaml['dev_dependencies'] as Map<Object?, Object?>?;
+          dep = devDependencies?[name];
           isDev = true;
         }
         if (dep == null) {
