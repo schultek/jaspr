@@ -1,7 +1,7 @@
 import '../../jaspr.dart';
 
-/// A "Built with Jaspr" badge component. 
-/// 
+/// A "Built with Jaspr" badge component.
+///
 /// Use one of the named constructors to choose a style:
 /// - `JasprBadge.light()`: Light background with dark icon and text.
 /// - `JasprBadge.dark()`: Dark background with light icon and text.
