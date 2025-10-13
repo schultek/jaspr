@@ -8,6 +8,8 @@ import '../../jaspr.dart';
 /// - `JasprBadge.lightTwoTone()`: Light background with blue icon and dark text.
 /// - `JasprBadge.darkTwoTone()`: Dark background with blue icon and light text.
 class JasprBadge extends StatelessComponent {
+  /// Creates a "Built with Jaspr" badge with a
+  /// light background, dark icon, and dark text.
   const JasprBadge.light({super.key})
     : backgroundColor = _lightBackground,
       textColor = _darkBackground,
