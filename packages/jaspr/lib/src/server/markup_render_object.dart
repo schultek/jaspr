@@ -5,7 +5,6 @@ import 'package:universal_web/web.dart' as web;
 import '../../server.dart';
 import 'child_nodes.dart';
 
-
 abstract class MarkupRenderObject extends RenderObject {
   @override
   MarkupRenderObject? parent;
