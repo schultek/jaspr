@@ -1,17 +1,21 @@
 @TestOn('vm')
 library;
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
 import 'package:meta/meta.dart';
 
-final _ = ''.padLeft(40, '-');
-
 @isTest
-void testOutput(String description, {required Component input, required String output}) {
+void testOutput(
+  String description, {
+  required Component input,
+  required String output,
+  required int lineLength,
+}) {
   testServer('formats $description', (tester) async {
     tester.pumpComponent(input);
 
+    MarkupRenderObject.maxHtmlLineLength = lineLength;
     var response = await tester.request('/');
 
     expect(response.statusCode, equals(200));
@@ -31,128 +35,134 @@ void main() {
         span([text('C')]),
       ]),
       output: '<div><span>A</span><span>B</span><span>C</span></div>',
+      lineLength: 50,
     );
 
     testOutput(
       'block content',
       input: div([
-        span([text('A $_')]),
-        span([text('B $_')]),
-        span([text('C $_')]),
+        span([text('Hello')]),
+        span([text('World')]),
+        span([text('Test')]),
       ]),
       output:
           '<div>\n'
-          '      <span>A $_</span>\n'
-          '      <span>B $_</span>\n'
-          '      <span>C $_</span>\n'
+          '      <span>Hello</span>\n'
+          '      <span>World</span>\n'
+          '      <span>Test</span>\n'
           '    </div>',
+      lineLength: 50,
     );
 
     testOutput(
       'paragraph content',
       input: p([
-        span([text('A $_ ')]),
-        span([text('B $_')]),
-        span([text(' C $_')]),
-        span([text('D')]),
+        span([text('Hello ')]),
+        span([text('World')]),
+        span([text(' Lorem')]),
+        span([text('Ipsum')]),
       ]),
       output:
           '<p>\n'
-          '      <span>A $_ </span>\n'
-          '      <span>B $_</span>\n'
-          '      <span> C $_</span><span>D</span>\n'
+          '      <span>Hello </span><span>World</span>\n'
+          '      <span> Lorem</span><span>Ipsum</span>\n'
           '    </p>',
+      lineLength: 30,
     );
 
     testOutput(
       'text content',
       input: p([
-        text('Hello $_ '),
-        b([text('World $_')]),
-        text('C $_'),
+        text('Hello '),
+        b([text('World')]),
+        text('!'),
       ]),
       output:
           '<p>\n'
-          '      Hello $_ \n'
-          '      <b>World $_</b>C $_\n'
+          '      Hello <b>World</b>!\n'
           '    </p>',
+      lineLength: 10,
     );
 
     testOutput(
       'nested paragraph content',
       input: p([
-        span([text('A $_')]),
+        span([text('Lorem ')]),
         em([
-          text('Hello $_ '),
-          b([text('World $_')]),
+          text('Hello '),
+          b([text('World')]),
         ]),
-        span([text('C $_')]),
+        span([text(' Ipsum')]),
       ]),
       output:
           '<p>\n'
-          '      <span>A $_</span><em>Hello $_ \n'
-          '        <b>World $_</b></em><span>C $_</span>\n'
+          '      <span>Lorem </span><em>Hello <b>World</b></em>\n'
+          '      <span> Ipsum</span>\n'
           '    </p>',
+      lineLength: 20,
     );
 
     testOutput(
       'formatted text',
-      input: p([text('A $_\nB $_\nC')]),
+      input: p([text('A\nB\nC')]),
       output:
           '<p>\n'
-          '      A $_\n'
-          '      B $_\n'
+          '      A\n'
+          '      B\n'
           '      C\n'
           '    </p>',
+      lineLength: 30,
     );
 
     testOutput(
       'unformatted text',
       input: div([
-        span([text('A $_\nB $_\nC')]),
-        b([text('D $_')]),
+        span([text('A\nB\nC')]),
+        b([text('D')]),
       ]),
       output:
           '<div>\n'
-          '      <span>A $_\n'
-          'B $_\n'
+          '      <span>A\n'
+          'B\n'
           'C</span>\n'
-          '      <b>D $_</b>\n'
+          '      <b>D</b>\n'
           '    </div>',
+      lineLength: 30,
     );
 
     testOutput(
       'with fragments',
       input: div([
         fragment([
-          p([text('A $_ ')]),
+          p([text('Hello ')]),
           fragment([]),
           fragment([
-            p([text('B $_ ')]),
+            p([text('World ')]),
             p([
-              fragment([text('C $_ ')]),
+              fragment([text('Test ')]),
             ]),
           ]),
         ]),
         div([
           fragment([
             fragment([
-              p([text('D $_ ')]),
-              p([text('E $_ ')]),
+              p([text('Lorem ')]),
+              p([text('Ipsum ')]),
             ]),
           ]),
         ]),
       ]),
       output:
           '<div>\n'
-          '      <p>A ---------------------------------------- </p>\n'
-          '      <p>B ---------------------------------------- </p>\n'
-          '      <p>C ---------------------------------------- </p>\n'
+          '      <p>Hello </p>\n'
+          '      <p>World </p>\n'
+          '      <p>Test </p>\n'
           '      <div>\n'
-          '        <p>D ---------------------------------------- </p>\n'
-          '        <p>E ---------------------------------------- </p>\n'
+          '        <p>Lorem </p>\n'
+          '        <p>Ipsum </p>\n'
           '      </div>\n'
           '    </div>',
+      lineLength: 20,
     );
 
     testOutput(
@@ -168,6 +178,7 @@ void main() {
           '      Hello\n'
           '   </p>\n'
           '</div>',
+      lineLength: 30,
     );
   });
 }

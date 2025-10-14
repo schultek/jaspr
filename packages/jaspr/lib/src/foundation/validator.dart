@@ -23,7 +23,7 @@ class DomValidator {
     'track',
     'wbr',
   };
-  static const _strictWhitespace = <String>{'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'label'};
+  static const _strictWhitespace = <String>{'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'label', 'li'};
   static const _strictFormatting = <String>{'span', 'pre'};
   static final whitespace = RegExp(r'\s');
   static final _tags = <String>{};
