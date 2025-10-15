@@ -12,7 +12,7 @@ void testOutput(
   required String output,
   required int lineLength,
 }) {
-  testServer('formats $description', (tester) async {
+  testServer(description, (tester) async {
     tester.pumpComponent(input);
 
     MarkupRenderObject.maxHtmlLineLength = lineLength;
@@ -28,7 +28,7 @@ void testOutput(
 void main() {
   group('markup formatting test', () {
     testOutput(
-      'short content',
+      'formats short content',
       input: div([
         span([text('A')]),
         span([text('B')]),
@@ -39,7 +39,7 @@ void main() {
     );
 
     testOutput(
-      'block content',
+      'formats block content',
       input: div([
         span([text('Hello')]),
         span([text('World')]),
@@ -55,7 +55,7 @@ void main() {
     );
 
     testOutput(
-      'paragraph content',
+      'formats paragraph content',
       input: p([
         span([text('Hello ')]),
         span([text('World')]),
@@ -71,7 +71,7 @@ void main() {
     );
 
     testOutput(
-      'text content',
+      'formats text content',
       input: p([
         text('Hello '),
         b([text('World')]),
@@ -85,7 +85,7 @@ void main() {
     );
 
     testOutput(
-      'nested paragraph content',
+      'formats nested paragraph content',
       input: p([
         span([text('Lorem ')]),
         em([
@@ -103,7 +103,7 @@ void main() {
     );
 
     testOutput(
-      'formatted text',
+      'formats formatted text',
       input: p([text('A\nB\nC')]),
       output:
           '<p>\n'
@@ -115,7 +115,7 @@ void main() {
     );
 
     testOutput(
-      'unformatted text',
+      'formats unformatted text',
       input: div([
         span([text('A\nB\nC')]),
         b([text('D')]),
@@ -131,7 +131,7 @@ void main() {
     );
 
     testOutput(
-      'with fragments',
+      'formats content with fragments',
       input: div([
         fragment([
           p([text('Hello ')]),
@@ -166,7 +166,7 @@ void main() {
     );
 
     testOutput(
-      'with preformatted html',
+      'formats content with preformatted html',
       input: div([
         text('\n   '),
         p([text('\n      '), text('Hello'), text('\n   ')]),
@@ -178,6 +178,22 @@ void main() {
           '      Hello\n'
           '   </p>\n'
           '</div>',
+      lineLength: 30,
+    );
+
+    testOutput(
+      'formats empty content',
+      input: div([
+        span([text('')]),
+        text('Hello'),
+        b([]),
+        text(''),
+        fragment([
+          text('')
+        ]),
+        fragment([]),
+      ]),
+      output: '<div><span></span>Hello<b></b></div>',
       lineLength: 30,
     );
   });

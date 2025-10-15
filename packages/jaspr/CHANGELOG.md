@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed regression in rendering implementation.
+
 ## 0.21.4
 
 - Added `JasprBadge` component that renders a "Built with Jaspr" badge.

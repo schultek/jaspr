@@ -63,6 +63,10 @@ abstract class MarkupRenderObject extends RenderObject {
     bool childStrictWhitespace = false,
     String indent = '',
   ]) {
+    if (children.isEmpty) {
+      return ('', false, false);
+    }
+
     final output = StringBuffer();
     // Don't increase the indent for fragments.
     final childIndent = this is MarkupRenderFragment ? indent : '$indent  ';
@@ -70,77 +74,80 @@ abstract class MarkupRenderObject extends RenderObject {
     var leadingWhitespace = false;
     var trailingWhitespace = false;
 
-    if (children.isNotEmpty) {
-      final childOutput = <({String html, bool leading, bool trailing, bool hasNewline})>[];
-      var childOutputLength = 0;
-      var childOutputLinebreak = false;
+    final childOutput = <({String html, bool leading, bool trailing, bool hasNewline})>[];
+    var childOutputLength = 0;
+    var childOutputLinebreak = false;
 
-      // Special case: Detect parsed html by checking for initial whitespace-only text node containing a newline.
-      final firstChild = children.first;
-      childStrictFormatting |=
-          firstChild is MarkupRenderText && firstChild.text.contains('\n') && firstChild.text.trim().isEmpty;
+    // Special case: Detect parsed html by checking for initial whitespace-only text node containing a newline.
+    final firstChild = children.first;
+    childStrictFormatting |=
+        firstChild is MarkupRenderText && firstChild.text.contains('\n') && firstChild.text.trim().isEmpty;
 
-      for (var child in children) {
-        final (html, leading, trailing) = child._renderAndFormat(
-          childStrictFormatting,
-          childStrictWhitespace,
-          childIndent,
-        );
-        if (html.isEmpty) continue;
-        final hasNewline = html.contains('\n');
-        childOutput.add((html: html, leading: leading, trailing: trailing, hasNewline: hasNewline));
-        childOutputLength += html.length;
-        childOutputLinebreak |= hasNewline;
-      }
+    for (var child in children) {
+      final (html, leading, trailing) = child._renderAndFormat(
+        childStrictFormatting,
+        childStrictWhitespace,
+        childIndent,
+      );
+      if (html.isEmpty) continue;
+      
+      final hasNewline = html.contains('\n');
+      childOutput.add((html: html, leading: leading, trailing: trailing, hasNewline: hasNewline));
+      childOutputLength += html.length;
+      childOutputLinebreak |= hasNewline;
+    }
 
-      // Iterate over the rendered children and adds newlines based on the following rules:
-      //
-      // a) When the element requires strict formatting (like <pre>) add no newlines.
-      // b) When the combined child output is small enough to fit on one line and contains no newlines already, add no newlines.
-      // c) When the element requires strict whitespace (like <p>, where multi-length whitespaces are collapsed into one), then:
-      //    - only add newlines to existing leading or trailing whitespace and
-      //    - try to keep children on the same line as much as possible.
-      // d) When the element does not require strict whitespace (like <div>), add newlines before every child to improve readability.
+    if (childOutput.isEmpty) {
+      return ('', false, false);
+    }
 
-      // Whether newlines are generally allowed (checks rule a and b).
-      final allowNewlines = !childStrictFormatting && (childOutputLength > maxHtmlLineLength || childOutputLinebreak);
+    // Iterate over the rendered children and adds newlines based on the following rules:
+    //
+    // a) When the element requires strict formatting (like <pre>) add no newlines.
+    // b) When the combined child output is small enough to fit on one line and contains no newlines already, add no newlines.
+    // c) When the element requires strict whitespace (like <p>, where multi-length whitespaces are collapsed into one), then:
+    //    - only add newlines to existing leading or trailing whitespace and
+    //    - try to keep children on the same line as much as possible.
+    // d) When the element does not require strict whitespace (like <div>), add newlines before every child to improve readability.
 
-      // Whether to add a newline before the next child.
-      var addNewline = allowNewlines && !strictWhitespace;
+    // Whether newlines are generally allowed (checks rule a and b).
+    final allowNewlines = !childStrictFormatting && (childOutputLength > maxHtmlLineLength || childOutputLinebreak);
 
-      // Keep track of the current line length to only break when necessary (for rule c).
-      var currentLineLength = 0;
+    // Whether to add a newline before the next child.
+    var addNewline = allowNewlines && !strictWhitespace;
 
-      for (var (index, child) in childOutput.indexed) {
-        if (allowNewlines) {
-          // Allow additional newlines if the child has leading whitespace and the line is too long.
-          addNewline |= child.leading && currentLineLength > maxHtmlLineLength;
-          // Skip newlines for the first child in a fragment to avoid excessive vertical space.
-          addNewline &= index > 0 || this is! MarkupRenderFragment;
-          if (addNewline) {
-            output.write('\n$childIndent');
-            currentLineLength = 0;
-          }
-        }
+    // Keep track of the current line length to only break when necessary (for rule c).
+    var currentLineLength = 0;
 
-        if (index == 0) leadingWhitespace = child.leading || addNewline;
-        output.write(child.html);
-
-        if (allowNewlines) {
-          // Update the current line length.
-          currentLineLength = child.hasNewline
-              ? child.html.length - child.html.lastIndexOf('\n')
-              : currentLineLength + child.html.length;
-          // When strict whitespace, only allow newlines if the child has trailing whitespace and the line is too long.
-          addNewline = !childStrictWhitespace || (child.trailing && currentLineLength > maxHtmlLineLength);
+    for (var (index, child) in childOutput.indexed) {
+      if (allowNewlines) {
+        // Allow additional newlines if the child has leading whitespace and the line is too long.
+        addNewline |= child.leading && currentLineLength > maxHtmlLineLength;
+        // Skip newlines for the first child in a fragment to avoid excessive vertical space.
+        addNewline &= index > 0 || this is! MarkupRenderFragment;
+        if (addNewline) {
+          output.write('\n$childIndent');
+          currentLineLength = 0;
         }
       }
-      if (allowNewlines && this is! MarkupRenderFragment && (addNewline || !strictWhitespace)) {
-        output.write('\n$indent');
-        trailingWhitespace = true;
-      } else {
-        trailingWhitespace = childOutput.last.trailing;
+
+      if (index == 0) leadingWhitespace = child.leading || addNewline;
+      output.write(child.html);
+
+      if (allowNewlines) {
+        // Update the current line length.
+        currentLineLength = child.hasNewline
+            ? child.html.length - child.html.lastIndexOf('\n')
+            : currentLineLength + child.html.length;
+        // When strict whitespace, only allow newlines if the child has trailing whitespace and the line is too long.
+        addNewline = !childStrictWhitespace || (child.trailing && currentLineLength > maxHtmlLineLength);
       }
+    }
+    if (allowNewlines && this is! MarkupRenderFragment && (addNewline || !strictWhitespace)) {
+      output.write('\n$indent');
+      trailingWhitespace = true;
+    } else {
+      trailingWhitespace = childOutput.last.trailing;
     }
 
     return (output.toString(), leadingWhitespace, trailingWhitespace);
