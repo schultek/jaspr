@@ -90,7 +90,7 @@ abstract class MarkupRenderObject extends RenderObject {
         childIndent,
       );
       if (html.isEmpty) continue;
-      
+
       final hasNewline = html.contains('\n');
       childOutput.add((html: html, leading: leading, trailing: trailing, hasNewline: hasNewline));
       childOutputLength += html.length;

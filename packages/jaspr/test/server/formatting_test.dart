@@ -188,9 +188,7 @@ void main() {
         text('Hello'),
         b([]),
         text(''),
-        fragment([
-          text('')
-        ]),
+        fragment([text('')]),
         fragment([]),
       ]),
       output: '<div><span></span>Hello<b></b></div>',
