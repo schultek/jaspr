@@ -104,7 +104,8 @@ class Page {
   /// This performs the following steps in order:
   /// 1. Parses the frontmatter if [enableFrontmatter] is true.
   /// 2. Loads additional data using the provided [dataLoaders].
-  /// 3. Preprocesses the content if a [templateEngine] is provided.
+  /// 3. Preprocesses the content if a [templateEngine] is provided and
+  ///    `data.page['skipTemplateRendering']` isn't `true`.
   /// 4. If [enableRawOutput] is true, outputs the content as raw text and skips further processing.
   ///    Else continues with 5.
   /// 5. Parses the nodes of the page using one of the [parsers].
@@ -117,7 +118,10 @@ class Page {
     await loadData();
     return AsyncBuilder(
       builder: (context) async {
-        await renderTemplate(context.pages);
+        final skipTemplateRendering = data.page['skipTemplateRendering'] as bool? ?? false;
+        if (!skipTemplateRendering) {
+          await renderTemplate(context.pages);
+        }
 
         if (kGenerateMode) {
           if (data.page['sitemap'] case final sitemap?) {
@@ -285,8 +289,8 @@ extension PageHandlersExtension on Page {
   ///
   /// Modifies the page content.
   FutureOr<void> renderTemplate(List<Page> pages) {
-    if (config.templateEngine != null) {
-      return config.templateEngine!.render(this, pages);
+    if (config.templateEngine case final templateEngine?) {
+      return templateEngine.render(this, pages);
     }
   }
 

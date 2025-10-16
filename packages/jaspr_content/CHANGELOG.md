@@ -1,3 +1,8 @@
+## Unreleased patch
+
+- Allow an individual page to skip processing with the configured template engine
+  if `data.page['skipTemplateRendering']` is set to `true`.
+
 ## 0.4.2
 
 - Fix `FilesystemLoader` not recognizing file changes on Linux.
