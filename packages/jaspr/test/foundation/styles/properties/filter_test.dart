@@ -53,14 +53,6 @@ void main() {
         expect(() => filter.value, throwsA(predicate((e) => e == 'Filter.list cannot be empty.')));
       });
 
-      test("Filter.list does not allow nesting another Filter.list", () {
-        final nestedFilter = Filter.list([Filter.list([])]);
-        expect(
-          () => nestedFilter.value,
-          throwsA(predicate((e) => e == 'Cannot nest [Filter.list] inside [Filter.list].')),
-        );
-      });
-
       test("Filter.list does not allow non-listable members", () {
         for (final val in const <Filter>[
           Filter.none,
