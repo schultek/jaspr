@@ -1,7 +1,13 @@
-## Unreleased patch
+## 0.21.5
 
+- Fixed regression in rendering implementation.
+
+## 0.21.4
+
+- Added `JasprBadge` component that renders a "Built with Jaspr" badge.
 - Add the `--no-managed-build-options` flag to commands launching a build daemon. Without managed
   build options, users are responsible for configuring `build_web_compilers`.
+- Fixed another whitespace rendering bug.
 
 - **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
 - Allow nesting non-empty `Filter.list` inside each other.

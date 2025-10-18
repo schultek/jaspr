@@ -40,6 +40,21 @@ void main() {
         );
       });
 
+      test('loads files with dots in their name', () async {
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        pagesDir.childFile('release-0.1.0.md').createSync();
+
+        final loader = FilesystemLoader('pages', fileSystem: fileSystem);
+
+        final sources = await loader.loadPageSources();
+
+        expect(sources, hasLength(1));
+        expect(
+          sources,
+          equals([pageSource('release-0.1.0.md', '/release-0.1.0', private: false)]),
+        );
+      });
+
       test('loads nested file structure', () async {
         // Arrange
         final pagesDir = fileSystem.directory('pages')..createSync();

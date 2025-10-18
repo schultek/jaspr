@@ -12,6 +12,10 @@ void main() {
       title: 'Jaspr | Dart Web Framework',
       lang: 'en',
       head: [link(rel: 'icon', type: 'image/x-icon', href: 'favicon.ico')],
+      styles: [
+        css('html.light .on-dark').styles(display: Display.none),
+        css('html.dark .on-light').styles(display: Display.none),
+      ],
       body: App(),
     ),
   );
