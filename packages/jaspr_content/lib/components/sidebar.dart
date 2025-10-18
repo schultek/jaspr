@@ -104,7 +104,7 @@ class Sidebar extends StatelessComponent {
               textOverflow: TextOverflow.ellipsis,
               radius: BorderRadius.circular(.375.rem),
               display: Display.flex,
-              transition: Transition('all', duration: 150, curve: Curve.easeInOut),
+              transition: Transition('all', duration: 150.ms, curve: Curve.easeInOut),
             ),
             css('&:hover').styles(opacity: 1, backgroundColor: Color('#0000000d')),
             css('&.active').styles(
