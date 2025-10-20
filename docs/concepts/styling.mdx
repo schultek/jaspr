@@ -31,7 +31,7 @@ class App extends StatelessComponent {
   }
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.main', [
       css('&').styles(
         width: 100.px,
@@ -93,7 +93,7 @@ Provide a `MediaQuery` as well as child styles to the function:
 
 ```dart
 @css
-final styles = [
+static List<StyleRule> get styles => [
     css('.main').styles(
       display: Display.flex, 
       flexDirection: FlexDirection.row,
