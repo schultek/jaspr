@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Added `checked` and `indeterminate` parameters to `input()`. These will control the state of a checkbox or radio input.
+
 ## 0.21.5
 
 - Fixed regression in rendering implementation.
