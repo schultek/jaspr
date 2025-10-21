@@ -50,7 +50,7 @@ String? _tryFindRootProjectDir(String startingDir) {
 }
 
 Handler staticFileHandler([http.Client? client]) => jasprProxyPort != null
-    ? proxyHandler('http://localhost:$jasprProxyPort/', client: client)
+    ? createProxyHandler(client)
     : Directory(webDir).existsSync()
     ? createStaticHandler(webDir, defaultDocument: 'index.html')
     : (_) => Response.notFound('');
@@ -115,6 +115,12 @@ Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandl
     var response = await proxyHandler(indexRequest);
     return response.statusCode == 200 ? response.readAsString() : null;
   };
+}
+
+Handler createProxyHandler(http.Client? client) {
+  final handler = proxyHandler('http://localhost:$jasprProxyPort/', client: client);
+  // Determine and pass the base path to the proxy handler so it can rewrite DWDS handler paths correctly.
+  return (req) => handler(req.change(headers: {'jaspr_base_path': req.handlerPath}));
 }
 
 // coverage:ignore-start
