@@ -1,3 +1,13 @@
+## Unreleased breaking
+
+- **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
+- **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
+
+- Added `ms` and `seconds` extensions to `int` for simple conversion to `Duration`.
+- Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`.
+- Added `none`, `initial`, `revert`, `revertLayer` and `unset` to `TextShadow` and `BoxShadow`.
+- Allow nesting non-empty `Filter.list` inside each other.
+
 ## 0.21.6
 
 - Added `checked` and `indeterminate` parameters to `input()`. These will control the state of a checkbox or radio input.
@@ -13,11 +23,6 @@
 - Add the `--no-managed-build-options` flag to commands launching a build daemon. Without managed
   build options, users are responsible for configuring `build_web_compilers`.
 - Fixed another whitespace rendering bug.
-
-- **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
-- Allow nesting non-empty `Filter.list` inside each other.
-- Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`.
-- Added `none`, `initial`, `revert`, `revertLayer` and `unset` to `TextShadow` and `BoxShadow`.
 
 ## 0.21.3
 
@@ -618,7 +623,7 @@
     jaspr_web_compilers: ^4.0.4
   ```
 
-  For an example see `examples/flutter_plugin_interop`](<https://github.com/schultek/Jaspr/tree/main/examples/flutter_plugin_interop>).
+  For an example see [`examples/flutter_plugin_interop`](https://github.com/schultek/Jaspr/tree/main/examples/flutter_plugin_interop).
 
 - Improved **flutter element embedding**.
 
@@ -628,7 +633,7 @@
   This removes the need for any kind of interop between apps as they can directly communicate
   through the usual primitives of passing properties and callbacks.
 
-  For an example see `examples/flutter_embedding`](<https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding>).
+  For an example see [`examples/flutter_embedding`](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding).
 
 - `jaspr build` now outputs to `/build/jaspr` instead of `/build`.
 

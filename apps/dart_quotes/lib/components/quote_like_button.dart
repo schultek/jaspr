@@ -45,7 +45,9 @@ class QuoteLikeButton extends StatelessComponent {
       ),
       css('&:hover span').styles(transform: Transform.scale(1.2)),
       css('&.active span').styles(color: Colors.blue),
-      css('span').styles(transition: Transition('transform', duration: 300, curve: Curve.ease)),
+      css('span').styles(
+        transition: Transition('transform', duration: 300.ms, curve: Curve.ease),
+      ),
     ]),
   ];
 }

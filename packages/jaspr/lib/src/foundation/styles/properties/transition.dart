@@ -1,5 +1,3 @@
-import 'unit.dart';
-
 class Transition {
   const Transition._(this.value);
 
@@ -9,7 +7,7 @@ class Transition {
   static const revertLayer = Transition._('revert-layer');
   static const unset = Transition._('unset');
 
-  const factory Transition(String property, {required double duration, Curve? curve, double? delay}) = _Transition;
+  const factory Transition(String property, {required Duration duration, Curve? curve, Duration? delay}) = _Transition;
   const factory Transition.combine(List<Transition> transitions) = _CombineTransition;
 
   final String value;
@@ -21,16 +19,16 @@ class _Transition implements _ListableTransition {
   const _Transition(this.property, {required this.duration, this.curve, this.delay});
 
   final String property;
-  final double duration;
+  final Duration duration;
   final Curve? curve;
-  final double? delay;
+  final Duration? delay;
 
   @override
   String get value => [
     property,
-    '${duration.numstr}ms',
+    '${duration.inMilliseconds}ms',
     if (curve != null) curve!.value,
-    if (delay != null) '${delay!.numstr}ms',
+    if (delay != null) '${delay!.inMilliseconds}ms',
   ].join(' ');
 }
 

@@ -34,7 +34,7 @@ class LinkCard extends StatelessComponent {
         border: Border(width: 2.px, color: borderColor),
         radius: BorderRadius.circular(13.px),
         shadow: BoxShadow(offsetX: 1.px, offsetY: 1.px, blur: 3.px, spread: (-1).px, color: shadowColor1),
-        transition: Transition('background', duration: 300),
+        transition: Transition('background', duration: 300.ms),
         textAlign: TextAlign.start,
         textDecoration: TextDecoration.none,
       ),

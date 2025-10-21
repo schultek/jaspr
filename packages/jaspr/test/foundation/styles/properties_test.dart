@@ -59,7 +59,7 @@ void main() {
         cursor: Cursor.crosshair,
         userSelect: UserSelect.none,
         pointerEvents: PointerEvents.fill,
-        transition: Transition('width', duration: 500),
+        transition: Transition('width', duration: Duration(milliseconds: 500)),
         transform: Transform.scale(2),
         // Flexbox Styles
         flexDirection: FlexDirection.column,
