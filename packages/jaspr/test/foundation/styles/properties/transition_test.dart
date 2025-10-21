@@ -13,17 +13,17 @@ void main() {
       });
 
       test('basic', () {
-        const styles = Styles(transition: Transition('all', duration: 500.0, curve: Curve.ease, delay: 600.0));
+        final styles = Styles(transition: Transition('all', duration: 500.ms, curve: Curve.ease, delay: 600.ms));
         expect(styles.properties, equals({'transition': 'all 500ms ease 600ms'}));
       });
 
       group('combine', () {
         test('basic', () {
-          const transition = Transition.combine([
-            Transition('opacity', duration: 100.0),
-            Transition('height', duration: 200.0),
+          final transition = Transition.combine([
+            Transition('opacity', duration: 100.ms),
+            Transition('height', duration: 2.seconds),
           ]);
-          expect(transition.value, equals('opacity 100ms, height 200ms'));
+          expect(transition.value, equals('opacity 100ms, height 2000ms'));
         });
 
         test('empty list not allowed', () {
