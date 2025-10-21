@@ -140,7 +140,11 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
           var required = attrs[attr]['required'] == true;
 
           if (type == 'boolean') {
-            content.write('if ($name == true) ');
+            if (attrs[attr]['explicit'] == true) {
+              content.write('if ($name != null) ');
+            } else {
+              content.write('if ($name == true) ');
+            }
           }
 
           content.write("'$attr': ");
@@ -150,7 +154,11 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
           if (type == 'string') {
             content.write('$nullCheck$name');
           } else if (type == 'boolean') {
-            content.write("''");
+            if (attrs[attr]['explicit'] == true) {
+              content.write("$name ? 'true' : 'false'");
+            } else {
+              content.write("''");
+            }
           } else if (type == 'int' || type == 'double') {
             content.write("$nullCheck$name$nullCheck.toString()");
           } else if (type is String && type.startsWith('enum:')) {

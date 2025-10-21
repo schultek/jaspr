@@ -33,6 +33,58 @@ void main() {
       expect(node.value, text);
     });
 
+    testBrowser('controls checked value', (tester) async {
+      bool checked = false;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, s) {
+            setState = s;
+            return input(type: InputType.checkbox, checked: checked);
+          },
+        ),
+      );
+
+      final node = tester.findNode(find.tag('input')) as HTMLInputElement;
+
+      expect(node.checked, checked);
+
+      setState(() {
+        checked = true;
+      });
+
+      await pumpEventQueue();
+
+      expect(node.checked, checked);
+    });
+
+    testBrowser('controls indeterminate value', (tester) async {
+      bool indeterminate = false;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, s) {
+            setState = s;
+            return input(type: InputType.checkbox, indeterminate: indeterminate);
+          },
+        ),
+      );
+
+      final node = tester.findNode(find.tag('input')) as HTMLInputElement;
+
+      expect(node.indeterminate, indeterminate);
+
+      setState(() {
+        indeterminate = true;
+      });
+
+      await pumpEventQueue();
+
+      expect(node.indeterminate, indeterminate);
+    });
+
     testBrowser('controlled select option', (tester) async {
       String value = "a";
       late void Function(void Function() cb) setState;
