@@ -41,7 +41,7 @@ class ZoomableImage extends StatefulComponent {
       css('img').styles(
         position: Position.absolute(),
         cursor: Cursor.zoomOut,
-        transition: Transition('transform', duration: 300),
+        transition: Transition('transform', duration: 300.ms),
         raw: {'transform-origin': 'top left'},
       ),
     ]),

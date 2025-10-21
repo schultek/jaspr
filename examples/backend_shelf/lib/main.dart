@@ -51,7 +51,7 @@ void main() async {
           .addHandler(router.call);
 
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
-  server = await shelf_io.serve(handler, InternetAddress.anyIPv4, port);
+  server = await shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true);
 
   // Enable content compression
   server.autoCompress = true;

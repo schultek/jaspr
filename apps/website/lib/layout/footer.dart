@@ -10,12 +10,24 @@ class Footer extends StatelessComponent {
   Component build(BuildContext context) {
     return footer([
       div(classes: 'footer-navigation', [
-        div([
-          Logo(),
-          span(classes: 'created-by', [
-            text('Created by '),
-            a(href: 'https://schultek.dev', classes: 'animated-underline', [text('@schultek')]),
+        div(classes: 'footer-logo', [
+          div([
+            Logo(),
+            span(classes: 'created-by', [
+              text('Created by '),
+              a(href: 'https://schultek.dev', classes: 'animated-underline', [
+                text('@schultek'),
+              ]),
+            ]),
           ]),
+          a(
+            href: "https://github.com/schultek/jaspr/tree/main/apps/website",
+            target: Target.blank,
+            [
+              span(classes: 'on-dark', [JasprBadge.light()]),
+              span(classes: 'on-light', [JasprBadge.dark()]),
+            ],
+          ),
         ]),
         div([
           h5([text('Navigation')]),
@@ -74,7 +86,6 @@ class Footer extends StatelessComponent {
         a(href: 'https://github.com/schultek/jaspr/blob/main/LICENSE', classes: 'animated-underline', [
           raw('MIT&nbsp;License'),
         ]),
-        raw(' | Built&nbsp;with&nbsp;Jaspr&nbsp;(obviously)'),
       ]),
     ]);
   }
@@ -106,8 +117,22 @@ class Footer extends StatelessComponent {
           alignItems: AlignItems.start,
           gap: Gap.all(2.rem),
         ),
+        css('.footer-logo', [
+          css('&').styles(
+            display: Display.flex,
+            flexDirection: FlexDirection.column,
+            justifyContent: JustifyContent.spaceBetween,
+            alignSelf: AlignSelf.stretch,
+            gap: Gap.all(1.rem),
+          ),
+        ]),
         css('h5').styles(margin: Margin.only(bottom: 1.rem)),
-        css('ul').styles(padding: Padding.zero, listStyle: ListStyle.none, fontSize: 0.9.rem, lineHeight: 2.rem),
+        css('ul').styles(
+          padding: Padding.zero,
+          listStyle: ListStyle.none,
+          fontSize: 0.9.rem,
+          lineHeight: 2.rem,
+        ),
         css('ul a').styles(color: textDim),
       ]),
       css('.footer-banner').styles(

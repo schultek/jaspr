@@ -276,7 +276,7 @@ class UncontrolledProviderScope extends InheritedComponent {
 class _UncontrolledProviderScopeElement extends InheritedElement {
   _UncontrolledProviderScopeElement(UncontrolledProviderScope super.component);
 
-  void Function()? _task;
+  Task? _task;
   // ignore: unused_field
   bool _mounted = true;
 
@@ -321,8 +321,16 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     setDependencies(dependent, getDependencies(dependent) ?? ProviderDependencies(dependent, this));
   }
 
-  void _jasprVsync(void Function() task) {
-    assert(_task == null, 'Only one task can be scheduled at a time');
+  void _jasprVsync(Task task) {
+    assert(
+      _task == null ||
+          // Checks for race conditions where a task has been completed in a different scope.
+          // If so, it then becomes possible for another task to be scheduled
+          // before this scoped had the opportunity to run its task.
+          // TODO find a way to test this.
+          _task!.completed,
+      'Only one task can be scheduled at a time',
+    );
     _task = task;
 
     Future.microtask(() async {
@@ -374,8 +382,9 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
 
   @override
   void performRebuild() {
-    _task?.call();
+    final task = _task;
     _task = null;
+    task?.call();
     return super.performRebuild();
   }
 }

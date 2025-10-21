@@ -1,8 +1,30 @@
-## Unreleased patch
+## Unreleased breaking
 
+- **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
+- **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
+
+- Added `ms` and `seconds` extensions to `int` for simple conversion to `Duration`.
+- Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`.
+- Added `none`, `initial`, `revert`, `revertLayer` and `unset` to `TextShadow` and `BoxShadow`.
+- Allow nesting non-empty `Filter.list` inside each other.
+
+- Allow binary responses in `AppContext.setStatusCode`.
+
+## 0.21.6
+
+- Added `checked` and `indeterminate` parameters to `input()`. These will control the state of a checkbox or radio input.
+- Fixed client hydration and debugging bug on chrome when running the app under a base path.
+
+## 0.21.5
+
+- Fixed regression in rendering implementation.
+
+## 0.21.4
+
+- Added `JasprBadge` component that renders a "Built with Jaspr" badge.
 - Add the `--no-managed-build-options` flag to commands launching a build daemon. Without managed
   build options, users are responsible for configuring `build_web_compilers`.
-- Allow binary responses in `AppContext.setStatusCode`.
+- Fixed another whitespace rendering bug.
 
 ## 0.21.3
 
@@ -76,7 +98,7 @@
 
 - Added `allowedPathSuffixes` option to `Jaspr.initializeApp()` to enable handling route paths with extensions other than `html`.
 
-- Added support for generating a **sitemap.xml** in static mode. To enable this, pass `--sitemap-domain=my.domain.com` to `jaspr build`. 
+- Added support for generating a **sitemap.xml** in static mode. To enable this, pass `--sitemap-domain=my.domain.com` to `jaspr build`.
 
   Add sitemap params like `changefreq` and `priority` to your routes by using `Route(settings: RouteSettings(priority: 0.5))` or set them through `ServerApp.requestRouteGeneration()`.
 
@@ -115,7 +137,7 @@
 
 - **BREAKING** Changed `AppBinding`s `Uri get currentUri` to `String get currentUrl`.
 
-- **BREAKING** Changed return type of `renderComponent()` from `Future<String>` to `Future<({int statusCode, String body, Map<String, List<String>> headers})>`. 
+- **BREAKING** Changed return type of `renderComponent()` from `Future<String>` to `Future<({int statusCode, String body, Map<String, List<String>> headers})>`.
 
   The rendered html is accessible through the `body` property. `statusCode` and `headers` can be used to create a response object when part of a custom http handler.
 
@@ -126,6 +148,7 @@
 - Deprecated having seperate style groups (`Styles.box()`, `Styles.text()`, `Styles.background()`, etc. as well as `.box()`, `.text()`, etc.). All styling properties are now available under the single `Styles()` constructur and `.styles()` method.
 
   **Before:**
+
   ```dart
   css('.main')
     .box(width: 100.px, height: 100.px)
@@ -134,6 +157,7 @@
   ````
 
   **After:**
+
   ```dart
   css('.main').styles(
     width: 100.px,
@@ -154,7 +178,6 @@
 - Update logo and website links.
 
 ## 0.17.0
-
 
 - **BREAKING** Removed `currentState` from `GlobalKey`, use `GlobalStateKey` instead.
 - Added `GlobalStateKey<T extends State>` to access the state of a component using `currentState`.
@@ -286,11 +309,14 @@
   To enable this a custom model class must have two methods:
 
   - An instance method that encodes the model to a primitive value and is annotated with `@encoder`:
+
     ```dart
     @encoder
     String toJson() { ... }
     ```
+
   - A static method that decodes the model from a primitive value and is annotated with `@decoder`:
+
     ```dart
     @decoder
     static MyModel fromJson(String json) { ... }
@@ -599,7 +625,7 @@
     jaspr_web_compilers: ^4.0.4
   ```
 
-  For an example see `examples/flutter_plugin_interop`](https://github.com/schultek/Jaspr/tree/main/examples/flutter_plugin_interop).
+  For an example see [`examples/flutter_plugin_interop`](https://github.com/schultek/Jaspr/tree/main/examples/flutter_plugin_interop).
 
 - Improved **flutter element embedding**.
 
@@ -609,7 +635,7 @@
   This removes the need for any kind of interop between apps as they can directly communicate
   through the usual primitives of passing properties and callbacks.
 
-  For an example see `examples/flutter_embedding`](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding).
+  For an example see [`examples/flutter_embedding`](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding).
 
 - `jaspr build` now outputs to `/build/jaspr` instead of `/build`.
 
@@ -652,10 +678,12 @@
 ## 0.3.0
 
 - **BREAKING** The cli is now a separate package: `jaspr_cli`. To migrate run:
+
   ```shell
     dart pub global deactivate jaspr
     dart pub global activate jaspr_cli
   ```
+
   The usage stays the same with `jaspr create`, `jaspr serve` and `jaspr build`.
 
 ## 0.2.0

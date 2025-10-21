@@ -111,19 +111,49 @@ class DomRenderElement extends DomRenderObject
 
     if (attributes != null && attributes.isNotEmpty) {
       for (final attr in attributes.entries) {
-        if (attr.key == 'value' && node.isHtmlInputElement && (node as web.HTMLInputElement).value != attr.value) {
-          if (kVerboseMode) {
-            print("Set input value: ${attr.value}");
+        if (attr.key == 'value' && node.isHtmlInputElement) {
+          if ((node as web.HTMLInputElement).value != attr.value) {
+            if (kVerboseMode) {
+              print("Set input value: ${attr.value}");
+            }
+            (node as web.HTMLInputElement).value = attr.value;
           }
-          (node as web.HTMLInputElement).value = attr.value;
           continue;
         }
 
-        if (attr.key == 'value' && node.isHtmlSelectElement && (node as web.HTMLSelectElement).value != attr.value) {
-          if (kVerboseMode) {
-            print("Set select value: ${attr.value}");
+        if (attr.key == 'checked' &&
+            node.isHtmlInputElement &&
+            ['checkbox', 'radio'].contains((node as web.HTMLInputElement).type)) {
+          final shouldBeChecked = attr.value == 'true';
+          if ((node as web.HTMLInputElement).checked != shouldBeChecked) {
+            if (kVerboseMode) {
+              print("Set input checked: $shouldBeChecked");
+            }
+            (node as web.HTMLInputElement).checked = shouldBeChecked;
           }
-          (node as web.HTMLSelectElement).value = attr.value;
+          continue;
+        }
+
+        if (attr.key == 'indeterminate' &&
+            node.isHtmlInputElement &&
+            (node as web.HTMLInputElement).type == 'checkbox') {
+          final shouldBeIndeterminate = attr.value == 'true';
+          if ((node as web.HTMLInputElement).indeterminate != shouldBeIndeterminate) {
+            if (kVerboseMode) {
+              print("Set input indeterminate: $shouldBeIndeterminate");
+            }
+            (node as web.HTMLInputElement).indeterminate = shouldBeIndeterminate;
+          }
+          continue;
+        }
+
+        if (attr.key == 'value' && node.isHtmlSelectElement) {
+          if ((node as web.HTMLSelectElement).value != attr.value) {
+            if (kVerboseMode) {
+              print("Set select value: ${attr.value}");
+            }
+            (node as web.HTMLSelectElement).value = attr.value;
+          }
           continue;
         }
 

@@ -60,7 +60,7 @@ class GradientBorder extends StatelessComponent {
         css('svg').styles(overflow: Overflow.visible),
       ]),
       css('rect').styles(
-        transition: Transition('stroke-dasharray', duration: 300, curve: Curve.easeOut),
+        transition: Transition('stroke-dasharray', duration: 300.ms, curve: Curve.easeOut),
         raw: {'stroke-dasharray': '0 101'},
       ),
       css('&:hover rect, &.fixed rect').styles(raw: {'stroke-dasharray': '50 0 52'}),

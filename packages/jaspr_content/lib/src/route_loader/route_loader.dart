@@ -172,32 +172,24 @@ abstract class RouteLoaderBase implements RouteLoader {
   }
 }
 
-final indexRegex = RegExp(r'index\.[^/]*$');
-
 abstract class PageSource {
   PageSource(this.path, this.loader, {bool keepSuffix = false, pkg_path.Context? context}) {
-    final segments = (context ?? pkg_path.context).split(path);
-
-    private = segments.any((s) => s.startsWith('_') || s.startsWith('.'));
+    final pathContext = context ?? pkg_path.context;
+    final segments = pathContext.split(path).where((segment) => segment.isNotEmpty).toList();
 
     if (segments.isEmpty) {
       url = '/';
       return;
     }
 
-    if (segments.first.isEmpty) {
-      segments.removeAt(0);
-    }
-    if (segments.last.isEmpty) {
-      segments.removeLast();
-    }
+    private = segments.any((s) => s.startsWith('_') || s.startsWith('.'));
 
     if (!keepSuffix) {
-      final isIndex = indexRegex.hasMatch(segments.last);
-      if (isIndex) {
+      final lastSegmentName = pathContext.basenameWithoutExtension(segments.last);
+      if (lastSegmentName == 'index') {
         segments.removeLast();
       } else {
-        segments.last = segments.last.replaceFirst(RegExp(r'\.[^/]*$'), '');
+        segments.last = lastSegmentName;
       }
     }
 
