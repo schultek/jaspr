@@ -182,3 +182,11 @@ extension NumberString on double {
     return roundToDouble() == this ? round().toString() : toString();
   }
 }
+
+extension DurationExt on int {
+  /// Shorthand for `Duration(milliseconds: this)`
+  Duration get ms => Duration(milliseconds: this);
+
+  /// Shorthand for `Duration(seconds: this)`
+  Duration get seconds => Duration(seconds: this);
+}

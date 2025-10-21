@@ -129,5 +129,12 @@ void main() {
         expect(insets.styles, equals({'top': '10px', 'bottom': '10px'}));
       });
     });
+
+    group('duration', () {
+      test('extension on int', () {
+        expect(500.ms, equals(Duration(milliseconds: 500)));
+        expect(50.seconds, equals(Duration(seconds: 50)));
+      });
+    });
   });
 }
