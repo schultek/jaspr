@@ -732,6 +732,16 @@ const htmlSpec = {
               "Indicates that the user should not be able to interact with the input. Disabled inputs are typically rendered with a dimmer color or using some other form of indication that the field is not available for use.",
           "type": "boolean",
         },
+        "checked": {
+          "doc": "Specifies whether the form control is checked or not. Applies only to checkbox and radio inputs.",
+          "type": "boolean",
+          "explicit": true,
+        },
+        "indeterminate": {
+          "doc": "Specifies whether the checkbox control is indeterminate or not. Applies only to checkbox inputs.",
+          "type": "boolean",
+          "explicit": true,
+        },
         "onInput": {
           "doc": "Callback for the 'input' event. The type of [value] depends on [type].",
           "type": "event:onInput:ValueChanged<dynamic>",
