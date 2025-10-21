@@ -3,12 +3,14 @@ on:
   pull_request:
     branches:
       - main
+      - next
     paths:
       - '.github/workflows/cli.yml'
       - 'packages/jaspr_cli/**'
   push:
     branches:
       - main
+      - next
     paths:
       - '.github/workflows/cli.yml'
       - 'packages/jaspr_cli/**'
