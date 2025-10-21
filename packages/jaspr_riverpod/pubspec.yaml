@@ -20,7 +20,7 @@ resolution: workspace
 dependencies:
   jaspr: ^0.21.0
   meta: ^1.9.1
-  riverpod: ^3.0.0
+  riverpod: ^3.0.2
 
 dev_dependencies:
   jaspr_repo: any
