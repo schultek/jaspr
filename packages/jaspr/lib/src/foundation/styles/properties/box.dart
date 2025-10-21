@@ -59,10 +59,14 @@ class __Border implements Border {
   final Color? color;
   final Unit? width;
 
-  const __Border({this.style = BorderStyle.solid, this.color, this.width});
+  const __Border({this.style = BorderStyle.solid, this.color, this.width})
+    : assert(
+        style != null || color != null || width != null,
+        'At least one of style, color or width must be not null. For no border, use Border.none',
+      );
 
   @override
-  Map<String, String> get styles => {
+  Map<String, String> get styles => <String, String>{
     'border': [
       if (style != null) style!.value,
       if (color != null) color!.value,
@@ -444,7 +448,19 @@ enum BoxSizing {
   const BoxSizing(this.value);
 }
 
-abstract class BoxShadow {
+class BoxShadow {
+  const BoxShadow._(this.value);
+
+  final String value;
+
+  // Keyword and global values
+  static const BoxShadow none = BoxShadow._('none');
+  static const BoxShadow initial = BoxShadow._('initial');
+  static const BoxShadow inherit = BoxShadow._('inherit');
+  static const BoxShadow revert = BoxShadow._('revert');
+  static const BoxShadow revertLayer = BoxShadow._('revert-layer');
+  static const BoxShadow unset = BoxShadow._('unset');
+
   const factory BoxShadow({required Unit offsetX, required Unit offsetY, Unit? blur, Unit? spread, Color? color}) =
       _BoxShadow;
 
@@ -457,11 +473,11 @@ abstract class BoxShadow {
   }) = _InsetBoxShadow;
 
   const factory BoxShadow.combine(List<BoxShadow> shadows) = _CombineBoxShadow;
-
-  String get value;
 }
 
-class _BoxShadow implements BoxShadow {
+abstract class _ListableBoxShadow implements BoxShadow {}
+
+class _BoxShadow implements _ListableBoxShadow {
   const _BoxShadow({
     required this.offsetX,
     required this.offsetY,
@@ -494,13 +510,30 @@ class _InsetBoxShadow extends _BoxShadow {
     : super(inset: true);
 }
 
-class _CombineBoxShadow implements BoxShadow {
+class _CombineBoxShadow implements _ListableBoxShadow {
   const _CombineBoxShadow(this.shadows);
 
   final List<BoxShadow> shadows;
 
+  bool _shadowsListable() {
+    if (shadows.isEmpty) {
+      throw '[BoxShadow.combine] cannot be empty.';
+    }
+
+    for (final shadow in shadows) {
+      if (shadow is! _ListableBoxShadow) {
+        throw 'Cannot use ${shadow.value} as a list item, only standalone use supported.';
+      }
+    }
+
+    return true;
+  }
+
   @override
-  String get value => shadows.map((s) => s.value).join(', ');
+  String get value {
+    assert(_shadowsListable());
+    return shadows.map((s) => s.value).join(', ');
+  }
 }
 
 class Cursor {

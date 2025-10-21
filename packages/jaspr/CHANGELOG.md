@@ -1,7 +1,12 @@
 ## Unreleased breaking
 
 - **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
+- **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
+
 - Added `ms` and `seconds` extensions to `int` for simple conversion to `Duration`.
+- Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`.
+- Added `none`, `initial`, `revert`, `revertLayer` and `unset` to `TextShadow` and `BoxShadow`.
+- Allow nesting non-empty `Filter.list` inside each other.
 
 ## 0.21.6
 

@@ -7,9 +7,25 @@ import 'package:jaspr_test/jaspr_test.dart';
 void main() {
   group('style', () {
     group('transform', () {
-      test('combine', () {
-        var transform = Transform.combine([Transform.scale(2), Transform.translate(x: 100.px)]);
-        expect(transform.value, equals('scale(2) translateX(100px)'));
+      group('combine', () {
+        test('basic', () {
+          var transform = Transform.combine([Transform.scale(2), Transform.translate(x: 100.px)]);
+          expect(transform.value, equals('scale(2) translateX(100px)'));
+        });
+
+        test('empty list not allowed', () {
+          expect(
+            () => Transform.combine([]).value,
+            throwsA(predicate((e) => e == '[Transform.combine] cannot be empty.')),
+          );
+        });
+
+        test('named not allowed in combine', () {
+          expect(
+            () => Transform.combine([Transform.none]).value,
+            throwsA(predicate((e) => e == 'Cannot use none as a filter list item, only standalone use supported.')),
+          );
+        });
       });
 
       test('rotate', () {
