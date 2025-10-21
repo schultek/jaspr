@@ -17,7 +17,7 @@ When used as the `@css` annotation, you can register any amount of style definit
 
 ```dart
 @css
-final List<StyleRule> styles = [
+List<StyleRule> get styles => [
   // Style rules in here (covered in next section)
   /* ... */
 ];
@@ -48,7 +48,7 @@ class App extends StatelessComponent {
   }
 
   @css
-  static final styles = [
+  static List<StyleRule> get styles => [
     css('.main', [
       css('&').styles(
         width: 100.px,

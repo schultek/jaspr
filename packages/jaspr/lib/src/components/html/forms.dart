@@ -150,6 +150,8 @@ enum AutoComplete {
 /// - [name]: Name of the form control. Submitted with the form as part of a name/value pair.
 /// - [value]: The value of the control.
 /// - [disabled]: Indicates that the user should not be able to interact with the input. Disabled inputs are typically rendered with a dimmer color or using some other form of indication that the field is not available for use.
+/// - [checked]: Specifies whether the form control is checked or not. Applies only to checkbox and radio inputs.
+/// - [indeterminate]: Specifies whether the checkbox control is indeterminate or not. Applies only to checkbox inputs.
 /// - [onInput]: Callback for the 'input' event. The type of [value] depends on [type].
 /// - [onChange]: Callback for the 'change' event. The type of [value] depends on [type].
 Component input({
@@ -157,6 +159,8 @@ Component input({
   String? name,
   String? value,
   bool? disabled,
+  bool? checked,
+  bool? indeterminate,
   ValueChanged<dynamic>? onInput,
   ValueChanged<dynamic>? onChange,
   Key? key,
@@ -178,6 +182,8 @@ Component input({
       'name': ?name,
       'value': ?value,
       if (disabled == true) 'disabled': '',
+      if (checked != null) 'checked': checked ? 'true' : 'false',
+      if (indeterminate != null) 'indeterminate': indeterminate ? 'true' : 'false',
     },
     events: {
       ...?events,
