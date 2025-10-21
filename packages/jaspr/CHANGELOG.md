@@ -1,6 +1,7 @@
 ## Unreleased patch
 
 - Added `checked` and `indeterminate` parameters to `input()`. These will control the state of a checkbox or radio input.
+- Fixed client hydration and debugging bug on chrome when running the app under a base path.
 
 ## 0.21.5
 

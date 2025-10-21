@@ -45,9 +45,12 @@ mixin ProxyHelper on BaseCommand {
       // The bootstrap script hardcodes the host:port url for the dwds handler endpoint,
       // so we have to change it to our server url to be able to intercept it.
       if (res.statusCode == 200 && req.url.path.endsWith('.dart.bootstrap.js')) {
+        var basePath = req.headers['jaspr_base_path'] ?? '/';
+        if (!basePath.endsWith('/')) basePath += '/';
+        if (!basePath.startsWith('/')) basePath = '/$basePath';
         var body = await res.readAsString();
         // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:<webPort>/$dwdsSseHandler";'
-        return res.change(body: body.replaceAll('http://localhost:$webPort/', 'http://localhost:$serverPort/'));
+        return res.change(body: body.replaceAll('http://localhost:$webPort/', 'http://localhost:$serverPort$basePath'));
       }
 
       // Second try to load the resource from the flutter process.
