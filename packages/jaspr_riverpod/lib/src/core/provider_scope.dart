@@ -322,7 +322,15 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
   }
 
   void _jasprVsync(Task task) {
-    assert(_task == null, 'Only one task can be scheduled at a time');
+    assert(
+      _task == null ||
+          // Checks for race conditions where a task has been completed in a different scope.
+          // If so, it then becomes possible for another task to be scheduled
+          // before this scoped had the opportunity to run its task.
+          // TODO find a way to test this.
+          _task!.completed,
+      'Only one task can be scheduled at a time',
+    );
     _task = task;
 
     Future.microtask(() async {
@@ -374,8 +382,9 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
 
   @override
   void performRebuild() {
-    _task?.call();
+    final task = _task;
     _task = null;
+    task?.call();
     return super.performRebuild();
   }
 }
