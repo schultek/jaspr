@@ -8,6 +8,9 @@
 - Added `none`, `initial`, `revert`, `revertLayer` and `unset` to `TextShadow` and `BoxShadow`.
 - Allow nesting non-empty `Filter.list` inside each other.
 
+- **Breaking**: `ResponseLike.body` (returned from `renderComponent()`) is now a `Uint8List` instead of `String`.
+- Allow binary responses in `AppContext.setStatusCode`.
+
 ## 0.21.6
 
 - Added `checked` and `indeterminate` parameters to `input()`. These will control the state of a checkbox or radio input.

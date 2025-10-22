@@ -1,6 +1,8 @@
 @TestOn('vm')
 library;
 
+import 'dart:convert';
+
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr/src/server/run_app.dart';
 import 'package:test/test.dart';
@@ -12,7 +14,7 @@ void main() {
     test('should resolve the project root and render', () async {
       Jaspr.initializeApp();
       final rendered = await renderComponent(App());
-      expect(rendered.body.contains('Hello'), isTrue);
+      expect(utf8.decode(rendered.body).contains('Hello'), isTrue);
     });
   });
 }

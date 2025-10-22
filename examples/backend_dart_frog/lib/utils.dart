@@ -30,7 +30,7 @@ Future<Response> renderJasprComponent(RequestContext context, Component child) a
     request: shelf.Request(context.request.method.name, context.request.url, headers: context.request.headers),
   );
 
-  return Response(statusCode: response.statusCode, body: response.body, headers: response.headers);
+  return Response.bytes(statusCode: response.statusCode, body: response.body, headers: response.headers);
 }
 
 class BasePath {
