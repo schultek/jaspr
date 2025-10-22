@@ -13,7 +13,9 @@ void main() {
       });
 
       test('basic', () {
-        final styles = Styles(transition: Transition('all', duration: 500.ms, curve: Curve.ease, delay: 600.ms));
+        final styles = Styles(
+          transition: Transition('all', duration: 500.ms, curve: Curve.ease, delay: 600.ms),
+        );
         expect(styles.properties, equals({'transition': 'all 500ms ease 600ms'}));
       });
 
