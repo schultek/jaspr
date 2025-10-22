@@ -18,6 +18,7 @@ final _events = events;
 /// Renders a text node.
 ///
 /// Convenience method for `Component.text()`.
+@Deprecated('Use Component.text() instead.')
 Component text(String text, {Key? key}) {
   return Component.text(text, key: key);
 }
@@ -36,6 +37,7 @@ Component raw(String text, {Key? key}) {
 /// Renders a list of children without any wrapping element.
 ///
 /// Convenience method for `Component.fragment()`.
+@Deprecated('Use Component.fragment() instead.')
 Component fragment(List<Component> children, {Key? key}) {
   return Component.fragment(children, key: key);
 }
