@@ -2,8 +2,8 @@ part of 'framework.dart';
 
 /// Represents a html element in the DOM
 ///
-/// Must have a [tag] and any number of attributes.
-/// Can have a single [child] component or any amount of [children].
+/// Must have a [tag] and any number of [attributes].
+/// Accepts a list of [children].
 class DomComponent extends Component {
   const DomComponent._({
     super.key,
