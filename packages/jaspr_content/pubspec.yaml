@@ -29,7 +29,7 @@ dependencies:
   jaspr_router: ^0.7.1
   liquify: ^1.0.0
   markdown: ^7.3.0
-  mustache_template: ^2.0.0
+  mustache_template: ^2.0.2
   path: ^1.9.1
   syntax_highlight_lite: ^0.0.1
   universal_web: ^1.1.0
@@ -40,13 +40,6 @@ dev_dependencies:
   jaspr_repo: any
   mocktail: ^1.0.4
   test: ^1.24.0
-
-dependency_overrides:
-  # Needed until https://github.com/jonahwilliams/mustache/pull/6 is merged.
-  mustache_template:
-    git:
-      url: https://github.com/Rodsevich/mustache
-      ref: 119cd0799e9c7b55397521ace7ca73787a32ef8d
 
 screenshots:
   - description: The jaspr_content logo
