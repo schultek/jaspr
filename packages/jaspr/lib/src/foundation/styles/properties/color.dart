@@ -1,4 +1,8 @@
-/// An immutable css color value.
+/// A CSS color value.
+///
+/// See also [Colors] for a list of predefined color names.
+///
+/// Read more: [MDN Color](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value)
 abstract class Color {
   /// Constructs a [Color] from a css color value.
   ///
@@ -63,6 +67,9 @@ abstract class Color {
   Color withValues({double? red, double? green, double? blue, double? alpha});
 }
 
+/// Predefined CSS color names.
+///
+/// Read more: [MDN Color names](https://developer.mozilla.org/en-US/docs/Web/CSS/named-color)
 class Colors {
   static const Color aliceBlue = Color('aliceBlue');
   static const Color antiqueWhite = Color('antiqueWhite');

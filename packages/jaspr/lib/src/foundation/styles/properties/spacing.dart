@@ -1,22 +1,39 @@
 import 'unit.dart';
 
+/// The `padding` CSS property sets the inner spacing of an element.
+///
+/// Read more: [MDN `padding`](https://developer.mozilla.org/en-US/docs/Web/CSS/padding)
 typedef Padding = Spacing;
+
+/// The `margin` CSS property sets the outer spacing of an element.
+///
+/// Read more: [MDN `margin`](https://developer.mozilla.org/en-US/docs/Web/CSS/margin)
 typedef Margin = Spacing;
 
+/// Represents spacing properties such as padding and margin in CSS.
+///
+/// Prefer using [Padding] and [Margin] type aliases for better readability.
 class Spacing {
+  // TODO: Support block and inline spacings.
+
   /// The css styles
   final Map<String, String> styles;
 
   const Spacing._(this.styles);
 
-  const factory Spacing.fromLTRB(Unit left, Unit top, Unit right, Unit bottom) = _QuadEdgeInsets;
+  /// Creates spacing with individual values for left, top, right, and bottom.
+  const factory Spacing.fromLTRB(Unit left, Unit top, Unit right, Unit bottom) = _QuadSpacing;
 
-  const factory Spacing.only({Unit? left, Unit? top, Unit? right, Unit? bottom}) = _QuadEdgeInsets.only;
+  /// Creates spacing with optional values for left, top, right, and bottom.
+  const factory Spacing.only({Unit? left, Unit? top, Unit? right, Unit? bottom}) = _QuadSpacing.only;
 
-  const factory Spacing.all(Unit value) = _AllEdgeInsets;
+  /// Creates spacing with the same value for all directions.
+  const factory Spacing.all(Unit value) = _AllSpacing;
 
-  const factory Spacing.symmetric({Unit? vertical, Unit? horizontal}) = _SymmetricEdgeInsets;
+  /// Creates symmetric spacing with optional vertical and horizontal values.
+  const factory Spacing.symmetric({Unit? vertical, Unit? horizontal}) = _SymmetricSpacing;
 
+  /// Creates spacing with zero value for all directions.
   static const Spacing zero = Spacing.all(Unit.zero);
 
   Unit get left => Unit.zero;
@@ -31,14 +48,14 @@ class Spacing {
   static const Spacing unset = Spacing._({'': 'unset'});
 }
 
-class _QuadEdgeInsets implements Spacing {
+class _QuadSpacing implements Spacing {
   final Unit? _left;
   final Unit? _top;
   final Unit? _right;
   final Unit? _bottom;
 
-  const _QuadEdgeInsets(this._left, this._top, this._right, this._bottom);
-  const _QuadEdgeInsets.only({Unit? left, Unit? top, Unit? right, Unit? bottom})
+  const _QuadSpacing(this._left, this._top, this._right, this._bottom);
+  const _QuadSpacing.only({Unit? left, Unit? top, Unit? right, Unit? bottom})
     : _left = left,
       _top = top,
       _right = right,
@@ -68,10 +85,10 @@ class _QuadEdgeInsets implements Spacing {
   }
 }
 
-class _AllEdgeInsets implements Spacing {
+class _AllSpacing implements Spacing {
   final Unit _value;
 
-  const _AllEdgeInsets(this._value);
+  const _AllSpacing(this._value);
 
   @override
   Unit get left => _value;
@@ -86,11 +103,11 @@ class _AllEdgeInsets implements Spacing {
   Map<String, String> get styles => {'': _value.value};
 }
 
-class _SymmetricEdgeInsets implements Spacing {
+class _SymmetricSpacing implements Spacing {
   final Unit? vertical;
   final Unit? horizontal;
 
-  const _SymmetricEdgeInsets({this.vertical, this.horizontal});
+  const _SymmetricSpacing({this.vertical, this.horizontal});
 
   @override
   Map<String, String> get styles {

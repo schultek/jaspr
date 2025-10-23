@@ -2,6 +2,10 @@ import 'angle.dart';
 import 'color.dart';
 import 'unit.dart';
 
+/// CSS filter effects let you define a way of processing an element's rendering before the element is displayed in the
+/// document. Examples of such effects include blurring and changing the intensity of the color of an element.
+///
+/// Read more: [MDN CSS Filter Effects](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_filter_effects)
 class Filter {
   const Filter._(this.value);
 
@@ -18,18 +22,42 @@ class Filter {
   static const Filter revertLayer = Filter._('revert-layer');
   static const Filter unset = Filter._('unset');
 
+  /// Combines multiple filter functions into a single filter value.
   const factory Filter.list(List<Filter> filterValues) = _FilterList;
+
+  /// Creates a blur filter function that applies a Gaussian blur to the input image.
   const factory Filter.blur([Unit length]) = _BlurFilter;
+
+  /// Creates a brightness filter function that applies a linear multiplier value on an element or an input image, making the image appear
+  /// brighter or darker.
   const factory Filter.brightness([double percentage]) = _BrightnessFilter;
+
+  /// Creates a contrast filter function that adjusts the contrast of the input image.
   const factory Filter.contrast([double percentage]) = _ContrastFilter;
+
+  /// Creates a drop-shadow filter function that applies a drop shadow effect to the input image.
   const factory Filter.dropShadow({required Unit offsetX, required Unit offsetY, Unit? spread, Color? color}) =
       _DropShadowFilter;
+
+  /// Creates a grayscale filter function that converts the input image to grayscale.
   const factory Filter.grayscale([double percentage]) = _GrayscaleFilter;
+
+  /// Creates a hue-rotate filter function that rotates the hue of an element and its contents.
   const factory Filter.hueRotate([Angle angle]) = _HueRotateFilter;
+
+  /// Creates an invert filter function that inverts the colors of the input image.
   const factory Filter.invert([double percentage]) = _InvertFilter;
+
+  /// Creates an opacity filter function that applies transparency to the samples in the input image
   const factory Filter.opacity([double percentage]) = _OpacityFilter;
+
+  /// Creates a sepia filter function that applies a sepia filter to the input image, giving it a warm, brownish tone.
   const factory Filter.sepia([double percentage]) = _SepiaFilter;
+
+  /// Creates a saturate filter function that super-saturates or desaturates the input image.
   const factory Filter.saturate([double percentage]) = _SaturateFilter;
+
+  /// Creates a url filter function that references an SVG filter element.
   const factory Filter.url(String url) = _UrlFilter;
 }
 

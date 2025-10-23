@@ -1,26 +1,46 @@
 import 'angle.dart';
 import 'unit.dart';
 
+/// Represents the CSS `transform` property.
+///
+/// CSS transforms let you rotate, scale, skew, or translate an element. It modifies the
+/// coordinate space of the CSS visual formatting model.
+///
+/// Use the various factory constructors to create different types of transforms. You can
+/// apply multiple transforms to an element by combining them using [Transform.combine].
+///
+/// Read more: [MDN `transform`](https://developer.mozilla.org/en-US/docs/Web/CSS/transform)
 class Transform {
   const Transform._(this.value);
 
+  /// The css value
   final String value;
 
+  /// No transform is applied.
   static const Transform none = Transform._('none');
 
+  /// Combine multiple transforms into one.
   const factory Transform.combine(List<Transform> transforms) = _CombineTransform;
 
+  /// Rotates an element around a fixed point on the 2D plane.
   const factory Transform.rotate(Angle angle) = _RotateTransform;
+
+  /// Rotates an element around the individual axes in 3D space.
   const factory Transform.rotateAxis({Angle? x, Angle? y, Angle? z}) = _RotateAxisTransform;
 
+  /// Translates an element on the 2D plane.
   const factory Transform.translate({Unit? x, Unit? y}) = _TranslateTransform;
 
+  /// Scales an element up or down on the 2D plane.
   const factory Transform.scale(double value) = _ScaleTransform;
 
+  /// Skews an element on the 2D plane.
   const factory Transform.skew({Angle? x, Angle? y}) = _SkewTransform;
 
+  /// Describes a homogeneous 2D transformation matrix.
   const factory Transform.matrix(double a, double b, double c, double d, double tx, double ty) = _MatrixTransform;
 
+  /// Sets the distance between the user and the z=0 plane.
   const factory Transform.perspective(Unit value) = _PerspectiveTransform;
 
   static const Transform inherit = Transform._('inherit');
