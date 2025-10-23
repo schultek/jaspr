@@ -1,14 +1,23 @@
 import 'unit.dart';
 
-/// The background-attachment CSS property sets whether a background image's position is fixed within the viewport, or scrolls with its containing block.
+/// The `background-attachment` CSS property sets whether a background image's
+/// position is fixed within the viewport or scrolls with its containing block.
+///
+/// Possible values include `scroll`, `fixed` and `local`.
 enum BackgroundAttachment {
-  /// The background is fixed relative to the element itself and does not scroll with its contents. (It is effectively attached to the element's border.)
+  /// The background is fixed relative to the element itself and does not scroll 
+  /// with its contents. (It is effectively attached to the element's border.)
   scroll('scroll'),
 
-  /// The background is fixed relative to the viewport. Even if an element has a scrolling mechanism, the background doesn't move with the element. (This is not compatible with background-clip: text.)
+  /// The background is fixed relative to the viewport. Even if an element has 
+  /// a scrolling mechanism, the background doesn't move with the element. 
+  /// (This is not compatible with background-clip: text.)
   fixed('fixed'),
 
-  /// The background is fixed relative to the element's contents. If the element has a scrolling mechanism, the background scrolls with the element's contents, and the background painting area and background positioning area are relative to the scrollable area of the element rather than to the border framing them.
+  /// The background is fixed relative to the element's contents. If the element 
+  /// has a scrolling mechanism, the background scrolls with the element's contents, 
+  /// and the background painting area and background positioning area are relative 
+  /// to the scrollable area of the element rather than to the border framing them.
   local('local'),
 
   inherit('inherit'),
@@ -22,7 +31,10 @@ enum BackgroundAttachment {
   const BackgroundAttachment(this.value);
 }
 
-/// The background-clip CSS property sets whether an element's background extends underneath its border box, padding box, or content box.
+/// The `background-clip` CSS property sets whether an element's background
+/// extends underneath its border box, padding box, or content box.
+///
+/// Values: `border-box`, `padding-box`, `content-box` and `text`.
 enum BackgroundClip {
   /// The background extends to the outside edge of the border (but underneath the border in z-ordering).
   borderBox('border-box'),
@@ -47,18 +59,21 @@ enum BackgroundClip {
   const BackgroundClip(this.value);
 }
 
-/// The background-image CSS property sets one or more background images on an element.
+/// The `background-image` CSS property sets one or more background images on
+/// an element. It accepts images (`url()`), gradients, and the keyword `none`.
+///
+// TODO: support multiple layered images and gradients.
 class BackgroundImage {
   /// The css value
   final String value;
 
   const BackgroundImage._(this.value);
 
+  /// No background image (CSS `none`).
   static const BackgroundImage none = BackgroundImage._('none');
 
+  /// Create a background image from an `ImageStyle` such as `url()`.
   const factory BackgroundImage.image(ImageStyle image) = _ImageBackgroundImage;
-
-  // TODO multiple background images
 
   static const BackgroundImage inherit = BackgroundImage._('inherit');
   static const BackgroundImage initial = BackgroundImage._('initial');
@@ -75,19 +90,20 @@ class _ImageBackgroundImage implements BackgroundImage {
   String get value => image.value;
 }
 
+/// Helper representing an image style value such as `url(...)` or gradients.
 class ImageStyle {
   /// The css value
   final String value;
 
+  /// Creates an image style with `url(...)` syntax.
   const ImageStyle.url(String url) : value = 'url($url)';
 
-  // TODO
-  // const ImageStyle.gradient() : value = '';
-
-  // TODO element, image, crossFade, imageSet
+  // TODO: gradients, image-set(), cross-fade(), element() etc.
 }
 
-/// The background-origin CSS property sets the background's origin: from the border start, inside the border, or inside the padding.
+/// The `background-origin` CSS property sets the background's origin: which
+/// box (border-box, padding-box or content-box) the background's position is
+/// relative to.
 enum BackgroundOrigin {
   /// The background is positioned relative to the border box.
   borderBox('border-box'),
@@ -109,14 +125,19 @@ enum BackgroundOrigin {
   const BackgroundOrigin(this.value);
 }
 
-/// The background-position CSS property sets the initial position for each background image. The position is relative to the position layer set by background-origin.
+/// The `background-position` CSS property sets the initial position for each
+/// background image. The position is relative to the box established by
+/// `background-origin`.
 class BackgroundPosition {
   /// The css value
   final String value;
 
   const BackgroundPosition._(this.value);
 
+  /// A shorthand for the centered background position (`center`).
   static const BackgroundPosition center = BackgroundPosition._('center');
+
+  /// Construct a background position from optional alignments and offsets.
   const factory BackgroundPosition({BackgroundAlignX? alignX, BackgroundAlignY? alignY, Unit? offsetX, Unit? offsetY}) =
       _BackgroundPosition;
 
@@ -154,7 +175,9 @@ class _BackgroundPosition implements BackgroundPosition {
   }
 }
 
-/// The background-repeat CSS property sets how background images are repeated. A background image can be repeated along the horizontal and vertical axes, or not repeated at all.
+/// The background-repeat CSS property sets how background images are 
+/// repeated. A background image can be repeated along the horizontal 
+/// and vertical axes, or not repeated at all.
 class BackgroundRepeat {
   /// The css value
   final String value;
@@ -168,6 +191,7 @@ class BackgroundRepeat {
   static const BackgroundRepeat round = BackgroundRepeat._('round');
   static const BackgroundRepeat noRepeat = BackgroundRepeat._('no-repeat');
 
+  /// Create an axis-specific repeat value from two axis repeat values.
   const factory BackgroundRepeat.axis(BackgroundAxisRepeat x, BackgroundAxisRepeat y) = _AxisBackgroundRepeat;
 
   static const BackgroundRepeat inherit = BackgroundRepeat._('inherit');
@@ -178,6 +202,7 @@ class BackgroundRepeat {
 }
 
 /// The background-repeat CSS property sets how background images are repeated.
+/// Per-axis values for the `background-repeat` property.
 enum BackgroundAxisRepeat {
   /// The image is repeated as much as needed to cover the whole background image painting area. The last image will be clipped if it doesn't fit.
   repeat('repeat'),
@@ -206,14 +231,21 @@ class _AxisBackgroundRepeat implements BackgroundRepeat {
   String get value => '${x.value} ${y.value}';
 }
 
-/// The background-size CSS property sets the size of the element's background image. The image can be left to its natural size, stretched, or constrained to fit the available space.
+/// The background-size CSS property sets the size of the element's background 
+/// image. The image can be left to its natural size, stretched, or constrained 
+/// to fit the available space.
 class BackgroundSize {
   /// The css value
   final String value;
 
   const BackgroundSize._(this.value);
 
+  /// The `contain` keyword: scale the image to be as large as possible while
+  /// maintaining aspect ratio and fitting inside the background painting area.
   static const BackgroundSize contain = BackgroundSize._('contain');
+
+  /// The `cover` keyword: scale the image to cover the whole background
+  /// painting area while preserving aspect ratio; image may be cropped.
   static const BackgroundSize cover = BackgroundSize._('cover');
 
   const factory BackgroundSize.width(Unit? width) = _WidthBackgroundSize;

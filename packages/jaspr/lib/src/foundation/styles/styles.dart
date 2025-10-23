@@ -8,7 +8,7 @@ abstract class Styles with StylesMixin<Styles> {
 
   Map<String, String> get properties;
 
-  /// Constructs an empty [Styles] instance.
+  /// Constructs a [Styles] instance with the given css properties.
   const factory Styles({
     All? all,
     // Box Styles
@@ -101,8 +101,8 @@ abstract class Styles with StylesMixin<Styles> {
 
 abstract mixin class StylesMixin<T> {
   T styles({
-    // Box Styles
     All? all,
+    // Box Styles
     String? content,
     Display? display,
     Position? position,

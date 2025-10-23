@@ -1,8 +1,19 @@
+/// Describes where a grid item should be placed within a grid. It can 
+/// place an item by naming a grid area, or by describing start/end lines 
+/// for the item's row and column tracks. Use this to control the item's 
+/// location and span inside its grid.
+/// 
+/// Maps to the CSS `grid-area`, `grid-row`, and `grid-column` properties.
 abstract class GridPlacement {
+  /// Creates a placement that targets a named grid area.
   const factory GridPlacement.area(String name) = _GridPlacement;
 
+  /// A placement that leaves the item's position to automatic placement
+  /// (equivalent to using the browser's automatic grid placement).
   static const GridPlacement auto = _GridPlacement('auto');
 
+  /// Creates a placement by specifying start/end lines for rows and
+  /// columns using [LinePlacement] values.
   const factory GridPlacement({
     LinePlacement? rowStart,
     LinePlacement? rowEnd,
@@ -56,17 +67,28 @@ class _LineGridPlacement implements GridPlacement {
   }
 }
 
+/// Places an item by specifying grid lines or spans.
+///
+/// A line placement identifies a grid line by name or index,
+/// or describes a span across multiple tracks. It's used to indicate
+/// where a grid item should start or end on a row or column axis.
 class LinePlacement {
   const LinePlacement._(this.value);
 
   final String value;
 
+  /// The automatic placement value.
   static const LinePlacement auto = LinePlacement._('auto');
 
+  /// Creates a placement that targets a named grid line.
   const factory LinePlacement.named(String name) = _NamedLinePlacement;
 
+  /// Creates a placement by numeric line index. Optionally provide
+  /// a [lineName] to also include a named line.
   const factory LinePlacement(int index, {String? lineName}) = _NormalLinePlacement;
 
+  /// Creates a placement using a `span` expression to span multiple
+  /// tracks. An optional [lineName] may be provided.
   const factory LinePlacement.span(int span, {String? lineName}) = _SpanLinePlacement;
 }
 
@@ -93,6 +115,11 @@ class _SpanLinePlacement extends _LinePlacement {
   const _SpanLinePlacement(int span, {super.lineName}) : super(span: true, number: span);
 }
 
+/// Represents the `justify-self` CSS property.
+///
+/// This controls how a grid item is positioned along the
+/// inline (row) axis inside its grid area. Use it to override the 
+/// container's `justify-items` for a particular item.
 enum JustifySelf {
   // Basic keywords/values
   auto('auto'),
