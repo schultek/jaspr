@@ -1,3 +1,7 @@
+## Unrelease patch
+
+- Fixed allowing children for `path` tag by removing it from list of self-closing tags.
+
 ## 0.21.6
 
 - Added `checked` and `indeterminate` parameters to `input()`. These will control the state of a checkbox or radio input.

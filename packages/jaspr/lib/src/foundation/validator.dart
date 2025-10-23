@@ -18,7 +18,6 @@ class DomValidator {
     'link',
     'meta',
     'param',
-    'path',
     'source',
     'track',
     'wbr',
