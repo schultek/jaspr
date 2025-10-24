@@ -23,6 +23,3 @@ dependencies:
     sdk: flutter
   jaspr: ^0.21.0
   web: ^1.0.0
-
-dev_dependencies:
-  jaspr_repo: any

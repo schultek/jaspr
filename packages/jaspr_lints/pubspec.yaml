@@ -24,6 +24,3 @@ dependencies:
   custom_lint_builder: ^0.8.1
   path: ^1.9.0
   yaml: ^3.1.2
-
-dev_dependencies:
-  jaspr_repo: any

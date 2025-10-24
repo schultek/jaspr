@@ -24,6 +24,3 @@ dependencies:
   serverpod_client: '>=2.3.0 <3.0.0'
   shelf: ^1.4.0
   web: ^1.0.0
-
-dev_dependencies:
-  jaspr_repo: any
