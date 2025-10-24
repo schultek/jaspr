@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - main
+      - next
     paths:
       - '.github/workflows/test.yml'
       - 'apps/**'
@@ -12,6 +13,7 @@ on:
   push:
     branches:
       - main
+      - next
     paths:
       - '.github/workflows/test.yml'
       - 'apps/**'

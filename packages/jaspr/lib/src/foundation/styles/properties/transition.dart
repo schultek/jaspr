@@ -1,36 +1,61 @@
-import 'unit.dart';
+class Transition {
+  const Transition._(this.value);
 
-abstract class Transition {
-  const factory Transition(String property, {required double duration, Curve? curve, double? delay}) = _Transition;
+  static const inherit = Transition._('inherit');
+  static const initial = Transition._('initial');
+  static const revert = Transition._('revert');
+  static const revertLayer = Transition._('revert-layer');
+  static const unset = Transition._('unset');
+
+  const factory Transition(String property, {required Duration duration, Curve? curve, Duration? delay}) = _Transition;
   const factory Transition.combine(List<Transition> transitions) = _CombineTransition;
 
-  String get value;
+  final String value;
 }
 
-class _Transition implements Transition {
+abstract class _ListableTransition implements Transition {}
+
+class _Transition implements _ListableTransition {
   const _Transition(this.property, {required this.duration, this.curve, this.delay});
 
   final String property;
-  final double duration;
+  final Duration duration;
   final Curve? curve;
-  final double? delay;
+  final Duration? delay;
 
   @override
   String get value => [
     property,
-    '${duration.numstr}ms',
+    '${duration.inMilliseconds}ms',
     if (curve != null) curve!.value,
-    if (delay != null) '${delay!.numstr}ms',
+    if (delay != null) '${delay!.inMilliseconds}ms',
   ].join(' ');
 }
 
-class _CombineTransition implements Transition {
+class _CombineTransition implements _ListableTransition {
   const _CombineTransition(this.transitions);
 
   final List<Transition> transitions;
 
+  bool _transitionsListable() {
+    if (transitions.isEmpty) {
+      throw 'Transition.combine cannot be empty.';
+    }
+
+    for (final transition in transitions) {
+      if (transition is! _ListableTransition) {
+        throw 'Cannot use ${transition.value} as a transition list item, only standalone use supported.';
+      }
+    }
+
+    return true;
+  }
+
   @override
-  String get value => transitions.map((t) => t.value).join(', ');
+  String get value {
+    assert(_transitionsListable());
+    return transitions.map((t) => t.value).join(', ');
+  }
 }
 
 class Curve {

@@ -37,7 +37,7 @@ class EmbeddedCounter extends StatelessComponent {
         radius: BorderRadius.circular(cardBorderRadius.px),
         backgroundColor: surfaceColor,
       ),
-      css('& > div[flt-embedding]').styles(opacity: 0, transition: Transition('opacity', duration: 400)),
+      css('& > div[flt-embedding]').styles(opacity: 0, transition: Transition('opacity', duration: 400.ms)),
       css('&.active > div[flt-embedding]').styles(opacity: 1),
     ]),
   ];

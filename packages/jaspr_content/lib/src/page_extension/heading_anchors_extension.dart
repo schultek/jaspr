@@ -77,7 +77,7 @@ class HeadingAnchorsExtension implements PageExtension {
         textDecoration: TextDecoration.none,
         opacity: 0,
         fontSize: 0.8.em,
-        transition: Transition('opacity', duration: 300),
+        transition: Transition('opacity', duration: 300.ms),
       ),
       css('&:hover > a').styles(opacity: 0.8),
       css('& > a:hover').styles(opacity: 1),

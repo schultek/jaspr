@@ -110,7 +110,7 @@ class DocsLayout extends PageLayoutBase {
             width: 17.rem,
             overflow: Overflow.only(y: Overflow.auto),
             transform: Transform.translate(x: (-100).percent),
-            transition: Transition('transform', duration: 150, curve: Curve.easeInOut),
+            transition: Transition('transform', duration: 150.ms, curve: Curve.easeInOut),
           ),
           css.media(MediaQuery.all(minWidth: 768.px), [css('&').styles(margin: Margin.only(left: (-1.25).rem))]),
           css.media(MediaQuery.all(minWidth: 1024.px), [
