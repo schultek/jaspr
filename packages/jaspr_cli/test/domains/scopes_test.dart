@@ -39,7 +39,11 @@ void main() {
   Future<void> expectScopesResult(Object? data) async {
     await untilCalled(
       () => daemon.send(
-        any(that: predicate<Map>((map) => map['event'] == 'scopes.status' && map['params'][projectPath] == false)),
+        any(
+          that: predicate<Map<String, Object?>>(
+            (map) => map['event'] == 'scopes.status' && (map['params'] as Map<String, Object?>)[projectPath] == false,
+          ),
+        ),
       ),
     );
 

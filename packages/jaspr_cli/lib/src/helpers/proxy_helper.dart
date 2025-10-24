@@ -17,7 +17,7 @@ mixin ProxyHelper on BaseCommand {
     required String serverPort,
     String? flutterPort,
     bool redirectNotFound = false,
-    void Function(dynamic)? onMessage,
+    void Function(Object?)? onMessage,
   }) async {
     var client = http.Client();
     var webdevHandler = proxyHandler(Uri.parse('http://localhost:$webPort'), client: client);
@@ -110,8 +110,8 @@ Handler _sseProxyHandler(http.Client client, String webPort, Logger logger) {
           '\r\n',
         );
 
-      StreamSubscription? serverSseSub;
-      StreamSubscription? reqChannelSub;
+      StreamSubscription<void>? serverSseSub;
+      StreamSubscription<void>? reqChannelSub;
 
       serverSseSub = utf8.decoder
           .bind(serverResponse.stream)

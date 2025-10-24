@@ -33,12 +33,12 @@ Future<void> run(String command, {required Directory dir}) async {
   var firstArg = command.indexOf('-');
   var prefix = command.substring(0, firstArg != -1 ? firstArg : command.length).trim();
 
-  LineSplitter().convert(result.stdout).forEach((line) {
+  LineSplitter().convert(result.stdout as String).forEach((line) {
     print('<$prefix> $line');
   });
 
   if (result.exitCode != 0) {
-    LineSplitter().convert(result.stderr).forEach((line) {
+    LineSplitter().convert(result.stderr as String).forEach((line) {
       print('<$prefix> $line');
     });
   }

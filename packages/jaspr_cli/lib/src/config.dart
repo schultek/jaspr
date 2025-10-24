@@ -73,7 +73,7 @@ class Project {
         if (result) {
           var result = Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
           if (result.exitCode != 0) {
-            log.err(result.stderr);
+            log.err(result.stderr as String?);
             logger.write(
               'Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.',
               tag: Tag.cli,
