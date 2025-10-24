@@ -43,7 +43,7 @@ class LikeButton extends StatelessComponent {
       css('&.active span').styles(color: Colors.red),
       css('span').styles(
         display: Display.inlineBlock,
-        transition: Transition('transform', duration: 300, curve: Curve.ease),
+        transition: Transition('transform', duration: 300.ms, curve: Curve.ease),
       ),
     ]),
   ];

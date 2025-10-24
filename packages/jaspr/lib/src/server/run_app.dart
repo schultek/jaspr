@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:shelf/shelf.dart';
 
@@ -30,7 +31,7 @@ Handler serveApp(AppHandler handler) {
 }
 
 /// A record containing the status code, body, and headers for a response.
-typedef ResponseLike = ({int statusCode, String body, Map<String, List<String>> headers});
+typedef ResponseLike = ({int statusCode, Uint8List body, Map<String, List<String>> headers});
 
 /// Directly renders the provided component to HTML. Returns a [ResponseLike] object.
 ///
