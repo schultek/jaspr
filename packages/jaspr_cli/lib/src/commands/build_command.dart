@@ -214,7 +214,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       serverPid.writeAsStringSync('');
 
       final process = await Process.start(
-        Platform.executable,
+        dartExecutable,
         [
           // Use direct `dart` entry point for now due to
           // https://github.com/dart-lang/sdk/issues/61373.

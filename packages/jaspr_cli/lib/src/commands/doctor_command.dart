@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:mason/mason.dart';
 
+import '../config.dart';
 import '../helpers/analytics.dart';
 import '../version.dart';
 import 'base_command.dart';
@@ -22,11 +23,15 @@ class DoctorCommand extends BaseCommand {
   Future<int> runCommand() async {
     final sections = <DoctorSection>[];
 
+    final localVersion = Platform.version.trim();
+    final globalVersion = dartSdkVersion;
+
     sections.add((
       name: 'Jaspr CLI',
       details: 'Version $jasprCliVersion',
       items: [
-        'Dart Version ${Platform.version} at ${Platform.executable}',
+        'Dart Version $globalVersion at $dartExecutable',
+        if (localVersion != globalVersion) 'CLI installed with $localVersion',
         'Running on ${Platform.operatingSystem} ${Platform.operatingSystemVersion} - Locale ${Platform.localeName}',
         'Analytics: ${analyticsEnabled ? 'Enabled' : 'Disabled'}',
       ],

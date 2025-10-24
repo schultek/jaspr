@@ -291,3 +291,21 @@ class Project {
     }
   }
 }
+
+final dartExecutable = () {
+  return Platform.isWindows
+      // Use 'where.exe' to support powershell as well
+      ? (Process.runSync('where.exe', ['dart.exe']).stdout as String).split(RegExp('(\r\n|\r|\n)')).first.trim()
+      : Process.runSync('which', ['dart']).stdout.toString().trim();
+}();
+
+final dartSdkVersion = () {
+  final result = Process.runSync(dartExecutable, ['--version']);
+  if (result.exitCode != 0) {
+    return 'unknown';
+  }
+  final output = result.stdout.toString().trim();
+  if (output.startsWith('Dart SDK version:')) {
+    return output.substring('Dart SDK version:'.length).trim();
+  }
+}();
