@@ -23,14 +23,14 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addOption(
       'input',
       abbr: 'i',
-      help: 'Specify the input file for the server app',
-      defaultsTo: 'lib/main.dart',
+      help: 'Specify the entry file for the server app',
+      valueHelp: 'Defaults to the value of "jaspr.target" in pubspec.yaml or "lib/main.dart".',
     );
     argParser.addOption(
       'target',
       abbr: 't',
       help: 'Specify the compilation target for the executable (only in server mode)',
-      allowed: ['aot-snapshot', 'exe', 'jit-snapshot'],
+      allowed: ['exe', 'aot-snapshot', 'jit-snapshot'],
       allowedHelp: {
         'exe': 'Compile to a self-contained executable.',
         'aot-snapshot': 'Compile to an AOT snapshot.',
@@ -101,6 +101,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   @override
   String get category => 'Project';
 
+  late final input = argResults!.option('input');
   late final useWasm = argResults!.flag('experimental-wasm');
   late final includeSourceMaps = argResults!.flag('include-source-maps');
   late final sitemapDomain = argResults!.option('sitemap-domain');
@@ -116,10 +117,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     var dir = Directory('build/jaspr').absolute;
     var webDir = project.requireMode == JasprMode.server ? Directory('build/jaspr/web').absolute : dir;
 
-    String? entryPoint;
-    if (project.requireMode != JasprMode.client) {
-      entryPoint = await getEntryPoint(argResults!.option('input'));
-    }
+    final entryPoint = await getServerEntryPoint(input);
 
     if (dir.existsSync()) {
       dir.deleteSync(recursive: true);
@@ -160,8 +158,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (project.requireMode == JasprMode.server) {
       logger.write('Building server app...', progress: ProgressState.running);
 
-      final target = argResults!.option('target')!;
-      final extension = switch (target) {
+      final compileTarget = argResults!.option('target')!;
+      final extension = switch (compileTarget) {
         'exe' when Platform.isWindows => '.exe',
         'aot-snapshot' => '.aot',
         'kernel' => '.dill',
@@ -170,7 +168,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       var process = await Process.start('dart', [
         'compile',
-        target,
+        compileTarget,
         entryPoint!,
         '-o',
         './build/jaspr/app$extension',
@@ -186,11 +184,12 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       List<String> queuedRoutes = [];
 
       var serverStartedCompleter = Completer<void>();
+      final serverPort = project.port ?? '8080';
 
       await startProxy(
         '5567',
         webPort: '0',
-        serverPort: '8080',
+        serverPort: serverPort,
         onMessage: (message) {
           if (message case {'route': String route}) {
             if (!serverStartedCompleter.isCompleted) {
@@ -228,7 +227,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           for (var define in serverDefines.entries) '-D${define.key}=${define.value}',
           entryPoint!,
         ],
-        environment: {'PORT': '8080', 'JASPR_PROXY_PORT': '5567'},
+        environment: {'PORT': serverPort, 'JASPR_PROXY_PORT': '5567'},
         workingDirectory: Directory.current.path,
       );
 
@@ -262,7 +261,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
         http.Response response;
         try {
-          response = await httpClient.get(Uri.parse('http://localhost:8080$route'));
+          response = await httpClient.get(Uri.parse('http://localhost:$serverPort$route'));
         } catch (e) {
           logger.write(
             'Failed to generate route "$route". ($e)',
@@ -423,6 +422,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       '--release',
       '--verbose',
       '--delete-conflicting-outputs',
+      if (input != null) ...[
+        '--define=jaspr_builder:client_registry=jaspr-target=$input',
+        '--define=jaspr_builder:jaspr_options=jaspr-target=$input',
+      ],
       if (managedBuildOptions) ...[
         '--define=$entrypointBuilder=compiler=$compiler',
         '--define=$entrypointBuilder=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',

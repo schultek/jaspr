@@ -134,7 +134,7 @@ class Project {
     var modeYaml = configYaml['mode'];
     if (modeYaml == null) {
       logger.write(
-        '\'jaspr.mode\' option is required but missing in pubspec.yaml.',
+        '\'jaspr.mode\' option in pubspec.yaml is required but missing.',
         tag: Tag.cli,
         level: Level.critical,
       );
@@ -143,7 +143,7 @@ class Project {
     var modeOrNull = JasprMode.values.where((v) => v.name == modeYaml).firstOrNull;
     if (modeOrNull == null) {
       logger.write(
-        '\'jaspr.mode\' must be one of ${JasprMode.values.map((v) => v.name).join(', ')} in pubspec.yaml.',
+        '\'jaspr.mode\' in pubspec.yaml must be one of ${JasprMode.values.map((v) => v.name).join(', ')}.',
         tag: Tag.cli,
         level: Level.critical,
       );
@@ -152,17 +152,57 @@ class Project {
     return modeOrNull;
   }
 
-  String? get devCommand {
+  List<String>? get target {
     var configYaml = _requireJasprOptions;
 
-    var devCommandYaml = configYaml['dev-command'];
-    if (devCommandYaml != null) {
-      if (devCommandYaml is! String) {
-        logger.write('\'jaspr.dev-command\' must be a string in pubspec.yaml.', tag: Tag.cli, level: Level.critical);
-        exit(1);
+    var targetYaml = configYaml['target'];
+    if (targetYaml != null) {
+      final targets = <String>[];
+      switch (targetYaml) {
+        case String s:
+          targets.add(s);
+        case List l:
+          targets.addAll(l.cast<String>());
+        default:
+          logger.write(
+            '\'jaspr.target\' in pubspec.yaml must be a String or List<String>.',
+            tag: Tag.cli,
+            level: Level.critical,
+          );
+          exit(1);
       }
 
-      return devCommandYaml;
+      for (var target in targets) {
+        if (!File(target).existsSync()) {
+          logger.write(
+            'The file "$target" specified by \'jaspr.target\' in pubspec.yaml does not exist.',
+            tag: Tag.cli,
+            level: Level.critical,
+          );
+          exit(1);
+        }
+      }
+
+      return targets;
+    }
+    return null;
+  }
+
+  String? get port {
+    var configYaml = _requireJasprOptions;
+
+    var portYaml = configYaml['port'];
+    if (portYaml != null) {
+      if (portYaml is int) {
+        return portYaml.toString();
+      } else {
+        logger.write(
+          '\'jaspr.port\' in pubspec.yaml must be an integer.',
+          tag: Tag.cli,
+          level: Level.critical,
+        );
+        exit(1);
+      }
     }
     return null;
   }

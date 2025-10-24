@@ -21,4 +21,5 @@ dev_dependencies:
 
 jaspr:
   mode: server
-  dev-command: dart bin/main.dart --apply-migrations
+  target: bin/main.dart
+  port: 8082

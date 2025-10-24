@@ -170,8 +170,11 @@ extension LoadBundle on BuildStep {
     }
   }
 
-  Future<Set<AssetId>> loadTransitiveSources() async {
-    final main = AssetId(inputId.package, 'lib/main.dart');
+  Future<Set<AssetId>> loadTransitiveSources(BuilderOptions options, String? target) async {
+    final targetOption = options.config['jaspr-target'] as String?;
+    final effectiveTarget = targetOption ?? target ?? 'lib/main.dart';
+
+    final main = AssetId(inputId.package, effectiveTarget);
     if (!await canRead(main)) {
       return {};
     }

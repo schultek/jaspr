@@ -8,7 +8,9 @@ import 'client_bundle_builder.dart';
 
 /// Builds the registry for client components.
 class ClientRegistryBuilder implements Builder {
-  ClientRegistryBuilder(BuilderOptions options);
+  ClientRegistryBuilder(this.options);
+
+  final BuilderOptions options;
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
@@ -39,12 +41,23 @@ class ClientRegistryBuilder implements Builder {
     final pubspecYaml = await buildStep.readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
     final jasprConfig = (yaml.loadYaml(pubspecYaml) as Map<Object?, Object?>?)?['jaspr'] as Map<Object?, Object?>?;
     final mode = jasprConfig?['mode'] as String?;
+    final target = jasprConfig?['target'];
 
     if (mode != 'static' && mode != 'server') {
       return null;
     }
 
-    var (clients, sources) = await (buildStep.loadClients(), buildStep.loadTransitiveSources()).wait;
+    var (clients, sources) = await (
+      buildStep.loadClients(),
+      buildStep.loadTransitiveSources(
+        options,
+        target is String
+            ? target
+            : target is List
+            ? target.cast<String>().firstOrNull
+            : null,
+      ),
+    ).wait;
 
     clients = clients.where((c) => sources.contains(c.id)).toList();
 

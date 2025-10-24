@@ -19,7 +19,8 @@ Add the following to the bottom of `pubspec.yaml`:
 ```yaml
 jaspr:
   mode: server
-  dev-command: dart bin/main.dart --apply-migrations
+  target: bin/main.dart
+  port: 8082
 ```
 
 Move everything from `web/static/` up to `web/`:
@@ -177,5 +178,17 @@ class _CounterState extends State<Counter> {
 ---
 
 You are now set to run your server and render your website using Serverpod and Jaspr. 
+
+To start **both** the Jaspr development server and run Serverpod in debug mode, use the following command:
+
+```shell
+jaspr serve
+```
+
+To pass command line arguments to your serverpod server (like `--apply-migrations`) add an additional `--` before the arguments:
+
+```shell
+jaspr serve -- --apply-migrations
+```
 
 Check the [Jaspr Docs](https://docs.jaspr.site) and [Serverpod Docs](https://docs.serverpod.dev/) for more information.
