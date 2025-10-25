@@ -39,6 +39,7 @@ abstract class Styles with StylesMixin<Styles> {
     Cursor? cursor,
     UserSelect? userSelect,
     PointerEvents? pointerEvents,
+    Animation? animation,
     Transition? transition,
     Transform? transform,
     // Flexbox Styles
@@ -79,6 +80,7 @@ abstract class Styles with StylesMixin<Styles> {
     TextShadow? textShadow,
     TextOverflow? textOverflow,
     WhiteSpace? whiteSpace,
+    Quotes? quotes,
     // Background Styles
     Color? backgroundColor,
     ImageStyle? backgroundImage,
@@ -130,6 +132,7 @@ abstract mixin class StylesMixin<T> {
     Cursor? cursor,
     UserSelect? userSelect,
     PointerEvents? pointerEvents,
+    Animation? animation,
     Transition? transition,
     Transform? transform,
     // Flexbox Styles
@@ -170,6 +173,7 @@ abstract mixin class StylesMixin<T> {
     TextShadow? textShadow,
     TextOverflow? textOverflow,
     WhiteSpace? whiteSpace,
+    Quotes? quotes,
     // Background Styles
     Color? backgroundColor,
     ImageStyle? backgroundImage,
@@ -209,6 +213,7 @@ abstract mixin class StylesMixin<T> {
       filter: filter,
       backdropFilter: backdropFilter,
       cursor: cursor,
+      animation: animation,
       transition: transition,
       userSelect: userSelect,
       pointerEvents: pointerEvents,
@@ -227,6 +232,7 @@ abstract mixin class StylesMixin<T> {
       textShadow: textShadow,
       textOverflow: textOverflow,
       whiteSpace: whiteSpace,
+      quotes: quotes,
       backgroundColor: backgroundColor,
       backgroundAttachment: backgroundAttachment,
       backgroundClip: backgroundClip,
@@ -306,6 +312,7 @@ class _Styles extends Styles {
   final Cursor? cursor;
   final UserSelect? userSelect;
   final PointerEvents? pointerEvents;
+  final Animation? animation;
   final Transition? transition;
   final Transform? transform;
   // Flexbox Style
@@ -346,6 +353,7 @@ class _Styles extends Styles {
   final TextShadow? textShadow;
   final TextOverflow? textOverflow;
   final WhiteSpace? whiteSpace;
+  final Quotes? quotes;
   // Background Style
   final Color? backgroundColor;
   final ImageStyle? backgroundImage;
@@ -388,6 +396,7 @@ class _Styles extends Styles {
     this.cursor,
     this.userSelect,
     this.pointerEvents,
+    this.animation,
     this.transition,
     this.transform,
     // Flexbox Styles
@@ -428,6 +437,7 @@ class _Styles extends Styles {
     this.textShadow,
     this.textOverflow,
     this.whiteSpace,
+    this.quotes,
     // Background Styles
     this.backgroundColor,
     this.backgroundImage,
@@ -474,6 +484,7 @@ class _Styles extends Styles {
     'user-select': ?userSelect?.value,
     '-webkit-user-select': ?userSelect?.value,
     'pointer-events': ?pointerEvents?.value,
+    'animation': ?animation?.value,
     'transition': ?transition?.value,
     'transform': ?transform?.value,
     // Flexbox Styles
@@ -514,6 +525,7 @@ class _Styles extends Styles {
     'text-shadow': ?textShadow?.value,
     'text-overflow': ?textOverflow?.value,
     'white-space': ?whiteSpace?.value,
+    'quotes': ?quotes?.value,
     // Background Styles
     'background-color': ?backgroundColor?.value,
     'background-image': ?backgroundImage?.value,

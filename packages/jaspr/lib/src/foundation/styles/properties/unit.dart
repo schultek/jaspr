@@ -179,6 +179,7 @@ class _VhUnit extends _Unit {
 
 extension NumberString on double {
   String get numstr {
+    if (isInfinite) return toString().toLowerCase();
     return roundToDouble() == this ? round().toString() : toString();
   }
 }
