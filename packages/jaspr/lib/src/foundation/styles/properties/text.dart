@@ -314,13 +314,23 @@ class _TextDecoration implements TextDecoration {
         'At least one of line, style or color must not be null. For no text decoration, use TextDecoration.none',
       );
 
+  bool _attributesNotEntirelyNull() {
+    if (line == null && style == null && color == null && thickness == null) {
+      throw '[TextDecoration] cannot have all attributes null.';
+    }
+    return true;
+  }
+
   @override
-  String get value => [
-    if (line != null) line!.value,
-    if (style != null) style!.value,
-    if (color != null) color!.value,
-    if (thickness != null) thickness!.value,
-  ].join(' ');
+  String get value {
+    assert(_attributesNotEntirelyNull());
+    return [
+      if (line != null) line!.value,
+      if (style != null) style!.value,
+      if (color != null) color!.value,
+      if (thickness != null) thickness!.value,
+    ].join(' ');
+  }
 }
 
 class TextShadow {
