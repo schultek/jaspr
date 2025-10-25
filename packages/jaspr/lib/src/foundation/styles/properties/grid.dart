@@ -31,7 +31,7 @@ class GridTracks {
 }
 
 class _GridTracks implements GridTracks {
-  const _GridTracks(this.tracks);
+  const _GridTracks(this.tracks) : assert(tracks.length > 0, 'GridTracks cannot be empty');
 
   final List<GridTrack> tracks;
 
@@ -50,7 +50,7 @@ class _GridTracks implements GridTracks {
 }
 
 class GridAreas {
-  const GridAreas(this.lines);
+  const GridAreas(this.lines) : assert(lines.length > 0, 'GridAreas cannot be empty');
 
   final List<String> lines;
 
