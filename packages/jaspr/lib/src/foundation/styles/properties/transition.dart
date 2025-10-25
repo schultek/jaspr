@@ -1,3 +1,5 @@
+import 'unit.dart' show NumberString;
+
 class Transition {
   const Transition._(this.value);
 
