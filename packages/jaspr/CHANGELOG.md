@@ -1,5 +1,8 @@
 ## Unreleased breaking
 
+- **Breaking**: Renamed `Curve.linear` to `Curve.linear_` and added `Curve.linear()` function.
+- Added `Animation`, `Quotes` CSS properties.
+
 - **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
 - **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
 
@@ -7,9 +10,6 @@
 - Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`.
 - Added `none`, `initial`, `revert`, `revertLayer` and `unset` to `TextShadow` and `BoxShadow`.
 - Allow nesting non-empty `Filter.list` inside each other.
-- Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`.
-- Added `Animation`, `Quotes` CSS properties.
-- **Breaking**: Renamed `Curve.linear` to `Curve.linear_` and added `Curve.linear()` function.
 
 - **Breaking**: `ResponseLike.body` (returned from `renderComponent()`) is now a `Uint8List` instead of `String`.
 - Allow binary responses in `AppContext.setStatusCode`.
@@ -631,16 +631,7 @@
     jaspr_web_compilers: ^4.0.4
   ```
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   For an example see [`examples/flutter_plugin_interop`](https://github.com/schultek/Jaspr/tree/main/examples/flutter_plugin_interop)
-=======
-
-  For an example see `examples/flutter_plugin_interop`](<https://github.com/schultek/Jaspr/tree/main/examples/flutter_plugin_interop>).
->>>>>>> aad3872a (Update CHANGELOG.md)
-=======
-  For an example see `examples/flutter_plugin_interop`](<https://github.com/schultek/Jaspr/tree/main/examples/flutter_plugin_interop>).
->>>>>>> refs/remotes/origin/lav/css
 
 - Improved **flutter element embedding**.
 
@@ -650,16 +641,7 @@
   This removes the need for any kind of interop between apps as they can directly communicate
   through the usual primitives of passing properties and callbacks.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   For an example see [`examples/flutter_embedding`](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding)
-=======
-
-  For an example see `examples/flutter_embedding`](<https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding>).
->>>>>>> aad3872a (Update CHANGELOG.md)
-=======
-  For an example see `examples/flutter_embedding`](<https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding>).
->>>>>>> refs/remotes/origin/lav/css
 
 - `jaspr build` now outputs to `/build/jaspr` instead of `/build`.
 
