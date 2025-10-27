@@ -14,26 +14,39 @@ import 'view_constraints.dart';
 
 Map<int, flt.Widget> _viewWidgets = {};
 
-Future<FlutterApp> _flutterApp = Future(() {
-  final completer = Completer<FlutterApp>();
+@JS('_flutter_app')
+external FlutterApp _flutterAppJS;
 
-  flutter!.loader!.didCreateEngineInitializer = (EngineInitializer engineInitializer) {
-    return Future(() async {
-      var engine = await engineInitializer
-          .initializeEngine(InitializeEngineOptions(multiViewEnabled: true, renderer: 'canvaskit'))
-          .toDart;
-      var app = await engine.runApp().toDart;
-      completer.complete(app);
-    }).toJS;
-  }.toJS;
+Future<FlutterApp> _flutterApp = Future(() async {
+  // final completer = Completer<FlutterApp>();
+
+  // flutter!.loader!.didCreateEngineInitializer = (EngineInitializer engineInitializer) {
+  //   return Future(() async {
+  //     var engine = await engineInitializer
+  //         .initializeEngine(InitializeEngineOptions(multiViewEnabled: true, renderer: 'skwasm'))
+  //         .toDart;
+  //     var app = await engine.runApp().toDart;
+  //     completer.complete(app);
+  //   }).toJS;
+  // }.toJS;
+
+  // return completer.future;
+
+  final completer = Completer();
 
   ui_web.bootstrapEngine(
     runApp: () {
       flt.runWidget(MultiViewApp(viewBuilder: (viewId) => _viewWidgets[viewId]));
+      completer.complete();
     },
   );
 
-  return completer.future;
+  await completer.future;
+  await Future(() {}); // Allow js script to set window._flutter_app
+
+  flt.runWidget(MultiViewApp(viewBuilder: (viewId) => _viewWidgets[viewId]));
+  
+  return _flutterAppJS;
 });
 
 Future<void> preloadEngine() => _flutterApp;

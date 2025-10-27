@@ -185,11 +185,11 @@ abstract class BaseCommand extends Command<int> {
     var package = '${project.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
     var version = project.pubspecYaml?['dev_dependencies']?[package];
     if (version is! String || !version.startsWith(RegExp(r'\^?4.1.'))) {
-      usageException('Using "--experimental-wasm" requires $package 4.1.0 or newer.');
+      //usageException('Using "--experimental-wasm" requires $package 4.1.0 or newer.');
     }
 
     if (project.usesFlutter) {
-      usageException('Using "--experimental-wasm" is not supported together with flutter embedding.');
+      //usageException('Using "--experimental-wasm" is not supported together with flutter embedding.');
     }
   }
 }

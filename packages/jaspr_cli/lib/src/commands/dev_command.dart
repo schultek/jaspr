@@ -290,6 +290,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     var dartdevcDefines = dartDefines.entries.map((e) => ',"${e.key}":"${e.value}"').join();
     var dart2jsDefines = dartDefines.entries.map((e) => ',"-D${e.key}=${e.value}"').join();
 
+    final extraCompilerArgs = compiler == 'dart2wasm'
+        ? ',"-E--import-shared-memory","-E--shared-memory-max-pages=32768"'//,"-E--enable-deferred-loading","-O0"'
+        : '';
+
     final buildArgs = [
       if (release) '--release',
       if (managedBuildOptions) ...[
@@ -299,7 +303,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--define=$package:entrypoint=compiler=$compiler',
         if (compiler == 'dartdevc') '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug$dartdevcDefines}',
         if (compiler != 'dartdevc')
-          '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"$dart2jsDefines${!release ? ',"--enable-asserts"' : ''}]',
+          '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"$dart2jsDefines${!release ? ',"--enable-asserts"' : ''}$extraCompilerArgs]',
       ],
     ];
 

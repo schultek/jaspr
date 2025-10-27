@@ -36,7 +36,10 @@ mixin ProxyHelper on BaseCommand {
       var body = req.read().asBroadcastStream();
 
       if (flutterHandler != null && req.url.path == 'flutter_bootstrap.js') {
-        return await flutterHandler(req.change(body: body));
+        final res = await flutterHandler(req.change(body: body));
+
+        var body2 = await res.readAsString();
+        return res.change(body: body2.replaceFirst('loadDynamicModule', 'loadDeferredWasm:async(d)=>fetch(c(s.replace(\'.wasm\',\'_\'+d+\'.wasm\'))),loadDynamicModule'));
       }
 
       // First try to load the resource from the webdev process.

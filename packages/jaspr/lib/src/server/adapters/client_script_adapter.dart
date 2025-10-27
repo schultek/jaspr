@@ -14,6 +14,7 @@ class ClientScriptAdapter extends HeadScopeAdapter {
     if (clientTargets.isEmpty) {
       return false;
     }
+    return false;
 
     final base = head.children.findWhere<MarkupRenderElement>((c) => c.tag == 'base');
 

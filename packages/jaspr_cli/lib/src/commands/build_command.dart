@@ -408,9 +408,14 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       dartDefines.addAll(getFlutterDartDefines(useWasm, true));
     }
 
+    final extraCompilerArgs = useWasm
+        ? ['-E--import-shared-memory', '-E--shared-memory-max-pages=32768', '-E--enable-deferred-loading']
+        : [];
+
     final args = [
       '-Djaspr.flags.release=true',
       '-O${argResults!['optimize']}',
+      ...extraCompilerArgs,
       if (useWasm) //
         ...argResults!['extra-wasm-compiler-option']
       else
