@@ -4,6 +4,11 @@ analyzer:
   exclude:
     - tool/scaffold/**
     - tool/templates/**
+  language:
+    # TODO: Enable and fix remaining strict-casts diagnostics.
+    # strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
   
 linter:
   rules:
