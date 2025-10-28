@@ -3,7 +3,8 @@ import 'package:build_test/build_test.dart';
 import 'package:jaspr_builder/src/options/jaspr_options_builder.dart';
 import 'package:test/test.dart';
 
-import 'sources/options.dart';
+import 'sources/alternate_target_options.dart';
+import 'sources/default_options.dart';
 
 void main() {
   group('jaspr options builder', () {
@@ -19,6 +20,15 @@ void main() {
         JasprOptionsBuilder(BuilderOptions({})),
         optionsSources,
         outputs: optionsOutputs,
+        readerWriter: reader,
+      );
+    });
+
+     test('generates options with alternate target', () async {
+      await testBuilder(
+        JasprOptionsBuilder(BuilderOptions({})),
+        alternateTargetOptionsSources,
+        outputs: alternateTargetOptionsOutputs,
         readerWriter: reader,
       );
     });

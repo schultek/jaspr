@@ -1,5 +1,7 @@
-import 'dart:io';
+import 'dart:io' as io;
 
+import 'package:file/file.dart';
+import 'package:file/local.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 
@@ -8,9 +10,13 @@ import 'logging.dart';
 enum JasprMode { static, server, client }
 
 class Project {
-  Project(this.logger);
+  Project(this.logger, {FileSystem? fs, Never Function(int)? exitFn})
+    : _fs = fs ?? const LocalFileSystem(),
+      _exitFn = exitFn ?? io.exit;
 
   final Logger logger;
+  final FileSystem _fs;
+  final Never Function(int) _exitFn;
 
   YamlMap? get pubspecYaml => _pubspecYaml;
   YamlMap get requirePubspecYaml {
@@ -21,14 +27,14 @@ class Project {
         tag: Tag.cli,
         level: Level.critical,
       );
-      exit(1);
+      _exitFn(1);
     }
     return pubspecYaml;
   }
 
   late final YamlMap? _pubspecYaml = () {
     var pubspecPath = 'pubspec.yaml';
-    var pubspecFile = File(pubspecPath).absolute;
+    var pubspecFile = _fs.file(pubspecPath).absolute;
     if (!pubspecFile.existsSync()) {
       return null;
     }
@@ -37,7 +43,7 @@ class Project {
       return loadYaml(pubspecFile.readAsStringSync()) as YamlMap;
     } catch (e) {
       logger.write('Could not parse pubspec.yaml file: $e', tag: Tag.cli, level: Level.critical);
-      exit(1);
+      _exitFn(1);
     }
   }();
 
@@ -50,7 +56,7 @@ class Project {
         tag: Tag.cli,
         level: Level.critical,
       );
-      exit(1);
+      _exitFn(1);
     }
   }
 
@@ -71,7 +77,7 @@ class Project {
           defaultValue: true,
         );
         if (result) {
-          var result = Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
+          var result = io.Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
           if (result.exitCode != 0) {
             log.err(result.stderr as String?);
             logger.write(
@@ -79,7 +85,7 @@ class Project {
               tag: Tag.cli,
               level: Level.critical,
             );
-            exit(1);
+            _exitFn(1);
           }
 
           log.success('Successfully added jaspr_builder to your dev_dependencies.');
@@ -106,11 +112,11 @@ class Project {
     var configYaml = requirePubspecYaml['jaspr'];
     if (configYaml == null) {
       logger.write('Missing \'jaspr\' options in pubspec.yaml.', tag: Tag.cli, level: Level.critical);
-      exit(1);
+      _exitFn(1);
     }
     if (configYaml is! YamlMap) {
       logger.write('\'jaspr\' options must be a yaml map in pubspec.yaml.', tag: Tag.cli, level: Level.critical);
-      exit(1);
+      _exitFn(1);
     }
     return configYaml;
   }
@@ -138,7 +144,7 @@ class Project {
         tag: Tag.cli,
         level: Level.critical,
       );
-      exit(1);
+      _exitFn(1);
     }
     var modeOrNull = JasprMode.values.where((v) => v.name == modeYaml).firstOrNull;
     if (modeOrNull == null) {
@@ -147,7 +153,7 @@ class Project {
         tag: Tag.cli,
         level: Level.critical,
       );
-      exit(1);
+      _exitFn(1);
     }
     return modeOrNull;
   }
@@ -169,17 +175,17 @@ class Project {
             tag: Tag.cli,
             level: Level.critical,
           );
-          exit(1);
+          _exitFn(1);
       }
 
       for (var target in targets) {
-        if (!File(target).existsSync()) {
+        if (!_fs.file(target).existsSync()) {
           logger.write(
             'The file "$target" specified by \'jaspr.target\' in pubspec.yaml does not exist.',
             tag: Tag.cli,
             level: Level.critical,
           );
-          exit(1);
+          _exitFn(1);
         }
       }
 
@@ -201,7 +207,7 @@ class Project {
           tag: Tag.cli,
           level: Level.critical,
         );
-        exit(1);
+        _exitFn(1);
       }
     }
     return null;
@@ -209,8 +215,8 @@ class Project {
 
   late final YamlMap? pubspecLock = () {
     var pubspecLockPath = 'pubspec.lock';
-    var pubspecLockFile = File(pubspecLockPath).absolute;
-
+    var pubspecLockFile = _fs.file(pubspecLockPath).absolute;
+    
     if (!pubspecLockFile.existsSync() && pubspecYaml?['resolution'] == 'workspace') {
       var n = 1;
       while (n < 5) {
@@ -218,7 +224,7 @@ class Project {
         if (parent == pubspecLockFile.path) {
           break;
         }
-        pubspecLockFile = File(path.join(parent, 'pubspec.lock'));
+        pubspecLockFile = _fs.file(path.join(parent, 'pubspec.lock'));
         if (pubspecLockFile.existsSync()) {
           break;
         }
@@ -231,7 +237,7 @@ class Project {
         return loadYaml(pubspecLockFile.readAsStringSync()) as YamlMap;
       } catch (e) {
         logger.write('Could not parse pubspec.lock file: $e', tag: Tag.cli, level: Level.critical);
-        exit(1);
+        _exitFn(1);
       }
     }
     return null;
