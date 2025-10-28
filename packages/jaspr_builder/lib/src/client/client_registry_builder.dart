@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:build/build.dart';
-import 'package:yaml/yaml.dart' as yaml;
 
 import '../utils.dart';
 import 'client_bundle_builder.dart';
@@ -38,10 +37,7 @@ class ClientRegistryBuilder implements Builder {
   };
 
   Future<String?> generateClients(BuildStep buildStep) async {
-    final pubspecYaml = await buildStep.readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
-    final jasprConfig = (yaml.loadYaml(pubspecYaml) as Map<Object?, Object?>?)?['jaspr'] as Map<Object?, Object?>?;
-    final mode = jasprConfig?['mode'] as String?;
-    final target = jasprConfig?['target'];
+    final (:mode, :target) = await buildStep.loadProjectConfig(options);
 
     if (mode != 'static' && mode != 'server') {
       return null;
@@ -49,14 +45,7 @@ class ClientRegistryBuilder implements Builder {
 
     var (clients, sources) = await (
       buildStep.loadClients(),
-      buildStep.loadTransitiveSources(
-        options,
-        target is String
-            ? target
-            : target is List
-            ? target.cast<String>().firstOrNull
-            : null,
-      ),
+      buildStep.loadTransitiveSources(target),
     ).wait;
 
     clients = clients.where((c) => sources.contains(c.id)).toList();

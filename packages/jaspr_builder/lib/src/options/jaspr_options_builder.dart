@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 
-import 'package:yaml/yaml.dart' as yaml;
-
 import '../client/client_bundle_builder.dart';
 import '../client/client_module_builder.dart';
 import '../styles/styles_bundle_builder.dart';
@@ -43,10 +41,7 @@ class JasprOptionsBuilder implements Builder {
       "// Generated with jaspr_builder\n";
 
   Future<void> generateOptionsOutput(BuildStep buildStep) async {
-    final pubspecYaml = await buildStep.readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
-    final jasprConfig = (yaml.loadYaml(pubspecYaml) as Map<Object?, Object?>?)?['jaspr'] as Map<Object?, Object?>?;
-    final mode = jasprConfig?['mode'] as String?;
-    final target = jasprConfig?['target'];
+    final (:mode, :target) = await buildStep.loadProjectConfig(options);
 
     if (mode != 'static' && mode != 'server') {
       return;
@@ -55,14 +50,7 @@ class JasprOptionsBuilder implements Builder {
     var (clients, styles, sources) = await (
       buildStep.loadClients(),
       buildStep.loadStyles(),
-      buildStep.loadTransitiveSources(
-        options,
-        target is String
-            ? target
-            : target is List
-            ? target.cast<String>().firstOrNull
-            : null,
-      ),
+      buildStep.loadTransitiveSources(target),
     ).wait;
 
     final package = buildStep.inputId.package;
