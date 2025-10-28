@@ -24,8 +24,3 @@ void main() async {
   var versionsFile = File('lib/src/version.dart');
   await versionsFile.writeAsString(output.toString());
 }
-
-String toCamelCase(String s) {
-  var c = s.split('_');
-  return [c.first, ...c.skip(1).map((c) => c[0].toUpperCase() + c.substring(1))].join();
-}
