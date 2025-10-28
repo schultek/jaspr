@@ -7,14 +7,14 @@ class Animation {
   static const none = Animation._('none');
 
   const factory Animation({
-    required double duration,
+    required Duration duration,
     Curve? easeFunc,
-    double? delay,
-    double? iterCount,
+    Duration? delay,
+    double? count,
     AnimationDirection? direction,
     AnimationFillMode? fillMode,
     AnimationPlayState? playState,
-    String? keyframe,
+    String? name,
   }) = _Animation;
   const factory Animation.list(List<Animation> animations) = _AnimationList;
 
@@ -27,35 +27,32 @@ class _Animation implements Animation {
     required this.duration,
     this.easeFunc,
     this.delay,
-    this.iterCount,
+    this.count,
     this.direction,
     this.fillMode,
     this.playState,
-    this.keyframe,
+    this.name,
   });
 
-  /// Duration in milliseconds.
-  final double duration;
+  final Duration duration;
   final Curve? easeFunc;
-
-  /// Delay in milliseconds.
-  final double? delay;
-  final double? iterCount;
+  final Duration? delay;
+  final double? count;
   final AnimationDirection? direction;
   final AnimationFillMode? fillMode;
   final AnimationPlayState? playState;
-  final String? keyframe;
+  final String? name;
 
   @override
   String get value {
-    var val = '${duration.numstr}ms';
+    var val = '${duration.inMilliseconds}ms';
     if (easeFunc != null) val += ' ${easeFunc!.value}';
-    if (delay != null) val += ' ${delay!.numstr}ms';
-    if (iterCount != null) val += ' ${iterCount!.numstr}';
+    if (delay != null) val += ' ${delay!.inMilliseconds}ms';
+    if (count != null) val += ' ${count!.numstr}';
     if (direction != null) val += ' ${direction!.value}';
     if (fillMode != null) val += ' ${fillMode!.value}';
     if (playState != null) val += ' ${playState!.value}';
-    if (keyframe != null) val += ' $keyframe';
+    if (name != null) val += ' $name';
 
     return val;
   }

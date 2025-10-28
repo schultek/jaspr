@@ -15,14 +15,14 @@ void main() {
       test('basic', () {
         const styles = Styles(
           animation: Animation(
-            duration: 500.0,
+            duration: Duration(milliseconds: 500),
             easeFunc: Curve.linearFn([Linear(0.2, 30.0, 60.0), Linear(0.3, 40.0, 80.5)]),
-            delay: 100.0,
-            iterCount: double.infinity,
+            delay: Duration(milliseconds: 100),
+            count: double.infinity,
             direction: AnimationDirection.normal,
             fillMode: AnimationFillMode.forwards,
             playState: AnimationPlayState.running,
-            keyframe: 'slide',
+            name: 'slide',
           ),
         );
         expect(
@@ -36,8 +36,8 @@ void main() {
       group('combine', () {
         test('basic', () {
           const animations = Animation.list([
-            Animation(duration: 100.0, keyframe: 'slide'),
-            Animation(duration: 200.0, keyframe: 'rotate'),
+            Animation(duration: Duration(milliseconds: 100), name: 'slide'),
+            Animation(duration: Duration(milliseconds: 200), name: 'rotate'),
           ]);
           expect(animations.value, equals('100ms slide, 200ms rotate'));
         });
