@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 
-import 'package:yaml/yaml.dart' as yaml;
-
 import '../client/client_bundle_builder.dart';
 import '../client/client_module_builder.dart';
 import '../styles/styles_bundle_builder.dart';
@@ -13,7 +11,9 @@ import '../utils.dart';
 
 /// Builds part files and web entrypoints for components annotated with @app
 class JasprOptionsBuilder implements Builder {
-  JasprOptionsBuilder(BuilderOptions options);
+  JasprOptionsBuilder(this.options);
+
+  final BuilderOptions options;
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
@@ -41,9 +41,7 @@ class JasprOptionsBuilder implements Builder {
       "// Generated with jaspr_builder\n";
 
   Future<void> generateOptionsOutput(BuildStep buildStep) async {
-    final pubspecYaml = await buildStep.readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
-    final jasprConfig = (yaml.loadYaml(pubspecYaml) as Map<Object?, Object?>?)?['jaspr'] as Map<Object?, Object?>?;
-    final mode = jasprConfig?['mode'] as String?;
+    final (:mode, :target) = await buildStep.loadProjectConfig(options);
 
     if (mode != 'static' && mode != 'server') {
       return;
@@ -52,20 +50,25 @@ class JasprOptionsBuilder implements Builder {
     var (clients, styles, sources) = await (
       buildStep.loadClients(),
       buildStep.loadStyles(),
-      buildStep.loadTransitiveSources(),
+      buildStep.loadTransitiveSources(target),
     ).wait;
 
     final package = buildStep.inputId.package;
 
     if (sources.isNotEmpty) {
       clients = clients.where((c) => sources.contains(c.id)).toList();
-      styles = styles
-          .map(
-            (s) => sources.contains(s.id)
-                ? s
-                : StylesModule(id: s.id, elements: s.elements.where((e) => !e.contains('.')).toList()),
-          )
-          .toList();
+      styles = styles.map((s) {
+        if (sources.contains(s.id)) {
+          // For imported libraries include all styles.
+          return s;
+        } else if (s.id.package == buildStep.inputId.package) {
+          // For unimported libraries from the same package, include only global styles.
+          return StylesModule(id: s.id, elements: s.elements.where((e) => !e.contains('.')).toList());
+        } else {
+          // For unimported libraries from other packages, exclude all styles.
+          return StylesModule(id: s.id, elements: []);
+        }
+      }).toList();
     }
 
     clients.sortByCompare((c) => '${c.import}/${c.name}', ImportsWriter.compareImports);
@@ -125,9 +128,10 @@ class JasprOptionsBuilder implements Builder {
   }
 
   String buildStylesEntries(List<StylesModule> styles) {
-    if (styles.isEmpty) return '';
+    final filteredStyles = styles.where((s) => s.elements.isNotEmpty).toList();
+    if (filteredStyles.isEmpty) return '';
 
-    return 'styles: () => [${styles.map((s) {
+    return 'styles: () => [${filteredStyles.map((s) {
       return s.elements.map((e) => '...[[${s.id.toImportUrl()}]].$e,').join('\n');
     }).join('\n')}],';
   }

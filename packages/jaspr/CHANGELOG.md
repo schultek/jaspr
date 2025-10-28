@@ -1,5 +1,20 @@
 ## Unreleased breaking
 
+- **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`. Use `jaspr.target` instead.
+
+- Added support for `jaspr.target` option in `pubspec.yaml` to specify the default entrypoint(s) of your Jaspr application.
+
+  This can either be a single file (e.g. `bin/main.dart`) or a list of files (e.g. `["lib/main.dart","lib/other.dart"]`).
+  When multiple files are specified, the desired entrypoint can be selected using the `--input` flag when running `jaspr serve` or `jaspr build`, or the file will be used if the `--input` flag is not set. 
+  
+  If neither is set, the default entrypoint stays `lib/main.dart`.
+
+- Added support for `jaspr.port` option in `pubspec.yaml` to specify the default port used by `jaspr serve`. 
+
+  This can still be overridden using the `--port` flag. If neither is set, the default port stays `8080`.
+
+- Global `@css` styles from other packages will no longer be included automatically. To include them, import the file where they are defined.
+
 - **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
 - **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
 

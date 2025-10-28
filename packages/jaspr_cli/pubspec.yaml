@@ -49,6 +49,7 @@ dependencies:
   watcher: ^1.1.2
   html: ^0.15.6
   mocktail: ^1.0.4
+  file: ^7.0.1
 
 dev_dependencies:
   test: ^1.22.0

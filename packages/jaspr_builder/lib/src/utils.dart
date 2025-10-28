@@ -9,6 +9,7 @@ import 'package:dart_style/dart_style.dart';
 import 'package:jaspr/jaspr.dart'
     show ClientAnnotation, CssUtility, Import, Component, Key, StyleRule, SyncAnnotation, State;
 import 'package:source_gen/source_gen.dart';
+import 'package:yaml/yaml.dart' as yaml;
 
 const String generationHeader =
     "// dart format off\n"
@@ -170,8 +171,8 @@ extension LoadBundle on BuildStep {
     }
   }
 
-  Future<Set<AssetId>> loadTransitiveSources() async {
-    final main = AssetId(inputId.package, 'lib/main.dart');
+  Future<Set<AssetId>> loadTransitiveSources(String target) async {
+    final main = AssetId(inputId.package, target);
     if (!await canRead(main)) {
       return {};
     }
@@ -183,5 +184,22 @@ extension LoadBundle on BuildStep {
         return [];
       }
     }).toSet();
+  }
+
+  Future<({String? mode, String target})> loadProjectConfig(BuilderOptions options) async {
+    final pubspecYaml = await readAsString(AssetId(inputId.package, 'pubspec.yaml'));
+    final jasprConfig = (yaml.loadYaml(pubspecYaml) as Map<Object?, Object?>?)?['jaspr'] as Map<Object?, Object?>?;
+    final mode = jasprConfig?['mode'] as String?;
+    final target = jasprConfig?['target'];
+
+    final firstTarget = switch (target) {
+      String t => t,
+      List<Object?> l => l.cast<String>().firstOrNull,
+      _ => null,
+    };
+    final targetOption = options.config['jaspr-target'] as String?;
+    final effectiveTarget = targetOption ?? firstTarget ?? 'lib/main.dart';
+
+    return (mode: mode, target: effectiveTarget);
   }
 }
