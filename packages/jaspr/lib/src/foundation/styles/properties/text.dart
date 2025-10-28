@@ -452,7 +452,9 @@ class _Quotes implements Quotes {
   @override
   String get value {
     var quotes = '"${primary.$1}" "${primary.$2}"';
-    quotes += secondary != null ? ' "${secondary!.$1}" "${secondary!.$2}"' : '';
+    if (secondary case final secondary?) {
+      quotes += ' "${secondary.$1}" "${secondary.$2}"';
+    }
     return quotes;
   }
 }
