@@ -995,10 +995,10 @@ packages:
     dependency: transitive
     description:
       name: image_picker_platform_interface
-      sha256: "9f143b0dba3e459553209e20cc425c9801af48e6dfa4f01a0fcf927be3f41665"
+      sha256: "567e056716333a1647c64bb6bd873cff7622233a5c3f694be28a583d4715690c"
       url: "https://pub.dev"
     source: hosted
-    version: "2.11.0"
+    version: "2.11.1"
   image_picker_windows:
     dependency: transitive
     description:
@@ -1192,14 +1192,13 @@ packages:
     source: hosted
     version: "1.0.4"
   mustache_template:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "."
-      ref: "119cd0799e9c7b55397521ace7ca73787a32ef8d"
-      resolved-ref: "119cd0799e9c7b55397521ace7ca73787a32ef8d"
-      url: "https://github.com/Rodsevich/mustache"
-    source: git
-    version: "2.0.1"
+      name: mustache_template
+      sha256: daa42be75f2ccfb287c24a75e7ac594f2ea0b32bf9ebe7c15154aa45b2dfb2de
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   nanoid2:
     dependency: transitive
     description:
@@ -1356,10 +1355,10 @@ packages:
     dependency: transitive
     description:
       name: postgres
-      sha256: "96d7f40e079b96cdbfed13d71c64668cfd79c35bc17223c6b3ac0ca63bff72f0"
+      sha256: fefbbfe749c6130e5096588b9c4459173684c695952cd7636ab19be76f255469
       url: "https://pub.dev"
     source: hosted
-    version: "3.5.8"
+    version: "3.5.9"
   process:
     dependency: transitive
     description:
