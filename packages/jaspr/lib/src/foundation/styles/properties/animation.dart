@@ -9,7 +9,7 @@ class Animation {
   const factory Animation({
     required String name,
     required Duration duration,
-    Curve? easeFunc,
+    Curve? curve,
     Duration? delay,
     double? count,
     AnimationDirection? direction,
@@ -26,7 +26,7 @@ class _Animation implements Animation {
   const _Animation({
     required this.name,
     required this.duration,
-    this.easeFunc,
+    this.curve,
     this.delay,
     this.count,
     this.direction,
@@ -36,7 +36,7 @@ class _Animation implements Animation {
 
   final String name;
   final Duration duration;
-  final Curve? easeFunc;
+  final Curve? curve;
   final Duration? delay;
   final double? count;
   final AnimationDirection? direction;
@@ -46,7 +46,7 @@ class _Animation implements Animation {
   @override
   String get value {
     var val = '$name ${duration.inMilliseconds}ms';
-    if (easeFunc != null) val += ' ${easeFunc!.value}';
+    if (curve != null) val += ' ${curve!.value}';
     if (delay != null) val += ' ${delay!.inMilliseconds}ms';
     if (count != null) val += ' ${count!.numstr}';
     if (direction != null) val += ' ${direction!.value}';

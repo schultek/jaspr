@@ -16,7 +16,7 @@ void main() {
         const styles = Styles(
           animation: Animation(
             duration: Duration(milliseconds: 500),
-            easeFunc: Curve.linearFn([Linear(0.2, 30.0, 60.0), Linear(0.3, 40.0, 80.5)]),
+            curve: Curve.linearFn([Linear(0.2, 30.0, 60.0), Linear(0.3, 40.0, 80.5)]),
             delay: Duration(milliseconds: 100),
             count: double.infinity,
             direction: AnimationDirection.normal,
