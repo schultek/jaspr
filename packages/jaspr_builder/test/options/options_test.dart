@@ -24,7 +24,7 @@ void main() {
       );
     });
 
-     test('generates options with alternate target', () async {
+    test('generates options with alternate target', () async {
       await testBuilder(
         JasprOptionsBuilder(BuilderOptions({})),
         alternateTargetOptionsSources,

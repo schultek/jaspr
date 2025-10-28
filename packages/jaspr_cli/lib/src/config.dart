@@ -216,7 +216,7 @@ class Project {
   late final YamlMap? pubspecLock = () {
     var pubspecLockPath = 'pubspec.lock';
     var pubspecLockFile = _fs.file(pubspecLockPath).absolute;
-    
+
     if (!pubspecLockFile.existsSync() && pubspecYaml?['resolution'] == 'workspace') {
       var n = 1;
       while (n < 5) {
