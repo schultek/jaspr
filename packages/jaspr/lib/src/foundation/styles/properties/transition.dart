@@ -69,17 +69,17 @@ class Curve {
   static const Curve easeIn = Curve._('ease-in');
   static const Curve easeOut = Curve._('ease-out');
   static const Curve easeInOut = Curve._('ease-in-out');
-  static const Curve linear_ = Curve._('linear');
+  static const Curve linear = Curve._('linear');
   static const Curve stepStart = Curve._('step-start');
   static const Curve stepEnd = Curve._('step-end');
 
-  const factory Curve.linear(List<Linear> vals) = _LinearCurve;
+  const factory Curve.linearFn(List<Linear> vals) = _LinearFnCurve;
   const factory Curve.cubicBezier(double p1, double p2, double p3, double p4) = _CubicBezierCurve;
   const factory Curve.steps(int steps, {required StepJump jump}) = _StepsCurve;
 }
 
-class _LinearCurve implements Curve {
-  const _LinearCurve(this.vals);
+class _LinearFnCurve implements Curve {
+  const _LinearFnCurve(this.vals);
 
   final List<Linear> vals;
 
