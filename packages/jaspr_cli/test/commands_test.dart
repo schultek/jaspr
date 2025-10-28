@@ -34,13 +34,13 @@ void main() {
         var serveResult = runner.run('serve -v', dir: dirs.app, checkExitCode: false);
 
         // Wait until server is started.
-        await Future.delayed(Duration(seconds: 10));
+        await Future<void>.delayed(Duration(seconds: 10));
         while (true) {
           try {
             await http.head(Uri.parse('http://localhost:8080'));
             break;
           } on SocketException catch (_) {}
-          await Future.delayed(Duration(seconds: 5));
+          await Future<void>.delayed(Duration(seconds: 5));
         }
 
         var paths = variant.resources;
@@ -58,7 +58,7 @@ void main() {
         // Wait for the server to be stopped.
         await runner.runner.commands.values.whereType<ServeCommand>().firstOrNull?.stop();
         await serveResult;
-        await Future.delayed(Duration(seconds: 5));
+        await Future<void>.delayed(Duration(seconds: 5));
 
         await runner.run('build -v', dir: dirs.app);
 

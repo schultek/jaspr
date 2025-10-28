@@ -133,8 +133,8 @@ class ScopesDomain extends Domain {
         final packagesContent = context.contextRoot.packagesFile?.readAsStringSync();
         final packagesJson = jsonDecode(packagesContent ?? '{}');
         if (packagesJson case {
-          'packages': List packages,
-        } when packages.any((p) => p['name'] == 'jaspr_web_compilers')) {
+          'packages': List<Object?> packages,
+        } when packages.cast<Map<String, Object?>>().any((p) => p['name'] == 'jaspr_web_compilers')) {
           usesJasprWebCompilers = true;
         }
       } catch (_) {

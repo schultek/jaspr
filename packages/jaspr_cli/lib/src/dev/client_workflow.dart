@@ -81,7 +81,7 @@ class ClientWorkflow {
     });
   }
 
-  final _doneCompleter = Completer();
+  final _doneCompleter = Completer<void>();
   final BuildDaemonClient client;
   final Logger logger;
 
