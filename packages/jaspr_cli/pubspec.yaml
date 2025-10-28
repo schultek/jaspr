@@ -51,5 +51,4 @@ dependencies:
   mocktail: ^1.0.4
 
 dev_dependencies:
-  jaspr_repo: any
   test: ^1.22.0

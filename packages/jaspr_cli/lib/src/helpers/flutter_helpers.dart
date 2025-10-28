@@ -79,7 +79,7 @@ mixin FlutterHelper on BaseCommand {
 Future<void> copyFiles(String from, String to, [List<String> targets = const ['']]) async {
   var moveTargets = [...targets];
 
-  var moves = <Future>[];
+  var moves = <Future<void>>[];
   while (moveTargets.isNotEmpty) {
     var moveTarget = moveTargets.removeAt(0);
     var file = File('$from/$moveTarget').absolute;
@@ -97,5 +97,5 @@ Future<void> copyFiles(String from, String to, [List<String> targets = const [''
     }
   }
 
-  await Future.wait(moves);
+  await moves.wait;
 }

@@ -185,7 +185,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       Map<String, ({String? lastmod, String? changefreq, double? priority})?> generatedRoutes = {};
       List<String> queuedRoutes = [];
 
-      var serverStartedCompleter = Completer();
+      var serverStartedCompleter = Completer<void>();
 
       await startProxy(
         '5567',

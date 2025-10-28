@@ -35,7 +35,7 @@ abstract class BaseCommand extends Command<int> {
         StreamGroup.merge([
           ProcessSignal.sigint.watch(),
           // SIGTERM is not supported on Windows.
-          Platform.isWindows ? const Stream.empty() : ProcessSignal.sigterm.watch(),
+          Platform.isWindows ? const Stream<void>.empty() : ProcessSignal.sigterm.watch(),
         ]).listen((signal) async {
           cancelCount++;
           if (cancelCount > 1) exit(1);
@@ -165,7 +165,7 @@ abstract class BaseCommand extends Command<int> {
       return exitCode;
     }
 
-    await Future.delayed(Duration(seconds: 2));
+    await Future<void>.delayed(Duration(seconds: 2));
 
     await errSub.cancel();
     await outSub.cancel();
