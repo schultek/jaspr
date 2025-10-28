@@ -7,6 +7,7 @@ class Animation {
   static const none = Animation._('none');
 
   const factory Animation({
+    required String name,
     required Duration duration,
     Curve? easeFunc,
     Duration? delay,
@@ -14,7 +15,6 @@ class Animation {
     AnimationDirection? direction,
     AnimationFillMode? fillMode,
     AnimationPlayState? playState,
-    String? name,
   }) = _Animation;
   const factory Animation.list(List<Animation> animations) = _AnimationList;
 
@@ -24,6 +24,7 @@ class Animation {
 
 class _Animation implements Animation {
   const _Animation({
+    required this.name,
     required this.duration,
     this.easeFunc,
     this.delay,
@@ -31,9 +32,9 @@ class _Animation implements Animation {
     this.direction,
     this.fillMode,
     this.playState,
-    this.name,
   });
 
+  final String name;
   final Duration duration;
   final Curve? easeFunc;
   final Duration? delay;
@@ -41,18 +42,16 @@ class _Animation implements Animation {
   final AnimationDirection? direction;
   final AnimationFillMode? fillMode;
   final AnimationPlayState? playState;
-  final String? name;
 
   @override
   String get value {
-    var val = '${duration.inMilliseconds}ms';
+    var val = '$name ${duration.inMilliseconds}ms';
     if (easeFunc != null) val += ' ${easeFunc!.value}';
     if (delay != null) val += ' ${delay!.inMilliseconds}ms';
     if (count != null) val += ' ${count!.numstr}';
     if (direction != null) val += ' ${direction!.value}';
     if (fillMode != null) val += ' ${fillMode!.value}';
     if (playState != null) val += ' ${playState!.value}';
-    if (name != null) val += ' $name';
 
     return val;
   }

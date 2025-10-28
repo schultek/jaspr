@@ -28,7 +28,7 @@ void main() {
         expect(
           styles.properties,
           equals({
-            'animation': '500ms linear(0.2 30% 60%, 0.3 40% 80.5%) 100ms infinity normal forwards running slide',
+            'animation': 'slide 500ms linear(0.2 30% 60%, 0.3 40% 80.5%) 100ms infinity normal forwards running',
           }),
         );
       });
@@ -39,7 +39,7 @@ void main() {
             Animation(duration: Duration(milliseconds: 100), name: 'slide'),
             Animation(duration: Duration(milliseconds: 200), name: 'rotate'),
           ]);
-          expect(animations.value, equals('100ms slide, 200ms rotate'));
+          expect(animations.value, equals('slide 100ms, rotate 200ms'));
         });
 
         test('empty list not allowed', () {
