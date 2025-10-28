@@ -161,7 +161,7 @@ class Project {
       switch (targetYaml) {
         case String s:
           targets.add(s);
-        case List l:
+        case List<Object?> l:
           targets.addAll(l.cast<String>());
         default:
           logger.write(
