@@ -21,7 +21,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addOption(
       'input',
       abbr: 'i',
-      help: 'Specify the entry file for the server app. Defaults to {jaspr.target} from pubspec.yaml or "lib/main.dart".',
+      help:
+          'Specify the entry file for the server app. Defaults to {jaspr.target} from pubspec.yaml or "lib/main.dart".',
     );
     argParser.addOption(
       'mode',
@@ -34,7 +35,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: 'refresh',
     );
-    argParser.addOption('port', abbr: 'p', help: 'Specify a port to run the dev server on. Defaults to {jaspr.port} from pubspec.yaml or "8080".');
+    argParser.addOption(
+      'port',
+      abbr: 'p',
+      help: 'Specify a port to run the dev server on. Defaults to {jaspr.port} from pubspec.yaml or "8080".',
+    );
     argParser.addFlag('debug', abbr: 'd', help: 'Serves the app in debug mode.', negatable: false);
     argParser.addFlag('release', abbr: 'r', help: 'Serves the app in release mode.', negatable: false);
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
@@ -78,7 +83,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final entryPoint = await getServerEntryPoint(input);
 
     if (entryPoint != null && !entryPoint.startsWith('lib/')) {
-      logger.write("Entry point is not located inside lib/ folder, disabling server-side hot-reload.", level: Level.warning);
+      logger.write(
+        "Entry point is not located inside lib/ folder, disabling server-side hot-reload.",
+        level: Level.warning,
+      );
     }
 
     var workflow = await _runClient(webPort);
@@ -124,7 +132,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     logger.write("Starting server...", tag: Tag.cli, progress: ProgressState.running);
 
     final useHotReload = entryPoint.startsWith('lib/') && !release;
-    
+
     var serverTarget = File('.dart_tool/jaspr/server_target.dart').absolute;
     if (useHotReload && !serverTarget.existsSync()) {
       serverTarget.createSync(recursive: true);

@@ -101,7 +101,7 @@ class ScopesDomain extends Domain {
         final targetYaml = pubspecYaml['jaspr']?['target'];
         target = switch (targetYaml) {
           String t => t,
-          List l => l.cast<String>().firstOrNull,
+          List<Object?> l => l.cast<String>().firstOrNull,
           _ => null,
         };
       } catch (e) {
