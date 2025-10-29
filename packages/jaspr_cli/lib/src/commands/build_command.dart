@@ -200,8 +200,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
               queuedRoutes.insert(0, route);
             }
 
-            final lastmod = message['lastmod'] is String ? message['lastmod'] : null;
-            final changefreq = message['changefreq'] is String ? message['changefreq'] : null;
+            final lastmod = message['lastmod'] is String ? message['lastmod'] as String : null;
+            final changefreq = message['changefreq'] is String ? message['changefreq'] as String : null;
             final priority = message['priority'] is num ? (message['priority'] as num).toDouble() : null;
 
             generatedRoutes[route] = (lastmod: lastmod, changefreq: changefreq, priority: priority);

@@ -89,19 +89,19 @@ class ClientDomain extends Domain {
     }
   }
 
-  Future<Map<String, dynamic>?> _callServiceExtension(Map<String, dynamic> args) async {
+  Future<Map<String, Object?>?> _callServiceExtension(Map<String, Object?> args) async {
     final appId = getStringArg(args, 'appId', required: true);
     final appState = _clientStates[appId];
     if (appState == null) {
       throw ArgumentError.value(appId, 'appId', 'Not found');
     }
     final methodName = getStringArg(args, 'methodName', required: true)!;
-    final params = args['params'] != null ? (args['params'] as Map<String, dynamic>) : <String, dynamic>{};
+    final params = args['params'] != null ? (args['params'] as Map<String, Object?>) : <String, Object?>{};
     final response = await appState.vmService?.callServiceExtension(methodName, args: params);
     return response?.json;
   }
 
-  Future<Map<String, dynamic>> _restart(Map<String, dynamic> args) async {
+  Future<Map<String, Object?>> _restart(Map<String, Object?> args) async {
     final appId = getStringArg(args, 'appId', required: true);
     final appState = _clientStates[appId];
     if (appState == null) {
@@ -133,7 +133,7 @@ class ClientDomain extends Domain {
     return {'code': response?.type == 'Success' ? 0 : 1, 'message': response.toString()};
   }
 
-  Future<bool> _stop(Map<String, dynamic> args) async {
+  Future<bool> _stop(Map<String, Object?> args) async {
     final appId = getStringArg(args, 'appId', required: true);
     final appState = _clientStates[appId];
     if (appState == null) {
