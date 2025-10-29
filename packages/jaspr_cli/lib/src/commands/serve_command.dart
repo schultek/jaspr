@@ -25,7 +25,8 @@ class ServeCommand extends DevCommand {
   String get name => 'serve';
 
   @override
-  late final bool launchInChrome = argResults?['launch-in-chrome'] as bool? ?? false;
+  late final bool launchInChrome = argResults?.flag('launch-in-chrome') ?? false;
+  
   @override
   final bool autoRun = true;
 

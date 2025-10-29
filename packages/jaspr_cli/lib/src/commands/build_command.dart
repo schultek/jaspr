@@ -101,11 +101,11 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   @override
   String get category => 'Project';
 
-  late final useWasm = argResults!['experimental-wasm'] as bool;
-  late final includeSourceMaps = argResults!['include-source-maps'] as bool;
-  late final sitemapDomain = argResults!['sitemap-domain'] as String?;
-  late final sitemapExclude = argResults!['sitemap-exclude'] as String?;
-  late final managedBuildOptions = argResults!['managed-build-options'] as bool;
+  late final useWasm = argResults!.flag('experimental-wasm');
+  late final includeSourceMaps = argResults!.flag('include-source-maps');
+  late final sitemapDomain = argResults!.option('sitemap-domain');
+  late final sitemapExclude = argResults!.option('sitemap-exclude');
+  late final managedBuildOptions = argResults!.flag('managed-build-options');
 
   @override
   Future<int> runCommand() async {

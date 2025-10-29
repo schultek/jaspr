@@ -21,7 +21,7 @@ abstract class BaseCommand extends Command<int> {
   Logger get logger => _logger ??= Logger(verbose);
   Logger? _logger;
 
-  late final bool verbose = argResults?['verbose'] as bool? ?? false;
+  late final bool verbose = argResults?.flag('verbose') ?? false;
 
   late final Project project = Project(logger);
 

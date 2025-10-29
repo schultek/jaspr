@@ -48,12 +48,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   @override
   String get category => 'Project';
 
-  late final debug = argResults!['debug'] as bool;
-  late final release = argResults!['release'] as bool;
-  late final mode = argResults!['mode'] as String;
-  late final port = argResults!['port'] as String;
-  late final useWasm = argResults!['experimental-wasm'] as bool;
-  late final managedBuildOptions = argResults!['managed-build-options'] as bool;
+  late final debug = argResults!.flag('debug');
+  late final release = argResults!.flag('release');
+  late final mode = argResults!.option('mode')!;
+  late final port = argResults!.option('port')!;
+  late final useWasm = argResults!.flag('experimental-wasm');
+  late final managedBuildOptions = argResults!.flag('managed-build-options');
 
   bool get launchInChrome;
   bool get autoRun;
