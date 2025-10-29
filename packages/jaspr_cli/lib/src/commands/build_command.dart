@@ -118,7 +118,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     String? entryPoint;
     if (project.requireMode != JasprMode.client) {
-      entryPoint = await getEntryPoint(argResults!['input']);
+      entryPoint = await getEntryPoint(argResults!.option('input'));
     }
 
     if (dir.existsSync()) {
@@ -160,8 +160,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (project.requireMode == JasprMode.server) {
       logger.write('Building server app...', progress: ProgressState.running);
 
-      final target = argResults!['target'];
-      String extension = switch (target) {
+      final target = argResults!.option('target')!;
+      final extension = switch (target) {
         'exe' when Platform.isWindows => '.exe',
         'aot-snapshot' => '.aot',
         'kernel' => '.dill',
@@ -170,7 +170,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       var process = await Process.start('dart', [
         'compile',
-        argResults!['target'],
+        target,
         entryPoint!,
         '-o',
         './build/jaspr/app$extension',
@@ -410,11 +410,11 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final args = [
       '-Djaspr.flags.release=true',
-      '-O${argResults!['optimize']}',
+      '-O${argResults!.option('optimize')}',
       if (useWasm) //
-        ...argResults!['extra-wasm-compiler-option']
+        ...argResults!.multiOption('extra-wasm-compiler-option')
       else
-        ...argResults!['extra-js-compiler-option'],
+        ...argResults!.multiOption('extra-js-compiler-option'),
       for (final entry in dartDefines.entries) //
         '-D${entry.key}=${entry.value}',
     ];

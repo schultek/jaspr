@@ -76,7 +76,7 @@ void main() {
 }
 
 Future<void> bootstrap(TestVariant variant, Directory dir) async {
-  var jasprDir = Process.runSync('git', ['rev-parse', '--show-toplevel'], runInShell: true).stdout.trim();
+  var jasprDir = (Process.runSync('git', ['rev-parse', '--show-toplevel'], runInShell: true).stdout as String).trim();
 
   var overrides = File(p.join(dir.path, 'myapp', 'pubspec_overrides.yaml'));
   overrides.createSync();

@@ -142,7 +142,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       args.add('--pause-isolates-on-start');
     }
 
-    var entryPoint = await getEntryPoint(argResults!['input'], true);
+    var entryPoint = await getEntryPoint(argResults!.option('input'), true);
 
     if (!release) {
       var import = entryPoint.replaceFirst('lib', 'package:${project.requirePubspecYaml['name']}');
