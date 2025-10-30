@@ -140,6 +140,23 @@ void main() {
           });
         });
       });
+
+      group('quotes', () {
+        test('named', () {
+          const quote = Quotes.initial;
+          expect(quote.value, equals('initial'));
+        });
+
+        test('primary', () {
+          final quote = Quotes(('<', '>'));
+          expect(quote.value, equals('"<" ">"'));
+        });
+
+        test('secondary', () {
+          final quote = Quotes(('<', '>'), ('<<', '>>'));
+          expect(quote.value, equals('"<" ">" "<<" ">>"'));
+        });
+      });
     });
   });
 }
