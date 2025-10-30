@@ -12,7 +12,26 @@ class FileTree implements CustomComponent {
   Component? create(Node node, NodesBuilder builder) {
     if (node is ElementNode && node.tag == 'FileTree') {
       final child = buildFileTree(node.children ?? [], builder);
-      return div(classes: 'file-tree not-content', [child]);
+      return Builder(
+        builder: (context) {
+          final children = <Component>[];
+          final theme = Content.themeOf(context);
+
+          if (theme.enabled) {
+            final defaultColors = [
+              FileTree.backgroundColor,
+              FileTree.textColor,
+              FileTree.iconColor,
+            ].subtract(theme.colors);
+            if (defaultColors.isNotEmpty) {
+              children.add(Document.head(children: [Style(styles: defaultColors.build())]));
+            }
+          }
+
+          children.add(div(classes: 'file-tree not-content', [child]));
+          return Component.fragment(children);
+        },
+      );
     }
     return null;
   }
@@ -57,22 +76,43 @@ class FileTree implements CustomComponent {
   }
 
   Component buildFileTreeEntry(List<Node> nodes, NodesBuilder builder, {bool isFolder = false}) {
-    final content = nodes.map((n) => n.innerText).join();
-    final isHighlight = nodes.firstOrNull is ElementNode && (nodes.firstOrNull as ElementNode).tag == 'strong';
-    final [fileOrDirectory, ...comments] = content.split(' ');
 
-    isFolder |= fileOrDirectory.endsWith('/');
+    String? name;
+    List<Node> comment = [];
+    bool isHighlight = false;
 
-    final iconName = isFolder ? 'seti:folder' : getIconName(fileOrDirectory);
+    for (final node in nodes) {
+      if (name == null) {
+        if (node is ElementNode && node.tag == 'strong') {
+          isHighlight = true;
+          name = node.innerText;
+          continue;
+        } else if (node is TextNode) {
+          final [namePart, ...commentParts] = node.text.split(' ');
+          name = namePart;
+          if (commentParts.isNotEmpty) {
+            comment.add(TextNode(commentParts.join(' ')));
+          }
+        } else {
+          name = node.innerText;
+        }
+      } else {
+        comment.add(node);
+      }
+    }
+
+    isFolder |= name!.endsWith('/');
+
+    final iconName = isFolder ? 'seti:folder' : getIconName(name);
 
     return span(classes: 'tree-entry', [
-      span(classes: isHighlight ? 'highlight' : null, [
+      span(classes: 'tree-entry-name${isHighlight ? ' highlight' : ''}', [
         if (iconName != null) buildIcon(iconName),
-        text(fileOrDirectory),
+        text(name),
       ]),
-      if (comments.isNotEmpty)
+      if (comment.isNotEmpty)
         span(classes: 'comment', [
-          text(' ${comments.join(' ')}'),
+          builder.build(comment),
         ]),
     ]);
   }
@@ -114,6 +154,11 @@ class FileTree implements CustomComponent {
     );
   }
 
+  static ColorToken get backgroundColor =>
+      ColorToken('file-tree-bg', ThemeColors.gray.$200, dark: ThemeColors.gray.$900);
+  static ColorToken get textColor => ColorToken('file-tree-text', ThemeColors.gray.$800, dark: ThemeColors.gray.$100);
+  static ColorToken get iconColor => ColorToken('file-tree-icon', ThemeColors.gray.$600, dark: ThemeColors.gray.$400);
+
   @css
   static List<StyleRule> get styles => [
     css('.file-tree', [
@@ -121,18 +166,18 @@ class FileTree implements CustomComponent {
         display: Display.block,
         padding: Padding.all(1.rem),
         fontSize: 0.8125.rem,
-        backgroundColor: ContentColors.preBg,
-        color: ContentColors.preCode,
+        backgroundColor: backgroundColor,
+        color: textColor,
         margin: Margin.only(top: 1.71.em, bottom: 1.71.em),
         radius: BorderRadius.circular(0.375.rem),
         fontFamily: ContentTheme.defaultCodeFont,
-        lineHeight: 1.375.rem
+        lineHeight: 1.375.rem,
       ),
       css('ul').styles(
         listStyle: ListStyle.none,
         margin: Margin.only(left: .5.rem),
         border: Border.only(
-          left: BorderSide.solid(width: 1.px, color: ContentColors.bullets),
+          left: BorderSide.solid(width: 1.px, color: iconColor),
         ),
         padding: Padding.only(left: .125.rem),
       ),
@@ -146,6 +191,7 @@ class FileTree implements CustomComponent {
           margin: Margin.symmetric(vertical: 0.125.rem),
         ),
         css('&.file').styles(
+          display: Display.flex,
           margin: Margin.only(left: 1.25.rem),
         ),
         css('svg').styles(
@@ -153,7 +199,7 @@ class FileTree implements CustomComponent {
           margin: Margin.only(left: .25.rem, right: .375.rem),
           width: .875.rem,
           height: .875.rem,
-          color: ContentColors.bullets,
+          color: iconColor,
           raw: {
             'vertical-align': 'middle',
           },
@@ -165,14 +211,26 @@ class FileTree implements CustomComponent {
               border: Border.none,
               backgroundColor: Colors.transparent,
             ),
-            css('> summary').styles(
-              margin: Margin.only(left: (-1.5).rem),
-              padding: Padding.symmetric(horizontal: .625.rem),
-              maxWidth: 100.percent,
-            ),
-            css('> summary::marker').styles(
-              color: ContentColors.bullets,
-            ),
+            css('> summary', [
+              css('&').styles(
+                maxWidth: 100.percent,
+                padding: Padding.symmetric(horizontal: .625.rem),
+                margin: Margin.only(left: (-1.5).rem),
+              ),
+              css('&::marker').styles(
+                color: iconColor,
+              ),
+              css('&:hover', [
+                css('&').styles(
+                  cursor: Cursor.pointer,
+                  color: ContentColors.primary,
+                ),
+                css('svg').styles(color: ContentColors.primary),
+                css('~ul').styles(
+                  border: Border.only(left: BorderSide(color: ContentColors.primary)),
+                ),
+              ]),
+            ]),
           ]),
         ]),
       ]),
@@ -181,16 +239,27 @@ class FileTree implements CustomComponent {
           display: Display.inlineFlex,
           alignItems: AlignItems.center,
           gap: Gap.all(0.5.rem),
+          raw: {'vertical-align': 'middle'},
+        ),
+        css('.tree-entry-name').styles(
+          display: Display.inlineFlex,
+          alignItems: AlignItems.center,
         ),
         css('.comment').styles(
-          color: ContentColors.captions,
+          padding: Padding.only(left: 1.5.rem),
+          color: iconColor,
           fontStyle: FontStyle.italic,
         ),
-        css('.highlight').styles(
-          backgroundColor: ContentColors.primary,
-          padding: Padding.symmetric(horizontal: 0.25.rem),
-          radius: BorderRadius.circular(0.25.rem),
-        ),
+        css('.highlight', [
+          css('&').styles(
+            padding: Padding.symmetric(horizontal: 0.25.rem),
+            radius: BorderRadius.circular(0.25.rem),
+            alignItems: AlignItems.center,
+            color: backgroundColor,
+            backgroundColor: ContentColors.primary,
+          ),
+          css('svg').styles(color: backgroundColor),
+        ]),
       ]),
     ]),
   ];
