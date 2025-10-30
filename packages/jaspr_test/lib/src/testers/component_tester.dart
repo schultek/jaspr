@@ -19,7 +19,7 @@ void testComponents(
   bool isClient = true,
   bool? skip,
   Timeout? timeout,
-  dynamic tags,
+  Object? tags,
 }) {
   test(
     description,

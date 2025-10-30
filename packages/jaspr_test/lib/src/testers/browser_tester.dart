@@ -18,7 +18,7 @@ void testBrowser(
   String location = '/',
   bool? skip,
   Timeout? timeout,
-  dynamic tags,
+  Object? tags,
 }) {
   test(
     description,
@@ -35,7 +35,7 @@ void testBrowser(
       });
 
       // Clear all nodes
-      web.document.body?.replaceChildren([].jsify()!);
+      web.document.body?.replaceChildren(<web.Node>[].toJS);
     },
     skip: skip,
     timeout: timeout,
