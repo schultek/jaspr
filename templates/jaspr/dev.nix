@@ -1,6 +1,6 @@
 { pkgs, ... }: {
   # Which nixpkgs channel to use.
-  channel = "stable-23.11"; # or "unstable"
+  channel = "unstable";
   # Use https://search.nixos.org/packages to find packages
   packages = [
     pkgs.dart
@@ -12,11 +12,12 @@
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
       "dart-code.dart-code"
+      "schultek.jaspr-code"
     ];
     workspace = {
       # Runs when a workspace is first created with this `dev.nix` file
       onCreate = {
-        pub-get = "dart pub get";
+        jaspr-create = "./.idx/jaspr-create.sh";
 
         default.openFiles = [
           "pubspec.yaml"
@@ -33,7 +34,8 @@
         web = {
           command = [
             "jaspr"
-            "serve -p $PORT"
+            "serve"
+            "--port=$PORT"
           ];
           manager = "web";
         };

@@ -1,7 +1,7 @@
 {
   "name": "Jaspr",
   "description": "A web project template for Jaspr",
-  "icon": "https://github.com/schultek/jaspr/blob/main/assets/jaspr_icon.png",
+  "icon": "https://raw.githubusercontent.com/schultek/jaspr/refs/heads/main/assets/logo_emoji.png",
   "categories": [
     "Jaspr",
     "Web app"
@@ -12,10 +12,10 @@
       "id": "mode",
       "name": "Rendering Mode",
       "type": "enum",
-      "default": "static",
+      "default": "static:auto",
       "options": {
-        "static": "Static Site (Recommended)",
-        "server": "Server Rendered Site",
+        "static:auto": "Static Site (Recommended)",
+        "server:auto": "Server Rendered Site",
         "client": "Single Page Application"
       },
       "required": true
@@ -26,9 +26,9 @@
       "type": "enum",
       "default": "multi-page",
       "options": {
-        "multi-page": "Multi-page routing.",
-        "single-page": "Single-page routing.",
-        "none": "No routing."
+        "multi-page": "Multi-page Routing",
+        "single-page": "Single-page Routing",
+        "none": "No Routing"
       },
       "required": false
     },
