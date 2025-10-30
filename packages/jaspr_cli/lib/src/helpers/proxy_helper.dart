@@ -17,7 +17,7 @@ mixin ProxyHelper on BaseCommand {
     required String serverPort,
     String? flutterPort,
     bool redirectNotFound = false,
-    void Function(dynamic)? onMessage,
+    void Function(Object?)? onMessage,
   }) async {
     var client = http.Client();
     var webdevHandler = proxyHandler(Uri.parse('http://localhost:$webPort'), client: client);

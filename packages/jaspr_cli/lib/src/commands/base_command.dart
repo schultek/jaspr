@@ -21,14 +21,18 @@ abstract class BaseCommand extends Command<int> {
   Logger get logger => _logger ??= Logger(verbose);
   Logger? _logger;
 
-  late final bool verbose = argResults?['verbose'] as bool? ?? false;
+  late final bool verbose = argResults?.flag('verbose') ?? false;
 
   late final Project project = Project(logger);
 
   @override
   @mustCallSuper
   Future<int> run() async {
-    await trackEvent(name, projectName: project.pubspecYaml?['name'], projectMode: project.modeOrNull?.name);
+    await trackEvent(
+      name,
+      projectName: project.pubspecYaml?['name'] as String?,
+      projectMode: project.modeOrNull?.name,
+    );
 
     var cancelCount = 0;
     final cancelSub =
@@ -183,7 +187,8 @@ abstract class BaseCommand extends Command<int> {
 
   void checkWasmSupport() {
     var package = '${project.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
-    var version = project.pubspecYaml?['dev_dependencies']?[package];
+    var devDependencies = project.pubspecYaml?['dev_dependencies'] as Map<Object?, Object?>?;
+    var version = devDependencies?[package];
     if (version is! String || !version.startsWith(RegExp(r'\^?4.1.'))) {
       usageException('Using "--experimental-wasm" requires $package 4.1.0 or newer.');
     }

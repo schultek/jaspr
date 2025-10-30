@@ -9,7 +9,8 @@ void main() async {
 
   var packages = await Process.run('melos', 'list --no-private --json'.split(' '), stdoutEncoding: utf8);
   var jsonStartIndex = (packages.stdout as String).indexOf('[');
-  var packagesJson = jsonDecode((packages.stdout as String).substring(jsonStartIndex)) as List;
+  var packagesJson = (jsonDecode((packages.stdout as String).substring(jsonStartIndex)) as List<Object?>)
+      .cast<Map<String, Object?>>();
 
   var jasprCliVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr_cli')['version'];
   var jasprVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr')['version'];

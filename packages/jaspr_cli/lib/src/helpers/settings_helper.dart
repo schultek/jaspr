@@ -19,15 +19,15 @@ void updateSetting(String key, Object value) {
   _writeSettings();
 }
 
-Map<String, dynamic>? _settings = _loadSettings();
+Map<String, Object?>? _settings = _loadSettings();
 
-Map<String, dynamic>? _loadSettings() {
+Map<String, Object?>? _loadSettings() {
   if (settingsFile == null) {
     return null;
   }
   try {
     var str = settingsFile!.readAsStringSync();
-    return jsonDecode(str);
+    return jsonDecode(str) as Map<String, Object?>;
   } catch (_) {
     return null;
   }

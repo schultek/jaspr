@@ -38,16 +38,16 @@ mixin DaemonHelper on BaseCommand {
 class DaemonLogger implements Logger {
   DaemonLogger();
 
-  static Stream<Map<String, dynamic>> get stdinCommandStream => stdin
+  static Stream<Map<String, Object?>> get stdinCommandStream => stdin
       .transform<String>(utf8.decoder)
       .transform<String>(const LineSplitter())
       .where((String line) => line.startsWith('[{') && line.endsWith('}]'))
-      .map<Map<String, dynamic>>((String line) {
+      .map<Map<String, Object?>>((String line) {
         line = line.substring(1, line.length - 1);
-        return json.decode(line) as Map<String, dynamic>;
+        return json.decode(line) as Map<String, Object?>;
       });
 
-  static void stdoutCommandResponse(Map<String, dynamic> command) {
+  static void stdoutCommandResponse(Map<String, Object?> command) {
     stdout.writeln('[${json.encode(command)}]');
   }
 
@@ -93,11 +93,11 @@ class DaemonLogger implements Logger {
   @override
   void complete(bool success) {}
 
-  void log(Map<String, dynamic> data) {
+  void log(Map<String, Object?> data) {
     event('daemon.log', data);
   }
 
-  void event(String event, Map<String, dynamic> params) {
+  void event(String event, Map<String, Object?> params) {
     _logger.write('[${jsonEncode({'event': event, 'params': params})}]\n');
   }
 }
