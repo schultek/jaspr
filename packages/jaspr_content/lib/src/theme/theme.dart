@@ -37,6 +37,9 @@ class ContentTheme {
   /// Disables any theming and styles for the page.
   const factory ContentTheme.none() = _NoContentTheme;
 
+  /// Whether the theme is enabled. This is false for [ContentTheme.none].
+  final bool enabled = true;
+
   /// A set of color tokens for the site.
   final List<ColorToken> colors;
 
@@ -111,6 +114,9 @@ class ContentTheme {
 
 class _NoContentTheme implements ContentTheme {
   const _NoContentTheme();
+
+  @override
+  final bool enabled = false;
 
   @override
   FontFamily? get codeFont => null;
