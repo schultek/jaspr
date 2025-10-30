@@ -67,7 +67,6 @@ Future<(Map<String, dynamic>, Map<String, String>)> fetchIconDefinitions() async
   return (definitions, icons.cast<String, String>());
 }
 
-
 const copyrightNotice = '''
 // Based on https://github.com/elviswolcott/seti-icons
 //
