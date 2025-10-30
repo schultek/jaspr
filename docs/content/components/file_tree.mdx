@@ -1,0 +1,64 @@
+---
+title: FileTree
+description: A file tree component for displaying directory structures.
+---
+
+---
+
+File Trees are a great way to display directory structures in your site. It renders a collapsible tree view of files and folders, and automatically shows icons for different file types.
+
+## Usage
+
+Add the `FileTree()` component to your `components` list in your `main.dart` file:
+
+```dart
+import 'package:jaspr_content/components/file_tree.dart';
+
+// ...
+
+ContentApp(
+  components: [
+    FileTree(),
+  ],
+)
+```
+
+Then use the `<FileTree>` component in your content files to display the file trees.
+
+```markdown
+
+<FileTree>
+
+- lib/
+  - components/
+    - clicker.dart
+  - **main.dart** Highlighted file with comment
+- tool/
+- .gitignore
+- analysis_options.yaml
+- CHANGELOG.md
+- LICENSE 
+- package.yaml 
+- README.md This is a comment
+
+</FileTree>
+
+```
+
+---
+
+### Theming
+
+You can customize the appearance of the `FileTree` component using the `FileTreeTheme` extension. 
+You can set customize the background, text, icons, and highlight color as well as the border radius of the tree container.
+
+```dart
+ContentTheme(
+  extensions: [
+    FileTreeTheme(
+      highlightColor: ThemeColors.teal,
+      radius: 2.rem,
+    ),
+  ],
+)
+```

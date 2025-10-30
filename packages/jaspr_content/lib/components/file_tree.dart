@@ -5,36 +5,20 @@ import '../theme.dart';
 import '_internal/file_tree_icons.dart';
 
 /// A file tree component for displaying a directory structure.
-class FileTree implements CustomComponent {
-  const FileTree();
+class FileTree extends CustomComponent {
+  const FileTree() : super.base();
 
   @override
   Component? create(Node node, NodesBuilder builder) {
     if (node is ElementNode && node.tag == 'FileTree') {
       final child = buildFileTree(node.children ?? [], builder);
-      return Builder(
-        builder: (context) {
-          final children = <Component>[];
-          final theme = Content.themeOf(context);
-
-          if (theme.enabled) {
-            final defaultColors = [
-              FileTree.backgroundColor,
-              FileTree.textColor,
-              FileTree.iconColor,
-            ].subtract(theme.colors);
-            if (defaultColors.isNotEmpty) {
-              children.add(Document.head(children: [Style(styles: defaultColors.build())]));
-            }
-          }
-
-          children.add(div(classes: 'file-tree not-content', [child]));
-          return Component.fragment(children);
-        },
-      );
+      return div(classes: 'file-tree not-content', [child]);
     }
     return null;
   }
+
+  @override
+  FileTreeTheme get theme => FileTreeTheme();
 
   Component buildFileTree(List<Node> nodes, NodesBuilder builder) {
     if (nodes case [ElementNode(tag: 'ul', :final children)]) {
@@ -101,13 +85,18 @@ class FileTree implements CustomComponent {
     }
 
     isFolder |= name!.endsWith('/');
+    final isPlaceholder = name == '...';
 
-    final iconName = isFolder ? 'seti:folder' : getIconName(name);
+    final iconName = isFolder
+        ? 'seti:folder'
+        : isPlaceholder
+        ? null
+        : getIconName(name);
 
     return span(classes: 'tree-entry', [
       span(classes: 'tree-entry-name${isHighlight ? ' highlight' : ''}', [
         if (iconName != null) buildIcon(iconName),
-        text(name),
+        text(isPlaceholder ? '…' : name),
       ]),
       if (comment.isNotEmpty)
         span(classes: 'comment', [
@@ -126,7 +115,7 @@ class FileTree implements CustomComponent {
     for (final MapEntry(key: partial, value: partialIcon) in definitions['partials']!.entries) {
       if (fileName.contains(partial)) return partialIcon;
     }
-    return null;
+    return 'seti:default';
   }
 
   String? getFileIconTypeFromExtension(String fileName) {
@@ -153,11 +142,6 @@ class FileTree implements CustomComponent {
     );
   }
 
-  static ColorToken get backgroundColor =>
-      ColorToken('file-tree-bg', ThemeColors.gray.$200, dark: ThemeColors.gray.$900);
-  static ColorToken get textColor => ColorToken('file-tree-text', ThemeColors.gray.$800, dark: ThemeColors.gray.$100);
-  static ColorToken get iconColor => ColorToken('file-tree-icon', ThemeColors.gray.$600, dark: ThemeColors.gray.$400);
-
   @css
   static List<StyleRule> get styles => [
     css('.file-tree', [
@@ -165,18 +149,18 @@ class FileTree implements CustomComponent {
         display: Display.block,
         padding: Padding.all(1.rem),
         fontSize: 0.8125.rem,
-        backgroundColor: backgroundColor,
-        color: textColor,
-        margin: Margin.only(top: 1.71.em, bottom: 1.71.em),
-        radius: BorderRadius.circular(0.375.rem),
-        fontFamily: ContentTheme.defaultCodeFont,
+        backgroundColor: Color.variable(FileTreeTheme._backgroundVariable),
+        color: Color.variable(FileTreeTheme._textVariable),
         lineHeight: 1.375.rem,
       ),
       css('ul').styles(
         listStyle: ListStyle.none,
         margin: Margin.only(left: .5.rem),
         border: Border.only(
-          left: BorderSide.solid(width: 1.px, color: iconColor),
+          left: BorderSide.solid(
+            width: 1.px,
+            color: Color.variable(FileTreeTheme._iconVariable),
+          ),
         ),
         padding: Padding.only(left: .125.rem),
       ),
@@ -198,7 +182,7 @@ class FileTree implements CustomComponent {
           margin: Margin.only(left: .25.rem, right: .375.rem),
           width: .875.rem,
           height: .875.rem,
-          color: iconColor,
+          color: Color.variable(FileTreeTheme._iconVariable),
           raw: {
             'vertical-align': 'middle',
           },
@@ -214,19 +198,20 @@ class FileTree implements CustomComponent {
               css('&').styles(
                 maxWidth: 100.percent,
                 padding: Padding.symmetric(horizontal: .625.rem),
-                margin: Margin.only(left: (-1.5).rem),
+                margin: Margin.only(left: (-1.5).rem, bottom: Unit.zero),
               ),
               css('&::marker').styles(
-                color: iconColor,
+                color: Color.variable(FileTreeTheme._iconVariable),
               ),
               css('&:hover', [
                 css('&').styles(
                   cursor: Cursor.pointer,
-                  color: ContentColors.primary,
+                  color: Color.variable(FileTreeTheme._highlightVariable),
                 ),
-                css('svg').styles(color: ContentColors.primary),
+                css('svg').styles(color: Color.variable(FileTreeTheme._highlightVariable)),
+                css('.highlight svg').styles(color: Color.variable(FileTreeTheme._backgroundVariable)),
                 css('~ul').styles(
-                  border: Border.only(left: BorderSide(color: ContentColors.primary)),
+                  border: Border.only(left: BorderSide(color: Color.variable(FileTreeTheme._highlightVariable))),
                 ),
               ]),
             ]),
@@ -236,7 +221,7 @@ class FileTree implements CustomComponent {
       css('.tree-entry', [
         css('&').styles(
           display: Display.inlineFlex,
-          alignItems: AlignItems.center,
+          alignItems: AlignItems.start,
           gap: Gap.all(0.5.rem),
           raw: {'vertical-align': 'middle'},
         ),
@@ -246,7 +231,7 @@ class FileTree implements CustomComponent {
         ),
         css('.comment').styles(
           padding: Padding.only(left: 1.5.rem),
-          color: iconColor,
+          color: Color.variable(FileTreeTheme._iconVariable),
           fontStyle: FontStyle.italic,
         ),
         css('.highlight', [
@@ -254,12 +239,75 @@ class FileTree implements CustomComponent {
             padding: Padding.symmetric(horizontal: 0.25.rem),
             radius: BorderRadius.circular(0.25.rem),
             alignItems: AlignItems.center,
-            color: backgroundColor,
-            backgroundColor: ContentColors.primary,
+            color: Color.variable(FileTreeTheme._backgroundVariable),
+            backgroundColor: Color.variable(FileTreeTheme._highlightVariable),
           ),
-          css('svg').styles(color: backgroundColor),
+          css('svg').styles(
+            color: Color.variable(FileTreeTheme._backgroundVariable),
+          ),
         ]),
       ]),
     ]),
   ];
+}
+
+class FileTreeTheme extends ThemeExtension<FileTreeTheme> {
+  FileTreeTheme({
+    this.backgroundColor,
+    this.textColor,
+    this.iconColor,
+    this.highlightColor,
+    this.radius,
+  });
+
+  final Color? backgroundColor;
+  final Color? textColor;
+  final Color? iconColor;
+  final Color? highlightColor;
+  final Unit? radius;
+
+  static const _backgroundVariable = '--file-tree-bg';
+  static const _textVariable = '--file-tree-text';
+  static const _iconVariable = '--file-tree-icon';
+  static const _highlightVariable = '--file-tree-highlight';
+  static const _radiusVariable = '--file-tree-radius';
+
+  @override
+  ThemeExtension<FileTreeTheme> copyWith({
+    Color? backgroundColor,
+    Color? textColor,
+    Color? iconColor,
+    Color? highlightColor,
+    Unit? radius,
+  }) {
+    return FileTreeTheme(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      textColor: textColor ?? this.textColor,
+      iconColor: iconColor ?? this.iconColor,
+      highlightColor: highlightColor ?? this.highlightColor,
+      radius: radius ?? this.radius,
+    );
+  }
+
+  @override
+  Map<String, Object> buildVariables(ContentTheme theme) {
+    return {
+      _backgroundVariable: backgroundColor ?? ThemeColor(ThemeColors.gray.$200, dark: ThemeColors.gray.$900),
+      _textVariable: textColor ?? ThemeColor(ThemeColors.gray.$800, dark: ThemeColors.gray.$100),
+      _iconVariable: iconColor ?? ThemeColor(ThemeColors.gray.$600, dark: ThemeColors.gray.$400),
+      _highlightVariable: highlightColor ?? ContentColors.primary,
+      _radiusVariable: radius ?? 0.375.rem,
+    };
+  }
+
+  @override
+  List<StyleRule> buildStyles(ContentTheme theme) {
+    return [
+      css('.file-tree').styles(
+        margin: Margin.only(top: 1.71.em, bottom: 1.71.em),
+        radius: BorderRadius.circular(Unit.variable(FileTreeTheme._radiusVariable)),
+        fontFamily: ContentTheme.currentCodeFont,
+      ),
+    ];
+  }
 }
