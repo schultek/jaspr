@@ -45,13 +45,14 @@ class _Animation implements Animation {
 
   @override
   String get value {
-    var val = '$name ${duration.inMilliseconds}ms';
+    var val = '${duration.inMilliseconds}ms';
     if (curve != null) val += ' ${curve!.value}';
     if (delay != null) val += ' ${delay!.inMilliseconds}ms';
     if (count != null) val += ' ${count!.numstr}';
     if (direction != null) val += ' ${direction!.value}';
     if (fillMode != null) val += ' ${fillMode!.value}';
     if (playState != null) val += ' ${playState!.value}';
+    val += ' $name';
 
     return val;
   }

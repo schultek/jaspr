@@ -15,6 +15,7 @@ void main() {
       test('basic', () {
         const styles = Styles(
           animation: Animation(
+            name: 'slide',
             duration: Duration(milliseconds: 500),
             curve: Curve.linearFn([Linear(0.2, 30.0, 60.0), Linear(0.3, 40.0, 80.5)]),
             delay: Duration(milliseconds: 100),
@@ -22,13 +23,12 @@ void main() {
             direction: AnimationDirection.normal,
             fillMode: AnimationFillMode.forwards,
             playState: AnimationPlayState.running,
-            name: 'slide',
           ),
         );
         expect(
           styles.properties,
           equals({
-            'animation': 'slide 500ms linear(0.2 30% 60%, 0.3 40% 80.5%) 100ms infinity normal forwards running',
+            'animation': '500ms linear(0.2 30% 60%, 0.3 40% 80.5%) 100ms infinity normal forwards running slide',
           }),
         );
       });
@@ -39,7 +39,7 @@ void main() {
             Animation(duration: Duration(milliseconds: 100), name: 'slide'),
             Animation(duration: Duration(milliseconds: 200), name: 'rotate'),
           ]);
-          expect(animations.value, equals('slide 100ms, rotate 200ms'));
+          expect(animations.value, equals('100ms slide, 200ms rotate'));
         });
 
         test('empty list not allowed', () {
