@@ -1,3 +1,5 @@
+import 'unit.dart' show NumberString;
+
 class Transition {
   const Transition._(this.value);
 
@@ -71,9 +73,45 @@ class Curve {
   static const Curve stepStart = Curve._('step-start');
   static const Curve stepEnd = Curve._('step-end');
 
+  const factory Curve.linearFn(List<Linear> vals) = _LinearFnCurve;
   const factory Curve.cubicBezier(double p1, double p2, double p3, double p4) = _CubicBezierCurve;
-
   const factory Curve.steps(int steps, {required StepJump jump}) = _StepsCurve;
+}
+
+class _LinearFnCurve implements Curve {
+  const _LinearFnCurve(this.vals);
+
+  final List<Linear> vals;
+
+  bool _validateLinears() {
+    if (vals.isEmpty) {
+      throw 'Curve.linear cannot be empty';
+    }
+    return true;
+  }
+
+  @override
+  String get value {
+    assert(_validateLinears());
+    return "linear(${vals.map((e) => e.value).join(', ')})";
+  }
+}
+
+/// Tuple used with [Curve.linear]. The optional arguments are percentages between 0-100.
+///
+/// e.g.,
+/// ```dart
+/// Linear(0.2); // Becomes "0.2"
+/// Linear(0.2, 10); // Becomes "0.2 10%"
+/// Linear(0.2, 10, 5.5); // Becomes "0.2 10% 5.5%"
+/// ```
+class Linear {
+  const Linear(this.n, [this.p1, this.p2]);
+
+  final double n;
+  final double? p1, p2;
+
+  String get value => "${n.numstr}${p1 != null ? ' ${p1!.numstr}%' : ''}${p2 != null ? ' ${p2!.numstr}%' : ''}";
 }
 
 class _CubicBezierCurve implements Curve {

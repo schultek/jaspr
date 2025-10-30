@@ -59,6 +59,7 @@ void main() {
         cursor: Cursor.crosshair,
         userSelect: UserSelect.none,
         pointerEvents: PointerEvents.fill,
+        animation: Animation(duration: Duration(milliseconds: 100), name: 'slide'),
         transition: Transition('width', duration: Duration(milliseconds: 500)),
         transform: Transform.scale(2),
         // Flexbox Styles
@@ -99,6 +100,7 @@ void main() {
         textShadow: TextShadow(offsetX: Unit.zero, offsetY: Unit.zero, blur: Unit.pixels(10)),
         textOverflow: TextOverflow.ellipsis,
         whiteSpace: WhiteSpace.noWrap,
+        quotes: Quotes(('<', '>')),
         // Background Styles
         backgroundColor: Colors.red,
         backgroundImage: ImageStyle.url('abc.png'),
@@ -152,6 +154,7 @@ void main() {
             'user-select': 'none',
             '-webkit-user-select': 'none',
             'pointer-events': 'fill',
+            'animation': '100ms slide',
             'transition': 'width 500ms',
             'transform': 'scale(2)',
             // Flexbox Styles
@@ -197,6 +200,7 @@ void main() {
             'text-shadow': '0 0 10px',
             'text-overflow': 'ellipsis',
             'white-space': 'nowrap',
+            'quotes': '"<" ">"',
             // Background Styles
             'background-color': 'red',
             'background-image': 'url(abc.png)',
@@ -248,6 +252,7 @@ void main() {
             '  user-select: none;\n'
             '  -webkit-user-select: none;\n'
             '  pointer-events: fill;\n'
+            '  animation: 100ms slide;\n'
             '  transition: width 500ms;\n'
             '  transform: scale(2);\n'
             '  flex-direction: column;\n'
@@ -287,6 +292,7 @@ void main() {
             '  text-shadow: 0 0 10px;\n'
             '  text-overflow: ellipsis;\n'
             '  white-space: nowrap;\n'
+            '  quotes: "<" ">";\n'
             '  background-color: red;\n'
             '  background-image: url(abc.png);\n'
             '  background-origin: content-box;\n'

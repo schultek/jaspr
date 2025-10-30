@@ -418,3 +418,43 @@ enum WhiteSpace {
   final String value;
   const WhiteSpace(this.value);
 }
+
+class Quotes {
+  const Quotes._(this.value);
+
+  static const inherit = Quotes._('inherit');
+  static const initial = Quotes._('initial');
+  static const revert = Quotes._('revert');
+  static const revertLayer = Quotes._('revert-layer');
+  static const unset = Quotes._('unset');
+  static const none = Quotes._('none');
+  static const auto = Quotes._('auto');
+  static const matchParent = Quotes._('match-parent');
+
+  const factory Quotes(
+    (String, String) primary, [
+    (String, String)? secondary,
+  ]) = _Quotes;
+
+  /// The css value
+  final String value;
+}
+
+class _Quotes implements Quotes {
+  const _Quotes(
+    this.primary, [
+    this.secondary,
+  ]);
+
+  final (String, String) primary;
+  final (String, String)? secondary;
+
+  @override
+  String get value {
+    var quotes = '"${primary.$1}" "${primary.$2}"';
+    if (secondary case final secondary?) {
+      quotes += ' "${secondary.$1}" "${secondary.$2}"';
+    }
+    return quotes;
+  }
+}

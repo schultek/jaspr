@@ -1,5 +1,8 @@
 ## Unreleased breaking
 
+- Added `Curve.linearFn()` easing function.
+- Added `Animation`, `Quotes` CSS properties.
+
 - **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
 - **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
 
