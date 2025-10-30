@@ -76,7 +76,6 @@ class FileTree implements CustomComponent {
   }
 
   Component buildFileTreeEntry(List<Node> nodes, NodesBuilder builder, {bool isFolder = false}) {
-
     String? name;
     List<Node> comment = [];
     bool isHighlight = false;
