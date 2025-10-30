@@ -14,7 +14,7 @@ void testServer(
   FutureOr<void> Function(ServerTester tester) callback, {
   bool? skip,
   Timeout? timeout,
-  dynamic tags,
+  Object? tags,
 }) {
   test(
     description,
@@ -51,7 +51,7 @@ class DataResponse {
   int statusCode;
 
   /// The data returned by the HTTP request
-  Map<String, dynamic>? data;
+  Map<String, Object?>? data;
 }
 
 /// Tests a jaspr app in a simulated server environment.
@@ -108,5 +108,5 @@ class FakeHttpServer extends Fake implements HttpServer {
   int get port => 0;
 
   @override
-  Future close({bool force = false}) async {}
+  Future<void> close({bool force = false}) async {}
 }

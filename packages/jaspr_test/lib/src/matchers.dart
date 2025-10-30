@@ -95,7 +95,7 @@ class _FindsComponentMatcher extends Matcher {
   final int? max;
 
   @override
-  bool matches(covariant Finder finder, Map<dynamic, dynamic> matchState) {
+  bool matches(covariant Finder finder, Map<Object?, Object?> matchState) {
     assert(min != null || max != null);
     assert(min == null || max == null || min! <= max!);
     matchState[Finder] = finder;
@@ -149,9 +149,9 @@ class _FindsComponentMatcher extends Matcher {
 
   @override
   Description describeMismatch(
-    dynamic item,
+    Object? item,
     Description mismatchDescription,
-    Map<dynamic, dynamic> matchState,
+    Map<Object?, Object?> matchState,
     bool verbose,
   ) {
     final Finder finder = matchState[Finder] as Finder;
