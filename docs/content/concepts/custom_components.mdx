@@ -164,3 +164,78 @@ Component? create(Node node, NodesBuilder builder) {
 <Info>
 You can also use this in combination with custom markdown syntaxes. Checkout the [Markdown Parsing](/content/concepts/page_parsing#markdown) docs for more info.
 </Info>
+
+## Theming Custom Components
+
+For general styling, you can use the standard `@css` annotation to define CSS styles for your custom component:
+
+```dart
+class CustomCard implements CustomComponent {
+
+  ... // other implementation
+
+  @css
+  static List<StyleRule> get styles => [
+    ... // your styles here
+  ];
+}
+```
+
+If your component requires more advanced theming options, you can also provide a custom `ThemeExtension` by overriding the `theme` getter and returning your theme extension instance:
+
+```dart
+  @override
+  ThemeExtension? get theme => CustomCardTheme();
+
+...
+
+class CustomCardTheme extends ThemeExtension<CustomCardTheme> {
+  const CustomCardTheme({
+    this.backgroundColor,
+  });
+
+  final Color? backgroundColor;
+
+  @override
+  CustomCardTheme copyWith({Color? backgroundColor}) {
+    return CustomCardTheme(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+    );
+  }
+
+  @override
+  Map<String, Object> buildVariables(ContentTheme theme) {
+    return {
+      // Define a custom CSS variable for the background color.
+      // This defaults to the theme's background color if no custom color is provided.
+      '--custom-card-bg': backgroundColor ?? ContentColors.background,
+    };
+  }
+}
+```
+
+
+The theme extension can define a set of variables that will be injected into the `ContentTheme` CSS for use in your component styles. 
+Use these variables in your component styles like this:
+
+```dart
+  @css
+  static List<StyleRule> get styles => [
+    css('.custom-card', [
+      backgroundColor: Color.variable('--custom-card-bg'),
+    ]),
+  ];
+```
+
+The user of your component can then customize the component's look by providing their own instance of your theme extension to of their `ContentTheme`:
+
+```dart
+ContentTheme(
+  ...
+  extensions: [
+    CustomCardTheme(
+      backgroundColor: ThemeColors.blue.$50,
+    ),
+  ],
+)
+```

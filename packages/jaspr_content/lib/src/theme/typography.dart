@@ -4,6 +4,8 @@ part of 'theme.dart';
 class ContentTypography {
   const ContentTypography({required this.styles, required this.rules});
 
+  const ContentTypography.none() : styles = const Styles(), rules = const [];
+
   static final ContentTypography base = _baseContentTypography;
 
   final Styles styles;

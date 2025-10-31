@@ -440,6 +440,10 @@
           "href": "/content/components/tabs"
         },
         {
+          "title": "FileTree",
+          "href": "/content/components/file_tree"
+        },
+        {
           "title": "DropCap",
           "href": "/content/components/drop_cap"
         },
