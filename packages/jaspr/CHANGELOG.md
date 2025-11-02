@@ -5,7 +5,7 @@
 - Added support for `jaspr.target` option in `pubspec.yaml` to specify the default entrypoint(s) of your Jaspr application.
 
   This can either be a single file (e.g. `bin/main.dart`) or a list of files (e.g. `["lib/main.dart","lib/other.dart"]`).
-  When multiple files are specified, the desired entrypoint can be selected using the `--input` flag when running `jaspr serve` or `jaspr build`, or the file will be used if the `--input` flag is not set. 
+  When multiple files are specified, the desired entrypoint can be selected using the `--input` flag when running `jaspr serve` or `jaspr build`, or the first file will be used if the `--input` flag is not set. 
   
   If neither is set, the default entrypoint stays `lib/main.dart`.
 

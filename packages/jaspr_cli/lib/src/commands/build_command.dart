@@ -23,8 +23,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addOption(
       'input',
       abbr: 'i',
-      help: 'Specify the entry file for the server app',
-      valueHelp: 'Defaults to the value of "jaspr.target" in pubspec.yaml or "lib/main.dart".',
+      help:
+          'Specify the entry file for the server app. Defaults to {"jaspr.target} from pubspec.yaml or "lib/main.dart".',
     );
     argParser.addOption(
       'target',

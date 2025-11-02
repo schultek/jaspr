@@ -378,7 +378,7 @@ String serverEntrypoint(String import) =>
   import 'package:hotreloader/hotreloader.dart';
       
   void main(List<String> args) async {
-    final mainFunc  = m.main as dynamic;
+    final mainFunc = m.main as dynamic;
     final mainCall = mainFunc is dynamic Function(List<String>) ? () => mainFunc(args) : () => mainFunc();
 
     try {
