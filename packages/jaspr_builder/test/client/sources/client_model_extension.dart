@@ -29,11 +29,16 @@ final clientModelExtensionJsonOutputs = {
     "id": ["site", "lib/component_model_extension.dart"],
     "import": "package:site/component_model_extension.dart",
     "params": [
-      {"name": "a", "isNamed": false, "decoder": "p['a']", "encoder": "c.a"},
+      {
+        "name": "a",
+        "isNamed": false,
+        "decoder": "p.get<String>('a')",
+        "encoder": "c.a",
+      },
       {
         "name": "b",
         "isNamed": true,
-        "decoder": "[[package:site/model_extension.dart]].ModelBCodec.fromRaw(p['b'])",
+        "decoder": "[[package:site/model_extension.dart]].ModelBCodec.fromRaw(p.get<Map<String, dynamic>>('b'))",
         "encoder": "[[package:site/model_extension.dart]].ModelBCodec(c.b).toRaw()",
       },
     ],
@@ -52,8 +57,10 @@ final clientModelExtensionDartOutputs = {
       'import \'package:site/component_model_extension.dart\' as prefix0;\n'
       'import \'package:site/model_extension.dart\' as prefix1;\n'
       '\n'
-      'Component getComponentForParams(Map<String, dynamic> p) {\n'
-      '  return prefix0.Component(p[\'a\'], b: prefix1.ModelBCodec.fromRaw(p[\'b\']));\n'
-      '}\n'
-      '',
+      'Component getComponentForParams(ClientParams p) {\n'
+      '  return prefix0.Component(\n'
+      '    p.get<String>(\'a\'),\n'
+      '    b: prefix1.ModelBCodec.fromRaw(p.get<Map<String, dynamic>>(\'b\')),\n'
+      '  );\n'
+      '}\n',
 };

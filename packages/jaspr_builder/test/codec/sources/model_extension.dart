@@ -39,6 +39,7 @@ final modelExtensionOutputs = {
         "extension": "ModelBCodec",
         "decoder": "fromRaw",
         "encoder": "toRaw",
+        "rawType": "Map<String, dynamic>",
         "import": "package:site/model_extension.dart",
         "typeImport": "package:site/model_type.dart",
       },

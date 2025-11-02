@@ -40,4 +40,7 @@ JasprOptions get defaultJasprOptions => JasprOptions(
 
 Map<String, dynamic> _prefix1Root(prefix1.Root c) => {'child': c.child};
 Map<String, dynamic> _prefix2Root2(prefix2.Root2 c) => {'child': c.child};
-Map<String, dynamic> _prefix3Root3(prefix3.Root3 c) => {'child': c.child};
+Map<String, dynamic> _prefix3Root3(prefix3.Root3 c) => {
+  'children': c.children,
+  'children2': c.children2,
+};

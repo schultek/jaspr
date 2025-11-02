@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:universal_web/web.dart' as web;
@@ -10,7 +11,7 @@ import 'dom_render_object.dart';
 import 'utils.dart';
 
 typedef ClientLoader = FutureOr<ClientBuilder> Function();
-typedef ClientBuilder = Component Function(ConfigParams params);
+typedef ClientBuilder = Component Function(ClientParams params);
 
 typedef ClientByName = FutureOr<ClientBuilder> Function(String);
 
@@ -39,23 +40,23 @@ void registerClientsSync(Map<String, ClientBuilder> clients) {
   _findAnchors(clientByName: (name) => clients[name]!);
 }
 
-class ConfigParams {
-  ConfigParams(this._params, this.serverComponents);
+class ClientParams {
+  ClientParams(this._params, this.serverComponents);
 
   final Map<String, dynamic> _params;
   final Map<String, ServerComponentAnchor> serverComponents;
 
-  T get<T>(String key) {
-    if (T == Component) {
-      var sId = _params[key];
-      assert(sId is String && sId.startsWith('s${DomValidator.clientMarkerPrefixRegex}'));
-      var s = serverComponents[sId.substring(2)];
-      if (s != null) {
-        return s.build() as T;
-      } else {
-        return const Component.text("") as T;
-      }
+  Component mount(String sId) {
+    assert( sId.startsWith('s${DomValidator.clientMarkerPrefixRegex}'));
+    var s = serverComponents[sId.substring(2)];
+    if (s != null) {
+      return s.build();
+    } else {
+      return const Component.text("");
     }
+  }
+
+  T get<T>(String key) {
     if (_params[key] is! T) {
       print("$key is not $T: ${_params[key]}");
     }
@@ -91,7 +92,7 @@ class ClientComponentAnchor extends ComponentAnchor {
 
   Component build() {
     assert(builder is ClientBuilder, "ClientComponentAnchor was not resolved before calling build()");
-    var params = ConfigParams(
+    var params = ClientParams(
       data != null ? jsonDecode(const DomValidator().unescapeMarkerText(data!)) : {},
       serverAnchors,
     );

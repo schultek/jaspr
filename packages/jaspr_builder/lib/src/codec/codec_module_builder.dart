@@ -219,6 +219,7 @@ class CodecElement {
   final String? extension;
   final String decoder;
   final String encoder;
+  final String rawType;
   final String import;
   final String? typeImport;
 
@@ -227,6 +228,7 @@ class CodecElement {
     this.extension,
     required this.decoder,
     required this.encoder,
+    required this.rawType,
     required this.import,
     this.typeImport,
   });
@@ -240,6 +242,7 @@ class CodecElement {
           extension: element.name,
           decoder: decoder.name ?? '',
           encoder: encoder.name ?? '',
+          rawType: encoder.returnType.getDisplayString(),
           import: element.library.firstFragment.source.uri.toString(),
         );
       } else {
@@ -252,6 +255,7 @@ class CodecElement {
           extension: element.name,
           decoder: decoder.name ?? '',
           encoder: encoder.name ?? '',
+          rawType: encoder.returnType.getDisplayString(),
           import: element.library.firstFragment.source.uri.toString(),
           typeImport: import?.firstFragment.source.uri.toString(),
         );
@@ -261,6 +265,7 @@ class CodecElement {
         name: element.name ?? '',
         decoder: decoder.name ?? '',
         encoder: encoder.name ?? '',
+        rawType: encoder.returnType.getDisplayString(),
         import: element.library.firstFragment.source.uri.toString(),
       );
     }
@@ -271,6 +276,7 @@ class CodecElement {
       extension = map['extension'],
       decoder = map['decoder'],
       encoder = map['encoder'],
+      rawType = map['rawType'],
       import = map['import'],
       typeImport = map['typeImport'];
 
@@ -279,6 +285,7 @@ class CodecElement {
     'extension': ?extension,
     'decoder': decoder,
     'encoder': encoder,
+    'rawType': rawType,
     'import': import,
     'typeImport': ?typeImport,
   };

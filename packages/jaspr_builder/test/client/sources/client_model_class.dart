@@ -29,11 +29,11 @@ final clientModelClassJsonOutputs = {
     "id": ["site", "lib/component_model_class.dart"],
     "import": "package:site/component_model_class.dart",
     "params": [
-      {"name": "a", "isNamed": false, "decoder": "p['a']", "encoder": "c.a"},
+      {"name": "a", "isNamed": false, "decoder": "p.get<String>('a')", "encoder": "c.a"},
       {
         "name": "b",
         "isNamed": true,
-        "decoder": "[[package:site/model_class.dart]].ModelA.fromRaw(p['b'])",
+        "decoder": "[[package:site/model_class.dart]].ModelA.fromRaw(p.get<Map<String, dynamic>>('b'))",
         "encoder": "c.b.toRaw()",
       },
     ],
@@ -52,8 +52,10 @@ final clientModelClassDartOutputs = {
       'import \'package:site/component_model_class.dart\' as prefix0;\n'
       'import \'package:site/model_class.dart\' as prefix1;\n'
       '\n'
-      'Component getComponentForParams(Map<String, dynamic> p) {\n'
-      '  return prefix0.Component(p[\'a\'], b: prefix1.ModelA.fromRaw(p[\'b\']));\n'
-      '}\n'
-      '',
+      'Component getComponentForParams(ClientParams p) {\n'
+      '  return prefix0.Component(\n'
+      '    p.get<String>(\'a\'),\n'
+      '    b: prefix1.ModelA.fromRaw(p.get<Map<String, dynamic>>(\'b\')),\n'
+      '  );\n'
+      '}\n',
 };

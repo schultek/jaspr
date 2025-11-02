@@ -81,7 +81,8 @@ void main() {
         expect(
           errorLog,
           equals(
-            'SyncMixinsBuilder on lib/component.dart:\nFields annotated with @sync must have a primitive serializable type or a type that defines @decoder and @encoder methods. Failing field: [Map<int, int> a] in ComponentState',
+            'SyncMixinsBuilder on lib/component.dart:\nFields annotated with @sync must have a primitive serializable type or a type that defines @decoder and @encoder methods.\n'
+            'Failing field: [Map<int, int> a] in ComponentState',
           ),
         );
       });
@@ -104,7 +105,8 @@ void main() {
         expect(
           errorLog,
           equals(
-            'SyncMixinsBuilder on lib/component.dart:\nFields annotated with @sync must have a primitive serializable type or a type that defines @decoder and @encoder methods. Failing field: [DateTime time] in ComponentState',
+            'SyncMixinsBuilder on lib/component.dart:\nFields annotated with @sync must have a primitive serializable type or a type that defines @decoder and @encoder methods.\n'
+            'Failing field: [DateTime time] in ComponentState',
           ),
         );
       });

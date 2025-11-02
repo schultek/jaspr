@@ -128,11 +128,11 @@ class SyncMixinsBuilder implements Builder {
     final decoders = fields
         .map((f) {
           try {
-            var decoder = codecs.getDecoderFor(f.type, "value['${f.name}']");
+            var decoder = codecs.getDecoderFor(f.type, "(value['${f.name}'] as __CAST__)", false);
             return "${f.name} = $decoder;";
           } on InvalidParameterException catch (_) {
             throw UnsupportedError(
-              'Fields annotated with @sync must have a primitive serializable type or a type that defines @decoder and @encoder methods. '
+              'Fields annotated with @sync must have a primitive serializable type or a type that defines @decoder and @encoder methods.\n'
               'Failing field: [$f] in ${clazz.name}',
             );
           }
