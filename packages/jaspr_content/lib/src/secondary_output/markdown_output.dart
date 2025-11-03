@@ -5,6 +5,17 @@ import 'secondary_output.dart';
 
 /// Outputs a secondary 'index.html.md' file for a markdown page containing its unparsed content.
 class MarkdownOutput extends SecondaryOutput {
+  /// A function that creates a Markdown header for the
+  /// passed in [Page].
+  final String Function(Page)? createHeader;
+
+  /// Creates a [SecondaryOutput] that outputs a secondary `.index.html.md` file for
+  /// each Markdown page containing its unparsed content.
+  ///
+  /// A custom header can be added to the generated Markdown file based on
+  /// each individual page by specifying a [createHeader] callback function.
+  MarkdownOutput({this.createHeader});
+
   @override
   final Pattern pattern = RegExp(r'.*\.mdx?');
 
@@ -23,18 +34,12 @@ class MarkdownOutput extends SecondaryOutput {
     return Builder(
       builder: (context) {
         final pageContent = StringBuffer();
-        if (page.data.page['title'] case final String title when title.isNotEmpty) {
-          pageContent.writeln('# $title');
-
-          if (page.data.page['description'] case final String description when description.isNotEmpty) {
-            pageContent.writeln();
-            pageContent.writeln('> $description');
-          }
-
-          pageContent.writeln();
+        if (createHeader case final createHeader?) {
+          final headerForPage = createHeader(page);
+          pageContent.writeln(headerForPage);
         }
 
-        pageContent.write(page.content);
+        pageContent.writeln(page.content);
 
         context.setHeader('Content-Type', 'text/markdown');
         context.setStatusCode(200, responseBody: pageContent.toString());
