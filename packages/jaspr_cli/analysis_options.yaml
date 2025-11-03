@@ -5,12 +5,12 @@ analyzer:
     - tool/scaffold/**
     - tool/templates/**
   language:
-    # TODO: Enable and fix remaining strict-casts diagnostics.
-    # strict-casts: true
+    strict-casts: true
     strict-inference: true
     strict-raw-types: true
   
 linter:
   rules:
+    avoid_dynamic_calls: true
     # Disabled so that we can group dependencies semantically.
     sort_pub_dependencies: false

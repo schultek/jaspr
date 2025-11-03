@@ -51,8 +51,8 @@ class CleanCommand extends BaseCommand {
 
       if (pids.isNotEmpty) {
         bool kill = false;
-        if (argResults!['kill'] != null) {
-          kill = argResults!['kill'];
+        if (argResults!.wasParsed('kill')) {
+          kill = argResults!.flag('kill');
           if (kill) {
             logger.write("Killing ${pids.length} runaway processes.");
           }

@@ -101,11 +101,11 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   @override
   String get category => 'Project';
 
-  late final useWasm = argResults!['experimental-wasm'] as bool;
-  late final includeSourceMaps = argResults!['include-source-maps'] as bool;
-  late final sitemapDomain = argResults!['sitemap-domain'] as String?;
-  late final sitemapExclude = argResults!['sitemap-exclude'] as String?;
-  late final managedBuildOptions = argResults!['managed-build-options'] as bool;
+  late final useWasm = argResults!.flag('experimental-wasm');
+  late final includeSourceMaps = argResults!.flag('include-source-maps');
+  late final sitemapDomain = argResults!.option('sitemap-domain');
+  late final sitemapExclude = argResults!.option('sitemap-exclude');
+  late final managedBuildOptions = argResults!.flag('managed-build-options');
 
   @override
   Future<int> runCommand() async {
@@ -118,7 +118,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     String? entryPoint;
     if (project.requireMode != JasprMode.client) {
-      entryPoint = await getEntryPoint(argResults!['input']);
+      entryPoint = await getEntryPoint(argResults!.option('input'));
     }
 
     if (dir.existsSync()) {
@@ -160,8 +160,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (project.requireMode == JasprMode.server) {
       logger.write('Building server app...', progress: ProgressState.running);
 
-      final target = argResults!['target'];
-      String extension = switch (target) {
+      final target = argResults!.option('target')!;
+      final extension = switch (target) {
         'exe' when Platform.isWindows => '.exe',
         'aot-snapshot' => '.aot',
         'kernel' => '.dill',
@@ -170,7 +170,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       var process = await Process.start('dart', [
         'compile',
-        argResults!['target'],
+        target,
         entryPoint!,
         '-o',
         './build/jaspr/app$extension',
@@ -200,8 +200,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
               queuedRoutes.insert(0, route);
             }
 
-            final lastmod = message['lastmod'] is String ? message['lastmod'] : null;
-            final changefreq = message['changefreq'] is String ? message['changefreq'] : null;
+            final lastmod = message['lastmod'] is String ? message['lastmod'] as String : null;
+            final changefreq = message['changefreq'] is String ? message['changefreq'] as String : null;
             final priority = message['priority'] is num ? (message['priority'] as num).toDouble() : null;
 
             generatedRoutes[route] = (lastmod: lastmod, changefreq: changefreq, priority: priority);
@@ -410,11 +410,11 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final args = [
       '-Djaspr.flags.release=true',
-      '-O${argResults!['optimize']}',
+      '-O${argResults!.option('optimize')}',
       if (useWasm) //
-        ...argResults!['extra-wasm-compiler-option']
+        ...argResults!.multiOption('extra-wasm-compiler-option')
       else
-        ...argResults!['extra-js-compiler-option'],
+        ...argResults!.multiOption('extra-js-compiler-option'),
       for (final entry in dartDefines.entries) //
         '-D${entry.key}=${entry.value}',
     ];

@@ -30,10 +30,10 @@ class MigrateCommand extends BaseCommand {
   @override
   String get category => 'Tooling';
 
-  late final bool dryRun = argResults!['dry-run'] as bool;
-  late final bool apply = argResults!['apply'] as bool;
-  late final String? assumeVersion = argResults!['assume-version'] as String?;
-  late final List<String> includeDirs = List<String>.from(argResults!['include-dir'] as List);
+  late final bool dryRun = argResults!.flag('dry-run');
+  late final bool apply = argResults!.flag('apply');
+  late final String? assumeVersion = argResults!.option('assume-version');
+  late final List<String> includeDirs = argResults!.multiOption('include-dir');
 
   static List<Migration> get allMigrations => [BuildMethodMigration(), ComponentFactoryMigration()];
 

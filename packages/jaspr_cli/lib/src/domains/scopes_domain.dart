@@ -28,7 +28,7 @@ class ScopesDomain extends Domain {
   final Map<AnalysisContext, InspectData> _inspectedData = {};
 
   Future<void> registerScopes(
-    Map<String, dynamic> params, {
+    Map<String, Object?> params, {
     ResourceProvider? resourceProvider,
   }) async {
     await _collection?.dispose();
@@ -37,7 +37,7 @@ class ScopesDomain extends Domain {
     _watcherSubscriptions.clear();
     _inspectedData.clear();
 
-    final folders = params['folders'] as List<dynamic>;
+    final folders = params['folders'] as List<Object?>;
 
     _collection = AnalysisContextCollection(
       includedPaths: folders.cast(),
@@ -157,7 +157,7 @@ class ScopesDomain extends Domain {
   void emitScopes() {
     final allLibraries = _inspectedData.values.expand((data) => data.libraries.keys).toSet();
 
-    final output = <String, dynamic>{};
+    final output = <String, Object?>{};
 
     for (final libraryPath in allLibraries) {
       final components = <String>{};
@@ -222,7 +222,7 @@ class ScopesDomain extends Domain {
   }
 
   void emitStatus() {
-    final output = <String, dynamic>{};
+    final output = <String, Object?>{};
 
     for (final context in _collection!.contexts) {
       final status = _analysisStatus[context] ?? false;
@@ -587,7 +587,7 @@ class DirectiveTarget {
 
   DirectiveTarget(this.uri, this.target, this.line, this.character, this.length);
 
-  Map<String, dynamic> toJson() {
+  Map<String, Object?> toJson() {
     return {'uri': uri, 'target': target, 'line': line, 'character': character, 'length': length};
   }
 
@@ -604,7 +604,7 @@ class InspectTarget {
 
   InspectTarget(this.path, this.name, this.line, this.character);
 
-  Map<String, dynamic> toJson() {
+  Map<String, Object?> toJson() {
     return {'path': path, 'name': name, 'line': line, 'character': character};
   }
 }

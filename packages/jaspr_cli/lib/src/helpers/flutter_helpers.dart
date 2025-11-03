@@ -30,7 +30,7 @@ mixin FlutterHelper on BaseCommand {
         '.dart_tool/jaspr/flutter_target.dart',
         '--web-port=$flutterPort',
         if (wasm) '--wasm',
-        if (argResults!['release']) '--release',
+        if (argResults!.flag('release')) '--release',
       ],
       runInShell: true,
       workingDirectory: Directory.current.path,

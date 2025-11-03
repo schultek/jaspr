@@ -14,7 +14,7 @@ class HtmlDomain extends Domain {
 
   final Logger logger;
 
-  Future<String> convertHtml(Map<String, dynamic> params) async {
+  Future<String> convertHtml(Map<String, Object?> params) async {
     final html = params['html'] as String;
     final parsed = parseFragment(html);
 
@@ -36,7 +36,7 @@ class HtmlDomain extends Domain {
       var attrs = node.attributes;
       var children = node.nodes;
 
-      var spec = elementSpecs[tagName];
+      var spec = elementSpecs[tagName] as Map<String, Object?>?;
 
       if (spec == null) {
         final attrsString = attrs.isEmpty
@@ -50,6 +50,8 @@ class HtmlDomain extends Domain {
         return '${indent}Component.element(tag: \'$tagName\'$attrsString$childrenString)';
       }
 
+      final specAttributes = spec['attributes'] as Map<String, Object?>?;
+
       String? idString;
       String? classString;
       var paramStrings = <String>[];
@@ -61,7 +63,7 @@ class HtmlDomain extends Domain {
         } else if (key == 'id') {
           idString = value;
         } else {
-          if (spec?['attributes']?[key] case final attrSpec?) {
+          if (specAttributes?[key] case final Map<String, Object?> attrSpec) {
             final attrName = (attrSpec['name'] ?? key) as String;
             var attrType = attrSpec['type'];
 
@@ -77,10 +79,10 @@ class HtmlDomain extends Domain {
               final enumName = attrType.substring(5);
               attrType = enumSpecs[enumName];
             }
-            if (attrType case {'name': String enumName, 'values': Map<String, dynamic> enumValues}) {
+            if (attrType case {'name': String enumName, 'values': Map<String, Object?> enumValues}) {
               final enumValue = enumValues.entries
                   .where(
-                    (e) => (e.value['value'] ?? e.key) == value,
+                    (e) => ((e.value as Map<String, Object?>?)?['value'] ?? e.key) == value,
                   )
                   .firstOrNull;
               if (enumValue != null) {
@@ -122,7 +124,10 @@ class HtmlDomain extends Domain {
         result += '}, ';
       }
 
-      final contentParam = (spec['attributes'] as Map?)?.entries.where((e) => e.value['type'] == 'content').firstOrNull;
+      final contentParam = specAttributes?.entries
+          .map((e) => (key: e.key, value: e.value as Map<String, Object?>))
+          .where((e) => e.value['type'] == 'content')
+          .firstOrNull;
 
       if (contentParam != null && children.isNotEmpty) {
         final contentParamName = contentParam.value['name'] as String? ?? contentParam.key;
@@ -171,7 +176,7 @@ class HtmlDomain extends Domain {
 }
 
 final elementSpecs = (() {
-  final config = <String, dynamic>{};
+  final config = <String, Object?>{};
   for (final group in htmlSpec.values) {
     for (final entry in group.entries) {
       final name = entry.key;
@@ -184,13 +189,11 @@ final elementSpecs = (() {
 })();
 
 final enumSpecs = (() {
-  final enums = <String, Map<String, dynamic>>{};
-  for (final element in elementSpecs.values) {
-    final attrs = element['attributes'] as Map<String, dynamic>?;
-    if (attrs != null) {
-      for (final attr in attrs.values) {
-        final type = attr['type'];
-        if (type case <String, dynamic>{'name': String _, 'values': Map<String, dynamic> _}) {
+  final enums = <String, Map<String, Object?>>{};
+  for (final element in elementSpecs.values.cast<Map<String, Object?>>()) {
+    if (element['attributes'] case final Map<String, Object?> attrs) {
+      for (final attr in attrs.values.cast<Map<String, Object?>>()) {
+        if (attr['type'] case <String, Object?>{'name': String _, 'values': Map<String, Object?> type}) {
           enums[type['name'] as String] = type;
         }
       }

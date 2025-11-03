@@ -26,14 +26,14 @@ extension AddDartDefine on BaseCommand {
   }
 
   Map<String, String> getClientDartDefines() {
-    final defines = argResults?['dart-define'] as List<String>? ?? [];
-    final clientDefines = argResults?['dart-define-client'] as List<String>? ?? [];
+    final defines = argResults?.multiOption('dart-define') ?? [];
+    final clientDefines = argResults?.multiOption('dart-define-client') ?? [];
     return _parseDefines(defines.followedBy(clientDefines));
   }
 
   Map<String, String> getServerDartDefines() {
-    final defines = argResults?['dart-define'] as List<String>? ?? [];
-    final serverDefines = argResults?['dart-define-server'] as List<String>? ?? [];
+    final defines = argResults?.multiOption('dart-define') ?? [];
+    final serverDefines = argResults?.multiOption('dart-define-server') ?? [];
     return _parseDefines(defines.followedBy(serverDefines));
   }
 

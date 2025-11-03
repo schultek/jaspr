@@ -101,13 +101,13 @@ class CreateCommand extends BaseCommand {
   @override
   String get category => 'Project';
 
-  late final bool runPubGet = argResults!['pub-get'] as bool;
+  late final bool runPubGet = argResults!.flag('pub-get');
 
   @override
   Future<int> runCommand() async {
     var (dir, name) = getTargetDirectory();
 
-    var template = argResults!['template'] as String?;
+    var template = argResults!.option('template');
     if (template != null) {
       return await createFromTemplate(template, dir, name);
     }
@@ -284,7 +284,7 @@ class CreateCommand extends BaseCommand {
   }
 
   (RenderingMode, bool) getRenderingMode() {
-    var opt = argResults!['mode'] as String?;
+    var opt = argResults!.option('mode');
     return switch (opt?.split(':')) {
       ['client'] => (RenderingMode.client, false),
       [var m, 'auto'] => (RenderingMode.values.byName(m), true),
@@ -304,7 +304,7 @@ class CreateCommand extends BaseCommand {
   }
 
   (bool, bool) getRouting(bool useServer, bool useHydration) {
-    var opt = argResults!['routing'] as String?;
+    var opt = argResults!.option('routing');
 
     return switch (opt) {
       'none' => (false, false),
@@ -330,7 +330,7 @@ class CreateCommand extends BaseCommand {
   }
 
   (bool, bool) getFlutter() {
-    var opt = argResults!['flutter'] as String?;
+    var opt = argResults!.option('flutter');
 
     return switch (opt) {
       'none' => (false, false),
@@ -347,7 +347,7 @@ class CreateCommand extends BaseCommand {
   }
 
   String? getBackend() {
-    var opt = argResults!['backend'] as String?;
+    var opt = argResults!.option('backend');
 
     return switch (opt) {
       'none' => null,
