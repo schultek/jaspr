@@ -22,8 +22,22 @@ class MarkdownOutput extends SecondaryOutput {
   Component build(Page page) {
     return Builder(
       builder: (context) {
+        final pageContent = StringBuffer();
+        if (page.data.page['title'] case final String title when title.isNotEmpty) {
+          pageContent.writeln('# $title');
+
+          if (page.data.page['description'] case final String description when description.isNotEmpty) {
+            pageContent.writeln();
+            pageContent.writeln('> $description');
+          }
+
+          pageContent.writeln();
+        }
+
+        pageContent.write(page.content);
+
         context.setHeader('Content-Type', 'text/markdown');
-        context.setStatusCode(200, responseBody: page.content);
+        context.setStatusCode(200, responseBody: pageContent.toString());
         return Component.text('');
       },
     );
