@@ -124,6 +124,23 @@ Component? create(Node node, NodesBuilder builder) {
 You can also use this in combination with custom markdown syntaxes. Checkout the [Markdown Parsing](/content/concepts/page_parsing#markdown) docs for more info.
 </Info>
 
+### Using Page Data in Components
+
+You can also get access to the current `Page` inside your component (or any Jaspr component under `ContentApp`) by using the `context.page` extension on `BuildContext`. This allows you to read frontmatter data from the current page, access [global data](/content/concepts/data_loading) and more.
+
+```dart
+// Some build method
+Component build(BuildContext context) {
+  Page page = context.page;
+
+  String? title = page.data.page['title']; // Access frontmatter data on `page.data.page`.
+
+  Map<String, dynamic>? myCustomData = page.data['my_data']; // Access global data loaded from 'content/_data/my_data.yaml' or '.json'.
+
+  return ...;
+}
+```
+
 ## Layouts
 
 So far we only covered how to customize the main content of a page. However a website usually consists of other parts as well, like headers, footers, sidebars or other ui before or after the content. This is where [PageLayouts](/content/concepts/page_layouts) come into play.

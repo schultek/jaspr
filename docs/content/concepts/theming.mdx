@@ -209,8 +209,6 @@ ContentTheme(
 You can also create your own theme extension by extending `ThemeExtension<T>`. 
 If you create a [Custom Component](/content/concepts/custom_components) that requires theming, you should return a default instance of your theme extension in the `theme` getter of your `CustomComponent`.
 
-```dart
-
 ## Disable Theming
 
 By default (even without any configuration) `jaspr_content` will apply a set of global reset styles and the default content styles to the page. You can opt-out of that (e.g. to use your own custom theming solution) by using `ContentTheme.none()`.

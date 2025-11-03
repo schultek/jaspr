@@ -97,6 +97,29 @@ class MyComponent extends StatelessComponent {
 }
 ```
 
+### Eagerly accessing all Pages
+
+In some cases you might want to access all, or a subset of all pages of your site at once, e.g. to build an overview page or a list of blog posts.
+You can achieve this by using the `context.pages` extension getter on `BuildContext`. **For this to work, you need to enable eager loading of all pages by setting `eagerlyLoadAllPages: true` in your `ContentApp` configuration.**
+
+```dart
+// in main.dart
+ContentApp(
+  eagerlyLoadAllPages: true,
+  ...
+)
+
+// in your component
+Component build(BuildContext context) {
+  final allPages = context.pages;
+
+  // Optionally filter pages by their path, frontmatter data or something else.
+  final blogPosts = allPages.where((page) => page.path.startsWith('blog/'));
+
+  return ...
+}
+```
+
 ---
 
 ## PageConfig
