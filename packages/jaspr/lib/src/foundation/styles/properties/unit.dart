@@ -45,16 +45,23 @@ extension UnitExt on num {
   Unit get vh => Unit.vh(toDouble());
 }
 
+/// Represents a CSS unit value.
+///
+/// This can be used to specify lengths, sizes, and other measurements in CSS.
+///
+/// Read more: [MDN CSS Values and Units](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units)
 abstract class Unit {
   static const Unit zero = _ExpUnit('0');
 
   /// The style attribute unit 'auto'
   static const Unit auto = _ExpUnit('auto');
 
-  /// The max-content sizing keyword represents the maximum intrinsic size of the content. For text content this means that the content will not wrap at all even if it causes overflows.
+  /// The max-content sizing keyword represents the maximum intrinsic size of the content. For text content this means
+  /// that the content will not wrap at all even if it causes overflows.
   static const Unit maxContent = _ExpUnit('max-content');
 
-  /// The min-content sizing keyword represents the minimum intrinsic size of the content. For text content this means that the content will take all soft-wrapping opportunities, becoming as small as the longest word.
+  /// The min-content sizing keyword represents the minimum intrinsic size of the content. For text content this means
+  /// that the content will take all soft-wrapping opportunities, becoming as small as the longest word.
   static const Unit minContent = _ExpUnit('min-content');
 
   /// The fit-content keyword means that the box will use the available space, but never more than max-content.

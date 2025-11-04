@@ -1,5 +1,11 @@
 import 'unit.dart' show NumberString;
 
+/// Represents the CSS `transition` property.
+///
+/// Transitions enable you to define the transition between two states of an element. Different
+/// states may be defined using pseudo-classes like `:hover` or `:active` or dynamically set.
+///
+/// Read more: [MDN `transition`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition)
 class Transition {
   const Transition._(this.value);
 
@@ -9,9 +15,13 @@ class Transition {
   static const revertLayer = Transition._('revert-layer');
   static const unset = Transition._('unset');
 
+  /// Create a transition for a specific CSS property.
   const factory Transition(String property, {required Duration duration, Curve? curve, Duration? delay}) = _Transition;
+
+  /// Combine multiple transitions into one.
   const factory Transition.combine(List<Transition> transitions) = _CombineTransition;
 
+  /// The css value
   final String value;
 }
 
@@ -60,21 +70,49 @@ class _CombineTransition implements _ListableTransition {
   }
 }
 
+/// Describes the timing function of a transition.
+///
+/// This defines an acceleration curve so that the speed of the transition can vary over its duration.
+///
+/// Read more: [MDN `transition-timing-function`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function)
 class Curve {
   const Curve._(this.value);
 
+  /// The css value
   final String value;
 
+  /// Equal to `cubic-bezier(0.25, 0.1, 0.25, 1.0)`, the default value, increases in velocity towards the
+  /// middle of the transition, slowing back down at the end.
   static const Curve ease = Curve._('ease');
+
+  /// Equal to `cubic-bezier(0.42, 0, 1.0, 1.0)`, starts off slowly, with the transition speed increasing
+  /// until complete.
   static const Curve easeIn = Curve._('ease-in');
+
+  /// Equal to `cubic-bezier(0, 0, 0.58, 1.0)`, starts transitioning quickly, slowing down as the transition
+  /// continues.
   static const Curve easeOut = Curve._('ease-out');
+
+  /// Equal to `cubic-bezier(0.42, 0, 0.58, 1.0)`, starts transitioning slowly, speeds up, and then slows down
+  /// again.
   static const Curve easeInOut = Curve._('ease-in-out');
+
+  /// Equal to `cubic-bezier(0.0, 0.0, 1.0, 1.0)`, transitions at an even speed.
   static const Curve linear = Curve._('linear');
+
+  /// Equal to `steps(1, jump-start)`.
   static const Curve stepStart = Curve._('step-start');
+
+  /// Equal to `steps(1, jump-end)`.
   static const Curve stepEnd = Curve._('step-end');
 
   const factory Curve.linearFn(List<Linear> vals) = _LinearFnCurve;
+
+  /// An custom cubic-Bezier curve, where the p1 and p3 values must be in the range of 0 to 1.
   const factory Curve.cubicBezier(double p1, double p2, double p3, double p4) = _CubicBezierCurve;
+
+  /// Displays the transition along [steps] stops along the transition, displaying each stop for equal lengths
+  /// of time. How the transition behaves at the start and end is defined by [jump].
   const factory Curve.steps(int steps, {required StepJump jump}) = _StepsCurve;
 }
 
@@ -136,10 +174,18 @@ class _StepsCurve implements Curve {
   String get value => 'steps($steps, ${jump.value})';
 }
 
+/// Describes how the transition behaves at the start and end when using [Curve.steps].
 enum StepJump {
+  /// Denotes a left-continuous function, so that the first jump happens when the transition begins.
   start('jump-start'),
+
+  /// Denotes a right-continuous function, so that the last jump happens when the animation ends.
   end('jump-end'),
+
+  /// There is no jump on either end. Instead, holding at both the 0% mark and the 100% mark, each for 1/n of the duration.
   none('jump-none'),
+
+  /// Includes pauses at both the 0% and 100% marks, effectively adding a step during the transition time.
   both('jump-both');
 
   /// The css value

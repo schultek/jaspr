@@ -1,29 +1,56 @@
 import 'unit.dart';
 
+/// Extension helpers to create [Angle] values from numeric literals.
+///
+/// Example:
+///
+/// ```dart
+///  90.deg
+///  1.rad
+///  0.25.turn
+/// ```
 extension AngleExt on num {
+  /// Returns an [Angle] expressed in degrees (CSS `deg`).
   Angle get deg => Angle.deg(toDouble());
+
+  /// Returns an [Angle] expressed in radians (CSS `rad`).
   Angle get rad => Angle.rad(toDouble());
+
+  /// Returns an [Angle] expressed in turns (CSS `turn`).
   Angle get turn => Angle.turn(toDouble());
 }
 
+/// The `<angle>` CSS data type represents an angle value expressed in
+/// degrees, gradians, radians, or turns. It is used by CSS functions like
+/// `rotate()` and in gradient angles.
+///
+/// Positive numbers represent clockwise angles; negative numbers represent
+/// counter-clockwise angles. Common units are `deg`, `rad`, and `turn`.
+///
+/// Examples (CSS): `90deg`, `3.1416rad`, `0.25turn`.
+///
+/// Read more: [MDN `<angle>`](https://developer.mozilla.org/en-US/docs/Web/CSS/angle)
 abstract class Angle {
+  /// A zero angle (`0`). Useful when no rotation is required.
   static const Angle zero = _ZeroAngle();
 
-  /// Constructs an [Angle] in the form '90deg'
+  /// Constructs an [Angle] in degrees (`<number>deg`).
   const factory Angle.deg(double value) = _DegreeAngle;
 
-  /// Constructs an [Angle] in the form '1rad'
+  /// Constructs an [Angle] in radians (`<number>rad`).
   const factory Angle.rad(double value) = _RadianAngle;
 
-  /// Constructs an [Angle] in the form '1turn'
+  /// Constructs an [Angle] in turns (`<number>turn`). One full circle is `1turn`.
   const factory Angle.turn(double value) = _TurnAngle;
 
-  /// Represents a css variable
+  /// Constructs an [Angle] from a CSS variable reference: `var(--name)`.
   const factory Angle.variable(String value) = _VariableAngle;
 
+  /// Adds two angles. If both angles use the same unit the result may be
+  /// combined; otherwise a CSS `calc()` expression will be produced.
   Angle operator +(Angle other);
 
-  /// The css value
+  /// The CSS text value for this angle (e.g. `90deg`, `1.5708rad`, `0.25turn`).
   String get value;
 }
 

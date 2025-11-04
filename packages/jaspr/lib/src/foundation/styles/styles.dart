@@ -2,13 +2,13 @@ import 'properties/all.dart';
 
 export 'properties/all.dart' hide NumberString;
 
-/// Represents a set of css styles by pairs of property and value.
+/// Represents a set of css styles.
 abstract class Styles with StylesMixin<Styles> {
   const Styles._();
 
   Map<String, String> get properties;
 
-  /// Constructs an empty [Styles] instance.
+  /// Constructs a [Styles] instance with the given css properties.
   const factory Styles({
     All? all,
     // Box Styles
@@ -103,8 +103,8 @@ abstract class Styles with StylesMixin<Styles> {
 
 abstract mixin class StylesMixin<T> {
   T styles({
-    // Box Styles
     All? all,
+    // Box Styles
     String? content,
     Display? display,
     Position? position,
