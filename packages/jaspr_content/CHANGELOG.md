@@ -1,5 +1,6 @@
 ## Unreleased patch
 
+- Enable adding a header based on the current page to `MarkdownOutput`.
 - Update `package:mustache_template` constraint to `^2.0.2`.
   This version adds support for emojis in templates,
   no longer requiring a dependency override.
