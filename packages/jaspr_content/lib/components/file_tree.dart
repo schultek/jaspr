@@ -10,7 +10,7 @@ import '_internal/file_tree_icons.dart';
 /// normal [Component].
 class FileTree extends CustomComponent {
   /// Creates a file tree [CustomComponent].
-  /// 
+  ///
   /// The contents of a `<FileTree>` tag will be parsed as a file tree structure, and must be a single
   /// unordered list, with each item representing a file or folder. The following rules apply:
   /// - Folders can contain nested lists of files/folders.
