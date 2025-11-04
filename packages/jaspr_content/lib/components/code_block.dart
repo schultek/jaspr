@@ -5,8 +5,8 @@ import '../jaspr_content.dart';
 import '_internal/code_block_copy_button.dart';
 
 /// A code block component that renders syntax-highlighted code.
-class CodeBlock implements CustomComponent {
-  CodeBlock({this.defaultLanguage = 'dart', this.grammars = const {}, this.theme});
+class CodeBlock extends CustomComponent {
+  CodeBlock({this.defaultLanguage = 'dart', this.grammars = const {}, this.codeTheme}) : super.base();
 
   static Component from({required String source, Highlighter? highlighter, Key? key}) {
     return _CodeBlock(source: source, highlighter: highlighter, key: key);
@@ -22,7 +22,7 @@ class CodeBlock implements CustomComponent {
   final Map<String, String> grammars;
 
   /// The default theme for the code block.
-  final HighlighterTheme? theme;
+  final HighlighterTheme? codeTheme;
 
   bool _initialized = false;
   HighlighterTheme? _defaultTheme;
@@ -49,7 +49,7 @@ class CodeBlock implements CustomComponent {
         builder: (context) async {
           final highlighter = Highlighter(
             language: language ?? defaultLanguage,
-            theme: theme ?? (_defaultTheme ??= await HighlighterTheme.loadDarkTheme()),
+            theme: codeTheme ?? (_defaultTheme ??= await HighlighterTheme.loadDarkTheme()),
           );
 
           return _CodeBlock(source: children?.map((c) => c.innerText).join(' ') ?? '', highlighter: highlighter);

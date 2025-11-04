@@ -188,6 +188,26 @@ typography: ContentTypography.base.apply(
 
 By combining these theming options, you can create a visually consistent and appealing site that aligns perfectly with your design requirements.
 
+## Component Styles & Theme Extensions
+
+The `ContentTheme` can also be extended with custom `ThemeExtension`s, for example to customize individual components.
+
+Some components, like the `FileTree`, provide their own theme extension (e.g. `FileTreeTheme`) to customize their styling. To do that, create an instance of the theme extension and add it to the `extensions` list in your `ContentTheme`:
+
+```dart
+ContentTheme(
+  // ... other theme settings
+  extensions: [
+    FileTreeTheme(
+      // Custom highlight color for the FileTree component.
+      highlightColor: ThemeColors.teal,
+    ),
+  ],
+)
+```
+
+You can also create your own theme extension by extending `ThemeExtension<T>`. 
+If you create a [Custom Component](/content/concepts/custom_components) that requires theming, you should return a default instance of your theme extension in the `theme` getter of your `CustomComponent`.
 
 ## Disable Theming
 

@@ -70,7 +70,7 @@ The `MemoryDataLoader` allows you to provide data programmatically instead of lo
 - Test data
 - Other dynamic data
 
-#### Usage
+Use it by providing a `Map<String, dynamic>` containing your data:
 
 ```dart
 ContentApp.custom(
@@ -92,7 +92,11 @@ ContentApp.custom(
 )
 ```
 
-Now this data is available in your content pipeline, including [Templates](/content/concepts/templating) and [Layouts](/content/concepts/page_layouts).
+## Usage
+
+Now this data is available in your content pipeline, including [Templates](/content/concepts/templating), [Layouts](/content/concepts/page_layouts) and [Components](/content/concepts/custom_components).
+
+In your templates, you can access the loaded data like this:
 
 ```markdown
 # {{site.title}}
@@ -101,6 +105,21 @@ Now this data is available in your content pipeline, including [Templates](/cont
 <Comments />
 {{/settings.showComments}}
 ```
+
+In components, you can access the data via the page by using the `context.page` extension getter on `BuildContext`:
+
+```dart
+Component build(BuildContext context) {
+  Page page = context.page;
+
+  String? siteTitle = page.data['site']?['title'] as String?;
+  bool? showComments = page.data['settings']?['showComments'] as bool?;
+
+  return ...
+}
+```
+
+Read more about the **Page** object and its properties [here](/content/concepts/pages).
 
 ## Creating Custom Data Loaders
 
