@@ -53,7 +53,7 @@ class FileTree extends CustomComponent {
       String? name;
       List<Node> comment = [];
       bool isOpen = true;
-      bool isHighlight = false;
+      bool isHighlighted = false;
       List<FileTreeItem> subItems = [];
 
       if (nodes case [..._, ElementNode(tag: 'ul', :final children)]) {
@@ -67,7 +67,7 @@ class FileTree extends CustomComponent {
       for (final node in nodes) {
         if (name == null) {
           if (node is ElementNode && node.tag == 'strong') {
-            isHighlight = true;
+            isHighlighted = true;
             name = node.innerText;
             continue;
           } else if (node is TextNode) {
@@ -93,7 +93,7 @@ class FileTree extends CustomComponent {
         name: name,
         isFolder: subItems.isNotEmpty || name.endsWith('/'),
         isOpen: subItems.isNotEmpty && isOpen,
-        isHighlight: isHighlight,
+        isHighlighted: isHighlighted,
         comment: comment.isNotEmpty ? builder.build(comment) : null,
         children: subItems,
       );
@@ -168,8 +168,12 @@ class FileTree extends CustomComponent {
                   cursor: Cursor.pointer,
                   color: Color.variable(FileTreeTheme._highlightVariable),
                 ),
-                css('svg').styles(color: Color.variable(FileTreeTheme._highlightVariable)),
-                css('.highlight svg').styles(color: Color.variable(FileTreeTheme._backgroundVariable)),
+                css('svg').styles(
+                  color: Color.variable(FileTreeTheme._highlightVariable),
+                ),
+                css('.tree-entry-name[data-highlighted] svg').styles(
+                  color: Color.variable(FileTreeTheme._backgroundVariable),
+                ),
                 css('~ul').styles(
                   border: Border.only(left: BorderSide(color: Color.variable(FileTreeTheme._highlightVariable))),
                 ),
@@ -185,27 +189,32 @@ class FileTree extends CustomComponent {
           gap: Gap.all(0.5.rem),
           raw: {'vertical-align': 'middle'},
         ),
-        css('.tree-entry-name').styles(
-          display: Display.inlineFlex,
-          alignItems: AlignItems.center,
-        ),
+        css('.tree-entry-name', [
+          css('&').styles(
+            display: Display.inlineFlex,
+            alignItems: AlignItems.center,
+          ),
+          css('&[data-highlighted]', [
+            css('&').styles(
+              padding: Padding.symmetric(horizontal: 0.25.rem),
+              radius: BorderRadius.circular(0.25.rem),
+              alignItems: AlignItems.center,
+              color: Color.variable(FileTreeTheme._backgroundVariable),
+              backgroundColor: Color.variable(FileTreeTheme._highlightVariable),
+            ),
+            css('svg').styles(
+              color: Color.variable(FileTreeTheme._backgroundVariable),
+            ),
+          ]),
+          css('&[data-placeholder]').styles(
+            color: Color.variable(FileTreeTheme._iconVariable),
+          ),
+        ]),
         css('.comment').styles(
           padding: Padding.only(left: 1.5.rem),
           color: Color.variable(FileTreeTheme._iconVariable),
           fontStyle: FontStyle.italic,
         ),
-        css('.highlight', [
-          css('&').styles(
-            padding: Padding.symmetric(horizontal: 0.25.rem),
-            radius: BorderRadius.circular(0.25.rem),
-            alignItems: AlignItems.center,
-            color: Color.variable(FileTreeTheme._backgroundVariable),
-            backgroundColor: Color.variable(FileTreeTheme._highlightVariable),
-          ),
-          css('svg').styles(
-            color: Color.variable(FileTreeTheme._backgroundVariable),
-          ),
-        ]),
       ]),
     ]),
   ];
@@ -252,10 +261,17 @@ class _FileTree extends StatelessComponent {
         : getIconName(item.name);
 
     return span(classes: 'tree-entry', [
-      span(classes: 'tree-entry-name${item.isHighlight ? ' highlight' : ''}', [
-        if (iconName != null) buildIcon(iconName),
-        text(isPlaceholder ? '…' : item.name),
-      ]),
+      span(
+        classes: 'tree-entry-name',
+        attributes: {
+          if (item.isHighlighted) 'data-highlighted': '',
+          if (isPlaceholder) 'data-placeholder': '',
+        },
+        [
+          if (iconName != null) buildIcon(iconName),
+          text(isPlaceholder ? '…' : item.name),
+        ],
+      ),
       if (item.comment case final comment?) span(classes: 'comment', [comment]),
     ]);
   }
@@ -301,7 +317,7 @@ class FileTreeItem {
     required this.name,
     this.isFolder = false,
     this.isOpen = false,
-    this.isHighlight = false,
+    this.isHighlighted = false,
     this.comment,
     this.children = const [],
   }) : assert(children.length > 0 || !isOpen, 'Only items with children can be open.');
@@ -309,7 +325,7 @@ class FileTreeItem {
   final String name;
   final bool isFolder;
   final bool isOpen;
-  final bool isHighlight;
+  final bool isHighlighted;
   final Component? comment;
   final List<FileTreeItem> children;
 }
