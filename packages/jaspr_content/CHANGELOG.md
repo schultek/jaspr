@@ -1,5 +1,8 @@
-## Unreleased patch
+## 0.4.3
 
+- Added a new `FileTree` component for rendering file tree structures.
+- Enable adding a header based on the current page to `MarkdownOutput`.
+- Fixed `TableOfContentsExtension` to correctly find headers in nested elements.
 - Update `package:mustache_template` constraint to `^2.0.2`.
   This version adds support for emojis in templates,
   no longer requiring a dependency override.
