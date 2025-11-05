@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.4.3
 
 - Added a new `FileTree` component for rendering file tree structures.
 - Enable adding a header based on the current page to `MarkdownOutput`.
