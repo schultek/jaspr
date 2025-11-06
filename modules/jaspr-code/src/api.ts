@@ -18,8 +18,8 @@ function getDartExtensionApi(): PublicDartExtensionApi {
   }
 
   const dartExtensionApi = dartCode.exports as PublicDartExtensionApi;
-  if (dartExtensionApi.version !== 2) {
-    throw new Error(`Incompatible Dart extension version. Make sure you switch to the pre-release version of the Dart extension.`);
+  if (dartExtensionApi.version < 2) {
+    throw new Error(`Incompatible Dart extension version. Make sure you have the latest version of the Dart extension installed.`);
   }
 
   return dartExtensionApi;
