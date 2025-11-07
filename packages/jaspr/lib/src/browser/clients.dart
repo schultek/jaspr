@@ -1,33 +1,40 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 
 import 'package:universal_web/web.dart' as web;
 
+import '../components/basic.dart';
+import '../foundation/type_checks.dart';
 import '../foundation/validator.dart';
 import '../framework/framework.dart';
 import 'browser_binding.dart';
-import 'dom_render_object.dart';
-import 'utils.dart';
+import 'custom_node_component.dart';
 
 typedef ClientLoader = FutureOr<ClientBuilder> Function();
 typedef ClientBuilder = Component Function(ClientParams params);
 
-typedef ClientByName = FutureOr<ClientBuilder> Function(String);
+final Map<String, ClientLoader> _loaders = {};
+final Map<String, ClientBuilder> _builders = {};
+final List<ClientComponentAnchor> _rootAnchors = [];
+
+FutureOr<ClientBuilder> _getClientByName(String name) {
+  if (_builders.containsKey(name)) {
+    return _builders[name]!;
+  }
+
+  final loader = _loaders[name]!();
+  if (loader is ClientBuilder) {
+    return _builders[name] = loader;
+  } else {
+    return loader.then((b) => _builders[name] = b);
+  }
+}
 
 /// Called by the shared client components entrypoint.
 void registerClients(Map<String, ClientLoader> clients) {
-  final Map<String, ClientBuilder> builders = {};
-  _findAnchors(
-    clientByName: (name) {
-      final client = (builders[name] ?? clients[name]!()) as FutureOr<ClientBuilder>;
-      if (client is ClientBuilder) {
-        return builders[name] = client;
-      } else {
-        return client.then((b) => builders[name] = b);
-      }
-    },
-  );
+  _loaders.addAll(clients);
+  _builders.removeWhere((key, _) => clients.containsKey(key));
+  _rootAnchors.addAll(_findAnchors(runEagerly: true));
 }
 
 /// Helper method to get a client loader from a deferred import.
@@ -37,7 +44,8 @@ ClientLoader loadClient(Future<void> Function() loader, ClientBuilder builder) {
 
 /// Sync variant of [registerClients].
 void registerClientsSync(Map<String, ClientBuilder> clients) {
-  _findAnchors(clientByName: (name) => clients[name]!);
+  _builders.addAll(clients);
+  _rootAnchors.addAll(_findAnchors(runEagerly: true));
 }
 
 class ClientParams {
@@ -47,7 +55,7 @@ class ClientParams {
   final Map<String, ServerComponentAnchor> serverComponents;
 
   Component mount(String sId) {
-    assert( sId.startsWith('s${DomValidator.clientMarkerPrefixRegex}'));
+    assert(sId.startsWith('s${DomValidator.clientMarkerPrefixRegex}'));
     var s = serverComponents[sId.substring(2)];
     if (s != null) {
       return s.build();
@@ -64,26 +72,44 @@ class ClientParams {
   }
 }
 
-final _clientStartRegex = RegExp('^${DomValidator.clientMarkerPrefixRegex}(\\S+)(?:\\s+data=(.*))?\$');
+final _clientStartRegex = RegExp('^${DomValidator.clientMarkerPrefixRegex}(\\S+)(?:\\s+#(\\S*))?(?:\\s+data=(.*))?\$');
 final _clientEndRegex = RegExp('^/${DomValidator.clientMarkerPrefixRegex}(\\S+)\$');
 
-final _serverStartRegex = RegExp('^s${DomValidator.clientMarkerPrefixRegex}(\\d+)\$');
+final _serverStartRegex = RegExp('^s${DomValidator.clientMarkerPrefixRegex}(\\d+)(?:\\s+#(\\S*))?\$');
 final _serverEndRegex = RegExp('^/s${DomValidator.clientMarkerPrefixRegex}(\\d+)\$');
 
 sealed class ComponentAnchor {
-  ComponentAnchor(this.name, this.startNode);
+  ComponentAnchor(this.name, this.key, this.startNode);
 
   final String name;
+  final String key;
   final web.Node startNode;
   late web.Node endNode;
 }
 
-class ClientComponentAnchor extends ComponentAnchor {
-  ClientComponentAnchor(super.name, super.startNode, this.data);
+final Expando<ClientComponentAnchor> _clientAnchorExpando = Expando();
 
-  final String? data;
+extension ClientAnchorExtension on web.Node {
+  ClientComponentAnchor? get clientAnchor => _clientAnchorExpando[this];
+
+  set clientAnchor(ClientComponentAnchor? anchor) {
+    _clientAnchorExpando[this] = anchor;
+  }
+}
+
+class ClientComponentAnchor extends ComponentAnchor {
+  ClientComponentAnchor(
+    super.name,
+    super.key,
+    super.startNode,
+    this.data,
+  );
+
+  String? data;
   late FutureOr<ClientBuilder> builder;
   final Map<String, ServerComponentAnchor> serverAnchors = {};
+
+  void Function(void Function())? _setState;
 
   Future<void> resolve() async {
     var r = await (Future.value(builder), Future.wait(serverAnchors.values.map((a) => a.resolve()))).wait;
@@ -92,11 +118,26 @@ class ClientComponentAnchor extends ComponentAnchor {
 
   Component build() {
     assert(builder is ClientBuilder, "ClientComponentAnchor was not resolved before calling build()");
-    var params = ClientParams(
-      data != null ? jsonDecode(const DomValidator().unescapeMarkerText(data!)) : {},
-      serverAnchors,
+    return StatefulBuilder(
+      key: GlobalObjectKey(key),
+      builder: (context, setState) {
+        _setState = setState;
+        final params = ClientParams(
+          data != null ? jsonDecode(const DomValidator().unescapeMarkerText(data!)) : {},
+          serverAnchors,
+        );
+        return (builder as ClientBuilder)(params);
+      },
     );
-    return (builder as ClientBuilder)(params);
+  }
+
+  void rebuild(String? data, Map<String, ServerComponentAnchor> serverAnchors) {
+    assert(_setState != null, "ClientComponentAnchor was not built before calling rebuild()");
+    _setState!(() {
+      this.data = data;
+      this.serverAnchors.clear();
+      this.serverAnchors.addAll(serverAnchors);
+    });
   }
 
   Future<void> run() async {
@@ -114,53 +155,41 @@ class ClientComponentAnchor extends ComponentAnchor {
 }
 
 class ServerComponentAnchor extends ComponentAnchor {
-  ServerComponentAnchor(super.name, super.startNode);
+  ServerComponentAnchor(super.name, super.key, super.startNode);
 
-  late final web.DocumentFragment fragment;
-  late final List<ClientComponentAnchor> clientAnchors;
-
-  final List<Component> children = [];
+  final List<ClientComponentAnchor> clientAnchors = [];
 
   Future<void> resolve() async {
     await Future.wait(clientAnchors.map((a) => a.resolve()));
   }
 
-  void recursivelyFindChildAnchors(ClientByName clientByName) {
-    fragment = web.document.createDocumentFragment();
+  Component build() {
+    final List<web.Node> nodes = [];
 
-    web.Node? curr = startNode.nextSibling;
+    web.Node? curr = startNode;
     while (curr != null && curr != endNode) {
       final next = curr.nextSibling;
-      fragment.append(curr);
+      nodes.add(curr);
       curr = next;
     }
+    nodes.add(endNode);
 
-    clientAnchors = _findAnchors(clientByName: clientByName, root: fragment, runEagerly: false);
-
-    for (var client in clientAnchors) {
-      children.add(
-        ClientComponent(
-          key: GlobalKey(),
-          anchor: client,
-        ),
-      );
-    }
-  }
-
-  Component build() {
-    return ServerComponentNode(key: GlobalKey(), fragment, children);
+    return CustomNodeComponent(key: UniqueKey(), nodes, [
+      for (var client in clientAnchors) ClientComponent(anchor: client),
+    ]);
   }
 }
 
-List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, web.Node? root, bool runEagerly = true}) {
-  var iterator = web.document.createNodeIterator(root ?? web.document, 128 /* NodeFilter.SHOW_COMMENT */);
+List<ClientComponentAnchor> _findAnchors({web.Node? root, bool runEagerly = false}) {
+  final iterator = web.document.createNodeIterator(root ?? web.document, 128 /* NodeFilter.SHOW_COMMENT */);
 
   List<ComponentAnchor> anchors = [];
   List<ClientComponentAnchor> clientAnchors = [];
+  Map<String, int> clientKeyCounters = {};
 
   web.Comment? currNode;
   while ((currNode = iterator.nextNode() as web.Comment?) != null) {
-    var value = currNode!.nodeValue ?? '';
+    final value = currNode!.nodeValue ?? '';
 
     // Find client start anchor.
     var match = _clientStartRegex.firstMatch(value);
@@ -170,9 +199,19 @@ List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, we
         "Found directly nested client component anchor, which is not allowed.",
       );
 
-      var name = match.group(1)!;
-      var data = match.group(2);
-      anchors.add(ClientComponentAnchor(name, currNode, data));
+      final name = match.group(1)!;
+      final key = match.group(2);
+      final data = match.group(3);
+
+      final resolvedKey = key != null
+          ? '@$name#$key'
+          : (() {
+              var count = clientKeyCounters[name] ?? -1;
+              clientKeyCounters[name] = count + 1;
+              return '@$name-${anchors.length}-$count';
+            })();
+
+      anchors.add(ClientComponentAnchor(name, resolvedKey, currNode, data));
 
       continue;
     }
@@ -180,32 +219,34 @@ List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, we
     // Find client end anchor.
     match = _clientEndRegex.firstMatch(value);
     if (match != null) {
-      var name = match.group(1)!;
+      final name = match.group(1)!;
       assert(
         anchors.isNotEmpty && anchors.last.name == name,
         "Found client component end anchor without matching start anchor.",
       );
 
-      var comp = anchors.removeLast() as ClientComponentAnchor;
+      final comp = anchors.removeLast() as ClientComponentAnchor;
 
-      // Nested client components are handled recursively.
-      if (anchors.isNotEmpty) continue;
-
-      var start = comp.startNode;
+      final start = comp.startNode;
       assert(start.parentNode == currNode.parentNode, "Found client component anchors with different parent nodes.");
 
       comp.endNode = currNode;
-      comp.builder = clientByName(name);
+      comp.builder = _getClientByName(name);
 
       // Remove the data string.
       start.textContent = '${DomValidator.clientMarkerPrefix}${comp.name}';
 
-      if (runEagerly) {
-        // Instantly run the client component.
-        comp.run();
-      }
+      start.clientAnchor = comp;
 
-      clientAnchors.add(comp);
+      if (anchors.isEmpty) {
+        // This is a root client component.
+        if (runEagerly) {
+          comp.run();
+        }
+        clientAnchors.add(comp);
+      } else {
+        (anchors.last as ServerComponentAnchor).clientAnchors.add(comp);
+      }
 
       continue;
     }
@@ -219,8 +260,13 @@ List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, we
         "Found directly nested server component anchor, which is not allowed.",
       );
 
-      var name = match.group(1)!;
-      anchors.add(ServerComponentAnchor(name, currNode));
+      final name = match.group(1)!;
+      final key = match.group(2);
+
+      final count = (anchors.last as ClientComponentAnchor).serverAnchors.length;
+      final resolvedKey = key != null ? 's#$key' : 's-${anchors.length}-$count';
+
+      anchors.add(ServerComponentAnchor(name, resolvedKey, currNode));
 
       continue;
     }
@@ -234,20 +280,15 @@ List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, we
         "Found server component end anchor without matching start anchor.",
       );
 
-      var comp = anchors.removeLast() as ServerComponentAnchor;
+      final comp = anchors.removeLast() as ServerComponentAnchor;
 
-      // Nested client components are handled recursively.
-      if (anchors.length > 1) continue;
-
-      var start = comp.startNode;
+      final start = comp.startNode;
       assert(start.parentNode == currNode.parentNode, "Found server component anchors with different parent nodes.");
 
       comp.endNode = currNode;
 
       assert(anchors.isNotEmpty, "Found server component without ancestor client component.");
       (anchors.last as ClientComponentAnchor).serverAnchors[name] = comp;
-
-      comp.recursivelyFindChildAnchors(clientByName);
 
       continue;
     }
@@ -256,48 +297,16 @@ List<ClientComponentAnchor> _findAnchors({required ClientByName clientByName, we
   return clientAnchors;
 }
 
-class NestedClientDomRenderObject extends DomRenderObject with MultiChildDomRenderObject, HydratableDomRenderObject {
-  NestedClientDomRenderObject(this.node, DomRenderObject parent, [List<web.Node>? nodes]) {
-    this.parent = parent;
-    toHydrate = [...nodes ?? node.childNodes.toIterable()];
-    beforeStart = toHydrate.firstOrNull?.previousSibling;
-  }
-
-  factory NestedClientDomRenderObject.between(DomRenderObject parent, web.Node start, web.Node end) {
-    final nodes = <web.Node>[];
-    web.Node? curr = start.nextSibling;
-    while (curr != null && curr != end) {
-      nodes.add(curr);
-      curr = curr.nextSibling;
-    }
-    return NestedClientDomRenderObject(start.parentElement!, parent, nodes);
-  }
-
-  @override
-  final web.Element node;
-  late final web.Node? beforeStart;
-
-  @override
-  void attach(DomRenderObject child, {DomRenderObject? after}) {
-    attachChild(child, after, startNode: beforeStart);
-  }
-
-  @override
-  void remove(DomRenderObject child) {
-    removeChild(child);
-  }
-}
-
-class ClientComponent extends Component {
+class ClientComponent extends NodeChildComponent {
   ClientComponent({required this.anchor, super.key});
 
   final ClientComponentAnchor anchor;
 
   @override
-  Element createElement() => ClientComponentElement(this);
+  NodeChildElement createElement() => ClientComponentElement(this);
 }
 
-class ClientComponentElement extends MultiChildRenderObjectElement {
+class ClientComponentElement extends MultiChildRenderObjectElement implements NodeChildElement {
   ClientComponentElement(ClientComponent super.component);
 
   @override
@@ -320,9 +329,9 @@ class ClientComponentElement extends MultiChildRenderObjectElement {
   }
 
   @override
-  RenderObject createRenderObject() {
-    return NestedClientDomRenderObject.between(
-      parentRenderObjectElement!.renderObject as DomRenderObject,
+  DomRenderNodeChild createRenderObject() {
+    return DomRenderNodeChild.between(
+      parentRenderObjectElement!.renderObject as DomRenderNodes,
       component.anchor.startNode,
       component.anchor.endNode,
     );
@@ -332,106 +341,113 @@ class ClientComponentElement extends MultiChildRenderObjectElement {
   void updateRenderObject(RenderObject renderObject) {}
 }
 
-class ServerComponentNode extends Component {
-  ServerComponentNode(this.fragment, this.children, {super.key});
+void updatePage(web.Element newBody) {
+  final currentBody = web.document.body!;
+  _findAnchors(root: newBody, runEagerly: false);
 
-  final web.DocumentFragment fragment;
-  final List<Component> children;
-
-  @override
-  Element createElement() => ServerComponentNodeElement(this);
+  updateChildren(currentBody, newBody);
 }
 
-class ServerComponentNodeElement extends MultiChildRenderObjectElement {
-  ServerComponentNodeElement(ServerComponentNode super.component);
+void updateElement(web.Element currentNode, web.Element newNode) {
+  // Update attributes.
 
-  @override
-  ServerComponentNode get component => super.component as ServerComponentNode;
+  final currentAttributes = currentNode.attributes;
+  final newAttributes = newNode.attributes;
 
-  @override
-  void update(ServerComponentNode newComponent) {
-    assert(
-      newComponent.fragment == component.fragment,
-      'ServerComponentNode cannot be updated with a different fragment.',
-    );
-    super.update(newComponent);
+  final attributesToRemove = <String>{};
+
+  for (var i = 0; i < currentAttributes.length; i++) {
+    var attr = currentAttributes.item(i)!;
+    attributesToRemove.add(attr.name);
   }
 
-  @override
-  List<Component> buildChildren() {
-    return component.children;
-  }
+  for (var i = 0; i < newAttributes.length; i++) {
+    var attr = newAttributes.item(i)!;
+    attributesToRemove.remove(attr.name);
 
-  @override
-  RenderObject createRenderObject() {
-    final parent = parentRenderObjectElement!.renderObject;
-    return ServerComponentDomRenderObject(component.fragment, parent as DomRenderObject);
-  }
-
-  @override
-  void updateRenderObject(RenderObject renderObject) {}
-
-  @override
-  void unmount() {
-    super.unmount();
-    _clearEventListeners(this);
-  }
-
-  static _clearEventListeners(Element e) {
-    if (e case RenderObjectElement(renderObject: DomRenderElement r)) {
-      r.events?.forEach((type, binding) {
-        binding.clear();
-      });
-      r.events = null;
-    }
-
-    e.visitChildren(_clearEventListeners);
-  }
-}
-
-class ServerComponentDomRenderObject extends DomRenderFragment {
-  ServerComponentDomRenderObject(super.fragment, super.parent) : super.from() {
-    if (node.childNodes.length > 0) {
-      firstChild = DomRenderNode(node.childNodes.item(0)!);
-      lastChild = DomRenderNode(node.childNodes.item(node.childNodes.length - 1)!);
+    if (currentAttributes.getNamedItem(attr.name)?.name != attr.value) {
+      currentNode.setAttribute(attr.name, attr.value);
     }
   }
 
-  @override
-  void attach(covariant RenderObject child, {covariant RenderObject? after}) {
-    if (child is NestedClientDomRenderObject) {
-      return;
-    }
-    throw UnsupportedError('Server nodes cannot have children attached to them.');
+  for (var attrName in attributesToRemove) {
+    currentNode.removeAttribute(attrName);
   }
 
-  @override
-  void remove(covariant RenderObject child) {
-    throw UnsupportedError('Server nodes cannot have children removed from them.');
-  }
+  // Recursively update child nodes.
+  updateChildren(currentNode, newNode);
 }
 
-class DomRenderNode extends DomRenderObject {
-  DomRenderNode(this.node);
+void updateChildren(web.Element currentNode, web.Element newNode) {
+  final currentChildren = currentNode.childNodes;
+  final newChildren = newNode.childNodes;
 
-  @override
-  final web.Node node;
+  var currentChildIndex = 0;
+  var newChildIndex = 0;
 
-  @override
-  void attach(covariant RenderObject child, {covariant RenderObject? after}) {
-    throw UnsupportedError('Raw nodes cannot have children attached to them.');
+  while (currentChildIndex < currentChildren.length && newChildIndex < newChildren.length) {
+    final currentChild = currentChildren.item(currentChildIndex)!;
+    final newChild = newChildren.item(newChildIndex)!;
+
+    if (currentChild.clientAnchor case final anchor?) {
+      // This is a client component anchor, skip it.
+      currentChildIndex++;
+      while (currentChildIndex < currentChildren.length) {
+        if (currentChildren.item(currentChildIndex) == anchor.endNode) {
+          currentChildIndex++;
+          break;
+        }
+        currentChildIndex++;
+      }
+
+      if (newChild.clientAnchor case final newAnchor? when newAnchor.name == anchor.name) {
+        // Skip the new client component as well.
+        newChildIndex++;
+        while (newChildIndex < newChildren.length) {
+          final child = newChildren.item(newChildIndex)!;
+          if (child == newAnchor.endNode) {
+            newChildIndex++;
+            break;
+          }
+          newChildIndex++;
+        }
+
+        anchor.rebuild(newAnchor.data, newAnchor.serverAnchors);
+      }
+      continue;
+    }
+
+    if (currentChild.nodeType != newChild.nodeType) {
+      currentNode.insertBefore(newChild, currentChild);
+      continue;
+    }
+
+    if (currentChild.isText) {
+      if (currentChild.textContent != newChild.textContent) {
+        currentChild.textContent = newChild.textContent;
+      }
+      currentChildIndex++;
+      newChildIndex++;
+      continue;
+    }
+    if (currentChild.isElement) {
+      updateElement(currentChild as web.Element, newChild as web.Element);
+      currentChildIndex++;
+      newChildIndex++;
+      continue;
+    }
+
+    currentNode.replaceChild(newChild, currentChild);
+    currentChildIndex++;
   }
 
-  @override
-  void remove(covariant RenderObject child) {
-    throw UnsupportedError('Text nodes cannot have children removed from them.');
+  while (currentChildIndex < currentChildren.length) {
+    var currentChild = currentChildren.item(currentChildIndex)!;
+    currentNode.removeChild(currentChild);
   }
 
-  @override
-  void finalize() {}
-
-  @override
-  web.Node? retakeNode(bool Function(web.Node node) visitNode) {
-    return null; // Not applicable for raw nodes
+  while (newChildIndex < newChildren.length) {
+    var newChild = newChildren.item(newChildIndex)!;
+    currentNode.appendChild(newChild);
   }
 }

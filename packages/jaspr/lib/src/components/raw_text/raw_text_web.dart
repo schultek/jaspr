@@ -3,6 +3,7 @@ import 'dart:js_interop';
 import 'package:universal_web/web.dart' as web;
 
 import '../../../browser.dart';
+import '../../browser/custom_node_component.dart';
 import '../../browser/utils.dart';
 
 /// Renders its input as raw HTML.

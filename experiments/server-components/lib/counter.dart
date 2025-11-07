@@ -1,34 +1,36 @@
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_riverpod/jaspr_riverpod.dart';
-import 'package:jaspr_riverpod/legacy.dart';
-
-final counter = StateProvider((_) => 0);
 
 @client
 class Counter extends StatefulComponent {
-  const Counter({super.key});
-  
+  const Counter({this.step = 1, this.child, super.key});
+
+  final int step;
+  final Component? child;
+
   @override
   State<StatefulComponent> createState() => CounterState();
 }
 
 class CounterState extends State<Counter> {
-
   int count = 0;
 
   @override
   Component build(BuildContext context) {
-    return div([
-      text('$count'),
-      text(' Shared: ${context.watch(counter)}'),
+    print("Building Counter with count=$count and step=${component.step}");
+    return div(classes: 'client', [
+      text('$count '),
+      button(
+        onClick: () {
+          setState(() {
+            count += component.step;
+          });
+        },
+        [text("Increase by ${component.step}")],
+      ),
+      if (component.child != null) component.child!,
       button(onClick: () {
-        context.read(counter.notifier).state++;
-        setState(() {
-          count++;
-        });
-      }, [
-        text("Increase"),
-      ])
+        context.reload();
+      }, [text('Reload Page')]),
     ]);
   }
 }

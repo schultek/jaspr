@@ -1,42 +1,44 @@
-import 'dart:math';
-
 import 'package:jaspr/server.dart';
 import 'jaspr_options.dart';
 
 import 'counter.dart';
-import 'root.dart';
-import 'root2.dart';
-import 'root3.dart';
+import 'minicounter.dart';
 
 void main() {
   Jaspr.initializeApp(options: defaultJasprOptions);
 
-  runApp(Document(
-    title: 'server_components',
-    body: div([
-      // Root(
-      //   child: div([
-      //     Counter(),
-      //     Counter(),
-      //   ]),
-      // ),
-      // Root2(
-      //   child: p([text("Server text")]),
-      // ),
-      Root3(
-        children: [
-           span([text("Server Child 1")]),
-           span([text("Server Child 2")]),
-           span([text("Server Child 3")]),
-           span([text("Server Child 4")]),
-        ],
-        children2: {
-          "42": div([text("The answer to life, the universe and everything")]),
-          "7": div([text("A lucky number")]),
-          "13": div([text("An unlucky number")]),
-          "69": div([text("A funny number")]),
-        }
+  runApp(
+    Document(
+      title: 'server_components',
+      body: Builder(
+        builder: (context) {
+          var time = DateTime.now();
+          return div(classes: 'server', [
+            p([text('Server Time: $time')]),
+            Counter(
+              step: time.second,
+              child: p(classes: 'server', [
+                text(
+                  'This is a server component asdasdaasdasd, rendered at $time.',
+                ),
+                MiniCounter(),
+              ]),
+            ),
+          ]);
+        },
       ),
-    ]),
-  ));
+    ),
+  );
 }
+
+@css
+List<StyleRule> get styles => [
+      css('.server').styles(
+        padding: Padding.all(2.px),
+        border: Border(color: Colors.red),
+      ),
+      css('.client').styles(
+        padding: Padding.all(2.px),
+        border: Border(color: Colors.green),
+      ),
+    ];

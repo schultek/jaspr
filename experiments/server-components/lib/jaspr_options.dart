@@ -6,9 +6,8 @@
 
 import 'package:jaspr/jaspr.dart';
 import 'package:server_components/counter.dart' as prefix0;
-import 'package:server_components/root.dart' as prefix1;
-import 'package:server_components/root2.dart' as prefix2;
-import 'package:server_components/root3.dart' as prefix3;
+import 'package:server_components/main.dart' as prefix1;
+import 'package:server_components/minicounter.dart' as prefix2;
 
 /// Default [JasprOptions] for use with your jaspr project.
 ///
@@ -28,19 +27,17 @@ import 'package:server_components/root3.dart' as prefix3;
 /// ```
 JasprOptions get defaultJasprOptions => JasprOptions(
   clients: {
-    prefix0.Counter: ClientTarget<prefix0.Counter>('counter'),
+    prefix0.Counter: ClientTarget<prefix0.Counter>(
+      'counter',
+      params: _prefix0Counter,
+    ),
 
-    prefix1.Root: ClientTarget<prefix1.Root>('root', params: _prefix1Root),
-
-    prefix2.Root2: ClientTarget<prefix2.Root2>('root2', params: _prefix2Root2),
-
-    prefix3.Root3: ClientTarget<prefix3.Root3>('root3', params: _prefix3Root3),
+    prefix2.MiniCounter: ClientTarget<prefix2.MiniCounter>('minicounter'),
   },
+  styles: () => [...prefix1.styles],
 );
 
-Map<String, dynamic> _prefix1Root(prefix1.Root c) => {'child': c.child};
-Map<String, dynamic> _prefix2Root2(prefix2.Root2 c) => {'child': c.child};
-Map<String, dynamic> _prefix3Root3(prefix3.Root3 c) => {
-  'children': c.children,
-  'children2': c.children2,
+Map<String, dynamic> _prefix0Counter(prefix0.Counter c) => {
+  'step': c.step,
+  'child': c.child,
 };

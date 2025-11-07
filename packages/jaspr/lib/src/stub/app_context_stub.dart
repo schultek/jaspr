@@ -8,4 +8,9 @@ extension AppContext on BuildContext {
   String get url {
     throw UnimplementedError('Should be overridden on client and server.');
   }
+
+  /// Reloads the current page.
+  void reload() {
+    throw UnimplementedError('Should be overridden on client and server.');
+  }
 }

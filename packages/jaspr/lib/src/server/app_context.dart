@@ -9,6 +9,11 @@ extension AppContext on BuildContext {
   /// The url of the current request.
   String get url => binding.currentUrl;
 
+  /// Reloads the current page.
+  void reload() {
+    throw UnimplementedError('Reload is not supported on the server side.');
+  }
+
   /// The HTTP headers of the current request with case-insensitive keys.
   ///
   /// If a header occurs more than once in the query string, they are mapped to

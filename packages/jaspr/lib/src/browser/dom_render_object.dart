@@ -244,9 +244,10 @@ class DomRenderText extends DomRenderObject implements RenderText {
 class DomRenderFragment extends DomRenderObject
     with MultiChildDomRenderObject, HydratableDomRenderObject
     implements RenderFragment {
-  DomRenderFragment(DomRenderObject? parent) : node = web.document.createDocumentFragment() {
+  DomRenderFragment(DomRenderObject? parent, [List<web.Node>? toHydrate])
+    : node = web.document.createDocumentFragment() {
     this.parent = parent;
-    toHydrate = parent is HydratableDomRenderObject ? parent.toHydrate : [];
+    this.toHydrate = toHydrate ?? (parent is HydratableDomRenderObject ? parent.toHydrate : []);
   }
 
   DomRenderFragment.from(this.node, DomRenderObject? parent) {
@@ -258,21 +259,21 @@ class DomRenderFragment extends DomRenderObject
   final web.DocumentFragment node;
   bool isAttached = false;
 
-  DomRenderObject? firstChild;
-  DomRenderObject? lastChild;
+  DomRenderObject? _firstChild;
+  DomRenderObject? _lastChild;
 
   web.Node? get firstChildNode {
-    if (firstChild case DomRenderFragment c) {
+    if (_firstChild case DomRenderFragment c) {
       return c.firstChildNode;
     }
-    return firstChild?.node;
+    return _firstChild?.node;
   }
 
   web.Node? get lastChildNode {
-    if (lastChild case DomRenderFragment c) {
+    if (_lastChild case DomRenderFragment c) {
       return c.lastChildNode;
     }
-    return lastChild?.node;
+    return _lastChild?.node;
   }
 
   @override
@@ -280,10 +281,10 @@ class DomRenderFragment extends DomRenderObject
     attachChild(child, after, startNode: firstChildNode?.previousSibling);
 
     if (after == null) {
-      firstChild = child;
+      _firstChild = child;
     }
-    if (after == lastChild) {
-      lastChild = child;
+    if (after == _lastChild) {
+      _lastChild = child;
     }
   }
 
@@ -292,7 +293,7 @@ class DomRenderFragment extends DomRenderObject
     assert(isAttached, 'Cannot move fragment that is not attached to a parent.');
 
     if (kVerboseMode) {
-      print("Move fragment $node to $targetNode after $afterNode");
+      print("Move fragment to $targetNode after $afterNode");
     }
 
     if (firstChildNode == null) {
@@ -422,13 +423,19 @@ mixin MultiChildDomRenderObject on DomRenderObject {
 
   web.Node? getRealNodeOf(DomRenderObject? after) {
     if (after is DomRenderFragment) {
-      final node = getRealNodeOf(after.lastChild);
-      return node ?? getRealNodeOf(after.previousSibling);
+      if (after.lastChildNode case final node?) {
+        return node;
+      } else {
+        return getRealNodeOf(after.previousSibling);
+      }
     }
-    if (after == null && this is DomRenderFragment && (this as DomRenderFragment).isAttached) {
+    if (after != null) {
+      return after.node;
+    }
+    if (this case DomRenderFragment(isAttached: true)) {
       return (parent as MultiChildDomRenderObject).getRealNodeOf(previousSibling);
     }
-    return after?.node;
+    return null;
   }
 
   void attachChild(DomRenderObject child, DomRenderObject? after, {web.Node? startNode}) {

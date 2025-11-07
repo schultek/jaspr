@@ -80,6 +80,16 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       return responseBodyOverride!;
     }
 
+    if (request.headers.singleValues['X-Jaspr-Reload'] == 'true' && !standalone) {
+      final body = (root.children.findWhere<MarkupRenderElement>((c) => c.tag == 'html')?.node as MarkupRenderElement?)
+          ?.children
+          .findWhere<MarkupRenderElement>((c) => c.tag == 'body')
+          ?.node;
+      if (body != null) {
+        return body.renderToHtml();
+      }
+    }
+
     return root.renderToHtml();
   }
 
