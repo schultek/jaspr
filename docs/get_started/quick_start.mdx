@@ -1,4 +1,214 @@
----
+import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:math';
+import 'package:audioplayers/audioplayers.dart';
+
+void main() => runApp(MathGameApp());
+
+class MathGameApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'لعبة الرياضيات المتقدمة',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        brightness: Brightness.light,
+      ),
+      home: MathHomePage(),
+    );
+  }
+}
+
+class MathHomePage extends StatefulWidget {
+  @override
+  _MathHomePageState createState() => _MathHomePageState();
+}
+
+class _MathHomePageState extends State<MathHomePage> {
+  final Random _random = Random();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  int _num1 = 0;
+  int _num2 = 0;
+  String _operation = '+';
+  String _userAnswer = '';
+  int _score = 0;
+  int _timeLeft = 15;
+  Timer? _timer;
+  String _difficulty = 'سهل';
+
+  @override
+  void initState() {
+    super.initState();
+    _generateQuestion();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timeLeft = 15;
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _timeLeft--;
+      });
+      if (_timeLeft <= 0) {
+        _showSnackBar('انتهى الوقت! 😢');
+        _generateQuestion();
+      }
+    });
+  }
+
+  void _generateQuestion() {
+    int maxNumber;
+    switch (_difficulty) {
+      case 'سهل':
+        maxNumber = 20;
+        break;
+      case 'متوسط':
+        maxNumber = 50;
+        break;
+      case 'صعب':
+        maxNumber = 100;
+        break;
+      default:
+        maxNumber = 50;
+    }
+
+    setState(() {
+      _num1 = _random.nextInt(maxNumber) + 1;
+      _num2 = _random.nextInt(maxNumber) + 1;
+      List<String> ops = ['+', '-', '×', '÷'];
+      _operation = ops[_random.nextInt(ops.length)];
+      if (_operation == '÷') {
+        _num1 = _num1 * _num2; // للقسمة الصحيحة
+      }
+      _userAnswer = '';
+      _startTimer();
+    });
+  }
+
+  void _checkAnswer() async {
+    double correctAnswer;
+    switch (_operation) {
+      case '+':
+        correctAnswer = _num1 + _num2.toDouble();
+        break;
+      case '-':
+        correctAnswer = _num1 - _num2.toDouble();
+        break;
+      case '×':
+        correctAnswer = _num1 * _num2.toDouble();
+        break;
+      case '÷':
+        correctAnswer = _num1 / _num2;
+        break;
+      default:
+        correctAnswer = 0;
+    }
+
+    if (_userAnswer.isNotEmpty && double.tryParse(_userAnswer) == correctAnswer) {
+      _score += (_timeLeft > 5) ? 2 : 1;
+      await _audioPlayer.play(AssetSource('sounds/correct.mp3'));
+      _showSnackBar('إجابة صحيحة! 🎉');
+    } else {
+      await _audioPlayer.play(AssetSource('sounds/wrong.mp3'));
+      _showSnackBar('إجابة خاطئة 😢 الإجابة الصحيحة: $correctAnswer');
+    }
+
+    _generateQuestion();
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: Duration(seconds: 1)),
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('لعبة الرياضيات المتقدمة'),
+        actions: [
+          DropdownButton<String>(
+            value: _difficulty,
+            icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+            dropdownColor: Colors.deepPurple,
+            underline: SizedBox(),
+            onChanged: (String? newValue) {
+              setState(() {
+                _difficulty = newValue!;
+                _generateQuestion();
+              });
+            },
+            items: <String>['سهل', 'متوسط', 'صعب']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value, style: TextStyle(color: Colors.white)),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.deepPurple.shade100, Colors.deepPurple.shade300],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('النتيجة: $_score', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+            SizedBox(height: 20),
+            Text('الوقت المتبقي: $_timeLeft ثانية', style: TextStyle(fontSize: 20, color: Colors.red)),
+            SizedBox(height: 40),
+            Text('$_num1 $_operation $_num2 = ?', style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
+            SizedBox(height: 20),
+            TextField(
+              keyboardType: TextInputType.number,
+              onChanged: (value) => _userAnswer = value,
+              decoration: InputDecoration(
+                labelText: 'أدخل إجابتك',
+                border: OutlineInputBorder(),
+                filled: true,
+                fillColor: Colors.white70,
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _checkAnswer,
+              child: Text('تحقق ✅', style: TextStyle(fontSize: 20)),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+              ),
+            ),
+            SizedBox(height: 15),
+            ElevatedButton(
+              onPressed: _generateQuestion,
+              child: Text('سؤال جديد 🔄', style: TextStyle(fontSize: 18)),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                primary: Colors.deepPurple.shade700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}--
 title: Quickstart
 description: Get started with Jaspr and build your first website in Dart.
 ---
@@ -125,43 +335,4 @@ You can choose from the following options:
 
 <Property name="Routing">
   Whether to set up routing. Selecting **Yes** will setup a basic `Routing` with two routes ('/home' and '/about'). This gives you a convenient
-  starting point when you plan to develop a website with multiple pages.
-</Property>
-
----
-
-<Property name="Multi-Page Routing" type="conditional">
-  Whether to set up multi-page or single-page routing, also called server-side or client-side routing respectively. This defined how navigating
-  between routes will behave. Either a "real" page load is performed when navigating to a new route (aka. the browser requests the new page using its url from the server).
-  Or the routing happens purely on the client without any request to the server.
-
-  <Info>
-      There are different advantages and disadvantages for both types. To help you decide you can find many [articles](https://www.google.com/search?q=multi+page+vs+single+page+site) about this topic.
-  </Info>
-
-  Read more about routing [here](/concepts/routing).
-</Property>
-
----
-
-<Property name="Flutter Embedding">
-  Whether to setup an embedded Flutter application with your site. This will use Jaspr's first-party integration for [Flutter element embedding](https://docs.flutter.dev/deployment/web#embedding-a-flutter-app-into-an-html-page) and create a simple Flutter counter app that synchronizes its state with your Jaspr site.
-</Property>
-
----
-
-<Property name="Plugin Support">
-  Whether to enable support for Flutter web plugins. This will switch to Jaspr's custom compiler pipeline (replacing `build_web_compilers`) which allows the use of most Flutter web plugins in your Jaspr site without any additional setup.
-  *Flutter web plugins* refers to any Flutter plugin from pub.dev that supports web and is not concerned with widgets or rendering. This includes packages like `shared_preferences` or `firebase`.
-</Property>
-
----
-
-<Property name="Custom Backend" type="conditional">
-  Whether to use a custom backend package or framework for the server part of your project. You can choose between:
-  - **None**: No backend setup. This is the default option and is recommended if you are just starting out.
-  - **Shelf**: A simple and lightweight web server for Dart. This is a good choice if you want to build a custom backend for your project.
-  - *More options coming soon*
-
-  Read more about backends [here](/going_further/backend).
-</Property>
+  starting point when you plan to develop a website with multiple 
