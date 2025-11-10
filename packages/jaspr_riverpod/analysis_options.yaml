@@ -1,5 +1,12 @@
 include: package:jaspr_repo/package.yaml
 
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
 linter:
   rules:
+    avoid_dynamic_calls: true
     avoid_types_as_parameter_names: false
