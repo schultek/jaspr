@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/server.dart';
 
 import 'configuration.dart';
 import 'match.dart';
@@ -36,6 +37,7 @@ FutureOr<RouteMatchList> redirect(
   final String prevLocation = prevMatchList.uri.toString();
   FutureOr<RouteMatchList> processTopLevelRedirect(String? topRedirectLocation) {
     if (topRedirectLocation != null && topRedirectLocation != prevLocation) {
+
       final RouteMatchList newMatch = _getNewMatches(
         topRedirectLocation,
         prevMatchList.uri,
@@ -63,6 +65,9 @@ FutureOr<RouteMatchList> redirect(
           return newMatch;
         }
         return redirect(context, newMatch, configuration, matcher, redirectHistory: redirectHistory, extra: extra);
+      }
+      if (!kIsWeb && (redirectHistory?.length ?? 0) > 1) {
+        return _setRedirectHeader(context, prevMatchList);
       }
       return prevMatchList;
     }
@@ -205,3 +210,32 @@ void _addRedirect(List<RouteMatchList> redirects, RouteMatchList newMatch, Uri p
     return true;
   }());
 }
+
+RouteMatchList _setRedirectHeader(BuildContext context, RouteMatchList matchList) {
+  context.setHeader('Location', matchList.fullpath);
+  context.setStatusCode(302);
+
+  return _redirectMatch(matchList.uri);
+}
+
+/// The match used when redirecting on the server, renders nothing.
+RouteMatchList _redirectMatch(Uri uri) {
+  return RouteMatchList(
+    <RouteMatch>[
+      RouteMatch(
+        subloc: uri.path,
+        extra: null,
+        error: null,
+        route: Route(
+          path: uri.toString(),
+          builder: (BuildContext context, RouteState state) {
+            return const Component.empty();
+          },
+        ),
+      ),
+    ],
+    uri,
+    const <String, String>{},
+  );
+}
+
