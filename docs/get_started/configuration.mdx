@@ -1,16 +1,72 @@
 ---
-title: Project Structure
-description: The structure of a new Jaspr project.
+title: Project Configuration
+description: The configuration options for a Jaspr project.
 ---
 
 ---
 
 Each Jaspr project is a normal Dart project including a `pubspec.yaml` file and `lib/` directory.
 
+The project-wide Jaspr configuration is specified in `pubspec.yaml` under the `jaspr` option:
+
+```yaml
+name: my_project
+...
+
+jaspr:
+  mode: static
+  target: lib/main.dart
+  port: 8080
+```
+
+There are currently the following configuration options available:
+
+<Property name="mode" type="Enum" required>
+
+  Sets the [**Rendering Mode**](/get_started/modes) for your project. Either `static`, `server` or `client`.
+</Property>
+
+---
+
+<Property name="target" type="String | List<String>" optional>
+
+  *Only applicable in "static" or "server" mode.*
+
+  Specifies one or multiple **entry points** for your project. This is optional and defaults to "lib/main.dart" if not set. Use this to define one or more different entry points if needed.
+
+  Can be used either with a single file-path, or a list of paths.
+
+  ```yaml
+  jaspr:
+    target: bin/main.dart
+  ```
+  ```yaml
+  jaspr:
+    target:
+      - lib/main_prod.dart
+      - lib/main_staging.dart
+  ```
+
+  When defining multiple entry-points, use the `--input` flag with `jaspr serve` and `jaspr build` to choose the desired one when serving or building your app.
+</Property>
+
+---
+
+<Property name="port" type="int" optional>
+
+  *Only applicable in "static" or "server" mode.*
+
+  Specifies the target port to use when **serving** your project. This is optional and defaults to "8080" if not set. Can be overridden by the `--port` flag with `jaspr serve`.
+</Property>
+
+---
+
+## Project Structure
+
 Depending on your chosen [**Rendering Mode**](/get_started/modes) and [**Hydration**](/concepts/hydration) settings,
 your Jaspr project will have a slightly different project structure.
 
-## Static/Server Mode with Automatic Hydration
+### Static/Server Mode with Automatic Hydration
 
 ```markdown
 ├── lib/
@@ -47,7 +103,7 @@ your Jaspr project will have a slightly different project structure.
 
 ---
 
-## Static/Server Mode with Manual Hydration
+### Static/Server Mode with Manual Hydration
 
 ```markdown
 ├── lib/
@@ -84,7 +140,7 @@ your Jaspr project will have a slightly different project structure.
 
 ---
 
-## Client Mode
+### Client Mode
 
 ```markdown
 ├── lib/

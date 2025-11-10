@@ -50,11 +50,11 @@ melos:
         - melos exec --scope=jaspr_cli -- "dart format lib --set-exit-if-changed"
     analyze: melos exec -- "dart analyze . --fatal-infos"
     test:
-      run: dart test
+      run: dart test --exclude-tags=cli
       exec:
         concurrency: 1
       packageFilters:
-        scope: [ jaspr, jaspr_builder, jaspr_content, jaspr_riverpod, jaspr_router ]
+        scope: [ jaspr, jaspr_builder, jaspr_cli, jaspr_content, jaspr_riverpod, jaspr_router ]
     coverage:
       run: |
         dart test --coverage=coverage --exclude-tags=cli &&

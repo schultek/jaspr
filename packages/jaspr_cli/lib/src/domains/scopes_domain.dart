@@ -86,6 +86,8 @@ class ScopesDomain extends Domain {
         return;
       }
 
+      String? target;
+
       try {
         final pubspecYaml = loadYaml(pubspecFile.readAsStringSync()) as YamlMap;
 
@@ -95,15 +97,22 @@ class ScopesDomain extends Domain {
           logger.write('Scopes not available in client mode.');
           return;
         }
+
+        final targetYaml = (pubspecYaml['jaspr'] as Map)['target'];
+        target = switch (targetYaml) {
+          String t => t,
+          List<Object?> l => l.cast<String>().firstOrNull,
+          _ => null,
+        };
       } catch (e) {
         logger.write('Failed to read pubspec.yaml in $rootPath: $e');
         return;
       }
 
-      final mainFile = context.contextRoot.root.getChildAssumingFolder('lib').getChildAssumingFile('main.dart');
-
+      target ??= 'lib/main.dart';
+      final mainFile = context.contextRoot.root.getChildAssumingFile(target);
       if (!mainFile.exists) {
-        logger.write('No main.dart found in $rootPath');
+        logger.write('No file "$target" found in $rootPath');
         return;
       }
 
@@ -123,10 +132,10 @@ class ScopesDomain extends Domain {
       sw.stop();
 
       if (result is! ResolvedLibraryResult) {
-        logger.write('Failed to resolve main.dart in $rootPath');
+        logger.write('Failed to resolve "$target" in "$rootPath"');
         return;
       }
-      logger.write('Resolved main.dart in ${sw.elapsedMilliseconds}ms');
+      logger.write('Resolved "$target" in ${sw.elapsedMilliseconds}ms');
 
       bool usesJasprWebCompilers = false;
       try {
@@ -146,7 +155,7 @@ class ScopesDomain extends Domain {
       emitScopes();
     } on InconsistentAnalysisException catch (_) {
       logger.write('Skipping inconsistent analysis for $rootPath');
-    } on Exception catch (e) {
+    } catch (e) {
       logger.write('Error analyzing $rootPath: $e');
     } finally {
       _analysisStatus[context] = false;

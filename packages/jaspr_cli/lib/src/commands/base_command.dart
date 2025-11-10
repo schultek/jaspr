@@ -98,8 +98,22 @@ abstract class BaseCommand extends Command<int> {
     }
   }
 
-  Future<String> getEntryPoint(String? input, [bool forceInsideLib = false]) async {
-    var entryPoint = input ?? 'lib/main.dart';
+  Future<String?> getServerEntryPoint(String? target) async {
+    if (project.requireMode == JasprMode.client) {
+      return null; // No server entry point in client mode.
+    }
+    if (target != null) {
+      if (project.target == null || !project.target!.contains(target)) {
+        logger.write(
+          "Specified entry point '$target' must be included in 'jaspr.target' in pubspec.yaml.",
+          level: Level.critical,
+        );
+        await shutdown();
+        exit(1);
+      }
+    }
+
+    var entryPoint = target ?? project.target?.firstOrNull ?? 'lib/main.dart';
 
     if (!File(entryPoint).absolute.existsSync()) {
       logger.complete(false);
@@ -111,11 +125,7 @@ abstract class BaseCommand extends Command<int> {
       exit(1);
     }
 
-    if (forceInsideLib && !entryPoint.startsWith('lib/')) {
-      logger.write("Entry point must be located inside lib/ folder, got '$entryPoint'.", level: Level.critical);
-      await shutdown();
-      exit(1);
-    }
+    logger.write("Using server entry point: $entryPoint", level: Level.verbose);
 
     return entryPoint;
   }

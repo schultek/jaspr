@@ -18,7 +18,12 @@ import 'base_command.dart';
 
 abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   DevCommand({super.logger}) {
-    argParser.addOption('input', abbr: 'i', help: 'Specify the input file for the web app.');
+    argParser.addOption(
+      'input',
+      abbr: 'i',
+      help:
+          'Specify the entry file for the server app. Defaults to {jaspr.target} from pubspec.yaml or "lib/main.dart".',
+    );
     argParser.addOption(
       'mode',
       abbr: 'm',
@@ -30,7 +35,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: 'refresh',
     );
-    argParser.addOption('port', abbr: 'p', help: 'Specify a port to run the dev server on.', defaultsTo: '8080');
+    argParser.addOption(
+      'port',
+      abbr: 'p',
+      help: 'Specify a port to run the dev server on. Defaults to {jaspr.port} from pubspec.yaml or "8080".',
+    );
     argParser.addFlag('debug', abbr: 'd', help: 'Serves the app in debug mode.', negatable: false);
     argParser.addFlag('release', abbr: 'r', help: 'Serves the app in release mode.', negatable: false);
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
@@ -48,10 +57,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   @override
   String get category => 'Project';
 
+  late final input = argResults!.option('input');
   late final debug = argResults!.flag('debug');
   late final release = argResults!.flag('release');
   late final mode = argResults!.option('mode')!;
-  late final port = argResults!.option('port')!;
+  late final port = argResults!.option('port') ?? project.port ?? '8080';
   late final useWasm = argResults!.flag('experimental-wasm');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
 
@@ -69,6 +79,15 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     var proxyPort = project.requireMode == JasprMode.client ? port : '5567';
     var flutterPort = '5678';
     var webPort = '5467';
+
+    final entryPoint = await getServerEntryPoint(input);
+
+    if (entryPoint != null && !entryPoint.startsWith('lib/')) {
+      logger.write(
+        "Entry point is not located inside lib/ folder, disabling server-side hot-reload.",
+        level: Level.warning,
+      );
+    }
 
     var workflow = await _runClient(webPort);
     if (workflow == null) {
@@ -106,18 +125,16 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       return 0;
     }
 
-    if (project.devCommand != null) {
-      return await _runDevCommand(project.devCommand!, proxyPort);
-    } else {
-      return await _runServer(proxyPort, workflow);
-    }
+    return await _runServer(entryPoint!, proxyPort, workflow);
   }
 
-  Future<int> _runServer(String proxyPort, ClientWorkflow workflow) async {
+  Future<int> _runServer(String entryPoint, String proxyPort, ClientWorkflow workflow) async {
     logger.write("Starting server...", tag: Tag.cli, progress: ProgressState.running);
 
+    final useHotReload = entryPoint.startsWith('lib/') && !release;
+
     var serverTarget = File('.dart_tool/jaspr/server_target.dart').absolute;
-    if (!serverTarget.existsSync()) {
+    if (useHotReload && !serverTarget.existsSync()) {
       serverTarget.createSync(recursive: true);
     }
 
@@ -142,9 +159,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       args.add('--pause-isolates-on-start');
     }
 
-    var entryPoint = await getEntryPoint(argResults!.option('input'), true);
-
-    if (!release) {
+    if (useHotReload) {
       var import = entryPoint.replaceFirst('lib', 'package:${project.requirePubspecYaml['name']}');
       serverTarget.writeAsStringSync(serverEntrypoint(import));
 
@@ -209,38 +224,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     return serverFuture;
   }
 
-  Future<int> _runDevCommand(String command, String proxyPort) async {
-    logger.write("Starting server...", tag: Tag.cli, progress: ProgressState.running);
-
-    if (release) {
-      logger.write("Ignoring --release flag since custom dev command is used.", tag: Tag.cli, level: Level.warning);
-    }
-    if (debug) {
-      logger.write("Ignoring --debug flag since custom dev command is used.", tag: Tag.cli, level: Level.warning);
-    }
-    var userDefines = getServerDartDefines();
-    if (userDefines.isNotEmpty) {
-      logger.write(
-        "Ignoring all --dart-define options since custom dev command is used.",
-        tag: Tag.cli,
-        level: Level.warning,
-      );
-    }
-
-    var [exec, ...args] = command.split(" ");
-
-    var process = await Process.start(
-      exec,
-      args,
-      environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
-      workingDirectory: Directory.current.path,
-    );
-
-    logger.write('Server started.', tag: Tag.cli, progress: ProgressState.completed);
-
-    return await watchProcess('server', process, tag: Tag.server);
-  }
-
   Future<void> _runChrome() async {
     if (!launchInChrome) return;
 
@@ -292,6 +275,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final buildArgs = [
       if (release) '--release',
+      if (input != null) ...[
+        '--define=jaspr_builder:client_registry=jaspr-target=$input',
+        '--define=jaspr_builder:jaspr_options=jaspr-target=$input',
+      ],
       if (managedBuildOptions) ...[
         '--define',
         '$package:ddc=generate-full-dill=true',
@@ -390,11 +377,14 @@ String serverEntrypoint(String import) =>
   import '$import' as m;
   import 'package:hotreloader/hotreloader.dart';
       
-  void main() async {
+  void main(List<String> args) async {
+    final mainFunc = m.main as dynamic;
+    final mainCall = mainFunc is dynamic Function(List<String>) ? () => mainFunc(args) : () => mainFunc();
+
     try {
       await HotReloader.create(
         debounceInterval: Duration.zero,
-        onAfterReload: (ctx) => m.main(),
+        onAfterReload: (ctx) => mainCall(),
       );
       print('[INFO] Server hot reload is enabled.');
     } on StateError catch (e) {
@@ -405,6 +395,6 @@ String serverEntrypoint(String import) =>
       }
     }
     
-    m.main();
+    mainCall();
   }
 ''';

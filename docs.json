@@ -90,8 +90,8 @@
           "href": "/get_started/cli"
         },
         {
-          "title": "\uD83D\uDCE6 Project Structure",
-          "href": "/get_started/project_structure"
+          "title": "\uD83D\uDCE6 Configuration",
+          "href": "/get_started/configuration"
         },
         {
           "title": "\uD83E\uDDF9 Linting",

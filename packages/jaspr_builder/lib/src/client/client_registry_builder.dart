@@ -1,14 +1,15 @@
 import 'dart:async';
 
 import 'package:build/build.dart';
-import 'package:yaml/yaml.dart' as yaml;
 
 import '../utils.dart';
 import 'client_bundle_builder.dart';
 
 /// Builds the registry for client components.
 class ClientRegistryBuilder implements Builder {
-  ClientRegistryBuilder(BuilderOptions options);
+  ClientRegistryBuilder(this.options);
+
+  final BuilderOptions options;
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
@@ -36,15 +37,16 @@ class ClientRegistryBuilder implements Builder {
   };
 
   Future<String?> generateClients(BuildStep buildStep) async {
-    final pubspecYaml = await buildStep.readAsString(AssetId(buildStep.inputId.package, 'pubspec.yaml'));
-    final jasprConfig = (yaml.loadYaml(pubspecYaml) as Map<Object?, Object?>?)?['jaspr'] as Map<Object?, Object?>?;
-    final mode = jasprConfig?['mode'] as String?;
+    final (:mode, :target) = await buildStep.loadProjectConfig(options);
 
     if (mode != 'static' && mode != 'server') {
       return null;
     }
 
-    var (clients, sources) = await (buildStep.loadClients(), buildStep.loadTransitiveSources()).wait;
+    var (clients, sources) = await (
+      buildStep.loadClients(),
+      buildStep.loadTransitiveSources(target),
+    ).wait;
 
     clients = clients.where((c) => sources.contains(c.id)).toList();
 

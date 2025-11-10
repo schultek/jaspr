@@ -1,3 +1,8 @@
+## Unreleased minor
+
+- `jaspr` upgraded to `0.22.0`
+- Updated documentation to use the new `jaspr.target` and `jaspr.port` options in pubspec.yaml instead of `jaspr.dev-command`.
+
 ## 0.5.8
 
 - `jaspr` upgraded to `0.21.1`
