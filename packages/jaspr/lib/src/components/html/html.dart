@@ -1,4 +1,5 @@
 import '../../foundation/basic_types.dart';
+import '../../foundation/constants.dart';
 import '../../foundation/events.dart';
 import '../../foundation/styles/styles.dart';
 import '../../framework/framework.dart';
@@ -38,3 +39,9 @@ Component raw(String text, {Key? key}) {
 Component fragment(List<Component> children, {Key? key}) {
   return Component.fragment(children, key: key);
 }
+
+String? _explicitBool(bool? val) => switch (val) {
+  true => kIsWeb ? 'true' : '',
+  false => kIsWeb ? 'false' : null,
+  null => null,
+};

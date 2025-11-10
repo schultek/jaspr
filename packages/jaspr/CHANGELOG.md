@@ -1,6 +1,7 @@
 ## _BLOCKED_ Unreleased patch
 
 - Fixed bug when using `SyncStateMixin` or `@sync` on a `@client` component.
+- Fixed bug with `checked` and `indeterminate` attributes not rendering correctly on `input` elements.
 - Fixed allowing children for `path` tag by removing it from list of self-closing tags.
 
 ## 0.21.6
