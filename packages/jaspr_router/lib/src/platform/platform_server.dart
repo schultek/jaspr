@@ -9,6 +9,12 @@ class PlatformRouterImpl implements PlatformRouter {
 
   @override
   final RouteRegistry registry = RouteRegistryImpl();
+
+  @override
+  void redirect(BuildContext context, String url) {
+    context.setStatusCode(302);
+    context.setHeader('Location', url);
+  }
 }
 
 /// Server implementation of HistoryManager

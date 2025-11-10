@@ -37,6 +37,9 @@ class MockPlatformRouter implements PlatformRouter {
 
   @override
   final RouteRegistry registry = MockRouteRegistry();
+
+  @override
+  void redirect(BuildContext context, String url) {}
 }
 
 class MockHistoryManager implements HistoryManager {

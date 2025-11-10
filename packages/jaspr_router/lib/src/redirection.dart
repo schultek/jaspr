@@ -6,11 +6,11 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/server.dart';
 
 import 'configuration.dart';
 import 'match.dart';
 import 'matching.dart';
+import 'platform/platform.dart';
 import 'route.dart';
 
 /// A GoRouter redirector function.
@@ -37,7 +37,6 @@ FutureOr<RouteMatchList> redirect(
   final String prevLocation = prevMatchList.uri.toString();
   FutureOr<RouteMatchList> processTopLevelRedirect(String? topRedirectLocation) {
     if (topRedirectLocation != null && topRedirectLocation != prevLocation) {
-
       final RouteMatchList newMatch = _getNewMatches(
         topRedirectLocation,
         prevMatchList.uri,
@@ -66,7 +65,7 @@ FutureOr<RouteMatchList> redirect(
         }
         return redirect(context, newMatch, configuration, matcher, redirectHistory: redirectHistory, extra: extra);
       }
-      if (!kIsWeb && (redirectHistory?.length ?? 0) > 1) {
+      if (!context.binding.isClient && (redirectHistory?.length ?? 0) > 1) {
         return _setRedirectHeader(context, prevMatchList);
       }
       return prevMatchList;
@@ -212,9 +211,7 @@ void _addRedirect(List<RouteMatchList> redirects, RouteMatchList newMatch, Uri p
 }
 
 RouteMatchList _setRedirectHeader(BuildContext context, RouteMatchList matchList) {
-  context.setHeader('Location', matchList.fullpath);
-  context.setStatusCode(302);
-
+  PlatformRouter.instance.redirect(context, matchList.uri.path);
   return _redirectMatch(matchList.uri);
 }
 
@@ -238,4 +235,3 @@ RouteMatchList _redirectMatch(Uri uri) {
     const <String, String>{},
   );
 }
-

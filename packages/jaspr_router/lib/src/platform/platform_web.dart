@@ -12,6 +12,11 @@ class PlatformRouterImpl implements PlatformRouter {
 
   @override
   final RouteRegistry registry = RouteRegistryImpl();
+
+  @override
+  void redirect(BuildContext context, String url) {
+    assert(false, 'Redirects are only supported on the server.');
+  }
 }
 
 /// Browser implementation of HistoryManager
