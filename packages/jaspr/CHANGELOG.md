@@ -1,5 +1,6 @@
 ## _BLOCKED_ Unreleased patch
 
+- Fixed bug when using `SyncStateMixin` or `@sync` on a `@client` component.
 - Fixed allowing children for `path` tag by removing it from list of self-closing tags.
 
 ## 0.21.6
