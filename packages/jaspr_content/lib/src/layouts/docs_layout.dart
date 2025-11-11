@@ -87,7 +87,6 @@ class DocsLayout extends PageLayoutBase {
         css('&').styles(
           padding: Padding.zero,
           margin: Margin.symmetric(horizontal: Unit.auto),
-          maxWidth: 90.rem,
         ),
         css.media(MediaQuery.all(minWidth: 768.px), [
           css('&').styles(padding: Padding.symmetric(horizontal: 1.25.rem)),
@@ -140,12 +139,14 @@ class DocsLayout extends PageLayoutBase {
             css('&').styles(
               padding: Padding.only(top: 2.rem, left: 1.rem, right: 1.rem),
               display: Display.flex,
+              justifyContent: JustifyContent.center,
             ),
             css.media(MediaQuery.all(minWidth: 1024.px), [css('&').styles(padding: Padding.only(left: 4.rem))]),
             css('.content-container', [
               css('&').styles(
                 flex: Flex(grow: 1, shrink: 1, basis: 0.percent),
                 minWidth: Unit.zero,
+                maxWidth: 80.rem,
                 padding: Padding.only(right: Unit.zero),
               ),
               css.media(MediaQuery.all(minWidth: 1280.px), [css('&').styles(padding: Padding.only(right: 3.rem))]),
