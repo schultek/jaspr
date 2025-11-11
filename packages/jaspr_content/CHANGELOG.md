@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Adjust styling of `DocsLayout` to be more responsive on large screens.
+
 ## 0.4.3
 
 - Added a new `FileTree` component for rendering file tree structures.
