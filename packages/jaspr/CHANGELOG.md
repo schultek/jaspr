@@ -1,5 +1,6 @@
 ## _BLOCKED_ Unreleased patch
 
+- `@Import` now supports defining extensions and properly checks elements inside the `show` parameter.
 - Fixed bug when using `SyncStateMixin` or `@sync` on a `@client` component.
 - Fixed bug with `checked` and `indeterminate` attributes not rendering correctly on `input` elements.
 - Fixed allowing children for `path` tag by removing it from list of self-closing tags.
