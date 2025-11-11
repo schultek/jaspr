@@ -40,6 +40,11 @@ import '../framework/framework.dart';
 ///
 /// `S` is the type of interaction summary.
 ///
+/// When running on the server, `stream` must be null to avoid scheduling unallowed
+/// rebuilds. Use `kIsWeb` to conditionally provide a stream only when running on the web,
+/// or consider using PreloadStateMixin or AsyncStatelessComponent to perform async work
+/// on the server side.
+///
 /// See also:
 ///
 ///  * [StreamBuilder], which is specialized for the case where only the most
@@ -106,6 +111,14 @@ class _StreamBuilderBaseState<T, S> extends State<StreamBuilderBase<T, S>> {
   @override
   void initState() {
     super.initState();
+
+    assert(
+      context.binding.isClient || component.stream == null,
+      'The stream parameter of StreamBuilder must be null when running on the server to avoid scheduling unallowed rebuilds. '
+      'Use `stream: kIsWeb ? yourStream : null` instead, or consider using PreloadStateMixin or '
+      'AsyncStatelessComponent to perform async work on the server side.',
+    );
+
     _summary = component.initial();
     _subscribe();
   }
@@ -324,9 +337,14 @@ typedef AsyncComponentBuilder<T> = Component Function(BuildContext context, Asyn
 ///
 /// Component rebuilding is scheduled by each interaction, using [State.setState],
 /// but is otherwise decoupled from the timing of the stream. The [builder]
-/// is called at the discretion of the Flutter pipeline, and will thus receive a
+/// is called at the discretion of the Jaspr pipeline, and will thus receive a
 /// timing-dependent sub-sequence of the snapshots that represent the
 /// interaction with the stream.
+///
+/// When running on the server, `stream` must be null to avoid scheduling unallowed
+/// rebuilds. Use `kIsWeb` to conditionally provide a stream only when running on the web,
+/// or consider using [PreloadStateMixin] or [AsyncStatelessComponent] to perform async work
+/// on the server side.
 ///
 /// As an example, when interacting with a stream producing the integers
 /// 0 through 9, the [builder] may be called with any ordered sub-sequence
@@ -364,16 +382,6 @@ typedef AsyncComponentBuilder<T> = Component Function(BuildContext context, Asyn
 /// This should be used to ensure that the first frame has the expected value,
 /// as the builder will always be called before the stream listener has a chance
 /// to be processed.
-///
-/// {@tool dartpad}
-/// This sample shows a [StreamBuilder] that listens to a Stream that emits bids
-/// for an auction. Every time the StreamBuilder receives a bid from the Stream,
-/// it will display the price of the bid below an icon. If the Stream emits an
-/// error, the error is displayed below an error icon. When the Stream finishes
-/// emitting bids, the final price is displayed.
-///
-/// ** See code in examples/api/lib/components/async/stream_builder.0.dart **
-/// {@end-tool}
 ///
 /// See also:
 ///
@@ -450,6 +458,11 @@ class StreamBuilder<T> extends StreamBuilderBase<T, AsyncSnapshot<T>> {
 ///
 /// {@youtube 560 315 https://www.youtube.com/watch?v=ek8ZPdWj4Qo}
 ///
+/// When running on the server, `future` must be null to avoid scheduling unallowed
+/// rebuilds. Use `kIsWeb` to conditionally provide a stream only when running on the web,
+/// or consider using [PreloadStateMixin] or [AsyncStatelessComponent] to perform async work
+/// on the server side.
+///
 /// ## Timing
 ///
 /// Component rebuilding is scheduled by the completion of the future, using
@@ -498,17 +511,6 @@ class StreamBuilder<T> extends StreamBuilderBase<T, AsyncSnapshot<T>> {
 /// A [FutureBuilder] behaves identically to a [StreamBuilder] configured with
 /// `future?.asStream()`, except that snapshots with `ConnectionState.active`
 /// may appear for the latter, depending on how the stream is implemented.
-///
-/// {@tool dartpad}
-/// This sample shows a [FutureBuilder] that displays a loading spinner while it
-/// loads data. It displays a success icon and text if the [Future] completes
-/// with a result, or an error icon and text if the [Future] completes with an
-/// error. Assume the `_calculation` field is set by pressing a button elsewhere
-/// in the UI.
-///
-/// ** See code in examples/api/lib/components/async/future_builder.0.dart **
-/// {@end-tool}
-// TODO(ianh): remove unreachable code above once https://github.com/dart-lang/sdk/issues/35520 is fixed
 class FutureBuilder<T> extends StatefulComponent {
   /// Creates a component that builds itself based on the latest snapshot of
   /// interaction with a [Future].
@@ -580,6 +582,14 @@ class _FutureBuilderState<T> extends State<FutureBuilder<T>> {
   @override
   void initState() {
     super.initState();
+
+    assert(
+      context.binding.isClient || component.future == null,
+      'The future parameter of FutureBuilder must be null when running on the server to avoid scheduling unallowed rebuilds. '
+      'Use `future: kIsWeb ? yourFuture : null` instead, or consider using PreloadStateMixin or '
+      'AsyncStatelessComponent to perform async work on the server side.',
+    );
+
     _snapshot = component.initialData == null
         ? AsyncSnapshot<T>.nothing()
         : AsyncSnapshot<T>.withData(ConnectionState.none, component.initialData as T);
