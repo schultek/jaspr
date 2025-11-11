@@ -3,7 +3,7 @@
 - Fixed bug when using `SyncStateMixin` or `@sync` on a `@client` component.
 - Fixed bug with `checked` and `indeterminate` attributes not rendering correctly on `input` elements.
 - Fixed allowing children for `path` tag by removing it from the list of self-closing tags.
-- Deprecate the `package:jaspr/ui.dart` library that provides small utility components.
+- Deprecate the `package:jaspr/ui.dart` library that provides legacy utility components.
   For accessing Jaspr APIs, import `package:jaspr/jaspr.dart` instead.
   For the utility components, build your own or use a component library.
 
