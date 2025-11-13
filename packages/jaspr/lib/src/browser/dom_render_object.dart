@@ -130,6 +130,10 @@ class DomRenderElement extends DomRenderObject
               print("Set input checked: $shouldBeChecked");
             }
             (node as web.HTMLInputElement).checked = shouldBeChecked;
+            if (!shouldBeChecked && node.hasAttribute('checked')) {
+              // Remove the attribute if unchecked to avoid HTML5 validation issues.
+              node.removeAttribute('checked');
+            }
           }
           continue;
         }
@@ -143,6 +147,10 @@ class DomRenderElement extends DomRenderObject
               print("Set input indeterminate: $shouldBeIndeterminate");
             }
             (node as web.HTMLInputElement).indeterminate = shouldBeIndeterminate;
+            if (!shouldBeIndeterminate && node.hasAttribute('indeterminate')) {
+              // Remove the attribute if unchecked to avoid HTML5 validation issues.
+              node.removeAttribute('indeterminate');
+            }
           }
           continue;
         }

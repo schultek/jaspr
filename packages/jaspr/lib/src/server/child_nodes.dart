@@ -190,6 +190,11 @@ class ChildList with Iterable<MarkupRenderObject> {
 
     while (true) {
       if (startBefore.prev case ChildNodeBoundary startPrev when startPrev.range.start == startPrev) {
+        if (startPrev.element == element) {
+          // Wrapping the same element, apply reverse order
+          startBefore = startPrev;
+          continue;
+        }
         assert(startPrev.element.depth != element.depth);
         if (element.depth > startPrev.element.depth) {
           // element is a descendant of startPrev, correct order
@@ -204,6 +209,11 @@ class ChildList with Iterable<MarkupRenderObject> {
     }
     while (true) {
       if (endAfter.next case ChildNodeBoundary endNext when endNext.range.end == endNext) {
+        if (endNext.element == element) {
+          // Wrapping the same element, apply reverse order
+          endAfter = endNext;
+          continue;
+        }
         assert(endNext.element.depth != element.depth);
         if (element.depth > endNext.element.depth) {
           // element is a descendant of startPrev, correct order

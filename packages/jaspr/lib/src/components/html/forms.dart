@@ -182,8 +182,8 @@ Component input({
       'name': ?name,
       'value': ?value,
       if (disabled == true) 'disabled': '',
-      if (checked != null) 'checked': checked ? 'true' : 'false',
-      if (indeterminate != null) 'indeterminate': indeterminate ? 'true' : 'false',
+      'checked': ?_explicitBool(checked),
+      'indeterminate': ?_explicitBool(indeterminate),
     },
     events: {
       ...?events,

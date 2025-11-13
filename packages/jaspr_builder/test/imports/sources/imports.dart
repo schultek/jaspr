@@ -6,6 +6,7 @@ const importsSources = {
     
     @Import.onWeb('dart:html', show: [#window, #Window])
     @Import.onServer('dart:io', show: [#HttpServer])
+    @Import.onServer('dart:collection', show: [#IterableExtensions])
     import 'target.imports.dart';
   ''',
 };
@@ -14,13 +15,35 @@ final importsModuleOutput = {
   'site|lib/target.imports.json': jsonEncode([
     {
       "url": "dart:html",
-      "show": ["window", "Window"],
       "platform": 0,
+      "elements": [
+        {"name": "window", "type": 2, "details": <String>[]},
+        {"name": "Window", "type": 0, "details": <String>[]},
+      ],
     },
     {
       "url": "dart:io",
-      "show": ["HttpServer"],
       "platform": 1,
+      "elements": [
+        {"name": "HttpServer", "type": 0, "details": <String>[]},
+      ],
+    },
+    {
+      "url": "dart:collection",
+      "platform": 1,
+      "elements": [
+        {
+          "name": "IterableExtensions",
+          "type": 1,
+          "details": [
+            "dynamic get indexed => null;",
+            "dynamic get firstOrNull => null;",
+            "dynamic get lastOrNull => null;",
+            "dynamic get singleOrNull => null;",
+            "dynamic get elementAtOrNull => null;",
+          ],
+        },
+      ],
     },
   ]),
 };
@@ -39,7 +62,7 @@ final importsOutput = {
       '\n'
       'export \'generated/imports/_vm.dart\'\n'
       '    if (dart.library.js_interop) \'generated/imports/_stubs.dart\'\n'
-      '    show HttpServer, HttpServerOrStubbed;\n'
+      '    show HttpServer, HttpServerOrStubbed, IterableExtensions;\n'
       '',
 };
 
@@ -59,7 +82,8 @@ final importsStubsOutput = {
       '',
   'site|lib/generated/imports/_vm.dart':
       '// dart format off\n'
-      '// ignore_for_file: type=lint\n\n'
+      '// ignore_for_file: type=lint\n'
+      '\n'
       '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
@@ -67,6 +91,7 @@ final importsStubsOutput = {
       '\n'
       'import \'dart:io\' show HttpServer;\n'
       'export \'dart:io\' show HttpServer;\n'
+      'export \'dart:collection\' show IterableExtensions;\n'
       '\n'
       'typedef HttpServerOrStubbed = HttpServer;\n'
       '',
@@ -83,5 +108,13 @@ final importsStubsOutput = {
       'typedef WindowOrStubbed = dynamic;\n'
       'dynamic HttpServer;\n'
       'typedef HttpServerOrStubbed = dynamic;\n'
+      '\n'
+      'extension IterableExtensions on dynamic {\n'
+      '  dynamic get indexed => null;\n'
+      '  dynamic get firstOrNull => null;\n'
+      '  dynamic get lastOrNull => null;\n'
+      '  dynamic get singleOrNull => null;\n'
+      '  dynamic get elementAtOrNull => null;\n'
+      '}\n'
       '',
 };

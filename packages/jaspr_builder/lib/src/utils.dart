@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:analyzer/dart/analysis/results.dart';
-import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
@@ -35,33 +33,93 @@ final TypeChecker stateChecker = TypeChecker.typeNamed(State, inPackage: 'jaspr'
 final TypeChecker importChecker = TypeChecker.typeNamed(Import, inPackage: 'jaspr');
 
 class ImportEntry {
-  String url;
-  List<String> show;
+  final String url;
   final int platform;
+  final List<ImportElement> elements;
 
-  ImportEntry(this.url, this.show, this.platform);
+  ImportEntry(this.url, this.platform, this.elements);
+
+  factory ImportEntry.from(String url, List<String> show, int platform, LibraryElement lib) {
+    final elements = <ImportElement>[];
+    for (final name in show) {
+      final element = lib.exportNamespace.get2(name);
+      if (element == null) {
+        throw StateError('Import "$url" does not export symbol "$name".');
+      }
+
+      List<String> details = [];
+
+      if (element case ExtensionElement ext) {
+        for (final child in ext.children) {
+          if (child.isSynthetic || child.isPrivate || child.name == null) continue;
+          if (child is ExecutableElement && child.isStatic) continue;
+          if (child is VariableElement && child.isStatic) continue;
+
+          details.add(switch (child) {
+            SetterElement() => 'set ${child.name!}(dynamic _) {}',
+            _ => 'dynamic get ${child.name!} => null;',
+          });
+        }
+      }
+
+      elements.add(
+        ImportElement(name, switch (element) {
+          ExtensionElement() => ElementType.extension,
+          TypeDefiningElement() => ElementType.type,
+          TopLevelVariableElement() || GetterElement() => ElementType.variable,
+          _ => throw StateError('Unsupported import symbol type: ${element.runtimeType}'),
+        }, details),
+      );
+    }
+
+    return ImportEntry(url, platform, elements);
+  }
+
+  factory ImportEntry.fromJson(Map<String, Object?> json) {
+    return ImportEntry(
+      json['url'] as String,
+      json['platform'] as int,
+      (json['elements'] as List<Object?>).map((e) => ImportElement.fromJson(e as Map<String, Object?>)).toList(),
+    );
+  }
 
   Map<String, Object?> toJson() {
-    return {'url': url, 'show': show, 'platform': platform};
+    return {
+      'url': url,
+      'platform': platform,
+      'elements': elements.map((e) => e.toJson()).toList(),
+    };
   }
 }
 
-extension TypeStub on String {
-  bool get isType {
-    var n = substring(0, 1);
-    return n.toLowerCase() != n;
+class ImportElement {
+  final String name;
+  final ElementType type;
+  final List<String> details;
+
+  ImportElement(this.name, this.type, this.details);
+
+  factory ImportElement.fromJson(Map<String, Object?> json) {
+    return ImportElement(
+      json['name'] as String,
+      ElementType.values[json['type'] as int],
+      (json['details'] as List<Object?>).cast<String>(),
+    );
+  }
+
+  Map<String, Object?> toJson() {
+    return {
+      'name': name,
+      'type': type.index,
+      'details': details,
+    };
   }
 }
 
-extension ElementNode on Element {
-  AstNode? get node {
-    var result = session?.getParsedLibraryByElement(library!);
-    if (result is ParsedLibraryResult) {
-      return result.getFragmentDeclaration(firstFragment)?.node;
-    } else {
-      return null;
-    }
-  }
+enum ElementType {
+  type,
+  extension,
+  variable,
 }
 
 class ImportsWriter {

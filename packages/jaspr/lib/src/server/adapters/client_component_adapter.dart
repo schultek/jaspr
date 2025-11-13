@@ -40,7 +40,10 @@ class ClientComponentRegistryElement extends ObserverElement {
   final List<ClientTarget> _clientTargets = [];
 
   @override
-  void willRebuildElement(Element element) {
+  void willRebuildElement(Element element) {}
+
+  @override
+  void didRebuildElement(Element element) {
     var binding = this.binding as ServerAppBinding;
 
     if (!_didAddClientScript) {
@@ -67,9 +70,6 @@ class ClientComponentRegistryElement extends ObserverElement {
     _clientTargets.add(entry);
     binding.addRenderAdapter(ClientComponentAdapter(entry.name, entry.dataFor(element.component), element));
   }
-
-  @override
-  void didRebuildElement(Element element) {}
 
   @override
   void didUnmountElement(Element element) {}

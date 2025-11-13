@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 void main() {
-  var specFile = File('tool/data/html.json');
-  var specJson = jsonDecode(specFile.readAsStringSync()) as Map<String, dynamic>;
+  final specFile = File('tool/data/html.json');
+  final specJson = jsonDecode(specFile.readAsStringSync()) as Map<String, dynamic>;
 
-  var cliSpecFile = File('../jaspr_cli/lib/src/html_spec.dart');
+  final cliSpecFile = File('../jaspr_cli/lib/src/html_spec.dart');
 
   cliSpecFile.writeAsString('''
 // GENERATED FILE - DO NOT EDIT
@@ -14,17 +14,17 @@ void main() {
 const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
 ''');
 
-  var allTags = <String>{};
+  final allTags = <String>{};
 
-  for (var key in specJson.keys) {
-    var group = specJson[key] as Map<String, dynamic>;
-    var file = File('lib/src/components/html/$key.dart');
-    var content = StringBuffer("part of 'html.dart';\n");
+  for (final key in specJson.keys) {
+    final group = specJson[key] as Map<String, dynamic>;
+    final file = File('lib/src/components/html/$key.dart');
+    final content = StringBuffer("part of 'html.dart';\n");
 
-    var schemas = <String, Map<String, dynamic>>{};
+    final schemas = <String, Map<String, dynamic>>{};
 
-    for (var tag in group.keys) {
-      var data = group[tag] as Map<String, dynamic>;
+    for (final tag in group.keys) {
+      final data = group[tag] as Map<String, dynamic>;
       if (tag.startsWith(':')) {
         schemas[tag.substring(1)] = data;
         continue;
@@ -35,7 +35,7 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
 
       var attrs = data['attributes'] as Map<String, dynamic>?;
 
-      var inherit = data['inherit'];
+      final inherit = data['inherit'];
 
       if (inherit != null) {
         (attrs ??= {}).addAll(schemas[inherit]!);
@@ -43,32 +43,32 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
 
       if (attrs != null) {
         content.writeln('///');
-        for (var attr in attrs.keys) {
-          var name = attrs[attr]['name'] ?? attr;
+        for (final attr in attrs.keys) {
+          final name = attrs[attr]['name'] ?? attr;
           content.writeln('/// - [$name]: ${attrs[attr]['doc'].split('\n').join('\n///   ')}');
         }
       }
       content.write('Component $tag(');
 
-      var selfClosing = data['self_closing'] == true;
+      final selfClosing = data['self_closing'] == true;
 
       if (!selfClosing) {
         content.write('List<Component> children, ');
       }
       content.write('{');
 
-      var events = <String>{};
+      final events = <String>{};
       String? contentParam;
 
       if (attrs != null) {
-        for (var attr in attrs.keys) {
-          var name = attrs[attr]['name'] ?? attr;
-          var type = attrs[attr]['type'];
+        for (final attr in attrs.keys) {
+          final name = attrs[attr]['name'] ?? attr;
+          final type = attrs[attr]['type'];
 
           if (type == null) {
             throw ArgumentError('Attribute type is required for attribute $key.$tag.$attr');
           }
-          var required = attrs[attr]['required'] == true;
+          final required = attrs[attr]['required'] == true;
 
           if (required) {
             content.write('required ');
@@ -83,17 +83,17 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
           } else if (type == 'double') {
             content.write('double');
           } else if (type is String && type.startsWith('enum:')) {
-            var name = type.split(':')[1];
+            final name = type.split(':')[1];
             content.write(name);
           } else if (type is String && type.startsWith('event:')) {
-            var [_, name, t] = type.split(':');
+            final [_, name, t] = type.split(':');
             events.add(name);
             content.write(t);
           } else if (type is String && type.startsWith('css:')) {
-            var [_, name] = type.split(':');
+            final [_, name] = type.split(':');
             content.write(name);
           } else if (type is Map<String, dynamic>) {
-            var name = type['name'];
+            final name = type['name'];
             content.write(name);
           } else if (type == 'content') {
             content.write('String');
@@ -129,35 +129,32 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
           '      ...?attributes,\n',
         );
 
-        for (var attr in attrs.keys) {
-          var name = attrs[attr]['name'] ?? attr;
-          var type = attrs[attr]['type'];
+        for (final attr in attrs.keys) {
+          final name = attrs[attr]['name'] ?? attr;
+          final type = attrs[attr]['type'];
 
           if (type is String && (type.startsWith('event:') || type == 'content')) continue;
 
           content.write('      ');
 
-          var required = attrs[attr]['required'] == true;
+          final required = attrs[attr]['required'] == true;
+          final explicitBool = attrs[attr]['explicit'] == true;
 
-          if (type == 'boolean') {
-            if (attrs[attr]['explicit'] == true) {
-              content.write('if ($name != null) ');
-            } else {
-              content.write('if ($name == true) ');
-            }
+          if (type == 'boolean' && !explicitBool) {
+            content.write('if ($name == true) ');
           }
 
           content.write("'$attr': ");
 
-          var nullCheck = !required && type != 'boolean' ? '?' : '';
+          final nullCheck = !required ? '?' : '';
 
           if (type == 'string') {
             content.write('$nullCheck$name');
           } else if (type == 'boolean') {
-            if (attrs[attr]['explicit'] == true) {
-              content.write("$name ? 'true' : 'false'");
+            if (!explicitBool) {
+              content.write('\'\'');
             } else {
-              content.write("''");
+              content.write('?_explicitBool($name)');
             }
           } else if (type == 'int' || type == 'double') {
             content.write("$nullCheck$name$nullCheck.toString()");
@@ -204,20 +201,20 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
       );
 
       if (attrs != null) {
-        for (var attr in attrs.keys) {
-          var type = attrs[attr]['type'];
+        for (final attr in attrs.keys) {
+          final type = attrs[attr]['type'];
 
           if (type is Map<String, dynamic>) {
             if (type['values'] != null) {
-              var name = type['name'] as String;
-              var values = type['values'] as Map<String, dynamic>;
+              final name = type['name'] as String;
+              final values = type['values'] as Map<String, dynamic>;
 
               content.write('\n${type['doc'].split('\n').map((t) => '/// $t\n').join()}');
 
               content.write('enum $name {\n');
 
-              for (var name in values.keys) {
-                var value = values[name]['value'] ?? name;
+              for (final name in values.keys) {
+                final value = values[name]['value'] ?? name;
                 content.write('  /// ${values[name]['doc'].split('\n').join('\n  /// ')}\n');
                 content.write('  $name(\'$value\')');
                 if (values.keys.last != name) {
@@ -242,6 +239,6 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
     file.writeAsStringSync(content.toString());
   }
 
-  var lintFile = File('../jaspr_lints/lib/src/all_html_tags.dart');
+  final lintFile = File('../jaspr_lints/lib/src/all_html_tags.dart');
   lintFile.writeAsStringSync('const allHtmlTags = {${allTags.map((t) => "'$t'").join(', ')}};\n');
 }

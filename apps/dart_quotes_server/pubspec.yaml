@@ -1,6 +1,6 @@
 name: dart_quotes_server
 description: Collection of Dart quotes.
-version: 0.1.9
+version: 0.1.10
 publish_to: none
 
 environment:
@@ -12,7 +12,7 @@ dependencies:
   dart_quotes_client:
     path: ./client
   jaspr: ^0.21.0
-  jaspr_router: ^0.7.1
+  jaspr_router: ^0.8.0
   jaspr_serverpod: ^0.5.6
   serverpod: 2.3.0
   serverpod_auth_google_flutter: 2.3.0

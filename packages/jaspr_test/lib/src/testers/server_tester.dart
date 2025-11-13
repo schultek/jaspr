@@ -31,10 +31,13 @@ void testServer(
 
 /// A virtual response object containing the server-rendered html document.
 class DocumentResponse {
-  DocumentResponse({required this.statusCode, required this.body, this.document});
+  DocumentResponse({required this.statusCode, required this.headers, required this.body, this.document});
 
   /// The status code of the HTTP response
   int statusCode;
+
+  /// The headers of the HTTP response
+  Map<String, String> headers = {};
 
   /// The body of the HTTP response
   String body;
@@ -84,15 +87,21 @@ class ServerTester {
   /// Perform a virtual request to your app that renders the components and returns the
   /// resulting document.
   Future<DocumentResponse> request(String location) async {
-    var uri = Uri.parse('http://test.server$location');
+    final uri = Uri.parse('http://test.server$location');
 
-    var response = await _handler(Request('GET', uri));
-    var statusCode = response.statusCode;
-    var body = await response.readAsString();
+    final response = await _handler(Request('GET', uri));
+    final statusCode = response.statusCode;
+    final headers = response.headers;
+    final body = await response.readAsString();
 
-    var doc = statusCode == 200 ? parse(body) : null;
+    final doc = statusCode == 200 ? parse(body) : null;
 
-    return DocumentResponse(statusCode: statusCode, body: body, document: doc?.body != null ? doc : null);
+    return DocumentResponse(
+      statusCode: statusCode,
+      headers: headers,
+      body: body,
+      document: doc?.body != null ? doc : null,
+    );
   }
 }
 

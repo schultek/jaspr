@@ -27,7 +27,15 @@
 - **Breaking**: `ResponseLike.body` (returned from `renderComponent()`) is now a `Uint8List` instead of `String`.
 - Allow binary responses in `AppContext.setStatusCode`.
 
-- Fixed allowing children for `path` tag by removing it from list of self-closing tags.
+## 0.21.7
+
+- `@Import` now supports defining extensions and properly checks elements inside the `show` parameter.
+- Fixed bug when using `SyncStateMixin` or `@sync` on a `@client` component.
+- Fixed bug with `checked` and `indeterminate` attributes not rendering correctly on `input` elements.
+- Fixed allowing children for `path` tag by removing it from the list of self-closing tags.
+- Deprecate the `package:jaspr/ui.dart` library that provides legacy utility components.
+  For accessing Jaspr APIs, import `package:jaspr/jaspr.dart` instead.
+  For the utility components, build your own or use a component library.
 
 ## 0.21.6
 

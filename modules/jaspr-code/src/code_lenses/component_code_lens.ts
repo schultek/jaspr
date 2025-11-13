@@ -1,20 +1,16 @@
+import { lspToRange } from "../helpers/object_helper";
 import * as vs from "vscode";
-import { dartExtensionApi } from "./api";
+import { ScopeResults, ScopesDomain, ScopeTarget } from "../jaspr/scopes_domain";
+import { dartExtensionApi } from "../api";
 import { PublicOutline } from "dart-code/src/extension/api/interfaces";
-import { ScopeResults, ScopesDomain, ScopeTarget } from "./jaspr/scopes_domain";
 
-export class ComponentCodeLensProvider
-  implements vs.CodeLensProvider, vs.Disposable
-{
+export class ComponentCodeLensProvider implements vs.CodeLensProvider, vs.Disposable {
   private scopesDomain: ScopesDomain;
 
-  private _onDidChangeCodeLenses: vs.EventEmitter<void> =
-    new vs.EventEmitter<void>();
-  public readonly onDidChangeCodeLenses: vs.Event<void> =
-    this._onDidChangeCodeLenses.event;
+  private _onDidChangeCodeLenses: vs.EventEmitter<void> = new vs.EventEmitter<void>();
+  public readonly onDidChangeCodeLenses: vs.Event<void> = this._onDidChangeCodeLenses.event;
 
   private hintCommand: vs.Disposable;
-
   private scopeResults: ScopeResults = {};
 
   constructor(scopesDomain: ScopesDomain) {
@@ -148,12 +144,4 @@ function targetToLocation(target: ScopeTarget): vs.Location {
     vs.Uri.file(target.path),
     new vs.Position(target.line - 1, target.character)
   );
-}
-
-export function lspToRange(range: any): vs.Range {
-  return new vs.Range(lspToPosition(range.start), lspToPosition(range.end));
-}
-
-export function lspToPosition(position: any): vs.Position {
-  return new vs.Position(position.line, position.character);
 }

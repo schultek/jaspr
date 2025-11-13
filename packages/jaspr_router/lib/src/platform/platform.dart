@@ -10,6 +10,8 @@ abstract class PlatformRouter {
   HistoryManager get history;
 
   RouteRegistry get registry;
+
+  void redirect(BuildContext context, String url);
 }
 
 /// Interface for history management
