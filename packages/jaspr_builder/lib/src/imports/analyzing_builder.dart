@@ -50,20 +50,41 @@ class ImportsModuleBuilder implements Builder {
         return;
       }
 
-      var annotations = importChecker.annotationsOf(import);
+      final annotations = importChecker.annotationsOf(import);
       if (annotations.isEmpty) {
         return;
       }
 
-      var entries = <ImportEntry>[];
+      final entries = <ImportEntry>[];
 
-      for (var annotation in annotations) {
-        var url = annotation.getField('import')!.toStringValue()!;
-        var show = annotation.getField('show')!.toListValue()!.map((s) {
+      for (final annotation in annotations) {
+        final url = annotation.getField('import')!.toStringValue()!;
+        final show = annotation.getField('show')!.toListValue()!.map((s) {
           return s.toSymbolValue() ?? s.toStringValue() ?? s.toString();
         }).toList();
-        var platform = annotation.getField('platform')!.getField('index')!.toIntValue()!;
-        entries.add(ImportEntry(url, show, platform));
+        final platform = annotation.getField('platform')!.getField('index')!.toIntValue()!;
+
+        try {
+          final libUri = Uri.parse(url);
+          if (libUri.scheme == 'dart') {
+            final lib = (await buildStep.resolver.libraries.where((lib) {
+              return lib.isInSdk && lib.uri == libUri;
+            }).toList()).firstOrNull;
+            if (lib == null) {
+              throw NonLibraryAssetException(AssetId('', url));
+            }
+            entries.add(ImportEntry.from(url, show, platform, lib));
+          } else {
+            final libId = AssetId.resolve(libUri, from: buildStep.inputId);
+            final lib = await buildStep.resolver.libraryFor(libId, allowSyntaxErrors: true);
+            entries.add(ImportEntry.from(url, show, platform, lib));
+          }
+        } on NonLibraryAssetException {
+          log.severe(
+            'Could not resolve import "$url" in @Import annotation in '
+            'library ${buildStep.inputId.uri.toString()}. Make sure the import URI is correct.',
+          );
+        }
       }
 
       await buildStep.writeAsString(outputId, jsonEncode(entries));

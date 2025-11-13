@@ -14,24 +14,35 @@ class ImportsStubsBuilder implements Builder {
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
-    var imports = buildStep.findAssets(Glob('**/*.imports.json'));
+    final imports = buildStep.findAssets(Glob('**/*.imports.json'));
 
-    var webImports = <String, Set<String>>{};
-    var vmImports = <String, Set<String>>{};
+    final webImports = <String, Set<ImportElement>>{};
+    final vmImports = <String, Set<ImportElement>>{};
 
-    var stubs = <String>{};
+    final stubs = <String>{};
 
-    await for (var id in imports) {
-      var entries = jsonDecode(await buildStep.readAsString(id)) as List<Object?>;
-      for (var entry in entries.cast<Map<String, Object?>>()) {
-        var url = entry['url'] as String;
-        var platform = entry['platform'] as int?;
-        var show = (entry['show'] as List<Object?>).cast<String>();
+    await for (final id in imports) {
+      final entries = (jsonDecode(await buildStep.readAsString(id)) as List<Object?>)
+          .cast<Map<String, Object?>>()
+          .map(ImportEntry.fromJson)
+          .toList();
+      for (final entry in entries) {
+        var url = entry.url;
 
-        stubs.addAll(show.map((n) => 'dynamic $n;'));
-
-        var types = show.where((n) => n.substring(0, 1).toLowerCase() != n.substring(0, 1));
-        stubs.addAll(types.map((n) => 'typedef ${n}OrStubbed = dynamic;'));
+        for (final elem in entry.elements) {
+          if (elem.type == ElementType.variable) {
+            stubs.add('dynamic ${elem.name};');
+          } else if (elem.type == ElementType.type) {
+            stubs.add('dynamic ${elem.name};');
+            stubs.add('typedef ${elem.name}OrStubbed = dynamic;');
+          } else if (elem.type == ElementType.extension) {
+            stubs.add(
+              'extension ${elem.name} on dynamic {\n'
+              '${elem.details.join('\n')}\n'
+              '}',
+            );
+          }
+        }
 
         var uri = Uri.parse(url);
         if (uri.scheme.isEmpty && path.isRelative(uri.path)) {
@@ -39,42 +50,42 @@ class ImportsStubsBuilder implements Builder {
           url = path.relative(absUrl, from: 'lib/generated/imports/_.dart');
         }
 
-        if (platform == 0) {
-          (webImports[url] ??= {}).addAll(show.cast());
+        if (entry.platform == 0) {
+          (webImports[url] ??= {}).addAll(entry.elements);
         } else {
-          (vmImports[url] ??= {}).addAll(show.cast());
+          (vmImports[url] ??= {}).addAll(entry.elements);
         }
       }
     }
 
     if (vmImports.isNotEmpty) {
       await buildStep.writeAsFormattedDart(AssetId(buildStep.inputId.package, 'lib/generated/imports/_vm.dart'), """
-          // ignore_for_file: directives_ordering, deprecated_member_use
-          
-          ${vmImports.entries.where((e) => e.value.any((v) => v.isType)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
-          ${vmImports.entries.map((e) => "export '${e.key}' show ${e.value.join(', ')};").join('\n')}
-          
-          ${vmImports.values.expand((v) => v.where((e) => e.isType)).map((e) => 'typedef ${e}OrStubbed = $e;').join('\n')}
-        """);
+        // ignore_for_file: directives_ordering, deprecated_member_use
+        
+        ${vmImports.entries.where((e) => e.value.any((e) => e.type == ElementType.type)).map((e) => "import '${e.key}' show ${e.value.where((e) => e.type == ElementType.type).map((e) => e.name).join(', ')};").join('\n')}
+        ${vmImports.entries.map((e) => "export '${e.key}' show ${e.value.map((e) => e.name).join(', ')};").join('\n')}
+
+        ${vmImports.values.expand((v) => v.where((e) => e.type == ElementType.type)).map((e) => 'typedef ${e.name}OrStubbed = ${e.name};').join('\n')}
+      """);
     }
 
     if (webImports.isNotEmpty) {
       await buildStep.writeAsFormattedDart(AssetId(buildStep.inputId.package, 'lib/generated/imports/_web.dart'), """
-          // ignore_for_file: directives_ordering, deprecated_member_use
-          
-          ${webImports.entries.where((e) => e.value.any((v) => v.isType)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
-          ${webImports.entries.map((e) => "export '${e.key}' show ${e.value.join(', ')};").join('\n')}
-          
-          ${webImports.values.expand((v) => v.where((e) => e.isType)).map((e) => 'typedef ${e}OrStubbed = $e;').join('\n')}
-        """);
+        // ignore_for_file: directives_ordering, deprecated_member_use
+
+        ${webImports.entries.where((e) => e.value.any((v) => v.type == ElementType.type)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.type == ElementType.type).map((v) => v.name).join(', ')};").join('\n')}
+        ${webImports.entries.map((e) => "export '${e.key}' show ${e.value.map((e) => e.name).join(', ')};").join('\n')}
+
+        ${webImports.values.expand((v) => v.where((e) => e.type == ElementType.type)).map((e) => 'typedef ${e.name}OrStubbed = ${e.name};').join('\n')}
+      """);
     }
 
     if (stubs.isNotEmpty) {
       await buildStep.writeAsFormattedDart(AssetId(buildStep.inputId.package, 'lib/generated/imports/_stubs.dart'), """
-         // ignore_for_file: directives_ordering, non_constant_identifier_names
-         
-         ${stubs.join('\n')}
-        """);
+        // ignore_for_file: directives_ordering, non_constant_identifier_names
+        
+        ${stubs.join('\n')}
+      """);
     }
   }
 
