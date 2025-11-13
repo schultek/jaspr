@@ -7,7 +7,7 @@ import 'package:jaspr_test/server_test.dart';
 void main() {
   group('html test', () {
     setUpAll(() {
-      Jaspr.initializeApp(useIsolates: false);
+      Jaspr.initializeApp();
     });
 
     test('renders checked and indeterminate attributes correctly', () async {

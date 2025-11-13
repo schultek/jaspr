@@ -45,7 +45,7 @@ void main() {
 
     testServer('preloads async provider values then outputs', (tester) async {
       final someFutureProvider = FutureProvider(
-        (_) async => Future.delayed(Duration(milliseconds: 100)).then((_) => 'value'),
+        (_) async => Future<void>.delayed(Duration(milliseconds: 100)).then((_) => 'value'),
       );
 
       dynamic providerValue;
