@@ -1,4 +1,4 @@
-## _BLOCKED_ Unreleased patch
+## Unreleased patch
 
 - `@Import` now supports defining extensions and properly checks elements inside the `show` parameter.
 - Fixed bug when using `SyncStateMixin` or `@sync` on a `@client` component.
