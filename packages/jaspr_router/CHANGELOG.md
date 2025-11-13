@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.8.0
 
 - Using a `redirect` function on `Router` or `Route` while rendering on the server will now trigger a HTTP redirect (302) instead of rendering the target page.
 
