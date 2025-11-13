@@ -7,7 +7,7 @@ import 'package:jaspr_test/server_test.dart';
 void main() {
   group('render test', () {
     setUpAll(() {
-      Jaspr.initializeApp(useIsolates: false);
+      Jaspr.initializeApp();
     });
 
     test('renders component with document structure', () async {

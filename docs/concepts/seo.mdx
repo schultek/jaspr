@@ -84,34 +84,103 @@ Once you have optimized the overall hydration of your site, you can use code spl
 
 Code splitting can improve the load time of your client-side javascript bundle that is compiled from your Dart source. It allows you to split up the compiled javascript into smaller chunks and load them only when needed.
 
+<Info>
+When using [@client](/api/utils/at_client) components in **server** or **static** mode, Jaspr automatically splits code into a separate chunk for each client component. This should be enough for most use-cases and you don't need to perform any additional code-splitting.
+
+If you are using **client** mode only, or want more fine-grained control over code-splitting, read on.
+</Info>
+
 This functionality is built into Dart using a concept called [deferred imports](https://dart.dev/language/libraries#lazily-loading-a-library). You can use a deferred import for lazily importing any Dart library, whether it is in your own codebase or from a package.
 
 For example lazy-loading a component could look like this:
+
+<Tabs defaultValue="client">
+<TabItem label="client mode" value="client">
 
 ```dart
 // Use the "deferred as" syntax to specify a deferred import.
 import 'components/hello.dart' deferred as hello;
 
-class MyPage extends StatelessComponent {
+class MyPage extends StatefulComponent {
+  const MyPage({super.key});
+
+  State<MyPage> createState() => _MyPageState();
+}
+
+class _MyPageState extends State<MyPage> {
+  bool isLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load the library when the component is initialized.
+    hello.loadLibrary().then((_) {
+      setState(() {
+        isLoaded = true;
+      });
+    });
+  }
 
   @override
   Component build(BuildContext context) {
-    return FutureBuilder(
-      // This loads in the library when first built.
-      future: hello.loadLibrary(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          // Show the component only once loaded.
-          return hello.Hello();
-        } else {
-          // Else show a fallback component.
-          return Fallback();
-        }
-      }
-    );
+    if (!isLoaded) {
+      // Show a fallback component while loading.
+      return Fallback();
+    }
+
+    // Show the imported component only once loaded.
+    return hello.Hello();
   }
 }
 ```
+
+</TabItem>
+<TabItem label="server/static mode" value="server">
+
+```dart
+// Use the "deferred as" syntax to specify a deferred import.
+import 'components/hello.dart' deferred as hello;
+
+// Mark this (or any ancestor) component with @client to render it on the client (as well as server).
+@client
+class MyPage extends StatefulComponent {
+  const MyPage({super.key});
+
+  State<MyPage> createState() => _MyPageState();
+}
+
+class _MyPageState extends State<MyPage> {
+  bool isLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Only load the library on the client.
+    if (kIsWeb) {
+      hello.loadLibrary().then((_) {
+        setState(() {
+          isLoaded = true;
+        });
+      });
+    }
+  }
+
+  @override
+  Component build(BuildContext context) {
+    if (!isLoaded) {
+      // Show a fallback component while loading, or on the server during pre-rendering.
+      return Fallback();
+    }
+
+    // Show the imported component only once loaded.
+    return hello.Hello();
+  }
+}
+```
+
+</TabItem>
+</Tabs>
 
 Loading a library like this mostly makes sense if the library is rather complex and would add a significant amount of code to the javascript bundle. Some potential use-cases can be:
 
