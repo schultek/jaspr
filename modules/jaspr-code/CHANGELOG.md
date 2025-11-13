@@ -1,6 +1,10 @@
+## 0.3.0
+
+- Added the `Serve` code-lens to `main` functions for launching Jaspr, and hide the default `Run / Debug` code lenses.
+
 ## 0.2.3
 
-- Improve stability of component scope analysis.
+- Improved stability of component scope analysis.
 
 ## 0.2.2
 
