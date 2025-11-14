@@ -19,7 +19,7 @@ void main() {
       binding.attachRootComponent(app);
 
       if (binding.rootElement!.owner.isFirstBuild) {
-        final completer = Completer.sync();
+        final completer = Completer<void>.sync();
         binding.rootElement!.binding.addPostFrameCallback(completer.complete);
         await completer.future;
       }

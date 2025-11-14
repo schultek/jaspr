@@ -52,9 +52,11 @@ abstract class MultiChildElement extends Element {
 
   @override
   void visitChildren(ElementVisitor visitor) {
-    for (var child in _children ?? []) {
-      if (!_forgottenChildren.contains(child)) {
-        visitor(child);
+    if (_children case final children?) {
+      for (final child in children) {
+        if (!_forgottenChildren.contains(child)) {
+          visitor(child);
+        }
       }
     }
   }

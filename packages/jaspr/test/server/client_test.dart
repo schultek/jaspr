@@ -30,17 +30,17 @@ class App3 extends StatefulComponent {
   State<App3> createState() => _App3State();
 }
 
-class _App3State extends State<App3> with SyncStateMixin {
+class _App3State extends State<App3> with SyncStateMixin<App3, Map<String, int>> {
   int count = 3;
 
   @override
-  getState() {
+  Map<String, int> getState() {
     return {'count': count};
   }
 
   @override
-  void updateState(value) {
-    count = value['count'];
+  void updateState(Map<String, int> value) {
+    count = value['count']!;
   }
 
   @override
@@ -56,23 +56,23 @@ class App4 extends StatefulComponent {
   State<App4> createState() => _App4State();
 }
 
-class _App4State extends State<App4> with SyncStateMixin, PreloadStateMixin {
+class _App4State extends State<App4> with SyncStateMixin<App4, Map<String, String>>, PreloadStateMixin {
   String label = 'hello';
 
   @override
   Future<void> preloadState() async {
-    await Future.delayed(Duration(milliseconds: 10));
+    await Future<void>.delayed(Duration(milliseconds: 10));
     label = 'world';
   }
 
   @override
-  getState() {
+  Map<String, String> getState() {
     return {'label': label};
   }
 
   @override
-  void updateState(value) {
-    label = value['label'];
+  void updateState(Map<String, String> value) {
+    label = value['label']!;
   }
 
   @override

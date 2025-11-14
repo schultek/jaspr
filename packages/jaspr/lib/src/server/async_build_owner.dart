@@ -78,7 +78,7 @@ class TaskChain {
   }
 
   Future<void> get asFuture {
-    var c = Completer.sync();
+    var c = Completer<void>.sync();
     _then(c.complete);
     return c.future;
   }
