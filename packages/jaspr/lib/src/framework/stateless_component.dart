@@ -144,7 +144,7 @@ class StatelessElement extends BuildableElement {
   @override
   StatelessComponent get component => super.component as StatelessComponent;
 
-  Future? _asyncFirstBuild;
+  Future<void>? _asyncFirstBuild;
 
   @override
   void didMount() {
@@ -153,7 +153,7 @@ class StatelessElement extends BuildableElement {
 
     if (owner.isFirstBuild && !binding.isClient && component is OnFirstBuild) {
       var result = (component as OnFirstBuild).onFirstBuild(this);
-      if (result is Future) {
+      if (result is Future<void>) {
         _asyncFirstBuild = result;
       }
     }
@@ -176,7 +176,7 @@ class StatelessElement extends BuildableElement {
           .then((_) {
             super.performRebuild();
           })
-          .catchError((e, st) {
+          .onError<Object>((e, st) {
             failRebuild(e, st);
           });
     }

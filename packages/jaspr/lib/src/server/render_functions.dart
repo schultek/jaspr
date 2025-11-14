@@ -36,8 +36,9 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
   var errorPort = ReceivePort();
 
   var errorSub = errorPort.listen((message) {
-    var [error, stack] = message;
-    resultCompleter.completeError(error, StackTrace.fromString(stack));
+    if (message case [final Object error, final String stack]) {
+      resultCompleter.completeError(error, StackTrace.fromString(stack));
+    }
   });
 
   var sub = port.listen((message) async {
@@ -69,7 +70,7 @@ void _render(_RenderMessage message) async {
     loadFile: (name) {
       receivePort ??= ReceivePort();
       message.sendPort.send(_LoadFileRequest(name, receivePort!.sendPort));
-      return receivePort!.first.then((value) => value);
+      return receivePort!.first.then((value) => value as String?);
     },
   );
   message.setup(binding);

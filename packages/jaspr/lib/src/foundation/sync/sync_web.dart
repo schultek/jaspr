@@ -5,7 +5,7 @@ import '../../foundation/type_checks.dart';
 
 final _syncRegex = RegExp('^${DomValidator.syncMarkerPrefixRegex}(.*)\$');
 
-void initSyncState(SyncStateMixin sync) {
+void initSyncState<T extends StatefulComponent, U>(SyncStateMixin<T, U> sync) {
   var r = (sync.context as Element).parentRenderObjectElement?.renderObject as DomRenderObject?;
   if (r == null) return;
 
@@ -27,6 +27,6 @@ void initSyncState(SyncStateMixin sync) {
     syncMarker.parentNode?.removeChild(syncMarker);
 
     var data = const DomValidator().unescapeMarkerText(_syncRegex.firstMatch(syncMarker.nodeValue ?? '')!.group(1)!);
-    sync.updateState(jsonDecode(data));
+    sync.updateState(jsonDecode(data) as U);
   }
 }
