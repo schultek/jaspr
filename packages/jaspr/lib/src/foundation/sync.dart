@@ -28,7 +28,7 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> {
     initSyncState(this);
   }
 
-  static void initSyncState<T extends StatefulComponent, U>(SyncStateMixin<T, U> mixin) => s.initSyncState(mixin);
+  static void initSyncState(SyncStateMixin<StatefulComponent, Object?> mixin) => s.initSyncState(mixin);
 }
 
 const sync = SyncAnnotation._();

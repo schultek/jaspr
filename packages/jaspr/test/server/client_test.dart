@@ -30,7 +30,7 @@ class App3 extends StatefulComponent {
   State<App3> createState() => _App3State();
 }
 
-class _App3State extends State<App3> with SyncStateMixin<App3, Map<String, int>> {
+class _App3State extends State<App3> with SyncStateMixin<App3, Map<String, Object?>> {
   int count = 3;
 
   @override
@@ -39,8 +39,8 @@ class _App3State extends State<App3> with SyncStateMixin<App3, Map<String, int>>
   }
 
   @override
-  void updateState(Map<String, int> value) {
-    count = value['count']!;
+  void updateState(Map<String, Object?> value) {
+    count = value['count'] as int;
   }
 
   @override
@@ -56,7 +56,7 @@ class App4 extends StatefulComponent {
   State<App4> createState() => _App4State();
 }
 
-class _App4State extends State<App4> with SyncStateMixin<App4, Map<String, String>>, PreloadStateMixin {
+class _App4State extends State<App4> with SyncStateMixin<App4, Map<String, Object?>>, PreloadStateMixin {
   String label = 'hello';
 
   @override
@@ -71,8 +71,8 @@ class _App4State extends State<App4> with SyncStateMixin<App4, Map<String, Strin
   }
 
   @override
-  void updateState(Map<String, String> value) {
-    label = value['label']!;
+  void updateState(Map<String, Object?> value) {
+    label = value['label'] as String;
   }
 
   @override

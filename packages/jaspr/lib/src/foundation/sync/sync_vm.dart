@@ -2,16 +2,16 @@ import 'dart:convert';
 
 import '../../../server.dart';
 
-void initSyncState<T extends StatefulComponent, U>(SyncStateMixin<T, U> element) {
+void initSyncState(SyncStateMixin<StatefulComponent, Object?> element) {
   if (element.context.binding case ServerAppBinding b) {
     b.addRenderAdapter(SyncAdapter(element, element.context as Element));
   }
 }
 
-class SyncAdapter<T extends StatefulComponent, U> extends ElementBoundaryAdapter {
+class SyncAdapter extends ElementBoundaryAdapter {
   SyncAdapter(this.sync, super.element);
 
-  final SyncStateMixin<T, U> sync;
+  final SyncStateMixin<StatefulComponent, Object?> sync;
 
   @override
   void applyBoundary(ChildListRange range) {
