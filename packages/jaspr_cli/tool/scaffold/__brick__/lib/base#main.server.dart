@@ -1,7 +1,7 @@
 // The entrypoint for the **server** environment.
 //
 // The [main] method will only be executed on the server during pre-rendering.
-// To run code on the client, {{^hydration}}see [web/main.dart]{{/hydration}}{{#hydration}}use the @client annotation{{/hydration}}.
+// To run code on the client, use the @client annotation.
 
 // Server-specific jaspr import.
 import 'package:jaspr/server.dart';
@@ -10,12 +10,12 @@ import 'package:jaspr/server.dart';
 import 'app.dart';
 
 // This file is generated automatically by Jaspr, do not remove or edit.
-import 'jaspr_options.dart';
+import 'jaspr_options.server.g.dart';
 
 void main() {
   // Initializes the server environment with the generated default options.
   Jaspr.initializeApp(
-    options: defaultJasprOptions,
+    options: defaultServerOptions,
   );
 
   // Starts the app.
@@ -40,19 +40,12 @@ void main() {
         margin: Margin.unset,
         fontSize: 4.rem,
       ),
-    ],{{^hydration}}
-    head: [
-      // Links to the compiled client entrypoint.
-      script(defer: true, src: 'main.dart.js'),{{#flutter}}
-      // The generated flutter manifest and bootstrap script.
-      link(rel: 'manifest', href: 'manifest.json'),
-      script(src: "flutter_bootstrap.js", async: true),{{/flutter}}
-    ],{{/hydration}}{{#hydration}}{{#flutter}}
+    ],{{#flutter}}
     head: [
       // The generated flutter manifest and bootstrap script.
       link(rel: 'manifest', href: 'manifest.json'),
       script(src: "flutter_bootstrap.js", async: true),
-    ],{{/flutter}}{{/hydration}}
+    ],{{/flutter}}
     body: App(),
   ));
 }

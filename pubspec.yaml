@@ -28,6 +28,7 @@ workspace:
   - examples/flutter_multi_view
   - examples/flutter_plugin_interop
   - examples/package_riverpod
+  - examples/clienttest
 
 dev_dependencies:
   melos: ^7.1.0

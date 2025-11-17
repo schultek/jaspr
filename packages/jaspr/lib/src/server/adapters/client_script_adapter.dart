@@ -18,7 +18,7 @@ class ClientScriptAdapter extends HeadScopeAdapter {
     final base = head.children.findWhere<MarkupRenderElement>((c) => c.tag == 'base');
 
     // Use absolute path if no base tag is present, otherwise relative to the base.
-    final scriptSrc = base == null ? '/main.clients.dart.js' : 'main.clients.dart.js';
+    final scriptSrc = base == null ? '/main.client.dart.js' : 'main.client.dart.js';
 
     head.children.insertBefore(
       head.createChildRenderElement('script')..update(null, null, null, {'src': scriptSrc, 'defer': ''}, null),

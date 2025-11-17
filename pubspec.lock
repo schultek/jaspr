@@ -157,34 +157,34 @@ packages:
     dependency: transitive
     description:
       name: build_modules
-      sha256: "0126ba5111c4b8f5b1f557beb23eb0bd9266f9114199ff42d9270c29c997b1be"
+      sha256: "8adf3cb2dafa858fe9dbc32c58aae831da5fe402fb68ad2dc6de43a642b9773d"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.18"
+    version: "5.1.1"
   build_runner:
     dependency: transitive
     description:
       name: build_runner
-      sha256: a9461b8e586bf018dd4afd2e13b49b08c6a844a4b226c8d1d10f3a723cdd78c3
+      sha256: "7b5b569f3df370590a85029148d6fc66c7d0201fc6f1847c07dd85d365ae9fcd"
       url: "https://pub.dev"
     source: hosted
-    version: "2.10.1"
+    version: "2.10.3"
   build_test:
     dependency: transitive
     description:
       name: build_test
-      sha256: "86124991e1df069c0993fd1c29dc4e112b73884543f6d9d1d3c2ddb1d6f61dc0"
+      sha256: "5e8aaaa8464be5c1ec723799956827a6aafa91633417dbf409727abb79e60bf1"
       url: "https://pub.dev"
     source: hosted
-    version: "3.5.1"
+    version: "3.5.3"
   build_web_compilers:
     dependency: transitive
     description:
       name: build_web_compilers
-      sha256: "75732844afcadb8e1ec2103acfeb813bb35f4754a8cd89ad9fd3378edb59378b"
+      sha256: "9b662ff4961624c57c1e14c6b82f56e341c7b6dc9a65b5101390e620932bc5d7"
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.2"
+    version: "4.4.2"
   built_collection:
     dependency: transitive
     description:
@@ -1027,10 +1027,10 @@ packages:
     dependency: transitive
     description:
       name: jaspr_web_compilers
-      sha256: "3b4799d78763ef97e83b28f90b29309a4d5ad11e06cd36d49dfc1acf594bbc32"
+      sha256: "8d85a18dea4ce8df8ba934fa2aa0db0b34850058f740c9b6059b9bf4a6727ff1"
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.2+1"
+    version: "4.3.2"
   jose:
     dependency: transitive
     description:

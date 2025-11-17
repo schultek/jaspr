@@ -103,31 +103,54 @@ abstract class BaseCommand extends Command<int> {
       return null; // No server entry point in client mode.
     }
     if (target != null) {
-      if (project.target == null || !project.target!.contains(target)) {
+      if (!target.endsWith('.server.dart')) {
         logger.write(
-          "Specified entry point '$target' must be included in 'jaspr.target' in pubspec.yaml.",
+          "Specified entry point '$target' must end in '.server.dart'.",
           level: Level.critical,
         );
         await shutdown();
         exit(1);
       }
+      if (!File(target).absolute.existsSync()) {
+        logger.write(
+          "Specified entry point '$target' does not exist.",
+          level: Level.critical,
+        );
+        await shutdown();
+        exit(1);
+      }
+      logger.write("Using server entry point: $target", level: Level.verbose);
+      return target;
     }
 
-    var entryPoint = target ?? project.target?.firstOrNull ?? 'lib/main.dart';
-
-    if (!File(entryPoint).absolute.existsSync()) {
-      logger.complete(false);
-      logger.write(
-        "Cannot find entry point. Create a lib/main.dart file, or specify a file using --input.",
-        level: Level.critical,
-      );
-      await shutdown();
-      exit(1);
-    }
-
+    final entryPoint = await _findServerEntrypoint(Directory.current.path);
     logger.write("Using server entry point: $entryPoint", level: Level.verbose);
 
     return entryPoint;
+  }
+
+  Future<String> _findServerEntrypoint(String projectDir) async {
+    var binDir = Directory.fromUri(Uri.file(projectDir)).uri.resolve('bin/');
+    var libDir = Directory.fromUri(Uri.file(projectDir)).uri.resolve('lib/');
+
+    await for (var entity in Directory.fromUri(binDir).list(recursive: true)) {
+      if (entity is File && entity.path.endsWith('.server.dart')) {
+        return entity.path;
+      }
+    }
+
+    await for (var entity in Directory.fromUri(libDir).list(recursive: true)) {
+      if (entity is File && entity.path.endsWith('.server.dart')) {
+        return entity.path;
+      }
+    }
+
+    logger.write(
+      'No server entrypoint found in "bin/" or "lib/". Make sure to have at least one "*.server.dart" file (usually "lib/main.server.dart") in your project.',
+      level: Level.critical,
+    );
+    await shutdown();
+    exit(1);
   }
 
   void guardResource(FutureOr<void> Function() fn) {

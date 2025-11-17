@@ -1,4 +1,4 @@
-// The entrypoint for the **client** environment.
+// The entrypoint for the **client** app.
 //
 // This file is compiled to javascript and executed in the browser.
 

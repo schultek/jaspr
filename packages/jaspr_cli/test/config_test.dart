@@ -55,26 +55,21 @@ void main() {
     });
 
     group('jaspr config', () {
-      test('with correct mode, target and port', () {
+      test('with correct mode and port', () {
         fs.file('pubspec.yaml').writeAsStringSync('''
 name: test
 dependencies:
   jaspr: any
 jaspr:
   mode: server
-  target: [lib/main.dart, lib/other.dart]
   port: 8080
 ''');
-        // create target files
-        fs.file('lib/main.dart').createSync(recursive: true);
-        fs.file('lib/other.dart').createSync(recursive: true);
-
+        
         expect(project.pubspecYaml, isNotNull);
         expect(project.requirePubspecYaml, isNotNull);
         expect(() => project.requireJasprDependency, isNot(throwsException));
         expect(project.modeOrNull, equals(JasprMode.server));
         expect(project.requireMode, equals(JasprMode.server));
-        expect(project.target, equals(['lib/main.dart', 'lib/other.dart']));
         expect(project.port, equals('8080'));
         expect(logger.messages, isEmpty);
         expect(exits, isEmpty);
@@ -92,39 +87,6 @@ jaspr:
         expect(project.modeOrNull, isNull);
         expect(() => project.requireMode, throwsStateError);
         expect(logger.messages, contains('\'jaspr.mode\' in pubspec.yaml must be one of static, server, client.'));
-        expect(exits, equals([1]));
-      });
-
-      test('with invalid target causes exit', () {
-        fs.file('pubspec.yaml').writeAsStringSync('''
-name: test
-dependencies:
-  jaspr: any
-jaspr:
-  mode: static
-  target: 123
-''');
-
-        expect(() => project.target, throwsStateError);
-        expect(logger.messages, contains('\'jaspr.target\' in pubspec.yaml must be a String or List<String>.'));
-        expect(exits, equals([1]));
-      });
-
-      test('with missing target file causes exit', () {
-        fs.file('pubspec.yaml').writeAsStringSync('''
-name: test
-dependencies:
-  jaspr: any
-jaspr:
-  mode: static
-  target: missing.dart
-''');
-
-        expect(() => project.target, throwsStateError);
-        expect(
-          logger.messages,
-          contains('The file "missing.dart" specified by \'jaspr.target\' in pubspec.yaml does not exist.'),
-        );
         expect(exits, equals([1]));
       });
 

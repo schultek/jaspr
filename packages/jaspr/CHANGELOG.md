@@ -1,13 +1,25 @@
 ## Unreleased breaking
 
+- **Breaking** Changed project structure for **static** and **server** mode:
+
+  - Any server entrypoint file must now end in `.server.dart` (e.g. `lib/main.server.dart`).
+  - The generated server-side options file is now `lib/jaspr_options.server.g.dart` containing `defaultServerOptions`.
+
+  - The project must contain at least one server entrypoint file ending in `.client.dart` (e.g. `lib/main.client.dart`) for client-side rendering.
+  - A new client-side Jaspr options file is generated at `lib/jaspr_options.client.g.dart` containing `defaultClientOptions`.
+
+  - Added a new `ClientApp` component that should be used inside the client entrypoint like this:
+    ```dart
+    void main() {
+      runApp(
+        ClientApp(
+          options: defaultClientOptions,
+        ),
+      );
+    }
+    ```
+
 - **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`. Use `jaspr.target` instead.
-
-- Added support for `jaspr.target` option in `pubspec.yaml` to specify the default entrypoint(s) of your Jaspr application.
-
-  This can either be a single file (e.g. `bin/main.dart`) or a list of files (e.g. `["lib/main.dart","lib/other.dart"]`).
-  When multiple files are specified, the desired entrypoint can be selected using the `--input` flag when running `jaspr serve` or `jaspr build`, or the first file will be used if the `--input` flag is not set. 
-  
-  If neither is set, the default entrypoint stays `lib/main.dart`.
 
 - Added support for `jaspr.port` option in `pubspec.yaml` to specify the default port used by `jaspr serve`. 
 

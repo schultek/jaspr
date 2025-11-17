@@ -2,7 +2,7 @@ import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
 import 'package:jaspr_builder/src/client/client_bundle_builder.dart';
 import 'package:jaspr_builder/src/client/client_module_builder.dart';
-import 'package:jaspr_builder/src/client/client_registry_builder.dart';
+import 'package:jaspr_builder/src/client/client_entrypoint_builder.dart';
 import 'package:test/test.dart';
 
 import 'sources/bundle.dart';
@@ -141,7 +141,7 @@ void main() {
 
     test('generates registry', () async {
       await testBuilder(
-        ClientRegistryBuilder(BuilderOptions({})),
+        ClientEntrypointBuilder(BuilderOptions({})),
         clientRegistrySources,
         outputs: clientRegistryOutputs,
         readerWriter: reader,

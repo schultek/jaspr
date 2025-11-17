@@ -9,9 +9,9 @@ import '../styles/styles_bundle_builder.dart';
 import '../styles/styles_module_builder.dart';
 import '../utils.dart';
 
-/// Builds part files and web entrypoints for components annotated with @app
-class JasprOptionsBuilder implements Builder {
-  JasprOptionsBuilder(this.options);
+/// Builds the server options file for jaspr projects.
+class ServerOptionsBuilder implements Builder {
+  ServerOptionsBuilder(this.options);
 
   final BuilderOptions options;
 
@@ -33,7 +33,7 @@ class JasprOptionsBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-    r'lib/$lib$': ['lib/jaspr_options.dart'],
+    r'lib/$lib$': ['lib/server_options.g.dart'],
   };
 
   String get generationHeader =>
@@ -41,7 +41,7 @@ class JasprOptionsBuilder implements Builder {
       "// Generated with jaspr_builder\n";
 
   Future<void> generateOptionsOutput(BuildStep buildStep) async {
-    final (:mode, :target) = await buildStep.loadProjectConfig(options);
+    final (:mode, :target) = await buildStep.loadProjectConfig(options, buildStep);
 
     if (mode != 'static' && mode != 'server') {
       return;
@@ -85,17 +85,17 @@ class JasprOptionsBuilder implements Builder {
       ///
       /// Example:
       /// ```dart
-      /// import 'jaspr_options.dart';
+      /// import 'server_options.g.dart';
       /// 
       /// void main() {
       ///   Jaspr.initializeApp(
-      ///     options: defaultJasprOptions,
+      ///     options: defaultServerOptions,
       ///   );
       ///   
       ///   runApp(...);
       /// }
       /// ```
-      JasprOptions get defaultJasprOptions => JasprOptions(
+      JasprOptions get defaultServerOptions => JasprOptions(
         ${buildClientEntries(clients, package)}
         ${buildStylesEntries(styles)}
       );
@@ -103,7 +103,7 @@ class JasprOptionsBuilder implements Builder {
       ${buildClientParamGetters(clients)}  
     ''';
     source = ImportsWriter().resolve(source);
-    final optionsId = AssetId(buildStep.inputId.package, 'lib/jaspr_options.dart');
+    final optionsId = AssetId(buildStep.inputId.package, 'lib/server_options.g.dart');
     await buildStep.writeAsFormattedDart(optionsId, source);
   }
 

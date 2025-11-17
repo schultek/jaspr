@@ -22,7 +22,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'input',
       abbr: 'i',
       help:
-          'Specify the entry file for the server app. Defaults to {jaspr.target} from pubspec.yaml or "lib/main.dart".',
+          'Specify the entry file for the server app. Must end in ".server.dart".\nDefaults to the first found "*.server.dart" file in the project.',
     );
     argParser.addOption(
       'mode',

@@ -4,6 +4,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_style/dart_style.dart';
+import 'package:glob/glob.dart';
 import 'package:jaspr/jaspr.dart'
     show ClientAnnotation, CssUtility, Import, Component, Key, StyleRule, SyncAnnotation, State;
 import 'package:source_gen/source_gen.dart';
@@ -229,7 +230,10 @@ extension LoadBundle on BuildStep {
     }
   }
 
-  Future<Set<AssetId>> loadTransitiveSources(String target) async {
+  Future<Set<AssetId>> loadTransitiveSources(String? target) async {
+    if (target == null) {
+      return {};
+    }
     final main = AssetId(inputId.package, target);
     if (!await canRead(main)) {
       return {};
@@ -244,20 +248,25 @@ extension LoadBundle on BuildStep {
     }).toSet();
   }
 
-  Future<({String? mode, String target})> loadProjectConfig(BuilderOptions options) async {
+  Future<({String? mode, String? target})> loadProjectConfig(BuilderOptions options, BuildStep buildStep) async {
     final pubspecYaml = await readAsString(AssetId(inputId.package, 'pubspec.yaml'));
     final jasprConfig = (yaml.loadYaml(pubspecYaml) as Map<Object?, Object?>?)?['jaspr'] as Map<Object?, Object?>?;
     final mode = jasprConfig?['mode'] as String?;
-    final target = jasprConfig?['target'];
 
-    final firstTarget = switch (target) {
-      String t => t,
-      List<Object?> l => l.cast<String>().firstOrNull,
-      _ => null,
-    };
-    final targetOption = options.config['jaspr-target'] as String?;
-    final effectiveTarget = targetOption ?? firstTarget ?? 'lib/main.dart';
+    var target = options.config['jaspr-target'] as String?;
+    target ??= await findServerEntrypoint(buildStep);
 
-    return (mode: mode, target: effectiveTarget);
+    return (mode: mode, target: target);
+  }
+
+  Future<String?> findServerEntrypoint(BuildStep buildStep) async {
+    await for (final asset in buildStep.findAssets(Glob('bin/**/*.server.dart'))) {
+      return asset.path;
+    }
+    await for (final asset in buildStep.findAssets(Glob('lib/**/*.server.dart'))) {
+      return asset.path;
+    }
+
+    return null;
   }
 }

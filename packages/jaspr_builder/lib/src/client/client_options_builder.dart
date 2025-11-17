@@ -4,10 +4,11 @@ import 'package:build/build.dart';
 
 import '../utils.dart';
 import 'client_bundle_builder.dart';
+import 'client_module_builder.dart';
 
-/// Builds the registry for client components.
-class ClientRegistryBuilder implements Builder {
-  ClientRegistryBuilder(this.options);
+/// Builds the options file for client components.
+class ClientOptionsBuilder implements Builder {
+  ClientOptionsBuilder(this.options);
 
   final BuilderOptions options;
 
@@ -16,7 +17,7 @@ class ClientRegistryBuilder implements Builder {
     try {
       var source = await generateClients(buildStep);
       if (source != null) {
-        var outputId = AssetId(buildStep.inputId.package, 'web/main.clients.dart');
+        var outputId = AssetId(buildStep.inputId.package, 'lib/client_options.g.dart');
         await buildStep.writeAsFormattedDart(outputId, source);
       }
     } catch (e, st) {
@@ -33,11 +34,11 @@ class ClientRegistryBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-    'lib/\$lib\$': ['web/main.clients.dart'],
+    'lib/\$lib\$': ['lib/client_options.g.dart'],
   };
 
   Future<String?> generateClients(BuildStep buildStep) async {
-    final (:mode, :target) = await buildStep.loadProjectConfig(options);
+    final (:mode, :target) = await buildStep.loadProjectConfig(options, buildStep);
 
     if (mode != 'static' && mode != 'server') {
       return null;
@@ -50,32 +51,29 @@ class ClientRegistryBuilder implements Builder {
 
     clients = clients.where((c) => sources.contains(c.id)).toList();
 
-    if (clients.isEmpty) {
-      return null;
-    }
-
     final package = buildStep.inputId.package;
 
     var source =
         '''
       import 'package:jaspr/browser.dart';
       [[/]]
-      
-      void main() {
-        registerClients({
-          ${clients.map((c) {
-          final id = c.resolveId(package);
-          final import = c.import.replaceFirst('.dart', '.client.dart');
 
-          return '''
-        '$id': loadClient([[$import]].loadLibrary, (p) => [[$import]].getComponentForParams(p)),
-      ''';
-        }).join('\n')}
-        });
-      }
+      ClientOptions get defaultClientOptions => ClientOptions(
+        ${buildClientEntries(clients, package)}
+      );
     ''';
 
     source = ImportsWriter(deferred: true).resolve(source);
     return source;
+  }
+
+  String buildClientEntries(List<ClientModule> clients, String package) {
+    if (clients.isEmpty) return '';
+    return 'clients: {${clients.map((c) {
+      final id = c.resolveId(package);
+      return '''
+        '$id': loadClient([[${c.import}]].loadLibrary, (p) => ${c.componentFactory()}),
+      ''';
+    }).join('\n')}},';
   }
 }
