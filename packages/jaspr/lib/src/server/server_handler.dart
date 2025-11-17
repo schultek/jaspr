@@ -150,8 +150,8 @@ Handler _sseProxyHandler(http.Client client, String webPort) {
           '\r\n',
         );
 
-      StreamSubscription? serverSseSub;
-      StreamSubscription? reqChannelSub;
+      StreamSubscription<void>? serverSseSub;
+      StreamSubscription<void>? reqChannelSub;
 
       serverSseSub = utf8.decoder
           .bind(serverResponse.stream)

@@ -563,17 +563,16 @@ typedef DomEventCallback = void Function(web.Event event);
 class EventBinding {
   final String type;
   DomEventCallback fn;
-  StreamSubscription? subscription;
+  StreamSubscription<web.Event>? _subscription;
 
-  EventBinding(web.Element element, this.type, this.fn) {
-    subscription = web.EventStreamProvider<web.Event>(type).forElement(element).listen((event) {
-      fn(event);
-    });
-  }
+  EventBinding(web.Element element, this.type, this.fn)
+    : _subscription = web.EventStreamProvider<web.Event>(type).forElement(element).listen((event) {
+        fn(event);
+      });
 
   void clear() {
-    subscription?.cancel();
-    subscription = null;
+    _subscription?.cancel();
+    _subscription = null;
   }
 }
 

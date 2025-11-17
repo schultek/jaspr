@@ -33,7 +33,7 @@ Component button(
     },
     events: {
       ...?events,
-      ..._events(onClick: onClick),
+      ..._events<void, void>(onClick: onClick),
     },
     children: children,
   );
