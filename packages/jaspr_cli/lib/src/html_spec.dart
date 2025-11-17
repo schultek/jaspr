@@ -640,6 +640,9 @@ const htmlSpec = {
     "input": {
       "doc": "The &lt;input&gt; HTML element is used to create interactive controls for web-based forms in order to accept data from the user; a wide variety of types of input data and control widgets are available, depending on the device and user agent. The &lt;input&gt; element is one of the most powerful and complex in all of HTML due to the sheer number of combinations of input types and attributes.",
       "self_closing": true,
+      "type_args": [
+        "T"
+      ],
       "attributes": {
         "type": {
           "doc": "Defines how an &lt;input&gt; works. If this attribute is not specified, the default type adopted is text.",
@@ -741,11 +744,11 @@ const htmlSpec = {
         },
         "onInput": {
           "doc": "Callback for the 'input' event. The type of [value] depends on [type].",
-          "type": "event:onInput:ValueChanged<dynamic>"
+          "type": "event:onInput:ValueChanged<T>"
         },
         "onChange": {
           "doc": "Callback for the 'change' event. The type of [value] depends on [type].",
-          "type": "event:onChange:ValueChanged<dynamic>"
+          "type": "event:onChange:ValueChanged<T>"
         }
       }
     },

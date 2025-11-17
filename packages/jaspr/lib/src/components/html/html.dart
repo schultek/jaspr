@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart' show optionalTypeArgs;
+
 import '../../foundation/basic_types.dart';
 import '../../foundation/constants.dart';
 import '../../foundation/events.dart';

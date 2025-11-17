@@ -51,6 +51,12 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
             c.name = tag;
             c.extend = refer('StatelessComponent');
 
+            final typeArgs = data['type_args'] as List<Object?>? ?? [];
+            if (typeArgs.isNotEmpty) {
+              c.types.addAll(typeArgs.map((t) => refer(t as String)));
+              c.annotations.add(refer('optionalTypeArgs'));
+            }
+
             final docs = (data['doc'] as String).split('\n').map((d) => '/// $d');
             c.docs.addAll([
               '/// {@template jaspr.html.$tag}',
@@ -88,7 +94,6 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
                   }
                   final required = attrs[attr]['required'] == true;
                   final explicitBool = attrs[attr]['explicit'] == true;
-
 
                   final parameter = Parameter((p) {
                     p.name = name;

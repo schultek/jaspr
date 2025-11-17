@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../components/html/html.dart';
@@ -9,7 +10,8 @@ typedef EventCallback = void Function(web.Event event);
 typedef EventCallbacks = Map<String, EventCallback>;
 
 /// Helper function to provide typed event handlers to the `events` property of html components.
-EventCallbacks events<V1, V2>({
+@optionalTypeArgs
+EventCallbacks events<V>({
   /// Listens to the 'click' event.
   ///
   /// If the target element is an anchor (<a>) element, this will override the default behavior of the link and not
@@ -24,7 +26,7 @@ EventCallbacks events<V1, V2>({
   /// - `List<String>` for select elements
   /// - `String` for text input and textarea elements
   /// - `Null` for all other elements
-  ValueChanged<V1>? onInput,
+  ValueChanged<V>? onInput,
 
   /// Listens to the 'change' event. When providing a generic type for [value], it must be according to the target element:
   /// - `bool?` for checkbox or radio input elements
@@ -34,7 +36,7 @@ EventCallbacks events<V1, V2>({
   /// - `List<String>` for select elements
   /// - `String` for text input and textarea elements
   /// - `Null` for all other elements
-  ValueChanged<V2>? onChange,
+  ValueChanged<V>? onChange,
 }) => {
   if (onClick != null)
     'click': (event) {
