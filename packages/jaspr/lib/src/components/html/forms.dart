@@ -227,7 +227,8 @@ enum AutoComplete {
 /// {@template jaspr.html.input}
 /// The &lt;input&gt; HTML element is used to create interactive controls for web-based forms in order to accept data from the user; a wide variety of types of input data and control widgets are available, depending on the device and user agent. The &lt;input&gt; element is one of the most powerful and complex in all of HTML due to the sheer number of combinations of input types and attributes.
 /// {@endtemplate}
-class input extends StatelessComponent {
+@optionalTypeArgs
+class input<T> extends StatelessComponent {
   /// {@macro jaspr.html.input}
   const input({
     this.type,
@@ -265,10 +266,10 @@ class input extends StatelessComponent {
   final bool? indeterminate;
 
   /// Callback for the 'input' event. The type of [value] depends on [type].
-  final ValueChanged<dynamic>? onInput;
+  final ValueChanged<T>? onInput;
 
   /// Callback for the 'change' event. The type of [value] depends on [type].
-  final ValueChanged<dynamic>? onChange;
+  final ValueChanged<T>? onChange;
 
   /// The id of the HTML element. Must be unique within the document.
   final String? id;

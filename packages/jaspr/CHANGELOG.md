@@ -4,6 +4,8 @@
 
   This is mostly a structural change, as all components keep their lowercase names to have the familiar html-like syntax and differentiate to other Components. All standard uses of these components should still work as before, with a few exceptions when used with inferred typing (such as `var child = div([]);`), which may now require an explicit type annotation (such as `Component child = div([]);`) when assigning other values (such as `child = span([]);`).
 
+- **Breaking** Changed `events()` method to accept only one optional type parameter for both `onInput` and `onChange` events.
+
 - **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`. Use `jaspr.target` instead.
 
 - Added support for `jaspr.target` option in `pubspec.yaml` to specify the default entrypoint(s) of your Jaspr application.
