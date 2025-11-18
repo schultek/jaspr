@@ -8,7 +8,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:package_riverpod/components/app.dart' as prefix0;
 import 'package:package_riverpod/main.dart' as prefix1;
 
-/// Default [JasprOptions] for use with your jaspr project.
+/// Default [ServerOptions] for use with your jaspr project.
 ///
 /// Use this to initialize jaspr **before** calling [runApp].
 ///
@@ -24,7 +24,7 @@ import 'package:package_riverpod/main.dart' as prefix1;
 ///   runApp(...);
 /// }
 /// ```
-JasprOptions get defaultJasprOptions => JasprOptions(
+ServerOptions get defaultJasprOptions => ServerOptions(
       clients: {prefix0.App: ClientTarget<prefix0.App>('components/app')},
       styles: () => [...prefix1.styles],
     );

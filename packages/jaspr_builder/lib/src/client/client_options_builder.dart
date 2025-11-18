@@ -17,7 +17,7 @@ class ClientOptionsBuilder implements Builder {
     try {
       var source = await generateClients(buildStep);
       if (source != null) {
-        var outputId = AssetId(buildStep.inputId.package, 'lib/client_options.g.dart');
+        var outputId = AssetId(buildStep.inputId.package, 'lib/options.client.g.dart');
         await buildStep.writeAsFormattedDart(outputId, source);
       }
     } catch (e, st) {
@@ -34,7 +34,7 @@ class ClientOptionsBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-    'lib/\$lib\$': ['lib/client_options.g.dart'],
+    'lib/\$lib\$': ['lib/options.client.g.dart'],
   };
 
   Future<String?> generateClients(BuildStep buildStep) async {
@@ -58,6 +58,20 @@ class ClientOptionsBuilder implements Builder {
       import 'package:jaspr/browser.dart';
       [[/]]
 
+      /// Default [ClientOptions] for use with your Jaspr project.
+      ///
+      /// Pass this to [ClientApp].
+      ///
+      /// Example:
+      /// ```dart
+      /// import 'options.client.g.dart';
+      /// 
+      /// void main() {
+      ///   runApp(ClientApp(
+      ///     options: defaultClientOptions,
+      ///   ));
+      /// }
+      /// ```
       ClientOptions get defaultClientOptions => ClientOptions(
         ${buildClientEntries(clients, package)}
       );
@@ -72,8 +86,8 @@ class ClientOptionsBuilder implements Builder {
     return 'clients: {${clients.map((c) {
       final id = c.resolveId(package);
       return '''
-        '$id': loadClient([[${c.import}]].loadLibrary, (p) => ${c.componentFactory()}),
+        '$id': ClientLoader([[${c.import}]].loadLibrary, (p) => ${c.componentFactory()}),
       ''';
-    }).join('\n')}},';
+    }).join()}},';
   }
 }

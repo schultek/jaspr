@@ -260,10 +260,10 @@ extension LoadBundle on BuildStep {
   }
 
   Future<String?> findServerEntrypoint(BuildStep buildStep) async {
-    await for (final asset in buildStep.findAssets(Glob('bin/**/*.server.dart'))) {
+    await for (final asset in buildStep.findAssets(Glob('bin/**.server.dart'))) {
       return asset.path;
     }
-    await for (final asset in buildStep.findAssets(Glob('lib/**/*.server.dart'))) {
+    await for (final asset in buildStep.findAssets(Glob('lib/**.server.dart'))) {
       return asset.path;
     }
 

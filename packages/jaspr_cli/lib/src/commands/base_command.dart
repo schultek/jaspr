@@ -123,25 +123,29 @@ abstract class BaseCommand extends Command<int> {
       return target;
     }
 
-    final entryPoint = await _findServerEntrypoint(Directory.current.path);
+    final entryPoint = await _findServerEntrypoint();
     logger.write("Using server entry point: $entryPoint", level: Level.verbose);
 
     return entryPoint;
   }
 
-  Future<String> _findServerEntrypoint(String projectDir) async {
-    var binDir = Directory.fromUri(Uri.file(projectDir)).uri.resolve('bin/');
-    var libDir = Directory.fromUri(Uri.file(projectDir)).uri.resolve('lib/');
+  Future<String> _findServerEntrypoint() async {
+    var binDir = Directory('bin/');
+    var libDir = Directory('lib/');
 
-    await for (var entity in Directory.fromUri(binDir).list(recursive: true)) {
-      if (entity is File && entity.path.endsWith('.server.dart')) {
-        return entity.path;
+    if (binDir.existsSync()) {
+      await for (var entity in binDir.list(recursive: true)) {
+        if (entity is File && entity.path.endsWith('.server.dart')) {
+          return entity.path;
+        }
       }
     }
 
-    await for (var entity in Directory.fromUri(libDir).list(recursive: true)) {
-      if (entity is File && entity.path.endsWith('.server.dart')) {
-        return entity.path;
+    if (libDir.existsSync()) {
+      await for (var entity in libDir.list(recursive: true)) {
+        if (entity is File && entity.path.endsWith('.server.dart')) {
+          return entity.path;
+        }
       }
     }
 

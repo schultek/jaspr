@@ -10,7 +10,7 @@ import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
 import '../foundation/constants.dart';
-import '../foundation/options.dart';
+import 'options.dart';
 import 'render_functions.dart';
 import 'server_app.dart';
 

@@ -12,6 +12,7 @@ import 'adapters/document_adapter.dart';
 import 'adapters/global_styles_adapter.dart';
 import 'async_build_owner.dart';
 import 'markup_render_object.dart';
+import 'options.dart';
 import 'render_functions.dart';
 
 typedef FileLoader = Future<String?> Function(String);
@@ -117,10 +118,10 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     _adapters.add(adapter);
   }
 
-  JasprOptions get options => _options!;
-  JasprOptions? _options;
+  ServerOptions get options => _options!;
+  ServerOptions? _options;
 
-  void initializeOptions(JasprOptions options) {
+  void initializeOptions(ServerOptions options) {
     _options = options;
   }
 

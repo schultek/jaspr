@@ -33,7 +33,7 @@ class ServerOptionsBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-    r'lib/$lib$': ['lib/server_options.g.dart'],
+    r'lib/$lib$': ['lib/options.server.g.dart'],
   };
 
   String get generationHeader =>
@@ -79,13 +79,13 @@ class ServerOptionsBuilder implements Builder {
       import 'package:jaspr/jaspr.dart';
       [[/]]
       
-      /// Default [JasprOptions] for use with your jaspr project.
+      /// Default [ServerOptions] for use with your Jaspr project.
       ///
-      /// Use this to initialize jaspr **before** calling [runApp].
+      /// Use this to initialize Jaspr **before** calling [runApp].
       ///
       /// Example:
       /// ```dart
-      /// import 'server_options.g.dart';
+      /// import 'options.server.g.dart';
       /// 
       /// void main() {
       ///   Jaspr.initializeApp(
@@ -95,7 +95,7 @@ class ServerOptionsBuilder implements Builder {
       ///   runApp(...);
       /// }
       /// ```
-      JasprOptions get defaultServerOptions => JasprOptions(
+      ServerOptions get defaultServerOptions => ServerOptions(
         ${buildClientEntries(clients, package)}
         ${buildStylesEntries(styles)}
       );
@@ -103,7 +103,7 @@ class ServerOptionsBuilder implements Builder {
       ${buildClientParamGetters(clients)}  
     ''';
     source = ImportsWriter().resolve(source);
-    final optionsId = AssetId(buildStep.inputId.package, 'lib/server_options.g.dart');
+    final optionsId = AssetId(buildStep.inputId.package, 'lib/options.server.g.dart');
     await buildStep.writeAsFormattedDart(optionsId, source);
   }
 
@@ -115,7 +115,7 @@ class ServerOptionsBuilder implements Builder {
           '${c.resolveId(package)}'${c.params.isNotEmpty ? ', params: _[[${c.import}]]${c.name}' : ''}
         ),
       ''';
-    }).join('\n')}},';
+    }).join()}},';
   }
 
   String buildClientParamGetters(List<ClientModule> clients) {

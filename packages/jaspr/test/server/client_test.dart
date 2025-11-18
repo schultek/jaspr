@@ -85,7 +85,7 @@ void main() {
   group('@client', () {
     setUpAll(() {
       Jaspr.initializeApp(
-        options: JasprOptions(
+        options: ServerOptions(
           clients: {
             App1: ClientTarget<App1>('app1'),
             App2: ClientTarget<App2>('app2', params: (a) => {'count': a.count, 'label': a.label}),

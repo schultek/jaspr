@@ -1,4 +1,4 @@
-import '../../foundation/options.dart';
+import '../options.dart';
 import '../markup_render_object.dart';
 import '../server_binding.dart';
 import 'head_scope_adapter.dart';

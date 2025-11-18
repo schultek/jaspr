@@ -16,7 +16,6 @@ export 'src/foundation/change_notifier.dart';
 export 'src/foundation/constants.dart';
 export 'src/foundation/events.dart';
 export 'src/foundation/object.dart';
-export 'src/foundation/options.dart';
 export 'src/foundation/scheduler.dart';
 export 'src/foundation/style.dart';
 export 'src/foundation/sync.dart';

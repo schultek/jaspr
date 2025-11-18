@@ -57,6 +57,12 @@ class BrowserAppBinding extends AppBinding with ComponentsBinding {
   }
 
   @override
+  void completeInitialFrame() {
+    (rootElement!.renderObject as DomRenderObject).finalize();
+    super.completeInitialFrame();
+  }
+
+  @override
   void reportBuildError(Element element, Object error, StackTrace stackTrace) {
     web.console.error('Error while building ${element.component.runtimeType}:\n$error\n\n$stackTrace'.toJS);
   }

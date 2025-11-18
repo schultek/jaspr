@@ -3,10 +3,11 @@
 - **Breaking** Changed project structure for **static** and **server** mode:
 
   - Any server entrypoint file must now end in `.server.dart` (e.g. `lib/main.server.dart`).
-  - The generated server-side options file is now `lib/jaspr_options.server.g.dart` containing `defaultServerOptions`.
+  - The generated server-side options file is now `lib/options.server.g.dart` containing `defaultServerOptions`
+  - `Jaspr.initializeApp()` now requires the `package:jaspr/server.dart` import.
 
-  - The project must contain at least one server entrypoint file ending in `.client.dart` (e.g. `lib/main.client.dart`) for client-side rendering.
-  - A new client-side Jaspr options file is generated at `lib/jaspr_options.client.g.dart` containing `defaultClientOptions`.
+  - The project may contain at least one client entrypoint file ending in `.client.dart` (e.g. `lib/main.client.dart`) for client-side rendering.
+  - A new client-side Jaspr options file is generated at `lib/options.client.g.dart` containing `defaultClientOptions`.
 
   - Added a new `ClientApp` component that should be used inside the client entrypoint like this:
     ```dart
@@ -22,22 +23,20 @@
 - **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`. Use `jaspr.target` instead.
 
 - Added support for `jaspr.port` option in `pubspec.yaml` to specify the default port used by `jaspr serve`. 
-
   This can still be overridden using the `--port` flag. If neither is set, the default port stays `8080`.
-
-- Global `@css` styles from other packages will no longer be included automatically. To include them, import the file where they are defined.
-
-- **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
-- **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
-
-- Added `Curve.linearFn()` easing function.
-- Added `Animation`, `Quotes` CSS properties.
-- Added `ms` and `seconds` extensions to `int` for simple conversion to `Duration`.
-- Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`, `TextShadow` and `BoxShadow`.
-- Allow nesting non-empty `Filter.list` inside each other.
 
 - **Breaking**: `ResponseLike.body` (returned from `renderComponent()`) is now a `Uint8List` instead of `String`.
 - Allow binary responses in `AppContext.setStatusCode`.
+
+- Global `@css` styles from other packages will no longer be included automatically. To include them, import the file where they are defined.
+
+- Added `Animation`, `Quotes` CSS properties.
+- Added `Curve.linearFn()` easing function.
+- Added `ms` and `seconds` extensions to `int` for simple conversion to `Duration`.
+- Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`, `TextShadow` and `BoxShadow`.
+- **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
+- **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
+- Allow nesting non-empty `Filter.list` inside each other.
 
 ## 0.21.7
 
