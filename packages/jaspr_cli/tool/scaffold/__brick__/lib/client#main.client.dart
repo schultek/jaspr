@@ -2,10 +2,10 @@
 //
 // This file is compiled to javascript and executed in the browser.
 
-// Client-specific jaspr import.
+// Client-specific Jaspr import.
 import 'package:jaspr/browser.dart';
 // Imports the [App] component.
-import 'package:{{name}}/app.dart';
+import 'app.dart';
 
 void main() {
   // Attaches the [App] component to the <body> of the page.

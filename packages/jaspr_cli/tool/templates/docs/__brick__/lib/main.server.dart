@@ -1,9 +1,9 @@
 // The entrypoint for the **server** environment.
 //
 // The [main] method will only be executed on the server during pre-rendering.
-// To run code on the client, use the @client annotation.
+// To run code on the client, check the 'main.client.dart' file.
 
-// Server-specific jaspr import.
+// Server-specific Jaspr import.
 import 'package:jaspr/server.dart';
 
 import 'package:jaspr_content/components/callout.dart';

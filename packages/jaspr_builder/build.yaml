@@ -1,18 +1,30 @@
 builders:
 # =====================
-# === Server Options ===
+# === Options ===
 # =====================
   server_options:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "buildServerOptions" ]
     build_extensions:
-      "lib/$lib$":
-        - "lib/options.server.g.dart"
+      "lib/{{file}}.server.dart":
+        - "lib/{{file}}.server.g.dart"
     auto_apply: root_package
     build_to: source
     required_inputs:
       - 'clients.bundle.json'
       - 'styles.bundle.json'
+    runs_before:
+      - jaspr_web_compilers:entrypoint_bootstrap
+  client_options:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildClientOptions" ]
+    build_extensions:
+      "lib/{{file}}.client.dart":
+        - "lib/{{file}}.client.g.dart"
+    auto_apply: root_package
+    build_to: source
+    required_inputs:
+      - 'clients.bundle.json'
     runs_before:
       - jaspr_web_compilers:entrypoint_bootstrap
 # ========================
@@ -38,18 +50,6 @@ builders:
     build_to: cache
     required_inputs:
       - '.client.module.json'
-  client_options:
-    import: "package:jaspr_builder/builder.dart"
-    builder_factories: [ "buildClientOptions" ]
-    build_extensions:
-      "lib/$lib$":
-        - "lib/options.client.g.dart"
-    auto_apply: root_package
-    build_to: source
-    required_inputs:
-      - 'clients.bundle.json'
-    runs_before:
-      - jaspr_web_compilers:entrypoint_bootstrap
   client_entrypoint:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "buildClientEntrypoint" ]

@@ -2,7 +2,6 @@ import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
 import 'package:jaspr_builder/src/client/client_bundle_builder.dart';
 import 'package:jaspr_builder/src/client/client_module_builder.dart';
-import 'package:jaspr_builder/src/client/client_entrypoint_builder.dart';
 import 'package:test/test.dart';
 
 import 'sources/bundle.dart';
@@ -10,14 +9,13 @@ import 'sources/client_basic.dart';
 import 'sources/client_invalid.dart';
 import 'sources/client_model_class.dart';
 import 'sources/client_model_extension.dart';
-import 'sources/registry.dart';
 
 void main() {
   group('client annotation', () {
     late TestReaderWriter reader;
 
     setUp(() async {
-      reader = TestReaderWriter(rootPackage: 'models');
+      reader = TestReaderWriter(rootPackage: 'site');
       await reader.testing.loadIsolateSources();
     });
 
@@ -26,16 +24,7 @@ void main() {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientBasicSources,
-          outputs: {...clientBasicJsonOutputs, 'site|lib/component_basic.client.dart': isNotEmpty},
-          readerWriter: reader,
-        );
-      });
-
-      test('generates entrypoint', () async {
-        await testBuilder(
-          ClientModuleBuilder(BuilderOptions({})),
-          clientBasicSources,
-          outputs: {'site|lib/component_basic.client.json': isNotEmpty, ...clientBasicDartOutputs},
+          outputs: {...clientBasicModuleOutputs},
           readerWriter: reader,
         );
       });
@@ -46,16 +35,7 @@ void main() {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientModelClassSources,
-          outputs: {...clientModelClassJsonOutputs, 'site|lib/component_model_class.client.dart': isNotEmpty},
-          readerWriter: reader,
-        );
-      });
-
-      test('generates entrypoint', () async {
-        await testBuilder(
-          ClientModuleBuilder(BuilderOptions({})),
-          clientModelClassSources,
-          outputs: {'site|lib/component_model_class.client.json': isNotEmpty, ...clientModelClassDartOutputs},
+          outputs: {...clientModelClassModuleOutputs},
           readerWriter: reader,
         );
       });
@@ -66,16 +46,7 @@ void main() {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientModelExtensionSources,
-          outputs: {...clientModelExtensionJsonOutputs, 'site|lib/component_model_extension.client.dart': isNotEmpty},
-          readerWriter: reader,
-        );
-      });
-
-      test('generates entrypoint', () async {
-        await testBuilder(
-          ClientModuleBuilder(BuilderOptions({})),
-          clientModelExtensionSources,
-          outputs: {'site|lib/component_model_extension.client.json': isNotEmpty, ...clientModelExtensionDartOutputs},
+          outputs: {...clientModelExtensionModuleOutputs},
           readerWriter: reader,
         );
       });
@@ -133,17 +104,12 @@ void main() {
     test('generates bundle', () async {
       await testBuilder(
         ClientsBundleBuilder(BuilderOptions({})),
-        {...clientBasicJsonOutputs, ...clientModelClassJsonOutputs, ...clientModelExtensionJsonOutputs},
+        {
+          ...clientBasicModuleOutputs,
+          ...clientModelClassModuleOutputs,
+          ...clientModelExtensionModuleOutputs,
+        },
         outputs: clientBundleOutputs,
-        readerWriter: reader,
-      );
-    });
-
-    test('generates registry', () async {
-      await testBuilder(
-        ClientEntrypointBuilder(BuilderOptions({})),
-        clientRegistrySources,
-        outputs: clientRegistryOutputs,
         readerWriter: reader,
       );
     });

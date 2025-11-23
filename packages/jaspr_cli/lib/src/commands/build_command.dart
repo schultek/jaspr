@@ -422,10 +422,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       '--release',
       '--verbose',
       '--delete-conflicting-outputs',
-      if (input != null) ...[
-        '--define=jaspr_builder:client_registry=jaspr-target=$input',
-        '--define=jaspr_builder:jaspr_options=jaspr-target=$input',
-      ],
       if (managedBuildOptions) ...[
         '--define=$entrypointBuilder=compiler=$compiler',
         '--define=$entrypointBuilder=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',

@@ -18,7 +18,7 @@ class ServerOptionsBuilder implements Builder {
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     try {
-      await generateOptionsOutput(buildStep);
+      await generateServerOptions(buildStep);
     } catch (e, st) {
       print(
         'An unexpected error occurred.\n'
@@ -33,16 +33,15 @@ class ServerOptionsBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-    r'lib/$lib$': ['lib/options.server.g.dart'],
+    r'lib/{{file}}.server.dart': ['lib/{{file}}.server.g.dart'],
   };
 
   String get generationHeader =>
       "// GENERATED FILE, DO NOT MODIFY\n"
       "// Generated with jaspr_builder\n";
 
-  Future<void> generateOptionsOutput(BuildStep buildStep) async {
-    final (:mode, :target) = await buildStep.loadProjectConfig(options, buildStep);
-
+  Future<void> generateServerOptions(BuildStep buildStep) async {
+    final mode = await buildStep.loadProjectMode(options, buildStep);
     if (mode != 'static' && mode != 'server') {
       return;
     }
@@ -50,7 +49,7 @@ class ServerOptionsBuilder implements Builder {
     var (clients, styles, sources) = await (
       buildStep.loadClients(),
       buildStep.loadStyles(),
-      buildStep.loadTransitiveSources(target),
+      buildStep.loadTransitiveSources(),
     ).wait;
 
     final package = buildStep.inputId.package;
@@ -71,12 +70,14 @@ class ServerOptionsBuilder implements Builder {
       }).toList();
     }
 
-    clients.sortByCompare((c) => '${c.import}/${c.name}', ImportsWriter.compareImports);
-    styles.sortByCompare((s) => s.id.toImportUrl(), ImportsWriter.compareImports);
+    clients.sortByCompare((c) => '${c.import}/${c.name}', comparePaths);
+    styles.sortByCompare((s) => s.id.toImportUrl(), comparePaths);
+
+    final optionsId = buildStep.inputId.changeExtension('.g.dart');
 
     var source =
         '''
-      import 'package:jaspr/jaspr.dart';
+      import 'package:jaspr/server.dart';
       [[/]]
       
       /// Default [ServerOptions] for use with your Jaspr project.
@@ -85,7 +86,7 @@ class ServerOptionsBuilder implements Builder {
       ///
       /// Example:
       /// ```dart
-      /// import 'options.server.g.dart';
+      /// import '${optionsId.path.split('/').last}';
       /// 
       /// void main() {
       ///   Jaspr.initializeApp(
@@ -96,6 +97,7 @@ class ServerOptionsBuilder implements Builder {
       /// }
       /// ```
       ServerOptions get defaultServerOptions => ServerOptions(
+        ${await buildClientIdEntry(buildStep)}
         ${buildClientEntries(clients, package)}
         ${buildStylesEntries(styles)}
       );
@@ -103,16 +105,29 @@ class ServerOptionsBuilder implements Builder {
       ${buildClientParamGetters(clients)}  
     ''';
     source = ImportsWriter().resolve(source);
-    final optionsId = AssetId(buildStep.inputId.package, 'lib/options.server.g.dart');
     await buildStep.writeAsFormattedDart(optionsId, source);
+  }
+
+  Future<String> buildClientIdEntry(BuildStep buildStep) async {
+    final clientId = buildStep.inputId.path.replaceFirst('.server.dart', '.client.dart');
+    if (!(await buildStep.canRead(AssetId(buildStep.inputId.package, clientId)))) {
+      return '';
+    }
+    return "clientId: '${clientId.replaceFirst('lib/', '')}.js',";
   }
 
   String buildClientEntries(List<ClientModule> clients, String package) {
     if (clients.isEmpty) return '';
+
+    final compressed = compressPaths(clients.map((c) => c.id.path).toList());
+
     return 'clients: {${clients.map((c) {
+      final id = compressed[c.id.path]!;
+      final fullId = c.id.package != package ? '${c.id.package}:$id' : id;
+
       return '''
         [[${c.import}]].${c.name}: ClientTarget<[[${c.import}]].${c.name}>(
-          '${c.resolveId(package)}'${c.params.isNotEmpty ? ', params: _[[${c.import}]]${c.name}' : ''}
+          '$fullId'${c.params.isNotEmpty ? ', params: _[[${c.import}]]${c.name}' : ''}
         ),
       ''';
     }).join()}},';

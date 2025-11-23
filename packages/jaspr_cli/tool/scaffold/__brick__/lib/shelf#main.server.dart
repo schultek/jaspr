@@ -1,11 +1,11 @@
 // The entrypoint for the **server** environment.
 //
 // The [main] method will only be executed on the server during pre-rendering.
-// To run code on the client, use the @client annotation.
+// To run code on the client, check the 'main.client.dart' file.
 
 import 'dart:io';
 
-// Server-specific jaspr import.
+// Server-specific Jaspr import.
 import 'package:jaspr/server.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
@@ -15,7 +15,7 @@ import 'package:shelf_router/shelf_router.dart';
 import 'app.dart';
 
 // This file is generated automatically by Jaspr, do not remove or edit.
-import 'jaspr_options.server.g.dart';
+import 'main.server.g.dart';
 
 /// Initializes the custom shelf server.
 ///

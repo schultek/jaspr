@@ -3,8 +3,7 @@ library;
 
 import 'dart:convert';
 
-import 'package:jaspr/jaspr.dart';
-import 'package:jaspr/src/server/run_app.dart';
+import 'package:jaspr/server.dart';
 import 'package:test/test.dart';
 
 import 'without_jaspr_testing_library_app.dart';

@@ -275,10 +275,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final buildArgs = [
       if (release) '--release',
-      if (input != null) ...[
-        '--define=jaspr_builder:client_registry=jaspr-target=$input',
-        '--define=jaspr_builder:jaspr_options=jaspr-target=$input',
-      ],
       if (managedBuildOptions) ...[
         '--define',
         '$package:ddc=generate-full-dill=true',

@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:universal_web/web.dart' as web;
 
 import '../../jaspr.dart';
-import 'client_app.dart';
+import 'options.dart';
 
 sealed class ComponentAnchor {
   ComponentAnchor(this.name, this.startNode);

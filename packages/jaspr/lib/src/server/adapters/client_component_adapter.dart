@@ -1,7 +1,7 @@
-import '../options.dart';
 import '../../foundation/validator.dart';
 import '../../framework/framework.dart';
 import '../markup_render_object.dart';
+import '../options.dart';
 import '../server_binding.dart';
 import 'client_script_adapter.dart';
 import 'element_boundary_adapter.dart';
@@ -46,8 +46,8 @@ class ClientComponentRegistryElement extends ObserverElement {
   void didRebuildElement(Element element) {
     var binding = this.binding as ServerAppBinding;
 
-    if (!_didAddClientScript) {
-      (binding).addRenderAdapter(ClientScriptAdapter(binding, _clientTargets));
+    if (!_didAddClientScript && binding.options.clientId != null) {
+      (binding).addRenderAdapter(ClientScriptAdapter(binding.options.clientId!));
       _didAddClientScript = true;
     }
 

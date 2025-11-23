@@ -130,6 +130,11 @@ abstract class BaseCommand extends Command<int> {
   }
 
   Future<String> _findServerEntrypoint() async {
+    var mainFile = File('lib/main.server.dart');
+    if (mainFile.existsSync()) {
+      return mainFile.path;
+    }
+
     var binDir = Directory('bin/');
     var libDir = Directory('lib/');
 

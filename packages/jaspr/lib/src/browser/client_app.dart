@@ -5,36 +5,11 @@ import 'package:universal_web/web.dart' as web;
 import '../framework/framework.dart';
 import 'component_anchors.dart';
 import 'dom_render_object.dart';
+import 'options.dart';
 import 'slotted_dom_nodes_component.dart';
 
-typedef ClientBuilder = Component Function(Map<String, dynamic> params);
-
-class ClientLoader {
-  ClientLoader(this.loader, this.builder);
-
-  final Future<void> Function() loader;
-  final ClientBuilder builder;
-
-  FutureOr<ClientBuilder>? _loadedBuilder;
-  FutureOr<ClientBuilder> get loadedBuilder {
-    _loadedBuilder ??= loader().then((_) {
-      _loadedBuilder = builder;
-      return builder;
-    });
-    return _loadedBuilder!;
-  }
-}
-
-class ClientOptions {
-  ClientOptions({this.clients = const {}});
-
-  final Map<String, ClientLoader> clients;
-}
-
 class ClientApp extends Component {
-  ClientApp({required this.options});
-
-  final ClientOptions options;
+  const ClientApp();
 
   @override
   Element createElement() => _ClientAppElement(this);
@@ -49,8 +24,8 @@ class _ClientAppElement extends BuildableElement {
   bool mounted = true;
 
   FutureOr<ClientBuilder> getClientByName(String name) {
-    final clients = (component as ClientApp).options.clients;
-    assert(clients.containsKey(name), "No client component registered with name '$name'");
+    final clients = Jaspr.options.clients;
+    assert(clients.containsKey(name), "No client component registered with name '$name'.");
     return clients[name]!.loadedBuilder;
   }
 

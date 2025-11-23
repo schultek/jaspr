@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import '../../jaspr.dart';
 
-/// Main class for initializing the jaspr framework.
+/// Main class for initializing the Jaspr framework on the server.
 ///
 /// Call [Jaspr.initializeApp()] at the start of your app, before any calls to [runApp].
 class Jaspr {
@@ -28,11 +28,12 @@ class Jaspr {
   static List<String> _allowedPathSuffixes = [];
 }
 
-/// Global options for configuring jaspr. DO NOT USE DIRECTLY.
+/// Global options for configuring Jaspr on the server. DO NOT USE DIRECTLY.
 /// Use the generated [defaultServerOptions] instead.
 class ServerOptions {
-  const ServerOptions({this.clients, this.styles});
+  const ServerOptions({this.clientId, this.clients, this.styles});
 
+  final String? clientId;
   final Map<Type, ClientTarget>? clients;
   final List<StyleRule> Function()? styles;
 }

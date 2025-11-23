@@ -64,9 +64,15 @@ void main() {
       expect(p2Element.parentNode, equals(divElement));
       expect(p2Element.textContent, equals('B'));
 
-      registerClientsSync({
-        'app': (_) => p([text('C')]),
-      });
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((_) => p([text('C')])),
+          },
+        ),
+      );
+
+      runApp(const ClientApp());
       await pumpEventQueue();
 
       expect(divElement.parentNode, equals(window.document.body));
@@ -99,9 +105,15 @@ void main() {
       expect(p2Element.parentNode, equals(divElement));
       expect(p2Element.textContent, equals('Hello'));
 
-      registerClientsSync({
-        'app': (params) => p([text('Hello ${params['name']}')]),
-      });
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) => p([text('Hello ${params['name']}')])),
+          },
+        ),
+      );
+
+      runApp(const ClientApp());
       await pumpEventQueue();
 
       expect(divElement.parentNode, equals(window.document.body));
