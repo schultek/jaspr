@@ -496,7 +496,7 @@ abstract class Element implements BuildContext {
     if (oldChildren.length <= 1 && newComponents.length <= 1) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren.firstOrNull);
       var newChild = updateChild(oldChild, newComponents.firstOrNull, ElementSlot(0, null));
-      return [if (newChild != null) newChild];
+      return [?newChild];
     }
 
     int newChildrenTop = 0;

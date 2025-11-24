@@ -12,8 +12,8 @@ dependencies:
   codemirror: ^0.7.14+5.65.18
   collection: ^1.18.0
   dart_mappable: ^4.6.1
-  googleapis: ^13.2.0
-  googleapis_auth: ^1.6.0
+  googleapis: ^15.0.0
+  googleapis_auth: ^2.0.0
   http: ^1.2.1
   jaspr: ^0.21.0
   jaspr_riverpod: ^0.3.21

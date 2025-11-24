@@ -5,14 +5,13 @@ import 'package:googleapis/storage/v1.dart';
 import 'package:googleapis_auth/auth_io.dart' as auth;
 
 class StorageCache {
-  late Future<StorageApi> _storage;
-  final _bucket = 'jasprpad_compile_cache';
+  static const String _bucket = 'jasprpad_compile_cache';
 
-  StorageCache() {
-    _storage = _initStorage();
-  }
+  final Future<StorageApi> _storage;
 
-  Future<StorageApi> _initStorage() async {
+  StorageCache() : _storage = _initStorage();
+
+  static Future<StorageApi> _initStorage() async {
     // Read the service account credentials from the file.
     var jsonCredentials = File('serviceAccountKey.json').readAsStringSync();
     var credentials = auth.ServiceAccountCredentials.fromJson(jsonCredentials);
