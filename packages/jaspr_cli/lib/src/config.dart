@@ -32,9 +32,9 @@ class Project {
     return pubspecYaml;
   }
 
+  late final File pubspecFile = _fs.file('pubspec.yaml').absolute;
+
   late final YamlMap? _pubspecYaml = () {
-    var pubspecPath = 'pubspec.yaml';
-    var pubspecFile = _fs.file(pubspecPath).absolute;
     if (!pubspecFile.existsSync()) {
       return null;
     }

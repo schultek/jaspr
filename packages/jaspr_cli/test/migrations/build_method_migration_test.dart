@@ -1,5 +1,4 @@
 import 'package:jaspr_cli/src/migrations/build_method_migration.dart';
-import 'package:jaspr_cli/src/migrations/migration_models.dart';
 import 'package:test/test.dart';
 
 import 'utils.dart';
@@ -8,7 +7,7 @@ void main() {
   group('build method migration', () {
     group('succeeds', () {
       test('with single yield', () async {
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: '''
 class MyComponent extends StatelessComponent {
@@ -27,18 +26,14 @@ class MyComponent extends StatelessComponent {
 }
 ''',
           expectedMigrations: [
-            isA<MigrationInstance>().having(
-              (i) => i.description,
-              'description',
-              'Migrated build() method of MyComponent class',
-            ),
+            matchesMigration('Migrated build() method of MyComponent class'),
           ],
           expectedWarnings: [],
         );
       });
 
       test('with multi yield', () async {
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: '''
 class MyComponent extends StatelessComponent {
@@ -64,7 +59,7 @@ class MyComponent extends StatelessComponent {
       });
 
       test('with yield inside if and for', () async {
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: '''
 class MyComponent extends StatelessComponent {
@@ -112,7 +107,7 @@ class MyComponent extends StatelessComponent {
       });
 
       test('with multi-line childs', () async {
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: '''
 class MyComponent extends StatelessComponent {
@@ -146,7 +141,7 @@ class MyComponent extends StatelessComponent {
       });
 
       test('with multiple yields in if', () async {
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: '''
 class MyComponent extends StatelessComponent {
@@ -188,7 +183,7 @@ class MyComponent extends StatelessComponent {
       });
 
       test('with logic before yield', () async {
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: '''
 class MyComponent extends StatelessComponent {
@@ -212,7 +207,7 @@ class MyComponent extends StatelessComponent {
       });
 
       test('with logic between yields', () async {
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: '''
 class MyComponent extends StatelessComponent {
@@ -242,7 +237,7 @@ class MyComponent extends StatelessComponent {
       });
 
       test('with intermediate returns', () async {
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: '''
 class MyComponent extends StatelessComponent {
@@ -298,7 +293,7 @@ class MyComponent extends StatelessComponent {
       });
 
       test('with multi-line complex childs', () async {
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: '''
 class MyComponent extends StatelessComponent {
@@ -358,7 +353,7 @@ class MyComponent extends StatelessComponent {
       });
 
       test('with Builder component', () async {
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: '''
 class MyComponent extends StatelessComponent {
@@ -390,7 +385,7 @@ class MyComponent extends StatelessComponent {
     });
 
     test('with Builder.single component', () async {
-      testMigration(
+      testUnitMigration(
         BuildMethodMigration(),
         input: '''
 class MyComponent extends StatelessComponent {
@@ -431,15 +426,13 @@ class MyComponent extends StatelessComponent {
 }
 ''';
 
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: source,
           expectedOutput: source,
           expectedWarnings: [
-            isA<MigrationWarning>().having(
-              (w) => w.message,
-              'message',
-              'Cannot migrate MyComponent.build(): Only build methods using sync* or async* can be migrated automatically',
+            matchesWarning(
+              "Cannot migrate MyComponent.build(): Only build methods using sync* or async* can be migrated automatically",
             ),
           ],
         );
@@ -453,15 +446,13 @@ class MyComponent extends StatelessComponent {
 }
 ''';
 
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: source,
           expectedOutput: source,
           expectedWarnings: [
-            isA<MigrationWarning>().having(
-              (w) => w.message,
-              'message',
-              'Cannot migrate MyComponent.build(): Only build methods using sync* or async* can be migrated automatically',
+            matchesWarning(
+              "Cannot migrate MyComponent.build(): Only build methods using sync* or async* can be migrated automatically",
             ),
           ],
         );
@@ -474,7 +465,7 @@ class MyComponent extends StatelessComponent {
 class MyComponent extends StatelessComponent {}
 ''';
 
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: source,
           expectedOutput: source,
@@ -493,7 +484,7 @@ class MyClass {
 }
 ''';
 
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: source,
           expectedOutput: source,
@@ -512,7 +503,7 @@ class MyComponent extends StatelessComponent {
 }
 ''';
 
-        testMigration(
+        testUnitMigration(
           BuildMethodMigration(),
           input: source,
           expectedOutput: source,

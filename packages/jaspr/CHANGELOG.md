@@ -26,7 +26,7 @@
     }
     ```
 
-- **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`. Use `jaspr.target` instead.
+- **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`.
 
 - Added support for `jaspr.port` option in `pubspec.yaml` to specify the default port used by `jaspr serve`. 
   This can still be overridden using the `--port` flag. If neither is set, the default port stays `8080`.

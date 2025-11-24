@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/source/source_range.dart';
@@ -92,6 +94,12 @@ class ComponentFactoryMigration implements Migration {
         }
       });
     }
+  }
+
+  @override
+  List<MigrationResult> runForDirectory(Directory dir, bool apply) {
+    // This migration does not implement directory-level processing.
+    return [];
   }
 }
 

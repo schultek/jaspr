@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:file/file.dart';
 import 'package:io/ansi.dart';
 
 import 'migration_models.dart';
@@ -52,6 +53,12 @@ class BuildMethodMigration implements Migration {
     }
   }
 
+  @override
+  List<MigrationResult> runForDirectory(Directory dir, bool apply) {
+    // This migration does not implement directory-level processing.
+    return [];
+  }
+
   void _migrateBuildMethod(MethodDeclaration node, String className, MigrationReporter reporter) {
     if (node.body.keyword == null) {
       reporter.reportManualMigrationNeeded(
@@ -93,7 +100,7 @@ class BuildMethodMigration implements Migration {
     });
   }
 
-  void _migrateFunctionBody(FunctionBody node, MigrationBuilder builder) {
+  void _migrateFunctionBody(FunctionBody node, EditBuilder builder) {
     final keyword = node.keyword;
     if (keyword == null || node is! BlockFunctionBody) {
       return;
@@ -266,6 +273,8 @@ class BuildMethodMigration implements Migration {
             _canMigrateDeclaratively(s.thenStatement) &&
             (s.elseStatement == null || _canMigrateDeclaratively(s.elseStatement!)));
   }
+
+
 }
 
 class BuilderVisitor extends RecursiveAstVisitor<void> {
