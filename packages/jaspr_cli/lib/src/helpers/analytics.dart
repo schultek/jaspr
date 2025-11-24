@@ -70,7 +70,7 @@ Future<void> trackEvent(String command, {String? projectName, String? projectMod
             'command': command,
             'mode': projectMode,
             'cli_version': jasprCliVersion,
-            if (projectHash != null) 'project_id': projectHash,
+            'project_id': ?projectHash,
             'os': Platform.operatingSystem,
             'ci': isCI,
           },
