@@ -44,9 +44,9 @@ class FlutterEmbedView extends StatelessComponent {
             minHeight: c.minHeight != double.infinity ? c.minHeight?.px : null,
             maxHeight: c.maxHeight != double.infinity ? c.maxHeight?.px : null,
           ),
-        if (styles != null) styles!,
+        ?styles,
       ]),
-      [if (loader != null) loader!],
+      [?loader],
     );
   }
 }
