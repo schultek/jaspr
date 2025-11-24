@@ -1,13 +1,12 @@
 // [sample=2] Jaspr Riverpod
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
-import 'package:jaspr_riverpod/legacy.dart';
 
 void main() {
   runApp(ProviderScope(child: App()));
 }
 
-final counterProvider = StateProvider((ref) => 0);
+final counterProvider = NotifierProvider<_CounterNotifier, int>(_CounterNotifier.new);
 
 class App extends StatelessComponent {
   const App({super.key});
@@ -23,10 +22,17 @@ class App extends StatelessComponent {
       ),
       button(
         onClick: () {
-          context.read(counterProvider.notifier).state++;
+          context.read(counterProvider.notifier).increment();
         },
         [text('Press Me')],
       ),
     ]);
   }
+}
+
+class _CounterNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void increment() => state = state + 1;
 }
