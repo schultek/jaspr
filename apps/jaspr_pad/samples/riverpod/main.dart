@@ -8,6 +8,13 @@ void main() {
 
 final counterProvider = NotifierProvider<_CounterNotifier, int>(_CounterNotifier.new);
 
+class _CounterNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void increment() => state = state + 1;
+}
+
 class App extends StatelessComponent {
   const App({super.key});
 
@@ -28,11 +35,4 @@ class App extends StatelessComponent {
       ),
     ]);
   }
-}
-
-class _CounterNotifier extends Notifier<int> {
-  @override
-  int build() => 0;
-
-  void increment() => state = state + 1;
 }
