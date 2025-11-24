@@ -141,14 +141,14 @@ class BaseDocument extends StatelessComponent implements Document {
   Component build(BuildContext context) {
     return Component.element(
       tag: 'html',
-      attributes: {if (lang != null) 'lang': lang!},
+      attributes: {'lang': ?lang},
       children: [
         Component.element(
           tag: 'head',
           children: [
             if (base != null) Component.element(tag: 'base', attributes: {'href': _normalizedBase!}),
             if (charset != null) Component.element(tag: 'meta', attributes: {'charset': charset!}),
-            HeadDocument(title: title, meta: {if (viewport != null) 'viewport': viewport!, ...meta}),
+            HeadDocument(title: title, meta: {'viewport': ?viewport, ...meta}),
             if (styles.isNotEmpty) //
               Style(styles: styles),
             ...head,
