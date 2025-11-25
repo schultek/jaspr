@@ -68,6 +68,7 @@ class ImportEntry {
       elements.add(
         ImportElement(name, switch (element) {
           ExtensionElement() => ElementType.extension,
+          // ignore: deprecated_member_use
           TypeDefiningElement() => ElementType.type,
           TopLevelVariableElement() || GetterElement() => ElementType.variable,
           _ => throw StateError('Unsupported import symbol type: ${element.runtimeType}'),

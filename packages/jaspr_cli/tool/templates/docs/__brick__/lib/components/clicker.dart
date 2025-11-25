@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_content/theme.dart';
 
 /// A simple Jaspr component that counts the number of clicks.
@@ -21,7 +21,7 @@ class ClickerState extends State<Clicker> {
         setState(() => count++);
       },
       [
-        text('Click me! ($count)'),
+        .text('Click me! ($count)'),
       ],
     );
   }
@@ -29,10 +29,10 @@ class ClickerState extends State<Clicker> {
   @css
   static List<StyleRule> get styles => [
     css('.clicker').styles(
-      padding: Padding.all(0.5.rem),
-      margin: Margin.only(top: 1.rem),
-      border: Border(color: ContentColors.primary),
-      radius: BorderRadius.circular(0.5.rem),
+      padding: .all(0.5.rem),
+      margin: .only(top: 1.rem),
+      border: .all(color: ContentColors.primary),
+      radius: .circular(0.5.rem),
     ),
   ];
 }

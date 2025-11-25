@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
 // The flutter widget is only imported on the web (as the server cannot import flutter)
@@ -15,7 +15,7 @@ class EmbeddedCounter extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return FlutterEmbedView.deferred(
-      styles: Styles(margin: Margin.only(top: 2.rem)),
+      styles: Styles(margin: .only(top: 2.rem)),
       // We need to set constraints as the flutter view cannot dynamically size itself.
       constraints: ViewConstraints(
         minWidth: 300,
