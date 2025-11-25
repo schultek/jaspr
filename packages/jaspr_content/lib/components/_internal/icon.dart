@@ -3,7 +3,7 @@
 /// The icon paths are sourced from lucide icons (https://lucide.dev/icons).
 library;
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 /// A close icon.
 class CloseIcon extends StatelessComponent {

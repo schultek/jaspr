@@ -1,6 +1,7 @@
 @TestOn('vm')
 library;
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
 import 'package:meta/meta.dart';
@@ -30,9 +31,9 @@ void main() {
     testOutput(
       'formats short content',
       input: div([
-        span([text('A')]),
-        span([text('B')]),
-        span([text('C')]),
+        span([Component.text('A')]),
+        span([Component.text('B')]),
+        span([Component.text('C')]),
       ]),
       output: '<div><span>A</span><span>B</span><span>C</span></div>',
       lineLength: 50,
@@ -41,9 +42,9 @@ void main() {
     testOutput(
       'formats block content',
       input: div([
-        span([text('Hello')]),
-        span([text('World')]),
-        span([text('Test')]),
+        span([Component.text('Hello')]),
+        span([Component.text('World')]),
+        span([Component.text('Test')]),
       ]),
       output:
           '<div>\n'
@@ -57,10 +58,10 @@ void main() {
     testOutput(
       'formats paragraph content',
       input: p([
-        span([text('Hello ')]),
-        span([text('World')]),
-        span([text(' Lorem')]),
-        span([text('Ipsum')]),
+        span([Component.text('Hello ')]),
+        span([Component.text('World')]),
+        span([Component.text(' Lorem')]),
+        span([Component.text('Ipsum')]),
       ]),
       output:
           '<p>\n'
@@ -73,9 +74,9 @@ void main() {
     testOutput(
       'formats text content',
       input: p([
-        text('Hello '),
-        b([text('World')]),
-        text('!'),
+        Component.text('Hello '),
+        b([Component.text('World')]),
+        Component.text('!'),
       ]),
       output:
           '<p>\n'
@@ -87,12 +88,12 @@ void main() {
     testOutput(
       'formats nested paragraph content',
       input: p([
-        span([text('Lorem ')]),
+        span([Component.text('Lorem ')]),
         em([
-          text('Hello '),
-          b([text('World')]),
+          Component.text('Hello '),
+          b([Component.text('World')]),
         ]),
-        span([text(' Ipsum')]),
+        span([Component.text(' Ipsum')]),
       ]),
       output:
           '<p>\n'
@@ -104,7 +105,7 @@ void main() {
 
     testOutput(
       'formats formatted text',
-      input: p([text('A\nB\nC')]),
+      input: p([Component.text('A\nB\nC')]),
       output:
           '<p>\n'
           '      A\n'
@@ -117,8 +118,8 @@ void main() {
     testOutput(
       'formats unformatted text',
       input: div([
-        span([text('A\nB\nC')]),
-        b([text('D')]),
+        span([Component.text('A\nB\nC')]),
+        b([Component.text('D')]),
       ]),
       output:
           '<div>\n'
@@ -133,21 +134,21 @@ void main() {
     testOutput(
       'formats content with fragments',
       input: div([
-        fragment([
-          p([text('Hello ')]),
-          fragment([]),
-          fragment([
-            p([text('World ')]),
+        Component.fragment([
+          p([Component.text('Hello ')]),
+          Component.fragment([]),
+          Component.fragment([
+            p([Component.text('World ')]),
             p([
-              fragment([text('Test ')]),
+              Component.fragment([Component.text('Test ')]),
             ]),
           ]),
         ]),
         div([
-          fragment([
-            fragment([
-              p([text('Lorem ')]),
-              p([text('Ipsum ')]),
+          Component.fragment([
+            Component.fragment([
+              p([Component.text('Lorem ')]),
+              p([Component.text('Ipsum ')]),
             ]),
           ]),
         ]),
@@ -168,9 +169,9 @@ void main() {
     testOutput(
       'formats content with preformatted html',
       input: div([
-        text('\n   '),
-        p([text('\n      '), text('Hello'), text('\n   ')]),
-        text('\n'),
+        Component.text('\n   '),
+        p([Component.text('\n      '), Component.text('Hello'), Component.text('\n   ')]),
+        Component.text('\n'),
       ]),
       output:
           '<div>\n'
@@ -184,12 +185,12 @@ void main() {
     testOutput(
       'formats empty content',
       input: div([
-        span([text('')]),
-        text('Hello'),
+        span([Component.text('')]),
+        Component.text('Hello'),
         b([]),
-        text(''),
-        fragment([text('')]),
-        fragment([]),
+        Component.text(''),
+        Component.fragment([Component.text('')]),
+        Component.fragment([]),
       ]),
       output: '<div><span></span>Hello<b></b></div>',
       lineLength: 30,

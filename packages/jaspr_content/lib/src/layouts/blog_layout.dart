@@ -1,8 +1,7 @@
 /// @docImport 'package:jaspr_content/components/header.dart';
 library;
 
-import 'package:jaspr/server.dart' as jaspr;
-import 'package:jaspr/server.dart';
+import 'package:jaspr/dom.dart';
 
 import '../../theme.dart';
 import '../page.dart';
@@ -58,13 +57,13 @@ class BlogLayout extends PageLayoutBase {
         main_([
           div(classes: 'content-container', [
             div(classes: 'post-header', [
-              if (pageData['title'] case String title) h1([text(title)]),
+              if (pageData['title'] case String title) h1([Component.text(title)]),
               div(classes: 'post-info', [
                 if (pageData['authorImage'] case String authorImage) img(src: authorImage, alt: 'Author image'),
                 div([
-                  span([text(pageData['author'] as String? ?? 'Unknown')]),
+                  span([Component.text(pageData['author'] as String? ?? 'Unknown')]),
                   span([
-                    text(
+                    Component.text(
                       [
                         if (pageData['readTime'] case String readTime) '$readTime read',
                         if (pageData['date'] case String date) date,
@@ -78,7 +77,7 @@ class BlogLayout extends PageLayoutBase {
             child,
             if (pageData['tags'] case List<Object?> tags)
               div(classes: 'post-tags', [
-                for (final tag in tags) span([text(tag.toString())]),
+                for (final tag in tags) span([Component.text(tag.toString())]),
               ]),
           ]),
         ]),
@@ -115,7 +114,7 @@ class BlogLayout extends PageLayoutBase {
                   margin: Margin.only(top: 2.rem),
                   display: Display.flex,
                   alignItems: AlignItems.center,
-                  gap: Gap(column: 1.rem),
+                  gap: Gap.column(1.rem),
                 ),
                 css('> img').styles(width: 42.px, height: 42.px, radius: BorderRadius.circular(10.rem)),
                 css('> div', [

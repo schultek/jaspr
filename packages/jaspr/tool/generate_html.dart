@@ -23,7 +23,7 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
 
   for (final key in specJson.keys) {
     final group = specJson[key] as Map<String, dynamic>;
-    final file = File('lib/src/components/html/$key.dart');
+    final file = File('lib/src/dom/html/$key.dart');
 
     final library = Library((l) {
       l.directives.add(Directive.partOf('html.dart'));
@@ -337,7 +337,7 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
                 if (!selfClosing) {
                   content.write('    children: children,\n');
                 } else if (contentParam != null) {
-                  content.write('    children: [if ($contentParam case final $contentParam?) raw($contentParam)],\n');
+                  content.write('    children: [if ($contentParam case final $contentParam?) RawText($contentParam)],\n');
                 }
 
                 content.writeln('  );');

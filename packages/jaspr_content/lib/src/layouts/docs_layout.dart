@@ -2,8 +2,7 @@
 /// @docImport 'package:jaspr_content/components/sidebar.dart';
 library;
 
-import 'package:jaspr/server.dart' as jaspr;
-import 'package:jaspr/server.dart';
+import 'package:jaspr/dom.dart';
 
 import '../page.dart';
 import '../page_extension/table_of_contents_extension.dart';
@@ -54,8 +53,8 @@ class DocsLayout extends PageLayoutBase {
           div([
             div(classes: 'content-container', [
               div(classes: 'content-header', [
-                if (pageData['title'] case String title) h1([text(title)]),
-                if (pageData['description'] case String description) p([text(description)]),
+                if (pageData['title'] case String title) h1([Component.text(title)]),
+                if (pageData['description'] case String description) p([Component.text(description)]),
                 if (pageData['image'] case String image) img(src: image, alt: pageData['imageAlt'] as String?),
               ]),
               child,
@@ -64,7 +63,7 @@ class DocsLayout extends PageLayoutBase {
             aside(classes: 'toc', [
               if (page.data['toc'] case TableOfContents toc)
                 div([
-                  h3([text('On this page')]),
+                  h3([Component.text('On this page')]),
                   toc.build(),
                 ]),
             ]),

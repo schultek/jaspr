@@ -3,7 +3,7 @@ library;
 
 import 'dart:js_interop';
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_riverpod/legacy.dart';
 import 'package:jaspr_test/browser_test.dart';
@@ -35,7 +35,7 @@ void main() {
                   final v1 = context.read(p1);
                   final v2 = context.watch(p2);
 
-                  return text('One: $v1, Two: $v2');
+                  return Component.text('One: $v1, Two: $v2');
                 },
               ),
             ]),

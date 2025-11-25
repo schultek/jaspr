@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -209,7 +209,7 @@ void main() {
       final root = binding.root;
       final component = FakeComponent(
         child: div([
-          h1(key: GlobalObjectKey(1), [text('Hello World!')]),
+          h1(key: GlobalObjectKey(1), [Component.text('Hello World!')]),
         ]),
       );
       binding.attachRootComponent(component);
@@ -240,7 +240,7 @@ void main() {
 
       verifyNoMoreRenderInteractions(root);
 
-      component.updateChild(h1(key: GlobalObjectKey(1), [text('Hello World!')]));
+      component.updateChild(h1(key: GlobalObjectKey(1), [Component.text('Hello World!')]));
       await pumpEventQueue();
 
       verifyInOrder([

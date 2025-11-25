@@ -1,7 +1,7 @@
 @TestOn('vm')
 library;
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_riverpod/legacy.dart';
 import 'package:jaspr_test/server_test.dart';
@@ -16,7 +16,7 @@ void main() {
               Provider((_) => 'value').syncWith('some_key'),
               StateProvider((_) => 42).syncWith('some_number'),
             ],
-            child: p([text('Hello\nWorld')]),
+            child: p([Component.text('Hello\nWorld')]),
           ),
         ]),
       );
@@ -60,7 +60,7 @@ void main() {
               Builder(
                 builder: (context) {
                   providerValue = context.read(someFutureProvider);
-                  return text('Hello\nWorld');
+                  return Component.text('Hello\nWorld');
                 },
               ),
             ]),

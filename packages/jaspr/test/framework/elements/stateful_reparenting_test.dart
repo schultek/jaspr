@@ -1,7 +1,7 @@
 @TestOn('vm')
 library;
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
 import '../../utils/test_component.dart';
@@ -65,7 +65,7 @@ void main() {
       state.lifecycle.clear();
 
       // phase 3: component should be unmounted
-      component.updateChild(InheritedData(child: text('')));
+      component.updateChild(InheritedData(child: Component.text('')));
       await tester.pump();
 
       expect(find.byType(MyStatefulComponent), findsNothing);

@@ -27,7 +27,7 @@ final _defaultCodeFont = FontFamily.list([
 final List<StyleRule> _resetStyles = [
   css('*, :after, :before').styles(
     boxSizing: BoxSizing.borderBox,
-    border: Border(width: Unit.zero, style: BorderStyle.solid, color: Color('#e5e7eb')),
+    border: Border.all(width: Unit.zero, style: BorderStyle.solid, color: Color('#e5e7eb')),
   ),
   css(':host,html').styles(
     lineHeight: 1.5.em,
@@ -62,7 +62,7 @@ final List<StyleRule> _resetStyles = [
   css('sup').styles(position: Position.relative(top: (-0.5).em)),
   css('table').styles(
     textIndent: Unit.zero,
-    border: Border(color: Color.inherit),
+    border: Border.all(color: Color.inherit),
     raw: {'border-collapse': 'collapse'},
   ),
   css('button, input, optgroup, select, textarea').styles(

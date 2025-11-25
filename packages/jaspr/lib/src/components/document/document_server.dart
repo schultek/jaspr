@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 
-import '../../../server.dart';
-import '../../server/adapters/document_adapter.dart';
-
-export '../style.dart' hide Style;
+import '/dom.dart';
+import '/server.dart';
+import '/src/server/adapters/document_adapter.dart';
 
 abstract class Document implements Component {
   /// Sets up a basic document structure at the root of your app and renders the main `<html>`, `<head>` and `<body>` tags.

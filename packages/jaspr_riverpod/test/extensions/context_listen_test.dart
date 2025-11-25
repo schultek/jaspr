@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_riverpod/legacy.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -78,7 +78,7 @@ void main() {
                   onClick: () {
                     context.read(counter.notifier).state++;
                   },
-                  [text('a ${context.watch(counter)}')],
+                  [Component.text('a ${context.watch(counter)}')],
                 );
               },
             );

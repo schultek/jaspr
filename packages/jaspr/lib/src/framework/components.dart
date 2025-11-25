@@ -28,6 +28,8 @@ class DomComponent extends Component {
   Element createElement() => DomElement(this);
 }
 
+typedef EventCallback = void Function(web.Event event);
+
 class DomElement extends MultiChildRenderObjectElement {
   DomElement(DomComponent super.component);
 

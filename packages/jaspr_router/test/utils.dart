@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:jaspr_router/src/platform/platform.dart';
 import 'package:jaspr_test/jaspr_test.dart';
@@ -85,24 +85,24 @@ Route route(String path, [List<RouteBase> routes = const [], String? name, Route
   path: path,
   name: name,
   redirect: redirect,
-  builder: (_, s) => Page(path: s.subloc),
+  builder: (_, state) => Page(path: state.subloc),
   routes: routes,
 );
 
 Route lazyRoute(String path, Future<void> future, [List<RouteBase> routes = const []]) => Route.lazy(
   path: path,
-  builder: (_, s) => Page(path: s.subloc),
+  builder: (_, state) => Page(path: state.subloc),
   load: () => future,
   routes: routes,
 );
 
 ShellRoute shellRoute(String name, List<RouteBase> routes) => ShellRoute(
-  builder: (_, s, c) => Page(path: name, child: c),
+  builder: (_, _, child) => Page(path: name, child: child),
   routes: routes,
 );
 
 ShellRoute lazyShellRoute(String name, Future<void> future, List<RouteBase> routes) => ShellRoute.lazy(
-  builder: (_, s, c) => Page(path: name, child: c),
+  builder: (_, _, child) => Page(path: name, child: child),
   load: () => future,
   routes: routes,
 );
@@ -117,11 +117,11 @@ class Page extends StatelessComponent {
   Component build(BuildContext context) {
     var label = path.startsWith('/') ? path.substring(1) : path;
     final children = <Component>[];
-    children.add(span([text(label)]));
+    children.add(span([Component.text(label)]));
 
     var state = RouteState.of(context);
     if (state.params.isNotEmpty) {
-      children.add(span([text(state.params.entries.map((e) => '${e.key}=${e.value}').join(','))]));
+      children.add(span([Component.text(state.params.entries.map((e) => '${e.key}=${e.value}').join(','))]));
     }
 
     if (child != null) {

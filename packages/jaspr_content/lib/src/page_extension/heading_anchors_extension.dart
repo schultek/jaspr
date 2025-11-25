@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
@@ -51,7 +52,7 @@ class HeadingAnchorsExtension implements PageExtension {
           Builder(
             builder: (context) {
               var route = RouteState.of(context);
-              return a(href: '${route.path}#$id', [text('#')]);
+              return a(href: '${route.path}#$id', [Component.text('#')]);
             },
           ),
         ),
@@ -71,7 +72,7 @@ class HeadingAnchorsExtension implements PageExtension {
       css('&').styles(
         display: Display.flex,
         alignItems: AlignItems.baseline,
-        gap: Gap(column: 0.5.rem),
+        gap: Gap.column(0.5.rem),
       ),
       css('> a').styles(
         textDecoration: TextDecoration.none,

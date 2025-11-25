@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../../src/theme/theme.dart';
@@ -22,7 +22,7 @@ class TabBar extends StatefulComponent {
       css('&').styles(
         display: Display.flex,
         alignItems: AlignItems.center,
-        gap: Gap(column: 1.25.rem),
+        gap: Gap.column(1.25.rem),
         border: Border.only(
           bottom: BorderSide(width: 1.px, color: ContentColors.hr),
         ),
@@ -74,7 +74,7 @@ class _TabBarState extends State<TabBar> {
               nexttabView?.setAttribute('active', '');
             },
           },
-          [text(item.value)],
+          [Component.text(item.value)],
         ),
     ]);
   }

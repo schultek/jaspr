@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 // ignore: implementation_imports
 import 'package:jaspr/src/server/async_build_owner.dart';
 import 'package:meta/meta.dart';

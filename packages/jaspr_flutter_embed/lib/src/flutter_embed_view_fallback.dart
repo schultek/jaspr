@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 import 'view_constraints.dart';
 import 'widget.dart';

@@ -1,10 +1,28 @@
 ## Unreleased breaking
 
+- **Breaking** Moved all html components, style classes and dom utilities including `div()` et al., `Styles`, `css`, `Color` et al., `events()`, `RawText`, `DomValidator` and `ViewTransitionMixin` to separate `package:jaspr/dom.dart` library.
+
+  This reduces the "pollution" of the global namespace when importing `package:jaspr/jaspr.dart` and allows for more fine-grained control of imported APIs.
+
 - **Breaking** All html components are now implemented as classes instead of functions, and can thereby used with `const`. 
 
   This is mostly a structural change, as all components keep their lowercase names to have the familiar html-like syntax and differentiate to other Components. All standard uses of these components should still work as before, with a few exceptions when used with inferred typing (such as `var child = div([]);`), which may now require an explicit type annotation (such as `Component child = div([]);`) when assigning other values (such as `child = span([]);`).
 
-- **Breaking** Changed `events()` method to accept only one optional type parameter for both `onInput` and `onChange` events.
+- Deprecated `text()`, `fragment()` and `raw()` functions in favor of `Component.text()`, `Component.fragment()` and `RawText`, respectively.
+
+  ```dart
+  // Before:
+  text('Hello World');
+  fragment([ ... ]);
+  raw('<div>Raw HTML</div>');
+
+  // After (with dot-shorthands):
+  .text('Hello World');
+  .fragment([ ... ]);
+  RawText('<div>Raw HTML</div>');
+  ```
+
+- **Breaking** Removed deprecated `package:jaspr/ui.dart` library. 
 
 - **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`. Use `jaspr.target` instead.
 
@@ -19,7 +37,12 @@
 
   This can still be overridden using the `--port` flag. If neither is set, the default port stays `8080`.
 
+- **Breaking**: `ResponseLike.body` (returned from `renderComponent()`) is now a `Uint8List` instead of `String`.
+- Allow binary responses in `AppContext.setStatusCode`.
+
 - Global `@css` styles from other packages will no longer be included automatically. To include them, import the file where they are defined.
+
+- **Breaking** Changed `events()` method to accept only one optional type parameter for both `onInput` and `onChange` events.
 
 - **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
 - **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
@@ -28,10 +51,10 @@
 - Added `Animation`, `Quotes` CSS properties.
 - Added `ms` and `seconds` extensions to `int` for simple conversion to `Duration`.
 - Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`, `TextShadow` and `BoxShadow`.
+- Added `Gap.row()` and `Gap.column()` constructors.
+- Added `Flex.grow()`, `Flex.shrink()` and `Flex.basis()` constructors.
+- Added `Border.all()` constructor and deprecate the unnamed `Border` constructor.
 - Allow nesting non-empty `Filter.list` inside each other.
-
-- **Breaking**: `ResponseLike.body` (returned from `renderComponent()`) is now a `Uint8List` instead of `String`.
-- Allow binary responses in `AppContext.setStatusCode`.
 
 ## 0.21.7
 

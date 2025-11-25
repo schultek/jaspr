@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 /// Default error page implementation.
 class ErrorScreen extends StatelessComponent {
@@ -14,6 +14,6 @@ class ErrorScreen extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return div([text('Page Not Found'), br(), text(error?.toString() ?? 'page not found')]);
+    return div([Component.text('Page Not Found'), br(), Component.text(error?.toString() ?? 'page not found')]);
   }
 }

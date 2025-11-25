@@ -23,17 +23,17 @@ class ComponentFactoryMigration implements Migration {
 
   @override
   void runForUnit(CompilationUnit unit, MigrationReporter reporter) {
+    if (!unit.directives.any(
+      (d) => d is ImportDirective && (d.uri.stringValue?.startsWith('package:jaspr/') ?? false),
+    )) {
+      // Only run if Jaspr is imported.
+      return;
+    }
+
     final texts = <SourceRange>[];
     final domComponents = <SourceRange>[];
     final fragments = <(SourceRange, ArgumentList)>[];
     final wrapDomComponents = <SourceRange>[];
-
-    if (!unit.directives.any(
-      (d) => d is ImportDirective && (d.uri.stringValue?.startsWith('package:jaspr/') ?? false),
-    )) {
-      // Only run if jaspr is imported.
-      return;
-    }
 
     unit.accept(
       ComponentVisitor(

@@ -4,6 +4,7 @@ library;
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
 
@@ -68,7 +69,7 @@ void main() {
           builder: (context) {
             var value = context.headers['x-test'];
             context.setHeader('x-test2', 'xyz');
-            return div(id: 'test', [text(value ?? '')]);
+            return div(id: 'test', [Component.text(value ?? '')]);
           },
         ),
         request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'x-test': 'abc'}),
@@ -92,7 +93,7 @@ void main() {
           builder: (context) {
             var value = context.cookies['test'];
             context.setCookie('test2', 'xyz');
-            return div(id: 'test', [text(value ?? '')]);
+            return div(id: 'test', [Component.text(value ?? '')]);
           },
         ),
         request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'cookie': 'test=abc'}),
@@ -116,7 +117,7 @@ void main() {
           builder: (context) {
             var value = context.cookies['test'];
             context.setStatusCode(201, responseBody: 'custom');
-            return div(id: 'test', [text(value ?? '')]);
+            return div(id: 'test', [Component.text(value ?? '')]);
           },
         ),
         request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'cookie': 'test=abc'}),
@@ -133,7 +134,7 @@ void main() {
           builder: (context) {
             var value = context.cookies['test'];
             context.setStatusCode(201, responseBody: Uint8List.fromList([1, 2, 3]));
-            return div(id: 'test', [text(value ?? '')]);
+            return div(id: 'test', [Component.text(value ?? '')]);
           },
         ),
         request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'cookie': 'test=abc'}),
@@ -150,7 +151,7 @@ void main() {
           builder: (context) {
             var value = context.cookies['test'];
             expect(() => context.setStatusCode(201, responseBody: DateTime.now()), throwsArgumentError);
-            return div(id: 'test', [text(value ?? '')]);
+            return div(id: 'test', [Component.text(value ?? '')]);
           },
         ),
         request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'cookie': 'test=abc'}),

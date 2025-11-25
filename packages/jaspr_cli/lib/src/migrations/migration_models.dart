@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
@@ -33,7 +34,10 @@ extension MigrationExtension on List<Migration> {
       for (final file in files) {
         final content = file.readAsStringSync();
         try {
-          final result = parseString(content: content);
+          final result = parseString(
+            content: content,
+            featureSet: FeatureSet.latestLanguageVersion(flags: ['dot-shorthands']),
+          );
 
           final builder = MigrationBuilder(result.lineInfo);
           final reporter = MigrationReporter(builder);

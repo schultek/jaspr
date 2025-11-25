@@ -3,7 +3,7 @@ import 'package:html/parser.dart' as html;
 import 'package:html/src/token.dart' as html;
 // ignore: implementation_imports
 import 'package:html/src/tokenizer.dart' as html;
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:markdown/markdown.dart' as md;
 
 import '../page.dart';

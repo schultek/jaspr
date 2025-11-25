@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../../dom.dart' show StyleRule, DomValidator;
 import '../../jaspr.dart';
 
 /// Main class for initializing the jaspr framework.

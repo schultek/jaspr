@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../../../dom.dart' show DomValidator;
 import '../../../server.dart';
 
 void initSyncState(SyncStateMixin element) {

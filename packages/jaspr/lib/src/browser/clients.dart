@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:universal_web/web.dart' as web;
 
-import '../foundation/validator.dart';
+import '../dom/validator.dart';
 import '../framework/framework.dart';
 import 'browser_binding.dart';
 

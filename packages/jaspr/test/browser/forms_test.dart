@@ -1,7 +1,7 @@
 @TestOn('browser')
 library;
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_test/browser_test.dart';
 import 'package:universal_web/web.dart';
 
@@ -13,8 +13,8 @@ void main() {
 
       tester.pumpComponent(
         StatefulBuilder(
-          builder: (context, s) {
-            setState = s;
+          builder: (context, set) {
+            setState = set;
             return input(value: text);
           },
         ),
@@ -39,8 +39,8 @@ void main() {
 
       tester.pumpComponent(
         StatefulBuilder(
-          builder: (context, s) {
-            setState = s;
+          builder: (context, set) {
+            setState = set;
             return input(type: InputType.checkbox, checked: checked);
           },
         ),
@@ -65,8 +65,8 @@ void main() {
 
       tester.pumpComponent(
         StatefulBuilder(
-          builder: (context, s) {
-            setState = s;
+          builder: (context, set) {
+            setState = set;
             return input(type: InputType.checkbox, indeterminate: indeterminate);
           },
         ),
@@ -91,8 +91,8 @@ void main() {
 
       tester.pumpComponent(
         StatefulBuilder(
-          builder: (context, s) {
-            setState = s;
+          builder: (context, set) {
+            setState = set;
             return select(value: value, [option(value: "a", []), option(value: "b", [])]);
           },
         ),

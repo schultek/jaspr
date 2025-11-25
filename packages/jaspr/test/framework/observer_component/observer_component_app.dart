@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 import '../../utils/test_component.dart';
 import '../../utils/track_state_lifecycle.dart';

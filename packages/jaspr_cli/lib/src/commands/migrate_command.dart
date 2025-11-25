@@ -5,6 +5,8 @@ import 'package:io/ansi.dart';
 import '../logging.dart';
 import '../migrations/build_method_migration.dart';
 import '../migrations/component_factory_migration.dart';
+import '../migrations/dom_import_migration.dart';
+import '../migrations/html_helper_migration.dart';
 import '../migrations/migration_models.dart';
 import 'base_command.dart';
 
@@ -35,7 +37,12 @@ class MigrateCommand extends BaseCommand {
   late final String? assumeVersion = argResults!.option('assume-version');
   late final List<String> includeDirs = argResults!.multiOption('include-dir');
 
-  static List<Migration> get allMigrations => [BuildMethodMigration(), ComponentFactoryMigration()];
+  static List<Migration> get allMigrations => [
+    BuildMethodMigration(),
+    ComponentFactoryMigration(),
+    DomImportMigration(),
+    HtmlHelperMigration(),
+  ];
 
   @override
   Future<int> runCommand() async {
@@ -59,7 +66,7 @@ class MigrateCommand extends BaseCommand {
     }
 
     var migrations = allMigrations.where((m) {
-      return currentJasprVersion.compareTo(m.minimumJasprVersion) >= 0;
+      return currentJasprVersion.compareTo(m.minimumJasprVersion) == 0;
     }).toList();
 
     if (migrations.isEmpty) {

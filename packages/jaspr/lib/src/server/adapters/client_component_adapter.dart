@@ -1,5 +1,5 @@
+import '../../dom/validator.dart';
 import '../../foundation/options.dart';
-import '../../foundation/validator.dart';
 import '../../framework/framework.dart';
 import '../markup_render_object.dart';
 import '../server_binding.dart';

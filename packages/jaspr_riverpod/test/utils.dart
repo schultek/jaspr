@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 Component providerApp(ComponentBuilder builder) {
@@ -13,6 +13,6 @@ class Button extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return button(events: {'click': (e) => onPressed()}, [text(label)]);
+    return button(events: {'click': (e) => onPressed()}, [Component.text(label)]);
   }
 }

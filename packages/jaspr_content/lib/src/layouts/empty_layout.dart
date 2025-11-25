@@ -1,4 +1,4 @@
-import 'package:jaspr/server.dart';
+import 'package:jaspr/dom.dart';
 
 import '../page.dart';
 import 'page_layout.dart';

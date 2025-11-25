@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:universal_web/web.dart' as web;
 
 import 'icon.dart';

@@ -1,4 +1,4 @@
-import '../../jaspr.dart';
+import '/dom.dart';
 
 /// A "Built with Jaspr" badge component.
 ///
