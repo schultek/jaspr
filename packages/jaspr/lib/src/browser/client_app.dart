@@ -8,7 +8,19 @@ import 'dom_render_object.dart';
 import 'options.dart';
 import 'slotted_dom_nodes_component.dart';
 
-class ClientApp extends Component {
+/// Locates and initializes @client components during hydration.
+///
+/// Each @client component will be mounted as a direct child of this component,
+/// independent of the actual position of that component in the DOM tree. It
+/// allows client components to share a root subtree, which can be useful for
+/// sharing state by wrapping this component with one or more [InheritedComponent]s.
+///
+/// Beware that wrapping this component with components that render DOM objects
+/// may prevent @client components to be properly hydrated.
+///
+/// Requires [Jaspr.initializeApp] to be called with the generated [ClientOptions]
+/// before being used.
+final class ClientApp extends Component {
   const ClientApp();
 
   @override

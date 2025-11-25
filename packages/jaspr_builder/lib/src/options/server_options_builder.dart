@@ -137,7 +137,7 @@ class ServerOptionsBuilder implements Builder {
     return clients
         .where((c) => c.params.isNotEmpty)
         .map((c) {
-          return 'Map<String, dynamic> _[[${c.import}]]${c.name}([[${c.import}]].${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};';
+          return 'Map<String, Object?> _[[${c.import}]]${c.name}([[${c.import}]].${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};';
         })
         .join('\n');
   }

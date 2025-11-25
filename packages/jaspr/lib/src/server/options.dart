@@ -5,7 +5,7 @@ import '../../jaspr.dart';
 /// Main class for initializing the Jaspr framework on the server.
 ///
 /// Call [Jaspr.initializeApp()] at the start of your app, before any calls to [runApp].
-class Jaspr {
+abstract final class Jaspr {
   static void initializeApp({
     ServerOptions options = const ServerOptions(),
     bool useIsolates = false,
@@ -18,7 +18,7 @@ class Jaspr {
 
   static bool get isInitialized => _options != null;
 
-  static ServerOptions get options => _options ?? ServerOptions();
+  static ServerOptions get options => _options ?? const ServerOptions();
   static ServerOptions? _options;
 
   static bool get useIsolates => _useIsolates;
@@ -28,9 +28,11 @@ class Jaspr {
   static List<String> _allowedPathSuffixes = [];
 }
 
-/// Global options for configuring Jaspr on the server. DO NOT USE DIRECTLY.
+/// Global options for configuring Jaspr on the server.
+///
+/// **DO NOT USE DIRECTLY.**
 /// Use the generated [defaultServerOptions] instead.
-class ServerOptions {
+final class ServerOptions {
   const ServerOptions({this.clientId, this.clients, this.styles});
 
   final String? clientId;
@@ -38,11 +40,13 @@ class ServerOptions {
   final List<StyleRule> Function()? styles;
 }
 
-/// The target configuration for a @client component. DO NOT USE DIRECTLY.
+/// The target configuration for a @client component.
+///
+/// **DO NOT USE DIRECTLY.**
 /// Use the generated [defaultServerOptions] instead.
-class ClientTarget<T extends Component> {
+final class ClientTarget<T extends Component> {
   final String name;
-  final Map<String, dynamic> Function(T component)? params;
+  final Map<String, Object?> Function(T component)? params;
 
   const ClientTarget(this.name, {this.params});
 

@@ -300,10 +300,7 @@ class CreateCommand extends BaseCommand {
     return switch (opt) {
       'none' => (false, false),
       'single-page' => (true, false),
-      'multi-page' =>
-        !useServer
-            ? usageException("Cannot use multi-page routing in client mode.")
-            : (true, true),
+      'multi-page' => !useServer ? usageException("Cannot use multi-page routing in client mode.") : (true, true),
       _ => () {
         var routing = logger.logger!.confirm('Setup routing for different pages of your site?', defaultValue: true);
         var multiPage = routing && useServer

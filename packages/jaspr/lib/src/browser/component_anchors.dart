@@ -11,18 +11,18 @@ sealed class ComponentAnchor {
 
   final String name;
   final web.Node startNode;
-  late web.Node endNode;
+  late final web.Node endNode;
 }
 
 class ClientComponentAnchor extends ComponentAnchor {
-  ClientComponentAnchor(super.name, super.startNode, this.data);
+  ClientComponentAnchor._(super.name, super.startNode, this.data);
 
-  String? data;
+  final String? data;
   late FutureOr<ClientBuilder> builder;
 
-  late final params = data != null
-      ? jsonDecode(const DomValidator().unescapeMarkerText(data!)) as Map<String, dynamic>
-      : <String, dynamic>{};
+  late final Map<String, Object?> params = data != null
+      ? jsonDecode(const DomValidator().unescapeMarkerText(data!)) as Map<String, Object?>
+      : {};
 
   Future<void> resolve() async {
     var r = await builder;
@@ -52,11 +52,11 @@ List<ClientComponentAnchor> extractClientAnchors(
     final iterator = web.document.createNodeIterator(rootNode, 128 /* NodeFilter.SHOW_COMMENT */);
 
     while ((currNode = iterator.nextNode() as web.Comment?) != null) {
-      final value = currNode!.nodeValue ?? '';
+      final value = currNode!.nodeValue;
+      if (value == null) continue;
 
       // Find client start anchor.
-      var match = _clientStartRegex.firstMatch(value);
-      if (match != null) {
+      if (_clientStartRegex.firstMatch(value) case final match?) {
         assert(
           anchors.isEmpty,
           "Found nested client component anchor, which is not allowed.",
@@ -65,13 +65,12 @@ List<ClientComponentAnchor> extractClientAnchors(
         final name = match.group(1)!;
         final data = match.group(2);
 
-        anchors.add(ClientComponentAnchor(name, currNode, data));
+        anchors.add(ClientComponentAnchor._(name, currNode, data));
         continue;
       }
 
       // Find client end anchor.
-      match = _clientEndRegex.firstMatch(value);
-      if (match != null) {
+      if (_clientEndRegex.firstMatch(value) case final match?) {
         final name = match.group(1)!;
         assert(
           anchors.isNotEmpty && anchors.last.name == name,

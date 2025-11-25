@@ -329,7 +329,7 @@ class DomRenderFragment extends DomRenderObject
   void move(DomRenderObject parent, web.Node targetNode, web.Node? afterNode) {
     assert(parent == this.parent, 'Cannot move fragment to a different parent.');
     assert(isAttached, 'Cannot move fragment that is not attached to a parent.');
-    
+
     if (kVerboseMode) {
       print("Move fragment to $targetNode after $afterNode");
     }

@@ -3,10 +3,10 @@
 - **Breaking** Changed project structure for **static** and **server** mode:
 
   - Any server entrypoint file must now end in `.server.dart` (e.g. `lib/main.server.dart`).
-  - The generated server-side options file is now generated alongside the server entrypoint (e.g. as `lib/main.server.g.dart`) containing `defaultServerOptions`
+  - The generated server-side options file is now generated alongside the server entrypoint (e.g. as `lib/main.server.g.dart`) containing `defaultServerOptions`.
   - `Jaspr.initializeApp()` now requires the `package:jaspr/server.dart` import.
 
-  - The project may contain at least one client entrypoint file ending in `.client.dart` (e.g. `lib/main.client.dart`) for client-side rendering.
+  - The project can contain at least one client entrypoint file ending in `.client.dart` (e.g. `lib/main.client.dart`) for client-side rendering.
   - A new client-side Jaspr options file is generated alongside the client entrypoint (e.g. as `lib/main.client.g.dart`) containing `defaultClientOptions`.
   - Added a new `ClientApp` component that should be used inside the client entrypoint like this:
     ```dart

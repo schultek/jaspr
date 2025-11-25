@@ -5,6 +5,8 @@ import '../framework/framework.dart';
 import 'dom_render_object.dart';
 import 'utils.dart';
 
+/// A slot that attaches a child component to a specific DOM node within
+/// a [SlottedDomNodesComponent].
 abstract class ChildSlot extends Component {
   const ChildSlot();
 
@@ -19,6 +21,8 @@ abstract class ChildSlot extends Component {
   Element createElement() => ChildSlotElement(this);
 }
 
+/// A [ChildSlot] that attaches its child to the first DOM element matching
+/// the given CSS [query].
 class QueryChildSlot extends ChildSlot {
   QueryChildSlot(this.query, {required this.child});
 
@@ -52,7 +56,6 @@ class QueryChildSlot extends ChildSlot {
   }
 }
 
-
 class ChildSlotElement extends MultiChildRenderObjectElement {
   ChildSlotElement(ChildSlot super.component);
 
@@ -83,10 +86,16 @@ class ChildSlotElement extends MultiChildRenderObjectElement {
   void updateRenderObject(RenderObject renderObject) {}
 }
 
+/// Component that renders its children into specified DOM nodes (slots).
+///
+/// Child components are mounted as direct children of this component, but may target
+/// specific nested DOM nodes within the component's DOM subtree. This allows for hydrating
+/// only specific parts of the DOM tree while having a single coherent component tree.
 class SlottedChildView extends Component {
   SlottedChildView({required this.slots, super.key}) : nodes = null;
 
-  // SlottedChildView._withNodes({required List<web.Node> this.nodes, required this.slots});
+  // ignore: unused_element - for future use by server components.
+  SlottedChildView._withNodes({required List<web.Node> this.nodes, required this.slots});
 
   final List<web.Node>? nodes;
   final List<ChildSlot> slots;

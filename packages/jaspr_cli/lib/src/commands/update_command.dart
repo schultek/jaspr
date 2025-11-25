@@ -59,8 +59,10 @@ class UpdateCommand extends BaseCommand {
 
     logger.write('Updated jaspr_cli to $latestVersion.', progress: ProgressState.completed);
 
-    logger.write('There might be automatic code migrations available for your project. '
-    'Run \'jaspr migrate\' to check for available migrations.');
+    logger.write(
+      'There might be automatic code migrations available for your project. '
+      'Run \'jaspr migrate\' to check for available migrations.',
+    );
 
     return 0;
   }

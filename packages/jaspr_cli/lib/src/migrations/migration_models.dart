@@ -1,5 +1,3 @@
-
-
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
@@ -64,7 +62,6 @@ extension MigrationExtension on List<Migration> {
       for (final migration in this) {
         results.addAll(migration.runForDirectory(dir, apply));
       }
-
     }
 
     return results;

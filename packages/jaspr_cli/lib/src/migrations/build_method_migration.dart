@@ -273,8 +273,6 @@ class BuildMethodMigration implements Migration {
             _canMigrateDeclaratively(s.thenStatement) &&
             (s.elseStatement == null || _canMigrateDeclaratively(s.elseStatement!)));
   }
-
-
 }
 
 class BuilderVisitor extends RecursiveAstVisitor<void> {

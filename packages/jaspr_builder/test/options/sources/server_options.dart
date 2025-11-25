@@ -67,9 +67,9 @@ final serverOptionsOutputs = {
       '  styles: () => [...\$styles_global.styles, ...\$styles_global.styles2],\n'
       ');\n'
       '\n'
-      'Map<String, dynamic> _\$component_basicComponent(\$component_basic.Component c) =>\n'
+      'Map<String, Object?> _\$component_basicComponent(\$component_basic.Component c) =>\n'
       '    {\'a\': c.a, \'b\': c.b, \'c\': c.c, \'d\': c.d};\n'
-      'Map<String, dynamic> _\$component_model_extensionComponent(\n'
+      'Map<String, Object?> _\$component_model_extensionComponent(\n'
       '  \$component_model_extension.Component c,\n'
       ') => {\'a\': c.a, \'b\': \$model_extension.ModelBCodec(c.b).toRaw()};\n'
       '',

@@ -59,7 +59,7 @@ class MigrateCommand extends BaseCommand {
     if (dryRun && apply) {
       usageException('Cannot use both --dry-run and --apply at the same time.');
     }
-    
+
     if (currentVersion == null) {
       ensureInProject(requireJasprMode: false, preferBuilderDependency: false);
     }
@@ -72,7 +72,9 @@ class MigrateCommand extends BaseCommand {
         };
 
     if (currentJasprVersion.isEmpty) {
-      usageException('Could not determine current Jaspr version from pubspec.lock. Run with --current-version=x.y.z to set a version manually.');
+      usageException(
+        'Could not determine current Jaspr version from pubspec.lock. Run with --current-version=x.y.z to set a version manually.',
+      );
     }
 
     var targetJasprVersion = targetVersion;

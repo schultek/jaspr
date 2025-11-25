@@ -76,7 +76,9 @@ class EntrypointMigration implements Migration {
         jasprOptionsFile.deleteSync();
       }
       results.add(
-        MigrationResult(jasprOptionsFile.path, [MigrationInstance("Removed 'jaspr_options.dart' file. Run 'jaspr serve' to re-generate.", this)], []),
+        MigrationResult(jasprOptionsFile.path, [
+          MigrationInstance("Removed 'jaspr_options.dart' file. Run 'jaspr serve' to re-generate.", this),
+        ], []),
       );
     }
 
