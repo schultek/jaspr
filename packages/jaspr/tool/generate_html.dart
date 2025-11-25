@@ -183,10 +183,11 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
       content.write('    events: ');
 
       if (events.isNotEmpty) {
+        final needsTypeArgs = events.length == 1 && events.first == 'onClick';
         content.write(
           '{\n'
           '      ...?events,\n'
-          '      ..._events(${events.map((e) => '$e: $e').join(', ')}),\n'
+          '      ..._events${needsTypeArgs ? '<void, void>' : ''}(${events.map((e) => '$e: $e').join(', ')}),\n'
           '    },\n',
         );
       } else {

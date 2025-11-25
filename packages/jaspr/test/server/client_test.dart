@@ -34,7 +34,7 @@ class _App3State extends State<App3> with SyncStateMixin<App3, Map<String, Objec
   int count = 3;
 
   @override
-  Map<String, int> getState() {
+  Map<String, Object?> getState() {
     return {'count': count};
   }
 
@@ -66,7 +66,7 @@ class _App4State extends State<App4> with SyncStateMixin<App4, Map<String, Objec
   }
 
   @override
-  Map<String, String> getState() {
+  Map<String, Object?> getState() {
     return {'label': label};
   }
 
