@@ -10,7 +10,7 @@ import '../../utils/track_state_lifecycle.dart';
 class MyInheritedComponent extends InheritedComponent {
   MyInheritedComponent({required this.value, required super.child});
 
-  final dynamic value;
+  final int value;
 
   @override
   bool updateShouldNotify(covariant MyInheritedComponent oldComponent) {
@@ -26,7 +26,7 @@ class MyChildComponent extends StatefulComponent {
 }
 
 class MyChildState extends State<MyChildComponent> with TrackStateLifecycle<MyChildComponent> {
-  dynamic inheritedValue;
+  int? inheritedValue;
 
   @override
   void didChangeDependencies() {

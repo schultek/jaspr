@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_dynamic_calls
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -31,7 +33,9 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
       }
 
       allTags.add(tag);
-      content.write('\n${data['doc'].split('\n').map((t) => '/// $t\n').join()}');
+
+      final doc = data['doc'] as String;
+      content.write('\n${doc.split('\n').map((t) => '/// $t\n').join()}');
 
       var attrs = data['attributes'] as Map<String, dynamic>?;
 
@@ -97,7 +101,7 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
             content.write(name);
           } else if (type == 'content') {
             content.write('String');
-            contentParam = name;
+            contentParam = name as String;
           } else {
             throw ArgumentError('Attribute type is unknown ($type) for attribute $key.$tag.$attr');
           }
@@ -179,10 +183,11 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
       content.write('    events: ');
 
       if (events.isNotEmpty) {
+        final needsTypeArgs = events.length == 1 && events.first == 'onClick';
         content.write(
           '{\n'
           '      ...?events,\n'
-          '      ..._events(${events.map((e) => '$e: $e').join(', ')}),\n'
+          '      ..._events${needsTypeArgs ? '<void, void>' : ''}(${events.map((e) => '$e: $e').join(', ')}),\n'
           '    },\n',
         );
       } else {
@@ -208,8 +213,9 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
             if (type['values'] != null) {
               final name = type['name'] as String;
               final values = type['values'] as Map<String, dynamic>;
+              final doc = type['doc'] as String;
 
-              content.write('\n${type['doc'].split('\n').map((t) => '/// $t\n').join()}');
+              content.write('\n${doc.split('\n').map((t) => '/// $t\n').join()}');
 
               content.write('enum $name {\n');
 

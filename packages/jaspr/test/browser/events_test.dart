@@ -29,8 +29,8 @@ void main() {
       tester.pumpComponent(
         input(
           type: InputType.checkbox,
-          onInput: (value) => checkedInput = value,
-          onChange: (value) => checkedChange = value,
+          onInput: (value) => checkedInput = value as bool,
+          onChange: (value) => checkedChange = value as bool,
         ),
       );
 
@@ -48,8 +48,8 @@ void main() {
       tester.pumpComponent(
         input(
           type: InputType.number,
-          onInput: (value) => numberInput = value,
-          onChange: (value) => numberChange = value,
+          onInput: (value) => numberInput = value as double,
+          onChange: (value) => numberChange = value as double,
         ),
       );
 
@@ -65,7 +65,11 @@ void main() {
       String textChange = "";
 
       tester.pumpComponent(
-        input(type: InputType.text, onInput: (value) => textInput = value, onChange: (value) => textChange = value),
+        input(
+          type: InputType.text,
+          onInput: (value) => textInput = value as String,
+          onChange: (value) => textChange = value as String,
+        ),
       );
 
       await tester.input(find.tag('input'), value: "Hello");
