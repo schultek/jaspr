@@ -337,7 +337,9 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
                 if (!selfClosing) {
                   content.write('    children: children,\n');
                 } else if (contentParam != null) {
-                  content.write('    children: [if ($contentParam case final $contentParam?) RawText($contentParam)],\n');
+                  content.write(
+                    '    children: [if ($contentParam case final $contentParam?) RawText($contentParam)],\n',
+                  );
                 }
 
                 content.writeln('  );');

@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 import '../../../constants/theme.dart';
 import 'items/0_develop.dart';
@@ -12,8 +12,8 @@ class DevExp extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return section(id: 'devex', [
-      span(classes: 'caption text-gradient', [text('Developer Experience')]),
-      h2([text('The productivity of Dart'), br(), text('brought to the Web')]),
+      span(classes: 'caption text-gradient', [.text('Developer Experience')]),
+      h2([.text('The productivity of Dart'), br(), .text('brought to the Web')]),
       div(classes: 'devex-grid', [
         div([Develop(), Run()]),
         div([Integrate(), Analyze()]),
@@ -25,31 +25,31 @@ class DevExp extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('#devex', [
       css('&').styles(
-        display: Display.flex,
-        padding: Padding.only(top: sectionPadding),
-        flexDirection: FlexDirection.column,
-        alignItems: AlignItems.center,
-        textAlign: TextAlign.center,
+        display: .flex,
+        padding: .only(top: sectionPadding),
+        flexDirection: .column,
+        alignItems: .center,
+        textAlign: .center,
       ),
       css('.devex-grid', [
         css('&').styles(
-          display: Display.flex,
+          display: .flex,
           maxWidth: maxContentWidth,
-          padding: Padding.symmetric(horizontal: contentPadding),
-          margin: Margin.only(top: 3.rem),
-          flexDirection: FlexDirection.column,
-          gap: Gap(row: 3.rem),
+          padding: .symmetric(horizontal: contentPadding),
+          margin: .only(top: 3.rem),
+          flexDirection: .column,
+          gap: .row(3.rem),
         ),
         css('& > div', [
           css('&').styles(
-            display: Display.flex,
-            flexDirection: FlexDirection.row,
-            flexWrap: FlexWrap.wrap,
-            gap: Gap.all(3.rem),
+            display: .flex,
+            flexDirection: .row,
+            flexWrap: .wrap,
+            gap: .all(3.rem),
           ),
-          css('& > *').styles(flex: Flex(grow: 1, shrink: 1, basis: 16.rem)),
-          css('&:first-child > *:first-child').styles(flex: Flex(basis: 30.rem)),
-          css('&:last-child > *:last-child').styles(flex: Flex(basis: 30.rem)),
+          css('& > *').styles(flex: .new(grow: 1, shrink: 1, basis: 16.rem)),
+          css('&:first-child > *:first-child').styles(flex: .basis(30.rem)),
+          css('&:last-child > *:last-child').styles(flex: .basis(30.rem)),
         ]),
       ]),
     ]),

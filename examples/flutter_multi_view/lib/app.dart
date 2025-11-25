@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
 import 'components/counter.dart';
@@ -45,7 +45,7 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
 
   @override
   Component build(BuildContext context) {
-    return fragment([
+    return .fragment([
       div(classes: 'main', [
         img(src: 'images/logo.svg', width: 80),
         div(classes: 'buttons', [
@@ -53,25 +53,25 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
             onClick: () {
               removeCounter();
             },
-            [text('Less Counters')],
+            [.text('Less Counters')],
           ),
           button(
             onClick: () {
               addCounter();
             },
-            [text('More Counters')],
+            [.text('More Counters')],
           ),
         ]),
         div(classes: 'counters', [for (var name in counters) Counter(name: name)]),
       ]),
-      footer([
-        text('💙 Built with '),
-        a(href: "https://github.com/schultek/jaspr", [text('Jaspr')]),
-        text(' by '),
-        a(href: "https://x.com/schultek_dev", [text('@schultek')]),
-        text(' 💙'),
+      const footer([
+        .text('💙 Built with '),
+        a(href: "https://github.com/schultek/jaspr", [.text('Jaspr')]),
+        .text(' by '),
+        a(href: "https://x.com/schultek_dev", [.text('@schultek')]),
+        .text(' 💙'),
         br(),
-        a(href: "https://github.com/schultek/jaspr/tree/main/examples/flutter_multi_view", [text('See the code')]),
+        a(href: "https://github.com/schultek/jaspr/tree/main/examples/flutter_multi_view", [.text('See the code')]),
       ]),
     ]);
   }
@@ -80,37 +80,40 @@ class AppState extends State<App> with ViewTransitionMixin<App> {
   static List<StyleRule> get styles => [
     css('.main', [
       css('&').styles(
-        display: Display.flex,
+        display: .flex,
         minHeight: 80.vh,
-        flexDirection: FlexDirection.column,
-        alignItems: AlignItems.center,
+        flexDirection: .column,
+        alignItems: .center,
       ),
       css('.buttons', [
-        css('&').styles(display: Display.flex, flexDirection: FlexDirection.row),
+        css('&').styles(display: .flex, flexDirection: .row),
         css('button').styles(
-          padding: Padding.all(8.px),
-          border: Border(color: primaryColor, width: 1.px),
+          padding: .all(8.px),
+          border: .all(color: primaryColor, width: 1.px),
         ),
         css('button:first-child').styles(
-          margin: Margin.only(right: (-1).px),
-          radius: BorderRadius.horizontal(left: Radius.circular(6.px)),
+          margin: .only(right: (-1).px),
+          radius: .horizontal(left: .circular(6.px)),
         ),
         css('button:last-child').styles(
-          margin: Margin.only(left: (-1).px),
-          radius: BorderRadius.horizontal(right: Radius.circular(6.px)),
+          margin: .only(left: (-1).px),
+          radius: .horizontal(right: .circular(6.px)),
         ),
       ]),
       css('.counters', [
         css('&').styles(
-          display: Display.flex,
-          flexDirection: FlexDirection.row,
-          flexWrap: FlexWrap.wrap,
-          justifyContent: JustifyContent.center,
+          display: .flex,
+          flexDirection: .row,
+          flexWrap: .wrap,
+          justifyContent: .center,
         ),
       ]),
     ]),
-    css(
-      'footer',
-    ).styles(margin: Margin.all(40.px), textAlign: TextAlign.center, fontSize: 12.px, fontStyle: FontStyle.italic),
+    css('footer').styles(
+      margin: .all(40.px),
+      textAlign: .center,
+      fontSize: 12.px,
+      fontStyle: .italic,
+    ),
   ];
 }

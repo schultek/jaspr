@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:markdown/markdown.dart';
 
 import '../constants/theme.dart';
@@ -18,9 +18,9 @@ class MarkdownPage extends StatelessComponent {
     final content = file.readAsStringSync();
     final html = markdownToHtml(content);
 
-    return fragment([
+    return Component.fragment([
       Header(showHome: true),
-      main_(classes: 'markdown-content', [raw(html)]),
+      main_(classes: 'markdown-content', [RawText(html)]),
       Footer(),
     ]);
   }
@@ -30,9 +30,9 @@ class MarkdownPage extends StatelessComponent {
     css('.markdown-content', [
       css('&').styles(
         minHeight: 50.vh,
-        padding: Padding.only(top: 8.rem, left: contentPadding, right: contentPadding, bottom: 4.rem),
+        padding: .only(top: 8.rem, left: contentPadding, right: contentPadding, bottom: 4.rem),
       ),
-      css('h3').styles(margin: Margin.only(top: 3.rem)),
+      css('h3').styles(margin: .only(top: 3.rem)),
     ]),
   ];
 }

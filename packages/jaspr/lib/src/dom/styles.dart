@@ -5,7 +5,7 @@ import 'styles/rules.dart';
 export 'styles/css.dart' show css;
 export 'styles/rules.dart' show StyleRule, MediaQuery, Orientation, ColorScheme, Contrast;
 export 'styles/selector.dart' show Selector, SelectorMixin, AttrCheck, Combinator;
-export 'styles/styles.dart' ;
+export 'styles/styles.dart';
 
 /// Renders the provided [StyleRule]s into css and wraps them
 /// with a &lt;style&gt; element.

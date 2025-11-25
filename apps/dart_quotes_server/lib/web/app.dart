@@ -1,4 +1,4 @@
-import 'package:jaspr/server.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
 import 'pages/home_page.dart';
@@ -7,7 +7,7 @@ import 'pages/quote_page.dart';
 class App extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return fragment([
+    return .fragment([
       div(classes: 'main', [
         Router(
           routes: [
@@ -33,11 +33,11 @@ class App extends StatelessComponent {
     css('.main').styles(
       minHeight: 100.vh,
       maxWidth: 500.px,
-      padding: Padding.symmetric(horizontal: 2.em),
-      margin: Margin.all(Unit.auto),
+      padding: .symmetric(horizontal: 2.em),
+      margin: .all(.auto),
     ),
     css('.github-badge').styles(
-      position: Position.absolute(top: 0.px, right: 0.px),
+      position: .absolute(top: 0.px, right: 0.px),
     ),
   ];
 }

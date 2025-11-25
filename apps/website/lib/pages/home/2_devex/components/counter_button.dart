@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 import '../../../../components/link_button.dart';
 import '../../../../components/particles.dart';
@@ -50,19 +50,19 @@ class CounterButtonState extends State<CounterButton> {
   Component build(BuildContext context) {
     return div(classes: 'counter-container', [
       Particles(particles: particles),
-      Component.wrapElement(
+      .wrapElement(
         events: {
           'click': (event) {
             event.preventDefault();
             increment();
           },
         },
-        styles: Styles(width: 10.em, textAlign: TextAlign.center, whiteSpace: WhiteSpace.noWrap),
+        styles: Styles(width: 10.em, textAlign: .center, whiteSpace: .noWrap),
         child: LinkButton.filled(label: 'Clicked $count times', to: ''),
       ),
     ]);
   }
 
   @css
-  static List<StyleRule> get styles => [css('.counter-container').styles(position: Position.relative())];
+  static List<StyleRule> get styles => [css('.counter-container').styles(position: .relative())];
 }

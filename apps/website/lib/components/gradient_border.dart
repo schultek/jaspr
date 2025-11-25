@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 import '../constants/theme.dart';
 
@@ -14,16 +14,16 @@ class GradientBorder extends StatelessComponent {
     return div(classes: 'gradient-border-container${fixed ? ' fixed' : ''}', [
       div(classes: 'gradient-border', [
         svg(width: 100.percent, height: 100.percent, [
-          Component.element(
+          .element(
             tag: 'defs',
             children: [
-              Component.element(
+              .element(
                 tag: 'linearGradient',
                 attributes: {'id': 'linear', 'x1': '0%', 'y1': '0%', 'x2': '100%', 'y2': '100%'},
                 children: [
-                  Component.element(tag: 'stop', attributes: {'offset': '0%', 'stop-color': primaryDark.value}),
-                  Component.element(tag: 'stop', attributes: {'offset': '50%', 'stop-color': primaryMid.value}),
-                  Component.element(tag: 'stop', attributes: {'offset': '100%', 'stop-color': primaryLight.value}),
+                  .element(tag: 'stop', attributes: {'offset': '0%', 'stop-color': primaryDark.value}),
+                  .element(tag: 'stop', attributes: {'offset': '50%', 'stop-color': primaryMid.value}),
+                  .element(tag: 'stop', attributes: {'offset': '100%', 'stop-color': primaryLight.value}),
                 ],
               ),
             ],
@@ -52,15 +52,15 @@ class GradientBorder extends StatelessComponent {
   @css
   static List<StyleRule> get styles => [
     css('.gradient-border-container', [
-      css('&').styles(position: Position.relative(), height: 100.percent),
+      css('&').styles(position: .relative(), height: 100.percent),
       css('.gradient-border', [
         css('&').styles(
-          position: Position.absolute(top: (-1).px, left: (-1).px, right: (-1).px, bottom: (-1).px),
+          position: .absolute(top: (-1).px, left: (-1).px, right: (-1).px, bottom: (-1).px),
         ),
-        css('svg').styles(overflow: Overflow.visible),
+        css('svg').styles(overflow: .visible),
       ]),
       css('rect').styles(
-        transition: Transition('stroke-dasharray', duration: 300.ms, curve: Curve.easeOut),
+        transition: .new('stroke-dasharray', duration: 300.ms, curve: .easeOut),
         raw: {'stroke-dasharray': '0 101'},
       ),
       css('&:hover rect, &.fixed rect').styles(raw: {'stroke-dasharray': '50 0 52'}),

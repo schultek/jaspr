@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 import '../constants/theme.dart';
 
@@ -25,13 +25,13 @@ class Particles extends StatelessComponent {
   Component build(BuildContext context) {
     return svg(classes: 'particles', [
       for (final particle in particles)
-        Component.element(
+        .element(
           key: ValueKey(particle.id),
           tag: 'g',
           styles: Styles(
-            transform: Transform.combine([
-              Transform.translate(x: particle.dx.percent, y: particle.dy.percent),
-              Transform.rotate(particle.angle.deg),
+            transform: .combine([
+              .translate(x: particle.dx.percent, y: particle.dy.percent),
+              .rotate(particle.angle.deg),
             ]),
             raw: {'--particle-offset': '${particle.offset}px'},
           ),
@@ -44,18 +44,18 @@ class Particles extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('svg.particles', [
       css('&').styles(
-        position: Position.absolute(top: Unit.zero, left: Unit.zero),
+        position: .absolute(top: .zero, left: .zero),
         width: 100.percent,
         height: 100.percent,
-        overflow: Overflow.visible,
-        pointerEvents: PointerEvents.none,
+        overflow: .visible,
+        pointerEvents: .none,
       ),
       css('circle').styles(raw: {'animation': 'particle 1s linear forwards'}),
     ]),
     css.keyframes('particle', {
-      '0%': Styles(transform: Transform.translate(y: 0.px)),
+      '0%': Styles(transform: .translate(y: 0.px)),
       '90%': Styles(opacity: 1),
-      '100%': Styles(opacity: 0, transform: Transform.translate(x: Unit.variable('--particle-offset'))),
+      '100%': Styles(opacity: 0, transform: .translate(x: .variable('--particle-offset'))),
     }),
   ];
 }

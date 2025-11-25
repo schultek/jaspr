@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 @client
 class Hello extends StatelessComponent {
@@ -8,6 +8,6 @@ class Hello extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return p([text('Hello $name')]);
+    return p([.text('Hello $name')]);
   }
 }

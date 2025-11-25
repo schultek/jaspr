@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../../../../components/link_button.dart';
@@ -66,7 +66,7 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
         );
       } else {
         children.add(
-          Component.wrapElement(
+          .wrapElement(
             events: {
               'click': (event) {
                 event.preventDefault();
@@ -80,12 +80,12 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
         );
       }
 
-      return fragment(children);
+      return .fragment(children);
     }
 
     children.add(
       div(id: 'meet-jaspr-button', [
-        Component.wrapElement(
+        .wrapElement(
           classes: touchTimer != null ? 'active' : null,
           events: {
             'mousemove': (event) {
@@ -129,12 +129,12 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
         Particles(particles: notifier.particles),
       ]),
     );
-    return fragment(children);
+    return .fragment(children);
   }
 
   @css
   static List<StyleRule> get styles => [
-    css('#meet-jaspr-button', [css('&').styles(position: Position.relative())]),
+    css('#meet-jaspr-button', [css('&').styles(position: .relative())]),
   ];
 }
 

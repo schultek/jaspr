@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../providers/app_state_provider.dart';
@@ -16,9 +16,9 @@ class _InteropControlsState extends State<InteropControls> {
     var state = context.watch(appStateProvider);
 
     return fieldset(id: 'interop', [
-      legend([text('JS Interop')]),
+      legend([.text('JS Interop')]),
       label(htmlFor: 'screen-selector', [
-        text('Screen'),
+        .text('Screen'),
         select(
           name: 'screen-select',
           id: 'screen-selector',
@@ -27,21 +27,21 @@ class _InteropControlsState extends State<InteropControls> {
             context.read(appStateProvider.notifier).changeDemoScreenTo(DemoScreen.values.byName(value.first));
           },
           [
-            option(value: 'counter', [text('Counter')]),
-            option(value: 'textField', [text('TextField')]),
-            option(value: 'custom', [text('Custom App')]),
+            option(value: 'counter', [.text('Counter')]),
+            option(value: 'textField', [.text('TextField')]),
+            option(value: 'custom', [.text('Custom App')]),
           ],
         ),
       ]),
-      label(htmlFor: 'value', classes: state.currentScreen != DemoScreen.counter ? 'disabled' : null, [
-        text('Value'),
-        input(id: 'value', value: state.count.toString(), type: InputType.text, attributes: {'readonly': ''}),
+      label(htmlFor: 'value', classes: state.currentScreen != .counter ? 'disabled' : null, [
+        .text('Value'),
+        input(id: 'value', value: state.count.toString(), type: .text, attributes: {'readonly': ''}),
       ]),
       input(
         id: 'increment',
         value: 'Increment',
-        type: InputType.button,
-        classes: state.currentScreen != DemoScreen.counter ? 'disabled' : null,
+        type: .button,
+        classes: state.currentScreen != .counter ? 'disabled' : null,
         events: events(
           onClick: () {
             context.read(appStateProvider.notifier).increment();

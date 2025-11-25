@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 import '../models/session.dart';
 import 'session_card.dart';
@@ -11,7 +11,7 @@ class SessionList extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    var groups = sessions.groupListsBy((s) => s.startsAt);
+    var groups = sessions.groupListsBy((session) => session.startsAt);
 
     return ul(classes: "sessions", [
       for (final MapEntry(value: sessions) in groups.entries)
@@ -25,15 +25,15 @@ class SessionList extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('.sessions', [
       css('&').styles(
-        padding: Padding.symmetric(horizontal: 40.px),
-        listStyle: ListStyle.none,
+        padding: .symmetric(horizontal: 40.px),
+        listStyle: .none,
       ),
-      css('li').styles(margin: Margin.only(bottom: 8.px)),
+      css('li').styles(margin: .only(bottom: 8.px)),
       css('.group').styles(
-        padding: Padding.only(left: 8.px, right: 8.px, top: 8.px),
-        margin: Margin.symmetric(vertical: 20.px),
-        border: Border(style: BorderStyle.dashed, color: Colors.gray),
-        radius: BorderRadius.circular(8.px),
+        padding: .only(left: 8.px, right: 8.px, top: 8.px),
+        margin: .symmetric(vertical: 20.px),
+        border: .all(style: .dashed, color: Colors.gray),
+        radius: .circular(8.px),
       ),
     ]),
   ];

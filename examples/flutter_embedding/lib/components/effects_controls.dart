@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../providers/effects_provider.dart';
@@ -13,7 +13,7 @@ class EffectsControls extends StatelessComponent {
     Component effectButton(String label, String fx, [bool alignTop = false]) {
       return input(
         value: label,
-        type: InputType.button,
+        type: .button,
         classes:
             'fx'
             '${alignTop ? ' align-top' : ''}'
@@ -41,7 +41,7 @@ class EffectsControls extends StatelessComponent {
         },
       },
       [
-        legend([text('Effects')]),
+        legend([.text('Effects')]),
         effectButton('Shadow', 'shadow'),
         effectButton('Mirror 🧪', 'mirror'),
         effectButton('Resize', 'resize', true),
@@ -49,7 +49,7 @@ class EffectsControls extends StatelessComponent {
           effectButton('Spin', 'spin'),
           input(
             value: context.watch(rotationProvider).toString(),
-            type: InputType.range,
+            type: .range,
             id: 'rotation',
             classes: 'tight${effects.contains('handheld') ? ' disabled' : ''}',
             attributes: {'min': '-180', 'max': '180', 'list': 'markers'},

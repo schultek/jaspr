@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
 import 'components/banner.dart';
@@ -17,7 +17,7 @@ class App extends StatelessComponent {
       routes: [
         Route(
           path: '/',
-          builder: (_, _) => fragment([
+          builder: (_, _) => .fragment([
             Banner(),
             Header(),
             main_([Home()]),
@@ -32,8 +32,8 @@ class App extends StatelessComponent {
 
   @css
   static List<StyleRule> get styles => [
-    css('main').styles(overflow: Overflow.hidden),
-    css('section').styles(position: Position.relative()),
+    css('main').styles(overflow: .hidden),
+    css('section').styles(position: .relative()),
     css('#hero:before').combine(backgroundShade(40.vh, (-20).vw, w: 80.vw, h: 160.vh)),
     css('#devex:before').combine(backgroundShade(10.vh, 20.vw, w: 80.vw, h: 60.vh)),
     css('#testimonials:before').combine(backgroundShade((-10).vh, (-10).vw, w: 60.vw, h: 60.vh)),
@@ -43,11 +43,11 @@ class App extends StatelessComponent {
   static Styles backgroundShade(Unit top, Unit left, {Unit? w, Unit? h, Unit? b, Unit? r}) {
     return Styles(
       content: '',
-      position: Position.absolute(top: top, left: left, right: r, bottom: b),
-      zIndex: ZIndex(-1),
+      position: .absolute(top: top, left: left, right: r, bottom: b),
+      zIndex: .new(-1),
       width: w,
       height: h,
-      radius: BorderRadius.circular(100.percent),
+      radius: .circular(100.percent),
       opacity: 0.05,
       raw: {'filter': 'blur(64px)', '-webkit-filter': 'blur(64px)', 'background': primaryGradient},
     );

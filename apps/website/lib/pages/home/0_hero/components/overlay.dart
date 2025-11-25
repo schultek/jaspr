@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../../../../constants/theme.dart';
@@ -62,9 +62,9 @@ class OverlayState extends State<Overlay> {
       [
         img(src: 'images/jasper_resized/$currentImage.webp', alt: 'Jasper'),
         span([
-          text('Click anywhere to see another image.'),
+          .text('Click anywhere to see another image.'),
           br(),
-          text('Press ESC or click '),
+          .text('Press ESC or click '),
           a(
             href: '',
             events: {
@@ -73,9 +73,9 @@ class OverlayState extends State<Overlay> {
                 component.onClose();
               },
             },
-            [text('here')],
+            [.text('here')],
           ),
-          text(' to close.'),
+          .text(' to close.'),
         ]),
       ],
     );
@@ -85,13 +85,13 @@ class OverlayState extends State<Overlay> {
   static List<StyleRule> get styles => [
     css('.blur-backdrop', [
       css('&').styles(
-        display: Display.flex,
-        position: Position.fixed(top: Unit.zero, left: Unit.zero, right: Unit.zero, bottom: Unit.zero),
-        zIndex: ZIndex(1),
-        userSelect: UserSelect.none,
-        flexDirection: FlexDirection.column,
-        justifyContent: JustifyContent.center,
-        alignItems: AlignItems.center,
+        display: .flex,
+        position: .fixed(top: .zero, left: .zero, right: .zero, bottom: .zero),
+        zIndex: .new(1),
+        userSelect: .none,
+        flexDirection: .column,
+        justifyContent: .center,
+        alignItems: .center,
         backgroundColor: backgroundFaded,
         raw: {'backdrop-filter': 'blur(5px)', '-webkit-backdrop-filter': 'blur(5px)'},
       ),
@@ -99,15 +99,15 @@ class OverlayState extends State<Overlay> {
         css('&').styles(
           maxWidth: 80.percent,
           maxHeight: 80.percent,
-          radius: BorderRadius.circular(20.px),
-          pointerEvents: PointerEvents.none,
+          radius: .circular(20.px),
+          pointerEvents: .none,
           raw: {'object-fit': 'cover'},
         ),
       ]),
       css('span')
           .styles(
-            display: Display.inlineBlock,
-            margin: Margin.only(top: 1.rem),
+            display: .inlineBlock,
+            margin: .only(top: 1.rem),
           )
           .combine(bodySmall),
     ]),

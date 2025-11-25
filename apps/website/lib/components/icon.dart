@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 class Icon extends StatelessComponent {
   const Icon(this.name, {this.size, super.key});
@@ -17,7 +17,7 @@ class Icon extends StatelessComponent {
           styles: Styles(height: size ?? 1.2.em),
         ),
       );
-      return fragment(children);
+      return .fragment(children);
     } else if (name == 'dart') {
       children.add(
         img(
@@ -26,7 +26,7 @@ class Icon extends StatelessComponent {
           styles: Styles(height: size ?? 1.2.em),
         ),
       );
-      return fragment(children);
+      return .fragment(children);
     }
     children.add(
       i(
@@ -35,7 +35,7 @@ class Icon extends StatelessComponent {
         [],
       ),
     );
-    return fragment(children);
+    return .fragment(children);
   }
 
   @css
@@ -43,7 +43,7 @@ class Icon extends StatelessComponent {
     css('[class^=icon-custom-]').styles(
       width: 1.em,
       height: 1.em,
-      color: Color.inherit,
+      color: .inherit,
       raw: {
         '-webkit-mask': 'var(--icon) no-repeat',
         'mask': 'var(--icon) no-repeat',

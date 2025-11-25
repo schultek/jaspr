@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 import '../models/session.dart';
 import 'like_button.dart';
@@ -13,9 +13,9 @@ class SessionCard extends StatelessComponent {
   Component build(BuildContext context) {
     return a(href: '/${session.slug}', classes: "session-card", [
       LikeButton(session: session),
-      span([text(session.timeFormatted)]),
-      h2([text(session.title)]),
-      p([text(session.speakers.map((s) => s.name).join(', '))]),
+      span([.text(session.timeFormatted)]),
+      h2([.text(session.title)]),
+      p([.text(session.speakers.map((sp) => sp.name).join(', '))]),
       div([Tag(label: session.room), Tag(label: session.format), Tag(label: session.durationFormatted)]),
     ]);
   }
@@ -24,23 +24,23 @@ class SessionCard extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('.session-card', [
       css('&').styles(
-        display: Display.block,
-        position: Position.relative(),
-        padding: Padding.all(16.px),
-        border: Border(),
-        radius: BorderRadius.all(Radius.circular(12.px)),
-        color: Color.initial,
-        textDecoration: TextDecoration(line: TextDecorationLine.none),
+        display: .block,
+        position: .relative(),
+        padding: .all(16.px),
+        border: .none,
+        radius: .all(.circular(12.px)),
+        color: .initial,
+        textDecoration: .new(line: .none),
       ),
       css('&:hover').styles(backgroundColor: Color('#0001')),
       css('span').styles(fontSize: 0.7.em),
       css('h2').styles(
-        margin: Margin.symmetric(vertical: 4.px),
+        margin: .symmetric(vertical: 4.px),
         fontSize: 1.2.em,
       ),
-      css('div').styles(display: Display.flex),
+      css('div').styles(display: .flex),
       css('button').styles(
-        position: Position.absolute(right: 10.px, top: 10.px),
+        position: .absolute(right: 10.px, top: 10.px),
       ),
     ]),
   ];

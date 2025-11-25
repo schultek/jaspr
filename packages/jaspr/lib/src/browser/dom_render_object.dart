@@ -3,9 +3,8 @@ import 'dart:js_interop';
 
 import 'package:universal_web/web.dart' as web;
 
-import '../foundation/constants.dart';
-import '../dom/events.dart';
 import '../dom/type_checks.dart';
+import '../foundation/constants.dart';
 import '../framework/framework.dart';
 import 'utils.dart';
 

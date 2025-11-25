@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 @client
 class Counter extends StatefulComponent {
@@ -13,15 +13,15 @@ class _CounterState extends State<Counter> {
 
   @override
   Component build(BuildContext context) {
-    return fragment([
-      span([text("Count: $counter ")]),
+    return .fragment([
+      span([.text("Count: $counter ")]),
       button(
         onClick: () {
           setState(() {
             counter++;
           });
         },
-        [text("Increase")],
+        [.text("Increase")],
       ),
     ]);
   }

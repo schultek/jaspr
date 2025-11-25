@@ -1,5 +1,5 @@
 import 'package:highlight/highlight.dart' show Node, Result, highlight;
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 import '../../constants/theme.dart';
 import 'theme.dart';
@@ -41,9 +41,9 @@ class CodeBlock extends StatelessComponent {
           span(classes: 'lines ${selectable ? 'selectable' : ''}', [
             for (var i = 0; i < lines.length; i++) ...[
               span(classes: 'line ${lineClasses[i] ?? ''}', [
-                span(classes: 'line-number', [text('${i + 1}')]),
-                span([raw(lines[i])]),
-                raw('&nbsp;'),
+                span(classes: 'line-number', [.text('${i + 1}')]),
+                span([RawText(lines[i])]),
+                RawText('&nbsp;'),
               ]),
               br(),
             ],
@@ -56,19 +56,19 @@ class CodeBlock extends StatelessComponent {
   @css
   static List<StyleRule> get styles => [
     css('.code-block', [
-      css('&').styles(display: Display.flex),
+      css('&').styles(display: .flex),
       css('pre', [
         css('&').styles(
-          position: Position.relative(),
-          width: Unit.zero,
-          padding: Padding.only(left: 3.em),
-          margin: Margin.zero,
-          flex: Flex(grow: 1),
+          position: .relative(),
+          width: .zero,
+          padding: .only(left: 3.em),
+          margin: .zero,
+          flex: .grow(1),
         ),
         css('&::before').styles(
           content: '',
-          display: Display.block,
-          position: Position.absolute(left: Unit.zero),
+          display: .block,
+          position: .absolute(left: .zero),
           width: 3.em,
           height: 100.percent,
           backgroundColor: surfaceLow,
@@ -76,34 +76,34 @@ class CodeBlock extends StatelessComponent {
         css('code', [
           css('&')
               .styles(
-                display: Display.inlineBlock,
+                display: .inlineBlock,
                 width: 100.percent,
-                padding: Padding.only(top: 0.5.em, bottom: 0.5.em, right: 0.5.em),
-                boxSizing: BoxSizing.borderBox,
-                overflow: Overflow.only(x: Overflow.hidden),
-                textAlign: TextAlign.start,
+                padding: .only(top: 0.5.em, bottom: 0.5.em, right: 0.5.em),
+                boxSizing: .borderBox,
+                overflow: .only(x: .hidden),
+                textAlign: .start,
                 backgroundColor: surfaceLowest,
               )
               .combine(jasprTheme['root']!),
-          css('&.scroll').styles(overflow: Overflow.only(x: Overflow.scroll)),
+          css('&.scroll').styles(overflow: .only(x: .scroll)),
         ]),
         css('.lines', [
-          css('&').styles(display: Display.inlineBlock, minWidth: 100.percent),
+          css('&').styles(display: .inlineBlock, minWidth: 100.percent),
           css('.line', [
             css('&').styles(
-              display: Display.inlineBlock,
+              display: .inlineBlock,
               width: 100.percent,
-              padding: Padding.only(left: .5.em),
+              padding: .only(left: .5.em),
             ),
             css('.line-number').styles(
-              display: Display.inlineBlock,
-              position: Position.absolute(left: Unit.zero),
+              display: .inlineBlock,
+              position: .absolute(left: .zero),
               width: 3.em,
-              padding: Padding.only(right: 0.6.em),
-              boxSizing: BoxSizing.borderBox,
+              padding: .only(right: 0.6.em),
+              boxSizing: .borderBox,
               opacity: 0.5,
               color: textBlack,
-              textAlign: TextAlign.right,
+              textAlign: .right,
             ),
           ]),
           css('&.selectable .line:hover', [
