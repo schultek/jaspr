@@ -16,7 +16,7 @@ dependencies:
   googleapis_auth: ^2.0.0
   http: ^1.2.1
   jaspr: ^0.21.0
-  jaspr_riverpod: ^0.3.21
+  jaspr_riverpod: ^0.4.1
   markdown: ^7.1.1
   mdc_web: ^0.6.0
   path: ^1.9.0
@@ -33,10 +33,6 @@ dev_dependencies:
   jaspr_test: ^0.21.0
   lints: ^5.0.0
   test: ^1.25.0
-
-dependency_overrides: 
-  jaspr_riverpod:
-    path: ../../packages/jaspr_riverpod
 
 jaspr:
   mode: server
