@@ -7,10 +7,10 @@ import 'package:shelf_router/shelf_router.dart';
 
 import 'components/app.dart';
 import 'components/hello.dart';
-import 'jaspr_options.dart';
+import 'main.server.g.dart';
 
 void main() async {
-  Jaspr.initializeApp(options: defaultJasprOptions);
+  Jaspr.initializeApp(options: defaultServerOptions);
 
   HttpServer? server;
 

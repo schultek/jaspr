@@ -1,10 +1,10 @@
 import 'package:jaspr/server.dart';
 
 import 'app.dart';
-import 'jaspr_options.dart';
+import 'main.server.g.dart';
 
 void main() {
-  Jaspr.initializeApp(options: defaultJasprOptions);
+  Jaspr.initializeApp(options: defaultServerOptions);
 
   runApp(
     Document(

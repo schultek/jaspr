@@ -1,11 +1,11 @@
 import 'package:jaspr/server.dart';
 
 import 'components/app.dart';
-import 'jaspr_options.dart';
+import 'main.server.g.dart';
 
 /// The server entrypoint for the jaspr app.
 void main() {
-  Jaspr.initializeApp(options: defaultJasprOptions);
+  Jaspr.initializeApp(options: defaultServerOptions);
 
   runApp(
     Document(

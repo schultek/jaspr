@@ -53,7 +53,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     );
     argParser.addFlag(
       'skip-server',
-      help: 'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable.',
+      help:
+          'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable.',
       negatable: false,
       defaultsTo: false,
     );

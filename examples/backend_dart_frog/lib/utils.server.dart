@@ -1,8 +1,8 @@
-/// Utilities for using Jaspr with Dart Frog. 
+/// Utilities for using Jaspr with Dart Frog.
 ///
 /// The `.server.dart` suffix is only needed to trigger generation of the server options file.
 /// The actual server entrypoint is managed by Dart Frog.
-/// 
+///
 /// See also `build.yaml` for further configuration related to the generated server options.
 library;
 
@@ -34,8 +34,12 @@ Future<Response> renderJasprComponent(RequestContext context, Component child) a
   final base = context.read<BasePath>();
 
   final response = await renderComponent(
-    Document(base: base.path, body: child),
-    request: shelf.Request(context.request.method.name, context.request.url, headers: context.request.headers),
+    Document(
+      base: base.path,
+      head: [script(src: 'main.client.dart.js', defer: true)],
+      body: child,
+    ),
+    request: shelf.Request(context.request.method.name, context.request.uri, headers: context.request.headers),
   );
 
   return Response.bytes(statusCode: response.statusCode, body: response.body, headers: response.headers);
