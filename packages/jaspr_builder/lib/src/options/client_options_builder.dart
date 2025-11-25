@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
-// ignore: depend_on_referenced_packages
-import 'package:package_config/package_config.dart';
 import 'package:yaml/yaml.dart';
 
 import '../client/client_bundle_builder.dart';
@@ -65,7 +63,7 @@ class ClientOptionsBuilder implements Builder {
 
     var source =
         '''
-      import 'package:jaspr/browser.dart';
+      import 'package:jaspr/client.dart';
       ${plugins.isNotEmpty ? "import 'package:flutter_web_plugins/flutter_web_plugins.dart';" : ''}
       [[/]]
 
@@ -156,7 +154,7 @@ Future<List<Plugin>> loadWebPlugins(BuildStep buildStep) async {
       continue;
     }
 
-    final plugin = await _loadPluginForPackage(package, buildStep, toVisit);
+    final plugin = await _loadPluginForPackage(package.name, package.root, buildStep, toVisit);
     if (plugin != null) {
       plugins[packageName] = plugin;
     }
@@ -165,8 +163,8 @@ Future<List<Plugin>> loadWebPlugins(BuildStep buildStep) async {
   return plugins.values.toList();
 }
 
-Future<Plugin?> _loadPluginForPackage(Package package, BuildStep buildStep, List<String> toVisit) async {
-  var pubspecId = AssetId.resolve(package.root.resolve('pubspec.yaml'));
+Future<Plugin?> _loadPluginForPackage(String pluginName, Uri root, BuildStep buildStep, List<String> toVisit) async {
+  var pubspecId = AssetId.resolve(root.resolve('pubspec.yaml'));
   Object? pubspec;
   try {
     pubspec = loadYaml(await buildStep.readAsString(pubspecId));
@@ -189,7 +187,7 @@ Future<Plugin?> _loadPluginForPackage(Package package, BuildStep buildStep, List
       'fileName': String fileName,
     }) {
       return Plugin(
-        name: package.name,
+        name: pluginName,
         pluginClass: pluginClass,
         fileName: fileName,
       );

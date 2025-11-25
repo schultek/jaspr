@@ -117,8 +117,8 @@ class ImportEntry {
       elements.add(
         ImportElement(name, switch (element) {
           ExtensionElement() => ElementType.extension,
-          TypeDefiningElement() => ElementType.type,
-          TopLevelVariableElement() || GetterElement() => ElementType.variable,
+          InterfaceElement() || TypeAliasElement() => ElementType.type,
+          TopLevelVariableElement() || TopLevelFunctionElement() || GetterElement() => ElementType.variable,
           _ => throw StateError('Unsupported import symbol type: ${element.runtimeType}'),
         }, details),
       );

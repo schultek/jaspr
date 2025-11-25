@@ -6,13 +6,13 @@
   - The generated server-side options file is now generated alongside the server entrypoint (e.g. as `lib/main.server.g.dart`) containing `defaultServerOptions`.
   - `Jaspr.initializeApp()` now requires the `package:jaspr/server.dart` import.
 
-  - The project can contain at least one client entrypoint file ending in `.client.dart` (e.g. `lib/main.client.dart`) for client-side rendering.
+  - The project can contain at least one client entrypoint file ending in `.client.dart` (e.g. `lib/main.client.dart`) for client-side rendering (also available in **client** mode).
   - A new client-side Jaspr options file is generated alongside the client entrypoint (e.g. as `lib/main.client.g.dart`) containing `defaultClientOptions`.
   - Added a new `ClientApp` component that should be used inside the client entrypoint like this:
     ```dart
     // This file is lib/main.client.dart
 
-    import 'package:jaspr/browser.dart';
+    import 'package:jaspr/client.dart';
     import 'main.client.g.dart';
 
     void main() {
@@ -25,6 +25,12 @@
       );
     }
     ```
+
+- **Breaking** Renamed `package:jaspr/browser.dart` library to `package:jaspr/client.dart`, as well as:
+  
+  - Renamed `BrowserAppBinding` class to `ClientAppBinding`.
+  - Renamed `package:jaspr_test/browser_test.dart` library to `package:jaspr_test/client_test.dart`.
+  - Renamed `testBrowser()` class to `testClient()`.
 
 - **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`.
 

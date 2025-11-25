@@ -26,7 +26,7 @@ final clientOptionsOutputs = {
       '// GENERATED FILE, DO NOT MODIFY\n'
       '// Generated with jaspr_builder\n'
       '\n'
-      'import \'package:jaspr/browser.dart\';\n'
+      'import \'package:jaspr/client.dart\';\n'
       'import \'package:site/component_basic.dart\' deferred as \$component_basic;\n'
       'import \'package:site/component_model_extension.dart\'\n'
       '    deferred as \$component_model_extension;\n'

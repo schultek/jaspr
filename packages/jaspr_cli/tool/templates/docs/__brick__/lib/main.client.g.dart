@@ -4,7 +4,7 @@
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
-import 'package:jaspr/browser.dart';
+import 'package:jaspr/client.dart';
 
 /// Default [ClientOptions] for use with your Jaspr project.
 ///

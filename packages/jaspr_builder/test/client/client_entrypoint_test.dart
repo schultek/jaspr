@@ -17,7 +17,7 @@ void main() {
         ClientEntrypointBuilder(BuilderOptions({})),
         {
           'site|lib/main.client.dart': '''
-              import 'package:jaspr/browser.dart';
+              import 'package:jaspr/client.dart';
               
               void main() {
                 runApp(div([]));
@@ -33,7 +33,7 @@ void main() {
               '// GENERATED FILE, DO NOT MODIFY\n'
               '// Generated with jaspr_builder\n'
               '\n'
-              'import \'package:jaspr/browser.dart\';\n'
+              'import \'package:jaspr/client.dart\';\n'
               'import \'package:site/main.client.dart\' as \$main\$client;\n'
               '\n'
               'void main() {\n'
@@ -50,7 +50,7 @@ void main() {
         ClientEntrypointBuilder(BuilderOptions({})),
         {
           'site|lib/subdir/other.client.dart': '''
-              import 'package:jaspr/browser.dart';
+              import 'package:jaspr/client.dart';
               
               void main() {
                 runApp(div([]));
@@ -66,7 +66,7 @@ void main() {
               '// GENERATED FILE, DO NOT MODIFY\n'
               '// Generated with jaspr_builder\n'
               '\n'
-              'import \'package:jaspr/browser.dart\';\n'
+              'import \'package:jaspr/client.dart\';\n'
               'import \'package:site/subdir/other.client.dart\' as \$other\$client;\n'
               '\n'
               'void main() {\n'

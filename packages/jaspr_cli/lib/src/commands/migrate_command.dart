@@ -9,6 +9,7 @@ import 'package:yaml/yaml.dart';
 import '../command_runner.dart';
 import '../logging.dart';
 import '../migrations/build_method_migration.dart';
+import '../migrations/client_import_migration.dart';
 import '../migrations/component_factory_migration.dart';
 import '../migrations/entrypoint_migration.dart';
 import '../migrations/migration_models.dart';
@@ -51,6 +52,7 @@ class MigrateCommand extends BaseCommand {
   static List<Migration> get allMigrations => [
     BuildMethodMigration(),
     ComponentFactoryMigration(),
+    ClientImportMigration(),
     EntrypointMigration(),
   ];
 

@@ -28,5 +28,4 @@ dev_dependencies:
 
 jaspr:
   mode: server
-  target: bin/main.dart
   port: 8082

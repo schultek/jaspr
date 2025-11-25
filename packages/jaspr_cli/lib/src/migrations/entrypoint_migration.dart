@@ -121,7 +121,7 @@ const String _mainClientTemplate = '''
 // The [main] method will only be executed on the client after loading the page.
 
 // Client-specific Jaspr import.
-import 'package:jaspr/browser.dart';
+import 'package:jaspr/client.dart';
 
 // This file is generated automatically by Jaspr, do not remove or edit.
 import 'main.client.g.dart';

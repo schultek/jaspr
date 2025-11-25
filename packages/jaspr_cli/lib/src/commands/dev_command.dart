@@ -51,6 +51,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       negatable: true,
       defaultsTo: true,
     );
+    argParser.addFlag(
+      'skip-server',
+      help: 'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable.',
+      negatable: false,
+      defaultsTo: false,
+    );
     addDartDefineArgs();
   }
 
@@ -64,6 +70,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final port = argResults!.option('port') ?? project.port ?? '8080';
   late final useWasm = argResults!.flag('experimental-wasm');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
+  late final skipServer = argResults!.flag('skip-server');
 
   bool get launchInChrome;
   bool get autoRun;
@@ -125,6 +132,16 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       return 0;
     }
 
+    if (skipServer) {
+      logger.write(
+        'Skipping server as per --skip-server flag.\n'
+        'Make sure to set the JASPR_PROXY_PORT=$proxyPort environment variable when starting the server manually.',
+        tag: Tag.cli,
+        level: Level.warning,
+      );
+      await workflow.done;
+      return 0;
+    }
     return await _runServer(entryPoint!, proxyPort, workflow);
   }
 

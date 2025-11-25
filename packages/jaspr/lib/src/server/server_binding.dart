@@ -17,7 +17,7 @@ import 'render_functions.dart';
 
 typedef FileLoader = Future<String?> Function(String);
 
-/// Global component binding for the server
+/// Global component binding for the server.
 class ServerAppBinding extends AppBinding with ComponentsBinding {
   ServerAppBinding(this.request, {required FileLoader loadFile}) : _fileLoader = loadFile;
 

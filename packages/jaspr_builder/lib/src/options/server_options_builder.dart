@@ -46,10 +46,14 @@ class ServerOptionsBuilder implements Builder {
       return;
     }
 
+    final rootPath = options.config['root_path'] as String?;
+
     var (clients, styles, sources) = await (
       buildStep.loadClients(),
       buildStep.loadStyles(),
-      buildStep.loadTransitiveSources(),
+      rootPath != null
+          ? buildStep.loadTransitiveSourcesFor(AssetId(buildStep.inputId.package, rootPath))
+          : buildStep.loadTransitiveSources(),
     ).wait;
 
     final package = buildStep.inputId.package;

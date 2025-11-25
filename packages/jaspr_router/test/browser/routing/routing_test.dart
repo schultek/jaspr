@@ -2,14 +2,14 @@
 library;
 
 import 'package:jaspr_router/jaspr_router.dart';
-import 'package:jaspr_test/browser_test.dart';
+import 'package:jaspr_test/client_test.dart';
 
 import '../../utils.dart';
 import '../utils.dart';
 
 void main() {
   group('router', () {
-    testBrowser('should push route', (tester) async {
+    testClient('should push route', (tester) async {
       tester.pumpComponent(Router(routes: [homeRoute(), route('/a')]));
 
       expect(find.text('home'), findsOneComponent);
@@ -30,7 +30,7 @@ void main() {
       expect(find.text('a'), findsOneComponent);
     });
 
-    testBrowser('should replace route', (tester) async {
+    testClient('should replace route', (tester) async {
       tester.pumpComponent(Router(routes: [homeRoute(), route('/a'), route('/b')]));
 
       expect(find.text('home'), findsOneComponent);

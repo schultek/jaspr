@@ -1,7 +1,7 @@
 import 'package:universal_web/web.dart' as web;
 
-import '../../../browser.dart';
-import '../../browser/utils.dart';
+import '../../../client.dart';
+import '../../client/utils.dart';
 import '../../foundation/type_checks.dart';
 
 abstract class Document implements Component {

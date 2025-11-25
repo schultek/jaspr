@@ -38,7 +38,7 @@ class ClientEntrypointBuilder implements Builder {
   Future<String?> generateEntrypoint(BuildStep buildStep) async {
     var source =
         '''
-      import 'package:jaspr/browser.dart';
+      import 'package:jaspr/client.dart';
       [[/]]
       
       void main() {
