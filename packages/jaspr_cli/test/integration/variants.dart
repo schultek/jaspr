@@ -5,10 +5,10 @@ import 'file_matchers.dart';
 
 final allVariants = [
   for (var mode in RenderingMode.values)
-      for (var routing in RoutingOption.values)
-        for (var flutter in FlutterOption.values)
-          for (var backend in BackendOption.valuesFor(mode))
-            TestVariant(mode: mode, routing: routing, flutter: flutter, backend: backend),
+    for (var routing in RoutingOption.values)
+      for (var flutter in FlutterOption.values)
+        for (var backend in BackendOption.valuesFor(mode))
+          TestVariant(mode: mode, routing: routing, flutter: flutter, backend: backend),
 ];
 
 class TestVariant {
@@ -24,11 +24,9 @@ class TestVariant {
     required this.backend,
   });
 
-  String get name =>
-      '${mode.name} routing:${routing.option} flutter:${flutter.option} backend:${backend.option}';
+  String get name => '${mode.name} routing:${routing.option} flutter:${flutter.option} backend:${backend.option}';
 
-  String get options =>
-      '-m ${mode.name} -r ${routing.option} -f ${flutter.option} -b ${backend.option}';
+  String get options => '-m ${mode.name} -r ${routing.option} -f ${flutter.option} -b ${backend.option}';
 
   String get tag => '${mode.tag}${routing.tag}${flutter.tag}${backend.tag}';
 
@@ -75,23 +73,19 @@ extension on RenderingMode {
     RenderingMode.static || RenderingMode.server => {
       ('lib/main.client.dart', fileExists),
       ('lib/main.server.dart', fileExists),
-      ('lib/jaspr_options.client.g.dart', fileExists),
-      ('lib/jaspr_options.server.g.dart', fileExists),
+      ('lib/main.client.g.dart', fileExists),
+      ('lib/main.server.g.dart', fileExists),
     },
     RenderingMode.client => {
+      ('lib/main.client.dart', fileExists),
+      ('lib/main.client.g.dart', isNot(fileExists)),
       ('web/index.html', fileExists),
-      ('web/main.dart', fileExists),
       ('web/styles.css', fileExists),
     },
   };
   Set<String> get resources => {};
-  Set<(String, Matcher)> get outputs => switch (this) {
-    RenderingMode.static || RenderingMode.server => {
-      ('main.client.dart.js', fileExists),
-    },
-    RenderingMode.client => {
-      ('main.dart.js', fileExists),
-    },
+  Set<(String, Matcher)> get outputs => {
+    ('main.client.dart.js', fileExists),
   };
 }
 
