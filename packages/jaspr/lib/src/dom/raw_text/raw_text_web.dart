@@ -5,14 +5,20 @@ import 'package:universal_web/web.dart' as web;
 import '../../../client.dart';
 import '../../client/utils.dart';
 
-/// Renders its input as raw HTML.
+/// Renders its [text] input as raw HTML.
 ///
+/// {@template jaspr.rawText.warning}
 /// **WARNING**: This component does not escape any
 /// user input and is vulnerable to [cross-site scripting (XSS) attacks](https://owasp.org/www-community/attacks/xss/).
 /// Make sure to sanitize any user input when using this component.
-class RawText extends StatelessComponent {
+/// {@endtemplate}
+final class RawText extends StatelessComponent {
+  /// Creates a component that renders [text] as raw HTML.
+  ///
+  /// {@macro jaspr.rawText.warning}
   const RawText(this.text, {super.key});
 
+  /// The text to render as raw HTML.
   final String text;
 
   @override
@@ -20,28 +26,28 @@ class RawText extends StatelessComponent {
     var fragment = web.document.createElement('template') as web.HTMLTemplateElement;
     fragment.innerHTML = text.toJS;
     return Component.fragment([
-      for (var node in fragment.content.childNodes.toIterable()) RawNode(node, key: ValueKey(node)),
+      for (var node in fragment.content.childNodes.toIterable()) _RawNode(node, key: ValueKey(node)),
     ]);
   }
 }
 
-class RawNode extends Component {
-  RawNode(this.node, {super.key});
+class _RawNode extends Component {
+  _RawNode(this.node, {super.key});
 
   final web.Node node;
 
   @override
-  Element createElement() => RawNodeElement(this);
+  Element createElement() => _RawNodeElement(this);
 }
 
-class RawNodeElement extends LeafRenderObjectElement {
-  RawNodeElement(RawNode super.component);
+class _RawNodeElement extends LeafRenderObjectElement {
+  _RawNodeElement(_RawNode super.component);
 
   @override
-  RawNode get component => super.component as RawNode;
+  _RawNode get component => super.component as _RawNode;
 
   @override
-  void update(RawNode newComponent) {
+  void update(_RawNode newComponent) {
     assert(
       newComponent.node == component.node,
       'RawNode cannot be updated with a different node. Use a new RawNode instance instead.',
@@ -52,15 +58,15 @@ class RawNodeElement extends LeafRenderObjectElement {
   @override
   RenderObject createRenderObject() {
     final parent = parentRenderObjectElement!.renderObject;
-    return DomRenderNode(component.node)..parent = parent as DomRenderObject;
+    return _DomRenderNode(component.node)..parent = parent as DomRenderObject;
   }
 
   @override
   void updateRenderObject(RenderObject renderObject) {}
 }
 
-class DomRenderNode extends DomRenderObject {
-  DomRenderNode(this.node);
+class _DomRenderNode extends DomRenderObject {
+  _DomRenderNode(this.node);
 
   @override
   final web.Node node;
@@ -80,6 +86,6 @@ class DomRenderNode extends DomRenderObject {
 
   @override
   web.Node? retakeNode(bool Function(web.Node node) visitNode) {
-    return null; // Not applicable for raw nodes
+    return null; // Not applicable for raw nodes.
   }
 }
