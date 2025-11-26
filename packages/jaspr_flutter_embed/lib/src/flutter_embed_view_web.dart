@@ -51,7 +51,10 @@ class FlutterEmbedView extends StatefulComponent {
       styles: styles,
       constraints: constraints,
       loader: loader,
-      widget: (widget ?? builder?.call()),
+      // Casted to dynamic to work around different widget types
+      // without needing to import the one from Flutter.
+      // ignore: argument_type_not_assignable
+      widget: (widget ?? builder?.call()) as dynamic,
     );
   }
 
