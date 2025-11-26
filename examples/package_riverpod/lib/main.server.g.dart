@@ -5,8 +5,8 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/server.dart';
-import 'package:package_riverpod/components/app.dart' as $app;
-import 'package:package_riverpod/main.server.dart' as $main$server;
+import 'package:package_riverpod/components/app.dart' as _app;
+import 'package:package_riverpod/main.server.dart' as _main$server;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -26,6 +26,6 @@ import 'package:package_riverpod/main.server.dart' as $main$server;
 /// ```
 ServerOptions get defaultServerOptions => ServerOptions(
   clientId: 'main.client.dart.js',
-  clients: {$app.App: ClientTarget<$app.App>('app')},
-  styles: () => [...$main$server.styles],
+  clients: {_app.App: ClientTarget<_app.App>('app')},
+  styles: () => [..._main$server.styles],
 );

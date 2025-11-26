@@ -5,15 +5,15 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/server.dart';
-import 'package:fluttercon/components/like_button.dart' as $like_button;
-import 'package:fluttercon/components/pages_nav.dart' as $pages_nav;
-import 'package:fluttercon/components/session_card.dart' as $session_card;
-import 'package:fluttercon/components/session_list.dart' as $session_list;
-import 'package:fluttercon/components/tag.dart' as $tag;
-import 'package:fluttercon/models/session.dart' as $session;
-import 'package:fluttercon/pages/favorites.dart' as $favorites;
-import 'package:fluttercon/pages/schedule.dart' as $schedule;
-import 'package:fluttercon/pages/session.dart' as $pages_session;
+import 'package:fluttercon/components/like_button.dart' as _like_button;
+import 'package:fluttercon/components/pages_nav.dart' as _pages_nav;
+import 'package:fluttercon/components/session_card.dart' as _session_card;
+import 'package:fluttercon/components/session_list.dart' as _session_list;
+import 'package:fluttercon/components/tag.dart' as _tag;
+import 'package:fluttercon/models/session.dart' as _session;
+import 'package:fluttercon/pages/favorites.dart' as _favorites;
+import 'package:fluttercon/pages/schedule.dart' as _schedule;
+import 'package:fluttercon/pages/session.dart' as _pages_session;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -34,25 +34,25 @@ import 'package:fluttercon/pages/session.dart' as $pages_session;
 ServerOptions get defaultServerOptions => ServerOptions(
   clientId: 'main.client.dart.js',
   clients: {
-    $like_button.LikeButton: ClientTarget<$like_button.LikeButton>(
+    _like_button.LikeButton: ClientTarget<_like_button.LikeButton>(
       'like_button',
-      params: _$like_buttonLikeButton,
+      params: __like_buttonLikeButton,
     ),
-    $favorites.FavoritesPage: ClientTarget<$favorites.FavoritesPage>(
+    _favorites.FavoritesPage: ClientTarget<_favorites.FavoritesPage>(
       'favorites',
     ),
   },
   styles: () => [
-    ...$like_button.LikeButton.styles,
-    ...$pages_nav.PagesNav.styles,
-    ...$session_card.SessionCard.styles,
-    ...$session_list.SessionList.styles,
-    ...$tag.Tag.styles,
-    ...$schedule.SchedulePage.styles,
-    ...$pages_session.SessionPage.styles,
+    ..._like_button.LikeButton.styles,
+    ..._pages_nav.PagesNav.styles,
+    ..._session_card.SessionCard.styles,
+    ..._session_list.SessionList.styles,
+    ..._tag.Tag.styles,
+    ..._schedule.SchedulePage.styles,
+    ..._pages_session.SessionPage.styles,
   ],
 );
 
-Map<String, Object?> _$like_buttonLikeButton($like_button.LikeButton c) => {
-  'session': $session.SessionCodex(c.session).encode(),
+Map<String, Object?> __like_buttonLikeButton(_like_button.LikeButton c) => {
+  'session': _session.SessionCodex(c.session).encode(),
 };

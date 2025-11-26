@@ -193,7 +193,8 @@ class ImportsWriter {
 
     final compressed = compressPaths(imports.toList());
     final prefixes = {
-      for (var url in imports) url: '\$${compressed[url]!.replaceAll('/', '_').replaceAll('.', r'$')}',
+      for (var url in imports)
+        url: '_${compressed[url]!.replaceFirst('package:', '\$').replaceAll('/', '_').replaceAll('.', r'$')}',
     };
 
     return source

@@ -5,8 +5,8 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/server.dart';
-import 'package:backend_dart_frog/components/counter.dart' as $counter;
-import 'package:backend_dart_frog/components/hello.dart' as $hello;
+import 'package:backend_dart_frog/components/counter.dart' as _counter;
+import 'package:backend_dart_frog/components/hello.dart' as _hello;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -26,9 +26,9 @@ import 'package:backend_dart_frog/components/hello.dart' as $hello;
 /// ```
 ServerOptions get defaultServerOptions => ServerOptions(
   clients: {
-    $counter.Counter: ClientTarget<$counter.Counter>('counter'),
-    $hello.Hello: ClientTarget<$hello.Hello>('hello', params: _$helloHello),
+    _counter.Counter: ClientTarget<_counter.Counter>('counter'),
+    _hello.Hello: ClientTarget<_hello.Hello>('hello', params: __helloHello),
   },
 );
 
-Map<String, Object?> _$helloHello($hello.Hello c) => {'name': c.name};
+Map<String, Object?> __helloHello(_hello.Hello c) => {'name': c.name};

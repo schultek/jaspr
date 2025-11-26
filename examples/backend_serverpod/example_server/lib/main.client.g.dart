@@ -6,7 +6,7 @@
 
 import 'package:jaspr/client.dart';
 
-import 'package:example_server/components/counter.dart' deferred as $counter;
+import 'package:example_server/components/counter.dart' deferred as _counter;
 
 /// Default [ClientOptions] for use with your Jaspr project.
 ///
@@ -27,8 +27,8 @@ import 'package:example_server/components/counter.dart' deferred as $counter;
 ClientOptions get defaultClientOptions => ClientOptions(
   clients: {
     'counter': ClientLoader(
-      (p) => $counter.Counter(),
-      loader: $counter.loadLibrary,
+      (p) => _counter.Counter(),
+      loader: _counter.loadLibrary,
     ),
   },
 );

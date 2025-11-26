@@ -6,7 +6,7 @@
 
 import 'package:jaspr/client.dart';
 
-import 'package:flutter_multi_view/app.dart' deferred as $app;
+import 'package:flutter_multi_view/app.dart' deferred as _app;
 
 /// Default [ClientOptions] for use with your Jaspr project.
 ///
@@ -25,5 +25,5 @@ import 'package:flutter_multi_view/app.dart' deferred as $app;
 /// }
 /// ```
 ClientOptions get defaultClientOptions => ClientOptions(
-  clients: {'app': ClientLoader((p) => $app.App(), loader: $app.loadLibrary)},
+  clients: {'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary)},
 );

@@ -7,11 +7,11 @@
 import 'package:jaspr/client.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:fluttercon/components/like_button.dart'
-    deferred as $like_button;
-import 'package:fluttercon/models/session.dart' as $session;
-import 'package:fluttercon/pages/favorites.dart' deferred as $favorites;
+    deferred as _like_button;
+import 'package:fluttercon/models/session.dart' as _session;
+import 'package:fluttercon/pages/favorites.dart' deferred as _favorites;
 import 'package:shared_preferences_web/shared_preferences_web.dart'
-    as $shared_preferences_web;
+    as _shared_preferences_web;
 
 /// Default [ClientOptions] for use with your Jaspr project.
 ///
@@ -32,19 +32,19 @@ import 'package:shared_preferences_web/shared_preferences_web.dart'
 ClientOptions get defaultClientOptions => ClientOptions(
   initialize: () {
     final Registrar registrar = webPluginRegistrar;
-    $shared_preferences_web.SharedPreferencesPlugin.registerWith(registrar);
+    _shared_preferences_web.SharedPreferencesPlugin.registerWith(registrar);
     registrar.registerMessageHandler();
   },
   clients: {
     'like_button': ClientLoader(
-      (p) => $like_button.LikeButton(
-        session: $session.SessionCodex.decode(p['session']),
+      (p) => _like_button.LikeButton(
+        session: _session.SessionCodex.decode(p['session']),
       ),
-      loader: $like_button.loadLibrary,
+      loader: _like_button.loadLibrary,
     ),
     'favorites': ClientLoader(
-      (p) => $favorites.FavoritesPage(),
-      loader: $favorites.loadLibrary,
+      (p) => _favorites.FavoritesPage(),
+      loader: _favorites.loadLibrary,
     ),
   },
 );

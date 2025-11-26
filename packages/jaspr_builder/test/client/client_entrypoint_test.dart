@@ -34,10 +34,10 @@ void main() {
               '// Generated with jaspr_builder\n'
               '\n'
               'import \'package:jaspr/client.dart\';\n'
-              'import \'package:site/main.client.dart\' as \$main\$client;\n'
+              'import \'package:site/main.client.dart\' as _main\$client;\n'
               '\n'
               'void main() {\n'
-              '  \$main\$client.main();\n'
+              '  _main\$client.main();\n'
               '}\n'
               '',
         },
@@ -67,10 +67,10 @@ void main() {
               '// Generated with jaspr_builder\n'
               '\n'
               'import \'package:jaspr/client.dart\';\n'
-              'import \'package:site/subdir/other.client.dart\' as \$other\$client;\n'
+              'import \'package:site/subdir/other.client.dart\' as _other\$client;\n'
               '\n'
               'void main() {\n'
-              '  \$other\$client.main();\n'
+              '  _other\$client.main();\n'
               '}\n'
               '',
         },

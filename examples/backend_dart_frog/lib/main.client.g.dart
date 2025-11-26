@@ -6,8 +6,8 @@
 
 import 'package:jaspr/client.dart';
 
-import 'package:backend_dart_frog/components/counter.dart' deferred as $counter;
-import 'package:backend_dart_frog/components/hello.dart' deferred as $hello;
+import 'package:backend_dart_frog/components/counter.dart' deferred as _counter;
+import 'package:backend_dart_frog/components/hello.dart' deferred as _hello;
 
 /// Default [ClientOptions] for use with your Jaspr project.
 ///
@@ -28,12 +28,12 @@ import 'package:backend_dart_frog/components/hello.dart' deferred as $hello;
 ClientOptions get defaultClientOptions => ClientOptions(
   clients: {
     'counter': ClientLoader(
-      (p) => $counter.Counter(),
-      loader: $counter.loadLibrary,
+      (p) => _counter.Counter(),
+      loader: _counter.loadLibrary,
     ),
     'hello': ClientLoader(
-      (p) => $hello.Hello(name: p['name']),
-      loader: $hello.loadLibrary,
+      (p) => _hello.Hello(name: p['name']),
+      loader: _hello.loadLibrary,
     ),
   },
 );

@@ -6,8 +6,8 @@
 
 import 'package:jaspr/client.dart';
 
-import 'package:backend_shelf/components/app.dart' deferred as $app;
-import 'package:backend_shelf/components/hello.dart' deferred as $hello;
+import 'package:backend_shelf/components/app.dart' deferred as _app;
+import 'package:backend_shelf/components/hello.dart' deferred as _hello;
 
 /// Default [ClientOptions] for use with your Jaspr project.
 ///
@@ -27,7 +27,7 @@ import 'package:backend_shelf/components/hello.dart' deferred as $hello;
 /// ```
 ClientOptions get defaultClientOptions => ClientOptions(
   clients: {
-    'app': ClientLoader((p) => $app.App(), loader: $app.loadLibrary),
-    'hello': ClientLoader((p) => $hello.Hello(), loader: $hello.loadLibrary),
+    'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary),
+    'hello': ClientLoader((p) => _hello.Hello(), loader: _hello.loadLibrary),
   },
 );

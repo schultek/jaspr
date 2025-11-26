@@ -5,14 +5,14 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/server.dart';
-import 'package:flutter_multi_view/components/counter.dart' as $counter;
+import 'package:flutter_multi_view/components/counter.dart' as _counter;
 import 'package:flutter_multi_view/components/embedded_counter.dart'
-    as $embedded_counter;
+    as _embedded_counter;
 import 'package:flutter_multi_view/components/pulsing_loader.dart'
-    as $pulsing_loader;
+    as _pulsing_loader;
 import 'package:flutter_multi_view/constants/view_transition.dart'
-    as $view_transition;
-import 'package:flutter_multi_view/app.dart' as $app;
+    as _view_transition;
+import 'package:flutter_multi_view/app.dart' as _app;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -32,12 +32,12 @@ import 'package:flutter_multi_view/app.dart' as $app;
 /// ```
 ServerOptions get defaultServerOptions => ServerOptions(
   clientId: 'main.client.dart.js',
-  clients: {$app.App: ClientTarget<$app.App>('app')},
+  clients: {_app.App: ClientTarget<_app.App>('app')},
   styles: () => [
-    ...$counter.CounterState.styles,
-    ...$embedded_counter.EmbeddedCounter.styles,
-    ...$pulsing_loader.PulsingLoader.styles,
-    ...$view_transition.viewTransitionStyles,
-    ...$app.AppState.styles,
+    ..._counter.CounterState.styles,
+    ..._embedded_counter.EmbeddedCounter.styles,
+    ..._pulsing_loader.PulsingLoader.styles,
+    ..._view_transition.viewTransitionStyles,
+    ..._app.AppState.styles,
   ],
 );
