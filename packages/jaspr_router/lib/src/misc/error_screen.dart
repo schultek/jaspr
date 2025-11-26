@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 /// Default error page implementation.
 class ErrorScreen extends StatelessComponent {

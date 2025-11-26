@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 @client
 class SponsorsList extends StatefulComponent {

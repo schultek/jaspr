@@ -22,8 +22,8 @@ class HtmlHelperMigration implements Migration {
   }
 
   @override
-  void runForUnit(CompilationUnit unit, MigrationReporter reporter) {
-    if (!unit.directives.any(
+  void runForUnit(MigrationContext context) {
+    if (!context.unit.directives.any(
       (d) => d is ImportDirective && (d.uri.stringValue?.startsWith('package:jaspr/') ?? false),
     )) {
       // Only run if Jaspr is imported.
@@ -34,7 +34,7 @@ class HtmlHelperMigration implements Migration {
     final fragments = <SourceRange>[];
     final raw = <SourceRange>[];
 
-    unit.accept(
+    context.unit.accept(
       HelperVisitor(
         onText: texts.add,
         onFragment: fragments.add,
@@ -42,24 +42,28 @@ class HtmlHelperMigration implements Migration {
       ),
     );
 
+    final useDotShorthands = context.features.contains('dot-shorthands');
+
     if (texts.isNotEmpty) {
-      reporter.createMigration('Replaced text() with Component.text()', (builder) {
+      final replacement = useDotShorthands ? '.text' : 'Component.text';
+      context.reporter.createMigration('Replaced text() with $replacement()', (builder) {
         for (final node in texts) {
-          builder.replace(node.offset, node.length, 'Component.text');
+          builder.replace(node.offset, node.length, replacement);
         }
       });
     }
 
     if (fragments.isNotEmpty) {
-      reporter.createMigration('Replaced fragment() with Component.fragment()', (builder) {
+      final replacement = useDotShorthands ? '.fragment' : 'Component.fragment';
+      context.reporter.createMigration('Replaced fragment() with $replacement()', (builder) {
         for (final node in fragments) {
-          builder.replace(node.offset, node.length, 'Component.fragment');
+          builder.replace(node.offset, node.length, replacement);
         }
       });
     }
 
     if (raw.isNotEmpty) {
-      reporter.createMigration('Replaced raw() with RawText()', (builder) {
+      context.reporter.createMigration('Replaced raw() with RawText()', (builder) {
         for (final node in raw) {
           builder.replace(node.offset, node.length, 'RawText');
         }

@@ -9,7 +9,7 @@ part of 'html.dart';
 /// {@template jaspr.html.details}
 /// The &lt;details&gt; HTML element creates a disclosure widget in which information is visible only when the widget is toggled into an "open" state. A summary or label must be provided using the &lt;summary&gt; element.
 /// {@endtemplate}
-class details extends StatelessComponent {
+final class details extends StatelessComponent {
   /// {@macro jaspr.html.details}
   const details(
     this.children, {
@@ -60,7 +60,7 @@ class details extends StatelessComponent {
 /// {@template jaspr.html.dialog}
 /// The &lt;dialog&gt; HTML element represents a dialog box or other interactive component, such as a dismissible alert, inspector, or subwindow.
 /// {@endtemplate}
-class dialog extends StatelessComponent {
+final class dialog extends StatelessComponent {
   /// {@macro jaspr.html.dialog}
   const dialog(
     this.children, {
@@ -111,7 +111,7 @@ class dialog extends StatelessComponent {
 /// {@template jaspr.html.summary}
 /// The &lt;summary&gt; HTML element specifies a summary, caption, or legend for a &lt;details&gt; element's disclosure box. Clicking the &lt;summary&gt; element toggles the state of the parent &lt;details&gt; element open and closed.
 /// {@endtemplate}
-class summary extends StatelessComponent {
+final class summary extends StatelessComponent {
   /// {@macro jaspr.html.summary}
   const summary(
     this.children, {
@@ -158,7 +158,7 @@ class summary extends StatelessComponent {
 /// {@template jaspr.html.meta}
 /// The  &lt;meta&gt; HTML element represents metadata that cannot be represented by other HTML meta-related elements, like  &lt;base &gt;,  &lt;link &gt;,  &lt;script &gt;,  &lt;style &gt; or  &lt;title &gt;.
 /// {@endtemplate}
-class meta extends StatelessComponent {
+final class meta extends StatelessComponent {
   /// {@macro jaspr.html.meta}
   const meta({
     this.name,
@@ -223,7 +223,7 @@ class meta extends StatelessComponent {
 /// {@template jaspr.html.link}
 /// The &lt;link&gt; HTML element specifies relationships between the current document and an external resource. This element is most commonly used to link to stylesheets, but is also used to establish site icons (both "favicon" style icons and icons for the home screen and apps on mobile devices) among other things.
 /// {@endtemplate}
-class link extends StatelessComponent {
+final class link extends StatelessComponent {
   /// {@macro jaspr.html.link}
   const link({
     required this.href,
@@ -287,7 +287,7 @@ class link extends StatelessComponent {
 /// {@template jaspr.html.script}
 /// The &lt;script&gt; HTML element is used to embed executable code or data; this is typically used to embed or refer to JavaScript code. The &lt;script&gt; element can also be used with other languages, such as WebGL's GLSL shader programming language and JSON.
 /// {@endtemplate}
-class script extends StatelessComponent {
+final class script extends StatelessComponent {
   /// {@macro jaspr.html.script}
   const script({
     this.async = false,

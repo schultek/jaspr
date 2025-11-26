@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:markdown/markdown.dart';
 
 import '../constants/theme.dart';

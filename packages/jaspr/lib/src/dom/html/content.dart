@@ -9,7 +9,7 @@ part of 'html.dart';
 /// {@template jaspr.html.article}
 /// The &lt;article&gt; HTML element represents a self-contained composition in a document, page, application, or site, which is intended to be independently distributable or reusable (e.g., in syndication). Examples include: a forum post, a magazine or newspaper article, or a blog entry, a product card, a user-submitted comment, an interactive widget or gadget, or any other independent item of content.
 /// {@endtemplate}
-class article extends StatelessComponent {
+final class article extends StatelessComponent {
   /// {@macro jaspr.html.article}
   const article(
     this.children, {
@@ -56,7 +56,7 @@ class article extends StatelessComponent {
 /// {@template jaspr.html.aside}
 /// The &lt;aside&gt; HTML element represents a portion of a document whose content is only indirectly related to the document's main content. Asides are frequently presented as sidebars or call-out boxes.
 /// {@endtemplate}
-class aside extends StatelessComponent {
+final class aside extends StatelessComponent {
   /// {@macro jaspr.html.aside}
   const aside(
     this.children, {
@@ -103,7 +103,7 @@ class aside extends StatelessComponent {
 /// {@template jaspr.html.body}
 /// The &lt;body&gt; HTML element represents the content of an HTML document. There can be only one &lt;body&gt; element in a document.
 /// {@endtemplate}
-class body extends StatelessComponent {
+final class body extends StatelessComponent {
   /// {@macro jaspr.html.body}
   const body(
     this.children, {
@@ -150,7 +150,7 @@ class body extends StatelessComponent {
 /// {@template jaspr.html.footer}
 /// The &lt;footer&gt; HTML element represents a footer for its nearest ancestor sectioning content or sectioning root element. A &lt;footer&gt; typically contains information about the author of the section, copyright data or links to related documents.
 /// {@endtemplate}
-class footer extends StatelessComponent {
+final class footer extends StatelessComponent {
   /// {@macro jaspr.html.footer}
   const footer(
     this.children, {
@@ -197,7 +197,7 @@ class footer extends StatelessComponent {
 /// {@template jaspr.html.head}
 /// The &lt;head&gt; HTML element contains machine-readable information (metadata) about the document, like its title, scripts, and style sheets.
 /// {@endtemplate}
-class head extends StatelessComponent {
+final class head extends StatelessComponent {
   /// {@macro jaspr.html.head}
   const head(
     this.children, {
@@ -244,7 +244,7 @@ class head extends StatelessComponent {
 /// {@template jaspr.html.header}
 /// The &lt;header&gt; HTML element represents introductory content, typically a group of introductory or navigational aids. It may contain some heading elements but also a logo, a search form, an author name, and other elements.
 /// {@endtemplate}
-class header extends StatelessComponent {
+final class header extends StatelessComponent {
   /// {@macro jaspr.html.header}
   const header(
     this.children, {
@@ -291,7 +291,7 @@ class header extends StatelessComponent {
 /// {@template jaspr.html.html}
 /// The &lt;html&gt; HTML element represents the root (top-level element) of an HTML document, so it is also referred to as the root element. All other elements must be descendants of this element.
 /// {@endtemplate}
-class html extends StatelessComponent {
+final class html extends StatelessComponent {
   /// {@macro jaspr.html.html}
   const html(
     this.children, {
@@ -338,7 +338,7 @@ class html extends StatelessComponent {
 /// {@template jaspr.html.h1}
 /// The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest.
 /// {@endtemplate}
-class h1 extends StatelessComponent {
+final class h1 extends StatelessComponent {
   /// {@macro jaspr.html.h1}
   const h1(
     this.children, {
@@ -385,7 +385,7 @@ class h1 extends StatelessComponent {
 /// {@template jaspr.html.h2}
 /// The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest.
 /// {@endtemplate}
-class h2 extends StatelessComponent {
+final class h2 extends StatelessComponent {
   /// {@macro jaspr.html.h2}
   const h2(
     this.children, {
@@ -432,7 +432,7 @@ class h2 extends StatelessComponent {
 /// {@template jaspr.html.h3}
 /// The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest.
 /// {@endtemplate}
-class h3 extends StatelessComponent {
+final class h3 extends StatelessComponent {
   /// {@macro jaspr.html.h3}
   const h3(
     this.children, {
@@ -479,7 +479,7 @@ class h3 extends StatelessComponent {
 /// {@template jaspr.html.h4}
 /// The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest.
 /// {@endtemplate}
-class h4 extends StatelessComponent {
+final class h4 extends StatelessComponent {
   /// {@macro jaspr.html.h4}
   const h4(
     this.children, {
@@ -526,7 +526,7 @@ class h4 extends StatelessComponent {
 /// {@template jaspr.html.h5}
 /// The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest.
 /// {@endtemplate}
-class h5 extends StatelessComponent {
+final class h5 extends StatelessComponent {
   /// {@macro jaspr.html.h5}
   const h5(
     this.children, {
@@ -573,7 +573,7 @@ class h5 extends StatelessComponent {
 /// {@template jaspr.html.h6}
 /// The &lt;h1&gt; to &lt;h6&gt; HTML elements represent six levels of section headings. &lt;h1&gt; is the highest section level and &lt;h6&gt; is the lowest.
 /// {@endtemplate}
-class h6 extends StatelessComponent {
+final class h6 extends StatelessComponent {
   /// {@macro jaspr.html.h6}
   const h6(
     this.children, {
@@ -620,7 +620,7 @@ class h6 extends StatelessComponent {
 /// {@template jaspr.html.main_}
 /// The &lt;main&gt; HTML element represents the primary content of a document, distinct from content that is repeated across multiple pages such as site headers, footers, and navigation bars.
 /// {@endtemplate}
-class main_ extends StatelessComponent {
+final class main_ extends StatelessComponent {
   /// {@macro jaspr.html.main_}
   const main_(
     this.children, {
@@ -667,7 +667,7 @@ class main_ extends StatelessComponent {
 /// {@template jaspr.html.nav}
 /// The &lt;nav&gt; HTML element represents a section of a page whose purpose is to provide navigation links, either within the current document or to other documents. Common examples of navigation sections are menus, tables of contents, and indexes.
 /// {@endtemplate}
-class nav extends StatelessComponent {
+final class nav extends StatelessComponent {
   /// {@macro jaspr.html.nav}
   const nav(
     this.children, {
@@ -714,7 +714,7 @@ class nav extends StatelessComponent {
 /// {@template jaspr.html.section}
 /// The &lt;section&gt; HTML element represents a generic standalone section of a document, which doesn't have a more specific semantic element to represent it. Sections should always have a heading, with very few exceptions.
 /// {@endtemplate}
-class section extends StatelessComponent {
+final class section extends StatelessComponent {
   /// {@macro jaspr.html.section}
   const section(
     this.children, {
@@ -761,7 +761,7 @@ class section extends StatelessComponent {
 /// {@template jaspr.html.blockquote}
 /// The &lt;blockquote&gt; HTML element indicates that the enclosed text is an extended quotation. Usually, this is rendered visually by indentation. A URL for the source of the quotation may be given using the cite attribute, while a text representation of the source can be given using the &lt;cite&gt; element.
 /// {@endtemplate}
-class blockquote extends StatelessComponent {
+final class blockquote extends StatelessComponent {
   /// {@macro jaspr.html.blockquote}
   const blockquote(
     this.children, {
@@ -812,7 +812,7 @@ class blockquote extends StatelessComponent {
 /// {@template jaspr.html.div}
 /// The &lt;div&gt; HTML element is the generic container for flow content. It has no effect on the content or layout until styled in some way using CSS (e.g. styling is directly applied to it, or some kind of layout model like Flexbox is applied to its parent element).
 /// {@endtemplate}
-class div extends StatelessComponent {
+final class div extends StatelessComponent {
   /// {@macro jaspr.html.div}
   const div(
     this.children, {
@@ -859,7 +859,7 @@ class div extends StatelessComponent {
 /// {@template jaspr.html.ul}
 /// The &lt;ul&gt; HTML element represents an unordered list of items, typically rendered as a bulleted list.
 /// {@endtemplate}
-class ul extends StatelessComponent {
+final class ul extends StatelessComponent {
   /// {@macro jaspr.html.ul}
   const ul(
     this.children, {
@@ -906,7 +906,7 @@ class ul extends StatelessComponent {
 /// {@template jaspr.html.ol}
 /// The &lt;ol&gt; HTML element represents an ordered list of items — typically rendered as a numbered list.
 /// {@endtemplate}
-class ol extends StatelessComponent {
+final class ol extends StatelessComponent {
   /// {@macro jaspr.html.ol}
   const ol(
     this.children, {
@@ -993,7 +993,7 @@ enum NumberingType {
 /// {@template jaspr.html.li}
 /// The &lt;li&gt; HTML element is used to represent an item in a list. It must be contained in a parent element: an ordered list (&lt;ol&gt;), an unordered list (&lt;ul&gt;), or a menu (&lt;menu&gt;). In menus and unordered lists, list items are usually displayed using bullet points. In ordered lists, they are usually displayed with an ascending counter on the left, such as a number or letter.
 /// {@endtemplate}
-class li extends StatelessComponent {
+final class li extends StatelessComponent {
   /// {@macro jaspr.html.li}
   const li(
     this.children, {
@@ -1044,7 +1044,7 @@ class li extends StatelessComponent {
 /// {@template jaspr.html.hr}
 /// The &lt;hr&gt; HTML element represents a thematic break between paragraph-level elements: for example, a change of scene in a story, or a shift of topic within a section.
 /// {@endtemplate}
-class hr extends StatelessComponent {
+final class hr extends StatelessComponent {
   /// {@macro jaspr.html.hr}
   const hr({
     this.id,
@@ -1086,7 +1086,7 @@ class hr extends StatelessComponent {
 /// {@template jaspr.html.p}
 /// The &lt;p&gt; HTML element represents a paragraph. Paragraphs are usually represented in visual media as blocks of text separated from adjacent blocks by blank lines and/or first-line indentation, but HTML paragraphs can be any structural grouping of related content, such as images or form fields.
 /// {@endtemplate}
-class p extends StatelessComponent {
+final class p extends StatelessComponent {
   /// {@macro jaspr.html.p}
   const p(
     this.children, {
@@ -1133,7 +1133,7 @@ class p extends StatelessComponent {
 /// {@template jaspr.html.pre}
 /// The &lt;pre&gt; HTML element represents preformatted text which is to be presented exactly as written in the HTML file. The text is typically rendered using a non-proportional, or monospaced, font. Whitespace inside this element is displayed as written.
 /// {@endtemplate}
-class pre extends StatelessComponent {
+final class pre extends StatelessComponent {
   /// {@macro jaspr.html.pre}
   const pre(
     this.children, {

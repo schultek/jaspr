@@ -21,6 +21,12 @@ class MigrateCommand extends BaseCommand {
       hide: true,
       defaultsTo: ['lib', 'web', 'test'],
     );
+    argParser.addMultiOption(
+      'feature',
+      help: 'Specify which language features to use during migration (can be used multiple times).',
+      allowed: ['dot-shorthands'],
+      allowedHelp: {'dot-shorthands': 'Use dot shorthands where possible.'},
+    );
   }
 
   @override
@@ -36,6 +42,7 @@ class MigrateCommand extends BaseCommand {
   late final bool apply = argResults!.flag('apply');
   late final String? assumeVersion = argResults!.option('assume-version');
   late final List<String> includeDirs = argResults!.multiOption('include-dir');
+  late final List<String> features = argResults!.multiOption('feature');
 
   static List<Migration> get allMigrations => [
     BuildMethodMigration(),
@@ -87,7 +94,7 @@ class MigrateCommand extends BaseCommand {
 
     final results = migrations.computeResults(includeDirs, apply, (file, e, st) {
       logger.write('Error processing ${file.path}: $e\n$st', level: Level.error);
-    });
+    }, features: features);
 
     final check = green.wrap(styleBold.wrap('✓'));
     final warn = yellow.wrap(styleBold.wrap('⚠'));

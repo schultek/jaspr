@@ -9,7 +9,7 @@ part of 'html.dart';
 /// {@template jaspr.html.audio}
 /// The &lt;audio&gt; HTML element is used to embed sound content in documents. It may contain one or more audio sources, represented using the src attribute or the &lt;source&gt; element: the browser will choose the most suitable one. It can also be the destination for streamed media, using a MediaStream.
 /// {@endtemplate}
-class audio extends StatelessComponent {
+final class audio extends StatelessComponent {
   /// {@macro jaspr.html.audio}
   const audio(
     this.children, {
@@ -123,7 +123,7 @@ enum Preload {
 /// {@template jaspr.html.img}
 /// The &lt;img&gt; HTML element embeds an image into the document.
 /// {@endtemplate}
-class img extends StatelessComponent {
+final class img extends StatelessComponent {
   /// {@macro jaspr.html.img}
   const img({
     this.alt,
@@ -215,7 +215,7 @@ enum MediaLoading {
 /// {@template jaspr.html.video}
 /// The &lt;video&gt; HTML element embeds a media player which supports video playback into the document. You can use &lt;video&gt; for audio content as well, but the &lt;audio&gt; element may provide a more appropriate user experience.
 /// {@endtemplate}
-class video extends StatelessComponent {
+final class video extends StatelessComponent {
   /// {@macro jaspr.html.video}
   const video(
     this.children, {
@@ -314,7 +314,7 @@ class video extends StatelessComponent {
 /// {@template jaspr.html.embed}
 /// The &lt;embed&gt; HTML element embeds external content at the specified point in the document. This content is provided by an external application or other source of interactive content such as a browser plug-in.
 /// {@endtemplate}
-class embed extends StatelessComponent {
+final class embed extends StatelessComponent {
   /// {@macro jaspr.html.embed}
   const embed({
     required this.src,
@@ -378,7 +378,7 @@ class embed extends StatelessComponent {
 /// {@template jaspr.html.iframe}
 /// The &lt;iframe&gt; HTML element represents a nested browsing context, embedding another HTML page into the current one.
 /// {@endtemplate}
-class iframe extends StatelessComponent {
+final class iframe extends StatelessComponent {
   /// {@macro jaspr.html.iframe}
   const iframe(
     this.children, {
@@ -503,7 +503,7 @@ enum ReferrerPolicy {
 /// {@template jaspr.html.object}
 /// The &lt;object&gt; HTML element represents an external resource, which can be treated as an image, a nested browsing context, or a resource to be handled by a plugin.
 /// {@endtemplate}
-class object extends StatelessComponent {
+final class object extends StatelessComponent {
   /// {@macro jaspr.html.object}
   const object(
     this.children, {
@@ -577,7 +577,7 @@ class object extends StatelessComponent {
 /// {@template jaspr.html.source}
 /// The &lt;source&gt; HTML element specifies multiple media resources for the &lt;picture&gt;, the &lt;audio&gt; element, or the &lt;video&gt; element. It is an empty element, meaning that it has no content and does not have a closing tag. It is commonly used to offer the same media content in multiple file formats in order to provide compatibility with a broad range of browsers given their differing support for image file formats and media file formats.
 /// {@endtemplate}
-class source extends StatelessComponent {
+final class source extends StatelessComponent {
   /// {@macro jaspr.html.source}
   const source({
     this.type,
@@ -629,7 +629,7 @@ class source extends StatelessComponent {
 /// {@template jaspr.html.figure}
 /// The &lt;figure&gt; HTML element represents self-contained content, potentially with an optional caption, which is specified using the &lt;figcaption&gt; element. The figure, its caption, and its contents are referenced as a single unit.
 /// {@endtemplate}
-class figure extends StatelessComponent {
+final class figure extends StatelessComponent {
   /// {@macro jaspr.html.figure}
   const figure(
     this.children, {
@@ -676,7 +676,7 @@ class figure extends StatelessComponent {
 /// {@template jaspr.html.figcaption}
 /// The &lt;figcaption&gt; HTML element represents a caption or legend describing the rest of the contents of its parent &lt;figure&gt; element, providing the &lt;figure&gt;> an accessible description.
 /// {@endtemplate}
-class figcaption extends StatelessComponent {
+final class figcaption extends StatelessComponent {
   /// {@macro jaspr.html.figcaption}
   const figcaption(
     this.children, {

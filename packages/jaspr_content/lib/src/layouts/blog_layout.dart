@@ -2,6 +2,7 @@
 library;
 
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../../theme.dart';
 import '../page.dart';

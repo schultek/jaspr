@@ -9,7 +9,7 @@ part of 'html.dart';
 /// {@template jaspr.html.svg}
 /// The &lt;svg&gt; element is a container that defines a new coordinate system and viewport. It is used as the outermost element of SVG documents, but it can also be used to embed an SVG fragment inside an SVG or HTML document.
 /// {@endtemplate}
-class svg extends StatelessComponent {
+final class svg extends StatelessComponent {
   /// {@macro jaspr.html.svg}
   const svg(
     this.children, {
@@ -73,7 +73,7 @@ class svg extends StatelessComponent {
 /// {@template jaspr.html.rect}
 /// The &lt;rect&gt; element is a basic SVG shape that draws rectangles, defined by their position, width, and height. The rectangles may have their corners rounded.
 /// {@endtemplate}
-class rect extends StatelessComponent {
+final class rect extends StatelessComponent {
   /// {@macro jaspr.html.rect}
   const rect(
     this.children, {
@@ -167,7 +167,7 @@ class rect extends StatelessComponent {
 /// {@template jaspr.html.circle}
 /// The &lt;circle&gt; SVG element is an SVG basic shape, used to draw circles based on a center point and a radius.
 /// {@endtemplate}
-class circle extends StatelessComponent {
+final class circle extends StatelessComponent {
   /// {@macro jaspr.html.circle}
   const circle(
     this.children, {
@@ -246,7 +246,7 @@ class circle extends StatelessComponent {
 /// {@template jaspr.html.ellipse}
 /// The &lt;ellipse&gt; element is an SVG basic shape, used to create ellipses based on a center coordinate, and both their x and y radius.
 /// {@endtemplate}
-class ellipse extends StatelessComponent {
+final class ellipse extends StatelessComponent {
   /// {@macro jaspr.html.ellipse}
   const ellipse(
     this.children, {
@@ -330,7 +330,7 @@ class ellipse extends StatelessComponent {
 /// {@template jaspr.html.line}
 /// The &lt;line&gt; element is an SVG basic shape used to create a line connecting two points.
 /// {@endtemplate}
-class line extends StatelessComponent {
+final class line extends StatelessComponent {
   /// {@macro jaspr.html.line}
   const line(
     this.children, {
@@ -414,7 +414,7 @@ class line extends StatelessComponent {
 /// {@template jaspr.html.path}
 /// The &lt;path&gt; SVG element is the generic element to define a shape. All the basic shapes can be created with a path element.
 /// {@endtemplate}
-class path extends StatelessComponent {
+final class path extends StatelessComponent {
   /// {@macro jaspr.html.path}
   const path(
     this.children, {
@@ -483,7 +483,7 @@ class path extends StatelessComponent {
 /// {@template jaspr.html.polygon}
 /// The &lt;polygon&gt; element defines a closed shape consisting of a set of connected straight line segments. The last point is connected to the first point.
 /// {@endtemplate}
-class polygon extends StatelessComponent {
+final class polygon extends StatelessComponent {
   /// {@macro jaspr.html.polygon}
   const polygon(
     this.children, {
@@ -552,7 +552,7 @@ class polygon extends StatelessComponent {
 /// {@template jaspr.html.polyline}
 /// The &lt;polyline&gt; SVG element is an SVG basic shape that creates straight lines connecting several points. Typically a polyline is used to create open shapes as the last point doesn't have to be connected to the first point.
 /// {@endtemplate}
-class polyline extends StatelessComponent {
+final class polyline extends StatelessComponent {
   /// {@macro jaspr.html.polyline}
   const polyline(
     this.children, {

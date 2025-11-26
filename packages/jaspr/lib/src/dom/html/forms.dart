@@ -9,7 +9,7 @@ part of 'html.dart';
 /// {@template jaspr.html.button}
 /// The &lt;button&gt; HTML element is an interactive element activated by a user with a mouse, keyboard, finger, voice command, or other assistive technology. Once activated, it then performs a programmable action, such as submitting a form or opening a dialog.
 /// {@endtemplate}
-class button extends StatelessComponent {
+final class button extends StatelessComponent {
   /// {@macro jaspr.html.button}
   const button(
     this.children, {
@@ -96,7 +96,7 @@ enum ButtonType {
 /// {@template jaspr.html.form}
 /// The &lt;form&gt; HTML element represents a document section containing interactive controls for submitting information.
 /// {@endtemplate}
-class form extends StatelessComponent {
+final class form extends StatelessComponent {
   /// {@macro jaspr.html.form}
   const form(
     this.children, {
@@ -228,7 +228,7 @@ enum AutoComplete {
 /// The &lt;input&gt; HTML element is used to create interactive controls for web-based forms in order to accept data from the user; a wide variety of types of input data and control widgets are available, depending on the device and user agent. The &lt;input&gt; element is one of the most powerful and complex in all of HTML due to the sheer number of combinations of input types and attributes.
 /// {@endtemplate}
 @optionalTypeArgs
-class input<T> extends StatelessComponent {
+final class input<T> extends StatelessComponent {
   /// {@macro jaspr.html.input}
   const input({
     this.type,
@@ -386,7 +386,7 @@ enum InputType {
 /// {@template jaspr.html.label}
 /// The &lt;label&gt; HTML element represents a caption for an item in a user interface.
 /// {@endtemplate}
-class label extends StatelessComponent {
+final class label extends StatelessComponent {
   /// {@macro jaspr.html.label}
   const label(
     this.children, {
@@ -437,7 +437,7 @@ class label extends StatelessComponent {
 /// {@template jaspr.html.datalist}
 /// The &lt;datalist&gt; HTML element contains a set of &lt;option&gt; elements that represent the permissible or recommended options available to choose from within other controls.
 /// {@endtemplate}
-class datalist extends StatelessComponent {
+final class datalist extends StatelessComponent {
   /// {@macro jaspr.html.datalist}
   const datalist(
     this.children, {
@@ -484,7 +484,7 @@ class datalist extends StatelessComponent {
 /// {@template jaspr.html.legend}
 /// The &lt;legend&gt; HTML element represents a caption for the content of its parent &lt;fieldset&gt;.
 /// {@endtemplate}
-class legend extends StatelessComponent {
+final class legend extends StatelessComponent {
   /// {@macro jaspr.html.legend}
   const legend(
     this.children, {
@@ -531,7 +531,7 @@ class legend extends StatelessComponent {
 /// {@template jaspr.html.meter}
 /// The &lt;meter&gt; HTML element represents either a scalar value within a known range or a fractional value.
 /// {@endtemplate}
-class meter extends StatelessComponent {
+final class meter extends StatelessComponent {
   /// {@macro jaspr.html.meter}
   const meter(
     this.children, {
@@ -610,7 +610,7 @@ class meter extends StatelessComponent {
 /// {@template jaspr.html.progress}
 /// The &lt;progress&gt; HTML element displays an indicator showing the completion progress of a task, typically displayed as a progress bar.
 /// {@endtemplate}
-class progress extends StatelessComponent {
+final class progress extends StatelessComponent {
   /// {@macro jaspr.html.progress}
   const progress(
     this.children, {
@@ -669,7 +669,7 @@ class progress extends StatelessComponent {
 /// {@template jaspr.html.optgroup}
 /// The &lt;optgroup&gt; HTML element creates a grouping of options within a &lt;select&gt; element.
 /// {@endtemplate}
-class optgroup extends StatelessComponent {
+final class optgroup extends StatelessComponent {
   /// {@macro jaspr.html.optgroup}
   const optgroup(
     this.children, {
@@ -728,7 +728,7 @@ class optgroup extends StatelessComponent {
 /// {@template jaspr.html.option}
 /// The &lt;option&gt; HTML element is used to define an item contained in a &lt;select&gt;, an &lt;optgroup&gt;, or a &lt;datalist&gt; element. As such, &lt;option&gt; can represent menu items in popups and other lists of items in an HTML document.
 /// {@endtemplate}
-class option extends StatelessComponent {
+final class option extends StatelessComponent {
   /// {@macro jaspr.html.option}
   const option(
     this.children, {
@@ -797,7 +797,7 @@ class option extends StatelessComponent {
 /// {@template jaspr.html.select}
 /// The &lt;select&gt; HTML element represents a control that provides a menu of options.
 /// {@endtemplate}
-class select extends StatelessComponent {
+final class select extends StatelessComponent {
   /// {@macro jaspr.html.select}
   const select(
     this.children, {
@@ -897,7 +897,7 @@ class select extends StatelessComponent {
 /// {@template jaspr.html.fieldset}
 /// The &lt;fieldset&gt; HTML element is used to group several controls as well as labels (&lt;label&gt;) within a web form.
 /// {@endtemplate}
-class fieldset extends StatelessComponent {
+final class fieldset extends StatelessComponent {
   /// {@macro jaspr.html.fieldset}
   const fieldset(
     this.children, {
@@ -952,7 +952,7 @@ class fieldset extends StatelessComponent {
 /// {@template jaspr.html.textarea}
 /// The &lt;textarea&gt; HTML element represents a multi-line plain-text editing control, useful when you want to allow users to enter a sizeable amount of free-form text, for example a comment on a review or feedback form.
 /// {@endtemplate}
-class textarea extends StatelessComponent {
+final class textarea extends StatelessComponent {
   /// {@macro jaspr.html.textarea}
   const textarea(
     this.children, {

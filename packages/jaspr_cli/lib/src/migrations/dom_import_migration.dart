@@ -12,18 +12,16 @@ class DomImportMigration implements Migration {
   @override
   String get name => 'dom_import_migration';
   @override
-  String get description =>
-      "Migrates 'package:jaspr/jaspr.dart' imports to 'package:jaspr/dom.dart' where appropriate.";
+  String get description => "Adds 'package:jaspr/dom.dart' import where appropriate.";
 
   @override
   String get hint {
-    return '${styleItalic.wrap(red.wrap("    - import 'package:jaspr/jaspr.dart';"))!}\n'
-        '${styleItalic.wrap(green.wrap("    + import 'package:jaspr/dom.dart';"))!}';
+    return styleItalic.wrap(green.wrap("    + import 'package:jaspr/dom.dart';"))!;
   }
 
   @override
-  void runForUnit(CompilationUnit unit, MigrationReporter reporter) {
-    final domImport = unit.directives
+  void runForUnit(MigrationContext context) {
+    final domImport = context.unit.directives
         .whereType<ImportDirective>()
         .where((d) => d.uri.stringValue == 'package:jaspr/dom.dart')
         .firstOrNull;
@@ -33,11 +31,11 @@ class DomImportMigration implements Migration {
       return;
     }
 
-    final jasprImport = unit.directives
+    final jasprImport = context.unit.directives
         .whereType<ImportDirective>()
         .where((d) => d.uri.stringValue == 'package:jaspr/jaspr.dart')
         .firstOrNull;
-    final platformImport = unit.directives
+    final platformImport = context.unit.directives
         .whereType<ImportDirective>()
         .where(
           (d) =>
@@ -52,28 +50,18 @@ class DomImportMigration implements Migration {
     }
 
     final visitor = DomApiUsageVisitor();
-    unit.accept(visitor);
+    context.unit.accept(visitor);
     if (!visitor.usesDomApis) {
       // No need to migrate if no DOM APIs are used.
       return;
     }
 
-    if (jasprImport != null && !visitor.usesDocumentApi) {
-      reporter.createMigration("Changed 'package:jaspr/jaspr.dart' import to 'package:jaspr/dom.dart'.", (builder) {
-        builder.replace(
-          jasprImport.uri.offset,
-          jasprImport.uri.length,
-          "'package:jaspr/dom.dart'",
-        );
-      });
-    } else {
-      reporter.createMigration("Added 'package:jaspr/dom.dart' import.", (builder) {
-        builder.insert(
-          platformImport?.offset ?? jasprImport!.offset,
-          "import 'package:jaspr/dom.dart';\n",
-        );
-      });
-    }
+    context.reporter.createMigration("Added 'package:jaspr/dom.dart' import.", (builder) {
+      builder.insert(
+        jasprImport?.offset ?? platformImport!.offset,
+        "import 'package:jaspr/dom.dart';\n",
+      );
+    });
   }
 }
 
@@ -83,14 +71,10 @@ class DomApiUsageVisitor extends RecursiveAstVisitor<void> {
   bool _useDomApis = false;
   bool get usesDomApis => _useDomApis;
 
-  bool get usesDocumentApi => _useDocumentApi;
-  bool _useDocumentApi = false;
-
   static final _allTags = {
     for (final group in htmlSpec.values) ...group.keys,
     'raw',
     'RawText',
-    'DomValidator',
   };
 
   static final _domClasses = {'css', 'Styles', 'StyleRule', 'Color', 'Unit'};
@@ -99,14 +83,13 @@ class DomApiUsageVisitor extends RecursiveAstVisitor<void> {
   void visitMethodInvocation(MethodInvocation node) {
     if (_allTags.contains(node.methodName.name) && node.target == null) {
       _useDomApis = true;
+      return;
     } else if (_domClasses.contains(node.methodName.name) && node.target == null) {
       _useDomApis = true;
+      return;
     } else if (node.target case SimpleIdentifier id when _domClasses.contains(id.name)) {
       _useDomApis = true;
-    }
-
-    if (node.target case SimpleIdentifier id when id.name == 'Document') {
-      _useDocumentApi = true;
+      return;
     }
 
     super.visitMethodInvocation(node);
@@ -117,12 +100,10 @@ class DomApiUsageVisitor extends RecursiveAstVisitor<void> {
     final constr = node.constructorName;
     if (_allTags.contains(constr.type.name.lexeme) && constr.name == null) {
       _useDomApis = true;
+      return;
     } else if (_domClasses.contains(constr.type.name.lexeme)) {
       _useDomApis = true;
-    }
-
-    if (constr.type.name.lexeme == 'Document') {
-      _useDocumentApi = true;
+      return;
     }
 
     super.visitInstanceCreationExpression(node);

@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import 'flutter_embed_view_fallback.dart' as fallback;
 import 'flutter_embed_view_flutter.dart' deferred as flutter;

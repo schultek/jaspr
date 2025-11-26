@@ -5,6 +5,7 @@ import 'dart:js_interop';
 
 import 'package:jaspr/browser.dart';
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/src/dom/validator.dart';
 import 'package:jaspr_test/browser_test.dart';
 import 'package:universal_web/web.dart';
 

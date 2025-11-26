@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 class PagesNav extends StatelessComponent {
   const PagesNav({this.day, super.key});

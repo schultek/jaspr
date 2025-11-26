@@ -2,6 +2,7 @@
 library;
 
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/browser_test.dart';
 import 'package:universal_web/web.dart';
 

@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../src/page_parser/page_parser.dart';
 import '_internal/icon.dart';

@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../data/firebase.dart';
 @Import.onWeb('../interop/confetti.dart', show: [#JSConfetti])

@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../jaspr_content.dart';
 import '_internal/zoomable_image.dart';

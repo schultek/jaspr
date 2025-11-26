@@ -3,6 +3,7 @@
 library;
 
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../page.dart';
 import '../theme/theme.dart';

@@ -33,8 +33,8 @@ class BuildMethodMigration implements Migration {
   }
 
   @override
-  void runForUnit(CompilationUnit unit, MigrationReporter reporter) {
-    for (final declaration in unit.declarations) {
+  void runForUnit(MigrationContext context) {
+    for (final declaration in context.unit.declarations) {
       if (declaration is ClassDeclaration) {
         if (!_isBuildableClass(declaration)) {
           continue;
@@ -45,7 +45,7 @@ class BuildMethodMigration implements Migration {
               continue;
             }
 
-            _migrateBuildMethod(member, declaration.name.lexeme, reporter);
+            _migrateBuildMethod(member, declaration.name.lexeme, context.reporter);
           }
         }
       }

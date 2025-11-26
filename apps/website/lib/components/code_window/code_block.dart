@@ -1,5 +1,6 @@
 import 'package:highlight/highlight.dart' show Node, Result, highlight;
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../../constants/theme.dart';
 import 'theme.dart';

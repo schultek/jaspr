@@ -9,7 +9,7 @@ part of 'html.dart';
 /// {@template jaspr.html.table}
 /// The &lt;table&gt; HTML element represents tabular data—that is, information presented in a two-dimensional table comprised of rows and columns of cells containing data.
 /// {@endtemplate}
-class table extends StatelessComponent {
+final class table extends StatelessComponent {
   /// {@macro jaspr.html.table}
   const table(
     this.children, {
@@ -56,7 +56,7 @@ class table extends StatelessComponent {
 /// {@template jaspr.html.caption}
 /// The &lt;caption&gt; HTML element specifies the caption (or title) of a table, providing the table an accessible description.
 /// {@endtemplate}
-class caption extends StatelessComponent {
+final class caption extends StatelessComponent {
   /// {@macro jaspr.html.caption}
   const caption(
     this.children, {
@@ -103,7 +103,7 @@ class caption extends StatelessComponent {
 /// {@template jaspr.html.thead}
 /// The &lt;thead&gt; HTML element encapsulates a set of table rows (&lt;tr&gt; elements), indicating that they comprise the head of a table with information about the table's columns. This is usually in the form of column headers (&lt;th&gt; elements).
 /// {@endtemplate}
-class thead extends StatelessComponent {
+final class thead extends StatelessComponent {
   /// {@macro jaspr.html.thead}
   const thead(
     this.children, {
@@ -150,7 +150,7 @@ class thead extends StatelessComponent {
 /// {@template jaspr.html.tbody}
 /// The &lt;tbody&gt; HTML element encapsulates a set of table rows (&lt;tr&gt; elements), indicating that they comprise the body of a table's (main) data.
 /// {@endtemplate}
-class tbody extends StatelessComponent {
+final class tbody extends StatelessComponent {
   /// {@macro jaspr.html.tbody}
   const tbody(
     this.children, {
@@ -197,7 +197,7 @@ class tbody extends StatelessComponent {
 /// {@template jaspr.html.tfoot}
 /// The &lt;tfoot&gt; HTML element encapsulates a set of table rows (&lt;tr&gt; elements), indicating that they comprise the foot of a table with information about the table's columns. This is usually a summary of the columns, e.g., a sum of the given numbers in a column.
 /// {@endtemplate}
-class tfoot extends StatelessComponent {
+final class tfoot extends StatelessComponent {
   /// {@macro jaspr.html.tfoot}
   const tfoot(
     this.children, {
@@ -244,7 +244,7 @@ class tfoot extends StatelessComponent {
 /// {@template jaspr.html.th}
 /// The &lt;th&gt; HTML element defines a cell as the header of a group of table cells and may be used as a child of the &lt;tr&gt; element. The exact nature of this group is defined by the scope and headers attributes.
 /// {@endtemplate}
-class th extends StatelessComponent {
+final class th extends StatelessComponent {
   /// {@macro jaspr.html.th}
   const th(
     this.children, {
@@ -323,7 +323,7 @@ class th extends StatelessComponent {
 /// {@template jaspr.html.tr}
 /// The &lt;tr&gt; HTML element defines a row of cells in a table. The row's cells can then be established using a mix of &lt;td&gt; (data cell) and &lt;th&gt; (header cell) elements.
 /// {@endtemplate}
-class tr extends StatelessComponent {
+final class tr extends StatelessComponent {
   /// {@macro jaspr.html.tr}
   const tr(
     this.children, {
@@ -370,7 +370,7 @@ class tr extends StatelessComponent {
 /// {@template jaspr.html.td}
 /// The &lt;td&gt; HTML element defines a cell of a table that contains data and may be used as a child of the &lt;tr&gt; element.
 /// {@endtemplate}
-class td extends StatelessComponent {
+final class td extends StatelessComponent {
   /// {@macro jaspr.html.td}
   const td(
     this.children, {
@@ -434,7 +434,7 @@ class td extends StatelessComponent {
 /// {@template jaspr.html.col}
 /// The &lt;col&gt; HTML element defines one or more columns in a column group represented by its parent &lt;colgroup&gt; element. The &lt;col&gt; element is only valid as a child of a &lt;colgroup&gt; element that has no span attribute defined.
 /// {@endtemplate}
-class col extends StatelessComponent {
+final class col extends StatelessComponent {
   /// {@macro jaspr.html.col}
   const col({
     this.span,
@@ -480,7 +480,7 @@ class col extends StatelessComponent {
 /// {@template jaspr.html.colgroup}
 /// The &lt;colgroup&gt; HTML element defines a group of columns within a table.
 /// {@endtemplate}
-class colgroup extends StatelessComponent {
+final class colgroup extends StatelessComponent {
   /// {@macro jaspr.html.colgroup}
   const colgroup(
     this.children, {

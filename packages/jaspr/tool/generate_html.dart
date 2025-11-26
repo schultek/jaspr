@@ -49,6 +49,7 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
         l.body.add(
           Class((c) {
             c.name = tag;
+            c.modifier = ClassModifier.final$;
             c.extend = refer('StatelessComponent');
 
             final typeArgs = data['type_args'] as List<Object?>? ?? [];

@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 class Icon extends StatelessComponent {
   const Icon(this.name, {this.size, super.key});

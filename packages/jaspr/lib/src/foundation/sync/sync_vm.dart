@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import '../../../dom.dart' show DomValidator;
 import '../../../server.dart';
+import '../../dom/validator.dart';
 
 void initSyncState(SyncStateMixin element) {
   if (element.context.binding case ServerAppBinding b) {

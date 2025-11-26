@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../../../../components/link_button.dart';
 import '../../../../components/particles.dart';

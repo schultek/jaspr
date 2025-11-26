@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../../../../components/code_window/code_window.dart';
 import '../components/counter_button.dart';

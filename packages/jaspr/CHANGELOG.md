@@ -1,6 +1,6 @@
 ## Unreleased breaking
 
-- **Breaking** Moved all html components, style classes and dom utilities including `div()` et al., `Styles`, `css`, `Color` et al., `events()`, `RawText`, `DomValidator` and `ViewTransitionMixin` to separate `package:jaspr/dom.dart` library.
+- **Breaking** Moved all html components, style classes and dom utilities including `div()` et al., `Styles`, `css`, `Color` et al., `events()`, `RawText`, and `ViewTransitionMixin` to a separate `package:jaspr/dom.dart` library.
 
   This reduces the "pollution" of the global namespace when importing `package:jaspr/jaspr.dart` and allows for more fine-grained control of imported APIs.
 

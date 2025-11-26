@@ -3,6 +3,7 @@
 library;
 
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../page.dart';
 import '../page_extension/table_of_contents_extension.dart';

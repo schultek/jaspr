@@ -1,4 +1,4 @@
-import 'package:jaspr/dom.dart';
+import 'package:jaspr/src/dom/validator.dart';
 import 'package:test/test.dart';
 
 void main() {

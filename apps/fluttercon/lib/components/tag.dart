@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 class Tag extends StatelessComponent {
   const Tag({required this.label, super.key});
