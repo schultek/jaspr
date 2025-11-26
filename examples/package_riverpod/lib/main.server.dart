@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 
 import 'components/app.dart';
@@ -13,5 +14,5 @@ void main() async {
 @css
 List<StyleRule> get styles => [
   css('.main').styles(minWidth: 12.px),
-  css.media(MediaQuery.screen(minWidth: 200.px), []),
+  css.media(.screen(minWidth: 200.px), []),
 ];

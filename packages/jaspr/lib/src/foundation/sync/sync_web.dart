@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import '../../../client.dart';
-import '../../foundation/type_checks.dart';
+import '../../dom/type_checks.dart';
+import '../../dom/validator.dart';
 
 final _syncRegex = RegExp('^${DomValidator.syncMarkerPrefixRegex}(.*)\$');
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart';
 
@@ -37,7 +38,7 @@ class InstallCommandState extends State<InstallCommand> {
       [
         span([
           Icon('terminal'),
-          code([text('dart pub global activate jaspr_cli')]),
+          code([.text('dart pub global activate jaspr_cli')]),
           button(
             styles: copied ? Styles(color: Colors.forestGreen) : null,
             attributes: {'aria-label': 'Copy'},
@@ -52,28 +53,28 @@ class InstallCommandState extends State<InstallCommand> {
   static List<StyleRule> get styles => [
     css('.install-jaspr', [
       css('&').styles(
-        padding: Padding.symmetric(horizontal: .8.rem, vertical: .6.rem),
-        margin: Margin.only(bottom: .8.rem),
-        border: Border(color: borderColor2),
-        radius: BorderRadius.circular(3.em),
-        cursor: Cursor.copy,
+        padding: .symmetric(horizontal: .8.rem, vertical: .6.rem),
+        margin: .only(bottom: .8.rem),
+        border: .all(color: borderColor2),
+        radius: .circular(3.em),
+        cursor: .copy,
         color: textDark,
         fontSize: .8.rem,
         backgroundColor: surfaceLow,
       ),
       css('& span').styles(
-        display: Display.flex,
-        alignItems: AlignItems.center,
-        gap: Gap(column: .6.rem),
+        display: .flex,
+        alignItems: .center,
+        gap: .column(0.6.rem),
       ),
       css('& button', [
         css('&').styles(
-          display: Display.inlineFlex,
-          padding: Padding.zero,
-          border: Border.unset,
-          cursor: Cursor.pointer,
-          alignItems: AlignItems.center,
-          color: Color.unset,
+          display: .inlineFlex,
+          padding: .zero,
+          border: .unset,
+          cursor: .pointer,
+          alignItems: .center,
+          color: .unset,
           backgroundColor: Colors.transparent,
         ),
         css('&:hover').styles(color: textBlack),

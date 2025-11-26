@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,8 +21,8 @@ class _CounterState extends State<Counter> {
   void initState() {
     super.initState();
 
-    SharedPreferences.getInstance().then((s) {
-      setState(() => store = s);
+    SharedPreferences.getInstance().then((prefs) {
+      setState(() => store = prefs);
     });
 
     initFirestore();
@@ -60,8 +61,8 @@ class _CounterState extends State<Counter> {
   @override
   Component build(BuildContext context) {
     return div(classes: 'container', [
-      button(events: {'click': (_) => setState(() => count++)}, [text('Local count: $count')]),
-      button(events: {'click': (_) => setState(() => remoteCount++)}, [text('Firestore count: $remoteCount')]),
+      button(events: {'click': (_) => setState(() => count++)}, [.text('Local count: $count')]),
+      button(events: {'click': (_) => setState(() => remoteCount++)}, [.text('Firestore count: $remoteCount')]),
     ]);
   }
 }

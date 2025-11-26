@@ -10,13 +10,13 @@ class FavoritesPage extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return fragment([
+    return .fragment([
       PagesNav(),
       ListenableBuilder(
         listenable: FavoritesService.instance,
         builder: (context) {
           var favorites = FavoritesService.instance.favorites.values.toList();
-          favorites.sort((a, b) => a.startsAt.compareTo(b.startsAt));
+          favorites.sort((fa, fb) => fa.startsAt.compareTo(fb.startsAt));
           return SessionList(sessions: favorites);
         },
       ),

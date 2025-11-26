@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:universal_web/web.dart' as web;
 
 import '../../server.dart';
+import '../dom/validator.dart';
 import 'child_nodes.dart';
 
 abstract class MarkupRenderObject extends RenderObject {

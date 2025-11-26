@@ -2,6 +2,8 @@
 library;
 
 import 'package:jaspr/client.dart';
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/client_test.dart';
 import 'package:universal_web/web.dart';
 
@@ -12,10 +14,10 @@ void main() {
     testClient('should attach fragment children to parent', (tester) async {
       final component = FakeComponent(
         child: div([
-          fragment([
-            h1([text('Hello World')]),
-            b([text('Bold Text')]),
-            text('Some text'),
+          Component.fragment([
+            h1([Component.text('Hello World')]),
+            b([Component.text('Bold Text')]),
+            Component.text('Some text'),
           ]),
         ]),
       );
@@ -32,10 +34,10 @@ void main() {
 
       component.updateChild(
         div([
-          fragment([
-            h1([text('Hello World')]),
-            text('Some text'),
-            p([text('Paragraph')]),
+          Component.fragment([
+            h1([Component.text('Hello World')]),
+            Component.text('Some text'),
+            p([Component.text('Paragraph')]),
           ]),
         ]),
       );
@@ -54,11 +56,11 @@ void main() {
     testClient('should attach fragment children to parent after start node', (tester) async {
       tester.pumpComponent(
         div([
-          text('Start'),
-          fragment([
-            h1([text('Hello World')]),
-            b([text('Bold Text')]),
-            text('Some text'),
+          Component.text('Start'),
+          Component.fragment([
+            h1([Component.text('Hello World')]),
+            b([Component.text('Bold Text')]),
+            Component.text('Some text'),
           ]),
         ]),
       );
@@ -77,21 +79,21 @@ void main() {
     testClient('should attach children in correct order with empty fragments', (tester) async {
       tester.pumpComponent(
         div([
-          text('Start'),
-          fragment([
-            fragment([]),
-            h1([text('Hello World')]),
-            fragment([
-              b([text('Bold Text')]),
-              fragment([]),
-              fragment([
-                fragment([
-                  fragment([fragment([])]),
-                  p([text('Paragraph')]),
+          Component.text('Start'),
+          Component.fragment([
+            Component.fragment([]),
+            h1([Component.text('Hello World')]),
+            Component.fragment([
+              b([Component.text('Bold Text')]),
+              Component.fragment([]),
+              Component.fragment([
+                Component.fragment([
+                  Component.fragment([Component.fragment([])]),
+                  p([Component.text('Paragraph')]),
                 ]),
               ]),
             ]),
-            text('Some text'),
+            Component.text('Some text'),
           ]),
         ]),
       );
@@ -112,15 +114,15 @@ void main() {
     testClient('should move fragment children when fragment moves', (tester) async {
       final component = FakeComponent(
         child: div([
-          text('Start'),
-          fragment(key: ValueKey('f1'), [
-            h1([text('Hello World')]),
+          Component.text('Start'),
+          Component.fragment(key: ValueKey('f1'), [
+            h1([Component.text('Hello World')]),
           ]),
-          fragment(key: ValueKey('f2'), [
-            b([text('Bold Text')]),
-            text('Some text'),
+          Component.fragment(key: ValueKey('f2'), [
+            b([Component.text('Bold Text')]),
+            Component.text('Some text'),
           ]),
-          text('End'),
+          Component.text('End'),
         ]),
       );
       tester.pumpComponent(component);
@@ -139,15 +141,15 @@ void main() {
       print("MOVE");
       component.updateChild(
         div([
-          text('Start'),
-          fragment(key: ValueKey('f2'), [
-            b([text('Bold Text')]),
-            text('Some text'),
+          Component.text('Start'),
+          Component.fragment(key: ValueKey('f2'), [
+            b([Component.text('Bold Text')]),
+            Component.text('Some text'),
           ]),
-          fragment(key: ValueKey('f1'), [
-            h1([text('Hello World')]),
+          Component.fragment(key: ValueKey('f1'), [
+            h1([Component.text('Hello World')]),
           ]),
-          text('End'),
+          Component.text('End'),
         ]),
       );
       await pumpEventQueue();

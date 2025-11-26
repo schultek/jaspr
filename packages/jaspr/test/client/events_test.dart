@@ -1,7 +1,7 @@
 @TestOn('browser')
 library;
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr_test/client_test.dart';
 
 void main() {
@@ -27,7 +27,7 @@ void main() {
       bool checkedChange = false;
 
       tester.pumpComponent(
-        input(
+        input<bool>(
           type: InputType.checkbox,
           onInput: (value) => checkedInput = value,
           onChange: (value) => checkedChange = value,
@@ -46,7 +46,7 @@ void main() {
       double numberChange = 0;
 
       tester.pumpComponent(
-        input(
+        input<double>(
           type: InputType.number,
           onInput: (value) => numberInput = value,
           onChange: (value) => numberChange = value,
@@ -65,7 +65,11 @@ void main() {
       String textChange = "";
 
       tester.pumpComponent(
-        input(type: InputType.text, onInput: (value) => textInput = value, onChange: (value) => textChange = value),
+        input<String>(
+          type: InputType.text,
+          onInput: (value) => textInput = value,
+          onChange: (value) => textChange = value,
+        ),
       );
 
       await tester.input(find.tag('input'), value: "Hello");
@@ -80,7 +84,11 @@ void main() {
       String textChange = "";
 
       tester.pumpComponent(
-        textarea(onInput: (value) => textInput = value, onChange: (value) => textChange = value, []),
+        textarea(
+          onInput: (value) => textInput = value,
+          onChange: (value) => textChange = value,
+          [],
+        ),
       );
 
       await tester.input(find.tag('textarea'), value: "Hello");

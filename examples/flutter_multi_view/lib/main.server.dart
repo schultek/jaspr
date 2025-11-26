@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 
 import 'app.dart';
@@ -18,11 +19,11 @@ void main() {
         css('html, body').styles(
           width: 100.percent,
           minHeight: 100.vh,
-          padding: Padding.zero,
-          margin: Margin.zero,
-          fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]),
+          padding: .zero,
+          margin: .zero,
+          fontFamily: const .list([FontFamily('Roboto'), FontFamilies.sansSerif]),
         ),
-        css('h1').styles(margin: Margin.unset, fontSize: 4.rem),
+        css('h1').styles(margin: .unset, fontSize: 4.rem),
       ],
       body: App(),
     ),

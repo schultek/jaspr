@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../constants/theme.dart';
@@ -13,10 +14,10 @@ class PulsingLoader extends StatelessComponent {
   @css
   static List<StyleRule> get styles => [
     css('.loader').styles(
-      margin: Margin.all(Unit.auto),
-      boxSizing: BoxSizing.borderBox,
-      border: Border(width: 0.px, color: loaderColor),
-      radius: BorderRadius.circular(50.percent),
+      margin: .all(.auto),
+      boxSizing: .borderBox,
+      border: .all(width: 0.px, color: loaderColor),
+      radius: .circular(50.percent),
       raw: {'animation': 'loading 1s infinite ease-out'},
     ),
     css.keyframes('loading', {
@@ -25,38 +26,17 @@ class PulsingLoader extends StatelessComponent {
       '30%': Styles(
         width: 30.px,
         height: 30.px,
-        border: Border(width: 15.px, color: loaderColor),
+        border: .all(width: 15.px, color: loaderColor),
         opacity: 1,
         backgroundColor: Colors.transparent,
       ),
       '100%': Styles(
         width: 30.px,
         height: 30.px,
-        border: Border(width: 0.px, color: loaderColor),
+        border: .all(width: 0.px, color: loaderColor),
         opacity: 0,
         backgroundColor: Colors.transparent,
       ),
     }),
   ];
 }
-
-/*
-0%
-    +size(0)
-    background-color: $loader-color
-
-  29%
-    background-color: $loader-color
-
-  30%
-    +size($loader-size)
-    background-color: transparent
-    border-width: $loader-size / 2
-    opacity: 1
-
-  100%
-    +size($loader-size)
-    border-width: 0
-    opacity: 0
-    background-color: transparent
- */

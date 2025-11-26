@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
@@ -86,7 +87,7 @@ class TableOfContents {
         Builder(
           builder: (context) {
             var route = RouteState.of(context);
-            return a(href: '${route.path}#${entry.id}', [text(entry.text)]);
+            return a(href: '${route.path}#${entry.id}', [Component.text(entry.text)]);
           },
         ),
       ]);

@@ -4,6 +4,8 @@ library;
 import 'dart:js_interop';
 
 import 'package:jaspr/client.dart';
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/src/dom/validator.dart';
 import 'package:jaspr_test/client_test.dart';
 import 'package:universal_web/web.dart';
 
@@ -26,9 +28,9 @@ void main() {
       tester.pumpComponent(
         div([
           p(key: pKey, [
-            text('Hello '),
-            b(key: bKey, [text('World2')]),
-            text('!'),
+            Component.text('Hello '),
+            b(key: bKey, [Component.text('World2')]),
+            Component.text('!'),
           ]),
         ]),
       );
@@ -67,7 +69,7 @@ void main() {
       Jaspr.initializeApp(
         options: ClientOptions(
           clients: {
-            'app': ClientLoader((_) => p([text('C')])),
+            'app': ClientLoader((_) => p([Component.text('C')])),
           },
         ),
       );
@@ -108,7 +110,7 @@ void main() {
       Jaspr.initializeApp(
         options: ClientOptions(
           clients: {
-            'app': ClientLoader((params) => p([text('Hello ${params['name']}')])),
+            'app': ClientLoader((params) => p([Component.text('Hello ${params['name']}')])),
           },
         ),
       );

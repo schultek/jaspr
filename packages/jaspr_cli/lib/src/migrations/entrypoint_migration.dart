@@ -22,8 +22,8 @@ class EntrypointMigration implements Migration {
   }
 
   @override
-  void runForUnit(CompilationUnit unit, MigrationReporter reporter) {
-    final optionsImport = unit.directives
+  void runForUnit(MigrationContext context) {
+    final optionsImport = context.unit.directives
         .whereType<ImportDirective>()
         .where((d) => d.uri.stringValue?.endsWith('jaspr_options.dart') ?? false)
         .firstOrNull;
@@ -33,12 +33,12 @@ class EntrypointMigration implements Migration {
       return;
     }
 
-    final jasprImport = unit.directives
+    final jasprImport = context.unit.directives
         .whereType<ImportDirective>()
         .where((d) => d.uri.stringValue?.startsWith('package:jaspr/jaspr.dart') ?? false)
         .firstOrNull;
 
-    reporter.createMigration("Replaced 'jaspr_options.dart' import with 'main.server.g.dart'", (builder) {
+    context.reporter.createMigration("Replaced 'jaspr_options.dart' import with 'main.server.g.dart'", (builder) {
       builder.replace(optionsImport.uri.offset, optionsImport.uri.length, "'main.server.g.dart'");
       if (jasprImport != null) {
         builder.replace(jasprImport.uri.offset, jasprImport.uri.length, "'package:jaspr/server.dart'");
@@ -49,7 +49,7 @@ class EntrypointMigration implements Migration {
           builder.replace(node.offset, node.length, 'defaultServerOptions');
         },
       );
-      unit.visitChildren(visitor);
+      context.unit.visitChildren(visitor);
     });
   }
 

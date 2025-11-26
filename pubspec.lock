@@ -1997,5 +1997,5 @@ packages:
     source: hosted
     version: "2.2.2"
 sdks:
-  dart: ">=3.9.0 <3.11.0-z"
+  dart: ">=3.10.0 <3.11.0-z"
   flutter: ">=3.35.0"

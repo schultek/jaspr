@@ -19,7 +19,7 @@ class App extends AsyncStatelessComponent {
     );
 
     final [{"sessions": sessionsJson}] = jsonDecode(response.body) as List;
-    final sessions = (sessionsJson as List).map((s) => SessionMapper.fromMap(s)).toList();
+    final sessions = (sessionsJson as List).map((sessionMap) => SessionMapper.fromMap(sessionMap)).toList();
 
     return Router(
       redirect: (context, state) {
@@ -31,8 +31,10 @@ class App extends AsyncStatelessComponent {
           Route(
             path: '/day-$i',
             title: 'Fluttercon Berlin 2024',
-            builder: (context, state) =>
-                SchedulePage(day: i, sessions: sessions.where((s) => s.startsAt.day == i + 2).toList()),
+            builder: (context, state) => SchedulePage(
+              day: i,
+              sessions: sessions.where((session) => session.startsAt.day == i + 2).toList(),
+            ),
           ),
         Route(path: '/favorites', title: 'Favorites', builder: (context, state) => FavoritesPage()),
         for (var session in sessions)

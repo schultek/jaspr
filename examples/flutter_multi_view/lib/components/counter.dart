@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../constants/theme.dart';
@@ -23,18 +24,18 @@ class CounterState extends State<Counter> {
           onClick: () {
             setState(() => count--);
           },
-          [text('–')],
+          [.text('–')],
         ),
         span([
-          text('Jaspr Counter'),
+          .text('Jaspr Counter'),
           br(),
-          b([text('$count')]),
+          b([.text('$count')]),
         ]),
         button(
           onClick: () {
             setState(() => count++);
           },
-          [text('+')],
+          [.text('+')],
         ),
       ]),
       EmbeddedCounter(
@@ -49,41 +50,41 @@ class CounterState extends State<Counter> {
   @css
   static List<StyleRule> get styles => [
     css('.counter-group').styles(
-      padding: Padding.all(10.px),
-      margin: Margin.all(10.px),
-      border: Border(style: BorderStyle.dashed, width: 1.px, color: Colors.lightGrey),
-      radius: BorderRadius.circular((cardBorderRadius + 10).px),
+      padding: .all(10.px),
+      margin: .all(10.px),
+      border: .all(style: .dashed, width: 1.px, color: Colors.lightGrey),
+      radius: .circular((cardBorderRadius + 10).px),
     ),
     css('.counter', [
       css('&').styles(
-        display: Display.flex,
+        display: .flex,
         minHeight: cardHeight.px,
         maxWidth: cardWidth.px,
-        padding: Padding.symmetric(vertical: 10.px),
-        boxSizing: BoxSizing.borderBox,
-        border: Border(color: primaryColor, width: 1.px),
-        radius: BorderRadius.circular(cardBorderRadius.px),
-        justifyContent: JustifyContent.spaceAround,
-        alignItems: AlignItems.center,
+        padding: .symmetric(vertical: 10.px),
+        boxSizing: .borderBox,
+        border: .all(color: primaryColor, width: 1.px),
+        radius: .circular(cardBorderRadius.px),
+        justifyContent: .spaceAround,
+        alignItems: .center,
         color: Colors.black,
         backgroundColor: surfaceColor,
       ),
       css('button', [
         css('&').styles(
-          display: Display.flex,
+          display: .flex,
           width: 2.em,
           height: 2.em,
-          border: Border.unset,
-          radius: BorderRadius.all(Radius.circular(2.em)),
-          cursor: Cursor.pointer,
-          justifyContent: JustifyContent.center,
-          alignItems: AlignItems.center,
+          border: .unset,
+          radius: .all(.circular(2.em)),
+          cursor: .pointer,
+          justifyContent: .center,
+          alignItems: .center,
           fontSize: 1.5.rem,
           backgroundColor: Colors.transparent,
         ),
         css('&:hover').styles(backgroundColor: const Color('#0001')),
       ]),
-      css('span').styles(textAlign: TextAlign.center, fontSize: 14.px),
+      css('span').styles(textAlign: .center, fontSize: 14.px),
       css('b').styles(fontSize: 18.px),
     ]),
   ];

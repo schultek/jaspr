@@ -9,13 +9,15 @@ void testUnitMigration(
   Object? expectedOutput,
   Object? expectedMigrations,
   Object? expectedWarnings,
+  List<String> features = const [],
 }) {
   final result = parseString(content: input);
 
   final builder = EditBuilder(result.lineInfo);
   final reporter = MigrationReporter(builder);
+  final context = MigrationContext(result.unit, reporter, features);
 
-  reporter.run(migration, result.unit);
+  reporter.run(migration, context);
 
   final output = builder.apply(input);
 

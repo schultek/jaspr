@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' hide Document;
 
@@ -30,7 +31,7 @@ final class SidebarToggleButton extends StatelessComponent {
           barrierSub = window.document.querySelector('.sidebar-barrier')?.onClick.listen(close);
           window.document.querySelector('.sidebar-container')?.classList.add('open');
         },
-        [raw(_menuIcon)],
+        [RawText(_menuIcon)],
       ),
     ]);
   }

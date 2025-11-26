@@ -2,7 +2,8 @@
 /// @docImport 'markdown_parser.dart';
 library;
 
-import 'package:jaspr/server.dart';
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../page.dart';
 import '../theme/theme.dart';
@@ -174,9 +175,9 @@ class NodesBuilder {
       }
       if (node is TextNode) {
         if (node.raw) {
-          result.add(raw(node.text));
+          result.add(RawText(node.text));
         } else {
-          result.add(text(node.text));
+          result.add(Component.text(node.text));
         }
       } else if (node is ElementNode) {
         result.add(

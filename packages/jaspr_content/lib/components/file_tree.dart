@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../jaspr_content.dart';
@@ -269,7 +270,7 @@ class _FileTree extends StatelessComponent {
         },
         [
           if (iconName != null) buildIcon(iconName),
-          text(isPlaceholder ? '…' : item.name),
+          Component.text(isPlaceholder ? '…' : item.name),
         ],
       ),
       if (item.comment case final comment?) span(classes: 'comment', [comment]),
@@ -307,7 +308,7 @@ class _FileTree extends StatelessComponent {
     return svg(
       viewBox: '0 0 24 24',
       attributes: {'fill': 'currentColor', 'width': '16', 'height': '16'},
-      [raw(fileIcons[iconName] ?? '')],
+      [RawText(fileIcons[iconName] ?? '')],
     );
   }
 }

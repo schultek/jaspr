@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../../../../components/gradient_border.dart';
@@ -19,8 +20,8 @@ class LinkCard extends StatelessComponent {
         radius: 12,
         child: div(classes: 'link-card-content', [
           span(classes: 'card-icon', [Icon(icon)]),
-          h5([text(title)]),
-          p([text(description)]),
+          h5([.text(title)]),
+          p([.text(description)]),
         ]),
       ),
     ]);
@@ -30,30 +31,30 @@ class LinkCard extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('.link-card', [
       css('&').styles(
-        display: Display.block,
-        border: Border(width: 2.px, color: borderColor),
-        radius: BorderRadius.circular(13.px),
-        shadow: BoxShadow(offsetX: 1.px, offsetY: 1.px, blur: 3.px, spread: (-1).px, color: shadowColor1),
-        transition: Transition('background', duration: 300.ms),
-        textAlign: TextAlign.start,
-        textDecoration: TextDecoration.none,
+        display: .block,
+        border: .all(width: 2.px, color: borderColor),
+        radius: .circular(13.px),
+        shadow: .new(offsetX: 1.px, offsetY: 1.px, blur: 3.px, spread: (-1).px, color: shadowColor1),
+        transition: .new('background', duration: 300.ms),
+        textAlign: .start,
+        textDecoration: .none,
       ),
       css('&:hover').styles(backgroundColor: surface),
       css('.link-card-content').styles(
-        display: Display.flex,
-        padding: Padding.all(1.rem),
-        radius: BorderRadius.circular(10.px),
-        flexDirection: FlexDirection.column,
-        alignItems: AlignItems.stretch,
+        display: .flex,
+        padding: .all(1.rem),
+        radius: .circular(10.px),
+        flexDirection: .column,
+        alignItems: .stretch,
       ),
       css('.card-icon').styles(
-        margin: Margin.only(bottom: 1.rem),
+        margin: .only(bottom: 1.rem),
         color: primaryMid,
         fontSize: 1.5.em,
       ),
       css('p')
           .styles(
-            margin: Margin.only(top: 0.4.em, bottom: Unit.zero),
+            margin: .only(top: 0.4.em, bottom: .zero),
           )
           .combine(bodySmall),
     ]),

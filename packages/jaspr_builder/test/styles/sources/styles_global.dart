@@ -2,7 +2,7 @@ import 'dart:convert';
 
 const stylesGlobalSources = {
   'site|lib/styles_global.dart': '''
-    import 'package:jaspr/jaspr.dart';
+    import 'package:jaspr/dom.dart';
         
     @css
     final styles = [

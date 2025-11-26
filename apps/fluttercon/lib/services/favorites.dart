@@ -14,8 +14,8 @@ class FavoritesService extends ChangeNotifier {
     SessionMapper.ensureInitialized();
     if (kIsWeb) {
       prefs = SharedPreferences.getInstance()
-        ..then((p) {
-          _favorites = MapperContainer.globals.fromJson(p.getString('favorites') ?? '{}');
+        ..then((preferences) {
+          _favorites = MapperContainer.globals.fromJson(preferences.getString('favorites') ?? '{}');
           notifyListeners();
         });
     } else {

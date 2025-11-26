@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' hide Document;
 
@@ -168,13 +169,13 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
         src: component.src,
         alt: component.alt ?? component.caption,
         styles: zoomed ? Styles(visibility: Visibility.hidden) : null,
-        events: events<void, void>(
+        events: events<void>(
           onClick: () {
             zoomIn();
           },
         ),
       ),
-      if (component.caption != null) figcaption([text(component.caption!)]),
+      if (component.caption != null) figcaption([Component.text(component.caption!)]),
     ]);
   }
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../../server.dart';
+import '../../dom/validator.dart';
 
 void initSyncState(SyncStateMixin element) {
   if (element.context.binding case ServerAppBinding b) {

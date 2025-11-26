@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:universal_web/web.dart' as web;
 
 import '../../jaspr.dart';
+import '../dom/validator.dart';
 import 'options.dart';
 
 sealed class ComponentAnchor {

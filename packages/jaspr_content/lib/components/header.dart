@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import 'sidebar_toggle_button.dart';
@@ -34,7 +35,7 @@ class Header extends StatelessComponent {
         ...leading,
         a(classes: 'header-title', href: '/', [
           img(src: logo, alt: 'Logo'),
-          span([text(title)]),
+          span([Component.text(title)]),
         ]),
         div(classes: 'header-content', [
           div(classes: 'header-items', items),
@@ -49,7 +50,7 @@ class Header extends StatelessComponent {
         height: 4.rem,
         display: Display.flex,
         alignItems: AlignItems.center,
-        gap: Gap(column: 1.rem),
+        gap: Gap.column(1.rem),
         padding: Padding.symmetric(horizontal: 1.rem, vertical: .25.rem),
         margin: Margin.symmetric(horizontal: Unit.auto),
         border: Border.only(
@@ -62,7 +63,7 @@ class Header extends StatelessComponent {
           display: Display.inlineFlex,
           flex: Flex(basis: 17.rem),
           alignItems: AlignItems.center,
-          gap: Gap(column: .75.rem),
+          gap: Gap.column(.75.rem),
         ),
         css('img').styles(height: 1.5.rem, width: Unit.auto),
         css('span').styles(fontWeight: FontWeight.w700),
@@ -77,7 +78,7 @@ class Header extends StatelessComponent {
       css('.header-items', [
         css('&').styles(
           display: Display.flex,
-          gap: Gap(column: 0.25.rem),
+          gap: Gap.column(0.25.rem),
         ),
       ]),
     ]),

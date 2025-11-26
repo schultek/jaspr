@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
@@ -16,7 +17,7 @@ class EmbeddedCounter extends StatelessComponent {
   Component build(BuildContext context) {
     return FlutterEmbedView.deferred(
       classes: 'flutter-counter',
-      styles: Styles(margin: Margin.only(top: 20.px)),
+      styles: Styles(margin: .only(top: 20.px)),
       constraints: ViewConstraints(
         minWidth: cardWidth,
         minHeight: cardHeight,
@@ -33,11 +34,11 @@ class EmbeddedCounter extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('.flutter-counter', [
       css('&').styles(
-        display: Display.flex,
-        radius: BorderRadius.circular(cardBorderRadius.px),
+        display: .flex,
+        radius: .circular(cardBorderRadius.px),
         backgroundColor: surfaceColor,
       ),
-      css('& > div[flt-embedding]').styles(opacity: 0, transition: Transition('opacity', duration: 400.ms)),
+      css('& > div[flt-embedding]').styles(opacity: 0, transition: .new('opacity', duration: 400.ms)),
       css('&.active > div[flt-embedding]').styles(opacity: 1),
     ]),
   ];

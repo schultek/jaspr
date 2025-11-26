@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
 
@@ -25,18 +26,18 @@ class ThemeToggleState extends State<ThemeToggle> {
 
   @override
   Component build(BuildContext context) {
-    return fragment([
+    return .fragment([
       if (kIsWeb)
         Document.html(attributes: {'class': isDark ? 'dark' : 'light'})
       else
         Document.head(
           children: [
             // ignore: prefer_html_methods
-            Component.element(
+            .element(
               id: 'theme-script',
               tag: 'script',
               children: [
-                raw('''
+                RawText('''
             let userTheme = window.localStorage.getItem('active-theme');
             if (userTheme != null) {
               document.documentElement.className = userTheme;
@@ -59,7 +60,7 @@ class ThemeToggleState extends State<ThemeToggle> {
           });
           web.window.localStorage.setItem('active-theme', isDark ? 'dark' : 'light');
         },
-        styles: !kIsWeb ? Styles(visibility: Visibility.hidden) : null,
+        styles: !kIsWeb ? Styles(visibility: .hidden) : null,
         [Icon(isDark ? 'moon' : 'sun')],
       ),
     ]);
@@ -69,12 +70,12 @@ class ThemeToggleState extends State<ThemeToggle> {
   static List<StyleRule> get styles => [
     css('.theme-toggle', [
       css('&').styles(
-        display: Display.flex,
-        padding: Padding.all(.7.rem),
-        border: Border.unset,
-        radius: BorderRadius.circular(8.px),
-        outline: Outline.unset,
-        alignItems: AlignItems.center,
+        display: .flex,
+        padding: .all(.7.rem),
+        border: .unset,
+        radius: .circular(8.px),
+        outline: .unset,
+        alignItems: .center,
         color: textBlack,
         backgroundColor: Colors.transparent,
       ),

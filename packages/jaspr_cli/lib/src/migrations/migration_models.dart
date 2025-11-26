@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
@@ -10,9 +11,17 @@ abstract class Migration {
   String get minimumJasprVersion;
   String get hint;
 
-  void runForUnit(CompilationUnit unit, MigrationReporter reporter);
+  void runForUnit(MigrationContext context);
 
   List<MigrationResult> runForDirectory(Directory dir, bool apply);
+}
+
+class MigrationContext {
+  MigrationContext(this.unit, this.reporter, this.features);
+
+  final CompilationUnit unit;
+  final MigrationReporter reporter;
+  final List<String> features;
 }
 
 extension MigrationExtension on List<Migration> {
@@ -20,8 +29,9 @@ extension MigrationExtension on List<Migration> {
     List<String> directories,
     bool apply,
     FileSystem fs,
-    void Function(File, Object, StackTrace) onError,
-  ) {
+    void Function(File, Object, StackTrace) onError, {
+    List<String> features = const [],
+  }) {
     final results = <MigrationResult>[];
 
     for (final path in directories) {
@@ -35,13 +45,17 @@ extension MigrationExtension on List<Migration> {
       for (final file in files) {
         final content = file.readAsStringSync();
         try {
-          final result = parseString(content: content);
+          final result = parseString(
+            content: content,
+            featureSet: FeatureSet.latestLanguageVersion(flags: ['dot-shorthands']),
+          );
 
           final builder = EditBuilder(result.lineInfo);
           final reporter = MigrationReporter(builder);
+          final context = MigrationContext(result.unit, reporter, features);
 
           for (final migration in this) {
-            reporter.run(migration, result.unit);
+            reporter.run(migration, context);
           }
 
           if (reporter.migrations.isEmpty && reporter.warnings.isEmpty) {
@@ -85,9 +99,9 @@ class MigrationReporter {
 
   Migration? _currentMigration;
 
-  void run(Migration migration, CompilationUnit unit) {
+  void run(Migration migration, MigrationContext context) {
     _currentMigration = migration;
-    migration.runForUnit(unit, this);
+    migration.runForUnit(context);
   }
 
   void reportManualMigrationNeeded(int offset, int length, String message) {

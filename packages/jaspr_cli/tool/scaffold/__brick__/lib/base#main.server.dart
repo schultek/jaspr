@@ -4,6 +4,7 @@
 /// To run code on the client, check the `main.client.dart` file.
 library;
 
+import 'package:jaspr/dom.dart';
 // Server-specific Jaspr import.
 import 'package:jaspr/server.dart';
 
@@ -33,12 +34,12 @@ void main() {
       css('html, body').styles(
         width: 100.percent,
         minHeight: 100.vh,
-        padding: Padding.zero,
-        margin: Margin.zero,
-        fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]),
+        padding: .zero,
+        margin: .zero,
+        fontFamily: const .list([FontFamily('Roboto'), FontFamilies.sansSerif]),
       ),
       css('h1').styles(
-        margin: Margin.unset,
+        margin: .unset,
         fontSize: 4.rem,
       ),
     ],{{#flutter}}

@@ -4,8 +4,11 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_style/dart_style.dart';
-import 'package:jaspr/jaspr.dart'
-    show ClientAnnotation, CssUtility, Import, Component, Key, StyleRule, SyncAnnotation, State;
+import 'package:jaspr/jaspr.dart' show ClientAnnotation, Import, Component, Key, SyncAnnotation, State;
+// ignore: implementation_imports
+import 'package:jaspr/src/dom/styles/css.dart' show CssUtility;
+// ignore: implementation_imports
+import 'package:jaspr/src/dom/styles/rules.dart' show StyleRule;
 import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
 import 'package:yaml/yaml.dart' as yaml;

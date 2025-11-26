@@ -1,4 +1,4 @@
-import '../../foundation/validator.dart';
+import '../../dom/validator.dart';
 import '../../framework/framework.dart';
 import '../markup_render_object.dart';
 import '../options.dart';

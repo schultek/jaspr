@@ -1,4 +1,5 @@
 import '../../../server.dart';
+import '../../dom/styles/rules.dart' show StyleRulesRender;
 
 class GlobalStylesAdapter extends HeadScopeAdapter {
   GlobalStylesAdapter(this.binding);

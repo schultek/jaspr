@@ -1,6 +1,6 @@
 import 'package:universal_web/web.dart' as web;
 
-import '../foundation/type_checks.dart';
+import '../dom/type_checks.dart';
 import '../framework/framework.dart';
 import 'dom_render_object.dart';
 import 'utils.dart';

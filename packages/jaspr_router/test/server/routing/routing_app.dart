@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
@@ -10,7 +11,7 @@ class App extends StatelessComponent {
         Route(path: '/about', builder: (_, _) => About()),
       ],
       errorBuilder: (_, state) {
-        return span([text('Unknown (${state.location})')]);
+        return span([Component.text('Unknown (${state.location})')]);
       },
     );
   }
@@ -23,7 +24,7 @@ class Home extends StatelessComponent {
     shouldThrow(() => Router.of(context).replace('/'));
     shouldThrow(() => Router.of(context).back());
 
-    return span([text('Home')]);
+    return span([Component.text('Home')]);
   }
 
   void shouldThrow(void Function() fn) {
@@ -40,13 +41,13 @@ class Home extends StatelessComponent {
 class About extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return span([text('About')]);
+    return span([Component.text('About')]);
   }
 }
 
 class Contact extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return span([text('Contact')]);
+    return span([Component.text('Contact')]);
   }
 }

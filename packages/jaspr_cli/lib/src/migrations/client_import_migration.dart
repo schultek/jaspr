@@ -21,14 +21,14 @@ class ClientImportMigration implements Migration {
   }
 
   @override
-  void runForUnit(CompilationUnit unit, MigrationReporter reporter) {
-    final browserImport = unit.directives
+  void runForUnit(MigrationContext context) {
+    final browserImport = context.unit.directives
         .whereType<ImportDirective>()
         .where((d) => d.uri.stringValue == 'package:jaspr/browser.dart')
         .firstOrNull;
 
     if (browserImport != null) {
-      reporter.createMigration("Changed 'package:jaspr/browser.dart' import to 'package:jaspr/client.dart'.", (
+      context.reporter.createMigration("Changed 'package:jaspr/browser.dart' import to 'package:jaspr/client.dart'.", (
         builder,
       ) {
         builder.replace(
@@ -42,17 +42,17 @@ class ClientImportMigration implements Migration {
             builder.replace(node.offset, node.length, 'ClientAppBinding');
           },
         );
-        unit.visitChildren(visitor);
+        context.unit.visitChildren(visitor);
       });
     }
 
-    final browserTestImport = unit.directives
+    final browserTestImport = context.unit.directives
         .whereType<ImportDirective>()
         .where((d) => d.uri.stringValue == 'package:jaspr_test/browser_test.dart')
         .firstOrNull;
 
     if (browserTestImport != null) {
-      reporter.createMigration(
+      context.reporter.createMigration(
         "Changed 'package:jaspr_test/browser_test.dart' import to 'package:jaspr_test/client_test.dart'.",
         (builder) {
           builder.replace(
@@ -68,7 +68,7 @@ class ClientImportMigration implements Migration {
               }
             },
           );
-          unit.visitChildren(visitor);
+          context.unit.visitChildren(visitor);
         },
       );
     }

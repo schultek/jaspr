@@ -7,6 +7,7 @@
 library;
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart' hide Response;
 import 'package:shelf/shelf.dart' as shelf;
 

@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../components/logo.dart';
@@ -14,15 +15,15 @@ class Footer extends StatelessComponent {
           div([
             Logo(),
             span(classes: 'created-by', [
-              text('Created by '),
+              .text('Created by '),
               a(href: 'https://schultek.dev', classes: 'animated-underline', [
-                text('@schultek'),
+                .text('@schultek'),
               ]),
             ]),
           ]),
           a(
             href: "https://github.com/schultek/jaspr/tree/main/apps/website",
-            target: Target.blank,
+            target: .blank,
             [
               span(classes: 'on-dark', [JasprBadge.light()]),
               span(classes: 'on-light', [JasprBadge.dark()]),
@@ -30,61 +31,61 @@ class Footer extends StatelessComponent {
           ),
         ]),
         div([
-          h5([text('Navigation')]),
+          h5([.text('Navigation')]),
           ul([
             li([
-              a(href: '/', classes: 'animated-underline', [text('Home')]),
+              a(href: '/', classes: 'animated-underline', [.text('Home')]),
             ]),
             li([
-              a(href: 'https://docs.jaspr.site', classes: 'animated-underline', [text('Docs')]),
+              a(href: 'https://docs.jaspr.site', classes: 'animated-underline', [.text('Docs')]),
             ]),
             li([
-              a(href: 'https://playground.jaspr.site', classes: 'animated-underline', [text('Playground')]),
+              a(href: 'https://playground.jaspr.site', classes: 'animated-underline', [.text('Playground')]),
             ]),
             li([
-              a(href: 'https://github.com/schultek/jaspr', classes: 'animated-underline', [text('Github')]),
+              a(href: 'https://github.com/schultek/jaspr', classes: 'animated-underline', [.text('Github')]),
             ]),
           ]),
         ]),
         div([
-          h5([text('Community')]),
+          h5([.text('Community')]),
           ul([
             li([
-              a(href: 'https://discord.gg/XGXrGEk4c6', target: Target.blank, classes: 'animated-underline', [
-                text('Discord'),
+              a(href: 'https://discord.gg/XGXrGEk4c6', target: .blank, classes: 'animated-underline', [
+                .text('Discord'),
               ]),
             ]),
             li([
               a(
                 href: 'https://docs.jaspr.site/going_further/contributing',
-                target: Target.blank,
+                target: .blank,
                 classes: 'animated-underline',
-                [text('Contribute')],
+                [.text('Contribute')],
               ),
             ]),
             li([
-              a(href: 'https://github.com/sponsors/schultek/', target: Target.blank, classes: 'animated-underline', [
-                text('Sponsor'),
+              a(href: 'https://github.com/sponsors/schultek/', target: .blank, classes: 'animated-underline', [
+                .text('Sponsor'),
               ]),
             ]),
           ]),
         ]),
         div([
-          h5([text('Legal')]),
+          h5([.text('Legal')]),
           ul([
             li([
-              a(href: '/imprint', classes: 'animated-underline', [text('Imprint')]),
+              a(href: '/imprint', classes: 'animated-underline', [.text('Imprint')]),
             ]),
             li([
-              a(href: '/privacy', classes: 'animated-underline', [text('Privacy Policy')]),
+              a(href: '/privacy', classes: 'animated-underline', [.text('Privacy Policy')]),
             ]),
           ]),
         ]),
       ]),
       div(classes: 'footer-banner', [
-        text('Copyright © 2025 Jaspr | '),
+        .text('Copyright © 2025 Jaspr | '),
         a(href: 'https://github.com/schultek/jaspr/blob/main/LICENSE', classes: 'animated-underline', [
-          raw('MIT&nbsp;License'),
+          RawText('MIT&nbsp;License'),
         ]),
       ]),
     ]);
@@ -94,58 +95,58 @@ class Footer extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('footer', [
       css('&').styles(
-        border: Border.only(
-          top: BorderSide(color: borderColor, width: 2.px),
+        border: .only(
+          top: .new(color: borderColor, width: 2.px),
         ),
       ),
       css('.created-by', [
         css('&').styles(
-          display: Display.inlineBlock,
-          margin: Margin.only(top: 0.4.rem),
+          display: .inlineBlock,
+          margin: .only(top: 0.4.rem),
           color: textDim,
           fontSize: 0.7.rem,
         ),
-        css('a').styles(color: textDark, fontWeight: FontWeight.w500, textDecoration: TextDecoration.none),
+        css('a').styles(color: textDark, fontWeight: .w500, textDecoration: .none),
       ]),
       css('.footer-navigation', [
         css('&').styles(
-          display: Display.flex,
+          display: .flex,
           maxWidth: maxContentWidth,
-          padding: Padding.only(top: 4.rem, left: 2.rem, right: 4.rem, bottom: 2.5.rem),
-          flexDirection: FlexDirection.row,
-          justifyContent: JustifyContent.spaceBetween,
-          alignItems: AlignItems.start,
-          gap: Gap.all(2.rem),
+          padding: .only(top: 4.rem, left: 2.rem, right: 4.rem, bottom: 2.5.rem),
+          flexDirection: .row,
+          justifyContent: .spaceBetween,
+          alignItems: .start,
+          gap: .all(2.rem),
         ),
         css('.footer-logo', [
           css('&').styles(
-            display: Display.flex,
-            flexDirection: FlexDirection.column,
-            justifyContent: JustifyContent.spaceBetween,
-            alignSelf: AlignSelf.stretch,
-            gap: Gap.all(1.rem),
+            display: .flex,
+            flexDirection: .column,
+            justifyContent: .spaceBetween,
+            alignSelf: .stretch,
+            gap: .all(1.rem),
           ),
         ]),
-        css('h5').styles(margin: Margin.only(bottom: 1.rem)),
+        css('h5').styles(margin: .only(bottom: 1.rem)),
         css('ul').styles(
-          padding: Padding.zero,
-          listStyle: ListStyle.none,
+          padding: .zero,
+          listStyle: .none,
           fontSize: 0.9.rem,
           lineHeight: 2.rem,
         ),
         css('ul a').styles(color: textDim),
       ]),
       css('.footer-banner').styles(
-        padding: Padding.symmetric(vertical: 1.rem, horizontal: 2.rem),
-        border: Border.only(
-          top: BorderSide(color: borderColor, width: 2.px),
+        padding: .symmetric(vertical: 1.rem, horizontal: 2.rem),
+        border: .only(
+          top: .new(color: borderColor, width: 2.px),
         ),
         color: textDim,
         fontSize: 0.8.rem,
       ),
     ]),
-    css.media(MediaQuery.all(maxWidth: 600.px), [
-      css('footer', [css('.footer-navigation').styles(display: Display.flex, flexDirection: FlexDirection.column)]),
+    css.media(.all(maxWidth: 600.px), [
+      css('footer', [css('.footer-navigation').styles(display: .flex, flexDirection: .column)]),
     ]),
   ];
 }
