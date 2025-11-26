@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
 // The flutter widget is only imported on the web (as the server cannot import flutter)

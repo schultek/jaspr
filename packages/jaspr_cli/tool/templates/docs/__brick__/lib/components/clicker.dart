@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_content/theme.dart';
 
 /// A simple Jaspr component that counts the number of clicks.

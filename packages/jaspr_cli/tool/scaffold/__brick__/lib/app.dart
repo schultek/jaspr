@@ -1,4 +1,5 @@
-import 'package:jaspr/dom.dart';{{#routing}}
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';{{#routing}}
 import 'package:jaspr_router/jaspr_router.dart';{{/routing}}
 {{#routing}}
 import 'components/header.dart';{{/routing}}

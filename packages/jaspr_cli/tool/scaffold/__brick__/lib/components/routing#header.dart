@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 {{#server}}
 import '../constants/theme.dart';{{/server}}

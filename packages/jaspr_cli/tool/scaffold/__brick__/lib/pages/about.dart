@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 {{#multipage}}
 // By using the @client annotation this component will be automatically compiled to javascript and mounted
 // on the client. Therefore:

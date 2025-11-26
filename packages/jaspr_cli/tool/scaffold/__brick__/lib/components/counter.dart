@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 {{#server}}
 import '../constants/theme.dart';{{/server}}{{#flutter}}
 import 'embedded_counter.dart';{{/flutter}}
