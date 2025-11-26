@@ -24,7 +24,7 @@ class FlutterEmbedView extends StatelessComponent {
   final Styles? styles;
   final ViewConstraints? constraints;
   final Component? loader;
-  final Future? loadLibrary;
+  final Future<void>? loadLibrary;
   final Widget? widget;
 
   final Object Function()? builder;

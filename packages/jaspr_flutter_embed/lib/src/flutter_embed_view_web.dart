@@ -6,9 +6,16 @@ import 'view_constraints.dart';
 import 'widget.dart';
 
 class FlutterEmbedView extends StatefulComponent {
-  const FlutterEmbedView({this.id, this.classes, this.styles, this.constraints, this.loader, this.widget, super.key})
-    : loadLibrary = null,
-      builder = null;
+  const FlutterEmbedView({
+    this.id,
+    this.classes,
+    this.styles,
+    this.constraints,
+    this.loader,
+    this.widget,
+    super.key,
+  }) : loadLibrary = null,
+       builder = null;
 
   const FlutterEmbedView.deferred({
     this.id,
@@ -26,7 +33,7 @@ class FlutterEmbedView extends StatefulComponent {
   final Styles? styles;
   final ViewConstraints? constraints;
   final Component? loader;
-  final Future? loadLibrary;
+  final Future<void>? loadLibrary;
   final Widget? widget;
   final Widget Function()? builder;
 
@@ -44,7 +51,7 @@ class FlutterEmbedView extends StatefulComponent {
       styles: styles,
       constraints: constraints,
       loader: loader,
-      widget: (widget ?? builder?.call()) as dynamic,
+      widget: (widget ?? builder?.call()),
     );
   }
 
@@ -74,8 +81,8 @@ class FlutterEmbedViewState extends State<FlutterEmbedView> {
       });
     });
 
-    if (component.loadLibrary != null) {
-      component.loadLibrary!.whenComplete(() {
+    if (component.loadLibrary case final loadLibrary?) {
+      loadLibrary.whenComplete(() {
         if (!mounted) return;
         setState(() {
           libraryLoading = false;

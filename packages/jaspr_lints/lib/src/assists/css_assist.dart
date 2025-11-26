@@ -10,7 +10,7 @@ class CssAssistProvider extends DartAssist {
   @override
   void run(CustomLintResolver resolver, ChangeReporter reporter, CustomLintContext context, SourceRange target) {
     var config = readJasprConfig(resolver.path);
-    if (config['mode'] != 'server' && config['mode'] != 'static') {
+    if (config == null || config['mode'] != 'server' && config['mode'] != 'static') {
       return;
     }
 

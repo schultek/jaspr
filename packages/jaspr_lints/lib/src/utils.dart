@@ -95,14 +95,15 @@ extension Indent on String {
   }
 }
 
-dynamic readJasprConfig(String filePath) {
+YamlMap? readJasprConfig(String filePath) {
   var segments = path.split(filePath);
   while (segments.length > 1) {
     var pubspecFile = File(path.joinAll([...segments, 'pubspec.yaml']));
     if (pubspecFile.existsSync()) {
-      var pubspecData = loadYaml(pubspecFile.readAsStringSync());
-      return pubspecData['jaspr'];
+      var pubspecData = loadYaml(pubspecFile.readAsStringSync()) as YamlMap;
+      return pubspecData['jaspr'] as YamlMap?;
     }
     segments.removeLast();
   }
+  return null;
 }
