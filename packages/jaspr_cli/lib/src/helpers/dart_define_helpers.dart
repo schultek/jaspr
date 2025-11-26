@@ -5,21 +5,27 @@ extension AddDartDefine on BaseCommand {
     argParser.addMultiOption(
       'dart-define',
       help:
-          'Additional key-value pairs that will be available both on the server and client as constants from the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors. Multiple defines can be passed by repeating "--dart-define" multiple times.',
+          'Additional key-value pairs that will be available both on the server and client as constants\n'
+          'from the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors.\n'
+          'Multiple defines can be passed by repeating "--dart-define" multiple times.',
       valueHelp: 'key=value',
       splitCommas: false,
     );
     argParser.addMultiOption(
       'dart-define-client',
       help:
-          'Additional key-value pairs that will be available on the client as constants from the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors. Multiple defines can be passed by repeating "--dart-define-client" multiple times.',
+          'Additional key-value pairs that will be available on the client as constants\n'
+          'from the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors.\n'
+          'Multiple defines can be passed by repeating "--dart-define-client" multiple times.',
       valueHelp: 'key=value',
       splitCommas: false,
     );
     argParser.addMultiOption(
       'dart-define-server',
       help:
-          'Additional key-value pairs that will be available on the server as constants from the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors. Multiple defines can be passed by repeating "--dart-define-client" multiple times.',
+          'Additional key-value pairs that will be available on the server as constants\n'
+          'from the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors.\n'
+          'Multiple defines can be passed by repeating "--dart-define-server" multiple times.',
       valueHelp: 'key=value',
       splitCommas: false,
     );

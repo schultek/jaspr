@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/source/source_range.dart';
+import 'package:file/file.dart';
 import 'package:io/ansi.dart';
 
 import 'migration_models.dart';
@@ -69,6 +70,11 @@ class HtmlHelperMigration implements Migration {
         }
       });
     }
+  }
+
+  @override
+  List<MigrationResult> runForDirectory(Directory dir, bool apply) {
+    return [];
   }
 }
 

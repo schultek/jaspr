@@ -160,7 +160,7 @@ export class ScopesDomain implements vscode.Disposable {
             );
 
             let message = `Unsafe import: '${dep.invalidOnServer.uri}' depends on '${dep.invalidOnServer.target}', which is not available on the server.\nTry using a platform-independent library ${messageSuffix}`;
-            if (s.uri === "package:jaspr/browser.dart") {
+            if (s.uri === "package:jaspr/client.dart") {
               message = `Unsafe import: '${s.uri}' is not available on the server.\nTry using 'package:jaspr/jaspr.dart' instead ${messageSuffix}`;
             } else if (
               s.uri === "package:web/web.dart" ||

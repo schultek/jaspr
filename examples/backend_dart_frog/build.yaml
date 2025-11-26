@@ -1,0 +1,6 @@
+global_options:
+  jaspr_builder:server_options:
+    options:
+      # This is needed since we are not using the default `lib/main.server.dart` entrypoint.
+      # Run `dart_frog dev` once before building to ensure the file exists.
+      root_path: .dart_frog/server.dart

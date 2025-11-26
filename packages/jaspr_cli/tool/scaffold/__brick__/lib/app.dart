@@ -11,7 +11,7 @@ import 'pages/home.dart';
 // By using multi-page routing, this component will only be built on the server during pre-rendering and
 // **not** executed on the client. Instead only the nested [Home] and [About] components will be mounted on the client.
 class App extends StatelessComponent {
-  const App({super.key});{{/multipage}}{{^multipage}}{{#hydration}}
+  const App({super.key});{{/multipage}}{{^multipage}}
 // By using the @client annotation this component will be automatically compiled to javascript and mounted
 // on the client. Therefore:
 // - this file and any imported file must be compilable for both server and client environments.
@@ -39,13 +39,7 @@ class AppState extends State<App> {
     } else {
       print("Hello server");
     }
-  }{{/hydration}}{{^hydration}}
-// This component is used on both the server (`lib/main.dart`) and the client (`web/main.dart`). Therefore:
-// - this file and any imported file must be compilable for both server and client environments.
-// - this component and any child components will be built once on the server during pre-rendering and then
-//   again on the client during normal rendering.
-class App extends StatelessComponent {
-  const App({super.key});{{/hydration}}{{/multipage}}{{/server}}{{^server}}
+  }{{/multipage}}{{/server}}{{^server}}
 class App extends StatelessComponent {
   const App({super.key});{{/server}}
 

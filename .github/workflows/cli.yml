@@ -24,14 +24,14 @@ jobs:
     strategy:
       matrix:
         Variant:
-          - sampn
-          - vnsnn
-          - cnsnn
-          - vanen
-          - cnnen
-          - vanns
-          - sanpn
-          - cnspn
+          - smpn
+          - vsnn
+          - csnn
+          - vnen
+          - cnen
+          - vnns
+          - snpn
+          - cspn
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5

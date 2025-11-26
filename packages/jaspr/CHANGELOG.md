@@ -1,5 +1,37 @@
 ## Unreleased breaking
 
+- **Breaking** Changed project structure for **static** and **server** mode:
+
+  - Any server entrypoint file must now end in `.server.dart` (e.g. `lib/main.server.dart`).
+  - The generated server-side options file is now generated alongside the server entrypoint (e.g. as `lib/main.server.g.dart`) containing `defaultServerOptions`.
+  - `Jaspr.initializeApp()` now requires the `package:jaspr/server.dart` import.
+
+  - The project can contain at least one client entrypoint file ending in `.client.dart` (e.g. `lib/main.client.dart`) for client-side rendering (also available in **client** mode).
+  - A new client-side Jaspr options file is generated alongside the client entrypoint (e.g. as `lib/main.client.g.dart`) containing `defaultClientOptions`.
+  - Added a new `ClientApp` component that should be used inside the client entrypoint like this:
+    ```dart
+    // This file is lib/main.client.dart
+
+    import 'package:jaspr/client.dart';
+    import 'main.client.g.dart';
+
+    void main() {
+      Jaspr.initializeApp(
+        options: defaultClientOptions,
+      );
+
+      runApp(
+        const ClientApp(),
+      );
+    }
+    ```
+
+- **Breaking** Renamed `package:jaspr/browser.dart` library to `package:jaspr/client.dart`, as well as:
+  
+  - Renamed `BrowserAppBinding` class to `ClientAppBinding`.
+  - Renamed `package:jaspr_test/browser_test.dart` library to `package:jaspr_test/client_test.dart`.
+  - Renamed `testBrowser()` class to `testClient()`.
+
 - **Breaking** Moved all html components, style classes and dom utilities including `div()` et al., `Styles`, `css`, `Color` et al., `events()`, `RawText`, and `ViewTransitionMixin` to a separate `package:jaspr/dom.dart` library.
 
   This reduces the "pollution" of the global namespace when importing `package:jaspr/jaspr.dart` and allows for more fine-grained control of imported APIs.
@@ -24,17 +56,9 @@
 
 - **Breaking** Removed deprecated `package:jaspr/ui.dart` library. 
 
-- **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`. Use `jaspr.target` instead.
-
-- Added support for `jaspr.target` option in `pubspec.yaml` to specify the default entrypoint(s) of your Jaspr application.
-
-  This can either be a single file (e.g. `bin/main.dart`) or a list of files (e.g. `["lib/main.dart","lib/other.dart"]`).
-  When multiple files are specified, the desired entrypoint can be selected using the `--input` flag when running `jaspr serve` or `jaspr build`, or the first file will be used if the `--input` flag is not set. 
-  
-  If neither is set, the default entrypoint stays `lib/main.dart`.
+- **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`.
 
 - Added support for `jaspr.port` option in `pubspec.yaml` to specify the default port used by `jaspr serve`. 
-
   This can still be overridden using the `--port` flag. If neither is set, the default port stays `8080`.
 
 - **Breaking**: `ResponseLike.body` (returned from `renderComponent()`) is now a `Uint8List` instead of `String`.
@@ -44,16 +68,15 @@
 
 - **Breaking** Changed `events()` method to accept only one optional type parameter for both `onInput` and `onChange` events.
 
-- **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
-- **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
-
-- Added `Curve.linearFn()` easing function.
 - Added `Animation`, `Quotes` CSS properties.
-- Added `ms` and `seconds` extensions to `int` for simple conversion to `Duration`.
-- Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`, `TextShadow` and `BoxShadow`.
+- Added `Curve.linearFn()` easing function.
 - Added `Gap.row()` and `Gap.column()` constructors.
 - Added `Flex.grow()`, `Flex.shrink()` and `Flex.basis()` constructors.
 - Added `Border.all()` constructor and deprecate the unnamed `Border` constructor.
+- **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
+- Added `ms` and `seconds` extensions to `int` for simple conversion to `Duration`.
+- **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
+- Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`, `TextShadow` and `BoxShadow`.
 - Allow nesting non-empty `Filter.list` inside each other.
 
 ## 0.21.7

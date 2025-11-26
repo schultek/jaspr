@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/source/line_info.dart';
+import 'package:file/file.dart';
 
 abstract class Migration {
   String get name;
@@ -13,6 +12,8 @@ abstract class Migration {
   String get hint;
 
   void runForUnit(MigrationContext context);
+
+  List<MigrationResult> runForDirectory(Directory dir, bool apply);
 }
 
 class MigrationContext {
@@ -27,13 +28,14 @@ extension MigrationExtension on List<Migration> {
   List<MigrationResult> computeResults(
     List<String> directories,
     bool apply,
+    FileSystem fs,
     void Function(File, Object, StackTrace) onError, {
     List<String> features = const [],
   }) {
     final results = <MigrationResult>[];
 
     for (final path in directories) {
-      final dir = Directory(path);
+      final dir = fs.directory(path);
       if (!dir.existsSync()) {
         continue;
       }
@@ -48,7 +50,7 @@ extension MigrationExtension on List<Migration> {
             featureSet: FeatureSet.latestLanguageVersion(flags: ['dot-shorthands']),
           );
 
-          final builder = MigrationBuilder(result.lineInfo);
+          final builder = EditBuilder(result.lineInfo);
           final reporter = MigrationReporter(builder);
           final context = MigrationContext(result.unit, reporter, features);
 
@@ -60,7 +62,7 @@ extension MigrationExtension on List<Migration> {
             continue;
           }
 
-          results.add(MigrationResult(file.path, content, reporter));
+          results.add(MigrationResult(file.path, reporter.migrations, reporter.warnings));
 
           if (apply) {
             final result = builder.apply(content);
@@ -70,6 +72,10 @@ extension MigrationExtension on List<Migration> {
           onError(file, e, st);
         }
       }
+
+      for (final migration in this) {
+        results.addAll(migration.runForDirectory(dir, apply));
+      }
     }
 
     return results;
@@ -77,17 +83,17 @@ extension MigrationExtension on List<Migration> {
 }
 
 class MigrationResult {
-  MigrationResult(this.path, this.content, this.reporter);
+  MigrationResult(this.path, this.migrations, this.warnings);
 
   final String path;
-  final String content;
-  final MigrationReporter reporter;
+  final List<MigrationInstance> migrations;
+  final List<MigrationWarning> warnings;
 }
 
 class MigrationReporter {
   MigrationReporter(this._builder);
 
-  final MigrationBuilder _builder;
+  final EditBuilder _builder;
   final List<MigrationInstance> migrations = [];
   final List<MigrationWarning> warnings = [];
 
@@ -102,7 +108,7 @@ class MigrationReporter {
     warnings.add(MigrationWarning(offset, length, message, _currentMigration!));
   }
 
-  void createMigration(String description, void Function(MigrationBuilder builder) migration) {
+  void createMigration(String description, void Function(EditBuilder builder) migration) {
     migrations.add(MigrationInstance(description, _currentMigration!));
     migration(_builder);
   }
@@ -127,8 +133,8 @@ class MigrationInstance {
   String toString() => description;
 }
 
-class MigrationBuilder {
-  MigrationBuilder(this.lineInfo);
+class EditBuilder {
+  EditBuilder(this.lineInfo);
 
   final LineInfo lineInfo;
   final List<ChangeRequest> changes = [];

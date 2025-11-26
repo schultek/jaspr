@@ -7,7 +7,7 @@ import 'utils.dart';
 void main() {
   group('html helper migration', () {
     test('migrates text() to Component.text()', () {
-      testMigration(
+      testUnitMigration(
         HtmlHelperMigration(),
         input: '''
 import 'package:jaspr/jaspr.dart';
@@ -34,7 +34,7 @@ void main() {
     });
 
     test('migrates fragment() to Component.fragment()', () {
-      testMigration(
+      testUnitMigration(
         HtmlHelperMigration(),
         input: '''
 import 'package:jaspr/jaspr.dart';
@@ -66,7 +66,7 @@ void main() {
     });
 
     test('migrates raw() to RawText()', () {
-      testMigration(
+      testUnitMigration(
         HtmlHelperMigration(),
         input: '''
 import 'package:jaspr/jaspr.dart';
@@ -93,7 +93,7 @@ void main() {
     });
 
     test('does not migrate when jaspr is not imported', () {
-      testMigration(
+      testUnitMigration(
         HtmlHelperMigration(),
         input: '''
 void main() {
@@ -110,7 +110,7 @@ void main() {
     });
 
     test('does not migrate methods with target', () {
-      testMigration(
+      testUnitMigration(
         HtmlHelperMigration(),
         input: '''
 import 'package:jaspr/jaspr.dart';
@@ -141,7 +141,7 @@ void main() {
     });
 
     test('does not migrate methods with wrong arguments', () {
-      testMigration(
+      testUnitMigration(
         HtmlHelperMigration(),
         input: '''
 import 'package:jaspr/jaspr.dart';
@@ -166,7 +166,7 @@ void main() {
     });
 
     test('migrates with key argument', () {
-      testMigration(
+      testUnitMigration(
         HtmlHelperMigration(),
         input: '''
 import 'package:jaspr/jaspr.dart';
@@ -193,7 +193,7 @@ void main() {
     });
 
     test('migrates text() to .text() with dot-shorthands', () {
-      testMigration(
+      testUnitMigration(
         HtmlHelperMigration(),
         input: '''
 import 'package:jaspr/jaspr.dart';
@@ -221,7 +221,7 @@ void main() {
     });
 
     test('migrates fragment() to .fragment() with dot-shorthands', () {
-      testMigration(
+      testUnitMigration(
         HtmlHelperMigration(),
         input: '''
 import 'package:jaspr/jaspr.dart';

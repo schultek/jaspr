@@ -2,8 +2,8 @@ import 'dart:js_interop';
 
 import 'package:universal_web/web.dart' as web;
 
-import '/browser.dart';
-import '/src/browser/utils.dart';
+import '../../../client.dart';
+import '../../client/utils.dart';
 
 /// Renders its input as raw HTML.
 ///

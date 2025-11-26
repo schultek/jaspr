@@ -7,7 +7,7 @@ import 'utils.dart';
 void main() {
   group('dom import migration', () {
     test('adds dom import when html tags are used', () {
-      testMigration(
+      testUnitMigration(
         DomImportMigration(),
         input: '''
 import 'package:jaspr/jaspr.dart';
@@ -35,7 +35,7 @@ void main() {
     });
 
     test('adds dom import when dom classes are used', () {
-      testMigration(
+      testUnitMigration(
         DomImportMigration(),
         input: '''
 import 'package:jaspr/jaspr.dart';
@@ -63,7 +63,7 @@ void main() {
     });
 
     test('does not add import if already present', () {
-      testMigration(
+      testUnitMigration(
         DomImportMigration(),
         input: '''
 import 'package:jaspr/jaspr.dart';
@@ -86,7 +86,7 @@ void main() {
     });
 
     test('does not add import if no dom apis used', () {
-      testMigration(
+      testUnitMigration(
         DomImportMigration(),
         input: '''
 import 'package:jaspr/jaspr.dart';
@@ -107,7 +107,7 @@ void main() {
     });
 
     test('adds import after platform import if jaspr import missing', () {
-      testMigration(
+      testUnitMigration(
         DomImportMigration(),
         input: '''
 import 'package:jaspr/browser.dart';
@@ -135,7 +135,7 @@ void main() {
     });
 
     test('does not run if no jaspr imports present', () {
-      testMigration(
+      testUnitMigration(
         DomImportMigration(),
         input: '''
 import 'dart:html';

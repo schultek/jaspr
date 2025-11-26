@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../../../browser.dart';
+import '../../../client.dart';
 import '../../dom/type_checks.dart';
 import '../../dom/validator.dart';
 

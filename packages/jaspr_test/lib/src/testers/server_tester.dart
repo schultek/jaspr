@@ -57,7 +57,7 @@ class DataResponse {
   Map<String, Object?>? data;
 }
 
-/// Tests a jaspr app in a simulated server environment.
+/// Tests a Jaspr app in a simulated server environment.
 ///
 /// You can send requests using the [request] or [fetchData] methods and evaluate the
 /// server-rendered response for the given url.

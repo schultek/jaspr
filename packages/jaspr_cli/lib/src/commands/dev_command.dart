@@ -22,7 +22,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'input',
       abbr: 'i',
       help:
-          'Specify the entry file for the server app. Defaults to {jaspr.target} from pubspec.yaml or "lib/main.dart".',
+          'Specify the entry file for the server app. Must end in ".server.dart".\nDefaults to the first found "*.server.dart" file in the project.',
     );
     argParser.addOption(
       'mode',
@@ -51,6 +51,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       negatable: true,
       defaultsTo: true,
     );
+    argParser.addFlag(
+      'skip-server',
+      help:
+          'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable.',
+      negatable: false,
+      defaultsTo: false,
+    );
     addDartDefineArgs();
   }
 
@@ -64,6 +71,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final port = argResults!.option('port') ?? project.port ?? '8080';
   late final useWasm = argResults!.flag('experimental-wasm');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
+  late final skipServer = argResults!.flag('skip-server');
 
   bool get launchInChrome;
   bool get autoRun;
@@ -125,6 +133,16 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       return 0;
     }
 
+    if (skipServer) {
+      logger.write(
+        'Skipping server as per --skip-server flag.\n'
+        'Make sure to set the JASPR_PROXY_PORT=$proxyPort environment variable when starting the server manually.',
+        tag: Tag.cli,
+        level: Level.warning,
+      );
+      await workflow.done;
+      return 0;
+    }
     return await _runServer(entryPoint!, proxyPort, workflow);
   }
 
@@ -173,7 +191,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       Platform.executable,
       args,
       environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
-      workingDirectory: Directory.current.path,
+      workingDirectory: Directory.current.absolute.path,
     );
 
     logger.write('Server started.', tag: Tag.cli, progress: ProgressState.completed);
@@ -275,10 +293,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final buildArgs = [
       if (release) '--release',
-      if (input != null) ...[
-        '--define=jaspr_builder:client_registry=jaspr-target=$input',
-        '--define=jaspr_builder:jaspr_options=jaspr-target=$input',
-      ],
       if (managedBuildOptions) ...[
         '--define',
         '$package:ddc=generate-full-dill=true',

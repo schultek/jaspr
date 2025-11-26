@@ -15,7 +15,7 @@ void main() {
   group('child list', () {
     Future<RenderObjectElement> renderServerApp(Component app) async {
       final binding = ServerAppBinding((url: '/', headers: Headers.empty()), loadFile: (_) async => null);
-      binding.initializeOptions(JasprOptions());
+      binding.initializeOptions(ServerOptions());
       binding.attachRootComponent(app);
 
       if (binding.rootElement!.owner.isFirstBuild) {

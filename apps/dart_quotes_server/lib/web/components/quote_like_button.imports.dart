@@ -4,17 +4,18 @@
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
-export '../../generated/imports/_web.dart' if (dart.library.io) '../../generated/imports/_stubs.dart'
+export '../../generated/imports/_web.dart'
+    if (dart.library.io) '../../generated/imports/_stubs.dart'
     show
         StreamingConnectionHandler,
-        Client,
-        QuoteInit,
         StreamingConnectionHandlerOrStubbed,
+        Client,
         ClientOrStubbed,
+        QuoteInit,
         QuoteInitOrStubbed,
         FlutterAuthenticationKeyManager,
-        SessionManager,
         FlutterAuthenticationKeyManagerOrStubbed,
+        SessionManager,
         SessionManagerOrStubbed,
         JSConfetti,
         JSConfettiOrStubbed,

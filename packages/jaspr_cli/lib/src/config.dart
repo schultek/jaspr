@@ -32,9 +32,9 @@ class Project {
     return pubspecYaml;
   }
 
+  late final File pubspecFile = _fs.file('pubspec.yaml').absolute;
+
   late final YamlMap? _pubspecYaml = () {
-    var pubspecPath = 'pubspec.yaml';
-    var pubspecFile = _fs.file(pubspecPath).absolute;
     if (!pubspecFile.existsSync()) {
       return null;
     }
@@ -156,42 +156,6 @@ class Project {
       _exitFn(1);
     }
     return modeOrNull;
-  }
-
-  List<String>? get target {
-    var configYaml = _requireJasprOptions;
-
-    var targetYaml = configYaml['target'];
-    if (targetYaml != null) {
-      final targets = <String>[];
-      switch (targetYaml) {
-        case String s:
-          targets.add(s);
-        case List<Object?> l:
-          targets.addAll(l.cast<String>());
-        default:
-          logger.write(
-            '\'jaspr.target\' in pubspec.yaml must be a String or List<String>.',
-            tag: Tag.cli,
-            level: Level.critical,
-          );
-          _exitFn(1);
-      }
-
-      for (var target in targets) {
-        if (!_fs.file(target).existsSync()) {
-          logger.write(
-            'The file "$target" specified by \'jaspr.target\' in pubspec.yaml does not exist.',
-            tag: Tag.cli,
-            level: Level.critical,
-          );
-          _exitFn(1);
-        }
-      }
-
-      return targets;
-    }
-    return null;
   }
 
   String? get port {

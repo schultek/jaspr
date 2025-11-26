@@ -5,7 +5,7 @@ import 'package:shelf/shelf.dart';
 // ignore: implementation_imports
 import 'package:shelf/src/headers.dart';
 
-import '../../jaspr.dart';
+import 'options.dart';
 import 'run_app.dart';
 import 'server_app.dart';
 import 'server_binding.dart';

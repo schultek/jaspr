@@ -2,7 +2,7 @@
 library;
 
 import 'package:jaspr/dom.dart';
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
 
 class App1 extends StatelessComponent {
@@ -86,7 +86,8 @@ void main() {
   group('@client', () {
     setUpAll(() {
       Jaspr.initializeApp(
-        options: JasprOptions(
+        options: ServerOptions(
+          clientId: 'main.clients.dart.js',
           clients: {
             App1: ClientTarget<App1>('app1'),
             App2: ClientTarget<App2>('app2', params: (app) => {'count': app.count, 'label': app.label}),

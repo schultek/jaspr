@@ -24,7 +24,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'input',
       abbr: 'i',
       help:
-          'Specify the entry file for the server app. Defaults to {"jaspr.target} from pubspec.yaml or "lib/main.dart".',
+          'Specify the entry file for the server app. Must end in ".server.dart".\nDefaults to the first found "*.server.dart" file in the project.',
     );
     argParser.addOption(
       'target',
@@ -74,7 +74,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addOption(
       'sitemap-domain',
       help:
-          'If set, generates a sitemap.xml file for the static site. '
+          'If set, generates a sitemap.xml file for the static site.\n'
           'The domain will be used as the base URL for the sitemap entries.',
     );
     argParser.addOption(
@@ -84,7 +84,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addFlag(
       'managed-build-options',
       help:
-          'Whether jaspr will launch `build_runner` with options derived from command line arguments (the default).'
+          'Whether jaspr will launch `build_runner` with options derived from command line arguments (the default).\n'
           'When disabled, builders compiling to the web need to be configured manually.',
       negatable: true,
       defaultsTo: true,
@@ -422,10 +422,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       '--release',
       '--verbose',
       '--delete-conflicting-outputs',
-      if (input != null) ...[
-        '--define=jaspr_builder:client_registry=jaspr-target=$input',
-        '--define=jaspr_builder:jaspr_options=jaspr-target=$input',
-      ],
       if (managedBuildOptions) ...[
         '--define=$entrypointBuilder=compiler=$compiler',
         '--define=$entrypointBuilder=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',

@@ -51,12 +51,12 @@ Since jaspr is a fullstack-framework, there are **3** test functions to choose f
 
   See [here](https://pub.dev/documentation/jaspr_test/latest/server_test/ComponentTester-class.html) for a full api reference.
 
-- **testBrowser** can test components and dom-interactions in a headless browser environment.
+- **testClient** can test components and dom-interactions in a headless browser environment.
 
   Use similar to the `testComponents` with additional options for the `url` and `initialStateData` to
   simulate synced state from the server.
 
-  See [here](https://pub.dev/documentation/jaspr_test/latest/browser_test/BrowserTester-class.html) for a full api reference.
+  See [here](https://pub.dev/documentation/jaspr_test/latest/client_test/ClientTester-class.html) for a full api reference.
 
 - **testServer** can test the rendering of components in a simulated server environment.
 

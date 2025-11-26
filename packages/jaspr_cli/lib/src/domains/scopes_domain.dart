@@ -345,7 +345,7 @@ class InspectData {
   }
 
   bool isClientLib(LibraryElement lib) {
-    return lib.identifier == 'package:jaspr/browser.dart' ||
+    return lib.identifier == 'package:jaspr/client.dart' ||
         lib.identifier == 'package:web/web.dart' ||
         lib.identifier == 'dart:js_interop' ||
         lib.identifier == 'dart:js_interop_unsafe' ||

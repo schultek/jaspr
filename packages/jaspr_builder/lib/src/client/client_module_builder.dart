@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
-import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
 
@@ -34,7 +33,7 @@ class ClientModuleBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-    'lib/{{file}}.dart': ['lib/{{file}}.client.json', 'lib/{{file}}.client.dart'],
+    'lib/{{file}}.dart': ['lib/{{file}}.client.module.json'],
   };
 
   Future<void> generateClientModule(BuildStep buildStep) async {
@@ -91,34 +90,8 @@ class ClientModuleBuilder implements Builder {
       return;
     }
 
-    var outputId = buildStep.inputId.changeExtension('.client.json');
+    var outputId = buildStep.inputId.changeExtension('.client.module.json');
     await buildStep.writeAsString(outputId, jsonEncode(module.serialize()));
-
-    await generateWebEntrypoint(module, buildStep);
-  }
-
-  Future<void> generateWebEntrypoint(ClientModule module, BuildStep buildStep) async {
-    var source =
-        '''
-      $generationHeader
-      
-      import 'package:jaspr/browser.dart';
-      [[/]]
-            
-      Component getComponentForParams(Map<String, dynamic> p) {
-        return ${module.componentFactory()};
-      }
-    ''';
-    source = ImportsWriter().resolve(source);
-    source = DartFormatter(
-      languageVersion: DartFormatter.latestShortStyleLanguageVersion,
-      pageWidth: 120,
-    ).format(source);
-
-    var moduleId = AssetId.resolve(Uri.parse(module.import));
-
-    var entryId = AssetId(moduleId.package, moduleId.path.replaceFirst('.dart', '.client.dart'));
-    await buildStep.writeAsString(entryId, source);
   }
 }
 

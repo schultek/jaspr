@@ -47,13 +47,10 @@ class CreateCommand extends BaseCommand {
       abbr: 'm',
       help: 'Choose a rendering mode for the project.',
       allowed: [
-        for (var m in RenderingMode.values) ...[m.name, if (m.useServer) '${m.name}:auto'],
+        for (var m in RenderingMode.values) m.name,
       ],
       allowedHelp: {
-        for (var v in RenderingMode.values) ...{
-          v.name: '${v.help}.',
-          if (v.useServer) '${v.name}:auto': '${v.recommend}${v.help} with automatic client-side hydration.',
-        },
+        for (var v in RenderingMode.values) v.name: '${v.help}.',
       },
     );
     argParser.addOption(
@@ -112,8 +109,8 @@ class CreateCommand extends BaseCommand {
       return await createFromTemplate(template, dir, name);
     }
 
-    var (useMode, useHydration) = getRenderingMode();
-    var (useRouting, useMultiPageRouting) = getRouting(useMode.useServer, useHydration);
+    var useMode = getRenderingMode();
+    var (useRouting, useMultiPageRouting) = getRouting(useMode.useServer);
     var (useFlutter, usePlugins) = getFlutter();
     var useBackend = useMode == RenderingMode.server ? getBackend() : null;
 
@@ -121,9 +118,7 @@ class CreateCommand extends BaseCommand {
       if (useMode.useServer) 'server',
       if (useMode == RenderingMode.client) 'client',
       if (useRouting) 'routing',
-      if (useHydration) 'hydration',
       if (useFlutter) 'flutter',
-      if (useMode == RenderingMode.client || !useHydration) 'manual',
       if (useMode.useServer) useBackend ?? 'base',
     };
 
@@ -150,7 +145,6 @@ class CreateCommand extends BaseCommand {
         'multipage': useMultiPageRouting,
         'flutter': useFlutter,
         'plugins': usePlugins,
-        'hydration': useHydration,
         'server': useMode.useServer,
         'shelf': useBackend == 'shelf',
         'jasprCoreVersion': jasprCoreVersion,
@@ -283,41 +277,33 @@ class CreateCommand extends BaseCommand {
     return (directory, name);
   }
 
-  (RenderingMode, bool) getRenderingMode() {
+  RenderingMode getRenderingMode() {
     var opt = argResults!.option('mode');
-    return switch (opt?.split(':')) {
-      ['client'] => (RenderingMode.client, false),
-      [var m, 'auto'] => (RenderingMode.values.byName(m), true),
-      [var m] => (RenderingMode.values.byName(m), false),
+    return switch (opt) {
+      'client' => RenderingMode.client,
+      'server' => RenderingMode.server,
+      'static' => RenderingMode.static,
       _ => () {
         var mode = logger.logger!.chooseOne(
           'Select a rendering mode:',
           choices: RenderingMode.values,
           display: (o) => '${o.name}: ${o.help}.',
         );
-        var hydration =
-            mode.useServer &&
-            logger.logger!.confirm('(Recommended) Enable automatic hydration on the client?', defaultValue: true);
-        return (mode, hydration);
+        return mode;
       }(),
     };
   }
 
-  (bool, bool) getRouting(bool useServer, bool useHydration) {
+  (bool, bool) getRouting(bool useServer) {
     var opt = argResults!.option('routing');
 
     return switch (opt) {
       'none' => (false, false),
       'single-page' => (true, false),
-      'multi-page' =>
-        !useServer
-            ? usageException("Cannot use multi-page routing in client mode.")
-            : !useHydration
-            ? usageException("Cannot use multi-page routing with manual hydration.")
-            : (true, true),
+      'multi-page' => !useServer ? usageException("Cannot use multi-page routing in client mode.") : (true, true),
       _ => () {
         var routing = logger.logger!.confirm('Setup routing for different pages of your site?', defaultValue: true);
-        var multiPage = routing && useServer && useHydration
+        var multiPage = routing && useServer
             ? logger.logger!.confirm(
                 '(Recommended) Use multi-page (server-side) routing? '
                 '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',

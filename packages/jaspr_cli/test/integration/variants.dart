@@ -5,35 +5,30 @@ import 'file_matchers.dart';
 
 final allVariants = [
   for (var mode in RenderingMode.values)
-    for (var hydration in HydrationMode.valuesFor(mode))
-      for (var routing in RoutingOption.values)
-        for (var flutter in FlutterOption.values)
-          for (var backend in BackendOption.valuesFor(mode))
-            TestVariant(mode: mode, hydration: hydration, routing: routing, flutter: flutter, backend: backend),
+    for (var routing in RoutingOption.values)
+      for (var flutter in FlutterOption.values)
+        for (var backend in BackendOption.valuesFor(mode))
+          TestVariant(mode: mode, routing: routing, flutter: flutter, backend: backend),
 ];
 
 class TestVariant {
   final RenderingMode mode;
-  final HydrationMode hydration;
   final RoutingOption routing;
   final FlutterOption flutter;
   final BackendOption backend;
 
   const TestVariant({
     required this.mode,
-    required this.hydration,
     required this.routing,
     required this.flutter,
     required this.backend,
   });
 
-  String get name =>
-      '${mode.name}${hydration.option} routing:${routing.option} flutter:${flutter.option} backend:${backend.option}';
+  String get name => '${mode.name} routing:${routing.option} flutter:${flutter.option} backend:${backend.option}';
 
-  String get options =>
-      '-m ${mode.name}${hydration.option} -r ${routing.option} -f ${flutter.option} -b ${backend.option}';
+  String get options => '-m ${mode.name} -r ${routing.option} -f ${flutter.option} -b ${backend.option}';
 
-  String get tag => '${mode.tag}${hydration.tag}${routing.tag}${flutter.tag}${backend.tag}';
+  String get tag => '${mode.tag}${routing.tag}${flutter.tag}${backend.tag}';
 
   Set<String> get packages => {
     if (routing != RoutingOption.none) 'packages/jaspr_router',
@@ -76,48 +71,21 @@ extension on RenderingMode {
 
   Set<(String, Matcher)> get files => switch (this) {
     RenderingMode.static || RenderingMode.server => {
-      ('lib/main.dart', fileExists),
-      ('lib/jaspr_options.dart', fileExists),
+      ('lib/main.client.dart', fileExists),
+      ('lib/main.server.dart', fileExists),
+      ('lib/main.client.g.dart', fileExists),
+      ('lib/main.server.g.dart', fileExists),
     },
     RenderingMode.client => {
+      ('lib/main.client.dart', fileExists),
+      ('lib/main.client.g.dart', isNot(fileExists)),
       ('web/index.html', fileExists),
       ('web/styles.css', fileExists),
     },
   };
   Set<String> get resources => {};
-  Set<(String, Matcher)> get outputs => {};
-}
-
-enum HydrationMode {
-  none(''),
-  auto(':auto');
-
-  const HydrationMode(this.option);
-  final String option;
-
-  static List<HydrationMode> valuesFor(RenderingMode mode) => switch (mode) {
-    RenderingMode.client => [none],
-    _ => [auto, none],
-  };
-
-  String get tag => switch (this) {
-    none => 'n',
-    auto => 'a',
-  };
-
-  Set<(String, Matcher)> get files => switch (this) {
-    none => {
-      ('web/main.dart', fileExists),
-    },
-    auto => {},
-  };
-  Set<String> get resources => {};
-  Set<(String, Matcher)> get outputs => switch (this) {
-    none => {('main.dart.js', fileExists)},
-    auto => {
-      ('main.clients.dart.js', fileExists),
-      ('components/app.client.dart.js', fileExists),
-    },
+  Set<(String, Matcher)> get outputs => {
+    ('main.client.dart.js', fileExists),
   };
 }
 

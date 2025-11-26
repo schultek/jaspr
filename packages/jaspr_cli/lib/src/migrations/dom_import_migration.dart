@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:file/file.dart';
 import 'package:io/ansi.dart';
 
 import '../html_spec.dart';
@@ -40,6 +41,7 @@ class DomImportMigration implements Migration {
         .where(
           (d) =>
               d.uri.stringValue == 'package:jaspr/browser.dart' || //
+              d.uri.stringValue == 'package:jaspr/client.dart' ||
               d.uri.stringValue == 'package:jaspr/server.dart',
         )
         .firstOrNull;
@@ -62,6 +64,11 @@ class DomImportMigration implements Migration {
         "import 'package:jaspr/dom.dart';\n",
       );
     });
+  }
+
+  @override
+  List<MigrationResult> runForDirectory(Directory dir, bool apply) {
+    return [];
   }
 }
 

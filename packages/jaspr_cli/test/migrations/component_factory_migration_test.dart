@@ -1,5 +1,4 @@
 import 'package:jaspr_cli/src/migrations/component_factory_migration.dart';
-import 'package:jaspr_cli/src/migrations/migration_models.dart';
 import 'package:test/test.dart';
 
 import 'utils.dart';
@@ -8,7 +7,7 @@ void main() {
   group('build method migration', () {
     group('succeeds', () {
       test('with DomComponent and Text', () async {
-        testMigration(
+        testUnitMigration(
           ComponentFactoryMigration(),
           input: '''
 import 'package:jaspr/jaspr.dart';
@@ -31,23 +30,15 @@ Component build() {
 }
 ''',
           expectedMigrations: [
-            isA<MigrationInstance>().having(
-              (i) => i.description,
-              'description',
-              'Replaced Text() with Component.text()',
-            ),
-            isA<MigrationInstance>().having(
-              (i) => i.description,
-              'description',
-              'Replaced DomComponent() with Component.element()',
-            ),
+            matchesMigration('Replaced Text() with Component.text()'),
+            matchesMigration('Replaced DomComponent() with Component.element()'),
           ],
           expectedWarnings: [],
         );
       });
 
       test('with Fragment', () async {
-        testMigration(
+        testUnitMigration(
           ComponentFactoryMigration(),
           input: '''
 import 'package:jaspr/jaspr.dart';
@@ -73,7 +64,7 @@ Component build() {
       });
 
       test('with DomComponent.wrap', () async {
-        testMigration(
+        testUnitMigration(
           ComponentFactoryMigration(),
           input: '''
 import 'package:jaspr/jaspr.dart';
@@ -112,7 +103,7 @@ Component build() {
 }
 ''';
 
-        testMigration(
+        testUnitMigration(
           ComponentFactoryMigration(),
           input: source,
           expectedOutput: source,
@@ -128,7 +119,7 @@ Component build() {
 }
 ''';
 
-        testMigration(
+        testUnitMigration(
           ComponentFactoryMigration(),
           input: source,
           expectedOutput: source,
