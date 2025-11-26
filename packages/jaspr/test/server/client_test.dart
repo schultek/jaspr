@@ -86,6 +86,7 @@ void main() {
     setUpAll(() {
       Jaspr.initializeApp(
         options: ServerOptions(
+          clientId: 'main.clients.dart.js',
           clients: {
             App1: ClientTarget<App1>('app1'),
             App2: ClientTarget<App2>('app2', params: (a) => {'count': a.count, 'label': a.label}),

@@ -18,7 +18,7 @@ void main() {
 
       expect(
         result.body,
-        _decodedMatches(
+        decodedMatches(
           '<!DOCTYPE html>\n'
           '<html><head></head><body><div id="test"></div></body></html>\n'
           '',
@@ -38,7 +38,7 @@ void main() {
 
       expect(
         result.body,
-        _decodedMatches(
+        decodedMatches(
           '<!DOCTYPE html>\n'
           '<html lang="en">\n'
           '  <head>\n'
@@ -59,7 +59,7 @@ void main() {
     test('renders standalone component', () async {
       var result = await renderComponent(div(id: 'test', []), standalone: true);
 
-      expect(result.body, _decodedMatches('<div id="test"></div>\n'));
+      expect(result.body, decodedMatches('<div id="test"></div>\n'));
     });
 
     test('renders component with headers', () async {
@@ -76,7 +76,7 @@ void main() {
       );
 
       expect(result.statusCode, equals(200));
-      expect(result.body, _decodedMatches('<div id="test">abc</div>\n'));
+      expect(result.body, decodedMatches('<div id="test">abc</div>\n'));
       expect(
         result.headers,
         equals({
@@ -100,7 +100,7 @@ void main() {
       );
 
       expect(result.statusCode, equals(200));
-      expect(result.body, _decodedMatches('<div id="test">abc</div>\n'));
+      expect(result.body, decodedMatches('<div id="test">abc</div>\n'));
       expect(
         result.headers,
         equals({
@@ -124,7 +124,7 @@ void main() {
       );
 
       expect(result.statusCode, equals(201));
-      expect(result.body, _decodedMatches('custom'));
+      expect(result.body, decodedMatches('custom'));
     });
 
     test('renders custom binary responses', () async {
@@ -160,6 +160,6 @@ void main() {
   });
 }
 
-TypeMatcher<List<int>> _decodedMatches(dynamic string) {
+TypeMatcher<List<int>> decodedMatches(dynamic string) {
   return isA<List<int>>().having((e) => utf8.decode(e), 'decoded', string);
 }

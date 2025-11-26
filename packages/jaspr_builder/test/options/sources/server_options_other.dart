@@ -60,9 +60,9 @@ final serverOptionsOtherOutputs = {
       '  styles: () => [...\$styles_global.styles, ...\$styles_global.styles2],\n'
       ');\n'
       '\n'
-      'Map<String, dynamic> _\$component_basicComponent(\$component_basic.Component c) =>\n'
+      'Map<String, Object?> _\$component_basicComponent(\$component_basic.Component c) =>\n'
       '    {\'a\': c.a, \'b\': c.b, \'c\': c.c, \'d\': c.d};\n'
-      'Map<String, dynamic> _\$component_model_classComponent(\n'
+      'Map<String, Object?> _\$component_model_classComponent(\n'
       '  \$component_model_class.Component c,\n'
       ') => {\'a\': c.a, \'b\': c.b.toRaw()};\n'
       '',
