@@ -131,12 +131,12 @@ abstract class BaseCommand extends Command<int> {
 
   Future<String> _findServerEntrypoint() async {
     var mainFile = File('lib/main.server.dart');
-    if (mainFile.existsSync()) {
+    if (await mainFile.absolute.exists()) {
       return mainFile.path;
     }
 
-    var binDir = Directory('bin/');
-    var libDir = Directory('lib/');
+    var binDir = Directory('bin/').absolute;
+    var libDir = Directory('lib/').absolute;
 
     if (binDir.existsSync()) {
       await for (var entity in binDir.list(recursive: true)) {
