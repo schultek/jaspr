@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../../../constants/theme.dart';
@@ -9,8 +10,8 @@ class Features extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return section(id: 'features', [
-      span(classes: 'caption text-gradient', [text('Features')]),
-      h2([text('Comes with '), br(), text('Everything You Need')]),
+      span(classes: 'caption text-gradient', [.text('Features')]),
+      h2([.text('Comes with '), br(), .text('Everything You Need')]),
       div(classes: 'feature-grid', [
         LinkCard(
           icon: 'milestone',
@@ -68,25 +69,25 @@ class Features extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('#features', [
       css('&').styles(
-        display: Display.flex,
-        padding: Padding.only(top: sectionPadding),
-        flexDirection: FlexDirection.column,
-        alignItems: AlignItems.center,
-        textAlign: TextAlign.center,
+        display: .flex,
+        padding: .only(top: sectionPadding),
+        flexDirection: .column,
+        alignItems: .center,
+        textAlign: .center,
       ),
       css('.feature-grid', [
         css('&').styles(
-          display: Display.flex,
+          display: .flex,
           maxWidth: maxContentWidth,
-          padding: Padding.symmetric(horizontal: contentPadding),
-          margin: Margin.only(top: 3.rem, bottom: 4.rem),
-          flexDirection: FlexDirection.row,
-          flexWrap: FlexWrap.wrap,
-          gap: Gap.all(1.5.rem),
+          padding: .symmetric(horizontal: contentPadding),
+          margin: .only(top: 3.rem, bottom: 4.rem),
+          flexDirection: .row,
+          flexWrap: .wrap,
+          gap: .all(1.5.rem),
         ),
         css('& > *').styles(
-          boxSizing: BoxSizing.borderBox,
-          flex: Flex(grow: 1, shrink: 0, basis: 13.rem),
+          boxSizing: .borderBox,
+          flex: .new(grow: 1, shrink: 0, basis: 13.rem),
         ),
       ]),
     ]),

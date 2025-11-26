@@ -74,7 +74,7 @@ abstract class RouteLoaderBase implements RouteLoader {
   }
 
   PageSource? getSourceForPage(Page page) {
-    return _sources?.where((s) => s.page == page).firstOrNull;
+    return _sources?.where((source) => source.page == page).firstOrNull;
   }
 
   @override

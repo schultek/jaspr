@@ -294,15 +294,15 @@ extension PageHandlersExtension on Page {
     if (data['content-type'] case final String type) {
       return type;
     }
-    if (this.path.endsWith('.html')) {
+    if (path.endsWith('.html')) {
       return 'text/html';
-    } else if (this.path.endsWith('.xml')) {
+    } else if (path.endsWith('.xml')) {
       return 'text/xml';
-    } else if (this.path.endsWith('.md')) {
+    } else if (path.endsWith('.md')) {
       return 'text/markdown';
-    } else if (this.path.endsWith('.json')) {
+    } else if (path.endsWith('.json')) {
       return 'application/json';
-    } else if (this.path.endsWith('.yaml') || this.path.endsWith('.yml')) {
+    } else if (path.endsWith('.yaml') || path.endsWith('.yml')) {
       return 'application/yaml';
     } else {
       return 'text/plain';

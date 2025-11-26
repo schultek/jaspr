@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../src/page_parser/page_parser.dart';
@@ -27,7 +28,7 @@ class PostBreak extends StatelessComponent with CustomComponentBase {
         margin: Margin.only(top: 3.rem, bottom: 3.rem),
         display: Display.flex,
         justifyContent: JustifyContent.center,
-        gap: Gap(column: 1.25.rem),
+        gap: Gap.column(1.25.rem),
       ),
       css(
         'span',

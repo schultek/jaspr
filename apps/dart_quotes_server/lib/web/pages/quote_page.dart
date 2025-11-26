@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_serverpod/jaspr_serverpod.dart';
 
@@ -12,18 +13,18 @@ class QuotePage extends AsyncStatelessComponent {
   @override
   Future<Component> build(BuildContext context) async {
     final navChild = nav([
-      a(href: "/", [text('Home')]),
+      a(href: "/", [.text('Home')]),
     ]);
 
     var quote = await QuotesService.getQuoteById(context.session, id);
     if (quote == null) {
-      return fragment([
+      return .fragment([
         navChild,
-        div(classes: "center", [text("Not Found")]),
+        div(classes: "center", [.text("Not Found")]),
       ]);
     }
 
-    return fragment([
+    return .fragment([
       navChild,
       Document.head(
         title: quote.quote,
@@ -35,8 +36,8 @@ class QuotePage extends AsyncStatelessComponent {
       div(classes: "center", [
         div(classes: "quote-container", [
           img(classes: "quotes-start", src: 'images/quote.jpg', alt: "Starting quote symbol", width: 100),
-          h1([text(quote.quote)]),
-          p([text(quote.author)]),
+          h1([.text(quote.quote)]),
+          p([.text(quote.author)]),
           QuoteLikeButton(id: id, initialCount: quote.likes.length),
           img(classes: "quotes-end", src: 'images/quote.jpg', alt: "Ending quote symbol", width: 100),
         ]),
@@ -46,24 +47,24 @@ class QuotePage extends AsyncStatelessComponent {
 
   @css
   static List<StyleRule> get styles => [
-    css('nav').styles(padding: Padding.all(20.px), textAlign: TextAlign.center),
+    css('nav').styles(padding: .all(20.px), textAlign: .center),
     css('.center').styles(
-      display: Display.flex,
+      display: .flex,
       height: 100.vh,
-      justifyContent: JustifyContent.center,
-      alignItems: AlignItems.center,
+      justifyContent: .center,
+      alignItems: .center,
     ),
     css('.quote-container', [
-      css('&').styles(position: Position.relative(), textAlign: TextAlign.center),
+      css('&').styles(position: .relative(), textAlign: .center),
       css('.quotes-start').styles(
-        position: Position.absolute(top: (-100).px, left: (-10).px),
-        transform: Transform.rotate(180.deg),
+        position: .absolute(top: (-100).px, left: (-10).px),
+        transform: .rotate(180.deg),
       ),
       css('.quotes-end').styles(
-        position: Position.absolute(right: (-10).px, bottom: (-50).px),
+        position: .absolute(right: (-10).px, bottom: (-50).px),
       ),
       css('h1').styles(fontSize: 40.px),
-      css('p').styles(fontWeight: FontWeight.normal, fontStyle: FontStyle.italic),
+      css('p').styles(fontWeight: .normal, fontStyle: .italic),
     ]),
   ];
 }

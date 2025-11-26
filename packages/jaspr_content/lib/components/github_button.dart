@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 @Deprecated('Migrate to GitHubButton instead.')
@@ -28,7 +29,7 @@ final class GitHubButton extends StatefulComponent {
         padding: Padding.symmetric(horizontal: 0.7.rem, vertical: 0.4.rem),
         radius: BorderRadius.circular(8.px),
         alignItems: AlignItems.center,
-        gap: Gap(column: .5.rem),
+        gap: Gap.column(.5.rem),
         fontSize: 0.7.rem,
         textDecoration: TextDecoration.none,
         lineHeight: 1.2.em,
@@ -51,7 +52,7 @@ final class GitHubButton extends StatefulComponent {
             display: Display.flex,
             opacity: 0.7,
             alignItems: AlignItems.center,
-            gap: Gap(column: .3.em),
+            gap: Gap.column(.3.em),
             fontSize: 0.9.em,
             fontWeight: FontWeight.w800,
           ),
@@ -103,13 +104,13 @@ class _GitHubButtonState extends State<GitHubButton> with PreloadStateMixin<GitH
     return a(href: 'https://github.com/${component.repo}', target: Target.blank, classes: 'github-button not-content', [
       div(classes: 'github-icon', const [_GitHubIcon()]),
       div(classes: 'github-info', [
-        span([text(component.repo)]),
+        span([Component.text(component.repo)]),
         span([
-          text('★'),
-          span(styles: !loaded ? const Styles(opacity: 0) : null, [text('${_stars ?? 9999}')]),
+          Component.text('★'),
+          span(styles: !loaded ? const Styles(opacity: 0) : null, [Component.text('${_stars ?? 9999}')]),
           span([]),
-          text('⑂'),
-          span(styles: !loaded ? const Styles(opacity: 0) : null, [text('${_forks ?? 99}')]),
+          Component.text('⑂'),
+          span(styles: !loaded ? const Styles(opacity: 0) : null, [Component.text('${_forks ?? 99}')]),
         ]),
       ]),
     ]);

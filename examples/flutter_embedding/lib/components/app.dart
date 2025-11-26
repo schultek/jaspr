@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
@@ -15,7 +16,7 @@ class App extends StatelessComponent {
       child: section(classes: 'contents', [
         FlutterAppContainer(),
         aside(id: 'demo_controls', [
-          h1([text('Element embedding')]),
+          h1([.text('Element embedding')]),
           EffectsControls(),
           InteropControls(),
         ]),

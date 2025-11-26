@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 {{#server}}
 import '../constants/theme.dart';{{/server}}{{#flutter}}
@@ -21,14 +22,14 @@ class CounterState extends State<Counter> {
           onClick: () {
             setState(() => count--);
           },
-          [text('-')],
+          [.text('-')],
         ),
-        span([text('$count')]),
+        span([.text('$count')]),
         button(
           onClick: () {
             setState(() => count++);
           },
-          [text('+')],
+          [.text('+')],
         ),
       ]),{{#flutter}}
       EmbeddedCounter(
@@ -44,21 +45,21 @@ class CounterState extends State<Counter> {
   static List<StyleRule> get styles => [
     css('.counter', [
       css('&').styles(
-        display: Display.flex,
-        padding: Padding.symmetric(vertical: 10.px),
-        border: Border.symmetric(vertical: BorderSide.solid(color: primaryColor, width: 2.px)),
-        alignItems: AlignItems.center,
+        display: .flex,
+        padding: .symmetric(vertical: 10.px),
+        border: .symmetric(vertical: .solid(color: primaryColor, width: 2.px)),
+        alignItems: .center,
       ),
       css('button', [
         css('&').styles(
-          display: Display.flex,
+          display: .flex,
           width: 2.em,
           height: 2.em, 
-          border: Border.unset, 
-          radius: BorderRadius.all(Radius.circular(2.em)),
-          cursor: Cursor.pointer,
-          justifyContent: JustifyContent.center, 
-          alignItems: AlignItems.center,
+          border: .unset, 
+          radius: .all(.circular(2.em)),
+          cursor: .pointer,
+          justifyContent: .center, 
+          alignItems: .center,
           fontSize: 2.rem,
           backgroundColor: Colors.transparent,
         ),
@@ -68,10 +69,10 @@ class CounterState extends State<Counter> {
       ]),
       css('span').styles(
         minWidth: 2.5.em,
-        padding: Padding.symmetric(horizontal: 2.rem),
-        boxSizing: BoxSizing.borderBox, 
+        padding: .symmetric(horizontal: 2.rem),
+        boxSizing: .borderBox, 
         color: primaryColor, 
-        textAlign: TextAlign.center,
+        textAlign: .center,
         fontSize: 4.rem,
       ),
     ]),

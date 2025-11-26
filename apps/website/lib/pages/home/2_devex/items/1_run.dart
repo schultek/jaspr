@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../../../../constants/theme.dart';
@@ -28,26 +29,26 @@ class Run extends StatelessComponent {
     return DevexBox(
       caption: 'RUN',
       title: 'Integrated Tooling',
-      description: fragment([
-        text('Create, serve and build your site using simple cli commands, or the official '),
+      description: .fragment([
+        .text('Create, serve and build your site using simple cli commands, or the official '),
         a(
           href: 'https://marketplace.visualstudio.com/items?itemName=schultek.jaspr-code',
-          target: Target.blank,
+          target: .blank,
           [
-            text('VSCode Extension'),
+            .text('VSCode Extension'),
           ],
         ),
-        text('.'),
+        .text('.'),
       ]),
       preview: div(classes: 'run-preview', [
         code(classes: 'console', [
-          text(r'$'),
-          text(' jaspr serve'),
+          .text(r'$'),
+          .text(' jaspr serve'),
           br(),
           for (final line in lines) ...[
             span([
-              span(styles: Styles(color: line.$2), [text(line.$1)]),
-              text(line.$3),
+              span(styles: Styles(color: line.$2), [.text(line.$1)]),
+              .text(line.$3),
             ]),
             br(),
           ],
@@ -59,10 +60,16 @@ class Run extends StatelessComponent {
   @css
   static List<StyleRule> get styles => [
     css('.run-preview', [
-      css('&').styles(padding: Padding.all(.5.rem)),
-      css(
-        '.console',
-      ).styles(display: Display.block, opacity: .8, color: textBlack, textAlign: TextAlign.start, fontSize: .7.rem),
+      css('&').styles(
+        padding: .all(.5.rem),
+      ),
+      css('.console').styles(
+        display: .block,
+        opacity: .8,
+        color: textBlack,
+        textAlign: .start,
+        fontSize: .7.rem,
+      ),
     ]),
   ];
 }

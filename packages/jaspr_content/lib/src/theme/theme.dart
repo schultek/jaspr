@@ -1,6 +1,8 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 // ignore: implementation_imports
-import 'package:jaspr/src/foundation/styles/css.dart';
+import 'package:jaspr/src/dom/styles/css.dart' show StyleRuleResolve;
+// ignore: implementation_imports
+import 'package:jaspr/src/dom/styles/rules.dart' show BlockStyleRule;
 
 part '_base.dart';
 part '_reset.dart';

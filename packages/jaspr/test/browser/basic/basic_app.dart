@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 class App extends StatelessComponent {
@@ -37,6 +38,6 @@ class Button extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return button(events: {'click': (e) => onPressed()}, [text(label)]);
+    return button(events: {'click': (e) => onPressed()}, [Component.text(label)]);
   }
 }

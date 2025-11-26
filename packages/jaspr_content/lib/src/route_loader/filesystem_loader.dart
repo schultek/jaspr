@@ -129,14 +129,14 @@ class FilesystemLoader extends RouteLoaderBase {
   }
 
   void removeFile(String path) {
-    final source = sources.whereType<FilePageSource>().where((s) => s.file.path == path).firstOrNull;
+    final source = sources.whereType<FilePageSource>().where((source) => source.file.path == path).firstOrNull;
     if (source != null) {
       removeSource(source);
     }
   }
 
   void invalidateFile(String path, {bool rebuild = true}) {
-    final source = sources.whereType<FilePageSource>().where((s) => s.file.path == path).firstOrNull;
+    final source = sources.whereType<FilePageSource>().where((source) => source.file.path == path).firstOrNull;
     if (source != null) {
       invalidateSource(source, rebuild: rebuild);
     }
@@ -169,6 +169,6 @@ class FilePageSource extends PageSource {
   Future<Page> buildPage() async {
     final content = await file.readAsString();
 
-    return Page(path: this.path, url: url, content: content, config: config, loader: loader);
+    return Page(path: path, url: url, content: content, config: config, loader: loader);
   }
 }

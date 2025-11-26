@@ -3,6 +3,7 @@
 // The [main] method will only be executed on the server during pre-rendering.
 // To run code on the client, {{^hydration}}see [web/main.dart]{{/hydration}}{{#hydration}}use the @client annotation{{/hydration}}.
 
+import 'package:jaspr/dom.dart';
 // Server-specific jaspr import.
 import 'package:jaspr/server.dart';
 
@@ -32,12 +33,12 @@ void main() {
       css('html, body').styles(
         width: 100.percent,
         minHeight: 100.vh,
-        padding: Padding.zero,
-        margin: Margin.zero,
-        fontFamily: const FontFamily.list([FontFamily('Roboto'), FontFamilies.sansSerif]),
+        padding: .zero,
+        margin: .zero,
+        fontFamily: const .list([FontFamily('Roboto'), FontFamilies.sansSerif]),
       ),
       css('h1').styles(
-        margin: Margin.unset,
+        margin: .unset,
         fontSize: 4.rem,
       ),
     ],{{^hydration}}

@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../../../components/link_button.dart';
@@ -13,14 +14,14 @@ class Hero extends StatelessComponent {
       div([
         HeroPill(),
         h1([
-          text('The '),
-          span(classes: 'text-gradient', [text('Web Framework')]),
-          text(' for Dart Developers'),
+          .text('The '),
+          span(classes: 'text-gradient', [.text('Web Framework')]),
+          .text(' for Dart Developers'),
         ]),
         p([
-          text('Jaspr is a free and open source framework for building websites in Dart.'),
+          .text('Jaspr is a free and open source framework for building websites in Dart.'),
           br(),
-          text('Create fast and dynamic web experiences with ease in a familiar language and ecosystem.'),
+          .text('Create fast and dynamic web experiences with ease in a familiar language and ecosystem.'),
         ]),
         div(classes: 'cta', [
           InstallCommand(),
@@ -41,29 +42,29 @@ class Hero extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('#hero', [
       css('&').styles(
-        display: Display.flex,
+        display: .flex,
         minHeight: 100.vh,
-        padding: Padding.only(left: contentPadding, right: contentPadding, top: 8.rem, bottom: 4.rem),
-        boxSizing: BoxSizing.borderBox,
-        justifyContent: JustifyContent.center,
-        alignItems: AlignItems.center,
-        textAlign: TextAlign.center,
+        padding: .only(left: contentPadding, right: contentPadding, top: 8.rem, bottom: 4.rem),
+        boxSizing: .borderBox,
+        justifyContent: .center,
+        alignItems: .center,
+        textAlign: .center,
       ),
       css('& > div').styles(
-        display: Display.flex,
+        display: .flex,
         maxWidth: 45.rem,
-        flexDirection: FlexDirection.column,
-        justifyContent: JustifyContent.center,
-        alignItems: AlignItems.center,
+        flexDirection: .column,
+        justifyContent: .center,
+        alignItems: .center,
       ),
       css('p').styles(raw: {'text-wrap': 'balance'}).combine(bodyMedium),
       css('.cta').styles(
-        display: Display.flex,
-        margin: Margin.only(top: 2.rem),
-        flexDirection: FlexDirection.column,
-        alignItems: AlignItems.center,
+        display: .flex,
+        margin: .only(top: 2.rem),
+        flexDirection: .column,
+        alignItems: .center,
       ),
     ]),
-    css.media(MediaQuery.all(maxWidth: mobileBreakpoint), [css('#hero').styles(minHeight: 95.vh)]),
+    css.media(.all(maxWidth: mobileBreakpoint), [css('#hero').styles(minHeight: 95.vh)]),
   ];
 }

@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../jaspr_content.dart';
@@ -83,7 +84,7 @@ class TabItem extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return Component.fragment([
-      span(classes: 'tab-item', [text(label)]),
+      span(classes: 'tab-item', [Component.text(label)]),
       child,
     ]);
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart' as flt;
 import 'package:jaspr/browser.dart';
+import 'package:jaspr/dom.dart';
 import 'package:web/web.dart' as web;
 
 import 'run_flutter_app.dart';

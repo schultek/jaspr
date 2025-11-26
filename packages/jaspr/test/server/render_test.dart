@@ -4,6 +4,7 @@ library;
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
 
@@ -18,7 +19,7 @@ void main() {
 
       expect(
         result.body,
-        _decodedMatches(
+        decodedMatches(
           '<!DOCTYPE html>\n'
           '<html><head></head><body><div id="test"></div></body></html>\n'
           '',
@@ -38,7 +39,7 @@ void main() {
 
       expect(
         result.body,
-        _decodedMatches(
+        decodedMatches(
           '<!DOCTYPE html>\n'
           '<html lang="en">\n'
           '  <head>\n'
@@ -59,7 +60,7 @@ void main() {
     test('renders standalone component', () async {
       var result = await renderComponent(div(id: 'test', []), standalone: true);
 
-      expect(result.body, _decodedMatches('<div id="test"></div>\n'));
+      expect(result.body, decodedMatches('<div id="test"></div>\n'));
     });
 
     test('renders component with headers', () async {
@@ -68,7 +69,7 @@ void main() {
           builder: (context) {
             var value = context.headers['x-test'];
             context.setHeader('x-test2', 'xyz');
-            return div(id: 'test', [text(value ?? '')]);
+            return div(id: 'test', [Component.text(value ?? '')]);
           },
         ),
         request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'x-test': 'abc'}),
@@ -76,7 +77,7 @@ void main() {
       );
 
       expect(result.statusCode, equals(200));
-      expect(result.body, _decodedMatches('<div id="test">abc</div>\n'));
+      expect(result.body, decodedMatches('<div id="test">abc</div>\n'));
       expect(
         result.headers,
         equals({
@@ -92,7 +93,7 @@ void main() {
           builder: (context) {
             var value = context.cookies['test'];
             context.setCookie('test2', 'xyz');
-            return div(id: 'test', [text(value ?? '')]);
+            return div(id: 'test', [Component.text(value ?? '')]);
           },
         ),
         request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'cookie': 'test=abc'}),
@@ -100,7 +101,7 @@ void main() {
       );
 
       expect(result.statusCode, equals(200));
-      expect(result.body, _decodedMatches('<div id="test">abc</div>\n'));
+      expect(result.body, decodedMatches('<div id="test">abc</div>\n'));
       expect(
         result.headers,
         equals({
@@ -116,7 +117,7 @@ void main() {
           builder: (context) {
             var value = context.cookies['test'];
             context.setStatusCode(201, responseBody: 'custom');
-            return div(id: 'test', [text(value ?? '')]);
+            return div(id: 'test', [Component.text(value ?? '')]);
           },
         ),
         request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'cookie': 'test=abc'}),
@@ -124,7 +125,7 @@ void main() {
       );
 
       expect(result.statusCode, equals(201));
-      expect(result.body, _decodedMatches('custom'));
+      expect(result.body, decodedMatches('custom'));
     });
 
     test('renders custom binary responses', () async {
@@ -133,7 +134,7 @@ void main() {
           builder: (context) {
             var value = context.cookies['test'];
             context.setStatusCode(201, responseBody: Uint8List.fromList([1, 2, 3]));
-            return div(id: 'test', [text(value ?? '')]);
+            return div(id: 'test', [Component.text(value ?? '')]);
           },
         ),
         request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'cookie': 'test=abc'}),
@@ -150,7 +151,7 @@ void main() {
           builder: (context) {
             var value = context.cookies['test'];
             expect(() => context.setStatusCode(201, responseBody: DateTime.now()), throwsArgumentError);
-            return div(id: 'test', [text(value ?? '')]);
+            return div(id: 'test', [Component.text(value ?? '')]);
           },
         ),
         request: Request('GET', Uri.parse('https://0.0.0.0/'), headers: {'cookie': 'test=abc'}),
@@ -160,6 +161,6 @@ void main() {
   });
 }
 
-TypeMatcher<List<int>> _decodedMatches(dynamic string) {
+TypeMatcher<List<int>> decodedMatches(dynamic string) {
   return isA<List<int>>().having((e) => utf8.decode(e), 'decoded', string);
 }

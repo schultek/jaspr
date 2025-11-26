@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
 
@@ -53,12 +54,12 @@ class HeaderState extends State<Header> {
 
   @override
   Component build(BuildContext context) {
-    var content = fragment(key: contentKey, [
+    Component content = .fragment(key: contentKey, [
       nav([
-        if (component.showHome) a(href: '/', classes: 'animated-underline', [text("Home")]),
-        a(href: "https://docs.jaspr.site", classes: 'animated-underline', [text("Docs")]),
-        a(href: "https://playground.jaspr.site", classes: 'animated-underline', [text("Playground")]),
-        a(href: "https://github.com/sponsors/schultek/", classes: 'animated-underline', [text("Sponsor")]),
+        if (component.showHome) a(href: '/', classes: 'animated-underline', [.text("Home")]),
+        a(href: "https://docs.jaspr.site", classes: 'animated-underline', [.text("Docs")]),
+        a(href: "https://playground.jaspr.site", classes: 'animated-underline', [.text("Playground")]),
+        a(href: "https://github.com/sponsors/schultek/", classes: 'animated-underline', [.text("Sponsor")]),
       ]),
       div(classes: 'header-actions', [
         ThemeToggle(),
@@ -66,7 +67,7 @@ class HeaderState extends State<Header> {
           LinkButton.icon(
             icon: 'custom-discord',
             to: 'https://discord.gg/XGXrGEk4c6',
-            target: Target.blank,
+            target: .blank,
             ariaLabel: 'Join Discord',
           ),
         ]),
@@ -92,32 +93,35 @@ class HeaderState extends State<Header> {
   static List<StyleRule> get styles => [
     css('header', [
       css('&').styles(
-        display: Display.flex,
-        position: Position.absolute(left: Unit.zero, right: Unit.zero),
-        zIndex: ZIndex(1),
-        padding: Padding.symmetric(horizontal: 2.rem, vertical: 2.rem),
-        gap: Gap(column: 2.rem),
+        display: .flex,
+        position: .absolute(left: .zero, right: .zero),
+        zIndex: .new(1),
+        padding: .symmetric(horizontal: 2.rem, vertical: 2.rem),
+        gap: .column(2.rem),
       ),
-      css('& > *').styles(display: Display.flex, alignItems: AlignItems.center),
+      css('& > *').styles(display: .flex, alignItems: .center),
       css('nav', [
         css('&').styles(
-          display: Display.flex,
-          justifyContent: JustifyContent.end,
-          gap: Gap(column: 2.rem),
-          flex: Flex(grow: 1),
+          display: .flex,
+          justifyContent: .end,
+          gap: .column(2.rem),
+          flex: .grow(1),
           color: textBlack,
         ),
-        css(
-          '& a',
-        ).styles(color: textBlack, fontSize: 1.rem, fontWeight: FontWeight.w500, textDecoration: TextDecoration.none),
+        css('& a').styles(
+          color: textBlack,
+          fontSize: 1.rem,
+          fontWeight: .w500,
+          textDecoration: .none,
+        ),
         css('& a:hover').styles(color: primaryMid),
       ]),
     ]),
-    css.media(MediaQuery.screen(maxWidth: mobileBreakpoint.px), [
+    css.media(.screen(maxWidth: mobileBreakpoint.px), [
       css('header', [
-        css('&').styles(display: Display.flex, justifyContent: JustifyContent.spaceBetween),
-        css('& > nav').styles(display: Display.none),
-        css('& > .header-actions').styles(display: Display.none),
+        css('&').styles(display: .flex, justifyContent: .spaceBetween),
+        css('& > nav').styles(display: .none),
+        css('& > .header-actions').styles(display: .none),
       ]),
     ]),
   ];

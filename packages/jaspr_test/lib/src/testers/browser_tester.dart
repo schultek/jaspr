@@ -3,7 +3,7 @@ import 'dart:js_interop';
 
 import 'package:jaspr/browser.dart';
 // ignore: implementation_imports
-import 'package:jaspr/src/foundation/type_checks.dart';
+import 'package:jaspr/src/dom/type_checks.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 import 'package:universal_web/web.dart' as web;

@@ -22,20 +22,20 @@ class ComponentFactoryMigration implements Migration {
   }
 
   @override
-  void runForUnit(CompilationUnit unit, MigrationReporter reporter) {
+  void runForUnit(MigrationContext context) {
+    if (!context.unit.directives.any(
+      (d) => d is ImportDirective && (d.uri.stringValue?.startsWith('package:jaspr/') ?? false),
+    )) {
+      // Only run if Jaspr is imported.
+      return;
+    }
+
     final texts = <SourceRange>[];
     final domComponents = <SourceRange>[];
     final fragments = <(SourceRange, ArgumentList)>[];
     final wrapDomComponents = <SourceRange>[];
 
-    if (!unit.directives.any(
-      (d) => d is ImportDirective && (d.uri.stringValue?.startsWith('package:jaspr/') ?? false),
-    )) {
-      // Only run if jaspr is imported.
-      return;
-    }
-
-    unit.accept(
+    context.unit.accept(
       ComponentVisitor(
         onText: (node) {
           texts.add(node);
@@ -53,7 +53,7 @@ class ComponentFactoryMigration implements Migration {
     );
 
     if (texts.isNotEmpty) {
-      reporter.createMigration('Replaced Text() with Component.text()', (builder) {
+      context.reporter.createMigration('Replaced Text() with Component.text()', (builder) {
         for (final node in texts) {
           builder.replace(node.offset, node.length, 'Component.text');
         }
@@ -61,7 +61,7 @@ class ComponentFactoryMigration implements Migration {
     }
 
     if (domComponents.isNotEmpty) {
-      reporter.createMigration('Replaced DomComponent() with Component.element()', (builder) {
+      context.reporter.createMigration('Replaced DomComponent() with Component.element()', (builder) {
         for (final node in domComponents) {
           builder.replace(node.offset, node.length, 'Component.element');
         }
@@ -69,7 +69,7 @@ class ComponentFactoryMigration implements Migration {
     }
 
     if (wrapDomComponents.isNotEmpty) {
-      reporter.createMigration('Replaced DomComponent.wrap() with Component.wrapElement()', (builder) {
+      context.reporter.createMigration('Replaced DomComponent.wrap() with Component.wrapElement()', (builder) {
         for (final node in wrapDomComponents) {
           builder.replace(node.offset, node.length, 'Component.wrapElement');
         }
@@ -77,7 +77,7 @@ class ComponentFactoryMigration implements Migration {
     }
 
     if (fragments.isNotEmpty) {
-      reporter.createMigration('Replaced Fragment() with Component.fragment()', (builder) {
+      context.reporter.createMigration('Replaced Fragment() with Component.fragment()', (builder) {
         for (final (node, arguments) in fragments) {
           builder.replace(node.offset, node.length, 'Component.fragment');
           final childrenArg =

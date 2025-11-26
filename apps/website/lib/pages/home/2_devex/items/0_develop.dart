@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../../../../components/code_window/code_window.dart';
@@ -14,7 +15,7 @@ class Develop extends StatelessComponent {
     return DevexBox(
       caption: 'DEVELOP',
       title: 'Familiar Concepts',
-      description: text(
+      description: .text(
         'Apply your Flutter skills to build websites. '
         'Reuse already learned concepts like BuildContext, setState and much more.',
       ),
@@ -47,20 +48,20 @@ class Develop extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('.develop-preview', [
       css('&').styles(
-        position: Position.relative(),
+        position: .relative(),
         height: 100.percent,
-        padding: Padding.all(1.rem),
-        boxSizing: BoxSizing.borderBox,
+        padding: .all(1.rem),
+        boxSizing: .borderBox,
       ),
       css('& > div').styles(
-        position: Position.absolute(top: 50.percent, left: 47.percent),
+        position: .absolute(top: 50.percent, left: 47.percent),
         width: 33.rem,
         maxWidth: 100.percent,
-        transform: Transform.translate(x: (-50).percent, y: (-50).percent),
+        transform: .translate(x: (-50).percent, y: (-50).percent),
       ),
-      css('& > div > div').styles(position: Position.relative()),
+      css('& > div > div').styles(position: .relative()),
       css('.counter-button').styles(
-        position: Position.absolute(right: (-1.5).rem, bottom: (-0.5).rem),
+        position: .absolute(right: (-1.5).rem, bottom: (-0.5).rem),
       ),
     ]),
   ];

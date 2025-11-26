@@ -10,28 +10,27 @@ import 'dart:collection';
 import 'package:meta/meta.dart';
 import 'package:universal_web/web.dart' as web;
 
+import '../dom/styles/styles.dart' show Styles, Padding, Colors, Unit;
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
-import '../foundation/events.dart';
 import '../foundation/object.dart';
-import '../foundation/styles/styles.dart';
 
 part 'build_context.dart';
 part 'build_owner.dart';
 part 'buildable_element.dart';
-part 'components_binding.dart';
 part 'components.dart';
+part 'components_binding.dart';
 part 'inactive_elements.dart';
 part 'inherited_component.dart';
 part 'inherited_model.dart';
 part 'keys.dart';
+part 'leaf_element.dart';
+part 'multi_child_element.dart';
 part 'notification.dart';
 part 'observer_component.dart';
-part 'leaf_element.dart';
 part 'render_object.dart';
 part 'stateful_component.dart';
 part 'stateless_component.dart';
-part 'multi_child_element.dart';
 
 /// Describes the configuration for an [Element].
 ///

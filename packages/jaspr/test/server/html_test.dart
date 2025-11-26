@@ -1,8 +1,11 @@
 @TestOn('vm')
 library;
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
+
+import 'render_test.dart';
 
 void main() {
   group('html test', () {
@@ -15,7 +18,7 @@ void main() {
 
       expect(
         result.body,
-        equals(
+        decodedMatches(
           '<!DOCTYPE html>\n'
           '<html><head></head><body><input type="checkbox" checked indeterminate/></body></html>\n'
           '',
@@ -26,7 +29,7 @@ void main() {
 
       expect(
         result.body,
-        equals(
+        decodedMatches(
           '<!DOCTYPE html>\n'
           '<html><head></head><body><input type="checkbox"/></body></html>\n'
           '',

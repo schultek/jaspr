@@ -80,7 +80,7 @@ class MemoryPageSource extends PageSource {
   Future<Page> buildPage() async {
     if (_page.builder case final pageBuilder?) {
       return _BuilderPage(
-        path: this.path,
+        path: path,
         url: url,
         builder: pageBuilder,
         applyLayout: _page.applyLayout,
@@ -90,7 +90,7 @@ class MemoryPageSource extends PageSource {
       );
     }
     return Page(
-      path: this.path,
+      path: path,
       url: url,
       content: _page.content ?? '',
       initialData: _page.initialData,
@@ -117,7 +117,7 @@ class _BuilderPage extends Page {
   @override
   Page copy() {
     return _BuilderPage(
-      path: this.path,
+      path: path,
       url: url,
       builder: builder,
       applyLayout: applyLayout,

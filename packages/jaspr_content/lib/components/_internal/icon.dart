@@ -3,6 +3,7 @@
 /// The icon paths are sourced from lucide icons (https://lucide.dev/icons).
 library;
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 /// A close icon.

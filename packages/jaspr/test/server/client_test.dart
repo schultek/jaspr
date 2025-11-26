@@ -1,7 +1,8 @@
 @TestOn('vm')
 library;
 
-import 'package:jaspr/server.dart';
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/server_test.dart';
 
 class App1 extends StatelessComponent {
@@ -88,7 +89,7 @@ void main() {
         options: JasprOptions(
           clients: {
             App1: ClientTarget<App1>('app1'),
-            App2: ClientTarget<App2>('app2', params: (a) => {'count': a.count, 'label': a.label}),
+            App2: ClientTarget<App2>('app2', params: (app) => {'count': app.count, 'label': app.label}),
             App3: ClientTarget<App3>('app3'),
             App4: ClientTarget<App4>('app4'),
           },

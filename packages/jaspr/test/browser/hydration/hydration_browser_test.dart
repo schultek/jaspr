@@ -4,6 +4,8 @@ library;
 import 'dart:js_interop';
 
 import 'package:jaspr/browser.dart';
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/src/dom/validator.dart';
 import 'package:jaspr_test/browser_test.dart';
 import 'package:universal_web/web.dart';
 
@@ -26,9 +28,9 @@ void main() {
       tester.pumpComponent(
         div([
           p(key: pKey, [
-            text('Hello '),
-            b(key: bKey, [text('World2')]),
-            text('!'),
+            Component.text('Hello '),
+            b(key: bKey, [Component.text('World2')]),
+            Component.text('!'),
           ]),
         ]),
       );
@@ -65,7 +67,7 @@ void main() {
       expect(p2Element.textContent, equals('B'));
 
       registerClientsSync({
-        'app': (_) => p([text('C')]),
+        'app': (_) => p([Component.text('C')]),
       });
       await pumpEventQueue();
 
@@ -100,7 +102,7 @@ void main() {
       expect(p2Element.textContent, equals('Hello'));
 
       registerClientsSync({
-        'app': (params) => p([text('Hello ${params['name']}')]),
+        'app': (params) => p([Component.text('Hello ${params['name']}')]),
       });
       await pumpEventQueue();
 

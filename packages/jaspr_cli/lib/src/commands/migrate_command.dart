@@ -5,6 +5,8 @@ import 'package:io/ansi.dart';
 import '../logging.dart';
 import '../migrations/build_method_migration.dart';
 import '../migrations/component_factory_migration.dart';
+import '../migrations/dom_import_migration.dart';
+import '../migrations/html_helper_migration.dart';
 import '../migrations/migration_models.dart';
 import 'base_command.dart';
 
@@ -18,6 +20,12 @@ class MigrateCommand extends BaseCommand {
       help: 'Include the specified directory for migration (can be used multiple times).',
       hide: true,
       defaultsTo: ['lib', 'web', 'test'],
+    );
+    argParser.addMultiOption(
+      'feature',
+      help: 'Specify which language features to use during migration (can be used multiple times).',
+      allowed: ['dot-shorthands'],
+      allowedHelp: {'dot-shorthands': 'Use dot shorthands where possible.'},
     );
   }
 
@@ -34,8 +42,14 @@ class MigrateCommand extends BaseCommand {
   late final bool apply = argResults!.flag('apply');
   late final String? assumeVersion = argResults!.option('assume-version');
   late final List<String> includeDirs = argResults!.multiOption('include-dir');
+  late final List<String> features = argResults!.multiOption('feature');
 
-  static List<Migration> get allMigrations => [BuildMethodMigration(), ComponentFactoryMigration()];
+  static List<Migration> get allMigrations => [
+    BuildMethodMigration(),
+    ComponentFactoryMigration(),
+    DomImportMigration(),
+    HtmlHelperMigration(),
+  ];
 
   @override
   Future<int> runCommand() async {
@@ -59,7 +73,7 @@ class MigrateCommand extends BaseCommand {
     }
 
     var migrations = allMigrations.where((m) {
-      return currentJasprVersion.compareTo(m.minimumJasprVersion) >= 0;
+      return currentJasprVersion.compareTo(m.minimumJasprVersion) == 0;
     }).toList();
 
     if (migrations.isEmpty) {
@@ -80,7 +94,7 @@ class MigrateCommand extends BaseCommand {
 
     final results = migrations.computeResults(includeDirs, apply, (file, e, st) {
       logger.write('Error processing ${file.path}: $e\n$st', level: Level.error);
-    });
+    }, features: features);
 
     final check = green.wrap(styleBold.wrap('✓'));
     final warn = yellow.wrap(styleBold.wrap('⚠'));
