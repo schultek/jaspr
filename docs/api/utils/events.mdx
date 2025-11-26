@@ -11,7 +11,7 @@ return div(events: {
   'click': (event) {
     print('Clicked');
   },
-}, [text('Click Me')]);
+}, [.text('Click Me')]);
 ```
 
 By default, you provide a `Map<String, EventCallback>` with the **event name** and a
@@ -25,7 +25,7 @@ type-safe way. The same element from above using the `events()` method looks lik
 ```dart title="Using events utility"
 return div(events: events(onClick: () {
   print('Clicked');
-}), [text('Click Me')]);
+}), [.text('Click Me')]);
 ```
 
 As shown, the result of the `events()` call can be passed directly to the `events:` parameter of a html component.

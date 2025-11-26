@@ -34,6 +34,12 @@ The [flutter docs](https://docs.flutter.dev/platform-integration/web) write in t
 > static content such as blog articles benefit from the document-centric model that the web is built around, 
 > rather than the app-centric services that a UI framework like Flutter can deliver.
 
+<Info>
+Did you know `dart.dev` and `docs.flutter.dev` are both built with Jaspr? 
+
+They are a great example of how Jaspr can be used to build text-rich, static content websites with Dart.
+</Info>
+
 ---
 
 ## Conceptual Differences
@@ -62,6 +68,14 @@ Rather it **embraces these differences** to give the best of both worlds.
    <Info>
    Trade-Off: Giving `Text` a style option would be superficial and not native to web, and thereby not
    a good practice.
+   </Info>
+
+3. Jaspr does not have the same layout primitives like Flutter, such as `Column`, `Row`, or `Stack`. Instead, you use 
+   standard HTML elements like `div`, `p` and `span` in combination with CSS for layouting.
+
+   <Info>
+   Trade-Off: Implementing the same layout primitives as Flutter would hide the underlying web platform
+   and make it harder to learn and use web-native technologies like CSS for layouting.
    </Info>
 
 ---

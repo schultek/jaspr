@@ -166,7 +166,7 @@ Component buildBody(Page page, Component child) {
       aside(classes: 'toc', [
         if (page.data['toc'] case TableOfContents toc)
           div([
-            h3([text('On this page')]),
+            h3([.text('On this page')]),
             toc.build(), // Renders the ToC as an unstyled <ul> list
           ]),
       ]),

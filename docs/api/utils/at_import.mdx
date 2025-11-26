@@ -24,6 +24,7 @@ Jaspr can do this for you using the `@Import` annotation. Say you have the follo
 ```dart title="lib/app.dart"
 import 'dart:html' show window;
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 class App extends StatelessComponent {
@@ -32,7 +33,7 @@ class App extends StatelessComponent {
     if (kIsWeb) {
       window.alert('Hi Jaspr');
     }
-    return p([text('Hello World')]);
+    return p([.text('Hello World')]);
   }
 }
 ```
@@ -47,6 +48,7 @@ With Jasprs **platform-specific imports** you can change the code to this:
 @Import.onWeb('dart:html', show: [#window])
 import 'app.imports.dart';
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 class App extends StatelessComponent {
@@ -55,7 +57,7 @@ class App extends StatelessComponent {
     if (kIsWeb) {
       window.alert('Hi Jaspr');
     }
-    return p([text('Hello World')]);
+    return p([.text('Hello World')]);
   }
 }
 ```
