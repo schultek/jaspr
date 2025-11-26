@@ -94,12 +94,9 @@ class DomRenderElement extends DomRenderObject
     Map<String, String>? attributes,
     Map<String, EventCallback>? events,
   ) {
-    late Set<String> attributesToRemove;
-
-    attributesToRemove = {};
-    for (var i = 0; i < node.attributes.length; i++) {
-      attributesToRemove.add(node.attributes.item(i)!.name);
-    }
+    final Set<String> originalAttributes = {
+      for (var i = 0; i < node.attributes.length; i++) node.attributes.item(i)!.name,
+    };
 
     node.clearOrSetAttribute('id', id);
     node.clearOrSetAttribute('class', classes == null || classes.isEmpty ? null : classes);
@@ -109,81 +106,84 @@ class DomRenderElement extends DomRenderObject
     );
 
     if (attributes != null && attributes.isNotEmpty) {
-      for (final attr in attributes.entries) {
-        if (attr.key == 'value' && node.isHtmlInputElement) {
-          if ((node as web.HTMLInputElement).value != attr.value) {
-            if (kVerboseMode) {
-              print("Set input value: ${attr.value}");
+      for (final MapEntry(key: attrName, value: attrValue) in attributes.entries) {
+        if (attrName == 'value') {
+          if (node.isHtmlSelectElement) {
+            final nodeAsSelectElement = node as web.HTMLSelectElement;
+            if (nodeAsSelectElement.value != attrValue) {
+              if (kVerboseMode) {
+                print('Set select value: $attrValue');
+              }
+              nodeAsSelectElement.value = attrValue;
             }
-            (node as web.HTMLInputElement).value = attr.value;
+            continue;
           }
-          continue;
+
+          if (node.isHtmlInputElement) {
+            final nodeAsInputElement = node as web.HTMLInputElement;
+            if (nodeAsInputElement.value != attrValue) {
+              if (kVerboseMode) {
+                print('Set input value: $attrValue');
+              }
+              nodeAsInputElement.value = attrValue;
+            }
+            continue;
+          }
+        } else if (attrName == 'checked') {
+          if (node.isHtmlInputElement) {
+            final nodeAsInputElement = node as web.HTMLInputElement;
+            if (nodeAsInputElement.type case 'checkbox' || 'radio') {
+              final shouldBeChecked = attrValue == 'true';
+              if (nodeAsInputElement.checked != shouldBeChecked) {
+                if (kVerboseMode) {
+                  print('Set input checked: $shouldBeChecked');
+                }
+                nodeAsInputElement.checked = shouldBeChecked;
+                if (!shouldBeChecked && node.hasAttribute('checked')) {
+                  // Remove the attribute if unchecked to avoid HTML5 validation issues.
+                  nodeAsInputElement.removeAttribute('checked');
+                }
+              }
+              continue;
+            }
+          }
+        } else if (attrName == 'indeterminate') {
+          if (node.isHtmlInputElement) {
+            final nodeAsInputElement = node as web.HTMLInputElement;
+            if (nodeAsInputElement.type == 'checkbox') {
+              final shouldBeIndeterminate = attrValue == 'true';
+              if (nodeAsInputElement.indeterminate != shouldBeIndeterminate) {
+                if (kVerboseMode) {
+                  print('Set input indeterminate: $shouldBeIndeterminate');
+                }
+                nodeAsInputElement.indeterminate = shouldBeIndeterminate;
+                if (!shouldBeIndeterminate && node.hasAttribute('indeterminate')) {
+                  // Remove the attribute if unchecked to avoid HTML5 validation issues.
+                  nodeAsInputElement.removeAttribute('indeterminate');
+                }
+              }
+              continue;
+            }
+          }
         }
 
-        if (attr.key == 'checked' &&
-            node.isHtmlInputElement &&
-            ['checkbox', 'radio'].contains((node as web.HTMLInputElement).type)) {
-          final shouldBeChecked = attr.value == 'true';
-          if ((node as web.HTMLInputElement).checked != shouldBeChecked) {
-            if (kVerboseMode) {
-              print("Set input checked: $shouldBeChecked");
-            }
-            (node as web.HTMLInputElement).checked = shouldBeChecked;
-            if (!shouldBeChecked && node.hasAttribute('checked')) {
-              // Remove the attribute if unchecked to avoid HTML5 validation issues.
-              node.removeAttribute('checked');
-            }
-          }
-          continue;
-        }
-
-        if (attr.key == 'indeterminate' &&
-            node.isHtmlInputElement &&
-            (node as web.HTMLInputElement).type == 'checkbox') {
-          final shouldBeIndeterminate = attr.value == 'true';
-          if ((node as web.HTMLInputElement).indeterminate != shouldBeIndeterminate) {
-            if (kVerboseMode) {
-              print("Set input indeterminate: $shouldBeIndeterminate");
-            }
-            (node as web.HTMLInputElement).indeterminate = shouldBeIndeterminate;
-            if (!shouldBeIndeterminate && node.hasAttribute('indeterminate')) {
-              // Remove the attribute if unchecked to avoid HTML5 validation issues.
-              node.removeAttribute('indeterminate');
-            }
-          }
-          continue;
-        }
-
-        if (attr.key == 'value' && node.isHtmlSelectElement) {
-          if ((node as web.HTMLSelectElement).value != attr.value) {
-            if (kVerboseMode) {
-              print("Set select value: ${attr.value}");
-            }
-            (node as web.HTMLSelectElement).value = attr.value;
-          }
-          continue;
-        }
-
-        node.clearOrSetAttribute(attr.key, attr.value);
+        node.clearOrSetAttribute(attrName, attrValue);
       }
     }
 
-    attributesToRemove.removeAll(['id', 'class', 'style', ...?attributes?.keys]);
-    if (attributesToRemove.isNotEmpty) {
-      for (final name in attributesToRemove) {
-        node.removeAttribute(name);
-        if (kVerboseMode) {
-          print("Remove attribute: $name");
-        }
+    final attributesToRemove = originalAttributes.difference({'id', 'class', 'style', ...?attributes?.keys});
+    for (final name in attributesToRemove) {
+      node.removeAttribute(name);
+      if (kVerboseMode) {
+        print('Removed attribute: $name');
       }
     }
 
     if (events != null && events.isNotEmpty) {
-      final prevEventTypes = this.events?.keys.toSet();
-      this.events ??= <String, EventBinding>{};
-      final dataEvents = this.events!;
+      final dataEvents = this.events ??= <String, EventBinding>{};
+      final prevEventTypes = dataEvents.keys.toSet();
       events.forEach((type, fn) {
-        prevEventTypes?.remove(type);
+        prevEventTypes.remove(type);
         final currentBinding = dataEvents[type];
         if (currentBinding != null) {
           currentBinding.fn = fn;
@@ -191,14 +191,16 @@ class DomRenderElement extends DomRenderObject
           dataEvents[type] = EventBinding(node, type, fn);
         }
       });
-      prevEventTypes?.forEach((type) {
+      for (final type in prevEventTypes) {
         dataEvents.remove(type)?.clear();
-      });
+      }
     } else {
-      this.events?.forEach((type, binding) {
-        binding.clear();
-      });
-      this.events = null;
+      if (this.events case final existingEvents?) {
+        for (final binding in existingEvents.values) {
+          binding.clear();
+        }
+        this.events = null;
+      }
     }
   }
 
