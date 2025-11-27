@@ -152,45 +152,45 @@ class SlottedDomNodesElement extends MultiChildRenderObjectElement {
 }
 
 class SlottedDomRenderObject extends DomRenderFragment {
-  SlottedDomRenderObject(DomRenderObject? parent) : super(parent, []);
+  SlottedDomRenderObject._(
+    DomRenderObject? parent, {
+    this.firstChildNode,
+    this.lastChildNode,
+  }) : super(parent, []);
 
   factory SlottedDomRenderObject.fromNodes(List<web.Node>? nodes, DomRenderObject? parent) {
-    nodes ??= (parent is HydratableDomRenderObject) ? [...parent.toHydrate] : <web.Node>[];
+    final nodesToAdd = nodes ?? [if (parent is HydratableDomRenderObject) ...parent.toHydrate];
 
-    final object = SlottedDomRenderObject(parent);
-    if (nodes.isEmpty) {
-      object.firstChildNode = null;
-      object.lastChildNode = null;
+    if (nodesToAdd.isEmpty) {
+      return SlottedDomRenderObject._(parent)..isAttached = true;
+    }
+
+    final firstNode = nodesToAdd.first;
+    final lastNode = nodesToAdd.last;
+    assert(firstNode.parentNode == lastNode.parentNode, 'All nodes must share the same parent.');
+    final object = SlottedDomRenderObject._(parent, firstChildNode: firstNode, lastChildNode: lastNode);
+    if (parent != null && parent.node.contains(firstNode)) {
+      if (parent is HydratableDomRenderObject) {
+        final startIndex = parent.toHydrate.indexOf(firstNode);
+        final endIndex = parent.toHydrate.indexOf(lastNode);
+        if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
+          parent.toHydrate.removeRange(startIndex, endIndex + 1);
+        }
+      }
       object.isAttached = true;
     } else {
-      final firstNode = nodes.first;
-      final lastNode = nodes.last;
-      assert(firstNode.parentNode == lastNode.parentNode, 'All nodes must share the same parent.');
-      object.firstChildNode = firstNode;
-      object.lastChildNode = lastNode;
-      if (parent != null && parent.node.contains(firstNode)) {
-        if (parent is HydratableDomRenderObject) {
-          var startIndex = parent.toHydrate.indexOf(firstNode);
-          var endIndex = parent.toHydrate.indexOf(lastNode);
-          if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
-            parent.toHydrate.removeRange(startIndex, endIndex + 1);
-          }
-        }
-        object.isAttached = true;
-      } else {
-        for (final node in nodes) {
-          object.node.appendChild(node);
-        }
+      for (final node in nodesToAdd) {
+        object.node.appendChild(node);
       }
     }
     return object;
   }
 
   @override
-  late final web.Node? firstChildNode;
+  final web.Node? firstChildNode;
 
   @override
-  late final web.Node? lastChildNode;
+  final web.Node? lastChildNode;
 
   @override
   void attach(covariant RenderObject child, {covariant RenderObject? after}) {
