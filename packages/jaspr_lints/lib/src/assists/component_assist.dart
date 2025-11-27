@@ -207,14 +207,14 @@ class ComponentAssistProvider extends DartAssist {
   }
 }
 
-class StateBuildVisitor extends UnifyingAstVisitor {
+class StateBuildVisitor extends UnifyingAstVisitor<void> {
   StateBuildVisitor(this.builder, this.clazz);
 
   final DartFileEditBuilder builder;
   final ClassDeclaration clazz;
 
   @override
-  visitSimpleIdentifier(SimpleIdentifier node) {
+  void visitSimpleIdentifier(SimpleIdentifier node) {
     var elem = node.element;
     if (elem == null) return;
 

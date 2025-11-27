@@ -263,7 +263,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
   Future<ClientWorkflow?> _runClient(String webPort) async {
     if (useWasm) {
-      checkWasmSupport();
+      project.checkWasmSupport();
     }
 
     logger.write('Starting web compiler...', tag: Tag.cli, progress: ProgressState.running);

@@ -48,7 +48,7 @@ class LinkButton extends StatelessComponent {
       classes: 'link-button link-button-$style',
       href: to,
       target: target,
-      attributes: {if (ariaLabel != null) 'aria-label': ariaLabel!},
+      attributes: {'aria-label': ?ariaLabel},
       [child],
     );
   }

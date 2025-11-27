@@ -393,7 +393,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
   Future<int> _buildWeb() async {
     if (useWasm) {
-      checkWasmSupport();
+      project.checkWasmSupport();
     }
 
     logger.write('Building web assets...', progress: ProgressState.running);

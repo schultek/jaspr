@@ -50,6 +50,7 @@ dependencies:
   html: ^0.15.6
   mocktail: ^1.0.4
   file: ^7.0.1
+  pub_semver: ^2.2.0
 
 dev_dependencies:
   test: ^1.22.0

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_dynamic_calls
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -87,7 +89,7 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
                 }
 
                 for (final attr in attrs.keys) {
-                  final name = attrs[attr]['name'] ?? attr;
+                  final name = attrs[attr]['name'] as String? ?? attr;
                   final type = attrs[attr]['type'];
 
                   if (type == null) {
@@ -146,7 +148,7 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
             );
 
             for (final attr in attrs.keys) {
-              final name = attrs[attr]['name'] ?? attr;
+              final name = attrs[attr]['name'] as String? ?? attr;
               final type = attrs[attr]['type'];
 
               if (type == null) {
@@ -184,7 +186,7 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
                       final [_, name] = type.split(':');
                       t.symbol = name;
                     } else if (type is Map<String, dynamic>) {
-                      final name = type['name'];
+                      final name = type['name'] as String?;
                       t.symbol = name;
                     } else if (type == 'content') {
                       t.symbol = 'String';
@@ -325,10 +327,11 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
                 content.write('    events: ');
 
                 if (events.isNotEmpty) {
+                  final needsTypeArgs = events.length == 1 && events.first == 'onClick';
                   content.write(
                     '{\n'
                     '      ...?events,\n'
-                    '      ..._events(${events.map((e) => '$e: $e').join(', ')}),\n'
+                    '      ..._events${needsTypeArgs ? '<void>' : ''}(${events.map((e) => '$e: $e').join(', ')}),\n'
                     '    },\n',
                   );
                 } else {
@@ -358,14 +361,15 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
             if (type['values'] != null) {
               final name = type['name'] as String;
               final values = type['values'] as Map<String, dynamic>;
+              final doc = type['doc'] as String;
 
               l.body.add(
                 Enum((e) {
                   e.name = name;
-                  e.docs.addAll((type['doc'] as String).split('\n').map((d) => '/// $d'));
+                  e.docs.addAll(doc.split('\n').map((d) => '/// $d'));
 
                   for (final name in values.keys) {
-                    final value = values[name]['value'] ?? name;
+                    final value = values[name]['value'] as String? ?? name;
 
                     e.values.add(
                       EnumValue((ev) {

@@ -4,13 +4,8 @@ analyzer:
   exclude:
     - tool/scaffold/**
     - tool/templates/**
-  language:
-    strict-casts: true
-    strict-inference: true
-    strict-raw-types: true
   
 linter:
   rules:
-    avoid_dynamic_calls: true
     # Disabled so that we can group dependencies semantically.
     sort_pub_dependencies: false

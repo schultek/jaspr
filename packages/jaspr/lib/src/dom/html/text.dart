@@ -94,7 +94,7 @@ final class a extends StatelessComponent {
       },
       events: {
         ...?events,
-        ..._events(onClick: onClick),
+        ..._events<void>(onClick: onClick),
       },
       children: children,
     );

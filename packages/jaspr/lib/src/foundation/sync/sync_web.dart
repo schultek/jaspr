@@ -6,7 +6,7 @@ import '../../dom/validator.dart';
 
 final _syncRegex = RegExp('^${DomValidator.syncMarkerPrefixRegex}(.*)\$');
 
-void initSyncState(SyncStateMixin sync) {
+void initSyncState(SyncStateMixin<StatefulComponent, Object?> sync) {
   var r = (sync.context as Element).parentRenderObjectElement?.renderObject as DomRenderObject?;
   if (r == null) return;
 

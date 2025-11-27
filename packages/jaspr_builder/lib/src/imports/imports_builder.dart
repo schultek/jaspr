@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:build/build.dart';
+import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 
 import '../utils.dart';
@@ -17,7 +18,8 @@ class ImportsOutputBuilder implements Builder {
       final entries = (jsonDecode(await buildStep.readAsString(buildStep.inputId)) as List<Object?>)
           .cast<Map<String, Object?>>()
           .map(ImportEntry.fromJson)
-          .toList();
+          .toList()
+          .sortedBy((e) => e.url);
       final outputId = buildStep.inputId.changeExtension('.dart');
 
       final webShow = <String>{};

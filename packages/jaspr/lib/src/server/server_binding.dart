@@ -57,7 +57,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     if (rootElement == null) return _emptyResponse;
 
     if (rootElement!.owner.isFirstBuild) {
-      final completer = Completer.sync();
+      final completer = Completer<void>.sync();
       rootElement!.binding.addPostFrameCallback(completer.complete);
       await completer.future;
     }

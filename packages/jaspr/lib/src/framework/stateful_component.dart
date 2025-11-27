@@ -624,10 +624,10 @@ class StatefulElement extends BuildableElement {
   /// There is a one-to-one relationship between [State] objects and the
   /// [StatefulElement] objects that hold them. The [State] objects are created
   /// by [StatefulElement] in [mount].
-  State? _state;
+  State<StatefulComponent>? _state;
   State get state => _state!;
 
-  Future? _asyncInitState;
+  Future<void>? _asyncInitState;
 
   @override
   void didMount() {
@@ -682,7 +682,7 @@ class StatefulElement extends BuildableElement {
             }
             super.performRebuild();
           })
-          .catchError((e, st) {
+          .onError<Object>((e, st) {
             failRebuild(e, st);
           });
     }

@@ -91,7 +91,7 @@ class Link extends StatelessComponent {
           }
         },
       },
-      [if (child != null) child!, ...?children],
+      [?child, ...?children],
     );
   }
 }
