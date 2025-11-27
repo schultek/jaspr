@@ -184,19 +184,6 @@ abstract class BaseCommand extends Command<int> {
 
     return exitCode;
   }
-
-  void checkWasmSupport() {
-    var package = '${project.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
-    var devDependencies = project.pubspecYaml?['dev_dependencies'] as Map<Object?, Object?>?;
-    var version = devDependencies?[package];
-    if (version is! String || !version.startsWith(RegExp(r'\^?4.1.'))) {
-      usageException('Using "--experimental-wasm" requires $package 4.1.0 or newer.');
-    }
-
-    if (project.usesFlutter) {
-      usageException('Using "--experimental-wasm" is not supported together with flutter embedding.');
-    }
-  }
 }
 
 extension on Stream<String> {
