@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
+import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart';
 
 import 'logging.dart';
@@ -196,4 +197,32 @@ class Project {
     }
     return null;
   }();
+
+  void checkWasmSupport() {
+    final package = '${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    final devDependencies = pubspecYaml?['dev_dependencies'] as Map<Object?, Object?>?;
+    final version = switch (devDependencies?[package]) {
+      String v => VersionConstraint.parse(v),
+      _ => null,
+    };
+    final minVersion = VersionConstraint.compatibleWith(Version(4, 1, 0));
+    if (version == null || !minVersion.allowsAll(version)) {
+      logger.write(
+        'Using "--experimental-wasm" requires $package 4.1.0 or newer. '
+        'Please update your version constraint in pubspec.yaml.',
+        tag: Tag.cli,
+        level: Level.critical,
+      );
+      exit(1);
+    }
+
+    if (usesFlutter) {
+      logger.write(
+        'Using "--experimental-wasm" is currently not supported together with Flutter embedding.',
+        tag: Tag.cli,
+        level: Level.critical,
+      );
+      exit(1);
+    }
+  }
 }
