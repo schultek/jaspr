@@ -6,7 +6,7 @@ import 'dom_render_object.dart';
 import 'utils.dart';
 
 /// A slot that attaches a child component to a specific DOM node within
-/// a [SlottedDomNodesComponent].
+/// a [SlottedChildView].
 abstract class ChildSlot extends Component {
   const ChildSlot();
 
@@ -101,11 +101,11 @@ class SlottedChildView extends Component {
   final List<ChildSlot> slots;
 
   @override
-  Element createElement() => SlottedDomNodesElement(this);
+  Element createElement() => SlottedChildViewElement(this);
 }
 
-class SlottedDomNodesElement extends MultiChildRenderObjectElement {
-  SlottedDomNodesElement(SlottedChildView super.component);
+class SlottedChildViewElement extends MultiChildRenderObjectElement {
+  SlottedChildViewElement(SlottedChildView super.component);
 
   @override
   SlottedChildView get component => super.component as SlottedChildView;
@@ -114,7 +114,7 @@ class SlottedDomNodesElement extends MultiChildRenderObjectElement {
   void update(SlottedChildView newComponent) {
     assert(
       newComponent.nodes == component.nodes,
-      'SlottedDomNodesComponent cannot be updated with different nodes.',
+      'SlottedChildView cannot be updated with different nodes.',
     );
     super.update(newComponent);
   }

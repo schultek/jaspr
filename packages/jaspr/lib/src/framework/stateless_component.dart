@@ -6,7 +6,7 @@ part of 'framework.dart';
 /// building a constellation of other components that describe the user interface
 /// more concretely. The building process continues recursively until the
 /// description of the user interface is fully concrete (e.g., consists
-/// entirely of [DOMComponent]s, which describe concrete DOM elements).
+/// entirely of [DomComponent]s, which describe concrete DOM elements).
 ///
 /// Stateless component are useful when the part of the user interface you are
 /// describing does not depend on anything other than the configuration

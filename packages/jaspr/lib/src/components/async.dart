@@ -5,6 +5,10 @@
 /// Components that handle interaction with asynchronous computations.
 ///
 /// Asynchronous computations are represented by [Future]s and [Stream]s.
+///
+/// @docImport '../foundation/change_notifier.dart';
+/// @docImport '../server/components/async.dart';
+/// @docImport 'listenable_builder.dart';
 library;
 
 import 'dart:async' show StreamSubscription;

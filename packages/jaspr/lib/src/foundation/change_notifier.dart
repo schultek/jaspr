@@ -1,3 +1,7 @@
+/// @docImport '../components/listenable_builder.dart';
+/// @docImport '../framework/framework.dart';
+library;
+
 import 'package:meta/meta.dart';
 
 import 'basic_types.dart';
@@ -11,9 +15,6 @@ import 'basic_types.dart';
 ///
 ///  * [ValueListenable], an interface that augments the [Listenable] interface
 ///    with the concept of a _current value_.
-///
-///  * [Animation], an interface that augments the [ValueListenable] interface
-///    to add the concept of direction (forward or reverse).
 ///
 /// Many classes in the Flutter API use or implement these interfaces. The
 /// following subclasses are especially relevant:
@@ -29,18 +30,12 @@ import 'basic_types.dart';
 ///
 /// See also:
 ///
-///  * [AnimatedBuilder], a widget that uses a builder callback to rebuild
-///    whenever a given [Listenable] triggers its notifications. This widget is
-///    commonly used with [Animation] subclasses, hence its name, but is by no
-///    means limited to animations, as it can be used with any [Listenable]. It
-///    is a subclass of [AnimatedWidget], which can be used to create widgets
-///    that are driven from a [Listenable].
 ///  * [ValueListenableBuilder], a widget that uses a builder callback to
 ///    rebuild whenever a [ValueListenable] object triggers its notifications,
 ///    providing the builder with the value of the object.
 ///  * [InheritedNotifier], an abstract superclass for widgets that use a
-///    [Listenable]'s notifications to trigger rebuilds in descendant widgets
-///    that declare a dependency on them, using the [InheritedWidget] mechanism.
+///    [Listenable]'s notifications to trigger rebuilds in descendant components
+///    that declare a dependency on them, using the [InheritedComponent] mechanism.
 ///  * [Listenable.merge], which creates a [Listenable] that triggers
 ///    notifications whenever any of a list of other [Listenable]s trigger their
 ///    notifications.

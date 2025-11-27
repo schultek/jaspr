@@ -1,3 +1,6 @@
+/// @docImport '../foundation/binding.dart';
+library;
+
 import 'dart:async';
 import 'dart:isolate';
 
@@ -14,7 +17,7 @@ typedef RequestLike = ({String url, Headers headers});
 
 /// Performs the rendering process and provides the created [AppBinding] to [setup].
 ///
-/// If [Jaspr.useIsolates] is true, this spawns an isolate for each render.
+/// If [Jaspr.useIsolates] is `true`, this spawns an isolate for each render.
 Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loadFile, bool standalone) async {
   var url = request.url.normalizePath().toString();
   if (!url.startsWith('/')) {

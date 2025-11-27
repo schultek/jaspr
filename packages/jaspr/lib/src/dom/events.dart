@@ -10,10 +10,10 @@ Map<String, EventCallback> events<V>({
   /// Listens to the 'click' event.
   ///
   /// If the target element is an anchor (<a>) element, this will override the default behavior of the link and not
-  /// visit [href] when clicked.
+  /// visit the specified `href` when clicked.
   VoidCallback? onClick,
 
-  /// Listens to the 'input' event. When providing a generic type for [value], it must be according to the target element:
+  /// Listens to the 'input' event. When providing a generic type for [V], it must be according to the target element:
   /// - `bool?` for checkbox or radio input elements
   /// - `num?` for number input elements
   /// - `DateTime` for date input elements
@@ -23,7 +23,7 @@ Map<String, EventCallback> events<V>({
   /// - `Null` for all other elements
   ValueChanged<V>? onInput,
 
-  /// Listens to the 'change' event. When providing a generic type for [value], it must be according to the target element:
+  /// Listens to the 'change' event. When providing a generic type for [V], it must be according to the target element:
   /// - `bool?` for checkbox or radio input elements
   /// - `num?` for number input elements
   /// - `DateTime` for date input elements

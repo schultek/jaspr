@@ -6,7 +6,7 @@ import '../dom/validator.dart';
 
 /// Main class for initializing the Jaspr framework on the server.
 ///
-/// Call [Jaspr.initializeApp()] at the start of your app, before any calls to [runApp].
+/// Call [Jaspr.initializeApp] at the start of your app, before any calls to [runApp].
 abstract final class Jaspr {
   static void initializeApp({
     ServerOptions options = const ServerOptions(),

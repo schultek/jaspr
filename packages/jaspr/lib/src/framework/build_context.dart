@@ -35,16 +35,15 @@ sealed class BuildContext {
   /// be called apply to this method as well.
   InheritedComponent dependOnInheritedElement(InheritedElement ancestor, {Object? aspect});
 
-  /// Obtains the nearest component of the given type `T`, which must be the type of a
+  /// Obtains the nearest component of the given type [T], which must be the type of a
   /// concrete [InheritedComponent] subclass, and registers this build context with
   /// that component such that when that component changes (or a new component of that
   /// type is introduced, or the component goes away), this build context is
   /// rebuilt so that it can obtain new values from that component.
   ///
-  /// This is typically called implicitly from `of()` static methods, e.g.
-  /// [Router.of].
+  /// This is typically called implicitly from `of()` static methods, such as `Router.of`.
   ///
-  /// The [aspect] parameter is only used when `T` is an
+  /// The [aspect] parameter is only used when [T] is an
   /// [InheritedComponent] subclasses that supports partial updates.
   /// It specifies what "aspect" of the inherited
   /// component this context depends on.

@@ -1,3 +1,6 @@
+/// @docImport '../../components/basic.dart';
+library;
+
 import 'package:meta/meta.dart';
 
 import '../../framework/framework.dart';

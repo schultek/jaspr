@@ -1,6 +1,6 @@
 part of 'framework.dart';
 
-/// A [Key] is an identifier for [Component]s, [Element]s and [SemanticsNode]s.
+/// A [Key] is an identifier for [Component]s and [Element]s.
 ///
 /// A new component will only be used to update an existing element if its key is
 /// the same as the key of the current component associated with the element.

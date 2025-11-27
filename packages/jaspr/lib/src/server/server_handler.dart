@@ -17,7 +17,7 @@ import 'server_app.dart';
 final String? jasprProxyPort = Platform.environment['JASPR_PROXY_PORT'];
 const String kDevWeb = String.fromEnvironment('jaspr.dev.web');
 
-final webDir = kDevWeb.isNotEmpty ? kDevWeb : join(_findRootProjectDir(), 'web');
+final String webDir = kDevWeb.isNotEmpty ? kDevWeb : join(_findRootProjectDir(), 'web');
 
 String _findRootProjectDir() {
   final executableDir = dirname(Platform.script.toFilePath());
