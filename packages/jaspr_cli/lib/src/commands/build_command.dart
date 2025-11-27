@@ -282,11 +282,14 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           continue;
         }
 
+        // Try to naively get the file extension, or fallback to html
+        final ext = response.headers['content-type']?.split('/').lastOrNull ?? 'html';
+
         var file = File(
           p.url.join(
             'build/jaspr',
             route.startsWith('/') ? route.substring(1) : route,
-            p.url.extension(route).isEmpty ? 'index.html' : null,
+            p.url.extension(route).isEmpty ? 'index.$ext' : null,
           ),
         ).absolute;
 
