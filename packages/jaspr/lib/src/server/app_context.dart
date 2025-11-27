@@ -2,7 +2,6 @@
 library;
 
 import 'dart:io';
-import 'dart:typed_data';
 
 import '../framework/framework.dart';
 import 'server_binding.dart';
