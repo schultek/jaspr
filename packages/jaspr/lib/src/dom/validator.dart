@@ -78,6 +78,6 @@ class DomValidator {
   }
 
   String escapeMarkerText(String text) {
-    return HtmlEscape(HtmlEscapeMode(escapeLtGt: true)).convert(text);
+    return const HtmlEscape(HtmlEscapeMode(escapeLtGt: true)).convert(text);
   }
 }
