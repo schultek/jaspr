@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+/// @docImport '../components/basic.dart';
+/// @docImport '../components/notification_listener.dart';
+/// @docImport '../foundation/change_notifier.dart';
 library;
 
 import 'dart:async';

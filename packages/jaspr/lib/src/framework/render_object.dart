@@ -1,12 +1,5 @@
 part of 'framework.dart';
 
-/// Signature for a function that is called for each [RenderObject].
-///
-/// Used by [RenderObject.visitChildren].
-///
-/// The `child` argument must not be null.
-typedef RenderObjectVisitor = void Function(RenderObject child);
-
 abstract class RenderObject {
   RenderObject? get parent;
   web.Node? get node;

@@ -6,7 +6,7 @@ import 'dom_render_object.dart';
 import 'utils.dart';
 
 /// A slot that attaches a child component to a specific DOM node within
-/// a [SlottedDomNodesComponent].
+/// a [SlottedChildView].
 abstract class ChildSlot extends Component {
   const ChildSlot();
 

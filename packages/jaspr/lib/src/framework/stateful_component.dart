@@ -11,7 +11,7 @@ part of 'framework.dart';
 /// building a constellation of other components that describe the user interface
 /// more concretely. The building process continues recursively until the
 /// description of the user interface is fully concrete (e.g., consists
-/// entirely of [DOMComponent]s, which describe concrete DOM elements).
+/// entirely of [DomComponent]s, which describe concrete DOM elements).
 ///
 /// Stateful components are useful when the part of the user interface you are
 /// describing can change dynamically, e.g. due to having an internal
@@ -113,9 +113,7 @@ part of 'framework.dart';
 ///
 ///  * If the depth must be changed for some reason, consider wrapping the
 ///    common parts of the subtrees in components that have a [GlobalKey] that
-///    remains consistent for the life of the stateful component. (The
-///    [KeyedSubtree] component may be useful for this purpose if no other component
-///    can conveniently be assigned the key.)
+///    remains consistent for the life of the stateful component.
 ///
 /// By convention, component constructors only use named arguments. Also by
 /// convention, the first argument is [key], and the last argument is `child`,
@@ -747,10 +745,10 @@ class StatefulElement extends BuildableElement {
   /// This can happen when the component has dropped out of the tree, but depends
   /// on an [InheritedComponent] that is still in the tree.
   ///
-  /// It is set initially to false, since [_firstBuild] makes the initial call
-  /// on the [state]. When it is true, [build] will call
-  /// `state.didChangeDependencies` and then sets it to false. Subsequent calls
-  /// to [didChangeDependencies] set it to true.
+  /// It is set initially to `false`, since [BuildOwner.performInitialBuild] makes
+  /// the initial call on the [state]. When it is `true`,
+  /// [build] will call [State.didChangeDependencies] and then sets it to `false`.
+  /// Subsequent calls to [didChangeDependencies] set it to `true`.
   bool _didChangeDependencies = false;
 
   @override

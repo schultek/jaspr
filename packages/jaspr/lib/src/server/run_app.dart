@@ -10,8 +10,8 @@ import 'render_functions.dart';
 import 'server_app.dart';
 import 'server_handler.dart';
 
-/// Main entry point on the server
-/// TODO: Add hint about usage of global variables and isolate state
+/// Main entry point on the server.
+// TODO: Add hint about usage of global variables and isolate state.
 void runApp(Component app) {
   _checkInitialized('runApp');
   ServerApp.run(_createSetup(app));
