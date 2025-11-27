@@ -6,7 +6,7 @@ import '../framework/framework.dart';
 import 'component_anchors.dart';
 import 'dom_render_object.dart';
 import 'options.dart';
-import 'slotted_dom_nodes_component.dart';
+import 'slotted_child_view.dart';
 
 /// Locates and initializes @client components during hydration.
 ///
