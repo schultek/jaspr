@@ -44,10 +44,14 @@ class DomElement extends MultiChildRenderObjectElement {
   @override
   void _updateInheritance() {
     super._updateInheritance();
-    if (_inheritedElements != null && _inheritedElements!.containsKey(_WrappingDomComponent)) {
-      _inheritedElements = HashMap<Type, InheritedElement>.from(_inheritedElements!);
+    if (_inheritedElements case final originalInheritedElements?
+        when originalInheritedElements.containsKey(_WrappingDomComponent)) {
+      final updatedInheritedElements = HashMap<Type, InheritedElement>.of(originalInheritedElements);
+      _wrappingElement = updatedInheritedElements.remove(_WrappingDomComponent);
+      _inheritedElements = updatedInheritedElements;
+      return;
     }
-    _wrappingElement = _inheritedElements?.remove(_WrappingDomComponent);
+    _wrappingElement = null;
   }
 
   @override

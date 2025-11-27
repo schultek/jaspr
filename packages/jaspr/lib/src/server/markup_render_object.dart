@@ -153,10 +153,6 @@ abstract class MarkupRenderObject extends RenderObject {
 
     return (output.toString(), leadingWhitespace, trailingWhitespace);
   }
-
-  final _elementEscape = HtmlEscape(HtmlEscapeMode.element);
-  final _attributeEscape = HtmlEscape(HtmlEscapeMode.attribute);
-  final _domValidator = DomValidator();
 }
 
 class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
@@ -307,3 +303,7 @@ class RootMarkupRenderObject extends MarkupRenderObject {
     return (output.toString(), leadingWhitespace, trailingWhitespace);
   }
 }
+
+const HtmlEscape _elementEscape = HtmlEscape(HtmlEscapeMode.element);
+const HtmlEscape _attributeEscape = HtmlEscape(HtmlEscapeMode.attribute);
+const DomValidator _domValidator = DomValidator();
