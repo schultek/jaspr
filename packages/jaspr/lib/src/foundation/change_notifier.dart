@@ -1,5 +1,5 @@
 /// @docImport '../components/listenable_builder.dart';
-/// @docImport '../framework/inherited_component.dart';
+/// @docImport '../framework/framework.dart';
 library;
 
 import 'package:meta/meta.dart';
