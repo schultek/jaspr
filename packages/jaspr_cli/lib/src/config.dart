@@ -223,7 +223,7 @@ class Project {
         tag: Tag.cli,
         level: Level.critical,
       );
-      exit(1);
+      _exitFn(1);
     }
 
     if (usesFlutter) {
@@ -232,7 +232,7 @@ class Project {
         tag: Tag.cli,
         level: Level.critical,
       );
-      exit(1);
+      _exitFn(1);
     }
   }
 }

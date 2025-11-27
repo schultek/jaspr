@@ -108,8 +108,8 @@ class _LinePlacement implements LinePlacement {
   @override
   String get value => [
     if (span) 'span',
-    if (number != null) number!,
-    if (lineName != null) lineName!,
+    ?number,
+    ?lineName,
   ].join(' ');
 }
 

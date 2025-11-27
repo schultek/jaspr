@@ -23,7 +23,7 @@ After you have [setup](https://pub.dev/documentation/jaspr_serverpod/latest/topi
 
 ## Building and deploying
 
-To build your project, run `jaspr build -i bin/main.dart` in your terminal.
+To build your project, run `jaspr build` in your terminal.
 If you are using docker to deploy your project, modify the `Dockerfile` like this:
 
 ```diff
@@ -34,7 +34,7 @@ If you are using docker to deploy your project, modify the `Dockerfile` like thi
 + RUN dart pub global activate jaspr_cli
   RUN dart pub get
 - RUN dart compile exe bin/main.dart -o bin/main
-+ RUN jaspr build -i bin/main.dart -v
++ RUN jaspr build -v
 
   ...
   
