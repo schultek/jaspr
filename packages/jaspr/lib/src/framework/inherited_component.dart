@@ -75,13 +75,11 @@ class InheritedElement extends BuildableElement {
   @override
   void _updateInheritance() {
     assert(_lifecycleState == _ElementLifecycle.active);
-    final Map<Type, InheritedElement>? incomingElements = _parent?._inheritedElements;
-    if (incomingElements != null) {
-      _inheritedElements = HashMap<Type, InheritedElement>.from(incomingElements);
-    } else {
-      _inheritedElements = HashMap<Type, InheritedElement>();
-    }
-    _inheritedElements![component.runtimeType] = this;
+    final incomingElements = _parent?._inheritedElements;
+    final inheritedElements = _inheritedElements = incomingElements != null
+        ? HashMap<Type, InheritedElement>.of(incomingElements)
+        : HashMap<Type, InheritedElement>();
+    inheritedElements[component.runtimeType] = this;
   }
 
   /// Returns the dependencies value recorded for [dependent]
