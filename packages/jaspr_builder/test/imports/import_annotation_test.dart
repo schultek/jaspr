@@ -42,5 +42,28 @@ void main() {
         readerWriter: reader,
       );
     });
+
+    test('throws on conflicting names', () async {
+      final result = await testBuilder(
+        ImportsStubsBuilder(BuilderOptions({})),
+        {
+          ...importsSources,
+          ...conflictingImportsSources,
+          ...importsModuleOutput,
+          ...conflictingImportsModuleOutput,
+        },
+        readerWriter: reader,
+      );
+
+      expect(result.succeeded, isFalse);
+      expect(result.errors, hasLength(1));
+      expect(
+        result.errors.first,
+        equals(
+          'Exception: Cannot import Document from package:jaspr/browser.dart, because it is also imported from dart:html. '
+          'Names imported via @Import must be unique for each platform across the project.',
+        ),
+      );
+    });
   });
 }
