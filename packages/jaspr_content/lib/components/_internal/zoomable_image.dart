@@ -62,8 +62,8 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
   bool zoomed = false;
   bool isResize = false;
 
-  var sourceOffset = (x: 0.0, y: 0.0, scale: 1.0);
-  var targetOffset = (x: 0.0, y: 0.0, width: 0.0, height: 0.0);
+  ({double scale, double x, double y}) sourceOffset = (x: 0.0, y: 0.0, scale: 1.0);
+  ({double height, double width, double x, double y}) targetOffset = (x: 0.0, y: 0.0, width: 0.0, height: 0.0);
 
   @override
   void initState() {

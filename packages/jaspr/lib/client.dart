@@ -1,3 +1,4 @@
+/// Client-specific Jaspr APIs.
 library;
 
 export 'jaspr.dart' hide runApp, AppContext;

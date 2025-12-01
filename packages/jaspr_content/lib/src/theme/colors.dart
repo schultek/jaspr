@@ -106,7 +106,7 @@ class ThemeColor implements Color {
   }
 
   @override
-  operator ==(Object other) {
+  bool operator ==(Object other) {
     return other is ThemeColor && other.light == light && other.dark == dark;
   }
 
@@ -135,7 +135,7 @@ class ColorToken extends ThemeColor {
   }
 
   @override
-  operator ==(Object other) {
+  bool operator ==(Object other) {
     return other is ColorToken && other.name == name && other.light == light && other.dark == dark;
   }
 

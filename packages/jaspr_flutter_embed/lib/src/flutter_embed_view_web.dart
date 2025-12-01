@@ -43,7 +43,7 @@ class FlutterEmbedView extends StatefulComponent {
   static Future<void> preload() => _libraryFuture;
 
   @override
-  State<StatefulComponent> createState() => FlutterEmbedViewState();
+  State<StatefulComponent> createState() => _FlutterEmbedViewState();
 
   Component _buildFlutter() {
     return flutter.FlutterEmbedView(
@@ -70,9 +70,9 @@ class FlutterEmbedView extends StatefulComponent {
   }
 }
 
-class FlutterEmbedViewState extends State<FlutterEmbedView> {
-  var flutterLoading = true;
-  var libraryLoading = true;
+class _FlutterEmbedViewState extends State<FlutterEmbedView> {
+  bool flutterLoading = true;
+  bool libraryLoading = true;
 
   @override
   void initState() {
