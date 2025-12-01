@@ -36,6 +36,13 @@ Version 0.22.0 ships separate entrypoints for server and client environments to 
 - **Allow binary responses**: The `AppContext.setStatusCode` method now accepts binary data for overriding the response body.
 - **Various Styling Improvements**: New CSS properties like `animation` and `quotes`, improved properties like `Transition`, better support for dot-shorthands and more.
 
+<Warning>
+Most changes can be **automatically migrated** using the `jaspr migrate` command.
+
+While using the beta, provide the target version manually using `jaspr migrate --target-version=0.22.0`.
+If you are on latest Dart and want the migrations to use dot-shorthands, additionally add `--feature=dot-shorthands`.
+</Warning>
+
 ---
 
 ## Project Entrypoints
