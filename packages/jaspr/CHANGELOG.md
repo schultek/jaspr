@@ -1,6 +1,6 @@
 ## Unreleased breaking beta.0
 
-- **Breaking** Changed project structure for **static** and **server** mode:
+- **Breaking** Changed project entrypoint conventions:
 
   - Any server entrypoint file must now end in `.server.dart` (e.g. `lib/main.server.dart`).
   - The generated server-side options file is now generated alongside the server entrypoint (e.g. as `lib/main.server.g.dart`) containing `defaultServerOptions`.
