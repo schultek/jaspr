@@ -1,4 +1,4 @@
-## Unreleased breaking
+## Unreleased breaking beta.0
 
 - **Breaking** Changed project structure for **static** and **server** mode:
 

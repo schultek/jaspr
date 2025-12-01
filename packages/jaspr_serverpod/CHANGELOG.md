@@ -1,7 +1,7 @@
-## Unreleased minor
+## Unreleased minor beta.0
 
-- `jaspr` upgraded to `0.22.0`
-- Updated documentation to use the new `jaspr.target` and `jaspr.port` options in pubspec.yaml instead of `jaspr.dev-command`.
+- `jaspr` upgraded to `0.22.0-beta.0`
+- Updated documentation to reflect latest project requirements.
 
 ## 0.5.8
 
