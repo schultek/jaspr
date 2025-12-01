@@ -1,4 +1,4 @@
-## Unreleased breaking beta.0
+## 0.22.0-beta.0
 
 - **Breaking** Changed project entrypoint conventions:
 

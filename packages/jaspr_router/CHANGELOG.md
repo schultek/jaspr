@@ -1,3 +1,7 @@
+## 0.8.1-beta.0
+
+- `jaspr` upgraded to `0.22.0-beta.0`
+
 ## 0.8.0
 
 - Using a `redirect` function on `Router` or `Route` while rendering on the server will now trigger a HTTP redirect (302) instead of rendering the target page.
