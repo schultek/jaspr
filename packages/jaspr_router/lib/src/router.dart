@@ -1,5 +1,3 @@
-library;
-
 import 'dart:async';
 
 import 'package:jaspr/jaspr.dart';

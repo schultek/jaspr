@@ -40,7 +40,7 @@ class ImportsModuleBuilder implements Builder {
             }
             log.severe(
               '@Import must only be applied to the respective "<filename>.imports.dart" import of a library. '
-              'Instead found it on "${uri.toString()}" in library ${lib.firstFragment.source.uri.toString()}.',
+              'Instead found it on "$uri" in library ${lib.firstFragment.source.uri}.',
             );
             return false;
           })
@@ -82,7 +82,7 @@ class ImportsModuleBuilder implements Builder {
         } on NonLibraryAssetException {
           log.severe(
             'Could not resolve import "$url" in @Import annotation in '
-            'library ${buildStep.inputId.uri.toString()}. Make sure the import URI is correct.',
+            'library ${buildStep.inputId.uri}. Make sure the import URI is correct.',
           );
         }
       }

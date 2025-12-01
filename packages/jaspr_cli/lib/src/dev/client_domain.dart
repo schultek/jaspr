@@ -42,15 +42,10 @@ class ClientDomain extends Domain {
       case BuildStatus.started:
         _buildProgressEventId = _progressEventId++;
         sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'message': 'Building...'});
-        break;
       case BuildStatus.failed:
         sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'finished': true});
-        break;
       case BuildStatus.succeeded:
         sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'finished': true});
-        break;
-      default:
-        break;
     }
   }
 
