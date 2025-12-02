@@ -44,6 +44,10 @@ void main() {
       test('replacing entrypoints', () {
         final fs = MemoryFileSystem()
           ..directory('lib').createSync()
+          ..file('pubspec.yaml').writeAsStringSync('''
+jaspr:
+  mode: static
+''')
           ..file('lib/main.dart').writeAsStringSync('''
 void main() {}
 ''')
@@ -91,6 +95,30 @@ void main() {
           expectedMigrations: [],
           expectedWarnings: [],
         );
+      });
+
+      test('with client mode', () async {
+        final fs = MemoryFileSystem()
+          ..directory('lib').createSync()
+          ..file('pubspec.yaml').writeAsStringSync('''
+jaspr:
+  mode: client
+''')
+          ..file('lib/main.dart').writeAsStringSync('''
+void main() {}
+''');
+
+        testProjectMigration(
+          EntrypointMigration(),
+          fs: fs,
+
+          expectedMigrations: {},
+          expectedWarnings: {},
+        );
+
+        expect(fs.file('lib/main.dart').existsSync(), isTrue);
+        expect(fs.file('lib/main.server.dart').existsSync(), isFalse);
+        expect(fs.file('lib/main.client.dart').existsSync(), isFalse);
       });
     });
   });

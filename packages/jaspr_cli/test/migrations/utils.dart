@@ -1,5 +1,7 @@
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:file/file.dart';
+import 'package:jaspr_cli/src/config.dart';
+import 'package:jaspr_cli/src/logging.dart';
 import 'package:jaspr_cli/src/migrations/migration_models.dart';
 import 'package:test/test.dart';
 
@@ -15,7 +17,7 @@ void testUnitMigration(
 
   final builder = EditBuilder(result.lineInfo);
   final reporter = MigrationReporter(builder);
-  final context = MigrationContext(result.unit, reporter, features);
+  final context = MigrationUnitContext(result.unit, reporter, features);
 
   reporter.run(migration, context);
 
@@ -43,10 +45,20 @@ void testProjectMigration(
   final results = <MigrationResult>[];
 
   for (final dir in directories) {
-    results.addAll(migration.runForDirectory(fs.directory(dir), true));
+    results.addAll(
+      migration.runForDirectory(
+        MigrationContext(
+          fs.directory(dir),
+          true,
+          Project(Logger(false), fs: fs),
+        ),
+      ),
+    );
   }
 
   if (expectedMigrations != null) {
+    expect(results.where((r) => r.migrations.isNotEmpty), hasLength(expectedMigrations.length));
+
     for (final MapEntry(:key, :value) in expectedMigrations.entries) {
       final result = results.firstWhere((r) => r.path == key);
       expect(result.migrations, value, reason: 'Migrations for $key did not match expected migrations');
@@ -54,6 +66,8 @@ void testProjectMigration(
   }
 
   if (expectedWarnings != null) {
+    expect(results.where((r) => r.warnings.isNotEmpty), hasLength(expectedWarnings.length));
+
     for (final MapEntry(:key, :value) in expectedWarnings.entries) {
       final result = results.firstWhere((r) => r.path == key);
       expect(result.warnings, value, reason: 'Warnings for $key did not match expected warnings');

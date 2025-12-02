@@ -5,29 +5,40 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/source/line_info.dart';
 import 'package:file/file.dart';
 
+import '../config.dart';
+
 abstract class Migration {
   String get name;
   String get description;
   String get minimumJasprVersion;
   String get hint;
 
-  void runForUnit(MigrationContext context);
+  void runForUnit(MigrationUnitContext context);
 
-  List<MigrationResult> runForDirectory(Directory dir, bool apply);
+  List<MigrationResult> runForDirectory(MigrationContext context);
 }
 
-class MigrationContext {
-  MigrationContext(this.unit, this.reporter, this.features);
+class MigrationUnitContext {
+  MigrationUnitContext(this.unit, this.reporter, this.features);
 
   final CompilationUnit unit;
   final MigrationReporter reporter;
   final List<String> features;
 }
 
+class MigrationContext {
+  MigrationContext(this.dir, this.apply, this.project);
+
+  final Directory dir;
+  final bool apply;
+  final Project project;
+}
+
 extension MigrationExtension on List<Migration> {
   List<MigrationResult> computeResults(
     List<String> directories,
     bool apply,
+    Project project,
     FileSystem fs,
     void Function(File, Object, StackTrace) onError, {
     List<String> features = const [],
@@ -52,7 +63,7 @@ extension MigrationExtension on List<Migration> {
 
           final builder = EditBuilder(result.lineInfo);
           final reporter = MigrationReporter(builder);
-          final context = MigrationContext(result.unit, reporter, features);
+          final context = MigrationUnitContext(result.unit, reporter, features);
 
           for (final migration in this) {
             reporter.run(migration, context);
@@ -74,7 +85,7 @@ extension MigrationExtension on List<Migration> {
       }
 
       for (final migration in this) {
-        results.addAll(migration.runForDirectory(dir, apply));
+        results.addAll(migration.runForDirectory(MigrationContext(dir, apply, project)));
       }
     }
 
@@ -99,7 +110,7 @@ class MigrationReporter {
 
   Migration? _currentMigration;
 
-  void run(Migration migration, MigrationContext context) {
+  void run(Migration migration, MigrationUnitContext context) {
     _currentMigration = migration;
     migration.runForUnit(context);
   }

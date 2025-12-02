@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/source/source_range.dart';
@@ -24,7 +22,7 @@ class ComponentFactoryMigration implements Migration {
   }
 
   @override
-  void runForUnit(MigrationContext context) {
+  void runForUnit(MigrationUnitContext context) {
     if (!context.unit.directives.any(
       (d) => d is ImportDirective && (d.uri.stringValue?.startsWith('package:jaspr/') ?? false),
     )) {
@@ -97,7 +95,7 @@ class ComponentFactoryMigration implements Migration {
   }
 
   @override
-  List<MigrationResult> runForDirectory(Directory dir, bool apply) {
+  List<MigrationResult> runForDirectory(MigrationContext context) {
     // This migration does not implement directory-level processing.
     return [];
   }

@@ -1,8 +1,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:file/file.dart';
 import 'package:io/ansi.dart';
 
+import '../config.dart';
 import 'migration_models.dart';
 
 class EntrypointMigration implements Migration {
@@ -22,7 +22,7 @@ class EntrypointMigration implements Migration {
   }
 
   @override
-  void runForUnit(MigrationContext context) {
+  void runForUnit(MigrationUnitContext context) {
     final optionsImport = context.unit.directives
         .whereType<ImportDirective>()
         .where((d) => d.uri.stringValue?.endsWith('jaspr_options.dart') ?? false)
@@ -54,46 +54,50 @@ class EntrypointMigration implements Migration {
   }
 
   @override
-  List<MigrationResult> runForDirectory(Directory dir, bool apply) {
-    if (dir.path != 'lib') return [];
+  List<MigrationResult> runForDirectory(MigrationContext context) {
+    if (context.dir.path != 'lib') return [];
 
     final results = <MigrationResult>[];
 
-    var mainFile = dir.childFile('main.dart');
-    var mainServerFile = dir.childFile('main.server.dart');
-    if (mainFile.existsSync() && !mainServerFile.existsSync()) {
-      if (apply) {
-        mainFile.renameSync(mainServerFile.path);
+    if (context.project.modeOrNull?.isServerOrStatic ?? false) {
+      var mainFile = context.dir.childFile('main.dart');
+      var mainServerFile = context.dir.childFile('main.server.dart');
+      if (mainFile.existsSync() && !mainServerFile.existsSync()) {
+        if (context.apply) {
+          mainFile.renameSync(mainServerFile.path);
+        }
+        results.add(
+          MigrationResult(mainFile.path, [
+            MigrationInstance("Renamed 'main.dart' file to 'main.server.dart'", this),
+          ], []),
+        );
       }
-      results.add(
-        MigrationResult(mainFile.path, [MigrationInstance("Renamed 'main.dart' file to 'main.server.dart'", this)], []),
-      );
-    }
 
-    var jasprOptionsFile = dir.childFile('jaspr_options.dart');
-    if (jasprOptionsFile.existsSync()) {
-      if (apply) {
-        jasprOptionsFile.deleteSync();
+      var jasprOptionsFile = context.dir.childFile('jaspr_options.dart');
+      if (jasprOptionsFile.existsSync()) {
+        if (context.apply) {
+          jasprOptionsFile.deleteSync();
+        }
+        results.add(
+          MigrationResult(jasprOptionsFile.path, [
+            MigrationInstance("Removed 'jaspr_options.dart' file. Run 'jaspr serve' to re-generate.", this),
+          ], []),
+        );
       }
-      results.add(
-        MigrationResult(jasprOptionsFile.path, [
-          MigrationInstance("Removed 'jaspr_options.dart' file. Run 'jaspr serve' to re-generate.", this),
-        ], []),
-      );
-    }
 
-    var mainClientFile = dir.childFile('main.client.dart');
-    if (!mainClientFile.existsSync()) {
-      if (apply) {
-        mainClientFile
-          ..createSync()
-          ..writeAsStringSync(_mainClientTemplate);
+      var mainClientFile = context.dir.childFile('main.client.dart');
+      if (!mainClientFile.existsSync()) {
+        if (context.apply) {
+          mainClientFile
+            ..createSync()
+            ..writeAsStringSync(_mainClientTemplate);
+        }
+        results.add(
+          MigrationResult(mainClientFile.path, [
+            MigrationInstance("Created 'main.client.dart' file", this),
+          ], []),
+        );
       }
-      results.add(
-        MigrationResult(mainClientFile.path, [
-          MigrationInstance("Created 'main.client.dart' file", this),
-        ], []),
-      );
     }
 
     return results;

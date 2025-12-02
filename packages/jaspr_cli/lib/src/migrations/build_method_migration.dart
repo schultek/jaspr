@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:file/file.dart';
 import 'package:io/ansi.dart';
 
 import 'migration_models.dart';
@@ -34,7 +33,7 @@ class BuildMethodMigration implements Migration {
   }
 
   @override
-  void runForUnit(MigrationContext context) {
+  void runForUnit(MigrationUnitContext context) {
     for (final declaration in context.unit.declarations) {
       if (declaration is ClassDeclaration) {
         if (!_isBuildableClass(declaration)) {
@@ -54,7 +53,7 @@ class BuildMethodMigration implements Migration {
   }
 
   @override
-  List<MigrationResult> runForDirectory(Directory dir, bool apply) {
+  List<MigrationResult> runForDirectory(MigrationContext context) {
     // This migration does not implement directory-level processing.
     return [];
   }

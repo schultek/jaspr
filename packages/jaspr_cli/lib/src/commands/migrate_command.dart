@@ -142,15 +142,15 @@ class MigrateCommand extends BaseCommand {
           final builder = EditBuilder(LineInfo.fromContent(pubspecContent));
 
           if (pubspecMap.nodes['dependencies'] case YamlMap dependencies) {
-            if (dependencies.nodes['jaspr'] case YamlNode jasprNode) {
+            if (dependencies.nodes['jaspr'] case YamlScalar jasprNode when jasprNode.value != null) {
               builder.replace(jasprNode.span.start.offset, jasprNode.span.length, "^$targetJasprVersion");
             }
           }
           if (pubspecMap.nodes['dev_dependencies'] case YamlMap devDependencies) {
-            if (devDependencies.nodes['jaspr_builder'] case YamlNode builderNode) {
+            if (devDependencies.nodes['jaspr_builder'] case YamlScalar builderNode when builderNode.value != null) {
               builder.replace(builderNode.span.start.offset, builderNode.span.length, "^$targetJasprVersion");
             }
-            if (devDependencies.nodes['jaspr_test'] case YamlNode testNode) {
+            if (devDependencies.nodes['jaspr_test'] case YamlScalar testNode when testNode.value != null) {
               builder.replace(testNode.span.start.offset, testNode.span.length, "^$targetJasprVersion");
             }
           }
@@ -166,7 +166,7 @@ class MigrateCommand extends BaseCommand {
       logger.write('Previewing migrations (dry run)...', level: Level.info);
     }
 
-    final results = migrations.computeResults(includeDirs, apply, LocalFileSystem(), (file, e, st) {
+    final results = migrations.computeResults(includeDirs, apply, project, LocalFileSystem(), (file, e, st) {
       logger.write('Error processing ${file.path}: $e\n$st', level: Level.error);
     }, features: features);
 

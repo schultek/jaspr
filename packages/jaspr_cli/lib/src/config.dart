@@ -10,6 +10,10 @@ import 'logging.dart';
 
 enum JasprMode { static, server, client }
 
+extension JasprModeExtension on JasprMode {
+  bool get isServerOrStatic => this == JasprMode.server || this == JasprMode.static;
+}
+
 class Project {
   Project(this.logger, {FileSystem? fs, Never Function(int)? exitFn})
     : _fs = fs ?? const LocalFileSystem(),
