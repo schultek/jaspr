@@ -63,8 +63,7 @@ export class ScopesDomain implements vscode.Disposable {
 
   private async registerFolders() {
     var folders = await findJasprProjectFolders();
-    folders = folders.map((f) => join(f, "lib", 'main.dart'));
-
+   
     this.statusBarItem?.dispose();
     this.statusBarItem = vscode.window.createStatusBarItem(
       vscode.StatusBarAlignment.Left,

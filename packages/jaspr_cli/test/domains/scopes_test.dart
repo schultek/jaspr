@@ -77,7 +77,7 @@ void main() {
   group('scopes domain', () {
     test('analyzes simple scopes', () async {
       projectPath = setUpProject({
-        'main.dart': '''
+        'main.server.dart': '''
 import 'package:jaspr/jaspr.dart';
 import 'app.dart';
 
@@ -125,7 +125,7 @@ class Page extends StatelessComponent {
           ],
           'serverScopeRoots': [
             {
-              'path': '$projectPath/lib/main.dart',
+              'path': '$projectPath/lib/main.server.dart',
               'name': 'main',
               'line': 4,
               'character': 6,
@@ -144,7 +144,100 @@ class Page extends StatelessComponent {
           ],
           'serverScopeRoots': [
             {
-              'path': '$projectPath/lib/main.dart',
+              'path': '$projectPath/lib/main.server.dart',
+              'name': 'main',
+              'line': 4,
+              'character': 6,
+            },
+          ],
+        },
+      });
+    });
+
+    test('analyzes multiple server entrypoints', () async {
+      projectPath = setUpProject({
+        'main.server.dart': '''
+import 'package:jaspr/jaspr.dart';
+import 'app.dart';
+
+void main() {
+  runApp(App());
+}
+''',
+        'other.server.dart': '''
+import 'package:jaspr/jaspr.dart';
+import 'page.dart';
+
+void main() {
+  runApp(Page());
+}
+''',
+        'app.dart': '''
+import 'package:jaspr/jaspr.dart';
+import 'page.dart';
+
+@client
+class App extends StatelessComponent {
+  @override
+  Component build(BuildContext context) {
+    return Page();
+  }
+}
+''',
+        'page.dart': '''
+import 'package:jaspr/jaspr.dart';
+
+class Page extends StatelessComponent {
+  @override
+  Component build(BuildContext context) {
+    return text('Hello, World!');
+  }
+}
+''',
+      });
+      await domain.registerScopes({
+        'folders': [projectPath],
+      });
+
+      await expectScopesResult({
+        '$projectPath/lib/app.dart': {
+          'components': ['App'],
+          'clientScopeRoots': [
+            {
+              'path': '$projectPath/lib/app.dart',
+              'name': 'App',
+              'line': 5,
+              'character': 7,
+            },
+          ],
+          'serverScopeRoots': [
+            {
+              'path': '$projectPath/lib/main.server.dart',
+              'name': 'main',
+              'line': 4,
+              'character': 6,
+            },
+          ],
+        },
+        '$projectPath/lib/page.dart': {
+          'components': ['Page'],
+          'clientScopeRoots': [
+            {
+              'path': '$projectPath/lib/app.dart',
+              'name': 'App',
+              'line': 5,
+              'character': 7,
+            },
+          ],
+          'serverScopeRoots': [
+            {
+              'path': '$projectPath/lib/other.server.dart',
+              'name': 'main',
+              'line': 4,
+              'character': 6,
+            },
+            {
+              'path': '$projectPath/lib/main.server.dart',
               'name': 'main',
               'line': 4,
               'character': 6,
@@ -156,7 +249,7 @@ class Page extends StatelessComponent {
 
     test('analyzes unallowed imports', () async {
       projectPath = setUpProject({
-        'main.dart': '''
+        'main.server.dart': '''
 import 'package:jaspr/jaspr.dart';
 import 'app.dart';
 
@@ -194,7 +287,7 @@ class App extends StatelessComponent {
           ],
           'serverScopeRoots': [
             {
-              'path': '$projectPath/lib/main.dart',
+              'path': '$projectPath/lib/main.server.dart',
               'name': 'main',
               'line': 4,
               'character': 6,

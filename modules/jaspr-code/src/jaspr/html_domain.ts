@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import { JasprToolingDaemon } from "./tooling_daemon";
-import { checkJasprVersion } from "../helpers/install_helper";
 
 export class HtmlDomain
   implements vscode.DocumentPasteEditProvider, vscode.Disposable

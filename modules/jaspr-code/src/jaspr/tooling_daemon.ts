@@ -6,7 +6,6 @@ import {
   checkJasprVersion,
 } from "../helpers/install_helper";
 import { spawn } from "child_process";
-import { minimumJasprVersion } from "../constants";
 
 export class JasprToolingDaemon implements vscode.Disposable {
   private _disposables: vscode.Disposable[] = [];
