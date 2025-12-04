@@ -1,6 +1,7 @@
 ## 0.3.0
 
 - Added the `Serve` code-lens to `main` functions for launching Jaspr, and hide the default `Run / Debug` code lenses.
+- Allow latest Dart Extension.
 
 ## 0.2.3
 

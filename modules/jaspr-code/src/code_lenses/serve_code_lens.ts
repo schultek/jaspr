@@ -1,9 +1,10 @@
 import * as vs from "vscode";
 import { findJasprProjectFolders } from "../helpers/project_helper";
-import path from "path";
-import * as yaml from "yaml";
 import { dartExtensionApi } from "../api";
 import { lspToRange } from "../helpers/object_helper";
+import path from "path";
+import * as yaml from "yaml";
+import { checkJasprVersion } from "../helpers/install_helper";
 
 export class ServeCodeLensProvider implements vs.CodeLensProvider, vs.Disposable {
 
@@ -11,70 +12,84 @@ export class ServeCodeLensProvider implements vs.CodeLensProvider, vs.Disposable
   public readonly onDidChangeCodeLenses: vs.Event<void> = this._onDidChangeCodeLenses.event;
 
   private folders: string[] = [];
-  private targets: string[] = [];
+  private serverTargets: string[] = [];
+  private clientTargets: string[] = [];
   private suppressions: vs.Disposable[] = [];
 
   constructor() {
-    this.loadTargets();
+    this.loadEntrypoints();
     vs.workspace.onDidChangeWorkspaceFolders(async () => {
-      await this.loadTargets();
+      await this.loadEntrypoints();
       this._onDidChangeCodeLenses.fire();
     });
     vs.workspace.onDidChangeTextDocument(async (e) => {
       if (e.document.languageId === "yaml" && e.document.fileName.endsWith("pubspec.yaml")) {
-        await this.loadTargets();
+        await this.loadEntrypoints();
         this._onDidChangeCodeLenses.fire();
       }
     });
   }
 
-  private async loadTargets() {
+  private async loadEntrypoints() {
+    const v = await checkJasprVersion();
+    if (!v || v < '0.22.0') {
+      return;
+    }
+
     const folders = await findJasprProjectFolders();
-    const targets: string[] = [];
+
+    const serverUris = await vs.workspace.findFiles('**/*.server.dart', '**/build/**');
+    const clientUris = await vs.workspace.findFiles('**/*.client.dart', '**/build/**');
+
+    const suppressionTargets: vs.Uri[] = [];
+    const serverTargets: string[] = [];
+    const clientTargets: string[] = [];
 
     for (let project of folders) {
+
       const pubspecPath = path.join(project, "pubspec.yaml");
       const pubspecContent = await vs.workspace.fs.readFile(vs.Uri.file(pubspecPath));
       const pubspec = await yaml.parse(Buffer.from(pubspecContent).toString("utf8"));
 
-      const target = pubspec?.jaspr?.target as string | string[] | undefined;
-      if (typeof target === "string") {
-        targets.push(path.join(project, target));
-      } else if (Array.isArray(target)) {
-        for (let t of target) {
-          targets.push(path.join(project, t));
-        }
-      } else {
-        targets.push(path.join(project, "lib", "main.dart"));
+      const mode = pubspec?.jaspr?.mode;
+
+      const projectServerUris = serverUris.filter((uri) => uri.fsPath.startsWith(project));
+      const projectClientUris = clientUris.filter((uri) => uri.fsPath.startsWith(project));
+
+      suppressionTargets.push(...projectClientUris, ...projectServerUris);
+
+      if (mode === "server" || mode === "static") {
+        serverTargets.push(...projectServerUris.map((u) => u.fsPath));
+      }
+
+      if (mode === "client") {
+        clientTargets.push(...projectClientUris.map((u) => u.fsPath));
       }
     }
 
     this.folders = folders;
-    this.targets = targets;
+    this.serverTargets = serverTargets;
+    this.clientTargets = clientTargets;
 
     this.suppressions.forEach((s) => s.dispose());
-    this.suppressions = [];
-    this.suppressions.push(
-      dartExtensionApi.features.codeLens.suppress(this.targets.map((t) => vs.Uri.file(t)), { main: true })
-    );
+    this.suppressions = [
+      dartExtensionApi.features.codeLens.suppress(suppressionTargets, { main: true }),
+    ];
   }
 
   public async provideCodeLenses(document: vs.TextDocument, token: vs.CancellationToken): Promise<vs.CodeLens[] | undefined> {
-    let isTarget = !!this.targets.find((t) => t === document.uri.fsPath);
-    if (!isTarget) {
+    const isServerTarget = !!this.serverTargets.find((t) => t === document.uri.fsPath);
+    const isClientTarget = !!this.clientTargets.find((t) => t === document.uri.fsPath);
+    if (!isServerTarget && !isClientTarget) {
       return;
     }
 
-    const outline = await dartExtensionApi.workspace.getOutline(
-      document,
-      token
-    );
+    const outline = await dartExtensionApi.workspace.getOutline(document, token);
     if (!outline?.children?.length) {
       return;
     }
 
     const main = outline.children.find((c) => c.element.name === "main");
-
     if (!main) {
       return;
     }
@@ -90,7 +105,7 @@ export class ServeCodeLensProvider implements vs.CodeLensProvider, vs.Disposable
       new vs.CodeLens(range, {
         command: "jaspr.serve",
         title: "Serve",
-        arguments: [input, folder],
+        arguments: [isServerTarget ? input : undefined, folder],
       }),
     ];
   }

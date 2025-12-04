@@ -6,7 +6,7 @@ import {
 } from "./debug";
 
 import { createJasprProject, handleNewProjects } from "./create";
-import { jasprClean, jasprDoctor } from "./commands";
+import { jasprClean, jasprDoctor, jasprServe } from "./commands";
 import { JasprServeDaemon } from "./jaspr/serve_daemon";
 import {
   findJasprProjectFolders,
@@ -66,27 +66,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("jaspr.serve", async (input: string | undefined, folder: string | undefined) => {
-      if (!folder) {
-        folder = await getFolderToRunCommandIn(
-          `Select the folder to run "jaspr serve" in`
-        );
-      }
-      if (!folder) {
-        return;
-      }
-
-      const process = new JasprServeDaemon();
-      context.subscriptions.push(process);
-
-      process.start(context, undefined, {
-        name: "Jaspr",
-        request: "launch",
-        type: "jaspr",
-        cwd: folder,
-        args: !!input ? ['--input=' + input] : []
-      });
-    })
+    vscode.commands.registerCommand("jaspr.serve", jasprServe(context))
   );
 
   const toolingDaemon = new JasprToolingDaemon();
