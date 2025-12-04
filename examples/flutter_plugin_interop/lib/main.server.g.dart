@@ -13,7 +13,7 @@ import 'package:flutter_plugin_interop/components/app.dart' as _app;
 ///
 /// Example:
 /// ```dart
-/// import 'main.server.g.dart';
+/// import 'main.server.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

@@ -12,7 +12,7 @@ import 'package:jaspr/server.dart';
 ///
 /// Example:
 /// ```dart
-/// import 'counter.server.g.dart';
+/// import 'counter.server.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

@@ -73,12 +73,12 @@ extension on RenderingMode {
     RenderingMode.static || RenderingMode.server => {
       ('lib/main.client.dart', fileExists),
       ('lib/main.server.dart', fileExists),
-      ('lib/main.client.g.dart', fileExists),
-      ('lib/main.server.g.dart', fileExists),
+      ('lib/main.client.options.dart', fileExists),
+      ('lib/main.server.options.dart', fileExists),
     },
     RenderingMode.client => {
       ('lib/main.client.dart', fileExists),
-      ('lib/main.client.g.dart', isNot(fileExists)),
+      ('lib/main.client.options.dart', isNot(fileExists)),
       ('web/index.html', fileExists),
       ('web/styles.css', fileExists),
     },

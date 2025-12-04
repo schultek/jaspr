@@ -17,7 +17,7 @@ import 'package:shelf_router/shelf_router.dart';
 import 'app.dart';
 
 // This file is generated automatically by Jaspr, do not remove or edit.
-import 'main.server.g.dart';
+import 'main.server.options.dart';
 
 /// Initializes the custom shelf server.
 ///

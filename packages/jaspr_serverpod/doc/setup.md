@@ -45,7 +45,7 @@ Edit your `lib/main.server.dart` to:
 import 'package:jaspr/server.dart';
 
 // This file will be generated when running `jaspr serve` later.
-import 'main.server.g.dart';
+import 'main.server.options.dart';
 
 // ... Other imports
 
@@ -71,7 +71,7 @@ void main(List<String> args) async {
 
 ```
 
-> The 'lib/main.server.g.dart' file will be generated when you first run `jaspr serve`.
+> The 'lib/main.server.options.dart' file will be generated when you first run `jaspr serve`.
 
 Then change your root route inside `lib/src/web/routes/root.dart` to this:
 
@@ -198,7 +198,7 @@ Finally, to setup hydration on the client, create a `lib/main.client.dart` file 
 import 'package:jaspr/client.dart';
 
 // This file is generated automatically by Jaspr, do not remove or edit.
-import 'main.client.g.dart';
+import 'main.client.options.dart';
 
 void main() {
   // Initializes the client environment with the generated default options.

@@ -2,7 +2,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 
 import 'app.dart';
-import 'main.server.g.dart';
+import 'main.server.options.dart';
 
 void main() {
   Jaspr.initializeApp(options: defaultServerOptions);

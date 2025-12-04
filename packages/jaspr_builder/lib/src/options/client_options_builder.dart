@@ -32,7 +32,7 @@ class ClientOptionsBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-    'lib/{{file}}.client.dart': ['lib/{{file}}.client.g.dart'],
+    'lib/{{file}}.client.dart': ['lib/{{file}}.client.options.dart'],
   };
 
   Future<void> generateClientOptions(BuildStep buildStep) async {
@@ -59,7 +59,7 @@ class ClientOptionsBuilder implements Builder {
     clients.sortByCompare((c) => '${c.import}/${c.name}', comparePaths);
 
     final package = buildStep.inputId.package;
-    final outputId = buildStep.inputId.changeExtension('.g.dart');
+    final outputId = buildStep.inputId.changeExtension('.options.dart');
 
     var source =
         '''

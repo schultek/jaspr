@@ -33,7 +33,7 @@ class ServerOptionsBuilder implements Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => const {
-    r'lib/{{file}}.server.dart': ['lib/{{file}}.server.g.dart'],
+    r'lib/{{file}}.server.dart': ['lib/{{file}}.server.options.dart'],
   };
 
   String get generationHeader =>
@@ -77,7 +77,7 @@ class ServerOptionsBuilder implements Builder {
     clients.sortByCompare((c) => '${c.import}/${c.name}', comparePaths);
     styles.sortByCompare((s) => s.id.toImportUrl(), comparePaths);
 
-    final optionsId = buildStep.inputId.changeExtension('.g.dart');
+    final optionsId = buildStep.inputId.changeExtension('.options.dart');
 
     var source =
         '''

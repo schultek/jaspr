@@ -13,7 +13,7 @@ import 'package:example_server/components/counter.dart' as _counter;
 ///
 /// Example:
 /// ```dart
-/// import 'main.server.g.dart';
+/// import 'main.server.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

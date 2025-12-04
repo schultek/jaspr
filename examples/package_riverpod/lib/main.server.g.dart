@@ -14,7 +14,7 @@ import 'package:package_riverpod/main.server.dart' as _main$server;
 ///
 /// Example:
 /// ```dart
-/// import 'main.server.g.dart';
+/// import 'main.server.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

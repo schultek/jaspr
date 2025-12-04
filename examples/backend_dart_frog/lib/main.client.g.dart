@@ -15,7 +15,7 @@ import 'package:backend_dart_frog/components/hello.dart' deferred as _hello;
 ///
 /// Example:
 /// ```dart
-/// import 'main.client.g.dart';
+/// import 'main.client.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

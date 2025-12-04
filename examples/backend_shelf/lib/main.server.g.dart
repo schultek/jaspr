@@ -14,7 +14,7 @@ import 'package:backend_shelf/components/hello.dart' as _hello;
 ///
 /// Example:
 /// ```dart
-/// import 'main.server.g.dart';
+/// import 'main.server.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

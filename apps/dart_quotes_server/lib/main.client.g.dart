@@ -15,7 +15,7 @@ import 'package:dart_quotes_server/web/components/quote_like_button.dart'
 ///
 /// Example:
 /// ```dart
-/// import 'main.client.g.dart';
+/// import 'main.client.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

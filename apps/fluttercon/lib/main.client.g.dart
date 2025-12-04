@@ -19,7 +19,7 @@ import 'package:shared_preferences_web/shared_preferences_web.dart'
 ///
 /// Example:
 /// ```dart
-/// import 'main.client.g.dart';
+/// import 'main.client.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

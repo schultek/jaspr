@@ -19,7 +19,7 @@ import 'package:firebase_core_web/firebase_core_web.dart' as _firebase_core_web;
 ///
 /// Example:
 /// ```dart
-/// import 'main.client.g.dart';
+/// import 'main.client.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

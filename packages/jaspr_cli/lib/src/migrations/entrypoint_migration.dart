@@ -17,8 +17,8 @@ class EntrypointMigration implements Migration {
   @override
   String get hint {
     return '${styleItalic.wrap(red.wrap('    - main.dart, jaspr_options.dart'))!}\n'
-        '${styleItalic.wrap(green.wrap('    + main.server.dart, main.server.g.dart'))!}\n'
-        '${styleItalic.wrap(green.wrap('    + main.client.dart, main.client.g.dart'))!}';
+        '${styleItalic.wrap(green.wrap('    + main.server.dart, main.server.options.dart'))!}\n'
+        '${styleItalic.wrap(green.wrap('    + main.client.dart, main.client.options.dart'))!}';
   }
 
   @override
@@ -38,8 +38,8 @@ class EntrypointMigration implements Migration {
         .where((d) => d.uri.stringValue?.startsWith('package:jaspr/jaspr.dart') ?? false)
         .firstOrNull;
 
-    context.reporter.createMigration("Replaced 'jaspr_options.dart' import with 'main.server.g.dart'", (builder) {
-      builder.replace(optionsImport.uri.offset, optionsImport.uri.length, "'main.server.g.dart'");
+    context.reporter.createMigration("Replaced 'jaspr_options.dart' import with 'main.server.options.dart'", (builder) {
+      builder.replace(optionsImport.uri.offset, optionsImport.uri.length, "'main.server.options.dart'");
       if (jasprImport != null) {
         builder.replace(jasprImport.uri.offset, jasprImport.uri.length, "'package:jaspr/server.dart'");
       }
@@ -128,7 +128,7 @@ const String _mainClientTemplate = '''
 import 'package:jaspr/client.dart';
 
 // This file is generated automatically by Jaspr, do not remove or edit.
-import 'main.client.g.dart';
+import 'main.client.options.dart';
 
 void main() {
   // Initializes the client environment with the generated default options.

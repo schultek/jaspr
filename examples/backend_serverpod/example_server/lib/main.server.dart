@@ -1,7 +1,7 @@
 import 'package:jaspr/server.dart';
 import 'package:serverpod/serverpod.dart';
 
-import 'main.server.g.dart';
+import 'main.server.options.dart';
 import 'src/generated/endpoints.dart';
 import 'src/generated/protocol.dart';
 import 'src/web/routes/root.dart';

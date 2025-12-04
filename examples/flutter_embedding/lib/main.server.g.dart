@@ -13,7 +13,7 @@ import 'package:flutter_embedding_demo/components/app.dart' as _app;
 ///
 /// Example:
 /// ```dart
-/// import 'main.server.g.dart';
+/// import 'main.server.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

@@ -2,7 +2,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 
 import 'components/app.dart';
-import 'main.server.g.dart';
+import 'main.server.options.dart';
 
 /// The server entrypoint for the jaspr app.
 void main() {

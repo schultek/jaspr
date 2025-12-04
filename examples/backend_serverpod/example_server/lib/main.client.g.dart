@@ -14,7 +14,7 @@ import 'package:example_server/components/counter.dart' deferred as _counter;
 ///
 /// Example:
 /// ```dart
-/// import 'main.client.g.dart';
+/// import 'main.client.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

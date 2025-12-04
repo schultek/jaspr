@@ -24,7 +24,7 @@ void main() {
 ''',
           expectedOutput: '''
 import 'package:jaspr/server.dart';
-import 'main.server.g.dart';
+import 'main.server.options.dart';
 
 void main() {
   Jaspr.initializeApp(
@@ -35,7 +35,7 @@ void main() {
 }
 ''',
           expectedMigrations: [
-            matchesMigration("Replaced 'jaspr_options.dart' import with 'main.server.g.dart'"),
+            matchesMigration("Replaced 'jaspr_options.dart' import with 'main.server.options.dart'"),
           ],
           expectedWarnings: [],
         );

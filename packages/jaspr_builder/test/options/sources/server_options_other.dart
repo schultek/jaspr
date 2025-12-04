@@ -17,7 +17,7 @@ final serverOptionsOtherSources = {
 };
 
 final serverOptionsOtherOutputs = {
-  'site|lib/other.server.g.dart':
+  'site|lib/other.server.options.dart':
       '// dart format off\n'
       '// ignore_for_file: type=lint\n'
       '\n'
@@ -35,7 +35,7 @@ final serverOptionsOtherOutputs = {
       '///\n'
       '/// Example:\n'
       '/// ```dart\n'
-      '/// import \'other.server.g.dart\';\n'
+      '/// import \'other.server.options.dart\';\n'
       '///\n'
       '/// void main() {\n'
       '///   Jaspr.initializeApp(\n'
