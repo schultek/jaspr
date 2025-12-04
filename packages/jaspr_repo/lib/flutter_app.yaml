@@ -1,10 +1,5 @@
 include: package:flutter_lints/flutter.yaml
 
-# TODO: Reenable once migrated to analyzer v8.
-#analyzer:
-#  plugins:
-#    - custom_lint
-
 linter:
   rules:
     directives_ordering: true

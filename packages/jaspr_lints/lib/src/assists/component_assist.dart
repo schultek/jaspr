@@ -1,17 +1,23 @@
+import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/source/source_range.dart';
-import 'package:analyzer_plugin/utilities/change_builder/change_builder_dart.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
-class ComponentAssistProvider extends DartAssist {
+import '../assist.dart';
+import '../utils.dart';
+
+abstract class CreateComponentAssist extends ResolvedCorrectionProducer {
+  CreateComponentAssist({required super.context});
+
   @override
-  void run(CustomLintResolver resolver, ChangeReporter reporter, CustomLintContext context, SourceRange target) {
-    context.registry.addCompilationUnit((node) {
+  CorrectionApplicability get applicability => CorrectionApplicability.singleLocation;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    if (node case CompilationUnit node) {
       var hasJasprImport = false;
 
       for (var dir in node.directives) {
-        if (dir.end > target.offset) {
+        if (dir.end > selectionOffset) {
           return;
         }
         if (dir is ImportDirective && (dir.uri.stringValue?.startsWith('package:jaspr/') ?? false)) {
@@ -20,54 +26,33 @@ class ComponentAssistProvider extends DartAssist {
       }
 
       for (var dec in node.declarations) {
-        if (target.offset >= dec.offset && target.end <= dec.end) {
+        if (selectionOffset >= dec.offset && selectionEnd <= dec.end) {
           return;
         }
       }
 
-      var nameSuggestion = resolver.path.split('/').last;
+      var nameSuggestion = file.split('/').last;
       if (nameSuggestion.endsWith('.dart')) nameSuggestion = nameSuggestion.substring(0, nameSuggestion.length - 5);
 
       nameSuggestion = nameSuggestion.split('_').map((s) => s.substring(0, 1).toUpperCase() + s.substring(1)).join();
 
-      createStatelessComponent(reporter, target, nameSuggestion, hasJasprImport);
-      createStatefulComponent(reporter, target, nameSuggestion, hasJasprImport);
-      createInheritedComponent(reporter, target, nameSuggestion, hasJasprImport);
-    });
-
-    context.registry.addClassDeclaration((node) {
-      if (target.offset < node.offset || target.end > node.leftBracket.end) {
-        return;
-      }
-      if (node.extendsClause?.superclass.name.lexeme != 'StatelessComponent') {
-        return;
-      }
-
-      MethodDeclaration? buildMethod;
-      List<String> members = [];
-      for (var m in node.members) {
-        if (m is MethodDeclaration && m.name.lexeme == "build") {
-          buildMethod = m;
-        } else if (m is FieldDeclaration) {
-          members.addAll(m.fields.variables.map((v) => v.name.lexeme));
-        }
-      }
-
-      convertToStatefulComponent(reporter, node, buildMethod);
-      if (buildMethod != null && buildMethod.body.keyword != null) {
-        convertToAsyncStatelessComponent(reporter, node, buildMethod);
-      }
-    });
+      createComponent(builder, nameSuggestion, hasJasprImport);
+    }
   }
 
-  void createStatelessComponent(
-    ChangeReporter reporter,
-    SourceRange target,
-    String nameSuggestion,
-    bool hasJasprImport,
-  ) {
-    reporter.createChangeBuilder(priority: 1, message: 'Create StatelessComponent').addDartFileEdit((builder) {
-      builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
+  void createComponent(ChangeBuilder builder, String nameSuggestion, bool hasJasprImport);
+}
+
+class CreateStatelessComponent extends CreateComponentAssist {
+  CreateStatelessComponent({required super.context});
+
+  @override
+  AssistKind get assistKind => JasprAssistKind.createStatelessComponent;
+
+  @override
+  void createComponent(ChangeBuilder builder, String nameSuggestion, bool hasJasprImport) {
+    builder.addDartFileEdit(file, (builder) {
+      builder.addInsertion(selectionEnd == 0 ? 1 : selectionEnd, (edit) {
         edit.write('class ');
         edit.addSimpleLinkedEdit('name', nameSuggestion);
         edit.write(
@@ -88,15 +73,18 @@ class ComponentAssistProvider extends DartAssist {
       }
     });
   }
+}
 
-  void createStatefulComponent(
-    ChangeReporter reporter,
-    SourceRange target,
-    String nameSuggestion,
-    bool hasJasprImport,
-  ) {
-    reporter.createChangeBuilder(priority: 1, message: 'Create StatefulComponent').addDartFileEdit((builder) {
-      builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
+class CreateStatefulComponent extends CreateComponentAssist {
+  CreateStatefulComponent({required super.context});
+
+  @override
+  AssistKind get assistKind => JasprAssistKind.createStatefulComponent;
+
+  @override
+  void createComponent(ChangeBuilder builder, String nameSuggestion, bool hasJasprImport) {
+    builder.addDartFileEdit(file, (builder) {
+      builder.addInsertion(selectionEnd == 0 ? 1 : selectionEnd, (edit) {
         edit.write('class ');
         edit.addSimpleLinkedEdit('name', nameSuggestion);
         edit.write(
@@ -123,19 +111,18 @@ class ComponentAssistProvider extends DartAssist {
       }
     });
   }
+}
 
-  void createInheritedComponent(
-    ChangeReporter reporter,
-    SourceRange target,
-    String nameSuggestion,
-    bool hasJasprImport,
-  ) {
-    reporter.createChangeBuilder(priority: 1, message: 'Create InheritedComponent').addDartFileEdit((builder) {
-      if (!hasJasprImport) {
-        builder.importLibrary(Uri.parse('package:jaspr/jaspr.dart'));
-      }
+class CreateInheritedComponent extends CreateComponentAssist {
+  CreateInheritedComponent({required super.context});
 
-      builder.addInsertion(target.end == 0 ? 1 : target.end, (edit) {
+  @override
+  AssistKind get assistKind => JasprAssistKind.createInheritedComponent;
+
+  @override
+  void createComponent(ChangeBuilder builder, String nameSuggestion, bool hasJasprImport) {
+    builder.addDartFileEdit(file, (builder) {
+      builder.addInsertion(selectionEnd == 0 ? 1 : selectionEnd, (edit) {
         edit.write('class ');
         edit.addSimpleLinkedEdit('name', nameSuggestion);
         edit.write(
@@ -159,11 +146,55 @@ class ComponentAssistProvider extends DartAssist {
         edit.addSimpleLinkedEdit('name', nameSuggestion);
         edit.write(' oldComponent) {\n    return false;\n  }\n}\n');
       });
+      if (!hasJasprImport) {
+        builder.importLibrary(Uri.parse('package:jaspr/jaspr.dart'));
+      }
     });
   }
+}
 
-  void convertToStatefulComponent(ChangeReporter reporter, ClassDeclaration node, MethodDeclaration? buildMethod) {
-    reporter.createChangeBuilder(priority: 1, message: 'Convert to StatefulComponent').addDartFileEdit((builder) {
+abstract class ConvertComponentAssist extends ResolvedCorrectionProducer {
+  ConvertComponentAssist({required super.context});
+
+  @override
+  CorrectionApplicability get applicability => CorrectionApplicability.singleLocation;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    if (node
+        case final ClassDeclaration node ||
+            ExtendsClause(parent: final ClassDeclaration node) ||
+            NamedType(parent: ExtendsClause(parent: final ClassDeclaration node))) {
+      if (node.extendsClause?.superclass.name.lexeme != 'StatelessComponent') {
+        return;
+      }
+
+      MethodDeclaration? buildMethod;
+      List<String> members = [];
+      for (var m in node.members) {
+        if (m is MethodDeclaration && m.name.lexeme == "build") {
+          buildMethod = m;
+        } else if (m is FieldDeclaration) {
+          members.addAll(m.fields.variables.map((v) => v.name.lexeme));
+        }
+      }
+
+      await convertComponent(builder, node, buildMethod);
+    }
+  }
+
+  Future<void> convertComponent(ChangeBuilder builder, ClassDeclaration node, MethodDeclaration? buildMethod);
+}
+
+class ConvertToStatefulComponent extends ConvertComponentAssist {
+  ConvertToStatefulComponent({required super.context});
+
+  @override
+  AssistKind get assistKind => JasprAssistKind.convertToStatefulComponent;
+
+  @override
+  Future<void> convertComponent(ChangeBuilder builder, ClassDeclaration node, MethodDeclaration? buildMethod) async {
+    await builder.addDartFileEdit(file, (builder) {
       builder.addReplacement(node.extendsClause!.superclass.sourceRange, (edit) {
         edit.write('StatefulComponent');
       });
@@ -180,12 +211,22 @@ class ComponentAssistProvider extends DartAssist {
         );
       });
 
-      buildMethod?.body.visitChildren(StateBuildVisitor(builder, node));
+      buildMethod?.body.visitChildren(
+        StateBuildVisitor(node, builder),
+      );
     });
   }
+}
 
-  void convertToAsyncStatelessComponent(ChangeReporter reporter, ClassDeclaration node, MethodDeclaration buildMethod) {
-    reporter.createChangeBuilder(priority: 1, message: 'Convert to AsyncStatelessComponent').addDartFileEdit((builder) {
+class ConvertToAsyncStatelessComponent extends ConvertComponentAssist {
+  ConvertToAsyncStatelessComponent({required super.context});
+
+  @override
+  AssistKind get assistKind => JasprAssistKind.convertToAsyncStatelessComponent;
+
+  @override
+  Future<void> convertComponent(ChangeBuilder builder, ClassDeclaration node, MethodDeclaration? buildMethod) async {
+    await builder.addDartFileEdit(file, (builder) {
       if (node.parent case CompilationUnit unit) {
         for (var dir in unit.directives) {
           if (dir is ImportDirective && dir.uri.stringValue == 'package:jaspr/jaspr.dart') {
@@ -197,21 +238,28 @@ class ComponentAssistProvider extends DartAssist {
       builder.importLibrary(Uri.parse('package:jaspr/server.dart'));
 
       builder.addSimpleReplacement(node.extendsClause!.superclass.sourceRange, 'AsyncStatelessComponent');
-      builder.addSimpleReplacement(buildMethod.body.keyword!.sourceRange, 'async');
-      if (buildMethod.returnType != null) {
-        builder.addSimpleReplacement(buildMethod.returnType!.sourceRange, 'Stream<Component>');
-      } else {
-        builder.addSimpleInsertion(buildMethod.name.offset, 'Stream<Component> ');
+
+      if (buildMethod != null) {
+        if (buildMethod.body.keyword case final keyword?) {
+          builder.addSimpleReplacement(keyword.sourceRange, 'async');
+        } else {
+          builder.addSimpleInsertion(buildMethod.body.offset, 'async ');
+        }
+        if (buildMethod.returnType != null) {
+          builder.addSimpleReplacement(buildMethod.returnType!.sourceRange, 'Future<Component>');
+        } else {
+          builder.addSimpleInsertion(buildMethod.name.offset, 'Future<Component> ');
+        }
       }
     });
   }
 }
 
 class StateBuildVisitor extends UnifyingAstVisitor<void> {
-  StateBuildVisitor(this.builder, this.clazz);
+  StateBuildVisitor(this.clazz, this.builder);
 
-  final DartFileEditBuilder builder;
   final ClassDeclaration clazz;
+  final DartFileEditBuilder builder;
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
