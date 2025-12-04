@@ -60,7 +60,7 @@ void main() {
       expect(
         result.errors.first,
         equals(
-          'Exception: Cannot import Document from package:jaspr/browser.dart, because it is also imported from dart:html. '
+          'Exception: Cannot import Document from package:jaspr/client.dart, because it is also imported from dart:html. '
           'Names imported via @Import must be unique for each platform across the project.',
         ),
       );

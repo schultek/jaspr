@@ -22,7 +22,7 @@ const conflictingImportsSources = {
   'site|lib/conflict.dart': '''
     import 'package:jaspr/jaspr.dart';
     
-    @Import.onWeb('package:jaspr/browser.dart', show: [#Document])
+    @Import.onWeb('package:jaspr/client.dart', show: [#Document])
     import 'conflict.imports.dart';
   ''',
 };
@@ -86,7 +86,7 @@ final importsModuleOutput = {
 final conflictingImportsModuleOutput = {
   'site|lib/conflict.imports.json': jsonEncode([
     {
-      "url": "package:jaspr/browser.dart",
+      "url": "package:jaspr/client.dart",
       "platform": 0,
       "elements": [
         {"name": "Document", "type": 0, "details": <String>[]},
