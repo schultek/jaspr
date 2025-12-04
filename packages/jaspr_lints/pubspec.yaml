@@ -19,8 +19,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  analyzer: ^8.0.0
-  analyzer_plugin: ^0.13.4
-  custom_lint_builder: ^0.8.1
+  analysis_server_plugin: ^0.3.0
+  analyzer: '>=8.0.0 <10.0.0'
   path: ^1.9.0
   yaml: ^3.1.2

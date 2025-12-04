@@ -1,24 +1,24 @@
+import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/source/source_range.dart';
-import 'package:analyzer_plugin/utilities/change_builder/change_builder_dart.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../assist.dart';
+import '../utils.dart';
 import '../utils/imports_verifier.dart';
 
-class ImportAssistProvider extends DartAssist {
+abstract class ConvertToPlatformImport extends ResolvedCorrectionProducer {
+  ConvertToPlatformImport({required this.platform, required super.context});
+
+  final String platform;
+
   @override
-  void run(CustomLintResolver resolver, ChangeReporter reporter, CustomLintContext context, SourceRange target) {
-    context.registry.addImportDirective((node) {
-      if (!target.coveredBy(node.sourceRange)) {
-        return;
-      }
+  CorrectionApplicability get applicability => CorrectionApplicability.singleLocation;
 
-      var unit = node.parent;
-      if (unit is! CompilationUnit || unit.declaredFragment == null) return;
-
-      var fileName = resolver.source.shortName;
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    if (node case ImportDirective node) {
+      var fileName = unitResult.libraryFragment.source.shortName;
       if (fileName.endsWith('.dart')) fileName = fileName.substring(0, fileName.length - 5);
 
       ImportDirective? importTarget = unit.directives
@@ -38,31 +38,38 @@ class ImportAssistProvider extends DartAssist {
 
       var show = elements.map((e) => '#${e.name}').join(', ');
 
-      void convertImport(String name) {
-        reporter
-            .createChangeBuilder(message: 'Convert to ${name.toLowerCase()}-only import', priority: 1)
-            .addDartFileEdit((builder) {
-              var annotation = '@Import.on$name(\'${node.uri.stringValue}\', show: [$show])\n';
+      await builder.addDartFileEdit(file, (builder) {
+        var annotation = '@Import.on$platform(\'${node.uri.stringValue}\', show: [$show])\n';
 
-              if (importTarget != null) {
-                builder.addSimpleInsertion(importTarget.importKeyword.offset, annotation);
-              } else {
-                builder.addSimpleInsertion(
-                  unit.directives.lastOrNull?.end ?? 0,
-                  '\n${annotation}import \'$fileName.imports.dart\';',
-                );
-              }
+        if (importTarget != null) {
+          builder.addSimpleInsertion(importTarget.importKeyword.offset, annotation);
+        } else {
+          builder.addSimpleInsertion(
+            unit.directives.lastOrNull?.end ?? 0,
+            '\n${annotation}import \'$fileName.imports.dart\';',
+          );
+        }
 
-              unit.accept(ReplaceStubbedTypesVisitor(builder, elements));
+        unit.accept(ReplaceStubbedTypesVisitor(builder, elements));
 
-              builder.addDeletion(node.sourceRange);
-            });
-      }
-
-      convertImport('Web');
-      convertImport('Server');
-    });
+        builder.addDeletion(node.sourceRange);
+      });
+    }
   }
+}
+
+class ConvertToWebImport extends ConvertToPlatformImport {
+  ConvertToWebImport({required super.context}) : super(platform: 'Web');
+
+  @override
+  AssistKind get assistKind => JasprAssistKind.convertToWebImport;
+}
+
+class ConvertToServerImport extends ConvertToPlatformImport {
+  ConvertToServerImport({required super.context}) : super(platform: 'Server');
+
+  @override
+  AssistKind get assistKind => JasprAssistKind.convertToServerImport;
 }
 
 class ReplaceStubbedTypesVisitor extends RecursiveAstVisitor<void> {

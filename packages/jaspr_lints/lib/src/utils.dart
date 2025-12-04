@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:io';
 
 import 'package:analyzer/dart/ast/ast.dart';
@@ -6,8 +8,17 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/type_visitor.dart';
 import 'package:analyzer/source/line_info.dart';
+import 'package:analyzer/source/source_range.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
+
+export 'package:analysis_server_plugin/edit/dart/dart_fix_kind_priority.dart';
+export 'package:analyzer/error/error.dart';
+export 'package:analyzer_plugin/utilities/assist/assist.dart';
+export 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
+export 'package:analyzer_plugin/utilities/change_builder/change_builder_dart.dart';
+export 'package:analyzer_plugin/utilities/fixes/fixes.dart';
+export 'package:analyzer_plugin/utilities/range_factory.dart';
 
 bool isComponentType(DartType? type) {
   return type != null && type.accept(IsComponentVisitor());
@@ -18,7 +29,7 @@ bool isStylesType(DartType? type) {
   var name = type.element.name;
   var lib = type.element.library;
 
-  return lib.identifier == 'package:jaspr/src/foundation/styles/styles.dart' && name == 'Styles';
+  return lib.identifier == 'package:jaspr/src/dom/styles/styles.dart' && name == 'Styles';
 }
 
 bool isComponentListType(DartType? type) {
@@ -106,4 +117,12 @@ YamlMap? readJasprConfig(String filePath) {
     segments.removeLast();
   }
   return null;
+}
+
+extension AstSourceRange on AstNode {
+  SourceRange get sourceRange => SourceRange(offset, length);
+}
+
+extension TokenSourceRange on Token {
+  SourceRange get sourceRange => SourceRange(offset, length);
 }

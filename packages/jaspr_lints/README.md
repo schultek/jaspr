@@ -24,16 +24,14 @@ This package provides lints and code assists for Jaspr projects.
 
 ## Setup:
 
-* Add `jaspr_lints` as dev dependency:
-```shell
-dart pub add jaspr_lints --dev
-```
-
-* Add the following to your `analysis_options.yaml` file:
+* Add `jaspr_lints` as a plugin to your `analysis_options.yaml` file:
 ```yaml
-analyzer:
-  plugins:
-    - custom_lint
+plugins:
+  jaspr_lints:
+    diagnostics:
+      sort_children_last: true
+      prefer_html_components: true
+      styles_ordering: true
 ```
 
 After running `dart pub get` you now see additional Jaspr lints 
