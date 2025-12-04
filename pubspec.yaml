@@ -48,7 +48,7 @@ melos:
       steps:
         - melos exec --ignore=jaspr_cli -- "dart format . --set-exit-if-changed"
         - melos exec --scope=jaspr_cli -- "dart format lib --set-exit-if-changed"
-    analyze: melos exec -- "dart analyze . --fatal-infos"
+    analyze: melos exec -- "dart analyze . --fatal-infos --no-use-aot-snapshot"
     test:
       run: dart test --exclude-tags=cli
       exec:
