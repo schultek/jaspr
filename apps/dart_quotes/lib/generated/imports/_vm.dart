@@ -13,6 +13,6 @@ export 'package:dart_firebase_admin/dart_firebase_admin.dart'
     show FirebaseAdminApp, Credential;
 export 'package:dart_firebase_admin/firestore.dart' show Firestore;
 
-typedef FirebaseAdminAppOrStubbed = FirebaseAdminApp;
 typedef CredentialOrStubbed = Credential;
+typedef FirebaseAdminAppOrStubbed = FirebaseAdminApp;
 typedef FirestoreOrStubbed = Firestore;

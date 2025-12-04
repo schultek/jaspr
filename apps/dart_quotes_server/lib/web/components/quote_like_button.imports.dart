@@ -7,16 +7,16 @@
 export '../../generated/imports/_web.dart'
     if (dart.library.io) '../../generated/imports/_stubs.dart'
     show
+        JSConfetti,
+        JSConfettiOrStubbed,
         StreamingConnectionHandler,
         StreamingConnectionHandlerOrStubbed,
         Client,
         ClientOrStubbed,
         QuoteInit,
         QuoteInitOrStubbed,
+        signInWithGoogle,
         FlutterAuthenticationKeyManager,
         FlutterAuthenticationKeyManagerOrStubbed,
         SessionManager,
-        SessionManagerOrStubbed,
-        JSConfetti,
-        JSConfettiOrStubbed,
-        signInWithGoogle;
+        SessionManagerOrStubbed;
