@@ -66,7 +66,15 @@ class ScopesDomain extends Domain {
       }
 
       final serverEntrypoints = serverEntrypointGlob.listSync(root: folder);
+      if (serverEntrypoints.isEmpty) {
+        logger.write('No server entrypoints found in $folder.');
+        continue;
+      }
       entryPaths.addAll(serverEntrypoints.map((e) => e.path));
+    }
+
+    if (entryPaths.isEmpty) {
+      return;
     }
 
     _collection = AnalysisContextCollection(
@@ -113,6 +121,9 @@ class ScopesDomain extends Domain {
     final rootPath = context.contextRoot.root.path;
 
     final targets = entryPaths.where((e) => e.startsWith(rootPath)).toList();
+    if (targets.isEmpty) {
+      return;
+    }
 
     try {
       if (awaitPendingChanges) {
