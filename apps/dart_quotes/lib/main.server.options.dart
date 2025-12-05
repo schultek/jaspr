@@ -5,11 +5,11 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/server.dart';
-import 'package:dart_quotes_server/web/components/quote_like_button.dart'
+import 'package:dart_quotes/components/quote_like_button.dart'
     as _quote_like_button;
-import 'package:dart_quotes_server/web/pages/home_page.dart' as _home_page;
-import 'package:dart_quotes_server/web/pages/quote_page.dart' as _quote_page;
-import 'package:dart_quotes_server/web/app.dart' as _app;
+import 'package:dart_quotes/pages/home_page.dart' as _home_page;
+import 'package:dart_quotes/pages/quote_page.dart' as _quote_page;
+import 'package:dart_quotes/app.dart' as _app;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -17,7 +17,7 @@ import 'package:dart_quotes_server/web/app.dart' as _app;
 ///
 /// Example:
 /// ```dart
-/// import 'main.server.g.dart';
+/// import 'main.server.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(
@@ -37,7 +37,7 @@ ServerOptions get defaultServerOptions => ServerOptions(
         ),
   },
   styles: () => [
-    ..._quote_like_button.QuoteLikeButtonState.styles,
+    ..._quote_like_button.QuoteLikeButton.styles,
     ..._home_page.HomePage.styles,
     ..._quote_page.QuotePage.styles,
     ..._app.App.styles,

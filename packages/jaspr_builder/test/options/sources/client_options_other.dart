@@ -12,7 +12,7 @@ final clientOptionsOtherSources = {
 };
 
 final clientOptionsOtherOutputs = {
-  'site|lib/other.client.g.dart':
+  'site|lib/other.client.options.dart':
       '// dart format off\n'
       '// ignore_for_file: type=lint\n'
       '\n'
@@ -35,7 +35,7 @@ final clientOptionsOtherOutputs = {
       '///\n'
       '/// Example:\n'
       '/// ```dart\n'
-      '/// import \'other.client.g.dart\';\n'
+      '/// import \'other.client.options.dart\';\n'
       '///\n'
       '/// void main() {\n'
       '///   Jaspr.initializeApp(\n'

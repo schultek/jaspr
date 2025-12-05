@@ -7,7 +7,7 @@ builders:
     builder_factories: [ "buildServerOptions" ]
     build_extensions:
       "lib/{{file}}.server.dart":
-        - "lib/{{file}}.server.g.dart"
+        - "lib/{{file}}.server.options.dart"
     auto_apply: root_package
     build_to: source
     required_inputs:
@@ -20,7 +20,7 @@ builders:
     builder_factories: [ "buildClientOptions" ]
     build_extensions:
       "lib/{{file}}.client.dart":
-        - "lib/{{file}}.client.g.dart"
+        - "lib/{{file}}.client.options.dart"
     auto_apply: root_package
     build_to: source
     required_inputs:

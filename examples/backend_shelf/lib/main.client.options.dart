@@ -6,8 +6,8 @@
 
 import 'package:jaspr/client.dart';
 
-import 'package:dart_quotes_server/web/components/quote_like_button.dart'
-    deferred as _quote_like_button;
+import 'package:backend_shelf/components/app.dart' deferred as _app;
+import 'package:backend_shelf/components/hello.dart' deferred as _hello;
 
 /// Default [ClientOptions] for use with your Jaspr project.
 ///
@@ -15,7 +15,7 @@ import 'package:dart_quotes_server/web/components/quote_like_button.dart'
 ///
 /// Example:
 /// ```dart
-/// import 'main.client.g.dart';
+/// import 'main.client.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(
@@ -27,12 +27,7 @@ import 'package:dart_quotes_server/web/components/quote_like_button.dart'
 /// ```
 ClientOptions get defaultClientOptions => ClientOptions(
   clients: {
-    'quote_like_button': ClientLoader(
-      (p) => _quote_like_button.QuoteLikeButton(
-        id: p['id'],
-        initialCount: p['initialCount'],
-      ),
-      loader: _quote_like_button.loadLibrary,
-    ),
+    'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary),
+    'hello': ClientLoader((p) => _hello.Hello(), loader: _hello.loadLibrary),
   },
 );

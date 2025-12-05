@@ -7,10 +7,8 @@
 export '../generated/imports/_web.dart'
     if (dart.library.io) '../generated/imports/_stubs.dart'
     show
-        Firebase,
-        FirebaseOrStubbed,
-        FirebaseApp,
-        FirebaseAppOrStubbed,
+        DefaultFirebaseOptions,
+        DefaultFirebaseOptionsOrStubbed,
         FirebaseFirestore,
         FirebaseFirestoreOrStubbed,
         FieldValue,
@@ -19,8 +17,10 @@ export '../generated/imports/_web.dart'
         DocumentSnapshotOrStubbed,
         FirebaseAuth,
         FirebaseAuthOrStubbed,
-        DefaultFirebaseOptions,
-        DefaultFirebaseOptionsOrStubbed;
+        Firebase,
+        FirebaseOrStubbed,
+        FirebaseApp,
+        FirebaseAppOrStubbed;
 
 export '../generated/imports/_vm.dart'
     if (dart.library.js_interop) '../generated/imports/_stubs.dart'

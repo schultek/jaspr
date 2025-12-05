@@ -52,7 +52,7 @@ The project can now contain separate entrypoints for server and client environme
 - `<file>.server.dart` (in server and static mode)
 - `<file>.client.dart` (in all modes)
 
-The generated global options fil (previously `jaspr_options.dart`) is now generated as `<file>.server.g.dart` alongside the entrypoint, and an additional `<file>.client.g.dart` is generated for client-side code.
+The generated global options file (previously `jaspr_options.dart`) is now generated as `<file>.server.options.dart` alongside the entrypoint, and an additional `<file>.client.options.dart` is generated for client-side code.
 
 <Info>
 All needed changes can be automatically applied using the `jaspr migrate` command.
@@ -67,7 +67,7 @@ The default `main.client.dart` file should look like this:
 import 'package:jaspr/client.dart';
 
 // Generated options file.
-import 'main.client.g.dart';
+import 'main.client.options.dart';
 
 void main() {
   Jaspr.initializeApp(
@@ -87,7 +87,7 @@ Futher, the new `ClientApp` component may be wrapped with other (Inherited) comp
 
 ### Flutter Plugin Support
 
-Jaspr supports using Flutter web plugins through the `jaspr_web_compilers` package. Part of the required setup logic related to plugins has now moved into the `.client.g.dart` file. To continue using plugins, make sure to use the latest version of `jaspr_web_compilers` together with the new entrypoint system.
+Jaspr supports using Flutter web plugins through the `jaspr_web_compilers` package. Part of the required setup logic related to plugins has now moved into the `.client.options.dart` file. To continue using plugins, make sure to use the latest version of `jaspr_web_compilers` together with the new entrypoint system.
 
 ### Changed `browser` library to `client`
 

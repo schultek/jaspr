@@ -6,8 +6,7 @@
 
 import 'package:jaspr/client.dart';
 
-import 'package:backend_shelf/components/app.dart' deferred as _app;
-import 'package:backend_shelf/components/hello.dart' deferred as _hello;
+import 'package:example_server/components/counter.dart' deferred as _counter;
 
 /// Default [ClientOptions] for use with your Jaspr project.
 ///
@@ -15,7 +14,7 @@ import 'package:backend_shelf/components/hello.dart' deferred as _hello;
 ///
 /// Example:
 /// ```dart
-/// import 'main.client.g.dart';
+/// import 'main.client.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(
@@ -27,7 +26,9 @@ import 'package:backend_shelf/components/hello.dart' deferred as _hello;
 /// ```
 ClientOptions get defaultClientOptions => ClientOptions(
   clients: {
-    'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary),
-    'hello': ClientLoader((p) => _hello.Hello(), loader: _hello.loadLibrary),
+    'counter': ClientLoader(
+      (p) => _counter.Counter(),
+      loader: _counter.loadLibrary,
+    ),
   },
 );

@@ -6,16 +6,16 @@
 
 // ignore_for_file: directives_ordering, non_constant_identifier_names
 
+dynamic JSConfetti;
+typedef JSConfettiOrStubbed = dynamic;
 dynamic StreamingConnectionHandler;
 typedef StreamingConnectionHandlerOrStubbed = dynamic;
 dynamic Client;
 typedef ClientOrStubbed = dynamic;
 dynamic QuoteInit;
 typedef QuoteInitOrStubbed = dynamic;
+dynamic signInWithGoogle;
 dynamic FlutterAuthenticationKeyManager;
 typedef FlutterAuthenticationKeyManagerOrStubbed = dynamic;
 dynamic SessionManager;
 typedef SessionManagerOrStubbed = dynamic;
-dynamic JSConfetti;
-typedef JSConfettiOrStubbed = dynamic;
-dynamic signInWithGoogle;

@@ -5,6 +5,7 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/server.dart';
+import 'package:example_server/components/counter.dart' as _counter;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -12,7 +13,7 @@ import 'package:jaspr/server.dart';
 ///
 /// Example:
 /// ```dart
-/// import 'counter.server.g.dart';
+/// import 'main.server.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(
@@ -22,4 +23,7 @@ import 'package:jaspr/server.dart';
 ///   runApp(...);
 /// }
 /// ```
-ServerOptions get defaultServerOptions => ServerOptions();
+ServerOptions get defaultServerOptions => ServerOptions(
+  clientId: 'main.client.dart.js',
+  clients: {_counter.Counter: ClientTarget<_counter.Counter>('counter')},
+);

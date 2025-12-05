@@ -2,7 +2,7 @@ import 'package:jaspr/server.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 
-import 'main.server.g.dart';
+import 'main.server.options.dart';
 import 'src/generated/endpoints.dart';
 import 'src/generated/protocol.dart';
 import 'src/routes/root.dart';

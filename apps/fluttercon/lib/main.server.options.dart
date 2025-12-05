@@ -21,7 +21,7 @@ import 'package:fluttercon/pages/session.dart' as _pages_session;
 ///
 /// Example:
 /// ```dart
-/// import 'main.server.g.dart';
+/// import 'main.server.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

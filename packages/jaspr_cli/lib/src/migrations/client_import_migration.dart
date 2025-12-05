@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:file/file.dart';
 import 'package:io/ansi.dart';
 
 import 'migration_models.dart';
@@ -21,7 +20,7 @@ class ClientImportMigration implements Migration {
   }
 
   @override
-  void runForUnit(MigrationContext context) {
+  void runForUnit(MigrationUnitContext context) {
     final browserImport = context.unit.directives
         .whereType<ImportDirective>()
         .where((d) => d.uri.stringValue == 'package:jaspr/browser.dart')
@@ -75,7 +74,7 @@ class ClientImportMigration implements Migration {
   }
 
   @override
-  List<MigrationResult> runForDirectory(Directory dir, bool apply) {
+  List<MigrationResult> runForDirectory(MigrationContext context) {
     return [];
   }
 }

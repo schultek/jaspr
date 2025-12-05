@@ -8,11 +8,10 @@ import 'package:jaspr/client.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:cloud_firestore_web/cloud_firestore_web.dart'
     as _cloud_firestore_web;
+import 'package:dart_quotes/components/quote_like_button.dart'
+    deferred as _quote_like_button;
 import 'package:firebase_auth_web/firebase_auth_web.dart' as _firebase_auth_web;
 import 'package:firebase_core_web/firebase_core_web.dart' as _firebase_core_web;
-import 'package:flutter_plugin_interop/components/app.dart' deferred as _app;
-import 'package:shared_preferences_web/shared_preferences_web.dart'
-    as _shared_preferences_web;
 
 /// Default [ClientOptions] for use with your Jaspr project.
 ///
@@ -20,7 +19,7 @@ import 'package:shared_preferences_web/shared_preferences_web.dart'
 ///
 /// Example:
 /// ```dart
-/// import 'main.client.g.dart';
+/// import 'main.client.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(
@@ -33,11 +32,18 @@ import 'package:shared_preferences_web/shared_preferences_web.dart'
 ClientOptions get defaultClientOptions => ClientOptions(
   initialize: () {
     final Registrar registrar = webPluginRegistrar;
-    _shared_preferences_web.SharedPreferencesPlugin.registerWith(registrar);
     _firebase_core_web.FirebaseCoreWeb.registerWith(registrar);
     _firebase_auth_web.FirebaseAuthWeb.registerWith(registrar);
     _cloud_firestore_web.FirebaseFirestoreWeb.registerWith(registrar);
     registrar.registerMessageHandler();
   },
-  clients: {'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary)},
+  clients: {
+    'quote_like_button': ClientLoader(
+      (p) => _quote_like_button.QuoteLikeButton(
+        id: p['id'],
+        initialCount: p['initialCount'],
+      ),
+      loader: _quote_like_button.loadLibrary,
+    ),
+  },
 );

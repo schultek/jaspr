@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:file/file.dart';
 import 'package:io/ansi.dart';
 
 import '../html_spec.dart';
@@ -21,7 +20,7 @@ class DomImportMigration implements Migration {
   }
 
   @override
-  void runForUnit(MigrationContext context) {
+  void runForUnit(MigrationUnitContext context) {
     final domImport = context.unit.directives
         .whereType<ImportDirective>()
         .where((d) => d.uri.stringValue == 'package:jaspr/dom.dart')
@@ -67,7 +66,7 @@ class DomImportMigration implements Migration {
   }
 
   @override
-  List<MigrationResult> runForDirectory(Directory dir, bool apply) {
+  List<MigrationResult> runForDirectory(MigrationContext context) {
     return [];
   }
 }

@@ -11,7 +11,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart' hide Response;
 import 'package:shelf/shelf.dart' as shelf;
 
-import 'utils.server.g.dart';
+import 'utils.server.options.dart';
 
 /// Wraps jasprs [serveApp] as a dart_frog middleware.
 ///

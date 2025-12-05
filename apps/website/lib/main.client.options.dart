@@ -24,7 +24,7 @@ import 'package:website/pages/home/5_community/components/sponsors_list.dart'
 ///
 /// Example:
 /// ```dart
-/// import 'main.client.g.dart';
+/// import 'main.client.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

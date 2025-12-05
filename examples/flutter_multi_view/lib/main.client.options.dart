@@ -14,7 +14,7 @@ import 'package:flutter_multi_view/app.dart' deferred as _app;
 ///
 /// Example:
 /// ```dart
-/// import 'main.client.g.dart';
+/// import 'main.client.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(

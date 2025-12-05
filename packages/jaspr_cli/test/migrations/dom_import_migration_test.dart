@@ -106,11 +106,11 @@ void main() {
       );
     });
 
-    test('adds import after platform import if jaspr import missing', () {
+    test('adds import before platform import if jaspr import missing', () {
       testUnitMigration(
         DomImportMigration(),
         input: '''
-import 'package:jaspr/browser.dart';
+import 'package:jaspr/server.dart';
 
 void main() {
   div([]);
@@ -118,7 +118,7 @@ void main() {
 ''',
         expectedOutput: '''
 import 'package:jaspr/dom.dart';
-import 'package:jaspr/browser.dart';
+import 'package:jaspr/server.dart';
 
 void main() {
   div([]);

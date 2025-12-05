@@ -5,8 +5,8 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/server.dart';
-import 'package:package_riverpod/components/app.dart' as _app;
-import 'package:package_riverpod/main.server.dart' as _main$server;
+import 'package:backend_dart_frog/components/counter.dart' as _counter;
+import 'package:backend_dart_frog/components/hello.dart' as _hello;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -14,7 +14,7 @@ import 'package:package_riverpod/main.server.dart' as _main$server;
 ///
 /// Example:
 /// ```dart
-/// import 'main.server.g.dart';
+/// import 'utils.server.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(
@@ -25,7 +25,10 @@ import 'package:package_riverpod/main.server.dart' as _main$server;
 /// }
 /// ```
 ServerOptions get defaultServerOptions => ServerOptions(
-  clientId: 'main.client.dart.js',
-  clients: {_app.App: ClientTarget<_app.App>('app')},
-  styles: () => [..._main$server.styles],
+  clients: {
+    _counter.Counter: ClientTarget<_counter.Counter>('counter'),
+    _hello.Hello: ClientTarget<_hello.Hello>('hello', params: __helloHello),
+  },
 );
+
+Map<String, Object?> __helloHello(_hello.Hello c) => {'name': c.name};

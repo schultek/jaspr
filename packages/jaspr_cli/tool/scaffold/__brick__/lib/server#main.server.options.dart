@@ -5,7 +5,6 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/server.dart';
-import 'package:flutter_plugin_interop/components/app.dart' as _app;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -13,7 +12,7 @@ import 'package:flutter_plugin_interop/components/app.dart' as _app;
 ///
 /// Example:
 /// ```dart
-/// import 'main.server.g.dart';
+/// import 'main.server.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(
@@ -23,7 +22,4 @@ import 'package:flutter_plugin_interop/components/app.dart' as _app;
 ///   runApp(...);
 /// }
 /// ```
-ServerOptions get defaultServerOptions => ServerOptions(
-  clientId: 'main.client.dart.js',
-  clients: {_app.App: ClientTarget<_app.App>('app')},
-);
+ServerOptions get defaultServerOptions => ServerOptions();
