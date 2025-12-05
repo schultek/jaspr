@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
@@ -99,3 +100,45 @@ Future<void> copyFiles(String from, String to, [List<String> targets = const [''
 
   await moves.wait;
 }
+
+final flutterInfo = (() {
+  var result = Process.runSync(
+    'flutter',
+    ['doctor', '--version', '--machine'],
+    stdoutEncoding: utf8,
+    runInShell: true,
+  );
+  if (result.exitCode < 0) {
+    throw UnsupportedError(
+      'Calling "flutter doctor" resulted in: "${result.stderr}". '
+      'Make sure flutter is installed and setup correctly.',
+    );
+  }
+  final Map<String, Object?> output;
+  try {
+    output = jsonDecode(result.stdout as String) as Map<String, Object?>;
+  } catch (e) {
+    throw UnsupportedError(
+      'Could not find flutter web sdk. '
+      'Calling "flutter doctor" resulted in: "${result.stdout}". '
+      'Make sure flutter is installed and setup correctly. '
+      'If you think this is a bug, open an issue at https://github.com/schultek/jaspr/issues',
+    );
+  }
+  return output;
+})();
+final webSdkDir = (() {
+  var webSdkPath = p.join(flutterInfo['flutterRoot'] as String, 'bin', 'cache', 'flutter_web_sdk');
+  if (!Directory(webSdkPath).existsSync()) {
+    Process.runSync('flutter', ['precache', '--web'], runInShell: true);
+  }
+  if (!Directory(webSdkPath).existsSync()) {
+    throw UnsupportedError(
+      'Could not find flutter web sdk in $webSdkPath. '
+      'Make sure flutter is installed and setup correctly. '
+      'If you think this is a bug, open an issue at https://github.com/schultek/jaspr/issues',
+    );
+  }
+  return webSdkPath;
+})();
+final flutterVersion = flutterInfo['flutterVersion'] as String;

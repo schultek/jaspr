@@ -89,6 +89,16 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       negatable: true,
       defaultsTo: true,
     );
+
+    argParser.addFlag(
+      'use-flutter-sdk',
+      help:
+          'Use the installed Flutter SDK to compile the app. This enables support for using '
+          'Flutter web plugins and Flutter embedding.\n'
+          'This is automatically enabled when depending on flutter in pubspec.yaml.',
+      negatable: false,
+      defaultsTo: false,
+    );
     addDartDefineArgs();
   }
 
@@ -107,6 +117,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final sitemapDomain = argResults!.option('sitemap-domain');
   late final sitemapExclude = argResults!.option('sitemap-exclude');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
+  late final useFlutterSdk = argResults!.flag('use-flutter-sdk');
 
   @override
   Future<int> runCommand() async {
@@ -399,8 +410,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     logger.write('Building web assets...', progress: ProgressState.running);
 
     final compiler = useWasm ? 'dart2wasm' : 'dart2js';
-    final builders = '${project.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
-    final entrypointBuilder = '$builders:entrypoint';
 
     var dartDefines = getClientDartDefines();
     if (project.usesFlutter) {
@@ -414,20 +423,44 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         ...argResults!.multiOption('extra-wasm-compiler-option')
       else
         ...argResults!.multiOption('extra-js-compiler-option'),
+      if (useWasm && (useFlutterSdk || project.usesFlutter))
+        '--extra-compiler-option=--platform=${p.join(webSdkDir, 'kernel', 'dart2wasm_platform.dill')}',
+
       for (final entry in dartDefines.entries) //
         '-D${entry.key}=${entry.value}',
     ];
+
+    List<String> additionalFlutterBuildArgs() {
+      final librariesPath = p.join(webSdkDir, 'libraries.json');
+      final sdkJsPath = p.join(
+        webSdkDir,
+        'kernel',
+        flutterVersion.compareTo('3.32.0') >= 0 ? 'amd-canvaskit' : 'amd-canvaskit-sound',
+      );
+      return [
+        '--define=build_web_compilers:entrypoint=use-ui-libraries=true',
+        '--define=build_web_compilers:entrypoint_marker=use-ui-libraries=true',
+        '--define=build_web_compilers:ddc=use-ui-libraries=true',
+        '--define=build_web_compilers:ddc_modules=use-ui-libraries=true',
+        '--define=build_web_compilers:dart2js_modules=use-ui-libraries=true',
+        '--define=build_web_compilers:dart2wasm_modules=use-ui-libraries=true',
+        '--define=build_web_compilers:entrypoint=libraries_path="$librariesPath"',
+        '--define=build_web_compilers:entrypoint=silence_unsupported_modules_warnings=true',
+        '--define=build_web_compilers:sdk_js=use-prebuilt-sdk-from-path="$sdkJsPath"',
+      ];
+    }
 
     final client = await d.connectClient(Directory.current.path, [
       '--release',
       '--verbose',
       '--delete-conflicting-outputs',
       if (managedBuildOptions) ...[
-        '--define=$entrypointBuilder=compiler=$compiler',
-        '--define=$entrypointBuilder=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',
+        '--define=build_web_compilers:entrypoint=compiler=$compiler',
+        '--define=build_web_compilers:entrypoint=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',
+        if (useFlutterSdk || project.usesFlutter) ...additionalFlutterBuildArgs(),
         if (includeSourceMaps) ...[
-          '--define=$builders:dart2js_archive_extractor=filter_outputs=false',
-          '--define=$builders:dart_source_cleanup=enabled=false',
+          '--define=build_web_compilers:dart2js_archive_extractor=filter_outputs=false',
+          '--define=build_web_compilers:dart_source_cleanup=enabled=false',
         ],
       ],
     ], logger.writeServerLog);

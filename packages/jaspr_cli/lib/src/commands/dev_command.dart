@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/src/loaders/strategy.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
 
 import '../config.dart';
 import '../dev/chrome.dart';
@@ -22,7 +23,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'input',
       abbr: 'i',
       help:
-          'Specify the entry file for the server app. Must end in ".server.dart".\nDefaults to the first found "*.server.dart" file in the project.',
+          'Specify the entry file for the server app. Must end in ".server.dart".\n'
+          'Defaults to the first found "*.server.dart" file in the project.',
     );
     argParser.addOption(
       'mode',
@@ -52,6 +54,15 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       defaultsTo: true,
     );
     argParser.addFlag(
+      'use-flutter-sdk',
+      help:
+          'Use the installed Flutter SDK to compile the app. This enables support for using '
+          'Flutter web plugins and Flutter embedding.\n'
+          'This is automatically enabled when depending on flutter in pubspec.yaml.',
+      negatable: false,
+      defaultsTo: false,
+    );
+    argParser.addFlag(
       'skip-server',
       help:
           'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable.',
@@ -71,6 +82,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final port = argResults!.option('port') ?? project.port ?? '8080';
   late final useWasm = argResults!.flag('experimental-wasm');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
+  late final useFlutterSdk = argResults!.flag('use-flutter-sdk');
   late final skipServer = argResults!.flag('skip-server');
 
   bool get launchInChrome;
@@ -276,7 +288,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       autoRun: autoRun,
     );
 
-    var package = '${project.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
     var compiler = useWasm
         ? 'dart2wasm'
         : release
@@ -288,19 +299,59 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       dartDefines.addAll(getFlutterDartDefines(useWasm, release));
     }
 
-    var dartdevcDefines = dartDefines.entries.map((e) => ',"${e.key}":"${e.value}"').join();
-    var dart2jsDefines = dartDefines.entries.map((e) => ',"-D${e.key}=${e.value}"').join();
+    final ddcDefines = [
+      '"jaspr.flags.verbose":$debug',
+      for (final e in dartDefines.entries) '"${e.key}":"${e.value}"',
+    ].join(',');
+
+    final dart2jsDefines = [
+      '"-Djaspr.flags.release=$release"',
+      if (!release) '"--enable-asserts"',
+      if (useWasm && (useFlutterSdk || project.usesFlutter))
+        '"--extra-compiler-option=--platform=${p.join(webSdkDir, 'kernel', 'dart2wasm_platform.dill')}"',
+      for (final e in dartDefines.entries) '"-D${e.key}=${e.value}"',
+    ].join(',');
+
+    List<String> additionalFlutterBuildArgs() {
+      final sdkKernelPath = p.url.join(
+        'kernel',
+        flutterVersion.compareTo('3.32.0') >= 0 ? 'ddc_outline.dill' : 'ddc_outline_sound.dill',
+      );
+      final librariesPath = p.join(webSdkDir, 'libraries.json');
+      final sdkJsPath = p.join(
+        webSdkDir,
+        'kernel',
+        flutterVersion.compareTo('3.32.0') >= 0 ? 'amd-canvaskit' : 'amd-canvaskit-sound',
+      );
+      return [
+        '--define=build_web_compilers:entrypoint=use-ui-libraries=true',
+        '--define=build_web_compilers:entrypoint_marker=use-ui-libraries=true',
+        '--define=build_web_compilers:ddc=use-ui-libraries=true',
+        '--define=build_web_compilers:ddc_modules=use-ui-libraries=true',
+        '--define=build_web_compilers:dart2js_modules=use-ui-libraries=true',
+        '--define=build_web_compilers:dart2wasm_modules=use-ui-libraries=true',
+        '--define=build_web_compilers:entrypoint=libraries_path="$librariesPath"',
+        '--define=build_web_compilers:entrypoint=silence_unsupported_modules_warnings=true',
+        '--define=build_web_compilers:sdk_js=use-prebuilt-sdk-from-path="$sdkJsPath"',
+        if (compiler == 'dartdevc') ...[
+          '--define=build_web_compilers:ddc=ddc-kernel-path="$sdkKernelPath"',
+          '--define=build_web_compilers:ddc=libraries-path="$librariesPath"',
+          '--define=build_web_compilers:ddc=platform-sdk="$webSdkDir"',
+        ],
+      ];
+    }
 
     final buildArgs = [
       if (release) '--release',
+      '--delete-conflicting-outputs',
       if (managedBuildOptions) ...[
-        '--define',
-        '$package:ddc=generate-full-dill=true',
-        '--delete-conflicting-outputs',
-        '--define=$package:entrypoint=compiler=$compiler',
-        if (compiler == 'dartdevc') '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug$dartdevcDefines}',
-        if (compiler != 'dartdevc')
-          '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"$dart2jsDefines${!release ? ',"--enable-asserts"' : ''}]',
+        '--define=build_web_compilers:ddc=generate-full-dill=true',
+        '--define=build_web_compilers:entrypoint=compiler=$compiler',
+        switch (compiler) {
+          'dartdevc' => '--define=build_web_compilers:ddc=environment={$ddcDefines}',
+          _ => '--define=build_web_compilers:entrypoint=${compiler}_args=[$dart2jsDefines]',
+        },
+        if (useFlutterSdk || project.usesFlutter) ...additionalFlutterBuildArgs(),
       ],
     ];
 
