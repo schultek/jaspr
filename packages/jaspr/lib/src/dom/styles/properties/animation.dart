@@ -141,7 +141,7 @@ enum AnimationFillMode {
 
 /// The `animation-play-state` CSS property sets whether an animation is running or paused.
 ///
-/// Read more: [MDN `animation-play-state`](https://developer.mozilla.org/en-US
+/// Read more: [MDN `animation-play-state`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/animation-play-state)
 enum AnimationPlayState {
   /// The animation is currently playing.
   running('running'),
