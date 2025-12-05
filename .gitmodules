@@ -1,6 +1,3 @@
 [submodule "benchmarks"]
 	path = benchmarks
 	url = https://github.com/schultek/jaspr-benchmarks.git
-[submodule "modules/build"]
-	path = modules/build
-	url = https://github.com/schultek/build.git
