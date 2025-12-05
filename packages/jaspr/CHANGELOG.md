@@ -1,4 +1,4 @@
-## Unreleased 0.22.0-beta.1
+## 0.22.0-beta.1
 
 - Changed build extensions to use `.options.dart` instead of `.g.dart`.
 
